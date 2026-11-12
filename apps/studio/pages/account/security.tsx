@@ -7,20 +7,23 @@ import {
   PageHeaderTitle,
 } from 'ui-patterns/PageHeader'
 
+import { SignInMethods } from '@/components/interfaces/Account/Preferences/SignInMethods'
+import { getPrimarySecurityAction } from '@/components/interfaces/Account/Security/Security.utils'
 import { TOTPFactors } from '@/components/interfaces/Account/TOTPFactors'
 import AccountLayout from '@/components/layouts/AccountLayout/AccountLayout'
 import { AppLayout } from '@/components/layouts/AppLayout/AppLayout'
 import { DefaultLayout } from '@/components/layouts/DefaultLayout'
-import { UnknownInterface } from '@/components/ui/UnknownInterface'
-import { useIsFeatureEnabled } from '@/hooks/misc/useIsFeatureEnabled'
+import { useAccountRecovery } from '@/hooks/misc/useAccountRecovery'
 import type { NextPageWithLayout } from '@/types'
 
 const Security: NextPageWithLayout = () => {
-  const showSecuritySettings = useIsFeatureEnabled('account:show_security_settings')
-
-  if (!showSecuritySettings) {
-    return <UnknownInterface urlBack={`/account/me`} />
-  }
+  const recovery = useAccountRecovery()
+  const primaryAction = getPrimarySecurityAction({
+    findings: recovery.findings,
+    isPending: recovery.isPending,
+    isError: recovery.isError,
+    canEnableMfa: recovery.isFactorsSuccess && recovery.verifiedFactorCount === 0,
+  })
 
   return (
     <>
@@ -29,13 +32,14 @@ const Security: NextPageWithLayout = () => {
           <PageHeaderSummary>
             <PageHeaderTitle>Security</PageHeaderTitle>
             <PageHeaderDescription>
-              Manage your account security settings and authentication methods.
+              Manage how you sign in, protect your account, and recover access.
             </PageHeaderDescription>
           </PageHeaderSummary>
         </PageHeaderMeta>
       </PageHeader>
       <PageContainer size="small">
-        <TOTPFactors />
+        <SignInMethods primaryAction={primaryAction} />
+        <TOTPFactors findings={recovery.findings} primaryAction={primaryAction} />
       </PageContainer>
     </>
   )

@@ -201,7 +201,8 @@ export const LogsQueryPanel = ({
               <Tooltip>
                 <TooltipTrigger className="flex items-start">
                   <Badge variant="warning">
-                    {warnings.length} {warnings.length > 1 ? 'warnings' : 'warning'}
+                    {warnings.length}{' '}
+                    {warnings.length > 1 ? <span>warnings</span> : <span>warning</span>}
                   </Badge>
                   <TooltipContent className="p-0 divide-y max-w-xs" side="bottom">
                     {warnings.map((warning, index) => (

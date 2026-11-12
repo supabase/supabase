@@ -1,6 +1,5 @@
 import { useParams } from 'common'
 
-import { crossesCollationLineageBoundary } from './CollationLineage.utils'
 import { useProjectUpgradeEligibilityQuery } from '@/data/config/project-upgrade-eligibility-query'
 import { useOverdueInvoicesQuery } from '@/data/invoices/invoices-overdue-query'
 import {
@@ -61,12 +60,9 @@ export const useCheckEligibilityDeployReplica = () => {
 
   const upgradeEligibilityQuery = useProjectUpgradeEligibilityQuery({ projectRef })
   const upgradeEligibility = upgradeEligibilityQuery.data
-  const isCollationLineageCrossed =
-    upgradeEligibility !== undefined &&
-    crossesCollationLineageBoundary({
-      sourceVersion: upgradeEligibility.current_app_version,
-      targetVersions: upgradeEligibility.target_upgrade_versions.map((x) => x.app_version),
-    })
+  const isCollationLineageCrossed = (upgradeEligibility?.warnings ?? []).some(
+    (warning) => warning.type === 'collation_reindex_required'
+  )
 
   const queries = [overdueInvoicesQuery, replicasQuery, addonsQuery, upgradeEligibilityQuery]
   const isLoading = queries.some((query) => query.isLoading)

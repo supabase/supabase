@@ -7,6 +7,7 @@ import {
   isCancellationRejection,
   isChallengeExpiredError,
   isUserAbortedOperation,
+  shouldDropForSampleRate,
 } from './sentry-client-options'
 
 describe('Sentry beforeSend filtering functions', () => {
@@ -343,6 +344,26 @@ describe('Sentry beforeSend filtering functions', () => {
   })
 })
 
+describe('shouldDropForSampleRate', () => {
+  it('keeps events without a sample_rate tag', () => {
+    expect(shouldDropForSampleRate({}, () => 0.99)).toBe(false)
+  })
+
+  it('keeps events with rate 1', () => {
+    expect(shouldDropForSampleRate({ tags: { sample_rate: 1 } }, () => 0.99)).toBe(false)
+  })
+
+  it('keeps or drops sampled events depending on the random draw', () => {
+    const event = { tags: { sample_rate: 0.1 } }
+    expect(shouldDropForSampleRate(event, () => 0.05)).toBe(false)
+    expect(shouldDropForSampleRate(event, () => 0.5)).toBe(true)
+  })
+
+  it('accepts numeric string rates', () => {
+    expect(shouldDropForSampleRate({ tags: { sample_rate: '0.1' } }, () => 0.5)).toBe(true)
+  })
+})
+
 describe('buildSentryClientOptions', () => {
   // Representative subset of Sentry's default integrations. `integrations`
   // is the function form: Sentry.init calls it with the defaults and installs
@@ -496,6 +517,20 @@ describe('which errors Studio sends to Sentry', () => {
 
     expect(await beforeSend(event, {})).toBeNull()
     expect(Math.random).not.toHaveBeenCalled()
+  })
+
+  it('drops user SQL errors even when something else captured them', async () => {
+    const { UserSqlError } = await import('@/lib/errors/studio-errors')
+    const event: Parameters<typeof beforeSend>[0] = {
+      type: undefined,
+      exception: {
+        values: [
+          { value: 'Failed to run sql query', stacktrace: { frames: [{ filename: 'app.js' }] } },
+        ],
+      },
+    }
+    const hint = { originalException: new UserSqlError({ message: 'Failed to run sql query' }) }
+    expect(await beforeSend(event, hint)).toBeNull()
   })
 
   it('drops errors with no code location when they did not crash the page', async () => {

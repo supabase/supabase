@@ -88,6 +88,61 @@ describe('matchRedirect moved Studio routes', () => {
     })
   })
 
+  it.each(['security', 'performance', 'health'])(
+    'leaves %s advisors to the flag-aware page',
+    (category) => {
+      for (const isPlatform of [true, false]) {
+        expect(
+          matchRedirect({
+            pathname: `/project/${ref}/advisors/${category}`,
+            search: { severity: 'critical' },
+            isPlatform,
+          })
+        ).toBeNull()
+      }
+    }
+  )
+
+  it.each([
+    ['database/security-advisor', 'security'],
+    ['database/performance-advisor', 'performance'],
+    ['database/linter', 'security'],
+  ])('preserves legacy finding links from %s', (path, category) => {
+    for (const isPlatform of [true, false]) {
+      expect(
+        matchRedirect({
+          pathname: `/project/${ref}/${path}`,
+          search: { id: 'opaque-key', preset: 'WARN' },
+          hash: 'finding',
+          isPlatform,
+        })
+      ).toEqual({
+        destination: `/project/${ref}/advisors/${category}?id=opaque-key&preset=WARN#finding`,
+        permanent: true,
+      })
+    }
+  })
+
+  it('redirects the advisor root while leaving check settings and Issues alone', () => {
+    expect(
+      matchRedirect({ pathname: `/project/${ref}/advisors`, search: {}, isPlatform: true })
+    ).toEqual({ destination: `/project/${ref}/advisors/security`, permanent: true })
+    expect(
+      matchRedirect({
+        pathname: `/project/${ref}/advisors/rules/security`,
+        search: {},
+        isPlatform: true,
+      })
+    ).toBeNull()
+    expect(
+      matchRedirect({
+        pathname: `/project/${ref}/issues`,
+        search: { category: 'security' },
+        isPlatform: true,
+      })
+    ).toBeNull()
+  })
+
   it('preserves the incoming query and hash', () => {
     expect(
       matchRedirect({

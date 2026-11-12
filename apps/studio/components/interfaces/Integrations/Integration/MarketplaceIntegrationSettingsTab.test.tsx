@@ -1,5 +1,6 @@
 import { PermissionAction } from '@supabase/shared-types/out/constants'
 import { fireEvent, screen, waitFor } from '@testing-library/react'
+import userEvent from '@testing-library/user-event'
 import { mockAnimationsApi } from 'jsdom-testing-mocks'
 import { HttpResponse } from 'msw'
 import { describe, expect, test, vi } from 'vitest'
@@ -12,6 +13,8 @@ import { type AuthConfigResponse } from '@/data/auth/auth-config-query'
 import { type ProjectSecret } from '@/data/secrets/secrets-query'
 import { customRender } from '@/tests/lib/custom-render'
 import { addAPIMock } from '@/tests/lib/msw'
+import { mockPermissions } from '@/tests/lib/msw-permissions'
+import { ALL_FGA_PERMISSIONS, allPermissionsFor } from '@/tests/lib/permissions-fixtures'
 
 // The OAuth-apps query overrides its return type to `AuthorizedApp`, but the wire response (and so
 // the MSW resolver) is the raw OpenAPI `OAuthAppResponse`. Build fixtures against the API shape.
@@ -103,6 +106,8 @@ const mockProjectResources = ({
   oauthApps = [] as OAuthAppResponse[],
   smtpHost = null as string | null,
 } = {}) => {
+  // The API keys query is gated on a grant
+  mockPermissions(allPermissionsFor(['acme']))
   addAPIMock({
     method: 'get',
     path: '/platform/profile/permissions',
@@ -323,6 +328,35 @@ describe('MarketplaceIntegrationSettingsTab', () => {
 
       await waitFor(() => expect(deleteRequests).toEqual([['DOPPLER_CONFIG']]))
       await waitFor(() => expect(screen.getByText('No connected resources')).toBeInTheDocument())
+    })
+
+    test('disables Remove on an API key when the user cannot delete API keys', async () => {
+      setIntegration({ secretKeyPrefix: 'custom_' })
+      mockProjectResources({ apiKeys: [secretApiKey('custom_metrics_key')] })
+      // Can list API keys but not write them. Registered last so MSW gives it priority.
+      mockPermissions({
+        organizations: [
+          {
+            slug: 'acme',
+            role: 'developer',
+            permissions: ALL_FGA_PERMISSIONS.filter((p) => p !== 'api_gateway_keys_write'),
+            projects: [],
+          },
+        ],
+      })
+      const user = userEvent.setup()
+
+      customRender(<MarketplaceIntegrationSettingsTab />)
+
+      const remove = await screen.findByRole('button', { name: 'Remove' })
+      await user.hover(remove)
+      expect(
+        (await screen.findAllByText('You need additional permissions to delete API keys')).length
+      ).toBeGreaterThan(0)
+      expect(remove).toBeAriaDisabled()
+
+      await user.click(remove)
+      expect(screen.queryByText(/Delete secret API key/)).not.toBeInTheDocument()
     })
   })
 })

@@ -95,3 +95,20 @@
   top: 2px;
   line-height: 1;
 }
+
+@media (prefers-reduced-motion: no-preference) {
+  .ask-ai-answer > *,
+  .ask-ai-answer li {
+    transition:
+      opacity 240ms ease-out,
+      filter 150ms ease-out;
+  }
+
+  @starting-style {
+    .ask-ai-answer > *,
+    .ask-ai-answer li {
+      opacity: 0;
+      filter: blur(4px);
+    }
+  }
+}

@@ -144,7 +144,7 @@ export const ArchivedFilePreviewPane = () => {
         {hasOlderVersions
           ? ' — its next most recent version becomes the one shown here'
           : ', leaving nothing left to restore'}
-        . This cannot be undone.
+        <span>. This cannot be undone.</span>
       </>
     )
   }

@@ -1,6 +1,14 @@
 import { DEFAULT_SYSTEM_SCHEMAS } from '../../../constants'
 import { escapeIlikeLiteral } from '../../../helpers'
 import { joinSqlFragments, literal, safeSql, type SafeSqlFragment } from '../../../pg-format'
+import {
+  EXTENSION_FUNCTIONS_CTE,
+  EXTENSION_RELATIONS_CTE,
+  hasTableAccess,
+  isSecurityInvokerView,
+  triggerActivation,
+  triggerEvents,
+} from './catalog-helpers'
 
 // Postgres identifiers are capped at 63 bytes, so a longer search string can
 // never match a name. Callers should skip the request entirely in that case.
@@ -11,28 +19,27 @@ export const SEARCH_ENTITIES_MAX_QUERY_LENGTH = 63
 // role can't access doesn't starve the result set.
 const CANDIDATE_LIMIT = 50
 
-// Mirrors what the table list endpoints expose: the role owns the table or has
-// some privilege on it (or one of its columns).
-const hasTableAccess = (oid: SafeSqlFragment, owner: SafeSqlFragment) => safeSql`(
-  pg_has_role(${owner}, 'USAGE')
-  or has_table_privilege(
-    ${oid},
-    'SELECT, INSERT, UPDATE, DELETE, TRUNCATE, REFERENCES, TRIGGER'
-  )
-  or has_any_column_privilege(${oid}, 'SELECT, INSERT, UPDATE, REFERENCES')
-)`
+// For things that hang off a table (policies, triggers). Name matches rank by
+// their own name. Ones pulled in through a matched table group by that table
+// first (in the table's own order), then by their own name.
+const TABLE_RELATED_ORDER = safeSql`source, rank, table_sort_length, table_sort_name, length(name), name, table_name`
 
-// Name matches rank by policy name. Policies pulled in through a matched table
-// group by that table first (in the table's own order), then by policy name.
-const POLICY_ORDER = safeSql`source, rank, table_sort_length, table_sort_name, length(name), name, table_name`
-
-export type SearchEntitiesTable = {
+type SearchEntitiesRelation = {
   id: number
   schema: string
   name: string
-  rls_enabled: boolean
-  policy_count: number
 }
+
+/**
+ * A matched relation, keyed by pg_class.relkind — every kind the table editor
+ * can open. Partitions are excluded, so 'p' is always a partition parent.
+ */
+export type SearchEntitiesTable = SearchEntitiesRelation &
+  (
+    | { type: 'r' | 'p'; rls_enabled: boolean; policy_count: number }
+    | { type: 'v'; security_invoker: boolean }
+    | { type: 'm' | 'f' }
+  )
 
 export type SearchEntitiesPolicy = {
   id: number
@@ -43,9 +50,31 @@ export type SearchEntitiesPolicy = {
   table_id: number
 }
 
+export type SearchEntitiesTrigger = {
+  id: number
+  name: string
+  activation: 'BEFORE' | 'AFTER' | 'INSTEAD OF'
+  events: Array<'INSERT' | 'UPDATE' | 'DELETE' | 'TRUNCATE'>
+  schema: string
+  table: string
+  table_id: number
+  // Set only when the trigger was found because its function matched the search
+  matched_function: string | null
+}
+
+export type SearchEntitiesFunction = {
+  id: number
+  schema: string
+  name: string
+  type: 'function' | 'procedure'
+  args: string
+}
+
 export type SearchEntitiesResult = {
   tables: SearchEntitiesTable[]
   policies: SearchEntitiesPolicy[]
+  functions: SearchEntitiesFunction[]
+  triggers: SearchEntitiesTrigger[]
 }
 
 /**
@@ -72,7 +101,7 @@ export type SearchEntitiesResult = {
  */
 export const getSearchEntitiesSql = ({
   query,
-  limit = 6,
+  limit = 5,
 }: {
   query: string
   limit?: number
@@ -81,17 +110,21 @@ export const getSearchEntitiesSql = ({
   const schemaPart = dotIndex === -1 ? undefined : query.slice(0, dotIndex)
   const namePart = dotIndex === -1 ? query : query.slice(dotIndex + 1)
 
-  const nameFilter = safeSql`c.relname ilike ${literal(`%${escapeIlikeLiteral(query)}%`)}`
-  const matchFilter =
-    schemaPart === undefined
-      ? nameFilter
-      : safeSql`(
+  // `schema.name` queries match a schema prefix and a name substring, and the
+  // full query is still matched against the name alone since names may contain dots
+  const getMatchFilter = (nameColumn: SafeSqlFragment, schemaColumn: SafeSqlFragment) => {
+    const nameFilter = safeSql`${nameColumn} ilike ${literal(`%${escapeIlikeLiteral(query)}%`)}`
+    if (schemaPart === undefined) return nameFilter
+    return safeSql`(
           ${nameFilter}
           or (
-            nc.nspname ilike ${literal(`${escapeIlikeLiteral(schemaPart)}%`)}
-            and c.relname ilike ${literal(`%${escapeIlikeLiteral(namePart)}%`)}
+            ${schemaColumn} ilike ${literal(`${escapeIlikeLiteral(schemaPart)}%`)}
+            and ${nameColumn} ilike ${literal(`%${escapeIlikeLiteral(namePart)}%`)}
           )
         )`
+  }
+  const tableMatchFilter = getMatchFilter(safeSql`c.relname`, safeSql`nc.nspname`)
+  const functionMatchFilter = getMatchFilter(safeSql`p.proname`, safeSql`n.nspname`)
 
   // Rank on the name part, so `public.colors` ranks the `colors` table first
   const prefixPattern = literal(`${escapeIlikeLiteral(namePart)}%`)
@@ -101,41 +134,66 @@ export const getSearchEntitiesSql = ({
     ', '
   )
 
+  const triggerNamePattern = literal(`%${escapeIlikeLiteral(query)}%`)
+  const triggerPrefixPattern = literal(`${escapeIlikeLiteral(query)}%`)
+  const triggerExactName = literal(query.toLowerCase())
+
   const policyNamePattern = literal(`%${escapeIlikeLiteral(query)}%`)
   const policyPrefixPattern = literal(`${escapeIlikeLiteral(query)}%`)
   const policyExactName = literal(query.toLowerCase())
 
   return safeSql`
-    with table_candidates as materialized (
+    with ${EXTENSION_RELATIONS_CTE},
+    table_candidates as materialized (
       select
         c.oid,
         c.relname,
         c.relowner,
+        c.relkind,
         c.relrowsecurity,
+        c.reloptions,
         nc.nspname,
         case
           when lower(c.relname) = ${exactName} then 0
           when c.relname ilike ${prefixPattern} then 1
           else 2
         end as rank
-      from pg_class c
+      -- offset 0 is load-bearing: inlined, the wider relkind list estimates badly
+      -- enough that the planner runs the ILIKE ahead of it, over all of pg_class.
+      from (
+        select c.oid, c.relname, c.relowner, c.relkind, c.relrowsecurity, c.reloptions,
+               c.relnamespace
+        from pg_class c
+        -- Partition children would bury the parent the user actually searched for
+        where c.relkind in ('r', 'p', 'v', 'm', 'f')
+          and not c.relispartition
+        offset 0
+      ) c
       join pg_namespace nc on nc.oid = c.relnamespace
-      where c.relkind in ('r', 'p')
-        and not c.relispartition
-        and nc.nspname not in (${excludedSchemas})
+      where nc.nspname not in (${excludedSchemas})
         and not pg_is_other_temp_schema(nc.oid)
-        and ${matchFilter}
+        and c.oid not in (select objid from extension_relations)
+        and ${tableMatchFilter}
       order by rank, length(c.relname), c.relname
       limit ${literal(CANDIDATE_LIMIT)}
     ),
     matched_tables as (
       select
         tc.oid,
+        tc.relowner,
         tc.oid::int8 as id,
         tc.nspname as schema,
         tc.relname as name,
+        tc.relkind::text as type,
         tc.relrowsecurity as rls_enabled,
-        (select count(*) from pg_policy pol where pol.polrelid = tc.oid)::int as policy_count,
+        -- Past the cap on purpose: in the scan it runs for every name match
+        ${isSecurityInvokerView(safeSql`tc.reloptions`)} as security_invoker,
+        -- Only tables and partitioned tables can have policies
+        case
+          when tc.relkind in ('r', 'p')
+            then (select count(*) from pg_policy pol where pol.polrelid = tc.oid)
+          else 0
+        end::int as policy_count,
         tc.rank
       from table_candidates tc
       where ${hasTableAccess(safeSql`tc.oid`, safeSql`tc.relowner`)}
@@ -216,7 +274,123 @@ export const getSearchEntitiesSql = ({
         from policy_matches pm
         order by pm.id, pm.source
       ) deduped
-      order by ${POLICY_ORDER}
+      order by ${TABLE_RELATED_ORDER}
+      limit ${literal(limit)}
+    ),
+    ${EXTENSION_FUNCTIONS_CTE},
+    function_candidates as materialized (
+      select
+        p.oid,
+        p.proname,
+        p.proowner,
+        p.prokind,
+        n.nspname,
+        case
+          when lower(p.proname) = ${exactName} then 0
+          when p.proname ilike ${prefixPattern} then 1
+          else 2
+        end as rank
+      from pg_proc p
+      join pg_namespace n on n.oid = p.pronamespace
+      where p.prokind in ('f', 'p')
+        and n.nspname not in (${excludedSchemas})
+        and not pg_is_other_temp_schema(n.oid)
+        and p.oid not in (select objid from extension_functions)
+        and ${functionMatchFilter}
+      order by rank, length(p.proname), p.proname
+      limit ${literal(CANDIDATE_LIMIT)}
+    ),
+    matched_functions as (
+      select fc.oid, fc.nspname, fc.proname, fc.prokind, fc.rank
+      from function_candidates fc
+      where pg_has_role(fc.proowner, 'USAGE') or has_function_privilege(fc.oid, 'EXECUTE')
+      order by fc.rank, length(fc.proname), fc.proname, fc.nspname
+      limit ${literal(limit)}
+    ),
+    trigger_name_candidates as materialized (
+      select
+        t.oid,
+        t.tgname,
+        t.tgtype,
+        t.tgfoid,
+        t.tgrelid as table_oid,
+        c.relname,
+        c.relowner,
+        nc.nspname,
+        case
+          when lower(t.tgname) = ${triggerExactName} then 0
+          when t.tgname ilike ${triggerPrefixPattern} then 1
+          when t.tgname ilike ${triggerNamePattern} then 2
+          else 3
+        end as rank
+      from pg_trigger t
+      -- Same per-row pg_class_oid_index probe as the policy candidates above
+      cross join lateral (
+        select c.relname, c.relowner, c.relnamespace
+        from pg_class c
+        where c.oid = t.tgrelid
+        offset 0
+      ) c
+      join pg_namespace nc on nc.oid = c.relnamespace
+      -- pg_trigger has no index on tgfoid, so matching by function shares this single
+      -- pass over pg_trigger instead of adding a second one. Triggers that only match
+      -- through their function (rank 3) sort after the name matches.
+      where not t.tgisinternal
+        and (t.tgname ilike ${triggerNamePattern} or t.tgfoid in (select oid from matched_functions))
+        and nc.nspname not in (${excludedSchemas})
+        and not pg_is_other_temp_schema(nc.oid)
+      order by rank, length(t.tgname), t.tgname
+      limit ${literal(CANDIDATE_LIMIT)}
+    ),
+    trigger_matches as (
+      select
+        tnc.oid::int8 as id,
+        tnc.tgname as name,
+        tnc.tgtype,
+        tnc.tgfoid,
+        tnc.nspname as schema,
+        tnc.relname as table_name,
+        tnc.table_oid::int8 as table_id,
+        0 as source,
+        tnc.rank,
+        0 as table_sort_length,
+        '' as table_sort_name
+      from trigger_name_candidates tnc
+      where ${hasTableAccess(safeSql`tnc.table_oid`, safeSql`tnc.relowner`, { includeSelect: false })}
+
+      union all
+
+      select
+        trg.oid::int8,
+        trg.tgname,
+        trg.tgtype,
+        trg.tgfoid,
+        mt.schema,
+        mt.name,
+        mt.id,
+        1,
+        mt.rank,
+        length(mt.name),
+        mt.name
+      from matched_tables mt
+      cross join lateral (
+        select t.oid, t.tgname, t.tgtype, t.tgfoid
+        from pg_trigger t
+        where t.tgrelid = mt.oid
+          and not t.tgisinternal
+        order by t.tgname
+        limit ${literal(limit)}
+      ) trg
+      where ${hasTableAccess(safeSql`mt.oid`, safeSql`mt.relowner`, { includeSelect: false })}
+    ),
+    matched_triggers as (
+      select *
+      from (
+        select distinct on (tm.id) tm.*
+        from trigger_matches tm
+        order by tm.id, tm.source
+      ) deduped
+      order by ${TABLE_RELATED_ORDER}
       limit ${literal(limit)}
     )
     select
@@ -227,9 +401,18 @@ export const getSearchEntitiesSql = ({
               'id', t.id,
               'schema', t.schema,
               'name', t.name,
-              'rls_enabled', t.rls_enabled,
-              'policy_count', t.policy_count
+              'type', t.type
             )
+            -- Omitted rather than zeroed: a matview cannot have RLS at all, so
+            -- reporting it as disabled would imply a setting that exists
+            || case
+                 when t.type in ('r', 'p') then jsonb_build_object(
+                   'rls_enabled', t.rls_enabled,
+                   'policy_count', t.policy_count
+                 )
+                 when t.type = 'v' then jsonb_build_object('security_invoker', t.security_invoker)
+                 else '{}'::jsonb
+               end
             order by t.rank, length(t.name), t.name
           )
           from matched_tables t
@@ -253,11 +436,49 @@ export const getSearchEntitiesSql = ({
               'table', p.table_name,
               'table_id', p.table_id
             )
-            order by ${POLICY_ORDER}
+            order by ${TABLE_RELATED_ORDER}
           )
           from matched_policies p
         ),
         '[]'::jsonb
-      ) as policies
+      ) as policies,
+      coalesce(
+        (
+          select jsonb_agg(
+            jsonb_build_object(
+              'id', f.oid::int8,
+              'schema', f.nspname,
+              'name', f.proname,
+              'type', case f.prokind when 'p' then 'procedure' else 'function' end,
+              'args', coalesce(pg_get_function_identity_arguments(f.oid), '')
+            )
+            order by f.rank, length(f.proname), f.proname, f.nspname
+          )
+          from matched_functions f
+        ),
+        '[]'::jsonb
+      ) as functions,
+      coalesce(
+        (
+          select jsonb_agg(
+            jsonb_build_object(
+              'id', t.id,
+              'name', t.name,
+              'activation', ${triggerActivation(safeSql`t.tgtype`)},
+              'events', ${triggerEvents(safeSql`t.tgtype`)},
+              'schema', t.schema,
+              'table', t.table_name,
+              'table_id', t.table_id,
+              'matched_function', case
+                when t.source = 0 and t.rank = 3
+                  then (select p.proname from pg_proc p where p.oid = t.tgfoid)
+              end
+            )
+            order by ${TABLE_RELATED_ORDER}
+          )
+          from matched_triggers t
+        ),
+        '[]'::jsonb
+      ) as triggers
   `
 }

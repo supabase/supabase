@@ -78,6 +78,7 @@ export const GLOBAL_MENU_ITEMS: GlobalMenuItems = [
   [
     {
       label: 'Products',
+      icon: 'products',
       menuItems: [
         [
           { label: 'Features' },
@@ -151,6 +152,7 @@ export const GLOBAL_MENU_ITEMS: GlobalMenuItems = [
   [
     {
       label: 'Build',
+      icon: 'build',
       menuItems: [
         [
           {
@@ -194,6 +196,7 @@ export const GLOBAL_MENU_ITEMS: GlobalMenuItems = [
   [
     {
       label: 'Manage',
+      icon: 'manage',
       menuItems: [
         [
           {
@@ -1048,6 +1051,7 @@ export const database: NavMenuConstant = {
     },
     {
       name: 'Working with your database (basics)',
+      shortName: 'Basics',
       url: undefined,
       items: [
         {
@@ -1072,6 +1076,7 @@ export const database: NavMenuConstant = {
     },
     {
       name: 'Working with your database (intermediate)',
+      shortName: 'Intermediate',
       url: undefined,
       items: [
         {
@@ -2105,6 +2110,10 @@ export const storage: NavMenuConstant = {
               name: 'Access Control',
               url: '/guides/storage/security/access-control' as `/${string}`,
             },
+            {
+              name: 'URL Signing Keys',
+              url: '/guides/storage/security/signing-keys' as `/${string}`,
+            },
           ],
         },
         {
@@ -2484,6 +2493,12 @@ export const ai_tools: NavMenuConstant = {
       name: 'Agent Skills',
       url: '/guides/ai-tools/ai-skills' as `/${string}`,
       enabled: agentSkillsEnabled,
+    },
+    // agent-only instructions: the html page returns 404, and the .md stays available
+    {
+      name: 'Report documentation problems: instructions for agents',
+      url: '/guides/ai-tools/agent-feedback',
+      enabled: false,
     },
     {
       name: 'Prompts',
@@ -3027,6 +3042,7 @@ export const telemetry: NavMenuConstant = {
       items: [
         { name: 'Query logs with SQL', url: '/guides/observability/advanced-log-filtering' },
         { name: 'Logs in Studio', url: '/guides/observability/logs' },
+        { name: 'Logs in the CLI', url: '/guides/observability/cli-logs' },
         { name: 'Log sources and fields', url: '/guides/observability/log-field-reference' },
         { name: 'Inspect the database', url: '/guides/observability/inspect' },
         { name: 'Advisors', url: '/guides/observability/advisors' },

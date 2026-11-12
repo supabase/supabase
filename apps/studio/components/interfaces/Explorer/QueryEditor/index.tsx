@@ -336,6 +336,7 @@ export const QueryEditor = forwardRef<QueryEditorHandle, QueryEditorProps>(funct
       projectRef: project.ref,
       connectionString,
       sql: wrapWithRoleImpersonation(limitedSql.sql, roleImpersonationState),
+      sqlOrigin: 'user',
       autoLimit: limitedSql.appendAutoLimit ? rowLimit : undefined,
       contextualInvalidation: true,
       isStatementTimeoutDisabled: true,

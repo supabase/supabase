@@ -11,6 +11,7 @@ import { DestinationLogo } from './DestinationLogo'
 import { DetailSubtext } from './DetailSubtext'
 import { PipelineStatePill } from './PipelineStatePill'
 import { PipelineStatusName } from './Replication.constants'
+import { canModifyDestination } from './ReplicationDiagram/Nodes.utils'
 import {
   getFormattedLagValue,
   getInitialSyncProgress,
@@ -186,7 +187,7 @@ export const DestinationRow = ({ destinationId }: DestinationRowProps) => {
                       <>
                         <span aria-hidden>&middot;</span>
                         <span className="text-destructive">
-                          {errorCount} table error{errorCount === 1 ? '' : 's'}
+                          {errorCount} table error{errorCount === 1 ? '' : <span>s</span>}
                         </span>
                       </>
                     )}
@@ -239,6 +240,7 @@ export const DestinationRow = ({ destinationId }: DestinationRowProps) => {
                   >
                     <RowMenu
                       destinationId={destinationId}
+                      destinationType={type}
                       pipeline={pipeline}
                       pipelineStatus={pipelineStatus?.status}
                       error={pipelineStatusError}
@@ -276,7 +278,7 @@ export const DestinationRow = ({ destinationId }: DestinationRowProps) => {
       />
 
       <UpdateVersionModal
-        visible={showUpdateVersionModal}
+        visible={canModifyDestination(type) && showUpdateVersionModal}
         pipeline={pipeline}
         onClose={() => setShowUpdateVersionModal(false)}
       />

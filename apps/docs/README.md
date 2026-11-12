@@ -1,27 +1,13 @@
-# Reference Docs
+# Supabase Docs
 
-Supabase Reference Docs
+This directory contains the Next.js app for [supabase.com/docs](https://supabase.com/docs).
 
-## Maintainers
+Guides live in `content/` as MDX. Reference pages are generated from the specs in `spec/`: OpenAPI, SDKSpec, ConfigSpec, and CLISpec. Some sections come from other repositories.
 
-If you are a maintainer of any tools in the Supabase ecosystem, you can use this site to provide documentation for the tools & libraries that you maintain.
+## Where to go
 
-## DocSpec
-
-We use documentation specifications which can be used to generate human-readable docs.
-
-- OpenAPI: for documenting API endpoints.
-- SDKSpec (custom to Supabase): for SDKs and client libraries.
-- ConfigSpec (custom to Supabase): for configuration options.
-- CLISpec (custom to Supabase): for CLI commands and usage.
-
-The benefit of using custom specifications is that we can generate many other types from a strict schema (eg, HTML and manpages).
-It also means that we can switch to any documentation system we want. On this site we use Next.js, but on Supabase's official website, we use a custom React site and expose only a subset of the available API for each tool.
-
-## Redirects
-
-Redirects for `/docs` URLs live in [`lib/redirects/`](lib/redirects/README.md). Static one-to-one entries go in `static-redirects.json`, conditional entries go in `dynamic-redirects.js`, and the `.md` variants for `/docs/guides/` entries are generated at build time. Read that README before adding or changing a redirect.
-
-## Contributing
-
-To contribute to docs, see the [style guide](https://github.com/supabase/supabase/tree/master/apps/docs/style-guide) for how to write a page, and the [developers' guide](https://github.com/supabase/supabase/blob/master/apps/docs/DEVELOPERS.md) and [contributing guide](https://github.com/supabase/supabase/blob/master/apps/docs/CONTRIBUTING.md) for repo mechanics. If you write with an AI coding agent, use the `/write-the-docs` skill to draft and `/edit-the-docs` to revise an existing page.
+- To write a page, follow the [style guide](./style-guide/README.md).
+- To find where a page lives, add one, or update generated reference docs, use the [contributing guide](./CONTRIBUTING.md). Library maintainers start at [Reference structure](./CONTRIBUTING.md#reference-structure).
+- To use an agent, use the [AI agent skills for docs authoring](./CONTRIBUTING.md#ai-agent-skills-for-docs-authoring). Those skills include framing a page and placing it in the information architecture.
+- To run the site locally, use the [developers' guide](./DEVELOPERS.md).
+- To add or change a redirect, read [`lib/redirects/README.md`](./lib/redirects/README.md) first.

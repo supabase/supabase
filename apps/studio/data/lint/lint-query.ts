@@ -39,7 +39,7 @@ export const useProjectLintsQuery = <TData = ProjectLintsData>(
     ...options
   }: UseCustomQueryOptions<ProjectLintsData, ProjectLintsError, TData> = {}
 ) => {
-  const { data: project } = useSelectedProjectQuery()
+  const { data: project } = useSelectedProjectQuery({ enabled: enabled !== false })
   const isActive = project?.status === PROJECT_STATUS.ACTIVE_HEALTHY
 
   return useQuery<ProjectLintsData, ProjectLintsError, TData>({
