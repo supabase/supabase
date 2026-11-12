@@ -2,7 +2,7 @@
 
 import { ChevronsDownUp, ChevronsUpDown, Maximize2 } from 'lucide-react'
 import type { ComponentProps, ReactNode } from 'react'
-import { Badge, Button, cn, Tooltip, TooltipContent, TooltipProvider, TooltipTrigger } from 'ui'
+import { Badge, Button, cn, Tooltip, TooltipContent, TooltipTrigger } from 'ui'
 
 import { useTrace, useView } from './Trace'
 import { areAllCollapsed } from './utils'
@@ -48,14 +48,10 @@ export function Status() {
 
 function ControlTooltip({ label, children }: { label: string; children: ReactNode }) {
   return (
-    <TooltipProvider delayDuration={200}>
-      <Tooltip>
-        <TooltipTrigger asChild>
-          <span className="inline-flex [&>button:disabled]:pointer-events-none">{children}</span>
-        </TooltipTrigger>
-        <TooltipContent side="bottom">{label}</TooltipContent>
-      </Tooltip>
-    </TooltipProvider>
+    <Tooltip>
+      <TooltipTrigger asChild>{children}</TooltipTrigger>
+      <TooltipContent side="bottom">{label}</TooltipContent>
+    </Tooltip>
   )
 }
 
@@ -73,6 +69,7 @@ export function CollapseAll() {
         size="tiny"
         className="size-6 p-0"
         disabled={index.childrenOf.size === 0}
+        focusableWhenDisabled
         icon={allCollapsed ? <ChevronsUpDown /> : <ChevronsDownUp />}
         aria-label={label}
         data-trace-collapse-all
@@ -92,6 +89,7 @@ export function ResetZoom() {
         size="tiny"
         className="size-6 p-0"
         disabled={!isZoomed}
+        focusableWhenDisabled
         icon={<Maximize2 />}
         aria-label="Reset zoom"
         data-trace-reset-zoom
