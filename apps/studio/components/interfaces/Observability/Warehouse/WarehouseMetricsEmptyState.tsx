@@ -10,14 +10,14 @@ interface WarehouseMetricsEmptyStateProps {
 
 const COPY = {
   not_provisioned: {
-    title: "Supabase Warehouse isn't enabled",
+    title: 'Warehouse is not set up',
     description:
       'Run analytical queries on a replicated copy of your data, then monitor query latency, failures, and capacity here.',
   },
   disabled: {
-    title: 'Supabase Warehouse is disabled',
+    title: 'Warehouse is disabled',
     description:
-      'Set up Supabase Warehouse again to query a replicated copy of your data and monitor its latency, failures, and capacity here.',
+      'Set up Warehouse again to query a replicated copy of your data and monitor its latency, failures, and capacity here.',
   },
 } as const
 

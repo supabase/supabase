@@ -79,7 +79,7 @@ describe('WarehouseMetricsReport', () => {
 
     customRender(<WarehouseMetricsReport />)
 
-    expect(await screen.findByText("Supabase Warehouse isn't enabled")).toBeInTheDocument()
+    expect(await screen.findByText('Warehouse is not set up')).toBeInTheDocument()
     expect(screen.getByRole('link', { name: 'Set up Warehouse' })).toHaveAttribute(
       'href',
       '/project/default/integrations/warehouse/overview'
@@ -91,7 +91,7 @@ describe('WarehouseMetricsReport', () => {
 
     customRender(<WarehouseMetricsReport />)
 
-    expect(await screen.findByText('Supabase Warehouse is disabled')).toBeInTheDocument()
+    expect(await screen.findByText('Warehouse is disabled')).toBeInTheDocument()
     expect(screen.getByRole('link', { name: 'Set up Warehouse' })).toHaveAttribute(
       'href',
       '/project/default/integrations/warehouse/overview'
