@@ -153,7 +153,7 @@ export const WarehouseSchemaTablePicker = ({
             <PageSectionTitle>Tables</PageSectionTitle>
             <PageSectionDescription>
               {isEditing
-                ? 'Tables currently replicating are selected. Changes apply on save.'
+                ? 'Tables currently replicating.'
                 : 'Data available to analytical queries.'}
             </PageSectionDescription>
           </PageSectionSummary>
@@ -205,9 +205,7 @@ export const WarehouseSchemaTablePicker = ({
         <PageSectionSummary>
           <PageSectionTitle>Tables</PageSectionTitle>
           <PageSectionDescription>
-            {isEditing
-              ? 'Tables currently replicating are selected. Changes apply on save.'
-              : 'Data available to analytical queries.'}
+            {isEditing ? 'Tables currently replicating.' : 'Data available to analytical queries.'}
           </PageSectionDescription>
         </PageSectionSummary>
       </PageSectionMeta>
@@ -331,7 +329,7 @@ export const WarehouseSchemaTablePicker = ({
               loading={isSubmitting}
               onClick={handleSubmit}
             >
-              {isEditing ? 'Update replicated tables' : 'Enable Warehouse'}
+              {isEditing ? 'Save changes' : 'Replicate'}
             </Button>
           </CardFooter>
         </Card>

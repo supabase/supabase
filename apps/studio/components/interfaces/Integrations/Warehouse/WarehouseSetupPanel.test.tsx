@@ -20,7 +20,7 @@ type Destinations = components['schemas']['DestinationsResponse_Output']
 
 mockAnimationsApi()
 vi.mock('./WarehouseSchemaTablePicker', () => ({
-  WarehouseSchemaTablePicker: () => <button tabIndex={0}>Enable Warehouse</button>,
+  WarehouseSchemaTablePicker: () => <button tabIndex={0}>Replicate</button>,
 }))
 vi.mock('./WarehouseConnectSection', () => ({ WarehouseConnectSection: () => null }))
 vi.mock('./WarehouseDisableCard', () => ({
@@ -112,7 +112,7 @@ const DuckLakeForm = () => {
 }
 
 describe('OrioleDB catalog restrictions', () => {
-  test('explains that Warehouse is loading before showing setup controls', async () => {
+  test('shows a loading placeholder before showing setup controls', async () => {
     mockProject(false)
     addAPIMock({
       method: 'get',
@@ -122,8 +122,8 @@ describe('OrioleDB catalog restrictions', () => {
 
     customRender(<WarehouseSetupPanel />)
 
-    expect(await screen.findByText('Loading Warehouse...')).toBeInTheDocument()
-    expect(screen.queryByRole('button', { name: 'Enable Warehouse' })).not.toBeInTheDocument()
+    expect(await screen.findByLabelText('Loading Warehouse')).toBeInTheDocument()
+    expect(screen.queryByRole('button', { name: 'Replicate' })).not.toBeInTheDocument()
   })
 
   test.each(['not_started', 'disabled', 'error'] as const)(
@@ -135,7 +135,7 @@ describe('OrioleDB catalog restrictions', () => {
       expect(
         await screen.findByText('This project cannot host a Warehouse catalog')
       ).toBeInTheDocument()
-      expect(screen.queryByRole('button', { name: 'Enable Warehouse' })).not.toBeInTheDocument()
+      expect(screen.queryByRole('button', { name: 'Replicate' })).not.toBeInTheDocument()
     }
   )
 
@@ -145,7 +145,7 @@ describe('OrioleDB catalog restrictions', () => {
       mockProject(false)
       mockWarehouse(status)
       customRender(<WarehouseSetupPanel />)
-      expect(await screen.findByRole('button', { name: 'Enable Warehouse' })).toBeInTheDocument()
+      expect(await screen.findByRole('button', { name: 'Replicate' })).toBeInTheDocument()
     }
   )
 
@@ -162,11 +162,11 @@ describe('OrioleDB catalog restrictions', () => {
 
       expect(await screen.findByText('Failed to check project compatibility')).toBeInTheDocument()
       expect(screen.getByText(/The project database version is unavailable/)).toBeInTheDocument()
-      expect(screen.queryByRole('button', { name: 'Enable Warehouse' })).not.toBeInTheDocument()
+      expect(screen.queryByRole('button', { name: 'Replicate' })).not.toBeInTheDocument()
 
       mockProject(false)
       fireEvent.click(screen.getByRole('button', { name: 'Retry' }))
-      expect(await screen.findByRole('button', { name: 'Enable Warehouse' })).toBeInTheDocument()
+      expect(await screen.findByRole('button', { name: 'Replicate' })).toBeInTheDocument()
     }
   )
 
@@ -192,7 +192,7 @@ describe('OrioleDB catalog restrictions', () => {
       expect(retryStatus).toBeEmptyDOMElement()
 
       expect(await screen.findByText('Failed to load Warehouse destination')).toBeInTheDocument()
-      expect(screen.queryByRole('button', { name: 'Enable Warehouse' })).not.toBeInTheDocument()
+      expect(screen.queryByRole('button', { name: 'Replicate' })).not.toBeInTheDocument()
 
       mockWarehouse('error', hasRetainedDestination ? [WAREHOUSE_DESTINATION] : [])
       fireEvent.click(screen.getByRole('button', { name: 'Retry' }))
@@ -200,14 +200,14 @@ describe('OrioleDB catalog restrictions', () => {
         expect(
           await screen.findByText('Warehouse destination loaded. You can continue setup.')
         ).toBeInTheDocument()
-        expect(screen.getByRole('button', { name: 'Enable Warehouse' })).toBeInTheDocument()
+        expect(screen.getByRole('button', { name: 'Replicate' })).toBeInTheDocument()
         expect(retryStatus).toHaveFocus()
       } else {
         expect(
           await screen.findByText('This project cannot host a Warehouse catalog')
         ).toBeInTheDocument()
         expect(retryStatus).toBeEmptyDOMElement()
-        expect(screen.queryByRole('button', { name: 'Enable Warehouse' })).not.toBeInTheDocument()
+        expect(screen.queryByRole('button', { name: 'Replicate' })).not.toBeInTheDocument()
       }
       expect(screen.getByRole('status')).toBe(retryStatus)
       expect(screen.queryByText('Failed to load Warehouse destination')).not.toBeInTheDocument()
@@ -240,7 +240,7 @@ describe('OrioleDB catalog restrictions', () => {
       mockProject(true)
       mockWarehouse(status, [WAREHOUSE_DESTINATION])
       customRender(<WarehouseSetupPanel />)
-      expect(await screen.findByRole('button', { name: 'Enable Warehouse' })).toBeInTheDocument()
+      expect(await screen.findByRole('button', { name: 'Replicate' })).toBeInTheDocument()
     }
   )
 

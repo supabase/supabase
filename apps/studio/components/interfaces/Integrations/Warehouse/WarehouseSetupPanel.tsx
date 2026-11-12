@@ -1,6 +1,6 @@
 import { useParams } from 'common'
 import { useEffect, useRef, useState } from 'react'
-import { Button } from 'ui'
+import { Button, Card, CardContent } from 'ui'
 import { Admonition } from 'ui-patterns/Admonition'
 
 import { isWarehouseSettingUp, type WarehouseSetupTarget } from './Warehouse.utils'
@@ -127,7 +127,15 @@ const WarehouseSetupPanelContent = ({
     )
   }
 
-  if (isPending) return <WarehouseLoadingState />
+  const loadingState = (
+    <Card>
+      <CardContent>
+        <WarehouseLoadingState />
+      </CardContent>
+    </Card>
+  )
+
+  if (isPending) return loadingState
 
   // Warehouse rides on the replication API, which isn't wired up in local development. Same
   // treatment Pipelines gives it, so a local dev doesn't read this as a broken build.
@@ -153,12 +161,12 @@ const WarehouseSetupPanelContent = ({
       />
     )
   }
-  if (!data) return <WarehouseLoadingState />
+  if (!data) return loadingState
 
   const status = data.setup_status
 
   if (shouldCheckCatalogCompatibility) {
-    if (isProjectPending && !isProjectFetched) return <WarehouseLoadingState />
+    if (isProjectPending && !isProjectFetched) return loadingState
     if (!isProjectSuccess || isOrioleDb === undefined) {
       return (
         <AlertError
@@ -174,7 +182,7 @@ const WarehouseSetupPanelContent = ({
       )
     }
     if (isOrioleDb) {
-      if (isDestinationsPending && !isDestinationsFetched) return <WarehouseLoadingState />
+      if (isDestinationsPending && !isDestinationsFetched) return loadingState
       if (!isDestinationsSuccess) {
         return (
           <AlertError

@@ -46,7 +46,7 @@ export const WarehouseWorkloadChart = ({
           )}
         </div>
         {isPreview && (
-          <div aria-hidden="true" className="h-7 w-20 rounded bg-surface-200 opacity-40" />
+          <div aria-hidden="true" className="h-7 w-20 rounded bg-surface-200 opacity-50" />
         )}
         {!isPreview && <p className="text-xl tabular-nums">{value ?? 'Unavailable'}</p>}
         {hasValues && (

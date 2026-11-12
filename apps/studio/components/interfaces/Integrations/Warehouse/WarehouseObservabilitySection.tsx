@@ -98,11 +98,14 @@ const WarehouseWorkloadPreview = () => {
       </div>
       <Card>
         <CardContent>
-          <dl className="grid gap-4 opacity-40 grayscale sm:grid-cols-2">
+          <dl className="grid gap-4 sm:grid-cols-2">
             {['Query errors', 'Worker slots in use'].map((label) => (
               <div key={label} className="space-y-2">
                 <dt className="text-sm text-foreground-light">{label}</dt>
-                <dd aria-label="Not yet measured" className="h-7 w-20 rounded bg-surface-200" />
+                <dd
+                  aria-label="Not yet measured"
+                  className="h-7 w-20 rounded bg-surface-200 opacity-50"
+                />
               </div>
             ))}
           </dl>
@@ -156,7 +159,14 @@ const WarehouseWorkloadMetrics = () => {
   }
 
   const renderSummary = () => {
-    if (isPending) return <WarehouseLoadingState label="Loading workload metrics..." />
+    if (isPending)
+      return (
+        <Card>
+          <CardContent>
+            <WarehouseLoadingState label="Loading workload metrics" />
+          </CardContent>
+        </Card>
+      )
     if (isError)
       return (
         <AlertError

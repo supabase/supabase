@@ -223,7 +223,7 @@ export const WarehouseMetricsReport = () => {
       <ReportHeader showDatabaseSelector={false} title={REPORT_TITLE} />
       <ReportStickyNav
         content={
-          <div className="ml-auto flex flex-wrap items-center gap-2">
+          <div className="flex w-full flex-wrap items-center gap-2">
             <ShortcutTooltip
               shortcutId={SHORTCUT_IDS.OBSERVABILITY_REFRESH}
               label="Refresh report"

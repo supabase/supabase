@@ -170,7 +170,7 @@ describe('WarehouseSchemaTablePicker', () => {
 
     expect(await screen.findByLabelText('Loading tables')).toHaveAttribute('aria-busy', 'true')
     expect(screen.getByRole('heading', { name: 'Tables' })).toBeInTheDocument()
-    expect(screen.queryByRole('button', { name: 'Enable Warehouse' })).not.toBeInTheDocument()
+    expect(screen.queryByRole('button', { name: 'Replicate' })).not.toBeInTheDocument()
   })
 
   test('starts empty and supports selecting every table in a schema', async () => {
@@ -180,14 +180,14 @@ describe('WarehouseSchemaTablePicker', () => {
     customRender(<WarehousePickerHarness />)
 
     expect(await screen.findByText('0 tables selected')).toBeInTheDocument()
-    expect(screen.getByRole('button', { name: 'Enable Warehouse' })).toBeDisabled()
+    expect(screen.getByRole('button', { name: 'Replicate' })).toBeDisabled()
     expect(screen.queryByRole('button', { name: 'Cancel' })).not.toBeInTheDocument()
 
     fireEvent.click(screen.getByRole('combobox', { name: 'Select tables to replicate' }))
     await userEvent.click(screen.getAllByText('Select all')[1])
 
     expect(screen.getByText('2 tables selected')).toBeInTheDocument()
-    await userEvent.click(screen.getByRole('button', { name: 'Enable Warehouse' }))
+    await userEvent.click(screen.getByRole('button', { name: 'Replicate' }))
 
     await waitFor(() =>
       expect(requests).toEqual([{ targets: [{ type: 'schema', schema: 'public' }] }])
@@ -212,14 +212,14 @@ describe('WarehouseSchemaTablePicker', () => {
     expect(await screen.findByText('1 table selected')).toBeInTheDocument()
     expect(screen.getByText('Failed to copy orders', { exact: false })).toBeInTheDocument()
     expect(screen.queryByText(/Try refreshing/)).not.toBeInTheDocument()
-    expect(screen.getByRole('button', { name: 'Enable Warehouse' })).toBeEnabled()
-    await userEvent.click(screen.getByRole('button', { name: 'Enable Warehouse' }))
+    expect(screen.getByRole('button', { name: 'Replicate' })).toBeEnabled()
+    await userEvent.click(screen.getByRole('button', { name: 'Replicate' }))
     expect(requests).toEqual([[{ type: 'table', schema: 'public', name: 'orders' }]])
 
     fireEvent.click(screen.getByRole('combobox', { name: 'Select tables to replicate' }))
     await userEvent.click(screen.getByText('customers'))
     expect(screen.getByText('2 tables selected')).toBeInTheDocument()
-    await userEvent.click(screen.getByRole('button', { name: 'Enable Warehouse' }))
+    await userEvent.click(screen.getByRole('button', { name: 'Replicate' }))
     expect(requests[1]).toEqual([{ type: 'schema', schema: 'public' }])
   })
 
@@ -243,7 +243,7 @@ describe('WarehouseSchemaTablePicker', () => {
     fireEvent.click(screen.getByRole('combobox', { name: 'Select tables to replicate' }))
     await userEvent.click(screen.getByText('customers'))
 
-    await userEvent.click(screen.getByRole('button', { name: 'Update replicated tables' }))
+    await userEvent.click(screen.getByRole('button', { name: 'Save changes' }))
 
     await waitFor(() =>
       expect(requests).toEqual([{ targets: [{ type: 'table', schema: 'public', name: 'orders' }] }])
