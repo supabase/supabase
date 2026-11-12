@@ -19,6 +19,7 @@ import { GenericSkeletonLoader } from 'ui-patterns/ShimmeringLoader'
 
 import { EnablePipelinesCallout } from '../EnablePipelinesCallout'
 import { PipelineStatusName } from '../Replication.constants'
+import { canModifyDestination } from '../ReplicationDiagram/Nodes.utils'
 import { UnknownDestinationNotice } from '../UnknownDestinationNotice'
 import { useDestinationInformation } from '../useDestinationInformation'
 import { useIsPipelinesEnabled } from '../useIsPipelinesEnabled'
@@ -84,8 +85,7 @@ export const DestinationPanel = () => {
   const showAccessRequest = !isAccessLoading && !enablePgReplicate
   const showEnablement = !isAccessLoading && enablePgReplicate && replicationNotEnabled
   const isEditLoading = editMode && destinationFetcher.isPending
-  const canEditDestination =
-    !editMode || (existingDestinationType !== undefined && !isUnknownDestination)
+  const canEditDestination = !editMode || canModifyDestination(existingDestinationType)
   const showDestinationForm =
     !isAccessLoading && enablePgReplicate && !replicationNotEnabled && canEditDestination
 

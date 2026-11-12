@@ -52,7 +52,10 @@ import {
 } from './Pipeline.utils'
 import { PipelineStatePill } from './PipelineStatePill'
 import { PipelineStatusName } from './Replication.constants'
-import { getReplicationDestinationType } from './ReplicationDiagram/Nodes.utils'
+import {
+  canModifyDestination,
+  getReplicationDestinationType,
+} from './ReplicationDiagram/Nodes.utils'
 import { UnknownDestinationNotice } from './UnknownDestinationNotice'
 import { UpdateVersionModal } from './UpdateVersionModal'
 import { useUnifiedLogsPreview } from '@/components/interfaces/App/FeaturePreview/FeaturePreviewContext'
@@ -139,7 +142,7 @@ export const ReplicationPipelineLayout = ({ children }: PropsWithChildren) => {
   const displayState = getPipelineDisplayState(requestStatus, statusName)
   const destinationType = getReplicationDestinationType(destination?.config)
   const isUnknownDestination = destinationType === 'Unknown'
-  const canModify = destinationType !== undefined && !isUnknownDestination
+  const canModify = canModifyDestination(destinationType)
   const isPipelineIdentityLoading =
     isPipelineLoading || (pipeline !== undefined && isDestinationLoading)
   const hasUpdate = canModify && Boolean(versionData?.new_version)

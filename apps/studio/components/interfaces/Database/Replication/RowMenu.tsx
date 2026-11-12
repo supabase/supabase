@@ -28,7 +28,10 @@ import { ShimmeringLoader } from 'ui-patterns/ShimmeringLoader'
 
 import { getStatusName } from './Pipeline.utils'
 import { PipelineStatusName } from './Replication.constants'
-import type { ReplicationDestinationType } from './ReplicationDiagram/Nodes.utils'
+import {
+  canModifyDestination,
+  type ReplicationDestinationType,
+} from './ReplicationDiagram/Nodes.utils'
 import { ReplicationPipelineStatusData } from '@/data/replication/pipeline-status-query'
 import { Pipeline } from '@/data/replication/pipelines-query'
 import { useRestartPipelineMutation } from '@/data/replication/restart-pipeline-mutation'
@@ -82,7 +85,7 @@ export const RowMenu = ({
     : PipelineStatusRequestStatus.None
 
   const isPipelineRequestPending = !!pipeline && isRequestPending(pipeline.id)
-  const canModify = destinationType !== undefined && destinationType !== 'Unknown'
+  const canModify = canModifyDestination(destinationType)
   const shouldShowUpdate = canModify && hasUpdate
 
   // Show actions when not in a transitional state

@@ -12,3 +12,6 @@ export const getReplicationDestinationType = (
   if ('clickhouse' in config) return 'ClickHouse'
   return 'Unknown'
 }
+
+export const canModifyDestination = (type: ReplicationDestinationType | undefined): boolean =>
+  type !== undefined && type !== 'Unknown'

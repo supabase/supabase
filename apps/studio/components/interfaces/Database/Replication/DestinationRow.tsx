@@ -11,6 +11,7 @@ import { DestinationLogo } from './DestinationLogo'
 import { DetailSubtext } from './DetailSubtext'
 import { PipelineStatePill } from './PipelineStatePill'
 import { PipelineStatusName } from './Replication.constants'
+import { canModifyDestination } from './ReplicationDiagram/Nodes.utils'
 import {
   getFormattedLagValue,
   getInitialSyncProgress,
@@ -277,7 +278,7 @@ export const DestinationRow = ({ destinationId }: DestinationRowProps) => {
       />
 
       <UpdateVersionModal
-        visible={type !== undefined && type !== 'Unknown' && showUpdateVersionModal}
+        visible={canModifyDestination(type) && showUpdateVersionModal}
         pipeline={pipeline}
         onClose={() => setShowUpdateVersionModal(false)}
       />
