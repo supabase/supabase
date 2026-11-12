@@ -33,8 +33,22 @@ vi.mock('@/hooks/misc/useSelectedProject', () => ({
 
 const SEARCH_RESULT: EntitySearchData = {
   tables: [
-    { id: 101, schema: 'public', name: 'blog_posts', rls_enabled: true, policy_count: 4 },
-    { id: 102, schema: 'blog', name: 'blog_posts_archive', rls_enabled: false, policy_count: 1 },
+    {
+      id: 101,
+      schema: 'public',
+      name: 'blog_posts',
+      type: 'r',
+      rls_enabled: true,
+      policy_count: 4,
+    },
+    {
+      id: 102,
+      schema: 'blog',
+      name: 'blog_posts_archive',
+      type: 'r',
+      rls_enabled: false,
+      policy_count: 1,
+    },
   ],
   policies: [
     {
@@ -158,6 +172,53 @@ describe('useDatabaseEntitySearchCommands', () => {
     expect(section).toHaveTextContent('blog.blog_posts_archive')
     expect(section).toHaveTextContent('1 policy • RLS disabled')
     expect(section).toHaveTextContent('/project/default/editor/101?schema=public')
+  })
+
+  it('describes views by their security mode, and says nothing for kinds that have none', async () => {
+    addAPIMock({
+      method: 'post',
+      path: '/platform/pg-meta/:ref/query',
+      response: () =>
+        HttpResponse.json([
+          {
+            ...SEARCH_RESULT,
+            tables: [
+              {
+                id: 110,
+                schema: 'public',
+                name: 'blog_posts_v',
+                type: 'v',
+                security_invoker: true,
+              },
+              {
+                id: 111,
+                schema: 'public',
+                name: 'blog_posts_public',
+                type: 'v',
+                security_invoker: false,
+              },
+              { id: 112, schema: 'public', name: 'blog_posts_daily', type: 'm' },
+              { id: 113, schema: 'public', name: 'blog_posts_remote', type: 'f' },
+            ],
+            policies: [],
+            triggers: [],
+            functions: [],
+          },
+        ]),
+    })
+    customRender(<CommandMenuHarness />)
+
+    await userEvent.type(screen.getByRole('textbox', { name: 'Search' }), 'blog_posts')
+
+    const section = await screen.findByRole('region', { name: 'Tables' })
+    expect(section).toHaveTextContent('Security invoker')
+    expect(section).toHaveTextContent('Security definer')
+    // A materialized view supports neither RLS nor security_invoker, so claiming
+    // "RLS disabled" would read as a setting the user could change
+    expect(section).not.toHaveTextContent('RLS')
+    // All four are reachable in the table editor, same as from its sidebar
+    expect(section).toHaveTextContent('/project/default/editor/112?schema=public')
+    expect(section).toHaveTextContent('/project/default/editor/113?schema=public')
   })
 
   it('lists matching policies with their command and table, linking to the policy editor', async () => {
