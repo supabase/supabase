@@ -416,11 +416,13 @@ export const ReplicationPipelineLayout = ({ children }: PropsWithChildren) => {
           <GenericSkeletonLoader />
         </PageContainer>
       )}
+
       {isUnknownDestination && (
         <PageContainer size="large">
           <UnknownDestinationNotice />
         </PageContainer>
       )}
+
       {destinationError && (
         <PageContainer size="large">
           <AlertError
@@ -430,6 +432,7 @@ export const ReplicationPipelineLayout = ({ children }: PropsWithChildren) => {
           />
         </PageContainer>
       )}
+
       {!isUnknownDestination && (canModify || pipelineError) && children}
 
       <DestinationPanel />

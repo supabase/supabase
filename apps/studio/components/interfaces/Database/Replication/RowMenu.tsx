@@ -148,7 +148,7 @@ export const RowMenu = ({
   }
 
   return (
-    <div className="flex justify-end items-center space-x-2">
+    <div className="flex justify-end items-center gap-x-2">
       {isLoading && <ShimmeringLoader />}
 
       {isError && (
@@ -186,7 +186,7 @@ export const RowMenu = ({
         </DropdownMenuTrigger>
 
         <DropdownMenuContent side="bottom" align="end" className="w-44">
-          <DropdownMenuItem className="space-x-2" asChild disabled={!pipeline}>
+          <DropdownMenuItem className="gap-x-2" asChild disabled={!pipeline}>
             <Link href={`/project/${projectRef}/database/pipelines/${pipeline?.id}`}>
               <EyeIcon size={14} />
               <p>View details</p>
@@ -212,7 +212,7 @@ export const RowMenu = ({
           )}
           {shouldShowStart && (
             <>
-              <DropdownMenuItem className="space-x-2" onClick={onEnablePipeline}>
+              <DropdownMenuItem className="gap-x-2" onClick={onEnablePipeline}>
                 <PlayIcon size={14} />
                 <p>Start pipeline</p>
               </DropdownMenuItem>
@@ -222,12 +222,12 @@ export const RowMenu = ({
           {shouldShowStop && (
             <>
               {shouldShowRestart && (
-                <DropdownMenuItem className="space-x-2" onClick={onRestartPipeline}>
+                <DropdownMenuItem className="gap-x-2" onClick={onRestartPipeline}>
                   <RotateCcwIcon size={14} />
                   <p>Restart pipeline</p>
                 </DropdownMenuItem>
               )}
-              <DropdownMenuItem className="space-x-2" onClick={onDisablePipeline}>
+              <DropdownMenuItem className="gap-x-2" onClick={onDisablePipeline}>
                 <CircleStopIcon size={14} />
                 <p>Stop pipeline</p>
               </DropdownMenuItem>
@@ -237,7 +237,7 @@ export const RowMenu = ({
 
           {canModify && (
             <DropdownMenuItem
-              className="space-x-2"
+              className="gap-x-2"
               onClick={() => setEdit(destinationId)}
               disabled={isPipelineRequestPending}
             >
@@ -246,7 +246,7 @@ export const RowMenu = ({
             </DropdownMenuItem>
           )}
           <DropdownMenuItem
-            className="space-x-2"
+            className="gap-x-2"
             onClick={onDeleteClick}
             disabled={isPipelineRequestPending}
           >

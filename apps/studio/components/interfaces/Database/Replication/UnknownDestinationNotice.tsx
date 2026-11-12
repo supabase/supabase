@@ -4,6 +4,6 @@ export const UnknownDestinationNotice = () => (
   <Admonition
     type="warning"
     title="Unknown destination"
-    description="This destination's saved settings could not be read. You can stop or delete this pipeline."
+    description="Pipeline cannot be edited as the destination configuration cannot be read. You may stop or delete it."
   />
 )
