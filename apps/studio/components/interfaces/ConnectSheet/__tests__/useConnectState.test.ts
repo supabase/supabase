@@ -21,6 +21,7 @@ vi.mock('@/hooks/misc/useCheckEntitlements', () => ({
 
 vi.mock('@/hooks/misc/useSelectedProject', () => ({
   useIsHighAvailability: vi.fn().mockImplementation(() => false),
+  useProjectCapabilities: vi.fn().mockImplementation(() => undefined),
 }))
 
 const deploymentModeMock = { isPlatform: true, isCli: false, isSelfHosted: false }
