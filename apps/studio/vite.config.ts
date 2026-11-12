@@ -866,6 +866,7 @@ export default defineConfig(({ command, mode }) => {
         project: process.env.SENTRY_PROJECT ?? 'supabase-studio-tanstack',
         authToken: process.env.SENTRY_AUTH_TOKEN,
         autoInstrumentMiddleware: false,
+        silent: true,
         sourcemaps: {
           disable: !shouldUploadSourceMaps,
           // Intermediate SSR maps must survive until Nitro composes the final server maps.
