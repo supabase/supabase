@@ -2,7 +2,7 @@ import { useParams } from 'common'
 import dayjs from 'dayjs'
 import { ShimmeringLoader } from 'ui-patterns/ShimmeringLoader'
 
-import { UpcomingInvoice } from './UpcomingInvoice'
+import { UpcomingInvoice } from './UpcomingInvoice/UpcomingInvoiceV2'
 import {
   ScaffoldSection,
   ScaffoldSectionContent,
@@ -111,7 +111,7 @@ const BillingBreakdown = () => {
               <AlertError subject="Failed to retrieve subscription" error={subscriptionError} />
             )}
 
-            {invoiceFeatureEnabled && <UpcomingInvoice slug={orgSlug} />}
+            {invoiceFeatureEnabled && orgSlug && <UpcomingInvoice slug={orgSlug} />}
           </>
         )}
       </ScaffoldSectionContent>

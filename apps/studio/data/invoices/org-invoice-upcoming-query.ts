@@ -19,7 +19,7 @@ export async function getUpcomingInvoice(
   if (!orgSlug) throw new Error('orgSlug is required')
 
   const { data, error } = await get(`/platform/organizations/{slug}/billing/invoices/upcoming`, {
-    params: { path: { slug: orgSlug } },
+    params: { path: { slug: orgSlug }, query: { enable_v2: 'true' } },
     headers: { Version: '2' },
     signal,
   })

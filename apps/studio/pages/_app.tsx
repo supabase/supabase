@@ -24,6 +24,7 @@ import {
 } from 'common'
 import MetaFaviconsPagesRouter from 'common/MetaFavicons/pages-router'
 import dayjs from 'dayjs'
+import advancedFormat from 'dayjs/plugin/advancedFormat'
 import customParseFormat from 'dayjs/plugin/customParseFormat'
 import duration from 'dayjs/plugin/duration'
 import relativeTime from 'dayjs/plugin/relativeTime'
@@ -72,6 +73,7 @@ import { Toaster } from '@/lib/toaster'
 import { AiAssistantStateContextProvider } from '@/state/ai-assistant-state'
 import type { AppPropsWithLayout } from '@/types'
 
+dayjs.extend(advancedFormat)
 dayjs.extend(customParseFormat)
 dayjs.extend(utc)
 dayjs.extend(timezone)
