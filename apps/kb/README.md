@@ -1,65 +1,57 @@
-# Astro Starter Kit: Basics
+# Supabase Knowledgebase (human guidelines)
+
+Welcome to the [Supabase Knowledgebase](https://supabase.com/kb), which serves as a home for troubleshooting, migration, and other types of content that don't quite fit in the [Supabase Docs](https://supabase.com/docs).
+
+## Content
+
+There are 3 buckets of content that live within the repo itself:
+
+- **Guides**: Walkthroughs, migrations, comparison content, etc. Lives in `src/content/guides/**.mdx`.
+- **FAQs**: Short, specific questions with direct answers. Lives in `src/content/faqs/**/**.mdx`.
+- **Community resources**: Community-produced guides or tutorials on other websites. Lives at `src/data/community-guides.
+
+Additionally, the KB has **troubleshooting** topics (`src/content/troubleshooting/`), but this content lives in a private repo. See `AGENTS.md` for how it works and what's intentionally left out for now.
+
+### Style guide
+
+In general, follow all the existing guidelines in the [Docs Style Guide](https://github.com/supabase/supabase/blob/master/apps/docs/style-guide/README.md).
+
+Additionally, stick to plain GitHub-Flavored Markdown:
+
+- No custom/JSX components in guide bodies — content is also exported as plain `.md` (see below), and a
+  component wouldn't survive that export.
+- For callouts, use GitHub's native alert syntax (`> [!NOTE]`, `> [!TIP]`, `> [!IMPORTANT]`, `> [!WARNING]`,
+  `> [!CAUTION]`) — the build renders these into the `Admonition` component for you
+  (`src/lib/mdx/rehype-admonitions.ts`). Don't import or use `Admonition` directly in content.
+- Frontmatter requires `title`, `description`, and `topics` (values must match `TOPIC_NAMES` in
+  `src/lib/topics.ts`); `pinned` and `github_url` are optional. See `src/content.config.ts` for the full schema.
+
+## Development
+
+Requires Node >= 22.12 and pnpm. Install dependencies from the repository root with `pnpm install`, then start the dev server at [http://localhost:3008](http://localhost:3008):
 
 ```sh
-npm create astro@latest -- --template basics
+# From the root directory of the repository
+pnpm dev:kb
+
+# From the apps/kb directory
+pnpm dev
 ```
 
-> 🧑‍🚀 **Seasoned astronaut?** Delete this file. Have fun!
+Troubleshooting content is fetched from a private repo, so it's only available locally if you have access and credentials set. Copy `.env.example` to `.env`, then set `GH_TOKEN` (for example `export GH_TOKEN=$(gh auth token)`) and run `pnpm fetch:federated-content`. Guides, FAQs, and community guides work without any extra setup.
 
-## 🚀 Project Structure
+To check a production build locally:
 
-Inside of your Astro project, you'll see the following folders and files:
+```sh
+# From the root directory of the repository
+pnpm build:kb
 
-```text
-/
-├── public/
-│   └── favicon.svg
-├── src
-│   ├── assets
-│   │   └── astro.svg
-│   ├── components
-│   │   └── Welcome.astro
-│   ├── layouts
-│   │   └── Layout.astro
-│   └── pages
-│       └── index.astro
-└── package.json
+# From the apps/kb directory
+pnpm build
+pnpm preview
 ```
 
-To learn more about the folder structure of an Astro project, refer to [our guide on project structure](https://docs.astro.build/en/basics/project-structure/).
-
-## 🧞 Commands
-
-All commands are run from the root of the project, from a terminal:
-
-| Command                   | Action                                           |
-| :------------------------ | :----------------------------------------------- |
-| `npm install`             | Installs dependencies                            |
-| `npm run dev`             | Starts local dev server at `localhost:4321`      |
-| `npm run build`           | Build your production site to `./dist/`          |
-| `npm run preview`         | Preview your build locally, before deploying     |
-| `npm run astro ...`       | Run CLI commands like `astro add`, `astro check` |
-| `npm run astro -- --help` | Get help using the Astro CLI                     |
-
-## 👀 Want to learn more?
-
-Feel free to check [our documentation](https://docs.astro.build) or jump into our [Discord server](https://astro.build/chat).
-
-## Federated troubleshooting content
-
-`src/content/troubleshooting/` isn't hand-written — it's fetched from a private repo by
-`scripts/federated-content/fetch-federated-content.ts` as part of the build (the `fetch:federated-content` task in `turbo.jsonc`)
-and is gitignored. See `AGENTS.md` for how it works and what's intentionally left out for now.
-
-## Workflows
-
-`.github/workflows/kb-troubleshooting-sync.yml` runs on pushes to `master` that touch `apps/kb/**` (or can be
-triggered manually): it fetches troubleshooting content, creates a GitHub Discussion for any guide that doesn't have one yet
-(`sync:troubleshooting-entries`), and pushes title/content updates to discussions whose guide has since
-changed (`sync:troubleshooting-updates`). This is separate from kb's own build — it has real side effects
-(creating/updating Discussions, writing DB rows), so it never runs as part of `pnpm build`.
-
-## Tests
+### Tests
 
 Unit tests (vitest) live next to the code they cover, including the search API (`api/search/_search.test.ts`;
 the `_` prefix keeps Vercel from deploying it as a function). Run them from `apps/kb`:
