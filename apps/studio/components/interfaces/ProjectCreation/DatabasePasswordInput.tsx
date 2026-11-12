@@ -68,7 +68,11 @@ export const DatabasePasswordInput = ({ form }: DatabasePasswordInputProps) => {
                   placeholder="Type in a strong password"
                   {...field}
                   id="dbPass"
-                  autoComplete="off"
+                  autoComplete="new-password"
+                  data-1p-ignore
+                  data-lpignore="true"
+                  data-form-type="other"
+                  data-bwignore
                   onChange={async (event) => {
                     const newValue = event.target.value
                     field.onChange(event)
