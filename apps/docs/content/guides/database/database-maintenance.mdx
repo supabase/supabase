@@ -1,0 +1,58 @@
+---
+id: 'database-maintenance'
+title: 'Database Maintenance Responsibilities'
+description: 'Understand the shared responsibilities of maintaining your Supabase Postgres database.'
+---
+
+When you provision a database on Supabase, the operational responsibilities are shared between you and the Supabase platform. While Supabase manages the underlying infrastructure and provides tools for automation, there are specific maintenance tasks that require your attention to ensure optimal performance, data integrity, and security.
+
+This guide clarifies what Supabase handles automatically and what you are responsible for maintaining.
+
+## Database Updates
+
+### Security Patches
+
+Supabase automatically handles infrastructure-level updates and applies critical security patches to the underlying operating system and Postgres engine. When a high-severity vulnerability is disclosed, the Supabase team will apply the necessary patches. For patches that require a restart or temporary downtime, you will be notified in advance via email and the Supabase dashboard.
+
+### Postgres Version Upgrades
+
+For major PostgreSQL version upgrades (e.g., from Postgres 14 to 15), Supabase provides the tooling to upgrade your database, but **you must initiate the upgrade manually** via the Supabase Dashboard. This ensures that you have time to test compatibility with your application before applying the new version.
+
+Minor version upgrades are typically applied automatically during scheduled maintenance windows, and you will receive notifications prior to any updates that might affect availability.
+
+## Routine Maintenance Tasks
+
+Postgres requires routine maintenance to reclaim storage space, update statistics, and optimize query performance.
+
+### Automated Tasks
+
+Supabase configures standard Postgres maintenance processes to run automatically:
+
+- **Auto-Vacuum:** The Postgres `autovacuum` daemon is enabled by default on all Supabase projects. It automatically runs `VACUUM` and `ANALYZE` commands in the background to reclaim storage from deleted or updated rows and to update query planner statistics. For most workloads, the default `autovacuum` settings are sufficient.
+- **Auto-Analyze:** The `autovacuum` daemon also automatically analyzes tables when they receive enough inserts, updates, or deletes, ensuring the query planner has up-to-date statistics.
+
+### Tasks Requiring Manual Intervention
+
+Depending on your workload and data volume, you may occasionally need to perform the following tasks manually or schedule them via `pg_cron`:
+
+- **Manual `VACUUM` / `VACUUM FULL`:** If a table experiences heavy churn (frequent updates/deletes) and `autovacuum` cannot keep up, you may experience database bloat. In these cases, you might need to run a manual `VACUUM`. Note that `VACUUM FULL` locks the table and rewrites it entirely to reclaim maximum space, which requires downtime for that table.
+- **`REINDEX`:** Over time, indexes can become bloated or fragmented. Running `REINDEX` rebuilds the index, which can improve query performance. Starting from Postgres 12, you can run `REINDEX CONCURRENTLY` to rebuild an index without locking out concurrent inserts, updates, or deletes.
+- **`CLUSTER`:** If you frequently query a table using a specific index (like a timestamp for time-series data), running `CLUSTER` physically reorders the data on disk to match the index. This can vastly improve read performance. `CLUSTER` requires an exclusive lock, so it must be scheduled during a maintenance window. Subsequent inserts are not clustered automatically.
+- **Partitioning / Table Sharding:** As tables grow extremely large (e.g., tens of millions of rows), you are responsible for implementing table partitioning (e.g., using `pg_partman`) to maintain performance and simplify data retention (like dropping old partitions).
+- **Data Integrity Checks:** Supabase automatically monitors the underlying storage layer for disk errors. However, application-level data integrity (e.g., enforcing foreign keys, unique constraints) is your responsibility.
+
+## Backups & Recovery
+
+### Automated Backups
+
+Supabase automatically manages database backups for your project. 
+- **Point-in-Time Recovery (PITR):** Available on Pro and higher plans, PITR continuously backs up your database, allowing you to restore to any specific second within your retention window.
+- **Daily Backups:** For projects not using PITR, Supabase takes daily logical backups. The timing of these daily backups is determined by the region and internal scheduling. **Currently, the exact time of the daily backup cannot be manually configured.**
+
+### Custom Backups
+
+If you need backups aligned with specific events—such as taking a snapshot right before a cron job deletes old records—you should implement your own custom backup routine. You can achieve this by using `pg_dump` via a scheduled script (like GitHub Actions or a secure cron service) to export your schema and data precisely when you need it.
+
+---
+
+By understanding this shared responsibility model, you can plan your maintenance windows, schedule cron jobs appropriately, and ensure your Supabase database remains performant and reliable as your application scales.
