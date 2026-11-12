@@ -724,10 +724,15 @@ from
     pg_catalog.pg_class c
     join pg_catalog.pg_namespace n
         on c.relnamespace = n.oid
+    left join pg_catalog.pg_depend dep
+        on c.oid = dep.objid
+        and dep.deptype = 'e'
 where
     c.relkind = 'r' -- regular tables
     -- RLS is disabled
     and not c.relrowsecurity
+    -- exclude tables owned by extensions (e.g. PostGIS spatial_ref_sys)
+    and dep.objid is null
     and (
         pg_catalog.has_table_privilege('anon', c.oid, 'SELECT')
         or pg_catalog.has_table_privilege('authenticated', c.oid, 'SELECT')
