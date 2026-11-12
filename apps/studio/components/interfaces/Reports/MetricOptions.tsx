@@ -18,11 +18,10 @@ import {
 import { ShimmeringLoader } from 'ui-patterns/ShimmeringLoader'
 
 import { BURSTABLE_IO_METRIC_KEYS, DEPRECATED_REPORTS } from './Reports.constants'
-import { hasBurstableIO } from '@/components/interfaces/DiskManagement/DiskManagement.utils'
 import { SIDEBAR_KEYS } from '@/components/layouts/ProjectLayout/LayoutSidebar/LayoutSidebarProvider'
 import { useContentQuery } from '@/data/content/content-query'
 import { useIsFeatureEnabled } from '@/hooks/misc/useIsFeatureEnabled'
-import { useSelectedProjectQuery } from '@/hooks/misc/useSelectedProject'
+import { useProjectDiskLimits } from '@/hooks/misc/useProjectDiskLimits'
 import { Metric, METRIC_CATEGORIES, METRICS } from '@/lib/constants/metrics'
 import { useTrack } from '@/lib/telemetry/track'
 import { editorPanelState } from '@/state/editor-panel-state'
@@ -42,7 +41,6 @@ interface MetricOptionsProps {
 
 export const MetricOptions = ({ config, handleChartSelection }: MetricOptionsProps) => {
   const { ref: projectRef } = useParams()
-  const { data: project } = useSelectedProjectQuery()
   const { openSidebar } = useSidebarManagerSnapshot()
   const [search, setSearch] = useState('')
 
@@ -51,7 +49,7 @@ export const MetricOptions = ({ config, handleChartSelection }: MetricOptionsPro
     'project_storage:all',
   ])
 
-  const supportsBurstableIO = hasBurstableIO(project?.infra_compute_size)
+  const { isBurstable: supportsBurstableIO } = useProjectDiskLimits()
 
   const metricCategories = Object.values(METRIC_CATEGORIES).filter(({ key }) => {
     if (key === 'api_auth') return authEnabled

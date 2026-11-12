@@ -46,7 +46,6 @@ export const DestinationPanel = () => {
     'destinationType',
     parseAsStringEnum<DestinationType>([
       'BigQuery',
-      'Analytics Bucket',
       'DuckLake',
       'Snowflake',
       'ClickHouse',
@@ -105,10 +104,7 @@ export const DestinationPanel = () => {
     onClose,
   })
 
-  const destinationDocsPath =
-    destinationType && destinationType !== 'Analytics Bucket'
-      ? DESTINATION_DOCS_PATHS[destinationType]
-      : undefined
+  const destinationDocsPath = destinationType ? DESTINATION_DOCS_PATHS[destinationType] : undefined
   const docsUrl = `${DOCS_URL}${
     destinationDocsPath ?? '/guides/database/replication/pipelines#step-3-configure-a-destination'
   }`

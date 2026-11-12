@@ -73,8 +73,10 @@ withTestDatabase('matches schema-qualified searches', async (db) => {
   expect(await search(db, 'v1.palette')).toEqual(['public.v1.palette'])
 })
 
-withTestDatabase('only returns tables, excluding partitions and system schemas', async (db) => {
-  await db.executeQuery(`
+withTestDatabase(
+  'returns every relation kind the table editor opens, excluding partitions and system schemas',
+  async (db) => {
+    await db.executeQuery(`
     create table public.blog_posts (id int);
     create view public.blog_view as select 1;
     create materialized view public.blog_mat_view as select 1;
@@ -82,8 +84,78 @@ withTestDatabase('only returns tables, excluding partitions and system schemas',
     create table public.blog_events_east partition of public.blog_events for values in ('east');
   `)
 
-  expect((await search(db, 'blog')).sort()).toEqual(['public.blog_events', 'public.blog_posts'])
-  expect(await search(db, 'pg_class')).toEqual([])
+    // blog_events is the partition parent; its blog_events_east child is not listed
+    expect((await search(db, 'blog')).sort()).toEqual([
+      'public.blog_events',
+      'public.blog_mat_view',
+      'public.blog_posts',
+      'public.blog_view',
+    ])
+    expect(await search(db, 'pg_class')).toEqual([])
+  }
+)
+
+// The test container runs PG14 (test/db/Dockerfile), which predates the
+// security_invoker reloption entirely -- there, every view runs as its owner, so
+// the definer case below is the only one reachable. The invoker case is gated on
+// PG15+ so it starts being covered when the container is bumped.
+const supportsSecurityInvoker = async (db: Awaited<ReturnType<typeof createTestDatabase>>) => {
+  const [{ server_version_num }] =
+    await db.executeQuery<{ server_version_num: string }[]>(`show server_version_num`)
+  return Number(server_version_num) >= 150000
+}
+
+withTestDatabase(
+  'reports each relation by its kind, with only the fields that kind supports',
+  async (db) => {
+    await db.executeQuery(`
+      create table public.rel_table (id int);
+      alter table public.rel_table enable row level security;
+      create policy "read" on public.rel_table for select using (true);
+      create view public.rel_definer as select * from public.rel_table;
+      create materialized view public.rel_matview as select * from public.rel_table;
+      create table public.rel_parted (id int, region text) partition by list (region);
+    `)
+    if (await supportsSecurityInvoker(db)) {
+      await db.executeQuery(
+        `create view public.rel_invoker with (security_invoker = true) as select * from public.rel_table`
+      )
+    }
+
+    const [row] = await db.executeQuery<SearchEntitiesResult[]>(
+      getSearchEntitiesSql({ query: 'rel_' })
+    )
+    const byName = Object.fromEntries(row.tables.map((t) => [t.name, t]))
+
+    expect(byName.rel_table).toMatchObject({ type: 'r', rls_enabled: true, policy_count: 1 })
+    expect(byName.rel_parted).toMatchObject({ type: 'p', rls_enabled: false, policy_count: 0 })
+    expect(byName.rel_definer).toMatchObject({ type: 'v', security_invoker: false })
+    expect(byName.rel_matview).toMatchObject({ type: 'm' })
+    if (await supportsSecurityInvoker(db)) {
+      expect(byName.rel_invoker).toMatchObject({ type: 'v', security_invoker: true })
+    }
+
+    // RLS and policies cannot exist for a view or materialized view, so the keys
+    // are absent rather than reporting an inapplicable zero
+    expect(byName.rel_definer).not.toHaveProperty('rls_enabled')
+    expect(byName.rel_definer).not.toHaveProperty('policy_count')
+    expect(byName.rel_matview).not.toHaveProperty('rls_enabled')
+    // security_invoker is a view-only option
+    expect(byName.rel_table).not.toHaveProperty('security_invoker')
+    expect(byName.rel_matview).not.toHaveProperty('security_invoker')
+  }
+)
+
+withTestDatabase('leaves out relations installed by an extension', async (db) => {
+  await db.executeQuery(`
+    create extension if not exists pgcrypto;
+    create table public.pgcrypto_notes (id int);
+    create extension if not exists pg_stat_statements;
+  `)
+
+  // The user's own relation is kept; pg_stat_statements' views are extension members
+  expect(await search(db, 'pgcrypto')).toEqual(['public.pgcrypto_notes'])
+  expect(await search(db, 'pg_stat_statements')).toEqual([])
 })
 
 withTestDatabase('returns RLS status and policy count', async (db) => {
@@ -104,6 +176,7 @@ withTestDatabase('returns RLS status and policy count', async (db) => {
       id: expect.any(Number),
       schema: 'public',
       name: 'posts',
+      type: 'r',
       rls_enabled: true,
       policy_count: 2,
     },
@@ -111,6 +184,7 @@ withTestDatabase('returns RLS status and policy count', async (db) => {
       id: expect.any(Number),
       schema: 'public',
       name: 'posts_drafts',
+      type: 'r',
       rls_enabled: false,
       policy_count: 0,
     },
