@@ -22,6 +22,7 @@ import { Input } from 'ui-patterns/DataInputs/Input'
 import { FormItemLayout } from 'ui-patterns/form/FormItemLayout/FormItemLayout'
 
 import { NO_REQUIRED_CHARACTERS } from '../Auth.constants'
+import { sanitizeProviderFormPayload } from './ProviderForm.utils'
 import { AuthAlert } from './AuthAlert'
 import type { Provider } from './AuthProvidersForm.types'
 import FormField from './FormField'
@@ -127,6 +128,8 @@ export const ProviderForm = ({ config, provider, isActive }: ProviderFormProps) 
       if (doubleNegativeKeys.includes(x)) payload[x] = !values[x]
       if (payload[x] === '') payload[x] = null
     })
+
+    sanitizeProviderFormPayload(payload)
 
     // The backend uses empty string to represent no required characters in the password
     if (payload.PASSWORD_REQUIRED_CHARACTERS === NO_REQUIRED_CHARACTERS) {
