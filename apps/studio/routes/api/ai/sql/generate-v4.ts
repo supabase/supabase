@@ -18,7 +18,7 @@ import {
   type AssistantMessageMetadata,
 } from '@/lib/ai/assistant-message-metadata'
 import { ASSISTANT_TIMEOUT_MS } from '@/lib/ai/assistant-timeout'
-import { isTracingAllowed } from '@/lib/ai/braintrust-logger'
+import { IS_TRACING_ENABLED } from '@/lib/ai/braintrust-logger'
 import { generateAssistantResponse } from '@/lib/ai/generate-assistant-response'
 import { isExplorerEnabled } from '@/lib/ai/is-explorer-enabled'
 import { getModel } from '@/lib/ai/model'
@@ -115,7 +115,6 @@ async function handlePost(req: NextApiRequest, res: NextApiResponse, claims?: Jw
 
   let aiOptInLevel: AiOptInLevel = 'disabled'
   let hasAccessToAdvanceModel = false
-  let projectRegion: string | undefined
   let isHighComplianceProject: boolean | undefined
   let orgId: number | undefined
   let orgSlug: string | undefined
@@ -135,7 +134,6 @@ async function handlePost(req: NextApiRequest, res: NextApiResponse, claims?: Jw
       orgId = aiDetails.orgId
       orgSlug = aiDetails.orgSlug
       planId = aiDetails.planId
-      projectRegion = aiDetails.region
       isHighComplianceProject = aiDetails.isHighComplianceProject
     } catch (error) {
       return res.status(400).json({
@@ -222,7 +220,7 @@ async function handlePost(req: NextApiRequest, res: NextApiResponse, claims?: Jw
       projectRef,
       chatId,
       chatName,
-      allowTracing: isTracingAllowed({ projectRegion }),
+      allowTracing: IS_TRACING_ENABLED && orgId !== undefined,
       supportMode,
       userId,
       orgId,

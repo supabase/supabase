@@ -10,7 +10,6 @@ export type AIDetails = {
   orgId: number | undefined
   orgSlug: string | undefined
   planId: string | undefined
-  region: string | undefined
   /** "High Compliance" in the dashboard, `is_sensitive` in the platform API. */
   isHighComplianceProject: boolean | undefined
 }
@@ -35,13 +34,12 @@ export const getAIDetails = async ({
   const [organizations, advanceModelAccess, project, projectSettings] = await Promise.all([
     getOrganizations({ headers }),
     checkEntitlement(orgSlug, 'assistant.advance_model', undefined, headers),
-    // skipWake: only organization_id and region are needed, neither requires a running project
+    // Organization membership can be checked without waking the project.
     getProjectDetail({ ref: projectRef, skipWake: true }, undefined, headers),
     getProjectSettings({ projectRef }, undefined, headers),
   ])
 
   const selectedOrg = organizations.find((org) => org.slug === orgSlug)
-  const region = project?.region
   const isHighComplianceProject = projectSettings?.is_sensitive ?? undefined
 
   const isProjectInOrg = selectedOrg !== undefined && project?.organization_id === selectedOrg.id
@@ -53,8 +51,6 @@ export const getAIDetails = async ({
       orgId: undefined,
       orgSlug: undefined,
       planId: undefined,
-      // Undefined rather than the real region so isTracingAllowed fails closed
-      region: undefined,
       isHighComplianceProject: undefined,
     }
   }
@@ -65,7 +61,6 @@ export const getAIDetails = async ({
     orgId: selectedOrg.id,
     orgSlug: selectedOrg.slug,
     planId: selectedOrg.plan.id,
-    region,
     isHighComplianceProject,
   }
 }

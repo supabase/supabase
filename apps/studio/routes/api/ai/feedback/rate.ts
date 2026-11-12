@@ -9,7 +9,7 @@ import { toWebHandler } from '@/compat/next/api'
 import { rateMessageResponseSchema } from '@/components/ui/AIAssistantPanel/Message.utils'
 import type { AiOptInLevel } from '@/hooks/misc/useOrgOptedIntoAi'
 import { getAIDetails } from '@/lib/ai/ai-details'
-import { IS_TRACING_ENABLED, isTracingAllowed } from '@/lib/ai/braintrust-logger'
+import { IS_TRACING_ENABLED } from '@/lib/ai/braintrust-logger'
 import { getModel } from '@/lib/ai/model'
 import { DEFAULT_COMPLETION_MODEL } from '@/lib/ai/model.utils'
 import { sanitizeMessagePart } from '@/lib/ai/tools/tool-sanitizer'
@@ -55,7 +55,7 @@ async function handlePost(req: NextApiRequest, res: NextApiResponse) {
   const { rating, messages: rawMessages, projectRef, orgSlug, reason, spanId } = data
 
   let aiOptInLevel: AiOptInLevel = 'disabled'
-  let projectRegion: string | undefined
+  let orgId: number | undefined
 
   if (!IS_PLATFORM) {
     aiOptInLevel = 'schema'
@@ -66,7 +66,7 @@ async function handlePost(req: NextApiRequest, res: NextApiResponse) {
       const aiDetails = await getAIDetails({ orgSlug, projectRef, authorization })
 
       aiOptInLevel = aiDetails.aiOptInLevel
-      projectRegion = aiDetails.region
+      orgId = aiDetails.orgId
     } catch (error) {
       return res.status(400).json({
         error: 'There was an error fetching your organization details',
@@ -127,7 +127,7 @@ Instructions:
     })
 
     // Log feedback to Braintrust if tracing is enabled and span ID is available
-    if (IS_TRACING_ENABLED && isTracingAllowed({ projectRegion }) && spanId) {
+    if (IS_TRACING_ENABLED && orgId !== undefined && spanId) {
       try {
         const logger = currentLogger()
         logger?.logFeedback({
