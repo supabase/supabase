@@ -301,8 +301,7 @@ const DatabaseUsage = () => {
       <ReportHeader showDatabaseSelector title={REPORT_TITLE} />
       <ReportStickyNav
         content={
-          <div className="ml-auto flex items-center gap-2 flex-wrap">
-            <DocsButton href={OBSERVABILITY_DOCS_HREFS.database} topic={REPORT_TITLE} />
+          <div className="w-full flex items-center gap-2 flex-wrap">
             <ShortcutTooltip
               shortcutId={SHORTCUT_IDS.OBSERVABILITY_REFRESH}
               label="Refresh report"
@@ -347,6 +346,11 @@ const DatabaseUsage = () => {
                 </div>
               )}
             </div>
+            <DocsButton
+              href={OBSERVABILITY_DOCS_HREFS.database}
+              topic={REPORT_TITLE}
+              className="ml-auto"
+            />
           </div>
         }
       >

@@ -148,8 +148,7 @@ const RealtimeUsage = () => {
       <ReportStickyNav
         content={
           <div className="flex flex-col gap-3 w-full">
-            <div className="ml-auto flex items-center gap-2 flex-wrap">
-              <DocsButton href={OBSERVABILITY_DOCS_HREFS.realtime} topic={REPORT_TITLE} />
+            <div className="w-full flex items-center gap-2 flex-wrap">
               <ShortcutTooltip
                 shortcutId={SHORTCUT_IDS.OBSERVABILITY_REFRESH}
                 label="Refresh report"
@@ -190,6 +189,11 @@ const RealtimeUsage = () => {
                   </p>
                 </div>
               )}
+              <DocsButton
+                href={OBSERVABILITY_DOCS_HREFS.realtime}
+                topic={REPORT_TITLE}
+                className="ml-auto"
+              />
             </div>
           </div>
         }
