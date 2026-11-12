@@ -10,11 +10,7 @@ export const Route = createFileRoute('/project/$ref/')({
 function ProjectHomeRoute() {
   return (
     <ProjectLayoutWithAuth>
-      <HomePage />
+      <ProjectHome />
     </ProjectLayoutWithAuth>
   )
-}
-
-function HomePage() {
-  return <ProjectHome />
 }
