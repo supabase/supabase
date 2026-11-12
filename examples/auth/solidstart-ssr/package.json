@@ -1,0 +1,22 @@
+{
+  "name": "solidstart-ssr",
+  "version": "1.0.0",
+  "description": "SolidStart SSR example with Supabase SSR auth client",
+  "type": "module",
+  "scripts": {
+    "dev": "vinxi dev",
+    "build": "vinxi build",
+    "start": "vinxi start"
+  },
+  "dependencies": {
+    "@supabase/ssr": "latest",
+    "@supabase/supabase-js": "^2",
+    "@solidjs/start": "^1",
+    "solid-js": "^1.8",
+    "vinxi": "^0.5"
+  },
+  "devDependencies": {
+    "@types/node": "^20",
+    "vite": "^5"
+  }
+}
