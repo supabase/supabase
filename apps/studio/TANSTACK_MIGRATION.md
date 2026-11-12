@@ -2,31 +2,23 @@
 
 Temporary tracking doc. Delete once migration is done.
 
-**Runtime model — Next.js and TanStack Start run side-by-side**
+**Runtime model — TanStack Start only**
 
-Throughout this migration both runtimes coexist in the same workspace:
+FE-3106 retired the Next build (`build:next` / `dev:next`, `scripts/dispatch.js`,
+the `STUDIO_FRAMEWORK` switch and the Next E2E shard). `pnpm dev`/`build`/`start`
+run the Vite/TanStack build only, so nothing serves `pages/...` any more.
 
-- The Next.js pages router (`pages/...`) and the TanStack route tree
-  (`routes/...`) ship **at the same time**. The Vite/TanStack build is
-  what we run today; the Next build (`build:next` / `dev:next` scripts
-  in `apps/studio/package.json`) stays alive as a fallback so we can
-  bisect regressions and ship either runtime if needed.
-- **Do not delete any `apps/studio/pages/...` file during the per-route
-  migration.** Path A pages re-export their `pages/` default export, so
-  the Next file is load-bearing for both runtimes. Removing it breaks
-  the Next build and breaks the TanStack route too.
-- Body-moves and `pages/...` deletion happen **only in the final
-  cleanup pass**, after every route is represented in `routes/...` and
-  we're ready to retire the Next runtime entirely. That's a separate,
-  deliberate phase — not something to fold into individual route PRs.
-- Same rule for the Next compat shims (`apps/studio/compat/next/`):
-  they stay until the cleanup pass, regardless of how many routes have
-  moved.
+- `pages/...` files are plain modules: Path A routes still re-export them until
+  the cleanup pass moves each body into its route file and deletes the page.
+- The FE-3106 cleanup PRs delete `pages/...` area by area; deleting a page is
+  safe once its route no longer imports it.
+- The Next compat shims (`apps/studio/compat/next/`) stay while components
+  outside `routes/...` still import `next/*`.
 
 **PR guardrail — mirror page edits into their route**
 
-Because both runtimes ship at once, any change to a `pages/...` file can
-leave its `routes/...` mirror stale. A CodeRabbit `path_instructions`
+While a route still re-exports its page, a change to the `pages/...` file can
+leave its `routes/...` wrapper stale. A CodeRabbit `path_instructions`
 rule (`.coderabbit.yaml`, scoped to `apps/studio/pages/**`) posts a
 review reminder on every PR that touches a page, prompting the author to
 check whether the corresponding route needs the same change. It's a
@@ -53,10 +45,10 @@ Once every page is represented in `routes/`, we do a second pass to properly mov
 
 Other rules:
 
-- New code uses native TanStack APIs directly (no `next/router`, no `next/link`). The Next compat shim stays in place for pages we re-export.
+- New code uses native TanStack APIs directly (no `next/router`, no `next/link`). The Next compat shim stays in place for code that still imports `next/*`.
 - `withAuth()` HOC → TanStack `beforeLoad` on the containing route/layout. Apply this at shared-layout level where possible.
-- **Never** delete a `pages/...` file mid-migration — both runtimes need to keep working. Body-moves and Next-file deletions are reserved for the cleanup pass at the very end, after every entry in this checklist is `[x]`. See "Runtime model" above.
-- Not migrated via this list: `pages/api/**` (Next API routes — separate migration), `_app.tsx`, `_document.tsx`, `_error`, `pages/org/_/[[...routeSlug]].tsx`, `pages/project/_/[[...routeSlug]].tsx` (catch-alls — revisit at the end).
+- Body moves and `pages/...` deletions happen in the FE-3106 cleanup PRs; mark each entry `[x] A→done` as its page is deleted.
+- Not migrated via this list: `_app.tsx`, `_document.tsx`, `_error`, `pages/org/_/[[...routeSlug]].tsx`, `pages/project/_/[[...routeSlug]].tsx` (catch-alls — revisit at the end).
 
 **Legend**
 
@@ -95,7 +87,7 @@ These are the layout-only TanStack files. Most hold a single product layout comp
 - [x] `routes/project/$ref/logs.tsx` — LogsLayout (reads `logsLayoutTitle` from leaf staticData). Honours `skipLogsLayout: true` for `logs/index` (page handles its own ProjectLayout-wrapped content for the UnifiedLogs / no-permission cases). Refactored `pages/.../logs/index.tsx` to move the inline `<DefaultLayout>` into `getLayout` so it isn't duplicated when the TanStack project shell already provides DefaultLayout.
 - [x] `routes/project/$ref/observability.tsx` — ObservabilityLayout (reads `observabilityLayoutTitle` from leaf staticData)
 - [x] `routes/project/$ref/compute.tsx` — ComputeLayout (reads `computeLayoutTitle` from leaf `staticData`). Flag-gated: `ComputeLayout` itself redirects to the project home when `useFlag('compute')` is off, so the shell needs no extra guard.
-- [x] `routes/project/$ref/advisors.tsx` — AdvisorsLayout (reads `advisorsLayoutTitle` from leaf staticData). Honours `skipAdvisorsLayout: true` opt-out for the rules sub-shell, which provides its own AdvisorsLayout-less-DefaultLayout wrap. Scans whole match chain (same pattern as functions.tsx).
+- [x] `routes/project/$ref/advisors.tsx` — IssuesLayout. Honours `skipAdvisorsLayout: true` opt-out for the rules sub-shell, which provides its own wrap, and for the old health/performance/security pages, which only redirect to `/issues`. Scans whole match chain (same pattern as functions.tsx).
 - [x] `routes/project/$ref/advisors/rules.tsx` — sub-shell that inlines the inner body of `AdvisorRulesLayout` (AdvisorsLayout + PageLayout with title/tabs/feature-preview badge), minus the outer DefaultLayout (already provided by the parent project shell). Sets `skipAdvisorsLayout: true` on its own staticData. **Delta vs plan:** the existing `AdvisorRulesLayout` component wraps in DefaultLayout + AdvisorsLayout internally, so reusing it as-is would double-wrap both. Inlined the inner part; the Next-side component is untouched.
 - [x] `routes/project/$ref/settings.tsx` — SettingsLayout (reads `settingsLayoutTitle` from leaf staticData). Honours `skipSettingsLayout: true` for `settings/api` (redirect-only page). Adds a sub-shell at `routes/project/$ref/settings/api-keys.tsx` providing `ApiKeysLayout` for both api-keys leaves; `jwt/index` wraps in `JWTKeysLayout` inline since `jwt/legacy` doesn't share it.
 - [x] `routes/project/$ref/integrations.tsx` — ProjectMarketplaceLayout (no staticData; all 4 leaves share identical layout). Layout is `withAuth(({ children }) => <ProjectLayout productMenu={<MarketplaceProductMenu />}>{children}</ProjectLayout>)`, so the shell just wraps `<Outlet />` once.
@@ -387,13 +379,12 @@ These are the layout-only TanStack files. Most hold a single product layout comp
 
 ## API routes
 
-**Strategy — shim + re-export.** `compat/next/api.ts` exposes
-`toWebHandler(nextHandler)` that adapts a `(req, res) => …` Next.js handler
-into a TanStack Start Web-fetch handler. Each `routes/api/...` file imports
-the default export from `pages/api/...`, wraps with `toWebHandler`, and
-registers via `createFileRoute(...).server.handlers`. `apiWrapper` and
-`apiAuthenticate` stay untouched — they run inside the shim, seeing a
-NextApiRequest-shaped `req` and a proxy `res`.
+**Strategy — shim.** Each `routes/api/...` file holds its handler
+(moved from `pages/api/...`, which is deleted, FE-3106), wraps it with
+`toWebHandler` from `compat/next/api.ts`, and registers it via
+`createFileRoute(...).server.handlers`. `apiWrapper` and
+`apiAuthenticate` run inside the shim, seeing a NextApiRequest-shaped
+`req` and a proxy `res`.
 
 **Path conventions** — `pages/api/foo/[bar]/baz.ts` → `routes/api/foo/$bar/baz.ts`;
 `pages/api/foo/[[...slug]].ts` → `routes/api/foo/$.ts`.
@@ -432,8 +423,7 @@ Web-natively from scratch:
 - `routes/api/mcp/index.ts` — uses MCP SDK's
   `WebStandardStreamableHTTPServerTransport` (`handleRequest(request)`
   returns a `Response` directly).
-- `pages/api/ai/docs.ts` was already edge-runtime / Web-Response native
-  — direct re-export, no shim involved.
+- `routes/api/ai/docs.ts` is Web-Response native — no shim involved.
 
 Tracking below is coarse — each bullet is a `pages/api/**` subtree. Check off
 once every file in the subtree has a `routes/api/**` counterpart. Expand into

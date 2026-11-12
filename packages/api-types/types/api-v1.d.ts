@@ -5480,7 +5480,6 @@ export interface components {
             status: string
           }
       result?: {
-        /** Format: date-time */
         timestamp: string
         total_auth_requests: number
         total_realtime_requests: number
@@ -6491,6 +6490,8 @@ export interface operations {
         code_challenge_method?: 'plain' | 'sha256' | 'S256'
         /** @description Organization slug */
         organization_slug?: string
+        /** @description Project ref */
+        project_ref?: string
         redirect_uri: string
         /** @description Resource indicator for MCP (Model Context Protocol) clients */
         resource?: string

@@ -236,7 +236,7 @@ export const FileExplorerColumn = ({
                   </div>
                 </>
               ) : (
-                <p className="text-sm text-foreground-light">No files available for selection</p>
+                <p className="text-sm text-foreground-lighter">No files available for selection</p>
               )}
             </div>
           )}

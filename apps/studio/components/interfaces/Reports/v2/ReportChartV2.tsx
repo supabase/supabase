@@ -183,6 +183,7 @@ export const ReportChartV2 = ({
               sql={queryResult?.query}
               highlightActions={highlightActions}
               showNewBadge={report.showNewBadge}
+              getHeaderStats={report.getHeaderStats}
             />
           </div>
         )}

@@ -170,6 +170,10 @@ export const ISO_COMPOSITIONS: Record<Topic, IsoComposition> = {
     titleAt: 'top',
     boxes: FAQ_BLOCKS,
   },
+  Community: {
+    titleAt: 'top',
+    boxes: FAQ_BLOCKS,
+  },
 }
 
 export const FALLBACK_COMPOSITION: IsoComposition = { titleAt: 'top', boxes: [cube(0, 0, 0, 1)] }

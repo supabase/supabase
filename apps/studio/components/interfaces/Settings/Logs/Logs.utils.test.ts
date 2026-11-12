@@ -364,8 +364,8 @@ describe('Logs.utils', () => {
   })
 
   describe('genChartQuery', () => {
-    test.each([150, '03dg2o5teb2eucxr9ggh3uie6', "opaque' OR '1'='1"])(
-      'reads pipeline %s through the table alias in every legacy query',
+    test.each([150, '00150', '03dg2o5teb2eucxr9ggh3uie6', "opaque' OR '1'='1"])(
+      'reads only pipeline_id_v2 for pipeline %s in every legacy query',
       (pipelineId) => {
         const params = {
           iso_timestamp_start: '2026-10-30T10:00:00Z',
@@ -381,7 +381,7 @@ describe('Logs.utils', () => {
         ]) {
           expect(sql).toContain('etl_replication_logs t')
           expect(sql).toContain("json_value(to_json_string(t), '$.pipeline_id_v2')")
-          expect(sql).toContain('cast(t.pipeline_id as string)')
+          expect(sql).not.toContain('cast(t.pipeline_id as string)')
           expect(sql).not.toContain('etl_replication_logs.pipeline_id')
           expect(sql).not.toContain('to_json_string(etl_replication_logs)')
           expect(sql).toContain(`= '${expectedId}'`)

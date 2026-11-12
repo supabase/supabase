@@ -82,6 +82,17 @@ export function isAbortError(err: unknown): err is { name: 'AbortError'; message
   return typeof err === 'object' && err !== null && 'name' in err && err.name === 'AbortError'
 }
 
+/**
+ * True for a raw abort or for the tagged `RequestAborted` error the fetch layer turns it into.
+ * Use this instead of checking `error.name === 'AbortError'`.
+ */
+export function isRequestAborted(err: unknown): boolean {
+  return isAbortError(err) || (isStudioError(err) && err._tag === 'RequestAborted')
+}
+
+export const NETWORK_UNREACHABLE_MESSAGE =
+  'Unable to reach the server. Please check your network or try again later.'
+
 // Browsers reject fetch with a TypeError on network failure, but TypeError also covers
 // ordinary programming bugs, so match only the fetch-failure messages (Chrome, Firefox, Safari)
 const FETCH_FAILURE_MESSAGES = [
@@ -105,7 +116,7 @@ export function isFetchFailure(err: unknown): err is TypeError {
  */
 export function classifyError(
   error: unknown,
-  context?: Pick<StudioErrorInput, 'endpoint' | 'method' | 'requestPathname'>
+  context?: Pick<StudioErrorInput, 'endpoint' | 'method'>
 ): StudioError {
   if (isStudioError(error)) return error
 
@@ -117,7 +128,7 @@ export function classifyError(
     const isOffline = typeof navigator !== 'undefined' && navigator.onLine === false
     return new NetworkUnreachableError({
       ...context,
-      message: error.message,
+      message: NETWORK_UNREACHABLE_MESSAGE,
       reason: isOffline ? 'offline' : undefined,
       cause: error,
     })
@@ -139,14 +150,138 @@ const responseErrorBodySchema = z.object({
   code: optional(z.number()),
   requestId: optional(z.string()),
   retryAfter: optional(z.number()),
-  requestPathname: optional(z.string()),
+  endpoint: optional(z.string()),
+  method: optional(z.string()),
   metadata: optional(z.record(z.string(), z.unknown())),
   formattedError: optional(z.string()),
   position: optional(z.string()),
 })
 
+const MAX_TEXT_MESSAGE_LENGTH = 500
+
+const jsonErrorBodySchema = z.object({
+  msg: optional(z.string()),
+  message: optional(z.string()),
+  error: optional(z.string()),
+  metadata: optional(z.record(z.string(), z.unknown())),
+  formattedError: optional(z.string()),
+})
+
+/** Parses `text` as JSON and returns it only when it is a plain object. */
+export function parseJsonObject(text: string): Record<string, unknown> | undefined {
+  try {
+    const parsed: unknown = JSON.parse(text)
+    if (typeof parsed === 'object' && parsed !== null && !Array.isArray(parsed)) {
+      return parsed as Record<string, unknown>
+    }
+  } catch {
+    // not JSON
+  }
+  return undefined
+}
+
+const HTTP_DATE_MONTH = /\b(Jan|Feb|Mar|Apr|May|Jun|Jul|Aug|Sep|Oct|Nov|Dec)\b/
+
 /**
- * Reads the error body the fetch middleware produces for a failed API response. Returns undefined
+ * Parses a `Retry-After` header value into a number of seconds from now.
+ * Per RFC 9110 it is either delta-seconds (`"120"`) or an HTTP-date
+ * (`"Wed, 21 Oct 2015 07:28:00 GMT"`). Returns undefined for anything else.
+ */
+export function parseRetryAfterSeconds(
+  header: string | null | undefined,
+  now = Date.now()
+): number | undefined {
+  const value = header?.trim()
+  if (!value) return undefined
+  if (/^\d+$/.test(value)) return Number(value)
+  if (!HTTP_DATE_MONTH.test(value)) return undefined
+  const dateMs = Date.parse(value)
+  if (Number.isNaN(dateMs)) return undefined
+  return Math.max(0, Math.ceil((dateMs - now) / 1000))
+}
+
+/**
+ * Parses an `X-RateLimit-Reset` header value into a number of seconds from now.
+ * Supabase sends seconds remaining, but many APIs send a Unix epoch timestamp
+ * instead. Values >= 1_000_000_000 (an epoch in seconds, after 2001) are treated
+ * as epochs; smaller values are treated as delta-seconds.
+ */
+export function parseRateLimitResetSeconds(
+  header: string | null | undefined,
+  now = Date.now()
+): number | undefined {
+  const value = header?.trim()
+  if (!value || !/^\d+$/.test(value)) return undefined
+  const n = Number(value)
+  return n >= 1_000_000_000 ? Math.max(0, Math.ceil(n - now / 1000)) : n
+}
+
+/**
+ * The single place that turns an HTTP error response into a `RawResponseError`. A JSON object body
+ * supplies the message and extra fields. A short `text/plain` body becomes the message. Other
+ * bodies (HTML error pages, empty bodies, JSON arrays) yield no message, so classification falls
+ * back to the status.
+ */
+export function readResponseError({
+  status,
+  headers,
+  text,
+  requestId,
+  endpoint,
+  method,
+}: {
+  status: number
+  headers: Headers
+  text: string
+  requestId?: string
+  endpoint?: string
+  method?: string
+}): RawResponseError {
+  const parsed = parseJsonObject(text)
+
+  let message: string | undefined
+  let metadata: ErrorMetadata | undefined
+  let formattedError: string | undefined
+
+  if (parsed) {
+    const body = jsonErrorBodySchema.parse(parsed)
+    message = body.msg ?? body.message ?? body.error
+    metadata = body.metadata as ErrorMetadata | undefined
+    formattedError = body.formattedError
+  } else {
+    const trimmed = text.trim()
+    const contentType = headers.get('Content-Type') ?? ''
+    if (
+      trimmed.length > 0 &&
+      trimmed.length <= MAX_TEXT_MESSAGE_LENGTH &&
+      contentType.toLowerCase().startsWith('text/plain')
+    ) {
+      message = trimmed
+    }
+  }
+
+  const retryAfter =
+    parseRetryAfterSeconds(headers.get('Retry-After')) ??
+    parseRateLimitResetSeconds(headers.get('X-RateLimit-Reset'))
+
+  const raw: RawResponseError = {
+    message,
+    code: status,
+    retryAfter,
+    requestId,
+    endpoint,
+    method,
+    metadata,
+    formattedError,
+  }
+  return Object.fromEntries(
+    Object.entries(raw).filter(([, value]) => value !== undefined)
+  ) as RawResponseError
+}
+
+/**
+ * Validates the `RawResponseError` shape of the value `handleError` receives (a body from
+ * `readResponseError` or a hand-built `{ message, code }` object). Returns undefined
  * when there is neither a message nor a status code, or for tagged, aborted, and fetch-failure
  * errors that merely carry a message, so the caller can fall back to `classifyError`.
  */
