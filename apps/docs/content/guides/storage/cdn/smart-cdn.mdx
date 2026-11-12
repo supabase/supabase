@@ -58,9 +58,9 @@ For more information about revoking signed URLs, see [URL Signing Keys](/docs/gu
 
 When you request a private asset through the authenticated endpoint (`/storage/v1/object/authenticated/[bucket]/[asset-name]`), access is allowed until the user's access token (JWT) expires. The CDN caches the response based on the user's access at the time of the request, and keeps serving it until the JWT expires.
 
-This means that:
+For the authenticated endpoint:
 
-- If you change a user's access, for example by updating a Row Level Security (RLS) policy, [purge the CDN cache](/docs/guides/storage/cdn/purge-cdn-cache) so the next request that reaches the server is re-evaluated against your current access rules.
+- If you change a user's access, for example, by updating a Row Level Security (RLS) policy, [purge the CDN cache](/docs/guides/storage/cdn/purge-cdn-cache) so the next request that reaches the server is re-evaluated against your current access rules.
   - The purge can take up to 60 seconds to propagate.
   - A CDN purge doesn't update permissions stored in JWT claims. An unexpired JWT can still grant access after you change those permissions.
   - A CDN purge doesn't clear browser caches. A browser can reuse a cached asset without sending a request to Storage until its `cacheControl` TTL expires.
@@ -68,7 +68,7 @@ This means that:
   - Signing out ends the Auth session but doesn't invalidate access tokens that were already issued.
   - To shorten this window, lower the access token expiry in your project's [Sessions settings](/dashboard/project/_/auth/sessions). Changes only affect newly issued JWTs. Existing tokens keep their original expiry. See the [recommended values](/docs/guides/auth/sessions#what-are-recommended-values-for-access-token-jwt-expiration) before choosing a duration.
 
-To revoke access immediately, check the user's session and permissions in your own server code, for example in an [Edge Function](/docs/guides/functions). Your code then handles authorization, so it can call the Storage API with a secret API key (or the legacy `service_role` key) and still benefit from CDN caching between Storage and your server.
+To revoke access immediately, check the user's session and permissions in your own server code, for example, in an [Edge Function](/docs/guides/functions). Your code then handles authorization, so it can call the Storage API with a secret API key and still benefit from CDN caching between Storage and your server. Projects that use legacy API keys can use the `service_role` key.
 
 To check for sign-out in that code:
 
