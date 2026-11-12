@@ -64,7 +64,8 @@ export function Inspector() {
         className="flex max-h-96 w-80 flex-col gap-3 overflow-y-auto p-3 text-xs"
         onOpenAutoFocus={(event) => event.preventDefault()}
         onCloseAutoFocus={(event) => event.preventDefault()}
-        onInteractOutside={(event) => {
+        onFocusOutside={(event) => event.preventDefault()}
+        onPointerDownOutside={(event) => {
           const waterfall = treeRef.current?.closest('[data-trace-waterfall]')
           if (waterfall?.contains(event.target as Node)) event.preventDefault()
         }}
