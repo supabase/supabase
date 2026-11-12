@@ -396,10 +396,10 @@ export function useConnectState(initialState?: Partial<ConnectState>): UseConnec
     const hasValidSource =
       state.connectionSource === undefined ||
       state.connectionSource === projectRef ||
-      state.connectionSource === CONNECTION_SOURCE_LOAD_BALANCER
+      (isHighAvailability && state.connectionSource === CONNECTION_SOURCE_LOAD_BALANCER)
     if (!hasValidSource) next.connectionSource = projectRef ?? '_'
     return next
-  }, [state, hasConnectionPooling, projectRef])
+  }, [state, hasConnectionPooling, isHighAvailability, projectRef])
 
   const activeFields = useMemo(() => {
     let fields = getActiveFields(connectSchema, resolvedState)

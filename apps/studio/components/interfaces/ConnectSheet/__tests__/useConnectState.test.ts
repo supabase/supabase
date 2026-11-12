@@ -331,6 +331,33 @@ describe('useConnectState', () => {
       expect(result.current.state.connectionSource).toBe('load-balancer')
     })
 
+    test('should coerce a stale load balancer connection source to the primary for Multigres Lite projects', async () => {
+      const { useProjectCapabilities } = await import('@/hooks/misc/useSelectedProject')
+      vi.mocked(useProjectCapabilities).mockReturnValue({
+        deploysOnK8s: true,
+        usesWalg: false,
+        usesFsxVolume: false,
+        supportsReadReplicas: false,
+        supportsJitAccess: false,
+        supportsPauseAndRestore: false,
+        supportsAddons: false,
+        exposesMetricsApi: false,
+        k8sNamespacePrefix: 'ha',
+        poolerPort: 5432,
+        allowSslEnforcementConfiguration: false,
+        hasConnectionPooling: false,
+        requiresDirectTlsNegotiation: true,
+      })
+
+      const { result } = renderHook(() =>
+        useConnectState({ mode: 'direct', connectionSource: 'load-balancer' })
+      )
+
+      expect(result.current.state.connectionSource).toBe('test-ref')
+
+      vi.mocked(useProjectCapabilities).mockReturnValue(undefined)
+    })
+
     test('should hide connectionMethod field for HA projects', async () => {
       const { useIsHighAvailability } = await import('@/hooks/misc/useSelectedProject')
       vi.mocked(useIsHighAvailability).mockReturnValue(true)
