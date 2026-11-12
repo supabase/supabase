@@ -54,6 +54,7 @@ import { AddonVariantId } from '@/data/subscriptions/types'
 import { useResourceWarningsQuery } from '@/data/usage/resource-warnings-query'
 import { useCheckEntitlements } from '@/hooks/misc/useCheckEntitlements'
 import { FGA_PERMISSIONS, useAsyncCheckPermissionsV2 } from '@/hooks/misc/useCheckPermissionsV2'
+import { useProjectDiskLimits } from '@/hooks/misc/useProjectDiskLimits'
 import { useSelectedOrganizationQuery } from '@/hooks/misc/useSelectedOrganization'
 import {
   useIsAwsCloudProvider,
@@ -143,6 +144,7 @@ export function DiskManagementForm({
   const computeSize = project?.infra_compute_size
     ? mapComputeSizeNameToAddonVariantId(project?.infra_compute_size)
     : undefined
+  const { limits: projectDiskLimits, isPerInstance } = useProjectDiskLimits()
 
   // @ts-ignore
   const { type, iops, throughput_mbps, size_gb } = data?.attributes ?? { size_gb: 0, iops: 0 }
@@ -164,6 +166,8 @@ export function DiskManagementForm({
         defaultTotalSize: defaultValues.totalSize,
         cloudProvider: project?.cloud_provider as CloudProvider,
         isSpendCapEnabled,
+        currentComputeSize: computeSize,
+        currentInstanceLimits: isPerInstance ? projectDiskLimits : undefined,
       })
     ),
     defaultValues,

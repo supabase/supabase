@@ -29,10 +29,12 @@ export function useBranchCommands() {
   const branchesGrant = useGrant('GET /v1/projects/{ref}/branches', {
     projectRef: parentProjectRef,
   })
-  let { data: branches } = useQuery({
-    ...branchesQueryOptions({ projectRef: parentProjectRef, grant: branchesGrant.grant }),
-    enabled: isBranchingEnabled,
-  })
+  let { data: branches } = useQuery(
+    branchesQueryOptions(
+      { projectRef: parentProjectRef, grant: branchesGrant.grant },
+      { enabled: isBranchingEnabled }
+    )
+  )
 
   branches ??= EMPTY_ARRAY
 

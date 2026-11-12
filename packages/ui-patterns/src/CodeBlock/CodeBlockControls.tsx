@@ -126,7 +126,7 @@ export function CodeBlockControls({
   )
 }
 
-function CrossfadeIcon({
+export function CrossfadeIcon({
   active,
   activeIcon: ActiveIcon,
   inactiveIcon: InactiveIcon,

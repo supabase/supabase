@@ -31,9 +31,11 @@ type Routing = {
 export const ERROR_ROUTING = {
   RequestAborted: { sentrySampleRate: SAMPLE_NEVER },
   NetworkUnreachable: { sentrySampleRate: SAMPLE_OTHER },
-  MalformedResponse: { sentrySampleRate: SAMPLE_OTHER },
+  MalformedResponse: { sentrySampleRate: SAMPLE_ALWAYS },
   PlatformError: { sentrySampleRate: SAMPLE_OTHER },
   UnclassifiedApiError: { sentrySampleRate: SAMPLE_OWNED },
   DbConnectionTimeout: { sentrySampleRate: SAMPLE_OTHER },
+  UserSqlError: { sentrySampleRate: SAMPLE_NEVER },
+  StudioSqlError: { sentrySampleRate: SAMPLE_OWNED },
   UnexpectedError: { sentrySampleRate: SAMPLE_OWNED },
 } as const satisfies Record<StudioErrorTag, Routing>

@@ -1,4 +1,5 @@
-import { LightbulbIcon } from 'lucide-react'
+import { useFlag } from 'common'
+import { CircleAlertIcon, LightbulbIcon } from 'lucide-react'
 import { useMemo } from 'react'
 import { cn } from 'ui'
 
@@ -14,6 +15,7 @@ import { useSidebarManagerSnapshot } from '@/state/sidebar-manager-state'
 export const AdvisorButton = ({ projectRef }: { projectRef?: string }) => {
   const { toggleSidebar, activeSidebar } = useSidebarManagerSnapshot()
   const track = useTrack()
+  const isIssuesInboxEnabled = useFlag('issuesInbox')
 
   const { data: lints } = useProjectLintsQuery({ projectRef })
   const { data: signalItems } = useAdvisorSignals({ projectRef })
@@ -43,6 +45,9 @@ export const AdvisorButton = ({ projectRef }: { projectRef?: string }) => {
     toggleSidebar(SIDEBAR_KEYS.ADVISOR_PANEL)
   }
 
+  const label = isIssuesInboxEnabled ? 'Issues' : 'Advisor Center'
+  const Icon = isIssuesInboxEnabled ? CircleAlertIcon : LightbulbIcon
+
   return (
     <div className="relative">
       <ButtonTooltip
@@ -51,8 +56,6 @@ export const AdvisorButton = ({ projectRef }: { projectRef?: string }) => {
         id="advisor-center-trigger"
         className={cn(
           'rounded-full w-[32px] h-[32px] flex items-center justify-center p-0 group',
-          // Critical fill/border only when idle — selected matches the other
-          // header circles (foreground fill, no destructive outline).
           hasCriticalIssues &&
             !isOpen &&
             'bg-destructive-200 border-destructive-500 hover:border-destructive',
@@ -61,11 +64,11 @@ export const AdvisorButton = ({ projectRef }: { projectRef?: string }) => {
         onClick={handleClick}
         tooltip={{
           content: {
-            text: 'Advisor Center',
+            text: label,
           },
         }}
       >
-        <LightbulbIcon
+        <Icon
           size={16}
           strokeWidth={1.5}
           className={cn(
@@ -73,13 +76,12 @@ export const AdvisorButton = ({ projectRef }: { projectRef?: string }) => {
             isOpen && 'text-background group-hover:text-background'
           )}
         />
-        <span className="sr-only">Advisor Center</span>
+        <span className="sr-only">{label}</span>
       </ButtonTooltip>
       {hasCriticalIssues ? (
         <span
           className={cn(
             'absolute top-1.5 right-1.5 w-1.5 h-1.5 rounded-full',
-            // Slightly lighter on the inverted selected fill in light mode only.
             isOpen ? 'bg-destructive-500 dark:bg-destructive' : 'bg-destructive'
           )}
         />

@@ -3,7 +3,7 @@ import { useQuery } from '@tanstack/react-query'
 import { contentApiKeys } from './keys'
 import { executeGraphQL } from '@/data/graphql/execute'
 import { graphql } from '@/data/graphql/gql'
-import { Service } from '@/data/graphql/graphql'
+import type { Service } from '@/data/graphql/graphql'
 import { UseCustomQueryOptions } from '@/types'
 
 const ErrorCodeQuery = graphql(`

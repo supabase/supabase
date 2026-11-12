@@ -1,6 +1,6 @@
 import { CheckIcon } from 'lucide-react'
 import Image from 'next/image'
-import { Badge, Button } from 'ui'
+import { Badge } from 'ui'
 
 import { AWS_IDP_REGIONS } from './AwsRegionSelector'
 import {
@@ -9,12 +9,15 @@ import {
   getIntegrationTypeLabel,
   INTEGRATION_TYPES,
 } from './ThirdPartyAuthForm.utils'
+import { ButtonTooltip } from '@/components/ui/ButtonTooltip'
 import { ThirdPartyAuthIntegration } from '@/data/third-party-auth/integrations-query'
 import { DOCS_URL } from '@/lib/constants'
 
 interface IntegrationCardProps {
   integration: ThirdPartyAuthIntegration
   canUpdateConfig: boolean
+  /** Explains why deleting is disabled, if it is. */
+  deleteTooltip?: string
   onDelete: () => void
 }
 
@@ -194,6 +197,7 @@ export const IntegrationTypeContent = ({
 export const IntegrationCard = ({
   integration,
   canUpdateConfig,
+  deleteTooltip,
   onDelete,
 }: IntegrationCardProps) => {
   const type = getIntegrationType(integration)
@@ -214,9 +218,14 @@ export const IntegrationCard = ({
           <div>
             {/* TODO: this should be a configure integration where it would show the sheet and the user can disable or delete the integration
               but there's no "edit integration" endpoing for now. */}
-            <Button variant="danger" disabled={!canUpdateConfig} onClick={() => onDelete()}>
+            <ButtonTooltip
+              variant="danger"
+              disabled={!canUpdateConfig}
+              onClick={() => onDelete()}
+              tooltip={{ content: { side: 'bottom', text: deleteTooltip } }}
+            >
               Delete integration
-            </Button>
+            </ButtonTooltip>
           </div>
         </div>
         <div className="shrink-0">

@@ -227,7 +227,9 @@ export const QueryIndexes = ({
         <div className="mb-4 flex flex-col gap-y-1">
           <h4 className="mb-2">Indexes in use</h4>
           <p className="text-sm text-foreground-light">
-            This query is using the following index{(usedIndexes ?? []).length > 1 ? 's' : ''}:
+            This query is using the following index
+            {(usedIndexes ?? []).length > 1 ? <span>s</span> : ''}
+            <span>:</span>
           </p>
         </div>
         {isLoading && <GenericSkeletonLoader />}
@@ -316,13 +318,17 @@ export const QueryIndexes = ({
                           <LightbulbIcon />
                           <AlertTitle>
                             We have {index_statements.length} index recommendation
-                            {index_statements.length > 1 ? 's' : ''}
+                            {index_statements.length > 1 ? <span>s</span> : ''}
                           </AlertTitle>
                           <AlertDescription>
                             You can improve this query's performance by{' '}
                             <span className="text-primary">{totalImprovement.toFixed(2)}%</span> by
                             adding the following suggested{' '}
-                            {index_statements.length > 1 ? 'indexes' : 'index'}
+                            {index_statements.length > 1 ? (
+                              <span>indexes</span>
+                            ) : (
+                              <span>index</span>
+                            )}
                           </AlertDescription>
                         </Alert>
                       ) : (
@@ -380,7 +386,7 @@ export const QueryIndexes = ({
                     />
                   </CollapsibleContent>
                   <CollapsibleTrigger className="text-xs py-1.5 border-t text-foreground-light bg-studio w-full rounded-b-md">
-                    View {showStartupCosts ? 'less' : 'more'}
+                    View {showStartupCosts ? <span>less</span> : <span>more</span>}
                   </CollapsibleTrigger>
                 </Collapsible>
               </div>

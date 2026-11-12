@@ -6,6 +6,7 @@ import { safeLocalStorage } from 'common/safe-storage'
 import { useEffect, useSyncExternalStore } from 'react'
 
 import { IA_NAV_FLAG, isIaNavVariant as isVariant, type IaNavVariant } from './constants'
+import { useIaNavRouteVariant } from './IaNavRouteProvider'
 
 const subscribeToNothing = () => () => {}
 
@@ -24,7 +25,8 @@ export function useIaNavVariant(): IaNavVariant {
   const { posthog, hasLoaded } = useFeatureFlags()
   const { hasAccepted } = useConsentState()
   const searchParams = useSearchParamsShallow()
-  const override = searchParams.get(IA_NAV_FLAG)
+  const routeVariant = useIaNavRouteVariant()
+  const override = routeVariant ?? searchParams.get(IA_NAV_FLAG)
   // the value known before the flags load. it is null on the server and on a first visit
   const knownFlag = useSyncExternalStore(subscribeToNothing, readKnownFlag, () => null)
 
@@ -44,13 +46,13 @@ export function useIaNavVariant(): IaNavVariant {
 
   useEffect(() => {
     // the cached flag can be stale, so only the loaded flag records an exposure
-    if (!hasPosthogFlags || !isAssigned) return
+    if (!hasPosthogFlags || !isAssigned || routeVariant) return
     // useSearchParamsShallow is empty until its own effect runs, so read the URL directly.
     const urlOverride = new URLSearchParams(window.location.search).get(IA_NAV_FLAG)
     if (isVariant(urlOverride)) return
 
     posthogClient.captureExperimentExposure(IA_NAV_FLAG, { variant: flagVariant }, hasAccepted)
-  }, [hasPosthogFlags, isAssigned, flagVariant, hasAccepted])
+  }, [hasPosthogFlags, isAssigned, routeVariant, flagVariant, hasAccepted])
 
   return isVariant(override) ? override : flagVariant
 }

@@ -62,18 +62,20 @@ export const RestartCostEstimate = ({
             <p className="text-sm font-medium">Estimated additional initial sync cost</p>
             <p className="text-xs text-foreground-lighter">
               Based on an estimated {formatBytes(restartEstimate.estimatedBytes)} of initial sync
-              data across {tables.length} {tables.length === 1 ? 'table' : 'tables'}
+              data across {tables.length}{' '}
+              {tables.length === 1 ? <span>table</span> : <span>tables</span>}
             </p>
           </div>
           <span className="shrink-0 font-mono text-lg font-semibold" translate="no">
             {formatCurrency(restartEstimate.estimatedCost)}
-            {restartEstimate.hasRowFilteredTables ? '*' : null}
+            {restartEstimate.hasRowFilteredTables ? <span>*</span> : null}
           </span>
         </div>
       ) : (
         <p className="text-sm text-foreground-light">
           A cost estimate is unavailable. You can still reset the{' '}
-          {tables.length === 1 ? 'table' : 'tables'}.
+          {tables.length === 1 ? <span>table</span> : <span>tables</span>}
+          <span>.</span>
         </p>
       )}
       {restartEstimate?.isComplete && restartEstimate.hasRowFilteredTables && (

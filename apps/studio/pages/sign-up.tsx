@@ -8,13 +8,16 @@ import { SignUpForm } from '@/components/interfaces/SignIn/SignUpForm'
 import { SignInLayout } from '@/components/layouts/SignInLayout/SignInLayout'
 import { UnknownInterface } from '@/components/ui/UnknownInterface'
 import { useEnabledIdentityProviders } from '@/hooks/misc/useEnabledIdentityProviders'
+import { useHydratedQuery } from '@/hooks/misc/useHydratedQuery'
 import { useInboundBranding } from '@/hooks/misc/useInboundBranding'
 import { useIsFeatureEnabled } from '@/hooks/misc/useIsFeatureEnabled'
+import { getSignInQuery } from '@/lib/gotrue'
 import type { NextPageWithLayout } from '@/types'
 
 const SignUpPage: NextPageWithLayout = () => {
   const [showOtherOptions, setShowOtherOptions] = useState(false)
   const [isSubmitted, setIsSubmitted] = useState(false)
+  const query = useHydratedQuery()
   const { dashboardAuthSignUp: signUpEnabled } = useIsFeatureEnabled(['dashboard_auth:sign_up'])
 
   const { focusProvider } = useInboundBranding('sign-up')
@@ -61,7 +64,7 @@ const SignUpPage: NextPageWithLayout = () => {
       <div className={cn('self-center text-center text-sm mb-8', isSubmitted ? 'mt-2' : 'mt-8')}>
         <span className="text-foreground-light">Have an account?</span>{' '}
         <Link
-          href="/sign-in"
+          href={{ pathname: '/sign-in', query: getSignInQuery(query) }}
           className="underline text-foreground hover:text-foreground-light transition"
         >
           Sign in
