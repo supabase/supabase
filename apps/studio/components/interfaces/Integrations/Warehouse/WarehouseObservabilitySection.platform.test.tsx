@@ -42,6 +42,27 @@ const mockMetrics = (body: WarehouseMetricsResponse) =>
   })
 
 describe('Warehouse workload summary', () => {
+  test('shows labelled example charts before setup without requesting project metrics', () => {
+    customRender(<WarehouseObservabilitySection mode="example" />)
+    expect(screen.getByText('Example data')).toBeInTheDocument()
+    expect(screen.getByRole('heading', { name: 'Query duration (p95)' })).toBeInTheDocument()
+    expect(screen.getByRole('heading', { name: 'Query rate' })).toBeInTheDocument()
+    expect(screen.queryByRole('link', { name: 'View metrics' })).not.toBeInTheDocument()
+    expect(screen.queryByText('Unavailable')).not.toBeInTheDocument()
+  })
+
+  test('never replaces unavailable project metrics with examples or a setup claim', async () => {
+    mockMetrics(response({ availability: 'not_provisioned', series: [] }))
+    customRender(<WarehouseObservabilitySection />)
+    expect(
+      await screen.findByText(
+        'Warehouse metrics are unavailable. Replication status is shown above.'
+      )
+    ).toBeInTheDocument()
+    expect(screen.queryByText('Example data')).not.toBeInTheDocument()
+    expect(screen.queryByText('Warehouse is not enabled')).not.toBeInTheDocument()
+  })
+
   test('keeps the workload section and metrics link available while observations load', async () => {
     addAPIMock({
       method: 'get',
@@ -67,7 +88,7 @@ describe('Warehouse workload summary', () => {
     expect(screen.getByText('800 ms')).toBeInTheDocument()
     expect(screen.getByText('0/s')).toBeInTheDocument()
     expect(screen.getByText('3 / 10')).toBeInTheDocument()
-    expect(screen.getAllByText(/^Interval ending /)).toHaveLength(4)
+    expect(screen.getAllByText(/^Interval ending /)).toHaveLength(2)
     expect(screen.getByRole('link', { name: 'View metrics' })).toHaveAttribute(
       'href',
       '/project/default/observability/warehouse'

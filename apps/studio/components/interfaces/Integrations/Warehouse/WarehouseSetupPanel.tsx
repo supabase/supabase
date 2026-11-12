@@ -12,6 +12,8 @@ import { WarehouseSchemaTablePicker } from './WarehouseSchemaTablePicker'
 import {
   WarehouseEnablingProgress,
   WarehouseReplicatedTablesSection,
+  WarehouseSelectedTablesSection,
+  WarehouseStatusPreview,
 } from './WarehouseTableStatusList'
 import { AlertError } from '@/components/ui/AlertError'
 import { useReplicationDestinationsQuery } from '@/data/replication/destinations-query'
@@ -216,16 +218,26 @@ const WarehouseSetupPanelContent = ({
 
   if (status === 'not_started' || status === 'disabled') {
     return (
-      <WarehouseSchemaTablePicker
-        onSubmit={handleSetup}
-        isSubmitting={setupMutation.isPending}
-        error={setupMutation.error}
-      />
+      <>
+        <WarehouseSchemaTablePicker
+          onSubmit={handleSetup}
+          isSubmitting={setupMutation.isPending}
+          error={setupMutation.error}
+        />
+        <WarehouseStatusPreview />
+        <WarehouseObservabilitySection mode="example" />
+      </>
     )
   }
 
   if (isWarehouseSettingUp(status)) {
-    return <WarehouseEnablingProgress status={data} />
+    return (
+      <>
+        <WarehouseSelectedTablesSection tables={data.tables} />
+        <WarehouseEnablingProgress status={data} />
+        <WarehouseObservabilitySection mode="waiting" />
+      </>
+    )
   }
 
   if (status === 'disabling') {
@@ -284,14 +296,14 @@ const WarehouseSetupPanelContent = ({
 
   return (
     <>
-      <WarehouseReplicatedTablesSection tables={data.tables} />
-      <WarehouseObservabilitySection />
       <WarehouseSchemaTablePicker
         isEditing
         onSubmit={handleSetup}
         isSubmitting={setupMutation.isPending}
         error={setupMutation.error}
       />
+      <WarehouseReplicatedTablesSection tables={data.tables} />
+      <WarehouseObservabilitySection />
       <WarehouseConnectSection />
       <WarehouseDisableCard />
     </>

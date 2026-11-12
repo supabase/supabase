@@ -1,6 +1,9 @@
 import { describe, expect, test } from 'vitest'
 
-import { getWarehouseSummaryValue } from './WarehouseObservabilitySection.utils'
+import {
+  getWarehouseSummaryPoints,
+  getWarehouseSummaryValue,
+} from './WarehouseObservabilitySection.utils'
 import { createWarehouseMetric } from '@/components/interfaces/Observability/Warehouse/WarehouseMetrics.fixtures'
 import type { WarehouseMetric } from '@/data/warehouse/warehouse-metrics-api-types'
 
@@ -56,5 +59,34 @@ describe('getWarehouseSummaryValue', () => {
     const data = metric()
     data.series = [...data.series, ...data.series]
     expect(getWarehouseSummaryValue({ metrics: [data] }, 'query_rate').value).toBeNull()
+  })
+})
+
+describe('getWarehouseSummaryPoints', () => {
+  test('retains missing intervals as chart gaps while converting durations', () => {
+    const data = metric({
+      series: [
+        {
+          labels: {},
+          points: [
+            { timestamp: 100, value: 0.5 },
+            { timestamp: 160, value: null },
+            { timestamp: 220, value: 0 },
+          ],
+          coverage: { returned_points: 2, expected_points: 3 },
+        },
+      ],
+    })
+    expect(getWarehouseSummaryPoints({ metrics: [data] }, 'query_rate', 1000)).toEqual([
+      { timestamp: '1970-01-01T00:01:40.000Z', value: 500 },
+      { timestamp: '1970-01-01T00:02:40.000Z' },
+      { timestamp: '1970-01-01T00:03:40.000Z', value: 0 },
+    ])
+  })
+
+  test('does not chart stale measurements as current observations', () => {
+    expect(
+      getWarehouseSummaryPoints({ metrics: [metric({ availability: 'stale' })] }, 'query_rate')
+    ).toEqual([])
   })
 })

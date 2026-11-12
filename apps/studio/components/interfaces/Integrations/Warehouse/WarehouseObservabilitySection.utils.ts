@@ -61,12 +61,38 @@ export const getWarehouseSummaryNotice = ({ availability, value }: WarehouseSumm
     case 'no_data':
       return 'No samples in this period'
     case 'disabled':
-      return 'Warehouse is disabled'
+      return 'Warehouse metrics are unavailable'
     case 'not_provisioned':
-      return 'Warehouse is not enabled'
+      return 'Warehouse metrics are unavailable'
     case 'unavailable':
       return 'Metric unavailable'
     default:
       return value === null ? 'No value at the latest interval' : undefined
   }
 }
+
+export type WarehouseSummaryPoint = { timestamp: string } & Record<string, string | number>
+
+export const getWarehouseSummaryPoints = (
+  response: WarehouseMetricsResponse,
+  name: WarehouseMetricName,
+  scale = 1
+) => {
+  const metric = response.metrics.find((item) => item.metric === name)
+  if (!metric || !['ok', 'partial'].includes(metric.availability) || metric.series.length !== 1) {
+    return []
+  }
+  return metric.series[0].points.map((point): WarehouseSummaryPoint => {
+    const row: WarehouseSummaryPoint = { timestamp: new Date(point.timestamp * 1000).toISOString() }
+    if (point.value !== null && Number.isFinite(point.value)) row.value = point.value * scale
+    return row
+  })
+}
+
+export const getWarehouseExamplePoints = (endDate: string, scale = 1) =>
+  [4, 5, 4, 7, 6, 9, 8, 6, 7, 5, 6, 4].map((value, index) => ({
+    timestamp: dayjs(endDate)
+      .subtract((11 - index) * 5, 'minute')
+      .toISOString(),
+    value: value * scale,
+  }))

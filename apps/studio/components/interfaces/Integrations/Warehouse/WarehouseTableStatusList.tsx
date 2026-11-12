@@ -160,3 +160,46 @@ export const WarehouseEnablingProgress = ({ status }: WarehouseEnablingProgressP
     </PageSection>
   )
 }
+
+export const WarehouseStatusPreview = () => (
+  <PageSection className="pt-5!">
+    <PageSectionMeta>
+      <PageSectionSummary>
+        <PageSectionTitle>Status</PageSectionTitle>
+        <PageSectionDescription>Replication progress and data freshness.</PageSectionDescription>
+      </PageSectionSummary>
+    </PageSectionMeta>
+    <PageSectionContent>
+      <Card>
+        <CardContent className="py-8 text-sm text-foreground-light">
+          Replication status appears here after you set up Warehouse.
+        </CardContent>
+      </Card>
+    </PageSectionContent>
+  </PageSection>
+)
+
+export const WarehouseSelectedTablesSection = ({ tables }: WarehouseTableStatusListProps) => (
+  <PageSection className="pt-5!">
+    <PageSectionMeta>
+      <PageSectionSummary>
+        <PageSectionTitle>Tables</PageSectionTitle>
+        <PageSectionDescription>Tables selected for replication.</PageSectionDescription>
+      </PageSectionSummary>
+    </PageSectionMeta>
+    <PageSectionContent>
+      <Card>
+        <CardContent>
+          <ul className="space-y-2 text-sm">
+            {tables.map((table) => (
+              <li key={`${table.schema}.${table.name}`}>
+                {table.schema}.{table.name}
+              </li>
+            ))}
+            {tables.length === 0 && <li>Preparing the selected tables.</li>}
+          </ul>
+        </CardContent>
+      </Card>
+    </PageSectionContent>
+  </PageSection>
+)

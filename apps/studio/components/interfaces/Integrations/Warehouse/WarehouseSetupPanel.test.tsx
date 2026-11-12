@@ -26,7 +26,8 @@ vi.mock('./WarehouseConnectSection', () => ({ WarehouseConnectSection: () => nul
 vi.mock('./WarehouseDisableCard', () => ({
   WarehouseDisableCard: () => <button tabIndex={0}>Disable Warehouse</button>,
 }))
-vi.mock('./WarehouseTableStatusList', () => ({
+vi.mock('./WarehouseTableStatusList', async (importOriginal) => ({
+  ...(await importOriginal<typeof import('./WarehouseTableStatusList')>()),
   WarehouseEnablingProgress: () => <p>Warehouse setup in progress</p>,
   WarehouseReplicatedTablesSection: () => <p>Replicated tables</p>,
 }))
