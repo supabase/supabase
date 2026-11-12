@@ -1,5 +1,6 @@
 import type { UseQueryResult } from '@tanstack/react-query'
 import { Button, Card, CardContent, cn } from 'ui'
+import { GenericSkeletonLoader } from 'ui-patterns/ShimmeringLoader'
 
 import type { WarehouseSectionDef } from './WarehouseMetrics.constants'
 import { WarehouseMetricsChart } from './WarehouseMetricsChart'
@@ -46,8 +47,7 @@ export const WarehouseMetricsSection = ({
               className={cn(chart.isFullWidth && 'md:col-span-2')}
             >
               <CardContent className="flex min-h-[200px] flex-col gap-3 p-4">
-                <div className="h-4 w-32 animate-pulse rounded bg-surface-300" />
-                <div className="flex-1 animate-pulse rounded bg-surface-200" />
+                <GenericSkeletonLoader />
               </CardContent>
             </Card>
           ))}

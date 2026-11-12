@@ -3,8 +3,9 @@ import { useParams } from 'common'
 import dayjs from 'dayjs'
 import { ArrowRightIcon, RefreshCwIcon } from 'lucide-react'
 import { useState } from 'react'
-import { Button } from 'ui'
+import { Button, Card, CardContent } from 'ui'
 import { Admonition } from 'ui-patterns/Admonition'
+import { GenericSkeletonLoader } from 'ui-patterns/ShimmeringLoader'
 
 import {
   getSectionAttributes,
@@ -27,6 +28,7 @@ import { DocsButton } from '@/components/ui/DocsButton'
 import { ShortcutTooltip } from '@/components/ui/ShortcutTooltip'
 import { warehouseKeys } from '@/data/warehouse/keys'
 import { warehouseMetricsQueryOptions } from '@/data/warehouse/warehouse-metrics-query'
+import { useWarehouseSetupStatusQuery } from '@/data/warehouse/warehouse-setup-status-query'
 import { useRefreshHandler, useReportDateRange } from '@/hooks/misc/useReportDateRange'
 import { IS_PLATFORM } from '@/lib/constants'
 import { SHORTCUT_IDS } from '@/state/shortcuts/registry'
@@ -37,6 +39,10 @@ const REPORT_TITLE = 'Warehouse'
 export const WarehouseMetricsReport = () => {
   const { ref } = useParams()
   const queryClient = useQueryClient()
+  const setup = useWarehouseSetupStatusQuery({ projectRef: ref }, { enabled: IS_PLATFORM })
+  const hasLiveTables = setup.data?.tables.some((table) => table.state === 'live') ?? false
+  const isNotSetUp = setup.data?.setup_status === 'not_started' && !hasLiveTables
+  const isDisabled = setup.data?.setup_status === 'disabled' && !hasLiveTables
   const [isRefreshing, setIsRefreshing] = useState(false)
   const [showDatePicker, setShowDatePicker] = useState(false)
 
@@ -77,7 +83,10 @@ export const WarehouseMetricsReport = () => {
     handleDatePickerChange,
     async () => {
       setIsRefreshing(true)
-      await queryClient.invalidateQueries({ queryKey: warehouseKeys.metricsAll(ref) })
+      await Promise.all([
+        queryClient.invalidateQueries({ queryKey: warehouseKeys.setupStatus(ref) }),
+        queryClient.invalidateQueries({ queryKey: warehouseKeys.metricsAll(ref) }),
+      ])
       setTimeout(() => setIsRefreshing(false), 1000)
     }
   )
@@ -101,7 +110,21 @@ export const WarehouseMetricsReport = () => {
   }
 
   const pageState = getWarehouseMetricsPageState(results)
+  const hasReportMetrics = results.some(
+    (result) =>
+      result.isSuccess &&
+      result.data.metrics.some(
+        (metric) => metric.availability !== 'not_provisioned' && metric.availability !== 'disabled'
+      )
+  )
   const syncId = `warehouse-${ref}`
+  const loadingState = (
+    <Card aria-label="Loading Warehouse report" aria-busy="true">
+      <CardContent className="py-8">
+        <GenericSkeletonLoader />
+      </CardContent>
+    </Card>
+  )
 
   const renderContent = () => {
     if (!IS_PLATFORM) {
@@ -129,8 +152,39 @@ export const WarehouseMetricsReport = () => {
       )
     }
 
+    if (isNotSetUp || isDisabled) {
+      if (setup.isFetching) return loadingState
+      return (
+        <WarehouseMetricsEmptyState
+          projectRef={ref}
+          status={isDisabled ? 'disabled' : 'not_provisioned'}
+        />
+      )
+    }
+
+    // Metrics can still be read when replication status is unavailable.
+    if (!setup.data && !hasReportMetrics) {
+      if (setup.isPending || results.some((result) => result.isPending)) {
+        return loadingState
+      }
+      if (setup.isError) {
+        return (
+          <AlertError
+            projectRef={ref}
+            subject="Failed to check Warehouse status"
+            error={setup.error}
+            additionalActions={
+              <Button variant="default" loading={setup.isFetching} onClick={() => setup.refetch()}>
+                Retry
+              </Button>
+            }
+          />
+        )
+      }
+    }
+
     if (pageState.status === 'not_provisioned' || pageState.status === 'disabled') {
-      return <WarehouseMetricsEmptyState projectRef={ref} />
+      return <WarehouseMetricsEmptyState projectRef={ref} status="unavailable" />
     }
 
     if (pageState.status === 'all_failed') {

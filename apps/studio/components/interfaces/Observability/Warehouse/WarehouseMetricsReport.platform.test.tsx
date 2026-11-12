@@ -1,10 +1,12 @@
-import { screen } from '@testing-library/react'
+import { QueryClient } from '@tanstack/react-query'
+import { act, fireEvent, screen } from '@testing-library/react'
 import type { platformComponents as components } from 'api-types'
 import { HttpResponse } from 'msw'
 import { beforeEach, describe, expect, test } from 'vitest'
 
 import { createWarehouseMetric, createWarehouseMetricsResponse } from './WarehouseMetrics.fixtures'
 import { WarehouseMetricsReport } from './WarehouseMetricsReport'
+import { warehouseKeys } from '@/data/warehouse/keys'
 import type {
   WarehouseMetric,
   WarehouseMetricName,
@@ -24,24 +26,27 @@ const getAttributes = (request: Request) =>
 type MetricOverrides = (attributes: WarehouseMetricName[]) => Partial<WarehouseMetric> | undefined
 type WarehouseSetupStatus = components['schemas']['WarehouseSetupStatusResponse_Output']
 
+const createSetupStatus = (
+  setup_status: WarehouseSetupStatus['setup_status']
+): WarehouseSetupStatus => ({
+  setup_status,
+  steps: [],
+  tables: [],
+  fdw_status: {
+    extension_available: true,
+    extension_installed: true,
+    foreign_schema_imported: true,
+    schema_created: true,
+    server_configured: true,
+    wrapper_installed: true,
+  },
+})
+
 const mockSetupStatus = (setup_status: WarehouseSetupStatus['setup_status']) =>
   addAPIMock({
     method: 'get',
     path: '/platform/warehouse/:ref/setup-status',
-    response: () =>
-      HttpResponse.json<WarehouseSetupStatus>({
-        setup_status,
-        steps: [],
-        tables: [],
-        fdw_status: {
-          extension_available: true,
-          extension_installed: true,
-          foreign_schema_imported: true,
-          schema_created: true,
-          server_configured: true,
-          wrapper_installed: true,
-        },
-      }),
+    response: () => HttpResponse.json<WarehouseSetupStatus>(createSetupStatus(setup_status)),
   })
 
 const mockMetrics = (overrides: MetricOverrides = () => undefined) =>
@@ -58,6 +63,7 @@ const mockMetrics = (overrides: MetricOverrides = () => undefined) =>
 
 describe('WarehouseMetricsReport', () => {
   beforeEach(() => {
+    mockSetupStatus('complete')
     // The date range hook looks up the project to resolve the plan; its result doesn't matter here
     addAPIMock({
       method: 'get',
@@ -75,7 +81,9 @@ describe('WarehouseMetricsReport', () => {
 
     customRender(<WarehouseMetricsReport />)
 
-    expect(await screen.findAllByLabelText(/^Loading /)).toHaveLength(12)
+    expect(await screen.findAllByLabelText(/^Loading (?!Warehouse report)/)).toHaveLength(12)
+    expect(screen.queryByRole('link', { name: 'Set up Warehouse' })).not.toBeInTheDocument()
+    expect(screen.queryByText('Checking Warehouse status...')).not.toBeInTheDocument()
   })
 
   test('renders every section and chart title once metrics load', async () => {
@@ -145,18 +153,99 @@ describe('WarehouseMetricsReport', () => {
     }
   )
 
-  test('checks actual setup before claiming Warehouse is not configured', async () => {
+  test('keeps a neutral loading state until setup is known without flashing chart tiles', async () => {
     mockMetrics(() => ({ availability: 'not_provisioned', series: [] }))
+    const status = Promise.withResolvers<WarehouseSetupStatus>()
     addAPIMock({
       method: 'get',
       path: '/platform/warehouse/:ref/setup-status',
-      response: () => new Promise<never>(() => {}),
+      response: async () => HttpResponse.json<WarehouseSetupStatus>(await status.promise),
     })
 
     customRender(<WarehouseMetricsReport />)
 
-    expect(await screen.findByText('Checking Warehouse status...')).toBeInTheDocument()
-    expect(screen.queryByText('Warehouse is not set up')).not.toBeInTheDocument()
+    expect(screen.getByLabelText('Loading Warehouse report')).toBeInTheDocument()
+    expect(screen.queryByText('Checking Warehouse status...')).not.toBeInTheDocument()
+    expect(screen.queryByRole('heading', { name: 'Queries' })).not.toBeInTheDocument()
+    expect(screen.queryByLabelText('Loading Query rate')).not.toBeInTheDocument()
+    expect(screen.queryByRole('link', { name: 'Set up Warehouse' })).not.toBeInTheDocument()
+
+    await act(async () => status.resolve(createSetupStatus('not_started')))
+
+    expect(await screen.findByText('Warehouse is not set up')).toBeInTheDocument()
+    expect(screen.queryByLabelText('Loading Query rate')).not.toBeInTheDocument()
+  })
+
+  test('uses cached configured status without showing the neutral loading state', () => {
+    const queryClient = new QueryClient({ defaultOptions: { queries: { retry: false } } })
+    queryClient.setQueryData(warehouseKeys.setupStatus('default'), createSetupStatus('complete'))
+    addAPIMock({
+      method: 'get',
+      path: '/platform/warehouse/:ref/metrics',
+      response: () => new Promise<never>(() => {}),
+    })
+
+    customRender(<WarehouseMetricsReport />, { queryClient })
+
+    expect(screen.getByLabelText('Loading Query rate')).toBeInTheDocument()
+    expect(screen.queryByLabelText('Loading Warehouse report')).not.toBeInTheDocument()
+    expect(screen.queryByRole('link', { name: 'Set up Warehouse' })).not.toBeInTheDocument()
+  })
+
+  test('rechecks cached unconfigured status without flashing a setup action to an enabled project', async () => {
+    const queryClient = new QueryClient({ defaultOptions: { queries: { retry: false } } })
+    queryClient.setQueryData(warehouseKeys.setupStatus('default'), createSetupStatus('not_started'))
+    const status = Promise.withResolvers<WarehouseSetupStatus>()
+    addAPIMock({
+      method: 'get',
+      path: '/platform/warehouse/:ref/setup-status',
+      response: async () => HttpResponse.json<WarehouseSetupStatus>(await status.promise),
+    })
+    addAPIMock({
+      method: 'get',
+      path: '/platform/warehouse/:ref/metrics',
+      response: () => new Promise<never>(() => {}),
+    })
+
+    customRender(<WarehouseMetricsReport />, { queryClient })
+
+    expect(screen.getByLabelText('Loading Warehouse report')).toBeInTheDocument()
+    expect(screen.queryByRole('link', { name: 'Set up Warehouse' })).not.toBeInTheDocument()
+    await act(async () => status.resolve(createSetupStatus('complete')))
+    expect(await screen.findByLabelText('Loading Query rate')).toBeInTheDocument()
+    expect(screen.queryByRole('link', { name: 'Set up Warehouse' })).not.toBeInTheDocument()
+  })
+
+  test('refreshes setup status as well as metrics after Warehouse is enabled elsewhere', async () => {
+    const queryClient = new QueryClient({
+      defaultOptions: { queries: { retry: false, staleTime: Infinity } },
+    })
+    queryClient.setQueryData(warehouseKeys.setupStatus('default'), createSetupStatus('not_started'))
+    mockMetrics()
+
+    customRender(<WarehouseMetricsReport />, { queryClient })
+
+    expect(await screen.findByRole('link', { name: 'Set up Warehouse' })).toBeInTheDocument()
+    mockSetupStatus('complete')
+    fireEvent.click(screen.getByRole('button', { name: 'Refresh report' }))
+    expect(await screen.findByText('Query rate')).toBeInTheDocument()
+    expect(screen.queryByRole('link', { name: 'Set up Warehouse' })).not.toBeInTheDocument()
+  })
+
+  test('keeps metrics available when replication status cannot be checked', async () => {
+    mockMetrics()
+    addAPIMock({
+      method: 'get',
+      path: '/platform/warehouse/:ref/setup-status',
+      response: () =>
+        HttpResponse.json<APIErrorBody>({ message: 'Status unavailable' }, { status: 500 }),
+    })
+
+    customRender(<WarehouseMetricsReport />)
+
+    expect(await screen.findByText('Query rate')).toBeInTheDocument()
+    expect(screen.queryByText('Failed to check Warehouse status')).not.toBeInTheDocument()
+    expect(screen.queryByRole('link', { name: 'Set up Warehouse' })).not.toBeInTheDocument()
   })
 
   test('shows a setup-status failure without assuming Warehouse is not set up', async () => {
@@ -173,6 +262,10 @@ describe('WarehouseMetricsReport', () => {
     expect(await screen.findByText('Failed to check Warehouse status')).toBeInTheDocument()
     expect(screen.queryByText('Warehouse is not set up')).not.toBeInTheDocument()
     expect(screen.queryByRole('link', { name: 'Set up Warehouse' })).not.toBeInTheDocument()
+
+    mockSetupStatus('complete')
+    fireEvent.click(screen.getByRole('button', { name: 'Retry' }))
+    expect(await screen.findByText('Warehouse metrics are unavailable')).toBeInTheDocument()
   })
 
   test('shows an error for the failing section while the other sections still render', async () => {
