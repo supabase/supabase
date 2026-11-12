@@ -154,7 +154,7 @@ export const WarehouseSchemaTablePicker = ({
             <PageSectionDescription>
               {isEditing
                 ? 'Tables currently replicating are selected. Changes apply on save.'
-                : 'Choose which schemas or tables to replicate. You can change this at any time.'}
+                : 'Data available to analytical queries.'}
             </PageSectionDescription>
           </PageSectionSummary>
         </PageSectionMeta>
@@ -207,7 +207,7 @@ export const WarehouseSchemaTablePicker = ({
           <PageSectionDescription>
             {isEditing
               ? 'Tables currently replicating are selected. Changes apply on save.'
-              : 'Choose which schemas or tables to replicate. You can change this at any time.'}
+              : 'Data available to analytical queries.'}
           </PageSectionDescription>
         </PageSectionSummary>
       </PageSectionMeta>

@@ -186,14 +186,14 @@ export const WarehouseStatusPreview = () => (
                   {['w-28', 'w-36'].map((width) => (
                     <TableRow key={width}>
                       <TableCell>
-                        <div className={`h-4 rounded bg-foreground-muted/40 ${width}`} />
+                        <div className={`h-4 rounded bg-surface-200 opacity-40 ${width}`} />
                       </TableCell>
                       <TableCell>
-                        <div className="h-4 w-20 rounded bg-foreground-muted/40" />
+                        <div className="h-4 w-20 rounded bg-surface-200 opacity-40" />
                       </TableCell>
                       <TableCell>
-                        <StateDot variant="default" className="opacity-60">
-                          <span className="block h-4 w-12 rounded bg-foreground-muted/60" />
+                        <StateDot variant="default" className="opacity-40">
+                          <span className="block h-4 w-12 rounded bg-surface-200" />
                         </StateDot>
                       </TableCell>
                     </TableRow>

@@ -52,6 +52,7 @@ describe('Warehouse workload summary', () => {
     expect(screen.getByRole('heading', { name: 'Query duration' })).toBeInTheDocument()
     expect(screen.queryByRole('button')).not.toBeInTheDocument()
     expect(screen.queryByText(/Interval ending| ms|\/s/)).not.toBeInTheDocument()
+    expect(screen.queryByText(/Jan 1, 2026/)).not.toBeInTheDocument()
     expect(screen.getByRole('heading', { name: 'Query rate' })).toBeInTheDocument()
     expect(screen.queryByRole('link', { name: 'View metrics' })).not.toBeInTheDocument()
     expect(screen.queryByText('Unavailable')).not.toBeInTheDocument()

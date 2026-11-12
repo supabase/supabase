@@ -58,7 +58,10 @@ export const WarehouseWorkloadChart = ({
             <ChartLine
               className="h-36"
               isFullHeight
-              data={points}
+              data={
+                isPreview ? points.map((point, index) => ({ index, value: point.value })) : points
+              }
+              xKey={isPreview ? 'index' : 'timestamp'}
               dataKey="value"
               config={{ value: { label: title, color: 'var(--chart-1)' } }}
               color="var(--chart-1)"
