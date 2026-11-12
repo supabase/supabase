@@ -2,7 +2,7 @@ import { useParams } from 'common'
 import dayjs from 'dayjs'
 import { ShimmeringLoader } from 'ui-patterns/ShimmeringLoader'
 
-import { UpcomingInvoice } from './UpcomingInvoice/UpcomingInvoiceV2'
+import { UpcomingInvoice } from './UpcomingInvoice/UpcomingInvoice'
 import {
   ScaffoldSection,
   ScaffoldSectionContent,

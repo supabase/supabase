@@ -55,15 +55,12 @@ export const UpcomingInvoice = ({ slug }: UpcomingInvoiceProps) => {
     return <div ref={ref}></div>
   }
 
-  // cannot be `null` if `enable_v2` query param is set on query
   const invoice = data.upcomingInvoice
 
   const hasMinimumFeeTopUp = invoice.minimum_fee.expectedAtEndOfCycle > 0
 
-  // Once costs exceed the floor price there's no top-up; show the floor price crossed out instead
-  const hasMetMinimumFee = !hasMinimumFeeTopUp && invoice.minimum_fee.floorPrice != null
+  const hasMetMinimumFeeThreshold = !hasMinimumFeeTopUp && invoice.minimum_fee.floorPrice != null
 
-  // Without a forecast, only the credits applied so far are known
   const prepaidCreditsApplied =
     invoice.prepaidCredits.kind === 'with_forecast'
       ? invoice.prepaidCredits.expectedWithdrawnAtEndOfCycle
@@ -123,13 +120,15 @@ export const UpcomingInvoice = ({ slug }: UpcomingInvoiceProps) => {
             )}
           </Accordion>
 
-          {(hasMinimumFeeTopUp || hasMetMinimumFee) && (
+          {(hasMinimumFeeTopUp || hasMetMinimumFeeThreshold) && (
             <InvoiceTotalRow
               title={invoice.minimum_fee.prorated ? 'Minimum Fee (prorated)' : 'Minimum Fee'}
               tooltip={getMinimumFeeTooltip(invoice.minimum_fee)}
               amount={invoice.minimum_fee.expectedAtEndOfCycle}
               amountBeforeDiscount={
-                hasMetMinimumFee ? (invoice.minimum_fee.floorPrice ?? undefined) : undefined
+                hasMetMinimumFeeThreshold
+                  ? (invoice.minimum_fee.floorPrice ?? undefined)
+                  : undefined
               }
             />
           )}
@@ -392,7 +391,6 @@ function InvoiceProjectBreakdownRow({
   )
 }
 
-/** Leaf row, indented to line up with sibling accordion titles (chevron width + gap) */
 function InvoiceAmountRow({
   title,
   detail,
