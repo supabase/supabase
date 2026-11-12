@@ -40,20 +40,24 @@ export const OAuthAppsAuthorizedRow = ({
       <TableCell className="pr-2">
         <div
           className="flex h-[30px] w-[30px] shrink-0 items-center justify-center rounded-full border border-control bg-cover bg-center bg-no-repeat text-xs"
-          style={{ backgroundImage: approval.app.icon ? `url('${approval.app.icon}')` : 'none' }}
+          style={{
+            backgroundImage: approval.attributes.app.icon
+              ? `url('${approval.attributes.app.icon}')`
+              : 'none',
+          }}
         >
-          {!!approval.app.icon ? '' : approval.app.name[0]}
+          {!!approval.attributes.app.icon ? '' : approval.attributes.app.name[0]}
         </div>
       </TableCell>
       <TableCell className="pl-0">
         <div>
-          <p className="min-w-0 truncate" title={approval.app.name}>
-            {approval.app.name}
+          <p className="min-w-0 truncate" title={approval.attributes.app.name}>
+            {approval.attributes.app.name}
           </p>
-          <p className="min-w-0 text-foreground-lighter font-mono">{approval.app.id}</p>
+          <p className="min-w-0 text-foreground-lighter font-mono">{approval.id}</p>
         </div>
       </TableCell>
-      <TableCell>{getGrantTargetLabel(approval.grant_target)}</TableCell>
+      <TableCell>{getGrantTargetLabel(approval.attributes.target)}</TableCell>
       <TableCell className="text-right">
         <Dialog
           open={isDialogOpen}

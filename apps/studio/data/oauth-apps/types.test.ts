@@ -2,7 +2,7 @@ import { describe, expect, test } from 'vitest'
 
 import { DEVELOPER_ROLE } from './mocks'
 import type { OAuthAppsAuthorizeOrganizationProject, OAuthExistingGrant } from './types'
-import { getFailedProjects, getPreselectedProjectRefs, isRoleValidationFailure } from './types'
+import { getFailedProjects, getPreselectedProjectRefs } from './types'
 
 const project = (ref: string): OAuthAppsAuthorizeOrganizationProject => ({
   ref,
@@ -11,6 +11,7 @@ const project = (ref: string): OAuthAppsAuthorizeOrganizationProject => ({
 })
 
 const grant = (refs: string[]): OAuthExistingGrant => ({
+  grant_id: '',
   approved_scopes: ['projects:read'],
   project_refs: refs,
   approved_at: '2026-08-14T09:12:00.000Z',
@@ -88,23 +89,6 @@ describe('getPreselectedProjectRefs', () => {
         liveProjects: [],
       })
     ).toEqual([])
-  })
-})
-
-describe('isRoleValidationFailure', () => {
-  test('recognises a role validation failure', () => {
-    expect(
-      isRoleValidationFailure({
-        status: 'error',
-        error_code: 'role_validation_failed',
-        message: 'nope',
-        validation: { scope_target: 'organization', role: { name: 'read-only' } },
-      })
-    ).toBe(true)
-  })
-
-  test('treats a redirect as a success', () => {
-    expect(isRoleValidationFailure({ url: 'https://vercel.com/callback?code=abc' })).toBe(false)
   })
 })
 

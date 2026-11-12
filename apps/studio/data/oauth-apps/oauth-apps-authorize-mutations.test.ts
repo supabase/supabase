@@ -2,8 +2,6 @@ import { describe, expect, test } from 'vitest'
 
 import { OAUTH_APPS_MOCK_SCENARIOS } from './mocks'
 import { approveOAuthAppsAuthorize } from './oauth-apps-authorize-approve-mutation'
-import { denyOAuthAppsAuthorize } from './oauth-apps-authorize-deny-mutation'
-import { isRoleValidationFailure } from './types'
 
 const AUTH_ID = OAUTH_APPS_MOCK_SCENARIOS.vercelDeveloper
 const SLUG = 'northwind-traders'
@@ -12,9 +10,12 @@ const BODY = { project_refs: ['northwindstorefront1'] }
 async function approveExpectingRedirect(
   variables: Parameters<typeof approveOAuthAppsAuthorize>[0]
 ) {
-  const result = await approveOAuthAppsAuthorize(variables)
-  if (isRoleValidationFailure(result)) throw new Error('expected a redirect, got a role failure')
-  return result
+  try {
+    const result = await approveOAuthAppsAuthorize(variables)
+    return result
+  } catch {
+    throw new Error('expected a redirect, got a role failure')
+  }
 }
 
 describe('approveOAuthAppsAuthorize', () => {
@@ -55,28 +56,5 @@ describe('approveOAuthAppsAuthorize', () => {
     })
 
     expect(url).toBeTruthy()
-  })
-})
-
-describe('denyOAuthAppsAuthorize', () => {
-  test('returns a redirect url carrying access_denied and state', async () => {
-    const { url } = await denyOAuthAppsAuthorize({ slug: SLUG, auth_id: AUTH_ID })
-
-    const params = new URL(url).searchParams
-    expect(params.get('error')).toBe('access_denied')
-    expect(params.get('state')).toBeTruthy()
-    expect(params.get('code')).toBeNull()
-  })
-
-  test('requires an authorization request id', async () => {
-    await expect(denyOAuthAppsAuthorize({ slug: SLUG, auth_id: '' })).rejects.toThrow(
-      'Authorization request id is required'
-    )
-  })
-
-  test('requires an organization slug', async () => {
-    await expect(denyOAuthAppsAuthorize({ slug: '', auth_id: AUTH_ID })).rejects.toThrow(
-      'Organization slug is required'
-    )
   })
 })

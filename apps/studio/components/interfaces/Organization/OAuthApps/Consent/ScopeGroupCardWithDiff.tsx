@@ -10,11 +10,10 @@ import {
   ScopeGroupLevel,
 } from './OAuthAppsAuthorizeScreen.utils'
 import { ScopeGroupCardItem } from './ScopeGroupCardItem'
-import type { OAuthScope } from '@/data/oauth-apps/types'
 
 export interface ScopeGroupCardProps {
-  scopes: OAuthScope[]
-  previousScopes: OAuthScope[]
+  scopes: string[]
+  previousScopes: string[]
 }
 
 export const ScopeGroupCardWithDiff = ({ scopes, previousScopes }: ScopeGroupCardProps) => {
