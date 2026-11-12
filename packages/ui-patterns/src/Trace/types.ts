@@ -83,6 +83,7 @@ export interface ViewContextValue {
   setWindow: (start: number, end: number) => void
   resetWindow: () => void
   treeRef: RefObject<HTMLDivElement | null>
+  scrollRef: RefObject<HTMLDivElement | null>
 }
 
 export interface SpanContextValue {

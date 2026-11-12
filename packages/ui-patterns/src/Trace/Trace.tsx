@@ -37,6 +37,7 @@ export function Root({ trace, minRangeMs, defaultCollapsed, children }: RootProp
   )
   const resetWindow = useCallback(() => setZoom(null), [])
   const treeRef = useRef<HTMLDivElement>(null)
+  const scrollRef = useRef<HTMLDivElement>(null)
 
   const view = useMemo<ViewContextValue>(
     () => ({
@@ -49,6 +50,7 @@ export function Root({ trace, minRangeMs, defaultCollapsed, children }: RootProp
       setWindow,
       resetWindow,
       treeRef,
+      scrollRef,
     }),
     [selectedId, collapsed, window, zoom, setCollapsed, setWindow, resetWindow]
   )

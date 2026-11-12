@@ -13,9 +13,16 @@ const STATUS_BADGE: Record<SpanStatus, 'success' | 'destructive' | 'default'> = 
   unset: 'default',
 }
 
-function anchorRect(tree: HTMLElement | null, id: string): DOMRect {
+function anchorRect(tree: HTMLElement | null, viewport: HTMLElement | null, id: string): DOMRect {
   const row = tree?.querySelector<HTMLElement>(`[data-trace-row-id="${CSS.escape(id)}"]`)
   if (!row) return new DOMRect(-10000, -10000, 0, 0)
+  if (viewport) {
+    const rowRect = row.getBoundingClientRect()
+    const viewportRect = viewport.getBoundingClientRect()
+    if (rowRect.bottom <= viewportRect.top || rowRect.top >= viewportRect.bottom) {
+      return new DOMRect(-10000, -10000, 0, 0)
+    }
+  }
   const lane = (row.querySelector('[data-trace-lane]') ?? row).getBoundingClientRect()
   const bar = row.querySelector('[data-trace-bar]')?.getBoundingClientRect()
   if (!bar || bar.right < lane.left || bar.left > lane.right) return lane
@@ -25,7 +32,7 @@ function anchorRect(tree: HTMLElement | null, id: string): DOMRect {
 
 export function Inspector() {
   const { byId, bounds, nowMs } = useTrace()
-  const { selectedId, select, treeRef } = useView()
+  const { selectedId, select, treeRef, scrollRef } = useView()
   const span = selectedId === null ? undefined : byId.get(selectedId)
 
   const virtualRef = useMemo(
@@ -34,10 +41,11 @@ export function Inspector() {
         get contextElement() {
           return treeRef.current ?? undefined
         },
-        getBoundingClientRect: () => anchorRect(treeRef.current, selectedId ?? ''),
+        getBoundingClientRect: () =>
+          anchorRect(treeRef.current, scrollRef.current, selectedId ?? ''),
       },
     }),
-    [treeRef, selectedId]
+    [treeRef, scrollRef, selectedId]
   )
 
   if (!span) return null
