@@ -1,4 +1,5 @@
 import { screen } from '@testing-library/react'
+import type { platformComponents as components } from 'api-types'
 import { HttpResponse } from 'msw'
 import { beforeEach, describe, expect, test } from 'vitest'
 
@@ -21,6 +22,27 @@ const getAttributes = (request: Request) =>
     .filter(Boolean) as WarehouseMetricName[]
 
 type MetricOverrides = (attributes: WarehouseMetricName[]) => Partial<WarehouseMetric> | undefined
+type WarehouseSetupStatus = components['schemas']['WarehouseSetupStatusResponse_Output']
+
+const mockSetupStatus = (setup_status: WarehouseSetupStatus['setup_status']) =>
+  addAPIMock({
+    method: 'get',
+    path: '/platform/warehouse/:ref/setup-status',
+    response: () =>
+      HttpResponse.json<WarehouseSetupStatus>({
+        setup_status,
+        steps: [],
+        tables: [],
+        fdw_status: {
+          extension_available: true,
+          extension_installed: true,
+          foreign_schema_imported: true,
+          schema_created: true,
+          server_configured: true,
+          wrapper_installed: true,
+        },
+      }),
+  })
 
 const mockMetrics = (overrides: MetricOverrides = () => undefined) =>
   addAPIMock({
@@ -68,14 +90,11 @@ describe('WarehouseMetricsReport', () => {
     expect(await screen.findByText('Query rate')).toBeInTheDocument()
     expect(await screen.findByText('Worker slots')).toBeInTheDocument()
     expect(await screen.findByText('Request duration')).toBeInTheDocument()
-    expect(screen.getByRole('link', { name: 'Warehouse integration overview' })).toHaveAttribute(
-      'href',
-      '/project/default/integrations/warehouse/overview'
-    )
   })
 
   test('shows the empty state with a link to the integration when Warehouse is not provisioned', async () => {
     mockMetrics(() => ({ availability: 'not_provisioned', series: [] }))
+    mockSetupStatus('not_started')
 
     customRender(<WarehouseMetricsReport />)
 
@@ -88,6 +107,7 @@ describe('WarehouseMetricsReport', () => {
 
   test('shows the disabled empty state when Warehouse is disabled', async () => {
     mockMetrics(() => ({ availability: 'disabled', series: [] }))
+    mockSetupStatus('disabled')
 
     customRender(<WarehouseMetricsReport />)
 
@@ -96,6 +116,60 @@ describe('WarehouseMetricsReport', () => {
       'href',
       '/project/default/integrations/warehouse/overview'
     )
+  })
+
+  test.each([
+    ['not_provisioned', 'complete'],
+    ['disabled', 'complete'],
+    ['not_provisioned', 'copying'],
+  ] as const)(
+    'does not claim Warehouse needs setup when metrics report %s and setup is %s',
+    async (availability, setupStatus) => {
+      mockMetrics(() => ({ availability, series: [] }))
+      mockSetupStatus(setupStatus)
+
+      customRender(<WarehouseMetricsReport />)
+
+      await screen.findByRole('link', { name: /^(View|Set up) Warehouse$/ })
+      expect(screen.getByText('Warehouse metrics are unavailable')).toBeInTheDocument()
+      expect(screen.queryByText('Warehouse is not set up')).not.toBeInTheDocument()
+      expect(screen.queryByText('Warehouse is disabled')).not.toBeInTheDocument()
+      expect(screen.queryByRole('link', { name: 'Set up Warehouse' })).not.toBeInTheDocument()
+      expect(screen.getByRole('link', { name: 'View Warehouse' })).toHaveAttribute(
+        'href',
+        '/project/default/integrations/warehouse/overview'
+      )
+    }
+  )
+
+  test('checks actual setup before claiming Warehouse is not configured', async () => {
+    mockMetrics(() => ({ availability: 'not_provisioned', series: [] }))
+    addAPIMock({
+      method: 'get',
+      path: '/platform/warehouse/:ref/setup-status',
+      response: () => new Promise<never>(() => {}),
+    })
+
+    customRender(<WarehouseMetricsReport />)
+
+    expect(await screen.findByText('Checking Warehouse status...')).toBeInTheDocument()
+    expect(screen.queryByText('Warehouse is not set up')).not.toBeInTheDocument()
+  })
+
+  test('shows a setup-status failure without assuming Warehouse is not set up', async () => {
+    mockMetrics(() => ({ availability: 'not_provisioned', series: [] }))
+    addAPIMock({
+      method: 'get',
+      path: '/platform/warehouse/:ref/setup-status',
+      response: () =>
+        HttpResponse.json<APIErrorBody>({ message: 'Status unavailable' }, { status: 500 }),
+    })
+
+    customRender(<WarehouseMetricsReport />)
+
+    expect(await screen.findByText('Failed to check Warehouse status')).toBeInTheDocument()
+    expect(screen.queryByText('Warehouse is not set up')).not.toBeInTheDocument()
+    expect(screen.queryByRole('link', { name: 'Set up Warehouse' })).not.toBeInTheDocument()
   })
 
   test('shows an error for the failing section while the other sections still render', async () => {
