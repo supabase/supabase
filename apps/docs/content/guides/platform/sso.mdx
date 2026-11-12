@@ -88,18 +88,6 @@ When SSO is enabled for an organization:
 - If an SSO user with the following email of `alice@foocorp.com` attempts to sign in with a GitHub account that uses the same email, a separate Supabase account is created and will not be linked to the SSO user's account.
 - SSO users will only see organizations/projects they've been invited to or auto-joined into. See [access control](/docs/guides/platform/access-control) for more details.
 
-## Enabling SSO for an organization
-
-**Recommended workflow:**
-
-1. Create or verify at least one non-SSO owner account exists (required for safety)
-2. Configure your SSO provider following one of our [provider-specific guides](#supported-providers)
-3. Start with auto-join **disabled** to test the configuration
-4. Test SSO sign-in with your own account
-5. Once confirmed working, enable auto-join if desired
-6. Thoroughly test using our [SSO Testing and Best Practices](/docs/guides/platform/sso/testing-best-practices) guide
-7. Invite users to the organization or let them auto-join on sign-in
-
 <Admonition type="note" title="Non-SSO Accounts">
 
 If a user is already a member of the organization under a non-SSO account, they will need to be removed and invited again with an SSO-required invitation to join under their SSO account. SSO and non-SSO accounts with the same email are treated as separate accounts.
@@ -113,6 +101,22 @@ Each user account verified using an SSO identity provider will not be eligible f
 Users will need to ensure they are signed in with the correct account when accessing organizations/projects.
 
 </Admonition>
+
+## Enabling SSO for an organization
+
+**Recommended workflow:**
+
+1. Create or verify at least one non-SSO owner account exists (required for safety).
+   - Use an email address that no one will sign in with through SSO.
+   - You can't invite an email that already belongs to an account in the organization.
+2. Configure your SSO provider following one of our [provider-specific guides](#supported-providers)
+3. Start with auto-join **disabled** to test the configuration
+4. Test SSO sign-in with your own account or a test account
+   - If your own account is already a non-SSO member, remove it, then re-invite the email with an SSO-required invitation from the non-SSO owner account you set up in step 1.
+   - Otherwise, use a separate test account.
+5. Once confirmed working, enable auto-join if desired
+6. Thoroughly test using our [SSO Testing and Best Practices](/docs/guides/platform/sso/testing-best-practices) guide
+7. Invite users to the organization or let them auto-join on sign-in
 
 ## Disabling SSO for an organization
 
