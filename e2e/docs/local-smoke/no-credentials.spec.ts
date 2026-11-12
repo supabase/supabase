@@ -25,13 +25,13 @@ test.describe('docs dev runs locally without credentials', () => {
     expect(errors.some((message) => SUPABASE_URL_ERROR.test(message))).toBeFalsy()
   })
 
-  test('advisors page renders (full content or graceful fallback, never a crash)', async ({
+  test('issues page renders (full content or graceful fallback, never a crash)', async ({
     page,
   }) => {
-    const response = await page.goto('/docs/guides/observability/advisors')
+    const response = await page.goto('/docs/guides/observability/issues')
     expect(response?.ok(), `expected 200, got ${response?.status()}`).toBeTruthy()
 
-    await expect(page.getByRole('heading', { name: 'Advisors' })).toBeVisible()
+    await expect(page.getByRole('heading', { name: 'Issues', exact: true })).toBeVisible()
   })
 
   test('a federated guide missing locally returns a clean 404, not a crash', async ({ page }) => {
