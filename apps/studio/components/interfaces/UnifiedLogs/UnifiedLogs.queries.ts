@@ -399,8 +399,6 @@ const buildBaseWhere = (
   const scope = getUnifiedLogsScopeCondition(search.scope)
   if (scope) {
     parts.push(scope)
-    // An unusable scope is a hard stop; ANDing view options onto it would only
-    // pad the SQL with predicates that can't change the (empty) result.
     if (scope === NO_ROWS) return parts
   }
 

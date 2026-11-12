@@ -875,9 +875,9 @@ describe('metrics request exclusion (FE-4969)', () => {
       }
       expect(rows(shown)).not.toContain(METRICS_PATH)
       expect(chart(shown)).not.toContain(METRICS_PATH)
-      const metricsBranch = counts(withFilters('method:eq:GET'))
-        .split("'show_privileged_metrics_requests'")
-        .at(-1)!
+      const metricsBranch =
+        counts(withFilters('method:eq:GET')).split("'show_privileged_metrics_requests'").at(-1) ??
+        ''
       expect(metricsBranch).toContain(METRICS_PATH)
       expect(metricsBranch).toContain("IN ('GET')")
       expect(metricsBranch).not.toMatch(/NOT [Cc][Oo][Aa][Ll][Ee][Ss][Cc][Ee]/)
@@ -901,8 +901,6 @@ describe('metrics request exclusion (FE-4969)', () => {
   })
 
   it('leaves every other source untouched', () => {
-    // Scoped to edge_logs, so a postgres-only view carries no extra predicate
-    // over its rows.
     expect(getUnifiedLogsQuery(baseSearch)).toContain(`source != 'edge_logs'`)
   })
 

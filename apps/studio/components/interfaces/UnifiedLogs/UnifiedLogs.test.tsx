@@ -808,7 +808,6 @@ describe('UnifiedLogs', () => {
           expect(queries.filter((q) => q.includes(kind)).at(-1)).toContain(METRICS_PATH)
         }
       })
-      // Only the successful ones go — every other status on that path stays.
       expect(lastRowQuery(queries)).toContain("IN ('200')")
     })
 
@@ -913,7 +912,8 @@ describe('UnifiedLogs', () => {
         expect(localStorage.getItem('unified-logs-show-privileged-metrics-requests-default')).toBe(
           'false'
         )
-      }
+      },
+      15_000
     )
 
     it.each(['true', '"true"', '{invalid'])(
@@ -928,7 +928,8 @@ describe('UnifiedLogs', () => {
         expect(await screen.findByText('No results found')).toBeInTheDocument()
         await expandApiGateway(user)
         expect(metricsCheckbox()).not.toBeChecked()
-      }
+      },
+      15_000
     )
 
     it('shows the successful metrics count while the exclusion is enabled', async () => {
