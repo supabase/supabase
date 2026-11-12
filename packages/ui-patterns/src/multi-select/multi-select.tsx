@@ -33,7 +33,7 @@ interface MultiSelectContextProps {
   open: boolean
   setOpen: (open: boolean) => void
   inputValue: string
-  setInputValue: React.Dispatch<React.SetStateAction<string>>
+  setInputValue: (value: string) => void
   activeIndex: number
   setActiveIndex: React.Dispatch<React.SetStateAction<number>>
   size: MultiSelectorProps['size']
@@ -79,6 +79,7 @@ type MultiSelectorProps = {
   values: string[]
   onValuesChange: (value: string[]) => void
   onOpenChange?: (open: boolean) => void
+  onSearchChange?: (value: string) => void
   disabled?: boolean
 } & React.ComponentPropsWithoutRef<typeof Command> &
   VariantProps<typeof MultiSelectorVariants>
@@ -87,6 +88,7 @@ function MultiSelector({
   values = [],
   onValuesChange,
   onOpenChange,
+  onSearchChange,
   disabled,
   dir,
   size,
@@ -186,6 +188,14 @@ function MultiSelector({
     [values, inputValue, activeIndex, handleOpenChange]
   )
 
+  const handleSearchChange = React.useCallback(
+    (value: string) => {
+      setInputValue(value)
+      if (onSearchChange) onSearchChange(value)
+    },
+    [onSearchChange]
+  )
+
   return (
     <MultiSelectContext.Provider
       value={{
@@ -196,7 +206,7 @@ function MultiSelector({
         open,
         setOpen: handleOpenChange,
         inputValue,
-        setInputValue,
+        setInputValue: handleSearchChange,
         activeIndex,
         setActiveIndex,
         size: size || 'small',
