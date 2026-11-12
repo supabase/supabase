@@ -231,6 +231,7 @@ function inFilterSql(filter: Filter) {
     const filterValueTxt = String(filter.value)
     values = filterValueTxt.split(',').map((x) => filterLiteral(x))
   }
+  if (values.length === 0) return safeSql`false`
   return safeSql`${ident(filter.column)} ${filter.operator as SafeSqlFragment} (${joinSqlFragments(values, ',')})`
 }
 
@@ -263,6 +264,7 @@ function inTupleFilterSql(filter: Filter) {
   if (!Array.isArray(filter.value)) {
     throw new Error(`Values for a tuple 'in' filter must be an array`)
   }
+  if (filter.value.length === 0) return safeSql`false`
 
   const columns = safeSql`(${joinSqlFragments(
     filter.column.map((c) => ident(c)),
