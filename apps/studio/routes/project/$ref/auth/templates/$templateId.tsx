@@ -68,8 +68,7 @@ export const Route = createFileRoute('/project/$ref/auth/templates/$templateId')
 })
 
 function TemplatePage() {
-  const { templateId, ref } = Route.useParams()
-  const { ref: projectRef } = useParams()
+  const { templateId, ref } = useParams()
 
   const { can: canReadAuthSettings, isSuccess: isPermissionsLoaded } = useAsyncCheckPermissionsV2(
     FGA_PERMISSIONS.PROJECT.AUTH_CONFIG_READ
@@ -79,7 +78,7 @@ function TemplatePage() {
     FGA_PERMISSIONS.PROJECT.AUTH_CONFIG_WRITE
   )
 
-  const { data: authConfig, isPending: isLoadingConfig } = useAuthConfigQuery({ projectRef })
+  const { data: authConfig, isPending: isLoadingConfig } = useAuthConfigQuery({ projectRef: ref })
   const { data: selectedOrganization } = useSelectedOrganizationQuery()
   const { data: selectedProject } = useSelectedProjectQuery()
   const isTemplateRestrictionStatusKnown = isCustomEmailTemplateRestrictionStatusKnown({
@@ -145,8 +144,8 @@ function TemplatePage() {
   })
 
   const onSubmit = (values: z.infer<typeof TemplateFormSchema>) => {
-    if (!projectRef) return console.error('Project ref is required')
-    updateAuthConfig({ projectRef: projectRef, config: { ...values }, skipInvalidation: true })
+    if (!ref) return console.error('Project ref is required')
+    updateAuthConfig({ projectRef: ref, config: { ...values }, skipInvalidation: true })
   }
 
   useEffect(() => {
@@ -177,7 +176,7 @@ function TemplatePage() {
           description={`${templateId ? `The template "${templateId}"` : 'This template'} doesn’t seem to exist.`}
         >
           <Button asChild className="mt-2">
-            <Link to="/project/$ref/auth/templates" params={{ ref }}>
+            <Link to="..">
               Head back
             </Link>
           </Button>
@@ -193,7 +192,7 @@ function TemplatePage() {
           <BreadcrumbList>
             <BreadcrumbItem>
               <BreadcrumbLink asChild>
-                <Link to="/project/$ref/auth/templates" params={{ ref }}>
+                <Link to="..">
                   Emails
                 </Link>
               </BreadcrumbLink>
