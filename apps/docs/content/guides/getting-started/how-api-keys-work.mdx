@@ -8,8 +8,6 @@ An API key identifies the application component that calls your Supabase project
 
 ## What an API key identifies
 
-An API key authenticates an application component to give it access to Supabase services. An application component might be a web page, a mobile app, or a server. An API key doesn't distinguish between users but between applications.
-
 API keys provide the first layer of authentication for data access. Supabase Auth builds on top of that. This table covers the difference:
 
 | Responsibility                     | Question                       | Answer                                                  |
@@ -66,8 +64,6 @@ A secret key bypasses every Row Level Security policy you have. Never put one in
 If a secret key leaks, see [Rotate a leaked or compromised API key](/docs/guides/security/rotate-leaked-api-keys).
 
 </Admonition>
-
-Secret keys authorize access to your project's data through the built-in `service_role` Postgres role. By design, this role has full access to your project's data. It also has the [`BYPASSRLS` attribute](https://www.postgresql.org/docs/current/ddl-rowsecurity.html#:~:text=BYPASSRLS), so it skips every Row Level Security policy you attach.
 
 Secret keys improve on the old JWT-based `service_role` key, and we recommend them wherever possible. They add checks that prevent misuse:
 

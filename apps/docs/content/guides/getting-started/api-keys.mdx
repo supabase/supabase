@@ -17,8 +17,6 @@ Pick the key by asking where the code runs.
 | Anything you ship: browser, mobile app, CLI, script   | Publishable key | Anyone can read it, so it only reaches what Row Level Security allows |
 | Anything you control: server, Edge Function, cron job | Secret key      | It bypasses Row Level Security, so it must never leave your control   |
 
-Think of your project's data as a building. The publishable key is taped to the front door, and it only opens the lobby. The secret key is the master key, and it stays in your pocket.
-
 To swap keys in an application that already ships legacy keys, follow [Migrating to new API keys](/docs/guides/getting-started/migrating-to-new-api-keys) instead.
 
 <$Partial path="api_keys_deprecation.mdx" />
@@ -46,10 +44,6 @@ SUPABASE_SECRET_KEY=sb_secret_...
 ```
 
 ### Find your keys
-
-Pick the path that matches where you are working.
-
-Every path below reads keys that already exist. If your project has no publishable or secret key yet, create them first in the [**Settings > API Keys**](/dashboard/project/_/settings/api-keys/) section of the Dashboard.
 
 <Tabs
   scrollable

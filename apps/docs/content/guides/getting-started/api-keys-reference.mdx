@@ -19,8 +19,6 @@ Supabase supports four types of API keys:
 
 Publishable and secret keys are short strings, not JWTs. If a tool, tutorial, or AI assistant tells you to copy a long key that begins with `eyJ`, it was written for the legacy keys.
 
-Running `supabase start` prints a publishable key and a secret key for your local project. The local secret key takes the place of the local `service_role` key. See the [CLI getting started guide](/docs/guides/local-development/cli/getting-started) for the full output.
-
 ## Handling secret keys safely
 
 Exposing a secret key puts all of your project's data at risk. The rules below are grouped by the kind of mistake they prevent.
