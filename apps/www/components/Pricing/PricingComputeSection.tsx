@@ -46,11 +46,7 @@ const PricingComputeSection = () => {
             className="grid grid-cols-2 gap-2 w-full bg-surface-200 rounded-md"
           >
             {plans.map((plan) => (
-              <ToggleGroupItem
-                key={plan.name}
-                value={plan.name}
-                className="w-full h-6"
-              >
+              <ToggleGroupItem key={plan.name} value={plan.name} className="w-full h-6">
                 {plan.name}
               </ToggleGroupItem>
             ))}
