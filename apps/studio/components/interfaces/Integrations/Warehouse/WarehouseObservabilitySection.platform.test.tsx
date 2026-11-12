@@ -42,10 +42,13 @@ const mockMetrics = (body: WarehouseMetricsResponse) =>
   })
 
 describe('Warehouse workload summary', () => {
-  test('shows labelled example charts before setup without requesting project metrics', () => {
+  test('shows chart silhouettes before setup without measurements or controls', () => {
     customRender(<WarehouseObservabilitySection mode="example" />)
-    expect(screen.getByText('Example data')).toBeInTheDocument()
-    expect(screen.getByRole('heading', { name: 'Query duration (p95)' })).toBeInTheDocument()
+    expect(screen.queryByText('Example data')).not.toBeInTheDocument()
+    expect(screen.getByText('Query performance appears after setup.')).toBeInTheDocument()
+    expect(screen.getByRole('heading', { name: 'Query duration' })).toBeInTheDocument()
+    expect(screen.queryByRole('button')).not.toBeInTheDocument()
+    expect(screen.queryByText(/Interval ending| ms|\/s/)).not.toBeInTheDocument()
     expect(screen.getByRole('heading', { name: 'Query rate' })).toBeInTheDocument()
     expect(screen.queryByRole('link', { name: 'View metrics' })).not.toBeInTheDocument()
     expect(screen.queryByText('Unavailable')).not.toBeInTheDocument()

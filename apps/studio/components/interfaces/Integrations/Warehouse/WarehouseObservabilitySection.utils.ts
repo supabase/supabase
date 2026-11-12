@@ -88,11 +88,3 @@ export const getWarehouseSummaryPoints = (
     return row
   })
 }
-
-export const getWarehouseExamplePoints = (endDate: string, scale = 1) =>
-  [4, 5, 4, 7, 6, 9, 8, 6, 7, 5, 6, 4].map((value, index) => ({
-    timestamp: dayjs(endDate)
-      .subtract((11 - index) * 5, 'minute')
-      .toISOString(),
-    value: value * scale,
-  }))

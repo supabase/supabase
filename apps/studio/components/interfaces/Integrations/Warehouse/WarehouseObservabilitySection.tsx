@@ -3,7 +3,7 @@ import { useParams } from 'common'
 import dayjs from 'dayjs'
 import { RefreshCwIcon } from 'lucide-react'
 import { useState, type ReactNode } from 'react'
-import { Badge, Button, Card, CardContent, Tooltip, TooltipContent, TooltipTrigger } from 'ui'
+import { Button, Card, CardContent, Tooltip, TooltipContent, TooltipTrigger } from 'ui'
 import {
   PageSection,
   PageSectionContent,
@@ -15,7 +15,6 @@ import {
 
 import { WarehouseLoadingState } from './WarehouseLoadingState'
 import {
-  getWarehouseExamplePoints,
   getWarehouseSummaryNotice,
   getWarehouseSummaryPoints,
   getWarehouseSummaryRange,
@@ -72,11 +71,8 @@ const WorkloadSection = ({
       <PageSectionSummary>
         <PageSectionTitle>Workload</PageSectionTitle>
         <PageSectionDescription>
-          {isExample
-            ? 'See query performance and capacity after setup.'
-            : 'Query performance and capacity.'}
+          {isExample ? 'Query performance appears after setup.' : 'Query performance and capacity.'}
         </PageSectionDescription>
-        {isExample && <Badge variant="default">Example data</Badge>}
       </PageSectionSummary>
     </PageSectionMeta>
     <PageSectionContent className="space-y-4">{children}</PageSectionContent>
@@ -84,24 +80,31 @@ const WorkloadSection = ({
 )
 
 const WarehouseWorkloadPreview = () => {
-  const [range] = useState(getWarehouseSummaryRange)
   return (
     <WorkloadSection isExample>
-      <div className="grid gap-4 sm:grid-cols-2" aria-label="Example Warehouse workload charts">
-        <WarehouseWorkloadChart
-          title="Query duration (p95)"
-          unit="ms"
-          description=""
-          points={getWarehouseExamplePoints(range.endDate, 80)}
-          isExample
-        />
-        <WarehouseWorkloadChart
-          title="Query rate"
-          unit="/s"
-          description=""
-          points={getWarehouseExamplePoints(range.endDate)}
-          isExample
-        />
+      <div className="grid gap-4 sm:grid-cols-2">
+        {['Query duration', 'Query rate'].map((title) => (
+          <Card key={title}>
+            <CardContent className="space-y-3 p-4">
+              <h3 className="text-sm text-foreground-light">{title}</h3>
+              <svg
+                aria-hidden="true"
+                viewBox="0 0 300 100"
+                preserveAspectRatio="none"
+                className="h-36 w-full text-foreground-muted opacity-30"
+                fill="none"
+              >
+                <path d="M0 25H300M0 50H300M0 75H300" stroke="currentColor" strokeOpacity="0.3" />
+                <path
+                  d="M0 80C25 80 25 60 50 65S75 85 100 55S125 65 150 45S175 60 200 30S225 45 250 25S275 35 300 15"
+                  stroke="currentColor"
+                  strokeWidth="2"
+                  vectorEffect="non-scaling-stroke"
+                />
+              </svg>
+            </CardContent>
+          </Card>
+        ))}
       </div>
     </WorkloadSection>
   )

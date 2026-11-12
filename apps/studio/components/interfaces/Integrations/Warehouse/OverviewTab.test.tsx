@@ -266,10 +266,10 @@ describe('WarehouseOverviewTab', () => {
     expect(screen.queryByText('Picker error: Initial setup failed')).not.toBeInTheDocument()
   })
 
-  test('shows Tables, Status and labelled example workload before setup', async () => {
+  test('shows Tables, Status and workload silhouettes before setup', async () => {
     mockSetupStatus({ setup_status: 'not_started' })
     customRender(<WarehouseOverviewTab />)
-    expect(await screen.findByText('Example data')).toBeInTheDocument()
+    expect(await screen.findByText('Query performance appears after setup.')).toBeInTheDocument()
     const headings = screen
       .getAllByRole('heading')
       .map((heading) => heading.textContent)
