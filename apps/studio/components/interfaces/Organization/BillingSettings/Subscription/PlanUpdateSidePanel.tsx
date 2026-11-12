@@ -1,5 +1,5 @@
 import { useDebounce } from '@uidotdev/usehooks'
-import { useParams } from 'common'
+import { useFlag, useParams } from 'common'
 import { StudioPricingSidePanelOpenedEvent } from 'common/telemetry-constants'
 import { useRouter } from 'next/router'
 import { useCallback, useEffect, useEffectEvent, useMemo, useRef, useState } from 'react'
@@ -133,6 +133,11 @@ export const PlanUpdateSidePanel = () => {
     FGA_PERMISSIONS.ORGANIZATION.BILLING_WRITE
   )
 
+  const { can: canReadSubscriptions } = useAsyncCheckPermissionsV2(
+    FGA_PERMISSIONS.ORGANIZATION.BILLING_READ
+  )
+  const projectUpdateDisabled = useFlag('disableProjectCreationAndUpdate')
+
   const snap = useOrgSettingsPageStateSnapshot()
   const isOpenedViaUrl = router.query.panel === 'subscriptionPlan'
   const visible = snap.panelKey === 'subscriptionPlan' || isOpenedViaUrl
@@ -157,9 +162,10 @@ export const PlanUpdateSidePanel = () => {
     snap.setPanelKey(undefined)
   }
 
-  const { data: subscription, isSuccess: isSuccessSubscription } = useOrgSubscriptionQuery({
-    orgSlug: slug,
-  })
+  const { data: subscription, isSuccess: isSuccessSubscription } = useOrgSubscriptionQuery(
+    { orgSlug: slug },
+    { enabled: canReadSubscriptions }
+  )
   const { data: plans, isPending: isLoadingPlans } = useOrgPlansQuery(
     { orgSlug: slug },
     { enabled: visible }
@@ -234,6 +240,7 @@ export const PlanUpdateSidePanel = () => {
   const showAwsMarketplacePurchase =
     isSuccessSubscription &&
     canUpdateSubscription &&
+    !projectUpdateDisabled &&
     selectedOrganization?.managed_by === MANAGED_BY.SUPABASE &&
     !isPartnerBilledOrganization &&
     subscription.billing_via_partner === false &&

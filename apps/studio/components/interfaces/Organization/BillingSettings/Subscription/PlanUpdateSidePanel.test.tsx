@@ -8,12 +8,19 @@ import { createMockOrganization, render } from '@/tests/helpers'
 const mockSelectedOrganization = vi.hoisted(() => vi.fn())
 const mockPush = vi.hoisted(() => vi.fn())
 const mockPartnerManagedResource = vi.hoisted(() => vi.fn())
+const mockCanReadBilling = vi.hoisted(() => vi.fn())
+const mockProjectUpdateDisabled = vi.hoisted(() => vi.fn())
+const mockUseOrgSubscriptionQuery = vi.hoisted(() => vi.fn())
 
 vi.mock('common', async (importOriginal) => {
   const original = (await importOriginal()) as typeof import('common')
   return {
     ...original,
     useParams: () => ({ slug: 'stripe-org' }),
+    useFlag: (flag: string) =>
+      flag === 'disableProjectCreationAndUpdate'
+        ? mockProjectUpdateDisabled()
+        : original.useFlag(flag),
   }
 })
 
@@ -58,10 +65,18 @@ vi.mock('@/lib/telemetry/track', () => ({
   useTrack: () => vi.fn(),
 }))
 
-vi.mock('@/hooks/misc/useCheckPermissionsV2', async (importOriginal) => ({
-  ...(await importOriginal<typeof import('@/hooks/misc/useCheckPermissionsV2')>()),
-  useAsyncCheckPermissionsV2: () => ({ can: true }),
-}))
+vi.mock('@/hooks/misc/useCheckPermissionsV2', async (importOriginal) => {
+  const original = await importOriginal<typeof import('@/hooks/misc/useCheckPermissionsV2')>()
+  return {
+    ...original,
+    useAsyncCheckPermissionsV2: (permission: unknown) => ({
+      can:
+        permission === original.FGA_PERMISSIONS.ORGANIZATION.BILLING_READ
+          ? mockCanReadBilling()
+          : true,
+    }),
+  }
+})
 
 vi.mock('@/state/organization-settings', () => ({
   useOrgSettingsPageStateSnapshot: () => ({
@@ -83,10 +98,7 @@ vi.mock('@/data/organizations/organization-query', () => ({
 }))
 
 vi.mock('@/data/subscriptions/org-subscription-query', () => ({
-  useOrgSubscriptionQuery: () => ({
-    data: { plan: { id: 'free', name: 'Free' }, billing_via_partner: false },
-    isSuccess: true,
-  }),
+  useOrgSubscriptionQuery: mockUseOrgSubscriptionQuery,
 }))
 
 vi.mock('@/data/subscriptions/org-plans-query', () => ({
@@ -138,6 +150,12 @@ vi.mock('./SubscriptionPlanUpdateDialog', () => ({
 
 describe('PlanUpdateSidePanel', () => {
   beforeEach(() => {
+    mockCanReadBilling.mockReturnValue(true)
+    mockProjectUpdateDisabled.mockReturnValue(false)
+    mockUseOrgSubscriptionQuery.mockReturnValue({
+      data: { plan: { id: 'free', name: 'Free' }, billing_via_partner: false },
+      isSuccess: true,
+    })
     mockSelectedOrganization.mockReturnValue(
       createMockOrganization({
         slug: 'stripe-org',
@@ -249,6 +267,43 @@ describe('PlanUpdateSidePanel', () => {
       expect(
         screen.queryByText('Prefer purchasing through AWS Marketplace?')
       ).not.toBeInTheDocument()
+    })
+
+    it('does not offer AWS Marketplace when project updates are disabled', () => {
+      mockProjectUpdateDisabled.mockReturnValue(true)
+
+      render(<PlanUpdateSidePanel />)
+
+      expect(
+        screen.queryByText('Prefer purchasing through AWS Marketplace?')
+      ).not.toBeInTheDocument()
+    })
+
+    it('does not fetch the subscription without BILLING_READ', () => {
+      mockUseOrgSubscriptionQuery.mockClear()
+      mockCanReadBilling.mockReturnValue(false)
+
+      render(<PlanUpdateSidePanel />)
+
+      expect(mockUseOrgSubscriptionQuery).toHaveBeenCalledWith(
+        { orgSlug: 'stripe-org' },
+        { enabled: false }
+      )
+      expect(mockUseOrgSubscriptionQuery).not.toHaveBeenCalledWith(
+        { orgSlug: 'stripe-org' },
+        { enabled: true }
+      )
+    })
+
+    it('fetches the subscription with BILLING_READ', () => {
+      mockUseOrgSubscriptionQuery.mockClear()
+
+      render(<PlanUpdateSidePanel />)
+
+      expect(mockUseOrgSubscriptionQuery).toHaveBeenCalledWith(
+        { orgSlug: 'stripe-org' },
+        { enabled: true }
+      )
     })
 
     it('does not render gap rows', () => {
