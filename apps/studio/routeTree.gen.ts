@@ -191,6 +191,7 @@ import { Route as ProjectRefObservabilityAuthRouteImport } from './routes/projec
 import { Route as ProjectRefObservabilityConnectionsRouteImport } from './routes/project/$ref/observability/connections'
 import { Route as ProjectRefObservabilityDatabaseRouteImport } from './routes/project/$ref/observability/database'
 import { Route as ProjectRefObservabilityEdgeFunctionsRouteImport } from './routes/project/$ref/observability/edge-functions'
+import { Route as ProjectRefObservabilityEgressRouteImport } from './routes/project/$ref/observability/egress'
 import { Route as ProjectRefObservabilityPostgrestRouteImport } from './routes/project/$ref/observability/postgrest'
 import { Route as ProjectRefObservabilityQueryInsightsRouteImport } from './routes/project/$ref/observability/query-insights'
 import { Route as ProjectRefObservabilityQueryPerformanceRouteImport } from './routes/project/$ref/observability/query-performance'
@@ -1305,6 +1306,12 @@ const ProjectRefObservabilityEdgeFunctionsRoute =
     path: '/edge-functions',
     getParentRoute: () => ProjectRefObservabilityRoute,
   } as any)
+const ProjectRefObservabilityEgressRoute =
+  ProjectRefObservabilityEgressRouteImport.update({
+    id: '/egress',
+    path: '/egress',
+    getParentRoute: () => ProjectRefObservabilityRoute,
+  } as any)
 const ProjectRefObservabilityPostgrestRoute =
   ProjectRefObservabilityPostgrestRouteImport.update({
     id: '/postgrest',
@@ -2344,6 +2351,7 @@ export interface FileRoutesByFullPath {
   '/project/$ref/observability/connections': typeof ProjectRefObservabilityConnectionsRoute
   '/project/$ref/observability/database': typeof ProjectRefObservabilityDatabaseRoute
   '/project/$ref/observability/edge-functions': typeof ProjectRefObservabilityEdgeFunctionsRoute
+  '/project/$ref/observability/egress': typeof ProjectRefObservabilityEgressRoute
   '/project/$ref/observability/postgrest': typeof ProjectRefObservabilityPostgrestRoute
   '/project/$ref/observability/query-insights': typeof ProjectRefObservabilityQueryInsightsRoute
   '/project/$ref/observability/query-performance': typeof ProjectRefObservabilityQueryPerformanceRoute
@@ -2658,6 +2666,7 @@ export interface FileRoutesByTo {
   '/project/$ref/observability/connections': typeof ProjectRefObservabilityConnectionsRoute
   '/project/$ref/observability/database': typeof ProjectRefObservabilityDatabaseRoute
   '/project/$ref/observability/edge-functions': typeof ProjectRefObservabilityEdgeFunctionsRoute
+  '/project/$ref/observability/egress': typeof ProjectRefObservabilityEgressRoute
   '/project/$ref/observability/postgrest': typeof ProjectRefObservabilityPostgrestRoute
   '/project/$ref/observability/query-insights': typeof ProjectRefObservabilityQueryInsightsRoute
   '/project/$ref/observability/query-performance': typeof ProjectRefObservabilityQueryPerformanceRoute
@@ -2989,6 +2998,7 @@ export interface FileRoutesById {
   '/project/$ref/observability/connections': typeof ProjectRefObservabilityConnectionsRoute
   '/project/$ref/observability/database': typeof ProjectRefObservabilityDatabaseRoute
   '/project/$ref/observability/edge-functions': typeof ProjectRefObservabilityEdgeFunctionsRoute
+  '/project/$ref/observability/egress': typeof ProjectRefObservabilityEgressRoute
   '/project/$ref/observability/postgrest': typeof ProjectRefObservabilityPostgrestRoute
   '/project/$ref/observability/query-insights': typeof ProjectRefObservabilityQueryInsightsRoute
   '/project/$ref/observability/query-performance': typeof ProjectRefObservabilityQueryPerformanceRoute
@@ -3320,6 +3330,7 @@ export interface FileRouteTypes {
     | '/project/$ref/observability/connections'
     | '/project/$ref/observability/database'
     | '/project/$ref/observability/edge-functions'
+    | '/project/$ref/observability/egress'
     | '/project/$ref/observability/postgrest'
     | '/project/$ref/observability/query-insights'
     | '/project/$ref/observability/query-performance'
@@ -3634,6 +3645,7 @@ export interface FileRouteTypes {
     | '/project/$ref/observability/connections'
     | '/project/$ref/observability/database'
     | '/project/$ref/observability/edge-functions'
+    | '/project/$ref/observability/egress'
     | '/project/$ref/observability/postgrest'
     | '/project/$ref/observability/query-insights'
     | '/project/$ref/observability/query-performance'
@@ -3964,6 +3976,7 @@ export interface FileRouteTypes {
     | '/project/$ref/observability/connections'
     | '/project/$ref/observability/database'
     | '/project/$ref/observability/edge-functions'
+    | '/project/$ref/observability/egress'
     | '/project/$ref/observability/postgrest'
     | '/project/$ref/observability/query-insights'
     | '/project/$ref/observability/query-performance'
@@ -5529,6 +5542,13 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof ProjectRefObservabilityEdgeFunctionsRouteImport
       parentRoute: typeof ProjectRefObservabilityRoute
     }
+    '/project/$ref/observability/egress': {
+      id: '/project/$ref/observability/egress'
+      path: '/egress'
+      fullPath: '/project/$ref/observability/egress'
+      preLoaderRoute: typeof ProjectRefObservabilityEgressRouteImport
+      parentRoute: typeof ProjectRefObservabilityRoute
+    }
     '/project/$ref/observability/postgrest': {
       id: '/project/$ref/observability/postgrest'
       path: '/postgrest'
@@ -7071,6 +7091,7 @@ interface ProjectRefObservabilityRouteChildren {
   ProjectRefObservabilityConnectionsRoute: typeof ProjectRefObservabilityConnectionsRoute
   ProjectRefObservabilityDatabaseRoute: typeof ProjectRefObservabilityDatabaseRoute
   ProjectRefObservabilityEdgeFunctionsRoute: typeof ProjectRefObservabilityEdgeFunctionsRoute
+  ProjectRefObservabilityEgressRoute: typeof ProjectRefObservabilityEgressRoute
   ProjectRefObservabilityPostgrestRoute: typeof ProjectRefObservabilityPostgrestRoute
   ProjectRefObservabilityQueryInsightsRoute: typeof ProjectRefObservabilityQueryInsightsRoute
   ProjectRefObservabilityQueryPerformanceRoute: typeof ProjectRefObservabilityQueryPerformanceRoute
@@ -7090,6 +7111,7 @@ const ProjectRefObservabilityRouteChildren: ProjectRefObservabilityRouteChildren
     ProjectRefObservabilityDatabaseRoute: ProjectRefObservabilityDatabaseRoute,
     ProjectRefObservabilityEdgeFunctionsRoute:
       ProjectRefObservabilityEdgeFunctionsRoute,
+    ProjectRefObservabilityEgressRoute: ProjectRefObservabilityEgressRoute,
     ProjectRefObservabilityPostgrestRoute:
       ProjectRefObservabilityPostgrestRoute,
     ProjectRefObservabilityQueryInsightsRoute:

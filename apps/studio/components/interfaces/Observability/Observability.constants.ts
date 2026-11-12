@@ -10,6 +10,7 @@ export const OBSERVABILITY_DOCS_HREFS = {
   auth: `${DOCS_URL}/guides/telemetry/reports#auth`,
   edgeFunctions: `${DOCS_URL}/guides/telemetry/reports#edge-functions`,
   storage: `${DOCS_URL}/guides/telemetry/reports#storage`,
+  egress: `${DOCS_URL}/guides/platform/manage-your-usage/egress`,
   realtime: `${DOCS_URL}/guides/realtime/reports`,
   customReport: `${DOCS_URL}/guides/telemetry/reports#using-reports`,
 } as const
