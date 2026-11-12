@@ -566,6 +566,24 @@ export interface OnboardingSurveySubmitFailedEvent {
 }
 
 /**
+ * Signed-in user was shown the new organization form in either arm of the
+ * onboardingSurveyPlacement experiment. Fires once per mount of the form, after the
+ * profile loads and the flags for that user have resolved.
+ *
+ * @group Events
+ * @source studio
+ * @page new
+ */
+export interface OnboardingSurveyPlacementExperimentExposedEvent {
+  action: 'onboarding_survey_placement_experiment_exposed'
+  properties: {
+    experiment_id: 'onboarding_survey_placement'
+    /** The experiment variant the user is enrolled in */
+    variant: 'control' | 'org_form'
+  }
+}
+
+/**
  * Project creation form was rendered and shown to the user. Passive impression that
  * anchors the project-creation funnel (exposed -> completed). Fires once per form view,
  * after the org and create-project permission have resolved, so it tracks the form
@@ -4697,6 +4715,7 @@ export type TelemetryEvent =
   | OnboardingSurveySubmitButtonClickedEvent
   | OnboardingSurveyDismissedEvent
   | OnboardingSurveySubmitFailedEvent
+  | OnboardingSurveyPlacementExperimentExposedEvent
   | ProjectCreationFormExposedEvent
   | FreeTierGeneralRegionExperimentExposedEvent
   | FreeTierGeneralRegionUpgradeClickedEvent
