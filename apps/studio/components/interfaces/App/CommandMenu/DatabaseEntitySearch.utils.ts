@@ -57,12 +57,13 @@ export function matchesTableRelatedSearch(
   return matchesEntitySearch({ schema, name: table }, query)
 }
 
-export function formatTableSearchDetails({
-  policy_count,
-  rls_enabled,
-}: Pick<EntitySearchTable, 'policy_count' | 'rls_enabled'>) {
-  const policies = `${policy_count} ${policy_count === 1 ? 'policy' : 'policies'}`
-  return `${policies} • RLS ${rls_enabled ? 'enabled' : 'disabled'}`
+export function formatTableSearchDetails(table: EntitySearchTable) {
+  if (table.type === 'r' || table.type === 'p') {
+    const policies = `${table.policy_count} ${table.policy_count === 1 ? 'policy' : 'policies'}`
+    return `${policies} • RLS ${table.rls_enabled ? 'enabled' : 'disabled'}`
+  }
+  if (table.type === 'v') return table.security_invoker ? 'Security invoker' : 'Security definer'
+  return ''
 }
 
 // Triggers found through their function don't match by name or table, so say which

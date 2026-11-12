@@ -37,7 +37,7 @@ const TocAnchorsProvider = ({ children }: PropsWithChildren) => {
       const newHeadings = headings
         .filter((heading) => heading.id)
         .map((heading) => {
-          const text = heading.textContent?.replace('#', '') || ''
+          const text = heading.textContent || ''
           const link = heading.id ? `#${heading.id}` : null
 
           const level = heading.tagName === 'H2' ? 2 : 3

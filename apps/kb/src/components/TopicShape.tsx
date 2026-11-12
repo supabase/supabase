@@ -72,10 +72,12 @@ export const TopicShape = ({ topic, text, isMirrored, className }: TopicShapePro
         HERO_PADDING[topic] ?? 0
       )
       const dashedRings = rings.filter((ring) => ring.isDashed)
-      const solidRings = rings.filter((ring) => !ring.isDashed)
+      const solidRings = rings.filter((ring) => !ring.isDashed && !ring.arc)
+      const arcs = rings.filter((ring) => ring.arc)
       const isReducedMotion = matchMedia('(prefers-reduced-motion: reduce)').matches
       const startedAt = performance.now()
-      const orbitsAt = GUIDES_LEAD_MS + (solidRings.length + pieces.length) * PIECE_DELAY_MS
+      const orbitsAt =
+        GUIDES_LEAD_MS + (solidRings.length + arcs.length + pieces.length) * PIECE_DELAY_MS
       let frame = 0
 
       const draw = () => {
@@ -129,7 +131,11 @@ export const TopicShape = ({ topic, text, isMirrored, className }: TopicShapePro
 
         const ringPoints = (ring: (typeof rings)[number]) => {
           const center = toCanvas([ring.cx, ring.cy])
-          return circlePoints({ cx: center.x, cy: center.y, radius: ring.radius * fit })
+          const [scaleX, scaleY] = ring.scale ?? [1, 1]
+          const [from, to] = ring.arc ?? [0, Math.PI * 2]
+          return circlePoints({ cx: 0, cy: 0, radius: ring.radius * fit, from, to }).map(
+            ({ x, y }) => ({ x: center.x + x * scaleX, y: center.y + y * scaleY })
+          )
         }
 
         // the dashed orbits paint first, so the solid rings hide them where they cross
@@ -142,11 +148,14 @@ export const TopicShape = ({ topic, text, isMirrored, className }: TopicShapePro
           fillInside(points)
           fillGlyphs(points, drawnAt(index))
         })
+        arcs.forEach((ring, index) =>
+          fillGlyphs(ringPoints(ring), drawnAt(solidRings.length + index))
+        )
         pieces.forEach((piece, index) => {
           for (const polygon of [...piece.faces, ...piece.insets]) {
             const points = polygon.map(toCanvas)
             fillInside(points)
-            fillGlyphs(points, drawnAt(solidRings.length + index), true)
+            fillGlyphs(points, drawnAt(solidRings.length + arcs.length + index), true)
           }
         })
 
