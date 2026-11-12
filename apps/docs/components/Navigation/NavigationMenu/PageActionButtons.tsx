@@ -1,6 +1,5 @@
 'use client'
 
-import { CrossfadeIcon } from 'ui-patterns/CodeBlock/CodeBlockControls'
 import { BASE_PATH, PROD_URL } from '~/lib/constants'
 import { useDocsPathname } from '~/features/IaNav/IaNavRouteProvider'
 import { mdUrl } from '~/lib/md-alternates'
@@ -16,6 +15,7 @@ import {
   Button,
   cn,
   copyToClipboard,
+  CrossfadeIcon,
   DropdownMenu,
   DropdownMenuContent,
   DropdownMenuItem,
