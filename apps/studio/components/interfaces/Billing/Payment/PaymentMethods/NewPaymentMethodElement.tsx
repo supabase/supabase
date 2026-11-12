@@ -331,12 +331,21 @@ export const NewPaymentMethodElement = forwardRef(
     return (
       <div className="space-y-2">
         <p className="text-sm text-foreground-lighter">
-          Please ensure CVC and postal codes match what’s on file for your card.
+          Please ensure CVC and postal codes match what’s on file for your card. If you are prompted
+          to confirm a phone number/email, you are likely connected to{' '}
+          <a
+            className="underline"
+            href="https://support.link.com/questions/how-do-i-update-my-information-with-link"
+          >
+            Stripe Link
+          </a>
+          . Opt out of it by clicking the "X" symbol.
         </p>
 
         <PaymentElement
           options={{
             layout: 'tabs',
+            wallets: { link: 'never' }, // prevent Stripe Link from auto-registering
             defaultValues: { billingDetails: { email: email ?? undefined } },
             readOnly,
           }}
@@ -367,6 +376,17 @@ export const NewPaymentMethodElement = forwardRef(
               </TooltipContent>
             </Tooltip>
           </div>
+        )}
+
+        {/*
+          Stripe renders the AddressElement's "Full name" label inside its iframe and exposes
+          no option to reword it (display.name only toggles full/split/organization), so the
+          business-name case is spelled out here instead.
+        */}
+        {!purchasingAsBusiness && (
+          <p className="text-sm text-foreground-lighter">
+            Enter your full name, or your business name if you are purchasing as a business.
+          </p>
         )}
 
         <AddressElement

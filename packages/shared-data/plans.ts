@@ -65,6 +65,7 @@ export const plans: PricingInformation[] = [
       ['Add Log Drains', 'additional $60 per drain, per project'],
     ],
     preface: 'Everything in the Free Plan, plus:',
+    footer: 'First project included. Additional projects from $10/mo.',
     cta: 'Get Started',
   },
   {
@@ -88,6 +89,7 @@ export const plans: PricingInformation[] = [
       '28-day log retention',
     ],
     preface: 'Everything in the Pro Plan, plus:',
+    footer: 'First project included. Additional projects from $10/mo.',
     cta: 'Get Started',
   },
   {

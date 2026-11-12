@@ -37,8 +37,25 @@ import { useOrgSettingsPageStateSnapshot } from '@/state/organization-settings'
 
 const stripePromise = loadStripe(STRIPE_PUBLIC_KEY)
 
+type SavedPaymentMethod = { card?: { last4?: string; exp_month?: number; exp_year?: number } }
+
+/** e.g. "•••• 4242 · expires 08/28" — enough to tell saved cards apart at a glance. */
+const getCardLabel = (method: SavedPaymentMethod) => {
+  const card = method.card
+  if (!card?.last4) return 'Saved payment method'
+
+  const digits = `•••• ${card.last4}`
+  if (!card.exp_month || !card.exp_year) return digits
+
+  const month = String(card.exp_month).padStart(2, '0')
+  const year = String(card.exp_year).slice(-2)
+  return `${digits} · expires ${month}/${year}`
+}
+
 export interface PaymentMethodSelectionProps {
   selectedPaymentMethod?: string
+  /** Field label above the saved-card select. Pass null when the surrounding section already names it. */
+  label?: string | null
   onSelectPaymentMethod: (id: string) => void
   layout?: 'vertical' | 'horizontal'
   readOnly: boolean
@@ -52,6 +69,7 @@ export interface PaymentMethodSelectionProps {
 const PaymentMethodSelection = forwardRef(function PaymentMethodSelection(
   {
     selectedPaymentMethod,
+    label = 'Payment method',
     onSelectPaymentMethod,
     layout = 'vertical',
     readOnly,
@@ -71,11 +89,18 @@ const PaymentMethodSelection = forwardRef(function PaymentMethodSelection(
   const [setupIntent, setSetupIntent] = useState<SetupIntentResponse | undefined>(undefined)
   const { resolvedTheme } = useTheme()
   const paymentRef = useRef<PaymentMethodElementRef | null>(null)
-  const [setupNewPaymentMethod, setSetupNewPaymentMethod] = useState<boolean | null>(null)
-  const { data: customerProfile, isPending: isCustomerProfileLoading } =
-    useOrganizationCustomerProfileQuery({
-      slug,
-    })
+  // Stays null until the customer picks "Add new payment method" themselves. The default
+  // comes from whether they have a saved card, which `isAddingNewPaymentMethod` derives
+  // below — deciding it here would mean deciding it off loading state.
+  const [hasChosenNewPaymentMethod, setHasChosenNewPaymentMethod] = useState<boolean | null>(null)
+  const {
+    data: customerProfile,
+    isPending: isCustomerProfileLoading,
+    isSuccess: isCustomerProfileLoaded,
+    isError: isCustomerProfileError,
+  } = useOrganizationCustomerProfileQuery({
+    slug,
+  })
   const {
     data: taxId,
     isPending: isCustomerTaxIdLoading,
@@ -85,7 +110,12 @@ const PaymentMethodSelection = forwardRef(function PaymentMethodSelection(
     onError: () => {},
   })
 
-  const { data: allPaymentMethods, isPending: isLoading } = useOrganizationPaymentMethodsQuery({
+  const {
+    data: allPaymentMethods,
+    isPending: isLoading,
+    isSuccess: arePaymentMethodsLoaded,
+    isError: isPaymentMethodsError,
+  } = useOrganizationPaymentMethodsQuery({
     slug,
   })
 
@@ -111,6 +141,23 @@ const PaymentMethodSelection = forwardRef(function PaymentMethodSelection(
     setCaptchaRef(node)
   }, [])
 
+  /**
+   * `paymentMethods.data` is an empty array while either query is in flight — the memo
+   * above blanks it until the customer profile loads — so an organization with saved
+   * cards looks card-less until both land, which would open the new card form over the
+   * top of a perfectly good saved card.
+   *
+   * Checked as settled rather than "not pending" on purpose: both queries sit disabled
+   * (and so pending) until the permission check resolves, and that window reads as
+   * card-less too. A failed query counts as settled, so a billing outage still leaves
+   * the customer a way to enter a card.
+   */
+  const arePaymentMethodsResolved =
+    (arePaymentMethodsLoaded || isPaymentMethodsError) &&
+    (isCustomerProfileLoaded || isCustomerProfileError)
+  const isAddingNewPaymentMethod =
+    hasChosenNewPaymentMethod ?? (arePaymentMethodsResolved && paymentMethods.data.length === 0)
+
   const { mutate: initSetupIntent, isPending: setupIntentLoading } =
     useOrganizationPaymentMethodSetupIntent({
       onSuccess: (intent) => {
@@ -120,12 +167,6 @@ const PaymentMethodSelection = forwardRef(function PaymentMethodSelection(
         toast.error(`Failed to setup intent: ${error.message}`)
       },
     })
-
-  useEffect(() => {
-    if (paymentMethods?.data && paymentMethods.data.length === 0 && setupNewPaymentMethod == null) {
-      setSetupNewPaymentMethod(true)
-    }
-  }, [paymentMethods])
 
   useEffect(() => {
     const loadSetupIntent = async (hcaptchaToken: string | undefined) => {
@@ -138,7 +179,7 @@ const PaymentMethodSelection = forwardRef(function PaymentMethodSelection(
     }
 
     const loadPaymentForm = async () => {
-      if (setupNewPaymentMethod && captchaRef) {
+      if (isAddingNewPaymentMethod && captchaRef) {
         let token = captchaToken
 
         try {
@@ -156,7 +197,7 @@ const PaymentMethodSelection = forwardRef(function PaymentMethodSelection(
     }
 
     loadPaymentForm()
-  }, [captchaRef, setupNewPaymentMethod])
+  }, [captchaRef, isAddingNewPaymentMethod])
 
   const resetCaptcha = () => {
     setCaptchaToken(null)
@@ -191,7 +232,7 @@ const PaymentMethodSelection = forwardRef(function PaymentMethodSelection(
   }, [selectedPaymentMethod, paymentMethods, onSelectPaymentMethod])
 
   const getFormValues = async (): ReturnType<PaymentMethodElementRef['getFormValues']> => {
-    if (setupNewPaymentMethod || (paymentMethods?.data && paymentMethods.data.length === 0)) {
+    if (isAddingNewPaymentMethod) {
       return paymentRef.current?.getFormValues()
     } else {
       return {
@@ -262,7 +303,7 @@ const PaymentMethodSelection = forwardRef(function PaymentMethodSelection(
   const createPaymentMethod = async (): ReturnType<
     PaymentMethodElementRef['createPaymentMethod']
   > => {
-    if (setupNewPaymentMethod || (paymentMethods?.data && paymentMethods.data.length === 0)) {
+    if (isAddingNewPaymentMethod) {
       const paymentResult = await paymentRef.current?.createPaymentMethod()
 
       if (!paymentResult) return paymentResult
@@ -317,12 +358,12 @@ const PaymentMethodSelection = forwardRef(function PaymentMethodSelection(
             <LoaderIcon className="animate-spin" size={14} />
             <p className="text-sm text-foreground-light">Retrieving payment methods</p>
           </div>
-        ) : paymentMethods?.data && paymentMethods?.data.length > 0 && !setupNewPaymentMethod ? (
+        ) : paymentMethods.data.length > 0 && !isAddingNewPaymentMethod ? (
           <FormItemLayout
             id="payment-method"
             isReactForm={false}
             layout={layout}
-            label="Payment method"
+            label={label ?? undefined}
             className="gap-[2px]"
             size="tiny"
           >
@@ -330,29 +371,30 @@ const PaymentMethodSelection = forwardRef(function PaymentMethodSelection(
               value={selectedPaymentMethod}
               onValueChange={(value) => {
                 if (value === 'new') {
-                  setSetupNewPaymentMethod(true)
+                  setHasChosenNewPaymentMethod(true)
                   return
                 }
                 onSelectPaymentMethod(value)
               }}
             >
-              <SelectTrigger id="payment-method">
+              <SelectTrigger
+                id="payment-method"
+                size="small"
+                aria-label={label ?? 'Payment method'}
+              >
                 <SelectValue className="flex gap-2" />
               </SelectTrigger>
               <SelectContent>
-                {paymentMethods?.data.map((method) => {
-                  const label = `•••• •••• •••• ${method.card?.last4}`
-                  return (
-                    <SelectItem key={method.id} value={method.id}>
-                      <div className="flex gap-2">
-                        <CardBrandIcon brand={method.card?.brand} />
-                        {label}
-                      </div>
-                    </SelectItem>
-                  )
-                })}
+                {paymentMethods?.data.map((method) => (
+                  <SelectItem key={method.id} value={method.id}>
+                    <div className="flex items-center gap-2">
+                      <CardBrandIcon brand={method.card?.brand} />
+                      <span translate="no">{getCardLabel(method)}</span>
+                    </div>
+                  </SelectItem>
+                ))}
                 <SelectItem value="new">
-                  <div className="flex gap-2">
+                  <div className="flex items-center gap-2">
                     <PlusIcon size={16} />
                     <p className="transition text-foreground-light group-hover:text-foreground">
                       Add new payment method

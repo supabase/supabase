@@ -131,9 +131,6 @@ const PricingPlans = ({ organizations, hasExistingOrganizations }: PricingPlansP
 
                           {isUpgradablePlan ? (
                             <div className="mt-4 flex flex-col gap-1">
-                              <span className="text-[13px] leading-4">
-                                First project included. Additional projects from $10/mo.
-                              </span>
                               <Link
                                 href="#addon-compute"
                                 className="hover:underline text-foreground-lighter text-[13px] m-0 p-0 leading-3"

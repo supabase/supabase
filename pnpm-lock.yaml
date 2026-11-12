@@ -1121,11 +1121,11 @@ importers:
         specifier: ^4.0.4
         version: 4.0.4
       '@stripe/react-stripe-js':
-        specifier: 6.1.0
-        version: 6.1.0(@stripe/stripe-js@9.1.0)(react-dom@19.2.6(react@19.2.6))(react@19.2.6)
+        specifier: 7.0.1
+        version: 7.0.1(@stripe/stripe-js@10.2.1)(react-dom@19.2.6(react@19.2.6))(react@19.2.6)
       '@stripe/stripe-js':
-        specifier: 9.1.0
-        version: 9.1.0
+        specifier: 10.2.1
+        version: 10.2.1
       '@stripe/sync-engine':
         specifier: 1.0.32
         version: 1.0.32(@types/node@22.13.14)(supports-color@8.1.1)
@@ -8664,15 +8664,15 @@ packages:
   '@stitches/core@1.2.8':
     resolution: {integrity: sha512-Gfkvwk9o9kE9r9XNBmJRfV8zONvXThnm1tcuojL04Uy5uRyqg93DC83lDebl0rocZCfKSjUv+fWYtMQmEDJldg==}
 
-  '@stripe/react-stripe-js@6.1.0':
-    resolution: {integrity: sha512-LbKbRv4+wUSHLb5VNxqiYcKaqXPvTju0bJaF0RrzH0h4+aKWDXAk4RzUBcpNxxj8KtjuxICElANs1Li7aTv1IQ==}
+  '@stripe/react-stripe-js@7.0.1':
+    resolution: {integrity: sha512-yDVPIS/RcmYqtX0xuNjAlHd/d9B9twmWwzn4GrZcfrlg737yPC/rfnOs2vCwAs40zrZ2qz4VL1r5b1t0gFRjQQ==}
     peerDependencies:
-      '@stripe/stripe-js': '>=9.0.0 <10.0.0'
+      '@stripe/stripe-js': '>=10.0.0 <11.0.0'
       react: '>=16.8.0 <20.0.0'
       react-dom: '>=16.8.0 <20.0.0'
 
-  '@stripe/stripe-js@9.1.0':
-    resolution: {integrity: sha512-v51LoEfZNiNS/5DcarWPCYgn24w4dqwwALR4GTbMW/N0DDzzj4DgYNoixX6PYvpt6uIJMucGUabn/BHhylggIQ==}
+  '@stripe/stripe-js@10.2.1':
+    resolution: {integrity: sha512-diHeR1/FeWZZzuFXEvkjRMzydgKEpxUTrKEUxSV8NcpeZY3Kl8C4Gerw/JSMK+3oXsBRJtgkG7ckviQJ651moA==}
     engines: {node: '>=12.16'}
 
   '@stripe/sync-engine@1.0.32':
@@ -25457,14 +25457,14 @@ snapshots:
 
   '@stitches/core@1.2.8': {}
 
-  '@stripe/react-stripe-js@6.1.0(@stripe/stripe-js@9.1.0)(react-dom@19.2.6(react@19.2.6))(react@19.2.6)':
+  '@stripe/react-stripe-js@7.0.1(@stripe/stripe-js@10.2.1)(react-dom@19.2.6(react@19.2.6))(react@19.2.6)':
     dependencies:
-      '@stripe/stripe-js': 9.1.0
+      '@stripe/stripe-js': 10.2.1
       prop-types: 15.8.1
       react: 19.2.6
       react-dom: 19.2.6(react@19.2.6)
 
-  '@stripe/stripe-js@9.1.0': {}
+  '@stripe/stripe-js@10.2.1': {}
 
   '@stripe/sync-engine@1.0.32(@types/node@22.13.14)(supports-color@8.1.1)':
     dependencies:
