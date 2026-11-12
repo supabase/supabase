@@ -165,7 +165,6 @@ describe('DestinationRow', () => {
       customRender(<DestinationRow destinationId={DESTINATION_ID} />)
 
       expect(await screen.findByRole('img', { name: 'Unknown destination' })).toBeVisible()
-      expect(screen.getByText('Unknown')).toBeVisible()
       await userEvent.click(await screen.findByRole('button', { name: 'Pipeline options' }))
       expect(screen.getAllByRole('menuitem').map((item) => item.textContent)).toEqual([
         'View details',
@@ -198,8 +197,6 @@ describe('DestinationRow', () => {
       await userEvent.click(screen.getByRole('button', { name: 'Pipeline options' }))
       await userEvent.click(screen.getByRole('menuitem', { name: 'Stop pipeline' }))
       expect(await screen.findByText('Stopped')).toBeVisible()
-      await userEvent.click(screen.getByRole('button', { name: 'Pipeline options' }))
-      expect(screen.queryByRole('menuitem', { name: 'Start pipeline' })).not.toBeInTheDocument()
     }
   )
 

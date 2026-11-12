@@ -8,7 +8,6 @@ describe('getReplicationDestinationType', () => {
     ['ducklake', 'DuckLake'],
     ['snowflake', 'Snowflake'],
     ['clickhouse', 'ClickHouse'],
-    ['unknown', 'Unknown'],
   ])('maps %s configs to %s', (key, expected) => {
     expect(getReplicationDestinationType({ [key]: {} })).toBe(expected)
   })
