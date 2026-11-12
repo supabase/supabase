@@ -35,6 +35,7 @@ Listener (port 8000)
   ▼
 HTTP filter chain
   ├─ CORS
+  ├─ Lua: 403 for cross-origin writes (Studio only)
   ├─ Basic Auth  (dashboard only)
   ├─ Lua: copy ?apikey query to header
   ├─ Lua: 401 for missing/invalid API key
@@ -140,11 +141,29 @@ The `/functions/v1/` route sets `idle_timeout` to `160s` and `timeout` to `410s`
 
 ## Authentication
 
-The gateway handles three authentication-related steps: dashboard basic auth on the catch-all route, API key enforcement on protected routes, and an opaque-to-internal key translation step that runs before enforcement.
+The gateway handles four authentication-related steps: dashboard basic auth on the catch-all route, cross-origin request protection on Studio routes, API key enforcement on protected routes, and an opaque-to-internal key translation step that runs before enforcement.
 
 ### Dashboard basic auth
 
 The catch-all `/` route requires HTTP basic auth with credentials from `DASHBOARD_USERNAME` and `DASHBOARD_PASSWORD`. The `Authorization` header is stripped (regardless of scheme) before the request is forwarded to Studio, so the basic auth credentials never reach the upstream service.
+
+### Cross-origin request protection
+
+Browsers resend basic auth credentials on requests from any site, so the gateway blocks cross-site request forgery (CSRF) against Studio. On the Studio routes (`/`, `/mcp`, and `/api/mcp`), it rejects any request other than `GET`, `HEAD`, or `OPTIONS` that a browser marks as cross-origin, and returns `403` with the body `Forbidden: cross-origin request blocked`. The check runs before basic auth.
+
+The check follows [Filippo Valsorda's header-based approach](https://words.filippo.io/csrf/):
+
+1. If the request has a `Sec-Fetch-Site` header, only `same-origin` and `none` are allowed. `same-site` and `cross-site` are rejected.
+2. Otherwise, if the request has an `Origin` header, its host must match the request's `Host` header.
+3. Requests with neither header come from non-browser clients, such as `curl`, scripts, or server-side calls, and are allowed.
+
+API routes such as `/rest/v1/`, `/auth/v1/`, and `/functions/v1/` authenticate with API keys instead of browser credentials and aren't affected.
+
+<Admonition type="caution">
+
+The Caddy and nginx overrides (`docker-compose.caddy.yml` and `docker-compose.nginx.yml`) proxy Studio directly to `studio:3000` instead of through the gateway, so this check doesn't apply to Studio in those setups.
+
+</Admonition>
 
 ### API key enforcement on protected routes
 
@@ -238,6 +257,7 @@ The gateway is configured with these production-oriented settings:
 | `path_with_escaped_slashes_action: REJECT_REQUEST` | Rejects requests that contain URL-encoded slashes in the path                                                                                                                                      |
 | `use_remote_address: true`                         | Treats Envoy as an edge proxy: uses the peer connection IP as the trusted client address (rather than trusting client-supplied `X-Forwarded-For`) and strips untrusted `x-envoy-*` request headers |
 | `headers_with_underscores_action: REJECT_REQUEST`  | Blocks header smuggling attacks that exploit underscore-vs-hyphen normalization                                                                                                                    |
+| Cross-origin request check on Studio routes        | Blocks CSRF against Studio. See [Cross-origin request protection](#cross-origin-request-protection)                                                                                                |
 | `per_connection_buffer_limit_bytes: 32768`         | Caps per-connection buffer memory to 32 KiB                                                                                                                                                        |
 | `max_active_downstream_connections: 30000`         | Overload manager limit on total downstream connections                                                                                                                                             |
 | Admin interface bound to `127.0.0.1:9901`          | The admin API is reachable only from inside the container, not from other containers or the host                                                                                                   |

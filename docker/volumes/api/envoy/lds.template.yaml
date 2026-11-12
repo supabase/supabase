@@ -603,7 +603,8 @@ resources:
                             expose_headers: "*"
                             max_age: "3600"
 
-                      - match:
+                      - name: studio-api-mcp
+                        match:
                           prefix: /api/mcp
                         route:
                           cluster: studio
@@ -631,7 +632,8 @@ resources:
                                     principals:
                                       - any: true
 
-                      - match:
+                      - name: studio-mcp
+                        match:
                           prefix: /mcp
                         route:
                           cluster: studio
@@ -679,7 +681,8 @@ resources:
                             #              address_prefix: ::1
                             #              prefix_len: 128
 
-                      - match:
+                      - name: studio
+                        match:
                           prefix: /
                         route:
                           cluster: studio
@@ -710,6 +713,70 @@ resources:
                   typed_config:
                     '@type': >-
                       type.googleapis.com/envoy.extensions.filters.http.cors.v3.Cors
+
+                # Rejects cross-origin non-safe requests to Studio routes (CSRF), using
+                # Sec-Fetch-Site with an Origin fallback: https://words.filippo.io/csrf/
+                - name: envoy.filters.http.lua
+                  typed_config:
+                    '@type': >-
+                      type.googleapis.com/envoy.extensions.filters.http.lua.v3.Lua
+                    inline_code: |
+                      local STUDIO_ROUTES = {
+                        ["studio"] = true,
+                        ["studio-mcp"] = true,
+                        ["studio-api-mcp"] = true,
+                      }
+
+                      local SAFE_METHODS = {
+                        GET = true,
+                        HEAD = true,
+                        OPTIONS = true,
+                      }
+
+                      local function reject(request_handle)
+                        request_handle:respond({
+                          [":status"] = "403",
+                          ["content-type"] = "text/plain",
+                        }, "Forbidden: cross-origin request blocked")
+                      end
+
+                      function envoy_on_request(request_handle)
+                        local route_name = request_handle:streamInfo():routeName()
+                        if route_name == nil or STUDIO_ROUTES[route_name] ~= true then
+                          return
+                        end
+
+                        local headers = request_handle:headers()
+                        if SAFE_METHODS[headers:get(":method")] then
+                          return
+                        end
+
+                        -- Sent by all modern browsers: only same-origin and user-initiated
+                        -- (none) requests are allowed. same-site is rejected too.
+                        local sec_fetch_site = headers:get("sec-fetch-site")
+                        if sec_fetch_site ~= nil then
+                          if sec_fetch_site == "same-origin" or sec_fetch_site == "none" then
+                            return
+                          end
+                          reject(request_handle)
+                          return
+                        end
+
+                        -- Neither header: not a browser request (curl, server-side fetches, MCP clients)
+                        local origin = headers:get("origin")
+                        if origin == nil then
+                          return
+                        end
+
+                        -- Older browsers: Origin's host must match the requested host
+                        local origin_host = string.match(origin, "^[%a][%w+.-]*://([^/]+)$")
+                        local authority = headers:get(":authority")
+                        if origin_host ~= nil and authority ~= nil and string.lower(origin_host) == string.lower(authority) then
+                          return
+                        end
+
+                        reject(request_handle)
+                      end
 
                 - name: envoy.filters.http.basic_auth
                   typed_config:
