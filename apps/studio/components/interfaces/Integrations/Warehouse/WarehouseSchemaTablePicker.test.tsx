@@ -158,7 +158,7 @@ const mockSetupMutation = () => {
 }
 
 describe('WarehouseSchemaTablePicker', () => {
-  test('explains that tables are loading before offering a selection', async () => {
+  test('keeps the Tables section loading before offering a selection', async () => {
     addAPIMock({ method: 'get', path: '/platform/projects/:ref', response: PROJECT })
     addAPIMock({
       method: 'post',
@@ -168,7 +168,7 @@ describe('WarehouseSchemaTablePicker', () => {
 
     customRender(<WarehouseSchemaTablePicker onSubmit={() => {}} isSubmitting={false} />)
 
-    expect(await screen.findByText('Loading tables...')).toBeInTheDocument()
+    expect(await screen.findByLabelText('Loading tables')).toHaveAttribute('aria-busy', 'true')
     expect(screen.getByRole('heading', { name: 'Tables' })).toBeInTheDocument()
     expect(screen.queryByRole('button', { name: 'Enable Warehouse' })).not.toBeInTheDocument()
   })
