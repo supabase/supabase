@@ -9,6 +9,7 @@ import Table from '@/components/to-be-cleaned/Table'
 import { AlertError } from '@/components/ui/AlertError'
 import { ButtonTooltip } from '@/components/ui/ButtonTooltip'
 import { useEgressReport } from '@/data/reports/egress-report-query'
+import type { OrgMetricsUsage } from '@/data/usage/org-usage-query'
 
 // Log rows arrive untyped (LogData[]); parse at the boundary instead of casting.
 // coerce handles the BigQuery integer count and the OTEL float count alike.
@@ -19,6 +20,11 @@ const TopPathsSchema = z.array(
     count: z.coerce.number(),
   })
 )
+
+// Only surface the breakdown (and run its query) once a project is at least
+// this fraction of its egress quota. Keeps the log query off the many projects
+// that are nowhere near their limit.
+const USAGE_THRESHOLD = 0.5
 
 const EgressTopPaths = ({ projectRef }: { projectRef: string }) => {
   const { data, error, isLoading } = useEgressReport(projectRef)
@@ -96,7 +102,7 @@ const EgressTopPaths = ({ projectRef }: { projectRef: string }) => {
  * single project is selected it renders a disabled trigger with a tooltip,
  * matching the rest of the egress affordances.
  */
-export const EgressBreakdownPanel = () => {
+export const EgressBreakdownPanel = ({ usageMeta }: { usageMeta?: OrgMetricsUsage }) => {
   const [{ projectRef }] = useQueryStates({ projectRef: parseAsString })
   const [open, setOpen] = useState(false)
 
@@ -111,6 +117,19 @@ export const EgressBreakdownPanel = () => {
       >
         Show top API paths
       </ButtonTooltip>
+    )
+  }
+
+  // When the project has a known egress quota and is below the threshold, show a
+  // quiet hint instead of the control — nothing queries until it matters.
+  const freeUnits = usageMeta?.pricing_free_units ?? 0
+  const usageRatio = freeUnits > 0 ? (usageMeta?.usage ?? 0) / freeUnits : undefined
+  if (usageRatio !== undefined && usageRatio < USAGE_THRESHOLD) {
+    return (
+      <p className="text-sm text-foreground-light">
+        Egress is under {Math.round(USAGE_THRESHOLD * 100)}% of your quota. The top API paths
+        breakdown appears as you get closer to it.
+      </p>
     )
   }
 
