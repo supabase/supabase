@@ -1,4 +1,4 @@
-import pgMeta from '@supabase/pg-meta'
+import pgMeta, { asWriteSql } from '@supabase/pg-meta'
 import type { PGFunctionUpdate } from '@supabase/pg-meta/src/pg-meta-functions'
 import { useMutation, useQueryClient } from '@tanstack/react-query'
 import { toast } from 'sonner'
@@ -7,13 +7,13 @@ import { z } from 'zod'
 import type { SavedDatabaseFunction } from './database-functions-query'
 import { databaseKeys } from '@/data/database/keys'
 import { isUserFaultForSql } from '@/data/error-classification'
-import { unguarded } from '@/data/fetchers'
-import { executeSql } from '@/data/sql/execute-sql-mutation'
+import { executeSql, type PgMetaWriteGrant } from '@/data/sql/execute-sql-mutation'
 import type { StudioError } from '@/lib/errors/studio-errors'
 import type { UseCustomMutationOptions } from '@/types'
 
 export type DatabaseFunctionUpdateVariables = {
   projectRef: string
+  grant: PgMetaWriteGrant
   connectionString?: string | null
   func: SavedDatabaseFunction
   payload: PGFunctionUpdate
@@ -21,6 +21,7 @@ export type DatabaseFunctionUpdateVariables = {
 
 export async function updateDatabaseFunction({
   projectRef,
+  grant,
   connectionString,
   func,
   payload,
@@ -30,13 +31,13 @@ export async function updateDatabaseFunction({
   const { result } = await executeSql({
     projectRef,
     connectionString,
-    sql,
+    sql: asWriteSql(sql),
     // Studio composes the statement, but the user wrote the expressions and bodies Postgres parses
     sqlOrigin: 'studio',
     queryName: 'database-function-update',
     isUserFaultSqlState: isUserFaultForSql,
     queryKey: ['functions', 'update', func.id.toString()],
-    grant: unguarded.migrating,
+    grant,
   })
 
   return result as z.infer<typeof zod>

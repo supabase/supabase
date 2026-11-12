@@ -566,6 +566,24 @@ export interface OnboardingSurveySubmitFailedEvent {
 }
 
 /**
+ * Signed-in user was shown the new organization form in either arm of the
+ * onboardingSurveyPlacement experiment. Fires once per mount of the form, after the
+ * profile loads and the flags for that user have resolved.
+ *
+ * @group Events
+ * @source studio
+ * @page new
+ */
+export interface OnboardingSurveyPlacementExperimentExposedEvent {
+  action: 'onboarding_survey_placement_experiment_exposed'
+  properties: {
+    experiment_id: 'onboarding_survey_placement'
+    /** The experiment variant the user is enrolled in */
+    variant: 'control' | 'org_form'
+  }
+}
+
+/**
  * Project creation form was rendered and shown to the user. Passive impression that
  * anchors the project-creation funnel (exposed -> completed). Fires once per form view,
  * after the org and create-project permission have resolved, so it tracks the form
@@ -1090,6 +1108,11 @@ export type MarkdownAffordancePageType =
   | 'ask_ai_answer'
 
 /**
+ * Part of the docs page actions split button that a user ran an action from.
+ */
+export type PageActionsOrigin = 'page_actions_button' | 'page_actions_menu'
+
+/**
  * User clicked 'Copy as Markdown' on a page or under a Supabase AI answer, and the markdown was copied
  * successfully.
  * Fires on success only; failed fetch/clipboard writes are not counted.
@@ -1104,6 +1127,10 @@ export interface CopyAsMarkdownClickedEvent {
      * Page class the affordance sits on.
      */
     pageType: MarkdownAffordancePageType
+    /**
+     * Docs page actions control that sent the event. Not set by other surfaces.
+     */
+    origin?: PageActionsOrigin
   }
 }
 
@@ -1115,6 +1142,48 @@ export interface CopyAsMarkdownClickedEvent {
  */
 export interface AgentSetupClickedEvent {
   action: 'agent_setup_clicked'
+}
+
+/**
+ * User copied the URL of a page's Markdown version and the clipboard write succeeded.
+ *
+ * @group Events
+ * @source docs
+ * @page /docs/guides
+ */
+export interface MarkdownUrlCopiedEvent {
+  action: 'markdown_url_copied'
+  properties: {
+    /**
+     * Page class the affordance sits on.
+     */
+    pageType: MarkdownAffordancePageType
+    /**
+     * Docs page actions control that sent the event.
+     */
+    origin: PageActionsOrigin
+  }
+}
+
+/**
+ * User clicked "View as Markdown" to open a page's Markdown version.
+ *
+ * @group Events
+ * @source docs
+ * @page /docs/guides
+ */
+export interface ViewAsMarkdownClickedEvent {
+  action: 'view_as_markdown_clicked'
+  properties: {
+    /**
+     * Page class the affordance sits on.
+     */
+    pageType: MarkdownAffordancePageType
+    /**
+     * Docs page actions control that sent the event.
+     */
+    origin: PageActionsOrigin
+  }
 }
 
 /**
@@ -1147,6 +1216,10 @@ export interface AskAiClickedEvent {
      * Page class the affordance sits on.
      */
     pageType: MarkdownAffordancePageType
+    /**
+     * Docs page actions control that sent the event. Not set by other surfaces.
+     */
+    origin?: PageActionsOrigin
   }
 }
 
@@ -4576,6 +4649,30 @@ export interface AccountRecoveryReminderClosedEvent {
   groups: TelemetryGroups
 }
 
+export type RecoveryCodesSurface = 'account_security' | 'mfa_setup' | 'recovery_interstitial'
+
+/**
+ * @group Events
+ * @source User successfully copies codes from the Save your recovery codes dialog
+ * @page /account/security, /organizations, /org/*, /project/*, /new, /new/*
+ */
+export interface RecoveryCodesCopiedEvent {
+  action: 'recovery_codes_copied'
+  properties: { surface: RecoveryCodesSurface }
+  groups: TelemetryGroups
+}
+
+/**
+ * @group Events
+ * @source User starts a download from the Save your recovery codes dialog
+ * @page /account/security, /organizations, /org/*, /project/*, /new, /new/*
+ */
+export interface RecoveryCodesDownloadClickedEvent {
+  action: 'recovery_codes_download_clicked'
+  properties: { surface: RecoveryCodesSurface }
+  groups: TelemetryGroups
+}
+
 /**
  * @hidden
  */
@@ -4584,6 +4681,8 @@ export type TelemetryEvent =
   | AccountRecoveryActionClickedEvent
   | AccountRecoveryTaskCompletedEvent
   | AccountRecoveryReminderClosedEvent
+  | RecoveryCodesCopiedEvent
+  | RecoveryCodesDownloadClickedEvent
   | ExplorerQuerySubmittedEvent
   | ExplorerQueryCompletedEvent
   | ExplorerQueryFailedEvent
@@ -4616,6 +4715,7 @@ export type TelemetryEvent =
   | OnboardingSurveySubmitButtonClickedEvent
   | OnboardingSurveyDismissedEvent
   | OnboardingSurveySubmitFailedEvent
+  | OnboardingSurveyPlacementExperimentExposedEvent
   | ProjectCreationFormExposedEvent
   | FreeTierGeneralRegionExperimentExposedEvent
   | FreeTierGeneralRegionUpgradeClickedEvent
@@ -4650,6 +4750,8 @@ export type TelemetryEvent =
   | CopyAsMarkdownClickedEvent
   | AgentSetupClickedEvent
   | PreferredSourceClickedEvent
+  | MarkdownUrlCopiedEvent
+  | ViewAsMarkdownClickedEvent
   | AskAiClickedEvent
   | DocsAiPromptCopiedEvent
   | DocsContentListingClickedEvent

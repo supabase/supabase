@@ -57,28 +57,13 @@ export function matchesTableRelatedSearch(
   return matchesEntitySearch({ schema, name: table }, query)
 }
 
-export function formatTableSearchDetails({
-  policy_count,
-  rls_enabled,
-}: Pick<EntitySearchTable, 'policy_count' | 'rls_enabled'>) {
-  const policies = `${policy_count} ${policy_count === 1 ? 'policy' : 'policies'}`
-  return `${policies} • RLS ${rls_enabled ? 'enabled' : 'disabled'}`
-}
-
-export function getTableEditorRoute(
-  projectRef: string,
-  table: Pick<EntitySearchTable, 'id' | 'schema'>
-): `/${string}` {
-  return `/project/${projectRef}/editor/${table.id}?schema=${encodeURIComponent(table.schema)}`
-}
-
-// The policies page lists policies per schema, so the schema must be set for
-// the policy to be found and opened for editing.
-export function getPolicyEditorRoute(
-  projectRef: string,
-  policy: Pick<EntitySearchPolicy, 'id' | 'schema'>
-): `/${string}` {
-  return `/project/${projectRef}/database/policies?schema=${encodeURIComponent(policy.schema)}&edit=${policy.id}`
+export function formatTableSearchDetails(table: EntitySearchTable) {
+  if (table.type === 'r' || table.type === 'p') {
+    const policies = `${table.policy_count} ${table.policy_count === 1 ? 'policy' : 'policies'}`
+    return `${policies} • RLS ${table.rls_enabled ? 'enabled' : 'disabled'}`
+  }
+  if (table.type === 'v') return table.security_invoker ? 'Security invoker' : 'Security definer'
+  return ''
 }
 
 // Triggers found through their function don't match by name or table, so say which
@@ -106,16 +91,6 @@ export function matchesTriggerSearch(
   return trigger.matched_function?.toLowerCase().includes(query.toLowerCase()) ?? false
 }
 
-// The triggers page lists triggers per schema (of their table), so the schema
-// must be set for the trigger to be found and opened for editing. The index
-// route only redirects, and drops the query string, so link to the list directly.
-export function getTriggerEditorRoute(
-  projectRef: string,
-  trigger: Pick<EntitySearchTrigger, 'id' | 'schema'>
-): `/${string}` {
-  return `/project/${projectRef}/database/triggers/data?schema=${encodeURIComponent(trigger.schema)}&edit=${trigger.id}`
-}
-
 export function formatFunctionSearchDetails({
   type,
   args,
@@ -123,13 +98,4 @@ export function formatFunctionSearchDetails({
   const procedure = type === 'procedure' ? 'procedure' : ''
   if (args.length === 0) return procedure
   return `${procedure} (${args})`.trim()
-}
-
-// The functions page lists functions per schema, so the schema must be set for
-// the function to be found and opened for editing.
-export function getFunctionEditorRoute(
-  projectRef: string,
-  fn: Pick<EntitySearchFunction, 'id' | 'schema'>
-): `/${string}` {
-  return `/project/${projectRef}/database/functions?schema=${encodeURIComponent(fn.schema)}&edit=${fn.id}`
 }
