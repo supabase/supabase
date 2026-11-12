@@ -80,14 +80,16 @@ const LogsViewRow = ({
   }
 
   const handleKeyDown = (e: KeyboardEvent<HTMLInputElement>) => {
+    // Radix's DropdownMenuContent runs typeahead search on any character keydown
+    // bubbling up from within it, stealing focus to a matching item — stop every
+    // keystroke here so typing in the input isn't hijacked.
+    e.stopPropagation()
     if (e.key === 'Escape') {
       e.preventDefault()
-      e.stopPropagation()
       setName(view.name)
       setIsEditingName(false)
     } else if (e.key === 'Enter') {
       e.preventDefault()
-      e.stopPropagation()
       saveName()
     }
   }
@@ -102,6 +104,11 @@ const LogsViewRow = ({
           onChange={(e) => setName(e.target.value)}
           onKeyDown={handleKeyDown}
           onBlur={saveName}
+          // The DropdownMenuItem wrapping this input re-focuses itself (stealing
+          // focus from the input) whenever the pointer moves over it — Radix's
+          // hover-to-focus behavior for keyboard roving tabindex. Stop these from
+          // reaching it so the input keeps focus while the mouse is over the row.
+          onPointerMove={(e) => e.stopPropagation()}
           className="w-full"
         />
       </DropdownMenuItem>

@@ -145,10 +145,14 @@ describe('LogsViewsMenu', () => {
     await userEvent.click(screen.getByRole('button', { name: 'Rename Errors only' }))
 
     const input = await screen.findByDisplayValue('Errors only')
-    fireEvent.change(input, { target: { value: 'Warnings and errors' } })
+    // Types real keystrokes (rather than fireEvent.change) so a regression where
+    // character keydowns leak to Radix's menu-level typeahead and steal focus away
+    // from the input would fail this test.
+    await userEvent.type(input, ' - renamed')
+    expect(input).toHaveFocus()
     fireEvent.keyDown(input, { key: 'Enter' })
 
-    expect(onRename).toHaveBeenCalledWith('view-1', 'Warnings and errors')
+    expect(onRename).toHaveBeenCalledWith('view-1', 'Errors only - renamed')
   })
 
   it('deletes a view after confirmation', async () => {
