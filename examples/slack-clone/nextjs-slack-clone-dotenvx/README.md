@@ -5,11 +5,11 @@ This project is a full-stack Slack clone built using:
 ### Frontend:
 
 - **[Next.js](https://github.com/vercel/next.js):** A React framework optimized for production.
-- **[Supabase.js](https://supabase.com/docs/library/getting-started):** For user management and real-time data syncing.
+- **[Supabase.js](https://supabase.com/docs/library/getting-started?utm_source=supabase&utm_content=examples/slack-clone/nextjs-slack-clone-dotenvx/README.md):** For user management and real-time data syncing.
 
 ### Backend:
 
-- **[Supabase](https://supabase.com/dashboard):** A hosted Postgres database with a RESTful API, used alongside Supabase.js.
+- **[Supabase](https://supabase.com/dashboard?utm_source=supabase&utm_content=examples/slack-clone/nextjs-slack-clone-dotenvx/README.md):** A hosted Postgres database with a RESTful API, used alongside Supabase.js.
 - **GitHub Authentication:** For user login.
 
 ---
@@ -118,7 +118,7 @@ Visit `localhost:3000` to test the app with GitHub OAuth integration.
 
 1. **Create a Supabase Project:**
 
-Sign up at [Supabase Dashboard](https://supabase.com/dashboard) and create a new project. After the database initializes, create `supabase/.env.production` file with your project specific values.
+Sign up at [Supabase Dashboard](https://supabase.com/dashboard?utm_source=supabase&utm_content=examples/slack-clone/nextjs-slack-clone-dotenvx/README.md) and create a new project. After the database initializes, create `supabase/.env.production` file with your project specific values.
 
 ```dotenv
 NEXT_PUBLIC_SUPABASE_URL=https://<your-project>.supabase.co

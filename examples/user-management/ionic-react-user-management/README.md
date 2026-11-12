@@ -1,14 +1,14 @@
 # Supabase Ionic React User Management
 
-> This project is based on the Supabase Ionic React user management [Quickstart](https://supabase.com/docs/guides/with-ionic-react)
+> This project is based on the Supabase Ionic React user management [Quickstart](https://supabase.com/docs/guides/with-ionic-react?utm_source=supabase&utm_content=examples/user-management/ionic-react-user-management/README.md)
 > To keep it in sync with this Quickstart, architecture choices have been made to facilitate the comparison
 
 This example will set you up for a very common situation: users can sign up with a magic link and then update their account with profile information, including a profile image.
 
 This demonstrates how to use:
 
-- User signups using Supabase [Auth](https://supabase.com/auth).
-- User avatar images using Supabase [Storage](https://supabase.com/storage).
+- User signups using Supabase [Auth](https://supabase.com/auth?utm_source=supabase&utm_content=examples/user-management/ionic-react-user-management/README.md).
+- User avatar images using Supabase [Storage](https://supabase.com/storage?utm_source=supabase&utm_content=examples/user-management/ionic-react-user-management/README.md).
 - Frontend using [React](http://reactjs.org).
 
 ## Technologies used
@@ -17,9 +17,9 @@ This demonstrates how to use:
   - [Ionic](https://ionicframework.com)
   - [Capacitor](https://capacitorjs.com)
   - [React](https://reactjs.org)
-  - [Supabase.js](https://supabase.com/docs/library/getting-started) for user management and realtime data syncing.
+  - [Supabase.js](https://supabase.com/docs/library/getting-started?utm_source=supabase&utm_content=examples/user-management/ionic-react-user-management/README.md) for user management and realtime data syncing.
 - Backend:
-  - [supabase.com/dashboard](https://supabase.com/dashboard): hosted Postgres database with restful API for usage with Supabase.js.
+  - [supabase.com/dashboard](https://supabase.com/dashboard?utm_source=supabase&utm_content=examples/user-management/ionic-react-user-management/README.md): hosted Postgres database with restful API for usage with Supabase.js.
 
 ## Instant deploy
 
@@ -31,7 +31,7 @@ The Vercel deployment will guide you through creating a Supabase account and pro
 
 ### 1. Create new project
 
-Sign up to Supabase - [https://supabase.com/dashboard](https://supabase.com/dashboard) and create a new project. Wait for your database to start.
+Sign up to Supabase - [https://supabase.com/dashboard](https://supabase.com/dashboard?utm_source=supabase&utm_content=examples/user-management/ionic-react-user-management/README.md) and create a new project. Wait for your database to start.
 
 ### 2. Run "User Management" Quickstart
 
@@ -123,7 +123,7 @@ create policy "Anyone can upload an avatar."
 
 ## Authors
 
-- [Supabase](https://supabase.com)
+- [Supabase](https://supabase.com/?utm_source=supabase&utm_content=examples/user-management/ionic-react-user-management/README.md)
 - [Mike Hartington](https://github.com/mhartington)
 
 Supabase is open source. We'd love for you to follow along and get involved at https://github.com/supabase/supabase

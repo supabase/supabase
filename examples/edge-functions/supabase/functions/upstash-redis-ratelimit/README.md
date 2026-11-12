@@ -16,7 +16,7 @@ cp supabase/.env.local.example supabase/.env.local
 
 ## Run locally
 
-Make sure you have the latest version of the [Supabase CLI installed](https://supabase.com/docs/guides/cli#installation).
+Make sure you have the latest version of the [Supabase CLI installed](https://supabase.com/docs/guides/cli?utm_source=supabase&utm_content=examples/edge-functions/supabase/functions/upstash-redis-ratelimit/README.md#installation).
 
 ```bash
 supabase start

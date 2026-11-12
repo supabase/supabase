@@ -31,7 +31,7 @@ Your app is ready to be deployed!
 
 ### 1. Create new project
 
-Sign up to Supabase - [https://supabase.com/dashboard](https://supabase.com/dashboard) and create a new project. Wait for your database to start.
+Sign up to Supabase - [https://supabase.com/dashboard](https://supabase.com/dashboard?utm_source=supabase&utm_content=examples/user-management/solid-user-management/README.md) and create a new project. Wait for your database to start.
 
 ### 2. Run "User Management" Quickstart
 
@@ -129,6 +129,6 @@ with
 
 ## Authors
 
-- [Supabase](https://supabase.com)
+- [Supabase](https://supabase.com/?utm_source=supabase&utm_content=examples/user-management/solid-user-management/README.md)
 
 Supabase is open source. We'd love for you to follow along and get involved at https://github.com/supabase/supabase

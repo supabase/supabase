@@ -4,7 +4,7 @@
 
 A Flutter app demonstrating how to implement Multi-Factor Authentication (MFA) with Supabase and Flutter. A user can sign up, add MFA via an authenticator app, and only after they have signed in using MFA they can view the content from the database.
 
-- Full tutorial article [here](https://supabase.com/blog/flutter-multi-factor-authentication)
+- Full tutorial article [here](https://supabase.com/blog/flutter-multi-factor-authentication?utm_source=supabase&utm_content=examples/auth/flutter-mfa/README.md)
 
 ## Getting Started
 
@@ -42,7 +42,7 @@ create policy "Users can view private_posts if they have signed in via MFA"
 
 ## Resources
 
-- [Flutter Tutorial: building a Flutter chat app article](https://supabase.com/blog/flutter-tutorial-building-a-chat-app)
-- [Flutter Authorization with RLS article](https://supabase.com/blog/flutter-authorization-with-rls)
-- [Supabase docs for Flutter](https://supabase.com/docs/reference/dart/introduction)
+- [Flutter Tutorial: building a Flutter chat app article](https://supabase.com/blog/flutter-tutorial-building-a-chat-app?utm_source=supabase&utm_content=examples/auth/flutter-mfa/README.md)
+- [Flutter Authorization with RLS article](https://supabase.com/blog/flutter-authorization-with-rls?utm_source=supabase&utm_content=examples/auth/flutter-mfa/README.md)
+- [Supabase docs for Flutter](https://supabase.com/docs/reference/dart/introduction?utm_source=supabase&utm_content=examples/auth/flutter-mfa/README.md)
 - [Supabase Flutter YouTube playlist](https://www.youtube.com/watch?v=F2j6Q-4nLEE&list=PL5S4mPUpp4OtkMf5LNDLXdTcAp1niHjoL)

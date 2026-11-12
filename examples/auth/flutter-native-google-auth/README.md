@@ -4,7 +4,7 @@
 
 A simple Flutter application with native Google login capabilities on iOS and Android using Supabase auth. Upon signing in, the user is presented with a profile screen where their name and profile image from their Google account are displayed.
 
-- Full tutorial article [here](https://supabase.com/blog/flutter-authentication)
+- Full tutorial article [here](https://supabase.com/blog/flutter-authentication?utm_source=supabase&utm_content=examples/auth/flutter-native-google-auth/README.md)
 - Full video guide [here](https://www.youtube.com/watch?v=YtvxRgGouwg)
 
 ## Getting Started
@@ -18,8 +18,8 @@ A simple Flutter application with native Google login capabilities on iOS and An
 
 ## Resources
 
-- [Flutter Authorization with RLS article](https://supabase.com/blog/flutter-authorization-with-rls)
-- [Securing your Flutter apps with Multi-Factor Authentication article](https://supabase.com/blog/flutter-multi-factor-authentication)
-- [Flutter Tutorial: building a Flutter chat app article](https://supabase.com/blog/flutter-tutorial-building-a-chat-app)
-- [Supabase docs for Flutter](https://supabase.com/docs/reference/dart/introduction)
+- [Flutter Authorization with RLS article](https://supabase.com/blog/flutter-authorization-with-rls?utm_source=supabase&utm_content=examples/auth/flutter-native-google-auth/README.md)
+- [Securing your Flutter apps with Multi-Factor Authentication article](https://supabase.com/blog/flutter-multi-factor-authentication?utm_source=supabase&utm_content=examples/auth/flutter-native-google-auth/README.md)
+- [Flutter Tutorial: building a Flutter chat app article](https://supabase.com/blog/flutter-tutorial-building-a-chat-app?utm_source=supabase&utm_content=examples/auth/flutter-native-google-auth/README.md)
+- [Supabase docs for Flutter](https://supabase.com/docs/reference/dart/introduction?utm_source=supabase&utm_content=examples/auth/flutter-native-google-auth/README.md)
 - [Supabase Flutter YouTube playlist](https://www.youtube.com/watch?v=F2j6Q-4nLEE&list=PL5S4mPUpp4OtkMf5LNDLXdTcAp1niHjoL)

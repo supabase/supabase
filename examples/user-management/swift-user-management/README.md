@@ -1,18 +1,18 @@
 # Supabase Swift User Management
 
-This repo is a quick sample of how you can get started building apps using Swift and Supabase. You can find a step by step guide of how to build out this app in the [Quickstart: Swift guide](https://supabase.com/docs/guides/getting-started/quickstarts/ios-swiftui).
+This repo is a quick sample of how you can get started building apps using Swift and Supabase. You can find a step by step guide of how to build out this app in the [Quickstart: Swift guide](https://supabase.com/docs/guides/getting-started/quickstarts/ios-swiftui?utm_source=supabase&utm_content=examples/user-management/swift-user-management/README.md).
 
 This repo will demonstrate how to:
 
-- Sign users in with Supabase Auth using [magic link](https://supabase.com/docs/reference/dart/auth-signinwithotp)
-- Store and retrieve data with [Supabase database](https://supabase.com/docs/guides/database)
-- Store image files in [Supabase storage](https://supabase.com/docs/guides/storage)
+- Sign users in with Supabase Auth using [magic link](https://supabase.com/docs/reference/dart/auth-signinwithotp?utm_source=supabase&utm_content=examples/user-management/swift-user-management/README.md)
+- Store and retrieve data with [Supabase database](https://supabase.com/docs/guides/database?utm_source=supabase&utm_content=examples/user-management/swift-user-management/README.md)
+- Store image files in [Supabase storage](https://supabase.com/docs/guides/storage?utm_source=supabase&utm_content=examples/user-management/swift-user-management/README.md)
 
 ![Supabase User Management example](supabase-swift-demo.png)
 
 ## Getting Started
 
-Run `cp .env.example .env` and fill in [your credentials](https://supabase.com/docs/guides/with-flutter#get-the-api-keys).
+Run `cp .env.example .env` and fill in [your credentials](https://supabase.com/docs/guides/with-flutter?utm_source=supabase&utm_content=examples/user-management/swift-user-management/README.md#get-the-api-keys).
 
 Run the application in a device or simulator using Xcode.
 

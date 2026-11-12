@@ -38,7 +38,7 @@ The database webhook handler to send push notifications is located in [supabase/
 
 ## Create the database webhook
 
-Navigate to the [Database Webhooks settings](https://supabase.com/dashboard/project/_/database/hooks) in your Supabase Dashboard.
+Navigate to the [Database Webhooks settings](https://supabase.com/dashboard/project/_/database/hooks?utm_source=supabase&utm_content=examples/user-management/expo-push-notifications/README.md) in your Supabase Dashboard.
 
 1. Enable and create a new hook.
 1. Conditions to fire webhook: Select the `notifications` table and tick the `Insert` event.
@@ -49,6 +49,6 @@ Navigate to the [Database Webhooks settings](https://supabase.com/dashboard/proj
 
 ## Send push notification
 
-1. Navigate to the [table editor](https://supabase.com/dashboard/project/_/editor) in your Supabase Dashboard.
+1. Navigate to the [table editor](https://supabase.com/dashboard/project/_/editor?utm_source=supabase&utm_content=examples/user-management/expo-push-notifications/README.md) in your Supabase Dashboard.
 1. In your `notifications` table, insert a new row.
 1. Watch the magic happen 🪄

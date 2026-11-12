@@ -12,7 +12,7 @@ Download this example:
 curl https://codeload.github.com/supabase/supabase/tar.gz/master | tar -xz --strip=3 supabase-master/examples/caching/with-nextjs-13
 ```
 
-Then, start Supabase locally and seed your local development database with the [Supabase CLI](https://supabase.com/docs/reference/cli):
+Then, start Supabase locally and seed your local development database with the [Supabase CLI](https://supabase.com/docs/reference/cli?utm_source=supabase&utm_content=examples/caching/with-nextjs-13/README.md):
 
 ```bash
 supabase start

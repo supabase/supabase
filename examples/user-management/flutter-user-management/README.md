@@ -1,18 +1,18 @@
 # Supabase Flutter User Management
 
-This repo is a quick sample of how you can get started building apps using Flutter and Supabase. You can find a step by step guide of how to build out this app in the [Quickstart: Flutter guide](https://supabase.com/docs/guides/with-flutter).
+This repo is a quick sample of how you can get started building apps using Flutter and Supabase. You can find a step by step guide of how to build out this app in the [Quickstart: Flutter guide](https://supabase.com/docs/guides/with-flutter?utm_source=supabase&utm_content=examples/user-management/flutter-user-management/README.md).
 
 This repo will demonstrate how to:
 
-- sign users in with Supabase Auth using [magic link](https://supabase.com/docs/reference/dart/auth-signinwithotp)
-- store and retrieve data with [Supabase database](https://supabase.com/docs/guides/database)
-- store image files in [Supabase storage](https://supabase.com/docs/guides/storage)
+- sign users in with Supabase Auth using [magic link](https://supabase.com/docs/reference/dart/auth-signinwithotp?utm_source=supabase&utm_content=examples/user-management/flutter-user-management/README.md)
+- store and retrieve data with [Supabase database](https://supabase.com/docs/guides/database?utm_source=supabase&utm_content=examples/user-management/flutter-user-management/README.md)
+- store image files in [Supabase storage](https://supabase.com/docs/guides/storage?utm_source=supabase&utm_content=examples/user-management/flutter-user-management/README.md)
 
 <img height="500px" src="https://raw.githubusercontent.com/supabase/supabase/master/examples/user-management/flutter-user-management/supabase-flutter-demo.png" alt="Supabase User Management example" />
 
 ## Getting Started
 
-Rename `.env.example` to `.env` and fill in [your Supabase credentials](https://supabase.com/docs/guides/with-flutter#get-the-api-keys).
+Rename `.env.example` to `.env` and fill in [your Supabase credentials](https://supabase.com/docs/guides/with-flutter?utm_source=supabase&utm_content=examples/user-management/flutter-user-management/README.md#get-the-api-keys).
 
 You can run this app on iOS, Android or the Web.
 

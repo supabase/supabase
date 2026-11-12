@@ -4,22 +4,22 @@ This example sets you up for a very common situation: users can sign up or sign 
 
 This demonstrates how to use:
 
-- User signups using Supabase [Auth](https://supabase.com/auth).
-  - Supabase [SSR Auth for Next.js](https://supabase.com/docs/guides/auth/server-side/nextjs) with the Next.js App Router and Server Actions.
-- User avatar images using Supabase [Storage](https://supabase.com/storage).
-- Public profiles restricted with [Row Level Security policies](https://supabase.com/docs/guides/auth/row-level-security).
+- User signups using Supabase [Auth](https://supabase.com/auth?utm_source=supabase&utm_content=examples/user-management/nextjs-user-management/README.md).
+  - Supabase [SSR Auth for Next.js](https://supabase.com/docs/guides/auth/server-side/nextjs?utm_source=supabase&utm_content=examples/user-management/nextjs-user-management/README.md) with the Next.js App Router and Server Actions.
+- User avatar images using Supabase [Storage](https://supabase.com/storage?utm_source=supabase&utm_content=examples/user-management/nextjs-user-management/README.md).
+- Public profiles restricted with [Row Level Security policies](https://supabase.com/docs/guides/auth/row-level-security?utm_source=supabase&utm_content=examples/user-management/nextjs-user-management/README.md).
 - Frontend using [Next.js](https://nextjs.org/) (App Router) with React 19 and Tailwind CSS v4.
 
 ## Technologies used
 
 - Frontend:
   - [Next.js](https://github.com/vercel/next.js) (App Router) — a React framework for production.
-  - [`@supabase/ssr`](https://supabase.com/docs/guides/auth/server-side/nextjs) for cookie-based SSR auth, used from both Server Components and Server Actions.
-  - [`@supabase/supabase-js`](https://supabase.com/docs/library/getting-started) for the browser client and realtime data.
+  - [`@supabase/ssr`](https://supabase.com/docs/guides/auth/server-side/nextjs?utm_source=supabase&utm_content=examples/user-management/nextjs-user-management/README.md) for cookie-based SSR auth, used from both Server Components and Server Actions.
+  - [`@supabase/supabase-js`](https://supabase.com/docs/library/getting-started?utm_source=supabase&utm_content=examples/user-management/nextjs-user-management/README.md) for the browser client and realtime data.
   - [Tailwind CSS v4](https://tailwindcss.com/) for styling.
 - Backend:
-  - [supabase.com/dashboard](https://supabase.com/dashboard/) — hosted Postgres database with a REST API, Auth, and Storage.
-  - Local development via the [Supabase CLI](https://supabase.com/docs/guides/cli).
+  - [supabase.com/dashboard](https://supabase.com/dashboard/?utm_source=supabase&utm_content=examples/user-management/nextjs-user-management/README.md) — hosted Postgres database with a REST API, Auth, and Storage.
+  - Local development via the [Supabase CLI](https://supabase.com/docs/guides/cli?utm_source=supabase&utm_content=examples/user-management/nextjs-user-management/README.md).
 
 ## Project structure
 
@@ -80,7 +80,7 @@ Open [http://localhost:3000](http://localhost:3000) to use the app.
 
 ### 1. Create a project
 
-Sign up at [https://supabase.com/dashboard](https://supabase.com/dashboard) and create a new project. Wait for your database to start.
+Sign up at [https://supabase.com/dashboard](https://supabase.com/dashboard?utm_source=supabase&utm_content=examples/user-management/nextjs-user-management/README.md) and create a new project. Wait for your database to start.
 
 ### 2. Get the URL and publishable key
 
@@ -211,12 +211,12 @@ These official examples are maintained by the Supabase team:
 
 ### Other resources
 
-- [[Docs] Next.js User Management Quickstart](https://supabase.com/docs/guides/getting-started/tutorials/with-nextjs)
-- [[Docs] Server-Side Auth for Next.js](https://supabase.com/docs/guides/auth/server-side/nextjs)
-- [[Blog] Fetching and caching Supabase data in Next.js 13 Server Components](https://supabase.com/blog/fetching-and-caching-supabase-data-in-next-js-server-components)
+- [[Docs] Next.js User Management Quickstart](https://supabase.com/docs/guides/getting-started/tutorials/with-nextjs?utm_source=supabase&utm_content=examples/user-management/nextjs-user-management/README.md)
+- [[Docs] Server-Side Auth for Next.js](https://supabase.com/docs/guides/auth/server-side/nextjs?utm_source=supabase&utm_content=examples/user-management/nextjs-user-management/README.md)
+- [[Blog] Fetching and caching Supabase data in Next.js 13 Server Components](https://supabase.com/blog/fetching-and-caching-supabase-data-in-next-js-server-components?utm_source=supabase&utm_content=examples/user-management/nextjs-user-management/README.md)
 
 ## Authors
 
-- [Supabase](https://supabase.com)
+- [Supabase](https://supabase.com/?utm_source=supabase&utm_content=examples/user-management/nextjs-user-management/README.md)
 
 Supabase is open source. We'd love for you to follow along and get involved at https://github.com/supabase/supabase

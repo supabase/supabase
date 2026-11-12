@@ -6,13 +6,13 @@ This example demonstrates how to use Supabase Auth with React Native and Expo.
 
 ### 1. Create a Supabase project
 
-[Launch a new project](https://supabase.com/dashboard) in the Supabase Dashboard.
+[Launch a new project](https://supabase.com/dashboard?utm_source=supabase&utm_content=examples/auth/quickstarts/react-native/README.md) in the Supabase Dashboard.
 
 ### 2. Configure environment variables
 
 Create a `.env` file and populate with your Supabase connection variables:
 
-You can find these in your [Supabase Dashboard](https://supabase.com/dashboard/project/_/settings/api) under Settings > API.
+You can find these in your [Supabase Dashboard](https://supabase.com/dashboard/project/_/settings/api?utm_source=supabase&utm_content=examples/auth/quickstarts/react-native/README.md) under Settings > API.
 
 ### 3. Install dependencies
 
@@ -50,5 +50,5 @@ Follow the instructions in the terminal to open the app on your device or emulat
 
 ## Learn more
 
-- [Supabase Auth Documentation](https://supabase.com/docs/guides/auth)
-- [React Native Quickstart](https://supabase.com/docs/guides/auth/quickstarts/react-native)
+- [Supabase Auth Documentation](https://supabase.com/docs/guides/auth?utm_source=supabase&utm_content=examples/auth/quickstarts/react-native/README.md)
+- [React Native Quickstart](https://supabase.com/docs/guides/auth/quickstarts/react-native?utm_source=supabase&utm_content=examples/auth/quickstarts/react-native/README.md)

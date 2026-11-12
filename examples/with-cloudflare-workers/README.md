@@ -62,7 +62,7 @@ return new Response(JSON.stringify(data), {
 
 ## Resources
 
-- [Selecting data with Supabase JS](https://supabase.com/docs/reference/javascript/select)
+- [Selecting data with Supabase JS](https://supabase.com/docs/reference/javascript/select?utm_source=supabase&utm_content=examples/with-cloudflare-workers/README.md)
 - [Introducing Secrets and Environment Variables to Cloudflare Workers](https://blog.cloudflare.com/workers-secrets-environment/)
 - [Cloudflare docs for sending JSON responses](https://developers.cloudflare.com/workers/examples/return-json/)
 

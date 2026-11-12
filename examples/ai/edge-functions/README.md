@@ -7,14 +7,14 @@ Since Supabase Edge Runtime [v1.36.0](https://github.com/supabase/edge-runtime/r
 This demo consists of three parts:
 
 1. A [`generate-embedding`](./supabase/functions/generate-embedding/index.ts) database webhook edge function which generates embeddings when a content row is added (or updated) in the [`public.embeddings`](./supabase/migrations/20240408072601_embeddings.sql) table.
-2. A [`query_embeddings` Postgres function](./supabase/migrations/20240410031515_vector-search.sql) which allows us to perform similarity search from an edge function via [Remote Procedure Call (RPC)](https://supabase.com/docs/guides/database/functions?language=js).
+2. A [`query_embeddings` Postgres function](./supabase/migrations/20240410031515_vector-search.sql) which allows us to perform similarity search from an edge function via [Remote Procedure Call (RPC)](https://supabase.com/docs/guides/database/functions?language=js&utm_source=supabase&utm_content=examples/ai/edge-functions/README.md).
 3. A [`search` edge function](./supabase/functions/search/index.ts) which generates the embedding for the search term, performs the similarity search via RPC function call, and returns the result.
 
 ## Deploy
 
 - Link your project: `supabase link`
 - Deploy Edge Functions: `supabase functions deploy`
-- Update project config to [enable webhooks](https://supabase.com/docs/guides/local-development/cli/config#experimental.webhooks.enabled): `supabase config push`
+- Update project config to [enable webhooks](https://supabase.com/docs/guides/local-development/cli/config?utm_source=supabase&utm_content=examples/ai/edge-functions/README.md#experimental.webhooks.enabled): `supabase config push`
 - Navigate to the [database-webhook](./supabase/migrations/20240410041607_database-webhook.sql) migration file and insert your `generate-embedding` function details.
 - Push up the database schema `supabase db push`
 

@@ -2,7 +2,7 @@
 
 ![Supabase Figma Clone](https://raw.githubusercontent.com/dshukertjr/examples/main/.github/images/design.png 'Supabase Figma Clone')
 
-This app demonstrates the real-time communication capabilities of [Supabase](https://supabase.com) by creating an interactive design board where you can draw some shapes and move them around while seeing each other's cursors.
+This app demonstrates the real-time communication capabilities of [Supabase](https://supabase.com/?utm_source=supabase&utm_content=examples/realtime/flutter-figma-clone/README.md) by creating an interactive design board where you can draw some shapes and move them around while seeing each other's cursors.
 
 - Authorized Realtime channel
 - Cursor position sharing in real-time
@@ -10,11 +10,11 @@ This app demonstrates the real-time communication capabilities of [Supabase](htt
 
 ## Run locally
 
-- Run `supabase start` while docker running. If you don't have Supabase CLI yet, you can get it [here](https://supabase.com/docs/guides/cli/getting-started).
+- Run `supabase start` while docker running. If you don't have Supabase CLI yet, you can get it [here](https://supabase.com/docs/guides/cli/getting-started?utm_source=supabase&utm_content=examples/realtime/flutter-figma-clone/README.md).
 - Run Flutter locally. The app should work on any platform, but is not optimized for mobile.
 
 ## Resources
 
-- [Supabase](https://supabase.com/)
-- [Supabase Broadcast](https://supabase.com/docs/guides/realtime/broadcast)
-- [Flutter Tutorial: building a Flutter chat app](https://supabase.com/blog/flutter-tutorial-building-a-chat-app)
+- [Supabase](https://supabase.com/?utm_source=supabase&utm_content=examples/realtime/flutter-figma-clone/README.md)
+- [Supabase Broadcast](https://supabase.com/docs/guides/realtime/broadcast?utm_source=supabase&utm_content=examples/realtime/flutter-figma-clone/README.md)
+- [Flutter Tutorial: building a Flutter chat app](https://supabase.com/blog/flutter-tutorial-building-a-chat-app?utm_source=supabase&utm_content=examples/realtime/flutter-figma-clone/README.md)

@@ -5,19 +5,19 @@
 
 # Supabase
 
-[Supabase](https://supabase.com) is the Postgres development platform. We're building the features of Firebase using enterprise-grade open source tools.
+[Supabase](https://supabase.com/?utm_source=supabase&utm_content=README.md) is the Postgres development platform. We're building the features of Firebase using enterprise-grade open source tools.
 
-- [x] Hosted Postgres Database. [Docs](https://supabase.com/docs/guides/database)
-- [x] Authentication and Authorization. [Docs](https://supabase.com/docs/guides/auth)
+- [x] Hosted Postgres Database. [Docs](https://supabase.com/docs/guides/database?utm_source=supabase&utm_content=README.md)
+- [x] Authentication and Authorization. [Docs](https://supabase.com/docs/guides/auth?utm_source=supabase&utm_content=README.md)
 - [x] Auto-generated APIs.
-  - [x] REST. [Docs](https://supabase.com/docs/guides/api)
-  - [x] GraphQL. [Docs](https://supabase.com/docs/guides/graphql)
-  - [x] Realtime subscriptions. [Docs](https://supabase.com/docs/guides/realtime)
+  - [x] REST. [Docs](https://supabase.com/docs/guides/api?utm_source=supabase&utm_content=README.md)
+  - [x] GraphQL. [Docs](https://supabase.com/docs/guides/graphql?utm_source=supabase&utm_content=README.md)
+  - [x] Realtime subscriptions. [Docs](https://supabase.com/docs/guides/realtime?utm_source=supabase&utm_content=README.md)
 - [x] Functions.
-  - [x] Database Functions. [Docs](https://supabase.com/docs/guides/database/functions)
-  - [x] Edge Functions. [Docs](https://supabase.com/docs/guides/functions)
-- [x] File Storage. [Docs](https://supabase.com/docs/guides/storage)
-- [x] AI + Vector/Embeddings Toolkit. [Docs](https://supabase.com/docs/guides/ai)
+  - [x] Database Functions. [Docs](https://supabase.com/docs/guides/database/functions?utm_source=supabase&utm_content=README.md)
+  - [x] Edge Functions. [Docs](https://supabase.com/docs/guides/functions?utm_source=supabase&utm_content=README.md)
+- [x] File Storage. [Docs](https://supabase.com/docs/guides/storage?utm_source=supabase&utm_content=README.md)
+- [x] AI + Vector/Embeddings Toolkit. [Docs](https://supabase.com/docs/guides/ai?utm_source=supabase&utm_content=README.md)
 - [x] Dashboard.
 
 ![Supabase Dashboard](https://raw.githubusercontent.com/supabase/supabase/master/apps/www/public/images/github/supabase-dashboard.png)
@@ -28,7 +28,7 @@ Watch "releases" of this repo to get notified of major updates.
 
 ## Documentation
 
-For full documentation, visit [supabase.com/docs](https://supabase.com/docs)
+For full documentation, visit [supabase.com/docs](https://supabase.com/docs?utm_source=supabase&utm_content=README.md)
 
 To see how to Contribute, visit [Getting Started](./DEVELOPERS.md)
 
@@ -36,7 +36,7 @@ To see how to Contribute, visit [Getting Started](./DEVELOPERS.md)
 
 - [Community Forum](https://github.com/supabase/supabase/discussions). Best for: help with building, discussion about database best practices.
 - [GitHub Issues](https://github.com/supabase/supabase/issues). Best for: bugs and errors you encounter using Supabase.
-- [Email Support](https://supabase.com/docs/support#business-support). Best for: problems with your database or infrastructure.
+- [Email Support](https://supabase.com/docs/support?utm_source=supabase&utm_content=README.md#business-support). Best for: problems with your database or infrastructure.
 - [Discord](https://discord.supabase.com). Best for: sharing your applications and hanging out with the community.
 
 ## How it works
@@ -45,8 +45,8 @@ Supabase is a combination of open source tools. We’re building the features of
 
 **Architecture**
 
-Supabase is a [hosted platform](https://supabase.com/dashboard). You can sign up and start using Supabase without installing anything.
-You can also [self-host](https://supabase.com/docs/guides/hosting/overview) and [develop locally](https://supabase.com/docs/guides/local-development).
+Supabase is a [hosted platform](https://supabase.com/dashboard?utm_source=supabase&utm_content=README.md). You can sign up and start using Supabase without installing anything.
+You can also [self-host](https://supabase.com/docs/guides/hosting/overview?utm_source=supabase&utm_content=README.md) and [develop locally](https://supabase.com/docs/guides/local-development?utm_source=supabase&utm_content=README.md).
 
 ![Architecture](apps/docs/public/img/supabase-architecture.svg)
 

@@ -1,15 +1,15 @@
 # Build a Supabase Marketplace Integration
 
-Supabase offers an [OAuth2 connection flow](https://supabase.com/docs/guides/platform/oauth-apps/authorize-an-oauth-app) and a [Management API](https://supabase.com/docs/reference/api/introduction) allowing you to build Supabase Marketplace Integrations that connect to our users' hosted Supabase projects, making it more convenient than ever to create scalabale backends programmatically and tap into the extensive pool of Supabase users.
+Supabase offers an [OAuth2 connection flow](https://supabase.com/docs/guides/platform/oauth-apps/authorize-an-oauth-app?utm_source=supabase&utm_content=examples/edge-functions/supabase/functions/connect-supabase/README.md) and a [Management API](https://supabase.com/docs/reference/api/introduction?utm_source=supabase&utm_content=examples/edge-functions/supabase/functions/connect-supabase/README.md) allowing you to build Supabase Marketplace Integrations that connect to our users' hosted Supabase projects, making it more convenient than ever to create scalabale backends programmatically and tap into the extensive pool of Supabase users.
 
 ## Setup
 
-1. Follow the [steps in the docs](https://supabase.com/docs/guides/platform/oauth-apps/publish-an-oauth-app) to create an OAuth App.
+1. Follow the [steps in the docs](https://supabase.com/docs/guides/platform/oauth-apps/publish-an-oauth-app?utm_source=supabase&utm_content=examples/edge-functions/supabase/functions/connect-supabase/README.md) to create an OAuth App.
 1. Set `SUPA_CONNECT_CLIENT_ID` and `SUPA_CONNECT_CLIENT_SECRET` in your `.env.local` file as shown in the [`.env.local.example` file](../../.env.local.example).
 
 ## Connect to Supabase using OAuth2
 
-This example showcases and end-to-end OAuth2 connection flow with [PKCE](https://supabase.com/blog/supabase-auth-sso-pkce#introducing-pkce), with the following steps:
+This example showcases and end-to-end OAuth2 connection flow with [PKCE](https://supabase.com/blog/supabase-auth-sso-pkce?utm_source=supabase&utm_content=examples/edge-functions/supabase/functions/connect-supabase/README.md#introducing-pkce), with the following steps:
 
 1. Create authorization URL with PKCE codeVerifier.
 1. Redirect user to Supabase to authorize your application to connect to their Supabase account.

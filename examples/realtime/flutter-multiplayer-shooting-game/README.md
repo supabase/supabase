@@ -1,14 +1,14 @@
 # Flutter Real-time Multiplayer Shooting Game
 
-A real-time shooting game built with [Flutter](https://flutter.dev/), [Flame](https://flame-engine.org/) and [Supabase](https://supabase.com).
+A real-time shooting game built with [Flutter](https://flutter.dev/), [Flame](https://flame-engine.org/) and [Supabase](https://supabase.com/?utm_source=supabase&utm_content=examples/realtime/flutter-multiplayer-shooting-game/README.md).
 
-You can find a step by step guide on how to build this app on [How to build a real-time multiplayer game with Flutter Flame](https://supabase.com/blog/flutter-real-time-multiplayer-game) article.
+You can find a step by step guide on how to build this app on [How to build a real-time multiplayer game with Flutter Flame](https://supabase.com/blog/flutter-real-time-multiplayer-game?utm_source=supabase&utm_content=examples/realtime/flutter-multiplayer-shooting-game/README.md) article.
 
 ## Getting Started
 
 ### 1. Create new project
 
-Sign up to Supabase - [supabase.com/dashboard](https://supabase.com/dashboard) and create a new project. Wait for your database to start.
+Sign up to Supabase - [supabase.com/dashboard](https://supabase.com/dashboard?utm_source=supabase&utm_content=examples/realtime/flutter-multiplayer-shooting-game/README.md) and create a new project. Wait for your database to start.
 
 ### 2. Get the URL and Key
 

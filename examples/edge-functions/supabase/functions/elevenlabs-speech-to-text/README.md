@@ -9,8 +9,8 @@ For a detailed tutorial, please see the [ElevenLabs Developer Docs](https://elev
 ## Requirements
 
 - An ElevenLabs account with an [API key](/app/settings/api-keys).
-- A [Supabase](https://supabase.com) account (you can sign up for a free account via [database.new](https://database.new)).
-- The [Supabase CLI](https://supabase.com/docs/guides/local-development) installed on your machine.
+- A [Supabase](https://supabase.com/?utm_source=supabase&utm_content=examples/edge-functions/supabase/functions/elevenlabs-speech-to-text/README.md) account (you can sign up for a free account via [database.new](https://database.new)).
+- The [Supabase CLI](https://supabase.com/docs/guides/local-development?utm_source=supabase&utm_content=examples/edge-functions/supabase/functions/elevenlabs-speech-to-text/README.md) installed on your machine.
 - The [Deno runtime](https://docs.deno.com/runtime/getting_started/installation/) installed on your machine and optionally [setup in your facourite IDE](https://docs.deno.com/runtime/getting_started/setup_your_environment).
 - A [Telegram](https://telegram.org) account.
 
