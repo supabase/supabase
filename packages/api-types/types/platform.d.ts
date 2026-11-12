@@ -15535,7 +15535,7 @@ export interface components {
     }
     UpdatePostgrestConfigBody: {
       db_extra_search_path?: string
-      db_pool?: number
+      db_pool?: number | null
       db_pool_acquisition_timeout?: number
       db_pool_max_idletime?: number
       db_pool_max_lifetime?: number
