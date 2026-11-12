@@ -86,9 +86,10 @@ export const ProjectConnectionPopover = ({ projectRef }: ProjectConnectionPopove
   const capabilities = useProjectCapabilities()
   const isHighAvailability = useIsHighAvailability()
   // Fall back to the pre-capabilities `isHighAvailability` check (rather than
-  // a fixed default) so behaviour for already-correct HA/Multigres projects
+  // a fixed default) so behavior for already-correct HA/Multigres projects
   // doesn't regress while the backend capabilities field is still rolling out.
-  const requiresDirectTlsNegotiation = capabilities?.requiresDirectTlsNegotiation ?? isHighAvailability
+  const requiresDirectTlsNegotiation =
+    capabilities?.requiresDirectTlsNegotiation ?? isHighAvailability
 
   const directConnectionString = useMemo(() => {
     if (

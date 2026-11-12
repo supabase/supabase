@@ -32,10 +32,11 @@ export const useConnectionStringDatabases = (deploymentMode: DeploymentMode) => 
   const isHighAvailability = useIsHighAvailability()
   const capabilities = useProjectCapabilities()
   // Fall back to the pre-capabilities `isHighAvailability` check (rather than
-  // a fixed default) so behaviour for already-correct HA/Multigres projects
+  // a fixed default) so behavior for already-correct HA/Multigres projects
   // doesn't regress while the backend capabilities field is still rolling out.
   const hasConnectionPooling = capabilities?.hasConnectionPooling ?? !isHighAvailability
-  const requiresDirectTlsNegotiation = capabilities?.requiresDirectTlsNegotiation ?? isHighAvailability
+  const requiresDirectTlsNegotiation =
+    capabilities?.requiresDirectTlsNegotiation ?? isHighAvailability
 
   const { data: databases = [] } = useReadReplicasQuery({ projectRef })
   // Multigres and Multigres Lite have no pooler, so the pooler config endpoints don't apply

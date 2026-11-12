@@ -36,21 +36,35 @@ export function filterSchemasForHighAvailability<T extends { name: string }>(
 }
 
 /**
- * Memoized `filterSchemasForHighAvailability` bound to the selected project's
- * capabilities. Driven by `hasConnectionPooling` (false for both full
+ * Whether the selected project's internal `multigres` schema should be
+ * hidden/filtered. Driven by `hasConnectionPooling` (false for both full
  * Multigres and Multigres Lite) rather than `isHighAvailability`, since Lite
  * also has the internal `multigres` schema despite not being HA.
+ *
+ * Single source of truth for this decision — use it anywhere the `multigres`
+ * schema needs to be filtered or detected, not just `isHighAvailability`
+ * directly, so persisted state (e.g. previously-selected exposed schemas)
+ * stays consistent with the live schema list.
+ */
+export function useShouldHideMultigresSchema(): boolean {
+  const capabilities = useProjectCapabilities()
+  const isHighAvailability = useIsHighAvailability()
+  // Fall back to the pre-capabilities `isHighAvailability` check (rather than
+  // a fixed default) so behavior for already-correct HA/Multigres projects
+  // doesn't regress while the backend capabilities field is still rolling out.
+  return capabilities !== undefined
+    ? capabilities.hasConnectionPooling === false
+    : isHighAvailability
+}
+
+/**
+ * Memoized `filterSchemasForHighAvailability` bound to the selected project's
+ * capabilities. See `useShouldHideMultigresSchema` above.
  */
 export function useSchemasFilteredForHighAvailability<T extends { name: string }>(
   schemas: T[] | undefined
 ): T[] {
-  const capabilities = useProjectCapabilities()
-  const isHighAvailability = useIsHighAvailability()
-  // Fall back to the pre-capabilities `isHighAvailability` check (rather than
-  // a fixed default) so behaviour for already-correct HA/Multigres projects
-  // doesn't regress while the backend capabilities field is still rolling out.
-  const shouldHideMultigresSchema =
-    capabilities !== undefined ? capabilities.hasConnectionPooling === false : isHighAvailability
+  const shouldHideMultigresSchema = useShouldHideMultigresSchema()
 
   return useMemo(
     () => filterSchemasForHighAvailability(schemas ?? [], shouldHideMultigresSchema),

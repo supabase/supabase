@@ -267,7 +267,7 @@ export const buildConnectionStringPooler = ({
   connectionStringsDedicated?: { direct: ConnectionStrings; pooler: ConnectionStrings }
   ipv4Addon: boolean
   /**
-   * Defaults to `true` (classic V2/V3 pooler behaviour) when the backend
+   * Defaults to `true` (classic V2/V3 pooler behavior) when the backend
    * hasn't reported capabilities yet, matching this function's pre-capability
    * fallback of treating an unknown project as non-HA.
    */
