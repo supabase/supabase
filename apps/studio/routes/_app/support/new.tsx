@@ -14,8 +14,4 @@ function SupportNewRoute() {
   return <SupportPageWithAuth />
 }
 
-function SupportPage() {
-  return <SupportFormPage />
-}
-
-const SupportPageWithAuth = withAuth(SupportPage)
+const SupportPageWithAuth = withAuth(SupportFormPage)
