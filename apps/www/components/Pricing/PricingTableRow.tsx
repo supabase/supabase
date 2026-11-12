@@ -219,7 +219,7 @@ export const PricingTableRowDesktop = (props: any) => {
 
         return (
           <Fragment key={feat.title}>
-            <tr className="divide-border" key={i}>
+            <tr key={i}>
               <th
                 className={`text-foreground flex items-center px-6 py-5 last:pb-24 text-left text-xs font-normal `}
                 scope="row"
@@ -235,12 +235,16 @@ export const PricingTableRowDesktop = (props: any) => {
               {Object.entries(feat.plans).map((entry: any, i) => {
                 const planName = entry[0] as 'pro' | 'team' | 'enterprise'
                 const planValue = entry[1]
+                const label =
+                  typeof planValue === 'string' ? planValue : String(planValue?.[0] ?? '')
+                // the icon stays on the line of the last word, so it never wraps alone
+                const lastSpace = label.lastIndexOf(' ')
 
                 return (
                   <td
                     key={i}
                     className={[
-                      `pl-6 pr-2 py-5 tier-${planName}`,
+                      `pl-6 pr-2 py-5 align-top tier-${planName}`,
                       typeof planValue === 'boolean' ? 'text-center' : '',
                     ].join(' ')}
                   >
@@ -252,17 +256,26 @@ export const PricingTableRowDesktop = (props: any) => {
                       </div>
                     ) : (
                       <div className="text-foreground text-xs flex flex-col justify-center gap-2">
-                        <span className="flex items-center gap-2">
-                          {tooltips?.[planName] && (
-                            <InfoTooltip
-                              side="top"
-                              className="max-w-[250px]"
-                              label={`About ${feat.title} on the ${planName} plan`}
-                            >
-                              {tooltips[planName]}
-                            </InfoTooltip>
+                        <span>
+                          {tooltips?.[planName] ? (
+                            <>
+                              {label.slice(0, lastSpace + 1)}
+                              <span className="whitespace-nowrap">
+                                {label.slice(lastSpace + 1)}
+                                <span className="ml-1.5 inline-flex align-middle">
+                                  <InfoTooltip
+                                    side="top"
+                                    className="max-w-[250px]"
+                                    label={`About ${feat.title} on the ${planName} plan`}
+                                  >
+                                    {tooltips[planName]}
+                                  </InfoTooltip>
+                                </span>
+                              </span>
+                            </>
+                          ) : (
+                            label
                           )}
-                          {typeof planValue === 'string' ? planValue : planValue[0]}
                         </span>
                         {Array.isArray(planValue) &&
                           planValue.slice(1).map((val, idx) => (
@@ -294,7 +307,7 @@ export const PricingTableRowMobile = (props: any) => {
     <table className="mt-8 w-full -scroll-mt-5" id={`${props.sectionId}-mobile`}>
       <caption className="bg-background border-default border-t px-4 py-3 text-left text-sm font-medium text-foreground">
         <span className="flex items-center gap-2">
-          {category.icon ? <ProductIcon icon={props.icon} /> : null}
+          {category.icon ? <ProductIcon icon={props.icon} color="green" /> : null}
           <span className="text-foreground font-normal">{category.title}</span>
         </span>
       </caption>
@@ -308,10 +321,10 @@ export const PricingTableRowMobile = (props: any) => {
           </th>
         </tr>
       </thead>
-      <tbody className="divide-border-default divide-y">
+      <tbody className="*:*:groove-page">
         {category.features.map((feat: any, i: number) => {
           return (
-            <tr key={i} className="border-default border-t">
+            <tr key={i}>
               <th
                 className="text-foreground-light px-4 py-3 text-left text-sm font-normal"
                 scope="row"
