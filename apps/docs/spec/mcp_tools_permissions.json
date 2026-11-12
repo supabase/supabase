@@ -20,6 +20,7 @@
   "get_logs": [["analytics_logs_read"]],
   "query_logs": [["analytics_logs_read"]],
   "get_advisors": [["advisors_read"]],
+  "get_issues": [["advisors_read"]],
   "generate_typescript_types": [["database_read"]],
   "get_project_url": [["project_admin_read"]],
   "get_publishable_keys": [["api_gateway_keys_read"]],
