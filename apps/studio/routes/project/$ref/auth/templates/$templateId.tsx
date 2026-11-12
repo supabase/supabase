@@ -176,9 +176,7 @@ function TemplatePage() {
           description={`${templateId ? `The template "${templateId}"` : 'This template'} doesn’t seem to exist.`}
         >
           <Button asChild className="mt-2">
-            <Link to="..">
-              Head back
-            </Link>
+            <Link to="..">Head back</Link>
           </Button>
         </Admonition>
       </div>
@@ -192,9 +190,7 @@ function TemplatePage() {
           <BreadcrumbList>
             <BreadcrumbItem>
               <BreadcrumbLink asChild>
-                <Link to="..">
-                  Emails
-                </Link>
+                <Link to="..">Emails</Link>
               </BreadcrumbLink>
             </BreadcrumbItem>
             <BreadcrumbSeparator />
