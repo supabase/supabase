@@ -315,7 +315,7 @@ export const pricing: Pricing = {
         key: 'auth.auditLogs',
         title: 'Auth Audit Logs',
         plans: {
-          free: '1 hour',
+          free: '24 hours',
           pro: '7 days',
           team: '28 days',
           enterprise: true,

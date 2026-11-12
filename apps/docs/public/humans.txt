@@ -51,6 +51,7 @@ Beng Eu
 Benjamin Coenen
 Benoit Ammermann
 Beth Long
+Bob Van Landuyt
 Bobbie Soedirgo
 Brad Deam
 Brad Gyger
@@ -166,6 +167,7 @@ Inian P
 Iryna Deans
 Isaac Dawson
 Ivan Vasilov
+Jagpreet Singh
 Jamie Boyd
 Jake Ng
 Jared Patterson
@@ -355,6 +357,7 @@ Sreyas Udayavarman
 Stephanie Jackson (stejacks)
 Stephen Denham
 Stephen Morgan
+Steve Abrams
 Steve Chavez
 Steven Eubank
 Stojan Dimitrovski
