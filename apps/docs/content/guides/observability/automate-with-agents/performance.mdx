@@ -19,7 +19,7 @@ flowchart TD
 
 - Long-running sessions and the PIDs blocking other sessions
 - Query execution-time regressions across saved hourly measurements
-- Performance issues at warning and error level
+- Performance issues at warning and critical severity
 
 It uses `get_issues` and read-only `execute_sql` on project-scoped [Supabase MCP](/docs/guides/ai-tools/mcp). It does not create indexes, rewrite queries, or cancel sessions.
 

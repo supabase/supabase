@@ -14,7 +14,11 @@ BEFORE QUERYING
 2. Confirm project and database instance from the scheduled task configuration.
    Use project-scoped Supabase MCP with project_ref and read_only=true.
    Use query_logs for ClickHouse, execute_sql for read-only Postgres diagnostics,
-   and get_issues for the specified category. Follow each tool's input schema.
+   and get_issues for security, performance, or health checks as applicable.
+   Follow each tool's input schema. For get_issues, review checks for unavailable
+   categories and preserve each issue's affected-resource evidence. Use normalized
+   info, warning, and critical severities; do not treat an empty issues list as
+   clear when coverage is incomplete.
    Supply explicit UTC log windows, no longer than 24 hours per request.
 3. Load operator threshold overrides, prior snapshots, reset markers, configured
    limits, and prior alert state from the authorized harness state. If unavailable,

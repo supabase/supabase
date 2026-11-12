@@ -66,7 +66,7 @@ from pg_stat_activity;
 
 ### Review security issues
 
-**Action:** call `get_issues` with `type: "security"`, using the tool's project scope. Report `WARN` and `ERROR` findings with the lint name, affected object, and documentation link. Keep `INFO` as context without alerting by default.
+**Action:** call `get_issues` with `type: "security"`, using the tool's project scope. Report `warning` and `critical` issues with the check ID, affected resources, and documentation links. Review `checks` for unavailable categories before treating an empty result as clear. Keep `info` as context without alerting by default.
 
 **Next:** follow the check documentation and verify the intended access model before proposing a change. Rerun the check after a fix. No findings does not prove the project is secure. See [Issues](/docs/guides/observability/issues) for other execution paths.
 
@@ -138,7 +138,7 @@ Compare rows present in all snapshots with unchanged reset/start markers and cou
 
 ### Review performance issues
 
-Call `get_issues` with `type: "performance"`. Apply the Security severity policy: report `WARN` and `ERROR`; retain `INFO` as context. Follow the returned documentation, verify relevance to the workload, and rerun after a fix.
+Call `get_issues` with `type: "performance"`. Apply the Security severity policy: report `warning` and `critical`; retain `info` as context. Review check coverage and preserve the affected-resource evidence. Follow the returned documentation, verify relevance to the workload, and rerun after a fix.
 
 ### Inspect cache misses
 
