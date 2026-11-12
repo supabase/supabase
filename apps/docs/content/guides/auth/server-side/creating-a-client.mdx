@@ -838,8 +838,8 @@ exports.createClient = (context) => {
         return parseCookieHeader(context.req.headers.cookie ?? '')
       },
       setAll(cookiesToSet, headers) {
-        cookiesToSet.forEach(({ name, value }) =>
-          context.res.appendHeader('Set-Cookie', serializeCookieHeader(name, value))
+        cookiesToSet.forEach(({ name, value, options }) =>
+          context.res.appendHeader('Set-Cookie', serializeCookieHeader(name, value, options))
         )
         Object.entries(headers).forEach(([key, value]) => context.res.setHeader(key, value))
       },
