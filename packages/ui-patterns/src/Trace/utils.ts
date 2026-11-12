@@ -223,13 +223,12 @@ export function getSpanBounds(
 ): SpanBounds {
   const startFraction = scale.toFraction(span.startMs)
   const endFraction = scale.toFraction(effectiveEndMs(span, nowMs))
-  const clamp = (fraction: number) => Math.min(Math.max(fraction, 0), 1)
 
   return {
     startFraction,
     endFraction,
-    visibleStart: clamp(startFraction),
-    visibleEnd: clamp(endFraction),
+    visibleStart: clamp(startFraction, 0, 1),
+    visibleEnd: clamp(endFraction, 0, 1),
     isVisible: endFraction >= 0 && startFraction <= 1,
   }
 }
