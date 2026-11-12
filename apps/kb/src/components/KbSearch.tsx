@@ -91,6 +91,7 @@ const KbSearchPanel = ({ onClose }: Pick<KbSearchDialogProps, 'onClose'>) => {
     sendKbTelemetryEvent({
       action: 'kb_search_submitted',
       properties: {
+        query: searchState.query,
         queryLength: searchState.query.length,
         resultCount,
         hasResults: resultCount > 0,
