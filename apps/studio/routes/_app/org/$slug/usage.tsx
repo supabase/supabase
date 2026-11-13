@@ -1,14 +1,10 @@
 import { createFileRoute } from '@tanstack/react-router'
 
-import OrgUsagePage from '@/pages/org/[slug]/usage'
+import { Usage } from '@/components/interfaces/Organization/Usage/Usage'
 
 export const Route = createFileRoute('/_app/org/$slug/usage')({
-  component: OrgUsage,
+  component: Usage,
   staticData: {
     orgLayoutTitle: 'Usage',
   },
 })
-
-function OrgUsage() {
-  return <OrgUsagePage dehydratedState={undefined} />
-}

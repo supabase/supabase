@@ -113,22 +113,22 @@ These are the layout-only TanStack files. Most hold a single product layout comp
 
 ### App shell — `/org/$slug/*`
 
-- [x] A `routes/_app/org/$slug/index.tsx` ← `pages/org/[slug]/index.tsx`
-- [x] A `routes/_app/org/$slug/apps.tsx` ← `pages/org/[slug]/apps.tsx`
-- [x] A `routes/_app/org/$slug/audit.tsx` ← `pages/org/[slug]/audit.tsx`
-- [x] A `routes/_app/org/$slug/audit-log-drains.tsx` ← `pages/org/[slug]/audit-log-drains.tsx` (wraps in OrganizationSettingsLayout inline)
-- [x] A `routes/_app/org/$slug/billing.tsx` ← `pages/org/[slug]/billing.tsx`
-- [x] A `routes/_app/org/$slug/documents.tsx` ← `pages/org/[slug]/documents.tsx`
-- [x] A `routes/_app/org/$slug/general.tsx` ← `pages/org/[slug]/general.tsx`
-- [x] A `routes/_app/org/$slug/integrations.tsx` ← `pages/org/[slug]/integrations.tsx`
-- [x] A `routes/_app/org/$slug/security.tsx` ← `pages/org/[slug]/security.tsx`
-- [x] A `routes/_app/org/$slug/sso.tsx` ← `pages/org/[slug]/sso.tsx`
-- [x] A `routes/_app/org/$slug/team.tsx` ← `pages/org/[slug]/team.tsx`
-- [x] A `routes/_app/org/$slug/usage.tsx` ← `pages/org/[slug]/usage.tsx`
-- [x] A `routes/_app/org/$slug/private-apps/index.tsx` ← `pages/org/[slug]/private-apps/index.tsx`
-- [x] A `routes/_app/org/$slug/webhooks/index.tsx` ← `pages/org/[slug]/webhooks/index.tsx`
-- [x] A `routes/_app/org/$slug/webhooks/$endpointId.tsx` ← `pages/org/[slug]/webhooks/[endpointId].tsx`
-- [x] A `routes/_app/org/index.tsx` ← `pages/org/index.tsx` (redirect)
+- [x] A→done `routes/_app/org/$slug/index.tsx` ← `pages/org/[slug]/index.tsx`
+- [x] A→done `routes/_app/org/$slug/apps.tsx` ← `pages/org/[slug]/apps.tsx`
+- [x] A→done `routes/_app/org/$slug/audit.tsx` ← `pages/org/[slug]/audit.tsx`
+- [x] A→done `routes/_app/org/$slug/audit-log-drains.tsx` ← `pages/org/[slug]/audit-log-drains.tsx` (wraps in OrganizationSettingsLayout inline)
+- [x] A→done `routes/_app/org/$slug/billing.tsx` ← `pages/org/[slug]/billing.tsx`
+- [x] A→done `routes/_app/org/$slug/documents.tsx` ← `pages/org/[slug]/documents.tsx`
+- [x] A→done `routes/_app/org/$slug/general.tsx` ← `pages/org/[slug]/general.tsx`
+- [x] A→done `routes/_app/org/$slug/integrations.tsx` ← `pages/org/[slug]/integrations.tsx`
+- [x] A→done `routes/_app/org/$slug/security.tsx` ← `pages/org/[slug]/security.tsx`
+- [x] A→done `routes/_app/org/$slug/sso.tsx` ← `pages/org/[slug]/sso.tsx`
+- [x] A→done `routes/_app/org/$slug/team.tsx` ← `pages/org/[slug]/team.tsx`
+- [x] A→done `routes/_app/org/$slug/usage.tsx` ← `pages/org/[slug]/usage.tsx`
+- [x] A→done `routes/_app/org/$slug/private-apps/index.tsx` ← `pages/org/[slug]/private-apps/index.tsx`
+- [x] A→done `routes/_app/org/$slug/webhooks/index.tsx` ← `pages/org/[slug]/webhooks/index.tsx`
+- [x] A→done `routes/_app/org/$slug/webhooks/$endpointId.tsx` ← `pages/org/[slug]/webhooks/[endpointId].tsx`
+- [x] A→done `routes/_app/org/index.tsx` ← `pages/org/index.tsx` (redirect)
 
 ### App shell — top-level pages
 
