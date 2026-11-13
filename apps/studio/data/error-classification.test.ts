@@ -5,6 +5,8 @@ import {
   classifyResponseError,
   classifySqlResponseError,
   isRequestAborted,
+  isUserFaultForSql,
+  isUserFaultForValues,
   NETWORK_UNREACHABLE_MESSAGE,
   parseRateLimitResetSeconds,
   parseResponseErrorBody,
@@ -15,6 +17,7 @@ import {
   ConnectionTimeoutError,
   getServiceForEndpoint,
   isNeverReportedError,
+  isUserError,
   NetworkUnreachableError,
   PlatformError,
   RequestAbortedError,
@@ -259,10 +262,15 @@ describe('classifySqlResponseError', () => {
     endpoint: '/platform/pg-meta/{ref}/query',
   }
 
-  it('classifies a Postgres error from user SQL as UserSqlError, which is never reported', () => {
+  it('classifies a Postgres error from user SQL as a user-fault UserSqlError', () => {
     const err = classifySqlResponseError(sqlBody, { origin: 'user' })
     expect(err).toBeInstanceOf(UserSqlError)
-    expect(err).toMatchObject({ fault: 'user', reason: 'user_sql', message: sqlBody.message })
+    expect(err).toMatchObject({ reason: 'user_sql', message: sqlBody.message })
+    expect(isUserError(err)).toBe(true)
+  })
+
+  it('never reports a UserSqlError', () => {
+    const err = classifySqlResponseError(sqlBody, { origin: 'user' })
     expect(isNeverReportedError(err)).toBe(true)
   })
 
@@ -278,6 +286,7 @@ describe('classifySqlResponseError', () => {
       queryName: 'tables',
       formattedError: sqlBody.formattedError,
     })
+    expect(isUserError(err)).toBe(false)
     expect(isNeverReportedError(err)).toBe(false)
   })
 
@@ -302,6 +311,91 @@ describe('classifySqlResponseError', () => {
     expect(classifySqlResponseError(body, { origin: 'studio', queryName: 'x' })).toBeInstanceOf(
       StudioSqlError
     )
+  })
+
+  it.each([
+    ['22P02', 'invalid input syntax for type integer: "abc"'],
+    ['23505', 'duplicate key value violates unique constraint'],
+    ['42501', 'permission denied for table todos'],
+    ['P0001', 'raised by a trigger'],
+    ['57014', 'canceling statement due to statement timeout'],
+  ])(
+    'classifies %s as a user-fault StudioSqlError (user_input) only when the caller passes a predicate that accepts it',
+    (state, text) => {
+      const body = { message: `Failed to run sql query: ERROR:  ${state}: ${text}`, code: 400 }
+      const err = classifySqlResponseError(body, {
+        origin: 'studio',
+        queryName: 'table-rows',
+        isUserFaultSqlState: isUserFaultForValues,
+      })
+      expect(err).toBeInstanceOf(StudioSqlError)
+      expect(err).toMatchObject({
+        fault: 'user',
+        reason: 'user_input',
+        sqlState: state,
+        queryName: 'table-rows',
+      })
+      expect(isUserError(err)).toBe(true)
+      expect(isNeverReportedError(err)).toBe(false)
+
+      const studioOnly = classifySqlResponseError(body, { origin: 'studio', queryName: 'tables' })
+      expect(studioOnly).toBeInstanceOf(StudioSqlError)
+      expect(studioOnly).toMatchObject({ fault: 'studio', reason: 'studio_sql' })
+      expect(isUserError(studioOnly)).toBe(false)
+    }
+  )
+
+  it.each([
+    ['42601', 'syntax error at or near "from"'],
+    ['42P01', 'relation "x" does not exist'],
+    ['42702', 'column reference is ambiguous'],
+  ])('keeps Studio SQL failing with %s as a StudioSqlError even with user input', (state, text) => {
+    const body = { message: `Failed to run sql query: ERROR:  ${state}: ${text}`, code: 400 }
+    const err = classifySqlResponseError(body, {
+      origin: 'studio',
+      queryName: 'x',
+      isUserFaultSqlState: isUserFaultForValues,
+    })
+    expect(err).toBeInstanceOf(StudioSqlError)
+  })
+
+  it('keeps Studio SQL without a SQLSTATE as a StudioSqlError', () => {
+    const body = { message: 'Failed to run sql query: ERROR: odd', code: 400 }
+    expect(
+      classifySqlResponseError(body, {
+        origin: 'studio',
+        queryName: 'x',
+        isUserFaultSqlState: isUserFaultForValues,
+      })
+    ).toBeInstanceOf(StudioSqlError)
+  })
+
+  it('keeps Studio SQL as studio_sql when the predicate rejects the SQLSTATE', () => {
+    const body = { message: 'Failed to run sql query: ERROR:  22P02: bad', code: 400 }
+    const err = classifySqlResponseError(body, {
+      origin: 'studio',
+      queryName: 'x',
+      isUserFaultSqlState: () => false,
+    })
+    expect(err).toMatchObject({ fault: 'studio', reason: 'studio_sql' })
+  })
+
+  it('composes predicates for pg_stat_statements text: 42P02 is Studio, 42703 is the user', () => {
+    const isUserFault = (s: string) => s !== '42P02' && isUserFaultForSql(s)
+    const classify = (state: string) =>
+      classifySqlResponseError(
+        { message: `Failed to run sql query: ERROR:  ${state}: x`, code: 400 },
+        { origin: 'studio', queryName: 'x', isUserFaultSqlState: isUserFault }
+      )
+    expect(classify('42P02')).toMatchObject({ fault: 'studio', reason: 'studio_sql' })
+    expect(classify('42703')).toMatchObject({ fault: 'user', reason: 'user_input' })
+  })
+
+  it('keeps reason user_sql for user-written SQL even with a user-caused SQLSTATE', () => {
+    const body = { message: 'Failed to run sql query: ERROR:  23505: dup', code: 400 }
+    expect(classifySqlResponseError(body, { origin: 'user' })).toMatchObject({
+      reason: 'user_sql',
+    })
   })
 
   it('keeps a 400 without a SQLSTATE as a SQL error when no pattern matches', () => {
@@ -346,4 +440,34 @@ describe('isRequestAborted', () => {
   ])('rejects %s', (_, value) => {
     expect(isRequestAborted(value)).toBe(false)
   })
+})
+
+describe('isUserFaultForValues', () => {
+  it.each(['22P02', '22001', '23505', '23503', '42501', 'P0001', 'P0002', '57014'])(
+    'accepts %s',
+    (state) => expect(isUserFaultForValues(state)).toBe(true)
+  )
+  it.each(['42601', '42P01', '42703', '42702', '08006', '57P01', 'XX000', '53300'])(
+    'rejects %s',
+    (state) => expect(isUserFaultForValues(state)).toBe(false)
+  )
+})
+
+describe('isUserFaultForSql', () => {
+  it.each([
+    '42601',
+    '42P01',
+    '42703',
+    '42P02',
+    '22P02',
+    '23505',
+    '42501',
+    'P0001',
+    '57014',
+    '0A000',
+  ])('accepts %s', (state) => expect(isUserFaultForSql(state)).toBe(true))
+  it.each(['08006', '08001', '53300', '53200', '57P01', '57P03', '58030', 'XX000', 'XX001'])(
+    'rejects %s, which describes the server',
+    (state) => expect(isUserFaultForSql(state)).toBe(false)
+  )
 })
