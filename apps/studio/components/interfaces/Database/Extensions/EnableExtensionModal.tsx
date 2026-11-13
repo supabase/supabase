@@ -62,13 +62,16 @@ export const EnableExtensionModal = ({
   const onConfirmEnable = async () => {
     if (project === undefined) return console.error('Project is required')
 
+    const schema = defaultSchema ?? 'extensions'
+
     enableExtension({
       projectRef: project.ref,
       connectionString: project?.connectionString,
-      schema: defaultSchema ?? 'extensions',
+      schema,
       name: extension.name,
       version: extension.default_version,
       cascade: true,
+      createSchema: hasFixedSchema && !schema.startsWith('pg_'),
     })
   }
 
