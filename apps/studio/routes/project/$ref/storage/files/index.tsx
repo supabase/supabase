@@ -1,14 +1,10 @@
 import { createFileRoute } from '@tanstack/react-router'
 
-import StorageFilesPage from '@/pages/project/[ref]/storage/files/index'
+import { FilesBuckets } from '@/components/interfaces/Storage/FilesBuckets'
 
 export const Route = createFileRoute('/project/$ref/storage/files/')({
-  component: StorageFilesIndexRoute,
+  component: FilesBuckets,
   staticData: {
     storageLayoutTitle: 'Files',
   },
 })
-
-function StorageFilesIndexRoute() {
-  return <StorageFilesPage dehydratedState={undefined} />
-}

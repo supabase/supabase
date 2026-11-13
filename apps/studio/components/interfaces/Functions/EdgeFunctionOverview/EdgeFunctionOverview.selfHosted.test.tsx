@@ -1,17 +1,19 @@
-import { dehydrate, QueryClient } from '@tanstack/react-query'
+import { QueryClient } from '@tanstack/react-query'
 import { waitFor } from '@testing-library/react'
 import { FeatureFlagContext } from 'common'
 import { HttpResponse } from 'msw'
 import { createDynamicRouteParser } from 'next-router-mock/dynamic-routes'
 import { useRouter } from 'next/router'
+import type { PropsWithChildren } from 'react'
 import { afterAll, expect, it, vi } from 'vitest'
 
 import type { EdgeFunction } from '@/data/edge-functions/edge-function-query'
 import { projectKeys } from '@/data/projects/keys'
-import OverviewPage from '@/pages/project/[ref]/functions/[functionSlug]/index'
+import { Route } from '@/routes/project/$ref/functions/$functionSlug/index'
 import { createMockProject } from '@/tests/helpers'
-import { customRender } from '@/tests/lib/custom-render'
+import { CustomWrapper } from '@/tests/lib/custom-render'
 import { addAPIMock } from '@/tests/lib/msw'
+import { renderRoute } from '@/tests/lib/route-render'
 
 vi.unmock('common')
 
@@ -24,6 +26,13 @@ const removeRouteParser = routerMock.useParser(
   ])
 )
 afterAll(removeRouteParser)
+
+// The overview redirects through the next/router mock, which doesn't drive the
+// TanStack route, so unmount it once the mock leaves the overview URL.
+const UntilRedirected = ({ children }: PropsWithChildren) => {
+  const { asPath } = useRouter()
+  return asPath === '/project/default/functions/send-email' ? children : null
+}
 
 it('redirects the self-hosted overview to function details before feature flags load', async () => {
   routerMock.setCurrentUrl('/project/default/functions/send-email')
@@ -44,19 +53,19 @@ it('redirects the self-hosted overview to function details before feature flags 
       }),
   })
 
-  const OverviewRoute = () => {
-    const { asPath } = useRouter()
-    return asPath === '/project/default/functions/send-email' ? (
-      <OverviewPage dehydratedState={dehydrate(queryClient)} />
-    ) : null
-  }
-
-  customRender(
-    <FeatureFlagContext.Provider value={{ configcat: {}, posthog: {}, hasLoaded: false }}>
-      <OverviewRoute />
-    </FeatureFlagContext.Provider>,
-    { queryClient }
-  )
+  await renderRoute(Route, {
+    routeId: '/project/$ref/functions/$functionSlug/',
+    url: '/project/default/functions/send-email',
+    renderOptions: {
+      wrapper: ({ children }) => (
+        <CustomWrapper queryClient={queryClient}>
+          <FeatureFlagContext.Provider value={{ configcat: {}, posthog: {}, hasLoaded: false }}>
+            <UntilRedirected>{children}</UntilRedirected>
+          </FeatureFlagContext.Provider>
+        </CustomWrapper>
+      ),
+    },
+  })
 
   await waitFor(() =>
     expect(routerMock.asPath).toBe('/project/default/functions/send-email/details')

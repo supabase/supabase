@@ -1,14 +1,10 @@
 import { createFileRoute } from '@tanstack/react-router'
 
-import FunctionOverviewPage from '@/pages/project/[ref]/functions/[functionSlug]/index'
+import { EdgeFunctionOverview } from '@/components/interfaces/Functions/EdgeFunctionOverview/EdgeFunctionOverview'
 
 export const Route = createFileRoute('/project/$ref/functions/$functionSlug/')({
-  component: FunctionOverviewRoute,
+  component: EdgeFunctionOverview,
   staticData: {
     edgeFunctionDetailsTitle: 'Overview',
   },
 })
-
-function FunctionOverviewRoute() {
-  return <FunctionOverviewPage dehydratedState={undefined} />
-}

@@ -1,15 +1,143 @@
+import { useQuery } from '@tanstack/react-query'
 import { createFileRoute } from '@tanstack/react-router'
+import { useParams } from 'common'
+import { ExternalLinkIcon, RefreshCwIcon } from 'lucide-react'
+import { useState } from 'react'
+import { Button } from 'ui'
+import { Admonition } from 'ui-patterns/Admonition'
+import { PageContainer } from 'ui-patterns/PageContainer'
+import {
+  PageHeader,
+  PageHeaderDescription,
+  PageHeaderMeta,
+  PageHeaderSummary,
+  PageHeaderTitle,
+} from 'ui-patterns/PageHeader'
+import { PageSection, PageSectionContent } from 'ui-patterns/PageSection'
+import { GenericSkeletonLoader } from 'ui-patterns/ShimmeringLoader'
 
+import {
+  isComputeForbidden,
+  isComputeUnavailable,
+} from '@/components/interfaces/Compute/Compute.utils'
+import { ComputeEmptyState } from '@/components/interfaces/Compute/ComputeEmptyState'
+import { ComputeList } from '@/components/interfaces/Compute/ComputeList'
+import { DeployComputeInstanceDialog } from '@/components/interfaces/Compute/DeployComputeInstanceDialog'
+import { AlertError } from '@/components/ui/AlertError'
+import { AlphaNotice } from '@/components/ui/AlphaNotice'
+import { NoPermission } from '@/components/ui/NoPermission'
+import { computeQueryOptions } from '@/data/compute/compute-query'
 import { PRODUCT_NAME } from '@/lib/constants/compute'
-import ComputePage from '@/pages/project/[ref]/compute/index'
 
 export const Route = createFileRoute('/project/$ref/compute/')({
-  component: ComputeIndexRoute,
+  component: ComputePage,
   staticData: {
     computeLayoutTitle: PRODUCT_NAME,
   },
 })
 
-function ComputeIndexRoute() {
-  return <ComputePage dehydratedState={undefined} />
+function ComputePage() {
+  const { ref } = useParams()
+  const [isDeployInstructionsOpen, setIsDeployInstructionsOpen] = useState(false)
+  const [isManuallyRefreshing, setIsManuallyRefreshing] = useState(false)
+  const {
+    data: instances,
+    error,
+    isPending,
+    isError,
+    isSuccess,
+    refetch,
+  } = useQuery(computeQueryOptions({ projectRef: ref }))
+
+  // Separate from the query's own isFetching so background polling doesn't flash the button
+  const handleManualRefresh = () => {
+    setIsManuallyRefreshing(true)
+    refetch().finally(() => setIsManuallyRefreshing(false))
+  }
+
+  const isNotEnrolled = isError && isComputeUnavailable(error)
+  const isMissingPermission = isError && isComputeForbidden(error)
+  const isUnexpectedError = isError && !isNotEnrolled && !isMissingPermission
+
+  return (
+    <div className="w-full min-h-full flex flex-col items-stretch">
+      <PageHeader size="large">
+        <PageHeaderMeta>
+          <PageHeaderSummary>
+            <PageHeaderTitle>{PRODUCT_NAME}</PageHeaderTitle>
+            <PageHeaderDescription>
+              Run fully managed compute in isolation next to your database
+            </PageHeaderDescription>
+          </PageHeaderSummary>
+        </PageHeaderMeta>
+      </PageHeader>
+
+      <PageContainer size="large">
+        <PageSection>
+          <PageSectionContent className="flex flex-col gap-y-8">
+            <AlphaNotice
+              entity="Compute"
+              feedbackUrl="https://github.com/orgs/supabase/discussions"
+            />
+
+            {isPending && <GenericSkeletonLoader />}
+            {isNotEnrolled && (
+              <Admonition
+                type="default"
+                layout="horizontal"
+                title={`You don't have access to ${PRODUCT_NAME} yet`}
+                description="Join the waitlist to get early access."
+                actions={
+                  <Button asChild icon={<ExternalLinkIcon />}>
+                    <a
+                      href="https://supabase.com/compute"
+                      target="_blank"
+                      rel="noopener noreferrer"
+                    >
+                      Join waitlist
+                    </a>
+                  </Button>
+                }
+              />
+            )}
+            {isMissingPermission && (
+              <NoPermission resourceText="view this project's compute instances" />
+            )}
+            {isUnexpectedError && (
+              <AlertError
+                error={error}
+                subject="Failed to retrieve compute instances"
+                additionalActions={
+                  <Button
+                    icon={<RefreshCwIcon />}
+                    loading={isManuallyRefreshing}
+                    onClick={handleManualRefresh}
+                  >
+                    Refresh
+                  </Button>
+                }
+              />
+            )}
+            {isSuccess && instances.length === 0 && (
+              <ComputeEmptyState onDeploy={() => setIsDeployInstructionsOpen(true)} />
+            )}
+            {isSuccess && instances.length > 0 && ref && (
+              <ComputeList
+                projectRef={ref}
+                instances={instances}
+                onDeploy={() => setIsDeployInstructionsOpen(true)}
+                onRefresh={handleManualRefresh}
+                isRefreshing={isManuallyRefreshing}
+              />
+            )}
+          </PageSectionContent>
+        </PageSection>
+      </PageContainer>
+
+      <DeployComputeInstanceDialog
+        open={isDeployInstructionsOpen}
+        onOpenChange={setIsDeployInstructionsOpen}
+      />
+    </div>
+  )
 }

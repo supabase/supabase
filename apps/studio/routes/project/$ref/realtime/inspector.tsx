@@ -1,14 +1,10 @@
 import { createFileRoute } from '@tanstack/react-router'
 
-import InspectorPage from '@/pages/project/[ref]/realtime/inspector'
+import { RealtimeInspector } from '@/components/interfaces/Realtime/Inspector'
 
 export const Route = createFileRoute('/project/$ref/realtime/inspector')({
-  component: RealtimeInspectorRoute,
+  component: RealtimeInspector,
   staticData: {
     realtimeLayoutTitle: 'Realtime Inspector',
   },
 })
-
-function RealtimeInspectorRoute() {
-  return <InspectorPage dehydratedState={undefined} />
-}
