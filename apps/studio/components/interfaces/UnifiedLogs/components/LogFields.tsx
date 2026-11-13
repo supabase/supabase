@@ -25,7 +25,7 @@ export function LogFields<TData>({
   if (data === null || typeof data !== 'object' || data instanceof Date) {
     const value = data instanceof Date ? data.toISOString() : String(data)
     return (
-      <span className="min-w-0 whitespace-pre-wrap break-words text-left font-mono text-xs leading-5">
+      <span className="min-w-0 whitespace-pre-wrap break-words text-right font-mono text-xs leading-5">
         {value}
       </span>
     )

@@ -87,7 +87,7 @@ const FieldValue = ({ config, value, wrap, level }: FieldValueProps): ReactNode 
         data-code-style="plain"
         className={cn(
           'min-w-0 text-xs leading-5',
-          wrap ? 'break-words text-left' : 'truncate text-right'
+          wrap ? 'break-words text-right' : 'truncate text-right'
         )}
       >
         {value}
