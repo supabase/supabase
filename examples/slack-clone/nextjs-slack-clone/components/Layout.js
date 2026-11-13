@@ -75,7 +75,7 @@ export default function Layout(props) {
 const SidebarItem = ({ channel, isActiveChannel, user }) => (
   <>
     <li className="flex items-center justify-between">
-      <Link href="/channels/[id]" as={`/channels/${channel.id}`}>
+      <Link legacyBehavior href="/channels/[id]" as={`/channels/${channel.id}`}>
         <a className={isActiveChannel ? 'font-bold' : ''}>{channel.slug}</a>
       </Link>
       {channel.id !== 1 && (channel.created_by === user?.id || user?.appRole === 'admin') && (
