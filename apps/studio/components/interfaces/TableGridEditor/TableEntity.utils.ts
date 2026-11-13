@@ -57,14 +57,13 @@ export class JsonText {
 
 /**
  * Grid rows carry json/jsonb columns as JSON text (the grid query casts them to text).
- * `formatTableRowsToSQL` treats plain values in those columns as parsed JSON, so wrap the untruncated
- * text cells in `JsonText` before passing grid rows to it. Truncated cells are left as-is so they can
- * still be fetched in full.
+ * `formatTableRowsToSQL` treats plain values in those columns as parsed JSON, so wrap the text cells
+ * in `JsonText` before passing grid rows to it. Do this after truncated cells are hydrated (as text),
+ * and not before, so primary key lookups still see the original values.
  */
 export const wrapGridJsonText = <T extends Record<string, unknown>>(
   table: SupaTable,
-  rows: T[],
-  isTruncated: (value: string) => boolean
+  rows: T[]
 ): T[] => {
   const jsonColumns = table.columns.filter(
     (col) => col.format?.includes('json') && col.dataType !== 'ARRAY'
@@ -75,7 +74,7 @@ export const wrapGridJsonText = <T extends Record<string, unknown>>(
     const wrappedRow: Record<string, unknown> = { ...row }
     jsonColumns.forEach(({ name }) => {
       const val = row[name]
-      if (typeof val === 'string' && !isTruncated(val)) wrappedRow[name] = new JsonText(val)
+      if (typeof val === 'string') wrappedRow[name] = new JsonText(val)
     })
     return wrappedRow as T
   })

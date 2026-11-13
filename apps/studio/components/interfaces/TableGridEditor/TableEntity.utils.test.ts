@@ -4,7 +4,6 @@ import {
   formatTableRowsToJSON,
   formatTableRowsToSQL,
   getTablePoliciesUrl,
-  JsonText,
   wrapGridJsonText,
 } from './TableEntity.utils'
 import type { SupaTable } from '@/components/grid/types'
@@ -361,7 +360,7 @@ describe('TableEntity.utils: wrapGridJsonText', () => {
       { note: '{"a":1}', meta: '{"text":"say \\"hi\\""}', tags: ['{"x":1}'] },
       { note: 'n', meta: '"hello"', tags: [] },
     ]
-    const wrapped = wrapGridJsonText(table, rows, () => false)
+    const wrapped = wrapGridJsonText(table, rows)
     expect(wrapped[0].note).toBe('{"a":1}')
     expect(wrapped[0].tags).toEqual(['{"x":1}'])
     expect(formatTableRowsToSQL(table, wrapped)).toBe(
@@ -371,42 +370,31 @@ describe('TableEntity.utils: wrapGridJsonText', () => {
   })
 
   it('keeps numbers outside the safe integer range exact', () => {
-    const wrapped = wrapGridJsonText(
-      table,
-      [{ note: 'n', meta: '{"n":9007199254740993,"d":1.10}', tags: [] }],
-      () => false
-    )
+    const wrapped = wrapGridJsonText(table, [
+      { note: 'n', meta: '{"n":9007199254740993,"d":1.10}', tags: [] },
+    ])
     expect(formatTableRowsToSQL(table, wrapped)).toContain(`'{"n":9007199254740993,"d":1.10}'`)
   })
 
   it('keeps a JSON null distinct from a SQL NULL', () => {
-    const wrapped = wrapGridJsonText(
-      table,
-      [
-        { note: 'n', meta: 'null', tags: [] },
-        { note: 'n', meta: null, tags: [] },
-      ],
-      () => false
-    )
+    const wrapped = wrapGridJsonText(table, [
+      { note: 'n', meta: 'null', tags: [] },
+      { note: 'n', meta: null, tags: [] },
+    ])
     expect(formatTableRowsToSQL(table, wrapped)).toContain(
       `VALUES ('n', 'null', '{}'), ('n', null, '{}');`
     )
   })
 
-  it('escapes single quotes in the json text', () => {
-    const wrapped = wrapGridJsonText(table, [{ note: 'n', meta: '"it\'s"', tags: [] }], () => false)
-    expect(formatTableRowsToSQL(table, wrapped)).toContain(`'"it''s"'`)
+  it('does not change the rows it is given, so primary key lookups keep the original values', () => {
+    const rows = [{ note: 'n', meta: '1', tags: [] }]
+    const wrapped = wrapGridJsonText(table, rows)
+    expect(rows[0].meta).toBe('1')
+    expect(wrapped[0].meta).not.toBe('1')
   })
 
-  it('checks truncation on the original text and leaves truncated cells alone', () => {
-    const isTruncated = (v: string) => v.endsWith('...')
-    const rows = [
-      { note: 'n', meta: '{"a":1...', tags: [] },
-      // Complete JSON string whose decoded content looks truncated must still be wrapped
-      { note: 'n', meta: '"abc..."', tags: [] },
-    ]
-    const wrapped = wrapGridJsonText(table, rows, isTruncated)
-    expect(wrapped[0].meta).toBe('{"a":1...')
-    expect(wrapped[1].meta).toBeInstanceOf(JsonText)
+  it('escapes single quotes in the json text', () => {
+    const wrapped = wrapGridJsonText(table, [{ note: 'n', meta: '"it\'s"', tags: [] }])
+    expect(formatTableRowsToSQL(table, wrapped)).toContain(`'"it''s"'`)
   })
 })

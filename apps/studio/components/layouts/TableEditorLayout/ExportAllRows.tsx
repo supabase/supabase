@@ -22,7 +22,6 @@ import { useProgressToasts } from './ExportAllRows.progress'
 import { hydrateTruncatedRows } from '@/components/grid/components/header/Header.utils'
 import { parseSupaTable } from '@/components/grid/SupabaseGrid.utils'
 import type { Filter, Sort, SupaTable } from '@/components/grid/types'
-import { isValueTruncated } from '@/components/interfaces/TableGridEditor/SidePanelEditor/RowEditor/RowEditor.utils'
 import {
   formatTableRowsToSQL,
   wrapGridJsonText,
@@ -176,7 +175,7 @@ const fetchAllRows = async ({
       jsonColumnsAsText: preserveJsonValues,
     })
     if (preserveJsonValues) {
-      rows = wrapGridJsonText(supaTable, rows, () => false)
+      rows = wrapGridJsonText(supaTable, rows)
     }
   } catch (error: unknown) {
     return { status: 'error', error: new FetchRowsError(supaTable.name, error) }
@@ -317,14 +316,12 @@ export const useExportAllRowsGeneric = (
         params.type === 'provided_rows'
           ? await (async () => {
               const hydrated = await hydrateTruncatedRows({
-                // Grid rows carry json columns as text, mark it so SQL output emits it verbatim
-                rows: preserveJsonValues
-                  ? wrapGridJsonText(params.table, params.rows, (v) => isValueTruncated(v))
-                  : params.rows,
+                rows: params.rows,
                 table: params.table,
                 projectRef,
                 connectionString,
                 roleImpersonationState: params.roleImpersonationState,
+                jsonAsText: preserveJsonValues,
               })
               if (hydrated.status === 'no_primary_key') {
                 return {
@@ -339,7 +336,14 @@ export const useExportAllRowsGeneric = (
                 }
               }
               return convertAndDownload(
-                formatRowsForExport(hydrated.rows, params.table, preserveJsonValues),
+                formatRowsForExport(
+                  // Grid rows carry json columns as text, mark it so SQL output emits it verbatim
+                  preserveJsonValues
+                    ? wrapGridJsonText(params.table, hydrated.rows)
+                    : hydrated.rows,
+                  params.table,
+                  preserveJsonValues
+                ),
                 params.table,
                 {
                   convertToOutputFormat,

@@ -243,15 +243,12 @@ const RowHeader = ({ rows: visibleRows, tableQueriesEnabled = true }: RowHeaderP
     setIsCopying(true)
     const formatted = (async () => {
       const hydrated = await hydrateTruncatedRows({
-        rows:
-          type === 'sql'
-            ? // Grid rows carry json columns as text, mark it so SQL output emits it verbatim
-              wrapGridJsonText(snap.table, selected, (v) => isValueTruncated(v))
-            : selected,
+        rows: selected,
         table: snap.table,
         projectRef: project.ref,
         connectionString: project.connectionString ?? null,
         roleImpersonationState: roleImpersonationState as RoleImpersonationState,
+        jsonAsText: type === 'sql',
       })
       if (hydrated.status !== 'ok') {
         throw new Error('Failed to fetch full values for truncated cells')
@@ -263,7 +260,8 @@ const RowHeader = ({ rows: visibleRows, tableQueriesEnabled = true }: RowHeaderP
           columns: snap.table!.columns.map((column) => column.name),
         })
       } else if (type === 'sql') {
-        return formatTableRowsToSQL(snap.table, rows)
+        // Grid rows carry json columns as text, mark it so SQL output emits it verbatim
+        return formatTableRowsToSQL(snap.table, wrapGridJsonText(snap.table, rows))
       } else {
         return formatTableRowsToJSON(snap.table, rows)
       }
