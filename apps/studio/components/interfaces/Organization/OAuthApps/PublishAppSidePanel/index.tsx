@@ -44,7 +44,6 @@ import {
 import { ScopesPanel } from './Scopes'
 import { DocsButton } from '@/components/ui/DocsButton'
 import { Shortcut } from '@/components/ui/Shortcut'
-import { USE_MOCKS } from '@/data/oauth-apps/mocks'
 import {
   OAuthAppCreateResponse,
   useOAuthAppCreateMutation,
@@ -63,11 +62,30 @@ export interface PublishAppSidePanelProps {
   onCreateSuccess: (app: OAuthAppCreateResponse) => void
 }
 
-const getFormDefaultValues = (
+function getFormDefaultValues(
   selectedApp: OAuthApp | undefined,
-  withOAuthAppScopedGrants = false
-): FormSchema => {
+  withOAuthAppScopedGrants: true
+): FormSchemaWithOAuthAppScopedGrants
+function getFormDefaultValues(
+  selectedApp: OAuthApp | undefined,
+  withOAuthAppScopedGrants: false
+): FormSchema
+function getFormDefaultValues(
+  selectedApp: OAuthApp | undefined,
+  withOAuthAppScopedGrants: boolean = false
+): FormSchema | FormSchemaWithOAuthAppScopedGrants {
   if (selectedApp) {
+    if (!withOAuthAppScopedGrants) {
+      return {
+        name: selectedApp.name,
+        website: selectedApp.website,
+        redirect_uris:
+          selectedApp.redirect_uris?.map((url) => {
+            return { id: uuidv4(), value: url }
+          }) ?? [],
+      }
+    }
+
     return {
       name: selectedApp.name,
       website: selectedApp.website,
@@ -75,17 +93,18 @@ const getFormDefaultValues = (
         selectedApp.redirect_uris?.map((url) => {
           return { id: uuidv4(), value: url }
         }) ?? [],
-      ...(withOAuthAppScopedGrants
-        ? {
-            // TODO: read the next 4 props from the selected app once implemented in backend
-            // Set to true to verify it can't be changed once enabled
-            member_bound_grant: true,
-            member_bound_grant_confirmed: true,
-            // Set to false to verify it can be changed if it wasn't enabled before
-            project_scoping: false,
-            project_scoping_confirmed: false,
-          }
-        : {}),
+      member_bound_grant: selectedApp.grant_kind === 'member_bound',
+      member_bound_grant_confirmed: selectedApp.grant_kind == null,
+      project_scoping: selectedApp.project_scoping_mode,
+      project_scoping_confirmed: selectedApp.project_scoping_mode == null,
+    }
+  }
+
+  if (!withOAuthAppScopedGrants) {
+    return {
+      name: '',
+      website: '',
+      redirect_uris: [{ id: uuidv4(), value: '' }],
     }
   }
 
@@ -93,14 +112,10 @@ const getFormDefaultValues = (
     name: '',
     website: '',
     redirect_uris: [{ id: uuidv4(), value: '' }],
-    ...(withOAuthAppScopedGrants
-      ? {
-          member_bound_grant: false,
-          member_bound_grant_confirmed: false,
-          project_scoping: false,
-          project_scoping_confirmed: false,
-        }
-      : {}),
+    member_bound_grant: false,
+    member_bound_grant_confirmed: false,
+    project_scoping: false,
+    project_scoping_confirmed: false,
   }
 }
 
@@ -114,7 +129,7 @@ export const PublishAppSidePanel = ({
 }: PublishAppSidePanelProps) => {
   const { slug } = useParams()
   const uploadButtonRef = useRef<HTMLInputElement | null>(null)
-  const areOAuthAppScopedGrantsEnabled = useFlag('enableScopedOAuthPublish') && USE_MOCKS
+  const areOAuthAppScopedGrantsEnabled = useFlag('enableScopedOAuthPublish')
 
   const { mutateAsync: createOAuthApp } = useOAuthAppCreateMutation({
     onSuccess: (res, variables) => {
@@ -164,10 +179,17 @@ export const PublishAppSidePanel = ({
     event.target.value = ''
   }
 
-  const onSubmit: SubmitHandler<FormSchema> = async (values) => {
+  const onSubmit: SubmitHandler<FormSchema | FormSchemaWithOAuthAppScopedGrants> = async (
+    values
+  ) => {
     if (!slug) return console.error('Slug is required')
 
     const { name, website, redirect_uris } = values
+    let member_bound_grant, project_scoping
+    if (isFormValuesWithOAuthAppScopedGrants(values, areOAuthAppScopedGrantsEnabled)) {
+      member_bound_grant = values.member_bound_grant
+      project_scoping = values.project_scoping
+    }
     const uploadedIconUrl =
       iconFile !== undefined
         ? await uploadAttachment('oauth-app-icons', `${slug}/${uuidv4()}.png`, iconFile)
@@ -188,6 +210,8 @@ export const PublishAppSidePanel = ({
           redirect_uris: redirect_uris.map((uris) => uris.value),
           scopes,
           icon: uploadedIconUrl,
+          grant_kind: member_bound_grant ? 'member_bound' : 'organization_bound',
+          project_scoping_mode: project_scoping,
         })
       } else {
         // Update application
@@ -199,6 +223,8 @@ export const PublishAppSidePanel = ({
           redirect_uris: redirect_uris.map((uris) => uris.value),
           scopes,
           icon: uploadedIconUrl,
+          grant_kind: member_bound_grant ? 'member_bound' : 'organization_bound',
+          project_scoping_mode: project_scoping,
         })
       }
     } catch {
@@ -211,6 +237,7 @@ export const PublishAppSidePanel = ({
       ? FormSchemaWithOAuthAppScopedGrants
       : FormSchema
   >({
+    // @ts-expect-error known issue in TS https://github.com/microsoft/TypeScript/issues/50754
     defaultValues: getFormDefaultValues(selectedApp, areOAuthAppScopedGrantsEnabled),
     resolver: zodResolver(
       areOAuthAppScopedGrantsEnabled ? formSchemaWithOAuthAppScopedGrants : formSchema
@@ -221,6 +248,7 @@ export const PublishAppSidePanel = ({
 
   useEffect(() => {
     if (visible) {
+      // @ts-expect-error known issue in TS https://github.com/microsoft/TypeScript/issues/50754
       const defaultValues = getFormDefaultValues(selectedApp, areOAuthAppScopedGrantsEnabled)
       reset(defaultValues)
     }
@@ -368,6 +396,7 @@ export const PublishAppSidePanel = ({
                 <input
                   multiple
                   type="file"
+                  aria-label="Logo"
                   ref={uploadButtonRef}
                   className="hidden"
                   accept="image/png, image/jpeg"
@@ -496,5 +525,12 @@ const isFormSchemaWithOAuthAppScopedGrants = (
   _schema: Control<FormSchema> | Control<FormSchemaWithOAuthAppScopedGrants>,
   withOAuthAppScopedGrants: boolean
 ): _schema is Control<FormSchemaWithOAuthAppScopedGrants> => {
+  return withOAuthAppScopedGrants
+}
+
+const isFormValuesWithOAuthAppScopedGrants = (
+  _values: FormSchema | FormSchemaWithOAuthAppScopedGrants,
+  withOAuthAppScopedGrants: boolean
+): _values is FormSchemaWithOAuthAppScopedGrants => {
   return withOAuthAppScopedGrants
 }
