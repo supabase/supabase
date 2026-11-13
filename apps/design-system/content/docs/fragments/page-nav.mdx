@@ -1,6 +1,6 @@
 ---
 title: Page Nav
-description: Full-width sub-navigation row for page chrome, placed below breadcrumbs and outside PageHeader.
+description: Sub-navigation row for page chrome, placed below breadcrumbs and outside PageHeader.
 fragment: true
 ---
 
@@ -32,8 +32,24 @@ import { PageNav } from 'ui-patterns/PageNav'
 
 ## Sub-components
 
-- `PageNav` — bordered, full-width container for `NavMenu` tab navigation
+- `PageNav` — container for `NavMenu` tab navigation. The bottom border always spans the full width.
 
-`PageNav` uses `PageContainer` with `size="full"` for width and padding. It does not depend on `PageHeader`.
+## Props
+
+| Prop   | Type                                        | Default  | Description                                                          |
+| ------ | ------------------------------------------- | -------- | -------------------------------------------------------------------- |
+| `size` | `'small' \| 'default' \| 'large' \| 'full'` | `'full'` | Width and padding of the nav content, same values as `PageContainer` |
+
+`PageNav` uses `PageContainer` for width and padding. It does not depend on `PageHeader`.
+
+Set `size` to match the sibling `PageHeader` and page content so the tabs line up with the title and body. With `full` (the default), the tabs span edge to edge with the page chrome's `px-4` padding. Any other size uses `PageContainer`'s max-width and padding, so on wide viewports the tabs stay centered with the rest of the page.
+
+```tsx
+<PageHeader size="large">…</PageHeader>
+<PageNav size="large">
+  <NavMenu>…</NavMenu>
+</PageNav>
+<PageContainer size="large">…</PageContainer>
+```
 
 Place it directly below `PageBreadcrumbs` and outside `PageHeader`. For legacy pages, `PageHeaderNavigationTabs` remains available on `PageHeader`.

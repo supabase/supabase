@@ -75,6 +75,8 @@ export type PageHeaderBreadcrumbProps = React.ComponentProps<typeof Breadcrumb>
  * Breadcrumb component for page header.
  * A wrapper around Breadcrumb with page header styling.
  * Should be placed as the first child of PageHeader.
+ *
+ * @deprecated Should use PageBreadcrumbs instead
  */
 const PageHeaderBreadcrumb = ({ className, children, ...props }: PageHeaderBreadcrumbProps) => {
   const { size } = usePageHeaderContext()
@@ -242,6 +244,8 @@ export type PageHeaderNavigationTabsProps = React.ComponentProps<'div'>
  * Navigation component for page header.
  * Container for tab navigation (NavMenu).
  * Should be placed as the last child of PageHeader.
+ *
+ * @deprecated Should use PageNav instead
  */
 const PageHeaderNavigationTabs = ({ className, ...props }: PageHeaderNavigationTabsProps) => {
   const { size } = usePageHeaderContext()
