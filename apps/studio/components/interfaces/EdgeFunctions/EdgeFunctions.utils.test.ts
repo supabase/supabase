@@ -1,6 +1,23 @@
 import { describe, expect, it } from 'vitest'
 
-import { formatFunctionBodyToFiles, getDefaultSelectedFileId } from './EdgeFunctions.utils'
+import {
+  formatFunctionBodyToFiles,
+  getDefaultSelectedFileId,
+  getFallbackImportMapPath,
+} from './EdgeFunctions.utils'
+
+describe('getFallbackImportMapPath', () => {
+  it.each(['deno.json', 'deno.jsonc', 'src/deno.jsonc', 'import_map.json'])(
+    'detects the configuration file %s',
+    (name) => {
+      expect(getFallbackImportMapPath([{ name: 'index.ts' }, { name }])).toBe(name)
+    }
+  )
+
+  it('does not treat an arbitrary character as the configuration file extension separator', () => {
+    expect(getFallbackImportMapPath([{ name: 'denoXjson' }])).toBeUndefined()
+  })
+})
 
 describe('formatFunctionBodyToFiles', () => {
   it('returns no files when there is no entrypoint path', () => {
