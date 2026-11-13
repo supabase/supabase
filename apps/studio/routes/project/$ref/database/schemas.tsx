@@ -1,14 +1,21 @@
 import { createFileRoute } from '@tanstack/react-router'
+import { ReactFlowProvider } from '@xyflow/react'
 
-import SchemasPage from '@/pages/project/[ref]/database/schemas'
+import { SchemaGraph } from '@/components/interfaces/Database/Schemas/SchemaGraph'
 
 export const Route = createFileRoute('/project/$ref/database/schemas')({
-  component: SchemasRoute,
+  component: SchemasPage,
   staticData: {
     databaseLayoutTitle: 'Schema Visualizer',
   },
 })
 
-function SchemasRoute() {
-  return <SchemasPage dehydratedState={undefined} />
+function SchemasPage() {
+  return (
+    <div className="flex w-full h-full flex-col">
+      <ReactFlowProvider>
+        <SchemaGraph />
+      </ReactFlowProvider>
+    </div>
+  )
 }
