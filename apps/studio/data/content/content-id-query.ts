@@ -4,6 +4,7 @@ import { components } from 'api-types'
 import type { Content } from './content-query'
 import { remapSqlContentField, remapWireSnippet } from './content-remap'
 import { contentKeys } from './keys'
+import { isLogsViewContent } from './logs-view-content'
 import type { SnippetWithContent } from './sql-folders-query'
 import { get, handleError } from '@/data/fetchers'
 import type { StudioError } from '@/lib/errors/studio-errors'
@@ -31,6 +32,7 @@ export async function getContentById(
   })
 
   if (error) throw handleError(error)
+  if (isLogsViewContent(data)) throw new Error('Saved log views cannot be opened as SQL queries')
   return remapSqlContentField(data as unknown as GetUserContentByIdResponse)
 }
 
@@ -54,6 +56,7 @@ export async function getSqlSnippetById(
   })
 
   if (error) throw handleError(error)
+  if (isLogsViewContent(data)) throw new Error('Saved log views cannot be opened as SQL queries')
   return remapWireSnippet(data, 'saved')
 }
 

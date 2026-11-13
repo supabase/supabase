@@ -2,6 +2,7 @@ import { useQuery } from '@tanstack/react-query'
 import { operations } from 'api-types'
 
 import { contentKeys } from './keys'
+import { getAllLogContent, isLogsViewContent } from './logs-view-content'
 import { get, handleError } from '@/data/fetchers'
 import type { StudioError } from '@/lib/errors/studio-errors'
 import type { UseCustomQueryOptions } from '@/types'
@@ -16,6 +17,17 @@ export async function getContentCount(
   signal?: AbortSignal
 ) {
   if (typeof projectRef === 'undefined') throw new Error('projectRef is required')
+
+  if (type === 'log_sql') {
+    const rows = (await getAllLogContent({ projectRef, name }, signal)).filter(
+      (row) => !isLogsViewContent(row)
+    )
+    return {
+      favorites: rows.filter((row) => row.favorite).length,
+      private: rows.filter((row) => row.visibility === 'user').length,
+      shared: rows.filter((row) => row.visibility !== 'user').length,
+    }
+  }
 
   const { data, error } = await get('/platform/projects/{ref}/content/count', {
     params: {
