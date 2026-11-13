@@ -269,6 +269,69 @@ withTestDatabase('multi event', async ({ executeQuery }) => {
   expect(result).toBeUndefined()
 })
 
+withTestDatabase('truncate triggers', async ({ executeQuery }) => {
+  // information_schema.triggers has no rows for TRUNCATE events
+  await executeQuery(`
+    create function tr_f() returns trigger language plpgsql as 'begin return null; end';
+    create table t();
+    create trigger tr_truncate before truncate on t execute function tr_f();
+    create trigger tr_insert_or_truncate after insert or truncate on t execute function tr_f();
+  `)
+
+  const { sql: listSql, zod: listZod } = pgMeta.triggers.list({ includedSchemas: ['public'] })
+  const triggers = listZod.parse(await executeQuery(listSql))
+  expect(
+    triggers
+      .map(({ name, events }) => ({ name, events }))
+      .sort((a, b) => a.name.localeCompare(b.name))
+  ).toMatchInlineSnapshot(`
+    [
+      {
+        "events": [
+          "INSERT",
+          "TRUNCATE",
+        ],
+        "name": "tr_insert_or_truncate",
+      },
+      {
+        "events": [
+          "TRUNCATE",
+        ],
+        "name": "tr_truncate",
+      },
+    ]
+  `)
+
+  const { sql: retrieveSql, zod: retrieveZod } = pgMeta.triggers.retrieve({
+    name: 'tr_truncate',
+    table: 't',
+    schema: 'public',
+  })
+  const trigger = retrieveZod.parse((await executeQuery(retrieveSql))[0])
+  expect(trigger).toMatchInlineSnapshot(
+    { id: expect.any(Number), table_id: expect.any(Number) },
+    `
+    {
+      "activation": "BEFORE",
+      "condition": null,
+      "enabled_mode": "ORIGIN",
+      "events": [
+        "TRUNCATE",
+      ],
+      "function_args": [],
+      "function_name": "tr_f",
+      "function_schema": "public",
+      "id": Any<Number>,
+      "name": "tr_truncate",
+      "orientation": "STATEMENT",
+      "schema": "public",
+      "table": "t",
+      "table_id": Any<Number>,
+    }
+    `
+  )
+})
+
 withTestDatabase('triggers with the same name on different schemas', async ({ executeQuery }) => {
   // Create test schemas and triggers
   await executeQuery(`
