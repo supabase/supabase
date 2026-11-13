@@ -41,6 +41,7 @@ import { useDatabaseReport } from '@/data/reports/database-report-query'
 import { useProjectAddonsQuery } from '@/data/subscriptions/project-addons-query'
 import { useCheckEntitlements } from '@/hooks/misc/useCheckEntitlements'
 import { FGA_PERMISSIONS, useAsyncCheckPermissionsV2 } from '@/hooks/misc/useCheckPermissionsV2'
+import { useProjectDiskLimits } from '@/hooks/misc/useProjectDiskLimits'
 import { useRefreshHandler, useReportDateRange } from '@/hooks/misc/useReportDateRange'
 import { useSelectedOrganizationQuery } from '@/hooks/misc/useSelectedOrganization'
 import { useIsHighAvailability, useSelectedProjectQuery } from '@/hooks/misc/useSelectedProject'
@@ -213,6 +214,7 @@ const DatabaseUsage = () => {
   const isSpendCapEnabled = entitledFeatures.includes('database') && !org?.usage_billing_enabled
 
   const showDiskIOBurstBalanceChart = useFlag('showDiskIOBurstBalanceChart')
+  const { limits: projectDiskLimits } = useProjectDiskLimits()
   const showMemoryCommitmentChart = useFlag('showMemoryCommitmentChart')
   const showMemoryCommitmentRiskZones = useFlag('showMemoryCommitmentRiskZones')
   const memoryCommitmentPreview = useMemoryCommitmentPreview(ref)
@@ -231,7 +233,8 @@ const DatabaseUsage = () => {
     isSpendCapEnabled,
     showDiskIOBurstBalanceChart,
     showMemoryCommitmentChart,
-    showMemoryCommitmentRiskZones
+    showMemoryCommitmentRiskZones,
+    projectDiskLimits
   )
 
   const { isPending: isUpdatingDiskSize } = useProjectDiskResizeMutation({
@@ -298,8 +301,7 @@ const DatabaseUsage = () => {
       <ReportHeader showDatabaseSelector title={REPORT_TITLE} />
       <ReportStickyNav
         content={
-          <div className="ml-auto flex items-center gap-2 flex-wrap">
-            <DocsButton href={OBSERVABILITY_DOCS_HREFS.database} topic={REPORT_TITLE} />
+          <div className="w-full flex items-center gap-2 flex-wrap">
             <ShortcutTooltip
               shortcutId={SHORTCUT_IDS.OBSERVABILITY_REFRESH}
               label="Refresh report"
@@ -314,7 +316,7 @@ const DatabaseUsage = () => {
               />
             </ShortcutTooltip>
             <ReportSettings chartId="database-charts" />
-            <div className="flex items-center gap-3">
+            <div className="contents">
               <LogsDatePicker
                 onSubmit={handleDatePickerChange}
                 value={datePickerValue}
@@ -331,7 +333,7 @@ const DatabaseUsage = () => {
                 source="databaseReportDateRange"
               />
               {selectedDateRange && (
-                <div className="flex items-center gap-x-2 text-xs">
+                <div className="order-last flex w-full flex-wrap items-center gap-x-2 text-xs xl:order-none xl:w-auto">
                   <p className="text-foreground-light">
                     {dayjs(selectedDateRange.period_start.date).format('MMM D, h:mma')}
                   </p>
@@ -344,6 +346,11 @@ const DatabaseUsage = () => {
                 </div>
               )}
             </div>
+            <DocsButton
+              href={OBSERVABILITY_DOCS_HREFS.database}
+              topic={REPORT_TITLE}
+              className="ml-auto"
+            />
           </div>
         }
       >
