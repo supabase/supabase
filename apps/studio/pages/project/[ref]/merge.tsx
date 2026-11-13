@@ -87,9 +87,9 @@ const MergePage: NextPageWithLayout = () => {
     projectRef: parentProjectRef,
     isDefault: currentBranch?.is_default,
   })
-  const mergeBranchGrant = useBranchGrant('POST /v1/branches/{branch_id_or_ref}/merge', {
+  // Merging writes to the production branch, so it always needs production permissions
+  const mergeBranchGrant = useGrant('POST /v1/branches/{branch_id_or_ref}/merge', {
     projectRef: parentProjectRef,
-    isDefault: currentBranch?.is_default,
   })
   const diffGrant = useBranchGrant('GET /v1/branches/{branch_id_or_ref}/diff', {
     projectRef: parentProjectRef,
