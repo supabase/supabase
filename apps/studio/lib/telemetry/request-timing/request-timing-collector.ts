@@ -154,7 +154,8 @@ export function createRequestTimingCollector({
     discardAndPause() {
       isPaused = true
       pendingSummaries = []
-      visit = newVisit({ isInitialLoad: visit.isInitialLoad })
+      // The route is still the one the user is on, so a summary after consent returns keeps it
+      visit = newVisit({ isInitialLoad: visit.isInitialLoad, routeTemplate: visit.routeTemplate })
     },
 
     /** Consent granted after a denial. The visit is already clean, nothing was kept while paused. */

@@ -5,31 +5,23 @@ import {
   createRouter,
   RouterContextProvider,
 } from '@tanstack/react-router'
-import { act, renderHook } from '@testing-library/react'
-import { consentState } from 'common'
+import { act, renderHook, waitFor } from '@testing-library/react'
+import { consentState, sendTelemetryEvent } from 'common'
+import { HttpResponse } from 'msw'
 import type { ReactNode } from 'react'
-import { beforeEach, describe, expect, it, vi } from 'vitest'
+import { beforeEach, describe, expect, it } from 'vitest'
 
 import { createRequestTimingCollector } from './request-timing-collector'
 import { useRouteRequestTelemetry } from './use-route-request-telemetry'
+import { API_URL } from '@/lib/constants'
+import { addAPIMock } from '@/tests/lib/msw'
 
-const { sendTelemetryEvent, harness } = vi.hoisted(() => ({
-  sendTelemetryEvent: vi.fn(),
-  harness: { collector: undefined as unknown },
-}))
+interface SentEvent {
+  action: string
+  pathname: string
+  custom_properties: Record<string, unknown>
+}
 
-vi.mock('common', async (importOriginal) => ({
-  ...(await importOriginal<typeof import('common')>()),
-  sendTelemetryEvent,
-}))
-vi.mock('@/lib/telemetry/request-timing/request-timing-collector', async (importOriginal) => ({
-  ...(await importOriginal<typeof import('./request-timing-collector')>()),
-  get requestTimingCollector() {
-    return harness.collector
-  },
-}))
-
-const API_URL = 'https://api.example.com'
 const PROJECT = '/project/abcdefghijklmnopqrst'
 
 // Mirrors how Studio's routes are laid out, including a pathless layout route
@@ -53,7 +45,7 @@ let router: ReturnType<typeof createTestRouter>
 let collector: ReturnType<typeof createRequestTimingCollector>
 
 const renderTelemetryHook = () =>
-  renderHook(() => useRouteRequestTelemetry({ apiUrl: API_URL }), {
+  renderHook(() => useRouteRequestTelemetry({ apiUrl: API_URL, collector }), {
     wrapper: ({ children }: { children: ReactNode }) => (
       <RouterContextProvider router={router}>{children}</RouterContextProvider>
     ),
@@ -86,16 +78,42 @@ const hideTab = () =>
 const loadRequest = () =>
   collector.recordRequest({ endpoint: 'GET /a', startMs: 0, endMs: 10, isError: false })
 
-const sentSummaries = () => sendTelemetryEvent.mock.calls.map(([, event]) => event.properties)
+// Events as they reach the network, through the real consent gate and transport
+let sentEvents: SentEvent[]
+
+const sentSummaries = () =>
+  sentEvents.filter((event) => event.action === 'route_requests_evaluated')
+
+const waitForSummaries = (count: number) =>
+  waitFor(() => expect(sentSummaries().length).toBeGreaterThanOrEqual(count))
+
+// Requests reach the network in the order they were sent, so once this unrelated event has
+// arrived, anything sent before it has too. Lets a test check that nothing was sent.
+const waitForTransportToFlush = async () => {
+  sendTelemetryEvent(API_URL, {
+    action: 'sign_in_button_clicked',
+    properties: { buttonLocation: 'test' },
+  })
+  await waitFor(() =>
+    expect(sentEvents.some((event) => event.action === 'sign_in_button_clicked')).toBe(true)
+  )
+}
 
 beforeEach(async () => {
-  sendTelemetryEvent.mockClear()
+  sentEvents = []
+  addAPIMock({
+    method: 'post',
+    path: '/platform/telemetry/event',
+    response: async ({ request }) => {
+      sentEvents.push((await request.json()) as SentEvent)
+      return HttpResponse.json({})
+    },
+  })
   Object.defineProperty(document, 'visibilityState', { value: 'visible', configurable: true })
 
   router = createTestRouter(PROJECT)
   await router.load()
   collector = createRequestTimingCollector({ isSampled: true, sampleRate: 1 })
-  harness.collector = collector
 })
 
 describe('route visits', () => {
@@ -105,20 +123,19 @@ describe('route visits', () => {
     loadRequest()
 
     await navigate(`${PROJECT}/editor`)
+    await waitForSummaries(1)
 
-    expect(sendTelemetryEvent).toHaveBeenCalledTimes(1)
-    expect(sendTelemetryEvent).toHaveBeenCalledWith(
-      API_URL,
-      {
-        action: 'route_requests_evaluated',
-        properties: expect.objectContaining({
-          routeTemplate: '/project/[ref]',
-          isInitialLoad: true,
-          requestCount: 1,
-        }),
+    expect(sentSummaries()).toHaveLength(1)
+    // The route template is the pathname, so the event never carries the project ref there
+    expect(sentSummaries()[0]).toMatchObject({
+      action: 'route_requests_evaluated',
+      pathname: '/project/[ref]',
+      custom_properties: {
+        routeTemplate: '/project/[ref]',
+        isInitialLoad: true,
+        requestCount: 1,
       },
-      '/project/[ref]'
-    )
+    })
   })
 
   it('attributes the next visit to the route that was navigated to', async () => {
@@ -128,8 +145,9 @@ describe('route visits', () => {
     await navigate(`${PROJECT}/editor`)
     loadRequest()
     await navigate('/org/acme')
+    await waitForSummaries(2)
 
-    expect(sentSummaries()[1]).toMatchObject({
+    expect(sentSummaries()[1].custom_properties).toMatchObject({
       routeTemplate: '/project/[ref]/editor',
       isInitialLoad: false,
       requestCount: 1,
@@ -144,9 +162,10 @@ describe('route visits', () => {
     await navigate(`${PROJECT}?filter=a`)
     loadRequest()
     await navigate('/org/acme')
+    await waitForTransportToFlush()
 
-    expect(sendTelemetryEvent).toHaveBeenCalledTimes(1)
-    expect(sentSummaries()[0]).toMatchObject({ requestCount: 2 })
+    expect(sentSummaries()).toHaveLength(1)
+    expect(sentSummaries()[0].custom_properties).toMatchObject({ requestCount: 2 })
   })
 
   it('starts a new visit when only the project in the path changes', async () => {
@@ -154,8 +173,9 @@ describe('route visits', () => {
     renderTelemetryHook()
 
     await navigate('/project/zyxwvutsrqponmlkjihg')
+    await waitForSummaries(1)
 
-    expect(sendTelemetryEvent).toHaveBeenCalledTimes(1)
+    expect(sentSummaries()).toHaveLength(1)
   })
 
   it('sends the visit when the tab is hidden, and not again for the empty visit after it', async () => {
@@ -167,9 +187,13 @@ describe('route visits', () => {
     act(() => {
       window.dispatchEvent(new Event('pagehide'))
     })
+    await waitForTransportToFlush()
 
-    expect(sendTelemetryEvent).toHaveBeenCalledTimes(1)
-    expect(sentSummaries()[0]).toMatchObject({ routeTemplate: '/project/[ref]', requestCount: 1 })
+    expect(sentSummaries()).toHaveLength(1)
+    expect(sentSummaries()[0].custom_properties).toMatchObject({
+      routeTemplate: '/project/[ref]',
+      requestCount: 1,
+    })
   })
 })
 
@@ -180,12 +204,14 @@ describe('consent', () => {
     loadRequest()
 
     await navigate('/org/acme')
-    expect(sendTelemetryEvent).not.toHaveBeenCalled()
-
     await setConsent('accepted')
+    await waitForSummaries(1)
 
-    expect(sendTelemetryEvent).toHaveBeenCalledTimes(1)
-    expect(sentSummaries()[0]).toMatchObject({ isInitialLoad: true, requestCount: 1 })
+    expect(sentSummaries()).toHaveLength(1)
+    expect(sentSummaries()[0].custom_properties).toMatchObject({
+      isInitialLoad: true,
+      requestCount: 1,
+    })
   })
 
   it('never sends a visit that finished before the user denied consent', async () => {
@@ -196,8 +222,17 @@ describe('consent', () => {
 
     await setConsent('denied')
     await setConsent('accepted')
+    // The next visit is reported, so anything held from before would arrive ahead of it
+    loadRequest()
+    await navigate(`${PROJECT}/editor`)
+    await waitForSummaries(1)
+    await waitForTransportToFlush()
 
-    expect(sendTelemetryEvent).not.toHaveBeenCalled()
+    expect(sentSummaries()).toHaveLength(1)
+    expect(sentSummaries()[0].custom_properties).toMatchObject({
+      routeTemplate: '/org/[slug]',
+      isInitialLoad: false,
+    })
   })
 
   it('discards what the current visit had recorded when consent is denied', async () => {
@@ -208,32 +243,42 @@ describe('consent', () => {
     await setConsent('denied')
     await setConsent('accepted')
     await navigate('/org/acme')
+    await waitForSummaries(1)
 
-    expect(sentSummaries()[0]).toMatchObject({ requestCount: 0 })
+    expect(sentSummaries()[0].custom_properties).toMatchObject({
+      routeTemplate: '/project/[ref]',
+      requestCount: 0,
+    })
   })
 
-  it('sends nothing while consent is denied', async () => {
+  it('does not keep a visit that finished while consent was denied', async () => {
     await setConsent('denied')
     renderTelemetryHook()
     loadRequest()
-
     await navigate('/org/acme')
 
-    expect(sendTelemetryEvent).not.toHaveBeenCalled()
+    await setConsent('accepted')
+    loadRequest()
+    await navigate(`${PROJECT}/editor`)
+    await waitForSummaries(1)
+    await waitForTransportToFlush()
+
+    expect(sentSummaries()).toHaveLength(1)
+    expect(sentSummaries()[0].custom_properties).toMatchObject({ routeTemplate: '/org/[slug]' })
   })
 })
 
 describe('page loads that are not reported', () => {
   it('sends nothing for a page load that was not sampled', async () => {
     collector = createRequestTimingCollector({ isSampled: false, sampleRate: 0.1 })
-    harness.collector = collector
     await setConsent('accepted')
     renderTelemetryHook()
     loadRequest()
 
     await navigate('/org/acme')
     hideTab()
+    await waitForTransportToFlush()
 
-    expect(sendTelemetryEvent).not.toHaveBeenCalled()
+    expect(sentSummaries()).toHaveLength(0)
   })
 })

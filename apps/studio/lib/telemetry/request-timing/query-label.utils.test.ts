@@ -34,6 +34,9 @@ describe('getQueryLabel', () => {
     ['SQL text', ['select * from users']],
     ['an object', [{ search: 'private' }]],
     ['a very long name', ['a'.repeat(41)]],
+    // Shaped like a resource name, which is what an organization slug looks like
+    ['an organization slug', ['acme-corp', 'oauth-apps']],
+    ['a name that is not in the vocabulary', ['some-new-resource']],
     ['no segments', []],
   ])('does not label a key that starts with %s', (_name, queryKey) => {
     expect(getQueryLabel(queryKey)).toBe(UNLABELED_QUERY)
@@ -47,5 +50,6 @@ describe('getQueryLabel', () => {
       'projects'
     )
     expect(getQueryLabel(['projects', 'abcdefghijklmnopqrst', { filter: 'x' }])).toBe('projects')
+    expect(getQueryLabel(['projects', 'abcdefghijklmnopqrst', 'acme-corp'])).toBe('projects')
   })
 })

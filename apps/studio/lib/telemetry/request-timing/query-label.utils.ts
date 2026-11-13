@@ -1,23 +1,16 @@
-// Query keys mix a resource name with values that identify a user, project or organization
-// (refs, slugs, schema and table names, search text, SQL). A label must never carry those, so
-// it is built from an allowlist-shaped reading of the key, not by trusting positions.
-
-// Lowercase words joined by hyphens, e.g. `edge-functions`. No digits, so ids and UUIDs fail.
-const RESOURCE_NAME = /^[a-z]+(-[a-z]+)*$/
-const MAX_SEGMENT_LENGTH = 40
-// Project refs are 20 lowercase letters, which would otherwise pass as a resource name
-const PROJECT_REF_SHAPE = /^[a-z]{20}$/
+import { QUERY_LABEL_VOCABULARY } from './query-label-vocabulary'
 
 // Keys under these start `[scope, <ref or slug>, <resource>, ...]`
 const SCOPES_WITH_IDENTIFIER = new Set(['projects', 'project', 'organizations'])
 
 export const UNLABELED_QUERY = 'unlabeled'
 
+// Query keys mix resource names with values that identify a user, project or organization
+// (refs, slugs, schema and table names, search text, SQL). A label may only contain names from
+// the vocabulary, so a value is never reported just because it looks like a name.
 function asResourceName(segment: unknown): string | undefined {
   if (typeof segment !== 'string') return undefined
-  if (segment.length > MAX_SEGMENT_LENGTH) return undefined
-  if (!RESOURCE_NAME.test(segment) || PROJECT_REF_SHAPE.test(segment)) return undefined
-  return segment
+  return QUERY_LABEL_VOCABULARY.has(segment) ? segment : undefined
 }
 
 /**

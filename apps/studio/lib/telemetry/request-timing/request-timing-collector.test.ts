@@ -161,6 +161,20 @@ describe('consent', () => {
     expect(collector.finishVisit()).toMatchObject({ requestCount: 1 })
   })
 
+  it('keeps the current route when consent is denied and later granted', () => {
+    const collector = createCollector()
+    collector.setRouteTemplate('/project/[ref]/editor')
+
+    collector.discardAndPause()
+    collector.resume()
+    collector.recordRequest(fetchOk(0, 10))
+
+    expect(collector.finishVisit()).toMatchObject({
+      routeTemplate: '/project/[ref]/editor',
+      requestCount: 1,
+    })
+  })
+
   it('holds finished summaries until drained, keeping only the newest few', () => {
     const collector = createCollector()
     for (let index = 1; index <= 7; index++) {

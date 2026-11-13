@@ -4584,7 +4584,10 @@ export interface RouteRequestsEvaluatedEvent {
     /** Requests belonging to endpoints left out of `endpoints` by the cap */
     otherEndpointRequestCount: number
 
-    /** React Query fetches that started during the visit (a retry chain counts once) */
+    /**
+     * React Query fetches that finished during the visit (a retry chain counts once). A fetch
+     * that started on the previous route is counted here, with its full duration and outcome.
+     */
     queryFetchCount: number
     /** Fetches that ended in an error after retries */
     queryErrorCount: number

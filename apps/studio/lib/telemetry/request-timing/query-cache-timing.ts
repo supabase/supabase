@@ -1,4 +1,4 @@
-import type { Mutation, Query, QueryClient } from '@tanstack/react-query'
+import type { Query, QueryClient } from '@tanstack/react-query'
 
 import { getQueryLabel } from './query-label.utils'
 import type { RequestTimingCollector } from './request-timing-collector'
@@ -22,7 +22,7 @@ export function observeQueryClient(
   collector: RequestTimingCollector
 ): () => void {
   const queryStarts = new WeakMap<Query, { startMs: number; isBackgroundRefetch: boolean }>()
-  const mutationStarts = new WeakMap<Mutation<any, any, any, any>, number>()
+  const mutationStarts = new WeakMap<object, number>()
 
   const unsubscribeQueries = queryClient.getQueryCache().subscribe((event) => {
     if (event.type === 'removed') {

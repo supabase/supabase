@@ -3,7 +3,11 @@ import { consentState, sendTelemetryEvent } from 'common'
 import { useEffect } from 'react'
 import { useSnapshot } from 'valtio'
 
-import { requestTimingCollector, type RouteRequestsSummary } from './request-timing-collector'
+import {
+  requestTimingCollector,
+  type RequestTimingCollector,
+  type RouteRequestsSummary,
+} from './request-timing-collector'
 import { toRouteTemplate } from './route-template.utils'
 import { useLatest } from '@/hooks/misc/useLatest'
 
@@ -27,7 +31,14 @@ function sendSummary(apiUrl: string, summary: RouteRequestsSummary) {
  * A visit ends when the pathname changes (query-only changes, such as filters kept in the URL,
  * stay in the same visit) and when the tab is hidden, since that may be the last chance to send.
  */
-export function useRouteRequestTelemetry({ apiUrl }: { apiUrl: string }) {
+export function useRouteRequestTelemetry({
+  apiUrl,
+  collector = requestTimingCollector,
+}: {
+  apiUrl: string
+  /** The page load's collector. Only tests pass another, to control what is sampled. */
+  collector?: RequestTimingCollector
+}) {
   const router = useRouter()
   const { hasConsented, isResolved, showConsentToast } = useSnapshot(consentState)
 
@@ -39,34 +50,32 @@ export function useRouteRequestTelemetry({ apiUrl }: { apiUrl: string }) {
   const hasConsentedRef = useLatest(hasConsented)
 
   useEffect(() => {
-    if (isConsentDenied) requestTimingCollector.discardAndPause()
-    else requestTimingCollector.resume()
-  }, [isConsentDenied])
+    if (isConsentDenied) collector.discardAndPause()
+    else collector.resume()
+  }, [collector, isConsentDenied])
 
   // Visits that finished before consent was given
   useEffect(() => {
     if (!hasConsented) return
 
-    requestTimingCollector
-      .drainQueuedSummaries()
-      .forEach((summary) => sendSummary(apiUrlRef.current, summary))
-  }, [hasConsented, apiUrlRef])
+    collector.drainQueuedSummaries().forEach((summary) => sendSummary(apiUrlRef.current, summary))
+  }, [collector, hasConsented, apiUrlRef])
 
   useEffect(() => {
-    if (!requestTimingCollector.isSampled) return
+    if (!collector.isSampled) return
 
     const setRouteTemplate = () => {
       const leafMatch = router.state.matches[router.state.matches.length - 1]
-      if (leafMatch) requestTimingCollector.setRouteTemplate(toRouteTemplate(leafMatch.fullPath))
+      if (leafMatch) collector.setRouteTemplate(toRouteTemplate(leafMatch.fullPath))
     }
     setRouteTemplate()
 
     const endVisit = (next?: { resumedAfterHidden: boolean }) => {
-      const summary = requestTimingCollector.finishVisit(next)
+      const summary = collector.finishVisit(next)
       if (!summary) return
 
       if (hasConsentedRef.current) sendSummary(apiUrlRef.current, summary)
-      else requestTimingCollector.queueSummary(summary)
+      else collector.queueSummary(summary)
     }
 
     const unsubscribeResolved = router.subscribe('onResolved', ({ fromLocation, pathChanged }) => {
@@ -89,5 +98,5 @@ export function useRouteRequestTelemetry({ apiUrl }: { apiUrl: string }) {
       document.removeEventListener('visibilitychange', handleVisibilityChange)
       window.removeEventListener('pagehide', handlePageHide)
     }
-  }, [router, hasConsentedRef, apiUrlRef])
+  }, [collector, router, hasConsentedRef, apiUrlRef])
 }
