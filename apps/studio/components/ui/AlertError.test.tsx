@@ -5,8 +5,15 @@ import { Button } from 'ui'
 import { expect, test, vi } from 'vitest'
 
 import { AlertError } from './AlertError'
+import { OFFLINE_MESSAGE, USER_FAULT_DESCRIPTION } from './AlertError.utils'
 import { createSupportFormUrl } from '@/components/interfaces/Support/SupportForm.utils'
 import { takeBreadcrumbSnapshot } from '@/lib/breadcrumbs'
+import {
+  NetworkUnreachableError,
+  PlatformError,
+  StudioSqlError,
+  UserSqlError,
+} from '@/lib/errors/studio-errors'
 import { customRender } from '@/tests/lib/custom-render'
 
 vi.mock('@/lib/telemetry/track', () => ({ useTrack: () => vi.fn() }))
@@ -73,4 +80,79 @@ test('support continues the error message inline when instructions are hidden', 
   const link = screen.getByRole('link', { name: 'contact support' })
   expect(link.closest('p')).toHaveTextContent('oh no. If the issue persists, contact support.')
   expect(screen.queryByRole('link', { name: 'Contact support' })).not.toBeInTheDocument()
+})
+
+test('shows request and event IDs and a copy button for a tagged error', () => {
+  const error = new PlatformError({ message: 'Bad gateway', code: 502, requestId: 'req-123' })
+  error.errorEventId = 'evt-456'
+  customRender(<AlertError error={error} subject="Failed to load" />)
+  expect(screen.getByText('Request ID:')).toBeInTheDocument()
+  expect(screen.getByText('req-123')).toBeInTheDocument()
+  expect(screen.getByText('Event ID (before sampling):')).toBeInTheDocument()
+  expect(screen.getByText('evt-456')).toBeInTheDocument()
+  expect(screen.getByRole('button', { name: 'Copy details' })).toBeInTheDocument()
+})
+
+test('omits identifiers that are absent on a tagged error', () => {
+  customRender(<AlertError error={new PlatformError({ message: 'Bad gateway' })} />)
+  expect(screen.queryByText(/Request ID/)).not.toBeInTheDocument()
+  expect(screen.queryByText(/Event ID/)).not.toBeInTheDocument()
+  expect(screen.getByRole('button', { name: 'Copy details' })).toBeInTheDocument()
+})
+
+test('a plain error has no identifiers and no copy button', () => {
+  customRender(<AlertError error={{ message: 'plain' }} />)
+  expect(screen.queryByText(/Request ID|Event ID/)).not.toBeInTheDocument()
+  expect(screen.queryByRole('button', { name: 'Copy details' })).not.toBeInTheDocument()
+})
+
+test('copy details sits alongside additional actions', () => {
+  customRender(
+    <AlertError error={new PlatformError({})} additionalActions={<Button>Retry</Button>} />
+  )
+  expect(screen.getByRole('button', { name: 'Retry' })).toBeInTheDocument()
+  expect(screen.getByRole('button', { name: 'Copy details' })).toBeInTheDocument()
+})
+
+test('offline shows a dedicated message with no support, event ID or copy button', () => {
+  const error = new NetworkUnreachableError({ message: 'Unable to reach', reason: 'offline' })
+  error.errorEventId = 'evt-1'
+  customRender(<AlertError error={error} />)
+  expect(screen.getByText(OFFLINE_MESSAGE)).toBeInTheDocument()
+  expect(screen.queryByText(/Error:/)).not.toBeInTheDocument()
+  expect(screen.queryByText(/contact support/i)).not.toBeInTheDocument()
+  expect(screen.queryByText(/Event ID/)).not.toBeInTheDocument()
+  expect(screen.queryByRole('button', { name: 'Copy details' })).not.toBeInTheDocument()
+})
+
+test('a user-fault error says to try again, with no support, identifiers or copy button', () => {
+  const error = new UserSqlError({ message: 'permission denied for table todos', requestId: 'r1' })
+  error.errorEventId = 'evt-2'
+  customRender(<AlertError error={error} />)
+  expect(screen.getByText('Error: permission denied for table todos')).toBeInTheDocument()
+  expect(screen.getByText(USER_FAULT_DESCRIPTION)).toBeInTheDocument()
+  expect(screen.queryByText(/^Try refreshing your browser/)).not.toBeInTheDocument()
+  expect(screen.queryByText(/contact support/i)).not.toBeInTheDocument()
+  expect(screen.queryByText(/Request ID|Event ID/)).not.toBeInTheDocument()
+  expect(screen.queryByRole('button', { name: 'Copy details' })).not.toBeInTheDocument()
+})
+
+test('Studio SQL that failed on user input (user_input) gets the user-fault presentation', () => {
+  const error = new StudioSqlError({
+    message: 'invalid input syntax for type integer: "abc"',
+    reason: 'user_input',
+    requestId: 'r3',
+  })
+  error.errorEventId = 'evt-3'
+  customRender(<AlertError error={error} />)
+  expect(screen.getByText(USER_FAULT_DESCRIPTION)).toBeInTheDocument()
+  expect(screen.queryByText(/Request ID|Event ID/)).not.toBeInTheDocument()
+  expect(screen.queryByRole('button', { name: 'Copy details' })).not.toBeInTheDocument()
+})
+
+test('caller props win over the tag defaults', () => {
+  const error = new UserSqlError({ message: 'x' })
+  customRender(<AlertError error={error} description="Custom." />)
+  expect(screen.getByText('Custom.')).toBeInTheDocument()
+  expect(screen.queryByText(USER_FAULT_DESCRIPTION)).not.toBeInTheDocument()
 })

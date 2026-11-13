@@ -173,7 +173,6 @@ export const StoragePolicies = () => {
               projectRef: project?.ref,
               connectionString: project?.connectionString,
               payload,
-              sqlOrigin: 'user',
             })
             return false
           } catch (error: any) {
@@ -197,7 +196,6 @@ export const StoragePolicies = () => {
         projectRef: project?.ref,
         connectionString: project?.connectionString,
         payload,
-        sqlOrigin: 'user',
       })
       return false
     } catch (error: any) {
@@ -222,7 +220,6 @@ export const StoragePolicies = () => {
         connectionString: project?.connectionString,
         originalPolicy: selectedPolicyToEdit,
         payload,
-        sqlOrigin: 'user',
       })
       return false
     } catch (error: any) {

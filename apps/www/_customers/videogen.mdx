@@ -31,9 +31,13 @@ region: 'North America'
 supabase_products: ['database', 'auth', 'realtime', 'vector']
 ---
 
-> If we stuck with Firebase, maybe we would have had some more growth in the short term, but we would have been in a much worse position today.
->
-> _— David Grossman, Co-founder and CTO, VideoGen_
+<Quote>
+
+If we stuck with Firebase, maybe we would have had some more growth in the short term, but we would have been in a much worse position today.
+
+<div className="mt-4">David Grossman, Co-founder and CTO, VideoGen</div>
+
+</Quote>
 
 [VideoGen](https://videogen.io) is an AI-native, browser-based platform for creating, editing, and generating videos. Users start from a script, a voiceover, a prompt, a screen recording, or a set of slides, and VideoGen turns it into a finished video.
 
@@ -45,9 +49,13 @@ VideoGen reached 1 million users with one core feature, turning a script into a 
 
 Building the Teams plan is what exposed Firebase's limits, because every user, team, and project had to stay linked to one another, and Firebase stores data as separate documents, which made those links difficult to build and maintain.
 
-> It was going to be very clunky in this document-based structure, and we just needed a proper relational database.
->
-> _— David Grossman, Co-founder and CTO, VideoGen_
+<Quote>
+
+It was going to be very clunky in this document-based structure, and we just needed a proper relational database.
+
+<div className="mt-4">David Grossman, Co-founder and CTO, VideoGen</div>
+
+</Quote>
 
 The team had seen a similar scenario play out before at another organization, where a document database on a Teams plan led to orphaned documents and constant data problems. That experience made staying on Firebase a bigger risk.
 
@@ -63,15 +71,23 @@ The VideoGen app also runs a lot of vector search, which is why David calls Post
 
 The team started from Supabase's published examples for moving Firebase users, including email and password and Google sign-in, plus documents. At 3.3 million users, VideoGen was well beyond the scale those examples were built for, and the team ran into sharding problems that put the first estimate for the migration at a full day.
 
-> When we were first speccing the migration, we thought the approach we had was going to take a full day. We've got to cut this down to less than 20 minutes.
->
-> _— David Grossman, Co-founder and CTO, VideoGen_
+<Quote>
+
+When we were first speccing the migration, we thought the approach we had was going to take a full day. We've got to cut this down to less than 20 minutes.
+
+<div className="mt-4">David Grossman, Co-founder and CTO, VideoGen</div>
+
+</Quote>
 
 To get there, the team copied data across in the background ahead of time so the cutover itself only had to move what was left. Two engineers did the work and rehearsed with dry runs before the real cutover. On the night, the cutover took about 20 minutes with no downtime or data loss. The team also learned a lesson about data design, because on Firebase each project lived in a JSON blob with no separate columns to update on their own, and the first plan for Supabase kept a similar structure. They later split the data into proper columns, and David says he would go further next time.
 
-> It's natural to take your Firebase structure and copy it one-to-one onto Supabase, but to get the most benefit you want to think it through from the ground up as much as possible.
->
-> _— David Grossman, Co-founder and CTO, VideoGen_
+<Quote>
+
+It's natural to take your Firebase structure and copy it one-to-one onto Supabase, but to get the most benefit you want to think it through from the ground up as much as possible.
+
+<div className="mt-4">David Grossman, Co-founder and CTO, VideoGen</div>
+
+</Quote>
 
 ### The stack today
 
@@ -79,17 +95,25 @@ Today VideoGen runs on TypeScript, React, and Supabase, with serverless services
 
 Realtime powers the collaboration within VideoGen, so pages update live and teams of users can edit the same project at once.
 
-> Multiple users on a team can be in the same project. One person types something, and it gets broadcast instantly, like Google Docs or Figma.
->
-> _— David Grossman, Co-founder and CTO, VideoGen_
+<Quote>
+
+Multiple users on a team can be in the same project. One person types something, and it gets broadcast instantly, like Google Docs or Figma.
+
+<div className="mt-4">David Grossman, Co-founder and CTO, VideoGen</div>
+
+</Quote>
 
 ## Building for scale, speed, and revenue
 
 VideoGen has grown from 3 million users at the time of the migration to now more than 5 million, and the database has scaled reliably along the way.
 
-> Supabase makes the migrations super easy, and the auto-scaling of the disk and the compute is literally one click.
->
-> _— David Grossman, Co-founder and CTO, VideoGen_
+<Quote>
+
+Supabase makes the migrations super easy, and the auto-scaling of the disk and the compute is literally one click.
+
+<div className="mt-4">David Grossman, Co-founder and CTO, VideoGen</div>
+
+</Quote>
 
 The bigger change is what VideoGen can build with Supabase. When using Firebase, one JSON blob represented a whole project, while on Supabase a project works like a browser with a tab for each artifact, so a user can build one workflow and produce 10 videos from it.
 
