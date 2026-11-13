@@ -1,31 +1,20 @@
 import { afterAll, expect, test } from 'vitest'
 
-<<<<<<< HEAD
 import {
   getEntitiesByIdsSQL,
   getEntityTypesSQL,
   getPartitionCountSQL,
   getPartitionInfoSQL,
 } from '../../../src'
-=======
-import { getEntityTypesSQL } from '../../../src'
->>>>>>> master
 import { cleanupRoot, createTestDatabase } from '../../db/utils'
 
 afterAll(async () => {
   await cleanupRoot()
 })
 
-<<<<<<< HEAD
 type TestDatabase = Awaited<ReturnType<typeof createTestDatabase>>
 
 const withTestDatabase = (name: string, fn: (db: TestDatabase) => Promise<void>) => {
-=======
-const withTestDatabase = (
-  name: string,
-  fn: (db: Awaited<ReturnType<typeof createTestDatabase>>) => Promise<void>
-) => {
->>>>>>> master
   test(name, async () => {
     const db = await createTestDatabase()
     try {
@@ -44,25 +33,17 @@ type EntityTypesRow = {
 }
 
 const listEntities = async (
-<<<<<<< HEAD
   db: TestDatabase,
   namePrefix: string,
   { excludePartitions = false, parentId }: { excludePartitions?: boolean; parentId?: number } = {}
-=======
-  db: Awaited<ReturnType<typeof createTestDatabase>>,
-  namePrefix: string
->>>>>>> master
 ) => {
   const [row] = await db.executeQuery<EntityTypesRow[]>(
     getEntityTypesSQL({
       schemas: ['public'],
       sort: 'alphabetical',
       filterTypes: ['r', 'v', 'm', 'f', 'p'],
-<<<<<<< HEAD
       excludePartitions,
       parentId,
-=======
->>>>>>> master
       search: namePrefix,
       limit: 100,
       page: 0,
@@ -100,7 +81,6 @@ withTestDatabase('does not flag non-table relations as partitions', async (db) =
 
   expect(await listEntities(db, 'tone_')).toEqual(['tone_base r', 'tone_matview m', 'tone_view v'])
 })
-<<<<<<< HEAD
 
 const oidOf = async (db: TestDatabase, name: string) => {
   const [{ oid }] = await db.executeQuery<{ oid: number }[]>(
@@ -210,5 +190,3 @@ withTestDatabase(
     ).toEqual(['cross_child r partition'])
   }
 )
-=======
->>>>>>> master
