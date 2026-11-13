@@ -23,7 +23,11 @@ import { FormItemLayout } from 'ui-patterns/form/FormItemLayout/FormItemLayout'
 import { z } from 'zod'
 
 import { ORG_SIZE_DEFAULT, ORG_SIZE_TYPES } from '../Organization/NewOrg/OrganizationDetailsFields'
-import { BUILDING_OPTIONS, SURVEY_ORG_KIND_OPTIONS } from './OnboardingSurvey.constants'
+import {
+  BUILDING_OPTIONS,
+  CAN_CODE_OPTIONS,
+  SURVEY_ORG_KIND_OPTIONS,
+} from './OnboardingSurvey.constants'
 import { OnboardingSurveySelect } from './OnboardingSurveySelect'
 import { FormSectionCollapse } from '@/components/ui/FormSectionCollapse'
 
@@ -33,6 +37,7 @@ const FormSchema = z.object({
   kind: z.string(),
   size: z.string(),
   building: z.string(),
+  can_code: z.string(),
 })
 
 export type OnboardingSurveyFollowUpValues = z.infer<typeof FormSchema>
@@ -41,6 +46,7 @@ const defaultValues: OnboardingSurveyFollowUpValues = {
   kind: '',
   size: ORG_SIZE_DEFAULT,
   building: '',
+  can_code: '',
 }
 
 type OnboardingSurveyFollowUpDialogProps = {
@@ -62,11 +68,11 @@ export function OnboardingSurveyFollowUpDialog({
     defaultValues,
   })
 
-  const [kind, building] = useWatch({
+  const [kind, building, canCode] = useWatch({
     control: form.control,
-    name: ['kind', 'building'],
+    name: ['kind', 'building', 'can_code'],
   })
-  const hasAnswer = kind !== '' || building !== ''
+  const hasAnswer = kind !== '' || building !== '' || canCode !== ''
 
   return (
     <Dialog open={open} onOpenChange={(isOpen) => !isOpen && onClose()}>
@@ -82,7 +88,6 @@ export function OnboardingSurveyFollowUpDialog({
                 All questions are optional. Your answers help us improve Supabase.
               </p>
 
-              {/* Each question appears once the one before it is answered */}
               <div>
                 <FormField
                   control={form.control}
@@ -131,29 +136,41 @@ export function OnboardingSurveyFollowUpDialog({
                   )}
                 </AnimatePresence>
 
-                <AnimatePresence initial={false}>
-                  {kind !== '' && (
-                    <FormSectionCollapse>
-                      <div className="pt-5">
-                        <FormField
-                          control={form.control}
-                          name="building"
-                          render={({ field }) => (
-                            <FormItemLayout label="What are you building?" layout="vertical">
-                              <FormControl>
-                                <OnboardingSurveySelect
-                                  value={field.value}
-                                  onValueChange={field.onChange}
-                                  options={BUILDING_OPTIONS}
-                                />
-                              </FormControl>
-                            </FormItemLayout>
-                          )}
-                        />
-                      </div>
-                    </FormSectionCollapse>
-                  )}
-                </AnimatePresence>
+                <div className="pt-5">
+                  <FormField
+                    control={form.control}
+                    name="building"
+                    render={({ field }) => (
+                      <FormItemLayout label="What are you building?" layout="vertical">
+                        <FormControl>
+                          <OnboardingSurveySelect
+                            value={field.value}
+                            onValueChange={field.onChange}
+                            options={BUILDING_OPTIONS}
+                          />
+                        </FormControl>
+                      </FormItemLayout>
+                    )}
+                  />
+                </div>
+
+                <div className="pt-5">
+                  <FormField
+                    control={form.control}
+                    name="can_code"
+                    render={({ field }) => (
+                      <FormItemLayout label="Do you know how to code?" layout="vertical">
+                        <FormControl>
+                          <OnboardingSurveySelect
+                            value={field.value}
+                            onValueChange={field.onChange}
+                            options={CAN_CODE_OPTIONS}
+                          />
+                        </FormControl>
+                      </FormItemLayout>
+                    )}
+                  />
+                </div>
               </div>
             </DialogSection>
           </form>

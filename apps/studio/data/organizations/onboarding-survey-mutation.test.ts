@@ -36,6 +36,18 @@ describe('submitOnboardingSurvey', () => {
     ])
   })
 
+  it('sends can_code in the same request as the other answers', async () => {
+    const requests = mockSurveyEndpoint()
+
+    await submitOnboardingSurvey({ slug: 'acme', building: 'b2b_saas', can_code: 'no' })
+    await submitOnboardingSurvey({ slug: 'acme', building: 'b2b_saas', can_code: '' })
+
+    expect(requests).toEqual([
+      { slug: 'acme', building: 'b2b_saas', can_code: 'no' },
+      { slug: 'acme', building: 'b2b_saas' },
+    ])
+  })
+
   it('rejects when the request fails, so callers can keep the answers', async () => {
     mockSurveyEndpoint(500)
 
