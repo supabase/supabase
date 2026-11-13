@@ -231,7 +231,8 @@ create policy "Policy name."
   as restrictive -- very important!
   to authenticated
   using
-    (array[(select auth.jwt()->>'aal')] <@ (
+    ((select private.current_user_created_at()) is not null
+     and array[(select auth.jwt()->>'aal')] <@ (
        select
          case
            when (select private.current_user_created_at()) >= '2022-12-12T00:00:00Z'
@@ -244,6 +245,9 @@ create policy "Policy name."
 - The policy will accept both `aal1` and `aal2` for users with a `created_at`
   timestamp prior to 12th December 2022 at 00:00 UTC, but will only accept
   `aal2` for all other timestamps.
+- If the JWT subject has no matching `auth.users` row, such as a deleted user
+  with an unexpired token, the helper returns `NULL`. The `is not null` guard
+  makes the policy deny access rather than allow both `aal1` and `aal2`.
 - The helper function must be owned by a role that can read `auth.users`, such as
   `postgres`. It only returns the calling user's `created_at`.
 - The helper lives in the `private` schema, which is not exposed through the Data
