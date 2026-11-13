@@ -18,6 +18,7 @@ import {
   Input,
 } from 'ui'
 import { ConfirmationModal } from 'ui-patterns/Dialogs/ConfirmationModal'
+import { EmptyStatePresentational } from 'ui-patterns/EmptyStatePresentational'
 
 import { type LogsView } from '../UnifiedLogs.views'
 import { ButtonTooltip } from '@/components/ui/ButtonTooltip'
@@ -210,9 +211,16 @@ export const LogsViewsMenu = ({
             </DropdownMenuItem>
           )}
           {!isLoading && !isError && views.length === 0 && (
-            <DropdownMenuItem disabled className="text-foreground-light">
-              No saved views yet
-            </DropdownMenuItem>
+            <div className="py-2">
+              <EmptyStatePresentational
+                icon={BookmarkIcon}
+                iconSize={20}
+                title="No saved views"
+                description="Start by configuring 2 or more filters."
+                className="border-0 bg-transparent px-4 py-2"
+                contentClassName="gap-y-1 [&_h3]:text-sm [&_p]:text-xs"
+              />
+            </div>
           )}
           {!isLoading &&
             !isError &&
