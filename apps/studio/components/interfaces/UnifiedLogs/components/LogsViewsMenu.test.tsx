@@ -45,7 +45,7 @@ describe('LogsViewsMenu', () => {
 
     await openMenu()
 
-    expect(await screen.findByText('No saved views yet')).toBeInTheDocument()
+    expect(await screen.findByText("You haven't saved any views yet")).toBeInTheDocument()
   })
 
   it('shows a loading state', async () => {
