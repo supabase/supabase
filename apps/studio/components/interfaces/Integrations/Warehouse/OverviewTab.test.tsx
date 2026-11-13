@@ -266,7 +266,22 @@ describe('WarehouseOverviewTab', () => {
     expect(screen.queryByText('Picker error: Initial setup failed')).not.toBeInTheDocument()
   })
 
-  test('shows Status, Tables, Connect, then Disable once setup is complete', async () => {
+  test('shows Tables, Status and full workload previews before setup', async () => {
+    mockSetupStatus({ setup_status: 'not_started' })
+    customRender(<WarehouseOverviewTab />)
+    expect(await screen.findByRole('group', { name: 'Workload preview' })).toBeInTheDocument()
+    const headings = screen
+      .getAllByRole('heading')
+      .map((heading) => heading.textContent)
+      .filter((heading) => ['Tables', 'Status', 'Workload'].includes(heading ?? ''))
+    expect(headings).toEqual(['Tables', 'Status', 'Workload'])
+    expect(screen.getByRole('img', { name: 'Replication status preview' })).toBeInTheDocument()
+    expect(
+      screen.queryByText('Replication status appears here after you set up Warehouse.')
+    ).not.toBeInTheDocument()
+  })
+
+  test('shows Tables, Status, Workload, Connect, then Disable once setup is complete', async () => {
     mockSetupStatus({
       setup_status: 'complete',
       tables: [
@@ -292,7 +307,7 @@ describe('WarehouseOverviewTab', () => {
     customRender(<WarehouseOverviewTab />)
 
     // findByRole throws on duplicates, so this also guards the section titles staying distinct.
-    for (const name of ['Status', 'Tables', 'Connect', 'Disable']) {
+    for (const name of ['Tables', 'Status', 'Workload', 'Connect', 'Disable']) {
       expect(await screen.findByRole('heading', { name })).toBeInTheDocument()
     }
     expect(screen.getByText('Replicated tables picker')).toBeInTheDocument()
@@ -307,9 +322,11 @@ describe('WarehouseOverviewTab', () => {
     const headings = screen
       .getAllByRole('heading')
       .map((heading) => heading.textContent)
-      .filter((heading) => ['Status', 'Tables', 'Connect', 'Disable'].includes(heading ?? ''))
+      .filter((heading) =>
+        ['Tables', 'Status', 'Workload', 'Connect', 'Disable'].includes(heading ?? '')
+      )
 
-    expect(headings).toEqual(['Status', 'Tables', 'Connect', 'Disable'])
+    expect(headings).toEqual(['Tables', 'Status', 'Workload', 'Connect', 'Disable'])
   })
 
   test('tracks initial setup as enablement', async () => {
