@@ -5,8 +5,7 @@ import { BASE_PATH, IS_PLATFORM } from '@/lib/constants'
 // [Ivan] Serve the Monaco assets locally from the public folder for self-hosted deployments, but use the CDN for
 // the platform deployment to reduce bundle size and improve caching.
 //
-// Shared by both runtime entry points — `pages/_app.tsx` (Next) and
-// `routes/__root.tsx` (TanStack) — so the asset path can't drift between them.
+// Called from `routes/__root.tsx`.
 export function configureMonacoLoader() {
   if (typeof window !== 'undefined') {
     loader.config({

@@ -7,10 +7,8 @@ import { createMiddleware, createStart } from '@tanstack/react-start'
 import { BASE_PATH, IS_PLATFORM } from '@/lib/constants'
 import { isHostedSupportedApiPath } from '@/lib/hosted-api-allowlist'
 
-// Self-hosted-only API routes must 404 in platform (hosted) mode. Under the
-// Next pages router this lives in middleware (proxy.ts); TanStack Start has no
-// middleware runtime, so it's a global request middleware sharing the same
-// allowlist (lib/hosted-api-allowlist.ts). On Vercel every `/api/*` request
+// Self-hosted-only API routes must 404 in platform (hosted) mode, via a
+// global request middleware using the allowlist in lib/hosted-api-allowlist.ts. On Vercel every `/api/*` request
 // still reaches the function (pages are a static shell), so this covers all
 // API routes from one place.
 

@@ -16,7 +16,7 @@ import type { McpOnCopyCallback } from '../types'
  * instructions module stays importable by the Node markdown build, which can't
  * resolve static png imports.
  */
-const INSTRUCTION_ASSETS: Record<string, StaticImageData> = {
+const INSTRUCTION_ASSETS: Record<string, StaticImageData | string> = {
   'antigravity-auth': antigravityAuthenticateScreenshot,
 }
 

@@ -214,13 +214,12 @@ export const AIEditor = ({
     })
 
     if (language === 'javascript' || language === 'typescript') {
-      // The Deno libs load as raw text — via the raw-loader rules in
-      // next.config.ts (Next/turbopack) and the `rawTextLoader` plugin in
-      // vite.config.ts (TanStack/Vite) — and are registered as Monaco extra
-      // libs. The specifiers must stay string literals so both bundlers can
-      // statically analyze and code-split them; the `as string` cast keeps
+      // The Deno libs load as raw text via the `rawTextLoader` plugin in
+      // vite.config.ts and are registered as Monaco extra libs. The
+      // specifiers must stay string literals so the bundler can statically
+      // analyze and code-split them; the `as string` cast keeps
       // tsc from resolving the `.d.ts` files as declaration files (TS2846 /
-      // "not a module") while erasing to a plain literal for the bundlers.
+      // "not a module") while erasing to a plain literal for the bundler.
       const denoTypeLibs: Record<string, Promise<{ default: string }>> = {
         'edge-runtime': import('@/public/deno/edge-runtime.d.ts' as string),
         'lib.deno': import('@/public/deno/lib.deno.d.ts' as string),

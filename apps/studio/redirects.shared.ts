@@ -1,11 +1,10 @@
-// Shared redirect tables consumed by both `next.config.ts` (the Next.js
-// build) and `vercel.ts` (the TanStack/Vercel deploy). Defined once here
-// so the two configs don't drift.
+// Redirect tables consumed by `vercel.ts` (the Vercel edge) and
+// `routes/__root.tsx` (`matchRedirect`, for the Node server and client-side
+// navigation). Defined once here so the two don't drift.
 //
-// Shape mirrors Next's `redirects()` entry and Vercel's `Redirect` type
-// (they're identical — `source`, `destination`, `permanent`, optional
-// `has`). Basepath handling differs between the two: Next auto-prefixes,
-// Vercel doesn't — each consumer is responsible for that.
+// Shape mirrors Vercel's `Redirect` type (`source`, `destination`,
+// `permanent`, optional `has`). Vercel doesn't apply the basePath, so
+// `vercel.ts` prefixes it.
 
 export interface StudioRedirect {
   source: string
@@ -487,7 +486,7 @@ function hasQueryMatches(
 // win; params consumed by the matched rule (its `has` query keys) are
 // dropped; a hash on the destination wins over the incoming one. `hash` is
 // the bare fragment without the leading `#`. Runtime-agnostic (also usable
-// from next.config / Vercel edge). Exported for unit tests.
+// from the Vercel edge). Exported for unit tests.
 export function preserveQueryAndHash(
   destination: string,
   search: URLSearchParams | Record<string, string | string[] | undefined>,
