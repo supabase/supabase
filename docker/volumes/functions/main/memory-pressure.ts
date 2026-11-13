@@ -1,3 +1,5 @@
+import { logInternal } from './logging.ts'
+
 const CHECK_INTERVAL_MS = 1_000
 const PRESSURE_THRESHOLD = 0.8
 const CLEANUP_TIMEOUT_MS = 1_000
@@ -20,7 +22,7 @@ export function startMemoryPressureLoop(): void {
     try {
       const max = (await Deno.readTextFile('/sys/fs/cgroup/memory.max')).trim()
       if (max === 'max') {
-        console.warn('Memory pressure monitor disabled: a finite memory limit is required')
+        logInternal('main', 'warning', 'Memory pressure monitor disabled: a finite memory limit is required')
         return
       }
       const current = (await Deno.readTextFile('/sys/fs/cgroup/memory.current')).trim()
@@ -32,7 +34,7 @@ export function startMemoryPressureLoop(): void {
       const workingSetBytes = Math.max(0, currentBytes - inactiveFileBytes)
       // Logged once so operators (and test-container-logs.sh) can confirm monitoring is on.
       if (!activeReported) {
-        console.log(`Memory pressure monitor active (limit ${limitBytes} bytes)`)
+        logInternal('main', 'info', `Memory pressure monitor active (limit ${limitBytes} bytes)`)
         activeReported = true
       }
 
@@ -41,7 +43,9 @@ export function startMemoryPressureLoop(): void {
         const acknowledged = await EdgeRuntime.userWorkers.tryCleanupIdleWorkers(CLEANUP_TIMEOUT_MS)
         EdgeRuntime.miCollect()
         if (acknowledged > 0) {
-          console.warn(
+          logInternal(
+            'main',
+            'warning',
             `Memory pressure: working set ${workingSetBytes} / ${limitBytes} bytes before cleanup; ` +
               `${acknowledged} worker(s) acknowledged retirement`
           )
@@ -50,12 +54,12 @@ export function startMemoryPressureLoop(): void {
       errorReported = false
     } catch (error) {
       if (error instanceof Deno.errors.NotFound || error instanceof Deno.errors.PermissionDenied) {
-        console.warn(`Memory pressure monitor disabled: ${error}`)
+        logInternal('main', 'warning', 'Memory pressure monitor disabled', error)
         return
       }
       delay = RETRY_INTERVAL_MS
       if (!errorReported) {
-        console.warn(`Memory pressure monitor failed; retrying: ${error}`)
+        logInternal('main', 'warning', 'Memory pressure monitor failed; retrying', error)
         errorReported = true
       }
     }
