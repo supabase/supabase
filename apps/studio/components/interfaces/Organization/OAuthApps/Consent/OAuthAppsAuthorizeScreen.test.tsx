@@ -3,10 +3,7 @@ import { describe, expect, test, vi } from 'vitest'
 
 import { OAuthAppsAuthorizeScreen } from './OAuthAppsAuthorizeScreen'
 import { MAX_SELECTED_PROJECTS } from './ProjectMultiSelect'
-import {
-  getMockOAuthAppsAuthorizeRequest,
-  OAUTH_APPS_MOCK_SCENARIOS,
-} from '@/data/oauth-apps/mocks'
+import { OAUTH_APPS_MOCK_SCENARIOS } from '@/data/oauth-apps/mocks'
 import type { OAuthAppsAuthorizeRequest } from '@/data/oauth-apps/types'
 import { customRender } from '@/tests/lib/custom-render'
 
@@ -19,14 +16,12 @@ type RenderScreenOptions = {
 
 function renderScreen({
   authId = OAUTH_APPS_MOCK_SCENARIOS.vercelDeveloper,
-  request,
   organizationSlug,
   projectRef,
 }: RenderScreenOptions = {}) {
   return customRender(
     <OAuthAppsAuthorizeScreen
       authId={authId}
-      request={request ?? getMockOAuthAppsAuthorizeRequest(authId)}
       organizationSlug={organizationSlug}
       projectRef={projectRef}
       navigate={vi.fn()}

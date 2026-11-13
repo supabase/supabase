@@ -6,7 +6,6 @@ import { ApiAuthorizationScreen } from '@/components/interfaces/ApiAuthorization
 import { ApiAuthorizationLoadingScreen } from '@/components/interfaces/ApiAuthorization/ApiAuthorization.Loading'
 import { OAuthAppsAuthorizeScreen } from '@/components/interfaces/Organization/OAuthApps/Consent'
 import { OAUTH_APPS_MOCK_SCENARIOS, USE_MOCKS } from '@/data/oauth-apps/mocks'
-import { useOAuthAppsAuthorizeRequestQuery } from '@/data/oauth-apps/oauth-apps-authorize-request-query'
 import { withAuth } from '@/hooks/misc/withAuth'
 import { buildStudioPageTitle } from '@/lib/page-title'
 import type { NextPageWithLayout } from '@/types'
@@ -44,11 +43,6 @@ const APIAuthorizationPage: NextPageWithLayout = () => {
   const projectRefParam = router.query.project_ref
   const projectRef = (Array.isArray(projectRefParam) ? projectRefParam[0] : projectRefParam) ?? null
 
-  const { data: request } = useOAuthAppsAuthorizeRequestQuery(
-    { id: authId },
-    { enabled: isScopedOAuthFlowEnabled }
-  )
-
   if (!routerReady) {
     return (
       <>
@@ -61,17 +55,6 @@ const APIAuthorizationPage: NextPageWithLayout = () => {
   }
 
   if (isScopedOAuthFlowEnabled) {
-    if (!authId || !request) {
-      return (
-        <>
-          <Head>
-            <title>{PAGE_TITLE}</title>
-          </Head>
-          <ApiAuthorizationLoadingScreen />
-        </>
-      )
-    }
-
     return (
       <>
         <Head>
@@ -79,7 +62,6 @@ const APIAuthorizationPage: NextPageWithLayout = () => {
         </Head>
         <OAuthAppsAuthorizeScreen
           authId={authId}
-          request={request}
           organizationSlug={organizationSlug}
           projectRef={projectRef}
           navigate={(destination) => router.push(destination)}
