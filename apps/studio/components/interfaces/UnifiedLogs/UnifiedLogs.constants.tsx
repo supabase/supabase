@@ -53,6 +53,11 @@ export const LOG_TYPE_TO_SOURCE: Record<Exclude<LogType, 'compute'>, string> = {
   pipelines: 'etl_replication_logs',
 }
 
+export const METRICS_REQUESTS_RULE = {
+  pathname: '/customer/v1/privileged/metrics',
+  statuses: ['200'],
+} as const
+
 const parseAsSort = createParser({
   parse(queryValue: string) {
     const [id, desc] = queryValue.split(SORT_DELIMITER)
@@ -97,6 +102,9 @@ export const SEARCH_PARAMS_PARSER = {
   edge_auth: parseAsBoolean.withDefault(true),
   edge_storage: parseAsBoolean.withDefault(true),
   edge_postgrest: parseAsBoolean.withDefault(true),
+  show_privileged_metrics_requests: parseAsBoolean
+    .withDefault(false)
+    .withOptions({ clearOnDefault: false }),
 
   // Support searching for user against user ID
   // See userAttributionCondition in UnifiedLogs.queries.ts.

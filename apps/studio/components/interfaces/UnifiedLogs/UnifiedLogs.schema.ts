@@ -113,5 +113,8 @@ export const querySearchParamsSchema = z.object({
   edge_auth: z.boolean().default(SEARCH_PARAMS_PARSER.edge_auth.defaultValue),
   edge_storage: z.boolean().default(SEARCH_PARAMS_PARSER.edge_storage.defaultValue),
   edge_postgrest: z.boolean().default(SEARCH_PARAMS_PARSER.edge_postgrest.defaultValue),
+  show_privileged_metrics_requests: z
+    .boolean()
+    .default(SEARCH_PARAMS_PARSER.show_privileged_metrics_requests.defaultValue),
   user: z.string().optional(),
 })

@@ -99,7 +99,7 @@ export function DataTableFilterCheckboxAsync<TData>({
                     )}
                   </div>
                   <span className="shrink-0 flex items-center justify-center font-mono text-xs group-hover:opacity-0">
-                    {'count' in option ? formatCompactNumber(option.count) : null}
+                    {option.count !== undefined ? formatCompactNumber(option.count) : null}
                   </span>
                   <button
                     type="button"

@@ -1,6 +1,10 @@
 import dayjs from 'dayjs'
 
-import { DEFAULT_LOG_TYPES, LOG_TYPE_TO_SOURCE } from './UnifiedLogs.constants'
+import {
+  DEFAULT_LOG_TYPES,
+  LOG_TYPE_TO_SOURCE,
+  METRICS_REQUESTS_RULE,
+} from './UnifiedLogs.constants'
 import {
   getLogAttributeKey,
   groupLogsFiltersByColumn,
@@ -393,7 +397,10 @@ const buildBaseWhere = (
   }
 
   const scope = getUnifiedLogsScopeCondition(search.scope)
-  if (scope) parts.push(scope)
+  if (scope) {
+    parts.push(scope)
+    if (scope === NO_ROWS) return parts
+  }
 
   for (const [key, { operator, values }] of Object.entries(grouped)) {
     if (key === excludeField) continue
@@ -478,6 +485,11 @@ export const isUserFilterUnreachable = (search: QuerySearchParamsType): boolean 
   return !sources.some((source) => USER_ATTRIBUTABLE_SOURCES.has(source))
 }
 
+const METRICS_REQUEST_CONDITION = safeSql`source = 'edge_logs' AND ${ATTR.path} = ${lit(METRICS_REQUESTS_RULE.pathname)} AND ${ATTR.status} IN (${joinSqlFragments(
+  METRICS_REQUESTS_RULE.statuses.map((status) => lit(status)),
+  ','
+)})`
+
 const applySearchParamsFilter = (search: QuerySearchParamsType): SafeLogSqlFragment | null => {
   const conditions: SafeLogSqlFragment[] = []
 
@@ -491,6 +503,15 @@ const applySearchParamsFilter = (search: QuerySearchParamsType): SafeLogSqlFragm
       event_message NOT LIKE 'connection authenticated%' AND
       event_message NOT LIKE 'connection authorized%'
     ))`)
+  }
+
+  if (search.show_privileged_metrics_requests === false) {
+    conditions.push(
+      safeSql`(source != 'edge_logs' OR NOT coalesce((${ATTR.path} = ${lit(METRICS_REQUESTS_RULE.pathname)} AND ${ATTR.status} IN (${joinSqlFragments(
+        METRICS_REQUESTS_RULE.statuses.map((status) => lit(status)),
+        ','
+      )})), false))`
+    )
   }
 
   // Visible by default — only an explicit `false` hides that service's
@@ -630,6 +651,12 @@ HAVING value != ''
     else baseFacets.push(facet)
   }
   blocks.push(scanBlock(baseFacets, whereFor()))
+
+  const metricsConditions = buildBaseWhere({ ...search, show_privileged_metrics_requests: true })
+  metricsConditions.push(METRICS_REQUEST_CONDITION)
+  blocks.push(safeSql`SELECT 'show_privileged_metrics_requests' AS facet, 'all' AS value, count() AS count
+FROM logs
+${whereClause(metricsConditions)}`)
 
   return safeSql`-- unified logs: sidebar facet counts
 ${joinSqlFragments(blocks, ' UNION ALL ')}`
