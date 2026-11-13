@@ -11,6 +11,7 @@ import { MAX_SELECTED_PROJECTS, ProjectMultiSelect } from './ProjectMultiSelect'
 import { ScopeGroupCard } from './ScopeGroupCard'
 import { ScopeGroupCardWithDiff } from './ScopeGroupCardWithDiff'
 import { useMemberOrganization } from './useMemberOrganization'
+import { ApiAuthorizationLoadingScreen } from '@/components/interfaces/ApiAuthorization/ApiAuthorization.Loading'
 import {
   DestinationLogo,
   InterstitialLayout,
@@ -22,11 +23,11 @@ import { useOAuthAppsAuthorizeApproveMutation } from '@/data/oauth-apps/oauth-ap
 import { useOAuthAppsAuthorizeDenyMutation } from '@/data/oauth-apps/oauth-apps-authorize-deny-mutation'
 import { useOAuthAppsAuthorizeOrganizationProjectsQuery } from '@/data/oauth-apps/oauth-apps-authorize-organization-projects-query'
 import { useOAuthAppsAuthorizeOrganizationsQuery } from '@/data/oauth-apps/oauth-apps-authorize-organizations-query'
+import { useOAuthAppsAuthorizeRequestQuery } from '@/data/oauth-apps/oauth-apps-authorize-request-query'
 import { useOAuthOrgAppDetailsQuery } from '@/data/oauth-apps/oauth-apps-org-app-details-query'
 import { useOAuthAppsPreflightValidationQuery } from '@/data/oauth-apps/oauth-apps-preflight-validation-query'
 import type {
   OAuthAppsAuthorizeRedirect,
-  OAuthAppsAuthorizeRequest,
   OAuthAppsAuthorizeRoleValidationFailure,
   OAuthAuthorizeApproveRequest,
 } from '@/data/oauth-apps/types'
@@ -38,8 +39,7 @@ import {
 import { useSignOut } from '@/lib/auth'
 
 export interface OAuthAppsAuthorizeScreenProps {
-  authId: string
-  request: OAuthAppsAuthorizeRequest
+  authId?: string
   organizationSlug?: string
   projectRef?: string | null
   navigate: (destination: string) => void
@@ -47,15 +47,21 @@ export interface OAuthAppsAuthorizeScreenProps {
 
 export const OAuthAppsAuthorizeScreen = ({
   authId,
-  request,
   organizationSlug,
   projectRef = null,
   navigate,
 }: OAuthAppsAuthorizeScreenProps) => {
   const signOut = useSignOut()
 
-  const grantKind = request.grant_kind
-  const isProjectScopingModeEnabled = request.project_scoping_mode
+  const {
+    data: request,
+    error: requestError,
+    isPending: isPendingRequest,
+    isError: isErrorRequest,
+  } = useOAuthAppsAuthorizeRequestQuery({ id: authId })
+
+  const grantKind = request?.grant_kind
+  const isProjectScopingModeEnabled = request?.project_scoping_mode
 
   const [selectedProjectRefs, setSelectedProjectRefs] = useState<string[]>([])
   const [allProjectsSelected, setAllProjectsSelected] = useState(false)
@@ -101,10 +107,10 @@ export const OAuthAppsAuthorizeScreen = ({
   } = useOAuthOrgAppDetailsQuery(
     {
       slug: memberOrg || '',
-      appId: request.app_id,
+      appId: request?.app_id,
     },
     {
-      enabled: !isPendingMemberOrg && !!memberOrg,
+      enabled: !isPendingRequest && !isPendingMemberOrg && !!memberOrg,
     }
   )
 
@@ -131,11 +137,11 @@ export const OAuthAppsAuthorizeScreen = ({
 
   const preflightQuery = useOAuthAppsPreflightValidationQuery(
     {
-      appId: request.app_id,
+      appId: request?.app_id,
       slug: memberOrg!,
     },
     {
-      enabled: !isPendingMemberOrg && !!memberOrg,
+      enabled: !isPendingRequest && !isPendingMemberOrg && !!memberOrg,
     }
   )
 
@@ -171,16 +177,28 @@ export const OAuthAppsAuthorizeScreen = ({
   const hasRoleFailure = flaggedRefs.length > 0
   const primaryActionLabel = hasRoleFailure
     ? `Deselect ${flaggedRefs.length} ${flaggedRefs.length === 1 ? 'project' : 'projects'}`
-    : `Authorize ${request.name}`
+    : `Authorize ${request?.name}`
   const primaryActionVariant = hasRoleFailure || isSubmitting ? 'default' : 'primary'
 
   const usesSelectedProjects = isProjectScopingModeEnabled && !allProjectsSelected
   const hasNoSelection = usesSelectedProjects && selectedProjectRefs.length === 0
 
-  if (isPendingIdentity || isPendingMemberOrg) {
-    return null
+  if (isPendingRequest || isPendingIdentity || isPendingMemberOrg) {
+    return <ApiAuthorizationLoadingScreen />
   }
 
+  if (isErrorRequest) {
+    return (
+      <InterstitialLayout
+        title="Application authorization"
+        description="An application wants to access your Supabase Account"
+      >
+        <div className="flex flex-col gap-6 px-6 pb-6">
+          <AlertError subject="An error occurred while loading your data" error={requestError} />
+        </div>
+      </InterstitialLayout>
+    )
+  }
   if (isErrorIdentity) {
     return (
       <InterstitialLayout
