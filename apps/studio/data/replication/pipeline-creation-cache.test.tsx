@@ -22,6 +22,7 @@ const destination: Destination = {
 const pipeline: Pipeline = {
   id: '8',
   destination_id: 7,
+  cluster_id: 'clust_12345',
   destination_name: 'Warehouse',
   source_id: 1,
   source_name: 'default',

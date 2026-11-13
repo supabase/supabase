@@ -111,6 +111,7 @@ type SourcesResponse = components['schemas']['SourcesResponse_Output']
 
 const PIPELINE: PipelineResponse = {
   id: 42,
+  cluster_id: 'clust_12345',
   config: { publication_name: 'analytics_publication' },
   destination_id: 7,
   destination_name: 'Analytics warehouse',
