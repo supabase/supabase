@@ -47,6 +47,39 @@ export const formatTableRowsToJSON = (table: SupaTable, rows: Record<string, unk
   return `[${objects.join(',')}]`
 }
 
+/**
+ * JSON text from a json/jsonb column, to be emitted into SQL verbatim. Keeping the text, rather than
+ * parsing it, preserves number precision and tells a JSON `null` apart from a SQL `NULL`.
+ */
+export class JsonText {
+  constructor(readonly text: string) {}
+}
+
+/**
+ * Grid rows carry json/jsonb columns as JSON text (the grid query casts them to text).
+ * `formatTableRowsToSQL` treats plain values in those columns as parsed JSON, so wrap the text cells
+ * in `JsonText` before passing grid rows to it. Do this after truncated cells are hydrated (as text),
+ * and not before, so primary key lookups still see the original values.
+ */
+export const wrapGridJsonText = <T extends Record<string, unknown>>(
+  table: SupaTable,
+  rows: T[]
+): T[] => {
+  const jsonColumns = table.columns.filter(
+    (col) => col.format?.includes('json') && col.dataType !== 'ARRAY'
+  )
+  if (jsonColumns.length === 0) return rows
+
+  return rows.map((row) => {
+    const wrappedRow: Record<string, unknown> = { ...row }
+    jsonColumns.forEach(({ name }) => {
+      const val = row[name]
+      if (typeof val === 'string') wrappedRow[name] = new JsonText(val)
+    })
+    return wrappedRow as T
+  })
+}
+
 export const formatTableRowsToSQL = (table: SupaTable, rows: any[]) => {
   if (rows.length === 0) return ''
 
@@ -66,9 +99,16 @@ export const formatTableRowsToSQL = (table: SupaTable, rows: any[]) => {
           return 'null'
         } else if (dataType === 'ARRAY') {
           const array = Array.isArray(val) ? val : JSON.parse(val as string)
+          // `ARRAY[]` has no element type for Postgres to infer, an untyped literal takes the column's
+          if (array.length === 0) return `'{}'`
           return `${formatArrayForSql(array as unknown[])}`
+        } else if (val instanceof JsonText) {
+          return `'${val.text.replaceAll("'", "''")}'`
         } else if (format?.includes('json')) {
-          return `${JSON.stringify(val).replace(/\\"/g, '"').replace(/'/g, "''").replace('"', "'").replace(/.$/, "'")}`
+          // `val` is the parsed JSON value, so serializing it yields valid JSON text
+          // (including for plain strings, e.g. "hello"). Only single quotes need
+          // escaping for the SQL string literal.
+          return `'${JSON.stringify(val).replaceAll("'", "''")}'`
         } else if (
           typeof format === 'string' &&
           typeof val === 'string' &&

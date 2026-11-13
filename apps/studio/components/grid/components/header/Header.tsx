@@ -27,6 +27,7 @@ import { isValueTruncated } from '@/components/interfaces/TableGridEditor/SidePa
 import {
   formatTableRowsToJSON,
   formatTableRowsToSQL,
+  wrapGridJsonText,
 } from '@/components/interfaces/TableGridEditor/TableEntity.utils'
 import {
   useExportAllRowsAsCsv,
@@ -247,6 +248,7 @@ const RowHeader = ({ rows: visibleRows, tableQueriesEnabled = true }: RowHeaderP
         projectRef: project.ref,
         connectionString: project.connectionString ?? null,
         roleImpersonationState: roleImpersonationState as RoleImpersonationState,
+        jsonAsText: type === 'sql',
       })
       if (hydrated.status !== 'ok') {
         throw new Error('Failed to fetch full values for truncated cells')
@@ -258,7 +260,8 @@ const RowHeader = ({ rows: visibleRows, tableQueriesEnabled = true }: RowHeaderP
           columns: snap.table!.columns.map((column) => column.name),
         })
       } else if (type === 'sql') {
-        return formatTableRowsToSQL(snap.table, rows)
+        // Grid rows carry json columns as text, mark it so SQL output emits it verbatim
+        return formatTableRowsToSQL(snap.table, wrapGridJsonText(snap.table, rows))
       } else {
         return formatTableRowsToJSON(snap.table, rows)
       }

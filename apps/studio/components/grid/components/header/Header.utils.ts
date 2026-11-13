@@ -36,13 +36,26 @@ export const hydrateTruncatedRows = async ({
   projectRef,
   connectionString,
   roleImpersonationState,
+  jsonAsText = false,
 }: {
   rows: Record<string, unknown>[]
   table: SupaTable
   projectRef: string
   connectionString: string | null
   roleImpersonationState?: RoleImpersonationState
+  /**
+   * Fetch truncated json/jsonb cells as JSON text, matching how the grid carries them, instead of
+   * as parsed values. Needed to keep exact number precision when generating SQL.
+   */
+  jsonAsText?: boolean
 }): Promise<HydrateTruncatedRowsResult> => {
+  const textColumns = new Set(
+    jsonAsText
+      ? table.columns
+          .filter((col) => col.format?.includes('json') && col.dataType !== 'ARRAY')
+          .map((col) => col.name)
+      : []
+  )
   const jobs: { rowIdx: number; column: string }[] = []
   rows.forEach((row, rowIdx) => {
     Object.keys(row).forEach((column) => {
@@ -77,6 +90,7 @@ export const hydrateTruncatedRows = async ({
           column,
           pkMatch,
           roleImpersonationState,
+          asText: textColumns.has(column),
         })
       })
     )
