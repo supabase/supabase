@@ -2,7 +2,7 @@ import * as Sentry from '@sentry/nextjs'
 import { useQueryClient } from '@tanstack/react-query'
 import { useIsLoggedIn, useUser } from 'common'
 import { useRouter } from 'next/router'
-import { createContext, PropsWithChildren, useContext, useEffect, useMemo } from 'react'
+import { createContext, PropsWithChildren, useContext, useEffect, useMemo, useRef } from 'react'
 import { toast } from 'sonner'
 
 import { useSignOut } from './auth'
@@ -42,6 +42,12 @@ export const ProfileProvider = ({ children }: PropsWithChildren<{}>) => {
   const router = useRouter()
   const signOut = useSignOut()
 
+  // The user ID that profile creation was already requested for, so that it runs once per user.
+  // Refetching the profile after a 409 puts the query back in a pending state, which would
+  // otherwise trigger another create request every time the refetch returns "not found".
+  const createRequestedForUserIdRef = useRef<string | undefined>(undefined)
+  const createConflictMessageRef = useRef<string | undefined>(undefined)
+
   const track = useTrack()
   const { mutate: createProfile, isPending: isCreatingProfile } = useProfileCreateMutation({
     onSuccess: () => {
@@ -63,6 +69,7 @@ export const ProfileProvider = ({ children }: PropsWithChildren<{}>) => {
         // elsewhere), so the earlier "not found" is stale. Refetch rather than leaving the
         // user stuck on the cached error. Sentry capture is kept to monitor how often this occurs.
         Sentry.captureMessage('Profile already exists: ' + error.message)
+        createConflictMessageRef.current = error.message
         queryClient.invalidateQueries({ queryKey: profileKeys.profile() })
         queryClient.invalidateQueries({ queryKey: organizationKeys.list() })
         queryClient.invalidateQueries({ queryKey: permissionKeys.list() })
@@ -87,6 +94,17 @@ export const ProfileProvider = ({ children }: PropsWithChildren<{}>) => {
   const isProfileNotFound = isError && error?.message === "User's profile not found"
   useEffect(() => {
     if (!isProfileNotFound || !user?.id) return
+
+    if (createRequestedForUserIdRef.current === user.id) {
+      // Creation returned a 409 and the profile still can't be found (e.g. the email conflicts
+      // with another account), so retrying won't help. Surface the reason to the user instead.
+      const conflictMessage = createConflictMessageRef.current
+      if (conflictMessage) toast.error(conflictMessage, { id: 'profile-create-conflict' })
+      return
+    }
+
+    createRequestedForUserIdRef.current = user.id
+    createConflictMessageRef.current = undefined
     createProfile()
   }, [isProfileNotFound, user?.id, createProfile])
 

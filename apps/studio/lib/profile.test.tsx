@@ -1,5 +1,6 @@
 import { screen, waitFor } from '@testing-library/react'
-import { HttpResponse } from 'msw'
+import { delay, HttpResponse } from 'msw'
+import { toast } from 'sonner'
 import { beforeEach, describe, expect, it, vi } from 'vitest'
 
 import { ProfileProvider, useProfile } from './profile'
@@ -20,6 +21,7 @@ vi.mock('common', async (importOriginal) => {
 
 vi.mock('@sentry/nextjs', () => ({ captureMessage: vi.fn(), captureException: vi.fn() }))
 vi.mock('@/lib/telemetry/track', () => ({ useTrack: () => vi.fn() }))
+vi.mock('sonner', () => ({ toast: { error: vi.fn(), success: vi.fn() } }))
 
 const profileResponse = (username?: string) =>
   HttpResponse.json<ProfileResponse>(createMockProfile({ username }))
@@ -38,13 +40,15 @@ const renderProvider = () =>
     </ProfileProvider>
   )
 
-// Serves each GET response in order, repeating the last one
+// Serves each GET response in order, repeating the last one. The delay keeps the query in its
+// pending state for a render while refetching, as a real network request does.
 const mockProfileGet = (responses: Array<'not-found' | 'found'>) => {
   const getSpy = vi.fn()
   addAPIMock({
     method: 'get',
     path: '/platform/profile',
-    response: () => {
+    response: async () => {
+      await delay(50)
       const next = responses[Math.min(getSpy.mock.calls.length, responses.length - 1)]
       getSpy()
       return next === 'found'
@@ -100,12 +104,13 @@ describe('ProfileProvider profile creation', () => {
   it('does not loop POSTing when the profile is still not found after a 409', async () => {
     const getSpy = mockProfileGet(['not-found'])
     const postSpy = vi.fn()
+    const conflictMessage = 'The email conflicts with an existing account'
     addAPIMock({
       method: 'post',
       path: '/platform/profile',
       response: () => {
         postSpy()
-        return errorResponse('Profile already exists', 409)
+        return errorResponse(conflictMessage, 409)
       },
     })
 
@@ -113,6 +118,9 @@ describe('ProfileProvider profile creation', () => {
 
     // Initial GET, then the refetch triggered by the 409
     await waitFor(() => expect(getSpy).toHaveBeenCalledTimes(2))
+    await waitFor(() =>
+      expect(toast.error).toHaveBeenCalledWith(conflictMessage, expect.anything())
+    )
     await new Promise((resolve) => setTimeout(resolve, 300))
     expect(postSpy).toHaveBeenCalledTimes(1)
     expect(getSpy).toHaveBeenCalledTimes(2)
