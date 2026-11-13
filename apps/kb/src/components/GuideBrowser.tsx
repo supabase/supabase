@@ -69,6 +69,8 @@ const bindPanelHeight = (content: HTMLDivElement | null) => {
 const getExternalHost = (href: string) =>
   /^https?:\/\//.test(href) ? new URL(href).hostname.replace(/^www\./, '') : null
 
+const SUPABASE_FAVICON = `${import.meta.env.BASE_URL.replace(/\/$/, '')}/favicon/android-icon-192x192.png`
+
 const toTabValue = (topic: Topic | null) => topic ?? 'all'
 
 const subscribeToTopic = (onChange: () => void) => {
@@ -318,21 +320,24 @@ const GuideList = ({ guides, activeTopic, onTopicClear }: GuideListProps) => {
               )}
             >
               <span className="min-w-0 flex-1 text-sm font-medium tracking-body text-foreground">
-                {externalHost ? (
-                  <span className="mr-3">
-                    <img
-                      // google serves a favicon for any host, so contributors do not upload a logo
-                      src={`https://www.google.com/s2/favicons?domain=${externalHost}&sz=32`}
-                      alt=""
-                      width={16}
-                      height={16}
-                      loading="lazy"
-                      referrerPolicy="no-referrer"
-                      className="mr-2 inline size-4 rounded-sm align-text-bottom"
-                    />
-                    {guide.author ?? externalHost}
-                  </span>
-                ) : null}
+                <span className={cn(externalHost && 'mr-3')}>
+                  <img
+                    // google serves a favicon for any host, so contributors do not upload a logo.
+                    // the kb's own pages use the Supabase favicon
+                    src={
+                      externalHost
+                        ? `https://www.google.com/s2/favicons?domain=${externalHost}&sz=32`
+                        : SUPABASE_FAVICON
+                    }
+                    alt=""
+                    width={16}
+                    height={16}
+                    loading="lazy"
+                    referrerPolicy="no-referrer"
+                    className="mr-2 inline size-4 rounded-sm align-text-bottom"
+                  />
+                  {externalHost ? (guide.author ?? externalHost) : null}
+                </span>
                 <span className={cn(externalHost && 'text-foreground-light')}>{guide.title}</span>
                 {externalHost ? (
                   <span className="ml-1 text-foreground-lighter transition-colors group-hover:text-foreground-light">
