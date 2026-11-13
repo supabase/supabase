@@ -9,6 +9,7 @@ import {
 } from '@/components/interfaces/Storage/Storage.constants'
 import type { StorageItem } from '@/components/interfaces/Storage/Storage.types'
 import {
+  calculateTotalRemainingTime,
   copyStorageExplorerUrl,
   copyStoragePath,
   describeUploadFailure,
@@ -24,6 +25,35 @@ import {
   serializeStoragePath,
   validateFolderName,
 } from '@/components/interfaces/Storage/StorageExplorer/StorageExplorer.utils'
+
+describe('calculateTotalRemainingTime', () => {
+  it('returns the same weighted average regardless of upload order', () => {
+    const progresses = [
+      {
+        percentage: 0.5,
+        elapsed: 10,
+        uploadSpeed: 100,
+        remainingBytes: 1000,
+        remainingTime: 10,
+      },
+      {
+        percentage: 0.5,
+        elapsed: 30,
+        uploadSpeed: 1000 / 30,
+        remainingBytes: 1000,
+        remainingTime: 30,
+      },
+    ]
+    expect([
+      calculateTotalRemainingTime(progresses),
+      calculateTotalRemainingTime([...progresses].reverse()),
+    ]).toEqual([20, 20])
+  })
+
+  it('returns 0 when there are no progresses', () => {
+    expect(calculateTotalRemainingTime([])).toBe(0)
+  })
+})
 
 function makeBucket(name: string) {
   return {

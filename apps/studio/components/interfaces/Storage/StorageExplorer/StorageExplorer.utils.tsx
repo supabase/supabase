@@ -258,13 +258,12 @@ export const formatTime = (seconds: number) => {
 
 export const calculateTotalRemainingTime = (progresses: UploadProgress[]) => {
   let totalRemainingTime = 0
-  let totalRemainingBytes = 0
+  const totalRemainingBytes = progresses.reduce((sum, progress) => sum + progress.remainingBytes, 0)
+  if (totalRemainingBytes === 0) {
+    return 0
+  }
 
   progresses.forEach((progress) => {
-    totalRemainingBytes += progress.remainingBytes
-    if (totalRemainingBytes === 0) {
-      return
-    }
     const weight = progress.remainingBytes / totalRemainingBytes
     totalRemainingTime += weight * progress.remainingTime
   })
