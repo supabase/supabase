@@ -9,6 +9,9 @@ export type UpcomingInvoiceUsageUnit = Extract<
   UpcomingInvoiceUsageLineItem,
   { schema: 'compute' }
 >['usage_unit']
+export type UpcomingInvoiceUsageMetric = NonNullable<
+  Extract<UpcomingInvoiceUsageLineItem, { schema: 'generic' }>['usage_metric']
+>
 export type UpcomingInvoiceProjectBreakdown = UpcomingInvoiceUsageLineItem['breakdown'][number]
 
 export type UpcomingInvoiceAnyLineItem =

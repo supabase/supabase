@@ -1,4 +1,8 @@
-import { UpcomingInvoiceUsageUnit } from './types'
+import type {
+  UpcomingInvoiceUsageLineItem,
+  UpcomingInvoiceUsageMetric,
+  UpcomingInvoiceUsageUnit,
+} from './types'
 import { PricingMetric } from '@/data/analytics/org-daily-stats-query'
 import { DOCS_URL } from '@/lib/constants'
 import { pluralize } from '@/lib/helpers'
@@ -48,7 +52,7 @@ export function formatUsageWithUnit(usage: number, unit: UpcomingInvoiceUsageUni
   return `${formattedUsage} ${pluralize(usage, label.singular, label.plural)}`
 }
 
-export const usageBillingDocsLink: { [K in PricingMetric]?: string } = {
+export const usageBillingDocsLink: Partial<Record<UpcomingInvoiceUsageMetric, string>> = {
   [PricingMetric.MONTHLY_ACTIVE_USERS]: `${DOCS_URL}/guides/platform/manage-your-usage/monthly-active-users`,
   [PricingMetric.MONTHLY_ACTIVE_SSO_USERS]: `${DOCS_URL}/guides/platform/manage-your-usage/monthly-active-users-sso`,
   [PricingMetric.MONTHLY_ACTIVE_THIRD_PARTY_USERS]: `${DOCS_URL}/guides/platform/manage-your-usage/monthly-active-users-third-party`,
@@ -76,7 +80,28 @@ export const usageBillingDocsLink: { [K in PricingMetric]?: string } = {
   [PricingMetric.DISK_IOPS_IO2]: `${DOCS_URL}/guides/platform/manage-your-usage/disk-iops`,
   [PricingMetric.DISK_THROUGHPUT_GP3]: `${DOCS_URL}/guides/platform/manage-your-usage/disk-throughput`,
   [PricingMetric.LOG_DRAIN]: `${DOCS_URL}/guides/platform/manage-your-usage/log-drains`,
+  [PricingMetric.LOG_DRAIN_EVENTS]: `${DOCS_URL}/guides/platform/manage-your-usage/log-drains`,
+  [PricingMetric.LOG_INGESTION]: `${DOCS_URL}/guides/platform/manage-your-usage/logs-ingest`,
+  [PricingMetric.LOG_QUERYING]: `${DOCS_URL}/guides/platform/manage-your-usage/logs-query`,
+  [PricingMetric.LOG_STORAGE]: `${DOCS_URL}/guides/platform/manage-your-usage/logs`,
   [PricingMetric.PIPELINES_PIPELINE]: `${DOCS_URL}/guides/platform/manage-your-usage/pipelines`,
   [PricingMetric.PIPELINES_COPY_BACKFILL_DATA]: `${DOCS_URL}/guides/platform/manage-your-usage/pipelines`,
   [PricingMetric.PIPELINES_REPLICATED_DATA]: `${DOCS_URL}/guides/platform/manage-your-usage/pipelines`,
+}
+
+const computeBillingDocsLink: Record<
+  Extract<UpcomingInvoiceUsageLineItem, { schema: 'compute' }>['type'],
+  string
+> = {
+  compute: `${DOCS_URL}/guides/platform/manage-your-usage/compute`,
+  branch: `${DOCS_URL}/guides/platform/manage-your-usage/branching`,
+  replica: `${DOCS_URL}/guides/platform/manage-your-usage/read-replicas`,
+}
+
+export function getLineItemDocsLink(item: UpcomingInvoiceUsageLineItem) {
+  // Compute line items have no usage metric; their type identifies the category
+  if (item.schema === 'compute') return computeBillingDocsLink[item.type]
+
+  const usageMetric = item.usage_metric ?? item.breakdown[0]?.variants[0]?.usage_metric
+  return usageMetric ? usageBillingDocsLink[usageMetric] : undefined
 }

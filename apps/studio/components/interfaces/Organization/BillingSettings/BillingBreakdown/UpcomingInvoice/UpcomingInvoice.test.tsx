@@ -345,5 +345,52 @@ describe('UpcomingInvoice', () => {
 
     expect(await screen.findByText('Compute Credits')).toBeInTheDocument()
     expect(screen.getByText('-$10.00')).toBeInTheDocument()
+    expect(
+      screen.getByRole('link', { name: 'Compute Hours billing docs (opens in a new tab)' })
+    ).toHaveAttribute('href', expect.stringContaining('/guides/platform/manage-your-usage/compute'))
+  })
+
+  test.each([
+    { shape: 'a plain row', breakdown: [] },
+    {
+      shape: 'an expandable row',
+      breakdown: [
+        {
+          project_name: 'Project A',
+          project_ref: 'project-a',
+          total_usage: 1_500_000_000,
+          total_pre_tax_amount: 4.5,
+          variants: [],
+        },
+      ],
+    },
+  ])('links a usage line item to its billing docs as $shape', async ({ breakdown }) => {
+    await renderUpcomingInvoice(
+      createUpcomingInvoice({
+        currentCosts: {
+          actualInElapsedCycle: 4.5,
+          fixedFees: { lineItems: [] },
+          usage: {
+            lineItems: [
+              createUsageLineItem({
+                name: 'Egress',
+                usage_metric: 'EGRESS',
+                usage_unit: 'byte',
+                pre_tax_amount: 4.5,
+                pre_tax_amount_before_discount: 4.5,
+                breakdown,
+              }),
+            ],
+          },
+        },
+      })
+    )
+
+    const docsLink = screen.getByRole('link', { name: 'Egress billing docs (opens in a new tab)' })
+    expect(docsLink).toHaveAttribute(
+      'href',
+      expect.stringContaining('/guides/platform/manage-your-usage/egress')
+    )
+    expect(docsLink).toHaveAttribute('target', '_blank')
   })
 })

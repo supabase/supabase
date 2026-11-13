@@ -1,6 +1,7 @@
 import { describe, expect, test } from 'vitest'
 
-import { formatDecimalBytes, formatNumber, formatUsageWithUnit } from './utils'
+import type { UpcomingInvoiceUsageLineItem } from './types'
+import { formatDecimalBytes, formatNumber, formatUsageWithUnit, getLineItemDocsLink } from './utils'
 
 describe('formatNumber', () => {
   test.each([
@@ -41,5 +42,86 @@ describe('formatUsageWithUnit', () => {
     { usage: 1_500, unit: 'byte', expected: '1.5 KB' },
   ] as const)('formats $usage $unit as $expected', ({ usage, unit, expected }) => {
     expect(formatUsageWithUnit(usage, unit)).toBe(expected)
+  })
+})
+
+describe('getLineItemDocsLink', () => {
+  const period = { start: '2026-11-01T00:00:00Z', end: '2026-12-01T00:00:00Z' }
+
+  const computeItem = (
+    type: Extract<UpcomingInvoiceUsageLineItem, { schema: 'compute' }>['type']
+  ): UpcomingInvoiceUsageLineItem => ({
+    schema: 'compute',
+    type,
+    name: 'Compute',
+    period,
+    usage_unit: 'hour',
+    pre_tax_amount: 0,
+    pre_tax_amount_before_discount: 0,
+    compute_credits_used: null,
+    breakdown: [],
+  })
+
+  const genericItem = (
+    details: Partial<Extract<UpcomingInvoiceUsageLineItem, { schema: 'generic' }>>
+  ): UpcomingInvoiceUsageLineItem => ({
+    schema: 'generic',
+    name: 'Usage',
+    description: 'Usage',
+    period,
+    pre_tax_amount: 0,
+    pre_tax_amount_before_discount: 0,
+    quantity: null,
+    unit_price: null,
+    unit_price_desc: null,
+    breakdown: [],
+    ...details,
+  })
+
+  test.each([
+    { type: 'compute', page: 'compute' },
+    { type: 'branch', page: 'branching' },
+    { type: 'replica', page: 'read-replicas' },
+  ] as const)('links $type compute to the $page docs', ({ type, page }) => {
+    expect(getLineItemDocsLink(computeItem(type))).toMatch(
+      new RegExp(`/guides/platform/manage-your-usage/${page}$`)
+    )
+  })
+
+  test('links a usage item by its usage metric', () => {
+    expect(getLineItemDocsLink(genericItem({ usage_metric: 'LOG_INGESTION' }))).toMatch(
+      /\/guides\/platform\/manage-your-usage\/logs-ingest$/
+    )
+  })
+
+  test('falls back to the usage metric of its project breakdown', () => {
+    const item = genericItem({
+      breakdown: [
+        {
+          project_name: 'Project A',
+          project_ref: 'project-a',
+          total_usage: 10,
+          variants: [
+            {
+              name: 'gp3',
+              is_active_variant: true,
+              usage: 10,
+              usage_metric: 'DISK_SIZE_GB_HOURS_GP3',
+              pre_tax_amount: 0,
+              pre_tax_amount_before_discount: 0,
+              unit_price_desc: null,
+            },
+          ],
+        },
+      ],
+    })
+
+    expect(getLineItemDocsLink(item)).toMatch(/\/guides\/platform\/manage-your-usage\/disk-size$/)
+  })
+
+  test('has no link for a metric without a docs page', () => {
+    expect(getLineItemDocsLink(genericItem({ usage_metric: 'FUNCTION_CPU_MILLISECONDS' }))).toBe(
+      undefined
+    )
   })
 })

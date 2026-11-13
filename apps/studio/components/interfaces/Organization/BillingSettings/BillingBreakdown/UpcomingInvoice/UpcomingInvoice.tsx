@@ -1,5 +1,5 @@
 import dayjs from 'dayjs'
-import { AlertTriangleIcon, ChevronRightIcon } from 'lucide-react'
+import { AlertTriangleIcon, ChevronRightIcon, ExternalLinkIcon } from 'lucide-react'
 import { ReactNode } from 'react'
 import { useInView } from 'react-intersection-observer'
 import {
@@ -21,7 +21,7 @@ import type {
   UpcomingInvoiceProjectBreakdown,
   UpcomingInvoiceUsageUnit,
 } from './types'
-import { formatUsageWithUnit } from './utils'
+import { formatUsageWithUnit, getLineItemDocsLink } from './utils'
 import { AlertError } from '@/components/ui/AlertError'
 import { useOrgUpcomingInvoiceQuery } from '@/data/invoices/org-invoice-upcoming-query'
 import { useOrganizationQuery } from '@/data/organizations/organization-query'
@@ -211,16 +211,18 @@ export const UpcomingInvoice = ({ slug }: UpcomingInvoiceProps) => {
 function InvoiceAccordionHeader({
   title,
   tooltip,
+  docsUrl,
   amount,
   className,
 }: {
   title: string
   tooltip?: ReactNode
+  docsUrl?: string
   amount: ReactNode
   className?: string
 }) {
   return (
-    <div className={cn('flex items-center gap-1', className)}>
+    <div className={cn('group/invoice-row flex items-center gap-1', className)}>
       <div>
         <AccordionTrigger
           hideIcon
@@ -234,6 +236,7 @@ function InvoiceAccordionHeader({
         </AccordionTrigger>
       </div>
       {tooltip && <InfoTooltip className="max-w-sm">{tooltip}</InfoTooltip>}
+      {docsUrl && <UsageDocsLink href={docsUrl} title={title} />}
       <div className="ml-auto text-right" translate="no">
         {amount}
       </div>
@@ -303,6 +306,8 @@ function InvoiceLineItemRow({
       ? formatPricingTooltip(item.unit_price_desc)
       : undefined
 
+  const docsUrl = getLineItemDocsLink(item)
+
   const hasComputeCredits =
     item.schema === 'compute' && typeof item.compute_credits_used === 'number'
 
@@ -312,6 +317,7 @@ function InvoiceLineItemRow({
         <InvoiceAccordionHeader
           title={title}
           tooltip={pricingTooltip}
+          docsUrl={docsUrl}
           amount={
             <InvoiceLineItemAmount
               amount={item.pre_tax_amount}
@@ -347,6 +353,7 @@ function InvoiceLineItemRow({
     <InvoiceAmountRow
       title={title}
       tooltip={pricingTooltip}
+      docsUrl={docsUrl}
       amount={item.pre_tax_amount}
       amountBeforeDiscount={item.pre_tax_amount_before_discount}
     />
@@ -409,25 +416,28 @@ function InvoiceAmountRow({
   title,
   detail,
   tooltip,
+  docsUrl,
   amount,
   amountBeforeDiscount,
 }: {
   title: string
   detail?: string
   tooltip?: ReactNode
+  docsUrl?: string
   amount: number
   amountBeforeDiscount?: number
 }) {
   const isFree = amount === 0 && !amountBeforeDiscount
 
   return (
-    <div className="flex items-center justify-between py-2 pl-5">
+    <div className="group/invoice-row flex items-center justify-between py-2 pl-5">
       <div className="flex items-center gap-1">
         <span>
           {title}
           {detail && <span className="text-foreground-lighter"> ({detail})</span>}
         </span>
         {tooltip && <InfoTooltip className="max-w-sm">{tooltip}</InfoTooltip>}
+        {docsUrl && <UsageDocsLink href={docsUrl} title={title} />}
       </div>
       {isFree ? (
         <span>-</span>
@@ -435,6 +445,24 @@ function InvoiceAmountRow({
         <InvoiceLineItemAmount amount={amount} amountBeforeDiscount={amountBeforeDiscount} />
       )}
     </div>
+  )
+}
+
+function UsageDocsLink({ href, title }: { href: string; title: string }) {
+  return (
+    <a
+      href={href}
+      target="_blank"
+      rel="noreferrer"
+      aria-label={`${title} billing docs (opens in a new tab)`}
+      className={cn(
+        'flex rounded-sm text-foreground-lighter transition hover:text-foreground focus-ring',
+        // Revealed on row hover; always visible on touch devices, which can't hover
+        'opacity-0 group-hover/invoice-row:opacity-100 focus-visible:opacity-100 [@media(hover:none)]:opacity-100'
+      )}
+    >
+      <ExternalLinkIcon aria-hidden="true" size={14} strokeWidth={2} />
+    </a>
   )
 }
 
