@@ -9,10 +9,14 @@ export function Hero() {
     <SectionContainerWithCn spacing="sections">
       <div className="flex flex-col gap-6 lg:gap-8">
         <div className="grid grid-cols-1 lg:grid-cols-2 gap-4 items-end">
-          <h1 className="text-foreground text-3xl sm:text-5xl sm:leading-none">
-            <span className="block">Edge Functions</span>
-            <span className="text-foreground-lighter block">globally in seconds</span>
-          </h1>
+          <div>
+            <h1 className="text-foreground text-3xl sm:text-5xl sm:leading-none">
+              <span className="block">Edge Functions</span>
+            </h1>
+            <p className="font-heading font-medium tracking-normal text-foreground-lighter text-3xl sm:text-5xl sm:leading-none">
+              globally in seconds
+            </p>
+          </div>
           <p className="text-foreground-lighter text-sm lg:text-base">
             Author, deploy, and monitor serverless functions distributed globally at the edge, close
             to your users.

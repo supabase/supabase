@@ -6,9 +6,9 @@ import { canonicalAlternates } from '@/lib/canonical'
 import { mdAlternates } from '@/lib/md-alternates'
 
 export const metadata: Metadata = {
-  title: 'Database | Supabase',
+  title: 'Postgres Database | Supabase',
   description:
-    'Every Supabase project is a dedicated Postgres database. Use it on its own, or with the rest of the Supabase platform. 100% portable with no vendor lock-in.',
+    'Every Supabase project is a Postgres database. Use our relational database on its own, or with the rest of the Supabase platform. Start for free. 100% portable with no vendor lock-in.',
   alternates: {
     ...canonicalAlternates('/database'),
     ...mdAlternates('database'),

@@ -9,7 +9,7 @@ tocVideo: 'xmfNUCjszh4'
 While our [Headless Vector search](/docs/guides/ai/examples/headless-vector-search) provides a toolkit for generative Q&A, in this tutorial we'll go more in-depth, build a custom ChatGPT-like search experience from the ground-up using Next.js. You will:
 
 1. Convert your markdown into embeddings using OpenAI.
-2. Store you embeddings in Postgres using pgvector.
+2. Store you embeddings in Postgres using [pgvector]().
 3. Deploy a function for answering your users' questions.
 
 You can read our [Supabase Clippy](/blog/chatgpt-supabase-docs) blog post for a full example.
@@ -165,7 +165,7 @@ Prepare the database schema. We can use the "OpenAI Vector Search" quickstart in
   <StepHikeCompact.Step step={4}>
     <StepHikeCompact.Details title="Create similarity search database function">
 
-    Anytime the user sends a query, we want to find the content that's relevant to their questions. We can do this using pgvector's similarity search.
+    Anytime the user sends a query, we want to find the content that's relevant to their questions. We can do this using [pgvector](/docs/guides/database/extensions/pgvector)'s similarity search.
 
     For complex SQL operations, wrap them in database functions that you can call from the frontend using [RPC](/docs/reference/javascript/rpc).
 

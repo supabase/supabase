@@ -9,7 +9,7 @@ import { mdAlternates } from '@/lib/md-alternates'
 export const metadata: Metadata = {
   title: 'Auth | Supabase',
   description:
-    'Add user sign ups and logins to your app. Secure your data with Row Level Security. Works with all major OAuth providers.',
+    'Use authentication to add user sign ups and logins to your app. Secure your data with Row Level Security. Works with all major OAuth providers.',
   alternates: {
     ...canonicalAlternates('/auth'),
     ...mdAlternates('auth'),
