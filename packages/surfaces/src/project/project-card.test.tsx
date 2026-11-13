@@ -27,13 +27,19 @@ describe('ProjectCard', () => {
     expect(screen.getByRole('status').textContent).toBe('Status: Active')
   })
 
-  it('keeps the last known status when a check fails and lets the user retry', () => {
+  it('shows a failed check as the status, until a check succeeds', () => {
     const onRefresh = vi.fn()
-    render(<ProjectCard project={starting} error="Network error" onRefresh={onRefresh} />)
-    expect(screen.getByText('Starting')).toBeTruthy()
-    expect(screen.getByText('Error: Network error')).toBeTruthy()
-    fireEvent.click(screen.getByRole('button', { name: 'Retry' }))
+    const { rerender } = render(
+      <ProjectCard project={starting} error="Network error" onRefresh={onRefresh} />
+    )
+    // The last status read may no longer be true, so it is not shown.
+    expect(screen.queryByText('Starting')).toBeNull()
+    expect(screen.getByText('Check failed')).toBeTruthy()
+    expect(screen.getByRole('status').textContent).toBe('Failed to check status: Network error')
+    fireEvent.click(screen.getByRole('button', { name: 'Refresh status' }))
     expect(onRefresh).toHaveBeenCalled()
+    rerender(<ProjectCard project={testProject} onRefresh={onRefresh} />)
+    expect(screen.getByText('Active')).toBeTruthy()
   })
 
   it('puts Refresh beside Open in dashboard', () => {

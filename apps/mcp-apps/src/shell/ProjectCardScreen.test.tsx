@@ -99,7 +99,7 @@ describe('ProjectCardScreen', () => {
     await waitFor(() => expect(getProject).toHaveBeenCalled())
   })
 
-  it('keeps the last known status when a read fails', async () => {
+  it('shows a failed read as the status', async () => {
     const getProject = vi.fn(async () => {
       throw new Error('Network error')
     })
@@ -112,8 +112,8 @@ describe('ProjectCardScreen', () => {
       />
     )
     fireEvent.click(screen.getByRole('button', { name: 'Refresh status' }))
-    expect(await screen.findByText('Error: Network error')).toBeTruthy()
-    expect(screen.getByText('Starting')).toBeTruthy()
+    expect(await screen.findByText('Check failed')).toBeTruthy()
+    expect(screen.getByRole('status').textContent).toBe('Failed to check status: Network error')
   })
 
   it('names the organization once it is known', async () => {

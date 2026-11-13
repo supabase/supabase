@@ -1,7 +1,6 @@
 import { ExternalLinkIcon, Loader2Icon, RefreshCwIcon } from 'lucide-react'
 import { useEffect, useState } from 'react'
-import { Badge, Button, Card } from 'ui'
-import { Admonition } from 'ui-patterns/Admonition'
+import { Badge, Button, Card, Tooltip, TooltipContent, TooltipTrigger } from 'ui'
 
 import type { Project } from '../contract'
 import { ButtonTooltip } from '../explorer/button-tooltip'
@@ -16,7 +15,7 @@ export interface ProjectCardProps {
   isFollowing?: boolean
   /** Whether a status check is in flight. */
   isRefreshing?: boolean
-  /** The last status check failed. The card keeps showing the last known status. */
+  /** The last status check failed. The badge says so in place of the status until a check succeeds. */
   error?: string
   /** Checks the status now, for hosts that also keep it live. Omit to hide Refresh. */
   onRefresh?: () => void
@@ -62,8 +61,10 @@ export function ProjectCard({
   onRefresh,
   onOpenDashboard,
 }: ProjectCardProps) {
-  const status = projectStatusBadge(project.status)
-  const isChanging = isProjectChanging(project.status)
+  const projectStatus = projectStatusBadge(project.status)
+  // A failed check replaces the status: the last one read may no longer be true.
+  const status = error ? { label: 'Check failed', variant: 'destructive' as const } : projectStatus
+  const isChanging = !error && isProjectChanging(project.status)
   // While a new project sets up, show how long it has been going, from created_at.
   const createdAt = project.created_at ? Date.parse(project.created_at) : NaN
   const isSettingUp = SETTING_UP.has(project.status) && Number.isFinite(createdAt)
@@ -88,12 +89,21 @@ export function ProjectCard({
               <h2 id="project-card-title" className="truncate text-base text-foreground">
                 {project.name}
               </h2>
-              <Badge variant={status.variant} className="gap-1">
-                {isChanging && isFollowing && (
-                  <Loader2Icon size={12} aria-hidden="true" className="animate-spin" />
-                )}
-                {status.label}
-              </Badge>
+              {error ? (
+                <Tooltip>
+                  <TooltipTrigger asChild>
+                    <Badge variant={status.variant}>{status.label}</Badge>
+                  </TooltipTrigger>
+                  <TooltipContent side="bottom">{`Failed to check status: ${error}`}</TooltipContent>
+                </Tooltip>
+              ) : (
+                <Badge variant={status.variant} className="gap-1">
+                  {isChanging && isFollowing && (
+                    <Loader2Icon size={12} aria-hidden="true" className="animate-spin" />
+                  )}
+                  {status.label}
+                </Badge>
+              )}
             </div>
             <ProjectDetails details={details} className="text-sm" />
           </div>
@@ -125,24 +135,8 @@ export function ProjectCard({
         </div>
         {/* The badge is not announced when it changes; this is. Always rendered. */}
         <p role="status" className="sr-only">
-          {`Status: ${status.label}`}
+          {error ? `Failed to check status: ${error}` : `Status: ${status.label}`}
         </p>
-        {error && (
-          <div className="px-4 pb-4">
-            <Admonition
-              type="warning"
-              title="Failed to check project status"
-              description={`Error: ${error}`}
-              actions={
-                onRefresh && (
-                  <Button variant="default" size="tiny" disabled={isRefreshing} onClick={onRefresh}>
-                    Retry
-                  </Button>
-                )
-              }
-            />
-          </div>
-        )}
       </section>
     </Card>
   )
