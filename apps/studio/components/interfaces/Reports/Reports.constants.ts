@@ -289,6 +289,34 @@ export const PRESET_CONFIG: Record<Presets, PresetConfig> = {
         order by count desc
         limit 10`,
       },
+      egressTopPaths: {
+        queryType: 'logs',
+        safeSql: () => safeLogSql`
+        -- reports-egress-top-paths
+        select
+          response.status_code as status_code,
+          request.path as path,
+          count(t.id) as count
+        from edge_logs t
+          cross join unnest(metadata) as m
+          cross join unnest(m.response) as response
+          cross join unnest(m.request) as request
+        where request.path like '/rest/v1/%'
+        group by status_code, path
+        order by count desc
+        limit 10`,
+        safeSqlOtel: () => safeLogSql`
+        -- reports-egress-top-paths
+        select
+          ${OTEL_STATUS_CODE} as status_code,
+          log_attributes['request.path'] as path,
+          toFloat64(count()) as count
+        from logs
+        where source = 'edge_logs' and log_attributes['request.path'] like '/rest/v1/%'
+        group by ${OTEL_STATUS_CODE}, log_attributes['request.path']
+        order by count desc
+        limit 10`,
+      },
       errorCounts: {
         queryType: 'logs',
         safeSql: (filters) => safeLogSql`
