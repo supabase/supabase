@@ -110,6 +110,21 @@ export const MCP_CLIENT_INSTRUCTIONS: Record<string, McpClientInstructions> = {
       </>
     ),
   },
+  kimchi: {
+    alternate: () => (
+      <>
+        <paragraph>
+          Kimchi reads MCP servers from <inlineCode value=".kimchi/mcp.json" /> in your current
+          working directory. Create the file there with the configuration above. To use the server
+          in every project, place it under <inlineCode value="~/.kimchi/mcp.json" /> instead.
+        </paragraph>
+        <paragraph>
+          Start a new Kimchi session to load the server. On first connect, Kimchi opens your browser
+          to complete the Supabase OAuth flow.
+        </paragraph>
+      </>
+    ),
+  },
   kimi: {
     alternate: () => (
       <>
