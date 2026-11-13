@@ -37,7 +37,11 @@ import {
   GitHubChangeEmailAddress,
   SSOChangeEmailAddress,
 } from './ChangeEmailAddress'
-import { parseRedirectMessage, shouldShowAddPasswordRow } from './SignInMethods.utils'
+import {
+  canUnlinkIdentity,
+  parseRedirectMessage,
+  shouldShowAddPasswordRow,
+} from './SignInMethods.utils'
 import { AlertError } from '@/components/ui/AlertError'
 import { ButtonTooltip } from '@/components/ui/ButtonTooltip'
 import { IdentityProviderIcon } from '@/components/ui/ProviderIcon'
@@ -107,6 +111,12 @@ export const SignInMethods = ({
     )
 
   const onConfirmUnlinkIdentity = async () => {
+    if (!selectedProviderUnlink) return
+    if (
+      !canUnlinkIdentity({ provider: selectedProviderUnlink, identityCount: identities.length })
+    ) {
+      return
+    }
     const identity = identities.find((i) => i.provider === selectedProviderUnlink)
     if (identity) unlinkIdentity(identity)
   }
@@ -232,8 +242,22 @@ export const SignInMethods = ({
                           icon={<UnlinkIcon />}
                           aria-label={`Unlink ${providerName} identity`}
                           className="w-7"
+                          disabled={
+                            !canUnlinkIdentity({
+                              provider,
+                              identityCount: identities.length,
+                            })
+                          }
                           onClick={() => setSelectedProviderUnlink(provider)}
-                          tooltip={{ content: { side: 'bottom', text: 'Unlink identity' } }}
+                          tooltip={{
+                            content: {
+                              side: 'bottom',
+                              text:
+                                provider === 'email'
+                                  ? 'Temporarily unavailable'
+                                  : 'Unlink identity',
+                            },
+                          }}
                         />
                       )}
                     </div>
