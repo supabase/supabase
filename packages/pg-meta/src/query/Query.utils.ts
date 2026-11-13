@@ -378,15 +378,13 @@ function parseArrayLiteral(value: string): SafeSqlFragment | null {
   }
   if (current.trim()) rawItems.push(current.trim())
 
-  const unquoted = rawItems.map((item) => {
-    if (item.startsWith("'") && item.endsWith("'")) {
-      return item.slice(1, -1).replace(/''/g, "'")
-    }
-    return item
-  })
-
   const formattedItems = joinSqlFragments(
-    unquoted.map((x) => literal(x)),
+    rawItems.map((item) => {
+      if (item.startsWith("'") && item.endsWith("'")) {
+        return literal(item.slice(1, -1).replace(/''/g, "'"))
+      }
+      return item.toUpperCase() === 'NULL' ? safeSql`NULL` : literal(item)
+    }),
     ','
   )
   return safeSql`ARRAY[${formattedItems}]${typeCast}`
