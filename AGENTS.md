@@ -1,6 +1,6 @@
 # Supabase Monorepo
 
-pnpm 11 + Turborepo monorepo. Requires Node >= 22.13.
+pnpm 11 + Turborepo monorepo. Requires Node >= 22.23.4.
 
 ## Structure
 
