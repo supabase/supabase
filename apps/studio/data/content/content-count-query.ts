@@ -2,7 +2,8 @@ import { useQuery } from '@tanstack/react-query'
 import { operations } from 'api-types'
 
 import { contentKeys } from './keys'
-import { getAllLogContent, isLogsViewContent } from './logs-view-content'
+import { isLogsViewContent } from './log-content-schema'
+import { getAllLogContent } from './logs-view-content'
 import { get, handleError } from '@/data/fetchers'
 import type { StudioError } from '@/lib/errors/studio-errors'
 import type { UseCustomQueryOptions } from '@/types'
@@ -20,7 +21,7 @@ export async function getContentCount(
 
   if (type === 'log_sql') {
     const rows = (await getAllLogContent({ projectRef, name }, signal)).filter(
-      (row) => !isLogsViewContent(row)
+      (row) => row.type === 'log_sql' && !isLogsViewContent(row)
     )
     return {
       favorites: rows.filter((row) => row.favorite).length,

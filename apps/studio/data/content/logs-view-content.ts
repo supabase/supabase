@@ -1,46 +1,6 @@
-import { z } from 'zod'
-
 import type { ContentBase } from './content-query'
+import { isLogsViewContent, parseLogSqlSnippet } from './log-content-schema'
 import { get, handleError } from '@/data/fetchers'
-
-const filterConditionSchema = z.object({
-  propertyName: z.string(),
-  operator: z.enum(['=', '<>', '~~*', '!~~*']),
-  value: z.union([z.string(), z.number(), z.boolean()]),
-})
-
-export const logsViewContentSchema = z.object({
-  type: z.literal('logs_view'),
-  version: z.literal(1),
-  logSource: z.string(),
-  filters: z.object({
-    logicalOperator: z.literal('AND'),
-    conditions: z.array(filterConditionSchema),
-  }),
-  viewOptions: z
-    .object({
-      latency: z.array(z.number().int()).nullable().optional(),
-      'timing.dns': z.array(z.number().int()).nullable().optional(),
-      'timing.connection': z.array(z.number().int()).nullable().optional(),
-      'timing.tls': z.array(z.number().int()).nullable().optional(),
-      'timing.ttfb': z.array(z.number().int()).nullable().optional(),
-      'timing.transfer': z.array(z.number().int()).nullable().optional(),
-      sort: z.object({ id: z.string(), desc: z.boolean() }).nullable().optional(),
-      show_connection_logs: z.boolean().nullable().optional(),
-      edge_auth: z.boolean().nullable().optional(),
-      edge_storage: z.boolean().nullable().optional(),
-      edge_postgrest: z.boolean().nullable().optional(),
-      user: z.string().nullable().optional(),
-    })
-    .passthrough(),
-})
-
-export const isLogsViewContent = (row: { type: string; content?: unknown }) =>
-  row.type === 'log_sql' &&
-  typeof row.content === 'object' &&
-  row.content !== null &&
-  'type' in row.content &&
-  row.content.type === 'logs_view'
 
 type LogContentVariables = {
   projectRef?: string
@@ -101,7 +61,9 @@ export async function getLogSqlSnippetPage(
   let cursor = variables.cursor
   do {
     const data = await getLogContentPage({ ...variables, cursor }, signal, headers)
-    const rows = data.data.filter((row) => !isLogsViewContent(row))
+    const rows = data.data
+      .filter((row) => row.type === 'log_sql' && !isLogsViewContent(row))
+      .map(parseLogSqlSnippet)
     cursor = data.cursor
     if (rows.length > 0 || !cursor) return { cursor, rows }
   } while (cursor)

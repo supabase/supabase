@@ -64,7 +64,7 @@ export async function getContent(
       signal,
       headers
     )
-    return { cursor: nextCursor, content: remapSqlContentFields(rows as unknown as Content[]) }
+    return { cursor: nextCursor, content: rows }
   }
 
   const { data, error } = await get('/platform/projects/{ref}/content', {

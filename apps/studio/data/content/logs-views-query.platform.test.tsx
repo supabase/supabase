@@ -49,7 +49,7 @@ const legacyRow: ContentBase = {
   id: 'b0eebc99-9c0b-4ef8-bb6d-6bb9bd380a11',
   name: 'Legacy SQL',
   visibility: 'user',
-  content: { sql: 'select timestamp from edge_logs', schema_version: '1' },
+  content: { sql: 'select timestamp from edge_logs', extra_metadata: 'legacy' },
 }
 
 function mockList() {
@@ -70,6 +70,7 @@ function mockList() {
             ]
           : [
               viewRow,
+              { ...legacyRow, type: 'sql' },
               { ...viewRow, content: { ...viewRow.content, version: 2 } },
               { ...viewRow, content: { ...viewRow.content, viewOptions: { sort: 'invalid' } } },
             ],
@@ -101,11 +102,33 @@ describe('saved log views persistence', () => {
     expect(snippets.contents.map((snippet) => snippet.name)).toEqual(['Legacy SQL'])
     expect(snippets.cursor).toBe('final-page')
     expect(snippets.contents[0].content?.unchecked_sql).toBe('select timestamp from edge_logs')
+    expect(snippets.contents[0]).toMatchObject({
+      id: legacyRow.id,
+      owner_id: 1,
+      visibility: 'user',
+      content: { content_id: legacyRow.id, schema_version: '1', extra_metadata: 'legacy' },
+    })
+    expect(snippets.contents[0].content).not.toHaveProperty('sql')
     expect(await getContentCount({ projectRef: 'project-a', type: 'log_sql' })).toEqual({
       favorites: 0,
       private: 2,
       shared: 0,
     })
+  })
+
+  it('rejects a non-string legacy SQL body before exposing a runnable snippet', async () => {
+    addAPIMock({
+      method: 'get',
+      path: '/platform/projects/:ref/content',
+      response: () =>
+        HttpResponse.json<ListResponse>({
+          data: [{ ...legacyRow, content: { sql: 42 } }],
+          cursor: undefined,
+        }),
+    })
+    await expect(
+      getSqlSnippets({ projectRef: 'project-a', type: 'log_sql' })
+    ).rejects.toMatchObject({ name: 'ZodError' })
   })
 
   it('sends project-scoped opaque content and confirms create, update and delete', async () => {

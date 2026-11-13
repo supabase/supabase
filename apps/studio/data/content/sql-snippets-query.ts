@@ -37,8 +37,7 @@ export async function getSqlSnippets(
       { projectRef, name, visibility, favorite, sort, cursor, limit: SNIPPET_PAGE_LIMIT },
       signal
     )
-    const snippets = remapSqlContentFields(rows as unknown as SnippetWithContent[])
-    return { cursor: nextCursor, contents: snippets.map(withSavedStatus) }
+    return { cursor: nextCursor, contents: rows.map(withSavedStatus) }
   }
 
   const sortOrder = sort === 'name' ? 'asc' : 'desc'
