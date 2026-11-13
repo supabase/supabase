@@ -36,7 +36,7 @@ import { Database, useReadReplicasQuery } from '@/data/read-replicas/replicas-qu
 import { formatDatabaseID, formatDatabaseRegion } from '@/data/read-replicas/replicas.utils'
 import { useCheckEntitlements } from '@/hooks/misc/useCheckEntitlements'
 import { useDeploymentMode } from '@/hooks/misc/useDeploymentMode'
-import { useIsHighAvailability } from '@/hooks/misc/useSelectedProject'
+import { useIsHighAvailability, useProjectCapabilities } from '@/hooks/misc/useSelectedProject'
 
 // ============================================================================
 // Data Source Helpers
@@ -248,6 +248,11 @@ export function useConnectState(initialState?: Partial<ConnectState>): UseConnec
   const { data: databases = [] } = useReadReplicasQuery({ projectRef })
   const { hasAccess: hasDedicatedPooler } = useCheckEntitlements('dedicated_pooler')
   const isHighAvailability = useIsHighAvailability()
+  const capabilities = useProjectCapabilities()
+  // Fall back to the pre-capabilities `isHighAvailability` check (rather than
+  // a fixed default) so behavior for already-correct HA projects doesn't
+  // regress while the backend capabilities field is still rolling out.
+  const hasConnectionPooling = capabilities?.hasConnectionPooling ?? !isHighAvailability
   const deploymentMode = useDeploymentMode()
 
   const [state, setState] = useState<ConnectState>(() => {
@@ -378,23 +383,23 @@ export function useConnectState(initialState?: Partial<ConnectState>): UseConnec
     [projectRef, deploymentMode.isSelfHosted, deploymentMode.isPlatform]
   )
 
-  // Multigres has no pooler, so pooler-flavored selections restored from the
-  // URL or localStorage (shared across projects) must never leak into an HA
-  // project — every consumer sees the direct connection method. Likewise a
-  // stale connection source (e.g. a replica identifier restored from the URL)
-  // falls back to the primary, since HA sources are only the primary and the
-  // load balancer.
+  // Multigres and Multigres Lite have no pooler, so pooler-flavored selections
+  // restored from the URL or localStorage (shared across projects) must never
+  // leak into a project running either flavor — every consumer sees the
+  // direct connection method. Likewise a stale connection source (e.g. a
+  // replica identifier restored from the URL) falls back to the primary,
+  // since HA sources are only the primary and the load balancer.
   const resolvedState = useMemo(() => {
-    if (!isHighAvailability) return state
+    if (hasConnectionPooling) return state
 
     const next: ConnectState = { ...state, connectionMethod: 'direct', useSharedPooler: false }
     const hasValidSource =
       state.connectionSource === undefined ||
       state.connectionSource === projectRef ||
-      state.connectionSource === CONNECTION_SOURCE_LOAD_BALANCER
+      (isHighAvailability && state.connectionSource === CONNECTION_SOURCE_LOAD_BALANCER)
     if (!hasValidSource) next.connectionSource = projectRef ?? '_'
     return next
-  }, [state, isHighAvailability, projectRef])
+  }, [state, hasConnectionPooling, isHighAvailability, projectRef])
 
   const activeFields = useMemo(() => {
     let fields = getActiveFields(connectSchema, resolvedState)
@@ -403,13 +408,13 @@ export function useConnectState(initialState?: Partial<ConnectState>): UseConnec
       // already uses Supavisor shared)
       fields = fields.filter((f) => f.id !== 'useSharedPooler')
     }
-    if (isHighAvailability) {
+    if (!hasConnectionPooling) {
       fields = fields
         .filter((f) => f.id !== 'connectionMethod' && f.id !== 'useSharedPooler')
         .map((f) => (f.id === 'connectionType' ? { ...f, label: 'Connection Type' } : f))
     }
     return fields
-  }, [resolvedState, hasDedicatedPooler, isHighAvailability, deploymentMode.isPlatform])
+  }, [resolvedState, hasDedicatedPooler, hasConnectionPooling, deploymentMode.isPlatform])
 
   const resolvedSteps = useMemo(() => resolveSteps(connectSchema, resolvedState), [resolvedState])
 

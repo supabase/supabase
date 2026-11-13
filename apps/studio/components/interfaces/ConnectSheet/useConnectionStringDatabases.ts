@@ -14,7 +14,7 @@ import { useSupavisorConfigurationQuery } from '@/data/database/supavisor-config
 import { useReadReplicasQuery } from '@/data/read-replicas/replicas-query'
 import { useProjectAddonsQuery } from '@/data/subscriptions/project-addons-query'
 import { useCheckEntitlements } from '@/hooks/misc/useCheckEntitlements'
-import { useIsHighAvailability } from '@/hooks/misc/useSelectedProject'
+import { useIsHighAvailability, useProjectCapabilities } from '@/hooks/misc/useSelectedProject'
 import { pluckObjectFields } from '@/lib/helpers'
 
 /**
@@ -27,17 +27,26 @@ import { pluckObjectFields } from '@/lib/helpers'
 export const useConnectionStringDatabases = (deploymentMode: DeploymentMode) => {
   const { ref: projectRef } = useParams()
   const { hasAccess: allowPgBouncerSelection } = useCheckEntitlements('dedicated_pooler')
+  // Genuinely HA-specific (the read-only load balancer only exists for replicated
+  // Multigres, not Multigres Lite) — kept separate from `capabilities` below.
   const isHighAvailability = useIsHighAvailability()
+  const capabilities = useProjectCapabilities()
+  // Fall back to the pre-capabilities `isHighAvailability` check (rather than
+  // a fixed default) so behavior for already-correct HA/Multigres projects
+  // doesn't regress while the backend capabilities field is still rolling out.
+  const hasConnectionPooling = capabilities?.hasConnectionPooling ?? !isHighAvailability
+  const requiresDirectTlsNegotiation =
+    capabilities?.requiresDirectTlsNegotiation ?? isHighAvailability
 
   const { data: databases = [] } = useReadReplicasQuery({ projectRef })
-  // Multigres has no pooler, so the pooler config endpoints don't apply
+  // Multigres and Multigres Lite have no pooler, so the pooler config endpoints don't apply
   const { data: pgbouncerConfig } = usePgbouncerConfigQuery(
     { projectRef },
-    { enabled: !isHighAvailability }
+    { enabled: hasConnectionPooling }
   )
   const { data: supavisorConfig } = useSupavisorConfigurationQuery(
     { projectRef },
-    { enabled: !isHighAvailability }
+    { enabled: hasConnectionPooling }
   )
   const { data: addons } = useProjectAddonsQuery({ projectRef })
   const { ipv4: ipv4Addon } = getAddons(addons?.selected_addons ?? [])
@@ -96,7 +105,8 @@ export const useConnectionStringDatabases = (deploymentMode: DeploymentMode) => 
             connectionStringsShared,
             connectionStringsDedicated,
             ipv4Addon: !!ipv4Addon,
-            isHighAvailability,
+            hasConnectionPooling,
+            requiresDirectTlsNegotiation,
           }),
         ]
       })
@@ -119,7 +129,8 @@ export const useConnectionStringDatabases = (deploymentMode: DeploymentMode) => 
           metadata: { projectRef },
         }),
         ipv4Addon: false,
-        isHighAvailability,
+        hasConnectionPooling,
+        requiresDirectTlsNegotiation,
       })
     }
 
@@ -133,5 +144,7 @@ export const useConnectionStringDatabases = (deploymentMode: DeploymentMode) => 
     projectRef,
     deploymentMode,
     isHighAvailability,
+    hasConnectionPooling,
+    requiresDirectTlsNegotiation,
   ])
 }

@@ -13,6 +13,7 @@ const {
   mockUsePgbouncerConfigQuery,
   mockUsePgbouncerConfigurationUpdateMutation,
   mockUseProjectAddonsQuery,
+  mockUseProjectCapabilities,
   mockUseSelectedProjectQuery,
 } = vi.hoisted(() => ({
   mockUpdatePoolerConfig: vi.fn(),
@@ -23,6 +24,7 @@ const {
   mockUsePgbouncerConfigQuery: vi.fn(),
   mockUsePgbouncerConfigurationUpdateMutation: vi.fn(),
   mockUseProjectAddonsQuery: vi.fn(),
+  mockUseProjectCapabilities: vi.fn(),
   mockUseSelectedProjectQuery: vi.fn(),
 }))
 
@@ -48,6 +50,7 @@ vi.mock('@/hooks/misc/useSelectedProject', () => ({
   useSelectedProjectQuery: mockUseSelectedProjectQuery,
   useIsHighAvailability: () => mockUseHighAvailability().isHighAvailability ?? false,
   useIsAwsCloudProvider: () => false,
+  useProjectCapabilities: mockUseProjectCapabilities,
 }))
 
 vi.mock('@/data/database/max-connections-query', () => ({
@@ -84,6 +87,7 @@ describe('ConnectionPooling', () => {
       },
     })
     mockUseHighAvailability.mockReturnValue({ isHighAvailability: true, isPending: false })
+    mockUseProjectCapabilities.mockReturnValue(undefined)
     mockUseAsyncCheckPermissions.mockReturnValue({ can: true })
     mockUseCheckEntitlements.mockReturnValue({ hasAccess: true })
     mockUsePgbouncerConfigQuery.mockReturnValue({
@@ -151,5 +155,27 @@ describe('ConnectionPooling', () => {
 
     expectEveryQueryCall(mockUsePgbouncerConfigQuery, true)
     expectEveryQueryCall(mockUseMaxConnectionsQuery, true)
+  })
+
+  it('shows a no-pooler notice and skips fetching pooling config for Multigres Lite projects', () => {
+    mockUseHighAvailability.mockReturnValue({ isHighAvailability: false, isPending: false })
+    mockUseProjectCapabilities.mockReturnValue({
+      hasConnectionPooling: false,
+      requiresDirectTlsNegotiation: true,
+    })
+
+    customRender(<ConnectionPooling />)
+
+    expect(
+      screen.getByText('Connection pooling is not available for this project')
+    ).toBeInTheDocument()
+    expect(
+      screen.queryByText(
+        'Connection pooling settings are managed automatically on High Availability projects'
+      )
+    ).not.toBeInTheDocument()
+
+    expectEveryQueryCall(mockUsePgbouncerConfigQuery, false)
+    expectEveryQueryCall(mockUseMaxConnectionsQuery, false)
   })
 })

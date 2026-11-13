@@ -75,6 +75,23 @@ export const useIsHighAvailability = () => {
   return project?.high_availability ?? false
 }
 
+/**
+ * Backend-computed, per-flavor capabilities (connection pooling, TLS
+ * negotiation, etc. — see `PlatformCapabilities` in
+ * supabase/platform's `packages/api-core/src/platform-flavor/index.ts`).
+ *
+ * Prefer this over `useIsHighAvailability()` for anything that depends on
+ * *what the server actually does* (pooler presence, TLS mode, schema
+ * visibility) rather than on whether the project is genuinely
+ * highly-available/replicated — those are different questions that used to
+ * be conflated under one boolean, which is wrong for Multigres Lite (not HA,
+ * but runs the same multigateway/direct-TLS stack as full Multigres).
+ */
+export const useProjectCapabilities = () => {
+  const { data: project } = useSelectedProjectQuery()
+  return project?.capabilities
+}
+
 export const useIsProjectActive = () => {
   const { data: project } = useSelectedProjectQuery()
   return project?.status === PROJECT_STATUS.ACTIVE_HEALTHY

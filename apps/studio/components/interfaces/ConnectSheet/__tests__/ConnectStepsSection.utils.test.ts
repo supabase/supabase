@@ -134,7 +134,7 @@ describe('shouldShowIpv4AddonNotice', () => {
     connectionMethod: 'direct',
     useSharedPooler: false,
     hasIpv4Addon: false,
-    isHighAvailability: false,
+    hasConnectionPooling: true,
   }
 
   test('returns true for a direct connection with no IPv4 addon', () => {
@@ -162,7 +162,7 @@ describe('shouldShowIpv4AddonNotice', () => {
     ['self-hosted (not platform)', { isPlatform: false }],
     ['not on AWS (e.g. Multigres/Fly)', { isAws: false }],
     ['the IPv4 add-on is not enabled for the project', { isIpv4Enabled: false }],
-    ['high-availability projects', { isHighAvailability: true }],
+    ['projects with no connection pooler (HA or Multigres Lite)', { hasConnectionPooling: false }],
   ])('returns false for %s', (_label, overrides) => {
     expect(shouldShowIpv4AddonNotice({ ...BASE, ...overrides })).toBe(false)
   })

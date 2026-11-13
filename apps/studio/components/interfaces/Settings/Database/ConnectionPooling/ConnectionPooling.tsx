@@ -48,7 +48,11 @@ import { useCheckEntitlements } from '@/hooks/misc/useCheckEntitlements'
 import { FGA_PERMISSIONS, useAsyncCheckPermissionsV2 } from '@/hooks/misc/useCheckPermissionsV2'
 import { useHighAvailability } from '@/hooks/misc/useHighAvailability'
 import { useIsFeatureEnabled } from '@/hooks/misc/useIsFeatureEnabled'
-import { useIsAwsCloudProvider, useSelectedProjectQuery } from '@/hooks/misc/useSelectedProject'
+import {
+  useIsAwsCloudProvider,
+  useProjectCapabilities,
+  useSelectedProjectQuery,
+} from '@/hooks/misc/useSelectedProject'
 import { DOCS_URL } from '@/lib/constants'
 import { preprocessEmptyNumberInput } from '@/lib/forms/zod-number-input'
 
@@ -70,7 +74,12 @@ export const ConnectionPooling = () => {
   const isAws = useIsAwsCloudProvider()
   const { data: project } = useSelectedProjectQuery()
   const { isHighAvailability, isPending: isHighAvailabilityPending } = useHighAvailability()
-  const canLoadPoolingConfig = !isHighAvailability && !isHighAvailabilityPending
+  const capabilities = useProjectCapabilities()
+  // Fall back to the pre-capabilities `isHighAvailability` check (rather than
+  // a fixed default) so behavior for already-correct HA projects doesn't
+  // regress while the backend capabilities field is still rolling out.
+  const hasConnectionPooling = capabilities?.hasConnectionPooling ?? !isHighAvailability
+  const canLoadPoolingConfig = hasConnectionPooling && !isHighAvailabilityPending
 
   const { can: canUpdateConnectionPoolingConfiguration } = useAsyncCheckPermissionsV2(
     FGA_PERMISSIONS.PROJECT.DATABASE_POOLING_CONFIG_WRITE
@@ -130,12 +139,12 @@ export const ConnectionPooling = () => {
     isAws &&
     projectAddonsDedicatedIpv4Address &&
     isSuccessAddons &&
-    !isHighAvailability &&
+    hasConnectionPooling &&
     !disablePoolModeSelection &&
     !hasIpv4Addon
 
   const onSubmit: SubmitHandler<z.infer<typeof PoolingConfigurationFormSchema>> = async (data) => {
-    if (!projectRef || isHighAvailability) return
+    if (!projectRef || !hasConnectionPooling) return
 
     const { default_pool_size } = data
     updatePoolerConfig(
@@ -199,6 +208,14 @@ export const ConnectionPooling = () => {
           />
         )}
 
+        {!hasConnectionPooling && !isHighAvailability && (
+          <Admonition
+            type="default"
+            title="Connection pooling is not available for this project"
+            description="Clients connect directly to Postgres, so there is no connection pooler to configure."
+          />
+        )}
+
         {showIpv4Callout && (
           <Admonition
             type="default"
@@ -218,7 +235,7 @@ export const ConnectionPooling = () => {
         <Panel
           noMargin
           footer={
-            isHighAvailability ? undefined : (
+            !hasConnectionPooling ? undefined : (
               <FormActions
                 form={formId}
                 isSubmitting={isUpdatingPoolerConfig}
@@ -234,7 +251,7 @@ export const ConnectionPooling = () => {
           }
         >
           <Panel.Content>
-            {!isHighAvailability && isLoadingPgbouncerConfig && (
+            {hasConnectionPooling && isLoadingPgbouncerConfig && (
               <div className="flex flex-col gap-y-4">
                 {Array.from({ length: 4 }).map((_, i) => (
                   <Fragment key={`loader-${i}`}>
@@ -249,13 +266,13 @@ export const ConnectionPooling = () => {
                 <ShimmeringLoader className="h-8 w-full" />
               </div>
             )}
-            {!isHighAvailability && isErrorPgbouncerConfig && (
+            {hasConnectionPooling && isErrorPgbouncerConfig && (
               <AlertError
                 error={pgbouncerConfigError}
                 subject="Failed to retrieve connection pooler configuration"
               />
             )}
-            {!isHighAvailability && connectionPoolingUnavailable && (
+            {hasConnectionPooling && connectionPoolingUnavailable && (
               <Admonition
                 type="default"
                 title="Unable to retrieve pooling configuration"
