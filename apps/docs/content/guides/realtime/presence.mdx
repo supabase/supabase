@@ -246,11 +246,13 @@ Listen to the `sync`, `join`, and `leave` events triggered whenever any client j
 ```python
 room_one = supabase.channel('room_01')
 
-room_one
+(
+  room_one
   .on_presence_sync(lambda: print('sync', room_one.presenceState()))
   .on_presence_join(lambda key, curr_presences, joined_presences: print('join', key, curr_presences, joined_presences))
   .on_presence_leave(lambda key, curr_presences, left_presences: print('leave', key, curr_presences, left_presences))
   .subscribe()
+)
 ```
 
 </TabPanel>

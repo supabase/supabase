@@ -266,9 +266,11 @@ Binary payloads (`ArrayBuffer` / `ArrayBufferView`) are received automatically f
       print(f"Broadcast received: {payload}")
 
     # Subscribe to the Channel
-    await my_channel
+    await (
+      my_channel
       .on_broadcast('shout', message_received) # Listen for "shout". Can be "*" to listen to all events
       .subscribe()
+    )
     ```
 
   </TabPanel>
