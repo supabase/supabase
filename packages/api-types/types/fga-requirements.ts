@@ -218,10 +218,7 @@ export const fgaRequirements = {
   'POST /platform/projects/{ref}/restart-services': [['database_write']],
   'POST /platform/projects/{ref}/wake': [['project_admin_read']],
   'POST /platform/storage/{ref}/archive': [['storage_write']],
-  'POST /v1/branches/{branch_id_or_ref}/merge': [
-    ['branching_development_write'],
-    ['branching_production_write'],
-  ],
+  'POST /v1/branches/{branch_id_or_ref}/merge': [['branching_production_write']],
   'POST /v1/branches/{branch_id_or_ref}/push': [
     ['branching_development_write'],
     ['branching_production_write'],
