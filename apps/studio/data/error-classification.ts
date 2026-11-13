@@ -91,8 +91,10 @@ export type SqlOrigin = 'user' | 'studio'
  * A 400 whose message carries a SQLSTATE came from Postgres, so it is a SQL error before any
  * message-pattern rule runs: user SQL can raise any text, including a pattern's. Other 400s go
  * through the pattern rules first (a connection timeout has no SQLSTATE) and are SQL errors only
- * when no rule matches. Other statuses keep their usual classification, and anything that isn't
- * a response body goes through `classifyError`.
+ * when no rule matches. A 408 (the query endpoint timed out waiting for the query to finish) on
+ * user SQL is a `UserSqlError` too: the user's query ran too long, like a statement timeout
+ * (57014). Other statuses keep their usual classification, and anything that isn't a response
+ * body goes through `classifyError`.
  */
 export function classifySqlResponseError(
   error: unknown,
@@ -106,6 +108,9 @@ export function classifySqlResponseError(
   if (!raw) return classifyError(error)
 
   const sqlState = raw.code === 400 ? raw.message?.match(SQLSTATE_IN_MESSAGE)?.[1] : undefined
+  if (origin === 'user' && raw.code === 408) {
+    return new UserSqlError({ ...raw, ...(queryName && { queryName }) })
+  }
   if (!sqlState) {
     const classified = classifyResponseError(raw)
     if (classified._tag !== 'UnclassifiedApiError' || classified.code !== 400) return classified

@@ -22,6 +22,7 @@ import {
   PlatformError,
   RequestAbortedError,
   StudioSqlError,
+  UnclassifiedApiError,
   UnexpectedError,
   UserSqlError,
 } from '@/lib/errors/studio-errors'
@@ -299,6 +300,28 @@ describe('classifySqlResponseError', () => {
     ],
   ])('keeps the usual classification for %s', (_, body, ErrorClass) => {
     expect(classifySqlResponseError(body, { origin: 'user' })).toBeInstanceOf(ErrorClass)
+  })
+
+  describe('a query read timeout (408)', () => {
+    const timeoutBody = {
+      message: 'Failed to run sql query: Query read timeout',
+      code: 408,
+      endpoint: '/platform/pg-meta/{ref}/query',
+    }
+
+    it('classifies it as a never-reported UserSqlError for user SQL', () => {
+      const err = classifySqlResponseError(timeoutBody, { origin: 'user' })
+      expect(err).toBeInstanceOf(UserSqlError)
+      expect(err).toMatchObject({ reason: 'user_sql', code: 408, message: timeoutBody.message })
+      expect(isUserError(err)).toBe(true)
+      expect(isNeverReportedError(err)).toBe(true)
+    })
+
+    it('keeps the usual classification for Studio SQL', () => {
+      const err = classifySqlResponseError(timeoutBody, { origin: 'studio', queryName: 'x' })
+      expect(err).toBeInstanceOf(UnclassifiedApiError)
+      expect(isNeverReportedError(err)).toBe(false)
+    })
   })
 
   it('classifies Postgres errors as SQL errors even when the text matches a pattern rule', () => {
