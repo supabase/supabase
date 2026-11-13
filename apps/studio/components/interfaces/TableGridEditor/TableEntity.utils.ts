@@ -48,36 +48,36 @@ export const formatTableRowsToJSON = (table: SupaTable, rows: Record<string, unk
 }
 
 /**
- * Stands for a JSON `null` in a json/jsonb column, as opposed to a SQL `NULL`. Both parse to `null`.
+ * JSON text from a json/jsonb column, to be emitted into SQL verbatim. Keeping the text, rather than
+ * parsing it, preserves number precision and tells a JSON `null` apart from a SQL `NULL`.
  */
-export const JSON_NULL = Symbol('json null')
+export class JsonText {
+  constructor(readonly text: string) {}
+}
 
 /**
- * Grid rows carry json/jsonb columns as JSON text (the grid query casts them to text), whereas
- * `formatTableRowsToSQL` expects parsed JSON values. Parses the untruncated json cells so grid rows
- * can be passed to it. Truncated cells are left as-is so they can still be fetched in full.
+ * Grid rows carry json/jsonb columns as JSON text (the grid query casts them to text).
+ * `formatTableRowsToSQL` treats plain values in those columns as parsed JSON, so wrap the untruncated
+ * text cells in `JsonText` before passing grid rows to it. Truncated cells are left as-is so they can
+ * still be fetched in full.
  */
-export const parseGridJsonColumns = <T extends Record<string, unknown>>(
+export const wrapGridJsonText = <T extends Record<string, unknown>>(
   table: SupaTable,
   rows: T[],
   isTruncated: (value: string) => boolean
 ): T[] => {
-  const jsonColumns = table.columns.filter((col) => col.format?.includes('json'))
+  const jsonColumns = table.columns.filter(
+    (col) => col.format?.includes('json') && col.dataType !== 'ARRAY'
+  )
   if (jsonColumns.length === 0) return rows
 
   return rows.map((row) => {
-    const parsedRow: Record<string, unknown> = { ...row }
-    jsonColumns.forEach(({ name, dataType }) => {
+    const wrappedRow: Record<string, unknown> = { ...row }
+    jsonColumns.forEach(({ name }) => {
       const val = row[name]
-      if (dataType === 'ARRAY' || typeof val !== 'string' || isTruncated(val)) return
-      try {
-        const parsed = JSON.parse(val)
-        parsedRow[name] = parsed === null ? JSON_NULL : parsed
-      } catch {
-        // Not JSON text, keep the original value
-      }
+      if (typeof val === 'string' && !isTruncated(val)) wrappedRow[name] = new JsonText(val)
     })
-    return parsedRow as T
+    return wrappedRow as T
   })
 }
 
@@ -103,8 +103,8 @@ export const formatTableRowsToSQL = (table: SupaTable, rows: any[]) => {
           // `ARRAY[]` has no element type for Postgres to infer, an untyped literal takes the column's
           if (array.length === 0) return `'{}'`
           return `${formatArrayForSql(array as unknown[])}`
-        } else if (val === JSON_NULL) {
-          return `'null'`
+        } else if (val instanceof JsonText) {
+          return `'${val.text.replaceAll("'", "''")}'`
         } else if (format?.includes('json')) {
           // `val` is the parsed JSON value, so serializing it yields valid JSON text
           // (including for plain strings, e.g. "hello"). Only single quotes need

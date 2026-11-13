@@ -25,7 +25,7 @@ import type { Filter, Sort, SupaTable } from '@/components/grid/types'
 import { isValueTruncated } from '@/components/interfaces/TableGridEditor/SidePanelEditor/RowEditor/RowEditor.utils'
 import {
   formatTableRowsToSQL,
-  parseGridJsonColumns,
+  wrapGridJsonText,
 } from '@/components/interfaces/TableGridEditor/TableEntity.utils'
 import { InlineLink } from '@/components/ui/InlineLink'
 import { ENTITY_TYPE } from '@/data/entity-types/entity-type-constants'
@@ -176,7 +176,7 @@ const fetchAllRows = async ({
       jsonColumnsAsText: preserveJsonValues,
     })
     if (preserveJsonValues) {
-      rows = parseGridJsonColumns(supaTable, rows, () => false)
+      rows = wrapGridJsonText(supaTable, rows, () => false)
     }
   } catch (error: unknown) {
     return { status: 'error', error: new FetchRowsError(supaTable.name, error) }
@@ -317,9 +317,9 @@ export const useExportAllRowsGeneric = (
         params.type === 'provided_rows'
           ? await (async () => {
               const hydrated = await hydrateTruncatedRows({
-                // Grid rows carry json columns as text, SQL output expects parsed values
+                // Grid rows carry json columns as text, mark it so SQL output emits it verbatim
                 rows: preserveJsonValues
-                  ? parseGridJsonColumns(params.table, params.rows, (v) => isValueTruncated(v))
+                  ? wrapGridJsonText(params.table, params.rows, (v) => isValueTruncated(v))
                   : params.rows,
                 table: params.table,
                 projectRef,

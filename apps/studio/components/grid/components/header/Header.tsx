@@ -27,7 +27,7 @@ import { isValueTruncated } from '@/components/interfaces/TableGridEditor/SidePa
 import {
   formatTableRowsToJSON,
   formatTableRowsToSQL,
-  parseGridJsonColumns,
+  wrapGridJsonText,
 } from '@/components/interfaces/TableGridEditor/TableEntity.utils'
 import {
   useExportAllRowsAsCsv,
@@ -245,8 +245,8 @@ const RowHeader = ({ rows: visibleRows, tableQueriesEnabled = true }: RowHeaderP
       const hydrated = await hydrateTruncatedRows({
         rows:
           type === 'sql'
-            ? // Grid rows carry json columns as text, SQL output expects parsed values
-              parseGridJsonColumns(snap.table, selected, (v) => isValueTruncated(v))
+            ? // Grid rows carry json columns as text, mark it so SQL output emits it verbatim
+              wrapGridJsonText(snap.table, selected, (v) => isValueTruncated(v))
             : selected,
         table: snap.table,
         projectRef: project.ref,

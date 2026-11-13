@@ -4,8 +4,8 @@ import {
   formatTableRowsToJSON,
   formatTableRowsToSQL,
   getTablePoliciesUrl,
-  JSON_NULL,
-  parseGridJsonColumns,
+  JsonText,
+  wrapGridJsonText,
 } from './TableEntity.utils'
 import type { SupaTable } from '@/components/grid/types'
 import { ENTITY_TYPE } from '@/data/entity-types/entity-type-constants'
@@ -341,7 +341,7 @@ describe('TableEntity.utils: getTablePoliciesUrl', () => {
   })
 })
 
-describe('TableEntity.utils: parseGridJsonColumns', () => {
+describe('TableEntity.utils: wrapGridJsonText', () => {
   const table: SupaTable = {
     id: 1,
     type: ENTITY_TYPE.TABLE,
@@ -356,32 +356,57 @@ describe('TableEntity.utils: parseGridJsonColumns', () => {
     estimateRowCount: 1,
   }
 
-  it('parses json text so the SQL formatter does not double-encode it', () => {
+  it('emits json text verbatim so the SQL formatter does not double-encode it', () => {
     const rows = [
       { note: '{"a":1}', meta: '{"text":"say \\"hi\\""}', tags: ['{"x":1}'] },
       { note: 'n', meta: '"hello"', tags: [] },
     ]
-    const parsed = parseGridJsonColumns(table, rows, () => false)
-    expect(parsed[0]).toEqual({ note: '{"a":1}', meta: { text: 'say "hi"' }, tags: ['{"x":1}'] })
-    expect(parsed[1].meta).toBe('hello')
-    expect(formatTableRowsToSQL(table, parsed.slice(1))).toContain(`'"hello"'`)
-  })
-
-  it('keeps a JSON null distinct from a SQL NULL', () => {
-    const parsed = parseGridJsonColumns(table, [{ note: 'n', meta: 'null', tags: [] }], () => false)
-    expect(parsed[0].meta).toBe(JSON_NULL)
-    expect(formatTableRowsToSQL(table, [parsed[0], { note: 'n', meta: null }])).toContain(
-      `VALUES ('n', 'null', '{}'), ('n', null, null);`
+    const wrapped = wrapGridJsonText(table, rows, () => false)
+    expect(wrapped[0].note).toBe('{"a":1}')
+    expect(wrapped[0].tags).toEqual(['{"x":1}'])
+    expect(formatTableRowsToSQL(table, wrapped)).toBe(
+      `INSERT INTO public.demo (note, meta, tags) VALUES ` +
+        `('{"a":1}', '{"text":"say \\"hi\\""}', ARRAY['{"x":1}']), ('n', '"hello"', '{}');`
     )
   })
 
-  it('leaves truncated and null values alone', () => {
+  it('keeps numbers outside the safe integer range exact', () => {
+    const wrapped = wrapGridJsonText(
+      table,
+      [{ note: 'n', meta: '{"n":9007199254740993,"d":1.10}', tags: [] }],
+      () => false
+    )
+    expect(formatTableRowsToSQL(table, wrapped)).toContain(`'{"n":9007199254740993,"d":1.10}'`)
+  })
+
+  it('keeps a JSON null distinct from a SQL NULL', () => {
+    const wrapped = wrapGridJsonText(
+      table,
+      [
+        { note: 'n', meta: 'null', tags: [] },
+        { note: 'n', meta: null, tags: [] },
+      ],
+      () => false
+    )
+    expect(formatTableRowsToSQL(table, wrapped)).toContain(
+      `VALUES ('n', 'null', '{}'), ('n', null, '{}');`
+    )
+  })
+
+  it('escapes single quotes in the json text', () => {
+    const wrapped = wrapGridJsonText(table, [{ note: 'n', meta: '"it\'s"', tags: [] }], () => false)
+    expect(formatTableRowsToSQL(table, wrapped)).toContain(`'"it''s"'`)
+  })
+
+  it('checks truncation on the original text and leaves truncated cells alone', () => {
+    const isTruncated = (v: string) => v.endsWith('...')
     const rows = [
       { note: 'n', meta: '{"a":1...', tags: [] },
-      { note: 'n', meta: null, tags: [] },
+      // Complete JSON string whose decoded content looks truncated must still be wrapped
+      { note: 'n', meta: '"abc..."', tags: [] },
     ]
-    const parsed = parseGridJsonColumns(table, rows, (v) => v.endsWith('...'))
-    expect(parsed[0].meta).toBe('{"a":1...')
-    expect(parsed[1].meta).toBeNull()
+    const wrapped = wrapGridJsonText(table, rows, isTruncated)
+    expect(wrapped[0].meta).toBe('{"a":1...')
+    expect(wrapped[1].meta).toBeInstanceOf(JsonText)
   })
 })
