@@ -11,7 +11,7 @@ export const ReportPadding = ({
   return (
     <div
       className={cn(
-        'flex flex-col grow gap-4 px-5 py-6 mx-auto 1xl:px-28 lg:px-16 2xl:px-32 w-full @lg:px-6 @xl:px-22',
+        'flex flex-col grow gap-4 px-(--report-padding-x) py-6 mx-auto w-full [--report-padding-x:1.25rem] lg:[--report-padding-x:4rem] 1xl:[--report-padding-x:7rem] 2xl:[--report-padding-x:8rem] @lg:[--report-padding-x:1.5rem] @xl:[--report-padding-x:5.5rem]',
         className
       )}
     >
