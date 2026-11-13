@@ -138,6 +138,7 @@ Self-hosted Studio reads `ENABLED_FEATURES_*` env vars at container start time t
 |---|---|---|---|---|
 | `ENABLED_FEATURES_*` | boolean | | Per-flag runtime override. Set to `true` or `false` (case-insensitive); other values are logged and ignored. | One env var per flag. Full key list: `packages/common/enabled-features/enabled-features.json`. No-op when `NEXT_PUBLIC_IS_PLATFORM=true`. |
 | `ENABLED_FEATURES_LOGS_ALL` | boolean | Self-hosted | Disable the entire Logs section of the dashboard. Maps to the `logs:all` feature flag. | Documented explicitly as the runtime replacement for the legacy build-time `NEXT_PUBLIC_ENABLE_LOGS`. |
+| `ENABLED_FEATURES_PROJECT_STORAGE_ALL` | boolean | | Hide Storage from the dashboard navigation and menus. Maps to the `project_storage:all` feature flag. | Use when the Storage API is not running. |
 
 ### AI features
 
