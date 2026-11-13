@@ -6,6 +6,7 @@ import {
   isBrowserWalletExtensionError,
   isCancellationRejection,
   isChallengeExpiredError,
+  isInjectedPageScriptError,
   isUserAbortedOperation,
   shouldDropForSampleRate,
 } from './sentry-client-options'
@@ -79,6 +80,56 @@ describe('Sentry beforeSend filtering functions', () => {
         },
       }
       expect(isBrowserWalletExtensionError(event)).toBe(false)
+    })
+  })
+
+  describe('isInjectedPageScriptError', () => {
+    const eventWithFrames = (filenames: string[]): SentryEvent => ({
+      exception: {
+        values: [
+          {
+            type: 'RangeError',
+            value: 'Maximum call stack size exceeded.',
+            stacktrace: {
+              frames: filenames.map((filename) => ({ filename }) as StackFrame),
+            },
+          },
+        ],
+      },
+    })
+
+    it('returns true when every frame points at a page URL', () => {
+      const event = eventWithFrames([
+        'https://supabase.com/dashboard/project/abc/settings/infrastructure',
+        'https://supabase.com/dashboard/project/abc/observability/database',
+        'https://supabase.com/dashboard/project/abc/observability/database',
+      ])
+      expect(isInjectedPageScriptError(event)).toBe(true)
+    })
+
+    it('returns false when any frame points at a script file', () => {
+      const event = eventWithFrames([
+        'https://supabase.com/dashboard/assets/index-abc123.js',
+        'https://supabase.com/dashboard/project/abc/sql/new',
+      ])
+      expect(isInjectedPageScriptError(event)).toBe(false)
+    })
+
+    it.each([
+      'app:///_next/static/chunks/main.js',
+      'https://supabase.com/dashboard/_next/static/chunks/pages/_app-abc.js',
+      'https://supabase.com/dashboard/assets/router-abc.mjs',
+    ])('returns false for app script frames: %s', (filename) => {
+      expect(isInjectedPageScriptError(eventWithFrames([filename]))).toBe(false)
+    })
+
+    it('returns false for frames without a URL', () => {
+      expect(isInjectedPageScriptError(eventWithFrames(['<anonymous>', '']))).toBe(false)
+    })
+
+    it('returns false when there are no frames', () => {
+      expect(isInjectedPageScriptError({})).toBe(false)
+      expect(isInjectedPageScriptError(eventWithFrames([]))).toBe(false)
     })
   })
 
@@ -531,6 +582,41 @@ describe('which errors Studio sends to Sentry', () => {
     }
     const hint = { originalException: new UserSqlError({ message: 'Failed to run sql query' }) }
     expect(await beforeSend(event, hint)).toBeNull()
+  })
+
+  it('drops errors whose frames all point at a page URL', async () => {
+    const event: Parameters<typeof beforeSend>[0] = {
+      type: undefined,
+      exception: {
+        values: [
+          {
+            value: 'Maximum call stack size exceeded.',
+            stacktrace: {
+              frames: [{ filename: 'https://supabase.com/dashboard/project/abc/sql/new' }],
+            },
+          },
+        ],
+      },
+    }
+    expect(await beforeSend(event, {})).toBeNull()
+  })
+
+  it('sends page crashes even when their frames all point at a page URL', async () => {
+    const event: Parameters<typeof beforeSend>[0] = {
+      type: undefined,
+      tags: { globalErrorBoundary: true },
+      exception: {
+        values: [
+          {
+            value: 'Maximum call stack size exceeded.',
+            stacktrace: {
+              frames: [{ filename: 'https://supabase.com/dashboard/project/abc/sql/new' }],
+            },
+          },
+        ],
+      },
+    }
+    expect(await beforeSend(event, {})).toBe(event)
   })
 
   it('drops errors with no code location when they did not crash the page', async () => {
