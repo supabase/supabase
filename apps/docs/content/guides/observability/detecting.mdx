@@ -211,6 +211,64 @@ Report when the current value already meets the confirmed limit, regardless of h
 
 Run the Health query for two separate complete UTC days. Compare API Gateway `events`; report at least 1,000 events and twice the preceding count. If the preceding count is zero, report new observed traffic without a growth percentage. Apply the missing-source rules. Request growth is workload context, not a capacity limit or billing total.
 
+## Automate scheduled checks
+
+Use `pg_cron` and `pg_net` to run checks automatically and ship findings to an Edge Function for alerting or storage. The following example runs the slow-query check every hour.
+
+Store your project URL and service role key in [Vault](/docs/guides/database/vault):
+
+```sql
+select vault.create_secret('https://project-ref.supabase.co', 'project_url');
+select vault.create_secret('YOUR_SERVICE_ROLE_KEY', 'service_key');
+```
+
+Create a function that collects slow queries and posts findings:
+
+```sql
+create or replace function check_slow_queries()
+returns void language plpgsql as $$
+declare
+  findings jsonb;
+begin
+  select jsonb_agg(jsonb_build_object(
+    'query', query,
+    'mean_exec_time_ms', round(mean_exec_time::numeric, 2),
+    'calls', calls
+  ))
+  into findings
+  from pg_stat_statements
+  where mean_exec_time > 100
+    and calls > 50
+  order by mean_exec_time desc
+  limit 10;
+
+  if findings is not null then
+    perform net.http_post(
+      url:= (select decrypted_secret from vault.decrypted_secrets where name = 'project_url')
+              || '/functions/v1/slow-query-alert',
+      headers:= jsonb_build_object(
+        'Content-Type', 'application/json',
+        'apikey', (select decrypted_secret from vault.decrypted_secrets where name = 'service_key')
+      ),
+      body:= jsonb_build_object('findings', findings, 'observed_at', now())
+    );
+  end if;
+end;
+$$;
+```
+
+Schedule it with `pg_cron`:
+
+```sql
+select cron.schedule(
+  'check-slow-queries-hourly',
+  '0 * * * *',
+  $$ select check_slow_queries(); $$
+);
+```
+
+The Edge Function receives a JSON body with `findings` and `observed_at` and can forward alerts to Slack, PagerDuty, or any other destination. For setup details including function authentication, see [Scheduling Edge Functions](/docs/guides/functions/schedule-functions).
+
 ## Turn a detection into a diagnosis
 
 Report the check, outcome, project, observation time, window or snapshot, threshold, measured values and units, and an evidence identifier. Include one investigation link and a verification step. Separate observations from hypotheses; do not invent a cause or remediation SQL. Use the [troubleshooting guides](/kb/topics/troubleshooting) to investigate the evidence.
