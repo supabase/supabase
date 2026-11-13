@@ -5,6 +5,7 @@ import { HttpResponse } from 'msw'
 import { describe, expect, it, vi } from 'vitest'
 
 import { getContentCount } from './content-count-query'
+import { getContentById, getSqlSnippetById } from './content-id-query'
 import type { ContentBase } from './content-query'
 import {
   logsViewsQueryOptions,
@@ -129,6 +130,24 @@ describe('saved log views persistence', () => {
     await expect(
       getSqlSnippets({ projectRef: 'project-a', type: 'log_sql' })
     ).rejects.toMatchObject({ name: 'ZodError' })
+  })
+
+  it.each([
+    ['generic content', getContentById],
+    ['SQL editor', getSqlSnippetById],
+  ])('rejects malformed log SQL on direct open through %s', async (_, readSnippet) => {
+    addAPIMock({
+      method: 'get',
+      path: '/platform/projects/:ref/content/item/:id',
+      response: () =>
+        HttpResponse.json<components['schemas']['GetUserContentByIdResponse_Output']>({
+          ...legacyRow,
+          content: { sql: 42 },
+        }),
+    })
+    await expect(readSnippet({ projectRef: 'project-a', id: legacyRow.id })).rejects.toMatchObject({
+      name: 'ZodError',
+    })
   })
 
   it('sends project-scoped opaque content and confirms create, update and delete', async () => {

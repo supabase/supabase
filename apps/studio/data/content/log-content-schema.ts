@@ -1,6 +1,5 @@
 import { z } from 'zod'
 
-import type { ContentBase } from './content-query'
 import { untrustedLogSql } from '@/data/logs/safe-analytics-sql'
 
 export const logsViewFilterConditionSchema = z.object({
@@ -47,7 +46,9 @@ const logSqlContentSchema = z
   })
   .passthrough()
 
-export const parseLogSqlSnippet = (row: ContentBase) => {
+export const parseLogSqlSnippet = <Row extends { id: string; type: string; content?: unknown }>(
+  row: Row
+) => {
   const type = z.literal('log_sql').parse(row.type)
   const { sql, ...content } = logSqlContentSchema.parse(row.content)
   return {
