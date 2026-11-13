@@ -5,7 +5,7 @@ import { reportStudioError } from './report-studio-error'
 import { PlatformError, StudioSqlError, UserSqlError } from './studio-errors'
 
 const { captureException } = vi.hoisted(() => ({ captureException: vi.fn(() => 'event-id') }))
-vi.mock('@sentry/nextjs', () => ({ captureException }))
+vi.mock('@sentry/react', () => ({ captureException }))
 
 beforeEach(() => {
   captureException.mockClear()
