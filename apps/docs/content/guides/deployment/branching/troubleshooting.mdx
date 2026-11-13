@@ -49,6 +49,14 @@ A deployment might fail for various reasons, including invalid SQL statements an
 
 To check the error message, see the Supabase workflow run for your branch under the [View logs](/dashboard/project/_/branches) section.
 
+### Production serves an outdated Edge Function
+
+If you push to your production branch before the previous deployment finishes, the deployment runs for the two commits overlap. The run for the earlier commit might deploy a function after the run for the later commit. Production then serves the earlier code, and the Supabase checks on both commits pass.
+
+To restore the code from your most recent commit, wait for both runs to finish. On the [Branches page](/dashboard/project/_/branches), open the **More options** menu for your production branch and click **Resync branch**, then confirm with **Resync**. A resync reruns every workflow step against the most recent commit on your Git branch.
+
+To prevent overlapping runs, see [Deploy one commit at a time](/docs/guides/deployment/branching/github-integration#deploy-one-commit-at-a-time).
+
 ### Schema drift between preview branches
 
 If multiple preview branches exist, each preview branch might contain different schema changes. This is similar to Git branches, where each branch might contain different code changes.
