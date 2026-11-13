@@ -139,7 +139,7 @@ tenant_region = "<region>" # if your tenant has a region
 
 ## Use an Auth0 Action to assign the authenticated role
 
-Your Supabase project inspects the `role` claim present in all JWTs sent to it, to assign the correct Postgres role when using the Data API, Storage or Realtime authorization.
+Your Supabase project inspects the `role` claim present in all JWTs sent to it, to assign the correct [Postgres role](/docs/guides/database/postgres/roles) when using the Data API, Storage or Realtime authorization.
 
 By default, Auth0 JWTs (both access token and ID token) do not contain a `role` claim in them. If you were to send such a JWT to your Supabase project, the `anon` role would be assigned when executing the Postgres query. Most of your app's logic will be accessible by the `authenticated` role.
 

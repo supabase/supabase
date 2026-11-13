@@ -172,7 +172,7 @@ export default {
 
 This is a key distinction that affects how you build URLs in your functions:
 
-- **`SUPABASE_URL`** contains an internal Docker network hostname. Use it for server-side calls from your functions to other Supabase services (Auth, Storage, database via PostgREST). This is what the Supabase JS client should use inside functions.
+- **`SUPABASE_URL`** contains an internal Docker network hostname. Use it for server-side calls from your functions to other Supabase services (Auth, Storage, database via PostgREST). This is what the [Supabase JS client](/docs/reference/javascript/introduction) should use inside functions.
 
 - **`SUPABASE_PUBLIC_URL`** is the externally-reachable URL of your Supabase instance. Use it if your function needs to build URLs that HTTP clients can reach from the outside.
 

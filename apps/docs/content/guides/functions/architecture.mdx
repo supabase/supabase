@@ -13,7 +13,7 @@ This guide explains the architecture and inner workings of Supabase Edge Functio
 To illustrate how edge functions operate, consider a photo-sharing app where users upload images and apply filters (e.g., grayscale or sepia) before saving them.
 
 - **Workflow Overview**:
-  - A user uploads an original image to Supabase Storage.
+  - A user uploads an original image to [Supabase Storage](/docs/guides/storage/quickstart).
   - When the user selects a filter, the client-side app (using the Supabase JavaScript SDK) invokes an edge function named something like "apply-filter."
   - The edge function:
     1. Downloads the original image from Supabase Storage.

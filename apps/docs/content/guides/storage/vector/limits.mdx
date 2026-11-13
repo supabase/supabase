@@ -30,4 +30,4 @@ The `queryVectors` limits differ between hosted and local vector buckets.
 | **Maximum results per response** | 100                   | 100                  |
 | **`nextToken` query pagination** | Supported             | Not supported        |
 
-Hosted vector buckets use Amazon S3 Vectors. When a response includes a `nextToken`, send the same query again with that token to retrieve the next page. Local vector buckets use pgvector and return the requested results in one response.
+Hosted vector buckets use Amazon S3 Vectors. When a response includes a `nextToken`, send the same query again with that token to retrieve the next page. Local vector buckets use [pgvector](/docs/guides/database/extensions/pgvector) and return the requested results in one response.

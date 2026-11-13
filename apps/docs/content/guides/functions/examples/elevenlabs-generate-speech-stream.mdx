@@ -6,7 +6,7 @@ tocVideo: '4Roog4PAmZ8'
 
 ## Introduction
 
-In this tutorial you will learn how to build an edge API to generate, stream, store, and cache speech using Supabase Edge Functions, Supabase Storage, and [ElevenLabs text to speech API](https://elevenlabs.io/text-to-speech).
+In this tutorial you will learn how to build an edge API to generate, stream, store, and cache speech using Supabase Edge Functions, [Supabase Storage](/docs/guides/storage/quickstart), and [ElevenLabs text to speech API](https://elevenlabs.io/text-to-speech).
 
 <Admonition type="note">
 
@@ -33,7 +33,7 @@ supabase init
 
 ### Configure the storage bucket
 
-You can configure the Supabase CLI to automatically generate a storage bucket by adding this configuration in the `config.toml` file:
+You can configure the [Supabase CLI](/docs/guides/local-development/cli/getting-started) to automatically generate a storage bucket by adding this configuration in the `config.toml` file:
 
 ```toml ./supabase/config.toml
 [storage.buckets.audio]

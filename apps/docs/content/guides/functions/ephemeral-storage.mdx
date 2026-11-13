@@ -83,7 +83,7 @@ You can use ephemeral storage with [Background Tasks](/docs/guides/functions/bac
 
 Imagine you have a Photo Album application that accepts photo uploads as zip files. A streaming implementation will run into memory limit errors with zip files exceeding 100MB, as it retains all archive files in memory simultaneously.
 
-You can write the zip file to ephemeral storage first, then use a background task to extract and upload files to Supabase Storage. This way, you only read parts of the zip file to the memory.
+You can write the zip file to ephemeral storage first, then use a background task to extract and upload files to [Supabase Storage](/docs/guides/storage/quickstart). This way, you only read parts of the zip file to the memory.
 
 ```tsx
 import { BlobWriter, ZipReader } from 'https://deno.land/x/zipjs/index.js'
