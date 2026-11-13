@@ -4,6 +4,7 @@ import { toast } from 'sonner'
 
 import { invalidateReplicationPipelineQueries } from './invalidate-pipeline-queries'
 import { replicationKeys } from './keys'
+import { pipelineIdSchema } from './pipeline-id'
 import type {
   BigQueryDestinationConfig,
   BigQueryTableOption,
@@ -18,7 +19,8 @@ import {
   isDucklakeSupabaseConfig,
 } from './utils'
 import { handleError, post } from '@/data/fetchers'
-import type { ResponseError, UseCustomMutationOptions } from '@/types'
+import type { StudioError } from '@/lib/errors/studio-errors'
+import type { UseCustomMutationOptions } from '@/types'
 
 type CreateDestinationPipelineBody =
   components['schemas']['CreateReplicationDestinationPipelineBody']
@@ -96,32 +98,6 @@ export const buildCreateDestinationApiConfig = (
     return buildBigQueryApiConfig(destinationConfig.bigQuery)
   }
 
-  if ('iceberg' in destinationConfig) {
-    const {
-      projectRef,
-      namespace,
-      warehouseName,
-      catalogToken,
-      s3AccessKeyId,
-      s3SecretAccessKey,
-      s3Region,
-    } = destinationConfig.iceberg
-
-    return {
-      iceberg: {
-        supabase: {
-          namespace,
-          project_ref: projectRef,
-          warehouse_name: warehouseName,
-          catalog_token: catalogToken,
-          s3_access_key_id: s3AccessKeyId,
-          s3_secret_access_key: s3SecretAccessKey,
-          s3_region: s3Region,
-        },
-      },
-    }
-  }
-
   if ('ducklake' in destinationConfig) {
     return buildDucklakeApiConfig(destinationConfig.ducklake)
   }
@@ -150,7 +126,7 @@ export const buildCreateDestinationApiConfig = (
   }
 
   throw new Error(
-    'Invalid destination config: must specify bigQuery, iceberg, ducklake, snowflake, or clickHouse'
+    'Invalid destination config: must specify bigQuery, ducklake, snowflake, or clickHouse'
   )
 }
 
@@ -190,7 +166,7 @@ async function createDestinationPipeline(
   })
 
   if (error) handleError(error)
-  return data
+  return { ...data, pipeline_id: pipelineIdSchema.parse(data.pipeline_id) }
 }
 
 type CreateDestinationPipelineData = Awaited<ReturnType<typeof createDestinationPipeline>>
@@ -202,34 +178,32 @@ export const useCreateDestinationPipelineMutation = ({
 }: Omit<
   UseCustomMutationOptions<
     CreateDestinationPipelineData,
-    ResponseError,
+    StudioError,
     CreateDestinationPipelineParams
   >,
   'mutationFn'
 > = {}) => {
   const queryClient = useQueryClient()
 
-  return useMutation<CreateDestinationPipelineData, ResponseError, CreateDestinationPipelineParams>(
-    {
-      mutationFn: (vars) => createDestinationPipeline(vars),
-      async onSuccess(data, variables, context) {
-        const { projectRef } = variables
+  return useMutation<CreateDestinationPipelineData, StudioError, CreateDestinationPipelineParams>({
+    mutationFn: (vars) => createDestinationPipeline(vars),
+    async onSuccess(data, variables, context) {
+      const { projectRef } = variables
 
-        await Promise.all([
-          queryClient.invalidateQueries({ queryKey: replicationKeys.destinations(projectRef) }),
-          invalidateReplicationPipelineQueries(queryClient, projectRef),
-        ])
+      await Promise.all([
+        queryClient.invalidateQueries({ queryKey: replicationKeys.destinations(projectRef) }),
+        invalidateReplicationPipelineQueries(queryClient, projectRef),
+      ])
 
-        await onSuccess?.(data, variables, context)
-      },
-      async onError(data, variables, context) {
-        if (onError === undefined) {
-          toast.error(`Failed to create destination or pipeline: ${data.message}`)
-        } else {
-          onError(data, variables, context)
-        }
-      },
-      ...options,
-    }
-  )
+      await onSuccess?.(data, variables, context)
+    },
+    async onError(data, variables, context) {
+      if (onError === undefined) {
+        toast.error(`Failed to create destination or pipeline: ${data.message}`)
+      } else {
+        onError(data, variables, context)
+      }
+    },
+    ...options,
+  })
 }

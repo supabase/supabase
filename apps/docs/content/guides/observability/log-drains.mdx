@@ -35,8 +35,8 @@ Requests to custom endpoints are currently unsigned. Signed requests are coming 
 
 </Admonition>
 
-<Accordion type="default">
-  <AccordionItem header="Edge Function walkthrough (uncompressed)" id="uncompressed">
+<details>
+<summary>Edge Function walkthrough (uncompressed)</summary>
 
 1. Create and deploy an Edge Function to receive the drain:
 
@@ -61,7 +61,7 @@ Deno.serve(async (req) => {
 Deploy it:
 
 ```bash
-supabase functions deploy log-receiver --project-ref [PROJECT REF]
+supabase functions deploy log-receiver --remote=[PROJECT REF]
 ```
 
 <Admonition type="caution">
@@ -78,9 +78,10 @@ Deploying an Edge Function as a log drain target will create a feedback loop —
 
 <ProjectConfigVariables variable="publishable" />
 
-  </AccordionItem>
+</details>
 
-  <AccordionItem header="Edge Function walkthrough (Gzip)" id="gzip">
+<details>
+<summary>Edge Function walkthrough (Gzip)</summary>
 
 Gzip payloads can be decompressed using Node-compatible built-in APIs. See the Edge Function [compression guide](/docs/guides/functions/compression) for more details.
 
@@ -107,8 +108,7 @@ Deno.serve(async (req) => {
 })
 ```
 
-  </AccordionItem>
-</Accordion>
+</details>
 
 ## OpenTelemetry (OTLP)
 
@@ -129,8 +129,8 @@ Your OTLP endpoint must accept logs at the `/v1/logs` path with `application/x-p
 
 Compatible platforms include OpenTelemetry Collector, Grafana Cloud, New Relic, Honeycomb, Datadog (OTLP ingestion), Elastic, and any other OTLP-compatible observability tool.
 
-<Accordion type="default">
-  <AccordionItem header="OpenTelemetry Collector example" id="otel-collector">
+<details>
+<summary>OpenTelemetry Collector example</summary>
 
 Configure an OTLP HTTP receiver in your Collector config:
 
@@ -158,9 +158,10 @@ service:
 
 Then create a log drain in [Project Settings > Log Drains](/dashboard/project/_/settings/log-drains) with the endpoint set to `https://your-collector:4318/v1/logs`.
 
-  </AccordionItem>
+</details>
 
-  <AccordionItem header="Authentication examples" id="otlp-auth">
+<details>
+<summary>Authentication examples</summary>
 
 Different OTLP platforms use different authentication methods. Add the appropriate header to your drain configuration:
 
@@ -182,8 +183,7 @@ Authorization: Bearer your-token
 Authorization: Basic base64(username:password)
 ```
 
-  </AccordionItem>
-</Accordion>
+</details>
 
 ## Datadog
 
@@ -200,8 +200,8 @@ Logs are batched and sent to Datadog with Gzip compression. Each event's log sou
 2. Create the drain in [Project Settings > Log Drains](/dashboard/project/_/settings/log-drains).
 3. Watch incoming events on the [Datadog Logs page](https://app.datadoghq.com/logs).
 
-<Accordion type="default">
-  <AccordionItem header="Parsing and pipeline configuration" id="datadog-pipeline">
+<details>
+<summary>Parsing and pipeline configuration</summary>
 
 [Grok parser](https://docs.datadoghq.com/service_management/events/pipelines_and_processors/grok_parser?tab=matchers) — extract the timestamp into a `date` field:
 
@@ -221,8 +221,7 @@ Logs are batched and sent to Datadog with Gzip compression. Each event's log sou
 metadata.parsed.error_severity, metadata.level
 ```
 
-  </AccordionItem>
-</Accordion>
+</details>
 
 ## Loki
 

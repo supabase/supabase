@@ -1,5 +1,7 @@
 @import 'config/tailwind.config.css';
 @import 'config/inline-code.css';
+@import 'ui-patterns/CodeBlock/code-block.css';
+@import 'ui-patterns/Notch/notch.css';
 
 @source '../_blog/*.mdx';
 @source '../components/**/*.tsx';
@@ -17,10 +19,19 @@
     var(--font-inter), Inter, Helvetica Neue, Helvetica, ui-sans-serif, system-ui, sans-serif;
   --font-heading: var(--font-manrope, var(--font-sans));
   --font-mono: var(--font-source-code-pro), 'Source Code Pro', ui-monospace, Menlo, monospace;
+
+  --color-pane-dark: hsl(var(--colors-gray-dark-300));
 }
 
 @utility section-container {
   @apply w-full mx-auto max-w-7xl px-6 lg:px-12 xl:px-24;
+}
+
+@utility construction-mask {
+  mask:
+    linear-gradient(to right, transparent, #000 35%, #000 65%, transparent),
+    linear-gradient(to bottom, #000 60%, transparent);
+  mask-composite: intersect;
 }
 
 /**
@@ -75,6 +86,8 @@
   --animate-marquee-vertical: marquee-vertical 180s linear infinite both;
   --animate-pulse-radar: pulse-radar 3s linear infinite;
   --animate-slide-in: slideIn 250ms ease-in both;
+  --animate-draw-line: draw-line 1.8s linear both;
+  --animate-reveal-hatch: reveal-hatch 2.4s cubic-bezier(0.4, 0, 1, 1) 1.8s both;
 
   --delay-1200: 1200ms;
   --delay-1500: 1500ms;
@@ -92,6 +105,21 @@
   --text-8xl: 5.875rem;
   --text-9xl: 7.875rem;
   --font-weight-normal: 450;
+}
+
+@keyframes draw-line {
+  from {
+    stroke-dashoffset: 1;
+  }
+}
+
+@keyframes reveal-hatch {
+  from {
+    scale: 0;
+  }
+  to {
+    scale: 1;
+  }
 }
 
 @keyframes flash-code {

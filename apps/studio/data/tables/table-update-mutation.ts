@@ -6,7 +6,8 @@ import { CreateTableBody } from './table-create-mutation'
 import { unguarded } from '@/data/fetchers'
 import { executeSql } from '@/data/sql/execute-sql-mutation'
 import { invalidateTableMetadata } from '@/data/tables/table-metadata-invalidation'
-import type { ResponseError, UseCustomMutationOptions } from '@/types'
+import type { StudioError } from '@/lib/errors/studio-errors'
+import type { UseCustomMutationOptions } from '@/types'
 
 export type UpdateTableBody = Partial<CreateTableBody> & {
   id?: number
@@ -38,6 +39,8 @@ export async function updateTable({
   const { result } = await executeSql<void>({
     projectRef,
     connectionString,
+    sqlOrigin: 'studio',
+    queryName: 'table-update',
     sql,
     queryKey: ['table', 'update', id],
     grant: unguarded.migrating,
@@ -53,12 +56,12 @@ export const useTableUpdateMutation = ({
   onError,
   ...options
 }: Omit<
-  UseCustomMutationOptions<TableUpdateData, ResponseError, TableUpdateVariables>,
+  UseCustomMutationOptions<TableUpdateData, StudioError, TableUpdateVariables>,
   'mutationFn'
 > = {}) => {
   const queryClient = useQueryClient()
 
-  return useMutation<TableUpdateData, ResponseError, TableUpdateVariables>({
+  return useMutation<TableUpdateData, StudioError, TableUpdateVariables>({
     mutationFn: (vars) => updateTable(vars),
     async onSuccess(data, variables, context) {
       const { projectRef, schema, id, name, payload } = variables

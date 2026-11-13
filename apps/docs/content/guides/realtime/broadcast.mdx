@@ -7,6 +7,12 @@ tocVideo: _-y_Lnujq64
 
 You can use Realtime Broadcast to send low-latency messages between users. Messages can be sent using the client libraries, REST APIs, or directly from your database.
 
+<Admonition type="note">
+
+To see Broadcast in action, try the demo app at [multiplayer.dev](https://multiplayer.dev).
+
+</Admonition>
+
 ## How Broadcast works
 
 The way Broadcast works changes based on the channel you are using:
@@ -1137,7 +1143,7 @@ const changes = supabase
 
 ## Broadcast replay
 
-### How it works
+### How it works [#broadcast-replay-how-it-works]
 
 Broadcast Replay enables **private** channels to access messages that were sent earlier. Only messages published via [Broadcast From the Database](#broadcast-from-the-database) are available for replay.
 
@@ -1325,3 +1331,7 @@ A few common use cases for Broadcast Replay include:
 - Loading the last events that happened during a sports event
 - Ensuring users always see the latest events after a page reload or network interruption
 - Highlighting the most recent sections that changed in a web page
+
+## Related resources
+
+- The Supabase Library has Broadcast-based components for web you can install with a single command: [Realtime Chat](/library/docs/nextjs/realtime-chat) and [Realtime Cursor](/library/docs/nextjs/realtime-cursor).

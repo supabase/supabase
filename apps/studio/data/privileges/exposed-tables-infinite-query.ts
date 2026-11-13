@@ -5,7 +5,7 @@ import { privilegeKeys } from './keys'
 import { unguarded } from '@/data/fetchers'
 import { executeSql } from '@/data/sql/execute-sql-mutation'
 import { INTERNAL_SCHEMAS } from '@/hooks/useProtectedSchemas'
-import type { ResponseError } from '@/types'
+import type { StudioError } from '@/lib/errors/studio-errors'
 
 const IGNORED_SCHEMAS = [...INTERNAL_SCHEMAS, 'pg_catalog']
 export const EXPOSED_TABLES_PAGE_LIMIT = 50
@@ -48,6 +48,8 @@ export async function getExposedTables(
     {
       projectRef,
       connectionString,
+      sqlOrigin: 'studio',
+      queryName: 'exposed-tables',
       sql,
       queryKey: ['exposed-tables', page],
       grant: unguarded.migrating,
@@ -59,14 +61,13 @@ export async function getExposedTables(
 }
 
 export type ExposedTablesData = Awaited<ReturnType<typeof getExposedTables>>
-export type ExposedTablesError = ResponseError
+export type ExposedTablesError = StudioError
 
 export const exposedTablesInfiniteQueryOptions = (
   { projectRef, connectionString, search }: ExposedTablesVariables,
   { enabled = true }: { enabled?: boolean } = {}
 ) => {
   return infiniteQueryOptions({
-    // eslint-disable-next-line @tanstack/query/exhaustive-deps -- connection string doesn't change the result of the query
     queryKey: privilegeKeys.exposedTablesInfinite(projectRef, search),
     queryFn: ({ signal, pageParam }) =>
       getExposedTables(

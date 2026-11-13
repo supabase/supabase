@@ -3,7 +3,8 @@ import { toast } from 'sonner'
 
 import { getMockOAuthAppsAuthorizeApproveResult, USE_MOCKS } from './mocks'
 import type { OAuthAppsAuthorizeApproveResult, OAuthAuthorizeApproveRequest } from './types'
-import type { ResponseError, UseCustomMutationOptions } from '@/types'
+import type { StudioError } from '@/lib/errors/studio-errors'
+import type { UseCustomMutationOptions } from '@/types'
 
 export type OAuthAppsAuthorizeApproveVariables = {
   slug: string
@@ -33,14 +34,14 @@ export const useOAuthAppsAuthorizeApproveMutation = ({
 }: Omit<
   UseCustomMutationOptions<
     OAuthAppsAuthorizeApproveData,
-    ResponseError,
+    StudioError,
     OAuthAppsAuthorizeApproveVariables
   >,
   'mutationFn'
 > = {}) => {
   return useMutation<
     OAuthAppsAuthorizeApproveData,
-    ResponseError,
+    StudioError,
     OAuthAppsAuthorizeApproveVariables
   >({
     mutationFn: (vars) => approveOAuthAppsAuthorize(vars),

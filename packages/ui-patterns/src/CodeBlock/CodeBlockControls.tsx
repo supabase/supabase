@@ -1,8 +1,16 @@
 'use client'
 
-import { ArrowRightFromLine, Check, Copy, WrapText, type LucideIcon } from 'lucide-react'
+import { ArrowRightFromLine, Check, Copy, WrapText } from 'lucide-react'
 import { useEffect, useState } from 'react'
-import { Button, cn, copyToClipboard, Tooltip, TooltipContent, TooltipTrigger } from 'ui'
+import {
+  Button,
+  cn,
+  copyToClipboard,
+  CrossfadeIcon,
+  Tooltip,
+  TooltipContent,
+  TooltipTrigger,
+} from 'ui'
 
 export function CodeCopyButton({
   className,
@@ -69,8 +77,14 @@ export function CodeCopyButton({
   )
 }
 
-export function CodeBlockControls({ content }: { content: string }) {
-  const [isWrapped, setIsWrapped] = useState(false)
+export function CodeBlockControls({
+  content,
+  defaultWrapped = false,
+}: {
+  content: string
+  defaultWrapped?: boolean
+}) {
+  const [isWrapped, setIsWrapped] = useState(defaultWrapped)
   // Empty until the first toggle, so nothing is announced on mount
   const [wrapStatus, setWrapStatus] = useState('')
 
@@ -117,30 +131,5 @@ export function CodeBlockControls({ content }: { content: string }) {
       </Tooltip>
       <CodeCopyButton content={content} />
     </div>
-  )
-}
-
-function CrossfadeIcon({
-  active,
-  activeIcon: ActiveIcon,
-  inactiveIcon: InactiveIcon,
-}: {
-  active: boolean
-  activeIcon: LucideIcon
-  inactiveIcon: LucideIcon
-}) {
-  const iconClass = (shown: boolean) =>
-    cn(
-      'absolute inset-0 m-auto text-lighter group-hover/btn:text-foreground',
-      'transition-[opacity,scale,filter,color] duration-300 [transition-timing-function:cubic-bezier(0.2,0,0,1)]',
-      'motion-reduce:transition-none',
-      shown ? 'opacity-100 scale-100 blur-none' : 'opacity-0 scale-[0.25] blur-[4px]'
-    )
-
-  return (
-    <span className="relative block size-3.5">
-      <ActiveIcon size={14} aria-hidden="true" className={iconClass(active)} />
-      <InactiveIcon size={14} aria-hidden="true" className={iconClass(!active)} />
-    </span>
   )
 }

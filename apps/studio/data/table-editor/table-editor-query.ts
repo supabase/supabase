@@ -5,7 +5,8 @@ import { tableEditorKeys } from './keys'
 import { Entity } from './table-editor-types'
 import { unguarded } from '@/data/fetchers'
 import { executeSql } from '@/data/sql/execute-sql-mutation'
-import { ResponseError, UseCustomQueryOptions } from '@/types'
+import type { StudioError } from '@/lib/errors/studio-errors'
+import { UseCustomQueryOptions } from '@/types'
 
 type TableEditorArgs = {
   id?: number
@@ -29,6 +30,8 @@ export async function getTableEditor(
     {
       projectRef,
       connectionString,
+      sqlOrigin: 'studio',
+      queryName: 'table-editor',
       sql,
       queryKey: ['table-editor', id],
       grant: unguarded.migrating,
@@ -40,7 +43,7 @@ export async function getTableEditor(
 }
 
 export type TableEditorData = Awaited<ReturnType<typeof getTableEditor>>
-export type TableEditorError = ResponseError
+export type TableEditorError = StudioError
 
 export const useTableEditorQuery = <TData = TableEditorData>(
   { projectRef, connectionString, id }: TableEditorVariables,

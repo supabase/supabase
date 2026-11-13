@@ -5,7 +5,7 @@ import { z } from 'zod'
 import { databaseKeys } from './keys'
 import { unguarded } from '@/data/fetchers'
 import { executeSql } from '@/data/sql/execute-sql-mutation'
-import type { ResponseError } from '@/types'
+import type { StudioError } from '@/lib/errors/studio-errors'
 
 export type EntitySearchVariables = {
   projectRef?: string
@@ -13,14 +13,54 @@ export type EntitySearchVariables = {
   query: string
 }
 
+const relationFields = {
+  id: z.number(),
+  schema: z.string(),
+  name: z.string(),
+}
+
 const entitySearchResultSchema = z.object({
   tables: z.array(
+    z.discriminatedUnion('type', [
+      z.object({
+        ...relationFields,
+        type: z.enum(['r', 'p']),
+        rls_enabled: z.boolean(),
+        policy_count: z.number(),
+      }),
+      z.object({ ...relationFields, type: z.literal('v'), security_invoker: z.boolean() }),
+      z.object({ ...relationFields, type: z.enum(['m', 'f']) }),
+    ])
+  ),
+  policies: z.array(
+    z.object({
+      id: z.number(),
+      name: z.string(),
+      command: z.enum(['ALL', 'SELECT', 'INSERT', 'UPDATE', 'DELETE']),
+      schema: z.string(),
+      table: z.string(),
+      table_id: z.number(),
+    })
+  ),
+  triggers: z.array(
+    z.object({
+      id: z.number(),
+      name: z.string(),
+      activation: z.enum(['BEFORE', 'AFTER', 'INSTEAD OF']),
+      events: z.array(z.enum(['INSERT', 'UPDATE', 'DELETE', 'TRUNCATE'])),
+      schema: z.string(),
+      table: z.string(),
+      table_id: z.number(),
+      matched_function: z.string().nullable(),
+    })
+  ),
+  functions: z.array(
     z.object({
       id: z.number(),
       schema: z.string(),
       name: z.string(),
-      rls_enabled: z.boolean(),
-      policy_count: z.number(),
+      type: z.enum(['function', 'procedure']),
+      args: z.string(),
     })
   ),
 })
@@ -35,6 +75,8 @@ async function getEntitySearch(
     {
       projectRef,
       connectionString,
+      sqlOrigin: 'studio',
+      queryName: 'entity-search',
       sql: getSearchEntitiesSql({ query }),
       queryKey: ['entity-search'],
       grant: unguarded.migrating,
@@ -47,14 +89,16 @@ async function getEntitySearch(
 
 export type EntitySearchData = Awaited<ReturnType<typeof getEntitySearch>>
 export type EntitySearchTable = EntitySearchData['tables'][number]
-export type EntitySearchError = ResponseError
+export type EntitySearchPolicy = EntitySearchData['policies'][number]
+export type EntitySearchTrigger = EntitySearchData['triggers'][number]
+export type EntitySearchFunction = EntitySearchData['functions'][number]
+export type EntitySearchError = StudioError
 
 export const entitySearchQueryOptions = (
   { projectRef, connectionString, query }: EntitySearchVariables,
   { enabled = true }: { enabled?: boolean } = {}
 ) =>
   queryOptions({
-    // eslint-disable-next-line @tanstack/query/exhaustive-deps -- connection string doesn't change the result of the query
     queryKey: databaseKeys.entitySearch(projectRef, query),
     queryFn: ({ signal }) => getEntitySearch({ projectRef, connectionString, query }, signal),
     enabled: enabled && typeof projectRef !== 'undefined' && query.length > 0,

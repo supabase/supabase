@@ -1,8 +1,9 @@
 import type { IncomingHttpHeaders } from 'node:http'
 import { snakeCase } from 'lodash'
+import type { NextApiRequest } from 'next'
 import z from 'zod'
 
-import { IS_PLATFORM } from '@/lib/constants'
+import { IS_PLATFORM, PG_META_URL } from '@/lib/constants'
 
 /**
  * Construct headers for api request.
@@ -121,6 +122,24 @@ export function commaSeparatedStringIntoArray(value: string): string[] {
     .filter(Boolean)
 }
 
+const BEARER_SCHEME = 'bearer'
+
+/**
+ * Extract the token from a `Bearer <token>` Authorization header (scheme is case-insensitive).
+ *
+ * Returns `null` for a missing, array-valued, non-Bearer or empty header. Parsed without a regex
+ * over the token so untrusted input can't trigger backtracking.
+ */
+export function getBearerToken(authorization: string | string[] | undefined | null) {
+  if (typeof authorization !== 'string') return null
+
+  const scheme = authorization.slice(0, BEARER_SCHEME.length)
+  const rest = authorization.slice(BEARER_SCHEME.length)
+  if (scheme.toLowerCase() !== BEARER_SCHEME || !/^\s/.test(rest)) return null
+
+  return rest.trim() || null
+}
+
 export class InternalServerError extends Error {
   constructor(
     message: string,
@@ -129,4 +148,29 @@ export class InternalServerError extends Error {
     super(message)
     this.name = 'InternalServerError'
   }
+}
+
+/**
+ * Construct the pgMeta redirection url passing along the filtering query params
+ * @param req
+ * @param endpoint
+ */
+export function getPgMetaRedirectUrl(req: NextApiRequest, endpoint: string) {
+  const query = Object.entries(req.query).reduce((query, entry) => {
+    const [key, value] = entry
+    if (Array.isArray(value)) {
+      for (const v of value) {
+        query.append(key, v)
+      }
+    } else if (value) {
+      query.set(key, value)
+    }
+    return query
+  }, new URLSearchParams())
+
+  let url = `${PG_META_URL}/${endpoint}`
+  if (Object.keys(req.query).length > 0) {
+    url += `?${query}`
+  }
+  return url
 }

@@ -11,7 +11,6 @@ const {
   docsAuthConfiguration: authConfigurationEnabled,
   docsAuthFlows: authFlowsEnabled,
   docsAuthFullSecurity: authFullSecurityEnabled,
-  docsAuthTroubleshooting: authTroubleshootingEnabled,
   docsCompliance: complianceEnabled,
   docsContribution: contributionEnabled,
   docsFdw: fdwEnabled,
@@ -39,7 +38,6 @@ const {
   'docs:auth_configuration',
   'docs:auth_flows',
   'docs:auth_full_security',
-  'docs:auth_troubleshooting',
   'docs:compliance',
   'docs:contribution',
   'docs:fdw',
@@ -80,8 +78,10 @@ export const GLOBAL_MENU_ITEMS: GlobalMenuItems = [
   [
     {
       label: 'Products',
+      icon: 'products',
       menuItems: [
         [
+          { label: 'Features' },
           {
             label: 'Database',
             icon: 'database',
@@ -152,6 +152,7 @@ export const GLOBAL_MENU_ITEMS: GlobalMenuItems = [
   [
     {
       label: 'Build',
+      icon: 'build',
       menuItems: [
         [
           {
@@ -195,6 +196,7 @@ export const GLOBAL_MENU_ITEMS: GlobalMenuItems = [
   [
     {
       label: 'Manage',
+      icon: 'manage',
       menuItems: [
         [
           {
@@ -286,16 +288,23 @@ export const GLOBAL_MENU_ITEMS: GlobalMenuItems = [
             new: true,
           },
           {
+            label: 'TanStack DB',
+            icon: 'reference-javascript',
+            href: '/reference/tanstack_db' as `/${string}`,
+            level: 'reference_tanstack_db',
+            experimental: true,
+          },
+          {
             label: 'CLI Commands',
             icon: 'reference-cli',
             href: '/reference/cli/introduction' as `/${string}`,
-            level: 'reference_javascript',
+            level: 'reference_cli',
           },
           {
             label: 'Management API',
             icon: 'reference-api',
             href: '/reference/api/introduction' as `/${string}`,
-            level: 'reference_javascript',
+            level: 'reference_api',
           },
           {
             label: 'Library',
@@ -335,12 +344,6 @@ export const GLOBAL_MENU_ITEMS: GlobalMenuItems = [
             icon: 'contributing',
             href: '/contributing' as `/${string}`,
             enabled: contributionEnabled,
-          },
-          {
-            label: 'Troubleshooting',
-            icon: 'troubleshooting',
-            href: '/guides/troubleshooting' as `/${string}`,
-            level: 'troubleshooting',
           },
           {
             label: 'Knowledge base',
@@ -848,14 +851,7 @@ export const auth: NavMenuConstant = {
     },
     {
       name: 'Debugging',
-      items: [
-        { name: 'Error Codes', url: '/guides/auth/debugging/error-codes' },
-        {
-          name: 'Troubleshooting',
-          url: '/guides/auth/troubleshooting',
-          enabled: authTroubleshootingEnabled,
-        },
-      ],
+      items: [{ name: 'Error Codes', url: '/guides/auth/debugging/error-codes' }],
     },
     {
       name: 'OAuth 2.1 Server',
@@ -1055,6 +1051,7 @@ export const database: NavMenuConstant = {
     },
     {
       name: 'Working with your database (basics)',
+      shortName: 'Basics',
       url: undefined,
       items: [
         {
@@ -1079,6 +1076,7 @@ export const database: NavMenuConstant = {
     },
     {
       name: 'Working with your database (intermediate)',
+      shortName: 'Intermediate',
       url: undefined,
       items: [
         {
@@ -1208,6 +1206,10 @@ export const database: NavMenuConstant = {
           name: 'Postgres log configuration',
           url: '/guides/database/postgres/postgres-log-config' as `/${string}`,
         },
+        {
+          name: 'Log slow and failing queries',
+          url: '/guides/observability/log-slow-queries' as `/${string}`,
+        },
       ],
     },
     {
@@ -1223,16 +1225,12 @@ export const database: NavMenuConstant = {
           url: '/guides/observability/inspect' as `/${string}`,
         },
         {
-          name: 'Debugging performance issues',
-          url: '/guides/database/debugging-performance' as `/${string}`,
+          name: 'Query plans with explain()',
+          url: '/guides/api/query-plans' as `/${string}`,
         },
         {
           name: 'Supavisor',
           url: '/guides/database/supavisor' as `/${string}`,
-        },
-        {
-          name: 'Troubleshooting',
-          url: '/guides/database/troubleshooting' as `/${string}`,
         },
       ],
     },
@@ -1691,8 +1689,8 @@ export const api: NavMenuConstant = {
           url: '/guides/database/full-text-search' as `/${string}`,
         },
         {
-          name: 'Debugging performance issues',
-          url: '/guides/database/debugging-performance' as `/${string}`,
+          name: 'Query plans with explain()',
+          url: '/guides/api/query-plans' as `/${string}`,
         },
         {
           name: 'Using custom schemas',
@@ -1818,10 +1816,6 @@ export const functions: NavMenuConstant = {
         {
           name: 'Error codes',
           url: '/guides/functions/error-codes' as `/${string}`,
-        },
-        {
-          name: 'Troubleshooting',
-          url: '/guides/functions/troubleshooting' as `/${string}`,
         },
       ],
     },
@@ -2083,10 +2077,7 @@ export const realtime: NavMenuConstant = {
     {
       name: 'Debugging',
       url: undefined,
-      items: [
-        { name: 'Operational Error Codes', url: '/guides/realtime/error_codes', items: [] },
-        { name: 'Troubleshooting', url: '/guides/realtime/troubleshooting' },
-      ],
+      items: [{ name: 'Operational Error Codes', url: '/guides/realtime/error_codes', items: [] }],
     },
   ],
 }
@@ -2118,6 +2109,10 @@ export const storage: NavMenuConstant = {
             {
               name: 'Access Control',
               url: '/guides/storage/security/access-control' as `/${string}`,
+            },
+            {
+              name: 'URL Signing Keys',
+              url: '/guides/storage/security/signing-keys' as `/${string}`,
             },
           ],
         },
@@ -2189,7 +2184,6 @@ export const storage: NavMenuConstant = {
           items: [
             { name: 'Logs', url: '/guides/storage/debugging/logs' },
             { name: 'Error Codes', url: '/guides/storage/debugging/error-codes' },
-            { name: 'Troubleshooting', url: '/guides/storage/troubleshooting' },
           ],
         },
         {
@@ -2500,6 +2494,12 @@ export const ai_tools: NavMenuConstant = {
       url: '/guides/ai-tools/ai-skills' as `/${string}`,
       enabled: agentSkillsEnabled,
     },
+    // agent-only instructions: the html page returns 404, and the .md stays available
+    {
+      name: 'Report documentation problems: instructions for agents',
+      url: '/guides/ai-tools/agent-feedback',
+      enabled: false,
+    },
     {
       name: 'Prompts',
       url: '/guides/ai-tools/ai-prompts' as `/${string}`,
@@ -2530,7 +2530,12 @@ export const local_development: NavMenuConstant = {
   items: [
     { name: 'Overview & quickstart', url: '/guides/local-development' },
     { name: 'Install and run the CLI', url: '/guides/local-development/cli/getting-started' },
+    { name: 'Migrating to CLI v3', url: '/guides/local-development/cli/migrating-to-v3' },
     { name: 'Local development workflow', url: '/guides/local-development/cli-workflows' },
+    {
+      name: 'Local and hosted projects',
+      url: '/guides/local-development/local-and-hosted-projects',
+    },
     {
       name: 'Guides',
       url: undefined,
@@ -2598,7 +2603,7 @@ export const local_development: NavMenuConstant = {
         { name: 'Database testing', url: '/guides/database/testing' },
         {
           name: 'RLS policies testing',
-          url: '/guides/database/extensions/pgtap#testing-rls-policies' as `/${string}`,
+          url: '/guides/database/postgres/testing-row-level-security',
         },
       ],
     },
@@ -2650,12 +2655,21 @@ export const security: NavMenuConstant = {
           enabled: productionChecklistEnabled,
         },
         {
+          name: 'Production security checklist',
+          url: '/guides/security/production-checklist' as `/${string}`,
+          enabled: productionChecklistEnabled,
+        },
+        {
           name: 'Shared Responsibility Model',
           url: '/guides/deployment/shared-responsibility-model' as `/${string}`,
         },
         { name: 'Row Level Security', url: '/guides/database/postgres/row-level-security' },
         { name: 'Securing your API', url: '/guides/api/securing-your-api' },
         { name: 'Securing your npm installs', url: '/guides/security/npm-security' },
+        {
+          name: 'Rotate a leaked API key',
+          url: '/guides/security/rotate-leaked-api-keys',
+        },
       ],
     },
   ],
@@ -2786,8 +2800,8 @@ export const platform: NavMenuConstant = {
               url: '/guides/platform/sso/testing-best-practices' as `/${string}`,
             },
             {
-              name: 'Enterprise-Managed Authentication for MCP',
-              url: '/guides/platform/sso/enterprise-mcp-authentication' as `/${string}`,
+              name: 'Enterprise-Managed Authorization for MCP',
+              url: '/guides/platform/sso/enterprise-mcp-authorization' as `/${string}`,
             },
           ],
         },
@@ -2825,6 +2839,10 @@ export const platform: NavMenuConstant = {
         {
           name: 'Temporary Access',
           url: '/guides/platform/temporary-access' as `/${string}`,
+        },
+        {
+          name: 'Map team members to Postgres roles',
+          url: '/guides/platform/team-database-access' as `/${string}`,
         },
         { name: 'Performance Tuning', url: '/guides/platform/performance' as `/${string}` },
         { name: 'SSL Enforcement', url: '/guides/platform/ssl-enforcement' as `/${string}` },
@@ -3024,6 +3042,7 @@ export const telemetry: NavMenuConstant = {
       items: [
         { name: 'Query logs with SQL', url: '/guides/observability/advanced-log-filtering' },
         { name: 'Logs in Studio', url: '/guides/observability/logs' },
+        { name: 'Logs in the CLI', url: '/guides/observability/cli-logs' },
         { name: 'Log sources and fields', url: '/guides/observability/log-field-reference' },
         { name: 'Inspect the database', url: '/guides/observability/inspect' },
         { name: 'Advisors', url: '/guides/observability/advisors' },
@@ -3046,10 +3065,7 @@ export const telemetry: NavMenuConstant = {
     },
     {
       name: 'Detect and diagnose',
-      items: [
-        { name: 'Detection checks', url: '/guides/observability/detecting' },
-        { name: 'Troubleshooting', url: '/guides/troubleshooting' },
-      ],
+      items: [{ name: 'Detection checks', url: '/guides/observability/detecting' }],
     },
     {
       name: 'Agent prompts',
@@ -3068,6 +3084,7 @@ export const telemetry: NavMenuConstant = {
       name: 'Configure and export',
       items: [
         { name: 'Configure logging', url: '/guides/observability/configure-logging' },
+        { name: 'Log slow and failing queries', url: '/guides/observability/log-slow-queries' },
         { name: 'Log drains', url: '/guides/observability/log-drains' },
         { name: 'Client-side tracing', url: '/guides/observability/client-side-tracing' },
         { name: 'Sentry integration', url: '/guides/observability/sentry-monitoring' },
@@ -3220,6 +3237,10 @@ export const deployment: NavMenuConstant = {
         },
         { name: 'Configuration', url: '/guides/deployment/branching/configuration' },
         { name: 'Integrations', url: '/guides/deployment/branching/integrations' },
+        {
+          name: 'Preview branches on Vercel',
+          url: '/guides/integrations/vercel-preview-branches' as `/${string}`,
+        },
         { name: 'Troubleshooting', url: '/guides/deployment/branching/troubleshooting' },
         { name: 'Billing', url: '/guides/platform/manage-your-usage/branching' },
       ],
@@ -3285,6 +3306,10 @@ export const integrations: NavMenuConstant = {
       url: '/guides/integrations/vercel-marketplace',
     },
     {
+      name: 'Preview branches on Vercel',
+      url: '/guides/integrations/vercel-preview-branches',
+    },
+    {
       name: 'Stripe Projects',
       url: '/guides/integrations/stripe-projects',
     },
@@ -3347,14 +3372,14 @@ export const reference = {
           enabled: sdkCsharpEnabled,
         },
         {
-          name: 'supbase-python',
+          name: 'supabase-python',
           url: '/reference/python/start',
           level: 'reference_python',
           icon: '/img/icons/menu/reference-python' as `/${string}`,
           enabled: sdkPythonEnabled,
         },
         {
-          name: 'supbase-swift',
+          name: 'supabase-swift',
           url: '/reference/swift/start',
           level: 'reference_swift',
           items: [],
@@ -3430,6 +3455,17 @@ export const reference_middleware_v1 = {
   pkg: {
     name: '@supabase/middleware',
     repo: 'https://github.com/supabase/middleware',
+  },
+}
+
+export const reference_tanstack_db_v1 = {
+  icon: 'reference-javascript',
+  title: 'TanStack DB',
+  url: '/reference/tanstack_db',
+  parent: '/reference',
+  pkg: {
+    name: '@supabase-labs/tanstack-db',
+    repo: 'https://github.com/supabase/tanstack-db',
   },
 }
 

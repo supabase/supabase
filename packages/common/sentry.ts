@@ -60,6 +60,8 @@ export const BROWSER_NOISE_IGNORE_ERRORS: (string | RegExp)[] = [
   "Cannot read properties of null (reading 'removeChild')",
   "TypeError: can't access dead object",
   /^NS_ERROR_/,
+  // Extension messaging API (chrome.runtime / browser.runtime), never called by our code
+  /Invalid call to runtime\.sendMessage\(\)/,
 
   // === Non-Error throws (extensions, third-party libs throwing strings/objects) ===
   'Non-Error exception captured',

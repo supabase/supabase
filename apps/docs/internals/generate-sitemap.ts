@@ -7,6 +7,7 @@ import fs from 'fs'
 import { globby } from 'globby'
 import matter from 'gray-matter'
 import prettier from 'prettier'
+import { checkGuidePageEnabled } from '~/features/docs/NavigationPageStatus.utils'
 
 import { generateReferencePages } from './files/reference-lib'
 
@@ -28,20 +29,9 @@ async function generate() {
     })
   )
 
-  const troubleshootingFiles = await globby(['content/troubleshooting/**/!(_)*.mdx'])
-  const troubleshootingPages = await Promise.all(
-    troubleshootingFiles.map(async (filePath) => {
-      return {
-        link: filePath.replace(/^content/, 'guides').replace(/\.mdx$/, ''),
-        priority: 1,
-      }
-    })
-  )
-
-  const allPages = (contentPages as Array<{ link: string; priority: number }>).concat(
-    troubleshootingPages,
-    referencePages
-  )
+  const allPages = (contentPages as Array<{ link: string; priority: number }>)
+    .filter(({ link }) => checkGuidePageEnabled(`/${link}`))
+    .concat(referencePages)
   // Keep the output order stable across builds
   allPages.sort((a, b) => (a.link < b.link ? -1 : a.link > b.link ? 1 : 0))
 

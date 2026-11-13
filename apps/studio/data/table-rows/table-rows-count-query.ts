@@ -6,14 +6,16 @@ import { IS_PLATFORM } from 'common'
 import { tableRowKeys } from './keys'
 import { parseSupaTable } from '@/components/grid/SupabaseGrid.utils'
 import type { Filter, SupaTable } from '@/components/grid/types'
+import { isUserFaultForValues } from '@/data/error-classification'
 import { unguarded } from '@/data/fetchers'
 import { useConnectionStringForReadOps } from '@/data/read-replicas/replicas-query'
 import { executeSql } from '@/data/sql/execute-sql-mutation'
 import { prefetchTableEditor } from '@/data/table-editor/table-editor-query'
 import { FGA_PERMISSIONS, useAsyncCheckPermissionsV2 } from '@/hooks/misc/useCheckPermissionsV2'
+import type { StudioError } from '@/lib/errors/studio-errors'
 import { RoleImpersonationState, wrapWithRoleImpersonation } from '@/lib/role-impersonation'
 import { isRoleImpersonationEnabled } from '@/state/role-impersonation-state'
-import { ResponseError, UseCustomQueryOptions } from '@/types'
+import { UseCustomQueryOptions } from '@/types'
 
 export type GetTableRowsCountArgs = {
   table?: SupaTable
@@ -35,7 +37,7 @@ export type TableRowsCountVariables = Omit<GetTableRowsCountArgs, 'table'> & {
 }
 
 export type TableRowsCountData = TableRowsCount
-export type TableRowsCountError = ResponseError
+export type TableRowsCountError = StudioError
 
 export async function getTableRowsCount(
   {
@@ -78,6 +80,9 @@ export async function getTableRowsCount(
     {
       projectRef,
       connectionString,
+      sqlOrigin: 'studio',
+      queryName: 'table-rows-count',
+      isUserFaultSqlState: filters?.length ? isUserFaultForValues : undefined,
       sql,
       queryKey: ['table-rows-count', table.id],
       isRoleImpersonationEnabled: isRoleImpersonationEnabled(roleImpersonationState?.role),

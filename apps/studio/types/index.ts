@@ -1,5 +1,4 @@
 export {
-  ResponseError,
   type Dictionary,
   type Organization,
   type Permission,

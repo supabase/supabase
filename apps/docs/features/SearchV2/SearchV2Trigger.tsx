@@ -1,29 +1,50 @@
 'use client'
 
-import { SearchTrigger, useSearchShortcut, type SearchTriggerProps } from 'docs-search/components'
-import { useCallback } from 'react'
+import { SearchTrigger, type SearchTriggerProps } from 'docs-search/components'
+import { Search } from 'lucide-react'
+import { Button, cn, KeyboardShortcut, Tooltip, TooltipContent, TooltipTrigger } from 'ui'
 
-import { SearchV2Dialog } from './SearchV2Dialog'
-import { useSearchV2Dialog } from './useSearchV2Dialog'
+import { SEARCH_SHORTCUT_KEY } from './constants'
+import { useSearchV2 } from './SearchV2Provider'
 
 type SearchV2TriggerProps = Pick<SearchTriggerProps, 'className' | 'placeholder'>
 
 export function SearchV2Trigger({ className, placeholder }: SearchV2TriggerProps) {
-  const { open, openDialog, handleOpenChange } = useSearchV2Dialog()
-
-  const handleShortcut = useCallback(() => openDialog('keyboard_shortcut'), [openDialog])
-
-  useSearchShortcut(handleShortcut)
+  const { isSearchOpen, showSearch } = useSearchV2()
 
   return (
-    <>
-      <SearchTrigger
-        className={className}
-        placeholder={placeholder}
-        expanded={open}
-        onClick={() => openDialog('search_input')}
-      />
-      <SearchV2Dialog open={open} onOpenChange={handleOpenChange} />
-    </>
+    <SearchTrigger
+      className={className}
+      placeholder={placeholder}
+      expanded={isSearchOpen}
+      onClick={() => showSearch('search_input')}
+    />
+  )
+}
+
+export const SearchV2IconTrigger = ({ className }: { className?: string }) => {
+  const { isSearchOpen, showSearch } = useSearchV2()
+
+  const handleClick = () => showSearch('search_input')
+
+  return (
+    <Tooltip>
+      <TooltipTrigger asChild>
+        <Button
+          aria-label="Search docs"
+          aria-haspopup="dialog"
+          aria-expanded={isSearchOpen}
+          aria-keyshortcuts={`Meta+${SEARCH_SHORTCUT_KEY} Control+${SEARCH_SHORTCUT_KEY}`}
+          onClick={handleClick}
+          icon={<Search />}
+          className={cn('size-7.5 shrink-0 px-0', className)}
+        />
+      </TooltipTrigger>
+      <TooltipContent side="bottom" className="flex items-center gap-2">
+        {/* the button label already names it, so the tooltip description adds only the shortcut */}
+        <span aria-hidden>Search docs</span>
+        <KeyboardShortcut keys={['Meta', SEARCH_SHORTCUT_KEY]} variant="keycaps" />
+      </TooltipContent>
+    </Tooltip>
   )
 }

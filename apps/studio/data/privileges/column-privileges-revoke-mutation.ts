@@ -5,7 +5,8 @@ import { toast } from 'sonner'
 import { privilegeKeys } from './keys'
 import { unguarded } from '@/data/fetchers'
 import { executeSql } from '@/data/sql/execute-sql-mutation'
-import type { ResponseError, UseCustomMutationOptions } from '@/types'
+import type { StudioError } from '@/lib/errors/studio-errors'
+import type { UseCustomMutationOptions } from '@/types'
 
 export type ColumnPrivilegesRevoke = {
   column_id: string
@@ -35,6 +36,8 @@ export async function revokeColumnPrivileges({
   const { result } = await executeSql({
     projectRef,
     connectionString,
+    sqlOrigin: 'studio',
+    queryName: 'column-privileges-revoke',
     sql,
     queryKey: ['column-privileges', 'revoke'],
     grant: unguarded.migrating,
@@ -52,14 +55,14 @@ export const useColumnPrivilegesRevokeMutation = ({
 }: Omit<
   UseCustomMutationOptions<
     ColumnPrivilegesRevokeData,
-    ResponseError,
+    StudioError,
     ColumnPrivilegesRevokeVariables
   >,
   'mutationFn'
 > = {}) => {
   const queryClient = useQueryClient()
 
-  return useMutation<ColumnPrivilegesRevokeData, ResponseError, ColumnPrivilegesRevokeVariables>({
+  return useMutation<ColumnPrivilegesRevokeData, StudioError, ColumnPrivilegesRevokeVariables>({
     mutationFn: (vars) => revokeColumnPrivileges(vars),
     async onSuccess(data, variables, context) {
       const { projectRef } = variables

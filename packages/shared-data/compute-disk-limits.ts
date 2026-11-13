@@ -1,15 +1,17 @@
 import { z } from 'zod'
 
+import { INSTANCE_DISK_LIMITS } from './instance-disk-limits'
+
 /**
- * Size-wide floor values for disk limits.
+ * Size-wide floor values for disk limits, derived per compute size as the
+ * minimum across all configurations the size can run on (see
+ * `instance-disk-limits.ts`, the single source for the underlying numbers).
+ * Every project gets at least these limits; the actual limits of a given
+ * project can be higher.
  *
- * Each value is the minimum across all configurations a compute size can run
- * on, so every project gets at least these limits; the actual limits of a
- * given project can be higher. Derived from the AWS EBS-optimized performance
- * tables (https://instances.vantage.sh, mirroring
- * `aws ec2 describe-instance-types`). Last verified: 2026-09-04.
- *
- * Throughput values are stored in MB/s (AWS lists Mbps, so we convert with toMBps).
+ * These floors are published in the docs and on www — a change to the
+ * configuration table that moves a floor changes public numbers, which is why
+ * the derived values are pinned in `DiskManagement.test.ts`.
  */
 
 export type ComputeDiskLimit = {
@@ -20,145 +22,48 @@ export type ComputeDiskLimit = {
   maxThroughputMBps: number
 }
 
-const toMBps = (throughputMbps: number) => Math.round(throughputMbps / 8)
+const COMPUTE_SIZE_NAMES = {
+  ci_nano: 'Nano (free)',
+  ci_micro: 'Micro',
+  ci_small: 'Small',
+  ci_medium: 'Medium',
+  ci_large: 'Large',
+  ci_xlarge: 'XL',
+  ci_2xlarge: '2XL',
+  ci_4xlarge: '4XL',
+  ci_8xlarge: '8XL',
+  ci_12xlarge: '12XL',
+  ci_16xlarge: '16XL',
+  ci_24xlarge: '24XL',
+  ci_24xlarge_optimized_cpu: '24XL - Optimized CPU',
+  ci_24xlarge_optimized_memory: '24XL - Optimized Memory',
+  ci_24xlarge_high_memory: '24XL - High Memory',
+  ci_48xlarge: '48XL',
+  ci_48xlarge_optimized_cpu: '48XL - Optimized CPU',
+  ci_48xlarge_optimized_memory: '48XL - Optimized Memory',
+  ci_48xlarge_high_memory: '48XL - High Memory',
+} as const
 
-export const COMPUTE_DISK = {
-  ci_nano: {
-    name: 'Nano (free)',
-    baselineIops: 250,
-    maxIops: 11800,
-    baselineThroughputMBps: toMBps(43),
-    maxThroughputMBps: toMBps(2085),
-  },
-  ci_micro: {
-    name: 'Micro',
-    baselineIops: 500,
-    maxIops: 11800,
-    baselineThroughputMBps: toMBps(87),
-    maxThroughputMBps: toMBps(2085),
-  },
-  ci_small: {
-    name: 'Small',
-    baselineIops: 1000,
-    maxIops: 11800,
-    baselineThroughputMBps: toMBps(174),
-    maxThroughputMBps: toMBps(2085),
-  },
-  ci_medium: {
-    name: 'Medium',
-    baselineIops: 2000,
-    maxIops: 11800,
-    baselineThroughputMBps: toMBps(315),
-    maxThroughputMBps: toMBps(2085),
-  },
-  ci_large: {
-    name: 'Large',
-    baselineIops: 3600,
-    maxIops: 20000,
-    baselineThroughputMBps: toMBps(630),
-    maxThroughputMBps: toMBps(4750),
-  },
-  ci_xlarge: {
-    name: 'XL',
-    baselineIops: 6000,
-    maxIops: 20000,
-    baselineThroughputMBps: toMBps(1188),
-    maxThroughputMBps: toMBps(4750),
-  },
-  ci_2xlarge: {
-    name: '2XL',
-    baselineIops: 12000,
-    maxIops: 20000,
-    baselineThroughputMBps: toMBps(2375),
-    maxThroughputMBps: toMBps(4750),
-  },
-  ci_4xlarge: {
-    name: '4XL',
-    baselineIops: 20000,
-    maxIops: 20000,
-    baselineThroughputMBps: toMBps(4750),
-    maxThroughputMBps: toMBps(4750),
-  },
-  ci_8xlarge: {
-    name: '8XL',
-    baselineIops: 40000,
-    maxIops: 40000,
-    baselineThroughputMBps: toMBps(9500),
-    maxThroughputMBps: toMBps(9500),
-  },
-  ci_12xlarge: {
-    name: '12XL',
-    baselineIops: 50000,
-    maxIops: 50000,
-    baselineThroughputMBps: toMBps(14250),
-    maxThroughputMBps: toMBps(14250),
-  },
-  ci_16xlarge: {
-    name: '16XL',
-    baselineIops: 80000,
-    maxIops: 80000,
-    baselineThroughputMBps: toMBps(19000),
-    maxThroughputMBps: toMBps(19000),
-  },
-  ci_24xlarge: {
-    name: '24XL',
-    baselineIops: 120000,
-    maxIops: 120000,
-    baselineThroughputMBps: toMBps(30000),
-    maxThroughputMBps: toMBps(30000),
-  },
-  ci_24xlarge_optimized_cpu: {
-    name: '24XL - Optimized CPU',
-    baselineIops: 120000,
-    maxIops: 120000,
-    baselineThroughputMBps: toMBps(30000),
-    maxThroughputMBps: toMBps(30000),
-  },
-  ci_24xlarge_optimized_memory: {
-    name: '24XL - Optimized Memory',
-    baselineIops: 120000,
-    maxIops: 120000,
-    baselineThroughputMBps: toMBps(30000),
-    maxThroughputMBps: toMBps(30000),
-  },
-  ci_24xlarge_high_memory: {
-    name: '24XL - High Memory',
-    baselineIops: 120000,
-    maxIops: 120000,
-    baselineThroughputMBps: toMBps(30000),
-    maxThroughputMBps: toMBps(30000),
-  },
-  ci_48xlarge: {
-    name: '48XL',
-    baselineIops: 240000,
-    maxIops: 240000,
-    baselineThroughputMBps: toMBps(40000),
-    maxThroughputMBps: toMBps(40000),
-  },
-  ci_48xlarge_optimized_cpu: {
-    name: '48XL - Optimized CPU',
-    baselineIops: 240000,
-    maxIops: 240000,
-    baselineThroughputMBps: toMBps(40000),
-    maxThroughputMBps: toMBps(40000),
-  },
-  ci_48xlarge_optimized_memory: {
-    name: '48XL - Optimized Memory',
-    baselineIops: 240000,
-    maxIops: 240000,
-    baselineThroughputMBps: toMBps(40000),
-    maxThroughputMBps: toMBps(40000),
-  },
-  ci_48xlarge_high_memory: {
-    name: '48XL - High Memory',
-    baselineIops: 240000,
-    maxIops: 240000,
-    baselineThroughputMBps: toMBps(40000),
-    maxThroughputMBps: toMBps(40000),
-  },
-} as const satisfies Record<string, ComputeDiskLimit>
+export type ComputeDiskKey = keyof typeof COMPUTE_SIZE_NAMES
 
-export type ComputeDiskKey = keyof typeof COMPUTE_DISK
+export const COMPUTE_DISK = Object.fromEntries(
+  Object.entries(COMPUTE_SIZE_NAMES).map(([key, name]) => {
+    const configurations = Object.values(INSTANCE_DISK_LIMITS).filter((entry) => entry.size === key)
+    if (configurations.length === 0) {
+      throw new Error(`No instance configurations found for compute size ${key}`)
+    }
+    return [
+      key,
+      {
+        name,
+        baselineIops: Math.min(...configurations.map((c) => c.baselineIops)),
+        maxIops: Math.min(...configurations.map((c) => c.maxIops)),
+        baselineThroughputMBps: Math.min(...configurations.map((c) => c.baselineThroughputMBps)),
+        maxThroughputMBps: Math.min(...configurations.map((c) => c.maxThroughputMBps)),
+      },
+    ]
+  })
+) as Record<ComputeDiskKey, ComputeDiskLimit>
 
 export const COMPUTE_BASELINE_IOPS = Object.fromEntries(
   Object.entries(COMPUTE_DISK).map(([key, value]) => [key, value.baselineIops])
@@ -176,7 +81,7 @@ export const COMPUTE_MAX_THROUGHPUT = Object.fromEntries(
   Object.entries(COMPUTE_DISK).map(([key, value]) => [key, value.maxThroughputMBps])
 )
 
-const computeInstanceAddonVariantIds = Object.keys(COMPUTE_DISK) as ComputeDiskKey[]
+const computeInstanceAddonVariantIds = Object.keys(COMPUTE_SIZE_NAMES) as ComputeDiskKey[]
 
 export const computeInstanceAddonVariantIdSchema = z.enum(
   computeInstanceAddonVariantIds as [ComputeDiskKey, ...ComputeDiskKey[]]

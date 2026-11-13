@@ -1,6 +1,6 @@
 ---
 id: 'auth-mfa'
-title: 'Multi-Factor Authentication'
+title: 'Supabase Auth multi-factor authentication'
 description: 'Add an additional layer of security to your apps with Supabase Auth multi-factor authentication.'
 ---
 
@@ -280,7 +280,7 @@ However, encountering a different AAL level on the server may not be a security 
 3. User has lost their authenticator device and is confused about the next
    steps.
 
-We thus recommend you redirect users to a page where they can authenticate using their additional factor, instead of rendering an HTTP 401 Unauthorized or HTTP 403 Forbidden content.
+We thus recommend you redirect users to a page where they can authenticate using their additional factor, instead of rendering an HTTP 401 Unauthorized or HTTP 403 Forbidden content. If a user has lost access to their authenticator device, see [Lost access to MFA device](/kb/troubleshooting/lost-accessforgot-the-mfa-device-nAPT-7).
 
 ### APIs
 
@@ -298,18 +298,8 @@ If your application uses the Supabase Database, Storage or Edge Functions, Row L
 
 ## Frequently asked questions
 
-<Accordion
-  type="default"
-  chevronAlign="right"
-  justified
-  size="medium"
-  className="text-foreground-light mt-8 mb-6 [&>div]:space-y-4"
->
-
-<AccordionItem
-header="How do I check when a user went through MFA?"
-id="how-do-i-check-when-a-user-went-through-mfa"
->
+<details>
+<summary>How do I check when a user went through MFA?</summary>
 
 Access tokens issued by Supabase Auth contain an `amr` (Authentication Methods Reference) claim. It is an array of objects that indicate what authentication methods the user has used so far.
 
@@ -366,6 +356,4 @@ The following additional claims are available when using PKCE flow:
 
 More authentication methods will be added over time as we increase the number of authentication methods supported by Supabase.
 
-</AccordionItem>
-
-</Accordion>
+</details>

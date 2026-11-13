@@ -3,7 +3,8 @@ import { toast } from 'sonner'
 
 import { storageKeys } from './keys'
 import { handleError, put } from '@/data/fetchers'
-import type { ResponseError, UseCustomMutationOptions } from '@/types'
+import type { StudioError } from '@/lib/errors/studio-errors'
+import type { UseCustomMutationOptions } from '@/types'
 
 type UrlSigningKeyUpdateVariables = {
   projectRef?: string
@@ -32,12 +33,12 @@ export const useUrlSigningKeyUpdateMutation = ({
   onError,
   ...options
 }: Omit<
-  UseCustomMutationOptions<UrlSigningKeyUpdateData, ResponseError, UrlSigningKeyUpdateVariables>,
+  UseCustomMutationOptions<UrlSigningKeyUpdateData, StudioError, UrlSigningKeyUpdateVariables>,
   'mutationFn'
 > = {}) => {
   const queryClient = useQueryClient()
 
-  return useMutation<UrlSigningKeyUpdateData, ResponseError, UrlSigningKeyUpdateVariables>({
+  return useMutation<UrlSigningKeyUpdateData, StudioError, UrlSigningKeyUpdateVariables>({
     mutationFn: (vars) => updateUrlSigningKey(vars),
     async onSuccess(data, variables, context) {
       await queryClient.invalidateQueries({

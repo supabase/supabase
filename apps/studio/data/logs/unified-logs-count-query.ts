@@ -12,7 +12,9 @@ import {
 import { getLogsCountQuery } from '@/components/interfaces/UnifiedLogs/UnifiedLogs.queries'
 import { getLogsCountQuery as getLogsCountQueryBq } from '@/components/interfaces/UnifiedLogs/UnifiedLogs.queries.bq'
 import { FacetMetadataSchema } from '@/components/interfaces/UnifiedLogs/UnifiedLogs.schema'
-import { ResponseError, UseCustomQueryOptions } from '@/types'
+import { handleError } from '@/data/fetchers'
+import type { StudioError } from '@/lib/errors/studio-errors'
+import { UseCustomQueryOptions } from '@/types'
 
 // Trimmed client-side because the OTEL endpoint rejects LIMIT BY, so the count
 // query can't cap rows per facet in SQL.
@@ -38,6 +40,8 @@ export async function getUnifiedLogsCount(
     iso_timestamp_end: isoTimestampEnd,
     signal,
   })
+
+  if (data.error) handleError(typeof data.error === 'string' ? new Error(data.error) : data.error)
 
   const facets: Record<string, FacetMetadataSchema> = {}
   const countsByFacet: Record<string, Map<string, number>> = {}
@@ -81,7 +85,7 @@ export async function getUnifiedLogsCount(
 }
 
 export type UnifiedLogsCountData = Awaited<ReturnType<typeof getUnifiedLogsCount>>
-export type UnifiedLogsCountError = ResponseError
+export type UnifiedLogsCountError = StudioError
 
 export const useUnifiedLogsCountQuery = <TData = UnifiedLogsCountData>(
   { projectRef, search }: UnifiedLogsVariables,

@@ -3,7 +3,8 @@ import { toast } from 'sonner'
 
 import { jitDbAccessKeys } from './keys'
 import { del, handleError, unguarded } from '@/data/fetchers'
-import type { ResponseError, UseCustomMutationOptions } from '@/types'
+import type { StudioError } from '@/lib/errors/studio-errors'
+import type { UseCustomMutationOptions } from '@/types'
 
 type JitDbAccessRevokeVariables = {
   projectRef: string
@@ -30,12 +31,12 @@ export const useJitDbAccessRevokeMutation = ({
   onError,
   ...options
 }: Omit<
-  UseCustomMutationOptions<JitDbAccessRevokeData, ResponseError, JitDbAccessRevokeVariables>,
+  UseCustomMutationOptions<JitDbAccessRevokeData, StudioError, JitDbAccessRevokeVariables>,
   'mutationFn'
 > = {}) => {
   const queryClient = useQueryClient()
 
-  return useMutation<JitDbAccessRevokeData, ResponseError, JitDbAccessRevokeVariables>({
+  return useMutation<JitDbAccessRevokeData, StudioError, JitDbAccessRevokeVariables>({
     mutationFn: (vars) => revokeJitDbAccess(vars),
 
     async onSuccess(data, variables, context) {

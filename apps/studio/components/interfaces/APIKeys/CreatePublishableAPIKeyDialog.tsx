@@ -4,6 +4,7 @@ import { useParams } from 'next/navigation'
 import { parseAsString, useQueryState } from 'nuqs'
 import { useRef } from 'react'
 import { SubmitHandler, useForm } from 'react-hook-form'
+import { toast } from 'sonner'
 import {
   Button,
   Dialog,
@@ -22,8 +23,10 @@ import {
 import { FormItemLayout } from 'ui-patterns/form/FormItemLayout/FormItemLayout'
 import * as z from 'zod'
 
+import { ButtonTooltip } from '@/components/ui/ButtonTooltip'
 import { Shortcut } from '@/components/ui/Shortcut'
 import { useAPIKeyCreateMutation } from '@/data/api-keys/api-key-create-mutation'
+import { getWriteGrantToastMessage, getWriteGrantTooltip, useGrant } from '@/lib/grants'
 import { SHORTCUT_IDS } from '@/state/shortcuts/registry'
 
 const FORM_ID = 'create-publishable-api-key'
@@ -47,7 +50,9 @@ export const CreatePublishableAPIKeyDialog = () => {
     if (value) setVisible('publishable')
     else setVisible('')
   }
-  const openDialog = () => setVisible('publishable')
+  const openDialog = () => {
+    if (canCreateAPIKeys) setVisible('publishable')
+  }
 
   const defaultValues = { name: '', description: '' }
 
@@ -59,12 +64,20 @@ export const CreatePublishableAPIKeyDialog = () => {
     },
   })
 
+  const createGrant = useGrant('POST /v1/projects/{ref}/api-keys', { projectRef })
+  const canCreateAPIKeys = createGrant.status === 'granted'
+
   const { mutate: createAPIKey, isPending: isCreatingAPIKey } = useAPIKeyCreateMutation()
 
   const onSubmit: SubmitHandler<z.infer<typeof SCHEMA>> = async (values) => {
+    if (!createGrant.grant) {
+      toast.error(getWriteGrantToastMessage(createGrant.status, 'create', 'API keys'))
+      return
+    }
     createAPIKey(
       {
         projectRef,
+        grant: createGrant.grant,
         type: 'publishable',
         name: values.name,
         description: values.description,
@@ -84,11 +97,22 @@ export const CreatePublishableAPIKeyDialog = () => {
         id={SHORTCUT_IDS.API_KEYS_NEW_PUBLISHABLE}
         onTrigger={openDialog}
         side="bottom"
-        tooltipOpen={visible === 'publishable' ? false : undefined}
+        // Hide the shortcut hint while blocked so the permission tooltip shows instead
+        tooltipOpen={visible === 'publishable' || !canCreateAPIKeys ? false : undefined}
       >
-        <Button icon={<PlusIcon />} onClick={openDialog}>
+        <ButtonTooltip
+          icon={<PlusIcon />}
+          onClick={openDialog}
+          disabled={!canCreateAPIKeys}
+          tooltip={{
+            content: {
+              side: 'bottom',
+              text: getWriteGrantTooltip(createGrant.status, 'create', 'API keys'),
+            },
+          }}
+        >
           New publishable key
-        </Button>
+        </ButtonTooltip>
       </Shortcut>
       <DialogContent>
         <DialogHeader>
@@ -148,7 +172,13 @@ export const CreatePublishableAPIKeyDialog = () => {
             options={{ enabled: visible === 'publishable' && !isCreatingAPIKey }}
             side="top"
           >
-            <Button variant="primary" form={FORM_ID} type="submit" loading={isCreatingAPIKey}>
+            <Button
+              variant="primary"
+              form={FORM_ID}
+              type="submit"
+              loading={isCreatingAPIKey}
+              disabled={!canCreateAPIKeys}
+            >
               Create Publishable API key
             </Button>
           </Shortcut>

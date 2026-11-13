@@ -4,7 +4,8 @@ import { useQuery } from '@tanstack/react-query'
 import { configKeys } from './keys'
 import { unguarded } from '@/data/fetchers'
 import { executeSql } from '@/data/sql/execute-sql-mutation'
-import type { ResponseError, UseCustomQueryOptions } from '@/types'
+import type { StudioError } from '@/lib/errors/studio-errors'
+import type { UseCustomQueryOptions } from '@/types'
 
 export type DiskBreakdownVariables = {
   projectRef?: string
@@ -27,6 +28,8 @@ export async function getDiskBreakdown(
     {
       projectRef,
       connectionString,
+      sqlOrigin: 'studio',
+      queryName: 'disk-breakdown',
       sql: safeSql`
     SELECT
   (
@@ -49,7 +52,7 @@ export async function getDiskBreakdown(
 }
 
 export type DiskBreakdownData = Awaited<ReturnType<typeof getDiskBreakdown>>
-export type DiskBreakdownError = ResponseError
+export type DiskBreakdownError = StudioError
 
 export const useDiskBreakdownQuery = <TData = DiskBreakdownData>(
   { projectRef, connectionString }: DiskBreakdownVariables,

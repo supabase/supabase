@@ -1,18 +1,19 @@
 import Breadcrumbs from '~/components/Breadcrumbs'
-import GuidesSidebar from '~/components/GuidesSidebar'
+import { GuidesSidebar } from '~/components/GuidesSidebar'
 import { GuideTocMenu, TocAnchorsProvider } from '~/features/docs/GuidesMdx.client'
 import { MDXRemoteBase } from '~/features/docs/MdxBase'
 import type { WithRequired } from '~/features/helpers.types'
+import { PageTitleObserver } from '~/layouts/MobileHeaderSlots'
+import { UpdatedAtSlotPortal } from '~/layouts/UpdatedAtSlot'
 import { resolveBreadcrumbs } from '~/lib/breadcrumbs'
 import { PROD_URL } from '~/lib/constants'
 import { type GuideFrontmatter } from '~/lib/docs'
 import { breadcrumbListSchema, serializeJsonLd, techArticleSchema } from '~/lib/json-ld'
 import { mdToPlainText } from '~/lib/md-to-plain-text'
 import { SerializeOptions } from '~/types/next-mdx-remote-serialize'
-import { ExternalLink } from 'lucide-react'
 import { type ReactNode } from 'react'
 import ReactMarkdown from 'react-markdown'
-import { cn } from 'ui'
+import { cn, IconGitHubSolid } from 'ui'
 
 const EDIT_LINK_SYMBOL = Symbol('edit link')
 interface EditLink {
@@ -57,11 +58,20 @@ interface BaseGuideTemplateProps {
   editLink: EditLink
   mdxOptions?: SerializeOptions
   pathname: `/${string}`
+  lastUpdated?: string
 }
 
 type GuideTemplateProps =
   | WithRequired<BaseGuideTemplateProps, 'children'>
   | WithRequired<BaseGuideTemplateProps, 'content'>
+
+const formatLastUpdated = (iso: string) =>
+  new Date(iso).toLocaleDateString('en-US', {
+    year: 'numeric',
+    month: 'short',
+    day: 'numeric',
+    timeZone: 'UTC',
+  })
 
 const GuideTemplate = ({
   meta,
@@ -70,8 +80,11 @@ const GuideTemplate = ({
   editLink,
   mdxOptions,
   pathname,
+  lastUpdated,
 }: GuideTemplateProps) => {
   const hideToc = meta?.hideToc || meta?.hide_table_of_contents
+  // the client sidebar gets a string, because the branded edit link cannot cross to the client
+  const editHref = editLink.includesProtocol ? editLink.link : `https://github.com/${editLink.link}`
   const breadcrumbChain = resolveBreadcrumbs(pathname)
   const breadcrumbSchema = breadcrumbListSchema({ pathname, chain: breadcrumbChain })
   const breadcrumbJsonLd = breadcrumbSchema ? serializeJsonLd(breadcrumbSchema) : null
@@ -81,9 +94,19 @@ const GuideTemplate = ({
           url: `${PROD_URL}${pathname}`,
           headline: mdToPlainText(meta.title),
           description: mdToPlainText(meta.description ?? meta.subtitle ?? '') || undefined,
+          dateModified: lastUpdated,
         })
       )
     : null
+
+  const updatedAt = lastUpdated ? (
+    <p className="text-sm text-foreground-lighter">
+      Updated{' '}
+      <time dateTime={new Date(lastUpdated).toISOString()} className="whitespace-nowrap">
+        {formatLastUpdated(lastUpdated)}
+      </time>
+    </p>
+  ) : null
 
   return (
     <TocAnchorsProvider>
@@ -93,7 +116,8 @@ const GuideTemplate = ({
             'relative',
             'transition-all ease-out',
             'duration-100',
-            'col-span-12 md:col-span-8'
+            'col-span-12 md:col-span-8',
+            'layout-v2:md:col-span-12 layout-v2:w-full layout-v2:max-w-docs-content layout-v2:mx-auto'
           )}
         >
           {techArticleJsonLd && (
@@ -108,15 +132,25 @@ const GuideTemplate = ({
               dangerouslySetInnerHTML={{ __html: breadcrumbJsonLd }}
             />
           )}
-          <Breadcrumbs className="mb-6" />
+          <div
+            className={cn(
+              'mb-12 flex flex-wrap items-center justify-between gap-x-4 gap-y-2 text-sm',
+              'layout-v2:lg:hidden'
+            )}
+          >
+            <Breadcrumbs />
+            {updatedAt}
+          </div>
+          <UpdatedAtSlotPortal>{updatedAt}</UpdatedAtSlotPortal>
           <article
             // Used to get headings for the table of contents
             id="sb-docs-guide-main-article"
             data-testid="sb-docs-guide-main-article"
             className="prose max-w-none"
           >
-            <header className="mb-8">
+            <header className="mb-12">
               <h1 className="mt-0 mb-0 [&>p]:m-0">
+                <PageTitleObserver title={mdToPlainText(meta?.title || 'Supabase Docs')} />
                 <ReactMarkdown>{meta?.title || 'Supabase Docs'}</ReactMarkdown>
               </h1>
               {meta?.subtitle && (
@@ -132,21 +166,21 @@ const GuideTemplate = ({
             )}
             {children}
 
-            <footer className="mt-16 not-prose">
+            <footer className="mt-16 not-prose layout-v2:lg:hidden">
               <a
-                href={
-                  editLink.includesProtocol ? editLink.link : `https://github.com/${editLink.link}`
-                }
+                href={editHref}
                 className={cn(
-                  'w-fit',
-                  'flex items-center gap-1',
+                  'relative w-fit',
+                  'flex items-center gap-1.5',
                   'text-sm text-tertiary-foreground hover:text-foreground',
-                  'transition-colors'
+                  'transition-colors',
+                  'after:absolute after:-inset-y-3 after:inset-x-0'
                 )}
                 target="_blank"
                 rel="noreferrer noopener edit"
               >
-                Edit this page on GitHub <ExternalLink size={14} strokeWidth={1.5} />
+                <IconGitHubSolid size={14} aria-hidden />
+                Edit this page
               </a>
             </footer>
           </article>
@@ -155,6 +189,7 @@ const GuideTemplate = ({
           video={meta?.tocVideo}
           videoTitle={meta?.title ? mdToPlainText(meta.title) : undefined}
           hideToc={hideToc}
+          editHref={editHref}
           className={cn(
             'hidden md:flex',
             'md:col-span-3 md:col-start-10',

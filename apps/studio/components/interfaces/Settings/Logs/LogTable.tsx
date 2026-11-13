@@ -50,9 +50,9 @@ import {
   FGA_PERMISSIONS,
   useAsyncCheckUserContentPermissions,
 } from '@/hooks/misc/useCheckPermissionsV2'
+import type { StudioError } from '@/lib/errors/studio-errors'
 import { SHORTCUT_IDS } from '@/state/shortcuts/registry'
 import { useShortcut } from '@/state/shortcuts/useShortcut'
-import type { ResponseError } from '@/types'
 
 interface Props {
   data?: LogData[]
@@ -73,7 +73,7 @@ interface Props {
   showHistogramToggle?: boolean
   selectedLog?: LogData
   isSelectedLogLoading?: boolean
-  selectedLogError?: LogQueryError | ResponseError
+  selectedLogError?: LogQueryError | StudioError
   onSelectedLogChange?: (log: LogData | null) => void
   sqlQuery?: string
   columnRenderers?: Column<LogData>[]

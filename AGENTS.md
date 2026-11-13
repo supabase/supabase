@@ -62,12 +62,14 @@ Never hand-edit generated files: `packages/api-types/types/**`, `**/routeTree.ge
 
 The skills in `.agents/skills/` are the source of truth for conventions. Load the relevant ones before working, don't guess. One exception: for docs **content** style, `apps/docs/style-guide/` is the source of truth and the docs skills are the process that applies it.
 
+- [code-review](.agents/skills/code-review/SKILL.md) — read-only assessments and development-task readiness checks
 - `copywriting` — any user-facing text, anywhere in the monorepo
 - `pm-the-docs` / `write-the-docs` / `edit-the-docs` / `ask-the-docs` / `review-the-docs` — anything under `apps/docs` (see `apps/docs/CONTRIBUTING.md` for the authoring skill model, and `apps/docs/style-guide/` for the content style rules they apply)
 - `telemetry-standards` — PostHog events, `packages/common/telemetry-constants.ts`
 - `dev-toolbar-review` — `packages/dev-tools`, `packages/common/posthog-client.ts`, `packages/common/feature-flags.tsx`
 - `safe-sql-execution` — any code that builds or executes SQL against user databases
 - `react-hook-form` — writing or modifying any form code, anywhere in the monorepo
+- `turbo-scripts` — `package.json` scripts or `turbo.jsonc` in any app or package (pre/post hooks, script chains, `maybe-turbo`, task inputs, env, caching)
 - `vitest` / `vercel-composition-patterns` — generic unit-testing and React composition references
 
 ## Studio

@@ -3,7 +3,7 @@ import { toast } from 'sonner'
 
 import { storageKeys } from './keys'
 import { handleError, post } from '@/data/fetchers'
-import type { ResponseError } from '@/types'
+import type { StudioError } from '@/lib/errors/studio-errors'
 
 type VectorBucketCreateVariables = {
   projectRef: string
@@ -32,12 +32,12 @@ export const useVectorBucketCreateMutation = ({
   onError,
   ...options
 }: Omit<
-  UseMutationOptions<VectorBucketCreateData, ResponseError, VectorBucketCreateVariables>,
+  UseMutationOptions<VectorBucketCreateData, StudioError, VectorBucketCreateVariables>,
   'mutationFn'
 > = {}) => {
   const queryClient = useQueryClient()
 
-  return useMutation<VectorBucketCreateData, ResponseError, VectorBucketCreateVariables>({
+  return useMutation<VectorBucketCreateData, StudioError, VectorBucketCreateVariables>({
     mutationFn: (vars) => createVectorBucket(vars),
     async onSuccess(data, variables, context, mutationContext) {
       const { projectRef } = variables

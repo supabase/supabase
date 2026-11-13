@@ -5,7 +5,7 @@ import { privilegeKeys } from './keys'
 import { unguarded } from '@/data/fetchers'
 import { executeSql } from '@/data/sql/execute-sql-mutation'
 import { INTERNAL_SCHEMAS } from '@/hooks/useProtectedSchemas'
-import type { ResponseError } from '@/types'
+import type { StudioError } from '@/lib/errors/studio-errors'
 
 const IGNORED_SCHEMAS = [...INTERNAL_SCHEMAS, 'pg_catalog']
 
@@ -33,6 +33,8 @@ export async function getExposedFunctionCounts(
     {
       projectRef,
       connectionString,
+      sqlOrigin: 'studio',
+      queryName: 'exposed-function-counts',
       sql,
       queryKey: ['exposed-function-counts', selectedSchemas],
       grant: unguarded.migrating,
@@ -44,14 +46,13 @@ export async function getExposedFunctionCounts(
 }
 
 export type ExposedFunctionCountsData = Awaited<ReturnType<typeof getExposedFunctionCounts>>
-export type ExposedFunctionCountsError = ResponseError
+export type ExposedFunctionCountsError = StudioError
 
 export const exposedFunctionCountsQueryOptions = (
   { projectRef, connectionString, selectedSchemas }: ExposedFunctionCountsVariables,
   { enabled = true }: { enabled?: boolean } = {}
 ) => {
   return queryOptions({
-    // eslint-disable-next-line @tanstack/query/exhaustive-deps -- connection string doesn't change the result of the query
     queryKey: privilegeKeys.exposedFunctionCounts(projectRef, selectedSchemas),
     queryFn: ({ signal }) =>
       getExposedFunctionCounts(

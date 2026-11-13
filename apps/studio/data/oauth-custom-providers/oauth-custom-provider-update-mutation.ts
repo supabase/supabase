@@ -4,8 +4,9 @@ import { toast } from 'sonner'
 
 import { oAuthCustomProvidersKeys } from './keys'
 import { handleError } from '@/data/fetchers'
+import type { StudioError } from '@/lib/errors/studio-errors'
 import { createProjectSupabaseClient } from '@/lib/project-supabase-client'
-import type { ResponseError, UseCustomMutationOptions } from '@/types'
+import type { UseCustomMutationOptions } from '@/types'
 
 export type OAuthCustomProviderUpdateVariables = UpdateCustomProviderParams & {
   identifier: string | undefined
@@ -42,7 +43,7 @@ export const useOAuthCustomProviderUpdateMutation = ({
 }: Omit<
   UseCustomMutationOptions<
     OAuthCustomProviderUpdateData,
-    ResponseError,
+    StudioError,
     OAuthCustomProviderUpdateVariables
   >,
   'mutationFn'
@@ -51,7 +52,7 @@ export const useOAuthCustomProviderUpdateMutation = ({
 
   return useMutation<
     OAuthCustomProviderUpdateData,
-    ResponseError,
+    StudioError,
     OAuthCustomProviderUpdateVariables
   >({
     mutationFn: (vars) => updateOAuthCustomProvider(vars),

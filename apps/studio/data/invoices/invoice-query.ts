@@ -2,7 +2,8 @@ import { useQuery } from '@tanstack/react-query'
 
 import { invoicesKeys } from './keys'
 import { get, handleError } from '@/data/fetchers'
-import type { ResponseError, UseCustomQueryOptions } from '@/types'
+import type { StudioError } from '@/lib/errors/studio-errors'
+import type { UseCustomQueryOptions } from '@/types'
 
 export type InvoiceVariables = {
   invoiceId?: string
@@ -26,7 +27,7 @@ export async function getInvoice({ invoiceId, slug }: InvoiceVariables, signal?:
 }
 
 export type InvoiceData = Awaited<ReturnType<typeof getInvoice>>
-export type InvoiceError = ResponseError
+export type InvoiceError = StudioError
 
 export const useInvoiceQuery = <TData = InvoiceData>(
   { invoiceId: id }: InvoiceVariables,

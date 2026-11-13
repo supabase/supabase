@@ -7,24 +7,27 @@ import {
   formatMetric,
   formatRate,
   formatReferenceDelta,
-  getBucketedTimeRange,
   getChartEmptyStateCopy,
   getChartTimeRangeLabels,
+  getEdgeFunctionLogsScope,
+  getEdgeFunctionLogsUrl,
   getExecutionMetrics,
   getInvocationChartData,
   getInvocationChartNavigationUrl,
   getInvocationTotals,
   getInvocationUpdateAnnotation,
+  getLegacyEdgeFunctionLogsUrl,
   getMemoryTooltipDetail,
   getRollingTimeRange,
-  getSegmentedButtonClassName,
   getUsageMetrics,
   toEdgeFunctionChartData,
   type EdgeFunctionChartRawDatum,
 } from './EdgeFunctionOverview.utils'
+import { getUnifiedLogsQuery } from '@/components/interfaces/UnifiedLogs/UnifiedLogs.queries'
+import { createUnifiedLogsSearch } from '@/components/interfaces/UnifiedLogs/UnifiedLogs.utils'
 
-describe('EdgeFunctionOverview.utils', () => {
-  it('builds invocation chart data and totals from combined stats', () => {
+describe('Edge function overview chart summaries', () => {
+  it('counts every invocation status and groups redirects and client errors as warnings', () => {
     const chartData = toEdgeFunctionChartData([
       {
         timestamp: '2026-03-20T10:00:00.000Z',
@@ -80,11 +83,7 @@ describe('EdgeFunctionOverview.utils', () => {
     })
   })
 
-  it('builds segmented button classes and chart range labels', () => {
-    expect(getSegmentedButtonClassName(0, 4)).toBe('rounded-tr-none rounded-br-none')
-    expect(getSegmentedButtonClassName(1, 4)).toBe('rounded-none')
-    expect(getSegmentedButtonClassName(3, 4)).toBe('rounded-tl-none rounded-bl-none')
-
+  it('labels the first and last chart timestamps for the selected period', () => {
     expect(
       getChartTimeRangeLabels(
         [{ timestamp: '2026-03-20T10:00:00.000Z' }, { timestamp: '2026-03-20T11:00:00.000Z' }],
@@ -100,7 +99,7 @@ describe('EdgeFunctionOverview.utils', () => {
     )
   })
 
-  it('computes execution and usage metrics', () => {
+  it('summarizes execution time, CPU time, and memory across the returned invocation buckets', () => {
     const stats = [
       {
         timestamp: '2026-03-20T10:00:00.000Z',
@@ -151,7 +150,7 @@ describe('EdgeFunctionOverview.utils', () => {
     ['an ISO string', '2026-03-20T10:16:30.000Z'],
     ['a numeric', new Date('2026-03-20T10:16:30.000Z').valueOf()],
   ])(
-    'returns a snapped deploy annotation for %s updated_at within the selected window',
+    'marks the nearest invocation bucket to a deployment recorded with %s timestamp',
     (_, updatedAt) => {
       const annotation = getInvocationUpdateAnnotation({
         updatedAt,
@@ -170,7 +169,7 @@ describe('EdgeFunctionOverview.utils', () => {
     }
   )
 
-  it('hides the deploy annotation when updated_at is outside the selected window', () => {
+  it('hides deployments outside the selected chart period', () => {
     const annotation = getInvocationUpdateAnnotation({
       updatedAt: '2026-03-20T11:05:00.000Z',
       invocationChartData: [
@@ -183,7 +182,7 @@ describe('EdgeFunctionOverview.utils', () => {
     expect(annotation).toBeUndefined()
   })
 
-  it('hides the deploy annotation for an invalid updated_at timestamp', () => {
+  it('hides the deployment marker when its timestamp cannot be read', () => {
     const annotation = getInvocationUpdateAnnotation({
       updatedAt: 'invalid',
       invocationChartData: [
@@ -205,7 +204,7 @@ describe('EdgeFunctionOverview.utils', () => {
     },
     { updatedAt: '2026-03-20T10:00:00.000Z', invocationChartData: [] },
   ])(
-    'hides the deploy annotation when required data is missing',
+    'hides the deployment marker until its timestamp and invocation data are available',
     ({ updatedAt, invocationChartData }) => {
       const annotation = getInvocationUpdateAnnotation({
         updatedAt,
@@ -218,26 +217,35 @@ describe('EdgeFunctionOverview.utils', () => {
     }
   )
 
-  it('builds bucketed and rolling time windows from the selected interval', () => {
-    const interval = EDGE_FUNCTION_CHART_INTERVALS.find((item) => item.key === '1hr')
-    expect(interval).toBeDefined()
+  it.each([
+    { period: '1hr', start: '2026-03-20T09:37:00.000Z' },
+    { period: '1day', start: '2026-03-19T10:37:00.000Z' },
+  ])('opens the full past $period through the current minute', ({ period, start }) => {
+    const interval = EDGE_FUNCTION_CHART_INTERVALS.find((item) => item.key === period)
+    if (!interval) throw new Error(`Unknown function chart period: ${period}`)
 
-    const now = new Date('2026-03-20T10:37:00.000Z')
-    const [bucketedStart, bucketedEnd] = getBucketedTimeRange(interval!, now)
-    const [rollingStart, rollingEnd] = getRollingTimeRange(interval!, now)
+    const [rollingStart, rollingEnd] = getRollingTimeRange(
+      interval,
+      new Date('2026-03-20T10:37:00.000Z')
+    )
 
-    expect(bucketedStart.toISOString()).toBe('2026-03-20T09:00:00.000Z')
-    expect(bucketedEnd.toISOString()).toBe('2026-03-20T10:00:00.000Z')
-    expect(rollingStart.toISOString()).toBe('2026-03-20T09:37:00.000Z')
+    expect(rollingStart.toISOString()).toBe(start)
     expect(rollingEnd.toISOString()).toBe('2026-03-20T10:37:00.000Z')
   })
 
   it.each([
-    { isUnifiedLogsEnabled: true, destination: 'logs' },
-    { isUnifiedLogsEnabled: false, destination: 'invocations' },
+    {
+      isUnifiedLogsEnabled: true,
+      expected: `/project/project-ref/functions/function-slug/logs?date=${Date.parse('2026-03-20T10:27:30.000Z')}-${Date.parse('2026-03-20T10:32:30.000Z')}`,
+    },
+    {
+      isUnifiedLogsEnabled: false,
+      expected:
+        '/project/project-ref/functions/function-slug/invocations?its=2026-03-20T10%3A27%3A30.000Z&ite=2026-03-20T10%3A32%3A30.000Z',
+    },
   ])(
-    'builds a focused $destination URL from the clicked bar',
-    ({ isUnifiedLogsEnabled, destination }) => {
+    'builds a focused URL from the clicked bar (unified logs: $isUnifiedLogsEnabled)',
+    ({ isUnifiedLogsEnabled, expected }) => {
       const url = getInvocationChartNavigationUrl({
         projectRef: 'project-ref',
         functionSlug: 'function-slug',
@@ -247,13 +255,57 @@ describe('EdgeFunctionOverview.utils', () => {
         clickedTimestamp: '2026-03-20T10:30:00.000Z',
       })
 
-      expect(url).toBe(
-        `/project/project-ref/functions/function-slug/${destination}?its=2026-03-20T10%3A27%3A30.000Z&ite=2026-03-20T10%3A32%3A30.000Z`
-      )
+      expect(url).toBe(expected)
     }
   )
 
-  it('formats metric, rate, and reference deltas consistently', () => {
+  it('links to the unified function logs tab with an optional range and selected log', () => {
+    const base = { projectRef: 'project-ref', functionSlug: 'function-slug' }
+
+    expect(getEdgeFunctionLogsUrl(base)).toBe('/project/project-ref/functions/function-slug/logs')
+    expect(
+      getEdgeFunctionLogsUrl({
+        ...base,
+        start: '2026-03-20T10:00:00.000Z',
+        end: '2026-03-20T11:00:00.000Z',
+        filters: ['level:eq:error'],
+        logId: 'log-id',
+      })
+    ).toBe(
+      `/project/project-ref/functions/function-slug/logs?filter=level:eq:error&date=${Date.parse('2026-03-20T10:00:00.000Z')}-${Date.parse('2026-03-20T11:00:00.000Z')}&id=log-id`
+    )
+  })
+
+  it("scopes unified logs to the function's invocations and runtime logs", () => {
+    const sql = getUnifiedLogsQuery(createUnifiedLogsSearch({}, getEdgeFunctionLogsScope('fn-1')))
+    const where = sql.split(/\bWHERE\b/)[1] ?? ''
+
+    expect(where).toContain(
+      `((source = 'function_edge_logs') OR (source = 'function_logs')) AND log_attributes['function_id'] IN ('fn-1')`
+    )
+    expect(where).not.toContain(`source = 'postgres_logs'`)
+  })
+
+  it('links to the pre-unified Invocations and Logs tabs with their own params', () => {
+    const base = { projectRef: 'project-ref', functionSlug: 'function-slug' }
+
+    expect(getLegacyEdgeFunctionLogsUrl({ ...base, tab: 'logs' })).toBe(
+      '/project/project-ref/functions/function-slug/logs'
+    )
+    expect(
+      getLegacyEdgeFunctionLogsUrl({
+        ...base,
+        tab: 'invocations',
+        start: '2026-03-20T10:00:00.000Z',
+        end: '2026-03-20T11:00:00.000Z',
+        logId: 'log-id',
+      })
+    ).toBe(
+      '/project/project-ref/functions/function-slug/invocations?its=2026-03-20T10%3A00%3A00.000Z&ite=2026-03-20T11%3A00%3A00.000Z&log=log-id'
+    )
+  })
+
+  it('shows metric units, invocation percentages, and differences from the average', () => {
     expect(formatMetric(12.34, 'MB')).toBe('12.3MB')
     expect(formatMetric(1234, 'ms')).toBe('1,234ms')
     expect(formatRate(1, 4)).toBe('25%')
@@ -262,7 +314,7 @@ describe('EdgeFunctionOverview.utils', () => {
     expect(formatReferenceDelta(100, 100)).toBe('At average')
   })
 
-  it('builds empty-state copy and tooltip detail strings', () => {
+  it('explains empty charts, query failures, and heap and external memory usage', () => {
     expect(getChartEmptyStateCopy('invocations', false, 'boom')).toEqual({
       title: 'No data to show',
       description: undefined,

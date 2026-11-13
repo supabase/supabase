@@ -2,16 +2,9 @@
 
 Our docs help developers to get started and keep succeeding with Supabase. We welcome contributions from everyone.
 
-If you'd like to contribute, see our list of [recommended issues](https://github.com/supabase/supabase/issues?q=is%3Aopen+is%3Aissue+label%3Adocumentation+label%3A%22help+wanted%22). We also welcome you to open a PR or a new issue with your question.
+If you'd like to contribute, pick a [recommended issue](https://github.com/supabase/supabase/issues?q=is%3Aopen+is%3Aissue+label%3Adocumentation+label%3A%22help+wanted%22) or [open an issue](https://github.com/supabase/supabase/issues/new/choose) with your question or idea first. Link the issue in your pull request. GitHub automatically requests a review from the Docs team (`@supabase/docs`).
 
-How to write a docs page is covered by the [style guide](./style-guide/README.md). This file covers repo mechanics. If you write with an AI coding agent, these skills apply the style guide for you:
-
-- `/write-the-docs` to draft a new page.
-- `/edit-the-docs` to revise an existing page.
-- `/test-the-docs` to run the snippets you wrote.
-- `/review-the-docs` to check your work before you open a pull request.
-
-See [AI agent skills for docs authoring](#ai-agent-skills-for-docs-authoring) for the full set, including the skills that help you frame a page and place it in the information architecture.
+How to write a docs page is covered by the [style guide](./style-guide/README.md). If you write with an agent, use our [AI agent skills for docs authoring](#ai-agent-skills-for-docs-authoring), including the skills that help you frame a page and place it in the information architecture. Be sure to give your changes human review.
 
 ## Style guide
 
@@ -84,11 +77,12 @@ Adding a new guide requires:
 - YAML frontmatter
 - A navigation entry in a separate file
 
-Frontmatter looks like this. `title` is mandatory. There are also optional properties that you can use to control the page display, including `subtitle`, `tocVideo`, and `hideToc`.
+Frontmatter looks like this. `title` and `description` are required. Optional properties control the page display, including `subtitle`, `tocVideo`, and `hideToc`. For what goes in `description` and `subtitle`, see [Write good frontmatter](./style-guide/03-page-structure.md#write-good-frontmatter).
 
 ```yaml
 ---
 title: How to connect to Supabase
+description: Connect to your Supabase Postgres database from a frontend app, a backend server, or a database tool, using a direct connection or the connection pooler.
 hideToc: true
 ---
 ```
@@ -96,6 +90,17 @@ hideToc: true
 The navigation is defined in [`NavigationMenu.constants.ts`](https://github.com/supabase/supabase/blob/master/apps/docs/components/Navigation/NavigationMenu/NavigationMenu.constants.ts).
 
 Add an entry with the `name`, `url`, and optional `icon` for your page.
+
+### Skip anchor link CI check
+
+When you remove a header that is linked to elsewhere, CI fails.
+You may want to merge your change anyway. For example, you may want to correct the links in a separate PR to avoid PR bloat.
+
+To merge anyway:
+
+1. Confirm the removal is deliberate.
+2. Add the `skip-anchor-check` label to the PR.
+3. Wait for the check to rerun. It passes and lists the broken links as warnings.
 
 ## Reference structure
 
@@ -151,13 +156,50 @@ Run `pnpm test:local lib/content-listings.test.ts` from apps/docs.
 **Manually add content listings:**
 
 1. Add or update a `ContentListingGroup` export in [`data/content-listings/[topic].data.ts`](data/content-listings/). The `id` field must be globally unique across all listing groups. For example, use `storage-get-started` rather than `get-started`. The ID is both the lookup key and the telemetry `listingId`.
-2. Place the component inline in guide MDX, for example `<ContentListings id="storage-get-started" />`. Use a partial only when the block is reused or gated with `$Show` at the partial level. For individual items that depend on a feature flag (for example `sdk:dart`), set `feature` on the item instead of wrapping the whole listing.
+2. Place the component inline in guide MDX, for example `<ContentListings id="storage-get-started" />`. Use a partial only when the block is reused or gated with `$Show` at the partial level. For individual items that depend on a feature flag (for example `sdk:dart`), set `feature` on the item instead of wrapping the whole listing. The `feature` field removes only the listing item. The linked page stays live.
 3. Run `pnpm test:local lib/content-listings.test.ts` from `apps/docs`.
 
 Code snippets for manually adding content listings are available in [`.vscode/content-listing.code-snippets`](../../.vscode/content-listing.code-snippets). Use `cl-data` for a data export with a namespaced ID. Use `cl-inline` for an MDX component.
 
+## Feature flags and experiments
+
+Docs can hide or show content at build time with `enabled-features` flags. Use the `$Show` directive in MDX, or the `feature` field on a content listing item. To add or change a flag, see the [enabled-features README](../../packages/common/enabled-features/README.md).
+
+Docs also supports A/B tests behind PostHog feature flags. PostHog flags resolve in the browser, not at build time.
+
+Supabase staff: to run an experiment, contact the Docs PM or Docs Engineering. Read [Feature flag a docs change](https://app.notion.com/p/4105004b775f81bf810ddd5682284d23) (internal, staff only) first.
+
+Other contributors: if your change may need an A/B test, say so in your PR description or issue. The Docs team decides and sets up the flag. To preview a variant of a live experiment locally, add `?<flag>=<variant>` to the URL.
+
 ## Search
 
-Search uses a Supabase instance. During CI, [a script](https://github.com/supabase/supabase/blob/master/apps/docs/scripts/search/generate-embeddings.ts) collects guides, reference documentation, and other content. The script creates OpenAI embeddings and stores the search index in a Supabase database.
+Search is keyword-based, backed by the `docs_search_v2` table and RPC in Postgres (see [`supabase/migrations/*_docs_search_v2*.sql`](../../supabase/migrations/)).
 
-Search combines native Postgres full-text search (FTS) with embedding similarity search based on [`pgvector`](https://github.com/pgvector/pgvector). At runtime, a PostgREST call invokes the weighted FTS RPC. An [Edge Function](https://github.com/supabase/supabase/tree/master/supabase/functions) runs the embedding search.
+- **UI**: [`features/SearchV2`](features/SearchV2) holds `SearchV2Trigger` (top bar, Cmd+K), `SearchV2Dialog`, and `useSearchV2Dialog`. The presentational pieces (`SearchTrigger`, `SearchPanel`, `useSearchShortcut`) live in the [`docs-search`](../../packages/docs-search) package.
+- **Hook**: `useDocsSearchV2` in [`packages/common/hooks`](../../packages/common/hooks/useDocsSearchV2.ts) calls an endpoint with `?q=` and manages the search state. It also feeds the 404 page recommendations.
+- **API**: [`app/api/search_v2/route.ts`](app/api/search_v2/route.ts) calls the RPC.
+- **Ingestion**: `pnpm ingest:search_v2` ([`scripts/search_v2`](scripts/search_v2)) chunks the generated markdown with `docs-search/ingest` and upserts it into the table. The [Ingest Docs Content for Search V2](../../.github/workflows/docs-search-v2-ingest.yml) workflow runs it on content changes to `master` and nightly.
+
+### Try search locally
+
+1. Start a local Supabase stack from the repo root. It applies the `docs_search_v2` migrations:
+
+   ```bash
+   supabase start
+   ```
+
+2. Add the following to `apps/docs/.env.local`, taking the values from `supabase status`:
+
+   ```bash
+   NEXT_PUBLIC_SUPABASE_URL=http://127.0.0.1:54321
+   SUPABASE_SECRET_KEY=<secret key>
+   # Federated content is fetched from GitHub during ingestion
+   GH_TOKEN=<token>   # or run: export GH_TOKEN=$(gh auth token)
+   ```
+
+3. Ingest the content, then start the app and use the search box:
+
+   ```bash
+   pnpm ingest:search_v2
+   pnpm dev
+   ```

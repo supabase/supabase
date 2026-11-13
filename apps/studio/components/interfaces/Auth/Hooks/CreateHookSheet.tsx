@@ -6,7 +6,6 @@ import {
   type SafeSqlFragment,
 } from '@supabase/pg-meta/src/pg-format'
 import { useParams } from 'common'
-import randomBytes from 'randombytes'
 import { useEffect, useMemo } from 'react'
 import { SubmitHandler, useForm, useWatch } from 'react-hook-form'
 import { toast } from 'sonner'
@@ -48,6 +47,7 @@ import { executeSql } from '@/data/sql/execute-sql-mutation'
 import { useSelectedProjectQuery } from '@/hooks/misc/useSelectedProject'
 import { useConfirmOnClose } from '@/hooks/ui/useConfirmOnClose'
 import { DOCS_URL } from '@/lib/constants'
+import { generateRandomBase64 } from '@/lib/random'
 
 interface CreateHookSheetProps {
   visible: boolean
@@ -59,9 +59,7 @@ interface CreateHookSheetProps {
 
 export function generateAuthHookSecret() {
   const secretByteLength = 60
-  const buffer = randomBytes(secretByteLength)
-  const base64String = buffer.toString('base64')
-  return `v1,whsec_${base64String}`
+  return `v1,whsec_${generateRandomBase64(secretByteLength)}`
 }
 
 const FORM_ID = 'create-edit-auth-hook'
@@ -219,6 +217,8 @@ revoke execute on function ${ident(schema)}.${ident(functionName)} from authenti
         executeSql({
           projectRef,
           connectionString: project!.connectionString,
+          sqlOrigin: 'studio',
+          queryName: 'auth-hook-update-permissions',
           sql: joinSqlFragments(statements, '\n'),
           grant: unguarded.migrating,
         })
@@ -454,10 +454,12 @@ revoke execute on function ${ident(schema)}.${ident(functionName)} from authenti
                                 No function with a single JSON/B argument
                                 <br />
                                 and JSON/B
-                                {definition.enabledKey === 'HOOK_SEND_EMAIL_ENABLED'
-                                  ? ' or void'
-                                  : ''}{' '}
-                                return type found in this schema.
+                                {definition.enabledKey === 'HOOK_SEND_EMAIL_ENABLED' ? (
+                                  <span>{' or void'}</span>
+                                ) : (
+                                  ''
+                                )}{' '}
+                                <span>return type found in this schema.</span>
                               </span>
                             }
                           />

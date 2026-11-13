@@ -4,7 +4,8 @@ import { useQuery } from '@tanstack/react-query'
 import { databaseKeys } from './keys'
 import { unguarded } from '@/data/fetchers'
 import { executeSql } from '@/data/sql/execute-sql-mutation'
-import { ResponseError, UseCustomQueryOptions } from '@/types'
+import type { StudioError } from '@/lib/errors/studio-errors'
+import { UseCustomQueryOptions } from '@/types'
 
 type GetTableDefinitionArgs = {
   id?: number
@@ -26,6 +27,8 @@ export async function getTableDefinition(
     {
       projectRef,
       connectionString,
+      sqlOrigin: 'studio',
+      queryName: 'table-definition',
       sql,
       queryKey: ['table-definition', id],
       grant: unguarded.migrating,
@@ -37,7 +40,7 @@ export async function getTableDefinition(
 }
 
 export type TableDefinitionData = string
-export type TableDefinitionError = ResponseError
+export type TableDefinitionError = StudioError
 
 export const useTableDefinitionQuery = <TData = TableDefinitionData>(
   { projectRef, connectionString, id }: TableDefinitionVariables,

@@ -20,7 +20,7 @@ When a JWT is issued by Supabase Auth, the key used to create its [signature](ht
 
 ### Benefits of the signing keys system
 
-We've designed the Signing keys system to address many problems the legacy system had. It goes hand-in-hand with the [publishable and secret API keys](/docs/guides/getting-started/api-keys).
+We've designed the Signing keys system to address many problems the legacy system had. It goes hand-in-hand with the [publishable and secret API keys](/docs/guides/getting-started/api-keys). If you are moving off `anon` and `service_role`, follow [Migrating to new API keys](/docs/guides/getting-started/migrating-to-new-api-keys).
 
 | Benefit                                     | Legacy JWT secret                                                                                                            | JWT signing keys                                                                                                                                                                       |
 | ------------------------------------------- | ---------------------------------------------------------------------------------------------------------------------------- | -------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
@@ -58,7 +58,7 @@ Key rotation and revocation are one of the most important processes for maintain
 - The legacy JWT secret has been leaked in logs, committed to source control, or accidentally exposed in the frontend build of your application, a library, desktop or mobile app package, etc.
 - You suspect that a [member of your organization](/docs/guides/platform/access-control) has lost control of their devices, and a malicious actor may have accessed the JWT secret via the Supabase dashboard or by accessing your application's backend configuration.
 - You suspect that an ex-team-member of your organization may be a malicious actor, by abusing the power the legacy JWT secret provides.
-- Make sure you also switch to [publishable and secret API keys](/docs/guides/getting-started/api-keys) and disable the `anon` and `service_role` keys.
+- Make sure you also switch to [publishable and secret API keys](/docs/guides/getting-started/api-keys) and disable the `anon` and `service_role` keys. For the steps, refer to [Migrating to new API keys](/docs/guides/getting-started/migrating-to-new-api-keys).
 - If you've imported a private key, and you're suspecting that this private key has been compromised on your end similarly.
 
 **Closer alignment to security best practices and compliance frameworks (SOC2, PCI-DSS, ISO27000, HIPAA, ...)**
@@ -71,6 +71,12 @@ Key rotation and revocation are one of the most important processes for maintain
 **Changing key algorithm for technical reasons**
 
 - You may wish to switch signing algorithms due to compatibility problems or to simplify development on your end.
+
+<Admonition type="note">
+
+Storage signed URLs use a separate key for signing, so rotating Auth signing keys doesn't invalidate them. For more information, see [Storage URL Signing Keys](/docs/guides/storage/security/signing-keys).
+
+</Admonition>
 
 ### Lifetime of a signing key
 
