@@ -1,7 +1,7 @@
 import { beforeEach, describe, expect, it, vi } from 'vitest'
 
 import { classifyResponseError } from './error-classification'
-import { ERROR_ROUTING } from '@/lib/errors/error-routing'
+import { getErrorRouting } from '@/lib/errors/error-routing'
 import {
   ConnectionTimeoutError,
   isStudioError,
@@ -95,10 +95,9 @@ describe('handleError — error classification', () => {
     )
   })
 
-  it('derives the service from the request pathname', () => {
+  it('derives the service from the endpoint', () => {
     expect(
-      throwAndCatch({ message: 'x', code: 500, requestPathname: '/platform/pg-meta/abc/query' })
-        .service
+      throwAndCatch({ message: 'x', code: 500, endpoint: '/platform/pg-meta/{ref}/query' }).service
     ).toBe('pg-meta')
   })
 
@@ -192,7 +191,7 @@ describe('handleError — error classification', () => {
         expect.any(NetworkUnreachableError),
         expect.objectContaining({
           tags: expect.objectContaining({
-            sample_rate: ERROR_ROUTING.NetworkUnreachable.sentrySampleRate,
+            sample_rate: getErrorRouting(new NetworkUnreachableError({})).sentrySampleRate,
           }),
         })
       )
@@ -220,7 +219,7 @@ describe('handleError — error classification', () => {
         err,
         expect.objectContaining({
           tags: expect.objectContaining({
-            sample_rate: ERROR_ROUTING.UnexpectedError.sentrySampleRate,
+            sample_rate: getErrorRouting(err).sentrySampleRate,
           }),
         })
       )
@@ -260,13 +259,13 @@ describe('handleError — error classification', () => {
         code: 503,
         requestId: 'req-abc',
         retryAfter: 30,
-        requestPathname: '/rest/v1/table',
+        endpoint: '/platform/projects/{ref}/table',
       })
       expect(err.message).toBe('CONNECTION TERMINATED DUE TO CONNECTION TIMEOUT')
       expect(err.code).toBe(503)
       expect(err.requestId).toBe('req-abc')
       expect(err.retryAfter).toBe(30)
-      expect(err.requestPathname).toBe('/rest/v1/table')
+      expect(err.endpoint).toBe('/platform/projects/{ref}/table')
     })
 
     it('preserves all fields on unclassified errors', () => {

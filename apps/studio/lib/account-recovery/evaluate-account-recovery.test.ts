@@ -7,7 +7,7 @@ const base: AccountRecoveryInput = {
   email: 'person@example.com',
   verifiedFactorCount: 1,
   recoveryCodes: { status: 'available', remaining: 8 },
-  features: { hasSecuritySettings: true, recoveryCodesEnabled: true, passwordEnabled: true },
+  features: { recoveryCodesEnabled: true, passwordEnabled: true },
 }
 
 const evaluate = (overrides: Partial<AccountRecoveryInput> = {}) =>
@@ -72,14 +72,11 @@ describe('evaluateAccountRecovery', () => {
     ).toEqual([{ id: 'single-mfa-factor', severity: 'info', action: 'add-factor' }])
   })
 
-  it('gates security findings but independently advises on a single OAuth sign-in', () => {
+  it('advises on a single OAuth sign-in independently of MFA findings', () => {
     const identities = [{ provider: 'github' }]
-    expect(
-      evaluate({
-        identities,
-        features: { ...base.features, hasSecuritySettings: false },
-      })
-    ).toEqual([{ id: 'single-oauth-identity', severity: 'warning', action: 'set-password' }])
+    expect(evaluate({ identities, verifiedFactorCount: 0 })).toEqual([
+      { id: 'single-oauth-identity', severity: 'warning', action: 'set-password' },
+    ])
     expect(evaluate({ identities: [...identities, { provider: 'google' }] })).toEqual([
       { id: 'single-mfa-factor', severity: 'info', action: 'add-factor' },
     ])

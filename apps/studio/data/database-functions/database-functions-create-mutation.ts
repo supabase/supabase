@@ -1,23 +1,25 @@
-import pgMeta from '@supabase/pg-meta'
+import pgMeta, { asWriteSql } from '@supabase/pg-meta'
 import type { PGFunctionCreate } from '@supabase/pg-meta/src/pg-meta-functions'
 import { useMutation, useQueryClient } from '@tanstack/react-query'
 import { toast } from 'sonner'
 import { z } from 'zod'
 
 import { databaseKeys } from '@/data/database/keys'
-import { unguarded } from '@/data/fetchers'
-import { executeSql } from '@/data/sql/execute-sql-mutation'
+import { isUserFaultForSql } from '@/data/error-classification'
+import { executeSql, type PgMetaWriteGrant } from '@/data/sql/execute-sql-mutation'
 import type { StudioError } from '@/lib/errors/studio-errors'
 import type { UseCustomMutationOptions } from '@/types'
 
 export type DatabaseFunctionCreateVariables = {
   projectRef: string
+  grant: PgMetaWriteGrant
   connectionString?: string | null
   payload: PGFunctionCreate
 }
 
 export async function createDatabaseFunction({
   projectRef,
+  grant,
   connectionString,
   payload,
 }: DatabaseFunctionCreateVariables) {
@@ -26,9 +28,13 @@ export async function createDatabaseFunction({
   const { result } = await executeSql({
     projectRef,
     connectionString,
-    sql,
+    sql: asWriteSql(sql),
+    // Studio composes the statement, but the user wrote the expressions and bodies Postgres parses
+    sqlOrigin: 'studio',
+    queryName: 'database-function-create',
+    isUserFaultSqlState: isUserFaultForSql,
     queryKey: ['functions', 'create'],
-    grant: unguarded.migrating,
+    grant,
   })
 
   return result as z.infer<typeof zod>

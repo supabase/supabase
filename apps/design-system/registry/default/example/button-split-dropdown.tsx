@@ -5,23 +5,19 @@ import {
   DropdownMenuContent,
   DropdownMenuItem,
   DropdownMenuTrigger,
+  SplitButtonGroup,
 } from 'ui'
 
 export default function ButtonSplitDropdownDemo() {
   return (
-    <div className="flex w-fit">
-      <Button
-        type="button"
-        className="rounded-r-none hover:z-10 focus-visible:z-10 focus-visible:rounded-r-sm"
-      >
-        Export CSV
-      </Button>
+    <SplitButtonGroup className="w-fit">
+      <Button type="button">Export CSV</Button>
       <DropdownMenu>
         <DropdownMenuTrigger asChild>
           <Button
             type="button"
             aria-label="More export formats"
-            className="shrink-0 rounded-l-none px-1 py-1.25 -ml-px focus-visible:z-10 focus-visible:rounded-l-sm"
+            className="shrink-0 px-1 py-1.25"
             icon={<ChevronDown />}
           />
         </DropdownMenuTrigger>
@@ -30,6 +26,6 @@ export default function ButtonSplitDropdownDemo() {
           <DropdownMenuItem>Export TSV</DropdownMenuItem>
         </DropdownMenuContent>
       </DropdownMenu>
-    </div>
+    </SplitButtonGroup>
   )
 }

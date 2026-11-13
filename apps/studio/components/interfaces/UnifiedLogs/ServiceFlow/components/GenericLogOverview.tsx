@@ -16,7 +16,7 @@ import { LogFieldRow } from '../../components/LogFieldRow'
 import { LogFields } from '../../components/LogFields'
 import type { ColumnSchema } from '../../UnifiedLogs.schema'
 import { getEventMessageDisplay } from '../../UnifiedLogs.utils'
-import type { BlockFieldConfig, ServiceFlowBlockProps } from '../types'
+import type { AddAttributeFilter, BlockFieldConfig, ServiceFlowBlockProps } from '../types'
 import { groupLogAttributes, type AttributeSectionId } from '../utils/attributeSections'
 import { DetailRow } from './shared/DetailRow'
 import { CollapsibleDetailSection } from '@/components/ui/DataTable/CollapsibleDetailSection'
@@ -52,7 +52,7 @@ const LOG_FIELDS: BlockFieldConfig[] = [
 type GenericLogOverviewProps = Pick<ServiceFlowBlockProps, 'filterFields' | 'table'> & {
   data: ColumnSchema
   attributes?: ColumnSchema['metadata']
-  onAddAttributeFilter?: (key: string, value: string) => void
+  onAddAttributeFilter?: AddAttributeFilter
 }
 
 export function GenericLogOverview({
@@ -90,7 +90,7 @@ export function LogAttributes({
   onAddFilter,
 }: {
   attributes?: ColumnSchema['metadata']
-  onAddFilter?: (key: string, value: string) => void
+  onAddFilter?: AddAttributeFilter
 }) {
   return (
     <>
@@ -109,7 +109,7 @@ export function LogAttributes({
               filterFields={[]}
               onAddFilter={
                 onAddFilter && ['string', 'number', 'boolean'].includes(typeof value)
-                  ? () => onAddFilter(key, String(value))
+                  ? (operator) => onAddFilter(key, String(value), operator)
                   : undefined
               }
               className="pl-9.5"

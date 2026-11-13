@@ -14,6 +14,9 @@ const KEEPALIVE_ACTIONS = new Set<TelemetryEvent['action']>([
   'www_pricing_plan_cta_clicked',
   'example_link_clicked',
   'kb_search_result_clicked',
+  'kb_search_closed',
+  'agent_setup_clicked',
+  'view_as_markdown_clicked',
 ])
 
 // no auth imports here: apps without a dashboard session (kb) send events through this

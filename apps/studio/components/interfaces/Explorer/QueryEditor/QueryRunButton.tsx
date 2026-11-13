@@ -6,6 +6,7 @@ import {
   DropdownMenuItem,
   DropdownMenuTrigger,
   KeyboardShortcut,
+  SplitButtonGroup,
 } from 'ui'
 
 import { ButtonTooltip } from '@/components/ui/ButtonTooltip'
@@ -26,14 +27,13 @@ export const QueryRunButton = ({
   onRunSelected,
 }: QueryRunButtonProps) => {
   return (
-    <div className="ml-1 flex w-fit">
+    <SplitButtonGroup className="ml-1 w-fit">
       <ButtonTooltip
         type="button"
         size="tiny"
         loading={isExecuting}
         disabled={disabled}
         icon={<PlayIcon size={16} strokeWidth={2} />}
-        className="rounded-r-none hover:z-10 focus-visible:z-10 focus-visible:rounded-r-sm"
         onClick={onRun}
         tooltip={{
           content: {
@@ -56,7 +56,7 @@ export const QueryRunButton = ({
             size="tiny"
             disabled={disabled}
             aria-label="More actions"
-            className="shrink-0 rounded-l-none px-[4px] py-[5px] -ml-px focus-visible:z-10 focus-visible:rounded-l-sm"
+            className="shrink-0 px-1 py-1.25"
             icon={<ChevronDownIcon />}
           />
         </DropdownMenuTrigger>
@@ -66,6 +66,6 @@ export const QueryRunButton = ({
           </DropdownMenuItem>
         </DropdownMenuContent>
       </DropdownMenu>
-    </div>
+    </SplitButtonGroup>
   )
 }

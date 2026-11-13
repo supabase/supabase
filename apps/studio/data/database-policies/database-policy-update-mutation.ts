@@ -4,6 +4,7 @@ import { useMutation, useQueryClient } from '@tanstack/react-query'
 import { toast } from 'sonner'
 
 import { databasePoliciesKeys } from './keys'
+import { isUserFaultForSql } from '@/data/error-classification'
 import { unguarded } from '@/data/fetchers'
 import { executeSql } from '@/data/sql/execute-sql-mutation'
 import type { StudioError } from '@/lib/errors/studio-errors'
@@ -40,6 +41,10 @@ export async function updateDatabasePolicy({
     projectRef,
     connectionString,
     sql,
+    // Studio composes the statement, but the user wrote the expressions and bodies Postgres parses
+    sqlOrigin: 'studio',
+    queryName: 'database-policy-update',
+    isUserFaultSqlState: isUserFaultForSql,
     queryKey: ['policy', 'update', originalPolicy.id],
     grant: unguarded.migrating,
   })

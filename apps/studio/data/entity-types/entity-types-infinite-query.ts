@@ -26,6 +26,7 @@ export interface Entity {
   type: ENTITY_TYPE
   comment: string | null
   rls_enabled: boolean
+  is_partition: boolean
 }
 
 export type EntityTypesResponse = {
@@ -54,6 +55,8 @@ export async function getEntityTypes(
     {
       projectRef,
       connectionString,
+      sqlOrigin: 'studio',
+      queryName: 'entity-types',
       sql,
       queryKey: ['entity-types', ...schemas, page],
       grant: unguarded.migrating,

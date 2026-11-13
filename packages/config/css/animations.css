@@ -12,6 +12,7 @@
 @theme {
   --ease-enter: cubic-bezier(0.16, 1, 0.3, 1);
   --ease-move: cubic-bezier(0.87, 0, 0.13, 1);
+  --ease-crossfade: cubic-bezier(0.2, 0, 0, 1);
 
   --animate-fade-in: fadeIn 300ms both;
   --animate-fade-out: fadeOut 300ms both;
