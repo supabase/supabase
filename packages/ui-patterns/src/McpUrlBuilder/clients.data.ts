@@ -416,6 +416,29 @@ export interface McpCliCommands {
   authenticate?: string
 }
 
+const CODEX_OAUTH_SCOPES = [
+  'organizations:read',
+  'projects:read',
+  'projects:write',
+  'database:write',
+  'database:read',
+  'analytics:read',
+  'secrets:read',
+  'edge_functions:read',
+  'edge_functions:write',
+  'environment:read',
+  'environment:write',
+  'storage:read',
+  'storage:write',
+]
+
+export function getCodexAuthenticateCommand(readOnly: boolean): string {
+  const scopes = readOnly
+    ? CODEX_OAUTH_SCOPES.filter((scope) => scope.endsWith(':read'))
+    : CODEX_OAUTH_SCOPES
+  return `codex mcp login supabase --scopes ${scopes.join(',')}`
+}
+
 /**
  * CLI install/auth commands keyed by client key. Single source of truth shared
  * by the dashboard's Connect panel and the generated markdown docs, so the two
@@ -428,7 +451,7 @@ export const MCP_CLI_COMMANDS: Record<string, McpCliCommands> = {
   },
   codex: {
     install: (url) => `codex mcp add supabase --url "${url}"`,
-    authenticate: 'codex mcp login supabase',
+    authenticate: getCodexAuthenticateCommand(false),
   },
   grok: {
     install: (url) => `grok mcp add supabase "${url}" --transport http`,
