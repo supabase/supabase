@@ -48,6 +48,11 @@ export const formatTableRowsToJSON = (table: SupaTable, rows: Record<string, unk
 }
 
 /**
+ * Stands for a JSON `null` in a json/jsonb column, as opposed to a SQL `NULL`. Both parse to `null`.
+ */
+export const JSON_NULL = Symbol('json null')
+
+/**
  * Grid rows carry json/jsonb columns as JSON text (the grid query casts them to text), whereas
  * `formatTableRowsToSQL` expects parsed JSON values. Parses the untruncated json cells so grid rows
  * can be passed to it. Truncated cells are left as-is so they can still be fetched in full.
@@ -66,7 +71,8 @@ export const parseGridJsonColumns = <T extends Record<string, unknown>>(
       const val = row[name]
       if (dataType === 'ARRAY' || typeof val !== 'string' || isTruncated(val)) return
       try {
-        parsedRow[name] = JSON.parse(val)
+        const parsed = JSON.parse(val)
+        parsedRow[name] = parsed === null ? JSON_NULL : parsed
       } catch {
         // Not JSON text, keep the original value
       }
@@ -94,7 +100,11 @@ export const formatTableRowsToSQL = (table: SupaTable, rows: any[]) => {
           return 'null'
         } else if (dataType === 'ARRAY') {
           const array = Array.isArray(val) ? val : JSON.parse(val as string)
+          // `ARRAY[]` has no element type for Postgres to infer, an untyped literal takes the column's
+          if (array.length === 0) return `'{}'`
           return `${formatArrayForSql(array as unknown[])}`
+        } else if (val === JSON_NULL) {
+          return `'null'`
         } else if (format?.includes('json')) {
           // `val` is the parsed JSON value, so serializing it yields valid JSON text
           // (including for plain strings, e.g. "hello"). Only single quotes need

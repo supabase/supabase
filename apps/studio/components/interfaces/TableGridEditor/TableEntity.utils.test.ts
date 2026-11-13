@@ -4,6 +4,7 @@ import {
   formatTableRowsToJSON,
   formatTableRowsToSQL,
   getTablePoliciesUrl,
+  JSON_NULL,
   parseGridJsonColumns,
 } from './TableEntity.utils'
 import type { SupaTable } from '@/components/grid/types'
@@ -131,6 +132,21 @@ describe('TableEntity.utils: formatTableRowsToSQL', () => {
     const result = formatTableRowsToSQL(table, rows)
     const expected = `INSERT INTO public.demo (id, name, tags, metadata) VALUES (2, 'Person 1', ARRAY['tag-a','tag-c'], '{"version":1}'), (3, 'ONeil', ARRAY['tag-a'], '{"version":1,"name":"O''Neil"}');`
     expect(result).toBe(expected)
+  })
+
+  it('should emit an untyped literal for empty arrays', () => {
+    const table: SupaTable = {
+      id: 1,
+      type: ENTITY_TYPE.TABLE,
+      columns: [{ name: 'tags', dataType: 'ARRAY', format: '_text', position: 0 }],
+      name: 'demo',
+      schema: 'public',
+      comment: undefined,
+      estimateRowCount: 1,
+    }
+    expect(formatTableRowsToSQL(table, [{ tags: [] }, { tags: ['a'] }])).toBe(
+      `INSERT INTO public.demo (tags) VALUES ('{}'), (ARRAY['a']);`
+    )
   })
 
   it('should escape quotes and backslashes in json and jsonb values', () => {
@@ -349,6 +365,14 @@ describe('TableEntity.utils: parseGridJsonColumns', () => {
     expect(parsed[0]).toEqual({ note: '{"a":1}', meta: { text: 'say "hi"' }, tags: ['{"x":1}'] })
     expect(parsed[1].meta).toBe('hello')
     expect(formatTableRowsToSQL(table, parsed.slice(1))).toContain(`'"hello"'`)
+  })
+
+  it('keeps a JSON null distinct from a SQL NULL', () => {
+    const parsed = parseGridJsonColumns(table, [{ note: 'n', meta: 'null', tags: [] }], () => false)
+    expect(parsed[0].meta).toBe(JSON_NULL)
+    expect(formatTableRowsToSQL(table, [parsed[0], { note: 'n', meta: null }])).toContain(
+      `VALUES ('n', 'null', '{}'), ('n', null, null);`
+    )
   })
 
   it('leaves truncated and null values alone', () => {

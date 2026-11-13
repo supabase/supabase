@@ -173,7 +173,11 @@ const fetchAllRows = async ({
       sorts,
       roleImpersonationState,
       progressCallback,
+      jsonColumnsAsText: preserveJsonValues,
     })
+    if (preserveJsonValues) {
+      rows = parseGridJsonColumns(supaTable, rows, () => false)
+    }
   } catch (error: unknown) {
     return { status: 'error', error: new FetchRowsError(supaTable.name, error) }
   }

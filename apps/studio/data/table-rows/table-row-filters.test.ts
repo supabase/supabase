@@ -79,3 +79,29 @@ describe('formatPatternMatchFilterValue', () => {
     }
   )
 })
+
+describe('getAllTableRowsSql jsonColumnsAsText', () => {
+  const jsonTable = {
+    id: 1,
+    name: 'docs',
+    schema: 'public',
+    columns: [
+      { name: 'id', dataType: 'bigint', format: 'int8' },
+      { name: 'meta', dataType: 'jsonb', format: 'jsonb' },
+      { name: 'tags', dataType: 'ARRAY', format: '_jsonb' },
+    ],
+  } as unknown as SupaTable
+
+  it('casts json columns to text after the star select, and skips json arrays', () => {
+    const sql = String(
+      getAllTableRowsSql({ table: jsonTable, jsonColumnsAsText: true }).sql.toSql()
+    )
+    expect(sql).toContain('meta::text')
+    expect(sql).not.toContain('tags::text')
+  })
+
+  it('leaves the select untouched by default', () => {
+    const sql = String(getAllTableRowsSql({ table: jsonTable }).sql.toSql())
+    expect(sql).not.toContain('::text')
+  })
+})
