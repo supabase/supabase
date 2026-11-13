@@ -1,5 +1,5 @@
 import { useFlag } from 'common'
-import { Issues } from 'icons'
+import { Inbox, Issues } from 'icons'
 import { LightbulbIcon } from 'lucide-react'
 import { useMemo } from 'react'
 import { cn } from 'ui'
@@ -7,11 +7,23 @@ import { cn } from 'ui'
 import { SIDEBAR_KEYS } from '@/components/layouts/ProjectLayout/LayoutSidebar/LayoutSidebarProvider'
 import { useAdvisorSignals } from '@/components/ui/AdvisorPanel/useAdvisorSignals'
 import { ButtonTooltip } from '@/components/ui/ButtonTooltip'
+import { useProjectIssues } from '@/data/issues/useProjectIssues'
 import { useProjectLintsQuery } from '@/data/lint/lint-query'
 import { useNotificationsV2Query } from '@/data/notifications/notifications-v2-query'
 import { IS_PLATFORM } from '@/lib/constants'
 import { useTrack } from '@/lib/telemetry/track'
 import { useSidebarManagerSnapshot } from '@/state/sidebar-manager-state'
+
+function getButtonIcon({
+  isIssuesInboxEnabled,
+  hasIssues,
+}: {
+  isIssuesInboxEnabled: boolean
+  hasIssues: boolean
+}) {
+  if (!isIssuesInboxEnabled) return LightbulbIcon
+  return hasIssues ? Issues : Inbox
+}
 
 export const AdvisorButton = ({ projectRef }: { projectRef?: string }) => {
   const { toggleSidebar, activeSidebar } = useSidebarManagerSnapshot()
@@ -20,6 +32,7 @@ export const AdvisorButton = ({ projectRef }: { projectRef?: string }) => {
 
   const { data: lints } = useProjectLintsQuery({ projectRef })
   const { data: signalItems } = useAdvisorSignals({ projectRef })
+  const { issues } = useProjectIssues({ projectRef, enabled: isIssuesInboxEnabled })
 
   const { data: notificationsData } = useNotificationsV2Query(
     { filters: {}, limit: 20 },
@@ -47,7 +60,7 @@ export const AdvisorButton = ({ projectRef }: { projectRef?: string }) => {
   }
 
   const label = isIssuesInboxEnabled ? 'Issues' : 'Advisor Center'
-  const Icon = isIssuesInboxEnabled ? Issues : LightbulbIcon
+  const Icon = getButtonIcon({ isIssuesInboxEnabled, hasIssues: issues.length > 0 })
 
   return (
     <div className="relative">

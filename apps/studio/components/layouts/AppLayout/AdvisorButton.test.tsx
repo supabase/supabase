@@ -141,6 +141,36 @@ describe('AdvisorButton', () => {
     expect(container.querySelector('.bg-warning')).not.toBeInTheDocument()
   })
 
+  it('shows an empty inbox icon when the project has no issues', () => {
+    const { container } = render(<AdvisorButton projectRef="project-ref" />)
+
+    expect(container.querySelector('.lucide-inbox')).toBeInTheDocument()
+    expect(container.querySelector('.lucide-issues')).not.toBeInTheDocument()
+  })
+
+  it('swaps in the issues icon once the project has issues', () => {
+    mockUseProjectLintsQuery.mockReturnValue({
+      data: [
+        {
+          cache_key: 'lint-1',
+          name: 'unknown_lint',
+          detail: 'Lint detail',
+          description: 'Description',
+          level: 'WARN',
+          categories: ['SECURITY'],
+          metadata: {},
+        },
+      ],
+      isPending: false,
+      isError: false,
+    })
+
+    const { container } = render(<AdvisorButton projectRef="project-ref" />)
+
+    expect(container.querySelector('.lucide-issues')).toBeInTheDocument()
+    expect(container.querySelector('.lucide-inbox')).not.toBeInTheDocument()
+  })
+
   it('falls back to the brand dot for unread notifications when there are no issues', () => {
     mockUseNotificationsV2Query.mockReturnValue({
       data: {

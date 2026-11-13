@@ -225,6 +225,16 @@ export const Index: Record<string, any> = [
   jsx: "import { Home } from \"icons\"\n  <Home/>\n  "
 },
 {
+  name: "inbox",
+  componentName: "Inbox",
+  deprecated: false,
+  raw: "import createSupabaseIcon from '../createSupabaseIcon';\n\n/**\n * @component @name Inbox\n * @description Supabase SVG icon component, renders SVG Element with children.\n *\n * @preview ![img](data:image/svg+xml;base64,PHN2ZyB3aWR0aD0iMjQiIGhlaWdodD0iMjQiIHZpZXdCb3g9IjAgMCAyNCAyNCIgZmlsbD0ibm9uZSIgeG1sbnM9Imh0dHA6Ly93d3cudzMub3JnLzIwMDAvc3ZnIiBzdHJva2U9IiMwMDAiIHN0eWxlPSJiYWNrZ3JvdW5kLWNvbG9yOiAjZmZmOyBib3JkZXItcmFkaXVzOiAycHgiICAgIHN0cm9rZS13aWR0aD0iMS41Ij4KPHBhdGggZD0iTTIyIDE0SDE2TDE0IDE3SDEwTDggMTRIMk03LjI0IDZDNi44Njc5MiA2LjAwMDIgNi41MDMyNiA2LjEwNDE5IDYuMTg3MDQgNi4zMDAyOEM1Ljg3MDgzIDYuNDk2MzcgNS42MTU1OCA2Ljc3Njc5IDUuNDUgNy4xMUwyIDE0VjIwQzIgMjAuNTMwNCAyLjIxMDcxIDIxLjAzOTEgMi41ODU3OSAyMS40MTQyQzIuOTYwODYgMjEuNzg5MyAzLjQ2OTU3IDIyIDQgMjJIMjBDMjAuNTMwNCAyMiAyMS4wMzkxIDIxLjc4OTMgMjEuNDE0MiAyMS40MTQyQzIxLjc4OTMgMjEuMDM5MSAyMiAyMC41MzA0IDIyIDIwVjE0TDE4LjU1IDcuMTFDMTguMzg0NCA2Ljc3Njc5IDE4LjEyOTIgNi40OTYzNyAxNy44MTMgNi4zMDAyOEMxNy40OTY3IDYuMTA0MTkgMTcuMTMyMSA2LjAwMDIgMTYuNzYgNkg3LjI0WiIvPgo8L3N2Zz4K)\n *\n * @param {Object} props - Supabase icons props and any valid SVG attribute\n * @returns {JSX.Element} JSX Element\n *\n */\nconst Inbox = createSupabaseIcon(\n  'Inbox',\n  [\n    [\n      'path',\n      {\n        d: 'M22 14H16L14 17H10L8 14H2M7.24 6C6.86792 6.0002 6.50326 6.10419 6.18704 6.30028C5.87083 6.49637 5.61558 6.77679 5.45 7.11L2 14V20C2 20.5304 2.21071 21.0391 2.58579 21.4142C2.96086 21.7893 3.46957 22 4 22H20C20.5304 22 21.0391 21.7893 21.4142 21.4142C21.7893 21.0391 22 20.5304 22 20V14L18.55 7.11C18.3844 6.77679 18.1292 6.49637 17.813 6.30028C17.4967 6.10419 17.1321 6.0002 16.76 6H7.24Z',\n        key: 'x6btcl',\n      },\n    ],\n  ],\n  { fill: 'none', stroke: 'currentColor', strokeWidth: '1.5' },\n);\n\nexport default Inbox;\n",
+  component: React.lazy(() => import('icons/src/icons/inbox')),
+  import: "import { Inbox } from 'icons'",
+  svg: "<svg width=\"24\" height=\"24\" viewBox=\"0 0 24 24\" fill=\"none\" xmlns=\"http://www.w3.org/2000/svg\" stroke=\"currentColor\"\n    stroke-width=\"1.5\">\n<path d=\"M22 14H16L14 17H10L8 14H2M7.24 6C6.86792 6.0002 6.50326 6.10419 6.18704 6.30028C5.87083 6.49637 5.61558 6.77679 5.45 7.11L2 14V20C2 20.5304 2.21071 21.0391 2.58579 21.4142C2.96086 21.7893 3.46957 22 4 22H20C20.5304 22 21.0391 21.7893 21.4142 21.4142C21.7893 21.0391 22 20.5304 22 20V14L18.55 7.11C18.3844 6.77679 18.1292 6.49637 17.813 6.30028C17.4967 6.10419 17.1321 6.0002 16.76 6H7.24Z\"/>\n</svg>\n",
+  jsx: "import { Inbox } from \"icons\"\n  <Inbox/>\n  "
+},
+{
   name: "insert-code",
   componentName: "InsertCode",
   deprecated: false,

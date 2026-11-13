@@ -20,6 +20,7 @@ export { default as Google } from './google';
 export { default as Grafana } from './grafana';
 export { default as Graphql } from './graphql';
 export { default as Home } from './home';
+export { default as Inbox } from './inbox';
 export { default as InsertCode } from './insert-code';
 export { default as Integrations } from './integrations';
 export { default as Issues } from './issues';
