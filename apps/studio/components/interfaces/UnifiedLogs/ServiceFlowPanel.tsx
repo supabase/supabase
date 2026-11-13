@@ -93,7 +93,7 @@ export function ServiceFlowPanel({
               {!hasMultiple && activeLog ? (
                 <OpenLogSummary log={activeLog} searchParameters={searchParameters} />
               ) : (
-                <span className="truncate text-base font-medium leading-6 text-foreground">
+                <span className="truncate text-sm font-medium leading-6 text-foreground">
                   {title}
                 </span>
               )}

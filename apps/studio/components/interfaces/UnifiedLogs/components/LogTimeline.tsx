@@ -207,7 +207,7 @@ function LogStepRow({ log, timeLabel }: { log: ColumnSchema; timeLabel: string }
 /** One-line identity of a log: type icon, status, and its request or message. */
 export function LogStepSummary({ log, isLoading }: { log: ColumnSchema; isLoading?: boolean }) {
   return (
-    <div className="flex min-w-0 flex-1 items-center gap-2 text-base font-medium leading-6 text-foreground">
+    <div className="flex min-w-0 flex-1 items-center gap-2 text-sm font-medium leading-6 text-foreground">
       {isLoading ? (
         // Matches the log type icon's size so the summary doesn't move when loading ends
         <span className="inline-flex" role="img" aria-label="Loading log details">
