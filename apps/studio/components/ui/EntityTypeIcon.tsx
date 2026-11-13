@@ -151,7 +151,9 @@ export const EntityTypeIcon = ({
           'text-warning-600/80 dark:text-yellow-900 bg-yellow-500',
         type === ENTITY_TYPE.MATERIALIZED_VIEW && 'text-purple-1100 bg-purple-500',
         type === ENTITY_TYPE.PARTITIONED_TABLE &&
-          `${isPartition ? 'text-blue-1100 bg-blue-500 dark:bg-blue-500' : 'text-foreground bg-blue-700 dark:bg-blue-800'}`
+          (isPartition
+            ? 'text-blue-1100 bg-blue-500 dark:bg-blue-500'
+            : 'text-foreground bg-blue-700 dark:bg-blue-800')
       )}
     >
       {Object.entries(ENTITY_TYPE)
