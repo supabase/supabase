@@ -36,7 +36,7 @@ const DestinationRow = (props: { destinationId: number }) => (
 )
 
 const DESTINATION_ID = 1
-const PIPELINE_ID = '42'
+const PIPELINE_ID = '03h6pes1npx2ptvf052my5nx2'
 
 const addSourcesMock = () =>
   addAPIMock({
@@ -95,6 +95,7 @@ const addPipelinesMock = (waitForResponse?: Promise<void>) =>
               publication_name: 'supabase_realtime',
               table_sync_copy: { type: 'include_all_tables' },
             },
+            cluster_id: '1',
           },
         ],
       })
@@ -365,10 +366,40 @@ describe('DestinationRow', () => {
 
     const row = (await screen.findByText('supabase_realtime')).closest('tr')
     expect(row).not.toBeNull()
+    expect(screen.getByText(`#${PIPELINE_ID}`)).toBeVisible()
+    expect(screen.getByRole('button', { name: 'Copy pipeline ID' })).toHaveAttribute(
+      'title',
+      PIPELINE_ID
+    )
     await userEvent.click(row!)
 
     expect(routerMock.asPath).toBe(`/project/default/database/pipelines/${PIPELINE_ID}`)
   })
+
+  test.each(['click', 'keyboard'])(
+    'copies the full ID using %s without navigating',
+    async (interaction) => {
+      const user = userEvent.setup()
+      addAllMocks()
+      routerMock.setCurrentUrl('/project/default/database/pipelines')
+      customRender(
+        <Table>
+          <TableBody>
+            <DestinationRow destinationId={DESTINATION_ID} />
+          </TableBody>
+        </Table>
+      )
+      const copyButton = await screen.findByRole('button', { name: 'Copy pipeline ID' })
+      if (interaction === 'click') {
+        await user.click(copyButton)
+      } else {
+        copyButton.focus()
+        await user.keyboard('{Enter}')
+      }
+      expect(await navigator.clipboard.readText()).toBe(PIPELINE_ID)
+      expect(routerMock.asPath).toBe('/project/default/database/pipelines')
+    }
+  )
 
   test('does not navigate when the row overflow menu is opened', async () => {
     addAllMocks()
@@ -378,6 +409,10 @@ describe('DestinationRow', () => {
 
     await screen.findByText('supabase_realtime')
     await userEvent.click(screen.getByRole('button', { name: 'Pipeline options' }))
+    expect(screen.getByRole('menuitem', { name: 'View details' })).toHaveAttribute(
+      'href',
+      `/project/default/database/pipelines/${PIPELINE_ID}`
+    )
 
     expect(routerMock.asPath).toBe('/project/default/database/pipelines')
   })

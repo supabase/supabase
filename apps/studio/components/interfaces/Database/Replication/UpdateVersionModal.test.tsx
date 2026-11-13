@@ -30,6 +30,7 @@ const pipeline: Pipeline = {
   destination_name: 'Analytics',
   replicator_id: 1,
   config: { publication_name: 'analytics' },
+  cluster_id: '1',
 }
 
 const StatusView = () => {

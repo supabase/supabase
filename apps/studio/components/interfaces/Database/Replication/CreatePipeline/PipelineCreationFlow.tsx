@@ -16,6 +16,7 @@ import { NewPublicationPanel } from '../DestinationPanel/DestinationForm/NewPubl
 import { SnowflakeFields } from '../DestinationPanel/DestinationForm/Snowflake/Fields'
 import { DESTINATION_DOCS_PATHS } from '../DestinationPanel/DestinationPanel.constants'
 import type { DestinationType } from '../DestinationPanel/DestinationPanel.types'
+import { PipelineClusterSelector } from '../PipelineClusterSelector'
 import { PipelineConnectionSection } from './PipelineConnectionSection'
 import { PIPELINE_CREATION_STEPS as steps } from './PipelineCreationFlow.constants'
 import { PipelineCreationHeader } from './PipelineCreationHeader'
@@ -28,6 +29,7 @@ import {
   PipelineValidationAdmonition,
   SANDWICHED_ADMONITION_CLASS,
 } from './PipelineValidationAdmonition'
+import { useEnsurePipelineRegionSource } from './useEnsurePipelineRegionSource'
 import { usePipelineConnectionValidation } from './usePipelineConnectionValidation'
 import { usePipelineCreationSubmission } from './usePipelineCreationSubmission'
 import { usePipelineDataValidation } from './usePipelineDataValidation'
@@ -80,6 +82,7 @@ export const PipelineCreationFlow = ({
   const { validateConnection, resetValidation, isValidating, isConnectionVerified, failures } =
     usePipelineConnectionValidation({ projectRef, type, form })
   const sourceId = useReplicationSourceId({ projectRef })
+  const { ensureRegionSource, isCreatingSource } = useEnsurePipelineRegionSource(projectRef)
   const {
     validateData,
     isValidatingData,
@@ -111,7 +114,7 @@ export const PipelineCreationFlow = ({
       ? 'Fix the above issues and review warnings before starting the pipeline.'
       : 'Fix the above issues before starting the pipeline.'
   }
-  const isBusy = isValidating || isValidatingData || isSubmitting
+  const isBusy = isValidating || isValidatingData || isSubmitting || isCreatingSource
   const accessibleStep = (() => {
     if (isSubmitting) return step
     if ((step === 'data' || step === 'review') && !isConnectionVerified) return 'connection'
@@ -124,6 +127,7 @@ export const PipelineCreationFlow = ({
     enabled: accessibleStep === 'review',
   })
   const handleNext = async () => {
+    if (accessibleStep === 'destination' && !(await ensureRegionSource())) return
     if (accessibleStep === 'connection' && !isConnectionVerified && !(await validateConnection()))
       return
     if (accessibleStep === 'data' && !(await validateData())) return
@@ -177,7 +181,7 @@ export const PipelineCreationFlow = ({
                 actions={docsUrl && <DocsButton href={docsUrl} />}
               />
               {accessibleStep === 'destination' && (
-                <div className="p-5">
+                <div className="flex flex-col gap-5 p-5">
                   <PipelineDestinationSelection
                     availableDestinations={availableDestinations}
                     value={type}
@@ -190,6 +194,7 @@ export const PipelineCreationFlow = ({
                     }}
                     renderLogo={(value) => <DestinationLogo type={value} />}
                   />
+                  <PipelineClusterSelector onChange={resetValidation} />
                 </div>
               )}
               {accessibleStep === 'connection' && (

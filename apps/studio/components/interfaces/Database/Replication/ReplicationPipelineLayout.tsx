@@ -50,6 +50,7 @@ import {
   getRestartRequestStatus,
   getStatusName,
 } from './Pipeline.utils'
+import { PipelineId } from './PipelineId'
 import { PipelineStatePill } from './PipelineStatePill'
 import { PipelineStatusName } from './Replication.constants'
 import {
@@ -61,6 +62,10 @@ import { UpdateVersionModal } from './UpdateVersionModal'
 import { useUnifiedLogsPreview } from '@/components/interfaces/App/FeaturePreview/FeaturePreviewContext'
 import { AlertError } from '@/components/ui/AlertError'
 import { DocsButton } from '@/components/ui/DocsButton'
+import {
+  getReplicationRegionLabel,
+  useReplicationClusterGroups,
+} from '@/data/replication/clusters-query'
 import { useDeleteDestinationPipelineMutation } from '@/data/replication/delete-destination-pipeline-mutation'
 import { useReplicationDestinationByIdQuery } from '@/data/replication/destination-by-id-query'
 import { useReplicationPipelineByIdQuery } from '@/data/replication/pipeline-by-id-query'
@@ -71,6 +76,7 @@ import { useStartPipelineMutation } from '@/data/replication/start-pipeline-muta
 import { useStopPipelineMutation } from '@/data/replication/stop-pipeline-mutation'
 import { DOCS_URL } from '@/lib/constants'
 import type { StudioError } from '@/lib/errors/studio-errors'
+import { useReplicationClusterId } from '@/state/replication-cluster'
 import {
   PipelineStatusRequestStatus,
   usePipelineRequestStatus,
@@ -88,6 +94,9 @@ const LIFECYCLE_BY_STATUS: Partial<
 
 export const ReplicationPipelineLayout = ({ children }: PropsWithChildren) => {
   const { ref: projectRef, pipelineId } = useParams()
+  const clusterId = useReplicationClusterId()
+  const { groups, hasMultipleRegions } = useReplicationClusterGroups()
+  const region = groups.find((group) => group.clusterId === clusterId)?.region
   const { isEnabled: isUnifiedLogsEnabled } = useUnifiedLogsPreview()
   const router = useRouter()
   const [showUpdateVersionModal, setShowUpdateVersionModal] = useState(false)
@@ -284,6 +293,7 @@ export const ReplicationPipelineLayout = ({ children }: PropsWithChildren) => {
                   (pipeline?.destination_name ?? 'Pipeline')
                 )}
               </PageHeaderTitle>
+              {pipeline && <PipelineId pipelineId={pipeline.id} className="w-fit" />}
               <PageHeaderDescription className="flex flex-row flex-wrap items-center gap-x-1.5 gap-y-1 text-sm!">
                 <PipelineStatePill
                   pipelineStatus={pipelineStatusData?.status}
@@ -310,6 +320,16 @@ export const ReplicationPipelineLayout = ({ children }: PropsWithChildren) => {
                     <span>{destinationType ?? pipeline?.destination_name ?? 'Unknown'}</span>
                   )}
                 </span>
+                {hasMultipleRegions && region && (
+                  <>
+                    <span aria-hidden className="text-foreground-lighter">
+                      &middot;
+                    </span>
+                    <span className="text-foreground-light">
+                      {getReplicationRegionLabel(region)}
+                    </span>
+                  </>
+                )}
               </PageHeaderDescription>
             </PageHeaderSummary>
 

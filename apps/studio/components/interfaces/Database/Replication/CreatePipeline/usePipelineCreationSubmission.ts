@@ -7,6 +7,7 @@ import {
 } from '../DestinationPanel/DestinationForm/DestinationForm.schema'
 import { useDestinationForm } from '../DestinationPanel/DestinationForm/useDestinationForm'
 import type { DestinationType } from '../DestinationPanel/DestinationPanel.types'
+import { useReplicationClusterId } from '@/state/replication-cluster'
 
 export const usePipelineCreationSubmission = ({
   type,
@@ -26,6 +27,7 @@ export const usePipelineCreationSubmission = ({
     pipelineValidationFailures,
     resetValidation,
   } = useDestinationForm({ selectedType: type })
+  const clusterId = useReplicationClusterId()
   const [isSubmitting, setIsSubmitting] = useState(false)
   const isSubmittingRef = useRef(false)
   const hasCreated = useRef(false)
@@ -34,7 +36,7 @@ export const usePipelineCreationSubmission = ({
     control: form.control,
     name: DestinationPanelFormSchema.keyof().options,
   })
-  const configurationSnapshot = JSON.stringify([type, values])
+  const configurationSnapshot = JSON.stringify([type, clusterId, values])
   const failures = [...destinationValidationFailures, ...pipelineValidationFailures]
 
   const createPipeline = async (data: DestinationPanelSchemaType) => {

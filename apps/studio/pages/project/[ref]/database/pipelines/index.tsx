@@ -21,6 +21,7 @@ import { UnknownInterface } from '@/components/ui/UnknownInterface'
 import { useHighAvailability } from '@/hooks/misc/useHighAvailability'
 import { useIsFeatureEnabled } from '@/hooks/misc/useIsFeatureEnabled'
 import { DOCS_URL } from '@/lib/constants'
+import { ReplicationClusterProvider } from '@/state/replication-cluster'
 import type { NextPageWithLayout } from '@/types'
 
 const DatabasePipelinesPage: NextPageWithLayout = () => {
@@ -101,10 +102,11 @@ const DatabasePipelinesPage: NextPageWithLayout = () => {
                 </div>
               </>
             ) : (
-              <>
+              // The list spans every region, so it ignores any cluster in the URL.
+              <ReplicationClusterProvider clusterId={undefined}>
                 <ReplicationDiagram />
                 <Destinations />
-              </>
+              </ReplicationClusterProvider>
             )}
           </PageSectionContent>
         </PageSection>

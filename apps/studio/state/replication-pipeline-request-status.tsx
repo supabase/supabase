@@ -3,6 +3,7 @@ import { useParams } from 'common'
 import { createContext, useContext, useState, type ReactNode } from 'react'
 
 import { replicationPipelineStatusQueryOptions } from '@/data/replication/pipeline-status-query'
+import { useReplicationClusterId } from '@/state/replication-cluster'
 
 export enum PipelineStatusRequestStatus {
   None = 'None',
@@ -21,7 +22,8 @@ interface PipelineRequestStatusContextType {
   runWithRequestStatus: <T>(
     pipelineId: string,
     status: PipelineStatusRequestStatus,
-    action: () => Promise<T>
+    action: () => Promise<T>,
+    clusterId?: string
   ) => Promise<T>
 }
 
@@ -37,7 +39,8 @@ export const PipelineRequestStatusProvider = ({ children }: { children: ReactNod
   const runWithRequestStatus: PipelineRequestStatusContextType['runWithRequestStatus'] = async (
     pipelineId,
     status,
-    action
+    action,
+    clusterId
   ) => {
     const id = Symbol('pipeline request')
     setRequests((previous) => ({ ...previous, [pipelineId]: { id, status } }))
@@ -45,7 +48,7 @@ export const PipelineRequestStatusProvider = ({ children }: { children: ReactNod
       return await action()
     } finally {
       const options = {
-        ...replicationPipelineStatusQueryOptions({ projectRef, pipelineId }),
+        ...replicationPipelineStatusQueryOptions({ projectRef, pipelineId, clusterId }),
         staleTime: 0,
       }
       // A status fetch that was already in flight started before this mutation resolved, so it
@@ -84,9 +87,18 @@ export const PipelineRequestStatusProvider = ({ children }: { children: ReactNod
   )
 }
 
+/** Request statuses are shared across clusters; refreshes target the caller's cluster. */
 export const usePipelineRequestStatus = () => {
+  const clusterId = useReplicationClusterId()
   const context = useContext(PipelineRequestStatusContext)
   if (context === undefined)
     throw new Error('usePipelineRequestStatus must be used within a PipelineRequestStatusProvider')
-  return context
+  return {
+    ...context,
+    runWithRequestStatus: <T,>(
+      pipelineId: string,
+      status: PipelineStatusRequestStatus,
+      action: () => Promise<T>
+    ) => context.runWithRequestStatus(pipelineId, status, action, clusterId),
+  }
 }

@@ -57,8 +57,9 @@ export const TableReplicationRow = ({
     syncLagParts !== undefined && syncLagParts.length > 0 ? syncLagParts.join(' · ') : undefined
   // Status column already names the state (Copying, Queued, …). Prefer the sync line when we have
   // one; keep the description only when it adds something the status label doesn't say.
-  const detailsLine =
-    syncLagLabel !== undefined ? syncLagLabel : isErrorState ? undefined : statusConfig.description
+  const detailsLine = isPipelineStopped
+    ? 'Reported before the pipeline stopped'
+    : (syncLagLabel ?? statusConfig.description)
 
   return (
     <TableRow>
@@ -76,11 +77,13 @@ export const TableReplicationRow = ({
           <StateDot variant="default">Not available</StateDot>
         ) : (
           <StateDot
-            variant={statusConfig.variant}
-            isPulsing={statusConfig.isPulsing}
-            pulseDelayMs={statusConfig.isPulsing ? (table.id % 8) * 55 : undefined}
+            variant={isPipelineStopped ? 'default' : statusConfig.variant}
+            isPulsing={!isPipelineStopped && statusConfig.isPulsing}
+            pulseDelayMs={
+              !isPipelineStopped && statusConfig.isPulsing ? (table.id % 8) * 55 : undefined
+            }
           >
-            {statusConfig.label}
+            {isPipelineStopped ? `Last: ${statusConfig.label}` : statusConfig.label}
           </StateDot>
         )}
       </TableCell>

@@ -119,6 +119,7 @@ const PIPELINE: PipelineResponse = {
   source_id: 2,
   source_name: 'main-db',
   tenant_id: 'default',
+  cluster_id: '1',
 }
 
 const DESTINATION: DestinationResponse = {
@@ -216,6 +217,24 @@ describe('ReplicationPipelineLayout', () => {
     mockPipeline()
     mockVersion(false)
   })
+
+  test.each(['00150', '03h6pes1npx2ptvf052my5nx2'.repeat(4)])(
+    'copies the full pipeline ID %s from the detail header',
+    async (pipelineId) => {
+      const user = userEvent.setup()
+      routeParams.pipelineId = pipelineId
+      mockPipeline(pipelineId)
+      mockVersion(false, pipelineId)
+      mockStatus('stopped', pipelineId)
+
+      renderLayout()
+
+      const copyButton = await screen.findByRole('button', { name: 'Copy pipeline ID' })
+      expect(copyButton).toHaveAttribute('title', pipelineId)
+      await user.click(copyButton)
+      expect(await navigator.clipboard.readText()).toBe(pipelineId)
+    }
+  )
 
   test.each(['started', 'stopped', 'failed'] as const)(
     'only allows stopping and deletion for an unknown destination when %s',
@@ -362,7 +381,6 @@ describe('ReplicationPipelineLayout', () => {
     )
     await waitFor(() => expect(screen.queryByRole('dialog')).not.toBeInTheDocument())
   })
-
   test.each([42, '42', '003l8j9rxqi6c8rd5mcx1w2ya'])(
     'renders pipeline %s and stops it using its original ID',
     async (pipelineId) => {

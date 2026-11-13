@@ -29,6 +29,7 @@ const pipeline: Pipeline = {
   tenant_id: 'tenant',
   replicator_id: 9,
   config: { publication_name: 'analytics' },
+  cluster_id: '1',
 }
 
 // Regression: lists were mounted with `refetchOnMount: false`, so after creating a pipeline

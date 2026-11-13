@@ -6,6 +6,7 @@ import { cn, Tooltip, TooltipContent, TooltipTrigger } from 'ui'
 
 import { DestinationLogo } from '../DestinationLogo'
 import { getStatusName } from '../Pipeline.utils'
+import { PipelineId } from '../PipelineId'
 import { getReplicationDestinationType } from './Nodes.utils'
 import { RegionFlag } from '@/components/ui/RegionFlag'
 import { useReplicationDestinationsQuery } from '@/data/replication/destinations-query'
@@ -29,12 +30,9 @@ const NodeContainer = ({ className, children }: PropsWithChildren<{ className?: 
   )
 }
 
-export const PrimaryDatabaseNode = () => {
-  const { ref: projectRef } = useParams()
+export const PrimaryDatabaseNode = ({ data }: { data: { hasDestinations: boolean } }) => {
   const { data: project } = useSelectedProjectQuery()
-
-  const { data: destinationsData } = useReplicationDestinationsQuery({ projectRef })
-  const hasDestinations = (destinationsData?.destinations ?? []).length > 0
+  const { hasDestinations } = data
 
   const region = Object.values(AWS_REGIONS).find((x) => x.code === project?.region)
 
@@ -55,19 +53,26 @@ export const PrimaryDatabaseNode = () => {
   )
 }
 
-export const ReplicationNode = ({ id }: { id: string }) => {
+export const ReplicationNode = ({
+  data,
+}: {
+  data: { destinationId: string; clusterId: string | undefined }
+}) => {
   const { ref: projectRef } = useParams()
+  const { destinationId: id, clusterId } = data
 
-  const { data: destinationsData } = useReplicationDestinationsQuery({ projectRef })
+  const { data: destinationsData } = useReplicationDestinationsQuery({ projectRef, clusterId })
   const destination = (destinationsData?.destinations ?? []).find((x) => x.id.toString() === id)
 
   const { data: pipelinesData } = useReplicationPipelinesQuery({
     projectRef,
+    clusterId,
   })
   const pipeline = (pipelinesData?.pipelines ?? []).find((x) => x.destination_id.toString() === id)
   const { data: pipelineStatusData } = useReplicationPipelineStatusQuery({
     projectRef,
     pipelineId: pipeline?.id,
+    clusterId,
   })
   const statusName = getStatusName(pipelineStatusData?.status)
 
@@ -75,7 +80,7 @@ export const ReplicationNode = ({ id }: { id: string }) => {
 
   return (
     <NodeContainer>
-      <div className="text-sm flex flex-col gap-y-0.5">
+      <div className="text-sm flex min-w-0 flex-1 flex-col gap-y-0.5">
         <div className="flex items-center">
           <p>{type}</p>
           {(statusName === 'started' || statusName === 'failed') && (
@@ -96,8 +101,10 @@ export const ReplicationNode = ({ id }: { id: string }) => {
             </Tooltip>
           )}
         </div>
-        <p className="text-foreground-light">{destination?.name}</p>
-        <p className="text-foreground-light">ID: {destination?.id}</p>
+        <p className="truncate text-foreground-light" title={destination?.name}>
+          {destination?.name}
+        </p>
+        {pipeline && <PipelineId pipelineId={pipeline.id} className="self-start" />}
       </div>
       {type ? <DestinationLogo type={type} /> : null}
       <Handle type="target" position={Position.Left} className="opacity-25" />

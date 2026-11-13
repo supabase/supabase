@@ -9,6 +9,7 @@ import { ShimmeringLoader } from 'ui-patterns/ShimmeringLoader'
 import { DeleteDestination } from './DeleteDestination'
 import { DestinationLogo } from './DestinationLogo'
 import { DetailSubtext } from './DetailSubtext'
+import { PipelineId } from './PipelineId'
 import { PipelineStatePill } from './PipelineStatePill'
 import { PipelineStatusName } from './Replication.constants'
 import { canModifyDestination } from './ReplicationDiagram/Nodes.utils'
@@ -20,6 +21,7 @@ import { RowMenu } from './RowMenu'
 import { UpdateVersionModal } from './UpdateVersionModal'
 import { useDestinationInformation } from './useDestinationInformation'
 import { AlertError } from '@/components/ui/AlertError'
+import { withReplicationCluster } from '@/data/replication/cluster-path'
 import { useDeleteDestinationPipelineMutation } from '@/data/replication/delete-destination-pipeline-mutation'
 import { useReplicationPipelineReplicationStatusQuery } from '@/data/replication/pipeline-replication-status-query'
 import { useReplicationPipelineStatusQuery } from '@/data/replication/pipeline-status-query'
@@ -27,6 +29,7 @@ import { useReplicationPipelineVersionQuery } from '@/data/replication/pipeline-
 import { useStopPipelineMutation } from '@/data/replication/stop-pipeline-mutation'
 import type { StudioError } from '@/lib/errors/studio-errors'
 import { createNavigationHandler } from '@/lib/navigation'
+import { useReplicationClusterId } from '@/state/replication-cluster'
 import {
   PipelineStatusRequestStatus,
   usePipelineRequestStatus,
@@ -37,6 +40,7 @@ interface DestinationRowProps {
 }
 
 export const DestinationRow = ({ destinationId }: DestinationRowProps) => {
+  const clusterId = useReplicationClusterId()
   const router = useRouter()
   const { ref: projectRef } = useParams()
   const [showDeleteDestinationForm, setShowDeleteDestinationForm] = useState(false)
@@ -103,7 +107,13 @@ export const DestinationRow = ({ destinationId }: DestinationRowProps) => {
   const hasUpdate = Boolean(versionData?.new_version)
 
   const handleNavigation = pipeline
-    ? createNavigationHandler(`/project/${projectRef}/database/pipelines/${pipeline.id}`, router)
+    ? createNavigationHandler(
+        withReplicationCluster(
+          `/project/${projectRef}/database/pipelines/${pipeline.id}`,
+          clusterId
+        ),
+        router
+      )
     : undefined
 
   const onDeleteClick = async () => {
@@ -170,7 +180,7 @@ export const DestinationRow = ({ destinationId }: DestinationRowProps) => {
             {type ? <DestinationLogo type={type} hasErrors={hasTableErrors} /> : null}
           </TableCell>
 
-          <TableCell className="max-w-[180px]">
+          <TableCell className="min-w-64 max-w-xs">
             {isPipelineLoading && !destinationName ? (
               <ShimmeringLoader />
             ) : (
@@ -179,8 +189,8 @@ export const DestinationRow = ({ destinationId }: DestinationRowProps) => {
                   {destinationName || type}
                 </p>
                 {pipeline && (
-                  <DetailSubtext className="flex items-center gap-x-1.5">
-                    <span>#{pipeline.id}</span>
+                  <DetailSubtext className="flex min-w-0 flex-wrap items-center gap-x-1.5 gap-y-0.5">
+                    <PipelineId pipelineId={pipeline.id} />
                     <span aria-hidden>&middot;</span>
                     <span>{type}</span>
                     {hasTableErrors && (

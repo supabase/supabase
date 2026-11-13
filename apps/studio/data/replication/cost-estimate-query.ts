@@ -3,12 +3,14 @@ import { useQuery } from '@tanstack/react-query'
 import { replicationKeys } from './keys'
 import { get, handleError } from '@/data/fetchers'
 import type { StudioError } from '@/lib/errors/studio-errors'
+import { useReplicationClusterId } from '@/state/replication-cluster'
 import type { UseCustomQueryOptions } from '@/types'
 
 type ReplicationCostEstimateParams = {
   projectRef?: string
   sourceId?: number
   publicationName?: string
+  clusterId?: string
 }
 
 async function fetchReplicationCostEstimate(
@@ -38,14 +40,20 @@ async function fetchReplicationCostEstimate(
 export type ReplicationCostEstimateData = Awaited<ReturnType<typeof fetchReplicationCostEstimate>>
 
 export const useReplicationCostEstimateQuery = <TData = ReplicationCostEstimateData>(
-  { projectRef, sourceId, publicationName }: ReplicationCostEstimateParams,
+  {
+    projectRef,
+    sourceId,
+    publicationName,
+    clusterId: requestedClusterId,
+  }: ReplicationCostEstimateParams,
   {
     enabled = true,
     ...options
   }: UseCustomQueryOptions<ReplicationCostEstimateData, StudioError, TData> = {}
-) =>
-  useQuery<ReplicationCostEstimateData, StudioError, TData>({
-    queryKey: replicationKeys.costEstimate(projectRef, sourceId, publicationName),
+) => {
+  const clusterId = useReplicationClusterId(requestedClusterId)
+  return useQuery<ReplicationCostEstimateData, StudioError, TData>({
+    queryKey: replicationKeys.costEstimate(projectRef, sourceId, publicationName, clusterId),
     queryFn: ({ signal }) =>
       fetchReplicationCostEstimate({ projectRef, sourceId, publicationName }, signal),
     enabled:
@@ -56,3 +64,4 @@ export const useReplicationCostEstimateQuery = <TData = ReplicationCostEstimateD
       publicationName.length > 0,
     ...options,
   })
+}

@@ -115,6 +115,7 @@ const getPipelineData = (): PipelineResponse => ({
     max_table_sync_workers: 4,
     max_copy_connections_per_table: 1,
   },
+  cluster_id: '1',
 })
 const project: ProjectDetail = {
   cloud_provider: 'AWS',

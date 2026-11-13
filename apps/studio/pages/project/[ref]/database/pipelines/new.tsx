@@ -1,3 +1,4 @@
+import { useQuery } from '@tanstack/react-query'
 import { useFeatureFlags, useParams } from 'common'
 import Head from 'next/head'
 import { useRouter } from 'next/router'
@@ -7,18 +8,18 @@ import { usePipelineCreationPreview } from '@/components/interfaces/App/FeatureP
 import { PipelineCreationFlow } from '@/components/interfaces/Database/Replication/CreatePipeline/PipelineCreationFlow'
 import { PipelineCreationHeader } from '@/components/interfaces/Database/Replication/CreatePipeline/PipelineCreationHeader'
 import { PipelineCreationSkeleton } from '@/components/interfaces/Database/Replication/CreatePipeline/PipelineCreationSkeleton'
+import { PipelineClusterScope } from '@/components/interfaces/Database/Replication/PipelineClusterScope'
 import {
   useIsPipelinesBigQueryEnabled,
   useIsPipelinesClickHouseEnabled,
   useIsPipelinesDuckLakeEnabled,
   useIsPipelinesSnowflakeEnabled,
 } from '@/components/interfaces/Database/Replication/useIsPipelinesEnabled'
-import { useReplicationSourcesQuery } from '@/data/replication/sources-query'
+import { replicationSourcesQueryOptions } from '@/data/replication/sources-query'
 import { useHighAvailability } from '@/hooks/misc/useHighAvailability'
 import { useIsFeatureEnabled } from '@/hooks/misc/useIsFeatureEnabled'
 import { useSelectedOrganizationQuery } from '@/hooks/misc/useSelectedOrganization'
 import { withAuth } from '@/hooks/misc/withAuth'
-import { PipelineRequestStatusProvider } from '@/state/replication-pipeline-request-status'
 import type { NextPageWithLayout } from '@/types'
 
 const PipelineCreationPage: NextPageWithLayout<Record<string, never>> = () => {
@@ -36,10 +37,12 @@ const PipelineCreationPage: NextPageWithLayout<Record<string, never>> = () => {
   const isProjectAccessLoading =
     isLoading || (isEnabled && (!hasLoaded || isOrganizationPending || isPending))
   const canAccessFlow = isEnabled && !isHighAvailability && canUseReplication
-  const sources = useReplicationSourcesQuery(
-    { projectRef: ref },
-    { enabled: !isProjectAccessLoading && canAccessFlow, refetchOnMount: 'always' }
-  )
+  // Enablement lives in the default cluster; the flow adds a source to another region on demand.
+  const sources = useQuery({
+    ...replicationSourcesQueryOptions({ projectRef: ref }),
+    enabled: !!ref && !isProjectAccessLoading && canAccessFlow,
+    refetchOnMount: 'always',
+  })
   const hasSource = sources.data?.sources.some((source) => source.name === ref) === true
   const listHref = `/project/${ref}/database/pipelines`
   const isAccessLoading =
@@ -106,8 +109,6 @@ const PipelineCreationPage: NextPageWithLayout<Record<string, never>> = () => {
   )
 }
 
-PipelineCreationPage.getLayout = (page) => (
-  <PipelineRequestStatusProvider>{page}</PipelineRequestStatusProvider>
-)
+PipelineCreationPage.getLayout = (page) => <PipelineClusterScope>{page}</PipelineClusterScope>
 
 export default withAuth(PipelineCreationPage)
