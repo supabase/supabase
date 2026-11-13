@@ -19,3 +19,22 @@ export const shouldShowAddPasswordRow = ({
 
   return !hasEmailIdentity && !hasSsoIdentity
 }
+
+/**
+ * Whether the unlink control should be shown for a linked identity.
+ *
+ * Email unlink is temporarily blocked: Auth leaves `encrypted_password` after
+ * unlinking the email identity, so the UI can claim the password is gone while
+ * the old password still works and re-adding fails with "Current password required".
+ * Re-enable once Auth clears the password hash on email unlink.
+ */
+export const canUnlinkIdentity = ({
+  provider,
+  identityCount,
+}: {
+  provider: string
+  identityCount: number
+}): boolean => {
+  if (provider === 'email') return false
+  return identityCount > 1
+}

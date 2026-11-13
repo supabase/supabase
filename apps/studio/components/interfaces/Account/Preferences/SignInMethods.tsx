@@ -37,7 +37,11 @@ import {
   GitHubChangeEmailAddress,
   SSOChangeEmailAddress,
 } from './ChangeEmailAddress'
-import { parseRedirectMessage, shouldShowAddPasswordRow } from './SignInMethods.utils'
+import {
+  canUnlinkIdentity,
+  parseRedirectMessage,
+  shouldShowAddPasswordRow,
+} from './SignInMethods.utils'
 import { AlertError } from '@/components/ui/AlertError'
 import { ButtonTooltip } from '@/components/ui/ButtonTooltip'
 import { IdentityProviderIcon } from '@/components/ui/ProviderIcon'
@@ -107,6 +111,12 @@ export const SignInMethods = ({
     )
 
   const onConfirmUnlinkIdentity = async () => {
+    if (!selectedProviderUnlink) return
+    if (
+      !canUnlinkIdentity({ provider: selectedProviderUnlink, identityCount: identities.length })
+    ) {
+      return
+    }
     const identity = identities.find((i) => i.provider === selectedProviderUnlink)
     if (identity) unlinkIdentity(identity)
   }
@@ -226,7 +236,7 @@ export const SignInMethods = ({
                           tooltip={{ content: { side: 'top', text: 'Update email address' } }}
                         />
                       )}
-                      {identities.length > 1 && (
+                      {canUnlinkIdentity({ provider, identityCount: identities.length }) && (
                         <ButtonTooltip
                           variant="text"
                           icon={<UnlinkIcon />}

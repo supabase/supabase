@@ -1,6 +1,10 @@
 import { describe, expect, it } from 'vitest'
 
-import { parseRedirectMessage, shouldShowAddPasswordRow } from './SignInMethods.utils'
+import {
+  canUnlinkIdentity,
+  parseRedirectMessage,
+  shouldShowAddPasswordRow,
+} from './SignInMethods.utils'
 
 describe('parseRedirectMessage', () => {
   it('drops the trailing sb marker and decodes + as spaces', () => {
@@ -71,5 +75,19 @@ describe('shouldShowAddPasswordRow', () => {
     expect(shouldShowAddPasswordRow({ identities: [{ provider: 'github' }], email: '' })).toBe(
       false
     )
+  })
+})
+
+describe('canUnlinkIdentity', () => {
+  it('blocks unlinking the email identity while Auth leaves the password hash', () => {
+    expect(canUnlinkIdentity({ provider: 'email', identityCount: 2 })).toBe(false)
+  })
+
+  it('allows unlinking a non-email identity when another identity remains', () => {
+    expect(canUnlinkIdentity({ provider: 'github', identityCount: 2 })).toBe(true)
+  })
+
+  it('blocks unlinking the last remaining identity', () => {
+    expect(canUnlinkIdentity({ provider: 'github', identityCount: 1 })).toBe(false)
   })
 })
