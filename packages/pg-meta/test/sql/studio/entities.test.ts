@@ -146,7 +146,7 @@ withTestDatabase(
 )
 
 withTestDatabase(
-  'getPartitionCountSQL counts nested partitions but not the table itself',
+  'getPartitionCountSQL counts direct partitions only, not nested ones or the table itself',
   async (db) => {
     await db.executeQuery(`
     create table public.depth_parted (id int, hue int not null) partition by range (hue);
@@ -160,7 +160,8 @@ withTestDatabase(
     const [row] = await db.executeQuery<{ count: number }[]>(
       getPartitionCountSQL({ id: await oidOf(db, 'public.depth_parted') })
     )
-    expect(row.count).toBe(3)
+    // Only direct children, matching what a partition list shows: no grandchildren
+    expect(row.count).toBe(2)
   }
 )
 

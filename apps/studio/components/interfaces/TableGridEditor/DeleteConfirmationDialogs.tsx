@@ -377,8 +377,8 @@ const DeleteConfirmationDialogs = ({
           )}
           {isPartitionedTableDialogOpen && partitionCount !== undefined && partitionCount > 0 && (
             <p className="text-sm text-foreground-light">
-              This will also delete its {partitionCount} {pluralize(partitionCount, 'partition')}{' '}
-              and all of their data.
+              This will also delete its {partitionCount} {pluralize(partitionCount, 'partition')},
+              any nested partitions, and all of their data.
             </p>
           )}
           <p className="text-sm text-foreground-light">

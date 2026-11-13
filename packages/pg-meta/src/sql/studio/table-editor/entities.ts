@@ -98,12 +98,12 @@ export const getEntityTypesSQL = ({
   `
 }
 
-/** Counts nested partitions too; level 0 is the table itself */
+/** Direct child partitions only (what a partition list shows). Reads the catalog without locking the partitions */
 export const getPartitionCountSQL = ({ id }: { id: number }): SafeSqlFragment => {
   return safeSql`
     select count(*)::int as "count"
-    from pg_partition_tree(${literal(id)}::oid::regclass)
-    where level > 0;
+    from pg_inherits
+    where inhparent = ${literal(id)}::oid;
   `
 }
 

@@ -37,6 +37,7 @@ async function getPartitionCount(
 export type PartitionCountData = Awaited<ReturnType<typeof getPartitionCount>>
 export type PartitionCountError = StudioError
 
+/** Counts direct child partitions only, matching what the partition list shows */
 export const partitionCountQueryOptions = ({
   projectRef,
   connectionString,
