@@ -1,5 +1,5 @@
 import { fireEvent, render, screen } from '@testing-library/react'
-import React from 'react'
+import React, { createRef } from 'react'
 import { describe, expect, it, vi } from 'vitest'
 
 import { Button, buttonVariants } from './Button'
@@ -172,9 +172,7 @@ describe('#Button', () => {
   })
 
   it('should forward ref', () => {
-    const ref: React.MutableRefObject<HTMLButtonElement | null> = {
-      current: null,
-    }
+    const ref = createRef<HTMLButtonElement>()
 
     render(<Button ref={ref}>Button</Button>)
 

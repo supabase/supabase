@@ -33,7 +33,7 @@ export function useCommandHandling({
   freeformText: string
   onFreeformTextChange: (text: string) => void
   handleOperatorChange: (path: number[], value: string) => void
-  newPathRef: React.MutableRefObject<number[]>
+  newPathRef: React.RefObject<number[]>
   setIsCommandMenuVisible: (visible: boolean) => void
   defaultGroupOperator?: FilterGroup['logicalOperator']
 }) {
