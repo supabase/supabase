@@ -53,6 +53,30 @@ export function isBrowserWalletExtensionError(event: Sentry.Event): boolean {
   })
 }
 
+const SCRIPT_FILE_EXTENSION = /\.(c|m)?js$/i
+
+function isPageDocumentUrl(filename: string): boolean {
+  let url: URL
+  try {
+    url = new URL(filename)
+  } catch {
+    return false
+  }
+  if (url.protocol !== 'http:' && url.protocol !== 'https:') return false
+  return !SCRIPT_FILE_EXTENSION.test(url.pathname)
+}
+
+// Filter errors thrown by scripts the browser injects into the page (e.g. translation or
+// autofill scripts on mobile browsers). Their stack frames point at the HTML page URL
+// instead of a script file, which passes `allowUrls`. Studio's own code is always served
+// from script files (`.js` chunks), so an error whose frames ALL point at a page URL
+// did not come from Studio.
+export function isInjectedPageScriptError(event: Sentry.Event): boolean {
+  const frames = event.exception?.values?.flatMap((e) => e.stacktrace?.frames || []) || []
+  if (frames.length === 0) return false
+  return frames.every((frame) => isPageDocumentUrl(frame.filename || frame.abs_path || ''))
+}
+
 // Filter user-aborted operations (intentional cancellations)
 // These are expected when users cancel requests or navigate away
 // Examples: SUPABASE-APP-BG6, SUPABASE-APP-BG7
@@ -231,6 +255,9 @@ export function buildSentryClientOptions({
       }
 
       if (isBrowserWalletExtensionError(event)) {
+        return null
+      }
+      if (!isErrorBoundaryCrash && isInjectedPageScriptError(event)) {
         return null
       }
       if (isUserAbortedOperation(hint.originalException, event)) {
