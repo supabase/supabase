@@ -117,8 +117,7 @@ describe('saved log views persistence', () => {
         writes.push({ projectRef: params.ref, body: await request.json() })
         return HttpResponse.json<components['schemas']['GetUserContentByIdResponse_Output']>({
           ...viewRow,
-          updated_by: 1,
-          owner: undefined,
+          last_updated_by: 1,
         })
       },
     })
@@ -194,8 +193,7 @@ describe('saved log views persistence', () => {
           ? HttpResponse.json<APIErrorBody>({ message: 'Write failed' }, { status: 403 })
           : HttpResponse.json<components['schemas']['GetUserContentByIdResponse_Output']>({
               ...viewRow,
-              updated_by: 1,
-              owner: undefined,
+              last_updated_by: 1,
             }),
     })
     const onCancel = vi.fn()
