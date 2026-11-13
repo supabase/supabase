@@ -84,6 +84,7 @@ const addPipelinesMock = (waitForResponse?: Promise<void>) =>
         pipelines: [
           {
             id: PIPELINE_ID,
+            cluster_id: 'clust-12345',
             tenant_id: 't',
             source_id: 1,
             source_name: 'main-db',
