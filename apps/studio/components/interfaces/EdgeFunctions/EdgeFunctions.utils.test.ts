@@ -1,6 +1,10 @@
 import { describe, expect, it } from 'vitest'
 
-import { formatFunctionBodyToFiles, getDefaultSelectedFileId } from './EdgeFunctions.utils'
+import {
+  formatFunctionBodyToFiles,
+  getDefaultSelectedFileId,
+  getFallbackImportMapPath,
+} from './EdgeFunctions.utils'
 
 describe('formatFunctionBodyToFiles', () => {
   it('returns no files when there is no entrypoint path', () => {
@@ -188,5 +192,20 @@ describe('getDefaultSelectedFileId', () => {
     const id = getDefaultSelectedFileId(files, entrypointPath)
 
     expect(files.find((f) => f.id === id)?.name).toBe('index.ts')
+  })
+})
+
+describe('getFallbackImportMapPath', () => {
+  it.each(['deno.json', 'deno.jsonc', 'import_map.json', 'functions/hello/deno.jsonc'])(
+    'finds %s',
+    (name) => {
+      const files = [{ name: 'index.ts' }, { name }]
+      expect(getFallbackImportMapPath(files)).toBe(name)
+    }
+  )
+
+  it.each(['deno.jso', 'deno-json', 'import_map.jsonn', 'deno.json.bak'])('ignores %s', (name) => {
+    const files = [{ name: 'index.ts' }, { name }]
+    expect(getFallbackImportMapPath(files)).toBeUndefined()
   })
 })
