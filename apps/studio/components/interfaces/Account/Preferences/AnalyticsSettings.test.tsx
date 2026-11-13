@@ -5,7 +5,6 @@ import { afterEach, beforeEach, describe, expect, test, vi } from 'vitest'
 import { AnalyticsSettings } from './AnalyticsSettings'
 import { customRender } from '@/tests/lib/custom-render'
 
-// Stands in for the Usercentrics SDK; consentState and useConsentState stay real
 const makeUC = () => ({
   acceptAllServices: vi.fn(() => Promise.resolve()),
   denyAllServices: vi.fn(() => Promise.resolve()),
