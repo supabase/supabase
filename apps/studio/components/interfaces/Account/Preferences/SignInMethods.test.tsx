@@ -29,6 +29,7 @@ vi.mock('common', async (importOriginal) => {
     ...actual,
     useParams: () => ({}),
     useFlag: useFlagMock,
+    useSession: () => ({ access_token: 'test-token' }),
   }
 })
 

@@ -14,6 +14,12 @@ import { auth } from '@/lib/gotrue'
 import { customRender } from '@/tests/lib/custom-render'
 import { addAPIMock, type APIErrorBody } from '@/tests/lib/msw'
 
+vi.mock('common', async (importOriginal) => ({
+  ...(await importOriginal<typeof import('common')>()),
+  useParams: () => ({ ref: 'default' }),
+  useSession: () => ({ access_token: 'test-token' }),
+}))
+
 mockAnimationsApi()
 
 const factor: Factor<'totp', 'verified'> = {

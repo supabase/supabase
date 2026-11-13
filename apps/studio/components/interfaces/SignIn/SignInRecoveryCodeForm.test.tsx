@@ -17,6 +17,11 @@ vi.mock('next/router', () => ({
   }),
 }))
 vi.mock('@/lib/telemetry/track', () => ({ useTrack: () => vi.fn() }))
+vi.mock('common', async (importOriginal) => ({
+  ...(await importOriginal<typeof import('common')>()),
+  useParams: () => ({ ref: 'default' }),
+  useSession: () => ({ access_token: 'test-token' }),
+}))
 
 beforeEach(() => {
   vi.restoreAllMocks()
