@@ -1,5 +1,7 @@
 import type { ReactNode } from 'react'
 
+import { ORG_SETTINGS_ROUTES } from '@/components/layouts/OrganizationLayout/OrganizationLayout.utils'
+
 export interface OrgNavItem {
   label: string
   href: string
@@ -13,15 +15,6 @@ export function getOrgActiveRoute(pathname: string): string | undefined {
   if (orgIndex === -1 || segments.length <= orgIndex + 1) return undefined
   return segments[orgIndex + 2]
 }
-
-const ORG_SETTINGS_ROUTES: string[] = [
-  'general',
-  'apps',
-  'audit',
-  'documents',
-  'security',
-  'sso',
-] as const
 
 export function getOrgSectionKeyFromPathname(activeRoute: string | undefined): string | null {
   if (activeRoute && ORG_SETTINGS_ROUTES.includes(activeRoute)) {
@@ -42,10 +35,7 @@ export function isOrgMenuActive(
   if (item.key === 'settings') {
     const route = activeRoute ?? getOrgActiveRoute(pathname)
     if (route === undefined) return false
-    return (
-      route === 'settings' ||
-      ORG_SETTINGS_ROUTES.includes(route as (typeof ORG_SETTINGS_ROUTES)[number])
-    )
+    return route === 'settings' || ORG_SETTINGS_ROUTES.includes(route)
   }
   return activeRoute === item.key
 }

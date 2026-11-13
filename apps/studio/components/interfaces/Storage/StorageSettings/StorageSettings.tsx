@@ -305,7 +305,7 @@ export const StorageSettings = () => {
                                     Learn more
                                   </InlineLink>
                                   .
-                                  {!shouldAutoValidateBucketLimits && (
+                                  {!isBucketEstimatePending && !shouldAutoValidateBucketLimits && (
                                     <p>
                                       Ensure that the global limit is greater than that of
                                       individual buckets
