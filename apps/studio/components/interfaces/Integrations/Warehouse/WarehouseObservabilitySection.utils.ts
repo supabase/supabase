@@ -71,6 +71,24 @@ export const getWarehouseSummaryNotice = ({ availability, value }: WarehouseSumm
   }
 }
 
+export const getWarehouseErrorPercentage = (
+  errors: WarehouseSummaryValue,
+  rate: WarehouseSummaryValue
+): WarehouseSummaryValue => ({
+  ...errors,
+  availability:
+    errors.availability === 'partial' || rate.availability === 'partial'
+      ? 'partial'
+      : errors.availability,
+  value:
+    errors.value !== null &&
+    rate.value !== null &&
+    rate.value > 0 &&
+    errors.timestamp === rate.timestamp
+      ? (errors.value / rate.value) * 100
+      : null,
+})
+
 export type WarehouseSummaryPoint = { timestamp: string } & Record<string, string | number>
 
 export const getWarehouseSummaryPoints = (

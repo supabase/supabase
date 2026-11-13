@@ -1,5 +1,6 @@
 import { QueryClient } from '@tanstack/react-query'
 import { act, fireEvent, screen } from '@testing-library/react'
+import userEvent from '@testing-library/user-event'
 import type { platformComponents as components } from 'api-types'
 import { HttpResponse } from 'msw'
 import { beforeEach, describe, expect, test } from 'vitest'
@@ -101,6 +102,11 @@ describe('WarehouseMetricsReport', () => {
     expect(
       screen.getByRole('link', { name: 'Warehouse reports documentation (opens in new tab)' })
     ).toHaveAttribute('href', expect.stringContaining('/guides/observability/reports#warehouse'))
+    await userEvent.click(screen.getByRole('button', { name: 'More actions', exact: true }))
+    expect(screen.getByRole('menuitem', { name: 'View Warehouse' })).toHaveAttribute(
+      'href',
+      '/project/default/integrations/warehouse/overview'
+    )
   })
 
   test('shows the empty state with a link to the integration when Warehouse is not provisioned', async () => {

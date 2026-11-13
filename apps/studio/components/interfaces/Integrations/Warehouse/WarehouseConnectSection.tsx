@@ -57,7 +57,7 @@ import {
  * rather than an Iceberg REST catalog, so Trino, Spark and PyIceberg need API support first.
  */
 const QUERY_ENGINES = [
-  { value: 'flightsql', label: 'FlightSQL' },
+  { value: 'flightsql', label: 'Flight SQL' },
   { value: 'duckdb', label: 'DuckDB' },
 ] as const
 
@@ -345,8 +345,9 @@ export const WarehouseConnectionCard = ({ variant = 'default' }: WarehouseConnec
   const connectionCard = (
     <Card
       className={cn(
+        'relative',
         isSheet &&
-          'relative space-y-4 rounded-none border-0 bg-transparent shadow-none [&>div]:border-0 [&>div]:p-0'
+          'space-y-4 rounded-none border-0 bg-transparent shadow-none [&>div]:border-0 [&>div]:p-0'
       )}
     >
       <CardContent className="border-none">

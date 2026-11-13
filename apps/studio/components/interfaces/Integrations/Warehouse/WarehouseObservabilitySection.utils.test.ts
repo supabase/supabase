@@ -1,6 +1,7 @@
 import { describe, expect, test } from 'vitest'
 
 import {
+  getWarehouseErrorPercentage,
   getWarehouseSummaryPoints,
   getWarehouseSummaryValue,
 } from './WarehouseObservabilitySection.utils'
@@ -18,6 +19,21 @@ const metric = (overrides: Partial<WarehouseMetric> = {}) =>
     ],
     ...overrides,
   })
+
+describe('getWarehouseErrorPercentage', () => {
+  const observation = { availability: 'ok', value: 0.02, timestamp: 100 } as const
+
+  test('uses errors and traffic from the same interval', () => {
+    expect(getWarehouseErrorPercentage(observation, { ...observation, value: 4 }).value).toBe(0.5)
+  })
+
+  test('does not invent a percentage for zero traffic or mismatched intervals', () => {
+    expect(getWarehouseErrorPercentage(observation, { ...observation, value: 0 }).value).toBeNull()
+    expect(
+      getWarehouseErrorPercentage(observation, { ...observation, value: 4, timestamp: 160 }).value
+    ).toBeNull()
+  })
+})
 
 describe('getWarehouseSummaryValue', () => {
   test('preserves observed zero traffic', () => {

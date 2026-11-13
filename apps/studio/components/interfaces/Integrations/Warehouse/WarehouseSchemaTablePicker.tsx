@@ -329,7 +329,7 @@ export const WarehouseSchemaTablePicker = ({
               loading={isSubmitting}
               onClick={handleSubmit}
             >
-              {isEditing ? 'Save changes' : 'Replicate'}
+              {isEditing ? 'Save' : 'Replicate'}
             </Button>
           </CardFooter>
         </Card>

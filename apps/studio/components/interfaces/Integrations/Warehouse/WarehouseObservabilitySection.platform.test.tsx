@@ -1,6 +1,6 @@
 import { fireEvent, screen } from '@testing-library/react'
 import { HttpResponse } from 'msw'
-import { describe, expect, test } from 'vitest'
+import { describe, expect, test, vi } from 'vitest'
 
 import { WarehouseObservabilitySection } from './WarehouseObservabilitySection'
 import { WAREHOUSE_SUMMARY_ATTRIBUTES } from './WarehouseObservabilitySection.utils'
@@ -42,6 +42,23 @@ const mockMetrics = (body: WarehouseMetricsResponse) =>
   })
 
 describe('Warehouse workload summary', () => {
+  test('shows development metrics and preserves the design mode when opening the report', async () => {
+    vi.stubEnv('NODE_ENV', 'development')
+    try {
+      customRender(<WarehouseObservabilitySection />, {
+        nuqs: { searchParams: '?warehouseMetricsDemo=true' },
+      })
+      expect(await screen.findByText('Query errors')).toBeInTheDocument()
+      expect(screen.queryByText('Unavailable')).not.toBeInTheDocument()
+      expect(screen.getByRole('link', { name: 'Observability' })).toHaveAttribute(
+        'href',
+        '/project/default/observability/warehouse?warehouseMetricsDemo=true'
+      )
+    } finally {
+      vi.unstubAllEnvs()
+    }
+  })
+
   test('previews the full workload layout before setup without measurements or controls', () => {
     customRender(<WarehouseObservabilitySection mode="example" />)
     expect(screen.queryByText('Example data')).not.toBeInTheDocument()
@@ -54,18 +71,16 @@ describe('Warehouse workload summary', () => {
     expect(screen.queryByText(/Interval ending| ms|\/s/)).not.toBeInTheDocument()
     expect(screen.queryByText(/Jan 1, 2026/)).not.toBeInTheDocument()
     expect(screen.getByRole('heading', { name: 'Query rate' })).toBeInTheDocument()
-    expect(screen.queryByRole('link', { name: 'View metrics' })).not.toBeInTheDocument()
+    expect(screen.queryByRole('link', { name: 'Observability' })).not.toBeInTheDocument()
     expect(screen.queryByText('Unavailable')).not.toBeInTheDocument()
   })
 
-  test('never replaces unavailable project metrics with examples or a setup claim', async () => {
+  test('shows an unavailable notice without replacing missing metrics with examples', async () => {
     mockMetrics(response({ availability: 'not_provisioned', series: [] }))
     customRender(<WarehouseObservabilitySection />)
-    expect(
-      await screen.findByText(
-        'Warehouse metrics are unavailable. Replication status is shown above.'
-      )
-    ).toBeInTheDocument()
+    expect(await screen.findByText('Warehouse metrics are unavailable')).toBeInTheDocument()
+    expect(screen.getByText('Replication status is shown above.')).toBeInTheDocument()
+    expect(screen.queryByRole('group', { name: 'Workload preview' })).not.toBeInTheDocument()
     expect(screen.queryByText('Example data')).not.toBeInTheDocument()
     expect(screen.queryByText('Warehouse is not enabled')).not.toBeInTheDocument()
   })
@@ -81,7 +96,7 @@ describe('Warehouse workload summary', () => {
 
     expect(await screen.findByLabelText('Loading workload metrics')).toBeInTheDocument()
     expect(screen.getByRole('heading', { name: 'Workload' })).toBeInTheDocument()
-    expect(screen.getByRole('link', { name: 'View metrics' })).toHaveAttribute(
+    expect(screen.getByRole('link', { name: 'Observability' })).toHaveAttribute(
       'href',
       '/project/default/observability/warehouse'
     )
@@ -93,10 +108,10 @@ describe('Warehouse workload summary', () => {
     customRender(<WarehouseObservabilitySection />)
     expect(await screen.findByText('4/s')).toBeInTheDocument()
     expect(screen.getByText('800 ms')).toBeInTheDocument()
-    expect(screen.getByText('0/s')).toBeInTheDocument()
+    expect(screen.getByText('0%')).toBeInTheDocument()
     expect(screen.getByText('3 / 10')).toBeInTheDocument()
-    expect(screen.getAllByText(/^Interval ending /)).toHaveLength(2)
-    expect(screen.getByRole('link', { name: 'View metrics' })).toHaveAttribute(
+    expect(screen.queryByText(/^Interval ending /)).not.toBeInTheDocument()
+    expect(screen.getByRole('link', { name: 'Observability' })).toHaveAttribute(
       'href',
       '/project/default/observability/warehouse'
     )
@@ -109,7 +124,7 @@ describe('Warehouse workload summary', () => {
     errors.series[0].points[0].value = 0.0033
     mockMetrics(body)
     customRender(<WarehouseObservabilitySection />)
-    expect(await screen.findByText('0.0033/s')).toBeInTheDocument()
+    expect(await screen.findByText('0.0825%')).toBeInTheDocument()
   })
 
   test('distinguishes missing telemetry from observed zero traffic', async () => {

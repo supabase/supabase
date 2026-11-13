@@ -1,4 +1,3 @@
-import dayjs from 'dayjs'
 import { InfoIcon } from 'lucide-react'
 import { Card, CardContent, cn, Tooltip, TooltipContent, TooltipTrigger } from 'ui'
 import { ChartLine } from 'ui-patterns/Chart'
@@ -34,11 +33,14 @@ export const WarehouseWorkloadChart = ({
   return (
     <Card>
       <CardContent className="space-y-3 p-4">
-        <div className="flex items-center justify-between gap-2">
-          <h3 className="text-sm text-foreground-light">{title}</h3>
+        <div className="flex items-center gap-1.5">
+          <h3 className="text-sm font-normal text-foreground-light">{title}</h3>
           {!isPreview && (
             <Tooltip>
-              <TooltipTrigger aria-label={`About ${title.toLowerCase()}`}>
+              <TooltipTrigger
+                className="inline-flex shrink-0"
+                aria-label={`About ${title.toLowerCase()}`}
+              >
                 <InfoIcon size={14} className="text-foreground-lighter" />
               </TooltipTrigger>
               <TooltipContent className="max-w-72">{description}</TooltipContent>
@@ -65,7 +67,8 @@ export const WarehouseWorkloadChart = ({
               dataKey="value"
               config={{ value: { label: title, color: 'var(--chart-1)' } }}
               color="var(--chart-1)"
-              showXAxis={!isPreview}
+              showXAxis={false}
+              DateTimeFormat="MMM D, HH:mm"
               showYAxis={false}
               showHighlightArea={false}
               tooltipDetails={(_, __, pointValue) => `${pointValue}${unit === 'ms' ? ' ms' : '/s'}`}
@@ -76,11 +79,6 @@ export const WarehouseWorkloadChart = ({
           <div className="flex min-h-36 items-center justify-center text-sm text-foreground-light">
             {notice ?? 'Waiting for query measurements'}
           </div>
-        )}
-        {!isPreview && metric?.timestamp !== null && metric?.timestamp !== undefined && (
-          <p className="text-xs text-foreground-lighter">
-            Interval ending {dayjs.unix(metric.timestamp).format('HH:mm')}
-          </p>
         )}
         {hasValues && notice && <p className="text-xs text-foreground-light">{notice}</p>}
       </CardContent>

@@ -1,9 +1,10 @@
 import { useQuery, useQueryClient } from '@tanstack/react-query'
 import { useParams } from 'common'
-import dayjs from 'dayjs'
-import { RefreshCwIcon } from 'lucide-react'
+import { ArrowUpRightIcon, InfoIcon, RefreshCwIcon } from 'lucide-react'
+import { parseAsBoolean, useQueryState } from 'nuqs'
 import { useState, type ReactNode } from 'react'
 import { Button, Card, CardContent, Tooltip, TooltipContent, TooltipTrigger } from 'ui'
+import { Admonition } from 'ui-patterns/Admonition'
 import {
   PageSection,
   PageSectionContent,
@@ -15,6 +16,7 @@ import {
 
 import { WarehouseLoadingState } from './WarehouseLoadingState'
 import {
+  getWarehouseErrorPercentage,
   getWarehouseSummaryNotice,
   getWarehouseSummaryPoints,
   getWarehouseSummaryRange,
@@ -45,10 +47,14 @@ const SummaryMetric = ({
   const notice = getWarehouseSummaryNotice(metric)
   return (
     <div className="space-y-1">
-      <dt className="text-sm text-foreground-light">
+      <dt className="flex items-center gap-1.5 text-sm font-normal text-foreground-light">
+        {label}
         <Tooltip>
-          <TooltipTrigger className="underline decoration-dotted underline-offset-4">
-            {label}
+          <TooltipTrigger
+            className="inline-flex shrink-0"
+            aria-label={`About ${label.toLowerCase()}`}
+          >
+            <InfoIcon size={14} className="text-foreground-lighter" />
           </TooltipTrigger>
           <TooltipContent className="max-w-72">{description}</TooltipContent>
         </Tooltip>
@@ -59,19 +65,20 @@ const SummaryMetric = ({
   )
 }
 
-const WorkloadSection = ({ children }: { children: ReactNode }) => (
+const WorkloadSection = ({ children, actions }: { children: ReactNode; actions?: ReactNode }) => (
   <PageSection className="pt-5!">
-    <PageSectionMeta>
+    <PageSectionMeta className="flex-row items-end @xl:items-end justify-between gap-3">
       <PageSectionSummary>
         <PageSectionTitle>Workload</PageSectionTitle>
         <PageSectionDescription>Query performance and capacity.</PageSectionDescription>
       </PageSectionSummary>
+      {actions}
     </PageSectionMeta>
     <PageSectionContent className="space-y-4">{children}</PageSectionContent>
   </PageSection>
 )
 
-const WarehouseWorkloadPreview = () => {
+const WarehouseWorkloadEmptyTiles = () => {
   const points = (values: number[]) =>
     values.map((value, index) => ({
       timestamp: new Date(Date.UTC(2026, 0, 1, 0, index * 5)).toISOString(),
@@ -79,7 +86,7 @@ const WarehouseWorkloadPreview = () => {
     }))
 
   return (
-    <WorkloadSection>
+    <>
       <div className="grid gap-4 sm:grid-cols-2" role="group" aria-label="Workload preview">
         <WarehouseWorkloadChart
           title="Query duration"
@@ -111,7 +118,7 @@ const WarehouseWorkloadPreview = () => {
           </dl>
         </CardContent>
       </Card>
-    </WorkloadSection>
+    </>
   )
 }
 
@@ -130,13 +137,20 @@ export const WarehouseObservabilitySection = ({
 }: {
   mode?: 'live' | 'example' | 'waiting'
 }) => {
-  if (mode === 'example') return <WarehouseWorkloadPreview />
+  if (mode === 'example')
+    return (
+      <WorkloadSection>
+        <WarehouseWorkloadEmptyTiles />
+      </WorkloadSection>
+    )
   if (mode === 'waiting') return <WarehouseWorkloadWaiting />
   return <WarehouseWorkloadMetrics />
 }
 
 const WarehouseWorkloadMetrics = () => {
   const { ref: projectRef } = useParams()
+  const [isDemoRequested] = useQueryState('warehouseMetricsDemo', parseAsBoolean.withDefault(false))
+  const isDemo = process.env.NODE_ENV === 'development' && isDemoRequested
   const queryClient = useQueryClient()
   const [range, setRange] = useState(getWarehouseSummaryRange)
   const { data, error, isPending, isError, isFetching, refetch } = useQuery(
@@ -145,6 +159,7 @@ const WarehouseWorkloadMetrics = () => {
       attributes: WAREHOUSE_SUMMARY_ATTRIBUTES,
       ...range,
       interval: '1m',
+      isDemo,
     })
   )
 
@@ -189,16 +204,18 @@ const WarehouseWorkloadMetrics = () => {
       )
     if (isUnavailable)
       return (
-        <Card>
-          <CardContent className="py-8 text-sm text-foreground-light">
-            Warehouse metrics are unavailable. Replication status is shown above.
-          </CardContent>
-        </Card>
+        <>
+          <Admonition
+            title="Warehouse metrics are unavailable"
+            description="Replication status is shown above."
+          />
+        </>
       )
 
     const rate = getWarehouseSummaryValue(data, 'query_rate')
     const duration = getWarehouseSummaryValue(data, 'query_duration_p95')
     const errors = getWarehouseSummaryValue(data, 'query_error_rate')
+    const errorPercentage = getWarehouseErrorPercentage(errors, rate)
     const occupied = getWarehouseSummaryValue(data, 'worker_admission_occupied')
     const limit = getWarehouseSummaryValue(data, 'worker_admission_limit')
     const capacityValue =
@@ -221,7 +238,7 @@ const WarehouseWorkloadMetrics = () => {
           <WarehouseWorkloadChart
             title="Query duration (p95)"
             unit="ms"
-            description="Includes worker waits and result streaming."
+            description="Includes worker waits and result streaming. One-minute samples over the last hour."
             points={getWarehouseSummaryPoints(data, 'query_duration_p95', 1000)}
             metric={duration}
             value={
@@ -242,9 +259,11 @@ const WarehouseWorkloadMetrics = () => {
             <dl className="grid gap-4 sm:grid-cols-2">
               <SummaryMetric
                 label="Query errors"
-                metric={errors}
-                value={errors.value === null ? null : `${formatNumber(errors.value)}/s`}
-                description="Includes timeouts. Cancellations are separate."
+                metric={errorPercentage}
+                value={
+                  errorPercentage.value === null ? null : `${formatNumber(errorPercentage.value)}%`
+                }
+                description="Percentage of query operations that failed in the latest interval, including timeouts. Cancellations are separate."
               />
               <SummaryMetric
                 label="Worker slots in use"
@@ -260,33 +279,49 @@ const WarehouseWorkloadMetrics = () => {
   }
 
   return (
-    <WorkloadSection>
-      <div className="flex flex-wrap items-center justify-between gap-2">
-        <p className="text-xs text-foreground-light">
-          {dayjs(range.startDate).format('MMM D, HH:mm')} to{' '}
-          {dayjs(range.endDate).format('MMM D, HH:mm')} · 1-minute samples
-        </p>
-        <Button
-          variant="text"
-          aria-label="Refresh workload summary"
-          icon={<RefreshCwIcon size={14} />}
-          disabled={isFetching}
-          onClick={handleRefresh}
+    <WorkloadSection
+      actions={
+        <div
+          role="group"
+          aria-label="Workload actions"
+          className="flex shrink-0 items-center gap-2"
         >
-          Refresh
-        </Button>
-      </div>
+          <Tooltip>
+            <TooltipTrigger asChild>
+              <Button
+                variant="text"
+                aria-label="Refresh report"
+                className="shrink-0 px-2"
+                icon={<RefreshCwIcon size={14} />}
+                disabled={isFetching}
+                onClick={handleRefresh}
+              />
+            </TooltipTrigger>
+            <TooltipContent>Refresh report</TooltipContent>
+          </Tooltip>
+          <Button asChild variant="default" iconRight={<ArrowUpRightIcon size={14} />}>
+            <InlineLink
+              className="no-underline"
+              href={`/project/${projectRef}/observability/warehouse${isDemo ? '?warehouseMetricsDemo=true' : ''}`}
+              onClick={(event) => {
+                if (
+                  event.button === 0 &&
+                  !event.metaKey &&
+                  !event.ctrlKey &&
+                  !event.shiftKey &&
+                  !event.altKey
+                ) {
+                  event.currentTarget.closest('main')?.scrollTo({ top: 0, behavior: 'instant' })
+                }
+              }}
+            >
+              Observability
+            </InlineLink>
+          </Button>
+        </div>
+      }
+    >
       {renderSummary()}
-      <div className="flex justify-end">
-        <Button asChild variant="default">
-          <InlineLink
-            className="no-underline"
-            href={`/project/${projectRef}/observability/warehouse`}
-          >
-            View metrics
-          </InlineLink>
-        </Button>
-      </div>
     </WorkloadSection>
   )
 }

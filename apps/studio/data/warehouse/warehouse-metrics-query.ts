@@ -19,6 +19,7 @@ export type WarehouseMetricsVariables = {
   startDate: string
   endDate: string
   interval: WarehouseMetricsInterval
+  isDemo?: boolean
 }
 
 export type WarehouseMetricsData = WarehouseMetricsResponse
@@ -52,11 +53,24 @@ export const warehouseMetricsQueryOptions = ({
   startDate,
   endDate,
   interval,
-}: WarehouseMetricsVariables) =>
-  queryOptions({
-    queryKey: warehouseKeys.metrics(projectRef, { attributes, startDate, endDate, interval }),
-    queryFn: ({ signal }) =>
-      getWarehouseMetrics({ projectRef, attributes, startDate, endDate, interval }, signal),
+  isDemo = false,
+}: WarehouseMetricsVariables) => {
+  const isDevelopmentDemo = process.env.NODE_ENV === 'development' && isDemo
+
+  return queryOptions({
+    queryKey: isDevelopmentDemo
+      ? [
+          ...warehouseKeys.metrics(projectRef, { attributes, startDate, endDate, interval }),
+          'development-demo',
+        ]
+      : warehouseKeys.metrics(projectRef, { attributes, startDate, endDate, interval }),
+    queryFn: async ({ signal }) => {
+      if (isDevelopmentDemo) {
+        const { createWarehouseMetricsDemo } = await import('./warehouse-metrics-demo')
+        return createWarehouseMetricsDemo({ projectRef, attributes, startDate, endDate, interval })
+      }
+      return getWarehouseMetrics({ projectRef, attributes, startDate, endDate, interval }, signal)
+    },
     enabled:
       IS_PLATFORM && !!projectRef && attributes.length > 0 && attributes.length <= MAX_ATTRIBUTES,
     retry: (failureCount: number, error: WarehouseMetricsError) =>
@@ -65,3 +79,4 @@ export const warehouseMetricsQueryOptions = ({
       Math.min(1000 * 2 ** attemptIndex, 8000) + Math.random() * 500,
     refetchOnWindowFocus: false,
   })
+}

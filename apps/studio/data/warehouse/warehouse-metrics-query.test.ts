@@ -4,6 +4,7 @@ import { afterEach, describe, expect, test, vi } from 'vitest'
 
 import { warehouseKeys } from './keys'
 import type { WarehouseMetricName, WarehouseMetricsResponse } from './warehouse-metrics-api-types'
+import { createWarehouseMetricsDemo } from './warehouse-metrics-demo'
 import {
   shouldRetryWarehouseMetrics,
   warehouseMetricsQueryOptions,
@@ -99,6 +100,43 @@ describe('warehouseMetricsQueryOptions', () => {
     expect(selfHosted.warehouseMetricsQueryOptions(variables).enabled).toBe(false)
   })
 
+  test('development demo respects the range and refreshes without a metrics request', async () => {
+    vi.stubEnv('NODE_ENV', 'development')
+    let requests = 0
+    addAPIMock({
+      method: 'get',
+      path: '/platform/warehouse/:ref/metrics',
+      response: () => {
+        requests++
+        return HttpResponse.json<WarehouseMetricsResponse>({ metrics: [] })
+      },
+    })
+    const client = newQueryClient()
+    const options = warehouseMetricsQueryOptions({ ...variables, isDemo: true })
+    const data = await client.fetchQuery(options)
+    expect(options.queryKey).not.toEqual(warehouseMetricsQueryOptions(variables).queryKey)
+    expect(data.metrics[0].series[0].points).toHaveLength(61)
+    expect(data.metrics[0].series[0].points[0].timestamp).toBe(1793876400)
+    expect(
+      new Set(data.metrics[0].series[0].points.map(({ value }) => value)).size
+    ).toBeGreaterThan(30)
+    await client.invalidateQueries({ queryKey: warehouseKeys.metricsAll(variables.projectRef) })
+    expect(await client.fetchQuery(options)).toEqual(data)
+    expect(requests).toBe(0)
+  })
+
+  test('production ignores the demo opt-in and still requests live metrics', async () => {
+    vi.stubEnv('NODE_ENV', 'production')
+    addAPIMock({
+      method: 'get',
+      path: '/platform/warehouse/:ref/metrics',
+      response: () => HttpResponse.json<WarehouseMetricsResponse>({ metrics: [] }),
+    })
+    const options = warehouseMetricsQueryOptions({ ...variables, isDemo: true })
+    expect(options.queryKey).toEqual(warehouseMetricsQueryOptions(variables).queryKey)
+    expect(await newQueryClient().fetchQuery(options)).toEqual({ metrics: [] })
+  })
+
   test('sends the attributes, interval, and date range to the API', async () => {
     let search: URLSearchParams | undefined
     addAPIMock({
@@ -131,5 +169,32 @@ describe('warehouseMetricsQueryOptions', () => {
     await expect(
       newQueryClient().fetchQuery(warehouseMetricsQueryOptions(variables))
     ).rejects.toMatchObject({ code: 500, message: 'Boom' })
+  })
+})
+
+describe('Warehouse metrics development workload', () => {
+  test('keeps monthly ranges bounded and retains the selected project', () => {
+    const { metrics } = createWarehouseMetricsDemo({
+      ...variables,
+      projectRef: 'design-project',
+      startDate: '2026-10-06T12:00:00.000Z',
+      interval: '1m',
+    })
+    expect(metrics[0].project_ref).toBe('design-project')
+    expect(metrics[0].series[0].points).toHaveLength(1441)
+    expect(metrics[0].effective.step).toBe(1800)
+    expect(metrics[0].series[0].points.at(-1)?.timestamp).toBe(Date.parse(variables.endDate) / 1000)
+  })
+
+  test('keeps duration percentiles ordered during the same workload', () => {
+    const { metrics } = createWarehouseMetricsDemo({
+      ...variables,
+      attributes: ['query_duration_p50', 'query_duration_p95', 'query_duration_p99'],
+    })
+    const [p50, p95, p99] = metrics.map((metric) => metric.series[0].points)
+    p50.forEach((point, index) => {
+      expect(point.value).toBeLessThan(p95[index].value!)
+      expect(p95[index].value).toBeLessThan(p99[index].value!)
+    })
   })
 })

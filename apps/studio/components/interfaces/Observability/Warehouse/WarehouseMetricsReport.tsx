@@ -1,9 +1,18 @@
 import { useQueries, useQueryClient } from '@tanstack/react-query'
 import { useParams } from 'common'
 import dayjs from 'dayjs'
-import { ArrowRightIcon, RefreshCwIcon } from 'lucide-react'
+import { ArrowRightIcon, EllipsisIcon, RefreshCwIcon } from 'lucide-react'
+import { parseAsBoolean, useQueryState } from 'nuqs'
 import { useState } from 'react'
-import { Button, Card, CardContent } from 'ui'
+import {
+  Button,
+  Card,
+  CardContent,
+  DropdownMenu,
+  DropdownMenuContent,
+  DropdownMenuItem,
+  DropdownMenuTrigger,
+} from 'ui'
 import { Admonition } from 'ui-patterns/Admonition'
 import { GenericSkeletonLoader } from 'ui-patterns/ShimmeringLoader'
 
@@ -25,6 +34,7 @@ import ReportStickyNav from '@/components/interfaces/Reports/ReportStickyNav'
 import { LogsDatePicker } from '@/components/interfaces/Settings/Logs/Logs.DatePickers'
 import { AlertError } from '@/components/ui/AlertError'
 import { DocsButton } from '@/components/ui/DocsButton'
+import { InlineLink } from '@/components/ui/InlineLink'
 import { ShortcutTooltip } from '@/components/ui/ShortcutTooltip'
 import { warehouseKeys } from '@/data/warehouse/keys'
 import { warehouseMetricsQueryOptions } from '@/data/warehouse/warehouse-metrics-query'
@@ -39,6 +49,8 @@ const REPORT_TITLE = 'Warehouse'
 export const WarehouseMetricsReport = () => {
   const { ref } = useParams()
   const queryClient = useQueryClient()
+  const [isDemoRequested] = useQueryState('warehouseMetricsDemo', parseAsBoolean.withDefault(false))
+  const isDemo = process.env.NODE_ENV === 'development' && isDemoRequested
   const setup = useWarehouseSetupStatusQuery({ projectRef: ref }, { enabled: IS_PLATFORM })
   const hasLiveTables = setup.data?.tables.some((table) => table.state === 'live') ?? false
   const isNotSetUp = setup.data?.setup_status === 'not_started' && !hasLiveTables
@@ -68,6 +80,7 @@ export const WarehouseMetricsReport = () => {
     queries: WAREHOUSE_METRICS_SECTIONS.map((section) => ({
       ...warehouseMetricsQueryOptions({
         projectRef: ref,
+        isDemo,
         attributes: getSectionAttributes(section),
         startDate: isRangeOk ? range.startDate : '',
         endDate: isRangeOk ? range.endDate : '',
@@ -152,7 +165,7 @@ export const WarehouseMetricsReport = () => {
       )
     }
 
-    if (isNotSetUp || isDisabled) {
+    if (!isDemo && (isNotSetUp || isDisabled)) {
       if (setup.isFetching) return loadingState
       return (
         <WarehouseMetricsEmptyState
@@ -246,16 +259,37 @@ export const WarehouseMetricsReport = () => {
               onOpenChange={setShowDatePicker}
               shortcutId={SHORTCUT_IDS.OBSERVABILITY_TOGGLE_DATE_PICKER}
             />
-            <div className="flex items-center gap-x-2 text-xs text-foreground-light">
+            <div className="order-last flex w-full flex-wrap items-center gap-x-2 text-xs text-foreground-light xl:order-none xl:w-auto">
               <p>{dayjs(selectedDateRange.period_start.date).format('MMM D, h:mma')}</p>
               <ArrowRightIcon size={12} />
               <p>{dayjs(selectedDateRange.period_end.date).format('MMM D, h:mma')}</p>
             </div>
-            <DocsButton
-              className="ml-auto"
-              href={OBSERVABILITY_DOCS_HREFS.warehouse}
-              topic="Warehouse reports"
-            />
+            <div
+              className="ml-auto flex shrink-0 items-center gap-2"
+              role="group"
+              aria-label="Warehouse report actions"
+            >
+              <DocsButton href={OBSERVABILITY_DOCS_HREFS.warehouse} topic="Warehouse reports" />
+              <DropdownMenu>
+                <DropdownMenuTrigger asChild>
+                  <Button
+                    aria-label="More actions"
+                    className="shrink-0 px-2"
+                    icon={<EllipsisIcon size={14} />}
+                  />
+                </DropdownMenuTrigger>
+                <DropdownMenuContent align="end" className="w-40">
+                  <DropdownMenuItem asChild>
+                    <InlineLink
+                      className="no-underline"
+                      href={`/project/${ref}/integrations/warehouse/overview${isDemo ? '?warehouseMetricsDemo=true' : ''}`}
+                    >
+                      View Warehouse
+                    </InlineLink>
+                  </DropdownMenuItem>
+                </DropdownMenuContent>
+              </DropdownMenu>
+            </div>
           </div>
         }
       >
