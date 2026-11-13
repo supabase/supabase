@@ -87,7 +87,8 @@ export function ServiceFlowPanel({
         className="bg-card"
       >
         <div className="flex h-full flex-col overflow-hidden">
-          <div className="flex min-w-0 shrink-0 items-center gap-3 px-4 pb-1.5 pt-4">
+          {/* Matches the table header height so the title lines up with the column labels */}
+          <div className="flex h-9 min-w-0 shrink-0 items-center gap-3 px-4">
             <div className="flex min-w-0 flex-1" role="status" title={title}>
               {!hasMultiple && activeLog ? (
                 <OpenLogSummary log={activeLog} searchParameters={searchParameters} />
