@@ -1,11 +1,11 @@
 import { createFileRoute } from '@tanstack/react-router'
 
-import AdvisorSecurityRulesPage from '@/pages/project/[ref]/advisors/rules/security'
+import { AdvisorRules } from '@/components/interfaces/Advisors/AdvisorRules'
 
 export const Route = createFileRoute('/project/$ref/advisors/rules/security')({
-  component: AdvisorRulesSecurityRoute,
+  component: AdvisorSecurityRulesPage,
 })
 
-function AdvisorRulesSecurityRoute() {
-  return <AdvisorSecurityRulesPage dehydratedState={undefined} />
+function AdvisorSecurityRulesPage() {
+  return <AdvisorRules category="security" />
 }

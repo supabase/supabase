@@ -1,11 +1,7 @@
 import { createFileRoute } from '@tanstack/react-router'
 
-import IssuesPage from '@/pages/project/[ref]/issues'
+import { IssuesOverview } from '@/components/interfaces/Issues/IssuesOverview'
 
 export const Route = createFileRoute('/project/$ref/issues/')({
-  component: IssuesRoute,
+  component: IssuesOverview,
 })
-
-function IssuesRoute() {
-  return <IssuesPage dehydratedState={undefined} />
-}

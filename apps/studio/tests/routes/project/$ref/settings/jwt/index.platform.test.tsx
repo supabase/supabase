@@ -2,12 +2,12 @@ import { screen } from '@testing-library/react'
 import type { ReactNode } from 'react'
 import { describe, expect, it, vi } from 'vitest'
 
-import JWTSigningKeysPage from '@/pages/project/[ref]/settings/jwt/index'
-import { customRender as render } from '@/tests/lib/custom-render'
+import { Route } from '@/routes/project/$ref/settings/jwt/index'
 import { mockPermissionsError } from '@/tests/lib/msw-permissions'
 import { ALL_FGA_PERMISSIONS, NO_PERMISSIONS } from '@/tests/lib/permissions-fixtures'
 import { createMockProfileContext } from '@/tests/lib/profile-helpers'
 import { mockProjectGrantContext } from '@/tests/lib/project-grant-mocks'
+import { renderRoute } from '@/tests/lib/route-render'
 
 vi.mock('common', async () => {
   const actual = await vi.importActual<Record<string, unknown>>('common')
@@ -31,13 +31,18 @@ vi.mock('@/components/interfaces/JwtSecrets/jwt-secret-keys-table', () => ({
   JWTSecretKeysTable: () => <div>JWTSecretKeysTable</div>,
 }))
 
-describe('/project/[ref]/settings/jwt grants', () => {
+const renderJwtKeys = () =>
+  renderRoute(Route, {
+    routeId: '/project/$ref/settings/jwt/',
+    url: '/project/default/settings/jwt',
+    profileContext: createMockProfileContext(),
+  })
+
+describe('/project/$ref/settings/jwt grants', () => {
   it('renders the keys table when the grant is held', async () => {
     mockProjectGrantContext({ ref: 'default' })
 
-    render(<JWTSigningKeysPage dehydratedState={{}} />, {
-      profileContext: createMockProfileContext(),
-    })
+    await renderJwtKeys()
 
     expect(await screen.findByText('JWTSecretKeysTable')).toBeInTheDocument()
   })
@@ -45,9 +50,7 @@ describe('/project/[ref]/settings/jwt grants', () => {
   it('shows a no-permission message when the grant is denied', async () => {
     mockProjectGrantContext({ ref: 'default', permissions: NO_PERMISSIONS })
 
-    render(<JWTSigningKeysPage dehydratedState={{}} />, {
-      profileContext: createMockProfileContext(),
-    })
+    await renderJwtKeys()
 
     expect(await screen.findByText(/need additional permissions/)).toBeVisible()
     expect(screen.queryByText('JWTSecretKeysTable')).not.toBeInTheDocument()
@@ -68,9 +71,7 @@ describe('/project/[ref]/settings/jwt grants', () => {
       },
     })
 
-    render(<JWTSigningKeysPage dehydratedState={{}} />, {
-      profileContext: createMockProfileContext(),
-    })
+    await renderJwtKeys()
 
     expect(await screen.findByText(/need additional permissions/)).toBeVisible()
   })
@@ -79,9 +80,7 @@ describe('/project/[ref]/settings/jwt grants', () => {
     mockProjectGrantContext({ ref: 'default' })
     mockPermissionsError()
 
-    render(<JWTSigningKeysPage dehydratedState={{}} />, {
-      profileContext: createMockProfileContext(),
-    })
+    await renderJwtKeys()
 
     expect(await screen.findByText(/Failed to check JWT signing keys permissions/)).toBeVisible()
   })

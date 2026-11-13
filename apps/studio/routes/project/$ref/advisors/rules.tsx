@@ -14,13 +14,6 @@ export const Route = createFileRoute('/project/$ref/advisors/rules')({
   },
 })
 
-// Body inlined from `components/layouts/AdvisorsLayout/AdvisorRulesLayout.tsx`
-// minus its outer <DefaultLayout> wrap (already provided by the
-// `routes/project/$ref.tsx` shell). The Next-side AdvisorRulesLayout
-// keeps working unchanged for the pages router; we duplicate the
-// PageLayout config here so the TanStack route can re-use the same
-// title + nav + feature-preview badge without coupling to the
-// component's DefaultLayout-wrapping shape.
 function AdvisorRulesShell() {
   const { ref } = useParams()
   const isIssuesInboxEnabled = useFlag('issuesInbox')

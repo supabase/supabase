@@ -1,7 +1,21 @@
 import { createFileRoute } from '@tanstack/react-router'
+import { useFlag, useParams } from 'common'
+import { useMemo, useState } from 'react'
+import { LoadingLine } from 'ui'
+import { Admonition } from 'ui-patterns/Admonition'
 
+import { IssuesCategoryRedirect } from '@/components/interfaces/Issues/IssuesCategoryRedirect'
+import { LINTER_LEVELS } from '@/components/interfaces/Linter/Linter.constants'
+import { lintInfoMap, parseLinterLevel } from '@/components/interfaces/Linter/Linter.utils'
+import { LinterDataGrid } from '@/components/interfaces/Linter/LinterDataGrid'
+import { LinterFilters } from '@/components/interfaces/Linter/LinterFilters'
+import { LintPageTabs } from '@/components/interfaces/Linter/LintPageTabs'
+import { useAdvisorPageShortcuts } from '@/components/interfaces/Linter/useAdvisorPageShortcuts'
 import { LegacyAdvisorsLayout } from '@/components/layouts/AdvisorsLayout/LegacyAdvisorsLayout'
-import AdvisorsHealthPage from '@/pages/project/[ref]/advisors/health'
+import { FormHeader } from '@/components/ui/Forms/FormHeader'
+import { useProjectHealthLintsQuery } from '@/data/lint/health-lints-query'
+import { Lint } from '@/data/lint/lint-query'
+import { useSelectedProjectQuery } from '@/hooks/misc/useSelectedProject'
 
 export const Route = createFileRoute('/project/$ref/advisors/health')({
   component: AdvisorsHealthRoute,
@@ -11,7 +25,103 @@ export const Route = createFileRoute('/project/$ref/advisors/health')({
 function AdvisorsHealthRoute() {
   return (
     <LegacyAdvisorsLayout>
-      <AdvisorsHealthPage dehydratedState={undefined} />
+      <AdvisorsHealthPage />
     </LegacyAdvisorsLayout>
+  )
+}
+
+const ProjectHealthLints = () => {
+  const isHealthAdvisorEnabled = useFlag('healthAdvisor')
+
+  if (!isHealthAdvisorEnabled) {
+    return (
+      <div className="flex items-center justify-center w-full h-full">
+        <Admonition type="default" title="Health Advisor is not available for this project" />
+      </div>
+    )
+  }
+
+  return <ProjectHealthLintsContent />
+}
+
+const ProjectHealthLintsContent = () => {
+  const { preset, id } = useParams()
+  const { data: project } = useSelectedProjectQuery()
+
+  const [filters, setFilters] = useState<{ level: LINTER_LEVELS; filters: string[] }[]>([
+    { level: LINTER_LEVELS.ERROR, filters: [] },
+    { level: LINTER_LEVELS.WARN, filters: [] },
+    { level: LINTER_LEVELS.INFO, filters: [] },
+  ])
+  const [currentTab, setCurrentTab] = useState<LINTER_LEVELS>(
+    parseLinterLevel(preset) ?? LINTER_LEVELS.ERROR
+  )
+  const { data, isPending, isRefetching, refetch } = useProjectHealthLintsQuery({
+    projectRef: project?.ref,
+  })
+
+  const isLoading = isPending
+
+  const activeLints = (data ?? []).filter((lint) => lint.categories.includes('HEALTH'))
+  const currentTabFilters = filters.find((filter) => filter.level === currentTab)?.filters ?? []
+  const filteredLints = activeLints
+    .filter((x) => x.level === currentTab)
+    .filter((x) => (currentTabFilters.length > 0 ? currentTabFilters.includes(x.name) : x))
+  const filterOptions = lintInfoMap
+    .filter((item) =>
+      activeLints.some((lint) => lint.name === item.name && lint.level === currentTab)
+    )
+    .map((type) => ({
+      name: type.title,
+      value: type.name,
+    }))
+
+  const selectedLint: Lint | null = useMemo(() => {
+    return activeLints.find((lint) => lint.cache_key === id) ?? null
+  }, [id, activeLints])
+
+  useAdvisorPageShortcuts({
+    setCurrentTab,
+    refetch,
+    hasSelectedLint: selectedLint !== null,
+    isRefreshDisabled: isLoading || isRefetching,
+  })
+
+  return (
+    <div className="h-full flex flex-col">
+      <FormHeader className="py-4 px-6 -mb-px!" title="Health Advisor" />
+      <LintPageTabs
+        activeLints={activeLints}
+        isLoading={isLoading}
+        currentTab={currentTab}
+        setCurrentTab={setCurrentTab}
+      />
+      <LinterFilters
+        filterOptions={filterOptions}
+        filteredLints={filteredLints}
+        activeLints={activeLints}
+        currentTab={currentTab}
+        filters={filters}
+        isLoading={isLoading || isRefetching}
+        setFilters={setFilters}
+        onClickRefresh={refetch}
+      />
+      <LoadingLine loading={isRefetching} />
+      <LinterDataGrid
+        filteredLints={filteredLints}
+        currentTab={currentTab}
+        selectedLint={selectedLint}
+        isLoading={isLoading}
+      />
+    </div>
+  )
+}
+
+function AdvisorsHealthPage() {
+  const isIssuesInboxEnabled = useFlag('issuesInbox')
+  return isIssuesInboxEnabled ? (
+    <IssuesCategoryRedirect category="health" />
+  ) : (
+    <ProjectHealthLints />
   )
 }

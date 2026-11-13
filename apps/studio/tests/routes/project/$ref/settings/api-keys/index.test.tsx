@@ -4,9 +4,9 @@ import { delay, HttpResponse } from 'msw'
 import type { ReactNode } from 'react'
 import { beforeEach, describe, expect, it, vi } from 'vitest'
 
-import ApiKeysPage from '@/pages/project/[ref]/settings/api-keys/index'
-import { customRender as render } from '@/tests/lib/custom-render'
+import { Route } from '@/routes/project/$ref/settings/api-keys/index'
 import { addAPIMock } from '@/tests/lib/msw'
+import { renderRoute } from '@/tests/lib/route-render'
 
 type ApiKeyResponse = components['schemas']['ApiKeyResponse_Output']
 
@@ -28,21 +28,6 @@ vi.mock('common', async () => {
 
 vi.mock('@/hooks/misc/useDeploymentMode', () => ({
   useDeploymentMode: mockUseDeploymentMode,
-}))
-
-vi.mock('@/components/layouts/DefaultLayout', () => ({
-  __esModule: true,
-  default: ({ children }: { children: ReactNode }) => <div>{children}</div>,
-}))
-
-vi.mock('@/components/layouts/ProjectSettingsLayout/SettingsLayout', () => ({
-  __esModule: true,
-  default: ({ children }: { children: ReactNode }) => <div>{children}</div>,
-}))
-
-vi.mock('@/components/layouts/APIKeys/APIKeysLayout', () => ({
-  __esModule: true,
-  default: ({ children }: { children: ReactNode }) => <div>{children}</div>,
 }))
 
 vi.mock('@/components/interfaces/APIKeys/ApiKeysIllustrations', () => ({
@@ -90,7 +75,13 @@ const mockApiKeys = (keys: ApiKeyResponse[]) =>
     response: () => HttpResponse.json<ApiKeyResponse[]>(keys),
   })
 
-describe('/project/[ref]/settings/api-keys', () => {
+const renderApiKeys = () =>
+  renderRoute(Route, {
+    routeId: '/project/$ref/settings/api-keys/',
+    url: '/project/project-ref/settings/api-keys',
+  })
+
+describe('/project/$ref/settings/api-keys', () => {
   beforeEach(() => {
     mockIsPlatform.value = true
     mockUseDeploymentMode.mockReturnValue({
@@ -102,7 +93,7 @@ describe('/project/[ref]/settings/api-keys', () => {
   })
 
   it('renders publishable and secret keys with the retirement notice on platform when keys exist', async () => {
-    render(<ApiKeysPage dehydratedState={{}} />)
+    await renderApiKeys()
 
     expect(await screen.findByText('PublishableAPIKeys')).toBeInTheDocument()
     expect(screen.getByText('SecretAPIKeys')).toBeInTheDocument()
@@ -115,13 +106,13 @@ describe('/project/[ref]/settings/api-keys', () => {
   it('renders the create callout on platform when no new keys exist', async () => {
     mockApiKeys([])
 
-    render(<ApiKeysPage dehydratedState={{}} />)
+    await renderApiKeys()
 
     expect(await screen.findByText('ApiKeysCreateCallout')).toBeInTheDocument()
     expect(screen.getByText('LegacyAPIKeysRetirementNotice')).toBeInTheDocument()
   })
 
-  it('does not render the create callout while keys are loading', () => {
+  it('does not render the create callout while keys are loading', async () => {
     addAPIMock({
       method: 'get',
       path: '/v1/projects/:ref/api-keys',
@@ -131,7 +122,7 @@ describe('/project/[ref]/settings/api-keys', () => {
       },
     })
 
-    render(<ApiKeysPage dehydratedState={{}} />)
+    await renderApiKeys()
 
     expect(screen.queryByText('ApiKeysCreateCallout')).not.toBeInTheDocument()
     expect(screen.getByText('LegacyAPIKeysRetirementNotice')).toBeInTheDocument()
@@ -154,11 +145,11 @@ describe('/project/[ref]/settings/api-keys', () => {
     },
   ])(
     'renders the matching admonition above the keys on self-hosted ($mode mode)',
-    ({ isCli, isSelfHosted, shown, hidden }) => {
+    async ({ isCli, isSelfHosted, shown, hidden }) => {
       mockIsPlatform.value = false
       mockUseDeploymentMode.mockReturnValue({ isPlatform: false, isCli, isSelfHosted })
 
-      render(<ApiKeysPage dehydratedState={{}} />)
+      await renderApiKeys()
 
       expect(screen.getByText(shown)).toBeInTheDocument()
       expect(screen.queryByText(hidden)).not.toBeInTheDocument()
