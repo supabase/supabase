@@ -25,8 +25,7 @@ export const CollapsibleCardSection = ({
     </CollapsibleTrigger>
     <CollapsibleContent
       className={cn(
-        // pb-1 fits the 4px focus ring of the last child, which overflow-y: clip would otherwise cut off
-        '[overflow-y:clip] pt-2 pb-1 data-closed:animate-collapsible-up data-open:animate-collapsible-down'
+        'pt-2 data-closed:animate-collapsible-up-clipped data-open:animate-collapsible-down-clipped'
       )}
     >
       {description && <p className="text-xs text-foreground-lighter mb-6">{description}</p>}
