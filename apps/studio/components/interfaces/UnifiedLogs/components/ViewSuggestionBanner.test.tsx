@@ -5,7 +5,7 @@ import { ViewSuggestionBanner } from './ViewSuggestionBanner'
 
 const baseProps = {
   visible: true,
-  title: "You've configured 5 filters!",
+  title: "You've configured 5 filters",
   description: 'Would you like to save them as a view?',
   primaryLabel: 'Save',
   onPrimary: vi.fn(),
