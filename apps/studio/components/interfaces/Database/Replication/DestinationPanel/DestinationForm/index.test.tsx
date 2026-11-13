@@ -17,7 +17,6 @@ type DestinationResponse = components['schemas']['DestinationResponse_Output']
 type PipelineResponse = components['schemas']['PipelineResponse_Output']
 type PublicationDetailsResponse = components['schemas']['PublicationDetailsResponse_Output']
 type PublicationNamesResponse = components['schemas']['ReadPublicationsResponse_Output']
-type ProjectSettingsResponse = components['schemas']['ProjectSettingsResponse_Output']
 type SourcesResponse = components['schemas']['SourcesResponse_Output']
 
 const mocks = vi.hoisted(() => ({
@@ -103,6 +102,7 @@ let pipelineTableIds = [101, 999]
 const getPipelineData = (): PipelineResponse => ({
   id: '8',
   tenant_id: 'tenant',
+  cluster_id: 'cluster',
   source_id: 42,
   source_name: 'postgres',
   destination_id: 7,
@@ -116,27 +116,6 @@ const getPipelineData = (): PipelineResponse => ({
     max_copy_connections_per_table: 1,
   },
 })
-const projectSettings: ProjectSettingsResponse = {
-  app_config: {
-    db_schema: 'public',
-    endpoint: 'project-ref.supabase.co',
-    storage_endpoint: 'project-ref.supabase.co/storage/v1',
-  },
-  cloud_provider: 'AWS',
-  db_dns_name: 'db.project-ref.supabase.co',
-  db_host: 'db.project-ref.supabase.co',
-  db_ip_addr_config: 'ipv4',
-  db_name: 'postgres',
-  db_port: 5432,
-  db_user: 'postgres',
-  inserted_at: '2026-08-28T00:00:00Z',
-  name: 'project-ref',
-  ref: 'project-ref',
-  region: 'ap-southeast-1',
-  ssl_enforced: true,
-  status: 'ACTIVE_HEALTHY',
-}
-
 const project: ProjectDetail = {
   cloud_provider: 'AWS',
   connectionString: 'postgresql://postgres@localhost:5432/postgres',
@@ -226,7 +205,6 @@ vi.mock('../../useIsPipelinesEnabled', () => ({
   useIsPipelinesBigQueryEnabled: () => true,
   useIsPipelinesClickHouseEnabled: () => false,
   useIsPipelinesDuckLakeEnabled: () => true,
-  useIsPipelinesIcebergEnabled: () => false,
   useIsPipelinesSnowflakeEnabled: () => false,
 }))
 
@@ -279,7 +257,6 @@ vi.mock('./TableCopySelection', () => ({
 }))
 vi.mock('./AdvancedSettings', () => ({ AdvancedSettings: () => null }))
 vi.mock('./BigQuery/Fields', () => ({ BigQueryFields: () => null }))
-vi.mock('./AnalyticsBucket/Fields', () => ({ AnalyticsBucketFields: () => null }))
 vi.mock('./DuckLake/Fields', () => ({
   DuckLakeFields: ({ form }: { form: UseFormReturn<DestinationPanelSchemaType> }) => (
     <>
@@ -316,10 +293,6 @@ vi.mock('./PipelineCostDialog', () => ({
 }))
 vi.mock('./ValidationFailuresSection', () => ({ ValidationFailuresSection: () => null }))
 vi.mock('./ValidationWarningsDialog', () => ({ ValidationWarningsDialog: () => null }))
-vi.mock('@/components/interfaces/Storage/AnalyticsBuckets/CreateAnalyticsBucketSheet', () => ({
-  CreateAnalyticsBucketSheet: () => null,
-}))
-
 describe('DestinationForm', () => {
   beforeEach(() => {
     pipelineTableIds = [101, 999]
@@ -358,11 +331,6 @@ describe('DestinationForm', () => {
       method: 'get',
       path: '/platform/replication/:ref/pipelines/:pipeline_id',
       response: () => HttpResponse.json<PipelineResponse>(getPipelineData()),
-    })
-    addAPIMock({
-      method: 'get',
-      path: '/platform/projects/:ref/settings',
-      response: () => HttpResponse.json<ProjectSettingsResponse>(projectSettings),
     })
   })
 

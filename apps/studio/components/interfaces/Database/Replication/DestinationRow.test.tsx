@@ -9,6 +9,7 @@ import { describe, expect, test, vi } from 'vitest'
 
 import { DestinationRow as DestinationRowComponent } from './DestinationRow'
 import type { SlotLagMetrics } from './ReplicationPipelineStatus/ReplicationPipelineStatus.types'
+import type { DestinationWireResponse } from '@/data/replication/api-types'
 import { API_URL } from '@/lib/constants'
 import { PipelineRequestStatusProvider } from '@/state/replication-pipeline-request-status'
 import { customRender } from '@/tests/lib/custom-render'
@@ -16,7 +17,9 @@ import { addAPIMock, mswServer, type APIErrorBody } from '@/tests/lib/msw'
 import { routerMock } from '@/tests/lib/route-mock'
 
 type ReplicationPipelinesResponse = components['schemas']['PipelinesResponse_Output']
-type ReplicationDestinationResponse = components['schemas']['DestinationResponse_Output']
+type ReplicationDestinationResponse = DestinationWireResponse<
+  components['schemas']['DestinationResponse_Output']
+>
 type ReplicationSourcesResponse = components['schemas']['SourcesResponse_Output']
 type ReplicationPipelineStatusResponse = components['schemas']['PipelineStatusResponse_Output']
 type ReplicationPipelineReplicationStatusResponse =
@@ -52,7 +55,7 @@ const addSourcesMock = () =>
       }),
   })
 
-const addDestinationMock = () =>
+const addDestinationMock = (config?: ReplicationDestinationResponse['config']) =>
   addAPIMock({
     method: 'get',
     path: '/platform/replication/:ref/destinations/:destination_id',
@@ -61,7 +64,7 @@ const addDestinationMock = () =>
         tenant_id: 't',
         id: DESTINATION_ID,
         name: 'My BigQuery Destination',
-        config: {
+        config: config ?? {
           big_query: {
             project_id: 'gcp-proj',
             dataset_id: 'analytics',
@@ -82,6 +85,7 @@ const addPipelinesMock = (waitForResponse?: Promise<void>) =>
           {
             id: PIPELINE_ID,
             tenant_id: 't',
+            cluster_id: 'c',
             source_id: 1,
             source_name: 'main-db',
             destination_id: DESTINATION_ID,
@@ -129,7 +133,7 @@ const addReplicationStatusMock = (
       }),
   })
 
-const addVersionMock = () =>
+const addVersionMock = (hasUpdate = false) =>
   addAPIMock({
     method: 'get',
     path: '/platform/replication/:ref/pipelines/:pipeline_id/version',
@@ -137,6 +141,7 @@ const addVersionMock = () =>
       HttpResponse.json<ReplicationPipelineVersionResponse>({
         pipeline_id: PIPELINE_ID,
         version: { id: 1, name: 'v0.3.0' },
+        ...(hasUpdate ? { new_version: { id: 2, name: 'v0.4.0' } } : {}),
       }),
   })
 
@@ -149,6 +154,52 @@ describe('DestinationRow', () => {
     addReplicationStatusMock(0)
     addVersionMock()
   }
+
+  test.each(['started', 'stopped', 'failed'] as const)(
+    'only offers stopping and deletion for an unknown destination when %s',
+    async (status) => {
+      addAllMocks()
+      addDestinationMock({ unknown: {} })
+      addPipelineStatusMock(status)
+      addVersionMock(true)
+
+      customRender(<DestinationRow destinationId={DESTINATION_ID} />)
+
+      expect(await screen.findByRole('img', { name: 'Unknown destination' })).toBeVisible()
+      await userEvent.click(await screen.findByRole('button', { name: 'Pipeline options' }))
+      expect(screen.getAllByRole('menuitem').map((item) => item.textContent)).toEqual([
+        'View details',
+        ...(status === 'stopped' ? [] : ['Stop pipeline']),
+        'Delete pipeline',
+      ])
+      await userEvent.click(screen.getByRole('menuitem', { name: 'Delete pipeline' }))
+      expect(await screen.findByPlaceholderText('Type the pipeline name')).toBeVisible()
+    }
+  )
+
+  test.each(['started', 'failed'] as const)(
+    'stops an unknown destination pipeline when %s',
+    async (status) => {
+      addAllMocks()
+      addDestinationMock({ unknown: {} })
+      addPipelineStatusMock(status)
+      addAPIMock({
+        method: 'post',
+        path: '/platform/replication/:ref/pipelines/:pipeline_id/stop',
+        response: () => {
+          addPipelineStatusMock('stopped')
+          return HttpResponse.json<Record<string, never>>({}, { status: 202 })
+        },
+      })
+
+      customRender(<DestinationRow destinationId={DESTINATION_ID} />)
+      await screen.findByRole('img', { name: 'Unknown destination' })
+      await screen.findByText(status === 'started' ? 'Running' : 'Failed')
+      await userEvent.click(screen.getByRole('button', { name: 'Pipeline options' }))
+      await userEvent.click(screen.getByRole('menuitem', { name: 'Stop pipeline' }))
+      expect(await screen.findByText('Stopped')).toBeVisible()
+    }
+  )
 
   test('shows the destination before its pipeline details load', async () => {
     let finishPipelineRequest = () => {}

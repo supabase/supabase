@@ -15,7 +15,6 @@ import { mcpConfigPanelMarkdown as McpConfigPanel } from 'ui-patterns/McpUrlBuil
 
 import { stripHeadingCustomIds } from './helpers'
 import { addBaseUrlPrefix, getInternalLinkBaseUrl, withDocsBasePath } from './internal-links'
-import { AccordionItem } from './markdown-schema/Accordion'
 import { Admonition } from './markdown-schema/Admonition'
 import { AgentSetup } from './markdown-schema/AgentSetup'
 import { AgentWatchSchedule } from './markdown-schema/AgentWatchSchedule'
@@ -27,6 +26,7 @@ import { ContentListings } from './markdown-schema/ContentListings'
 import { CustomContent } from './markdown-schema/CustomContent'
 import { DatabaseAdvisorsIndex } from './markdown-schema/DatabaseAdvisorsIndex'
 import { ErrorCodes } from './markdown-schema/ErrorCodes'
+import { GettingStartedStepper } from './markdown-schema/GettingStartedStepper'
 import { IconCheck, IconX } from './markdown-schema/Icons'
 import { Image } from './markdown-schema/Image'
 import { Link } from './markdown-schema/Link'
@@ -179,12 +179,12 @@ function applySchema(parent: Parent, schema: ComponentSchema): void {
  * component not listed is unwrapped (children are kept, wrapper is dropped).
  */
 const SCHEMA: ComponentSchema = {
-  AccordionItem,
   Admonition,
   AgentSetup,
   AgentWatchSchedule,
   AiPrompt,
   AiSkillsIndex,
+  GettingStartedStepper,
   IconCheck,
   IconX,
   Image,

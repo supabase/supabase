@@ -1,5 +1,12 @@
-import type { IsoPoint } from '../iso-shapes'
-import { BEAM_ALPHA, hash, isBeamAt, rampGlyph } from './field'
+import type { IsoPoint } from 'ui-patterns/IsoShape/IsoShape.geometry'
+import {
+  BEAM_ALPHA,
+  FLUID_RISE_MS,
+  hash,
+  isBeamAt,
+  rampGlyph,
+} from 'ui-patterns/IsoShape/IsoShape.glyphs'
+
 import { tracePolygon } from './layer'
 
 interface DrawFluidParams {
@@ -14,7 +21,6 @@ interface DrawFluidParams {
 
 const FLUID_COLUMN = 8
 const FLUID_ROW = 10
-export const FLUID_RISE_MS = 200
 
 export const drawFluid = ({ ctx, area, level, now, color, beam, flow }: DrawFluidParams) => {
   if (level <= 0) return

@@ -25,9 +25,9 @@ async function enrollFactor() {
     },
     error: null,
   })
-  await userEvent.type(screen.getByRole('textbox', { name: 'Authenticator app name' }), 'Backup')
-  fireEvent.click(screen.getByRole('button', { name: 'Generate QR' }))
-  await screen.findByText('Verify new factor Backup')
+  await userEvent.type(screen.getByRole('textbox', { name: 'Authenticator name' }), 'Backup')
+  fireEvent.click(screen.getByRole('button', { name: 'Generate QR code' }))
+  await screen.findByText('Verify authenticator app: Backup')
 }
 
 async function verifyFactor() {

@@ -20,7 +20,7 @@ export const UnavailableChartBlock = ({ label, actions }: UnavailableChartBlockP
     >
       <div className="flex flex-1 flex-col justify-center gap-y-1 px-5 py-4">
         <p className="text-xs text-foreground-light">
-          This chart isn't available on your current compute size
+          This chart isn't available on your current compute configuration
         </p>
         <p className="text-xs text-foreground-lighter">
           Your compute's disk IO runs at a sustained rate. There's no burst credit pool to track.

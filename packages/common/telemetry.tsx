@@ -135,6 +135,7 @@ export const PageTelemetry = ({
   }, [API_URL, enabled, hasAcceptedConsent, slug, ref])
 
   const hasSentInitialPageTelemetryRef = useRef(false)
+  const lastSentPagesUrlRef = useRef<string | null>(null)
   const previousAppPathnameRef = useRef<string | null>(null)
 
   useEffect(() => {
@@ -170,6 +171,7 @@ export const PageTelemetry = ({
       } finally {
         clearFirstTouchData()
         hasSentInitialPageTelemetryRef.current = true
+        lastSentPagesUrlRef.current = window.location.pathname + window.location.search
       }
     }
   }, [router?.isReady, enabled, hasAcceptedConsent, slug, ref])
@@ -179,6 +181,11 @@ export const PageTelemetry = ({
 
     function handleRouteChange() {
       if (!hasSentInitialPageTelemetryRef.current) return
+      // routeChangeComplete can fire when only the hash changes, and `$current_url` drops the hash,
+      // so that pageview would be an exact repeat.
+      const url = window.location.pathname + window.location.search
+      if (url === lastSentPagesUrlRef.current) return
+      lastSentPagesUrlRef.current = url
       sendPageTelemetry()
     }
 

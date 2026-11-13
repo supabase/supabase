@@ -94,7 +94,7 @@ export const Migrations = () => {
                   size="tiny"
                   placeholder="Search for a migration"
                   value={search}
-                  className="w-full lg:w-52"
+                  containerClassName="w-full w-52"
                   onChange={(e) => setSearch(e.target.value)}
                   icon={<SearchIcon />}
                 />

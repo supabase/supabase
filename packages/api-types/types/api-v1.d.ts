@@ -2521,6 +2521,7 @@ export interface components {
       external_discord_enabled: boolean | null
       external_discord_secret: string | null
       external_email_enabled: boolean | null
+      external_email_magic_link_disabled: boolean | null
       external_facebook_client_id: string | null
       external_facebook_email_optional: boolean | null
       external_facebook_enabled: boolean | null
@@ -4690,6 +4691,7 @@ export interface components {
       external_discord_enabled?: boolean | null
       external_discord_secret?: string | null
       external_email_enabled?: boolean | null
+      external_email_magic_link_disabled?: boolean
       external_facebook_client_id?: string | null
       external_facebook_email_optional?: boolean | null
       external_facebook_enabled?: boolean | null
@@ -5480,7 +5482,6 @@ export interface components {
             status: string
           }
       result?: {
-        /** Format: date-time */
         timestamp: string
         total_auth_requests: number
         total_realtime_requests: number
@@ -6189,6 +6190,15 @@ export interface operations {
         }
         content?: never
       }
+      /** @description Persistent branches are not available on the organization plan */
+      402: {
+        headers: {
+          [name: string]: unknown
+        }
+        content: {
+          'application/json': components['schemas']['PlanGateErrorBody']
+        }
+      }
       /** @description Forbidden action */
       403: {
         headers: {
@@ -6491,6 +6501,8 @@ export interface operations {
         code_challenge_method?: 'plain' | 'sha256' | 'S256'
         /** @description Organization slug */
         organization_slug?: string
+        /** @description Project ref */
+        project_ref?: string
         redirect_uri: string
         /** @description Resource indicator for MCP (Model Context Protocol) clients */
         resource?: string
@@ -7138,6 +7150,15 @@ export interface operations {
           [name: string]: unknown
         }
         content?: never
+      }
+      /** @description The instance size is not available on the organization plan, or the organization has overdue invoices */
+      402: {
+        headers: {
+          [name: string]: unknown
+        }
+        content: {
+          'application/json': components['schemas']['PlanGateErrorBody']
+        }
       }
       /** @description Forbidden action */
       403: {
@@ -8052,6 +8073,15 @@ export interface operations {
         }
         content?: never
       }
+      /** @description Custom JWT templates for secret API keys are not available on the organization plan */
+      402: {
+        headers: {
+          [name: string]: unknown
+        }
+        content: {
+          'application/json': components['schemas']['PlanGateErrorBody']
+        }
+      }
       /** @description Forbidden action */
       403: {
         headers: {
@@ -8221,6 +8251,15 @@ export interface operations {
           [name: string]: unknown
         }
         content?: never
+      }
+      /** @description Custom JWT templates for secret API keys are not available on the organization plan */
+      402: {
+        headers: {
+          [name: string]: unknown
+        }
+        content: {
+          'application/json': components['schemas']['PlanGateErrorBody']
+        }
       }
       /** @description Forbidden action */
       403: {
@@ -8592,6 +8631,15 @@ export interface operations {
           [name: string]: unknown
         }
         content?: never
+      }
+      /** @description Branching or persistent branches are not available on the organization plan */
+      402: {
+        headers: {
+          [name: string]: unknown
+        }
+        content: {
+          'application/json': components['schemas']['PlanGateErrorBody']
+        }
       }
       /** @description Forbidden action */
       403: {
@@ -9026,6 +9074,15 @@ export interface operations {
           [name: string]: unknown
         }
         content?: never
+      }
+      /** @description An auth setting in the request is not available on the organization plan */
+      402: {
+        headers: {
+          [name: string]: unknown
+        }
+        content: {
+          'application/json': components['schemas']['PlanGateErrorBody']
+        }
       }
       /** @description Forbidden action */
       403: {
@@ -10192,6 +10249,15 @@ export interface operations {
         }
         content?: never
       }
+      /** @description Disk modifications are not available on the organization plan */
+      402: {
+        headers: {
+          [name: string]: unknown
+        }
+        content: {
+          'application/json': components['schemas']['PlanGateErrorBody']
+        }
+      }
       /** @description Forbidden action */
       403: {
         headers: {
@@ -10531,6 +10597,15 @@ export interface operations {
           [name: string]: unknown
         }
         content?: never
+      }
+      /** @description A storage feature or file size limit in the request is not available on the organization plan */
+      402: {
+        headers: {
+          [name: string]: unknown
+        }
+        content: {
+          'application/json': components['schemas']['PlanGateErrorBody']
+        }
       }
       /** @description Forbidden action */
       403: {
@@ -12333,7 +12408,9 @@ export interface operations {
         headers: {
           [name: string]: unknown
         }
-        content?: never
+        content: {
+          'application/json': components['schemas']['PlanGateErrorBody']
+        }
       }
       /** @description Forbidden action */
       403: {
@@ -12403,7 +12480,9 @@ export interface operations {
         headers: {
           [name: string]: unknown
         }
-        content?: never
+        content: {
+          'application/json': components['schemas']['PlanGateErrorBody']
+        }
       }
       /** @description Forbidden action */
       403: {
@@ -12686,7 +12765,9 @@ export interface operations {
         headers: {
           [name: string]: unknown
         }
-        content?: never
+        content: {
+          'application/json': components['schemas']['PlanGateErrorBody']
+        }
       }
       /** @description Forbidden action */
       403: {
@@ -13842,6 +13923,15 @@ export interface operations {
           [name: string]: unknown
         }
         content?: never
+      }
+      /** @description The restore is not available on the organization plan, or the organization has overdue invoices or a service restriction */
+      402: {
+        headers: {
+          [name: string]: unknown
+        }
+        content: {
+          'application/json': components['schemas']['PlanGateErrorBody']
+        }
       }
       /** @description Forbidden action */
       403: {

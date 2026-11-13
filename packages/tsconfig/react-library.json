@@ -6,6 +6,6 @@
     "jsx": "react-jsx",
     "module": "preserve",
     "moduleResolution": "bundler",
-    "target": "es2021"
+    "target": "es2022"
   }
 }

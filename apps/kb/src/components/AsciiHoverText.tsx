@@ -1,6 +1,5 @@
 import { cn } from 'ui'
-
-import { hash, RAMP } from '../lib/ascii/field'
+import { hash, RAMP } from 'ui-patterns/IsoShape/IsoShape.glyphs'
 
 export interface AsciiHoverTextProps {
   text: string
