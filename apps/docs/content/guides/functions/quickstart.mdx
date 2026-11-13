@@ -100,6 +100,12 @@ Your function is now running at [`http://localhost:54321/functions/v1/hello-worl
 - Make sure Docker is running
 - Run `supabase stop` then `supabase start` to restart services
 
+<Admonition type="note">
+
+The container might not be able to access your project files on Linux systems with Security-Enhanced Linux (SELinux) enabled, such as Fedora. From your project root, run `sudo chcon -Rt container_file_t $(pwd)` to grant the container access.
+
+</Admonition>
+
 ### Port already in use?
 
 - Check what's running with `supabase status`
