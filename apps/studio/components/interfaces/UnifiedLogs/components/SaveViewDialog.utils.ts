@@ -1,11 +1,6 @@
 import { isGroup, type FilterGroup } from 'ui-patterns/FilterBar'
 
-import {
-  getLogAttributeKey,
-  groupLogsFiltersByColumn,
-  LOGS_FILTER_OPERATOR_VERBS,
-  type LogsFilter,
-} from '../UnifiedLogs.filters'
+import { getLogAttributeKey } from '../UnifiedLogs.filters'
 import { type ViewOptionKey } from '../UnifiedLogs.views'
 import {
   logsViewFilterConditionSchema,
@@ -34,30 +29,29 @@ export interface SummaryRow {
   text: string
 }
 
+export interface FilterSummaryPill {
+  label: string
+  operator: string
+  value: string
+}
+
 export const buildFilterSummary = (
   filters: FilterGroup,
   columnLabels: Record<string, string>
-): SummaryRow[] => {
-  const logsFilters: LogsFilter[] = filters.conditions.flatMap((condition) => {
+): FilterSummaryPill[] =>
+  filters.conditions.flatMap((condition) => {
     if (isGroup(condition)) return []
     const result = logsViewFilterConditionSchema.safeParse(condition)
     if (!result.success) return []
+    const { propertyName, operator, value } = result.data
     return [
       {
-        column: result.data.propertyName,
-        operator: result.data.operator,
-        value: String(result.data.value),
+        label: columnLabels[propertyName] ?? getLogAttributeKey(propertyName) ?? propertyName,
+        operator,
+        value: String(value),
       },
     ]
   })
-
-  return Object.entries(groupLogsFiltersByColumn(logsFilters)).map(
-    ([column, { operator, values }]) => ({
-      label: columnLabels[column] ?? getLogAttributeKey(column) ?? column,
-      text: `${LOGS_FILTER_OPERATOR_VERBS[operator]} ${values.join(', ')}`,
-    })
-  )
-}
 
 const formatViewOptionValue = (value: unknown): string => {
   if (typeof value === 'boolean') return value ? 'On' : 'Off'

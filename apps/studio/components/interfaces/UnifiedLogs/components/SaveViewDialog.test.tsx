@@ -31,11 +31,12 @@ const baseProps = {
 }
 
 describe('SaveViewDialog', () => {
-  it('shows the filter summary grouped by column and the options summary', async () => {
+  it('shows a filter pill per condition and the options summary', async () => {
     customRender(<SaveViewDialog {...baseProps} />)
 
-    expect(await screen.findByText('Level')).toBeInTheDocument()
-    expect(screen.getByText('equals error, warning')).toBeInTheDocument()
+    expect(await screen.findAllByText('Level')).toHaveLength(2)
+    expect(screen.getByText('error')).toBeInTheDocument()
+    expect(screen.getByText('warning')).toBeInTheDocument()
 
     expect(screen.getByText('Connection logs')).toBeInTheDocument()
     expect(screen.getByText('Off')).toBeInTheDocument()
