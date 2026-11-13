@@ -56,7 +56,7 @@ Provides identifying information (called "claims") about the user (or other enti
 | `iss`                                              | Identifies the server which issued the token. If you append `/.well-known/jwks.json` to this URL you'll get access to the public keys with which you can verify the token. |
 | `exp`                                              | Sets a time limit after which the token should not be trusted and is considered expired, even if it is properly signed.                                                    |
 | `sub`                                              | Means _subject_, is the unique ID of the user represented by the token.                                                                                                    |
-| <span className="whitespace-nowrap!">`role`</span> | The Postgres role to use when applying Row Level Security policies.                                                                                                        |
+| <span className="whitespace-nowrap!">`role`</span> | The [Postgres role](/docs/guides/database/postgres/roles) to use when applying Row Level Security policies.                                                                |
 | ...                                                | All other claims are useful for quick access to profile information without having to query the database or send a request to the Auth server.                             |
 
 **Signature**

@@ -88,7 +88,7 @@ However, an "Unlogged Queue" creates `pgmq.q_<queue_name>` as an unlogged table 
 
 Queues, by default, are not exposed over the Supabase Data API and are only accessible via Postgres clients.
 
-However, you may grant client-side consumers access to your Queues by enabling the Supabase Data API and granting permissions to the Queues API, which is a collection of database functions in the `pgmq_public` schema that wraps the database functions in the `pgmq` schema.
+However, you may grant client-side consumers access to your Queues by enabling the Supabase Data API and granting permissions to the Queues API, which is a collection of [database functions](/docs/guides/database/functions) in the `pgmq_public` schema that wraps the database functions in the `pgmq` schema.
 
 This is to prevent direct access to the `pgmq` schema and its tables (RLS is not enabled by default on any tables) and database functions.
 

@@ -48,7 +48,7 @@ Next, create a new database table to log the transcription results:
 supabase migrations new init
 ```
 
-This will create a new migration file in the `supabase/migrations` directory. Open the file and add the following SQL:
+This will create a new [migration file](/docs/guides/deployment/database-migrations) in the `supabase/migrations` directory. Open the file and add the following SQL:
 
 ```sql supabase/migrations/init.sql
 CREATE TABLE IF NOT EXISTS transcription_logs (
