@@ -205,25 +205,53 @@ create policy "Policy name."
 
 If your app falls under this case, the rules get more complex. User accounts created past a certain timestamp must have a `aal2` level to access the database.
 
+The policy needs the caller's `created_at` from `auth.users`, but the `authenticated` role cannot read that table directly. A policy that selects from `auth.users` runs as the calling user and fails with `42501: permission denied for table users`. Wrap the lookup in a `SECURITY DEFINER` function so it runs with the owner's privileges, and expose only the caller's own timestamp. Keep the helper in a schema that the Data API does not expose, so it is not callable through `/rest/v1/rpc` and does not trigger the `SECURITY DEFINER` function advisor lint:
+
 ```sql
+create schema if not exists private;
+grant usage on schema private to authenticated;
+
+create or replace function private.current_user_created_at()
+returns timestamptz
+language sql
+stable
+security definer
+set search_path = ''
+as $$
+  select created_at
+  from auth.users
+  where id = (select auth.uid());
+$$;
+
+revoke execute on function private.current_user_created_at() from public;
+grant execute on function private.current_user_created_at() to authenticated;
+
 create policy "Policy name."
   on table_name
   as restrictive -- very important!
   to authenticated
   using
-    (array[(select auth.jwt()->>'aal')] <@ (
+    ((select private.current_user_created_at()) is not null
+     and array[(select auth.jwt()->>'aal')] <@ (
        select
          case
-           when created_at >= '2022-12-12T00:00:00Z' then array['aal2']
+           when (select private.current_user_created_at()) >= '2022-12-12T00:00:00Z'
+             then array['aal2']
            else array['aal1', 'aal2']
          end as aal
-       from auth.users
-       where (select auth.uid()) = id));
+    ));
 ```
 
 - The policy will accept both `aal1` and `aal2` for users with a `created_at`
   timestamp prior to 12th December 2022 at 00:00 UTC, but will only accept
   `aal2` for all other timestamps.
+- If the JWT subject has no matching `auth.users` row, such as a deleted user
+  with an unexpired token, the helper returns `NULL`. The `is not null` guard
+  makes the policy deny access rather than allow both `aal1` and `aal2`.
+- The helper function must be owned by a role that can read `auth.users`, such as
+  `postgres`. It only returns the calling user's `created_at`.
+- The helper lives in the `private` schema, which is not exposed through the Data
+  API. `authenticated` needs `USAGE` on the schema to call it from the policy.
 - The `<@` operator is Postgres's ["contained in"
   operator.](https://www.postgresql.org/docs/current/functions-array.html)
 - **Using `as restrictive` ensures this policy will restrict all commands on the
