@@ -1,12 +1,23 @@
 import { createFileRoute } from '@tanstack/react-router'
+import { useParams } from 'common'
 
-import MultigresLogsPage from '@/pages/project/[ref]/logs/multigres-logs'
+import { LogsTableName } from '@/components/interfaces/Settings/Logs/Logs.constants'
+import { LogsPreviewer } from '@/components/interfaces/Settings/Logs/LogsPreviewer'
 
 export const Route = createFileRoute('/project/$ref/logs/multigres-logs')({
-  component: MultigresLogsRoute,
+  component: LogPage,
   staticData: { logsLayoutTitle: 'Multigres Logs' },
 })
 
-function MultigresLogsRoute() {
-  return <MultigresLogsPage dehydratedState={undefined} />
+function LogPage() {
+  const { ref } = useParams()
+
+  return (
+    <LogsPreviewer
+      condensedLayout
+      queryType="multigres"
+      projectRef={ref as string}
+      tableName={LogsTableName.MULTIGRES}
+    />
+  )
 }

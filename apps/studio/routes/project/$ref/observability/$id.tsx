@@ -1,14 +1,21 @@
 import { createFileRoute } from '@tanstack/react-router'
 
-import ObservabilityReportPage from '@/pages/project/[ref]/observability/[id]'
+import { ReportPadding } from '@/components/interfaces/Reports/ReportPadding'
+import Reports from '@/components/interfaces/Reports/Reports'
 
 export const Route = createFileRoute('/project/$ref/observability/$id')({
-  component: ObservabilityReportRoute,
+  component: ObservabilityReportPage,
   staticData: {
     observabilityLayoutTitle: 'Report',
   },
 })
 
-function ObservabilityReportRoute() {
-  return <ObservabilityReportPage dehydratedState={undefined} />
+function ObservabilityReportPage() {
+  return (
+    <div className="mx-auto flex flex-col gap-4 w-full grow">
+      <ReportPadding>
+        <Reports />
+      </ReportPadding>
+    </div>
+  )
 }
