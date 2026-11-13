@@ -1,5 +1,6 @@
+import { Loader2Icon } from 'lucide-react'
 import { useState, type ReactNode } from 'react'
-import { cn } from 'ui'
+import { Badge, cn } from 'ui'
 
 import { LOG_TYPES_LABELS } from '../UnifiedLogs.constants'
 import { ColumnSchema } from '../UnifiedLogs.schema'
@@ -31,61 +32,42 @@ export function LogTimeline({
   footer,
 }: LogTimelineProps) {
   const [isExpanded, setIsExpanded] = useState(false)
-  const { leadingLogs, activeLog, hiddenBefore, hiddenAfter } = foldTimelineSteps(logs, {
+  const items = foldTimelineSteps(logs, {
     activeLogId,
     isExpanded,
     collapsedCount: collapsedStepCount,
   })
-  const renderStep = (log: ColumnSchema, hasPrev: boolean, hasNext: boolean) => (
-    <TimelineStep
-      key={log.id}
-      log={log}
-      timeLabel={getTimeLabel(log)}
-      isActive={log.id === activeLogId}
-      hasPrev={hasPrev}
-      hasNext={hasNext}
-      href={getLogHref?.(log)}
-      onSelect={onSelectLog}
-    />
-  )
 
   return (
     <ol aria-label={ariaLabel} className="flex flex-col">
-      {leadingLogs.map((log, index) =>
-        renderStep(
-          log,
-          index > 0,
-          index < leadingLogs.length - 1 ||
-            hiddenBefore > 0 ||
-            !!activeLog ||
-            hiddenAfter > 0 ||
-            !!footer
+      {items.map((item, index) => {
+        const hasPrev = index > 0
+        const hasNext = index < items.length - 1 || !!footer
+        if (item.type === 'more') {
+          return (
+            <TimelineMoreStep
+              key={`more-${index}`}
+              hasPrev={hasPrev}
+              hasNext={hasNext}
+              onClick={() => setIsExpanded(true)}
+            >
+              +{item.count} more
+            </TimelineMoreStep>
+          )
+        }
+        return (
+          <TimelineStep
+            key={item.log.id}
+            log={item.log}
+            timeLabel={getTimeLabel(item.log)}
+            isActive={item.log.id === activeLogId}
+            hasPrev={hasPrev}
+            hasNext={hasNext}
+            href={getLogHref?.(item.log)}
+            onSelect={onSelectLog}
+          />
         )
-      )}
-      {hiddenBefore > 0 && (
-        <TimelineMoreStep
-          hasPrev={leadingLogs.length > 0}
-          hasNext
-          onClick={() => setIsExpanded(true)}
-        >
-          +{hiddenBefore} more
-        </TimelineMoreStep>
-      )}
-      {activeLog &&
-        renderStep(
-          activeLog,
-          leadingLogs.length > 0 || hiddenBefore > 0,
-          hiddenAfter > 0 || !!footer
-        )}
-      {hiddenAfter > 0 && (
-        <TimelineMoreStep
-          hasPrev={leadingLogs.length > 0 || !!activeLog}
-          hasNext={!!footer}
-          onClick={() => setIsExpanded(true)}
-        >
-          +{hiddenAfter} more
-        </TimelineMoreStep>
-      )}
+      })}
       {footer}
     </ol>
   )
@@ -207,11 +189,6 @@ function TimelineStep({
 }
 
 function LogStepRow({ log, timeLabel }: { log: ColumnSchema; timeLabel: string }) {
-  const hasRequest = !!log.method && !!log.pathname
-  const message = hasRequest
-    ? log.pathname
-    : (getEventMessageDisplay(log.log_type, log.event_message).message ?? log.pathname)
-
   return (
     <span className="flex min-w-0 flex-1 items-center gap-2 font-mono text-xs leading-5 tracking-tight">
       <LogTypeIcon type={log.log_type} className="shrink-0 text-foreground-lighter" />
@@ -220,44 +197,63 @@ function LogStepRow({ log, timeLabel }: { log: ColumnSchema; timeLabel: string }
           <DataTableColumnStatusCode value={log.status} level={log.level ?? undefined} />
         )}
       </span>
-      {hasRequest && <span className="shrink-0 text-foreground-lighter">{log.method}</span>}
-      <span className="min-w-0 flex-1 truncate text-foreground-light">{message}</span>
+      {hasRequest(log) && <span className="shrink-0 text-foreground-lighter">{log.method}</span>}
+      <span className="min-w-0 flex-1 truncate text-foreground-light">{getLogMessage(log)}</span>
       <span className="shrink-0 text-foreground-lighter">{timeLabel}</span>
     </span>
   )
 }
 
-export function LogStepSummary({
-  log,
-  timeLabel,
-  className,
-}: {
-  log: ColumnSchema
-  timeLabel?: string
-  className?: string
-}) {
+/** One-line identity of a log: type icon, status, and its request or message. */
+export function LogStepSummary({ log, isLoading }: { log: ColumnSchema; isLoading?: boolean }) {
   return (
-    <span className={cn('flex min-w-0 flex-1 flex-col gap-0.5', className)}>
-      <span className="flex min-w-0 items-center gap-2 text-sm">
-        <LogTypeIcon type={log.log_type} className="shrink-0 text-foreground-lighter" />
-        <span className="truncate text-foreground">{getLogTypeLabel(log.log_type)}</span>
-        {log.status !== null && log.status !== undefined && (
-          <DataTableColumnStatusCode
-            value={log.status}
-            level={log.level ?? undefined}
-            className="shrink-0 text-sm"
+    <div className="flex min-w-0 flex-1 items-center gap-2 text-sm font-medium leading-6 text-foreground">
+      {isLoading ? (
+        // Matches the log type icon's size so the summary doesn't move when loading ends
+        <span className="inline-flex" role="img" aria-label="Loading log details">
+          <Loader2Icon
+            size={14}
+            strokeWidth={1.5}
+            className="shrink-0 animate-spin text-foreground-lighter"
           />
-        )}
-        {timeLabel && (
-          <span className="ml-auto shrink-0 font-mono text-xs text-foreground-lighter">
-            {timeLabel}
+        </span>
+      ) : (
+        <LogTypeIcon
+          type={log.log_type}
+          label={getLogTypeLabel(log.log_type)}
+          className="shrink-0 text-foreground-lighter"
+        />
+      )}
+      {!!log.status && (
+        <>
+          <Badge
+            variant={log.level ? STATUS_BADGE_VARIANTS[log.level] : 'default'}
+            className="shrink-0 font-mono"
+          >
+            {log.status}
+          </Badge>{' '}
+        </>
+      )}
+      {hasRequest(log) ? (
+        <span className="flex min-w-0 gap-1">
+          <span className="shrink-0">{log.method}</span>{' '}
+          {/* Clip long paths from the start so the most specific segment stays visible */}
+          <span dir="rtl" className="truncate text-left">
+            <bdi dir="ltr">{log.pathname}</bdi>
           </span>
-        )}
-      </span>
-      <span className="truncate font-mono text-xs text-foreground-light">{getLogSummary(log)}</span>
-    </span>
+        </span>
+      ) : (
+        <span className="min-w-0 truncate">{getLogMessage(log)}</span>
+      )}
+    </div>
   )
 }
+
+const STATUS_BADGE_VARIANTS = {
+  success: 'default',
+  warning: 'warning',
+  error: 'destructive',
+} as const
 
 const LOG_TYPE_LABELS: Partial<Record<string, string>> = {
   ...LOG_TYPES_LABELS,
@@ -268,7 +264,11 @@ function getLogTypeLabel(logType: string) {
   return LOG_TYPE_LABELS[logType] ?? logType
 }
 
-function getLogSummary(log: ColumnSchema) {
-  if (log.method && log.pathname) return `${log.method} ${log.pathname}`
-  return getEventMessageDisplay(log.log_type, log.event_message).message ?? log.pathname ?? ''
+function hasRequest(log: ColumnSchema) {
+  return !!log.method && !!log.pathname
+}
+
+function getLogMessage(log: ColumnSchema) {
+  if (hasRequest(log)) return log.pathname
+  return getEventMessageDisplay(log.log_type, log.event_message).message ?? log.pathname
 }

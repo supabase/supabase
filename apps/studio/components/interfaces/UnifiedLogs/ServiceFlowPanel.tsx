@@ -13,6 +13,7 @@ import { LogDetail } from './components/LogDetail'
 import { LogStepSummary } from './components/LogTimeline'
 import { LogUser } from './components/LogUser'
 import { LogTimestampHeader, RequestTimeline } from './components/RequestTimeline'
+import { useLogEnrichment } from './components/useLogEnrichment'
 import { LogSelectionActions } from './LogSelectionActions'
 import {
   LogPanelCloseButton,
@@ -27,6 +28,8 @@ import { ShortcutBadge } from '@/components/ui/ShortcutBadge'
 import { useUnifiedLogsBackend } from '@/data/logs/unified-logs-infinite-query'
 import { useIsFeatureEnabled } from '@/hooks/misc/useIsFeatureEnabled'
 import { SHORTCUT_IDS } from '@/state/shortcuts/registry'
+
+const TAB_TRIGGER_CLASS_NAME = 'py-2.5 data-[state=active]:shadow-none'
 
 interface ServiceFlowPanelProps {
   dock: 'bottom' | 'right'
@@ -64,10 +67,10 @@ export function ServiceFlowPanel({
     : getEventMessageDisplay(activeLog?.log_type ?? '', activeLog?.event_message).message ||
       activeLog?.id
 
+  // Stays on the timeline so the user can step through the request one log at a time
   const handleSelectTimelineLog = (log: ColumnSchema) => {
     if (!selectedRow) return
     setOpenedLog(log.id === selectedRow.id ? null : { fromId: selectedRow.id, log })
-    setActiveTab('overview')
   }
   const { logsMetadata } = useIsFeatureEnabled(['logs:metadata'])
   const selectedJson = selectedRows.map((row) =>
@@ -81,18 +84,21 @@ export function ServiceFlowPanel({
         id="log-sidepanel"
         defaultSize={400}
         minSize={dock === 'bottom' ? 300 : 400}
-        className="bg-dash-sidebar"
+        className="bg-card"
       >
         <div className="flex h-full flex-col overflow-hidden">
-          <div className="flex min-w-0 items-start gap-3 px-4 pb-2 pt-3">
+          {/* Matches the table header height so the title lines up with the column labels */}
+          <div className="flex h-9 min-w-0 shrink-0 items-center gap-3 px-4">
             <div className="flex min-w-0 flex-1" role="status" title={title}>
               {!hasMultiple && activeLog ? (
-                <LogStepSummary log={activeLog} />
+                <OpenLogSummary log={activeLog} searchParameters={searchParameters} />
               ) : (
-                <span className="truncate text-sm leading-5 text-foreground">{title}</span>
+                <span className="truncate text-sm font-medium leading-6 text-foreground">
+                  {title}
+                </span>
               )}
             </div>
-            <div className="flex h-5 shrink-0 items-center gap-1">
+            <div className="-mr-1 flex h-6 shrink-0 items-center gap-1">
               <LogSelectionActions rows={hasMultiple || !activeLog ? selectedRows : [activeLog]} />
               <LogPanelCloseButton />
             </div>
@@ -111,11 +117,23 @@ export function ServiceFlowPanel({
               onValueChange={setActiveTab}
               className="flex min-h-0 flex-1 flex-col"
             >
-              <TabsList className="shrink-0 gap-x-4 px-4">
-                <TabsTrigger value="overview">Overview</TabsTrigger>
-                <TabsTrigger value="raw-json">Raw JSON</TabsTrigger>
-                {showTimeline && <TabsTrigger value="timeline">Timeline</TabsTrigger>}
-                {showUser && <TabsTrigger value="user">User</TabsTrigger>}
+              <TabsList className="shrink-0 gap-x-5 px-4">
+                <TabsTrigger value="overview" className={TAB_TRIGGER_CLASS_NAME}>
+                  Overview
+                </TabsTrigger>
+                <TabsTrigger value="raw-json" className={TAB_TRIGGER_CLASS_NAME}>
+                  Raw JSON
+                </TabsTrigger>
+                {showTimeline && (
+                  <TabsTrigger value="timeline" className={TAB_TRIGGER_CLASS_NAME}>
+                    Timeline
+                  </TabsTrigger>
+                )}
+                {showUser && (
+                  <TabsTrigger value="user" className={TAB_TRIGGER_CLASS_NAME}>
+                    User
+                  </TabsTrigger>
+                )}
                 <TabsIndicator />
               </TabsList>
               {tabs.map((tab) => (
@@ -146,7 +164,7 @@ export function ServiceFlowPanel({
               ))}
             </Tabs>
           )}
-          <div className="flex shrink-0 items-center gap-2 border-t px-4 py-1.5 text-xs text-foreground-lighter">
+          <div className="flex shrink-0 items-center gap-2 border-t py-1.5 pl-4 pr-3 text-xs text-foreground-lighter">
             <div className="flex min-w-0 flex-1 flex-wrap items-center gap-2">
               <ShortcutBadge shortcutId={SHORTCUT_IDS.UNIFIED_LOGS_EXTEND_PREV_ROW} />
               <ShortcutBadge shortcutId={SHORTCUT_IDS.UNIFIED_LOGS_EXTEND_NEXT_ROW} />
@@ -158,4 +176,16 @@ export function ServiceFlowPanel({
       </ResizablePanel>
     </>
   )
+}
+
+/** Shows a spinner in place of the log type icon while the open log's details load */
+function OpenLogSummary({
+  log,
+  searchParameters,
+}: {
+  log: ColumnSchema
+  searchParameters: QuerySearchParamsType
+}) {
+  const { isLoading } = useLogEnrichment({ row: log, searchParameters, shouldFetch: false })
+  return <LogStepSummary log={log} isLoading={isLoading} />
 }

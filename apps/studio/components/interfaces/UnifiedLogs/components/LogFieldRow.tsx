@@ -61,7 +61,7 @@ export function LogFieldRow<TData>({
     >
       <span
         className={cn(
-          'min-w-0 flex-1 font-sans text-sm leading-5 text-foreground-lighter',
+          'min-w-0 flex-1 font-sans text-xs leading-5 text-foreground-lighter',
           truncateLabel ? 'truncate' : 'break-all'
         )}
       >
@@ -69,7 +69,7 @@ export function LogFieldRow<TData>({
       </span>{' '}
       <span
         className={cn(
-          'flex min-w-0 flex-[2] justify-end text-right text-sm leading-5 transition-transform',
+          'flex min-w-0 flex-[2] justify-end text-right text-xs leading-5 transition-transform',
           canUseHoverActions &&
             'group-hover/field:-translate-x-9 group-has-[[data-state=open]]/field:-translate-x-9'
         )}
