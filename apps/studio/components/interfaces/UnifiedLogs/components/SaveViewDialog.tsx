@@ -44,11 +44,13 @@ const defaultValues = { name: '' }
 // Mirrors the read-only parts of `FilterCondition`'s pill styling (ui-patterns/FilterBar)
 // so filters and options look the same here as filters do on the filter bar itself.
 const Pill = ({ children }: { children: ReactNode }) => (
-  <div className="h-[26px] rounded-sm border bg-muted flex items-stretch shrink-0">{children}</div>
+  <div className="min-h-[26px] rounded-sm border bg-muted flex items-stretch shrink-0">
+    {children}
+  </div>
 )
 
 const PillSegment = ({ className, children }: { className?: string; children: ReactNode }) => (
-  <span className={cn('text-xs leading-4 flex items-center whitespace-nowrap', className)}>
+  <span className={cn('text-xs leading-4 py-1 flex items-center whitespace-nowrap', className)}>
     {children}
   </span>
 )
@@ -57,14 +59,18 @@ const FilterPill = ({ label, operator, value }: FilterSummaryPill) => (
   <Pill>
     <PillSegment className="pl-2 pr-1 text-foreground-light">{label}</PillSegment>
     <PillSegment className="px-1 text-foreground">{operator}</PillSegment>
-    <PillSegment className="pl-1 pr-2 text-foreground truncate max-w-[160px]">{value}</PillSegment>
+    <PillSegment className="pl-1 pr-2 text-foreground whitespace-normal break-words">
+      {value}
+    </PillSegment>
   </Pill>
 )
 
 const OptionPill = ({ label, value }: { label: string; value: string }) => (
   <Pill>
     <PillSegment className="pl-2 pr-1 text-foreground-light">{label}</PillSegment>
-    <PillSegment className="pl-1 pr-2 text-foreground truncate max-w-[160px]">{value}</PillSegment>
+    <PillSegment className="pl-1 pr-2 text-foreground whitespace-normal break-words">
+      {value}
+    </PillSegment>
   </Pill>
 )
 
