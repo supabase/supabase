@@ -78,7 +78,7 @@ These are the layout-only TanStack files. Most hold a single product layout comp
 - [x] `routes/project/$ref/database.tsx` — DatabaseLayout (reads `databaseLayoutTitle` from leaf `staticData`)
 - [x] `routes/project/$ref/database/triggers.tsx` — sub-shell with `PageLayout` + permission gate + nav items, inlined from `DatabaseTriggersLayout`. **Delta vs plan:** the existing `DatabaseTriggersLayout` component wraps `<DatabaseLayout title="Triggers">` internally, so re-using it inside the database.tsx shell would double-wrap. Inlined the inner part instead; the Next-side component was deleted once the triggers pages moved into their routes.
 - [x] `routes/project/$ref/database/pipelines.tsx` — sub-shell providing `PipelineRequestStatusProvider`, mirrors the former Next-side `PipelinesLayout` (deleted once the pipelines pages moved into their routes). Sets `databaseLayoutTitle: 'Pipelines'` for the whole subtree so the provider stays a single instance across navigation between the Pipelines list and detail routes. Legacy Replication routes are retained only for redirects, while the replica detail route redirects to Infrastructure.
-- [x] `routes/project/$ref/auth.tsx` — AuthLayout (reads `authLayoutTitle` from leaf `staticData`). **Delta vs plan:** shell honours a `skipAuthLayout: true` opt-out in `staticData` for leaves whose own body or sub-layout already wraps in `AuthLayout` (`AuthProvidersLayout`, `AuthEmailsLayout`, `pages/.../auth/third-party.tsx`) — without it those routes would double-wrap (which also doubles `withAuth` + `ProjectLayout`).
+- [x] `routes/project/$ref/auth.tsx` — AuthLayout (reads `authLayoutTitle` from leaf `staticData`). **Delta vs plan:** shell honours a `skipAuthLayout: true` opt-out in `staticData` for leaves whose own body or sub-layout already wraps in `AuthLayout` (`AuthProvidersLayout`, `AuthEmailsLayout`, `routes/project/$ref/auth/third-party.tsx`) — without it those routes would double-wrap (which also doubles `withAuth` + `ProjectLayout`).
 - ~~`routes/project/$ref/auth/templates.tsx` — AuthEmailsLayout~~ **Delta vs plan: not landed.** A unified `templates.tsx` sub-shell would force `templates/$templateId.tsx` (which uses plain `AuthLayout`, not `AuthEmailsLayout`) into the wrong wrapping. Instead `templates/index.tsx` and `auth/smtp.tsx` each set `skipAuthLayout: true` and wrap themselves in `AuthEmailsLayout`; `templates/$templateId.tsx` uses the standard auth shell with `authLayoutTitle: 'Emails'`.
 - [x] `routes/project/$ref/storage.tsx` — StorageLayout + StorageBucketsLayout (reads `storageLayoutTitle`, optional `skipStorageBucketsLayout`, `storageBucketsLayoutTitle`, `storageBucketsLayoutHideSubtitle` from leaf `staticData`). **Delta vs plan:** the shell wraps in BOTH StorageLayout and StorageBucketsLayout by default — every storage page except bucket-detail pages uses both. Bucket-detail pages set `skipStorageBucketsLayout: true`. `/storage/s3` uses `storageBucketsLayout{Title,HideSubtitle}` to override the inner header.
 - [x] `routes/project/$ref/realtime.tsx` — RealtimeLayout (reads `realtimeLayoutTitle` from leaf `staticData`)
@@ -188,24 +188,24 @@ These are the layout-only TanStack files. Most hold a single product layout comp
 
 ### Project shell — `/auth/*`
 
-- [x] A `routes/project/$ref/auth/overview.tsx` ← `pages/project/[ref]/auth/overview.tsx`
-- [x] A `routes/project/$ref/auth/users.tsx` ← `pages/project/[ref]/auth/users.tsx`
-- [x] A `routes/project/$ref/auth/providers.tsx` ← `pages/project/[ref]/auth/providers.tsx` (sets `skipAuthLayout: true`, wraps in `AuthProvidersLayout` directly)
-- [x] A `routes/project/$ref/auth/mfa.tsx` ← `pages/project/[ref]/auth/mfa.tsx`
-- [x] A `routes/project/$ref/auth/hooks.tsx` ← `pages/project/[ref]/auth/hooks.tsx`
-- [x] A `routes/project/$ref/auth/smtp.tsx` ← `pages/project/[ref]/auth/smtp.tsx` (sets `skipAuthLayout: true`, wraps in `AuthEmailsLayout` directly)
-- [x] A `routes/project/$ref/auth/sessions.tsx` ← `pages/project/[ref]/auth/sessions.tsx`
-- [x] A `routes/project/$ref/auth/passkeys.tsx` ← `pages/project/[ref]/auth/passkeys.tsx`
-- [x] A `routes/project/$ref/auth/performance.tsx` ← `pages/project/[ref]/auth/performance.tsx`
-- [x] A `routes/project/$ref/auth/protection.tsx` ← `pages/project/[ref]/auth/protection.tsx`
-- [x] A `routes/project/$ref/auth/rate-limits.tsx` ← `pages/project/[ref]/auth/rate-limits.tsx`
-- [x] A `routes/project/$ref/auth/third-party.tsx` ← `pages/project/[ref]/auth/third-party.tsx` (sets `skipAuthLayout: true` — page body inlines `<AuthProvidersLayout>` which already wraps `<AuthLayout>`)
-- [x] A `routes/project/$ref/auth/oauth-apps.tsx` ← `pages/project/[ref]/auth/oauth-apps.tsx`
-- [x] A `routes/project/$ref/auth/oauth-server.tsx` ← `pages/project/[ref]/auth/oauth-server.tsx`
-- [x] A `routes/project/$ref/auth/url-configuration.tsx` ← `pages/project/[ref]/auth/url-configuration.tsx`
-- [x] A `routes/project/$ref/auth/audit-logs.tsx` ← `pages/project/[ref]/auth/audit-logs.tsx`
-- [x] A `routes/project/$ref/auth/templates/index.tsx` ← `pages/project/[ref]/auth/templates/index.tsx` (sets `skipAuthLayout: true`, wraps in `AuthEmailsLayout` directly)
-- [x] A `routes/project/$ref/auth/templates/$templateId.tsx` ← `pages/project/[ref]/auth/templates/[templateId].tsx` (`authLayoutTitle: 'Emails'` — page uses plain `AuthLayout`, not `AuthEmailsLayout`)
+- [x] A→done `routes/project/$ref/auth/overview.tsx` ← `pages/project/[ref]/auth/overview.tsx`
+- [x] A→done `routes/project/$ref/auth/users.tsx` ← `pages/project/[ref]/auth/users.tsx`
+- [x] A→done `routes/project/$ref/auth/providers.tsx` ← `pages/project/[ref]/auth/providers.tsx` (sets `skipAuthLayout: true`, wraps in `AuthProvidersLayout` directly)
+- [x] A→done `routes/project/$ref/auth/mfa.tsx` ← `pages/project/[ref]/auth/mfa.tsx`
+- [x] A→done `routes/project/$ref/auth/hooks.tsx` ← `pages/project/[ref]/auth/hooks.tsx`
+- [x] A→done `routes/project/$ref/auth/smtp.tsx` ← `pages/project/[ref]/auth/smtp.tsx` (sets `skipAuthLayout: true`, wraps in `AuthEmailsLayout` directly)
+- [x] A→done `routes/project/$ref/auth/sessions.tsx` ← `pages/project/[ref]/auth/sessions.tsx`
+- [x] A→done `routes/project/$ref/auth/passkeys.tsx` ← `pages/project/[ref]/auth/passkeys.tsx`
+- [x] A→done `routes/project/$ref/auth/performance.tsx` ← `pages/project/[ref]/auth/performance.tsx`
+- [x] A→done `routes/project/$ref/auth/protection.tsx` ← `pages/project/[ref]/auth/protection.tsx`
+- [x] A→done `routes/project/$ref/auth/rate-limits.tsx` ← `pages/project/[ref]/auth/rate-limits.tsx`
+- [x] A→done `routes/project/$ref/auth/third-party.tsx` ← `pages/project/[ref]/auth/third-party.tsx` (sets `skipAuthLayout: true` — route body inlines `<AuthProvidersLayout>` which already wraps `<AuthLayout>`)
+- [x] A→done `routes/project/$ref/auth/oauth-apps.tsx` ← `pages/project/[ref]/auth/oauth-apps.tsx`
+- [x] A→done `routes/project/$ref/auth/oauth-server.tsx` ← `pages/project/[ref]/auth/oauth-server.tsx`
+- [x] A→done `routes/project/$ref/auth/url-configuration.tsx` ← `pages/project/[ref]/auth/url-configuration.tsx`
+- [x] A→done `routes/project/$ref/auth/audit-logs.tsx` ← `pages/project/[ref]/auth/audit-logs.tsx`
+- [x] A→done `routes/project/$ref/auth/templates/index.tsx` ← `pages/project/[ref]/auth/templates/index.tsx` (sets `skipAuthLayout: true`, wraps in `AuthEmailsLayout` directly)
+- [x] A→done `routes/project/$ref/auth/templates/$templateId.tsx` ← `pages/project/[ref]/auth/templates/[templateId].tsx` (`authLayoutTitle: 'Emails'` — page uses plain `AuthLayout`, not `AuthEmailsLayout`)
 
 ### Project shell — `/storage/*`
 
