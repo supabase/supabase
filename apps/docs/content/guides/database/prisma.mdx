@@ -95,7 +95,7 @@ If you plan to solely use Prisma instead of the Supabase Data API (PostgREST), t
             <TabPanel id="pnpm_initiate" label="pnpm">
               ```bash
               pnpm init
-              # --allow-build needs pnpm 10.4 or later. Earlier versions run the build scripts without it.
+              # --allow-build needs pnpm 10.4 or later. pnpm 9 and earlier run build scripts by default, so omit the flags there.
               pnpm install prisma@7 tsx typescript @types/pg --save-dev --allow-build=prisma --allow-build=@prisma/engines --allow-build=esbuild
               pnpm install @prisma/client@7 @prisma/adapter-pg@7 dotenv pg
 
