@@ -128,6 +128,27 @@ describe('sendTelemetryEvent', () => {
     )
   })
 
+  it('passes on the request to skip the access token, which is off by default', async () => {
+    const event = {
+      action: 'kb_search_result_clicked',
+      properties: { resultPath: '/kb/a', resultPosition: 2, resultCount: 3 },
+    } as const
+
+    await sendTelemetryEvent(API_URL, event, undefined, { skipAccessToken: true })
+    expect(post).toHaveBeenLastCalledWith(expect.any(String), expect.any(Object), {
+      headers: { Version: '2' },
+      keepalive: true,
+      skipAccessToken: true,
+    })
+
+    await sendTelemetryEvent(API_URL, event)
+    expect(post).toHaveBeenLastCalledWith(
+      expect.any(String),
+      expect.any(Object),
+      expect.not.objectContaining({ skipAccessToken: true })
+    )
+  })
+
   it('posts nothing without consent', async () => {
     consent.value = false
     await sendTelemetryEvent(API_URL, {

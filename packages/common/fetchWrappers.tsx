@@ -29,10 +29,15 @@ export async function get(url: string, options = {} as { [key: string]: any }) {
     })
 }
 
+/**
+ * `skipAccessToken` sends the request without waiting for the access token or sending it,
+ * for a request that has to be issued before the page unloads (waiting would let it go first).
+ * Only for endpoints that do not need the token.
+ */
 export async function post(url: string, data: DataProps, options = {} as { [key: string]: any }) {
-  const { headers: optionHeaders, ...otherOptions } = options
+  const { headers: optionHeaders, skipAccessToken, ...otherOptions } = options
 
-  const accessToken = await getAccessToken()
+  const accessToken = skipAccessToken ? undefined : await getAccessToken()
 
   let headers = new Headers({
     'Content-Type': 'application/json',

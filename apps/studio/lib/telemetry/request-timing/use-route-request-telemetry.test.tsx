@@ -9,7 +9,7 @@ import { act, renderHook, waitFor } from '@testing-library/react'
 import { consentState, sendTelemetryEvent } from 'common'
 import { HttpResponse } from 'msw'
 import type { ReactNode } from 'react'
-import { beforeEach, describe, expect, it } from 'vitest'
+import { beforeEach, describe, expect, it, vi } from 'vitest'
 
 import { createRequestTimingCollector } from './request-timing-collector'
 import { useRouteRequestTelemetry } from './use-route-request-telemetry'
@@ -194,6 +194,32 @@ describe('route visits', () => {
       routeTemplate: '/project/[ref]',
       requestCount: 1,
     })
+  })
+})
+
+describe('leaving the page', () => {
+  // The page can unload before any later tick, so the request has to be issued in the same one
+  // as the event, not after something else is awaited
+  it.each([
+    ['the tab is hidden', hideTab],
+    [
+      'the page is hidden for unloading',
+      () => act(() => void window.dispatchEvent(new Event('pagehide'))),
+    ],
+  ])('issues the request straight away when %s', async (_name, leave) => {
+    await setConsent('accepted')
+    renderTelemetryHook()
+    loadRequest()
+    const fetchSpy = vi.spyOn(globalThis, 'fetch')
+
+    leave()
+
+    expect(fetchSpy).toHaveBeenCalledWith(
+      expect.stringContaining('/telemetry/event'),
+      expect.objectContaining({ keepalive: true })
+    )
+    await waitForSummaries(1)
+    fetchSpy.mockRestore()
   })
 })
 

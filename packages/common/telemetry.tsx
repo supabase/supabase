@@ -241,7 +241,19 @@ export const PageTelemetry = ({
 const EXAMPLE_LINK_PATTERN =
   /^https:\/\/github\.com\/supabase\/supabase\/(?:tree|blob)\/[^/]+\/examples\/([^?#]+)/
 
-export function sendTelemetryEvent(API_URL: string, event: TelemetryEvent, pathname?: string) {
+export function sendTelemetryEvent(
+  API_URL: string,
+  event: TelemetryEvent,
+  pathname?: string,
+  options?: {
+    /**
+     * Issue the request in the same tick instead of after the access token is read. For an event
+     * sent as the page is hidden or unloading, which would otherwise never go out. The endpoint
+     * identifies the user from cookies, so it does not need the token.
+     */
+    skipAccessToken?: boolean
+  }
+) {
   const request = buildTelemetryEventRequest(API_URL, event, pathname)
   if (!request) return
 
@@ -254,6 +266,7 @@ export function sendTelemetryEvent(API_URL: string, event: TelemetryEvent, pathn
   return post(request.url, request.body, {
     headers: { Version: '2' },
     keepalive: request.keepalive,
+    skipAccessToken: options?.skipAccessToken,
   }).catch((error) => {
     console.error('Problem sending telemetry event:', error)
   })

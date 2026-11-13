@@ -11,12 +11,14 @@ import {
 import { toRouteTemplate } from './route-template.utils'
 import { useLatest } from '@/hooks/misc/useLatest'
 
-function sendSummary(apiUrl: string, summary: RouteRequestsSummary) {
+function sendSummary(apiUrl: string, summary: RouteRequestsSummary, isLeavingPage = false) {
   // The route template is sent as the pathname so the event never carries a project ref there
   sendTelemetryEvent(
     apiUrl,
     { action: 'route_requests_evaluated', properties: summary },
-    summary.routeTemplate
+    summary.routeTemplate,
+    // As the page is hidden or unloads, there may be no time left to read the access token first
+    { skipAccessToken: isLeavingPage }
   )
 }
 
@@ -74,7 +76,9 @@ export function useRouteRequestTelemetry({
       const summary = collector.finishVisit(next)
       if (!summary) return
 
-      if (hasConsentedRef.current) sendSummary(apiUrlRef.current, summary)
+      // Only the tab being hidden and the page unloading pass `next`
+      const isLeavingPage = next !== undefined
+      if (hasConsentedRef.current) sendSummary(apiUrlRef.current, summary, isLeavingPage)
       else collector.queueSummary(summary)
     }
 
