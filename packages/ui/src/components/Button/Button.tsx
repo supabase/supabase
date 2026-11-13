@@ -154,6 +154,20 @@ const IconContainerVariants = cva('inline-flex items-center justify-center shrin
       danger: 'text-destructive-foreground/50',
       warning: 'text-warning-foreground/50',
     },
+    // Nudge the glyph toward the edge without shrinking button padding. Keeps
+    // left/right padding equal, and skips icon-only controls (split chevrons).
+    opticalLeading: {
+      true: '-ml-px',
+      false: '',
+    },
+    opticalTrailing: {
+      true: '-mr-px',
+      false: '',
+    },
+  },
+  defaultVariants: {
+    opticalLeading: false,
+    opticalTrailing: false,
   },
 })
 
@@ -222,9 +236,16 @@ const Button = forwardRef<HTMLButtonElement, ButtonProps>(
   ) => {
     const Comp = asChild ? Slot.Slot : 'button'
     const { className, tabIndex, disabled: disabledProp, onClick, ...rest } = props
-    const showIcon = loading || icon
-    // decrecating 'showIcon' for rightIcon
     const _iconLeft: React.ReactNode = icon ?? iconLeft
+    const showLeadingIcon = Boolean(loading || _iconLeft)
+    // asChild always passes an element as children, so inspect the slotted label.
+    // Empty string counts as no label so icon-only optical/sizing still apply.
+    const label = asChild
+      ? isValidElement<{ children?: ReactNode }>(children)
+        ? children.props.children
+        : undefined
+      : children
+    const isIconOnly = label == null || label === false || label === ''
     const isLoading = loading === true
     // if loading, button is disabled
     const disabled = isLoading || disabledProp === true
@@ -233,8 +254,14 @@ const Button = forwardRef<HTMLButtonElement, ButtonProps>(
 
     const computedTabIndex = getExplicitTabIndex(tabIndex, nativeDisabled)
 
-    const renderIconContainer = (content: ReactNode) => (
-      <div aria-hidden className={cn(IconContainerVariants({ size, variant }))}>
+    const renderIconContainer = (
+      content: ReactNode,
+      { opticalLeading = false, opticalTrailing = false } = {}
+    ) => (
+      <div
+        aria-hidden
+        className={cn(IconContainerVariants({ size, variant, opticalLeading, opticalTrailing }))}
+      >
         {content}
       </div>
     )
@@ -251,6 +278,21 @@ const Button = forwardRef<HTMLButtonElement, ButtonProps>(
         onClick?.(e as React.MouseEvent<HTMLButtonElement>)
       }
     }
+
+    const opticalAlign = !isIconOnly
+    const leadingIcon = showLeadingIcon
+      ? loading
+        ? renderIconContainer(<Loader2 className={cn(loadingVariants({ loading, variant }))} />, {
+            opticalLeading: opticalAlign,
+          })
+        : _iconLeft
+          ? renderIconContainer(_iconLeft, { opticalLeading: opticalAlign })
+          : null
+      : null
+    const trailingIcon =
+      iconRight && !loading
+        ? renderIconContainer(iconRight, { opticalTrailing: opticalAlign })
+        : null
 
     return (
       <Comp
@@ -269,7 +311,7 @@ const Button = forwardRef<HTMLButtonElement, ButtonProps>(
             focusableWhenDisabled,
             block,
             rounded,
-            iconOnly: children == null || children === false,
+            iconOnly: isIconOnly,
           }),
           className
         )}
@@ -282,32 +324,15 @@ const Button = forwardRef<HTMLButtonElement, ButtonProps>(
               {
                 onClick: (e) => handleActivation(e, children.props.onClick),
               },
-              showIcon &&
-                (loading
-                  ? renderIconContainer(
-                      <Loader2 className={cn(loadingVariants({ loading, variant }))} />
-                    )
-                  : _iconLeft
-                    ? renderIconContainer(_iconLeft)
-                    : null),
-              children.props.children && (
-                <span className={'truncate'}>{children.props.children}</span>
-              ),
-              iconRight && !loading && renderIconContainer(iconRight)
+              leadingIcon,
+              label ? <span className={'truncate'}>{label}</span> : null,
+              trailingIcon
             )
           ) : null
         ) : (
           <>
-            {showIcon &&
-              (loading
-                ? renderIconContainer(
-                    <Loader2 className={cn(loadingVariants({ loading, variant }))} />
-                  )
-                : _iconLeft
-                  ? renderIconContainer(_iconLeft)
-                  : null)}{' '}
-            {children && <span className={'truncate'}>{children}</span>}{' '}
-            {iconRight && !loading && renderIconContainer(iconRight)}
+            {leadingIcon} {children && <span className={'truncate'}>{children}</span>}{' '}
+            {trailingIcon}
           </>
         )}
       </Comp>

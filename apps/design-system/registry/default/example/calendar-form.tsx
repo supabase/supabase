@@ -62,7 +62,7 @@ export default function CalendarForm() {
                         'w-[240px] justify-start',
                         !field.value && 'text-muted-foreground'
                       )}
-                      icon={<CalendarIcon className="ml-auto opacity-50" />}
+                      icon={<CalendarIcon className="opacity-50" />}
                     >
                       {field.value ? format(field.value, 'PPP') : <span>Pick a date</span>}
                     </Button>

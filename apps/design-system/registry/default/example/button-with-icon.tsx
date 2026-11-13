@@ -3,7 +3,7 @@ import { Button } from 'ui'
 
 export default function ButtonWithIcon() {
   return (
-    <Button variant="primary" icon={<Mail className="mr-2 h-4 w-4" />}>
+    <Button variant="primary" icon={<Mail />}>
       Sign in with email
     </Button>
   )

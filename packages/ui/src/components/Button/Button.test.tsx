@@ -42,6 +42,61 @@ describe('#Button', () => {
     expect(className).toContain('px-2.5')
   })
 
+  it('should optically nudge leading and trailing icons on labeled buttons without changing padding', () => {
+    render(
+      <Button
+        icon={<svg data-testid="leading-icon" />}
+        iconRight={<svg data-testid="trailing-icon" />}
+      >
+        Label
+      </Button>
+    )
+
+    const button = screen.getByRole('button', { name: 'Label' })
+    expect(button.className).toContain('px-2.5')
+    expect(button.className).not.toContain('pl-2')
+    expect(screen.getByTestId('leading-icon').parentElement).toHaveClass('-ml-px')
+    expect(screen.getByTestId('trailing-icon').parentElement).toHaveClass('-mr-px')
+  })
+
+  it('should not optically nudge icon-only buttons so split chevron px overrides stay clean', () => {
+    render(
+      <Button
+        aria-label="More actions"
+        className="shrink-0 px-1 py-1.25"
+        icon={<svg data-testid="chevron" />}
+      />
+    )
+
+    const button = screen.getByRole('button', { name: 'More actions' })
+    expect(button.className).toContain('px-1')
+    expect(screen.getByTestId('chevron').parentElement).not.toHaveClass('-ml-px')
+    expect(screen.getByTestId('chevron').parentElement).not.toHaveClass('-mr-px')
+  })
+
+  it('should treat asChild links without text as icon-only for optical alignment', () => {
+    render(
+      <Button asChild className="px-1.5" icon={<svg data-testid="aschild-icon" />}>
+        <a href="/logs" aria-label="Open logs" />
+      </Button>
+    )
+
+    const link = screen.getByRole('link', { name: 'Open logs' })
+    expect(link.className).toContain('px-1.5')
+    expect(link.className).toContain('w-6.5')
+    expect(screen.getByTestId('aschild-icon').parentElement).not.toHaveClass('-ml-px')
+  })
+
+  it('should optically nudge icons on labeled asChild buttons', () => {
+    render(
+      <Button asChild icon={<svg data-testid="aschild-leading" />}>
+        <a href="/docs">Docs</a>
+      </Button>
+    )
+
+    expect(screen.getByTestId('aschild-leading').parentElement).toHaveClass('-ml-px')
+  })
+
   it('should allow an explicit primary variant override', () => {
     render(<Button variant="primary">Primary</Button>)
 
