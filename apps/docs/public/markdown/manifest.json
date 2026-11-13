@@ -438,6 +438,7 @@
   "observability/configure-logging",
   "observability/detecting",
   "observability/inspect",
+  "observability/issues",
   "observability/log-drains",
   "observability/log-field-reference",
   "observability/log-slow-queries",
