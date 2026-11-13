@@ -228,7 +228,7 @@ describe('OrioleDB catalog restrictions', () => {
     mockProject(false)
     mockWarehouse('complete')
     customRender(<WarehouseSetupPanel />)
-    expect(await screen.findByRole('link', { name: 'View metrics' })).toHaveAttribute(
+    expect(await screen.findByRole('link', { name: 'Observability' })).toHaveAttribute(
       'href',
       '/project/default/observability/warehouse'
     )

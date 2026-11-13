@@ -243,7 +243,7 @@ describe('WarehouseSchemaTablePicker', () => {
     fireEvent.click(screen.getByRole('combobox', { name: 'Select tables to replicate' }))
     await userEvent.click(screen.getByText('customers'))
 
-    await userEvent.click(screen.getByRole('button', { name: 'Save', exact: true }))
+    await userEvent.click(screen.getByRole('button', { name: 'Save' }))
 
     await waitFor(() =>
       expect(requests).toEqual([{ targets: [{ type: 'table', schema: 'public', name: 'orders' }] }])

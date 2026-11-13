@@ -102,7 +102,7 @@ describe('WarehouseMetricsReport', () => {
     expect(
       screen.getByRole('link', { name: 'Warehouse reports documentation (opens in new tab)' })
     ).toHaveAttribute('href', expect.stringContaining('/guides/observability/reports#warehouse'))
-    await userEvent.click(screen.getByRole('button', { name: 'More actions', exact: true }))
+    await userEvent.click(screen.getByRole('button', { name: 'More actions' }))
     expect(screen.getByRole('menuitem', { name: 'View Warehouse' })).toHaveAttribute(
       'href',
       '/project/default/integrations/warehouse/overview'

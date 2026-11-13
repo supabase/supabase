@@ -144,7 +144,7 @@ describe('WarehouseTab', () => {
       '/project/default/integrations/warehouse/overview'
     )
 
-    // FlightSQL is the default engine and needs no catalog access, so nothing here provisions.
+    // Flight SQL is the default engine and needs no catalog access, so nothing here provisions.
     expect(screen.queryByRole('switch')).not.toBeInTheDocument()
 
     await userEvent.click(screen.getByRole('combobox', { name: 'Query engine' }))
@@ -215,7 +215,7 @@ describe('WarehouseTab', () => {
     expect(screen.getByText(CATALOG_PASSWORD)).toBeInTheDocument()
 
     await userEvent.click(screen.getByRole('combobox', { name: 'Query engine' }))
-    await userEvent.click(screen.getByRole('option', { name: 'FlightSQL' }))
+    await userEvent.click(screen.getByRole('option', { name: 'Flight SQL' }))
 
     expect(screen.queryByRole('heading', { name: 'Follow these steps' })).not.toBeInTheDocument()
     expect(screen.queryByRole('button', { name: 'Copy prompt' })).not.toBeInTheDocument()
