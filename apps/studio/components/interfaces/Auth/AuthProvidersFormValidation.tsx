@@ -1042,7 +1042,7 @@ const EXTERNAL_PROVIDER_GOOGLE = {
       title: 'Client IDs',
       description:
         'Comma-separated list of client IDs for Web, OAuth, Android apps, One Tap, and Chrome extensions.',
-      type: 'string',
+      type: 'comma-separated-list',
     },
     EXTERNAL_GOOGLE_SECRET: {
       title: 'Client Secret (for OAuth)',
