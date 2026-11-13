@@ -33,9 +33,13 @@ region: 'Oceania'
 supabase_products: ['database', 'auth', 'storage', 'realtime', 'vector', 'functions']
 ---
 
-> If we were to start a company tomorrow, how would we want to build our platform? That's the approach we took.
->
-> _— Marko Tomic, Co-Founder and CTO, Assignar_
+<Quote>
+
+If we were to start a company tomorrow, how would we want to build our platform? That's the approach we took.
+
+<div className="mt-4">Marko Tomic, Co-Founder and CTO, Assignar</div>
+
+</Quote>
 
 ## Key results
 
@@ -55,23 +59,35 @@ Assignar started in 2014 to solve a problem co-founder Sean McCreanor had in his
 
 The subcontractor's side is only one layer of a tiered industry. On a major site, the general contractor hands most of the physical work to subcontractors but remains responsible for their productivity, operations, and safety. General contractors want a single view across all of their subcontractors' work. Subcontractors, meanwhile, upload timesheets and compliance documents into each contractor's own system with nothing to show for it. That lack of transparency across both user bases is a root cause of projects running over time and over budget.
 
-> "When managing projects they're looking in the rear-view mirror all the time. Trying to piece together what happened two months ago - which at that point, it's too late."
->
-> _— Marko Tomic, Co-Founder and CTO, Assignar_
+<Quote>
+
+When managing projects they're looking in the rear-view mirror all the time. Trying to piece together what happened two months ago - which at that point, it's too late.
+
+<div className="mt-4">Marko Tomic, Co-Founder and CTO, Assignar</div>
+
+</Quote>
 
 Marko and Sean wanted Assignar to serve every tier of construction, but the original platform was built around the subcontractor's workflow, and its technical design made that transparency gap hard to close. It gave every customer a database of its own on AWS Aurora MySQL, which met compliance requirements but multiplied the work of changing anything. Keeping schemas and migrations consistent across all of those databases took internal tools the team had to build and maintain, and the schema had never been designed for tiered data, so letting a general contractor see into its subcontractors' records would take a rebuild.
 
 ## Starting over on Postgres
 
-> "The old platform was aging a little, at 11 years old, and we had a decision to make. Do we keep building on top of this, or do we start from scratch and treat it like a brand new company?"
->
-> _— Marko Tomic, Co-Founder and CTO, Assignar_
+<Quote>
+
+The old platform was aging a little, at 11 years old, and we had a decision to make. Do we keep building on top of this, or do we start from scratch and treat it like a brand new company?
+
+<div className="mt-4">Marko Tomic, Co-Founder and CTO, Assignar</div>
+
+</Quote>
 
 They chose to start over on Supabase, which Marko already had experience with from years of side projects and a handful of apps he built as an early adopter. The question that mattered to him most was whether one database could hold every tenant's data and still show each general contractor, and only that contractor, the subcontractors it worked with.
 
-> "We decided to build Assignar Pay on top of Supabase using Postgres and Row Level Security, and that was a game changer. It actually allowed us to build what we always wanted to build."
->
-> _— Marko Tomic, Co-Founder and CTO, Assignar_
+<Quote>
+
+We decided to build Assignar Pay on top of Supabase using Postgres and Row Level Security, and that was a game changer. It actually allowed us to build what we always wanted to build.
+
+<div className="mt-4">Marko Tomic, Co-Founder and CTO, Assignar</div>
+
+</Quote>
 
 One shared database also simplified the daily work of running it. There was one schema to change instead of one for every customer, so managing migrations and database versions became much easier, and the founders had that in place before the wider team joined.
 
@@ -81,9 +97,13 @@ Marko and Sean spent about six months building the foundations themselves, from 
 
 Assignar Pay runs on Next.js on Vercel, and everything is written in TypeScript. The application code and the Supabase migrations live in one repository, managed with Turborepo, so engineers aren't switching between codebases. When an engineer opens a feature branch in GitHub, Supabase automatically starts a database for it, something the team previously had to build by hand on the old stack.
 
-> "Everyone was smiling because the developer experience went through the roof. There was no context switching between different frameworks and languages."
->
-> _— Marko Tomic, Co-Founder and CTO, Assignar_
+<Quote>
+
+Everyone was smiling because the developer experience went through the roof. There was no context switching between different frameworks and languages.
+
+<div className="mt-4">Marko Tomic, Co-Founder and CTO, Assignar</div>
+
+</Quote>
 
 In Assignar Pay, general contractors and subcontractors each have their own organization inside a single shared Postgres database, and Row Level Security keeps every organization's data separate. A general contractor invites its subcontractors into its organization and defines the information it wants from them, such as insurance documents and timesheets. A process that used to run through several systems and a lot of manual follow-up now follows one consistent format. Since the build began, that one database has grown to about 500 tables, with roughly 1,700 migrations and 7,000 security policies keeping each organization's data apart.
 
@@ -101,15 +121,23 @@ On the original platform, Assignar paid a third-party vendor for authentication.
 
 Developer velocity jumped after the rebuild. Assignar's small team of agentic and forward deployed engineers works alongside AI agents with strong harnesses that take work from ticket to reviewed pull request, and Supabase Branching and Row Level Security let those agents move fast without putting customer data at risk. The team went from 12 pull requests in January to more than 500 in August and more than 1,000 in October, and the pace is still climbing.
 
-> "We're still trying to find out what our throughput is actually going to be like. When are we going to plateau?"
->
-> _— Marko Tomic, Co-Founder and CTO, Assignar_
+<Quote>
+
+We're still trying to find out what our throughput is actually going to be like. When are we going to plateau?
+
+<div className="mt-4">Marko Tomic, Co-Founder and CTO, Assignar</div>
+
+</Quote>
 
 The rebuild has changed the commercial picture too, with customers now getting significantly more value and features from Assignar Pay than from the previous platform.
 
-> "We rebuilt everything the old product has, and we added a whole lot more onto the new platform. The value we provide is so much greater than what we were able to do before."
->
-> _— Marko Tomic, Co-Founder and CTO, Assignar_
+<Quote>
+
+We rebuilt everything the old product has, and we added a whole lot more onto the new platform. The value we provide is so much greater than what we were able to do before.
+
+<div className="mt-4">Marko Tomic, Co-Founder and CTO, Assignar</div>
+
+</Quote>
 
 ## What is next for Assignar Pay
 
@@ -117,12 +145,20 @@ The team's current priority is moving existing customers over to Assignar Pay. A
 
 Assignar Pay already covers the job lifecycle from bid to invoice, bringing timesheets, compliance and field communication into one platform. The next step is to deepen its financial capabilities, using AI to bridge the gap between construction operations and accounting systems.
 
-> "Accounting systems don't do the field and resource planning, and they don't capture the data in real time, so they don't know what the actual numbers are. We do. We have the actuals."
->
-> _— Marko Tomic, Co-Founder and CTO, Assignar_
+<Quote>
+
+Accounting systems don't do the field and resource planning, and they don't capture the data in real time, so they don't know what the actual numbers are. We do. We have the actuals.
+
+<div className="mt-4">Marko Tomic, Co-Founder and CTO, Assignar</div>
+
+</Quote>
 
 ## Featured quote
 
-> "We thought that if we rebuilt on Supabase earlier, it would be better than waiting. I'm glad we did it in retrospect. It was the right call, 100%."
->
-> _— Marko Tomic, Co-Founder and CTO, Assignar_
+<Quote>
+
+We thought that if we rebuilt on Supabase earlier, it would be better than waiting. I'm glad we did it in retrospect. It was the right call, 100%.
+
+<div className="mt-4">Marko Tomic, Co-Founder and CTO, Assignar</div>
+
+</Quote>

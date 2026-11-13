@@ -301,8 +301,7 @@ const DatabaseUsage = () => {
       <ReportHeader showDatabaseSelector title={REPORT_TITLE} />
       <ReportStickyNav
         content={
-          <div className="ml-auto flex items-center gap-2 flex-wrap">
-            <DocsButton href={OBSERVABILITY_DOCS_HREFS.database} topic={REPORT_TITLE} />
+          <div className="w-full flex items-center gap-2 flex-wrap">
             <ShortcutTooltip
               shortcutId={SHORTCUT_IDS.OBSERVABILITY_REFRESH}
               label="Refresh report"
@@ -317,7 +316,7 @@ const DatabaseUsage = () => {
               />
             </ShortcutTooltip>
             <ReportSettings chartId="database-charts" />
-            <div className="flex items-center gap-3">
+            <div className="contents">
               <LogsDatePicker
                 onSubmit={handleDatePickerChange}
                 value={datePickerValue}
@@ -334,7 +333,7 @@ const DatabaseUsage = () => {
                 source="databaseReportDateRange"
               />
               {selectedDateRange && (
-                <div className="flex items-center gap-x-2 text-xs">
+                <div className="order-last flex w-full flex-wrap items-center gap-x-2 text-xs xl:order-none xl:w-auto">
                   <p className="text-foreground-light">
                     {dayjs(selectedDateRange.period_start.date).format('MMM D, h:mma')}
                   </p>
@@ -347,6 +346,11 @@ const DatabaseUsage = () => {
                 </div>
               )}
             </div>
+            <DocsButton
+              href={OBSERVABILITY_DOCS_HREFS.database}
+              topic={REPORT_TITLE}
+              className="ml-auto"
+            />
           </div>
         }
       >
