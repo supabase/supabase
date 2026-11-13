@@ -77,6 +77,12 @@ const PROVIDER_EMAIL = {
         },
       ],
     },
+    EXTERNAL_EMAIL_MAGIC_LINK_DISABLED: {
+      title: 'Enable magic links and email OTP',
+      description:
+        'Allow users to sign in with a magic link or a one-time password sent to their email. Passwords and other methods are not affected.',
+      type: 'boolean',
+    },
     MAILER_OTP_EXP: {
       title: 'Email OTP expiration',
       type: 'number',
@@ -97,6 +103,7 @@ const PROVIDER_EMAIL = {
       SECURITY_UPDATE_PASSWORD_REQUIRE_REAUTHENTICATION: z.boolean(),
       SECURITY_UPDATE_PASSWORD_REQUIRE_CURRENT_PASSWORD: z.boolean(),
       PASSWORD_HIBP_ENABLED: z.boolean(),
+      EXTERNAL_EMAIL_MAGIC_LINK_DISABLED: z.boolean(),
       MAILER_OTP_EXP: preprocessEmptyNumberInput(
         z.coerce
           .number({ required_error: 'This is required', invalid_type_error: 'This is required' })
@@ -122,6 +129,7 @@ const PROVIDER_EMAIL = {
       SECURITY_UPDATE_PASSWORD_REQUIRE_REAUTHENTICATION: z.boolean().optional(),
       PASSWORD_HIBP_ENABLED: z.boolean().optional(),
       SECURITY_UPDATE_PASSWORD_REQUIRE_CURRENT_PASSWORD: z.boolean().optional(),
+      EXTERNAL_EMAIL_MAGIC_LINK_DISABLED: z.boolean().optional(),
       MAILER_OTP_EXP: preprocessEmptyNumberInput(z.coerce.number().optional()),
       MAILER_OTP_LENGTH: preprocessEmptyNumberInput(z.coerce.number().optional()),
       PASSWORD_MIN_LENGTH: preprocessEmptyNumberInput(z.coerce.number().optional()),
