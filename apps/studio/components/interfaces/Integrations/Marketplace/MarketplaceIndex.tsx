@@ -1,8 +1,7 @@
 import { useParams } from 'common'
 import { parseAsString, parseAsStringEnum, useQueryState } from 'nuqs'
 import { useMemo, useRef } from 'react'
-import { Button, Card, ShadowScrollArea, Table, TableBody, TableHeader } from 'ui'
-import { EmptyStatePresentational } from 'ui-patterns/EmptyStatePresentational'
+import { Card, ShadowScrollArea, Table, TableBody, TableHeader } from 'ui'
 import { PageContainer } from 'ui-patterns/PageContainer'
 import {
   PageHeader,
