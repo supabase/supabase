@@ -43,6 +43,9 @@ export const pgFunctionZod = z.object({
   return_type: z.string(),
   return_type_relation_id: z.union([z.number(), z.null()]),
   is_set_returning_function: z.boolean(),
+  // Optional for compatibility with function rows sourced from older cached queries.
+  // The SQL read path always returns it.
+  is_strict: z.boolean().optional(),
   behavior: z.union([z.literal('IMMUTABLE'), z.literal('STABLE'), z.literal('VOLATILE')]),
   security_definer: z.boolean(),
   config_params: z.union([z.record(z.string(), z.string()), z.null()]),
@@ -187,6 +190,7 @@ export const pgFunctionCreateZod = z.object({
   language: z.string().optional(),
   return_type: z.string().optional(),
   security_definer: z.boolean().optional(),
+  is_strict: z.boolean().optional(),
 })
 
 // Zod validates `args`, `return_type`, and `config_params` values as runtime
@@ -237,6 +241,14 @@ function qualifiedIdent(value: string): SafeSqlFragment {
     )
 }
 
+/**
+ * Builds the `CREATE FUNCTION` / `CREATE PROCEDURE` statement used by
+ * `create()` and `update()`.
+ *
+ * Procedures omit the return type, volatility, and strictness clauses.
+ * Functions emit `STRICT` when `is_strict` is true, otherwise
+ * `CALLED ON NULL INPUT`.
+ */
 function _generateCreateFunctionSql(
   {
     name,
@@ -248,6 +260,7 @@ function _generateCreateFunctionSql(
     behavior,
     security_definer,
     config_params,
+    is_strict = false,
     type = 'function',
   }: PGFunctionCreate,
   { replace = false } = {}
@@ -273,12 +286,15 @@ function _generateCreateFunctionSql(
     ${isProcedure ? safeSql`` : safeSql`RETURNS ${return_type!}`}
     AS ${literal(definition)}
     LANGUAGE ${keyword(language!)}
-    ${isProcedure ? safeSql`` : safeSql`${keyword(behavior!)} CALLED ON NULL INPUT`}
+    ${isProcedure ? safeSql`` : safeSql`${keyword(behavior!)} ${is_strict ? safeSql`STRICT` : safeSql`CALLED ON NULL INPUT`}`}
     ${security_definer ? safeSql`SECURITY DEFINER` : safeSql`SECURITY INVOKER`}
     ${configParamsFragment};
   `
 }
 
+/**
+ * Returns SQL that creates a function or procedure.
+ */
 export function create({
   name,
   schema = 'public',
@@ -289,6 +305,7 @@ export function create({
   behavior = 'VOLATILE',
   security_definer = false,
   config_params = {},
+  is_strict = false,
   type = 'function',
 }: PGFunctionCreate) {
   const sql = _generateCreateFunctionSql({
@@ -301,6 +318,7 @@ export function create({
     behavior,
     security_definer,
     config_params,
+    is_strict,
     type,
   })
 
@@ -322,6 +340,14 @@ function splitArgumentTypes(argumentTypes: SafeSqlFragment): Array<SafeSqlFragme
   return argumentTypes.split(', ') as Array<SafeSqlFragment>
 }
 
+/**
+ * Returns SQL that updates a function or procedure.
+ *
+ * Definition changes are implemented as `CREATE OR REPLACE`, which needs the
+ * full function metadata. `is_strict` must be present when `definition` is
+ * provided so the regenerated SQL preserves the function's NULL handling;
+ * callers holding a stale row should refetch before updating.
+ */
 export function update(
   currentFunc: PGSavedFunction,
   { name, schema, definition }: PGFunctionUpdate
@@ -329,6 +355,17 @@ export function update(
   const args = splitArgumentTypes(currentFunc.argument_types)
   const identityArgs = currentFunc.identity_argument_types
   const routineKeyword = currentFunc.type === 'procedure' ? safeSql`PROCEDURE` : safeSql`FUNCTION`
+  const isStrict = currentFunc.is_strict
+
+  if (
+    currentFunc.type === 'function' &&
+    typeof definition === 'string' &&
+    typeof isStrict !== 'boolean'
+  ) {
+    throw new Error(
+      'Cannot update the function definition because its strictness is unknown. Refresh the function and try again.'
+    )
+  }
 
   const updateDefinitionSql =
     typeof definition === 'string'
@@ -338,6 +375,7 @@ export function update(
             definition,
             args,
             config_params: currentFunc.config_params ?? {},
+            is_strict: isStrict,
             type: currentFunc.type,
           },
           { replace: true }
