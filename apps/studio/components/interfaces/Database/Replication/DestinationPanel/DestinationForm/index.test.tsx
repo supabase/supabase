@@ -102,6 +102,7 @@ let pipelineTableIds = [101, 999]
 const getPipelineData = (): PipelineResponse => ({
   id: '8',
   tenant_id: 'tenant',
+  cluster_id: 'cluster',
   source_id: 42,
   source_name: 'postgres',
   destination_id: 7,
