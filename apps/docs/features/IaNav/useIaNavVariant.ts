@@ -39,7 +39,8 @@ export function useIaNavVariant(): IaNavVariant {
   const searchParams = useSearchParamsShallow()
   const routeVariant = useIaNavRouteVariant()
   const sessionOverride = useSyncExternalStore(subscribeToNothing, readSessionOverride, () => null)
-  const override = routeVariant ?? searchParams.get(IA_NAV_FLAG) ?? sessionOverride
+  const urlOverride = searchParams.get(IA_NAV_FLAG)
+  const override = routeVariant ?? (isVariant(urlOverride) ? urlOverride : sessionOverride)
   // the value known before the flags load. it is null on the server and on a first visit
   const knownFlag = useSyncExternalStore(subscribeToNothing, readKnownFlag, () => null)
 
