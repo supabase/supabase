@@ -23,6 +23,13 @@
       "dependsOn": ["fetch:federated-content"],
       "inputs": ["$TURBO_DEFAULT$", { "mode": "jit", "globs": ["src/content/**"] }],
       "env": ["VERCEL_ENV", "VERCEL_URL"],
+      "passThroughEnv": [
+        "KB_GITHUB_APP_ID",
+        "KB_GITHUB_APP_INSTALLATION_ID",
+        "KB_GITHUB_APP_PRIVATE_KEY",
+        "SUPABASE_URL",
+        "SUPABASE_SERVICE_ROLE_KEY",
+      ],
       "outputs": ["public/markdown/**"],
     },
     "build": {
@@ -35,7 +42,12 @@
       // PUBLIC_* (client) and other vars such as MISC_URL (server) through import.meta.env.
       // SUPABASE_URL picks the project that src/lib/troubleshooting-db.ts reads metadata from.
       "env": ["NEXT_PUBLIC_*", "PUBLIC_*", "MISC_URL", "SUPABASE_URL", "NODE_ENV", "VERCEL_ENV"],
-      "passThroughEnv": ["SUPABASE_SERVICE_ROLE_KEY"],
+      "passThroughEnv": [
+        "SUPABASE_SERVICE_ROLE_KEY",
+        "KB_GITHUB_APP_ID",
+        "KB_GITHUB_APP_INSTALLATION_ID",
+        "KB_GITHUB_APP_PRIVATE_KEY",
+      ],
       "outputs": ["dist/**"],
     },
     // Write to a remote database, so never cached.

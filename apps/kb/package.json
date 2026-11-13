@@ -2,9 +2,6 @@
   "name": "kb",
   "type": "module",
   "version": "0.0.1",
-  "engines": {
-    "node": ">=22.12.0"
-  },
   "scripts": {
     "dev": "astro dev --port 3008",
     "build": "maybe-turbo astro build",
