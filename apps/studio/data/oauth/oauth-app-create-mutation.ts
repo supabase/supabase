@@ -15,6 +15,9 @@ export type OAuthAppCreateVariables = {
   icon?: string
   scopes: OAuthScope[]
   redirect_uris: string[]
+  grant_kind?: 'organization_bound' | 'member_bound'
+  project_scoping_mode?: boolean
+  allow_partial_grants?: boolean
 }
 
 export type OAuthAppCreateResponse = components['schemas']['CreateOAuthAppResponse_Output']
@@ -26,6 +29,9 @@ export async function createOAuthApp({
   icon,
   scopes,
   redirect_uris,
+  grant_kind,
+  project_scoping_mode,
+  allow_partial_grants,
 }: OAuthAppCreateVariables) {
   const { data, error } = await post('/platform/organizations/{slug}/oauth/apps', {
     params: { path: { slug } },
@@ -35,6 +41,9 @@ export async function createOAuthApp({
       icon,
       scopes,
       redirect_uris,
+      grant_kind,
+      project_scoping_mode,
+      allow_partial_grants,
     },
   })
 
