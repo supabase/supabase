@@ -1,17 +1,16 @@
 {
   "rules": {
-    "shadcn/no-arbitrary-values": 42,
+    "shadcn/no-arbitrary-values": 34,
     "shadcn/no-unknown-classes": 8,
     "shadcn/no-raw-colors": 22
   },
   "ruleFiles": {
     "shadcn/no-arbitrary-values": {
       "components/code-block-wrapper.tsx": 1,
-      "components/code-fragment.tsx": 7,
+      "components/code-fragment.tsx": 5,
       "components/color-palette.tsx": 2,
       "components/command-menu.tsx": 1,
-      "components/component-preview.tsx": 12,
-      "components/mdx-components.tsx": 2,
+      "components/component-preview.tsx": 10,
       "registry/default/example/admonition-button-split.tsx": 2,
       "registry/default/example/assistant-chat-commands.tsx": 2,
       "registry/default/example/button-split-dropdown.tsx": 2,
@@ -21,8 +20,7 @@
       "registry/default/example/drawer-demo.tsx": 1,
       "registry/default/example/page-layout-edge-function.tsx": 1,
       "registry/default/example/toc-demo.tsx": 1,
-      "registry/default/example/toc-single-demo.tsx": 1,
-      "registry/default/example/typography-inline-code.tsx": 2
+      "registry/default/example/toc-single-demo.tsx": 1
     },
     "shadcn/no-unknown-classes": {
       "components/code-block-wrapper.tsx": 1,
