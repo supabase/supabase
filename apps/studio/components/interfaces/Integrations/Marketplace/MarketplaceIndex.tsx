@@ -33,6 +33,7 @@ import { useInstalledIntegrations } from '@/components/interfaces/Integrations/L
 import { useIntegrationFilteringAndSort } from '@/components/interfaces/Integrations/Landing/useIntegrationFilteringAndSort'
 import { AlertError } from '@/components/ui/AlertError'
 import { DocsButton } from '@/components/ui/DocsButton'
+import { NoSearchResults } from '@/components/ui/NoSearchResults'
 import { useMarketplaceCategoriesQuery } from '@/data/marketplace/integration-categories-query'
 import { useLocalStorageQuery } from '@/hooks/misc/useLocalStorage'
 import { DOCS_URL } from '@/lib/constants'
@@ -286,9 +287,7 @@ export const MarketplaceIndex = () => {
             />
 
             {filtered.length === 0 && (
-              <EmptyStatePresentational title="No results found">
-                <Button onClick={clearAll}>Clear filters</Button>
-              </EmptyStatePresentational>
+              <NoSearchResults searchString={search} onResetFilter={clearAll} />
             )}
 
             {filtered.length > 0 &&
