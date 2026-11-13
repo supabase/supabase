@@ -12,10 +12,10 @@ import {
   NavigationMenuViewport,
 } from 'ui'
 
-export interface TopNavMenuProps {
+export type TopNavMenuProps = {
   children: ReactNode
   className?: string
-}
+} & { [key: `data-${string}`]: string | undefined }
 
 export interface TopNavMenuItemProps extends Omit<ComponentProps<'button'>, 'children'> {
   label: ReactNode
@@ -34,7 +34,7 @@ export interface TopNavMenuGroupProps {
 
 // the panel spans the closest positioned parent and its closed edge draws the bar's bottom line,
 // so render the menu inside a `relative` bar with no bottom border of its own on desktop
-export const TopNavMenu = ({ children, className }: TopNavMenuProps) => {
+export const TopNavMenu = ({ children, className, ...dataAttributes }: TopNavMenuProps) => {
   const rootRef = useRef<HTMLElement>(null)
 
   // the panel is as wide as the bar, so its columns start under the first item's text
@@ -58,6 +58,7 @@ export const TopNavMenu = ({ children, className }: TopNavMenuProps) => {
       renderViewport={false}
       onValueChange={handleValueChange}
       className={cn('static h-full items-stretch', className)}
+      {...dataAttributes}
     >
       <NavigationMenuList className="h-full items-stretch space-x-0">{children}</NavigationMenuList>
       <NavigationMenuViewport

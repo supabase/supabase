@@ -50,10 +50,12 @@ export const SimpleConfigurationDetails = ({ bucketName }: { bucketName?: string
       { enabled: canReadAPIKeys }
     )
 
-  const { data: apiKeysData, isSuccess: isSuccessApiKeys } = useQuery({
-    ...revealedApiKeysQueryOptions({ projectRef: project?.ref, grant: apiKeysGrant.grant }),
-    select: getKeys,
-  })
+  const { data: apiKeysData, isSuccess: isSuccessApiKeys } = useQuery(
+    revealedApiKeysQueryOptions(
+      { projectRef: project?.ref, grant: apiKeysGrant.grant },
+      { select: getKeys }
+    )
+  )
 
   const isTokenValid = apiKeysData?.allSecretKeys.some((x) => x.api_key === decryptedToken)
 

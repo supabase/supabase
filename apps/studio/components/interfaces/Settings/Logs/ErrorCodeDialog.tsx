@@ -14,7 +14,7 @@ import {
 import { ShimmeringLoader } from 'ui-patterns/ShimmeringLoader'
 
 import { useErrorCodesQuery } from '@/data/content-api/docs-error-codes-query'
-import { Service, type ErrorCodeQueryQuery } from '@/data/graphql/graphql'
+import type { ErrorCodeQueryQuery, Service } from '@/data/graphql/graphql'
 
 interface ErrorCodeDialogProps {
   open: boolean

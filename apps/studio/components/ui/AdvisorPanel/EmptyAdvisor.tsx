@@ -1,3 +1,4 @@
+import { useFlag } from 'common'
 import { TextSearchIcon } from 'lucide-react'
 import { Button } from 'ui'
 
@@ -37,6 +38,7 @@ export const EmptyAdvisor = ({
   hasFilters,
   onClearFilters,
 }: EmptyAdvisorProps) => {
+  const isIssuesInboxEnabled = useFlag('issuesInbox')
   const singleCategory = categoryFilters.length === 1 ? categoryFilters[0] : undefined
   const canClearFilters = hasFilters || categoryFilters.length > 0
 
@@ -44,7 +46,9 @@ export const EmptyAdvisor = ({
     if (hasFilters) {
       return {
         heading: 'No items found',
-        message: 'No advisor items match your current filters',
+        message: isIssuesInboxEnabled
+          ? 'No issues match your current filters'
+          : 'No advisor items match your current filters',
       }
     }
 

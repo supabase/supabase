@@ -79,7 +79,7 @@ export const CustomDomainConfig = () => {
           <PageSectionSummary>
             <PageSectionTitle>Custom domains</PageSectionTitle>
             <PageSectionDescription>
-              Present a branded experience to your users
+              Present a branded experience to your users.
             </PageSectionDescription>
           </PageSectionSummary>
         </PageSectionMeta>
@@ -100,7 +100,7 @@ export const CustomDomainConfig = () => {
         <PageSectionSummary>
           <PageSectionTitle>Custom domains</PageSectionTitle>
           <PageSectionDescription>
-            Present a branded experience to your users
+            Present a branded experience to your users.
           </PageSectionDescription>
         </PageSectionSummary>
       </PageSectionMeta>

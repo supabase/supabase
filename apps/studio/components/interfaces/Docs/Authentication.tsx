@@ -17,10 +17,9 @@ interface AuthenticationProps {
 const Authentication = ({ selectedLang, showApiKey }: AuthenticationProps) => {
   const { ref: projectRef } = useParams()
   const apiKeysGrant = useGrant('GET /v1/projects/{ref}/api-keys', { projectRef })
-  const { data: apiKeyData } = useQuery({
-    ...apiKeysQueryOptions({ projectRef, grant: apiKeysGrant.grant }),
-    select: getKeys,
-  })
+  const { data: apiKeyData } = useQuery(
+    apiKeysQueryOptions({ projectRef, grant: apiKeysGrant.grant }, { select: getKeys })
+  )
   const { anonKey, serviceKey } = apiKeyData ?? {}
 
   const { data: settings } = useProjectSettingsV2Query({ projectRef })

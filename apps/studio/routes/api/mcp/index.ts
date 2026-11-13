@@ -9,14 +9,6 @@ import { commaSeparatedStringIntoArray, zBooleanString } from '@/lib/api/apiHelp
 import { getSelfHostedPlatform } from '@/lib/api/self-hosted/mcp'
 import { DEFAULT_PROJECT } from '@/lib/constants/api'
 
-// Twin of `pages/api/mcp/index.ts`. Web-fetch rewrite — the
-// pages-router version used the SDK's Node-shaped
-// `StreamableHTTPServerTransport`, which writes directly to the Node
-// `res` and can't run through the buffering `toWebHandler` shim. MCP's
-// `WebStandardStreamableHTTPServerTransport` accepts a Web `Request`
-// and returns a Web `Response` directly, so the handler can pass the
-// request through unmodified.
-
 const supabase = createClient(
   process.env.SUPABASE_URL || 'http://localhost:8000',
   process.env.SUPABASE_PUBLISHABLE_KEY || process.env.SUPABASE_ANON_KEY!,

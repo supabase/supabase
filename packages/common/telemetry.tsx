@@ -27,6 +27,7 @@ import {
 import { TelemetryEvent } from './telemetry-constants'
 import { buildTelemetryEventRequest } from './telemetry-event'
 import { clearFirstTouchData, getFirstTouchData } from './telemetry-first-touch-store'
+import { setTelemetryPlatform, type TelemetryPlatform } from './telemetry-utils'
 
 export { handlePageLeaveTelemetry }
 
@@ -67,6 +68,7 @@ export const TelemetryTagManager = () => {
 
 export const PageTelemetry = ({
   API_URL,
+  platform,
   hasAcceptedConsent,
   enabled = true,
   organizationSlug,
@@ -74,6 +76,7 @@ export const PageTelemetry = ({
   sessionReplay,
 }: {
   API_URL: string
+  platform: TelemetryPlatform
   hasAcceptedConsent: boolean
   enabled?: boolean
   organizationSlug?: string
@@ -81,6 +84,8 @@ export const PageTelemetry = ({
   /** Masking policy for session replay. Omit to disable recording. */
   sessionReplay?: SessionRecordingOptions
 }) => {
+  setTelemetryPlatform(platform)
+
   const router = useRouter()
 
   const pagesPathname = router?.pathname
@@ -130,6 +135,7 @@ export const PageTelemetry = ({
   }, [API_URL, enabled, hasAcceptedConsent, slug, ref])
 
   const hasSentInitialPageTelemetryRef = useRef(false)
+  const lastSentPagesUrlRef = useRef<string | null>(null)
   const previousAppPathnameRef = useRef<string | null>(null)
 
   useEffect(() => {
@@ -165,6 +171,7 @@ export const PageTelemetry = ({
       } finally {
         clearFirstTouchData()
         hasSentInitialPageTelemetryRef.current = true
+        lastSentPagesUrlRef.current = window.location.pathname + window.location.search
       }
     }
   }, [router?.isReady, enabled, hasAcceptedConsent, slug, ref])
@@ -174,6 +181,11 @@ export const PageTelemetry = ({
 
     function handleRouteChange() {
       if (!hasSentInitialPageTelemetryRef.current) return
+      // routeChangeComplete can fire when only the hash changes, and `$current_url` drops the hash,
+      // so that pageview would be an exact repeat.
+      const url = window.location.pathname + window.location.search
+      if (url === lastSentPagesUrlRef.current) return
+      lastSentPagesUrlRef.current = url
       sendPageTelemetry()
     }
 

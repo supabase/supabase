@@ -15,7 +15,6 @@ import { mcpConfigPanelMarkdown as McpConfigPanel } from 'ui-patterns/McpUrlBuil
 
 import { stripHeadingCustomIds } from './helpers'
 import { addBaseUrlPrefix, getInternalLinkBaseUrl, withDocsBasePath } from './internal-links'
-import { AccordionItem } from './markdown-schema/Accordion'
 import { Admonition } from './markdown-schema/Admonition'
 import { AgentSetup } from './markdown-schema/AgentSetup'
 import { AgentWatchSchedule } from './markdown-schema/AgentWatchSchedule'
@@ -179,7 +178,6 @@ function applySchema(parent: Parent, schema: ComponentSchema): void {
  * component not listed is unwrapped (children are kept, wrapper is dropped).
  */
 const SCHEMA: ComponentSchema = {
-  AccordionItem,
   Admonition,
   AgentSetup,
   AgentWatchSchedule,
@@ -250,7 +248,8 @@ async function parseSingleSource(
 }
 
 async function renderManifest(sources: MarkdownSource[]): Promise<void> {
-  const slugs = Array.from(new Set(sources.map((s) => s.slug)))
+  // Sorted so the output is deterministic: turbo hashes this tracked file as a task input.
+  const slugs = Array.from(new Set(sources.map((s) => s.slug))).sort()
   const content = `${JSON.stringify(slugs, null, 2)}\n`
 
   await fs.mkdir(path.dirname(MANIFEST_PATH), { recursive: true })

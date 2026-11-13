@@ -180,7 +180,7 @@ supabase inspect db bloat --remote
 
 ## Reclaiming disk space
 
-To [reclaim the disk space](/kb/troubleshooting/disk-size-not-shrinking-after-deleting-data) freed by deleted rows, Postgres' autovacuum process runs automatically to mark deleted rows as reusable, but it may not always keep up with large deletes.
+To [reclaim the disk space](/kb/troubleshooting/disk-size-not-shrinking-after-deleting-data-135390) freed by deleted rows, Postgres' autovacuum process runs automatically to mark deleted rows as reusable, but it may not always keep up with large deletes.
 
 If autovacuum is not keeping up, you can trigger a manual vacuum:
 

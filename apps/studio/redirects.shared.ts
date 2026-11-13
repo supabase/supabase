@@ -283,6 +283,11 @@ export const SHARED_REDIRECTS: StudioRedirect[] = [
     permanent: true,
   },
   {
+    source: '/project/:ref/advisors',
+    destination: '/project/:ref/advisors/security',
+    permanent: true,
+  },
+  {
     source: '/project/:ref/advisors/query-performance',
     destination: '/project/:ref/observability/query-performance',
     permanent: true,
@@ -299,7 +304,7 @@ export const SHARED_REDIRECTS: StudioRedirect[] = [
   },
   {
     source: '/project/:ref/database/linter',
-    destination: '/project/:ref/database/security-advisor',
+    destination: '/project/:ref/advisors/security',
     permanent: true,
   },
   {
@@ -388,9 +393,9 @@ export const SHARED_REDIRECTS: StudioRedirect[] = [
 // page doesn't depend on either.
 export const MAINTENANCE_PASSTHROUGH_SEGMENTS = [
   'maintenance',
-  // Build output. Next chunks (`/_next`, which Next also never redirects
-  // itself) are served from the app when no asset CDN is configured. Vite's
-  // chunks are under `/assets`, or `/_vercel/immutable/<salt>/nitro` on Vercel.
+  // Build output. Next chunks are under `/_next` (which Next also never
+  // redirects itself). Vite's chunks are under `/assets`, or
+  // `/_vercel/immutable/<salt>/nitro` on Vercel.
   '_next',
   '_vercel',
   'assets',

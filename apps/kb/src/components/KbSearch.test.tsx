@@ -46,7 +46,7 @@ const resultsState: DocsSearchV2State = {
   status: 'results',
   key: 1,
   results: [result('/kb/guides/a'), result('/kb/guides/b'), result('/kb/guides/c')],
-  query: 'secret query',
+  query: 'storage policies',
 }
 
 describe('KbSearch telemetry', () => {
@@ -93,15 +93,32 @@ describe('KbSearch telemetry', () => {
       keepalive: init.keepalive,
     }))
 
-  it('sends kb_search_submitted with counts and no query text', () => {
+  const sentActions = () => sent().map(({ action }) => action)
+
+  const sentWith = (action: string) => sent().filter((event) => event.action === action)
+
+  const pressShortcut = () =>
+    act(() => {
+      window.dispatchEvent(new KeyboardEvent('keydown', { key: 'k', metaKey: true }))
+    })
+
+  const pressEscape = () =>
+    act(() => {
+      document.activeElement?.dispatchEvent(
+        new KeyboardEvent('keydown', { key: 'Escape', bubbles: true })
+      )
+    })
+
+  it('sends kb_search_submitted with the query text and counts', () => {
     renderWithState(resultsState)
 
-    expect(sent()).toHaveLength(1)
-    expect(sent()[0]).toMatchObject({
-      action: 'kb_search_submitted',
-      custom_properties: { queryLength: 12, resultCount: 3, hasResults: true },
+    expect(sentWith('kb_search_submitted')).toHaveLength(1)
+    expect(sentWith('kb_search_submitted')[0].custom_properties).toEqual({
+      query: 'storage policies',
+      queryLength: 16,
+      resultCount: 3,
+      hasResults: true,
     })
-    expect(JSON.stringify(sent()[0].custom_properties)).not.toContain('secret')
   })
 
   it('posts to the telemetry endpoint with cookies and no auth header', () => {
@@ -121,16 +138,17 @@ describe('KbSearch telemetry', () => {
     { status: 'initial', key: 0 },
     { status: 'loading', key: 1, staleResults: [], staleQuery: '' },
     { status: 'error', key: 1, message: 'failed' },
-  ])('sends nothing while the search is $status', (state) => {
+  ])('sends no search event while the search is $status', (state) => {
     renderWithState(state)
 
-    expect(fetchMock).not.toHaveBeenCalled()
+    expect(sentActions()).toEqual(['kb_search_opened'])
   })
 
   it('reports a search with no results', () => {
     renderWithState({ status: 'noResults', key: 1, query: 'zzz' })
 
-    expect(sent()[0].custom_properties).toEqual({
+    expect(sentWith('kb_search_submitted')[0].custom_properties).toEqual({
+      query: 'zzz',
       queryLength: 3,
       resultCount: 0,
       hasResults: false,
@@ -143,11 +161,88 @@ describe('KbSearch telemetry', () => {
     link.addEventListener('click', (event) => event.preventDefault())
     act(() => link.click())
 
-    expect(sent()[1]).toMatchObject({
-      action: 'kb_search_result_clicked',
+    expect(sentWith('kb_search_result_clicked')[0]).toMatchObject({
       custom_properties: { resultPath: '/kb/guides/b', resultPosition: 2, resultCount: 3 },
       keepalive: true,
     })
+  })
+
+  it('sends kb_search_opened with search_input when a search button opens the dialog', () => {
+    renderWithState({ status: 'initial', key: 0 })
+
+    expect(sent()).toEqual([
+      expect.objectContaining({
+        action: 'kb_search_opened',
+        custom_properties: { triggerType: 'search_input' },
+      }),
+    ])
+  })
+
+  it('sends one kb_search_opened when a search button is clicked while the dialog is open', () => {
+    renderWithState({ status: 'initial', key: 0 })
+    act(() => openKbSearch())
+
+    expect(sentActions()).toEqual(['kb_search_opened'])
+  })
+
+  it('sends kb_search_opened and kb_search_closed for the keyboard shortcut', () => {
+    search.state = { status: 'initial', key: 0 }
+    const container = document.createElement('div')
+    document.body.appendChild(container)
+    root = createRoot(container)
+    act(() => root!.render(<KbSearch />))
+
+    pressShortcut()
+    pressShortcut()
+
+    expect(sent()).toEqual([
+      expect.objectContaining({
+        action: 'kb_search_opened',
+        custom_properties: { triggerType: 'keyboard_shortcut' },
+      }),
+      expect.objectContaining({
+        action: 'kb_search_closed',
+        custom_properties: { closeReason: 'dismissed' },
+      }),
+    ])
+  })
+
+  it('sends kb_search_closed with dismissed when Escape closes the dialog', () => {
+    renderWithState({ status: 'initial', key: 0 })
+    pressEscape()
+
+    expect(sentWith('kb_search_closed')).toEqual([
+      expect.objectContaining({ custom_properties: { closeReason: 'dismissed' } }),
+    ])
+  })
+
+  it('sends kb_search_closed with result_navigated and keepalive when a result is clicked', () => {
+    renderWithState(resultsState)
+    const link = document.querySelector<HTMLAnchorElement>('a[href="/kb/guides/b"]')!
+    link.addEventListener('click', (event) => event.preventDefault())
+    act(() => link.click())
+
+    expect(sentWith('kb_search_closed')).toEqual([
+      expect.objectContaining({
+        custom_properties: { closeReason: 'result_navigated' },
+        keepalive: true,
+      }),
+    ])
+  })
+
+  it('sends kb_search_closed with result_navigated when Enter opens a result', () => {
+    renderWithState(resultsState)
+    const input = document.querySelector<HTMLInputElement>('[role="dialog"] input')!
+    act(() => {
+      input.dispatchEvent(new KeyboardEvent('keydown', { key: 'Enter', bubbles: true }))
+    })
+
+    expect(sentWith('kb_search_closed')).toEqual([
+      expect.objectContaining({
+        custom_properties: { closeReason: 'result_navigated' },
+        keepalive: true,
+      }),
+    ])
   })
 
   it('sends nothing without consent', () => {
