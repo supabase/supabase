@@ -11,6 +11,7 @@ import { defineConfig } from 'astro/config'
 import { BASE_PATH } from './src/lib/constants.ts'
 import rehypeAdmonitions from './src/lib/mdx/rehype-admonitions.js'
 import { sharedCodeBlock } from './src/lib/mdx/shiki-code-block.ts'
+import { getSitemapLastmods } from './src/lib/sitemap-lastmod.ts'
 import { codeBlockTheme } from 'ui-patterns/CodeBlock/CodeBlock.theme'
 
 // Absolute dir of lodash-es, for the lodash alias below (same fix
@@ -43,6 +44,9 @@ const nextPublicEnv = Object.fromEntries(
   Object.entries(process.env).filter(([key]) => key.startsWith('NEXT_PUBLIC_'))
 )
 
+// Loaded once per config evaluation: article URL -> last-modified date for the sitemap.
+const sitemapLastmods = await getSitemapLastmods()
+
 // https://astro.build/config
 export default defineConfig({
   site: 'https://supabase.com',
@@ -56,7 +60,12 @@ export default defineConfig({
         rehypePlugins: [rehypeAdmonitions],
       }),
     }),
-    sitemap(),
+    sitemap({
+      serialize(item) {
+        const lastmod = sitemapLastmods.get(item.url)
+        return lastmod ? { ...item, lastmod } : item
+      },
+    }),
   ],
   vite: {
     // Client only: a top-level `define` would also replace `process.env` in server code that reads SUPABASE_SERVICE_ROLE_KEY.

@@ -222,4 +222,23 @@ describe('renderSitemapMarkdown', () => {
       ].join('\n\n') + '\n'
     )
   })
+
+  it('appends the display date to entries that have one', () => {
+    const markdown = renderSitemapMarkdown({
+      topics: [],
+      guides: [
+        {
+          title: 'Dated guide',
+          url: 'https://supabase.com/kb/guides/dated.md',
+          updated: 'Sep 24, 2026',
+        },
+      ],
+      faqs: [],
+      troubleshooting: [],
+    })
+
+    expect(markdown).toContain(
+      '- [Dated guide](https://supabase.com/kb/guides/dated.md) (updated Sep 24, 2026)'
+    )
+  })
 })
