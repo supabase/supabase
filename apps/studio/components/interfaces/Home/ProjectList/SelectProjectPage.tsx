@@ -1,7 +1,6 @@
+import { useLocation } from '@tanstack/react-router'
 import { IS_PLATFORM, useParams } from 'common'
 import { AlertTriangleIcon } from 'lucide-react'
-import { NextPage } from 'next'
-import { useRouter } from 'next/router'
 import { useEffect, useState } from 'react'
 import {
   Alert,
@@ -15,7 +14,6 @@ import {
 } from 'ui'
 import { ShimmeringLoader } from 'ui-patterns/ShimmeringLoader'
 
-import { parseCatchAllRoute } from '@/compat/next/router'
 import {
   Header,
   LoadingCardView,
@@ -33,13 +31,16 @@ import { withAuth } from '@/hooks/misc/withAuth'
 // like a proxy to the project specific pages, and we let those pages handle
 // any route validation logic instead
 
-const GenericProjectPage: NextPage = () => {
-  const router = useRouter()
+function SelectProject() {
+  const { pathname, searchStr } = useLocation()
+  // `/project/_/billing` → ['billing']; the splat route nests under the `/project/_` route,
+  // which renders this page, so the trailing path is read from the location
+  const trailingSegments = pathname
+    .replace(/^\/project\/_\/?/, '')
+    .split('/')
+    .filter(Boolean)
+  const routeSlug = trailingSegments.length > 0 ? trailingSegments : undefined
   const { slug } = useParams()
-  // Normalise the catch-all path across Next (`routeSlug: string[]`) and
-  // TanStack (`_splat: string`) so downstream URL building
-  // (urlRewriterFactory) keeps working — see parseCatchAllRoute.
-  const { segments: routeSlug, queryParams } = parseCatchAllRoute(router.query, 'routeSlug')
 
   const { lastVisitedOrganization } = useLastVisitedOrganization()
 
@@ -57,9 +58,7 @@ const GenericProjectPage: NextPage = () => {
   )
   const selectedOrganization = organizations.find((x) => x.slug === selectedSlug)
 
-  const query = Object.keys(queryParams).length
-    ? `?${new URLSearchParams(queryParams as Record<string, string>)}`
-    : undefined
+  const query = searchStr || undefined
 
   const urlRewriterFactory = (slug: string | string[] | undefined) => {
     return (projectRef: string) => {
@@ -136,4 +135,4 @@ const GenericProjectPage: NextPage = () => {
   )
 }
 
-export default withAuth(GenericProjectPage)
+export const SelectProjectPage = withAuth(SelectProject)
