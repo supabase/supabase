@@ -20,8 +20,11 @@ import { createApiResponseWaiter, waitForApiResponse } from '../utils/wait-for-r
  */
 const openEntityContextMenu = async (page: Page, entityName: string) => {
   const entityButton = page.getByRole('button', { name: `View ${entityName}`, exact: true })
-  await entityButton.click()
-  await entityButton.hover()
+  // Interact at the row's left padding: the centre can land on the Unrestricted badge, whose
+  // right-side tooltip then covers the menu button and intercepts the click
+  const rowEdge = { position: { x: 4, y: 14 } }
+  await entityButton.click(rowEdge)
+  await entityButton.hover(rowEdge)
   const menuButton = entityButton.locator('button[aria-haspopup="menu"]')
   await expect(menuButton).toBeVisible({ timeout: 30000 })
   await menuButton.click()
