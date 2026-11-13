@@ -267,6 +267,7 @@ export const EntityListItem = ({
               <ButtonTooltip
                 variant="text"
                 className="h-6 py-0 px-1 space-x-1 text-foreground-lighter"
+                aria-label={`View ${partitionCount} ${pluralize(partitionCount, 'partition')}`}
                 iconRight={<LayersIcon />}
                 tooltip={{
                   content: {
