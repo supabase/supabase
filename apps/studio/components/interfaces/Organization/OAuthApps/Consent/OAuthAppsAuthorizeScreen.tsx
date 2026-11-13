@@ -6,7 +6,6 @@ import { TimestampInfo } from 'ui-patterns/TimestampInfo'
 import { AuthorizeSuccessScreen } from './AuthorizeSuccessScreen'
 import { AuthorizingAsCard } from './AuthorizingAsCard'
 import { NoProjectsNotice } from './NoProjectsNotice'
-import { CONSENT_COPY } from './OAuthAppsAuthorizeScreen.utils'
 import { MAX_SELECTED_PROJECTS, ProjectMultiSelect } from './ProjectMultiSelect'
 import { ScopeGroupCard } from './ScopeGroupCard'
 import { ScopeGroupCardWithDiff } from './ScopeGroupCardWithDiff'
@@ -323,15 +322,19 @@ export const OAuthAppsAuthorizeScreen = ({
         {preflightQuery.data?.status === 'error' && (
           <Admonition
             type="warning"
-            title={CONSENT_COPY.roleFailureAllProjects.title(request.name)}
-            description={CONSENT_COPY.roleFailureAllProjects.description(memberOrg)}
+            title={`Couldn't authorize ${request.name}`}
+            description={`Your Read-only role in ${memberOrg} can't grant write access. Ask an admin to change your role, or switch organization.`}
           />
         )}
         {hasRoleFailure && (
           <Admonition
             type="warning"
-            title={CONSENT_COPY.roleFailure.title(flaggedRefs.length)}
-            description={CONSENT_COPY.roleFailure.description(request.name)}
+            title={
+              flaggedRefs.length === 1
+                ? "Couldn't authorize 1 project"
+                : `Couldn't authorize ${flaggedRefs.length} projects`
+            }
+            description={`${request.name} needs write access but your role is read-only on the projects highlighted. Deselect them to continue.`}
           />
         )}
 
@@ -358,7 +361,9 @@ export const OAuthAppsAuthorizeScreen = ({
                 selectedRefs={selectedProjectRefs}
                 onChange={setSelectedProjectRefs}
                 maxSelected={MAX_SELECTED_PROJECTS}
-                error={hasNoSelection ? CONSENT_COPY.selectionRequired : undefined}
+                error={
+                  hasNoSelection ? 'Must select at least one project to authorize.' : undefined
+                }
                 flaggedRefs={flaggedRefs}
                 unavailableRefs={getFailedProjects(roleFailure).map((project) => project.ref)}
                 allProjectsSelected={allProjectsSelected}
@@ -393,8 +398,8 @@ export const OAuthAppsAuthorizeScreen = ({
               {grantKind === 'organization_bound' && (
                 <Admonition
                   type="default"
-                  title={CONSENT_COPY.organizationBoundGrant.title}
-                  description={CONSENT_COPY.organizationBoundGrant.description(request.name)}
+                  title="Want this scoped to one member?"
+                  description={`Have them authorize ${request.name} from their own account. Authorizing here gives it your Administrator access on every project, including ones created later.`}
                 />
               )}
             </>
