@@ -1,8 +1,5 @@
-import { useIsLoggedIn, useParams } from 'common'
 import { TerminalIcon } from 'lucide-react'
-import Head from 'next/head'
 import Link from 'next/link'
-import { useRouter } from 'next/router'
 import { useEffect, useEffectEvent, useRef, useState, type ReactNode } from 'react'
 import { Button, Card, CardContent } from 'ui'
 import { Admonition } from 'ui-patterns/Admonition'
@@ -18,12 +15,7 @@ import {
 import CopyButton from '@/components/ui/CopyButton'
 import { InlineLink } from '@/components/ui/InlineLink'
 import { createCliLoginSession } from '@/data/cli/login'
-import { withAuth } from '@/hooks/misc/withAuth'
-import { buildStudioPageTitle } from '@/lib/page-title'
 import { useProfile } from '@/lib/profile'
-import type { NextPageWithLayout } from '@/types'
-
-const PAGE_TITLE = buildStudioPageTitle({ section: 'Authorize CLI', brand: 'Supabase' })
 
 const CliLogo = () => (
   <LogoBox className="bg-black">
@@ -62,31 +54,6 @@ function getErrorMessage(error: unknown): string {
   return 'Unknown error'
 }
 
-const CliLoginPage: NextPageWithLayout = () => {
-  const router = useRouter()
-  const { session_id, public_key, token_name, device_code } = useParams()
-  const isLoggedIn = useIsLoggedIn()
-
-  if (!router.isReady) return null
-
-  return (
-    <>
-      <Head>
-        <title>{PAGE_TITLE}</title>
-      </Head>
-      <CliLoginScreen
-        isLoggedIn={isLoggedIn}
-        routerReady={router.isReady}
-        sessionId={session_id}
-        publicKey={public_key}
-        tokenName={token_name}
-        deviceCode={device_code}
-        navigate={(destination) => router.push(destination)}
-      />
-    </>
-  )
-}
-
 type CliLoginStatus =
   | { _tag: 'loading' }
   | { _tag: 'ready'; deviceCode: string }
@@ -95,7 +62,6 @@ type CliLoginStatus =
 
 export const CliLoginScreen = ({
   isLoggedIn,
-  routerReady,
   sessionId,
   publicKey,
   tokenName,
@@ -103,7 +69,6 @@ export const CliLoginScreen = ({
   navigate: navigateProp,
 }: {
   isLoggedIn: boolean
-  routerReady: boolean
   sessionId?: string
   publicKey?: string
   tokenName?: string
@@ -119,7 +84,7 @@ export const CliLoginScreen = ({
   const displayName = profile?.primary_email ?? profile?.username
 
   useEffect(() => {
-    if (!isLoggedIn || !routerReady) return
+    if (!isLoggedIn) return
     if (deviceCode) {
       setStatus({ _tag: 'ready', deviceCode })
       return
@@ -167,7 +132,7 @@ export const CliLoginScreen = ({
     return () => {
       isActive = false
     }
-  }, [deviceCode, isLoggedIn, publicKey, routerReady, sessionId, tokenName])
+  }, [deviceCode, isLoggedIn, publicKey, sessionId, tokenName])
 
   if (status._tag === 'loading') {
     return (
@@ -286,5 +251,3 @@ export const CliLoginScreen = ({
     </CliLoginInterstitial>
   )
 }
-
-export default withAuth(CliLoginPage)
