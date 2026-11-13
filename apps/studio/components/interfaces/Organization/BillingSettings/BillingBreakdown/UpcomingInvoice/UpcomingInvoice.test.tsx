@@ -236,6 +236,29 @@ describe('UpcomingInvoice', () => {
     expect(screen.getByText('$2.00')).toBeInTheDocument()
   })
 
+  test('shows tax without an amount when it could not be calculated', async () => {
+    await renderUpcomingInvoice(
+      createUpcomingInvoice({
+        taxes: { status: 'failed', expectedAtEndOfCycle: 2, percentage: 8 },
+      })
+    )
+
+    expect(screen.getByText('Tax')).toBeInTheDocument()
+    expect(screen.getByRole('button', { name: 'Tax could not be calculated' })).toBeInTheDocument()
+    expect(screen.queryByText('Tax (8%)')).not.toBeInTheDocument()
+    expect(screen.queryByText('$2.00')).not.toBeInTheDocument()
+  })
+
+  test('hides tax when it does not apply', async () => {
+    await renderUpcomingInvoice(
+      createUpcomingInvoice({
+        taxes: { status: 'not_applicable', expectedAtEndOfCycle: 0, percentage: 0 },
+      })
+    )
+
+    expect(screen.queryByText(/^Tax/)).not.toBeInTheDocument()
+  })
+
   test('notes that the plan fee was paid in advance when it is missing from an in-arrears invoice', async () => {
     await renderUpcomingInvoice(
       createUpcomingInvoice({

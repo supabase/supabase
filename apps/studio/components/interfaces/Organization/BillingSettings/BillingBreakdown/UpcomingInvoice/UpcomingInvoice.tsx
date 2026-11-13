@@ -1,8 +1,17 @@
 import dayjs from 'dayjs'
-import { ChevronRightIcon } from 'lucide-react'
+import { AlertTriangleIcon, ChevronRightIcon } from 'lucide-react'
 import { ReactNode } from 'react'
 import { useInView } from 'react-intersection-observer'
-import { Accordion, AccordionContent, AccordionItem, AccordionTrigger, cn } from 'ui'
+import {
+  Accordion,
+  AccordionContent,
+  AccordionItem,
+  AccordionTrigger,
+  cn,
+  Tooltip,
+  TooltipContent,
+  TooltipTrigger,
+} from 'ui'
 import { InfoTooltip } from 'ui-patterns/info-tooltip'
 import { ShimmeringLoader } from 'ui-patterns/ShimmeringLoader'
 
@@ -75,7 +84,8 @@ export const UpcomingInvoice = ({ slug }: UpcomingInvoiceProps) => {
 
   const hasAppliedCustomerBalance = invoice.appliedCustomerBalance !== 0
 
-  const hasTax = invoice.taxes.status === 'calculated'
+  const taxesWereCalculated = invoice.taxes.status === 'calculated'
+  const taxCalculationHasFailed = invoice.taxes.status === 'failed'
 
   const hasProjectedCosts =
     invoice.projectedCosts.projectedInRemainingCycle !== 0 &&
@@ -100,101 +110,100 @@ export const UpcomingInvoice = ({ slug }: UpcomingInvoiceProps) => {
   }))
 
   return (
-    <div ref={ref}>
+    <div ref={ref} className="w-full text-sm">
       <Accordion type="multiple" defaultValue={['current-costs']}>
-        <div className="w-full text-sm">
-          <Accordion type="multiple" defaultValue={['current-costs']}>
-            <InvoiceSection
-              value="current-costs"
-              title="Costs to Date"
-              tooltip="Fixed fees and usage costs accumulated from the start of the billing cycle up until now."
-              amount={invoice.currentCosts.actualInElapsedCycle}
-            >
-              <InvoiceLineItemList lineItems={allCurrentLineItems} />
-            </InvoiceSection>
+        <InvoiceSection
+          value="current-costs"
+          title="Costs to Date"
+          tooltip="Fixed fees and usage costs accumulated from the start of the billing cycle up until now."
+          amount={invoice.currentCosts.actualInElapsedCycle}
+        >
+          <InvoiceLineItemList lineItems={allCurrentLineItems} />
+        </InvoiceSection>
 
-            {hasProjectedCosts && (
-              <InvoiceSection
-                value="projected-costs"
-                title="Projected Costs"
-                tooltip="Estimated costs for the rest of the billing cycle. Includes predictable costs like Compute Hours, IPv4, Custom Domain and Point-in-Time Recovery. Does not include usage-based metrics like MAU, storage or function invocations. Final amounts depend on your usage."
-                amount={invoice.projectedCosts.projectedInRemainingCycle}
-              >
-                <InvoiceLineItemList lineItems={projectedUsageLineItems} />
-              </InvoiceSection>
-            )}
-          </Accordion>
-
-          {(hasMinimumFeeTopUp || hasMetMinimumFeeThreshold) && (
-            <InvoiceTotalRow
-              title={invoice.minimum_fee.prorated ? 'Minimum Fee (prorated)' : 'Minimum Fee'}
-              tooltip={getMinimumFeeTooltip(invoice.minimum_fee)}
-              amount={invoice.minimum_fee.expectedAtEndOfCycle}
-              amountBeforeDiscount={
-                hasMetMinimumFeeThreshold
-                  ? (invoice.minimum_fee.floorPrice ?? undefined)
-                  : undefined
-              }
-            />
-          )}
-
-          {hasPrepaidCredits && (
-            <InvoiceTotalRow
-              title="Prepaid Credits"
-              tooltip={<PrepaidCreditsTooltip prepaidCredits={invoice.prepaidCredits} />}
-              amount={-prepaidCreditsApplied}
-            />
-          )}
-
-          <InvoiceTotalRow
-            title="Subtotal"
-            amount={invoice.total.gross.expectedAtEndOfCycle}
-            isEmphasized
-          />
-
-          {hasTax && (
-            <InvoiceTotalRow
-              title={
-                invoice.taxes.expectedAtEndOfCycle === 0
-                  ? 'Tax'
-                  : `Tax (${invoice.taxes.percentage}%)`
-              }
-              tooltip="Estimated based on your organization's billing address. The final amount may differ at the end of the billing cycle."
-              amount={invoice.taxes.expectedAtEndOfCycle}
-            />
-          )}
-
-          {hasAppliedCustomerBalance && (
-            <InvoiceTotalRow
-              title={invoice.appliedCustomerBalance < 0 ? 'Account Balance' : 'Owed Balance'}
-              tooltip={
-                invoice.appliedCustomerBalance < 0
-                  ? 'Credited balance from earlier billing changes, such as mid-cycle plan changes, applied to this invoice.'
-                  : 'Owed balance from earlier billing changes or invoices that were too small to be charged directly.'
-              }
-              amount={invoice.appliedCustomerBalance}
-            />
-          )}
-
-          <InvoiceTotalRow
-            title={`Projected Total (due on ${dayjs(invoice.billing_cycle_end).format('MMMM Do')})`}
-            tooltip="The estimated amount we expect to charge at the end of the billing cycle. The final amount depends on your usage."
-            amount={invoice.total.net.expectedAtEndOfCycle}
-            isEmphasized
-          />
-
-          {isPlanFeePaidInAdvance && (
-            <p className="pt-2 text-foreground-light text-xs text-right">
-              <span>Your </span>
-              {organization?.plan?.name && <span>{organization.plan.name} </span>}
-              <span>
-                Plan fee for this period has already been paid. This invoice will only reflect usage
-                charges.
-              </span>
-            </p>
-          )}
-        </div>
+        {hasProjectedCosts && (
+          <InvoiceSection
+            value="projected-costs"
+            title="Projected Costs"
+            tooltip="Estimated costs for the rest of the billing cycle. Includes predictable costs like Compute Hours, IPv4, Custom Domain and Point-in-Time Recovery. Does not include usage-based metrics like MAU, storage or function invocations. Final amounts depend on your usage."
+            amount={invoice.projectedCosts.projectedInRemainingCycle}
+          >
+            <InvoiceLineItemList lineItems={projectedUsageLineItems} />
+          </InvoiceSection>
+        )}
       </Accordion>
+
+      {(hasMinimumFeeTopUp || hasMetMinimumFeeThreshold) && (
+        <InvoiceTotalRow
+          title={invoice.minimum_fee.prorated ? 'Minimum Fee (prorated)' : 'Minimum Fee'}
+          tooltip={getMinimumFeeTooltip(invoice.minimum_fee)}
+          amount={invoice.minimum_fee.expectedAtEndOfCycle}
+          amountBeforeDiscount={
+            hasMetMinimumFeeThreshold ? (invoice.minimum_fee.floorPrice ?? undefined) : undefined
+          }
+        />
+      )}
+
+      {hasPrepaidCredits && (
+        <InvoiceTotalRow
+          title="Prepaid Credits"
+          tooltip={<PrepaidCreditsTooltip prepaidCredits={invoice.prepaidCredits} />}
+          amount={-prepaidCreditsApplied}
+        />
+      )}
+
+      <InvoiceTotalRow
+        title="Subtotal"
+        amount={invoice.total.gross.expectedAtEndOfCycle}
+        isEmphasized
+      />
+
+      {taxesWereCalculated && (
+        <InvoiceTotalRow
+          title={
+            invoice.taxes.expectedAtEndOfCycle === 0 ? 'Tax' : `Tax (${invoice.taxes.percentage}%)`
+          }
+          tooltip="Estimated based on your organization's billing address. The final amount may differ at the end of the billing cycle."
+          amount={invoice.taxes.expectedAtEndOfCycle}
+        />
+      )}
+      {taxCalculationHasFailed && (
+        <InvoiceFailedToCalculateRow
+          title={'Tax'}
+          tooltip="We couldn't estimate tax for your organization right now. Make sure your billing address in your organization's billing settings is complete and correct."
+        />
+      )}
+
+      {hasAppliedCustomerBalance && (
+        <InvoiceTotalRow
+          title={invoice.appliedCustomerBalance < 0 ? 'Account Balance' : 'Owed Balance'}
+          tooltip={
+            invoice.appliedCustomerBalance < 0
+              ? 'Credited balance from earlier billing changes, such as mid-cycle plan changes, applied to this invoice.'
+              : 'Owed balance from earlier billing changes or invoices that were too small to be charged directly.'
+          }
+          amount={invoice.appliedCustomerBalance}
+        />
+      )}
+
+      {/* Format in UTC so the due date matches the date on the invoice PDF, regardless of the viewer's timezone */}
+      <InvoiceTotalRow
+        title={`Projected Total (due on ${dayjs.utc(invoice.billing_cycle_end).format('MMMM Do')})`}
+        tooltip="The estimated amount we expect to charge at the end of the billing cycle. The final amount depends on your usage."
+        amount={invoice.total.net.expectedAtEndOfCycle}
+        isEmphasized
+      />
+
+      {isPlanFeePaidInAdvance && (
+        <p className="pt-2 text-foreground-light text-xs text-right">
+          <span>Your </span>
+          {organization?.plan?.name && <span>{organization.plan.name} </span>}
+          <span>
+            Plan fee for this period has already been paid. This invoice will only reflect usage
+            charges.
+          </span>
+        </p>
+      )}
     </div>
   )
 }
@@ -429,6 +438,40 @@ function InvoiceAmountRow({
   )
 }
 
+function InvoiceFailedToCalculateRow({
+  title,
+  tooltip,
+  isEmphasized = false,
+}: {
+  title: string
+  tooltip: ReactNode
+  isEmphasized?: boolean
+}) {
+  return (
+    <div
+      className={cn('flex items-center justify-between py-2 border-b', isEmphasized && 'font-bold')}
+    >
+      <div className="flex items-center gap-1">
+        <span>{title}</span>
+        <Tooltip>
+          <TooltipTrigger type="button" className="flex">
+            <AlertTriangleIcon
+              aria-hidden="true"
+              className="text-warning"
+              size={14}
+              strokeWidth={2}
+            />
+            <span className="sr-only">{`${title} could not be calculated`}</span>
+          </TooltipTrigger>
+          <TooltipContent className="max-w-sm">{tooltip}</TooltipContent>
+        </Tooltip>
+      </div>
+      <span aria-hidden="true">-</span>
+      <span className="sr-only">Not available</span>
+    </div>
+  )
+}
+
 function InvoiceTotalRow({
   title,
   tooltip,
@@ -495,8 +538,9 @@ function PrepaidCreditsTooltip({
         )}
         {prepaidCredits.kind === 'without_forecast' && (
           <span>
-            " We can't estimate accurately how many credits you will consume before the billing
-            cycle ends."
+            {' '}
+            We can't estimate accurately how many credits you will consume before the billing cycle
+            ends.
           </span>
         )}
       </p>
