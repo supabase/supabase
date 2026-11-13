@@ -446,7 +446,12 @@ describe('project creation wizard', () => {
       mockWizardEndpoints({
         organizations: [mockOrg({ plan: { id: 'free', name: 'Free' } })],
         freeProjectLimitMembers: [
-          { free_project_limit: 2, primary_email: 'member@example.com', username: 'member-1' },
+          {
+            free_project_limit: 2,
+            primary_email: 'member@example.com',
+            username: 'member-1',
+            free_plan_organizations: [],
+          },
         ],
       })
       addAPIMock({ method: 'get', path: '/platform/organizations/:slug/members', response: [] })
