@@ -1,14 +1,17 @@
 import { createFileRoute } from '@tanstack/react-router'
 
-import SupportPage from '@/pages/support/new'
+import { SupportFormPage } from '@/components/interfaces/Support/SupportFormPage'
+import { withAuth } from '@/hooks/misc/withAuth'
 
 export const Route = createFileRoute('/_app/support/new')({
   component: SupportNewRoute,
   // _app shell reads hideMobileMenu from leaf staticData and forwards it to
-  // DefaultLayout. The Next-side getLayout sets hideMobileMenu on DefaultLayout.
+  // DefaultLayout.
   staticData: { hideMobileMenu: true },
 })
 
 function SupportNewRoute() {
-  return <SupportPage dehydratedState={undefined} />
+  return <SupportPageWithAuth />
 }
+
+const SupportPageWithAuth = withAuth(SupportFormPage)

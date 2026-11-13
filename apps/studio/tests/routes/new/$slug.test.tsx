@@ -9,13 +9,15 @@ import { beforeEach, describe, expect, test, vi } from 'vitest'
 
 import { AUTO_ENABLE_RLS_EVENT_TRIGGER_SQL } from '@/components/interfaces/Database/Triggers/EventTriggersList/EventTriggers.constants'
 import { FGA_PERMISSIONS } from '@/hooks/misc/useCheckPermissionsV2'
+import { Route } from '@/routes/new/$slug'
 import { createMockOrganizationResponse } from '@/tests/helpers'
-import { customRender } from '@/tests/lib/custom-render'
+import { CustomWrapper } from '@/tests/lib/custom-render'
 import { addAPIMock, type APIErrorBody } from '@/tests/lib/msw'
 import { mockPermissions } from '@/tests/lib/msw-permissions'
 import type { PermissionsV2Response } from '@/tests/lib/permissions-fixtures'
 import { createMockProfileContext } from '@/tests/lib/profile-helpers'
 import { routerMock } from '@/tests/lib/route-mock'
+import { renderRoute } from '@/tests/lib/route-render'
 
 type OrganizationResponse = components['schemas']['OrganizationResponse_Output']
 type CreateProjectBody = components['schemas']['CreateProjectBody']
@@ -76,6 +78,16 @@ vi.mock(import('@/lib/constants'), async (importOriginal) => {
     ...actual,
     IS_PLATFORM: true,
   }
+})
+
+vi.mock('@/components/layouts/DefaultLayout', () => ({
+  DefaultLayout: ({ children }: { children: React.ReactNode }) => <>{children}</>,
+}))
+
+// keep the wizard column markup but skip the auth guard
+vi.mock(import('@/components/layouts/WizardLayout'), async (importOriginal) => {
+  const actual = await importOriginal()
+  return { ...actual, default: actual.WizardLayoutWithoutAuth }
 })
 
 const ORG_SLUG = 'default-org'
@@ -300,20 +312,27 @@ const DEFAULT_FLAGS = {
 async function renderWizard(
   options: { flags?: Record<string, boolean | string>; isConfigCatStale?: boolean } = {}
 ) {
-  const { default: Wizard } = await import('@/pages/new/[slug]')
-  return customRender(
-    <FeatureFlagContext.Provider
-      value={{
-        configcat: { ...DEFAULT_FLAGS, ...options.flags },
-        posthog: {},
-        hasLoaded: true,
-        isConfigCatStale: options.isConfigCatStale,
-      }}
-    >
-      <Wizard dehydratedState={undefined} />
-    </FeatureFlagContext.Provider>,
-    { profileContext: createMockProfileContext() }
-  )
+  const profileContext = createMockProfileContext()
+  return renderRoute(Route, {
+    routeId: '/new/$slug',
+    url: `/new/${ORG_SLUG}`,
+    renderOptions: {
+      wrapper: ({ children }) => (
+        <CustomWrapper profileContext={profileContext}>
+          <FeatureFlagContext.Provider
+            value={{
+              configcat: { ...DEFAULT_FLAGS, ...options.flags },
+              posthog: {},
+              hasLoaded: true,
+              isConfigCatStale: options.isConfigCatStale,
+            }}
+          >
+            {children}
+          </FeatureFlagContext.Provider>
+        </CustomWrapper>
+      ),
+    },
+  })
 }
 
 const mockCreateProject = (onRequest?: (body: CreateProjectBody) => void) => {
