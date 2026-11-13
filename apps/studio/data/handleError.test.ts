@@ -153,6 +153,19 @@ describe('handleError — error classification', () => {
       expect(captureException).not.toHaveBeenCalled()
     })
 
+    it('never reports with skipReport, even with alwaysCapture or reportImmediately', async () => {
+      const { reportQueryError } = await import('@/lib/errors/report-studio-error')
+      const err = throwAndCatch(
+        { message: 'not found', code: 404 },
+        { skipReport: true, alwaysCapture: true, reportImmediately: true }
+      )
+      expect(err).toBeInstanceOf(UnclassifiedApiError)
+
+      reportQueryError(err)
+      expect(captureException).not.toHaveBeenCalled()
+      expect(err.errorEventId).toBeUndefined()
+    })
+
     it('reports the fallthrough exactly once and records the event id', () => {
       const err = throwAndCatch(null, { reportImmediately: true })
       expect(err).toBeInstanceOf(UnexpectedError)
