@@ -44,6 +44,6 @@ export const useOAuthApprovalsQuery = <TData = OAuthApprovalsData>(
     queryFn: ({ pageParam }) => getOAuthApprovals({ slug, cursor: pageParam }),
     enabled: enabled && USE_MOCKS && Boolean(slug),
     initialPageParam: cursor,
-    getNextPageParam: (lastPage) => lastPage.pagination.next_cursor,
+    getNextPageParam: (lastPage) => lastPage.links.next,
     ...options,
   })

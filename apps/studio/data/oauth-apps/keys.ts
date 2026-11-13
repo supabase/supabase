@@ -10,8 +10,6 @@ export const oauthAppsKeys = {
       statuses?: string[]
     }
   ) => ['oauth-apps', 'authorize', 'organizations', slug, 'projects', params] as const,
-  orgAppDetails: (slug: string | undefined, appId: string | undefined) =>
-    ['oauth-apps', 'organizations', slug, 'apps', appId, 'grant'] as const,
   preflightValidation: (slug: string | undefined, appId: string | undefined) =>
     ['oauth-apps', 'organizations', slug, 'apps', appId, 'preflight-validation'] as const,
   // cursor omitted (rather than passed as `undefined`) so the cursor-less key is a true prefix
