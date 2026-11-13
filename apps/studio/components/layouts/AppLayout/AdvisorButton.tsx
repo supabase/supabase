@@ -1,5 +1,6 @@
 import { useFlag } from 'common'
-import { CircleAlertIcon, LightbulbIcon } from 'lucide-react'
+import { Issues } from 'icons'
+import { LightbulbIcon } from 'lucide-react'
 import { useMemo } from 'react'
 import { cn } from 'ui'
 
@@ -46,7 +47,7 @@ export const AdvisorButton = ({ projectRef }: { projectRef?: string }) => {
   }
 
   const label = isIssuesInboxEnabled ? 'Issues' : 'Advisor Center'
-  const Icon = isIssuesInboxEnabled ? CircleAlertIcon : LightbulbIcon
+  const Icon = isIssuesInboxEnabled ? Issues : LightbulbIcon
 
   return (
     <div className="relative">

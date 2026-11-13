@@ -4,19 +4,13 @@ import {
   Compute,
   Database,
   EdgeFunctions,
+  Issues,
   Realtime,
   SqlEditor,
   Storage,
   TableEditor,
 } from 'icons'
-import {
-  BlocksIcon,
-  CircleAlertIcon,
-  LightbulbIcon,
-  ListIcon,
-  SettingsIcon,
-  TelescopeIcon,
-} from 'lucide-react'
+import { BlocksIcon, LightbulbIcon, ListIcon, SettingsIcon, TelescopeIcon } from 'lucide-react'
 
 import {
   useIsExplorerEnabled,
@@ -228,7 +222,7 @@ export const generateOtherRoutes = (
       label: isIssuesInboxEnabled ? 'Issues' : 'Advisors',
       disabled: !isProjectActive,
       icon: isIssuesInboxEnabled ? (
-        <CircleAlertIcon size={ICON_SIZE} strokeWidth={ICON_STROKE_WIDTH} />
+        <Issues size={ICON_SIZE} strokeWidth={ICON_STROKE_WIDTH} />
       ) : (
         <LightbulbIcon size={ICON_SIZE} strokeWidth={ICON_STROKE_WIDTH} />
       ),

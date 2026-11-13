@@ -1,5 +1,6 @@
 import { useParams } from 'common'
-import { CircleAlertIcon, ExternalLinkIcon } from 'lucide-react'
+import { Issues } from 'icons'
+import { ExternalLinkIcon } from 'lucide-react'
 import Link from 'next/link'
 import type { ComponentProps, ReactNode } from 'react'
 import { cn } from 'ui'
@@ -89,7 +90,7 @@ const IssueDetailSkeleton = () => (
     toolbar={
       <ExplorerToolbar aria-hidden className="md:h-(--header-height)">
         <ExplorerToolbarIcon>
-          <CircleAlertIcon size={16} strokeWidth={2} />
+          <Issues size={16} strokeWidth={2} />
         </ExplorerToolbarIcon>
         <ShimmeringLoader className="h-3 w-48 py-0" />
       </ExplorerToolbar>
