@@ -39,7 +39,7 @@ export const plans: PricingInformation[] = [
       '1 GB file storage',
       'Community support',
     ],
-    footer: 'Free projects are paused after 1 week of inactivity. Limit of 2 active projects.',
+    footer: 'Free projects are paused after 1 week of inactivity.\nLimit of 2 active projects.',
     cta: 'Start for Free',
   },
   {
@@ -106,7 +106,7 @@ export const plans: PricingInformation[] = [
     ],
     priceLabel: '',
     priceMonthly: 'Custom',
-    preface: '',
+    preface: 'Everything in the Team Plan, plus:',
     cta: 'Contact us',
   },
 ] as const

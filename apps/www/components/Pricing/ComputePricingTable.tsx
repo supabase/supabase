@@ -1,7 +1,7 @@
 import pricingAddOn from '~/data/PricingAddOnTable.json'
 import Link from 'next/link'
 import { Fragment, useMemo } from 'react'
-import { cn } from 'ui'
+import { Badge, cn } from 'ui'
 
 import { isCrossZoneHref } from '@/lib/cross-zone'
 
@@ -17,7 +17,7 @@ const ComputePricingTable = () => {
   return (
     <>
       <div className="p-5">
-        <table className="text-foreground m-0 hidden w-full table-auto overflow-hidden rounded-b lg:table text-xs">
+        <table className="text-foreground m-0 hidden w-full table-auto border-separate border-spacing-0 overflow-hidden rounded-b lg:table text-xs">
           <thead>
             <tr>
               {columnNames.map((column) => (
@@ -28,53 +28,52 @@ const ComputePricingTable = () => {
             </tr>
           </thead>
           <tbody>
-            {pricingAddOn.database.rows.map((row, i) => (
-              <Fragment key={`row-${i}`}>
-                {i === 0 && (
-                  <tr>
-                    <td className="pb-1 bg-border-strong px-3 py-1 -mr-1 border-l-4 border-strong">
-                      <span>First instance is free on paid plans</span>
-                    </td>
-                  </tr>
-                )}
-                <tr
-                  key={i}
-                  className={cn(
-                    i % 2 === 0 ? 'bg-surface-100 rounded-lg' : '',
-                    i === 0 ? 'border-4 border-strong' : ''
-                  )}
+            <tr>
+              <td className="p-0 align-bottom">
+                <span
+                  className="relative block w-fit rounded-t-lg bg-surface-200 px-3 pt-2 pb-1 text-foreground
+                    after:absolute after:bottom-0 after:left-full after:size-2
+                    after:inverted-corner"
                 >
-                  {row.columns.map((column) => (
-                    <td
-                      key={column.key}
-                      className="p-3"
-                      translate={column.key === 'pricing' ? 'no' : undefined}
-                    >
-                      {column.url ? (
-                        isCrossZoneHref(column.url) ? (
-                          <a
-                            href={column.url}
-                            className="underline text-primary hover:text-brand-600"
-                            target="_blank"
-                          >
-                            {column.value}
-                          </a>
-                        ) : (
-                          <Link
-                            href={column.url}
-                            className="underline text-primary hover:text-brand-600"
-                            target="_blank"
-                          >
-                            {column.value}
-                          </Link>
-                        )
+                  First instance free on paid plans
+                </span>
+              </td>
+            </tr>
+            {pricingAddOn.database.rows.map((row, i) => (
+              <tr key={`row-${i}`} className={cn(i > 0 && i % 2 === 0 && 'bg-surface-100')}>
+                {row.columns.map((column) => (
+                  <td
+                    key={column.key}
+                    className={cn(
+                      'p-3',
+                      i === 0 && 'bg-surface-200 first:rounded-bl-lg last:rounded-r-lg'
+                    )}
+                    translate={column.key === 'pricing' ? 'no' : undefined}
+                  >
+                    {column.url ? (
+                      isCrossZoneHref(column.url) ? (
+                        <a
+                          href={column.url}
+                          className="underline text-primary hover:text-brand-600"
+                          target="_blank"
+                        >
+                          {column.value}
+                        </a>
                       ) : (
-                        column.value
-                      )}
-                    </td>
-                  ))}
-                </tr>
-              </Fragment>
+                        <Link
+                          href={column.url}
+                          className="underline text-primary hover:text-brand-600"
+                          target="_blank"
+                        >
+                          {column.value}
+                        </Link>
+                      )
+                    ) : (
+                      column.value
+                    )}
+                  </td>
+                ))}
+              </tr>
             ))}
           </tbody>
         </table>
@@ -98,7 +97,14 @@ const ComputePricingTable = () => {
                       column.key === 'plan' ? 'text-primary pt-16 lg:pt-3' : ''
                     }`}
                   >
-                    {column.value}
+                    {column.key === 'plan' && i === 0 ? (
+                      <span className="flex flex-wrap items-center gap-2">
+                        {column.value}
+                        <Badge variant="success">First instance free on paid plans</Badge>
+                      </span>
+                    ) : (
+                      column.value
+                    )}
                   </td>
                 </tr>
               ))}

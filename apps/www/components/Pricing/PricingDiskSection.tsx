@@ -33,16 +33,16 @@ const PricingDiskSection = () => (
       </p>
     </div>
     <Panel outerClassName="gap-4 mx-auto max-w-6xl">
-      <div>
+      <div className="px-2 pb-2">
         <table className="text-foreground m-0 hidden w-full table-auto overflow-hidden rounded-b lg:table text-sm">
           <thead>
             <tr>
               <th></th>
-              <th className="p-3 text-left font-medium">Max Size</th>
-              <th className="p-3 text-left font-medium">Size</th>
-              <th className="p-3 text-left font-medium">IOPS</th>
-              <th className="p-3 text-left font-medium">Throughput</th>
-              <th className="p-3 text-left font-medium">Durability</th>
+              <th className="px-3 py-2 text-left font-medium text-foreground-light">Max Size</th>
+              <th className="px-3 py-2 text-left font-medium text-foreground-light">Size</th>
+              <th className="px-3 py-2 text-left font-medium text-foreground-light">IOPS</th>
+              <th className="px-3 py-2 text-left font-medium text-foreground-light">Throughput</th>
+              <th className="px-3 py-2 text-right font-medium text-foreground-light">Durability</th>
             </tr>
           </thead>
           <tbody>
@@ -63,7 +63,7 @@ const PricingDiskSection = () => (
                 <td className="p-3 whitespace-pre-line" translate="no">
                   {diskType.throughput}
                 </td>
-                <td>{diskType.durability}</td>
+                <td className="p-3 text-right tabular-nums">{diskType.durability}</td>
               </tr>
             ))}
           </tbody>

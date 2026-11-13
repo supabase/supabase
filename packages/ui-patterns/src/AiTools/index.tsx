@@ -75,21 +75,6 @@ export const AiTools = ({
             Connect your AI agent
           </a>
         ) : null}
-        <button
-          type="button"
-          onClick={handleCopy}
-          className={cn(ITEM_CLASS, 'cursor-pointer text-left')}
-        >
-          {copied ? (
-            <Check aria-hidden className="size-3.5 text-primary" strokeWidth={1.5} />
-          ) : (
-            <Copy aria-hidden className="size-3.5" strokeWidth={1.5} />
-          )}
-          {copied ? 'Copied!' : 'Copy as Markdown'}
-        </button>
-        <span className="sr-only" role="status">
-          {copied ? 'Copied to clipboard' : ''}
-        </span>
         <a
           href={urls.chatgpt}
           target="_blank"
@@ -110,6 +95,21 @@ export const AiTools = ({
           <Claude aria-hidden className="size-3.5" />
           Ask Claude
         </a>
+        <button
+          type="button"
+          onClick={handleCopy}
+          className={cn(ITEM_CLASS, 'cursor-pointer text-left')}
+        >
+          {copied ? (
+            <Check aria-hidden className="size-3.5 text-primary" strokeWidth={1.5} />
+          ) : (
+            <Copy aria-hidden className="size-3.5" strokeWidth={1.5} />
+          )}
+          {copied ? 'Copied!' : 'Copy as Markdown'}
+        </button>
+        <span className="sr-only" role="status">
+          {copied ? 'Copied to clipboard' : ''}
+        </span>
         {preferredSourceHref ? (
           <a
             href={preferredSourceHref}
