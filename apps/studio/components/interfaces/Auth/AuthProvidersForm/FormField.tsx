@@ -208,6 +208,12 @@ const FormField = ({
                       placeholder="Enter multi-line text"
                       className="resize-none"
                       readOnly={readOnly}
+                      onChange={(e) => {
+                        // Normalize line endings to \n for cross-platform consistency
+                        // This ensures SMS templates with newlines (e.g. WebOTP format)
+                        // are preserved correctly regardless of the user's OS.
+                        field.onChange(e.target.value.replace(/\r\n/g, '\n').replace(/\r/g, '\n'))
+                      }}
                     />
                   </FormControl>
                 </FormItemLayout>
