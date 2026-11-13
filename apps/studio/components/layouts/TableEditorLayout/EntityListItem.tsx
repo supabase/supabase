@@ -1,3 +1,4 @@
+import { useQuery } from '@tanstack/react-query'
 import { useParams } from 'common'
 import {
   CopyIcon,
@@ -5,6 +6,7 @@ import {
   DownloadIcon,
   EditIcon,
   GlobeIcon,
+  LayersIcon,
   LockIcon,
   MoreVerticalIcon,
   TrashIcon,
@@ -35,12 +37,14 @@ import { useExportAllRowsAsCsv, useExportAllRowsAsSql } from './ExportAllRows'
 import { useUrlTableFilters } from '@/components/grid/hooks/useTableFilter'
 import { buildTableEditorUrl } from '@/components/grid/SupabaseGrid.utils'
 import { getEntityLintDetails } from '@/components/interfaces/TableGridEditor/TableEntity.utils'
+import { ButtonTooltip } from '@/components/ui/ButtonTooltip'
 import { EntityTypeIcon } from '@/components/ui/EntityTypeIcon'
 import { InlineLink } from '@/components/ui/InlineLink'
 import { getTableDefinition } from '@/data/database/table-definition-query'
 import { getViewDefinition } from '@/data/database/view-definition-query'
 import { ENTITY_TYPE } from '@/data/entity-types/entity-type-constants'
 import { Entity } from '@/data/entity-types/entity-types-infinite-query'
+import { partitionCountQueryOptions } from '@/data/entity-types/partition-count-query'
 import { useProjectLintsQuery } from '@/data/lint/lint-query'
 import { EditorTablePageLink } from '@/data/prefetchers/project.$ref.editor.$id'
 import type {
@@ -51,6 +55,7 @@ import { useTableRowsCountQuery } from '@/data/table-rows/table-rows-count-query
 import { useQuerySchemaState } from '@/hooks/misc/useSchemaQueryState'
 import { useSelectedProjectQuery } from '@/hooks/misc/useSelectedProject'
 import { formatSql } from '@/lib/formatSql'
+import { pluralize } from '@/lib/helpers'
 import {
   useRoleImpersonationStateSnapshot,
   type RoleImpersonationState,
@@ -114,6 +119,15 @@ export const EntityListItem = ({
     }
   )
   const rowCount = countData?.count
+
+  const { data: partitionCount } = useQuery({
+    ...partitionCountQueryOptions({
+      projectRef: project?.ref,
+      connectionString: project?.connectionString,
+      id: entity.id,
+    }),
+    enabled: entity.type === ENTITY_TYPE.PARTITIONED_TABLE && !!project?.ref,
+  })
 
   const { data: lints = [] } = useProjectLintsQuery({
     projectRef: project?.ref,
@@ -239,15 +253,37 @@ export const EntityListItem = ({
             {!isInSelectedSchema && <span className="text-foreground-muted">{entity.schema}.</span>}
             {entity.name}
           </span>
-          <EntityTooltipTrigger
-            entity={entity}
-            tableHasRlsDisabledLint={tableHasRlsDisabledLint}
-            tableHasRlsEnabledNoPolicyLint={tableHasRlsEnabledNoPolicyLint}
-            viewHasLints={viewHasLints}
-            materializedViewHasLints={materializedViewHasLints}
-            foreignTableHasLints={foreignTableHasLints}
-            apiAccessData={apiAccessData}
-          />
+          <div className="flex items-center gap-x-1">
+            <EntityTooltipTrigger
+              entity={entity}
+              tableHasRlsDisabledLint={tableHasRlsDisabledLint}
+              tableHasRlsEnabledNoPolicyLint={tableHasRlsEnabledNoPolicyLint}
+              viewHasLints={viewHasLints}
+              materializedViewHasLints={materializedViewHasLints}
+              foreignTableHasLints={foreignTableHasLints}
+              apiAccessData={apiAccessData}
+            />
+            {entity.type === ENTITY_TYPE.PARTITIONED_TABLE && !!partitionCount && (
+              <ButtonTooltip
+                variant="text"
+                className="h-6 py-0 px-1 space-x-1 text-foreground-lighter"
+                iconRight={<LayersIcon />}
+                tooltip={{
+                  content: {
+                    side: 'bottom',
+                    text: `View ${partitionCount} ${pluralize(partitionCount, 'partition')}`,
+                  },
+                }}
+                onClick={(e) => {
+                  e.preventDefault()
+                  e.stopPropagation()
+                  onViewPartitions?.(entity.id)
+                }}
+              >
+                {partitionCount}
+              </ButtonTooltip>
+            )}
+          </div>
         </div>
 
         {(canEdit || canViewPartitions) && (
@@ -667,7 +703,7 @@ const EntityTooltipTrigger = ({
   if (tooltipContent) {
     return (
       <Tooltip>
-        <TooltipTrigger className="min-w-4">
+        <TooltipTrigger className="shrink-0">
           <Badge variant="destructive">Unrestricted</Badge>
         </TooltipTrigger>
         <TooltipContent side="right" className="max-w-52">
@@ -684,7 +720,7 @@ const EntityTooltipTrigger = ({
   if (isRlsEnabledNoPolicies) {
     return (
       <Tooltip>
-        <TooltipTrigger className="min-w-4" aria-label="Table exposed via Data API">
+        <TooltipTrigger className="shrink-0" aria-label="Table exposed via Data API">
           <GlobeIcon size={14} strokeWidth={1} className="text-foreground-lighter" />
         </TooltipTrigger>
         <TooltipContent side="right" className="max-w-52">
@@ -700,7 +736,7 @@ const EntityTooltipTrigger = ({
   if (isApiExposedWithRlsAndPolicies) {
     return (
       <Tooltip>
-        <TooltipTrigger className="min-w-4" aria-label="Table exposed via Data API">
+        <TooltipTrigger className="shrink-0" aria-label="Table exposed via Data API">
           <GlobeIcon size={14} strokeWidth={1} className="text-foreground-lighter" />
         </TooltipTrigger>
         <TooltipContent side="right">This table can be accessed via the Data API</TooltipContent>
