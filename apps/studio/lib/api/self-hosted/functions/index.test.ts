@@ -37,12 +37,12 @@ describe('api/self-hosted/functions/index', () => {
       expect(util.assertSelfHosted).toHaveBeenCalled()
     })
 
-    it('should throw error if EDGE_FUNCTIONS_MANAGEMENT_FOLDER is not set', () => {
+    it('should create a store without a folder if EDGE_FUNCTIONS_MANAGEMENT_FOLDER is not set', () => {
       delete process.env.EDGE_FUNCTIONS_MANAGEMENT_FOLDER
 
-      expect(() => getFunctionsArtifactStore()).toThrow(
-        'EDGE_FUNCTIONS_MANAGEMENT_FOLDER is required'
-      )
+      getFunctionsArtifactStore()
+
+      expect(fileSystemStore.FileSystemFunctionsArtifactStore).toHaveBeenCalledWith(undefined)
     })
 
     it('should create FileSystemFunctionsArtifactStore with correct path', () => {

@@ -1,14 +1,14 @@
-import assert from 'node:assert'
-
 import { assertSelfHosted } from '../util'
 import { FileSystemFunctionsArtifactStore } from './fileSystemStore'
 
+/**
+ * Without EDGE_FUNCTIONS_MANAGEMENT_FOLDER the store has no folder, so it lists no functions
+ * and the dashboard shows the empty state.
+ */
 export function getFunctionsArtifactStore() {
   assertSelfHosted()
-  assert(
-    process.env.EDGE_FUNCTIONS_MANAGEMENT_FOLDER,
-    'EDGE_FUNCTIONS_MANAGEMENT_FOLDER is required'
-  )
 
-  return new FileSystemFunctionsArtifactStore(process.env.EDGE_FUNCTIONS_MANAGEMENT_FOLDER)
+  return new FileSystemFunctionsArtifactStore(
+    process.env.EDGE_FUNCTIONS_MANAGEMENT_FOLDER || undefined
+  )
 }

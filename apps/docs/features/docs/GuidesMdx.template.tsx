@@ -1,9 +1,10 @@
 import Breadcrumbs from '~/components/Breadcrumbs'
-import GuidesSidebar from '~/components/GuidesSidebar'
+import { GuidesSidebar } from '~/components/GuidesSidebar'
 import { GuideTocMenu, TocAnchorsProvider } from '~/features/docs/GuidesMdx.client'
 import { MDXRemoteBase } from '~/features/docs/MdxBase'
 import type { WithRequired } from '~/features/helpers.types'
 import { PageTitleObserver } from '~/layouts/MobileHeaderSlots'
+import { UpdatedAtSlotPortal } from '~/layouts/UpdatedAtSlot'
 import { resolveBreadcrumbs } from '~/lib/breadcrumbs'
 import { PROD_URL } from '~/lib/constants'
 import { type GuideFrontmatter } from '~/lib/docs'
@@ -82,6 +83,8 @@ const GuideTemplate = ({
   lastUpdated,
 }: GuideTemplateProps) => {
   const hideToc = meta?.hideToc || meta?.hide_table_of_contents
+  // the client sidebar gets a string, because the branded edit link cannot cross to the client
+  const editHref = editLink.includesProtocol ? editLink.link : `https://github.com/${editLink.link}`
   const breadcrumbChain = resolveBreadcrumbs(pathname)
   const breadcrumbSchema = breadcrumbListSchema({ pathname, chain: breadcrumbChain })
   const breadcrumbJsonLd = breadcrumbSchema ? serializeJsonLd(breadcrumbSchema) : null
@@ -96,6 +99,15 @@ const GuideTemplate = ({
       )
     : null
 
+  const updatedAt = lastUpdated ? (
+    <p className="text-sm text-foreground-lighter">
+      Updated{' '}
+      <time dateTime={new Date(lastUpdated).toISOString()} className="whitespace-nowrap">
+        {formatLastUpdated(lastUpdated)}
+      </time>
+    </p>
+  ) : null
+
   return (
     <TocAnchorsProvider>
       <div className={'grid grid-cols-12 relative gap-4'}>
@@ -104,7 +116,8 @@ const GuideTemplate = ({
             'relative',
             'transition-all ease-out',
             'duration-100',
-            'col-span-12 md:col-span-8'
+            'col-span-12 md:col-span-8',
+            'layout-v2:md:col-span-12 layout-v2:w-full layout-v2:max-w-docs-content layout-v2:mx-auto'
           )}
         >
           {techArticleJsonLd && (
@@ -119,17 +132,16 @@ const GuideTemplate = ({
               dangerouslySetInnerHTML={{ __html: breadcrumbJsonLd }}
             />
           )}
-          <div className="mb-12 flex flex-wrap items-center justify-between gap-x-4 gap-y-2 text-sm">
+          <div
+            className={cn(
+              'mb-12 flex flex-wrap items-center justify-between gap-x-4 gap-y-2 text-sm',
+              'layout-v2:lg:hidden'
+            )}
+          >
             <Breadcrumbs />
-            {lastUpdated ? (
-              <p className="text-foreground-lighter">
-                Updated{' '}
-                <time dateTime={new Date(lastUpdated).toISOString()} className="whitespace-nowrap">
-                  {formatLastUpdated(lastUpdated)}
-                </time>
-              </p>
-            ) : null}
+            {updatedAt}
           </div>
+          <UpdatedAtSlotPortal>{updatedAt}</UpdatedAtSlotPortal>
           <article
             // Used to get headings for the table of contents
             id="sb-docs-guide-main-article"
@@ -154,11 +166,9 @@ const GuideTemplate = ({
             )}
             {children}
 
-            <footer className="mt-16 not-prose">
+            <footer className="mt-16 not-prose layout-v2:lg:hidden">
               <a
-                href={
-                  editLink.includesProtocol ? editLink.link : `https://github.com/${editLink.link}`
-                }
+                href={editHref}
                 className={cn(
                   'relative w-fit',
                   'flex items-center gap-1.5',
@@ -179,6 +189,7 @@ const GuideTemplate = ({
           video={meta?.tocVideo}
           videoTitle={meta?.title ? mdToPlainText(meta.title) : undefined}
           hideToc={hideToc}
+          editHref={editHref}
           className={cn(
             'hidden md:flex',
             'md:col-span-3 md:col-start-10',

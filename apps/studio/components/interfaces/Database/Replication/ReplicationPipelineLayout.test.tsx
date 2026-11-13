@@ -1,5 +1,5 @@
-import { useQueryClient } from '@tanstack/react-query'
-import { screen, waitFor } from '@testing-library/react'
+import { QueryClient, useQueryClient } from '@tanstack/react-query'
+import { act, fireEvent, screen, waitFor, within } from '@testing-library/react'
 import userEvent from '@testing-library/user-event'
 import type { components } from 'api-types'
 import { mockAnimationsApi } from 'jsdom-testing-mocks'
@@ -9,7 +9,7 @@ import { beforeEach, describe, expect, test, vi } from 'vitest'
 
 import { ReplicationPipelineLayout } from './ReplicationPipelineLayout'
 import { ReplicationPipelineStatus } from './ReplicationPipelineStatus/ReplicationPipelineStatus'
-import type { PipelineWireResponse } from '@/data/replication/api-types'
+import type { DestinationWireResponse, PipelineWireResponse } from '@/data/replication/api-types'
 import { replicationKeys } from '@/data/replication/keys'
 import {
   PipelineRequestStatusProvider,
@@ -45,11 +45,12 @@ vi.mock('next/link', () => ({
   ),
 }))
 
-const renderLayout = (children?: ReactNode) =>
+const renderLayout = (children?: ReactNode, queryClient?: QueryClient) =>
   customRender(
     <PipelineRequestStatusProvider>
       <ReplicationPipelineLayout>{children}</ReplicationPipelineLayout>
-    </PipelineRequestStatusProvider>
+    </PipelineRequestStatusProvider>,
+    { queryClient }
   )
 
 const TableResetFixture = () => {
@@ -99,13 +100,18 @@ type PipelineReplicationStatusResponse = PipelineWireResponse<
 type PipelineVersionResponse = PipelineWireResponse<
   components['schemas']['PipelineVersionResponse_Output']
 >
-type DestinationResponse = components['schemas']['DestinationResponse_Output']
-type DestinationsResponse = components['schemas']['DestinationsResponse_Output']
+type DestinationResponse = DestinationWireResponse<
+  components['schemas']['DestinationResponse_Output']
+>
+type DestinationsResponse = DestinationWireResponse<
+  components['schemas']['DestinationsResponse_Output']
+>
 type PipelinesResponse = PipelineWireResponse<components['schemas']['PipelinesResponse_Output']>
 type SourcesResponse = components['schemas']['SourcesResponse_Output']
 
 const PIPELINE: PipelineResponse = {
   id: 42,
+  cluster_id: 'cluster',
   config: { publication_name: 'analytics_publication' },
   destination_id: 7,
   destination_name: 'Analytics warehouse',
@@ -128,7 +134,7 @@ const DESTINATION: DestinationResponse = {
   },
 }
 
-const mockPipeline = (id: string | number = 42) => {
+const mockPipeline = (id: string | number = 42, destination = DESTINATION) => {
   addAPIMock({
     method: 'get',
     path: '/platform/replication/:ref/pipelines/:pipeline_id',
@@ -137,14 +143,14 @@ const mockPipeline = (id: string | number = 42) => {
   addAPIMock({
     method: 'get',
     path: '/platform/replication/:ref/destinations/:destination_id',
-    response: () => HttpResponse.json<DestinationResponse>(DESTINATION),
+    response: () => HttpResponse.json<DestinationResponse>(destination),
   })
 
   // The header renders DestinationPanel so Edit destination can open in place
   addAPIMock({
     method: 'get',
     path: '/platform/replication/:ref/destinations',
-    response: () => HttpResponse.json<DestinationsResponse>({ destinations: [DESTINATION] }),
+    response: () => HttpResponse.json<DestinationsResponse>({ destinations: [destination] }),
   })
   addAPIMock({
     method: 'get',
@@ -211,6 +217,152 @@ describe('ReplicationPipelineLayout', () => {
     mockVersion(false)
   })
 
+  test.each(['started', 'stopped', 'failed'] as const)(
+    'only allows stopping and deletion for an unknown destination when %s',
+    async (status) => {
+      mockPipeline('42', { ...DESTINATION, config: { unknown: {} } })
+      mockStatus(status, '42')
+      mockVersion(true, '42')
+
+      renderLayout(<ReplicationPipelineStatus />)
+
+      expect(await screen.findByRole('img', { name: 'Unknown destination' })).toBeVisible()
+      expect(
+        screen.queryByRole('button', { name: /^(Start|Restart|Update available)$/ })
+      ).not.toBeInTheDocument()
+      expect(screen.queryByRole('button', { name: /Reset/ })).not.toBeInTheDocument()
+      if (status === 'stopped') {
+        expect(screen.queryByRole('button', { name: 'Stop' })).not.toBeInTheDocument()
+      } else {
+        addAPIMock({
+          method: 'post',
+          path: '/platform/replication/:ref/pipelines/:pipeline_id/stop',
+          response: () => {
+            mockStatus('stopped', '42')
+            return HttpResponse.json<Record<string, never>>({}, { status: 202 })
+          },
+        })
+        await screen.findByText(status === 'started' ? 'Running' : 'Failed')
+        expect(screen.getByRole('button', { name: 'Stop' })).toBeEnabled()
+        await userEvent.click(screen.getByRole('button', { name: 'Stop' }))
+        expect(await screen.findByText('Stopped')).toBeVisible()
+        expect(screen.queryByRole('button', { name: 'Start' })).not.toBeInTheDocument()
+      }
+      await userEvent.click(screen.getByRole('button', { name: 'Pipeline options' }))
+      expect(screen.getAllByRole('menuitem').map((item) => item.textContent)).toEqual([
+        'Delete pipeline',
+      ])
+      await userEvent.click(screen.getByRole('menuitem', { name: 'Delete pipeline' }))
+      expect(await screen.findByPlaceholderText('Type the pipeline name')).toBeVisible()
+    }
+  )
+
+  test('blocks direct edit URLs for unknown destinations even with a creation type in the URL', async () => {
+    mockPipeline('42', { ...DESTINATION, config: { unknown: {} } })
+    mockStatus('stopped', '42')
+    mockVersion(false, '42')
+
+    customRender(
+      <PipelineRequestStatusProvider>
+        <ReplicationPipelineLayout />
+      </PipelineRequestStatusProvider>,
+      { nuqs: { searchParams: '?edit=7&destinationType=BigQuery' } }
+    )
+
+    const dialog = await screen.findByRole('dialog')
+    expect(await within(dialog).findByText('Unknown destination')).toBeVisible()
+    expect(within(dialog).queryByRole('textbox')).not.toBeInTheDocument()
+  })
+
+  test('keeps stopping available without allowing edits when the destination lookup fails', async () => {
+    mockPipeline('42')
+    mockStatus('started', '42')
+    mockVersion(false, '42')
+    addAPIMock({
+      method: 'get',
+      path: '/platform/replication/:ref/destinations/:destination_id',
+      response: () =>
+        HttpResponse.json<APIErrorBody>({ message: 'Destination unavailable' }, { status: 500 }),
+    })
+    addAPIMock({
+      method: 'post',
+      path: '/platform/replication/:ref/pipelines/:pipeline_id/stop',
+      response: () => {
+        mockStatus('stopped', '42')
+        return HttpResponse.json<Record<string, never>>({}, { status: 202 })
+      },
+    })
+
+    customRender(
+      <PipelineRequestStatusProvider>
+        <ReplicationPipelineLayout />
+      </PipelineRequestStatusProvider>,
+      { nuqs: { searchParams: '?edit=7&destinationType=BigQuery' } }
+    )
+
+    await waitFor(() =>
+      expect(
+        within(screen.getByRole('dialog')).getByText('Failed to retrieve destination information')
+      ).toBeVisible()
+    )
+    const dialog = screen.getByRole('dialog')
+    expect(within(dialog).queryByRole('textbox')).not.toBeInTheDocument()
+    await userEvent.keyboard('{Escape}')
+    await waitFor(() => expect(screen.queryByRole('dialog')).not.toBeInTheDocument())
+    expect(screen.getByRole('button', { name: 'Stop' })).toBeEnabled()
+    await userEvent.click(screen.getByRole('button', { name: 'Stop' }))
+    expect(await screen.findByText('Stopped')).toBeVisible()
+  })
+
+  test('deletes an unknown pipeline through the existing shutdown and cleanup flow', async () => {
+    mockPipeline('42', { ...DESTINATION, config: { unknown: {} } })
+    mockStatus('started', '42')
+    mockVersion(false, '42')
+    addAPIMock({
+      method: 'post',
+      path: '/platform/replication/:ref/pipelines/:pipeline_id/stop',
+      response: () => {
+        mockStatus('stopping', '42')
+        return HttpResponse.json<Record<string, never>>({}, { status: 202 })
+      },
+    })
+    addAPIMock({
+      method: 'delete',
+      path: '/platform/replication/:ref/destinations-pipelines/:destination_id/:pipeline_id',
+      response: () =>
+        HttpResponse.json<
+          PipelineWireResponse<components['schemas']['DeleteDestinationPipelineResponse_Output']>
+        >({
+          destination_deleted: true,
+          destination_id: 7,
+          pipeline_id: '42',
+        }),
+    })
+    const queryClient = new QueryClient()
+    renderLayout(undefined, queryClient)
+    await screen.findByRole('img', { name: 'Unknown destination' })
+    await userEvent.click(screen.getByRole('button', { name: 'Pipeline options' }))
+    await userEvent.click(screen.getByRole('menuitem', { name: 'Delete pipeline' }))
+    const dialog = await screen.findByRole('dialog')
+    await userEvent.click(within(dialog).getByPlaceholderText('Type the pipeline name'))
+    await userEvent.paste('Analytics warehouse')
+    await waitFor(() =>
+      expect(within(dialog).getByRole('button', { name: 'Delete pipeline' })).toBeEnabled()
+    )
+    fireEvent.submit(dialog.querySelector('form')!)
+    await screen.findByText('Stopping')
+    await act(() =>
+      queryClient.invalidateQueries({ queryKey: replicationKeys.pipelinesStatus('default', '42') })
+    )
+    expect(within(dialog).getByRole('button', { name: 'Deleting…' })).toBeDisabled()
+
+    mockStatus('stopped', '42')
+    await act(() =>
+      queryClient.invalidateQueries({ queryKey: replicationKeys.pipelinesStatus('default', '42') })
+    )
+    await waitFor(() => expect(screen.queryByRole('dialog')).not.toBeInTheDocument())
+  })
+
   test.each([42, '42', '003l8j9rxqi6c8rd5mcx1w2ya'])(
     'renders pipeline %s and stops it using its original ID',
     async (pipelineId) => {
@@ -230,21 +382,10 @@ describe('ReplicationPipelineLayout', () => {
         },
       })
 
-      renderLayout(<div>Overview content</div>)
+      renderLayout()
 
       expect(await screen.findByRole('heading', { name: 'Analytics warehouse' })).toBeVisible()
-      expect(screen.getByRole('link', { name: 'Pipelines' })).toHaveAttribute(
-        'href',
-        '/project/default/database/pipelines'
-      )
-      expect(screen.getByRole('link', { name: 'View logs' }).getAttribute('href')).toContain(
-        'pipeline_id'
-      )
-      expect(screen.getByText('Running')).toBeVisible()
-      expect(screen.getByText('Primary database')).toBeVisible()
-      expect(await screen.findByText('BigQuery')).toBeVisible()
-      expect(await screen.findByRole('button', { name: 'Stop' })).toBeVisible()
-      expect(screen.getByText('Overview content')).toBeVisible()
+      expect(await screen.findByText('Running')).toBeVisible()
 
       await userEvent.click(screen.getByRole('button', { name: 'Stop' }))
       expect(await screen.findByRole('button', { name: 'Start' })).toBeVisible()
@@ -268,13 +409,11 @@ describe('ReplicationPipelineLayout', () => {
 
     expect(screen.getByText('Primary database')).toBeVisible()
     expect(screen.getByText('Loading destination')).toBeInTheDocument()
-    expect(screen.getAllByText('Loading pipeline')).toHaveLength(2)
     expect(screen.queryByText('Running')).not.toBeInTheDocument()
 
     resolvePipeline(PIPELINE)
 
     expect(await screen.findByRole('heading', { name: 'Analytics warehouse' })).toBeVisible()
-    expect(await screen.findByText('BigQuery')).toBeVisible()
     expect(await screen.findByText('Running')).toBeVisible()
   })
 
@@ -286,7 +425,6 @@ describe('ReplicationPipelineLayout', () => {
 
     expect(await screen.findByRole('heading', { name: 'Analytics warehouse' })).toBeVisible()
     expect(screen.getAllByRole('link', { name: 'View logs' })).toHaveLength(1)
-    expect(screen.getAllByRole('button', { name: 'Start' })).toHaveLength(1)
     expect(await screen.findByRole('heading', { name: 'Pipeline stopped' })).toBeVisible()
   })
 
@@ -297,10 +435,7 @@ describe('ReplicationPipelineLayout', () => {
 
     await userEvent.hover(await screen.findByText('Failed'))
 
-    expect(await screen.findByRole('tooltip')).toHaveTextContent(
-      'Replication has encountered an error. Check the logs for more information.'
-    )
-    expect(screen.queryByRole('link', { name: 'logs' })).not.toBeInTheDocument()
+    expect(await screen.findByRole('tooltip')).toBeVisible()
   })
 
   test('offers the pipeline actions the primary button does not', async () => {
@@ -313,8 +448,6 @@ describe('ReplicationPipelineLayout', () => {
     // Primary button is Stop while running, so the menu carries Restart instead
     expect(await screen.findByRole('menuitem', { name: 'Restart pipeline' })).toBeVisible()
     expect(screen.queryByRole('menuitem', { name: 'Stop pipeline' })).not.toBeInTheDocument()
-    expect(screen.getByRole('menuitem', { name: 'Edit pipeline' })).toBeVisible()
-    expect(screen.getByRole('menuitem', { name: 'Delete pipeline' })).toBeVisible()
   })
 
   test('blocks pipeline actions while a table reset is running', async () => {

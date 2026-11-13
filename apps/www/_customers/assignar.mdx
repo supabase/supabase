@@ -1,0 +1,164 @@
+---
+name: Assignar
+title: How Assignar achieved 80x faster development velocity by modernizing with Supabase
+description: Assignar builds software for subcontractors and the general contractor firms who hire them. After 11 years on a single-tenant AWS stack, its founders rebuilt its product on Supabase and built the new platform, Assignar Pay, helping them deliver more features and value to their customers.
+author: wendie_cheung
+author_title: Product Marketing
+logo: /images/customers/logos/on-light/assignar.png
+logo_inverse: /images/customers/logos/on-dark/assignar.png
+tags:
+  - supabase
+date: '2026-11-12'
+company_url: https://assignar.com
+stats: []
+misc:
+  [
+    {
+      label: 'Use case',
+      text: 'Multi-tenant platform where general contractors and subcontractors manage logistics, equipment, operations, compliance, timesheets, and field communication',
+    },
+    {
+      label: 'Solutions',
+      text: 'Database, Auth, Storage, Realtime, Vector, Edge Functions, Branching',
+    },
+  ]
+about: 'Assignar builds software for subcontractors and the general contractor firms who hire them, and rebuilt its platform as Assignar Pay on Supabase.'
+# "healthcare" | "fintech" | "ecommerce" | "education" | "gaming" | "media" | "real-estate" | "saas" | "social" | "analytics" | "ai" | "developer-tools"
+industry: ['saas']
+# "startup" | "enterprise" | "indie_dev"
+company_size: 'enterprise'
+# "Asia" | "Europe" | "North America" | "South America" | "Africa" | "Oceania"
+region: 'Oceania'
+# "database" | "auth" | "storage" | "realtime" | "functions" | "vector"
+supabase_products: ['database', 'auth', 'storage', 'realtime', 'vector', 'functions']
+---
+
+<Quote>
+
+If we were to start a company tomorrow, how would we want to build our platform? That's the approach we took.
+
+<div className="mt-4">Marko Tomic, Co-Founder and CTO, Assignar</div>
+
+</Quote>
+
+## Key results
+
+- Rebuilt the new platform, Assignar Pay, in less than a year to deliver additional value to customers
+- Increased developer team velocity with pull requests up from 12 in January to more than 1,000 in October.
+- Reduced operational complexity by replacing multiple single-tenant databases with a multi-tenant Postgres database managing about 500 tables, 1,700 migrations, and 7,000 security policies.
+
+## About Assignar
+
+Assignar is a construction operations platform that gives civil contractors real-time visibility and control over their crews, equipment, compliance, and project performance. Its customers are subcontractors, the specialist companies that do the physical work on roads, rail, and utility projects, and the general contractors, the companies that run a project overall and hire those subcontractors.
+
+Assignar Pay, the company's rebuilt platform, now serves subcontractors and general contractors across North America, Australia, and New Zealand. It exists because co-founders Marko Tomic and Sean McCreanor decided in early 2025 to rebuild their 11-year-old platform from scratch.
+
+## A dated platform that could not grow with industry demand
+
+Assignar started in 2014 to solve a problem co-founder Sean McCreanor had in his own construction business. He was scheduling crews and expensive equipment on spreadsheets and whiteboards, because the enterprise software on the market cost more than a subcontractor could justify. Sean and Marko built Assignar as the alternative: a tool made for subcontractors that keeps the right people and machines on the right jobs and keeps everyone compliant. Today the company operates across North America, Australia, and New Zealand.
+
+The subcontractor's side is only one layer of a tiered industry. On a major site, the general contractor hands most of the physical work to subcontractors but remains responsible for their productivity, operations, and safety. General contractors want a single view across all of their subcontractors' work. Subcontractors, meanwhile, upload timesheets and compliance documents into each contractor's own system with nothing to show for it. That lack of transparency across both user bases is a root cause of projects running over time and over budget.
+
+<Quote>
+
+When managing projects they're looking in the rear-view mirror all the time. Trying to piece together what happened two months ago - which at that point, it's too late.
+
+<div className="mt-4">Marko Tomic, Co-Founder and CTO, Assignar</div>
+
+</Quote>
+
+Marko and Sean wanted Assignar to serve every tier of construction, but the original platform was built around the subcontractor's workflow, and its technical design made that transparency gap hard to close. It gave every customer a database of its own on AWS Aurora MySQL, which met compliance requirements but multiplied the work of changing anything. Keeping schemas and migrations consistent across all of those databases took internal tools the team had to build and maintain, and the schema had never been designed for tiered data, so letting a general contractor see into its subcontractors' records would take a rebuild.
+
+## Starting over on Postgres
+
+<Quote>
+
+The old platform was aging a little, at 11 years old, and we had a decision to make. Do we keep building on top of this, or do we start from scratch and treat it like a brand new company?
+
+<div className="mt-4">Marko Tomic, Co-Founder and CTO, Assignar</div>
+
+</Quote>
+
+They chose to start over on Supabase, which Marko already had experience with from years of side projects and a handful of apps he built as an early adopter. The question that mattered to him most was whether one database could hold every tenant's data and still show each general contractor, and only that contractor, the subcontractors it worked with.
+
+<Quote>
+
+We decided to build Assignar Pay on top of Supabase using Postgres and Row Level Security, and that was a game changer. It actually allowed us to build what we always wanted to build.
+
+<div className="mt-4">Marko Tomic, Co-Founder and CTO, Assignar</div>
+
+</Quote>
+
+One shared database also simplified the daily work of running it. There was one schema to change instead of one for every customer, so managing migrations and database versions became much easier, and the founders had that in place before the wider team joined.
+
+## Rebuilding Assignar's foundations
+
+Marko and Sean spent about six months building the foundations themselves, from the structure of the platform to its development and deployment pipelines. Only then did they bring in five engineers to build on top, and that is when the developer experience paid off.
+
+Assignar Pay runs on Next.js on Vercel, and everything is written in TypeScript. The application code and the Supabase migrations live in one repository, managed with Turborepo, so engineers aren't switching between codebases. When an engineer opens a feature branch in GitHub, Supabase automatically starts a database for it, something the team previously had to build by hand on the old stack.
+
+<Quote>
+
+Everyone was smiling because the developer experience went through the roof. There was no context switching between different frameworks and languages.
+
+<div className="mt-4">Marko Tomic, Co-Founder and CTO, Assignar</div>
+
+</Quote>
+
+In Assignar Pay, general contractors and subcontractors each have their own organization inside a single shared Postgres database, and Row Level Security keeps every organization's data separate. A general contractor invites its subcontractors into its organization and defines the information it wants from them, such as insurance documents and timesheets. A process that used to run through several systems and a lot of manual follow-up now follows one consistent format. Since the build began, that one database has grown to about 500 tables, with roughly 1,700 migrations and 7,000 security policies keeping each organization's data apart.
+
+Field crews are the other group the platform has to serve. Assignar Pay uses Supabase Realtime to push notifications to everyone scheduled on a project, from weather warnings to reminders to submit timesheets. Crews can also share photos and files on the same channel, which gives them one shared place to coordinate on the job.
+
+Photos, compliance documents, and other files live in Supabase Storage, and vector embeddings in Postgres let people search that content by meaning rather than by exact filename.
+
+## Meeting enterprise security requirements
+
+Security is a major part of how general contracting firms vet their software vendors. Assignar holds ISO 27001 and SOC 2 Type 1 certifications, with SOC 2 Type 2 underway. It encrypts data at rest and in transit, and Assignar Pay includes role-based access control so each customer can define its own permissions.
+
+On the original platform, Assignar paid a third-party vendor for authentication. For Assignar Pay, the founders wanted it under the same roof as the database, and Supabase Auth, which runs against the same Postgres instance as everything else, was simple to implement against current security practices. Supabase's own SOC 2 Type 2 certification also forms part of what Assignar can show in those reviews.
+
+## What the rebuild changed
+
+Developer velocity jumped after the rebuild. Assignar's small team of agentic and forward deployed engineers works alongside AI agents with strong harnesses that take work from ticket to reviewed pull request, and Supabase Branching and Row Level Security let those agents move fast without putting customer data at risk. The team went from 12 pull requests in January to more than 500 in August and more than 1,000 in October, and the pace is still climbing.
+
+<Quote>
+
+We're still trying to find out what our throughput is actually going to be like. When are we going to plateau?
+
+<div className="mt-4">Marko Tomic, Co-Founder and CTO, Assignar</div>
+
+</Quote>
+
+The rebuild has changed the commercial picture too, with customers now getting significantly more value and features from Assignar Pay than from the previous platform.
+
+<Quote>
+
+We rebuilt everything the old product has, and we added a whole lot more onto the new platform. The value we provide is so much greater than what we were able to do before.
+
+<div className="mt-4">Marko Tomic, Co-Founder and CTO, Assignar</div>
+
+</Quote>
+
+## What is next for Assignar Pay
+
+The team's current priority is moving existing customers over to Assignar Pay. At Build Better, Assignar's recent user conference, customers saw what the new platform can do and asked to move sooner. The team expects migration to speed up in 2027 and is building import tools so each customer's data is already in place when they start on Assignar Pay. Assignar also plans to add an Australian read replica for customers who need their data hosted in-region.
+
+Assignar Pay already covers the job lifecycle from bid to invoice, bringing timesheets, compliance and field communication into one platform. The next step is to deepen its financial capabilities, using AI to bridge the gap between construction operations and accounting systems.
+
+<Quote>
+
+Accounting systems don't do the field and resource planning, and they don't capture the data in real time, so they don't know what the actual numbers are. We do. We have the actuals.
+
+<div className="mt-4">Marko Tomic, Co-Founder and CTO, Assignar</div>
+
+</Quote>
+
+## Featured quote
+
+<Quote>
+
+We thought that if we rebuilt on Supabase earlier, it would be better than waiting. I'm glad we did it in retrospect. It was the right call, 100%.
+
+<div className="mt-4">Marko Tomic, Co-Founder and CTO, Assignar</div>
+
+</Quote>

@@ -1,12 +1,6 @@
 import { useCallback } from 'react'
 import { cn } from 'ui'
 import { toOpaque } from 'ui-patterns/GlyphLines'
-
-import { clamp } from '../lib/ascii/field'
-import { circlePoints, fillGlyphPath, GLYPH_FONT } from '../lib/ascii/glyph-path'
-import { sizeLayers } from '../lib/ascii/layer'
-import { easeInOutCubic } from '../lib/ascii/warp'
-import { HERO_PADDING, HERO_RINGS, HERO_SHAPES } from '../lib/hero-shapes'
 import {
   compositionBounds,
   paintOrder,
@@ -14,7 +8,17 @@ import {
   ringBounds,
   VIEW_POINTS,
   type IsoPoint,
-} from '../lib/iso-shapes'
+} from 'ui-patterns/IsoShape/IsoShape.geometry'
+import {
+  ISO_SHAPE_PADDING,
+  ISO_SHAPE_RINGS,
+  ISO_SHAPES,
+} from 'ui-patterns/IsoShape/IsoShape.shapes'
+
+import { clamp } from '../lib/ascii/field'
+import { circlePoints, fillGlyphPath, GLYPH_FONT } from '../lib/ascii/glyph-path'
+import { sizeLayers } from '../lib/ascii/layer'
+import { easeInOutCubic } from '../lib/ascii/warp'
 import type { Topic } from '../lib/topics'
 import { ColorProbes, observeTheme, readProbeColor } from './ColorProbes'
 
@@ -62,20 +66,22 @@ export const TopicShape = ({ topic, text, isMirrored, className }: TopicShapePro
       const ctx = canvas?.getContext('2d')
       const probeRoot = canvas?.nextElementSibling
       if (!canvas || !ctx || !(probeRoot instanceof HTMLElement)) return
-      const pieces = paintOrder(HERO_SHAPES[topic]).map((box) => projectShape({ box }))
-      const rings = (HERO_RINGS[topic] ?? []).map((ring) => {
+      const pieces = paintOrder(ISO_SHAPES[topic]).map((box) => projectShape({ box }))
+      const rings = (ISO_SHAPE_RINGS[topic] ?? []).map((ring) => {
         const [cx, cy] = VIEW_POINTS.iso(ring.x, ring.y, ring.z)
         return { ...ring, cx, cy }
       })
       const bounds = compositionBounds(
         [...pieces, ...ringBounds({ rings })],
-        HERO_PADDING[topic] ?? 0
+        ISO_SHAPE_PADDING[topic] ?? 0
       )
       const dashedRings = rings.filter((ring) => ring.isDashed)
-      const solidRings = rings.filter((ring) => !ring.isDashed)
+      const solidRings = rings.filter((ring) => !ring.isDashed && !ring.arc)
+      const arcs = rings.filter((ring) => ring.arc)
       const isReducedMotion = matchMedia('(prefers-reduced-motion: reduce)').matches
       const startedAt = performance.now()
-      const orbitsAt = GUIDES_LEAD_MS + (solidRings.length + pieces.length) * PIECE_DELAY_MS
+      const orbitsAt =
+        GUIDES_LEAD_MS + (solidRings.length + arcs.length + pieces.length) * PIECE_DELAY_MS
       let frame = 0
 
       const draw = () => {
@@ -129,7 +135,11 @@ export const TopicShape = ({ topic, text, isMirrored, className }: TopicShapePro
 
         const ringPoints = (ring: (typeof rings)[number]) => {
           const center = toCanvas([ring.cx, ring.cy])
-          return circlePoints({ cx: center.x, cy: center.y, radius: ring.radius * fit })
+          const [scaleX, scaleY] = ring.scale ?? [1, 1]
+          const [from, to] = ring.arc ?? [0, Math.PI * 2]
+          return circlePoints({ cx: 0, cy: 0, radius: ring.radius * fit, from, to }).map(
+            ({ x, y }) => ({ x: center.x + x * scaleX, y: center.y + y * scaleY })
+          )
         }
 
         // the dashed orbits paint first, so the solid rings hide them where they cross
@@ -142,11 +152,14 @@ export const TopicShape = ({ topic, text, isMirrored, className }: TopicShapePro
           fillInside(points)
           fillGlyphs(points, drawnAt(index))
         })
+        arcs.forEach((ring, index) =>
+          fillGlyphs(ringPoints(ring), drawnAt(solidRings.length + index))
+        )
         pieces.forEach((piece, index) => {
           for (const polygon of [...piece.faces, ...piece.insets]) {
             const points = polygon.map(toCanvas)
             fillInside(points)
-            fillGlyphs(points, drawnAt(solidRings.length + index), true)
+            fillGlyphs(points, drawnAt(solidRings.length + arcs.length + index), true)
           }
         })
 

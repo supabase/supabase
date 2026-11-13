@@ -1,18 +1,9 @@
 import { useCallback, type RefObject } from 'react'
 import { cn } from 'ui'
 import { toOpaque } from 'ui-patterns/GlyphLines'
+import { BEAM_ALPHA, hash, isBeamAt, rampGlyph } from 'ui-patterns/IsoShape/IsoShape.glyphs'
 
-import {
-  BEAM_ALPHA,
-  clamp,
-  drawStep,
-  GLYPH_PITCH,
-  hash,
-  isBeamAt,
-  phase,
-  rampGlyph,
-  type PixelRect,
-} from '../lib/ascii/field'
+import { clamp, drawStep, GLYPH_PITCH, phase, type PixelRect } from '../lib/ascii/field'
 import { fillGlyphPath, GLYPH_FONT } from '../lib/ascii/glyph-path'
 import { createInfall } from '../lib/ascii/infall'
 import { createLayer, sizeLayers } from '../lib/ascii/layer'

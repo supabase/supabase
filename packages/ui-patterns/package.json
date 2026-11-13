@@ -455,6 +455,22 @@
       "import": "./src/InnerSideMenu/index.tsx",
       "types": "./src/InnerSideMenu/index.tsx"
     },
+    "./IsoShape/IsoShape.geometry": {
+      "import": "./src/IsoShape/IsoShape.geometry.ts",
+      "types": "./src/IsoShape/IsoShape.geometry.ts"
+    },
+    "./IsoShape/IsoShape.glyphs": {
+      "import": "./src/IsoShape/IsoShape.glyphs.ts",
+      "types": "./src/IsoShape/IsoShape.glyphs.ts"
+    },
+    "./IsoShape/IsoShape.shapes": {
+      "import": "./src/IsoShape/IsoShape.shapes.ts",
+      "types": "./src/IsoShape/IsoShape.shapes.ts"
+    },
+    "./IsoShape/IsoShape": {
+      "import": "./src/IsoShape/IsoShape.tsx",
+      "types": "./src/IsoShape/IsoShape.tsx"
+    },
     "./LogsBarChart": {
       "import": "./src/LogsBarChart/index.tsx",
       "types": "./src/LogsBarChart/index.tsx"
@@ -799,6 +815,46 @@
       "import": "./src/TopNav/TopNavMenuToggle.tsx",
       "types": "./src/TopNav/TopNavMenuToggle.tsx"
     },
+    "./Trace/Bar": {
+      "import": "./src/Trace/Bar.tsx",
+      "types": "./src/Trace/Bar.tsx"
+    },
+    "./Trace/Header": {
+      "import": "./src/Trace/Header.tsx",
+      "types": "./src/Trace/Header.tsx"
+    },
+    "./Trace/Inspector": {
+      "import": "./src/Trace/Inspector.tsx",
+      "types": "./src/Trace/Inspector.tsx"
+    },
+    "./Trace/Minimap": {
+      "import": "./src/Trace/Minimap.tsx",
+      "types": "./src/Trace/Minimap.tsx"
+    },
+    "./Trace/Rows": {
+      "import": "./src/Trace/Rows.tsx",
+      "types": "./src/Trace/Rows.tsx"
+    },
+    "./Trace/Trace": {
+      "import": "./src/Trace/Trace.tsx",
+      "types": "./src/Trace/Trace.tsx"
+    },
+    "./Trace/Waterfall": {
+      "import": "./src/Trace/Waterfall.tsx",
+      "types": "./src/Trace/Waterfall.tsx"
+    },
+    "./Trace": {
+      "import": "./src/Trace/index.ts",
+      "types": "./src/Trace/index.ts"
+    },
+    "./Trace/types": {
+      "import": "./src/Trace/types.ts",
+      "types": "./src/Trace/types.ts"
+    },
+    "./Trace/utils": {
+      "import": "./src/Trace/utils.ts",
+      "types": "./src/Trace/utils.ts"
+    },
     "./TweetCard": {
       "import": "./src/TweetCard/index.tsx",
       "types": "./src/TweetCard/index.tsx"
@@ -858,6 +914,7 @@
     "@supabase/sql-to-rest": "^0.1.6",
     "@supabase/supabase-js": "catalog:",
     "@tanstack/react-table": "catalog:",
+    "@tanstack/react-virtual": "^3.13.24",
     "class-variance-authority": "^0.7.1",
     "cmdk": "^1.1.1",
     "common": "workspace:*",

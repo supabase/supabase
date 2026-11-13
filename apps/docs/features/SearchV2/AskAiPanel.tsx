@@ -26,7 +26,6 @@ import {
 import { Markdown } from 'ui-patterns/Markdown'
 
 import { AskAiIcon } from './AskAiIcon'
-import { ASK_AI_QUESTION_TELEMETRY_LENGTH } from './constants'
 import { CurvedScrollArea } from '@/features/ui/CurvedScrollArea'
 import { useSendTelemetryEvent } from '@/lib/telemetry'
 
@@ -101,7 +100,6 @@ export function AskAiPanel({ initialQuestion }: AskAiPanelProps) {
     sendTelemetryEvent({
       action: 'docs_search_v2_ask_ai_question_submitted',
       properties: {
-        question: trimmedQuestion.slice(0, ASK_AI_QUESTION_TELEMETRY_LENGTH),
         questionLength: trimmedQuestion.length,
         questionSource: 'typed',
       },

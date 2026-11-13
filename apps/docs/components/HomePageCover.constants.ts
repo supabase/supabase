@@ -2,6 +2,7 @@ export const setupCommand = {
   installCli: 'npm install supabase --save-dev',
   installPlugin: 'npx plugins add supabase-community/supabase-plugin',
   initialize: 'npx supabase init',
+  start: 'npx supabase start',
 } as const
 
 export const setupCommands = [setupCommand.installCli, setupCommand.installPlugin].join('\n')

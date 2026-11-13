@@ -8,6 +8,7 @@ import { testGrant } from '@/tests/lib/test-grant'
 const BRANCHES = 'GET /v1/projects/{ref}/branches'
 const API_KEYS = 'GET /v1/projects/{ref}/api-keys'
 const API_KEY = 'GET /v1/projects/{ref}/api-keys/{id}'
+const PG_META_QUERY = 'POST /platform/pg-meta/{ref}/query'
 const params = { path: { ref: 'proj' } }
 
 type Result<F extends () => unknown> = Awaited<ReturnType<F>>
@@ -201,6 +202,49 @@ describe('guarded fetch types for an endpoint with an owned query param', () => 
   })
 })
 
+describe('guarded fetch types for an endpoint with a required read/write variant', () => {
+  const queryInit = {
+    params: { path: { ref: 'proj' }, header: { 'x-connection-encrypted': '' } },
+    body: { query: 'select 1' },
+  }
+
+  it('match the raw client with a read grant and a write grant', () => {
+    const r = () => client.POST('/platform/pg-meta/{ref}/query', queryInit)
+
+    const read = () =>
+      post('/platform/pg-meta/{ref}/query', {
+        ...queryInit,
+        grant: testGrant(PG_META_QUERY, { variant: 'read' }),
+      })
+    assertType<Equals<Result<typeof read>, Result<typeof r>>>(true)
+
+    const write = () =>
+      post('/platform/pg-meta/{ref}/query', {
+        ...queryInit,
+        grant: testGrant(PG_META_QUERY, { variant: 'write' }),
+      })
+    assertType<Equals<Result<typeof write>, Result<typeof r>>>(true)
+  })
+
+  it('reject a plain grant and a variant the endpoint does not have', () => {
+    const plain = { ...queryInit, grant: testGrant(PG_META_QUERY) }
+    // @ts-expect-error plain grant where a variant is required
+    void (() => post('/platform/pg-meta/{ref}/query', plain))
+    // @ts-expect-error the endpoint has no `reveal` variant
+    void (() => testGrant(PG_META_QUERY, { variant: 'reveal' }))
+  })
+
+  it('treat read and write grants as distinct types', () => {
+    type Plain = Grant<typeof PG_META_QUERY>
+    type Read = Grant<typeof PG_META_QUERY, 'read'>
+    type Write = Grant<typeof PG_META_QUERY, 'write'>
+    assertType<Equals<Read extends Write ? true : false, false>>(true)
+    assertType<Equals<Write extends Read ? true : false, false>>(true)
+    assertType<Equals<Plain extends Read ? true : false, false>>(true)
+    assertType<Equals<Plain extends Write ? true : false, false>>(true)
+  })
+})
+
 describe('guardMethod', () => {
   it('strips the grant before calling the raw method', async () => {
     const raw = vi.fn().mockResolvedValue({})
@@ -304,7 +348,6 @@ describe('assertGrant', () => {
     'PATCH /v1/branches/{branch_id_or_ref}',
     'DELETE /v1/branches/{branch_id_or_ref}',
     'GET /v1/branches/{branch_id_or_ref}/diff',
-    'POST /v1/branches/{branch_id_or_ref}/merge',
     'POST /v1/branches/{branch_id_or_ref}/push',
     'POST /v1/branches/{branch_id_or_ref}/reset',
     'POST /v1/branches/{branch_id_or_ref}/restore',
@@ -326,6 +369,18 @@ describe('assertGrant', () => {
     )
     expect(
       check(endpoint, testGrant(endpoint, { variant: 'production' }), create({ with_data: true }))
+    ).not.toThrow()
+  })
+
+  it('requires a variant on an endpoint with a required variant', () => {
+    expect(check(PG_META_QUERY, testGrant(PG_META_QUERY), { params })).toThrow(
+      'grant needs a variant'
+    )
+    expect(
+      check(PG_META_QUERY, testGrant(PG_META_QUERY, { variant: 'read' }), { params })
+    ).not.toThrow()
+    expect(
+      check(PG_META_QUERY, testGrant(PG_META_QUERY, { variant: 'write' }), { params })
     ).not.toThrow()
   })
 

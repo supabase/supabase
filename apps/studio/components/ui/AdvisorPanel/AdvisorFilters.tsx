@@ -59,6 +59,7 @@ export const AdvisorFilters = ({
   onClose,
   isPlatform = false,
 }: AdvisorFiltersProps) => {
+  const isIssuesInboxEnabled = useFlag('issuesInbox')
   const isHealthAdvisorEnabled = useFlag('healthAdvisor')
   const categoryOptions = (isPlatform ? platformCategories : selfHostedCategories)
     .filter((category) => category !== 'health' || isHealthAdvisorEnabled)
@@ -107,7 +108,12 @@ export const AdvisorFilters = ({
           className="w-7 h-7 p-0 mr-3"
           icon={<XIcon strokeWidth={1.5} />}
           onClick={onClose}
-          tooltip={{ content: { side: 'bottom', text: 'Close Advisor Center' } }}
+          tooltip={{
+            content: {
+              side: 'bottom',
+              text: isIssuesInboxEnabled ? 'Close Issues' : 'Close Advisor Center',
+            },
+          }}
         />
       </div>
     </div>

@@ -1,5 +1,5 @@
 # Runner for /test-the-docs: executes MDX fences inside the container.
-FROM node:22-bookworm-slim
+FROM node:24-bookworm-slim
 
 ARG TARGETARCH
 ARG SUPABASE_CLI_VERSION=2.39.2

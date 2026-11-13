@@ -1,22 +1,15 @@
 import { AuthError } from '@supabase/auth-js'
-import { fireEvent, screen, waitFor } from '@testing-library/react'
-import { describe, expect, test, vi } from 'vitest'
+import { act, fireEvent, screen, waitFor } from '@testing-library/react'
+import userEvent from '@testing-library/user-event'
+import { consentState } from 'common'
+import { HttpResponse } from 'msw'
+import { beforeEach, describe, expect, onTestFinished, test, vi } from 'vitest'
 
 import { GenerateRecoveryCodesModal } from './GenerateRecoveryCodesModal'
 import { RecoveryCodesModal } from './RecoveryCodesModal'
-import { formatRecoveryCode } from './RecoveryCodesModal.utils'
 import { auth } from '@/lib/gotrue'
 import { customRender } from '@/tests/lib/custom-render'
-
-const { mockCopyToClipboard } = vi.hoisted(() => ({
-  mockCopyToClipboard: vi.fn((_value: string, callback: () => void) => {
-    return callback()
-  }),
-}))
-vi.mock('ui', async (importOriginal) => ({
-  ...(await importOriginal<typeof import('ui')>()),
-  copyToClipboard: mockCopyToClipboard,
-}))
+import { addAPIMock, type APIErrorBody } from '@/tests/lib/msw'
 
 const codes = [
   'wto24t5xbeulvjmi',
@@ -32,10 +25,20 @@ const codes = [
 ]
 
 describe('GenerateRecoveryCodesModal', () => {
+  beforeEach(() => {
+    addAPIMock({
+      method: 'get',
+      path: '/platform/projects/:ref',
+      response: () =>
+        HttpResponse.json<APIErrorBody>({ message: 'Project not selected' }, { status: 404 }),
+    })
+  })
+
   test('shows shimmer content while codes are being generated', () => {
     customRender(
       <RecoveryCodesModal
         open
+        surface="account_security"
         onOpenChange={vi.fn()}
         mutation={{
           data: undefined,
@@ -53,7 +56,42 @@ describe('GenerateRecoveryCodesModal', () => {
     expect(screen.queryByRole('button', { name: 'Close' })).not.toBeInTheDocument()
   })
 
-  test('generate the recovery codes and allow users to copy them', async () => {
+  test('lets users copy and download generated recovery codes and tracks both actions', async () => {
+    userEvent.setup()
+    const hasFocus = vi.spyOn(document, 'hasFocus').mockReturnValue(true)
+    const writeText = vi
+      .spyOn(navigator.clipboard, 'writeText')
+      .mockRejectedValueOnce(new Error('Clipboard unavailable'))
+    const previousConsent = consentState.hasConsented
+    consentState.hasConsented = true
+    const telemetryRequests: unknown[] = []
+    addAPIMock({
+      method: 'post',
+      path: '/platform/telemetry/event',
+      response: async ({ request }) => {
+        telemetryRequests.push(await request.json())
+        return new HttpResponse(null, { status: 201 })
+      },
+    })
+
+    const downloadClick = vi
+      .spyOn(HTMLAnchorElement.prototype, 'click')
+      .mockImplementation(() => {})
+    vi.stubGlobal(
+      'URL',
+      class extends URL {
+        static createObjectURL = vi.fn(() => 'blob:recovery-codes')
+        static revokeObjectURL = vi.fn()
+      }
+    )
+    onTestFinished(() => {
+      hasFocus.mockRestore()
+      writeText.mockRestore()
+      downloadClick.mockRestore()
+      vi.unstubAllGlobals()
+      consentState.hasConsented = previousConsent
+    })
+
     vi.spyOn(auth.mfa.recoveryCodes, 'generate').mockResolvedValue({
       data: {
         id: 'some_id',
@@ -71,16 +109,36 @@ describe('GenerateRecoveryCodesModal', () => {
     await screen.findByText('WTO2-4T5X-BEUL-VJMI')
     await screen.findByText('KYYF-SP3E-QJYD-J53T')
 
-    // Users have to copy the codes before they can close the modal
     expect(await screen.findByRole('button', { name: 'Done' })).toBeDisabled()
-    fireEvent.click(await screen.findByRole('button', { name: 'Copy' }))
+    const copyButton = screen.getByRole('button', { name: 'Copy' })
+    await act(async () => {
+      fireEvent.click(copyButton)
+    })
+    expect(telemetryRequests).toHaveLength(0)
+
+    fireEvent.click(copyButton)
+    await screen.findByRole('button', { name: 'Copied' })
+    await waitFor(() => {
+      expect(telemetryRequests).toMatchObject([
+        { action: 'recovery_codes_copied', custom_properties: { surface: 'account_security' } },
+      ])
+    })
+    expect(await navigator.clipboard.readText()).toContain('WTO2-4T5X-BEUL-VJMI')
     fireEvent.click(
       screen.getByRole('checkbox', { name: 'I have saved my recovery codes somewhere safe' })
     )
-    expect(mockCopyToClipboard).toHaveBeenCalledWith(
-      codes.map((code) => formatRecoveryCode(code)).join('\n'),
-      expect.any(Function)
-    )
+    fireEvent.click(screen.getByRole('button', { name: 'Download' }))
+    expect(downloadClick).toHaveBeenCalledOnce()
+    await waitFor(() => {
+      expect(telemetryRequests).toMatchObject([
+        { action: 'recovery_codes_copied', custom_properties: { surface: 'account_security' } },
+        {
+          action: 'recovery_codes_download_clicked',
+          custom_properties: { surface: 'account_security' },
+        },
+      ])
+    })
+    expect(JSON.stringify(telemetryRequests)).not.toMatch(/wto2-?4t5x-?beul-?vjmi/i)
 
     // Done button is now enabled and closes the modal
     const doneButton = await screen.findByRole('button', { name: 'Done' })
