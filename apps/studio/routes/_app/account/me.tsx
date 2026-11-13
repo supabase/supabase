@@ -1,4 +1,4 @@
-import { createFileRoute, useLocation, useNavigate } from '@tanstack/react-router'
+import { createFileRoute, useLocation } from '@tanstack/react-router'
 import { useEffect } from 'react'
 import { Card, CardContent, CardFooter } from 'ui'
 import { PageContainer } from 'ui-patterns/PageContainer'
@@ -24,7 +24,6 @@ import { AnalyticsSettings } from '@/components/interfaces/Account/Preferences/A
 import { DashboardSettings } from '@/components/interfaces/Account/Preferences/DashboardSettings'
 import { HotkeySettings } from '@/components/interfaces/Account/Preferences/HotkeySettings'
 import { ProfileInformation } from '@/components/interfaces/Account/Preferences/ProfileInformation'
-import { parseRedirectMessage } from '@/components/interfaces/Account/Preferences/SignInMethods.utils'
 import { ThemeSettings } from '@/components/interfaces/Account/Preferences/ThemeSettings'
 import { TimezoneSettings } from '@/components/interfaces/Account/Preferences/TimezoneSettings'
 import { AlertError } from '@/components/ui/AlertError'
@@ -57,7 +56,6 @@ const PreferencesPageHeader = ({ description }: { description: string }) => (
 
 const PlatformPreferences = () => {
   const { href } = useLocation()
-  const navigate = useNavigate()
 
   const { profileShowInformation, profileShowAnalyticsAndMarketing, profileShowAccountDeletion } =
     useIsFeatureEnabled([
@@ -69,17 +67,10 @@ const PlatformPreferences = () => {
 
   useEffect(() => {
     const hash = href.split('#')[1]
-    const isEmailConfirmation = !!parseRedirectMessage(href)
-    // Email-change links already sent still return to Preferences (account/me).
-    // Now that sign-in methods are in Security, we need to redirect them there instead.
-    if (isEmailConfirmation) {
-      void navigate({ to: '/account/security', search: true, hash, replace: true })
-      return
-    }
     if (isLoading || !hash) return
 
     document.getElementById(hash)?.scrollIntoView({ block: 'start' })
-  }, [href, isLoading, navigate])
+  }, [href, isLoading])
 
   return (
     <>

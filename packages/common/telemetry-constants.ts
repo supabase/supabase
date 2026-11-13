@@ -1375,8 +1375,7 @@ export interface KbSearchClosedEvent {
 }
 
 /**
- * A knowledge base search returned, with or without results. The query text is left out
- * because it can contain personal data; only its length is sent.
+ * A knowledge base search returned, with or without results.
  *
  * @group Events
  * @source kb
@@ -1384,6 +1383,8 @@ export interface KbSearchClosedEvent {
 export interface KbSearchSubmittedEvent {
   action: 'kb_search_submitted'
   properties: {
+    /** The trimmed search term sent to the knowledge base search endpoint. */
+    query: string
     /** Length of the trimmed search term. */
     queryLength: number
     /** Number of results the search returned. */
