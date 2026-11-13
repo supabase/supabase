@@ -622,6 +622,17 @@ const EntityTooltipTrigger = ({
         )
       }
       break
+    case ENTITY_TYPE.PARTITIONED_TABLE:
+      // The RLS lint doesn't report partitioned tables, so derive it from the table itself
+      if (!entity.rls_enabled && apiAccessData?.apiAccessType === 'access') {
+        tooltipContent = (
+          <>
+            This table can be accessed by anyone via the Data API as RLS is disabled. {learnMoreCTA}
+            .
+          </>
+        )
+      }
+      break
     case ENTITY_TYPE.VIEW:
       if (viewHasLints) {
         tooltipContent = (
@@ -667,7 +678,7 @@ const EntityTooltipTrigger = ({
   }
 
   const isRlsEnabledNoPolicies =
-    entity.type === ENTITY_TYPE.TABLE &&
+    (entity.type === ENTITY_TYPE.TABLE || entity.type === ENTITY_TYPE.PARTITIONED_TABLE) &&
     apiAccessData?.apiAccessType === 'access' &&
     tableHasRlsEnabledNoPolicyLint
   if (isRlsEnabledNoPolicies) {
