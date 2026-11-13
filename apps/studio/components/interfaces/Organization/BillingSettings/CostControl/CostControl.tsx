@@ -8,6 +8,7 @@ import { Admonition } from 'ui-patterns/Admonition'
 import { ShimmeringLoader } from 'ui-patterns/ShimmeringLoader'
 
 import { ProjectUpdateDisabledTooltip } from '../ProjectUpdateDisabledTooltip'
+import { useOrgSettingsPanel } from '../useOrgSettingsPanel'
 import { SpendCapSidePanel } from './SpendCapSidePanel'
 import {
   ScaffoldSection,
@@ -24,12 +25,11 @@ import { FGA_PERMISSIONS, useAsyncCheckPermissionsV2 } from '@/hooks/misc/useChe
 import { useSelectedOrganizationQuery } from '@/hooks/misc/useSelectedOrganization'
 import { BASE_PATH, DOCS_URL } from '@/lib/constants'
 import { MANAGED_BY } from '@/lib/constants/infrastructure'
-import { useOrgSettingsPageStateSnapshot } from '@/state/organization-settings'
 
 export const CostControl = () => {
   const { slug } = useParams()
   const { resolvedTheme } = useTheme()
-  const snap = useOrgSettingsPageStateSnapshot()
+  const { setPanel } = useOrgSettingsPanel()
   const { data: selectedOrganization } = useSelectedOrganizationQuery()
 
   const projectUpdateDisabled = useFlag('disableProjectCreationAndUpdate')
@@ -187,7 +187,7 @@ export const CostControl = () => {
                         <Button
                           className="mt-4 pointer-events-auto"
                           disabled={!canChangeTier}
-                          onClick={() => snap.setPanelKey('costControl')}
+                          onClick={() => setPanel('costControl')}
                         >
                           Change spend cap
                         </Button>
