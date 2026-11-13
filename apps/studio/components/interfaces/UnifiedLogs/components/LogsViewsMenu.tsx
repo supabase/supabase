@@ -216,7 +216,7 @@ export const LogsViewsMenu = ({
                 icon={BookmarkIcon}
                 iconSize={20}
                 title="No saved views"
-                description="Start by configuring more than 2 filters."
+                description="Start by configuring 2 or more filters."
                 className="border-0 bg-transparent px-4 py-2"
                 contentClassName="gap-y-1 [&_h3]:text-sm [&_p]:text-xs"
               />
