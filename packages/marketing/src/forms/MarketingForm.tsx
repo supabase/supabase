@@ -259,8 +259,8 @@ export default function MarketingForm({
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault()
 
-    // Required checkboxes / checkbox-groups aren't covered by HTML5 validation;
-    // check them manually.
+    // Required checkboxes / checkbox-groups aren't covered by HTML5 validation, and Radix's
+    // hidden native <select> falls back to its first option, so check these manually.
     const validationErrors: string[] = []
     for (const f of visibleFields) {
       if (!f.required) continue
@@ -271,6 +271,8 @@ export default function MarketingForm({
         parseCheckboxGroup(values[f.name] ?? '').length === 0
       ) {
         validationErrors.push(`Please select at least one: ${f.label.replace(/\*$/, '').trim()}`)
+      } else if (f.type === 'select' && !values[f.name]) {
+        validationErrors.push(`Please select an option: ${f.label.replace(/\*$/, '').trim()}`)
       }
     }
     if (validationErrors.length > 0) {
