@@ -1,4 +1,6 @@
-import { hash, phase, RAMP } from './field'
+import { hash, RAMP } from 'ui-patterns/IsoShape/IsoShape.glyphs'
+
+import { phase } from './field'
 import { invertWarp, projectWarp, tangentAngle, type WarpPoint, type WarpShape } from './warp'
 
 interface InfallGlyph {
