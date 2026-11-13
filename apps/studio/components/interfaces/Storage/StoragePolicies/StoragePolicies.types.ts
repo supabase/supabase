@@ -31,8 +31,8 @@ export interface PostgresPolicyCreatePayload {
 export interface PostgresPolicyUpdatePayload {
   id: number
   name?: string
-  definition?: SafeSqlFragment
-  check?: SafeSqlFragment
+  definition?: SafeSqlFragment | null
+  check?: SafeSqlFragment | null
   roles?: string[]
 }
 
@@ -55,8 +55,8 @@ export interface DraftPostgresPolicyUpdatePayload extends Omit<
   PostgresPolicyUpdatePayload,
   'definition' | 'check'
 > {
-  definition?: DisplayableSqlFragment
-  check?: DisplayableSqlFragment
+  definition?: DisplayableSqlFragment | null
+  check?: DisplayableSqlFragment | null
 }
 
 export interface PolicyForReview {
