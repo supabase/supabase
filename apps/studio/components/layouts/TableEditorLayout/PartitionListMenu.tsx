@@ -18,7 +18,12 @@ import { partitionInfoQueryOptions } from '@/data/entity-types/partition-info-qu
 import { useTableApiAccessQuery } from '@/data/privileges/table-api-access-query'
 import { useSelectedProjectQuery } from '@/hooks/misc/useSelectedProject'
 
-const PARTITION_ENTITY_TYPES = [ENTITY_TYPE.TABLE, ENTITY_TYPE.PARTITIONED_TABLE]
+// Foreign tables can be partitions too (e.g. archival partitions served via a foreign server)
+const PARTITION_ENTITY_TYPES = [
+  ENTITY_TYPE.TABLE,
+  ENTITY_TYPE.PARTITIONED_TABLE,
+  ENTITY_TYPE.FOREIGN_TABLE,
+]
 
 type PartitionListMenuProps = {
   parentId: number
