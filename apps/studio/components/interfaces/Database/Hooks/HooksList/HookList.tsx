@@ -1,3 +1,4 @@
+import { useQuery } from '@tanstack/react-query'
 import { useParams } from 'common'
 import { includes } from 'lodash'
 import { EditIcon, MoreVerticalIcon, TrashIcon } from 'lucide-react'
@@ -18,11 +19,11 @@ import {
 
 import Table from '@/components/to-be-cleaned/Table'
 import { ButtonTooltip } from '@/components/ui/ButtonTooltip'
-import { useDatabaseHooksQuery } from '@/data/database-triggers/database-triggers-query'
-import { FGA_PERMISSIONS, useAsyncCheckPermissionsV2 } from '@/hooks/misc/useCheckPermissionsV2'
+import { databaseHooksQueryOptions } from '@/data/database-triggers/database-triggers-query'
 import { useSelectedProjectQuery } from '@/hooks/misc/useSelectedProject'
 import { isEdgeFunctionUrl } from '@/lib/api/edgeFunctions'
 import { BASE_PATH } from '@/lib/constants'
+import { useGrant } from '@/lib/grants'
 
 export interface HookListProps {
   schema: string
@@ -32,10 +33,23 @@ export interface HookListProps {
 export const HookList = ({ schema, filterString }: HookListProps) => {
   const { ref } = useParams()
   const { data: project } = useSelectedProjectQuery()
-  const { data: hooks } = useDatabaseHooksQuery({
-    projectRef: project?.ref,
-    connectionString: project?.connectionString,
-  })
+  const readGrant = useGrant(
+    'POST /platform/pg-meta/{ref}/query',
+    { projectRef: project?.ref },
+    { variant: 'read' }
+  )
+  const writeGrant = useGrant(
+    'POST /platform/pg-meta/{ref}/query',
+    { projectRef: project?.ref },
+    { variant: 'write' }
+  )
+  const { data: hooks } = useQuery(
+    databaseHooksQueryOptions({
+      projectRef: project?.ref,
+      connectionString: project?.connectionString,
+      grant: readGrant.grant,
+    })
+  )
 
   const [, setSelectedHookIdToEdit] = useQueryState('edit', parseAsString.withDefault(''))
   const [, setSelectedHookIdToDelete] = useQueryState('delete', parseAsString.withDefault(''))
@@ -48,9 +62,7 @@ export const HookList = ({ schema, filterString }: HookListProps) => {
       x.schema === schema &&
       x.function_args.length >= 2
   )
-  const { can: canUpdateWebhook } = useAsyncCheckPermissionsV2(
-    FGA_PERMISSIONS.PROJECT.DATABASE_WRITE
-  )
+  const canUpdateWebhook = writeGrant.status === 'granted'
 
   return (
     <>
