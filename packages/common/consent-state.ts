@@ -35,7 +35,9 @@ function resetServerTelemetryCookies(): Promise<void> {
     credentials: 'include',
     keepalive: true,
   })
-    .then(() => undefined)
+    .then((response) => {
+      if (!response.ok) console.error(`Telemetry reset failed with status ${response.status}`)
+    })
     .catch(() => undefined)
 
   return Promise.race([
@@ -214,18 +216,17 @@ export const consentState = proxy({
   hasConsented: false,
   acceptAll: () => {
     if (!consentState.UC) return
-    const previousConsentValue = consentState.hasConsented
 
-    consentState.hasConsented = true
     consentState.showConsentToast = false
 
+    // hasConsented starts PostHog, which clears a stored opt-out, so set it only once the accept is saved
     consentState.UC.acceptAllServices()
       .then(() => {
+        consentState.hasConsented = true
         consentState.categories = consentState.UC?.getCategoriesBaseInfo() ?? null
         posthogClient.optIn()
       })
       .catch(() => {
-        consentState.hasConsented = previousConsentValue
         consentState.showConsentToast = true
       })
   },

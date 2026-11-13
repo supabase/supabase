@@ -553,6 +553,16 @@ describe('revokeTrackingConsent', () => {
     )
   })
 
+  it('logs a failed reset response and still resolves', async () => {
+    const consoleError = vi.spyOn(console, 'error').mockImplementation(() => {})
+    fetchMock.mockImplementation(() => Promise.resolve(new Response(null, { status: 500 })))
+
+    await expect(revokeTrackingConsent()).resolves.toBeUndefined()
+
+    expect(consoleError).toHaveBeenCalledExactlyOnceWith('Telemetry reset failed with status 500')
+    consoleError.mockRestore()
+  })
+
   it('does not double the /platform suffix when the API URL already has it', async () => {
     vi.stubEnv('NEXT_PUBLIC_API_URL', 'https://api.supabase.com/platform/')
 
@@ -762,9 +772,26 @@ describe('consent withdrawal call sites', () => {
     consentState.hasConsented = false
 
     consentState.acceptAll()
-    await vi.waitFor(() => expect(consentState.hasConsented).toBe(false))
+    await vi.waitFor(() => expect(consentState.showConsentToast).toBe(true))
 
+    expect(consentState.hasConsented).toBe(false)
     expect(posthogClient.optIn).not.toHaveBeenCalled()
+  })
+
+  it('acceptAll keeps consent off until the decision is saved', async () => {
+    const UC = makeUC(true)
+    const saved = Promise.withResolvers<void>()
+    UC.acceptAllServices.mockReturnValueOnce(saved.promise)
+    consentState.UC = UC as never
+    consentState.hasConsented = false
+
+    consentState.acceptAll()
+
+    expect(consentState.showConsentToast).toBe(false)
+    expect(consentState.hasConsented).toBe(false)
+
+    saved.resolve()
+    await vi.waitFor(() => expect(consentState.hasConsented).toBe(true))
   })
 
   it('updateServices leaves consent untouched when saving fails', async () => {
