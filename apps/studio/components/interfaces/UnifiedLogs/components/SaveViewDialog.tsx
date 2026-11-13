@@ -29,7 +29,7 @@ import {
 interface SaveViewDialogProps {
   visible: boolean
   onCancel: () => void
-  onSave: (input: LogsViewDraft) => void
+  onSave: (input: LogsViewDraft) => Promise<void>
   logSource: string
   filters: FilterGroup
   viewOptions: Record<string, unknown>
@@ -81,14 +81,23 @@ export const SaveViewDialog = ({
     onCancel()
   }
 
-  const onSubmit = ({ name }: { name: string }) => {
-    onSave({ name, logSource, filters, viewOptions })
-    form.reset(defaultValues)
-    onCancel()
+  const onSubmit = async ({ name }: { name: string }) => {
+    try {
+      await onSave({ name, logSource, filters, viewOptions })
+      form.reset(defaultValues)
+      onCancel()
+    } catch {
+      return
+    }
   }
 
   return (
-    <Dialog open={visible} onOpenChange={handleCancel}>
+    <Dialog
+      open={visible}
+      onOpenChange={() => {
+        if (!isSubmitting) handleCancel()
+      }}
+    >
       <DialogContent size="medium">
         <DialogHeader>
           <DialogTitle>Save current filters as view</DialogTitle>

@@ -1,4 +1,4 @@
-import { fireEvent, screen } from '@testing-library/react'
+import { act, fireEvent, screen, waitFor } from '@testing-library/react'
 import userEvent from '@testing-library/user-event'
 import { mockAnimationsApi } from 'jsdom-testing-mocks'
 import { describe, expect, it, vi } from 'vitest'
@@ -80,15 +80,15 @@ describe('SaveViewDialog', () => {
 
     const input = await screen.findByPlaceholderText('Enter a name for this view')
     await userEvent.type(input, 'Errors only')
-    fireEvent.click(screen.getByRole('button', { name: 'Save view' }))
+    await act(async () => fireEvent.click(screen.getByRole('button', { name: 'Save view' })))
 
-    await vi.waitFor(() => expect(onSave).toHaveBeenCalledOnce())
+    await waitFor(() => expect(onSave).toHaveBeenCalledOnce())
     expect(onSave).toHaveBeenCalledWith({
       name: 'Errors only',
       logSource: 'edge_logs',
       filters,
       viewOptions,
     })
-    expect(onCancel).toHaveBeenCalledOnce()
+    await waitFor(() => expect(onCancel).toHaveBeenCalledOnce())
   })
 })

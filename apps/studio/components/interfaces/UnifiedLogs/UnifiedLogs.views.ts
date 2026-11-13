@@ -2,6 +2,7 @@ import isEqual from 'lodash/isEqual'
 import { isGroup, type FilterCondition, type FilterGroup } from 'ui-patterns/FilterBar'
 
 import {
+  getLogAttributeKey,
   logsFiltersToUrlParams,
   parseLogsFilterUrlParams,
   type LogsFilter,
@@ -53,7 +54,6 @@ export interface LogsView {
   viewOptions: Record<string, unknown>
 }
 
-// The content of a view, before an id is assigned by the store (useLogsViews.mock.ts).
 export type LogsViewDraft = Omit<LogsView, 'id' | 'type' | 'version'>
 
 export interface ApplyViewResult {
@@ -66,12 +66,17 @@ export interface UseLogsViewsResult {
   isLoading: boolean
   isError: boolean
   error: Error | null
-  createView: (input: LogsViewDraft) => string
+  isPending: boolean
+  canCreate: boolean
+  canUpdate: boolean
+  canDelete: boolean
+  retry: () => void
+  createView: (input: LogsViewDraft) => Promise<string>
   updateView: (
     id: string,
     input: Partial<Pick<LogsView, 'name' | 'filters' | 'viewOptions'>>
-  ) => void
-  deleteView: (id: string) => void
+  ) => Promise<void>
+  deleteView: (id: string) => Promise<void>
 }
 
 export const serializeView = ({
@@ -117,7 +122,15 @@ export const applyView = (
       dropped.push('(nested group)')
       continue
     }
-    if (!filterableNames.has(condition.propertyName)) {
+    const attributeKey = getLogAttributeKey(condition.propertyName)
+    const isDynamicFilter =
+      attributeKey !== undefined
+        ? attributeKey.length > 0
+        : /^[A-Za-z_][A-Za-z0-9_]*$/.test(condition.propertyName)
+    if (
+      condition.propertyName === 'date' ||
+      (!filterableNames.has(condition.propertyName) && !isDynamicFilter)
+    ) {
       dropped.push(condition.propertyName)
       continue
     }
@@ -131,6 +144,8 @@ export const applyView = (
   const params: Record<string, unknown> = {
     filter: filters.length > 0 ? logsFiltersToUrlParams(filters) : [],
   }
+
+  for (const key of VIEW_OPTION_KEYS) params[key] = null
 
   for (const [key, value] of Object.entries(view.viewOptions)) {
     if (!VIEW_OPTION_KEYS.includes(key as ViewOptionKey)) {
@@ -148,7 +163,20 @@ export const isViewModified = (
   search: Pick<SearchParamsType, 'filter'> & Partial<Pick<SearchParamsType, ViewOptionKey>>
 ): boolean => {
   const current = serializeView({ name: view.name, logSource: view.logSource, search })
-  return !isEqual(current.filters, view.filters) || !isEqual(current.viewOptions, view.viewOptions)
+  const normalizedOptions = (options: Record<string, unknown>) =>
+    Object.fromEntries(
+      VIEW_OPTION_KEYS.map((key) => [
+        key,
+        options[key] ??
+          (['show_connection_logs', 'edge_auth', 'edge_storage', 'edge_postgrest'].includes(key)
+            ? true
+            : null),
+      ])
+    )
+  return (
+    !isEqual(current.filters, view.filters) ||
+    !isEqual(normalizedOptions(current.viewOptions), normalizedOptions(view.viewOptions))
+  )
 }
 
 export const countActiveFilters = (view: LogsView): number => {

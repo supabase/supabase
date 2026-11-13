@@ -145,7 +145,8 @@ export const UnifiedLogs = ({
   const canShowPipelinesLogs = showPipelinesLogs || isLoadingPipelinesLogs
   const { hasLoaded: flagsLoaded } = useFeatureFlags()
   const computeEnabled = useFlag('compute')
-  const showSavedViews = useFlag(LOGS_SAVED_VIEWS_FLAG)
+  const savedViewsFlag = useFlag(LOGS_SAVED_VIEWS_FLAG)
+  const showSavedViews = IS_PLATFORM && savedViewsFlag
   const {
     views: savedViews,
     isLoading: isLoadingSavedViews,
@@ -153,9 +154,17 @@ export const UnifiedLogs = ({
     createView: createSavedView,
     updateView: updateSavedView,
     deleteView: deleteSavedView,
+    isPending: isSavingView,
+    canCreate: canCreateView,
+    canUpdate: canUpdateView,
+    canDelete: canDeleteView,
+    retry: retrySavedViews,
   } = useLogsViews()
   const [activeViewId, setActiveViewId] = useState<string | null>(null)
-  const [isSaveViewDialogOpen, setIsSaveViewDialogOpen] = useState(false)
+  const [saveDialogProject, setSaveDialogProject] = useState<string | null>(null)
+  const isSaveViewDialogOpen = saveDialogProject !== null && saveDialogProject === projectRef
+  const currentProjectRef = useRef(projectRef)
+  currentProjectRef.current = projectRef
   const [dismissedFilterKeys, setDismissedFilterKeys] = useState<Set<string>>(new Set())
   const [dismissedUpdateKey, setDismissedUpdateKey] = useState<string | null>(null)
   const computeAvailability = getComputeLogsAvailability({
@@ -480,7 +489,7 @@ export const UnifiedLogs = ({
   )
   const filterCombinationKey = getFilterCombinationKey(search.filter)
   const showSaveViewSuggestion = shouldShowSaveViewSuggestion({
-    isEnabled: showSavedViews,
+    isEnabled: showSavedViews && canCreateView && !isSavingView,
     activeFilterCount,
     hasActiveView: !!activeView,
     isDialogOpen: isSaveViewDialogOpen,
@@ -493,6 +502,8 @@ export const UnifiedLogs = ({
   const showUpdateViewSuggestion =
     showSavedViews &&
     !!activeView &&
+    canUpdateView &&
+    !isSavingView &&
     isActiveViewModified &&
     !isSaveViewDialogOpen &&
     updateSuggestionKey !== dismissedUpdateKey
@@ -502,23 +513,28 @@ export const UnifiedLogs = ({
     if (dropped.length > 0) {
       console.warn(`Saved view "${view.name}" dropped unknown filters/options:`, dropped)
     }
+    setSorting(params.sort ? [params.sort] : [])
     setSearch(params)
     setActiveViewId(view.id)
   }
 
-  const handleUpdateActiveView = () => {
+  const handleUpdateActiveView = async () => {
     if (!activeView) return
     const { filters, viewOptions } = serializeView({
       name: activeView.name,
       logSource: activeView.logSource,
       search,
     })
-    updateSavedView(activeView.id, { filters, viewOptions })
-    toast.success('View updated')
+    try {
+      await updateSavedView(activeView.id, { filters, viewOptions })
+      toast.success('View updated')
+    } catch {
+      return
+    }
   }
 
   const handleSaveCurrentView = () => {
-    setIsSaveViewDialogOpen(true)
+    setSaveDialogProject(projectRef ?? null)
   }
 
   const handleClearActiveView = () => {
@@ -526,10 +542,13 @@ export const UnifiedLogs = ({
     setActiveViewId(null)
   }
 
-  const handleCreateView = (input: LogsViewDraft) => {
-    const id = createSavedView(input)
-    setActiveViewId(id)
-    setIsSaveViewDialogOpen(false)
+  const handleCreateView = async (input: LogsViewDraft) => {
+    const savedProjectRef = projectRef
+    const id = await createSavedView(input)
+    if (currentProjectRef.current === savedProjectRef) {
+      setActiveViewId(id)
+      setSaveDialogProject(null)
+    }
     toast.success('View saved')
   }
 
@@ -706,10 +725,15 @@ export const UnifiedLogs = ({
                     />
                     {showSavedViews && (
                       <LogsViewsMenu
+                        key={projectRef}
                         views={savedViews}
                         isLoading={isLoadingSavedViews}
                         isError={isErrorSavedViews}
-                        activeViewId={activeViewId}
+                        activeViewId={activeView?.id ?? null}
+                        isPending={isSavingView}
+                        canUpdate={canUpdateView}
+                        canDelete={canDeleteView}
+                        onRetry={retrySavedViews}
                         onApply={handleApplyView}
                         onRename={(id, name) => updateSavedView(id, { name })}
                         onDelete={deleteSavedView}
@@ -820,8 +844,9 @@ export const UnifiedLogs = ({
         </DataTableSideBarLayout>
       </DataTableProvider>
       <SaveViewDialog
+        key={projectRef}
         visible={isSaveViewDialogOpen}
-        onCancel={() => setIsSaveViewDialogOpen(false)}
+        onCancel={() => setSaveDialogProject(null)}
         onSave={handleCreateView}
         logSource={logSource}
         filters={currentDraft.filters}

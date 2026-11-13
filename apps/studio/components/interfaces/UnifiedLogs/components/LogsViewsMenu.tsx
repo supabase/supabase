@@ -7,7 +7,7 @@ import {
   Trash2Icon,
   XIcon,
 } from 'lucide-react'
-import { KeyboardEvent, useState } from 'react'
+import { KeyboardEvent, useRef, useState } from 'react'
 import {
   cn,
   DropdownMenu,
@@ -26,10 +26,14 @@ interface LogsViewsMenuProps {
   views: LogsView[]
   isLoading: boolean
   isError: boolean
+  isPending?: boolean
+  canUpdate?: boolean
+  canDelete?: boolean
+  onRetry?: () => void
   activeViewId: string | null
   onApply: (view: LogsView) => void
-  onRename: (id: string, name: string) => void
-  onDelete: (id: string) => void
+  onRename: (id: string, name: string) => Promise<void>
+  onDelete: (id: string) => Promise<void>
   onClearActiveView: () => void
 }
 
@@ -40,13 +44,16 @@ const RowIconAction = ({
   icon,
   label,
   onClick,
+  disabled,
 }: {
+  disabled?: boolean
   icon: React.ReactNode
   label: string
   onClick: (e: React.MouseEvent) => void
 }) => (
   <button
     type="button"
+    disabled={disabled}
     tabIndex={0}
     aria-label={label}
     onClick={onClick}
@@ -62,20 +69,33 @@ const LogsViewRow = ({
   onApply,
   onRename,
   onRequestDelete,
+  canUpdate,
+  canDelete,
 }: {
   view: LogsView
+  canUpdate: boolean
+  canDelete: boolean
   isActive: boolean
   onApply: (view: LogsView) => void
-  onRename: (id: string, name: string) => void
+  onRename: (id: string, name: string) => Promise<void>
   onRequestDelete: (id: string) => void
 }) => {
   const [isEditingName, setIsEditingName] = useState(false)
   const [name, setName] = useState(view.name)
+  const isSavingName = useRef(false)
 
-  const saveName = () => {
+  const saveName = async () => {
+    if (isSavingName.current) return
+    isSavingName.current = true
     const trimmed = name.trim()
-    if (trimmed && trimmed !== view.name) onRename(view.id, trimmed)
-    setIsEditingName(false)
+    try {
+      if (trimmed && trimmed !== view.name) await onRename(view.id, trimmed)
+      setIsEditingName(false)
+    } catch {
+      return
+    } finally {
+      isSavingName.current = false
+    }
   }
 
   const handleKeyDown = (e: KeyboardEvent<HTMLInputElement>) => {
@@ -126,6 +146,7 @@ const LogsViewRow = ({
       <div className="flex items-center gap-1 shrink-0">
         <RowIconAction
           icon={<EditIcon size={12} />}
+          disabled={!canUpdate}
           label={`Rename ${view.name}`}
           onClick={(e) => {
             e.stopPropagation()
@@ -134,6 +155,7 @@ const LogsViewRow = ({
         />
         <RowIconAction
           icon={<Trash2Icon size={12} />}
+          disabled={!canDelete}
           label={`Delete ${view.name}`}
           onClick={(e) => {
             e.stopPropagation()
@@ -150,6 +172,10 @@ export const LogsViewsMenu = ({
   isLoading,
   isError,
   activeViewId,
+  isPending = false,
+  canUpdate = true,
+  canDelete = true,
+  onRetry,
   onApply,
   onRename,
   onDelete,
@@ -178,9 +204,9 @@ export const LogsViewsMenu = ({
             </DropdownMenuItem>
           )}
           {!isLoading && isError && (
-            <DropdownMenuItem disabled className="text-foreground-light">
+            <DropdownMenuItem onSelect={onRetry} className="text-foreground-light">
               <AlertCircleIcon size={14} className="mr-2" />
-              Failed to load views
+              Failed to load views. Retry
             </DropdownMenuItem>
           )}
           {!isLoading && !isError && views.length === 0 && (
@@ -195,6 +221,8 @@ export const LogsViewsMenu = ({
                 key={view.id}
                 view={view}
                 isActive={view.id === activeViewId}
+                canUpdate={canUpdate && !isPending}
+                canDelete={canDelete && !isPending}
                 onApply={onApply}
                 onRename={onRename}
                 onRequestDelete={(id) => setDeleteTarget(views.find((v) => v.id === id) ?? null)}
@@ -218,9 +246,15 @@ export const LogsViewsMenu = ({
         confirmLabel="Delete view"
         title="Confirm to delete saved view"
         onCancel={() => setDeleteTarget(null)}
-        onConfirm={() => {
-          if (deleteTarget) onDelete(deleteTarget.id)
-          setDeleteTarget(null)
+        loading={isPending}
+        onConfirm={async () => {
+          if (!deleteTarget) return
+          try {
+            await onDelete(deleteTarget.id)
+            setDeleteTarget(null)
+          } catch {
+            return
+          }
         }}
       >
         <p className="text-sm text-foreground-light">

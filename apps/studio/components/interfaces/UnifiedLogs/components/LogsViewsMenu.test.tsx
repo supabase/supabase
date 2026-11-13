@@ -1,4 +1,4 @@
-import { fireEvent, screen } from '@testing-library/react'
+import { fireEvent, screen, waitFor } from '@testing-library/react'
 import userEvent from '@testing-library/user-event'
 import { mockAnimationsApi } from 'jsdom-testing-mocks'
 import { describe, expect, it, vi } from 'vitest'
@@ -61,7 +61,7 @@ describe('LogsViewsMenu', () => {
 
     await openMenu()
 
-    expect(await screen.findByText('Failed to load views')).toBeInTheDocument()
+    expect(await screen.findByText('Failed to load views. Retry')).toBeInTheDocument()
   })
 
   it('lists views by name', async () => {
@@ -132,6 +132,9 @@ describe('LogsViewsMenu', () => {
     expect(input).toHaveFocus()
     fireEvent.keyDown(input, { key: 'Enter' })
 
+    await waitFor(() =>
+      expect(screen.queryByDisplayValue('Errors only - renamed')).not.toBeInTheDocument()
+    )
     expect(onRename).toHaveBeenCalledWith('view-1', 'Errors only - renamed')
   })
 
@@ -144,6 +147,9 @@ describe('LogsViewsMenu', () => {
     await userEvent.click(screen.getByRole('button', { name: 'Delete Errors only' }))
     await userEvent.click(await screen.findByRole('button', { name: 'Delete view' }))
 
+    await waitFor(() =>
+      expect(screen.queryByRole('button', { name: 'Delete view' })).not.toBeInTheDocument()
+    )
     expect(onDelete).toHaveBeenCalledWith('view-1')
   })
 

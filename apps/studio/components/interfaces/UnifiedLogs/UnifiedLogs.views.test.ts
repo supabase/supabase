@@ -89,7 +89,7 @@ describe('applyView', () => {
         logicalOperator: 'AND',
         conditions: [
           { propertyName: 'level', operator: '=', value: 'error' },
-          { propertyName: 'nonexistent_column', operator: '=', value: 'x' },
+          { propertyName: 'invalid column', operator: '=', value: 'x' },
         ],
       },
       viewOptions: {},
@@ -97,7 +97,7 @@ describe('applyView', () => {
 
     const { params, dropped } = applyView(view, { filterableNames })
 
-    expect(dropped).toContain('nonexistent_column')
+    expect(dropped).toContain('invalid column')
     expect(params.filter).toEqual(['level:eq:error'])
   })
 
@@ -134,6 +134,30 @@ describe('applyView', () => {
 
     expect(dropped).toContain('(nested group)')
     expect(params.filter).toEqual(['level:eq:error'])
+  })
+
+  it('round-trips custom attributes and legacy dynamic filters', () => {
+    const filter = ['attribute.request.path:eq:%2Fauth%3Fkey%3Dvalue', 'custom_key:neq:other']
+    const view = toView(
+      serializeView({ name: 'Custom', logSource: 'edge_logs', search: { filter } })
+    )
+    const { params, dropped } = applyView(view, { filterableNames })
+    expect(params.filter).toEqual(filter)
+    expect(dropped).toEqual([])
+  })
+
+  it('replaces unset options while retaining the current time range', () => {
+    const view = toView(
+      serializeView({ name: 'Empty', logSource: 'edge_logs', search: { filter: [] } })
+    )
+    const date = [new Date('2026-01-01'), new Date('2026-01-02')]
+    const { params } = applyView(view, { filterableNames })
+    expect({ ...baseSearch, date, ...params }).toMatchObject({
+      user: null,
+      latency: null,
+      sort: null,
+      date,
+    })
   })
 
   it('never reads or sets the time range', () => {
