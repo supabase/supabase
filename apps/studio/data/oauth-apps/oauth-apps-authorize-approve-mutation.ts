@@ -7,8 +7,8 @@ import type { StudioError } from '@/lib/errors/studio-errors'
 import type { UseCustomMutationOptions } from '@/types'
 
 export type OAuthAppsAuthorizeApproveVariables = {
-  slug: string
-  auth_id: string
+  slug?: string
+  auth_id?: string
   body: OAuthAuthorizeApproveRequest
 }
 
