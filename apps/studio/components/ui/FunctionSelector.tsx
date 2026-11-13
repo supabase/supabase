@@ -1,3 +1,4 @@
+import { useQuery } from '@tanstack/react-query'
 import { useParams } from 'common'
 import { uniqBy } from 'lodash'
 import { CheckIcon, PlusIcon } from 'lucide-react'
@@ -24,9 +25,11 @@ import {
 import { CommandItemLink } from '@/components/ui/CommandItemLink'
 import {
   DatabaseFunctionsData,
-  useDatabaseFunctionsQuery,
+  databaseFunctionsQueryOptions,
 } from '@/data/database-functions/database-functions-query'
+import { usePermissionsQueryV2 } from '@/data/permissions/permissions-query-v2'
 import { useSelectedProjectQuery } from '@/hooks/misc/useSelectedProject'
+import { useGrant } from '@/lib/grants'
 
 type DatabaseFunction = DatabaseFunctionsData[number]
 
@@ -58,17 +61,32 @@ const FunctionSelector = ({
   const { data: project } = useSelectedProjectQuery()
   const [open, setOpen] = useState(false)
 
+  const readGrant = useGrant(
+    'POST /platform/pg-meta/{ref}/query',
+    { projectRef: project?.ref },
+    { variant: 'read' }
+  )
+  const { refetch: refetchPermissions } = usePermissionsQueryV2({ enabled: false })
   const {
     data,
-    error,
-    isPending: isLoading,
-    isError,
+    error: queryError,
+    isPending: isLoadingFunctions,
+    isError: isQueryError,
     isSuccess,
     refetch,
-  } = useDatabaseFunctionsQuery({
-    projectRef: project?.ref,
-    connectionString: project?.connectionString,
-  })
+  } = useQuery(
+    databaseFunctionsQueryOptions({
+      projectRef: project?.ref,
+      connectionString: project?.connectionString,
+      grant: readGrant.grant,
+    })
+  )
+  const isLoading =
+    readGrant.status === 'loading' || (readGrant.status === 'granted' && isLoadingFunctions)
+  const isDenied = readGrant.status === 'denied'
+  const isPermissionsError = readGrant.status === 'error'
+  const isError = isQueryError || isPermissionsError
+  const errorMessage = isPermissionsError ? readGrant.error.message : queryError?.message
 
   const filteredFunctions = (data ?? [])
     .filter((func) => schema && func.schema === schema)
@@ -83,13 +101,26 @@ const FunctionSelector = ({
         </Button>
       )}
 
+      {showError && isDenied && (
+        <Alert variant="warning" className="px-3! py-3!">
+          <AlertTitle className="text-xs text-amber-900">Failed to load functions</AlertTitle>
+          <AlertDescription className="text-xs">
+            You need additional permissions to view database functions
+          </AlertDescription>
+        </Alert>
+      )}
+
       {showError && isError && (
         <Alert variant="warning" className="px-3! py-3!">
           <AlertTitle className="text-xs text-amber-900">Failed to load functions</AlertTitle>
 
-          <AlertDescription className="text-xs mb-2">Error: {error.message}</AlertDescription>
+          <AlertDescription className="text-xs mb-2">Error: {errorMessage}</AlertDescription>
 
-          <Button variant="default" size="tiny" onClick={() => refetch()}>
+          <Button
+            variant="default"
+            size="tiny"
+            onClick={() => (isPermissionsError ? refetchPermissions() : refetch())}
+          >
             Reload functions
           </Button>
         </Alert>
