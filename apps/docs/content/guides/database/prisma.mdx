@@ -10,6 +10,12 @@ This guide shows how to connect your Prisma application to Supabase Postgres. If
 
 <Admonition type="note">
 
+This guide uses Prisma ORM 7. The `latest` tag of the `prisma` package on npm points to the Prisma ORM 8 release candidate, which has a different CLI and client API. The install commands in this guide pin version 7 for that reason. For Prisma ORM 8, see the [Prisma ORM 8 docs](https://www.prisma.io/docs/orm).
+
+</Admonition>
+
+<Admonition type="note">
+
 If you plan to solely use Prisma instead of the Supabase Data API (PostgREST), turn it off in the [API Settings](/dashboard/project/_/settings/api).
 
 </Admonition>
@@ -78,8 +84,8 @@ If you plan to solely use Prisma instead of the Supabase Data API (PostgREST), t
             <TabPanel id="npm_initiate" label="npm">
               ```bash
               npm init -y
-              npm install prisma tsx @types/pg --save-dev
-              npm install @prisma/client @prisma/adapter-pg dotenv pg
+              npm install prisma@7 tsx typescript @types/pg --save-dev
+              npm install @prisma/client@7 @prisma/adapter-pg@7 dotenv pg
 
               npx tsc --init
 
@@ -89,19 +95,20 @@ If you plan to solely use Prisma instead of the Supabase Data API (PostgREST), t
             <TabPanel id="pnpm_initiate" label="pnpm">
               ```bash
               pnpm init
-              pnpm install prisma tsx @types/pg --save-dev
-              pnpm install @prisma/client @prisma/adapter-pg dotenv pg
+              # --allow-build needs pnpm 10.4 or later. pnpm 9 and earlier run build scripts by default, so omit the flags there.
+              pnpm install prisma@7 tsx typescript @types/pg --save-dev --allow-build=prisma --allow-build=@prisma/engines --allow-build=esbuild
+              pnpm install @prisma/client@7 @prisma/adapter-pg@7 dotenv pg
 
-              pnpx tsc --init
+              pnpm exec tsc --init
 
-              pnpx prisma init
+              pnpm exec prisma init
               ```
             </TabPanel>
             <TabPanel id="yarn_initiate" label="yarn">
               ```bash
               yarn init -y
-              yarn add prisma tsx @types/pg --save-dev
-              yarn add @prisma/client @prisma/adapter-pg dotenv pg
+              yarn add prisma@7 tsx typescript @types/pg --save-dev
+              yarn add @prisma/client@7 @prisma/adapter-pg@7 dotenv pg
 
               yarn tsc --init
 
@@ -111,8 +118,8 @@ If you plan to solely use Prisma instead of the Supabase Data API (PostgREST), t
             <TabPanel id="bun_initiate" label="bun">
               ```bash
               bun init -y
-              bun install prisma tsx @types/pg --save-dev
-              bun install @prisma/client @prisma/adapter-pg dotenv pg
+              bun install prisma@7 tsx typescript @types/pg --save-dev
+              bun install @prisma/client@7 @prisma/adapter-pg@7 dotenv pg
 
               bunx tsc --init
 
@@ -185,21 +192,21 @@ If you plan to solely use Prisma instead of the Supabase Data API (PostgREST), t
   </StepHikeCompact.Step>
 
   <StepHikeCompact.Step step={4}>
-    <StepHikeCompact.Details title="Configure prisma.config.ts">
+    <StepHikeCompact.Details title="Configure prisma7.config.ts">
 
-    Add `import "dotenv/config"` to the generated `prisma.config.ts`. If you are using a serverless environment, change the data source URL to `DIRECT_URL`.
+    Prisma 7.10 and later generate `prisma7.config.ts` (earlier versions name it `prisma.config.ts`) with the `import "dotenv/config"` line already in place. If you are using a serverless environment, change the data source URL to `DIRECT_URL`.
 
     </StepHikeCompact.Details>
 
     <StepHikeCompact.Code>
         <Tabs type="underlined" size="small">
             <TabPanel id="serverful" label="server-based deployments">
-                ```ts prisma.config.ts
+                ```ts prisma7.config.ts
                 import "dotenv/config";
                 import { defineConfig, env } from "prisma/config";
 
                 export default defineConfig({
-                  schema: "prisma/schema",
+                  schema: "prisma/schema.prisma",
                   migrations: {
                     path: "prisma/migrations",
                   },
@@ -210,12 +217,12 @@ If you plan to solely use Prisma instead of the Supabase Data API (PostgREST), t
                 ```
             </TabPanel>
             <TabPanel id="serverless" label="serverless deployments">
-                ```ts prisma.config.ts
+                ```ts prisma7.config.ts
                 import "dotenv/config";
                 import { defineConfig, env } from "prisma/config";
 
                 export default defineConfig({
-                  schema: "prisma/schema",
+                  schema: "prisma/schema.prisma",
                   migrations: {
                     path: "prisma/migrations",
                   },
@@ -279,8 +286,8 @@ If you plan to solely use Prisma instead of the Supabase Data API (PostgREST), t
             </TabPanel>
             <TabPanel id="pnpm_migrate" label="pnpm">
             ```bash
-            pnpx prisma migrate dev --name first_prisma_migration
-            pnpx prisma generate
+            pnpm exec prisma migrate dev --name first_prisma_migration
+            pnpm exec prisma generate
             ```
             </TabPanel>
             <TabPanel id="yarn_migrate" label="yarn">
@@ -339,7 +346,7 @@ If you plan to solely use Prisma instead of the Supabase Data API (PostgREST), t
 
           <TabPanel id="pnpm_sync" label="pnpm">
             ```bash
-            pnpx prisma db pull
+            pnpm exec prisma db pull
             ```
 
             Create a migration file
@@ -349,7 +356,7 @@ If you plan to solely use Prisma instead of the Supabase Data API (PostgREST), t
 
             Synchronize the migrations
             ```bash
-              pnpx prisma migrate diff \
+              pnpm exec prisma migrate diff \
               --from-empty \
               --to-schema prisma/schema.prisma \
               --script > prisma/migrations/0_init_supabase/migration.sql
@@ -361,8 +368,8 @@ If you plan to solely use Prisma instead of the Supabase Data API (PostgREST), t
             </Admonition>
 
             ```bash
-            pnpx prisma migrate resolve --applied 0_init_supabase
-            pnpx prisma generate
+            pnpm exec prisma migrate resolve --applied 0_init_supabase
+            pnpm exec prisma generate
             ```
           </TabPanel>
 
