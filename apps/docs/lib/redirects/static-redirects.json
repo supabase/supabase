@@ -1551,12 +1551,22 @@
   },
   {
     "source": "/docs/guides/local-development/cli/github-action/generating-types",
-    "destination": "/docs/guides/deployment/ci/generating-types",
+    "destination": "/docs/guides/api/rest/generating-types",
     "permanent": true
   },
   {
     "source": "/docs/guides/local-development/cli/github-action/testing",
-    "destination": "/docs/guides/deployment/ci/testing",
+    "destination": "/docs/guides/local-development/testing/overview",
+    "permanent": true
+  },
+  {
+    "source": "/docs/guides/deployment/ci/testing",
+    "destination": "/docs/guides/local-development/testing/overview",
+    "permanent": true
+  },
+  {
+    "source": "/docs/guides/deployment/ci/generating-types",
+    "destination": "/docs/guides/api/rest/generating-types",
     "permanent": true
   },
   {
