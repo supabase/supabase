@@ -216,18 +216,21 @@ export const consentState = proxy({
   hasConsented: false,
   acceptAll: () => {
     if (!consentState.UC) return
+    const previousConsentValue = consentState.hasConsented
 
+    consentState.hasConsented = true
     consentState.showConsentToast = false
 
-    // hasConsented starts PostHog, which clears a stored opt-out, so set it only once the accept is saved
     consentState.UC.acceptAllServices()
       .then(() => {
-        consentState.hasConsented = true
         consentState.categories = consentState.UC?.getCategoriesBaseInfo() ?? null
         posthogClient.optIn()
       })
       .catch(() => {
+        consentState.hasConsented = previousConsentValue
         consentState.showConsentToast = true
+        // The optimistic hasConsented started PostHog, which cleared any stored opt-out
+        if (!previousConsentValue) posthogClient.optOut()
       })
   },
   /**

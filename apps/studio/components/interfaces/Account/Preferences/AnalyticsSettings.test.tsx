@@ -65,6 +65,17 @@ describe('AnalyticsSettings', () => {
     expect(reload).not.toHaveBeenCalled()
   })
 
+  test('turns the switch back off when the opt-in fails to save', async () => {
+    consentState.hasConsented = false
+    UC.acceptAllServices.mockRejectedValueOnce(new Error('network'))
+    customRender(<AnalyticsSettings />)
+
+    fireEvent.click(screen.getByRole('switch'))
+
+    await waitFor(() => expect(UC.acceptAllServices).toHaveBeenCalledOnce())
+    await waitFor(() => expect(screen.getByRole('switch')).not.toBeChecked())
+  })
+
   test('does not reload when opting in', async () => {
     consentState.hasConsented = false
     customRender(<AnalyticsSettings />)

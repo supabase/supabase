@@ -765,35 +765,32 @@ describe('consent withdrawal call sites', () => {
     expect(posthogClient.optOut).not.toHaveBeenCalled()
   })
 
-  it('acceptAll does not opt PostHog back in when saving fails', async () => {
+  it('acceptAll opts PostHog back out when saving fails', async () => {
     const UC = makeUC(true)
     UC.acceptAllServices.mockImplementation(() => Promise.reject(new Error('network')))
     consentState.UC = UC as never
     consentState.hasConsented = false
 
     consentState.acceptAll()
-    await vi.waitFor(() => expect(consentState.showConsentToast).toBe(true))
+    expect(consentState.hasConsented).toBe(true)
+    await vi.waitFor(() => expect(consentState.hasConsented).toBe(false))
 
-    expect(consentState.hasConsented).toBe(false)
+    expect(consentState.showConsentToast).toBe(true)
     expect(posthogClient.optIn).not.toHaveBeenCalled()
+    expect(posthogClient.optOut).toHaveBeenCalledOnce()
   })
 
-  it('acceptAll keeps consent off until the decision is saved', async () => {
+  it('acceptAll leaves PostHog alone when a failed save follows an earlier accept', async () => {
     const UC = makeUC(true)
-    let resolveSave!: () => void
-    UC.acceptAllServices.mockReturnValueOnce(
-      new Promise<void>((resolve) => (resolveSave = resolve))
-    )
+    UC.acceptAllServices.mockImplementation(() => Promise.reject(new Error('network')))
     consentState.UC = UC as never
-    consentState.hasConsented = false
+    consentState.hasConsented = true
 
     consentState.acceptAll()
+    await vi.waitFor(() => expect(consentState.showConsentToast).toBe(true))
 
-    expect(consentState.showConsentToast).toBe(false)
-    expect(consentState.hasConsented).toBe(false)
-
-    resolveSave()
-    await vi.waitFor(() => expect(consentState.hasConsented).toBe(true))
+    expect(consentState.hasConsented).toBe(true)
+    expect(posthogClient.optOut).not.toHaveBeenCalled()
   })
 
   it('updateServices leaves consent untouched when saving fails', async () => {
