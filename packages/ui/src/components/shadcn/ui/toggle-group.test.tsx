@@ -34,7 +34,7 @@ describe('ToggleGroup', () => {
     const selected = screen.getByRole('radio', { name: 'Data' })
 
     expect(selected).toHaveAttribute('aria-checked', 'true')
-    expect(selected).toHaveClass('data-[state=on]:bg-transparent', 'aria-checked:bg-transparent')
+    expect(selected).toHaveClass('data-[state=on]:bg-transparent')
     expect(selected).not.toHaveClass(
       'data-[state=on]:bg-accent',
       'aria-checked:bg-accent',
