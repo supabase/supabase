@@ -72,7 +72,7 @@ Lovable did not go looking for a database. It went looking for a whole backend. 
 
 When someone builds on Lovable, they never ask for a database. They describe their idea. Lovable decides what the app needs and creates it. It spins up the project, builds the tables and storage buckets, writes the security policies, and deploys edge functions. Even the logs flow back the same way. All of it runs through the Supabase [Management API](https://supabase.com/docs/reference/api/introduction).
 
-Lovable uses nearly every Supabase service on top of it: Postgres, Auth, Storage, [Edge Functions](https://supabase.com/features/deno-edge-functions), Realtime for live updates, and Cron for scheduled jobs. Because each piece is modular and API-first, Lovable can combine them in any way a project requires.
+Lovable uses nearly every Supabase service on top of it: [Postgres](/database), [Auth](/auth), [Storage](/storage), [Edge Functions](https://supabase.com/features/deno-edge-functions), [Realtime](/realtime) for live updates, and [Cron](/modules/cron) for scheduled jobs. Because each piece is modular and API-first, Lovable can combine them in any way a project requires.
 
 <Quote img="aleksei-petrov-lovable.jpeg" caption="Aleksei Petrov, Lead Engineer, Lovable">
   The Management API is the core of everything. We use it for about 90% of our interactions with
