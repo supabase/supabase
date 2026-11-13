@@ -210,8 +210,12 @@ export const PublishAppSidePanel = ({
           redirect_uris: redirect_uris.map((uris) => uris.value),
           scopes,
           icon: uploadedIconUrl,
-          grant_kind: member_bound_grant ? 'member_bound' : 'organization_bound',
-          project_scoping_mode: project_scoping,
+          ...(areOAuthAppScopedGrantsEnabled
+            ? {
+                grant_kind: member_bound_grant ? 'member_bound' : 'organization_bound',
+                project_scoping_mode: project_scoping,
+              }
+            : {}),
         })
       } else {
         // Update application
@@ -223,8 +227,12 @@ export const PublishAppSidePanel = ({
           redirect_uris: redirect_uris.map((uris) => uris.value),
           scopes,
           icon: uploadedIconUrl,
-          grant_kind: member_bound_grant ? 'member_bound' : 'organization_bound',
-          project_scoping_mode: project_scoping,
+          ...(areOAuthAppScopedGrantsEnabled
+            ? {
+                grant_kind: member_bound_grant ? 'member_bound' : 'organization_bound',
+                project_scoping_mode: project_scoping,
+              }
+            : {}),
         })
       }
     } catch {
