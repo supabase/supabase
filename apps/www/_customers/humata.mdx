@@ -42,7 +42,7 @@ Humata, a platform enabling millions of users to chat with and analyse their all
 
 ## The Challenge
 
-As Humata's user base expanded, the need for scalable, reliable, and cost-effective infrastructure became critical. Initially, Humata used Pinecone for its vector database workloads for chat with doc solution, but managing this infrastructure became complex and expensive, with 20 s2.x8 pods and additional replicas required for latency. Humata needed a solution that would simplify infrastructure management, reduce costs, and enhance the platform's feature velocity without sacrificing performance.
+As Humata's user base expanded, the need for scalable, reliable, and cost-effective infrastructure became critical. Initially, Humata used Pinecone for its [vector database](https://supabase.com/features/vector-database) workloads for chat with doc solution, but managing this infrastructure became complex and expensive, with 20 s2.x8 pods and additional replicas required for latency. Humata needed a solution that would simplify infrastructure management, reduce costs, and enhance the platform's feature velocity without sacrificing performance.
 
 ## The Supabase Solution
 
@@ -50,7 +50,7 @@ Humata chose Supabase for its Postgres database, authentication, and real-time f
 
 ## Migration from Pinecone to Supabase
 
-The migration from Pinecone to Supabase was a game-changer for Humata's chat with PDF technology. By switching to a single 16XL instance of Supabase's pgVector, Humata achieved a staggering 4X cost reduction. This transition also simplified infrastructure management, eliminated the need for multiple replicas, and boosted feature velocity by enabling complex queries that combine semantic search with business data.
+The migration from Pinecone to Supabase was a game-changer for Humata's chat with PDF technology. By switching to a single 16XL instance of Supabase's [pgVector](https://supabase.com/docs/guides/database/extensions/pgvector), Humata achieved a staggering 4X cost reduction. This transition also simplified infrastructure management, eliminated the need for multiple replicas, and boosted feature velocity by enabling complex queries that combine semantic search with business data.
 
 ## Key Benefits of Using Supabase
 

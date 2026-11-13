@@ -2,7 +2,7 @@
 
 > Schedule and manage recurring jobs directly in Postgres with pg_cron.
 
-Supabase Cron is a Postgres module that uses the pg_cron extension to schedule and manage recurring jobs. Define schedules with standard cron syntax or natural language, and run jobs that call database functions, Edge Functions, or remote webhooks.
+[Supabase Cron](/docs/guides/cron/quickstart) is a Postgres module that uses the pg_cron extension to schedule and manage recurring jobs. Define schedules with standard cron syntax or natural language, and run jobs that call database functions, Edge Functions, or remote webhooks.
 
 ## Key Features
 

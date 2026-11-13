@@ -17,7 +17,7 @@ Multigres brings high availability to Supabase projects, and it's now in private
 
 Today, every Supabase project writes to a single Postgres primary. This works well for most applications, and it will stay the default. The downside is what happens when the primary fails. If the underlying hardware has a fault or its availability zone has an outage, your database is unavailable until it is recovered.
 
-Teams that can't accept that downtime usually build high availability themselves. They run replicas, add a failover manager, put a pooler in front, and write runbooks for the cases the tooling doesn't handle. The hardest part is making sure no committed writes are lost when a replica is promoted. With Multigres, Supabase takes care of all of this for you.
+Teams that can't accept that downtime usually build high availability themselves. They run replicas, add a failover manager, put a [pooler](/docs/guides/database/connecting-to-postgres/pooling-and-limits) in front, and write runbooks for the cases the tooling doesn't handle. The hardest part is making sure no committed writes are lost when a replica is promoted. With Multigres, Supabase takes care of all of this for you.
 
 <div className="video-container">
   <iframe
@@ -53,7 +53,7 @@ When you create a project with Multigres enabled, you get:
 - **Automatic failover.** If the primary fails, Multigres promotes a replica within seconds.
 - **Built-in connection pooling.** There is no separate pooler to configure or run.
 - **One standard Postgres connection string.** You don't need to change your application code to move to Multigres.
-- **Most of Supabase.** Auth, the REST Data API, Storage, Edge Functions, and all client libraries work with Multigres projects.
+- **Most of Supabase.** Auth, the REST Data API, Storage, [Edge Functions](/features/deno-edge-functions), and all client libraries work with Multigres projects.
 
 <Img
   alt="Your app connects through one connection string to the Multigateway, a Postgres wire-protocol proxy with a built-in pooler. The Multigateway sends writes to the primary in Zone B and reads to replicas in Zones A and C, and the primary replicates synchronously to both replicas."

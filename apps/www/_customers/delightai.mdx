@@ -77,7 +77,7 @@ Abhi can build almost anything he imagines. But dozens of non-engineers shipping
 
 ## The solution: one Supabase project per team
 
-Each team gets one Supabase project, connected through the Supabase integration on the Vercel Marketplace, so builders do not manage credentials by hand. Today the team runs about 20 to 25 Supabase projects across the org, and together they power more than 200 apps. Because a team's apps all share one project, they draw on the same underlying data instead of each app duplicating it.
+Each team gets one Supabase project, connected through the Supabase integration on the [Vercel Marketplace](https://supabase.com/docs/guides/integrations/vercel-marketplace), so builders do not manage credentials by hand. Today the team runs about 20 to 25 Supabase projects across the org, and together they power more than 200 apps. Because a team's apps all share one project, they draw on the same underlying data instead of each app duplicating it.
 
 That sharing comes down to how the code is organized. Prisma is the ORM, and it sits at the root of a single monorepo that manages all of a team's apps. With the ORM at the root, every app can share tables and run migrations without stepping on each other.
 
