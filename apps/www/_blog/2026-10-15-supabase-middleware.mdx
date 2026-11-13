@@ -82,7 +82,7 @@ You can pick the runtime or framework that fits the job and change it later with
 
 ### Export the pipeline as a fetch handler
 
-Moving to another runtime doesn't mean rewriting your logic. That matters when your code doesn't all run in one place. Say some of your functions run on Supabase Edge Functions and others on Vercel Functions or Cloudflare Workers, and the auth and CORS rules should match on both. You write those rules once, and each runtime runs them.
+Moving to another runtime doesn't mean rewriting your logic. That matters when your code doesn't all run in one place. Say some of your functions run on [Supabase Edge Functions](/features/deno-edge-functions) and others on Vercel Functions or Cloudflare Workers, and the auth and CORS rules should match on both. You write those rules once, and each runtime runs them.
 
 This works because the `pipeline` in the example above is a standard fetch handler: a function that takes a `Request` and returns a `Response`. Supabase Edge Functions, Vercel Functions, Cloudflare Workers, Deno, Bun, and Node 22 or newer can all run one, and the engine is plain Web Fetch.
 

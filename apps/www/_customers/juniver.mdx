@@ -72,9 +72,9 @@ Juniver had long run on Google Cloud with Firebase for the mobile app. The new B
 
 <Quote img="nick-farrant-juniver.jpg" caption="Nick Farrant, Founding Engineer, Juniver">
   The Supabase developer experience is so clear. I've got everything at my fingertips. I'm in the
-  Table Editor. The SQL editor is literally right below the table editor. The feature you have to
-  see the table from a different user's perspective to test your Row Level Security is a wonderful
-  little feature that I use all the time.
+  Table Editor. The [SQL editor](https://supabase.com/features/sql-editor) is literally right below
+  the table editor. The feature you have to see the table from a different user's perspective to
+  test your Row Level Security is a wonderful little feature that I use all the time.
 </Quote>
 
 ## The approach
@@ -88,7 +88,7 @@ Juniver used the B2B product as a greenfield build on Supabase, avoiding risky d
   - **Database (Postgres):** Relational schema with strict Row Level Security; frequent use of "view as user" to validate policies
   - **Auth & OAuth:** Managing identities for clinics and patients with fine-grained access
   - **Webhooks + Edge Functions:** Stripe purchase triggers an automated sequence to authenticate partners, provision license codes, and send emails
-  - **Operational visibility:** Edge Function logs and an integrated console for fast debugging and iteration
+  - **Operational visibility:** [Edge Function](https://supabase.com/docs/guides/functions) logs and an integrated console for fast debugging and iteration
 
 <Quote img="nick-farrant-juniver.jpg" caption="Nick Farrant, Founding Engineer, Juniver">
   You have to expect, plan, and build for scale. We can scale exponentially with Supabase.

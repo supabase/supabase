@@ -32,7 +32,7 @@ supabase_products: ['database', 'storage', 'functions']
 
 <Quote>
 
-The database part was something we didn't want to build. We needed a provider that gave us backend capabilities: edge functions, secret management, the whole combo. Now, whatever we want to build, we can build it.
+The database part was something we didn't want to build. We needed a provider that gave us backend capabilities: [edge functions](https://supabase.com/features/deno-edge-functions), secret management, the whole combo. Now, whatever we want to build, we can build it.
 
 <div className="mt-4">Yus Hilmi, Founder and CEO, Polymet</div>
 
@@ -64,7 +64,7 @@ We are customers of Supabase ourselves. We know it works and we love it. It made
 
 ## How Polymet runs on Supabase
 
-When a Polymet user submits a prompt, Polymet's agent asks clarifying questions to figure out whether the app needs a real backend or just a prototype. If it does, Polymet creates a Supabase project for that user through the Supabase Management API.
+When a Polymet user submits a prompt, Polymet's agent asks clarifying questions to figure out whether the app needs a real backend or just a prototype. If it does, Polymet creates a Supabase project for that user through the Supabase [Management API](https://supabase.com/docs/reference/api/introduction).
 
 Polymet built its own SDK on top of Supabase's OpenAPI spec to manage those projects, and embeds Supabase's platform kit directly in its product as a backend tab. Everything outside the backend, like Polymet's build system, its Git integration, and its hosting and domain proxying, is built in house. Everything inside the backend, the database, storage, and edge functions, runs on Supabase.
 
@@ -90,7 +90,7 @@ The table editor is great, especially being able to follow a reference from one 
 
 </Quote>
 
-Yus is also a heavy user of the Supabase MCP server for his own work, querying Polymet's internal databases to verify what Polymet's own AI agents build, with deeper MCP integration inside the product itself on the roadmap.
+Yus is also a heavy user of the [Supabase MCP server](https://supabase.com/features/mcp-server) for his own work, querying Polymet's internal databases to verify what Polymet's own AI agents build, with deeper MCP integration inside the product itself on the roadmap.
 
 ## Provisioning tens of thousands of backends without a backend team
 

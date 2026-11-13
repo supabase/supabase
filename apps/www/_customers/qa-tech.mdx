@@ -63,7 +63,7 @@ There was a lot of experimentation and pivoting in that first year and a half. S
 
 ## How QA.tech runs on Supabase
 
-QA.tech's product lets customers watch QA agents work in real time: configuring tests, chatting with AI to create new ones, and following along as agents click through an interface. That live view depends on Supabase Realtime, since a single regression run can spawn many agents at once and customers need to see them as they run.
+QA.tech's product lets customers watch QA agents work in real time: configuring tests, chatting with AI to create new ones, and following along as agents click through an interface. That live view depends on [Supabase Realtime](https://supabase.com/docs/guides/realtime), since a single regression run can spawn many agents at once and customers need to see them as they run.
 
 Auth and Row Level Security (RLS) handle permissions, and QA.tech added SSO on top as it started working with larger enterprises. Postgres tables store test runs, configurations, and metadata, the parts of the system that map cleanly onto a relational database.
 
