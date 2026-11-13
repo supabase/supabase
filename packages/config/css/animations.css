@@ -61,6 +61,8 @@
 
   --animate-collapsible-down: collapsible-down 0.1s ease-out;
   --animate-collapsible-up: collapsible-up 0.1s ease-out;
+  --animate-collapsible-down-clipped: collapsible-down 0.1s ease-out, clip-overflow-y 0.1s;
+  --animate-collapsible-up-clipped: collapsible-up 0.1s ease-out, clip-overflow-y 0.1s;
 }
 
 @keyframes fadeIn {
@@ -298,6 +300,13 @@
   }
   to {
     height: 0;
+  }
+}
+
+@keyframes clip-overflow-y {
+  from,
+  to {
+    overflow-y: clip;
   }
 }
 
