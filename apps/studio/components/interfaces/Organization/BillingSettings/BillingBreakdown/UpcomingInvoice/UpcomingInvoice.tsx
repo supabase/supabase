@@ -49,7 +49,6 @@ export const UpcomingInvoice = ({ slug }: UpcomingInvoiceProps) => {
 
   return (
     <div ref={ref}>
-      {/* Mounted in every state so screen readers announce the change once the invoice loads */}
       <span role="status" className="sr-only">
         {hasLoadedInvoice ? 'Upcoming invoice loaded' : ''}
       </span>
@@ -111,6 +110,7 @@ function UpcomingInvoiceBreakdown({
     line_item_kind: 'usage' as const,
   }))
   const allCurrentLineItems = [currentFixedFeeLineItems, currentUsageLineItems].flat()
+
   const projectedUsageLineItems = invoice.projectedCosts.usage.lineItems.map((item) => ({
     ...item,
     line_item_kind: 'usage' as const,
@@ -193,7 +193,7 @@ function UpcomingInvoiceBreakdown({
         />
       )}
 
-      {/* Format in UTC so the due date matches the date on the invoice PDF, regardless of the viewer's timezone */}
+      {/* Format in UTC so the due date matches the date on the invoice PDF */}
       <InvoiceTotalRow
         title={`Projected Total (due on ${dayjs.utc(invoice.billing_cycle_end).format('MMMM Do')})`}
         tooltip="The estimated amount we expect to charge at the end of the billing cycle. The final amount depends on your usage."
@@ -468,7 +468,7 @@ function UsageDocsLink({ href, title }: { href: string; title: string }) {
       aria-label={`${title} billing docs (opens in a new tab)`}
       className={cn(
         'flex rounded-sm text-foreground-lighter transition hover:text-foreground focus-ring',
-        // Revealed on row hover; always visible on touch devices, which can't hover
+        // reveal on hover; always show on touch devices
         'opacity-0 group-hover/invoice-row:opacity-100 focus-visible:opacity-100 [@media(hover:none)]:opacity-100'
       )}
     >

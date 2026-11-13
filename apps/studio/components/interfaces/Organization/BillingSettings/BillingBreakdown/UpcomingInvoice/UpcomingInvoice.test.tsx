@@ -35,6 +35,21 @@ const createUsageLineItem = (
   ...details,
 })
 
+const createComputeLineItem = (
+  details: Partial<Extract<UpcomingInvoiceUsageLineItem, { schema: 'compute' }>> = {}
+): UpcomingInvoiceUsageLineItem => ({
+  schema: 'compute',
+  type: 'compute',
+  name: 'Compute Hours',
+  period: PERIOD,
+  usage_unit: 'hour',
+  pre_tax_amount: 10,
+  pre_tax_amount_before_discount: 10,
+  compute_credits_used: null,
+  breakdown: [],
+  ...details,
+})
+
 const createUpcomingInvoice = (
   details: Partial<UpcomingInvoiceData> = {}
 ): UpcomingInvoiceData => ({
@@ -180,8 +195,8 @@ describe('UpcomingInvoice', () => {
     )
 
     expect(screen.getByText('Minimum Fee')).toBeInTheDocument()
-    expect(screen.getByText('$10.00')).toBeInTheDocument()
-    expect(screen.getByText('$0.00')).toBeInTheDocument()
+    expect(screen.getByText('$10.00')).toHaveClass('line-through')
+    expect(screen.getByText('$0.00')).not.toHaveClass('line-through')
   })
 
   test('hides the minimum fee when the plan has none', async () => {
@@ -317,36 +332,37 @@ describe('UpcomingInvoice', () => {
     expect(screen.getByText('(1.5 GB)')).toBeInTheDocument()
   })
 
-  test('shows compute credits as a deduction regardless of their sign', async () => {
+  test('lists compute credits under a compute line item', async () => {
     const user = userEvent.setup()
     await renderUpcomingInvoice(
       createUpcomingInvoice({
         currentCosts: {
           actualInElapsedCycle: 0,
           fixedFees: { lineItems: [] },
-          usage: {
-            lineItems: [
-              {
-                schema: 'compute',
-                type: 'compute',
-                name: 'Compute Hours',
-                period: PERIOD,
-                usage_unit: 'hour',
-                pre_tax_amount: 10,
-                pre_tax_amount_before_discount: 10,
-                compute_credits_used: 10,
-                breakdown: [],
-              },
-            ],
-          },
+          usage: { lineItems: [createComputeLineItem({ compute_credits_used: -10 })] },
         },
       })
     )
+
+    expect(screen.queryByText('Compute Credits')).not.toBeInTheDocument()
 
     await user.click(screen.getByRole('button', { name: 'Compute Hours' }))
 
     expect(await screen.findByText('Compute Credits')).toBeInTheDocument()
     expect(screen.getByText('-$10.00')).toBeInTheDocument()
+  })
+
+  test('links a compute line item to the compute billing docs', async () => {
+    await renderUpcomingInvoice(
+      createUpcomingInvoice({
+        currentCosts: {
+          actualInElapsedCycle: 10,
+          fixedFees: { lineItems: [] },
+          usage: { lineItems: [createComputeLineItem()] },
+        },
+      })
+    )
+
     expect(
       screen.getByRole('link', { name: 'Compute Hours billing docs (opens in a new tab)' })
     ).toHaveAttribute('href', expect.stringContaining('/guides/platform/manage-your-usage/compute'))

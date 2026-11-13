@@ -99,8 +99,9 @@ const computeBillingDocsLink: Record<
 }
 
 export function getLineItemDocsLink(item: UpcomingInvoiceUsageLineItem) {
-  // Compute line items have no usage metric; their type identifies the category
-  if (item.schema === 'compute') return computeBillingDocsLink[item.type]
+  if (item.schema === 'compute') {
+    return computeBillingDocsLink[item.type]
+  }
 
   const usageMetric = item.usage_metric ?? item.breakdown[0]?.variants[0]?.usage_metric
   return usageMetric ? usageBillingDocsLink[usageMetric] : undefined
