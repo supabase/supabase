@@ -1,6 +1,6 @@
-import type { ChartConfig } from '@supabase/mcp-server-supabase/apps'
 import { describe, expect, it } from 'vitest'
 
+import type { ChartConfig } from '../contract'
 import {
   chartRowsForSource,
   parseChartTimestamp,

@@ -14,13 +14,18 @@
  *   --platform=api    your real Supabase account via SUPABASE_ACCESS_TOKEN (default)
  *   --platform=mock   mocked Management API with PGlite databases: no account, no real data
  *
- * Reads SUPABASE_ACCESS_TOKEN and HOST_MODEL from the environment or from
- * apps/mcp-apps/.env.host. The MCP server comes from the linked
- * @supabase/mcp-server-supabase package; build it there first.
+ * Parked: the gallery and the design system are where the views are developed.
+ * This runs them against the reference MCP server on supabase/mcp `poc/surfaces`,
+ * which registers the tools and resources described in `src/preview/catalog.ts`.
+ * Point SUPABASE_MCP_DIR at that checkout's packages/mcp-server-supabase (default:
+ * a `mcp-surfaces` checkout next to this repository) and build it there first.
+ *
+ * Reads SUPABASE_ACCESS_TOKEN, HOST_MODEL and SUPABASE_MCP_DIR from the
+ * environment or from apps/mcp-apps/.env.host.
  */
 import { spawn } from 'node:child_process'
-import { existsSync, realpathSync } from 'node:fs'
-import { dirname, join } from 'node:path'
+import { existsSync } from 'node:fs'
+import { dirname, join, resolve } from 'node:path'
 import { fileURLToPath } from 'node:url'
 
 import { loadEnvFile } from '../host/server/env.mjs'
@@ -43,12 +48,13 @@ if (platform === 'mock') {
   process.exit(1)
 }
 
-// The package does not export package.json, so find its directory through the link.
-const mcpPackage = realpathSync(join(root, 'node_modules', '@supabase', 'mcp-server-supabase'))
+const mcpPackage = resolve(
+  process.env.SUPABASE_MCP_DIR || join(root, '../../../mcp-surfaces/packages/mcp-server-supabase')
+)
 const cli = join(mcpPackage, 'dist', 'cli.js')
 if (!existsSync(cli)) {
   console.error(
-    `The MCP server is not built in ${mcpPackage}. Run \`pnpm --filter @supabase/mcp-server-supabase build\` in the mcp repository.`
+    `No built MCP server in ${mcpPackage}. Check out supabase/mcp \`poc/surfaces\`, run \`pnpm --filter @supabase/mcp-server-supabase build\` there, and set SUPABASE_MCP_DIR to its packages/mcp-server-supabase.`
   )
   process.exit(1)
 }

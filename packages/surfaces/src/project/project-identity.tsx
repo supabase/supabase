@@ -1,7 +1,7 @@
-import type { Capabilities, Project, Traffic } from '@supabase/mcp-server-supabase/apps'
-import { Badge } from 'ui'
+import { Badge, cn } from 'ui'
 import { Admonition } from 'ui-patterns/Admonition'
 
+import type { Capabilities, Project, Traffic } from '../contract'
 import { compactNumber, fullNumber } from './project-format'
 import { projectStatusBadge } from './project-status'
 
@@ -30,20 +30,35 @@ export function ProjectHero({
         <h2 className="break-words text-2xl text-foreground">{project.name}</h2>
         <Badge variant={status.variant}>{status.label}</Badge>
       </div>
-      <dl className="mt-1 flex flex-wrap items-center gap-x-2 gap-y-1 text-sm text-foreground-light">
-        {details.map((detail, index) => (
-          <div key={detail.label} className="flex items-center gap-x-2">
-            {index > 0 && (
-              <span aria-hidden="true" className="text-foreground-muted">
-                ·
-              </span>
-            )}
-            <dt className="sr-only">{detail.label}</dt>
-            <dd>{detail.value}</dd>
-          </div>
-        ))}
-      </dl>
+      <ProjectDetails details={details} className="mt-1 text-sm" />
     </header>
+  )
+}
+
+/** A dot-separated row of labelled values, such as ref · region. Labels are for screen readers. */
+export function ProjectDetails({
+  details,
+  className,
+}: {
+  details: { label: string; value: string }[]
+  className?: string
+}) {
+  return (
+    <dl
+      className={cn('flex flex-wrap items-center gap-x-2 gap-y-1 text-foreground-light', className)}
+    >
+      {details.map((detail, index) => (
+        <div key={detail.label} className="flex min-w-0 items-center gap-x-2">
+          {index > 0 && (
+            <span aria-hidden="true" className="text-foreground-muted">
+              ·
+            </span>
+          )}
+          <dt className="sr-only">{detail.label}</dt>
+          <dd className="truncate">{detail.value}</dd>
+        </div>
+      ))}
+    </dl>
   )
 }
 

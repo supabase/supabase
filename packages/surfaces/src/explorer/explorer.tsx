@@ -1,16 +1,10 @@
-import type {
-  Capabilities,
-  LogWindow,
-  QueryDisplay,
-  QuerySource,
-  TableSummary,
-} from '@supabase/mcp-server-supabase/apps'
 import { DatabaseIcon } from 'lucide-react'
 import { useEffect, useImperativeHandle, useRef, useState, type Ref } from 'react'
 import { ConfirmationModal } from 'ui-patterns/Dialogs/ConfirmationModal'
 import { EmptyStatePresentational } from 'ui-patterns/EmptyStatePresentational'
 
 import type { Loadable } from '../common'
+import type { Capabilities, LogWindow, QueryDisplay, QuerySource, TableSummary } from '../contract'
 import { QueryEditor, type QueryEditorHandle } from '../query/query-editor'
 import { entityId, tableSql, type Entity, type RunQuery } from '../query/query-model'
 import type { SqlEditorComponent } from '../query/sql-editor'
@@ -189,7 +183,7 @@ export function Explorer({
   }
 
   return (
-    <div className="flex min-h-0 flex-1">
+    <div className="flex min-h-0 min-w-0 flex-1">
       <ExplorerSidebar
         schema={schema}
         schemas={schemas.data ?? []}

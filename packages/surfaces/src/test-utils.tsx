@@ -1,8 +1,8 @@
-import type { Capabilities, DataPort, Project, Table } from '@supabase/mcp-server-supabase/apps'
 import { render, type RenderResult } from '@testing-library/react'
 import type { ReactElement } from 'react'
 import { TooltipProvider } from 'ui'
 
+import type { Capabilities, DataPort, Project, Table } from './contract'
 import type { SqlEditorProps } from './query/sql-editor'
 
 /**
@@ -16,6 +16,8 @@ const unexpected = (name: string) => () =>
 export function fakeDataPort(overrides: Partial<DataPort> = {}): DataPort {
   return {
     bootstrap: unexpected('bootstrap'),
+    getProject: unexpected('getProject'),
+    getOrganization: unexpected('getOrganization'),
     getProjectOverview: unexpected('getProjectOverview'),
     listNotebooks: unexpected('listNotebooks'),
     listSchemas: unexpected('listSchemas'),

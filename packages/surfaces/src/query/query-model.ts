@@ -6,7 +6,7 @@ import {
   type QuerySource,
   type Row,
   type Table,
-} from '@supabase/mcp-server-supabase/apps'
+} from '../contract'
 
 export interface Entity {
   schema: string

@@ -1,6 +1,6 @@
-import type { Bootstrap } from '@supabase/mcp-server-supabase/apps'
 import { useRef, useState } from 'react'
 import { errorMessage } from 'surfaces/common'
+import type { Bootstrap } from 'surfaces/contract'
 import {
   Button,
   Dialog,

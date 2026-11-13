@@ -1,4 +1,3 @@
-import type { Capabilities, Organization, Project } from '@supabase/mcp-server-supabase/apps'
 import { ChevronRightIcon, PlusIcon, RefreshCwIcon, SearchIcon } from 'lucide-react'
 import { useState } from 'react'
 import { Badge, Button, Input } from 'ui'
@@ -6,6 +5,7 @@ import { Admonition } from 'ui-patterns/Admonition'
 import { EmptyStatePresentational } from 'ui-patterns/EmptyStatePresentational'
 
 import type { AskAgent } from '../common'
+import type { Capabilities, Organization, Project } from '../contract'
 import { ProjectChecksMenu } from './project-checks-menu'
 import { projectStatusBadge } from './project-status'
 

@@ -1,10 +1,10 @@
-import type { NotebookSummary, Project } from '@supabase/mcp-server-supabase/apps'
 import { NotebookIcon, StarIcon } from 'lucide-react'
 import { useRef, useState, type ReactNode } from 'react'
 import { Button, Card } from 'ui'
 import { Admonition } from 'ui-patterns/Admonition'
 
 import { errorMessage, type AskAgent, type Loadable } from '../common'
+import type { NotebookSummary, Project } from '../contract'
 
 export interface NotebooksListProps {
   project: Project

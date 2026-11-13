@@ -1,6 +1,5 @@
-import type { Column, Row, Table } from '@supabase/mcp-server-supabase/apps'
-
 import { displayValue, errorMessage } from '../common'
+import type { Column, Row, Table } from '../contract'
 
 /** How a field is written: a typed value, an explicit NULL, or the database default. */
 export type FieldMode = 'value' | 'null' | 'default'

@@ -1,7 +1,7 @@
-import type { LogWindow, QuerySource } from '@supabase/mcp-server-supabase/apps'
 import { ChevronLeftIcon, ChevronRightIcon } from 'lucide-react'
 import { Button, Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from 'ui'
 
+import type { LogWindow, QuerySource } from '../contract'
 import { QueryResultFooter } from '../explorer/query-result-footer'
 import { MAX_TABLE_OFFSET, type QueryResult } from './query-model'
 import { logWindowLabel } from './query-source'

@@ -1,8 +1,4 @@
-import {
-  resolveQueryWindow,
-  type Capabilities,
-  type Project,
-} from '@supabase/mcp-server-supabase/apps'
+import { resolveQueryWindow, type Capabilities, type Project } from 'surfaces/contract'
 import { EXPLORER_QUERY_ID, type ExplorerHandle, type ExplorerState } from 'surfaces/explorer'
 import { entityId } from 'surfaces/query'
 

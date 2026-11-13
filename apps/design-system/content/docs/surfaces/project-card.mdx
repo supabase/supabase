@@ -1,0 +1,17 @@
+---
+title: Project Card
+description: One project and its current status, condensed for a conversation.
+---
+
+<ComponentPreview name="surfaces-project-card" peekCode wide />
+
+## Usage
+
+`ProjectCard` shows a project's organization, name, status, ref and region in a compact card, condensed from the [Project Home](project-home) header. The first card above starts as Starting and becomes Active, as a new project does; Refresh starts it again.
+
+MCP Apps hosts render it inline when an agent creates a project with `create_project`. The host keeps checking the project while it starts and updates `project`. The status badge is the only status text; screen readers hear each change.
+
+- `isFollowing` says the host is following a project that is changing state, such as starting or restoring, and adds a spinner to the badge. Hosts keep the card live by reading the status on a timer and passing the new `project`.
+- `error` is the last failed check. The card keeps the last known status and shows Retry.
+- `organizationName` appears above the name once the host knows it. Organization slugs are not shown.
+- `onRefresh` adds an icon button to check the status now, beside Open in dashboard from `onOpenDashboard`. Omit either when the host can't do it.

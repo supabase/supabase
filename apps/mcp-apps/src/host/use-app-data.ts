@@ -1,12 +1,6 @@
-import type {
-  LogSettings,
-  NotebookSummary,
-  Project,
-  ProjectOverview,
-  Row,
-} from '@supabase/mcp-server-supabase/apps'
 import { useEffect, useState } from 'react'
 import { errorMessage, type Loadable } from 'surfaces/common'
+import type { LogSettings, NotebookSummary, Project, ProjectOverview, Row } from 'surfaces/contract'
 import { executeQuery, type RunQuery } from 'surfaces/query'
 import type { ReloadRow, SaveRow } from 'surfaces/row'
 

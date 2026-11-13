@@ -18,7 +18,6 @@
   "dependencies": {
     "@modelcontextprotocol/ext-apps": "1.7.5",
     "@openai/mcp-extensions": "0.1.0",
-    "@supabase/mcp-server-supabase": "link:../../../mcp-surfaces/packages/mcp-server-supabase",
     "lucide-react": "catalog:",
     "react": "catalog:",
     "react-dom": "catalog:",

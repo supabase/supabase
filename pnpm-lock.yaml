@@ -1027,9 +1027,6 @@ importers:
       '@openai/mcp-extensions':
         specifier: 0.1.0
         version: 0.1.0(@modelcontextprotocol/ext-apps@1.7.5(@modelcontextprotocol/sdk@1.32.0(@cfworker/json-schema@4.1.6)(supports-color@8.1.1)(zod@3.25.76))(react-dom@19.2.6(react@19.2.6))(react@19.2.6)(zod@3.25.76))(@modelcontextprotocol/sdk@1.32.0(@cfworker/json-schema@4.1.6)(supports-color@8.1.1)(zod@3.25.76))
-      '@supabase/mcp-server-supabase':
-        specifier: link:../../../mcp-surfaces/packages/mcp-server-supabase
-        version: link:../../../mcp-surfaces/packages/mcp-server-supabase
       lucide-react:
         specifier: 'catalog:'
         version: 1.55.0(@types/react@19.2.14)(react@19.2.6)
@@ -2914,9 +2911,6 @@ importers:
       '@lezer/highlight':
         specifier: ^1.2.1
         version: 1.2.1
-      '@supabase/mcp-server-supabase':
-        specifier: link:../../../mcp-surfaces/packages/mcp-server-supabase
-        version: link:../../../mcp-surfaces/packages/mcp-server-supabase
       lucide-react:
         specifier: 'catalog:'
         version: 1.55.0(@types/react@19.2.14)(react@19.2.6)

@@ -1,10 +1,10 @@
 import type { App } from '@modelcontextprotocol/ext-apps'
+import { flushSync } from 'react-dom'
 import {
   workspaceToolInputs,
   type WorkspaceToolInput,
   type WorkspaceToolName,
-} from '@supabase/mcp-server-supabase/apps'
-import { flushSync } from 'react-dom'
+} from 'surfaces/contract'
 
 type Row = Record<string, unknown>
 

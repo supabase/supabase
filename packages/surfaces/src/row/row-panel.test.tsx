@@ -1,8 +1,8 @@
-import type { Bootstrap, RowPanel as RowLaunch } from '@supabase/mcp-server-supabase/apps'
 import { act, cleanup, fireEvent, screen, waitFor } from '@testing-library/react'
 import { createRef } from 'react'
 import { afterEach, describe, expect, it, vi } from 'vitest'
 
+import type { Bootstrap, RowPanel as RowLaunch } from '../contract'
 import { renderWithTooltip, testCapabilities, testProject, testTable } from '../test-utils'
 import type { SaveRow } from './row-editor'
 import { RowPanel, type ReloadRow, type RowPanelHandle, type RowPanelSnapshot } from './row-panel'

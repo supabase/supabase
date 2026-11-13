@@ -1,8 +1,8 @@
-import type { ChartConfig, Row } from '@supabase/mcp-server-supabase/apps'
 import { useMemo } from 'react'
 import { cn, type ChartConfig as ChartSeriesConfig } from 'ui'
 import { Chart, ChartBar, ChartCard, ChartContent, ChartLine } from 'ui-patterns/Chart'
 
+import type { ChartConfig, Row } from '../contract'
 import {
   computeYAxisWidth,
   formatLogTick,

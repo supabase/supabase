@@ -1,7 +1,7 @@
-import type { LogWindow, QuerySource } from '@supabase/mcp-server-supabase/apps'
 import { useEffect, useEffectEvent, useRef, useState } from 'react'
 
 import { errorMessage } from '../common'
+import type { LogWindow, QuerySource } from '../contract'
 import type { Entity, QueryResult, RunQuery } from './query-model'
 
 const DEFAULT_PAGE_SIZE = 50

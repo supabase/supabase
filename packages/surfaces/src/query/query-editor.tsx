@@ -1,8 +1,8 @@
-import type { LogWindow, QueryDisplay, QuerySource, Row } from '@supabase/mcp-server-supabase/apps'
 import { CodeSquareIcon, RefreshCwIcon, Table2Icon } from 'lucide-react'
 import { useImperativeHandle, useRef, useState, type ReactNode, type Ref } from 'react'
 import { Admonition } from 'ui-patterns/Admonition'
 
+import type { LogWindow, QueryDisplay, QuerySource, Row } from '../contract'
 import { ExplorerToolbarAction } from '../explorer/explorer-toolbar'
 import { QueryEditorFrame } from '../explorer/query-editor-frame'
 import { RowEditor, type SaveRow } from '../row/row-editor'

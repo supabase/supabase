@@ -1,6 +1,6 @@
-import { parseUntrustedRows } from '@supabase/mcp-server-supabase/apps'
 import { describe, expect, it } from 'vitest'
 
+import { parseUntrustedRows } from '../contract'
 import {
   filterLogEntries,
   logSelectionContext,

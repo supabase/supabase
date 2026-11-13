@@ -1,10 +1,10 @@
-import type { Project } from '@supabase/mcp-server-supabase/apps'
 import { ChevronRightIcon } from 'lucide-react'
 import { useRef, useState } from 'react'
 import { Card, cn } from 'ui'
 import { Admonition } from 'ui-patterns/Admonition'
 
 import { errorMessage, type AskAgent } from '../common'
+import type { Project } from '../contract'
 import { checkIcons, projectChecks, type ProjectCheckId } from './project-overview'
 
 export interface ProjectChecksProps {

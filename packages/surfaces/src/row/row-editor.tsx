@@ -1,9 +1,9 @@
-import type { Row, Table } from '@supabase/mcp-server-supabase/apps'
 import { useId, useLayoutEffect, useRef, useState, type ReactNode } from 'react'
 import { Button, Sheet, SheetContent, SheetHeader, SheetTitle } from 'ui'
 import { Admonition } from 'ui-patterns/Admonition'
 
 import { errorMessage } from '../common'
+import type { Row, Table } from '../contract'
 import { RowField } from './row-field'
 import {
   buildRowValues,

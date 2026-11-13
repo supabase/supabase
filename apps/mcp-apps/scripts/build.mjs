@@ -5,12 +5,13 @@
  *   dist/v1/projects.{js,css}     ui://supabase/projects-v1  sidebar + thread workspace
  *   dist/v1/panel.{js,css}        ui://supabase/panel-v1     focused conversation panels
  *   dist/v1/query-block.{js,css}  ui://supabase/query-block-v1 inline query results
+ *   dist/v1/project-card.{js,css} ui://supabase/project-card-v1 create_project results, live status
  *
  * Each surface is one self-contained script and one stylesheet, with fonts and
  * images inlined, so the server can either link them from where `dist` is
  * hosted (`--apps-url`) or inline them into the document (`--apps-dir`). The
  * server renders the HTML document itself (`renderSurfaceDocument` in
- * `@supabase/mcp-server-supabase/apps`). `v1` is `SURFACE_VERSION`.
+ * `surfaces/contract`). `v1` is `SURFACE_VERSION`.
  *
  * `--watch` rebuilds on change. The server re-reads `--apps-dir` on every
  * resources/read, but hosts cache documents by URI: start a new chat to see
@@ -18,15 +19,20 @@
  */
 import { createHash } from 'node:crypto'
 import { mkdir, readFile, rename, rm, writeFile } from 'node:fs/promises'
-import { createRequire } from 'node:module'
 import { dirname, join } from 'node:path'
 import { fileURLToPath } from 'node:url'
-import { build } from 'vite'
+import { build, runnerImport } from 'vite'
 
 const root = join(dirname(fileURLToPath(import.meta.url)), '..')
-const require = createRequire(import.meta.url)
-const contracts = await import(require.resolve('@supabase/mcp-server-supabase/apps'))
-const { SURFACE_VERSION, SURFACE_NAMES, surfaceAssetFiles } = contracts
+// The contract is TypeScript; let Vite load it. Loading sets NODE_ENV to
+// development, which the production builds below must not inherit.
+const nodeEnv = process.env.NODE_ENV
+const { module: contract } = await runnerImport(
+  join(root, '../../packages/surfaces/src/contract/index.ts')
+)
+if (nodeEnv === undefined) delete process.env.NODE_ENV
+else process.env.NODE_ENV = nodeEnv
+const { SURFACE_VERSION, SURFACE_NAMES, surfaceAssetFiles } = contract
 
 const out = join(root, 'dist', SURFACE_VERSION)
 const watch = process.argv.includes('--watch')

@@ -1,5 +1,6 @@
-import { projectOverviewSchema } from '@supabase/mcp-server-supabase/apps'
 import { describe, expect, it } from 'vitest'
+
+import { projectOverviewSchema } from '../contract'
 
 describe('project overview contract', () => {
   it('rejects a ready advisor section without data, so missing data cannot read as clear', () => {

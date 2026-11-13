@@ -1,7 +1,7 @@
-import type { Bootstrap, Project } from '@supabase/mcp-server-supabase/apps'
 import { ChevronRight, RefreshCw } from 'lucide-react'
 import { useEffect, useRef, useState } from 'react'
 import { errorMessage, type AgentRequest } from 'surfaces/common'
+import type { Bootstrap, Project } from 'surfaces/contract'
 import { projectChecks, ProjectList, projectStatusBadge } from 'surfaces/project'
 import { Badge, Button, ToggleGroup, ToggleGroupItem } from 'ui'
 import { Admonition } from 'ui-patterns/Admonition'
@@ -166,11 +166,6 @@ export function ProjectsApp({
 
   return (
     <main className="flex h-full flex-col bg-background">
-      {host.isPreview && (
-        <div className="border-b bg-surface-200 px-4 py-1 text-center text-xs text-foreground-light">
-          Preview · Sample data · Changes stay in this session
-        </div>
-      )}
       {project && (
         <>
           <header className="flex h-11 shrink-0 items-center justify-between gap-3 border-b px-3">

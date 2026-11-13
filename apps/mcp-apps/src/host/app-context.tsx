@@ -1,6 +1,6 @@
-import type { Capabilities, DataPort } from '@supabase/mcp-server-supabase/apps'
 import { createContext, useContext, type ReactNode } from 'react'
 import type { ContextAttachment, SelectionSharing } from 'surfaces/common'
+import type { Capabilities, DataPort } from 'surfaces/contract'
 import type { SqlEditorComponent } from 'surfaces/query'
 
 import type { WorkspaceConnection } from './workspace-tools'

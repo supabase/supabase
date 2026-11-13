@@ -1,9 +1,3 @@
-import {
-  MAX_CHART_Y_SERIES,
-  type ChartConfig,
-  type QueryDisplay,
-  type Row,
-} from '@supabase/mcp-server-supabase/apps'
 import { BarChart2Icon, LineChartIcon, Settings2Icon, TableIcon } from 'lucide-react'
 import { useEffect, useEffectEvent, useMemo } from 'react'
 import {
@@ -31,6 +25,7 @@ import {
   MultiSelectorTrigger,
 } from 'ui-patterns/multi-select'
 
+import { MAX_CHART_Y_SERIES, type ChartConfig, type QueryDisplay, type Row } from '../contract'
 import { checkHasNonPositiveValues } from '../query/chart-utils'
 import { ExplorerToolbarAction } from './explorer-toolbar'
 

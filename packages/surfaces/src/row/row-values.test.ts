@@ -1,6 +1,6 @@
-import type { Column } from '@supabase/mcp-server-supabase/apps'
 import { describe, expect, it } from 'vitest'
 
+import type { Column } from '../contract'
 import { testTable } from '../test-utils'
 import { buildRowValues, initialRowDraft, parseCellValue } from './row-values'
 

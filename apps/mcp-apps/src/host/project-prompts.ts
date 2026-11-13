@@ -3,9 +3,9 @@
  * structured requests (`AgentRequest`); the wording, the server metadata and
  * the workspace tool instructions below are specific to MCP hosts.
  */
-import type { Bootstrap, Project } from '@supabase/mcp-server-supabase/apps'
-import { surfaceResources } from '@supabase/mcp-server-supabase/apps'
 import type { AgentRequest, AskAgent, ContextAttachment } from 'surfaces/common'
+import type { Bootstrap, Project } from 'surfaces/contract'
+import { surfaceResources } from 'surfaces/contract'
 import type { ProjectCheckId } from 'surfaces/project'
 
 import type { SendMessage } from './app-context'

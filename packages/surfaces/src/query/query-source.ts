@@ -1,4 +1,4 @@
-import type { LogWindow } from '@supabase/mcp-server-supabase/apps'
+import type { LogWindow } from '../contract'
 
 /** A short label for the time window a logs query runs against. */
 export function logWindowLabel(window?: LogWindow) {

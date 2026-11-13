@@ -1,5 +1,4 @@
-import type { AdvisorIssue, NotebookSummary, Project } from '@supabase/mcp-server-supabase/apps'
-
+import type { AdvisorIssue, NotebookSummary, Project } from '../contract'
 import type { AdvisorCategory } from '../project/issues-list'
 import type { ProjectCheckId } from '../project/project-overview'
 

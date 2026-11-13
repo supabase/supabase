@@ -1,8 +1,8 @@
-import type { LogSettings, Row } from '@supabase/mcp-server-supabase/apps'
 import { act, cleanup, fireEvent, screen, waitFor } from '@testing-library/react'
 import { afterEach, describe, expect, it, vi } from 'vitest'
 
 import type { AskAgent, ContextAttachment, Loadable, SelectionSharing } from '../common'
+import type { LogSettings, Row } from '../contract'
 import { renderWithTooltip, testCapabilities, testProject } from '../test-utils'
 import { LogsView, type LogsViewProps } from './logs-view'
 

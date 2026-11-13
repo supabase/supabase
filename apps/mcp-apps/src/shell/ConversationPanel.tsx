@@ -1,3 +1,4 @@
+import { useLayoutEffect, useRef, useState } from 'react'
 import {
   resolveQueryWindow,
   type ExplorerPanel,
@@ -9,8 +10,7 @@ import {
   type PanelBootstrap,
   type QueryPanel,
   type RowPanel as RowLaunch,
-} from '@supabase/mcp-server-supabase/apps'
-import { useLayoutEffect, useRef, useState } from 'react'
+} from 'surfaces/contract'
 import type { ExplorerHandle, ExplorerState } from 'surfaces/explorer'
 import { LogsView } from 'surfaces/logs'
 import { IssuesList, NotebooksList } from 'surfaces/project'

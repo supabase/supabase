@@ -4,7 +4,7 @@ import {
   parseUntrustedRows,
   type DataOperationName,
   type DataPort,
-} from '@supabase/mcp-server-supabase/apps'
+} from 'surfaces/contract'
 
 export interface ToolResult {
   isError?: boolean

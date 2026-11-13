@@ -1,8 +1,8 @@
-import type { Row, Table } from '@supabase/mcp-server-supabase/apps'
 import { KeyRoundIcon, PencilIcon } from 'lucide-react'
 import { Button, cn, Tooltip, TooltipContent, TooltipTrigger } from 'ui'
 
 import { displayValue } from '../common'
+import type { Row, Table } from '../contract'
 
 export interface QueryResultsGridProps {
   rows: readonly Row[]

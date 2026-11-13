@@ -1,10 +1,3 @@
-import {
-  LOG_SOURCE_LABELS,
-  logLevelSchema,
-  logMinutesSchema,
-  logSourceSchema,
-  type LogSettings,
-} from '@supabase/mcp-server-supabase/apps'
 import { RefreshCwIcon, SearchIcon, XIcon } from 'lucide-react'
 import {
   Button,
@@ -19,6 +12,13 @@ import {
   SelectValue,
 } from 'ui'
 
+import {
+  LOG_SOURCE_LABELS,
+  logLevelSchema,
+  logMinutesSchema,
+  logSourceSchema,
+  type LogSettings,
+} from '../contract'
 import type { LogLevelFilter, LogSourceFilter } from './logs-model'
 
 const LEVEL_OPTIONS: { value: LogLevelFilter; label: string }[] = [

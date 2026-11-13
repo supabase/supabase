@@ -4,7 +4,7 @@ import {
   type QueryDisplay,
   type QuerySource,
   type Row,
-} from '@supabase/mcp-server-supabase/apps'
+} from '../contract'
 
 /** A separate revision protects display choices without invalidating SQL edits. */
 export class QueryDisplayState {

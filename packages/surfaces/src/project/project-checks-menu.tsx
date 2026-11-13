@@ -1,7 +1,7 @@
-import type { Project } from '@supabase/mcp-server-supabase/apps'
 import { MoreHorizontalIcon } from 'lucide-react'
 import { DropdownMenu, DropdownMenuContent, DropdownMenuItem, DropdownMenuTrigger } from 'ui'
 
+import type { Project } from '../contract'
 import { ExplorerToolbarAction } from '../explorer/explorer-toolbar'
 import { checkIcons, projectChecks, type ProjectCheckId } from './project-overview'
 

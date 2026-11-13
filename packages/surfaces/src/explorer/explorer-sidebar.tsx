@@ -1,4 +1,3 @@
-import type { TableSummary } from '@supabase/mcp-server-supabase/apps'
 import { DatabaseIcon, SquareTerminalIcon, Table2Icon } from 'lucide-react'
 import type { ReactNode } from 'react'
 import {
@@ -13,6 +12,7 @@ import {
 } from 'ui'
 import { Admonition } from 'ui-patterns/Admonition'
 
+import type { TableSummary } from '../contract'
 import type { Entity } from '../query/query-model'
 
 /** A sidebar row: a table, or Run SQL. */

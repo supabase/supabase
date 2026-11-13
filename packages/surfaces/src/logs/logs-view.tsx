@@ -1,4 +1,3 @@
-import type { LogSettings, Project, Row } from '@supabase/mcp-server-supabase/apps'
 import { ScrollTextIcon } from 'lucide-react'
 import { useEffect, useMemo, useState } from 'react'
 import { Button } from 'ui'
@@ -6,6 +5,7 @@ import { Admonition } from 'ui-patterns/Admonition'
 import { EmptyStatePresentational } from 'ui-patterns/EmptyStatePresentational'
 
 import { errorMessage, type AskAgent, type Loadable, type SelectionSharing } from '../common'
+import type { LogSettings, Project, Row } from '../contract'
 import { LogDetailPanel } from './log-detail-panel'
 import { LogList, type SelectModifiers } from './log-list'
 import { selectLogRows, type LogRowSelection } from './log-selection'

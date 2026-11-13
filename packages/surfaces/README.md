@@ -6,18 +6,19 @@ The views are host-agnostic. Nothing here fetches, calls a tool, reads a router 
 
 ## Entry points
 
-| Import                | What                                                                                                                                                                    |
-| --------------------- | ----------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
-| `surfaces/explorer`   | `Explorer`: a sidebar (schema, search, tables, Run SQL) beside one `QueryEditor` for the selection. Also the Explorer toolbar and query layout pieces it is built from. |
-| `surfaces/query`      | `QueryEditor` for one table or query, the results grid, `QueryResultChart`, and the query, draft and display models.                                                    |
-| `surfaces/logs`       | `LogsView`: filters, a log list, a detail panel, and copy, share or send-to-agent for selected rows.                                                                    |
-| `surfaces/row`        | `RowPanel` and `RowEditor`: view and edit one table row.                                                                                                                |
-| `surfaces/project`    | `ProjectList`, `ProjectHome`, and the Home sections that also work on their own: `IssuesList`, `NotebooksList`, `ProjectChecks`.                                        |
-| `surfaces/common`     | Shared types and helpers only (`Loadable`, `AgentRequest`, `AskAgent`, `SelectionSharing`, `errorMessage`). Nothing here renders.                                       |
-| `surfaces/codemirror` | A CodeMirror SQL editor, for hosts that do not bring their own.                                                                                                         |
-| `surfaces/test-utils` | Render helpers and fixtures for tests of these views.                                                                                                                   |
+| Import                | What                                                                                                                                                                              |
+| --------------------- | --------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
+| `surfaces/explorer`   | `Explorer`: a sidebar (schema, search, tables, Run SQL) beside one `QueryEditor` for the selection. Also the Explorer toolbar and query layout pieces it is built from.           |
+| `surfaces/query`      | `QueryEditor` for one table or query, the results grid, `QueryResultChart`, and the query, draft and display models.                                                              |
+| `surfaces/logs`       | `LogsView`: filters, a log list, a detail panel, and copy, share or send-to-agent for selected rows.                                                                              |
+| `surfaces/row`        | `RowPanel` and `RowEditor`: view and edit one table row.                                                                                                                          |
+| `surfaces/project`    | `ProjectList`, `ProjectHome`, `ProjectCard` (one project and its live status), and the Home sections that also work on their own: `IssuesList`, `NotebooksList`, `ProjectChecks`. |
+| `surfaces/contract`   | What views need from a host: entity and capability schemas, `DataPort`, panel launches, surface resources (zod, browser-safe).                                                    |
+| `surfaces/common`     | Shared types and helpers only (`Loadable`, `AgentRequest`, `AskAgent`, `SelectionSharing`, `errorMessage`). Nothing here renders.                                                 |
+| `surfaces/codemirror` | A CodeMirror SQL editor, for hosts that do not bring their own.                                                                                                                   |
+| `surfaces/test-utils` | Render helpers and fixtures for tests of these views.                                                                                                                             |
 
-Entities and wire shapes (`Project`, `Capabilities`, `ProjectOverview`, `NotebookSummary`, `QueryDisplay`…) come from the Supabase MCP server's contract, `@supabase/mcp-server-supabase/apps`, so a view and the server never disagree on a field. The package is linked by path until a release publishes `/apps`.
+Entities and wire shapes (`Project`, `Capabilities`, `ProjectOverview`, `NotebookSummary`, `QueryDisplay`…) come from `surfaces/contract`, which defines what the views need from a host: entity schemas, `DataPort` and its `dataOperations`, panel launches and surface resources. Hosts implement it; the views own it. supabase/mcp `poc/surfaces` is a reference MCP server that implements it.
 
 ## How a view is shaped
 
@@ -84,4 +85,4 @@ Tests use Vitest and Testing Library (`renderWithTooltip`, `testCapabilities`, `
 1. Add the component to the closest entry point (or a new one in `package.json` `exports`), taking data as `Loadable` props and reporting actions through callbacks.
 2. Cover its states in a test next to it.
 3. Add a design-system page and demo for it.
-4. To let an agent open it, add a panel for it in the MCP server and render it in `apps/mcp-apps` (see "Add a view an agent can open" in that README).
+4. To show it in agent hosts, render it in `apps/mcp-apps` and add it to the gallery catalog (see "Add a view an agent can open" in that README).

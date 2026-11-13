@@ -1,10 +1,10 @@
-import type { AdvisorIssue, Project, ProjectOverview } from '@supabase/mcp-server-supabase/apps'
 import { CircleAlertIcon, CircleCheckIcon, TriangleAlertIcon } from 'lucide-react'
 import { useRef, useState, type ReactNode } from 'react'
 import { Button, Card } from 'ui'
 import { Admonition } from 'ui-patterns/Admonition'
 
 import { errorMessage, type AskAgent, type Loadable } from '../common'
+import type { AdvisorIssue, Project, ProjectOverview } from '../contract'
 
 export const ADVISOR_CATEGORIES = { security: 'Security', performance: 'Performance' } as const
 export type AdvisorCategory = keyof typeof ADVISOR_CATEGORIES

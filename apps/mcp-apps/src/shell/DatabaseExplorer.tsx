@@ -1,6 +1,6 @@
-import type { Bootstrap, Project } from '@supabase/mcp-server-supabase/apps'
 import { useEffect, useImperativeHandle, useRef, useState, type Ref } from 'react'
 import type { Loadable } from 'surfaces/common'
+import type { Bootstrap, Project } from 'surfaces/contract'
 import { Explorer, type ExplorerHandle, type ExplorerState } from 'surfaces/explorer'
 
 import { useApp } from '../host/app-context'

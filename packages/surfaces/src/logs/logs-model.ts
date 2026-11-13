@@ -1,6 +1,5 @@
-import { LOG_SOURCE_LABELS, type LogSettings, type Row } from '@supabase/mcp-server-supabase/apps'
-
 import type { ContextAttachment } from '../common'
+import { LOG_SOURCE_LABELS, type LogSettings, type Row } from '../contract'
 
 export type LogLevelLabel = 'INFO' | 'WARN' | 'ERROR'
 export type LogLevelFilter = NonNullable<LogSettings['level']>

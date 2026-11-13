@@ -1,4 +1,3 @@
-import type { Column } from '@supabase/mcp-server-supabase/apps'
 import { KeyRoundIcon, LockKeyholeIcon } from 'lucide-react'
 import {
   Input,
@@ -11,6 +10,7 @@ import {
   Textarea,
 } from 'ui'
 
+import type { Column } from '../contract'
 import { defaultHint, isJsonColumn, type FieldDraft, type FieldMode } from './row-values'
 
 interface RowFieldProps {

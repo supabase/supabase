@@ -1,4 +1,3 @@
-import type { Traffic } from '@supabase/mcp-server-supabase/apps'
 import { useState } from 'react'
 import { ToggleGroup, ToggleGroupItem } from 'ui'
 import {
@@ -14,6 +13,7 @@ import {
   type ChartLineTick,
 } from 'ui-patterns/Chart'
 
+import type { Traffic } from '../contract'
 import { compactNumber, fullNumber } from './project-format'
 
 /** Hourly error rates at or above this are marked with a threshold line. */

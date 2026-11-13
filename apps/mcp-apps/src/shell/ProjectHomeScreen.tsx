@@ -1,4 +1,4 @@
-import type { Bootstrap, Project } from '@supabase/mcp-server-supabase/apps'
+import type { Bootstrap, Project } from 'surfaces/contract'
 import { ProjectHome } from 'surfaces/project'
 
 import { useApp } from '../host/app-context'

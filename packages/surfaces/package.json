@@ -7,6 +7,7 @@
   "sideEffects": false,
   "exports": {
     "./common": "./src/common/index.ts",
+    "./contract": "./src/contract/index.ts",
     "./query": "./src/query/index.ts",
     "./row": "./src/row/index.ts",
     "./logs": "./src/logs/index.ts",
@@ -28,7 +29,6 @@
     "@codemirror/state": "6.5.2",
     "@codemirror/view": "6.36.5",
     "@lezer/highlight": "^1.2.1",
-    "@supabase/mcp-server-supabase": "link:../../../mcp-surfaces/packages/mcp-server-supabase",
     "lucide-react": "catalog:",
     "react": "catalog:",
     "react-dom": "catalog:",

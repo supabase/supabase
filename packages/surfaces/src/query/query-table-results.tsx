@@ -1,10 +1,4 @@
-import {
-  QUERY_RESULT_ROW_LIMIT,
-  type QuerySource,
-  type Row,
-  type Table,
-} from '@supabase/mcp-server-supabase/apps'
-
+import { QUERY_RESULT_ROW_LIMIT, type QuerySource, type Row, type Table } from '../contract'
 import type { QueryResult } from './query-model'
 import { QueryResultsGrid } from './query-results-grid'
 

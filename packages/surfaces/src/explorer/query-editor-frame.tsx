@@ -1,8 +1,8 @@
-import type { QueryDisplay, Row } from '@supabase/mcp-server-supabase/apps'
 import { CodeSquareIcon, EyeIcon, EyeOffIcon } from 'lucide-react'
 import type { ReactNode } from 'react'
 import { cn, ResizableHandle, ResizablePanel, ResizablePanelGroup } from 'ui'
 
+import type { QueryDisplay, Row } from '../contract'
 import { DisplaySettingsButton } from './display-settings-button'
 import {
   ExplorerQuery,

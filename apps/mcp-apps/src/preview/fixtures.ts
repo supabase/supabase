@@ -5,13 +5,7 @@
  * previewed without a host. The production build rejects any HTML containing
  * the marker above, so this module must only be imported from src/preview.
  */
-import type {
-  Bootstrap,
-  Column,
-  DataPort,
-  PanelBootstrap,
-  Row,
-} from '@supabase/mcp-server-supabase/apps'
+import type { Bootstrap, Column, DataPort, PanelBootstrap, Row } from 'surfaces/contract'
 
 const col = (name: string, format = 'text', extra: Partial<Column> = {}): Column => ({
   name,
@@ -208,6 +202,18 @@ export function createPreviewDataPort(): DataPort {
   }
 
   return {
+    async getOrganization({ id }) {
+      await wait()
+      const organization = previewBootstrap.organizations.find((o) => o.slug === id || o.id === id)
+      if (!organization) throw new Error('Organization not found in this preview.')
+      return organization
+    },
+    async getProject({ id }) {
+      await wait()
+      const project = previewBootstrap.projects.find((p) => p.id === id)
+      if (!project) throw new Error('Project not found in this preview.')
+      return project
+    },
     async bootstrap(input) {
       await wait()
       const data = structuredClone(previewBootstrap)

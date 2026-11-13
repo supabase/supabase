@@ -1,8 +1,8 @@
-import type { ProjectOverview } from '@supabase/mcp-server-supabase/apps'
 import { act, cleanup, fireEvent, screen } from '@testing-library/react'
 import { afterEach, beforeAll, describe, expect, it, vi } from 'vitest'
 
 import type { AskAgent, Loadable } from '../common'
+import type { ProjectOverview } from '../contract'
 import { renderWithTooltip, testCapabilities, testProject } from '../test-utils'
 import { ProjectHome, type ProjectHomeProps } from './project-home'
 

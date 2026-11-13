@@ -17,7 +17,7 @@ Because the host is different every time, a surface never loads data or talks to
 - **Actions go out as callbacks.** Saving a row, refreshing logs or asking the agent are callbacks. When a host can't do something, it omits the callback and the view hides or disables the action.
 - **Hosts supply what differs.** For example, the query editor takes the SQL editor as a prop, so Studio can pass Monaco while MCP Apps pass CodeMirror.
 
-Data shapes such as `Project`, `Table` and `ChartConfig` are contracts owned by the Supabase MCP server and exported from `@supabase/mcp-server-supabase/apps`. Every host reads and writes the same shapes.
+Data shapes such as `Project`, `Table` and `ChartConfig` come from `surfaces/contract`, which defines what the views need from a host. Every host reads and writes the same shapes.
 
 ## Where each surface is used
 

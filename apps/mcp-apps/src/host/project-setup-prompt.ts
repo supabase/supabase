@@ -1,5 +1,5 @@
-import type { Bootstrap } from '@supabase/mcp-server-supabase/apps'
-import { surfaceResources } from '@supabase/mcp-server-supabase/apps'
+import type { Bootstrap } from 'surfaces/contract'
+import { surfaceResources } from 'surfaces/contract'
 
 import type { ConnectionContext } from './project-prompts'
 

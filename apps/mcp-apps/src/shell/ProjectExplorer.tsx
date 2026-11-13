@@ -1,5 +1,5 @@
-import type { Bootstrap, LogSettings, Project } from '@supabase/mcp-server-supabase/apps'
 import { useLayoutEffect, useRef, useState } from 'react'
+import type { Bootstrap, LogSettings, Project } from 'surfaces/contract'
 import { EXPLORER_QUERY_ID, type ExplorerHandle, type ExplorerState } from 'surfaces/explorer'
 import { LogsView } from 'surfaces/logs'
 import { entityId } from 'surfaces/query'
@@ -138,7 +138,7 @@ export function ProjectExplorer({
         <ProjectHomeScreen project={project} context={context} refreshRevision={refreshRevision} />
       </div>
       {isOpen('database') && (
-        <div className="flex min-h-0 flex-1" hidden={view !== 'database'}>
+        <div className="flex min-h-0 min-w-0 flex-1" hidden={view !== 'database'}>
           <DatabaseExplorer
             ref={handleExplorerRef}
             project={project}

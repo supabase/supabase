@@ -273,6 +273,7 @@ export const docsConfig: DocsConfig = {
         { title: 'Issues List', href: '/docs/surfaces/issues-list', items: [] },
         { title: 'Logs', href: '/docs/surfaces/logs', items: [] },
         { title: 'Notebooks List', href: '/docs/surfaces/notebooks-list', items: [] },
+        { title: 'Project Card', href: '/docs/surfaces/project-card', items: [] },
         { title: 'Project List', href: '/docs/surfaces/project-list', items: [] },
         { title: 'Project Home', href: '/docs/surfaces/project-home', items: [] },
         { title: 'Query Editor', href: '/docs/surfaces/query-editor', items: [] },

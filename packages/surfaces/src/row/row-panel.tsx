@@ -1,10 +1,3 @@
-import {
-  rowPanelSchema,
-  type Bootstrap,
-  type Row,
-  type RowPanel as RowLaunch,
-  type Table,
-} from '@supabase/mcp-server-supabase/apps'
 import { RefreshCwIcon } from 'lucide-react'
 import {
   useCallback,
@@ -19,6 +12,13 @@ import { Button, Tooltip, TooltipContent, TooltipTrigger } from 'ui'
 import { Admonition } from 'ui-patterns/Admonition'
 
 import { errorMessage } from '../common'
+import {
+  rowPanelSchema,
+  type Bootstrap,
+  type Row,
+  type RowPanel as RowLaunch,
+  type Table,
+} from '../contract'
 import { RowEditorForm, type RowEditorFormState, type SaveRow } from './row-editor'
 import { rowKey } from './row-values'
 

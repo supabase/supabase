@@ -2036,6 +2036,11 @@ export const examples: Registry = [
     files: ['example/surfaces-issues-list.tsx'],
   },
   {
+    name: 'surfaces-project-card',
+    type: 'components:example',
+    files: ['example/surfaces-project-card.tsx'],
+  },
+  {
     name: 'surfaces-notebooks-list',
     type: 'components:example',
     files: ['example/surfaces-notebooks-list.tsx'],

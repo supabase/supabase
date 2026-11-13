@@ -1,9 +1,4 @@
-import {
-  QUERY_RESULT_ROW_LIMIT,
-  type ChartConfig,
-  type QuerySource,
-} from '@supabase/mcp-server-supabase/apps'
-
+import { QUERY_RESULT_ROW_LIMIT, type ChartConfig, type QuerySource } from '../contract'
 import { chartRowsForSource, prepareChart } from './query-display'
 import type { QueryResult } from './query-model'
 import { QueryResultChart } from './QueryResultChart'

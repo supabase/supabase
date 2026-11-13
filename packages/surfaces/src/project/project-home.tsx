@@ -1,13 +1,8 @@
-import type {
-  Capabilities,
-  NotebookSummary,
-  Project,
-  ProjectOverview,
-} from '@supabase/mcp-server-supabase/apps'
 import { Button } from 'ui'
 import { Admonition } from 'ui-patterns/Admonition'
 
 import type { AskAgent, Loadable } from '../common'
+import type { Capabilities, NotebookSummary, Project, ProjectOverview } from '../contract'
 import { IssuesList } from './issues-list'
 import { NotebooksList } from './notebooks-list'
 import { ProjectActivity } from './project-activity'
