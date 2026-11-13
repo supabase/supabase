@@ -116,6 +116,26 @@ describe('applyView', () => {
     expect(params).not.toHaveProperty('future_option')
   })
 
+  it('drops malformed operators and option values before constructing search params', () => {
+    const view = toView({
+      name: 'Invalid payload',
+      logSource: 'edge_logs',
+      filters: {
+        logicalOperator: 'AND',
+        conditions: [{ propertyName: 'level', operator: 'invalid', value: 'error' }],
+      },
+      viewOptions: {
+        user: { id: 'user-123' },
+        sort: { id: 'date', desc: 'false' },
+        date: ['ignored'],
+      },
+    })
+    const { params, dropped } = applyView(view, { filterableNames })
+    expect(params).toMatchObject({ filter: [], user: null, sort: null })
+    expect(params).not.toHaveProperty('date')
+    expect(dropped).toEqual(expect.arrayContaining(['level', 'user', 'sort.desc', 'date']))
+  })
+
   it('drops a nested filter group and reports it instead of throwing', () => {
     const view = toView({
       name: 'Has nested group',

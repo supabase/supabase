@@ -6,43 +6,18 @@ import {
   logsFiltersToUrlParams,
   parseLogsFilterUrlParams,
   type LogsFilter,
-  type LogsFilterOperator,
 } from './UnifiedLogs.filters'
 import type { SearchParamsType } from './UnifiedLogs.types'
+import {
+  logsViewFilterConditionSchema,
+  logsViewOptionKeySchema,
+  logsViewOptionsSchema,
+} from '@/data/content/log-content-schema'
 
 export const LOGS_VIEW_VERSION = 1 as const
 
-export type ViewOptionKey =
-  | 'latency'
-  | 'timing.dns'
-  | 'timing.connection'
-  | 'timing.tls'
-  | 'timing.ttfb'
-  | 'timing.transfer'
-  | 'sort'
-  | 'show_connection_logs'
-  | 'edge_auth'
-  | 'edge_storage'
-  | 'edge_postgrest'
-  | 'user'
-
-// The subset of SEARCH_PARAMS_PARSER (UnifiedLogs.constants.tsx) that defines a
-// saved view, excluding `date` (time range), pagination (`start`/`cursor`/`direction`),
-// `live`, and the open-row params (`uuid`/`id`).
-export const VIEW_OPTION_KEYS: ViewOptionKey[] = [
-  'latency',
-  'timing.dns',
-  'timing.connection',
-  'timing.tls',
-  'timing.ttfb',
-  'timing.transfer',
-  'sort',
-  'show_connection_logs',
-  'edge_auth',
-  'edge_storage',
-  'edge_postgrest',
-  'user',
-]
+export const VIEW_OPTION_KEYS = logsViewOptionKeySchema.options
+export type ViewOptionKey = (typeof VIEW_OPTION_KEYS)[number]
 
 export interface LogsView {
   id: string
@@ -56,8 +31,12 @@ export interface LogsView {
 
 export type LogsViewDraft = Omit<LogsView, 'id' | 'type' | 'version'>
 
+type SavedViewSearchParams = {
+  [Key in 'filter' | ViewOptionKey]: SearchParamsType[Key] | null
+}
+
 export interface ApplyViewResult {
-  params: Partial<SearchParamsType>
+  params: SavedViewSearchParams
   dropped: string[]
 }
 
@@ -134,28 +113,40 @@ export const applyView = (
       dropped.push(condition.propertyName)
       continue
     }
+    const parsed = logsViewFilterConditionSchema.safeParse(condition)
+    if (!parsed.success) {
+      dropped.push(condition.propertyName)
+      continue
+    }
     filters.push({
-      column: condition.propertyName,
-      operator: condition.operator as LogsFilterOperator,
-      value: String(condition.value),
+      column: parsed.data.propertyName,
+      operator: parsed.data.operator,
+      value: String(parsed.data.value),
     })
   }
 
-  const params: Record<string, unknown> = {
+  const options = logsViewOptionsSchema.safeParse(view.viewOptions)
+  if (!options.success) dropped.push(...options.error.issues.map((issue) => issue.path.join('.')))
+  for (const key of Object.keys(view.viewOptions)) {
+    if (!logsViewOptionKeySchema.safeParse(key).success) dropped.push(key)
+  }
+  const params: SavedViewSearchParams = {
     filter: filters.length > 0 ? logsFiltersToUrlParams(filters) : [],
+    latency: null,
+    'timing.dns': null,
+    'timing.connection': null,
+    'timing.tls': null,
+    'timing.ttfb': null,
+    'timing.transfer': null,
+    sort: null,
+    show_connection_logs: null,
+    edge_auth: null,
+    edge_storage: null,
+    edge_postgrest: null,
+    user: null,
+    ...(options.success ? options.data : {}),
   }
-
-  for (const key of VIEW_OPTION_KEYS) params[key] = null
-
-  for (const [key, value] of Object.entries(view.viewOptions)) {
-    if (!VIEW_OPTION_KEYS.includes(key as ViewOptionKey)) {
-      dropped.push(key)
-      continue
-    }
-    params[key] = value
-  }
-
-  return { params: params as Partial<SearchParamsType>, dropped }
+  return { params, dropped }
 }
 
 export const isViewModified = (

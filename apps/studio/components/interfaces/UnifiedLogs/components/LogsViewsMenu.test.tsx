@@ -25,7 +25,7 @@ const makeView = (overrides: Partial<LogsView> = {}): LogsView => ({
 })
 
 const baseProps = {
-  views: [] as LogsView[],
+  views: [],
   isLoading: false,
   isError: false,
   activeViewId: null,

@@ -1,4 +1,4 @@
-import { isGroup, type FilterCondition, type FilterGroup } from 'ui-patterns/FilterBar'
+import { isGroup, type FilterGroup } from 'ui-patterns/FilterBar'
 
 import {
   getLogAttributeKey,
@@ -7,6 +7,12 @@ import {
   type LogsFilter,
 } from '../UnifiedLogs.filters'
 import { type ViewOptionKey } from '../UnifiedLogs.views'
+import {
+  logsViewFilterConditionSchema,
+  logsViewOptionKeySchema,
+  logsViewOptionsSchema,
+  logsViewSortSchema,
+} from '@/data/content/log-content-schema'
 
 export const VIEW_OPTION_LABELS: Record<ViewOptionKey, string> = {
   latency: 'Latency',
@@ -32,13 +38,18 @@ export const buildFilterSummary = (
   filters: FilterGroup,
   columnLabels: Record<string, string>
 ): SummaryRow[] => {
-  const logsFilters: LogsFilter[] = filters.conditions
-    .filter((condition): condition is FilterCondition => !isGroup(condition))
-    .map((condition) => ({
-      column: condition.propertyName,
-      operator: condition.operator as LogsFilter['operator'],
-      value: String(condition.value),
-    }))
+  const logsFilters: LogsFilter[] = filters.conditions.flatMap((condition) => {
+    if (isGroup(condition)) return []
+    const result = logsViewFilterConditionSchema.safeParse(condition)
+    if (!result.success) return []
+    return [
+      {
+        column: result.data.propertyName,
+        operator: result.data.operator,
+        value: String(result.data.value),
+      },
+    ]
+  })
 
   return Object.entries(groupLogsFiltersByColumn(logsFilters)).map(
     ([column, { operator, values }]) => ({
@@ -51,18 +62,23 @@ export const buildFilterSummary = (
 const formatViewOptionValue = (value: unknown): string => {
   if (typeof value === 'boolean') return value ? 'On' : 'Off'
   if (Array.isArray(value)) return value.join(', ')
-  if (value && typeof value === 'object' && 'id' in value && 'desc' in value) {
-    const sort = value as { id: string; desc: boolean }
-    return `${sort.id} (${sort.desc ? 'desc' : 'asc'})`
-  }
+  const sort = logsViewSortSchema.safeParse(value)
+  if (sort.success) return `${sort.data.id} (${sort.data.desc ? 'desc' : 'asc'})`
   return String(value)
 }
 
 export const buildOptionsSummary = (viewOptions: Record<string, unknown>): SummaryRow[] =>
-  Object.entries(viewOptions).map(([key, value]) => ({
-    label: VIEW_OPTION_LABELS[key as ViewOptionKey] ?? key,
-    text: formatViewOptionValue(value),
-  }))
+  Object.entries(viewOptions).flatMap(([key, value]) => {
+    const parsedKey = logsViewOptionKeySchema.safeParse(key)
+    if (parsedKey.success && !logsViewOptionsSchema.shape[parsedKey.data].safeParse(value).success)
+      return []
+    return [
+      {
+        label: parsedKey.success ? VIEW_OPTION_LABELS[parsedKey.data] : key,
+        text: formatViewOptionValue(value),
+      },
+    ]
+  })
 
 export const isDuplicateViewName = (name: string, existingNames: string[]): boolean => {
   const normalized = name.trim().toLowerCase()
