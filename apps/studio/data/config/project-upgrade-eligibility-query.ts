@@ -37,6 +37,7 @@ export async function getProjectUpgradeEligibility(
   })
 
   if (error) handleError(error)
+
   return data as ProjectUpgradeEligibilityResponse | undefined
 }
 
