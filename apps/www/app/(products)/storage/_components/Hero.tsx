@@ -10,10 +10,10 @@ export function Hero() {
         <div className="grid grid-cols-1 lg:grid-cols-2 gap-4 items-end">
           <div>
             <h1 className="text-foreground text-3xl sm:text-5xl sm:leading-none">
-              <span className="block">Store and serve</span>
+              <span className="block">Storage</span>
             </h1>
             <p className="font-heading font-medium tracking-normal text-foreground-lighter text-3xl sm:text-5xl sm:leading-none">
-              any type of digital content
+              for any type of digital content
             </p>
           </div>
           <p className="text-foreground-lighter text-sm lg:text-base">
