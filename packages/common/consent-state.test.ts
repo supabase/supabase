@@ -780,8 +780,10 @@ describe('consent withdrawal call sites', () => {
 
   it('acceptAll keeps consent off until the decision is saved', async () => {
     const UC = makeUC(true)
-    const saved = Promise.withResolvers<void>()
-    UC.acceptAllServices.mockReturnValueOnce(saved.promise)
+    let resolveSave!: () => void
+    UC.acceptAllServices.mockReturnValueOnce(
+      new Promise<void>((resolve) => (resolveSave = resolve))
+    )
     consentState.UC = UC as never
     consentState.hasConsented = false
 
@@ -790,7 +792,7 @@ describe('consent withdrawal call sites', () => {
     expect(consentState.showConsentToast).toBe(false)
     expect(consentState.hasConsented).toBe(false)
 
-    saved.resolve()
+    resolveSave()
     await vi.waitFor(() => expect(consentState.hasConsented).toBe(true))
   })
 
