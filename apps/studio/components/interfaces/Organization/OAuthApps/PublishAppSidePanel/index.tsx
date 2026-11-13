@@ -94,9 +94,9 @@ function getFormDefaultValues(
           return { id: uuidv4(), value: url }
         }) ?? [],
       member_bound_grant: selectedApp.grant_kind === 'member_bound',
-      member_bound_grant_confirmed: selectedApp.grant_kind == null,
+      member_bound_grant_confirmed: selectedApp.grant_kind === 'member_bound',
       project_scoping: selectedApp.project_scoping_mode,
-      project_scoping_confirmed: selectedApp.project_scoping_mode == null,
+      project_scoping_confirmed: selectedApp.project_scoping_mode === true,
     }
   }
 
