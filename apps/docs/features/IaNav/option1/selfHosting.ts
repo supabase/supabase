@@ -6,6 +6,7 @@ export const selfHosting: NavMenuConstant = {
   url: '/guides/self-hosting',
   items: [
     { name: 'Deploy with Docker', url: '/guides/self-hosting/docker' },
+    { name: 'Deploy with Kubernetes', url: '/guides/self-hosting/kubernetes' },
     {
       name: 'Keys, gateway, HTTPS, and Postgres',
       items: [
