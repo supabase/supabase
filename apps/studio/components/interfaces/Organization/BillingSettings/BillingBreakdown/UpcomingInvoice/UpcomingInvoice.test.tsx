@@ -1,4 +1,4 @@
-import { act, screen } from '@testing-library/react'
+import { act, screen, waitFor } from '@testing-library/react'
 import userEvent from '@testing-library/user-event'
 import { platformComponents as components } from 'api-types'
 import { mockIntersectionObserver } from 'jsdom-testing-mocks'
@@ -272,8 +272,10 @@ describe('UpcomingInvoice', () => {
     )
 
     const note = await screen.findByText(/Plan fee for this period has already been paid/)
-    expect(note.closest('p')).toHaveTextContent(
-      'Your Pro Plan fee for this period has already been paid.'
+    await waitFor(() =>
+      expect(note.closest('p')).toHaveTextContent(
+        'Your Pro Plan fee for this period has already been paid.'
+      )
     )
   })
 

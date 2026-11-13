@@ -44,33 +44,40 @@ export const UpcomingInvoice = ({ slug }: UpcomingInvoiceProps) => {
 
   const { data: organization } = useOrganizationQuery({ slug })
 
-  if (isLoading) {
-    return (
-      <div ref={ref}>
+  const upcomingInvoice = data?.upcomingInvoice
+  const hasLoadedInvoice = isSuccess && !!upcomingInvoice
+
+  return (
+    <div ref={ref}>
+      {/* Mounted in every state so screen readers announce the change once the invoice loads */}
+      <span role="status" className="sr-only">
+        {hasLoadedInvoice ? 'Upcoming invoice loaded' : ''}
+      </span>
+
+      {isLoading && (
         <div className="space-y-2">
           <ShimmeringLoader />
           <ShimmeringLoader className="w-3/4" />
           <ShimmeringLoader className="w-1/2" />
         </div>
-      </div>
-    )
-  }
+      )}
 
-  if (isError) {
-    return (
-      <div ref={ref}>
-        <AlertError subject="Failed to retrieve upcoming invoice" error={error} />
-      </div>
-    )
-  }
+      {isError && <AlertError subject="Failed to retrieve upcoming invoice" error={error} />}
 
-  // just satisfying compiler
-  if (!data?.upcomingInvoice || !isSuccess) {
-    return <div ref={ref}></div>
-  }
+      {hasLoadedInvoice && (
+        <UpcomingInvoiceBreakdown invoice={upcomingInvoice} planName={organization?.plan?.name} />
+      )}
+    </div>
+  )
+}
 
-  const invoice = data.upcomingInvoice
-
+function UpcomingInvoiceBreakdown({
+  invoice,
+  planName,
+}: {
+  invoice: UpcomingInvoiceData
+  planName?: string
+}) {
   const hasMinimumFeeTopUp = invoice.minimum_fee.expectedAtEndOfCycle > 0
 
   const hasMetMinimumFeeThreshold = !hasMinimumFeeTopUp && invoice.minimum_fee.floorPrice != null
@@ -110,7 +117,7 @@ export const UpcomingInvoice = ({ slug }: UpcomingInvoiceProps) => {
   }))
 
   return (
-    <div ref={ref} className="w-full text-sm">
+    <div className="w-full text-sm">
       <Accordion type="multiple" defaultValue={['current-costs']}>
         <InvoiceSection
           value="current-costs"
@@ -197,7 +204,7 @@ export const UpcomingInvoice = ({ slug }: UpcomingInvoiceProps) => {
       {isPlanFeePaidInAdvance && (
         <p className="pt-2 text-foreground-light text-xs text-right">
           <span>Your </span>
-          {organization?.plan?.name && <span>{organization.plan.name} </span>}
+          {planName && <span>{planName} </span>}
           <span>
             Plan fee for this period has already been paid. This invoice will only reflect usage
             charges.
@@ -299,7 +306,11 @@ function InvoiceLineItemRow({
     )
   }
 
-  const title = item.name
+  let title = item.name
+  if (title.toLowerCase().includes('disk') && item.schema === 'generic') {
+    // be a little more specific than "Disk Size" – show "Disk Size IO2 GB-Hrs" instead
+    title = item.description
+  }
 
   const pricingTooltip =
     item.schema === 'generic' && item.unit_price_desc
