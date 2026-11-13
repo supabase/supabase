@@ -47,10 +47,3 @@ export function redactHiddenSpanError(data: SpanExportData): SpanExportData {
 function isRecord(value: unknown): value is Record<string, unknown> {
   return typeof value === 'object' && value !== null
 }
-
-// Checks that the project is outside the EU. An unknown region fails closed.
-export function isTracingAllowed({ projectRegion }: { projectRegion: string | undefined }) {
-  if (projectRegion === undefined || projectRegion.startsWith('eu-')) return false
-
-  return true
-}

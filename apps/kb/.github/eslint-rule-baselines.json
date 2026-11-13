@@ -1,0 +1,18 @@
+{
+  "rules": {
+    "shadcn/no-arbitrary-values": 3,
+    "shadcn/no-unknown-classes": 0,
+    "shadcn/no-raw-colors": 2
+  },
+  "ruleFiles": {
+    "shadcn/no-arbitrary-values": {
+      "src/components/AsciiHoverText.tsx": 1,
+      "src/components/Hero.tsx": 2
+    },
+    "shadcn/no-unknown-classes": {},
+    "shadcn/no-raw-colors": {
+      "src/components/Footer.astro": 1,
+      "src/components/HeroGrid.tsx": 1
+    }
+  }
+}

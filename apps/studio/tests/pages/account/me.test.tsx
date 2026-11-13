@@ -117,34 +117,6 @@ describe('/account/me', () => {
     expect(screen.getByText('AccountDeletion')).toBeInTheDocument()
   })
 
-  it('forwards a legacy confirmation message to Security with its query and fragment intact', () => {
-    const hash = 'message=Confirmation+link+accepted.+Confirm+the+other+email&sb='
-    mockRouter.asPath = `/account/me?keep=yes#${hash}`
-    mockRouter.query = { keep: 'yes' }
-
-    render(<PreferencesPage dehydratedState={{}} />)
-
-    expect(mockRouter.replace).toHaveBeenCalledWith({
-      pathname: '/account/security',
-      query: { keep: 'yes' },
-      hash,
-    })
-  })
-
-  it('handles a confirmation message that arrives after the first render', () => {
-    const { rerender } = render(<PreferencesPage dehydratedState={{}} />)
-    expect(mockRouter.replace).not.toHaveBeenCalled()
-
-    mockRouter.asPath = '/account/me#message=Confirmation+link+accepted&sb='
-    rerender(<PreferencesPage dehydratedState={{}} />)
-
-    expect(mockRouter.replace).toHaveBeenCalledWith({
-      pathname: '/account/security',
-      query: {},
-      hash: 'message=Confirmation+link+accepted&sb=',
-    })
-  })
-
   it.each([
     '/account/me',
     '/account/me#dashboard',

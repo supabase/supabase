@@ -13,19 +13,77 @@ Logs are provided for each function invocation, locally and in hosted environmen
 
 ### Production
 
-Access logs from the Functions section of your Dashboard:
+Open the logs for a function in the Dashboard:
 
-1. Navigate to the [Functions section](/dashboard/project/_/functions) of the Dashboard
-2. Select your function from the list
-3. Choose your log view:
-   - **Invocations:** Request/Response data including headers, body, status codes, and execution duration. Filter by date, time, or status code.
-   - **Logs:** Platform events, uncaught exceptions, and custom log messages. Filter by timestamp, level, or message content.
+1. Go to the [Edge Functions section](/dashboard/project/_/functions) of the Dashboard.
+2. Select your function from the list.
+3. Select the **Logs** tab.
 
-![Function invocations.](/docs/img/guides/functions/function-logs.png)
+The **Logs** tab shows one list with both kinds of events for the function:
+
+- **Invocations:** one row for each HTTP request the function handled, with the status code and execution time.
+- **Console logs and events:** output from `console.log`, `console.warn`, and `console.error`, uncaught exceptions, and boot and shutdown events.
 
 ### Development
 
 When [developing locally](/docs/guides/functions/quickstart) you will see error messages and console log statements printed to your local terminal window.
+
+---
+
+## Explore logs in the Dashboard
+
+### Filter the list
+
+Use the filter bar above the list to narrow the events:
+
+| Filter        | Behavior                                                                                            |
+| ------------- | --------------------------------------------------------------------------------------------------- |
+| Time range    | Show events from a fixed period.                                                                    |
+| Log Type      | Show **Edge Function** (invocations), **Edge Function runtime** (console logs and events), or both. |
+| Level         | Show **Success**, **Warning**, or **Error** events.                                                 |
+| Event message | Match text in the event message.                                                                    |
+
+For an invocation, the level follows the HTTP status code: 2xx is success, 4xx is warning, and 5xx is error. For a console log or event, `error` and `fatal` map to error, `warn` and `warning` map to warning, and other levels map to success.
+
+Select **Live** to fetch new events automatically. Select it again to pause. Choosing a time range or sorting the list also stops live mode.
+
+### Inspect an event
+
+Select a row to open the detail panel. The panel has these tabs:
+
+| Tab          | Shows                                                                    |
+| ------------ | ------------------------------------------------------------------------ |
+| **Overview** | The event grouped into sections, described below.                        |
+| **Raw JSON** | The full event data as JSON.                                             |
+| **Timeline** | Other logs that share the same request, trace, or function execution ID. |
+| **User**     | The user behind the request, when the event can be linked to one.        |
+
+For an invocation, **Overview** has these sections:
+
+- **Network:** host, method, path, and client, when available.
+- **Edge Function:** status, function path, execution time, and execution ID. It includes a **Function Details** section with the function ID, execution region, number of function logs, method, and user agent.
+- **Attributes:** the remaining fields of the event, grouped into **Details**, **Request**, **Response**, request and response headers, and other sections. A section appears only when the event has fields for it.
+
+<Admonition type="note">
+
+If you turn off **Updated Logs interface** in the Dashboard feature previews, the **Logs** page is replaced by separate **Invocations** and **Logs** tabs. Request and response bodies are not logged in either view.
+
+</Admonition>
+
+---
+
+## What invocation logs contain
+
+Invocation logs record the request method, path, and host, the response status code, the execution time, and a limited set of headers.
+
+Request and response bodies are not logged or retained. Logs do not contain the payload a client sent or the data your function returned, and you can't view them in the Dashboard. To see a body while debugging, log the part you need from your function code with `console.log`, taking care not to log sensitive data.
+
+Only a subset of request and response headers is kept. The `function_edge_logs` source records these headers:
+
+- Request headers: `accept`, `content-length`, `host`, and `user-agent`.
+- Response headers: `content-length`, `content-type`, `date`, `server`, and `vary`.
+
+Other headers, including `authorization` and custom headers, reach your function but are not part of the invocation log. To inspect them, log them from your function as shown in [Logging request headers](#logging-request-headers). For the full list of fields, see the [Log field reference](/docs/guides/observability/log-field-reference).
 
 ---
 
