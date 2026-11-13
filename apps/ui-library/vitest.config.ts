@@ -19,7 +19,7 @@ export default defineConfig({
         test: {
           name: 'node',
           environment: 'node',
-          include: ['middleware.test.ts', 'scripts/*.test.ts', './lib/*.test.ts'],
+          include: ['proxy.test.ts', 'scripts/*.test.ts', './lib/*.test.ts'],
         },
       },
     ],
