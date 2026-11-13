@@ -155,7 +155,7 @@ export function buildSentryClientOptions({
     // Enable performance monitoring
     tracesSampleRate: 0.02,
 
-    // Leave the error `sampleRate` unset (1.0). Error sampling is per tag in `ERROR_ROUTING` and
+    // Leave the error `sampleRate` unset (1.0). Error sampling is per tag and fault in `ERROR_ROUTING` and
     // applied in `beforeSend`; a global rate would multiply with it and also drop `alwaysCapture`.
 
     // Function form so Sentry's default integrations (browserSession,
