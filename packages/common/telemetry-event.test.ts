@@ -47,7 +47,7 @@ describe('buildTelemetryEventRequest', () => {
     })
     const other = buildTelemetryEventRequest(API_URL, {
       action: 'kb_search_submitted',
-      properties: { queryLength: 3, resultCount: 1, hasResults: true },
+      properties: { query: 'abc', queryLength: 3, resultCount: 1, hasResults: true },
     })
     expect(explorer?.body.page_title).toBe('Explorer')
     expect(other?.body.page_title).toBe('Page')
@@ -73,7 +73,7 @@ describe('buildTelemetryEventRequest', () => {
     })
     const submit = buildTelemetryEventRequest(API_URL, {
       action: 'kb_search_submitted',
-      properties: { queryLength: 3, resultCount: 1, hasResults: true },
+      properties: { query: 'abc', queryLength: 3, resultCount: 1, hasResults: true },
     })
     expect(click?.url).toBe('https://api.example.com/platform/telemetry/event')
     expect(click?.keepalive).toBe(true)
@@ -83,7 +83,7 @@ describe('buildTelemetryEventRequest', () => {
   it("adds the app's platform to custom_properties only once it is set", () => {
     const event = {
       action: 'kb_search_submitted',
-      properties: { queryLength: 3, resultCount: 1, hasResults: true },
+      properties: { query: 'abc', queryLength: 3, resultCount: 1, hasResults: true },
     } as const
     const unset = buildTelemetryEventRequest(API_URL, event)
     platform.value = 'kb'
@@ -96,7 +96,7 @@ describe('buildTelemetryEventRequest', () => {
   it('builds the same endpoint whether the API URL has a trailing slash or /platform', () => {
     const event = {
       action: 'kb_search_submitted',
-      properties: { queryLength: 3, resultCount: 1, hasResults: true },
+      properties: { query: 'abc', queryLength: 3, resultCount: 1, hasResults: true },
     } as const
     for (const apiUrl of [
       'https://api.example.com/',
@@ -132,7 +132,7 @@ describe('sendTelemetryEvent', () => {
     consent.value = false
     await sendTelemetryEvent(API_URL, {
       action: 'kb_search_submitted',
-      properties: { queryLength: 3, resultCount: 1, hasResults: true },
+      properties: { query: 'abc', queryLength: 3, resultCount: 1, hasResults: true },
     })
     expect(post).not.toHaveBeenCalled()
   })

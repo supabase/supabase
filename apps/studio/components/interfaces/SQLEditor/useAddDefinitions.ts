@@ -1,5 +1,5 @@
 import { Monaco } from '@monaco-editor/react'
-import { useQueryClient } from '@tanstack/react-query'
+import { useQuery, useQueryClient } from '@tanstack/react-query'
 import { LOCAL_STORAGE_KEYS } from 'common'
 import type { IDisposable } from 'monaco-editor'
 import { useEffect, useRef } from 'react'
@@ -7,7 +7,7 @@ import { useEffect, useRef } from 'react'
 import { getPgsqlCompletionProvider } from '@/components/ui/CodeEditor/Providers/PgSQLCompletionProvider'
 import { getPgsqlSignatureHelpProvider } from '@/components/ui/CodeEditor/Providers/PgSQLSignatureHelpProvider'
 import type { PgInfo } from '@/components/ui/CodeEditor/Providers/Providers.types'
-import { useDatabaseFunctionsQuery } from '@/data/database-functions/database-functions-query'
+import { databaseFunctionsQueryOptions } from '@/data/database-functions/database-functions-query'
 import { databaseKeys } from '@/data/database/keys'
 import { useKeywordsQuery } from '@/data/database/keywords-query'
 import { useSchemasQuery } from '@/data/database/schemas-query'
@@ -16,6 +16,7 @@ import { useSchemasFilteredForHighAvailability } from '@/hooks/misc/useHighAvail
 import { useLocalStorageQuery } from '@/hooks/misc/useLocalStorage'
 import { useSelectedProjectQuery } from '@/hooks/misc/useSelectedProject'
 import { formatSql } from '@/lib/formatSql'
+import { useGrant } from '@/lib/grants'
 import { useSqlEditorV2StateSnapshot } from '@/state/sql-editor/sql-editor-state'
 
 /**
@@ -74,12 +75,20 @@ export const useAddDefinitions = (
     },
     { enabled: enabled && intellisenseEnabled }
   )
-  const { data: functions, isSuccess: isFunctionsSuccess } = useDatabaseFunctionsQuery(
-    {
-      projectRef: project?.ref,
-      connectionString: project?.connectionString,
-    },
-    { enabled: enabled && intellisenseEnabled }
+  const readGrant = useGrant(
+    'POST /platform/pg-meta/{ref}/query',
+    { projectRef: project?.ref },
+    { variant: 'read' }
+  )
+  const { data: functions, isSuccess: isFunctionsSuccess } = useQuery(
+    databaseFunctionsQueryOptions(
+      {
+        projectRef: project?.ref,
+        connectionString: project?.connectionString,
+        grant: readGrant.grant,
+      },
+      { enabled: enabled && intellisenseEnabled }
+    )
   )
   const { data: schemas, isSuccess: isSchemasSuccess } = useSchemasQuery(
     {

@@ -1,7 +1,7 @@
 import { beforeEach, describe, expect, it, vi } from 'vitest'
 
 import { classifyResponseError } from './error-classification'
-import { ERROR_ROUTING } from '@/lib/errors/error-routing'
+import { getErrorRouting } from '@/lib/errors/error-routing'
 import {
   ConnectionTimeoutError,
   isStudioError,
@@ -191,7 +191,7 @@ describe('handleError — error classification', () => {
         expect.any(NetworkUnreachableError),
         expect.objectContaining({
           tags: expect.objectContaining({
-            sample_rate: ERROR_ROUTING.NetworkUnreachable.sentrySampleRate,
+            sample_rate: getErrorRouting(new NetworkUnreachableError({})).sentrySampleRate,
           }),
         })
       )
@@ -219,7 +219,7 @@ describe('handleError — error classification', () => {
         err,
         expect.objectContaining({
           tags: expect.objectContaining({
-            sample_rate: ERROR_ROUTING.UnexpectedError.sentrySampleRate,
+            sample_rate: getErrorRouting(err).sentrySampleRate,
           }),
         })
       )
