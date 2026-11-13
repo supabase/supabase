@@ -113,10 +113,10 @@ export default function mdxComponents(type?: 'blog' | 'lp' | undefined) {
       // biome-ignore lint/a11y/useAltText: provided in props
       return <img {...props} />
     },
-    Img: ({ zoomable = true, className, ...props }: ImageProps & { wide?: boolean }) => (
+    Img: ({ zoomable = true, className, wide, ...props }: ImageProps & { wide?: boolean }) => (
       <Image
         fill
-        containerClassName={cn(props.wide && 'wide')}
+        containerClassName={cn(wide && 'wide')}
         className={cn('m-0 object-cover', type === 'blog' ? 'rounded-md border' : '', className)}
         zoomable={zoomable}
         {...props}
