@@ -1,9 +1,17 @@
 // @vitest-environment jsdom
 import { act } from 'react'
 import { createRoot, type Root } from 'react-dom/client'
-import { afterEach, beforeAll, describe, expect, it } from 'vitest'
+import { afterEach, beforeAll, describe, expect, it, vi } from 'vitest'
 
 import { PrivacySettingsIsland } from './PrivacySettingsIsland'
+
+vi.hoisted(() => {
+  window.matchMedia = (() => ({
+    matches: false,
+    addEventListener: () => {},
+    removeEventListener: () => {},
+  })) as unknown as typeof window.matchMedia
+})
 
 describe('PrivacySettingsIsland', () => {
   let root: Root | undefined

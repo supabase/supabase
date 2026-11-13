@@ -3,6 +3,79 @@ import type { BaseCategory, UserDecision } from '@usercentrics/cmp-browser-sdk'
 import { proxy, ref, snapshot, useSnapshot } from 'valtio'
 
 import { IS_PLATFORM, LOCAL_STORAGE_KEYS } from './constants'
+import { posthogClient } from './posthog-client'
+
+const TRACKING_COOKIE_NAMES = ['_ga', 'FPID', 'FPAU', 'FPLC', '_dcid', 'session_id']
+const isTrackingCookie = (name: string) =>
+  TRACKING_COOKIE_NAMES.includes(name) ||
+  name.startsWith('_ga_') ||
+  name.startsWith('_gcl_') ||
+  name.startsWith('_gac_') ||
+  name.startsWith('FPGCL') ||
+  (name.startsWith('ph_') && name.endsWith('_posthog'))
+
+// Left in place, these restore the pre-revoke accept on the next load
+const STALE_CONSENT_STORAGE_KEYS = ['ucData', 'ucString', LOCAL_STORAGE_KEYS.TELEMETRY_CONSENT]
+
+const SERVER_RESET_WAIT_MS = 1000
+
+/**
+ * Asks the API to clear the HttpOnly telemetry cookies it sets (`session_id`, `anonymous_id`,
+ * `user_id`), which JavaScript can't remove. Resolves once the request settles or after a short
+ * cap, so a slow API never holds up the caller; keepalive lets a capped request finish anyway.
+ */
+function resetServerTelemetryCookies(): Promise<void> {
+  const apiUrl = process.env.NEXT_PUBLIC_API_URL?.replace(/\/+$/, '')
+  if (!IS_PLATFORM || !apiUrl) return Promise.resolve()
+
+  // helpers.ts has an ensurePlatformSuffix, but importing it here pulls in matchMedia at module load
+  const platformUrl = apiUrl.endsWith('/platform') ? apiUrl : `${apiUrl}/platform`
+  const request = fetch(`${platformUrl}/telemetry/reset`, {
+    method: 'POST',
+    credentials: 'include',
+    keepalive: true,
+  })
+    .then((response) => {
+      if (!response.ok) console.error(`Telemetry reset failed with status ${response.status}`)
+    })
+    .catch(() => undefined)
+
+  return Promise.race([
+    request,
+    new Promise<void>((resolve) => setTimeout(resolve, SERVER_RESET_WAIT_MS)),
+  ])
+}
+
+/**
+ * Clears GA, server-side GTM, PostHog, and telemetry session cookies, and PostHog's stored
+ * identity. Resolves once the API has had a chance to clear its HttpOnly telemetry cookies.
+ */
+export function revokeTrackingConsent(): Promise<void> {
+  if (typeof document === 'undefined') return Promise.resolve()
+
+  posthogClient.optOut()
+  const serverReset = resetServerTelemetryCookies()
+
+  document.cookie
+    .split(';')
+    .map((cookie) => cookie.split('=')[0].trim())
+    .filter(isTrackingCookie)
+    .forEach((name) => {
+      const expired = `${name}=; expires=Thu, 01 Jan 1970 00:00:00 GMT; path=/`
+      document.cookie = `${expired}; domain=.supabase.com`
+      document.cookie = expired
+    })
+
+  try {
+    const keys = Array.from({ length: localStorage.length }, (_, i) => localStorage.key(i))
+    keys
+      .filter((key): key is string => !!key?.startsWith('ph_') && key.endsWith('_posthog'))
+      .concat(STALE_CONSENT_STORAGE_KEYS)
+      .forEach((key) => localStorage.removeItem(key))
+  } catch {}
+
+  return serverReset
+}
 
 export type PriorConsentDecision =
   | null
@@ -151,36 +224,59 @@ export const consentState = proxy({
     consentState.UC.acceptAllServices()
       .then(() => {
         consentState.categories = consentState.UC?.getCategoriesBaseInfo() ?? null
+        posthogClient.optIn()
       })
       .catch(() => {
         consentState.hasConsented = previousConsentValue
         consentState.showConsentToast = true
+        // The optimistic hasConsented started PostHog, which cleared any stored opt-out
+        if (!previousConsentValue) posthogClient.optOut()
       })
   },
-  denyAll: () => {
-    if (!consentState.UC) return
+  /**
+   * Resolves to whether the opt-out was saved, after the API's telemetry cookies are reset. Pass
+   * `reload` to reload the page after a saved opt-out that withdrew consent, unless the caller
+   * reloads itself.
+   */
+  denyAll: ({ reload = false }: { reload?: boolean } = {}): Promise<boolean> => {
+    if (!consentState.UC) return Promise.resolve(false)
     const previousConsentValue = consentState.hasConsented
 
     consentState.hasConsented = false
     consentState.showConsentToast = false
 
-    consentState.UC.denyAllServices()
-      .then(() => {
+    return consentState.UC.denyAllServices()
+      .then(async () => {
         consentState.categories = consentState.UC?.getCategoriesBaseInfo() ?? null
+        await revokeTrackingConsent()
+        // GTM keeps running after its script unmounts; only a reload stops it in this tab
+        if (reload && previousConsentValue) window.location.reload()
+        return true
       })
       .catch(() => {
         consentState.showConsentToast = previousConsentValue
+        return false
       })
   },
   updateServices: (decisions: UserDecision[]) => {
     if (!consentState.UC) return
 
+    const previousConsentValue = consentState.hasConsented
     consentState.showConsentToast = false
 
     consentState.UC.updateServices(decisions)
-      .then(() => {
+      .then(async () => {
         consentState.hasConsented = consentState.UC?.areAllConsentsAccepted() ?? false
         consentState.categories = consentState.UC?.getCategoriesBaseInfo() ?? null
+
+        if (consentState.hasConsented) {
+          posthogClient.optIn()
+          return
+        }
+
+        await revokeTrackingConsent()
+        // GTM keeps running after its script unmounts; only a reload stops it in this tab
+        if (previousConsentValue) window.location.reload()
       })
       .catch(() => {
         consentState.showConsentToast = true

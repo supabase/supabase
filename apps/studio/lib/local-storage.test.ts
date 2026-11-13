@@ -21,4 +21,20 @@ describe('clearLocalStorage', () => {
     expect(localStorage.getItem('account-recovery-reminder:user-b')).toBe('snooze-b')
     expect(localStorage.getItem(followUpKey)).toBe('pending')
   })
+
+  it('keeps the visitor consent records so an opt-out survives sign-out', () => {
+    localStorage.clear()
+    const consentKeys = [
+      'uc_settings',
+      'uc_user_interaction',
+      'ucData',
+      'ucString',
+      '__ph_opt_in_out_phc_test',
+    ]
+    consentKeys.forEach((key) => localStorage.setItem(key, 'x'))
+
+    clearLocalStorage()
+
+    consentKeys.forEach((key) => expect(localStorage.getItem(key)).toBe('x'))
+  })
 })
