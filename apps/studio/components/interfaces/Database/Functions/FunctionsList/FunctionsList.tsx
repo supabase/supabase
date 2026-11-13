@@ -1,4 +1,5 @@
 import { safeSql } from '@supabase/pg-meta'
+import { useQuery } from '@tanstack/react-query'
 import { DatabaseIcon, PlusIcon, SearchIcon } from 'lucide-react'
 import { parseAsBoolean, parseAsJson, parseAsString, useQueryState } from 'nuqs'
 import { useEffect, useRef, useState } from 'react'
@@ -28,17 +29,18 @@ import {
 import { SIDEBAR_KEYS } from '@/components/layouts/ProjectLayout/LayoutSidebar/LayoutSidebarProvider'
 import { AlertError } from '@/components/ui/AlertError'
 import { ButtonTooltip } from '@/components/ui/ButtonTooltip'
+import { NoPermission } from '@/components/ui/NoPermission'
 import { SchemaSelector } from '@/components/ui/SchemaSelector'
 import { Shortcut } from '@/components/ui/Shortcut'
 import { TextConfirmModal } from '@/components/ui/TextConfirmModalWrapper'
 import { useDatabaseFunctionDeleteMutation } from '@/data/database-functions/database-functions-delete-mutation'
 import type { SavedDatabaseFunction } from '@/data/database-functions/database-functions-query'
-import { useDatabaseFunctionsQuery } from '@/data/database-functions/database-functions-query'
+import { databaseFunctionsQueryOptions } from '@/data/database-functions/database-functions-query'
 import { useSchemasQuery } from '@/data/database/schemas-query'
-import { FGA_PERMISSIONS, useAsyncCheckPermissionsV2 } from '@/hooks/misc/useCheckPermissionsV2'
 import { useQuerySchemaState } from '@/hooks/misc/useSchemaQueryState'
 import { useSelectedProjectQuery } from '@/hooks/misc/useSelectedProject'
 import { useIsProtectedSchema } from '@/hooks/useProtectedSchemas'
+import { getWriteGrantToastMessage, getWriteGrantTooltip, useGrant } from '@/lib/grants'
 import { onSearchInputEscape } from '@/lib/keyboard'
 import { useAiAssistantStateSnapshot } from '@/state/ai-assistant-state'
 import { useEditorPanelStateSnapshot } from '@/state/editor-panel-state'
@@ -123,10 +125,18 @@ export const FunctionsList = () => {
   const [schemaSelectorOpen, setSchemaSelectorOpen] = useState(false)
   const searchInputRef = useRef<HTMLInputElement>(null)
 
-  const { can: canCreateFunctions } = useAsyncCheckPermissionsV2(
-    FGA_PERMISSIONS.PROJECT.DATABASE_WRITE
+  const readGrant = useGrant(
+    'POST /platform/pg-meta/{ref}/query',
+    { projectRef: project?.ref },
+    { variant: 'read' }
+  )
+  const writeGrant = useGrant(
+    'POST /platform/pg-meta/{ref}/query',
+    { projectRef: project?.ref },
+    { variant: 'write' }
   )
 
+  const canCreateFunctions = writeGrant.status === 'granted'
   const { isSchemaLocked } = useIsProtectedSchema({ schema: selectedSchema })
 
   useShortcut(
@@ -153,14 +163,19 @@ export const FunctionsList = () => {
   const {
     data: functions = [],
     error,
-    isPending: isLoading,
+    isPending: isLoadingFunctions,
     isError,
     isSuccess,
-  } = useDatabaseFunctionsQuery({
-    projectRef: project?.ref,
-    connectionString: project?.connectionString,
-    schema: selectedSchema,
-  })
+  } = useQuery(
+    databaseFunctionsQueryOptions({
+      projectRef: project?.ref,
+      connectionString: project?.connectionString,
+      schema: selectedSchema,
+      grant: readGrant.grant,
+    })
+  )
+  const isLoading =
+    readGrant.status === 'loading' || (readGrant.status === 'granted' && isLoadingFunctions)
 
   // Get unique return types from functions in the selected schema
   const schemaFunctions = functions.filter((fn) => fn.schema === selectedSchema)
@@ -207,9 +222,13 @@ export const FunctionsList = () => {
   const onDeleteFunction = () => {
     if (!project) return console.error('Project is required')
     if (!functionToDelete) return console.error('Function is required')
+    if (!writeGrant.grant) {
+      return toast.error(getWriteGrantToastMessage(writeGrant.status, 'delete', 'functions'))
+    }
 
     deleteDatabaseFunction({
       func: functionToDelete,
+      grant: writeGrant.grant,
       projectRef: project.ref,
       connectionString: project.connectionString,
     })
@@ -242,6 +261,15 @@ export const FunctionsList = () => {
     setSelectedFunctionToDelete,
   ])
 
+  if (readGrant.status === 'denied') return <NoPermission resourceText="view database functions" />
+  if (readGrant.status === 'error') {
+    return (
+      <AlertError
+        error={readGrant.error}
+        subject="Failed to check database functions permissions"
+      />
+    )
+  }
   if (isLoading) return <GenericSkeletonLoader />
   if (isError) return <AlertError error={error} subject="Failed to retrieve database functions" />
 
@@ -418,11 +446,14 @@ const CreateFunctionButton = ({
   createFunction: () => void
 }) => {
   const { selectedSchema } = useQuerySchemaState()
-  const { can: canCreateFunctions } = useAsyncCheckPermissionsV2(
-    FGA_PERMISSIONS.PROJECT.DATABASE_WRITE
+  const { data: project } = useSelectedProjectQuery()
+  const writeGrant = useGrant(
+    'POST /platform/pg-meta/{ref}/query',
+    { projectRef: project?.ref },
+    { variant: 'write' }
   )
   const { isSchemaLocked } = useIsProtectedSchema({ schema: selectedSchema })
-  const canAddFunctions = canCreateFunctions && !isSchemaLocked
+  const canAddFunctions = writeGrant.status === 'granted' && !isSchemaLocked
 
   if (canAddFunctions) {
     return (
@@ -452,7 +483,9 @@ const CreateFunctionButton = ({
         tooltip={{
           content: {
             side: 'bottom',
-            text: 'You need additional permissions to create functions',
+            text:
+              getWriteGrantTooltip(writeGrant.status, 'create', 'functions') ??
+              'You need additional permissions to create functions',
           },
         }}
       >

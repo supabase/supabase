@@ -762,12 +762,11 @@ describe('Pipelines logs', () => {
     ['list', getUnifiedLogsQuery],
     ['counts', getLogsCountQuery],
     ['chart', getLogsChartQuery],
-  ])('uses the same source and string identity fallback for the %s', (_, buildQuery) => {
+  ])('uses only pipeline_id_v2 with the same source for the %s', (_, buildQuery) => {
     const sql = buildQuery(withFilters('log_type:eq:pipelines', `pipeline_id:eq:${pipelineId}`))
     expect(sql).toContain("source = 'etl_replication_logs'")
-    expect(sql).toContain(
-      "coalesce(nullIf(log_attributes['pipeline_id_v2'], ''), log_attributes['pipeline_id']) IN ('03dg2o5teb2eucxr9ggh3uie6')"
-    )
+    expect(sql).toContain("log_attributes['pipeline_id_v2'] IN ('03dg2o5teb2eucxr9ggh3uie6')")
+    expect(sql).not.toContain("log_attributes['pipeline_id']")
   })
 
   it('limits an identity-only filter to Pipelines logs', () => {
@@ -783,9 +782,7 @@ describe('Pipelines logs', () => {
       facet: 'pipeline_id',
       facetSearch: '03dg',
     })
-    expect(sql).toContain(
-      "coalesce(nullIf(log_attributes['pipeline_id_v2'], ''), log_attributes['pipeline_id'])"
-    )
+    expect(sql).toContain("log_attributes['pipeline_id_v2']")
     expect(sql).toContain("source = 'etl_replication_logs'")
     expect(sql).toContain("LIKE '%03dg%'")
     expect(sql).not.toContain("IN ('150')")
@@ -797,9 +794,7 @@ describe('Pipelines logs', () => {
       .split(/\bUNION ALL\b/)
       .find((branch) => branch.includes("facet = 'pipeline_id'"))
     expect(pipelineFacet).toBeDefined()
-    expect(pipelineFacet).toContain(
-      "coalesce(nullIf(log_attributes['pipeline_id_v2'], ''), log_attributes['pipeline_id'])"
-    )
+    expect(pipelineFacet).toContain("log_attributes['pipeline_id_v2']")
     expect(pipelineFacet).toContain("source = 'etl_replication_logs'")
     expect(pipelineFacet).not.toContain("IN ('150')")
   })
@@ -829,14 +824,17 @@ describe('Pipelines logs', () => {
     ['list', getUnifiedLogsQueryBQ],
     ['counts', getLogsCountQueryBQ],
     ['chart', getLogsChartQueryBQ],
-  ])('keeps the BigQuery %s compatible with an endpoint without the v2 column', (_, buildQuery) => {
-    const sql = buildQuery(withFilters('log_type:eq:pipelines', `pipeline_id:eq:${pipelineId}`))
-    expect(sql).toContain('from etl_replication_logs as pl')
-    expect(sql).toContain("json_value(to_json_string(pl), '$.pipeline_id_v2')")
-    expect(sql).toContain('cast(pl.pipeline_id as string)')
-    expect(sql).toContain("`pipeline_id` IN ('03dg2o5teb2eucxr9ggh3uie6')")
-    expect(sql).not.toContain('pl.pipeline_id_v2')
-  })
+  ])(
+    'reads only pipeline_id_v2 in the BigQuery %s without requiring a schema column',
+    (_, buildQuery) => {
+      const sql = buildQuery(withFilters('log_type:eq:pipelines', `pipeline_id:eq:${pipelineId}`))
+      expect(sql).toContain('from etl_replication_logs as pl')
+      expect(sql).toContain("json_value(to_json_string(pl), '$.pipeline_id_v2')")
+      expect(sql).not.toContain('cast(pl.pipeline_id as string)')
+      expect(sql).toContain("`pipeline_id` IN ('03dg2o5teb2eucxr9ggh3uie6')")
+      expect(sql).not.toContain('pl.pipeline_id_v2')
+    }
+  )
 
   it.each([getUnifiedLogsQuery, getUnifiedLogsQueryBQ])(
     'quotes an opaque identity safely',

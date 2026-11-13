@@ -1,16 +1,12 @@
 import type { Table } from '@tanstack/react-table'
-import { CopyIcon, FilterIcon, type LucideIcon } from 'lucide-react'
-import type { MouseEvent, ReactNode } from 'react'
+import { MoreHorizontalIcon } from 'lucide-react'
+import type { ReactNode } from 'react'
 import { useMedia } from 'react-use'
-import { cn, copyToClipboard, Tooltip, TooltipContent, TooltipTrigger } from 'ui'
+import { cn } from 'ui'
 
-import { LOGS_FILTER_OPERATOR_VERBS, type LogsFilterOperator } from '../UnifiedLogs.filters'
+import type { LogsFilterOperator } from '../UnifiedLogs.filters'
 import type { DataTableFilterField } from '@/components/ui/DataTable/DataTable.types'
-import {
-  DataTableSheetRowAction,
-  getRowFilterActions,
-  OPERATOR_ICONS,
-} from '@/components/ui/DataTable/DataTableSheetRowAction'
+import { DataTableSheetRowAction } from '@/components/ui/DataTable/DataTableSheetRowAction'
 
 const HOVER_ACTIONS_QUERY = '(hover: hover) and (pointer: fine) and (min-width: 768px)'
 
@@ -50,14 +46,6 @@ export function LogFieldRow<TData>({
   className,
 }: LogFieldRowProps<TData>) {
   const isHoverDevice = useMedia(HOVER_ACTIONS_QUERY, false)
-  const filterActions = getRowFilterActions({
-    fieldValue,
-    filterFields,
-    table,
-    value,
-    onAddFilter,
-    filterOperators,
-  })
   const canUseHoverActions = actionsMode === 'hover' && isHoverDevice && !disabled
   const triggerProps = { role: 'button', tabIndex: disabled ? -1 : 0 } as const
 
@@ -66,7 +54,7 @@ export function LogFieldRow<TData>({
       {...(canUseHoverActions ? {} : triggerProps)}
       className={cn(
         'group/field relative flex min-w-0 flex-1 items-start justify-between gap-4 px-4 py-2',
-        'hover:bg-surface-200 data-[state=open]:bg-surface-200',
+        'hover:bg-surface-200 data-[state=open]:bg-surface-200 has-[[data-state=open]]:bg-surface-200',
         !canUseHoverActions && 'cursor-pointer',
         className
       )}
@@ -81,8 +69,9 @@ export function LogFieldRow<TData>({
       </span>{' '}
       <span
         className={cn(
-          'flex min-w-0 flex-[2] justify-end text-right text-xs leading-5',
-          canUseHoverActions && 'group-hover/field:opacity-0 group-focus-within/field:opacity-0'
+          'flex min-w-0 flex-[2] justify-end text-right text-xs leading-5 transition-transform',
+          canUseHoverActions &&
+            'group-hover/field:-translate-x-9 group-has-[[data-state=open]]/field:-translate-x-9'
         )}
       >
         {children ?? value}
@@ -90,23 +79,31 @@ export function LogFieldRow<TData>({
       {canUseHoverActions && (
         <div
           className={cn(
-            'absolute inset-y-0 right-0 flex items-start gap-0.5 pr-4 pt-2 opacity-0',
-            'focus-within:opacity-100 group-hover/field:opacity-100'
+            'absolute right-4 top-2 opacity-0',
+            'focus-within:opacity-100 group-hover/field:opacity-100 has-[[data-state=open]]:opacity-100'
           )}
         >
-          {filterActions.map(({ operator, apply }) => (
-            <LogFieldRowAction
-              key={operator}
-              icon={OPERATOR_ICONS[operator] ?? FilterIcon}
-              label={`Filter where ${label} ${LOGS_FILTER_OPERATOR_VERBS[operator]}`}
-              onSelect={apply}
-            />
-          ))}
-          <LogFieldRowAction
-            icon={CopyIcon}
-            label={`Copy ${label}`}
-            onSelect={() => copyToClipboard(String(value))}
-          />
+          <DataTableSheetRowAction
+            fieldValue={fieldValue}
+            filterFields={filterFields}
+            table={table}
+            value={value}
+            label={label}
+            onAddFilter={onAddFilter}
+            filterOperators={filterOperators}
+          >
+            <button
+              type="button"
+              tabIndex={0}
+              aria-label={`Actions for ${label}`}
+              className={cn(
+                'focus-ring flex h-5 w-5 shrink-0 cursor-pointer items-center justify-center rounded-sm',
+                'text-foreground-lighter hover:bg-selection hover:text-foreground'
+              )}
+            >
+              <MoreHorizontalIcon size={12} />
+            </button>
+          </DataTableSheetRowAction>
         </div>
       )}
     </div>
@@ -128,42 +125,5 @@ export function LogFieldRow<TData>({
     >
       {row}
     </DataTableSheetRowAction>
-  )
-}
-
-function LogFieldRowAction({
-  icon: Icon,
-  label,
-  onSelect,
-}: {
-  icon: LucideIcon
-  label: string
-  onSelect: () => void
-}) {
-  const handleClick = (event: MouseEvent<HTMLButtonElement>) => {
-    event.stopPropagation()
-    onSelect()
-  }
-
-  return (
-    <Tooltip delayDuration={0} disableHoverableContent>
-      <TooltipTrigger asChild>
-        <button
-          type="button"
-          tabIndex={0}
-          aria-label={label}
-          onClick={handleClick}
-          className={cn(
-            'focus-ring flex h-5 w-5 shrink-0 cursor-pointer items-center justify-center rounded-sm',
-            'text-foreground-lighter hover:bg-selection hover:text-foreground'
-          )}
-        >
-          <Icon size={12} />
-        </button>
-      </TooltipTrigger>
-      <TooltipContent side="top" collisionPadding={8}>
-        {label}
-      </TooltipContent>
-    </Tooltip>
   )
 }

@@ -1,4 +1,12 @@
-import type { Span, TimeScale, TimeTick, TimeWindow, TraceIndex } from './types'
+import type {
+  Span,
+  SpanStatus,
+  TimeScale,
+  TimeTick,
+  TimeWindow,
+  TraceIndex,
+  VisibleRow,
+} from './types'
 
 export function buildTraceIndex(
   spans: readonly Span[],
@@ -134,23 +142,22 @@ export function formatMs(ms: number, stepMs: number): string {
   return minutes === 0 ? `${hours}h` : `${hours}h ${minutes}m`
 }
 
-function computeTicks([start, end]: TimeWindow, width: number): TimeTick[] {
+function computeTicks([start, end]: TimeWindow, width: number, origin: number): TimeTick[] {
   const durationMs = end - start
   if (!(durationMs > 0) || !(width > 0)) return []
 
   const stepMs = niceTickStep(durationMs, Math.max(1, Math.floor(width / TARGET_TICK_SPACING)))
   const ticks: TimeTick[] = []
-  for (let offset = 0; offset <= durationMs + 1e-9; offset += stepMs) {
-    ticks.push({
-      ms: start + offset,
-      fraction: offset / durationMs,
-      label: formatMs(offset, stepMs),
-    })
+  for (let i = Math.ceil((start - origin) / stepMs - 1e-9); ; i++) {
+    const offset = i * stepMs
+    const ms = origin + offset
+    if (ms > end + 1e-9) break
+    ticks.push({ ms, fraction: (ms - start) / durationMs, label: formatMs(offset, stepMs) })
   }
   return ticks
 }
 
-export function createTimeScale(window: TimeWindow, width: number): TimeScale {
+export function createTimeScale(window: TimeWindow, width: number, origin: number): TimeScale {
   const [start, end] = window
   const durationMs = Math.max(0, end - start)
   const toFraction = (ms: number) => (durationMs > 0 ? (ms - start) / durationMs : 0)
@@ -158,9 +165,203 @@ export function createTimeScale(window: TimeWindow, width: number): TimeScale {
     window,
     width,
     durationMs,
-    ticks: computeTicks(window, width),
+    ticks: computeTicks(window, width, origin),
     toFraction,
     toX: (ms) => toFraction(ms) * width,
     toMs: (x) => (width > 0 ? start + (x / width) * durationMs : start),
   }
+}
+
+export function formatDuration(ms: number): string {
+  return ms > 0 ? formatMs(ms, 10 ** (Math.floor(Math.log10(ms)) - 2)) : '0ms'
+}
+
+export function flattenTree(index: TraceIndex, collapsed: ReadonlySet<string>): VisibleRow[] {
+  const rows: VisibleRow[] = []
+  const stack = index.roots.map((id) => ({ id, depth: 0 })).reverse()
+
+  while (stack.length > 0) {
+    const { id, depth } = stack.pop()!
+    const children = index.childrenOf.get(id) ?? []
+    const hasChildren = children.length > 0
+    const isExpanded = hasChildren && !collapsed.has(id)
+    rows.push({ span: index.byId.get(id)!, depth, hasChildren, isExpanded })
+    if (!isExpanded) continue
+    for (let i = children.length - 1; i >= 0; i--) stack.push({ id: children[i], depth: depth + 1 })
+  }
+
+  return rows
+}
+
+export const STATUS_TEXT: Record<SpanStatus, string> = {
+  ok: 'text-brand',
+  error: 'text-destructive',
+  unset: 'text-foreground-muted',
+}
+
+export const MAX_COLLAPSED_MARKS = 200
+
+export function effectiveEndMs(span: Pick<Span, 'startMs' | 'endMs'>, nowMs: number): number {
+  return span.endMs ?? Math.max(span.startMs, nowMs)
+}
+
+export function collapsedChildMidpoints(index: TraceIndex, id: string): number[] {
+  const children = index.childrenOf.get(id) ?? []
+  if (children.length > MAX_COLLAPSED_MARKS) return []
+  return children.map((childId) => {
+    const child = index.byId.get(childId)!
+    return (child.startMs + effectiveEndMs(child, index.nowMs)) / 2
+  })
+}
+
+export interface SpanBounds {
+  startFraction: number
+  endFraction: number
+  visibleStart: number
+  visibleEnd: number
+  isVisible: boolean
+}
+
+export function getSpanBounds(
+  span: Pick<Span, 'startMs' | 'endMs'>,
+  nowMs: number,
+  scale: TimeScale
+): SpanBounds {
+  const startFraction = scale.toFraction(span.startMs)
+  const endFraction = scale.toFraction(effectiveEndMs(span, nowMs))
+
+  return {
+    startFraction,
+    endFraction,
+    visibleStart: clamp(startFraction, 0, 1),
+    visibleEnd: clamp(endFraction, 0, 1),
+    isVisible: endFraction >= 0 && startFraction <= 1,
+  }
+}
+
+export type TimingPlacement = 'after' | 'before' | 'inside'
+
+export function getTimingPlacement({
+  startPx,
+  endPx,
+  laneWidth,
+  labelPx,
+  gapPx,
+}: {
+  startPx: number
+  endPx: number
+  laneWidth: number
+  labelPx: number
+  gapPx: number
+}): TimingPlacement {
+  if (endPx + gapPx + labelPx <= laneWidth) return 'after'
+  if (startPx - gapPx - labelPx >= 0) return 'before'
+  return 'inside'
+}
+
+const MIN_WINDOW_FRACTION = 0.01
+export const MINIMAP_COLUMNS = 120
+
+const RANKED_STATUS: SpanStatus[] = ['unset', 'ok', 'error']
+
+const clamp = (value: number, min: number, max: number) => Math.min(Math.max(value, min), max)
+
+export function clampWindow(
+  [start, end]: TimeWindow,
+  [boundsStart, boundsEnd]: TimeWindow
+): TimeWindow {
+  const total = boundsEnd - boundsStart
+  const size = Math.min(total, Math.max(end - start, total * MIN_WINDOW_FRACTION))
+  const clampedStart = clamp(start, boundsStart, boundsEnd - size)
+  return [clampedStart, clampedStart + size]
+}
+
+export function resizeWindow(
+  [start, end]: TimeWindow,
+  edge: 'start' | 'end',
+  ms: number,
+  [boundsStart, boundsEnd]: TimeWindow
+): TimeWindow {
+  const minSize = (boundsEnd - boundsStart) * MIN_WINDOW_FRACTION
+  if (edge === 'start') return [Math.min(clamp(ms, boundsStart, boundsEnd), end - minSize), end]
+  return [start, Math.max(clamp(ms, boundsStart, boundsEnd), start + minSize)]
+}
+
+export interface MinimapRect {
+  lane: number
+  x: number
+  width: number
+  status: SpanStatus
+}
+
+export function computeMinimapRects(
+  index: TraceIndex,
+  columns: number,
+  maxLanes: number
+): { rects: MinimapRect[]; laneCount: number } {
+  const [start, end] = index.bounds
+  const duration = end - start
+  if (!(duration > 0)) return { rects: [], laneCount: 0 }
+
+  const visits: { span: Span; depth: number }[] = []
+  const stack = index.roots.map((id) => ({ id, depth: 0 })).reverse()
+  while (stack.length > 0) {
+    const { id, depth } = stack.pop()!
+    visits.push({ span: index.byId.get(id)!, depth })
+    for (const childId of index.childrenOf.get(id) ?? [])
+      stack.push({ id: childId, depth: depth + 1 })
+  }
+
+  const laneCount = Math.min(Math.max(...visits.map((visit) => visit.depth)) + 1, maxLanes)
+  const cells = Array.from({ length: laneCount }, () => new Array<number>(columns).fill(0))
+  for (const { span, depth } of visits) {
+    const lane = cells[Math.min(depth, laneCount - 1)]
+    const from = clamp(Math.floor(((span.startMs - start) / duration) * columns), 0, columns - 1)
+    const spanEnd = effectiveEndMs(span, index.nowMs)
+    const to = clamp(Math.ceil(((spanEnd - start) / duration) * columns) - 1, from, columns - 1)
+    for (let column = from; column <= to; column++) {
+      lane[column] = Math.max(lane[column], RANKED_STATUS.indexOf(span.status) + 1)
+    }
+  }
+
+  const rects: MinimapRect[] = []
+  cells.forEach((lane, laneIndex) => {
+    for (let column = 0; column < columns; ) {
+      if (lane[column] === 0) {
+        column++
+        continue
+      }
+      let next = column + 1
+      while (next < columns && lane[next] === lane[column]) next++
+      rects.push({
+        lane: laneIndex,
+        x: column,
+        width: next - column,
+        status: RANKED_STATUS[lane[column] - 1],
+      })
+      column = next
+    }
+  })
+  return { rects, laneCount }
+}
+
+export function formatAttributeValue(value: unknown): string {
+  if (typeof value === 'string') return value
+  if (value === null || typeof value !== 'object') return String(value)
+  return JSON.stringify(value)
+}
+
+export function areAllCollapsed(index: TraceIndex, collapsed: ReadonlySet<string>): boolean {
+  if (index.childrenOf.size === 0) return false
+  for (const id of index.childrenOf.keys()) {
+    if (!collapsed.has(id)) return false
+  }
+  return true
+}
+
+export function toggleAllCollapsed(
+  index: TraceIndex,
+  collapsed: ReadonlySet<string>
+): ReadonlySet<string> {
+  return areAllCollapsed(index, collapsed) ? new Set() : new Set(index.childrenOf.keys())
 }

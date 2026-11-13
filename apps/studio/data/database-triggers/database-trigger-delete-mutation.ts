@@ -1,10 +1,9 @@
-import pgMeta from '@supabase/pg-meta'
+import pgMeta, { asWriteSql } from '@supabase/pg-meta'
 import { useMutation, useQueryClient } from '@tanstack/react-query'
 import { toast } from 'sonner'
 
 import { databaseTriggerKeys } from './keys'
-import { unguarded } from '@/data/fetchers'
-import { executeSql } from '@/data/sql/execute-sql-mutation'
+import { executeSql, type PgMetaWriteGrant } from '@/data/sql/execute-sql-mutation'
 import type { StudioError } from '@/lib/errors/studio-errors'
 import type { UseCustomMutationOptions } from '@/types'
 
@@ -16,12 +15,14 @@ export type DatabaseTriggerDeleteVariables = {
     table: string
   }
   projectRef: string
+  grant: PgMetaWriteGrant
   connectionString?: string | null
 }
 
 export async function deleteDatabaseTrigger({
   trigger,
   projectRef,
+  grant,
   connectionString,
 }: DatabaseTriggerDeleteVariables) {
   const { sql } = pgMeta.triggers.remove(trigger)
@@ -31,9 +32,9 @@ export async function deleteDatabaseTrigger({
     connectionString,
     sqlOrigin: 'studio',
     queryName: 'trigger-delete',
-    sql,
+    sql: asWriteSql(sql),
     queryKey: ['trigger', 'delete', trigger.id],
-    grant: unguarded.migrating,
+    grant,
   })
 
   return result

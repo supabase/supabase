@@ -63,6 +63,11 @@ describe('isOrgMenuActive', () => {
     expect(isOrgMenuActive(mockItem('settings'), 5, '/org/foo/documents', undefined)).toBe(true)
     expect(isOrgMenuActive(mockItem('settings'), 5, '/org/foo/security', undefined)).toBe(true)
     expect(isOrgMenuActive(mockItem('settings'), 5, '/org/foo/sso', undefined)).toBe(true)
+    expect(isOrgMenuActive(mockItem('settings'), 5, '/org/foo/audit-log-drains', undefined)).toBe(
+      true
+    )
+    expect(isOrgMenuActive(mockItem('settings'), 5, '/org/foo/webhooks', undefined)).toBe(true)
+    expect(isOrgMenuActive(mockItem('settings'), 5, '/org/foo/private-apps', undefined)).toBe(true)
   })
 
   it('settings item is not active when pathname has no settings sub-route', () => {
@@ -82,6 +87,7 @@ describe('getOrgSectionKeyFromPathname', () => {
     expect(getOrgSectionKeyFromPathname('apps')).toBe('settings')
     expect(getOrgSectionKeyFromPathname('audit')).toBe('settings')
     expect(getOrgSectionKeyFromPathname('documents')).toBe('settings')
+    expect(getOrgSectionKeyFromPathname('audit-log-drains')).toBe('settings')
   })
 
   it('returns null for non-settings routes', () => {
