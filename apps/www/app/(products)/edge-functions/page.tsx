@@ -6,7 +6,7 @@ import { mdAlternates } from '@/lib/md-alternates'
 
 export const metadata: Metadata = {
   title: 'Edge Functions | Supabase',
-  description: 'Execute your code closest to your users with fast deploy times and low latency.',
+  description: 'Use our serverless functions to execute your code closest to your users with fast deploy times and low latency.',
   alternates: {
     ...canonicalAlternates('/edge-functions'),
     ...mdAlternates('edge-functions'),

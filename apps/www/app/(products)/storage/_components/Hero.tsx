@@ -8,10 +8,14 @@ export function Hero() {
     <SectionContainerWithCn>
       <div className="flex flex-col gap-6 lg:gap-8">
         <div className="grid grid-cols-1 lg:grid-cols-2 gap-4 items-end">
-          <h1 className="text-foreground text-3xl sm:text-5xl sm:leading-none">
-            <span className="block">Store and serve</span>
-            <span className="text-foreground-lighter block">any type of digital content</span>
-          </h1>
+          <div>
+            <h1 className="text-foreground text-3xl sm:text-5xl sm:leading-none">
+              <span className="block">Store and serve</span>
+            </h1>
+            <p className="font-heading font-medium tracking-normal text-foreground-lighter text-3xl sm:text-5xl sm:leading-none">
+              any type of digital content
+            </p>
+          </div>
           <p className="text-foreground-lighter text-sm lg:text-base">
             An open source S3 compatible storage solution with unlimited scalability, for any file
             type. With custom policies and permissions that are familiar and easy to implement.
