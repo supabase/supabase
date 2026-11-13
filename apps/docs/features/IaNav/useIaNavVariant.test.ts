@@ -57,6 +57,25 @@ describe('useIaNavVariant', () => {
 
   afterEach(() => {
     localStorage.clear()
+    sessionStorage.clear()
+  })
+
+  it('keeps a forced option-1 on later pages without the query param, with no exposure', () => {
+    renderVariant({ flagValue: 'control', override: 'option-1' })
+
+    const { result } = renderVariant({ flagValue: 'control' })
+
+    expect(result.current).toBe('option-1')
+    expect(captureExposure).not.toHaveBeenCalled()
+  })
+
+  it('lets a forced control replace a forced option-1 on later pages', () => {
+    renderVariant({ flagValue: 'option-1', override: 'option-1' })
+    renderVariant({ flagValue: 'option-1', override: 'control' })
+
+    const { result } = renderVariant({ flagValue: 'option-1' })
+
+    expect(result.current).toBe('control')
   })
 
   it('returns option-1 and records its exposure', () => {
