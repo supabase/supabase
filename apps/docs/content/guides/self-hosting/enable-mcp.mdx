@@ -83,7 +83,7 @@ Add the IP address you discovered to the Envoy configuration by editing the `/mc
   route:
     cluster: studio
     prefix_rewrite: /api/mcp
-    timeout: 30s
+    timeout: 0s
   request_headers_to_add:
     - header:
         key: X-Forwarded-Prefix
