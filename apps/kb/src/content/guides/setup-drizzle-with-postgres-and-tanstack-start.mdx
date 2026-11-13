@@ -1,0 +1,350 @@
+---
+title: 'Build a TanStack and Drizzle app with Postgres Database'
+description: 'Build a TanStack Start app with Drizzle ORM. Define a schema, run migrations, and query data from server functions, using Supabase as your Postgres database.'
+topics: ['Database', 'Tutorials']
+lastEdited: 2026-11-09
+---
+
+This tutorial shows how to build a to-do app with [TanStack Start](https://tanstack.com/start), [Drizzle ORM](https://orm.drizzle.team), and a Postgres database. TanStack Start is a full-stack React framework, and Drizzle is a TypeScript ORM for SQL databases. You define your schema in TypeScript, migrate it with Drizzle Kit, and query it from server functions.
+
+Drizzle needs a Postgres database, and Supabase is an excellent place to host one. Every Supabase project is a full Postgres database, so Drizzle works with it through a standard driver and a connection string. You develop against a local Postgres database, then deploy the same migrations to a hosted Supabase project. At the end, you deploy the app to [Vercel](https://vercel.com).
+
+## Prerequisites
+
+- [Node.js](https://nodejs.org) 22 or later
+- [pnpm](https://pnpm.io) installed
+- A [Supabase project](/dashboard/project/_), to deploy to
+- A [Vercel](https://vercel.com) account, to deploy the app
+- A [container runtime](/docs/guides/local-development/cli/getting-started#running-a-local-supabase-project) on your machine.
+
+## Set up the project
+
+Create the app, install Drizzle, and start a local Postgres database.
+
+### Create the app
+
+1. Create a TanStack Start app and move into its directory:
+
+   ```bash
+   pnpm dlx @tanstack/cli@latest create my-app --package-manager pnpm --yes --no-intent
+   cd my-app
+   ```
+
+   The `--yes` flag accepts the default options instead of prompting for them. The `--no-intent` flag skips TanStack's optional setup for AI coding agents.
+
+2. Install Drizzle ORM, the `postgres` driver, and `dotenv`:
+
+   ```bash
+   pnpm add drizzle-orm postgres dotenv
+   ```
+
+3. Install Drizzle Kit, which generates and runs migrations:
+
+   ```bash
+   pnpm add -D drizzle-kit
+   ```
+
+### Start Postgres locally
+
+Drizzle only needs a Postgres connection string, so any local Postgres works. This guide uses the [Supabase CLI](/docs/reference/cli/introduction) as a convenient way to run one. It starts Postgres in a container without any Docker configuration on your part, with the same Postgres version that hosted Supabase projects run. You use the CLI only to start and stop the database. Drizzle handles your schema, migrations, and queries.
+
+Install the CLI as a development dependency, then create its configuration file:
+
+```bash
+pnpm add -D supabase
+pnpm supabase init
+```
+
+### Turn off the Data API
+
+Supabase projects expose the `public` schema through an HTTP API, called the Data API. This app reads and writes data through Drizzle only, so turn the Data API off. Then your tables are reachable only through your database connection.
+
+1. In `supabase/config.toml`, set `enabled` to `false` in the `[api]` section:
+
+   ```toml
+   [api]
+   enabled = false
+   ```
+
+2. Start your [container runtime](/docs/guides/local-development/cli/getting-started#running-a-local-supabase-project).
+
+3. Start the local database. The CLI prints its connection details when it's ready:
+
+   ```bash
+   pnpm supabase start
+   ```
+
+   The local database URL is:
+
+   ```text
+   postgresql://postgres:postgres@127.0.0.1:54322/postgres
+   ```
+
+For more options, see [`api.enabled`](/docs/guides/local-development/cli/config#api.enabled) in the CLI configuration reference.
+
+### Set the database URL
+
+In your project root, create a `.env` file with the local database URL:
+
+```bash
+DATABASE_URL=postgresql://postgres:postgres@127.0.0.1:54322/postgres
+```
+
+## Define and migrate your schema
+
+Drizzle describes your tables in TypeScript. Drizzle Kit compares that schema with your previous migrations and writes the difference as SQL.
+
+### Define a table
+
+Create `src/db/schema.ts`:
+
+```ts
+import { bigint, boolean, pgTable, text, timestamp } from 'drizzle-orm/pg-core'
+
+export const todos = pgTable('todos', {
+  id: bigint('id', { mode: 'number' }).primaryKey().generatedAlwaysAsIdentity(),
+  title: text('title').notNull(),
+  isComplete: boolean('is_complete').notNull().default(false),
+  createdAt: timestamp('created_at', { withTimezone: true }).notNull().defaultNow(),
+})
+```
+
+The table uses an identity column for its primary key and `timestamptz` for timestamps, which are the recommended Postgres defaults.
+
+### Configure Drizzle Kit
+
+Create `drizzle.config.ts` in your project root:
+
+```ts
+import 'dotenv/config'
+
+import { defineConfig } from 'drizzle-kit'
+
+export default defineConfig({
+  dialect: 'postgresql',
+  schema: './src/db/schema.ts',
+  out: './drizzle',
+  dbCredentials: {
+    url: process.env.DATABASE_URL!,
+  },
+})
+```
+
+### Generate and apply the migration
+
+1. Generate a migration from your schema, then apply it to your local database:
+
+   ```bash
+   pnpm drizzle-kit generate --name create_todos
+   pnpm drizzle-kit migrate
+   ```
+
+   Drizzle Kit writes the SQL migration to the `drizzle/` directory. It records applied migrations in the `drizzle.__drizzle_migrations` table.
+
+2. Confirm that the table exists. Use any Postgres client, such as `psql`:
+
+   ```bash
+   psql 'postgresql://postgres:postgres@127.0.0.1:54322/postgres' -c 'select count(*) from public.todos'
+   ```
+
+3. Commit the `drizzle/` directory.
+
+## Query data from server functions
+
+Connect Drizzle to the database, then expose queries to your pages through TanStack Start [server functions](https://tanstack.com/start/latest/docs/framework/react/guide/server-functions). Server functions run only on the server, so your database credentials never reach the browser.
+
+### Connect to the database
+
+Create `src/db/index.ts`:
+
+```ts
+import 'dotenv/config'
+
+import { drizzle } from 'drizzle-orm/postgres-js'
+import postgres from 'postgres'
+
+const databaseUrl = process.env.DATABASE_URL
+if (!databaseUrl) throw new Error('DATABASE_URL is not set')
+
+// Transaction mode poolers don't support prepared statements
+const client = postgres(databaseUrl, { prepare: false, max: 1 })
+
+export const db = drizzle(client)
+```
+
+The `prepare: false` option lets the same code work against a pooled connection in transaction mode, which this guide uses in production. The `max: 1` option limits each serverless function instance to one database connection.
+
+### Create the server functions
+
+Create `src/lib/todos.functions.ts` with functions to list, add, toggle, and delete to-dos:
+
+```ts
+import { createServerFn } from '@tanstack/react-start'
+import { desc, eq, not } from 'drizzle-orm'
+
+import { db } from '@/db'
+import { todos } from '@/db/schema'
+
+export const getTodos = createServerFn({ method: 'GET' }).handler(async () => {
+  return db.select().from(todos).orderBy(desc(todos.createdAt))
+})
+
+export const addTodo = createServerFn({ method: 'POST' })
+  .inputValidator((data: { title: string }) => data)
+  .handler(async ({ data }) => {
+    await db.insert(todos).values({ title: data.title })
+  })
+
+export const toggleTodo = createServerFn({ method: 'POST' })
+  .inputValidator((data: { id: number }) => data)
+  .handler(async ({ data }) => {
+    await db
+      .update(todos)
+      .set({ isComplete: not(todos.isComplete) })
+      .where(eq(todos.id, data.id))
+  })
+
+export const deleteTodo = createServerFn({ method: 'POST' })
+  .inputValidator((data: { id: number }) => data)
+  .handler(async ({ data }) => {
+    await db.delete(todos).where(eq(todos.id, data.id))
+  })
+```
+
+Drizzle's query builder maps to SQL, and the `todos` table gives each query typed columns and results.
+
+### Build the page
+
+Replace `src/routes/index.tsx` with a page that loads the to-dos on the server and calls the other functions from the browser. It uses Tailwind CSS classes, which the TanStack Start starter includes:
+
+```tsx
+import { createFileRoute, useRouter } from '@tanstack/react-router'
+import { useState } from 'react'
+
+import { addTodo, deleteTodo, getTodos, toggleTodo } from '@/lib/todos.functions'
+
+export const Route = createFileRoute('/')({
+  loader: () => getTodos(),
+  component: Home,
+})
+
+function Home() {
+  const todos = Route.useLoaderData()
+  const router = useRouter()
+  const [title, setTitle] = useState('')
+
+  async function handleAdd(e: React.FormEvent) {
+    e.preventDefault()
+    if (!title.trim()) return
+    await addTodo({ data: { title } })
+    setTitle('')
+    router.invalidate()
+  }
+
+  return (
+    <main className="mx-auto my-16 max-w-sm rounded-lg border border-neutral-200 bg-white p-6 text-neutral-900 shadow-sm">
+      <h1 className="mb-4 text-lg font-semibold">To-dos</h1>
+      <form onSubmit={handleAdd} className="mb-4 flex gap-2">
+        <input
+          className="w-full rounded-md border border-neutral-300 px-3 py-2 text-sm"
+          placeholder="What needs doing?"
+          value={title}
+          onChange={(e) => setTitle(e.target.value)}
+        />
+        <button className="rounded-md bg-neutral-900 px-4 py-2 text-sm font-medium text-white hover:bg-neutral-700">
+          Add
+        </button>
+      </form>
+      <ul className="flex flex-col gap-2">
+        {todos.map((todo) => (
+          <li key={todo.id} className="flex items-center gap-2 text-sm">
+            <input
+              type="checkbox"
+              checked={todo.isComplete}
+              onChange={async () => {
+                await toggleTodo({ data: { id: todo.id } })
+                router.invalidate()
+              }}
+            />
+            <span className={todo.isComplete ? 'flex-1 text-neutral-400 line-through' : 'flex-1'}>
+              {todo.title}
+            </span>
+            <button
+              className="text-neutral-500 hover:text-red-600"
+              onClick={async () => {
+                await deleteTodo({ data: { id: todo.id } })
+                router.invalidate()
+              }}
+            >
+              Delete
+            </button>
+          </li>
+        ))}
+      </ul>
+    </main>
+  )
+}
+```
+
+### Test the app locally
+
+1. Start the dev server:
+
+   ```bash
+   pnpm dev
+   ```
+
+2. Open your app at `http://localhost:3000`. Add a to-do, mark it complete, and delete it.
+
+## Deploy and update the schema
+
+Apply the migrations to your hosted Supabase project. When your data model changes later, generate a new migration and deploy again.
+
+### Deploy to your Supabase project
+
+1. In your project's [API settings](/dashboard/project/_/settings/api), turn off the Data API, as you did locally.
+
+2. In your project's [**Connect** panel](/dashboard/project/_?showConnect=true), copy the shared pooler connection string in session mode.
+
+3. Run the migrations against your hosted database. Replace the placeholder with your connection string:
+
+   ```bash
+   DATABASE_URL='<your-connection-string>' pnpm drizzle-kit migrate
+   ```
+
+   Drizzle Kit applies only the migrations that your database hasn't recorded yet.
+
+4. Deploy your app to [Vercel](https://vercel.com). Set the `DATABASE_URL` environment variable to the shared pooler connection string in transaction mode, which you can also copy from the **Connect** panel.
+
+Vercel runs your app as serverless functions, which work best with a pooled connection in transaction mode. If you deploy somewhere else, such as a long-running server, you might need a different connection string and client settings. For details on each option, see [Connect to your database](/docs/guides/database/connecting-to-postgres).
+
+### Update the schema
+
+1. In `src/db/schema.ts`, change the schema. For example, add a column to `todos`:
+
+   ```ts
+   dueDate: timestamp('due_date', { withTimezone: true }),
+   ```
+
+2. Generate and apply the migration locally:
+
+   ```bash
+   pnpm drizzle-kit generate --name add_due_date
+   pnpm drizzle-kit migrate
+   ```
+
+3. Commit the new migration, then apply it to your hosted database as described in [Deploy to your Supabase project](#deploy-to-your-supabase-project).
+
+> [!CAUTION]
+> The `drizzle-kit push` command applies schema changes directly and doesn't create migration files. Use it for prototyping against a local database, and use `generate` and `migrate` for anything you deploy.
+
+To generate a Drizzle schema from tables that already exist in your database, run `pnpm drizzle-kit pull`.
+
+## Resources
+
+- [Drizzle ORM with PostgreSQL](https://orm.drizzle.team/docs/get-started/postgresql-new)
+- [Drizzle Kit migrations](https://orm.drizzle.team/docs/kit-overview)
+- [TanStack Start server functions](https://tanstack.com/start/latest/docs/framework/react/guide/server-functions)
+- [Drizzle quickstart](/docs/guides/database/drizzle)
+- [Connect to your database](/docs/guides/database/connecting-to-postgres)
+- [Supabase CLI configuration](/docs/guides/local-development/cli/config)
