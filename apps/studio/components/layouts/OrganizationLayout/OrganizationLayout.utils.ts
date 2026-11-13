@@ -1,3 +1,15 @@
+export const ORG_SETTINGS_ROUTES: readonly string[] = [
+  'general',
+  'security',
+  'sso',
+  'apps',
+  'private-apps',
+  'webhooks',
+  'audit',
+  'audit-log-drains',
+  'documents',
+]
+
 export function getPathnameWithoutQuery(asPath?: string, fallback?: string): string {
   const path = asPath ?? fallback ?? ''
   if (typeof path !== 'string' || path.length === 0) return ''
