@@ -248,7 +248,7 @@ const MOCK_IDENTITIES: Record<string, OAuthAppsAuthorizeIdentity> = {
   },
 }
 
-const MOCK_ORGANIZATION_PROJECTS: Record<string, OAuthAppsAuthorizeOrganizationProject[]> = {
+export const MOCK_ORGANIZATION_PROJECTS: Record<string, OAuthAppsAuthorizeOrganizationProject[]> = {
   'northwind-traders': [
     { ref: 'northwindstorefront1', name: 'northwind-storefront', role: ADMINISTRATOR_ROLE },
     { ref: 'northwindcms1', name: 'northwind-cms', role: DEVELOPER_ROLE },
