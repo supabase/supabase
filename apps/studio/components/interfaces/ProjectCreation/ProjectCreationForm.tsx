@@ -75,6 +75,7 @@ import {
   useDataApiRevokeOnCreateDefaultEnabled,
 } from '@/hooks/misc/useDataApiRevokeOnCreateDefault'
 import { useIsFeatureEnabled } from '@/hooks/misc/useIsFeatureEnabled'
+import { useIsV3AdvancedDeploymentEnabled } from '@/hooks/misc/useIsV3AdvancedDeploymentEnabled'
 import { useLastVisitedOrganization } from '@/hooks/misc/useLastVisitedOrganization'
 import { useSelectedOrganizationQuery } from '@/hooks/misc/useSelectedOrganization'
 import { useSelectedOrganizationCreatedAtQuery } from '@/hooks/misc/useSelectedOrganizationCreatedAt'
@@ -150,8 +151,10 @@ export const ProjectCreationForm = ({
 
   const { hasLoaded: flagsLoaded, isConfigCatStale } = useFeatureFlags()
   const projectCreationDisabled = useFlag('disableProjectCreationAndUpdate')
+  const internalOnlyConfigurationEnabled = useFlag('newProjectInternalOnlyConfiguration')
+  const v3AdvancedDeploymentEnabled = useIsV3AdvancedDeploymentEnabled(slug)
   const showInternalOnlyConfiguration =
-    useFlag('newProjectInternalOnlyConfiguration') && !isVercelIntegrationFlow
+    (internalOnlyConfigurationEnabled || v3AdvancedDeploymentEnabled) && !isVercelIntegrationFlow
   const { getRegionRestriction } = useRegionRestriction()
 
   // Read the raw flag for telemetry — coerce-undefined-to-false would record false for
