@@ -1,4 +1,5 @@
 import { fireEvent, screen, waitFor, within } from '@testing-library/react'
+import userEvent from '@testing-library/user-event'
 import { mockAnimationsApi } from 'jsdom-testing-mocks'
 import { http, HttpResponse } from 'msw'
 import { beforeEach, describe, expect, it, vi } from 'vitest'
@@ -162,14 +163,22 @@ describe('SignInMethods', () => {
     expect(screen.queryByRole('button', { name: 'Add password' })).not.toBeInTheDocument()
   })
 
-  it('hides unlink for email while still allowing unlink for another identity', async () => {
+  it('disables unlink for email while still allowing unlink for another identity', async () => {
     mockGetUser([githubIdentity, emailIdentity])
 
     renderSignInMethods()
 
     expect(await screen.findByRole('link', { name: 'Change password' })).toBeInTheDocument()
-    expect(screen.queryByRole('button', { name: 'Unlink Email identity' })).not.toBeInTheDocument()
-    expect(screen.getByRole('button', { name: 'Unlink GitHub identity' })).toBeInTheDocument()
+
+    const emailUnlink = screen.getByRole('button', { name: 'Unlink Email identity' })
+    expect(emailUnlink).toHaveAttribute('aria-disabled', 'true')
+    await userEvent.hover(emailUnlink)
+    expect(
+      await screen.findByRole('tooltip', { name: 'Temporarily unavailable' })
+    ).toBeInTheDocument()
+
+    const githubUnlink = screen.getByRole('button', { name: 'Unlink GitHub identity' })
+    expect(githubUnlink).not.toHaveAttribute('aria-disabled', 'true')
   })
 
   it('does not offer to add a password when the feature flag is disabled', async () => {

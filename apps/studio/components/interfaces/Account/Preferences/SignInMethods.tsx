@@ -236,14 +236,28 @@ export const SignInMethods = ({
                           tooltip={{ content: { side: 'top', text: 'Update email address' } }}
                         />
                       )}
-                      {canUnlinkIdentity({ provider, identityCount: identities.length }) && (
+                      {identities.length > 1 && (
                         <ButtonTooltip
                           variant="text"
                           icon={<UnlinkIcon />}
                           aria-label={`Unlink ${providerName} identity`}
                           className="w-7"
+                          disabled={
+                            !canUnlinkIdentity({
+                              provider,
+                              identityCount: identities.length,
+                            })
+                          }
                           onClick={() => setSelectedProviderUnlink(provider)}
-                          tooltip={{ content: { side: 'bottom', text: 'Unlink identity' } }}
+                          tooltip={{
+                            content: {
+                              side: 'bottom',
+                              text:
+                                provider === 'email'
+                                  ? 'Temporarily unavailable'
+                                  : 'Unlink identity',
+                            },
+                          }}
                         />
                       )}
                     </div>
