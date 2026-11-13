@@ -1,4 +1,5 @@
 import { createFileRoute } from '@tanstack/react-router'
+import { useParams } from 'common'
 import { PageContainer } from 'ui-patterns/PageContainer'
 import {
   PageHeader,
@@ -10,10 +11,11 @@ import {
 import { PageSection, PageSectionContent } from 'ui-patterns/PageSection'
 
 import { FunctionsList } from '@/components/interfaces/Database/Functions/FunctionsList/FunctionsList'
+import { AlertError } from '@/components/ui/AlertError'
 import { DocsButton } from '@/components/ui/DocsButton'
 import { NoPermission } from '@/components/ui/NoPermission'
-import { FGA_PERMISSIONS, useAsyncCheckPermissionsV2 } from '@/hooks/misc/useCheckPermissionsV2'
 import { DOCS_URL } from '@/lib/constants'
+import { useGrant } from '@/lib/grants'
 
 export const Route = createFileRoute('/project/$ref/database/functions')({
   component: DatabaseFunctionsPage,
@@ -23,12 +25,24 @@ export const Route = createFileRoute('/project/$ref/database/functions')({
 })
 
 function DatabaseFunctionsPage() {
-  const { can: canReadFunctions, isSuccess: isPermissionsLoaded } = useAsyncCheckPermissionsV2(
-    FGA_PERMISSIONS.PROJECT.DATABASE_READ
+  const { ref: projectRef } = useParams()
+  const readGrant = useGrant(
+    'POST /platform/pg-meta/{ref}/query',
+    { projectRef },
+    { variant: 'read' }
   )
 
-  if (isPermissionsLoaded && !canReadFunctions) {
+  if (readGrant.status === 'denied') {
     return <NoPermission isFullPage resourceText="view database functions" />
+  }
+
+  if (readGrant.status === 'error') {
+    return (
+      <AlertError
+        error={readGrant.error}
+        subject="Failed to check database functions permissions"
+      />
+    )
   }
 
   return (

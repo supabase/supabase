@@ -4,6 +4,7 @@ import { z } from 'zod'
 
 import { databaseKeys } from './keys'
 import { filterProtectedSchemaIndexAdvisorResult } from '@/components/interfaces/QueryPerformance/IndexAdvisor/index-advisor.utils'
+import { isUserFaultForStatsStatement } from '@/data/database/pg-stat-statements-sqlstate'
 import { unguarded } from '@/data/fetchers'
 import { executeSql } from '@/data/sql/execute-sql-mutation'
 import type { StudioError } from '@/lib/errors/studio-errors'
@@ -58,6 +59,7 @@ export async function getIndexAdvisorResult({
     connectionString,
     sqlOrigin: 'studio',
     queryName: 'retrieve-index-advisor-result',
+    isUserFaultSqlState: isUserFaultForStatsStatement,
     sql: safeSql`set search_path to public, extensions; select * from index_advisor(${literal(query)});`,
     grant: unguarded.migrating,
   })

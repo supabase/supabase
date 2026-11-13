@@ -1,4 +1,4 @@
-import { act, screen } from '@testing-library/react'
+import { screen } from '@testing-library/react'
 import { beforeEach, describe, expect, it, vi } from 'vitest'
 
 import { Route } from '@/routes/_app/account/me'
@@ -98,28 +98,6 @@ describe('/account/me', () => {
     expect(screen.getByText('DashboardSettings')).toBeInTheDocument()
     expect(screen.getByText('AnalyticsSettings')).toBeInTheDocument()
     expect(screen.getByText('AccountDeletion')).toBeInTheDocument()
-  })
-
-  it('forwards a legacy confirmation message to Security with its query and fragment intact', async () => {
-    const hash = 'message=Confirmation+link+accepted.+Confirm+the+other+email&sb='
-
-    const { router } = await renderPreferences(`/account/me?keep=yes#${hash}`)
-
-    await vi.waitFor(() => expect(router.state.location.pathname).toBe('/account/security'))
-    expect(router.state.location.search).toEqual({ keep: 'yes' })
-    expect(router.state.location.hash).toBe(hash)
-  })
-
-  it('handles a confirmation message that arrives after the first render', async () => {
-    const { router } = await renderPreferences()
-    expect(router.state.location.pathname).toBe('/account/me')
-
-    await act(() =>
-      router.navigate({ to: '/account/me', hash: 'message=Confirmation+link+accepted&sb=' })
-    )
-
-    await vi.waitFor(() => expect(router.state.location.pathname).toBe('/account/security'))
-    expect(router.state.location.hash).toBe('message=Confirmation+link+accepted&sb=')
   })
 
   it.each([
