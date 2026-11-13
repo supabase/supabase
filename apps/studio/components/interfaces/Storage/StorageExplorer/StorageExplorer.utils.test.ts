@@ -274,6 +274,28 @@ describe('sanitizeNameForDuplicateInColumn', () => {
       ).toBe('file (2).txt')
     })
 
+    it('treats regex metacharacters in the name literally', () => {
+      const state = makeState([[{ name: 'a+b.txt' }, { name: 'a+b (1).txt' }]])
+      expect(sanitizeNameForDuplicateInColumn(state, { name: 'a+b.txt', autofix: true })).toBe(
+        'a+b (2).txt'
+      )
+    })
+
+    it('ignores unrelated names that only match when the name is read as a regex', () => {
+      // `a+b` as a pattern would match `aab (7).txt` and push the suffix to 8.
+      const state = makeState([[{ name: 'a+b.txt' }, { name: 'aab (7).txt' }]])
+      expect(sanitizeNameForDuplicateInColumn(state, { name: 'a+b.txt', autofix: true })).toBe(
+        'a+b (1).txt'
+      )
+    })
+
+    it('matches the extension dot literally', () => {
+      const state = makeState([[{ name: 'file.txt' }, { name: 'file (5)xtxt' }]])
+      expect(sanitizeNameForDuplicateInColumn(state, { name: 'file.txt', autofix: true })).toBe(
+        'file (1).txt'
+      )
+    })
+
     it('treats the whole name as the extension when there is no dot (existing behaviour)', () => {
       // NOTE: the function splits on '.' and always treats the last segment as the
       // extension, so a dotless name produces " (1).myfile" rather than "myfile (1)".

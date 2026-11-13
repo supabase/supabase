@@ -1,3 +1,4 @@
+import { escapeRegExp } from 'lodash'
 import { toast } from 'sonner'
 import { copyToClipboard } from 'ui'
 
@@ -136,7 +137,7 @@ export function sanitizeNameForDuplicateInColumn(
       const fileExt = fileNameSegments[fileNameSegments.length - 1]
 
       const dupeNameRegex = new RegExp(
-        `${fileName} \\((?<number>\\d+)\\)${fileExt ? '.' + fileExt : ''}$`
+        `${escapeRegExp(fileName)} \\((?<number>\\d+)\\)${fileExt ? '\\.' + escapeRegExp(fileExt) : ''}$`
       )
       const namesWithSuffix = takenNames
         .map((takenName) => takenName.match(dupeNameRegex))
