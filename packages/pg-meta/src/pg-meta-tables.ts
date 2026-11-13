@@ -1,7 +1,7 @@
 import { z } from 'zod'
 
 import { DEFAULT_SYSTEM_SCHEMAS } from './constants'
-import { coalesceRowsToArray, filterByList } from './helpers'
+import { coalesceRowsToArray, filterByList, getDoBlockDelimiter } from './helpers'
 import {
   ident,
   joinSqlFragments,
@@ -249,8 +249,12 @@ function update(
   if (primary_keys === undefined) {
     // skip
   } else {
+    // The schema and table names flow into the DO block body, so the delimiter
+    // must not appear in either of them (e.g. a table named `weird$$name`
+    // would otherwise terminate a `$$`-quoted block early).
+    const doBlockDelimiter = getDoBlockDelimiter([old.schema, old.name])
     primaryKeysSql = safeSql`${primaryKeysSql}
-DO $$
+DO ${doBlockDelimiter}
 DECLARE
   r record;
 BEGIN
@@ -262,7 +266,7 @@ BEGIN
     EXECUTE ${literal(`${alter} DROP CONSTRAINT `)} || quote_ident(r.conname);
   END IF;
 END
-$$;
+${doBlockDelimiter};
 `
 
     if (primary_keys.length === 0) {
