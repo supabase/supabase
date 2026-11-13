@@ -64,6 +64,18 @@ describe('query timing', () => {
     })
   })
 
+  it('does not count a read from local storage as a fetch', async () => {
+    const collector = createCollector()
+    observeQueryClient(client, collector)
+
+    await client.fetchQuery({
+      queryKey: ['localStorage', 'supabase-ui-theme'],
+      queryFn: takes(1, 'dark'),
+    })
+
+    expect(collector.finishVisit()).toMatchObject({ queryFetchCount: 0, queries: [] })
+  })
+
   it('counts concurrent requests for the same query as one fetch', async () => {
     const collector = createCollector()
     observeQueryClient(client, collector)

@@ -37,6 +37,9 @@ export function observeQueryClient(
       case 'fetch': {
         // Repeated when fetch options change mid-flight; the first start is the real one
         if (!collector.isRecording || queryStarts.has(query)) return
+        // Local storage reads are wrapped in queries but are not fetches. On a signed-out page
+        // they were most of the fetches, which would swamp the counts.
+        if (query.queryKey[0] === 'localStorage') return
         queryStarts.set(query, {
           startMs: collector.now(),
           isBackgroundRefetch: query.state.data !== undefined,
