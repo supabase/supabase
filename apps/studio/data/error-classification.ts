@@ -15,9 +15,9 @@ import {
 } from '@/lib/errors/studio-errors'
 import type { ErrorMetadata } from '@/types/base'
 
-export type RawResponseError = Omit<StudioErrorInput, 'reason' | 'service'>
+export type RawResponseError = Omit<StudioErrorInput, 'service'>
 
-const CLIENT_ERROR_REASONS: Record<number, string> = {
+const CLIENT_ERROR_REASONS: Record<number, UnclassifiedApiError['reason']> = {
   401: 'unauthorized',
   403: 'forbidden',
   404: 'not_found',
@@ -47,12 +47,46 @@ export function classifyResponseError(raw: RawResponseError): StudioError {
 // pg-meta formats Postgres errors as `Failed to run sql query: ERROR:  42702: <message>`
 const SQLSTATE_IN_MESSAGE = /\bERROR:\s+([0-9A-Z]{5}):/
 
+/**
+ * Predicate for a Studio SQL caller (`isUserFaultSqlState` in `executeSql`): is a failure with this
+ * SQLSTATE the user's fault rather than Studio's? Two are provided; callers can compose them, e.g.
+ * `(s) => s !== '42P02' && isUserFaultForSql(s)`.
+ */
+export type IsUserFaultSqlState = (sqlState: string) => boolean
+
+const USER_FAULT_FOR_VALUES = /^(22|23|P0)|^(42501|57014)$/
+
+/**
+ * For SQL that embeds values the user typed (table editor filters and row edits, a cron job's name
+ * and schedule): Studio wrote the statement, so only errors about the values are the user's. Class
+ * 22 (data exception, e.g. a bad filter value), class 23 (integrity constraint), 42501
+ * (insufficient privilege, e.g. under role impersonation or RLS), class P0 (raised by PL/pgSQL in
+ * the user's functions and triggers) and 57014 (query canceled, e.g. a statement timeout). Syntax
+ * errors and undefined objects stay Studio's.
+ */
+export const isUserFaultForValues: IsUserFaultSqlState = (sqlState) =>
+  USER_FAULT_FOR_VALUES.test(sqlState)
+
+// 57014 (query canceled) is the user's, so it is excluded from the class 57 exception
+const SERVER_SQLSTATE = /^(08|53|58|XX)|^57(?!014$)/
+
+/**
+ * For SQL that embeds user-written SQL that Postgres parses or runs (policy expressions, function
+ * bodies, the user's own functions, queries from `pg_stat_statements`): any SQLSTATE is the user's,
+ * except classes that describe the server rather than the SQL: 08 (connection exception), 53
+ * (insufficient resources), 57 other than 57014 (operator intervention, e.g. admin shutdown), 58
+ * (system error) and XX (internal error).
+ */
+export const isUserFaultForSql: IsUserFaultSqlState = (sqlState) => !SERVER_SQLSTATE.test(sqlState)
+
 /** Who wrote the SQL sent to the pg-meta query endpoint. */
 export type SqlOrigin = 'user' | 'studio'
 
 /**
  * Classifies an error from the pg-meta query endpoint. Postgres rejecting the SQL comes back as a
- * 400, which becomes `UserSqlError` or `StudioSqlError` depending on who wrote the SQL.
+ * 400, which becomes `UserSqlError` or `StudioSqlError` depending on who wrote the SQL. Studio SQL
+ * whose caller passed `isUserFaultSqlState` and gets true for the error's SQLSTATE is a
+ * `StudioSqlError` with reason `user_input`, whose fault is the user's.
  *
  * A 400 whose message carries a SQLSTATE came from Postgres, so it is a SQL error before any
  * message-pattern rule runs: user SQL can raise any text, including a pattern's. Other 400s go
@@ -62,7 +96,11 @@ export type SqlOrigin = 'user' | 'studio'
  */
 export function classifySqlResponseError(
   error: unknown,
-  { origin, queryName }: { origin: SqlOrigin; queryName?: string }
+  {
+    origin,
+    queryName,
+    isUserFaultSqlState,
+  }: { origin: SqlOrigin; queryName?: string; isUserFaultSqlState?: IsUserFaultSqlState }
 ): StudioError {
   const raw = parseResponseErrorBody(error)
   if (!raw) return classifyError(error)
@@ -74,7 +112,10 @@ export function classifySqlResponseError(
   }
 
   const input = { ...raw, ...(queryName && { queryName }), ...(sqlState && { sqlState }) }
-  return origin === 'user' ? new UserSqlError(input) : new StudioSqlError(input)
+  if (origin === 'user') return new UserSqlError(input)
+  if (sqlState && isUserFaultSqlState?.(sqlState))
+    return new StudioSqlError({ ...input, reason: 'user_input' })
+  return new StudioSqlError(input)
 }
 
 // fetch rejects with a DOMException, which is not an Error subclass in every runtime

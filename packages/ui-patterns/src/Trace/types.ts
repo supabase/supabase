@@ -1,4 +1,4 @@
-import type { ComponentProps, ReactNode } from 'react'
+import type { ComponentProps, ReactNode, RefObject } from 'react'
 
 export type SpanStatus = 'ok' | 'error' | 'unset'
 
@@ -58,9 +58,36 @@ export interface TimeScale {
 export interface RootProps {
   trace: TraceData
   minRangeMs?: number
+  defaultCollapsed?: ReadonlySet<string>
   children?: ReactNode
 }
 
 export interface WaterfallProps extends ComponentProps<'div'> {
   treeWidth?: number
+}
+
+export interface VisibleRow {
+  span: Span
+  depth: number
+  hasChildren: boolean
+  isExpanded: boolean
+}
+
+export interface ViewContextValue {
+  selectedId: string | null
+  collapsed: ReadonlySet<string>
+  window: TimeWindow
+  isZoomed: boolean
+  select: (id: string | null) => void
+  setCollapsed: (id: string, collapsed: boolean) => void
+  toggleCollapseAll: () => void
+  setWindow: (start: number, end: number) => void
+  resetWindow: () => void
+  treeRef: RefObject<HTMLDivElement | null>
+  scrollRef: RefObject<HTMLDivElement | null>
+}
+
+export interface SpanContextValue {
+  row: VisibleRow
+  isSelected: boolean
 }

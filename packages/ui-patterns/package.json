@@ -799,6 +799,26 @@
       "import": "./src/TopNav/TopNavMenuToggle.tsx",
       "types": "./src/TopNav/TopNavMenuToggle.tsx"
     },
+    "./Trace/Bar": {
+      "import": "./src/Trace/Bar.tsx",
+      "types": "./src/Trace/Bar.tsx"
+    },
+    "./Trace/Header": {
+      "import": "./src/Trace/Header.tsx",
+      "types": "./src/Trace/Header.tsx"
+    },
+    "./Trace/Inspector": {
+      "import": "./src/Trace/Inspector.tsx",
+      "types": "./src/Trace/Inspector.tsx"
+    },
+    "./Trace/Minimap": {
+      "import": "./src/Trace/Minimap.tsx",
+      "types": "./src/Trace/Minimap.tsx"
+    },
+    "./Trace/Rows": {
+      "import": "./src/Trace/Rows.tsx",
+      "types": "./src/Trace/Rows.tsx"
+    },
     "./Trace/Trace": {
       "import": "./src/Trace/Trace.tsx",
       "types": "./src/Trace/Trace.tsx"
@@ -878,6 +898,7 @@
     "@supabase/sql-to-rest": "^0.1.6",
     "@supabase/supabase-js": "catalog:",
     "@tanstack/react-table": "catalog:",
+    "@tanstack/react-virtual": "^3.13.24",
     "class-variance-authority": "^0.7.1",
     "cmdk": "^1.1.1",
     "common": "workspace:*",

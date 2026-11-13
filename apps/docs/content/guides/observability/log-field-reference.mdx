@@ -46,6 +46,7 @@ Request headers:
 - `x-forwarded-user-agent`
 - `range`
 - `prefer`
+- `traceparent`
 
 Response headers:
 
@@ -64,6 +65,7 @@ Response headers:
 
 ## Capture limits
 
+- `log_attributes['request_id']`, `log_attributes['trace_id']`, and `log_attributes['span_id']` are potentially present on any source but are not guaranteed to be populated. The API gateway unpacks the `sb-request-id` request header into `log_attributes['request_id']` — there is no `log_attributes['request.headers.sb-request-id']` key.
 - Hosted Postgres events longer than 100,000 characters and Edge Function log messages longer than 10,000 characters are truncated.
 - Internal Supabase service connection events are not recorded in hosted Postgres logs.
 - An Edge Function invocation uses `function_edge_logs`; its console output uses `function_logs`.

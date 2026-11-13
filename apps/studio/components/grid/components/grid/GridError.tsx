@@ -213,14 +213,13 @@ const GeneralError = ({ error }: { error: StudioError }) => {
       orgSlug={org?.slug}
       className="pointer-events-auto"
       subject="Failed to retrieve rows from table"
-    >
-      {filters.length > 0 && (
-        <p>
-          Verify that the filter values are correct, as the error may stem from an incorrectly
-          applied filter
-        </p>
-      )}
-    </AlertError>
+      // Retrying won't help until the filter changes, so this replaces the default instructions
+      description={
+        filters.length > 0
+          ? 'Verify that the filter values are correct, as the error may stem from an incorrectly applied filter.'
+          : undefined
+      }
+    />
   )
 }
 

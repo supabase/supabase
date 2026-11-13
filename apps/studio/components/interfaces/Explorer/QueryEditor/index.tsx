@@ -1,5 +1,6 @@
 import { useMonaco } from '@monaco-editor/react'
 import { acceptUntrustedSql, untrustedSql, type UntrustedSqlFragment } from '@supabase/pg-meta'
+import { useQuery } from '@tanstack/react-query'
 import { useFlag } from 'common'
 import type { ExplorerQueryLocation } from 'common/telemetry-constants'
 import { CodeSquareIcon, EyeIcon, EyeOffIcon } from 'lucide-react'
@@ -54,7 +55,7 @@ import {
   type DatabaseSourceParameters,
   type LogsSourceParameters,
 } from '@/data/content/notebooks/notebook-schema'
-import { useDatabaseEventTriggersQuery } from '@/data/database-event-triggers/database-event-triggers-query'
+import { databaseEventTriggersQueryOptions } from '@/data/database-event-triggers/database-event-triggers-query'
 import { isValidConnString, unguarded } from '@/data/fetchers'
 import { useExecuteLogsSqlMutation } from '@/data/logs/execute-logs-sql-mutation'
 import {
@@ -72,6 +73,7 @@ import { useExecuteSqlMutation } from '@/data/sql/execute-sql-mutation'
 import { applyAutoLimit } from '@/data/sql/utils'
 import { useLatest } from '@/hooks/misc/useLatest'
 import { useSelectedProjectQuery } from '@/hooks/misc/useSelectedProject'
+import { useGrant } from '@/lib/grants'
 import { detectOS } from '@/lib/helpers'
 import { wrapWithRoleImpersonation } from '@/lib/role-impersonation'
 import { useTrack } from '@/lib/telemetry/track'
@@ -229,9 +231,16 @@ export const QueryEditor = forwardRef<QueryEditorHandle, QueryEditorProps>(funct
       ? project?.connectionString
       : databases?.find((database) => database.identifier === databaseIdentifier)?.connectionString
 
-  const { data: eventTriggers } = useDatabaseEventTriggersQuery(
-    { projectRef: project?.ref, connectionString },
-    { enabled: query._tag === 'database' && isValidConnString(connectionString) }
+  const readGrant = useGrant(
+    'POST /platform/pg-meta/{ref}/query',
+    { projectRef: project?.ref },
+    { variant: 'read' }
+  )
+  const { data: eventTriggers } = useQuery(
+    databaseEventTriggersQueryOptions(
+      { projectRef: project?.ref, connectionString, grant: readGrant.grant },
+      { enabled: query._tag === 'database' && isValidConnString(connectionString) }
+    )
   )
 
   const { mutateAsync: executeSql, isPending: isExecutingSql } = useExecuteSqlMutation({
