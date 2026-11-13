@@ -4,15 +4,12 @@ import type { init } from '@sentry/tanstackstart-react'
 
 import { applyStudioErrorPolicy } from '@/lib/errors/sentry-event-policy'
 
-// `@sentry/core`'s `Options` isn't a direct dependency, and neither SDK re-exports it. `init`'s
-// parameter is accepted by both `@sentry/tanstackstart-react` and `@sentry/nextjs` `init`.
+// `@sentry/core`'s `Options` isn't a direct dependency, and the SDK doesn't re-export it.
 type SentryServerOptions = Parameters<typeof init>[0]
 
 export interface SentryServerOptionsOverrides {
   /**
-   * Release identifier. Leave unset on the Next build: `withSentryConfig` injects the release, and
-   * an explicit `release` key (even `undefined`) would override it. The TanStack build runs no
-   * Sentry bundler plugin, so it passes the commit SHA.
+   * Release identifier (the commit SHA). The build runs no Sentry bundler plugin to inject one.
    */
   release?: string
 }

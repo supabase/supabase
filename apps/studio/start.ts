@@ -39,7 +39,7 @@ const deploymentMiddleware = createMiddleware({ type: 'function' }).client(({ ne
 
 // Sentry's global middlewares go at the FRONT so they wrap the whole request /
 // server-function lifecycle — including errors that downstream code swallows
-// into a 500, which the manual `@sentry/nextjs` approach never sees. The SDK's
+// into a 500, which manual capture calls never see. The SDK's
 // Vite plugin can auto-wrap these arrays instead, but we disable that
 // (`autoInstrumentMiddleware: false` in vite.config.ts) and wire them
 // explicitly so the instrumentation is visible in source.

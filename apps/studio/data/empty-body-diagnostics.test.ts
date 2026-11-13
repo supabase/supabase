@@ -4,7 +4,7 @@ import { afterEach, beforeEach, describe, expect, it, vi } from 'vitest'
 const platform = vi.hoisted(() => ({ isPlatform: true }))
 const sentry = vi.hoisted(() => ({ captureMessage: vi.fn(), captureException: vi.fn() }))
 
-vi.mock('@sentry/nextjs', () => sentry)
+vi.mock('@sentry/react', () => sentry)
 vi.mock('common', () => ({
   get IS_PLATFORM() {
     return platform.isPlatform

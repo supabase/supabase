@@ -59,7 +59,6 @@
     "@number-flow/react": "^0.3.2",
     "@radix-ui/react-use-escape-keydown": "^1.1.1",
     "@react-pdf/renderer": "^4.9.0",
-    "@sentry/nextjs": "catalog:",
     "@sentry/react": "^10.75.2",
     "@sentry/tanstackstart-react": "catalog:",
     "@smithy/property-provider": "^4.0.4",

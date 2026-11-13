@@ -1,3 +1,9 @@
+import {
+  createMemoryHistory,
+  createRootRoute,
+  createRouter,
+  RouterContextProvider,
+} from '@tanstack/react-router'
 import { screen, waitFor, within } from '@testing-library/react'
 import userEvent from '@testing-library/user-event'
 import { toast } from 'sonner'
@@ -132,7 +138,13 @@ const renderTemplateEditor = ({
     isPending: false,
   }))
 
-  return render(<TemplateEditor template={confirmationTemplate} />)
+  // the unsaved-changes guard blocks navigation through the router
+  const router = createRouter({ routeTree: createRootRoute(), history: createMemoryHistory() })
+  return render(
+    <RouterContextProvider router={router}>
+      <TemplateEditor template={confirmationTemplate} />
+    </RouterContextProvider>
+  )
 }
 
 describe('TemplateEditor reset to default', () => {
