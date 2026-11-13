@@ -107,7 +107,7 @@ function BaseEditor<TRow, TSummaryRow = unknown>({
             <p className="text-sm font-mono text-foreground-light">Invalid date format</p>
           ) : type === 'datetimetz' ? (
             <TimestampInfo
-              displayAs="utc"
+              displayAs="local"
               utcTimestamp={timeValue}
               labelFormat="DD MMM YYYY HH:mm:ss (ZZ)"
               className="text-left text-sm! font-mono tracking-tight"
