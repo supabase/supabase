@@ -4,6 +4,7 @@ import {
   formatTableRowsToJSON,
   formatTableRowsToSQL,
   getTablePoliciesUrl,
+  parseGridJsonColumns,
 } from './TableEntity.utils'
 import type { SupaTable } from '@/components/grid/types'
 import { ENTITY_TYPE } from '@/data/entity-types/entity-type-constants'
@@ -117,19 +118,47 @@ describe('TableEntity.utils: formatTableRowsToSQL', () => {
         id: 2,
         name: 'Person 1',
         tags: ['tag-a', 'tag-c'],
-        metadata: '{"version": 1}',
+        metadata: { version: 1 },
       },
       {
         idx: 2,
         id: 3,
         name: 'ONeil',
         tags: ['tag-a'],
-        metadata: `{"version": 1, "name": "O'Neil"}`,
+        metadata: { version: 1, name: "O'Neil" },
       },
     ]
     const result = formatTableRowsToSQL(table, rows)
-    const expected = `INSERT INTO public.demo (id, name, tags, metadata) VALUES (2, 'Person 1', ARRAY['tag-a','tag-c'], '{"version": 1}'), (3, 'ONeil', ARRAY['tag-a'], '{"version": 1, "name": "O''Neil"}');`
+    const expected = `INSERT INTO public.demo (id, name, tags, metadata) VALUES (2, 'Person 1', ARRAY['tag-a','tag-c'], '{"version":1}'), (3, 'ONeil', ARRAY['tag-a'], '{"version":1,"name":"O''Neil"}');`
     expect(result).toBe(expected)
+  })
+
+  it('should escape quotes and backslashes in json and jsonb values', () => {
+    const table: SupaTable = {
+      id: 1,
+      type: ENTITY_TYPE.TABLE,
+      columns: [
+        { name: 'a', dataType: 'jsonb', format: 'jsonb', position: 0 },
+        { name: 'b', dataType: 'json', format: 'json', position: 1 },
+      ],
+      name: 'demo',
+      schema: 'public',
+      comment: undefined,
+      estimateRowCount: 1,
+    }
+    const rows = [
+      { a: { text: 'say "hi"', path: 'C:\\dir', note: "it's" }, b: 'plain "string"' },
+      { a: 'hello', b: [1, 'two'] },
+      { a: 42, b: true },
+      { a: null },
+    ]
+    expect(formatTableRowsToSQL(table, rows)).toBe(
+      `INSERT INTO public.demo (a, b) VALUES ` +
+        `('{"text":"say \\"hi\\"","path":"C:\\\\dir","note":"it''s"}', '"plain \\"string\\""'), ` +
+        `('"hello"', '[1,"two"]'), ` +
+        `('42', 'true'), ` +
+        `(null, null);`
+    )
   })
 
   it('should emit valid Postgres literals for booleans, numbers and text arrays', () => {
@@ -293,5 +322,42 @@ describe('TableEntity.utils: getTablePoliciesUrl', () => {
     const parsed = new URL(url, 'http://example.com')
     expect(parsed.searchParams.get('search')).toBe('d e+f')
     expect(parsed.searchParams.get('schema')).toBe('a&b=c')
+  })
+})
+
+describe('TableEntity.utils: parseGridJsonColumns', () => {
+  const table: SupaTable = {
+    id: 1,
+    type: ENTITY_TYPE.TABLE,
+    columns: [
+      { name: 'note', dataType: 'text', format: 'text', position: 0 },
+      { name: 'meta', dataType: 'jsonb', format: 'jsonb', position: 1 },
+      { name: 'tags', dataType: 'ARRAY', format: '_jsonb', position: 2 },
+    ],
+    name: 'demo',
+    schema: 'public',
+    comment: undefined,
+    estimateRowCount: 1,
+  }
+
+  it('parses json text so the SQL formatter does not double-encode it', () => {
+    const rows = [
+      { note: '{"a":1}', meta: '{"text":"say \\"hi\\""}', tags: ['{"x":1}'] },
+      { note: 'n', meta: '"hello"', tags: [] },
+    ]
+    const parsed = parseGridJsonColumns(table, rows, () => false)
+    expect(parsed[0]).toEqual({ note: '{"a":1}', meta: { text: 'say "hi"' }, tags: ['{"x":1}'] })
+    expect(parsed[1].meta).toBe('hello')
+    expect(formatTableRowsToSQL(table, parsed.slice(1))).toContain(`'"hello"'`)
+  })
+
+  it('leaves truncated and null values alone', () => {
+    const rows = [
+      { note: 'n', meta: '{"a":1...', tags: [] },
+      { note: 'n', meta: null, tags: [] },
+    ]
+    const parsed = parseGridJsonColumns(table, rows, (v) => v.endsWith('...'))
+    expect(parsed[0].meta).toBe('{"a":1...')
+    expect(parsed[1].meta).toBeNull()
   })
 })

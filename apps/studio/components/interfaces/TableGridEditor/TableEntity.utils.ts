@@ -47,6 +47,34 @@ export const formatTableRowsToJSON = (table: SupaTable, rows: Record<string, unk
   return `[${objects.join(',')}]`
 }
 
+/**
+ * Grid rows carry json/jsonb columns as JSON text (the grid query casts them to text), whereas
+ * `formatTableRowsToSQL` expects parsed JSON values. Parses the untruncated json cells so grid rows
+ * can be passed to it. Truncated cells are left as-is so they can still be fetched in full.
+ */
+export const parseGridJsonColumns = <T extends Record<string, unknown>>(
+  table: SupaTable,
+  rows: T[],
+  isTruncated: (value: string) => boolean
+): T[] => {
+  const jsonColumns = table.columns.filter((col) => col.format?.includes('json'))
+  if (jsonColumns.length === 0) return rows
+
+  return rows.map((row) => {
+    const parsedRow: Record<string, unknown> = { ...row }
+    jsonColumns.forEach(({ name, dataType }) => {
+      const val = row[name]
+      if (dataType === 'ARRAY' || typeof val !== 'string' || isTruncated(val)) return
+      try {
+        parsedRow[name] = JSON.parse(val)
+      } catch {
+        // Not JSON text, keep the original value
+      }
+    })
+    return parsedRow as T
+  })
+}
+
 export const formatTableRowsToSQL = (table: SupaTable, rows: any[]) => {
   if (rows.length === 0) return ''
 
@@ -68,7 +96,10 @@ export const formatTableRowsToSQL = (table: SupaTable, rows: any[]) => {
           const array = Array.isArray(val) ? val : JSON.parse(val as string)
           return `${formatArrayForSql(array as unknown[])}`
         } else if (format?.includes('json')) {
-          return `${JSON.stringify(val).replace(/\\"/g, '"').replace(/'/g, "''").replace('"', "'").replace(/.$/, "'")}`
+          // `val` is the parsed JSON value, so serializing it yields valid JSON text
+          // (including for plain strings, e.g. "hello"). Only single quotes need
+          // escaping for the SQL string literal.
+          return `'${JSON.stringify(val).replaceAll("'", "''")}'`
         } else if (
           typeof format === 'string' &&
           typeof val === 'string' &&

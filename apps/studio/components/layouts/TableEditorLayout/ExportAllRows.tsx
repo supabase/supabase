@@ -22,7 +22,11 @@ import { useProgressToasts } from './ExportAllRows.progress'
 import { hydrateTruncatedRows } from '@/components/grid/components/header/Header.utils'
 import { parseSupaTable } from '@/components/grid/SupabaseGrid.utils'
 import type { Filter, Sort, SupaTable } from '@/components/grid/types'
-import { formatTableRowsToSQL } from '@/components/interfaces/TableGridEditor/TableEntity.utils'
+import { isValueTruncated } from '@/components/interfaces/TableGridEditor/SidePanelEditor/RowEditor/RowEditor.utils'
+import {
+  formatTableRowsToSQL,
+  parseGridJsonColumns,
+} from '@/components/interfaces/TableGridEditor/TableEntity.utils'
 import { InlineLink } from '@/components/ui/InlineLink'
 import { ENTITY_TYPE } from '@/data/entity-types/entity-type-constants'
 import type { Entity } from '@/data/entity-types/entity-types-infinite-query'
@@ -51,6 +55,12 @@ type OutputCallbacks = {
   convertToOutputFormat: (formattedRows: Record<string, unknown>[], table: SupaTable) => string
   convertToBlob: (str: string) => Blob
   save: (blob: Blob, table: SupaTable) => void
+  /**
+   * Keep json/jsonb column values as parsed JSON instead of stringifying them.
+   * Needed for SQL output, where a stringified JSON string can't be told apart
+   * from a JSON string value (e.g. `"hello"`).
+   */
+  preserveJsonValues?: boolean
 }
 
 type FetchAllRowsParams = {
@@ -87,6 +97,7 @@ const fetchAllRows = async ({
   convertToOutputFormat,
   convertToBlob,
   save,
+  preserveJsonValues,
 }: FetchAllRowsParams): Promise<FetchAllRowsReturn> => {
   if (IS_PLATFORM && !connectionString) {
     return { status: 'error', error: new NoConnectionStringError() }
@@ -170,7 +181,7 @@ const fetchAllRows = async ({
   if (rows.length === 0) {
     return { status: 'error', error: new NoRowsToExportError(entity.name) }
   }
-  const formattedRows = formatRowsForExport(rows, supaTable)
+  const formattedRows = formatRowsForExport(rows, supaTable, preserveJsonValues)
 
   return convertAndDownload(formattedRows, supaTable, {
     convertToOutputFormat,
@@ -179,7 +190,14 @@ const fetchAllRows = async ({
   })
 }
 
-const formatRowsForExport = (rows: Record<string, unknown>[], table: SupaTable) => {
+const formatRowsForExport = (
+  rows: Record<string, unknown>[],
+  table: SupaTable,
+  preserveJsonValues = false
+) => {
+  const jsonColumns = new Set(
+    table.columns.filter((col) => col.format?.includes('json')).map((col) => col.name)
+  )
   return rows.map((row) => {
     const formattedRow = { ...row }
     Object.keys(row).map((column) => {
@@ -190,6 +208,8 @@ const formatRowsForExport = (rows: Record<string, unknown>[], table: SupaTable) 
         delete formattedRow[column]
         return
       }
+
+      if (preserveJsonValues && jsonColumns.has(column)) return
 
       if (typeof row[column] === 'object' && row[column] !== null)
         formattedRow[column] = JSON.stringify(formattedRow[column])
@@ -279,7 +299,7 @@ export const useExportAllRowsGeneric = (
     markTrackerComplete,
   } = useProgressToasts()
 
-  const { convertToOutputFormat, convertToBlob, save } = params
+  const { convertToOutputFormat, convertToBlob, save, preserveJsonValues } = params
 
   const [confirmationMessage, setConfirmationMessage] = useState<string | null>(null)
 
@@ -293,7 +313,10 @@ export const useExportAllRowsGeneric = (
         params.type === 'provided_rows'
           ? await (async () => {
               const hydrated = await hydrateTruncatedRows({
-                rows: params.rows,
+                // Grid rows carry json columns as text, SQL output expects parsed values
+                rows: preserveJsonValues
+                  ? parseGridJsonColumns(params.table, params.rows, (v) => isValueTruncated(v))
+                  : params.rows,
                 table: params.table,
                 projectRef,
                 connectionString,
@@ -312,7 +335,7 @@ export const useExportAllRowsGeneric = (
                 }
               }
               return convertAndDownload(
-                formatRowsForExport(hydrated.rows, params.table),
+                formatRowsForExport(hydrated.rows, params.table, preserveJsonValues),
                 params.table,
                 {
                   convertToOutputFormat,
@@ -350,6 +373,7 @@ export const useExportAllRowsGeneric = (
               convertToOutputFormat,
               convertToBlob,
               save,
+              preserveJsonValues,
             })
 
       if (exportResult.status === 'error') {
@@ -459,6 +483,7 @@ export const useExportAllRowsAsSql = (
   const { exportInDesiredFormat: exportSql, confirmationModal } = useExportAllRowsGeneric({
     ...params,
     convertToOutputFormat: (formattedRows, table) => formatTableRowsToSQL(table, formattedRows),
+    preserveJsonValues: true,
     convertToBlob: (sqlStatements) =>
       new Blob([sqlStatements], { type: 'text/sql;charset=utf-8;' }),
     save: (sqlData, table) => saveAs(sqlData, `${table.name}_rows.sql`),
