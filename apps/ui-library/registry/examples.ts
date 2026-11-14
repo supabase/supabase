@@ -57,6 +57,17 @@ export const examples: RegistryItem[] = [
     ],
   },
   {
+    name: 'magic-auth-demo',
+    type: 'registry:example',
+    registryDependencies: [],
+    files: [
+      {
+        path: 'registry/default/examples/magic-auth.tsx',
+        type: 'registry:example',
+      },
+    ],
+  },
+  {
     name: 'current-user-avatar-demo',
     type: 'registry:example',
     registryDependencies: [],

@@ -27,6 +27,10 @@ export const Index = {
       component: React.lazy(() => import("@/registry/default/examples/password-based-auth.tsx")),
     }
     ,
+    "magic-auth-demo": {
+      component: React.lazy(() => import("@/registry/default/examples/magic-auth.tsx")),
+    }
+    ,
     "current-user-avatar-demo": {
       component: React.lazy(() => import("@/registry/default/examples/current-user-avatar-demo.tsx")),
     }
