@@ -2,7 +2,8 @@ import { useMutation } from '@tanstack/react-query'
 import { toast } from 'sonner'
 
 import { get, handleError } from '@/data/fetchers'
-import type { ResponseError, UseCustomMutationOptions } from '@/types'
+import type { StudioError } from '@/lib/errors/studio-errors'
+import type { UseCustomMutationOptions } from '@/types'
 
 export type GithubBranchVariables = {
   repositoryId: number
@@ -37,10 +38,10 @@ export const useCheckGithubBranchValidity = ({
   onError,
   ...options
 }: Omit<
-  UseCustomMutationOptions<GitHubIntegrationCreateData, ResponseError, GithubBranchVariables>,
+  UseCustomMutationOptions<GitHubIntegrationCreateData, StudioError, GithubBranchVariables>,
   'mutationFn'
 > = {}) => {
-  return useMutation<GitHubIntegrationCreateData, ResponseError, GithubBranchVariables>({
+  return useMutation<GitHubIntegrationCreateData, StudioError, GithubBranchVariables>({
     mutationFn: (vars) => checkGithubBranchValidity(vars),
     async onSuccess(data, variables, context) {
       await onSuccess?.(data, variables, context)

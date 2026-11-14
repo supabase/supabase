@@ -47,6 +47,7 @@ import { useProjectPostgrestConfigQuery } from '@/data/config/project-postgrest-
 import { useProjectPostgrestConfigUpdateMutation } from '@/data/config/project-postgrest-config-update-mutation'
 import { authenticatorRoleConfigQueryOptions } from '@/data/database/authenticator-role-config-query'
 import { useSchemasQuery } from '@/data/database/schemas-query'
+import { unguarded } from '@/data/fetchers'
 import { defaultPrivilegesQueryOptions } from '@/data/privileges/default-privileges-query'
 import { privilegeKeys } from '@/data/privileges/keys'
 import { useUpdateDefaultPrivilegesMutation } from '@/data/privileges/update-default-privileges-mutation'
@@ -56,8 +57,8 @@ import { FGA_PERMISSIONS, useAsyncCheckPermissionsV2 } from '@/hooks/misc/useChe
 import { useLatest } from '@/hooks/misc/useLatest'
 import { useSelectedProjectQuery } from '@/hooks/misc/useSelectedProject'
 import { IS_PLATFORM } from '@/lib/constants'
+import type { StudioError } from '@/lib/errors/studio-errors'
 import { noop } from '@/lib/void'
-import type { ResponseError } from '@/types'
 
 const resetAuthenticatorDbSchemasSql = safeSql`alter role authenticator reset pgrst.db_schemas`
 
@@ -273,7 +274,7 @@ export const PostgrestConfig = () => {
         functionNamesToRemove: [],
       })
     } catch (error) {
-      toast.error('Failed to save settings: ' + (error as ResponseError).message || 'Unknown error')
+      toast.error('Failed to save settings: ' + (error as StudioError).message || 'Unknown error')
     } finally {
       setIsUpdating(false)
     }
@@ -366,14 +367,14 @@ export const PostgrestConfig = () => {
                       {protectedSchemasExposed.length > 0 ? (
                         <p className="mt-1 text-sm text-warning">
                           {protectedSchemasExposed.length} protected schema
-                          {protectedSchemasExposed.length > 1 ? 's' : ''} is currently exposed and
-                          should be removed
+                          {protectedSchemasExposed.length > 1 ? <span>s</span> : ''}{' '}
+                          <span>is currently exposed and should be removed</span>
                         </p>
                       ) : missingExposedSchema.length > 0 ? (
                         <p className="mt-1 text-sm text-foreground-lighter">
                           {missingExposedSchema.length} exposed schema
-                          {missingExposedSchema.length > 1 ? 's' : ''} does not exist — safe to
-                          remove
+                          {missingExposedSchema.length > 1 ? <span>s</span> : ''}{' '}
+                          <span>does not exist — safe to remove</span>
                         </p>
                       ) : null}
                     </FormItemLayout>
@@ -388,7 +389,7 @@ export const PostgrestConfig = () => {
                             set to{' '}
                             {authenticatorDbSchemasOverride?.map((schema, i) => (
                               <span key={schema}>
-                                {i > 0 && ', '}
+                                {i > 0 && <span>{', '}</span>}
                                 <code>{schema}</code>
                               </span>
                             ))}
@@ -701,7 +702,10 @@ export const PostgrestConfig = () => {
           resetAuthenticatorOverride({
             projectRef,
             connectionString: project?.connectionString,
+            sqlOrigin: 'studio',
+            queryName: 'authenticator-role-override-reset',
             sql: resetAuthenticatorDbSchemasSql,
+            grant: unguarded.migrating,
           })
         }}
       >

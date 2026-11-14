@@ -3,7 +3,8 @@ import { toast } from 'sonner'
 
 import { configKeys } from './keys'
 import { handleError, post } from '@/data/fetchers'
-import type { ResponseError, UseCustomMutationOptions } from '@/types'
+import type { StudioError } from '@/lib/errors/studio-errors'
+import type { UseCustomMutationOptions } from '@/types'
 
 export const COOLDOWN_DURATION = 60 * 60 * 4
 
@@ -52,11 +53,11 @@ export const useUpdateDiskAttributesMutation = ({
   onError,
   ...options
 }: Omit<
-  UseCustomMutationOptions<UpdateDiskAttributesData, ResponseError, UpdateDiskAttributesVariables>,
+  UseCustomMutationOptions<UpdateDiskAttributesData, StudioError, UpdateDiskAttributesVariables>,
   'mutationFn'
 > = {}) => {
   const queryClient = useQueryClient()
-  return useMutation<UpdateDiskAttributesData, ResponseError, UpdateDiskAttributesVariables>({
+  return useMutation<UpdateDiskAttributesData, StudioError, UpdateDiskAttributesVariables>({
     mutationFn: (vars) => updateDiskAttributes(vars),
     async onSuccess(data, variables, context) {
       const { ref } = variables

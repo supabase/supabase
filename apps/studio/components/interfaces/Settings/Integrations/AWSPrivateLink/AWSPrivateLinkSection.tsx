@@ -172,11 +172,12 @@ export const AWSPrivateLinkSection = () => {
             <AlertDialogDescription>
               This removes the PrivateLink connection for{' '}
               {showDeleteConnectionId ? (
-                <code className="text-code-inline">{deleteConnectionTitle}</code>
+                <code>{deleteConnectionTitle}</code>
               ) : (
                 deleteConnectionTitle
               )}{' '}
-              on {deleteDatabaseCopy}. Applications using this private path will lose access.
+              <span>on</span> {deleteDatabaseCopy}
+              <span>. Applications using this private path will lose access.</span>
             </AlertDialogDescription>
           </AlertDialogHeader>
           <AlertDialogFooter>

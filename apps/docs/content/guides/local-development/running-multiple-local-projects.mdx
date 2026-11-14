@@ -176,7 +176,7 @@ One app can run several local projects by name. This keeps a destructive test ru
 
 A local project started without `--stack` is the app directory's default local project. Named local projects and the default one are independent of each other.
 
-The `db`, `migration`, and other database commands don't accept `--stack`. When they run against a local database, they use the default local project for the current branch. `supabase db pull`, `supabase db push`, and `supabase db dump` target the linked project unless you pass `--local`. To reach a named local project from a command that accepts `--db-url`, pass the `DB_URL` from `supabase status --stack <name> --env`. See [Limitations](#limitations).
+The `db`, `migration`, and other database commands don't accept `--stack`. When they run against a local database, they use the default local project for the current branch. `supabase db pull`, `supabase db push`, and `supabase db dump` do the same unless you pass `--remote`. To reach a named local project from a database command, pass the `DB_URL` from `supabase status --stack <name> --env` as `--remote=<postgres-url>`. The CLI treats that URL like a remote database, so commands that write to it ask for confirmation. Pass `--yes` in scripts. See [Limitations](#limitations).
 
 ## Find a local project's endpoints and keys
 
@@ -186,7 +186,7 @@ Ports differ between local projects, so don't assume the defaults from the CLI d
 supabase status
 ```
 
-Pass `--stack <name>` for a named local project. The local database password is `postgres`, so the database URL in the output works with `psql` and `--db-url`.
+Pass `--stack <name>` for a named local project. The local database password is `postgres`, so the database URL in the output works with `psql` and `--remote=<postgres-url>`.
 
 To export the connection details as environment variables, pass `--env`:
 
@@ -294,7 +294,7 @@ Keep these differences in mind when you turn the setting on for an app that used
   - A custom `edge_runtime.deno_version`
   - `db.major_version` values other than 15 and 17
   - `db.orioledb_version` in CLI versions earlier than v2.121.0, and the `experimental.s3_*` settings for OrioleDB in any version
-- Database commands don't accept `--stack`. `supabase db reset` and `supabase db diff` run against the current branch's default local project. `supabase db pull`, `supabase db push`, and `supabase db dump` target the linked project unless you pass `--local`. To reach a named local project, pass the `DB_URL` from `supabase status --stack <name> --env` to a command that accepts `--db-url`.
+- Database commands don't accept `--stack`. `supabase db reset` and `supabase db diff` run against the current branch's default local project. `supabase db pull`, `supabase db push`, and `supabase db dump` do the same unless you pass `--remote`. To reach a named local project, pass the `DB_URL` from `supabase status --stack <name> --env` as `--remote=<postgres-url>` to a database command. The CLI treats that URL like a remote database, so commands that write to it ask for confirmation. Pass `--yes` in scripts.
 - Switching branches switches local projects. The git branch is part of the identity. After you check out another branch in the same directory, `supabase start` creates or resumes a different local project with its own data. The first branch's local project keeps running until you stop it.
 - Moving or renaming an app directory creates a new local project, because the identity includes the project root path. The previous local project's data stays until you destroy it.
 

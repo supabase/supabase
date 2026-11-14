@@ -1,6 +1,7 @@
+import { useQuery } from '@tanstack/react-query'
 import { useParams } from 'common'
 import { useState } from 'react'
-import { Button, SidePanel } from 'ui'
+import { SidePanel } from 'ui'
 
 import { Bucket } from './Content/Bucket'
 import { EdgeFunction } from './Content/EdgeFunction'
@@ -16,10 +17,17 @@ import { UserManagement } from './Content/UserManagement'
 import { FirstLevelNav } from './FirstLevelNav'
 import LanguageSelector from './LanguageSelector'
 import { SecondLevelNav } from './SecondLevelNav'
-import { useAPIKeys } from '@/data/api-keys/api-keys-query'
+import { ButtonTooltip } from '@/components/ui/ButtonTooltip'
+import { apiKeysQueryOptions, getKeys } from '@/data/api-keys/api-keys-query'
 import { useProjectApiUrl } from '@/data/config/project-endpoint-query'
-import { FGA_PERMISSIONS, useAsyncCheckPermissionsV2 } from '@/hooks/misc/useCheckPermissionsV2'
+import { useGrant } from '@/lib/grants'
 import { useAppStateSnapshot } from '@/state/app-state'
+
+const getShowKeysTooltip = (status: 'loading' | 'granted' | 'denied' | 'error') => {
+  if (status === 'denied') return 'You need additional permissions to view API keys'
+  if (status === 'error') return 'Failed to check API key permissions'
+  return undefined
+}
 
 /**
  * [Joshen] Reminder: when we choose to release this as a main feature
@@ -43,13 +51,15 @@ export const ProjectAPIDocs = () => {
   const [showKeys, setShowKeys] = useState(false)
   const language = snap.docsLanguage
 
-  const { can: canReadAPIKeys } = useAsyncCheckPermissionsV2(
-    FGA_PERMISSIONS.PROJECT.API_GATEWAY_KEYS_READ
+  const apiKeysGrant = useGrant('GET /v1/projects/{ref}/api-keys', { projectRef: ref })
+  const { data: apiKeysData } = useQuery(
+    apiKeysQueryOptions(
+      { projectRef: ref, grant: apiKeysGrant.grant },
+      { enabled: snap.showProjectApiDocs, select: getKeys }
+    )
   )
-  const { data: apiKeysData } = useAPIKeys(
-    { projectRef: ref },
-    { enabled: snap.showProjectApiDocs && canReadAPIKeys }
-  )
+  const canShowKeys = apiKeysGrant.status === 'granted'
+  const showKeysTooltip = getShowKeysTooltip(apiKeysGrant.status)
   const { anonKey } = apiKeysData ?? {}
 
   const { data: endpoint } = useProjectApiUrl(
@@ -76,9 +86,13 @@ export const ProjectAPIDocs = () => {
             <div className="flex items-center space-x-1">
               {!isEntityDocs && <LanguageSelector simplifiedVersion />}
               {isIntroduction && (
-                <Button onClick={() => setShowKeys(!showKeys)}>
+                <ButtonTooltip
+                  disabled={!canShowKeys}
+                  onClick={() => setShowKeys(!showKeys)}
+                  tooltip={{ content: { side: 'bottom', text: showKeysTooltip } }}
+                >
                   {showKeys ? 'Hide keys' : 'Show keys'}
-                </Button>
+                </ButtonTooltip>
               )}
             </div>
           </div>

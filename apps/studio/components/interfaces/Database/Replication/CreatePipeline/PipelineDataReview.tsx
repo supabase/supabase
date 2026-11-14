@@ -12,18 +12,22 @@ import {
 } from '../DestinationPanel/DestinationForm/DestinationFormFieldCopy'
 import type { DestinationType } from '../DestinationPanel/DestinationPanel.types'
 import { describeBigQueryTableLayout } from './PipelineReviewSummary.utils'
+import { DATA_VALIDATION_HINT, PipelineValidationAdmonition } from './PipelineValidationAdmonition'
 import type { ReplicationPublicationData } from '@/data/replication/publication-query'
+import type { ValidationFailure } from '@/data/replication/validate-destination-mutation'
 
 export const PipelineDataReview = ({
   type,
   control,
   publication,
   onEdit,
+  validationFailures = [],
 }: {
   type: DestinationType
   control: Control<DestinationPanelSchemaType>
   publication?: ReplicationPublicationData
   onEdit?: () => void
+  validationFailures?: ValidationFailure[]
 }) => {
   const [publicationName, mode, ids, workers, copies, slot, batch, options] = useWatch({
     control,
@@ -113,47 +117,53 @@ export const PipelineDataReview = ({
         )
       : []
   return (
-    <section aria-label="Data review" className="space-y-6 p-5">
-      <div className="flex items-center justify-between gap-2">
-        <h3 className="text-sm font-medium text-foreground">Data</h3>
-        {onEdit && (
-          <Button
-            type="button"
-            icon={<EditIcon />}
-            size="tiny"
-            aria-label="Edit data"
-            onClick={onEdit}
+    <section aria-label="Data review">
+      <div className="space-y-6 p-5">
+        <div className="flex items-center justify-between gap-2">
+          <h3 className="text-sm font-medium text-foreground">Data</h3>
+          {onEdit && (
+            <Button
+              type="button"
+              icon={<EditIcon />}
+              size="tiny"
+              aria-label="Edit data"
+              onClick={onEdit}
+            >
+              Edit
+            </Button>
+          )}
+        </div>
+        {rows.map((row) => (
+          <ReviewField key={row.label} {...row} />
+        ))}
+        {layouts.length > 0 && (
+          <FormItemLayout
+            isReactForm={false}
+            layout="horizontal"
+            label="Table layout"
+            description="Partitioning and clustering applied when destination tables are first created or reset."
           >
-            Edit
-          </Button>
+            <div className="min-w-0 space-y-3">
+              {layouts.map((option) => {
+                const table = tables?.find(({ id }) => id === option.tableId)
+                const name = table ? `${table.schema}.${table.name}` : `Table ${option.tableId}`
+                return (
+                  <div
+                    key={option.tableId}
+                    className="min-w-0 rounded-md border bg-surface-200 p-3"
+                  >
+                    <p className="break-all text-sm text-foreground">{name}</p>
+                    <p className="mt-1 break-words text-sm text-foreground-light">
+                      {describeBigQueryTableLayout(option)}
+                    </p>
+                  </div>
+                )
+              })}
+            </div>
+          </FormItemLayout>
         )}
       </div>
-      {rows.map((row) => (
-        <ReviewField key={row.label} {...row} />
-      ))}
-      {layouts.length > 0 && (
-        <FormItemLayout
-          isReactForm={false}
-          layout="horizontal"
-          label="Table layout"
-          description="Partitioning and clustering applied when destination tables are first created or reset."
-        >
-          <div className="min-w-0 space-y-3">
-            {layouts.map((option) => {
-              const table = tables?.find(({ id }) => id === option.tableId)
-              const name = table ? `${table.schema}.${table.name}` : `Table ${option.tableId}`
-              return (
-                <div key={option.tableId} className="min-w-0 rounded-md border bg-surface-200 p-3">
-                  <p className="break-all text-sm text-foreground">{name}</p>
-                  <p className="mt-1 break-words text-sm text-foreground-light">
-                    {describeBigQueryTableLayout(option)}
-                  </p>
-                </div>
-              )
-            })}
-          </div>
-        </FormItemLayout>
-      )}
+      <PipelineValidationAdmonition failures={validationFailures} hint={DATA_VALIDATION_HINT} />
     </section>
   )
 }

@@ -61,6 +61,11 @@ export type FeatureFlagContextType = {
   posthog: CallFeatureFlagsResponse
   hasLoaded?: boolean
   /**
+   * True when the flags were fetched for the signed-in user. Flags fetched logged out
+   * stay in the store after sign-in until the refetch lands.
+   */
+  hasFlagsForSignedInUser?: boolean
+  /**
    * True while ConfigCat flags are being re-evaluated after `getConfigCatFlags` changed,
    * e.g. because its custom attributes changed. Until then, `configcat` holds values
    * evaluated with the previous attributes.
@@ -75,6 +80,8 @@ type ConfigCatFlagsFetcher = (
 type FeatureFlagStore = FeatureFlagContextType & {
   /** The `getConfigCatFlags` that produced the current ConfigCat values */
   configCatFetcher?: ConfigCatFlagsFetcher
+  /** The user the flags were fetched for. Undefined when they were fetched logged out. */
+  userId?: string
 }
 
 export const FeatureFlagContext = createContext<FeatureFlagContextType>({
@@ -170,6 +177,7 @@ export const FeatureFlagProvider = ({
         configcat: {},
         posthog: {},
         configCatFetcher: getConfigCatFlags,
+        userId: user?.id,
       }
 
       // Run both async operations in parallel — allSettled so a failure in one doesn't block the other
@@ -280,9 +288,13 @@ export const FeatureFlagProvider = ({
 
   // Memoized so consumers only re-render when the flags or their staleness change
   const contextValue = useMemo<FeatureFlagContextType>(() => {
-    const { configCatFetcher, ...flags } = store
-    return { ...flags, isConfigCatStale: configCatFetcher !== getConfigCatFlags }
-  }, [store, getConfigCatFlags])
+    const { configCatFetcher, userId, ...flags } = store
+    return {
+      ...flags,
+      isConfigCatStale: configCatFetcher !== getConfigCatFlags,
+      hasFlagsForSignedInUser: !!user?.id && userId === user.id,
+    }
+  }, [store, getConfigCatFlags, user?.id])
 
   return (
     <FeatureFlagContext.Provider value={contextValue}>

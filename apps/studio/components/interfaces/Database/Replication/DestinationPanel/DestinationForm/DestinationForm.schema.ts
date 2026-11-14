@@ -1,6 +1,5 @@
 import * as z from 'zod'
 
-import { AnalyticsBucketFormSchema } from './AnalyticsBucket/AnalyticsBucket.schema'
 import { BigQueryFormSchema } from './BigQuery/BigQuery.schema'
 import { ClickHouseFormSchema } from './ClickHouse/ClickHouse.schema'
 import { DuckLakeFormSchema } from './DuckLake/DuckLake.schema'
@@ -52,7 +51,6 @@ const CommonFormSchema = z.object({
 })
 
 export const DestinationPanelFormSchema = CommonFormSchema.extend(BigQueryFormSchema.shape)
-  .extend(AnalyticsBucketFormSchema.shape)
   .extend(DuckLakeFormSchema.shape)
   .extend(SnowflakeFormSchema.shape)
   .extend(ClickHouseFormSchema.shape)

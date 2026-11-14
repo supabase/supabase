@@ -10,7 +10,7 @@ import {
 } from '@tanstack/react-router'
 import { act, fireEvent, render, screen, waitFor } from '@testing-library/react'
 import { useMemo } from 'react'
-import { describe, expect, it, vi } from 'vitest'
+import { afterEach, beforeEach, describe, expect, it, vi } from 'vitest'
 
 import Link from '@/compat/next/link'
 import { useSyncFiltersToUrl } from '@/components/grid/hooks/useFilterLifeCycle'
@@ -75,10 +75,18 @@ function TablePage() {
 }
 
 // Allow the production filter synchronizer's 500ms debounce to finish before traversing.
-const settleFilters = () => act(async () => new Promise((resolve) => setTimeout(resolve, 650)))
+const settleFilters = () => act(() => vi.advanceTimersByTimeAsync(650))
 
 for (const basepath of ['/', '/dashboard']) {
   describe(`table filter history at ${basepath}`, () => {
+    // Fake time still advances on its own so waitFor polling and router microtasks keep working.
+    beforeEach(() => {
+      vi.useFakeTimers({ shouldAdvanceTime: true })
+    })
+    afterEach(() => {
+      vi.useRealTimers()
+    })
+
     it.each([false, true])(
       'preserves repeated Back/Forward with retained application state: %s',
       async (hasApplicationState) => {
@@ -142,7 +150,7 @@ for (const basepath of ['/', '/dashboard']) {
 
           // Leaving before the next debounce must cancel the old table's pending URL update.
           fireEvent.click(screen.getByText('Change filter'))
-          await act(async () => new Promise((resolve) => setTimeout(resolve, 0)))
+          await act(() => vi.advanceTimersByTimeAsync(0))
           fireEvent.click(screen.getByText('Table A'))
           await waitFor(() => expect(screen.getByTestId('table')).toHaveTextContent('17489'))
           await settleFilters()
@@ -154,8 +162,7 @@ for (const basepath of ['/', '/dashboard']) {
           push.mockRestore()
           history.destroy()
         }
-      },
-      10000
+      }
     )
   })
 }

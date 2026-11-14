@@ -312,7 +312,7 @@ describe('createTable', () => {
     const columns: ColumnField[] = [
       createColumnField({
         name: 'status',
-        defaultValue: "'pending'",
+        defaultValue: 'pending',
         isNullable: false,
       }),
     ]
@@ -328,7 +328,7 @@ describe('createTable', () => {
       track: mockTrack,
     })
 
-    expect(mockExecuteSql).toHaveBeenCalledTimes(1)
+    expect(mockExecuteSql.mock.calls[0][0].sql).toContain("DEFAULT 'pending'")
   })
 
   it('should create table with unique column', async () => {
@@ -351,7 +351,7 @@ describe('createTable', () => {
       track: mockTrack,
     })
 
-    expect(mockExecuteSql).toHaveBeenCalledTimes(1)
+    expect(mockExecuteSql.mock.calls[0][0].sql).toMatch(/UNIQUE/i)
   })
 
   it('should create table with array column', async () => {
@@ -373,7 +373,7 @@ describe('createTable', () => {
       track: mockTrack,
     })
 
-    expect(mockExecuteSql).toHaveBeenCalledTimes(1)
+    expect(mockExecuteSql.mock.calls[0][0].sql).toMatch(/\btext\[\]/i)
   })
 
   it('should create table with check constraint', async () => {
@@ -397,7 +397,7 @@ describe('createTable', () => {
       track: mockTrack,
     })
 
-    expect(mockExecuteSql).toHaveBeenCalledTimes(1)
+    expect(mockExecuteSql.mock.calls[0][0].sql).toMatch(/CHECK \(age >= 0\)/i)
   })
 
   it('should propagate SQL execution errors', async () => {

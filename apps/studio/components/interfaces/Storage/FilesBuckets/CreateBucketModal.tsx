@@ -191,7 +191,7 @@ export const CreateBucketModal = ({ open, onOpenChange }: CreateBucketModalProps
         }
       }}
     >
-      <DialogContent aria-describedby={undefined}>
+      <DialogContent size="large" aria-describedby={undefined}>
         <DialogHeader>
           <DialogTitle>Create file bucket</DialogTitle>
         </DialogHeader>

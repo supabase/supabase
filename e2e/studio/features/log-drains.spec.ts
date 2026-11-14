@@ -19,7 +19,7 @@ const LOG_DRAIN_OPTIONS = [
 ]
 
 test.describe('Log Drains Settings', () => {
-  test.skip(env.IS_PLATFORM, 'Log drains e2e tests only run against self-hosted')
+  test.skip(env.IS_PLATFORM, 'Log drains are not supported on platform')
 
   test.beforeEach(async ({ page, ref }) => {
     // Navigate to the log drains settings page

@@ -19,41 +19,36 @@ import { GenericSkeletonLoader } from 'ui-patterns/ShimmeringLoader'
 
 import { EnablePipelinesCallout } from '../EnablePipelinesCallout'
 import { PipelineStatusName } from '../Replication.constants'
+import { canModifyDestination } from '../ReplicationDiagram/Nodes.utils'
+import { UnknownDestinationNotice } from '../UnknownDestinationNotice'
 import { useDestinationInformation } from '../useDestinationInformation'
-import { useIsETLPrivateAlpha } from '../useIsETLPrivateAlpha'
+import { useIsPipelinesEnabled } from '../useIsPipelinesEnabled'
 import { DestinationForm } from './DestinationForm'
+import { DESTINATION_DOCS_PATHS } from './DestinationPanel.constants'
 import { DestinationType } from './DestinationPanel.types'
 import { DestinationTypeSelection } from './DestinationTypeSelection'
 import { DiscardChangesConfirmationDialog } from '@/components/ui-patterns/Dialogs/DiscardChangesConfirmationDialog'
+import { AlertError } from '@/components/ui/AlertError'
 import { DocsButton } from '@/components/ui/DocsButton'
 import { useReplicationDestinationsQuery } from '@/data/replication/destinations-query'
-import { checkLocalETLNotSetUp } from '@/data/replication/utils'
+import { checkLocalPipelinesNotSetUp } from '@/data/replication/utils'
 import { useSelectedOrganizationQuery } from '@/hooks/misc/useSelectedOrganization'
 import { useConfirmOnClose } from '@/hooks/ui/useConfirmOnClose'
 import { DOCS_URL, IS_PLATFORM } from '@/lib/constants'
-
-const DESTINATION_DOCS_PATHS: Partial<Record<DestinationType, string>> = {
-  BigQuery: '/guides/database/replication/pipelines/bigquery#configure-bigquery-as-a-destination',
-  ClickHouse:
-    '/guides/database/replication/pipelines/clickhouse#configure-clickhouse-as-a-destination',
-  DuckLake: '/guides/database/replication/pipelines/ducklake#choose-a-configuration-mode',
-  Snowflake: '/guides/database/replication/pipelines/snowflake#prepare-snowflake-resources',
-}
 
 export const DestinationPanel = () => {
   const { ref: projectRef } = useParams()
   const { hasLoaded: flagsLoaded } = useFeatureFlags()
   const { isPending: isOrganizationPending } = useSelectedOrganizationQuery()
-  const enablePgReplicate = useIsETLPrivateAlpha()
+  const enablePgReplicate = useIsPipelinesEnabled()
   const isAccessLoading = IS_PLATFORM && (!flagsLoaded || isOrganizationPending)
   const { error: destinationsError } = useReplicationDestinationsQuery({ projectRef })
-  const isLocalETLNotSetUp = checkLocalETLNotSetUp(destinationsError)
+  const isLocalPipelinesNotSetUp = checkLocalPipelinesNotSetUp(destinationsError)
 
   const [urlDestinationType, setDestinationType] = useQueryState(
     'destinationType',
     parseAsStringEnum<DestinationType>([
       'BigQuery',
-      'Analytics Bucket',
       'DuckLake',
       'Snowflake',
       'ClickHouse',
@@ -82,11 +77,17 @@ export const DestinationPanel = () => {
     type: existingDestinationType,
     destinationFetcher,
   } = useDestinationInformation({ id: edit })
-  const destinationType = existingDestinationType ?? urlDestinationType
+  const isUnknownDestination = editMode && existingDestinationType === 'Unknown'
+  const destinationType =
+    existingDestinationType === 'Unknown' ? null : (existingDestinationType ?? urlDestinationType)
   const invalidExistingDestination = destinationFetcher.error?.code === 404
+  const hasDestinationError = editMode && destinationFetcher.isError && !invalidExistingDestination
   const showAccessRequest = !isAccessLoading && !enablePgReplicate
   const showEnablement = !isAccessLoading && enablePgReplicate && replicationNotEnabled
-  const showDestinationForm = !isAccessLoading && enablePgReplicate && !replicationNotEnabled
+  const isEditLoading = editMode && destinationFetcher.isPending
+  const canEditDestination = !editMode || canModifyDestination(existingDestinationType)
+  const showDestinationForm =
+    !isAccessLoading && enablePgReplicate && !replicationNotEnabled && canEditDestination
 
   const existingDestination = editMode
     ? {
@@ -112,9 +113,9 @@ export const DestinationPanel = () => {
     onClose,
   })
 
+  const destinationDocsPath = destinationType ? DESTINATION_DOCS_PATHS[destinationType] : undefined
   const docsUrl = `${DOCS_URL}${
-    (destinationType && DESTINATION_DOCS_PATHS[destinationType]) ??
-    '/guides/database/replication/pipelines#step-3-configure-a-destination'
+    destinationDocsPath ?? '/guides/database/replication/pipelines#step-3-configure-a-destination'
   }`
 
   useEffect(() => {
@@ -134,7 +135,7 @@ export const DestinationPanel = () => {
   const pipelinesTypeSelection = (
     <>
       {typeSelection}
-      {destinationType != null && isLocalETLNotSetUp && (
+      {destinationType != null && isLocalPipelinesNotSetUp && (
         <SheetSection className="pb-0!">
           <Admonition
             type="warning"
@@ -166,9 +167,23 @@ export const DestinationPanel = () => {
               />
             </SheetHeader>
 
-            {isAccessLoading && (
+            {(isAccessLoading || isEditLoading) && (
               <SheetSection>
                 <GenericSkeletonLoader />
+              </SheetSection>
+            )}
+            {isUnknownDestination && (
+              <SheetSection>
+                <UnknownDestinationNotice />
+              </SheetSection>
+            )}
+            {hasDestinationError && (
+              <SheetSection>
+                <AlertError
+                  error={destinationFetcher.error}
+                  subject="Failed to retrieve destination information"
+                  projectRef={projectRef}
+                />
               </SheetSection>
             )}
             {showAccessRequest && (

@@ -14,7 +14,7 @@ imgSocial: launch-week-7/day-4-supabase-auth-sso-pkce/supabase-auth-sso-pkce-thu
 imgThumb: launch-week-7/day-4-supabase-auth-sso-pkce/supabase-auth-sso-pkce-og.jpg
 ---
 
-Today we're excited to announce a few new features for Supabase Auth:
+Today we're excited to announce a few new features for [Supabase Auth](/auth):
 
 1. [Easily add Single Sign-On support to your projects using SAML 2.0](/blog/supabase-auth-sso-pkce#single-sign-on-support-using-saml-20)
 2. [Better support for server-side rendering and mobile apps using PKCE](/blog/supabase-auth-sso-pkce#server-side-and-mobile-auth)
@@ -162,8 +162,8 @@ Then prepare an endpoint for the sign in process. The redirect URL is set to `/a
 
 ```tsx
 // api/auth/login
-import { NextApiRequest, NextApiResponse } from 'next'
 import { createServerSupabaseClient } from '@supabase/auth-helpers-nextjs'
+import { NextApiRequest, NextApiResponse } from 'next'
 
 export default async function handler(req: NextApiRequest, res: NextApiResponse) {
   // Create the Supabase Client
@@ -195,8 +195,8 @@ Now we can set up the callback API endpoint:
 
 ```tsx
 // api/auth/callback
-import { NextApiRequest, NextApiResponse } from 'next'
 import { createServerSupabaseClient } from '@supabase/auth-helpers-nextjs'
+import { NextApiRequest, NextApiResponse } from 'next'
 
 export default async function handler(req: NextApiRequest, res: NextApiResponse) {
   // Create authenticated Supabase Client

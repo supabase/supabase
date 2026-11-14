@@ -16,7 +16,6 @@ import {
 } from '@/state/replication-pipeline-request-status'
 
 type EdgeData = {
-  type: string
   identifier: string
   shiftEdgeEnd: boolean
 }

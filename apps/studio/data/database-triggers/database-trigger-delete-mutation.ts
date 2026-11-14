@@ -1,10 +1,11 @@
-import pgMeta from '@supabase/pg-meta'
+import pgMeta, { asWriteSql } from '@supabase/pg-meta'
 import { useMutation, useQueryClient } from '@tanstack/react-query'
 import { toast } from 'sonner'
 
 import { databaseTriggerKeys } from './keys'
-import { executeSql } from '@/data/sql/execute-sql-mutation'
-import type { ResponseError, UseCustomMutationOptions } from '@/types'
+import { executeSql, type PgMetaWriteGrant } from '@/data/sql/execute-sql-mutation'
+import type { StudioError } from '@/lib/errors/studio-errors'
+import type { UseCustomMutationOptions } from '@/types'
 
 export type DatabaseTriggerDeleteVariables = {
   trigger: {
@@ -14,12 +15,14 @@ export type DatabaseTriggerDeleteVariables = {
     table: string
   }
   projectRef: string
+  grant: PgMetaWriteGrant
   connectionString?: string | null
 }
 
 export async function deleteDatabaseTrigger({
   trigger,
   projectRef,
+  grant,
   connectionString,
 }: DatabaseTriggerDeleteVariables) {
   const { sql } = pgMeta.triggers.remove(trigger)
@@ -27,8 +30,11 @@ export async function deleteDatabaseTrigger({
   const { result } = await executeSql({
     projectRef,
     connectionString,
-    sql,
+    sqlOrigin: 'studio',
+    queryName: 'trigger-delete',
+    sql: asWriteSql(sql),
     queryKey: ['trigger', 'delete', trigger.id],
+    grant,
   })
 
   return result
@@ -41,16 +47,12 @@ export const useDatabaseTriggerDeleteMutation = ({
   onError,
   ...options
 }: Omit<
-  UseCustomMutationOptions<
-    DatabaseTriggerDeleteData,
-    ResponseError,
-    DatabaseTriggerDeleteVariables
-  >,
+  UseCustomMutationOptions<DatabaseTriggerDeleteData, StudioError, DatabaseTriggerDeleteVariables>,
   'mutationFn'
 > = {}) => {
   const queryClient = useQueryClient()
 
-  return useMutation<DatabaseTriggerDeleteData, ResponseError, DatabaseTriggerDeleteVariables>({
+  return useMutation<DatabaseTriggerDeleteData, StudioError, DatabaseTriggerDeleteVariables>({
     mutationFn: (vars) => deleteDatabaseTrigger(vars),
     async onSuccess(data, variables, context) {
       const { projectRef } = variables

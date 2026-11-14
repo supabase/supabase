@@ -51,8 +51,7 @@ const CopyButton = forwardRef<HTMLButtonElement, CopyButtonProps>(
         ref={ref}
         onClick={(e) => {
           const textToCopy = asyncText ? asyncText() : text
-          setShowCopied(true)
-          copyToClipboard(textToCopy)
+          copyToClipboard(textToCopy, () => setShowCopied(true))
           onClick?.(e)
         }}
         {...props}

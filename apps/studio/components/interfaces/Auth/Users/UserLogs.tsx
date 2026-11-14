@@ -8,7 +8,6 @@ import { Admonition } from 'ui-patterns/Admonition'
 import { GenericSkeletonLoader } from 'ui-patterns/ShimmeringLoader'
 import { TimestampInfo } from 'ui-patterns/TimestampInfo'
 
-import { UserHeader } from './UserHeader'
 import { PANEL_PADDING } from './Users.constants'
 import { LOGS_TABLES } from '@/components/interfaces/Settings/Logs/Logs.constants'
 import { ButtonTooltip } from '@/components/ui/ButtonTooltip'
@@ -78,10 +77,6 @@ export const UserLogs = ({ user }: UserLogsProps) => {
 
   return (
     <div>
-      <UserHeader user={user} />
-
-      <Separator />
-
       <div className={cn('flex flex-col gap-y-3', PANEL_PADDING)}>
         <div>
           <p>Auth API logs</p>

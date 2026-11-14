@@ -1,6 +1,7 @@
+import { useQuery } from '@tanstack/react-query'
 import { useParams } from 'common'
 import { includes } from 'lodash'
-import { Edit3Icon, MoreVerticalIcon, TrashIcon } from 'lucide-react'
+import { EditIcon, MoreVerticalIcon, TrashIcon } from 'lucide-react'
 import Image from 'next/legacy/image'
 import { parseAsString, useQueryState } from 'nuqs'
 import {
@@ -18,11 +19,11 @@ import {
 
 import Table from '@/components/to-be-cleaned/Table'
 import { ButtonTooltip } from '@/components/ui/ButtonTooltip'
-import { useDatabaseHooksQuery } from '@/data/database-triggers/database-triggers-query'
-import { FGA_PERMISSIONS, useAsyncCheckPermissionsV2 } from '@/hooks/misc/useCheckPermissionsV2'
+import { databaseHooksQueryOptions } from '@/data/database-triggers/database-triggers-query'
 import { useSelectedProjectQuery } from '@/hooks/misc/useSelectedProject'
 import { isEdgeFunctionUrl } from '@/lib/api/edgeFunctions'
 import { BASE_PATH } from '@/lib/constants'
+import { useGrant } from '@/lib/grants'
 
 export interface HookListProps {
   schema: string
@@ -32,10 +33,23 @@ export interface HookListProps {
 export const HookList = ({ schema, filterString }: HookListProps) => {
   const { ref } = useParams()
   const { data: project } = useSelectedProjectQuery()
-  const { data: hooks } = useDatabaseHooksQuery({
-    projectRef: project?.ref,
-    connectionString: project?.connectionString,
-  })
+  const readGrant = useGrant(
+    'POST /platform/pg-meta/{ref}/query',
+    { projectRef: project?.ref },
+    { variant: 'read' }
+  )
+  const writeGrant = useGrant(
+    'POST /platform/pg-meta/{ref}/query',
+    { projectRef: project?.ref },
+    { variant: 'write' }
+  )
+  const { data: hooks } = useQuery(
+    databaseHooksQueryOptions({
+      projectRef: project?.ref,
+      connectionString: project?.connectionString,
+      grant: readGrant.grant,
+    })
+  )
 
   const [, setSelectedHookIdToEdit] = useQueryState('edit', parseAsString.withDefault(''))
   const [, setSelectedHookIdToDelete] = useQueryState('delete', parseAsString.withDefault(''))
@@ -48,9 +62,7 @@ export const HookList = ({ schema, filterString }: HookListProps) => {
       x.schema === schema &&
       x.function_args.length >= 2
   )
-  const { can: canUpdateWebhook } = useAsyncCheckPermissionsV2(
-    FGA_PERMISSIONS.PROJECT.DATABASE_WRITE
-  )
+  const canUpdateWebhook = writeGrant.status === 'granted'
 
   return (
     <>
@@ -91,7 +103,7 @@ export const HookList = ({ schema, filterString }: HookListProps) => {
             </Table.td>
             <Table.td className="hidden xl:table-cell">
               <p className="truncate" title={url}>
-                <code className="text-code-inline">{method}</code>: {url}
+                <code>{method}</code>: {url}
               </p>
             </Table.td>
             <Table.td className="text-right">
@@ -102,7 +114,7 @@ export const HookList = ({ schema, filterString }: HookListProps) => {
                       <TooltipTrigger asChild>
                         <DropdownMenuTrigger asChild>
                           <Button
-                            className="px-1"
+                            className="w-6.5"
                             icon={<MoreVerticalIcon />}
                             aria-label={`${x.name} actions`}
                             // Tooltip repeats the label; screen readers would read it twice
@@ -113,24 +125,22 @@ export const HookList = ({ schema, filterString }: HookListProps) => {
                       <TooltipContent side="bottom">More options</TooltipContent>
                     </Tooltip>
 
-                    <DropdownMenuContent side="left">
-                      <>
-                        <DropdownMenuItem
-                          className="space-x-2"
-                          onClick={() => setSelectedHookIdToEdit(x.id.toString())}
-                        >
-                          <Edit3Icon size="14" />
-                          <p>Edit hook</p>
-                        </DropdownMenuItem>
-                        <DropdownMenuSeparator />
-                        <DropdownMenuItem
-                          className="space-x-2"
-                          onClick={() => setSelectedHookIdToDelete(x.id.toString())}
-                        >
-                          <TrashIcon stroke="red" size="14" />
-                          <p>Delete hook</p>
-                        </DropdownMenuItem>
-                      </>
+                    <DropdownMenuContent side="bottom" align="end" className="w-32">
+                      <DropdownMenuItem
+                        className="gap-x-2"
+                        onClick={() => setSelectedHookIdToEdit(x.id.toString())}
+                      >
+                        <EditIcon size={14} />
+                        <p>Edit hook</p>
+                      </DropdownMenuItem>
+                      <DropdownMenuSeparator />
+                      <DropdownMenuItem
+                        className="gap-x-2"
+                        onClick={() => setSelectedHookIdToDelete(x.id.toString())}
+                      >
+                        <TrashIcon size={14} />
+                        <p>Delete hook</p>
+                      </DropdownMenuItem>
                     </DropdownMenuContent>
                   </DropdownMenu>
                 ) : (

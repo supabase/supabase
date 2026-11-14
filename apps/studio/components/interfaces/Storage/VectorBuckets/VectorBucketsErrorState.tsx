@@ -1,10 +1,10 @@
 import { VectorBucketsLocalDisabledState } from './VectorBucketsLocalDisabledState'
 import { AlertError } from '@/components/ui/AlertError'
 import { useDeploymentMode } from '@/hooks/misc/useDeploymentMode'
-import type { ResponseError } from '@/types'
+import type { StudioError } from '@/lib/errors/studio-errors'
 
 interface VectorBucketsErrorStateProps {
-  error: ResponseError | null
+  error: StudioError | null
 }
 
 export const VectorBucketsErrorState = ({ error }: VectorBucketsErrorStateProps) => {

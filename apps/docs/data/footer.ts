@@ -1,4 +1,4 @@
-import { CheckCircle, FlaskConical, LifeBuoy } from 'lucide-react'
+import { CheckCircle, FlaskConical, LifeBuoy, MessagesSquare, ScrollText } from 'lucide-react'
 import { PrivacySettings } from 'ui-patterns/PrivacySettings'
 
 export const primaryLinks = [
@@ -20,6 +20,12 @@ export const primaryLinks = [
     ctaLabel: 'Check system status',
     url: 'https://status.supabase.com/',
   },
+]
+
+export const linkCells = [
+  { label: 'System status', url: 'https://status.supabase.com/' },
+  { label: 'Product updates', url: 'https://supabase.com/changelog', icon: ScrollText },
+  { label: 'Contact support', url: 'https://supabase.com/support', icon: MessagesSquare },
 ]
 
 export const secondaryLinks = [

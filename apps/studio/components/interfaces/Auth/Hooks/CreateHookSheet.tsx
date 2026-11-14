@@ -6,7 +6,6 @@ import {
   type SafeSqlFragment,
 } from '@supabase/pg-meta/src/pg-format'
 import { useParams } from 'common'
-import randomBytes from 'randombytes'
 import { useEffect, useMemo } from 'react'
 import { SubmitHandler, useForm, useWatch } from 'react-hook-form'
 import { toast } from 'sonner'
@@ -43,10 +42,12 @@ import { InlineLink } from '@/components/ui/InlineLink'
 import { SchemaSelector } from '@/components/ui/SchemaSelector'
 import { AuthConfigResponse } from '@/data/auth/auth-config-query'
 import { useAuthHooksUpdateMutation } from '@/data/auth/auth-hooks-update-mutation'
+import { unguarded } from '@/data/fetchers'
 import { executeSql } from '@/data/sql/execute-sql-mutation'
 import { useSelectedProjectQuery } from '@/hooks/misc/useSelectedProject'
 import { useConfirmOnClose } from '@/hooks/ui/useConfirmOnClose'
 import { DOCS_URL } from '@/lib/constants'
+import { generateRandomBase64 } from '@/lib/random'
 
 interface CreateHookSheetProps {
   visible: boolean
@@ -58,9 +59,7 @@ interface CreateHookSheetProps {
 
 export function generateAuthHookSecret() {
   const secretByteLength = 60
-  const buffer = randomBytes(secretByteLength)
-  const base64String = buffer.toString('base64')
-  return `v1,whsec_${base64String}`
+  return `v1,whsec_${generateRandomBase64(secretByteLength)}`
 }
 
 const FORM_ID = 'create-edit-auth-hook'
@@ -218,7 +217,10 @@ revoke execute on function ${ident(schema)}.${ident(functionName)} from authenti
         executeSql({
           projectRef,
           connectionString: project!.connectionString,
+          sqlOrigin: 'studio',
+          queryName: 'auth-hook-update-permissions',
           sql: joinSqlFragments(statements, '\n'),
+          grant: unguarded.migrating,
         })
       }
       onClose()
@@ -452,10 +454,12 @@ revoke execute on function ${ident(schema)}.${ident(functionName)} from authenti
                                 No function with a single JSON/B argument
                                 <br />
                                 and JSON/B
-                                {definition.enabledKey === 'HOOK_SEND_EMAIL_ENABLED'
-                                  ? ' or void'
-                                  : ''}{' '}
-                                return type found in this schema.
+                                {definition.enabledKey === 'HOOK_SEND_EMAIL_ENABLED' ? (
+                                  <span>{' or void'}</span>
+                                ) : (
+                                  ''
+                                )}{' '}
+                                <span>return type found in this schema.</span>
                               </span>
                             }
                           />
@@ -510,13 +514,12 @@ revoke execute on function ${ident(schema)}.${ident(functionName)} from authenti
                         description={
                           <div className="flex items-center gap-x-2">
                             <p>
-                              Should be a base64 encoded secret with a prefix{' '}
-                              <code className="text-code-inline">v1,whsec_</code>.
+                              Should be a base64 encoded secret with a prefix <code>v1,whsec_</code>
+                              .
                             </p>
                             <InfoTooltip side="bottom" className="w-60 text-center">
-                              <code className="text-code-inline">v1</code> denotes the signature
-                              version and <code className="text-code-inline">whsec_</code> signifies
-                              a symmetric secret.
+                              <code>v1</code> denotes the signature version and <code>whsec_</code>{' '}
+                              signifies a symmetric secret.
                             </InfoTooltip>
                           </div>
                         }

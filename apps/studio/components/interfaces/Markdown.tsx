@@ -17,11 +17,6 @@ const H3 = ({
 }: React.DetailedHTMLProps<React.HTMLAttributes<HTMLHeadingElement>, HTMLHeadingElement>) => (
   <h3 className="mb-1">{children}</h3>
 )
-const Code = ({
-  children,
-}: React.DetailedHTMLProps<React.HTMLAttributes<HTMLElement>, HTMLElement>) => (
-  <code className="text-code-inline">{children}</code>
-)
 const A = ({
   href,
   children,
@@ -42,7 +37,6 @@ export const Markdown = ({
         remarkPlugins={[remarkGfm]}
         components={{
           h3: H3,
-          code: Code,
           a: A,
         }}
         {...props}

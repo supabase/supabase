@@ -8,6 +8,9 @@ import type { AiOptInLevel } from '@/hooks/misc/useOrgOptedIntoAi'
 export const NO_DATA_PERMISSIONS =
   'The query was executed and the user has viewed the results but decided not to share in the conversation due to permission levels. Continue with your plan unless instructed to interpret the result. If you need the rows to answer and `update_opt_in_level` is available, call it with `schema_and_log_and_data`, unless the user already skipped that request in this chat.'
 
+export const NO_DATA_ERROR =
+  'The query failed. The error is not shared at the current permission level.'
+
 // the rows.length default covers chats saved before execute_sql sliced its rows
 export const toModelRows = <T>(
   rows: T[],

@@ -3,8 +3,10 @@ import { useMutation, useQueryClient } from '@tanstack/react-query'
 import { toast } from 'sonner'
 
 import { invalidateSchemasQuery } from './schemas-query'
+import { unguarded } from '@/data/fetchers'
 import { executeSql } from '@/data/sql/execute-sql-mutation'
-import type { ResponseError, UseCustomMutationOptions } from '@/types'
+import type { StudioError } from '@/lib/errors/studio-errors'
+import type { UseCustomMutationOptions } from '@/types'
 
 export type SchemaCreateVariables = {
   name: string
@@ -17,8 +19,11 @@ export async function createSchema({ name, projectRef, connectionString }: Schem
   const { result } = await executeSql({
     projectRef,
     connectionString,
+    sqlOrigin: 'studio',
+    queryName: 'schema-create',
     sql,
     queryKey: ['schema', 'create'],
+    grant: unguarded.migrating,
   })
   return result
 }
@@ -30,11 +35,11 @@ export const useSchemaCreateMutation = ({
   onError,
   ...options
 }: Omit<
-  UseCustomMutationOptions<SchemaCreateData, ResponseError, SchemaCreateVariables>,
+  UseCustomMutationOptions<SchemaCreateData, StudioError, SchemaCreateVariables>,
   'mutationFn'
 > = {}) => {
   const queryClient = useQueryClient()
-  return useMutation<SchemaCreateData, ResponseError, SchemaCreateVariables>({
+  return useMutation<SchemaCreateData, StudioError, SchemaCreateVariables>({
     mutationFn: (vars) => createSchema(vars),
     async onSuccess(data, variables, context) {
       const { projectRef } = variables

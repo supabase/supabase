@@ -58,6 +58,7 @@ import { useContentQuery, type Content } from '@/data/content/content-query'
 import { useContentUpsertMutation } from '@/data/content/content-upsert-mutation'
 import { contentKeys } from '@/data/content/keys'
 import type { Snippet } from '@/data/content/sql-folders-query'
+import { unguarded } from '@/data/fetchers'
 import { useExecuteSqlMutation } from '@/data/sql/execute-sql-mutation'
 import { applyAutoLimit } from '@/data/sql/utils'
 import { useSelectedOrganizationQuery } from '@/hooks/misc/useSelectedOrganization'
@@ -246,6 +247,7 @@ export const EditorPanel = () => {
 
     executeSql({
       sql: applyAutoLimit(acceptUntrustedSql(currentValue), 100).sql,
+      sqlOrigin: 'user',
       projectRef: project?.ref,
       connectionString: project?.connectionString,
       isStatementTimeoutDisabled: true,
@@ -253,6 +255,7 @@ export const EditorPanel = () => {
         throw executeError
       },
       contextualInvalidation: true,
+      grant: unguarded.migrating,
     })
   }
 
@@ -593,7 +596,8 @@ export const EditorPanel = () => {
             )}
             <div className="text-xs text-foreground-light border-t py-2 px-5 flex items-center justify-between">
               <span className="font-mono">
-                {results.length} rows{results.length >= 100 && ` (Limited to only 100 rows)`}
+                {results.length} rows
+                {results.length >= 100 && <span>{` (Limited to only 100 rows)`}</span>}
               </span>
               <Button size="tiny" className="ml-2" onClick={() => setShowResults((prev) => !prev)}>
                 {showResults ? 'Hide Results' : 'Show Results'}

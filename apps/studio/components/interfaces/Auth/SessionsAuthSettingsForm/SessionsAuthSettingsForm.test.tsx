@@ -7,7 +7,6 @@ import { SessionsAuthSettingsForm } from './SessionsAuthSettingsForm'
 import {
   MAX_REFRESH_TOKEN_REUSE_INTERVAL_MESSAGE,
   MAX_SESSIONS_INACTIVITY_TIMEOUT_MESSAGE,
-  MAX_SESSIONS_TIMEBOX_HOURS,
   MAX_SESSIONS_TIMEBOX_MESSAGE,
 } from './SessionsAuthSettingsForm.utils'
 import { customRender } from '@/tests/lib/custom-render'
@@ -124,6 +123,8 @@ async function saveForm(control: HTMLElement) {
   fireEvent.click(saveButton)
 }
 
+// Boundary and reduction rules are covered by SessionsAuthSettingsForm.utils.test.ts; these
+// tests check the schemas are wired into the form (errors shown, stored values honoured).
 describe('SessionsAuthSettingsForm — User Sessions', () => {
   test('blocks submit when the timebox exceeds the maximum', async () => {
     mockAuthConfig({ SESSIONS_TIMEBOX: 0 })
@@ -140,24 +141,6 @@ describe('SessionsAuthSettingsForm — User Sessions', () => {
 
     expect(await screen.findByText(MAX_SESSIONS_TIMEBOX_MESSAGE)).toBeInTheDocument()
     expect(patchCalled).toBe(false)
-  })
-
-  test('accepts a timebox at the maximum', async () => {
-    mockAuthConfig({ SESSIONS_TIMEBOX: 0 })
-    let patchBody: unknown
-    mockUpdateAuthConfig((body) => {
-      patchBody = body
-    })
-
-    customRender(<SessionsAuthSettingsForm />)
-
-    const input = await screen.findByLabelText('Time-box user sessions')
-    fireEvent.change(input, { target: { value: String(MAX_SESSIONS_TIMEBOX_HOURS) } })
-    await saveForm(input)
-
-    await waitFor(() =>
-      expect(patchBody).toMatchObject({ SESSIONS_TIMEBOX: MAX_SESSIONS_TIMEBOX_HOURS })
-    )
   })
 
   test('saves an over-limit timebox that is already stored', async () => {
@@ -177,39 +160,6 @@ describe('SessionsAuthSettingsForm — User Sessions', () => {
     await waitFor(() =>
       expect(patchBody).toMatchObject({ SESSIONS_TIMEBOX: 20000, SESSIONS_SINGLE_PER_USER: true })
     )
-  })
-
-  test('blocks a reduction that is still above the maximum', async () => {
-    mockAuthConfig({ SESSIONS_TIMEBOX: 20000 })
-    let patchCalled = false
-    mockUpdateAuthConfig(() => {
-      patchCalled = true
-    })
-
-    customRender(<SessionsAuthSettingsForm />)
-
-    const input = await screen.findByLabelText('Time-box user sessions')
-    fireEvent.change(input, { target: { value: '15000' } })
-    await saveForm(input)
-
-    expect(await screen.findByText(MAX_SESSIONS_TIMEBOX_MESSAGE)).toBeInTheDocument()
-    expect(patchCalled).toBe(false)
-  })
-
-  test('saves a reduction into the allowed range', async () => {
-    mockAuthConfig({ SESSIONS_TIMEBOX: 20000 })
-    let patchBody: unknown
-    mockUpdateAuthConfig((body) => {
-      patchBody = body
-    })
-
-    customRender(<SessionsAuthSettingsForm />)
-
-    const input = await screen.findByLabelText('Time-box user sessions')
-    fireEvent.change(input, { target: { value: '5000' } })
-    await saveForm(input)
-
-    await waitFor(() => expect(patchBody).toMatchObject({ SESSIONS_TIMEBOX: 5000 }))
   })
 
   test('blocks submit when the inactivity timeout exceeds the maximum', async () => {
@@ -265,24 +215,6 @@ describe('SessionsAuthSettingsForm — Refresh Tokens', () => {
 
     await waitFor(() =>
       expect(patchBody).toMatchObject({ SECURITY_REFRESH_TOKEN_REUSE_INTERVAL: 600 })
-    )
-  })
-
-  test('saves a reduction into the allowed range', async () => {
-    mockAuthConfig({ SECURITY_REFRESH_TOKEN_REUSE_INTERVAL: 600 })
-    let patchBody: unknown
-    mockUpdateAuthConfig((body) => {
-      patchBody = body
-    })
-
-    customRender(<SessionsAuthSettingsForm />)
-
-    const input = await screen.findByLabelText('Refresh token reuse interval')
-    fireEvent.change(input, { target: { value: '10' } })
-    await saveForm(input)
-
-    await waitFor(() =>
-      expect(patchBody).toMatchObject({ SECURITY_REFRESH_TOKEN_REUSE_INTERVAL: 10 })
     )
   })
 })

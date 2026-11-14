@@ -3,7 +3,8 @@ import { toast } from 'sonner'
 
 import { getMockOAuthAppsAuthorizeRedirect, USE_MOCKS } from './mocks'
 import type { OAuthAppsAuthorizeRedirect } from './types'
-import type { ResponseError, UseCustomMutationOptions } from '@/types'
+import type { StudioError } from '@/lib/errors/studio-errors'
+import type { UseCustomMutationOptions } from '@/types'
 
 export type OAuthAppsAuthorizeDenyVariables = {
   slug: string
@@ -28,12 +29,12 @@ export const useOAuthAppsAuthorizeDenyMutation = ({
 }: Omit<
   UseCustomMutationOptions<
     OAuthAppsAuthorizeDenyData,
-    ResponseError,
+    StudioError,
     OAuthAppsAuthorizeDenyVariables
   >,
   'mutationFn'
 > = {}) => {
-  return useMutation<OAuthAppsAuthorizeDenyData, ResponseError, OAuthAppsAuthorizeDenyVariables>({
+  return useMutation<OAuthAppsAuthorizeDenyData, StudioError, OAuthAppsAuthorizeDenyVariables>({
     mutationFn: (vars) => denyOAuthAppsAuthorize(vars),
     async onError(data, variables, context) {
       if (onError === undefined) {

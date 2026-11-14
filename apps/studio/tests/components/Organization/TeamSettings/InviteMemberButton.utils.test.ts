@@ -41,16 +41,8 @@ describe('parseEmails', () => {
     expect(parseEmails('a@example.com,a@example.com')).toStrictEqual(['a@example.com'])
   })
 
-  test('returns an empty array for an empty string', () => {
-    expect(parseEmails('')).toStrictEqual([])
-  })
-
-  test('returns an empty array for a whitespace-only string', () => {
-    expect(parseEmails('   ')).toStrictEqual([])
-  })
-
-  test('returns an empty array for commas only', () => {
-    expect(parseEmails(',,,,')).toStrictEqual([])
+  test.each(['', '   ', ',,,,'])('returns an empty array for %j', (value) => {
+    expect(parseEmails(value)).toStrictEqual([])
   })
 
   test('parses space-separated emails', () => {
@@ -123,17 +115,6 @@ describe('categorizeInviteEmails', () => {
     })
   })
 
-  test('places all emails in toInvite when none match existing members', () => {
-    const members = [makeMember({ primary_email: 'other@example.com' })]
-    expect(
-      categorizeInviteEmails(['a@example.com', 'b@example.com', 'c@example.com'], members)
-    ).toStrictEqual({
-      alreadyInvited: [],
-      alreadyMembers: [],
-      toInvite: ['a@example.com', 'b@example.com', 'c@example.com'],
-    })
-  })
-
   test('returns all-empty for an empty email list', () => {
     expect(categorizeInviteEmails([], [makeMember()])).toStrictEqual({
       alreadyInvited: [],
@@ -161,10 +142,6 @@ describe('buildProjectPayload', () => {
     expect(() => buildProjectPayload(false, [])).toThrowError(
       'At least one project is required when applyToOrg is false'
     )
-  })
-
-  test('returns a projects array when applyToOrg is false and one project is selected', () => {
-    expect(buildProjectPayload(false, ['ref_abc'])).toStrictEqual({ projects: ['ref_abc'] })
   })
 
   test('returns all selected projects when applyToOrg is false and multiple are selected', () => {

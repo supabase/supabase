@@ -8,5 +8,8 @@ export const cn: (...inputs: ClassValue[]) => string = createCn({
     theme: {
       spacing: ['card', 'content'],
     },
+    classGroups: {
+      shadow: [{ 'floating-surface-shadow': ['sm', 'md'] }],
+    },
   },
 })

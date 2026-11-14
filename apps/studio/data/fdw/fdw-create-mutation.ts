@@ -11,10 +11,12 @@ import { toast } from 'sonner'
 import { fdwKeys } from './keys'
 import { WrapperMeta } from '@/components/interfaces/Integrations/Wrappers/Wrappers.types'
 import { entityTypeKeys } from '@/data/entity-types/keys'
+import { unguarded } from '@/data/fetchers'
 import { foreignTableKeys } from '@/data/foreign-tables/keys'
 import { executeSql } from '@/data/sql/execute-sql-mutation'
 import { vaultSecretsKeys } from '@/data/vault/keys'
-import type { ResponseError, UseCustomMutationOptions } from '@/types'
+import type { StudioError } from '@/lib/errors/studio-errors'
+import type { UseCustomMutationOptions } from '@/types'
 
 export type FDWCreateVariables = {
   projectRef?: string
@@ -40,8 +42,11 @@ export async function createFDW({ projectRef, connectionString, ...rest }: FDWCr
   const { result } = await executeSql({
     projectRef,
     connectionString,
+    sqlOrigin: 'studio',
+    queryName: 'create-fdw',
     sql,
     queryKey: ['create-fdw'],
+    grant: unguarded.migrating,
   })
   return result
 }
@@ -53,12 +58,12 @@ export const useFDWCreateMutation = ({
   onError,
   ...options
 }: Omit<
-  UseCustomMutationOptions<FDWCreateData, ResponseError, FDWCreateVariables>,
+  UseCustomMutationOptions<FDWCreateData, StudioError, FDWCreateVariables>,
   'mutationFn'
 > = {}) => {
   const queryClient = useQueryClient()
 
-  return useMutation<FDWCreateData, ResponseError, FDWCreateVariables>({
+  return useMutation<FDWCreateData, StudioError, FDWCreateVariables>({
     mutationFn: (vars) => createFDW(vars),
     async onSuccess(data, variables, context) {
       const { projectRef } = variables

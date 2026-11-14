@@ -201,7 +201,8 @@ export const LogsQueryPanel = ({
               <Tooltip>
                 <TooltipTrigger className="flex items-start">
                   <Badge variant="warning">
-                    {warnings.length} {warnings.length > 1 ? 'warnings' : 'warning'}
+                    {warnings.length}{' '}
+                    {warnings.length > 1 ? <span>warnings</span> : <span>warning</span>}
                   </Badge>
                   <TooltipContent className="p-0 divide-y max-w-xs" side="bottom">
                     {warnings.map((warning, index) => (
@@ -253,13 +254,10 @@ export const LogsQueryPanel = ({
                   {useOtel ? (
                     <SheetDescription>
                       The following table shows the fields available on each source. Nested fields
-                      live in the{' '}
-                      <code className="text-code-inline text-xs !break-keep">log_attributes</code>{' '}
-                      map and are read with{' '}
-                      <code className="text-code-inline text-xs !break-keep">
-                        log_attributes['key']
-                      </code>{' '}
-                      — no unnesting joins needed.
+                      live in the <code className="text-xs !break-keep">log_attributes</code> map
+                      and are read with{' '}
+                      <code className="text-xs !break-keep">log_attributes['key']</code> — no
+                      unnesting joins needed.
                     </SheetDescription>
                   ) : (
                     <SheetDescription>

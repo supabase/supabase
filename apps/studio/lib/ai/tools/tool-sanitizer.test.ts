@@ -13,6 +13,7 @@ import {
 import { NO_DATA_PERMISSIONS } from './execute-sql-output'
 import { INVALID_NOTEBOOK_RUN_OUTPUT_MESSAGE, type NotebookRunOutput } from './notebook-run-output'
 import { sanitizeMessagePart } from './tool-sanitizer'
+import type { AiOptInLevel } from '@/hooks/misc/useOrgOptedIntoAi'
 
 const notebookRunPart = {
   type: 'tool-run_notebook',
@@ -89,108 +90,32 @@ describe('messages are sanitized based on opt-in level', () => {
     )
   })
 
-  test('messages are sanitized at disabled level', () => {
+  // Prepares messages as the frontend would, then sanitizes them as the API endpoint would
+  const sanitizeExecuteSqlConversation = (level: AiOptInLevel) => {
     const messages = [
       createAssistantMessageWithExecuteSqlTool('SELECT email FROM users', [
         { email: 'test@example.com' },
       ]),
     ]
+    const processedMessages = prepareMessagesForAPI(messages).map((msg) =>
+      msg.role === 'assistant' && msg.parts
+        ? { ...msg, parts: msg.parts.map((part) => sanitizeMessagePart(part, level)) }
+        : msg
+    )
+    return (processedMessages[0].parts[1] as ToolUIPart).output
+  }
 
-    // Prepare messages as frontend would
-    const preparedMessages = prepareMessagesForAPI(messages)
+  test.each(['disabled', 'schema', 'schema_and_log'] as const)(
+    'execute_sql rows are hidden at %s level',
+    (level) => {
+      expect(sanitizeExecuteSqlConversation(level)).toMatch(NO_DATA_PERMISSIONS)
+    }
+  )
 
-    // Sanitize messages as API endpoint would
-    const processedMessages = preparedMessages.map((msg) => {
-      if (msg.role === 'assistant' && msg.parts) {
-        const processedParts = msg.parts.map((part) => {
-          return sanitizeMessagePart(part, 'disabled')
-        })
-
-        return { ...msg, parts: processedParts }
-      }
-      return msg
-    })
-
-    const output = (processedMessages[0].parts[1] as ToolUIPart).output
-    expect(output).toMatch(NO_DATA_PERMISSIONS)
-  })
-
-  test('messages are sanitized at schema level', () => {
-    const messages = [
-      createAssistantMessageWithExecuteSqlTool('SELECT email FROM users', [
-        { email: 'test@example.com' },
-      ]),
-    ]
-
-    // Prepare messages as frontend would
-    const preparedMessages = prepareMessagesForAPI(messages)
-
-    // Sanitize messages as API endpoint would
-    const processedMessages = preparedMessages.map((msg) => {
-      if (msg.role === 'assistant' && msg.parts) {
-        const processedParts = msg.parts.map((part) => {
-          return sanitizeMessagePart(part, 'schema')
-        })
-
-        return { ...msg, parts: processedParts }
-      }
-      return msg
-    })
-
-    const output = (processedMessages[0].parts[1] as ToolUIPart).output
-    expect(output).toMatch(NO_DATA_PERMISSIONS)
-  })
-
-  test('messages are sanitized at schema and log level', () => {
-    const messages = [
-      createAssistantMessageWithExecuteSqlTool('SELECT email FROM users', [
-        { email: 'test@example.com' },
-      ]),
-    ]
-
-    // Prepare messages as frontend would
-    const preparedMessages = prepareMessagesForAPI(messages)
-
-    // Sanitize messages as API endpoint would
-    const processedMessages = preparedMessages.map((msg) => {
-      if (msg.role === 'assistant' && msg.parts) {
-        const processedParts = msg.parts.map((part) => {
-          return sanitizeMessagePart(part, 'schema_and_log')
-        })
-
-        return { ...msg, parts: processedParts }
-      }
-      return msg
-    })
-
-    const output = (processedMessages[0].parts[1] as ToolUIPart).output
-    expect(output).toMatch(NO_DATA_PERMISSIONS)
-  })
-
-  test('messages are not sanitized at data level', () => {
-    const messages = [
-      createAssistantMessageWithExecuteSqlTool('SELECT email FROM users', [
-        { email: 'test@example.com' },
-      ]),
-    ]
-
-    // Prepare messages as frontend would
-    const preparedMessages = prepareMessagesForAPI(messages)
-
-    // Sanitize messages as API endpoint would
-    const processedMessages = preparedMessages.map((msg) => {
-      if (msg.role === 'assistant' && msg.parts) {
-        const processedParts = msg.parts.map((part) => {
-          return sanitizeMessagePart(part, 'schema_and_log_and_data')
-        })
-
-        return { ...msg, parts: processedParts }
-      }
-      return msg
-    })
-
-    const output = (processedMessages[0].parts[1] as ToolUIPart).output
-    expect(output).toEqual([{ email: 'test@example.com' }])
+  test('execute_sql rows are not sanitized at data level', () => {
+    expect(sanitizeExecuteSqlConversation('schema_and_log_and_data')).toEqual([
+      { email: 'test@example.com' },
+    ])
   })
 
   test('multiple tool parts in message are sanitized', () => {

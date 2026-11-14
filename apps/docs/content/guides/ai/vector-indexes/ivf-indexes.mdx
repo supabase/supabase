@@ -62,7 +62,7 @@ For example, to create an index with 100 lists on a column that uses the cosine 
 create index on items using ivfflat (column_name vector_cosine_ops) with (lists = 100);
 ```
 
-For more info on the different operators, see [Distance operations](#distance-operators).
+For more info on the different operators, see [Distance operators](/docs/guides/ai/vector-indexes#distance-operators).
 
 For every query, you can set the number of probes (1 by default). The number of probes corresponds to the number of nearby cells to probe for a match. Increase this for better recall at the expense of speed.
 

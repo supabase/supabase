@@ -54,8 +54,10 @@ export async function GET(request: Request) {
 
   let results: KbSearchResult[] = data.map((row) => ({
     title: row.page_title,
-    href: `https://supabase.com/${row.slug.toLowerCase()}`,
+    // slugs keep the case of the content file, same as the pages and their markdown exports
+    href: `https://supabase.com/${row.slug}`,
     heading: row.heading,
+    headingPath: row.heading_path,
     excerpt: row.excerpt,
     score: row.score,
   }))

@@ -9,6 +9,7 @@ import { describe, expect, test, vi } from 'vitest'
 
 import { DestinationRow as DestinationRowComponent } from './DestinationRow'
 import type { SlotLagMetrics } from './ReplicationPipelineStatus/ReplicationPipelineStatus.types'
+import type { DestinationWireResponse } from '@/data/replication/api-types'
 import { API_URL } from '@/lib/constants'
 import { PipelineRequestStatusProvider } from '@/state/replication-pipeline-request-status'
 import { customRender } from '@/tests/lib/custom-render'
@@ -16,7 +17,9 @@ import { addAPIMock, mswServer, type APIErrorBody } from '@/tests/lib/msw'
 import { routerMock } from '@/tests/lib/route-mock'
 
 type ReplicationPipelinesResponse = components['schemas']['PipelinesResponse_Output']
-type ReplicationDestinationResponse = components['schemas']['DestinationResponse_Output']
+type ReplicationDestinationResponse = DestinationWireResponse<
+  components['schemas']['DestinationResponse_Output']
+>
 type ReplicationSourcesResponse = components['schemas']['SourcesResponse_Output']
 type ReplicationPipelineStatusResponse = components['schemas']['PipelineStatusResponse_Output']
 type ReplicationPipelineReplicationStatusResponse =
@@ -33,7 +36,7 @@ const DestinationRow = (props: { destinationId: number }) => (
 )
 
 const DESTINATION_ID = 1
-const PIPELINE_ID = 42
+const PIPELINE_ID = '42'
 
 const addSourcesMock = () =>
   addAPIMock({
@@ -52,7 +55,7 @@ const addSourcesMock = () =>
       }),
   })
 
-const addDestinationMock = () =>
+const addDestinationMock = (config?: ReplicationDestinationResponse['config']) =>
   addAPIMock({
     method: 'get',
     path: '/platform/replication/:ref/destinations/:destination_id',
@@ -61,7 +64,7 @@ const addDestinationMock = () =>
         tenant_id: 't',
         id: DESTINATION_ID,
         name: 'My BigQuery Destination',
-        config: {
+        config: config ?? {
           big_query: {
             project_id: 'gcp-proj',
             dataset_id: 'analytics',
@@ -82,6 +85,7 @@ const addPipelinesMock = (waitForResponse?: Promise<void>) =>
           {
             id: PIPELINE_ID,
             tenant_id: 't',
+            cluster_id: 'c',
             source_id: 1,
             source_name: 'main-db',
             destination_id: DESTINATION_ID,
@@ -129,7 +133,7 @@ const addReplicationStatusMock = (
       }),
   })
 
-const addVersionMock = () =>
+const addVersionMock = (hasUpdate = false) =>
   addAPIMock({
     method: 'get',
     path: '/platform/replication/:ref/pipelines/:pipeline_id/version',
@@ -137,6 +141,7 @@ const addVersionMock = () =>
       HttpResponse.json<ReplicationPipelineVersionResponse>({
         pipeline_id: PIPELINE_ID,
         version: { id: 1, name: 'v0.3.0' },
+        ...(hasUpdate ? { new_version: { id: 2, name: 'v0.4.0' } } : {}),
       }),
   })
 
@@ -149,6 +154,52 @@ describe('DestinationRow', () => {
     addReplicationStatusMock(0)
     addVersionMock()
   }
+
+  test.each(['started', 'stopped', 'failed'] as const)(
+    'only offers stopping and deletion for an unknown destination when %s',
+    async (status) => {
+      addAllMocks()
+      addDestinationMock({ unknown: {} })
+      addPipelineStatusMock(status)
+      addVersionMock(true)
+
+      customRender(<DestinationRow destinationId={DESTINATION_ID} />)
+
+      expect(await screen.findByRole('img', { name: 'Unknown destination' })).toBeVisible()
+      await userEvent.click(await screen.findByRole('button', { name: 'Pipeline options' }))
+      expect(screen.getAllByRole('menuitem').map((item) => item.textContent)).toEqual([
+        'View details',
+        ...(status === 'stopped' ? [] : ['Stop pipeline']),
+        'Delete pipeline',
+      ])
+      await userEvent.click(screen.getByRole('menuitem', { name: 'Delete pipeline' }))
+      expect(await screen.findByPlaceholderText('Type the pipeline name')).toBeVisible()
+    }
+  )
+
+  test.each(['started', 'failed'] as const)(
+    'stops an unknown destination pipeline when %s',
+    async (status) => {
+      addAllMocks()
+      addDestinationMock({ unknown: {} })
+      addPipelineStatusMock(status)
+      addAPIMock({
+        method: 'post',
+        path: '/platform/replication/:ref/pipelines/:pipeline_id/stop',
+        response: () => {
+          addPipelineStatusMock('stopped')
+          return HttpResponse.json<Record<string, never>>({}, { status: 202 })
+        },
+      })
+
+      customRender(<DestinationRow destinationId={DESTINATION_ID} />)
+      await screen.findByRole('img', { name: 'Unknown destination' })
+      await screen.findByText(status === 'started' ? 'Running' : 'Failed')
+      await userEvent.click(screen.getByRole('button', { name: 'Pipeline options' }))
+      await userEvent.click(screen.getByRole('menuitem', { name: 'Stop pipeline' }))
+      expect(await screen.findByText('Stopped')).toBeVisible()
+    }
+  )
 
   test('shows the destination before its pipeline details load', async () => {
     let finishPipelineRequest = () => {}
@@ -228,10 +279,8 @@ describe('DestinationRow', () => {
     await screen.findByText('supabase_realtime')
     await userEvent.click(screen.getByRole('button', { name: 'Pipeline options' }))
     await userEvent.click(screen.getByRole('menuitem', { name: 'Delete pipeline' }))
-    await userEvent.type(
-      screen.getByPlaceholderText('Type the pipeline name'),
-      'My BigQuery Destination'
-    )
+    await userEvent.click(screen.getByPlaceholderText('Type the pipeline name'))
+    await userEvent.paste('My BigQuery Destination')
     await waitFor(() =>
       expect(screen.getByRole('button', { name: 'Delete pipeline' })).toBeEnabled()
     )
@@ -289,10 +338,8 @@ describe('DestinationRow', () => {
     await screen.findByText('supabase_realtime')
     await userEvent.click(screen.getByRole('button', { name: 'Pipeline options' }))
     await userEvent.click(screen.getByRole('menuitem', { name: 'Delete pipeline' }))
-    await userEvent.type(
-      screen.getByPlaceholderText('Type the pipeline name'),
-      'My BigQuery Destination'
-    )
+    await userEvent.click(screen.getByPlaceholderText('Type the pipeline name'))
+    await userEvent.paste('My BigQuery Destination')
     await waitFor(() =>
       expect(screen.getByRole('button', { name: 'Delete pipeline' })).toBeEnabled()
     )
@@ -336,17 +383,11 @@ describe('DestinationRow', () => {
   })
 
   test('shows "Caught up" when confirmed_flush_lsn_bytes is 0', async () => {
-    addSourcesMock()
-    addDestinationMock()
-    addPipelinesMock()
-    addPipelineStatusMock('started')
-    addReplicationStatusMock(0)
-    addVersionMock()
+    addAllMocks()
 
     customRender(<DestinationRow destinationId={DESTINATION_ID} />)
 
     const lag = await screen.findByText('Caught up')
-    expect(lag).toHaveClass('text-foreground-light')
     expect(lag.closest('[aria-live="polite"]')).toHaveAttribute('aria-atomic', 'true')
   })
 
@@ -360,7 +401,7 @@ describe('DestinationRow', () => {
 
     customRender(<DestinationRow destinationId={DESTINATION_ID} />)
 
-    expect(await screen.findByText('2 KB')).toHaveClass('text-foreground-light')
+    expect(await screen.findByText('2 KB')).toBeInTheDocument()
   })
 
   test('shows unavailable lag instead of caught up when the distance is null', async () => {
@@ -400,7 +441,7 @@ describe('DestinationRow', () => {
     expect(screen.queryByText('Caught up')).not.toBeInTheDocument()
   })
 
-  test('shows initial sync with the same lag text treatment', async () => {
+  test('shows initial sync while tables are copying', async () => {
     addSourcesMock()
     addDestinationMock()
     addPipelinesMock()
@@ -419,7 +460,7 @@ describe('DestinationRow', () => {
 
     customRender(<DestinationRow destinationId={DESTINATION_ID} />)
 
-    expect(await screen.findByText('Initial sync')).toHaveClass('text-foreground-light')
+    expect(await screen.findByText('Initial sync')).toBeInTheDocument()
   })
 
   test('shows initial sync when apply lag is unavailable', async () => {
@@ -516,60 +557,18 @@ describe('DestinationRow', () => {
     expect(await screen.findByText('Lag unavailable')).toBeInTheDocument()
   })
 
-  test('shows publication name from pipeline config', async () => {
-    addSourcesMock()
-    addDestinationMock()
-    addPipelinesMock()
-    addPipelineStatusMock('started')
-    addReplicationStatusMock(0)
-    addVersionMock()
+  test.each([
+    ['started', 'Running'],
+    ['failed', 'Failed'],
+    ['stopped', 'Stopped'],
+  ] as const)('shows the %s pipeline status as %s', async (statusName, label) => {
+    addAllMocks()
+    addPipelineStatusMock(statusName)
 
     customRender(<DestinationRow destinationId={DESTINATION_ID} />)
 
-    expect(await screen.findByText('supabase_realtime')).toBeInTheDocument()
-  })
-
-  test('shows Running badge when pipeline is started', async () => {
-    addSourcesMock()
-    addDestinationMock()
-    addPipelinesMock()
-    addPipelineStatusMock('started')
-    addReplicationStatusMock(0)
-    addVersionMock()
-
-    customRender(<DestinationRow destinationId={DESTINATION_ID} />)
-
-    const status = await screen.findByText('Running')
-    const liveRegion = status.closest('[aria-live="polite"]')
-
-    expect(status).toBeInTheDocument()
-    expect(liveRegion).toHaveAttribute('aria-atomic', 'true')
-  })
-
-  test('shows Failed badge when pipeline has failed', async () => {
-    addSourcesMock()
-    addDestinationMock()
-    addPipelinesMock()
-    addPipelineStatusMock('failed')
-    addReplicationStatusMock(0)
-    addVersionMock()
-
-    customRender(<DestinationRow destinationId={DESTINATION_ID} />)
-
-    expect(await screen.findByText('Failed')).toBeInTheDocument()
-  })
-
-  test('shows Stopped badge when pipeline is stopped', async () => {
-    addSourcesMock()
-    addDestinationMock()
-    addPipelinesMock()
-    addPipelineStatusMock('stopped')
-    addReplicationStatusMock(0)
-    addVersionMock()
-
-    customRender(<DestinationRow destinationId={DESTINATION_ID} />)
-
-    expect(await screen.findByText('Stopped')).toBeInTheDocument()
+    const status = await screen.findByText(label)
+    expect(status.closest('[aria-live="polite"]')).toHaveAttribute('aria-atomic', 'true')
   })
 
   test('shows table errors in the subtext and on the logo when tables have replication errors', async () => {

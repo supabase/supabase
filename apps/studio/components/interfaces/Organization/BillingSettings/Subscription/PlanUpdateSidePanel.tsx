@@ -5,6 +5,7 @@ import { useRouter } from 'next/router'
 import { useCallback, useEffect, useEffectEvent, useMemo, useRef, useState } from 'react'
 import { plans as subscriptionsPlans } from 'shared-data/plans'
 
+import { useOrgSettingsPanel } from '../useOrgSettingsPanel'
 import { CancellationFlow } from './CancellationFlow'
 import { PlanCards } from './PlanCards'
 import { PlanUpdateFullScreenShell } from './PlanUpdatePanelShell'
@@ -24,7 +25,6 @@ import { FGA_PERMISSIONS, useAsyncCheckPermissionsV2 } from '@/hooks/misc/useChe
 import { useSelectedOrganizationQuery } from '@/hooks/misc/useSelectedOrganization'
 import { MANAGED_BY } from '@/lib/constants/infrastructure'
 import { useTrack } from '@/lib/telemetry/track'
-import { useOrgSettingsPageStateSnapshot } from '@/state/organization-settings'
 import { Organization } from '@/types/base'
 
 const getPartnerManagedResourceCta = (selectedOrganization: Organization) => {
@@ -63,8 +63,7 @@ const PartnerManagedPlanNotice = ({
         title="Organization plans are managed through Stripe."
         details={
           <>
-            Run <code className="text-code-inline">{stripeProjectsUpgradeCommand}</code> in your
-            project directory.
+            Run <code>{stripeProjectsUpgradeCommand}</code> in your project directory.
           </>
         }
         cta={{
@@ -134,9 +133,10 @@ export const PlanUpdateSidePanel = () => {
     FGA_PERMISSIONS.ORGANIZATION.BILLING_WRITE
   )
 
-  const snap = useOrgSettingsPageStateSnapshot()
-  const isOpenedViaUrl = router.query.panel === 'subscriptionPlan'
-  const visible = snap.panelKey === 'subscriptionPlan' || isOpenedViaUrl
+  const { panel, setPanel } = useOrgSettingsPanel()
+  const visible = panel === 'subscriptionPlan'
+  // Panel was already open when the page loaded (deep link), so skip the entry animation delay
+  const [isOpenedViaUrl] = useState(visible)
 
   const contentDelay = isOpenedViaUrl ? 0.4 : 0.15
 
@@ -151,11 +151,7 @@ export const PlanUpdateSidePanel = () => {
   const hasOrioleProjects = !!data?.has_oriole_project
 
   const onClose = () => {
-    const { panel, ...queryWithoutPanel } = router.query
-    router.push({ pathname: router.pathname, query: queryWithoutPanel }, undefined, {
-      shallow: true,
-    })
-    snap.setPanelKey(undefined)
+    setPanel(null)
   }
 
   const { data: subscription, isSuccess: isSuccessSubscription } = useOrgSubscriptionQuery({
@@ -231,6 +227,15 @@ export const PlanUpdateSidePanel = () => {
     />
   )
 
+  // Fail closed until subscription succeeds: unresolved plan ids look eligible.
+  const showAwsMarketplacePurchase =
+    isSuccessSubscription &&
+    canUpdateSubscription &&
+    selectedOrganization?.managed_by === MANAGED_BY.SUPABASE &&
+    !isPartnerBilledOrganization &&
+    subscription.billing_via_partner === false &&
+    !['enterprise', 'platform'].includes(subscription.plan.id)
+
   const planCards = (
     <PlanCards
       availablePlans={availablePlans}
@@ -242,6 +247,7 @@ export const PlanUpdateSidePanel = () => {
       hasOrioleProjects={hasOrioleProjects}
       selectedOrganization={selectedOrganization}
       entryDelay={contentDelay}
+      showAwsMarketplacePurchase={showAwsMarketplacePurchase}
       onSelectTier={setSelectedTier}
     />
   )

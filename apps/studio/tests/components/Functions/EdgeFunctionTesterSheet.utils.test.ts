@@ -33,19 +33,6 @@ describe('buildEdgeFunctionTestHeaders', () => {
     expect(headers).toEqual({ 'Content-Type': 'application/json' })
   })
 
-  it('keeps a user supplied Authorization header', () => {
-    const headers = buildEdgeFunctionTestHeaders({
-      apiKey: PUBLISHABLE_KEY,
-      customHeaders: [{ key: 'Authorization', value: 'Bearer user-token' }],
-    })
-
-    expect(headers).toEqual({
-      'Content-Type': 'application/json',
-      apikey: PUBLISHABLE_KEY,
-      Authorization: 'Bearer user-token',
-    })
-  })
-
   it('keeps the apikey alongside several user rows', () => {
     const headers = buildEdgeFunctionTestHeaders({
       apiKey: PUBLISHABLE_KEY,

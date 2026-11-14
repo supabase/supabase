@@ -1,9 +1,9 @@
 import { useQuery } from '@tanstack/react-query'
-import type { components } from 'api-types'
 
 import { replicationKeys } from './keys'
 import { get, handleError } from '@/data/fetchers'
-import type { ResponseError, UseCustomQueryOptions } from '@/types'
+import type { StudioError } from '@/lib/errors/studio-errors'
+import type { UseCustomQueryOptions } from '@/types'
 
 type ReplicationDestinationByIdParams = { projectRef?: string; destinationId?: number | null }
 
@@ -24,16 +24,18 @@ async function fetchReplicationDestinationById(
   return data
 }
 
-export type ReplicationDestinationByIdData = components['schemas']['DestinationResponse_Output']
+export type ReplicationDestinationByIdData = Awaited<
+  ReturnType<typeof fetchReplicationDestinationById>
+>
 
 export const useReplicationDestinationByIdQuery = <TData = ReplicationDestinationByIdData>(
   { projectRef, destinationId }: ReplicationDestinationByIdParams,
   {
     enabled = true,
     ...options
-  }: UseCustomQueryOptions<ReplicationDestinationByIdData, ResponseError, TData> = {}
+  }: UseCustomQueryOptions<ReplicationDestinationByIdData, StudioError, TData> = {}
 ) =>
-  useQuery<ReplicationDestinationByIdData, ResponseError, TData>({
+  useQuery<ReplicationDestinationByIdData, StudioError, TData>({
     queryKey: replicationKeys.destinationById(projectRef, destinationId),
     queryFn: ({ signal }) => fetchReplicationDestinationById({ projectRef, destinationId }, signal),
     enabled:

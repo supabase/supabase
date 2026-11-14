@@ -281,7 +281,14 @@ interface TabPanelProps {
 
 export const TabPanel = ({ children, id, className }: TabPanelProps) => {
   return (
-    <TabsContent value={id} className={cn('mt-0 focus:outline-hidden', className)} tabIndex={-1}>
+    // Every panel stays mounted so its content is in the server-rendered HTML for crawlers.
+    // Radix doesn't set `hidden` on force-mounted panels, so inactive ones are hidden with CSS.
+    <TabsContent
+      value={id}
+      forceMount
+      className={cn('mt-0 focus:outline-hidden data-[state=inactive]:hidden', className)}
+      tabIndex={-1}
+    >
       {children}
     </TabsContent>
   )

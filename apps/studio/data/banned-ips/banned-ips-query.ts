@@ -2,10 +2,11 @@ import { skipToken, useQuery } from '@tanstack/react-query'
 import { IS_PLATFORM } from 'common'
 
 import { BannedIPKeys } from './keys'
-import { handleError, post } from '@/data/fetchers'
+import { handleError, post, unguarded } from '@/data/fetchers'
 import { useProjectDetailQuery } from '@/data/projects/project-detail-query'
 import { PROVIDERS } from '@/lib/constants'
-import type { ResponseError, UseCustomQueryOptions } from '@/types'
+import type { StudioError } from '@/lib/errors/studio-errors'
+import type { UseCustomQueryOptions } from '@/types'
 
 type BannedIPVariables = { projectRef?: string }
 
@@ -15,6 +16,7 @@ export async function getBannedIPs({ projectRef }: BannedIPVariables, signal: Ab
   const { data, error } = await post(`/v1/projects/{ref}/network-bans/retrieve`, {
     params: { path: { ref: projectRef } },
     signal,
+    grant: unguarded.migrating,
   })
 
   if (error) handleError(error)
@@ -22,7 +24,7 @@ export async function getBannedIPs({ projectRef }: BannedIPVariables, signal: Ab
 }
 
 export type IPData = Awaited<ReturnType<typeof getBannedIPs>>
-export type IPError = ResponseError
+export type IPError = StudioError
 
 export const useBannedIPsQuery = <TData = IPData>(
   { projectRef }: BannedIPVariables,
