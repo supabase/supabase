@@ -111,12 +111,10 @@ export const getDefaultOrderByColumns = (
   table: Pick<PGTable, 'primary_keys' | 'columns'>,
   { excludedColumns = [] }: { excludedColumns?: string[] } = {}
 ) => {
-  const primaryKeyColumns = table.primary_keys?.map((pk) => pk.name)
-  if (
-    primaryKeyColumns &&
-    primaryKeyColumns.length > 0 &&
-    !primaryKeyColumns.every((col) => excludedColumns.includes(col))
-  ) {
+  const primaryKeyColumns = table.primary_keys
+    ?.map((pk) => pk.name)
+    .filter((col) => !excludedColumns.includes(col))
+  if (primaryKeyColumns && primaryKeyColumns.length > 0) {
     return primaryKeyColumns
   }
   if (table.columns && table.columns.length > 0) {
