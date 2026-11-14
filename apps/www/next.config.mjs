@@ -39,7 +39,6 @@ const withBundleAnalyzer = bundleAnalyzer({
  */
 const nextConfig = {
   basePath: '',
-  assetPrefix: getAssetPrefix(),
   pageExtensions: ['js', 'jsx', 'ts', 'tsx', 'md', 'mdx'],
   trailingSlash: false,
   transpilePackages: [
@@ -136,7 +135,8 @@ const nextConfig = {
         headers: [
           {
             key: 'Link',
-            value: '</.well-known/api-catalog>; rel="api-catalog"',
+            value:
+              '</.well-known/api-catalog>; rel="api-catalog", </.well-known/ai-catalog.json>; rel="ai-catalog"',
           },
         ],
       },
@@ -157,6 +157,13 @@ const nextConfig = {
         ],
       },
       {
+        source: '/schemas/:path*',
+        headers: [
+          { key: 'access-control-allow-origin', value: '*' },
+          { key: 'cache-control', value: 'public, max-age=3600' },
+        ],
+      },
+      {
         source: '/favicon/:slug*',
         headers: [{ key: 'cache-control', value: 'public, max-age=86400' }],
       },
@@ -173,7 +180,7 @@ const nextConfig = {
         ],
       },
       {
-        source: '/(docs|blog|kb)/:path*',
+        source: '/(docs|blog|kb|library)/:path*',
         headers: [
           {
             key: 'X-Robots-Tag',
@@ -182,7 +189,8 @@ const nextConfig = {
         ],
       },
       {
-        source: '/dashboard/:path*',
+        // Public auth pages are indexable; every other dashboard path stays noindex
+        source: '/dashboard/:path((?!sign-in$|sign-up$).*)',
         headers: [
           {
             key: 'X-Robots-Tag',
@@ -218,18 +226,7 @@ const nextConfig = {
     }
   },
   async redirects() {
-    // For /docs/guides/ redirects, auto-generate .md variants so renamed/deleted pages
-    // redirect correctly when fetched as markdown
-    const docsMdRedirects = redirects
-      .filter(
-        (r) =>
-          r.source.startsWith('/docs/guides/') &&
-          typeof r.destination === 'string' &&
-          r.destination.startsWith('/')
-      )
-      .map((r) => ({ ...r, source: `${r.source}.md`, destination: `${r.destination}.md` }))
-
-    return [...docsMdRedirects, ...redirects]
+    return redirects
   },
   typescript: {
     // On previews, typechecking is run via GitHub Action only for efficiency
@@ -274,17 +271,3 @@ export default withSentryConfig(configExport, {
   // side errors will fail.
   // tunnelRoute: "/monitoring",
 })
-
-function getAssetPrefix() {
-  // If not force enabled, but not production env, disable CDN
-  if (process.env.FORCE_ASSET_CDN !== '1' && process.env.VERCEL_ENV !== 'production') {
-    return undefined
-  }
-
-  // Force disable CDN
-  if (process.env.FORCE_ASSET_CDN === '-1') {
-    return undefined
-  }
-
-  return `https://frontend-assets.supabase.com/${process.env.SITE_NAME}/${process.env.VERCEL_GIT_COMMIT_SHA.substring(0, 12)}`
-}

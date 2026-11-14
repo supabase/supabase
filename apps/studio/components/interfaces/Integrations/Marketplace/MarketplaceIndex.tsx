@@ -1,7 +1,7 @@
+import { useParams } from 'common'
 import { parseAsString, parseAsStringEnum, useQueryState } from 'nuqs'
 import { useMemo, useRef } from 'react'
-import { Button, Card, ShadowScrollArea, Table, TableBody, TableHeader } from 'ui'
-import { EmptyStatePresentational } from 'ui-patterns/EmptyStatePresentational'
+import { Card, ShadowScrollArea, Table, TableBody, TableHeader } from 'ui'
 import { PageContainer } from 'ui-patterns/PageContainer'
 import {
   PageHeader,
@@ -32,6 +32,7 @@ import { useInstalledIntegrations } from '@/components/interfaces/Integrations/L
 import { useIntegrationFilteringAndSort } from '@/components/interfaces/Integrations/Landing/useIntegrationFilteringAndSort'
 import { AlertError } from '@/components/ui/AlertError'
 import { DocsButton } from '@/components/ui/DocsButton'
+import { NoSearchResults } from '@/components/ui/NoSearchResults'
 import { useMarketplaceCategoriesQuery } from '@/data/marketplace/integration-categories-query'
 import { useLocalStorageQuery } from '@/hooks/misc/useLocalStorage'
 import { DOCS_URL } from '@/lib/constants'
@@ -41,6 +42,7 @@ import { useShortcut } from '@/state/shortcuts/useShortcut'
 const MARKETPLACE_VIEW_MODE_STORAGE_KEY = 'supabase.marketplace.viewMode'
 
 export const MarketplaceIndex = () => {
+  const { ref } = useParams()
   const [search, setSearch] = useQueryState(
     'search',
     parseAsString.withDefault('').withOptions({ clearOnDefault: true })
@@ -72,19 +74,23 @@ export const MarketplaceIndex = () => {
 
   const {
     data: availableIntegrations,
-    error,
+    error: availableIntegrationsError,
     isPending: isLoadingAvailable,
-    isError,
+    isError: isErrorAvailableIntegrations,
     isSuccess: isSuccessAvailable,
   } = useAvailableIntegrations()
 
   const {
     installedIntegrations,
+    error: installedError,
     isLoading: isLoadingInstalled,
+    isError: isErrorInstalled,
     isSuccess: isSuccessInstalled,
   } = useInstalledIntegrations()
 
   const installedIds = installedIntegrations.map((i) => i.id)
+  const error = availableIntegrationsError || installedError
+  const isError = isErrorAvailableIntegrations || isErrorInstalled
   const isLoading = isLoadingAvailable || isLoadingInstalled
   const isSuccess = isSuccessAvailable && isSuccessInstalled
 
@@ -244,7 +250,7 @@ export const MarketplaceIndex = () => {
         )}
 
         {isError && (
-          <AlertError subject="Failed to retrieve available integrations" error={error} />
+          <AlertError subject="Failed to retrieve integrations" projectRef={ref} error={error} />
         )}
 
         {isSuccess && (
@@ -280,9 +286,7 @@ export const MarketplaceIndex = () => {
             />
 
             {filtered.length === 0 && (
-              <EmptyStatePresentational title="No results found">
-                <Button onClick={clearAll}>Clear filters</Button>
-              </EmptyStatePresentational>
+              <NoSearchResults searchString={search} onResetFilter={clearAll} />
             )}
 
             {filtered.length > 0 &&

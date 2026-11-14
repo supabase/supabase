@@ -3,7 +3,8 @@ import { toast } from 'sonner'
 
 import { contentKeys } from './keys'
 import { del, handleError } from '@/data/fetchers'
-import type { ResponseError, UseCustomMutationOptions } from '@/types'
+import type { StudioError } from '@/lib/errors/studio-errors'
+import type { UseCustomMutationOptions } from '@/types'
 
 export type DeleteSQLSnippetFoldersVariables = {
   projectRef: string
@@ -34,7 +35,7 @@ export const useSQLSnippetFoldersDeleteMutation = ({
 }: Omit<
   UseCustomMutationOptions<
     DeleteSQLSnippetFoldersData,
-    ResponseError,
+    StudioError,
     DeleteSQLSnippetFoldersVariables
   >,
   'mutationFn'
@@ -43,7 +44,7 @@ export const useSQLSnippetFoldersDeleteMutation = ({
 } = {}) => {
   const queryClient = useQueryClient()
 
-  return useMutation<DeleteSQLSnippetFoldersData, ResponseError, DeleteSQLSnippetFoldersVariables>({
+  return useMutation<DeleteSQLSnippetFoldersData, StudioError, DeleteSQLSnippetFoldersVariables>({
     mutationFn: (args) => deleteSQLSnippetFolders(args),
     async onSuccess(data, variables, context) {
       const { projectRef } = variables

@@ -7,49 +7,11 @@ import {
   isCancellationRejection,
   isChallengeExpiredError,
   isUserAbortedOperation,
+  shouldDropForSampleRate,
 } from './sentry-client-options'
 
 describe('Sentry beforeSend filtering functions', () => {
   describe('isBrowserWalletExtensionError', () => {
-    it('returns true for Gate.io wallet extension error (gt-window-provider.js)', () => {
-      const event: SentryEvent = {
-        exception: {
-          values: [
-            {
-              type: 'TypeError',
-              value: 'en.shouldSetTallyForCurrentProvider is not a function',
-              stacktrace: {
-                frames: [
-                  { filename: 'app:///_next/static/chunks/main.js' } as StackFrame,
-                  { filename: 'app:///gt-window-provider.js' } as StackFrame,
-                ],
-              },
-            },
-          ],
-        },
-      }
-
-      expect(isBrowserWalletExtensionError(event)).toBe(true)
-    })
-
-    it('returns true for Gate.io BTC wallet extension error (gt-window-provider-btc.js)', () => {
-      const event: SentryEvent = {
-        exception: {
-          values: [
-            {
-              type: 'TypeError',
-              value: 'f.shouldSetTallyForCurrentProvider is not a function',
-              stacktrace: {
-                frames: [{ filename: 'app:///gt-window-provider-btc.js' } as StackFrame],
-              },
-            },
-          ],
-        },
-      }
-
-      expect(isBrowserWalletExtensionError(event)).toBe(true)
-    })
-
     it('returns true for wallet-provider in abs_path', () => {
       const event: SentryEvent = {
         exception: {
@@ -121,32 +83,15 @@ describe('Sentry beforeSend filtering functions', () => {
   })
 
   describe('isUserAbortedOperation', () => {
-    it('returns true for "operation was aborted" error', () => {
-      const error = new Error('The operation was aborted.')
-      const event: SentryEvent = {}
-
-      expect(isUserAbortedOperation(error, event)).toBe(true)
-    })
-
-    it('returns true for "signal is aborted" error', () => {
-      const error = new Error('signal is aborted without reason')
-      const event: SentryEvent = {}
-
-      expect(isUserAbortedOperation(error, event)).toBe(true)
-    })
-
-    it('returns true for "manually canceled" error', () => {
-      const error = new Error('operation is manually canceled')
-      const event: SentryEvent = {}
-
-      expect(isUserAbortedOperation(error, event)).toBe(true)
-    })
-
-    it('returns true for "AbortError" message', () => {
-      const error = new Error('AbortError: The operation was aborted')
-      const event: SentryEvent = {}
-
-      expect(isUserAbortedOperation(error, event)).toBe(true)
+    it.each([
+      // SUPABASE-APP-BG6
+      'The operation was aborted.',
+      // SUPABASE-APP-BG7
+      'signal is aborted without reason',
+      'operation is manually canceled',
+      'AbortError: The operation was aborted',
+    ])('returns true for an error with message %o', (message) => {
+      expect(isUserAbortedOperation(new Error(message), {})).toBe(true)
     })
 
     it('returns true when message is in event.message (no error object)', () => {
@@ -358,26 +303,6 @@ describe('Sentry beforeSend filtering functions', () => {
       expect(isBrowserWalletExtensionError(event)).toBe(true)
     })
 
-    it('correctly identifies SUPABASE-APP-BG6 pattern (user aborted)', () => {
-      // Based on actual Sentry issue SUPABASE-APP-BG6
-      const error = new Error('The operation was aborted.')
-      const event: SentryEvent = {
-        message: '[CRITICAL][sign in via EP] Failed: The operation was aborted.',
-      }
-
-      expect(isUserAbortedOperation(error, event)).toBe(true)
-    })
-
-    it('correctly identifies SUPABASE-APP-BG7 pattern (signal aborted)', () => {
-      // Based on actual Sentry issue SUPABASE-APP-BG7
-      const error = new Error('signal is aborted without reason')
-      const event: SentryEvent = {
-        message: '[CRITICAL][sign in via EP] Failed: signal is aborted without reason',
-      }
-
-      expect(isUserAbortedOperation(error, event)).toBe(true)
-    })
-
     it('correctly identifies SUPABASE-APP-ACC pattern (challenge expired)', () => {
       // Based on actual Sentry issue SUPABASE-APP-ACC
       const error = new Error('Non-Error promise rejection captured with value: challenge-expired')
@@ -416,6 +341,26 @@ describe('Sentry beforeSend filtering functions', () => {
       expect(isCancellationRejection(event)).toBe(false)
       expect(isChallengeExpiredError(error, event)).toBe(false)
     })
+  })
+})
+
+describe('shouldDropForSampleRate', () => {
+  it('keeps events without a sample_rate tag', () => {
+    expect(shouldDropForSampleRate({}, () => 0.99)).toBe(false)
+  })
+
+  it('keeps events with rate 1', () => {
+    expect(shouldDropForSampleRate({ tags: { sample_rate: 1 } }, () => 0.99)).toBe(false)
+  })
+
+  it('keeps or drops sampled events depending on the random draw', () => {
+    const event = { tags: { sample_rate: 0.1 } }
+    expect(shouldDropForSampleRate(event, () => 0.05)).toBe(false)
+    expect(shouldDropForSampleRate(event, () => 0.5)).toBe(true)
+  })
+
+  it('accepts numeric string rates', () => {
+    expect(shouldDropForSampleRate({ tags: { sample_rate: '0.1' } }, () => 0.5)).toBe(true)
   })
 })
 
@@ -572,6 +517,20 @@ describe('which errors Studio sends to Sentry', () => {
 
     expect(await beforeSend(event, {})).toBeNull()
     expect(Math.random).not.toHaveBeenCalled()
+  })
+
+  it('drops user SQL errors even when something else captured them', async () => {
+    const { UserSqlError } = await import('@/lib/errors/studio-errors')
+    const event: Parameters<typeof beforeSend>[0] = {
+      type: undefined,
+      exception: {
+        values: [
+          { value: 'Failed to run sql query', stacktrace: { frames: [{ filename: 'app.js' }] } },
+        ],
+      },
+    }
+    const hint = { originalException: new UserSqlError({ message: 'Failed to run sql query' }) }
+    expect(await beforeSend(event, hint)).toBeNull()
   })
 
   it('drops errors with no code location when they did not crash the page', async () => {

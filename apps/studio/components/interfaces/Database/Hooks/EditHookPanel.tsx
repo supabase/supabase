@@ -1,24 +1,31 @@
 import { zodResolver } from '@hookform/resolvers/zod'
 import { keyword } from '@supabase/pg-meta'
 import type { PGTrigger, PGTriggerCreate } from '@supabase/pg-meta'
-import { useQueryClient } from '@tanstack/react-query'
+import { useQuery, useQueryClient } from '@tanstack/react-query'
 import { useParams } from 'common'
 import { parseAsBoolean, parseAsString, useQueryState } from 'nuqs'
 import { useEffect, useRef, useState } from 'react'
 import { SubmitHandler, useForm } from 'react-hook-form'
 import { toast } from 'sonner'
 import { Button, Form, SidePanel } from 'ui'
+import { Admonition } from 'ui-patterns/Admonition'
 
 import { FormSchema, WebhookFormValues } from './EditHookPanel.constants'
 import { FormContents } from './FormContents'
+import { RequiredExtensionsSection } from '@/components/interfaces/Integrations/Integration/RequiredExtensionsSection'
+import { useInstallRequiredExtensions } from '@/components/interfaces/Integrations/Integration/useInstallRequiredExtensions'
 import { DiscardChangesConfirmationDialog } from '@/components/ui-patterns/Dialogs/DiscardChangesConfirmationDialog'
+import { ButtonTooltip } from '@/components/ui/ButtonTooltip'
 import { useDatabaseTriggerCreateMutation } from '@/data/database-triggers/database-trigger-create-mutation'
 import { useDatabaseTriggerUpdateMutation } from '@/data/database-triggers/database-trigger-update-transaction-mutation'
-import { useDatabaseHooksQuery } from '@/data/database-triggers/database-triggers-query'
+import { databaseHooksQueryOptions } from '@/data/database-triggers/database-triggers-query'
+import { useHooksEnableMutation } from '@/data/database/hooks-enable-mutation'
+import { useSchemasQuery } from '@/data/database/schemas-query'
 import { tableEditorQueryOptions } from '@/data/table-editor/table-editor-query'
 import { useSelectedProjectQuery } from '@/hooks/misc/useSelectedProject'
 import { useConfirmOnClose } from '@/hooks/ui/useConfirmOnClose'
 import { isEdgeFunctionUrl } from '@/lib/api/edgeFunctions'
+import { getWriteGrantToastMessage, getWriteGrantTooltip, useGrant } from '@/lib/grants'
 import { uuidv4 } from '@/lib/helpers'
 
 export type HTTPArgument = { id: string; name: string; value: string }
@@ -68,12 +75,44 @@ const parseParameters = (selectedHook?: PGTrigger): HTTPArgument[] => {
 export const EditHookPanel = () => {
   const { ref } = useParams()
   const { data: project } = useSelectedProjectQuery()
+
   const [isLoadingTable, setIsLoadingTable] = useState(false)
 
-  const { data: hooks = [], isSuccess } = useDatabaseHooksQuery({
+  const {
+    requiredExtensionsToInstall,
+    needsExtensions,
+    isExtensionDataLoading: isExtensionsLoading,
+    installRequiredExtensions,
+  } = useInstallRequiredExtensions()
+
+  const { data: schemas, isSuccess: isSchemasLoaded } = useSchemasQuery({
     projectRef: project?.ref,
     connectionString: project?.connectionString,
   })
+  const { mutateAsync: enableHooks } = useHooksEnableMutation({ onError: () => {} })
+
+  const needsWebhooksEnabled =
+    isSchemasLoaded && !schemas.some((schema) => schema.name === 'supabase_functions')
+  const isExtensionDataLoading = isExtensionsLoading || !isSchemasLoaded
+
+  const readGrant = useGrant(
+    'POST /platform/pg-meta/{ref}/query',
+    { projectRef: project?.ref },
+    { variant: 'read' }
+  )
+  const writeGrant = useGrant(
+    'POST /platform/pg-meta/{ref}/query',
+    { projectRef: project?.ref },
+    { variant: 'write' }
+  )
+
+  const { data: hooks = [], isSuccess } = useQuery(
+    databaseHooksQueryOptions({
+      projectRef: project?.ref,
+      connectionString: project?.connectionString,
+      grant: readGrant.grant,
+    })
+  )
 
   const [showCreateHookForm, setShowCreateHookForm] = useQueryState(
     'new',
@@ -185,8 +224,45 @@ export const EditHookPanel = () => {
       return console.error('Project ref is required')
     }
 
+    if (!writeGrant.grant) {
+      toast.error(
+        getWriteGrantToastMessage(
+          writeGrant.status,
+          selectedHook === undefined ? 'create' : 'update',
+          'webhooks'
+        )
+      )
+      return
+    }
+
+    if (isExtensionDataLoading) return
+
     try {
       setIsLoadingTable(true)
+
+      if (needsExtensions || needsWebhooksEnabled) {
+        const toastId = toast.loading('Setting up database webhooks…')
+        try {
+          if (needsExtensions) {
+            const extensionNames = (requiredExtensionsToInstall ?? [])
+              .map((ext) => ext.name)
+              .join(', ')
+            toast.loading(`Installing extensions ${extensionNames}…`, { id: toastId })
+            await installRequiredExtensions()
+          }
+          if (needsWebhooksEnabled) {
+            toast.loading('Enabling database webhooks…', { id: toastId })
+            await enableHooks({ ref: project.ref })
+          }
+          toast.dismiss(toastId)
+        } catch (error) {
+          toast.error(`Failed to set up database webhooks: ${(error as Error).message}`, {
+            id: toastId,
+          })
+          return
+        }
+      }
+
       const selectedTable = await queryClient.fetchQuery(
         tableEditorQueryOptions({
           id: Number(values.table_id),
@@ -246,12 +322,14 @@ export const EditHookPanel = () => {
 
       if (selectedHook === undefined) {
         createDatabaseTrigger({
+          grant: writeGrant.grant,
           projectRef: project?.ref,
           connectionString: project?.connectionString,
           payload,
         })
       } else {
         updateDatabaseTrigger({
+          grant: writeGrant.grant,
           projectRef: project?.ref,
           connectionString: project?.connectionString,
           originalTrigger: selectedHook,
@@ -286,12 +364,12 @@ export const EditHookPanel = () => {
           selectedHook === undefined ? (
             'Create a new database webhook'
           ) : (
-            <>
+            <span>
               Update webhook <code className="text-sm">{selectedHook.name}</code>
-            </>
+            </span>
           )
         }
-        className="hooks-sidepanel mr-0 transform transition-all duration-300 ease-in-out"
+        className="mr-0 transform transition-all duration-300 ease-in-out"
         onConfirm={() => {}}
         onCancel={confirmOnClose}
         customFooter={
@@ -299,22 +377,44 @@ export const EditHookPanel = () => {
             <Button size="tiny" type="button" onClick={confirmOnClose} disabled={isSubmitting}>
               Cancel
             </Button>
-            <Button
+            <ButtonTooltip
               size="tiny"
               variant="primary"
               type="submit"
               form={FORM_ID}
-              disabled={isSubmitting}
+              disabled={isSubmitting || isExtensionDataLoading || !writeGrant.grant}
               loading={isSubmitting}
+              tooltip={{
+                content: {
+                  side: 'top',
+                  text: getWriteGrantTooltip(
+                    writeGrant.status,
+                    selectedHook === undefined ? 'create' : 'update',
+                    'webhooks'
+                  ),
+                },
+              }}
             >
               {selectedHook === undefined ? 'Create webhook' : 'Update webhook'}
-            </Button>
+            </ButtonTooltip>
           </div>
         }
       >
         <Form {...form}>
           <form id={FORM_ID} onSubmit={form.handleSubmit(onSubmit)}>
-            <FormContents form={form} selectedHook={selectedHook} />
+            <fieldset disabled={!writeGrant.grant} className="contents">
+              <div className="flex flex-col gap-y-4 border-b px-5 py-5">
+                {(needsExtensions || needsWebhooksEnabled) && (
+                  <Admonition
+                    type="warning"
+                    title="Database webhooks will be set up"
+                    description="Proceeding will also install the required extensions and enable database webhooks on your project."
+                  />
+                )}
+                <RequiredExtensionsSection hideSeparator />
+              </div>
+              <FormContents form={form} selectedHook={selectedHook} />
+            </fieldset>
           </form>
         </Form>
       </SidePanel>

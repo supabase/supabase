@@ -17,6 +17,11 @@ export const contract = {
   inputSchema,
   outputSchema: z.object({ status: z.string() }),
   minOptInLevel: null,
+  availability: {
+    environments: new Set(['platform']),
+    requires: new Set(['supportMode']),
+  },
   needsApproval: false,
+  promptGuidance: `- Only call \`resolve_support_conversation\` after the user explicitly confirms the issue is resolved; otherwise keep helping.`,
   toModelOutput: ({ status }) => ({ status }),
 } as const satisfies ToolContract

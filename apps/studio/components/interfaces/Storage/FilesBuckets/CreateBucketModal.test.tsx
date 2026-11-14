@@ -55,60 +55,51 @@ describe(`CreateBucketModal`, () => {
     })
   })
 
-  it(`renders a dialog with a form`, async () => {
+  it('submits the public flag, size limit and MIME types entered in the form', async () => {
+    const requests: unknown[] = []
+    addAPIMock({
+      method: 'post',
+      path: '/platform/storage/:ref/buckets',
+      response: async ({ request }) => {
+        requests.push(await request.json())
+        return Response.json({ name: 'test' })
+      },
+    })
+    const onOpenChange = vi.fn()
+
     customRender(
       <ProjectContextProvider projectRef="default">
-        <CreateBucketModal open={true} onOpenChange={() => {}} />
-      </ProjectContextProvider>,
-      {
-        nuqs: {
-          searchParams: {
-            new: 'true',
-          },
-        },
-      }
+        <CreateBucketModal open onOpenChange={onOpenChange} />
+      </ProjectContextProvider>
     )
 
-    await waitFor(() => {
-      expect(screen.getByRole(`dialog`)).toBeInTheDocument()
+    await userEvent.type(await screen.findByLabelText('Bucket name'), 'test')
+    await userEvent.click(screen.getByLabelText('Public bucket'))
+    await userEvent.click(screen.getByLabelText('Restrict file size'))
+    await userEvent.type(screen.getByLabelText('File size limit'), '25')
+
+    const sizeLimitUnitSelect = screen.getByLabelText('File size limit unit')
+    expect(sizeLimitUnitSelect).toHaveTextContent('MB')
+    await userEvent.click(sizeLimitUnitSelect)
+    await userEvent.click(screen.getByRole('option', { name: 'bytes' }))
+
+    await userEvent.click(screen.getByLabelText('Restrict MIME types'))
+    fireEvent.change(screen.getByLabelText('Allowed MIME types'), {
+      target: { value: 'image/jpeg, image/png' },
     })
 
-    const nameInput = screen.getByLabelText(`Bucket name`)
-    await userEvent.type(nameInput, `test`)
+    // jsdom doesn't associate the footer button with the form by attribute
+    fireEvent.submit(document.getElementById('create-storage-bucket-form')!)
 
-    const publicToggle = screen.getByLabelText(`Public bucket`)
-    expect(publicToggle).not.toBeChecked()
-    await userEvent.click(publicToggle)
-    expect(publicToggle).toBeChecked()
-
-    const sizeLimitToggle = screen.getByLabelText(`Restrict file size`)
-    expect(sizeLimitToggle).not.toBeChecked()
-    await userEvent.click(sizeLimitToggle)
-    expect(sizeLimitToggle).toBeChecked()
-
-    const sizeLimitInput = screen.getByLabelText(`File size limit`)
-    expect(sizeLimitInput).toHaveValue(null)
-    await userEvent.type(sizeLimitInput, `25`)
-
-    const sizeLimitUnitSelect = screen.getByLabelText(`File size limit unit`)
-    expect(sizeLimitUnitSelect).toHaveTextContent(`MB`)
-    await userEvent.click(sizeLimitUnitSelect)
-    const bytesOption = screen.getByRole(`option`, { name: `bytes` })
-    await userEvent.click(bytesOption)
-    expect(sizeLimitUnitSelect).toHaveTextContent(`bytes`)
-
-    const mimeTypeToggle = screen.getByLabelText(`Restrict MIME types`)
-    expect(mimeTypeToggle).not.toBeChecked()
-    await userEvent.click(mimeTypeToggle)
-    expect(mimeTypeToggle).toBeChecked()
-
-    const mimeTypeInput = screen.getByLabelText(`Allowed MIME types`)
-    expect(mimeTypeInput).toHaveValue(``)
-    await userEvent.type(mimeTypeInput, `image/jpeg, image/png`)
-
-    const submitButton = screen.getByRole(`button`, { name: `Create` })
-
-    fireEvent.click(submitButton)
+    await waitFor(() => expect(onOpenChange).toHaveBeenCalledWith(false))
+    expect(requests).toEqual([
+      expect.objectContaining({
+        id: 'test',
+        public: true,
+        file_size_limit: 25,
+        allowed_mime_types: ['image/jpeg', 'image/png'],
+      }),
+    ])
   })
 
   it('keeps the bucket it created when the retention policy is rejected', async () => {

@@ -1,0 +1,68 @@
+---
+title: 'Best authentication providers in 2026'
+description: 'Learn which authentication providers to consider in 2026, including Supabase Auth, Clerk, Auth0, Firebase Auth, and WorkOS.'
+topics: ['Rundowns']
+lastEdited: 2026-11-13
+---
+
+Authentication is the part of an app that decides who a user is before any data is read or written. An authentication provider handles sign-up, sign-in, sessions, and the security features around them, such as multi-factor authentication (MFA) and single sign-on (SSO), so you do not need to build them yourself.
+
+## Supabase Auth
+
+[Supabase Auth](/docs/guides/auth) supports email and password sign-in, [magic links](/docs/guides/auth/auth-email-passwordless), [phone sign-in](/docs/guides/auth/phone-login), [social sign-in](/docs/guides/auth/social-sign-in), [anonymous sign-ins](/docs/guides/auth/auth-anonymous), and [MFA](/docs/guides/auth/auth-mfa). For B2B apps, it also supports [SAML 2.0 single sign-on](/docs/guides/auth/enterprise-sso), and you can turn your project into an [OAuth 2.1 and OpenID Connect identity provider](/docs/guides/auth/oauth-server) to authenticate third-party apps and AI agents. You can customize sign-in flows with [Auth Hooks](/docs/guides/auth/auth-hooks).
+
+Supabase Auth works natively with the [Data API](/docs/guides/api), [Storage](/docs/guides/storage), [Realtime](/docs/guides/realtime), and [Edge Functions](/docs/guides/functions), as well as [Row Level Security](/docs/guides/database/postgres/row-level-security) policies.
+
+Supabase also offers [pre-built sign-in components](/library?category=Authentication) for Next.js, React Router, TanStack Start, Vue, and more.
+
+Choose Supabase Auth if you are starting a new project, if your project already uses Supabase, or if you want your users and your app data in the same Postgres database.
+
+## Clerk
+
+Clerk is a user management platform for web and mobile apps.
+
+Choose Clerk if you want hosted sign-in UI and session management for web or mobile apps.
+
+If you want to use Clerk with the rest of the Supabase Platform, see the [Clerk integration with Supabase](/docs/guides/auth/third-party/clerk).
+
+## Auth0
+
+Auth0, owned by Okta, is an identity platform for consumer and enterprise apps. It offers hosted sign-in pages, social and enterprise connections, and multi-factor authentication.
+
+Choose Auth0 if you already use it, or if you need an established platform with a wide range of enterprise connections.
+
+If you want to use Auth0 with the rest of the Supabase Platform, see the [Auth0 integration with Supabase](/docs/guides/auth/third-party/auth0). To move to Supabase Auth, see the [Auth0 migration guide](/kb/guides/migrate-from-auth0).
+
+## Firebase Auth
+
+Firebase Auth is Google's identity service within the Firebase platform. It supports email and password, phone, and federated sign-in with social providers.
+
+Choose Firebase Auth if your app already runs on Firebase or Google Cloud.
+
+If you want to use Firebase Auth with the rest of the Supabase Platform, see the [Firebase Auth integration with Supabase](/docs/guides/auth/third-party/firebase-auth). To move to Supabase Auth, see the [Firebase Auth migration guide](/kb/guides/migrate-from-firebase-auth).
+
+## WorkOS
+
+WorkOS provides single sign-on (SSO) and directory sync, so your customers' IT teams can connect their own identity provider, and its AuthKit product handles user authentication.
+
+Choose WorkOS if enterprise customers require SSO and directory sync before they will buy.
+
+If you want to use WorkOS with the rest of the Supabase Platform, see the [WorkOS integration with Supabase](/docs/guides/auth/third-party/workos).
+
+## Better Auth
+
+Better Auth is an open source authentication library for TypeScript apps. It runs inside your own app instead of as a hosted service, and can store users and sessions in your own database.
+
+Choose Better Auth if you want authentication to run as a library inside your TypeScript app, with its logic in your own codebase instead of a separate service.
+
+Every Supabase project is a full Postgres database, so Better Auth can connect to it directly. To store Better Auth users and sessions in Supabase, see [Set up Better Auth with Supabase Declarative Schema](/kb/guides/setup-better-auth-with-declarative-schema).
+
+## When to choose which provider
+
+- **You are starting a new project, or already use Supabase:** Supabase Auth. Your users live in your Postgres database and Row Level Security policies work out of the box.
+- **You want pre-built sign-in UI**: [Supabase Auth](/library?category=Authentication) or Clerk.
+- **You need an established platform with many enterprise connections, or already use it:** Auth0.
+- **Your app runs on Firebase or Google Cloud:** Firebase Auth.
+- **Enterprise customers require SSO and directory sync:** WorkOS. Supabase Auth also supports [SAML 2.0 single sign-on](/docs/guides/auth/enterprise-sso) if you want it in the same service as the rest of your backend.
+- **You want authentication to run as a library inside your TypeScript app, instead of as a separate service:** Better Auth. You can use it with a Supabase Postgres database.
+- **You already have users in another provider and want the rest of the Supabase Platform:** keep your provider and connect it through [third-party auth](/docs/guides/auth/third-party/overview), or migrate to Supabase Auth.

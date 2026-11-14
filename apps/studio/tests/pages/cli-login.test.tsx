@@ -129,29 +129,42 @@ describe('CliLoginScreen', () => {
     expect(screen.queryByText(/Unknown error/)).not.toBeInTheDocument()
   })
 
-  test('POSTs createCliLoginSession exactly once even when parent re-renders', async () => {
-    createCliLoginSessionMock.mockResolvedValue({ nonce: 'ABCDEFGH12345678' })
-    const { rerender } = renderScreen()
+  test('POSTs once and still navigates after the parent re-renders during an in-flight POST', async () => {
+    // Resolve manually so we can inject a re-render while the POST is in flight.
+    let resolveSession: (value: { nonce: string }) => void = () => {}
+    createCliLoginSessionMock.mockImplementation(
+      () =>
+        new Promise<{ nonce: string }>((resolve) => {
+          resolveSession = resolve
+        })
+    )
+    const { rerender, navigate: initialNavigate } = renderScreen()
 
     await waitFor(() => {
       expect(createCliLoginSessionMock).toHaveBeenCalledTimes(1)
     })
 
-    // Re-render with a brand-new `navigate` prop (mirrors the production
-    // bug where the parent recreated the closure on every render).
-    for (let i = 0; i < 5; i++) {
-      rerender(
-        <CliLoginScreen
-          isLoggedIn
-          routerReady
-          sessionId="session-test"
-          publicKey="public-key-test"
-          tokenName="local-dev"
-          navigate={vi.fn()}
-        />
-      )
-    }
+    // Parent re-renders mid-POST with a brand-new navigate ref. This was the
+    // production hang: the cleanup would invalidate the success handler and
+    // the ref guard would skip the retry, leaving the screen on the loader.
+    const laterNavigate = vi.fn()
+    rerender(
+      <CliLoginScreen
+        isLoggedIn
+        routerReady
+        sessionId="session-test"
+        publicKey="public-key-test"
+        tokenName="local-dev"
+        navigate={laterNavigate}
+      />
+    )
 
+    resolveSession({ nonce: 'ABCDEFGH12345678' })
+
+    await waitFor(() => {
+      expect(laterNavigate).toHaveBeenCalledWith('/cli/login?device_code=ABCDEFGH')
+    })
+    expect(initialNavigate).not.toHaveBeenCalled()
     expect(createCliLoginSessionMock).toHaveBeenCalledTimes(1)
   })
 })

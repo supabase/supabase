@@ -2,12 +2,12 @@ import { queryOptions } from '@tanstack/react-query'
 
 import { computeInstanceRefetchInterval, parseComputeInstance } from './compute.utils'
 import { computeKeys } from './keys'
-import { get, handleError } from '@/data/fetchers'
+import { get, handleError, unguarded } from '@/data/fetchers'
 import { IS_PLATFORM } from '@/lib/constants'
-import type { ResponseError } from '@/types'
+import type { StudioError } from '@/lib/errors/studio-errors'
 
 export type ComputeInstanceVariables = { projectRef?: string; name?: string }
-export type ComputeInstanceError = ResponseError
+export type ComputeInstanceError = StudioError
 
 async function getComputeInstance(
   { projectRef, name }: ComputeInstanceVariables,
@@ -19,6 +19,7 @@ async function getComputeInstance(
   const { data, error } = await get('/v2/projects/{ref}/compute/{name}', {
     params: { path: { ref: projectRef, name } },
     signal,
+    grant: unguarded.migrating,
   })
 
   if (error) return handleError(error)

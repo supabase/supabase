@@ -149,7 +149,7 @@ describe('BillingEmail', () => {
 
     const emailInput = await screen.findByPlaceholderText('Email')
     await userEvent.clear(emailInput)
-    await userEvent.type(emailInput, 'new-billing@example.com')
+    await userEvent.paste('new-billing@example.com')
 
     fireEvent.click(await screen.findByRole('button', { name: 'Save' }))
 
@@ -239,7 +239,7 @@ describe('BillingEmail', () => {
     await waitFor(() => expect(emailInput).toHaveValue('initial@example.com'))
 
     await userEvent.clear(emailInput)
-    await userEvent.type(emailInput, 'edited@example.com')
+    await userEvent.paste('edited@example.com')
 
     // Simulate an unrelated refetch of the same shared customer-profile query (e.g. triggered
     // by another section, or a background refetch) returning newer server data.

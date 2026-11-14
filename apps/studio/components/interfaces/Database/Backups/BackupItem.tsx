@@ -78,7 +78,7 @@ export const BackupItem = ({
               disabled={!canTriggerScheduledBackups || isDownloading}
               onClick={() => {
                 if (!projectRef) return console.error('Project ref is required')
-                downloadBackup({ ref: projectRef, backup })
+                downloadBackup({ ref: projectRef, backupId: backup.id })
               }}
               tooltip={{
                 content: {
@@ -115,9 +115,11 @@ export const BackupItem = ({
             <Badge variant="default">{backup.isPhysicalBackup ? 'Physical' : 'Logical'}</Badge>
           </TooltipTrigger>
           <TooltipContent side="bottom">
-            {backup.isPhysicalBackup
-              ? 'File-level backups of your entire database.'
-              : 'SQL-based backups of your entire database.'}{' '}
+            {backup.isPhysicalBackup ? (
+              <span>File-level backups of your entire database.</span>
+            ) : (
+              <span>SQL-based backups of your entire database.</span>
+            )}{' '}
             <InlineLink href="https://supabase.com/blog/postgresql-physical-logical-backups">
               Learn more
             </InlineLink>

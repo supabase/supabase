@@ -20,11 +20,11 @@ To access the auth token securely for your Edge Function call, we recommend stor
 
 ### Invoke an Edge Function every minute
 
-Store `project_url` and `publishable_key` in Supabase Vault:
+Call the function with your secret key. Don't use your publishable key, because it's public and anyone who has it can call a function that accepts it. Store your project URL and secret key in Supabase Vault:
 
 ```sql
 select vault.create_secret('https://project-ref.supabase.co', 'project_url');
-select vault.create_secret('YOUR_SUPABASE_PUBLISHABLE_KEY', 'publishable_key');
+select vault.create_secret('YOUR_SUPABASE_SECRET_KEY', 'secret_key');
 ```
 
 Make a POST request to a Supabase Edge Function every minute:
@@ -40,13 +40,17 @@ select
           url:= (select decrypted_secret from vault.decrypted_secrets where name = 'project_url') || '/functions/v1/function-name',
           headers:=jsonb_build_object(
             'Content-type', 'application/json',
-            'apikey', (select decrypted_secret from vault.decrypted_secrets where name = 'publishable_key')
+            'apikey', (select decrypted_secret from vault.decrypted_secrets where name = 'secret_key')
           ),
           body:=concat('{"time": "', now(), '"}')::jsonb
       ) as request_id;
     $$
   );
 ```
+
+The function receives the secret key on the `apikey` header. To accept it, disable `verify_jwt` and use `auth: 'secret'`. For more information, see [Service-to-service calls](/docs/guides/functions/auth#service-to-service-calls).
+
+<$Partial path="pg_net_queued_key.mdx" />
 
 ## Resources
 

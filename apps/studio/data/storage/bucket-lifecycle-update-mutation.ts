@@ -4,7 +4,8 @@ import { toast } from 'sonner'
 
 import { storageKeys } from './keys'
 import { del, handleError, put } from '@/data/fetchers'
-import type { ResponseError, UseCustomMutationOptions } from '@/types'
+import type { StudioError } from '@/lib/errors/studio-errors'
+import type { UseCustomMutationOptions } from '@/types'
 
 export type UpdateBucketLifecycleBody = components['schemas']['UpdateBucketLifecycleBody']
 export type BucketLifecycleRuleInput = UpdateBucketLifecycleBody['rules'][number]
@@ -48,16 +49,12 @@ export const useBucketLifecycleUpdateMutation = ({
   onError,
   ...options
 }: Omit<
-  UseCustomMutationOptions<
-    BucketLifecycleUpdateData,
-    ResponseError,
-    BucketLifecycleUpdateVariables
-  >,
+  UseCustomMutationOptions<BucketLifecycleUpdateData, StudioError, BucketLifecycleUpdateVariables>,
   'mutationFn'
 > = {}) => {
   const queryClient = useQueryClient()
 
-  return useMutation<BucketLifecycleUpdateData, ResponseError, BucketLifecycleUpdateVariables>({
+  return useMutation<BucketLifecycleUpdateData, StudioError, BucketLifecycleUpdateVariables>({
     mutationFn: updateBucketLifecycle,
     async onSuccess(data, variables, context) {
       await queryClient.invalidateQueries({

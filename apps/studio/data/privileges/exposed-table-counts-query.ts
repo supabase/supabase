@@ -2,9 +2,10 @@ import { getExposedTableCountsSql } from '@supabase/pg-meta'
 import { queryOptions } from '@tanstack/react-query'
 
 import { privilegeKeys } from './keys'
+import { unguarded } from '@/data/fetchers'
 import { executeSql } from '@/data/sql/execute-sql-mutation'
 import { INTERNAL_SCHEMAS } from '@/hooks/useProtectedSchemas'
-import type { ResponseError } from '@/types'
+import type { StudioError } from '@/lib/errors/studio-errors'
 
 const IGNORED_SCHEMAS = [...INTERNAL_SCHEMAS, 'pg_catalog']
 
@@ -32,8 +33,11 @@ export async function getExposedTableCounts(
     {
       projectRef,
       connectionString,
+      sqlOrigin: 'studio',
+      queryName: 'exposed-table-counts',
       sql,
       queryKey: ['exposed-table-counts', selectedSchemas],
+      grant: unguarded.migrating,
     },
     signal
   )
@@ -42,14 +46,13 @@ export async function getExposedTableCounts(
 }
 
 export type ExposedTableCountsData = Awaited<ReturnType<typeof getExposedTableCounts>>
-export type ExposedTableCountsError = ResponseError
+export type ExposedTableCountsError = StudioError
 
 export const exposedTableCountsQueryOptions = (
   { projectRef, connectionString, selectedSchemas }: ExposedTableCountsVariables,
   { enabled = true }: { enabled?: boolean } = {}
 ) => {
   return queryOptions({
-    // eslint-disable-next-line @tanstack/query/exhaustive-deps -- connection string doesn't change the result of the query
     queryKey: privilegeKeys.exposedTableCounts(projectRef, selectedSchemas),
     queryFn: ({ signal }) =>
       getExposedTableCounts(

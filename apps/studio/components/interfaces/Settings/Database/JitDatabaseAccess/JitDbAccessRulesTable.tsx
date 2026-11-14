@@ -149,7 +149,7 @@ export function JitDbAccessRulesTable({
                       <p className="text-foreground-lighter">{user.email}</p>
                     </TableCell>
                     <TableCell className="text-sm text-foreground-light">
-                      {enabledGrants.length} role{enabledGrants.length === 1 ? '' : 's'}
+                      {enabledGrants.length} role{enabledGrants.length === 1 ? '' : <span>s</span>}
                     </TableCell>
                     <TableCell className="text-sm text-foreground-light">
                       {statusDisplay.badges.length > 0 ? (

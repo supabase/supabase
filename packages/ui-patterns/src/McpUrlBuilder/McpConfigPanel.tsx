@@ -1,7 +1,7 @@
 'use client'
 
 import { ChevronRight } from 'lucide-react'
-import React, { useMemo, useState } from 'react'
+import { useMemo, useState } from 'react'
 import { cn, Collapsible, CollapsibleContent, CollapsibleTrigger, Label, Separator } from 'ui'
 import { CodeBlock } from 'ui-patterns/CodeBlock'
 
@@ -34,8 +34,8 @@ const CLIENT_GROUPS = MCP_CLIENT_GROUPS.map((group) => ({
 
 export interface McpConfigPanelProps {
   projectRef?: string
-  initialSelectedClient?: McpClient
-  onClientSelect?: (client: McpClient) => void
+  selectedClient: McpClient
+  onClientSelect: (client: McpClient) => void
   onCopyCallback: (type?: McpOnCopyCallback) => void
   onInstallCallback?: () => void
   theme?: 'light' | 'dark'
@@ -50,7 +50,7 @@ export interface McpConfigPanelProps {
 
 export function McpConfigPanel({
   projectRef,
-  initialSelectedClient,
+  selectedClient,
   onClientSelect,
   onCopyCallback,
   onInstallCallback,
@@ -64,9 +64,8 @@ export function McpConfigPanel({
   const [readonly, setReadonly] = useState(false)
   const supportedFeatures = isPlatform ? FEATURE_GROUPS_PLATFORM : FEATURE_GROUPS_NON_PLATFORM
   const [selectedFeatures, setSelectedFeatures] = useState<string[]>(() =>
-    supportedFeatures.filter((group) => group.id !== 'storage').map((group) => group.id)
+    supportedFeatures.filter((group) => !group.defaultDisabled).map((group) => group.id)
   )
-  const [selectedClient, setSelectedClient] = useState(initialSelectedClient ?? MCP_CLIENTS[0])
   const [skipElicitations, setSkipElicitations] = useState<McpSkipElicitation[]>([])
 
   const selectedFeaturesSupported = useMemo(() => {
@@ -85,6 +84,9 @@ export function McpConfigPanel({
       if (selectedFeaturesSupported.includes('branching')) {
         eligibleSkipElicitations.push('create_branch')
       }
+    }
+    if (selectedFeaturesSupported.includes('notebooks')) {
+      eligibleSkipElicitations.push('run_notebook', 'delete_notebook')
     }
   }
   const validSkipElicitations = skipElicitations.filter((tool) =>
@@ -110,12 +112,9 @@ export function McpConfigPanel({
   const handleClientChange = (clientKey: string) => {
     const client = MCP_CLIENTS.find((c) => c.key === clientKey)
     if (client) {
-      setSelectedClient(client)
+      onClientSelect(client)
     }
   }
-  React.useEffect(() => {
-    onClientSelect?.(selectedClient)
-  }, [selectedClient, onClientSelect])
 
   const innerPanelSpacing = 'px-4 py-3'
 

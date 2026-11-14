@@ -37,6 +37,18 @@ describe('docs proxy — /guides/* content negotiation', () => {
     }
   })
 
+  it('serves the markdown 404 for an unknown /<slug>.md, but not for an Accept-only miss', async () => {
+    const md = proxy(makeRequest('/docs/guides/doesnotexist.md'))
+    expect(md.status).toBe(404)
+    expect(md.headers.get('content-type')).toBe('text/markdown; charset=utf-8')
+    expect(md.headers.get('cache-control')).toBe('no-store')
+    const body = await md.text()
+    expect(body).toContain('<https://supabase.com/docs/guides/doesnotexist>')
+    expect(body).toContain('<https://supabase.com/llms.txt>')
+    const accept = makeRequest('/docs/guides/doesnotexist', { accept: 'text/markdown' })
+    expect(proxy(accept).headers.get(REWRITE_HEADER)).toBeNull()
+  })
+
   it('serves HTML for browser-style Accept', () => {
     const req = makeRequest('/docs/guides/auth', {
       accept: 'text/html,application/xhtml+xml,application/xml;q=0.9,image/webp,*/*;q=0.8',
@@ -175,11 +187,64 @@ describe('docs proxy — reference paths', () => {
     )
   })
 
+  it('serves the markdown 404 for .md guesses for every user agent, before the crawler rewrite', async () => {
+    for (const userAgent of [
+      'curl/8.7.1',
+      'Googlebot',
+      'Mozilla/5.0 (Macintosh; Intel Mac OS X 10_15_7) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/130.0.0.0 Safari/537.36',
+    ]) {
+      const res = proxy(makeRequest('/docs/reference/javascript/select.md', { userAgent }))
+      expect(res.status).toBe(404)
+      expect(res.headers.get(REWRITE_HEADER)).toBeNull()
+      const body = await res.text()
+      expect(body).toContain('<https://supabase.com/docs/reference/javascript/select>')
+      expect(body).toContain('<https://supabase.com/llms/js.txt>')
+    }
+  })
+
+  it('links the full markdown reference for cli and api .md guesses', async () => {
+    const cli = await proxy(makeRequest('/docs/reference/cli/supabase-init.md')).text()
+    expect(cli).toContain('<https://supabase.com/llms/cli.txt>')
+    const api = await proxy(makeRequest('/docs/reference/api/v1-list-all-projects.md')).text()
+    expect(api).toContain('<https://supabase.com/llms/api.txt>')
+  })
+
   it('sends the Kotlin root to the crawler renderer for bots', () => {
     expect(
       proxy(makeRequest('/docs/reference/kotlin', { userAgent: 'Googlebot' })).headers.get(
         REWRITE_HEADER
       )
     ).toBe('https://supabase.com/docs/api/crawlers')
+  })
+})
+
+describe('docs proxy — forced IA nav variant', () => {
+  const OPTION_1 = '?docs-ia-mvp-v1=option-1'
+
+  it('renders option-1 guides and the home page from the option-1 route', () => {
+    expect(proxy(makeRequest(`/docs/guides/auth${OPTION_1}`)).headers.get(REWRITE_HEADER)).toBe(
+      `https://supabase.com/docs/ia/option-1/guides/auth${OPTION_1}`
+    )
+    expect(proxy(makeRequest(`/docs${OPTION_1}`)).headers.get(REWRITE_HEADER)).toBe(
+      `https://supabase.com/docs/ia/option-1${OPTION_1}`
+    )
+  })
+
+  it('still serves markdown for an option-1 .md request', () => {
+    expect(proxy(makeRequest(`/docs/guides/auth.md${OPTION_1}`)).headers.get(REWRITE_HEADER)).toBe(
+      `${GUIDES_MD_REWRITE('auth')}${OPTION_1}`
+    )
+  })
+
+  it("leaves requests without option-1 on today's route", () => {
+    for (const path of [
+      '/docs/guides/auth',
+      '/docs',
+      '/docs/guides/auth?docs-ia-mvp-v1=control',
+      '/docs/guides/auth?docs-ia-mvp-v1=nope',
+      `/docs/guides/doesnotexist${OPTION_1}`,
+    ]) {
+      expect(proxy(makeRequest(path)).headers.get(REWRITE_HEADER)).toBeNull()
+    }
   })
 })

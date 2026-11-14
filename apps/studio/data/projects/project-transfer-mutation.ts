@@ -4,7 +4,8 @@ import { toast } from 'sonner'
 import { projectKeys } from './keys'
 import { useInvalidateProjectsInfiniteQuery } from './org-projects-infinite-query'
 import { handleError, post } from '@/data/fetchers'
-import type { ResponseError, UseCustomMutationOptions } from '@/types'
+import type { StudioError } from '@/lib/errors/studio-errors'
+import type { UseCustomMutationOptions } from '@/types'
 
 export type ProjectTransferVariables = {
   projectRef?: string
@@ -18,14 +19,13 @@ export async function transferProject({
   if (!projectRef) throw new Error('projectRef is required')
   if (!targetOrganizationSlug) throw new Error('targetOrganizationSlug is required')
 
-  const { data, error } = await post('/v2/projects/{ref}/transfers', {
+  const payload: { target_organization_slug: string } = {
+    target_organization_slug: targetOrganizationSlug,
+  }
+
+  const { data, error } = await post('/platform/projects/{ref}/transfer', {
     params: { path: { ref: projectRef } },
-    body: {
-      data: {
-        type: 'project_transfer_input',
-        attributes: { target_organization_slug: targetOrganizationSlug },
-      },
-    },
+    body: payload,
   })
   if (error) handleError(error)
   return data
@@ -38,13 +38,13 @@ export const useProjectTransferMutation = ({
   onError,
   ...options
 }: Omit<
-  UseCustomMutationOptions<ProjectTransferData, ResponseError, ProjectTransferVariables>,
+  UseCustomMutationOptions<ProjectTransferData, StudioError, ProjectTransferVariables>,
   'mutationFn'
 > = {}) => {
   const queryClient = useQueryClient()
   const { invalidateProjectsQuery } = useInvalidateProjectsInfiniteQuery()
 
-  return useMutation<ProjectTransferData, ResponseError, ProjectTransferVariables>({
+  return useMutation<ProjectTransferData, StudioError, ProjectTransferVariables>({
     mutationFn: (vars) => transferProject(vars),
     async onSuccess(data, variables, context) {
       const { projectRef, targetOrganizationSlug } = variables

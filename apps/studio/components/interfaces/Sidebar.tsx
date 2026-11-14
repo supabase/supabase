@@ -44,6 +44,7 @@ import {
   useGenerateOtherRoutes,
   useGenerateToolRoutes,
 } from '@/components/layouts/Navigation/NavigationBar/NavigationBar.utils'
+import { ORG_SETTINGS_ROUTES } from '@/components/layouts/OrganizationLayout/OrganizationLayout.utils'
 import { ProjectIndexPageLink } from '@/data/prefetchers/project.$ref'
 import { useHideSidebar } from '@/hooks/misc/useHideSidebar'
 import { useIsFeatureEnabled } from '@/hooks/misc/useIsFeatureEnabled'
@@ -229,11 +230,15 @@ export function SideBarNavLink({
     <SidebarMenuItem>
       {hasShortcut ? (
         <Shortcut
+          label={
+            route.shortcutId === SHORTCUT_IDS.NAV_ADVISORS || route.key === 'explorer'
+              ? `Go to ${route.label}`
+              : undefined
+          }
           id={route.shortcutId!}
           onTrigger={() => router.push(route.link!)}
           side="right"
           delayDuration={shortcutPopoverDelay}
-          label={route.key === 'explorer' ? 'Go to Explorer' : undefined}
         >
           {button}
         </Shortcut>
@@ -350,12 +355,15 @@ const ProjectLinks = () => {
       <SidebarGroup className="gap-0.5">
         <SidebarMenu>
           {otherRoutes.map((route) => {
-            if (route.key === 'advisors') {
+            if (route.key === 'issues' || route.key === 'advisors') {
               return (
                 <SideBarNavLink
                   key={route.key}
                   route={route}
-                  active={activeRoute === route.key}
+                  active={
+                    activeRoute === route.key ||
+                    (route.key === 'issues' && activeRoute === 'advisors')
+                  }
                   isLoading={isProjectPending}
                 >
                   {route.icon}
@@ -412,15 +420,6 @@ const OrganizationLinks = () => {
   const showBilling = useIsFeatureEnabled('billing:all')
 
   const activeRoute = router.pathname.split('/')[3]
-  const organizationSettingsRoutes = new Set([
-    'general',
-    'security',
-    'sso',
-    'apps',
-    'audit',
-    'documents',
-  ])
-
   const navMenuItems = [
     {
       label: 'Projects',
@@ -482,7 +481,7 @@ const OrganizationLinks = () => {
               i === 0
                 ? activeRoute === undefined
                 : item.key === 'settings'
-                  ? organizationSettingsRoutes.has(activeRoute ?? '')
+                  ? ORG_SETTINGS_ROUTES.includes(activeRoute ?? '')
                   : activeRoute === item.key
             }
             route={{

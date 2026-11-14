@@ -1,4 +1,9 @@
-import { cube, type IsoBox, type IsoRing, type IsoView } from './iso-shapes'
+import {
+  cube,
+  type IsoBox,
+  type IsoRing,
+  type IsoView,
+} from 'ui-patterns/IsoShape/IsoShape.geometry'
 import type { Topic } from './topics'
 
 interface IsoComposition {
@@ -75,6 +80,13 @@ const PLATFORM_LAYERS: IsoBox[] = [0, 1, 2].map((i) => ({
   h: 0.18,
   fillFace: 'top',
 }))
+
+const FAQ_BLOCKS: IsoBox[] = [
+  cube(0, 0, 0, 1),
+  cube(1.4, 0, 0, 1),
+  cube(0, 1.4, 0, 1),
+  cube(1.4, 1.4, 0, 1),
+]
 
 export const ISO_COMPOSITIONS: Record<Topic, IsoComposition> = {
   Auth: {
@@ -158,6 +170,14 @@ export const ISO_COMPOSITIONS: Record<Topic, IsoComposition> = {
     fillBoxes: PLATFORM_LAYERS.slice(1, 2),
     nudgeY: 13,
     zoom: 0.645,
+  },
+  FAQs: {
+    titleAt: 'top',
+    boxes: FAQ_BLOCKS,
+  },
+  Community: {
+    titleAt: 'top',
+    boxes: FAQ_BLOCKS,
   },
 }
 

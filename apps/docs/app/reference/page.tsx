@@ -2,12 +2,17 @@ import { clientSdkIds, REFERENCES } from '~/content/navigation.references'
 import { IconLinkList, IconLinkMenuIcon } from '~/features/ui/IconLink'
 import { LayoutMainContent } from '~/layouts/DefaultLayout'
 import { SidebarSkeleton } from '~/layouts/MainSkeleton'
+import type { Metadata } from 'next'
+
+export const metadata: Metadata = {
+  title: 'Supabase API references',
+}
 
 export default function ReferenceIndexPage() {
   return (
     <SidebarSkeleton>
-      <LayoutMainContent>
-        <article className="prose">
+      <LayoutMainContent className="layout-v2:lg:px-20">
+        <article className="prose layout-v2:mx-auto layout-v2:max-w-docs-content">
           <h1>API References</h1>
           <p>
             The Supabase client libraries help you interact with Supabase products, such as the

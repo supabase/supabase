@@ -2,7 +2,8 @@ import { useQuery } from '@tanstack/react-query'
 
 import { organizationKeys } from './keys'
 import { get, handleError } from '@/data/fetchers'
-import type { ResponseError, UseCustomQueryOptions } from '@/types'
+import type { StudioError } from '@/lib/errors/studio-errors'
+import type { UseCustomQueryOptions } from '@/types'
 
 export type OrganizationMfaVariables = {
   slug?: string
@@ -26,7 +27,7 @@ export async function getOrganizationMfaEnforcement(
   return orgMfaRequired?.enforced
 }
 
-export type OrganizationMfaError = ResponseError
+export type OrganizationMfaError = StudioError
 
 export const useOrganizationMfaQuery = <TData = boolean>(
   { slug }: OrganizationMfaVariables,

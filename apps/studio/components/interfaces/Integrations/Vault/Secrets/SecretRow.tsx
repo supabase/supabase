@@ -156,8 +156,8 @@ export const SecretRow = ({ row, col }: SecretRowProps) => {
     return (
       <div className="w-full flex items-center justify-start">
         <p className="text-xs text-foreground-light">
-          {row.updated_at === row.created_at ? 'Added' : 'Updated'} on{' '}
-          {dayjs(row.updated_at).format('MMM D, YYYY')}
+          {row.updated_at === row.created_at ? <span>Added</span> : <span>Updated</span>}{' '}
+          <span>on</span> {dayjs(row.updated_at).format('MMM D, YYYY')}
         </p>
       </div>
     )

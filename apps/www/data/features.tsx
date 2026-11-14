@@ -17,6 +17,7 @@ import {
   GitBranch,
   Globe,
   Image,
+  KeyRound,
   Lock,
   Mail,
   MessageCircle,
@@ -47,6 +48,12 @@ enum ADDITIONAL_PRODUCTS {
   PLATFORM = 'platform',
   STUDIO = 'studio',
 }
+
+/**
+ * Placeholder in a feature description where the CTA button is rendered.
+ * Renders as nothing in markdown; FeatureDescription splits on it.
+ */
+export const FEATURE_CTA_MARKER = '<!-- feature-cta -->'
 
 export type FeatureProductType = PRODUCT | PRODUCT_MODULE | ADDITIONAL_PRODUCTS
 
@@ -107,6 +114,11 @@ export type FeatureType = {
    */
   blogUrl?: string
   /**
+   * label for the CTA button rendered at the `FEATURE_CTA_MARKER` position in the description.
+   * Defaults to "Start your project".
+   */
+  ctaLabel?: string
+  /**
    * feature metadata on its status
    */
   status?: {
@@ -125,9 +137,9 @@ export const features: FeatureType[] = [
     title: 'Postgres database',
     subtitle: 'Every project is a full Postgres database.',
     description: `
-Every Supabase project is a dedicated [Postgres database](https://www.postgresql.org/) - _"a powerful, open source object-relational database system with over 35 years of active development that has earned it a strong reputation for reliability, feature robustness, and performance"_.
+Every Supabase project is a dedicated [Postgres database](https://www.postgresql.org/), which is a powerful, open source object-relational database. Start building for free.
 
-It's 100% portable, which means you can easily migrate your data to and from other Postgres databases, ensuring that your data is never locked into a proprietary system.
+${FEATURE_CTA_MARKER}
 
 ## Key benefits
 1. Advanced data types: Utilize JSON, arrays, and custom types to store complex data structures efficiently.
@@ -153,7 +165,9 @@ It's 100% portable, which means you can easily migrate your data to and from oth
     title: 'Vector database',
     subtitle: 'Store vector embeddings right next to the rest of your data.',
     description: `
-Supabase provides an open source toolkit for developing AI applications using Postgres and pgvector. Use the Supabase client libraries to store, index, and query your vector embeddings at scale.
+Use the Supabase client libraries to store, index, and query your vector embeddings at scale.
+
+${FEATURE_CTA_MARKER}
 
 ## Key benefits
 1. Unified data storage: Keep vector embeddings and relational data in one place, simplifying your data architecture.
@@ -168,6 +182,7 @@ Supabase provides an open source toolkit for developing AI applications using Po
     products: [PRODUCT_SHORTNAMES.DATABASE],
     heroImage: 'https://www.youtube-nocookie.com/embed/6xchFWcHkaI',
     docsUrl: 'https://supabase.com/docs/guides/ai',
+    blogUrl: 'https://supabase.com/blog/openai-embeddings-postgres-vector',
     slug: 'vector-database',
     status: {
       stage: PRODUCT_STAGES.GA,
@@ -227,6 +242,7 @@ Supabase offers lightning-fast GraphQL APIs through its custom-built Postgres Gr
     heroImage: '/images/features/auto-generated-graphql-api.png',
     heroImageLight: '/images/features/auto-generated-graphql-api-light.png',
     docsUrl: 'https://supabase.com/docs/guides/graphql/api',
+    blogUrl: 'https://supabase.com/blog/pg-graphql',
     slug: 'auto-generated-graphql-api',
     status: {
       stage: PRODUCT_STAGES.GA,
@@ -266,6 +282,7 @@ Supabase's backup solutions provide a balance of security, flexibility, and ease
     heroImage: '/images/features/backups.png',
     heroImageLight: '/images/features/backups-light.png',
     docsUrl: 'https://supabase.com/docs/guides/platform/backups',
+    blogUrl: 'https://supabase.com/blog/postgres-point-in-time-recovery',
     slug: 'database-backups',
     status: {
       stage: PRODUCT_STAGES.GA,
@@ -299,6 +316,7 @@ By using custom domains, you create a more cohesive brand experience and gain fl
     heroImage: '/images/features/custom-domains.png',
     heroImageLight: '/images/features/custom-domains-light.png',
     docsUrl: 'https://supabase.com/docs/guides/platform/custom-domains',
+    blogUrl: 'https://supabase.com/blog/custom-domain-names',
     slug: 'custom-domains',
     status: {
       stage: PRODUCT_STAGES.GA,
@@ -339,6 +357,7 @@ Once configured, your users sign in with \`signInWithOAuth({ provider: 'custom:m
     products: [PRODUCT_SHORTNAMES.AUTHENTICATION],
     heroImage: 'https://www.youtube-nocookie.com/embed/WrX3FfKj6I8',
     docsUrl: 'https://supabase.com/docs/guides/auth/custom-oauth-providers',
+    blogUrl: 'https://supabase.com/blog/custom-oauth-oidc-providers',
     slug: 'custom-oidc-providers',
     status: {
       stage: PRODUCT_STAGES.GA,
@@ -456,6 +475,7 @@ Connect a GitHub repo to your project. Migrations live in version control, and b
     heroImage: '/images/features/branching.png',
     heroImageLight: '/images/features/branching-light.png',
     docsUrl: 'https://supabase.com/docs/guides/deployment/branching',
+    blogUrl: 'https://supabase.com/blog/branching-2-0',
     slug: 'branching',
     status: {
       stage: PRODUCT_STAGES.GA,
@@ -532,6 +552,7 @@ Deploy your first Read Replica in minutes from Project Settings > Infrastructure
     products: [PRODUCT_SHORTNAMES.DATABASE],
     heroImage: 'https://www.youtube-nocookie.com/embed/PX3R1fXjJ2M',
     docsUrl: 'https://supabase.com/docs/guides/platform/read-replicas',
+    blogUrl: 'https://supabase.com/blog/introducing-read-replicas',
     slug: 'read-replicas',
     status: {
       stage: PRODUCT_STAGES.GA,
@@ -606,6 +627,7 @@ Dedicated Poolers provide an alternative to Supavisor for specific use cases, gi
     heroImage: '',
     docsUrl:
       'https://supabase.com/docs/guides/database/connecting-to-postgres/pooling-and-limits#shared-pooler',
+    blogUrl: 'https://supabase.com/blog/dedicated-poolers',
     slug: 'dedicated-poolers',
     status: {
       stage: PRODUCT_STAGES.GA,
@@ -640,6 +662,7 @@ Foreign Data Wrappers simplify data integration by bringing external data into y
     products: [PRODUCT_SHORTNAMES.DATABASE],
     heroImage: '',
     docsUrl: 'https://supabase.com/docs/guides/database/extensions/wrappers/overview',
+    blogUrl: 'https://supabase.com/blog/postgres-foreign-data-wrappers-rust',
     slug: 'foreign-data-wrappers',
     status: {
       stage: PRODUCT_STAGES.GA,
@@ -679,6 +702,7 @@ BigQuery and DuckLake keep current-state tables synchronized. ClickHouse support
     products: [PRODUCT_SHORTNAMES.DATABASE],
     heroImage: 'https://www.youtube-nocookie.com/embed/8o3duiYqppA',
     docsUrl: 'https://supabase.com/docs/guides/database/replication/pipelines',
+    blogUrl: 'https://supabase.com/blog/introducing-supabase-pipelines',
     slug: 'supabase-pipelines',
     status: {
       stage: PRODUCT_STAGES.PUBLIC_ALPHA,
@@ -730,6 +754,7 @@ This feature is particularly useful for teams looking to enhance their security 
     products: [ADDITIONAL_PRODUCTS.PLATFORM],
     heroImage: 'https://supabase.com/docs/img/guides/database/vault-hello-compressed.mp4',
     docsUrl: 'https://supabase.com/docs/guides/database/vault',
+    blogUrl: 'https://supabase.com/blog/supabase-vault',
     slug: 'vault',
     status: {
       stage: PRODUCT_STAGES.PUBLIC_ALPHA,
@@ -754,7 +779,8 @@ This feature is particularly valuable for teams looking to optimize their databa
     icon: Zap,
     products: [ADDITIONAL_PRODUCTS.PLATFORM],
     heroImage: 'https://www.youtube-nocookie.com/embed/ogYNmJOFEpk',
-    docsUrl: 'https://supabase.com/blog/supavisor-postgres-connection-pooler',
+    docsUrl: 'https://supabase.com/docs/guides/database/connecting-to-postgres/pooling-and-limits',
+    blogUrl: 'https://supabase.com/blog/supavisor-postgres-connection-pooler',
     slug: 'supavisor',
     status: {
       stage: PRODUCT_STAGES.PUBLIC_BETA,
@@ -793,6 +819,7 @@ Supabase's Realtime Postgres Changes feature allows you to listen to database ch
     products: [PRODUCT_SHORTNAMES.REALTIME],
     heroImage: 'https://www.youtube-nocookie.com/embed/_-y_Lnujq64',
     docsUrl: 'https://supabase.com/docs/guides/realtime/postgres-changes',
+    blogUrl: 'https://supabase.com/blog/postgres-changes-filters-and-column-selection',
     slug: 'realtime-postgres-changes',
     status: {
       stage: PRODUCT_STAGES.GA,
@@ -834,6 +861,7 @@ Supabase's Realtime Broadcast feature provides a powerful tool for creating resp
     products: [PRODUCT_SHORTNAMES.REALTIME],
     heroImage: 'https://www.youtube-nocookie.com/embed/_-y_Lnujq64',
     docsUrl: 'https://supabase.com/docs/guides/realtime/broadcast',
+    blogUrl: 'https://supabase.com/blog/supabase-realtime-multiplayer-general-availability',
     slug: 'realtime-broadcast',
     status: {
       stage: PRODUCT_STAGES.GA,
@@ -899,6 +927,7 @@ This feature is particularly valuable for applications that require controlled a
     products: [PRODUCT_SHORTNAMES.REALTIME, PRODUCT_SHORTNAMES.AUTHENTICATION],
     heroImage: 'https://www.youtube-nocookie.com/embed/IXRrU9MpA8Q',
     docsUrl: 'https://supabase.com/docs/guides/realtime/authorization#broadcast',
+    blogUrl: 'https://supabase.com/blog/supabase-realtime-broadcast-and-presence-authorization',
     slug: 'realtime-broadcast-authorization',
     status: {
       stage: PRODUCT_STAGES.PUBLIC_BETA,
@@ -923,6 +952,7 @@ This feature is particularly useful for collaborative applications where knowing
     products: [PRODUCT_SHORTNAMES.REALTIME, PRODUCT_SHORTNAMES.AUTHENTICATION],
     heroImage: 'https://www.youtube-nocookie.com/embed/IXRrU9MpA8Q',
     docsUrl: 'https://supabase.com/docs/guides/realtime/authorization#presence',
+    blogUrl: 'https://supabase.com/blog/supabase-realtime-broadcast-and-presence-authorization',
     slug: 'realtime-presence-authorization',
     status: {
       stage: PRODUCT_STAGES.PUBLIC_BETA,
@@ -958,6 +988,7 @@ Broadcast from Database provides a powerful way to trigger real-time events dire
     products: [PRODUCT_SHORTNAMES.REALTIME],
     heroImage: '',
     docsUrl: 'https://supabase.com/docs/guides/realtime/broadcast#broadcast-from-database',
+    blogUrl: 'https://supabase.com/blog/realtime-broadcast-from-database',
     slug: 'realtime-broadcast-from-database',
     status: {
       stage: PRODUCT_STAGES.PUBLIC_BETA,
@@ -992,6 +1023,7 @@ Broadcast Replay ensures users never miss important real-time updates, even when
     products: [PRODUCT_SHORTNAMES.REALTIME],
     heroImage: '',
     docsUrl: 'https://supabase.com/docs/guides/realtime/broadcast#broadcast-replay',
+    blogUrl: 'https://supabase.com/blog/realtime-broadcast-replay',
     slug: 'realtime-broadcast-replay',
     status: {
       stage: PRODUCT_STAGES.PUBLIC_ALPHA,
@@ -1039,10 +1071,10 @@ Supabase's Email Login provides a robust foundation for user authentication, all
     },
   },
   {
-    title: 'Social login',
-    subtitle: 'Provide social logins from platforms like Apple, GitHub, and Slack.',
+    title: 'Social sign-in',
+    subtitle: 'Provide social sign-in from platforms like Apple, GitHub, and Slack.',
     description: `
-Supabase's Social Login feature enables users to authenticate using their existing accounts from popular social platforms and services, providing a streamlined, password-free access to your application.
+Supabase's Social Sign-in feature enables users to authenticate using their existing accounts from popular social platforms and services, providing a streamlined, password-free access to your application.
 
 ## Key features
 1. Multiple provider support: Integrate with various platforms like Google, Facebook, Twitter, and more.
@@ -1057,21 +1089,21 @@ Supabase's Social Login feature enables users to authenticate using their existi
 - Enhanced security: Leverage the robust security measures of established platforms.
 - Rich user profiles: Access additional user data to personalize experiences.
 
-## Social login is valuable for:
+## Social sign-in is valuable for:
 - Mobile apps seeking to minimize user input
 - E-commerce platforms aiming to reduce cart abandonment
 - Content platforms looking to personalize user experiences
 - Community-driven websites fostering user engagement
 - B2B applications integrating with professional networks
 
-Supabase's Social Login feature allows you to improve user experience and potentially increase signup rates while maintaining security and control over user authentication.
+Supabase's Social Sign-in feature allows you to improve user experience and potentially increase signup rates while maintaining security and control over user authentication.
 `,
     icon: Users,
     products: [PRODUCT_SHORTNAMES.AUTHENTICATION],
     heroImage: '/images/features/social-login.png',
     heroImageLight: '/images/features/social-login-light.png',
-    docsUrl: 'https://supabase.com/docs/guides/auth/social-login',
-    slug: 'social-login',
+    docsUrl: 'https://supabase.com/docs/guides/auth/social-sign-in',
+    slug: 'social-sign-in',
     status: {
       stage: PRODUCT_STAGES.GA,
       availableOnSelfHosted: true,
@@ -1109,6 +1141,7 @@ Supabase's Phone Login feature enables a seamless authentication experience, par
     heroImage: '/images/features/phone-login.png',
     heroImageLight: '/images/features/phone-login-light.png',
     docsUrl: 'https://supabase.com/docs/guides/auth/phone-login',
+    blogUrl: 'https://supabase.com/blog/supabase-auth-passwordless-sms-login',
     slug: 'phone-logins',
     status: {
       stage: PRODUCT_STAGES.GA,
@@ -1212,6 +1245,7 @@ Third-Party Authentication bridges your existing auth system with Supabase's bac
     products: [PRODUCT_SHORTNAMES.AUTHENTICATION],
     heroImage: '',
     docsUrl: 'https://supabase.com/docs/guides/auth/third-party/overview',
+    blogUrl: 'https://supabase.com/blog/third-party-auth-mfa-phone-send-hooks',
     slug: 'third-party-authentication',
     status: {
       stage: PRODUCT_STAGES.GA,
@@ -1245,6 +1279,7 @@ Auth Hooks provide the flexibility to customize authentication while leveraging 
     products: [PRODUCT_SHORTNAMES.AUTHENTICATION],
     heroImage: '',
     docsUrl: 'https://supabase.com/docs/guides/auth/auth-hooks',
+    blogUrl: 'https://supabase.com/blog/supabase-auth-identity-linking-hooks',
     slug: 'auth-hooks',
     status: {
       stage: PRODUCT_STAGES.BETA,
@@ -1281,6 +1316,7 @@ JWT Signing Keys provide modern, secure JWT management with the flexibility requ
     products: [PRODUCT_SHORTNAMES.AUTHENTICATION],
     heroImage: '',
     docsUrl: 'https://supabase.com/docs/guides/auth/signing-keys',
+    blogUrl: 'https://supabase.com/blog/jwt-signing-keys',
     slug: 'jwt-signing-keys',
     status: {
       stage: PRODUCT_STAGES.GA,
@@ -1318,6 +1354,7 @@ OAuth 2.1 Server provides enterprise-grade identity provider capabilities built 
     products: [PRODUCT_SHORTNAMES.AUTHENTICATION],
     heroImage: '',
     docsUrl: 'https://supabase.com/docs/guides/auth/oauth-server',
+    blogUrl: 'https://supabase.com/blog/oauth2-provider',
     slug: 'oauth2-1-server',
     status: {
       stage: PRODUCT_STAGES.PUBLIC_BETA,
@@ -1357,6 +1394,7 @@ Web3 Authentication provides the wallet-based identity infrastructure required f
     products: [PRODUCT_SHORTNAMES.AUTHENTICATION],
     heroImage: '',
     docsUrl: 'https://supabase.com/docs/guides/auth/auth-web3',
+    blogUrl: 'https://supabase.com/blog/login-with-solana-ethereum',
     slug: 'web3-authentication',
     status: {
       stage: PRODUCT_STAGES.GA,
@@ -1397,6 +1435,7 @@ Email Templates provide complete control over your authentication email experien
     products: [PRODUCT_SHORTNAMES.AUTHENTICATION],
     heroImage: '',
     docsUrl: 'https://supabase.com/docs/guides/auth/auth-email-templates',
+    blogUrl: 'https://supabase.com/blog/introducing-seven-new-email-templates-for-auth',
     slug: 'email-templates',
     status: {
       stage: PRODUCT_STAGES.GA,
@@ -1436,6 +1475,7 @@ Supabase's MFA feature provides a robust tool for enhancing application security
     products: [PRODUCT_SHORTNAMES.AUTHENTICATION],
     heroImage: '',
     docsUrl: 'https://supabase.com/docs/guides/auth/auth-mfa',
+    blogUrl: 'https://supabase.com/blog/mfa-auth-via-rls',
     slug: 'multi-factor-authentication',
     status: {
       stage: PRODUCT_STAGES.GA,
@@ -1600,6 +1640,7 @@ Supabase Storage simplifies adding robust file management to your applications, 
     heroImage: '/images/features/file-storage.png',
     heroImageLight: '/images/features/file-storage-light.png',
     docsUrl: 'https://supabase.com/docs/guides/storage',
+    blogUrl: 'https://supabase.com/blog/supabase-storage',
     slug: 'file-storage',
     status: {
       stage: PRODUCT_STAGES.GA,
@@ -1637,6 +1678,7 @@ Analytics Buckets provide the scalable, cost-effective storage layer required fo
     products: [PRODUCT_SHORTNAMES.STORAGE],
     heroImage: '',
     docsUrl: 'https://supabase.com/docs/guides/storage/analytics/introduction',
+    blogUrl: 'https://supabase.com/blog/introducing-analytics-buckets',
     slug: 'analytics-buckets-with-iceberg',
     status: {
       stage: PRODUCT_STAGES.PUBLIC_ALPHA,
@@ -1674,6 +1716,7 @@ Vector Buckets provide the scalable vector storage required for AI-powered appli
     products: [PRODUCT_SHORTNAMES.STORAGE],
     heroImage: '',
     docsUrl: 'https://supabase.com/docs/guides/storage/vector/introduction',
+    blogUrl: 'https://supabase.com/blog/vector-buckets',
     slug: 'vector-buckets',
     status: {
       stage: PRODUCT_STAGES.PUBLIC_ALPHA,
@@ -1778,7 +1821,7 @@ Supabase’s Image Transformations feature enables developers to dynamically man
 3. Resize modes: Choose from ‘cover’, ‘contain’, or ‘fill’ to control how images fit within specified dimensions.
 4. Automatic format optimization: Automatically convert images to WebP format for supported browsers, enhancing load times and reducing egress usage.
 5. Flexible implementation: Utilize with public URLs, signed URLs, or direct downloads to fit various access control needs ([Server-side Auth](/features/server-side-auth)).
-6. [Next.js integration](/nextjs): Leverage a custom loader for optimized image handling in Next.js applications.
+6. [Next.js integration](/docs/guides/storage/serving/image-transformations#nextjs-loader): Leverage a custom loader for optimized image handling in Next.js applications.
 7. Self-hosting option: Deploy your own image transformation service using Imgproxy for greater control and customization.
 
 
@@ -1877,6 +1920,7 @@ Supabase's Resumable Uploads feature significantly improves the reliability and 
     products: [PRODUCT_SHORTNAMES.STORAGE],
     heroImage: 'https://www.youtube-nocookie.com/embed/pT2PcZFq_M0',
     docsUrl: 'https://supabase.com/docs/guides/storage/uploads/resumable-uploads',
+    blogUrl: 'https://supabase.com/blog/storage-v3-resumable-uploads',
     slug: 'resumable-uploads',
     status: {
       stage: PRODUCT_STAGES.GA,
@@ -1918,6 +1962,7 @@ Supabase's S3 compatibility allows seamless integration with existing workflows 
     heroImage: '/images/features/s3-compatibility.png',
     heroImageLight: '/images/features/s3-compatibility-light.png',
     docsUrl: 'https://supabase.com/docs/guides/storage/s3/compatibility',
+    blogUrl: 'https://supabase.com/blog/s3-compatible-storage',
     slug: 's3-compatibility',
     status: {
       stage: PRODUCT_STAGES.GA,
@@ -1963,6 +2008,7 @@ Supabase's Deno Edge Functions enable you to build responsive, globally distribu
     products: [PRODUCT_SHORTNAMES.FUNCTIONS],
     heroImage: 'https://www.youtube-nocookie.com/embed/EQ5h3NSWMbk',
     docsUrl: 'https://supabase.com/docs/guides/functions',
+    blogUrl: 'https://supabase.com/blog/supabase-edge-functions',
     slug: 'deno-edge-functions',
     status: {
       stage: PRODUCT_STAGES.GA,
@@ -1995,9 +2041,51 @@ Supabase's Deno Edge Functions enable you to build responsive, globally distribu
     products: [PRODUCT_SHORTNAMES.FUNCTIONS],
     heroImage: 'https://www.youtube-nocookie.com/embed/kL4M0auf4UU',
     docsUrl: 'https://supabase.com/docs/reference/middleware/introduction',
+    blogUrl: 'https://supabase.com/blog/supabase-middleware',
     slug: 'supabase-middleware',
     status: {
       stage: PRODUCT_STAGES.GA,
+      availableOnSelfHosted: true,
+    },
+  },
+  {
+    title: 'Server SDK',
+    subtitle: "Extend your app to users' agents with your Auth and RLS.",
+    description: `
+Use the Server SDK to give your Supabase app its own MCP server, so your users connect from Claude, Cursor, or ChatGPT (in developer mode) and work with their own records. They sign in with the account they already have, and every tool call runs as that user, so the RLS policies already in your database decide what the agent can read. If your app runs on Supabase Postgres and Supabase Auth, the access rules are already written.
+
+The same SDK, \`@supabase/server\`, checks who's calling your Edge Functions and other server code. The Supabase MCP server is separate: it connects your coding agent to your project so you can build the app.
+
+## Key benefits
+1. Give each agent the user's own view: Every tool call runs as the signed-in user, so a user's agent sees what that user can see in your app.
+2. Reuse the RLS you already wrote: The RLS policies that scope your web app decide what each MCP client can read, with no per-tool authorization code.
+3. Let users sign in with the account they have: Supabase Auth runs the OAuth 2.1 flow, dynamic client registration included, so users approve the MCP client once and never make a new account.
+4. Let users manage their own agents: The OAuth grant management endpoints list connected clients, and the Headless App block ships an \`/agents\` page for it. A user removes an agent's access from inside your app.
+5. Start from two blocks: The MCP Server block installs the Edge Function with a \`whoami\` tool. The OAuth Consent block adds the \`/oauth/consent\` route for Next.js, React, React Router, or TanStack Start.
+6. Keep your runtime: The same code also runs off Edge Functions, in a Next.js route handler, a SvelteKit endpoint, Cloudflare Workers, or a Node, Bun, or Deno server. There, you set the server URLs yourself.
+
+## When to use the Server SDK
+- Users of your CRM, ops, or analytics tool want to work on their own records from Claude, ChatGPT, Cursor, or VS Code (tool calls scoped by the RLS policies on those tables)
+- Staff need agent access to company data as themselves, with the row filters the web app already applies (a user session for every tool call, through your existing login)
+- You run a separate Express server beside your project to own one \`.well-known\` route (one Edge Function replaces it, with OAuth discovery served by the middleware)
+
+## How it works
+Turn on the OAuth 2.1 server and dynamic client registration under Authentication > OAuth Server. Host a consent screen in your frontend at the Auth Site URL. The project must sign JWTs with an asymmetric key (ES256 or RS256). Your function composes \`withOAuthProtectedResource()\` and \`withSupabase({ auth: 'user' })\` in a \`pipeline\` ahead of your MCP handler and sets \`verify_jwt = false\`. The first serves the protected resource metadata and the \`WWW-Authenticate\` challenge, so an MCP client needs the server URL and nothing else. The second rejects requests without a valid user token and hands your handler a client for that user, so anything a tool reads or writes goes through RLS. Test your RLS policies before you connect agents.
+
+## Get started
+- Start from the [Server SDK reference](https://supabase.com/docs/reference/server/introduction).
+- Run \`npx shadcn@latest add https://supabase.com/library/r/mcp.json\` to install the [MCP Server block](https://supabase.com/library/docs/headless/mcp).
+- Follow [Add authentication](https://supabase.com/docs/guides/ai-tools/byo-mcp#add-authentication) in the Deploy MCP servers guide.
+- Read the [authenticated example](https://github.com/supabase/supabase/tree/master/examples/edge-functions/supabase/functions/mcp/authenticated-mcp-server) with the \`todos\` tools, migration, and RLS policy.
+`,
+    icon: Server,
+    products: [PRODUCT_SHORTNAMES.AUTHENTICATION, PRODUCT_SHORTNAMES.FUNCTIONS],
+    heroImage: 'https://www.youtube-nocookie.com/embed/vEv87D-eJK4',
+    docsUrl: 'https://supabase.com/docs/reference/server/introduction',
+    blogUrl: 'https://supabase.com/blog/introducing-supabase-server',
+    slug: 'server-sdk',
+    status: {
+      stage: PRODUCT_STAGES.PUBLIC_BETA,
       availableOnSelfHosted: true,
     },
   },
@@ -2034,6 +2122,7 @@ Persistent Storage transforms Edge Functions into stateful, high-performance com
     products: [PRODUCT_SHORTNAMES.FUNCTIONS],
     heroImage: '',
     docsUrl: 'https://supabase.com/docs/guides/functions/ephemeral-storage',
+    blogUrl: 'https://supabase.com/blog/persistent-storage-for-faster-edge-functions',
     slug: 'persistent-storage',
     status: {
       stage: PRODUCT_STAGES.GA,
@@ -2148,6 +2237,7 @@ Automatic Embeddings eliminate the manual work of generating and maintaining vec
     products: [PRODUCT_MODULES_SHORTNAMES.VECTOR],
     heroImage: '',
     docsUrl: 'https://supabase.com/docs/guides/ai/automatic-embeddings',
+    blogUrl: 'https://supabase.com/blog/automatic-embeddings',
     slug: 'automatic-embeddings',
     status: {
       stage: PRODUCT_STAGES.GA,
@@ -2180,6 +2270,7 @@ Update to CLI v2.119.0 or later, then turn it on with \`SUPABASE_EXPERIMENTAL_ST
     heroImage: '/images/features/local-development.png',
     heroImageLight: '/images/features/local-development-light.png',
     docsUrl: 'https://supabase.com/docs/guides/local-development/running-multiple-local-projects',
+    blogUrl: 'https://supabase.com/blog/supabase-local-dev',
     slug: 'local-development',
     status: {
       stage: PRODUCT_STAGES.PUBLIC_ALPHA,
@@ -2211,6 +2302,7 @@ The Supabase CLI runs the full Supabase stack on your machine or in CI, captures
     products: [ADDITIONAL_PRODUCTS.PLATFORM],
     heroImage: 'https://www.youtube-nocookie.com/embed/vyHyYpvjaks',
     docsUrl: 'https://supabase.com/docs/guides/local-development',
+    blogUrl: 'https://supabase.com/blog/supabase-cli',
     slug: 'cli',
     status: {
       stage: PRODUCT_STAGES.GA,
@@ -2245,6 +2337,7 @@ Running several local projects is experimental and needs CLI v2.119.0 or later. 
     heroImage: '',
     hideHero: true,
     docsUrl: 'https://supabase.com/docs/guides/local-development/running-multiple-local-projects',
+    blogUrl: 'https://supabase.com/blog/local-supabase-project-per-agent-with-or-without-docker',
     slug: 'parallel-local-projects',
     status: {
       stage: PRODUCT_STAGES.PUBLIC_ALPHA,
@@ -2311,7 +2404,58 @@ By utilizing the Supabase Management API, you can create more efficient, scalabl
     heroImage: '/images/features/management-api.png',
     heroImageLight: '/images/features/management-api-light.png',
     docsUrl: 'https://supabase.com/docs/reference/api/introduction',
+    blogUrl: 'https://supabase.com/blog/supabase-cli-v1-and-admin-api-beta',
     slug: 'management-api',
+    status: {
+      stage: PRODUCT_STAGES.GA,
+      availableOnSelfHosted: false,
+    },
+  },
+  {
+    title: 'Personal Access Tokens',
+    subtitle: 'Limit a token to the organizations, projects, and permissions its job needs.',
+    description: `
+Personal Access Tokens authenticate your CLI, scripts, CI pipelines, and AI coding agents to your Supabase account. You can limit each token to the organizations, projects, and permissions its job needs, instead of handing a tool access to everything you can reach.
+
+Tokens you create in the Dashboard are scoped by default. Access is checked on every request and never exceeds your own role.
+
+## Key benefits
+1. Least privilege: Give a CI pipeline or coding agent a token limited to one project and the permissions its job needs.
+2. Contained leaks: A leaked token exposes only what it was scoped to, not your whole account.
+3. Review before you create: A review screen shows what a token can reach before you create it.
+4. Expiry: Set an expiry date so a temporary tool doesn't hold a token forever.
+5. Bounded by your role: A token never has more access than you do. If you lose access to a project, the token does too.
+6. Works where you work: Use a token with the CLI, the Management API, and the Supabase MCP server.
+
+## Personal Access Tokens are particularly valuable for:
+- CI pipelines that deploy a single project
+- AI coding agents connected through the Supabase MCP server
+- Scripts and tools that do one narrow task
+- Developers who belong to several organizations and want a token that reaches only one
+
+## Frequently asked questions
+
+### Can I change a token's scope after I create it?
+
+No. A token's scope is fixed when you create it. To change it, create a replacement token.
+
+### Can I scope the token that Supabase login creates?
+
+Not yet. \`supabase login\` in the browser creates a token with full account access today. Create the token in the Dashboard and pass it with \`supabase login --token\`.
+
+### What happens if I lose access to a project?
+
+The token loses that access too. If your access is restored, the token works again.
+
+Get started with the [Personal Access Tokens documentation](https://supabase.com/docs/guides/platform/personal-access-tokens).
+`,
+    icon: KeyRound,
+    products: [ADDITIONAL_PRODUCTS.PLATFORM],
+    heroImage: '/images/features/personal-access-tokens.png',
+    heroImageLight: '/images/features/personal-access-tokens-light.png',
+    docsUrl: 'https://supabase.com/docs/guides/platform/personal-access-tokens',
+    blogUrl: 'https://supabase.com/blog/scope-your-personal-access-tokens',
+    slug: 'personal-access-tokens',
     status: {
       stage: PRODUCT_STAGES.GA,
       availableOnSelfHosted: false,
@@ -2383,7 +2527,8 @@ By leveraging Supabase Reports, you gain a understanding of your project's perfo
     products: [ADDITIONAL_PRODUCTS.PLATFORM],
     heroImage: '/images/features/reports-and-metrics.png',
     heroImageLight: '/images/features/reports-and-metrics-light.png',
-    docsUrl: 'https://supabase.com/blog/supabase-reports-and-metrics',
+    docsUrl: 'https://supabase.com/docs/guides/observability/reports',
+    blogUrl: 'https://supabase.com/blog/supabase-reports-and-metrics',
     slug: 'reports-and-metrics',
     status: {
       stage: PRODUCT_STAGES.GA,
@@ -2464,6 +2609,7 @@ By building on Supabase's SOC 2 compliant platform, you gain a significant advan
     products: [ADDITIONAL_PRODUCTS.PLATFORM],
     heroImage: '',
     docsUrl: 'https://supabase.com/docs/guides/security/soc-2-compliance',
+    blogUrl: 'https://supabase.com/blog/supabase-soc2',
     slug: 'soc-2-compliance',
     status: {
       stage: PRODUCT_STAGES.GA,
@@ -2492,7 +2638,7 @@ With Supabase AI Assistant, you gain a powerful ally in your development process
     icon: Brain,
     products: [ADDITIONAL_PRODUCTS.PLATFORM],
     heroImage: 'https://www.youtube-nocookie.com/embed/_fdP-aaTHgw',
-    docsUrl: '/blog/supabase-ai-assistant-v2',
+    blogUrl: '/blog/supabase-ai-assistant-v2',
     slug: 'ai-assistant',
     status: {
       stage: PRODUCT_STAGES.PUBLIC_ALPHA,
@@ -2531,6 +2677,7 @@ This feature is particularly valuable for teams looking to enhance their applica
     heroImage: '/images/features/logs-analytics.png',
     heroImageLight: '/images/features/logs-analytics-light.png',
     docsUrl: 'https://supabase.com/docs/guides/monitoring-troubleshooting/logs',
+    blogUrl: 'https://supabase.com/blog/new-observability-features-in-supabase',
     slug: 'logs-analytics',
     status: {
       stage: PRODUCT_STAGES.GA,
@@ -2602,7 +2749,7 @@ Multiple users can collaborate on schema design in real-time, enhancing teamwork
     products: [ADDITIONAL_PRODUCTS.STUDIO],
     heroImage: '/images/features/visual-schema-designer.png',
     heroImageLight: '/images/features/visual-schema-designer-light.png',
-    docsUrl: 'https://supabase.com/blog/supabase-studio-3-0#schema-visualizer',
+    blogUrl: 'https://supabase.com/blog/supabase-studio-3-0#schema-visualizer',
     slug: 'visual-schema-designer',
     status: {
       stage: PRODUCT_STAGES.GA,
@@ -2628,7 +2775,6 @@ This feature is essential for organizations looking to maintain robust security 
     products: [ADDITIONAL_PRODUCTS.STUDIO],
     heroImage: '/images/features/policy-templates.png',
     heroImageLight: '/images/features/policy-templates-light.png',
-    docsUrl: '',
     slug: 'policy-templates',
     status: {
       stage: PRODUCT_STAGES.GA,
@@ -2639,7 +2785,9 @@ This feature is essential for organizations looking to maintain robust security 
     title: 'SQL Editor',
     subtitle: 'A powerful interface for writing and executing SQL queries.',
     description: `
-The SQL Editor in [Supabase Studio](/features?products=studio) provides users with a robust platform for writing, executing, and managing SQL queries directly within their browser. This feature is designed to enhance productivity by offering syntax highlighting, auto-completion, and error detection, making it easier for developers to interact with their databases efficiently.
+The SQL Editor in [Supabase Studio](/features?products=studio) provides users with a robust platform for writing, executing, and managing SQL queries directly within their browser. 
+
+${FEATURE_CTA_MARKER}
 
 ## Key benefits
 1. User-friendly interface: Intuitive design that simplifies the process of writing SQL queries.
@@ -2704,7 +2852,7 @@ Yes, the editor is available locally through [Supabase CLI](/features/cli).
     products: [ADDITIONAL_PRODUCTS.STUDIO],
     heroImage: '/images/features/sql-editor.png',
     heroImageLight: '/images/features/sql-editor-light.png',
-    docsUrl: '',
+    blogUrl: 'https://supabase.com/blog/supabase-studio-3-0',
     slug: 'sql-editor',
     status: {
       stage: PRODUCT_STAGES.GA,
@@ -2731,7 +2879,8 @@ This feature is essential for organizations aiming to maintain high security sta
     products: [ADDITIONAL_PRODUCTS.STUDIO],
     heroImage: '/images/features/security-and-performance-advisor.png',
     heroImageLight: '/images/features/security-and-performance-advisor-light.png',
-    docsUrl: 'https://supabase.com/blog/security-performance-advisor',
+    docsUrl: 'https://supabase.com/docs/guides/observability/advisors',
+    blogUrl: 'https://supabase.com/blog/security-performance-advisor',
     slug: 'security-and-performance-advisor',
     status: {
       stage: PRODUCT_STAGES.GA,
@@ -2796,6 +2945,7 @@ This feature is particularly valuable for teams looking to implement robust secu
     heroImage: '/images/features/postgres-roles.png',
     heroImageLight: '/images/features/postgres-roles-light.png',
     docsUrl: 'https://supabase.com/docs/guides/database/postgres/roles',
+    blogUrl: 'https://supabase.com/blog/postgres-roles-and-privileges',
     slug: 'postgres-roles',
     status: {
       stage: PRODUCT_STAGES.GA,
@@ -2827,7 +2977,7 @@ By leveraging User Impersonation, you can ensure that your application delivers 
     products: [PRODUCT_SHORTNAMES.AUTHENTICATION, ADDITIONAL_PRODUCTS.STUDIO],
     heroImage: '/images/blog/launch-week-x/day-1/3.png',
     heroImageLight: '/images/blog/launch-week-x/day-1/3.png',
-    docsUrl: '/blog/studio-introducing-assistant#user-impersonation',
+    blogUrl: '/blog/studio-introducing-assistant#user-impersonation',
     slug: 'user-impersonation',
     status: {
       stage: PRODUCT_STAGES.PUBLIC_BETA,
@@ -2853,7 +3003,7 @@ This feature is particularly beneficial for developers working with complex data
     products: [ADDITIONAL_PRODUCTS.STUDIO],
     heroImage:
       'https://xguihxuzqibwxjnimxev.supabase.co/storage/v1/object/public/videos/docs/fk-lookup.mp4',
-    docsUrl: 'https://supabase.com/blog/supabase-studio-2.0#foreign-key-selector',
+    blogUrl: 'https://supabase.com/blog/supabase-studio-2.0#foreign-key-selector',
     slug: 'foreign-key-selector',
     status: {
       stage: PRODUCT_STAGES.GA,
@@ -2883,6 +3033,7 @@ $60 per drain per project, plus $0.20 per million events and $0.09 per GB egress
     products: [ADDITIONAL_PRODUCTS.STUDIO],
     heroImage: 'https://www.youtube-nocookie.com/embed/A4GFmvgxS-E',
     docsUrl: 'https://supabase.com/docs/guides/observability/log-drains',
+    blogUrl: 'https://supabase.com/blog/log-drains',
     slug: 'log-drains',
     status: {
       stage: PRODUCT_STAGES.GA,
@@ -2908,6 +3059,7 @@ This feature is particularly valuable for developers looking to build dynamic we
     products: [ADDITIONAL_PRODUCTS.PLATFORM],
     heroImage: '',
     docsUrl: 'https://supabase.com/docs/reference/javascript/introduction',
+    blogUrl: 'https://supabase.com/blog/supabase-js-v2',
     slug: 'client-library-javascript',
     status: {
       stage: PRODUCT_STAGES.GA,
@@ -2933,6 +3085,7 @@ This feature is particularly useful for Flutter developers aiming to create resp
     products: [ADDITIONAL_PRODUCTS.PLATFORM],
     heroImage: '',
     docsUrl: 'https://supabase.com/docs/reference/dart/introduction',
+    blogUrl: 'https://supabase.com/blog/supabase-flutter-sdk-v1-released',
     slug: 'client-library-flutter',
     status: {
       stage: PRODUCT_STAGES.GA,
@@ -2958,6 +3111,7 @@ This feature is particularly valuable for iOS developers looking to leverage the
     products: [ADDITIONAL_PRODUCTS.PLATFORM],
     heroImage: '',
     docsUrl: 'https://supabase.com/docs/reference/swift/start',
+    blogUrl: 'https://supabase.com/blog/supabase-swift',
     slug: 'client-library-swift',
     status: {
       stage: PRODUCT_STAGES.GA,
@@ -2983,6 +3137,7 @@ This feature is especially beneficial for Python developers looking to build rob
     products: [ADDITIONAL_PRODUCTS.PLATFORM],
     heroImage: '',
     docsUrl: 'https://supabase.com/docs/reference/python/start',
+    blogUrl: 'https://supabase.com/blog/python-support',
     slug: 'client-library-python',
     status: {
       stage: PRODUCT_STAGES.BETA,
@@ -3008,6 +3163,7 @@ Supabase Cron is a Postgres module designed to schedule recurring Jobs with cron
     products: [PRODUCT_SHORTNAMES.DATABASE, ADDITIONAL_PRODUCTS.PLATFORM],
     heroImage: 'https://www.youtube-nocookie.com/embed/miRQPbIJOuQ',
     docsUrl: 'https://supabase.com/docs/guides/cron',
+    blogUrl: 'https://supabase.com/blog/supabase-cron',
     slug: 'supabase-cron',
     status: {
       stage: PRODUCT_STAGES.BETA,
@@ -3023,7 +3179,7 @@ OrioleDB is a PostgreSQL storage extension built on its pluggable storage framew
 ## Key benefits:
 1. Fully integrated: A drop-in replacement for PostgreSQL’s Heap storage, enabling easy adoption without major changes to existing workflows.
 2. Enhanced scalability: Eliminates buffer mapping bottlenecks and utilizes lock-less page reading, significantly improving vertical scalability and hardware utilization.
-3. Superior performance: Proven to outperform PostgreSQL Heap by up to 5.5x in benchmarks, particularly under high-load and large-scale scenarios.
+3. Superior performance: Proven to outperform PostgreSQL Heap by up to 5.5x in [benchmarks](https://dbarena.com), particularly under high-load and large-scale scenarios.
 4. Reduced maintenance overhead: Undo log-based MVCC eliminates storage bloat and removes the need for VACUUM, preventing common performance degradation.
 5. Efficient storage management: Built-in compression reduces storage requirements by up to 5x, enabling more cost-effective data handling.
 6. Modern write-ahead logging (WAL): Row-level WAL supports parallelism and is designed for future active-active multi-master configurations.
@@ -3039,6 +3195,7 @@ OrioleDB is a PostgreSQL storage extension built on its pluggable storage framew
     heroImage: '/images/features/orioledb.png',
     heroImageLight: '/images/features/orioledb-light.png',
     docsUrl: 'https://supabase.com/docs/guides/database/orioledb',
+    blogUrl: 'https://supabase.com/blog/orioledb-launch',
     slug: 'orioledb',
     status: {
       stage: PRODUCT_STAGES.PUBLIC_BETA,
@@ -3064,6 +3221,7 @@ Supabase Queues provides the reliability of Postgres with the simplicity of Supa
     products: [PRODUCT_SHORTNAMES.DATABASE, ADDITIONAL_PRODUCTS.PLATFORM],
     heroImage: 'https://www.youtube-nocookie.com/embed/UEwfaElBnZk',
     docsUrl: 'https://supabase.com/docs/guides/queues',
+    blogUrl: 'https://supabase.com/blog/supabase-queues',
     slug: 'queues',
     status: {
       stage: PRODUCT_STAGES.PUBLIC_ALPHA,
@@ -3180,10 +3338,56 @@ Yes, the MCP Server can perform actions like creating tables, running queries, a
     products: [PRODUCT_SHORTNAMES.DATABASE, ADDITIONAL_PRODUCTS.PLATFORM],
     heroImage: 'https://www.youtube-nocookie.com/embed/1SMldLoOhbg',
     docsUrl: 'https://supabase.com/docs/guides/getting-started/mcp',
+    blogUrl: 'https://supabase.com/blog/mcp-server',
     slug: 'mcp-server',
     status: {
       stage: PRODUCT_STAGES.GA,
       availableOnSelfHosted: true,
+    },
+  },
+  {
+    title: 'Enterprise-Managed Authorization for MCP',
+    subtitle: "Govern how your company's AI tools access Supabase through MCP.",
+    description: `
+Enterprise-Managed Authorization for MCP puts your company in charge of which AI tools can connect to Supabase instead of each employee. After the Supabase organization's owner or admin approves Claude, your identity provider or Claude confirms the identity of each employee who uses it. From then on, an employee who signs in to Claude sees Supabase already connected with the role they already have. There is no consent screen to click through and no token to create or share.
+
+## Key benefits
+1. Approve once: One approval by an owner or admin covers the whole organization. Members never see a consent screen.
+2. Same permissions as the Supabase Dashboard: Access is scoped to the signed-in member. A developer gets developer access and a read-only member gets read-only access.
+3. No tokens to manage: Access follows the member's sign-in and short-lived tokens expire on their own.
+4. Revoke in one place: Revoke Claude for the whole organization under Authorized apps in the Supabase Dashboard. To offboard one member, remove them from your Supabase organization and from your identity provider or Claude organization, whichever one issues their access.
+5. No IdP support required: Claude can issue the identity assertion when your IdP cannot.
+6. Standards-based: Supabase implements the MCP Enterprise-Managed Authorization extension on top of OAuth. Your security team reviews one open specification and the same setup works across any identity provider or AI tool that adopts it.
+
+## When to use it
+- Developers share personal access tokens because every Claude connection needs an owner or admin to approve it
+- Your security team needs one place to control which AI tools can reach Supabase and which employees can use them
+
+## How it works
+There are two ways to issue the identity assertion that Claude presents to Supabase:
+- Identity provider: Your IdP signs an identity assertion for each member and applies its own policy before issuing one. Okta supports this today and the [launch blog post](/blog/enterprise-managed-auth-for-the-supabase-mcp-server) walks through that setup.
+- Claude-issued (Claude auto-connect, in beta): Claude signs the assertion for any current member of your Claude organization. Use this when your IdP does not support the extension yet. Nothing changes in your IdP.
+
+A member signs in to Claude and Claude obtains the assertion from the issuer you registered. Supabase verifies the assertion against that issuer, confirms the member belongs to your organization with a matching SSO identity, and issues a short-lived access token bound to that member. When a token expires, Claude repeats the exchange rather than refreshing the token and the member never reconnects by hand.
+
+## Get started
+Requires a Supabase Team or Enterprise plan with SSO configured and a Claude Team or Enterprise plan. Setup takes about ten minutes once SSO is configured. Your identity provider must issue these identity assertions or Claude issues them for you. Each member must have signed in to Supabase through SSO at least once with the email they use in Claude.
+
+1. Authorize Claude: An owner or admin connects Claude to Supabase and approves it for the organization.
+2. Turn on managed authorization in Claude: An admin opens the Supabase connector, turns on managed authorization, and picks the identity source.
+3. Register the issuer in Supabase: The same owner or admin opens the SSO page in organization settings, expands Advanced settings, and enters the issuer URL for the identity source picked in step 2.
+
+From then on, every member with a matching Supabase account is connected the next time they use Claude.
+`,
+    icon: ShieldCheck,
+    products: [ADDITIONAL_PRODUCTS.PLATFORM],
+    heroImage: '/images/blog/2026-11-03-claude-issued-enterprise-managed-auth-for-mcp/og.png',
+    docsUrl: 'https://supabase.com/docs/guides/platform/sso/enterprise-mcp-authorization',
+    blogUrl: '/blog/claude-issued-enterprise-managed-auth-for-mcp',
+    slug: 'enterprise-managed-auth-for-mcp',
+    status: {
+      stage: PRODUCT_STAGES.GA,
+      availableOnSelfHosted: false,
     },
   },
   {
@@ -3255,6 +3459,7 @@ Get started with the [Declarative Schemas documentation](https://supabase.com/do
     products: [PRODUCT_SHORTNAMES.DATABASE],
     heroImage: 'https://www.youtube-nocookie.com/embed/EALkUlOKvAs',
     docsUrl: 'https://supabase.com/docs/guides/local-development/declarative-database-schemas',
+    blogUrl: 'https://supabase.com/blog/declarative-schemas',
     slug: 'declarative-schemas',
     status: {
       stage: PRODUCT_STAGES.GA,
@@ -3307,6 +3512,7 @@ By leveraging PrivateLink, you can satisfy stringent compliance requirements, re
     products: [ADDITIONAL_PRODUCTS.PLATFORM],
     heroImage: '/images/blog/2026/security-retro/privatelink.png',
     docsUrl: 'https://supabase.com/docs/guides/platform/privatelink',
+    blogUrl: 'https://supabase.com/blog/supabase-privatelink-available',
     slug: 'privatelink',
     status: {
       stage: PRODUCT_STAGES.BETA,

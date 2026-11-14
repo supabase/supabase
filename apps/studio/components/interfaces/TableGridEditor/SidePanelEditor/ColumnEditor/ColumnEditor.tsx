@@ -263,7 +263,7 @@ export const ColumnEditor = ({
                 description={
                   <>
                     Recommended to use lowercase and use an underscore to separate words e.g.{' '}
-                    <code className="text-code-inline">column_name</code>
+                    <code>column_name</code>
                   </>
                 }
               >

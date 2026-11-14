@@ -136,7 +136,7 @@ MCP routes are denied at the gateway by default. Allowing local access requires 
 
 </Admonition>
 
-The `/functions/v1/` route sets `idle_timeout` to `160s` and `timeout` to `410s` in `volumes/api/envoy/lds.template.yaml`. These allow the runtime's 150-second request idle timeout and 400-second worker lifetime limit to expire first. See [Memory or timeout errors](/docs/guides/self-hosting/self-hosted-functions#memory-or-timeout-errors) for the runtime settings.
+The `/functions/v1/` route sets `idle_timeout` to `160s` and `timeout` to `410s` in `volumes/api/envoy/lds.template.yaml`. These allow the runtime's 150-second request idle timeout and 400-second worker lifetime limit to expire first. See [Timeout errors](/docs/guides/self-hosting/self-hosted-functions#timeout-errors) for the runtime settings.
 
 ## Authentication
 
@@ -218,7 +218,9 @@ The gateway applies a permissive CORS policy at the virtual-host level:
 
 This matches both the current Supabase platform behavior and the previous Kong-based gateway. The auth boundary for Supabase APIs is the `apikey` header rather than the request origin.
 
-The `/pg/` route (direct Postgres introspection via `meta`, gated by the service role key) is the exception: it carries its own stricter per-route CORS override, restricted to `SUPABASE_PUBLIC_URL` and `localhost`/`127.0.0.1` origins, since there's no legitimate reason for this route to be called from an arbitrary third-party origin.
+The `/functions/v1/` route is an exception: the CORS filter is disabled there, as on the platform. Preflight requests reach your function, and its CORS headers pass through unchanged. See [CORS errors in the browser](/docs/guides/self-hosting/self-hosted-functions#cors-errors-in-the-browser).
+
+The `/pg/` route (direct Postgres introspection via `meta`, gated by the service role key) is another exception: it carries its own stricter per-route CORS override, restricted to `SUPABASE_PUBLIC_URL` and `localhost`/`127.0.0.1` origins, since there's no legitimate reason for this route to be called from an arbitrary third-party origin.
 
 <Admonition type="note">
 

@@ -37,7 +37,7 @@ export default function HeroSection({
               {section.subtitle}
             </p>
           )}
-          <h1 className="text-3xl md:text-4xl leading-tight tracking-tight text-balance">
+          <h1 className="text-3xl md:text-4xl leading-tight tracking-tight text-balance whitespace-pre-line">
             {section.title}
           </h1>
           {section.description && (

@@ -14,6 +14,13 @@ export const contract = {
   inputSchema,
   outputSchema: z.object({ success: z.boolean() }),
   minOptInLevel: null,
+  availability: {
+    environments: new Set(['platform']),
+  },
   needsApproval: true,
+  promptGuidance: `- Deploy Edge Functions by calling \`deploy_edge_function\` directly with \`name\` and \`code\`; the client handles confirmation and result presentation.
+- Provide example Edge Function code in markdown code blocks (\`\`\`edge\`\`\` or \`\`\`typescript\`\`\`) only upon user request or for illustrative purposes.
+- Use \`deploy_edge_function\` solely for deployment, not for presenting example code.
+- This tool requires user approval, and tools that need approval must be called one per step: never call it in parallel with another tool that needs approval. Issue one per step and wait for its result before calling the next.`,
   toModelOutput: ({ success }) => ({ success }),
 } as const satisfies ToolContract

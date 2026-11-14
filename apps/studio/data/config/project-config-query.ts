@@ -1,9 +1,9 @@
 import { queryOptions } from '@tanstack/react-query'
 
 import { configKeys } from './keys'
-import { get, handleError } from '@/data/fetchers'
+import { get, handleError, unguarded } from '@/data/fetchers'
 import { IS_PLATFORM } from '@/lib/constants'
-import type { ResponseError } from '@/types'
+import type { StudioError } from '@/lib/errors/studio-errors'
 
 export type ProjectConfigV2Variables = {
   projectRef?: string
@@ -20,6 +20,7 @@ export async function getProjectConfig(
   const { data, error } = await get('/v2/projects/{ref}/config', {
     params: { path: { ref: projectRef } },
     signal,
+    grant: unguarded.migrating,
   })
 
   if (error) handleError(error)
@@ -27,7 +28,7 @@ export async function getProjectConfig(
 }
 
 export type ProjectConfigV2Data = Awaited<ReturnType<typeof getProjectConfig>>
-export type ProjectConfigV2Error = ResponseError
+export type ProjectConfigV2Error = StudioError
 
 export const projectConfigV2QueryOptions = (
   { projectRef }: ProjectConfigV2Variables,
