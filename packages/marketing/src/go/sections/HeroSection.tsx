@@ -50,18 +50,32 @@ export default function HeroSection({
               {section.description}
             </p>
           )}
-          {section.ctas && section.ctas.length > 0 && (
-            <div className="flex flex-wrap items-center gap-4 pt-2">
-              {section.ctas.map((cta) => (
-                <Button
-                  key={cta.href}
-                  asChild
-                  variant={cta.variant === 'secondary' ? 'default' : 'primary'}
-                  size="medium"
+          {((section.ctas && section.ctas.length > 0) || section.supportingLink) && (
+            <div
+              className={cn('flex flex-col gap-4 pt-2', hasMedia ? 'items-start' : 'items-center')}
+            >
+              {section.ctas && section.ctas.length > 0 && (
+                <div className="flex flex-wrap items-center gap-4">
+                  {section.ctas.map((cta) => (
+                    <Button
+                      key={cta.href}
+                      asChild
+                      variant={cta.variant === 'secondary' ? 'default' : 'primary'}
+                      size="medium"
+                    >
+                      <a href={cta.href}>{cta.label}</a>
+                    </Button>
+                  ))}
+                </div>
+              )}
+              {section.supportingLink && (
+                <a
+                  href={section.supportingLink.href}
+                  className="text-sm text-foreground-light underline underline-offset-4 hover:text-foreground"
                 >
-                  <a href={cta.href}>{cta.label}</a>
-                </Button>
-              ))}
+                  {section.supportingLink.label}
+                </a>
+              )}
             </div>
           )}
         </div>
