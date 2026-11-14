@@ -2,11 +2,11 @@ import { useTheme } from 'next-themes'
 import { cn, StatusIcon } from 'ui'
 
 import { DestinationIcon } from './DestinationIcon'
-import type { DestinationType } from './DestinationPanel/DestinationPanel.types'
+import type { ReplicationDestinationType } from './ReplicationDiagram/Nodes.utils'
 import { BRAND_ICONS, resolveThemedIconSrc, type ThemedIconSrc } from '@/lib/brand-icons'
 import { resolveThemeOverrideMode } from '@/lib/theme-overrides'
 
-const BRAND_MARK_BY_TYPE: Partial<Record<DestinationType, ThemedIconSrc>> = {
+const BRAND_MARK_BY_TYPE: Partial<Record<ReplicationDestinationType, ThemedIconSrc>> = {
   BigQuery: BRAND_ICONS.bigquery,
   ClickHouse: BRAND_ICONS.clickhouse,
   DuckLake: BRAND_ICONS.ducklake,
@@ -19,7 +19,7 @@ const SIZE_CLASS_NAME = {
 } as const
 
 interface DestinationLogoProps {
-  type: DestinationType
+  type: ReplicationDestinationType
   size?: keyof typeof SIZE_CLASS_NAME
   className?: string
   /** Destructive badge on the bottom-right corner (e.g. table replication errors). */
@@ -43,7 +43,11 @@ export const DestinationLogo = ({
   const brandMarkSrc = brandMark === undefined ? undefined : resolveThemedIconSrc(brandMark, isDark)
 
   return (
-    <span className={cn('relative inline-flex shrink-0', className)}>
+    <span
+      role={type === 'Unknown' ? 'img' : undefined}
+      aria-label={type === 'Unknown' ? 'Unknown destination' : undefined}
+      className={cn('relative inline-flex shrink-0', className)}
+    >
       <span className={cn('flex items-center justify-center border bg-surface-100', sizing.frame)}>
         {brandMarkSrc === undefined ? (
           <DestinationIcon type={type} size={sizing.icon} className="text-foreground-light" />

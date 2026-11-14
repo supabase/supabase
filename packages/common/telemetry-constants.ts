@@ -456,10 +456,10 @@ export interface ProjectCreationSimpleVersionSubmittedEvent {
      */
     freeTierGeneralRegionExperiment?: 'control' | 'test'
     /**
-     * How the submitted region was arrived at. 'auto' = the user never touched the region field
-     * and kept the auto-assigned default. 'general' = the user picked a smart region group (e.g.
-     * Americas). 'specific' = the user picked an exact region (e.g. us-east-1). Only set when
-     * smart regions are enabled for the selected cloud provider.
+     * Which kind of region was submitted. 'auto' = the Auto (best available) region option.
+     * 'general' = a smart region group (e.g. Americas). 'specific' = an exact region (e.g.
+     * us-east-1). An untouched field reports whichever default it holds. Only set when smart
+     * regions are enabled for the selected cloud provider.
      */
     regionSelectionType?: 'general' | 'auto' | 'specific'
     /**
@@ -500,6 +500,89 @@ export interface ProjectCreationSimpleVersionConfirmModalOpenedEvent {
     instanceSize?: string
   }
   groups: Omit<TelemetryGroups, 'project'>
+}
+
+type OnboardingSurveySurface = 'org_form' | 'follow_up'
+
+/**
+ * User clicked Answer on the onboarding survey follow-up card.
+ *
+ * @group Events
+ * @source studio
+ */
+export interface OnboardingSurveyAnswerButtonClickedEvent {
+  action: 'onboarding_survey_answer_button_clicked'
+  properties: { surface: 'follow_up' }
+  groups: Partial<TelemetryGroups>
+}
+
+/**
+ * User clicked Submit. Fires before the backend mutation; pair with
+ * OnboardingSurveySubmitFailedEvent for failure rate. The platform's own
+ * `onboarding_survey_submitted` event tracks actual completions.
+ *
+ * @group Events
+ * @source studio
+ */
+export interface OnboardingSurveySubmitButtonClickedEvent {
+  action: 'onboarding_survey_submit_button_clicked'
+  properties: {
+    surface: OnboardingSurveySurface
+    hasKind: boolean
+    hasBuilding: boolean
+    hasCanCode: boolean
+  }
+  groups: Partial<TelemetryGroups>
+}
+
+/**
+ * User dismissed the onboarding survey.
+ *
+ * @group Events
+ * @source studio
+ */
+export interface OnboardingSurveyDismissedEvent {
+  action: 'onboarding_survey_dismissed'
+  properties: {
+    surface: OnboardingSurveySurface
+    reason: 'org_form_blank' | 'follow_up_skip' | 'follow_up_closed' | 'follow_up_expired'
+  }
+  groups: Partial<TelemetryGroups>
+}
+
+/**
+ * Onboarding survey submit failed.
+ *
+ * @group Events
+ * @source studio
+ */
+export interface OnboardingSurveySubmitFailedEvent {
+  action: 'onboarding_survey_submit_failed'
+  properties: {
+    surface: OnboardingSurveySurface
+    hasKind: boolean
+    hasBuilding: boolean
+    hasCanCode: boolean
+  }
+  groups: Partial<TelemetryGroups>
+}
+
+/**
+ * Signed-in user was shown the new organization form in either arm of the
+ * onboardingSurveyPlacement experiment. Fires once per mount of the form, after the
+ * profile loads and the flags for that user have resolved.
+ *
+ * @group Events
+ * @source studio
+ * @page new
+ */
+export interface OnboardingSurveyPlacementExperimentExposedEvent {
+  action: 'onboarding_survey_placement_experiment_exposed'
+  properties: {
+    experiment_id: 'onboarding_survey_placement'
+    /** The experiment variant the user is enrolled in */
+    variant: 'control' | 'org_form'
+  }
 }
 
 /**
@@ -1023,14 +1106,21 @@ export type MarkdownAffordancePageType =
   | 'pricing'
   | 'changelog'
   | 'guide'
-  | 'troubleshooting'
+  | 'kb'
+  | 'ask_ai_answer'
 
 /**
- * User clicked 'Copy as Markdown' on a page and the markdown was copied successfully.
+ * Part of the docs page actions split button that a user ran an action from.
+ */
+export type PageActionsOrigin = 'page_actions_button' | 'page_actions_menu'
+
+/**
+ * User clicked 'Copy as Markdown' on a page or under a Supabase AI answer, and the markdown was copied
+ * successfully.
  * Fires on success only; failed fetch/clipboard writes are not counted.
  *
  * @group Events
- * @source www, docs
+ * @source www, docs, kb
  */
 export interface CopyAsMarkdownClickedEvent {
   action: 'copy_as_markdown_clicked'
@@ -1039,6 +1129,10 @@ export interface CopyAsMarkdownClickedEvent {
      * Page class the affordance sits on.
      */
     pageType: MarkdownAffordancePageType
+    /**
+     * Docs page actions control that sent the event. Not set by other surfaces.
+     */
+    origin?: PageActionsOrigin
   }
 }
 
@@ -1046,10 +1140,52 @@ export interface CopyAsMarkdownClickedEvent {
  * User clicked the sidebar link to set up an AI coding agent with Supabase.
  *
  * @group Events
- * @source docs
+ * @source docs, kb
  */
 export interface AgentSetupClickedEvent {
   action: 'agent_setup_clicked'
+}
+
+/**
+ * User copied the URL of a page's Markdown version and the clipboard write succeeded.
+ *
+ * @group Events
+ * @source docs
+ * @page /docs/guides
+ */
+export interface MarkdownUrlCopiedEvent {
+  action: 'markdown_url_copied'
+  properties: {
+    /**
+     * Page class the affordance sits on.
+     */
+    pageType: MarkdownAffordancePageType
+    /**
+     * Docs page actions control that sent the event.
+     */
+    origin: PageActionsOrigin
+  }
+}
+
+/**
+ * User clicked "View as Markdown" to open a page's Markdown version.
+ *
+ * @group Events
+ * @source docs
+ * @page /docs/guides
+ */
+export interface ViewAsMarkdownClickedEvent {
+  action: 'view_as_markdown_clicked'
+  properties: {
+    /**
+     * Page class the affordance sits on.
+     */
+    pageType: MarkdownAffordancePageType
+    /**
+     * Docs page actions control that sent the event.
+     */
+    origin: PageActionsOrigin
+  }
 }
 
 /**
@@ -1072,7 +1208,7 @@ export interface PreferredSourceClickedEvent {
  * User clicked "Ask..." to open a new window to consult an agent about the current page.
  *
  * @group Events
- * @source www, docs
+ * @source www, docs, kb
  */
 export interface AskAiClickedEvent {
   action: 'ask_ai_clicked'
@@ -1082,6 +1218,10 @@ export interface AskAiClickedEvent {
      * Page class the affordance sits on.
      */
     pageType: MarkdownAffordancePageType
+    /**
+     * Docs page actions control that sent the event. Not set by other surfaces.
+     */
+    origin?: PageActionsOrigin
   }
 }
 
@@ -1121,7 +1261,9 @@ export interface DocsAiPromptCopiedEvent {
 }
 
 /**
- * User clicked a curated orientation link from a content listings MDX component.
+ * User clicked a curated orientation link from a content listings MDX component, or a
+ * link card or quickstart link in the getting started stepper (`listingId` is
+ * `getting-started-stepper`).
  *
  * @group Events
  * @source docs
@@ -1137,6 +1279,69 @@ export interface DocsContentListingClickedEvent {
 }
 
 /**
+ * User clicked a link to an example in the supabase/supabase GitHub repo's examples/ folder.
+ *
+ * @group Events
+ * @source PageTelemetry, in every app that mounts it (docs, www, studio, learn, ui-library, kb)
+ */
+export interface ExampleLinkClickedEvent {
+  action: 'example_link_clicked'
+  properties: {
+    /**
+     * Path after examples/ in the GitHub URL, e.g. auth/nextjs.
+     */
+    examplePath: string
+  }
+}
+
+/**
+ * User copied a docs code block with its copy button, and the clipboard write succeeded.
+ *
+ * @group Events
+ * @source docs
+ */
+export interface DocsCodeCopiedEvent {
+  action: 'docs_code_copied'
+  properties: {
+    /**
+     * Language of the code block, such as `bash` or `ts`.
+     */
+    lang?: string
+    /**
+     * Identifier that a page gives a code block it measures, such as
+     * `getting-started-install`.
+     */
+    copyId?: string
+  }
+}
+
+/**
+ * User picked an option in the getting started stepper: how to start, a framework, or a
+ * feature for the agent prompt.
+ *
+ * @group Events
+ * @source docs
+ * @page /docs/guides/getting-started
+ */
+export interface DocsGettingStartedOptionClickedEvent {
+  action: 'docs_getting_started_option_clicked'
+  properties: {
+    /**
+     * Stepper step the option belongs to.
+     */
+    optionType: 'start' | 'framework' | 'feature'
+    /**
+     * Start option id, framework slug, or feature id.
+     */
+    optionId: string
+    /**
+     * For a feature, true when the click selected it and false when it cleared it.
+     */
+    isSelected?: boolean
+  }
+}
+
+/**
  * User opened the Search V2 dialog.
  *
  * @group Events
@@ -1148,7 +1353,7 @@ export interface DocsSearchV2OpenedEvent {
     /**
      * The trigger that opened the Search V2 dialog.
      */
-    triggerType: 'keyboard_shortcut' | 'search_input'
+    triggerType: 'keyboard_shortcut' | 'search_input' | 'not_found_button'
   }
 }
 
@@ -1193,6 +1398,72 @@ export interface DocsSearchV2ResultClickedEvent {
 }
 
 /**
+ * User opened the knowledge base search dialog.
+ *
+ * @group Events
+ * @source kb
+ */
+export interface KbSearchOpenedEvent {
+  action: 'kb_search_opened'
+  properties: {
+    /** The trigger that opened the dialog: Cmd+K or Ctrl+K, or a search button on the page. */
+    triggerType: 'keyboard_shortcut' | 'search_input'
+  }
+}
+
+/**
+ * User closed the knowledge base search dialog.
+ *
+ * @group Events
+ * @source kb
+ */
+export interface KbSearchClosedEvent {
+  action: 'kb_search_closed'
+  properties: {
+    /** Why the dialog closed: the user dismissed it or opened a result. */
+    closeReason: 'dismissed' | 'result_navigated'
+  }
+}
+
+/**
+ * A knowledge base search returned, with or without results.
+ *
+ * @group Events
+ * @source kb
+ */
+export interface KbSearchSubmittedEvent {
+  action: 'kb_search_submitted'
+  properties: {
+    /** The trimmed search term sent to the knowledge base search endpoint. */
+    query: string
+    /** Length of the trimmed search term. */
+    queryLength: number
+    /** Number of results the search returned. */
+    resultCount: number
+    /** Whether the search returned at least one result. */
+    hasResults: boolean
+  }
+}
+
+/**
+ * User activated a knowledge base search result, by clicking it or selecting it via keyboard.
+ *
+ * @group Events
+ * @source kb
+ */
+export interface KbSearchResultClickedEvent {
+  action: 'kb_search_result_clicked'
+  properties: {
+    /** The path of the result that was activated. */
+    resultPath: string
+    /** 1-based position of the result in the list. */
+    resultPosition: number
+    /** Number of results showing when the result was activated. */
+    resultCount: number
+  }
+}
+
+/**
  * User closed the Search V2 dialog.
  *
  * @group Events
@@ -1200,6 +1471,142 @@ export interface DocsSearchV2ResultClickedEvent {
  */
 export interface DocsSearchV2ClosedEvent {
   action: 'docs_search_v2_closed'
+  properties: {
+    /**
+     * Why the dialog closed: the user dismissed it, opened a result, or switched to Ask AI.
+     */
+    closeReason: 'dismissed' | 'result_navigated' | 'switched_to_ask_ai'
+  }
+}
+
+/**
+ * User opened Ask AI in the Search V2 dialog.
+ *
+ * @group Events
+ * @source docs
+ */
+export interface DocsSearchV2AskAiOpenedEvent {
+  action: 'docs_search_v2_ask_ai_opened'
+  properties: {
+    /**
+     * The trigger that opened Ask AI: the top bar button, Cmd+I or Ctrl+I, the item shown when a
+     * search has no results, or the button in the search results footer.
+     */
+    triggerType: 'ask_ai_button' | 'keyboard_shortcut' | 'no_results_item' | 'results_footer_button'
+  }
+}
+
+/**
+ * User's question was sent to Ask AI in the Search V2 dialog. The question text is left out
+ * because it can contain personal data; only its length is sent.
+ *
+ * @group Events
+ * @source docs
+ */
+export interface DocsSearchV2AskAiQuestionSubmittedEvent {
+  action: 'docs_search_v2_ask_ai_question_submitted'
+  properties: {
+    /**
+     * The length of the question, in characters.
+     */
+    questionLength: number
+    /**
+     * Where the question came from: typed in Ask AI, or carried over from a search.
+     */
+    questionSource: 'typed' | 'search'
+  }
+}
+
+/**
+ * User clicked a source link under an Ask AI answer in the Search V2 dialog.
+ *
+ * @group Events
+ * @source docs
+ */
+export interface DocsSearchV2AskAiSourceClickedEvent {
+  action: 'docs_search_v2_ask_ai_source_clicked'
+  properties: {
+    /**
+     * The path of the source that was clicked.
+     */
+    sourcePath: string
+  }
+}
+
+/**
+ * User closed Ask AI in the Search V2 dialog, by closing the dialog or by switching to search.
+ *
+ * @group Events
+ * @source docs
+ */
+export interface DocsSearchV2AskAiClosedEvent {
+  action: 'docs_search_v2_ask_ai_closed'
+  properties: {
+    /**
+     * Why Ask AI closed: the user dismissed the dialog, or switched to search.
+     */
+    closeReason: 'dismissed' | 'switched_to_search'
+  }
+}
+
+/**
+ * Ask AI finished streaming an answer in the Search V2 dialog.
+ *
+ * @group Events
+ * @source docs
+ */
+export interface DocsSearchV2AskAiAnswerCompletedEvent {
+  action: 'docs_search_v2_ask_ai_answer_completed'
+  properties: {
+    /**
+     * Where the question came from: typed in Ask AI, or carried over from a search.
+     */
+    questionSource: 'typed' | 'search'
+    /**
+     * Time from sending the question to the end of the answer, in milliseconds.
+     */
+    durationMs: number
+    /**
+     * The number of source pages listed under the answer.
+     */
+    sourceCount: number
+  }
+}
+
+/**
+ * Ask AI failed to answer a question in the Search V2 dialog.
+ *
+ * @group Events
+ * @source docs
+ */
+export interface DocsSearchV2AskAiAnswerFailedEvent {
+  action: 'docs_search_v2_ask_ai_answer_failed'
+  properties: {
+    /**
+     * Where the question came from: typed in Ask AI, or carried over from a search.
+     */
+    questionSource: 'typed' | 'search'
+    /**
+     * Time from sending the question to the failure, in milliseconds.
+     */
+    durationMs: number
+  }
+}
+
+/**
+ * User clicked a link inside an Ask AI answer in the Search V2 dialog.
+ *
+ * @group Events
+ * @source docs
+ */
+export interface DocsSearchV2AskAiAnswerLinkClickedEvent {
+  action: 'docs_search_v2_ask_ai_answer_link_clicked'
+  properties: {
+    /**
+     * The link's destination, as written in the answer.
+     */
+    href: string
+  }
 }
 
 /**
@@ -1563,7 +1970,7 @@ export interface SqlEditorQueryRunButtonClickedEvent {
 }
 
 /**
- * User clicked on the "Cancel Subscription" Button on the billing settings page.
+ * User clicked on the "Cancel subscription" Button on the billing settings page.
  *
  * @group Events
  * @source studio
@@ -1630,32 +2037,6 @@ export interface StudioPricingSidePanelOpenedEvent {
  */
 export interface ReportsDatabaseGrafanaBannerClickedEvent {
   action: 'reports_database_grafana_banner_clicked'
-  groups: TelemetryGroups
-}
-
-/**
- * The logs.all deprecation banner was rendered, fired once per mount. Acts as the
- * denominator for the dismiss rate. Migration outcome itself is measured via decay in
- * `/v1/projects/:ref/analytics/endpoints/logs.all` traffic in the warehouse, not from this event.
- *
- * @group Events
- * @source studio
- * @page /project/[ref]/logs/*, /project/[ref]/observability/*
- */
-export interface LogsAllDeprecationBannerExposedEvent {
-  action: 'logs_all_deprecation_banner_exposed'
-  groups: TelemetryGroups
-}
-
-/**
- * User dismissed the logs.all deprecation banner.
- *
- * @group Events
- * @source studio
- * @page /project/[ref]/logs/*, /project/[ref]/observability/*
- */
-export interface LogsAllDeprecationBannerDismissButtonClickedEvent {
-  action: 'logs_all_deprecation_banner_dismiss_button_clicked'
   groups: TelemetryGroups
 }
 
@@ -2220,6 +2601,91 @@ export interface StorageBucketVersioningEnabledEvent {
   properties: {
     /** Whether a lifecycle policy was configured at the same time. */
     hasLifecyclePolicy?: boolean
+  }
+  groups: TelemetryGroups
+}
+
+/**
+ * Triggered when a standby URL signing key is created for a project's Storage.
+ *
+ * @group Events
+ * @source studio
+ * @page /project/{ref}/storage/signing-keys
+ */
+export interface StorageUrlSigningKeyCreatedEvent {
+  action: 'storage_url_signing_key_created'
+  properties: {
+    /** The algorithm the standby key was created with. */
+    algorithm: 'ES256' | 'HS512'
+  }
+  groups: TelemetryGroups
+}
+
+/**
+ * Triggered when a URL signing key's role changes: a standby key is rotated to active,
+ * a standby key is revoked, or a revoked key is moved back to standby.
+ *
+ * @group Events
+ * @source studio
+ * @page /project/{ref}/storage/signing-keys
+ */
+export interface StorageUrlSigningKeyUpdatedEvent {
+  action: 'storage_url_signing_key_updated'
+  properties: {
+    /** What happened to the key. */
+    change: 'rotated' | 'revoked' | 'moved_to_standby'
+  }
+  groups: TelemetryGroups
+}
+
+/**
+ * Triggered when a lifecycle rule is added to a bucket from its card on the Storage policies page.
+ *
+ * @group Events
+ * @source studio
+ * @page /dashboard/project/{ref}/storage/files/policies
+ */
+export interface StorageBucketLifecycleRuleCreatedEvent {
+  action: 'storage_bucket_lifecycle_rule_created'
+  properties: {
+    /** The new rule's status, Enabled or Disabled. */
+    ruleStatus: 'Enabled' | 'Disabled'
+    /** How many rules the bucket's lifecycle configuration holds after the save. */
+    ruleCount: number
+  }
+  groups: TelemetryGroups
+}
+
+/**
+ * Triggered when a bucket lifecycle rule is edited, enabled, or disabled on the Storage policies page.
+ *
+ * @group Events
+ * @source studio
+ * @page /dashboard/project/{ref}/storage/files/policies
+ */
+export interface StorageBucketLifecycleRuleUpdatedEvent {
+  action: 'storage_bucket_lifecycle_rule_updated'
+  properties: {
+    /** The rule's status after the save, Enabled or Disabled. */
+    ruleStatus: 'Enabled' | 'Disabled'
+    /** How many rules the bucket's lifecycle configuration holds after the save. */
+    ruleCount: number
+  }
+  groups: TelemetryGroups
+}
+
+/**
+ * Triggered when a bucket lifecycle rule is deleted on the Storage policies page.
+ *
+ * @group Events
+ * @source studio
+ * @page /dashboard/project/{ref}/storage/files/policies
+ */
+export interface StorageBucketLifecycleRuleRemovedEvent {
+  action: 'storage_bucket_lifecycle_rule_removed'
+  properties: {
+    /** How many rules remain; 0 means the configuration was removed. */
+    ruleCount: number
   }
   groups: TelemetryGroups
 }
@@ -2910,6 +3376,11 @@ export interface CommandMenuCommandClickedEvent {
     command_value?: string
     command_type: 'action' | 'route'
     /**
+     * Heading of the section the command was listed under, e.g. `Related resources`.
+     * Absent when the command was not listed under one, as on a command menu sub-page.
+     */
+    command_section?: string
+    /**
      * The search query that was active when the command was clicked
      */
     search_query?: string
@@ -3175,7 +3646,7 @@ type AdvisorLevel = 'ERROR' | 'WARN' | 'INFO'
  *
  * @group Events
  * @source studio
- * @page /dashboard/project/{ref}/advisors/security or home page or advisor panel sidebar
+ * @page /dashboard/project/{ref}/issues or home page or advisor panel sidebar
  */
 export interface AdvisorDetailOpenedEvent {
   action: 'advisor_detail_opened'
@@ -3210,7 +3681,7 @@ export interface AdvisorDetailOpenedEvent {
  *
  * @group Events
  * @source studio
- * @page /dashboard/project/{ref} (homepage), /dashboard/project/{ref}/advisors/security or /dashboard/project/{ref}/advisors/performance (lint detail panel)
+ * @page /dashboard/project/{ref} (homepage), /dashboard/project/{ref}/issues/{id} (issue detail)
  */
 export interface AdvisorAssistantButtonClickedEvent {
   action: 'advisor_assistant_button_clicked'
@@ -3266,6 +3737,7 @@ export type AiAssistantSource =
   | 'error_code'
   | 'advisor_signal_detail'
   | 'database_connections'
+  | 'edge_function_errors'
 
 /**
  * User copied an AI prompt to clipboard instead of using the built-in assistant.
@@ -3964,10 +4436,12 @@ export interface UnifiedLogsRowClickedEvent {
       | 'auth'
       | 'storage'
       | 'edge function'
+      | 'edge function runtime'
       | 'realtime'
       | 'supavisor'
       | 'pgbouncer'
       | 'multigres'
+      | 'pipelines'
       | 'compute'
   }
   groups: TelemetryGroups
@@ -4079,7 +4553,7 @@ export interface HeaderFeedbackDropdownOpenedEvent {
 }
 
 /**
- * User clicked the Advisor Center toggle button in the page header.
+ * User clicked the Issues panel toggle button in the page header (formerly the Advisor Center).
  *
  * @group Events
  * @source studio
@@ -4183,9 +4657,84 @@ export interface WarehouseDisabledEvent {
 }
 
 /**
+ * Account recovery rollout exposure when the takeover opens.
+ * @group Events
+ * @source Automatic reminder controller
+ * @page /organizations, /org/*, /project/*, /new, /new/*
+ */
+export interface AccountRecoveryReminderExposedEvent {
+  action: 'account_recovery_reminder_exposed'
+  properties: { gap: 'missing' | 'exhausted' }
+  groups: TelemetryGroups
+}
+
+/**
+ * @group Events
+ * @source User starts a recovery task
+ * @page /organizations, /org/*, /project/*, /new
+ */
+export interface AccountRecoveryActionClickedEvent {
+  action: 'account_recovery_action_clicked'
+  properties: { actionType: 'generate_codes' | 'regenerate_codes' | 'add_factor' }
+  groups: TelemetryGroups
+}
+
+/**
+ * @group Events
+ * @source User saves recovery codes or verifies another authenticator
+ * @page /organizations, /org/*, /project/*, /new
+ */
+export interface AccountRecoveryTaskCompletedEvent {
+  action: 'account_recovery_task_completed'
+  properties: { taskType: 'recovery_codes' | 'authenticator' }
+  groups: TelemetryGroups
+}
+
+/**
+ * @group Events
+ * @source User skips or continues from the recovery interstitial
+ * @page /organizations, /org/*, /project/*, /new
+ */
+export interface AccountRecoveryReminderClosedEvent {
+  action: 'account_recovery_reminder_closed'
+  properties: { hasCompletedTask: boolean }
+  groups: TelemetryGroups
+}
+
+export type RecoveryCodesSurface = 'account_security' | 'mfa_setup' | 'recovery_interstitial'
+
+/**
+ * @group Events
+ * @source User successfully copies codes from the Save your recovery codes dialog
+ * @page /account/security, /organizations, /org/*, /project/*, /new, /new/*
+ */
+export interface RecoveryCodesCopiedEvent {
+  action: 'recovery_codes_copied'
+  properties: { surface: RecoveryCodesSurface }
+  groups: TelemetryGroups
+}
+
+/**
+ * @group Events
+ * @source User starts a download from the Save your recovery codes dialog
+ * @page /account/security, /organizations, /org/*, /project/*, /new, /new/*
+ */
+export interface RecoveryCodesDownloadClickedEvent {
+  action: 'recovery_codes_download_clicked'
+  properties: { surface: RecoveryCodesSurface }
+  groups: TelemetryGroups
+}
+
+/**
  * @hidden
  */
 export type TelemetryEvent =
+  | AccountRecoveryReminderExposedEvent
+  | AccountRecoveryActionClickedEvent
+  | AccountRecoveryTaskCompletedEvent
+  | AccountRecoveryReminderClosedEvent
+  | RecoveryCodesCopiedEvent
+  | RecoveryCodesDownloadClickedEvent
   | ExplorerQuerySubmittedEvent
   | ExplorerQueryCompletedEvent
   | ExplorerQueryFailedEvent
@@ -4214,6 +4763,11 @@ export type TelemetryEvent =
   | ProjectCreationGithubConnectClickedEvent
   | ProjectCreationSimpleVersionSubmittedEvent
   | ProjectCreationSimpleVersionConfirmModalOpenedEvent
+  | OnboardingSurveyAnswerButtonClickedEvent
+  | OnboardingSurveySubmitButtonClickedEvent
+  | OnboardingSurveyDismissedEvent
+  | OnboardingSurveySubmitFailedEvent
+  | OnboardingSurveyPlacementExperimentExposedEvent
   | ProjectCreationFormExposedEvent
   | FreeTierGeneralRegionExperimentExposedEvent
   | FreeTierGeneralRegionUpgradeClickedEvent
@@ -4248,13 +4802,29 @@ export type TelemetryEvent =
   | CopyAsMarkdownClickedEvent
   | AgentSetupClickedEvent
   | PreferredSourceClickedEvent
+  | MarkdownUrlCopiedEvent
+  | ViewAsMarkdownClickedEvent
   | AskAiClickedEvent
   | DocsAiPromptCopiedEvent
   | DocsContentListingClickedEvent
+  | ExampleLinkClickedEvent
+  | DocsCodeCopiedEvent
+  | DocsGettingStartedOptionClickedEvent
   | DocsSearchV2OpenedEvent
   | DocsSearchV2SearchSubmittedEvent
   | DocsSearchV2ResultClickedEvent
+  | KbSearchOpenedEvent
+  | KbSearchClosedEvent
+  | KbSearchSubmittedEvent
+  | KbSearchResultClickedEvent
   | DocsSearchV2ClosedEvent
+  | DocsSearchV2AskAiOpenedEvent
+  | DocsSearchV2AskAiQuestionSubmittedEvent
+  | DocsSearchV2AskAiSourceClickedEvent
+  | DocsSearchV2AskAiClosedEvent
+  | DocsSearchV2AskAiAnswerCompletedEvent
+  | DocsSearchV2AskAiAnswerFailedEvent
+  | DocsSearchV2AskAiAnswerLinkClickedEvent
   | Docs404RecommendationClickedEvent
   | DocsProjectConfigVariablesCopyButtonClickedEvent
   | HomepageFrameworkQuickstartClickedEvent
@@ -4289,8 +4859,6 @@ export type TelemetryEvent =
   | StudioBillingCancelSubscriptionClickedEvent
   | StudioPricingSidePanelOpenedEvent
   | ReportsDatabaseGrafanaBannerClickedEvent
-  | LogsAllDeprecationBannerExposedEvent
-  | LogsAllDeprecationBannerDismissButtonClickedEvent
   | IndexAdvisorEnableButtonClickedEvent
   | IndexAdvisorBannerDismissButtonClickedEvent
   | IndexAdvisorTabClickedEvent
@@ -4324,6 +4892,11 @@ export type TelemetryEvent =
   | ForeignDataWrapperCreatedEvent
   | StorageBucketCreatedEvent
   | StorageBucketVersioningEnabledEvent
+  | StorageUrlSigningKeyCreatedEvent
+  | StorageUrlSigningKeyUpdatedEvent
+  | StorageBucketLifecycleRuleCreatedEvent
+  | StorageBucketLifecycleRuleUpdatedEvent
+  | StorageBucketLifecycleRuleRemovedEvent
   | BranchCreateButtonClickedEvent
   | BranchDeleteButtonClickedEvent
   | BranchCreateMergeRequestButtonClickedEvent

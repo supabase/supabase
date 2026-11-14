@@ -85,7 +85,7 @@ export const CronJobPage = () => {
       with command{' '}
       <Tooltip>
         <TooltipTrigger asChild>
-          <code className="text-code-inline max-w-[200px] inline-block truncate align-bottom cursor-pointer">
+          <code className="max-w-[200px] inline-block truncate align-bottom cursor-pointer">
             {job.command}
           </code>
         </TooltipTrigger>
@@ -94,7 +94,7 @@ export const CronJobPage = () => {
           align="center"
           className="min-w-[200px] max-w-[400px] text-wrap p-0"
         >
-          <p className="text-xs font-mono px-2 py-1 border-b bg-surface-100">Command</p>
+          <p className="text-xs font-mono px-2 py-1 border-b bg-muted">Command</p>
           <CodeBlock
             hideLineNumbers
             language="sql"

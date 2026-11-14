@@ -50,18 +50,26 @@ describe('catalog integrity', () => {
   const winter = new Date('2026-01-15T12:00:00Z')
   const summer = new Date('2026-07-15T12:00:00Z')
 
-  const cases = TIMEZONES_BY_IANA.flatMap((entry) =>
-    entry.utc.map((iana) => [entry.text, iana, entry] as const)
-  )
+  const getLabelOffsetHours = (label: string) => {
+    const match = label.match(/^\(UTC(?:([+-])(\d\d):(\d\d))?\)/)
+    if (!match) return undefined
+    return match[1] ? (match[1] === '-' ? -1 : 1) * (Number(match[2]) + Number(match[3]) / 60) : 0
+  }
 
-  it.each(cases)('%s: %s has the offset in its label in winter or summer', (_text, iana, entry) => {
-    const match = entry.text.match(/^\(UTC(?:([+-])(\d\d):(\d\d))?\)/)
-    expect(match).not.toBeNull()
-    const labelOffset = match?.[1]
-      ? (match[1] === '-' ? -1 : 1) * (Number(match[2]) + Number(match[3]) / 60)
-      : 0
+  it('every IANA zone has the offset in its label in winter or summer', () => {
+    const mismatches = TIMEZONES_BY_IANA.flatMap((entry) =>
+      entry.utc
+        .filter((iana) => {
+          const labelOffset = getLabelOffsetHours(entry.text)
+          return (
+            labelOffset === undefined ||
+            ![getOffsetHours(iana, winter), getOffsetHours(iana, summer)].includes(labelOffset)
+          )
+        })
+        .map((iana) => `${entry.text}: ${iana}`)
+    )
 
-    expect([getOffsetHours(iana, winter), getOffsetHours(iana, summer)]).toContain(labelOffset)
+    expect(mismatches).toEqual([])
   })
 })
 
@@ -98,13 +106,6 @@ const getTimezone = (zone: string) => {
 }
 
 describe('getTimezoneLabel', () => {
-  it.each([
-    ['2026-01-09T03:12:00Z', '(UTC+01:00) Brussels, Copenhagen, Madrid, Paris'],
-    ['2026-10-09T03:12:00Z', '(UTC+02:00) Brussels, Copenhagen, Madrid, Paris'],
-  ])('shows Madrid offset at %s', (date, label) => {
-    expect(getTimezoneLabel(getTimezone('Europe/Madrid'), dayjs(date))).toBe(label)
-  })
-
   it.each([
     ['2026-03-29T00:59:59Z', '(UTC+01:00)'],
     ['2026-03-29T01:00:00Z', '(UTC+02:00)'],

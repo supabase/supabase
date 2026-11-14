@@ -90,15 +90,20 @@ describe('RoleRow', () => {
       expect(deleteItem).toBeAriaDisabled()
       fireEvent.click(deleteItem)
       expect(onSelectDelete).not.toHaveBeenCalled()
-
-      await userEvent.hover(deleteItem)
-      expect(
-        await screen.findByRole('tooltip', {
-          name: `The ${name} role is a system role and cannot be deleted`,
-        })
-      ).toBeInTheDocument()
     }
   )
+
+  test('explains why Delete is disabled for a system role', async () => {
+    customRender(<RoleRow role={createRole(1, 'postgres')} onSelectDelete={vi.fn()} />)
+
+    await userEvent.click(screen.getByRole('button', { name: 'postgres actions' }))
+    await userEvent.hover(await screen.findByRole('menuitem', { name: 'Delete' }))
+    expect(
+      await screen.findByRole('tooltip', {
+        name: 'The postgres role is a system role and cannot be deleted',
+      })
+    ).toBeInTheDocument()
+  })
 
   test('keeps the postgres permission editor available', async () => {
     customRender(<RoleRow role={createRole(1, 'postgres')} onSelectDelete={vi.fn()} />)

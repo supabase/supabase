@@ -2,20 +2,25 @@
 
 import { File } from 'lucide-react'
 import dynamic from 'next/dynamic'
-import { useState } from 'react'
+import { createContext, useContext, useState } from 'react'
 import { cn, flattenTree, TreeView, TreeViewItem } from 'ui'
 import type { CodeBlockLang } from 'ui-patterns/CodeBlock'
 
 import { RegistryNode } from '@/lib/process-registry'
 
+// next/dynamic passes no props to `loading`, so the fallback reads the code from context.
+const PendingCodeContext = createContext('')
+
+function PendingCode() {
+  const code = useContext(PendingCodeContext)
+  return (
+    <pre className="w-full min-h-0 min-w-0 flex-1 overflow-auto p-4 font-mono text-xs">{code}</pre>
+  )
+}
+
 const CodeBlock = dynamic(
   () => import('ui-patterns/CodeBlock').then((module) => module.CodeBlock),
-  {
-    ssr: false,
-    loading: () => (
-      <div className="p-4 text-xs text-foreground-lighter">Loading code preview...</div>
-    ),
-  }
+  { ssr: false, loading: () => <PendingCode /> }
 )
 
 interface BlockItemCodeProps {
@@ -143,13 +148,15 @@ export function BlockItemCode({ files, embedded = false }: BlockItemCodeProps) {
 
       {/* Code display area */}
       {selectedFile?.content ? (
-        <CodeBlock
-          wrapperClassName="w-full min-h-0 min-w-0 flex-1"
-          className="h-full max-w-none w-full! flex-1 font-mono text-xs rounded-none border-none"
-          language={languageFor(selectedFile.name)}
-        >
-          {selectedFile?.content}
-        </CodeBlock>
+        <PendingCodeContext.Provider value={selectedFile.content}>
+          <CodeBlock
+            wrapperClassName="w-full min-h-0 min-w-0 flex-1"
+            className="h-full max-w-none w-full! flex-1 font-mono text-xs rounded-none border-none"
+            language={languageFor(selectedFile.name)}
+          >
+            {selectedFile?.content}
+          </CodeBlock>
+        </PendingCodeContext.Provider>
       ) : (
         <div className="flex items-center justify-center h-full text-muted-foreground">
           <div className="flex flex-col items-center gap-2">

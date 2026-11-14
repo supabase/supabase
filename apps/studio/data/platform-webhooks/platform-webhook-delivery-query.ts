@@ -4,7 +4,8 @@ import { platformWebhooksKeys } from './keys'
 import { getWebhookDelivery, type WebhookScopeParams } from './platform-webhooks-fetchers'
 import { toWebhookDelivery } from './platform-webhooks-mappers'
 import type { WebhookDelivery } from '@/components/interfaces/Platform/Webhooks/PlatformWebhooks.types'
-import type { ResponseError, UseCustomQueryOptions } from '@/types'
+import type { StudioError } from '@/lib/errors/studio-errors'
+import type { UseCustomQueryOptions } from '@/types'
 
 interface WebhookDeliveryVariables {
   scope: WebhookScopeParams
@@ -27,11 +28,11 @@ export const useWebhookDeliveryQuery = <TData = WebhookDeliveryData>(
   {
     enabled = true,
     ...options
-  }: UseCustomQueryOptions<WebhookDeliveryData, ResponseError, TData> = {}
+  }: UseCustomQueryOptions<WebhookDeliveryData, StudioError, TData> = {}
 ) => {
   const { scope, endpointId, id } = variables
 
-  return useQuery<WebhookDeliveryData, ResponseError, TData>({
+  return useQuery<WebhookDeliveryData, StudioError, TData>({
     queryKey: platformWebhooksKeys.delivery(scope, endpointId, id),
     queryFn: ({ signal }) => fetchWebhookDelivery({ scope, endpointId, id }, signal),
     enabled: enabled && Boolean(id),

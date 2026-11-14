@@ -3,7 +3,7 @@ import { toast } from 'sonner'
 
 import { awsAccountKeys } from './keys'
 import { handleError, post } from '@/data/fetchers'
-import type { ResponseError } from '@/types'
+import type { StudioError } from '@/lib/errors/studio-errors'
 
 export type AWSAccountCreateVariables = {
   projectRef: string
@@ -18,19 +18,19 @@ export async function createAWSAccount({
   accountName,
   databaseIdentifier,
 }: AWSAccountCreateVariables) {
-  const { data, error } = await post('/v2/projects/{ref}/private-link/associations', {
-    params: { path: { ref: projectRef } },
-    body: {
-      data: {
-        type: 'private_link_association',
-        attributes: {
-          aws_account_id: awsAccountId,
-          account_name: accountName,
-          database_identifier: databaseIdentifier,
-        },
+  const { data, error } = await post(
+    '/platform/projects/{ref}/privatelink/associations/aws-account',
+    {
+      params: {
+        path: { ref: projectRef },
       },
-    },
-  })
+      body: {
+        aws_account_id: awsAccountId,
+        account_name: accountName,
+        database_identifier: databaseIdentifier,
+      },
+    }
+  )
 
   if (error) handleError(error)
   return data
@@ -43,11 +43,11 @@ export const useAWSAccountCreateMutation = ({
   onError,
   ...options
 }: Omit<
-  UseMutationOptions<AWSAccountCreateData, ResponseError, AWSAccountCreateVariables>,
+  UseMutationOptions<AWSAccountCreateData, StudioError, AWSAccountCreateVariables>,
   'mutationFn'
 > = {}) => {
   const queryClient = useQueryClient()
-  return useMutation<AWSAccountCreateData, ResponseError, AWSAccountCreateVariables>({
+  return useMutation<AWSAccountCreateData, StudioError, AWSAccountCreateVariables>({
     mutationFn: (vars) => createAWSAccount(vars),
     async onSuccess(data, variables, context, mutationContext) {
       const { projectRef } = variables

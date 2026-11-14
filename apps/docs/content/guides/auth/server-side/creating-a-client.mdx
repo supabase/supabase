@@ -1,6 +1,6 @@
 ---
 title: 'Creating a Supabase client for SSR'
-subtitle: 'Configure your Supabase client to use cookies'
+description: 'Configure your Supabase client to use cookies'
 ---
 
 Learn how to configure your Supabase client to use cookies. Your app can then render on the server with the user already signed in.
@@ -221,47 +221,37 @@ The Proxy is responsible for:
 2. Passing the refreshed Auth token to Server Components, so they don't attempt to refresh the same token themselves. It is what keeps users signed in. This is accomplished with `request.cookies.set`.
 3. Passing the refreshed Auth token to the browser, so it replaces the old token. This is accomplished with `response.cookies.set`.
 
-<Accordion>
+<details>
+<summary>What does the `cookies` object do?</summary>
 
-    <AccordionItem
-      header="What does the `cookies` object do?"
-      id="utility-cookies"
-    >
+The cookies object lets the Supabase client know how to access the cookies, so it can read and write the user session data. To make `@supabase/ssr` framework-agnostic, the cookies methods aren't hard-coded. These utility functions adapt `@supabase/ssr`'s cookie handling for Next.js.
 
-    The cookies object lets the Supabase client know how to access the cookies, so it can read and write the user session data. To make `@supabase/ssr` framework-agnostic, the cookies methods aren't hard-coded. These utility functions adapt `@supabase/ssr`'s cookie handling for Next.js.
+`setAll` is called whenever the library needs to write cookies, for example after a token refresh. It receives two arguments: the array of cookies to set, and a `headers` object containing the cache headers `Cache-Control`, `Expires`, and `Pragma`, which must be applied to the HTTP response to prevent CDNs from caching the response and leaking the session to other users. In the Proxy, apply these headers to the response. In Server Components, the headers cannot be set, which is why the `setAll` call is wrapped in a try/catch and the error is ignored. The Proxy handles writing cookies and headers on every request.
 
-    `setAll` is called whenever the library needs to write cookies, for example after a token refresh. It receives two arguments: the array of cookies to set, and a `headers` object containing the cache headers `Cache-Control`, `Expires`, and `Pragma`, which must be applied to the HTTP response to prevent CDNs from caching the response and leaking the session to other users. In the Proxy, apply these headers to the response. In Server Components, the headers cannot be set, which is why the `setAll` call is wrapped in a try/catch and the error is ignored. The Proxy handles writing cookies and headers on every request.
+The cookie is named `sb-<project_ref>-auth-token` by default.
 
-    The cookie is named `sb-<project_ref>-auth-token` by default.
+</details>
 
-    </AccordionItem>
+<details>
+<summary>Do I need to create a new client for every route?</summary>
 
-    <AccordionItem
-      header="Do I need to create a new client for every route?"
-      id="client-deduplication"
-    >
+    Yes! Creating a Supabase client is lightweight.
 
-        Yes! Creating a Supabase client is lightweight.
+    - On the server, it basically configures a `fetch` call. You need to reconfigure the fetch call anew for every request to your server, because you need the cookies from the request.
+    - On the client, `createBrowserClient` already uses a singleton pattern, so you only ever create one instance, no matter how many times you call your `createClient` function.
 
-        - On the server, it basically configures a `fetch` call. You need to reconfigure the fetch call anew for every request to your server, because you need the cookies from the request.
-        - On the client, `createBrowserClient` already uses a singleton pattern, so you only ever create one instance, no matter how many times you call your `createClient` function.
+</details>
 
-    </AccordionItem>
+<details>
+<summary>Why does refreshing in two places sign users out?</summary>
 
-    <AccordionItem
-      header="Why does refreshing in two places sign users out?"
-      id="double-refresh"
-    >
+A refresh token can generally be used only once, with two exceptions. Supabase allows a short window in which the same token can be presented again, which covers the normal SSR round trip. It also returns the active token when the parent of the active token is presented, which covers a client that never received the previous response. A reuse attempt that matches neither exception revokes the whole session.
 
-    A refresh token can generally be used only once, with two exceptions. Supabase allows a short window in which the same token can be presented again, which covers the normal SSR round trip. It also returns the active token when the parent of the active token is presented, which covers a client that never received the previous response. A reuse attempt that matches neither exception revokes the whole session.
+This is hard to trace, because it looks like users being signed out at random rather than an error in your code.
 
-    This is hard to trace, because it looks like users being signed out at random rather than an error in your code.
+See [refresh token reuse detection](/docs/guides/auth/sessions#what-is-refresh-token-reuse-detection-and-what-does-it-protect-from).
 
-    See [refresh token reuse detection](/docs/guides/auth/sessions#what-is-refresh-token-reuse-detection-and-what-does-it-protect-from).
-
-    </AccordionItem>
-
-</Accordion>
+</details>
 
 Create a `lib/supabase` folder at the root of your project, or inside the `./src` folder if you are using one, with a file for each type of client. Then copy the lib utility functions for each client type.
 
@@ -838,8 +828,8 @@ exports.createClient = (context) => {
         return parseCookieHeader(context.req.headers.cookie ?? '')
       },
       setAll(cookiesToSet, headers) {
-        cookiesToSet.forEach(({ name, value }) =>
-          context.res.appendHeader('Set-Cookie', serializeCookieHeader(name, value))
+        cookiesToSet.forEach(({ name, value, options }) =>
+          context.res.appendHeader('Set-Cookie', serializeCookieHeader(name, value, options))
         )
         Object.entries(headers).forEach(([key, value]) => context.res.setHeader(key, value))
       },
@@ -1015,5 +1005,5 @@ See the [advanced Auth server-side rendering guide](/docs/guides/auth/server-sid
 ## Next steps
 
 - Implement [Authentication using Email and Password](/docs/guides/auth/passwords)
-- Implement [Authentication using OAuth](/docs/guides/auth/social-login)
+- Implement [Authentication using OAuth](/docs/guides/auth/social-sign-in)
 - [Learn more about SSR](/docs/guides/auth/server-side/advanced-guide)

@@ -4,7 +4,8 @@ import { logDrainsKeys } from './keys'
 import { LogDrainData } from './log-drains-query'
 import { get, handleError } from '@/data/fetchers'
 import { MAX_RETRY_FAILURE_COUNT } from '@/data/query-client'
-import type { ResponseError, UseCustomQueryOptions } from '@/types'
+import type { StudioError } from '@/lib/errors/studio-errors'
+import type { UseCustomQueryOptions } from '@/types'
 
 export type AuditLogDrainsVariables = {
   slug?: string
@@ -22,14 +23,11 @@ export async function getAuditLogDrains({ slug }: AuditLogDrainsVariables, signa
 
   if (error) handleError(error)
 
-  // Match the flattened shape of project log drains, where `id` is the token
-  return (data ?? []).map(({ token, name, description, config, type }): LogDrainData => {
-    return { id: token, token, name, description, config, type }
-  })
+  return (data ?? []) as LogDrainData[]
 }
 
 export type AuditLogDrainsData = LogDrainData[]
-export type AuditLogDrainsError = ResponseError
+export type AuditLogDrainsError = StudioError
 
 export const useAuditLogDrainsQuery = <TData = AuditLogDrainsData>(
   { slug }: AuditLogDrainsVariables,

@@ -4,7 +4,9 @@ import { useState } from 'react'
 import { cn, Tooltip, TooltipContent, TooltipProvider, TooltipTrigger } from 'ui'
 
 import { CHART_COLORS, DateTimeFormats } from './Charts.constants'
+import type { Datum } from './Charts.types'
 import { formatPercentage, numberFormatter } from './Charts.utils'
+import { getThresholdZoneValues } from './ComposedChartThresholdZones.utils'
 import { useFormatDateTime, useTimezone } from '@/lib/datetime'
 import { formatBytes, formatBytesMinMB } from '@/lib/helpers'
 
@@ -13,6 +15,8 @@ export interface ReportAttributes {
   titleTooltip?: string
   label: string
   attributes?: (MultiAttribute | false)[]
+  thresholdZones?: ThresholdZone[]
+  thresholdZoneAttribute?: string
   defaultChartStyle?: 'bar' | 'line' | 'stackedAreaLine'
   hide?: boolean
   entitlement?: string
@@ -36,6 +40,17 @@ export interface ReportAttributes {
   }
   normalizeVisibleStackToPercent?: boolean
   hideHighlightedValue?: boolean
+}
+
+export type ThresholdZone = {
+  label: string
+  color: string
+  textColor?: string
+  badgeLabel?: string
+  tooltipLabel?: string
+  isAlwaysVisible?: boolean
+  tooltip: string
+  getRanges: (data: Datum[]) => ([number, number] | null)[]
 }
 
 export type Provider = 'infra-monitoring' | 'daily-stats' | 'mock' | 'reference-line' | 'logs'
@@ -122,7 +137,8 @@ interface TooltipProps {
   payload?: any[]
   label?: string | number
   attributes?: MultiAttribute[]
-  data?: Record<string, unknown>[]
+  data?: Datum[]
+  thresholdZones?: ThresholdZone[]
   xAxisKey?: string
   isPercentage?: boolean
   format?: string | ((value: unknown) => string)
@@ -173,6 +189,7 @@ export const CustomTooltip = ({
   label: _label,
   attributes,
   data,
+  thresholdZones,
   xAxisKey = 'period_start',
   isPercentage,
   format,
@@ -192,6 +209,7 @@ export const CustomTooltip = ({
     const rawDataPoint = data?.find(
       (point) => point[xAxisKey] === timestamp || point[timestampKey] === timestamp
     )
+    const thresholdValues = getThresholdZoneValues(rawDataPoint, thresholdZones)
     const maxValueAttribute = isMaxAttribute(attributes)
     const maxValue =
       maxValueAttribute && rawDataPoint
@@ -279,8 +297,8 @@ export const CustomTooltip = ({
           </span>
           <span className="ml-3.5 flex items-end gap-1">
             {formatNumeric(rawValue) + (!isPercentage && format !== 'ms' ? byteUnitSuffix : '')}
-            {isPercentage ? '%' : ''}
-            {format === 'ms' ? 'ms' : ''}
+            {isPercentage ? <span>%</span> : ''}
+            {format === 'ms' ? <span>ms</span> : ''}
 
             {/* Show percentage if max value is set */}
             {percentage !== null && !isMax && !isPercentage && (
@@ -304,6 +322,15 @@ export const CustomTooltip = ({
           {[...payload].reverse().map((entry: any, index: number) => (
             <LabelItem key={`${entry.name}-${index}`} entry={entry} />
           ))}
+          {thresholdValues?.map((threshold) => (
+            <div key={threshold.label} className="flex items-center w-full">
+              <MaxConnectionsIcon color={threshold.color} />
+              <span className="text-foreground-lighter ml-1 grow cursor-default select-none">
+                {threshold.label}
+              </span>
+              <span className="ml-3.5">{formatNumeric(threshold.value)}</span>
+            </div>
+          ))}
           {active && showTotal && (
             <div className="flex md:flex-col gap-1 md:gap-0 text-foreground mt-1">
               <span className="grow text-foreground-lighter">Total</span>
@@ -313,7 +340,7 @@ export const CustomTooltip = ({
                     ? formatPercentage(total as number, valuePrecision)
                     : formatNumeric(total as number) +
                       (!isPercentage && format !== 'ms' ? byteUnitSuffix : '')}
-                  {format === 'ms' ? 'ms' : ''}
+                  {format === 'ms' ? <span>ms</span> : ''}
                 </span>
                 {maxValueAttribute &&
                   hasFiniteMaxValue &&

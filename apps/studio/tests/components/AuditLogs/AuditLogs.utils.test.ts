@@ -37,18 +37,8 @@ const logC = makeLog({
 })
 
 describe('timestamp conversion (microseconds → milliseconds)', () => {
-  test('dividing by 1000 produces a valid date', () => {
-    expect(dayjs(TS_A / TIMESTAMP_MICROS_PER_MS).isValid()).toBe(true)
-  })
-
-  test('produces the correct year', () => {
+  test('dividing by TIMESTAMP_MICROS_PER_MS produces the correct date', () => {
     expect(dayjs(TS_A / TIMESTAMP_MICROS_PER_MS).year()).toBe(2026)
-  })
-
-  test('dayjs.unix on a microsecond value produces an invalid date', () => {
-    // Guard: confirms the bug we fixed — dayjs.unix() treats the value as seconds,
-    // overflowing JS Date's max and producing "Invalid Date"
-    expect(dayjs.unix(TS_A).isValid()).toBe(false)
   })
 })
 

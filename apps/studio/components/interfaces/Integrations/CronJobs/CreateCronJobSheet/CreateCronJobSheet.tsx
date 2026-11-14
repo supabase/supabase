@@ -257,9 +257,11 @@ export const CreateCronJobSheet = ({ open, selectedCronJob, onClose }: CreateCro
       endpoint,
       snippet: '',
     })
-    if (command) {
-      form.setValue('values.snippet', command)
-    }
+    if (!command) return
+
+    // Keep the stored command until a field changes
+    const isStoredCommand = isEditing && command === buildCommand(cronJobValues)
+    form.setValue('values.snippet', isStoredCommand ? cronJobValues.snippet : command)
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [
     cronType,
@@ -392,8 +394,8 @@ export const CreateCronJobSheet = ({ open, selectedCronJob, onClose }: CreateCro
                         // @ts-ignore
                         title={
                           <span>
-                            Enable <code className="text-code-inline w-min">pg_net</code> for HTTP
-                            requests or Edge Functions
+                            Enable <code className="w-min">pg_net</code> for HTTP requests or Edge
+                            Functions
                           </span>
                         }
                         description={

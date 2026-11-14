@@ -3,7 +3,8 @@ import { toast } from 'sonner'
 
 import { invalidateSchemasQuery } from './schemas-query'
 import { handleError, post } from '@/data/fetchers'
-import type { ResponseError, UseCustomMutationOptions } from '@/types'
+import type { StudioError } from '@/lib/errors/studio-errors'
+import type { UseCustomMutationOptions } from '@/types'
 
 export type HooksEnableVariables = {
   ref: string
@@ -24,11 +25,11 @@ export const useHooksEnableMutation = ({
   onError,
   ...options
 }: Omit<
-  UseCustomMutationOptions<HooksEnableData, ResponseError, HooksEnableVariables>,
+  UseCustomMutationOptions<HooksEnableData, StudioError, HooksEnableVariables>,
   'mutationFn'
 > = {}) => {
   const queryClient = useQueryClient()
-  return useMutation<HooksEnableData, ResponseError, HooksEnableVariables>({
+  return useMutation<HooksEnableData, StudioError, HooksEnableVariables>({
     mutationFn: (vars) => enableDatabaseWebhooks(vars),
     async onSuccess(data, variables, context) {
       const { ref } = variables

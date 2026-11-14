@@ -18,6 +18,11 @@ export const telemetryAccessWhat: ContentListingGroup = {
       description: 'Filter, inspect, and export events in the unified Logs view.',
     },
     {
+      title: 'Logs in the CLI',
+      href: '/guides/observability/cli-logs',
+      description: 'Browse, filter, and export logs with Supabase CLI v3.',
+    },
+    {
       title: 'Log sources and fields',
       href: '/guides/observability/log-field-reference',
       description: 'Look up sources, ClickHouse query fields, and capture limits.',
@@ -54,19 +59,6 @@ export const telemetryDetect: ContentListingGroup = {
       href: '/guides/observability/detecting',
       description:
         'Run health, security, performance, and capacity checks against logs and database statistics to pick up a signal.',
-    },
-  ],
-}
-
-export const telemetryDiagnose: ContentListingGroup = {
-  id: 'telemetry-diagnose',
-  type: 'grid',
-  items: [
-    {
-      title: 'Diagnose and resolve',
-      href: '/guides/troubleshooting',
-      description:
-        'Use a concrete finding, symptom, or error code to identify the cause and apply a known solution.',
     },
   ],
 }

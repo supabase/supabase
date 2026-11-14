@@ -4,7 +4,8 @@ import { toast } from 'sonner'
 
 import { scopedAccessTokenKeys } from './keys'
 import { handleError, post } from '@/data/fetchers'
-import type { ResponseError, UseCustomMutationOptions } from '@/types'
+import type { StudioError } from '@/lib/errors/studio-errors'
+import type { UseCustomMutationOptions } from '@/types'
 
 export type ScopedAccessTokenCreateVariables = components['schemas']['CreateScopedAccessTokenBody']
 
@@ -31,12 +32,12 @@ export const useScopedAccessTokenCreateMutation = ({
   onError,
   ...options
 }: Omit<
-  UseCustomMutationOptions<NewScopedAccessToken, ResponseError, ScopedAccessTokenCreateVariables>,
+  UseCustomMutationOptions<NewScopedAccessToken, StudioError, ScopedAccessTokenCreateVariables>,
   'mutationFn'
 > = {}) => {
   const queryClient = useQueryClient()
 
-  return useMutation<NewScopedAccessToken, ResponseError, ScopedAccessTokenCreateVariables>({
+  return useMutation<NewScopedAccessToken, StudioError, ScopedAccessTokenCreateVariables>({
     mutationFn: (vars) => createScopedAccessToken(vars),
     async onSuccess(data, variables, context) {
       await queryClient.invalidateQueries({ queryKey: scopedAccessTokenKeys.list() })

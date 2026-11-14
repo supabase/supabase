@@ -59,8 +59,8 @@ export const ExceedsRoleBadge = ({ entry, mode, access }: ExceedsRoleBadgeProps)
         <p className="text-xs">
           {entry.name} ({PERMISSION_MODE_LABEL[mode]}) requires the{' '}
           {TOKEN_ROLE_LABEL[access.requiredRole]} role or above
-          {entry.level === 'organization' && ' at the organization level'}. Requests will be denied
-          on:
+          {entry.level === 'organization' && <span>{' at the organization level'}</span>}
+          <span>. Requests will be denied on:</span>
         </p>
         <ul className="text-xs text-foreground-light space-y-0.5">
           {failingResources.slice(0, MAX_LISTED_RESOURCES).map((resource) => (

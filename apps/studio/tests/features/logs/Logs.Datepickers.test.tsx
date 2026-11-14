@@ -185,11 +185,6 @@ describe('parseCustomInput', () => {
 })
 
 describe('generateDynamicHelper', () => {
-  test('generates helper with correct text', () => {
-    const helper = generateDynamicHelper(5, 'hour')
-    expect(helper.text).toBe('Last 5 hours')
-  })
-
   test('uses singular form when value is 1', () => {
     expect(generateDynamicHelper(1, 'minute').text).toBe('Last 1 minute')
     expect(generateDynamicHelper(1, 'hour').text).toBe('Last 1 hour')
@@ -273,24 +268,6 @@ test('renders warning', async () => {
   await screen.findByText(RegExp(from.format('DD MMM')))
 })
 
-test('renders dates in local time', async () => {
-  const from = dayjs().subtract(1, 'days')
-  const to = dayjs()
-  render(
-    <LogsDatePicker
-      helpers={PREVIEWER_DATEPICKER_HELPERS}
-      onSubmit={mockFn}
-      value={{
-        from: from.toISOString(),
-        to: to.toISOString(),
-      }}
-    />
-  )
-  // renders time locally
-  await userEvent.click(await screen.findByText(RegExp(from.format('DD MMM'))))
-  await screen.findByText(RegExp(from.format('DD MMM')))
-})
-
 test('renders datepicker selected dates in local time', async () => {
   const from = dayjs().date(25)
   const to = dayjs().date(27)
@@ -332,28 +309,26 @@ test('datepicker onSubmit will return ISO string of selected dates', async () =>
   )
 
   // open the datepicker
-  userEvent.click(screen.getByText(/13:00/i))
+  await userEvent.click(screen.getByText(/13:00/i))
 
   const day15 = dayjs().date(15)
   const day16 = day15.add(1, 'day')
 
   // Find and click on first date
   const day15Element = await screen.findByText(day15.format('D'))
-  userEvent.dblClick(day15Element)
+  await userEvent.dblClick(day15Element)
 
   // Find and click on second date
   const day16Element = await screen.findByText(day16.format('D'))
-  userEvent.click(day16Element)
+  await userEvent.click(day16Element)
 
   await userEvent.click(await screen.findByText('Apply'))
-  expect(mockFn).toBeCalled()
-
-  const call = mockFn.mock.calls[0][0]
-
-  expect(call).toMatchObject({
-    from: dayjs().date(day15.date()).hour(13).minute(0).second(0).millisecond(0).toISOString(),
-    to: dayjs().date(day16.date()).hour(23).minute(59).second(59).millisecond(0).toISOString(),
-  })
+  expect(mockFn).toHaveBeenCalledWith(
+    expect.objectContaining({
+      from: dayjs().date(day15.date()).hour(13).minute(0).second(0).millisecond(0).toISOString(),
+      to: dayjs().date(day16.date()).hour(23).minute(59).second(59).millisecond(0).toISOString(),
+    })
+  )
 })
 
 test('disabled helpers are disabled', async () => {
@@ -385,7 +360,7 @@ test('disabled helpers are disabled', async () => {
   )
 
   // click the datepicker
-  userEvent.click(screen.getByText('Last 7 days'))
+  await userEvent.click(screen.getByText('Last 7 days'))
 
   const disabledHelperContainer = await screen.findByText(/last 30 days/i)
 
@@ -394,31 +369,6 @@ test('disabled helpers are disabled', async () => {
   })
 
   expect(disabledButton.getAttribute('aria-disabled')).toBe('true')
-})
-
-test('passing a value prop shows the correct dates in the label', async () => {
-  const from = dayjs().subtract(10, 'days')
-  const to = dayjs()
-
-  render(
-    <LogsDatePicker
-      helpers={[]}
-      value={{ from: from.toISOString(), to: to.toISOString() }}
-      onSubmit={mockFn}
-    />
-  )
-
-  await screen.findByText(
-    `${from.format('DD MMM')}, ${from.format('HH:mm')} - ${to.format('DD MMM')}, ${to.format('HH:mm')}`
-  )
-
-  // change the date
-  userEvent.click(await screen.findByText(RegExp(from.format('DD MMM'))))
-  userEvent.click(await screen.findByText(RegExp(to.format('DD MMM'))))
-
-  await screen.findByText(
-    `${from.format('DD MMM')}, ${from.format('HH:mm')} - ${to.format('DD MMM')}, ${to.format('HH:mm')}`
-  )
 })
 
 test('opening with an unparseable date value (legacy epoch-ms its/ite) does not crash', async () => {

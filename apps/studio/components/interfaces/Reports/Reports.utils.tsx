@@ -11,7 +11,7 @@ import {
   unixMicroToIsoTimestamp,
 } from '@/components/interfaces/Settings/Logs/Logs.utils'
 import type { SafeLogSqlFragment } from '@/data/logs/safe-analytics-sql'
-import { REPORT_STATUS_CODE_COLORS } from '@/data/reports/report.utils'
+import { REPORT_STATUS_CODE_COLORS, type Granularity } from '@/data/reports/report.utils'
 import useDbQuery, { DbQueryHook } from '@/hooks/analytics/useDbQuery'
 import { useLogsQuery, type LogsQueryHook } from '@/hooks/analytics/useLogsQuery'
 import { getHttpStatusCodeInfo } from '@/lib/http-status-codes'
@@ -55,7 +55,8 @@ export const queriesFactory = <T extends string>(
     if (query.queryType === 'db') {
       return {
         ...acc,
-        [k]: () => useDbQuery({ sql: query.safeSql }),
+        [k]: () =>
+          useDbQuery({ sql: query.safeSql, sqlOrigin: 'studio', queryName: 'report-db-query' }),
       }
     } else {
       return {
@@ -70,7 +71,8 @@ export const queriesFactory = <T extends string>(
 export function getLogsSql(
   query: ReportQuery,
   filters: ReportFilterItem[],
-  useOtel = false
+  useOtel = false,
+  granularity?: Granularity
 ): SafeLogSqlFragment {
   if (query.queryType !== 'logs') {
     throw new Error(`Expected logs query, got ${query.queryType}`)
@@ -79,7 +81,7 @@ export function getLogsSql(
     if (query.safeSqlOtel === undefined) {
       throw new Error('Expected an OTEL logs query')
     }
-    return query.safeSqlOtel(filters)
+    return query.safeSqlOtel(filters, granularity)
   }
   return query.safeSql(filters)
 }
@@ -166,6 +168,26 @@ export function transformStatusCodeData(data: any[], statusCodes: string[]) {
   }, {})
 
   return Object.values(pivotedData)
+}
+
+/**
+ * Sums pivoted status code rows ({ timestamp, [status_code]: count }) into the
+ * warning (4xx) and error (5xx) counts shown in chart headers. Other codes only
+ * count towards the chart's total.
+ */
+export function getStatusClassCounts(rows: Record<string, unknown>[]) {
+  let warnings = 0
+  let errors = 0
+
+  for (const row of rows) {
+    for (const [key, value] of Object.entries(row)) {
+      if (typeof value !== 'number' || !/^\d{3}$/.test(key)) continue
+      if (key.startsWith('4')) warnings += value
+      else if (key.startsWith('5')) errors += value
+    }
+  }
+
+  return { warnings, errors }
 }
 
 /**

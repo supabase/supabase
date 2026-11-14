@@ -26,6 +26,7 @@ import { ButtonTooltip } from '@/components/ui/ButtonTooltip'
 import type { MultiAttribute } from '@/components/ui/Charts/ComposedChart.utils'
 import { LazyComposedChartHandler } from '@/components/ui/Charts/ComposedChartHandler'
 import { ReportSettings } from '@/components/ui/Charts/ReportSettings'
+import { getMemoryCommitmentPreviewData } from '@/components/ui/DevToolbar/MetricsTab.utils'
 import { DocsButton } from '@/components/ui/DocsButton'
 import { ObservabilityLink } from '@/components/ui/ObservabilityLink'
 import { ShortcutTooltip } from '@/components/ui/ShortcutTooltip'
@@ -40,12 +41,14 @@ import { useDatabaseReport } from '@/data/reports/database-report-query'
 import { useProjectAddonsQuery } from '@/data/subscriptions/project-addons-query'
 import { useCheckEntitlements } from '@/hooks/misc/useCheckEntitlements'
 import { FGA_PERMISSIONS, useAsyncCheckPermissionsV2 } from '@/hooks/misc/useCheckPermissionsV2'
+import { useProjectDiskLimits } from '@/hooks/misc/useProjectDiskLimits'
 import { useRefreshHandler, useReportDateRange } from '@/hooks/misc/useReportDateRange'
 import { useSelectedOrganizationQuery } from '@/hooks/misc/useSelectedOrganization'
 import { useIsHighAvailability, useSelectedProjectQuery } from '@/hooks/misc/useSelectedProject'
 import { DOCS_URL } from '@/lib/constants'
 import { formatBytes } from '@/lib/helpers'
 import { useDatabaseSelectorStateSnapshot } from '@/state/database-selector'
+import { useMemoryCommitmentPreview } from '@/state/metrics-preview'
 import { SHORTCUT_IDS } from '@/state/shortcuts/registry'
 import { useShortcut } from '@/state/shortcuts/useShortcut'
 import type { NextPageWithLayout } from '@/types'
@@ -211,7 +214,15 @@ const DatabaseUsage = () => {
   const isSpendCapEnabled = entitledFeatures.includes('database') && !org?.usage_billing_enabled
 
   const showDiskIOBurstBalanceChart = useFlag('showDiskIOBurstBalanceChart')
+  const { limits: projectDiskLimits } = useProjectDiskLimits()
   const showMemoryCommitmentChart = useFlag('showMemoryCommitmentChart')
+  const showMemoryCommitmentRiskZones = useFlag('showMemoryCommitmentRiskZones')
+  const memoryCommitmentPreview = useMemoryCommitmentPreview(ref)
+  const memoryCommitmentPreviewData = getMemoryCommitmentPreviewData(
+    memoryCommitmentPreview,
+    selectedDateRange?.period_start?.date,
+    selectedDateRange?.period_end?.date
+  )
 
   const REPORT_ATTRIBUTES = getReportAttributesV2(
     entitledFeatures,
@@ -221,7 +232,9 @@ const DatabaseUsage = () => {
     defaultMaxClientConn,
     isSpendCapEnabled,
     showDiskIOBurstBalanceChart,
-    showMemoryCommitmentChart
+    showMemoryCommitmentChart,
+    showMemoryCommitmentRiskZones,
+    projectDiskLimits
   )
 
   const { isPending: isUpdatingDiskSize } = useProjectDiskResizeMutation({
@@ -288,8 +301,7 @@ const DatabaseUsage = () => {
       <ReportHeader showDatabaseSelector title={REPORT_TITLE} />
       <ReportStickyNav
         content={
-          <div className="ml-auto flex items-center gap-2 flex-wrap">
-            <DocsButton href={OBSERVABILITY_DOCS_HREFS.database} topic={REPORT_TITLE} />
+          <div className="w-full flex items-center gap-2 flex-wrap">
             <ShortcutTooltip
               shortcutId={SHORTCUT_IDS.OBSERVABILITY_REFRESH}
               label="Refresh report"
@@ -304,7 +316,7 @@ const DatabaseUsage = () => {
               />
             </ShortcutTooltip>
             <ReportSettings chartId="database-charts" />
-            <div className="flex items-center gap-3">
+            <div className="contents">
               <LogsDatePicker
                 onSubmit={handleDatePickerChange}
                 value={datePickerValue}
@@ -321,7 +333,7 @@ const DatabaseUsage = () => {
                 source="databaseReportDateRange"
               />
               {selectedDateRange && (
-                <div className="flex items-center gap-x-2 text-xs">
+                <div className="order-last flex w-full flex-wrap items-center gap-x-2 text-xs xl:order-none xl:w-auto">
                   <p className="text-foreground-light">
                     {dayjs(selectedDateRange.period_start.date).format('MMM D, h:mma')}
                   </p>
@@ -334,11 +346,18 @@ const DatabaseUsage = () => {
                 </div>
               )}
             </div>
+            <DocsButton
+              href={OBSERVABILITY_DOCS_HREFS.database}
+              topic={REPORT_TITLE}
+              className="ml-auto"
+            />
           </div>
         }
       >
         {selectedDateRange &&
           REPORT_ATTRIBUTES.filter((chart) => !chart.hide).map((chart) => {
+            const chartPreviewData =
+              chart.id === 'memory-commitment' ? memoryCommitmentPreviewData : undefined
             const chartAvailable =
               !chart.entitlement ||
               isEntitlementLoading ||
@@ -347,6 +366,8 @@ const DatabaseUsage = () => {
               <LazyComposedChartHandler
                 key={chart.id}
                 {...chart}
+                data={chartPreviewData}
+                highlightedValue={chartPreviewData?.at(-1)?.ram_commit_used}
                 attributes={chart.attributes as MultiAttribute[]}
                 interval={selectedDateRange.interval}
                 startDate={selectedDateRange?.period_start?.date}

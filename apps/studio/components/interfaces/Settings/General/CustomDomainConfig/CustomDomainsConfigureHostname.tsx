@@ -103,11 +103,11 @@ export const CustomDomainsConfigureHostname = () => {
             <h4 className="text-sm mb-1">Configure a CNAME record</h4>
             <p className="text-sm text-foreground-light">
               Set up a CNAME record for{' '}
-              {domain ? <code className="text-code-inline">{domain}</code> : 'your custom domain'}{' '}
-              resolving to{' '}
+              {domain ? <code>{domain}</code> : <span>your custom domain</span>}{' '}
+              <span>resolving to</span>{' '}
               {endpoint ? (
                 <span className="inline-flex items-center gap-x-1">
-                  <code className="text-code-inline">{endpoint}</code>
+                  <code>{endpoint}</code>
                   <CopyButton
                     iconOnly
                     variant="text"
@@ -116,20 +116,24 @@ export const CustomDomainsConfigureHostname = () => {
                   />
                 </span>
               ) : (
-                "your project's API URL"
+                <span>your project's API URL</span>
               )}{' '}
-              with as low a TTL as possible. If you're using Cloudflare as your DNS provider,
-              disable the proxy option.
+              <span>
+                with as low a TTL as possible. If you're using Cloudflare as your DNS provider,
+                disable the proxy option.
+              </span>
               <br />
               {trimmedDomain.includes('.') ? (
                 <>
                   Some DNS providers expect only the subdomain label{' '}
-                  <code className="text-code-inline">{trimmedDomain.split('.')[0]}</code>, while
-                  others accept the full hostname{' '}
-                  <code className="text-code-inline whitespace-nowrap">{trimmedDomain}</code>.
+                  <code>{trimmedDomain.split('.')[0]}</code>, while others accept the full hostname{' '}
+                  <code className="whitespace-nowrap">{trimmedDomain}</code>.
                 </>
               ) : (
-                'Some DNS providers expect only the subdomain label, while others accept the full hostname.'
+                <span>
+                  Some DNS providers expect only the subdomain label, while others accept the full
+                  hostname.
+                </span>
               )}
             </p>
           </CardContent>

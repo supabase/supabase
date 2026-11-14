@@ -56,7 +56,12 @@ export const ForeignKeyRow = ({
               </Badge>
             )}
             <p className="text-sm text-foreground-light">
-              {foreignKey.columns.length > 1 ? 'Composite foreign' : 'Foreign'} key relation to:
+              {foreignKey.columns.length > 1 ? (
+                <span>Composite foreign</span>
+              ) : (
+                <span>Foreign</span>
+              )}{' '}
+              <span>key relation to:</span>
             </p>
             <Button
               asChild
@@ -95,7 +100,7 @@ export const ForeignKeyRow = ({
                 {x.source || '[column_name]'}
               </code>
               <ArrowRightIcon size={16} />
-              <code className="text-code-inline">
+              <code>
                 {foreignKey.schema}.{foreignKey.table}.{x.target}
               </code>
             </div>

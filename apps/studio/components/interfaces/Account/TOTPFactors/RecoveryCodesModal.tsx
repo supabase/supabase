@@ -1,5 +1,6 @@
 import { AuthError, AuthMFARecoveryCodesGenerateResponseData } from '@supabase/auth-js'
 import { UseMutationResult, useQueryClient } from '@tanstack/react-query'
+import type { RecoveryCodesSurface } from 'common/telemetry-constants'
 import { CheckIcon, CopyIcon, DownloadIcon } from 'lucide-react'
 import { ComponentProps, useEffect, useMemo, useState } from 'react'
 import {
@@ -17,24 +18,35 @@ import {
   DialogTitle,
 } from 'ui'
 import { Admonition } from 'ui-patterns/Admonition'
+import { ShimmeringLoader } from 'ui-patterns/ShimmeringLoader'
 
 import { formatRecoveryCode } from './RecoveryCodesModal.utils'
 import { AlertError } from '@/components/ui/AlertError'
+import { InlineLink } from '@/components/ui/InlineLink'
 import { recoveryCodeKeys } from '@/data/recovery-codes/keys'
+import { useTrack } from '@/lib/telemetry/track'
 
 interface RecoveryCodesModalProps<T>
   extends
     Omit<ComponentProps<typeof Dialog>, 'onOpenChange'>,
     Required<Pick<ComponentProps<typeof Dialog>, 'onOpenChange'>> {
-  mutation: UseMutationResult<AuthMFARecoveryCodesGenerateResponseData, AuthError, T>
+  surface: RecoveryCodesSurface
+  showSecurityLink?: boolean
+  mutation: Pick<
+    UseMutationResult<AuthMFARecoveryCodesGenerateResponseData, AuthError, T>,
+    'data' | 'status' | 'error' | 'isError' | 'isPending' | 'isSuccess' | 'reset'
+  >
 }
 
 export const RecoveryCodesModal = <T = unknown,>({
   onOpenChange,
   mutation,
+  surface,
+  showSecurityLink = false,
   ...props
 }: RecoveryCodesModalProps<T>) => {
   const queryClient = useQueryClient()
+  const track = useTrack()
   const [copied, setCopied] = useState(false)
   const [copiedToClipboard, setCopiedToClipboard] = useState(false)
 
@@ -64,6 +76,7 @@ export const RecoveryCodesModal = <T = unknown,>({
     a.click()
     document.body.removeChild(a)
     window.URL.revokeObjectURL(url)
+    track('recovery_codes_download_clicked', { surface })
   }
 
   useEffect(() => {
@@ -100,6 +113,13 @@ export const RecoveryCodesModal = <T = unknown,>({
         <DialogSectionSeparator />
 
         <DialogSection className={cn(isError && 'p-0 md:px-0')}>
+          {isPending && (
+            <div role="status" aria-label="Generating recovery codes" className="space-y-3">
+              <ShimmeringLoader className="h-4 py-0" />
+              <ShimmeringLoader className="h-4 w-3/4 py-0" />
+              <ShimmeringLoader className="h-32 py-0" />
+            </div>
+          )}
           {isError && (
             <AlertError
               layout="vertical"
@@ -141,7 +161,10 @@ export const RecoveryCodesModal = <T = unknown,>({
                     onClick={() =>
                       copyToClipboard(
                         codes.map((code) => formatRecoveryCode(code)).join('\n') ?? '',
-                        () => setCopiedToClipboard(true)
+                        () => {
+                          setCopiedToClipboard(true)
+                          track('recovery_codes_copied', { surface })
+                        }
                       )
                     }
                   >
@@ -176,6 +199,16 @@ export const RecoveryCodesModal = <T = unknown,>({
                   </label>
                 </div>
               </Admonition>
+              {showSecurityLink && (
+                <p className="text-xs text-foreground-lighter">
+                  Manage recovery codes in{' '}
+                  <InlineLink href="/account/security" target="_blank" rel="noreferrer">
+                    Account Security
+                    <span className="sr-only"> (opens in a new tab)</span>
+                  </InlineLink>
+                  .
+                </p>
+              )}
             </div>
           )}
         </DialogSection>

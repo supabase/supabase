@@ -21,7 +21,8 @@ import { customRender } from '@/tests/lib/custom-render'
 import { addAPIMock } from '@/tests/lib/msw'
 
 const pipeline: Pipeline = {
-  id: 9,
+  id: '9',
+  cluster_id: 'cluster',
   tenant_id: 'test',
   source_id: 1,
   source_name: 'main',
@@ -34,7 +35,7 @@ const pipeline: Pipeline = {
 const StatusView = () => {
   const { data, error, isPending, isError, isSuccess } = useReplicationPipelineStatusQuery({
     projectRef: 'default',
-    pipelineId: 9,
+    pipelineId: '9',
   })
   const { getRequestStatus, isRequestPending } = usePipelineRequestStatus()
   return (
@@ -45,9 +46,9 @@ const StatusView = () => {
         isLoading={isPending}
         isError={isError}
         isSuccess={isSuccess}
-        requestStatus={getRequestStatus(9)}
+        requestStatus={getRequestStatus('9')}
       />
-      <Button disabled={isRequestPending(9)}>Another action</Button>
+      <Button disabled={isRequestPending('9')}>Another action</Button>
     </>
   )
 }
@@ -87,7 +88,7 @@ describe('pipeline version updates', () => {
         path: '/platform/replication/:ref/pipelines/:pipeline_id/status',
         response: () =>
           HttpResponse.json<ReplicationPipelineStatusResponse>({
-            pipeline_id: 9,
+            pipeline_id: '9',
             status: { name: status },
           }),
       })
@@ -96,7 +97,7 @@ describe('pipeline version updates', () => {
         path: '/platform/replication/:ref/pipelines/:pipeline_id/version',
         response: () =>
           HttpResponse.json<components['schemas']['PipelineVersionResponse_Output']>({
-            pipeline_id: 9,
+            pipeline_id: '9',
             version: { id: 1, name: 'v1' },
             new_version: { id: 2, name: 'v2' },
           }),
@@ -124,7 +125,7 @@ describe('pipeline version updates', () => {
       expect(screen.getByText('Another action').closest('button')).toBeDisabled()
       await act(async () => {
         await queryClient.invalidateQueries(
-          { queryKey: replicationKeys.pipelinesStatus('default', 9) },
+          { queryKey: replicationKeys.pipelinesStatus('default', '9') },
           { cancelRefetch: false }
         )
       })

@@ -1,13 +1,14 @@
+import { useQuery } from '@tanstack/react-query'
 import { Dispatch, SetStateAction, useEffect, useEffectEvent, useRef } from 'react'
 import { toast } from 'sonner'
 
 import { RealtimeConfig } from './useRealtimeMessages'
 import { RoleImpersonationPopover } from '@/components/interfaces/RoleImpersonationSelector/RoleImpersonationPopover'
-import { useAPIKeys } from '@/data/api-keys/api-keys-query'
+import { apiKeysQueryOptions, getKeys } from '@/data/api-keys/api-keys-query'
 import { getTemporaryAPIKey } from '@/data/api-keys/temp-api-keys-query'
 import { useProjectPostgrestConfigQuery } from '@/data/config/project-postgrest-config-query'
-import { FGA_PERMISSIONS, useAsyncCheckPermissionsV2 } from '@/hooks/misc/useCheckPermissionsV2'
 import { IS_PLATFORM } from '@/lib/constants'
+import { useGrant } from '@/lib/grants'
 import { getRoleImpersonationJWT } from '@/lib/role-impersonation'
 import { useTrack } from '@/lib/telemetry/track'
 import { useRoleImpersonationStateSnapshot } from '@/state/role-impersonation-state'
@@ -20,15 +21,16 @@ interface RealtimeTokensPopoverProps {
 export const RealtimeTokensPopover = ({ config, onChangeConfig }: RealtimeTokensPopoverProps) => {
   const snap = useRoleImpersonationStateSnapshot()
 
-  const { can: canReadAPIKeys } = useAsyncCheckPermissionsV2(
-    FGA_PERMISSIONS.PROJECT.API_GATEWAY_KEYS_READ
-  )
-  const { data: apiKeysData } = useAPIKeys(
-    {
-      projectRef: config.projectRef,
-      reveal: true,
-    },
-    { enabled: canReadAPIKeys }
+  // Only the publishable/anon key is used, which doesn't need `reveal`. Denied access is shown by
+  // the inspector header, and a temporary key is used as a fallback.
+  const apiKeysGrant = useGrant('GET /v1/projects/{ref}/api-keys', {
+    projectRef: config.projectRef,
+  })
+  const { data: apiKeysData } = useQuery(
+    apiKeysQueryOptions(
+      { projectRef: config.projectRef, grant: apiKeysGrant.grant },
+      { select: getKeys }
+    )
   )
   const { data: postgrestConfig } = useProjectPostgrestConfigQuery(
     { projectRef: config.projectRef },

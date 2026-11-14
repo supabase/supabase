@@ -3,7 +3,8 @@ import { InfiniteData, useInfiniteQuery } from '@tanstack/react-query'
 import { oauthAppsKeys } from './keys'
 import { getMockOAuthOwnGrants, USE_MOCKS } from './mocks'
 import type { ListOwnGrantsResponse } from './types'
-import type { ResponseError, UseCustomInfiniteQueryOptions } from '@/types'
+import type { StudioError } from '@/lib/errors/studio-errors'
+import type { UseCustomInfiniteQueryOptions } from '@/types'
 
 export type OAuthGrantsVariables = {
   cursor?: string
@@ -20,7 +21,7 @@ export async function getOAuthGrants({
 }
 
 export type OAuthGrantsData = Awaited<ReturnType<typeof getOAuthGrants>>
-export type OAuthGrantsError = ResponseError
+export type OAuthGrantsError = StudioError
 
 export const useOAuthGrantsQuery = <TData = OAuthGrantsData>(
   { cursor }: OAuthGrantsVariables = {},

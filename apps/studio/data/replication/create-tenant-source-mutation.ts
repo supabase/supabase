@@ -3,7 +3,8 @@ import { toast } from 'sonner'
 
 import { replicationKeys } from './keys'
 import { handleError, post } from '@/data/fetchers'
-import type { ResponseError, UseCustomMutationOptions } from '@/types'
+import type { StudioError } from '@/lib/errors/studio-errors'
+import type { UseCustomMutationOptions } from '@/types'
 
 export type CreateTenantSourceParams = {
   projectRef: string
@@ -30,12 +31,12 @@ export const useCreateTenantSourceMutation = ({
   onError,
   ...options
 }: Omit<
-  UseCustomMutationOptions<CreateTenantSourceData, ResponseError, CreateTenantSourceParams>,
+  UseCustomMutationOptions<CreateTenantSourceData, StudioError, CreateTenantSourceParams>,
   'mutationFn'
 > = {}) => {
   const queryClient = useQueryClient()
 
-  return useMutation<CreateTenantSourceData, ResponseError, CreateTenantSourceParams>({
+  return useMutation<CreateTenantSourceData, StudioError, CreateTenantSourceParams>({
     mutationFn: (vars) => createTenantSource(vars),
     async onSuccess(data, variables, context) {
       const { projectRef } = variables

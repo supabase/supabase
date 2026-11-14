@@ -1,9 +1,7 @@
-import { COMPUTE_DISK, COMPUTE_MAX_IOPS } from 'shared-data'
+import { COMPUTE_DISK, hasBurstableDiskIO, type InstanceDiskLimits } from 'shared-data'
 
-import {
-  hasBurstableIO,
-  mapComputeSizeNameToAddonVariantId,
-} from '@/components/interfaces/DiskManagement/DiskManagement.utils'
+import { getMemoryCommitmentRanges } from './database-charts.utils'
+import { mapComputeSizeNameToAddonVariantId } from '@/components/interfaces/DiskManagement/DiskManagement.utils'
 import { compactNumberFormatter } from '@/components/ui/Charts/Charts.utils'
 import { ReportAttributes } from '@/components/ui/Charts/ComposedChart.utils'
 import { DiskAttributesData } from '@/data/config/disk-attributes-query'
@@ -17,9 +15,9 @@ import { formatBytes, formatBytesMinMB } from '@/lib/helpers'
 // Disk IO Burst Balance chart has no data to show for them.
 export const shouldShowDiskIOBurstBalanceChart = (
   project: Project | undefined,
-  isFlagEnabled: boolean
-): boolean =>
-  isFlagEnabled && hasBurstableIO(project?.infra_compute_size) && !resolveHighAvailability(project)
+  isFlagEnabled: boolean,
+  diskLimits: InstanceDiskLimits | undefined
+): boolean => isFlagEnabled && hasBurstableDiskIO(diskLimits) && !resolveHighAvailability(project)
 
 export const getReportAttributesV2: (
   entitledFeatures: string[],
@@ -29,7 +27,9 @@ export const getReportAttributesV2: (
   pgBouncerMaxConnections?: number,
   isSpendCapEnabled?: boolean,
   showDiskIOBurstBalanceChart?: boolean,
-  showMemoryCommitmentChart?: boolean
+  showMemoryCommitmentChart?: boolean,
+  showMemoryCommitmentRiskZones?: boolean,
+  projectDiskLimits?: InstanceDiskLimits
 ) => ReportAttributes[] = (
   entitledFeatures,
   project,
@@ -38,23 +38,37 @@ export const getReportAttributesV2: (
   pgBouncerMaxConnections,
   isSpendCapEnabled,
   showDiskIOBurstBalanceChart,
-  showMemoryCommitmentChart
+  showMemoryCommitmentChart,
+  showMemoryCommitmentRiskZones = true,
+  projectDiskLimits
 ) => {
   const computeVariantId = mapComputeSizeNameToAddonVariantId(project?.infra_compute_size)
   // High Availability projects run Multigres, whose dedicated pooler is multipooler rather
   // than PgBouncer. Multipooler docs aren't published yet, so the docs link is dropped for now.
   const isHighAvailability = resolveHighAvailability(project)
   const provisionedDiskIops = diskConfig?.attributes?.iops
-  const computeIopsLimit = COMPUTE_MAX_IOPS[computeVariantId]
+  const diskLimits = projectDiskLimits ?? COMPUTE_DISK[computeVariantId]
+  const computeIopsLimit = diskLimits?.maxIops
   const effectiveMaxIops =
     typeof provisionedDiskIops === 'number' && typeof computeIopsLimit === 'number'
       ? Math.min(provisionedDiskIops, computeIopsLimit)
       : provisionedDiskIops
+  const provisionedThroughputMBps =
+    diskConfig?.attributes?.type === 'gp3' &&
+    typeof diskConfig.attributes.throughput_mbps === 'number'
+      ? diskConfig.attributes.throughput_mbps
+      : undefined
+  const computeThroughputLimit = diskLimits?.maxThroughputMBps
+  const effectiveMaxThroughputMBps =
+    typeof provisionedThroughputMBps === 'number' && typeof computeThroughputLimit === 'number'
+      ? Math.min(provisionedThroughputMBps, computeThroughputLimit)
+      : provisionedThroughputMBps
   const showBurstBalanceChart = shouldShowDiskIOBurstBalanceChart(
     project,
-    !!showDiskIOBurstBalanceChart
+    !!showDiskIOBurstBalanceChart,
+    diskLimits
   )
-  const baselineThroughputMBps = COMPUTE_DISK[computeVariantId]?.baselineThroughputMBps
+  const baselineThroughputMBps = diskLimits?.baselineThroughputMBps
   const baselineThroughputLabel =
     typeof baselineThroughputMBps === 'number' ? `${baselineThroughputMBps} MB/s` : 'its baseline'
 
@@ -123,7 +137,6 @@ export const getReportAttributesV2: (
       showLegend: true,
       hideChartType: false,
       defaultChartStyle: 'bar',
-      showMaxValue: true,
       showGrid: true,
       syncId: 'database-reports',
       valuePrecision: 2,
@@ -131,6 +144,51 @@ export const getReportAttributesV2: (
         width: 75,
         tickFormatter: (value: number) => formatBytesMinMB(value, 2),
       },
+      titleTooltip: showMemoryCommitmentRiskZones
+        ? 'Risk thresholds estimate memory commitment risk from physical RAM plus 1 GiB of swap and do not predict when the database will run out of memory.'
+        : undefined,
+      thresholdZoneAttribute: showMemoryCommitmentRiskZones ? 'ram_commit_used' : undefined,
+      thresholdZones: showMemoryCommitmentRiskZones
+        ? [
+            {
+              label: 'Acknowledgment',
+              badgeLabel: 'Warning',
+              tooltipLabel: '50% threshold',
+              color: 'var(--color-yellow-900)',
+              textColor: 'var(--color-yellow-1100)',
+              tooltip:
+                'Above 50% of physical RAM plus 1 GiB: monitor memory usage and enable memory investigation tools to understand what your database has promised to operations.',
+              getRanges: (data) => getMemoryCommitmentRanges(data, 0.5, 0.8),
+            },
+            {
+              label: 'Problematic',
+              badgeLabel: 'Problematic',
+              tooltipLabel: '80% threshold',
+              color: 'var(--color-orange-900)',
+              textColor: 'var(--color-orange-1100)',
+              tooltip:
+                'Above 80% of physical RAM plus 1 GiB: optimize memory usage or upgrade compute, since using idle memory commitments at once can exhaust resources and trigger recovery.',
+              getRanges: (data) => getMemoryCommitmentRanges(data, 0.8, 0.9),
+            },
+            {
+              label: 'Severe',
+              badgeLabel: 'Severe',
+              tooltipLabel: '90% threshold',
+              color: 'hsl(var(--destructive-600))',
+              tooltip:
+                'Above 90% of physical RAM plus 1 GiB: simultaneous use of promised memory creates a high risk of an unexpected crash and recovery, so optimize memory usage or upgrade compute.',
+              getRanges: (data) => getMemoryCommitmentRanges(data, 0.9),
+            },
+            {
+              label: 'Full commitment capacity',
+              color: 'var(--chart-reference)',
+              isAlwaysVisible: true,
+              tooltip:
+                'Estimated physical RAM plus 1 GiB of swap, based on the infrastructure capacity at each timestamp.',
+              getRanges: (data) => getMemoryCommitmentRanges(data, 1, 1),
+            },
+          ]
+        : undefined,
       attributes: [
         {
           attribute: 'ram_commit_used',
@@ -139,17 +197,13 @@ export const getReportAttributesV2: (
           color: 'var(--chart-1)',
           fill: 'var(--chart-1-fill)',
           tooltip:
-            'Total memory the kernel has promised to processes (RAM plus swap). Sustained values near or above the commit limit indicate overcommitment and a high risk of out-of-memory failures',
+            'Memory the kernel has promised to processes, which may remain unused until needed and does not by itself indicate an out-of-memory failure',
         },
         {
           attribute: 'ram_commit_limit',
           provider: 'infra-monitoring',
-          label: 'Commit limit',
-          color: 'var(--chart-reference)',
-          isMaxValue: true,
+          enabled: false,
           omitFromTotal: true,
-          tooltip:
-            'Maximum memory the kernel will commit (RAM plus swap, adjusted by the overcommit ratio). Committed memory approaching this limit puts the database at risk of being killed when the system runs out of memory',
         },
       ],
     },
@@ -185,7 +239,7 @@ export const getReportAttributesV2: (
     {
       id: 'cpu-usage',
       label: 'CPU usage',
-      docsUrl: `${DOCS_URL}/guides/telemetry/reports#cpu-usage`,
+      docsUrl: `${DOCS_URL}/guides/observability/reports#cpu-usage`,
       syncId: 'database-reports',
       format: '%',
       valuePrecision: 2,
@@ -398,11 +452,10 @@ export const getReportAttributesV2: (
           label: 'Max throughput',
           color: 'var(--chart-reference)',
           value:
-            diskConfig?.attributes?.type === 'gp3' &&
-            typeof diskConfig.attributes.throughput_mbps === 'number'
-              ? diskConfig.attributes.throughput_mbps * 1024 * 1024
+            typeof effectiveMaxThroughputMBps === 'number'
+              ? effectiveMaxThroughputMBps * 1024 * 1024
               : undefined,
-          tooltip: 'Maximum disk throughput for your current compute size',
+          tooltip: 'Maximum disk throughput for your disk and compute configuration',
           isMaxValue: true,
         },
       ],

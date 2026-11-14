@@ -14,12 +14,11 @@ import { PipelineDestinationSelection } from '../CreatePipeline/PipelineDestinat
 import { DestinationLogo } from '../DestinationLogo'
 import { useDestinationInformation } from '../useDestinationInformation'
 import {
-  useIsETLBigQueryPrivateAlpha,
-  useIsETLClickHousePrivateAlpha,
-  useIsETLDucklakePrivateAlpha,
-  useIsETLIcebergPrivateAlpha,
-  useIsETLSnowflakePrivateAlpha,
-} from '../useIsETLPrivateAlpha'
+  useIsPipelinesBigQueryEnabled,
+  useIsPipelinesClickHouseEnabled,
+  useIsPipelinesDuckLakeEnabled,
+  useIsPipelinesSnowflakeEnabled,
+} from '../useIsPipelinesEnabled'
 import { DestinationType } from './DestinationPanel.types'
 import { usePipelineCreationPreview } from '@/components/interfaces/App/FeaturePreview/FeaturePreviewContext'
 
@@ -27,7 +26,7 @@ interface DestinationTypeOption {
   value: DestinationType
   label: string
   description: string
-  stage: 'Public Alpha' | 'Deprecated' | null
+  stage: 'Public Alpha' | null
   enabled: boolean
 }
 
@@ -38,17 +37,15 @@ interface DestinationTypeGroup {
 
 export const DestinationTypeSelection = () => {
   const { isEnabled: isCreationPreviewEnabled } = usePipelineCreationPreview()
-  const etlEnableBigQuery = useIsETLBigQueryPrivateAlpha()
-  const etlEnableIceberg = useIsETLIcebergPrivateAlpha()
-  const etlEnableDucklake = useIsETLDucklakePrivateAlpha()
-  const etlEnableSnowflake = useIsETLSnowflakePrivateAlpha()
-  const etlEnableClickHouse = useIsETLClickHousePrivateAlpha()
+  const isBigQueryEnabled = useIsPipelinesBigQueryEnabled()
+  const isDuckLakeEnabled = useIsPipelinesDuckLakeEnabled()
+  const isSnowflakeEnabled = useIsPipelinesSnowflakeEnabled()
+  const isClickHouseEnabled = useIsPipelinesClickHouseEnabled()
 
   const [urlDestinationType, setDestinationType] = useQueryState(
     'destinationType',
     parseAsStringEnum<DestinationType>([
       'BigQuery',
-      'Analytics Bucket',
       'DuckLake',
       'Snowflake',
       'ClickHouse',
@@ -65,7 +62,8 @@ export const DestinationTypeSelection = () => {
   const editMode = edit !== null
 
   const { type: existingDestinationType } = useDestinationInformation({ id: edit })
-  const destinationType = existingDestinationType ?? urlDestinationType
+  const destinationType =
+    existingDestinationType === 'Unknown' ? null : (existingDestinationType ?? urlDestinationType)
 
   const isOptionVisible = (value: DestinationType, hasAccess: boolean) =>
     editMode ? destinationType === value : hasAccess
@@ -79,40 +77,28 @@ export const DestinationTypeSelection = () => {
           label: 'BigQuery',
           description: 'Replicate changes to BigQuery for analytics and BI',
           stage: 'Public Alpha',
-          enabled: isOptionVisible('BigQuery', etlEnableBigQuery),
+          enabled: isOptionVisible('BigQuery', isBigQueryEnabled),
         },
         {
           value: 'DuckLake',
           label: 'DuckLake',
           description: 'Replicate changes to DuckLake for open lakehouse storage',
           stage: 'Public Alpha',
-          enabled: isOptionVisible('DuckLake', etlEnableDucklake),
+          enabled: isOptionVisible('DuckLake', isDuckLakeEnabled),
         },
         {
           value: 'Snowflake',
           label: 'Snowflake',
           description: 'Replicate changes to Snowflake for cloud data warehousing',
           stage: 'Public Alpha',
-          enabled: isOptionVisible('Snowflake', etlEnableSnowflake),
+          enabled: isOptionVisible('Snowflake', isSnowflakeEnabled),
         },
         {
           value: 'ClickHouse',
           label: 'ClickHouse',
           description: 'Replicate changes to ClickHouse for real-time analytics',
           stage: 'Public Alpha',
-          enabled: isOptionVisible('ClickHouse', etlEnableClickHouse),
-        },
-      ],
-    },
-    {
-      label: 'Deprecated',
-      options: [
-        {
-          value: 'Analytics Bucket',
-          label: 'Analytics Bucket',
-          description: 'Replicate changes to Supabase Storage as Apache Iceberg tables',
-          stage: 'Deprecated',
-          enabled: isOptionVisible('Analytics Bucket', etlEnableIceberg),
+          enabled: isOptionVisible('ClickHouse', isClickHouseEnabled),
         },
       ],
     },
@@ -125,24 +111,16 @@ export const DestinationTypeSelection = () => {
 
   const selectedOption = options.find((option) => option.value === destinationType)
 
-  const STAGE_DESCRIPTIONS: Record<
-    NonNullable<DestinationTypeOption['stage']>,
-    (type: DestinationType) => string
-  > = {
-    'Public Alpha': (type) => `${type} support is in public alpha.`,
-    Deprecated: (type) => `${type} is deprecated.`,
-  }
-
   const stageDescription = selectedOption?.stage
-    ? STAGE_DESCRIPTIONS[selectedOption.stage](selectedOption.value)
+    ? `${selectedOption.value} support is in public alpha.`
     : null
 
   const typeDescription =
     !editMode || stageDescription ? (
       <span>
-        {!editMode && 'Destination type cannot be changed after creation.'}
-        {!editMode && stageDescription ? ' ' : null}
-        {stageDescription}
+        {[!editMode && 'Destination type cannot be changed after creation.', stageDescription]
+          .filter(Boolean)
+          .join(' ')}
       </span>
     ) : undefined
 

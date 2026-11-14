@@ -1,4 +1,5 @@
 import { zodResolver } from '@hookform/resolvers/zod'
+import { useQuery } from '@tanstack/react-query'
 import { IS_PLATFORM, useParams } from 'common'
 import { useRouter } from 'next/router'
 import { useEffect, useMemo, useState } from 'react'
@@ -36,18 +37,22 @@ import {
   PageSectionSummary,
   PageSectionTitle,
 } from 'ui-patterns/PageSection'
+import { GenericSkeletonLoader } from 'ui-patterns/ShimmeringLoader'
 import z from 'zod'
 
 import CommandRender from '../CommandRender'
 import { INVOCATION_TABS } from './EdgeFunctionDetails.constants'
 import { generateCLICommands } from './EdgeFunctionDetails.utils'
-import { useAPIKeys } from '@/data/api-keys/api-keys-query'
+import { AlertError } from '@/components/ui/AlertError'
+import { ApiKeysAccessNote } from '@/components/ui/ApiKeysAccessNote'
+import { apiKeysQueryOptions, getKeys } from '@/data/api-keys/api-keys-query'
 import { useProjectApiUrl } from '@/data/config/project-endpoint-query'
 import { useEdgeFunctionQuery } from '@/data/edge-functions/edge-function-query'
 import { useEdgeFunctionDeleteMutation } from '@/data/edge-functions/edge-functions-delete-mutation'
 import { useEdgeFunctionUpdateMutation } from '@/data/edge-functions/edge-functions-update-mutation'
 import { FGA_PERMISSIONS, useAsyncCheckPermissionsV2 } from '@/hooks/misc/useCheckPermissionsV2'
 import { useIsFeatureEnabled } from '@/hooks/misc/useIsFeatureEnabled'
+import { useGrant } from '@/lib/grants'
 
 const FormSchema = z.object({
   name: z.string().min(0, 'Name is required'),
@@ -76,16 +81,34 @@ export const EdgeFunctionDetails = () => {
 
   const canUpdateEdgeFunction = IS_PLATFORM && canUpdateEdgeFunctionPermission
 
-  const { can: canReadAPIKeys } = useAsyncCheckPermissionsV2(
-    FGA_PERMISSIONS.PROJECT.API_GATEWAY_KEYS_READ
+  const apiKeysGrant = useGrant('GET /v1/projects/{ref}/api-keys', { projectRef })
+  const { data: apiKeyData } = useQuery(
+    apiKeysQueryOptions(
+      { projectRef, grant: apiKeysGrant.grant },
+      {
+        // A skipped query still returns cached data, so ignore it unless the grant is granted
+        select: (data) => getKeys(apiKeysGrant.status === 'granted' ? data : []),
+      }
+    )
   )
-  const { data: apiKeyData } = useAPIKeys({ projectRef }, { enabled: canReadAPIKeys })
   const { anonKey, publishableKey } = apiKeyData ?? {}
 
-  const { data: selectedFunction } = useEdgeFunctionQuery({ projectRef, slug: functionSlug })
+  const {
+    data: selectedFunction,
+    error: functionError,
+    isPending: isFunctionPending,
+  } = useEdgeFunctionQuery({ projectRef, slug: functionSlug })
 
-  const { data: endpoint } = useProjectApiUrl({ projectRef })
-  const functionUrl = `${endpoint}/functions/v1/${selectedFunction?.slug}`
+  const {
+    data: endpoint,
+    error: endpointError,
+    isPending: isEndpointPending,
+  } = useProjectApiUrl({ projectRef })
+  const functionUrl =
+    endpoint && selectedFunction ? `${endpoint}/functions/v1/${selectedFunction.slug}` : undefined
+  const isFunctionUrlLoading = !functionUrl && (isEndpointPending || isFunctionPending)
+  const functionUrlError =
+    !functionUrl && !isFunctionUrlLoading ? (endpointError ?? functionError) : null
 
   const { mutate: updateEdgeFunction, isPending: isUpdating } = useEdgeFunctionUpdateMutation()
   const { mutate: deleteEdgeFunction, isPending: isDeleting } = useEdgeFunctionDeleteMutation({
@@ -104,7 +127,7 @@ export const EdgeFunctionDetails = () => {
 
   const { managementCommands } = generateCLICommands({
     selectedFunction,
-    functionUrl,
+    functionUrl: functionUrl ?? '',
     anonKey: apiKey,
   })
 
@@ -187,12 +210,8 @@ export const EdgeFunctionDetails = () => {
                                   <em className="text-foreground not-italic">
                                     only by the legacy secret
                                   </em>{' '}
-                                  in the{' '}
-                                  <code className="text-code-inline break-keep!">
-                                    Authorization
-                                  </code>{' '}
-                                  header. The <code className="text-code-inline">anon</code> key
-                                  satisfies this.
+                                  in the <code className="break-keep!">Authorization</code> header.
+                                  The <code>anon</code> key satisfies this.
                                 </p>
                                 <p>
                                   Recommended: OFF with JWT and custom auth logic in your function
@@ -260,11 +279,32 @@ export const EdgeFunctionDetails = () => {
                       className="ml-auto -translate-y-2 translate-x-3"
                       onClick={() => setShowKey(!showKey)}
                     >
-                      {showKey ? 'Hide' : 'Show'} anon key
+                      {showKey ? <span>Hide</span> : <span>Show</span>} <span>anon key</span>
                     </Button>
                   )}
                 </TabsList>
+                <ApiKeysAccessNote
+                  grant={apiKeysGrant}
+                  fallback="Replace the placeholder with your own key."
+                  className="px-6 pb-2"
+                />
+                {isFunctionUrlLoading && (
+                  <div className="mt-4 px-6">
+                    <GenericSkeletonLoader />
+                  </div>
+                )}
+                {functionUrlError && (
+                  <div className="mt-4 px-6">
+                    <AlertError
+                      error={functionUrlError}
+                      subject="Failed to retrieve function URL"
+                      projectRef={projectRef}
+                    />
+                  </div>
+                )}
                 {invocationTabs.map((tab) => {
+                  if (!functionUrl) return null
+
                   const code = tab.code({
                     showKey,
                     functionUrl,

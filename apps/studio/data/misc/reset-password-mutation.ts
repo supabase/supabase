@@ -3,7 +3,8 @@ import { toast } from 'sonner'
 
 import { handleError, post } from '@/data/fetchers'
 import { captureCriticalError } from '@/lib/error-reporting'
-import type { ResponseError, UseCustomMutationOptions } from '@/types'
+import type { StudioError } from '@/lib/errors/studio-errors'
+import type { UseCustomMutationOptions } from '@/types'
 
 export type ResetPasswordVariables = {
   email: string
@@ -28,10 +29,10 @@ export const useResetPasswordMutation = ({
   onError,
   ...options
 }: Omit<
-  UseCustomMutationOptions<ResetPasswordData, ResponseError, ResetPasswordVariables>,
+  UseCustomMutationOptions<ResetPasswordData, StudioError, ResetPasswordVariables>,
   'mutationFn'
 > = {}) => {
-  return useMutation<ResetPasswordData, ResponseError, ResetPasswordVariables>({
+  return useMutation<ResetPasswordData, StudioError, ResetPasswordVariables>({
     mutationFn: (vars) => resetPassword(vars),
     async onSuccess(data, variables, context) {
       await onSuccess?.(data, variables, context)

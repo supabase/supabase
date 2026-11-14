@@ -34,6 +34,10 @@ function events() {
   return fs.readFileSync(path.join(fixture, '.checks/events'), 'utf8').trim().split('\n')
 }
 
+function count(event: string) {
+  return events().filter((e) => e === event).length
+}
+
 const helpers = `
 const fs = require('node:fs');
 const path = require('node:path');
@@ -45,8 +49,8 @@ const write = (file, value) => {
 const event = (value) => fs.appendFileSync(path.join(root, '.checks/events'), value + '\\n');
 `
 
-// Run the real pnpm lifecycle, Turbo binary/config, and uploader. Only remote
-// generators, Next compilation, and the aws executable are fixture stand-ins.
+// Run the real pnpm scripts, maybe-turbo and Turbo binary/config. Only remote generators
+// and Next compilation are fixture stand-ins.
 json('package.json', { name: 'fixture', private: true, packageManager: 'pnpm@11.13.1' })
 write('pnpm-workspace.yaml', 'packages:\n  - apps/*\n  - packages/*\n')
 write(
@@ -67,7 +71,35 @@ json('apps/www/package.json', {
   scripts: packageJson.scripts,
   dependencies: { common: 'workspace:*' },
 })
-json('apps/www/turbo.json', turboConfig)
+// Tasks run in strict env mode, so the variables the fixture generators read to simulate remote
+// content changes and failures are passed through like real credentials.
+const passThrough = (task: { passThroughEnv?: string[] } | undefined, ...names: string[]) => ({
+  ...task,
+  passThroughEnv: [...(task?.passThroughEnv ?? []), ...names],
+})
+json('apps/www/turbo.json', {
+  ...turboConfig,
+  tasks: {
+    ...turboConfig.tasks,
+    'content:build:core': passThrough(turboConfig.tasks['content:build:core'], 'FIXTURE_CONTENT'),
+    'content:build': passThrough(turboConfig.tasks['content:build'], 'FIXTURE_SKILLS'),
+  },
+})
+// Mirrors the parts of apps/docs/turbo.jsonc that www's build depends on.
+json('apps/docs/turbo.json', {
+  extends: ['//'],
+  tasks: {
+    'build:federated-content': {
+      cache: false,
+      passThroughEnv: ['FIXTURE_DOCS', 'FIXTURE_FAIL_PREPARE'],
+    },
+    'build:guides-markdown': {
+      dependsOn: ['build:federated-content'],
+      inputs: ['$TURBO_DEFAULT$', { mode: 'jit', globs: ['content/guides/**'] }],
+      outputs: ['public/markdown/guides/**'],
+    },
+  },
+})
 json('apps/docs/package.json', {
   name: 'docs',
   private: true,
@@ -142,27 +174,50 @@ write('.next/cache/temporary', 'not a deploy artifact');
 write('public/customers-rss.xml', content);
 `
 )
-executable(
-  'node_modules/.bin/aws',
-  helpers +
-    `
-event('upload:' + process.argv[4]);
-if (!fs.existsSync('.next/static/chunk.js')) throw new Error('Upload is missing restored static assets');
-for (const file of ['public/rss.xml', 'public/customers-rss.xml', 'public/sitemap.xml', 'public/sitemap_www.xml', 'public/.well-known/agent-skills/index.json', '../docs/public/markdown/guides/example.md']) {
-  if (!fs.existsSync(file)) throw new Error('Missing deployment artifact: ' + file);
+const deploymentArtifacts = [
+  'apps/www/.next/static/chunk.js',
+  'apps/www/public/rss.xml',
+  'apps/www/public/customers-rss.xml',
+  'apps/www/public/sitemap.xml',
+  'apps/www/public/sitemap_www.xml',
+  'apps/www/public/.well-known/agent-skills/index.json',
+  'apps/docs/public/markdown/guides/example.md',
+]
+
+function missingArtifacts() {
+  return deploymentArtifacts.filter((file) => !fs.existsSync(path.join(fixture, file)))
 }
-`
-)
-write(
-  'scripts/upload-static-assets.sh',
-  fs.readFileSync(path.join(repoRoot, 'scripts/upload-static-assets.sh'), 'utf8')
-)
-fs.chmodSync(path.join(fixture, 'scripts/upload-static-assets.sh'), 0o755)
 fs.symlinkSync(
   path.join(repoRoot, 'node_modules/.bin/turbo'),
   path.join(fixture, 'node_modules/.bin/turbo')
 )
 fs.symlinkSync(path.join(repoRoot, 'node_modules/turbo'), path.join(fixture, 'node_modules/turbo'))
+fs.symlinkSync(
+  path.join(repoRoot, 'packages/maybe-turbo/bin/maybe-turbo.mjs'),
+  path.join(fixture, 'node_modules/.bin/maybe-turbo')
+)
+
+// Like the real repo, so inputs that exclude files still skip gitignored ones such as .next.
+for (const args of [
+  ['init', '--quiet'],
+  ['add', '-A'],
+  [
+    '-c',
+    'user.name=test',
+    '-c',
+    'user.email=test@example.com',
+    'commit',
+    '--quiet',
+    '-m',
+    'fixture',
+  ],
+]) {
+  spawnSync('git', args, { cwd: fixture })
+}
+
+// The test process's own PATH locates the fixture's pnpm and turbo; it isn't a variable of any
+// turbo task, so it's read through a copy to stay out of the turbo env lint rule.
+const hostEnv = { ...process.env }
 
 function build(env: Partial<NodeJS.ProcessEnv> = {}, rootCommand = false) {
   const command = rootCommand ? path.join(fixture, 'node_modules/.bin/turbo') : 'pnpm'
@@ -174,14 +229,10 @@ function build(env: Partial<NodeJS.ProcessEnv> = {}, rootCommand = false) {
       encoding: 'utf8',
       timeout: 60_000,
       env: {
-        ...process.env,
+        ...hostEnv,
         CI: 'true',
-        FORCE_ASSET_CDN: '1',
-        VERCEL_ENV: 'preview',
         VERCEL_GIT_COMMIT_SHA: '1111111111111111111111111111111111111111',
-        SITE_NAME: 'www',
-        ASSET_CDN_S3_ENDPOINT: 'https://example.invalid',
-        PATH: `${path.join(fixture, 'node_modules/.bin')}${path.delimiter}${process.env.PATH}`,
+        PATH: `${path.join(fixture, 'node_modules/.bin')}${path.delimiter}${hostEnv.PATH}`,
         ...env,
       },
     }
@@ -192,30 +243,29 @@ function build(env: Partial<NodeJS.ProcessEnv> = {}, rootCommand = false) {
 afterAll(() => fs.rmSync(fixture, { recursive: true, force: true }))
 
 describe('www deployment build lifecycle', () => {
-  it('builds fresh artifacts before uploading them', () => {
+  it('prepares content before compiling', () => {
     const result = build()
     expect(result.status, result.output).toBe(0)
-    expect(events()).toEqual([
-      'docs:fetch',
-      'docs:markdown',
-      'www:content',
-      'compile',
-      'sitemap',
-      'upload:.next/static',
-      'upload:public',
-    ])
-    expect(fs.existsSync(path.join(app, '.next/static/chunk.js'))).toBe(false)
+    const log = events()
+    // Content preparation runs in parallel tasks, but all of it finishes before compilation.
+    expect([...log.slice(0, 3)].sort()).toEqual(['docs:fetch', 'docs:markdown', 'www:content'])
+    expect(log.indexOf('docs:fetch')).toBeLessThan(log.indexOf('docs:markdown'))
+    expect(log.slice(3)).toEqual(['compile', 'sitemap'])
+    expect(missingArtifacts()).toEqual([])
   }, 90_000)
 
-  it('restores compiled assets and sitemaps and still uploads on a cache hit', () => {
+  it('restores compiled assets and sitemaps on a cache hit', () => {
     fs.rmSync(path.join(app, '.next'), { recursive: true, force: true })
     fs.rmSync(path.join(app, 'public'), { recursive: true, force: true })
     const result = build()
     expect(result.status, result.output).toBe(0)
     expect(result.output).toContain('cache hit')
-    expect(events().filter((event) => event === 'compile')).toHaveLength(1)
-    expect(events().filter((event) => event === 'docs:fetch')).toHaveLength(2)
-    expect(events().filter((event) => event.startsWith('upload:'))).toHaveLength(4)
+    expect(count('compile')).toBe(1)
+    // Remote content is refreshed on every build, even when the compilation is cached.
+    expect(count('docs:fetch')).toBe(2)
+    expect(count('www:content')).toBe(2)
+    expect(count('docs:markdown')).toBe(1)
+    expect(missingArtifacts()).toEqual([])
     expect(fs.existsSync(path.join(app, '.next/cache/temporary'))).toBe(false)
   }, 90_000)
 
@@ -228,59 +278,54 @@ describe('www deployment build lifecycle', () => {
   ])(
     'invalidates compilation when an input changes: %j',
     (env) => {
-      const count = events().filter((event) => event === 'compile').length
+      const compiled = count('compile')
       const result = build(env)
       expect(result.status, result.output).toBe(0)
-      expect(events().filter((event) => event === 'compile')).toHaveLength(count + 1)
+      expect(count('compile')).toBe(compiled + 1)
     },
     90_000
   )
 
   it('invalidates compilation when a shared package changes', () => {
     write('packages/common/index.js', 'export const version = 2\n')
-    const count = events().filter((event) => event === 'compile').length
+    const compiled = count('compile')
     const result = build()
     expect(result.status, result.output).toBe(0)
-    expect(events().filter((event) => event === 'compile')).toHaveLength(count + 1)
+    expect(count('compile')).toBe(compiled + 1)
   }, 90_000)
 
   it('invalidates compilation when a local environment file changes', () => {
     write('apps/www/.env.local', 'NEXT_PUBLIC_LOCAL_SETTING=changed\n')
-    const count = events().filter((event) => event === 'compile').length
+    const compiled = count('compile')
     const result = build()
     expect(result.status, result.output).toBe(0)
-    expect(events().filter((event) => event === 'compile')).toHaveLength(count + 1)
+    expect(count('compile')).toBe(compiled + 1)
   }, 90_000)
 
   it('invalidates compilation when the imported Studio component changes', () => {
     write('apps/studio/components/ui/TwoOptionToggle.tsx', 'export const version = 2\n')
-    const count = events().filter((event) => event === 'compile').length
+    const compiled = count('compile')
     const result = build()
     expect(result.status, result.output).toBe(0)
-    expect(events().filter((event) => event === 'compile')).toHaveLength(count + 1)
+    expect(count('compile')).toBe(compiled + 1)
   }, 90_000)
 
-  it('also refreshes content and uploads through the root Turbo build', () => {
-    const count = events().filter((event) => event === 'compile').length
+  it('also refreshes content through the root Turbo build', () => {
+    const compiled = count('compile')
+    const fetched = count('docs:fetch')
+    const content = count('www:content')
     const result = build({}, true)
     expect(result.status, result.output).toBe(0)
-    expect(events().filter((event) => event === 'compile')).toHaveLength(count)
-    expect(events().slice(-5)).toEqual([
-      'docs:fetch',
-      'docs:markdown',
-      'www:content',
-      'upload:.next/static',
-      'upload:public',
-    ])
+    expect(count('compile')).toBe(compiled)
+    expect(count('docs:fetch')).toBe(fetched + 1)
+    expect(count('www:content')).toBe(content + 1)
   }, 90_000)
 
   it.each([{ FIXTURE_FAIL_PREPARE: '1' }, { NEXT_PUBLIC_FIXTURE_FAIL_BUILD: '1' }])(
-    'does not upload after an earlier build stage fails: %j',
+    'fails the build when an earlier stage fails: %j',
     (env) => {
-      const uploads = events().filter((event) => event.startsWith('upload:')).length
       const result = build(env)
       expect(result.status, result.output).not.toBe(0)
-      expect(events().filter((event) => event.startsWith('upload:'))).toHaveLength(uploads)
     },
     90_000
   )

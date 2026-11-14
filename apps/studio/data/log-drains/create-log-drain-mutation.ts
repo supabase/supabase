@@ -1,35 +1,28 @@
 import { useMutation, useQueryClient } from '@tanstack/react-query'
-import type { components } from 'api-types'
 import { toast } from 'sonner'
 
 import { logDrainsKeys } from './keys'
+import { LogDrainType } from '@/components/interfaces/LogDrains/LogDrains.constants'
 import { handleError, post } from '@/data/fetchers'
-import type { ResponseError, UseCustomMutationOptions } from '@/types'
-
-type LogDrainAttributes =
-  components['schemas']['CreateLogDrainRequestOpenApi']['data']['attributes']
+import type { StudioError } from '@/lib/errors/studio-errors'
+import type { UseCustomMutationOptions } from '@/types'
 
 export type LogDrainCreateVariables = {
   projectRef: string
   name: string
   description: string
-  config: LogDrainAttributes['config']
-  type: LogDrainAttributes['backend_type']
+  config: Record<string, never>
+  type: LogDrainType
 }
 
 export async function createLogDrain(payload: LogDrainCreateVariables) {
-  const { data, error } = await post('/v2/projects/{ref}/analytics/log-drains', {
+  const { data, error } = await post('/platform/projects/{ref}/analytics/log-drains', {
     params: { path: { ref: payload.projectRef } },
     body: {
-      data: {
-        type: 'log_drain',
-        attributes: {
-          name: payload.name,
-          description: payload.description,
-          backend_type: payload.type,
-          config: payload.config,
-        },
-      },
+      name: payload.name,
+      description: payload.description,
+      type: payload.type,
+      config: payload.config as any,
     },
   })
 
@@ -44,12 +37,12 @@ export const useCreateLogDrainMutation = ({
   onError,
   ...options
 }: Omit<
-  UseCustomMutationOptions<LogDrainCreateData, ResponseError, LogDrainCreateVariables>,
+  UseCustomMutationOptions<LogDrainCreateData, StudioError, LogDrainCreateVariables>,
   'mutationFn'
 > = {}) => {
   const queryClient = useQueryClient()
 
-  return useMutation<LogDrainCreateData, ResponseError, LogDrainCreateVariables>({
+  return useMutation<LogDrainCreateData, StudioError, LogDrainCreateVariables>({
     mutationFn: (vars) => createLogDrain(vars),
     async onSuccess(data, variables, context) {
       const { projectRef } = variables

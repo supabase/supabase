@@ -2,23 +2,19 @@
   "name": "kb",
   "type": "module",
   "version": "0.0.1",
-  "engines": {
-    "node": ">=22.12.0"
-  },
   "scripts": {
     "dev": "astro dev --port 3008",
-    "prebuild": "pnpm run fetch:federated-content && pnpm run generate:markdown",
-    "build": "astro build",
+    "build": "maybe-turbo astro build",
     "fetch:federated-content": "tsx ./scripts/federated-content/fetch-federated-content.ts",
-    "generate:markdown": "tsx ./scripts/generate-markdown.ts",
-    "presearch:ingest": "pnpm run fetch:federated-content && pnpm run generate:markdown",
-    "search:ingest": "tsx ./scripts/search/ingest.ts",
-    "sync:legacy-slugs": "tsx ./scripts/federated-content/backfill-legacy-slugs.ts",
+    "generate:markdown": "maybe-turbo tsx ./scripts/generate-markdown.ts",
+    "search:ingest": "maybe-turbo tsx ./scripts/search/ingest.ts",
     "sync:troubleshooting-entries": "tsx ./scripts/federated-content/sync-troubleshooting-entries.ts",
     "sync:troubleshooting-updates": "tsx ./scripts/federated-content/sync-troubleshooting-updates.ts",
     "preview": "astro preview",
     "astro": "astro",
-    "test": "vitest --run"
+    "test": "vitest --run",
+    "lint": "eslint .",
+    "lint:ratchet": "tsx node_modules/eslint-config-supabase/ratchet-eslint-rules.ts --rules-file node_modules/eslint-config-supabase/ratchet-rules.json"
   },
   "dependencies": {
     "@astrojs/markdown-remark": "7.2.4",
@@ -33,6 +29,7 @@
     "common": "workspace:*",
     "docs-search": "workspace:*",
     "gray-matter": "^4.0.3",
+    "hast-util-from-html": "^2.0.3",
     "lucide-react": "catalog:",
     "react": "catalog:",
     "react-dom": "catalog:",
@@ -47,13 +44,18 @@
     "yaml": "^2.9.0"
   },
   "devDependencies": {
+    "@astrojs/markdown-satteri": "0.3.8",
     "@tailwindcss/vite": "4.2.4",
     "@types/node": "catalog:",
     "@types/react": "catalog:",
     "@types/react-dom": "catalog:",
+    "@typescript-eslint/parser": "^8.48.0",
+    "astro-eslint-parser": "^1.4.0",
     "config": "workspace:*",
     "dotenv": "^16.5.0",
+    "eslint-config-supabase": "workspace:*",
     "lodash-es": "catalog:",
+    "maybe-turbo": "workspace:*",
     "tailwindcss": "catalog:",
     "tsx": "catalog:",
     "vitest": "catalog:"

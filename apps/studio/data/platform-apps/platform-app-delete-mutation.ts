@@ -2,8 +2,9 @@ import { useMutation, useQueryClient } from '@tanstack/react-query'
 import { toast } from 'sonner'
 
 import { platformAppKeys } from './keys'
-import { del, handleError } from '@/data/fetchers'
-import type { ResponseError, UseCustomMutationOptions } from '@/types'
+import { del, handleError, unguarded } from '@/data/fetchers'
+import type { StudioError } from '@/lib/errors/studio-errors'
+import type { UseCustomMutationOptions } from '@/types'
 
 export type PlatformAppDeleteVariables = {
   slug: string
@@ -13,6 +14,7 @@ export type PlatformAppDeleteVariables = {
 export async function deletePlatformApp({ slug, appId }: PlatformAppDeleteVariables) {
   const { data, error } = await del('/platform/organizations/{slug}/apps/{app_id}', {
     params: { path: { slug, app_id: appId } },
+    grant: unguarded.migrating,
   })
 
   if (error) handleError(error)
@@ -26,12 +28,12 @@ export const usePlatformAppDeleteMutation = ({
   onError,
   ...options
 }: Omit<
-  UseCustomMutationOptions<PlatformAppDeleteData, ResponseError, PlatformAppDeleteVariables>,
+  UseCustomMutationOptions<PlatformAppDeleteData, StudioError, PlatformAppDeleteVariables>,
   'mutationFn'
 > = {}) => {
   const queryClient = useQueryClient()
 
-  return useMutation<PlatformAppDeleteData, ResponseError, PlatformAppDeleteVariables>({
+  return useMutation<PlatformAppDeleteData, StudioError, PlatformAppDeleteVariables>({
     mutationFn: (vars) => deletePlatformApp(vars),
     async onSuccess(data, variables, context) {
       await queryClient.invalidateQueries({ queryKey: platformAppKeys.list(variables.slug) })

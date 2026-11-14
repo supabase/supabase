@@ -1,3 +1,7 @@
+export const DOCS_FEEDBACK_URL = 'https://supabase.com/docs/guides/ai-tools/agent-feedback.md'
+
+export const PREFERRED_SOURCE_URL = 'https://www.google.com/preferences/source?q=supabase.com'
+
 export function askAiPrompt(pageUrl: string) {
   return `Read from ${pageUrl} so I can ask questions about its contents`
 }

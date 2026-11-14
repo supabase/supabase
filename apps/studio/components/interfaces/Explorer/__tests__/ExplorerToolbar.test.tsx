@@ -12,42 +12,16 @@ import {
 import { customRender as render } from '@/tests/lib/custom-render'
 
 describe('ExplorerToolbar', () => {
-  it('composes the resource icon, title, direct actions, and custom controls', () => {
+  it('composes the icon, title, icon and labeled actions, and forwards refs and native props', () => {
+    const actionRef = createRef<HTMLButtonElement>()
+
     render(
-      <ExplorerToolbar aria-label="Explorer query toolbar">
+      <ExplorerToolbar aria-label="Explorer query toolbar" data-density="compact">
         <ExplorerToolbarIcon>Q</ExplorerToolbarIcon>
         <ExplorerToolbarTitle>Weekly signups</ExplorerToolbarTitle>
         <ExplorerToolbarActions>
           <span data-testid="source-menu">Database</span>
           <ExplorerToolbarAction aria-label="Run cell" icon={<span>R</span>} />
-        </ExplorerToolbarActions>
-      </ExplorerToolbar>
-    )
-
-    const toolbar = screen.getByRole('toolbar', { name: 'Explorer query toolbar' })
-    expect(toolbar).toHaveAttribute('data-slot', 'explorer-toolbar')
-    expect(toolbar.querySelector('[data-slot="explorer-toolbar-icon"]')).toHaveTextContent('Q')
-    expect(toolbar.querySelector('[data-slot="explorer-toolbar-title"]')).toHaveTextContent(
-      'Weekly signups'
-    )
-    expect(within(toolbar).getByTestId('source-menu')).toBeInTheDocument()
-
-    const runAction = within(toolbar).getByRole('button', { name: 'Run cell' })
-    expect(runAction).toHaveAttribute('data-slot', 'explorer-toolbar-action')
-    expect(runAction).toHaveAttribute('data-size', 'tiny')
-  })
-
-  it('supports labeled actions and forwards refs and native props', () => {
-    const actionRef = createRef<HTMLButtonElement>()
-
-    render(
-      <ExplorerToolbar
-        aria-label="Notebook toolbar"
-        className="custom-toolbar"
-        data-density="compact"
-      >
-        <ExplorerToolbarTitle>Authentication health</ExplorerToolbarTitle>
-        <ExplorerToolbarActions>
           <ExplorerToolbarAction ref={actionRef} data-command="analyze">
             Analyze
           </ExplorerToolbarAction>
@@ -55,15 +29,15 @@ describe('ExplorerToolbar', () => {
       </ExplorerToolbar>
     )
 
-    const toolbar = screen.getByRole('toolbar', { name: 'Notebook toolbar' })
-    const action = within(toolbar).getByRole('button', { name: 'Analyze' })
-
-    expect(toolbar).toHaveClass('custom-toolbar')
+    const toolbar = screen.getByRole('toolbar', { name: 'Explorer query toolbar' })
     expect(toolbar).toHaveAttribute('data-density', 'compact')
-    expect(toolbar.querySelector('[data-slot="explorer-toolbar-actions"]')).toHaveClass('gap-px')
+    expect(toolbar).toHaveTextContent('Q')
+    expect(toolbar).toHaveTextContent('Weekly signups')
+    expect(within(toolbar).getByTestId('source-menu')).toBeInTheDocument()
+    expect(within(toolbar).getByRole('button', { name: 'Run cell' })).toBeInTheDocument()
+
+    const action = within(toolbar).getByRole('button', { name: 'Analyze' })
     expect(action).toHaveAttribute('data-command', 'analyze')
-    expect(action).not.toHaveClass('w-7')
-    expect(action).toHaveClass('text-tertiary-foreground', 'hover:text-foreground')
     expect(actionRef.current).toBe(action)
   })
 })

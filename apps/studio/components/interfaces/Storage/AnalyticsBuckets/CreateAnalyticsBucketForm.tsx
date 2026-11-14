@@ -2,18 +2,7 @@ import { zodResolver } from '@hookform/resolvers/zod'
 import { useParams } from 'common'
 import { SubmitHandler, useForm } from 'react-hook-form'
 import { toast } from 'sonner'
-import {
-  Button,
-  cn,
-  DialogFooter,
-  DialogSection,
-  Form,
-  FormControl,
-  FormField,
-  Input,
-  SheetFooter,
-  SheetSection,
-} from 'ui'
+import { Button, DialogFooter, DialogSection, Form, FormControl, FormField, Input } from 'ui'
 import { Admonition } from 'ui-patterns/Admonition'
 import { FormItemLayout } from 'ui-patterns/form/FormItemLayout/FormItemLayout'
 import z from 'zod'
@@ -25,6 +14,7 @@ import {
   validBucketNameRegex,
 } from './CreateAnalyticsBucketForm.utils'
 import { getServiceVersionsPath } from '@/components/interfaces/Settings/General/ServiceVersions/ServiceVersions.utils'
+import { ApiKeysAccessNote } from '@/components/ui/ApiKeysAccessNote'
 import { InlineLink } from '@/components/ui/InlineLink'
 import { useDatabaseExtensionEnableMutation } from '@/data/database-extensions/database-extension-enable-mutation'
 import { useAnalyticsBucketCreateMutation } from '@/data/storage/analytics-bucket-create-mutation'
@@ -110,14 +100,10 @@ const formId = 'create-analytics-storage-bucket-form'
 export type CreateAnalyticsBucketForm = z.infer<typeof FormSchema>
 
 interface CreateAnalyticsBucketFormProps {
-  type?: 'dialog' | 'sheet'
   onOpenChange: (value: boolean) => void
 }
 
-export const CreateAnalyticsBucketForm = ({
-  type = 'dialog',
-  onOpenChange,
-}: CreateAnalyticsBucketFormProps) => {
+export const CreateAnalyticsBucketForm = ({ onOpenChange }: CreateAnalyticsBucketFormProps) => {
   const { ref } = useParams()
   const { data: project } = useSelectedProjectQuery()
   const { extension: wrappersExtension, state: wrappersExtensionState } =
@@ -134,8 +120,13 @@ export const CreateAnalyticsBucketForm = ({
       onError: () => {},
     })
 
-  const { mutateAsync: createIcebergWrapper, isPending: isCreatingIcebergWrapper } =
-    useIcebergWrapperCreateMutation()
+  const {
+    mutateAsync: createIcebergWrapper,
+    isPending: isCreatingIcebergWrapper,
+    apiKeysGrant,
+    apiKeyState,
+    isApiKeyReady,
+  } = useIcebergWrapperCreateMutation()
 
   const { mutateAsync: enableExtension, isPending: isEnablingExtension } =
     useDatabaseExtensionEnableMutation()
@@ -151,6 +142,7 @@ export const CreateAnalyticsBucketForm = ({
     if (!ref) return console.error('Project ref is required')
     if (!project) return console.error('Project details is required')
     if (!wrappersExtension) return console.error('Unable to find wrappers extension')
+    if (!isApiKeyReady) return
 
     const hasExistingBucket = buckets.some((x) => x.name === values.name)
     if (hasExistingBucket) return toast.error('Bucket name already exists')
@@ -183,12 +175,9 @@ export const CreateAnalyticsBucketForm = ({
     }
   }
 
-  const Section = type === 'dialog' ? DialogSection : SheetSection
-  const Footer = type === 'dialog' ? DialogFooter : SheetFooter
-
   return (
     <>
-      <Section className="flex flex-col p-0! grow">
+      <DialogSection className="flex flex-col p-0! grow">
         <Form {...form}>
           <form id={formId} onSubmit={form.handleSubmit(onSubmit)}>
             <FormField
@@ -218,15 +207,21 @@ export const CreateAnalyticsBucketForm = ({
               )}
             />
 
+            <ApiKeysAccessNote
+              className="px-5 pb-5"
+              grant={apiKeysGrant}
+              keyState={apiKeyState}
+              fallback="They're needed to set up the Iceberg Wrapper, so you can't create an Analytics bucket."
+            />
+
             {wrappersExtensionNeedsUpgrading ? (
               <Admonition
                 type="warning"
-                className={cn('border-x-0 rounded-none', type === 'dialog' && 'border-b-0')}
+                className="border-x-0 rounded-none border-b-0"
                 title="Wrappers extension must be updated for Iceberg Wrapper support"
               >
                 <p className="prose max-w-full text-sm leading-normal!">
-                  Update the <code className="text-code-inline">wrappers</code> extension by
-                  upgrading your project from your{' '}
+                  Update the <code>wrappers</code> extension by upgrading your project from your{' '}
                   <InlineLink href={getServiceVersionsPath(ref)}>project settings</InlineLink>{' '}
                   before creating an Analytics bucket.{' '}
                   <InlineLink href={`${DOCS_URL}/guides/database/extensions/wrappers/iceberg`}>
@@ -236,26 +231,27 @@ export const CreateAnalyticsBucketForm = ({
                 </p>
               </Admonition>
             ) : (
-              <Admonition
-                type="default"
-                className={cn('border-x-0 rounded-none', type === 'dialog' && 'border-b-0')}
-              >
+              <Admonition type="default" className="border-x-0 rounded-none border-b-0">
                 <p className="leading-normal!">
                   Supabase will install the{' '}
-                  {wrappersExtensionState !== 'installed' ? 'Wrappers extension and ' : ''}
-                  Iceberg Wrapper integration on your behalf.{' '}
+                  {wrappersExtensionState !== 'installed' ? (
+                    <span>{'Wrappers extension and '}</span>
+                  ) : (
+                    ''
+                  )}
+                  <span>Iceberg Wrapper integration on your behalf.</span>{' '}
                   <InlineLink href={`${DOCS_URL}/guides/database/extensions/wrappers/iceberg`}>
                     Learn more
                   </InlineLink>
-                  .
+                  <span>.</span>
                 </p>
               </Admonition>
             )}
           </form>
         </Form>
-      </Section>
+      </DialogSection>
 
-      <Footer>
+      <DialogFooter>
         <Button disabled={isCreating} onClick={() => onOpenChange(false)}>
           Cancel
         </Button>
@@ -264,11 +260,11 @@ export const CreateAnalyticsBucketForm = ({
           form={formId}
           type="submit"
           loading={isCreating}
-          disabled={wrappersExtensionNeedsUpgrading || isCreating}
+          disabled={wrappersExtensionNeedsUpgrading || isCreating || !isApiKeyReady}
         >
           Create bucket
         </Button>
-      </Footer>
+      </DialogFooter>
     </>
   )
 }

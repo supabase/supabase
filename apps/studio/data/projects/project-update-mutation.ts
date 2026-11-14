@@ -4,7 +4,8 @@ import { toast } from 'sonner'
 import { projectKeys } from './keys'
 import { useInvalidateProjectsInfiniteQuery } from './org-projects-infinite-query'
 import { handleError, patch } from '@/data/fetchers'
-import type { ResponseError, UseCustomMutationOptions } from '@/types'
+import type { StudioError } from '@/lib/errors/studio-errors'
+import type { UseCustomMutationOptions } from '@/types'
 
 export type ProjectUpdateVariables = {
   ref: string
@@ -33,13 +34,13 @@ export const useProjectUpdateMutation = ({
   onError,
   ...options
 }: Omit<
-  UseCustomMutationOptions<ProjectUpdateData, ResponseError, ProjectUpdateVariables>,
+  UseCustomMutationOptions<ProjectUpdateData, StudioError, ProjectUpdateVariables>,
   'mutationFn'
 > = {}) => {
   const queryClient = useQueryClient()
   const { invalidateProjectsQuery } = useInvalidateProjectsInfiniteQuery()
 
-  return useMutation<ProjectUpdateData, ResponseError, ProjectUpdateVariables>({
+  return useMutation<ProjectUpdateData, StudioError, ProjectUpdateVariables>({
     mutationFn: (vars) => updateProject(vars),
     async onSuccess(data, variables, context) {
       const { ref } = variables

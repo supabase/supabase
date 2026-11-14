@@ -24,7 +24,13 @@ export const contract = {
   inputSchema,
   outputSchema: notebookRunOutputSchema,
   minOptInLevel: 'schema',
+  availability: {
+    environments: new Set(['platform']),
+    requires: new Set(['explorer']),
+  },
   needsApproval: true,
+  promptGuidance: `- When the user asks to read or analyze a notebook using its current results, call \`get_notebook\` and then \`run_notebook\`. The run tool presents all query cells for one user approval, executes them in notebook order, and returns only the results allowed by the organization's sharing level. Do not replace it with one \`execute_sql\` call per cell.
+- Questions only about a notebook's saved structure or query configuration do not require \`run_notebook\`.`,
   toModelOutput: (output: NotebookRunOutput, optInLevel) =>
     sanitizeNotebookRunOutput(output, optInLevel),
   // Persisted output comes from the client, so a malformed run is replaced with an

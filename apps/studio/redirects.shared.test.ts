@@ -1,6 +1,23 @@
+import { readdirSync } from 'node:fs'
+import { createRequire } from 'node:module'
+import { fileURLToPath } from 'node:url'
 import { describe, expect, it } from 'vitest'
 
-import { matchRedirect, preserveQueryAndHash } from './redirects.shared'
+import {
+  getMaintenanceRedirects,
+  MAINTENANCE_PASSTHROUGH_SEGMENTS,
+  matchRedirect,
+  preserveQueryAndHash,
+} from './redirects.shared'
+
+// Next's own redirect matcher, so the declarative rule is tested as Next runs it.
+const require = createRequire(import.meta.url)
+const { getPathMatch } = require('next/dist/shared/lib/router/utils/path-match') as {
+  getPathMatch: (
+    path: string,
+    options: { strict: boolean; removeUnnamedParams: boolean }
+  ) => (pathname: string) => false | Record<string, string>
+}
 
 describe('preserveQueryAndHash', () => {
   it('carries incoming query params onto the destination', () => {
@@ -60,6 +77,7 @@ describe('matchRedirect moved Studio routes', () => {
     [`/project/${ref}/logs/edge-functions`, `/project/${ref}/logs/edge-functions-logs`],
     [`/project/${ref}/settings/vault`, `/project/${ref}/integrations/vault/secrets`],
     [`/project/${ref}/settings/billing`, '/org/_/billing'],
+    [`/project/${ref}/database/hooks`, `/project/${ref}/integrations/webhooks/overview`],
     ['/account', '/account/me'],
     ['/org/my-org/projects', '/org/my-org'],
     ['/project', '/organizations'],
@@ -68,6 +86,61 @@ describe('matchRedirect moved Studio routes', () => {
       destination,
       permanent: true,
     })
+  })
+
+  it.each(['security', 'performance', 'health'])(
+    'leaves %s advisors to the flag-aware page',
+    (category) => {
+      for (const isPlatform of [true, false]) {
+        expect(
+          matchRedirect({
+            pathname: `/project/${ref}/advisors/${category}`,
+            search: { severity: 'critical' },
+            isPlatform,
+          })
+        ).toBeNull()
+      }
+    }
+  )
+
+  it.each([
+    ['database/security-advisor', 'security'],
+    ['database/performance-advisor', 'performance'],
+    ['database/linter', 'security'],
+  ])('preserves legacy finding links from %s', (path, category) => {
+    for (const isPlatform of [true, false]) {
+      expect(
+        matchRedirect({
+          pathname: `/project/${ref}/${path}`,
+          search: { id: 'opaque-key', preset: 'WARN' },
+          hash: 'finding',
+          isPlatform,
+        })
+      ).toEqual({
+        destination: `/project/${ref}/advisors/${category}?id=opaque-key&preset=WARN#finding`,
+        permanent: true,
+      })
+    }
+  })
+
+  it('redirects the advisor root while leaving check settings and Issues alone', () => {
+    expect(
+      matchRedirect({ pathname: `/project/${ref}/advisors`, search: {}, isPlatform: true })
+    ).toEqual({ destination: `/project/${ref}/advisors/security`, permanent: true })
+    expect(
+      matchRedirect({
+        pathname: `/project/${ref}/advisors/rules/security`,
+        search: {},
+        isPlatform: true,
+      })
+    ).toBeNull()
+    expect(
+      matchRedirect({
+        pathname: `/project/${ref}/issues`,
+        search: { category: 'security' },
+        isPlatform: true,
+      })
+    ).toBeNull()
   })
 
   it('preserves the incoming query and hash', () => {
@@ -264,6 +337,71 @@ describe('matchRedirect maintenance mode', () => {
         maintenanceMode: true,
       })
     ).toBeNull()
+  })
+
+  // Static files the maintenance page (or the SPA shell rendering it) loads.
+  const assetPaths = [
+    '/maintenance',
+    '/maintenance/',
+    '/img/supabase-dark.svg',
+    '/favicon/favicon.ico',
+    '/favicon/manifest.json',
+    '/fonts/CustomFont-Book.woff2',
+    '/assets/main-abc123.js',
+    '/_vercel/immutable/salt/nitro/main-abc123.js',
+    '/_vercel/immutable/salt/nitro/styles-abc123.css',
+    '/_next/static/chunks/main-abc123.js',
+    '/monaco-editor/vs/loader.js',
+    '/supabase-logo.svg',
+  ]
+  const pagePaths = [
+    '/',
+    '/project/abc/editor',
+    '/org/acme/billing',
+    '/sign-in',
+    '/maintenance-other',
+    '/images/logo.svg',
+    '/project/img',
+    '/api/platform/profile',
+    '/_serverFn/function-id',
+  ]
+
+  it.each(assetPaths)('leaves %s reachable when enabled', (pathname) => {
+    expect(
+      matchRedirect({ pathname, search: {}, isPlatform: true, maintenanceMode: true })
+    ).toBeNull()
+  })
+
+  it.each(pagePaths)('redirects %s when enabled', (pathname) => {
+    expect(
+      matchRedirect({ pathname, search: {}, isPlatform: true, maintenanceMode: true })
+    ).toEqual({ destination: '/maintenance', permanent: false })
+  })
+
+  it.each(['', '/dashboard'])(
+    'declarative rule agrees with the runtime matcher under Next with base path "%s"',
+    (basePath) => {
+      const [rule] = getMaintenanceRedirects(true)
+      // Next prepends basePath to redirect sources.
+      const match = getPathMatch(`${basePath}${rule.source}`, {
+        strict: true,
+        removeUnnamedParams: true,
+      })
+      for (const pathname of assetPaths) {
+        expect(match(`${basePath}${pathname}`), pathname).toBe(false)
+      }
+      for (const pathname of pagePaths) {
+        expect(match(`${basePath}${pathname}`), pathname).not.toBe(false)
+      }
+    }
+  )
+
+  it('keeps every top-level public/ entry reachable', () => {
+    const publicDir = fileURLToPath(new URL('./public', import.meta.url))
+    for (const entry of readdirSync(publicDir)) {
+      if (entry.startsWith('.')) continue
+      expect(MAINTENANCE_PASSTHROUGH_SEGMENTS, entry).toContain(entry)
+    }
   })
 
   it('bounces /maintenance back to / when disabled', () => {
