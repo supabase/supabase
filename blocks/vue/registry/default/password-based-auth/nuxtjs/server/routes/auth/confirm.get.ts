@@ -1,14 +1,14 @@
 import type { EmailOtpType } from '@supabase/supabase-js'
-import { defineEventHandler, getQuery, sendRedirect } from 'h3'
+import { defineEventHandler, getQuery, getRequestURL, sendRedirect } from 'h3'
 
+import { safeNextPath } from '../../utils/safe-next-path'
 import { createSupabaseServerClient } from '@/registry/default/clients/nuxtjs/server/supabase/client'
 
 export default defineEventHandler(async (event) => {
   const query = getQuery(event)
   const token_hash = query.token_hash as string | null
   const type = query.type as EmailOtpType | null
-  const _next = query.next as string | undefined
-  const next = _next?.startsWith('/') ? _next : '/'
+  const next = safeNextPath(query.next, getRequestURL(event).origin)
 
   if (token_hash && type) {
     const supabase = createSupabaseServerClient(event)
