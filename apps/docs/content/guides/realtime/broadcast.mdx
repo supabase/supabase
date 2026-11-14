@@ -339,14 +339,10 @@ Broadcast payloads can be binary (`ArrayBuffer` or `ArrayBufferView`, e.g. `Uint
     const myChannel = supabase.channel('test-channel')
 
     /**
-     * Sending a message before subscribing will use HTTP
+     * Use httpSend() to send a message over HTTP without subscribing
      */
     myChannel
-      .send({
-        type: 'broadcast',
-        event: 'shout',
-        payload: { message: 'Hi' },
-      })
+      .httpSend('shout', { message: 'Hi' })
       .then((resp) => console.log(resp))
 
 
