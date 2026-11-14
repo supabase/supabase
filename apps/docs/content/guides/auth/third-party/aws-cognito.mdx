@@ -29,7 +29,7 @@ const supabase = createClient(
     accessToken: async () => {
       const session = await fetchAuthSession()
 
-      // Alternatively you can use session.tokens?.idToken instead.
+      // With a V1_0 pre-token generation trigger, use session.tokens?.idToken here and in the Realtime listener below.
       return session.tokens?.accessToken?.toString() ?? null
     },
   }
