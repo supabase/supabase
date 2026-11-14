@@ -6,9 +6,31 @@ import {
   DEFAULT_FALLBACK_PATH,
   DEFAULT_SIGNUP_RETURN_PATH,
   getReturnToPath,
+  getSignInQuery,
   getSignUpReturnTo,
   validateReturnTo,
 } from './gotrue'
+
+describe('getSignInQuery', () => {
+  it('drops returnTo when it is exactly /new and keeps other params', () => {
+    expect(getSignInQuery({ returnTo: '/new', destination: 'cli' })).toEqual({ destination: 'cli' })
+    expect(getSignInQuery({ returnTo: ['/new', '/other'] })).toEqual({})
+  })
+
+  it('keeps /new with a query string', () => {
+    expect(getSignInQuery({ returnTo: '/new?foo=bar' })).toEqual({ returnTo: '/new?foo=bar' })
+  })
+
+  it('keeps other destinations and params', () => {
+    const query = { returnTo: '/project/ref', destination: 'cli' }
+    expect(getSignInQuery(query)).toEqual(query)
+  })
+
+  it('returns the query unchanged when there is no returnTo', () => {
+    expect(getSignInQuery({})).toEqual({})
+    expect(getSignInQuery({ method: 'github' })).toEqual({ method: 'github' })
+  })
+})
 
 describe('getSignUpReturnTo', () => {
   it('defaults to /new when returnTo is missing', () => {

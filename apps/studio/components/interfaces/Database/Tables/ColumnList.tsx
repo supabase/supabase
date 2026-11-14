@@ -412,7 +412,8 @@ export const ColumnList = ({
               <TableFooter className="font-normal">
                 <TableRow className="border-b-0 [&>td]:hover:bg-inherit">
                   <TableCell colSpan={5} className="text-foreground-muted">
-                    {columns.length} {columns.length === 1 ? 'column' : 'columns'}
+                    {columns.length}{' '}
+                    {columns.length === 1 ? <span>column</span> : <span>columns</span>}
                   </TableCell>
                 </TableRow>
               </TableFooter>

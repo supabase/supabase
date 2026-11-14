@@ -132,10 +132,12 @@ export const ServiceStatus = () => {
   const branchesGrant = useGrant('GET /v1/projects/{ref}/branches', {
     projectRef: branchesProjectRef,
   })
-  const { data: branches, isPending: isBranchesPending } = useQuery({
-    ...branchesQueryOptions({ projectRef: branchesProjectRef, grant: branchesGrant.grant }),
-    enabled: isBranch,
-  })
+  const { data: branches, isPending: isBranchesPending } = useQuery(
+    branchesQueryOptions(
+      { projectRef: branchesProjectRef, grant: branchesGrant.grant },
+      { enabled: isBranch }
+    )
+  )
   const isBranchesLoading =
     isBranch &&
     (branchesGrant.status === 'loading' ||
@@ -409,8 +411,9 @@ export const ServiceStatus = () => {
             </div>
             <div className="flex flex-col gap-y-1">
               <p>
-                {isProjectNew ? 'New' : 'Recently restored'} projects can take up to{' '}
-                {SERVICE_STATUS_THRESHOLD} minutes to become fully operational.
+                {isProjectNew ? <span>New</span> : <span>Recently restored</span>}{' '}
+                <span>projects can take up to</span> {SERVICE_STATUS_THRESHOLD}{' '}
+                <span>minutes to become fully operational.</span>
               </p>
               <p>
                 If services stay unhealthy, refer to our{' '}

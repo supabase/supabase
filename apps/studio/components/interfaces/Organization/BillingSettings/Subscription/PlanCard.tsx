@@ -88,7 +88,8 @@ export function PlanCard({
         },
       }}
     >
-      {isDowngradeOption ? 'Downgrade' : 'Upgrade'} to {plan.name}
+      {isDowngradeOption ? <span>Downgrade</span> : <span>Upgrade</span>} <span>to</span>{' '}
+      {plan.name}
     </ButtonTooltip>
   )
 

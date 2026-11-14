@@ -24,12 +24,12 @@ import { TanStackDevtools } from '@tanstack/react-devtools'
 import type { QueryClient } from '@tanstack/react-query'
 import { ReactQueryDevtoolsPanel } from '@tanstack/react-query-devtools'
 import {
-  ClientOnly,
   createRootRouteWithContext,
   HeadContent,
   Outlet,
   redirect,
   Scripts,
+  useHydrated,
   useLocation,
   type AnyRouter,
   type ErrorComponentProps,
@@ -92,6 +92,7 @@ import { splitInternalUrl } from '@/lib/internal-url'
 // Custom adapter instead of `nuqs/adapters/tanstack-router` — the stock one
 // injects a trailing slash before the query on every nuqs write (see module).
 import { NuqsAdapter } from '@/lib/nuqs-tanstack-adapter'
+import { isPrerenderedRoute } from '@/lib/prerendered-routes'
 import { ProfileProvider } from '@/lib/profile'
 import { Telemetry } from '@/lib/telemetry'
 import { ToastErrorTracker } from '@/lib/toast-errors'
@@ -363,8 +364,11 @@ export const Route = createRootRouteWithContext<RouterContext>()({
 })
 
 function RootComponent() {
-  const recoveryLocation = useLocation()
+  const location = useLocation()
+  const isHydrated = useHydrated()
   useThemeSandbox()
+  // Until hydration, match the served HTML: a prerendered page, or the SPA shell's fallback.
+  const canRenderPage = isHydrated || (IS_PLATFORM && isPrerenderedRoute(location.pathname))
 
   return (
     <ErrorBoundary FallbackComponent={GlobalErrorBoundaryState} onError={errorBoundaryHandler}>
@@ -384,10 +388,8 @@ function RootComponent() {
                               <BannerStackProvider>
                                 <FeaturePreviewContextProvider>
                                   <MainScrollContainerProvider>
-                                    <RecoveryReminderController href={recoveryLocation.href}>
-                                      <ClientOnly fallback={<ShellFallback />}>
-                                        <Outlet />
-                                      </ClientOnly>
+                                    <RecoveryReminderController href={location.href}>
+                                      {canRenderPage ? <Outlet /> : <ShellFallback />}
                                     </RecoveryReminderController>
                                   </MainScrollContainerProvider>
                                   <GlobalShortcuts />

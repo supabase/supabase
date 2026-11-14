@@ -304,10 +304,12 @@ export const QueueSettings = ({}: QueueSettingsProps) => {
                           <TooltipContent side="bottom" className="w-64 flex flex-col gap-y-1">
                             <p>
                               Required for{' '}
-                              {relatedFunctions.length === 6
-                                ? 'all'
-                                : `the following ${relatedFunctions.length}`}{' '}
-                              functions:
+                              {relatedFunctions.length === 6 ? (
+                                <span>all</span>
+                              ) : (
+                                <span>{`the following ${relatedFunctions.length}`}</span>
+                              )}{' '}
+                              <span>functions:</span>
                             </p>
                             <div className="max-w-full flex flex-wrap gap-x-0.5 gap-y-1">
                               {relatedFunctions.map((y) => (

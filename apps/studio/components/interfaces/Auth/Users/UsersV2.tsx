@@ -932,15 +932,18 @@ export const UsersV2 = () => {
       >
         <p className="text-sm text-foreground-light">
           This is permanent! Are you sure you want to delete the{' '}
-          {selectedUsers.size === 1 ? '' : `selected ${selectedUsers.size} `}user
-          {selectedUsers.size > 1 ? 's' : ''}
+          {selectedUsers.size === 1 ? '' : <span>{`selected ${selectedUsers.size} `}</span>}
+          <span>user</span>
+          {selectedUsers.size > 1 ? <span>s</span> : ''}
           {selectedUsers.size === 1 ? (
             <span className="text-foreground">
               {' '}
-              {selectedUserFromCheckbox?.email ?? selectedUserFromCheckbox?.phone ?? 'this user'}
+              {selectedUserFromCheckbox?.email ?? selectedUserFromCheckbox?.phone ?? (
+                <span>this user</span>
+              )}
             </span>
           ) : null}
-          ?
+          <span>?</span>
         </p>
       </ConfirmationModal>
 

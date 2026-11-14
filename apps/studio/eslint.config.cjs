@@ -2,6 +2,7 @@ const { defineConfig } = require('eslint/config')
 const { fixupPluginRules } = require('@eslint/compat')
 const barrelFiles = require('eslint-plugin-barrel-files')
 const valtio = require('eslint-plugin-valtio')
+const reactGoogleTranslate = require('eslint-plugin-react-google-translate')
 // eslint-plugin-react-hook-form@0.3.1 (latest) still calls the ESLint 8
 // `context.getScope()`, which ESLint 9 removed. fixupPluginRules shims the
 // deprecated context methods so the rules run under flat config.
@@ -64,20 +65,20 @@ const FETCH_TYPE_BYPASS_EXCEPTIONS = [
   'data/log-drains/delete-log-drain-mutation.ts',
   // untyped `fetchGet` / `fetchPost`
   'lib/api/self-hosted/generate-types.ts',
-  'pages/api/platform/auth/[[]ref]/invite.ts',
-  'pages/api/platform/auth/[[]ref]/magiclink.ts',
-  'pages/api/platform/auth/[[]ref]/otp.ts',
-  'pages/api/platform/auth/[[]ref]/recover.ts',
-  'pages/api/platform/pg-meta/[[]ref]/column-privileges.ts',
-  'pages/api/platform/pg-meta/[[]ref]/extensions.ts',
-  'pages/api/platform/pg-meta/[[]ref]/foreign-tables.ts',
-  'pages/api/platform/pg-meta/[[]ref]/materialized-views.ts',
-  'pages/api/platform/pg-meta/[[]ref]/policies.ts',
-  'pages/api/platform/pg-meta/[[]ref]/publications.ts',
-  'pages/api/platform/pg-meta/[[]ref]/tables.ts',
-  'pages/api/platform/pg-meta/[[]ref]/triggers.ts',
-  'pages/api/platform/pg-meta/[[]ref]/types.ts',
-  'pages/api/platform/pg-meta/[[]ref]/views.ts',
+  'routes/api/platform/auth/$ref/invite.ts',
+  'routes/api/platform/auth/$ref/magiclink.ts',
+  'routes/api/platform/auth/$ref/otp.ts',
+  'routes/api/platform/auth/$ref/recover.ts',
+  'routes/api/platform/pg-meta/$ref/column-privileges.ts',
+  'routes/api/platform/pg-meta/$ref/extensions.ts',
+  'routes/api/platform/pg-meta/$ref/foreign-tables.ts',
+  'routes/api/platform/pg-meta/$ref/materialized-views.ts',
+  'routes/api/platform/pg-meta/$ref/policies.ts',
+  'routes/api/platform/pg-meta/$ref/publications.ts',
+  'routes/api/platform/pg-meta/$ref/tables.ts',
+  'routes/api/platform/pg-meta/$ref/triggers.ts',
+  'routes/api/platform/pg-meta/$ref/types.ts',
+  'routes/api/platform/pg-meta/$ref/views.ts',
 ]
 
 const APPROVAL_GATE_MESSAGE =
@@ -116,6 +117,7 @@ module.exports = defineConfig([
       'barrel-files': barrelFiles,
       valtio,
       'react-hook-form': fixupPluginRules(reactHookForm),
+      'react-google-translate': reactGoogleTranslate,
     },
     rules: {
       '@next/next/no-img-element': 'off',
@@ -158,6 +160,8 @@ module.exports = defineConfig([
       'react-hook-form/no-access-control': 'error',
       'react-hook-form/no-nested-object-setvalue': 'error',
       'react-hook-form/no-use-watch': 'error',
+      'react-google-translate/no-conditional-text-nodes-with-siblings': 'error',
+      'react-google-translate/no-return-text-nodes': 'error',
     },
   },
   {
@@ -201,7 +205,7 @@ module.exports = defineConfig([
   // re-includes the analytics selectors because flat config replaces (not
   // merges) a rule's options for overlapping files.
   {
-    files: ['pages/api/**/*.ts', 'pages/api/**/*.tsx', 'routes/**/*.ts', 'routes/**/*.tsx'],
+    files: ['routes/**/*.ts', 'routes/**/*.tsx'],
     rules: {
       'no-restricted-syntax': [
         'error',

@@ -90,6 +90,7 @@ Project events fire when a change occurs or an action is taken in a specific pro
 | [`v1.project.branch.created`](#v1projectbranchcreated) | A preview branch is created                      |
 | [`v1.project.branch.updated`](#v1projectbranchupdated) | A preview branch is updated                      |
 | [`v1.project.branch.removed`](#v1projectbranchremoved) | A preview branch is deleted                      |
+| [`v1.project.secrets.leaked`](#v1projectsecretsleaked) | A leaked credential is detected                  |
 
 ### v1.project.created
 
@@ -274,6 +275,48 @@ Fires when a preview branch is deleted.
 
 `git_branch` is `null` when the branch is not connected to a Git branch.
 
+### v1.project.secrets.leaked
+
+Fires when a project-scoped credential is detected as leaked. This covers secret API keys and personal access tokens scoped to this specific project.
+
+<Admonition type="note">
+
+This event only fires for project-scoped credentials. If an organization-scoped personal access token is leaked, only [`v1.organization.secrets.leaked`](#v1organizationsecretsleaked) is emitted — depending on the token's permissions, some or all projects in the organization may be affected. Subscribe to both events for full visibility.
+
+</Admonition>
+
+The payload always includes the token prefix but never the full token value. `secret.kind` determines what was leaked:
+
+**`secret_api_key`** — a secret API key was detected and revoked. `leak_source` is the URL where the leak was found (typically a GitHub repository). `member` is `null`.
+
+```json
+{
+  "secret": {
+    "kind": "secret_api_key",
+    "token_prefix": "sb_secret_abcd",
+    "token_name": "API Key",
+    "leak_source": "https://github.com/some-organization/some-repository"
+  },
+  "member": null,
+  "actor": null
+}
+```
+
+**`scoped_personal_access_token`** — a project-scoped personal access token was detected and revoked. `leak_source` is always `null`. `member` identifies the user who owns the leaked token.
+
+```json
+{
+  "secret": {
+    "kind": "scoped_personal_access_token",
+    "token_prefix": "sb_pat_fc12345abcde",
+    "token_name": "My Token",
+    "leak_source": null
+  },
+  "member": { "user_id": "6cf38595-f5ff-43ca-ba0f-84617bbe192e" },
+  "actor": null
+}
+```
+
 ## Organization events
 
 Organization events fire when something changes at the organization level. The payload always includes `organization_slug` and `project_ref` is always `null`.
@@ -289,6 +332,7 @@ Organization events fire when something changes at the organization level. The p
 | [`v1.organization.member.role.removed`](#v1organizationmemberroleremoved)               | A role is removed from a member           |
 | [`v1.organization.billing.plan.upgraded`](#v1organizationbillingplanupgraded)           | The billing plan is upgraded              |
 | [`v1.organization.billing.plan.downgraded`](#v1organizationbillingplandowngraded)       | The billing plan is downgraded            |
+| [`v1.organization.secrets.leaked`](#v1organizationsecretsleaked)                        | A leaked credential is detected           |
 
 ### v1.organization.member.invitation.created
 
@@ -445,3 +489,27 @@ Fires when the organization's billing plan is downgraded.
 ```
 
 `plan` is one of `free`, `pro`, `team`, or `enterprise`.
+
+### v1.organization.secrets.leaked
+
+Fires when an organization-scoped personal access token is detected as leaked. Depending on the token's permissions, some or all projects in the organization may be affected.
+
+<Admonition type="note">
+
+This event only fires for organization-scoped tokens. Depending on the token's permissions, some or all projects in the organization may be affected. Project-scoped credential leaks emit [`v1.project.secrets.leaked`](#v1projectsecretsleaked) instead. Subscribe to both events for full visibility.
+
+</Admonition>
+
+```json
+{
+  "secret": {
+    "kind": "scoped_personal_access_token",
+    "token_prefix": "sbp_fc12345abcde",
+    "token_name": "My token"
+  },
+  "member": { "user_id": "6cf38595-f5ff-43ca-ba0f-84617bbe192e" },
+  "actor": null
+}
+```
+
+`secret.kind` is `scoped_personal_access_token`. `member` identifies the user who owns the leaked token. The payload includes the token prefix but never the full token value.

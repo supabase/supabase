@@ -39,7 +39,7 @@ import { TimestampInfo } from 'ui-patterns/TimestampInfo'
 
 import { CreateOrUpdateOAuthAppSheet } from './CreateOrUpdateOAuthAppSheet'
 import { DeleteOAuthAppModal } from './DeleteOAuthAppModal'
-import { NewOAuthAppBanner } from './NewOAuthAppBanner'
+import { NewOAuthAppModal } from './NewOAuthAppModal'
 import {
   filterOAuthApps,
   OAUTH_APP_CLIENT_TYPE_OPTIONS,
@@ -238,9 +238,6 @@ export const OAuthAppsList = () => {
   return (
     <>
       <div className="flex flex-col gap-y-4">
-        {newOAuthApp?.client_secret && (
-          <NewOAuthAppBanner oauthApp={newOAuthApp} onClose={() => setNewOAuthApp(undefined)} />
-        )}
         {!isOAuthServerEnabled && (
           <Admonition
             type="default"
@@ -510,6 +507,8 @@ export const OAuthAppsList = () => {
           You'll need to update it in all applications that use it. This action cannot be undone.
         </p>
       </ConfirmationModal>
+
+      <NewOAuthAppModal oauthApp={newOAuthApp} onClose={() => setNewOAuthApp(undefined)} />
     </>
   )
 }

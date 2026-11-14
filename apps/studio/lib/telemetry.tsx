@@ -68,6 +68,7 @@ export function Telemetry() {
   return (
     <PageTelemetry
       API_URL={API_URL}
+      platform="studio"
       hasAcceptedConsent={hasAcceptedConsent}
       enabled={IS_PLATFORM}
       organizationSlug={organization?.slug}

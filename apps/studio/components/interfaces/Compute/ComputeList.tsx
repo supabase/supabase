@@ -208,7 +208,7 @@ export const ComputeList = ({
           <CardFooter className="flex items-center justify-between border-t p-4">
             <p className="text-sm text-foreground-muted">
               Showing {startIndex + 1} to {startIndex + paged.length} of {filtered.length} instance
-              {filtered.length === 1 ? '' : 's'}
+              {filtered.length === 1 ? '' : <span>s</span>}
             </p>
             <div className="flex items-center gap-x-2" aria-label="Pagination">
               <ButtonTooltip

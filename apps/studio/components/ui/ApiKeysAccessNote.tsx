@@ -25,8 +25,7 @@ export const ApiKeysAccessNote = ({
     return (
       <div className={className}>
         <p className="text-xs text-foreground-lighter">
-          You need additional permissions to view API keys.
-          {fallback ? ` ${fallback}` : ''}
+          {`You need additional permissions to view API keys.${fallback ? ` ${fallback}` : ''}`}
         </p>
       </div>
     )
@@ -42,8 +41,7 @@ export const ApiKeysAccessNote = ({
     return (
       <div className={className}>
         <p className="text-xs text-foreground-lighter">
-          Couldn't load your API keys.
-          {fallback ? ` ${fallback}` : ''}
+          {`Couldn't load your API keys.${fallback ? ` ${fallback}` : ''}`}
         </p>
       </div>
     )

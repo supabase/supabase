@@ -122,9 +122,11 @@ export const OutOfDateNotice = ({
                 <AlertDialogTitle>Update branch with modified functions</AlertDialogTitle>
                 <AlertDialogDescription>
                   This branch has {modifiedFunctionsCount} modified edge function
-                  {modifiedFunctionsCount !== 1 ? 's' : ''} that will be overwritten when updating
-                  with the latest functions from the production branch. This action cannot be
-                  undone.
+                  {modifiedFunctionsCount !== 1 ? <span>s</span> : ''}{' '}
+                  <span>
+                    that will be overwritten when updating with the latest functions from the
+                    production branch. This action cannot be undone.
+                  </span>
                 </AlertDialogDescription>
               </AlertDialogHeader>
               <AlertDialogFooter>

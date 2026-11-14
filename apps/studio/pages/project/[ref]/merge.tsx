@@ -66,12 +66,12 @@ const MergePage: NextPageWithLayout = () => {
     projectRef: parentProjectRef,
   })
 
-  const { data: branches } = useQuery({
-    ...branchesQueryOptions({ projectRef: parentProjectRef, grant: branchesGrant.grant }),
-    refetchOnMount: 'always',
-    refetchOnWindowFocus: true,
-    staleTime: 0,
-  })
+  const { data: branches } = useQuery(
+    branchesQueryOptions(
+      { projectRef: parentProjectRef, grant: branchesGrant.grant },
+      { refetchOnMount: 'always', refetchOnWindowFocus: true, staleTime: 0 }
+    )
+  )
   const currentBranch = branches?.find((branch) => branch.project_ref === ref)
   const mainBranch = branches?.find((branch) => branch.is_default)
 
@@ -87,9 +87,8 @@ const MergePage: NextPageWithLayout = () => {
     projectRef: parentProjectRef,
     isDefault: currentBranch?.is_default,
   })
-  const mergeBranchGrant = useBranchGrant('POST /v1/branches/{branch_id_or_ref}/merge', {
+  const mergeBranchGrant = useGrant('POST /v1/branches/{branch_id_or_ref}/merge', {
     projectRef: parentProjectRef,
-    isDefault: currentBranch?.is_default,
   })
   const diffGrant = useBranchGrant('GET /v1/branches/{branch_id_or_ref}/diff', {
     projectRef: parentProjectRef,

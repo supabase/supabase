@@ -23,10 +23,9 @@ export const HTTPHeaderFieldsSection = ({ variant }: HTTPHeaderFieldsSectionProp
     { projectRef: ref },
     { variant: 'reveal' }
   )
-  const { data: apiKeysData } = useQuery({
-    ...revealedApiKeysQueryOptions({ projectRef: ref, grant: apiKeysGrant.grant }),
-    select: getKeys,
-  })
+  const { data: apiKeysData } = useQuery(
+    revealedApiKeysQueryOptions({ projectRef: ref, grant: apiKeysGrant.grant }, { select: getKeys })
+  )
   const { serviceKey, secretKey } = apiKeysData ?? {}
 
   const apiKey = secretKey?.api_key ?? serviceKey?.api_key ?? '[YOUR API KEY]'

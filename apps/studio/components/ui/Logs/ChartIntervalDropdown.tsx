@@ -63,7 +63,8 @@ export const ChartIntervalDropdown = ({
                   <TooltipContent side={tooltipSide}>
                     <p>
                       Your plan only includes up to {retentionDays} day
-                      {retentionDays !== undefined && retentionDays > 1 ? 's' : ''} of log retention
+                      {retentionDays !== undefined && retentionDays > 1 ? <span>s</span> : ''}{' '}
+                      <span>of log retention</span>
                     </p>
                     <p className="text-foreground-light">
                       {organizationSlug ? (

@@ -42,7 +42,7 @@ Rules:
 - Export `xQueryOptions()` using `queryOptions`
 - Gate with `enabled` so the query doesn't run until required variables exist
 - Platform-only queries: include `IS_PLATFORM` from `lib/constants` in `enabled`
-- Don't add extra params to `xQueryOptions` — callers override by destructuring: `{ ...xQueryOptions(vars), enabled: true }`
+- Don't add extra params to `xQueryOptions` — callers override by destructuring: `{ ...xQueryOptions(vars), enabled: true }`. Exception: grant-gated queries (see below)
 
 ```ts
 import { queryOptions } from '@tanstack/react-query'
@@ -74,6 +74,30 @@ export const xQueryOptions = ({ projectRef }: XVariables) =>
     enabled: IS_PLATFORM && typeof projectRef !== 'undefined',
   })
 ```
+
+## Grant-gated queries
+
+Query options that take a `grant` (see `lib/grants.ts`) are an exception to the spread-and-override guidance. Build them with `grantedQueryOptions` from `@/data/granted-query-options`, and let callers pass their options as the **second argument**. Never spread them.
+
+```ts
+export const xQueryOptions = <TData = XData>(
+  { projectRef, grant }: XVariables,
+  options?: GrantedQueryCallerOptions<XData, XError, TData, ReturnType<typeof xKeys.list>>
+) =>
+  grantedQueryOptions(
+    {
+      queryKey: xKeys.list(projectRef),
+      queryFn:
+        projectRef && grant ? ({ signal }) => getX({ projectRef, grant }, signal) : undefined,
+    },
+    options
+  )
+
+// Caller
+useQuery(xQueryOptions({ projectRef, grant: xGrant.grant }, { select, enabled: open }))
+```
+
+Why: TanStack keeps one options object per cache entry, overwritten by whichever observer rendered last, and invalidation refetches with it. A missing grant yields `queryFn: undefined` and `enabled: false` (not `skipToken`, which would make invalidation fail with `Missing queryFn` if a grant-less observer rendered last). The helper owns `queryKey`, `queryFn`, and the `enabled` gate, so a caller can't override the grant check. `grantedQueryOptions` brands its return type (a type-only `__grantedQueryOptions` property), and the type-aware `fga/no-spread-granted-query-options` lint rule reports any object spread or `Object.assign` of a branded value, however it was obtained (variable, wrapper, renamed import).
 
 ## Using Query Options in Components
 

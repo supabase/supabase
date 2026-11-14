@@ -3,6 +3,7 @@ import {
   PERMISSION_CATALOG,
   PERMISSION_CATALOG_BY_CATEGORY,
   PERMISSION_MODE_LABEL,
+  type CategoryWithEntries,
   type PermissionCatalogEntry,
   type PermissionCategoryKey,
   type PermissionMode,
@@ -17,7 +18,7 @@ export {
   PERMISSION_CATALOG_BY_CATEGORY,
   PERMISSION_MODE_LABEL,
 }
-export type { PermissionCatalogEntry, PermissionMode, RiskLevel }
+export type { CategoryWithEntries, PermissionCatalogEntry, PermissionMode, RiskLevel }
 
 /**
  * Selection model for the scoped personal access token creation flow: none/read/readwrite modes per
@@ -75,16 +76,81 @@ export const scopesToSelection = (grantedScopes: string[]): PermissionSelection 
   return selection
 }
 
+const PROJECT_SCOPE_HIDDEN_KEYS = new Set<string>([
+  'user:organizations',
+  'organization:audit_logs',
+  'organization:billing',
+  'organization:config',
+  'organization:members',
+  'organization:projects',
+  'organization:platform_webhooks',
+  'project:auth_hooks',
+  'project:auth_users',
+  'project:operations',
+  'project:snippets',
+])
+
+const PROJECT_SCOPE_MODES: Record<string, PermissionMode[]> = {
+  'organization:admin': ['none', 'readwrite'],
+}
+
+export const isEntryVisible = (key: string, resourceAccess: ResourceAccessMode): boolean =>
+  resourceAccess !== 'project' || !PROJECT_SCOPE_HIDDEN_KEYS.has(key)
+
+export const getEntryModes = (
+  entry: PermissionCatalogEntry,
+  resourceAccess: ResourceAccessMode
+): PermissionMode[] => {
+  const restricted = resourceAccess === 'project' ? PROJECT_SCOPE_MODES[entry.key] : undefined
+  const modes = restricted ?? ['none', 'read', 'readwrite']
+  return modes.filter((mode) => mode !== 'readwrite' || entry.writable)
+}
+
+export const getVisibleEntries = (resourceAccess: ResourceAccessMode): PermissionCatalogEntry[] =>
+  PERMISSION_CATALOG.filter((entry) => isEntryVisible(entry.key, resourceAccess))
+
+export const getVisibleCategories = (resourceAccess: ResourceAccessMode): CategoryWithEntries[] =>
+  PERMISSION_CATALOG_BY_CATEGORY.map((category) => ({
+    ...category,
+    entries: category.entries.filter((entry) => isEntryVisible(entry.key, resourceAccess)),
+  })).filter((category) => category.entries.length > 0)
+
+export const sanitizeSelection = (
+  selection: PermissionSelection,
+  resourceAccess: ResourceAccessMode
+): PermissionSelection => {
+  const next: PermissionSelection = {}
+  for (const [key, mode] of Object.entries(selection)) {
+    const entry = getCatalogEntry(key)
+    const isAllowed =
+      entry !== undefined &&
+      isEntryVisible(key, resourceAccess) &&
+      getEntryModes(entry, resourceAccess).includes(mode)
+    next[key] = isAllowed ? mode : 'none'
+  }
+  return next
+}
+
 export const countConfiguredInCategory = (
   selection: PermissionSelection,
-  categoryKey: PermissionCategoryKey
+  categoryKey: PermissionCategoryKey,
+  resourceAccess: ResourceAccessMode
 ): number =>
   PERMISSION_CATALOG.filter(
-    (entry) => entry.category === categoryKey && (selection[entry.key] ?? 'none') !== 'none'
+    (entry) =>
+      entry.category === categoryKey &&
+      isEntryVisible(entry.key, resourceAccess) &&
+      (selection[entry.key] ?? 'none') !== 'none'
   ).length
 
-export const countConfigured = (selection: PermissionSelection): number =>
-  Object.values(selection).filter((mode) => mode !== 'none').length
+export const countConfigured = (
+  selection: PermissionSelection,
+  resourceAccess: ResourceAccessMode
+): number =>
+  PERMISSION_CATALOG.filter(
+    (entry) =>
+      isEntryVisible(entry.key, resourceAccess) && (selection[entry.key] ?? 'none') !== 'none'
+  ).length
 
 export const RISK_LEVEL_LABEL: Record<RiskLevel, string> = {
   low: 'Low risk',

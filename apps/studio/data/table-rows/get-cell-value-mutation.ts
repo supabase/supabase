@@ -46,6 +46,8 @@ export async function getCellValue({
   const { result } = await executeSql({
     projectRef,
     connectionString,
+    sqlOrigin: 'studio',
+    queryName: 'get-cell-value',
     sql,
     isRoleImpersonationEnabled: isRoleImpersonationEnabled(roleImpersonationState?.role),
     grant: unguarded.migrating,
