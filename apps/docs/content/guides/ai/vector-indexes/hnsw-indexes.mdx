@@ -128,7 +128,7 @@ The trade-off shows up when the filter is selective: an HNSW scan returns the to
 
 `hnsw.max_scan_tuples` (default 20,000) and `hnsw.scan_mem_multiplier` (default 1) bound how far the iterative scan goes. See the [pgvector iterative scans documentation](https://github.com/pgvector/pgvector#iterative-index-scans) for the full reference.
 
-An iterative scan still stops at `hnsw.max_scan_tuples`. Take a filter that matches only a few rows of a large table, such as one small customer in a shared `documents` table. The scan can hit that limit before it reaches those rows, so it still returns fewer rows than your `LIMIT`. If you filter on the same key in every query, index that key as well. On a table that takes writes, use `create index concurrently` so the build doesn't block inserts and updates. It can't run inside a transaction block:
+An iterative scan stops at roughly `hnsw.max_scan_tuples`, which is an approximate limit. Take a filter that matches only a few rows of a large table, such as one small customer in a shared `documents` table. The scan can hit that limit before it reaches those rows, so it still returns fewer rows than your `LIMIT`. If you filter on the same key in every query, index that key as well. On a table that takes writes, use `create index concurrently` so the build doesn't block inserts and updates. It can't run inside a transaction block, so run each statement on its own rather than sending both as one query:
 
 ```sql
 -- filter on a column, e.g. where user_id = $1
