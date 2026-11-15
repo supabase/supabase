@@ -121,6 +121,7 @@ module.exports = defineConfig([
     },
     rules: {
       '@next/next/no-img-element': 'off',
+      'import/no-anonymous-default-export': 'error',
       'react/no-unescaped-entities': 'off',
       'react/display-name': 'warn',
       'react/no-unstable-nested-components': 'warn',
