@@ -58,11 +58,14 @@ export const Migrations = () => {
     projectRef: project?.ref,
     connectionString: project?.connectionString,
   })
+  const lowerCaseSearch = search.toLowerCase()
   const migrations =
     search.length === 0
       ? data
       : (data.filter(
-          (migration) => migration.version.includes(search) || migration.name?.includes(search)
+          (migration) =>
+            migration.version.includes(search) ||
+            migration.name?.toLowerCase().includes(lowerCaseSearch)
         ) ?? [])
 
   return (
