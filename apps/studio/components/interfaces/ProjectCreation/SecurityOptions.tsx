@@ -1,16 +1,13 @@
 import { useParams } from 'common'
-import { UseFormReturn } from 'react-hook-form'
+import { useId } from 'react'
+import { UseFormReturn, useFormState } from 'react-hook-form'
 import {
   Checkbox,
-  cn,
   FormControl,
   FormDescription,
   FormField,
   FormItem,
   FormLabel,
-  Tooltip,
-  TooltipContent,
-  TooltipTrigger,
   useWatch,
 } from 'ui'
 import { Admonition } from 'ui-patterns/Admonition'
@@ -30,12 +27,14 @@ interface SecurityOptionsProps {
 
 export const SecurityOptions = ({ form, layout = 'horizontal', surface }: SecurityOptionsProps) => {
   const { slug } = useParams()
+  const apiAccessOptionsId = useId()
   const dataApi = useWatch({ control: form.control, name: 'dataApi' })
   const dataApiDefaultPrivileges = useWatch({
     control: form.control,
     name: 'dataApiDefaultPrivileges',
   })
-  const hasUserModified = form.getFieldState('dataApiDefaultPrivileges', form.formState).isDirty
+  const { dirtyFields } = useFormState({ control: form.control })
+  const hasUserModified = !!dirtyFields.dataApiDefaultPrivileges
 
   useTrackDefaultPrivilegesExposure(
     surface === 'main'
@@ -54,7 +53,7 @@ export const SecurityOptions = ({ form, layout = 'horizontal', surface }: Securi
 
   return (
     <Panel.Content className="pb-8">
-      <FormItemLayout layout={layout} label="Security" isReactForm={false}>
+      <FormItemLayout layout={layout} label="Data access" isReactForm={false}>
         <div className="flex flex-col gap-4">
           <FormField
             name="dataApi"
@@ -65,14 +64,16 @@ export const SecurityOptions = ({ form, layout = 'horizontal', surface }: Securi
                   <Checkbox
                     checked={field.value}
                     disabled={field.disabled}
+                    aria-expanded={dataApi}
+                    aria-controls={apiAccessOptionsId}
                     onCheckedChange={(value) => field.onChange(value === true)}
                   />
                 </FormControl>
                 <div className="space-y-1">
                   <FormLabel className="text-sm text-foreground">Enable Data API</FormLabel>
                   <FormDescription className="text-foreground-lighter">
-                    Autogenerate a RESTful API for your public schema. Recommended if using a client
-                    library like{' '}
+                    Read and write database data through generated API endpoints. Required for
+                    database queries with client libraries like{' '}
                     <InlineLink href={`${DOCS_URL}/reference/javascript/introduction`}>
                       supabase-js
                     </InlineLink>
@@ -83,53 +84,38 @@ export const SecurityOptions = ({ form, layout = 'horizontal', surface }: Securi
             )}
           />
 
-          <FormField
-            name="dataApiDefaultPrivileges"
-            control={form.control}
-            render={({ field }) => (
-              <FormItem
-                className={cn(
-                  'flex items-start gap-3',
-                  !dataApi && 'opacity-50 cursor-not-allowed'
-                )}
-              >
-                <FormControl>
-                  {dataApi ? (
+          <div id={apiAccessOptionsId} hidden={!dataApi} className="ms-7">
+            <FormField
+              name="dataApiDefaultPrivileges"
+              control={form.control}
+              render={({ field }) => (
+                <FormItem className="flex items-start gap-3">
+                  <FormControl>
                     <Checkbox
                       checked={field.value}
-                      disabled={field.disabled}
+                      disabled={field.disabled || !dataApi}
                       onCheckedChange={(value) => field.onChange(value === true)}
                     />
-                  ) : (
-                    <Tooltip>
-                      <TooltipTrigger asChild>
-                        <span className="cursor-not-allowed">
-                          <Checkbox checked={field.value} disabled />
-                        </span>
-                      </TooltipTrigger>
-                      <TooltipContent side="top">
-                        Enable the Data API to configure default privileges.
-                      </TooltipContent>
-                    </Tooltip>
-                  )}
-                </FormControl>
-                <div className="space-y-1">
-                  <FormLabel
-                    className={cn('text-sm text-foreground', !dataApi && 'text-foreground-muted')}
-                  >
-                    Automatically expose new tables
-                  </FormLabel>
-                  <FormDescription className="text-foreground-lighter">
-                    Grants privileges to Data API roles by default, exposing new tables.
-                    <br />
-                    <strong className="font-medium text-foreground-light">
-                      We recommend disabling this to control access manually.
-                    </strong>
-                  </FormDescription>
-                </div>
-              </FormItem>
-            )}
-          />
+                  </FormControl>
+                  <div className="space-y-1">
+                    <FormLabel className="text-sm text-foreground">
+                      Automatically grant API access to new tables
+                    </FormLabel>
+                    <FormDescription className="text-foreground-lighter">
+                      {field.value ? (
+                        <>
+                          Grant API roles access to new tables in the public schema. Use RLS
+                          policies to restrict which records users can access.
+                        </>
+                      ) : (
+                        'New tables require explicit API access grants. Recommended.'
+                      )}
+                    </FormDescription>
+                  </div>
+                </FormItem>
+              )}
+            />
+          </div>
 
           <FormField
             name="enableRlsEventTrigger"
@@ -144,10 +130,12 @@ export const SecurityOptions = ({ form, layout = 'horizontal', surface }: Securi
                   />
                 </FormControl>
                 <div className="space-y-1">
-                  <FormLabel className="text-sm text-foreground">Enable automatic RLS</FormLabel>
+                  <FormLabel className="text-sm text-foreground">
+                    Enable RLS on new tables automatically
+                  </FormLabel>
                   <FormDescription className="text-foreground-lighter">
-                    Create an event trigger that automatically enables Row Level Security on all new
-                    tables in the public schema.
+                    Enable Row Level Security (RLS) on new tables in the public schema, even when
+                    the Data API is off. Add RLS policies to allow users to access records.
                   </FormDescription>
                 </div>
               </FormItem>
@@ -157,9 +145,10 @@ export const SecurityOptions = ({ form, layout = 'horizontal', surface }: Securi
           {!dataApi && (
             <Admonition
               type="warning"
-              title="Client libraries need Data API to query your database"
+              title="Database queries through client libraries are disabled"
             >
-              Disabling it means supabase-js and similar libraries can't query or mutate data.
+              Enable the Data API to query your database with supabase-js and similar libraries.
+              Other features, such as Auth, remain available.
             </Admonition>
           )}
         </div>

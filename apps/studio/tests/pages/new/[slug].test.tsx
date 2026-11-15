@@ -1316,7 +1316,7 @@ describe('project creation wizard', () => {
     })
   })
 
-  describe('security options', () => {
+  describe('data access options', () => {
     test('disabling the Data API sends an empty exposed-schemas list', async () => {
       mockWizardEndpoints()
       const onRequest = vi.fn()
@@ -1327,8 +1327,16 @@ describe('project creation wizard', () => {
       await fillProjectName('No Data API Project')
       await generateAndWaitForStrongPassword()
 
+      const apiAccess = screen.getByLabelText('Automatically grant API access to new tables')
+      expect(apiAccess).toBeVisible()
       await user.click(screen.getByLabelText('Enable Data API'))
-      await screen.findByText('Client libraries need Data API to query your database')
+      expect(apiAccess).not.toBeVisible()
+      expect(screen.getByLabelText('Enable RLS on new tables automatically')).toBeEnabled()
+      await user.click(screen.getByLabelText('Enable Data API'))
+      expect(apiAccess).toBeVisible()
+      expect(apiAccess).toBeChecked()
+      await user.click(screen.getByLabelText('Enable Data API'))
+      await screen.findByText('Database queries through client libraries are disabled')
 
       fireEvent.click(screen.getByRole('button', { name: 'Create new project' }))
 
@@ -1348,7 +1356,10 @@ describe('project creation wizard', () => {
       await fillProjectName('Manual Privileges Project')
       await generateAndWaitForStrongPassword()
 
-      await user.click(screen.getByLabelText('Automatically expose new tables'))
+      await user.click(screen.getByLabelText('Automatically grant API access to new tables'))
+      expect(
+        screen.getByText('New tables require explicit API access grants. Recommended.')
+      ).toBeVisible()
 
       fireEvent.click(screen.getByRole('button', { name: 'Create new project' }))
 
@@ -1368,7 +1379,7 @@ describe('project creation wizard', () => {
       await fillProjectName('Auto RLS Project')
       await generateAndWaitForStrongPassword()
 
-      await user.click(screen.getByLabelText('Enable automatic RLS'))
+      await user.click(screen.getByLabelText('Enable RLS on new tables automatically'))
 
       fireEvent.click(screen.getByRole('button', { name: 'Create new project' }))
 
