@@ -128,14 +128,14 @@ The trade-off shows up when the filter is selective: an HNSW scan returns the to
 
 `hnsw.max_scan_tuples` (default 20,000) and `hnsw.scan_mem_multiplier` (default 1) bound how far the iterative scan goes. See the [pgvector iterative scans documentation](https://github.com/pgvector/pgvector#iterative-index-scans) for the full reference.
 
-An iterative scan still stops at `hnsw.max_scan_tuples`. If a filter matches only a few rows of a large table, for example one small customer in a shared `documents` table, the scan can hit that limit before it reaches those rows and still return fewer rows than your `LIMIT`. If you filter on the same key in every query, index that key as well:
+An iterative scan still stops at `hnsw.max_scan_tuples`. Take a filter that matches only a few rows of a large table, such as one small customer in a shared `documents` table. The scan can hit that limit before it reaches those rows, so it still returns fewer rows than your `LIMIT`. If you filter on the same key in every query, index that key as well. On a table that takes writes, use `create index concurrently` so the build doesn't block inserts and updates. It can't run inside a transaction block:
 
 ```sql
 -- filter on a column, e.g. where user_id = $1
-create index on documents (user_id);
+create index concurrently on documents (user_id);
 
 -- filter on jsonb metadata with @>, e.g. where metadata @> filter
-create index on documents using gin (metadata jsonb_path_ops);
+create index concurrently on documents using gin (metadata jsonb_path_ops);
 ```
 
 With an index on the filter key, the planner can fetch only the matching rows and sort them by exact distance when the filter is selective, and still use the HNSW index when it isn't.
