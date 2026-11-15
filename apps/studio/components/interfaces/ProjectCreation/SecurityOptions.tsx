@@ -3,6 +3,8 @@ import { useId } from 'react'
 import { UseFormReturn, useFormState } from 'react-hook-form'
 import {
   Checkbox,
+  Collapsible,
+  CollapsibleContent,
   FormControl,
   FormDescription,
   FormField,
@@ -10,7 +12,6 @@ import {
   FormLabel,
   useWatch,
 } from 'ui'
-import { Admonition } from 'ui-patterns/Admonition'
 import { FormItemLayout } from 'ui-patterns/form/FormItemLayout/FormItemLayout'
 
 import { CreateProjectForm } from './ProjectCreation.schema'
@@ -55,67 +56,65 @@ export const SecurityOptions = ({ form, layout = 'horizontal', surface }: Securi
     <Panel.Content className="pb-8">
       <FormItemLayout layout={layout} label="Data access" isReactForm={false}>
         <div className="flex flex-col gap-4">
-          <FormField
-            name="dataApi"
-            control={form.control}
-            render={({ field }) => (
-              <FormItem className="flex items-start gap-3">
-                <FormControl>
-                  <Checkbox
-                    checked={field.value}
-                    disabled={field.disabled}
-                    aria-expanded={dataApi}
-                    aria-controls={apiAccessOptionsId}
-                    onCheckedChange={(value) => field.onChange(value === true)}
-                  />
-                </FormControl>
-                <div className="space-y-1">
-                  <FormLabel className="text-sm text-foreground">Enable Data API</FormLabel>
-                  <FormDescription className="text-foreground-lighter">
-                    Read and write database data through generated API endpoints. Required for
-                    database queries with client libraries like{' '}
-                    <InlineLink href={`${DOCS_URL}/reference/javascript/introduction`}>
-                      supabase-js
-                    </InlineLink>
-                    .
-                  </FormDescription>
-                </div>
-              </FormItem>
-            )}
-          />
-
-          <div id={apiAccessOptionsId} hidden={!dataApi} className="ms-7">
+          <Collapsible open={dataApi}>
             <FormField
-              name="dataApiDefaultPrivileges"
+              name="dataApi"
               control={form.control}
               render={({ field }) => (
                 <FormItem className="flex items-start gap-3">
                   <FormControl>
                     <Checkbox
                       checked={field.value}
-                      disabled={field.disabled || !dataApi}
+                      disabled={field.disabled}
+                      aria-expanded={dataApi}
+                      aria-controls={apiAccessOptionsId}
                       onCheckedChange={(value) => field.onChange(value === true)}
                     />
                   </FormControl>
                   <div className="space-y-1">
-                    <FormLabel className="text-sm text-foreground">
-                      Automatically grant API access to new tables
-                    </FormLabel>
+                    <FormLabel className="text-sm text-foreground">Enable Data API</FormLabel>
                     <FormDescription className="text-foreground-lighter">
-                      {field.value ? (
-                        <>
-                          Grant API roles access to new tables in the public schema. Use RLS
-                          policies to restrict which records users can access.
-                        </>
-                      ) : (
-                        'New tables require explicit API access grants. Recommended.'
-                      )}
+                      Query your database through generated{' '}
+                      <InlineLink href={`${DOCS_URL}/guides/api`}>API endpoints</InlineLink>.
                     </FormDescription>
                   </div>
                 </FormItem>
               )}
             />
-          </div>
+
+            <CollapsibleContent
+              id={apiAccessOptionsId}
+              aria-hidden={!dataApi}
+              inert={!dataApi}
+              className="data-open:animate-collapsible-down-clipped data-closed:animate-collapsible-up-clipped motion-reduce:animate-none"
+            >
+              <div className="pt-4">
+                <FormField
+                  name="dataApiDefaultPrivileges"
+                  control={form.control}
+                  render={({ field }) => (
+                    <FormItem className="flex items-start gap-3">
+                      <FormControl>
+                        <Checkbox
+                          checked={field.value}
+                          disabled={field.disabled || !dataApi}
+                          onCheckedChange={(value) => field.onChange(value === true)}
+                        />
+                      </FormControl>
+                      <div className="space-y-1">
+                        <FormLabel className="text-sm text-foreground">
+                          Automatically grant API access to new tables
+                        </FormLabel>
+                        <FormDescription className="text-foreground-lighter">
+                          Applies to the public schema. Leave off to grant access per table.
+                        </FormDescription>
+                      </div>
+                    </FormItem>
+                  )}
+                />
+              </div>
+            </CollapsibleContent>
+          </Collapsible>
 
           <FormField
             name="enableRlsEventTrigger"
@@ -134,23 +133,16 @@ export const SecurityOptions = ({ form, layout = 'horizontal', surface }: Securi
                     Enable RLS on new tables automatically
                   </FormLabel>
                   <FormDescription className="text-foreground-lighter">
-                    Enable Row Level Security (RLS) on new tables in the public schema, even when
-                    the Data API is off. Add RLS policies to allow users to access records.
+                    Applies to the public schema. Add{' '}
+                    <InlineLink href={`${DOCS_URL}/guides/database/postgres/row-level-security`}>
+                      RLS policies
+                    </InlineLink>{' '}
+                    to allow access.
                   </FormDescription>
                 </div>
               </FormItem>
             )}
           />
-
-          {!dataApi && (
-            <Admonition
-              type="warning"
-              title="Database queries through client libraries are disabled"
-            >
-              Enable the Data API to query your database with supabase-js and similar libraries.
-              Other features, such as Auth, remain available.
-            </Admonition>
-          )}
         </div>
       </FormItemLayout>
     </Panel.Content>

@@ -1330,13 +1330,13 @@ describe('project creation wizard', () => {
       const apiAccess = screen.getByLabelText('Automatically grant API access to new tables')
       expect(apiAccess).toBeVisible()
       await user.click(screen.getByLabelText('Enable Data API'))
-      expect(apiAccess).not.toBeVisible()
+      expect(
+        screen.queryByRole('checkbox', { name: 'Automatically grant API access to new tables' })
+      ).not.toBeInTheDocument()
       expect(screen.getByLabelText('Enable RLS on new tables automatically')).toBeEnabled()
       await user.click(screen.getByLabelText('Enable Data API'))
-      expect(apiAccess).toBeVisible()
-      expect(apiAccess).toBeChecked()
+      expect(screen.getByLabelText('Automatically grant API access to new tables')).toBeChecked()
       await user.click(screen.getByLabelText('Enable Data API'))
-      await screen.findByText('Database queries through client libraries are disabled')
 
       fireEvent.click(screen.getByRole('button', { name: 'Create new project' }))
 
@@ -1356,10 +1356,10 @@ describe('project creation wizard', () => {
       await fillProjectName('Manual Privileges Project')
       await generateAndWaitForStrongPassword()
 
+      const grantsDescription = 'Applies to the public schema. Leave off to grant access per table.'
+      expect(screen.getByText(grantsDescription)).toBeVisible()
       await user.click(screen.getByLabelText('Automatically grant API access to new tables'))
-      expect(
-        screen.getByText('New tables require explicit API access grants. Recommended.')
-      ).toBeVisible()
+      expect(screen.getByText(grantsDescription)).toBeVisible()
 
       fireEvent.click(screen.getByRole('button', { name: 'Create new project' }))
 
