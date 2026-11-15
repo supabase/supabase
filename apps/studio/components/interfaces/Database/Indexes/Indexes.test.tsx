@@ -6,6 +6,8 @@ import { beforeEach, describe, expect, test } from 'vitest'
 import { Indexes } from './Indexes'
 import { ProjectContextProvider } from '@/components/layouts/ProjectLayout/ProjectContext'
 import type { DatabaseIndex } from '@/data/database-indexes/indexes-query'
+import type { SchemasData } from '@/data/database/schemas-query'
+import type { EntityTypesResponse } from '@/data/entity-types/entity-types-infinite-query'
 import { customRender } from '@/tests/lib/custom-render'
 import { addAPIMock } from '@/tests/lib/msw'
 import { routerMock } from '@/tests/lib/route-mock'
@@ -54,9 +56,13 @@ describe('Indexes search', () => {
       response: ({ request }) => {
         const key = new URL(request.url).searchParams.get('key') ?? ''
         if (key.startsWith('entity-types')) {
-          return HttpResponse.json([{ data: { entities: [], count: 0 } }])
+          return HttpResponse.json<EntityTypesResponse[]>([{ data: { entities: [], count: 0 } }])
         }
-        if (!key.startsWith('indexes')) return HttpResponse.json([{ id: 1, name: 'public' }])
+        if (!key.startsWith('indexes')) {
+          return HttpResponse.json<SchemasData>([
+            { id: 1, name: 'public', owner: 'postgres', comment: null },
+          ])
+        }
         return HttpResponse.json<DatabaseIndex[]>([
           createIndex('Customers', 'Customers_Email_idx'),
           createIndex('Customers', 'by_email'),
