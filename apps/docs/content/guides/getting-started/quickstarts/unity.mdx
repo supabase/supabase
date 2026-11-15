@@ -18,13 +18,17 @@ In Unity Hub, click **New project**. This guide uses Unity 6.3 and was tested in
 
 ## 5. Install the Supabase client library
 
-Unity can't install NuGet packages, so install [NuGetForUnity](https://github.com/GlitchEnzo/NuGetForUnity) first. Installing from a Git URL requires Git on your machine. In **Window > Package Management > Package Manager**, open the **+** menu, select **Install package from git URL**, and paste this URL:
+Unity can't install NuGet packages, so install [NuGetForUnity](https://github.com/GlitchEnzo/NuGetForUnity) first. Installing from a Git URL requires Git on your machine.
 
-```text
-https://github.com/GlitchEnzo/NuGetForUnity.git?path=/src/NuGetForUnity
-```
+1. Open **Window > Package Management > Package Manager**.
+2. Open the **+** menu and select **Install package from git URL**.
+3. Paste this URL and click **Install**:
 
-Then open **NuGet > Manage NuGet Packages** and install [`Supabase`](https://www.nuget.org/packages/Supabase).
+   ```text
+   https://github.com/GlitchEnzo/NuGetForUnity.git?path=/src/NuGetForUnity
+   ```
+
+4. Open **NuGet > Manage NuGet Packages** and install [`Supabase`](https://www.nuget.org/packages/Supabase).
 
 ## 6. Initialize the Supabase client
 
@@ -139,7 +143,10 @@ public class InstrumentList : MonoBehaviour
 
 ## 9. Start the app
 
-Click **Play** in the editor. Open **Window > General > Console**. The Console shows `violin`, `viola`, and `cello`.
+1. Click **Play** in the editor.
+2. Open **Window > General > Console**.
+
+The Console shows `violin`, `viola`, and `cello`.
 
 <$Partial path="quickstart_going_to_production.mdx" />
 
