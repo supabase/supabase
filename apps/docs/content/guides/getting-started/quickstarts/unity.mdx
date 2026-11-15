@@ -10,7 +10,7 @@ breadcrumb: 'Framework Quickstarts'
 
 ## 3. Create a Unity project
 
-In Unity Hub, click **New project**. This guide uses Unity 6.3 and was tested in the editor and in a Windows build. It does not cover Web builds, because Unity Web does not support `System.Net.Http`, which the SDK uses.
+In Unity Hub, click **New project**. This guide uses Unity 6.3 and was tested in the editor and in a Windows build. It doesn't cover Web builds, because Unity Web doesn't support `System.Net.Http`, which the SDK uses.
 
 ## 4. Set up AI tooling (optional)
 
@@ -18,7 +18,7 @@ In Unity Hub, click **New project**. This guide uses Unity 6.3 and was tested in
 
 ## 5. Install the Supabase client library
 
-Unity cannot install NuGet packages, so install [NuGetForUnity](https://github.com/GlitchEnzo/NuGetForUnity) first. This needs Git on your machine. In **Window > Package Management > Package Manager**, open the **+** menu, select **Install package from git URL**, and paste this URL:
+Unity can't install NuGet packages, so install [NuGetForUnity](https://github.com/GlitchEnzo/NuGetForUnity) first. Installing from a Git URL requires Git on your machine. In **Window > Package Management > Package Manager**, open the **+** menu, select **Install package from git URL**, and paste this URL:
 
 ```text
 https://github.com/GlitchEnzo/NuGetForUnity.git?path=/src/NuGetForUnity
@@ -77,13 +77,13 @@ public class SupabaseManager : MonoBehaviour
 
 <Admonition type="note">
 
-Unity does not load `.env` files, so this guide puts the project URL and publishable key in the script. The publishable key is safe to ship in your app. Row Level Security and database privileges control access to your data.
+Unity doesn't load `.env` files, so this guide puts the project URL and publishable key in the script. The publishable key is safe to ship in your app. Row Level Security and database privileges control access to your data.
 
 </Admonition>
 
 ## 7. Create a data model for instruments
 
-Create an `Instrument.cs` file. The attributes link the class to the `instruments` table and its columns.
+Create an `Instrument.cs` file. The attributes map the class to the `instruments` table and its properties to the columns.
 
 ```csharp name=Assets/Instrument.cs
 using Supabase.Postgrest.Attributes;
@@ -111,7 +111,7 @@ using UnityEngine;
 
 public class InstrumentList : MonoBehaviour
 {
-    // Unity does not await Start(), so this only starts the load.
+    // Unity doesn't await Start(), so this only starts the load.
     private void Start()
     {
         _ = LoadInstrumentsAsync();
@@ -139,13 +139,13 @@ public class InstrumentList : MonoBehaviour
 
 ## 9. Start the app
 
-Click **Play** in the editor. Open **Window > General > Console**. It shows `violin`, `viola`, and `cello`.
+Click **Play** in the editor. Open **Window > General > Console**. The Console shows `violin`, `viola`, and `cello`.
 
 <$Partial path="quickstart_going_to_production.mdx" />
 
 ### IL2CPP code stripping
 
-With a **Managed Stripping Level** above **Minimal**, IL2CPP removes code that the SDK needs. The query then returns empty names, and other calls fail. Add this `Assets/link.xml` to keep the SDK and your models:
+With a **Managed Stripping Level** above **Minimal**, IL2CPP removes code that the SDK needs. The query then returns empty names, and other calls fail. To keep the SDK and your models, add this `Assets/link.xml` file:
 
 ```xml name=Assets/link.xml
 <linker>
@@ -162,7 +162,7 @@ With a **Managed Stripping Level** above **Minimal**, IL2CPP removes code that t
 </linker>
 ```
 
-Add a `type` line for each model class. If your scripts are in an assembly definition, use its name instead of `Assembly-CSharp`.
+Add a `type` line with the full name of each model class, including its namespace. If your scripts are in an assembly definition, use its name instead of `Assembly-CSharp`.
 
 ## Next steps
 
