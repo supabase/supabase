@@ -10,7 +10,7 @@ breadcrumb: 'Framework Quickstarts'
 
 ## 3. Create a Unity project
 
-In Unity Hub, click **New project**. This guide uses Unity 6.3 and was tested in the editor and in a Windows build. It doesn't cover Web builds, because Unity Web doesn't support `System.Net.Http`, which the SDK uses.
+In Unity Hub, click **New project**. This guide uses Unity 6.3. It doesn't cover Web builds, because Unity Web doesn't support `System.Net.Http`, which the SDK uses.
 
 ## 4. Set up AI tooling (optional)
 
@@ -18,7 +18,7 @@ In Unity Hub, click **New project**. This guide uses Unity 6.3 and was tested in
 
 ## 5. Install the Supabase client library
 
-Unity can't install NuGet packages, so install [NuGetForUnity](https://github.com/GlitchEnzo/NuGetForUnity) first. Installing from a Git URL requires Git on your machine.
+Unity can't install NuGet packages, so install [NuGetForUnity](https://github.com/GlitchEnzo/NuGetForUnity) first. You need Git installed for this step.
 
 1. Open **Window > Package Management > Package Manager**.
 2. Open the **+** menu and select **Install package from git URL**.
@@ -81,7 +81,7 @@ public class SupabaseManager : MonoBehaviour
 
 <Admonition type="note">
 
-Unity doesn't load `.env` files, so this guide puts the project URL and publishable key in the script. The publishable key is safe to ship in your app. Row Level Security and database privileges control access to your data.
+Unity doesn't load `.env` files, so this guide puts the project URL and publishable key in the script. The publishable key is safe to ship in your app, because Row Level Security and database privileges control access to your data.
 
 </Admonition>
 
