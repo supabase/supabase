@@ -4,6 +4,8 @@ BEGIN;
   -- Create supabase_functions schema
   CREATE SCHEMA supabase_functions AUTHORIZATION supabase_admin;
   GRANT USAGE ON SCHEMA supabase_functions TO postgres, anon, authenticated, service_role;
+  -- The trigger serializes row values that may use types from extensions.
+  GRANT USAGE ON SCHEMA extensions TO supabase_admin;
   ALTER DEFAULT PRIVILEGES IN SCHEMA supabase_functions GRANT ALL ON TABLES TO postgres, anon, authenticated, service_role;
   ALTER DEFAULT PRIVILEGES IN SCHEMA supabase_functions GRANT ALL ON FUNCTIONS TO postgres, anon, authenticated, service_role;
   ALTER DEFAULT PRIVILEGES IN SCHEMA supabase_functions GRANT ALL ON SEQUENCES TO postgres, anon, authenticated, service_role;

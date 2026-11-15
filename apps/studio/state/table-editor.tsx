@@ -29,6 +29,7 @@ type ForeignKeyState = {
   foreignKey: ForeignKey
   row: Dictionary<any>
   column: PGColumn
+  singleColumn?: boolean
 }
 
 export type SidePanel =

@@ -33,21 +33,30 @@ ionic start supabase-ionic-angular blank --type angular
 cd supabase-ionic-angular
 ```
 
-Install the only additional dependency: [supabase-js](https://github.com/supabase/supabase-js)
+Install the [Supabase JavaScript client](https://github.com/supabase/supabase-js):
 
 ```bash
 npm install @supabase/supabase-js
 ```
 
-And finally, save the environment variables in the `src/environments/environment.ts` file.
-All you need are the API URL and the key that you copied [earlier](#get-api-details).
-These variables will be exposed on the browser, and that's fine as [Row Level Security](/docs/guides/database/postgres/row-level-security) is enabled on the Database.
+Save the API URL and publishable key that you copied [earlier](#get-api-details) in `src/environments/environment.ts`.
+These values are available in the browser. Keep Row Level Security enabled on your tables and use policies to control access.
 
 <$CodeSample
 path="/user-management/ionic-angular-user-management/src/environments/environment.ts"
 lines={[[1, -1]]}
 meta="name=src/environments/environment.ts"
 />
+
+To develop against a local Supabase project instead, start the local stack from your application directory:
+
+```bash
+npx supabase init
+npx supabase start
+npx supabase status
+```
+
+Copy the local **Project URL** and **Publishable** key from the `supabase status` output into `environment.ts`. The default local Project URL is `http://127.0.0.1:54321`. To create the tables and policies this app uses, open local Studio at [http://127.0.0.1:54323](http://127.0.0.1:54323) and run the **User Management Starter** SQL from the [database setup](#set-up-the-database-schema) above. Local email sign-in links are delivered to [Mailpit](http://127.0.0.1:54324). See [Local development with the Supabase CLI](/docs/guides/local-development/cli/getting-started) for CLI installation and workflow details.
 
 Now that you have the API credentials in place, create a `SupabaseService` with `ionic g s supabase` to initialize the Supabase client and implement functions to communicate with the Supabase API.
 
@@ -77,7 +86,7 @@ meta="name=src/app/login/login.page.html"
 ### Account page
 
 After a user is signed in, allow them to edit their profile details and manage their account.
-Create an `AccountComponent` with `ionic g page account` Ionic CLI command.
+Create an account page with the `ionic g page account` Ionic CLI command.
 
 <$CodeSample
 path="/user-management/ionic-angular-user-management/src/app/account/account.page.ts"

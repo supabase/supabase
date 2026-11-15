@@ -30,6 +30,7 @@ import { TableEditorTableStateContextProvider } from '@/state/table-editor-table
 export interface ForeignRowSelectorProps {
   visible: boolean
   foreignKey?: ForeignKey
+  sourceColumnName?: string
   isSaving?: boolean
   onSelect: (value?: { [key: string]: any }) => void
   closePanel: () => void
@@ -38,6 +39,7 @@ export interface ForeignRowSelectorProps {
 export const ForeignRowSelector = ({
   visible,
   foreignKey,
+  sourceColumnName,
   isSaving,
   onSelect,
   closePanel,
@@ -254,7 +256,10 @@ export const ForeignRowSelector = ({
                     rows={data.rows}
                     onRowSelect={(row) => {
                       if (!isSaving) {
-                        const value = columns?.reduce((a, b) => {
+                        const columnsToUpdate = sourceColumnName
+                          ? columns?.filter((column) => column.source === sourceColumnName)
+                          : columns
+                        const value = columnsToUpdate?.reduce((a, b) => {
                           const targetColumn = selectedTable?.columns.find(
                             (x) => x.name === b.target
                           )

@@ -17,6 +17,12 @@ The additional data types that PostGIS provides include [Point](https://postgis.
 
 You can get started with PostGIS by enabling the PostGIS extension in your Supabase dashboard.
 
+### Tiger geocoder data
+
+Enabling `postgis_tiger_geocoder` installs the geocoding functions, but it does not load the U.S. Census TIGER data those functions search. If `tiger.geocode` returns no rows, check whether the required nation and state data has been loaded into the `tiger_data` schema. The data-loading process uses PostGIS loader functions to generate command-line scripts that download and import Census data. See the [PostGIS Tiger Geocoder installation guide](https://postgis.net/docs/postgis_installation.html#install_tiger_geocoder_extension) for the loading steps and required tools.
+
+The PostGIS loader expects to create and manage tables in `tiger_data`. On managed Supabase projects, database roles do not have the ownership and schema permissions the loader requires, so the standard loader scripts cannot be run as documented. For self-hosted databases where you control those permissions, follow the PostGIS instructions. Enabling the extension by itself does not make geocoding data available.
+
 <Tabs
   scrollable
   size="small"

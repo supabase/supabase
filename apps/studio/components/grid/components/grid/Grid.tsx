@@ -130,6 +130,7 @@ export const Grid = memo(
             foreignKey,
             row,
             column: column as unknown as PGColumn,
+            singleColumn: true,
           })
         }
       }

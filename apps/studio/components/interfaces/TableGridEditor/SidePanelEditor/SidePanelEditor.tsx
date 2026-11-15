@@ -964,6 +964,11 @@ export const SidePanelEditor = ({
             ? snap.sidePanel.foreignKey.foreignKey
             : undefined
         }
+        sourceColumnName={
+          snap.sidePanel?.type === 'foreign-row-selector' && snap.sidePanel.foreignKey.singleColumn
+            ? snap.sidePanel.foreignKey.column.name
+            : undefined
+        }
         isSaving={isEditPending}
         closePanel={onClosePanel}
         onSelect={onSaveForeignRow}
