@@ -1,6 +1,6 @@
 import { zodResolver } from '@hookform/resolvers/zod'
 import { useMemo, type ReactNode } from 'react'
-import { useForm } from 'react-hook-form'
+import { useForm, useWatch } from 'react-hook-form'
 import {
   Button,
   cn,
@@ -104,6 +104,8 @@ export const SaveViewDialog = ({
     defaultValues,
   })
   const { isSubmitting } = form.formState
+  const name = useWatch({ control: form.control, name: 'name' })
+  const isNameEmpty = name.trim().length === 0
 
   const filterSummary = useMemo(
     () => buildFilterSummary(filters, columnLabels),
@@ -188,7 +190,7 @@ export const SaveViewDialog = ({
                 variant="primary"
                 type="submit"
                 loading={isSubmitting}
-                disabled={isSubmitting}
+                disabled={isSubmitting || isNameEmpty}
               >
                 Save view
               </Button>

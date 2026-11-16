@@ -52,14 +52,46 @@ describe('SaveViewDialog', () => {
     ).toBeInTheDocument()
   })
 
-  it('shows an inline error and does not save when the name is empty', async () => {
+  it('disables saving and does not save when the name is empty', async () => {
     const onSave = vi.fn()
     customRender(<SaveViewDialog {...baseProps} onSave={onSave} />)
 
-    fireEvent.click(await screen.findByRole('button', { name: 'Save view' }))
+    const saveButton = await screen.findByRole('button', { name: 'Save view' })
+    expect(saveButton).toBeDisabled()
 
-    expect(await screen.findByText('Enter a name for this view')).toBeInTheDocument()
+    fireEvent.click(saveButton)
+
     expect(onSave).not.toHaveBeenCalled()
+  })
+
+  it('disables saving and does not save when the name is only whitespace', async () => {
+    const onSave = vi.fn()
+    customRender(<SaveViewDialog {...baseProps} onSave={onSave} />)
+
+    const input = await screen.findByPlaceholderText('Enter a name for this view')
+    fireEvent.change(input, { target: { value: '   ' } })
+
+    const saveButton = screen.getByRole('button', { name: 'Save view' })
+    await waitFor(() => expect(saveButton).toBeDisabled())
+
+    fireEvent.click(saveButton)
+
+    expect(onSave).not.toHaveBeenCalled()
+  })
+
+  it('enables saving for a normal name and trims it before saving', async () => {
+    const onSave = vi.fn()
+    customRender(<SaveViewDialog {...baseProps} onSave={onSave} />)
+
+    const input = await screen.findByPlaceholderText('Enter a name for this view')
+    fireEvent.change(input, { target: { value: '  Errors only  ' } })
+
+    const saveButton = screen.getByRole('button', { name: 'Save view' })
+    await waitFor(() => expect(saveButton).toBeEnabled())
+    await act(async () => fireEvent.click(saveButton))
+
+    await waitFor(() => expect(onSave).toHaveBeenCalledOnce())
+    expect(onSave).toHaveBeenCalledWith(expect.objectContaining({ name: 'Errors only' }))
   })
 
   it('shows an inline error and does not save when the name is a duplicate (case/whitespace insensitive)', async () => {
