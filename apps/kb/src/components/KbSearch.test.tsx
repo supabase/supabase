@@ -109,12 +109,11 @@ describe('KbSearch telemetry', () => {
       )
     })
 
-  it('sends kb_search_submitted with the query text and counts', () => {
+  it('sends kb_search_submitted with counts and no query text', () => {
     renderWithState(resultsState)
 
     expect(sentWith('kb_search_submitted')).toHaveLength(1)
     expect(sentWith('kb_search_submitted')[0].custom_properties).toEqual({
-      query: 'storage policies',
       queryLength: 16,
       resultCount: 3,
       hasResults: true,
@@ -148,7 +147,6 @@ describe('KbSearch telemetry', () => {
     renderWithState({ status: 'noResults', key: 1, query: 'zzz' })
 
     expect(sentWith('kb_search_submitted')[0].custom_properties).toEqual({
-      query: 'zzz',
       queryLength: 3,
       resultCount: 0,
       hasResults: false,
