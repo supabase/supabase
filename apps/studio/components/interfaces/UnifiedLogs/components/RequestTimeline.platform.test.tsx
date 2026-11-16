@@ -324,6 +324,10 @@ describe('request timeline tab', () => {
     await user.click(screen.getByRole('tab', { name: 'Timeline' }))
 
     expect(await screen.findByRole('heading', { name: 'No related logs' })).toBeVisible()
+    // Announced through a live region, since the empty state replaces the loader silently
+    expect(
+      screen.getByText('No related logs', { selector: '[aria-live="polite"]' })
+    ).toBeInTheDocument()
     expect(
       screen.getByText(
         'Logs appear here when they share a request, trace, or function execution ID.'

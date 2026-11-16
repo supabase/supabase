@@ -45,55 +45,57 @@ export function RequestTimeline({ row, activeLog, onSelectLog }: RequestTimeline
     })
   )
 
-  if (isLoading) {
-    return (
-      <div className="flex flex-col gap-3 p-4" aria-label="Loading related logs">
-        {[0, 1, 2].map((i) => (
-          <Skeleton key={i} className="h-9 w-full" />
-        ))}
-      </div>
-    )
-  }
-
-  if (isError) {
-    return (
-      <AlertError
-        error={error}
-        subject="Failed to retrieve related logs"
-        projectRef={projectRef}
-        className="m-4"
-      />
-    )
-  }
-
-  if (!data || data.logs.length === 0) {
-    return (
-      <LogPanelEmptyState
-        icon={RouteIcon}
-        title="No related logs"
-        description="Logs appear here when they share a request, trace, or function execution ID."
-      />
-    )
-  }
-
-  const [firstLog] = data.logs
-  const startMs = getRowTimestampMs(firstLog) ?? 0
+  const logs = data?.logs ?? []
+  const hasLogs = !isLoading && !isError && logs.length > 0
+  const hasNoLogs = !isLoading && !isError && logs.length === 0
+  const [firstLog] = logs
+  const startMs = (firstLog && getRowTimestampMs(firstLog)) ?? 0
 
   return (
-    <div className="py-2">
-      <LogTimeline
-        aria-label="Related logs"
-        logs={data.logs}
-        activeLogId={activeLog.id}
-        onSelectLog={onSelectLog}
-        collapsedStepCount={COLLAPSED_STEP_COUNT}
-        getTimeLabel={(log) =>
-          log.id === firstLog.id
-            ? formatDateTime(startMs)
-            : formatOffset((getRowTimestampMs(log) ?? startMs) - startMs)
-        }
-      />
-    </div>
+    <>
+      {/* Stays mounted across states so screen readers hear the result when loading ends */}
+      <span aria-live="polite" className="sr-only">
+        {hasNoLogs ? 'No related logs' : ''}
+      </span>
+      {isLoading && (
+        <div className="flex flex-col gap-3 p-4" aria-label="Loading related logs">
+          {[0, 1, 2].map((i) => (
+            <Skeleton key={i} className="h-9 w-full" />
+          ))}
+        </div>
+      )}
+      {isError && (
+        <AlertError
+          error={error}
+          subject="Failed to retrieve related logs"
+          projectRef={projectRef}
+          className="m-4"
+        />
+      )}
+      {hasNoLogs && (
+        <LogPanelEmptyState
+          icon={RouteIcon}
+          title="No related logs"
+          description="Logs appear here when they share a request, trace, or function execution ID."
+        />
+      )}
+      {hasLogs && (
+        <div className="py-2">
+          <LogTimeline
+            aria-label="Related logs"
+            logs={logs}
+            activeLogId={activeLog.id}
+            onSelectLog={onSelectLog}
+            collapsedStepCount={COLLAPSED_STEP_COUNT}
+            getTimeLabel={(log) =>
+              log.id === firstLog.id
+                ? formatDateTime(startMs)
+                : formatOffset((getRowTimestampMs(log) ?? startMs) - startMs)
+            }
+          />
+        </div>
+      )}
+    </>
   )
 }
 

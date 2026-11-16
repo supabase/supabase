@@ -56,9 +56,11 @@ const HTTP_STATUS_EXPR: SafeLogSqlFragment = safeSql`CASE
 
 // storage-service rows expose method/path under `req.method` / `req.url`
 // rather than the gateway's `request.method` / `request.path`, and
-// edge function rows expose their path as `request.pathname`.
+// edge function rows expose their path as `request.pathname`. A missing map
+// key reads as '', so edge function rows without `request.pathname` fall
+// through to `request.path`.
 const HTTP_METHOD_EXPR: SafeLogSqlFragment = safeSql`if(source = 'storage_logs', log_attributes['req.method'], ${ATTR.method})`
-const HTTP_PATH_EXPR: SafeLogSqlFragment = safeSql`multiIf(source = 'storage_logs', log_attributes['req.url'], source = 'function_edge_logs', log_attributes['request.pathname'], ${ATTR.path})`
+const HTTP_PATH_EXPR: SafeLogSqlFragment = safeSql`multiIf(source = 'storage_logs', log_attributes['req.url'], source = 'function_edge_logs' AND log_attributes['request.pathname'] != '', log_attributes['request.pathname'], ${ATTR.path})`
 
 /**
  * Condition that matches rows belonging to a given log_type. Mirrors the

@@ -214,7 +214,7 @@ export function LogStepSummary({ log, isLoading }: { log: ColumnSchema; isLoadin
           <Loader2Icon
             size={14}
             strokeWidth={1.5}
-            className="shrink-0 animate-spin text-foreground-lighter"
+            className="shrink-0 text-foreground-lighter motion-safe:animate-spin"
           />
         </span>
       ) : (

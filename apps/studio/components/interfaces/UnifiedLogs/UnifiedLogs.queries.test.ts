@@ -95,10 +95,12 @@ describe('UnifiedLogs.queries (OTEL flat)', () => {
       expect(where).toContain(`NOT (source = 'function_logs')`)
     })
 
-    it('reads the path edge function rows store under request.pathname, so they can show it', () => {
+    it('reads the path edge function rows store under request.pathname, falling back to request.path when it is missing', () => {
       const sql = getUnifiedLogsQuery(withFilters('log_type:eq:edge function'))
 
-      expect(sql).toContain("source = 'function_edge_logs', log_attributes['request.pathname']")
+      expect(sql).toContain(
+        "source = 'function_edge_logs' AND log_attributes['request.pathname'] != '', log_attributes['request.pathname']"
+      )
     })
 
     it('projects only Compute fields that exist on worker logs', () => {
@@ -111,7 +113,7 @@ describe('UnifiedLogs.queries (OTEL flat)', () => {
         `if(${workerCondition} OR source = 'etl_replication_logs', null, if(source = 'storage_logs', log_attributes['req.method'], log_attributes['request.method']))`
       )
       expect(sql).toContain(
-        `if(${workerCondition} OR source = 'etl_replication_logs', null, multiIf(source = 'storage_logs', log_attributes['req.url'], source = 'function_edge_logs', log_attributes['request.pathname'], log_attributes['request.path']))`
+        `if(${workerCondition} OR source = 'etl_replication_logs', null, multiIf(source = 'storage_logs', log_attributes['req.url'], source = 'function_edge_logs' AND log_attributes['request.pathname'] != '', log_attributes['request.pathname'], log_attributes['request.path']))`
       )
       expect(sql).toContain(
         `if(${workerCondition} OR source IN ('function_logs', 'etl_replication_logs'), log_attributes, map()) AS metadata`
@@ -143,7 +145,7 @@ describe('UnifiedLogs.queries (OTEL flat)', () => {
       expect(sql).toContain(`log_attributes['parsed.sql_state_code']`)
       expect(sql).toMatch(/END\) IN \('401'\)/)
       expect(sql).toContain(
-        `(multiIf(source = 'storage_logs', log_attributes['req.url'], source = 'function_edge_logs', log_attributes['request.pathname'], log_attributes['request.path'])) LIKE '%/customers%'`
+        `(multiIf(source = 'storage_logs', log_attributes['req.url'], source = 'function_edge_logs' AND log_attributes['request.pathname'] != '', log_attributes['request.pathname'], log_attributes['request.path'])) LIKE '%/customers%'`
       )
     })
 
@@ -169,12 +171,12 @@ describe('UnifiedLogs.queries (OTEL flat)', () => {
     it('flips LIKE to NOT LIKE when the pathname/host operator is `<>`', () => {
       const sql = getUnifiedLogsQuery(withFilters('pathname:neq:/health', 'host:neq:cdn.foo'))
       expect(sql).toContain(
-        `(multiIf(source = 'storage_logs', log_attributes['req.url'], source = 'function_edge_logs', log_attributes['request.pathname'], log_attributes['request.path'])) NOT LIKE '%/health%'`
+        `(multiIf(source = 'storage_logs', log_attributes['req.url'], source = 'function_edge_logs' AND log_attributes['request.pathname'] != '', log_attributes['request.pathname'], log_attributes['request.path'])) NOT LIKE '%/health%'`
       )
       expect(sql).toContain(`log_attributes['request.url'] NOT LIKE '%cdn.foo%'`)
     })
 
-    const pathExpr = `(multiIf(source = 'storage_logs', log_attributes['req.url'], source = 'function_edge_logs', log_attributes['request.pathname'], log_attributes['request.path']))`
+    const pathExpr = `(multiIf(source = 'storage_logs', log_attributes['req.url'], source = 'function_edge_logs' AND log_attributes['request.pathname'] != '', log_attributes['request.pathname'], log_attributes['request.path']))`
 
     it.each([
       ['pathname:ilike:Customers', `${pathExpr} ILIKE '%Customers%'`, null],
