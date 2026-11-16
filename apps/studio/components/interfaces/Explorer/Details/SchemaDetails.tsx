@@ -1,3 +1,4 @@
+import { useQuery } from '@tanstack/react-query'
 import { ShimmeringLoader } from 'ui-patterns/ShimmeringLoader'
 
 import { useOpenEntityQuery } from '../hooks'
@@ -9,13 +10,14 @@ import {
   DetailsSection,
 } from './DetailsSection'
 import { EntityTypeIcon } from '@/components/ui/EntityTypeIcon'
-import { useDatabaseFunctionsQuery } from '@/data/database-functions/database-functions-query'
+import { databaseFunctionsQueryOptions } from '@/data/database-functions/database-functions-query'
 import { useDatabasePoliciesQuery } from '@/data/database-policies/database-policies-query'
 import { useSchemasQuery } from '@/data/database/schemas-query'
 import { ENTITY_TYPE } from '@/data/entity-types/entity-type-constants'
 import { useTablesQuery } from '@/data/tables/tables-query'
 import { useViewsQuery } from '@/data/views/views-query'
 import { useSelectedProjectQuery } from '@/hooks/misc/useSelectedProject'
+import { useGrant } from '@/lib/grants'
 
 const POSTGRES_DEFAULT_PUBLIC_COMMENT = 'standard public schema'
 
@@ -31,7 +33,14 @@ export const SchemaDetails = ({ schema }: { schema: string }) => {
   const { data: schemas } = useSchemasQuery(connection)
   const { data: tables, isPending: isLoadingTables } = useTablesQuery({ ...connection, schema })
   const { data: views } = useViewsQuery({ ...connection, schemas: [schema] })
-  const { data: functions } = useDatabaseFunctionsQuery({ ...connection, schema })
+  const readGrant = useGrant(
+    'POST /platform/pg-meta/{ref}/query',
+    { projectRef: project?.ref },
+    { variant: 'read' }
+  )
+  const { data: functions } = useQuery(
+    databaseFunctionsQueryOptions({ ...connection, schema, grant: readGrant.grant })
+  )
   const { data: policies } = useDatabasePoliciesQuery({ ...connection, schemas: [schema] })
 
   const details = schemas?.find(({ name }) => name === schema)

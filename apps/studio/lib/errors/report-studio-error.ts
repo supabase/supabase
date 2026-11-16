@@ -1,6 +1,6 @@
 import * as Sentry from '@sentry/nextjs'
 
-import { ERROR_ROUTING, SAMPLE_ALWAYS, SAMPLE_NEVER } from './error-routing'
+import { getErrorRouting, SAMPLE_ALWAYS, SAMPLE_NEVER } from './error-routing'
 import { classifyError } from '@/data/error-classification'
 import { isNeverReportedError, type StudioError } from '@/lib/errors/studio-errors'
 
@@ -22,7 +22,7 @@ export function reportStudioError(
   { force = false }: { force?: boolean } = {}
 ) {
   if (isNeverReportedError(err)) return
-  const sampleRate = force ? SAMPLE_ALWAYS : ERROR_ROUTING[err._tag].sentrySampleRate
+  const sampleRate = force ? SAMPLE_ALWAYS : getErrorRouting(err).sentrySampleRate
   if (sampleRate <= SAMPLE_NEVER) return
   if (err.errorEventId) return
 
@@ -33,6 +33,7 @@ export function reportStudioError(
       error_tag: err._tag,
       sample_rate: sampleRate,
       fault: err.fault,
+      reason: err.reason,
       classified_by: err.classifiedBy,
       service: err.service,
       ...(err.endpoint && { endpoint: err.endpoint }),

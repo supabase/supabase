@@ -15,6 +15,7 @@ export interface NavMenuSection {
   hasLightIcon?: boolean
   isDarkMode?: boolean
   enabled?: boolean
+  shortName?: string
 }
 
 type MenuItem = {

@@ -35,6 +35,16 @@ const tableRelatedResourcesSchema = z.object({
       schema: z.string(),
     })
   ),
+  indexes: z.array(
+    z.object({
+      id: z.number(),
+      name: z.string(),
+      schema: z.string(),
+      columns: z.array(z.string()),
+      is_primary: z.boolean(),
+      is_unique: z.boolean(),
+    })
+  ),
 })
 
 const tableReferencingFunctionsSchema = z.object({
@@ -98,6 +108,7 @@ export type TableRelatedResourcesData = Awaited<ReturnType<typeof getTableRelate
 export type TableReferencingFunctionsData = Awaited<ReturnType<typeof getTableReferencingFunctions>>
 export type TableRelatedPolicy = TableRelatedResourcesData['policies'][number]
 export type TableRelatedTrigger = TableRelatedResourcesData['triggers'][number]
+export type TableRelatedIndex = TableRelatedResourcesData['indexes'][number]
 export type TableRelatedFunction = TableReferencingFunctionsData['functions'][number]
 export type TableRelatedResourcesError = StudioError
 

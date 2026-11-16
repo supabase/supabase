@@ -19,7 +19,12 @@ import {
 import { Admonition } from 'ui-patterns/Admonition'
 
 import { CLASSIC_TOKEN_WARNING } from '../../AccessToken.constants'
-import { countConfigured, PermissionMode } from '../../AccessToken.permissions'
+import {
+  countConfigured,
+  sanitizeSelection,
+  type PermissionMode,
+  type ResourceAccessMode,
+} from '../../AccessToken.permissions'
 import { applyPreset, type PermissionPreset } from '../../AccessToken.presets'
 import { useTokenAccessEvaluation } from '../../hooks/useTokenAccessEvaluation'
 import { DEFAULT_EXPIRY, TokenFormSchema, TokenFormValues } from './NewScopedTokenForm.utils'
@@ -86,11 +91,7 @@ export const NewScopedTokenForm = forwardRef<
     defaultValue: [],
   })
   const projectRefs = useWatch({ control: form.control, name: 'projectRefs', defaultValue: [] })
-  const configuredCount = useWatch({
-    control: form.control,
-    name: 'permissions',
-    compute: (selection) => countConfigured(selection),
-  })
+  const configuredCount = countConfigured(selection, resourceAccess)
 
   const access = useTokenAccessEvaluation({
     selection,
@@ -124,10 +125,15 @@ export const NewScopedTokenForm = forwardRef<
 
   const isClassicMode = resourceAccess === 'account'
 
-  const handleSelectLegacyMode = () => {
-    form.setValue('resourceAccess', 'account', { shouldValidate: true })
-    form.setValue('organizationSlugs', [])
+  const handleResourceAccessChange = (mode: ResourceAccessMode) => {
+    form.setValue('resourceAccess', mode, { shouldValidate: true })
     form.setValue('projectRefs', [])
+    form.setValue('permissions', sanitizeSelection(form.getValues('permissions'), mode))
+  }
+
+  const handleSelectLegacyMode = () => {
+    handleResourceAccessChange('account')
+    form.setValue('organizationSlugs', [])
     form.clearErrors(['organizationSlugs', 'projectRefs'])
   }
 
@@ -140,7 +146,10 @@ export const NewScopedTokenForm = forwardRef<
       setMissingPermissionsAttempts((attempts) => attempts + 1)
       return
     }
-    setFormValues(values)
+    setFormValues({
+      ...values,
+      permissions: sanitizeSelection(values.permissions, values.resourceAccess),
+    })
     setStep('review')
   }
 
@@ -150,9 +159,9 @@ export const NewScopedTokenForm = forwardRef<
   }
 
   const handleApplyPreset = (preset: PermissionPreset) => {
-    const next = applyPreset(preset, selection)
+    const next = applyPreset(preset, selection, resourceAccess)
     form.setValue('permissions', next)
-    if (countConfigured(next) > 0) setMissingPermissionsAttempts(0)
+    if (countConfigured(next, resourceAccess) > 0) setMissingPermissionsAttempts(0)
   }
 
   return (
@@ -178,9 +187,7 @@ export const NewScopedTokenForm = forwardRef<
                   <button
                     type="button"
                     className={InlineLinkClassName}
-                    onClick={() =>
-                      form.setValue('resourceAccess', 'project', { shouldValidate: true })
-                    }
+                    onClick={() => handleResourceAccessChange('project')}
                     tabIndex={0}
                   >
                     Create scoped token
@@ -193,6 +200,7 @@ export const NewScopedTokenForm = forwardRef<
                     <ResourceAccessStep
                       control={form.control}
                       setValue={form.setValue}
+                      onResourceAccessChange={handleResourceAccessChange}
                       onSelectLegacyToken={handleSelectLegacyMode}
                     />
                   </div>
@@ -200,6 +208,7 @@ export const NewScopedTokenForm = forwardRef<
                   <PermissionsAccordion
                     control={form.control}
                     selection={selection}
+                    resourceAccess={resourceAccess}
                     onChange={handlePermissionChange}
                     onApplyPreset={handleApplyPreset}
                     access={access}

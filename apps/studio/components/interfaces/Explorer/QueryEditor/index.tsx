@@ -67,7 +67,7 @@ import {
   type DatabaseSourceParameters,
   type LogsSourceParameters,
 } from '@/data/content/notebooks/notebook-schema'
-import { useDatabaseEventTriggersQuery } from '@/data/database-event-triggers/database-event-triggers-query'
+import { databaseEventTriggersQueryOptions } from '@/data/database-event-triggers/database-event-triggers-query'
 import { isValidConnString, unguarded } from '@/data/fetchers'
 import { useExecuteLogsSqlMutation } from '@/data/logs/execute-logs-sql-mutation'
 import {
@@ -87,6 +87,7 @@ import { applyAutoLimit } from '@/data/sql/utils'
 import { useDebouncedValue } from '@/hooks/misc/useDebouncedValue'
 import { useLatest } from '@/hooks/misc/useLatest'
 import { useSelectedProjectQuery } from '@/hooks/misc/useSelectedProject'
+import { useGrant } from '@/lib/grants'
 import { detectOS } from '@/lib/helpers'
 import { getQueryLabel } from '@/lib/query-relations'
 import { wrapWithRoleImpersonation } from '@/lib/role-impersonation'
@@ -246,9 +247,16 @@ export const QueryEditor = forwardRef<QueryEditorHandle, QueryEditorProps>(funct
       ? project?.connectionString
       : databases?.find((database) => database.identifier === databaseIdentifier)?.connectionString
 
-  const { data: eventTriggers } = useDatabaseEventTriggersQuery(
-    { projectRef: project?.ref, connectionString },
-    { enabled: query._tag === 'database' && isValidConnString(connectionString) }
+  const readGrant = useGrant(
+    'POST /platform/pg-meta/{ref}/query',
+    { projectRef: project?.ref },
+    { variant: 'read' }
+  )
+  const { data: eventTriggers } = useQuery(
+    databaseEventTriggersQueryOptions(
+      { projectRef: project?.ref, connectionString, grant: readGrant.grant },
+      { enabled: query._tag === 'database' && isValidConnString(connectionString) }
+    )
   )
 
   const { mutateAsync: runSql, isPending: isExecutingSql } = useExecuteSqlMutation({

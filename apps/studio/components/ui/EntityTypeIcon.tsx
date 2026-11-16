@@ -55,22 +55,35 @@ interface EntityTypeIconProps {
   sqlSource?: SqlSnippetSource
   /** For a `query`, the database object it was opened from, if any. */
   entityType?: ENTITY_TYPE
+  isPartition?: boolean
+  className?: string
 }
 
 export const EntityTypeIcon = ({
-  type,
+  type: rawType,
   size = 15,
   strokeWidth = 1.5,
   isActive,
   sqlSource,
   entityType,
+  isPartition = false,
+  className,
 }: EntityTypeIconProps) => {
   // A query opened from a database object reads as that object, not as a generic query.
-  if (type === 'query' && entityType !== undefined) {
+  if (rawType === 'query' && entityType !== undefined) {
     return (
-      <EntityTypeIcon type={entityType} size={size} strokeWidth={strokeWidth} isActive={isActive} />
+      <EntityTypeIcon
+        type={entityType}
+        size={size}
+        strokeWidth={strokeWidth}
+        isActive={isActive}
+        isPartition={isPartition}
+        className={className}
+      />
     )
   }
+
+  const type = isPartition ? ENTITY_TYPE.PARTITIONED_TABLE : rawType
 
   if (type === 'sql' && sqlSource === 'logs') {
     return (
@@ -111,7 +124,8 @@ export const EntityTypeIcon = ({
         className={cn(
           'text-foreground-muted group-hover:text-foreground-lighter group-aria-selected:text-foreground',
           isActive && 'text-foreground-light',
-          'transition-colors'
+          'transition-colors',
+          className
         )}
       />
     )
@@ -127,9 +141,10 @@ export const EntityTypeIcon = ({
         size={size}
         strokeWidth={strokeWidth}
         className={cn(
-          'text-foreground-muted group-hover:text-foreground-lighter',
+          'text-foreground-muted group-hover:text-foreground-lighter group-aria-selected:text-foreground',
           isActive && 'text-foreground-lighter',
-          'transition-colors'
+          'transition-colors',
+          className
         )}
       />
     )
@@ -159,7 +174,7 @@ export const EntityTypeIcon = ({
           'text-warning-600/80 dark:text-yellow-900 bg-yellow-500',
         type === ENTITY_TYPE.MATERIALIZED_VIEW && 'text-purple-1100 bg-purple-500',
         type === ENTITY_TYPE.PARTITIONED_TABLE &&
-          'text-foreground-light bg-surface-400 dark:bg-border-stronger'
+          `${isPartition ? 'text-blue-1100 bg-blue-500 dark:bg-blue-500' : 'text-foreground bg-blue-700 dark:bg-blue-800'}`
       )}
     >
       {Object.entries(ENTITY_TYPE)

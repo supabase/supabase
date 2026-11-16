@@ -12,7 +12,7 @@ import {
   calculateSummary,
   createNodeTree,
 } from '@/components/interfaces/ExplainVisualizer/ExplainVisualizer.parser'
-import { classifySqlResponseError } from '@/data/error-classification'
+import { classifySqlResponseError, type IsUserFaultSqlState } from '@/data/error-classification'
 import { handleError as handleErrorFetchers, post, type Unguarded } from '@/data/fetchers'
 import { QUERY_SOURCE_REGISTRY } from '@/data/query-sources/query-source-registry'
 import { MB } from '@/lib/constants'
@@ -59,8 +59,17 @@ export type QueryResponseError = {
  *   (`table-rows`, `trigger-update`), never a value that includes IDs, schemas, or user input.
  */
 type SqlSource =
-  | { sqlOrigin: 'user'; queryName?: string }
-  | { sqlOrigin: 'studio'; queryName: string }
+  | { sqlOrigin: 'user'; queryName?: string; isUserFaultSqlState?: never }
+  | {
+      sqlOrigin: 'studio'
+      queryName: string
+      /**
+       * For SQL that embeds user input. A failure whose SQLSTATE this accepts is the user's fault,
+       * not Studio's. Pass `isUserFaultForValues` for typed values or `isUserFaultForSql` for
+       * user-written SQL (see `data/error-classification.ts`).
+       */
+      isUserFaultSqlState?: IsUserFaultSqlState
+    }
 
 type PgMetaQuery = 'POST /platform/pg-meta/{ref}/query'
 export type PgMetaReadGrant = GrantForVariants<'post', '/platform/pg-meta/{ref}/query'>
@@ -133,6 +142,7 @@ export async function executeSql<T = any>(
     sql,
     sqlOrigin,
     queryName,
+    isUserFaultSqlState,
     grant,
     queryKey,
     handleError,
@@ -264,6 +274,7 @@ export async function executeSql<T = any>(
     const classified = classifySqlResponseError(error, {
       origin: sqlOrigin,
       queryName,
+      isUserFaultSqlState,
     })
     if (handleError !== undefined) return handleError(classified)
     handleErrorFetchers(classified)

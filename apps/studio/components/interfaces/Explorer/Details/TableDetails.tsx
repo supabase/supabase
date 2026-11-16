@@ -1,3 +1,4 @@
+import { useQuery } from '@tanstack/react-query'
 import { ArrowLeftIcon, ArrowRightIcon } from 'lucide-react'
 import { useState } from 'react'
 import { toast } from 'sonner'
@@ -28,7 +29,7 @@ import { getTablePoliciesUrl } from '@/components/interfaces/TableGridEditor/Tab
 import { useIndexesQuery } from '@/data/database-indexes/indexes-query'
 import { useDatabasePoliciesQuery } from '@/data/database-policies/database-policies-query'
 import { useIsTableRealtimeEnabled } from '@/data/database-publications/database-publications-query'
-import { useDatabaseTriggersQuery } from '@/data/database-triggers/database-triggers-query'
+import { databaseTriggersQueryOptions } from '@/data/database-triggers/database-triggers-query'
 import { ENTITY_TYPE } from '@/data/entity-types/entity-type-constants'
 import type { QueryRelation } from '@/data/sql/query-relations-query'
 import { useTableEditorQuery } from '@/data/table-editor/table-editor-query'
@@ -39,6 +40,7 @@ import { FGA_PERMISSIONS, useAsyncCheckPermissionsV2 } from '@/hooks/misc/useChe
 import { useIsFeatureEnabled } from '@/hooks/misc/useIsFeatureEnabled'
 import { useSelectedProjectQuery } from '@/hooks/misc/useSelectedProject'
 import { useIsProtectedSchema } from '@/hooks/useProtectedSchemas'
+import { useGrant } from '@/lib/grants'
 import { useTrack } from '@/lib/telemetry/track'
 
 /** What a table query sits on top of: its size, access rules, and the objects around it. */
@@ -243,10 +245,25 @@ export const TableTriggers = ({
   isSchemaLocked: boolean
 }) => {
   const { data: project } = useSelectedProjectQuery()
-  const { data, isPending, isError } = useDatabaseTriggersQuery({
-    projectRef: project?.ref,
-    connectionString: project?.connectionString,
-  })
+  const readGrant = useGrant(
+    'POST /platform/pg-meta/{ref}/query',
+    { projectRef: project?.ref },
+    { variant: 'read' }
+  )
+  const {
+    data,
+    isPending: isPendingTriggers,
+    isError: isQueryError,
+  } = useQuery(
+    databaseTriggersQueryOptions({
+      projectRef: project?.ref,
+      connectionString: project?.connectionString,
+      grant: readGrant.grant,
+    })
+  )
+  const isPending =
+    readGrant.status === 'loading' || (readGrant.status === 'granted' && isPendingTriggers)
+  const isError = readGrant.status === 'denied' || readGrant.status === 'error' || isQueryError
   const triggers = (data ?? []).filter(({ table_id }) => table_id === relation.id)
   const createTriggerUrl = `/project/${project?.ref ?? ''}/database/triggers/data?schema=${encodeURIComponent(relation.schema)}&new=true`
 

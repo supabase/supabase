@@ -16,7 +16,6 @@ export type StudioErrorInput = {
   retryAfter?: number
   metadata?: ErrorMetadata
   formattedError?: string
-  reason?: string
   service?: StudioService
   /** OpenAPI path pattern, never a concrete URL */
   endpoint?: string
@@ -30,22 +29,26 @@ export type StudioErrorInput = {
   cause?: unknown
 }
 
-type StudioErrorFields = Omit<StudioErrorInput, 'message' | 'reason' | 'service'> & {
+/** What a class's constructor takes: the shared fields plus its own reasons. */
+type StudioErrorInputFor<R extends string> = StudioErrorInput & { reason?: R }
+
+type StudioErrorFields<R extends string> = Omit<StudioErrorInput, 'message' | 'service'> & {
   readonly message: string
-  readonly reason: string
+  readonly reason: R
   readonly service: StudioService
 }
 
-type StudioErrorConfig<F extends Fault, C extends ClassifiedBy> = {
-  fault: F | ((input: StudioErrorInput) => F)
+type StudioErrorConfig<F extends Fault, C extends ClassifiedBy, R extends string> = {
+  fault: F | ((input: StudioErrorInputFor<R>) => F)
   classifiedBy: C
-  defaultReason: string
-  retryable: (input: StudioErrorInput) => boolean
+  /** The reasons this class can have, so a mistyped one fails typecheck. The first is the default. */
+  reasons: readonly [R, ...R[]]
+  retryable: (input: StudioErrorInputFor<R>) => boolean
   /**
    * What Sentry shows instead of `message`, for classes whose message can contain user data. Built
    * only from fields that can't. `message` stays intact for the UI.
    */
-  sentryMessage?: (input: StudioErrorInput) => string
+  sentryMessage?: (input: StudioErrorInputFor<R>) => string
 }
 
 export function getServiceForEndpoint(endpoint?: string): StudioService {
@@ -56,11 +59,13 @@ export function getServiceForEndpoint(endpoint?: string): StudioService {
   return 'unknown'
 }
 
-function studioError<const Tag extends string, F extends Fault, C extends ClassifiedBy>(
-  tag: Tag,
-  config: StudioErrorConfig<F, C>
-) {
-  return class extends Data.TaggedError(tag)<StudioErrorFields> {
+function studioError<
+  const Tag extends string,
+  F extends Fault,
+  C extends ClassifiedBy,
+  R extends string,
+>(tag: Tag, config: StudioErrorConfig<F, C, R>) {
+  return class extends Data.TaggedError(tag)<StudioErrorFields<R>> {
     readonly fault: F
     readonly classifiedBy: C = config.classifiedBy
     readonly retryable: boolean
@@ -69,11 +74,11 @@ function studioError<const Tag extends string, F extends Fault, C extends Classi
     /** Set by `reportStudioError` when the error is sent to Sentry. Assigned before `beforeSend`, so it may refer to an event that was sampled out. */
     errorEventId?: string
 
-    constructor(input: StudioErrorInput = {}) {
+    constructor(input: StudioErrorInputFor<R> = {}) {
       super({
         ...input,
         message: input.message || DEFAULT_ERROR_MESSAGE,
-        reason: input.reason ?? config.defaultReason,
+        reason: input.reason ?? config.reasons[0],
         service: input.service ?? getServiceForEndpoint(input.endpoint),
       })
       this.fault = typeof config.fault === 'function' ? config.fault(input) : config.fault
@@ -86,7 +91,7 @@ function studioError<const Tag extends string, F extends Fault, C extends Classi
 export class RequestAbortedError extends studioError('RequestAborted', {
   fault: 'user',
   classifiedBy: 'rule',
-  defaultReason: 'request_aborted',
+  reasons: ['request_aborted'],
   retryable: () => false,
 }) {}
 
@@ -96,7 +101,7 @@ export class RequestAbortedError extends studioError('RequestAborted', {
 export class NetworkUnreachableError extends studioError('NetworkUnreachable', {
   fault: ({ reason }) => (reason === 'offline' ? 'user' : 'platform'),
   classifiedBy: 'rule',
-  defaultReason: 'network_unreachable',
+  reasons: ['network_unreachable', 'offline'],
   retryable: () => true,
 }) {}
 
@@ -105,21 +110,21 @@ export class NetworkUnreachableError extends studioError('NetworkUnreachable', {
 export class MalformedResponseError extends studioError('MalformedResponse', {
   fault: 'platform',
   classifiedBy: 'rule',
-  defaultReason: 'empty_body',
+  reasons: ['empty_body'],
   retryable: () => true,
 }) {}
 
 export class PlatformError extends studioError('PlatformError', {
   fault: 'platform',
   classifiedBy: 'default',
-  defaultReason: 'server_error',
+  reasons: ['server_error'],
   retryable: () => true,
 }) {}
 
 export class UnclassifiedApiError extends studioError('UnclassifiedApiError', {
   fault: 'studio',
   classifiedBy: 'default',
-  defaultReason: 'client_error',
+  reasons: ['client_error', 'unauthorized', 'forbidden', 'not_found', 'rate_limited'],
   retryable: ({ code }) => code === 429,
 }) {}
 
@@ -128,7 +133,7 @@ export class UnclassifiedApiError extends studioError('UnclassifiedApiError', {
 export class ConnectionTimeoutError extends studioError('DbConnectionTimeout', {
   fault: 'platform',
   classifiedBy: 'rule',
-  defaultReason: 'connection_timeout',
+  reasons: ['connection_timeout'],
   retryable: () => true,
 }) {}
 
@@ -138,17 +143,19 @@ export class ConnectionTimeoutError extends studioError('DbConnectionTimeout', {
 export class UserSqlError extends studioError('UserSqlError', {
   fault: 'user',
   classifiedBy: 'rule',
-  defaultReason: 'user_sql',
+  reasons: ['user_sql'],
   retryable: () => false,
 }) {}
 
 // Postgres rejected SQL that Studio wrote. The Postgres message can still echo user data (row
 // values in a constraint violation, a schema name), so Sentry gets only the SQLSTATE and the query
-// name.
+// name. When the SQL embeds user input and the caller's `isUserFaultSqlState` accepts the SQLSTATE,
+// the reason is `user_input` and the fault is the user's, which gives it a lower Sentry sample rate (see
+// `getErrorRouting`).
 export class StudioSqlError extends studioError('StudioSqlError', {
-  fault: 'studio',
+  fault: ({ reason }) => (reason === 'user_input' ? 'user' : 'studio'),
   classifiedBy: 'rule',
-  defaultReason: 'studio_sql',
+  reasons: ['studio_sql', 'user_input'],
   retryable: () => false,
   sentryMessage: ({ sqlState, queryName }) =>
     `Postgres error ${sqlState ?? 'without SQLSTATE'} in query ${queryName ?? 'without name'}`,
@@ -157,7 +164,7 @@ export class StudioSqlError extends studioError('StudioSqlError', {
 export class UnexpectedError extends studioError('UnexpectedError', {
   fault: 'studio',
   classifiedBy: 'default',
-  defaultReason: 'unexpected',
+  reasons: ['unexpected'],
   retryable: () => false,
 }) {}
 
@@ -173,6 +180,7 @@ export type StudioError =
   | UnexpectedError
 
 export type StudioErrorTag = StudioError['_tag']
+export type StudioErrorReason = StudioError['reason']
 
 export type ClassifiedError = ConnectionTimeoutError
 
@@ -197,6 +205,14 @@ export function isStudioError(error: unknown): error is StudioError {
     typeof error._tag === 'string' &&
     Object.hasOwn(STUDIO_ERROR_TAGS, error._tag)
   )
+}
+
+/**
+ * True for errors whose fault is the user's, so the user can fix them. Says nothing about whether
+ * the error is reported; use `isNeverReportedError` for that.
+ */
+export function isUserError(error: unknown): error is StudioError {
+  return isStudioError(error) && error.fault === 'user'
 }
 
 /**

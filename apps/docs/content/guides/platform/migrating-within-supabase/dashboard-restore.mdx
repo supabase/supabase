@@ -12,42 +12,33 @@ Dashboard backups are only available for older projects that still use logical b
 
 </Admonition>
 
-<Accordion
-  type="default"
-  chevronAlign="right"
-  justified
-  size="medium"
-  className="text-foreground-light mt-8 mb-6"
->
-  <AccordionItem
-      header="Install Postgres and psql"
-      id="install-postgres"
-    >
-      <$Partial path="postgres_installation.mdx" />
-    </AccordionItem>
-  <AccordionItem
-      header="Create and configure a new project"
-      id="create-project"
-    >
-      <StepHikeCompact>
-      <StepHikeCompact.Step step={1}>
-        <StepHikeCompact.Details title="Create New project" fullWidth>
-          Create a new [Supabase project](https://database.new)
+<details>
+<summary>Install Postgres and psql</summary>
+
+    <$Partial path="postgres_installation.mdx" />
+
+</details>
+<details>
+<summary>Create and configure a new project</summary>
+
+    <StepHikeCompact>
+    <StepHikeCompact.Step step={1}>
+      <StepHikeCompact.Details title="Create New project" fullWidth>
+        Create a new [Supabase project](https://database.new)
+      </StepHikeCompact.Details>
+    </StepHikeCompact.Step>
+      <StepHikeCompact.Step step={2}>
+        <StepHikeCompact.Details title="Configure your new project" fullWidth>
+              In your new project:
+
+              - If you were using Webhooks, enable [Database Webhooks](/dashboard/project/_/integrations/webhooks/overview).
+              - If you were using any extensions, enable the [Extensions](/dashboard/project/_/database/extensions).
+              - If you were using Replication for Realtime, enable [Publication](/dashboard/project/_/database/publications) where needed.
         </StepHikeCompact.Details>
       </StepHikeCompact.Step>
-        <StepHikeCompact.Step step={2}>
-          <StepHikeCompact.Details title="Configure your new project" fullWidth>
-                In your new project:
+    </StepHikeCompact>
 
-                - If you were using Webhooks, enable [Database Webhooks](/dashboard/project/_/integrations/webhooks/overview).
-                - If you were using any extensions, enable the [Extensions](/dashboard/project/_/database/extensions).
-                - If you were using Replication for Realtime, enable [Publication](/dashboard/project/_/database/publications) where needed.
-          </StepHikeCompact.Details>
-        </StepHikeCompact.Step>
-      </StepHikeCompact>
-    </AccordionItem>
-
-</Accordion>
+</details>
 
 ## Things to keep in mind
 

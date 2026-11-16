@@ -90,7 +90,13 @@ const mockDatabase = () => {
           entity.name.includes(search)
       )
         .sort((a, b) => a.name.localeCompare(b.name))
-        .map((entity, index) => ({ ...entity, id: index + 1, comment: null, rls_enabled: true }))
+        .map((entity, index) => ({
+          ...entity,
+          id: index + 1,
+          comment: null,
+          rls_enabled: true,
+          is_partition: false,
+        }))
 
       return HttpResponse.json<EntityTypesResponse[]>([
         { data: { count: entities.length, entities } },
