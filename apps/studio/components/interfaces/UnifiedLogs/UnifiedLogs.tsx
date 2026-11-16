@@ -40,6 +40,7 @@ import {
   getFilterCombinationKey,
   isFilterComboAlreadySaved,
   shouldShowSaveViewSuggestion,
+  truncateViewName,
 } from './components/SaveViewSuggestionBanner.utils'
 import { TooltipLabel } from './components/TooltipLabel'
 import { ViewSuggestionBanner } from './components/ViewSuggestionBanner'
@@ -790,7 +791,7 @@ export const UnifiedLogs = ({
               <ViewSuggestionBanner
                 visible={showUpdateViewSuggestion}
                 title="You have modified your view"
-                description="Would you like to update?"
+                description={`Update "${truncateViewName(activeView?.name ?? '')}" with these changes?`}
                 primaryLabel="Update"
                 onPrimary={handleUpdateActiveView}
                 onDismiss={handleDismissUpdateSuggestion}

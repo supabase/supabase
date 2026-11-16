@@ -6,6 +6,7 @@ import {
   isFilterComboAlreadySaved,
   SAVE_VIEW_SUGGESTION_THRESHOLD,
   shouldShowSaveViewSuggestion,
+  truncateViewName,
 } from './SaveViewSuggestionBanner.utils'
 
 const baseArgs = {
@@ -93,6 +94,18 @@ describe('isFilterComboAlreadySaved', () => {
 
   it('is false when there are no saved views', () => {
     expect(isFilterComboAlreadySaved(filters, [])).toBe(false)
+  })
+})
+
+describe('truncateViewName', () => {
+  it('leaves a short name untouched', () => {
+    expect(truncateViewName('Errors only')).toBe('Errors only')
+  })
+
+  it('truncates a long name with an ellipsis', () => {
+    const truncated = truncateViewName('a'.repeat(64))
+    expect(truncated).toBe(`${'a'.repeat(31)}…`)
+    expect(truncated.length).toBe(32)
   })
 })
 
