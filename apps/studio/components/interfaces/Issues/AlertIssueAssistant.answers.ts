@@ -24,7 +24,7 @@ const text = (value: unknown) => (value === undefined || value === null ? '' : S
 const sqlBlock = (sql: string) => `\`\`\`sql\n${sql}\n\`\`\``
 const nextSteps = (...items: string[]) =>
   `**Next steps**\n${items.map((item) => `- ${item}`).join('\n')}`
-const paragraphs = (...parts: (string | false | undefined)[]) =>
+const paragraphs = (...parts: (string | false | null | undefined)[]) =>
   parts.filter((part): part is string => !!part).join('\n\n')
 
 const AUTH_CALL = /(?<!select )\bauth\.(uid|jwt|role)\(\)/gi
