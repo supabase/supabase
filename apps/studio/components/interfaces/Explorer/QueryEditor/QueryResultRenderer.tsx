@@ -47,15 +47,29 @@ const QueryResultState = ({ icon, children, className, ...props }: QueryResultSt
 
 const RunningState = ({ className }: { className?: string }) => (
   <QueryResultState
-    role="status"
     className={className}
-    icon={<Loader2Icon size={20} strokeWidth={1.5} className="animate-spin" />}
+    icon={
+      <Loader2Icon
+        size={20}
+        strokeWidth={1.5}
+        className="animate-spin motion-reduce:animate-none"
+      />
+    }
   >
     Running query…
   </QueryResultState>
 )
 
-export const QueryResultRenderer = ({
+const getRunAnnouncement = ({ result, isExecuting }: QueryResultRendererProps) => {
+  if (isExecuting) return 'Running query…'
+  if (!result) return ''
+  if (result.error) return 'Query failed'
+  const rowCount = result.rows?.length ?? 0
+  if (rowCount === 0) return 'No rows returned'
+  return `${rowCount} ${rowCount === 1 ? 'row' : 'rows'} returned`
+}
+
+const QueryResultContent = ({
   result,
   isExecuting = false,
   view,
@@ -115,3 +129,16 @@ export const QueryResultRenderer = ({
     </div>
   )
 }
+
+/**
+ * The visible states swap whole elements, so screen readers get run progress from one
+ * status region that stays mounted while only its text changes.
+ */
+export const QueryResultRenderer = (props: QueryResultRendererProps) => (
+  <>
+    <p role="status" className="sr-only">
+      {getRunAnnouncement(props)}
+    </p>
+    <QueryResultContent {...props} />
+  </>
+)
