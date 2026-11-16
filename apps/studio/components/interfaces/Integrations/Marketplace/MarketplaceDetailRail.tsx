@@ -2,7 +2,12 @@ import { ArrowUpRightIcon, BookOpenIcon, GlobeIcon } from 'lucide-react'
 import type { ReactNode } from 'react'
 import { cn } from 'ui'
 
-import { getMarketplaceType, getMarketplaceTypeLabel } from './Marketplace.constants'
+import {
+  getMarketplaceSource,
+  getMarketplaceType,
+  getMarketplaceTypeLabel,
+  MarketplaceBuiltBy,
+} from './Marketplace.constants'
 import type { IntegrationDefinition } from '@/components/interfaces/Integrations/Landing/Integrations.constants'
 
 interface RailRowProps {
@@ -70,6 +75,7 @@ const tryHostname = (url: string | null | undefined) => {
 
 export const MarketplaceDetailRail = ({ integration, isInstalled }: MarketplaceDetailRailProps) => {
   const typeLabel = getMarketplaceTypeLabel(getMarketplaceType(integration))
+  const source = getMarketplaceSource(integration)
   const docsUrl = integration.docsUrl ?? undefined
   const siteUrl = integration.siteUrl ?? undefined
   const siteHost = tryHostname(siteUrl)
@@ -78,7 +84,16 @@ export const MarketplaceDetailRail = ({ integration, isInstalled }: MarketplaceD
     <aside className="sticky top-16 flex flex-col gap-4 self-start text-sm">
       <RailGroup>
         <RailRow label="Type" value={typeLabel} />
-        <RailRow label="Built by" value={integration.author?.name || 'Supabase'} />
+        <RailRow
+          label="Built by"
+          value={
+            <MarketplaceBuiltBy
+              authorName={integration.author?.name}
+              source={source}
+              markSize={12}
+            />
+          }
+        />
         {isInstalled && <RailRow label="Status" value="Installed" />}
       </RailGroup>
 
