@@ -155,6 +155,8 @@ type QueryEditorProps = {
   onShowQueryChange: (showQuery: boolean) => void
   /** Disables editor run actions and hides the toolbar run button (e.g. while an external confirm footer owns the run). */
   isRunDisabled?: boolean
+  /** Set while the query runs outside this editor (e.g. an approved Assistant tool call). */
+  isExternallyExecuting?: boolean
   onTitleChange: (title: string) => void
   onSqlChange: (sql: string) => void
   onSqlCommit?: (sql: string) => void
@@ -187,6 +189,7 @@ export const QueryEditor = forwardRef<QueryEditorHandle, QueryEditorProps>(funct
     showQuery,
     onShowQueryChange,
     isRunDisabled = false,
+    isExternallyExecuting = false,
     onTitleChange,
     onSqlChange,
     onSqlCommit,
@@ -269,7 +272,7 @@ export const QueryEditor = forwardRef<QueryEditorHandle, QueryEditorProps>(funct
 
   const isResolvingDatabase =
     databaseIdentifier !== undefined && databaseIdentifier !== project?.ref && isLoadingDatabases
-  const isExecuting = isExecutingSql || isExecutingLogs
+  const isExecuting = isExecutingSql || isExecutingLogs || isExternallyExecuting
   const isBusy = isLoadingProject || isResolvingDatabase || isExecuting
 
   // The sidebar describes database objects and reviews result edits, and needs the width a
@@ -512,12 +515,12 @@ export const QueryEditor = forwardRef<QueryEditorHandle, QueryEditorProps>(funct
       <QueryResultRenderer
         view={view}
         result={result}
+        isExecuting={isExecuting}
         chart={display?.chart}
         sql={result?.sql}
         source={result?.source}
         onDebug={onDebug}
         editing={workspace.editing}
-        isRunning={isExecuting}
         rowSelection={workspace.rowSelection}
       />
     </ExplorerQueryResults>

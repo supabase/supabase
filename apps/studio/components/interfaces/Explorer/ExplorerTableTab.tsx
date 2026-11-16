@@ -358,7 +358,7 @@ const ExplorerTableView = ({
             sql={result?.sql}
             source={result?.source}
             editing={workspace.editing}
-            isRunning={isRunning || result === undefined}
+            isExecuting={isRunning || result === undefined}
             rowSelection={workspace.rowSelection}
           />
         </ExplorerQueryResults>
