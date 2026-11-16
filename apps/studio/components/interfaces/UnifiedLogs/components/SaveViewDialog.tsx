@@ -41,6 +41,10 @@ interface SaveViewDialogProps {
 
 const defaultValues = { name: '' }
 
+// Matches the limit used for other user-chosen labels in Studio (e.g. secret API
+// key names). The dropdown truncates well before this, so it's a guard, not a fit.
+export const VIEW_NAME_MAX_LENGTH = 64
+
 // Mirrors the read-only parts of `FilterCondition`'s pill styling (ui-patterns/FilterBar)
 // so filters and options look the same here as filters do on the filter bar itself.
 const Pill = ({ children }: { children: ReactNode }) => (
@@ -91,6 +95,7 @@ export const SaveViewDialog = ({
           .string()
           .trim()
           .min(1, 'Enter a name for this view')
+          .max(VIEW_NAME_MAX_LENGTH, `Keep the name to ${VIEW_NAME_MAX_LENGTH} characters or less.`)
           .refine(
             (name) => !isDuplicateViewName(name, existingNames),
             "That name's already taken. Try another."

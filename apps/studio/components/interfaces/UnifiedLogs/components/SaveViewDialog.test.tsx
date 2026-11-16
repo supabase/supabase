@@ -3,7 +3,7 @@ import userEvent from '@testing-library/user-event'
 import { mockAnimationsApi } from 'jsdom-testing-mocks'
 import { describe, expect, it, vi } from 'vitest'
 
-import { SaveViewDialog } from './SaveViewDialog'
+import { SaveViewDialog, VIEW_NAME_MAX_LENGTH } from './SaveViewDialog'
 import { customRender } from '@/tests/lib/custom-render'
 
 // SaveViewDialog renders a Radix dialog, which uses Web Animations.
@@ -76,6 +76,33 @@ describe('SaveViewDialog', () => {
 
     fireEvent.click(saveButton)
 
+    expect(onSave).not.toHaveBeenCalled()
+  })
+
+  it(`saves a name at the ${VIEW_NAME_MAX_LENGTH} character limit`, async () => {
+    const onSave = vi.fn()
+    const name = 'a'.repeat(VIEW_NAME_MAX_LENGTH)
+    customRender(<SaveViewDialog {...baseProps} onSave={onSave} />)
+
+    const input = await screen.findByPlaceholderText('Enter a name for this view')
+    fireEvent.change(input, { target: { value: name } })
+    await act(async () => fireEvent.click(screen.getByRole('button', { name: 'Save view' })))
+
+    await waitFor(() => expect(onSave).toHaveBeenCalledOnce())
+    expect(onSave).toHaveBeenCalledWith(expect.objectContaining({ name }))
+  })
+
+  it(`shows an inline error and does not save one character over the limit`, async () => {
+    const onSave = vi.fn()
+    customRender(<SaveViewDialog {...baseProps} onSave={onSave} />)
+
+    const input = await screen.findByPlaceholderText('Enter a name for this view')
+    fireEvent.change(input, { target: { value: 'a'.repeat(VIEW_NAME_MAX_LENGTH + 1) } })
+    fireEvent.click(screen.getByRole('button', { name: 'Save view' }))
+
+    expect(
+      await screen.findByText(`Keep the name to ${VIEW_NAME_MAX_LENGTH} characters or less.`)
+    ).toBeInTheDocument()
     expect(onSave).not.toHaveBeenCalled()
   })
 
