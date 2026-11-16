@@ -51,4 +51,26 @@ describe('ViewSuggestionBanner', () => {
 
     expect(onDismiss).toHaveBeenCalledOnce()
   })
+
+  it('dismissing never triggers the primary or secondary action', () => {
+    const onDismiss = vi.fn()
+    const onPrimary = vi.fn()
+    const onSecondary = vi.fn()
+    render(
+      <ViewSuggestionBanner
+        {...baseProps}
+        primaryLabel="Update"
+        secondaryLabel="Save as new"
+        onPrimary={onPrimary}
+        onSecondary={onSecondary}
+        onDismiss={onDismiss}
+      />
+    )
+
+    fireEvent.click(screen.getByRole('button', { name: 'Dismiss' }))
+
+    expect(onDismiss).toHaveBeenCalledOnce()
+    expect(onPrimary).not.toHaveBeenCalled()
+    expect(onSecondary).not.toHaveBeenCalled()
+  })
 })
