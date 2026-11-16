@@ -26,7 +26,13 @@ import { PasswordStrengthBar } from '@/components/ui/PasswordStrengthBar'
 import { useProjectCloneMutation } from '@/data/projects/clone-mutation'
 import { useCloneBackupsQuery } from '@/data/projects/clone-query'
 import { useSelectedProjectQuery } from '@/hooks/misc/useSelectedProject'
-import { passwordStrength, PasswordStrengthScore } from '@/lib/password-strength'
+import {
+  DATABASE_PASSWORD_PLACEHOLDER,
+  isPlaceholderPassword,
+  passwordStrength,
+  PasswordStrengthScore,
+  PLACEHOLDER_PASSWORD_WARNING,
+} from '@/lib/password-strength'
 import { generateStrongPassword } from '@/lib/project'
 
 interface CreateNewProjectDialogProps {
@@ -54,7 +60,10 @@ export const CreateNewProjectDialog = ({
 
   const FormSchema = z.object({
     name: z.string().min(1),
-    password: z.string().min(1),
+    password: z
+      .string()
+      .min(1)
+      .refine((value) => !isPlaceholderPassword(value), PLACEHOLDER_PASSWORD_WARNING),
   })
 
   const form = useForm<z.infer<typeof FormSchema>>({
@@ -164,7 +173,7 @@ export const CreateNewProjectDialog = ({
                       <PasswordInput
                         id="db-password"
                         type="password"
-                        placeholder="Type in a strong password"
+                        placeholder={DATABASE_PASSWORD_PLACEHOLDER}
                         value={field.value}
                         copy={field.value?.length > 0}
                         reveal

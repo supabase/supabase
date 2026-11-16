@@ -1,6 +1,10 @@
 import { describe, expect, it } from 'vitest'
 
-import { passwordNeedsPercentEncoding, passwordStrength } from './password-strength'
+import {
+  isPlaceholderPassword,
+  passwordNeedsPercentEncoding,
+  passwordStrength,
+} from './password-strength'
 
 describe('passwordNeedsPercentEncoding', () => {
   it('returns false for passwords that are safe to use in a connection string', () => {
@@ -20,6 +24,19 @@ describe('passwordNeedsPercentEncoding', () => {
     expect(passwordNeedsPercentEncoding('test?string')).toBe(true)
     expect(passwordNeedsPercentEncoding('test&string')).toBe(true)
     expect(passwordNeedsPercentEncoding('test string')).toBe(true)
+  })
+})
+
+describe('isPlaceholderPassword', () => {
+  it('matches the placeholder text regardless of case and surrounding whitespace', () => {
+    expect(isPlaceholderPassword('Type in a strong password')).toBe(true)
+    expect(isPlaceholderPassword('  type in a STRONG password ')).toBe(true)
+  })
+
+  it('does not match other passwords', () => {
+    expect(isPlaceholderPassword('')).toBe(false)
+    expect(isPlaceholderPassword('Type in a strong password!')).toBe(false)
+    expect(isPlaceholderPassword('ActuallyAStrongPassword123!')).toBe(false)
   })
 })
 
@@ -43,6 +60,13 @@ describe('passwordStrength', () => {
     expect(result.message).toContain('This password is strong')
     expect(result.warning).toBe('')
     expect(result.strength).toBe(4)
+  })
+
+  it('returns strength 0 and a warning when the password is the placeholder text', async () => {
+    const result = await passwordStrength('Type in a strong password')
+    expect(result.strength).toBe(0)
+    expect(result.warning).toMatch(/placeholder text/i)
+    expect(result.message).toMatch(/not acceptable/i)
   })
 
   it('returns weak score, suggestion, and warning for weak password', async () => {

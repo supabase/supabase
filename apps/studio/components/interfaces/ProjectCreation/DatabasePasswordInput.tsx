@@ -6,7 +6,7 @@ import { FormItemLayout } from 'ui-patterns/form/FormItemLayout/FormItemLayout'
 import { CreateProjectForm } from './ProjectCreation.schema'
 import Panel from '@/components/ui/Panel'
 import { PasswordStrengthBar } from '@/components/ui/PasswordStrengthBar'
-import { passwordStrength } from '@/lib/password-strength'
+import { DATABASE_PASSWORD_PLACEHOLDER, passwordStrength } from '@/lib/password-strength'
 import { generateStrongPassword } from '@/lib/project'
 
 interface DatabasePasswordInputProps {
@@ -65,7 +65,7 @@ export const DatabasePasswordInput = ({ form }: DatabasePasswordInputProps) => {
                 <Input
                   copy={field.value.length > 0}
                   type="password"
-                  placeholder="Type in a strong password"
+                  placeholder={DATABASE_PASSWORD_PLACEHOLDER}
                   {...field}
                   id="dbPass"
                   autoComplete="off"

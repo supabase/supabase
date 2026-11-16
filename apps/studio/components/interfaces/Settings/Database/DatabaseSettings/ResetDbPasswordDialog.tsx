@@ -23,7 +23,11 @@ import { useDatabasePasswordResetMutation } from '@/data/database/database-passw
 import { FGA_PERMISSIONS, useAsyncCheckPermissionsV2 } from '@/hooks/misc/useCheckPermissionsV2'
 import { useIsProjectActive } from '@/hooks/misc/useSelectedProject'
 import { DEFAULT_MINIMUM_PASSWORD_STRENGTH } from '@/lib/constants'
-import { passwordStrength, PasswordStrengthScore } from '@/lib/password-strength'
+import {
+  DATABASE_PASSWORD_PLACEHOLDER,
+  passwordStrength,
+  PasswordStrengthScore,
+} from '@/lib/password-strength'
 import { generateStrongPassword } from '@/lib/project'
 
 export type ResetDbPasswordDialogProps = {
@@ -169,7 +173,7 @@ export const ResetDbPasswordDialog = ({
               copy={password.length > 0}
               aria-invalid={!!passwordStrengthWarning}
               type="password"
-              placeholder="Type in a strong password"
+              placeholder={DATABASE_PASSWORD_PLACEHOLDER}
               value={password}
               autoComplete="off"
               onChange={onDbPassChange}

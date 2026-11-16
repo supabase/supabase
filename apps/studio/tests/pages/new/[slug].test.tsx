@@ -47,7 +47,8 @@ vi.mock('sonner', () => ({
   toast: { error: vi.fn(), success: vi.fn() },
 }))
 
-vi.mock('@/lib/password-strength', () => ({
+vi.mock('@/lib/password-strength', async (importOriginal) => ({
+  ...(await importOriginal<typeof import('@/lib/password-strength')>()),
   passwordNeedsPercentEncoding: () => false,
   passwordStrength: async (value: string) =>
     value.length >= 12
