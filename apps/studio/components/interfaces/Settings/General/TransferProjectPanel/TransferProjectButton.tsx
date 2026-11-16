@@ -1,7 +1,7 @@
 import { useQueryClient } from '@tanstack/react-query'
 import { useFlag } from 'common'
 import { LoaderIcon, ShieldIcon, WrenchIcon } from 'lucide-react'
-import { useEffect, useEffectEvent, useState } from 'react'
+import { useEffect, useState } from 'react'
 import { toast } from 'sonner'
 import {
   Button,
@@ -71,23 +71,20 @@ export const TransferProjectButton = () => {
   )
   const queryClient = useQueryClient()
 
-  const trackBlockedNoticeExposed = useEffectEvent(
-    (preview: NonNullable<typeof transferPreviewData>) => {
-      track('project_transfer_blocked_notice_exposed', {
-        sourcePlan: preview.source_subscription_plan,
-        targetPlan: preview.target_subscription_plan,
-        membersExceedingLimitCount: preview.members_exceeding_free_project_limit.length,
-      })
-    }
-  )
-
   useEffect(() => {
     if (transferPreviewData === undefined) return
+    const membersExceedingLimitCount =
+      transferPreviewData.members_exceeding_free_project_limit.length
     const isBlockedNoticeShown =
-      transferPreviewData.errors.length > 0 &&
-      transferPreviewData.members_exceeding_free_project_limit.length > 0
-    if (isBlockedNoticeShown) trackBlockedNoticeExposed(transferPreviewData)
-  }, [transferPreviewData])
+      transferPreviewData.errors.length > 0 && membersExceedingLimitCount > 0
+    if (!isBlockedNoticeShown) return
+
+    track('project_transfer_blocked_notice_exposed', {
+      sourcePlan: transferPreviewData.source_subscription_plan,
+      targetPlan: transferPreviewData.target_subscription_plan,
+      membersExceedingLimitCount,
+    })
+  }, [transferPreviewData, track])
 
   useEffect(() => {
     if (isOpen) {
