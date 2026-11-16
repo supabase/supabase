@@ -3,7 +3,13 @@ import type { FilterGroup } from 'ui-patterns/FilterBar'
 
 import type { LogsView } from '../UnifiedLogs.views'
 
+// How many filters before we proactively offer to save a view. Deliberately higher
+// than MIN_FILTERS_TO_SAVE so the unprompted banner only interrupts once the filter
+// set is worth keeping.
 export const SAVE_VIEW_SUGGESTION_THRESHOLD = 2
+
+// How many filters before the user can save a view themselves.
+export const MIN_FILTERS_TO_SAVE = 1
 
 // Order-independent so two filter sets with the same conditions in a different
 // order count as "the same combination" for dismissal purposes.

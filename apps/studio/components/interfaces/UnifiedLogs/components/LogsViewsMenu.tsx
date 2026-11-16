@@ -22,7 +22,7 @@ import { ConfirmationModal } from 'ui-patterns/Dialogs/ConfirmationModal'
 import { EmptyStatePresentational } from 'ui-patterns/EmptyStatePresentational'
 
 import { type LogsView } from '../UnifiedLogs.views'
-import { SAVE_VIEW_SUGGESTION_THRESHOLD } from './SaveViewSuggestionBanner.utils'
+import { MIN_FILTERS_TO_SAVE } from './SaveViewSuggestionBanner.utils'
 import { ButtonTooltip } from '@/components/ui/ButtonTooltip'
 
 interface LogsViewsMenuProps {
@@ -194,7 +194,7 @@ export const LogsViewsMenu = ({
   const [isOpen, setIsOpen] = useState(false)
   const isViewActive = activeViewId !== null
   const canSaveCurrentFilters =
-    canCreate && !!onSaveCurrentView && activeFilterCount >= SAVE_VIEW_SUGGESTION_THRESHOLD
+    canCreate && !!onSaveCurrentView && activeFilterCount >= MIN_FILTERS_TO_SAVE
 
   return (
     <>
