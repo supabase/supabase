@@ -56,10 +56,10 @@ export function FilterSideBar({
       }}
       className={cn('flex flex-col w-full')}
     >
-      <div className="border-b border-border px-4 md:top-0">
-        <div className="flex h-[48px] items-center justify-between gap-3">
+      <div className="border-b border-border px-6 md:top-0">
+        <div className="flex min-h-(--header-height) items-center justify-between gap-2">
           <div className="flex items-center gap-2">
-            <p className="text-foreground text-lg">Logs</p>
+            <h4 className="text-foreground text-sm">Logs</h4>
             <Badge variant="default">Beta</Badge>
           </div>
           {table.getState().columnFilters.length || user ? (
