@@ -474,10 +474,14 @@ describe('project creation wizard', () => {
 
       await renderWizard()
 
-      await screen.findByText('Exceeding number of active Free Projects')
+      await screen.findByText('Unable to create project under Free Plan organization')
+      expect(screen.getByText(/member@example\.com/)).toBeInTheDocument()
+      expect(screen.getByText(/Limit: 2 free projects/)).toBeInTheDocument()
+
+      await user.click(screen.getByRole('button', { name: /member@example\.com/ }))
       expect(screen.getByRole('link', { name: 'Other Org' })).toHaveAttribute(
         'href',
-        '/org/other-org'
+        '/org/other-org/billing'
       )
       expect(screen.getByRole('link', { name: 'Active Project' })).toBeInTheDocument()
       expect(screen.queryByPlaceholderText('Project name')).not.toBeInTheDocument()
