@@ -27,6 +27,7 @@ type CancellationFlowState =
 
 export const CancellationFlow = (props: CancellationFlowProps) => {
   const { slug } = useParams()
+  const track = useTrack()
 
   const [flowState, setFlowState] = useState<CancellationFlowState>(
     props.visible ? 'show-downgrade-modal' : 'closed'
@@ -67,6 +68,10 @@ export const CancellationFlow = (props: CancellationFlowProps) => {
 
   const onConfirmDowngrade = () => {
     if (hasMembersExceedingFreeTierLimit) {
+      track('studio_billing_downgrade_blocked_modal_opened', {
+        currentPlan: subscription?.plan.id || 'free',
+        membersExceedingLimitCount: (membersExceededLimit || []).length,
+      })
       setFlowState('show-downgrade-error')
     } else {
       setFlowState('show-exit-survey')
