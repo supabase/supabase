@@ -46,7 +46,8 @@ const OrganizationCard = ({
         <ButtonTooltip
           tooltip={{
             content: {
-              text: (
+              text:
+                isSuccess && freePlanWithExceedingLimits ? (
                 <div className="flex flex-col gap-y-2 w-96 p-2">
                   <p className="leading-normal">
                     Owners and administrators are limited in how many active Free Plan projects they
@@ -73,7 +74,7 @@ const OrganizationCard = ({
                     you can create a free project within this organization.
                   </p>
                 </div>
-              ),
+                ) : undefined,
             },
           }}
           size="small"
