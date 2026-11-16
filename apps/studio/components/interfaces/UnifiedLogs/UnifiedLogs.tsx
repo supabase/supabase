@@ -733,11 +733,14 @@ export const UnifiedLogs = ({
                         isPending={isSavingView}
                         canUpdate={canUpdateView}
                         canDelete={canDeleteView}
+                        canCreate={canCreateView}
+                        activeFilterCount={activeFilterCount}
                         onRetry={retrySavedViews}
                         onApply={handleApplyView}
                         onRename={(id, name) => updateSavedView(id, { name })}
                         onDelete={deleteSavedView}
                         onClearActiveView={handleClearActiveView}
+                        onSaveCurrentView={handleSaveCurrentView}
                       />
                     )}
                     <DataTableViewOptions />
@@ -791,6 +794,8 @@ export const UnifiedLogs = ({
                 primaryLabel="Update"
                 onPrimary={handleUpdateActiveView}
                 onDismiss={handleDismissUpdateSuggestion}
+                secondaryLabel={canCreateView ? 'Save as new' : undefined}
+                onSecondary={canCreateView ? handleSaveCurrentView : undefined}
               />
               <ResizablePanelGroup
                 key="main-logs"

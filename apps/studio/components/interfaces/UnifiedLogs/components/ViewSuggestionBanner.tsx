@@ -10,6 +10,8 @@ interface ViewSuggestionBannerProps {
   primaryLabel: string
   onPrimary: () => void
   onDismiss: () => void
+  secondaryLabel?: string
+  onSecondary?: () => void
 }
 
 export const ViewSuggestionBanner = ({
@@ -19,6 +21,8 @@ export const ViewSuggestionBanner = ({
   primaryLabel,
   onPrimary,
   onDismiss,
+  secondaryLabel,
+  onSecondary,
 }: ViewSuggestionBannerProps) => {
   const content = (
     <AnimatePresence>
@@ -30,7 +34,7 @@ export const ViewSuggestionBanner = ({
             exit={{ opacity: 0, y: 16 }}
             transition={{ type: 'spring', stiffness: 420, damping: 30, mass: 0.4 }}
           >
-            <div className="flex flex-col gap-2 sm:flex-row sm:items-center sm:gap-4 p-3 sm:py-2 sm:pl-4 sm:pr-2 bg-surface-100 border rounded-lg shadow-lg sm:max-w-md">
+            <div className="flex flex-col gap-3 sm:flex-row sm:items-center sm:gap-6 p-3 sm:py-2 sm:pl-4 sm:pr-2 bg-surface-100 border rounded-lg shadow-lg sm:max-w-md">
               <div className="flex items-start gap-2 min-w-0">
                 <BookmarkIcon size={14} className="shrink-0 mt-0.5 text-foreground-lighter" />
                 <div className="flex flex-col min-w-0">
@@ -39,6 +43,11 @@ export const ViewSuggestionBanner = ({
                 </div>
               </div>
               <div className="flex items-center justify-end gap-1.5 shrink-0">
+                {secondaryLabel && onSecondary && (
+                  <Button size="tiny" variant="default" onClick={onSecondary}>
+                    {secondaryLabel}
+                  </Button>
+                )}
                 <Button size="tiny" variant="primary" onClick={onPrimary}>
                   {primaryLabel}
                 </Button>

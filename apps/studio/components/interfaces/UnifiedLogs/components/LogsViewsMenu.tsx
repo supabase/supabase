@@ -9,6 +9,7 @@ import {
 } from 'lucide-react'
 import { KeyboardEvent, useRef, useState } from 'react'
 import {
+  Button,
   cn,
   DropdownMenu,
   DropdownMenuContent,
@@ -21,6 +22,7 @@ import { ConfirmationModal } from 'ui-patterns/Dialogs/ConfirmationModal'
 import { EmptyStatePresentational } from 'ui-patterns/EmptyStatePresentational'
 
 import { type LogsView } from '../UnifiedLogs.views'
+import { SAVE_VIEW_SUGGESTION_THRESHOLD } from './SaveViewSuggestionBanner.utils'
 import { ButtonTooltip } from '@/components/ui/ButtonTooltip'
 
 interface LogsViewsMenuProps {
@@ -30,12 +32,15 @@ interface LogsViewsMenuProps {
   isPending?: boolean
   canUpdate?: boolean
   canDelete?: boolean
+  canCreate?: boolean
+  activeFilterCount?: number
   onRetry?: () => void
   activeViewId: string | null
   onApply: (view: LogsView) => void
   onRename: (id: string, name: string) => Promise<void>
   onDelete: (id: string) => Promise<void>
   onClearActiveView: () => void
+  onSaveCurrentView?: () => void
 }
 
 // Plain icon triggers (not the full `Button` component, which has a fixed tiny
@@ -176,72 +181,99 @@ export const LogsViewsMenu = ({
   isPending = false,
   canUpdate = true,
   canDelete = true,
+  canCreate = true,
+  activeFilterCount = 0,
   onRetry,
   onApply,
   onRename,
   onDelete,
   onClearActiveView,
+  onSaveCurrentView,
 }: LogsViewsMenuProps) => {
   const [deleteTarget, setDeleteTarget] = useState<LogsView | null>(null)
+  const [isOpen, setIsOpen] = useState(false)
   const isViewActive = activeViewId !== null
+  const canSaveCurrentFilters =
+    canCreate && !!onSaveCurrentView && activeFilterCount >= SAVE_VIEW_SUGGESTION_THRESHOLD
 
   return (
     <>
-      <DropdownMenu>
+      <DropdownMenu open={isOpen} onOpenChange={setIsOpen}>
         <DropdownMenuTrigger asChild>
           <ButtonTooltip
             size="tiny"
             variant={isViewActive ? 'primary' : 'default'}
             className="w-[26px]"
-            icon={<BookmarkIcon className={!isViewActive ? 'text-foreground' : undefined} />}
+            icon={
+              <BookmarkIcon
+                className={isViewActive ? 'text-primary-solid-foreground' : 'text-foreground'}
+              />
+            }
             aria-label="Saved views"
             tooltip={{ content: { side: 'bottom', text: 'Saved views' } }}
           />
         </DropdownMenuTrigger>
         <DropdownMenuContent side="bottom" align="end" className="w-64">
-          {isLoading && (
-            <DropdownMenuItem disabled className="justify-center">
-              <Loader2Icon size={14} className="animate-spin text-foreground-lighter" />
-            </DropdownMenuItem>
-          )}
-          {!isLoading && isError && (
-            <DropdownMenuItem onSelect={onRetry} className="text-foreground-light">
-              <AlertCircleIcon size={14} className="mr-2" />
-              Failed to load views. Retry
-            </DropdownMenuItem>
-          )}
-          {!isLoading && !isError && views.length === 0 && (
-            <div className="py-2">
-              <EmptyStatePresentational
-                icon={BookmarkIcon}
-                iconSize={20}
-                title="No saved views"
-                description="Start by configuring 2 or more filters."
-                className="border-0 bg-transparent px-4 py-2"
-                contentClassName="gap-y-1 [&_h3]:text-sm [&_p]:text-xs"
-              />
-            </div>
-          )}
-          {!isLoading &&
-            !isError &&
-            views.map((view) => (
-              <LogsViewRow
-                key={view.id}
-                view={view}
-                isActive={view.id === activeViewId}
-                canUpdate={canUpdate && !isPending}
-                canDelete={canDelete && !isPending}
-                onApply={onApply}
-                onRename={onRename}
-                onRequestDelete={(id) => setDeleteTarget(views.find((v) => v.id === id) ?? null)}
-              />
-            ))}
+          <div className="flex flex-col gap-0.5">
+            {isLoading && (
+              <DropdownMenuItem disabled className="justify-center">
+                <Loader2Icon size={14} className="animate-spin text-foreground-lighter" />
+              </DropdownMenuItem>
+            )}
+            {!isLoading && isError && (
+              <DropdownMenuItem onSelect={onRetry} className="text-foreground-light">
+                <AlertCircleIcon size={14} className="mr-2" />
+                Failed to load views. Retry
+              </DropdownMenuItem>
+            )}
+            {!isLoading && !isError && views.length === 0 && (
+              <div className="py-2">
+                <EmptyStatePresentational
+                  icon={BookmarkIcon}
+                  iconSize={20}
+                  title="No saved views"
+                  description="Start by configuring 2 or more filters."
+                  className="border-0 bg-transparent px-4 py-6"
+                  contentClassName="gap-y-1 [&_h3]:text-sm [&_p]:text-xs"
+                >
+                  {canSaveCurrentFilters && (
+                    <Button
+                      type="button"
+                      variant="primary"
+                      size="tiny"
+                      className="mt-2"
+                      onClick={() => {
+                        setIsOpen(false)
+                        onSaveCurrentView?.()
+                      }}
+                    >
+                      Save current filters as a view
+                    </Button>
+                  )}
+                </EmptyStatePresentational>
+              </div>
+            )}
+            {!isLoading &&
+              !isError &&
+              views.map((view) => (
+                <LogsViewRow
+                  key={view.id}
+                  view={view}
+                  isActive={view.id === activeViewId}
+                  canUpdate={canUpdate && !isPending}
+                  canDelete={canDelete && !isPending}
+                  onApply={onApply}
+                  onRename={onRename}
+                  onRequestDelete={(id) => setDeleteTarget(views.find((v) => v.id === id) ?? null)}
+                />
+              ))}
+          </div>
           {isViewActive && (
             <>
               <DropdownMenuSeparator />
               <DropdownMenuItem onSelect={onClearActiveView}>
                 <XIcon size={14} className="mr-2" />
-                Clear all views
+                Clear view
               </DropdownMenuItem>
             </>
           )}
