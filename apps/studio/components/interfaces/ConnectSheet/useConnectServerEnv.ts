@@ -65,10 +65,9 @@ export function useConnectServerEnv(): UseConnectServerEnvResult {
     ? new URL(JWKS_DISCOVERY_PATH, apiUrl).href
     : `your-project-url${JWKS_DISCOVERY_PATH}`
 
-  const { data: keys, isLoading: isLoadingKeys } = useQuery({
-    ...apiKeysQueryOptions({ projectRef, grant: apiKeysGrant.grant }),
-    select: getKeys,
-  })
+  const { data: keys, isLoading: isLoadingKeys } = useQuery(
+    apiKeysQueryOptions({ projectRef, grant: apiKeysGrant.grant }, { select: getKeys })
+  )
   const publishableKey = keys?.publishableKey?.api_key ?? keys?.anonKey?.api_key ?? ''
   const secretKey = keys?.secretKey ?? keys?.serviceKey
   const maskedValue = secretKey?.api_key

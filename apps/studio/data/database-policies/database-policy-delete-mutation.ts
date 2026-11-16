@@ -31,6 +31,8 @@ export async function deleteDatabasePolicy({
   const { result } = await executeSql({
     projectRef,
     connectionString,
+    sqlOrigin: 'studio',
+    queryName: 'policy-delete',
     sql,
     queryKey: ['policy', 'delete', originalPolicy.id],
     grant: unguarded.migrating,

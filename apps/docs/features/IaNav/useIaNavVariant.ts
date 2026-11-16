@@ -2,17 +2,30 @@
 
 import { posthogClient, useConsentState, useFeatureFlags, useSearchParamsShallow } from 'common'
 import { LOCAL_STORAGE_KEYS } from 'common/constants/local-storage'
-import { safeLocalStorage } from 'common/safe-storage'
+import { safeLocalStorage, safeSessionStorage } from 'common/safe-storage'
 import { useEffect, useSyncExternalStore } from 'react'
 
-import { IA_NAV_FLAG, isIaNavVariant as isVariant, type IaNavVariant } from './constants'
+import {
+  IA_NAV_FLAG,
+  IA_NAV_OVERRIDE_KEY,
+  isIaNavVariant as isVariant,
+  type IaNavVariant,
+} from './constants'
+import { useIaNavRouteVariant } from './IaNavRouteProvider'
 
 const subscribeToNothing = () => () => {}
+
+// the session override is the variant a url forced earlier in this browser session
+const readSessionOverride = () => {
+  const stored = safeSessionStorage.getItem(IA_NAV_OVERRIDE_KEY)
+  return isVariant(stored) ? stored : null
+}
 
 // the url override wins, so a forced variant shows at hydration like a cached one
 const readKnownFlag = () => {
   const override = new URLSearchParams(window.location.search).get(IA_NAV_FLAG)
-  return isVariant(override) ? override : safeLocalStorage.getItem(LOCAL_STORAGE_KEYS.IA_NAV_FLAG)
+  if (isVariant(override)) return override
+  return readSessionOverride() ?? safeLocalStorage.getItem(LOCAL_STORAGE_KEYS.IA_NAV_FLAG)
 }
 
 /**
@@ -24,9 +37,18 @@ export function useIaNavVariant(): IaNavVariant {
   const { posthog, hasLoaded } = useFeatureFlags()
   const { hasAccepted } = useConsentState()
   const searchParams = useSearchParamsShallow()
-  const override = searchParams.get(IA_NAV_FLAG)
+  const routeVariant = useIaNavRouteVariant()
+  const sessionOverride = useSyncExternalStore(subscribeToNothing, readSessionOverride, () => null)
+  const urlOverride = searchParams.get(IA_NAV_FLAG)
+  const override = routeVariant ?? (isVariant(urlOverride) ? urlOverride : sessionOverride)
   // the value known before the flags load. it is null on the server and on a first visit
   const knownFlag = useSyncExternalStore(subscribeToNothing, readKnownFlag, () => null)
+
+  // exception: the url is outside React state and links drop it, so the override must outlive the page
+  useEffect(() => {
+    const urlOverride = new URLSearchParams(window.location.search).get(IA_NAV_FLAG)
+    if (isVariant(urlOverride)) safeSessionStorage.setItem(IA_NAV_OVERRIDE_KEY, urlOverride)
+  }, [searchParams])
 
   // a failed posthog request loads no flags at all, so the last assignment stays
   const hasPosthogFlags = hasLoaded && Object.keys(posthog).length > 0
@@ -44,13 +66,13 @@ export function useIaNavVariant(): IaNavVariant {
 
   useEffect(() => {
     // the cached flag can be stale, so only the loaded flag records an exposure
-    if (!hasPosthogFlags || !isAssigned) return
+    if (!hasPosthogFlags || !isAssigned || routeVariant) return
     // useSearchParamsShallow is empty until its own effect runs, so read the URL directly.
     const urlOverride = new URLSearchParams(window.location.search).get(IA_NAV_FLAG)
-    if (isVariant(urlOverride)) return
+    if (isVariant(urlOverride) || sessionOverride) return
 
     posthogClient.captureExperimentExposure(IA_NAV_FLAG, { variant: flagVariant }, hasAccepted)
-  }, [hasPosthogFlags, isAssigned, flagVariant, hasAccepted])
+  }, [hasPosthogFlags, isAssigned, routeVariant, sessionOverride, flagVariant, hasAccepted])
 
   return isVariant(override) ? override : flagVariant
 }

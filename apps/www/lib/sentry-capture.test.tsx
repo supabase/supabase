@@ -129,4 +129,10 @@ describe('browser error reporting', () => {
       )
     }
   )
+
+  it('does not send browser extension messaging errors', async () => {
+    Sentry.captureException(new Error('Invalid call to runtime.sendMessage(). Tab not found.'))
+    await Sentry.flush()
+    expect(events()).toEqual([])
+  })
 })

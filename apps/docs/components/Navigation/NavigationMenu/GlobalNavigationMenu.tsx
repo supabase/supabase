@@ -1,8 +1,7 @@
 'use client'
 
 import Link from 'next/link'
-import { usePathname } from 'next/navigation'
-import React, { FC } from 'react'
+import React, { FC, type ReactNode } from 'react'
 import { Badge, cn } from 'ui'
 import {
   TopNavMenu,
@@ -13,57 +12,99 @@ import {
   TopNavMenuPanel,
 } from 'ui-patterns/TopNav/TopNavMenu'
 
-import type { DropdownMenuItem } from '../Navigation.types'
+import type { DropdownMenuItem, GlobalMenuItems } from '../Navigation.types'
 import MenuIconPicker from './MenuIconPicker'
 import { getMenuGroupLabelByPath } from './NavigationMenu.utils'
-import { IA_NAV_PENDING_CLASS, useIaNavReady, useNavItems } from '@/features/IaNav'
+import { IA_NAV_PENDING_CLASS, useDocsPathname, useIaNavReady, useNavItems } from '@/features/IaNav'
+
+interface MenuItemLabelProps {
+  title: ReactNode
+  icon?: ReactNode
+  community?: boolean
+  isNew?: boolean
+  experimental?: boolean
+}
 
 const GlobalNavigationMenu: FC = () => {
   const { GLOBAL_MENU_ITEMS } = useNavItems()
   const isNavReady = useIaNavReady()
-  const pathname = usePathname()
+  const pathname = useDocsPathname()
   const activeLabel = getMenuGroupLabelByPath({ menu: GLOBAL_MENU_ITEMS, pathname })
   const itemClassName = cn(!isNavReady && IA_NAV_PENDING_CLASS)
 
   return (
-    <TopNavMenu className="ml-3.5">
-      {GLOBAL_MENU_ITEMS.filter(([section]) => section.enabled !== false).map(([section]) => {
-        const label =
-          section.label === 'Home' ? <MenuIconPicker icon={section.icon || ''} /> : section.label
-        const ariaCurrent = activeLabel === section.label ? 'true' : undefined
+    <>
+      <TopNavMenu data-docs-nav="top-nav" className="ml-3.5">
+        {GLOBAL_MENU_ITEMS.filter(([section]) => section.enabled !== false).map(([section]) => {
+          const label =
+            section.label === 'Home' ? <MenuIconPicker icon={section.icon || ''} /> : section.label
+          const ariaCurrent = activeLabel === section.label ? 'true' : undefined
 
-        return section.menuItems ? (
-          <TopNavMenuItem
-            key={section.label}
-            label={label}
-            aria-current={ariaCurrent}
-            className={itemClassName}
-          >
-            <TopNavMenuPanel>
-              {section.menuItems.map((group, index) => (
-                <GlobalMenuGroup
-                  key={group[0].label}
-                  items={group}
-                  fallbackLabel={index === 0 ? section.label : undefined}
-                />
-              ))}
-            </TopNavMenuPanel>
-          </TopNavMenuItem>
-        ) : (
-          <TopNavMenuLink
-            key={section.label}
-            linkAs={Link}
-            href={section.href || '#'}
-            aria-current={ariaCurrent}
-            className={itemClassName}
-          >
-            {label}
-          </TopNavMenuLink>
-        )
-      })}
-    </TopNavMenu>
+          return section.menuItems ? (
+            <TopNavMenuItem
+              key={section.label}
+              label={label}
+              aria-current={ariaCurrent}
+              className={itemClassName}
+            >
+              <TopNavMenuPanel>
+                {section.menuItems.map((group, index) => (
+                  <GlobalMenuGroup
+                    key={group[0].label}
+                    items={group}
+                    fallbackLabel={index === 0 ? section.label : undefined}
+                  />
+                ))}
+              </TopNavMenuPanel>
+            </TopNavMenuItem>
+          ) : (
+            <TopNavMenuLink
+              key={section.label}
+              linkAs={Link}
+              href={section.href || '#'}
+              aria-current={ariaCurrent}
+              className={itemClassName}
+            >
+              {label}
+            </TopNavMenuLink>
+          )
+        })}
+      </TopNavMenu>
+      <GlobalMenuPanelsFallback menuItems={GLOBAL_MENU_ITEMS} />
+    </>
   )
 }
+
+// the menu panels mount on the client, so their links are also rendered for readers without JavaScript
+const GlobalMenuPanelsFallback = ({ menuItems }: { menuItems: GlobalMenuItems }) => (
+  <noscript>
+    <nav aria-label="Docs sections" data-docs-nav="top-nav-subheads" className="sr-only">
+      {menuItems
+        .filter(([section]) => section.enabled !== false && section.menuItems)
+        .map(([section]) => (
+          <section key={section.label}>
+            <h2>{section.label}</h2>
+            {section.menuItems?.map((group) => {
+              const enabledItems = group.filter((item) => item.enabled !== false)
+              const heading = enabledItems.find((item) => !item.href)?.label
+
+              return (
+                <ul key={group[0].label} aria-label={heading}>
+                  {enabledItems.map((item) =>
+                    item.href ? (
+                      <li key={item.href}>
+                        <Link href={item.href}>{item.label}</Link>
+                      </li>
+                    ) : null
+                  )}
+                </ul>
+              )
+            })}
+          </section>
+        ))}
+    </nav>
+  </noscript>
+)
 
 // an item without a link is the heading of its group. the first group falls back to the menu name
 const GlobalMenuGroup = ({
@@ -91,6 +132,26 @@ const GlobalMenuGroup = ({
   )
 }
 
+export const MenuItemLabel = ({
+  title,
+  icon,
+  community,
+  isNew,
+  experimental,
+}: MenuItemLabelProps) => (
+  <>
+    {icon ? (
+      <span aria-hidden className="contents">
+        {icon}
+      </span>
+    ) : null}
+    <span className="flex-1">{title}</span>
+    {community ? <Badge>Community</Badge> : null}
+    {isNew ? <Badge variant="success">New</Badge> : null}
+    {experimental ? <Badge variant="warning">Experimental</Badge> : null}
+  </>
+)
+
 export const MenuItem = React.forwardRef<
   React.ElementRef<'a'>,
   React.ComponentPropsWithoutRef<'a'> & {
@@ -116,13 +177,13 @@ export const MenuItem = React.forwardRef<
         {...props}
       >
         {children ?? (
-          <>
-            {icon && <MenuIconPicker icon={icon} className="text-foreground-lighter" />}
-            <span className="flex-1">{title}</span>
-            {community && <Badge>Community</Badge>}
-            {isNew && <Badge variant="success">New</Badge>}
-            {experimental && <Badge variant="warning">Experimental</Badge>}
-          </>
+          <MenuItemLabel
+            title={title}
+            icon={icon ? <MenuIconPicker icon={icon} className="text-foreground-lighter" /> : null}
+            community={community}
+            isNew={isNew}
+            experimental={experimental}
+          />
         )}
       </Link>
     )

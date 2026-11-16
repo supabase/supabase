@@ -31,6 +31,8 @@ export async function deleteTable({
   const { result } = await executeSql<void>({
     projectRef,
     connectionString,
+    sqlOrigin: 'studio',
+    queryName: 'table-delete',
     sql,
     queryKey: ['table', 'delete', id],
     grant: unguarded.migrating,

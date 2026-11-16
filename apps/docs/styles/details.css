@@ -1,0 +1,72 @@
+/* Native <details> / <summary> used for expandable content in MDX.
+ * Styled to match the shared accordion: bordered rows, a trailing chevron that
+ * rotates when open, and no default disclosure triangle. */
+
+.prose :where(details):not(:where([class~='not-prose'], [class~='not-prose'] *)) {
+  @apply border-b border-default;
+  margin-block: 0;
+}
+
+.prose :where(details > summary):not(:where([class~='not-prose'], [class~='not-prose'] *)) {
+  /* Not flex: inline code in a summary would split into separate flex items. */
+  @apply relative block cursor-pointer py-4 pr-6 text-sm font-medium;
+  list-style: none;
+}
+
+.prose :where(details > summary):not(:where([class~='not-prose'], [class~='not-prose'] *))::marker,
+.prose
+  :where(details > summary):not(
+    :where([class~='not-prose'], [class~='not-prose'] *)
+  )::-webkit-details-marker {
+  display: none;
+}
+
+.prose :where(details > summary):not(:where([class~='not-prose'], [class~='not-prose'] *)):hover {
+  @apply underline;
+}
+
+.prose :where(details > summary):not(:where([class~='not-prose'], [class~='not-prose'] *))::after {
+  content: '';
+  position: absolute;
+  top: 50%;
+  right: 0;
+  margin-top: -0.5rem;
+  width: 1rem;
+  height: 1rem;
+  background-color: currentColor;
+  /* lucide chevron-down */
+  -webkit-mask: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 24 24' fill='none' stroke='black' stroke-width='2' stroke-linecap='round' stroke-linejoin='round'%3E%3Cpath d='m6 9 6 6 6-6'/%3E%3C/svg%3E")
+    center / contain no-repeat;
+  mask: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 24 24' fill='none' stroke='black' stroke-width='2' stroke-linecap='round' stroke-linejoin='round'%3E%3Cpath d='m6 9 6 6 6-6'/%3E%3C/svg%3E")
+    center / contain no-repeat;
+  transition: transform 200ms;
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .prose
+    :where(details > summary):not(:where([class~='not-prose'], [class~='not-prose'] *))::after {
+    transition: none;
+  }
+}
+
+.prose
+  :where(details[open] > summary):not(:where([class~='not-prose'], [class~='not-prose'] *))::after {
+  transform: rotate(180deg);
+}
+
+/* Forced colors replaces background colors, which would hide the masked chevron.
+ * A system color is preserved, so use one. */
+@media (forced-colors: active) {
+  .prose
+    :where(details > summary):not(:where([class~='not-prose'], [class~='not-prose'] *))::after {
+    background-color: CanvasText;
+  }
+}
+
+.prose :where(details > summary + *):not(:where([class~='not-prose'], [class~='not-prose'] *)) {
+  margin-top: 0;
+}
+
+.prose :where(details > :last-child):not(:where([class~='not-prose'], [class~='not-prose'] *)) {
+  margin-bottom: 1rem;
+}

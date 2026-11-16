@@ -54,7 +54,7 @@ Each content collection renders through a matching catch-all page — e.g. `src/
 (`src/pages/topics/[topic].astro`) are generated from the `TOPICS` list in `src/lib/topics.ts`, not from
 content files, and read from every collection.
 
-Separately, `scripts/generate-markdown.ts` runs as a `prebuild` step and exports every content file — plus
+Separately, `scripts/generate-markdown.ts` runs as the `generate:markdown` turbo task (a `build` dependency) and exports every content file — plus
 one page per topic, listing its guides, and a root `sitemap.md` linking every topic, guide, FAQ, and troubleshooting article — as a plain `.md` file under the gitignored `public/markdown/`,
 mirroring the page's URL with a `.md` extension. `vercel.json` permanently redirects `<page>.md` requests to
 these generated files, one redirect entry per route section (`guides`, `topics`, `troubleshooting`). It also
@@ -75,8 +75,8 @@ Articles tagged with the `Comparison` topic are primarily oriented towards LLM c
 
 ## Federated troubleshooting content
 
-`src/content/troubleshooting/` is never hand-authored — it's gitignored and regenerated every `prebuild` by
-`scripts/federated-content/fetch-federated-content.ts`, which fetches it from the private
+`src/content/troubleshooting/` is never hand-authored — it's gitignored and regenerated on every build by the uncached `fetch:federated-content` turbo task
+(`scripts/federated-content/fetch-federated-content.ts`), which fetches it from the private
 `supabase/troubleshooting` repo. It has its own collection and route (`src/pages/troubleshooting/[...slug].astro`),
 separate from `guides`.
 
@@ -94,7 +94,7 @@ to `GH_TOKEN`/`GITHUB_TOKEN` for local dev — see `.env.example`.
 
 Syncing guides to GitHub Discussions (`scripts/federated-content/sync-troubleshooting-entries.ts` and
 `sync-troubleshooting-updates.ts`) is a separate concern from fetching — see `.github/workflows/kb-troubleshooting-sync.yml`
-and the README's "Workflows" section. Those scripts are CI-only, never part of `prebuild`.
+and the README's "Workflows" section. Those scripts are CI-only, never part of `build`.
 
 How the sync scripts match guides to rows: a guide's key is its file name without the extension, hash suffix
 included (`foo-bar-94a76b.mdx` -> `foo-bar-94a76b`), and that exact string is `troubleshooting_entries.slug`.

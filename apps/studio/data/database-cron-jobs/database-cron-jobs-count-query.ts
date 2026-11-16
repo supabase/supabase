@@ -23,6 +23,8 @@ export async function getDatabaseCronJobsCount({
   const { result } = await executeSql({
     projectRef,
     connectionString,
+    sqlOrigin: 'studio',
+    queryName: 'cron-jobs-count',
     sql: cronJobCountSql,
     queryKey: ['cron-jobs-count'],
     grant: unguarded.migrating,

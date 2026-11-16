@@ -132,10 +132,12 @@ export const ServiceStatus = () => {
   const branchesGrant = useGrant('GET /v1/projects/{ref}/branches', {
     projectRef: branchesProjectRef,
   })
-  const { data: branches, isPending: isBranchesPending } = useQuery({
-    ...branchesQueryOptions({ projectRef: branchesProjectRef, grant: branchesGrant.grant }),
-    enabled: isBranch,
-  })
+  const { data: branches, isPending: isBranchesPending } = useQuery(
+    branchesQueryOptions(
+      { projectRef: branchesProjectRef, grant: branchesGrant.grant },
+      { enabled: isBranch }
+    )
+  )
   const isBranchesLoading =
     isBranch &&
     (branchesGrant.status === 'loading' ||

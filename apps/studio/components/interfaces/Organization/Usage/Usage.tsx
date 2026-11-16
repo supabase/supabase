@@ -89,13 +89,15 @@ export const Usage = () => {
     isError: isErrorBranchesQuery,
     isSuccess: isSuccessBranches,
     error: branchesQueryError,
-  } = useQuery({
-    ...branchesQueryOptions({
-      projectRef: selectedProjectRef ?? undefined,
-      grant: branchesGrant.grant,
-    }),
-    enabled: isBranchesQueryEnabled,
-  })
+  } = useQuery(
+    branchesQueryOptions(
+      {
+        projectRef: selectedProjectRef ?? undefined,
+        grant: branchesGrant.grant,
+      },
+      { enabled: isBranchesQueryEnabled }
+    )
+  )
   const isPendingBranches =
     isBranchesQueryEnabled &&
     (branchesGrant.status === 'loading' ||

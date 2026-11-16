@@ -6,11 +6,16 @@ import { UseCustomQueryOptions } from '@/types'
 
 export type NetworkRestrictionsVariables = { projectRef?: string }
 
+type NetworkRestrictionsConfig = { dbAllowedCidrs: string[]; dbAllowedCidrsV6?: string[] }
+
 export type NetworkRestrictionsResponse = {
   entitlement: 'disallowed' | 'allowed'
   status: '' | 'stored' | 'applied'
-  config: { dbAllowedCidrs: string[] }
-  old_config?: { dbAllowedCidrs: string[] }
+  config: NetworkRestrictionsConfig
+  old_config?: NetworkRestrictionsConfig
+  pending_config?: Partial<NetworkRestrictionsConfig>
+  pending_requested_at?: string
+  updated_at?: string
   error?: any
 }
 

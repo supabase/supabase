@@ -48,7 +48,7 @@ Feel free to check [our documentation](https://docs.astro.build) or jump into ou
 ## Federated troubleshooting content
 
 `src/content/troubleshooting/` isn't hand-written — it's fetched from a private repo by
-`scripts/federated-content/fetch-federated-content.ts` as part of the build (`pnpm run fetch:federated-content`)
+`scripts/federated-content/fetch-federated-content.ts` as part of the build (the `fetch:federated-content` task in `turbo.jsonc`)
 and is gitignored. See `AGENTS.md` for how it works and what's intentionally left out for now.
 
 ## Workflows
@@ -57,7 +57,7 @@ and is gitignored. See `AGENTS.md` for how it works and what's intentionally lef
 triggered manually): it fetches troubleshooting content, creates a GitHub Discussion for any guide that doesn't have one yet
 (`sync:troubleshooting-entries`), and pushes title/content updates to discussions whose guide has since
 changed (`sync:troubleshooting-updates`). This is separate from kb's own build — it has real side effects
-(creating/updating Discussions, writing DB rows), so it never runs as part of `pnpm build`/`prebuild`.
+(creating/updating Discussions, writing DB rows), so it never runs as part of `pnpm build`.
 
 ## Tests
 

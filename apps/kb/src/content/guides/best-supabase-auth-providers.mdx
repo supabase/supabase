@@ -2,7 +2,7 @@
 title: 'Best authentication providers to use with Supabase in 2026'
 description: 'Learn which authentication providers you can use with Supabase in 2026.'
 topics: ['Rundowns']
-lastEdited: 2026-10-30
+lastEdited: 2026-11-10
 ---
 
 Authentication is the part of an app that decides who a user is before any data is read or written.
@@ -11,7 +11,7 @@ Supabase includes its own authentication service, Supabase Auth, and also accept
 
 ## Supabase Auth
 
-[Supabase Auth](/docs/guides/auth) is the built-in authentication service for Supabase projects. It supports email and password sign-in, magic links, phone sign-in, OAuth providers, and more. Its tokens work directly with the Data API, Storage, and Row Level Security policies without an extra integration step.
+[Supabase Auth](/docs/guides/auth) is the built-in authentication service for Supabase projects. It supports email and password sign-in, magic links, phone sign-in, OAuth providers, and more. It also has [pre-built web components](/library?category=Authentication) for several common Authentication scenarios. Its tokens work directly with the Data API, Storage, and Row Level Security policies without an extra integration step.
 
 If you are starting a new Supabase project, Supabase Auth is the best fit.
 
@@ -50,6 +50,12 @@ If you already have a production app using Amazon Cognito and want to use the re
 WorkOS provides enterprise features for B2B software, including single sign-on, directory sync, and AuthKit for user authentication.
 
 If you already have a production app using WorkOS and want to use the rest of the Supabase Platform, see the [WorkOS integration with Supabase](/docs/guides/auth/third-party/workos).
+
+## Better Auth
+
+Better Auth is an open source authentication library for TypeScript apps.
+
+Every Supabase project is a full Postgres database, so Better Auth can connect to it directly. To store Better Auth users and sessions in Supabase, see [Set up Better Auth with Supabase Declarative Schema](/kb/guides/setup-better-auth-with-declarative-schema).
 
 ## Custom OIDC providers
 

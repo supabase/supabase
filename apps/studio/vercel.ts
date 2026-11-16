@@ -9,17 +9,6 @@ import {
 } from './redirects.shared'
 import { getSecurityHeaders } from './security-headers'
 
-// STUDIO_FRAMEWORK gates the TanStack Start deploy. When the env var is
-// unset (the default — used by the Next.js prod deploy) this file returns
-// an empty `VercelConfig` so Vercel honours the dashboard-configured
-// Next.js preset untouched. Vercel reads `vercel.ts` regardless of the
-// framework preset (per vercel.com/docs/project-configuration —
-// `vercel.ts`'s `framework` field overrides the dashboard preset), so a
-// no-op early return is the only way to keep `framework: null` and the
-// headers below from clobbering the Next build. Set
-// `STUDIO_FRAMEWORK=tanstack` on the TanStack Vercel project to opt in.
-const isTanstack = process.env.STUDIO_FRAMEWORK === 'tanstack'
-
 // Routing lives in Nitro's Build Output config (`.vercel/output/config.json`,
 // shaped by scripts/vercel-spa-routes.ts). Vercel applies this file's
 // `redirects`/`headers` ahead of it, which is also why no `rewrites` belong
@@ -87,7 +76,7 @@ function buildRedirects(): Redirect[] {
   ]
 }
 
-function buildTanstackConfig(): VercelConfig {
+function buildConfig(): VercelConfig {
   // Vercel's Flags Explorer probes `/.well-known/vercel/flags` and expects
   // JSON. next.config.ts proxies it to supabase.com's endpoint and forces
   // `content-type: application/json`; mirror that here. It lives at the domain
@@ -112,10 +101,7 @@ function buildTanstackConfig(): VercelConfig {
   }
 }
 
-// Empty config = no overrides; Vercel falls back to the dashboard preset.
-const passthrough: VercelConfig = {}
-
-export const config: VercelConfig = isTanstack ? buildTanstackConfig() : passthrough
+export const config: VercelConfig = buildConfig()
 
 // Belt-and-braces: local @vercel/config CLI reads module.default, but the
 // docs claim Vercel's platform looks for a named `config` export. Export

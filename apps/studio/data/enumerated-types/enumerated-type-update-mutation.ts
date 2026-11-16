@@ -29,6 +29,8 @@ export async function updateEnumeratedType({
   const { result } = await executeSql({
     projectRef,
     connectionString,
+    sqlOrigin: 'studio',
+    queryName: 'enumerated-type-update',
     sql,
     grant: unguarded.migrating,
   })

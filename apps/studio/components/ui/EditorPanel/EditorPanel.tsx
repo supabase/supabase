@@ -247,6 +247,7 @@ export const EditorPanel = () => {
 
     executeSql({
       sql: applyAutoLimit(acceptUntrustedSql(currentValue), 100).sql,
+      sqlOrigin: 'user',
       projectRef: project?.ref,
       connectionString: project?.connectionString,
       isStatementTimeoutDisabled: true,
