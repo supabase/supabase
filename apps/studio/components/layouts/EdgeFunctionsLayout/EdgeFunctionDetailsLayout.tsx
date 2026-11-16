@@ -27,13 +27,18 @@ import { PageNav } from 'ui-patterns/PageNav'
 import { ProjectLayout } from '../ProjectLayout'
 import EdgeFunctionsLayout from './EdgeFunctionsLayout'
 import { useUnifiedLogsPreview } from '@/components/interfaces/App/FeaturePreview/FeaturePreviewContext'
+import { extractFunctionSourcesFromEszip } from '@/components/interfaces/EdgeFunctions/EdgeFunctions.eszip'
 import { EdgeFunctionTesterSheet } from '@/components/interfaces/Functions/EdgeFunctionDetails/EdgeFunctionTesterSheet'
 import { useFunctionsDetailShortcuts } from '@/components/interfaces/Functions/useFunctionsDetailShortcuts'
 import { DocsButton } from '@/components/ui/DocsButton'
 import { NoPermission } from '@/components/ui/NoPermission'
 import { ShortcutTooltip } from '@/components/ui/ShortcutTooltip'
 import { useProjectApiUrl } from '@/data/config/project-endpoint-query'
-import { useEdgeFunctionBodyQuery } from '@/data/edge-functions/edge-function-body-query'
+import {
+  getEdgeFunctionBodyEszip,
+  isFunctionBodyMaxSizeError,
+  useEdgeFunctionBodyQuery,
+} from '@/data/edge-functions/edge-function-body-query'
 import { useEdgeFunctionQuery } from '@/data/edge-functions/edge-function-query'
 import { FGA_PERMISSIONS, useAsyncCheckPermissionsV2 } from '@/hooks/misc/useCheckPermissionsV2'
 import { withAuth } from '@/hooks/misc/withAuth'
@@ -129,13 +134,31 @@ const EdgeFunctionDetailsLayout = ({
     : []
 
   const downloadFunction = async () => {
-    if (filesError) return toast.error('Failed to retrieve edge function files')
+    const isExceedMaxSize = isFunctionBodyMaxSizeError(filesError)
+    if (filesError && !isExceedMaxSize) {
+      return toast.error('Failed to retrieve edge function files')
+    }
+
+    // The multipart response is capped in size, so for large functions we fall back to the raw
+    // eszip bundle and extract the original sources from it
+    let files = functionBody.files
+
+    if (isExceedMaxSize) {
+      try {
+        const eszip = await getEdgeFunctionBodyEszip({ projectRef: ref, slug: functionSlug })
+        files = await extractFunctionSourcesFromEszip(eszip)
+      } catch (error) {
+        return toast.error(
+          `Failed to download edge function: ${error instanceof Error ? error.message : 'Unknown error'}`
+        )
+      }
+    }
 
     const zipFileWriter = new BlobWriter('application/zip')
     const zipWriter = new ZipWriter(zipFileWriter, { bufferedWrite: true })
 
     // Extract file paths relative to function slug
-    const filePaths = functionBody.files.map((file) => {
+    const filePaths = files.map((file) => {
       const nameSections = file.name.split('/')
       const slugIndex = nameSections.indexOf(functionSlug ?? '')
       return nameSections.slice(slugIndex + 1).join('/')
@@ -157,7 +180,7 @@ const EdgeFunctionDetailsLayout = ({
     })
 
     // Add files to zip with normalized paths
-    functionBody.files.forEach((file) => {
+    files.forEach((file) => {
       const nameSections = file.name.split('/')
       const slugIndex = nameSections.indexOf(functionSlug ?? '')
       const fileName = nameSections.slice(slugIndex + 1).join('/')

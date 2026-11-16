@@ -185,9 +185,14 @@ const CodePage = () => {
               <li>Update to the latest Supabase CLI version</li>
               {isExceedMaxSize ? (
                 <li>
-                  Download your function via the CLI with:
-                  <br />
-                  <code>supabase functions download {functionSlug}</code>
+                  Download your function using either:
+                  <ul className="list-disc! mt-0!">
+                    <li>
+                      The CLI via: <code>supabase functions download {functionSlug}</code>{' '}
+                      (Recommended)
+                    </li>
+                    <li>Or try the "Download" button above</li>
+                  </ul>
                 </li>
               ) : (
                 <li>

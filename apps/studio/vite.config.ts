@@ -630,6 +630,18 @@ export default defineConfig(({ command, mode }) => {
           find: /^@sentry\/nextjs$/,
           replacement: path.resolve(rootDir, 'compat/sentry-nextjs.ts'),
         },
+        // `@deno/eszip` (lazy-loaded when downloading oversized edge functions) imports
+        // Node-only `@deno/shim-deno` and `undici`. The shim calls `os.platform()` at module
+        // scope, which throws in the browser ("os.platform is not a function"). Swap both
+        // for browser stand-ins.
+        {
+          find: /^@deno\/shim-deno$/,
+          replacement: path.resolve(rootDir, 'compat/deno-shim.ts'),
+        },
+        {
+          find: /^undici$/,
+          replacement: path.resolve(rootDir, 'compat/undici.ts'),
+        },
       ],
     },
     ...(basePath && { base: basePath }),
