@@ -1,7 +1,7 @@
 import { useQueryClient } from '@tanstack/react-query'
 import { useFlag } from 'common'
 import { LoaderIcon, ShieldIcon, WrenchIcon } from 'lucide-react'
-import { useEffect, useState } from 'react'
+import { useEffect, useEffectEvent, useState } from 'react'
 import { toast } from 'sonner'
 import {
   Button,
@@ -34,8 +34,10 @@ import { useProjectTransferPreviewQuery } from '@/data/projects/project-transfer
 import { FGA_PERMISSIONS, useAsyncCheckPermissionsV2 } from '@/hooks/misc/useCheckPermissionsV2'
 import { useSelectedProjectQuery } from '@/hooks/misc/useSelectedProject'
 import { DOCS_URL } from '@/lib/constants'
+import { useTrack } from '@/lib/telemetry/track'
 
 export const TransferProjectButton = () => {
+  const track = useTrack()
   const { data: project } = useSelectedProjectQuery()
   const projectRef = project?.ref
   const projectOrgId = project?.organization_id
@@ -68,6 +70,24 @@ export const TransferProjectButton = () => {
     { enabled: !isTransferring && isOpen }
   )
   const queryClient = useQueryClient()
+
+  const trackBlockedNoticeExposed = useEffectEvent(
+    (preview: NonNullable<typeof transferPreviewData>) => {
+      track('project_transfer_blocked_notice_exposed', {
+        sourcePlan: preview.source_subscription_plan,
+        targetPlan: preview.target_subscription_plan,
+        membersExceedingLimitCount: preview.members_exceeding_free_project_limit.length,
+      })
+    }
+  )
+
+  useEffect(() => {
+    if (transferPreviewData === undefined) return
+    const isBlockedNoticeShown =
+      transferPreviewData.errors.length > 0 &&
+      transferPreviewData.members_exceeding_free_project_limit.length > 0
+    if (isBlockedNoticeShown) trackBlockedNoticeExposed(transferPreviewData)
+  }, [transferPreviewData])
 
   useEffect(() => {
     if (isOpen) {
