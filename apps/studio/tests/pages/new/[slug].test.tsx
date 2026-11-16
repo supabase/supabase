@@ -3,15 +3,16 @@ import userEvent from '@testing-library/user-event'
 import { platformComponents as components } from 'api-types'
 import { FeatureFlagContext } from 'common'
 import { mockAnimationsApi } from 'jsdom-testing-mocks'
-import { HttpResponse } from 'msw'
+import { http, HttpResponse } from 'msw'
 import { toast } from 'sonner'
-import { beforeEach, describe, expect, test, vi } from 'vitest'
+import { afterEach, beforeEach, describe, expect, test, vi } from 'vitest'
 
 import { AUTO_ENABLE_RLS_EVENT_TRIGGER_SQL } from '@/components/interfaces/Database/Triggers/EventTriggersList/EventTriggers.constants'
 import { FGA_PERMISSIONS } from '@/hooks/misc/useCheckPermissionsV2'
+import type { StatusPageResponse } from '@/lib/status-page/status-page.schema'
 import { createMockOrganizationResponse } from '@/tests/helpers'
 import { customRender } from '@/tests/lib/custom-render'
-import { addAPIMock, type APIErrorBody } from '@/tests/lib/msw'
+import { addAPIMock, mswServer, type APIErrorBody } from '@/tests/lib/msw'
 import { mockPermissions } from '@/tests/lib/msw-permissions'
 import type { PermissionsV2Response } from '@/tests/lib/permissions-fixtures'
 import { createMockProfileContext } from '@/tests/lib/profile-helpers'
@@ -201,6 +202,17 @@ function mockWizardEndpoints(
     githubRepositories?: GitHubRepositoriesResponse
   } = {}
 ) {
+  mswServer.use(
+    http.get('*/api/status-page', () =>
+      HttpResponse.json<StatusPageResponse>({
+        page_title: 'Supabase',
+        page_url: 'https://status.supabase.com',
+        ongoing_incidents: [],
+        in_progress_maintenances: [],
+        scheduled_maintenances: [],
+      })
+    )
+  )
   addAPIMock({
     method: 'get',
     path: '/platform/organizations',
@@ -290,6 +302,7 @@ function mockWizardEndpoints(
 const DEFAULT_FLAGS = {
   disableProjectCreationAndUpdate: false,
   newProjectInternalOnlyConfiguration: false,
+  orgsAllowedToUseV3AdvancedDeployment: 'none',
   disableOrioleProjectCreation: false,
   defaultRegionRestrictedPool: false,
   projectCreationRestrictedRegions: false,
@@ -393,6 +406,123 @@ describe('project creation wizard', () => {
   beforeEach(() => {
     user = userEvent.setup({ delay: null })
     routerMock.setCurrentUrl(`/new/${ORG_SLUG}`)
+  })
+
+  describe('production advanced deployment', () => {
+    beforeEach(() => {
+      vi.stubEnv('NEXT_PUBLIC_ENVIRONMENT', 'prod')
+    })
+    afterEach(() => vi.unstubAllEnvs())
+
+    test.each(['none', '', 'other-org', 'default-org-other,prefix-default-org'])(
+      'hides deployment configuration when the organization is absent from %j',
+      async (allowedOrganizations) => {
+        mockWizardEndpoints()
+        await renderWizard({
+          flags: { orgsAllowedToUseV3AdvancedDeployment: allowedOrganizations },
+        })
+
+        await screen.findByPlaceholderText('Project name')
+        expect(
+          screen.queryByRole('button', { name: 'Internal-only Configuration' })
+        ).not.toBeInTheDocument()
+      }
+    )
+
+    test('keeps deployment controls hidden when only the internal staff flag is enabled', async () => {
+      mockWizardEndpoints()
+      await renderWizard({ flags: { newProjectInternalOnlyConfiguration: true } })
+
+      fireEvent.click(await screen.findByRole('button', { name: 'Internal-only Configuration' }))
+
+      expect(screen.queryByText('Cloud provider')).not.toBeInTheDocument()
+      expect(screen.queryByText('Kubernetes cluster ID')).not.toBeInTheDocument()
+      expect(screen.queryByText('Custom instance type')).not.toBeInTheDocument()
+    })
+
+    test.each([false, true])(
+      'submits an AWS_K8S cluster override in production with force=%s',
+      async (force) => {
+        mockWizardEndpoints()
+        const onRequest = vi.fn()
+        mockCreateProject(onRequest)
+        await renderWizard({
+          flags: { orgsAllowedToUseV3AdvancedDeployment: 'other-org, default-org ' },
+        })
+
+        await fillProjectName('Advanced Deployment Project')
+        await generateAndWaitForStrongPassword()
+        fireEvent.click(await screen.findByRole('button', { name: 'Internal-only Configuration' }))
+
+        expect(screen.queryByText('Custom Postgres version')).not.toBeInTheDocument()
+        expect(screen.queryByText('Custom instance type')).not.toBeInTheDocument()
+        expect(screen.queryByText('Kubernetes cluster ID')).not.toBeInTheDocument()
+        await user.click(getSelectTriggerByLabel('Cloud provider'))
+        expect(
+          within(await screen.findByRole('listbox')).queryByRole('option', { name: 'AWS (Nimbus)' })
+        ).not.toBeInTheDocument()
+        await user.click(await findOption('AWS (Revamped)'))
+        await selectRegion(/East US/)
+
+        fireEvent.change(
+          screen.getByPlaceholderText('e.g dev-gbl-a001-c003-k001-0-eksCluster-038b450'),
+          {
+            target: { value: 'prod-cluster-eksCluster-123' },
+          }
+        )
+        if (force) {
+          await user.click(screen.getByRole('checkbox', { name: 'Force-deploy to this cluster' }))
+        }
+
+        fireEvent.click(screen.getByRole('button', { name: 'Create new project' }))
+        await waitFor(() => expect(onRequest).toHaveBeenCalled())
+        expect(onRequest.mock.calls[0][0]).toMatchObject({
+          cloud_provider: 'AWS_K8S',
+          custom_supabase_internal_requests: {
+            kubernetes_cluster_id: 'prod-cluster-eksCluster-123',
+            ...(force && { kubernetes_cluster_force: true }),
+          },
+        })
+        expect(onRequest.mock.calls[0][0].custom_supabase_internal_requests).not.toHaveProperty(
+          'ami'
+        )
+        if (!force) {
+          expect(onRequest.mock.calls[0][0].custom_supabase_internal_requests).not.toHaveProperty(
+            'kubernetes_cluster_force'
+          )
+        }
+      }
+    )
+
+    test('clears cluster placement when switching back to AWS', async () => {
+      mockWizardEndpoints()
+      const onRequest = vi.fn()
+      mockCreateProject(onRequest)
+      await renderWizard({
+        flags: { orgsAllowedToUseV3AdvancedDeployment: 'other-org, default-org ' },
+      })
+
+      await fillProjectName('Default Deployment Project')
+      await generateAndWaitForStrongPassword()
+      fireEvent.click(await screen.findByRole('button', { name: 'Internal-only Configuration' }))
+      await user.click(getSelectTriggerByLabel('Cloud provider'))
+      await user.click(await findOption('AWS (Revamped)'))
+      fireEvent.change(
+        screen.getByPlaceholderText('e.g dev-gbl-a001-c003-k001-0-eksCluster-038b450'),
+        {
+          target: { value: 'prod-cluster-eksCluster-123' },
+        }
+      )
+      await user.click(screen.getByRole('checkbox', { name: 'Force-deploy to this cluster' }))
+      await user.click(getSelectTriggerByLabel('Cloud provider'))
+      await user.click(await findOption('AWS'))
+
+      expect(screen.queryByText('Kubernetes cluster ID')).not.toBeInTheDocument()
+      fireEvent.click(screen.getByRole('button', { name: 'Create new project' }))
+      await waitFor(() => expect(onRequest).toHaveBeenCalled())
+      expect(onRequest.mock.calls[0][0].cloud_provider).toBe('AWS')
+      expect(onRequest.mock.calls[0][0].custom_supabase_internal_requests).toBeUndefined()
+    })
   })
 
   test('creates a project on the happy path for a paid-plan organization', async () => {
