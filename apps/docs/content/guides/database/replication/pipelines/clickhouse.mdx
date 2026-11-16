@@ -42,7 +42,7 @@ With `ReplacingMergeTree`, changing a source primary-key value removes the old k
 
 Managed Pipelines run in AWS `eu-central-1` (Frankfurt). When creating your ClickHouse service, choose a nearby region to [reduce replication latency](/docs/guides/database/replication/pipelines#region). Then prepare these resources in ClickHouse before creating the destination:
 
-1. Create an empty database for the replicated tables. In ClickHouse Cloud, open your service's **SQL console** and run `create database if not exists pipelines;`, replacing `pipelines` if you prefer another name. Pipelines creates and manages the tables and, for `ReplacingMergeTree`, the current-state views. Do not create or alter these objects yourself except when following a documented migration procedure.
+1. Create an empty database for the replicated tables. In ClickHouse Cloud, open your service's **SQL console** and run `create database if not exists pipelines;`, replacing `pipelines` if you prefer another name. Pipelines creates and manages the tables and, for `ReplacingMergeTree`, the current-state views. Do not create or alter these objects yourself.
 2. Create a dedicated database user for Pipelines and grant it access to that database. In ClickHouse Cloud, create this user in the **SQL console**; the organization's **Users and roles** page manages console members. The database user must be able to:
    - Query `system.databases`, `system.tables`, and `system.columns`
    - Create, alter, truncate, and drop tables
@@ -162,8 +162,6 @@ Pipelines creates ClickHouse columns with these mappings:
 Nullable scalar columns are wrapped in `Nullable(...)`. Character, text, `numeric`, `money`, JSON, `time`, `interval`, binary, bit-string, enum, and unsupported custom values are serialized into `String` columns rather than stored as native ClickHouse types.
 
 Postgres `timestamp` values keep their source wall-clock value in the UTC column. Infinite dates and timestamps are rejected. Keep finite dates and timestamps within ClickHouse's supported range, from 1900 through 2299; values outside it can read back at the range limits.
-
-Existing `timestamp` columns created as `DateTime64(6)` without an explicit time zone are not migrated automatically. Pipelines rejects them with a column type mismatch. A [table reset](/docs/guides/database/replication/pipelines-monitoring#restarting-tables) recreates the columns with UTC, but **deletes destination data and history**. If you need existing source rows copied again, select the table for **Initial sync**. To preserve destination history, follow the ETL repository's [timestamp migration procedure](https://github.com/supabase/etl/blob/main/crates/etl-destinations/src/clickhouse/README.md#timestamp-columns) on GitHub instead.
 
 ## Schema change support
 
