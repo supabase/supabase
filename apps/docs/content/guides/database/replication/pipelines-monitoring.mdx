@@ -71,6 +71,8 @@ The Dashboard displays **Unavailable** when Postgres returns no `safe_wal_size`.
 
 Pipelines keeps sending feedback during slow writes and while WAL reading is paused. It repeats the last safe position without acknowledging unfinished writes. A recent check-in and an active connection can therefore coexist with growing lag.
 
+Reading a change or having a destination accept it is not enough to advance durable progress. Retries can resend recent changes; see [delivery guarantees](/docs/guides/database/replication/pipelines-guarantees) for how each destination processes replay.
+
 The main slot tracks ongoing replication. [Table-sync slots](#initial-sync-and-table-sync-slots) appear temporarily during initial sync and have the same metrics.
 
 ### Slot statuses
@@ -140,7 +142,7 @@ Higher concurrency uses more source connections, and additional workers need mor
 | **Lost**                     | For a table-sync slot, retry the affected table. For the main slot, use the recovery procedure that follows.                                  |
 | **Unknown**                  | Check logs and slot details. If the state persists, contact support with the pipeline ID and error details.                                   |
 
-To recover a lost main slot, open **Edit pipeline > Advanced settings** and set **Invalidated slot behavior** to **Recreate slot**. Review the effects below, then click **Apply and restart pipeline** or **Apply and start pipeline**, depending on its current state.
+To recover a lost main slot, open **Edit pipeline > Advanced settings** and set **Invalidated slot behavior** to **Recreate slot**. Review the effects below, then save the changes and restart the pipeline. If it was stopped, start it after saving.
 
 **This replaces every destination table.** Existing source rows are copied only for tables [selected for initial sync](/docs/guides/database/replication/pipelines#choosing-which-tables-to-copy); excluded tables resume with new changes only. Data processed again is [billed again](/docs/guides/platform/manage-your-usage/pipelines#how-data-processed-is-measured).
 

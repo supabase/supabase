@@ -1,0 +1,50 @@
+---
+id: 'pipelines-guarantees'
+title: 'Delivery guarantees'
+description: 'Understand Supabase Pipelines delivery guarantees, how destinations prevent duplicate effects, and what to expect during retries, restarts, and recovery.'
+sidebar_label: 'Delivery guarantees'
+---
+
+<$Partial path="pipelines-public-alpha.mdx" />
+
+Supabase Pipelines provides at-least-once delivery. Retries and recovery can deliver the same change more than once.
+
+Depending on the destination, repeated changes are skipped, applied without changing the result again, or resolved when you query current state. Append-only histories can contain duplicates. Check your destination's guarantees before choosing how to query or process replicated data.
+
+## Retries and duplicate data
+
+If a destination write succeeds but the pipeline stops before saving its progress, recovery can send the change again. Pipelines advances its saved progress only after the destination confirms that the writes are durable.
+
+The destination determines what you see when this happens:
+
+| Destination                                                                                                 | What to expect after replay                                                                                                                             |
+| ----------------------------------------------------------------------------------------------------------- | ------------------------------------------------------------------------------------------------------------------------------------------------------- |
+| [BigQuery](/docs/guides/database/replication/pipelines/bigquery#delivery-and-replay)                        | At-least-once ingestion with idempotent updates: replay leaves the current row unchanged and cannot overwrite a newer change. Query the generated view. |
+| [ClickHouse: ReplacingMergeTree](/docs/guides/database/replication/pipelines/clickhouse#replacingmergetree) | At-least-once ingestion with query-time deduplication. The generated `__current` view resolves repeated row versions and excludes deleted rows.         |
+| [ClickHouse: MergeTree](/docs/guides/database/replication/pipelines/clickhouse#mergetree)                   | At-least-once ingestion. The history can contain repeated events; deduplicate them in your queries or downstream processing when needed.                |
+| [DuckLake](/docs/guides/database/replication/pipelines/ducklake#delivery-and-replay)                        | Exactly-once application of ongoing row changes to managed tables. Already committed changes are skipped during recovery.                               |
+| [Snowflake](/docs/guides/database/replication/pipelines/snowflake#delivery-and-replay)                      | Exactly-once ingestion of ongoing row changes into managed tables. Already committed changes are skipped during recovery.                               |
+
+These protections apply to the tables and views Pipelines maintains. If you use replicated data to update another system, that system needs its own protection against repeated processing. Data sent again can also be [billed again](/docs/guides/platform/manage-your-usage/pipelines#how-data-processed-is-measured).
+
+## Ordering and query visibility
+
+Pipelines preserves change order within each table.
+
+Replication is asynchronous. A successful source write does not mean the change is already available to destination queries. Tables can catch up at different speeds, and changes from one source transaction can become visible separately.
+
+During initial sync, destination tables can expose an incomplete copy. Wait for the relevant tables to become **Live** and catch up before treating them as a complete replica. [Zero replication lag](/docs/guides/database/replication/pipelines-monitoring#replication-lag-metrics) alone does not establish query visibility or initial-sync completion.
+
+## Restarts and recovery
+
+A pipeline restart normally resumes from saved progress. It can replay recent changes, which the destination processes as described in the table. An interrupted initial sync can instead discard its partial destination data and copy the table again.
+
+A [table restart](/docs/guides/database/replication/pipelines-monitoring#restarting-tables) deliberately deletes and rebuilds the selected destination tables. A published source `TRUNCATE` also clears the corresponding destination data. Both operations erase append-only history as well as current rows.
+
+After a table restart, current source rows are copied again only for tables selected for **Initial sync**. Excluded tables resume with new changes only.
+
+## Limits of recovery
+
+Delivery depends on Postgres retaining the changes the pipeline still needs. If a replication slot loses required write-ahead log (WAL), Pipelines cannot replay those changes. [Lost-slot recovery](/docs/guides/database/replication/pipelines-monitoring#respond-based-on-the-slot-status) rebuilds destination tables. A fresh initial sync can restore current source rows, but it cannot restore the missing change history.
+
+The publication and [initial sync selection](/docs/guides/database/replication/pipelines#choosing-which-tables-to-copy) define which data is replicated. Skipped initial syncs and filtered or unpublished changes are outside the delivery guarantee. Monitor [table errors and slot health](/docs/guides/database/replication/pipelines-monitoring), and follow each destination's key and replica-identity requirements.

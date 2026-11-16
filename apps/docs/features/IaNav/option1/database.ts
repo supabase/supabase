@@ -194,6 +194,10 @@ export const database: NavMenuConstant = {
             { name: 'DuckLake', url: '/guides/database/replication/pipelines/ducklake' },
             { name: 'Snowflake', url: '/guides/database/replication/pipelines/snowflake' },
             {
+              name: 'Delivery guarantees',
+              url: '/guides/database/replication/pipelines-guarantees',
+            },
+            {
               name: 'Monitoring pipelines',
               url: '/guides/database/replication/pipelines-monitoring',
             },

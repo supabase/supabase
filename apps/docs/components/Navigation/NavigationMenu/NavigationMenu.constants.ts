@@ -1266,6 +1266,10 @@ export const database: NavMenuConstant = {
               url: '/guides/database/replication/pipelines/snowflake' as `/${string}`,
             },
             {
+              name: 'Delivery guarantees',
+              url: '/guides/database/replication/pipelines-guarantees' as `/${string}`,
+            },
+            {
               name: 'Monitoring',
               url: '/guides/database/replication/pipelines-monitoring' as `/${string}`,
             },

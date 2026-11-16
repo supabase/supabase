@@ -46,11 +46,11 @@ The Dashboard validates source access, replication capacity, publication tables,
 
 Support differs by destination. Check the [schema-change guides](/docs/guides/database/replication/pipelines#schema-change-support) before changing column types, defaults, keys, or constraints.
 
-## Can data be processed more than once?
+## Can changes be delivered more than once? [#can-data-be-processed-more-than-once]
 
-Yes. Pipelines provides at-least-once processing: recovery can replay acknowledged data, and consumers of append-only histories must tolerate repeated events. Destination deduplication does not provide an exactly-once processing guarantee.
+Yes. Pipelines provides at-least-once delivery, so retries and recovery can send a change more than once. Depending on the destination, repeated changes are skipped, leave stored results unchanged, or are deduplicated when you query current state. Append-only histories, such as ClickHouse `MergeTree`, can contain repeated events.
 
-See the data models for [BigQuery](/docs/guides/database/replication/pipelines/bigquery#how-it-works), [ClickHouse](/docs/guides/database/replication/pipelines/clickhouse#choose-a-table-engine), [DuckLake](/docs/guides/database/replication/pipelines/ducklake#how-replication-works), and [Snowflake](/docs/guides/database/replication/pipelines/snowflake#append-only-change-history), and the [billing implications](/docs/guides/platform/manage-your-usage/pipelines#how-data-processed-is-measured).
+See [delivery guarantees](/docs/guides/database/replication/pipelines-guarantees) for destination behavior, ordering, and recovery limits, and [billing implications](/docs/guides/platform/manage-your-usage/pipelines#how-data-processed-is-measured) for data processed again.
 
 ## Why is a table not being replicated?
 
