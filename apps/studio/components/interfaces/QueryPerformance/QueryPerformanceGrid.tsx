@@ -46,6 +46,7 @@ import { QueryPerformanceRow } from './QueryPerformance.types'
 import { formatDuration } from './QueryPerformance.utils'
 import { NumericFilter } from '@/components/interfaces/Reports/v2/ReportsNumericFilter'
 import { ButtonTooltip } from '@/components/ui/ButtonTooltip'
+import { useFetchUntilScrollable } from '@/hooks/misc/useFetchUntilScrollable'
 
 interface QueryPerformanceGridProps {
   aggregatedData: QueryPerformanceRow[]
@@ -55,6 +56,9 @@ interface QueryPerformanceGridProps {
   onCurrentSelectQuery?: (query: string) => void
   onRetry?: () => void
   onScroll?: (event: UIEvent<HTMLDivElement>) => void
+  hasNextPage?: boolean
+  isFetchingNextPage?: boolean
+  fetchNextPage?: (options?: { cancelRefetch?: boolean }) => void
 }
 
 const calculateTimeConsumedWidth = (data: QueryPerformanceRow[]) => {
@@ -87,6 +91,9 @@ export const QueryPerformanceGrid = ({
   onCurrentSelectQuery,
   onRetry,
   onScroll,
+  hasNextPage,
+  isFetchingNextPage,
+  fetchNextPage,
 }: QueryPerformanceGridProps) => {
   const { sort, setSortConfig } = useQueryPerformanceSort()
   const gridRef = useRef<DataGridHandle>(null)
@@ -422,6 +429,16 @@ export const QueryPerformanceGrid = ({
 
     return data
   }, [aggregatedData, sort, search, roles, callsFilter])
+
+  const getScrollContainer = useCallback(() => gridRef.current?.element ?? null, [])
+  useFetchUntilScrollable({
+    getContainer: getScrollContainer,
+    hasNextPage,
+    isLoading,
+    isFetchingNextPage,
+    fetchNextPage,
+    rowCount: reportData.length,
+  })
 
   useEffect(() => {
     setSelectedRow(undefined)

@@ -250,6 +250,9 @@ export const WithStatements = ({
         }
         onRetry={handleRefresh}
         onScroll={handleScroll}
+        hasNextPage={hasNextPage}
+        isFetchingNextPage={isFetchingNextPage}
+        fetchNextPage={fetchNextPage}
       />
       <div
         className={cn('px-6 py-6 flex gap-x-4 border-t relative', {
