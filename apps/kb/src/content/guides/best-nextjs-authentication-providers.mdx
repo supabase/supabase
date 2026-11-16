@@ -22,7 +22,7 @@ Supabase Auth supports email and password sign-in, [magic links](/docs/guides/au
 
 Supabase Auth works natively with the [Data API](/docs/guides/api), [Storage](/docs/guides/storage), [Realtime](/docs/guides/realtime), and [Edge Functions](/docs/guides/functions), as well as [Row Level Security](/docs/guides/database/postgres/row-level-security) policies.
 
-For Next.js, the [`@supabase/ssr`](/docs/guides/auth/server-side/creating-a-client?queryGroups=framework&framework=nextjs) package stores the session in cookies, so it works in Server Components, Server Actions, Route Handlers, and Client Components. Supabase also offers [pre-built sign-in components](/library?category=Authentication) for Next.js.
+For Next.js, the [`@supabase/ssr`](/docs/guides/auth/server-side/creating-a-client?queryGroups=framework&framework=nextjs) package stores the session in cookies, so it works in Server Components, Server Actions, Route Handlers, and Client Components. Supabase also offers [pre-built sign-in omponents for web](/library?category=Authentication) for Next.js.
 
 To get started, see the [Next.js quickstart](/docs/guides/auth/quickstarts/nextjs).
 
@@ -60,7 +60,7 @@ Every Supabase project is a full Postgres database, so Better Auth can connect t
 
 ## When to choose which provider
 
-- **You are starting a new Next.js project, or already use Supabase:** Supabase Auth. Your users live in your Postgres database and Row Level Security policies work out of the box.
+- **You are starting a new Next.js project, or already use Supabase:** Supabase Auth. Your users live in your Postgres database and you can integrate with Row Level Security policies.
 - **You want a working Next.js app with sign-in already built:** the Supabase Auth [`with-supabase` template](/docs/guides/auth/quickstarts/nextjs), or Clerk.
 - **You need an established platform with many enterprise connections, or already use it:** Auth0.
 - **Enterprise customers require SSO and directory sync:** WorkOS. Supabase Auth also supports [SAML 2.0 single sign-on](/docs/guides/auth/enterprise-sso) if you want it in the same service as the rest of your backend.
