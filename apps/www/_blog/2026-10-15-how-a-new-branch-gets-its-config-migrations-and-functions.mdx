@@ -15,7 +15,7 @@ date: '2026-10-15'
 toc_depth: 3
 ---
 
-Supabase branches are their own projects, so three things have to land on one before you can use it: settings, schema, and edge functions. We run all three mostly in parallel when you create the branch.
+Supabase branches are their own projects, so three things have to land on one before you can use it: settings, schema, and [edge functions](/features/deno-edge-functions). We run all three mostly in parallel when you create the branch.
 
 You create a preview branch to test a schema change. About 20 seconds later (the median), the branch is ready, with your tables, settings, and Edge Functions in place. When a branch takes longer than expected, or a step fails, you need to know what ran in between.
 
@@ -55,7 +55,7 @@ graph TD
 
 ## Configuration
 
-Your branch starts with the same settings as your main project. We copy your Postgres settings, your connection pooler (Supavisor) settings, and your Auth, Data API, Realtime, and Storage config. SSL enforcement comes across too, along with your network restrictions if your main project has them. Auth secrets don't carry over. We also turn on Database Webhooks for the branch.
+Your branch starts with the same settings as your main project. We copy your Postgres settings, your connection pooler ([Supavisor](/features/supavisor)) settings, and your Auth, Data API, Realtime, and Storage config. SSL enforcement comes across too, along with your network restrictions if your main project has them. Auth secrets don't carry over. We also turn on Database Webhooks for the branch.
 
 ### Applying settings with one restart
 
@@ -107,7 +107,7 @@ The splitter is written in native Go and aims to be 100% compatible with psql's 
 
 Each file then runs in pipeline mode. We send every statement in the file, plus the row for the history table, to Postgres in one round trip. The batch runs as one transaction. A file either applies in full and gets its history row, or rolls back and leaves no trace.
 
-When a migration fails, the error shows which statement failed and points a caret at the position. A migration file older than the latest applied one still runs, with a warning. A version in the history table with no matching file fails the step.
+When a migration fails, the error shows which statement failed and points a caret at the position. A [migration file](/docs/guides/deployment/database-migrations) older than the latest applied one still runs, with a warning. A version in the history table with no matching file fails the step.
 
 ### Seed
 
