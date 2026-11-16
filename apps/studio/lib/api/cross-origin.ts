@@ -23,37 +23,43 @@ export function isCrossOriginRequest(request: Request): boolean {
   const origin = request.headers.get('origin')
   if (origin === null) return false
 
-  let originHost: string
+  let originUrl: URL
   try {
-    originHost = new URL(origin).host
+    originUrl = new URL(origin)
   } catch {
     // Opaque origins ("null") and malformed values
     return true
   }
 
-  return !requestedHosts(request.headers).includes(originHost)
+  return !isRequestedHost(originUrl, request.headers)
 }
 
-const HAS_PORT = /:\d+$/
-
 /**
- * The host (with port) the browser asked for. A proxy in front of Studio
- * forwards it in X-Forwarded-Host; without a proxy it's Host. Pages can't set
- * these headers on a cross-site form submit or simple fetch.
+ * Whether the origin is the host the browser asked for. A proxy in front of
+ * Studio forwards it in X-Forwarded-Host; without a proxy it's Host. Pages
+ * can't set these headers on a cross-site form submit or simple fetch.
  */
-function requestedHosts(headers: Headers): string[] {
+function isRequestedHost(origin: URL, headers: Headers): boolean {
   const first = (name: string) => headers.get(name)?.split(',')[0].trim().toLowerCase()
-
+  const host = first('host')
   const forwardedHost = first('x-forwarded-host')
-  if (!forwardedHost) {
-    const host = first('host')
-    return host ? [host] : []
+
+  if (!forwardedHost) return host === origin.host
+
+  // Kong rewrites Host to its upstream and leaves the port out of
+  // X-Forwarded-Host, so only the hostname can be compared there
+  if (hostnameOf(host) !== hostnameOf(forwardedHost)) {
+    return hostnameOf(forwardedHost) === origin.hostname
   }
 
-  // Kong leaves the port out of X-Forwarded-Host and sends it separately.
-  // The bare host still covers browsers on the default port.
-  const forwardedPort = first('x-forwarded-port')
-  return forwardedPort && !HAS_PORT.test(forwardedHost)
-    ? [forwardedHost, `${forwardedHost}:${forwardedPort}`]
-    : [forwardedHost]
+  return forwardedHost === origin.host
+}
+
+function hostnameOf(host: string | undefined): string | undefined {
+  if (!host) return undefined
+  try {
+    return new URL(`http://${host}`).hostname
+  } catch {
+    return undefined
+  }
 }

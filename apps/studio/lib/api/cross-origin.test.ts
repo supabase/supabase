@@ -68,11 +68,6 @@ describe('isCrossOriginRequest', () => {
         'http://studio.test:8000',
       ],
       [
-        'Kong',
-        { host: 'studio:3000', 'x-forwarded-host': 'studio.test', 'x-forwarded-port': '8000' },
-        'http://studio.test:8000',
-      ],
-      [
         'Caddy',
         { host: 'studio.test:8443', 'x-forwarded-host': 'studio.test:8443' },
         'https://studio.test:8443',
@@ -86,6 +81,20 @@ describe('isCrossOriginRequest', () => {
       const from = (origin: string) => isCrossOriginRequest(request('POST', { ...headers, origin }))
       expect(from(studio)).toBe(false)
       expect(from('http://studio.test:9999')).toBe(true)
+      expect(from('https://evil.example')).toBe(true)
+      expect(from('http://studio:3000')).toBe(true)
+    })
+
+    // Kong rewrites Host and reports its container port, whatever port is published
+    it('compares hostnames behind Kong', () => {
+      const headers = {
+        host: 'studio:3000',
+        'x-forwarded-host': 'studio.test',
+        'x-forwarded-port': '8000',
+      }
+      const from = (origin: string) => isCrossOriginRequest(request('POST', { ...headers, origin }))
+      expect(from('http://studio.test:8000')).toBe(false)
+      expect(from('http://studio.test:9000')).toBe(false)
       expect(from('https://evil.example')).toBe(true)
       expect(from('http://studio:3000')).toBe(true)
     })
