@@ -314,6 +314,8 @@ import { Route as ProjectRefStorageFilesBucketsBucketIdRouteImport } from './rou
 import { Route as ProjectRefStorageVectorsBucketsBucketIdRouteImport } from './routes/project/$ref/storage/vectors/buckets/$bucketId'
 import { Route as ApiPlatformAuthRefUsersIdIndexRouteImport } from './routes/api/platform/auth/$ref/users/$id/index'
 import { Route as ApiPlatformAuthRefUsersIdFactorsRouteImport } from './routes/api/platform/auth/$ref/users/$id/factors'
+import { Route as ApiPlatformProjectsRefAlertsIssuesIndexRouteImport } from './routes/api/platform/projects/$ref/alerts/issues/index'
+import { Route as ApiPlatformProjectsRefAlertsIssuesReadsRouteImport } from './routes/api/platform/projects/$ref/alerts/issues/reads'
 import { Route as ApiPlatformProjectsRefAnalyticsEndpointsNameRouteImport } from './routes/api/platform/projects/$ref/analytics/endpoints/$name'
 import { Route as ApiPlatformProjectsRefAnalyticsLogDrainsUuidRouteImport } from './routes/api/platform/projects/$ref/analytics/log-drains/$uuid'
 import { Route as ApiPlatformProjectsRefConfigSecretsUpdateStatusRouteImport } from './routes/api/platform/projects/$ref/config/secrets/update-status'
@@ -326,6 +328,7 @@ import { Route as ApiPlatformStorageRefVectorBucketsIdIndexRouteImport } from '.
 import { Route as ApiV1ProjectsRefFunctionsSlugIndexRouteImport } from './routes/api/v1/projects/$ref/functions/$slug/index'
 import { Route as ApiV1ProjectsRefFunctionsSlugBodyRouteImport } from './routes/api/v1/projects/$ref/functions/$slug/body'
 import { Route as ProjectRefIntegrationsIdPageIdChildIdIndexRouteImport } from './routes/project/$ref/integrations/$id/$pageId/$childId/index'
+import { Route as ApiPlatformProjectsRefAlertsIssuesAlertIssueIdActionsRouteImport } from './routes/api/platform/projects/$ref/alerts/issues/$alertIssueId/actions'
 import { Route as ApiPlatformStorageRefBucketsIdObjectsIndexRouteImport } from './routes/api/platform/storage/$ref/buckets/$id/objects/index'
 import { Route as ApiPlatformStorageRefBucketsIdObjectsDownloadRouteImport } from './routes/api/platform/storage/$ref/buckets/$id/objects/download'
 import { Route as ApiPlatformStorageRefBucketsIdObjectsListRouteImport } from './routes/api/platform/storage/$ref/buckets/$id/objects/list'
@@ -2033,6 +2036,18 @@ const ApiPlatformAuthRefUsersIdFactorsRoute =
     path: '/api/platform/auth/$ref/users/$id/factors',
     getParentRoute: () => rootRouteImport,
   } as any)
+const ApiPlatformProjectsRefAlertsIssuesIndexRoute =
+  ApiPlatformProjectsRefAlertsIssuesIndexRouteImport.update({
+    id: '/api/platform/projects/$ref/alerts/issues/',
+    path: '/api/platform/projects/$ref/alerts/issues/',
+    getParentRoute: () => rootRouteImport,
+  } as any)
+const ApiPlatformProjectsRefAlertsIssuesReadsRoute =
+  ApiPlatformProjectsRefAlertsIssuesReadsRouteImport.update({
+    id: '/api/platform/projects/$ref/alerts/issues/reads',
+    path: '/api/platform/projects/$ref/alerts/issues/reads',
+    getParentRoute: () => rootRouteImport,
+  } as any)
 const ApiPlatformProjectsRefAnalyticsEndpointsNameRoute =
   ApiPlatformProjectsRefAnalyticsEndpointsNameRouteImport.update({
     id: '/api/platform/projects/$ref/analytics/endpoints/$name',
@@ -2104,6 +2119,12 @@ const ProjectRefIntegrationsIdPageIdChildIdIndexRoute =
     id: '/$id/$pageId/$childId/',
     path: '/$id/$pageId/$childId/',
     getParentRoute: () => ProjectRefIntegrationsRoute,
+  } as any)
+const ApiPlatformProjectsRefAlertsIssuesAlertIssueIdActionsRoute =
+  ApiPlatformProjectsRefAlertsIssuesAlertIssueIdActionsRouteImport.update({
+    id: '/api/platform/projects/$ref/alerts/issues/$alertIssueId/actions',
+    path: '/api/platform/projects/$ref/alerts/issues/$alertIssueId/actions',
+    getParentRoute: () => rootRouteImport,
   } as any)
 const ApiPlatformStorageRefBucketsIdObjectsIndexRoute =
   ApiPlatformStorageRefBucketsIdObjectsIndexRouteImport.update({
@@ -2481,6 +2502,7 @@ export interface FileRoutesByFullPath {
   '/api/v1/projects/$ref/functions/': typeof ApiV1ProjectsRefFunctionsIndexRoute
   '/project/$ref/integrations/$id/$pageId/': typeof ProjectRefIntegrationsIdPageIdIndexRoute
   '/api/platform/auth/$ref/users/$id/factors': typeof ApiPlatformAuthRefUsersIdFactorsRoute
+  '/api/platform/projects/$ref/alerts/issues/reads': typeof ApiPlatformProjectsRefAlertsIssuesReadsRoute
   '/api/platform/projects/$ref/analytics/endpoints/$name': typeof ApiPlatformProjectsRefAnalyticsEndpointsNameRoute
   '/api/platform/projects/$ref/analytics/log-drains/$uuid': typeof ApiPlatformProjectsRefAnalyticsLogDrainsUuidRoute
   '/api/platform/projects/$ref/config/secrets/update-status': typeof ApiPlatformProjectsRefConfigSecretsUpdateStatusRoute
@@ -2489,11 +2511,13 @@ export interface FileRoutesByFullPath {
   '/api/platform/storage/$ref/buckets/$id/empty': typeof ApiPlatformStorageRefBucketsIdEmptyRoute
   '/api/v1/projects/$ref/functions/$slug/body': typeof ApiV1ProjectsRefFunctionsSlugBodyRoute
   '/api/platform/auth/$ref/users/$id/': typeof ApiPlatformAuthRefUsersIdIndexRoute
+  '/api/platform/projects/$ref/alerts/issues/': typeof ApiPlatformProjectsRefAlertsIssuesIndexRoute
   '/api/platform/projects/$ref/content/folders/': typeof ApiPlatformProjectsRefContentFoldersIndexRoute
   '/api/platform/storage/$ref/buckets/$id/': typeof ApiPlatformStorageRefBucketsIdIndexRoute
   '/api/platform/storage/$ref/vector-buckets/$id/': typeof ApiPlatformStorageRefVectorBucketsIdIndexRoute
   '/api/v1/projects/$ref/functions/$slug/': typeof ApiV1ProjectsRefFunctionsSlugIndexRoute
   '/project/$ref/integrations/$id/$pageId/$childId/': typeof ProjectRefIntegrationsIdPageIdChildIdIndexRoute
+  '/api/platform/projects/$ref/alerts/issues/$alertIssueId/actions': typeof ApiPlatformProjectsRefAlertsIssuesAlertIssueIdActionsRoute
   '/api/platform/storage/$ref/buckets/$id/objects/download': typeof ApiPlatformStorageRefBucketsIdObjectsDownloadRoute
   '/api/platform/storage/$ref/buckets/$id/objects/list': typeof ApiPlatformStorageRefBucketsIdObjectsListRoute
   '/api/platform/storage/$ref/buckets/$id/objects/list-v2': typeof ApiPlatformStorageRefBucketsIdObjectsListV2Route
@@ -2794,6 +2818,7 @@ export interface FileRoutesByTo {
   '/api/v1/projects/$ref/functions': typeof ApiV1ProjectsRefFunctionsIndexRoute
   '/project/$ref/integrations/$id/$pageId': typeof ProjectRefIntegrationsIdPageIdIndexRoute
   '/api/platform/auth/$ref/users/$id/factors': typeof ApiPlatformAuthRefUsersIdFactorsRoute
+  '/api/platform/projects/$ref/alerts/issues/reads': typeof ApiPlatformProjectsRefAlertsIssuesReadsRoute
   '/api/platform/projects/$ref/analytics/endpoints/$name': typeof ApiPlatformProjectsRefAnalyticsEndpointsNameRoute
   '/api/platform/projects/$ref/analytics/log-drains/$uuid': typeof ApiPlatformProjectsRefAnalyticsLogDrainsUuidRoute
   '/api/platform/projects/$ref/config/secrets/update-status': typeof ApiPlatformProjectsRefConfigSecretsUpdateStatusRoute
@@ -2802,11 +2827,13 @@ export interface FileRoutesByTo {
   '/api/platform/storage/$ref/buckets/$id/empty': typeof ApiPlatformStorageRefBucketsIdEmptyRoute
   '/api/v1/projects/$ref/functions/$slug/body': typeof ApiV1ProjectsRefFunctionsSlugBodyRoute
   '/api/platform/auth/$ref/users/$id': typeof ApiPlatformAuthRefUsersIdIndexRoute
+  '/api/platform/projects/$ref/alerts/issues': typeof ApiPlatformProjectsRefAlertsIssuesIndexRoute
   '/api/platform/projects/$ref/content/folders': typeof ApiPlatformProjectsRefContentFoldersIndexRoute
   '/api/platform/storage/$ref/buckets/$id': typeof ApiPlatformStorageRefBucketsIdIndexRoute
   '/api/platform/storage/$ref/vector-buckets/$id': typeof ApiPlatformStorageRefVectorBucketsIdIndexRoute
   '/api/v1/projects/$ref/functions/$slug': typeof ApiV1ProjectsRefFunctionsSlugIndexRoute
   '/project/$ref/integrations/$id/$pageId/$childId': typeof ProjectRefIntegrationsIdPageIdChildIdIndexRoute
+  '/api/platform/projects/$ref/alerts/issues/$alertIssueId/actions': typeof ApiPlatformProjectsRefAlertsIssuesAlertIssueIdActionsRoute
   '/api/platform/storage/$ref/buckets/$id/objects/download': typeof ApiPlatformStorageRefBucketsIdObjectsDownloadRoute
   '/api/platform/storage/$ref/buckets/$id/objects/list': typeof ApiPlatformStorageRefBucketsIdObjectsListRoute
   '/api/platform/storage/$ref/buckets/$id/objects/list-v2': typeof ApiPlatformStorageRefBucketsIdObjectsListV2Route
@@ -3126,6 +3153,7 @@ export interface FileRoutesById {
   '/api/v1/projects/$ref/functions/': typeof ApiV1ProjectsRefFunctionsIndexRoute
   '/project/$ref/integrations/$id/$pageId/': typeof ProjectRefIntegrationsIdPageIdIndexRoute
   '/api/platform/auth/$ref/users/$id/factors': typeof ApiPlatformAuthRefUsersIdFactorsRoute
+  '/api/platform/projects/$ref/alerts/issues/reads': typeof ApiPlatformProjectsRefAlertsIssuesReadsRoute
   '/api/platform/projects/$ref/analytics/endpoints/$name': typeof ApiPlatformProjectsRefAnalyticsEndpointsNameRoute
   '/api/platform/projects/$ref/analytics/log-drains/$uuid': typeof ApiPlatformProjectsRefAnalyticsLogDrainsUuidRoute
   '/api/platform/projects/$ref/config/secrets/update-status': typeof ApiPlatformProjectsRefConfigSecretsUpdateStatusRoute
@@ -3134,11 +3162,13 @@ export interface FileRoutesById {
   '/api/platform/storage/$ref/buckets/$id/empty': typeof ApiPlatformStorageRefBucketsIdEmptyRoute
   '/api/v1/projects/$ref/functions/$slug/body': typeof ApiV1ProjectsRefFunctionsSlugBodyRoute
   '/api/platform/auth/$ref/users/$id/': typeof ApiPlatformAuthRefUsersIdIndexRoute
+  '/api/platform/projects/$ref/alerts/issues/': typeof ApiPlatformProjectsRefAlertsIssuesIndexRoute
   '/api/platform/projects/$ref/content/folders/': typeof ApiPlatformProjectsRefContentFoldersIndexRoute
   '/api/platform/storage/$ref/buckets/$id/': typeof ApiPlatformStorageRefBucketsIdIndexRoute
   '/api/platform/storage/$ref/vector-buckets/$id/': typeof ApiPlatformStorageRefVectorBucketsIdIndexRoute
   '/api/v1/projects/$ref/functions/$slug/': typeof ApiV1ProjectsRefFunctionsSlugIndexRoute
   '/project/$ref/integrations/$id/$pageId/$childId/': typeof ProjectRefIntegrationsIdPageIdChildIdIndexRoute
+  '/api/platform/projects/$ref/alerts/issues/$alertIssueId/actions': typeof ApiPlatformProjectsRefAlertsIssuesAlertIssueIdActionsRoute
   '/api/platform/storage/$ref/buckets/$id/objects/download': typeof ApiPlatformStorageRefBucketsIdObjectsDownloadRoute
   '/api/platform/storage/$ref/buckets/$id/objects/list': typeof ApiPlatformStorageRefBucketsIdObjectsListRoute
   '/api/platform/storage/$ref/buckets/$id/objects/list-v2': typeof ApiPlatformStorageRefBucketsIdObjectsListV2Route
@@ -3457,6 +3487,7 @@ export interface FileRouteTypes {
     | '/api/v1/projects/$ref/functions/'
     | '/project/$ref/integrations/$id/$pageId/'
     | '/api/platform/auth/$ref/users/$id/factors'
+    | '/api/platform/projects/$ref/alerts/issues/reads'
     | '/api/platform/projects/$ref/analytics/endpoints/$name'
     | '/api/platform/projects/$ref/analytics/log-drains/$uuid'
     | '/api/platform/projects/$ref/config/secrets/update-status'
@@ -3465,11 +3496,13 @@ export interface FileRouteTypes {
     | '/api/platform/storage/$ref/buckets/$id/empty'
     | '/api/v1/projects/$ref/functions/$slug/body'
     | '/api/platform/auth/$ref/users/$id/'
+    | '/api/platform/projects/$ref/alerts/issues/'
     | '/api/platform/projects/$ref/content/folders/'
     | '/api/platform/storage/$ref/buckets/$id/'
     | '/api/platform/storage/$ref/vector-buckets/$id/'
     | '/api/v1/projects/$ref/functions/$slug/'
     | '/project/$ref/integrations/$id/$pageId/$childId/'
+    | '/api/platform/projects/$ref/alerts/issues/$alertIssueId/actions'
     | '/api/platform/storage/$ref/buckets/$id/objects/download'
     | '/api/platform/storage/$ref/buckets/$id/objects/list'
     | '/api/platform/storage/$ref/buckets/$id/objects/list-v2'
@@ -3770,6 +3803,7 @@ export interface FileRouteTypes {
     | '/api/v1/projects/$ref/functions'
     | '/project/$ref/integrations/$id/$pageId'
     | '/api/platform/auth/$ref/users/$id/factors'
+    | '/api/platform/projects/$ref/alerts/issues/reads'
     | '/api/platform/projects/$ref/analytics/endpoints/$name'
     | '/api/platform/projects/$ref/analytics/log-drains/$uuid'
     | '/api/platform/projects/$ref/config/secrets/update-status'
@@ -3778,11 +3812,13 @@ export interface FileRouteTypes {
     | '/api/platform/storage/$ref/buckets/$id/empty'
     | '/api/v1/projects/$ref/functions/$slug/body'
     | '/api/platform/auth/$ref/users/$id'
+    | '/api/platform/projects/$ref/alerts/issues'
     | '/api/platform/projects/$ref/content/folders'
     | '/api/platform/storage/$ref/buckets/$id'
     | '/api/platform/storage/$ref/vector-buckets/$id'
     | '/api/v1/projects/$ref/functions/$slug'
     | '/project/$ref/integrations/$id/$pageId/$childId'
+    | '/api/platform/projects/$ref/alerts/issues/$alertIssueId/actions'
     | '/api/platform/storage/$ref/buckets/$id/objects/download'
     | '/api/platform/storage/$ref/buckets/$id/objects/list'
     | '/api/platform/storage/$ref/buckets/$id/objects/list-v2'
@@ -4101,6 +4137,7 @@ export interface FileRouteTypes {
     | '/api/v1/projects/$ref/functions/'
     | '/project/$ref/integrations/$id/$pageId/'
     | '/api/platform/auth/$ref/users/$id/factors'
+    | '/api/platform/projects/$ref/alerts/issues/reads'
     | '/api/platform/projects/$ref/analytics/endpoints/$name'
     | '/api/platform/projects/$ref/analytics/log-drains/$uuid'
     | '/api/platform/projects/$ref/config/secrets/update-status'
@@ -4109,11 +4146,13 @@ export interface FileRouteTypes {
     | '/api/platform/storage/$ref/buckets/$id/empty'
     | '/api/v1/projects/$ref/functions/$slug/body'
     | '/api/platform/auth/$ref/users/$id/'
+    | '/api/platform/projects/$ref/alerts/issues/'
     | '/api/platform/projects/$ref/content/folders/'
     | '/api/platform/storage/$ref/buckets/$id/'
     | '/api/platform/storage/$ref/vector-buckets/$id/'
     | '/api/v1/projects/$ref/functions/$slug/'
     | '/project/$ref/integrations/$id/$pageId/$childId/'
+    | '/api/platform/projects/$ref/alerts/issues/$alertIssueId/actions'
     | '/api/platform/storage/$ref/buckets/$id/objects/download'
     | '/api/platform/storage/$ref/buckets/$id/objects/list'
     | '/api/platform/storage/$ref/buckets/$id/objects/list-v2'
@@ -4228,6 +4267,7 @@ export interface RootRouteChildren {
   ApiPlatformStorageRefVectorBucketsIndexRoute: typeof ApiPlatformStorageRefVectorBucketsIndexRoute
   ApiV1ProjectsRefFunctionsIndexRoute: typeof ApiV1ProjectsRefFunctionsIndexRoute
   ApiPlatformAuthRefUsersIdFactorsRoute: typeof ApiPlatformAuthRefUsersIdFactorsRoute
+  ApiPlatformProjectsRefAlertsIssuesReadsRoute: typeof ApiPlatformProjectsRefAlertsIssuesReadsRoute
   ApiPlatformProjectsRefAnalyticsEndpointsNameRoute: typeof ApiPlatformProjectsRefAnalyticsEndpointsNameRoute
   ApiPlatformProjectsRefConfigSecretsUpdateStatusRoute: typeof ApiPlatformProjectsRefConfigSecretsUpdateStatusRoute
   ApiPlatformProjectsRefContentFoldersIdRoute: typeof ApiPlatformProjectsRefContentFoldersIdRoute
@@ -4235,10 +4275,12 @@ export interface RootRouteChildren {
   ApiPlatformStorageRefBucketsIdEmptyRoute: typeof ApiPlatformStorageRefBucketsIdEmptyRoute
   ApiV1ProjectsRefFunctionsSlugBodyRoute: typeof ApiV1ProjectsRefFunctionsSlugBodyRoute
   ApiPlatformAuthRefUsersIdIndexRoute: typeof ApiPlatformAuthRefUsersIdIndexRoute
+  ApiPlatformProjectsRefAlertsIssuesIndexRoute: typeof ApiPlatformProjectsRefAlertsIssuesIndexRoute
   ApiPlatformProjectsRefContentFoldersIndexRoute: typeof ApiPlatformProjectsRefContentFoldersIndexRoute
   ApiPlatformStorageRefBucketsIdIndexRoute: typeof ApiPlatformStorageRefBucketsIdIndexRoute
   ApiPlatformStorageRefVectorBucketsIdIndexRoute: typeof ApiPlatformStorageRefVectorBucketsIdIndexRoute
   ApiV1ProjectsRefFunctionsSlugIndexRoute: typeof ApiV1ProjectsRefFunctionsSlugIndexRoute
+  ApiPlatformProjectsRefAlertsIssuesAlertIssueIdActionsRoute: typeof ApiPlatformProjectsRefAlertsIssuesAlertIssueIdActionsRoute
   ApiPlatformStorageRefBucketsIdObjectsDownloadRoute: typeof ApiPlatformStorageRefBucketsIdObjectsDownloadRoute
   ApiPlatformStorageRefBucketsIdObjectsListRoute: typeof ApiPlatformStorageRefBucketsIdObjectsListRoute
   ApiPlatformStorageRefBucketsIdObjectsListV2Route: typeof ApiPlatformStorageRefBucketsIdObjectsListV2Route
@@ -6390,6 +6432,20 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof ApiPlatformAuthRefUsersIdFactorsRouteImport
       parentRoute: typeof rootRouteImport
     }
+    '/api/platform/projects/$ref/alerts/issues/': {
+      id: '/api/platform/projects/$ref/alerts/issues/'
+      path: '/api/platform/projects/$ref/alerts/issues'
+      fullPath: '/api/platform/projects/$ref/alerts/issues/'
+      preLoaderRoute: typeof ApiPlatformProjectsRefAlertsIssuesIndexRouteImport
+      parentRoute: typeof rootRouteImport
+    }
+    '/api/platform/projects/$ref/alerts/issues/reads': {
+      id: '/api/platform/projects/$ref/alerts/issues/reads'
+      path: '/api/platform/projects/$ref/alerts/issues/reads'
+      fullPath: '/api/platform/projects/$ref/alerts/issues/reads'
+      preLoaderRoute: typeof ApiPlatformProjectsRefAlertsIssuesReadsRouteImport
+      parentRoute: typeof rootRouteImport
+    }
     '/api/platform/projects/$ref/analytics/endpoints/$name': {
       id: '/api/platform/projects/$ref/analytics/endpoints/$name'
       path: '/api/platform/projects/$ref/analytics/endpoints/$name'
@@ -6473,6 +6529,13 @@ declare module '@tanstack/react-router' {
       fullPath: '/project/$ref/integrations/$id/$pageId/$childId/'
       preLoaderRoute: typeof ProjectRefIntegrationsIdPageIdChildIdIndexRouteImport
       parentRoute: typeof ProjectRefIntegrationsRoute
+    }
+    '/api/platform/projects/$ref/alerts/issues/$alertIssueId/actions': {
+      id: '/api/platform/projects/$ref/alerts/issues/$alertIssueId/actions'
+      path: '/api/platform/projects/$ref/alerts/issues/$alertIssueId/actions'
+      fullPath: '/api/platform/projects/$ref/alerts/issues/$alertIssueId/actions'
+      preLoaderRoute: typeof ApiPlatformProjectsRefAlertsIssuesAlertIssueIdActionsRouteImport
+      parentRoute: typeof rootRouteImport
     }
     '/api/platform/storage/$ref/buckets/$id/objects/': {
       id: '/api/platform/storage/$ref/buckets/$id/objects/'
@@ -7436,6 +7499,8 @@ const rootRouteChildren: RootRouteChildren = {
     ApiPlatformStorageRefVectorBucketsIndexRoute,
   ApiV1ProjectsRefFunctionsIndexRoute: ApiV1ProjectsRefFunctionsIndexRoute,
   ApiPlatformAuthRefUsersIdFactorsRoute: ApiPlatformAuthRefUsersIdFactorsRoute,
+  ApiPlatformProjectsRefAlertsIssuesReadsRoute:
+    ApiPlatformProjectsRefAlertsIssuesReadsRoute,
   ApiPlatformProjectsRefAnalyticsEndpointsNameRoute:
     ApiPlatformProjectsRefAnalyticsEndpointsNameRoute,
   ApiPlatformProjectsRefConfigSecretsUpdateStatusRoute:
@@ -7449,6 +7514,8 @@ const rootRouteChildren: RootRouteChildren = {
   ApiV1ProjectsRefFunctionsSlugBodyRoute:
     ApiV1ProjectsRefFunctionsSlugBodyRoute,
   ApiPlatformAuthRefUsersIdIndexRoute: ApiPlatformAuthRefUsersIdIndexRoute,
+  ApiPlatformProjectsRefAlertsIssuesIndexRoute:
+    ApiPlatformProjectsRefAlertsIssuesIndexRoute,
   ApiPlatformProjectsRefContentFoldersIndexRoute:
     ApiPlatformProjectsRefContentFoldersIndexRoute,
   ApiPlatformStorageRefBucketsIdIndexRoute:
@@ -7457,6 +7524,8 @@ const rootRouteChildren: RootRouteChildren = {
     ApiPlatformStorageRefVectorBucketsIdIndexRoute,
   ApiV1ProjectsRefFunctionsSlugIndexRoute:
     ApiV1ProjectsRefFunctionsSlugIndexRoute,
+  ApiPlatformProjectsRefAlertsIssuesAlertIssueIdActionsRoute:
+    ApiPlatformProjectsRefAlertsIssuesAlertIssueIdActionsRoute,
   ApiPlatformStorageRefBucketsIdObjectsDownloadRoute:
     ApiPlatformStorageRefBucketsIdObjectsDownloadRoute,
   ApiPlatformStorageRefBucketsIdObjectsListRoute:
