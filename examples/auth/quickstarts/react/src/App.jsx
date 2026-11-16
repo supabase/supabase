@@ -46,16 +46,16 @@ export default function App() {
     }
 
     // Check for existing session using getClaims
-    supabase.auth.getClaims().then(({ data: { claims } }) => {
-      setClaims(claims)
+    supabase.auth.getClaims().then(({ data }) => {
+      setClaims(data?.claims)
     })
 
     // Listen for auth changes
     const {
       data: { subscription },
     } = supabase.auth.onAuthStateChange(() => {
-      supabase.auth.getClaims().then(({ data: { claims } }) => {
-        setClaims(claims)
+      supabase.auth.getClaims().then(({ data }) => {
+        setClaims(data?.claims)
       })
     })
 
