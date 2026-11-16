@@ -1,19 +1,20 @@
 import type { GoPageInput } from 'marketing'
-import Script from 'next/script'
 
 const page: GoPageInput = {
   template: 'lead-gen',
   slug: 'aws-reinvent/schedule',
+  theme: 'light',
   metadata: {
     title: 'Meet Supabase at AWS re:Invent 2026 | Supabase',
     description:
       'Book time with the Supabase team onsite at AWS re:Invent 2026. Talk architecture, migrations, and production Postgres with our engineers.',
   },
   hero: {
-    title: 'Meet with the Supabase team\nat AWS re:Invent',
+    title: 'Plan your next stage of growth with Supabase at AWS re:Invent',
     subtitle: 'Build in a weekend, scale to millions',
     description:
-      'Want to connect with the Supabase team?\nBook 1:1 time to meet our team using the scheduler below.',
+      "Book 1:1 time with our team while we're in Las Vegas.\nWe'll talk through where your build is headed and how to grow it.\nBring your roadmap, your open questions, or a problem you're stuck on.",
+    ctas: [{ label: 'Book a time', href: '#schedule', variant: 'primary' }],
   },
   sections: [
     {
@@ -69,10 +70,9 @@ const page: GoPageInput = {
             className="meetings-iframe-container"
             data-src="https://meetings.hubspot.com/wendie-cheung/aws-reinvent-2026?embed=true"
           />
-          <Script
-            src="https://static.hsappstatic.net/MeetingsEmbed/ex/MeetingsEmbedCode.js"
-            strategy="afterInteractive"
-          />
+          {/* HubSpot's embed script must be a parser-inserted tag right after the container; next/script loads it after page load and misses the container. */}
+          {/* eslint-disable-next-line @next/next/no-sync-scripts */}
+          <script src="https://static.hsappstatic.net/MeetingsEmbed/ex/MeetingsEmbedCode.js" />
         </>
       ),
     },
