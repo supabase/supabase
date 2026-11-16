@@ -317,6 +317,21 @@ var authorizeUrl = state.Uri;
 </$Show>
 </Tabs>
 
+### Refresh the session after linking
+
+Linking an identity makes the user permanent at once, but the access token the client holds still has `is_anonymous: true` until the session refreshes. RLS policies that check the claim keep treating the user as anonymous until then. Refresh the session after linking so the next request carries the updated claim:
+
+```js
+import { createClient } from '@supabase/supabase-js'
+
+const supabase = createClient('https://your-project-id.supabase.co', 'sb_publishable_...')
+
+// ---cut---
+const { data, error } = await supabase.auth.refreshSession()
+```
+
+To write policies that don't depend on the token, see [Access control](#access-control).
+
 ## Access control
 
 An anonymous user assumes the `authenticated` role like a permanent user. You can use row-level security (RLS) policies to differentiate between an anonymous user and a permanent user by checking for the `is_anonymous` claim in the JWT returned by `auth.jwt()`:
@@ -331,6 +346,38 @@ create policy "Anonymous and permanent users can view the news feed"
 on news_feed for select
 to authenticated
 using ( true );
+```
+
+<Admonition type="caution" title="The claim stays true until the token refreshes">
+
+A policy on the `is_anonymous` claim refuses a guest who just became a permanent user. Linking an email, phone, or OAuth identity makes the user permanent in `auth.users` at once, but the access token the client already holds keeps `is_anonymous: true` until the session refreshes, which can take up to the JWT expiry time. Until then, the policy rejects the user's requests with error `42501`.
+
+To avoid this, either [refresh the session after linking](#refresh-the-session-after-linking), or check the current state of the user instead of the claim.
+
+</Admonition>
+
+To check the current state, read `is_anonymous` from `auth.users` through a [`security definer` function](/docs/guides/database/postgres/row-level-security#use-security-definer-functions). Create the function in a schema the Data API doesn't expose, such as `private`, and set `search_path = ''`:
+
+```sql
+create schema if not exists private;
+
+create function private.is_permanent_user()
+returns boolean
+language sql
+stable
+security definer
+set search_path = ''
+as $$
+  select exists (
+    select 1 from auth.users
+    where id = (select auth.uid()) and is_anonymous is false
+  );
+$$;
+
+create policy "Only permanent users can post to the news feed"
+on news_feed as restrictive for insert
+to authenticated
+with check ( (select private.is_permanent_user()) );
 ```
 
 <Admonition type="note" title="Use restrictive policies">
