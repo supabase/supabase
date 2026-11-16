@@ -162,6 +162,7 @@ export const SaveViewDialog = ({
             )}
           </div>
           <p className="text-foreground-lighter">The time range isn't saved with this view.</p>
+          <p className="text-foreground-lighter">Visible to everyone in this project</p>
         </DialogSection>
         <DialogSectionSeparator />
         <Form {...form}>
