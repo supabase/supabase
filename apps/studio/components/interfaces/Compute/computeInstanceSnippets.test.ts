@@ -41,6 +41,20 @@ describe('buildComputeInstanceSnippets', () => {
     expect(aiPrompt).toContain('serves plain HTTP on the port in $PORT')
     expect(aiPrompt).not.toContain('entrypoint (Dockerfile)')
   })
+
+  it('asks for a background worker, not an HTTP server, for private instances', () => {
+    const { aiPrompt } = buildComputeInstanceSnippets(input({ access: 'private' }))
+
+    expect(aiPrompt).toContain('background worker')
+    expect(aiPrompt).not.toContain('serves plain HTTP')
+  })
+
+  it('calls public instances without an API key', () => {
+    const { javascript, python } = buildComputeInstanceSnippets(input())
+
+    expect(javascript).not.toContain('Authorization')
+    expect(python).not.toContain('Authorization')
+  })
 })
 
 describe('buildComputeInstanceCliCommands', () => {

@@ -1,4 +1,4 @@
-import { COMPUTE_REGION, computeInstanceUrl, RUNTIMES } from './Compute.constants'
+import { COMPUTE_REGION, computeInstanceUrl, LISTENING_PORT, RUNTIMES } from './Compute.constants'
 import type { ComputeInstanceAccess } from './Compute.types'
 import { formatSize } from './Compute.utils'
 import { CLI_NAME } from '@/lib/constants/compute'
@@ -79,13 +79,17 @@ export function buildComputeInstanceSnippets(
   const entrypointFile = runtimeMeta.entrypoint.split(' ').pop()
   const source =
     runtime === 'dockerfile'
-      ? `a Dockerfile whose app serves plain HTTP on the port in $PORT (not 8080, the platform proxy uses it)`
+      ? 'a Dockerfile'
       : `a ${runtimeMeta.label} entrypoint (${entrypointFile})`
+  const behavior =
+    input.access === 'public'
+      ? `serves plain HTTP on the port in $PORT (defaults to ${LISTENING_PORT}) and responds with "Hello, world!". Public instances do not verify API keys, so add your own auth if the endpoint needs it.`
+      : `runs a background worker that never exits, e.g. a loop that polls a pgmq queue and processes each message. Private instances have no inbound network access, so do not start an HTTP server.`
 
   const aiPrompt = [
     `Scaffold and deploy a Supabase Compute instance named "${name}" using the ${runtimeMeta.label} runtime:`,
     ``,
-    `1. Create a supabase/${CLI_NAME}/${name}/ directory with ${source} that responds with "Hello, world!".`,
+    `1. Create a supabase/${CLI_NAME}/${name}/ directory with ${source} that ${behavior}`,
     ``,
     `2. Add this block to supabase/config.toml, and set \`compute = true\` under the \`[experimental]\` table (add the table if it is missing) — the CLI hides the compute commands without it:`,
     '```toml',
@@ -95,15 +99,10 @@ export function buildComputeInstanceSnippets(
     `3. Make sure the project is linked (\`supabase link\`), then run \`supabase ${CLI_NAME} push ${name} --exposure ${input.access}\` to deploy it.`,
   ].join('\n')
 
-  const keyPlaceholder = input.access === 'public' ? '[YOUR ANON KEY]' : '[YOUR SERVICE ROLE KEY]'
-
   const javascript = [
     `const res = await fetch('${url}', {`,
     `  method: 'POST',`,
-    `  headers: {`,
-    `    Authorization: 'Bearer ${keyPlaceholder}',`,
-    `    'Content-Type': 'application/json',`,
-    `  },`,
+    `  headers: { 'Content-Type': 'application/json' },`,
     `  body: JSON.stringify({ name: 'world' }),`,
     `})`,
     `const data = await res.json()`,
@@ -114,7 +113,6 @@ export function buildComputeInstanceSnippets(
     ``,
     `res = requests.post(`,
     `    "${url}",`,
-    `    headers={"Authorization": "Bearer ${keyPlaceholder}"},`,
     `    json={"name": "world"},`,
     `)`,
     `print(res.json())`,
