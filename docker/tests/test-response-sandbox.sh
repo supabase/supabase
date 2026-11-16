@@ -7,8 +7,8 @@
 # and removes them.
 #
 # Usage (from the docker/ directory of a running local stack):
-#   sh tests/test-response-sanitization.sh              # Uses http://localhost:8000
-#   sh tests/test-response-sanitization.sh <base_url>   # Custom URL
+#   sh tests/test-response-sandbox.sh              # Uses http://localhost:8000
+#   sh tests/test-response-sandbox.sh <base_url>   # Custom URL
 #
 
 set -eu
