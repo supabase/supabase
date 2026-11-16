@@ -3,19 +3,12 @@ import type { FilterGroup } from 'ui-patterns/FilterBar'
 
 import type { LogsView } from '../UnifiedLogs.views'
 
-// How many filters before we proactively offer to save a view. Deliberately higher
-// than MIN_FILTERS_TO_SAVE so the unprompted banner only interrupts once the filter
-// set is worth keeping.
 export const SAVE_VIEW_SUGGESTION_THRESHOLD = 2
 
-// How many filters before the user can save a view themselves.
 export const MIN_FILTERS_TO_SAVE = 1
 
 const MAX_VIEW_NAME_IN_COPY = 32
 
-// A view name can run to VIEW_NAME_MAX_LENGTH, which would crowd out the rest of the
-// sentence in the banner. Truncate the name itself so the surrounding copy survives —
-// CSS truncation would clip the question instead.
 export const truncateViewName = (name: string): string =>
   name.length <= MAX_VIEW_NAME_IN_COPY
     ? name

@@ -185,8 +185,6 @@ describe('LogsViewsMenu', () => {
 
     await openMenu()
     const saveButton = await screen.findByRole('button', { name: 'Save view' })
-    // `ButtonTooltip` keeps a disabled button focusable via `aria-disabled` so its
-    // tooltip stays reachable, so the native `disabled` attribute is never set.
     expect(saveButton).not.toHaveAttribute('aria-disabled', 'true')
 
     await userEvent.click(saveButton)
