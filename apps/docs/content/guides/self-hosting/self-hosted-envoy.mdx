@@ -257,7 +257,7 @@ The gateway listens on plain HTTP only and does not terminate TLS. For public de
 
 ### HTML and SVG responses
 
-Studio is served from the same origin as the APIs, so a script in a file or response from Storage, REST, or Edge Functions would run with your dashboard credentials. As on the Supabase platform, the gateway neutralizes responses that browsers would render as HTML or SVG on `/storage/v1/`, `/rest/v1/`, and `GET` requests to `/functions/v1/`:
+Studio is served from the same origin as the APIs, so the gateway sanitizes responses that browsers would render as HTML or SVG on `/storage/v1/`, `/rest/v1/`, and `GET` requests to `/functions/v1/`:
 
 - HTML, XHTML, and XML responses, and paths ending in `.html`, `.htm`, `.xhtml`, or `.xhtm`, are served as `text/plain` with `Content-Security-Policy: default-src 'none'; sandbox`.
 - SVG responses keep their type, so they still display in `<img>` tags. They get the same policy and `Content-Disposition: attachment`, so opening one directly downloads it.

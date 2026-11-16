@@ -202,16 +202,14 @@ services:
           allow:
             - admin
             - anon
-      # Neutralizes responses that browsers would render as HTML or SVG, as the
-      # platform's API gateway does (reused by Storage and Functions below).
-      # Studio shares this origin, so script in user content would otherwise run
-      # with the dashboard's credentials.
+      # Sanitizes responses that browsers would render as HTML or SVG, since
+      # Studio shares this origin (reused by Storage and Functions below).
       - name: post-function
         config:
           header_filter:
             - &sanitize_html |
               local path = kong.request.get_path()
-              -- Functions may return HTML to other methods, as on the platform
+              -- Functions may return HTML to other methods
               if path:sub(1, 14) == "/functions/v1/" and kong.request.get_method() ~= "GET" then
                 return
               end

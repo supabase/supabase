@@ -299,7 +299,7 @@ A missing function, one that fails to start, or an unhandled error in your funct
 
 ### HTML from a function is shown as plain text
 
-The API gateway serves `GET` responses that contain HTML as `text/plain`, as on the platform, and opening an SVG response directly downloads it. Studio shares the gateway's origin, so this keeps scripts in function responses from running with your dashboard credentials. Other request methods aren't affected. See [HTML and SVG responses](/docs/guides/self-hosting/self-hosted-envoy#html-and-svg-responses).
+The API gateway serves `GET` responses that contain HTML as `text/plain`, and opening an SVG response directly downloads it, because Studio shares the gateway's origin. Other request methods aren't affected. See [HTML and SVG responses](/docs/guides/self-hosting/self-hosted-envoy#html-and-svg-responses).
 
 ### Changes to function code not reflected after editing
 

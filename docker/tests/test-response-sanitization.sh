@@ -1,9 +1,8 @@
 #!/bin/sh
 #
-# Response sanitization: the API gateway neutralizes responses that browsers
-# would render as HTML or SVG on Storage, REST and Functions (GET only), as on
-# the platform. Studio shares the gateway's origin, so script in user content
-# must not run there. Creates a temporary public bucket, function and database
+# Response sanitization: the API gateway sanitizes responses that browsers
+# would render as HTML or SVG on Storage, REST and Functions (GET only), since
+# Studio shares the gateway's origin. Creates a temporary public bucket, function and database
 # function, checks the response headers, and removes them.
 #
 # Usage (from the docker/ directory of a running local stack):

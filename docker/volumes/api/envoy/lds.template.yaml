@@ -1215,10 +1215,8 @@ resources:
                         end
                       end
 
-                # Neutralizes responses that browsers would render as HTML or SVG on
-                # Storage, REST and Functions (GET only), as the platform's API gateway
-                # does. Studio shares this origin, so script in user content would
-                # otherwise run with the dashboard's credentials.
+                # Sanitizes responses that browsers would render as HTML or SVG on
+                # Storage, REST and Functions (GET only), since Studio shares this origin.
                 - name: envoy.filters.http.lua
                   typed_config:
                     '@type': >-
@@ -1231,7 +1229,7 @@ resources:
                         if path:sub(1, 12) == "/storage/v1/" or path:sub(1, 9) == "/rest/v1/" then
                           return true
                         end
-                        -- Functions may return HTML to other methods, as on the platform
+                        -- Functions may return HTML to other methods
                         return path:sub(1, 14) == "/functions/v1/" and method == "GET"
                       end
 
