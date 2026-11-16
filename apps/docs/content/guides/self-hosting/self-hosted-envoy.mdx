@@ -42,6 +42,7 @@ HTTP filter chain
   ├─ Lua: translate opaque keys in header
   ├─ Lua: mirror apikey to x-api-key (Realtime WS)
   ├─ Lua: synthesize Authorization header
+  ├─ Lua: neutralize HTML and SVG responses (Storage, REST, Functions)
   ├─ RBAC  (global: service_role → /pg/, apikey → other API routes;
   │         per-route DENY override on /mcp and Realtime
   │         /api/tenants, /api/openapi)
@@ -253,6 +254,16 @@ The Envoy admin interface at `127.0.0.1:9901` exposes `/config_dump`, which cont
 The gateway listens on plain HTTP only and does not terminate TLS. For public deployments, terminate TLS at an upstream reverse proxy - the Docker setup ships `docker-compose.caddy.yml` and `docker-compose.nginx.yml` for this purpose.
 
 </Admonition>
+
+### HTML and SVG responses
+
+Studio is served from the same origin as the APIs, so a script in a file or response from Storage, REST, or Edge Functions would run with your dashboard credentials. As on the Supabase platform, the gateway neutralizes responses that browsers would render as HTML or SVG on `/storage/v1/`, `/rest/v1/`, and `GET` requests to `/functions/v1/`:
+
+- HTML, XHTML, and XML responses, and paths ending in `.html`, `.htm`, `.xhtml`, or `.xhtm`, are served as `text/plain` with `Content-Security-Policy: default-src 'none'; sandbox`.
+- SVG responses keep their type, so they still display in `<img>` tags. They get the same policy and `Content-Disposition: attachment`, so opening one directly downloads it.
+- These responses, and responses on paths without a file extension, get `X-Content-Type-Options: nosniff`.
+
+The Kong configuration applies the same rules.
 
 ## Customizing the configuration
 
