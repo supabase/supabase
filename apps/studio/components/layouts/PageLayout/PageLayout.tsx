@@ -58,7 +58,8 @@ interface PageLayoutProps {
  * @param size - Controls padding of the page header only, padding for the content to be controlled by PageContainer (Default: 'default')
  * @param isCompact - TBD (Default: false)
  *
- * @deprecated Refer to https://supabase-design-system.vercel.app/design-system/docs/fragments/page-section
+* @deprecated Prefer PageHeader, PageNav, and PageContainer.
+* See /design-system/docs/ui-patterns/layout
  */
 export const PageLayout = ({
   children,
