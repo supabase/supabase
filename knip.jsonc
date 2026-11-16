@@ -47,6 +47,8 @@
         "data/__templates/**",
         // evals are run from a GitHub action, not from the app
         "evals/**",
+        // used from the alert issues inbox UI in the next commit on this branch
+        "data/alert-issues/**",
       ],
       // Narrowly scoped suppressions: one issue type, one path. Preferred over
       // `ignore` (which drops the file from the project entirely, hiding the
