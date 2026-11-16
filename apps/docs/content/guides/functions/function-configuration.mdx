@@ -17,7 +17,7 @@ For example:
 
 To enable these per-function rules, create `supabase/config.toml` in your project root:
 
-```toml
+```toml name=supabase/config.toml
 # Disables authentication for the Stripe webhook.
 [functions.stripe-webhook]
 verify_jwt = false
@@ -47,7 +47,7 @@ To see more general `config.toml` options, check out [this guide](/docs/guides/l
 
 By default, Edge Functions require a valid JWT in the authorization header. If you want to use Edge Functions without Authorization checks (commonly used for Stripe webhooks), you can configure this in your `config.toml`:
 
-```toml
+```toml name=supabase/config.toml
 [functions.stripe-webhook]
 verify_jwt = false
 ```
@@ -78,7 +78,7 @@ When you create a new Edge Function, it will use TypeScript by default. However,
 
 Save your Function as a JavaScript file (e.g. `index.js`) update the `supabase/config.toml` :
 
-```toml
+```toml name=supabase/config.toml
 [functions.hello-world]
 entrypoint = './functions/hello-world/index.js' # path must be relative to config.toml
 ```

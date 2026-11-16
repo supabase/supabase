@@ -49,7 +49,7 @@ We recommend this folder structure:
 
 Individual function configuration like [JWT verification](/docs/guides/local-development/cli/config#functions.function_name.verify_jwt) and [import map location](/docs/guides/local-development/cli/config#functions.function_name.import_map) can be set via the `config.toml` file.
 
-```toml supabase/config.toml
+```toml name=supabase/config.toml
 [functions.hello-world]
 verify_jwt = false
 import_map = './import_map.json'
@@ -67,7 +67,7 @@ Save your Function as a JavaScript file (e.g. `index.js`) and then update the `s
 
 </Admonition>
 
-```toml supabase/config.toml
+```toml name=supabase/config.toml
 [functions.hello-world]
 # other entries
 entrypoint = './functions/hello-world/index.js' # path must be relative to config.toml

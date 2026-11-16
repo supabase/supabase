@@ -51,7 +51,7 @@ OAuth 2.1 server is in beta and available on all Supabase plans. It has no separ
 
 Edit your `supabase/config.toml` file and add the OAuth server configuration:
 
-```toml
+```toml name=supabase/config.toml
 [auth.oauth_server]
 enabled = true
 authorization_url_path = "/oauth/consent"
@@ -105,7 +105,7 @@ To test OAuth flows with external applications, you can expose your local Supaba
 
 When using a tunnel, configure the `jwt_issuer` field in your `supabase/config.toml` to match your tunnel URL:
 
-```toml
+```toml name=supabase/config.toml
 [auth]
 jwt_issuer = "https://my-tunnel.url/auth/v1"
 ```

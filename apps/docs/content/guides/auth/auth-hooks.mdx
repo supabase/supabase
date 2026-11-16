@@ -235,7 +235,7 @@ You can visit `SQL Editor > Templates` for hook templates.
 <TabPanel id="http" label="HTTP">
 Modify the `auth.hook.<hook_name>` field and set `uri` to a valid HTTP URI. For example, the `send_sms` hook would take the following fields:
 
-```toml
+```toml name=supabase/config.toml
 [auth.hook.send_sms]
 enabled = true
 uri = "http://host.docker.internal:54321/functions/v1/send_sms"

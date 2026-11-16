@@ -1,4 +1,10 @@
 import { type TOCHeader } from '~/components/GuidesSidebar'
+import {
+  CONFIG_JSONC_NAME,
+  CONFIG_TOML_NAME,
+  convertConfigTomlToJsonc,
+} from '~/features/directives/ConfigFormats'
+import { ConfigCodeTabs } from '~/features/directives/ConfigFormats.components'
 import { GuideTemplate, newEditLink } from '~/features/docs/GuidesMdx.template'
 import { genGuideMeta } from '~/features/docs/GuidesMdx.utils'
 import type { Parameter } from '~/lib/refGenerator/refTypes'
@@ -6,7 +12,8 @@ import specFile from '~/spec/cli_v1_config.yaml' with { type: 'yml' }
 import ReactMarkdown from 'react-markdown'
 import { Heading, Table } from 'ui'
 import { Admonition } from 'ui-patterns/Admonition'
-import { CodeBlock } from 'ui-patterns/CodeBlock'
+import { TabPanel } from '~/features/ui/Tabs'
+import { CodeBlock } from '~/features/ui/CodeBlock/CodeBlock'
 
 const meta = {
   title: 'Supabase CLI config',
@@ -44,7 +51,9 @@ const Config = () => {
   )
 }
 
-function Info({ parameter }: { parameter: Parameter }) {
+async function Info({ parameter }: { parameter: Parameter }) {
+  const jsonc = parameter.usage ? await convertConfigTomlToJsonc(parameter.usage) : undefined
+
   return (
     <div className="mt-8">
       <div>
@@ -85,9 +94,14 @@ function Info({ parameter }: { parameter: Parameter }) {
             {parameter.usage && (
               <div className="mb-4 scroll-mt-16 mt-0 ">
                 <p className="text-sm font-bold uppercase">Usage</p>
-                <CodeBlock className="useless-code-block-class" language="py">
-                  {parameter.usage}
-                </CodeBlock>
+                <ConfigCodeTabs>
+                  <TabPanel id={CONFIG_TOML_NAME} label={CONFIG_TOML_NAME}>
+                    <CodeBlock lang="toml" contents={parameter.usage} />
+                  </TabPanel>
+                  <TabPanel id={CONFIG_JSONC_NAME} label={CONFIG_JSONC_NAME}>
+                    <CodeBlock lang="jsonc" contents={jsonc} />
+                  </TabPanel>
+                </ConfigCodeTabs>
               </div>
             )}
             {parameter.links && (

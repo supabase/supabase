@@ -94,7 +94,7 @@ When testing Edge Functions locally with Supabase CLI, the instances are termina
 
 To prevent that, you can update the `supabase/config.toml` with the following settings:
 
-```toml
+```toml name=supabase/config.toml
 [edge_runtime]
 policy = "per_worker"
 ```

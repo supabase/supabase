@@ -32,7 +32,7 @@ If you want to manage multiple seed files or organize them across different fold
 
 For better modularity and maintainability, you can split your seed data into multiple files. For example, you can organize your seeds by table and include files such as `countries.sql` and `cities.sql`. Configure them in `config.toml` like so:
 
-```toml supabase/config.toml
+```toml name=supabase/config.toml
 [db.seed]
 enabled = true
 sql_paths = ['./countries.sql', './cities.sql']
@@ -40,7 +40,7 @@ sql_paths = ['./countries.sql', './cities.sql']
 
 Or to include all `.sql` files under a specific folder you can do:
 
-```toml supabase/config.toml
+```toml name=supabase/config.toml
 [db.seed]
 enabled = true
 sql_paths = ['./seeds/*.sql']

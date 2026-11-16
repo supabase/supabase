@@ -66,7 +66,7 @@ Cron jobs, workers, `pg_net`, and other Edge Functions make calls with a secret 
 
 1. In `supabase/config.toml`, disable the [`verify_jwt` check](/docs/guides/functions/auth-headers) for the function:
 
-   ```toml
+   ```toml name=supabase/config.toml
    [functions.your-function]
    verify_jwt = false
    ```
@@ -98,7 +98,7 @@ To call a function from Postgres with the secret key, see [Call an Edge Function
 
 For a genuinely public function, such as a health check, use `auth: 'none'` with `verify_jwt = false` so anonymous callers can reach the handler.
 
-```toml
+```toml name=supabase/config.toml
 [functions.health]
 verify_jwt = false
 ```
