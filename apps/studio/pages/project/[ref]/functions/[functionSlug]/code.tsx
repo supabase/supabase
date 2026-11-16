@@ -177,9 +177,7 @@ const CodePage = () => {
             className="max-w-xl"
             subject="Failed to load function code"
             description={
-              isExceedMaxSize
-                ? 'Function body exceeds maximum size for the browser'
-                : 'The format may be invalid or the function may be corrupted'
+              filesError?.message ?? 'The format may be invalid or the function may be corrupted'
             }
           >
             <p className="mb-0!">To resolve this issue:</p>
