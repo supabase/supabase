@@ -70,7 +70,7 @@ export function FilterSideBar({
 
       <UnifiedLogsBanner />
 
-      <div className="flex-1 p-2 sm:overflow-y-scroll">
+      <div className="flex-1 px-4 py-2 sm:overflow-y-scroll">
         <DataTableFilterControls
           dateRangeDisabled={dateRangeDisabled}
           itemsAfter={{ level: <UserLogFilterControl /> }}
