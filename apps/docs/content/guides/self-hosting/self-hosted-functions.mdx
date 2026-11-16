@@ -297,9 +297,9 @@ When you call a function from a browser, the function must handle preflight requ
 
 A missing function, one that fails to start, or an unhandled error in your function also shows up in the browser as a CORS or network error: the preflight fails, or the error response has no CORS headers. Check the function name in the URL and run `docker compose logs functions`.
 
-### HTML from a function is shown as plain text
+### Scripts in HTML from a function don't run
 
-The API gateway serves `GET` responses that contain HTML as `text/plain`, and opening an SVG response directly downloads it, because Studio shares the gateway's origin. Other request methods aren't affected. See [HTML and SVG responses](/docs/guides/self-hosting/self-hosted-envoy#html-and-svg-responses).
+The API gateway adds a sandbox `Content-Security-Policy` to responses to `GET` requests, because Studio shares the gateway's origin. A page returned by a function still displays, but its scripts don't run and its forms can't be submitted. Other request methods aren't affected. See [Sandboxed responses](/docs/guides/self-hosting/self-hosted-envoy#sandboxed-responses).
 
 ### Changes to function code not reflected after editing
 

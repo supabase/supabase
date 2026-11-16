@@ -42,7 +42,7 @@ HTTP filter chain
   ├─ Lua: translate opaque keys in header
   ├─ Lua: mirror apikey to x-api-key (Realtime WS)
   ├─ Lua: synthesize Authorization header
-  ├─ Lua: neutralize HTML and SVG responses (Storage, REST, Functions)
+  ├─ Lua: sandbox responses (Storage, REST, Functions)
   ├─ RBAC  (global: service_role → /pg/, apikey → other API routes;
   │         per-route DENY override on /mcp and Realtime
   │         /api/tenants, /api/openapi)
@@ -255,15 +255,16 @@ The gateway listens on plain HTTP only and does not terminate TLS. For public de
 
 </Admonition>
 
-### HTML and SVG responses
+### Sandboxed responses
 
-Studio is served from the same origin as the APIs, so the gateway sanitizes responses that browsers would render as HTML or SVG on `/storage/v1/`, `/rest/v1/`, and `GET` requests to `/functions/v1/`:
+Studio is served from the same origin as the APIs, so the gateway adds these headers to responses on `/storage/v1/`, `/rest/v1/`, and `GET` requests to `/functions/v1/`:
 
-- HTML, XHTML, and XML responses, and paths ending in `.html`, `.htm`, `.xhtml`, or `.xhtm`, are served as `text/plain` with `Content-Security-Policy: default-src 'none'; sandbox`.
-- SVG responses keep their type, so they still display in `<img>` tags. They get the same policy and `Content-Disposition: attachment`, so opening one directly downloads it.
-- These responses, and responses on paths without a file extension, get `X-Content-Type-Options: nosniff`.
+- `Content-Security-Policy: default-src 'none'; media-src 'self'; sandbox`
+- `X-Content-Type-Options: nosniff`
 
-The Kong configuration applies the same rules.
+A document opened directly from these routes, such as an HTML page or an SVG image, still displays, but it can't run scripts or submit forms. Images and media opened directly still display, and requests from your app, such as `fetch` calls and `<img>` tags, aren't affected.
+
+The Kong configuration adds the same headers.
 
 ## Customizing the configuration
 

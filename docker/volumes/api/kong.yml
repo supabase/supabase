@@ -202,41 +202,22 @@ services:
           allow:
             - admin
             - anon
-      # Sanitizes responses that browsers would render as HTML or SVG, since
-      # Studio shares this origin. `&sanitize_html` is a YAML anchor: the
-      # storage-v1 and functions-v1 services below reuse this same Lua code
-      # through the `*sanitize_html` alias, which YAML expands into a copy.
+      # Sandboxes responses, since Studio shares this origin: a document opened
+      # from these routes can't run script or submit forms. Subresources (<img>,
+      # fetch, downloads) ignore the policy, and media-src 'self' lets the browser's
+      # player load audio and video opened directly. `&sandbox_response` is a YAML anchor:
+      # the storage-v1 and functions-v1 services below reuse this same Lua code
+      # through the `*sandbox_response` alias, which YAML expands into a copy.
       - name: post-function
         config:
           header_filter:
-            - &sanitize_html |
-              local path = kong.request.get_path()
-              -- Functions may return HTML to other methods
-              if path:sub(1, 14) == "/functions/v1/" and kong.request.get_method() ~= "GET" then
+            - &sandbox_response |
+              -- Functions may return HTML pages to other methods
+              if kong.request.get_path():sub(1, 14) == "/functions/v1/" and kong.request.get_method() ~= "GET" then
                 return
               end
-              local content_type = (kong.response.get_header("Content-Type") or ""):lower()
-              local function has(value)
-                return content_type:find(value, 1, true) ~= nil
-              end
-              local svg = has("image/svg")
-              -- Any XML type (text/xml, application/xml, *+xml) renders as a document
-              local html = path:lower():match("%.x?html?$") ~= nil or has("text/html")
-                or has("application/xhtml") or has("text/xml") or has("application/xml")
-                or (has("+xml") and not svg)
-              if path:find(".", 1, true) and not html and not svg then
-                return
-              end
-              local csp = "default-src 'none'; sandbox"
+              kong.response.set_header("Content-Security-Policy", "default-src 'none'; media-src 'self'; sandbox")
               kong.response.set_header("X-Content-Type-Options", "nosniff")
-              if html then
-                kong.response.set_header("Content-Type", "text/plain")
-                kong.response.set_header("Content-Security-Policy", csp)
-              elseif svg then
-                -- Keeps the type so <img> still works; blocks script when opened directly
-                kong.response.set_header("Content-Security-Policy", csp)
-                kong.response.set_header("Content-Disposition", "attachment")
-              end
 
   ## Secure GraphQL routes
   - name: graphql-v1
@@ -395,8 +376,8 @@ services:
                 kong.service.request.clear_header("authorization")
               end
           header_filter:
-            # Same Lua code as the rest-v1 service (YAML alias of `&sanitize_html`)
-            - *sanitize_html
+            # Same Lua code as the rest-v1 service (YAML alias of `&sandbox_response`)
+            - *sandbox_response
 
   ## Edge Functions routes
   ##
@@ -445,8 +426,8 @@ services:
                 kong.service.request.clear_header("sb-api-key")
               end
           header_filter:
-            # Same Lua code as the rest-v1 service (YAML alias of `&sanitize_html`)
-            - *sanitize_html
+            # Same Lua code as the rest-v1 service (YAML alias of `&sandbox_response`)
+            - *sandbox_response
 
   ## OAuth 2.0 Authorization Server Metadata (RFC 8414)
   - name: well-known-oauth

@@ -1,9 +1,10 @@
 #!/bin/sh
 #
-# Response sanitization: the API gateway sanitizes responses that browsers
-# would render as HTML or SVG on Storage, REST and Functions (GET only), since
-# Studio shares the gateway's origin. Creates a temporary public bucket, function and database
-# function, checks the response headers, and removes them.
+# Response sandboxing: the API gateway adds a sandbox Content-Security-Policy
+# and nosniff to Storage, REST and Functions (GET only) responses, since Studio
+# shares the gateway's origin. Content types are kept. Creates a temporary
+# public bucket, function and database function, checks the response headers,
+# and removes them.
 #
 # Usage (from the docker/ directory of a running local stack):
 #   sh tests/test-response-sanitization.sh              # Uses http://localhost:8000
@@ -13,7 +14,7 @@
 set -eu
 
 BASE_URL="${1:-http://localhost:8000}"
-CSP="default-src 'none'; sandbox"
+CSP="default-src 'none'; media-src 'self'; sandbox"
 
 if [ ! -f .env ] || [ ! -d volumes/functions ]; then
     echo "Error: run from the docker/ directory of the running stack."
@@ -27,7 +28,7 @@ DASHBOARD_USERNAME=$(env_value DASHBOARD_USERNAME)
 DASHBOARD_PASSWORD=$(env_value DASHBOARD_PASSWORD)
 
 suffix=$(date +%s)
-bucket="sanitize-test-$suffix"
+bucket="sandbox-test-$suffix"
 fn_dir=""
 headers=""
 rest_fn=""
@@ -79,25 +80,19 @@ fetch() {
 
 # media_type: Content-Type of the last response without parameters (Kong adds a charset)
 media_type() {
-    header content-type | cut -d';' -f1 | tr -d ' '
+    header content-type | cut -d';' -f1 | tr -d ' ' | tr '[:upper:]' '[:lower:]'
 }
 
 psql_exec() {
     docker exec -i supabase-db psql -U postgres -d postgres -v ON_ERROR_STOP=1 -q -c "$1" >/dev/null
 }
 
-# expect_html <description>: rewritten to text/plain with a sandbox CSP
-expect_html() {
-    check "$1: Content-Type is text/plain" "text/plain" "$(media_type)"
+# expect_sandboxed <description> [media type]: sandbox CSP and nosniff, type kept
+expect_sandboxed() {
+    if [ -n "${2:-}" ]; then
+        check "$1: Content-Type is kept" "$2" "$(media_type)"
+    fi
     check "$1: sandbox CSP" "$CSP" "$(header content-security-policy)"
-    check "$1: nosniff" "nosniff" "$(header x-content-type-options)"
-}
-
-# expect_svg <description>: type kept, sandbox CSP, served as attachment
-expect_svg() {
-    check "$1: Content-Type is kept" "image/svg+xml" "$(media_type)"
-    check "$1: sandbox CSP" "$CSP" "$(header content-security-policy)"
-    check "$1: attachment" "attachment" "$(header content-disposition)"
     check "$1: nosniff" "nosniff" "$(header x-content-type-options)"
 }
 
@@ -119,27 +114,29 @@ check "Create public bucket" "200" "$status"
 check "Upload SVG" "200" "$(upload image.svg image/svg+xml '<svg xmlns="http://www.w3.org/2000/svg"/>')"
 check "Upload XML" "200" "$(upload data.xml application/xml '<a/>')"
 check "Upload HTML" "200" "$(upload page.html text/html '<h1>x</h1>')"
+check "Upload +xml" "200" "$(upload note.txt application/rdf+xml '<a/>')"
 check "Upload PNG" "200" "$(upload image.png image/png 'not really a png')"
-# Browsers render any +xml type as an XML document, whatever the file name
-check "Upload +xml" "200" "$(upload note.txt application/vnd.test+xml '<a/>')"
 
 public="$BASE_URL/storage/v1/object/public/$bucket"
 check "Public SVG" "200" "$(fetch GET "$public/image.svg")"
-expect_svg "Public SVG"
+expect_sandboxed "Public SVG" "image/svg+xml"
 check "Public XML" "200" "$(fetch GET "$public/data.xml")"
-expect_html "Public XML"
+expect_sandboxed "Public XML" "application/xml"
+# Storage itself may serve HTML as text/plain, so only the headers are checked
 check "Public HTML" "200" "$(fetch GET "$public/page.html")"
-expect_html "Public HTML"
+expect_sandboxed "Public HTML"
 check "Public +xml" "200" "$(fetch GET "$public/note.txt")"
-expect_html "Public +xml"
+expect_sandboxed "Public +xml" "application/rdf+xml"
 check "Public PNG" "200" "$(fetch GET "$public/image.png")"
-check "Public PNG: Content-Type is kept" "image/png" "$(media_type)"
-check "Public PNG: no CSP" "" "$(header content-security-policy)"
-check "Public PNG: no nosniff" "" "$(header x-content-type-options)"
+expect_sandboxed "Public PNG" "image/png"
+
+# S3 clients reject S3 protocol responses that aren't XML
+fetch GET "$BASE_URL/storage/v1/s3/$bucket" >/dev/null
+expect_sandboxed "S3 protocol error" "application/xml"
 
 # --- Functions -------------------------------------------------------------
 
-fn_dir=$(mktemp -d volumes/functions/sanitize-test-XXXXXX)
+fn_dir=$(mktemp -d volumes/functions/sandbox-test-XXXXXX)
 fn_url="$BASE_URL/functions/v1/${fn_dir##*/}"
 cat > "$fn_dir/index.ts" <<'EOF'
 Deno.serve((req) => {
@@ -153,27 +150,23 @@ chmod 644 "$fn_dir/index.ts"
 
 echo "--- Functions ---"
 check "GET HTML" "200" "$(fetch GET "$fn_url?type=text/html")"
-expect_html "GET HTML"
-check "GET SVG" "200" "$(fetch GET "$fn_url?type=image/svg%2Bxml")"
-expect_svg "GET SVG"
-check "GET +xml" "200" "$(fetch GET "$fn_url?type=application/vnd.test%2Bxml")"
-expect_html "GET +xml"
+expect_sandboxed "GET HTML" "text/html"
 # Media types are case-insensitive for browsers
 check "GET Text/HTML" "200" "$(fetch GET "$fn_url?type=Text/HTML")"
-expect_html "GET Text/HTML"
+expect_sandboxed "GET Text/HTML" "text/html"
+check "GET SVG" "200" "$(fetch GET "$fn_url?type=image/svg%2Bxml")"
+expect_sandboxed "GET SVG" "image/svg+xml"
 check "GET JSON" "200" "$(fetch GET "$fn_url?type=application/json")"
-check "GET JSON: Content-Type is kept" "application/json" "$(media_type)"
-check "GET JSON: no CSP" "" "$(header content-security-policy)"
-check "GET JSON: nosniff (no file extension)" "nosniff" "$(header x-content-type-options)"
+expect_sandboxed "GET JSON" "application/json"
 check "POST HTML" "200" "$(fetch POST "$fn_url?type=text/html" -d x)"
-check "POST HTML: Content-Type is kept (not GET)" "text/html" "$(media_type)"
+check "POST HTML: Content-Type is kept" "text/html" "$(media_type)"
 check "POST HTML: no CSP (not GET)" "" "$(header content-security-policy)"
 
 # --- REST ------------------------------------------------------------------
 
 echo "--- REST ---"
 if docker ps --format '{{.Names}}' 2>/dev/null | grep -q '^supabase-db$'; then
-    rest_fn="sanitize_test_$suffix"
+    rest_fn="sandbox_test_$suffix"
     if [ -z "$(docker exec supabase-db psql -U postgres -d postgres -tAc "select 1 from pg_type where typname = 'text/html'")" ]; then
         rest_domain_created=yes
     fi
@@ -189,7 +182,7 @@ if docker ps --format '{{.Names}}' 2>/dev/null | grep -q '^supabase-db$'; then
         sleep 1
     done
     check "RPC returning HTML" "200" "$rest_status"
-    expect_html "RPC returning HTML"
+    expect_sandboxed "RPC returning HTML" "text/html"
 else
     echo "  SKIP: REST HTML checks (database container not running)"
 fi
