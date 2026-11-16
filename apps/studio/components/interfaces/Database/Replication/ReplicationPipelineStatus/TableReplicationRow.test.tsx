@@ -5,11 +5,6 @@ import { describe, expect, it, vi } from 'vitest'
 import { TableReplicationRow } from './TableReplicationRow'
 import { customRender } from '@/tests/lib/custom-render'
 
-vi.mock('common', async (importOriginal) => ({
-  ...(await importOriginal<typeof import('common')>()),
-  useParams: () => ({ ref: 'default' }),
-}))
-
 describe('TableReplicationRow reset progress', () => {
   it.each([true, false])('describes a pending reset when stopped is %s', (isPipelineStopped) => {
     customRender(

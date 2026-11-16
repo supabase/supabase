@@ -148,7 +148,11 @@ Pipelines supports:
 
 New scalar columns leave historical BigQuery rows `NULL`; new array columns expose an empty array. Later row changes supply the source value. Pipelines does not backfill existing rows when adding a column.
 
-Removing a column from the publication also removes its destination values. Adding it again does not restore those values. To include a previously excluded array column, select the table for initial sync and [reset the table](/docs/guides/database/replication/pipelines-monitoring#restarting-tables).
+Removing a column from the publication also removes its destination values. Adding it again does not restore those values. To include a previously excluded array column:
+
+1. Add the column to the publication.
+2. Select the table for **Initial sync**.
+3. [Reset the table](/docs/guides/database/replication/pipelines-monitoring#restarting-tables).
 
 Adding `NOT NULL` keeps an existing destination column nullable. For type changes, unsupported changes, and interrupted schema changes, see the shared [schema-change behavior and recovery](/docs/guides/database/replication/pipelines#schema-change-support).
 
