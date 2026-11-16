@@ -5,7 +5,7 @@ topics: ['Rundowns']
 lastEdited: 2026-11-16
 ---
 
-[Astro](https://astro.build/) sites are static by default, so pages are built when there is no user, session, or cookie. Astro can also [render specific pages on demand](https://docs.astro.build/en/guides/on-demand-rendering/), which is how you read the signed-in user. An authentication provider for Astro needs to work wherever that code runs: pages, middleware, Astro Actions, API endpoints, and the browser.
+[Astro](https://astro.build/) sites are static by default, so there is no user when pages are built. That leaves two places to check who is signed in: the browser, which works on static pages, or the server, which needs [on-demand rendering](https://docs.astro.build/en/guides/on-demand-rendering/) so pages, middleware, Astro Actions, and API endpoints can read the user. Your authentication provider should work in whichever you use.
 
 When you compare providers, check how well they handle:
 
