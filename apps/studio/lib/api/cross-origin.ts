@@ -10,7 +10,9 @@ const SAFE_METHODS = new Set(['GET', 'HEAD', 'OPTIONS'])
  *
  * Follows https://words.filippo.io/csrf/: trust `Sec-Fetch-Site` when present,
  * fall back to comparing `Origin` with the requested host, and allow requests
- * with neither header, which don't come from a browser.
+ * with neither header, which don't come from a browser. Browsers send
+ * `Sec-Fetch-Site` only to HTTPS and localhost, so over plain HTTP the `Origin`
+ * check is the one that applies.
  */
 export function isCrossOriginRequest(request: Request): boolean {
   if (SAFE_METHODS.has(request.method)) return false
@@ -21,19 +23,37 @@ export function isCrossOriginRequest(request: Request): boolean {
   const origin = request.headers.get('origin')
   if (origin === null) return false
 
-  // A gateway may rewrite Host (Kong does by default), so prefer the host the
-  // browser asked for. Pages can't set X-Forwarded-Host on a cross-site form
-  // submit or simple fetch.
-  const forwardedHost = request.headers.get('x-forwarded-host')?.split(',')[0].trim()
-  const host = forwardedHost || request.headers.get('host')
-  if (!host) return true
-
+  let originHost: string
   try {
-    // Hostnames only: Kong leaves the port out of X-Forwarded-Host. Only
-    // browsers without Sec-Fetch-Site reach this check.
-    return new URL(origin).hostname !== new URL(`http://${host}`).hostname
+    originHost = new URL(origin).host
   } catch {
     // Opaque origins ("null") and malformed values
     return true
   }
+
+  return !requestedHosts(request.headers).includes(originHost)
+}
+
+const HAS_PORT = /:\d+$/
+
+/**
+ * The host (with port) the browser asked for. A proxy in front of Studio
+ * forwards it in X-Forwarded-Host; without a proxy it's Host. Pages can't set
+ * these headers on a cross-site form submit or simple fetch.
+ */
+function requestedHosts(headers: Headers): string[] {
+  const first = (name: string) => headers.get(name)?.split(',')[0].trim().toLowerCase()
+
+  const forwardedHost = first('x-forwarded-host')
+  if (!forwardedHost) {
+    const host = first('host')
+    return host ? [host] : []
+  }
+
+  // Kong leaves the port out of X-Forwarded-Host and sends it separately.
+  // The bare host still covers browsers on the default port.
+  const forwardedPort = first('x-forwarded-port')
+  return forwardedPort && !HAS_PORT.test(forwardedHost)
+    ? [forwardedHost, `${forwardedHost}:${forwardedPort}`]
+    : [forwardedHost]
 }

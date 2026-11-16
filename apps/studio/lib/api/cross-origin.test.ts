@@ -39,26 +39,53 @@ describe('isCrossOriginRequest', () => {
       expect(isCrossOriginRequest(request('POST'))).toBe(false)
     })
 
+    // Without a proxy, as on a CLI stack
     it('allows an Origin that matches Host', () => {
-      const req = request('POST', { origin: 'http://localhost:8000', host: 'localhost:8000' })
+      const req = request('POST', { origin: 'http://10.0.0.5:54323', host: '10.0.0.5:54323' })
       expect(isCrossOriginRequest(req)).toBe(false)
     })
 
-    it('blocks an Origin that differs from Host', () => {
-      const req = request('POST', { origin: 'https://evil.example', host: 'localhost:8000' })
+    it('blocks the same hostname on another port', () => {
+      const req = request('POST', { origin: 'http://10.0.0.5:8080', host: '10.0.0.5:54323' })
       expect(isCrossOriginRequest(req)).toBe(true)
     })
 
-    // Headers as each gateway forwards them to Studio
+    it('blocks another site', () => {
+      const req = request('POST', { origin: 'https://evil.example', host: '10.0.0.5:54323' })
+      expect(isCrossOriginRequest(req)).toBe(true)
+    })
+
+    // Headers as each proxy forwards them to Studio, with the origin of the
+    // page the browser loaded Studio from
     it.each([
-      ['Envoy', { host: 'localhost:8000', 'x-forwarded-host': 'localhost:8000' }],
+      [
+        'Envoy',
+        {
+          host: 'studio.test:8000',
+          'x-forwarded-host': 'studio.test:8000',
+          'x-forwarded-port': '8000',
+        },
+        'http://studio.test:8000',
+      ],
       [
         'Kong',
-        { host: 'studio:3000', 'x-forwarded-host': 'localhost', 'x-forwarded-port': '8000' },
+        { host: 'studio:3000', 'x-forwarded-host': 'studio.test', 'x-forwarded-port': '8000' },
+        'http://studio.test:8000',
       ],
-    ])('compares against the host the browser asked for behind %s', (_, headers) => {
+      [
+        'Caddy',
+        { host: 'studio.test:8443', 'x-forwarded-host': 'studio.test:8443' },
+        'https://studio.test:8443',
+      ],
+      [
+        'nginx',
+        { host: 'studio.test', 'x-forwarded-host': 'studio.test', 'x-forwarded-port': '443' },
+        'https://studio.test',
+      ],
+    ])('compares against the host the browser asked for behind %s', (_, headers, studio) => {
       const from = (origin: string) => isCrossOriginRequest(request('POST', { ...headers, origin }))
-      expect(from('http://localhost:8000')).toBe(false)
+      expect(from(studio)).toBe(false)
+      expect(from('http://studio.test:9999')).toBe(true)
       expect(from('https://evil.example')).toBe(true)
       expect(from('http://studio:3000')).toBe(true)
     })
