@@ -1,5 +1,5 @@
 import { IS_PLATFORM, useParams } from 'common'
-import { parseAsArrayOf, parseAsInteger, parseAsJson, parseAsString, useQueryStates } from 'nuqs'
+import { parseAsArrayOf, parseAsJson, parseAsString, useQueryStates } from 'nuqs'
 import { Admonition } from 'ui-patterns/Admonition'
 
 import { OBSERVABILITY_DOCS_HREFS } from '@/components/interfaces/Observability/Observability.constants'
@@ -32,7 +32,7 @@ const QueryPerformanceReport: NextPageWithLayout = () => {
       search: searchQuery,
       roles,
       sources,
-      minCalls,
+      callsFilter: callsFilterRaw,
       totalTimeFilter: totalTimeFilterRaw,
       indexAdvisor,
     },
@@ -42,26 +42,22 @@ const QueryPerformanceReport: NextPageWithLayout = () => {
     search: parseAsString.withDefault(''),
     roles: parseAsArrayOf(parseAsString).withDefault([]),
     sources: parseAsArrayOf(parseAsString).withDefault([]),
-    minCalls: parseAsInteger,
+    callsFilter: parseAsJson<NumericFilter | null>((value) =>
+      value === null || value === undefined ? null : (value as NumericFilter)
+    ),
     totalTimeFilter: parseAsJson<NumericFilter | null>((value) =>
       value === null || value === undefined ? null : (value as NumericFilter)
     ),
     indexAdvisor: parseAsString.withDefault('false'),
   })
 
-  const totalTimeFilter = totalTimeFilterRaw ?? null
+  const callsFilter = callsFilterRaw ?? undefined
+  const totalTimeFilter = totalTimeFilterRaw ?? undefined
 
   const config = PRESET_CONFIG[Presets.QUERY_PERFORMANCE]
   const hooks = queriesFactory(config.queries, ref ?? 'default')
   const queryHitRate = hooks.queryHitRate()
   const queryMetrics = hooks.queryMetrics()
-
-  const minTotalTime =
-    totalTimeFilter && totalTimeFilter.operator === '>'
-      ? totalTimeFilter.value
-      : totalTimeFilter && totalTimeFilter.operator === '>='
-        ? totalTimeFilter.value
-        : undefined
 
   const queryPerformanceQuery = useQueryPerformanceInfiniteQuery({
     searchQuery,
@@ -70,8 +66,8 @@ const QueryPerformanceReport: NextPageWithLayout = () => {
     roles,
     sources: sources as QuerySource[],
     runIndexAdvisor: isIndexAdvisorEnabled,
-    minCalls: minCalls ?? undefined,
-    minTotalTime,
+    callsFilter,
+    totalTimeFilter,
     filterIndexAdvisor: indexAdvisor === 'true',
   })
 
