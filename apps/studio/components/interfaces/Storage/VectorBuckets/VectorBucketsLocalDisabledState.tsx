@@ -16,9 +16,8 @@ export const VectorBucketsLocalDisabledState = () => {
   return (
     <Admonition type="default" title="Vector buckets are not enabled">
       <p className="text-foreground-light">
-        To use vector buckets locally, enable them in your{' '}
-        <code className="text-code-inline">supabase/config.toml</code> and restart with{' '}
-        <code className="text-code-inline">supabase start</code>.
+        To use vector buckets locally, enable them in your <code>supabase/config.toml</code> and
+        restart with <code>supabase start</code>.
       </p>
       <CodeBlock language="toml" hideLineNumbers className="mt-2 max-w-full">
         {CONFIG_SNIPPET}

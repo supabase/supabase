@@ -1,16 +1,14 @@
 import { createFileRoute, Outlet } from '@tanstack/react-router'
-import { LOCAL_STORAGE_KEYS, useParams } from 'common'
+import { LOCAL_STORAGE_KEYS, useFlag, useParams } from 'common'
 
 import { useIsAdvisorRulesEnabled } from '@/components/interfaces/App/FeaturePreview/FeaturePreviewContext'
-import AdvisorsLayout from '@/components/layouts/AdvisorsLayout/AdvisorsLayout'
+import { AdvisorsLayout } from '@/components/layouts/AdvisorsLayout/AdvisorsLayout'
+import { IssuesLayout } from '@/components/layouts/IssuesLayout/IssuesLayout'
 import { PageLayout } from '@/components/layouts/PageLayout/PageLayout'
 import { FeaturePreviewBadge } from '@/components/ui/FeaturePreviewBadge'
 
 export const Route = createFileRoute('/project/$ref/advisors/rules')({
   component: AdvisorRulesShell,
-  // Opt out of the parent advisors.tsx shell's <AdvisorsLayout> wrap
-  // — we render our own with no title, plus a PageLayout tab strip,
-  // mirroring the existing AdvisorRulesLayout component.
   staticData: {
     skipAdvisorsLayout: true,
   },
@@ -25,20 +23,26 @@ export const Route = createFileRoute('/project/$ref/advisors/rules')({
 // component's DefaultLayout-wrapping shape.
 function AdvisorRulesShell() {
   const { ref } = useParams()
+  const isIssuesInboxEnabled = useFlag('issuesInbox')
+  const Layout = isIssuesInboxEnabled ? IssuesLayout : AdvisorsLayout
   const isAdvisorRulesEnabled = useIsAdvisorRulesEnabled()
 
   return (
-    <AdvisorsLayout>
+    <Layout>
       <PageLayout
         title={
           <span className="flex items-center gap-x-4">
-            Advisor Settings
+            <span>{isIssuesInboxEnabled ? 'Check settings' : 'Advisor settings'}</span>
             {isAdvisorRulesEnabled && (
               <FeaturePreviewBadge featureKey={LOCAL_STORAGE_KEYS.UI_PREVIEW_ADVISOR_RULES} />
             )}
           </span>
         }
-        subtitle="Disable specific advisor categories or rules"
+        subtitle={
+          isIssuesInboxEnabled
+            ? 'Turn off specific checks or categories'
+            : 'Disable specific advisor categories or rules'
+        }
         navigationItems={[
           {
             label: 'Security',
@@ -52,6 +56,6 @@ function AdvisorRulesShell() {
       >
         <Outlet />
       </PageLayout>
-    </AdvisorsLayout>
+    </Layout>
   )
 }

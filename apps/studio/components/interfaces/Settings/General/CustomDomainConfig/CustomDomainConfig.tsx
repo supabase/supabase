@@ -1,6 +1,6 @@
 import { SupportCategories } from '@supabase/shared-types/out/constants'
 import { useFlag, useParams } from 'common'
-import { AlertCircle } from 'lucide-react'
+import { AlertCircleIcon } from 'lucide-react'
 import { Card, CardContent } from 'ui'
 import {
   PageSection,
@@ -79,7 +79,7 @@ export const CustomDomainConfig = () => {
           <PageSectionSummary>
             <PageSectionTitle>Custom domains</PageSectionTitle>
             <PageSectionDescription>
-              Present a branded experience to your users
+              Present a branded experience to your users.
             </PageSectionDescription>
           </PageSectionSummary>
         </PageSectionMeta>
@@ -100,7 +100,7 @@ export const CustomDomainConfig = () => {
         <PageSectionSummary>
           <PageSectionTitle>Custom domains</PageSectionTitle>
           <PageSectionDescription>
-            Present a branded experience to your users
+            Present a branded experience to your users.
           </PageSectionDescription>
         </PageSectionSummary>
       </PageSectionMeta>
@@ -140,7 +140,7 @@ export const CustomDomainConfig = () => {
           <Card>
             <CardContent className="space-y-6">
               <div className="flex items-center justify-center space-x-2 py-8">
-                <AlertCircle size={16} strokeWidth={1.5} />
+                <AlertCircleIcon size={16} strokeWidth={1.5} />
                 <p className="text-sm text-foreground-light">
                   Failed to retrieve custom domain configuration. Please try again later or{' '}
                   <SupportLink

@@ -1,5 +1,5 @@
-import { Checkbox } from 'ui'
 import {
+  Checkbox,
   Field,
   FieldContent,
   FieldDescription,
@@ -8,7 +8,7 @@ import {
   FieldLegend,
   FieldSeparator,
   FieldSet,
-} from 'ui/src/components/shadcn/ui/field'
+} from 'ui'
 
 export default function FieldCheckbox() {
   return (

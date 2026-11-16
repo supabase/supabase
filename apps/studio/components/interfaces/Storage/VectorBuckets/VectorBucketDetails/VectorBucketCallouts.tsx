@@ -28,8 +28,9 @@ export const ExtensionNotInstalled = ({
       <Admonition type="warning" title="Missing required extension">
         <p>
           The Wrappers extension is required in order to query vector tables.{' '}
-          {databaseNeedsUpgrading &&
-            'Please first upgrade your database and then install the extension.'}{' '}
+          {databaseNeedsUpgrading && (
+            <span>Please first upgrade your database and then install the extension.</span>
+          )}{' '}
           <InlineLink
             href={`${DOCS_URL}/guides/database/extensions/wrappers/s3_vectors`}
             target="_blank"
@@ -37,7 +38,7 @@ export const ExtensionNotInstalled = ({
             Learn more
           </InlineLink>
         </p>
-        <Button variant="default" asChild className="mt-2">
+        <Button asChild className="mt-2">
           <Link
             href={
               databaseNeedsUpgrading
@@ -74,14 +75,14 @@ export const ExtensionNeedsUpgrade = ({
           The {wrapperMeta.label} wrapper requires a minimum extension version of{' '}
           {wrapperMeta.minimumExtensionVersion}. You have version{' '}
           {wrappersExtension?.installed_version} installed. Please{' '}
-          {databaseNeedsUpgrading && 'first upgrade your database, and then '}update the extension
-          by disabling and enabling the Wrappers extension.
+          {databaseNeedsUpgrading && <span>{'first upgrade your database, and then '}</span>}
+          <span>update the extension by disabling and enabling the Wrappers extension.</span>
         </p>
         <p>
           Before reinstalling the wrapper extension, you must first remove all existing wrappers.
           Afterward, you can recreate the wrappers.
         </p>
-        <Button asChild variant="default">
+        <Button asChild>
           <Link
             href={
               databaseNeedsUpgrading
@@ -116,7 +117,7 @@ export const WrapperMissing = ({ bucketName }: { bucketName?: string }) => {
     <ScaffoldSection isFullWidth>
       <Admonition type="warning" title="Missing integration">
         <p>The S3 Vectors Wrapper integration is required in order to query vector tables.</p>
-        <Button variant="default" loading={isCreatingS3VectorsWrapper} onClick={onSetupWrapper}>
+        <Button loading={isCreatingS3VectorsWrapper} onClick={onSetupWrapper}>
           Install wrapper
         </Button>
       </Admonition>

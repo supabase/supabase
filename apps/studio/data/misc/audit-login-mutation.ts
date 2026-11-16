@@ -3,7 +3,8 @@ import { useMutation } from '@tanstack/react-query'
 import { toast } from 'sonner'
 
 import { handleError, post } from '@/data/fetchers'
-import type { ResponseError, UseCustomMutationOptions } from '@/types'
+import type { StudioError } from '@/lib/errors/studio-errors'
+import type { UseCustomMutationOptions } from '@/types'
 
 export async function addLoginEvent() {
   const { error } = await post('/platform/profile/audit-login')
@@ -18,10 +19,10 @@ export const useAddLoginEvent = ({
   onError,
   ...options
 }: Omit<
-  UseCustomMutationOptions<AddLoginEventData, ResponseError, AddLoginEventVariables>,
+  UseCustomMutationOptions<AddLoginEventData, StudioError, AddLoginEventVariables>,
   'mutationFn'
 > = {}) => {
-  return useMutation<AddLoginEventData, ResponseError, AddLoginEventVariables>({
+  return useMutation<AddLoginEventData, StudioError, AddLoginEventVariables>({
     mutationFn: () => addLoginEvent(),
     async onSuccess(data, variables, context) {
       await onSuccess?.(data, variables, context)

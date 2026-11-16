@@ -1,5 +1,5 @@
 import type { LucideIcon } from 'lucide-react'
-import { Server } from 'lucide-react'
+import { ServerIcon } from 'lucide-react'
 import type { ReactNode } from 'react'
 import { cn } from 'ui'
 import { EmptyStatePresentational } from 'ui-patterns/EmptyStatePresentational'
@@ -18,7 +18,7 @@ interface HighAvailabilityDisabledEmptyStateProps {
 export function HighAvailabilityDisabledEmptyState({
   title = DEFAULT_TITLE,
   description = DEFAULT_DESCRIPTION,
-  icon = Server,
+  icon = ServerIcon,
   className,
 }: HighAvailabilityDisabledEmptyStateProps) {
   return (

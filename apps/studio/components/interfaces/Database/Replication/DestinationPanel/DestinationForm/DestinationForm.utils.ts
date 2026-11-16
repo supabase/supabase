@@ -1,12 +1,8 @@
-import { UseMutateAsyncFunction } from '@tanstack/react-query'
-import { snakeCase } from 'lodash'
 import z from 'zod'
 
 import { DestinationType } from '../DestinationPanel.types'
 import { type ClickHouseApiConfig } from './ClickHouse/ClickHouse.utils'
 import {
-  CREATE_NEW_KEY,
-  CREATE_NEW_NAMESPACE,
   DEFAULT_CONNECTION_POOL_SIZE,
   DEFAULT_DUCKLAKE_POOL_SIZE,
   DEFAULT_MAX_COPY_CONNECTIONS_PER_TABLE,
@@ -24,27 +20,23 @@ import {
 } from './DuckLake/DuckLake.constants'
 import { type DucklakeApiConfig } from './DuckLake/DuckLake.utils'
 import { type SnowflakeApiConfig } from './Snowflake/Snowflake.utils'
-import {
+import { type ReplicationDestinationByIdData } from '@/data/replication/destination-by-id-query'
+import { type ReplicationPipelineByIdData } from '@/data/replication/pipeline-by-id-query'
+import { type ReplicationPublicationData } from '@/data/replication/publication-query'
+import type {
   BatchConfig,
   BigQueryDestinationConfig,
+  BigQueryPartitionBy,
+  BigQueryTableOption,
   ClickHouseDestinationConfig,
   DestinationConfig,
   DucklakeDestinationConfig,
   DucklakeManualDestinationConfig,
   DucklakeSupabaseDestinationConfig,
-  IcebergDestinationConfig,
   SnowflakeDestinationConfig,
   TableSyncCopyConfig,
-} from '@/data/replication/create-destination-pipeline-mutation'
-import { type ReplicationDestinationByIdData } from '@/data/replication/destination-by-id-query'
-import { type ReplicationPipelineByIdData } from '@/data/replication/pipeline-by-id-query'
-import { type ReplicationPublication } from '@/data/replication/publications-query'
+} from '@/data/replication/types'
 import { type ValidationFailure } from '@/data/replication/validate-destination-mutation'
-import {
-  type CreateS3AccessKeyCredentialVariables,
-  type S3AccessKeyCreateData,
-} from '@/data/storage/s3-access-key-create-mutation'
-import { type ResponseError } from '@/types'
 
 const normalizeOptionalString = (value?: string) => {
   const trimmed = value?.trim()
@@ -62,25 +54,15 @@ const normalizeOptionalUntrimmedString = (value?: string) => {
 export const generateDefaultValues = ({
   destinationData,
   pipelineData,
-  catalogToken,
-  region,
-  projectRef,
   editMode,
 }: {
   destinationData?: ReplicationDestinationByIdData
   pipelineData?: ReplicationPipelineByIdData
-  catalogToken: string
-  region?: string
-  projectRef?: string
   editMode: boolean
 }): DestinationPanelSchemaType => {
   const config = destinationData?.config
 
   const bigQueryConfig = config && 'big_query' in config ? config.big_query : undefined
-  const icebergConfig =
-    config && 'iceberg' in config && 'supabase' in config.iceberg
-      ? config.iceberg.supabase
-      : undefined
   const ducklakeConfig =
     config && 'ducklake' in config ? (config.ducklake as DucklakeApiConfig) : undefined
   const snowflakeConfig =
@@ -119,21 +101,12 @@ export const generateDefaultValues = ({
       (config as { big_query?: { connection_pool_size?: number } } | undefined)?.big_query
         ?.connection_pool_size ?? DEFAULT_CONNECTION_POOL_SIZE,
     maxStalenessMins: bigQueryConfig?.max_staleness_mins ?? undefined, // Default: null
-    // Analytics Bucket fields
-    warehouseName: icebergConfig?.warehouse_name ?? '',
-    namespace: icebergConfig?.namespace ?? '',
-    newNamespaceName: '',
-    catalogToken: editMode || icebergConfig ? '' : catalogToken,
-    s3AccessKeyId: '',
-    s3SecretAccessKey: '',
-    s3Region: region ?? icebergConfig?.s3_region ?? '',
+    tableOptions: (bigQueryConfig?.table_options?.tables ?? []).map(parseBigQueryTableOption),
     // DuckLake fields
-    // New destinations default to the managed "Use Supabase" mode with the current project
-    // pre-selected as both catalog and storage. Existing destinations always read back as the
-    // resolved/custom shape, so edit mode is locked to "Custom parameters".
+    // New destinations default to the managed mode, which keeps the catalog and storage in the
+    // current project. Existing destinations always read back as the resolved/custom shape, so
+    // edit mode is locked to custom connection details.
     ducklakeMode: (editMode ? DUCKLAKE_MODE_CUSTOM : DUCKLAKE_MODE_SUPABASE) as DucklakeMode,
-    ducklakeCatalogProjectRef: editMode ? '' : (projectRef ?? ''),
-    ducklakeStorageProjectRef: editMode ? '' : (projectRef ?? ''),
     ducklakeStorageBucket: '',
     ducklakeCatalogUrl: ducklakeConfig?.catalog_url ?? '',
     ducklakeDataPath: ducklakeConfig?.data_path ?? '',
@@ -172,7 +145,11 @@ export const buildTableSyncCopyConfig = ({
   if (mode === 'include_all_tables' || mode === 'skip_all_tables') return { type: mode }
 
   if (selectedTableIds.length === 0) {
-    throw new Error('Select at least one table for the initial sync')
+    throw new Error(
+      mode === 'skip_tables'
+        ? 'Select at least one table to exclude from the initial sync.'
+        : 'Select at least one table for the initial sync.'
+    )
   }
 
   const tableIds = selectedTableIds.map(Number)
@@ -203,15 +180,15 @@ export const buildBatchConfig = ({
 }
 
 // The set of table ids (as strings, matching form state) currently in the
-// selected publication. Selective table-copy only ever offers/keeps ids that
-// are in this set; ids selected previously that fall out of it are dropped at
-// submit time rather than resolved or displayed.
+// selected publication. Selective table-copy only ever offers ids in this set;
+// previously selected ids that fall out of it are highlighted in the form and
+// dropped at submit time.
 export const getPublicationTableIds = (
-  publications: ReplicationPublication[],
+  publication: ReplicationPublicationData,
   publicationName: string
 ): Set<string> => {
-  const publication = publications.find(({ name }) => name === publicationName)
-  return new Set((publication?.tables ?? []).map(({ id }) => String(id)))
+  if (publication.name !== publicationName) return new Set()
+  return new Set(publication.tables.map(({ id }) => String(id)))
 }
 
 // Drops selected table ids that are no longer in the current publication.
@@ -220,19 +197,71 @@ export const getPublicationTableIds = (
 export const pruneStaleSelectedTableIds = ({
   mode,
   selectedTableIds,
-  publications,
+  publication,
   publicationName,
 }: {
   mode: DestinationPanelSchemaType['tableSyncCopyMode']
   selectedTableIds: string[]
-  publications: ReplicationPublication[]
+  publication: ReplicationPublicationData
   publicationName: string
 }): string[] => {
   if (mode === 'include_all_tables' || mode === 'skip_all_tables') return selectedTableIds
 
-  const publicationTableIds = getPublicationTableIds(publications, publicationName)
+  const publicationTableIds = getPublicationTableIds(publication, publicationName)
   return selectedTableIds.filter((id) => publicationTableIds.has(id))
 }
+
+export const pruneStaleTableOptions = ({
+  tableOptions,
+  publication,
+  publicationName,
+}: {
+  tableOptions?: BigQueryTableOption[]
+  publication: ReplicationPublicationData
+  publicationName: string
+}): BigQueryTableOption[] | undefined => {
+  if (tableOptions === undefined) return undefined
+
+  const publicationTableIds = getPublicationTableIds(publication, publicationName)
+  return tableOptions.filter((option) => publicationTableIds.has(String(option.tableId)))
+}
+
+// Derived from the generated response type rather than hand-typed, so `granularity` stays the
+// same literal union the API actually returns instead of a widened `string` needing a cast.
+type BigQueryConfigResponse = Extract<
+  NonNullable<ReplicationDestinationByIdData['config']>,
+  { big_query: unknown }
+>['big_query']
+type BigQueryTableOptionResponse = NonNullable<
+  NonNullable<BigQueryConfigResponse['table_options']>['tables']
+>[number]
+type BigQueryPartitionByResponse = NonNullable<BigQueryTableOptionResponse['partition_by']>
+
+const parseBigQueryPartitionBy = (
+  partitionBy: BigQueryPartitionByResponse
+): BigQueryPartitionBy => {
+  switch (partitionBy.kind) {
+    case 'time_column':
+      return {
+        kind: 'time_column',
+        column: partitionBy.column,
+        granularity: partitionBy.granularity ?? 'day',
+      }
+    case 'integer_range':
+      return { ...partitionBy }
+    case 'ingestion_time':
+      return {
+        kind: 'ingestion_time',
+        granularity: partitionBy.granularity ?? 'day',
+      }
+  }
+}
+
+const parseBigQueryTableOption = (option: BigQueryTableOptionResponse): BigQueryTableOption => ({
+  tableId: option.table_id,
+  partitionBy: option.partition_by ? parseBigQueryPartitionBy(option.partition_by) : undefined,
+  clusterBy: option.cluster_by ?? [],
+})
 
 const buildBigQueryConfig = (
   data: z.infer<typeof DestinationPanelFormSchema>
@@ -242,6 +271,7 @@ const buildBigQueryConfig = (
   serviceAccountKey: data.serviceAccountKey ?? '',
   connectionPoolSize: data.connectionPoolSize,
   maxStalenessMins: data.maxStalenessMins,
+  tableOptions: data.tableOptions,
 })
 
 const buildSnowflakeConfig = (
@@ -266,17 +296,17 @@ const buildClickHouseConfig = (
   engine: data.clickhouseEngine,
 })
 
-// Builds the studio-side DuckLake config from form data, picking the right shape for the
-// selected mode. The create / update / validate mutations convert this to the API payload.
+// Managed mode always uses the current project for both the catalog and storage.
 const buildDucklakeConfig = (
-  data: z.infer<typeof DestinationPanelFormSchema>
+  data: z.infer<typeof DestinationPanelFormSchema>,
+  projectRef: string
 ): DucklakeDestinationConfig => {
   if (data.ducklakeMode === DUCKLAKE_MODE_SUPABASE) {
     const supabaseConfig: DucklakeSupabaseDestinationConfig = {
-      catalogProjectRef: normalizeRequiredString(data.ducklakeCatalogProjectRef),
-      storageProjectRef: normalizeRequiredString(data.ducklakeStorageProjectRef),
+      catalogProjectRef: projectRef,
+      storageProjectRef: projectRef,
       bucket: normalizeRequiredString(data.ducklakeStorageBucket),
-      poolSize: data.ducklakePoolSize,
+      poolSize: data.ducklakePoolSize === '' ? undefined : data.ducklakePoolSize,
       metadataSchema: normalizeOptionalString(data.ducklakeMetadataSchema),
     }
     return supabaseConfig
@@ -285,7 +315,7 @@ const buildDucklakeConfig = (
   const manualConfig: DucklakeManualDestinationConfig = {
     catalogUrl: data.ducklakeCatalogUrl ?? '',
     dataPath: data.ducklakeDataPath ?? '',
-    poolSize: data.ducklakePoolSize,
+    poolSize: data.ducklakePoolSize === '' ? undefined : data.ducklakePoolSize,
     s3AccessKeyId: normalizeRequiredString(data.ducklakeS3AccessKeyId),
     s3SecretAccessKey: normalizeRequiredString(data.ducklakeS3SecretAccessKey),
     s3Region: normalizeRequiredString(data.ducklakeS3Region),
@@ -311,61 +341,25 @@ export const buildDestinationConfigForValidation = ({
 
   if (selectedType === 'BigQuery') {
     return { bigQuery: buildBigQueryConfig(data) }
-  } else if (selectedType === 'Analytics Bucket') {
-    // For validation, use the namespace as-is (even if it's CREATE_NEW_NAMESPACE)
-    // The actual creation will happen later in submitPipeline
-    const validationNamespace =
-      data.namespace === CREATE_NEW_NAMESPACE ? data.newNamespaceName : data.namespace
-
-    // For validation purposes, if CREATE_NEW_KEY is selected, we skip S3 key validation
-    // The actual key creation will happen later in submitPipeline
-    // We'll use placeholder values for validation
-    const s3Keys =
-      data.s3AccessKeyId === CREATE_NEW_KEY
-        ? { accessKey: 'placeholder', secretKey: 'placeholder' }
-        : { accessKey: data.s3AccessKeyId ?? '', secretKey: data.s3SecretAccessKey ?? '' }
-
-    return {
-      iceberg: {
-        projectRef,
-        warehouseName: data.warehouseName ?? '',
-        namespace: validationNamespace,
-        catalogToken: data.catalogToken ?? '',
-        s3AccessKeyId: s3Keys.accessKey,
-        s3SecretAccessKey: s3Keys.secretKey,
-        s3Region: data.s3Region ?? '',
-      },
-    }
   } else if (selectedType === 'DuckLake') {
-    return { ducklake: buildDucklakeConfig(data) }
+    return { ducklake: buildDucklakeConfig(data, projectRef) }
   } else if (selectedType === 'Snowflake') {
     return { snowflake: buildSnowflakeConfig(data) }
   } else if (selectedType === 'ClickHouse') {
     return { clickHouse: buildClickHouseConfig(data) }
   } else {
-    throw new Error('Invalid destination type')
+    throw new Error('Invalid destination type.')
   }
 }
 
-export const buildDestinationConfig = async ({
+export const buildDestinationConfig = ({
   projectRef,
   selectedType,
   data,
-  createS3AccessKey,
-  resolveNamespace,
 }: {
   projectRef?: string
   selectedType: DestinationType
   data: z.infer<typeof DestinationPanelFormSchema>
-  createS3AccessKey: UseMutateAsyncFunction<
-    S3AccessKeyCreateData,
-    ResponseError,
-    CreateS3AccessKeyCredentialVariables,
-    unknown
-  >
-  resolveNamespace: (
-    data: z.infer<typeof DestinationPanelFormSchema>
-  ) => Promise<string | undefined>
 }) => {
   if (!projectRef) throw new Error('Project ref is required')
 
@@ -373,32 +367,8 @@ export const buildDestinationConfig = async ({
 
   if (selectedType === 'BigQuery') {
     destinationConfig = { bigQuery: buildBigQueryConfig(data) }
-  } else if (selectedType === 'Analytics Bucket') {
-    let s3Keys = { accessKey: data.s3AccessKeyId, secretKey: data.s3SecretAccessKey }
-
-    if (data.s3AccessKeyId === CREATE_NEW_KEY) {
-      const newKeys = await createS3AccessKey({
-        projectRef,
-        description: `Autogenerated key for replication to ${snakeCase(data.warehouseName)}`,
-      })
-      s3Keys = { accessKey: newKeys.access_key, secretKey: newKeys.secret_key }
-    }
-
-    // Resolve namespace (create if needed)
-    const finalNamespace = await resolveNamespace(data)
-
-    const icebergConfig: IcebergDestinationConfig = {
-      projectRef: projectRef,
-      warehouseName: data.warehouseName ?? '',
-      namespace: finalNamespace,
-      catalogToken: data.catalogToken ?? '',
-      s3AccessKeyId: s3Keys.accessKey ?? '',
-      s3SecretAccessKey: s3Keys.secretKey ?? '',
-      s3Region: data.s3Region ?? '',
-    }
-    destinationConfig = { iceberg: icebergConfig }
   } else if (selectedType === 'DuckLake') {
-    destinationConfig = { ducklake: buildDucklakeConfig(data) }
+    destinationConfig = { ducklake: buildDucklakeConfig(data, projectRef) }
   } else if (selectedType === 'Snowflake') {
     destinationConfig = { snowflake: buildSnowflakeConfig(data) }
   } else if (selectedType === 'ClickHouse') {

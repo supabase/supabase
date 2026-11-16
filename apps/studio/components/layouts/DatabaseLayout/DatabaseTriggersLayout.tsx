@@ -1,19 +1,20 @@
-import { PermissionAction } from '@supabase/shared-types/out/constants'
 import { useParams } from 'common'
 import { PropsWithChildren } from 'react'
 
-import DatabaseLayout from './DatabaseLayout'
+import { DatabaseLayout } from './DatabaseLayout'
 import { PageLayout } from '@/components/layouts/PageLayout/PageLayout'
+import { AlertError } from '@/components/ui/AlertError'
 import { NoPermission } from '@/components/ui/NoPermission'
-import { useAsyncCheckPermissions } from '@/hooks/misc/useCheckPermissions'
+import { useGrant } from '@/lib/grants'
 
 type DatabaseTriggersLayoutProps = PropsWithChildren
 
 export const DatabaseTriggersLayout = ({ children }: DatabaseTriggersLayoutProps) => {
   const { ref } = useParams()
-  const { can: canReadTriggers, isSuccess: isPermissionsLoaded } = useAsyncCheckPermissions(
-    PermissionAction.TENANT_SQL_ADMIN_READ,
-    'triggers'
+  const readGrant = useGrant(
+    'POST /platform/pg-meta/{ref}/query',
+    { projectRef: ref },
+    { variant: 'read' }
   )
 
   const navigationItems = [
@@ -29,9 +30,16 @@ export const DatabaseTriggersLayout = ({ children }: DatabaseTriggersLayoutProps
 
   return (
     <DatabaseLayout title="Triggers">
-      {isPermissionsLoaded && !canReadTriggers ? (
+      {readGrant.status === 'denied' && (
         <NoPermission isFullPage resourceText="view database triggers" />
-      ) : (
+      )}
+      {readGrant.status === 'error' && (
+        <AlertError
+          error={readGrant.error}
+          subject="Failed to check database triggers permissions"
+        />
+      )}
+      {(readGrant.status === 'loading' || readGrant.status === 'granted') && (
         <PageLayout
           title="Database Triggers"
           subtitle="Execute actions automatically when database events occur"

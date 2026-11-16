@@ -1,5 +1,5 @@
 import { groupBy } from 'lodash'
-import { ArrowLeft, ArrowRight } from 'lucide-react'
+import { ArrowLeftIcon, ArrowRightIcon } from 'lucide-react'
 import { useState } from 'react'
 import {
   Button,
@@ -70,7 +70,6 @@ export const WorkflowLogs = ({ branch }: WorkflowLogsProps) => {
     <Dialog open={isOpen} onOpenChange={setIsOpen}>
       <DialogTrigger asChild>
         <Button
-          variant="default"
           icon={
             showStatusIcon ? (
               <StatusIcon variant={isUnhealthy ? 'destructive' : 'default'} hideBackground />
@@ -132,7 +131,7 @@ export const WorkflowLogs = ({ branch }: WorkflowLogsProps) => {
                               utcTimestamp={workflowRun.created_at}
                             />
                           </div>
-                          {workflowRun.id !== projectRef && <ArrowRight size={16} />}
+                          {workflowRun.id !== projectRef && <ArrowRightIcon size={16} />}
                         </button>
                       </li>
                     ))}
@@ -148,7 +147,7 @@ export const WorkflowLogs = ({ branch }: WorkflowLogsProps) => {
               <Button
                 onClick={() => setSelectedWorkflowRun(undefined)}
                 variant="text"
-                icon={<ArrowLeft />}
+                icon={<ArrowLeftIcon />}
                 className="self-start"
               >
                 Back to workflow runs

@@ -4,8 +4,9 @@ import { IS_PLATFORM } from 'common'
 import { usageKeys } from './keys'
 import type { components } from '@/data/api'
 import { get, handleError } from '@/data/fetchers'
+import type { StudioError } from '@/lib/errors/studio-errors'
 import { EMPTY_ARR } from '@/lib/void'
-import type { ResponseError, UseCustomQueryOptions } from '@/types'
+import type { UseCustomQueryOptions } from '@/types'
 
 export type ResourceWarningsVariables = {
   ref?: string
@@ -30,9 +31,9 @@ export async function getResourceWarnings(
   return Array.isArray(data) ? data : EMPTY_ARR
 }
 
-export type ResourceWarning = components['schemas']['ProjectResourceWarningsResponse']
+export type ResourceWarning = components['schemas']['ProjectResourceWarningsResponse_Output']
 export type ResourceWarningsData = Awaited<ReturnType<typeof getResourceWarnings>>
-export type ResourceWarningsError = ResponseError
+export type ResourceWarningsError = StudioError
 
 export const useResourceWarningsQuery = <TData = ResourceWarningsData>(
   variables: ResourceWarningsVariables,
@@ -46,6 +47,6 @@ export const useResourceWarningsQuery = <TData = ResourceWarningsData>(
     queryFn: ({ signal }) => getResourceWarnings(variables, signal),
     enabled:
       IS_PLATFORM && enabled && (variables.ref !== undefined || variables.slug !== undefined),
-    staleTime: 1000 * 60 * 60,
+    staleTime: 1000 * 60 * 5,
     ...options,
   })

@@ -1,11 +1,15 @@
 import { useParams } from 'common'
-import { Loader2 } from 'lucide-react'
+import { Loader2Icon } from 'lucide-react'
 import { useRouter } from 'next/router'
 import { parseAsBoolean, parseAsString, useQueryState } from 'nuqs'
 import { MouseEvent, useEffect, useMemo, useRef, useState } from 'react'
 import { toast } from 'sonner'
 import { LoadingLine } from 'ui'
+import { Admonition } from 'ui-patterns/Admonition'
+import { PageSection } from 'ui-patterns/PageSection'
 
+import { ConstrainedIntegrationTabScaffold } from '../ConstrainedIntegrationTabScaffold'
+import { useIntegrationDetail } from '../Landing/useIntegrationDetail'
 import { formatCronJobColumns } from './CronJobs.utils'
 import { CronJobRunDetailsOverflowNotice } from './CronJobsTab.CleanupNotice'
 import { CronJobsTabDataGrid } from './CronJobsTab.DataGrid'
@@ -30,6 +34,8 @@ export const CronjobsTab = () => {
   const { data: project } = useSelectedProjectQuery()
   const track = useTrack()
 
+  const { isInstalled } = useIntegrationDetail()
+
   const [searchQuery, setSearchQuery] = useQueryState('search', parseAsString.withDefault(''))
 
   const [search, setSearch] = useState(searchQuery)
@@ -47,6 +53,7 @@ export const CronjobsTab = () => {
     projectRef: project?.ref,
     connectionString: project?.connectionString,
     searchQuery,
+    enabled: isInstalled,
   })
 
   const [createCronJobSheetShown, setCreateCronJobSheetShown] = useQueryState(
@@ -124,6 +131,18 @@ export const CronjobsTab = () => {
     }
   }, [cronJobForEditing, cronJobIdForEditing, grid.isSuccess, setCronJobForEditing])
 
+  if (!isInstalled) {
+    return (
+      <div className="mx-auto w-full max-w-6xl px-6 xl:px-10">
+        <ConstrainedIntegrationTabScaffold>
+          <PageSection className="py-0">
+            <Admonition type="default" description="Cron is not installed." />
+          </PageSection>
+        </ConstrainedIntegrationTabScaffold>
+      </div>
+    )
+  }
+
   return (
     <>
       <div className="h-full w-full space-y-4">
@@ -182,7 +201,7 @@ const CronJobsFooter = ({ count }: CronJobsFooterProps) => (
   <div className="flex justify-between min-h-9 h-9 overflow-hidden items-center px-6 w-full border-t text-xs text-foreground-light">
     {count.isLoading ? (
       <span className="flex items-center gap-2">
-        <Loader2 size={14} className="animate-spin" /> Loading...
+        <Loader2Icon size={14} className="animate-spin" /> Loading...
       </span>
     ) : (
       `Total: ${count.value ?? 0} jobs${count.isEstimate ? ' (estimate)' : ''}`

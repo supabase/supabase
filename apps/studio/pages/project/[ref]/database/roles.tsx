@@ -10,7 +10,7 @@ import {
 import { PageSection, PageSectionContent } from 'ui-patterns/PageSection'
 
 import { RolesList } from '@/components/interfaces/Database/Roles/RolesList'
-import DatabaseLayout from '@/components/layouts/DatabaseLayout/DatabaseLayout'
+import { DatabaseLayout } from '@/components/layouts/DatabaseLayout/DatabaseLayout'
 import { DefaultLayout } from '@/components/layouts/DefaultLayout'
 import { UnknownInterface } from '@/components/ui/UnknownInterface'
 import { useIsFeatureEnabled } from '@/hooks/misc/useIsFeatureEnabled'

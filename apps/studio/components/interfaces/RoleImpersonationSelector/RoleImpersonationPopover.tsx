@@ -1,5 +1,5 @@
 import { RoleImpersonationSelector } from '.'
-import { ChevronDown, User as IconUser } from 'lucide-react'
+import { ChevronDownIcon, UserIcon } from 'lucide-react'
 import { useState } from 'react'
 import { Button, cn, Popover, PopoverContent, PopoverTrigger } from 'ui'
 
@@ -33,7 +33,6 @@ export const RoleImpersonationPopover = ({
       <PopoverTrigger asChild>
         <Button
           size="tiny"
-          variant="default"
           className={cn(
             'h-[26px] pr-3 gap-0',
             variant === 'connected-on-right' && 'rounded-r-none border-r-0',
@@ -56,7 +55,7 @@ export const RoleImpersonationPopover = ({
                 </span>
               </>
             )}
-            <ChevronDown className="text-muted" strokeWidth={1} size={12} />
+            <ChevronDownIcon className="text-muted" strokeWidth={1} size={12} />
           </div>
         </Button>
       </PopoverTrigger>
@@ -81,7 +80,7 @@ const UserRoleButtonSection = ({ user }: { user: User }) => {
         <img className="rounded-full w-[18px] h-[18px]" src={avatarUrl} alt={displayName} />
       ) : (
         <div className="rounded-full w-[18px] h-[18px] bg-surface-100 border flex items-center justify-center text-light">
-          <IconUser size={12} strokeWidth={2} />
+          <UserIcon size={12} strokeWidth={2} />
         </div>
       )}
       <span className="truncate max-w-[84px]">{displayName}</span>
@@ -93,7 +92,7 @@ const ExternalAuthButtonSection = ({ sub }: { sub: string }) => {
   return (
     <div className="flex gap-1 items-center pl-0.5 pr-1.5 h-[21px] bg-surface-200 rounded-full overflow-hidden">
       <div className="rounded-full w-[18px] h-[18px] bg-surface-100 border flex items-center justify-center text-light">
-        <IconUser size={12} strokeWidth={2} />
+        <UserIcon size={12} strokeWidth={2} />
       </div>
       <span className="truncate max-w-[84px]">{sub}</span>
     </div>

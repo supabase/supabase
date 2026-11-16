@@ -2,10 +2,10 @@
 
 import { useFlag, useParams } from 'common'
 import { Home } from 'icons'
-import { ChevronLeft } from 'lucide-react'
+import { ChevronLeftIcon } from 'lucide-react'
 import { useRouter } from 'next/router'
 import React, { useMemo } from 'react'
-import { Button, cn, Separator, SidebarGroup, SidebarMenu } from 'ui'
+import { Button, cn, Separator, SheetTitle, SidebarGroup, SidebarMenu } from 'ui'
 import { GenericSkeletonLoader } from 'ui-patterns/ShimmeringLoader'
 
 import { resolveSectionDisplay } from './MobileMenuContent.utils'
@@ -16,9 +16,10 @@ import { ICON_SIZE, ICON_STROKE_WIDTH } from '@/components/interfaces/Sidebar'
 import {
   generateProductRoutes,
   generateSettingsRoutes,
-  generateToolRoutes,
   useGenerateOtherRoutes,
+  useGenerateToolRoutes,
 } from '@/components/layouts/Navigation/NavigationBar/NavigationBar.utils'
+import { ProductMenuBarHeader } from '@/components/layouts/Navigation/ProductMenuBar'
 import type { Route } from '@/components/ui/ui.types'
 import { useIsFeatureEnabled } from '@/hooks/misc/useIsFeatureEnabled'
 import { useSelectedProjectQuery } from '@/hooks/misc/useSelectedProject'
@@ -26,6 +27,7 @@ import { getPathnameWithoutQuery, getPathSegment } from '@/lib/pathname.utils'
 
 export interface MobileMenuContentProps {
   currentProductMenu: React.ReactNode
+  currentProductMenuHeader?: React.ReactNode
   currentProduct: string
   currentSectionKey: string | null
   onCloseSheet?: () => void
@@ -33,6 +35,7 @@ export interface MobileMenuContentProps {
 
 export function MobileMenuContent({
   currentProductMenu,
+  currentProductMenuHeader,
   currentProduct,
   currentSectionKey,
   onCloseSheet,
@@ -41,7 +44,9 @@ export function MobileMenuContent({
   const { ref } = useParams()
   const { data: project } = useSelectedProjectQuery()
   const pathname = getPathnameWithoutQuery(router.asPath, router.pathname)
-  const activeRoute = getPathSegment(pathname, 3)
+  const isIssuesInboxEnabled = useFlag('issuesInbox')
+  const sectionKey = getPathSegment(pathname, 3)
+  const activeRoute = sectionKey === 'advisors' && isIssuesInboxEnabled ? 'issues' : sectionKey
 
   const { viewLevel, selectedSectionKey, handleTopLevelClick, handleBackToTop } =
     useMobileMenuNavigation({
@@ -62,8 +67,9 @@ export function MobileMenuContent({
     'realtime:all',
   ])
   const authOverviewPageEnabled = useFlag('authOverviewPage')
+  const computeEnabled = useFlag('compute')
 
-  const toolRoutes = useMemo(() => generateToolRoutes(ref, project), [ref, project])
+  const toolRoutes = useGenerateToolRoutes()
   const productRoutes = useMemo(
     () =>
       generateProductRoutes(ref, project, {
@@ -72,6 +78,7 @@ export function MobileMenuContent({
         storage: storageEnabled,
         realtime: realtimeEnabled,
         authOverviewPage: authOverviewPageEnabled,
+        compute: computeEnabled,
       }),
     [
       ref,
@@ -81,6 +88,7 @@ export function MobileMenuContent({
       storageEnabled,
       realtimeEnabled,
       authOverviewPageEnabled,
+      computeEnabled,
     ]
   )
   const otherRoutes = useGenerateOtherRoutes()
@@ -110,7 +118,8 @@ export function MobileMenuContent({
   })
 
   const SectionMenuContent = sectionKeyToShow ? getProductMenuComponent(sectionKeyToShow) : null
-  const pageSegment = getPathSegment(pathname, 4)
+  const hasCurrentProductHeader =
+    viewLevel === 'section' && sectionKeyToShow === currentSectionKey && !!currentProductMenuHeader
 
   const renderRoute = (route: Route, isActive: boolean) => (
     <TopLevelRouteItem
@@ -125,6 +134,7 @@ export function MobileMenuContent({
 
   return (
     <div className="flex flex-col h-full bg-background">
+      <SheetTitle className="sr-only">Project menu</SheetTitle>
       {viewLevel === 'section' && sectionLabel && (
         <div
           className={cn(
@@ -134,7 +144,7 @@ export function MobileMenuContent({
           <Button
             variant="text"
             className="p-1! justify-start"
-            icon={<ChevronLeft size={20} />}
+            icon={<ChevronLeftIcon size={20} />}
             onClick={handleBackToTop}
             aria-label="Back to menu"
             block
@@ -143,7 +153,15 @@ export function MobileMenuContent({
           </Button>
         </div>
       )}
-      <div className="flex-1 overflow-y-auto pb-8 text-sidebar-foreground">
+      {hasCurrentProductHeader && (
+        <ProductMenuBarHeader>{currentProductMenuHeader}</ProductMenuBarHeader>
+      )}
+      <div
+        className={cn(
+          'flex-1 overflow-y-auto pb-8 text-sidebar-foreground',
+          hasCurrentProductHeader && 'min-h-0 flex flex-col'
+        )}
+      >
         {viewLevel === 'top' && (
           <nav className="flex flex-col gap-2 p-1" aria-label="Project menu">
             <SidebarMenu>
@@ -171,18 +189,12 @@ export function MobileMenuContent({
           </nav>
         )}
         {viewLevel === 'section' && sectionKeyToShow && (
-          <div className="p-1">
+          <div className={cn('p-1', hasCurrentProductHeader && 'min-h-0 flex-1 p-0')}>
             {sectionKeyToShow === currentSectionKey && currentProductMenu ? (
               currentProductMenu
             ) : SectionMenuContent ? (
               <React.Suspense fallback={<GenericSkeletonLoader className="p-4" />}>
-                {sectionKeyToShow === 'advisors' ? (
-                  <SectionMenuContent
-                    {...({ page: pageSegment } as React.ComponentProps<typeof SectionMenuContent>)}
-                  />
-                ) : (
-                  <SectionMenuContent />
-                )}
+                <SectionMenuContent />
               </React.Suspense>
             ) : null}
           </div>

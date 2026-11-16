@@ -1,4 +1,4 @@
-import { ChevronDown, X } from 'lucide-react'
+import { ChevronDownIcon, XIcon } from 'lucide-react'
 import { KeyboardEvent, memo } from 'react'
 import { Button, Input, Tooltip, TooltipContent, TooltipTrigger } from 'ui'
 
@@ -50,7 +50,7 @@ const FilterRow = ({ filter, filterIdx, onChange, onDelete, onKeyDown }: FilterR
           variant="outline"
           icon={
             <div className="text-foreground-lighter">
-              <ChevronDown strokeWidth={1.5} />
+              <ChevronDownIcon strokeWidth={1.5} />
             </div>
           }
           className="w-32 justify-start"
@@ -73,7 +73,7 @@ const FilterRow = ({ filter, filterIdx, onChange, onDelete, onKeyDown }: FilterR
           variant="outline"
           icon={
             <div className="text-foreground-lighter">
-              <ChevronDown strokeWidth={1.5} />
+              <ChevronDownIcon strokeWidth={1.5} />
             </div>
           }
         >
@@ -98,7 +98,7 @@ const FilterRow = ({ filter, filterIdx, onChange, onDelete, onKeyDown }: FilterR
           <Button
             variant="text"
             className="px-1"
-            icon={<X strokeWidth={1.5} />}
+            icon={<XIcon strokeWidth={1.5} />}
             onClick={() => onDelete(filterIdx)}
             aria-label="Remove filter"
           />

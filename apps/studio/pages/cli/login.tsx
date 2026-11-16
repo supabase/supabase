@@ -1,5 +1,5 @@
 import { useIsLoggedIn, useParams } from 'common'
-import { Terminal } from 'lucide-react'
+import { TerminalIcon } from 'lucide-react'
 import Head from 'next/head'
 import Link from 'next/link'
 import { useRouter } from 'next/router'
@@ -27,7 +27,7 @@ const PAGE_TITLE = buildStudioPageTitle({ section: 'Authorize CLI', brand: 'Supa
 
 const CliLogo = () => (
   <LogoBox className="bg-black">
-    <Terminal className="size-6 text-white" strokeWidth={2} />
+    <TerminalIcon className="size-6 text-white" strokeWidth={2} />
   </LogoBox>
 )
 
@@ -206,7 +206,7 @@ export const CliLoginScreen = ({
               isPlural ? 's' : ''
             }: ${status.missingParameters.join(', ')}.`}
           />
-          <Button variant="default" block asChild>
+          <Button block asChild>
             <Link href="/organizations">Back to dashboard</Link>
           </Button>
         </div>
@@ -234,7 +234,7 @@ export const CliLoginScreen = ({
               </>
             }
           />
-          <Button variant="default" block asChild>
+          <Button block asChild>
             <Link href="/organizations">Back to dashboard</Link>
           </Button>
         </div>

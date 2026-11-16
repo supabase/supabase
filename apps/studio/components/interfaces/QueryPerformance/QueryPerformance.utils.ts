@@ -34,7 +34,6 @@ export type QueryPerformanceErrorContext = {
   queryPreset?: string
   queryType?: 'hitRate' | 'metrics' | 'mainQuery' | 'slowQueriesCount' | 'supamonitor'
   sql?: string
-  errorMessage?: string
   postgresVersion?: string
   databaseType?: 'primary' | 'read-replica'
 }
@@ -53,7 +52,6 @@ export function captureQueryPerformanceError(
       queryType: context.queryType,
       postgresVersion: context.postgresVersion,
       databaseType: context.databaseType,
-      errorMessage: context.errorMessage,
     })
 
     if (error instanceof Error) {

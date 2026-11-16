@@ -9,7 +9,6 @@ export const projectKeys = {
   infiniteListByOrg: (
     slug: string | undefined,
     params?: {
-      limit: number
       sort?: 'name_asc' | 'name_desc' | 'created_asc' | 'created_desc'
       search?: string
       statuses?: string[]
@@ -39,6 +38,5 @@ export const projectKeys = {
   listCloneStatus: (projectRef: string | undefined) =>
     ['projects', projectRef, 'clone-status'] as const,
 
-  // Banner-specific: first-page snapshot used by the status page banner hook
   bannerProjectsByOrg: (slug: string) => ['banner', 'org-projects', slug] as const,
 }

@@ -1,5 +1,5 @@
-import { forwardRef } from 'react'
-import { Alert, AlertDescription, AlertTitle, cn } from 'ui'
+import { Children, forwardRef, Fragment, isValidElement, type ReactNode } from 'react'
+import { Alert, AlertDescription, AlertTitle, cn, FloatingPlate } from 'ui'
 
 import { TYPE_LABEL, TYPE_TO_VARIANT } from './Admonition.constants'
 import type { AdmonitionLayout, AdmonitionProps, AdmonitionType } from './Admonition.types'
@@ -7,8 +7,32 @@ import { AdmonitionTypeIcon } from './AdmonitionIcons'
 
 export type { AdmonitionLayout, AdmonitionProps, AdmonitionType }
 
-const admonitionBodyClassName =
-  '!mb-0 [&_p]:!mt-0 [&_p]:!mb-1.5 [&_p:last-child]:!mb-0 [&_ul]:!my-1.5 [&_ol]:!my-1.5 [&_li]:!my-0.5'
+const admonitionBodyClassName = [
+  'text-sm leading-relaxed [&_code]:text-[0.75rem]',
+  'mb-0 [&_p]:mt-0 [&_p]:mb-1.5 [&_p:last-child]:mb-0',
+  '[&_ul]:my-1.5 [&_ol]:my-1.5 [&_li]:my-0.5',
+  '[&_ul]:list-none [&_ol]:list-decimal [&_ul]:pl-4 [&_ol]:pl-4',
+  '[&_ul>li]:relative [&_ul>li]:before:absolute [&_ul>li]:before:left-[-1rem] [&_ul>li]:before:top-2.5 [&_ul>li]:before:h-0.5 [&_ul>li]:before:w-2 [&_ul>li]:before:rounded [&_ul>li]:before:bg-border-strong [&_ul>li]:before:content-[""]',
+].join(' ')
+
+const ActionPlates = ({ children, layout }: { children: ReactNode; layout: AdmonitionLayout }) =>
+  Children.map(children, (action) => {
+    if (action === null || action === undefined) return null
+    if (isValidElement<{ children?: ReactNode }>(action) && action.type === Fragment) {
+      return <ActionPlates layout={layout}>{action.props.children}</ActionPlates>
+    }
+    return (
+      <FloatingPlate
+        className={cn(
+          'flex',
+          layout === 'vertical' && 'has-[>.w-full]:w-full',
+          layout === 'responsive' && 'has-[>.w-full]:w-full @lg:has-[>.w-full]:w-auto'
+        )}
+      >
+        {action}
+      </FloatingPlate>
+    )
+  })
 
 export const Admonition = forwardRef<
   React.ComponentRef<typeof Alert>,
@@ -43,10 +67,10 @@ export const Admonition = forwardRef<
         aria-label={label}
         variant={TYPE_TO_VARIANT[type]}
         className={cn(
-          'overflow-hidden',
+          'overflow-hidden text-sm leading-normal',
           layout === 'responsive' && '@container',
           type === 'success' && [
-            'bg-brand-400/15 dark:bg-brand/10',
+            'bg-brand-400/15 dark:bg-brand-default/10',
             'border-brand-400 dark:border-brand-500',
           ],
           className
@@ -69,11 +93,15 @@ export const Admonition = forwardRef<
               ]
             )}
           >
-            <div className={cn(showIcon && !title && description && 'my-0.5')}>
+            <div
+              className={cn(
+                showIcon && (title || description || children) && (title ? 'mt-0.75' : 'mt-0.5')
+              )}
+            >
               {title && (
                 <AlertTitle
                   {...childProps?.title}
-                  className={cn('text-foreground', childProps?.title?.className)}
+                  className={cn('!mt-0 text-foreground', childProps?.title?.className)}
                 >
                   {title}
                 </AlertTitle>
@@ -99,12 +127,13 @@ export const Admonition = forwardRef<
               <div
                 className={cn(
                   'flex flex-row gap-2',
+                  '[&_button]:text-xs [&_a]:text-xs',
                   layout === 'vertical' && 'mt-3 items-start',
                   layout === 'horizontal' && 'items-center',
                   layout === 'responsive' && 'mt-3 items-start @md:mt-0 @md:items-center'
                 )}
               >
-                {actions}
+                <ActionPlates layout={layout}>{actions}</ActionPlates>
               </div>
             )}
           </div>

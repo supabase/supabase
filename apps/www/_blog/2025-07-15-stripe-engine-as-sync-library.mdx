@@ -31,7 +31,7 @@ Stripe-Sync-Engine is a webhook listener that transforms Stripe webhooks into st
 
 ## Why sync Stripe data to Postgres?
 
-While Supabase offers a convenient [foreign data wrapper](https://supabase.com/partners/integrations/supabase_wrapper_stripe) (FDW) for Stripe, sometimes you want your Stripe data _locally available_ in your Postgres database for:
+While Supabase offers a convenient [foreign data wrapper](https://supabase.com/partners/catalog/stripe?tab=stripe-wrapper) (FDW) for Stripe, sometimes you want your Stripe data _locally available_ in your Postgres database for:
 
 - **Lower latency**: Avoid round-trips to the Stripe API.
 - **Better joins**: Query subscriptions, invoices, and charges together.

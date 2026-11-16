@@ -85,7 +85,7 @@ export const EnableCleanupButton = ({ onScheduled }: EnableCleanupButtonProps) =
       }}
     >
       <DialogTrigger asChild>
-        <Button variant="default">Enable cleanup</Button>
+        <Button>Enable cleanup</Button>
       </DialogTrigger>
       <DialogContent>
         <DialogHeader>
@@ -98,8 +98,8 @@ export const EnableCleanupButton = ({ onScheduled }: EnableCleanupButtonProps) =
         <DialogSection className="flex flex-col gap-y-4">
           <p className="text-sm">
             Every cron job run is recorded in the{' '}
-            <code className="text-code-inline break-keep!">cron.job_run_details</code> table.
-            Without periodic cleanup, the table grows indefinitely and bloats the database.
+            <code className="break-keep!">cron.job_run_details</code> table. Without periodic
+            cleanup, the table grows indefinitely and bloats the database.
           </p>
           <div className="flex flex-col gap-y-2 text-sm">
             <p className="text-foreground">Delete run history</p>
@@ -131,10 +131,10 @@ export const EnableCleanupButton = ({ onScheduled }: EnableCleanupButtonProps) =
           />
         </DialogSection>
         <DialogFooter>
-          <Button variant="default" disabled={isScheduling} onClick={() => setOpen(false)}>
+          <Button disabled={isScheduling} onClick={() => setOpen(false)}>
             Cancel
           </Button>
-          <Button loading={isScheduling} onClick={onConfirm}>
+          <Button variant="primary" loading={isScheduling} onClick={onConfirm}>
             Enable cleanup
           </Button>
         </DialogFooter>

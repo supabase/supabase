@@ -1,5 +1,3 @@
-import Link from 'next/link'
-
 import SectionContainerWithCn from '../../../../components/Layouts/SectionContainerWithCn'
 
 const features = [
@@ -8,12 +6,12 @@ const features = [
     paragraph: (
       <>
         Edge functions run globally or can be{' '}
-        <Link
+        <a
           href="https://supabase.com/docs/guides/functions/regional-invocation"
           className="underline hover:text-foreground-light transition-colors"
         >
           pinned to your database's proximity
-        </Link>
+        </a>
       </>
     ),
   },

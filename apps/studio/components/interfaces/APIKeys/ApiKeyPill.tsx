@@ -1,15 +1,12 @@
-import { PermissionAction } from '@supabase/shared-types/out/constants'
-import { InputVariants } from '@ui/components/shadcn/ui/input'
 import { useParams } from 'common'
-import { Eye, EyeOff } from 'lucide-react'
+import { EyeIcon, EyeOffIcon } from 'lucide-react'
 import { useEffect, useState } from 'react'
 import { toast } from 'sonner'
-import { Button, cn, Tooltip, TooltipContent, TooltipTrigger } from 'ui'
+import { Button, cn, InputVariants, Tooltip, TooltipContent, TooltipTrigger } from 'ui'
 
 import { useRevealedSecret } from './useRevealedSecret'
 import CopyButton from '@/components/ui/CopyButton'
 import { APIKeysData } from '@/data/api-keys/api-keys-query'
-import { useAsyncCheckPermissions } from '@/hooks/misc/useCheckPermissions'
 
 export function ApiKeyPill({
   apiKey,
@@ -21,20 +18,20 @@ export function ApiKeyPill({
 
   const isSecret = apiKey.type === 'secret'
 
-  const { can: canManageSecretKeys, isLoading: isLoadingPermission } = useAsyncCheckPermissions(
-    PermissionAction.READ,
-    'service_api_keys'
-  )
-
   const {
     data: revealedKey,
     isLoading,
     reveal,
     clear,
+    revealGrant,
   } = useRevealedSecret({
     projectRef,
     id: apiKey.id as string,
   })
+
+  // Publishable keys are shown as-is, so only secret keys depend on the reveal grant
+  const isLoadingPermission = isSecret && revealGrant.status === 'loading'
+  const canManageSecretKeys = revealGrant.status === 'granted'
 
   // Auto-hide timer for the API key (security feature)
   useEffect(() => {
@@ -80,7 +77,11 @@ export function ApiKeyPill({
     }
   }
 
-  const isRestricted = isSecret && !canManageSecretKeys
+  const isRestricted = isSecret && !isLoadingPermission && !canManageSecretKeys
+  const restrictedReason = (action: 'reveal' | 'copy') =>
+    revealGrant.status === 'error'
+      ? `Failed to check permissions to ${action} secret API keys`
+      : `You need additional permissions to ${action} secret API keys`
 
   return (
     <>
@@ -115,14 +116,14 @@ export function ApiKeyPill({
               aria-label={show ? 'Hide API key' : 'Reveal API key'}
               className="rounded-full px-2 pointer-events-auto"
               loading={show && isLoading}
-              icon={show ? <EyeOff strokeWidth={2} /> : <Eye strokeWidth={2} />}
+              icon={show ? <EyeOffIcon strokeWidth={2} /> : <EyeIcon strokeWidth={2} />}
               onClick={onToggleShow}
-              disabled={isRestricted}
+              disabled={isRestricted || isLoadingPermission}
             />
           </TooltipTrigger>
           <TooltipContent side="bottom">
             {isRestricted
-              ? 'You need additional permissions to reveal secret API keys'
+              ? restrictedReason('reveal')
               : isLoadingPermission
                 ? 'Loading permissions...'
                 : show
@@ -145,7 +146,7 @@ export function ApiKeyPill({
         </TooltipTrigger>
         <TooltipContent side="bottom">
           {isRestricted
-            ? 'You need additional permissions to copy secret API keys'
+            ? restrictedReason('copy')
             : isLoadingPermission
               ? 'Loading permissions...'
               : 'Copy API key'}

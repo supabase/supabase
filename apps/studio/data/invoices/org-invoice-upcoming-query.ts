@@ -3,13 +3,14 @@ import { components } from 'api-types'
 
 import { invoicesKeys } from './keys'
 import { get, handleError } from '@/data/fetchers'
-import type { ResponseError, UseCustomQueryOptions } from '@/types'
+import type { StudioError } from '@/lib/errors/studio-errors'
+import type { UseCustomQueryOptions } from '@/types'
 
 export type UpcomingInvoiceVariables = {
   orgSlug?: string
 }
 
-export type UpcomingInvoiceResponse = components['schemas']['UpcomingInvoice']
+export type UpcomingInvoiceResponse = components['schemas']['UpcomingInvoice_Output']
 
 export async function getUpcomingInvoice(
   { orgSlug }: UpcomingInvoiceVariables,
@@ -28,7 +29,7 @@ export async function getUpcomingInvoice(
 }
 
 export type UpcomingInvoiceData = Awaited<ReturnType<typeof getUpcomingInvoice>>
-export type UpcomingInvoiceError = ResponseError
+export type UpcomingInvoiceError = StudioError
 
 export const useOrgUpcomingInvoiceQuery = <TData = UpcomingInvoiceData>(
   { orgSlug }: UpcomingInvoiceVariables,

@@ -1,6 +1,6 @@
 import { IS_PLATFORM } from 'common'
-import { AnimatePresence, motion } from 'framer-motion'
-import { Plus } from 'lucide-react'
+import { PlusIcon } from 'lucide-react'
+import { AnimatePresence, motion } from 'motion/react'
 import { useCallback, useEffect, useState } from 'react'
 import { toast } from 'sonner'
 import { Button, cn, flattenTree, INodeRendererProps, TreeView } from 'ui'
@@ -187,7 +187,7 @@ export const FileExplorerAndEditor = ({
       toast.success(
         <div className="flex flex-col gap-y-1">
           <p className="text-foreground">
-            Successfully added dropped file{totalFilesProcessed > 1 ? 's' : ''}
+            Successfully added dropped file{totalFilesProcessed > 1 ? <span>s</span> : ''}
           </p>
           <p className="text-foreground-light">{messages.join(', ')}.</p>
         </div>,
@@ -398,7 +398,7 @@ export const FileExplorerAndEditor = ({
             Files
           </h3>
           {IS_PLATFORM && (
-            <Button size="tiny" variant="default" icon={<Plus size={14} />} onClick={addNewFile}>
+            <Button size="tiny" icon={<PlusIcon size={14} />} onClick={addNewFile}>
               Add File
             </Button>
           )}

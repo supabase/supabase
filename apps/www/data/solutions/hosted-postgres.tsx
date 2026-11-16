@@ -1,4 +1,5 @@
 import { useBreakpoint } from 'common'
+import { DASHBOARD_SIGN_UP_URL } from '@/lib/dashboard-links'
 import {
   Activity,
   Blocks,
@@ -90,7 +91,7 @@ const data: () => {
       ctas: [
         {
           label: 'Start your project',
-          href: 'https://supabase.com/dashboard',
+          href: DASHBOARD_SIGN_UP_URL,
           type: 'primary' as any,
           onClick: () =>
             sendTelemetryEvent({
@@ -271,7 +272,14 @@ const data: () => {
           description: (
             <>
               Version-control your schema and run the full stack locally with{' '}
-              <code className="text-xs">supabase start</code>.
+              <code className="text-xs">supabase start</code>. With the experimental{' '}
+              <a
+                href="/docs/guides/local-development/running-multiple-local-projects#turn-on-the-stack-commands"
+                className="hover:text-foreground underline"
+              >
+                stack setting
+              </a>
+              , run one local project per app and worktree.
             </>
           ),
           icon: SquareTerminal,
@@ -439,7 +447,7 @@ const data: () => {
                 href="https://www.multigres.com"
                 target="_blank"
                 rel="noopener noreferrer"
-                className="text-foreground underline hover:text-brand transition-colors"
+                className="text-foreground underline hover:text-primary transition-colors"
               >
                 Multigres
               </a>{' '}

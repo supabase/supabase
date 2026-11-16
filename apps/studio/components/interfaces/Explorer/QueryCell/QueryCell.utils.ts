@@ -1,4 +1,5 @@
 import { untrustedSql } from '@supabase/pg-meta'
+import isEqual from 'lodash/isEqual'
 import { type Snapshot } from 'valtio'
 
 import { type ExplorerQueryModel } from '../QueryEditor'
@@ -17,13 +18,13 @@ export const DEFAULT_CELL_ROW_LIMIT = 100
  * Valtio snapshots are deep-readonly. Readonly properties assign to mutable ones, so only
  * the array needs rebuilding to turn a snapshot's chart back into a writable config.
  */
-type ReadonlyChartConfig = Omit<ChartConfig, 'y_columns'> & {
-  readonly y_columns: readonly string[]
+type ReadonlyChartConfig = Omit<ChartConfig, 'y_series'> & {
+  readonly y_series: readonly string[]
 }
 
 export const cloneChartConfig = (
   chart: ReadonlyChartConfig | undefined
-): ChartConfig | undefined => (chart ? { ...chart, y_columns: [...chart.y_columns] } : undefined)
+): ChartConfig | undefined => (chart ? { ...chart, y_series: [...chart.y_series] } : undefined)
 
 /** The display state a query cell hands the shared editor. */
 // `view` is already defaulted to 'table' by the domain transform, so there is nothing to
@@ -35,7 +36,7 @@ export const getCellDisplay = (cell: Snapshot<QueryCell>): QueryDisplay => ({
 
 /** Fields every query cell carries, copied out of a snapshot so the result is writable. */
 const copyQueryCellBase = (cell: Snapshot<QueryCell>) => ({
-  id: cell.id,
+  _id: cell._id,
   title: cell.title,
   view: cell.view,
   chart: cloneChartConfig(cell.chart),
@@ -89,6 +90,26 @@ export function changeCellSource(cell: Snapshot<QueryCell>, source: QuerySourceB
     row_limit: cell._tag === 'database_cell' ? cell.row_limit : DEFAULT_CELL_ROW_LIMIT,
     database_identifier: source.database_identifier,
   }
+}
+
+/**
+ * Whether a source change makes a cell's last in-session result stale enough to clear.
+ * A backend change (database ↔ logs) invalidates outright, since another engine returns
+ * unrelated columns. A log cell's time range is a request parameter rather than part of the
+ * SQL text (see notebookToMarkdown), so a plain SQL-text comparison wouldn't catch a result
+ * that's stale only because the range moved — that has to be checked here instead.
+ */
+export function shouldInvalidateResultOnSourceChange(
+  cell: Snapshot<QueryCell>,
+  source: QuerySourceBinding
+): boolean {
+  const isBackendChange = (source._tag === 'logs') !== (cell._tag === 'log_cell')
+  const isTimeRangeChange =
+    source._tag === 'logs' &&
+    cell._tag === 'log_cell' &&
+    !isEqual(source.time_range, cell.time_range)
+
+  return isBackendChange || isTimeRangeChange
 }
 
 /**

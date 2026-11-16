@@ -1,3 +1,5 @@
+import { useRouter } from 'next/router'
+import { useEffect } from 'react'
 import { Card, CardContent, CardFooter } from 'ui'
 import { PageContainer } from 'ui-patterns/PageContainer'
 import {
@@ -10,7 +12,6 @@ import {
 import {
   PageSection,
   PageSectionContent,
-  PageSectionDescription,
   PageSectionMeta,
   PageSectionSummary,
   PageSectionTitle,
@@ -19,7 +20,6 @@ import { ShimmeringLoader } from 'ui-patterns/ShimmeringLoader'
 
 import { AccountConnections } from '@/components/interfaces/Account/Preferences/AccountConnections'
 import { AccountDeletion } from '@/components/interfaces/Account/Preferences/AccountDeletion'
-import { AccountIdentities } from '@/components/interfaces/Account/Preferences/AccountIdentities'
 import { AnalyticsSettings } from '@/components/interfaces/Account/Preferences/AnalyticsSettings'
 import { DashboardSettings } from '@/components/interfaces/Account/Preferences/DashboardSettings'
 import { HotkeySettings } from '@/components/interfaces/Account/Preferences/HotkeySettings'
@@ -61,6 +61,8 @@ const PreferencesPageHeader = ({ description }: { description: string }) => (
 )
 
 const PlatformPreferences = () => {
+  const { asPath } = useRouter()
+
   const { profileShowInformation, profileShowAnalyticsAndMarketing, profileShowAccountDeletion } =
     useIsFeatureEnabled([
       'profile:show_information',
@@ -68,6 +70,13 @@ const PlatformPreferences = () => {
       'profile:show_account_deletion',
     ])
   const { error, isLoading, isError } = useProfile()
+
+  useEffect(() => {
+    const hash = asPath.split('#')[1]
+    if (isLoading || !hash) return
+
+    document.getElementById(hash)?.scrollIntoView({ block: 'start' })
+  }, [asPath, isLoading])
 
   return (
     <>
@@ -83,14 +92,9 @@ const PlatformPreferences = () => {
 
         {!isError && (
           <>
-            {isLoading ? (
-              <ProfileLoadingSections showProfileInformation={profileShowInformation} />
-            ) : (
-              <>
-                {profileShowInformation ? <ProfileInformation /> : null}
-                <AccountIdentities />
-              </>
-            )}
+            {profileShowInformation && isLoading && <ProfileLoadingSections />}
+
+            {profileShowInformation && !isLoading && <ProfileInformation />}
 
             <AccountConnections />
 
@@ -112,59 +116,33 @@ const PlatformPreferences = () => {
   )
 }
 
-const ProfileLoadingSections = ({
-  showProfileInformation,
-}: {
-  showProfileInformation: boolean
-}) => (
-  <>
-    {showProfileInformation && (
-      <PageSection>
-        <PageSectionMeta>
-          <PageSectionSummary>
-            <PageSectionTitle>Profile information</PageSectionTitle>
-          </PageSectionSummary>
-        </PageSectionMeta>
-        <PageSectionContent>
-          <Card>
-            <CardContent>
-              <ProfileFieldLoadingRow labelWidth="w-24" />
-            </CardContent>
-            <CardContent>
-              <ProfileFieldLoadingRow labelWidth="w-20" />
-            </CardContent>
-            <CardContent>
-              <ProfileFieldLoadingRow labelWidth="w-28" descriptionWidth="w-48" />
-            </CardContent>
-            <CardContent>
-              <ProfileFieldLoadingRow labelWidth="w-20" descriptionWidth="w-40" />
-            </CardContent>
-            <CardFooter className="justify-end">
-              <ShimmeringLoader className="h-8 w-16 rounded-md py-0" />
-            </CardFooter>
-          </Card>
-        </PageSectionContent>
-      </PageSection>
-    )}
-
-    <PageSection>
-      <PageSectionMeta>
-        <PageSectionSummary>
-          <PageSectionTitle>Sign-in methods</PageSectionTitle>
-          <PageSectionDescription>
-            Manage the providers linked to your Supabase account and update their details.
-          </PageSectionDescription>
-        </PageSectionSummary>
-      </PageSectionMeta>
-      <PageSectionContent>
-        <Card>
-          <CardContent>
-            <ShimmeringLoader />
-          </CardContent>
-        </Card>
-      </PageSectionContent>
-    </PageSection>
-  </>
+const ProfileLoadingSections = () => (
+  <PageSection>
+    <PageSectionMeta>
+      <PageSectionSummary>
+        <PageSectionTitle>Profile information</PageSectionTitle>
+      </PageSectionSummary>
+    </PageSectionMeta>
+    <PageSectionContent>
+      <Card>
+        <CardContent>
+          <ProfileFieldLoadingRow labelWidth="w-24" />
+        </CardContent>
+        <CardContent>
+          <ProfileFieldLoadingRow labelWidth="w-20" />
+        </CardContent>
+        <CardContent>
+          <ProfileFieldLoadingRow labelWidth="w-28" descriptionWidth="w-48" />
+        </CardContent>
+        <CardContent>
+          <ProfileFieldLoadingRow labelWidth="w-20" descriptionWidth="w-40" />
+        </CardContent>
+        <CardFooter className="justify-end">
+          <ShimmeringLoader className="h-8 w-16 rounded-md py-0" />
+        </CardFooter>
+      </Card>
+    </PageSectionContent>
+  </PageSection>
 )
 
 const ProfileFieldLoadingRow = ({

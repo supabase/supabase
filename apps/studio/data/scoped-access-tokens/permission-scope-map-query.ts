@@ -2,8 +2,9 @@ import { useQuery } from '@tanstack/react-query'
 import { z } from 'zod'
 
 import { scopedAccessTokenKeys } from './keys'
+import { classifyResponseError } from '@/data/error-classification'
 import { BASE_PATH } from '@/lib/constants'
-import { ResponseError } from '@/types'
+import type { StudioError } from '@/lib/errors/studio-errors'
 
 /**
  * Cross-reference between OpenFGA permission scopes, Management API endpoints, and MCP tools.
@@ -155,27 +156,6 @@ export const getEnabledEndpointsForCapability = ({
 }
 
 /**
- * Informational lookup for the per-permission risk tooltip: the MCP tools associated with any of
- * the given scopes. Unlike getEnabledMcpTools this is not conjunctive — it surfaces every tool that
- * lists one of these scopes, so users can see what a capability relates to before granting it.
- */
-export const getMcpToolsForScopes = ({
-  scopeIds,
-  permissionScopeMap,
-}: {
-  scopeIds: Iterable<string>
-  permissionScopeMap: PermissionScopeMap | undefined
-}): string[] => {
-  if (permissionScopeMap == null) return []
-
-  const tools = new Set<string>()
-  for (const id of scopeIds) {
-    permissionScopeMap.scopes[id]?.mcp_tools.forEach((tool) => tools.add(tool))
-  }
-  return Array.from(tools)
-}
-
-/**
  * The endpoint's payload changed endpoint/tool requirements from a flat conjunctive scope list
  * (string[]) to alternative groups (string[][], ScopeGroupAlternatives) at the same URL, and the
  * response is CDN-cached (s-maxage + stale-while-revalidate). Right after a deploy a new client
@@ -249,19 +229,18 @@ export async function getGetScopedTokenPermissionsForScope(signal?: AbortSignal)
       if (Number.isFinite(parsed) && parsed > 0) retryAfter = parsed
     }
 
-    throw new ResponseError(
-      `Failed to fetch scoped access token permissions: ${response.statusText}`,
-      response.status,
-      undefined,
-      retryAfter
-    )
+    throw classifyResponseError({
+      message: `Failed to fetch scoped access token permissions: ${response.statusText}`,
+      code: response.status,
+      retryAfter,
+    })
   }
 
   const payload: unknown = await response.json()
   return normalizePermissionScopeMap(payload)
 }
 
-export type ScopedAccessTokenPermissionsForScopeError = ResponseError
+export type ScopedAccessTokenPermissionsForScopeError = StudioError
 
 export const useGetEnabledEndpointsForCapability = () => {
   return useQuery<PermissionScopeMap, ScopedAccessTokenPermissionsForScopeError>({

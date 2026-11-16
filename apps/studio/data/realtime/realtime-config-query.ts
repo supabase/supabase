@@ -1,9 +1,13 @@
 import { useQuery } from '@tanstack/react-query'
+import type { components } from 'api-types'
 
 import { realtimeKeys } from './keys'
 import { get, handleError } from '@/data/fetchers'
 import { IS_PLATFORM } from '@/lib/constants'
-import type { ResponseError, UseCustomQueryOptions } from '@/types'
+import type { StudioError } from '@/lib/errors/studio-errors'
+import type { UseCustomQueryOptions } from '@/types'
+
+type RealtimeConfigResponse = components['schemas']['RealtimeConfigResponse_Output']
 
 export type RealtimeConfigurationVariables = {
   projectRef?: string
@@ -12,6 +16,7 @@ export type RealtimeConfigurationVariables = {
 export const REALTIME_DEFAULT_CONFIG = {
   private_only: false,
   connection_pool: 2,
+  postgres_changes_pool: 2,
   max_concurrent_users: 200,
   max_events_per_second: 100,
   max_bytes_per_second: 100000,
@@ -20,7 +25,9 @@ export const REALTIME_DEFAULT_CONFIG = {
   max_presence_events_per_second: 100,
   max_payload_size_in_kb: 100,
   suspend: false,
-}
+  presence_enabled: true,
+  admin_suspended_at: null,
+} as const satisfies RealtimeConfigResponse
 
 export async function getRealtimeConfiguration(
   { projectRef }: RealtimeConfigurationVariables,
@@ -33,7 +40,7 @@ export async function getRealtimeConfiguration(
     signal,
   })
   if (error) {
-    if ((error as ResponseError).message === 'Custom realtime config for a project not found') {
+    if ((error as StudioError).message === 'Custom realtime config for a project not found') {
       return REALTIME_DEFAULT_CONFIG
     } else {
       handleError(error)
@@ -43,7 +50,7 @@ export async function getRealtimeConfiguration(
 }
 
 export type RealtimeConfigurationData = Awaited<ReturnType<typeof getRealtimeConfiguration>>
-export type RealtimeConfigurationError = ResponseError
+export type RealtimeConfigurationError = StudioError
 
 export const useRealtimeConfigurationQuery = <TData = RealtimeConfigurationData>(
   { projectRef }: RealtimeConfigurationVariables,

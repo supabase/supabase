@@ -125,7 +125,8 @@ export const TextEditor = ({
       header={
         <div className="flex items-center justify-between">
           <p>
-            {readOnly ? 'Viewing' : 'Editing'} value of: <code>{column}</code>
+            {readOnly ? <span>Viewing</span> : <span>Editing</span>} <span>value of:</span>{' '}
+            <code>{column}</code>
           </p>
           {(!isTruncated || (isTruncated && isSuccess)) && (
             <TwoOptionToggle
@@ -183,7 +184,7 @@ export const TextEditor = ({
                 performance issues
               </p>
             </div>
-            <Button variant="default" loading={isPending} onClick={loadFullValue}>
+            <Button loading={isPending} onClick={loadFullValue}>
               Load full text data
             </Button>
           </div>

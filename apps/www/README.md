@@ -6,6 +6,27 @@ Refer to the [Development Guide](../../DEVELOPERS.md) to learn how to run this s
 
 To get started copy the example env file using `cp .env.local.example .env.local`.
 
+## Production builds
+
+Run `pnpm build` from `apps/www`, or `pnpm build --filter=www` from the repository
+root. Vercel uses the app's `build` script by default.
+
+`build` is a Turbo task (`maybe-turbo` makes `pnpm build` run it through Turbo), and
+`turbo.jsonc` declares what runs before it: `docs#build:guides-markdown` (which
+fetches the federated docs guides) and `content:build` (which refreshes the
+changelog, GitHub stars, RSS feeds and agent-skills index). The remote fetches
+aren't cached, so content is refreshed on every build. Turbo hashes the files they
+write after they finish and caches the `build` output (Next.js, sitemaps, and the
+customer RSS feed).
+
+Production cache reuse requires the same commit and inputs, including
+`VERCEL_GIT_COMMIT_SHA`. `pnpm typecheck` and `pnpm dev` run `content:build:core`
+first in the same way.
+
+Run `pnpm exec vitest run turbo-build.test.ts` to check cache invalidation and
+artifact restoration using real pnpm and Turbo with fixture generators and a
+stub compiler.
+
 ## Best practices
 
 ### Images
@@ -97,6 +118,10 @@ imgThumb: my-image.png
 ---
 ```
 
+#### Blog post dates
+
+Use quoted `YYYY-MM-DD` values. `date` is the publication date. Set optional `updated` for substantive content revisions, excluding typo, link, or image fixes. It must be on or after `date` and supplies the sitemap and structured-data modification date. When absent, `date` supplies both.
+
 #### Events
 
 Events use different image fields to avoid confusion with their display patterns:
@@ -149,6 +174,10 @@ content.
 
 See [`e2e/www/README.md`](https://github.com/supabase/supabase/blob/master/e2e/www/README.md)
 for coverage and limits.
+
+## Redirects
+
+Redirects for non-docs URLs live in [`lib/redirects.js`](lib/redirects.js). Redirects for `/docs` URLs moved to the docs app, so add new `/docs` redirects in [`apps/docs/lib/redirects/`](../docs/lib/redirects/README.md) instead.
 
 ## Go pages (`/go/*`)
 

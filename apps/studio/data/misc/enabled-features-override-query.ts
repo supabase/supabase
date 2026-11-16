@@ -3,7 +3,8 @@ import { useQuery } from '@tanstack/react-query'
 import { miscKeys } from './keys'
 import { fetchHandler } from '@/data/fetchers'
 import { BASE_PATH, IS_PLATFORM } from '@/lib/constants'
-import type { ResponseError, UseCustomQueryOptions } from '@/types'
+import type { StudioError } from '@/lib/errors/studio-errors'
+import type { UseCustomQueryOptions } from '@/types'
 
 type EnabledFeaturesOverride = { disabled_features: string[] }
 
@@ -14,7 +15,7 @@ export async function getEnabledFeaturesOverride(signal?: AbortSignal) {
 }
 
 export type EnabledFeaturesOverrideData = Awaited<ReturnType<typeof getEnabledFeaturesOverride>>
-export type EnabledFeaturesOverrideError = ResponseError
+export type EnabledFeaturesOverrideError = StudioError
 
 export const useEnabledFeaturesOverrideQuery = <TData = EnabledFeaturesOverrideData>({
   enabled = true,

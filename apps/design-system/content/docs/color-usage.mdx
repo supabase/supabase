@@ -5,13 +5,58 @@ description: Colors system breakdown with best practices.
 
 The shorthand utility classes below simplify our full color palette by providing sensible, contrast-checked defaults. Use them whenever possible to ensure accessible text colors and balanced background fills.
 
+## Primary and brand colors
+
+Primary is the theme's functional accent. Changing `--primary-hue` updates primary text, buttons, selected controls, and focus rings. Brand is the fixed Supabase palette for product identity.
+
+| Role              | Tokens                                                       | Follows the primary hue? |
+| ----------------- | ------------------------------------------------------------ | ------------------------ |
+| Functional accent | `--primary`, `--primary-solid`, `--primary-bright`, `--ring` | Yes                      |
+| Supabase identity | `brand-default`, `brand-*`                                   | No                       |
+
+### Primary ink
+
+`--primary` is for readable UI: links, labels, radios, step dots, and other small indicators. Utilities include `text-primary`, `bg-primary`, and `border-primary`.
+
+In light mode it is darkened to meet WCAG AA for normal text. In dark mode it stays bright so those controls remain visible on dark surfaces.
+
+### Primary solid
+
+`--primary-solid` is the deeper fill for primary buttons. In dark mode it is darker than `--primary` so buttons do not read as lime. In light mode it matches `--primary`, so ink and buttons share one green. Primary Button uses `bg-primary-solid` / `text-primary-solid-foreground`.
+
+### Bright primary
+
+`--primary-bright` gives focus rings, selected controls, and other interactive chrome a brighter version of the primary hue. It stays vivid when light-mode `--primary` is darkened for readable text. Use `bg-primary-bright`, `border-primary-bright`, and the shared `ring-ring` focus treatment.
+
+### Brand green
+
+`brand-default` remains the fixed Supabase green for explicitly branded surfaces.
+
+Toggle the theme to compare the swatches below. Light mode collapses primary and primary-solid; dark mode separates bright ink from the deeper button plate:
+
+<Colors
+  definition={'colors'}
+  classes={['bg-primary', 'bg-primary-solid', 'bg-primary-bright', 'bg-brand-default']}
+/>
+
+See also [Typography](../docs/typography) (`text-primary`) and [Accessibility](../docs/accessibility#focus-management) (shared focus ring).
+
 ## Text
 
 Use accent text colors (e.g. text-destructive, text-warning) sparingly to avoid visual overload.
 
+Use `text-primary` for readable branded text such as links, labels, and statuses. It meets
+WCAG AA for normal text on the surfaces used by the apps: darkened in light mode, bright in
+dark mode. Primary buttons use a separate solid plate in dark mode; focus chrome uses
+the brighter primary hue. See [Primary and brand colors](#primary-and-brand-colors).
+
 <Colors definition={'text'} />
 
 ## Background
+
+Use `bg-primary-bright` for selected controls that need a vivid fill, and `bg-primary`
+for smaller indicators such as radios and step dots. Use `bg-brand-default` only when
+the canonical Supabase green is required. Details in [Primary and brand colors](#primary-and-brand-colors).
 
 <Colors definition={'background'} />
 
@@ -32,7 +77,7 @@ We use backgrounds in 2 different ways. In the ./www and ./docs sites, we use a 
 <body className="bg-studio">{children}</body>
 ```
 
-### Backgrounds and Surfaces
+### Backgrounds and surfaces
 
 #### `./apps/www` + `./apps/docs`
 
@@ -64,7 +109,7 @@ This is not to be confused with `Dialogs`, they require to use the same app back
 
 <Colors definition={'border'} />
 
-## Other Colors
+## Other colors
 
 These can also be accessed with `foreground`. Like `text-foreground-light`.
 

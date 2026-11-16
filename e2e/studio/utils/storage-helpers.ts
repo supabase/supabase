@@ -176,7 +176,9 @@ export const uploadFile = async (page: Page, filePath: string, fileName: string)
   const fileInput = page.locator('input[type="file"]')
   await fileInput.setInputFiles(filePath)
 
-  await expect(page.getByRole('status')).not.toBeVisible()
+  // Wait out the upload progress toast. Scoped to the toast itself — a page-wide
+  // `getByRole('status')` also matches any live region the explorer renders.
+  await expect(page.locator('[data-sonner-toast]')).not.toBeVisible()
   // Verify file appears in the explorer by title
   await expect(
     page.getByTitle(fileName),
@@ -200,8 +202,9 @@ export const deleteItem = async (page: Page, itemName: string) => {
   // Click delete option from context menu
   await page.getByRole('menuitem', { name: 'Delete' }).click()
 
-  // Confirm deletion in the modal
-  await page.getByRole('button', { name: 'Submit' }).click()
+  // Confirm deletion in the modal. The label says what it does rather than
+  // carrying ConfirmationModal's "Submit" default.
+  await page.getByRole('button', { name: 'Delete', exact: true }).click()
 
   // Wait for deletion to complete
   await page.waitForTimeout(1000)
@@ -277,4 +280,49 @@ export const deleteAllBuckets = async (page: Page, ref: string) => {
       await deleteBucket(page, ref, bucketId)
     }
   }
+}
+
+/**
+ * Opens the move dialog for a file from its row actions menu.
+ *
+ * @param page - Playwright page instance
+ * @param fileName - Name of the file to move
+ * @returns The move dialog locator, to scope assertions to the picker
+ */
+export const openMoveDialog = async (page: Page, fileName: string) => {
+  // Opened from the row's context menu rather than its actions button: the actions button sits at
+  // the row's right edge, where a top-right toast can cover it, while a right-click targets the
+  // row's center. Both menus are built from the same options.
+  const row = page.getByTitle(fileName)
+  await expect(row, `Row for ${fileName} should be visible`).toBeVisible()
+  await row.click({ button: 'right' })
+  await page.getByRole('menuitem', { name: 'Move' }).click()
+
+  const dialog = page.getByRole('dialog')
+  await expect(dialog, 'Move dialog should be visible').toBeVisible()
+  await expect(dialog.getByText(`Move ${fileName}`), 'Dialog should name the file').toBeVisible()
+
+  return dialog
+}
+
+/**
+ * Confirms the move dialog, waiting for the move request so the assertion that follows runs
+ * against a settled explorer.
+ *
+ * @param page - Playwright page instance
+ * @param ref - Project reference
+ * @param destinationName - Folder name shown on the confirm button (the bucket name at the root)
+ */
+export const confirmMove = async (page: Page, ref: string, destinationName: string) => {
+  // The confirm button stays focusable when disabled, so it reports aria-disabled rather than
+  // the native disabled property
+  const moveButton = page.getByRole('button', { name: `Move to ${destinationName}` })
+  await expect(moveButton, `Move to ${destinationName} should be enabled`).not.toHaveAttribute(
+    'aria-disabled',
+    'true'
+  )
+
+  const movePromise = waitForApiResponse(page, 'storage', ref, 'objects/move', { method: 'POST' })
+  await moveButton.click()
+  await movePromise
 }

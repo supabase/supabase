@@ -41,6 +41,30 @@ export const SELF_HOSTED_REDIRECTS: StudioRedirect[] = [
 ]
 
 export const SHARED_REDIRECTS: StudioRedirect[] = [
+  { source: '/project', destination: '/organizations', permanent: true },
+  { source: '/account', destination: '/account/me', permanent: true },
+  { source: '/org/:slug/projects', destination: '/org/:slug', permanent: true },
+  {
+    source: '/project/:ref/database/backups',
+    destination: '/project/:ref/database/backups/scheduled',
+    permanent: true,
+  },
+  {
+    source: '/project/:ref/auth/emails',
+    destination: '/project/:ref/auth/templates',
+    permanent: true,
+  },
+  {
+    source: '/project/:ref/logs/edge-functions',
+    destination: '/project/:ref/logs/edge-functions-logs',
+    permanent: true,
+  },
+  {
+    source: '/project/:ref/settings/vault',
+    destination: '/project/:ref/integrations/vault/secrets',
+    permanent: true,
+  },
+  { source: '/project/:ref/settings/billing', destination: '/org/_/billing', permanent: true },
   { source: '/project/:ref/auth', destination: '/project/:ref/auth/users', permanent: true },
   {
     source: '/project/:ref/auth/advanced',
@@ -117,6 +141,21 @@ export const SHARED_REDIRECTS: StudioRedirect[] = [
   {
     source: '/project/:ref/settings/compute-and-disk',
     destination: '/project/:ref/settings/infrastructure',
+    permanent: true,
+  },
+  {
+    source: '/project/:ref/database/replication/replica/:replicaId',
+    destination: '/project/:ref/settings/infrastructure/replica/:replicaId',
+    permanent: true,
+  },
+  {
+    source: '/project/:ref/database/replication',
+    destination: '/project/:ref/database/pipelines',
+    permanent: true,
+  },
+  {
+    source: '/project/:ref/database/replication/:pipelineId',
+    destination: '/project/:ref/database/pipelines/:pipelineId',
     permanent: true,
   },
   {
@@ -244,6 +283,11 @@ export const SHARED_REDIRECTS: StudioRedirect[] = [
     permanent: true,
   },
   {
+    source: '/project/:ref/advisors',
+    destination: '/project/:ref/advisors/security',
+    permanent: true,
+  },
+  {
     source: '/project/:ref/advisors/query-performance',
     destination: '/project/:ref/observability/query-performance',
     permanent: true,
@@ -260,7 +304,7 @@ export const SHARED_REDIRECTS: StudioRedirect[] = [
   },
   {
     source: '/project/:ref/database/linter',
-    destination: '/project/:ref/database/security-advisor',
+    destination: '/project/:ref/advisors/security',
     permanent: true,
   },
   {
@@ -275,6 +319,11 @@ export const SHARED_REDIRECTS: StudioRedirect[] = [
   },
   {
     source: '/project/:ref/database/webhooks',
+    destination: '/project/:ref/integrations/webhooks/overview',
+    permanent: true,
+  },
+  {
+    source: '/project/:ref/database/hooks',
     destination: '/project/:ref/integrations/webhooks/overview',
     permanent: true,
   },
@@ -337,11 +386,45 @@ export const SHARED_REDIRECTS: StudioRedirect[] = [
   },
 ]
 
+// Top-level path segments (below the base path) that stay reachable in
+// maintenance mode: the maintenance page itself plus every static file it may
+// need to render. Page routes, `/api` and `/_serverFn` are still redirected —
+// maintenance takes the dashboard's backend offline too, and the maintenance
+// page doesn't depend on either.
+export const MAINTENANCE_PASSTHROUGH_SEGMENTS = [
+  'maintenance',
+  // Build output. Next chunks are under `/_next` (which Next also never
+  // redirects itself). Vite's chunks are under `/assets`, or
+  // `/_vercel/immutable/<salt>/nitro` on Vercel.
+  '_next',
+  '_vercel',
+  'assets',
+  // Top-level entries of `public/` (kept in sync by a unit test).
+  'archive',
+  'deno',
+  'favicon',
+  'fonts',
+  'img',
+  'json',
+  'monaco-editor',
+  'supabase-logo.svg',
+]
+
+const escapeRegex = (value: string) => value.replace(/[.*+?^${}()|[\]\\]/g, '\\$&')
+
 // The two maintenance-mode rules are mutually exclusive; pick by env at
-// build time. Same shape for Next and Vercel.
+// build time. Same shape for Next and Vercel. The lookahead matches whole
+// segments only, so `/maintenance-foo` or `/images` still redirect.
 export function getMaintenanceRedirects(maintenanceMode: boolean): StudioRedirect[] {
+  const passthrough = MAINTENANCE_PASSTHROUGH_SEGMENTS.map(escapeRegex).join('|')
   return maintenanceMode
-    ? [{ source: '/((?!maintenance|img).*)', destination: '/maintenance', permanent: false }]
+    ? [
+        {
+          source: `/((?!(?:${passthrough})(?:/|$)).*)`,
+          destination: '/maintenance',
+          permanent: false,
+        },
+      ]
     : [{ source: '/maintenance', destination: '/', permanent: false }]
 }
 
@@ -452,9 +535,10 @@ export function matchRedirect(input: {
 
   // Maintenance mode handled inline — the maintenance-on rule uses a
   // negative-lookahead regex source that the segment matcher above can't
-  // parse. Cheap to special-case here.
+  // parse. Checks the same segment list the regex is built from.
   if (maintenanceMode) {
-    if (!pathname.startsWith('/maintenance') && !pathname.startsWith('/img')) {
+    const firstSegment = pathname.split('/')[1] ?? ''
+    if (!MAINTENANCE_PASSTHROUGH_SEGMENTS.includes(firstSegment)) {
       return {
         destination: preserveQueryAndHash('/maintenance', search, { hash }),
         permanent: false,

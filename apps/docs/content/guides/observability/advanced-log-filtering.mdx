@@ -1,0 +1,242 @@
+---
+title: 'Query logs with SQL'
+description: 'Query ClickHouse logs through MCP, the Management API, or Explorer'
+---
+
+This guide explains how to query project logs with ClickHouse SQL. Use [MCP](#mcp) or the [Management API](#api) for programmatic access, or [Explorer](#studio) in Studio. To filter events without SQL, use [Logs in Studio](/docs/guides/observability/logs).
+
+## Query events [#querying-with-the-logs-explorer]
+
+Every event is a row in `logs`. Select a service with `source`, use a bounded time range, and limit the returned rows. For example, this query returns the latest API server errors within the supplied time range:
+
+```sql
+-- recent API server errors
+select timestamp, id,
+  toInt32OrZero(log_attributes['response.status_code']) as status,
+  log_attributes['request.path'] as path
+from logs
+where source = 'edge_logs'
+  and toInt32OrZero(log_attributes['response.status_code']) between 500 and 599
+order by timestamp desc
+limit 100;
+```
+
+Use the returned timestamp, ID, status, and path to investigate an event. No rows means no matching recorded events in that window; check the source, filters, and retention before concluding that there were no errors.
+
+### MCP [#mcp]
+
+Connect [Supabase MCP](/docs/guides/ai-tools/mcp) with `project_ref` and `read_only=true`. Call `query_logs` with the SQL and an explicit time range, using the tool's input schema. Use `execute_sql` for Postgres database diagnostics, not ClickHouse logs.
+
+### Management API [#api]
+
+Set `SUPABASE_ACCESS_TOKEN` to a Management API access token authorized to read project logs, and `PROJECT_REF` to the project reference. Set `START` and `END` to UTC timestamps such as `2026-09-07T09:00:00Z`, with a range of 24 hours or less. Save the query above as `logs.sql`, then run:
+
+```bash
+curl --get "https://api.supabase.com/v1/projects/$PROJECT_REF/analytics/endpoints/logs" \
+  --header "Authorization: Bearer $SUPABASE_ACCESS_TOKEN" \
+  --data-urlencode "sql@logs.sql" \
+  --data-urlencode "iso_timestamp_start=$START" \
+  --data-urlencode "iso_timestamp_end=$END"
+```
+
+Inspect both the HTTP status and the response for query errors before interpreting the results. Without `sql`, this endpoint queries API Gateway events only. See the [logs endpoint reference](/docs/reference/api/v1-get-project-logs) for request and response fields.
+
+### Explorer [#studio]
+
+1. Open [Explorer](/dashboard/project/_/explorer) and select **Run SQL**.
+2. Open the query source menu and select **Logs**.
+3. Choose the time range in that menu.
+4. Enter the query and select **Run**.
+
+The selected range is applied to the query. The **Logs** query source chooses ClickHouse; `source = 'edge_logs'` chooses API Gateway events within it. Select **Database** instead when running Postgres SQL.
+
+### Terminal access [#cli]
+
+Supabase CLI v2 does not query ClickHouse logs. Use the Management API command above. [Supabase CLI v3](/docs/guides/observability/cli-logs#query-with-sql) supports ClickHouse queries with `supabase logs --remote --sql`. For live database statistics, use [`supabase inspect db`](/docs/guides/observability/inspect).
+
+## Sources and fields [#logs-explorer]
+
+Use the [Log sources and fields reference](/docs/guides/observability/log-field-reference) to choose the service and query expressions. API Gateway events and a service's own logs describe different layers of a request.
+
+### Read structured fields [#understanding-field-references]
+
+Read a map key with bracket access, retaining its full dotted path. Values in `log_attributes` are strings. Cast numeric values before comparing them. `toInt32OrZero` treats missing or non-numeric values as zero; do not interpret that zero as a measured status or duration.
+
+When a field is missing or unfamiliar, discover the keys present on recorded events:
+
+```sql
+-- discover Postgres attributes
+select arrayJoin(mapKeys(log_attributes)) as key, count() as events
+from logs
+where source = 'postgres_logs'
+group by key
+order by events desc
+limit 100;
+```
+
+### Time ranges [#timestamp-display-and-behavior]
+
+`timestamp` is a UTC `DateTime64` value. Compare and order it directly. Explorer supplies the chosen time range; MCP and API callers must supply their own bounded range. To compare more than 24 hours through the API, fetch separate windows within retention and combine their aggregates.
+
+## Search messages [#filtering-with-regular-expressions]
+
+Use `ilike` for a case-insensitive substring, or ClickHouse's [`match`](https://clickhouse.com/docs/sql-reference/functions/string-search-functions#match) for a regular expression:
+
+```sql
+-- find connection failures
+select timestamp, id, event_message
+from logs
+where source = 'postgres_logs'
+  and event_message ilike '%connection%'
+  and match(event_message, '(?i)failed|refused|timeout')
+order by timestamp desc
+limit 100;
+```
+
+Combine predicates with `and`, `or`, and `not`. Select only the fields needed for the investigation. To correlate sources, use an identifier present in both; a shared timestamp alone does not establish that events belong to the same request.
+
+## Filter by Postgres error code [#sqlstate-filtering]
+
+Filter `postgres_logs` by SQLSTATE to surface errors at a specific category rather than by message text. The code lives in `log_attributes['parsed.sql_state_code']`.
+
+To see which error codes are occurring across a time window:
+
+```sql
+select
+  log_attributes['parsed.sql_state_code'] as sqlstate,
+  count() as occurrences
+from logs
+where source = 'postgres_logs'
+  and log_attributes['parsed.sql_state_code'] != ''
+group by sqlstate
+order by occurrences desc
+limit 50;
+```
+
+During a platform-level incident (such as the database entering read-only mode), codes like `25006` (`read_only_sql_transaction`) and `53100` (`disk_full`) will dominate the results. To focus on application errors while a platform incident is active, exclude the known platform codes:
+
+```sql
+select
+  timestamp,
+  log_attributes['parsed.sql_state_code'] as sqlstate,
+  event_message
+from logs
+where source = 'postgres_logs'
+  and log_attributes['parsed.sql_state_code'] not in ('25006', '53100', '57P03')
+  and log_attributes['parsed.error_severity'] = 'ERROR'
+order by timestamp desc
+limit 50;
+```
+
+SQLSTATE codes starting with `25` or `53` usually indicate platform-level resource events rather than application bugs. See the [PostgREST error codes reference](/docs/guides/api/rest/postgrest-error-codes#database-level-errors) and [Database size guide](/docs/guides/platform/database-size#read-only-mode) for context.
+
+## Correlate requests [#correlating-requests]
+
+Use a request ID or trace ID to join events across sources. These fields are potentially present on any source but are not guaranteed to be populated.
+
+### Correlating by request ID [#request-id]
+
+Every API Gateway response includes an `sb-request-id` header. The gateway unpacks that value into `log_attributes['request_id']` — there is no `log_attributes['request.headers.sb-request-id']` key. To find the edge log for a known request ID:
+
+```sql
+-- find the edge log for a given sb-request-id
+select timestamp, log_attributes
+from logs
+where source = 'edge_logs'
+  and log_attributes['request_id'] = '<sb-request-id>'
+limit 1;
+```
+
+If the response header `log_attributes['response.headers.cf_cache_status']` is `HIT`, the request was served from Cloudflare and never reached PostgREST, Auth, or Storage — no downstream logs exist for that `request_id`.
+
+### Correlate logs by trace ID [#trace-id]
+
+If the client sends a `traceparent` header (W3C Trace Context), the gateway records it in `log_attributes['request.headers.traceparent']` and extracts the trace and span IDs into `log_attributes['trace_id']` and `log_attributes['span_id']`. Use the `trace_id` to correlate across all sources:
+
+```sql
+-- correlate across all sources by trace_id
+select source, timestamp, log_attributes
+from logs
+where log_attributes['trace_id'] = '<trace_id>'
+order by timestamp;
+```
+
+See [Client-side tracing](/docs/guides/observability/client-side-tracing) for how to attach trace context from Supabase client SDKs.
+
+## Follow a user's activity [#follow-user-activity]
+
+### Track a user across services [#track-user-across-services]
+
+To trace what a specific user did, find their recent auth events by user ID, then use the `request_id` from those events to find the other service logs that belong to the same request.
+
+```sql
+-- step 1: find the user's recent auth events
+select timestamp,
+  log_attributes['user_id'] as user_id,
+  log_attributes['request_id'] as request_id,
+  event_message
+from logs
+where source = 'auth_logs'
+  and log_attributes['user_id'] = 'xxxxxxxx-xxxx-xxxx-xxxx-xxxxxxxxxxxx'
+order by timestamp desc
+limit 20;
+```
+
+```sql
+-- step 2: use a request_id from step 1 to find all related logs
+select timestamp, source, event_message
+from logs
+where log_attributes['request_id'] = '<request_id from step 1>'
+order by timestamp;
+```
+
+The user ID appears in [Auth](/dashboard/project/_/auth/users) and in your application's user table.
+
+### Investigate an Edge Function invocation [#investigate-edge-function]
+
+`function_edge_logs` records the HTTP request and response for each invocation. `function_logs` records the console output from inside the function. Both share an `execution_id` that lets you view them together.
+
+```sql
+-- find a failing invocation
+select timestamp,
+  log_attributes['execution_id'] as execution_id,
+  log_attributes['response.status_code'] as status,
+  log_attributes['request.path'] as path
+from logs
+where source = 'function_edge_logs'
+  and toInt32OrZero(log_attributes['response.status_code']) >= 500
+order by timestamp desc
+limit 20;
+```
+
+```sql
+-- fetch the HTTP layer and console output for one invocation
+select timestamp, source, event_message
+from logs
+where log_attributes['execution_id'] = '<execution_id from above>'
+order by timestamp;
+```
+
+## Query limits [#limit-and-result-row-limitations]
+
+Use an explicit `limit` and narrow time range. The logs query surface rejects `select *` and `count(*)`; list columns and use `count()`. A result limit bounds returned rows, not the time range scanned.
+
+## Record additional events [#working-with-api-logs]
+
+For HTTP header capture, see [Captured HTTP headers](/docs/guides/observability/log-field-reference#captured-http-headers). Configure event recording separately from querying:
+
+### Postgres connections [#logging-postgres-connections]
+
+See [Configure connection logging](/docs/guides/observability/configure-logging#postgres-connections).
+
+### Postgres statements [#logging-postgres-queries]
+
+See [Configure statement logging](/docs/guides/observability/configure-logging#postgres-statements).
+
+### Statement classes [#configuring-pgauditlog]
+
+See [pgAudit configuration](/docs/guides/database/extensions/pgaudit#configure-the-extension) for session and role scope.
+
+### Realtime connections [#logging-realtime-connections]
+
+See [Configure Realtime logging](/docs/guides/observability/configure-logging#realtime-connections).

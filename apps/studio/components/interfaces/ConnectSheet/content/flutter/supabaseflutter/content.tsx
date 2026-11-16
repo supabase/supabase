@@ -14,7 +14,7 @@ import 'package:supabase_flutter/supabase_flutter.dart';
 Future<void> main() async {
   await Supabase.initialize(
     url: '${projectKeys.apiUrl ?? 'your-project-url'}',
-    anonKey: '${projectKeys.publishableKey ?? '<prefer publishable key instead of anon key for mobile and desktop apps>'}',
+    publishableKey: '${projectKeys.publishableKey ?? 'your-publishable-key'}',
   );
   runApp(MyApp());
 }

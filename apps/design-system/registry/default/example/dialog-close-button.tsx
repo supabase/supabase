@@ -19,7 +19,7 @@ export default function DialogCloseButton() {
   return (
     <Dialog>
       <DialogTrigger asChild>
-        <Button variant="default">Share</Button>
+        <Button>Share</Button>
       </DialogTrigger>
       <DialogContent className="sm:max-w-md">
         <DialogHeader>
@@ -43,9 +43,7 @@ export default function DialogCloseButton() {
         </DialogSection>
         <DialogFooter className="sm:justify-start">
           <DialogClose asChild>
-            <Button variant="default" type="button">
-              Custom Close Button
-            </Button>
+            <Button type="button">Custom Close Button</Button>
           </DialogClose>
         </DialogFooter>
       </DialogContent>

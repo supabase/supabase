@@ -1,4 +1,4 @@
-import { RefreshCw } from 'lucide-react'
+import { RefreshCwIcon } from 'lucide-react'
 import { useTheme } from 'next-themes'
 import Head from 'next/head'
 import { useMemo } from 'react'
@@ -45,7 +45,11 @@ const MaintenancePage: NextPageWithLayout = () => {
           <p className="text-sm text-foreground-lighter">
             Reload the page to check if the maintenance window has ended
           </p>
-          <Button onClick={() => window.location.reload()} variant="primary" icon={<RefreshCw />}>
+          <Button
+            onClick={() => window.location.reload()}
+            variant="primary"
+            icon={<RefreshCwIcon />}
+          >
             Reload
           </Button>
         </div>

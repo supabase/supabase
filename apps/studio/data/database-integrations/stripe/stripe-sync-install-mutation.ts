@@ -5,8 +5,8 @@ import { toast } from 'sonner'
 import { stripeSyncKeys } from './keys'
 import { databaseKeys } from '@/data/database/keys'
 import { BASE_PATH } from '@/lib/constants'
+import type { StudioError } from '@/lib/errors/studio-errors'
 import { useTrack } from '@/lib/telemetry/track'
-import type { ResponseError } from '@/types'
 
 export type StripeSyncInstallVariables = {
   projectRef: string
@@ -55,15 +55,15 @@ export const useStripeSyncInstallMutation = ({
   onError,
   ...options
 }: Omit<
-  UseMutationOptions<StripeSyncInstallData, ResponseError, StripeSyncInstallVariables>,
+  UseMutationOptions<StripeSyncInstallData, StudioError, StripeSyncInstallVariables>,
   'mutationFn'
 > = {}) => {
   const queryClient = useQueryClient()
   const track = useTrack()
 
-  return useMutation<StripeSyncInstallData, ResponseError, StripeSyncInstallVariables>({
+  return useMutation<StripeSyncInstallData, StudioError, StripeSyncInstallVariables>({
     mutationFn: (vars) => installStripeSync(vars),
-    async onSuccess(data, variables, context) {
+    async onSuccess(data, variables, context, mutationContext) {
       const { projectRef } = variables
 
       track('integration_install_submitted', {
@@ -81,13 +81,13 @@ export const useStripeSyncInstallMutation = ({
         queryKey: stripeSyncKeys.all,
       })
 
-      await onSuccess?.(data, variables, context)
+      await onSuccess?.(data, variables, context, mutationContext)
     },
-    async onError(data, variables, context) {
+    async onError(data, variables, context, mutationContext) {
       if (onError === undefined) {
         toast.error(`Failed to install Stripe Sync: ${data.message}`)
       } else {
-        onError(data, variables, context)
+        onError(data, variables, context, mutationContext)
       }
     },
     ...options,

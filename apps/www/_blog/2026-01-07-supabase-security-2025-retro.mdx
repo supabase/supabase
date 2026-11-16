@@ -14,7 +14,7 @@ imgThumb: 2026/security-retro/thumb.png
 
 This post covers security changes made to the Supabase platform in 2025 and what to expect in 2026. Some changes may be breaking.
 
-Postgres Row Level Security (RLS) is powerful but can be complex for developers new to the pattern. Most of the changes in 2025 focused on safer defaults and better tooling to make security more accessible.
+Postgres [Row Level Security](/docs/guides/database/postgres/row-level-security) (RLS) is powerful but can be complex for developers new to the pattern. Most of the changes in 2025 focused on safer defaults and better tooling to make security more accessible.
 
 We'll cover what shipped in 2025 and outline planned improvements for 2026.
 
@@ -139,7 +139,7 @@ Security Advisors scan your project for misconfigurations using [Splinter](https
 
 The dashboard includes an Assistant that helps fix security issues detected by Security Advisors. When viewing alerts, you can ask the Assistant to generate and apply RLS policies. Describe your security requirements in plain text and the Assistant will generate the corresponding policy SQL. The Assistant can also suggest improvements for policies and configurations. This helps developers write correct RLS policies more quickly.
 
-Security Advisors are also available through our MCP server, allowing developers to scan and fix all security issues from their development environment with a simple command. This integrates security checks directly into your workflow.
+Security Advisors are also available through our [MCP server](/docs/guides/ai-tools/mcp), allowing developers to scan and fix all security issues from their development environment with a simple command. This integrates security checks directly into your workflow.
 
 ## Column-level security
 
@@ -163,7 +163,7 @@ Column-level security works independently from RLS. You can use both together: R
   zoomable={true}
 />
 
-[Custom claims](/docs/guides/database/postgres/custom-claims-and-role-based-access-control-rbac) let you add metadata to JWTs for role-based access control (RBAC). Instead of writing RLS policies for each table, you can embed role information in the authentication token and check it in your policies. This works well if you're migrating from traditional RBAC systems or prefer centralized role management.
+[Custom claims](/docs/guides/api/custom-claims-and-role-based-access-control-rbac) let you add metadata to JWTs for role-based access control (RBAC). Instead of writing RLS policies for each table, you can embed role information in the authentication token and check it in your policies. This works well if you're migrating from traditional RBAC systems or prefer centralized role management.
 
 ## VPC / Private Link on AWS
 

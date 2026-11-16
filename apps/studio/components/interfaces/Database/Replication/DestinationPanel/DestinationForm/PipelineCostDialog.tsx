@@ -25,11 +25,11 @@ import {
   getTableCopyTargets,
   summarizeTableCopyEstimate,
   type ReplicationTableIdentity,
-  type TableSyncCopyConfig,
 } from '@/components/interfaces/Database/Replication/TableSyncCopy.utils'
 import { InlineLink } from '@/components/ui/InlineLink'
 import { useReplicationCostEstimateQuery } from '@/data/replication/cost-estimate-query'
 import { useReplicationSourceId } from '@/data/replication/sources-query'
+import type { TableSyncCopyConfig } from '@/data/replication/types'
 import { useLatest } from '@/hooks/misc/useLatest'
 import { DOCS_URL } from '@/lib/constants'
 import { formatBytes, formatCurrency } from '@/lib/helpers'
@@ -102,7 +102,7 @@ export const PipelineCostDialog = ({
     <Dialog open={open} onOpenChange={onOpenChange}>
       <DialogContent size="large">
         <DialogHeader>
-          <DialogTitle>Confirm to create and start pipeline</DialogTitle>
+          <DialogTitle>Create and start pipeline</DialogTitle>
           <DialogDescription>
             Review the estimated costs before you create and start the pipeline.
           </DialogDescription>
@@ -123,7 +123,7 @@ export const PipelineCostDialog = ({
                 <p className="text-sm text-foreground-light">
                   This pipeline will replicate{' '}
                   <span className="text-foreground">
-                    {tableCount} {tableCount === 1 ? 'table' : 'tables'}
+                    {tableCount} {tableCount === 1 ? <span>table</span> : <span>tables</span>}
                   </span>
                   {publicationName ? (
                     <>
@@ -135,7 +135,7 @@ export const PipelineCostDialog = ({
                       publication
                     </>
                   ) : null}
-                  .
+                  <span>.</span>
                 </p>
 
                 <div className="flex flex-col gap-y-2">
@@ -180,7 +180,7 @@ export const PipelineCostDialog = ({
                             <TableRow>
                               <TableCell colSpan={3} className="text-xs text-foreground-lighter">
                                 +{hiddenTableCount} more{' '}
-                                {hiddenTableCount === 1 ? 'table' : 'tables'}
+                                {hiddenTableCount === 1 ? <span>table</span> : <span>tables</span>}
                               </TableCell>
                             </TableRow>
                           )}
@@ -252,8 +252,12 @@ export const PipelineCostDialog = ({
                       className="shrink-0 text-right font-mono text-lg font-semibold text-foreground"
                       translate="no"
                     >
-                      {copyEstimate?.isComplete ? formatCurrency(initialSyncTotal) : 'Unavailable'}
-                      {copyEstimate?.isComplete && hasRowFilteredTables ? '*' : null}
+                      {copyEstimate?.isComplete ? (
+                        formatCurrency(initialSyncTotal)
+                      ) : (
+                        <span>Unavailable</span>
+                      )}
+                      {copyEstimate?.isComplete && hasRowFilteredTables ? <span>*</span> : null}
                     </span>
                   </div>
 
@@ -269,7 +273,7 @@ export const PipelineCostDialog = ({
         )}
 
         <DialogFooter>
-          <Button variant="default" disabled={isConfirming} onClick={() => onOpenChange(false)}>
+          <Button disabled={isConfirming} onClick={() => onOpenChange(false)}>
             Cancel
           </Button>
           <Button

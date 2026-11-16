@@ -14,25 +14,22 @@ const EMPTY_QUERY: ConnectSheetQueryParams = {
   method: null,
   type: null,
   mcpClient: null,
+  warehouseQueryEngine: null,
 }
 
 const EMPTY_PREFS: ConnectSheetPrefs = {}
 
 describe('mapConnectTabToMode', () => {
-  test('returns null for null tab', () => {
-    expect(mapConnectTabToMode(null)).toBeNull()
+  test.each([null, 'not-a-real-tab'])('returns null for %s', (tab) => {
+    expect(mapConnectTabToMode(tab)).toBeNull()
   })
 
-  test('returns null for an unrecognized tab', () => {
-    expect(mapConnectTabToMode('not-a-real-tab')).toBeNull()
-  })
-
-  test.each(['frameworks', 'mobiles'])('maps "%s" to framework mode', (tab) => {
-    expect(mapConnectTabToMode(tab)).toBe('framework')
-  })
-
-  test('maps "orms" to orm mode', () => {
-    expect(mapConnectTabToMode('orms')).toBe('orm')
+  test.each([
+    ['frameworks', 'framework'],
+    ['mobiles', 'framework'],
+    ['orms', 'orm'],
+  ])('maps legacy tab "%s" to %s mode', (tab, mode) => {
+    expect(mapConnectTabToMode(tab)).toBe(mode)
   })
 
   test.each(ALL_MODES)('passes through an already-valid mode "%s"', (mode) => {
@@ -172,5 +169,26 @@ describe('resolveConnectSheetHydration', () => {
     expect(result.mode).toBe('server')
     expect(result.fieldUpdates).toEqual([])
     expect(result.urlUpdates).toEqual({})
+  })
+
+  test('hydrates the Warehouse query engine from stored preferences', () => {
+    const result = resolveConnectSheetHydration(
+      { ...EMPTY_QUERY, connectTab: 'warehouse' },
+      { warehouseQueryEngine: 'duckdb' },
+      [...ALL_MODES, 'warehouse']
+    )
+
+    expect(result.mode).toBe('warehouse')
+    expect(result.urlUpdates.warehouseQueryEngine).toBe('duckdb')
+  })
+
+  test('keeps the Warehouse query engine already present in the URL', () => {
+    const result = resolveConnectSheetHydration(
+      { ...EMPTY_QUERY, connectTab: 'warehouse', warehouseQueryEngine: 'duckdb' },
+      { warehouseQueryEngine: 'flightsql' },
+      [...ALL_MODES, 'warehouse']
+    )
+
+    expect(result.urlUpdates.warehouseQueryEngine).toBeUndefined()
   })
 })

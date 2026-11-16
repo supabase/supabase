@@ -37,7 +37,7 @@ export function parseReferencePath(slug: Array<string>) {
     let maybeCrawlers: string | null
     let path: string[]
     ;[sdkId, maybeVersion, maybeCrawlers, ...path] = slug
-    if (!/v\d+/.test(maybeVersion)) {
+    if (!/^v\d+$/.test(maybeVersion)) {
       maybeVersion = null
       path = [maybeCrawlers, ...path]
       maybeCrawlers = maybeVersion

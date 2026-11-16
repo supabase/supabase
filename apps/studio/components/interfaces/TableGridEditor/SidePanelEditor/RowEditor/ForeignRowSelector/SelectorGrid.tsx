@@ -1,4 +1,4 @@
-import { Key } from 'lucide-react'
+import { KeyIcon } from 'lucide-react'
 import DataGrid, { Column } from 'react-data-grid'
 import { Tooltip, TooltipContent, TooltipTrigger } from 'ui'
 
@@ -23,8 +23,8 @@ const columnRender = (name: string, isPrimaryKey = false) => {
       {isPrimaryKey && (
         <Tooltip>
           <TooltipTrigger>
-            <div className="text-brand">
-              <Key size={14} strokeWidth={2} />
+            <div className="text-primary">
+              <KeyIcon size={14} strokeWidth={2} />
             </div>
           </TooltipTrigger>
           <TooltipContent side="bottom">Primary key</TooltipContent>

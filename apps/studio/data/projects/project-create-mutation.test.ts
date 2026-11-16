@@ -1,72 +1,52 @@
-import { beforeEach, describe, expect, it, vi } from 'vitest'
+import { HttpResponse } from 'msw'
+import { describe, expect, it } from 'vitest'
 
-vi.mock('@/data/fetchers', () => ({
-  post: vi.fn(),
-  handleError: vi.fn((error) => {
-    throw error
-  }),
-}))
+import { createProject } from './project-create-mutation'
+import { addAPIMock } from '@/tests/lib/msw'
 
-describe('project-create-mutation', () => {
-  beforeEach(() => {
-    vi.clearAllMocks()
+const baseVariables = {
+  name: 'test-project',
+  organizationSlug: 'test-org',
+  dbPass: 'secret-password',
+  dbRegion: 'West US (North California)',
+}
+
+async function createProjectAndCaptureBody(variables: Parameters<typeof createProject>[0]) {
+  let body: unknown
+  addAPIMock({
+    method: 'post',
+    path: '/platform/projects',
+    response: async ({ request }) => {
+      body = await request.json()
+      return HttpResponse.json(null)
+    },
+  })
+  await createProject(variables)
+  return body
+}
+
+describe('createProject', () => {
+  it('sends GitHub connection fields when provided', async () => {
+    const body = await createProjectAndCaptureBody({
+      ...baseVariables,
+      githubInstallationId: 1234,
+      githubRepositoryId: 5678,
+    })
+
+    expect(body).toMatchObject({
+      name: 'test-project',
+      organization_slug: 'test-org',
+      db_pass: 'secret-password',
+      db_region: 'West US (North California)',
+      github_installation_id: 1234,
+      github_repository_id: 5678,
+    })
   })
 
-  describe('createProject', () => {
-    it('sends GitHub connection fields when provided', async () => {
-      const { post } = await import('@/data/fetchers')
-      const { createProject } = await import('./project-create-mutation')
+  it('does not send GitHub connection fields when omitted', async () => {
+    const body = await createProjectAndCaptureBody(baseVariables)
 
-      const mockPost = post as unknown as ReturnType<typeof vi.fn>
-      mockPost.mockResolvedValueOnce({
-        data: { ref: 'project-ref', organization_slug: 'test-org' },
-        error: null,
-      })
-
-      await createProject({
-        name: 'test-project',
-        organizationSlug: 'test-org',
-        dbPass: 'secret-password',
-        dbRegion: 'West US (North California)',
-        githubInstallationId: 1234,
-        githubRepositoryId: 5678,
-      })
-
-      expect(mockPost).toHaveBeenCalledWith('/platform/projects', {
-        body: expect.objectContaining({
-          name: 'test-project',
-          organization_slug: 'test-org',
-          db_pass: 'secret-password',
-          db_region: 'West US (North California)',
-          github_installation_id: 1234,
-          github_repository_id: 5678,
-        }),
-      })
-    })
-
-    it('does not populate GitHub connection fields when omitted', async () => {
-      const { post } = await import('@/data/fetchers')
-      const { createProject } = await import('./project-create-mutation')
-
-      const mockPost = post as unknown as ReturnType<typeof vi.fn>
-      mockPost.mockResolvedValueOnce({
-        data: { ref: 'project-ref', organization_slug: 'test-org' },
-        error: null,
-      })
-
-      await createProject({
-        name: 'test-project',
-        organizationSlug: 'test-org',
-        dbPass: 'secret-password',
-        dbRegion: 'West US (North California)',
-      })
-
-      expect(mockPost).toHaveBeenCalledWith('/platform/projects', {
-        body: expect.objectContaining({
-          github_installation_id: undefined,
-          github_repository_id: undefined,
-        }),
-      })
-    })
+    expect(body).not.toHaveProperty('github_installation_id')
+    expect(body).not.toHaveProperty('github_repository_id')
   })
 })

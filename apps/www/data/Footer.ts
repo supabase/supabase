@@ -27,6 +27,10 @@ const footerData = [
         url: '/edge-functions',
       },
       {
+        text: 'Compute',
+        url: '/compute',
+      },
+      {
         text: 'Realtime',
         url: '/realtime',
       },
@@ -97,12 +101,28 @@ const footerData = [
         url: '/partners/catalog',
       },
       {
-        text: 'Brand Assets',
-        url: '/brand-assets',
+        text: 'Knowledge Base',
+        url: '/kb',
+      },
+      {
+        text: 'FAQs',
+        url: '/kb/topics/faqs',
+      },
+      {
+        text: 'Brand Guidelines',
+        url: '/brand',
       },
       {
         text: 'Security & Compliance',
         url: '/security',
+      },
+      {
+        text: 'Regions',
+        url: '/regions',
+      },
+      {
+        text: 'dbarena',
+        url: 'https://dbarena.com',
       },
       {
         text: 'SOC2',

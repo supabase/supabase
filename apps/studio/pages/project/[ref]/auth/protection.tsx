@@ -1,4 +1,3 @@
-import { PermissionAction } from '@supabase/shared-types/out/constants'
 import { useParams } from 'common'
 import { PageContainer } from 'ui-patterns/PageContainer'
 import {
@@ -16,7 +15,7 @@ import AuthLayout from '@/components/layouts/AuthLayout/AuthLayout'
 import { DefaultLayout } from '@/components/layouts/DefaultLayout'
 import { NoPermission } from '@/components/ui/NoPermission'
 import { UnknownInterface } from '@/components/ui/UnknownInterface'
-import { useAsyncCheckPermissions } from '@/hooks/misc/useCheckPermissions'
+import { FGA_PERMISSIONS, useAsyncCheckPermissionsV2 } from '@/hooks/misc/useCheckPermissionsV2'
 import { useIsFeatureEnabled } from '@/hooks/misc/useIsFeatureEnabled'
 import type { NextPageWithLayout } from '@/types'
 
@@ -24,9 +23,8 @@ const ProtectionPage: NextPageWithLayout = () => {
   const { ref } = useParams()
   const showAttackProtection = useIsFeatureEnabled('authentication:attack_protection')
 
-  const { can: canReadAuthSettings, isSuccess: isPermissionsLoaded } = useAsyncCheckPermissions(
-    PermissionAction.READ,
-    'custom_config_gotrue'
+  const { can: canReadAuthSettings, isSuccess: isPermissionsLoaded } = useAsyncCheckPermissionsV2(
+    FGA_PERMISSIONS.PROJECT.AUTH_CONFIG_READ
   )
 
   if (!showAttackProtection) {

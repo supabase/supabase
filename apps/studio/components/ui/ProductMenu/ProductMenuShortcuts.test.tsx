@@ -1,5 +1,5 @@
 import { render } from '@testing-library/react'
-import { beforeEach, describe, expect, it, vi } from 'vitest'
+import { describe, expect, it, vi } from 'vitest'
 
 import type { ProductMenuGroup } from './ProductMenu.types'
 import { ProductMenuShortcuts } from './ProductMenuShortcuts'
@@ -54,17 +54,14 @@ const menu: ProductMenuGroup[] = [
 ]
 
 describe('ProductMenuShortcuts', () => {
-  beforeEach(() => {
-    vi.clearAllMocks()
-  })
-
   it('registers visible enabled internal shortcut items', () => {
     render(<ProductMenuShortcuts menu={menu} />)
 
     expect(mockUseShortcut).toHaveBeenCalledTimes(1)
     expect(mockUseShortcut).toHaveBeenCalledWith(
       SHORTCUT_IDS.NAV_DATABASE_TABLES,
-      expect.any(Function)
+      expect.any(Function),
+      { label: undefined }
     )
   })
 
@@ -105,7 +102,8 @@ describe('ProductMenuShortcuts', () => {
 
     expect(mockUseShortcut).toHaveBeenCalledWith(
       SHORTCUT_IDS.NAV_DATABASE_INDEXES,
-      expect.any(Function)
+      expect.any(Function),
+      { label: undefined }
     )
   })
 })

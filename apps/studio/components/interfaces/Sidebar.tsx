@@ -1,12 +1,21 @@
 import { LOCAL_STORAGE_KEYS, useFlag, useIsMFAEnabled, useParams } from 'common'
-import { AnimatePresence, motion, MotionProps } from 'framer-motion'
 import { Home } from 'icons'
 import { isUndefined } from 'lodash'
-import { Blocks, Boxes, ChartArea, PanelLeftDashed, Receipt, Settings, Users } from 'lucide-react'
+import {
+  BlocksIcon,
+  BoxesIcon,
+  ChartAreaIcon,
+  PanelLeftDashedIcon,
+  ReceiptIcon,
+  SettingsIcon,
+  UsersIcon,
+} from 'lucide-react'
+import { AnimatePresence, motion, MotionProps } from 'motion/react'
 import Link from 'next/link'
 import { useRouter } from 'next/router'
 import { ComponentProps, ComponentPropsWithoutRef, FC, ReactNode, useEffect } from 'react'
 import {
+  Badge,
   Button,
   cn,
   DropdownMenu,
@@ -32,9 +41,10 @@ import { Route } from '../ui/ui.types'
 import {
   generateProductRoutes,
   generateSettingsRoutes,
-  generateToolRoutes,
   useGenerateOtherRoutes,
+  useGenerateToolRoutes,
 } from '@/components/layouts/Navigation/NavigationBar/NavigationBar.utils'
+import { ORG_SETTINGS_ROUTES } from '@/components/layouts/OrganizationLayout/OrganizationLayout.utils'
 import { ProjectIndexPageLink } from '@/data/prefetchers/project.$ref'
 import { useHideSidebar } from '@/hooks/misc/useHideSidebar'
 import { useIsFeatureEnabled } from '@/hooks/misc/useIsFeatureEnabled'
@@ -42,6 +52,7 @@ import { useLints } from '@/hooks/misc/useLints'
 import { useLocalStorageQuery } from '@/hooks/misc/useLocalStorage'
 import { useSelectedOrganizationQuery } from '@/hooks/misc/useSelectedOrganization'
 import { useSelectedProjectQuery } from '@/hooks/misc/useSelectedProject'
+import { useTrack } from '@/lib/telemetry/track'
 import { SHORTCUT_IDS } from '@/state/shortcuts/registry'
 
 export const ICON_SIZE = 32
@@ -96,7 +107,7 @@ export const Sidebar = ({ className, ...props }: SidebarProps) => {
                   <Button
                     variant="text"
                     className={`w-min px-1.5 mx-0.5 ${sidebarBehaviour === 'open' ? 'px-2!' : ''}`}
-                    icon={<PanelLeftDashed size={ICON_SIZE} strokeWidth={ICON_STROKE_WIDTH} />}
+                    icon={<PanelLeftDashedIcon size={ICON_SIZE} strokeWidth={ICON_STROKE_WIDTH} />}
                     aria-label="Sidebar control"
                   />
                 </DropdownMenuTrigger>
@@ -167,6 +178,7 @@ export function SideBarNavLink({
 } & ComponentPropsWithoutRef<typeof SidebarMenuButton>) {
   const router = useRouter()
   const { state: sidebarState } = useSidebar()
+
   const [sidebarBehaviour] = useLocalStorageQuery(
     LOCAL_STORAGE_KEYS.SIDEBAR_BEHAVIOR,
     DEFAULT_SIDEBAR_BEHAVIOR
@@ -195,6 +207,14 @@ export function SideBarNavLink({
     <>
       {route.icon}
       <span>{route.label}</span>
+      {route.isNew && (
+        <Badge
+          variant="success"
+          className="ml-auto shrink-0 px-1.5 py-0.5 text-[9px] uppercase tracking-wider"
+        >
+          New
+        </Badge>
+      )}
     </>
   )
 
@@ -210,6 +230,11 @@ export function SideBarNavLink({
     <SidebarMenuItem>
       {hasShortcut ? (
         <Shortcut
+          label={
+            route.shortcutId === SHORTCUT_IDS.NAV_ADVISORS || route.key === 'explorer'
+              ? `Go to ${route.label}`
+              : undefined
+          }
           id={route.shortcutId!}
           onTrigger={() => router.push(route.link!)}
           side="right"
@@ -248,6 +273,7 @@ const ActiveDot = ({ hasErrors, hasWarnings }: { hasErrors: boolean; hasWarnings
 
 const ProjectLinks = () => {
   const router = useRouter()
+  const track = useTrack()
   const { ref } = useParams()
   const { data: project, isPending: isProjectPending } = useSelectedProjectQuery()
   const { securityLints, errorLints } = useLints()
@@ -267,14 +293,16 @@ const ProjectLinks = () => {
   ])
 
   const authOverviewPageEnabled = useFlag('authOverviewPage')
+  const computeEnabled = useFlag('compute')
 
-  const toolRoutes = generateToolRoutes(ref, project)
+  const toolRoutes = useGenerateToolRoutes()
   const productRoutes = generateProductRoutes(ref, project, {
     auth: authEnabled,
     edgeFunctions: edgeFunctionsEnabled,
     storage: storageEnabled,
     realtime: realtimeEnabled,
     authOverviewPage: authOverviewPageEnabled,
+    compute: computeEnabled,
   })
   const otherRoutes = useGenerateOtherRoutes()
   const settingsRoutes = generateSettingsRoutes(ref)
@@ -301,6 +329,11 @@ const ProjectLinks = () => {
               route={route}
               active={activeRoute === route.key}
               isLoading={isProjectPending}
+              onClick={
+                route.key === 'explorer' && activeRoute === 'sql'
+                  ? () => track('sql_editor_back_explorer_clicked')
+                  : undefined
+              }
             />
           ))}
         </SidebarMenu>
@@ -322,12 +355,15 @@ const ProjectLinks = () => {
       <SidebarGroup className="gap-0.5">
         <SidebarMenu>
           {otherRoutes.map((route) => {
-            if (route.key === 'advisors') {
+            if (route.key === 'issues' || route.key === 'advisors') {
               return (
                 <SideBarNavLink
                   key={route.key}
                   route={route}
-                  active={activeRoute === route.key}
+                  active={
+                    activeRoute === route.key ||
+                    (route.key === 'issues' && activeRoute === 'advisors')
+                  }
                   isLoading={isProjectPending}
                 >
                   {route.icon}
@@ -384,42 +420,33 @@ const OrganizationLinks = () => {
   const showBilling = useIsFeatureEnabled('billing:all')
 
   const activeRoute = router.pathname.split('/')[3]
-  const organizationSettingsRoutes = new Set([
-    'general',
-    'security',
-    'sso',
-    'apps',
-    'audit',
-    'documents',
-  ])
-
   const navMenuItems = [
     {
       label: 'Projects',
       href: `/org/${organizationSlug}`,
       key: 'projects',
-      icon: <Boxes size={ICON_SIZE} strokeWidth={ICON_STROKE_WIDTH} />,
+      icon: <BoxesIcon size={ICON_SIZE} strokeWidth={ICON_STROKE_WIDTH} />,
       shortcutId: SHORTCUT_IDS.NAV_ORG_PROJECTS,
     },
     {
       label: 'Team',
       href: `/org/${organizationSlug}/team`,
       key: 'team',
-      icon: <Users size={ICON_SIZE} strokeWidth={ICON_STROKE_WIDTH} />,
+      icon: <UsersIcon size={ICON_SIZE} strokeWidth={ICON_STROKE_WIDTH} />,
       shortcutId: SHORTCUT_IDS.NAV_ORG_TEAM,
     },
     {
       label: 'Integrations',
       href: `/org/${organizationSlug}/integrations`,
       key: 'integrations',
-      icon: <Blocks size={ICON_SIZE} strokeWidth={ICON_STROKE_WIDTH} />,
+      icon: <BlocksIcon size={ICON_SIZE} strokeWidth={ICON_STROKE_WIDTH} />,
       shortcutId: SHORTCUT_IDS.NAV_ORG_INTEGRATIONS,
     },
     {
       label: 'Usage',
       href: `/org/${organizationSlug}/usage`,
       key: 'usage',
-      icon: <ChartArea size={ICON_SIZE} strokeWidth={ICON_STROKE_WIDTH} />,
+      icon: <ChartAreaIcon size={ICON_SIZE} strokeWidth={ICON_STROKE_WIDTH} />,
       shortcutId: SHORTCUT_IDS.NAV_ORG_USAGE,
     },
     ...(showBilling
@@ -428,7 +455,7 @@ const OrganizationLinks = () => {
             label: 'Billing',
             href: `/org/${organizationSlug}/billing`,
             key: 'billing',
-            icon: <Receipt size={ICON_SIZE} strokeWidth={ICON_STROKE_WIDTH} />,
+            icon: <ReceiptIcon size={ICON_SIZE} strokeWidth={ICON_STROKE_WIDTH} />,
             shortcutId: SHORTCUT_IDS.NAV_ORG_BILLING,
           },
         ]
@@ -437,7 +464,7 @@ const OrganizationLinks = () => {
       label: 'Organization Settings',
       href: `/org/${organizationSlug}/general`,
       key: 'settings',
-      icon: <Settings size={ICON_SIZE} strokeWidth={ICON_STROKE_WIDTH} />,
+      icon: <SettingsIcon size={ICON_SIZE} strokeWidth={ICON_STROKE_WIDTH} />,
       shortcutId: SHORTCUT_IDS.NAV_ORG_SETTINGS,
     },
   ]
@@ -454,7 +481,7 @@ const OrganizationLinks = () => {
               i === 0
                 ? activeRoute === undefined
                 : item.key === 'settings'
-                  ? organizationSettingsRoutes.has(activeRoute ?? '')
+                  ? ORG_SETTINGS_ROUTES.includes(activeRoute ?? '')
                   : activeRoute === item.key
             }
             route={{

@@ -76,8 +76,6 @@ vi.mock('@/hooks/misc/useSelectedProject', () => ({
 
 describe('Project settings availability', () => {
   beforeEach(() => {
-    vi.clearAllMocks()
-
     mockUseIsFeatureEnabled.mockReturnValue({
       projectSettingsRestartProject: true,
     })

@@ -1,4 +1,10 @@
-import { Clipboard, MessageSquare, MoreVertical, Settings } from 'lucide-react'
+import {
+  ClipboardIcon,
+  MessageSquareIcon,
+  MoreVerticalIcon,
+  SettingsIcon,
+  TrashIcon,
+} from 'lucide-react'
 import { useState } from 'react'
 import { toast } from 'sonner'
 import {
@@ -17,6 +23,7 @@ import {
   ExplorerToolbarIcon,
   ExplorerToolbarTitle,
 } from './ExplorerToolbar'
+import { useExplorerDeleteItem } from '@/components/layouts/ExplorerLayout/ExplorerProvider'
 import { AIAssistantMetadataWarning } from '@/components/ui/AIAssistantPanel/AIAssistantMetadataWarning'
 import type { AssistantChatHeaderProps } from '@/components/ui/AIAssistantPanel/AssistantChat'
 import { ShortcutPills } from '@/components/ui/ShortcutTooltip'
@@ -35,12 +42,12 @@ export const ExplorerChatToolbar = ({
   isChatLoading,
   showMetadataWarning,
   updatedOptInSinceMCP,
-  isHipaaProjectDisallowed,
   aiOptInLevel,
 }: ExplorerChatToolbarProps) => {
   const snap = useAiAssistantStateSnapshot()
   const chat = snap.chats[chatId]
   const [isOptInModalOpen, setIsOptInModalOpen] = useState(false)
+  const { onSelectDelete } = useExplorerDeleteItem()
 
   const handleCopyChatId = () => {
     copyToClipboard(chatId, () => toast.success(`Copied chat ID for ${chat?.name}`))
@@ -61,7 +68,7 @@ export const ExplorerChatToolbar = ({
     <div className="z-30 sticky top-0">
       <ExplorerToolbar aria-label="Chat toolbar">
         <ExplorerToolbarIcon>
-          <MessageSquare />
+          <MessageSquareIcon size={16} strokeWidth={2} />
         </ExplorerToolbarIcon>
         <ExplorerToolbarTitle onSaveTitle={handleSaveName}>{chat?.name ?? ''}</ExplorerToolbarTitle>
         <ExplorerToolbarActions>
@@ -69,27 +76,26 @@ export const ExplorerChatToolbar = ({
             <DropdownMenuTrigger asChild>
               <ExplorerToolbarAction
                 aria-label="More options"
-                icon={<MoreVertical />}
+                icon={<MoreVerticalIcon size={16} strokeWidth={2} />}
                 disabled={isChatLoading}
               />
             </DropdownMenuTrigger>
             <DropdownMenuContent align="end" className="w-60">
               <DropdownMenuItem className="justify-between" onClick={handleCopyChatId}>
                 <div className="flex items-center gap-x-2">
-                  <Clipboard size={14} />
+                  <ClipboardIcon size={14} />
                   <span>Copy chat ID</span>
                 </div>
                 <ShortcutPills
                   sequence={SHORTCUT_DEFINITIONS[SHORTCUT_IDS.AI_ASSISTANT_COPY_CHAT_ID].sequence}
                 />
               </DropdownMenuItem>
-              <DropdownMenuSeparator />
               <DropdownMenuItem
                 className="justify-between"
                 onClick={() => setIsOptInModalOpen(true)}
               >
                 <div className="flex items-center gap-x-2">
-                  <Settings size={14} />
+                  <SettingsIcon size={14} />
                   <span>Permission settings</span>
                 </div>
                 <ShortcutPills
@@ -98,16 +104,24 @@ export const ExplorerChatToolbar = ({
                   }
                 />
               </DropdownMenuItem>
+              <DropdownMenuSeparator />
+              <DropdownMenuItem
+                className="gap-x-2"
+                onClick={() => onSelectDelete({ id: chatId, type: 'chat', name: chat?.name ?? '' })}
+              >
+                <TrashIcon size={14} />
+                <span>Delete chat</span>
+              </DropdownMenuItem>
             </DropdownMenuContent>
           </DropdownMenu>
         </ExplorerToolbarActions>
       </ExplorerToolbar>
+
       <AIAssistantMetadataWarning
         visible={isOptInModalOpen}
         onVisibleChange={setIsOptInModalOpen}
         showMetadataWarning={showMetadataWarning}
         updatedOptInSinceMCP={updatedOptInSinceMCP}
-        isHipaaProjectDisallowed={isHipaaProjectDisallowed}
         aiOptInLevel={aiOptInLevel}
       />
     </div>

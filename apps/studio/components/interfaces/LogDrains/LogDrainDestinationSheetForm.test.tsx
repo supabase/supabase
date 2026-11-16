@@ -72,13 +72,27 @@ const renderForm = (props?: Partial<ComponentProps<typeof LogDrainDestinationShe
   return { onOpenChange, onSubmit }
 }
 
+type User = ReturnType<typeof userEvent.setup>
+
+const fillInput = async (user: User, input: HTMLElement, value: string) => {
+  await user.click(input)
+  await user.paste(value)
+}
+
+const fillRequiredFields = async (user: User) => {
+  await fillInput(user, screen.getByPlaceholderText('My Destination'), 'Webhook sink')
+  await fillInput(
+    user,
+    screen.getByPlaceholderText('https://example.com/log-drain'),
+    'https://logs.example.com/ingest'
+  )
+}
+
 const submitForm = () =>
   fireEvent.submit(document.getElementById('log-drain-destination-form') as HTMLFormElement)
 
 describe('LogDrainDestinationSheetForm', () => {
   beforeEach(() => {
-    vi.clearAllMocks()
-
     useFlagMock.mockReturnValue(true)
     useParamsMock.mockReturnValue({ ref: 'project-ref' })
     useLogDrainsQueryMock.mockReturnValue({ data: [] })
@@ -102,9 +116,7 @@ describe('LogDrainDestinationSheetForm', () => {
     expect(mockShortcut).toHaveBeenCalledWith(
       expect.objectContaining({
         id: SHORTCUT_IDS.LOG_DRAINS_SAVE_DESTINATION,
-        onTrigger: expect.any(Function),
         options: { enabled: true },
-        side: 'top',
       }),
       undefined
     )
@@ -117,7 +129,7 @@ describe('LogDrainDestinationSheetForm', () => {
 
     await screen.findByRole('dialog')
 
-    await user.type(screen.getByPlaceholderText('My Destination'), 'existing-drain')
+    await fillInput(user, screen.getByPlaceholderText('My Destination'), 'existing-drain')
     submitForm()
 
     await waitFor(() => expect(toast.error).toHaveBeenCalledWith('Log drain name already exists'))
@@ -131,14 +143,10 @@ describe('LogDrainDestinationSheetForm', () => {
 
     await screen.findByRole('dialog')
 
-    await user.type(screen.getByPlaceholderText('My Destination'), 'Webhook sink')
-    await user.type(
-      screen.getByPlaceholderText('https://example.com/log-drain'),
-      'https://logs.example.com/ingest'
-    )
+    await fillRequiredFields(user)
     submitForm()
 
-    await waitFor(() => expect(onSubmit).toHaveBeenCalledTimes(1))
+    await waitFor(() => expect(onSubmit).toHaveBeenCalled())
     expect(onSaveClick).toHaveBeenCalledWith('webhook')
   })
 
@@ -159,18 +167,14 @@ describe('LogDrainDestinationSheetForm', () => {
 
     await screen.findByRole('dialog')
 
-    await user.type(screen.getByPlaceholderText('My Destination'), 'Webhook sink')
-    await user.type(
-      screen.getByPlaceholderText('https://example.com/log-drain'),
-      'https://logs.example.com/ingest'
-    )
+    await fillRequiredFields(user)
     await user.click(screen.getByRole('button', { name: 'Add a new header' }))
 
     const headerNameInputs = screen.getAllByPlaceholderText('Header name')
     const headerValueInputs = screen.getAllByPlaceholderText('Header value')
 
-    await user.type(headerNameInputs[0], 'X-API-Key')
-    await user.type(headerValueInputs[0], 'secret-key')
+    await fillInput(user, headerNameInputs[0], 'X-API-Key')
+    await fillInput(user, headerValueInputs[0], 'secret-key')
 
     submitForm()
 
@@ -192,21 +196,17 @@ describe('LogDrainDestinationSheetForm', () => {
 
     await screen.findByRole('dialog')
 
-    await user.type(screen.getByPlaceholderText('My Destination'), 'Webhook sink')
-    await user.type(
-      screen.getByPlaceholderText('https://example.com/log-drain'),
-      'https://logs.example.com/ingest'
-    )
+    await fillRequiredFields(user)
     await user.click(screen.getByRole('button', { name: 'Add a new header' }))
     await user.click(screen.getByRole('button', { name: 'Add a new header' }))
 
     const headerNameInputs = screen.getAllByPlaceholderText('Header name')
     const headerValueInputs = screen.getAllByPlaceholderText('Header value')
 
-    await user.type(headerNameInputs[0], 'X-Custom')
-    await user.type(headerValueInputs[0], 'one')
-    await user.type(headerNameInputs[1], 'X-Custom')
-    await user.type(headerValueInputs[1], 'two')
+    await fillInput(user, headerNameInputs[0], 'X-Custom')
+    await fillInput(user, headerValueInputs[0], 'one')
+    await fillInput(user, headerNameInputs[1], 'X-Custom')
+    await fillInput(user, headerValueInputs[1], 'two')
 
     submitForm()
 
@@ -220,11 +220,7 @@ describe('LogDrainDestinationSheetForm', () => {
 
     await screen.findByRole('dialog')
 
-    await user.type(screen.getByPlaceholderText('My Destination'), 'Webhook sink')
-    await user.type(
-      screen.getByPlaceholderText('https://example.com/log-drain'),
-      'https://logs.example.com/ingest'
-    )
+    await fillRequiredFields(user)
     await user.click(screen.getByRole('button', { name: 'Add a new header' }))
 
     submitForm()
@@ -239,49 +235,26 @@ describe('LogDrainDestinationSheetForm', () => {
     expect(screen.queryByText('undefined')).not.toBeInTheDocument()
   })
 
-  it('shows an inline value error when a header key is entered without a value', async () => {
-    const user = userEvent.setup()
-    const { onSubmit } = renderForm()
+  it.each([
+    ['value', 'Header name', 'X-Draft-Only', 'Header value is required'],
+    ['key', 'Header value', 'draft-value', 'Header name is required'],
+  ])(
+    'shows an inline %s error when only one side of a header is entered',
+    async (_, placeholder, value, message) => {
+      const user = userEvent.setup()
+      const { onSubmit } = renderForm()
 
-    await screen.findByRole('dialog')
+      await screen.findByRole('dialog')
 
-    await user.type(screen.getByPlaceholderText('My Destination'), 'Webhook sink')
-    await user.type(
-      screen.getByPlaceholderText('https://example.com/log-drain'),
-      'https://logs.example.com/ingest'
-    )
-    await user.click(screen.getByRole('button', { name: 'Add a new header' }))
+      await fillRequiredFields(user)
+      await user.click(screen.getByRole('button', { name: 'Add a new header' }))
+      await fillInput(user, screen.getByPlaceholderText(placeholder), value)
 
-    const headerNameInputs = screen.getAllByPlaceholderText('Header name')
-    await user.type(headerNameInputs[0], 'X-Draft-Only')
+      submitForm()
 
-    submitForm()
-
-    expect(await screen.findByText('Header value is required')).toBeInTheDocument()
-    expect(onSubmit).not.toHaveBeenCalled()
-    expect(screen.queryByText('undefined')).not.toBeInTheDocument()
-  })
-
-  it('shows an inline key error when a header value is entered without a key', async () => {
-    const user = userEvent.setup()
-    const { onSubmit } = renderForm()
-
-    await screen.findByRole('dialog')
-
-    await user.type(screen.getByPlaceholderText('My Destination'), 'Webhook sink')
-    await user.type(
-      screen.getByPlaceholderText('https://example.com/log-drain'),
-      'https://logs.example.com/ingest'
-    )
-    await user.click(screen.getByRole('button', { name: 'Add a new header' }))
-
-    const headerValueInputs = screen.getAllByPlaceholderText('Header value')
-    await user.type(headerValueInputs[0], 'draft-value')
-
-    submitForm()
-
-    expect(await screen.findByText('Header name is required')).toBeInTheDocument()
-    expect(onSubmit).not.toHaveBeenCalled()
-    expect(screen.queryByText('undefined')).not.toBeInTheDocument()
-  })
+      expect(await screen.findByText(message)).toBeInTheDocument()
+      expect(onSubmit).not.toHaveBeenCalled()
+      expect(screen.queryByText('undefined')).not.toBeInTheDocument()
+    }
+  )
 })

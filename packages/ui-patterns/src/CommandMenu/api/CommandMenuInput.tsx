@@ -5,6 +5,7 @@ import { forwardRef, useCallback, useEffect, useRef, useState } from 'react'
 import type React from 'react'
 import { cn, CommandInput } from 'ui'
 
+import { useCurrentPage, usePopPage } from './hooks/pagesHooks'
 import { useQuery, useSetQuery } from './hooks/queryHooks'
 import { useCommandMenuTelemetryContext } from './hooks/useCommandMenuTelemetryContext'
 
@@ -44,8 +45,11 @@ function useFocusInputOnWiderScreens(ref: React.ForwardedRef<HTMLInputElement>) 
 const CommandMenuInput = forwardRef<
   React.ElementRef<typeof CommandInput>,
   React.ComponentPropsWithoutRef<typeof CommandInput>
->(({ className, ...props }, ref) => {
+>(({ className, wrapperClassName, onKeyDown, value, onValueChange, ...props }, ref) => {
   const inputRef = useFocusInputOnWiderScreens(ref)
+
+  const page = useCurrentPage()
+  const popPage = usePopPage()
 
   const query = useQuery()
   const setQuery = useSetQuery()
@@ -56,9 +60,14 @@ const CommandMenuInput = forwardRef<
     previousValueRef.current = query
   }, [query])
 
+  // Support both controlled (value + onValueChange) and uncontrolled usage, so
+  // the query, telemetry and backspace navigation always follow what is shown
+  const isControlled = value !== undefined
+  const currentValue = isControlled ? value : inputValue
+
   // Get telemetry context
   const telemetryContext = useCommandMenuTelemetryContext()
-  const previousValueRef = useRef<string>(inputValue)
+  const previousValueRef = useRef<string>(currentValue)
 
   const inputTelemetryEvent = useCallback(
     (value: string) => {
@@ -79,37 +88,49 @@ const CommandMenuInput = forwardRef<
 
   const debouncedTelemetry = useDebounce(
     useCallback(() => {
-      inputTelemetryEvent(inputValue)
-      previousValueRef.current = inputValue
-    }, [inputTelemetryEvent, inputValue]),
+      inputTelemetryEvent(currentValue)
+      previousValueRef.current = currentValue
+    }, [inputTelemetryEvent, currentValue]),
     INPUT_TYPED_EVENT_DEBOUNCE_TIME
   )
 
   const handleValueChange = useCallback(
-    (value: string) => {
-      setInputValue(value)
+    (newValue: string) => {
+      if (!isControlled) setInputValue(newValue)
+      onValueChange?.(newValue)
 
       // Only trigger telemetry if the user is adding characters (not removing with backspace)
-      const isAddingCharacters = value.length > previousValueRef.current.length
+      const isAddingCharacters = newValue.length > previousValueRef.current.length
 
       if (!isAddingCharacters) {
-        previousValueRef.current = value
+        previousValueRef.current = newValue
         return
       }
 
       // Trigger debounced telemetry
       debouncedTelemetry()
     },
-    [debouncedTelemetry]
+    [isControlled, onValueChange, debouncedTelemetry]
   )
 
   // To handle CJK input
   const [imeComposing, setImeComposing] = useState(false)
   useEffect(() => {
     if (!imeComposing) {
-      setQuery(inputValue)
+      setQuery(currentValue)
     }
-  }, [inputValue, imeComposing])
+  }, [currentValue, imeComposing])
+
+  const handleKeyDown = (event: React.KeyboardEvent<HTMLInputElement>) => {
+    onKeyDown?.(event)
+    if (event.defaultPrevented) return
+
+    // Backspace on an empty input steps back to the previous page
+    if (event.key === 'Backspace' && !currentValue && !imeComposing && page) {
+      event.preventDefault()
+      popPage()
+    }
+  }
 
   return (
     <div className="relative w-full" cmdk-input-wrapper="">
@@ -118,18 +139,20 @@ const CommandMenuInput = forwardRef<
         // delays from useEffect
         autoFocus={false}
         ref={inputRef}
-        value={inputValue}
-        onValueChange={handleValueChange}
         placeholder="Run a command or search..."
         onCompositionStart={() => setImeComposing(true)}
         onCompositionEnd={() => setImeComposing(false)}
+        wrapperClassName={cn('px-4', wrapperClassName)}
         className={cn(
           'flex h-11 w-full rounded-md bg-transparent px-2 y-4 md:py-7 outline-hidden',
           'focus:shadow-none focus:ring-transparent',
-          'text-base text-foreground-light placeholder:text-foreground-muted disabled:cursor-not-allowed disabled:opacity-50 border-0',
+          'text-sm text-foreground-light placeholder:text-foreground-muted disabled:cursor-not-allowed disabled:opacity-50 border-0',
           className
         )}
         {...props}
+        value={currentValue}
+        onValueChange={handleValueChange}
+        onKeyDown={handleKeyDown}
       />
     </div>
   )

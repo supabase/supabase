@@ -2,11 +2,25 @@ import createGlobe from 'cobe'
 import { useTheme } from 'next-themes'
 import { useEffect, useRef } from 'react'
 
+// cobe crashes internally when neither webgl2 nor webgl is available instead
+// of failing gracefully, so we check ourselves before mounting it.
+const isWebGLAvailable = (canvas: HTMLCanvasElement) => {
+  try {
+    return !!(canvas.getContext('webgl2') || canvas.getContext('webgl'))
+  } catch {
+    return false
+  }
+}
+
 const Globe = () => {
   const { resolvedTheme } = useTheme()
   const canvasRef = useRef<any | null>(null)
 
   useEffect(() => {
+    if (!canvasRef.current || !isWebGLAvailable(canvasRef.current)) {
+      return
+    }
+
     let rotation = 0
     let width = 0
     let previousWidth = 0

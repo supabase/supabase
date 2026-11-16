@@ -1,4 +1,4 @@
-import { Upload } from 'lucide-react'
+import { UploadIcon } from 'lucide-react'
 import { useEffect, useRef, useState } from 'react'
 import { useForm } from 'react-hook-form'
 import {
@@ -109,8 +109,7 @@ export const SSOMetadata = ({
                       onChange={handleFileChange}
                     />
                     <Button
-                      variant="default"
-                      icon={<Upload className="w-4 h-4" />}
+                      icon={<UploadIcon className="w-4 h-4" />}
                       onClick={() => fileInputRef.current?.click()}
                     >
                       Upload XML

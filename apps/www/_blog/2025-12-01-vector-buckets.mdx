@@ -22,14 +22,14 @@ Supabase already gives you powerful tools for vectors, such as `pgvector` in Pos
 
 ## What are Vector Buckets?
 
-**Vector Buckets** are a new bucket type in Supabase Storage.
+**Vector Buckets** are a new bucket type in [Supabase Storage](/docs/guides/storage).
 
 Conceptually:
 
 - A **Vector Bucket** is where your vector indexes live.
 - Inside each bucket, you define one or more **vector indexes** (for example: `documents-openai`).
 - Each index stores high-dimensional vectors plus optional metadata.
-- You query those indexes using Supabase clients or directly from Postgres via a foreign data wrapper.
+- You query those indexes using Supabase clients or directly from Postgres via a [foreign data wrapper](/docs/guides/database/extensions/wrappers/overview).
 
 ## What do Vector Buckets bring to the table?
 

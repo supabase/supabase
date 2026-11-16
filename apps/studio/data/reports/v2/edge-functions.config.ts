@@ -4,6 +4,7 @@ import { ReportConfig } from './reports.types'
 import {
   extractStatusCodesFromData,
   generateStatusCodeAttributes,
+  getStatusClassCounts,
   transformStatusCodeData,
 } from '@/components/interfaces/Reports/Reports.utils'
 import { NumericFilter } from '@/components/interfaces/Reports/v2/ReportsNumericFilter'
@@ -377,7 +378,15 @@ export const edgeFunctionReports = ({
     showMaxValue: false,
     hideChartType: false,
     defaultChartStyle: 'line',
-    titleTooltip: 'The total number of edge function executions by status code.',
+    titleTooltip:
+      'The total number of edge function executions by status code. Warnings are 4xx responses and errors are 5xx responses.',
+    getHeaderStats: (rows) => {
+      const { warnings, errors } = getStatusClassCounts(rows)
+      return [
+        { label: 'Warnings', value: warnings, tone: 'warning' },
+        { label: 'Errors', value: errors, tone: 'destructive' },
+      ]
+    },
     dataProvider: async () => {
       const sql = (useOtel ? METRIC_SQL_OTEL : METRIC_SQL).ExecutionStatusCodes(interval, filters)
       const rawData = await fetchLogs(projectRef, sql, startDate, endDate, useOtel)

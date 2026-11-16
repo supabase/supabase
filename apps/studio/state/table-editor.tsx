@@ -33,7 +33,7 @@ type ForeignKeyState = {
 
 export type SidePanel =
   | { type: 'cell'; value?: { column: string; row: Dictionary<any> } }
-  | { type: 'row'; row?: Dictionary<any> }
+  | { type: 'row'; row?: Dictionary<any>; duplicateFrom?: Dictionary<any> }
   | { type: 'column'; column?: SafePostgresColumn }
   | { type: 'table'; mode: 'new' | 'edit' | 'duplicate'; templateData?: Partial<TableField> }
   | { type: 'schema'; mode: 'new' | 'edit' }
@@ -181,6 +181,12 @@ export const createTableEditorState = () => {
       state.ui = {
         open: 'side-panel',
         sidePanel: { type: 'row', row },
+      }
+    },
+    onDuplicateRow: (row: Dictionary<any>) => {
+      state.ui = {
+        open: 'side-panel',
+        sidePanel: { type: 'row', duplicateFrom: row },
       }
     },
     onDeleteRows: (

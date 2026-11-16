@@ -1,4 +1,4 @@
-import { LoaderCircle, RefreshCcw } from 'lucide-react'
+import { LoaderCircleIcon, RefreshCcwIcon } from 'lucide-react'
 import { Button } from 'ui'
 
 import { ButtonTooltip } from '../ButtonTooltip'
@@ -18,9 +18,9 @@ interface RefreshButtonProps {
 
 export const RefreshButton = ({ isLoading, onRefresh, shortcutId }: RefreshButtonProps) => {
   const icon = isLoading ? (
-    <LoaderCircle className="text-foreground animate-spin" />
+    <LoaderCircleIcon className="text-foreground animate-spin" />
   ) : (
-    <RefreshCcw className="text-foreground" />
+    <RefreshCcwIcon className="text-foreground" />
   )
 
   if (shortcutId) {
@@ -33,7 +33,6 @@ export const RefreshButton = ({ isLoading, onRefresh, shortcutId }: RefreshButto
       >
         <Button
           size="tiny"
-          variant="default"
           disabled={isLoading}
           onClick={onRefresh}
           className="w-[26px]"
@@ -47,7 +46,6 @@ export const RefreshButton = ({ isLoading, onRefresh, shortcutId }: RefreshButto
   return (
     <ButtonTooltip
       size="tiny"
-      variant="default"
       disabled={isLoading}
       onClick={onRefresh}
       className="w-[26px]"

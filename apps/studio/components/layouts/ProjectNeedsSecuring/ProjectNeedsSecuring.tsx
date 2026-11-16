@@ -1,5 +1,5 @@
 import { LOCAL_STORAGE_KEYS, useFlag, useParams } from 'common'
-import { AnimatePresence, motion } from 'framer-motion'
+import { AnimatePresence, motion } from 'motion/react'
 import { useRouter } from 'next/router'
 import { PropsWithChildren, useMemo } from 'react'
 

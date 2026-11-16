@@ -116,7 +116,7 @@ const Hero = (props: Props) => {
         <div className="col-span-12 text-foreground md:col-span-9 lg:col-span-8 xl:col-span-6">
           <p className="mb-10 text-4xl">Supabase is the Postgres development platform.</p>
           <p className="text-2xl">
-            Today, we're moving to <span className="text-brand">Beta</span>
+            Today, we're moving to <span className="text-primary">Beta</span>
           </p>
           <time itemProp="datePublished" dateTime="2020-12-03" className="text-sm opacity-80">
             Published December 3rd, 2020
@@ -137,7 +137,7 @@ const Introduction = () => {
             <a
               href="https://news.ycombinator.com/item?id=23319901"
               target="_blank"
-              className="text-brand hover:text-brand"
+              className="text-primary hover:text-primary"
             >
               Alpha
             </a>{' '}
@@ -152,7 +152,7 @@ const Introduction = () => {
           <a
             href="/blog/2020/12/02/case-study-xendit"
             target="_blank"
-            className="text-brand hover:text-brand"
+            className="text-primary hover:text-primary"
           >
             Xendit
           </a>
@@ -160,7 +160,7 @@ const Introduction = () => {
           <a
             href="/blog/2020/12/02/case-study-monitoro"
             target="_blank"
-            className="text-brand hover:text-brand"
+            className="text-primary hover:text-primary"
           >
             Monitoro
           </a>
@@ -168,7 +168,7 @@ const Introduction = () => {
           <a
             href="/blog/2020/12/02/case-study-tayfa"
             target="_blank"
-            className="text-brand hover:text-brand"
+            className="text-primary hover:text-primary"
           >
             TAYFA
           </a>{' '}
@@ -221,7 +221,7 @@ const TableOfContents = (props: any) => {
       <div className="container grid grid-cols-12 gap-4 px-8 py-20 mx-auto lg:px-28">
         <div className="col-span-12 mb-10 text-base">
           <p className="text-2xl text-foreground">
-            Supabase <span className="text-brand">Beta</span> is starting now.
+            Supabase <span className="text-primary">Beta</span> is starting now.
           </p>
         </div>
         <div className="grid grid-cols-12 col-span-12 gap-y-10">
@@ -309,7 +309,7 @@ const Performance = () => {
                         {stat.name}
                       </p>
                       <Bar
-                        color={stat.name === 'Supabase' ? 'bg-brand' : 'bg-brand-400'}
+                        color={stat.name === 'Supabase' ? 'bg-brand-default' : 'bg-brand-400'}
                         finalPercentage={Math.ceil((stat.value / maxValue) * 100)}
                       />
                       <p className="ml-2">{stat.value}/s</p>
@@ -346,7 +346,7 @@ const Performance = () => {
               <a
                 href="https://elixir-lang.org/"
                 target="_blank"
-                className="text-brand hover:text-brand"
+                className="text-primary hover:text-primary"
               >
                 Elixir
               </a>{' '}
@@ -354,7 +354,7 @@ const Performance = () => {
               <a
                 href="https://github.com/supabase/realtime"
                 target="_blank"
-                className="text-brand hover:text-brand"
+                className="text-primary hover:text-primary"
               >
                 Realtime engine
               </a>
@@ -362,7 +362,7 @@ const Performance = () => {
               <a
                 href="https://postgrest.org/en/v7.0.0/"
                 target="_blank"
-                className="text-brand hover:text-brand"
+                className="text-primary hover:text-primary"
               >
                 PostgREST
               </a>{' '}
@@ -374,7 +374,7 @@ const Performance = () => {
               <a
                 href="https://github.com/supabase/benchmarks/"
                 target="_blank"
-                className="text-brand hover:text-brand"
+                className="text-primary hover:text-primary"
               >
                 benchmarks
               </a>{' '}
@@ -444,7 +444,11 @@ const Security = () => {
               </li>
               <li className="mb-5">
                 Adopted the{' '}
-                <a href="https://snyk.io/" target="_blank" className="text-brand hover:text-brand">
+                <a
+                  href="https://snyk.io/"
+                  target="_blank"
+                  className="text-primary hover:text-primary"
+                >
                   Snyk
                 </a>{' '}
                 dependency monitor as part of our SSDLC on several key component of our system, to
@@ -456,7 +460,7 @@ const Security = () => {
                 <a
                   href="https://github.com/PostgREST/postgrest/pull/1600#issuecomment-735257952"
                   target="_blank"
-                  className="text-brand hover:text-brand"
+                  className="text-primary hover:text-primary"
                 >
                   now uses
                 </a>{' '}
@@ -502,7 +506,7 @@ const Reliability = () => {
               <a
                 href="https://status.supabase.com"
                 target="_blank"
-                className="text-brand hover:text-brand"
+                className="text-primary hover:text-primary"
               >
                 https://status.supabase.com
               </a>{' '}
@@ -544,7 +548,7 @@ const NewFeaturesAndIntegrations = () => {
                   <a
                     href="/docs/reference/javascript/auth-signup"
                     target="_blank"
-                    className="text-brand hover:text-brand"
+                    className="text-primary hover:text-primary"
                   >
                     JavaScript
                   </a>{' '}
@@ -552,7 +556,7 @@ const NewFeaturesAndIntegrations = () => {
                   <a
                     href="/docs/guides/auth/architecture#client-layer"
                     target="_blank"
-                    className="text-brand hover:text-brand"
+                    className="text-primary hover:text-primary"
                   >
                     HTTP
                   </a>
@@ -572,7 +576,7 @@ const NewFeaturesAndIntegrations = () => {
                   <a
                     href="/docs/guides/client-libraries#realtime-changes"
                     target="_blank"
-                    className="text-brand hover:text-brand"
+                    className="text-primary hover:text-primary"
                   >
                     subscribe to changes in your database
                   </a>{' '}
@@ -589,7 +593,7 @@ const NewFeaturesAndIntegrations = () => {
                   <a
                     href="/docs/reference/javascript/select?example=query-referenced-tables"
                     target="_blank"
-                    className="text-brand hover:text-brand"
+                    className="text-primary hover:text-primary"
                   >
                     querying from multiple tables
                   </a>{' '}
@@ -597,7 +601,7 @@ const NewFeaturesAndIntegrations = () => {
                   <a
                     href="/docs/reference/javascript/rpc"
                     target="_blank"
-                    className="text-brand hover:text-brand"
+                    className="text-primary hover:text-primary"
                   >
                     invoke complex functions
                   </a>
@@ -680,7 +684,7 @@ const BetaPricing = () => (
               <a
                 href="mailto:rory@supabase.io"
                 target="_blank"
-                className="text-brand hover:text-brand"
+                className="text-primary hover:text-primary"
               >
                 rory@supabase.io
               </a>
@@ -693,7 +697,7 @@ const BetaPricing = () => (
           </ul>
           <p>
             The Supabase Base plan is now called the Supabase Pro Plan as per the{' '}
-            <a href="https://supabase.com/pricing" className="text-brand hover:text-brand">
+            <a href="https://supabase.com/pricing" className="text-primary hover:text-primary">
               pricing page
             </a>
             .
@@ -724,7 +728,7 @@ const OpenSource = () => (
             <a
               href="https://github.com/sponsors/supabase/"
               target="_blank"
-              className="text-brand hover:text-brand"
+              className="text-primary hover:text-primary"
             >
               sponsorship
             </a>{' '}
@@ -736,7 +740,7 @@ const OpenSource = () => (
             <a
               href="/blog/2020/12/02/supabase-striveschool"
               target="_blank"
-              className="text-brand hover:text-brand"
+              className="text-primary hover:text-primary"
             >
               partnering with Strive School
             </a>{' '}
@@ -749,7 +753,7 @@ const OpenSource = () => (
             <a
               href="mailto:rory@supabase.io"
               target="_blank"
-              className="text-brand hover:text-brand"
+              className="text-primary hover:text-primary"
             >
               rory@supabase.io
             </a>{' '}
@@ -760,7 +764,7 @@ const OpenSource = () => (
             <a
               href="https://github.com/supabase"
               target="_blank"
-              className="text-brand hover:text-brand"
+              className="text-primary hover:text-primary"
             >
               our GitHub.
             </a>{' '}
@@ -796,7 +800,7 @@ const FundingPartners = () => (
             <a
               href="https://twitter.com/supabase"
               target="_blank"
-              className="text-brand hover:text-brand"
+              className="text-primary hover:text-primary"
             >
               Twitter
             </a>{' '}
@@ -833,7 +837,7 @@ const ScalingOurTeam = () => (
             <a
               href="mailto:work@supabase.io"
               target="_blank"
-              className="text-brand hover:text-brand"
+              className="text-primary hover:text-primary"
             >
               work@supabase.io
             </a>
@@ -891,7 +895,7 @@ const WhatsNext = () => (
             <a
               href="mailto:support@supabase.io"
               target="_blank"
-              className="text-brand hover:text-brand"
+              className="text-primary hover:text-primary"
             >
               support@supabase.io
             </a>{' '}
@@ -899,7 +903,7 @@ const WhatsNext = () => (
             <a
               href="https://github.com/supabase/supabase/discussions"
               target="_blank"
-              className="text-brand hover:text-brand"
+              className="text-primary hover:text-primary"
             >
               discussion
             </a>{' '}

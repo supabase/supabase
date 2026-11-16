@@ -1,9 +1,12 @@
-import { useState } from 'react'
+import { AlignLeftIcon } from 'lucide-react'
+import { forwardRef, useState } from 'react'
+import { KeyboardShortcut } from 'ui'
 import { type Snapshot } from 'valtio'
 
 import { AddCellDropdown } from '../AddCellDropdown'
+import { ExplorerToolbarAction } from '../ExplorerToolbar'
 import { MoveCellDropdownContent } from '../MoveCellDropdownContent'
-import { QueryEditor } from '../QueryEditor'
+import { QueryEditor, type QueryEditorHandle } from '../QueryEditor'
 import { type QueryDisplay, type QueryResult } from '../types'
 import {
   changeCellSource,
@@ -12,6 +15,7 @@ import {
   getCellDisplay,
   setCellRowLimit,
   setCellSql,
+  shouldInvalidateResultOnSourceChange,
   toQueryModel,
 } from './QueryCell.utils'
 import { SortableSection } from '@/components/ui/SortableSection'
@@ -22,13 +26,24 @@ import {
 import { type QuerySourceBinding } from '@/data/query-sources/query-source-registry'
 import { useCurrentNotebook, useNotebooksStateSnapshot } from '@/state/notebooks/notebooks-state'
 import { useLocalRoleImpersonationState } from '@/state/role-impersonation-state'
+import { hotkeyToKeys } from '@/state/shortcuts/formatShortcut'
+import { SHORTCUT_DEFINITIONS, SHORTCUT_IDS } from '@/state/shortcuts/registry'
+
+const PRETTIFY_SHORTCUT_KEYS = hotkeyToKeys(
+  SHORTCUT_DEFINITIONS[SHORTCUT_IDS.SQL_EDITOR_FORMAT].sequence[0]
+)
 
 interface QueryCellProps {
   cell: Snapshot<QueryCellSchema>
+  onEdit?: () => void
+  onPrettifyQuery?: () => void
 }
 
 /** Notebook adapter around the shared QueryEditor. */
-export const QueryCell = ({ cell }: QueryCellProps) => {
+export const QueryCell = forwardRef<QueryEditorHandle, QueryCellProps>(function QueryCell(
+  { cell, onEdit, onPrettifyQuery },
+  ref
+) {
   const snap = useNotebooksStateSnapshot()
   const currentNotebook = useCurrentNotebook()
 
@@ -37,6 +52,8 @@ export const QueryCell = ({ cell }: QueryCellProps) => {
   const roleImpersonationState = useLocalRoleImpersonationState()
 
   const title = cell.title ?? 'Untitled query'
+  const showQuery =
+    snap.cellLocalState.get(cell._id)?.showQuery ?? currentNotebook?.status === 'new'
 
   /**
    * Applies an update to this cell. The updater runs against the cell as the store holds
@@ -48,20 +65,21 @@ export const QueryCell = ({ cell }: QueryCellProps) => {
     const notebookId = currentNotebook?.notebook.id
     if (!notebookId) return
 
+    onEdit?.()
     snap.updateCell({
       id: notebookId,
-      cellId: cell.id,
-      updater: (candidate) => (isQueryCell(candidate) ? updater(candidate) : candidate),
+      cellId: cell._id,
+      updater: (candidate) => {
+        if (!isQueryCell(candidate)) return candidate
+        return updater(candidate)
+      },
     })
   }
 
   const handleSourceChange = (source: QuerySourceBinding) => {
     // The query text carries over (see `changeCellSource`), so the editor's buffer stays
-    // valid — but a result the old backend produced does not, since another engine
-    // returns unrelated columns.
-    const isBackendChange = (source._tag === 'logs') !== (cell._tag === 'log_cell')
-    if (isBackendChange) setResult(undefined)
-
+    // valid — but a result run against the old source (backend or time range) does not.
+    if (shouldInvalidateResultOnSourceChange(cell, source)) setResult(undefined)
     updateQueryCell((candidate) => changeCellSource(candidate, source))
   }
 
@@ -71,8 +89,13 @@ export const QueryCell = ({ cell }: QueryCellProps) => {
     updateQueryCell((candidate) => ({ ...cloneQueryCell(candidate), title: nextTitle }))
   }
 
-  const handleSqlCommit = (value: string) =>
+  // Running a cell re-commits its current SQL (see QueryEditor's handleRunQuery) even when
+  // nothing changed — skip the store write so that doesn't spuriously mark the notebook
+  // unsaved.
+  const handleSqlCommit = (value: string) => {
+    if (value === cell.unchecked_sql) return
     updateQueryCell((candidate) => setCellSql(candidate, value))
+  }
 
   const handleDisplayChange = (display: QueryDisplay) =>
     updateQueryCell((candidate) => ({
@@ -86,17 +109,31 @@ export const QueryCell = ({ cell }: QueryCellProps) => {
 
   return (
     <SortableSection
-      id={cell.id}
-      actions={<AddCellDropdown cellId={cell.id} />}
-      gripDropdownContent={<MoveCellDropdownContent cellId={cell.id} />}
-      gripClassName="mt-2 opacity-0 group-hover:opacity-100 has-[[data-state=open]]:opacity-100 transition"
+      id={cell._id}
+      sectionWidth="48rem"
+      actions={<AddCellDropdown cellId={cell._id} />}
+      gripDropdownContent={<MoveCellDropdownContent cellId={cell._id} />}
+      gripClassName="mt-2 sm:opacity-0 group-hover:opacity-100 has-[[data-state=open]]:opacity-100 transition"
     >
       <QueryEditor
-        id={cell.id}
+        ref={ref}
+        id={cell._id}
+        location={
+          currentNotebook
+            ? {
+                surface: 'notebook_cell',
+                notebookId: currentNotebook.notebook.id,
+                cellId: cell._id,
+              }
+            : undefined
+        }
         variant="embedded"
+        className="min-h-0"
         title={title}
         query={toQueryModel(cell, sql)}
         result={result}
+        showQuery={showQuery}
+        onShowQueryChange={(showQuery) => snap.setQueryVisibility({ cellId: cell._id, showQuery })}
         roleImpersonationState={roleImpersonationState}
         display={getCellDisplay(cell)}
         onTitleChange={handleTitleChange}
@@ -106,7 +143,19 @@ export const QueryCell = ({ cell }: QueryCellProps) => {
         onResultChange={setResult}
         onRowLimitChange={handleRowLimitChange}
         onDisplayChange={handleDisplayChange}
+        toolbarActions={
+          <ExplorerToolbarAction
+            icon={<AlignLeftIcon size={16} strokeWidth={2} />}
+            tooltip={
+              <div className="flex items-center gap-2.5">
+                <span>Prettify SQL</span>
+                <KeyboardShortcut keys={PRETTIFY_SHORTCUT_KEYS} />
+              </div>
+            }
+            onClick={onPrettifyQuery}
+          />
+        }
       />
     </SortableSection>
   )
-}
+})

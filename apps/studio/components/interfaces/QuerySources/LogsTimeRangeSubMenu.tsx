@@ -1,5 +1,5 @@
 import dayjs from 'dayjs'
-import { Check, Lock } from 'lucide-react'
+import { CheckIcon, LockIcon } from 'lucide-react'
 import {
   DropdownMenuItem,
   DropdownMenuSeparator,
@@ -68,9 +68,9 @@ export const LogsTimeRangeSubMenu = ({
             >
               <span>{helper.text}</span>
               {isLocked ? (
-                <Lock size={14} className="text-foreground-lighter" />
+                <LockIcon size={14} className="text-foreground-lighter" />
               ) : (
-                isSelected && <Check size={14} />
+                isSelected && <CheckIcon size={14} />
               )}
             </DropdownMenuItem>
           )
@@ -78,7 +78,7 @@ export const LogsTimeRangeSubMenu = ({
         <DropdownMenuSeparator />
         <DropdownMenuItem className="justify-between" onClick={onOpenCustomRange}>
           <span>Custom range…</span>
-          {isCustomRange && <Check size={14} />}
+          {isCustomRange && <CheckIcon size={14} />}
         </DropdownMenuItem>
       </DropdownMenuSubContent>
     </DropdownMenuSub>

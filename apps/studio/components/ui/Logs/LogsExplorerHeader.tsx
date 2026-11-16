@@ -1,5 +1,13 @@
 import { useFlag, useParams } from 'common'
-import { BookOpen, Check, ChevronsUpDown, Copy, ExternalLink, List, X } from 'lucide-react'
+import {
+  BookOpenIcon,
+  CheckIcon,
+  ChevronsUpDownIcon,
+  CopyIcon,
+  ExternalLinkIcon,
+  ListIcon,
+  XIcon,
+} from 'lucide-react'
 import Link from 'next/link'
 import { useState } from 'react'
 import { logConstants } from 'shared-data'
@@ -54,8 +62,8 @@ const LogsExplorerHeader = ({ subtitle }: LogsExplorerHeaderProps) => {
     <div className="flex flex-col md:flex-row md:items-center gap-4 md:gap-8 transition-all pb-6 justify-between">
       <div className="flex flex-col md:flex-row md:items-center gap-3">
         <div className="flex flex-row items-center gap-3">
-          <div className="flex h-6 w-6 items-center justify-center rounded-sm border border-brand-600 bg-brand-300 text-brand">
-            <List size={14} strokeWidth={3} />
+          <div className="flex h-6 w-6 items-center justify-center rounded-sm border border-brand-600 bg-brand-300 text-primary">
+            <ListIcon size={14} strokeWidth={3} />
           </div>
 
           <h1>Logs Explorer</h1>
@@ -74,7 +82,7 @@ const LogsExplorerHeader = ({ subtitle }: LogsExplorerHeaderProps) => {
                 variant="text"
                 className="px-1"
                 onClick={() => setShowReference(false)}
-                icon={<X size={18} strokeWidth={1.5} />}
+                icon={<XIcon size={18} strokeWidth={1.5} />}
               />
             </div>
           }
@@ -84,9 +92,8 @@ const LogsExplorerHeader = ({ subtitle }: LogsExplorerHeaderProps) => {
           hideFooter
           triggerElement={
             <Button
-              variant="default"
               onClick={() => setShowReference(true)}
-              icon={<BookOpen strokeWidth={1.5} />}
+              icon={<BookOpenIcon strokeWidth={1.5} />}
             >
               <span>Field Reference</span>
             </Button>
@@ -110,10 +117,10 @@ const LogsExplorerHeader = ({ subtitle }: LogsExplorerHeaderProps) => {
                     href={`${DOCS_URL}/guides/platform/logs#unnesting-arrays`}
                     target="_blank"
                     rel="noreferrer"
-                    className="text-brand"
+                    className="text-primary"
                   >
                     unnesting joins
-                    <ExternalLink
+                    <ExternalLinkIcon
                       size={14}
                       className="ml-1 inline translate-y-[-2px]"
                       strokeWidth={1.5}
@@ -128,12 +135,11 @@ const LogsExplorerHeader = ({ subtitle }: LogsExplorerHeaderProps) => {
             <Popover open={open} onOpenChange={setOpen}>
               <PopoverTrigger asChild>
                 <Button
-                  variant="default"
                   role="combobox"
                   size={'small'}
                   aria-expanded={open}
                   className="w-full justify-between"
-                  iconRight={<ChevronsUpDown className="ml-2 h-4 w-4 shrink-0 opacity-50" />}
+                  iconRight={<ChevronsUpDownIcon className="ml-2 h-4 w-4 shrink-0 opacity-50" />}
                 >
                   {selectedSchema?.name ?? 'Select source...'}
                 </Button>
@@ -153,7 +159,7 @@ const LogsExplorerHeader = ({ subtitle }: LogsExplorerHeaderProps) => {
                             setOpen(false)
                           }}
                         >
-                          <Check
+                          <CheckIcon
                             className={cn(
                               'mr-2 h-4 w-4',
                               selectedSchema?.reference === schema.reference
@@ -223,7 +229,7 @@ const Field = ({
         {isCopied ? (
           <Tooltip>
             <TooltipTrigger>
-              <Check size={14} strokeWidth={3} className="text-brand" />
+              <CheckIcon size={14} strokeWidth={3} className="text-primary" />
             </TooltipTrigger>
             <TooltipContent side="bottom" className="font-sans">
               Copied
@@ -232,7 +238,7 @@ const Field = ({
         ) : (
           <Tooltip>
             <TooltipTrigger>
-              <Copy size={14} />
+              <CopyIcon size={14} />
             </TooltipTrigger>
             <TooltipContent side="bottom" className="font-sans">
               Copy value

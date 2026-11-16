@@ -1,5 +1,5 @@
 import dayjs from 'dayjs'
-import { Code, Play } from 'lucide-react'
+import { CodeIcon, PlayIcon } from 'lucide-react'
 import { DragEvent, ReactNode, useEffect, useMemo, useRef, useState } from 'react'
 import { Bar, BarChart, CartesianGrid, Cell, Tooltip, XAxis, YAxis } from 'recharts'
 import { Badge, Button, ChartContainer, ChartTooltipContent, cn } from 'ui'
@@ -171,7 +171,7 @@ export const QueryBlock = ({
                 variant="text"
                 size="tiny"
                 className="w-7 h-7"
-                icon={<Code size={14} strokeWidth={1.5} />}
+                icon={<CodeIcon size={14} strokeWidth={1.5} />}
                 onClick={() => setShowSql(!showSql)}
                 tooltip={{
                   content: { side: 'bottom', text: showSql ? 'Hide query' : 'Show query' },
@@ -201,7 +201,7 @@ export const QueryBlock = ({
                 variant="text"
                 size="tiny"
                 className="w-7 h-7"
-                icon={<Play size={14} strokeWidth={1.5} />}
+                icon={<PlayIcon size={14} strokeWidth={1.5} />}
                 loading={isExecuting}
                 disabled={isExecuting || disabled || !sql}
                 onClick={runSelect}
@@ -375,7 +375,7 @@ export const QueryBlock = ({
                 Queries that involve any mutation will not be run in reports
               </p>
               {!!onRemoveChart && (
-                <Button variant="default" className="mt-2" onClick={() => onRemoveChart()}>
+                <Button className="mt-2" onClick={() => onRemoveChart()}>
                   Remove chart
                 </Button>
               )}

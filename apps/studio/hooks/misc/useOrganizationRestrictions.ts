@@ -51,15 +51,14 @@ export function useOrganizationRestrictions() {
   }
 
   if (overdueInvoicesFromOtherOrgs?.length) {
-    const otherOrgSlug = organizations?.find(
-      (o) => o.id === overdueInvoicesFromOtherOrgs[0].organization_id
-    )?.slug
+    const overdueOrgIds = new Set(overdueInvoicesFromOtherOrgs.map((i) => i.organization_id))
+    const orgsWithOverdueInvoices = (organizations ?? []).filter((o) => overdueOrgIds.has(o.id))
+
     warnings.push({
       variant: 'danger',
       title: RESTRICTION_MESSAGES.OVERDUE_INVOICES_FROM_OTHER_ORGS.title,
-      description: RESTRICTION_MESSAGES.OVERDUE_INVOICES_FROM_OTHER_ORGS.description(
-        otherOrgSlug ?? org?.slug ?? 'default'
-      ),
+      description:
+        RESTRICTION_MESSAGES.OVERDUE_INVOICES_FROM_OTHER_ORGS.description(orgsWithOverdueInvoices),
     })
   }
 

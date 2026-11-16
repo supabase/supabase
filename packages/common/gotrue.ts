@@ -1,4 +1,5 @@
 import { AuthClient, navigatorLock, User } from '@supabase/auth-js'
+
 import { isBrowser } from './helpers'
 
 export const STORAGE_KEY = process.env.NEXT_PUBLIC_STORAGE_KEY || 'supabase.dashboard.auth.token'
@@ -185,6 +186,8 @@ export const gotrueClient = new AuthClient({
   detectSessionInUrl: shouldDetectSessionInUrl,
   debug: debug ? (persistedDebug ? logIndexedDB : true) : false,
   lock: navigatorLockEnabled ? debuggableNavigatorLock : undefined,
+  // TODO: Should this be enabled with a feature flag?
+  experimental: { recoveryCodes: true },
   ...('localStorage' in globalThis
     ? { storage: globalThis.localStorage, userStorage: globalThis.localStorage }
     : null),

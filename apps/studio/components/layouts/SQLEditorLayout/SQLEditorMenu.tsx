@@ -1,7 +1,6 @@
-import { PermissionAction } from '@supabase/shared-types/out/constants'
 import { useDebounce } from '@uidotdev/usehooks'
 import { LOCAL_STORAGE_KEYS, useFlag, useParams } from 'common'
-import { FilePlus, FolderPlus, Plus, ScrollText, X } from 'lucide-react'
+import { FilePlusIcon, FolderPlusIcon, PlusIcon, ScrollTextIcon, XIcon } from 'lucide-react'
 import Link from 'next/link'
 import { useRouter } from 'next/router'
 import { useEffect, useState } from 'react'
@@ -25,13 +24,15 @@ import {
 
 import { SearchList } from './SQLEditorNavV2/SearchList'
 import { SQLEditorNav } from './SQLEditorNavV2/SQLEditorNav'
-import { useIsDatabaseConnectionsEnabled } from '@/components/interfaces/App/FeaturePreview/FeaturePreviewContext'
 import { type SqlSnippetSource } from '@/components/interfaces/SQLEditor/querySource'
-import { useAsyncCheckPermissions } from '@/hooks/misc/useCheckPermissions'
+import {
+  FGA_PERMISSIONS,
+  useAsyncCheckUserContentPermissions,
+} from '@/hooks/misc/useCheckPermissionsV2'
 import { useLocalStorage } from '@/hooks/misc/useLocalStorage'
 import { useSelectedProjectQuery } from '@/hooks/misc/useSelectedProject'
+import { getErrorMessage } from '@/lib/get-error-message'
 import { useProfile } from '@/lib/profile'
-import { getAppStateSnapshot } from '@/state/app-state'
 import { useSqlEditorV2StateSnapshot } from '@/state/sql-editor/sql-editor-state'
 
 export const SQLEditorMenu = () => {
@@ -41,7 +42,6 @@ export const SQLEditorMenu = () => {
   const { data: project } = useSelectedProjectQuery()
   const snapV2 = useSqlEditorV2StateSnapshot()
 
-  const { enabled: isDatabaseConnectionsEnabled } = useIsDatabaseConnectionsEnabled()
   const sqlEditorLogsSource = useFlag('sqlEditorLogsSource')
   const otelLegacyLogs = useFlag('otelLegacyLogs')
   const canCreateLogsSnippet = sqlEditorLogsSource && otelLegacyLogs
@@ -53,15 +53,13 @@ export const SQLEditorMenu = () => {
     'inserted_at'
   )
 
-  const appState = getAppStateSnapshot()
   const debouncedSearch = useDebounce(search, 500)
 
-  const { can: canCreateSQLSnippet } = useAsyncCheckPermissions(
-    PermissionAction.CREATE,
-    'user_content',
+  const { can: canCreateSQLSnippet } = useAsyncCheckUserContentPermissions(
+    FGA_PERMISSIONS.PROJECT.SNIPPETS_WRITE,
     {
-      resource: { type: 'sql', owner_id: profile?.id },
-      subject: { id: profile?.id },
+      mode: 'create',
+      type: 'sql',
     }
   )
 
@@ -84,8 +82,8 @@ export const SQLEditorMenu = () => {
       router.push(`/project/${ref}/sql/new?skip=true${suffix}`)
       setSearch('')
       setShowSearch(false)
-    } catch (error: any) {
-      toast.error(`Failed to create new query: ${error.message}`)
+    } catch (error) {
+      toast.error(`Failed to create new query: ${getErrorMessage(error)}`)
     }
   }
 
@@ -124,14 +122,14 @@ export const SQLEditorMenu = () => {
                       setShowSearch(false)
                     }}
                   >
-                    <X size={18} />
+                    <XIcon size={18} />
                   </TooltipTrigger>
                   <TooltipContent>Clear search</TooltipContent>
                 </Tooltip>
               ) : (
                 <InnerSideBarFilterSortDropdown
                   value={sort}
-                  onValueChange={(value: any) => setSort(value)}
+                  onValueChange={(value) => setSort(value as 'name' | 'inserted_at')}
                 >
                   <InnerSideBarFilterSortDropdownItem key="name" value="name">
                     Alphabetical
@@ -149,8 +147,7 @@ export const SQLEditorMenu = () => {
                 <DropdownMenuTrigger asChild>
                   <Button
                     data-testid="sql-editor-new-query-button"
-                    variant="default"
-                    icon={<Plus className="text-foreground" />}
+                    icon={<PlusIcon className="text-foreground" />}
                     className="w-[26px]"
                     aria-label="Create a new query"
                   />
@@ -160,17 +157,17 @@ export const SQLEditorMenu = () => {
             </Tooltip>
             <DropdownMenuContent align="end" side="bottom" className="w-48">
               <DropdownMenuItem className="gap-x-2" onClick={() => handleNewQuery()}>
-                <FilePlus size={14} />
+                <FilePlusIcon size={14} />
                 Create a new snippet
               </DropdownMenuItem>
               {canCreateLogsSnippet && (
                 <DropdownMenuItem className="gap-x-2" onClick={() => handleNewQuery('logs')}>
-                  <ScrollText size={14} />
+                  <ScrollTextIcon size={14} />
                   Create a new logs query
                 </DropdownMenuItem>
               )}
               <DropdownMenuItem className="gap-x-2" onClick={() => createNewFolder()}>
-                <FolderPlus size={14} />
+                <FolderPlusIcon size={14} />
                 Create a new folder
               </DropdownMenuItem>
             </DropdownMenuContent>
@@ -181,15 +178,9 @@ export const SQLEditorMenu = () => {
       </div>
 
       <div className="p-4 border-t sticky bottom-0 bg-studio">
-        {isDatabaseConnectionsEnabled ? (
-          <Button asChild block variant="default">
-            <Link href={`/project/${ref}/observability/connections`}>View running queries</Link>
-          </Button>
-        ) : (
-          <Button block variant="default" onClick={() => appState.setOnGoingQueriesPanelOpen(true)}>
-            View running queries
-          </Button>
-        )}
+        <Button asChild block>
+          <Link href={`/project/${ref}/observability/connections`}>View running queries</Link>
+        </Button>
       </div>
     </div>
   )

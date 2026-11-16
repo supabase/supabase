@@ -1,0 +1,13 @@
+.curved-scroll-area[data-scrolled] [data-radix-scroll-area-viewport] > * {
+  filter: var(--curved-scroll-filter);
+}
+
+.curved-scroll-area-neutral {
+  flood-color: rgb(128 128 128);
+}
+
+/* radix wraps the content in a display table, which grows to its widest line. a block keeps
+   long lines inside the area. radix sets the table inline, so this needs important */
+.curved-scroll-area [data-radix-scroll-area-viewport] > div {
+  display: block !important;
+}

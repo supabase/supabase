@@ -53,3 +53,21 @@ export function formatHosts(hosts: EventHost[]): {
     fullList,
   }
 }
+
+function isValidTimeZone(timeZone: string) {
+  if (!timeZone) return false
+  try {
+    new Intl.DateTimeFormat('en-US', { timeZone })
+    return true
+  } catch {
+    return false
+  }
+}
+
+// Server and first client render use the event's own zone so the HTML matches and shows
+// attendees' local dates; after hydration the visitor's zone applies.
+export function getEventTimeZone(date: string, eventTimeZone: string, isHydrated: boolean) {
+  if (date.endsWith('T12:00:00Z')) return 'UTC'
+  if (isHydrated) return undefined
+  return isValidTimeZone(eventTimeZone) ? eventTimeZone : 'UTC'
+}

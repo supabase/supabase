@@ -11,7 +11,7 @@ export default function RootLayout({ children }: { children: React.ReactNode }) 
   return (
     <>
       <BaseInjector />
-      <div>
+      <div className="preview min-h-svh">
         <div>{children}</div>
       </div>
     </>

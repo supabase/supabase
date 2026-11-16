@@ -41,9 +41,10 @@ export function FilterSideBar({
   return (
     <ResizablePanel
       panelRef={panelRef}
-      minSize={256}
-      defaultSize={265}
-      maxSize={512}
+      minSize="256px"
+      defaultSize="265px"
+      maxSize="512px"
+      groupResizeBehavior="preserve-pixel-size"
       id="panel-left"
       collapsible
       onResize={(size) => {
@@ -86,7 +87,7 @@ export function FilterSideBar({
             </div>
           }
           actions={
-            <Button asChild variant="default">
+            <Button asChild>
               <Link href={`/project/${ref}/settings/log-drains`}>Go to Log Drains</Link>
             </Button>
           }

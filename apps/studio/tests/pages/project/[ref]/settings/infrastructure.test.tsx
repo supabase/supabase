@@ -1,4 +1,3 @@
-import { PermissionAction } from '@supabase/shared-types/out/constants'
 import { screen, waitFor, within } from '@testing-library/react'
 import userEvent from '@testing-library/user-event'
 import { platformComponents as components } from 'api-types'
@@ -6,15 +5,16 @@ import { HttpResponse } from 'msw'
 import type { ReactNode } from 'react'
 import { beforeEach, describe, expect, test, vi } from 'vitest'
 
+import { FGA_PERMISSIONS } from '@/hooks/misc/useCheckPermissionsV2'
 import type { ProfileContextType } from '@/lib/profile'
 import InfrastructurePage from '@/pages/project/[ref]/settings/infrastructure'
 import { createMockOrganizationResponse } from '@/tests/helpers'
 import { customRender } from '@/tests/lib/custom-render'
 import { addAPIMock } from '@/tests/lib/msw'
+import { mockPermissions } from '@/tests/lib/msw-permissions'
 
-type ProjectDetailResponse = components['schemas']['ProjectDetailResponse']
-type ProjectAddonsResponse = components['schemas']['ProjectAddonsResponse']
-type PermissionResponse = components['schemas']['AccessControlPermission']
+type ProjectDetailResponse = components['schemas']['ProjectDetailResponse_Output']
+type ProjectAddonsResponse = components['schemas']['ProjectAddonsResponse_Output']
 
 const PROJECT_REF = 'project-ref'
 const ORGANIZATION_SLUG = 'acme'
@@ -44,6 +44,7 @@ const PROJECT: ProjectDetailResponse = {
   cloud_provider: 'AWS',
   connectionString: 'postgresql://postgres:password@db.project-ref.supabase.co:5432/postgres',
   db_host: 'db.project-ref.supabase.co',
+  dbVersion: 'supabase-postgres-15.1.0',
   high_availability: false,
   id: 1,
   infra_compute_size: 'micro',
@@ -177,20 +178,25 @@ function mockInfrastructureEndpoints() {
       ],
     },
   })
-  addAPIMock({
-    method: 'get',
-    path: '/platform/profile/permissions',
-    response: [
+  mockPermissions({
+    organizations: [
       {
-        actions: [PermissionAction.UPDATE],
-        condition: null,
-        organization_id: 1,
-        organization_slug: ORGANIZATION_SLUG,
-        project_ids: [PROJECT.id],
-        project_refs: [PROJECT_REF],
-        resources: ['projects'],
-        restrictive: false,
-      } satisfies PermissionResponse,
+        slug: ORGANIZATION_SLUG,
+        role: 'administrator',
+        permissions: [],
+        projects: [
+          {
+            ref: PROJECT_REF,
+            role: 'administrator',
+            permissions: [
+              FGA_PERMISSIONS.PROJECT.ADMIN_WRITE,
+              FGA_PERMISSIONS.PROJECT.OPERATIONS_WRITE,
+              FGA_PERMISSIONS.PROJECT.INFRA_ADDONS_WRITE,
+              FGA_PERMISSIONS.PROJECT.INFRA_DISK_CONFIG_WRITE,
+            ],
+          },
+        ],
+      },
     ],
   })
   addAPIMock({
@@ -275,6 +281,29 @@ function mockInfrastructureEndpoints() {
   })
   addAPIMock({
     method: 'get',
+    path: '/platform/stripe/invoices/overdue',
+    response: [],
+  })
+  addAPIMock({
+    method: 'get',
+    path: '/v1/projects/:ref/upgrade/eligibility',
+    response: {
+      eligible: true,
+      current_app_version: 'supabase-postgres-17.6.1.100',
+      current_app_version_release_channel: 'ga',
+      latest_app_version: 'supabase-postgres-17.6.1.100',
+      target_upgrade_versions: [],
+      duration_estimate_hours: 1,
+      legacy_auth_custom_roles: [],
+      objects_to_be_dropped: [],
+      unsupported_extensions: [],
+      user_defined_objects_in_internal_schemas: [],
+      validation_errors: [],
+      warnings: [],
+    },
+  })
+  addAPIMock({
+    method: 'get',
     path: '/platform/projects/:ref/infra-monitoring',
     response: () =>
       HttpResponse.json({
@@ -305,13 +334,12 @@ function renderInfrastructurePage() {
 
 describe('/project/[ref]/settings/infrastructure', () => {
   beforeEach(() => {
-    vi.clearAllMocks()
     mockInfrastructureEndpoints()
     window.HTMLElement.prototype.scrollIntoView = vi.fn()
   })
 
   test('loads the complete infrastructure page through MSW and resets an interaction', async () => {
-    const user = userEvent.setup()
+    const user = userEvent.setup({ delay: null })
     renderInfrastructurePage()
 
     expect(screen.getByRole('heading', { name: 'Infrastructure', level: 1 })).toBeInTheDocument()
@@ -329,6 +357,17 @@ describe('/project/[ref]/settings/infrastructure', () => {
     expect(screen.getByTestId('metric-Memory')).toHaveTextContent('50%')
     expect(screen.getByTestId('metric-Disk')).toHaveTextContent('50%')
 
+    // Compute options describe CPU by size: shared below Large, dedicated with vCPUs from Large up
+    expect(screen.getAllByText('Shared compute')).toHaveLength(3) // Nano, Micro, Small
+    expect(screen.getByText('Dedicated · 2 vCPUs')).toBeInTheDocument() // Large
+    expect(screen.queryByText(/-core/)).not.toBeInTheDocument()
+
+    // Compute stays editable for non High Availability projects
+    expect(
+      screen.queryByText("Compute size can't be changed on High Availability projects")
+    ).not.toBeInTheDocument()
+    expect(screen.getByText('Contact Us')).toBeInTheDocument()
+
     await user.click(screen.getByText('Small'))
     expect(screen.getByRole('button', { name: 'Review changes' })).toBeEnabled()
 
@@ -338,8 +377,20 @@ describe('/project/[ref]/settings/infrastructure', () => {
     })
   })
 
+  test('focuses the recommended compute option after closing the add replica dialog', async () => {
+    const user = userEvent.setup({ delay: null })
+    renderInfrastructurePage()
+
+    await user.click(await screen.findByRole('button', { name: 'Add read replica' }))
+    await user.click(await screen.findByRole('button', { name: 'Change compute' }))
+
+    const smallCompute = await screen.findByRole('radio', { name: /Small/ })
+    await waitFor(() => expect(smallCompute).toHaveFocus())
+    expect(smallCompute).toBeChecked()
+  })
+
   test('reviews and confirms a compute resize through the add-on API', async () => {
-    const user = userEvent.setup()
+    const user = userEvent.setup({ delay: null })
     let addonRequest: unknown
 
     addAPIMock({
@@ -371,8 +422,66 @@ describe('/project/[ref]/settings/infrastructure', () => {
     })
   })
 
+  test('renders compute as read-only for High Availability projects', async () => {
+    const user = userEvent.setup({ delay: null })
+
+    addAPIMock({
+      method: 'get',
+      path: '/platform/projects/:ref',
+      response: {
+        ...PROJECT,
+        cloud_provider: 'AWS_K8S',
+        high_availability: true,
+        infra_compute_size: 'large',
+      } satisfies ProjectDetailResponse,
+    })
+    addAPIMock({
+      method: 'get',
+      path: '/platform/projects/:ref/billing/addons',
+      response: {
+        available_addons: [
+          {
+            name: 'Compute Instance',
+            type: 'compute_instance',
+            variants: COMPUTE_VARIANTS,
+          },
+        ],
+        ref: PROJECT_REF,
+        selected_addons: [
+          {
+            type: 'compute_instance',
+            variant: COMPUTE_VARIANTS[2],
+          },
+        ],
+      },
+    })
+
+    renderInfrastructurePage()
+
+    expect(
+      await screen.findByText("Compute size can't be changed on High Availability projects")
+    ).toBeInTheDocument()
+
+    const largeCompute = await screen.findByRole('radio', { name: /Large/ })
+    await waitFor(() => expect(largeCompute).toBeChecked())
+
+    const microCompute = screen.getByRole('radio', { name: /Micro/ })
+    const smallCompute = screen.getByRole('radio', { name: /Small/ })
+    expect(largeCompute).toBeDisabled()
+    expect(microCompute).toBeDisabled()
+    expect(smallCompute).toBeDisabled()
+
+    // The "Contact Us" card for larger sizes is hidden for High Availability projects
+    expect(screen.queryByText('Contact Us')).not.toBeInTheDocument()
+
+    // Clicking a locked option must not dirty the form or surface the submit flow
+    await user.click(smallCompute)
+    expect(largeCompute).toBeChecked()
+    expect(screen.queryByRole('button', { name: 'Review changes' })).not.toBeInTheDocument()
+  })
+
   test('submits disk and autoscaling changes to both infrastructure APIs', async () => {
-    const user = userEvent.setup()
+    const user = userEvent.setup({ delay: null })
     let diskRequest: unknown
     let autoscaleRequest: unknown
 

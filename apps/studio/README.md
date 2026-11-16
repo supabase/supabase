@@ -23,6 +23,8 @@ Project settings are managed outside of the Dashboard. If you use docker compose
 
 ## How to contribute?
 
+For Assistant work, start with the [Supabase Assistant code guide](lib/ai/README.md) for the architecture, file map, tools, and validation workflow.
+
 - Branch from `master` and name your branches with the following structure
   - `{type}/{branch_name}`
     - Type: `chore | fix | feature`

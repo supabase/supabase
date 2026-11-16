@@ -22,7 +22,7 @@ import { NetworkRestrictions } from '@/components/interfaces/Settings/Database/N
 import { PoolingModesModal } from '@/components/interfaces/Settings/Database/PoolingModesModal'
 import { SettingsDatabaseEmptyStateLocal } from '@/components/interfaces/Settings/Database/SettingsDatabaseEmptyStateLocal'
 import { SSLConfiguration } from '@/components/interfaces/Settings/Database/SSLConfiguration'
-import DatabaseLayout from '@/components/layouts/DatabaseLayout/DatabaseLayout'
+import { DatabaseLayout } from '@/components/layouts/DatabaseLayout/DatabaseLayout'
 import { DefaultLayout } from '@/components/layouts/DefaultLayout'
 import { useIsFeatureEnabled } from '@/hooks/misc/useIsFeatureEnabled'
 import { useIsAwsCloudProvider, useIsAwsK8sCloudProvider } from '@/hooks/misc/useSelectedProject'

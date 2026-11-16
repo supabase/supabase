@@ -1,16 +1,17 @@
 import {
-  Clipboard,
-  Edit,
-  Maximize,
-  MessageCirclePlus,
-  MoreVertical,
-  Settings,
-  X,
+  ClipboardIcon,
+  EditIcon,
+  MaximizeIcon,
+  MessageCirclePlusIcon,
+  MoreVerticalIcon,
+  SettingsIcon,
+  XIcon,
 } from 'lucide-react'
 import { KeyboardEvent, useState } from 'react'
 import { toast } from 'sonner'
 import {
   Button,
+  cn,
   copyToClipboard,
   DropdownMenu,
   DropdownMenuContent,
@@ -24,10 +25,12 @@ import { ButtonTooltip } from '../ButtonTooltip'
 import { ShortcutPills, ShortcutTooltip } from '../ShortcutTooltip'
 import { AIAssistantChatSelector } from './AIAssistantChatSelector'
 import { AIAssistantMetadataWarning } from './AIAssistantMetadataWarning'
+import { useIsExplorerEnabled } from '@/components/interfaces/App/FeaturePreview/FeaturePreviewContext'
 import { useCreateChat } from '@/components/interfaces/Explorer/hooks'
 import { useAiAssistantStateSnapshot } from '@/state/ai-assistant-state'
 import { SHORTCUT_DEFINITIONS, SHORTCUT_IDS } from '@/state/shortcuts/registry'
 import { useShortcut } from '@/state/shortcuts/useShortcut'
+import { useSidebarManagerSnapshot } from '@/state/sidebar-manager-state'
 
 interface AIAssistantHeaderProps {
   isChatLoading: boolean
@@ -36,7 +39,6 @@ interface AIAssistantHeaderProps {
   onCloseAssistant: () => void
   showMetadataWarning: boolean
   updatedOptInSinceMCP: boolean
-  isHipaaProjectDisallowed: boolean
   aiOptInLevel: 'disabled' | 'schema' | 'full' | string | undefined
 }
 
@@ -47,14 +49,27 @@ export const AIAssistantHeader = ({
   onCloseAssistant,
   showMetadataWarning,
   updatedOptInSinceMCP,
-  isHipaaProjectDisallowed,
   aiOptInLevel,
 }: AIAssistantHeaderProps) => {
-  const snap = useAiAssistantStateSnapshot()
   const { openChat } = useCreateChat()
+  const snap = useAiAssistantStateSnapshot()
+  const { isMaximised, toggleMaximise } = useSidebarManagerSnapshot()
+  const isExplorerEnabled = useIsExplorerEnabled()
+
   const [value, setValue] = useState(snap.activeChat?.name)
   const [isEditingName, setIsEditingName] = useState(false)
   const [isOptInModalOpen, setIsOptInModalOpen] = useState(false)
+
+  const maximiseLabel = isExplorerEnabled
+    ? 'Open in Explorer'
+    : isMaximised
+      ? 'Minimize'
+      : 'Maximize'
+
+  const onSelectMaximise = () => {
+    if (isExplorerEnabled) handleOpenInExplorer()
+    else toggleMaximise()
+  }
 
   const handleOpenInExplorer = () => {
     if (!snap.activeChatId) return
@@ -100,7 +115,7 @@ export const AIAssistantHeader = ({
     enabled: shortcutsEnabled && !isChatLoading,
   })
 
-  useShortcut(SHORTCUT_IDS.AI_ASSISTANT_MAXIMIZE, handleOpenInExplorer, {
+  useShortcut(SHORTCUT_IDS.AI_ASSISTANT_MAXIMIZE, onSelectMaximise, {
     enabled: shortcutsEnabled && !isChatLoading,
   })
 
@@ -121,7 +136,7 @@ export const AIAssistantHeader = ({
             <Button
               variant="text"
               className="group min-w-0"
-              iconRight={<Edit className="transition opacity-0 group-hover:opacity-100" />}
+              iconRight={<EditIcon className="transition opacity-0 group-hover:opacity-100" />}
               onClick={() => {
                 setValue(snap.activeChat?.name)
                 setIsEditingName(true)
@@ -145,7 +160,7 @@ export const AIAssistantHeader = ({
                 variant="text"
                 aria-label="New chat"
                 size="tiny"
-                icon={<MessageCirclePlus />}
+                icon={<MessageCirclePlusIcon />}
                 onClick={onNewChat}
                 className="h-7 w-7 p-0"
               />
@@ -153,16 +168,16 @@ export const AIAssistantHeader = ({
 
             <ShortcutTooltip
               side="bottom"
-              label="Open in Explorer"
+              label={maximiseLabel}
               shortcutId={SHORTCUT_IDS.AI_ASSISTANT_MAXIMIZE}
             >
               <Button
                 variant="text"
-                aria-label="Open in Explorer"
+                aria-label={maximiseLabel}
                 size="tiny"
-                icon={<Maximize />}
-                onClick={handleOpenInExplorer}
-                className="h-7 w-7 p-0"
+                icon={<MaximizeIcon />}
+                onClick={onSelectMaximise}
+                className={cn('h-7 w-7 p-0', !isExplorerEnabled && 'hidden md:flex')}
               />
             </ShortcutTooltip>
 
@@ -171,7 +186,7 @@ export const AIAssistantHeader = ({
                 <ButtonTooltip
                   variant="text"
                   size="tiny"
-                  icon={<MoreVertical />}
+                  icon={<MoreVerticalIcon />}
                   className="h-7 w-7 p-0"
                   disabled={isChatLoading}
                   tooltip={{ content: { side: 'bottom', text: 'More options' } }}
@@ -180,7 +195,7 @@ export const AIAssistantHeader = ({
               <DropdownMenuContent align="end" className="w-60">
                 <DropdownMenuItem className="justify-between" onClick={handleCopyChatId}>
                   <div className="flex items-center gap-x-2">
-                    <Clipboard size={14} />
+                    <ClipboardIcon size={14} />
                     <span>Copy chat ID</span>
                   </div>
                   <ShortcutPills
@@ -193,7 +208,7 @@ export const AIAssistantHeader = ({
                   onClick={() => setIsOptInModalOpen(true)}
                 >
                   <div className="flex items-center gap-x-2">
-                    <Settings size={14} />
+                    <SettingsIcon size={14} />
                     <span>Permission settings</span>
                   </div>
                   <ShortcutPills
@@ -215,7 +230,7 @@ export const AIAssistantHeader = ({
                 variant="text"
                 className="w-7 h-7"
                 onClick={onCloseAssistant}
-                icon={<X strokeWidth={1.5} />}
+                icon={<XIcon strokeWidth={1.5} />}
               />
             </ShortcutTooltip>
           </div>
@@ -227,7 +242,6 @@ export const AIAssistantHeader = ({
         onVisibleChange={setIsOptInModalOpen}
         showMetadataWarning={showMetadataWarning}
         updatedOptInSinceMCP={updatedOptInSinceMCP}
-        isHipaaProjectDisallowed={isHipaaProjectDisallowed}
         aiOptInLevel={aiOptInLevel}
       />
     </div>

@@ -1,5 +1,11 @@
 import { useParams } from 'common'
-import { ArrowDown, ArrowRight, ArrowUp, ChevronDown, TextSearch } from 'lucide-react'
+import {
+  ArrowDownIcon,
+  ArrowRightIcon,
+  ArrowUpIcon,
+  ChevronDownIcon,
+  TextSearchIcon,
+} from 'lucide-react'
 import { parseAsArrayOf, parseAsJson, parseAsString, useQueryStates } from 'nuqs'
 import { UIEvent, useCallback, useEffect, useMemo, useRef, useState } from 'react'
 import DataGrid, { Column, DataGridHandle, Row } from 'react-data-grid'
@@ -133,7 +139,7 @@ export const QueryPerformanceGrid = ({
                     variant="text"
                     size="tiny"
                     className="p-1 h-5 w-5 shrink-0"
-                    icon={<ChevronDown size={14} className="text-foreground-muted" />}
+                    icon={<ChevronDownIcon size={14} className="text-foreground-muted" />}
                     onClick={(e) => e.stopPropagation()}
                   />
                 </DropdownMenuTrigger>
@@ -147,7 +153,7 @@ export const QueryPerformanceGrid = ({
                       sort?.column === col.id && sort?.order === 'asc' && 'text-foreground'
                     )}
                   >
-                    <ArrowUp size={14} />
+                    <ArrowUpIcon size={14} />
                     Sort Ascending
                   </DropdownMenuItem>
                   <DropdownMenuItem
@@ -159,7 +165,7 @@ export const QueryPerformanceGrid = ({
                       sort?.column === col.id && sort?.order === 'desc' && 'text-foreground'
                     )}
                   >
-                    <ArrowDown size={14} />
+                    <ArrowDownIcon size={14} />
                     Sort Descending
                   </DropdownMenuItem>
                 </DropdownMenuContent>
@@ -197,9 +203,8 @@ export const QueryPerformanceGrid = ({
               {onCurrentSelectQuery && (
                 <ButtonTooltip
                   tooltip={{ content: { text: 'Query details' } }}
-                  icon={<ArrowRight size={14} />}
+                  icon={<ArrowRightIcon size={14} />}
                   size="tiny"
-                  variant="default"
                   onClick={(e) => {
                     e.stopPropagation()
                     setSelectedRow(props.rowIdx)
@@ -488,9 +493,7 @@ export const QueryPerformanceGrid = ({
           >
             {onRetry && (
               <div className="mt-4">
-                <Button variant="default" onClick={onRetry}>
-                  Try again
-                </Button>
+                <Button onClick={onRetry}>Try again</Button>
               </div>
             )}
           </Admonition>
@@ -568,7 +571,7 @@ export const QueryPerformanceGrid = ({
               </div>
             ) : (
               <div className="absolute top-20 px-6 flex flex-col items-center justify-center w-full gap-y-2">
-                <TextSearch className="text-foreground-muted" strokeWidth={1} />
+                <TextSearchIcon className="text-foreground-muted" strokeWidth={1} />
                 <div className="text-center">
                   <p className="text-foreground">No queries detected</p>
                   <p className="text-foreground-light">

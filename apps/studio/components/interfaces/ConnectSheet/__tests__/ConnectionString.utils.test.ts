@@ -1,9 +1,12 @@
 import { describe, expect, test } from 'vitest'
 
+import type { ConnectionStringMethod } from '../Connect.constants'
+import type { ConnectionStringPooler } from '../Connect.types'
 import {
   appendConnectionStringParams,
   buildConnectionParameters,
   buildConnectionStringWithPassword,
+  buildDotnetConnectionString,
   buildJdbcString,
   buildPsqlCommand,
   buildSafeConnectionString,
@@ -11,21 +14,12 @@ import {
   parseConnectionParams,
   PASSWORD_PLACEHOLDER,
   resolveConnectionString,
+  withRequiredSslmode,
 } from '../ConnectionString.utils'
 
 describe('parseConnectionParams', () => {
-  test('returns hidden defaults for an empty string', () => {
-    expect(parseConnectionParams('')).toEqual({
-      host: 'hidden',
-      port: DEFAULT_PORT,
-      user: 'hidden',
-      database: 'hidden',
-      search: '',
-    })
-  })
-
-  test('returns hidden defaults for an unparseable URL', () => {
-    expect(parseConnectionParams('not a url')).toEqual({
+  test.each(['', 'not a url'])('returns hidden defaults for %j', (uri) => {
+    expect(parseConnectionParams(uri)).toEqual({
       host: 'hidden',
       port: DEFAULT_PORT,
       user: 'hidden',
@@ -101,7 +95,7 @@ describe('buildConnectionStringWithPassword', () => {
 })
 
 describe('resolveConnectionString', () => {
-  const pooler = {
+  const pooler: ConnectionStringPooler = {
     transactionShared: 'tx-shared',
     sessionShared: 'session-shared',
     transactionDedicated: 'tx-dedicated',
@@ -120,55 +114,21 @@ describe('resolveConnectionString', () => {
     ).toBe('')
   })
 
-  test('direct method returns the direct URI', () => {
-    expect(
-      resolveConnectionString({
-        connectionMethod: 'direct',
-        useSharedPooler: false,
-        connectionStringPooler: pooler,
-      })
-    ).toBe('direct-uri')
-  })
-
-  test('session method returns sessionShared', () => {
-    expect(
-      resolveConnectionString({
-        connectionMethod: 'session',
-        useSharedPooler: false,
-        connectionStringPooler: pooler,
-      })
-    ).toBe('session-shared')
-  })
-
-  test('transaction prefers dedicated when available and useSharedPooler is false', () => {
-    expect(
-      resolveConnectionString({
-        connectionMethod: 'transaction',
-        useSharedPooler: false,
-        connectionStringPooler: pooler,
-      })
-    ).toBe('tx-dedicated')
-  })
-
-  test('transaction falls back to shared when useSharedPooler is true', () => {
-    expect(
-      resolveConnectionString({
-        connectionMethod: 'transaction',
-        useSharedPooler: true,
-        connectionStringPooler: pooler,
-      })
-    ).toBe('tx-shared')
-  })
-
-  test('transaction falls back to shared when no dedicated pooler exists', () => {
-    expect(
-      resolveConnectionString({
-        connectionMethod: 'transaction',
-        useSharedPooler: false,
-        connectionStringPooler: { ...pooler, transactionDedicated: undefined },
-      })
-    ).toBe('tx-shared')
-  })
+  test.each<[ConnectionStringMethod, boolean, ConnectionStringPooler, string]>([
+    ['direct', false, pooler, 'direct-uri'],
+    ['session', false, pooler, 'session-shared'],
+    // transaction prefers the dedicated pooler when available
+    ['transaction', false, pooler, 'tx-dedicated'],
+    ['transaction', true, pooler, 'tx-shared'],
+    ['transaction', false, { ...pooler, transactionDedicated: undefined }, 'tx-shared'],
+  ])(
+    '%s method (useSharedPooler: %s) resolves the expected URI',
+    (connectionMethod, useSharedPooler, connectionStringPooler, expected) => {
+      expect(
+        resolveConnectionString({ connectionMethod, useSharedPooler, connectionStringPooler })
+      ).toBe(expected)
+    }
+  )
 })
 
 describe('appendConnectionStringParams', () => {
@@ -232,6 +192,52 @@ describe('buildJdbcString', () => {
   test('appends the query string using pgJDBC casing for sslnegotiation', () => {
     expect(buildJdbcString({ ...params, search: '?sslmode=require&sslnegotiation=direct' })).toBe(
       `jdbc:postgresql://db.proj.supabase.co:5432/postgres?user=postgres&password=${PASSWORD_PLACEHOLDER}&sslmode=require&sslNegotiation=direct`
+    )
+  })
+})
+
+describe('withRequiredSslmode', () => {
+  test('returns ?sslmode=require for an empty search', () => {
+    expect(withRequiredSslmode('')).toBe('?sslmode=require')
+  })
+
+  test('leaves a search that already sets sslmode unchanged', () => {
+    expect(withRequiredSslmode('?sslmode=require&sslnegotiation=direct')).toBe(
+      '?sslmode=require&sslnegotiation=direct'
+    )
+  })
+
+  test('appends sslmode=require to existing params without it', () => {
+    expect(withRequiredSslmode('?options=reference%3Dproj')).toBe(
+      '?options=reference%3Dproj&sslmode=require'
+    )
+  })
+})
+
+describe('buildDotnetConnectionString', () => {
+  const params = {
+    host: 'db.proj.supabase.co',
+    port: '5432',
+    user: 'postgres',
+    database: 'postgres',
+    search: '',
+  }
+
+  test('builds the base Npgsql string without SSL negotiation', () => {
+    expect(buildDotnetConnectionString(params)).toBe(
+      `Host=db.proj.supabase.co;Port=5432;Database=postgres;Username=postgres;Password=${PASSWORD_PLACEHOLDER};SSL Mode=Require;Trust Server Certificate=true`
+    )
+  })
+
+  test('appends SSL Negotiation=Direct when the URI requires direct negotiation', () => {
+    expect(
+      buildDotnetConnectionString({
+        ...params,
+        port: '5433',
+        search: '?sslmode=require&sslnegotiation=direct',
+      })
+    ).toBe(
+      `Host=db.proj.supabase.co;Port=5433;Database=postgres;Username=postgres;Password=${PASSWORD_PLACEHOLDER};SSL Mode=Require;Trust Server Certificate=true;SSL Negotiation=Direct`
     )
   })
 })

@@ -1,6 +1,6 @@
 import { useParams } from 'common'
 import dayjs from 'dayjs'
-import { Rewind } from 'lucide-react'
+import { RewindIcon } from 'lucide-react'
 import { useRouter } from 'next/router'
 import { PropsWithChildren, useEffect, useRef, useState } from 'react'
 import { Button } from 'ui'
@@ -15,10 +15,11 @@ import {
 import { DatePickerValue } from './Logs.DatePickers'
 import type { Filters, LogSearchCallback, LogTemplate, QueryType } from './Logs.types'
 import { maybeShowUpgradePromptIfNotEntitled } from './Logs.utils'
+import { calculateBarClickTimeRange } from './LogsBarChart.utils'
 import { LogTable } from './LogTable'
 import UpgradePrompt from './UpgradePrompt'
 import { useLogsPreviewShortcuts } from './useLogsPreviewShortcuts'
-import PreviewFilterPanel from '@/components/interfaces/Settings/Logs/PreviewFilterPanel'
+import { PreviewFilterPanel } from '@/components/interfaces/Settings/Logs/PreviewFilterPanel'
 import LoadingOpacity from '@/components/ui/LoadingOpacity'
 import ShimmerLine from '@/components/ui/ShimmerLine'
 import { ShortcutTooltip } from '@/components/ui/ShortcutTooltip'
@@ -32,54 +33,6 @@ import { useSelectedOrganizationQuery } from '@/hooks/misc/useSelectedOrganizati
 import { useUpgradePrompt } from '@/hooks/misc/useUpgradePrompt'
 import { useDatabaseSelectorStateSnapshot } from '@/state/database-selector'
 import { SHORTCUT_IDS } from '@/state/shortcuts/registry'
-
-/**
- * Calculates the appropriate time range for bar click filtering based on the current time range duration.
- *
- * @param currentRangeStart - The start timestamp of the current time range
- * @param currentRangeEnd - The end timestamp of the current time range
- * @param clickedTimestamp - The timestamp of the clicked bar
- * @returns Object containing the new start and end timestamps for filtering
- */
-export const calculateBarClickTimeRange = (
-  currentRangeStart: string,
-  currentRangeEnd: string | undefined,
-  clickedTimestamp: string
-) => {
-  const datumTimestamp = dayjs(clickedTimestamp).toISOString()
-
-  // Calculate the current time range duration in hours
-  // If currentRangeEnd is not provided, use current time as the end
-  const endTime = currentRangeEnd ? dayjs(currentRangeEnd) : dayjs()
-  const currentRangeDuration = endTime.diff(dayjs(currentRangeStart), 'hour', true)
-
-  let rangeOffset: number
-  let rangeUnit: dayjs.ManipulateType
-
-  if (currentRangeDuration >= 12) {
-    // For ranges >= 12h, use 1h range
-    rangeOffset = 0.5
-    rangeUnit = 'hour'
-  } else if (currentRangeDuration >= 1) {
-    // For ranges >= 1h but < 12h, use 5min range
-    rangeOffset = 2.5
-    rangeUnit = 'minute'
-  } else if (currentRangeDuration >= 1 / 30) {
-    // 2 minutes = 1/30 hour
-    // For ranges >= 2min but < 1h, use 2min range
-    rangeOffset = 1
-    rangeUnit = 'minute'
-  } else {
-    // For ranges < 2min, use 15sec range
-    rangeOffset = 7.5
-    rangeUnit = 'second'
-  }
-
-  return {
-    start: dayjs(datumTimestamp).subtract(rangeOffset, rangeUnit).toISOString(),
-    end: dayjs(datumTimestamp).add(rangeOffset, rangeUnit).toISOString(),
-  }
-}
 
 /**
  * Acts as a container component for the entire log display
@@ -374,8 +327,7 @@ export const LogsPreviewer = ({
           <ShortcutTooltip shortcutId={SHORTCUT_IDS.LOGS_PREVIEW_LOAD_OLDER} side="top">
             <Button
               onClick={loadOlder}
-              icon={<Rewind />}
-              variant="default"
+              icon={<RewindIcon />}
               loading={isLoadingOlder}
               disabled={isLoadingOlder}
             >

@@ -30,6 +30,21 @@ describe('EditSecretSheet', () => {
     await waitFor(() => expect(save).toBeEnabled())
   })
 
+  test('enables Save for a long multi-line value', async () => {
+    renderSheet()
+
+    const save = await screen.findByRole('button', { name: 'Save' })
+    const longValue = Array.from({ length: 200 }, (_, i) => `line-${i}-${'x'.repeat(60)}`).join(
+      '\n'
+    )
+
+    await userEvent.click(screen.getByPlaceholderText('my-secret-value'))
+    await userEvent.paste(longValue)
+
+    expect(screen.getByPlaceholderText('my-secret-value')).toHaveValue(longValue)
+    await waitFor(() => expect(save).toBeEnabled())
+  })
+
   test('posts the secret and closes on success', async () => {
     const requests: Array<{ ref: string | undefined; body: unknown }> = []
     addAPIMock({

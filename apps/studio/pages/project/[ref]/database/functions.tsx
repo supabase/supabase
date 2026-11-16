@@ -1,4 +1,4 @@
-import { PermissionAction } from '@supabase/shared-types/out/constants'
+import { useParams } from 'common'
 import { PageContainer } from 'ui-patterns/PageContainer'
 import {
   PageHeader,
@@ -10,22 +10,34 @@ import {
 import { PageSection, PageSectionContent } from 'ui-patterns/PageSection'
 
 import { FunctionsList } from '@/components/interfaces/Database/Functions/FunctionsList/FunctionsList'
-import DatabaseLayout from '@/components/layouts/DatabaseLayout/DatabaseLayout'
+import { DatabaseLayout } from '@/components/layouts/DatabaseLayout/DatabaseLayout'
 import { DefaultLayout } from '@/components/layouts/DefaultLayout'
+import { AlertError } from '@/components/ui/AlertError'
 import { DocsButton } from '@/components/ui/DocsButton'
 import { NoPermission } from '@/components/ui/NoPermission'
-import { useAsyncCheckPermissions } from '@/hooks/misc/useCheckPermissions'
 import { DOCS_URL } from '@/lib/constants'
+import { useGrant } from '@/lib/grants'
 import type { NextPageWithLayout } from '@/types'
 
 const DatabaseFunctionsPage: NextPageWithLayout = () => {
-  const { can: canReadFunctions, isSuccess: isPermissionsLoaded } = useAsyncCheckPermissions(
-    PermissionAction.TENANT_SQL_ADMIN_READ,
-    'functions'
+  const { ref: projectRef } = useParams()
+  const readGrant = useGrant(
+    'POST /platform/pg-meta/{ref}/query',
+    { projectRef },
+    { variant: 'read' }
   )
 
-  if (isPermissionsLoaded && !canReadFunctions) {
+  if (readGrant.status === 'denied') {
     return <NoPermission isFullPage resourceText="view database functions" />
+  }
+
+  if (readGrant.status === 'error') {
+    return (
+      <AlertError
+        error={readGrant.error}
+        subject="Failed to check database functions permissions"
+      />
+    )
   }
 
   return (

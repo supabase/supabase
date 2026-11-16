@@ -1,9 +1,5 @@
-import { cloneDeep } from 'lodash'
 import z from 'zod'
 
-// We don't have an OpenAPI that describes mcp tools security requirements so
-// we have this hard coded file that must be updated when they change
-import { MCPToolScopeMappings } from './MCPToolScopeMappings'
 import {
   EndpointMap,
   McpMap,
@@ -13,32 +9,29 @@ import {
 import { InternalServerError } from '@/lib/api/apiHelpers'
 
 /*
- * Builds the permissions/endpoint mapping by fetching the OpenAPI specs for our v1 and v2 APIs.
- * The two specs are indexed together rather than merged afterwards: every v1 path starts with
- * `/v1/` and every v2 path with `/v2/`, so they can't collide, and one pass de-duplicates a
- * scope's endpoint list by construction.
- * @throws InternalServerError when it can't fetch the OpenAPI specs
+ * Builds the permissions/endpoint mapping from three live sources: the v1 and v2 OpenAPI specs
+ * (endpoint -> FGA via `x-fga-permissions`) and the mgmt-api MCP-tool-permissions endpoint
+ * (tool -> FGA). The MCP map is owned by Control Plane — it's projected from the same MCP_TOOL_AUTH
+ * descriptor that drives enforcement — so Studio fetches it exactly like the OpenAPI spec instead of
+ * hand-maintaining or importing a copy.
+ * @throws InternalServerError when it can't fetch the specs or the MCP map
  */
 export const buildAPIPermissionScopeMap = async (): Promise<PermissionScopeMap> => {
-  const [apiV1SpecsJSON, apiV2SpecsJSON] = await Promise.all([
+  const [apiV1SpecsJSON, apiV2SpecsJSON, mcpToolsJSON] = await Promise.all([
     fetchAPIPermissionScope('v1'),
     fetchAPIPermissionScope('v2'),
+    fetchMcpToolPermissions(),
   ])
   const apiV1Specs = API_SPECS_SCHEMA.parse(apiV1SpecsJSON)
   const apiV2Specs = API_SPECS_SCHEMA.parse(apiV2SpecsJSON)
+  const mcpTools = MCP_TOOLS_SCHEMA.parse(mcpToolsJSON)
 
   const { scopes, endpoints } = getScopesAndEndpointsForAPI({
     paths: { ...apiV1Specs.paths, ...apiV2Specs.paths },
   })
-  addMCPToolsToScopes(scopes, MCPToolScopeMappings)
+  addMCPToolsToScopes(scopes, mcpTools)
 
-  return {
-    scopes,
-    endpoints,
-    // Deep copy so a caller mutating the response can't corrupt the module-level mapping, which
-    // outlives every request in a long-running server.
-    mcp_tools: cloneDeep(MCPToolScopeMappings),
-  }
+  return { scopes, endpoints, mcp_tools: mcpTools }
 }
 
 // OPEN API specs look like this (only kept the parts we're interested in):
@@ -63,7 +56,7 @@ export const buildAPIPermissionScopeMap = async (): Promise<PermissionScopeMap> 
 // KNOWN DIVERGENCE: annotations are trusted verbatim, and the one on
 // POST /v1/projects/{ref}/database/query overstates access — the spec publishes
 // `[[database_read], [database_write]]`, but the route's guard requires database_read outright and
-// the write group is doc-only (see the execute_sql entry in MCPToolScopeMappings.ts). A token
+// the write group is doc-only (the MCP endpoint reports execute_sql under database_read only). A token
 // granted only database_write is therefore shown this endpoint as callable when the guard would
 // reject it. Studio-created tokens can't hit this (write mode always grants the read scopes too),
 // so this stays a display inaccuracy for API-created tokens; the fix is correcting the annotation
@@ -147,6 +140,38 @@ const fetchAPIPermissionScope = async (version: 'v1' | 'v2') => {
   }
 }
 
+// The mgmt-api endpoint that projects the MCP_TOOL_AUTH descriptor (which also drives enforcement)
+// to tool -> FGA permission groups. Fetched like the OpenAPI spec above.
+const fetchMcpToolPermissions = async () => {
+  try {
+    const response = await fetch(`${NEXT_PUBLIC_API_DOMAIN}/platform/mcp-tools-permissions`, {
+      method: 'get',
+      headers: {
+        'Content-Type': 'application/json',
+      },
+    })
+    if (response.ok) {
+      return response.json()
+    }
+    const responseText = await response.text()
+
+    const retryAfter = response.headers.get('Retry-After') ?? undefined
+    throw new InternalServerError(`MCP tool permissions responded with ${response.status}`, {
+      status: response.status,
+      body: responseText,
+      ...(retryAfter !== undefined && { retryAfter }),
+    })
+  } catch (error: unknown) {
+    if (error instanceof InternalServerError) {
+      throw error
+    }
+
+    if (error instanceof Error) {
+      throw new InternalServerError(error.message)
+    }
+  }
+}
+
 // Simplified OPEN API specs schemas that only defines what we care about for scoped tokens
 
 const OPEN_API_PATH_METHOD_SCHEMA = z.object({
@@ -172,3 +197,6 @@ const OPEN_API_PATH_ITEM_SCHEMA = z.preprocess(
 const API_SPECS_SCHEMA = z.object({
   paths: z.record(z.string(), OPEN_API_PATH_ITEM_SCHEMA),
 })
+
+// tool name -> OR-of-AND FGA permission groups, as served by GET /platform/mcp-tools-permissions.
+const MCP_TOOLS_SCHEMA: z.ZodType<McpMap> = z.record(z.string(), z.array(z.array(z.string())))

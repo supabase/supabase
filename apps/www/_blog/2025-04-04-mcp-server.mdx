@@ -15,8 +15,7 @@ launchweek: '14'
 
 <Admonition type="note">
   Be sure to read our launch post about the [Supabase Remote MCP Server](/blog/remote-mcp-server),
-  and read our [MCP Server documentation](/docs/guides/getting-started/mcp) for the latest
-  information.
+  and read our [MCP Server documentation](/docs/guides/ai-tools/mcp) for the latest information.
 </Admonition>
 
 We are launching an official [Supabase MCP server](https://github.com/supabase/mcp). You can use this server to connect your favorite AI tools (such as [Cursor](https://www.cursor.com/) or [Claude](https://claude.ai/download)) directly with Supabase.
@@ -87,7 +86,7 @@ You'll need to create a [personal access token (PAT)](/dashboard/account/tokens)
 
 <Admonition type="note" >
 
-Some clients expect a slightly modified JSON format, and Windows users will have to prefix this command with `cmd /c`. For detailed step-by-step instructions for each client and OS, see our [MCP documentation](/docs/guides/getting-started/mcp).
+Some clients expect a slightly modified JSON format, and Windows users will have to prefix this command with `cmd /c`. For detailed step-by-step instructions for each client and OS, see our [MCP documentation](/docs/guides/ai-tools/mcp).
 
 </Admonition>
 
@@ -148,7 +147,7 @@ We believe MCP has a lot of potential in the AI builder world and we want to con
 
 ### Create and deploy Edge Functions
 
-Supabase Edge Functions allow you to run custom, server side code from our edge network closest to your users. We [just announced](/blog/supabase-edge-functions-deploy-dashboard-deno-2-1) the ability to create and deploy Edge Functions directly from the Supabase Dashboard. So, it would only be fitting also create and deploy Edge Functions directly from your favorite AI assistant.
+[Supabase Edge Functions](/edge-functions) allow you to run custom, server side code from our edge network closest to your users. We [just announced](/blog/supabase-edge-functions-deploy-dashboard-deno-2-1) the ability to create and deploy Edge Functions directly from the Supabase Dashboard. So, it would only be fitting also create and deploy Edge Functions directly from your favorite AI assistant.
 
 ### Native authorization
 
@@ -193,6 +192,6 @@ We've built the Supabase MCP server to bridge the gap between AI tools and your 
 
 The MCP protocol is evolving with proposals like the new [Streamable HTTP transport](https://github.com/modelcontextprotocol/specification/pull/206) that supports fully stateless servers without requiring long-lived connections. We're following these developments closely and evaluating how they might benefit the Supabase MCP experience.
 
-If you run into issues or have ideas for new tools we should add, [open an issue](https://github.com/supabase/mcp/issues/new) on the GitHub repo. We're particularly interested in hearing about your experiences with schema discovery, database branching, and other safety features as we continue to refine its protections.
+If you run into issues or have ideas for new tools we should add, [open an issue](https://github.com/supabase/mcp/issues/new) on the GitHub repo. We're particularly interested in hearing about your experiences with schema discovery, [database branching](/features/branching), and other safety features as we continue to refine its protections.
 
-Check out our [docs](/docs/guides/getting-started/mcp) for the latest updates and examples of what you can build with Supabase MCP.
+Check out our [docs](/docs/guides/ai-tools/mcp) for the latest updates and examples of what you can build with Supabase MCP.

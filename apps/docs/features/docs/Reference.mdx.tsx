@@ -11,7 +11,7 @@ import { type ComponentProps } from 'react'
 
 import { CodeBlock } from '../ui/CodeBlock/CodeBlock'
 
-async function getRefMarkdownInternal(relPath: string) {
+async function readRefMdx(relPath: string) {
   const fullPath = join(REF_DOCS_DIRECTORY, relPath + '.mdx')
 
   try {
@@ -20,11 +20,10 @@ async function getRefMarkdownInternal(relPath: string) {
     }
 
     const mdx = await readFile(fullPath, 'utf-8')
-    const { content } = matter(mdx)
-    return content
+    return matter(mdx)
   } catch (err) {
     console.error(`Error fetching reference markdown from file: ${fullPath}:\n\n${err}`)
-    return ''
+    return { content: '', data: {} as Record<string, unknown> }
   }
 }
 
@@ -34,21 +33,30 @@ async function getRefMarkdownInternal(relPath: string) {
  * here: this is just reading the public MDX files from the codebase.
  */
 const getRefMarkdown = cache_fullProcess_withDevCacheBust(
-  getRefMarkdownInternal,
+  async (relPath: string) => (await readRefMdx(relPath)).content,
+  REF_DOCS_DIRECTORY,
+  (filename: string) => JSON.stringify([filename.replace(/\.mdx$/, '')])
+)
+
+const getRefFrontmatter = cache_fullProcess_withDevCacheBust(
+  async (relPath: string) => (await readRefMdx(relPath)).data,
   REF_DOCS_DIRECTORY,
   (filename: string) => JSON.stringify([filename.replace(/\.mdx$/, '')])
 )
 
 interface MDXRemoteRefsProps {
   source: string
+  codeBlockProps?: Partial<ComponentProps<typeof CodeBlock>>
 }
 
-function MDXRemoteRefs({ source }: MDXRemoteRefsProps) {
+function MDXRemoteRefs({ source, codeBlockProps }: MDXRemoteRefsProps) {
   const refComponents = {
     ...components,
     // Override the CodeBlock used for normal guides to skip type generation
     // because it is too resource-intensive
-    pre: (props: ComponentProps<typeof CodeBlock>) => <CodeBlock {...props} skipTypeGeneration />,
+    pre: (props: ComponentProps<typeof CodeBlock>) => (
+      <CodeBlock {...props} {...codeBlockProps} skipTypeGeneration />
+    ),
     RefSubLayout,
     CliGlobalFlagsHandler,
   }
@@ -57,4 +65,4 @@ function MDXRemoteRefs({ source }: MDXRemoteRefsProps) {
   return <MDXRemoteBase source={source} components={refComponents} />
 }
 
-export { getRefMarkdown, MDXRemoteRefs }
+export { getRefFrontmatter, getRefMarkdown, MDXRemoteRefs }

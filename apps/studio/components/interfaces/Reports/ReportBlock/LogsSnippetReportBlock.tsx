@@ -1,4 +1,4 @@
-import { ScrollText } from 'lucide-react'
+import { ScrollTextIcon } from 'lucide-react'
 import { ReactNode } from 'react'
 
 import { ReportBlockContainer } from './ReportBlockContainer'
@@ -19,7 +19,7 @@ export const LogsSnippetReportBlock = ({ label, actions }: LogsSnippetReportBloc
       draggable
       showDragHandle
       loading={false}
-      icon={<ScrollText size={14} className="text-foreground-muted" />}
+      icon={<ScrollTextIcon size={14} className="text-foreground-muted" />}
       label={label}
       actions={actions}
     >

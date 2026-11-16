@@ -115,7 +115,7 @@ Like skip lists, search starts at the top layer and works its way down until it 
 
 HNSW should be your default choice when creating a vector index. Add the index when you don't need 100% accuracy and are willing to trade a small amount of accuracy for a lot of throughput.
 
-Unlike IVFFlat indexes, you are safe to build an HNSW index immediately after the table is created. HNSW indexes are based on graphs which inherently are not affected by the same limitations as IVFFlat. As new data is added to the table, the index will be filled automatically and the index structure will remain optimal.
+Unlike [IVFFlat indexes](/docs/guides/ai/vector-indexes/ivf-indexes), you are safe to build an HNSW index immediately after the table is created. HNSW indexes are based on graphs which inherently are not affected by the same limitations as IVFFlat. As new data is added to the table, the index will be filled automatically and the index structure will remain optimal.
 
 ## Filtering with HNSW indexes
 

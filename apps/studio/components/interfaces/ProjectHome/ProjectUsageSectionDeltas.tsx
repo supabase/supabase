@@ -1,17 +1,17 @@
-import { useParams } from 'common'
+import { LOCAL_STORAGE_KEYS, useParams } from 'common'
 import Link from 'next/link'
 import { useRouter } from 'next/router'
-import { useMemo, useState } from 'react'
+import { useMemo } from 'react'
 import { Card, CardContent, CardHeader, CardTitle, cn, Loading } from 'ui'
 import { LogsBarChart } from 'ui-patterns/LogsBarChart'
 import { Row } from 'ui-patterns/Row'
 
+import { isChartIntervalKey, resolveChartInterval } from './ChartInterval.utils'
 import {
   buildSortedServiceCards,
   computeSuccessAndNonSuccessRates,
   getBucketLogRange,
   isServiceDisabled,
-  type ChartIntervalKey,
   type LogsBarChartDatum,
 } from './ProjectUsage.metrics'
 import { useUnifiedLogsPreview } from '@/components/interfaces/App/FeaturePreview/FeaturePreviewContext'
@@ -26,14 +26,12 @@ import { CHART_INTERVALS } from '@/components/ui/Logs/logs.utils'
 import { useCheckEntitlements } from '@/hooks/misc/useCheckEntitlements'
 import { useIsDataApiEnabled } from '@/hooks/misc/useIsDataApiEnabled'
 import { useIsFeatureEnabled } from '@/hooks/misc/useIsFeatureEnabled'
+import { useLocalStorageQuery } from '@/hooks/misc/useLocalStorage'
 import { useSelectedOrganizationQuery } from '@/hooks/misc/useSelectedOrganization'
 import { useTrack } from '@/lib/telemetry/track'
 
 // Services the homepage shows; matches the telemetry event types.
 type HomeServiceKey = 'db' | 'functions' | 'auth' | 'storage' | 'realtime' | 'data_api'
-
-const isChartIntervalKey = (value: string): value is ChartIntervalKey =>
-  value === '1hr' || value === '1day' || value === '7day'
 
 type ServiceEntry = {
   key: HomeServiceKey
@@ -58,9 +56,11 @@ export const ProjectUsageSectionDeltas = () => {
   const { getEntitlementMax } = useCheckEntitlements('log.retention_days')
   const retentionDays = getEntitlementMax()
 
-  const [userInterval, setUserInterval] = useState<ChartIntervalKey | undefined>(undefined)
-  const interval: ChartIntervalKey =
-    userInterval ?? (retentionDays !== undefined && retentionDays < 7 ? '1hr' : '1day')
+  const [storedInterval, setStoredInterval] = useLocalStorageQuery<string | undefined>(
+    LOCAL_STORAGE_KEYS.HOME_CHART_INTERVAL(projectRef ?? ''),
+    undefined
+  )
+  const interval = resolveChartInterval(storedInterval, retentionDays)
 
   const selectedInterval = CHART_INTERVALS.find((i) => i.key === interval) || CHART_INTERVALS[1]
   const datetimeFormat = selectedInterval.format || 'MMM D, ha'
@@ -178,7 +178,7 @@ export const ProjectUsageSectionDeltas = () => {
         <ChartIntervalDropdown
           value={interval}
           onChange={(next) => {
-            if (isChartIntervalKey(next)) setUserInterval(next)
+            if (isChartIntervalKey(next)) setStoredInterval(next)
           }}
           organizationSlug={organization?.slug}
           dropdownAlign="end"

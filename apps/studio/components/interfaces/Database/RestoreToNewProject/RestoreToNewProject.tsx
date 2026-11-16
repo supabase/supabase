@@ -1,8 +1,15 @@
-import { PermissionAction } from '@supabase/shared-types/out/constants'
-import { Loader2 } from 'lucide-react'
+import { ChevronDownIcon, Loader2Icon } from 'lucide-react'
 import Link from 'next/link'
 import { useEffect, useState } from 'react'
-import { Alert, AlertDescription, AlertTitle, Button } from 'ui'
+import {
+  Alert,
+  AlertDescription,
+  AlertTitle,
+  Button,
+  Collapsible,
+  CollapsibleContent,
+  CollapsibleTrigger,
+} from 'ui'
 import { Admonition } from 'ui-patterns/Admonition'
 import { GenericSkeletonLoader } from 'ui-patterns/ShimmeringLoader'
 
@@ -24,11 +31,13 @@ import { useDiskAttributesQuery } from '@/data/config/disk-attributes-query'
 import { useCloneBackupsQuery } from '@/data/projects/clone-query'
 import { useCloneStatusQuery } from '@/data/projects/clone-status-query'
 import { useCheckEntitlements } from '@/hooks/misc/useCheckEntitlements'
-import { useAsyncCheckPermissions } from '@/hooks/misc/useCheckPermissions'
+import { FGA_PERMISSIONS, useAsyncCheckPermissionsV2 } from '@/hooks/misc/useCheckPermissionsV2'
 import { useSelectedOrganizationQuery } from '@/hooks/misc/useSelectedOrganization'
 import {
   useIsAwsK8sCloudProvider,
+  useIsHighAvailability,
   useIsOrioleDb,
+  useOrioleDbReleaseStage,
   useSelectedProjectQuery,
 } from '@/hooks/misc/useSelectedProject'
 import { DOCS_URL, PROJECT_STATUS } from '@/lib/constants'
@@ -40,7 +49,9 @@ export const RestoreToNewProject = () => {
   const { hasAccess: hasAccessToRestoreToNewProject, isLoading: isLoadingEntitlement } =
     useCheckEntitlements('backup.restore_to_new_project')
   const isOrioleDb = useIsOrioleDb()
+  const orioleDbReleaseStage = useOrioleDbReleaseStage()
   const isAwsK8s = useIsAwsK8sCloudProvider()
+  const isHighAvailability = useIsHighAvailability()
 
   const [refetchInterval, setRefetchInterval] = useState<number | false>(false)
   const [selectedBackupId, setSelectedBackupId] = useState<number | null>(null)
@@ -60,13 +71,10 @@ export const RestoreToNewProject = () => {
 
   const isActiveHealthy = project?.status === PROJECT_STATUS.ACTIVE_HEALTHY
 
-  const { can: canReadPhysicalBackups, isSuccess: isPermissionsLoaded } = useAsyncCheckPermissions(
-    PermissionAction.READ,
-    'physical_backups'
-  )
-  const { can: canTriggerPhysicalBackups } = useAsyncCheckPermissions(
-    PermissionAction.INFRA_EXECUTE,
-    'queue_job.restore.prepare'
+  const { can: canReadPhysicalBackups, isSuccess: isPermissionsLoaded } =
+    useAsyncCheckPermissionsV2(FGA_PERMISSIONS.PROJECT.BACKUPS_READ)
+  const { can: canTriggerPhysicalBackups } = useAsyncCheckPermissionsV2(
+    FGA_PERMISSIONS.PROJECT.BACKUPS_WRITE
   )
   const PITR_ENABLED = cloneBackups?.pitr_enabled
   const PHYSICAL_BACKUPS_ENABLED = project?.is_physical_backups_enabled
@@ -128,7 +136,17 @@ export const RestoreToNewProject = () => {
       <Admonition
         type="default"
         title="Restoring to new projects are not available for OrioleDB"
-        description="OrioleDB is currently in public alpha and projects created are strictly ephemeral with no database backups"
+        description={`OrioleDB is currently in public ${orioleDbReleaseStage} and restoring to a new project is unavailable on OrioleDB projects`}
+      />
+    )
+  }
+
+  if (isHighAvailability) {
+    return (
+      <Admonition
+        type="default"
+        title="Restoring to a new project is unavailable on High Availability projects"
+        description="We're working to bring restores to High Availability projects. Contact support if this is blocking your work."
       />
     )
   }
@@ -259,14 +277,17 @@ export const RestoreToNewProject = () => {
       />
       {isRestoring ? (
         <Alert className="[&>svg]:bg-none! [&>svg]:text-foreground-light mb-6">
-          <Loader2 className="animate-spin" />
+          <Loader2Icon className="animate-spin" />
           <AlertTitle>Restoration in progress</AlertTitle>
           <AlertDescription>
             <p>
-              The new project {(restoringClone?.target_project as any)?.name || ''} is currently
-              being created. You'll be able to restore again once the project is ready.
+              The new project {(restoringClone?.target_project as any)?.name || ''}{' '}
+              <span>
+                is currently being created. You'll be able to restore again once the project is
+                ready.
+              </span>
             </p>
-            <Button asChild variant="default" className="mt-2">
+            <Button asChild className="mt-2">
               <Link href={`/project/${restoringClone?.target_project?.ref ?? '_'}`}>
                 Go to new project
               </Link>
@@ -275,14 +296,25 @@ export const RestoreToNewProject = () => {
         </Alert>
       ) : null}
       {previousClones?.length ? (
-        <div className="flex flex-col gap-2">
-          <h3 className="text-sm font-medium">Previous restorations</h3>
-          <Panel className="flex flex-col divide-y divide-border">
-            {previousClones?.map((c) => (
-              <PreviousRestoreItem key={c.inserted_at} clone={c} />
-            ))}
-          </Panel>
-        </div>
+        <Collapsible className="flex flex-col gap-2">
+          <h3 className="text-sm font-medium">
+            <CollapsibleTrigger className="group flex w-full items-center justify-between text-left">
+              Previous restorations ({previousClones.length})
+              <ChevronDownIcon
+                className="text-foreground-lighter transition-transform duration-200 group-data-[state=open]:rotate-180"
+                size={14}
+                strokeWidth={1.5}
+              />
+            </CollapsibleTrigger>
+          </h3>
+          <CollapsibleContent>
+            <Panel className="flex flex-col divide-y divide-border">
+              {previousClones.map((c) => (
+                <PreviousRestoreItem key={c.inserted_at} clone={c} />
+              ))}
+            </Panel>
+          </CollapsibleContent>
+        </Collapsible>
       ) : null}
       {PITR_ENABLED ? (
         <>

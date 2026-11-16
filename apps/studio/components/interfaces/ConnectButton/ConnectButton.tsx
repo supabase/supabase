@@ -1,4 +1,4 @@
-import { Plug } from 'lucide-react'
+import { PlugIcon } from 'lucide-react'
 import { parseAsBoolean, useQueryState } from 'nuqs'
 import { ComponentProps } from 'react'
 import { Button, cn } from 'ui'
@@ -41,16 +41,17 @@ export const ConnectButton = ({
       >
         <Button
           variant={buttonVariant}
+          aria-label="Connect"
           disabled={!isActiveHealthy}
           className={cn('rounded-full', className)}
-          icon={<Plug className="rotate-90" />}
+          icon={<PlugIcon className="rotate-90" />}
           onClick={() => {
             track('header_connect_button_clicked')
             setConnectSheetSource('header_button')
             setShowConnect(true)
           }}
         >
-          <span className={cn({ 'sr-only': iconOnly })}>Connect</span>
+          {!iconOnly && <span>Connect</span>}
         </Button>
       </ShortcutTooltip>
     )
@@ -61,7 +62,7 @@ export const ConnectButton = ({
       variant={buttonVariant}
       disabled
       className={cn('rounded-full', className)}
-      icon={<Plug className="rotate-90" />}
+      icon={<PlugIcon className="rotate-90" />}
       onClick={() => {
         track('header_connect_button_clicked')
         setConnectSheetSource('header_button')

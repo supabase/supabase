@@ -2,6 +2,8 @@ export type WebhookScope = 'organization' | 'project'
 
 export type WebhookDeliveryStatus = 'pending' | 'success' | 'failure' | 'skipped'
 
+// UI-only row shape for the headers form (add/edit by key+value). The real API
+// stores these as a plain `{ [key]: value }` object — converted in the data layer.
 export interface WebhookHeader {
   id: string
   key: string
@@ -10,7 +12,6 @@ export interface WebhookHeader {
 
 export interface WebhookEndpoint {
   id: string
-  name: string
   url: string
   description: string
   enabled: boolean
@@ -23,9 +24,13 @@ export interface WebhookEndpoint {
 export interface WebhookDelivery {
   id: string
   endpointId: string
+  eventId: string
   eventType: string
+  eventPayload: Record<string, unknown>
   status: WebhookDeliveryStatus
-  responseCode?: number
+  responseCode: number
+  responseBody: string | Record<string, string> | null
+  responseHeaders: Record<string, string> | null
   attemptAt: string
 }
 
@@ -41,10 +46,10 @@ export interface PlatformWebhooksState {
 }
 
 export interface UpsertWebhookEndpointInput {
-  name: string
   url: string
   description: string
   enabled: boolean
   eventTypes: string[]
   customHeaders: Array<Pick<WebhookHeader, 'key' | 'value'>>
+  signingSecret: string
 }

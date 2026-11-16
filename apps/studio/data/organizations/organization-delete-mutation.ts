@@ -4,7 +4,8 @@ import { toast } from 'sonner'
 import { organizationKeys } from './keys'
 import { del, handleError } from '@/data/fetchers'
 import { permissionKeys } from '@/data/permissions/keys'
-import type { ResponseError, UseCustomMutationOptions } from '@/types'
+import type { StudioError } from '@/lib/errors/studio-errors'
+import type { UseCustomMutationOptions } from '@/types'
 
 export type OrganizationDeleteVariables = {
   slug: string
@@ -25,12 +26,12 @@ export const useOrganizationDeleteMutation = ({
   onError,
   ...options
 }: Omit<
-  UseCustomMutationOptions<OrganizationDeleteData, ResponseError, OrganizationDeleteVariables>,
+  UseCustomMutationOptions<OrganizationDeleteData, StudioError, OrganizationDeleteVariables>,
   'mutationFn'
 > = {}) => {
   const queryClient = useQueryClient()
 
-  return useMutation<OrganizationDeleteData, ResponseError, OrganizationDeleteVariables>({
+  return useMutation<OrganizationDeleteData, StudioError, OrganizationDeleteVariables>({
     mutationFn: (vars) => deleteOrganization(vars),
     async onSuccess(data, variables, context) {
       await Promise.all([

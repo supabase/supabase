@@ -1,24 +1,24 @@
-import { PermissionAction } from '@supabase/shared-types/out/constants'
-import { IS_PLATFORM } from 'common'
+import { IS_PLATFORM, useParams } from 'common'
 import { GenericSkeletonLoader } from 'ui-patterns/ShimmeringLoader'
 
 import { JWTSecretKeysTable } from '@/components/interfaces/JwtSecrets/jwt-secret-keys-table'
 import { DefaultLayout } from '@/components/layouts/DefaultLayout'
 import JWTKeysLayout from '@/components/layouts/JWTKeys/JWTKeysLayout'
 import SettingsLayout from '@/components/layouts/ProjectSettingsLayout/SettingsLayout'
+import { AlertError } from '@/components/ui/AlertError'
 import { LocalSetupGuide } from '@/components/ui/LocalSetupGuide'
 import { NoPermission } from '@/components/ui/NoPermission'
-import { useAsyncCheckPermissions } from '@/hooks/misc/useCheckPermissions'
 import { useDeploymentMode } from '@/hooks/misc/useDeploymentMode'
 import { DOCS_URL } from '@/lib/constants'
+import { useGrant } from '@/lib/grants'
 import type { NextPageWithLayout } from '@/types'
 
 const JWTSigningKeysPage: NextPageWithLayout = () => {
   const { isCli, isSelfHosted } = useDeploymentMode()
-  const { can: canReadAPIKeys, isSuccess: isPermissionsLoaded } = useAsyncCheckPermissions(
-    PermissionAction.READ,
-    'auth_signing_keys'
-  )
+  const { ref: projectRef } = useParams()
+  const signingKeysGrant = useGrant('GET /v1/projects/{ref}/config/auth/signing-keys', {
+    projectRef,
+  })
 
   if (!IS_PLATFORM) {
     return (
@@ -53,13 +53,17 @@ const JWTSigningKeysPage: NextPageWithLayout = () => {
 
   return (
     <>
-      {!isPermissionsLoaded ? (
-        <GenericSkeletonLoader />
-      ) : !canReadAPIKeys ? (
+      {signingKeysGrant.status === 'loading' && <GenericSkeletonLoader />}
+      {signingKeysGrant.status === 'denied' && (
         <NoPermission isFullPage resourceText="access your project's API keys" />
-      ) : (
-        <JWTSecretKeysTable />
       )}
+      {signingKeysGrant.status === 'error' && (
+        <AlertError
+          error={signingKeysGrant.error}
+          subject="Failed to check JWT signing keys permissions"
+        />
+      )}
+      {signingKeysGrant.status === 'granted' && <JWTSecretKeysTable />}
     </>
   )
 }

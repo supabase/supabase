@@ -140,8 +140,8 @@ export const TimestampInfo = ({
           })
         }}
         className={cn(
-          'relative cursor-pointer flex gap-y-2 gap-x-0.5 hover:bg-surface-100 px-2 py-1 group',
-          { 'bg-surface-100': copied }
+          'relative cursor-pointer flex gap-y-2 gap-x-0.5 hover:bg-muted px-2 py-1 group',
+          { 'bg-muted': copied }
         )}
       >
         <div className="flex items-center gap-x-2 text-left truncate">
@@ -151,11 +151,17 @@ export const TimestampInfo = ({
         <div className="relative flex items-center gap-x-2 grow">
           <div className="border-t w-full border-dashed z-10" />
           {copied && (
-            <span className="flex items-center justify-end w-full absolute inset-0 flex items-right text-brand-600 bg-surface-100">
+            <span className="flex items-center justify-end w-full absolute inset-0 text-brand-600">
               Copied!
             </span>
           )}
-          <span className="flex items-center gap-x-2 justify-end whitespace-nowrap">{value}</span>
+          <span
+            className={cn('flex items-center gap-x-2 justify-end whitespace-nowrap', {
+              invisible: copied,
+            })}
+          >
+            {value}
+          </span>
         </div>
       </div>
     )

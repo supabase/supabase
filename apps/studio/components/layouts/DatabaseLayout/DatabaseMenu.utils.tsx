@@ -1,7 +1,7 @@
 import { useParams } from 'common'
 
 import { useIsColumnLevelPrivilegesEnabled } from '@/components/interfaces/App/FeaturePreview/FeaturePreviewContext'
-import { useIsETLPrivateAlpha } from '@/components/interfaces/Database/Replication/useIsETLPrivateAlpha'
+import { useIsPipelinesEnabled } from '@/components/interfaces/Database/Replication/useIsPipelinesEnabled'
 import type {
   ProductMenuGroup,
   ProductMenuGroupItem,
@@ -26,7 +26,7 @@ export const useGenerateDatabaseMenu = (): ProductMenuGroup[] => {
 
   const pitrEnabled = addons?.selected_addons.some((addon) => addon.type === 'pitr') ?? false
   const columnLevelPrivileges = useIsColumnLevelPrivilegesEnabled()
-  const enablePgReplicate = useIsETLPrivateAlpha()
+  const enablePgReplicate = useIsPipelinesEnabled()
 
   const getDatabaseURL = (path: string) => `/project/${ref}/database/${path}`
 
@@ -123,9 +123,9 @@ export const useGenerateDatabaseMenu = (): ProductMenuGroup[] => {
       items: [
         IS_PLATFORM &&
           showPgReplicate && {
-            name: 'Replication',
-            key: 'replication',
-            url: getDatabaseURL('replication'),
+            name: 'Pipelines',
+            key: 'pipelines',
+            url: getDatabaseURL('pipelines'),
             label: enablePgReplicate ? 'New' : undefined,
             shortcutId: SHORTCUT_IDS.NAV_DATABASE_REPLICATION,
           },

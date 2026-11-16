@@ -49,6 +49,7 @@ export const UnshareSnippetModal = ({
         projectRef,
         payload: {
           ...snippet,
+          description: snippet.description ?? undefined,
           visibility: 'user',
           folder_id: null,
           content: snippetContent,

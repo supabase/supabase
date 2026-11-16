@@ -76,9 +76,7 @@ export const SendMessageModal = ({
           </div>
         </DialogSection>
         <DialogFooter>
-          <Button onClick={onSelectCancel} variant="default">
-            Cancel
-          </Button>
+          <Button onClick={onSelectCancel}>Cancel</Button>
           <Button
             onClick={() => {
               const payload = tryParseJson(values.payload)

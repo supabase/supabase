@@ -1,8 +1,7 @@
-import { PermissionAction } from '@supabase/shared-types/out/constants'
 import { useQueryClient } from '@tanstack/react-query'
 import { useParams } from 'common'
 import { groupBy, isEqual, isNull } from 'lodash'
-import { Plus, RefreshCw, Save } from 'lucide-react'
+import { PlusIcon, RefreshCwIcon, SaveIcon } from 'lucide-react'
 import { DragEvent, useEffect, useState } from 'react'
 import { toast } from 'sonner'
 import { Button, cn, DropdownMenu, DropdownMenuContent, DropdownMenuTrigger, LogoLoader } from 'ui'
@@ -27,7 +26,10 @@ import {
   UpsertContentPayload,
   useContentUpsertMutation,
 } from '@/data/content/content-upsert-mutation'
-import { useAsyncCheckPermissions } from '@/hooks/misc/useCheckPermissions'
+import {
+  FGA_PERMISSIONS,
+  useAsyncCheckUserContentPermissions,
+} from '@/hooks/misc/useCheckPermissionsV2'
 import { useSelectedProjectQuery } from '@/hooks/misc/useSelectedProject'
 import { usePreventNavigationOnUnsavedChanges } from '@/hooks/ui/usePreventNavigationOnUnsavedChanges'
 import { Metric, TIME_PERIODS_REPORTS } from '@/lib/constants/metrics'
@@ -78,29 +80,30 @@ const Reports = () => {
   )
   const currentReportContent = currentReport?.content as Dashboards.Content
 
-  const { can: canReadReport, isLoading: isLoadingPermissions } = useAsyncCheckPermissions(
-    PermissionAction.READ,
-    'user_content',
-    {
-      resource: {
-        type: 'report',
-        visibility: currentReport?.visibility,
-        owner_id: currentReport?.owner_id,
-      },
-      subject: { id: profile?.id },
-    }
-  )
-  const { can: canUpdateReport } = useAsyncCheckPermissions(
-    PermissionAction.UPDATE,
-    'user_content',
-    {
-      resource: {
-        type: 'report',
-        visibility: currentReport?.visibility,
-        owner_id: currentReport?.owner_id,
-      },
-      subject: { id: profile?.id },
-    }
+  const { can: canReadReport, isLoading: isLoadingPermissions } =
+    useAsyncCheckUserContentPermissions(
+      FGA_PERMISSIONS.PROJECT.SNIPPETS_READ,
+      currentReport
+        ? {
+            mode: 'existing',
+            type: 'report',
+            visibility: currentReport.visibility,
+            ownerId: currentReport.owner_id,
+            subjectId: profile?.id,
+          }
+        : undefined
+    )
+  const { can: canUpdateReport } = useAsyncCheckUserContentPermissions(
+    FGA_PERMISSIONS.PROJECT.SNIPPETS_WRITE,
+    currentReport
+      ? {
+          mode: 'existing',
+          type: 'report',
+          visibility: currentReport.visibility,
+          ownerId: currentReport.owner_id,
+          subjectId: profile?.id,
+        }
+      : undefined
   )
 
   function handleDateRangePicker({ period_start, period_end }: any) {
@@ -258,7 +261,11 @@ const Reports = () => {
     if (config === undefined) return console.error('Config is required')
     upsertContent({
       projectRef: ref,
-      payload: { ...currentReport, content: config },
+      payload: {
+        ...currentReport,
+        description: currentReport.description ?? undefined,
+        content: config,
+      },
     })
   }
 
@@ -382,16 +389,12 @@ const Reports = () => {
           </div>
           {hasEdits && (
             <div className="flex items-center gap-x-2">
-              <Button
-                variant="default"
-                disabled={isSaving}
-                onClick={() => setConfig(currentReportContent)}
-              >
+              <Button disabled={isSaving} onClick={() => setConfig(currentReportContent)}>
                 Cancel
               </Button>
               <Button
                 variant="primary"
-                icon={<Save />}
+                icon={<SaveIcon />}
                 loading={isSaving}
                 onClick={() => onSaveReport()}
               >
@@ -423,8 +426,7 @@ const Reports = () => {
           <div className="flex items-center gap-x-2">
             <DocsButton href={OBSERVABILITY_DOCS_HREFS.customReport} topic={reportTitle} />
             <ButtonTooltip
-              variant="default"
-              icon={<RefreshCw className={isRefreshing ? 'animate-spin' : ''} />}
+              icon={<RefreshCwIcon className={isRefreshing ? 'animate-spin' : ''} />}
               className="w-7"
               disabled={isRefreshing}
               tooltip={{ content: { side: 'bottom', text: 'Refresh report' } }}
@@ -433,7 +435,7 @@ const Reports = () => {
             {canUpdateReport ? (
               <DropdownMenu>
                 <DropdownMenuTrigger asChild>
-                  <Button variant="default" icon={<Plus />}>
+                  <Button icon={<PlusIcon />}>
                     <span>Add block</span>
                   </Button>
                 </DropdownMenuTrigger>
@@ -444,8 +446,7 @@ const Reports = () => {
             ) : (
               <ButtonTooltip
                 disabled
-                variant="default"
-                icon={<Plus />}
+                icon={<PlusIcon />}
                 tooltip={{
                   content: {
                     side: 'bottom',
@@ -474,9 +475,7 @@ const Reports = () => {
             {canUpdateReport ? (
               <DropdownMenu>
                 <DropdownMenuTrigger asChild>
-                  <Button variant="default" iconRight={<Plus size={14} />}>
-                    Add your first chart
-                  </Button>
+                  <Button iconRight={<PlusIcon size={14} />}>Add your first chart</Button>
                 </DropdownMenuTrigger>
                 <DropdownMenuContent side="bottom" align="center">
                   <MetricOptions config={config} handleChartSelection={handleChartSelection} />

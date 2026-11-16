@@ -1,4 +1,4 @@
-import { AnimatePresence, motion, useReducedMotion } from 'framer-motion'
+import { AnimatePresence, motion, useReducedMotion } from 'motion/react'
 import { useState } from 'react'
 
 import { useBannerStack } from './BannerStackProvider'

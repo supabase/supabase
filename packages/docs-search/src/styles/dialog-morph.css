@@ -1,0 +1,88 @@
+::view-transition-group(search-dialog),
+::view-transition-old(search-dialog),
+::view-transition-new(search-dialog) {
+  animation-duration: 200ms;
+  animation-timing-function: cubic-bezier(0.23, 1, 0.32, 1);
+}
+
+::view-transition-image-pair(search-dialog) {
+  overflow: clip;
+  border-radius: var(--radius-lg);
+}
+
+/* the clip above also cuts the dialog's own shadow from the snapshots, so the group draws it */
+::view-transition-group(search-dialog) {
+  border-radius: var(--radius-lg);
+  box-shadow: var(--shadow-codeblock);
+}
+
+::view-transition-image-pair(search-dialog-icon),
+::view-transition-image-pair(search-dialog-input) {
+  overflow: clip;
+}
+
+/* the inputs can differ in width when a clear button shows, so the text keeps its size */
+::view-transition-old(search-dialog-input),
+::view-transition-new(search-dialog-input) {
+  width: auto;
+  height: 100%;
+  object-fit: none;
+  object-position: left center;
+}
+
+::view-transition-old(search-dialog-icon),
+::view-transition-old(search-dialog-input),
+::view-transition-new(search-dialog-icon),
+::view-transition-new(search-dialog-input) {
+  animation-duration: 200ms;
+  animation-timing-function: cubic-bezier(0.23, 1, 0.32, 1);
+  animation-fill-mode: both;
+}
+
+html[data-search-dialog-morph='ask-ai']::view-transition-old(search-dialog-icon),
+html[data-search-dialog-morph='ask-ai']::view-transition-old(search-dialog-input) {
+  animation-name: search-dialog-roll-out-up;
+}
+
+html[data-search-dialog-morph='ask-ai']::view-transition-new(search-dialog-icon),
+html[data-search-dialog-morph='ask-ai']::view-transition-new(search-dialog-input) {
+  animation-name: search-dialog-roll-in-up;
+}
+
+html[data-search-dialog-morph='search']::view-transition-old(search-dialog-icon),
+html[data-search-dialog-morph='search']::view-transition-old(search-dialog-input) {
+  animation-name: search-dialog-roll-out-down;
+}
+
+html[data-search-dialog-morph='search']::view-transition-new(search-dialog-icon),
+html[data-search-dialog-morph='search']::view-transition-new(search-dialog-input) {
+  animation-name: search-dialog-roll-in-down;
+}
+
+@keyframes search-dialog-roll-out-up {
+  to {
+    translate: 0 -14px;
+    opacity: 0;
+  }
+}
+
+@keyframes search-dialog-roll-in-up {
+  from {
+    translate: 0 14px;
+    opacity: 0;
+  }
+}
+
+@keyframes search-dialog-roll-out-down {
+  to {
+    translate: 0 14px;
+    opacity: 0;
+  }
+}
+
+@keyframes search-dialog-roll-in-down {
+  from {
+    translate: 0 -14px;
+    opacity: 0;
+  }
+}

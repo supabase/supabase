@@ -5,7 +5,7 @@
 // other fragments that originate from URL parameters, UI inputs, or LLM output
 // can be spliced into SQL that is executed on behalf of the project. The pattern
 // here mirrors the pg-meta safe-SQL model described in
-// .claude/skills/safe-sql-execution/SKILL.md: every value that flows from an
+// .agents/skills/safe-sql-execution/SKILL.md: every value that flows from an
 // external source must pass through a sanitization helper before being
 // interpolated, and the wire boundary (`executeAnalyticsSql`) refuses plain
 // strings at compile time.

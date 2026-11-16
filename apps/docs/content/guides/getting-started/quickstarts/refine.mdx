@@ -44,7 +44,7 @@ Create a `.env` file and populate it with your Supabase URL and publishable key,
   </a>
 </Button>
 
-```text name=.env
+```dotenv name=.env
 VITE_SUPABASE_URL=<SUBSTITUTE_SUPABASE_URL>
 VITE_SUPABASE_PUBLISHABLE_KEY=<SUBSTITUTE_SUPABASE_PUBLISHABLE_KEY>
 ```
@@ -107,15 +107,15 @@ import { BrowserRouter, Route, Routes } from 'react-router'
 
 import './App.css'
 
-import authProvider from './providers/auth'
-import { dataProvider } from './providers/data'
-import { supabaseClient } from './providers/supabase-client'
 import {
   InstrumentsCreate,
   InstrumentsEdit,
   InstrumentsList,
   InstrumentsShow,
 } from './pages/instruments'
+import authProvider from './providers/auth'
+import { dataProvider } from './providers/data'
+import { supabaseClient } from './providers/supabase-client'
 
 function App() {
   return (
@@ -163,9 +163,9 @@ export default App
 
 ## 8. Allow writes to the instruments table
 
-The scaffolded pages create and edit instruments, but the database setup in step 2 grants read access only. Without write privileges and matching policies, the create and edit pages fail with `permission denied for table instruments`.
+The scaffolded pages create and edit instruments, but the database setup in step 2 grants read access only. Without write privileges and matching policies, the create and edit pages fail with `permission denied for table instruments`. For more on this error, see [Database API 42501 errors](/kb/troubleshooting/database-api-42501-errors).
 
-Run the following in the [SQL Editor](/dashboard/project/_/sql/new) to grant the privileges and add the policies:
+Grant the privileges and add the policies. Run the following SQL using the [SQL Editor](/dashboard/project/_/sql) in the Supabase Dashboard or with `psql` over a direct connection. To connect with `psql`, see [Direct connection](/docs/guides/database/connecting-to-postgres#direct-connection).
 
 ```sql SQL_EDITOR
 grant insert, update, delete on public.instruments to anon;

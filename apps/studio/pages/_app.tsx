@@ -32,20 +32,25 @@ import utc from 'dayjs/plugin/utc'
 import { DevToolbar, DevToolbarProvider, DevToolbarTrigger, type ExtraTab } from 'dev-tools'
 import dynamic from 'next/dynamic'
 import Head from 'next/head'
+import { useRouter } from 'next/router'
 import { NuqsAdapter } from 'nuqs/adapters/next/pages'
 import { ErrorInfo, useCallback, useEffect, useState, type ComponentProps } from 'react'
 import { ErrorBoundary } from 'react-error-boundary'
 import { TooltipProvider } from 'ui'
 import { TimestampInfoProvider } from 'ui-patterns/TimestampInfo'
 
+import { RecoveryReminderController } from '@/components/interfaces/Account/RecoveryReminderController'
+import { AppearanceSettingsProvider } from '@/components/interfaces/App/AppearanceSettingsProvider'
 import { StudioCommandMenu } from '@/components/interfaces/App/CommandMenu'
 import { StudioCommandProvider as CommandProvider } from '@/components/interfaces/App/CommandMenu/StudioCommandProvider'
 import { FeaturePreviewContextProvider } from '@/components/interfaces/App/FeaturePreview/FeaturePreviewContext'
 import { FeaturePreviewModal } from '@/components/interfaces/App/FeaturePreview/FeaturePreviewModal'
+import { IndirectTaxDeclarationModal } from '@/components/interfaces/App/IndirectTaxDeclarationModal'
 import { MonacoThemeProvider } from '@/components/interfaces/App/MonacoThemeProvider'
 import { RouteValidationWrapper } from '@/components/interfaces/App/RouteValidationWrapper'
 import { MainScrollContainerProvider } from '@/components/layouts/MainScrollContainerContext'
 import { BannerStackProvider } from '@/components/ui/BannerStack/BannerStackProvider'
+import { clearBootTimeoutFallback } from '@/components/ui/BootTimeoutFallback/BootTimeoutFallback'
 import { GlobalErrorBoundaryState } from '@/components/ui/ErrorBoundary/GlobalErrorBoundaryState'
 import { GlobalShortcuts } from '@/components/ui/GlobalShortcuts/GlobalShortcuts'
 import { getCLIReleaseVersion } from '@/data/misc/cli-release-version-query'
@@ -53,7 +58,10 @@ import { useRootQueryClient } from '@/data/query-client'
 import { inter, manrope, sourceCodePro } from '@/fonts'
 import { useCustomContent } from '@/hooks/custom-content/useCustomContent'
 import { useSelectedOrganizationQuery } from '@/hooks/misc/useSelectedOrganization'
+import { useSelectedOrganizationCreatedAtQuery } from '@/hooks/misc/useSelectedOrganizationCreatedAt'
 import { AuthProvider } from '@/lib/auth'
+import { getChunkLoadReloadDecision, isChunkLoadError } from '@/lib/chunk-load-error'
+import { toUnixSecondsString } from '@/lib/configcat-attributes'
 import { configureMonacoLoader } from '@/lib/configure-monaco-loader'
 import { API_URL, BASE_PATH, IS_PLATFORM, useDefaultProvider } from '@/lib/constants'
 import { TimezoneProvider, useTimezone } from '@/lib/datetime'
@@ -86,8 +94,13 @@ const ProjectStatusTab = IS_DEV_TOOLBAR_ENABLED
     )
   : () => null
 
+const MetricsTab = IS_DEV_TOOLBAR_ENABLED
+  ? dynamic(() => import('@/components/ui/DevToolbar/MetricsTab').then((m) => m.MetricsTab))
+  : () => null
+
 const devToolbarExtraTabs: ExtraTab[] = IS_DEV_TOOLBAR_ENABLED
   ? [
+      { id: 'metrics', label: 'Metrics', content: <MetricsTab /> },
       { id: 'warnings', label: 'Warnings', content: <ResourceWarningsTab /> },
       { id: 'project-status', label: 'Project Status', content: <ProjectStatusTab /> },
     ]
@@ -98,6 +111,7 @@ const FeatureFlagProviderWithOrgContext = ({
   ...props
 }: ComponentProps<typeof FeatureFlagProvider>) => {
   const { data: selectedOrganization } = useSelectedOrganizationQuery({ enabled: IS_PLATFORM })
+  const { data: organizationCreatedAt } = useSelectedOrganizationCreatedAtQuery()
   const cloudProvider = useDefaultProvider()
 
   const getConfigCatFlags = useCallback(
@@ -105,9 +119,17 @@ const FeatureFlagProviderWithOrgContext = ({
       const customAttributes: Record<string, string> = {}
       if (cloudProvider) customAttributes.cloud_provider = cloudProvider
       if (selectedOrganization?.plan?.id) customAttributes.plan = selectedOrganization.plan.id
+      if (selectedOrganization?.slug) customAttributes.organization_slug = selectedOrganization.slug
+      const createdAtUnixSeconds = toUnixSecondsString(organizationCreatedAt)
+      if (createdAtUnixSeconds) customAttributes.organization_created_at = createdAtUnixSeconds
       return getFlags(userEmail, customAttributes)
     },
-    [cloudProvider, selectedOrganization?.plan?.id]
+    [
+      cloudProvider,
+      selectedOrganization?.plan?.id,
+      selectedOrganization?.slug,
+      organizationCreatedAt,
+    ]
   )
 
   return (
@@ -134,6 +156,7 @@ configureMonacoLoader()
 // the dashboard, all other layout components should not be doing that
 
 function CustomApp({ Component, pageProps }: AppPropsWithLayout) {
+  const recoveryRouter = useRouter()
   const queryClient = useRootQueryClient()
   const { appTitle } = useCustomContent(['app:title'])
   const [isCLI, setIsCLI] = useState(false)
@@ -141,8 +164,16 @@ function CustomApp({ Component, pageProps }: AppPropsWithLayout) {
   const getLayout = Component.getLayout ?? ((page) => page)
 
   const errorBoundaryHandler = (error: Error, _info: ErrorInfo) => {
+    // A chunk failure a reload recovers from isn't worth reporting; one that
+    // recurs inside the reload guard window is reported below
+    if (getChunkLoadReloadDecision(error)) {
+      window.location.reload()
+      return
+    }
+
     Sentry.withScope(function (scope) {
       scope.setTag('globalErrorBoundary', true)
+      if (isChunkLoadError(error)) scope.setTag('chunkLoadError', true)
       const eventId = Sentry.captureException(error)
       // Attach the Sentry event ID to the error object so it can be accessed by the error boundary
       if (eventId && error && typeof error === 'object') {
@@ -155,10 +186,21 @@ function CustomApp({ Component, pageProps }: AppPropsWithLayout) {
 
   useThemeSandbox()
 
+  useEffect(() => {
+    clearBootTimeoutFallback()
+  }, [])
+
   const isTestEnv = process.env.NEXT_PUBLIC_NODE_ENV === 'test'
 
   // [Joshen] Should target hosted staging, local dev, and local CLI only
   const isNonProdEnv = (IS_PLATFORM && process.env.NEXT_PUBLIC_ENVIRONMENT !== 'prod') || isCLI
+  const isLocalEnv =
+    process.env.NODE_ENV === 'development' ||
+    process.env.NEXT_PUBLIC_ENVIRONMENT === 'local' ||
+    isCLI
+  let faviconRoute = '/favicon'
+  if (isNonProdEnv) faviconRoute = '/favicon/staging'
+  if (isLocalEnv) faviconRoute = '/favicon/local'
 
   const checkCliEnvironment = async () => {
     const data = await getCLIReleaseVersion()
@@ -202,7 +244,7 @@ function CustomApp({ Component, pageProps }: AppPropsWithLayout) {
                       <MetaFaviconsPagesRouter
                         includeManifest
                         applicationName="Supabase Studio"
-                        route={isNonProdEnv ? '/favicon/staging' : '/favicon'}
+                        route={faviconRoute}
                       />
                       <TooltipProvider>
                         <RouteValidationWrapper>
@@ -213,15 +255,19 @@ function CustomApp({ Component, pageProps }: AppPropsWithLayout) {
                                   <BannerStackProvider>
                                     <FeaturePreviewContextProvider>
                                       <MainScrollContainerProvider>
-                                        {getLayout(<Component {...pageProps} />)}
+                                        <RecoveryReminderController href={recoveryRouter.asPath}>
+                                          {getLayout(<Component {...pageProps} />)}
+                                        </RecoveryReminderController>
                                       </MainScrollContainerProvider>
                                       <GlobalShortcuts />
                                       <StudioCommandMenu />
                                       <FeaturePreviewModal />
+                                      <IndirectTaxDeclarationModal />
                                     </FeaturePreviewContextProvider>
                                   </BannerStackProvider>
                                   <Toaster />
                                   <MonacoThemeProvider />
+                                  <AppearanceSettingsProvider />
                                 </CommandProvider>
                               </AiAssistantStateContextProvider>
                               <DevToolbar extraTabs={devToolbarExtraTabs} />

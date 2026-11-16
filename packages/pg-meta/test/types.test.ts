@@ -103,11 +103,8 @@ const OPTION_MATRIX = [
 ]
 
 withTestDatabase(
-  'scoped types.list matches legacy for all option combos (enums, composites, dropped attrs, array types)',
+  'types.list is oid-ordered and handles enums, composites, and dropped attrs',
   async ({ executeQuery }) => {
-    // Fixture coverage: multi-label enum with a NON-alphabetical label order (so
-    // enumsortorder matters), a composite type with a dropped attribute, and a
-    // composite referencing the enum.
     await executeQuery(`
       create type color as enum ('red', 'green', 'blue', 'yellow');
       create type shipment as (id int8, note text, tossme int, color color);
@@ -115,26 +112,14 @@ withTestDatabase(
       create type point3 as (x float8, y float8, z float8);
     `)
 
-    // Legacy types.list has no ORDER BY (plan-dependent row order), so sort ONLY
-    // the legacy side by id (t.oid) to match the scoped `order by t.oid`.
     for (const { label, options } of OPTION_MATRIX) {
-      const legacy = await pgMeta.types.list(options)
-      const scoped = await pgMeta.types.list({ ...options, scoped: true })
-
-      const legacyRes = [...legacy.zod.parse(await executeQuery(legacy.sql))].sort(
-        (a, b) => a.id - b.id
-      )
-      const scopedRes = scoped.zod.parse(await executeQuery(scoped.sql))
-
-      expect(scopedRes, `option combo: ${label}`).toEqual(legacyRes)
-      // Scoped is already in t.oid order raw (no scoped-side sort).
-      const scopedIds = scopedRes.map((t) => t.id)
-      expect(scopedIds, `${label} oid-ordered`).toEqual([...scopedIds].sort((a, b) => a - b))
+      const { sql, zod } = await pgMeta.types.list(options)
+      const res = zod.parse(await executeQuery(sql))
+      const ids = res.map((t) => t.id)
+      expect(ids, `${label} oid-ordered`).toEqual([...ids].sort((a, b) => a - b))
     }
 
-    // Sanity: the enum/composite fixtures actually surface with correct
-    // ordering + dropped-attribute handling in the scoped path.
-    const { sql, zod } = await pgMeta.types.list({ includedSchemas: ['public'], scoped: true })
+    const { sql, zod } = await pgMeta.types.list({ includedSchemas: ['public'] })
     const res = zod.parse(await executeQuery(sql))
     expect(res.find((t) => t.name === 'color')?.enums).toEqual(['red', 'green', 'blue', 'yellow'])
     expect(res.find((t) => t.name === 'shipment')?.attributes.map((a) => a.name)).toEqual([

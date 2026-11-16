@@ -49,8 +49,8 @@ export const BannerTableEditorQueueOperations = () => {
               </div>
 
               <div className="flex gap-2 py-0.5">
-                <span className="text-brand-link select-none font-medium">+</span>
-                <span className="text-brand-link truncate max-w-full">Blue</span>
+                <span className="text-primary select-none font-medium">+</span>
+                <span className="text-primary truncate max-w-full">Blue</span>
               </div>
             </CardContent>
           </Card>
@@ -61,9 +61,10 @@ export const BannerTableEditorQueueOperations = () => {
             Batch multiple row edits and review them before saving to your database
           </p>
         </div>
-        <Button asChild variant="default" className="w-min">
+        <Button asChild className="w-min">
           <Link href={DASHBOARD_SETTINGS_URL}>
-            {isQueueOperationsEnabled ? 'View' : 'Enable in'} preferences
+            {isQueueOperationsEnabled ? <span>View</span> : <span>Enable in</span>}{' '}
+            <span>preferences</span>
           </Link>
         </Button>
       </div>

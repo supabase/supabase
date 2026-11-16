@@ -4,13 +4,14 @@ import { replicaKeys } from './keys'
 import type { components } from '@/data/api'
 import { get, handleError } from '@/data/fetchers'
 import { IS_PLATFORM } from '@/lib/constants'
-import type { ResponseError, UseCustomQueryOptions } from '@/types'
+import type { StudioError } from '@/lib/errors/studio-errors'
+import type { UseCustomQueryOptions } from '@/types'
 
 export type LoadBalancersVariables = {
   projectRef?: string
 }
 
-export type LoadBalancer = components['schemas']['LoadBalancerDetailResponse']
+export type LoadBalancer = components['schemas']['LoadBalancerDetailResponse_Output']
 
 export async function getLoadBalancers(
   { projectRef }: LoadBalancersVariables,
@@ -28,7 +29,7 @@ export async function getLoadBalancers(
 }
 
 export type LoadBalancersData = Awaited<ReturnType<typeof getLoadBalancers>>
-export type LoadBalancersError = ResponseError
+export type LoadBalancersError = StudioError
 
 export const useLoadBalancersQuery = <TData = LoadBalancersData>(
   { projectRef }: LoadBalancersVariables,

@@ -1,4 +1,5 @@
 import { CubeIcon } from '@heroicons/react/outline'
+import { DASHBOARD_SIGN_UP_URL } from '@/lib/dashboard-links'
 import { useBreakpoint } from 'common'
 import {
   ArrowLeftRight,
@@ -134,7 +135,7 @@ const data: () => {
       ctas: [
         {
           label: 'Start Building',
-          href: 'https://supabase.com/dashboard',
+          href: DASHBOARD_SIGN_UP_URL,
           type: 'primary' as any,
           onClick: () =>
             sendTelemetryEvent({
@@ -203,7 +204,7 @@ const data: () => {
         },
         {
           name: 'Claude & Cursor',
-          description: 'AI-powered local development',
+          description: 'AI-powered local development, one local project per git worktree',
         },
         {
           name: 'Figma',
@@ -751,7 +752,7 @@ const data: () => {
           description: 'Start free with any AI builder + Supabase',
           cta: {
             label: 'Create Your First App in 5 Minutes',
-            href: 'https://supabase.com/dashboard',
+            href: DASHBOARD_SIGN_UP_URL,
           },
         },
         {

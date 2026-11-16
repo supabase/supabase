@@ -1,6 +1,5 @@
 import { ReactNode } from 'react'
 
-import { OngoingQueriesPanel } from '@/components/interfaces/SQLEditor/OngoingQueriesPanel'
 import { SqlEditorManualSaveNoticeDialog } from '@/components/interfaces/SQLEditor/SqlEditorManualSaveNoticeDialog'
 import { withAuth } from '@/hooks/misc/withAuth'
 
@@ -12,7 +11,6 @@ const SQLEditorLayout = ({ children }: SQLEditorLayoutProps) => {
   return (
     <>
       {children}
-      <OngoingQueriesPanel />
       <SqlEditorManualSaveNoticeDialog />
     </>
   )

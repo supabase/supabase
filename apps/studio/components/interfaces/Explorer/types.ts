@@ -1,9 +1,13 @@
+import { type SqlSnippetSource } from '../SQLEditor/querySource'
 import { type ChartConfig } from '@/data/content/notebooks/notebook-schema'
 
 export type QueryResult = {
   rows?: readonly Record<string, unknown>[]
   error?: { message: string; formattedError?: string }
   autoLimit?: number
+  /** The query that was submitted to produce this result, snapshotted at run time. */
+  sql?: string
+  source?: SqlSnippetSource
 }
 
 /**

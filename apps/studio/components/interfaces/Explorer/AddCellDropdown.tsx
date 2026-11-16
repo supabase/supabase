@@ -1,4 +1,4 @@
-import { FileText, Plus, SquareCode } from 'lucide-react'
+import { FileTextIcon, PlusIcon, SquareCodeIcon } from 'lucide-react'
 import { DropdownMenu, DropdownMenuContent, DropdownMenuItem, DropdownMenuTrigger } from 'ui'
 
 import { createMarkdownCellSkeleton, createQueryCellSkeleton } from './utils'
@@ -28,18 +28,18 @@ export const AddCellDropdown = ({ cellId }: AddCellDropdownProps) => {
         <ButtonTooltip
           variant="text"
           className="w-7"
-          icon={<Plus />}
+          icon={<PlusIcon />}
           tooltip={{ content: { side: 'bottom', text: 'Add cell' } }}
         />
       </DropdownMenuTrigger>
       <DropdownMenuContent align="start" className="w-40">
         <DropdownMenuItem className="gap-x-2" onClick={() => onSelectAddCell('query')}>
-          <SquareCode size={14} />
-          <span>Add query cell</span>
+          <SquareCodeIcon size={14} />
+          <span>Add query</span>
         </DropdownMenuItem>
         <DropdownMenuItem className="gap-x-2" onClick={() => onSelectAddCell('markdown')}>
-          <FileText size={14} />
-          <span>Add markdown cell</span>
+          <FileTextIcon size={14} />
+          <span>Add markdown</span>
         </DropdownMenuItem>
       </DropdownMenuContent>
     </DropdownMenu>
