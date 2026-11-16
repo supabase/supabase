@@ -232,7 +232,7 @@ export const LogsViewsMenu = ({
                   icon={BookmarkIcon}
                   iconSize={20}
                   title="No saved views"
-                  description="Start by configuring 2 or more filters."
+                  description="Save your current filters as a view."
                   className="border-0 bg-transparent px-4 py-6"
                   contentClassName="gap-y-1 [&_h3]:text-sm [&_p]:text-xs"
                 >
@@ -247,7 +247,7 @@ export const LogsViewsMenu = ({
                         onSaveCurrentView?.()
                       }}
                     >
-                      Save current filters as a view
+                      Save view
                     </Button>
                   )}
                 </EmptyStatePresentational>
