@@ -3,10 +3,10 @@ import { beforeEach, describe, expect, it, vi } from 'vitest'
 
 import { PlanUpdateSidePanel } from './PlanUpdateSidePanel'
 import { MANAGED_BY } from '@/lib/constants/infrastructure'
-import { createMockOrganization, render } from '@/tests/helpers'
+import { createMockOrganization } from '@/tests/helpers'
+import { customRender } from '@/tests/lib/custom-render'
 
 const mockSelectedOrganization = vi.hoisted(() => vi.fn())
-const mockPush = vi.hoisted(() => vi.fn())
 const mockPartnerManagedResource = vi.hoisted(() => vi.fn())
 
 vi.mock('common', async (importOriginal) => {
@@ -21,9 +21,11 @@ vi.mock('next/router', () => ({
   useRouter: () => ({
     pathname: '/org/[slug]/billing',
     query: {},
-    push: mockPush,
   }),
 }))
+
+const render = (ui: React.ReactElement) =>
+  customRender(ui, { nuqs: { searchParams: '?panel=subscriptionPlan' } })
 
 vi.mock('shared-data/plans', () => ({
   plans: [
@@ -61,13 +63,6 @@ vi.mock('@/lib/telemetry/track', () => ({
 vi.mock('@/hooks/misc/useCheckPermissionsV2', async (importOriginal) => ({
   ...(await importOriginal<typeof import('@/hooks/misc/useCheckPermissionsV2')>()),
   useAsyncCheckPermissionsV2: () => ({ can: true }),
-}))
-
-vi.mock('@/state/organization-settings', () => ({
-  useOrgSettingsPageStateSnapshot: () => ({
-    panelKey: 'subscriptionPlan',
-    setPanelKey: vi.fn(),
-  }),
 }))
 
 vi.mock('@/data/projects/org-projects-infinite-query', () => ({

@@ -22,7 +22,7 @@ catalog:
   '@tanstack/react-router': ^1.170.44
   '@tanstack/react-start': ^1.169.2
   '@tanstack/react-table': ^8.21.3
-  '@types/node': ^22.0.0
+  '@types/node': ^24.0.0
   '@types/react': ^19.2.14
   '@types/react-dom': ^19.2.3
   # TypeScript 7 has no programmatic API until 7.1, so `typescript` stays aliased
