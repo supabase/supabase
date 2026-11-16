@@ -91,6 +91,13 @@ jobs:
           cd docker
           sh tests/test-functions-cors.sh
 
+      - name: Run response sanitization tests
+        shell: bash
+        run: |
+          set -euo pipefail
+          cd docker
+          sh tests/test-response-sanitization.sh
+
       - name: Run S3 protocol tests
         shell: bash
         run: |
