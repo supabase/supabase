@@ -1,9 +1,6 @@
 import { describe, expect, it } from 'vitest'
 
-import {
-  buildAlertIssueNotebookContent,
-  renderAlertIssueNotebook,
-} from './AlertIssueNotebook.utils'
+import { buildAlertIssueNotebookCells, renderAlertIssueNotebook } from './AlertIssueNotebook.utils'
 import type { AlertIssue } from '@/data/alert-issues/alert-issue.schema'
 
 const issue: AlertIssue = {
@@ -111,9 +108,9 @@ describe('renderAlertIssueNotebook', () => {
   })
 })
 
-describe('buildAlertIssueNotebookContent', () => {
+describe('buildAlertIssueNotebookCells', () => {
   it('starts with a markdown summary and keeps only runnable cells', () => {
-    const content = buildAlertIssueNotebookContent(
+    const cells = buildAlertIssueNotebookCells(
       {
         ...issue,
         notebook: [...(issue.notebook ?? []), { title: 'Bad', source: 'database', sql: '{{x}}' }],
@@ -121,20 +118,20 @@ describe('buildAlertIssueNotebookContent', () => {
       'http://localhost:8082/project/default/issues/alerts/a1'
     )
 
-    expect(content.schema_version).toBe(1)
-    expect(content.cells).toHaveLength(2)
-    expect(content.cells[0]).toMatchObject({ _tag: 'markdown_cell' })
-    const markdown = content.cells[0]._tag === 'markdown_cell' ? content.cells[0].text : ''
+    expect(cells).toHaveLength(2)
+    const [summary, query] = cells
+    expect(summary._tag).toBe('markdown_cell')
+    const markdown = summary._tag === 'markdown_cell' ? summary.text : ''
     expect(markdown).toContain('# RLS Disabled in Public: public.orders')
     expect(markdown).toContain('Table `public.orders` is public')
     expect(markdown).toContain('| table | orders |')
     expect(markdown).toContain(
       '[View alert issue](http://localhost:8082/project/default/issues/alerts/a1)'
     )
-    expect(content.cells[1]).toMatchObject({
+    expect(query).toMatchObject({
       _tag: 'database_cell',
       title: 'Exposed rows',
-      sql: "select count(*) from public.orders where note = 'orders';",
+      unchecked_sql: "select count(*) from public.orders where note = 'orders';",
       row_limit: 100,
     })
   })

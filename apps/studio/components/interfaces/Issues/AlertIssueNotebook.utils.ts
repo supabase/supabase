@@ -1,5 +1,10 @@
 import { ident, literal, untrustedSql, type UntrustedSqlFragment } from '@supabase/pg-meta'
 
+import {
+  createLogCellSkeleton,
+  createMarkdownCellSkeleton,
+  createQueryCellSkeleton,
+} from '@/components/interfaces/Explorer/utils'
 import type { AlertIssue } from '@/data/alert-issues/alert-issue.schema'
 import {
   analyticsLiteral,
@@ -7,6 +12,7 @@ import {
   untrustedLogSql,
   type UntrustedLogSqlFragment,
 } from '@/data/logs/safe-analytics-sql'
+import type { Notebooks } from '@/types'
 
 type Source = 'database' | 'logs'
 
@@ -72,21 +78,6 @@ export function renderAlertIssueNotebook(issue: AlertIssue): RenderedAlertIssueC
   })
 }
 
-export type AlertIssueNotebookDraftCell =
-  | { _tag: 'markdown_cell'; text: string }
-  | { _tag: 'database_cell'; title: string; sql: UntrustedSqlFragment; row_limit: number }
-  | {
-      _tag: 'log_cell'
-      title: string
-      sql: UntrustedLogSqlFragment
-      time_range: { _tag: 'relative_time_range'; unit: 'hour'; amount: number }
-    }
-
-export type AlertIssueNotebookDraft = {
-  schema_version: 1
-  cells: AlertIssueNotebookDraftCell[]
-}
-
 const escapeTableCell = (value: string) => value.replace(/\|/g, '\\|').replace(/\n/g, ' ')
 
 const summaryMarkdown = (issue: AlertIssue, alertIssueUrl: string) => {
@@ -108,32 +99,22 @@ const summaryMarkdown = (issue: AlertIssue, alertIssueUrl: string) => {
 }
 
 /**
- * The notebook created by "Open as notebook": a summary of the alert issue followed by its
- * runnable cells. Cells whose template could not be rendered are left out.
+ * The cells of the notebook created by "Open as notebook": a summary of the alert issue
+ * followed by its runnable cells. Cells whose template could not be rendered are left out.
  */
-export function buildAlertIssueNotebookContent(
+export function buildAlertIssueNotebookCells(
   issue: AlertIssue,
   alertIssueUrl: string
-): AlertIssueNotebookDraft {
-  const queryCells = renderAlertIssueNotebook(issue).flatMap(
-    (cell): AlertIssueNotebookDraftCell[] => {
-      if (cell.status !== 'ready') return []
-      if (cell.source === 'database') {
-        return [{ _tag: 'database_cell', title: cell.title, sql: cell.sql, row_limit: 100 }]
-      }
-      return [
-        {
-          _tag: 'log_cell',
-          title: cell.title,
-          sql: cell.sql,
-          time_range: { _tag: 'relative_time_range', unit: 'hour', amount: 24 },
-        },
-      ]
-    }
-  )
+): Notebooks.Content['cells'] {
+  const queryCells = renderAlertIssueNotebook(issue).flatMap((cell): Notebooks.Content['cells'] => {
+    if (cell.status !== 'ready') return []
+    return cell.source === 'database'
+      ? [createQueryCellSkeleton({ title: cell.title, sql: cell.sql })]
+      : [createLogCellSkeleton({ title: cell.title, sql: cell.sql })]
+  })
 
-  return {
-    schema_version: 1,
-    cells: [{ _tag: 'markdown_cell', text: summaryMarkdown(issue, alertIssueUrl) }, ...queryCells],
-  }
+  return [
+    createMarkdownCellSkeleton({ content: summaryMarkdown(issue, alertIssueUrl) }),
+    ...queryCells,
+  ]
 }

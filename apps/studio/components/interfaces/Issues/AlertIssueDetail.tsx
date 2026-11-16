@@ -9,6 +9,7 @@ import { GenericSkeletonLoader } from 'ui-patterns/ShimmeringLoader'
 
 import { AlertIssueComments } from './AlertIssueComments'
 import { AlertIssueLogEvents } from './AlertIssueLogEvents'
+import { AlertIssueNotebook } from './AlertIssueNotebook'
 import {
   ALERT_ISSUE_ACTION_LABELS,
   ALERT_ISSUE_STATUS_LABELS,
@@ -21,6 +22,7 @@ import {
   ExplorerToolbarIcon,
   ExplorerToolbarTitle,
 } from '@/components/interfaces/Explorer/ExplorerToolbar'
+import { Markdown } from '@/components/interfaces/Markdown'
 import { AlertError } from '@/components/ui/AlertError'
 import {
   useAlertIssueActionMutation,
@@ -33,6 +35,7 @@ type AlertIssueDetailViewProps = {
   issue: AlertIssue
   onAction: (action: AlertIssueAction) => void
   isUpdating?: boolean
+  investigation?: ReactNode
   children?: ReactNode
 }
 
@@ -43,6 +46,7 @@ export const AlertIssueDetailView = ({
   issue,
   onAction,
   isUpdating = false,
+  investigation,
   children,
 }: AlertIssueDetailViewProps) => {
   const detail = metadataText(issue.metadata, 'detail')
@@ -89,10 +93,11 @@ export const AlertIssueDetailView = ({
             </div>
           </header>
           {issue.description && (
-            <section aria-label="Description" className="text-base text-foreground-light">
-              {issue.description}
+            <section aria-label="Description">
+              <Markdown content={issue.description} className="max-w-none text-foreground-light" />
             </section>
           )}
+          {investigation}
           {(detail || remediation?.startsWith('https://')) && (
             <section aria-label="Detail" className="flex flex-col gap-2">
               {detail && <p className="text-sm text-foreground-light">{detail}</p>}
@@ -165,7 +170,12 @@ export const AlertIssueDetail = () => {
   }
 
   return (
-    <AlertIssueDetailView issue={issue} onAction={handleAction} isUpdating={isUpdating}>
+    <AlertIssueDetailView
+      issue={issue}
+      onAction={handleAction}
+      isUpdating={isUpdating}
+      investigation={ref && <AlertIssueNotebook issue={issue} projectRef={ref} />}
+    >
       {ref && (
         <>
           <AlertIssueLogEvents projectRef={ref} alertIssueId={issue.alert_issue_id} />

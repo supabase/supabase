@@ -85,6 +85,20 @@ describe('AlertIssueDetailView', () => {
     )
   })
 
+  it('renders the description as markdown with the investigation right after it', () => {
+    customRender(
+      <AlertIssueDetailView
+        issue={{ ...issue, description: 'Table `public.orders` is public.' }}
+        onAction={vi.fn()}
+        investigation={<section aria-label="Investigate" />}
+      />
+    )
+
+    const description = screen.getByRole('region', { name: 'Description' })
+    expect(description.querySelector('code')).toHaveTextContent('public.orders')
+    expect(description.nextElementSibling).toHaveAttribute('aria-label', 'Investigate')
+  })
+
   it('renders extra sections passed as children', () => {
     customRender(
       <AlertIssueDetailView issue={issue} onAction={vi.fn()}>
