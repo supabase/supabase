@@ -1256,9 +1256,10 @@ resources:
                         local function has(value)
                           return content_type:find(value, 1, true) ~= nil
                         end
-                        local html = flags.html_path or has("text/html") or has("application/xhtml")
-                          or has("text/xml") or has("application/xml")
                         local svg = has("image/svg")
+                        -- Any XML type (text/xml, application/xml, *+xml) renders as a document
+                        local html = flags.html_path or has("text/html") or has("application/xhtml") or has("text/xml")
+                          or has("application/xml") or (has("+xml") and not svg)
                         if flags.has_extension and not html and not svg then
                           return
                         end

@@ -219,9 +219,11 @@ services:
               local function has(value)
                 return content_type:find(value, 1, true) ~= nil
               end
+              local svg = has("image/svg")
+              -- Any XML type (text/xml, application/xml, *+xml) renders as a document
               local html = path:lower():match("%.x?html?$") ~= nil or has("text/html")
                 or has("application/xhtml") or has("text/xml") or has("application/xml")
-              local svg = has("image/svg")
+                or (has("+xml") and not svg)
               if path:find(".", 1, true) and not html and not svg then
                 return
               end
