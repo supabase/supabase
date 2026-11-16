@@ -17,24 +17,6 @@ const page: GoPageInput = {
   },
   sections: [
     {
-      type: 'single-column',
-      id: 'schedule',
-      title: 'Schedule a meeting',
-      description: 'Choose a time that works for you. We will confirm by email.',
-      children: (
-        <>
-          <div
-            className="meetings-iframe-container"
-            data-src="https://meetings.hubspot.com/wendie-cheung/aws-reinvent-2026?embed=true"
-          />
-          <Script
-            src="https://static.hsappstatic.net/MeetingsEmbed/ex/MeetingsEmbedCode.js"
-            strategy="afterInteractive"
-          />
-        </>
-      ),
-    },
-    {
       type: 'three-column',
       id: 'growth-leads',
       title: 'Meet our Growth Leads',
@@ -73,6 +55,24 @@ const page: GoPageInput = {
               <p className="text-foreground-light text-sm">Growth Lead</p>
             </div>
           </div>
+        </>
+      ),
+    },
+    {
+      type: 'single-column',
+      id: 'schedule',
+      title: 'Schedule a meeting',
+      description: 'Choose a time that works for you. We will confirm by email.',
+      children: (
+        <>
+          <div
+            className="meetings-iframe-container"
+            data-src="https://meetings.hubspot.com/wendie-cheung/aws-reinvent-2026?embed=true"
+          />
+          <Script
+            src="https://static.hsappstatic.net/MeetingsEmbed/ex/MeetingsEmbedCode.js"
+            strategy="afterInteractive"
+          />
         </>
       ),
     },
