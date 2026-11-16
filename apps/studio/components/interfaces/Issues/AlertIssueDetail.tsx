@@ -3,7 +3,7 @@ import { useParams } from 'common'
 import dayjs from 'dayjs'
 import { BellIcon, ExternalLinkIcon } from 'lucide-react'
 import type { ReactNode } from 'react'
-import { Badge, Button } from 'ui'
+import { Badge, Button, Tabs, TabsContent, TabsList, TabsTrigger } from 'ui'
 import { Admonition } from 'ui-patterns/Admonition'
 import { GenericSkeletonLoader } from 'ui-patterns/ShimmeringLoader'
 
@@ -36,6 +36,7 @@ type AlertIssueDetailViewProps = {
   onAction: (action: AlertIssueAction) => void
   isUpdating?: boolean
   investigation?: ReactNode
+  comments?: ReactNode
   children?: ReactNode
 }
 
@@ -47,6 +48,7 @@ export const AlertIssueDetailView = ({
   onAction,
   isUpdating = false,
   investigation,
+  comments,
   children,
 }: AlertIssueDetailViewProps) => {
   const metadataDetail = metadataText(issue.metadata, 'detail')
@@ -94,46 +96,60 @@ export const AlertIssueDetailView = ({
               <span>{signalSummary}</span>
             </div>
           </header>
-          {issue.description && (
-            <section aria-label="Description">
-              <Markdown content={issue.description} className="max-w-none text-foreground-light" />
-            </section>
-          )}
-          {(detail || remediationUrl) && (
-            <section aria-label="Detail" className="flex flex-col gap-2">
-              {detail && <p className="text-sm text-foreground-light">{detail}</p>}
-              {remediationUrl && (
-                <a
-                  href={remediationUrl}
-                  target="_blank"
-                  rel="noreferrer noopener"
-                  className="inline-flex items-center gap-1 text-sm text-brand hover:underline"
-                >
-                  View remediation
-                  <ExternalLinkIcon size={12} aria-hidden />
-                </a>
+          <Tabs defaultValue="overview" className="flex flex-col gap-6">
+            <TabsList className="gap-5">
+              <TabsTrigger value="overview">Overview</TabsTrigger>
+              <TabsTrigger value="metadata">Metadata</TabsTrigger>
+            </TabsList>
+            <TabsContent value="overview" className="mt-0 flex flex-col gap-6">
+              {issue.description && (
+                <section aria-label="Description">
+                  <Markdown
+                    content={issue.description}
+                    className="max-w-none text-foreground-light"
+                  />
+                </section>
               )}
-            </section>
-          )}
-          {investigation}
-          {children}
-          <section aria-label="Identifiers" className="flex flex-col gap-2">
-            <h2 className="text-sm text-foreground">Identifiers</h2>
-            <dl className="grid grid-cols-[max-content_1fr] gap-x-6 gap-y-1 font-mono text-xs">
-              {identifiers.map(([key, value]) => (
-                <div key={key} className="contents">
-                  <dt className="text-foreground-lighter">{key}</dt>
-                  <dd className="break-all text-foreground">{value}</dd>
-                </div>
-              ))}
-            </dl>
-          </section>
-          <section aria-label="Metadata" className="flex flex-col gap-2">
-            <h2 className="text-sm text-foreground">Metadata</h2>
-            <pre className="overflow-x-auto rounded-md bg-surface-200 p-3 text-xs text-foreground-light">
-              {JSON.stringify(issue.metadata, null, 2)}
-            </pre>
-          </section>
+              {(detail || remediationUrl) && (
+                <section aria-label="Detail" className="flex flex-col gap-2">
+                  {detail && <p className="text-sm text-foreground-light">{detail}</p>}
+                  {remediationUrl && (
+                    <a
+                      href={remediationUrl}
+                      target="_blank"
+                      rel="noreferrer noopener"
+                      className="inline-flex items-center gap-1 text-sm text-brand hover:underline"
+                    >
+                      View remediation
+                      <ExternalLinkIcon size={12} aria-hidden />
+                    </a>
+                  )}
+                </section>
+              )}
+              {investigation}
+              {children}
+              {comments}
+            </TabsContent>
+            <TabsContent value="metadata" className="mt-0 flex flex-col gap-6">
+              <section aria-label="Identifiers" className="flex flex-col gap-2">
+                <h2 className="text-sm text-foreground">Identifiers</h2>
+                <dl className="grid grid-cols-[max-content_1fr] gap-x-6 gap-y-1 font-mono text-xs">
+                  {identifiers.map(([key, value]) => (
+                    <div key={key} className="contents">
+                      <dt className="text-foreground-lighter">{key}</dt>
+                      <dd className="break-all text-foreground">{value}</dd>
+                    </div>
+                  ))}
+                </dl>
+              </section>
+              <section aria-label="Metadata" className="flex flex-col gap-2">
+                <h2 className="text-sm text-foreground">Metadata</h2>
+                <pre className="overflow-x-auto rounded-md bg-surface-200 p-3 text-xs text-foreground-light">
+                  {JSON.stringify(issue.metadata, null, 2)}
+                </pre>
+              </section>
+            </TabsContent>
+          </Tabs>
         </article>
       </div>
     </div>
@@ -177,13 +193,9 @@ export const AlertIssueDetail = () => {
       onAction={handleAction}
       isUpdating={isUpdating}
       investigation={ref && <AlertIssueNotebook issue={issue} projectRef={ref} />}
+      comments={ref && <AlertIssueComments projectRef={ref} alertIssueId={issue.alert_issue_id} />}
     >
-      {ref && (
-        <>
-          <AlertIssueLogEvents projectRef={ref} alertIssueId={issue.alert_issue_id} />
-          <AlertIssueComments projectRef={ref} alertIssueId={issue.alert_issue_id} />
-        </>
-      )}
+      {ref && <AlertIssueLogEvents projectRef={ref} alertIssueId={issue.alert_issue_id} />}
     </AlertIssueDetailView>
   )
 }

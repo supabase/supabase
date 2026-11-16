@@ -25,11 +25,21 @@ const issue: AlertIssue = {
 }
 
 describe('AlertIssueDetailView', () => {
-  it('shows the alert issue report, identifiers and metadata', () => {
+  it('shows the alert issue report on the overview tab', () => {
     customRender(<AlertIssueDetailView issue={issue} onAction={vi.fn()} />)
 
     expect(screen.getByRole('heading', { name: issue.title })).toBeInTheDocument()
+    expect(screen.getByRole('tab', { name: 'Overview', selected: true })).toBeInTheDocument()
     expect(screen.getByText('More than 5% of requests failed.')).toBeInTheDocument()
+    expect(screen.queryByText('function_id')).not.toBeInTheDocument()
+    expect(screen.queryByText(/"row_count": 3/)).not.toBeInTheDocument()
+  })
+
+  it('shows identifiers and metadata on the metadata tab', async () => {
+    customRender(<AlertIssueDetailView issue={issue} onAction={vi.fn()} />)
+
+    await userEvent.click(screen.getByRole('tab', { name: 'Metadata' }))
+
     expect(screen.getByText('function_id')).toBeInTheDocument()
     expect(screen.getByText('stripe-webhook')).toBeInTheDocument()
     expect(screen.getByText(/"row_count": 3/)).toBeInTheDocument()
@@ -111,13 +121,20 @@ describe('AlertIssueDetailView', () => {
     expect(description.nextElementSibling).toHaveAttribute('aria-label', 'Investigate')
   })
 
-  it('renders extra sections passed as children', () => {
+  it('renders extra sections, with comments last on the overview', () => {
     customRender(
-      <AlertIssueDetailView issue={issue} onAction={vi.fn()}>
-        <section aria-label="Comments">comments</section>
+      <AlertIssueDetailView
+        issue={issue}
+        onAction={vi.fn()}
+        investigation={<section aria-label="Investigate" />}
+        comments={<section aria-label="Comments">comments</section>}
+      >
+        <section aria-label="Log events">events</section>
       </AlertIssueDetailView>
     )
 
-    expect(screen.getByRole('region', { name: 'Comments' })).toBeInTheDocument()
+    const overview = screen.getByRole('tabpanel', { name: 'Overview' })
+    expect(screen.getByRole('region', { name: 'Log events' })).toBeInTheDocument()
+    expect(overview.lastElementChild).toHaveAttribute('aria-label', 'Comments')
   })
 })
