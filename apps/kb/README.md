@@ -51,6 +51,16 @@ Feel free to check [our documentation](https://docs.astro.build) or jump into ou
 `scripts/federated-content/fetch-federated-content.ts` as part of the build (the `fetch:federated-content` task in `turbo.jsonc`)
 and is gitignored. See `AGENTS.md` for how it works and what's intentionally left out for now.
 
+### Contributing to troubleshooting articles
+
+Troubleshooting articles (`/kb/troubleshooting/...`) aren't open for direct contributions. They go through an internal
+review process before they're published.
+
+You can still suggest a fix: comment on the article's GitHub Discussion (linked at the bottom of each article as
+"Go to the GitHub discussion"), or [open an issue](https://github.com/supabase/supabase/issues/new/choose) that
+links the article and describes the change. Pull requests for other `/kb` content, such as `src/content/guides/`,
+are welcome.
+
 ## Workflows
 
 `.github/workflows/kb-troubleshooting-sync.yml` runs on pushes to `master` that touch `apps/kb/**` (or can be
