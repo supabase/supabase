@@ -9,7 +9,6 @@ import {
 } from 'lucide-react'
 import { KeyboardEvent, useRef, useState } from 'react'
 import {
-  Button,
   cn,
   DropdownMenu,
   DropdownMenuContent,
@@ -193,8 +192,8 @@ export const LogsViewsMenu = ({
   const [deleteTarget, setDeleteTarget] = useState<LogsView | null>(null)
   const [isOpen, setIsOpen] = useState(false)
   const isViewActive = activeViewId !== null
-  const canSaveCurrentFilters =
-    canCreate && !!onSaveCurrentView && activeFilterCount >= MIN_FILTERS_TO_SAVE
+  const hasFiltersToSave = activeFilterCount >= MIN_FILTERS_TO_SAVE
+  const canSaveCurrentFilters = canCreate && !!onSaveCurrentView && hasFiltersToSave
 
   return (
     <>
@@ -232,23 +231,30 @@ export const LogsViewsMenu = ({
                   icon={BookmarkIcon}
                   iconSize={20}
                   title="No saved views"
-                  description="Save your current filters as a view."
+                  description="Save a collection of filters as a view."
                   className="border-0 bg-transparent px-4 py-6"
                   contentClassName="gap-y-1 [&_h3]:text-sm [&_p]:text-xs"
                 >
-                  {canSaveCurrentFilters && (
-                    <Button
+                  {!!onSaveCurrentView && (
+                    <ButtonTooltip
                       type="button"
                       variant="primary"
                       size="tiny"
                       className="mt-2"
+                      disabled={!canSaveCurrentFilters}
                       onClick={() => {
                         setIsOpen(false)
-                        onSaveCurrentView?.()
+                        onSaveCurrentView()
+                      }}
+                      tooltip={{
+                        content: {
+                          side: 'bottom',
+                          text: hasFiltersToSave ? undefined : 'Add a filter to save a view',
+                        },
                       }}
                     >
                       Save view
-                    </Button>
+                    </ButtonTooltip>
                   )}
                 </EmptyStatePresentational>
               </div>

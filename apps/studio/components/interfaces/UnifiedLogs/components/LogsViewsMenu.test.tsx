@@ -176,4 +176,36 @@ describe('LogsViewsMenu', () => {
 
     expect(onClearActiveView).toHaveBeenCalledOnce()
   })
+
+  it('enables the empty-state save action once a filter is configured', async () => {
+    const onSaveCurrentView = vi.fn()
+    customRender(
+      <LogsViewsMenu {...baseProps} activeFilterCount={1} onSaveCurrentView={onSaveCurrentView} />
+    )
+
+    await openMenu()
+    const saveButton = await screen.findByRole('button', { name: 'Save view' })
+    // `ButtonTooltip` keeps a disabled button focusable via `aria-disabled` so its
+    // tooltip stays reachable, so the native `disabled` attribute is never set.
+    expect(saveButton).not.toHaveAttribute('aria-disabled', 'true')
+
+    await userEvent.click(saveButton)
+
+    expect(onSaveCurrentView).toHaveBeenCalledOnce()
+  })
+
+  it('still renders the empty-state save action with no filters, disabled', async () => {
+    const onSaveCurrentView = vi.fn()
+    customRender(
+      <LogsViewsMenu {...baseProps} activeFilterCount={0} onSaveCurrentView={onSaveCurrentView} />
+    )
+
+    await openMenu()
+    const saveButton = await screen.findByRole('button', { name: 'Save view' })
+    expect(saveButton).toHaveAttribute('aria-disabled', 'true')
+
+    await userEvent.click(saveButton)
+
+    expect(onSaveCurrentView).not.toHaveBeenCalled()
+  })
 })
