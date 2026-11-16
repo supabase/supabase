@@ -20,7 +20,7 @@ const page: GoPageInput = {
       id: 'schedule',
       title: 'Schedule a meeting',
       description: 'Choose a time that works for you. We will confirm by email.',
-      meetingSlug: 'wendie-cheung/aws-reinvent-2026',
+      meetingSlug: 'ktalajic/aws-re-invent-meet-supabase-in-person-re-invent',
     },
   ],
 }
