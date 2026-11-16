@@ -20,7 +20,7 @@ export const ExceedFreeProjectLimitMembers = ({
               key={member.primary_email}
               value={member.primary_email}
             >
-              <AccordionTrigger className="text-xs">
+              <AccordionTrigger>
                 <p className="mb-0! flex items-center gap-x-2">
                   <span>{member.primary_email}</span>
                   <span className="text-foreground-light">
