@@ -70,13 +70,13 @@ export function FilterSideBar({
 
       <UnifiedLogsBanner />
 
-      <div className="flex-1 px-4 py-2 sm:overflow-y-scroll">
+      <div className="flex-1 px-4 py-1.5 sm:overflow-y-scroll">
         <DataTableFilterControls
           dateRangeDisabled={dateRangeDisabled}
           itemsAfter={{ level: <UserLogFilterControl /> }}
         />
         <FeaturePreviewSidebarPanel
-          className="mx-2 my-4"
+          className="my-4"
           title="Capture your logs"
           description="Send logs to your preferred observability or storage platform."
           illustration={
