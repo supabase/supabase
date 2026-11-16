@@ -12,6 +12,9 @@ catalogs:
     '@sentry/nextjs':
       specifier: ^10.75.2
       version: 10.76.2
+    '@sentry/node':
+      specifier: ^10.75.2
+      version: 10.76.2
     '@sentry/tanstackstart-react':
       specifier: ^10.75.2
       version: 10.76.2
@@ -775,6 +778,9 @@ importers:
       '@octokit/plugin-retry':
         specifier: ^8.1.0
         version: 8.1.0(@octokit/core@7.0.6)
+      '@sentry/node':
+        specifier: 'catalog:'
+        version: 10.76.2(@opentelemetry/core@2.12.0(@opentelemetry/api@1.9.1))(supports-color@8.1.1)
       '@supabase/supabase-js':
         specifier: 'catalog:'
         version: 2.117.3(@opentelemetry/api@1.9.1)
