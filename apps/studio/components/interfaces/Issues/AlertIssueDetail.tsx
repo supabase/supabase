@@ -7,6 +7,8 @@ import { Badge, Button, Tabs, TabsContent, TabsList, TabsTrigger } from 'ui'
 import { Admonition } from 'ui-patterns/Admonition'
 import { GenericSkeletonLoader } from 'ui-patterns/ShimmeringLoader'
 
+import { AlertIssueAskAssistant } from './AlertIssueAskAssistant'
+import { AlertIssueAssistantProvider } from './AlertIssueAssistantProvider'
 import { AlertIssueComments } from './AlertIssueComments'
 import { AlertIssueLogEvents } from './AlertIssueLogEvents'
 import { AlertIssueNotebook } from './AlertIssueNotebook'
@@ -102,30 +104,35 @@ export const AlertIssueDetailView = ({
               <TabsTrigger value="metadata">Metadata</TabsTrigger>
             </TabsList>
             <TabsContent value="overview" className="mt-0 flex flex-col gap-6">
-              {issue.description && (
-                <section aria-label="Description">
-                  <Markdown
-                    content={issue.description}
-                    className="max-w-none text-foreground-light"
-                  />
-                </section>
-              )}
-              {(detail || remediationUrl) && (
-                <section aria-label="Detail" className="flex flex-col gap-2">
-                  {detail && <p className="text-sm text-foreground-light">{detail}</p>}
-                  {remediationUrl && (
-                    <a
-                      href={remediationUrl}
-                      target="_blank"
-                      rel="noreferrer noopener"
-                      className="inline-flex items-center gap-1 text-sm text-brand hover:underline"
-                    >
-                      View remediation
-                      <ExternalLinkIcon size={12} aria-hidden />
-                    </a>
-                  )}
-                </section>
-              )}
+              <AlertIssueAskAssistant
+                context={{ kind: 'finding', label: 'the finding' }}
+                className="flex flex-col gap-6"
+              >
+                {issue.description && (
+                  <section aria-label="Description">
+                    <Markdown
+                      content={issue.description}
+                      className="max-w-none text-foreground-light"
+                    />
+                  </section>
+                )}
+                {(detail || remediationUrl) && (
+                  <section aria-label="Detail" className="flex flex-col gap-2">
+                    {detail && <p className="text-sm text-foreground-light">{detail}</p>}
+                    {remediationUrl && (
+                      <a
+                        href={remediationUrl}
+                        target="_blank"
+                        rel="noreferrer noopener"
+                        className="inline-flex items-center gap-1 text-sm text-brand hover:underline"
+                      >
+                        View remediation
+                        <ExternalLinkIcon size={12} aria-hidden />
+                      </a>
+                    )}
+                  </section>
+                )}
+              </AlertIssueAskAssistant>
               {investigation}
               {children}
               {comments}
@@ -187,15 +194,22 @@ export const AlertIssueDetail = () => {
     )
   }
 
+  if (!ref)
+    return <AlertIssueDetailView issue={issue} onAction={handleAction} isUpdating={isUpdating} />
+
   return (
-    <AlertIssueDetailView
-      issue={issue}
-      onAction={handleAction}
-      isUpdating={isUpdating}
-      investigation={ref && <AlertIssueNotebook issue={issue} projectRef={ref} />}
-      comments={ref && <AlertIssueComments projectRef={ref} alertIssueId={issue.alert_issue_id} />}
-    >
-      {ref && <AlertIssueLogEvents projectRef={ref} alertIssueId={issue.alert_issue_id} />}
-    </AlertIssueDetailView>
+    <AlertIssueAssistantProvider key={issue.alert_issue_id} projectRef={ref} issue={issue}>
+      <AlertIssueDetailView
+        issue={issue}
+        onAction={handleAction}
+        isUpdating={isUpdating}
+        investigation={<AlertIssueNotebook issue={issue} projectRef={ref} />}
+        comments={<AlertIssueComments projectRef={ref} alertIssueId={issue.alert_issue_id} />}
+      >
+        <AlertIssueAskAssistant context={{ kind: 'log_events', label: 'the log events' }}>
+          <AlertIssueLogEvents projectRef={ref} alertIssueId={issue.alert_issue_id} />
+        </AlertIssueAskAssistant>
+      </AlertIssueDetailView>
+    </AlertIssueAssistantProvider>
   )
 }

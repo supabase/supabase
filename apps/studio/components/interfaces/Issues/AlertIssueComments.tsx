@@ -7,9 +7,22 @@ import { FormItemLayout } from 'ui-patterns/form/FormItemLayout/FormItemLayout'
 import { GenericSkeletonLoader } from 'ui-patterns/ShimmeringLoader'
 import * as z from 'zod'
 
+import {
+  ASSISTANT_AUTHOR,
+  mentionsAssistant,
+  splitAssistantMentions,
+} from './AlertIssueAssistant.utils'
+import { useAlertIssueAssistant } from './AlertIssueAssistantProvider'
+import {
+  AlertIssueAssistantRun,
+  ASSISTANT_MARKDOWN_CLASS_NAME,
+  AssistantAuthor,
+} from './AlertIssueAssistantRun'
+import { Markdown } from '@/components/interfaces/Markdown'
 import { AlertError } from '@/components/ui/AlertError'
 import { useAlertIssueCommentCreateMutation } from '@/data/alert-issues/alert-issue-comment-create-mutation'
 import { alertIssueCommentsQueryOptions } from '@/data/alert-issues/alert-issue-comments-query'
+import type { AlertIssueComment } from '@/data/alert-issues/alert-issue.schema'
 
 const FormSchema = z.object({
   body: z
@@ -24,39 +37,76 @@ const defaultValues: FormValues = { body: '' }
 
 type AlertIssueCommentsProps = { projectRef: string; alertIssueId: string }
 
+const CommentItem = ({ comment }: { comment: AlertIssueComment }) => {
+  const timestamp = dayjs(comment.created_at).fromNow()
+  if (comment.author === ASSISTANT_AUTHOR) {
+    return (
+      <li className="flex flex-col gap-2 rounded-md border border-default bg-surface-100 p-3">
+        <AssistantAuthor timestamp={timestamp} />
+        <Markdown content={comment.body} className={ASSISTANT_MARKDOWN_CLASS_NAME} />
+      </li>
+    )
+  }
+  return (
+    <li className="flex flex-col gap-1">
+      <div className="flex items-center gap-2 text-xs text-foreground-lighter">
+        <span className="text-foreground-light">{comment.author}</span>
+        <span>{timestamp}</span>
+      </div>
+      <p className="whitespace-pre-wrap text-sm text-foreground">
+        {splitAssistantMentions(comment.body).map((part, index) =>
+          part.isMention ? (
+            <span key={index} className="rounded bg-brand-300 px-1 text-brand-600">
+              {part.text}
+            </span>
+          ) : (
+            <span key={index}>{part.text}</span>
+          )
+        )}
+      </p>
+    </li>
+  )
+}
+
 export const AlertIssueComments = ({ projectRef, alertIssueId }: AlertIssueCommentsProps) => {
   const { data, error, isPending, isError } = useQuery(
     alertIssueCommentsQueryOptions({ projectRef, alertIssueId })
   )
   const { mutate, isPending: isSaving } = useAlertIssueCommentCreateMutation()
+  const assistant = useAlertIssueAssistant()
+  const hasThread = (data?.length ?? 0) > 0 || !!assistant?.run
 
   const form = useForm<FormValues>({ resolver: zodResolver(FormSchema), defaultValues })
   const { isDirty } = form.formState
 
   const onSubmit = ({ body }: FormValues) => {
-    mutate({ projectRef, alertIssueId, body }, { onSuccess: () => form.reset(defaultValues) })
+    const prepared =
+      assistant && !assistant.isBusy && mentionsAssistant(body)
+        ? assistant.prepare({ kind: 'issue', label: 'this alert issue' })
+        : undefined
+    mutate(
+      { projectRef, alertIssueId, body },
+      {
+        onSuccess: () => {
+          form.reset(defaultValues)
+          if (prepared) assistant?.start(prepared)
+        },
+      }
+    )
   }
 
   return (
     <section aria-label="Comments" className="flex flex-col gap-3">
       <h2 className="text-sm text-foreground">Comments</h2>
-      {isPending ? (
-        <GenericSkeletonLoader />
-      ) : isError ? (
-        <AlertError error={error} subject="Failed to retrieve comments" />
-      ) : data.length === 0 ? (
-        <p className="text-sm text-foreground-lighter">No comments yet</p>
-      ) : (
+      {isPending && <GenericSkeletonLoader />}
+      {isError && <AlertError error={error} subject="Failed to retrieve comments" />}
+      {data && !hasThread && <p className="text-sm text-foreground-lighter">No comments yet</p>}
+      {hasThread && (
         <ol className="flex flex-col gap-3">
-          {data.map((comment) => (
-            <li key={comment.comment_id} className="flex flex-col gap-1">
-              <div className="flex items-center gap-2 text-xs text-foreground-lighter">
-                <span className="text-foreground-light">{comment.author}</span>
-                <span>{dayjs(comment.created_at).fromNow()}</span>
-              </div>
-              <p className="whitespace-pre-wrap text-sm text-foreground">{comment.body}</p>
-            </li>
+          {data?.map((comment) => (
+            <CommentItem key={comment.comment_id} comment={comment} />
           ))}
+          {assistant?.run && <AlertIssueAssistantRun run={assistant.run} />}
         </ol>
       )}
       <Form {...form}>
@@ -70,7 +120,7 @@ export const AlertIssueComments = ({ projectRef, alertIssueId }: AlertIssueComme
                   <Textarea
                     {...field}
                     rows={3}
-                    placeholder="Add a comment"
+                    placeholder="Add a comment, or mention @assistant"
                     aria-label="Add a comment"
                   />
                 </FormControl>

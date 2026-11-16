@@ -2,6 +2,7 @@ import { untrustedSql } from '@supabase/pg-meta'
 import { useState } from 'react'
 import { cn } from 'ui'
 
+import { AlertIssueAskAssistant } from './AlertIssueAskAssistant'
 import type { RenderedAlertIssueCell } from './AlertIssueNotebook.utils'
 import { QueryEditor, type ExplorerQueryModel } from '@/components/interfaces/Explorer/QueryEditor'
 import type { QueryResult } from '@/components/interfaces/Explorer/types'
@@ -27,24 +28,28 @@ export const AlertIssueQueryCell = ({ id, cell }: { id: string; cell: ReadyCell 
   const [showQuery, setShowQuery] = useState(true)
   const [hasRun, setHasRun] = useState(false)
 
+  const rows = result?.rows
+
   return (
-    <QueryEditor
-      id={id}
-      variant="embedded"
-      className={cn(
-        'min-h-0',
-        !hasRun &&
-          '[&_[data-slot=explorer-query-footer]]:hidden [&_[data-slot=explorer-query-results]]:hidden'
-      )}
-      title={title}
-      query={toQueryModel(cell, sql)}
-      result={result}
-      showQuery={showQuery}
-      onShowQueryChange={setShowQuery}
-      onTitleChange={setTitle}
-      onSqlChange={setSql}
-      onResultChange={setResult}
-      onRun={() => setHasRun(true)}
-    />
+    <AlertIssueAskAssistant context={{ kind: 'sql_cell', label: title, sql, rows }}>
+      <QueryEditor
+        id={id}
+        variant="embedded"
+        className={cn(
+          'min-h-0',
+          !hasRun &&
+            '[&_[data-slot=explorer-query-footer]]:hidden [&_[data-slot=explorer-query-results]]:hidden'
+        )}
+        title={title}
+        query={toQueryModel(cell, sql)}
+        result={result}
+        showQuery={showQuery}
+        onShowQueryChange={setShowQuery}
+        onTitleChange={setTitle}
+        onSqlChange={setSql}
+        onResultChange={setResult}
+        onRun={() => setHasRun(true)}
+      />
+    </AlertIssueAskAssistant>
   )
 }
