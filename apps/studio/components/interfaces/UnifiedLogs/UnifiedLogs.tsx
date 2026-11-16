@@ -778,7 +778,7 @@ export const UnifiedLogs = ({
               )}
               <ViewSuggestionBanner
                 visible={showSaveViewSuggestion}
-                title={`You've configured ${activeFilterCount} filters!`}
+                title={`You've configured ${activeFilterCount} filters`}
                 description="Would you like to save them as a view?"
                 primaryLabel="Save"
                 onPrimary={handleSaveCurrentView}

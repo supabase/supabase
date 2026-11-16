@@ -15,7 +15,7 @@ describe('saved view summaries', () => {
         },
         {}
       )
-    ).toEqual([{ label: 'method', text: 'equals GET' }])
+    ).toEqual([{ label: 'method', operator: '=', value: 'GET' }])
   })
 
   it('omits malformed known options while formatting valid sorting', () => {

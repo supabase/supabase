@@ -16,6 +16,7 @@
 
   --animate-fade-in: fadeIn 300ms both;
   --animate-fade-out: fadeOut 300ms both;
+  --animate-draw-line-fast: drawLine 850ms cubic-bezier(0.65, 0, 0.35, 1) both;
 
   /* may be unused — verify before pruning */
   --animate-dropdown-content-show: overlayContentShow 100ms var(--ease-enter);
@@ -63,6 +64,12 @@
   --animate-collapsible-up: collapsible-up 0.1s ease-out;
   --animate-collapsible-down-clipped: collapsible-down 0.1s ease-out, clip-overflow-y 0.1s;
   --animate-collapsible-up-clipped: collapsible-up 0.1s ease-out, clip-overflow-y 0.1s;
+}
+
+@keyframes drawLine {
+  from {
+    stroke-dashoffset: 1;
+  }
 }
 
 @keyframes fadeIn {
