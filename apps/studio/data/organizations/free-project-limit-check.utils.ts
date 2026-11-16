@@ -1,7 +1,6 @@
 import type { MemberWithFreeProjectLimit } from '@/data/organizations/free-project-limit-check-query'
 
 export type AffectedOrganization = {
-  /** Stable key for lists; falls back to the name when the slug is hidden */
   key: string
   /** Null when the current user has no access to the organization */
   slug: string | null

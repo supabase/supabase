@@ -57,11 +57,11 @@ const OrganizationCard = ({
                     </p>
                     <ul className="space-y-2">
                       {affectedOrganizations.map((affectedOrg) => (
-                        <li key={affectedOrg.slug}>
+                        <li key={affectedOrg.key}>
                           <span className="text-foreground">{affectedOrg.name}</span>
                           <ul className="pl-5 list-disc">
                             {affectedOrg.projects.map((project) => (
-                              <li key={project.ref}>{project.name}</li>
+                              <li key={project.key}>{project.name}</li>
                             ))}
                           </ul>
                           <p className="text-xs text-foreground-lighter">
