@@ -374,6 +374,10 @@ as $$
   );
 $$;
 
+revoke all on function private.is_permanent_user() from public;
+grant usage on schema private to authenticated;
+grant execute on function private.is_permanent_user() to authenticated;
+
 create policy "Only permanent users can post to the news feed"
 on news_feed as restrictive for insert
 to authenticated
