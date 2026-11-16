@@ -235,7 +235,7 @@ export const OrganizationProjectsMultiSelect = ({
         onValueChange={setSearch}
         placeholder={searchPlaceholder}
         handleReset={() => setSearch('')}
-        className="text-base sm:text-sm"
+        className="text-sm"
       />
       <CommandList className="max-h-none md:max-h-[300px] overflow-y-auto overflow-x-hidden">
         <CommandGroup>{renderListContent()}</CommandGroup>
