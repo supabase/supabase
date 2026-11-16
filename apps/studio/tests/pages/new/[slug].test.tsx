@@ -61,6 +61,16 @@ vi.mock('@/lib/password-strength', () => ({
 
 vi.mock('@/lib/telemetry/track', () => ({ useTrack: () => vi.fn() }))
 
+// The real usePHFlag returns false outside the platform build, so PostHog flags are driven
+// through this map (set per render via `renderWizard({ posthogFlags })`).
+const mockPostHogFlags = vi.hoisted(() => ({
+  current: {} as Record<string, boolean | string | undefined>,
+}))
+vi.mock(import('@/hooks/ui/useFlag'), async (importOriginal) => ({
+  ...(await importOriginal()),
+  usePHFlag: ((name: string) => mockPostHogFlags.current[name]) as never,
+}))
+
 vi.mock(import('common'), async (importOriginal) => {
   const actual = await importOriginal()
   return {
@@ -295,12 +305,16 @@ const DEFAULT_FLAGS = {
   projectCreationRestrictedRegions: false,
   freeTierGeneralRegionEnrollment: false,
   freeTierGeneralRegionSelection: false,
-  defaultNotExposedNewTables: false,
 }
 
 async function renderWizard(
-  options: { flags?: Record<string, boolean | string>; isConfigCatStale?: boolean } = {}
+  options: {
+    flags?: Record<string, boolean | string>
+    posthogFlags?: Record<string, boolean | string>
+    isConfigCatStale?: boolean
+  } = {}
 ) {
+  mockPostHogFlags.current = options.posthogFlags ?? {}
   const { default: Wizard } = await import('@/pages/new/[slug]')
   return customRender(
     <FeatureFlagContext.Provider
@@ -1323,7 +1337,7 @@ describe('project creation wizard', () => {
       const onRequest = vi.fn()
       mockCreateProject(onRequest)
 
-      await renderWizard({ flags: { defaultNotExposedNewTables: true } })
+      await renderWizard({ posthogFlags: { dataApiRevokeOnCreateDefault: true } })
 
       await fillProjectName('No Data API Project')
       await generateAndWaitForStrongPassword()
@@ -1359,7 +1373,7 @@ describe('project creation wizard', () => {
       const onRequest = vi.fn()
       mockCreateProject(onRequest)
 
-      await renderWizard({ flags: { defaultNotExposedNewTables: true } })
+      await renderWizard({ posthogFlags: { dataApiRevokeOnCreateDefault: true } })
 
       await fillProjectName('Manual Privileges Project')
       await generateAndWaitForStrongPassword()
@@ -1393,12 +1407,12 @@ describe('project creation wizard', () => {
       expect(body.data_api_revoke_default_privileges).toBe(true)
     })
 
-    test('grants API access to new tables by default when defaultNotExposedNewTables is off', async () => {
+    test('grants API access to new tables by default when dataApiRevokeOnCreateDefault is off', async () => {
       mockWizardEndpoints()
       const onRequest = vi.fn()
       mockCreateProject(onRequest)
 
-      await renderWizard({ flags: { defaultNotExposedNewTables: false } })
+      await renderWizard({ posthogFlags: { dataApiRevokeOnCreateDefault: false } })
 
       await fillProjectName('Default Grants Project')
       await generateAndWaitForStrongPassword()

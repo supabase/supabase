@@ -1,19 +1,40 @@
-import { useFlag } from 'common'
 import { useEffect, useRef } from 'react'
 
+import { usePHFlag } from '../ui/useFlag'
 import { IS_TEST_ENV } from '@/lib/constants'
 import { useTrack } from '@/lib/telemetry/track'
 
 /**
+ * Returns true iff the user is assigned to the treatment arm of the
+ * dataApiRevokeOnCreateDefault experiment. Shape-agnostic across the current
+ * boolean rollout config and a future multivariate experiment with named
+ * variants. See GROWTH-877 for the migration plan.
+ *
+ * Accepts:
+ *   - `true`     → treatment (current boolean shape)
+ *   - `'test'`   → treatment (future multivariate shape)
+ *   - anything else (`false`, `'control'`, `null`, `undefined`) → not treatment
+ *
+ * Use this everywhere the flag's value is read so the PostHog config can
+ * migrate to multivariate without a coordinated frontend deploy.
+ */
+export const isInDataApiRevokeTreatment = (flag: boolean | string | undefined): boolean => {
+  if (flag === true) return true
+  if (flag === 'test') return true
+  return false
+}
+
+/**
  * Default value of the "Grant API access to new tables automatically" checkbox
- * at project creation, driven by the `defaultNotExposedNewTables` flag (the
- * return value is `!flag`). When the flag is on, the checkbox defaults to
- * unchecked (i.e. revoke SQL runs). When the flag is off, or not loaded yet
- * (`useFlag` returns false), it defaults to checked (current behaviour —
- * default grants remain). Always returns false in tests.
+ * at project creation, driven by the PostHog `dataApiRevokeOnCreateDefault` flag (the
+ * return value is `!isInDataApiRevokeTreatment(flag)`). When the flag is on,
+ * the checkbox defaults to unchecked (i.e. revoke SQL runs). When the flag is
+ * off, or not loaded yet (`usePHFlag` returns undefined), it defaults to
+ * checked (current behaviour — default grants remain). Always returns false
+ * in tests.
  */
 export const useDataApiRevokeOnCreateDefaultEnabled = (): boolean => {
-  const flag = useFlag('defaultNotExposedNewTables')
+  const flag = usePHFlag<boolean | string>('dataApiRevokeOnCreateDefault')
 
   // Preserve current behaviour (default grants remain) in tests so existing
   // E2E flows don't change silently. Tests that need the revoke-default path
@@ -22,7 +43,7 @@ export const useDataApiRevokeOnCreateDefaultEnabled = (): boolean => {
     return false
   }
 
-  return !flag
+  return !isInDataApiRevokeTreatment(flag)
 }
 
 type DefaultPrivilegesExposureOptions =
@@ -40,8 +61,8 @@ type DefaultPrivilegesExposureOptions =
 
 /**
  * Fires `project_creation_default_privileges_exposed` once per mount, once the
- * form value is consistent with the flag's expected default (`!flag`). The
- * convergence gate avoids a render-ordering race: caller-side
+ * flag has resolved AND the form value is consistent with the flag's expected
+ * default. The convergence gate avoids a render-ordering race: caller-side
  * sync effects (in /new/[slug] and the Vercel deploy flow) update the form
  * value when the flag resolves late, but child effects fire before parent
  * effects in the same commit, so without the gate the exposure would capture
@@ -50,7 +71,7 @@ type DefaultPrivilegesExposureOptions =
  */
 export const useTrackDefaultPrivilegesExposure = (options: DefaultPrivilegesExposureOptions) => {
   const track = useTrack()
-  const flag = useFlag('defaultNotExposedNewTables')
+  const flag = usePHFlag<boolean | string>('dataApiRevokeOnCreateDefault')
   const hasTracked = useRef(false)
 
   const { surface, dataApiDefaultPrivileges, hasUserModified } = options
@@ -58,10 +79,11 @@ export const useTrackDefaultPrivilegesExposure = (options: DefaultPrivilegesExpo
 
   useEffect(() => {
     if (hasTracked.current) return
+    if (flag === undefined) return
     if (surface === 'vercel' && !orgSlug) return
 
     // Gate on form-flag convergence unless the user explicitly dirtied the field.
-    const expectedDefault = !flag
+    const expectedDefault = !isInDataApiRevokeTreatment(flag)
     if (!hasUserModified && dataApiDefaultPrivileges !== expectedDefault) return
     hasTracked.current = true
 
