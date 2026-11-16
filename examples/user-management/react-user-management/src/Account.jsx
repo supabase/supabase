@@ -2,7 +2,7 @@ import { useState, useEffect } from 'react'
 import { supabase } from './supabaseClient'
 import Avatar from './Avatar'
 
-export default function Account({ user }) {
+export default function Account({ claims }) {
   const [loading, setLoading] = useState(true)
   const [username, setUsername] = useState(null)
   const [website, setWebsite] = useState(null)
@@ -16,7 +16,7 @@ export default function Account({ user }) {
       const { data, error } = await supabase
         .from('profiles')
         .select(`username, website, avatar_url`)
-        .eq('id', user.id)
+        .eq('id', claims.sub)
         .single()
 
       if (!ignore) {
@@ -37,7 +37,7 @@ export default function Account({ user }) {
     return () => {
       ignore = true
     }
-  }, [user])
+  }, [claims])
 
   async function updateProfile(event, avatarUrl) {
     event.preventDefault()
@@ -45,7 +45,7 @@ export default function Account({ user }) {
     setLoading(true)
 
     const updates = {
-      id: user.id,
+      id: claims.sub,
       username,
       website,
       avatar_url: avatarUrl,
@@ -73,7 +73,7 @@ export default function Account({ user }) {
       />
       <div>
         <label htmlFor="email">Email</label>
-        <input id="email" type="text" value={user.email} disabled />
+        <input id="email" type="text" value={claims.email} disabled />
       </div>
       <div>
         <label htmlFor="username">Name</label>

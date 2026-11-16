@@ -12,7 +12,7 @@ This app demonstrates how to use:
 - User avatar images using Supabase [Storage](https://supabase.com/storage)
 - Public profiles restricted with [Row Level Security](https://supabase.com/docs/guides/auth#row-level-security)
 - Frontend using [Vite](https://vitejs.dev/) and React
-- The [`getUser()`](https://supabase.com/docs/reference/javascript/auth-getuser) method to fetch current user details
+- The [`getClaims()`](https://supabase.com/docs/reference/javascript/auth-getclaims) method to verify the signed-in user
 
 ## Technologies Used
 
@@ -234,7 +234,7 @@ Allows users to view and edit their profile:
 
 Key features:
 
-- Uses the `user` prop (not `session`) passed from the parent component
+- Uses the `claims` prop (not `session`) passed from the parent component
 - Implements proper cleanup with the `ignore` flag to prevent race conditions
 - Updates profile data with `upsert` to handle both inserts and updates
 
@@ -252,26 +252,30 @@ import Auth from './Auth'
 import Account from './Account'
 
 function App() {
-  const [user, setUser] = useState(null)
+  const [claims, setClaims] = useState(null)
 
   useEffect(() => {
-    // Get initial user on mount
-    supabase.auth.getUser().then(({ data: { user } }) => {
-      setUser(user)
+    const loadClaims = async () => {
+      const {
+        data: { claims },
+      } = await supabase.auth.getClaims()
+      setClaims(claims)
+    }
+
+    loadClaims()
+
+    const {
+      data: { subscription },
+    } = supabase.auth.onAuthStateChange(() => {
+      loadClaims()
     })
 
-    // Listen for auth changes
-    supabase.auth.onAuthStateChange(async () => {
-      const {
-        data: { user },
-      } = await supabase.auth.getUser()
-      setUser(user)
-    })
+    return () => subscription.unsubscribe()
   }, [])
 
   return (
     <div className="container" style={{ padding: '50px 0 100px 0' }}>
-      {!user ? <Auth /> : <Account key={user.id} user={user} />}
+      {!claims ? <Auth /> : <Account key={claims.sub} claims={claims} />}
     </div>
   )
 }
@@ -279,12 +283,11 @@ function App() {
 export default App
 ```
 
-**Important:** This component uses the [`getUser()`](https://supabase.com/docs/reference/javascript/auth-getuser) method instead of `getSession()`. The `getUser()` method:
+**Important:** This component uses the [`getClaims()`](https://supabase.com/docs/reference/javascript/auth-getclaims) method instead of `getSession()`. The `getClaims()` method:
 
-- Performs a network request to the Supabase Auth server
-- Validates the current session on the server side
-- Returns the most up-to-date user information
-- Is more reliable than reading from local storage
+- Verifies the access token's signature instead of trusting what's in local storage
+- Verifies locally with the WebCrypto API when the project uses asymmetric signing keys, and falls back to a request to the Auth server otherwise
+- Returns the token's claims, such as the user ID (`sub`) and `email`
 
 ## Understanding Row Level Security
 
