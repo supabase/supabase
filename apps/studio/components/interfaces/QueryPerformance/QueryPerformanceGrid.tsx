@@ -7,7 +7,7 @@ import {
   TextSearchIcon,
 } from 'lucide-react'
 import { parseAsArrayOf, parseAsJson, parseAsString, useQueryStates } from 'nuqs'
-import { UIEvent, useCallback, useEffect, useMemo, useRef, useState } from 'react'
+import { useCallback, useEffect, useMemo, useRef, useState } from 'react'
 import DataGrid, { Column, DataGridHandle, Row } from 'react-data-grid'
 import {
   Button,
@@ -46,7 +46,7 @@ import { QueryPerformanceRow } from './QueryPerformance.types'
 import { formatDuration } from './QueryPerformance.utils'
 import { NumericFilter } from '@/components/interfaces/Reports/v2/ReportsNumericFilter'
 import { ButtonTooltip } from '@/components/ui/ButtonTooltip'
-import { useFetchUntilScrollable } from '@/hooks/misc/useFetchUntilScrollable'
+import { useInfiniteScroll } from '@/hooks/misc/useInfiniteScroll'
 
 interface QueryPerformanceGridProps {
   aggregatedData: QueryPerformanceRow[]
@@ -55,10 +55,9 @@ interface QueryPerformanceGridProps {
   currentSelectedQuery?: string | null
   onCurrentSelectQuery?: (query: string) => void
   onRetry?: () => void
-  onScroll?: (event: UIEvent<HTMLDivElement>) => void
-  hasNextPage?: boolean
-  isFetchingNextPage?: boolean
-  fetchNextPage?: (options?: { cancelRefetch?: boolean }) => void
+  hasNextPage: boolean
+  isFetchingNextPage: boolean
+  fetchNextPage: (options?: { cancelRefetch?: boolean }) => void
 }
 
 const calculateTimeConsumedWidth = (data: QueryPerformanceRow[]) => {
@@ -90,7 +89,6 @@ export const QueryPerformanceGrid = ({
   currentSelectedQuery,
   onCurrentSelectQuery,
   onRetry,
-  onScroll,
   hasNextPage,
   isFetchingNextPage,
   fetchNextPage,
@@ -430,13 +428,12 @@ export const QueryPerformanceGrid = ({
     return data
   }, [aggregatedData, sort, search, roles, callsFilter])
 
-  const getScrollContainer = useCallback(() => gridRef.current?.element ?? null, [])
-  useFetchUntilScrollable({
-    getContainer: getScrollContainer,
-    hasNextPage,
+  const handleScroll = useInfiniteScroll({
     isLoading,
     isFetchingNextPage,
+    hasNextPage,
     fetchNextPage,
+    containerRef: gridRef,
     rowCount: reportData.length,
   })
 
@@ -534,7 +531,7 @@ export const QueryPerformanceGrid = ({
           headerRowHeight={36}
           columns={columns}
           rows={reportData}
-          onScroll={onScroll}
+          onScroll={handleScroll}
           rowClass={(_, idx) => {
             const isSelected = idx === selectedRow
             const query = reportData[idx]?.query

@@ -1,7 +1,8 @@
 import { renderHook } from '@testing-library/react'
+import type { UIEvent } from 'react'
 import { beforeEach, describe, expect, it, vi } from 'vitest'
 
-import { useFetchUntilScrollable } from './useFetchUntilScrollable'
+import { useInfiniteScroll } from './useInfiniteScroll'
 
 const observe = vi.fn()
 let triggerResize: () => void = () => {}
@@ -31,15 +32,17 @@ const makeContainer = (scrollHeight: number, clientHeight: number): FakeContaine
   clientHeight,
 })
 
-const toElement = (container: FakeContainer) => container as HTMLElement
+const makeRef = (container: FakeContainer) => ({
+  current: { element: container as HTMLElement },
+})
 
-describe('useFetchUntilScrollable', () => {
+describe('useInfiniteScroll fill behavior', () => {
   it('fetches the next page when the content does not overflow the container', () => {
     const fetchNextPage = vi.fn()
     const container = makeContainer(400, 900)
     renderHook(() =>
-      useFetchUntilScrollable({
-        getContainer: () => toElement(container),
+      useInfiniteScroll({
+        containerRef: makeRef(container),
         hasNextPage: true,
         fetchNextPage,
         rowCount: 20,
@@ -52,8 +55,8 @@ describe('useFetchUntilScrollable', () => {
     const fetchNextPage = vi.fn()
     const container = makeContainer(1200, 900)
     renderHook(() =>
-      useFetchUntilScrollable({
-        getContainer: () => toElement(container),
+      useInfiniteScroll({
+        containerRef: makeRef(container),
         hasNextPage: true,
         fetchNextPage,
         rowCount: 20,
@@ -70,8 +73,8 @@ describe('useFetchUntilScrollable', () => {
     const fetchNextPage = vi.fn()
     const container = makeContainer(400, 900)
     renderHook(() =>
-      useFetchUntilScrollable({
-        getContainer: () => toElement(container),
+      useInfiniteScroll({
+        containerRef: makeRef(container),
         fetchNextPage,
         rowCount: 20,
         ...options,
@@ -84,8 +87,8 @@ describe('useFetchUntilScrollable', () => {
     const fetchNextPage = vi.fn()
     const container = makeContainer(1200, 900)
     renderHook(() =>
-      useFetchUntilScrollable({
-        getContainer: () => toElement(container),
+      useInfiniteScroll({
+        containerRef: makeRef(container),
         hasNextPage: true,
         fetchNextPage,
         rowCount: 20,
@@ -101,10 +104,10 @@ describe('useFetchUntilScrollable', () => {
   it('keeps fetching after each page lands until the container overflows', () => {
     const fetchNextPage = vi.fn()
     const container = makeContainer(400, 900)
-    const getContainer = () => toElement(container)
-    const { rerender } = renderHook((props) => useFetchUntilScrollable(props), {
+    const containerRef = makeRef(container)
+    const { rerender } = renderHook((props) => useInfiniteScroll(props), {
       initialProps: {
-        getContainer,
+        containerRef,
         hasNextPage: true,
         isFetchingNextPage: false,
         fetchNextPage,
@@ -115,7 +118,7 @@ describe('useFetchUntilScrollable', () => {
 
     // A request is in flight: no duplicate fetch
     rerender({
-      getContainer,
+      containerRef,
       hasNextPage: true,
       isFetchingNextPage: true,
       fetchNextPage,
@@ -125,7 +128,7 @@ describe('useFetchUntilScrollable', () => {
 
     // Page landed but the grid is still underfilled: fetch again
     rerender({
-      getContainer,
+      containerRef,
       hasNextPage: true,
       isFetchingNextPage: false,
       fetchNextPage,
@@ -136,14 +139,14 @@ describe('useFetchUntilScrollable', () => {
     // Content now overflows: stop
     container.scrollHeight = 1200
     rerender({
-      getContainer,
+      containerRef,
       hasNextPage: true,
       isFetchingNextPage: true,
       fetchNextPage,
       rowCount: 40,
     })
     rerender({
-      getContainer,
+      containerRef,
       hasNextPage: true,
       isFetchingNextPage: false,
       fetchNextPage,
@@ -155,13 +158,13 @@ describe('useFetchUntilScrollable', () => {
   it('stops fetching once there are no more pages', () => {
     const fetchNextPage = vi.fn()
     const container = makeContainer(400, 900)
-    const getContainer = () => toElement(container)
-    const { rerender } = renderHook((props) => useFetchUntilScrollable(props), {
-      initialProps: { getContainer, hasNextPage: true, fetchNextPage, rowCount: 20 },
+    const containerRef = makeRef(container)
+    const { rerender } = renderHook((props) => useInfiniteScroll(props), {
+      initialProps: { containerRef, hasNextPage: true, fetchNextPage, rowCount: 20 },
     })
     expect(fetchNextPage).toHaveBeenCalledTimes(1)
 
-    rerender({ getContainer, hasNextPage: false, fetchNextPage, rowCount: 25 })
+    rerender({ containerRef, hasNextPage: false, fetchNextPage, rowCount: 25 })
     triggerResize()
     expect(fetchNextPage).toHaveBeenCalledTimes(1)
   })
@@ -169,8 +172,8 @@ describe('useFetchUntilScrollable', () => {
   it('disconnects the observer on unmount', () => {
     const container = makeContainer(1200, 900)
     const { unmount } = renderHook(() =>
-      useFetchUntilScrollable({
-        getContainer: () => toElement(container),
+      useInfiniteScroll({
+        containerRef: makeRef(container),
         hasNextPage: true,
         fetchNextPage: vi.fn(),
         rowCount: 20,
@@ -179,5 +182,33 @@ describe('useFetchUntilScrollable', () => {
     expect(observe).toHaveBeenCalledWith(container)
     unmount()
     expect(disconnect).toHaveBeenCalled()
+  })
+})
+
+const scrollEvent = (target: { scrollTop: number; scrollLeft: number }) =>
+  ({
+    currentTarget: { scrollHeight: 1000, clientHeight: 500, ...target },
+  }) as unknown as UIEvent<HTMLDivElement>
+
+describe('useInfiniteScroll scroll handler', () => {
+  it('fetches the next page when scrolled to the bottom', () => {
+    const fetchNextPage = vi.fn()
+    const { result } = renderHook(() => useInfiniteScroll({ hasNextPage: true, fetchNextPage }))
+    result.current(scrollEvent({ scrollTop: 500, scrollLeft: 0 }))
+    expect(fetchNextPage).toHaveBeenCalledWith({ cancelRefetch: false })
+  })
+
+  it('does not fetch when not at the bottom', () => {
+    const fetchNextPage = vi.fn()
+    const { result } = renderHook(() => useInfiniteScroll({ hasNextPage: true, fetchNextPage }))
+    result.current(scrollEvent({ scrollTop: 100, scrollLeft: 0 }))
+    expect(fetchNextPage).not.toHaveBeenCalled()
+  })
+
+  it('does not fetch while scrolling horizontally', () => {
+    const fetchNextPage = vi.fn()
+    const { result } = renderHook(() => useInfiniteScroll({ hasNextPage: true, fetchNextPage }))
+    result.current(scrollEvent({ scrollTop: 500, scrollLeft: 40 }))
+    expect(fetchNextPage).not.toHaveBeenCalled()
   })
 })
