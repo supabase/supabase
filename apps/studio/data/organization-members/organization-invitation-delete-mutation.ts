@@ -2,9 +2,10 @@ import { useMutation, useQueryClient } from '@tanstack/react-query'
 import { toast } from 'sonner'
 
 import { organizationKeys } from './keys'
-import { del, handleError } from '@/data/fetchers'
+import { del, handleError, unguarded } from '@/data/fetchers'
 import { organizationKeys as organizationKeysV1 } from '@/data/organizations/keys'
-import type { ResponseError, UseCustomMutationOptions } from '@/types'
+import type { StudioError } from '@/lib/errors/studio-errors'
+import type { UseCustomMutationOptions } from '@/types'
 
 export type OrganizationDeleteInvitationVariables = {
   slug: string
@@ -18,6 +19,7 @@ export async function deleteOrganizationInvitation({
 }: OrganizationDeleteInvitationVariables) {
   const { error } = await del('/platform/organizations/{slug}/members/invitations/{id}', {
     params: { path: { slug, id } },
+    grant: unguarded.migrating,
   })
 
   if (error) handleError(error)
@@ -33,7 +35,7 @@ export const useOrganizationDeleteInvitationMutation = ({
 }: Omit<
   UseCustomMutationOptions<
     OrganizationDeleteInvitationData,
-    ResponseError,
+    StudioError,
     OrganizationDeleteInvitationVariables
   >,
   'mutationFn'
@@ -42,7 +44,7 @@ export const useOrganizationDeleteInvitationMutation = ({
 
   return useMutation<
     OrganizationDeleteInvitationData,
-    ResponseError,
+    StudioError,
     OrganizationDeleteInvitationVariables
   >({
     mutationFn: (vars) => deleteOrganizationInvitation(vars),

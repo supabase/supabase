@@ -38,37 +38,27 @@ afterEach(() => {
 })
 
 describe('evictNotebookFromCaches', () => {
-  it('removes a saved notebook from the store and drops its cache entry', async () => {
-    seedNotebook('saved')
-    const queryClient = new QueryClient()
-    seedQueryData(queryClient)
+  // Unsaved ('new') notebooks are only evicted after their caller confirms discard.
+  it.each(['saved', 'new'] as const)(
+    'removes a %s notebook from the store and drops its cache entry',
+    async (status) => {
+      seedNotebook(status)
+      const queryClient = new QueryClient()
+      seedQueryData(queryClient)
 
-    const evicted = await evictNotebookFromCaches({
-      queryClient,
-      projectRef: PROJECT_REF,
-      id: NOTEBOOK_ID,
-    })
+      const evicted = await evictNotebookFromCaches({
+        queryClient,
+        projectRef: PROJECT_REF,
+        id: NOTEBOOK_ID,
+      })
 
-    expect(evicted).toBe(true)
-    expect(notebooksState.notebooks[NOTEBOOK_ID]).toBeUndefined()
-    expect(queryClient.getQueryData(contentKeys.resource(PROJECT_REF, NOTEBOOK_ID))).toBeUndefined()
-  })
-
-  it('removes an unsaved notebook and its cache entry after its caller confirms discard', async () => {
-    seedNotebook('new')
-    const queryClient = new QueryClient()
-    seedQueryData(queryClient)
-
-    const evicted = await evictNotebookFromCaches({
-      queryClient,
-      projectRef: PROJECT_REF,
-      id: NOTEBOOK_ID,
-    })
-
-    expect(evicted).toBe(true)
-    expect(notebooksState.notebooks[NOTEBOOK_ID]).toBeUndefined()
-    expect(queryClient.getQueryData(contentKeys.resource(PROJECT_REF, NOTEBOOK_ID))).toBeUndefined()
-  })
+      expect(evicted).toBe(true)
+      expect(notebooksState.notebooks[NOTEBOOK_ID]).toBeUndefined()
+      expect(
+        queryClient.getQueryData(contentKeys.resource(PROJECT_REF, NOTEBOOK_ID))
+      ).toBeUndefined()
+    }
+  )
 
   it('drops a stale cache entry when the notebook is not present in the store', async () => {
     const queryClient = new QueryClient()

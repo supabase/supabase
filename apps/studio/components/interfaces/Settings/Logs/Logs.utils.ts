@@ -16,6 +16,7 @@ import {
 import type { Filters, LogData, LogsEndpointParams, QueryType } from './Logs.types'
 import { convertResultsToCSV } from '@/components/interfaces/SQLEditor/UtilityPanel/Results.utils'
 import BackwardIterator from '@/components/ui/CodeEditor/Providers/BackwardIterator'
+import { parseOtelTimestamp } from '@/data/logs/otel-inspection.utils'
 import {
   analyticsLiteral,
   joinSqlFragments,
@@ -239,6 +240,13 @@ limit ${limitLit}
     case 'pg_upgrade_logs':
       return safeSql`select id, ${LOG_TABLE_SQL[table]}.timestamp, event_message from ${LOG_TABLE_SQL[table]} ${joins} ${where} ${orderBy} limit ${analyticsLiteral(100)}`
 
+    case 'etl_replication_logs':
+      return safeSql`select id, t.timestamp, event_message from ${LOG_TABLE_SQL[table]} t
+  ${where}
+  ${orderBy}
+  limit ${limitLit}
+  `
+
     case 'pg_cron_logs': {
       const userClauses = buildWhereClauses(table, filters)
       const pgCronWhere =
@@ -313,7 +321,7 @@ export const LOG_TABLE_SQL: Record<LogsTableName, SafeLogSqlFragment> = {
   [LogsTableName.PGBOUNCER]: safeSql`pgbouncer_logs`,
   [LogsTableName.PG_UPGRADE]: safeSql`pg_upgrade_logs`,
   [LogsTableName.PG_CRON]: safeSql`pg_cron_logs`,
-  [LogsTableName.ETL]: safeSql`etl_replication_logs`,
+  [LogsTableName.PIPELINES]: safeSql`etl_replication_logs`,
   [LogsTableName.MULTIGRES]: safeSql`multigres_logs`,
 }
 
@@ -362,7 +370,9 @@ export const genCountQuery = (table: LogsTableName, filters: Filters): SafeLogSq
     where = basePgCronWhere
   }
   const joins = genCrossJoinUnnests(table)
-  return safeSql`SELECT count(*) as count FROM ${LOG_TABLE_SQL[table]} ${joins} ${where}`
+  // Pipelines filters read the row through the `t` alias.
+  const alias = table === LogsTableName.PIPELINES ? safeSql` t` : safeSql``
+  return safeSql`SELECT count(*) as count FROM ${LOG_TABLE_SQL[table]}${alias} ${joins} ${where}`
 }
 
 // Falls back to now for missing or unparseable params so an Invalid Date can't
@@ -881,7 +891,7 @@ export function formatLogsAsMarkdown(rows: LogExportData[]): string {
         if (isFinite(numTs)) {
           tsString = new Date(numTs / 1000).toISOString()
         } else if (typeof row.timestamp === 'string') {
-          const d = new Date(row.timestamp)
+          const d = parseOtelTimestamp(row.timestamp)
           tsString = isNaN(d.getTime()) ? row.timestamp : d.toISOString()
         } else {
           tsString = String(row.timestamp)
@@ -913,7 +923,7 @@ const QUERY_TYPE_LABELS: Record<QueryType, string> = {
   pg_upgrade: 'Postgres upgrade',
   pg_cron: 'pg_cron',
   pgbouncer: 'PgBouncer',
-  etl: 'ETL',
+  pipelines: 'Pipelines',
   multigres: 'Multigres',
 }
 
@@ -931,7 +941,7 @@ const LOG_TABLE_TO_SERVICE_LABEL: Record<LogsTableName, string> = {
   pgbouncer_logs: 'PgBouncer',
   pg_upgrade_logs: 'Postgres upgrade',
   pg_cron_logs: 'pg_cron',
-  etl_replication_logs: 'ETL',
+  etl_replication_logs: 'Pipelines',
   multigres_logs: 'Multigres',
 }
 
@@ -953,8 +963,15 @@ function extractServiceLabelFromSql(sql: string): string | null {
 
 export function buildLogsPrompt(
   rows: LogExportData[],
-  queryType?: string,
-  sqlQuery?: string
+  {
+    queryType,
+    sqlQuery,
+    omittedCount = 0,
+  }: {
+    queryType?: string
+    sqlQuery?: string
+    omittedCount?: number
+  } = {}
 ): string {
   const serviceLabel =
     (queryType && isQueryType(queryType) ? QUERY_TYPE_LABELS[queryType] : null) ??
@@ -963,9 +980,14 @@ export function buildLogsPrompt(
   const sqlContext = sqlQuery ? `\n\n**Query used:**\n\`\`\`sql\n${sqlQuery.trim()}\n\`\`\`` : ''
   const header = `I have ${rows.length} Supabase log entr${rows.length === 1 ? 'y' : 'ies'}${serviceContext} I'd like help debugging:\n\n`
   const body = formatLogsAsMarkdown(rows)
+  const omittedContext =
+    omittedCount > 0
+      ? `\n\n+${omittedCount.toLocaleString('en-US')} more matching log entr${omittedCount === 1 ? 'y' : 'ies'} not included.`
+      : ''
   return (
     header +
     body +
+    omittedContext +
     sqlContext +
     '\n\nWhat do these logs indicate? What steps can I take to resolve it? Keep your answer very concise and actionable. Max 2 or 3 bullet points.'
   )

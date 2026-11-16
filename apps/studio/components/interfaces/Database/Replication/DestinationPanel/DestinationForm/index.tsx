@@ -16,16 +16,13 @@ import { PipelineDestinationReview } from '../../CreatePipeline/PipelineDestinat
 import { PipelineReviewCosts } from '../../CreatePipeline/PipelineReviewCosts'
 import { PipelineValidationAdmonition } from '../../CreatePipeline/PipelineValidationAdmonition'
 import {
-  useIsETLBigQueryPrivateAlpha,
-  useIsETLClickHousePrivateAlpha,
-  useIsETLDucklakePrivateAlpha,
-  useIsETLIcebergPrivateAlpha,
-  useIsETLSnowflakePrivateAlpha,
-} from '../../useIsETLPrivateAlpha'
+  useIsPipelinesBigQueryEnabled,
+  useIsPipelinesClickHouseEnabled,
+  useIsPipelinesDuckLakeEnabled,
+  useIsPipelinesSnowflakeEnabled,
+} from '../../useIsPipelinesEnabled'
 import { type DestinationType, type ExistingDestination } from '../DestinationPanel.types'
 import { AdvancedSettings } from './AdvancedSettings'
-import { getAnalyticsBucketValidationIssues } from './AnalyticsBucket/AnalyticsBucket.utils'
-import { AnalyticsBucketFields } from './AnalyticsBucket/Fields'
 import {
   BIGQUERY_SERVICE_ACCOUNT_JSON_MESSAGE,
   getBigQueryValidationIssues,
@@ -42,6 +39,7 @@ import {
   pruneStaleTableOptions,
 } from './DestinationForm.utils'
 import { DestinationNameInput } from './DestinationNameInput'
+import { DUCKLAKE_MODE_SUPABASE } from './DuckLake/DuckLake.constants'
 import { getDucklakeValidationIssues } from './DuckLake/DuckLake.utils'
 import { DuckLakeFields } from './DuckLake/Fields'
 import { NewPublicationPanel } from './NewPublicationPanel'
@@ -59,15 +57,13 @@ import { useDestinationForm } from './useDestinationForm'
 import { ValidationFailuresSection } from './ValidationFailuresSection'
 import { ValidationWarningsDialog } from './ValidationWarningsDialog'
 import { usePipelineCreationPreview } from '@/components/interfaces/App/FeaturePreview/FeaturePreviewContext'
-import { CreateAnalyticsBucketSheet } from '@/components/interfaces/Storage/AnalyticsBuckets/CreateAnalyticsBucketSheet'
-import { useAPIKeys } from '@/data/api-keys/api-keys-query'
-import { useProjectSettingsV2Query } from '@/data/config/project-settings-v2-query'
+import { AlertError } from '@/components/ui/AlertError'
 import { useReplicationDestinationByIdQuery } from '@/data/replication/destination-by-id-query'
 import { useReplicationPipelineByIdQuery } from '@/data/replication/pipeline-by-id-query'
 import { useReplicationPublicationNamesQuery } from '@/data/replication/publication-names-query'
 import { useReplicationPublicationQuery } from '@/data/replication/publication-query'
 import { useReplicationSourceId } from '@/data/replication/sources-query'
-import { FGA_PERMISSIONS, useAsyncCheckPermissionsV2 } from '@/hooks/misc/useCheckPermissionsV2'
+import { useIsOrioleDb, useSelectedProjectQuery } from '@/hooks/misc/useSelectedProject'
 
 const formId = 'destination-editor'
 
@@ -91,22 +87,25 @@ export const DestinationForm = ({
   onCancel = onClose,
 }: DestinationFormProps) => {
   const { ref: projectRef } = useParams()
+  const isOrioleDb = useIsOrioleDb({ enabled: selectedType === 'DuckLake' })
+  const {
+    isPending: isProjectPending,
+    isSuccess: isProjectSuccess,
+    isFetched: isProjectFetched,
+    isFetching: isProjectFetching,
+    error: projectError,
+    refetch: refetchProject,
+  } = useSelectedProjectQuery({ enabled: selectedType === 'DuckLake' })
+  const isDuckLakeProjectBlocked =
+    selectedType === 'DuckLake' && (!isProjectSuccess || isOrioleDb !== false)
 
-  const etlEnableBigQuery = useIsETLBigQueryPrivateAlpha()
-  const etlEnableIceberg = useIsETLIcebergPrivateAlpha()
-  const etlEnableDucklake = useIsETLDucklakePrivateAlpha()
-  const etlEnableSnowflake = useIsETLSnowflakePrivateAlpha()
-  const etlEnableClickHouse = useIsETLClickHousePrivateAlpha()
-  const { can: canReadAPIKeys } = useAsyncCheckPermissionsV2([
-    FGA_PERMISSIONS.PROJECT.API_GATEWAY_KEYS_READ,
-    // api keys reveal = true will require this perms
-    FGA_PERMISSIONS.PROJECT.API_GATEWAY_KEYS_SECRET_READ,
-  ])
-
+  const isBigQueryEnabled = useIsPipelinesBigQueryEnabled()
+  const isDuckLakeEnabled = useIsPipelinesDuckLakeEnabled()
+  const isSnowflakeEnabled = useIsPipelinesSnowflakeEnabled()
+  const isClickHouseEnabled = useIsPipelinesClickHouseEnabled()
   const [showValidationWarningsDialog, setShowValidationWarningsDialog] = useState(false)
   const [showCostDialog, setShowCostDialog] = useState(false)
   const [publicationPanelVisible, setPublicationPanelVisible] = useState(false)
-  const [newBucketSheetVisible, setNewBucketSheetVisible] = useState(false)
   const [pendingFormValues, setPendingFormValues] = useState<z.infer<typeof FormSchema> | null>(
     null
   )
@@ -120,20 +119,12 @@ export const DestinationForm = ({
   // Compute available destinations based on feature flags
   const availableDestinations = useMemo(() => {
     const destinations = []
-    if (etlEnableBigQuery) destinations.push({ value: 'BigQuery', label: 'BigQuery' })
-    if (etlEnableIceberg)
-      destinations.push({ value: 'Analytics Bucket', label: 'Analytics Bucket' })
-    if (etlEnableDucklake) destinations.push({ value: 'DuckLake', label: 'DuckLake' })
-    if (etlEnableSnowflake) destinations.push({ value: 'Snowflake', label: 'Snowflake' })
-    if (etlEnableClickHouse) destinations.push({ value: 'ClickHouse', label: 'ClickHouse' })
+    if (isBigQueryEnabled) destinations.push({ value: 'BigQuery', label: 'BigQuery' })
+    if (isDuckLakeEnabled) destinations.push({ value: 'DuckLake', label: 'DuckLake' })
+    if (isSnowflakeEnabled) destinations.push({ value: 'Snowflake', label: 'Snowflake' })
+    if (isClickHouseEnabled) destinations.push({ value: 'ClickHouse', label: 'ClickHouse' })
     return destinations
-  }, [
-    etlEnableBigQuery,
-    etlEnableDucklake,
-    etlEnableIceberg,
-    etlEnableSnowflake,
-    etlEnableClickHouse,
-  ])
+  }, [isBigQueryEnabled, isDuckLakeEnabled, isSnowflakeEnabled, isClickHouseEnabled])
   const hasNoAvailableDestinations = availableDestinations.length === 0
 
   const sourceId = useReplicationSourceId({ projectRef })
@@ -161,18 +152,6 @@ export const DestinationForm = ({
   const isErrorExistingConfig = editMode && (isErrorDestination || isErrorPipeline)
   const isExistingConfigReady = !editMode || (isSuccessDestination && isSuccessPipeline)
 
-  // Revealed API keys are only ever consumed as the default catalog token for
-  // Analytics Bucket (Iceberg) destinations, so don't fetch them for other
-  // destination types.
-  const { data: apiKeysData } = useAPIKeys(
-    { projectRef, reveal: true },
-    { enabled: canReadAPIKeys && selectedType === 'Analytics Bucket' && !editMode }
-  )
-  const { serviceKey } = apiKeysData ?? {}
-  const catalogToken = serviceKey?.api_key ?? ''
-
-  const { data: projectSettings } = useProjectSettingsV2Query({ projectRef })
-
   const {
     isValidating,
     validateConfiguration,
@@ -189,11 +168,9 @@ export const DestinationForm = ({
       generateDefaultValues({
         destinationData,
         pipelineData,
-        catalogToken,
-        region: projectSettings?.region,
         editMode,
       }),
-    [destinationData, pipelineData, catalogToken, projectSettings, editMode]
+    [destinationData, pipelineData, editMode]
   )
   const form = useForm<z.infer<typeof FormSchema>>({
     mode: 'onSubmit',
@@ -223,15 +200,8 @@ export const DestinationForm = ({
           }).forEach(({ path, message }) => {
             addRequiredFieldError(path, message)
           })
-        } else if (selectedType === 'Analytics Bucket') {
-          getAnalyticsBucketValidationIssues(data, {
-            secretsOptional: editMode,
-            storedS3AccessKeyId: editMode ? defaultValues.s3AccessKeyId : undefined,
-          }).forEach(({ path, message }) => {
-            addRequiredFieldError(path, message)
-          })
         } else if (selectedType === 'DuckLake') {
-          getDucklakeValidationIssues(data, { secretsOptional: editMode }).forEach(
+          getDucklakeValidationIssues(data, { secretsOptional: editMode, isOrioleDb }).forEach(
             ({ path, message }) => {
               addRequiredFieldError(path, message)
             }
@@ -257,6 +227,8 @@ export const DestinationForm = ({
   // See https://react-hook-form.com/docs/useform/formstate
   const { isDirty } = form.formState
 
+  const ducklakeMode = useWatch({ control: form.control, name: 'ducklakeMode' })
+  const isManagedDuckLake = selectedType === 'DuckLake' && ducklakeMode === DUCKLAKE_MODE_SUPABASE
   const publicationName = useWatch({ control: form.control, name: 'publicationName' })
   const { data: selectedPublication, isSuccess: isSuccessPublication } =
     useReplicationPublicationQuery({ projectRef, sourceId, publicationName })
@@ -287,6 +259,7 @@ export const DestinationForm = ({
 
   const isSubmitDisabled =
     isSaving ||
+    (isManagedDuckLake && isDuckLakeProjectBlocked) ||
     !isExistingConfigReady ||
     !isSuccessPublicationNames ||
     (!!publicationName && !isSuccessPublication) ||
@@ -320,6 +293,8 @@ export const DestinationForm = ({
   }
 
   const onSubmit = async (rawData: z.infer<typeof FormSchema>) => {
+    if (rawData.ducklakeMode === DUCKLAKE_MODE_SUPABASE && isDuckLakeProjectBlocked) return
+
     if (!isSuccessPublication || !selectedPublication) {
       toast.error('Publication tables are unavailable. Refresh and try again.')
       return
@@ -436,6 +411,9 @@ export const DestinationForm = ({
     const values = pendingFormValues
     setShowCostDialog(false)
 
+    // Project details may have failed to refresh while validation or confirmation was open.
+    if (values.ducklakeMode === DUCKLAKE_MODE_SUPABASE && isDuckLakeProjectBlocked) return
+
     await submitPipeline({
       data: values,
       existingDestination,
@@ -465,23 +443,43 @@ export const DestinationForm = ({
 
   const destinationFields = (
     <>
-      {selectedType === 'BigQuery' && etlEnableBigQuery && (
+      {selectedType === 'BigQuery' && isBigQueryEnabled && (
         <BigQueryFields form={form} editMode={editMode} />
       )}
-      {selectedType === 'Analytics Bucket' && etlEnableIceberg && (
-        <AnalyticsBucketFields
-          form={form}
-          editMode={editMode}
-          onSelectNewBucket={() => setNewBucketSheetVisible(true)}
-        />
+      {selectedType === 'DuckLake' && isDuckLakeEnabled && (
+        <>
+          <p role="status" className="px-5 pt-5 text-sm text-foreground-light empty:sr-only">
+            {isManagedDuckLake && isProjectPending && !isProjectFetched
+              ? 'Checking project compatibility...'
+              : ''}
+          </p>
+          {/* Keep this mounted during retries: AlertError's telemetry also observes the project. */}
+          {isManagedDuckLake &&
+            isProjectFetched &&
+            (!isProjectSuccess || isOrioleDb === undefined) && (
+              <AlertError
+                className="mx-5 mt-5"
+                subject="Failed to load project"
+                error={projectError ?? { message: 'The project database version is unavailable.' }}
+                projectRef={projectRef}
+                additionalActions={
+                  <Button
+                    type="button"
+                    loading={isProjectFetching}
+                    onClick={() => refetchProject()}
+                  >
+                    Retry
+                  </Button>
+                }
+              />
+            )}
+          <DuckLakeFields form={form} editMode={editMode} />
+        </>
       )}
-      {selectedType === 'DuckLake' && etlEnableDucklake && (
-        <DuckLakeFields form={form} editMode={editMode} />
-      )}
-      {selectedType === 'Snowflake' && etlEnableSnowflake && (
+      {selectedType === 'Snowflake' && isSnowflakeEnabled && (
         <SnowflakeFields form={form} editMode={editMode} />
       )}
-      {selectedType === 'ClickHouse' && etlEnableClickHouse && (
+      {selectedType === 'ClickHouse' && isClickHouseEnabled && (
         <ClickHouseFields form={form} editMode={editMode} />
       )}
     </>
@@ -640,11 +638,6 @@ export const DestinationForm = ({
           }
           setPublicationPanelVisible(false)
         }}
-      />
-
-      <CreateAnalyticsBucketSheet
-        open={newBucketSheetVisible}
-        onOpenChange={setNewBucketSheetVisible}
       />
 
       <ValidationWarningsDialog

@@ -1,3 +1,4 @@
+import { Admonition } from 'ui-patterns/Admonition'
 import { PageContainer } from 'ui-patterns/PageContainer'
 import {
   PageHeader,
@@ -13,7 +14,7 @@ import { RealtimeSettings } from '@/components/interfaces/Realtime/RealtimeSetti
 import { DefaultLayout } from '@/components/layouts/DefaultLayout'
 import RealtimeLayout from '@/components/layouts/RealtimeLayout/RealtimeLayout'
 import { DocsButton } from '@/components/ui/DocsButton'
-import { DOCS_URL } from '@/lib/constants'
+import { DOCS_URL, IS_PLATFORM } from '@/lib/constants'
 import type { NextPageWithLayout } from '@/types'
 
 const RealtimeSettingsPage: NextPageWithLayout = () => {
@@ -35,7 +36,15 @@ const RealtimeSettingsPage: NextPageWithLayout = () => {
       <PageContainer>
         <PageSection>
           <PageSectionContent>
-            <RealtimeSettings />
+            {!IS_PLATFORM ? (
+              <Admonition
+                type="default"
+                title="Realtime settings are not available for self-hosted projects"
+                description="Realtime settings are only available for Supabase Platform projects."
+              />
+            ) : (
+              <RealtimeSettings />
+            )}
           </PageSectionContent>
         </PageSection>
       </PageContainer>

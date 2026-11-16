@@ -4,10 +4,21 @@ on:
   push:
     branches:
       - master
+    paths:
+      - '.github/workflows/kb-troubleshooting-sync.yml'
+      - 'apps/kb/**'
   workflow_dispatch:
 
 permissions:
   contents: read
+
+# Overlapping runs (e.g. two quick pushes to master) must not interleave: both
+# would see a new guide as "no row yet" and create a discussion for it. Queue,
+# never cancel — a run cancelled between creating a discussion and writing its
+# row would leave that discussion orphaned.
+concurrency:
+  group: kb-troubleshooting-sync
+  cancel-in-progress: false
 
 jobs:
   sync:
@@ -42,9 +53,6 @@ jobs:
 
       - name: Install dependencies
         run: pnpm install --frozen-lockfile
-
-      - name: Backfill legacy troubleshooting slugs
-        run: pnpm run --filter kb sync:legacy-slugs
 
       - name: Fetch federated troubleshooting content
         run: pnpm run --filter kb fetch:federated-content

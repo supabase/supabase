@@ -297,8 +297,8 @@ export const CustomTooltip = ({
           </span>
           <span className="ml-3.5 flex items-end gap-1">
             {formatNumeric(rawValue) + (!isPercentage && format !== 'ms' ? byteUnitSuffix : '')}
-            {isPercentage ? '%' : ''}
-            {format === 'ms' ? 'ms' : ''}
+            {isPercentage ? <span>%</span> : ''}
+            {format === 'ms' ? <span>ms</span> : ''}
 
             {/* Show percentage if max value is set */}
             {percentage !== null && !isMax && !isPercentage && (
@@ -340,7 +340,7 @@ export const CustomTooltip = ({
                     ? formatPercentage(total as number, valuePrecision)
                     : formatNumeric(total as number) +
                       (!isPercentage && format !== 'ms' ? byteUnitSuffix : '')}
-                  {format === 'ms' ? 'ms' : ''}
+                  {format === 'ms' ? <span>ms</span> : ''}
                 </span>
                 {maxValueAttribute &&
                   hasFiniteMaxValue &&

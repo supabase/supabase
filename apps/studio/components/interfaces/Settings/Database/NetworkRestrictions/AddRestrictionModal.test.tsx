@@ -22,7 +22,7 @@ type NetworkRestrictionsResponse = components['schemas']['NetworkRestrictionsRes
 
 type ApplyRequest = { ref: string | undefined; body: unknown }
 
-const mockExistingRestrictions = (dbAllowedCidrs: string[]) => {
+const mockExistingRestrictions = (dbAllowedCidrs: string[], dbAllowedCidrsV6: string[] = []) => {
   addAPIMock({
     method: 'get',
     path: '/v1/projects/:ref/network-restrictions',
@@ -30,7 +30,7 @@ const mockExistingRestrictions = (dbAllowedCidrs: string[]) => {
       HttpResponse.json<NetworkRestrictionsResponse>({
         entitlement: 'allowed',
         status: 'applied',
-        config: { dbAllowedCidrs, dbAllowedCidrsV6: [] },
+        config: { dbAllowedCidrs, dbAllowedCidrsV6 },
       }),
   })
 }
@@ -57,7 +57,7 @@ const mockApply = () => {
 
 const renderModal = (
   props: Partial<React.ComponentProps<typeof AddRestrictionModal>> = {},
-  { cachedCidrs }: { cachedCidrs?: string[] } = {}
+  { cachedCidrs, cachedCidrsV6 = [] }: { cachedCidrs?: string[]; cachedCidrsV6?: string[] } = {}
 ) => {
   const onClose = props.onClose ?? vi.fn()
 
@@ -68,7 +68,7 @@ const renderModal = (
   })
   if (cachedCidrs) {
     queryClient.setQueryData(networkRestrictionKeys.list('default'), {
-      config: { dbAllowedCidrs: cachedCidrs, dbAllowedCidrsV6: [] },
+      config: { dbAllowedCidrs: cachedCidrs, dbAllowedCidrsV6: cachedCidrsV6 },
     })
   }
 
@@ -84,13 +84,21 @@ const renderModal = (
   return { onClose }
 }
 
+const user = userEvent.setup()
+
+// Pasting rather than typing: keystroke-level input isn't the behaviour under test
+const enterValue = async (input: HTMLElement, value: string) => {
+  await user.clear(input)
+  await user.paste(value)
+}
+
+const enterAddress = async (address: string) =>
+  enterValue(await screen.findByPlaceholderText('0.0.0.0'), address)
+
 const addEntry = async (address: string, cidrBlockSize?: string) => {
-  const ipInput = await screen.findByPlaceholderText('0.0.0.0')
-  await userEvent.type(ipInput, address)
+  await enterAddress(address)
   if (cidrBlockSize !== undefined) {
-    const sizeInput = screen.getByPlaceholderText('32')
-    await userEvent.clear(sizeInput)
-    await userEvent.type(sizeInput, cidrBlockSize)
+    await enterValue(screen.getByPlaceholderText('32'), cidrBlockSize)
   }
   fireEvent.click(screen.getByRole('button', { name: 'Add to list' }))
 }
@@ -148,7 +156,7 @@ describe('AddRestrictionModal', () => {
     const { onClose } = renderModal()
 
     await addEntry('203.0.113.7')
-    await userEvent.type(screen.getByPlaceholderText('0.0.0.0'), '192.0.2.1')
+    await enterAddress('192.0.2.1')
 
     fireEvent.click(await screen.findByRole('button', { name: 'Save restrictions' }))
 
@@ -166,7 +174,7 @@ describe('AddRestrictionModal', () => {
     const requests = mockApply()
     const { onClose } = renderModal()
 
-    await userEvent.type(await screen.findByPlaceholderText('0.0.0.0'), '192.0.2.1')
+    await enterAddress('192.0.2.1')
     fireEvent.click(await screen.findByRole('button', { name: 'Save restriction' }))
 
     await waitFor(() => expect(onClose).toHaveBeenCalled())
@@ -211,6 +219,33 @@ describe('AddRestrictionModal', () => {
     expect(screen.getByText('1 range to add')).toBeInTheDocument()
   })
 
+  test('rejects a range already restricted in another spelling', async () => {
+    mockExistingRestrictions([], ['2001:DB8::/32'])
+    renderModal({ type: 'IPv6' }, { cachedCidrs: [], cachedCidrsV6: ['2001:DB8::/32'] })
+
+    await enterValue(await screen.findByPlaceholderText('::0'), '2001:db8::')
+    await enterValue(screen.getByPlaceholderText('128'), '32')
+    fireEvent.click(screen.getByRole('button', { name: 'Add to list' }))
+
+    expect(
+      await screen.findByText('The address 2001:db8::/32 is already restricted')
+    ).toBeInTheDocument()
+  })
+
+  test('rejects an IPv4-mapped IPv6 address', async () => {
+    mockExistingRestrictions([])
+    renderModal({ type: 'IPv6' })
+
+    await enterValue(await screen.findByPlaceholderText('::0'), '::ffff:102:304')
+    fireEvent.click(screen.getByRole('button', { name: 'Add to list' }))
+
+    expect(
+      await screen.findByText(
+        "IPv4-mapped IPv6 addresses aren't supported. Add the address as an IPv4 restriction instead."
+      )
+    ).toBeInTheDocument()
+  })
+
   test('rejects private addresses', async () => {
     mockExistingRestrictions([])
     renderModal()
@@ -226,7 +261,7 @@ describe('AddRestrictionModal', () => {
     renderModal()
 
     await addEntry('203.0.113.7')
-    await userEvent.click(await screen.findByRole('button', { name: 'Remove 203.0.113.7/32' }))
+    await user.click(await screen.findByRole('button', { name: 'Remove 203.0.113.7/32' }))
 
     expect(screen.queryByDisplayValue('203.0.113.7/32')).not.toBeInTheDocument()
     expect(screen.getByRole('button', { name: 'Save restrictions' })).toBeDisabled()
@@ -237,12 +272,12 @@ describe('AddRestrictionModal', () => {
     const { onClose } = renderModal()
 
     await addEntry('203.0.113.7')
-    await userEvent.click(screen.getByRole('button', { name: 'Cancel' }))
+    await user.click(screen.getByRole('button', { name: 'Cancel' }))
 
     expect(await screen.findByText('Unsaved changes')).toBeInTheDocument()
     expect(onClose).not.toHaveBeenCalled()
 
-    await userEvent.click(screen.getByRole('button', { name: 'Discard changes' }))
+    await user.click(screen.getByRole('button', { name: 'Discard changes' }))
     expect(onClose).toHaveBeenCalled()
   })
 
@@ -250,7 +285,7 @@ describe('AddRestrictionModal', () => {
     mockExistingRestrictions([])
     const { onClose } = renderModal()
 
-    await userEvent.click(await screen.findByRole('button', { name: 'Cancel' }))
+    await user.click(await screen.findByRole('button', { name: 'Cancel' }))
 
     expect(onClose).toHaveBeenCalled()
   })

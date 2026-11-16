@@ -276,6 +276,18 @@ export const examples: Registry = [
     files: ['example/button-split-dropdown.tsx'],
   },
   {
+    name: 'button-dropdown',
+    type: 'components:example',
+    registryDependencies: ['button', 'dropdown-menu'],
+    files: ['example/button-dropdown.tsx'],
+  },
+  {
+    name: 'button-more-actions',
+    type: 'components:example',
+    registryDependencies: ['button', 'dropdown-menu', 'tooltip'],
+    files: ['example/button-more-actions.tsx'],
+  },
+  {
     name: 'calendar-demo',
     type: 'components:example',
     registryDependencies: ['calendar'],
@@ -727,6 +739,11 @@ export const examples: Registry = [
     type: 'components:example',
     registryDependencies: ['button'],
     files: ['example/keyboard-shortcut-inline.tsx'],
+  },
+  {
+    name: 'keyboard-shortcut-keycaps',
+    type: 'components:example',
+    files: ['example/keyboard-shortcut-keycaps.tsx'],
   },
   {
     name: 'label-demo',
@@ -1574,6 +1591,11 @@ export const examples: Registry = [
     files: ['example/ai-tools-minimal.tsx'],
   },
   {
+    name: 'ai-tools-horizontal',
+    type: 'components:example',
+    files: ['example/ai-tools-horizontal.tsx'],
+  },
+  {
     name: 'toc-demo',
     type: 'components:example',
     files: ['example/toc-demo.tsx'],
@@ -1949,5 +1971,15 @@ export const examples: Registry = [
     name: 'status-code-demo',
     type: 'components:example',
     files: ['example/status-code-demo.tsx'],
+  },
+  {
+    name: 'trace-waterfall-demo',
+    type: 'components:example',
+    files: ['example/trace-waterfall-demo.tsx'],
+  },
+  {
+    name: 'trace-waterfall-live-demo',
+    type: 'components:example',
+    files: ['example/trace-waterfall-live-demo.tsx'],
   },
 ]

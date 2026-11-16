@@ -3,7 +3,8 @@ import { toast } from 'sonner'
 
 import { platformWebhooksKeys } from './keys'
 import { deleteWebhookEndpoint, type WebhookScopeParams } from './platform-webhooks-fetchers'
-import type { ResponseError, UseCustomMutationOptions } from '@/types'
+import type { StudioError } from '@/lib/errors/studio-errors'
+import type { UseCustomMutationOptions } from '@/types'
 
 export type WebhookEndpointDeleteVariables = {
   scope: WebhookScopeParams
@@ -21,16 +22,12 @@ export const useWebhookEndpointDeleteMutation = ({
   onError,
   ...options
 }: Omit<
-  UseCustomMutationOptions<
-    WebhookEndpointDeleteData,
-    ResponseError,
-    WebhookEndpointDeleteVariables
-  >,
+  UseCustomMutationOptions<WebhookEndpointDeleteData, StudioError, WebhookEndpointDeleteVariables>,
   'mutationFn'
 > = {}) => {
   const queryClient = useQueryClient()
 
-  return useMutation<WebhookEndpointDeleteData, ResponseError, WebhookEndpointDeleteVariables>({
+  return useMutation<WebhookEndpointDeleteData, StudioError, WebhookEndpointDeleteVariables>({
     mutationFn: deleteEndpoint,
     async onSuccess(data, variables, context) {
       await queryClient.invalidateQueries({

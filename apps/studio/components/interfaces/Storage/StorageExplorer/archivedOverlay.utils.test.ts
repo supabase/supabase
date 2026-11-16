@@ -67,10 +67,7 @@ describe('getArchivedOverlayItems', () => {
     expect(row.type).toBe(STORAGE_ROW_TYPES.FILE)
     expect(row.archived).toEqual({ archivedObjectId: 'id-logo.svg' })
     expect(row.path).toBe('logo.svg')
-  })
-
-  it('carries the archived size and timestamp onto the row', () => {
-    const [row] = overlay([], [archived('logo.svg')])
+    // Carries the archived size and timestamp onto the row
     expect(row.metadata?.size).toBe(1024)
     expect(row.updated_at).toBe('2026-08-01T00:00:00Z')
   })
@@ -104,12 +101,11 @@ describe('getArchivedOverlayItems', () => {
     expect(rows.map((r) => r.name)).toEqual(['matches'])
   })
 
-  it('skips a folder that already exists in the live listing', () => {
-    expect(overlay([], [archived('matches/final.png')], ['matches'])).toEqual([])
-  })
-
-  it('skips a file that already exists in the live listing', () => {
-    expect(overlay([], [archived('logo.svg')], ['logo.svg'])).toEqual([])
+  it.each([
+    { kind: 'folder', path: 'matches/final.png', liveName: 'matches' },
+    { kind: 'file', path: 'logo.svg', liveName: 'logo.svg' },
+  ])('skips a $kind that already exists in the live listing', ({ path, liveName }) => {
+    expect(overlay([], [archived(path)], [liveName])).toEqual([])
   })
 
   it('orders folders before files', () => {
@@ -150,7 +146,7 @@ describe('getArchivedObjectsUnderFolder', () => {
     archived('matches-2026/other.png'),
   ]
 
-  it('collects everything under the folder at any depth', () => {
+  it('collects everything under the folder at any depth, but not a sibling sharing its name as a prefix', () => {
     const under = getArchivedObjectsUnderFolder({
       folderSegments: ['matches'],
       archivedObjects: objects,
@@ -159,14 +155,6 @@ describe('getArchivedObjectsUnderFolder', () => {
       'matches/final.png',
       'matches/round-3/a.png',
     ])
-  })
-
-  it('does not match a sibling folder sharing the name as a prefix', () => {
-    const under = getArchivedObjectsUnderFolder({
-      folderSegments: ['matches'],
-      archivedObjects: [archived('matches-2026/other.png')],
-    })
-    expect(under).toEqual([])
   })
 
   it('includes the placeholder, so an empty archived folder is still actionable', () => {

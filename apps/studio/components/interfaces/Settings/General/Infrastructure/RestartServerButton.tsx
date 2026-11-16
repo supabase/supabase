@@ -5,11 +5,11 @@ import { useState } from 'react'
 import { toast } from 'sonner'
 import {
   Button,
-  cn,
   DropdownMenu,
   DropdownMenuContent,
   DropdownMenuItem,
   DropdownMenuTrigger,
+  SplitButtonGroup,
 } from 'ui'
 import ConfirmationModal from 'ui-patterns/Dialogs/ConfirmationModal'
 
@@ -21,7 +21,7 @@ import { FGA_PERMISSIONS, useAsyncCheckPermissionsV2 } from '@/hooks/misc/useChe
 import { useIsFeatureEnabled } from '@/hooks/misc/useIsFeatureEnabled'
 import { useIsProjectActive, useSelectedProjectQuery } from '@/hooks/misc/useSelectedProject'
 import { PROJECT_STATUS } from '@/lib/constants'
-import { type ResponseError } from '@/types'
+import type { StudioError } from '@/lib/errors/studio-errors'
 
 export const RestartServerButton = () => {
   const router = useRouter()
@@ -83,7 +83,7 @@ export const RestartServerButton = () => {
     restartProjectServices({ ref: projectRef, region: projectRegion, services: ['postgresql'] })
   }
 
-  const onRestartFailed = (error: ResponseError, type: string) => {
+  const onRestartFailed = (error: StudioError, type: string) => {
     toast.error(`Unable to restart ${type}: ${error.message}`)
     setServiceToRestart(undefined)
   }
@@ -98,13 +98,10 @@ export const RestartServerButton = () => {
   return (
     <>
       {projectSettingsRestartProject ? (
-        <div className="flex w-full @lg:w-auto">
+        <SplitButtonGroup className="w-full @lg:w-auto">
           <ButtonTooltip
             type="button"
-            className={cn(
-              'flex-1 px-3 hover:z-10 focus-visible:z-10 @lg:flex-none',
-              canRestartProject && canRestart ? 'rounded-r-none focus-visible:rounded-r-sm' : ''
-            )}
+            className="flex-1 px-3 @lg:flex-none"
             disabled={
               project === undefined || !canRestartProject || !canRestart || projectRestartDisabled
             }
@@ -130,7 +127,7 @@ export const RestartServerButton = () => {
                 <Button
                   type="button"
                   aria-label="Choose restart type"
-                  className="shrink-0 rounded-l-none px-[4px] py-[5px] -ml-px focus-visible:z-10 focus-visible:rounded-l-sm"
+                  className="shrink-0 px-1 py-1.25"
                   icon={<ChevronDownIcon />}
                   disabled={!canRestartProject}
                 />
@@ -154,7 +151,7 @@ export const RestartServerButton = () => {
               </DropdownMenuContent>
             </DropdownMenu>
           )}
-        </div>
+        </SplitButtonGroup>
       ) : (
         <Button
           icon={<RefreshCwIcon />}

@@ -3,7 +3,7 @@ import { toast } from 'sonner'
 
 import { storageKeys } from '../keys'
 import { del, handleError } from '@/data/fetchers'
-import type { ResponseError } from '@/types'
+import type { StudioError } from '@/lib/errors/studio-errors'
 
 export type ObjectVersionDeleteVariables = {
   projectRef: string
@@ -38,12 +38,12 @@ export const useObjectVersionDeleteMutation = ({
   onError,
   ...options
 }: Omit<
-  UseMutationOptions<void, ResponseError, ObjectVersionDeleteVariables>,
+  UseMutationOptions<void, StudioError, ObjectVersionDeleteVariables>,
   'mutationFn'
 > = {}) => {
   const queryClient = useQueryClient()
 
-  return useMutation<void, ResponseError, ObjectVersionDeleteVariables>({
+  return useMutation<void, StudioError, ObjectVersionDeleteVariables>({
     mutationFn: deleteObjectVersion,
     async onSuccess(data, variables, context, mutationContext) {
       await queryClient.invalidateQueries({

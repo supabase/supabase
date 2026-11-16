@@ -1,3 +1,3 @@
 export const recoveryCodeKeys = {
-  status: () => ['recovery-code-status-query'] as const,
+  status: (userId?: string) => ['recovery-code-status-query', userId].filter(Boolean),
 }

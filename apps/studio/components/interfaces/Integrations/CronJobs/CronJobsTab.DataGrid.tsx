@@ -5,13 +5,13 @@ import { GenericSkeletonLoader } from 'ui-patterns/ShimmeringLoader'
 
 import { AlertError } from '@/components/ui/AlertError'
 import type { CronJob } from '@/data/database-cron-jobs/database-cron-jobs-infinite-query'
-import type { ResponseError } from '@/types'
+import type { StudioError } from '@/lib/errors/studio-errors'
 
 interface CronJobsTabDataGridProps {
   columns: readonly Column<CronJob>[]
   rows: CronJob[]
   isLoading: boolean
-  error: ResponseError | Error | null
+  error: StudioError | Error | null
   searchQuery?: string | null
   onScroll: (event: UIEvent<HTMLDivElement>) => void
   onRowClick: (row: CronJob, event: MouseEvent<HTMLDivElement>) => void

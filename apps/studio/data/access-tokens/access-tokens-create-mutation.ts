@@ -4,7 +4,8 @@ import { toast } from 'sonner'
 
 import { accessTokenKeys } from './keys'
 import { handleError, post } from '@/data/fetchers'
-import type { ResponseError, UseCustomMutationOptions } from '@/types'
+import type { StudioError } from '@/lib/errors/studio-errors'
+import type { UseCustomMutationOptions } from '@/types'
 
 export type AccessTokenCreateVariables = components['schemas']['CreateAccessTokenBody']
 
@@ -27,12 +28,12 @@ export const useAccessTokenCreateMutation = ({
   onError,
   ...options
 }: Omit<
-  UseCustomMutationOptions<AccessTokenCreateData, ResponseError, AccessTokenCreateVariables>,
+  UseCustomMutationOptions<AccessTokenCreateData, StudioError, AccessTokenCreateVariables>,
   'mutationFn'
 > = {}) => {
   const queryClient = useQueryClient()
 
-  return useMutation<AccessTokenCreateData, ResponseError, AccessTokenCreateVariables>({
+  return useMutation<AccessTokenCreateData, StudioError, AccessTokenCreateVariables>({
     mutationFn: (vars) => createAccessToken(vars),
     async onSuccess(data, variables, context) {
       await queryClient.invalidateQueries({ queryKey: accessTokenKeys.list() })

@@ -40,6 +40,7 @@
   --color-border: var(--border);
   --color-input: var(--input);
   --color-ring: var(--ring);
+  --color-glyph-strong: var(--border-control-hover);
 
   /* Backwards-compatible utility names */
   --color-foreground-light: var(--muted-foreground);

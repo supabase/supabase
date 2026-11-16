@@ -1027,7 +1027,8 @@ export interface paths {
     delete?: never
     options?: never
     head?: never
-    patch?: never
+    /** Partially updates project's Postgres config */
+    patch: operations['v1-patch-postgres-config']
     trace?: never
   }
   '/v1/projects/{ref}/config/disk': {
@@ -1883,6 +1884,28 @@ export interface paths {
     patch?: never
     trace?: never
   }
+  '/v1/projects/{ref}/network-restrictions/review': {
+    parameters: {
+      query?: never
+      header?: never
+      path?: never
+      cookie?: never
+    }
+    get?: never
+    put?: never
+    /**
+     * Applies or rejects the change in review in a project's network restrictions
+     * @description This is an **experimental** endpoint. It is subject to change or removal in future versions. Use it with caution, as it may not remain supported or stable.
+     *
+     *     This endpoint is currently in its **Alpha** stage.
+     */
+    post: operations['v1-review-network-restrictions']
+    delete?: never
+    options?: never
+    head?: never
+    patch?: never
+    trace?: never
+  }
   '/v1/projects/{ref}/pause': {
     parameters: {
       query?: never
@@ -2498,6 +2521,7 @@ export interface components {
       external_discord_enabled: boolean | null
       external_discord_secret: string | null
       external_email_enabled: boolean | null
+      external_email_magic_link_disabled: boolean | null
       external_facebook_client_id: string | null
       external_facebook_email_optional: boolean | null
       external_facebook_enabled: boolean | null
@@ -2766,6 +2790,7 @@ export interface components {
         | 'RESTARTING'
         | 'PAUSE_FAILED'
         | 'RESIZING'
+        | 'PROMOTING'
     }
     BranchResponse_Output: {
       /** Format: date-time */
@@ -2805,6 +2830,7 @@ export interface components {
         | 'RESTARTING'
         | 'PAUSE_FAILED'
         | 'RESIZING'
+        | 'PROMOTING'
       project_ref: string
       /** Format: date-time */
       review_requested_at?: string
@@ -3800,10 +3826,46 @@ export interface components {
         dbAllowedCidrs?: string[]
         dbAllowedCidrsV6?: string[]
       }
+      /**
+       * @description Present when a change that was never applied is waiting for review. `config` is the list the project enforces. Apply or reject the change with `POST /v1/projects/{ref}/network-restrictions/review`; submitting a new config also replaces it.
+       * @example {
+       *       "dbAllowedCidrs": [
+       *         "203.0.113.0/24"
+       *       ],
+       *       "dbAllowedCidrsV6": [
+       *         "2001:db8::/32"
+       *       ]
+       *     }
+       */
+      pending_config?: {
+        dbAllowedCidrs?: string[]
+        dbAllowedCidrsV6?: string[]
+      }
+      /**
+       * Format: date-time
+       * @description When the change in `pending_config` was requested. Send it as `requested_at` to the review endpoint.
+       */
+      pending_requested_at?: string
       /** @enum {string} */
       status: 'stored' | 'applied'
       /** Format: date-time */
       updated_at?: string
+    }
+    /** @example {
+     *       "action": "apply",
+     *       "requested_at": "2026-10-21T20:31:51.116+00:00"
+     *     } */
+    NetworkRestrictionsReviewRequest: {
+      /**
+       * @description `apply` replaces the enforced list with the pending one and applies it. `reject` discards the pending one and keeps the enforced list.
+       * @enum {string}
+       */
+      action: 'apply' | 'reject'
+      /**
+       * Format: date-time
+       * @description The `pending_requested_at` of the change being reviewed. Only that change is resolved: if another one has replaced it, the request gets a 409.
+       */
+      requested_at: string
     }
     NetworkRestrictionsV2Response_Output: {
       /** Format: date-time */
@@ -3876,8 +3938,15 @@ export interface components {
     OAuthTokenResponse_Output: {
       access_token: string
       expires_in: number
+      /** @description Project refs the token is limited to. `null` means all projects. */
+      project_refs: string[] | null
       /** @description The `urn:ietf:params:oauth:grant-type:jwt-bearer` grant type issues access tokens only, no refresh token is returned and the token cannot be revoked via `/v1/oauth/revoke`. */
       refresh_token?: string
+      /**
+       * @description Space-delimited scopes granted to the token. Omitted when no scopes were granted.
+       * @example projects:read projects:write
+       */
+      scope?: string
       /** @enum {string} */
       token_type: 'Bearer'
     }
@@ -3995,6 +4064,7 @@ export interface components {
           | 'RESTARTING'
           | 'PAUSE_FAILED'
           | 'RESIZING'
+          | 'PROMOTING'
       }[]
     }
     OrganizationResponseV1_Output: {
@@ -4089,6 +4159,10 @@ export interface components {
       db_pool: number | null
       /** @description If `null`, the value is automatically configured to 10. */
       db_pool_acquisition_timeout: number | null
+      /** @description If `null`, the value is automatically configured to 30. */
+      db_pool_max_idletime: number | null
+      /** @description If `null`, the value is automatically configured to 1800. */
+      db_pool_max_lifetime: number | null
       db_schema: string
       jwt_secret?: string
       max_rows: number
@@ -4187,6 +4261,14 @@ export interface components {
             type: 'active_replication_slot'
           }
         | {
+            column_name: string
+            schema_name: string
+            table_name: string
+            /** @enum {string} */
+            type: 'table_using_reg_type'
+            type_name: string
+          }
+        | {
             /** @enum {string} */
             type: 'x86_architecture'
           }
@@ -4211,6 +4293,10 @@ export interface components {
         | {
             /** @enum {string} */
             type: 'btree_gist_nan_reindex'
+          }
+        | {
+            /** @enum {string} */
+            type: 'collation_reindex_required'
           }
       )[]
     }
@@ -4605,6 +4691,7 @@ export interface components {
       external_discord_enabled?: boolean | null
       external_discord_secret?: string | null
       external_email_enabled?: boolean | null
+      external_email_magic_link_disabled?: boolean
       external_facebook_client_id?: string | null
       external_facebook_email_optional?: boolean | null
       external_facebook_enabled?: boolean | null
@@ -5395,7 +5482,6 @@ export interface components {
             status: string
           }
       result?: {
-        /** Format: date-time */
         timestamp: string
         total_auth_requests: number
         total_realtime_requests: number
@@ -5563,6 +5649,10 @@ export interface components {
       db_pool: number | null
       /** @description If `null`, the value is automatically configured to 10. */
       db_pool_acquisition_timeout: number | null
+      /** @description If `null`, the value is automatically configured to 30. */
+      db_pool_max_idletime: number | null
+      /** @description If `null`, the value is automatically configured to 1800. */
+      db_pool_max_lifetime: number | null
       db_schema: string
       max_rows: number
     }
@@ -5641,6 +5731,9 @@ export interface components {
           | 'log_auth_error_rate_high'
           | 'log_storage_error_rate_high'
           | 'log_edge_function_error_rate_high'
+          | 'realtime_authorization_timeouts'
+          | 'realtime_postgres_changes_spike'
+          | 'realtime_concurrent_users_near_limit'
           | 'project_not_active'
           | 'advisor_check_unavailable'
         /** Format: date-time */
@@ -5698,6 +5791,7 @@ export interface components {
         | 'RESTARTING'
         | 'PAUSE_FAILED'
         | 'RESIZING'
+        | 'PROMOTING'
     }
     V1ProjectWithDatabaseResponse_Output: {
       /** @description Creation timestamp */
@@ -5753,6 +5847,7 @@ export interface components {
         | 'RESTARTING'
         | 'PAUSE_FAILED'
         | 'RESIZING'
+        | 'PROMOTING'
     }
     /** @example {
      *       "query": "select * from pg_stat_activity limit 1;"
@@ -5920,6 +6015,8 @@ export interface components {
       db_extra_search_path?: string
       db_pool?: number
       db_pool_acquisition_timeout?: number
+      db_pool_max_idletime?: number
+      db_pool_max_lifetime?: number
       db_schema?: string
       max_rows?: number
     }
@@ -6092,6 +6189,15 @@ export interface operations {
           [name: string]: unknown
         }
         content?: never
+      }
+      /** @description Persistent branches are not available on the organization plan */
+      402: {
+        headers: {
+          [name: string]: unknown
+        }
+        content: {
+          'application/json': components['schemas']['PlanGateErrorBody']
+        }
       }
       /** @description Forbidden action */
       403: {
@@ -6395,6 +6501,8 @@ export interface operations {
         code_challenge_method?: 'plain' | 'sha256' | 'S256'
         /** @description Organization slug */
         organization_slug?: string
+        /** @description Project ref */
+        project_ref?: string
         redirect_uri: string
         /** @description Resource indicator for MCP (Model Context Protocol) clients */
         resource?: string
@@ -6650,6 +6758,13 @@ export interface operations {
       }
       /** @description Forbidden action */
       403: {
+        headers: {
+          [name: string]: unknown
+        }
+        content?: never
+      }
+      /** @description User not found */
+      404: {
         headers: {
           [name: string]: unknown
         }
@@ -7035,6 +7150,15 @@ export interface operations {
           [name: string]: unknown
         }
         content?: never
+      }
+      /** @description The instance size is not available on the organization plan, or the organization has overdue invoices */
+      402: {
+        headers: {
+          [name: string]: unknown
+        }
+        content: {
+          'application/json': components['schemas']['PlanGateErrorBody']
+        }
       }
       /** @description Forbidden action */
       403: {
@@ -7949,6 +8073,15 @@ export interface operations {
         }
         content?: never
       }
+      /** @description Custom JWT templates for secret API keys are not available on the organization plan */
+      402: {
+        headers: {
+          [name: string]: unknown
+        }
+        content: {
+          'application/json': components['schemas']['PlanGateErrorBody']
+        }
+      }
       /** @description Forbidden action */
       403: {
         headers: {
@@ -8007,6 +8140,13 @@ export interface operations {
         }
         content?: never
       }
+      /** @description API key not found for project */
+      404: {
+        headers: {
+          [name: string]: unknown
+        }
+        content?: never
+      }
       /** @description Rate limit exceeded */
       429: {
         headers: {
@@ -8052,6 +8192,13 @@ export interface operations {
       }
       /** @description Forbidden action */
       403: {
+        headers: {
+          [name: string]: unknown
+        }
+        content?: never
+      }
+      /** @description API key not found for project */
+      404: {
         headers: {
           [name: string]: unknown
         }
@@ -8105,8 +8252,24 @@ export interface operations {
         }
         content?: never
       }
+      /** @description Custom JWT templates for secret API keys are not available on the organization plan */
+      402: {
+        headers: {
+          [name: string]: unknown
+        }
+        content: {
+          'application/json': components['schemas']['PlanGateErrorBody']
+        }
+      }
       /** @description Forbidden action */
       403: {
+        headers: {
+          [name: string]: unknown
+        }
+        content?: never
+      }
+      /** @description API key not found for project */
+      404: {
         headers: {
           [name: string]: unknown
         }
@@ -8468,6 +8631,15 @@ export interface operations {
           [name: string]: unknown
         }
         content?: never
+      }
+      /** @description Branching or persistent branches are not available on the organization plan */
+      402: {
+        headers: {
+          [name: string]: unknown
+        }
+        content: {
+          'application/json': components['schemas']['PlanGateErrorBody']
+        }
       }
       /** @description Forbidden action */
       403: {
@@ -8902,6 +9074,15 @@ export interface operations {
           [name: string]: unknown
         }
         content?: never
+      }
+      /** @description An auth setting in the request is not available on the organization plan */
+      402: {
+        headers: {
+          [name: string]: unknown
+        }
+        content: {
+          'application/json': components['schemas']['PlanGateErrorBody']
+        }
       }
       /** @description Forbidden action */
       403: {
@@ -9935,6 +10116,60 @@ export interface operations {
       }
     }
   }
+  'v1-patch-postgres-config': {
+    parameters: {
+      query?: never
+      header?: never
+      path: {
+        /** @description Project ref */
+        ref: string
+      }
+      cookie?: never
+    }
+    requestBody: {
+      content: {
+        'application/json': components['schemas']['UpdatePostgresConfigBody']
+      }
+    }
+    responses: {
+      200: {
+        headers: {
+          [name: string]: unknown
+        }
+        content: {
+          'application/json': components['schemas']['PostgresConfigResponse_Output']
+        }
+      }
+      /** @description Unauthorized */
+      401: {
+        headers: {
+          [name: string]: unknown
+        }
+        content?: never
+      }
+      /** @description Forbidden action */
+      403: {
+        headers: {
+          [name: string]: unknown
+        }
+        content?: never
+      }
+      /** @description Rate limit exceeded */
+      429: {
+        headers: {
+          [name: string]: unknown
+        }
+        content?: never
+      }
+      /** @description Failed to update project's Postgres config */
+      500: {
+        headers: {
+          [name: string]: unknown
+        }
+        content?: never
+      }
+    }
+  }
   'v1-get-database-disk': {
     parameters: {
       query?: never
@@ -10013,6 +10248,15 @@ export interface operations {
           [name: string]: unknown
         }
         content?: never
+      }
+      /** @description Disk modifications are not available on the organization plan */
+      402: {
+        headers: {
+          [name: string]: unknown
+        }
+        content: {
+          'application/json': components['schemas']['PlanGateErrorBody']
+        }
       }
       /** @description Forbidden action */
       403: {
@@ -10353,6 +10597,15 @@ export interface operations {
           [name: string]: unknown
         }
         content?: never
+      }
+      /** @description A storage feature or file size limit in the request is not available on the organization plan */
+      402: {
+        headers: {
+          [name: string]: unknown
+        }
+        content: {
+          'application/json': components['schemas']['PlanGateErrorBody']
+        }
       }
       /** @description Forbidden action */
       403: {
@@ -12155,7 +12408,9 @@ export interface operations {
         headers: {
           [name: string]: unknown
         }
-        content?: never
+        content: {
+          'application/json': components['schemas']['PlanGateErrorBody']
+        }
       }
       /** @description Forbidden action */
       403: {
@@ -12225,7 +12480,9 @@ export interface operations {
         headers: {
           [name: string]: unknown
         }
-        content?: never
+        content: {
+          'application/json': components['schemas']['PlanGateErrorBody']
+        }
       }
       /** @description Forbidden action */
       403: {
@@ -12508,7 +12765,9 @@ export interface operations {
         headers: {
           [name: string]: unknown
         }
-        content?: never
+        content: {
+          'application/json': components['schemas']['PlanGateErrorBody']
+        }
       }
       /** @description Forbidden action */
       403: {
@@ -13034,6 +13293,60 @@ export interface operations {
         content?: never
       }
       /** @description Failed to update project network restrictions */
+      500: {
+        headers: {
+          [name: string]: unknown
+        }
+        content?: never
+      }
+    }
+  }
+  'v1-review-network-restrictions': {
+    parameters: {
+      query?: never
+      header?: never
+      path: {
+        /** @description Project ref */
+        ref: string
+      }
+      cookie?: never
+    }
+    requestBody: {
+      content: {
+        'application/json': components['schemas']['NetworkRestrictionsReviewRequest']
+      }
+    }
+    responses: {
+      200: {
+        headers: {
+          [name: string]: unknown
+        }
+        content: {
+          'application/json': components['schemas']['NetworkRestrictionsResponse_Output']
+        }
+      }
+      /** @description Unauthorized */
+      401: {
+        headers: {
+          [name: string]: unknown
+        }
+        content?: never
+      }
+      /** @description Forbidden action */
+      403: {
+        headers: {
+          [name: string]: unknown
+        }
+        content?: never
+      }
+      /** @description Rate limit exceeded */
+      429: {
+        headers: {
+          [name: string]: unknown
+        }
+        content?: never
+      }
+      /** @description Failed to resolve the network restrictions review */
       500: {
         headers: {
           [name: string]: unknown
@@ -13610,6 +13923,15 @@ export interface operations {
           [name: string]: unknown
         }
         content?: never
+      }
+      /** @description The restore is not available on the organization plan, or the organization has overdue invoices or a service restriction */
+      402: {
+        headers: {
+          [name: string]: unknown
+        }
+        content: {
+          'application/json': components['schemas']['PlanGateErrorBody']
+        }
       }
       /** @description Forbidden action */
       403: {

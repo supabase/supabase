@@ -83,6 +83,18 @@ Before handoff, run both passes from [Use with an AI agent](../../../apps/docs/s
 - [ ] Document type, section grouping, and chunking follow [`03-page-structure.md`](../../../apps/docs/style-guide/03-page-structure.md)
 - [ ] Admonitions, headings, links, and other components follow [`02-elements.md`](../../../apps/docs/style-guide/02-elements.md)
 
+## Phase 2.6 — Moved or deleted pages (conditional)
+
+Only apply this phase when the draft renames, moves, or deletes an existing page, so its URL changes or disappears. Skip it for new pages and for edits that keep the URL.
+
+- [ ] Every old URL that stops resolving gets a redirect. Follow [`apps/docs/lib/redirects/README.md`](../../../apps/docs/lib/redirects/README.md):
+  - One-to-one mappings go in `static-redirects.json`. Entries with params, splats, or conditions go in `dynamic-redirects.js`.
+  - Use full public paths that start with `/docs`.
+  - Don't add `.md` variants by hand for `/docs/guides/` entries. The generator adds them.
+- [ ] Deleted pages with no replacement get a redirect to the closest live page, and the choice goes in the "needs review" section of the PR description.
+- [ ] Internal links, nav entries, and partials that point at the old URL are updated, so the redirect is only a fallback for external links.
+- [ ] Run `pnpm -C apps/docs run redirects:generate` and confirm the new entry appears in the generated output.
+
 ## Phase 3 — Handoff
 
 This skill stops at a reviewable draft. It does not open worktrees or PRs itself:

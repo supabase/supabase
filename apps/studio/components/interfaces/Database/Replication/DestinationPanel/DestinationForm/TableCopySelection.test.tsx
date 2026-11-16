@@ -178,9 +178,7 @@ describe('TableCopySelection', () => {
 
     expect(await screen.findByText('Legacy.ArchivedOrders')).toBeInTheDocument()
     expect(screen.getByText('Legacy.ArchivedOrders')).toHaveClass('text-destructive-600')
-    expect(screen.getByText('Some tables are no longer in the publication.')).toHaveClass(
-      'text-destructive-600'
-    )
+    expect(screen.getByText('Some tables are no longer in the publication.')).toBeInTheDocument()
     expect(screen.queryByText('No longer in publication')).not.toBeInTheDocument()
     expect(document.body).not.toHaveTextContent('999')
   })

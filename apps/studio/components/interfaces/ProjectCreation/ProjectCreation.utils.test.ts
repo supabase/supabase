@@ -1,11 +1,6 @@
 import { AWS_REGIONS } from 'shared-data'
 import { describe, expect, it } from 'vitest'
 
-import {
-  HIGH_AVAILABILITY_INSTANCE_SIZE,
-  HIGH_AVAILABILITY_POSTGRES_ENGINE,
-  HIGH_AVAILABILITY_RELEASE_CHANNEL,
-} from './ProjectCreation.constants'
 import type { AvailableRegions } from './ProjectCreation.utils'
 import {
   AUTO_REGION_VALUE,
@@ -18,6 +13,7 @@ import {
   resolveDefaultDbRegion,
   resolvePostgresVersion,
   smartRegionToExactRegion,
+  sortPostgresVersionsNewestFirst,
 } from './ProjectCreation.utils'
 import type { PostgresEngine, ReleaseChannel } from '@/data/projects/new-project.constants'
 
@@ -140,12 +136,6 @@ describe('getAvailableRegions', () => {
 })
 
 describe('High Availability project creation constraints', () => {
-  it('pins the Alpha Postgres engine, release channel, and compute size', () => {
-    expect(HIGH_AVAILABILITY_POSTGRES_ENGINE).toBe('17')
-    expect(HIGH_AVAILABILITY_RELEASE_CHANNEL).toBe('ga')
-    expect(HIGH_AVAILABILITY_INSTANCE_SIZE).toBe('large')
-  })
-
   it.each([
     ['local', 'eu-central-1'],
     ['staging', 'us-east-1'],
@@ -206,16 +196,6 @@ describe('getFreeTierGeneralRegionExperimentVariant', () => {
       getFreeTierGeneralRegionExperimentVariant({ ...base, enrollmentFlag: false })
     ).toBeUndefined()
   })
-
-  it('returns undefined when the enrollment flag is off even if the selection flag is on', () => {
-    expect(
-      getFreeTierGeneralRegionExperimentVariant({
-        ...base,
-        enrollmentFlag: false,
-        selectionFlag: true,
-      })
-    ).toBeUndefined()
-  })
 })
 
 describe('getRegionSelectionType', () => {
@@ -266,32 +246,6 @@ describe('getRegionSelectionType', () => {
     expect(
       getRegionSelectionType({ dbRegion: 'Americas', availableRegions: undefined })
     ).toBeUndefined()
-  })
-
-  it('classifies an untouched field as auto, even if it resolved to a specific region', () => {
-    expect(
-      getRegionSelectionType({
-        dbRegion: 'East US (North Virginia)',
-        availableRegions,
-        isDbRegionDirty: false,
-      })
-    ).toBe('auto')
-  })
-
-  it('returns undefined for an untouched field holding a stale region matching neither list', () => {
-    expect(
-      getRegionSelectionType({
-        dbRegion: 'Nonexistent',
-        availableRegions,
-        isDbRegionDirty: false,
-      })
-    ).toBeUndefined()
-  })
-
-  it('classifies a touched field normally', () => {
-    expect(
-      getRegionSelectionType({ dbRegion: 'Americas', availableRegions, isDbRegionDirty: true })
-    ).toBe('general')
   })
 })
 
@@ -365,5 +319,50 @@ describe('resolvePostgresVersion', () => {
         availableOrioleVersion,
       })
     ).toEqual({})
+  })
+})
+
+describe('sortPostgresVersionsNewestFirst', () => {
+  const toVersions = (versions: string[]) =>
+    versions.map((version) => ({ version: `supabase-postgres-${version}` }))
+  const toNumbers = (versions: { version: string }[]) =>
+    versions.map((x) => x.version.replace('supabase-postgres-', ''))
+
+  it('compares segments numerically, not alphabetically', () => {
+    const sorted = sortPostgresVersionsNewestFirst(
+      toVersions([
+        '17.6.1.164',
+        '17.6.0.062',
+        '17.11.0.002',
+        '17.11.0.001',
+        '15.19.0.002',
+        '15.14.1.164',
+      ])
+    )
+
+    expect(toNumbers(sorted)).toEqual([
+      '17.11.0.002',
+      '17.11.0.001',
+      '17.6.1.164',
+      '17.6.0.062',
+      '15.19.0.002',
+      '15.14.1.164',
+    ])
+  })
+
+  it('interleaves OrioleDB versions by version number', () => {
+    const sorted = sortPostgresVersionsNewestFirst(
+      toVersions(['17.6.0.062-orioledb', '17.11.0.002', '17.6.1.164'])
+    )
+
+    expect(toNumbers(sorted)).toEqual(['17.11.0.002', '17.6.1.164', '17.6.0.062-orioledb'])
+  })
+
+  it('does not mutate the input', () => {
+    const input = toVersions(['15.6.1.139', '17.6.1.164'])
+    const sorted = sortPostgresVersionsNewestFirst(input)
+
+    expect(sorted).not.toBe(input)
+    expect(toNumbers(input)).toEqual(['15.6.1.139', '17.6.1.164'])
   })
 })

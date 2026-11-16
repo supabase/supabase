@@ -39,6 +39,10 @@ const lodashEs = {
   },
 }
 
+const nextPublicEnv = Object.fromEntries(
+  Object.entries(process.env).filter(([key]) => key.startsWith('NEXT_PUBLIC_'))
+)
+
 // https://astro.build/config
 export default defineConfig({
   site: 'https://supabase.com',
@@ -55,6 +59,14 @@ export default defineConfig({
     sitemap(),
   ],
   vite: {
+    // Client only: a top-level `define` would also replace `process.env` in server code that reads SUPABASE_SERVICE_ROLE_KEY.
+    environments: {
+      client: {
+        define: {
+          'process.env': JSON.stringify(nextPublicEnv),
+        },
+      },
+    },
     ssr: {
       noExternal: ['lodash'],
     },

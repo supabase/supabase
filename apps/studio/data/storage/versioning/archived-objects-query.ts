@@ -5,7 +5,7 @@ import { storageKeys } from '../keys'
 import type { ObjectVersionAction } from './object-versions-query'
 import { handleError, post } from '@/data/fetchers'
 import { IS_PLATFORM } from '@/lib/constants'
-import type { ResponseError } from '@/types'
+import type { StudioError } from '@/lib/errors/studio-errors'
 
 type StorageObjectV2 = components['schemas']['StorageListResponseV2_Output']['objects'][number]
 
@@ -40,7 +40,7 @@ export type ArchivedObjectsVariables = {
   bucketId?: string
 }
 
-export type ArchivedObjectsError = ResponseError
+export type ArchivedObjectsError = StudioError
 
 const PAGE_SIZE = 1000
 // Bounded so a pathological bucket can't page forever.

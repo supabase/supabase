@@ -6,11 +6,7 @@ import { describe, expect, it, vi } from 'vitest'
 import { mdAlternate } from './md-alternates'
 
 vi.mock('~/public/markdown/manifest.json', () => ({
-  default: [
-    'getting-started/quickstarts/react',
-    'troubleshooting/all-about-supabase-egress-a_Sg_e',
-    'troubleshooting',
-  ],
+  default: ['getting-started/quickstarts/react'],
 }))
 
 describe('mdAlternate', () => {
@@ -20,30 +16,13 @@ describe('mdAlternate', () => {
     })
   })
 
-  it('returns the sibling for a troubleshooting entry', () => {
-    expect(mdAlternate('troubleshooting/all-about-supabase-egress-a_Sg_e')).toEqual({
-      'text/markdown': `${PROD_URL}/guides/troubleshooting/all-about-supabase-egress-a_Sg_e.md`,
-    })
-  })
-
-  it('returns the sibling for the troubleshooting index', () => {
-    expect(mdAlternate('troubleshooting')).toEqual({
-      'text/markdown': `${PROD_URL}/guides/troubleshooting.md`,
-    })
-  })
-
   it('returns undefined for slugs without generated markdown', () => {
     expect(mdAlternate('database/extensions/wrappers/s3')).toBeUndefined()
     expect(mdAlternate('local-development/cli/config')).toBeUndefined()
   })
 })
 
-const WIRING: [string, string][] = [
-  ['features/docs/GuidesMdx.utils.tsx', 'mdAlternate('],
-  ['app/guides/troubleshooting/[slug]/page.tsx', 'mdAlternate(`troubleshooting/${slug}`)'],
-  ['app/guides/troubleshooting/page.tsx', "mdAlternate('troubleshooting')"],
-  ['features/docs/TroubleshootingSection.page.tsx', 'mdAlternate(`${topic}/troubleshooting`)'],
-]
+const WIRING: [string, string][] = [['features/docs/GuidesMdx.utils.tsx', 'mdAlternate(']]
 
 describe('markdown alternate wiring', () => {
   it('every tag emitter routes through mdAlternate', async () => {
@@ -51,14 +30,6 @@ describe('markdown alternate wiring', () => {
       const source = await fs.readFile(path.join(process.cwd(), file), 'utf-8')
       expect(source.includes(wiring), `${file} must contain "${wiring}"`).toBe(true)
     }
-  })
-
-  it('the generator registers the troubleshooting index in the manifest', async () => {
-    const source = await fs.readFile(
-      path.join(process.cwd(), 'internals/generate-guides-markdown.ts'),
-      'utf-8'
-    )
-    expect(source.includes("renderManifest(sources, ['troubleshooting'])")).toBe(true)
   })
 })
 

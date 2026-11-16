@@ -4,7 +4,8 @@ import { components } from 'api-types'
 import { organizationKeys } from './keys'
 import { get, handleError } from '@/data/fetchers'
 import { FGA_PERMISSIONS, useAsyncCheckPermissionsV2 } from '@/hooks/misc/useCheckPermissionsV2'
-import type { ResponseError, UseCustomQueryOptions } from '@/types'
+import type { StudioError } from '@/lib/errors/studio-errors'
+import type { UseCustomQueryOptions } from '@/types'
 
 export type OrganizationPaymentMethodsVariables = { slug?: string }
 export type OrganizationPaymentMethod = components['schemas']['PaymentsResponse_Output']['data'][0]
@@ -34,7 +35,7 @@ export async function getOrganizationPaymentMethods(
 export type OrganizationPaymentMethodsData = Awaited<
   ReturnType<typeof getOrganizationPaymentMethods>
 >
-export type OrganizationPaymentMethodsError = ResponseError
+export type OrganizationPaymentMethodsError = StudioError
 
 export const useOrganizationPaymentMethodsQuery = <TData = OrganizationPaymentMethodsData>(
   { slug }: OrganizationPaymentMethodsVariables,

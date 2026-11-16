@@ -909,6 +909,12 @@
         "title": "List organization roles",
         "slug": "v2-list-organization-roles",
         "type": "operation"
+      },
+      {
+        "id": "v2-remove-organization-members",
+        "title": "Remove organization members",
+        "slug": "v2-remove-organization-members",
+        "type": "operation"
       }
     ]
   },
@@ -1064,6 +1070,12 @@
         "id": "v2-delete-private-link-association-for-database",
         "title": "Delete private link association for database",
         "slug": "v2-delete-private-link-association-for-database",
+        "type": "operation"
+      },
+      {
+        "id": "v2-download-project-backup",
+        "title": "Download project backup",
+        "slug": "v2-download-project-backup",
         "type": "operation"
       },
       {

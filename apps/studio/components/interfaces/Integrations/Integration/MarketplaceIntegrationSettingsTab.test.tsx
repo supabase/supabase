@@ -1,4 +1,6 @@
+import { PermissionAction } from '@supabase/shared-types/out/constants'
 import { fireEvent, screen, waitFor } from '@testing-library/react'
+import userEvent from '@testing-library/user-event'
 import { mockAnimationsApi } from 'jsdom-testing-mocks'
 import { HttpResponse } from 'msw'
 import { describe, expect, test, vi } from 'vitest'
@@ -9,15 +11,16 @@ import { type components } from '@/data/api'
 import { type APIKey } from '@/data/api-keys/api-keys-query'
 import { type AuthConfigResponse } from '@/data/auth/auth-config-query'
 import { type ProjectSecret } from '@/data/secrets/secrets-query'
-import { FGA_PERMISSIONS } from '@/hooks/misc/useCheckPermissionsV2'
 import { customRender } from '@/tests/lib/custom-render'
 import { addAPIMock } from '@/tests/lib/msw'
+import { mockPermissions } from '@/tests/lib/msw-permissions'
+import { ALL_FGA_PERMISSIONS, allPermissionsFor } from '@/tests/lib/permissions-fixtures'
 
 // The OAuth-apps query overrides its return type to `AuthorizedApp`, but the wire response (and so
 // the MSW resolver) is the raw OpenAPI `OAuthAppResponse`. Build fixtures against the API shape.
 type OAuthAppResponse = components['schemas']['OAuthAppResponse_Output']
 type PartnerIntegrationListResponse = components['schemas']['PartnerIntegrationListResponse_Output']
-type PermissionsV2Response = components['schemas']['UserPermissionsResponse_Output']
+type AccessControlPermission = components['schemas']['AccessControlPermission']
 
 // `useIntegrationDetail` resolves the integration definition from the route, the marketplace query
 // and feature flags — none of which is the subject of this test. Mock it so each test can drive a
@@ -82,15 +85,15 @@ const authorizedApp = (appId: string): OAuthAppResponse => ({
   registration_type: 'manual',
 })
 
-const CAN_READ_OAUTH_APPS_PERMISSIONS: PermissionsV2Response = {
-  organizations: [
-    {
-      slug: 'acme',
-      role: 'administrator',
-      permissions: [FGA_PERMISSIONS.ORGANIZATION.CONFIG_READ],
-      projects: [],
-    },
-  ],
+const CAN_READ_OAUTH_APPS_PERMISSION: AccessControlPermission = {
+  actions: [PermissionAction.READ],
+  condition: null,
+  organization_id: null,
+  organization_slug: 'acme',
+  project_ids: null,
+  project_refs: [],
+  resources: ['oauth_apps'],
+  restrictive: false,
 }
 
 /**
@@ -103,10 +106,12 @@ const mockProjectResources = ({
   oauthApps = [] as OAuthAppResponse[],
   smtpHost = null as string | null,
 } = {}) => {
+  // The API keys query is gated on a grant
+  mockPermissions(allPermissionsFor(['acme']))
   addAPIMock({
     method: 'get',
-    path: '/platform/profile/permissions/v2',
-    response: () => HttpResponse.json<PermissionsV2Response>(CAN_READ_OAUTH_APPS_PERMISSIONS),
+    path: '/platform/profile/permissions',
+    response: () => HttpResponse.json<AccessControlPermission[]>([CAN_READ_OAUTH_APPS_PERMISSION]),
   })
   addAPIMock({
     method: 'get',
@@ -140,7 +145,7 @@ const mockProjectResources = ({
 
 describe('MarketplaceIntegrationSettingsTab', () => {
   describe('section visibility follows the integration definition', () => {
-    test('renders the secret API key section when the integration declares a secret key prefix', async () => {
+    test('renders the secret API key section with a Remove action and generic warning when the integration declares a secret key prefix', async () => {
       setIntegration({ secretKeyPrefix: 'custom_' })
       mockProjectResources({ apiKeys: [secretApiKey('custom_metrics_key')] })
 
@@ -148,6 +153,13 @@ describe('MarketplaceIntegrationSettingsTab', () => {
 
       expect(await screen.findByRole('heading', { name: 'Secret API key' })).toBeInTheDocument()
       expect(screen.getByText('custom_metrics_key')).toBeInTheDocument()
+      expect(screen.getByRole('button', { name: 'Remove' })).toBeInTheDocument()
+      // No integration-specific override, so the generic removal warning is used.
+      expect(
+        screen.getByText(
+          'Removing this key takes effect immediately and can interrupt the integration.'
+        )
+      ).toBeInTheDocument()
     })
 
     test('does not render a secret API key section when the integration declares no prefix, even if secret keys exist', async () => {
@@ -212,29 +224,6 @@ describe('MarketplaceIntegrationSettingsTab', () => {
   })
 
   describe('resource section states', () => {
-    test('a present resource shows the Connected badge and a Remove action', async () => {
-      setIntegration({ secretKeyPrefix: 'custom_' })
-      mockProjectResources({ apiKeys: [secretApiKey('custom_key')] })
-
-      customRender(<MarketplaceIntegrationSettingsTab />)
-
-      expect(await screen.findByText('custom_key')).toBeInTheDocument()
-      expect(screen.getByRole('button', { name: 'Remove' })).toBeInTheDocument()
-    })
-
-    test('uses the generic removal warning when the integration has no override copy', async () => {
-      setIntegration({ secretKeyPrefix: 'custom_' })
-      mockProjectResources({ apiKeys: [secretApiKey('custom_key')] })
-
-      customRender(<MarketplaceIntegrationSettingsTab />)
-
-      expect(
-        await screen.findByText(
-          'Removing this key takes effect immediately and can interrupt the integration.'
-        )
-      ).toBeInTheDocument()
-    })
-
     test('uses the integration-specific removal warning override when one is defined', async () => {
       setIntegration({ id: 'grafana', name: 'Grafana' })
       mockProjectResources({ apiKeys: [secretApiKey('grafana_cloud_integration_metrics')] })
@@ -339,6 +328,35 @@ describe('MarketplaceIntegrationSettingsTab', () => {
 
       await waitFor(() => expect(deleteRequests).toEqual([['DOPPLER_CONFIG']]))
       await waitFor(() => expect(screen.getByText('No connected resources')).toBeInTheDocument())
+    })
+
+    test('disables Remove on an API key when the user cannot delete API keys', async () => {
+      setIntegration({ secretKeyPrefix: 'custom_' })
+      mockProjectResources({ apiKeys: [secretApiKey('custom_metrics_key')] })
+      // Can list API keys but not write them. Registered last so MSW gives it priority.
+      mockPermissions({
+        organizations: [
+          {
+            slug: 'acme',
+            role: 'developer',
+            permissions: ALL_FGA_PERMISSIONS.filter((p) => p !== 'api_gateway_keys_write'),
+            projects: [],
+          },
+        ],
+      })
+      const user = userEvent.setup()
+
+      customRender(<MarketplaceIntegrationSettingsTab />)
+
+      const remove = await screen.findByRole('button', { name: 'Remove' })
+      await user.hover(remove)
+      expect(
+        (await screen.findAllByText('You need additional permissions to delete API keys')).length
+      ).toBeGreaterThan(0)
+      expect(remove).toBeAriaDisabled()
+
+      await user.click(remove)
+      expect(screen.queryByText(/Delete secret API key/)).not.toBeInTheDocument()
     })
   })
 })

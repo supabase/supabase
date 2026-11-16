@@ -24,7 +24,7 @@ When Supabase started in 2020, our website and our docs were powered by (the won
 However, as time went on, we began to face some challenges:
 
 - We added versioning to our client libraries. Supabase maintains multiple client libraries, each with different versions. This increased the complexity and reduced maintainability of our Docusaurus setup. Contributors and team members had trouble figuring out how to contribute fixes and write new docs.
-- It introduced friction with the rest of our stack (Next.js & Turborepo). At Supabase, we try and share as much setup and config as possible across projects. We have a monorepo of various Next.js sites with [shared](https://github.com/supabase/supabase/tree/master/packages) [Turborepo internal packages](https://turbo.build/repo/docs/handbook/sharing-code/internal-packages) including our Supabase UI library and configs for linting, Typescript, Tailwind and more. Having UI components and configs that we share across all projects is huge. The docs site was the only project not using Next.js and this internal packages setup.
+- It introduced friction with the rest of our stack (Next.js & Turborepo). At Supabase, we try and share as much setup and config as possible across projects. We have a monorepo of various Next.js sites with [shared](https://github.com/supabase/supabase/tree/master/packages) [Turborepo internal packages](https://turbo.build/repo/docs/handbook/sharing-code/internal-packages) including our Supabase [UI library](/library) and configs for linting, Typescript, Tailwind and more. Having UI components and configs that we share across all projects is huge. The docs site was the only project not using Next.js and this internal packages setup.
 
 In short: we outgrew Docusaurus.
 

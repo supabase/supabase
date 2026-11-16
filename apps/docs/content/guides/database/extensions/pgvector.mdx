@@ -45,7 +45,7 @@ This is particularly useful if you're building AI applications with large langua
 <TabPanel id="sql" label="SQL">
 
 ```sql
- -- Example: enable the "vector" extension.
+-- Example: enable the "vector" extension.
 create extension vector
 with
   schema extensions;
@@ -61,7 +61,7 @@ To disable an extension, call `drop extension`.
 </TabPanel>
 </Tabs>
 
-## Usage
+## Storing vectors
 
 ### Create a table to store vectors
 
@@ -76,7 +76,7 @@ create table posts (
 
 ### Storing a vector / embedding
 
-In this example we'll generate a vector using Transformer.js, then store it in the database using the Supabase client.
+In this example we'll generate a vector using Transformers.js, then store it in the database using the Supabase client.
 
 ```js
 import { pipeline } from '@xenova/transformers'
@@ -111,8 +111,8 @@ If you use an IVFFlat or HNSW index and naively filter the results based on the 
 
 For example, the following query may return fewer than 5 rows, even if 5 corresponding rows exist in the database. This is because the embedding index may not return 5 rows matching the filter.
 
-```
-SELECT * FROM items WHERE category_id = 123 ORDER BY embedding <-> '[3,1,2]' LIMIT 5;
+```sql
+select * from items where category_id = 123 order by embedding <-> '[3,1,2]' limit 5;
 ```
 
 To get the exact number of requested rows, use [iterative search](https://github.com/pgvector/pgvector/?tab=readme-ov-file#iterative-index-scans) to continue scanning the index until enough results are found.

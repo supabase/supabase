@@ -4,7 +4,8 @@ import { subscriptionKeys } from './keys'
 import { get, handleError } from '@/data/fetchers'
 import { useCheckEntitlements } from '@/hooks/misc/useCheckEntitlements'
 import { FGA_PERMISSIONS, useAsyncCheckPermissionsV2 } from '@/hooks/misc/useCheckPermissionsV2'
-import type { ResponseError, UseCustomQueryOptions } from '@/types'
+import type { StudioError } from '@/lib/errors/studio-errors'
+import type { UseCustomQueryOptions } from '@/types'
 
 export type OrgSubscriptionVariables = {
   orgSlug?: string
@@ -28,7 +29,7 @@ export async function getOrgSubscription(
 }
 
 export type OrgSubscriptionData = Awaited<ReturnType<typeof getOrgSubscription>>
-export type OrgSubscriptionError = ResponseError
+export type OrgSubscriptionError = StudioError
 
 export const useOrgSubscriptionQuery = <TData = OrgSubscriptionData>(
   { orgSlug }: OrgSubscriptionVariables,

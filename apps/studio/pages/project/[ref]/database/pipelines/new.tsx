@@ -8,11 +8,11 @@ import { PipelineCreationFlow } from '@/components/interfaces/Database/Replicati
 import { PipelineCreationHeader } from '@/components/interfaces/Database/Replication/CreatePipeline/PipelineCreationHeader'
 import { PipelineCreationSkeleton } from '@/components/interfaces/Database/Replication/CreatePipeline/PipelineCreationSkeleton'
 import {
-  useIsETLBigQueryPrivateAlpha,
-  useIsETLClickHousePrivateAlpha,
-  useIsETLDucklakePrivateAlpha,
-  useIsETLSnowflakePrivateAlpha,
-} from '@/components/interfaces/Database/Replication/useIsETLPrivateAlpha'
+  useIsPipelinesBigQueryEnabled,
+  useIsPipelinesClickHouseEnabled,
+  useIsPipelinesDuckLakeEnabled,
+  useIsPipelinesSnowflakeEnabled,
+} from '@/components/interfaces/Database/Replication/useIsPipelinesEnabled'
 import { useReplicationSourcesQuery } from '@/data/replication/sources-query'
 import { useHighAvailability } from '@/hooks/misc/useHighAvailability'
 import { useIsFeatureEnabled } from '@/hooks/misc/useIsFeatureEnabled'
@@ -29,10 +29,10 @@ const PipelineCreationPage: NextPageWithLayout<Record<string, never>> = () => {
   const { isEnabled, isLoading } = usePipelineCreationPreview()
   const { isHighAvailability, isPending } = useHighAvailability()
   const canUseReplication = useIsFeatureEnabled('database:replication')
-  const bigQuery = useIsETLBigQueryPrivateAlpha()
-  const duckLake = useIsETLDucklakePrivateAlpha()
-  const snowflake = useIsETLSnowflakePrivateAlpha()
-  const clickHouse = useIsETLClickHousePrivateAlpha()
+  const bigQuery = useIsPipelinesBigQueryEnabled()
+  const duckLake = useIsPipelinesDuckLakeEnabled()
+  const snowflake = useIsPipelinesSnowflakeEnabled()
+  const clickHouse = useIsPipelinesClickHouseEnabled()
   const isProjectAccessLoading =
     isLoading || (isEnabled && (!hasLoaded || isOrganizationPending || isPending))
   const canAccessFlow = isEnabled && !isHighAvailability && canUseReplication

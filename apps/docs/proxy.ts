@@ -1,5 +1,7 @@
 import { clientSdkIds } from '~/content/navigation.references'
-import { BASE_PATH } from '~/lib/constants'
+import { IA_NAV_FLAG, iaNavRoutePrefix, isIaNavVariant } from '~/features/IaNav/constants'
+import { BASE_PATH, PROD_URL } from '~/lib/constants'
+import { MARKDOWN_CONTENT_TYPE } from '~/lib/md-alternates'
 import MARKDOWN_SLUGS from '~/public/markdown/manifest.json'
 import { negotiateMarkdown } from 'common/markdown-negotiation'
 import { isbot } from 'isbot'
@@ -8,10 +10,54 @@ import { NextResponse, type NextRequest } from 'next/server'
 const REFERENCE_PATH = `${BASE_PATH ?? ''}/reference`
 const GUIDES_PATH = `${BASE_PATH ?? ''}/guides`
 const GUIDES_MARKDOWN_SLUGS = new Set(MARKDOWN_SLUGS)
+const REFERENCE_MARKDOWN_LIBS = new Set([...clientSdkIds, 'cli', 'api'])
+const LLMS_FILE_NAMES: Record<string, string> = { javascript: 'js' }
+
+function markdownUrl(section: string, lib: string | undefined) {
+  if (section !== 'reference' || !lib || !REFERENCE_MARKDOWN_LIBS.has(lib)) {
+    return 'https://supabase.com/llms.txt'
+  }
+  return `https://supabase.com/llms/${LLMS_FILE_NAMES[lib] ?? lib}.txt`
+}
+
+function markdownNotFound(pathname: string) {
+  const relativePath = pathname.replace(`${BASE_PATH}/`, '').replace(/\.md$/, '')
+  const [section, lib] = relativePath.split('/')
+
+  const markdown = `# 404 Not Found
+
+There is no markdown version of \`${BASE_PATH}/${relativePath}\`.
+
+- HTML page: <${PROD_URL}/${relativePath}>
+- Markdown: <${markdownUrl(section, lib)}>
+`
+
+  return new NextResponse(markdown, {
+    status: 404,
+    headers: {
+      'Content-Type': MARKDOWN_CONTENT_TYPE,
+      'Cache-Control': 'no-store',
+      'X-Content-Type-Options': 'nosniff',
+    },
+  })
+}
+
+function forcedVariantRewrite(url: URL, path: string) {
+  const variant = url.searchParams.get(IA_NAV_FLAG)
+  if (!isIaNavVariant(variant) || variant === 'control') return null
+
+  const rewriteUrl = new URL(url)
+  rewriteUrl.pathname = `${BASE_PATH ?? ''}${iaNavRoutePrefix(variant)}${path}`
+  return NextResponse.rewrite(rewriteUrl)
+}
 
 export function proxy(request: NextRequest) {
   const url = new URL(request.url)
   const { pathname } = url
+
+  if (pathname === (BASE_PATH || '/')) {
+    return forcedVariantRewrite(url, '') ?? NextResponse.next()
+  }
 
   if (pathname.startsWith(GUIDES_PATH + '/')) {
     const isMdSuffix = pathname.endsWith('.md')
@@ -33,6 +79,18 @@ export function proxy(request: NextRequest) {
       rewriteUrl.pathname = `${BASE_PATH ?? ''}/api/guides-md/${slug}`
       return NextResponse.rewrite(rewriteUrl)
     }
+
+    const variantRewrite =
+      !isMdSuffix && GUIDES_MARKDOWN_SLUGS.has(slug)
+        ? forcedVariantRewrite(url, `/guides/${slug}`)
+        : null
+    if (variantRewrite) return variantRewrite
+  }
+
+  // Reference pages have no per-page markdown yet, so every reference .md is a guess.
+  // Narrow this when per-page reference markdown ships, or it will 404 those files.
+  if (pathname.endsWith('.md')) {
+    return markdownNotFound(pathname)
   }
 
   if (!pathname.startsWith(REFERENCE_PATH)) {
@@ -86,5 +144,5 @@ export function proxy(request: NextRequest) {
 }
 
 export const config = {
-  matcher: ['/reference/:path*', '/guides/:path*'],
+  matcher: ['/', '/reference/:path*', '/guides/:path*'],
 }

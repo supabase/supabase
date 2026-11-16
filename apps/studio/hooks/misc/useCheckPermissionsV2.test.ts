@@ -55,4 +55,51 @@ describe('doPermissionsCheckV2', () => {
   it('returns false when organizationSlug is undefined', () => {
     expect(doPermissionsCheckV2(permissions(), 'storage_read', undefined)).toBe(false)
   })
+
+  describe('requirement groups', () => {
+    it('keeps flat arrays as a single AND group', () => {
+      expect(
+        doPermissionsCheckV2(permissions(), ['storage_read', 'storage_write'], 'org-slug')
+      ).toBe(true)
+      expect(
+        doPermissionsCheckV2(permissions(), ['storage_read', 'custom_domain_write'], 'org-slug')
+      ).toBe(false)
+    })
+
+    it('passes when any group is fully satisfied', () => {
+      const groups = [['custom_domain_write'], ['storage_read', 'storage_write']] as const
+      expect(doPermissionsCheckV2(permissions(), groups, 'org-slug')).toBe(true)
+    })
+
+    it('fails when every group misses a permission', () => {
+      const groups = [
+        ['storage_read', 'custom_domain_write'],
+        ['custom_domain_write', 'storage_write'],
+      ] as const
+      expect(doPermissionsCheckV2(permissions(), groups, 'org-slug')).toBe(false)
+    })
+
+    it('resolves each permission in a group from the project or the org', () => {
+      const data = permissions({
+        role: 'member',
+        permissions: ['storage_read'],
+        projects: [{ ref: 'project-ref', role: 'developer', permissions: ['storage_write'] }],
+      })
+      const groups = [['storage_read', 'storage_write']] as const
+      expect(doPermissionsCheckV2(data, groups, 'org-slug', 'project-ref')).toBe(true)
+      expect(doPermissionsCheckV2(data, groups, 'org-slug', 'other-project')).toBe(false)
+    })
+
+    it('fails closed on an empty group, even next to a satisfied one', () => {
+      expect(doPermissionsCheckV2(permissions(), [[]], 'org-slug')).toBe(false)
+      expect(doPermissionsCheckV2(permissions(), [[], ['storage_read']], 'org-slug')).toBe(true)
+      expect(doPermissionsCheckV2(permissions(), [[], ['custom_domain_write']], 'org-slug')).toBe(
+        false
+      )
+    })
+
+    it('fails closed on an empty list', () => {
+      expect(doPermissionsCheckV2(permissions(), [], 'org-slug')).toBe(false)
+    })
+  })
 })

@@ -14,6 +14,7 @@ import {
   type ConfigurationDriftRow,
 } from './ConfigurationDriftPage.utils'
 import { AlertError } from '@/components/ui/AlertError'
+import { NoPermission } from '@/components/ui/NoPermission'
 import { useSelectedGitHubConfigDrift } from '@/hooks/misc/useGitHubConfigDrift'
 
 export function ConfigurationDriftPageSkeleton() {
@@ -218,8 +219,17 @@ function ConfigFieldSection({
 
 export function ConfigurationDriftPage() {
   const { ref: projectRef = '' } = useParams()
-  const { summary, isReady, isPending, isFetching, isError, error, errorSource, refetch } =
-    useSelectedGitHubConfigDrift()
+  const {
+    summary,
+    isReady,
+    isPermissionDenied,
+    isPending,
+    isFetching,
+    isError,
+    error,
+    errorSource,
+    refetch,
+  } = useSelectedGitHubConfigDrift()
   const driftRows = createConfigurationDriftRows(summary.driftedFields, projectRef)
   const comparableSettingCount = summary.matchedFields.length + driftRows.length
   const matchedGroups = groupMatchedConfigFields(summary.matchedFields)
@@ -227,6 +237,10 @@ export function ConfigurationDriftPage() {
 
   if (isPending) {
     return <ConfigurationDriftPageSkeleton />
+  }
+
+  if (isPermissionDenied) {
+    return <NoPermission resourceText="check this project's configuration drift" />
   }
 
   if (isError) {

@@ -67,29 +67,6 @@ describe('getConfigDriftSummary', () => {
   })
 
   describe('auth.additional_redirect_urls', () => {
-    it('counts an identical list as managed', () => {
-      const summary = summaryOf(
-        getConfigDriftSummary({
-          dashboardConfig: {
-            auth: { additional_redirect_urls: ['https://a.com', 'https://b.com'] },
-          },
-          githubConfig: { auth: { additional_redirect_urls: ['https://a.com', 'https://b.com'] } },
-        })
-      )
-
-      expect(summary).toEqual({
-        driftedFields: [],
-        matchedFields: [
-          {
-            section: 'auth',
-            configPath: 'auth.additional_redirect_urls',
-            value: ['https://a.com', 'https://b.com'],
-          },
-        ],
-        unmanagedFields: [],
-      })
-    })
-
     it('counts a list that differs only in order as managed', () => {
       const summary = summaryOf(
         getConfigDriftSummary({

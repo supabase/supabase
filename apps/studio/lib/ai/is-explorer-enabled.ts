@@ -4,9 +4,9 @@ import { getServerFlags, type TrustedUserEmail } from '@/lib/server/configcat'
 
 // Notebooks haven't shipped yet — they're gated behind the Explorer feature flag on the
 // client (`useFlag('explorer')`). The AI tools that read notebook content (list_notebooks,
-// get_notebook in lib/ai/tools/notebook-tools.ts) must not be advertised to the assistant until
-// this resolves true for the requesting user, otherwise the assistant will believe notebooks
-// exist for users who can't yet see them in the UI.
+// get_notebook, which declare the `explorer` requirement) must not be advertised to the
+// assistant until this resolves true for the requesting user, otherwise the assistant will
+// believe notebooks exist for users who can't yet see them in the UI.
 //
 // Takes TrustedUserEmail, not a plain string: callers must go through
 // lib/server/configcat's trustedUserEmail() to prove this came from a verified source

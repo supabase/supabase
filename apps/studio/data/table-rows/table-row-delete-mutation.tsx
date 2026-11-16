@@ -7,12 +7,14 @@ import { getPrimaryKeys } from './utils'
 import type { SupaRow } from '@/components/grid/types'
 import { Markdown } from '@/components/interfaces/Markdown'
 import { DocsButton } from '@/components/ui/DocsButton'
+import { unguarded } from '@/data/fetchers'
 import { executeSql } from '@/data/sql/execute-sql-mutation'
 import { Entity } from '@/data/table-editor/table-editor-types'
 import { DOCS_URL } from '@/lib/constants'
+import type { StudioError } from '@/lib/errors/studio-errors'
 import { RoleImpersonationState, wrapWithRoleImpersonation } from '@/lib/role-impersonation'
 import { isRoleImpersonationEnabled } from '@/state/role-impersonation-state'
-import type { ResponseError, UseCustomMutationOptions } from '@/types'
+import type { UseCustomMutationOptions } from '@/types'
 
 export type TableRowDeleteVariables = {
   projectRef: string
@@ -60,8 +62,11 @@ export async function deleteTableRow({
   const { result } = await executeSql({
     projectRef,
     connectionString,
+    sqlOrigin: 'studio',
+    queryName: 'table-row-delete',
     sql,
     isRoleImpersonationEnabled: isRoleImpersonationEnabled(roleImpersonationState?.role),
+    grant: unguarded.migrating,
   })
 
   return result
@@ -74,12 +79,12 @@ export const useTableRowDeleteMutation = ({
   onError,
   ...options
 }: Omit<
-  UseCustomMutationOptions<TableRowDeleteData, ResponseError, TableRowDeleteVariables>,
+  UseCustomMutationOptions<TableRowDeleteData, StudioError, TableRowDeleteVariables>,
   'mutationFn'
 > = {}) => {
   const queryClient = useQueryClient()
 
-  return useMutation<TableRowDeleteData, ResponseError, TableRowDeleteVariables>({
+  return useMutation<TableRowDeleteData, StudioError, TableRowDeleteVariables>({
     mutationFn: (vars) => deleteTableRow(vars),
     async onSuccess(data, variables, context) {
       const { projectRef, table } = variables

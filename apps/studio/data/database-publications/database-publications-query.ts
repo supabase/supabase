@@ -3,8 +3,10 @@ import { useQuery } from '@tanstack/react-query'
 
 import { executeSql } from '../sql/execute-sql-mutation'
 import { databasePublicationsKeys } from './keys'
+import { unguarded } from '@/data/fetchers'
 import { useSelectedProjectQuery } from '@/hooks/misc/useSelectedProject'
-import type { ResponseError, UseCustomQueryOptions } from '@/types'
+import type { StudioError } from '@/lib/errors/studio-errors'
+import type { UseCustomQueryOptions } from '@/types'
 
 export type DatabasePublicationsVariables = {
   projectRef?: string
@@ -22,8 +24,11 @@ export async function getDatabasePublications(
     {
       projectRef,
       connectionString,
+      sqlOrigin: 'studio',
+      queryName: 'publications',
       sql,
       queryKey: ['publications'].filter(Boolean),
+      grant: unguarded.migrating,
     },
     signal
   )
@@ -32,7 +37,7 @@ export async function getDatabasePublications(
 }
 
 export type DatabasePublicationsData = Awaited<ReturnType<typeof getDatabasePublications>>
-export type DatabasePublicationsError = ResponseError
+export type DatabasePublicationsError = StudioError
 
 export const useDatabasePublicationsQuery = <TData = DatabasePublicationsData>(
   { projectRef, connectionString }: DatabasePublicationsVariables,

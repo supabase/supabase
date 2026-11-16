@@ -8,6 +8,7 @@ import { approvalGatedToolFromContract } from './tool-from-contract'
 import type { ApprovalGatedToolFactory } from './types'
 import { resolveLogTimeRange } from '@/components/interfaces/QuerySources/LogTimeRange.utils'
 import { getNotebook } from '@/data/content/notebooks/notebook-query'
+import { unguarded } from '@/data/fetchers'
 import { executeLogsSql } from '@/data/logs/execute-logs-sql-mutation'
 import { QUERY_SOURCE_REGISTRY } from '@/data/query-sources/query-source-registry'
 import { getReadReplicas } from '@/data/read-replicas/replicas-query'
@@ -118,7 +119,9 @@ export const createTool: ApprovalGatedToolFactory<typeof contract> = (ctx) => {
               projectRef,
               connectionString: selectedConnectionString,
               sql: limitedSql.sql,
+              sqlOrigin: 'user',
               isStatementTimeoutDisabled: true,
+              grant: unguarded.migrating,
             },
             abortSignal,
             authHeaders

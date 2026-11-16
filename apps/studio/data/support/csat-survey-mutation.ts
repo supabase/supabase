@@ -3,7 +3,8 @@ import { toast } from 'sonner'
 
 import { constructHeaders, fetchHandler, handleError } from '@/data/fetchers'
 import { API_URL } from '@/lib/constants'
-import type { ResponseError, UseCustomMutationOptions } from '@/types'
+import type { StudioError } from '@/lib/errors/studio-errors'
+import type { UseCustomMutationOptions } from '@/types'
 
 export type CsatSurveyVariables = {
   conversationId: string
@@ -43,10 +44,10 @@ export const useCsatSurveyMutation = ({
   onError,
   ...options
 }: Omit<
-  UseCustomMutationOptions<CsatSurveyData, ResponseError, CsatSurveyVariables>,
+  UseCustomMutationOptions<CsatSurveyData, StudioError, CsatSurveyVariables>,
   'mutationFn'
 > = {}) => {
-  return useMutation<CsatSurveyData, ResponseError, CsatSurveyVariables>({
+  return useMutation<CsatSurveyData, StudioError, CsatSurveyVariables>({
     mutationFn: (vars) => submitCsatSurvey(vars),
     async onSuccess(data, variables, context) {
       await onSuccess?.(data, variables, context)

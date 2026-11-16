@@ -5,21 +5,15 @@ import { beforeEach, describe, expect, it, vi } from 'vitest'
 import JWTKeysLegacyPage from '@/pages/project/[ref]/settings/jwt/legacy'
 import { customRender as render } from '@/tests/lib/custom-render'
 
-const { mockIsPlatform, mockUseIsFeatureEnabled, mockUseJwtSecretUpdatingStatusQuery } = vi.hoisted(
-  () => ({
-    mockIsPlatform: { value: true },
-    mockUseIsFeatureEnabled: vi.fn(),
-    mockUseJwtSecretUpdatingStatusQuery: vi.fn(),
-  })
-)
+const { mockUseIsFeatureEnabled, mockUseJwtSecretUpdatingStatusQuery } = vi.hoisted(() => ({
+  mockUseIsFeatureEnabled: vi.fn(),
+  mockUseJwtSecretUpdatingStatusQuery: vi.fn(),
+}))
 
 vi.mock('common', async () => {
   const actual = await vi.importActual<Record<string, unknown>>('common')
   return {
     ...actual,
-    get IS_PLATFORM() {
-      return mockIsPlatform.value
-    },
     useParams: () => ({ ref: 'project-ref' }),
   }
 })
@@ -53,22 +47,21 @@ vi.mock('@/components/interfaces/JwtSecrets/jwt-settings', () => ({
 
 describe('/project/[ref]/settings/jwt/legacy', () => {
   beforeEach(() => {
-    mockIsPlatform.value = true
     mockUseIsFeatureEnabled.mockReturnValue({ projectSettingsLegacyJwtKeys: true })
     mockUseJwtSecretUpdatingStatusQuery.mockReturnValue({ data: undefined })
   })
 
-  it('renders the JWT settings on platform', () => {
+  it('renders the JWT settings when legacy JWT keys are enabled', () => {
     render(<JWTKeysLegacyPage dehydratedState={{}} />)
 
     expect(screen.getByText('JWTSettings')).toBeInTheDocument()
   })
 
-  it('renders the JWT settings on self-hosted', () => {
-    mockIsPlatform.value = false
+  it('hides the JWT settings when legacy JWT keys are disabled', () => {
+    mockUseIsFeatureEnabled.mockReturnValue({ projectSettingsLegacyJwtKeys: false })
 
     render(<JWTKeysLegacyPage dehydratedState={{}} />)
 
-    expect(screen.getByText('JWTSettings')).toBeInTheDocument()
+    expect(screen.queryByText('JWTSettings')).not.toBeInTheDocument()
   })
 })

@@ -96,7 +96,6 @@ const fetchAllRows = async ({
   try {
     table = await queryClient.ensureQueryData({
       // Query is the same even if connectionString changes
-      // eslint-disable-next-line @tanstack/query/exhaustive-deps
       queryKey: tableEditorKeys.tableEditor(projectRef, entity.id),
       queryFn: ({ signal }) =>
         getTableEditor({ projectRef, connectionString, id: entity.id }, signal),

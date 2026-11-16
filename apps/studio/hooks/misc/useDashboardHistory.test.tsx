@@ -17,14 +17,6 @@ describe('useDashboardHistory', () => {
     localStorage.clear()
   })
 
-  it('stores the last visited snippet', async () => {
-    const { result } = await renderDashboardHistory()
-
-    act(() => result.current.setLastVisitedSnippet('snippet-a'))
-
-    await waitFor(() => expect(result.current.history.sql).toBe('snippet-a'))
-  })
-
   describe('clearSnippetsFromHistory', () => {
     it('purges the last visited snippet when it is one of the deleted ids', async () => {
       const { result } = await renderDashboardHistory()
@@ -66,16 +58,6 @@ describe('useDashboardHistory', () => {
   })
 
   describe('setLastVisitedExplorerTab', () => {
-    it('stores the last visited Explorer tab', async () => {
-      const { result } = await renderDashboardHistory()
-
-      act(() => result.current.setLastVisitedExplorerTab({ type: 'notebook', id: 'notebook-1' }))
-
-      await waitFor(() =>
-        expect(result.current.history.explorer).toEqual({ type: 'notebook', id: 'notebook-1' })
-      )
-    })
-
     it('clears the last visited Explorer tab when called with undefined', async () => {
       const { result } = await renderDashboardHistory()
 

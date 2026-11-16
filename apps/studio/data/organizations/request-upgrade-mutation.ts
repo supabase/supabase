@@ -3,7 +3,8 @@ import { components } from 'api-types'
 import { toast } from 'sonner'
 
 import { handleError, post } from '@/data/fetchers'
-import type { ResponseError, UseCustomMutationOptions } from '@/types'
+import type { StudioError } from '@/lib/errors/studio-errors'
+import type { UseCustomMutationOptions } from '@/types'
 
 export type PlanRequest = components['schemas']['RequestUpgradeBody']['requested_plan']
 
@@ -32,10 +33,10 @@ export const useSendUpgradeRequestMutation = ({
   onError,
   ...options
 }: Omit<
-  UseCustomMutationOptions<SendUpgradeRequestData, ResponseError, SendUpgradeRequestVariables>,
+  UseCustomMutationOptions<SendUpgradeRequestData, StudioError, SendUpgradeRequestVariables>,
   'mutationFn'
 > = {}) => {
-  return useMutation<SendUpgradeRequestData, ResponseError, SendUpgradeRequestVariables>({
+  return useMutation<SendUpgradeRequestData, StudioError, SendUpgradeRequestVariables>({
     mutationFn: (vars) => sendUpgradeRequest(vars),
     async onSuccess(data, variables, context) {
       await onSuccess?.(data, variables, context)

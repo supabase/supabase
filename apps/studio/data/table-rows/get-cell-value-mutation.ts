@@ -3,10 +3,12 @@ import { Query } from '@supabase/pg-meta/src/query'
 import { useMutation } from '@tanstack/react-query'
 import { toast } from 'sonner'
 
+import { unguarded } from '@/data/fetchers'
 import { executeSql } from '@/data/sql/execute-sql-mutation'
+import type { StudioError } from '@/lib/errors/studio-errors'
 import { RoleImpersonationState, wrapWithRoleImpersonation } from '@/lib/role-impersonation'
 import { isRoleImpersonationEnabled } from '@/state/role-impersonation-state'
-import type { ResponseError, UseCustomMutationOptions } from '@/types'
+import type { UseCustomMutationOptions } from '@/types'
 
 export type GetCellValueVariables = {
   projectRef: string
@@ -44,8 +46,11 @@ export async function getCellValue({
   const { result } = await executeSql({
     projectRef,
     connectionString,
+    sqlOrigin: 'studio',
+    queryName: 'get-cell-value',
     sql,
     isRoleImpersonationEnabled: isRoleImpersonationEnabled(roleImpersonationState?.role),
+    grant: unguarded.migrating,
   })
   return result?.[0][column]
 }
@@ -57,10 +62,10 @@ export const useGetCellValueMutation = ({
   onError,
   ...options
 }: Omit<
-  UseCustomMutationOptions<TableRowCreateData, ResponseError, GetCellValueVariables>,
+  UseCustomMutationOptions<TableRowCreateData, StudioError, GetCellValueVariables>,
   'mutationFn'
 > = {}) => {
-  return useMutation<TableRowCreateData, ResponseError, GetCellValueVariables>({
+  return useMutation<TableRowCreateData, StudioError, GetCellValueVariables>({
     mutationFn: (vars) => getCellValue(vars),
     async onSuccess(data, variables, context) {
       await onSuccess?.(data, variables, context)

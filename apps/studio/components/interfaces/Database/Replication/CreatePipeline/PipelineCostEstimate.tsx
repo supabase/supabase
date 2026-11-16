@@ -113,7 +113,8 @@ export const PipelineCostEstimate = ({
                       {hiddenTableCount > 0 && (
                         <TableRow>
                           <TableCell colSpan={3} className="text-foreground-lighter">
-                            +{hiddenTableCount} more {hiddenTableCount === 1 ? 'table' : 'tables'}
+                            +{hiddenTableCount} more{' '}
+                            {hiddenTableCount === 1 ? <span>table</span> : <span>tables</span>}
                           </TableCell>
                         </TableRow>
                       )}
@@ -141,9 +142,11 @@ export const PipelineCostEstimate = ({
 
               <p className="text-sm text-foreground-lighter">
                 Final charges are based on data processed during initial sync.
-                {copyEstimate?.isComplete && copyEstimate.hasRowFilteredTables
-                  ? ' Row filters may reduce this amount.'
-                  : ''}
+                {copyEstimate?.isComplete && copyEstimate.hasRowFilteredTables ? (
+                  <span>{' Row filters may reduce this amount.'}</span>
+                ) : (
+                  ''
+                )}
               </p>
             </section>
 

@@ -209,13 +209,7 @@
     "description": "Error when trying to broadcast database changes (realtime.messages) to subscribers."
   },
   "WarnSendingBroadcastMessage": {
-    "description": "Warning when `realtime.send` or `realtime.send_binary` cannot insert the message.",
-    "references": [
-      {
-        "href": "/docs/guides/realtime/troubleshooting",
-        "description": "Realtime troubleshooting guide"
-      }
-    ]
+    "description": "Warning when `realtime.send` or `realtime.send_binary` cannot insert the message."
   },
   "UnexpectedMessageReceived": {
     "description": "An unexpected message was received by the replication connection process."

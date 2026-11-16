@@ -45,4 +45,13 @@ describe('KeyboardShortcut', () => {
 
     expect(screen.getByText('Ctrl ↑')).toBeInTheDocument()
   })
+
+  it('renders each key as its own keycap', () => {
+    setNavigator('MacIntel', 'Mozilla/5.0 (Macintosh; Intel Mac OS X)')
+
+    render(<KeyboardShortcut keys={['Meta', 'k']} variant="keycaps" />)
+
+    expect(screen.getByText('⌘')).toBeInTheDocument()
+    expect(screen.getByText('K')).toBeInTheDocument()
+  })
 })

@@ -1,4 +1,4 @@
-import { describe, expect, test } from 'vitest'
+import { describe, expect, test, vi } from 'vitest'
 
 import { LogsTableName } from './Logs.constants'
 import type { Filters, LogData } from './Logs.types'
@@ -11,6 +11,7 @@ import {
   formatLogsAsJson,
   formatLogsAsMarkdown,
   genChartQuery,
+  genCountQuery,
   genDefaultQuery,
   getAuthLogSeverity,
   parseMultigresEventMessage,
@@ -139,12 +140,34 @@ describe('Logs.utils', () => {
   })
 
   describe('buildLogsPrompt', () => {
+    test.each([
+      '2026-10-27T10:15:00.000000',
+      '2026-10-27 10:15:00.000000',
+      '2026-10-27T10:15:00Z',
+      '2026-10-27T11:15:00+01:00',
+    ])(
+      'preserves the UTC log time in Assistant prompts regardless of the local timezone: %s',
+      (timestamp) => {
+        vi.stubEnv('TZ', 'Europe/Madrid')
+        try {
+          expect(new Date('2026-10-27T10:15:00').getTimezoneOffset()).toBe(-60)
+          const prompt = buildLogsPrompt([
+            { id: 'log', timestamp, event_message: 'Function failed' },
+          ])
+          expect(prompt).toContain('**Timestamp:** 2026-10-27T10:15:00.000Z')
+        } finally {
+          vi.unstubAllEnvs()
+        }
+      }
+    )
+
     test('builds prompt with single log', () => {
       const rows: LogData[] = [createLog({ id: '1', event_message: 'error occurred' })]
       const result = buildLogsPrompt(rows)
       expect(result).toContain('1 Supabase log entry')
       expect(result).toContain('error occurred')
       expect(result).toContain('What do these logs indicate')
+      expect(result).not.toContain('more matching log')
     })
 
     test('builds prompt with multiple logs', () => {
@@ -156,10 +179,24 @@ describe('Logs.utils', () => {
       expect(result).toContain('2 Supabase log entries')
     })
 
-    test('handles singular correctly', () => {
-      const rows: LogData[] = [createLog({ id: '1', event_message: 'single error' })]
-      const result = buildLogsPrompt(rows)
-      expect(result).toContain('1 Supabase log entry')
+    test.each([
+      [1, '+1 more matching log entry not included.'],
+      [45, '+45 more matching log entries not included.'],
+      [1234, '+1,234 more matching log entries not included.'],
+    ])('tells the assistant that %i matching preview logs were omitted', (omittedCount, note) => {
+      const rows: LogData[] = [createLog({ id: '1', event_message: 'latest error' })]
+      const result = buildLogsPrompt(rows, {
+        queryType: 'functions',
+        sqlQuery: 'select event_message from function_logs limit 1',
+        omittedCount,
+      })
+      expect(result).toContain('from the **Edge Functions** service')
+      expect(result).toContain('latest error')
+      expect(result.indexOf('latest error')).toBeLessThan(result.indexOf(note))
+      expect(result).toContain(note)
+      expect(result).toContain(
+        '**Query used:**\n```sql\nselect event_message from function_logs limit 1\n```'
+      )
     })
   })
 
@@ -168,18 +205,12 @@ describe('Logs.utils', () => {
       expect(extractEdgeFunctionName('/functions/v1/hello-world-1')).toBe('hello-world-1')
     })
 
-    test('returns empty string for null', () => {
-      expect(extractEdgeFunctionName(null)).toBe('')
-    })
-
-    test('returns empty string for undefined', () => {
-      expect(extractEdgeFunctionName(undefined)).toBe('')
-    })
-
-    test('returns empty string for non-string values', () => {
-      expect(extractEdgeFunctionName(42)).toBe('')
-      expect(extractEdgeFunctionName({})).toBe('')
-    })
+    test.each([null, undefined, 42, {}])(
+      'returns empty string for non-string value %o',
+      (value) => {
+        expect(extractEdgeFunctionName(value)).toBe('')
+      }
+    )
 
     test('handles pathname with no slashes', () => {
       expect(extractEdgeFunctionName('my-function')).toBe('my-function')
@@ -333,6 +364,31 @@ describe('Logs.utils', () => {
   })
 
   describe('genChartQuery', () => {
+    test.each([150, '00150', '03dg2o5teb2eucxr9ggh3uie6', "opaque' OR '1'='1"])(
+      'reads only pipeline_id_v2 for pipeline %s in every legacy query',
+      (pipelineId) => {
+        const params = {
+          iso_timestamp_start: '2026-10-30T10:00:00Z',
+          iso_timestamp_end: '2026-10-30T11:00:00Z',
+        }
+        // Legacy links can carry numeric IDs in the JSON filters query parameter.
+        const filters: Filters = JSON.parse(JSON.stringify({ pipeline_id: pipelineId }))
+        const expectedId = String(pipelineId).replaceAll("'", "''")
+        for (const sql of [
+          genChartQuery(LogsTableName.PIPELINES, params, filters),
+          genDefaultQuery(LogsTableName.PIPELINES, filters),
+          genCountQuery(LogsTableName.PIPELINES, filters),
+        ]) {
+          expect(sql).toContain('etl_replication_logs t')
+          expect(sql).toContain("json_value(to_json_string(t), '$.pipeline_id_v2')")
+          expect(sql).not.toContain('cast(t.pipeline_id as string)')
+          expect(sql).not.toContain('etl_replication_logs.pipeline_id')
+          expect(sql).not.toContain('to_json_string(etl_replication_logs)')
+          expect(sql).toContain(`= '${expectedId}'`)
+        }
+      }
+    )
+
     // Regression: an unparseable iso_timestamp_start used to reach
     // startOffset.toISOString() as an Invalid Date and throw RangeError.
     test('falls back to minute buckets for an unparseable time range without throwing', () => {

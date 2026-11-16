@@ -40,7 +40,15 @@ export function DataTableFilterCheckboxAsync<TData>({
       />
 
       {isError && (
-        <AlertError error={error} subject="Failed to retrieve pathnames" projectRef={projectRef} />
+        <AlertError
+          error={error}
+          subject={
+            value === 'pipeline_id'
+              ? 'Failed to retrieve pipeline IDs'
+              : 'Failed to retrieve pathnames'
+          }
+          projectRef={projectRef}
+        />
       )}
 
       <div className="max-h-[215px] overflow-y-auto rounded-sm border border-border empty:border-none">
@@ -81,7 +89,7 @@ export function DataTableFilterCheckboxAsync<TData>({
                 />
                 <Label
                   htmlFor={`${value}-${option.value}`}
-                  className="flex w-full items-center justify-between gap-2 text-foreground/70 group-hover:text-accent-foreground text-[0.8rem] min-w-0"
+                  className="flex w-full items-center justify-between gap-2 text-foreground/70 group-hover:text-accent-foreground text-sm min-w-0"
                 >
                   <div className="flex-1 min-w-0 overflow-hidden">
                     {Component ? (

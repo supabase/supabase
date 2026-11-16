@@ -10,17 +10,18 @@ import { getGitHubProfileImgUrl } from './github'
 import { organizationKeys } from '@/data/organizations/keys'
 import { permissionKeys } from '@/data/permissions/keys'
 import { usePermissionsQuery } from '@/data/permissions/permissions-query'
+import { usePermissionsQueryV2 } from '@/data/permissions/permissions-query-v2'
 import { profileKeys } from '@/data/profile/keys'
 import { useProfileCreateMutation } from '@/data/profile/profile-create-mutation'
 import { useProfileIdentitiesQuery } from '@/data/profile/profile-identities-query'
 import { useProfileQuery } from '@/data/profile/profile-query'
 import type { Profile } from '@/data/profile/types'
+import type { StudioError } from '@/lib/errors/studio-errors'
 import { useTrack } from '@/lib/telemetry/track'
-import type { ResponseError } from '@/types'
 
 export type ProfileContextType = {
   profile: Profile | undefined
-  error: ResponseError | null
+  error: StudioError | null
   isLoading: boolean
   isError: boolean
   isSuccess: boolean
@@ -100,9 +101,13 @@ export const ProfileProvider = ({ children }: PropsWithChildren<{}>) => {
   }, [isUnauthorized, signOut, router])
 
   const { isInitialLoading: isLoadingPermissions } = usePermissionsQuery({ enabled: isLoggedIn })
+  const { isInitialLoading: isLoadingPermissionsV2 } = usePermissionsQueryV2({
+    enabled: isLoggedIn,
+  })
 
   const value = useMemo(() => {
-    const isLoading = isLoadingProfile || isCreatingProfile || isLoadingPermissions
+    const isLoading =
+      isLoadingProfile || isCreatingProfile || isLoadingPermissions || isLoadingPermissionsV2
 
     return {
       error,
@@ -115,6 +120,7 @@ export const ProfileProvider = ({ children }: PropsWithChildren<{}>) => {
     isLoadingProfile,
     isCreatingProfile,
     isLoadingPermissions,
+    isLoadingPermissionsV2,
     profile,
     error,
     isError,

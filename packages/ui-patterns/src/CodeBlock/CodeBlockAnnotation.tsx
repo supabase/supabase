@@ -44,9 +44,12 @@ export const AnnotatedSpan = ({ content, className, annotations }: AnnotatedSpan
           tabIndex={0}
           className={cn(
             className,
-            'any-pointer-coarse:underline any-pointer-coarse:underline-offset-4',
-            'any-pointer-coarse:decoration-dashed',
-            'any-pointer-coarse:decoration-[rgba(from_currentColor_r_g_b/0.5)]'
+            'cursor-help rounded-xs transition-colors',
+            'underline underline-offset-4 decoration-dashed',
+            'decoration-current/40',
+            'hover:decoration-current focus-visible:decoration-current',
+            'hover:bg-current/12',
+            'focus-visible:bg-current/12'
           )}
         >
           {content}

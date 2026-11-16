@@ -1,32 +1,21 @@
 import { Search } from 'lucide-react'
-import { useCallback, useRef, useState, useSyncExternalStore, type ReactNode } from 'react'
+import { useRef, useSyncExternalStore, type ReactNode } from 'react'
 import { cn, KeyboardShortcut } from 'ui'
 
-import {
-  alignedEdges,
-  CELL_HEIGHT,
-  CELL_WIDTH,
-  heroField,
-  uniformEdges,
-  type Lattice,
-} from '../lib/ascii/field'
-import type { GuideSummary } from '../lib/guides'
 import type { Topic } from '../lib/topics'
-import { useQueryVariant } from '../lib/use-query-variant'
-import { AsciiCanvas, type CanvasSize } from './AsciiCanvas'
 import { AsciiHoverText } from './AsciiHoverText'
-import { GuideSearchDialog } from './GuideSearchDialog'
+import { FrameGlyphs } from './FrameGlyphs'
 import { HeroGrid } from './HeroGrid'
 import { InfallText } from './InfallText'
+import { openKbSearch } from './KbSearch'
 import { TopicShape } from './TopicShape'
 import { WarpCanvas } from './WarpCanvas'
 
 export interface HeroProps {
   title: string
   description: string
-  guides: GuideSummary[]
   breadcrumb?: ReactNode
-  variant?: 'grid' | 'warp' | 'construction'
+  variant?: 'warp' | 'construction'
   topic?: Topic
   children?: ReactNode
   className?: string
@@ -35,54 +24,32 @@ export interface HeroProps {
 export interface TopicHeroProps {
   topic: Topic
   description: string
-  guides: GuideSummary[]
   breadcrumb?: ReactNode
   className?: string
 }
 
 interface CopyFrameProps {
-  lines: { id: string; className: string }[]
+  lines: { id: string; className: string; fade?: number }[]
 }
 
 interface HeroFlanksProps {
   topic: Topic
+  text: string
 }
 
 export interface HomeHeroProps {
-  guides: GuideSummary[]
   className?: string
 }
 
-interface HeroSearchProps {
-  guides: GuideSummary[]
-}
-
-// hidden for launch. preview with ?search=on, flip the fallback to ship it
-const SEARCH_FLAG = ['off', 'on'] as const
-
-const DRAW_OUT = 'motion-safe:animate-draw-out'
+const DRAW_OUT = 'motion-safe:group-data-frame-glyphs-ready/hero:animate-draw-out'
 
 const FLANK_BOX = cn(
-  'grain-mask-flank absolute -top-[100vh] h-[calc(100%+200vh)] w-[50vw]',
+  'flank-mask absolute -top-[100vh] h-[calc(100%+200vh)] w-[50vw]',
   'pointer-events-none py-[100vh] pl-12 pr-92 max-lg:hidden'
 )
 
-const ACROSS = 'left-1/2 h-px w-screen -translate-x-1/2 bg-border'
-const UPRIGHT =
-  'inset-y-0 w-px origin-top bg-linear-to-b from-border via-border via-70% to-transparent'
-
-const getHeroLattice = ({ width, height }: CanvasSize): Lattice => {
-  const contentLeft = Math.max(0, (width - 1152) / 2) + 24
-  return {
-    xs: alignedEdges({
-      size: width,
-      start: contentLeft,
-      end: width - contentLeft,
-      target: CELL_WIDTH,
-    }),
-    ys: uniformEdges({ size: height, step: CELL_HEIGHT }),
-  }
-}
+const ACROSS = 'left-1/2 h-px w-screen -translate-x-1/2'
+const UPRIGHT = 'inset-y-0 w-px origin-top'
 
 const subscribeToNothing = () => () => {}
 
@@ -93,7 +60,6 @@ const getIsMacOnServer = () => false
 export const Hero = ({
   title,
   description,
-  guides,
   breadcrumb,
   variant = 'warp',
   topic,
@@ -101,45 +67,36 @@ export const Hero = ({
   className,
 }: HeroProps) => {
   const isWarp = variant === 'warp'
-  const isGrid = variant === 'grid'
+  const text = `${title} + ${description} + `.toUpperCase()
   const copyRef = useRef<HTMLDivElement>(null)
-  const ingestWords = [
-    ...new Set(
-      guides.flatMap((guide) =>
-        guide.title
-          .toLowerCase()
-          .split(/[^a-z0-9]+/)
-          .filter((word) => word.length >= 5)
-      )
-    ),
-  ]
 
   return (
     <section
       className={cn(
-        'relative isolate flex justify-center',
-        isWarp ? 'pt-39 pb-60' : 'pt-32.5 pb-26 max-sm:pt-19.5 max-sm:pb-19.5 lg:pb-40',
+        'group/hero relative isolate flex justify-center',
+        isWarp ? 'pt-39 pb-60' : 'max-lg:py-10 max-lg:border-b lg:pt-32.5 lg:pb-40',
         'overflow-hidden bg-background',
         className
       )}
     >
-      {isWarp ? <WarpCanvas anchorRef={copyRef} /> : null}
+      {isWarp ? <WarpCanvas anchorRef={copyRef} text={text} /> : null}
+      {variant === 'construction' ? (
+        <FrameGlyphs text={text} className="z-20 caret-background text-border-stronger" />
+      ) : null}
       {variant === 'construction' ? (
         <CopyFrame
           lines={[
-            { id: 'left', className: cn('right-[calc(50%+20rem)]', UPRIGHT, DRAW_OUT) },
-            { id: 'right', className: cn('left-[calc(50%+20rem)]', UPRIGHT, DRAW_OUT) },
+            {
+              id: 'left',
+              className: cn('right-[calc(50%+20rem)] max-lg:hidden', UPRIGHT, DRAW_OUT),
+              fade: 0.7,
+            },
+            {
+              id: 'right',
+              className: cn('left-[calc(50%+20rem)] max-lg:hidden', UPRIGHT, DRAW_OUT),
+              fade: 0.7,
+            },
           ]}
-        />
-      ) : null}
-      {isGrid ? (
-        <AsciiCanvas
-          getLattice={getHeroLattice}
-          getField={heroField}
-          keepOutRefs={[copyRef]}
-          keepOutMargin={0}
-          words={ingestWords}
-          decay={0.985}
         />
       ) : null}
       <div className="relative z-10 w-full max-w-6xl px-6">
@@ -160,6 +117,9 @@ export const Hero = ({
             isWarp ? 'py-16' : 'pt-12 pb-9.5'
           )}
         >
+          {variant === 'construction' && topic ? (
+            <TopicShape topic={topic} text={text} className="h-45 w-full lg:hidden" />
+          ) : null}
           {breadcrumb}
           <h1 className="m-0 text-5xl tracking-display text-foreground sm:text-6xl">
             {isWarp ? (
@@ -172,91 +132,69 @@ export const Hero = ({
             {isWarp ? <InfallText text={description} /> : description}
           </p>
           {children}
-          {variant === 'construction' && topic ? <HeroFlanks topic={topic} /> : null}
+          {variant === 'construction' && topic ? <HeroFlanks topic={topic} text={text} /> : null}
         </div>
       </div>
-      {isGrid ? (
-        <div
-          aria-hidden
-          className="pointer-events-none absolute inset-x-0 bottom-0 h-1/3 bg-linear-to-b from-transparent to-background"
-        />
-      ) : null}
     </section>
   )
 }
 
-export const HomeHero = ({ guides, className }: HomeHeroProps) => {
-  const isSearchEnabled =
-    useQueryVariant({ key: 'search', options: SEARCH_FLAG, fallback: 'off' }) === 'on'
-
+export const HomeHero = ({ className }: HomeHeroProps) => {
   return (
     <Hero
       title="Knowledge base"
       description="In-depth guides, tutorials, troubleshooting, and explainers for best practices for Supabase"
-      guides={guides}
       className={className}
     >
-      {isSearchEnabled ? <HeroSearch guides={guides} /> : null}
+      <HeroSearch />
     </Hero>
   )
 }
 
-export const TopicHero = ({
-  topic,
-  description,
-  guides,
-  breadcrumb,
-  className,
-}: TopicHeroProps) => {
-  // grid hero stays reachable with ?hero=grid, in case we go back to it
-  const variant = useQueryVariant({
-    key: 'hero',
-    options: ['construction', 'grid'],
-    fallback: 'construction',
-  })
+export const TopicHero = ({ topic, description, breadcrumb, className }: TopicHeroProps) => (
+  <Hero
+    variant="construction"
+    topic={topic}
+    title={topic}
+    description={description}
+    breadcrumb={breadcrumb}
+    className={className}
+  />
+)
 
-  return (
-    <Hero
-      variant={variant}
-      topic={topic}
-      title={topic}
-      description={description}
-      guides={guides}
-      breadcrumb={breadcrumb}
-      className={className}
-    />
-  )
-}
-
-const HeroFlanks = ({ topic }: HeroFlanksProps) => (
+const HeroFlanks = ({ topic, text }: HeroFlanksProps) => (
   <>
-    <HeroGrid axis="rows" className={cn('right-1/2', FLANK_BOX)} />
-    <HeroGrid axis="rows" className={cn('left-1/2 -scale-x-100', FLANK_BOX)} />
+    <HeroGrid axis="rows" text={text} className={cn('right-1/2', FLANK_BOX)} />
+    <HeroGrid axis="rows" text={text} isMirrored className={cn('left-1/2', FLANK_BOX)} />
     <HeroGrid
       axis="columns"
+      text={text}
       className={cn('right-1/2 [--flank-span:calc(100%_-_20rem)]', FLANK_BOX)}
     />
     <HeroGrid
       axis="columns"
-      className={cn('left-1/2 -scale-x-100 [--flank-span:calc(100%_-_20rem)]', FLANK_BOX)}
+      text={text}
+      isMirrored
+      className={cn('left-1/2 [--flank-span:calc(100%_-_20rem)]', FLANK_BOX)}
     />
-    <TopicShape topic={topic} className={cn('right-1/2', FLANK_BOX)} />
-    <TopicShape topic={topic} className={cn('left-1/2 -scale-x-100', FLANK_BOX)} />
+    <TopicShape topic={topic} text={text} className={cn('right-1/2', FLANK_BOX)} />
+    <TopicShape topic={topic} text={text} isMirrored className={cn('left-1/2', FLANK_BOX)} />
     <CopyFrame
       lines={[
         { id: 'top', className: cn('top-0', ACROSS, DRAW_OUT) },
-        { id: 'band', className: cn('-top-[calc(var(--spacing)*32.5/2)]', ACROSS, DRAW_OUT) },
+        {
+          id: 'band',
+          className: cn('-top-[calc(var(--spacing)*32.5/2)] max-lg:hidden', ACROSS, DRAW_OUT),
+        },
         { id: 'bottom', className: cn('bottom-0', ACROSS, DRAW_OUT) },
         {
           id: 'stem',
-          className: cn('bottom-full left-1/2 h-screen w-px origin-bottom bg-border', DRAW_OUT),
+          className: cn('bottom-full left-1/2 h-screen w-px origin-bottom', DRAW_OUT),
         },
         {
           id: 'tail',
-          className: cn(
-            'top-full left-1/2 h-40 w-px origin-top bg-linear-to-b from-border to-transparent',
-            DRAW_OUT
-          ),
+          className: cn('top-full left-1/2 h-40 w-px origin-top', DRAW_OUT),
+          fade: 0,
         },
       ]}
     />
@@ -264,51 +202,34 @@ const HeroFlanks = ({ topic }: HeroFlanksProps) => (
 )
 
 const CopyFrame = ({ lines }: CopyFrameProps) =>
-  lines.map(({ id, className }) => (
+  lines.map(({ id, className, fade }) => (
     <span
       key={id}
       aria-hidden
-      className={cn('grain-mask pointer-events-none absolute max-lg:hidden', className)}
+      data-glyph-frame
+      data-glyph-fade={fade}
+      className={cn('pointer-events-none invisible absolute', className)}
     />
   ))
 
-const HeroSearch = ({ guides }: HeroSearchProps) => {
-  const [isSearchOpen, setIsSearchOpen] = useState(false)
+const HeroSearch = () => {
   const isMac = useSyncExternalStore(subscribeToNothing, getIsMac, getIsMacOnServer)
 
-  const bindSearchShortcut = useCallback((trigger: HTMLButtonElement | null) => {
-    if (!trigger) return
-    const handleKeyDown = (event: KeyboardEvent) => {
-      if (event.repeat || event.key?.toLowerCase() !== 'k') return
-      if (!(event.metaKey || event.ctrlKey)) return
-      event.preventDefault()
-      setIsSearchOpen((isOpen) => !isOpen)
-    }
-    window.addEventListener('keydown', handleKeyDown)
-    return () => window.removeEventListener('keydown', handleKeyDown)
-  }, [])
-
-  const handleSearchOpen = () => setIsSearchOpen(true)
-
   return (
-    <>
-      <button
-        ref={bindSearchShortcut}
-        type="button"
-        data-warp-throat
-        aria-keyshortcuts="Meta+K Control+K"
-        onClick={handleSearchOpen}
-        className={cn(
-          'relative mt-2 flex h-12 w-full max-w-85 items-center gap-2.5 rounded-lg pl-3 pr-4 sm:max-w-107',
-          'border border-default bg-surface-75 text-left text-base text-foreground-lighter shadow-raised',
-          'transition-colors hover:border-strong hover:text-foreground-light focus-ring'
-        )}
-      >
-        <Search aria-hidden className="size-4.5 shrink-0" strokeWidth={2.25} />
-        <span className="flex-1 truncate">Search guides</span>
-        <KeyboardShortcut keys={[isMac ? '⌘' : 'Ctrl', 'K']} />
-      </button>
-      <GuideSearchDialog guides={guides} isOpen={isSearchOpen} onOpenChange={setIsSearchOpen} />
-    </>
+    <button
+      type="button"
+      data-warp-throat
+      aria-keyshortcuts="Meta+K Control+K"
+      onClick={openKbSearch}
+      className={cn(
+        'relative mt-2 flex h-12 w-full max-w-85 items-center gap-2.5 rounded-lg pl-3 pr-4 sm:max-w-107',
+        'border border-default bg-surface-75 text-left text-base text-foreground-lighter shadow-raised',
+        'transition-colors hover:border-strong hover:text-foreground-light focus-ring'
+      )}
+    >
+      <Search aria-hidden className="size-4.5 shrink-0" strokeWidth={2.25} />
+      <span className="flex-1 truncate">Search guides</span>
+      <KeyboardShortcut keys={[isMac ? '⌘' : 'Ctrl', 'K']} />
+    </button>
   )
 }

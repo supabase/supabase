@@ -434,7 +434,8 @@ export const SQLEditorTreeViewItem = ({
                         : 'fill-none stroke-foreground-light'
                     )}
                   />
-                  {isFavorite ? 'Remove from' : 'Add to'} favorites
+                  {isFavorite ? <span>Remove from</span> : <span>Add to</span>}{' '}
+                  <span>favorites</span>
                 </ContextMenuItem>
               )}
               {onSelectDownload !== undefined &&

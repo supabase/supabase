@@ -19,10 +19,10 @@ import { Admonition } from 'ui-patterns/Admonition'
 import { DocsButton } from './DocsButton'
 import { InlineLinkClassName } from './InlineLink'
 import { DOCS_URL } from '@/lib/constants'
-import { ResponseError } from '@/types'
+import type { StudioError } from '@/lib/errors/studio-errors'
 
 interface HighQueryCostErrorProps {
-  error: ResponseError
+  error: StudioError
   suggestions?: string[]
   onSelectLoadData?: () => void
 }
@@ -124,7 +124,7 @@ const LoadDataWarningDialog = ({
   error,
   onSelectLoadData,
 }: {
-  error: ResponseError
+  error: StudioError
   onSelectLoadData: () => void
 }) => {
   const metadata = error.metadata

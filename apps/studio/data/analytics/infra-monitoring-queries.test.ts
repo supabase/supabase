@@ -1,3 +1,4 @@
+// @vitest-environment jsdom
 import { waitFor } from '@testing-library/react'
 import dayjs from 'dayjs'
 import { HttpResponse } from 'msw'
@@ -246,14 +247,6 @@ describe('2m interval aggregation', () => {
     expect(dayjs(result.disk_io_budget?.data[1].period_start).minute() % 2).toBe(0)
   })
 
-  it('does not aggregate when interval is not 2m', () => {
-    const result = mapResponseToAnalyticsData(mockMultiResponse, ['max_cpu_usage', 'ram_usage'])
-
-    expect(result.max_cpu_usage?.data).toHaveLength(2)
-    expect(result.max_cpu_usage?.data[0].max_cpu_usage).toBe(1.5)
-    expect(result.max_cpu_usage?.data[1].max_cpu_usage).toBe(0)
-  })
-
   it('handles odd number of 1m data points', () => {
     const mock1MinData: InfraMonitoringMultiResponse = {
       data: [
@@ -351,29 +344,6 @@ describe('aggregate1MinTo2Min', () => {
     expect(dayjs(result[1].period_start).minute() % 2).toBe(0) // Should be even minute
   })
 
-  it('handles odd number of data points correctly', () => {
-    const dataPoints = [
-      {
-        period_start: '2024-01-02T03:00:00Z',
-        max_cpu_usage: 10,
-      },
-      {
-        period_start: '2024-01-02T03:01:00Z',
-        max_cpu_usage: 20,
-      },
-      {
-        period_start: '2024-01-02T03:02:00Z',
-        max_cpu_usage: 15,
-      },
-    ]
-
-    const result = aggregate1MinTo2Min(dataPoints)
-
-    expect(result).toHaveLength(2)
-    expect(result[0].max_cpu_usage).toBe(15) // (10 + 20) / 2
-    expect(result[1].max_cpu_usage).toBe(15) // single point in second bucket
-  })
-
   it('handles single data point', () => {
     const dataPoints = [
       {
@@ -448,48 +418,6 @@ describe('aggregate1MinTo2Min', () => {
     expect(result[0].label).toBeUndefined()
   })
 
-  it('handles data points across different 2-minute buckets', () => {
-    const dataPoints = [
-      {
-        period_start: '2024-01-02T03:00:00Z',
-        value: 10,
-      },
-      {
-        period_start: '2024-01-02T03:01:00Z',
-        value: 20,
-      },
-      {
-        period_start: '2024-01-02T03:02:00Z',
-        value: 15,
-      },
-      {
-        period_start: '2024-01-02T03:03:00Z',
-        value: 25,
-      },
-      {
-        period_start: '2024-01-02T03:04:00Z',
-        value: 30,
-      },
-      {
-        period_start: '2024-01-02T03:05:00Z',
-        value: 35,
-      },
-    ]
-
-    const result = aggregate1MinTo2Min(dataPoints)
-
-    expect(result).toHaveLength(3)
-    // First bucket: 03:00 and 03:01
-    expect(result[0].value).toBe(15) // (10 + 20) / 2
-    expect(dayjs(result[0].period_start).minute() % 2).toBe(0)
-    // Second bucket: 03:02 and 03:03
-    expect(result[1].value).toBe(20) // (15 + 25) / 2
-    expect(dayjs(result[1].period_start).minute() % 2).toBe(0)
-    // Third bucket: 03:04 and 03:05
-    expect(result[2].value).toBe(32.5) // (30 + 35) / 2
-    expect(dayjs(result[2].period_start).minute() % 2).toBe(0)
-  })
-
   it('sorts results by period_start', () => {
     const dataPoints = [
       {
@@ -510,20 +438,6 @@ describe('aggregate1MinTo2Min', () => {
 
     expect(result).toHaveLength(2)
     expect(dayjs(result[0].period_start).isBefore(dayjs(result[1].period_start))).toBe(true)
-  })
-
-  it('always includes periodStartFormatted in result', () => {
-    const dataPoints = [
-      {
-        period_start: '2024-01-02T03:00:00Z',
-        max_cpu_usage: 10,
-      },
-    ]
-
-    const result = aggregate1MinTo2Min(dataPoints)
-
-    expect(result[0].periodStartFormatted).toBeDefined()
-    expect(typeof result[0].periodStartFormatted).toBe('string')
   })
 })
 

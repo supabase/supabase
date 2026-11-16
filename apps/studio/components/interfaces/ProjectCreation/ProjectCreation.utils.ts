@@ -153,20 +153,16 @@ export type AvailableRegions = NonNullable<OrganizationAvailableRegionsData>['al
 type GetRegionSelectionTypeArgs = {
   dbRegion: string | undefined
   availableRegions: AvailableRegions | undefined
-  /** Whether the user ever touched the region field. Defaults to true for untracked callers. */
-  isDbRegionDirty?: boolean
 }
 
 /**
- * How the submitted region was arrived at: the auto-assigned default left untouched ('auto'),
- * a smart group region picked by the user (e.g. Americas, 'general'), or an exact region picked
- * by the user (e.g. us-east-1, 'specific'). Explicitly picking the Auto option is also 'auto'.
- * Returns undefined if dbRegion matches neither list, regardless of whether the field was touched.
+ * Classifies the submitted region: the Auto (best available) option ('auto'), a smart group
+ * region (e.g. Americas, 'general') or an exact region (e.g. us-east-1, 'specific'). An untouched
+ * field reports whichever default it holds. Returns undefined if dbRegion matches neither list.
  */
 export function getRegionSelectionType({
   dbRegion,
   availableRegions,
-  isDbRegionDirty = true,
 }: GetRegionSelectionTypeArgs): 'general' | 'auto' | 'specific' | undefined {
   if (!dbRegion || !availableRegions) return undefined
   if (dbRegion === AUTO_REGION_VALUE)
@@ -174,8 +170,20 @@ export function getRegionSelectionType({
   const isGeneral = availableRegions.smartGroup.some((region) => region.name === dbRegion)
   const isSpecific = availableRegions.specific.some((region) => region.name === dbRegion)
   if (!isGeneral && !isSpecific) return undefined
-  if (!isDbRegionDirty) return 'auto'
   return isGeneral ? 'general' : 'specific'
+}
+
+/**
+ * Sorts Postgres versions newest first. Compares numerically per segment, so `17.11.0.002` sorts
+ * above `17.6.1.164`, which a plain string comparison gets wrong. Returns a new array rather than
+ * sorting in place, since the input is often React Query's cached data.
+ */
+export function sortPostgresVersionsNewestFirst<T extends { version: string }>(
+  versions: readonly T[]
+): T[] {
+  return [...versions].sort((a, b) =>
+    b.version.localeCompare(a.version, undefined, { numeric: true })
+  )
 }
 
 export interface PostgresVersionDetails {

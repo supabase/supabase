@@ -1,17 +1,13 @@
 'use client'
 
 import { useEvents } from '~/app/events/context'
-import { formatHosts } from '~/lib/eventsUtils'
+import { formatHosts, getEventTimeZone } from '~/lib/eventsUtils'
 import { ArrowRightIcon, CalendarIcon, MapPinIcon, VideoIcon } from 'lucide-react'
 import Link from 'next/link'
 import { Badge, Button } from 'ui'
 
 export function EventBanner() {
-  const { isLoading, featuredEvent } = useEvents()
-
-  if (isLoading) {
-    return <EventBannerSkeleton />
-  }
+  const { featuredEvent, isHydrated } = useEvents()
 
   if (!featuredEvent) return null
 
@@ -45,7 +41,12 @@ export function EventBanner() {
 
         <div className="flex flex-col justify-between gap-8">
           <div className="flex flex-row gap-6">
-            <DateWidget date={featuredEvent.date} endDate={featuredEvent.end_date} />
+            <DateWidget
+              date={featuredEvent.date}
+              endDate={featuredEvent.end_date}
+              eventTimeZone={featuredEvent.timezone}
+              isHydrated={isHydrated}
+            />
             <LocationWidget
               location={featuredEvent.location}
               categories={featuredEvent.categories}
@@ -83,41 +84,52 @@ export function EventBanner() {
   )
 }
 
-const DateWidget = ({ date, endDate }: { date: string; endDate?: string }) => {
+const DateWidget = ({
+  date,
+  endDate,
+  eventTimeZone,
+  isHydrated,
+}: {
+  date: string
+  endDate?: string
+  eventTimeZone: string
+  isHydrated: boolean
+}) => {
   const eventDate = new Date(date)
   // Date-only Notion events are normalized to noon UTC (T12:00:00Z); detect them
   // so we can display in UTC and suppress the fabricated time component.
   const isDateOnly = date.endsWith('T12:00:00Z')
-  const tzOption = isDateOnly ? ({ timeZone: 'UTC' } as const) : {}
+  const timeZone = getEventTimeZone(date, eventTimeZone, isHydrated)
 
   const formattedDate = eventDate.toLocaleDateString('en-US', {
     weekday: 'long',
     month: 'short',
     day: 'numeric',
-    ...tzOption,
+    timeZone,
   })
 
-  const currentYear = new Date().getFullYear()
-  const eventYear = isDateOnly ? parseInt(date.slice(0, 4), 10) : eventDate.getFullYear()
+  const currentYear = new Date().toLocaleDateString('en-US', { year: 'numeric' })
+  const eventYear = eventDate.toLocaleDateString('en-US', { year: 'numeric', timeZone })
+  // Always show the year until hydration: the server's clock can't decide the visitor's current year.
   const formattedDateWithYear =
-    eventYear !== currentYear ? `${formattedDate}, ${eventYear}` : formattedDate
+    !isHydrated || eventYear !== currentYear ? `${formattedDate}, ${eventYear}` : formattedDate
+
+  const timeFormat = {
+    hour: 'numeric',
+    minute: '2-digit',
+    hour12: true,
+    timeZone,
+    timeZoneName: isHydrated ? undefined : 'short',
+  } as const
 
   // Only show time for events that have a real time component
   let timeDisplay: string | null = null
   if (!isDateOnly) {
-    const startTime = eventDate.toLocaleTimeString('en-US', {
-      hour: 'numeric',
-      minute: '2-digit',
-      hour12: true,
-    })
+    const startTime = eventDate.toLocaleTimeString('en-US', timeFormat)
 
     if (endDate && !endDate.endsWith('T12:00:00Z')) {
       const endEventDate = new Date(endDate)
-      const endTime = endEventDate.toLocaleTimeString('en-US', {
-        hour: 'numeric',
-        minute: '2-digit',
-        hour12: true,
-      })
+      const endTime = endEventDate.toLocaleTimeString('en-US', timeFormat)
       timeDisplay = `${startTime} - ${endTime}`
     } else {
       timeDisplay = startTime
@@ -168,49 +180,5 @@ const LocationWidget = ({ location, categories }: { location?: string; categorie
         <p className="text-foreground-light text-sm">{locationText}</p>
       </div>
     </div>
-  )
-}
-
-const EventBannerSkeleton = () => {
-  return (
-    <section className="flex flex-col gap-6 rounded-lg p-6">
-      <article className="flex flex-col md:flex-row md:items-stretch gap-6 lg:py-2">
-        {/* Left: title + host + description */}
-        <div className="flex flex-col gap-6 flex-1">
-          <div className="flex flex-col gap-1.5">
-            <div className="h-8 bg-surface-200 rounded-sm animate-pulse w-3/4" />
-            <div className="h-5 bg-surface-200 rounded-sm animate-pulse w-1/2 mt-1" />
-          </div>
-          <div className="h-16 bg-surface-200 rounded-sm animate-pulse w-full" />
-        </div>
-
-        {/* Right: widgets top, button bottom */}
-        <div className="flex flex-col justify-between gap-6">
-          <div className="flex flex-row gap-6">
-            {/* Date Widget Skeleton */}
-            <div className="flex items-center gap-4">
-              <div className="bg-surface-200 w-10 h-10 rounded-md animate-pulse" />
-              <div className="flex flex-col gap-2">
-                <div className="h-4 w-32 bg-surface-200 rounded-sm animate-pulse" />
-                <div className="h-3 w-20 bg-surface-200 rounded-sm animate-pulse" />
-              </div>
-            </div>
-            {/* Location Widget Skeleton */}
-            <div className="flex items-center gap-4">
-              <div className="bg-surface-200 w-10 h-10 rounded-md animate-pulse" />
-              <div className="flex flex-col gap-2">
-                <div className="h-4 w-20 bg-surface-200 rounded-sm animate-pulse" />
-                <div className="h-3 w-24 bg-surface-200 rounded-sm animate-pulse" />
-              </div>
-            </div>
-          </div>
-
-          {/* Button Skeleton */}
-          <div className="flex justify-end">
-            <div className="h-9 w-24 bg-surface-200 rounded-sm animate-pulse" />
-          </div>
-        </div>
-      </article>
-    </section>
   )
 }

@@ -4,7 +4,7 @@ import { toast } from 'sonner'
 
 import { storageKeys } from './keys'
 import { handleError, post } from '@/data/fetchers'
-import type { ResponseError } from '@/types'
+import type { StudioError } from '@/lib/errors/studio-errors'
 
 type VectorBucketIndexCreateVariables = components['schemas']['CreateBucketIndexBody'] & {
   projectRef: string
@@ -43,12 +43,12 @@ export const useVectorBucketIndexCreateMutation = ({
   onError,
   ...options
 }: Omit<
-  UseMutationOptions<VectorBucketIndexCreateData, ResponseError, VectorBucketIndexCreateVariables>,
+  UseMutationOptions<VectorBucketIndexCreateData, StudioError, VectorBucketIndexCreateVariables>,
   'mutationFn'
 > = {}) => {
   const queryClient = useQueryClient()
 
-  return useMutation<VectorBucketIndexCreateData, ResponseError, VectorBucketIndexCreateVariables>({
+  return useMutation<VectorBucketIndexCreateData, StudioError, VectorBucketIndexCreateVariables>({
     mutationFn: (vars) => createVectorBucketIndex(vars),
     async onSuccess(data, variables, context, mutationContext) {
       const { projectRef, bucketName } = variables

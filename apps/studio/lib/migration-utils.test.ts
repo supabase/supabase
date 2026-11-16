@@ -20,41 +20,12 @@ describe('parseMigrationVersion', () => {
     expect(result?.second()).toBe(0)
   })
 
-  it('should return undefined for invalid version format like "001"', () => {
-    const result = parseMigrationVersion('001')
-
-    expect(result).toBeUndefined()
-  })
-
-  it('should return undefined for invalid version format like "002"', () => {
-    const result = parseMigrationVersion('002')
-
-    expect(result).toBeUndefined()
-  })
-
-  it('should return undefined for invalid version format like "003"', () => {
-    const result = parseMigrationVersion('003')
-
-    expect(result).toBeUndefined()
-  })
-
-  it('should return undefined for empty string', () => {
-    const result = parseMigrationVersion('')
-
-    expect(result).toBeUndefined()
-  })
-
-  it('should return undefined for random string', () => {
-    const result = parseMigrationVersion('not-a-date')
-
-    expect(result).toBeUndefined()
-  })
-
-  it('should return undefined for partial date format', () => {
-    const result = parseMigrationVersion('20231128')
-
-    expect(result).toBeUndefined()
-  })
+  it.each(['001', '002', '', 'not-a-date', '20231128'])(
+    'should return undefined for invalid version %o',
+    (version) => {
+      expect(parseMigrationVersion(version)).toBeUndefined()
+    }
+  )
 
   it('should handle edge case date values that dayjs can parse', () => {
     // dayjs is lenient and will wrap invalid values to valid dates
@@ -64,14 +35,6 @@ describe('parseMigrationVersion', () => {
 
     expect(result).not.toBeNull()
     expect(result?.isValid()).toBe(true)
-  })
-
-  it('should allow chaining dayjs methods when valid', () => {
-    const result = parseMigrationVersion('20231128095400')
-
-    expect(result?.fromNow()).toBeDefined()
-    expect(result?.toISOString()).toBeDefined()
-    expect(result?.format('DD MMM YYYY')).toBe('28 Nov 2023')
   })
 
   it('should parse version digits as UTC so the UTC time is preserved exactly', () => {

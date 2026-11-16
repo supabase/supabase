@@ -465,6 +465,16 @@ const CareerPage = ({
                 </Link>
               </Button>
             </div>
+            <p className="text-foreground-lighter text-sm mt-8">
+              Read our{' '}
+              <Link
+                href="/legal/privacy-resources/candidate-privacy-notice"
+                className="text-foreground hover:underline"
+              >
+                Candidate Privacy Notice
+              </Link>{' '}
+              to see how we handle your personal information when you apply.
+            </p>
           </SectionContainer>
         </div>
       </DefaultLayout>

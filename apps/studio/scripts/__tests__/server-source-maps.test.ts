@@ -189,35 +189,31 @@ describe('server source maps', () => {
     await expect(plugin.load.call({} as never, codeFile)).rejects.toMatchObject({ code: 'EISDIR' })
   })
 
+  // Vercel output paths are covered by the build cases below; here only token/skip change the config.
   it.each([
-    [false, false, true],
-    [false, true, true],
-    [true, false, false],
-    [true, true, false],
-    [false, false, false],
-    [true, false, true],
-  ])(
-    'enables both server stages with token=%s, Vercel=%s, skip=%s',
-    async (hasToken, isVercel, shouldSkipUpload) => {
-      const config = await resolveStudioConfig(hasToken, isVercel, shouldSkipUpload)
-      expect(config.environments.ssr.build.sourcemap).toBe(true)
-      expect(config.environments.nitro.build.sourcemap).toBe(true)
-      expect(config.environments.client.build.sourcemap).toBe(
-        hasToken && !shouldSkipUpload ? 'hidden' : false
-      )
-      expect(captured.nitro?.experimental?.sourcemapMinify).toBe(false)
-      expect(captured.sentry?.sourcemaps?.filesToDeleteAfterUpload).toEqual([
-        path.join(studioRoot, '.output/public/**/*.map'),
-        path.join(studioRoot, '.vercel/output/static/**/*.map'),
-        ...(hasToken && !shouldSkipUpload
-          ? [
-              path.join(studioRoot, '.output/server/**/*.map'),
-              path.join(studioRoot, '.vercel/output/functions/**/*.map'),
-            ]
-          : []),
-      ])
-    }
-  )
+    [false, true],
+    [true, false],
+    [false, false],
+    [true, true],
+  ])('enables both server stages with token=%s, skip=%s', async (hasToken, shouldSkipUpload) => {
+    const config = await resolveStudioConfig(hasToken, false, shouldSkipUpload)
+    expect(config.environments.ssr.build.sourcemap).toBe(true)
+    expect(config.environments.nitro.build.sourcemap).toBe(true)
+    expect(config.environments.client.build.sourcemap).toBe(
+      hasToken && !shouldSkipUpload ? 'hidden' : false
+    )
+    expect(captured.nitro?.experimental?.sourcemapMinify).toBe(false)
+    expect(captured.sentry?.sourcemaps?.filesToDeleteAfterUpload).toEqual([
+      path.join(studioRoot, '.output/public/**/*.map'),
+      path.join(studioRoot, '.vercel/output/static/**/*.map'),
+      ...(hasToken && !shouldSkipUpload
+        ? [
+            path.join(studioRoot, '.output/server/**/*.map'),
+            path.join(studioRoot, '.vercel/output/functions/**/*.map'),
+          ]
+        : []),
+    ])
+  })
 
   it.each([
     [false, false, false],
@@ -248,11 +244,11 @@ describe('server source maps', () => {
         '<html><body><!--ssr-outlet--><script type="module" src="/client.ts"></script></body></html>'
       )
       await writeFile(path.join(root, 'client.ts'), 'console.log("source-map-fixture")')
-      const originalFile = path.join(studioRoot, 'pages/api/get-deployment-commit.ts')
+      const originalFile = path.join(studioRoot, 'routes/api/get-deployment-commit.ts')
       const originalSource = await readFile(originalFile, 'utf8')
       await writeFile(
         path.join(root, 'server.ts'),
-        `import handler from ${JSON.stringify(originalFile)};\nexport default {fetch() {return new Response(handler.name)}};\n`
+        `import { Route } from ${JSON.stringify(originalFile)};\nexport default {fetch(request) {return Route.options.server.handlers.GET({ request })}};\n`
       )
       const generatedAppMaps: { fileName: string; code: string; map: SourceMap }[] = []
       const builder = await createBuilder({
@@ -299,7 +295,7 @@ describe('server source maps', () => {
                 const map: SourceMap = JSON.parse(JSON.stringify(chunk.map))
                 if (
                   map.sources.some((source) =>
-                    source.endsWith('/pages/api/get-deployment-commit.ts')
+                    source.endsWith('/routes/api/get-deployment-commit.ts')
                   )
                 ) {
                   generatedAppMaps.push({ fileName: chunk.fileName, code: chunk.code, map })
@@ -345,7 +341,7 @@ describe('server source maps', () => {
       expect(generatedAppMaps.length).toBeGreaterThan(0)
       for (const { fileName, code, map } of generatedAppMaps) {
         const sourceIndex = map.sources.findIndex((source) =>
-          source.endsWith('/pages/api/get-deployment-commit.ts')
+          source.endsWith('/routes/api/get-deployment-commit.ts')
         )
         expect(map.sourcesContent[sourceIndex]).toBe(originalSource)
         const marker = 'Failed to fetch commit details'

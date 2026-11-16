@@ -2,8 +2,7 @@ import { render, screen } from '@testing-library/react'
 import { describe, expect, it, vi } from 'vitest'
 
 import { ErrorMatcher } from './ErrorMatcher'
-import { ConnectionTimeoutError } from '@/types/api-errors'
-import { ResponseError } from '@/types/base'
+import { ConnectionTimeoutError, UnexpectedError } from '@/lib/errors/studio-errors'
 
 vi.mock('@/lib/telemetry/track', () => ({ useTrack: () => vi.fn() }))
 vi.mock('@/state/ai-assistant-state', () => ({
@@ -37,18 +36,20 @@ describe('ErrorMatcher', () => {
   })
 
   it('renders troubleshooting steps for classified errors', () => {
-    const error = new ConnectionTimeoutError('CONNECTION TERMINATED DUE TO CONNECTION TIMEOUT')
+    const error = new ConnectionTimeoutError({
+      message: 'CONNECTION TERMINATED DUE TO CONNECTION TIMEOUT',
+    })
     render(<ErrorMatcher title="Failed to load tables" error={error} supportFormParams={{}} />)
     expect(screen.getByText('Try restarting your project')).toBeInTheDocument()
     expect(screen.getByText('Try our troubleshooting guide')).toBeInTheDocument()
     expect(screen.getByText('Debug with AI')).toBeInTheDocument()
   })
 
-  it('renders fallback for plain ResponseError (not a classified subclass)', () => {
+  it('renders fallback for non-timeout error class carrying a timeout message', () => {
     render(
       <ErrorMatcher
         title="Failed to load tables"
-        error={new ResponseError('CONNECTION TERMINATED DUE TO CONNECTION TIMEOUT')}
+        error={new UnexpectedError({ message: 'CONNECTION TERMINATED DUE TO CONNECTION TIMEOUT' })}
         supportFormParams={{}}
       />
     )
@@ -77,7 +78,9 @@ describe('ErrorMatcher', () => {
   })
 
   it('ignores the caller-provided fallback when the error is classified', () => {
-    const error = new ConnectionTimeoutError('CONNECTION TERMINATED DUE TO CONNECTION TIMEOUT')
+    const error = new ConnectionTimeoutError({
+      message: 'CONNECTION TERMINATED DUE TO CONNECTION TIMEOUT',
+    })
     render(
       <ErrorMatcher
         title="Failed to load tables"

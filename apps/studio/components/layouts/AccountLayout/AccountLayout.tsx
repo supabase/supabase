@@ -10,7 +10,6 @@ import { AccountMenuContent } from './AccountMenuContent'
 import { WithSidebar } from './WithSidebar'
 import { USE_MOCKS } from '@/data/oauth-apps/mocks'
 import { useCustomContent } from '@/hooks/custom-content/useCustomContent'
-import { useIsFeatureEnabled } from '@/hooks/misc/useIsFeatureEnabled'
 import { useLastVisitedOrganization } from '@/hooks/misc/useLastVisitedOrganization'
 import { withAuth } from '@/hooks/misc/withAuth'
 import { IS_PLATFORM } from '@/lib/constants'
@@ -28,8 +27,7 @@ const AccountLayout = ({ children, title }: PropsWithChildren<AccountLayoutProps
   const { setContent: setMobileSheetContent, registerOpenMenu } = useMobileSheet()
   const currentPath = router.pathname
 
-  const showSecuritySettings = useIsFeatureEnabled('account:show_security_settings')
-  const showOAuthApps = useFlag('OauthAppScopedGrants') && USE_MOCKS
+  const showOAuthApps = useFlag('enableScopedOAuthManage') && USE_MOCKS
   const { appTitle } = useCustomContent(['app:title'])
   const brandTitle = appTitle || 'Supabase'
   const surfaceLabel = IS_PLATFORM ? 'Account' : 'Preferences'
@@ -77,22 +75,18 @@ const AccountLayout = ({ children, title }: PropsWithChildren<AccountLayoutProps
                   isActive: currentPath === '/account/me',
                 },
                 {
+                  key: 'security',
+                  label: 'Security',
+                  href: '/account/security',
+                  isActive: currentPath === '/account/security',
+                },
+                {
                   key: 'access-tokens',
                   label: 'Access Tokens',
                   href: '/account/tokens',
                   isActive:
                     currentPath === '/account/tokens' || currentPath === '/account/tokens/scoped',
                 },
-                ...(showSecuritySettings
-                  ? [
-                      {
-                        key: 'security',
-                        label: 'Security',
-                        href: '/account/security',
-                        isActive: currentPath === '/account/security',
-                      },
-                    ]
-                  : []),
                 ...(showOAuthApps
                   ? [
                       {
@@ -118,7 +112,7 @@ const AccountLayout = ({ children, title }: PropsWithChildren<AccountLayoutProps
               ],
             },
           ],
-    [currentPath, showOAuthApps, showSecuritySettings]
+    [currentPath, showOAuthApps]
   )
 
   useLayoutEffect(() => {

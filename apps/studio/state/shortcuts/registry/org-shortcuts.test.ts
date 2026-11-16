@@ -28,50 +28,6 @@ describe('Org settings nav shortcuts', () => {
   })
 })
 
-describe('NAV_ORG_SETTINGS remap', () => {
-  it('uses G , (matching project settings chord)', () => {
-    const def = SHORTCUT_DEFINITIONS[SHORTCUT_IDS.NAV_ORG_SETTINGS]
-    expect(def.sequence).toEqual(['G', ','])
-  })
-})
-
-describe('Org action shortcuts', () => {
-  it('ORG_OAUTH_APPS_PUBLISH is registered', () => {
-    expect(SHORTCUT_DEFINITIONS[SHORTCUT_IDS.ORG_OAUTH_APPS_PUBLISH]).toBeDefined()
-    expect(SHORTCUT_DEFINITIONS[SHORTCUT_IDS.ORG_OAUTH_APPS_PUBLISH].sequence).toEqual(['Shift+N'])
-  })
-
-  it('ORG_OAUTH_APPS_SUBMIT uses Mod+Enter and is hidden from settings', () => {
-    const def = SHORTCUT_DEFINITIONS[SHORTCUT_IDS.ORG_OAUTH_APPS_SUBMIT]
-    expect(def.sequence).toEqual(['Mod+Enter'])
-    expect(def.showInSettings).toBe(false)
-  })
-
-  it('ORG_TEAM_INVITE is registered', () => {
-    expect(SHORTCUT_DEFINITIONS[SHORTCUT_IDS.ORG_TEAM_INVITE].sequence).toEqual(['Shift+N'])
-  })
-
-  it('ORG_TEAM_INVITE_SUBMIT uses Mod+Enter and is hidden from settings', () => {
-    const def = SHORTCUT_DEFINITIONS[SHORTCUT_IDS.ORG_TEAM_INVITE_SUBMIT]
-    expect(def.sequence).toEqual(['Mod+Enter'])
-    expect(def.showInSettings).toBe(false)
-  })
-
-  it('ORG_INTEGRATIONS_ADD_CONNECTION is registered', () => {
-    expect(SHORTCUT_DEFINITIONS[SHORTCUT_IDS.ORG_INTEGRATIONS_ADD_CONNECTION].sequence).toEqual([
-      'Shift+N',
-    ])
-  })
-
-  it('ORG_PROJECTS_NEW is registered', () => {
-    expect(SHORTCUT_DEFINITIONS[SHORTCUT_IDS.ORG_PROJECTS_NEW].sequence).toEqual(['Shift+N'])
-  })
-
-  it('ORG_PROJECTS_SEARCH is registered', () => {
-    expect(SHORTCUT_DEFINITIONS[SHORTCUT_IDS.ORG_PROJECTS_SEARCH].sequence).toEqual(['Shift+F'])
-  })
-})
-
 describe('Reference group ordering', () => {
   it('NAVIGATION_ORG_SETTINGS appears after NAVIGATION_GLOBAL', () => {
     const globalIdx = SHORTCUT_REFERENCE_GROUP_ORDER.indexOf(

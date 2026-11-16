@@ -1,4 +1,4 @@
-import { useQueryClient } from '@tanstack/react-query'
+import { useQuery, useQueryClient } from '@tanstack/react-query'
 import { useParams } from 'common'
 import { useEffect, useState } from 'react'
 import { toast } from 'sonner'
@@ -23,29 +23,30 @@ import { Admonition } from 'ui-patterns/Admonition'
 import { FormItemLayout } from 'ui-patterns/form/FormItemLayout/FormItemLayout'
 import { ShimmeringLoader } from 'ui-patterns/ShimmeringLoader'
 
+import { ApiKeysAccessNote } from '@/components/ui/ApiKeysAccessNote'
 import { InlineLink } from '@/components/ui/InlineLink'
-import { useAPIKeys } from '@/data/api-keys/api-keys-query'
+import { getKeys, revealedApiKeysQueryOptions } from '@/data/api-keys/api-keys-query'
 import { fdwKeys } from '@/data/fdw/keys'
 import { vaultSecretsKeys } from '@/data/vault/keys'
 import { useVaultSecretUpdateMutation } from '@/data/vault/vault-secret-update-mutation'
-import { FGA_PERMISSIONS, useAsyncCheckPermissionsV2 } from '@/hooks/misc/useCheckPermissionsV2'
 import { useSelectedProjectQuery } from '@/hooks/misc/useSelectedProject'
+import { useGrant } from '@/lib/grants'
 
 export const UpdateCatalogTokenDialog = ({ vaultTokenId }: { vaultTokenId?: string }) => {
   const { ref } = useParams()
   const queryClient = useQueryClient()
   const { data: project } = useSelectedProjectQuery()
-  const { can: canReadAPIKeys } = useAsyncCheckPermissionsV2([
-    FGA_PERMISSIONS.PROJECT.API_GATEWAY_KEYS_READ,
-    FGA_PERMISSIONS.PROJECT.API_GATEWAY_KEYS_SECRET_READ,
-  ])
+  const apiKeysGrant = useGrant(
+    'GET /v1/projects/{ref}/api-keys',
+    { projectRef: ref },
+    { variant: 'reveal' }
+  )
 
   const [open, setOpen] = useState(false)
   const [selectedKey, setSelectedKey] = useState<string>()
 
-  const { data: apiKeysData, isPending } = useAPIKeys(
-    { projectRef: ref, reveal: true },
-    { enabled: canReadAPIKeys }
+  const { data: apiKeysData, isPending } = useQuery(
+    revealedApiKeysQueryOptions({ projectRef: ref, grant: apiKeysGrant.grant }, { select: getKeys })
   )
   const { allSecretKeys } = apiKeysData ?? {}
 
@@ -109,7 +110,9 @@ export const UpdateCatalogTokenDialog = ({ vaultTokenId }: { vaultTokenId?: stri
             isReactForm={false}
             label="Select a secret key to use as your catalog token"
           >
-            {isPending ? (
+            {apiKeysGrant.status === 'denied' || apiKeysGrant.status === 'error' ? (
+              <ApiKeysAccessNote grant={apiKeysGrant} />
+            ) : isPending ? (
               <ShimmeringLoader className="py-4" />
             ) : (
               <Select value={selectedKey} onValueChange={setSelectedKey}>

@@ -104,7 +104,7 @@ We're just getting started with MCP. **We're working on making it even easier to
 
 ## Getting Started
 
-Setting up OAuth 2.1 in your Supabase project starts with registering OAuth clients through the Supabase dashboard or Management API. You'll configure their allowed redirect URIs and receive a `client_id`. Then you'll build your authorization flow, an endpoint that receives OAuth authorization requests, authenticates users (using existing Supabase Auth methods), presents a consent UI, and confirms approvals with Supabase Auth.
+Setting up OAuth 2.1 in your Supabase project starts with registering OAuth clients through the Supabase dashboard or Management API. You'll configure their allowed redirect URIs and receive a `client_id`. Then you'll build your authorization flow, an endpoint that receives OAuth authorization requests, authenticates users (using existing Supabase Auth methods), presents a consent UI (available as a [pre-built component](https://supabase.com/library/docs/nextjs/oauth-consent)), and confirms approvals with Supabase Auth.
 
 Update your Row Level Security policies to handle OAuth clients appropriately, deciding which data third-party apps can access and what remains user-only. Third-party apps validate tokens using your public JWKS endpoint, no shared secrets required. They can verify tokens asymmetrically using standard OAuth 2.1 libraries.
 

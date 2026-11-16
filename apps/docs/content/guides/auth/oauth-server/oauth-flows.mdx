@@ -436,7 +436,7 @@ Clients should refresh access tokens when:
 
 Make a POST request to the token endpoint with the refresh token. The client authenticates the same way as during the [token exchange](#step-5-token-exchange), based on its `token_endpoint_auth_method`.
 
-#### Public clients (`token_endpoint_auth_method: none`)
+#### Public clients (`token_endpoint_auth_method: none`) [#refresh-request-public-clients-token_endpoint_auth_method-none]
 
 ```bash
 curl -X POST 'https://<project-ref>.supabase.co/auth/v1/oauth/token' \
@@ -446,7 +446,7 @@ curl -X POST 'https://<project-ref>.supabase.co/auth/v1/oauth/token' \
   -d 'client_id=<client-id>'
 ```
 
-#### Confidential clients (`token_endpoint_auth_method: client_secret_basic`)
+#### Confidential clients (`token_endpoint_auth_method: client_secret_basic`) [#refresh-request-confidential-clients-token_endpoint_auth_method-client_secret_basic]
 
 ```bash
 curl -X POST 'https://<project-ref>.supabase.co/auth/v1/oauth/token' \
@@ -456,7 +456,7 @@ curl -X POST 'https://<project-ref>.supabase.co/auth/v1/oauth/token' \
   -d 'refresh_token=<refresh-token>'
 ```
 
-#### Confidential clients (`token_endpoint_auth_method: client_secret_post`)
+#### Confidential clients (`token_endpoint_auth_method: client_secret_post`) [#refresh-request-confidential-clients-token_endpoint_auth_method-client_secret_post]
 
 ```bash
 curl -X POST 'https://<project-ref>.supabase.co/auth/v1/oauth/token' \
@@ -467,7 +467,7 @@ curl -X POST 'https://<project-ref>.supabase.co/auth/v1/oauth/token' \
   -d 'client_secret=<client-secret>'
 ```
 
-#### Example in JavaScript
+#### Example in JavaScript [#refresh-request-example-in-javascript]
 
 ```javascript
 // Public clients (token_endpoint_auth_method: none)

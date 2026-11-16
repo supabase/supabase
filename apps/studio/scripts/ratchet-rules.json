@@ -10,5 +10,6 @@
   "jsx-a11y/no-redundant-roles",
   "jsx-a11y/anchor-is-valid",
   "jsx-a11y/heading-has-content",
-  "valtio/state-snapshot-rule"
+  "valtio/state-snapshot-rule",
+  "fga/no-unguarded-migrating"
 ]

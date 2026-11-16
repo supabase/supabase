@@ -2,7 +2,7 @@
 id: 'vault'
 title: 'Vault'
 description: 'Vault is a Postgres extension and accompanying Supabase UI that makes it safe and easy to store encrypted secrets.'
-subtitle: 'Managing secrets in Postgres.'
+subtitle: 'Manage secrets in Postgres'
 sidebar_label: 'Overview'
 video: 'https://www.youtube.com/v/J9mTPY8rIXE'
 ---
@@ -160,6 +160,18 @@ updated_at       | 2022-12-14 02:51:13.938396+00
 ```
 
 </details>
+
+### Deleting secrets
+
+To delete a secret, replace the example ID with your secret's ID:
+
+```sql
+delete from vault.secrets
+where id = '7095d222-efe5-4cd5-b5c6-5755b451e223'
+returning id, name;
+```
+
+Deleting the secret also removes it from the `vault.decrypted_secrets` view.
 
 ## Deep dive
 

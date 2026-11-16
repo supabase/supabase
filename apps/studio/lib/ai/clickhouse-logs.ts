@@ -2,7 +2,7 @@
  * Everything the model needs to know about the ClickHouse-backed Supabase `logs`
  * table, in one place. Both ClickHouse completion flows — the inline "edit this
  * query" path and the whole-query BigQuery rewrite — are assembled from these,
- * server-side in `pages/api/ai/code/complete.ts`, so there is exactly one
+ * server-side in `routes/api/ai/code/complete.ts`, so there is exactly one
  * description of the schema to keep current.
  */
 
@@ -41,7 +41,7 @@ Sources and their common log_attributes keys:
 - function_logs: event_type, function_id, execution_id, level
 - storage_logs, realtime_logs, postgrest_logs, supavisor_logs, pgbouncer_logs: mostly id, timestamp, event_message, with extra fields in log_attributes
 
-The editor or query_logs tool applies the user's selected time range as a request parameter, so do not add a timestamp filter in SQL.`
+The user's selected time range is applied as a request parameter, so do not add a timestamp filter in SQL.`
 
 function renderAvailableKeys(availableKeys?: string[]): string {
   if (!availableKeys || availableKeys.length === 0) return ''

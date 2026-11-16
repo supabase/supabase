@@ -115,17 +115,7 @@ export const Column = ({
   const activeRelations = relations.filter((relation) => !relation.toRemove)
 
   const onToggleSensitiveData = () => {
-    const marker = '[SENSITIVE]'
-    const isSensitiveData = !column.isSensitiveData
-    let updatedComment = column.comment || ''
-
-    if (isSensitiveData && !updatedComment.includes(marker)) {
-      updatedComment = `${updatedComment} ${marker}`.trim()
-    } else if (!isSensitiveData) {
-      updatedComment = updatedComment.replace(marker, '').trim()
-    }
-
-    onUpdateColumn({ isSensitiveData, comment: updatedComment })
+    onUpdateColumn({ isSensitiveData: !column.isSensitiveData })
   }
 
   const { attributes, listeners, setNodeRef, setActivatorNodeRef, transform, transition } =
@@ -219,7 +209,7 @@ export const Column = ({
                   >
                     <div className="text-xs px-2 pt-2">
                       Involved in {activeRelations.length} foreign key
-                      {activeRelations.length > 1 ? 's' : ''}
+                      {activeRelations.length > 1 ? <span>s</span> : ''}
                     </div>
                     <Command>
                       <CommandList>

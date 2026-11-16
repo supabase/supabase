@@ -24,17 +24,89 @@
     inset 0 1px 0 0 hsl(var(--button-edge-color) / calc(0.04 * var(--button-edge-strength))),
     inset 0 0 0 1px hsl(var(--button-edge-color) / calc(0.06 * var(--button-edge-strength))),
     inset 0 0 0 1px hsl(var(--button-edge-color) / calc(0.1 * var(--button-edge-strength)));
-  --button-shadow-default:
-    var(--button-shadow-drop),
+  --button-edge-default:
     inset 0 1px 0 0 hsl(var(--button-edge-color) / calc(0.04 * var(--button-edge-strength))),
     inset 0 0 0 1px hsl(var(--colors-black) / calc(0.06 * var(--button-edge-strength))),
     inset 0 -1px 0 0 hsl(var(--colors-black) / calc(0.06 * var(--button-edge-strength))),
     inset 0 0 0 1px hsl(var(--button-edge-color) / calc(0.1 * var(--button-edge-strength)));
+  --button-shadow-default: var(--button-shadow-drop), var(--button-edge-default);
 
   @variant dark {
     --button-shadow-opacity: 0.2;
     --button-edge-strength: calc(var(--contrast-border, 0.275625) / 0.275625);
     --button-edge-color: var(--colors-white);
+  }
+}
+
+@utility raised-control-group {
+  & > .raised-control-surface {
+    --button-shadow-default: var(--button-shadow-drop);
+    border-color: transparent;
+
+    &::after {
+      content: '';
+      position: absolute;
+      inset: 0;
+      border-radius: inherit;
+      box-shadow: var(--button-edge-default);
+      pointer-events: none;
+    }
+
+    &:focus-visible {
+      z-index: 10;
+    }
+  }
+
+  & > .raised-control-surface:has(~ .raised-control-surface) {
+    border-top-right-radius: 0;
+    border-bottom-right-radius: 0;
+    border-right-width: 1px;
+    background-clip: padding-box;
+    overflow-x: clip;
+
+    /* the edge ends 2px past the border, so the clip removes its end side at any pixel snap */
+    &::after {
+      right: -3px;
+    }
+
+    &:focus-visible {
+      border-top-right-radius: var(--radius-sm);
+      border-bottom-right-radius: var(--radius-sm);
+    }
+
+    &:hover {
+      background-clip: border-box;
+      overflow-x: visible;
+
+      &::after {
+        right: -1px;
+      }
+    }
+
+    &:hover ~ .raised-control-surface {
+      background-clip: padding-box;
+      overflow-x: clip;
+
+      &::after {
+        left: -3px;
+      }
+    }
+  }
+
+  & > .raised-control-surface ~ .raised-control-surface {
+    margin-left: -1px;
+    border-top-left-radius: 0;
+    border-bottom-left-radius: 0;
+    border-left-width: 1px;
+
+    &::after {
+      left: -1px;
+    }
+
+    &:focus-visible {
+      border-top-left-radius: var(--radius-sm);
+      border-bottom-left-radius: var(--radius-sm);
+    }
   }
 }
 
@@ -64,6 +136,21 @@
     &[data-state='open'] {
       @apply bg-accent;
     }
+  }
+}
+
+@utility raised-svg-surface {
+  & stop:first-child {
+    stop-color: hsl(var(--colors-white) / 0.015);
+  }
+  & stop:last-child {
+    stop-color: hsl(var(--colors-black) / 0.01);
+  }
+  & feDropShadow {
+    flood-color: hsl(var(--colors-black) / var(--button-shadow-opacity));
+  }
+  & [data-raised-edge] {
+    stroke: hsl(var(--button-edge-color) / calc(0.1 * var(--button-edge-strength)));
   }
 }
 

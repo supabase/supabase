@@ -333,6 +333,12 @@ resources:
                               value: /functions/v1/
                             append_action: ADD_IF_ABSENT
                         typed_per_filter_config:
+                          # Functions handle CORS themselves, as on the platform:
+                          # preflights reach the function, responses pass unchanged.
+                          envoy.filters.http.cors:
+                            '@type': >-
+                              type.googleapis.com/envoy.config.route.v3.FilterConfig
+                            disabled: true
                           envoy.filters.http.basic_auth:
                             '@type': >-
                               type.googleapis.com/envoy.config.route.v3.FilterConfig
@@ -1145,9 +1151,15 @@ resources:
                         return string.match(auth, "^[Bb]earer%s+(.+)$")
                       end
 
+                      -- Gateway CORS is off on this route, so this error carries
+                      -- its own CORS header and stays readable by browsers.
                       local function unauthorized(request_handle, message)
                         request_handle:respond(
-                          { [":status"] = "401", ["content-type"] = "text/plain" },
+                          {
+                            [":status"] = "401",
+                            ["content-type"] = "text/plain",
+                            ["access-control-allow-origin"] = "*",
+                          },
                           message
                         )
                       end

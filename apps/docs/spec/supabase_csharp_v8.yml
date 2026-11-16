@@ -618,7 +618,7 @@ functions:
     description: |
       Returns the Authenticator Assurance Level (AAL) for the active session.
     notes: |
-      - `aal1` (or `null`) means the user signed in with a single factor (password, OTP, magic link, or social login).
+      - `aal1` (or `null`) means the user signed in with a single factor (password, OTP, magic link, or social sign-in).
       - `aal2` means the user also verified an MFA factor.
       - Use this to decide whether to prompt the user to complete an MFA challenge.
     examples:

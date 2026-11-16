@@ -25,7 +25,7 @@ import { useEnabledLogDrainTypes } from './useEnabledLogDrainTypes'
 import { VoteLink } from './VoteLink'
 import { AlertError } from '@/components/ui/AlertError'
 import { LogDrainData } from '@/data/log-drains/log-drains-query'
-import type { ResponseError } from '@/types'
+import type { StudioError } from '@/lib/errors/studio-errors'
 
 export function LogDrainsList({
   logDrains,
@@ -40,7 +40,7 @@ export function LogDrainsList({
   logDrains: LogDrainData[] | undefined
   isLoading: boolean
   isError: boolean
-  error: ResponseError | null
+  error: StudioError | null
   isDeleting?: boolean
   onNewDrainClick: (src: LogDrainType) => void
   onDeleteDrain: (drain: LogDrainData) => void

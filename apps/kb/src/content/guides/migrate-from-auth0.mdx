@@ -2,6 +2,7 @@
 title: 'Migrate from Auth0 to Supabase Auth'
 description: 'Migrate your users from Auth0 to Supabase Auth.'
 topics: ['Migration', 'Auth']
+lastEdited: 2026-11-10
 ---
 
 You can migrate your users from Auth0 to Supabase Auth.
@@ -139,7 +140,7 @@ Once you have imported your users, you can sign them in using the [`signInWithOt
 
 #### OAuth
 
-Configure your OAuth providers in Supabase by following the [Social login guides](/docs/guides/auth/social-login).
+Configure your OAuth providers in Supabase by following the [Social sign-in guides](/docs/guides/auth/social-sign-in).
 
 For both new and existing users, sign in the user using the [`signInWithOAuth`](/docs/reference/javascript/auth-signinwithoauth) method. This works without pre-migrating existing users, since the user always needs to sign in through the OAuth provider before being redirected to your service.
 
@@ -229,5 +230,6 @@ This isn't supported by Supabase Auth yet.
 
 ## Useful references
 
+- [Authentication web components](/library?category=Authentication) - Ready-made sign-in, sign-up, and OAuth UI from the Supabase Library to replace your Auth0 login screens
 - [Migrating 125k users from Auth0 to Supabase](https://kevcodez.medium.com/migrating-125-000-users-from-auth0-to-supabase-81c0568de307)
 - [Loper to Supabase migration](https://eigen.sh/posts/auth-migration)

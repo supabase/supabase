@@ -349,7 +349,7 @@ export const ActivityRow = ({
 
               return (
                 <Fragment key={pid}>
-                  {index > 0 && ', '}
+                  {index > 0 && <span>{', '}</span>}
 
                   <HoverCard openDelay={150} closeDelay={100}>
                     <HoverCardTrigger
@@ -360,7 +360,8 @@ export const ActivityRow = ({
                     </HoverCardTrigger>
                     <HoverCardContent className="bg-alternative w-96 max-h-64 overflow-y-auto p-3 text-xs">
                       <p>
-                        Blocked via {blockChain.length} hop{blockChain.length > 1 ? 's' : ''}
+                        Blocked via {blockChain.length} hop
+                        {blockChain.length > 1 ? <span>s</span> : ''}
                       </p>
 
                       <div className="flex flex-col mt-2 gap-y-1.5">

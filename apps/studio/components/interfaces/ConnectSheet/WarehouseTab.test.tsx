@@ -131,7 +131,6 @@ describe('WarehouseTab', () => {
     })
 
     expect(await screen.findByRole('combobox', { name: 'Query engine' })).toBeInTheDocument()
-    expect(container.querySelector('.border-0.shadow-none')).toBeInTheDocument()
     expect(container.querySelector('[data-orientation="horizontal"]')).not.toBeInTheDocument()
     expect(screen.queryByRole('heading', { name: 'Connect' })).not.toBeInTheDocument()
     expect(screen.getByDisplayValue('default.warehouse.supabase.co')).toBeInTheDocument()
@@ -205,10 +204,7 @@ describe('WarehouseTab', () => {
     expect(screen.getByRole('button', { name: 'Copy prompt' })).toBeInTheDocument()
     expect(screen.getByText('Set environment variables')).toBeInTheDocument()
     expect(screen.getByText('Attach Warehouse')).toBeInTheDocument()
-
-    const stepsSection = screen.getByRole('heading', { name: 'Follow these steps' }).parentElement
-      ?.parentElement
-    expect(stepsSection).toHaveClass('border-t', 'bg-muted/50')
+    expect(screen.getByRole('heading', { name: 'Follow these steps' })).toBeInTheDocument()
 
     expect(screen.queryByText('s3-secret')).not.toBeInTheDocument()
     await userEvent.click(screen.getByRole('button', { name: 'Reveal DUCKLAKE_S3_SECRET' }))

@@ -48,21 +48,15 @@ The "default" email provided by Supabase is only for development purposes. It is
 
 ## Linting your database
 
-The Supabase CLI provides Postgres linting using the `supabase db lint` command:
+The Supabase CLI provides Postgres linting using the `supabase db lint` command. It checks the local database by default. Pass `--remote` to lint the linked project, or `--remote=<ref|branch|url>` to lint another database.
 
-{/* prettier-ignore */}
-```markdown
-supabase db lint --help
-Checks local database for typing error
+| Flag             | Description                                                                   |
+| ---------------- | ----------------------------------------------------------------------------- |
+| `--level`        | Error level to emit: `warning` or `error`.                                    |
+| `--fail-on`      | Error level that exits with a non-zero status: `none`, `warning`, or `error`. |
+| `-s`, `--schema` | Comma-separated list of schemas to include.                                   |
 
-Usage:
-  supabase db lint [flags]
-
-Flags:
-  --level [ warning | error ] Error level to emit. (default warning)
-  --linked Lints the linked project for schema errors.
-  -s, --schema strings List of schema to include. (default all)
-```
+Run `supabase db lint --help` for every flag.
 
 This is powered by [plpgsql_check](https://github.com/okbob/plpgsql_check), which leverages the internal Postgres parser/evaluator so you see any errors that would occur at runtime. It provides the following features:
 

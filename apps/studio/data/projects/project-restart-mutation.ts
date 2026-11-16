@@ -2,8 +2,9 @@ import { useMutation } from '@tanstack/react-query'
 import type { components } from 'api-types'
 import { toast } from 'sonner'
 
-import { handleError, post } from '@/data/fetchers'
-import type { ResponseError, UseCustomMutationOptions } from '@/types'
+import { handleError, post, unguarded } from '@/data/fetchers'
+import type { StudioError } from '@/lib/errors/studio-errors'
+import type { UseCustomMutationOptions } from '@/types'
 
 export type ProjectRestartVariables = {
   ref: string
@@ -19,6 +20,7 @@ export async function restartProject({ ref, identifier }: ProjectRestartVariable
   const { data, error } = await post('/platform/projects/{ref}/restart', {
     params: { path: { ref } },
     body: payload,
+    grant: unguarded.migrating,
   })
   if (error) handleError(error)
   return data
@@ -31,10 +33,10 @@ export const useProjectRestartMutation = ({
   onError,
   ...options
 }: Omit<
-  UseCustomMutationOptions<ProjectRestartData, ResponseError, ProjectRestartVariables>,
+  UseCustomMutationOptions<ProjectRestartData, StudioError, ProjectRestartVariables>,
   'mutationFn'
 > = {}) => {
-  return useMutation<ProjectRestartData, ResponseError, ProjectRestartVariables>({
+  return useMutation<ProjectRestartData, StudioError, ProjectRestartVariables>({
     mutationFn: (vars) => restartProject(vars),
     async onSuccess(data, variables, context) {
       await onSuccess?.(data, variables, context)

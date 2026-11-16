@@ -141,6 +141,25 @@ describe('absolutizeLinks', () => {
     const body = '| a | b |\n| - | - |\n| 1 | 2 |\n\n~~gone~~'
     expect(absolutizeLinks(body)).toBe('| a | b |\n| - | - |\n| 1 | 2 |\n\n~~gone~~\n')
   })
+
+  it('strips a custom anchor from the end of a heading', () => {
+    expect(absolutizeLinks('## How to create a client [#create-client]')).toBe(
+      '## How to create a client\n'
+    )
+  })
+
+  it('strips a custom anchor that follows inline code in a heading', () => {
+    expect(absolutizeLinks('## Using `createClient` [#create-client]')).toBe(
+      '## Using `createClient`\n'
+    )
+  })
+
+  it('leaves bracketed text that is not a trailing heading anchor untouched', () => {
+    const body = '## Arrays [#1] explained\n\nSee [#create-client] below.'
+    expect(absolutizeLinks(body)).toBe(
+      '## Arrays \\[#1] explained\n\nSee \\[#create-client] below.\n'
+    )
+  })
 })
 
 describe('renderMarkdown', () => {
@@ -178,13 +197,14 @@ describe('renderTopicMarkdown', () => {
 })
 
 describe('renderSitemapMarkdown', () => {
-  it('renders the site title and description, then a linked list for topics, troubleshooting and guides', () => {
+  it('renders the site title and description, then linked lists for topics, guides, FAQs and troubleshooting', () => {
     const markdown = renderSitemapMarkdown({
       topics: [{ title: 'Auth', url: 'https://supabase.com/kb/topics/auth.md' }],
+      guides: [{ title: 'Sample guide', url: 'https://supabase.com/kb/guides/sample-guide.md' }],
+      faqs: [{ title: 'Sample FAQ', url: 'https://supabase.com/kb/faqs/auth/sample-faq.md' }],
       troubleshooting: [
         { title: 'Permission denied', url: 'https://supabase.com/kb/troubleshooting/denied.md' },
       ],
-      guides: [{ title: 'Sample guide', url: 'https://supabase.com/kb/guides/sample-guide.md' }],
     })
 
     expect(markdown).toBe(
@@ -193,10 +213,12 @@ describe('renderSitemapMarkdown', () => {
         'In-depth guides, tutorials, troubleshooting, and explainers for best practices for Supabase',
         '## Topics',
         '- [Auth](https://supabase.com/kb/topics/auth.md)',
-        '## Troubleshooting',
-        '- [Permission denied](https://supabase.com/kb/troubleshooting/denied.md)',
         '## Guides',
         '- [Sample guide](https://supabase.com/kb/guides/sample-guide.md)',
+        '## FAQs',
+        '- [Sample FAQ](https://supabase.com/kb/faqs/auth/sample-faq.md)',
+        '## Troubleshooting',
+        '- [Permission denied](https://supabase.com/kb/troubleshooting/denied.md)',
       ].join('\n\n') + '\n'
     )
   })

@@ -53,6 +53,15 @@ const renderCoordinator = (queryClient: QueryClient) => {
   return { tabsState, tabId }
 }
 
+const persistLocalDraft = () =>
+  persistNotebookDraft({
+    projectRef: 'default',
+    id: NOTEBOOK_ID,
+    name: 'Test notebook',
+    content: { schema_version: 1, cells: [createQueryCellSkeleton()] },
+    baseUpdatedAt: null,
+  })
+
 afterEach(() => {
   delete notebooksState.notebooks[NOTEBOOK_ID]
   notebooksState.needsSaving.clear()
@@ -60,20 +69,11 @@ afterEach(() => {
 })
 
 describe('ExplorerNotebookTabCoordinator', () => {
-  it('flushes a saved notebook from the store and evicts its cache entry on close', () => {
-    seedNotebook('saved')
-    const queryClient = new QueryClient()
-    queryClient.setQueryData(contentKeys.resource('default', NOTEBOOK_ID), { id: NOTEBOOK_ID })
-
-    const { tabsState, tabId } = renderCoordinator(queryClient)
-    tabsState.closeTabs([tabId])
-
-    expect(notebooksState.notebooks[NOTEBOOK_ID]).toBeUndefined()
-    expect(queryClient.getQueryData(contentKeys.resource('default', NOTEBOOK_ID))).toBeUndefined()
-  })
-
-  it('discards an unsaved notebook from the store and cache on confirmed close', () => {
-    seedNotebook('new', [createQueryCellSkeleton()])
+  it.each([
+    ['flushes a saved notebook', 'saved' as const, []],
+    ['discards an unsaved notebook', 'new' as const, [createQueryCellSkeleton()]],
+  ])('%s from the store and evicts its cache entry on close', (_, status, cells) => {
+    seedNotebook(status, cells)
     const queryClient = new QueryClient()
     queryClient.setQueryData(contentKeys.resource('default', NOTEBOOK_ID), { id: NOTEBOOK_ID })
 
@@ -109,13 +109,7 @@ describe('ExplorerNotebookTabCoordinator', () => {
   })
 
   it('asks for confirmation before closing a notebook with only a local draft, never loaded this session', () => {
-    persistNotebookDraft({
-      projectRef: 'default',
-      id: NOTEBOOK_ID,
-      name: 'Test notebook',
-      content: { schema_version: 1, cells: [createQueryCellSkeleton()] },
-      baseUpdatedAt: null,
-    })
+    persistLocalDraft()
     const { tabsState, tabId } = renderCoordinator(new QueryClient())
 
     expect(tabsState.getCloseConfirmation([tabId])).toEqual({
@@ -125,13 +119,7 @@ describe('ExplorerNotebookTabCoordinator', () => {
   })
 
   it('removes a notebook local draft on close, even if it was never loaded into the store', () => {
-    persistNotebookDraft({
-      projectRef: 'default',
-      id: NOTEBOOK_ID,
-      name: 'Test notebook',
-      content: { schema_version: 1, cells: [createQueryCellSkeleton()] },
-      baseUpdatedAt: null,
-    })
+    persistLocalDraft()
     const { tabsState, tabId } = renderCoordinator(new QueryClient())
 
     tabsState.closeTabs([tabId])
@@ -140,13 +128,7 @@ describe('ExplorerNotebookTabCoordinator', () => {
   })
 
   it('shows the status dot for a notebook with only a local draft, never loaded this session', () => {
-    persistNotebookDraft({
-      projectRef: 'default',
-      id: NOTEBOOK_ID,
-      name: 'Test notebook',
-      content: { schema_version: 1, cells: [createQueryCellSkeleton()] },
-      baseUpdatedAt: null,
-    })
+    persistLocalDraft()
     const { tabsState, tabId } = renderCoordinator(new QueryClient())
     const StatusIndicator = tabsState.getTabStatusIndicator('notebook')!
 

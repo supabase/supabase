@@ -1,3 +1,4 @@
+// @vitest-environment jsdom
 import { renderHook } from '@testing-library/react'
 import { afterEach, beforeEach, describe, expect, it, vi } from 'vitest'
 
@@ -27,66 +28,36 @@ vi.mock('@/lib/telemetry/track', () => ({
 }))
 
 describe('isInDataApiRevokeTreatment', () => {
-  it('returns true for boolean true (current rollout shape)', () => {
-    expect(isInDataApiRevokeTreatment(true)).toBe(true)
-  })
-
-  it("returns true for the 'test' variant (future multivariate shape)", () => {
-    expect(isInDataApiRevokeTreatment('test')).toBe(true)
-  })
-
-  it('returns false for boolean false', () => {
-    expect(isInDataApiRevokeTreatment(false)).toBe(false)
-  })
-
-  it("returns false for the 'control' variant", () => {
-    expect(isInDataApiRevokeTreatment('control')).toBe(false)
-  })
-
-  it('returns false for undefined (flag not resolved)', () => {
-    expect(isInDataApiRevokeTreatment(undefined)).toBe(false)
-  })
-
-  it('returns false for unrelated string values', () => {
-    expect(isInDataApiRevokeTreatment('something-else')).toBe(false)
-    expect(isInDataApiRevokeTreatment('')).toBe(false)
+  // `true` is the current rollout shape; 'test'/'control' the future multivariate shape.
+  it.each([
+    [true, true],
+    ['test', true],
+    [false, false],
+    ['control', false],
+    [undefined, false],
+    ['something-else', false],
+    ['', false],
+  ])('maps flag %s to %s', (flag, expected) => {
+    expect(isInDataApiRevokeTreatment(flag)).toBe(expected)
   })
 })
 
+// Flag-shape permutations are covered by isInDataApiRevokeTreatment above.
 describe('useDataApiRevokeOnCreateDefaultEnabled', () => {
   afterEach(() => {
     vi.restoreAllMocks()
     vi.mocked(constants, { partial: true }).IS_TEST_ENV = false
   })
 
-  it('returns false when the PostHog flag is undefined (not yet resolved)', () => {
-    vi.mocked(usePHFlag).mockReturnValue(undefined)
+  it.each([
+    [undefined, false],
+    ['control', false],
+    [true, true],
+    ['test', true],
+  ])('maps PostHog flag %s to %s', (flag, expected) => {
+    vi.mocked(usePHFlag).mockReturnValue(flag)
     const { result } = renderHook(() => useDataApiRevokeOnCreateDefaultEnabled())
-    expect(result.current).toBe(false)
-  })
-
-  it('returns false when the PostHog flag is false', () => {
-    vi.mocked(usePHFlag).mockReturnValue(false)
-    const { result } = renderHook(() => useDataApiRevokeOnCreateDefaultEnabled())
-    expect(result.current).toBe(false)
-  })
-
-  it('returns true when the PostHog flag is true', () => {
-    vi.mocked(usePHFlag).mockReturnValue(true)
-    const { result } = renderHook(() => useDataApiRevokeOnCreateDefaultEnabled())
-    expect(result.current).toBe(true)
-  })
-
-  it("returns true when the PostHog flag is the 'test' variant string", () => {
-    vi.mocked(usePHFlag).mockReturnValue('test')
-    const { result } = renderHook(() => useDataApiRevokeOnCreateDefaultEnabled())
-    expect(result.current).toBe(true)
-  })
-
-  it("returns false when the PostHog flag is the 'control' variant string", () => {
-    vi.mocked(usePHFlag).mockReturnValue('control')
-    const { result } = renderHook(() => useDataApiRevokeOnCreateDefaultEnabled())
-    expect(result.current).toBe(false)
+    expect(result.current).toBe(expected)
   })
 
   it('returns false in test env regardless of flag value', () => {

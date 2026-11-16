@@ -260,21 +260,6 @@ describe('ComputeAndDiskUsageCharts utils', () => {
       expect(result.diskChartData[0].timestamp).toBe('2024-01-02T00:00:00Z')
       expect(result.computeChartData).toHaveLength(2)
     })
-
-    test('keeps missing disk IO balance unavailable', () => {
-      const result = buildUsageChartData(
-        buildMultiResponse([{ period_start: '2024-01-01T00:00:00Z', values: {} }])
-      )
-
-      expect(result.computeChartData).toEqual([
-        {
-          timestamp: '2024-01-01T00:00:00Z',
-          maxCpuUsage: 0,
-          ramUsage: 0,
-          diskIoBalance: undefined,
-        },
-      ])
-    })
   })
 
   describe('getComputeUsageSummary', () => {

@@ -1,14 +1,18 @@
 @import 'config/tailwind.config.css';
 @import 'config/inline-code.css';
 @import 'ui-patterns/CodeBlock/code-block.css';
+@import 'ui-patterns/Toc/toc-menu.css';
+@import 'ui-patterns/Notch/notch.css';
 @import './utilities.css';
 @import './keyframes.css';
+@import 'docs-search/styles.css';
 
 @source '../pages/**/*.astro';
 @source '../components/**/*.{astro,tsx}';
 @source '../layouts/**/*.astro';
 @source './../../../../packages/ui/src/**/*.{tsx,ts,js}';
 @source './../../../../packages/ui-patterns/src/**/*.{tsx,ts,js}';
+@source './../../../../packages/docs-search/src/**/*.{tsx,ts}';
 
 /* apps/docs loads Inter/Manrope via next/font, which injects these two
  * variables as inline styles on <html>. kb loads the same fonts via the
@@ -31,8 +35,6 @@
   --ease-out-strong: cubic-bezier(0.23, 1, 0.32, 1);
   --animate-draw-out: draw-out 700ms cubic-bezier(0.65, 0, 0.35, 1) both;
   --animate-draw-line: draw-line 1.8s linear both;
-  --animate-draw-line-fast: draw-line 850ms cubic-bezier(0.65, 0, 0.35, 1) both;
-  --animate-fade-in: fade-in 450ms ease-out both;
 }
 
 @theme {
@@ -110,7 +112,7 @@ h6:not(.font-mono),
 }
 
 @media (width < 64rem) {
-  html[data-mobile-menu-open] {
-    overflow: hidden;
+  html:has([data-toc-menu]) {
+    scroll-padding-top: calc(var(--header-height) + 2.5rem);
   }
 }

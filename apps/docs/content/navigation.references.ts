@@ -58,6 +58,19 @@ export const REFERENCES = {
       },
     },
   },
+  tanstack_db: {
+    type: 'sdk',
+    name: 'TanStack DB',
+    library: '@supabase-labs/tanstack-db',
+    libPath: 'tanstack_db',
+    versions: ['v1'],
+    icon: 'reference-javascript',
+    meta: {
+      v1: {
+        libId: 'reference_tanstack_db_v1',
+      },
+    },
+  },
   dart: {
     type: 'sdk',
     name: 'Flutter',

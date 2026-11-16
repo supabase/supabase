@@ -107,6 +107,6 @@ export const plans: PricingInformation[] = [
     priceLabel: '',
     priceMonthly: 'Custom',
     preface: '',
-    cta: 'Contact Us',
+    cta: 'Contact us',
   },
 ] as const

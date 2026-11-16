@@ -46,7 +46,7 @@ jobs:
         run: |
           set -euo pipefail
           archive="zizmor-x86_64-unknown-linux-gnu.tar.gz"
-          curl -sSLO "https://github.com/zizmorcore/zizmor/releases/download/v${ZIZMOR_VERSION}/${archive}"
+          gh release download "v${ZIZMOR_VERSION}" --repo zizmorcore/zizmor --pattern "${archive}"
           gh attestation verify "${archive}" --repo zizmorcore/zizmor
           mkdir -p ~/.local/bin
           tar -xzf "${archive}" -C ~/.local/bin zizmor

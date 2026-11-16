@@ -1,0 +1,116 @@
+---
+title: 'Enterprise-Managed Authorization for MCP'
+description: "Authorize your organization's use of the Supabase MCP Server through your identity provider, or Claude on its behalf, without per-user OAuth prompts."
+---
+
+<Admonition type="note">
+
+This feature is only available on the [Team and Enterprise Plans](/pricing).
+
+</Admonition>
+
+Enterprise-managed authorization replaces per-member consent prompts with one approval by a Supabase organization owner or admin. Every member then gets access to the [Supabase MCP Server](/docs/guides/ai-tools/mcp) with their own existing Supabase permissions. For each member, your identity provider (IdP) or Claude issues an _Identity Assertion JWT Authorization Grant_ (ID-JAG) as defined by the MCP specification's [Enterprise-Managed Authorization extension](https://modelcontextprotocol.io/extensions/auth/enterprise-managed-authorization).
+
+Claude is the first MCP client to support the extension. Other clients can use it once they implement the MCP specification's Enterprise-Managed Authorization extension.
+
+This page covers the Supabase MCP Server. If you're building your own MCP server backed by Supabase Auth, see [Model Context Protocol (MCP) Authentication](/docs/guides/auth/oauth-server/mcp-authentication) instead.
+
+## Before you start
+
+- **Plans.** Your Supabase organization needs a Team or Enterprise Plan and your Claude organization needs a Claude Team or Enterprise plan.
+- **SSO.** Your Supabase organization must have [single sign-on (SSO) configured](/docs/guides/platform/sso). Each member must have signed in through SSO at least once.
+- **Supabase owners or admins.** You need an owner or admin of your Supabase organization. If Claude issues the grants, you also need an admin of your Claude organization.
+- **Matching email addresses.** Each member's email in your IdP or Claude must match their Supabase email. Matching is case-insensitive but doesn't work with aliases or plus-addresses.
+
+## Set up managed authorization
+
+Setup is two steps: authorize the MCP client for your organization and then tell Supabase which issuer to trust for member grants, whether that is your IdP or Claude acting on its behalf.
+
+### Authorize the MCP client
+
+An organization owner or admin connects the MCP client to Supabase through the standard sign-in flow and approves it for your organization on the consent screen. The approved client then appears under [**Authorized apps**](/dashboard/org/_/apps) in your organization settings. Review or revoke it there.
+
+Registering an issuer alone doesn't grant access. Supabase rejects ID-JAGs for a client that hasn't been authorized this way.
+
+### Configure your ID-JAG issuer
+
+Use this path when your IdP issues ID-JAGs for MCP's Enterprise-Managed Authorization extension. Check with your IdP whether it supports the extension and how to turn it on. If it doesn't, see [Use Claude as the ID-JAG issuer](#use-claude-as-the-id-jag-issuer).
+
+1. Go to the [**SSO**](/dashboard/org/_/sso) page of your organization settings.
+2. Open **Advanced settings**.
+3. In the **ID-JAG Issuer** field, enter your identity provider's issuer URL.
+
+Supabase can't derive this URL from your SAML metadata because SAML assertions don't carry it. Your IdP's documentation lists it as the `iss` claim on the tokens it issues. It's usually the base URL used for OpenID Connect (OIDC) discovery.
+
+After you save, Supabase uses the URL to fetch your IdP's public keys and verify the ID-JAGs your MCP client presents.
+
+### Use Claude as the ID-JAG issuer
+
+Use this path when your IdP doesn't issue ID-JAGs and your members use Claude. Anthropic calls this Claude auto-connect. It's in beta for Claude Team and Enterprise plans. Claude signs a short-lived ID-JAG for each current member of your Claude organization. Members only need to be signed in to Claude. Anthropic recommends enforcing SSO for your Claude organization but doesn't require it for this setup.
+
+<Admonition type="caution">
+
+Supabase trusts one issuer URL per SSO provider. Entering the Claude URL replaces your IdP's URL and Supabase rejects every ID-JAG your IdP issues until you restore it. Any other AI tool that relied on your IdP for managed authorization loses access in the meantime. Each issuer URL can also serve only one Supabase organization and each Claude connector uses only one identity source.
+
+</Admonition>
+
+To use Claude as the issuer:
+
+1. In Claude, go to **Organization settings** > **Connectors** and select the Supabase connector.
+2. On the **Configuration** tab, next to **Managed authorization**, click **Set up**.
+3. In the **Connect** step, under **Identity source**, select **Claude-issued**. Then copy the **Issuer URL**. Leave **Tenant ID (optional)** empty because Supabase doesn't use one.
+4. In the Supabase Dashboard, follow [Configure your ID-JAG issuer](#configure-your-id-jag-issuer) and enter the Claude issuer URL in the **ID-JAG Issuer** field. If you aren't an owner or admin of the Supabase organization, use **Send to an admin** in Claude to share the setup with one.
+5. In Claude, in the **Connect** step, click **Run test** and confirm that every check passes, including **Exchange for access token** and **Probe connector**. Also confirm that the authorization server shown is `https://api.supabase.com`. If a check fails, correct the issuer URL and click **Run again**.
+6. Click **Enable and continue** and complete the **Roles** and **Scopes** steps. Every role gets managed authorization by default.
+
+Members now see Supabase already connected in Claude with no sign-in or consent screen. A member with no matching Supabase account sees the normal Connect prompt.
+
+## Manage access
+
+### Permissions and token lifetime
+
+An ID-JAG never grants access beyond what the member already has in Supabase. Each grant produces a short-lived access token for that member. The MCP client repeats the exchange whenever the access token expires instead of using a refresh token.
+
+When Claude is the issuer, it confirms only that the person is a member of your Claude organization and which email address their Claude account uses. It doesn't confirm a sign-in at your IdP, check your multi-factor authentication (MFA), or apply Supabase's own sign-in rules. Supabase receives the member's email address and an opaque identifier.
+
+### Remove members or revoke client access
+
+- **To revoke the MCP client for your whole organization**, remove its authorization under **Authorized apps**.
+- **To remove a member when your IdP is the issuer**, deprovision them in your IdP and remove them from your Supabase organization. Your IdP stops issuing ID-JAGs when their session ends and Supabase rejects grants for anyone who is no longer a member.
+- **To remove a member when Claude is the issuer**, remove them from your Claude organization and from your Supabase organization. Disabling them in your IdP doesn't cut off their access because Claude issues grants from its own membership records. With System for Cross-domain Identity Management (SCIM) directory sync, Claude removes a member when your directory deletes them but not when it only suspends them or marks them inactive.
+- **Issued tokens last until they expire.** Removing a member only stops new grants.
+- **Before you reassign a former member's email address**, remove the former member from your Supabase organization. Otherwise the new person is signed in as the old member.
+
+### Change or remove an issuer
+
+- **To switch issuers**, enter the new URL in the **ID-JAG Issuer** field. Supabase rejects grants from the previous issuer from then on.
+- **If Claude later shows a different issuer URL** for your organization, update the field to match. Supabase rejects Claude-issued grants until the two values agree.
+- **To stop using Claude as the issuer**, open the connector's **Managed authorization** settings in Claude and choose **Disable**. Members then connect to Supabase themselves. To stop trusting Claude entirely, also remove the Claude issuer URL in the Supabase Dashboard or restore your IdP's URL.
+
+## Troubleshooting Claude-issued setup
+
+In Claude, **Run test** stops at the first check that fails.
+
+| Check                         | Usual cause                                                                                                                                                                                                 | What to do                                                                                               |
+| ----------------------------- | ----------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- | -------------------------------------------------------------------------------------------------------- |
+| Check eligibility             | Your Claude organization or the Supabase connector can't use Claude as the issuer.                                                                                                                          | Contact Claude support or set up with your IdP.                                                          |
+| Discover authorization server | Supabase didn't publish its sign-in details.                                                                                                                                                                | [Contact Supabase support](/dashboard/support/new).                                                      |
+| Mint ID-JAG                   | Your Claude account has no email address or you aren't a current member of the Claude organization.                                                                                                         | Fix the account and run the test again.                                                                  |
+| Exchange for access token     | The issuer URL isn't saved in Supabase or is saved on a different Supabase organization, the Supabase connector isn't authorized for the organization, or no SSO member of the organization has your email. | Check each value in the Supabase Dashboard and run the test again.                                       |
+| Probe connector               | Supabase issued a token but the MCP Server refused it.                                                                                                                                                      | [Contact Supabase support](/dashboard/support/new) with the connector name and the time the test failed. |
+
+If Claude says Supabase's authorization server address changed, run the test again, check the new address, and confirm it.
+
+## How authorization works
+
+1. **The issuer creates the grant.** With your IdP as the issuer, the member signs in to the MCP client through your usual SSO flow. The client then exchanges the identity token for an ID-JAG scoped to Supabase through an [RFC 8693](https://datatracker.ietf.org/doc/html/rfc8693) token exchange that your IdP's policy controls. With Claude as the issuer, Claude signs the ID-JAG itself for any current member of your Claude organization.
+2. **Supabase validates the grant and issues a token.** The MCP client presents the ID-JAG to Supabase's OAuth server as a [JWT authorization grant](https://datatracker.ietf.org/doc/html/rfc7523) with no consent screen. Supabase checks the signature against the registered issuer's public keys, confirms the member belongs to your organization with a matching SSO identity, and confirms an owner or admin has authorized the client. If all checks pass, it issues a short-lived access token.
+3. **The client calls the MCP Server** with that token. From here the request looks like any other authenticated call.
+
+For protocol details, see the [Enterprise-Managed Authorization extension](https://modelcontextprotocol.io/extensions/auth/enterprise-managed-authorization).
+
+## Next steps
+
+- **Review authorized apps:** Check which clients your organization has approved under [Authorized apps](/dashboard/org/_/apps).
+- **Adjust Claude roles and scopes:** See [Authorize MCP connectors for your entire organization](https://support.claude.com/en/articles/15537633-authorize-mcp-connectors-for-your-entire-organization) in the Claude Help Center for the options.
+- **Connect your AI tools:** Point each tool at the [Supabase MCP Server](/docs/guides/ai-tools/mcp).

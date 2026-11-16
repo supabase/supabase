@@ -10,6 +10,7 @@ describe('toolFromContract createInputSchema', () => {
     description: 'A probe',
     outputSchema: z.object({}),
     minOptInLevel: null,
+    availability: { environments: new Set(['platform', 'self-hosted'] as const) },
     needsApproval: false,
     toModelOutput: () => ({}),
   } as const

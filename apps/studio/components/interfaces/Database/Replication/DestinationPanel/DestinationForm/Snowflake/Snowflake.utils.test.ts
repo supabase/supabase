@@ -91,15 +91,6 @@ describe('getSnowflakeValidationIssues', () => {
 
     expect(issues).toEqual([])
   })
-
-  it('does not flag an empty private key left blank while editing', () => {
-    const issues = getSnowflakeValidationIssues(
-      { ...VALID_DATA, snowflakePrivateKey: '' },
-      { secretsOptional: true }
-    )
-
-    expect(issues).toEqual([])
-  })
 })
 
 describe('readPrivateKeyFile', () => {

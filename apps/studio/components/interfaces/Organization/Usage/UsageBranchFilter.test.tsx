@@ -151,7 +151,8 @@ describe('UsageBranchFilter', () => {
 
     await user.click(screen.getByLabelText('Filter by branch'))
     const search = await screen.findByPlaceholderText('Find branch...')
-    await user.type(search, 'nonexistent-branch')
+    await user.click(search)
+    await user.paste('nonexistent-branch')
 
     expect(await screen.findByText('No branches found')).toBeInTheDocument()
     expect(screen.queryAllByRole('option')).toHaveLength(0)

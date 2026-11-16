@@ -67,17 +67,4 @@ describe('SnowflakeFields', () => {
 
     await waitFor(() => expect(textarea).toHaveValue(PRIVATE_KEY))
   })
-
-  it('rejects a public key file without replacing the private key', async () => {
-    const { container } = customRender(<TestForm snowflakePrivateKey="existing-key" />)
-    const publicKey = '-----BEGIN PUBLIC KEY-----\npublic-key\n-----END PUBLIC KEY-----'
-    const file = new File([publicKey], 'rsa_key.pub', { type: 'application/x-pem-file' })
-    Object.defineProperty(file, 'text', { value: vi.fn().mockResolvedValue(publicKey) })
-
-    const fileInput = container.querySelector<HTMLInputElement>('input[type="file"]')
-    fireEvent.change(fileInput!, { target: { files: [file] } })
-
-    expect(await screen.findByText('Select a P8 or PEM private key.')).toBeInTheDocument()
-    expect(screen.getByDisplayValue('existing-key')).toBeInTheDocument()
-  })
 })

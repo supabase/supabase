@@ -23,15 +23,22 @@ export const FGA_PERMISSIONS = Object.fromEntries(
 type DeepValue<T> = T extends object ? DeepValue<T[keyof T]> : T
 export type FgaPermissions = DeepValue<typeof FGA_PERMISSIONS>
 
+export type FgaRequirementGroups = readonly (readonly FgaPermissions[])[]
+
 /**
- * Checks an FGA permission against the v2 permissions response.
- * Resolution order:
+ * Checks FGA permissions against the v2 permissions response.
+ *
+ * `permission` is a single permission, a list of permissions that are all required (one AND group),
+ * or a list of such lists (OR-of-AND): the check passes if every permission in at least one group
+ * is held. Empty input, including an empty group, never grants.
+ *
+ * Each permission is looked up in this order:
  * 1. explicit project scoped role entry for projectRef (if provided)
  * 2. org level permissions (org role applies to all projects in the org)
  */
 export function doPermissionsCheckV2(
   data: PermissionsV2Data | undefined,
-  permission: FgaPermissions | FgaPermissions[],
+  permission: FgaPermissions | readonly FgaPermissions[] | FgaRequirementGroups,
   organizationSlug?: string,
   projectRef?: string | null
 ): boolean {
@@ -40,14 +47,90 @@ export function doPermissionsCheckV2(
   const org = data.organizations.find((o) => o.slug === organizationSlug)
   if (!org) return false
 
-  const required = Array.isArray(permission) ? permission : [permission]
-  if (required.length === 0) return false // nothing requested: fail closed
+  let groups: FgaRequirementGroups
+  if (typeof permission === 'string') {
+    groups = [[permission]]
+  } else if (permission.every((p): p is FgaPermissions => typeof p === 'string')) {
+    groups = [permission]
+  } else {
+    groups = permission
+  }
 
   const project = projectRef ? org.projects.find((p) => p.ref === projectRef) : undefined
 
-  return required.every(
-    (p) => (project?.permissions.includes(p) ?? false) || org.permissions.includes(p)
+  return groups.some(
+    (group) =>
+      group.length > 0 &&
+      group.every((p) => (project?.permissions.includes(p) ?? false) || org.permissions.includes(p))
   )
+}
+
+/**
+ * Resolves the organization and project an FGA check applies to.
+ *
+ * - `organizationSlug` defaults to the selected organization.
+ * - `projectRef` defaults to the URL ref; `null` means an org-level check.
+ * - `permissionsProjectRef` is the ref permissions are evaluated against. For the URL project it
+ *   resolves branches to their parent, since FGA tuples are written against the parent project
+ *   only. An explicit ref other than the URL ref is used as-is, without fetching its details.
+ */
+export function usePermissionScopeV2({
+  organizationSlug: organizationSlugOverride,
+  projectRef: projectRefOverride,
+  enabled = true,
+}: {
+  organizationSlug?: string
+  projectRef?: string | null
+  enabled?: boolean
+}) {
+  const getOrganizationDataFromParamsSlug = organizationSlugOverride === undefined && enabled
+  const {
+    data: organizationData,
+    isPending: isLoadingOrganization,
+    isSuccess: isSuccessOrganization,
+    error: organizationError,
+  } = useSelectedOrganizationQuery({
+    enabled: getOrganizationDataFromParamsSlug,
+  })
+  const organizationSlug =
+    organizationSlugOverride === undefined ? organizationData?.slug : organizationSlugOverride
+
+  const { ref: urlProjectRef } = useParams()
+  const projectRef = projectRefOverride === undefined ? urlProjectRef : projectRefOverride
+
+  const getProjectDataFromParamsRef = !!urlProjectRef && projectRef === urlProjectRef && enabled
+  const {
+    data: projectData,
+    isPending: isLoadingProject,
+    isSuccess: isSuccessProject,
+    error: projectError,
+  } = useSelectedProjectQuery({
+    enabled: getProjectDataFromParamsRef,
+  })
+
+  // branch projects resolve to their base project ref, since FGA tuples
+  // are written against the base project only
+  const permissionsProjectRef =
+    projectRef === urlProjectRef && !!urlProjectRef ? projectData?.parentRef : projectRef
+
+  const isLoading =
+    (getOrganizationDataFromParamsSlug && isLoadingOrganization) ||
+    (getProjectDataFromParamsRef && isLoadingProject)
+  const isSuccess =
+    (!getOrganizationDataFromParamsSlug || isSuccessOrganization) &&
+    (!getProjectDataFromParamsRef || isSuccessProject)
+  const error =
+    (getOrganizationDataFromParamsSlug ? organizationError : null) ??
+    (getProjectDataFromParamsRef ? projectError : null)
+
+  return {
+    organizationSlug,
+    projectRef,
+    permissionsProjectRef,
+    isLoading,
+    isSuccess,
+    error,
+  }
 }
 
 function useGetProjectPermissionsV2(
@@ -65,56 +148,23 @@ function useGetProjectPermissionsV2(
   })
   const permissions = permissionsOverride === undefined ? data : permissionsOverride
 
-  const getOrganizationDataFromParamsSlug = organizationSlugOverride === undefined && enabled
   const {
-    data: organizationData,
-    isPending: isLoadingOrganization,
-    isSuccess: isSuccessOrganization,
-  } = useSelectedOrganizationQuery({
-    enabled: getOrganizationDataFromParamsSlug,
+    organizationSlug,
+    permissionsProjectRef: projectRef,
+    isLoading: isLoadingScope,
+    isSuccess: isSuccessScope,
+  } = usePermissionScopeV2({
+    organizationSlug: organizationSlugOverride,
+    projectRef: projectRefOverride,
+    enabled,
   })
-  const organization =
-    organizationSlugOverride === undefined ? organizationData : { slug: organizationSlugOverride }
-  const organizationSlug = organization?.slug
-
-  const { ref: urlProjectRef } = useParams()
-  const getProjectDataFromParamsRef = !!urlProjectRef && projectRefOverride === undefined && enabled
-  const {
-    data: projectData,
-    isPending: isLoadingProject,
-    isSuccess: isSuccessProject,
-  } = useSelectedProjectQuery({
-    enabled: getProjectDataFromParamsRef,
-  })
-  const project =
-    projectRefOverride === undefined
-      ? projectData
-      : { ref: projectRefOverride, parent_project_ref: undefined }
-
-  // branch projects resolve to their base project ref, since FGA tuples
-  // are written against the base project only
-  const projectRef =
-    projectRefOverride === null
-      ? null
-      : project?.parent_project_ref
-        ? project.parent_project_ref
-        : project?.ref
-
-  const isLoading =
-    isLoadingPermissions ||
-    (getOrganizationDataFromParamsSlug && isLoadingOrganization) ||
-    (getProjectDataFromParamsRef && isLoadingProject)
-  const isSuccess =
-    isSuccessPermissions &&
-    (!getOrganizationDataFromParamsSlug || isSuccessOrganization) &&
-    (!getProjectDataFromParamsRef || isSuccessProject)
 
   return {
     permissions,
     organizationSlug,
     projectRef,
-    isLoading,
-    isSuccess,
+    isLoading: isLoadingPermissions || isLoadingScope,
+    isSuccess: isSuccessPermissions && isSuccessScope,
   }
 }
 
