@@ -48,32 +48,33 @@ const OrganizationCard = ({
             content: {
               text:
                 isSuccess && freePlanWithExceedingLimits ? (
-                <div className="flex flex-col gap-y-2 w-96 p-2">
-                  <p className="leading-normal">
-                    Owners and administrators are limited in how many active Free Plan projects they
-                    can have across all organizations. Members over the limit:
-                  </p>
+                  <div className="flex flex-col gap-y-2 w-96 p-2">
+                    <p className="leading-normal">
+                      Owners and administrators are limited in how many active Free Plan projects
+                      they can have across all organizations. Members over the limit:
+                    </p>
 
-                  <ul className="pl-6 list-disc">
-                    {membersExceededLimit?.map((member, idx: number) => (
-                      <li key={`member-${idx}`}>
-                        <span>{`${member.primary_email} (Limit: ${member.free_project_limit} free projects)`}</span>
-                        <ul className="text-foreground-light list-disc pl-4">
-                          {member.free_plan_organizations.map((org) => (
-                            <li key={org.slug || org.organization_name}>
-                              {org.organization_name}: {org.projects.map((x) => x.name).join(', ')}
-                            </li>
-                          ))}
-                        </ul>
-                      </li>
-                    ))}
-                  </ul>
+                    <ul className="pl-6 list-disc">
+                      {membersExceededLimit?.map((member, idx: number) => (
+                        <li key={`member-${idx}`}>
+                          <span>{`${member.primary_email} (Limit: ${member.free_project_limit} free projects)`}</span>
+                          <ul className="text-foreground-light list-disc pl-4">
+                            {member.free_plan_organizations.map((org) => (
+                              <li key={org.slug || org.organization_name}>
+                                {org.organization_name}:{' '}
+                                {org.projects.map((x) => x.name).join(', ')}
+                              </li>
+                            ))}
+                          </ul>
+                        </li>
+                      ))}
+                    </ul>
 
-                  <p className="leading-normal">
-                    They will need to delete, pause, or upgrade one or more of these projects before
-                    you can create a free project within this organization.
-                  </p>
-                </div>
+                    <p className="leading-normal">
+                      They will need to delete, pause, or upgrade one or more of these projects
+                      before you can create a free project within this organization.
+                    </p>
+                  </div>
                 ) : undefined,
             },
           }}
