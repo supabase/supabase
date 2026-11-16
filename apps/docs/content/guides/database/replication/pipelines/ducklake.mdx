@@ -86,13 +86,13 @@ Pipelines creates current-state tables, copies rows according to the [initial sy
 
 Source schema and table names are preserved, while ASCII uppercase letters in column names are converted to lowercase. DuckDB compares schema, table, and column identifiers without ASCII case distinctions, so don't publish names that differ only by ASCII case. Use distinct lowercase column names.
 
-A source `TRUNCATE` truncates the DuckLake table. A [table restart](/docs/guides/database/replication/pipelines-monitoring#restarting-tables) drops and recreates it. [Removing a table from the publication](/docs/guides/database/replication/pipelines#removing-tables-from-replication) leaves its destination data in place.
+A source `TRUNCATE` truncates the DuckLake table. A [table reset](/docs/guides/database/replication/pipelines-monitoring#restarting-tables) drops and recreates it. [Removing a table from the publication](/docs/guides/database/replication/pipelines#removing-tables-from-replication) leaves its destination data in place.
 
 ### Delivery and replay
 
 DuckLake applies ongoing row changes to managed tables exactly once. It commits data changes and their replay progress together, then skips already committed changes during recovery.
 
-This includes inserts into tables without a primary key. Identical rows that represent separate source inserts are preserved. An interrupted initial sync can instead discard its partial data and copy the table again. See [delivery guarantees](/docs/guides/database/replication/pipelines-guarantees) for ordering and recovery limits.
+This includes inserts into tables without a primary key. Identical rows that represent separate source inserts are preserved. An interrupted initial sync can instead discard its partial data and copy the table again. See [delivery guarantees](/docs/guides/database/replication/pipelines-faq#can-data-be-processed-more-than-once) for ordering and recovery limits.
 
 ## Query replicated data [#query-the-destination]
 
@@ -119,7 +119,7 @@ See the [DuckDB connection guide](https://ducklake.select/docs/stable/duckdb/usa
 | `REPLICA IDENTITY NOTHING`                       | Insert-only. Inserts replicate, but updates and deletes don't contain an identity that DuckLake can match safely.      |
 | `REPLICA IDENTITY DEFAULT` without a primary key | Insert-only. Add a key, configure a replica-identity index, or use full identity before publishing updates or deletes. |
 
-Replica-identity changes affect only new WAL. If retained updates or deletes still fail after a pipeline restart, [restart replication for the affected table](/docs/guides/database/replication/pipelines-monitoring#restarting-tables).
+Replica-identity changes affect only new WAL. If retained updates or deletes still fail after a pipeline restart, [reset the affected table](/docs/guides/database/replication/pipelines-monitoring#restarting-tables).
 
 <Admonition type="caution">
 

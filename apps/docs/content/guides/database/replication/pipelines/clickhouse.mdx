@@ -96,7 +96,7 @@ from pipelines."public_orders__current";
 
 ClickHouse background merges combine older row versions over time. Before a merge, the base table can contain multiple versions of the same source row. The generated view uses `FINAL` to return the current version and excludes deleted rows.
 
-Pipelines uses at-least-once ingestion into ClickHouse, so recovery can append the same change again. The generated view provides query-time deduplication. Querying the base table without `FINAL` can count repeated versions. See [delivery guarantees](/docs/guides/database/replication/pipelines-guarantees) for ordering and recovery limits.
+Pipelines uses at-least-once ingestion into ClickHouse, so recovery can append the same change again. The generated view provides query-time deduplication. Querying the base table without `FINAL` can count repeated versions. See [delivery guarantees](/docs/guides/database/replication/pipelines-faq#can-data-be-processed-more-than-once) for ordering and recovery limits.
 
 Removing deletion markers can make deleted rows reappear when older changes replay. Pipelines does not perform tombstone cleanup. For manual cleanup, follow the [ETL ClickHouse guide](https://github.com/supabase/etl/blob/main/crates/etl-destinations/src/clickhouse/README.md#replacingmergetree-default) to verify that no older changes can replay.
 
@@ -118,11 +118,11 @@ Retries can append repeated events. ClickHouse's insert-block deduplication can 
 
 Initial-sync rows share baseline ordering metadata. It does not uniquely identify copied rows. Treat the initial snapshot separately from ongoing changes when deduplicating history.
 
-### Truncates and table restarts
+### Truncates and table resets [#truncates-and-table-restarts]
 
 A source `TRUNCATE` truncates the ClickHouse table for either engine, then ongoing replication continues. It does not start a new initial sync.
 
-Restarting replication for a table drops and recreates its table and, for `ReplacingMergeTree`, its generated view. A table restart erases the accumulated destination data and copies existing source rows only if the table is [selected for initial sync](/docs/guides/database/replication/pipelines#choosing-which-tables-to-copy).
+Resetting a table drops and recreates its table and, for `ReplacingMergeTree`, its generated view. A table reset erases the accumulated destination data and copies existing source rows only if the table is [selected for initial sync](/docs/guides/database/replication/pipelines#choosing-which-tables-to-copy).
 
 ## Replica identity and arrays
 
@@ -135,7 +135,7 @@ Restarting replication for a table drops and recreates its table and, for `Repla
 
 `REPLICA IDENTITY NOTHING` cannot support updates or deletes.
 
-Use `REPLICA IDENTITY FULL` for tables whose updates can omit unchanged out-of-line TOAST values. It lets Pipelines reconstruct the complete new row. Changing replica identity affects only new WAL; incompatible retained updates can still require a [table restart](/docs/guides/database/replication/pipelines-monitoring#restarting-tables).
+Use `REPLICA IDENTITY FULL` for tables whose updates can omit unchanged out-of-line TOAST values. It lets Pipelines reconstruct the complete new row. Changing replica identity affects only new WAL; incompatible retained updates can still require a [table reset](/docs/guides/database/replication/pipelines-monitoring#restarting-tables).
 
 Array elements can be `NULL`. A whole-array SQL `NULL` is stored as an empty array, so these two source values become indistinguishable.
 
@@ -179,7 +179,7 @@ New scalar columns are made nullable when ClickHouse needs a value for historica
 
 A previously excluded column is added without a default. Historical rows read as `NULL` for scalar columns or empty arrays for array columns. Removing a published column drops its destination values; adding it again does not restore them.
 
-Source type changes that alter the mapped ClickHouse type are rejected, such as `integer` to `bigint`. Switching between `timestamp` and `timestamptz` is also rejected because it can change existing values. Changes that keep the mapped type, such as increasing a `varchar` length, continue without changing the destination type. [Restart table replication](/docs/guides/database/replication/pipelines-monitoring#restarting-tables) to rebuild the schema after a rejected change.
+Source type changes that alter the mapped ClickHouse type are rejected, such as `integer` to `bigint`. Switching between `timestamp` and `timestamptz` is also rejected because it can change existing values. Changes that keep the mapped type, such as increasing a `varchar` length, continue without changing the destination type. [Reset the table](/docs/guides/database/replication/pipelines-monitoring#restarting-tables) to rebuild the schema after a rejected change.
 
 For type changes, unsupported changes, and interrupted schema changes, see the shared [schema-change behavior and recovery](/docs/guides/database/replication/pipelines#schema-change-support).
 

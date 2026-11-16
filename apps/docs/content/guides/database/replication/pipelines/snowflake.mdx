@@ -207,9 +207,9 @@ The sequence number orders changes but is not a globally unique event ID. Initia
 
 For ongoing row changes, Pipelines provides exactly-once ingestion into managed Snowflake tables. Recovery uses Snowpipe Streaming's committed offsets to skip already committed changes. This depends on preserving the managed table and its streaming state. An interrupted initial sync can instead discard its partial data and copy the table again.
 
-Query the companion view for current rows, or the base table for change history. If you use that history to update another system, that system needs its own protection against repeated processing. See [delivery guarantees](/docs/guides/database/replication/pipelines-guarantees) for ordering and recovery limits.
+Query the companion view for current rows, or the base table for change history. If you use that history to update another system, that system needs its own protection against repeated processing. See [delivery guarantees](/docs/guides/database/replication/pipelines-faq#can-data-be-processed-more-than-once) for ordering and recovery limits.
 
-[Restarting a table](/docs/guides/database/replication/pipelines-monitoring#restarting-tables) erases its destination history. It copies existing source rows again only if the table is selected for **Initial sync**. By contrast, [removing a table from the publication](/docs/guides/database/replication/pipelines#removing-tables-from-replication) leaves its destination history in place but stops updating it.
+[Resetting a table](/docs/guides/database/replication/pipelines-monitoring#restarting-tables) erases its destination history. It copies existing source rows again only if the table is selected for **Initial sync**. By contrast, [removing a table from the publication](/docs/guides/database/replication/pipelines#removing-tables-from-replication) leaves its destination history in place but stops updating it.
 
 ### Type mapping
 
@@ -245,7 +245,7 @@ Pipelines receives supported schema changes through replication, including when 
 
 Replicated columns remain nullable in Snowflake, and changes to existing column defaults are not propagated. Pipelines can copy supported literal defaults when creating a table or adding a column. Other defaults are omitted, although Postgres still supplies source values through replication. Partial-update support does not backfill arbitrary default expressions for untouched rows.
 
-Schema changes also affect stored history. A rename changes the column name in earlier events, and a drop removes its historical values. Adding a column with a supported default can populate older rows. Changing publication column selection can remove values or leave historical gaps; resync the table after such changes before relying on current-state results.
+Schema changes also affect stored history. A rename changes the column name in earlier events, and a drop removes its historical values. Adding a column with a supported default can populate older rows. Changing publication column selection can remove values or leave historical gaps; reset the table after such changes before relying on current-state results.
 
 For type changes, unsupported changes, and interrupted schema changes, see the shared [schema-change behavior and recovery](/docs/guides/database/replication/pipelines#schema-change-support). Keep the primary key and its values stable. Apart from enabling change tracking for a stream, leave managed table and view definitions unchanged. For additional processing, use [separate derived objects](#customize-queries-and-materialization).
 
@@ -257,7 +257,7 @@ Query the automatically maintained companion view to read current rows. You don'
 
 The examples use a source table named `public.orders` with columns `id` and `status`. Its history table is `PIPELINES_DB.REPLICATED.PUBLIC_ORDERS` and its companion view is `PIPELINES_DB.REPLICATED.PUBLIC_ORDERS_CURRENT`. Replace these names with your own.
 
-Wait for initial sync to finish before treating the view as a complete replica. During initial sync or a table restart, it can expose rows while they are still being copied.
+Wait for initial sync to finish before treating the view as a complete replica. During initial sync or a table reset, it can expose rows while they are still being copied.
 
 Ask your Snowflake administrator to grant your analytics role `USAGE` on the query warehouse, database, and schema. The owner of the view can grant read access:
 
@@ -308,7 +308,7 @@ Both the companion view and custom current-state queries require:
 - An initial snapshot followed by uninterrupted publication coverage, including while replication is stopped. Keep publication actions, membership, and column selection unchanged, and do not use row filters.
 - All accepted history from that snapshot. Do not prune or manually edit events, or combine history from separate initial syncs.
 
-After incompatible key, schema, or publication changes, or lost history, [restart replication for the affected table](/docs/guides/database/replication/pipelines-monitoring#restarting-tables) with the table selected for **Initial sync** to take a new snapshot. This erases the previous destination history. Restarting the replicator process or manually truncating a Snowflake table is not a substitute for a table resync.
+After incompatible key, schema, or publication changes, or lost history, [reset the affected table](/docs/guides/database/replication/pipelines-monitoring#restarting-tables) with the table selected for **Initial sync** to take a new snapshot. This erases the previous destination history. Restarting the replicator process or manually truncating a Snowflake table is not a substitute for a table reset.
 
 ### Customize queries and materialization
 
@@ -316,7 +316,7 @@ For separately stored results, use Snowflake [dynamic tables](https://docs.snowf
 
 Custom history processing must distinguish omitted values from explicit `NULL` values and protect against repeated processing. See the [ETL Snowflake reference](https://supabase.github.io/etl/reference/destinations/#snowflake) for the history format and custom query requirements.
 
-After a source truncate or table resync, rebuild separately stored results. Use the base history table for streams; replacing a managed companion view can make streams attached to it stale. Follow Snowflake's [change-tracking requirements](https://docs.snowflake.com/en/user-guide/streams-manage#explicitly-enable-change-tracking-on-the-underlying-tables).
+After a source truncate or table reset, rebuild separately stored results. Use the base history table for streams; replacing a managed companion view can make streams attached to it stale. Follow Snowflake's [change-tracking requirements](https://docs.snowflake.com/en/user-guide/streams-manage#explicitly-enable-change-tracking-on-the-underlying-tables).
 
 ### Maintain derived objects
 
@@ -324,12 +324,12 @@ Pipelines owns and refreshes the generated companion views. Do not edit their de
 
 You maintain any additional queries, views, dynamic tables, or tasks:
 
-| Change                                 | What to do                                                                                                              |
-| -------------------------------------- | ----------------------------------------------------------------------------------------------------------------------- |
-| Source `TRUNCATE`                      | The companion view reads the truncated history. Refresh or rebuild separately stored results.                           |
-| Table resync                           | Wait for initial sync to finish. Recheck dependent objects, history-table grants, and change tracking.                  |
-| Added, renamed, or dropped column      | Update custom queries and derived objects that use the changed columns. The companion view updates automatically.       |
-| Source table rename followed by resync | The destination and companion view use the new source name. Update references and grant readers access to the new view. |
+| Change                                | What to do                                                                                                              |
+| ------------------------------------- | ----------------------------------------------------------------------------------------------------------------------- |
+| Source `TRUNCATE`                     | The companion view reads the truncated history. Refresh or rebuild separately stored results.                           |
+| Table reset                           | Wait for initial sync to finish. Recheck dependent objects, history-table grants, and change tracking.                  |
+| Added, renamed, or dropped column     | Update custom queries and derived objects that use the changed columns. The companion view updates automatically.       |
+| Source table rename followed by reset | The destination and companion view use the new source name. Update references and grant readers access to the new view. |
 
 ## Upgrade an existing pipeline
 
@@ -339,7 +339,7 @@ Before upgrading, make sure the Pipelines role has the [required permissions](#p
 2. Open the pipeline's actions menu in the Dashboard and select **Update available**. Follow the prompts to update and restart the pipeline.
 3. Confirm replication resumes, grant consumers `SELECT` on the companion views, and update your own queries or derived jobs before resuming them.
 
-A pipeline update normally preserves saved replication progress and destination history. If startup fails because a permission is missing, apply the grant and restart the pipeline. A table restart deletes history, so use it only when a rebuild is required.
+A pipeline update normally preserves saved replication progress and destination history. If startup fails because a permission is missing, apply the grant and restart the pipeline. A table reset deletes history, so use it only when a rebuild is required.
 
 ## Troubleshooting
 

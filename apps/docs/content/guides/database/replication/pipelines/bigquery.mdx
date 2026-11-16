@@ -52,13 +52,13 @@ Supabase Pipelines charges and Google Cloud charges are separate. BigQuery can c
 
 ## How it works
 
-Pipelines creates current-state BigQuery tables using destination-compatible names and types, then applies published inserts, updates, deletes, and truncates. These tables do not retain a history of row versions to query. Truncates and table restarts replace destination data.
+Pipelines creates current-state BigQuery tables using destination-compatible names and types, then applies published inserts, updates, deletes, and truncates. These tables do not retain a history of row versions to query. Truncates and table resets replace destination data.
 
 ### Delivery and replay
 
 Pipelines uses at-least-once ingestion into BigQuery. BigQuery's CDC updates are idempotent: repeating a change produces the same current row. The source primary key and change sequence prevent an older replay from overwriting a newer value. A primary-key value change deletes the old key and writes the row under its new key.
 
-Repeated ingestion can still incur charges. Query visibility depends on BigQuery applying the changes and your **Maximum staleness** setting. See [delivery guarantees](/docs/guides/database/replication/pipelines-guarantees) for ordering and recovery limits.
+Repeated ingestion can still incur charges. Query visibility depends on BigQuery applying the changes and your **Maximum staleness** setting. See [delivery guarantees](/docs/guides/database/replication/pipelines-faq#can-data-be-processed-more-than-once) for ordering and recovery limits.
 
 ## Query replicated data
 
@@ -81,7 +81,7 @@ You can configure BigQuery partitioning and clustering for individual replicated
 
 The publication determines [which source partitions become destination tables](/docs/guides/database/replication/pipelines#partitioned-tables). BigQuery layout is configured separately; Pipelines does not copy Postgres partition keys or bounds.
 
-Layout settings apply only when a destination table is created or recreated, including after a table restart or source truncate. A pipeline restart that resumes a table's saved progress does not apply new layout settings. [Restart replication for the table](/docs/guides/database/replication/pipelines-monitoring#restarting-tables) to apply them, which replaces its data.
+Layout settings apply only when a destination table is created or recreated, including after a table reset or source truncate. A pipeline restart that resumes a table's saved progress does not apply new layout settings. [Reset the table](/docs/guides/database/replication/pipelines-monitoring#restarting-tables) to apply them, which replaces its data.
 
 Set either option, both, or neither:
 
@@ -105,7 +105,7 @@ Choose a supported Postgres replica identity:
 
 BigQuery upserts require complete new rows. Postgres can omit unchanged out-of-line TOAST values; `REPLICA IDENTITY FULL` supplies the old row so Pipelines can reconstruct them.
 
-If replication fails on a partial update row, set full replica identity and restart the pipeline. The change affects only new WAL: incompatible retained updates can still require a [table restart](/docs/guides/database/replication/pipelines-monitoring#restarting-tables).
+If replication fails on a partial update row, set full replica identity and restart the pipeline. The change affects only new WAL: incompatible retained updates can still require a [table reset](/docs/guides/database/replication/pipelines-monitoring#restarting-tables).
 
 Check a table's current replica identity:
 
@@ -148,7 +148,7 @@ Pipelines supports:
 
 New scalar columns leave historical BigQuery rows `NULL`; new array columns expose an empty array. Later row changes supply the source value. Pipelines does not backfill existing rows when adding a column.
 
-Removing a column from the publication also removes its destination values. Adding it again does not restore those values. To include a previously excluded array column, select the table for initial sync and [restart its replication](/docs/guides/database/replication/pipelines-monitoring#restarting-tables).
+Removing a column from the publication also removes its destination values. Adding it again does not restore those values. To include a previously excluded array column, select the table for initial sync and [reset the table](/docs/guides/database/replication/pipelines-monitoring#restarting-tables).
 
 Adding `NOT NULL` keeps an existing destination column nullable. For type changes, unsupported changes, and interrupted schema changes, see the shared [schema-change behavior and recovery](/docs/guides/database/replication/pipelines#schema-change-support).
 

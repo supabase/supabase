@@ -12,7 +12,7 @@ Supabase Pipelines replicates Postgres data to a destination you configure in th
 
 **Initial sync** copies existing rows from selected tables. **Ongoing replication** uses change data capture (CDC) to apply subsequent inserts, updates, deletes, and truncates.
 
-Pipelines provides at-least-once delivery. How repeated changes affect stored data and query results depends on the destination. See [delivery guarantees](/docs/guides/database/replication/pipelines-guarantees) for destination behavior, ordering, and recovery limits.
+Pipelines provides at-least-once delivery. How repeated changes affect stored data and query results depends on the destination. See [delivery guarantees](/docs/guides/database/replication/pipelines-faq#can-data-be-processed-more-than-once) for destination behavior, ordering, and recovery limits.
 
 [Create a pipeline](#setup-overview), then refer to [settings](#pipeline-settings), [management](#managing-your-pipeline), or [advanced publication options](#advanced-publication-options) as needed.
 
@@ -93,9 +93,9 @@ Review initial sync choices and creation checks before tuning advanced settings.
 | **Selected tables only**       | Only the tables you include                    |
 | **No tables**                  | None; replicate new changes only               |
 
-Selection changes affect unfinished initial syncs. To copy a completed table again, include it here, apply the settings, and [restart its replication](/docs/guides/database/replication/pipelines-monitoring#restarting-tables).
+Selection changes affect unfinished initial syncs. To copy a completed table again, include it here, apply the settings, and [reset the table](/docs/guides/database/replication/pipelines-monitoring#restarting-tables).
 
-Skipping initial sync does not preserve or attach to previously loaded destination data. A table restart erases destination data even when initial sync is skipped.
+Skipping initial sync does not preserve or attach to previously loaded destination data. A table reset erases destination data even when initial sync is skipped.
 
 ### Creation checks
 
@@ -167,13 +167,15 @@ These examples use the `pub_users_orders` publication from the [SQL example](#pu
 
 After the restart, Pipelines removes its replication state for those tables. Source tables and destination tables, including data already replicated, remain unchanged. Other pipelines using publications that still include the tables are unaffected. If multiple pipelines use the changed publication, restart each one.
 
-You can delete the destination tables yourself after the restart. **Don't modify or delete tables still managed by Pipelines**; doing so can stop replication and require a [table restart](/docs/guides/database/replication/pipelines-monitoring#restarting-tables).
+You can delete the destination tables yourself after the restart. **Don't modify or delete tables still managed by Pipelines**; doing so can stop replication and require a [table reset](/docs/guides/database/replication/pipelines-monitoring#restarting-tables).
 
 ### Pipeline restarts and recovery
 
-A pipeline restart does not request a fresh copy of every table. Tables that completed initial sync resume from saved progress. An interrupted initial sync can start again from scratch: Pipelines deletes the partial destination data and copies the table again according to the **Initial sync** selection. This can also happen to an unfinished table when another table's restart temporarily stops the pipeline.
+A pipeline restart preserves saved progress for tables that completed initial sync. If the restart interrupts a table while copying or catching up after its copy, that table starts its entire initial sync again. Its partial destination data is deleted when it resumes. It does not resume from the last copied row or batch.
 
-If the main replication slot is lost and **Recreate slot** is enabled, startup rebuilds all replicated tables. Review [lost-slot recovery](/docs/guides/database/replication/pipelines-monitoring#respond-based-on-the-slot-status) for its data-loss and billing effects. To deliberately rebuild specific tables, use [Restarting tables](/docs/guides/database/replication/pipelines-monitoring#restarting-tables).
+Resetting a table on an active pipeline restarts the pipeline, so other tables' unfinished initial syncs also start over. Use **Reset table** to deliberately rebuild a completed table. See [restart and reset semantics](/docs/guides/database/replication/pipelines-monitoring#restarting-tables).
+
+If the main replication slot is lost and **Recreate slot** is enabled, startup rebuilds all replicated tables. Review [lost-slot recovery](/docs/guides/database/replication/pipelines-monitoring#respond-based-on-the-slot-status) for its data-loss and billing effects.
 
 ### Disabling Pipelines
 
@@ -310,7 +312,7 @@ To change modes, stop the pipeline, change the option, review **Initial sync** f
 
 With `publish_via_partition_root = true`, truncating a leaf partition keeps destination rows; truncating the published parent clears them.
 
-A [table restart](/docs/guides/database/replication/pipelines-monitoring#restarting-tables) discards retained rows. It copies current source data again only if the table is selected for initial sync.
+A [table reset](/docs/guides/database/replication/pipelines-monitoring#restarting-tables) discards retained rows. It copies current source data again only if the table is selected for initial sync.
 
 </Admonition>
 
@@ -325,7 +327,7 @@ Publication changes do not all require a pipeline restart:
 | Change published operations (`insert`, `update`, `delete`, `truncate`) | Postgres changes which operations it sends without a pipeline restart. Previously omitted operations are not replayed.                              |
 | Change `publish_via_partition_root`                                    | Stop the pipeline before changing this option, then restart it to discover the new table identities. See [Partitioned tables](#partitioned-tables). |
 
-Changing a row filter affects future changes only: it neither copies newly included historical rows nor removes rows that no longer match. A pipeline restart does not rebuild history. To rebuild it, include affected tables in initial sync and [restart their replication](/docs/guides/database/replication/pipelines-monitoring#restarting-tables).
+Changing a row filter affects future changes only: it neither copies newly included historical rows nor removes rows that no longer match. For tables that completed initial sync, a pipeline restart does not rebuild history. To rebuild it, include affected tables in initial sync and [reset those tables](/docs/guides/database/replication/pipelines-monitoring#restarting-tables).
 
 Wait for initial sync to finish before changing its filter; changing a filter does not update a copy already in progress.
 
@@ -345,7 +347,7 @@ Unsupported changes have different outcomes:
 
 Check [replication logs](/docs/guides/database/replication/pipelines-monitoring#viewing-logs) for warnings and errors after changing a replicated table.
 
-After a type change, or when a schema error cannot resume safely, resolve any source incompatibility and [restart replication for the affected tables](/docs/guides/database/replication/pipelines-monitoring#restarting-tables). This rebuilds their destination schema and **deletes their existing destination data**. Select the tables for **Initial sync** to copy their current source rows again. Restarting the pipeline alone does not rebuild tables. Do not repair managed destination objects manually.
+After a type change, or when a schema error cannot resume safely, resolve any source incompatibility and [reset the affected tables](/docs/guides/database/replication/pipelines-monitoring#restarting-tables). This rebuilds their destination schema and **deletes their existing destination data**. Select the tables for **Initial sync** to copy their current source rows again. Restarting the pipeline alone does not rebuild tables that completed initial sync. Do not repair managed destination objects manually.
 
 ## Limitations
 

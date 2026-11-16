@@ -446,7 +446,11 @@ describe('ReplicationPipelineLayout', () => {
     await userEvent.click(screen.getByRole('button', { name: 'Pipeline options' }))
 
     // Primary button is Stop while running, so the menu carries Restart instead
-    expect(await screen.findByRole('menuitem', { name: 'Restart pipeline' })).toBeVisible()
+    const restartAction = await screen.findByRole('menuitem', { name: 'Restart pipeline' })
+    expect(restartAction).toBeVisible()
+    expect(restartAction).toHaveAccessibleDescription(
+      'Resume saved progress. Unfinished initial syncs start over.'
+    )
     expect(screen.queryByRole('menuitem', { name: 'Stop pipeline' })).not.toBeInTheDocument()
   })
 
