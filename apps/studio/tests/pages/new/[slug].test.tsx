@@ -1327,15 +1327,22 @@ describe('project creation wizard', () => {
       await fillProjectName('No Data API Project')
       await generateAndWaitForStrongPassword()
 
-      const apiAccess = screen.getByLabelText('Automatically grant API access to new tables')
+      const apiAccess = screen.getByLabelText('Grant API access to new tables automatically')
       expect(apiAccess).toBeVisible()
+      const apiWarning =
+        'Client libraries like supabase-js need the Data API to query your database.'
+      expect(screen.queryByText(apiWarning)).not.toBeInTheDocument()
       await user.click(screen.getByLabelText('Enable Data API'))
       expect(
-        screen.queryByRole('checkbox', { name: 'Automatically grant API access to new tables' })
+        screen.queryByRole('checkbox', { name: 'Grant API access to new tables automatically' })
       ).not.toBeInTheDocument()
+      expect(screen.getByText(apiWarning)).toBeVisible()
       expect(screen.getByLabelText('Enable RLS on new tables automatically')).toBeEnabled()
       await user.click(screen.getByLabelText('Enable Data API'))
-      expect(screen.getByLabelText('Automatically grant API access to new tables')).toBeChecked()
+      expect(
+        screen.getByLabelText('Grant API access to new tables automatically')
+      ).not.toBeChecked()
+      expect(screen.queryByText(apiWarning)).not.toBeInTheDocument()
       await user.click(screen.getByLabelText('Enable Data API'))
 
       fireEvent.click(screen.getByRole('button', { name: 'Create new project' }))
@@ -1356,10 +1363,26 @@ describe('project creation wizard', () => {
       await fillProjectName('Manual Privileges Project')
       await generateAndWaitForStrongPassword()
 
-      const grantsDescription = 'Applies to the public schema. Leave off to grant access per table.'
-      expect(screen.getByText(grantsDescription)).toBeVisible()
-      await user.click(screen.getByLabelText('Automatically grant API access to new tables'))
-      expect(screen.getByText(grantsDescription)).toBeVisible()
+      const warning =
+        'Without RLS, anyone may be able to read, change or delete data in new tables. Enable RLS below to restrict access.'
+      expect(
+        screen.getByLabelText('Grant API access to new tables automatically')
+      ).not.toBeChecked()
+      expect(screen.queryByText(warning)).not.toBeInTheDocument()
+      await user.click(screen.getByLabelText('Grant API access to new tables automatically'))
+      await waitFor(() => expect(screen.getByText(warning)).toBeVisible())
+      await user.click(screen.getByLabelText('Enable RLS on new tables automatically'))
+      await waitFor(() => expect(screen.queryByText(warning)).not.toBeInTheDocument())
+      expect(
+        screen.queryByText('Add RLS policies to control which records users can access.')
+      ).not.toBeInTheDocument()
+      await user.click(screen.getByLabelText('Enable RLS on new tables automatically'))
+      expect(screen.getByText(warning)).toBeInTheDocument()
+      await user.click(screen.getByLabelText('Grant API access to new tables automatically'))
+      await waitFor(() => expect(screen.queryByText(warning)).not.toBeInTheDocument())
+      expect(
+        screen.queryByText('Add RLS policies to control which records users can access.')
+      ).not.toBeInTheDocument()
 
       fireEvent.click(screen.getByRole('button', { name: 'Create new project' }))
 

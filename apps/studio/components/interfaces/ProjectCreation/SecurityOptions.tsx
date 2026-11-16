@@ -1,4 +1,5 @@
 import { useParams } from 'common'
+import { AnimatePresence, motion, useReducedMotion } from 'motion/react'
 import { useId } from 'react'
 import { UseFormReturn, useFormState } from 'react-hook-form'
 import {
@@ -29,11 +30,13 @@ interface SecurityOptionsProps {
 export const SecurityOptions = ({ form, layout = 'horizontal', surface }: SecurityOptionsProps) => {
   const { slug } = useParams()
   const apiAccessOptionsId = useId()
+  const reduceMotion = useReducedMotion()
   const dataApi = useWatch({ control: form.control, name: 'dataApi' })
   const dataApiDefaultPrivileges = useWatch({
     control: form.control,
     name: 'dataApiDefaultPrivileges',
   })
+  const enableRlsEventTrigger = useWatch({ control: form.control, name: 'enableRlsEventTrigger' })
   const { dirtyFields } = useFormState({ control: form.control })
   const hasUserModified = !!dirtyFields.dataApiDefaultPrivileges
 
@@ -49,7 +52,8 @@ export const SecurityOptions = ({ form, layout = 'horizontal', surface }: Securi
           orgSlug: slug,
           dataApiDefaultPrivileges: dataApiDefaultPrivileges ?? true,
           hasUserModified,
-        }
+        },
+    false
   )
 
   return (
@@ -76,6 +80,12 @@ export const SecurityOptions = ({ form, layout = 'horizontal', surface }: Securi
                     <FormDescription className="text-foreground-lighter">
                       Query your database through generated{' '}
                       <InlineLink href={`${DOCS_URL}/guides/api`}>API endpoints</InlineLink>.
+                      {!dataApi && (
+                        <span className="block pt-1 text-warning">
+                          Client libraries like supabase-js need the Data API to query your
+                          database.
+                        </span>
+                      )}
                     </FormDescription>
                   </div>
                 </FormItem>
@@ -103,10 +113,31 @@ export const SecurityOptions = ({ form, layout = 'horizontal', surface }: Securi
                       </FormControl>
                       <div className="space-y-1">
                         <FormLabel className="text-sm text-foreground">
-                          Automatically grant API access to new tables
+                          Grant API access to new tables automatically
                         </FormLabel>
                         <FormDescription className="text-foreground-lighter">
-                          Applies to the public schema. Leave off to grant access per table.
+                          Expose new tables in the public schema to the{' '}
+                          <InlineLink href={`${DOCS_URL}/guides/api`}>Data API</InlineLink>.
+                          <AnimatePresence initial={false}>
+                            {field.value && !enableRlsEventTrigger && (
+                              <motion.span
+                                key="rls-warning"
+                                className="block overflow-hidden text-warning"
+                                initial={{ height: 0, opacity: 0 }}
+                                animate={{ height: 'auto', opacity: 1 }}
+                                exit={{ height: 0, opacity: 0 }}
+                                transition={{
+                                  duration: reduceMotion ? 0 : 0.18,
+                                  ease: [0.23, 1, 0.32, 1],
+                                }}
+                              >
+                                <span className="block pt-1">
+                                  Without RLS, anyone may be able to read, change or delete data in
+                                  new tables. Enable RLS below to restrict access.
+                                </span>
+                              </motion.span>
+                            )}
+                          </AnimatePresence>
                         </FormDescription>
                       </div>
                     </FormItem>
@@ -133,11 +164,11 @@ export const SecurityOptions = ({ form, layout = 'horizontal', surface }: Securi
                     Enable RLS on new tables automatically
                   </FormLabel>
                   <FormDescription className="text-foreground-lighter">
-                    Applies to the public schema. Add{' '}
+                    Enable{' '}
                     <InlineLink href={`${DOCS_URL}/guides/database/postgres/row-level-security`}>
-                      RLS policies
+                      Row Level Security
                     </InlineLink>{' '}
-                    to allow access.
+                    on new tables in the public schema.
                   </FormDescription>
                 </div>
               </FormItem>
