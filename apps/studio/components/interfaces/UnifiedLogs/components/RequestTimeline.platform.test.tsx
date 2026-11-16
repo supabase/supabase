@@ -4,7 +4,7 @@ import { screen, waitFor, within } from '@testing-library/react'
 import userEvent from '@testing-library/user-event'
 import type { platformComponents } from 'api-types'
 import { FeatureFlagContext, LOCAL_STORAGE_KEYS } from 'common'
-import { HttpResponse } from 'msw'
+import { http, HttpResponse } from 'msw'
 import { createDynamicRouteParser } from 'next-router-mock/dynamic-routes'
 import { useQueryStates } from 'nuqs'
 import { ResizablePanelGroup } from 'ui'
@@ -22,9 +22,10 @@ import { DataTableProvider } from '@/components/ui/DataTable/providers/DataTable
 import type { User } from '@/data/auth/users-infinite-query'
 import type { UnifiedLogsQueryRow } from '@/data/logs/unified-logs.utils'
 import { miscKeys } from '@/data/misc/keys'
+import { API_URL } from '@/lib/constants'
 import { TimezoneProvider } from '@/lib/datetime'
 import { customRender } from '@/tests/lib/custom-render'
-import { addAPIMock } from '@/tests/lib/msw'
+import { addAPIMock, mswServer } from '@/tests/lib/msw'
 
 type LogsResponse = platformComponents['schemas']['AnalyticsResponse_Output']
 
@@ -129,12 +130,14 @@ function renderPanel(
   {
     scope,
     flag = true,
+    enableTracesWaterfall = true,
     timezone,
     selectedLog,
     onSelectRow,
   }: {
     scope?: UnifiedLogsScope
     flag?: boolean | null
+    enableTracesWaterfall?: boolean
     timezone?: string
     selectedLog?: ColumnSchema
     onSelectRow?: (id: string) => void
@@ -191,7 +194,7 @@ function renderPanel(
   customRender(
     <FeatureFlagContext.Provider
       value={{
-        configcat: flag === null ? {} : { otelUnifiedLogs: flag },
+        configcat: flag === null ? {} : { otelUnifiedLogs: flag, enableTracesWaterfall },
         posthog: {},
         hasLoaded: true,
       }}
@@ -288,6 +291,103 @@ describe('request timeline tab', () => {
     await user.click(screen.getByRole('button', { name: 'Request' }))
     expect(screen.getByText('method')).toBeVisible()
     await waitFor(() => expect(queryClient.isFetching()).toBe(0))
+  })
+
+  it('shows a Waterfall tab once a trace_id resolves, rendering the trace spans', async () => {
+    const user = userEvent.setup()
+    const traceId = 'a'.repeat(32)
+    const rows = timelineRows.map((row) => ({
+      ...row,
+      metadata: { ...row.metadata, trace_id: traceId },
+    }))
+    mswServer.use(
+      http.get(`${API_URL}/v2/projects/:ref/analytics/traces/:traceId`, ({ params }) => {
+        expect(params.traceId).toBe(traceId)
+        return HttpResponse.json({
+          data: [
+            {
+              type: 'span',
+              id: 'span-1',
+              attributes: {
+                parent_span_id: null,
+                service_name: 'postgrest',
+                span_name: 'GET /rest/v1/orders',
+                span_kind: 'server',
+                status_code: 'ok',
+                start_time: '2026-01-01T10:00:00.000Z',
+                duration_ns: 1_500_000,
+              },
+            },
+          ],
+          meta: { partial: true },
+        })
+      })
+    )
+    const { queryClient } = renderPanel(rows)
+
+    await user.click(await screen.findByRole('tab', { name: 'Waterfall' }))
+
+    expect(await screen.findByRole('heading', { name: 'GET /rest/v1/orders' })).toBeVisible()
+    await waitFor(() => expect(queryClient.isFetching()).toBe(0))
+  })
+
+  it('hides the Waterfall tab when enableTracesWaterfall is off, even with a resolvable trace_id', async () => {
+    const traceId = 'a'.repeat(32)
+    const rows = timelineRows.map((row) => ({
+      ...row,
+      metadata: { ...row.metadata, trace_id: traceId },
+    }))
+    const { queryClient } = renderPanel(rows, { enableTracesWaterfall: false })
+
+    await screen.findByRole('tab', { name: 'Timeline' })
+    expect(screen.queryByRole('tab', { name: 'Waterfall' })).not.toBeInTheDocument()
+    await waitFor(() => expect(queryClient.isFetching()).toBe(0))
+  })
+
+  it('jumps to the Waterfall tab from the trace_id row on the Overview tab', async () => {
+    const user = userEvent.setup()
+    const traceId = 'a'.repeat(32)
+    const rows = timelineRows.map((row) => ({
+      ...row,
+      metadata: { ...row.metadata, trace_id: traceId },
+    }))
+    mswServer.use(
+      http.get(`${API_URL}/v2/projects/:ref/analytics/traces/:traceId`, () =>
+        HttpResponse.json({ data: [], meta: { partial: true } })
+      )
+    )
+    renderPanel(rows, { selectedLog: { ...gatewayLog, metadata: { trace_id: traceId } } })
+
+    // Wait for the Waterfall tab to resolve, which is also what gates the dropdown action.
+    await screen.findByRole('tab', { name: 'Waterfall' })
+
+    await user.click(await screen.findByRole('button', { name: 'Details' }))
+    await user.click(await screen.findByRole('button', { name: new RegExp(traceId) }))
+    await user.click(await screen.findByRole('menuitem', { name: 'View waterfall' }))
+
+    expect(screen.getByRole('tab', { name: 'Waterfall' })).toHaveAttribute('aria-selected', 'true')
+  })
+
+  it('offers to switch to Timeline when the waterfall has no spans but logs correlate', async () => {
+    const user = userEvent.setup()
+    const traceId = 'a'.repeat(32)
+    const rows = timelineRows.map((row) => ({
+      ...row,
+      metadata: { ...row.metadata, trace_id: traceId },
+    }))
+    mswServer.use(
+      http.get(`${API_URL}/v2/projects/:ref/analytics/traces/:traceId`, () =>
+        HttpResponse.json({ data: [], meta: { partial: true } })
+      )
+    )
+    renderPanel(rows)
+
+    await user.click(await screen.findByRole('tab', { name: 'Waterfall' }))
+
+    expect(await screen.findByText(/2 correlated logs/)).toBeVisible()
+    await user.click(screen.getByRole('button', { name: 'View in Timeline' }))
+
+    expect(screen.getByRole('tab', { name: 'Timeline' })).toHaveAttribute('aria-selected', 'true')
   })
 
   it('shows an empty state when no related logs share an ID', async () => {

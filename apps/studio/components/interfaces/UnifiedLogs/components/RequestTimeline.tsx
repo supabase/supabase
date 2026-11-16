@@ -4,12 +4,16 @@ import { ClockIcon, RouteIcon } from 'lucide-react'
 import { Skeleton } from 'ui'
 import { EmptyStatePresentational } from 'ui-patterns/EmptyStatePresentational'
 
+import { getRequestCorrelationIds } from '../UnifiedLogs.queries'
 import { ColumnSchema } from '../UnifiedLogs.schema'
 import { getLogTypeSource, getRowTimestampMs } from '../UnifiedLogs.utils'
 import { LogTimeline } from './LogTimeline'
 import { AlertError } from '@/components/ui/AlertError'
 import { DetailSectionHeader } from '@/components/ui/DataTable/DetailSectionHeader'
-import { unifiedLogRequestTimelineQueryOptions } from '@/data/logs/unified-log-request-timeline-query'
+import {
+  unifiedLogRequestTimelineQueryOptions,
+  type UnifiedLogRequestTimelineVariables,
+} from '@/data/logs/unified-log-request-timeline-query'
 import { useFormatDateTime } from '@/lib/datetime'
 
 const COLLAPSED_STEP_COUNT = 3
@@ -18,6 +22,28 @@ interface RequestTimelineProps {
   row: ColumnSchema
   activeLog: ColumnSchema
   onSelectLog: (log: ColumnSchema) => void
+}
+
+export function useRequestTraceId(
+  variables: UnifiedLogRequestTimelineVariables,
+  options: { enabled?: boolean } = {}
+) {
+  const queryOptions = unifiedLogRequestTimelineQueryOptions(variables)
+  const { data } = useQuery({
+    ...queryOptions,
+    enabled: (options.enabled ?? true) && queryOptions.enabled,
+  })
+
+  const traceId = data
+    ? getRequestCorrelationIds(
+        data.logs.map((log) => ({
+          source: getLogTypeSource(log.log_type) ?? '',
+          attributes: log.metadata,
+        }))
+      ).traceIds[0]
+    : undefined
+
+  return { traceId, logCount: data?.logs.length ?? 0 }
 }
 
 export function LogTimestampHeader({ log }: { log: ColumnSchema }) {
@@ -82,20 +108,22 @@ export function RequestTimeline({ row, activeLog, onSelectLog }: RequestTimeline
   const startMs = getRowTimestampMs(data.logs[0]) ?? 0
 
   return (
-    <div className="py-2">
+    <div className="flex h-full min-h-0 flex-col pt-2">
       <DetailSectionHeader
         title="Request started"
         icon={RouteIcon}
         summary={formatDateTime(startMs)}
       />
-      <LogTimeline
-        aria-label="Related logs"
-        logs={data.logs}
-        activeLogId={activeLog.id}
-        onSelectLog={onSelectLog}
-        collapsedStepCount={COLLAPSED_STEP_COUNT}
-        getTimeLabel={(log) => formatOffset((getRowTimestampMs(log) ?? startMs) - startMs)}
-      />
+      <div className="pb-2">
+        <LogTimeline
+          aria-label="Related logs"
+          logs={data.logs}
+          activeLogId={activeLog.id}
+          onSelectLog={onSelectLog}
+          collapsedStepCount={COLLAPSED_STEP_COUNT}
+          getTimeLabel={(log) => formatOffset((getRowTimestampMs(log) ?? startMs) - startMs)}
+        />
+      </div>
     </div>
   )
 }

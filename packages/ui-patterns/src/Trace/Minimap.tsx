@@ -20,6 +20,10 @@ const MIN_LANE = 2
 const BAR_PX = 4
 const GAP_PX = 0.5
 const EDGE_PX = 8
+// A pointer landing exactly on the container's own boundary pixel misses the element
+// entirely, making a flush-to-the-edge brush effectively ungrabbable at full zoom.
+// Shifts only the rendered edges inward; hit-testing math is untouched.
+const EDGE_INSET_PX = 4
 const KEY_STEP = 0.1
 
 interface Drag {
@@ -100,6 +104,8 @@ export function Minimap({ className, ...props }: ComponentProps<'div'>) {
 
   const left = duration > 0 ? ((window[0] - boundsStart) / duration) * 100 : 0
   const right = duration > 0 ? ((boundsEnd - window[1]) / duration) * 100 : 0
+  const leftEdge = `calc(${left}% + ${EDGE_INSET_PX}px)`
+  const rightEdge = `calc(${right}% + ${EDGE_INSET_PX}px)`
 
   return (
     <div
@@ -134,12 +140,12 @@ export function Minimap({ className, ...props }: ComponentProps<'div'>) {
       <div
         aria-hidden
         className="pointer-events-none absolute inset-y-0 left-0 bg-background/60"
-        style={{ width: `${left}%` }}
+        style={{ width: leftEdge }}
       />
       <div
         aria-hidden
         className="pointer-events-none absolute inset-y-0 right-0 bg-background/60"
-        style={{ width: `${right}%` }}
+        style={{ width: rightEdge }}
       />
       <div
         role="slider"
@@ -152,7 +158,7 @@ export function Minimap({ className, ...props }: ComponentProps<'div'>) {
         aria-valuetext={`${formatDuration(window[0] - boundsStart)} to ${formatDuration(window[1] - boundsStart)}`}
         data-trace-brush
         className="absolute inset-y-0 cursor-grab bg-brand/5 outline-none ring-2 ring-inset ring-brand focus-visible:ring-foreground active:cursor-grabbing active:bg-brand/10"
-        style={{ left: `${left}%`, right: `${right}%` }}
+        style={{ left: leftEdge, right: rightEdge }}
         onKeyDown={handleKeyDown}
       >
         <div aria-hidden className="absolute inset-y-0 -left-1 w-2 cursor-ew-resize">

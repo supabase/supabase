@@ -1,3 +1,4 @@
+import { useFlag, useParams } from 'common'
 import { useState } from 'react'
 import {
   ResizableHandle,
@@ -12,7 +13,12 @@ import {
 import { LogDetail } from './components/LogDetail'
 import { LogStepSummary } from './components/LogTimeline'
 import { LogUser } from './components/LogUser'
-import { LogTimestampHeader, RequestTimeline } from './components/RequestTimeline'
+import {
+  LogTimestampHeader,
+  RequestTimeline,
+  useRequestTraceId,
+} from './components/RequestTimeline'
+import { RequestTraceWaterfall } from './components/RequestTraceWaterfall'
 import { LogSelectionActions } from './LogSelectionActions'
 import {
   LogPanelCloseButton,
@@ -21,7 +27,12 @@ import {
 import { getLogDataForMetadataVisibility } from './ServiceFlowPanel.utils'
 import { ColumnSchema } from './UnifiedLogs.schema'
 import { QuerySearchParamsType } from './UnifiedLogs.types'
-import { getEventMessageDisplay, getRawLogData } from './UnifiedLogs.utils'
+import {
+  getEventMessageDisplay,
+  getLogTypeSource,
+  getRawLogData,
+  getRowTimestampMs,
+} from './UnifiedLogs.utils'
 import { JsonCodeBlock } from '@/components/ui/JsonCodeBlock'
 import { ShortcutBadge } from '@/components/ui/ShortcutBadge'
 import { useUnifiedLogsBackend } from '@/data/logs/unified-logs-infinite-query'
@@ -42,9 +53,11 @@ export function ServiceFlowPanel({
   searchParameters,
 }: ServiceFlowPanelProps) {
   const [activeTab, setActiveTab] = useState('overview')
+  const { ref: projectRef } = useParams()
 
   const [openedLog, setOpenedLog] = useState<{ fromId: string; log: ColumnSchema } | null>(null)
   const isRequestTimelineEnabled = useUnifiedLogsBackend(searchParameters)
+  const enableTracesWaterfall = useFlag('enableTracesWaterfall')
   const hasMultiple = selectedRows.length > 1
   const selectedRow = selectedRows[0]
   const activeLog =
@@ -52,10 +65,23 @@ export function ServiceFlowPanel({
   const isProcessLog = selectedRow?.log_type === 'compute' || selectedRow?.log_type === 'pipelines'
   const showTimeline = isRequestTimelineEnabled && !isProcessLog
   const showUser = !isProcessLog
+
+  const { traceId, logCount } = useRequestTraceId(
+    {
+      projectRef,
+      logId: selectedRow?.id,
+      source: selectedRow ? getLogTypeSource(selectedRow.log_type) : undefined,
+      logTimestampMs: selectedRow ? getRowTimestampMs(selectedRow) : null,
+    },
+    { enabled: showTimeline && enableTracesWaterfall }
+  )
+  const showWaterfall = showTimeline && enableTracesWaterfall && !!traceId
+
   const tabs = [
     'overview',
     'raw-json',
     ...(showTimeline ? ['timeline'] : []),
+    ...(showWaterfall ? ['waterfall'] : []),
     ...(showUser ? ['user'] : []),
   ]
   const currentTab = tabs.includes(activeTab) ? activeTab : 'overview'
@@ -115,6 +141,7 @@ export function ServiceFlowPanel({
                 <TabsTrigger value="overview">Overview</TabsTrigger>
                 <TabsTrigger value="raw-json">Raw JSON</TabsTrigger>
                 {showTimeline && <TabsTrigger value="timeline">Timeline</TabsTrigger>}
+                {showWaterfall && <TabsTrigger value="waterfall">Waterfall</TabsTrigger>}
                 {showUser && <TabsTrigger value="user">User</TabsTrigger>}
                 <TabsIndicator />
               </TabsList>
@@ -131,6 +158,13 @@ export function ServiceFlowPanel({
                       onSelectLog={handleSelectTimelineLog}
                     />
                   )}
+                  {tab === 'waterfall' && traceId && (
+                    <RequestTraceWaterfall
+                      traceId={traceId}
+                      logCount={logCount}
+                      onViewTimeline={() => setActiveTab('timeline')}
+                    />
+                  )}
                   {tab === 'user' && activeLog && (
                     <LogUser row={activeLog} searchParameters={searchParameters} />
                   )}
@@ -140,6 +174,7 @@ export function ServiceFlowPanel({
                       tab={tab}
                       searchParameters={searchParameters}
                       overviewHeader={<LogTimestampHeader log={activeLog} />}
+                      onViewWaterfall={showWaterfall ? () => setActiveTab('waterfall') : undefined}
                     />
                   )}
                 </TabsContent>

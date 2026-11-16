@@ -25,11 +25,13 @@ export function LogDetail({
   tab,
   searchParameters,
   overviewHeader,
+  onViewWaterfall,
 }: {
   row: ColumnSchema
   tab: 'overview' | 'raw-json'
   searchParameters: QuerySearchParamsType
   overviewHeader?: ReactNode
+  onViewWaterfall?: () => void
 }) {
   const { ref: projectRef } = useParams()
   const { table, filterFields } = useDataTable<ColumnSchema, unknown>()
@@ -98,6 +100,7 @@ export function LogDetail({
                   addLogsFilter(table, { field: logAttributeFilterId(key), operator, value })
               : undefined
           }
+          onViewWaterfall={onViewWaterfall}
           data={row}
           enrichedData={enrichedData}
           isLoading={isLoading}

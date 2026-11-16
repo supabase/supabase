@@ -12,7 +12,7 @@ import {
   FilterIcon,
   type LucideIcon,
 } from 'lucide-react'
-import { ComponentPropsWithRef, useEffect, useState } from 'react'
+import { ComponentPropsWithRef, ReactNode, useEffect, useState } from 'react'
 import {
   cn,
   copyToClipboard,
@@ -43,6 +43,8 @@ interface DataTableSheetRowActionProps<
   label?: string
   onAddFilter?: (operator: LogsFilterOperator) => void
   filterOperators?: readonly LogsFilterOperator[]
+  /** Extra `DropdownMenuItem`s rendered above the default filter/copy actions. */
+  extraItems?: ReactNode
 }
 
 export const OPERATOR_ICONS: Partial<Record<LogsFilterOperator, LucideIcon>> = {
@@ -108,6 +110,7 @@ export function DataTableSheetRowAction<TData, TFields extends DataTableFilterFi
   label,
   onAddFilter,
   filterOperators = EQUALITY_FILTER_OPERATORS,
+  extraItems,
   onKeyDown,
   ...props
 }: DataTableSheetRowActionProps<TData, TFields>) {
@@ -250,6 +253,12 @@ export function DataTableSheetRowAction<TData, TFields extends DataTableFilterFi
         className="w-56"
         onKeyDown={(event) => event.stopPropagation()}
       >
+        {extraItems && (
+          <>
+            <DropdownMenuGroup>{extraItems}</DropdownMenuGroup>
+            <DropdownMenuSeparator />
+          </>
+        )}
         {!!field && !!column && (
           <>
             {renderOptions()}

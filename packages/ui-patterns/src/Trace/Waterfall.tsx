@@ -95,7 +95,7 @@ export function Ruler({ className, children, ...props }: ComponentProps<'div'>) 
         data-trace-ruler-label
         className="flex w-(--trace-tree-width) shrink-0 select-none items-center justify-between px-3"
       >
-        <span className="text-xs uppercase tracking-wider text-foreground-muted">Span</span>
+        <span className="text-[10px] uppercase tracking-wider text-foreground-muted">Span</span>
         <div data-trace-controls className="flex shrink-0 flex-nowrap items-center gap-0.5">
           {children}
         </div>

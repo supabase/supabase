@@ -9,8 +9,10 @@ import {
   ListIcon,
   ScrollTextIcon,
   ShieldCheckIcon,
+  WaypointsIcon,
   type LucideIcon,
 } from 'lucide-react'
+import { DropdownMenuItem } from 'ui'
 
 import { LogFieldRow } from '../../components/LogFieldRow'
 import { LogFields } from '../../components/LogFields'
@@ -20,6 +22,8 @@ import type { AddAttributeFilter, BlockFieldConfig, ServiceFlowBlockProps } from
 import { groupLogAttributes, type AttributeSectionId } from '../utils/attributeSections'
 import { DetailRow } from './shared/DetailRow'
 import { CollapsibleDetailSection } from '@/components/ui/DataTable/CollapsibleDetailSection'
+
+const TRACE_ID_ATTRIBUTE_KEY = 'trace_id'
 
 const SECTION_ICONS: Record<AttributeSectionId, LucideIcon> = {
   details: FileTextIcon,
@@ -53,6 +57,7 @@ type GenericLogOverviewProps = Pick<ServiceFlowBlockProps, 'filterFields' | 'tab
   data: ColumnSchema
   attributes?: ColumnSchema['metadata']
   onAddAttributeFilter?: AddAttributeFilter
+  onViewWaterfall?: () => void
 }
 
 export function GenericLogOverview({
@@ -61,6 +66,7 @@ export function GenericLogOverview({
   filterFields,
   table,
   onAddAttributeFilter,
+  onViewWaterfall,
 }: GenericLogOverviewProps) {
   const logFields = LOG_FIELDS.map((config) => ({ config, value: config.getValue(data) })).filter(
     ({ value }) => value !== null && value !== undefined && value !== ''
@@ -80,7 +86,11 @@ export function GenericLogOverview({
           />
         ))}
       </CollapsibleDetailSection>
-      <LogAttributes attributes={attributes} onAddFilter={onAddAttributeFilter} />
+      <LogAttributes
+        attributes={attributes}
+        onAddFilter={onAddAttributeFilter}
+        onViewWaterfall={onViewWaterfall}
+      />
     </>
   )
 }
@@ -88,9 +98,11 @@ export function GenericLogOverview({
 export function LogAttributes({
   attributes,
   onAddFilter,
+  onViewWaterfall,
 }: {
   attributes?: ColumnSchema['metadata']
   onAddFilter?: AddAttributeFilter
+  onViewWaterfall?: () => void
 }) {
   return (
     <>
@@ -113,6 +125,14 @@ export function LogAttributes({
                   : undefined
               }
               className="pl-9.5"
+              extraItems={
+                key === TRACE_ID_ATTRIBUTE_KEY && onViewWaterfall ? (
+                  <DropdownMenuItem onClick={onViewWaterfall} className="flex items-center gap-2">
+                    <WaypointsIcon size={12} />
+                    View waterfall
+                  </DropdownMenuItem>
+                ) : undefined
+              }
             >
               <LogFields data={value} />
             </LogFieldRow>
