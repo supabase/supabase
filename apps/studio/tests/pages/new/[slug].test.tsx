@@ -295,6 +295,7 @@ const DEFAULT_FLAGS = {
   projectCreationRestrictedRegions: false,
   freeTierGeneralRegionEnrollment: false,
   freeTierGeneralRegionSelection: false,
+  defaultNotExposedNewTables: false,
 }
 
 async function renderWizard(
@@ -1322,7 +1323,7 @@ describe('project creation wizard', () => {
       const onRequest = vi.fn()
       mockCreateProject(onRequest)
 
-      await renderWizard()
+      await renderWizard({ flags: { defaultNotExposedNewTables: true } })
 
       await fillProjectName('No Data API Project')
       await generateAndWaitForStrongPassword()
@@ -1358,7 +1359,7 @@ describe('project creation wizard', () => {
       const onRequest = vi.fn()
       mockCreateProject(onRequest)
 
-      await renderWizard()
+      await renderWizard({ flags: { defaultNotExposedNewTables: true } })
 
       await fillProjectName('Manual Privileges Project')
       await generateAndWaitForStrongPassword()
@@ -1390,6 +1391,24 @@ describe('project creation wizard', () => {
       const body = onRequest.mock.calls[0][0]
       expect(body.data_api_exposed_schemas).toBeUndefined()
       expect(body.data_api_revoke_default_privileges).toBe(true)
+    })
+
+    test('grants API access to new tables by default when defaultNotExposedNewTables is off', async () => {
+      mockWizardEndpoints()
+      const onRequest = vi.fn()
+      mockCreateProject(onRequest)
+
+      await renderWizard({ flags: { defaultNotExposedNewTables: false } })
+
+      await fillProjectName('Default Grants Project')
+      await generateAndWaitForStrongPassword()
+
+      expect(screen.getByLabelText('Grant API access to new tables automatically')).toBeChecked()
+
+      fireEvent.click(screen.getByRole('button', { name: 'Create new project' }))
+
+      await waitFor(() => expect(onRequest).toHaveBeenCalled())
+      expect(onRequest.mock.calls[0][0].data_api_revoke_default_privileges).toBe(false)
     })
 
     test('enabling automatic RLS sends the event-trigger SQL', async () => {

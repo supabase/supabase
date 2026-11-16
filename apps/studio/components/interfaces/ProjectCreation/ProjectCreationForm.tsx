@@ -210,6 +210,7 @@ export const ProjectCreationForm = ({
   } = useWatch({ control: form.control })
   const { dirtyFields } = useFormState(form)
   const isDbRegionDirty = dirtyFields.dbRegion
+  const isDataApiDefaultPrivilegesDirty = !!dirtyFields.dataApiDefaultPrivileges
   const smartRegionEnabled = cloudProvider !== 'AWS_NIMBUS'
   const highAvailabilityRegionCode = getHighAvailabilityRegionCode()
 
@@ -690,6 +691,11 @@ export const ProjectCreationForm = ({
       setValue('dbRegion', defaultRegion)
     }
   }, [defaultRegion, isDbRegionDirty, setValue])
+
+  useEffect(() => {
+    if (isDataApiDefaultPrivilegesDirty) return
+    resetField('dataApiDefaultPrivileges', { defaultValue: isDataApiRevokeOnCreateDefault })
+  }, [isDataApiDefaultPrivilegesDirty, isDataApiRevokeOnCreateDefault, resetField])
 
   useEffect(() => {
     if (!smartRegionEnabled && regionError && fixedDefaultRegion) {
