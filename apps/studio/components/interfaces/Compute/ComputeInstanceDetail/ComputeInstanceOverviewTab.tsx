@@ -12,7 +12,7 @@ import {
   PageSectionTitle,
 } from 'ui-patterns/PageSection'
 
-import { COMPUTE_REGION_LABEL, LISTENING_PORT } from '../Compute.constants'
+import { COMPUTE_REGION_LABEL } from '../Compute.constants'
 import type { ComputeInstance } from '../Compute.types'
 import { formatSize, getRuntimeMeta } from '../Compute.utils'
 import { ComputeInstanceCommandLine } from '../ComputeInstanceCommandLine'
@@ -179,7 +179,7 @@ export const ComputeInstanceOverviewTab = ({ instance }: ComputeInstanceOverview
             )}
             <SettingsRow label="Listening port">
               <span className="font-mono text-xs text-foreground-light">
-                $PORT → {LISTENING_PORT}
+                $PORT (the platform proxy holds 8080)
               </span>
             </SettingsRow>
           </div>

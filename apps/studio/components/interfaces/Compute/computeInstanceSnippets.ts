@@ -43,7 +43,11 @@ export function buildComputeInstanceSnippets(
     computeInstanceUrl({ endpoint: input.endpoint, protocol: input.protocol, name }) ??
     '[YOUR INSTANCE URL]'
 
+  // config.toml takes the memory-only size ("2gb"); the CLI maps it to the API's "2gb-1vcpu".
+  const cliSize = input.size.split('-')[0]
+
   const cli = [
+    `export SUPABASE_EXPERIMENTAL_COMPUTE=1`,
     `supabase ${CLI_NAME} new ${name} --runtime ${runtime}`,
     `supabase ${CLI_NAME} push ${name} --instances ${input.instances} --exposure ${input.access}`,
   ].join('\n')
@@ -57,29 +61,38 @@ export function buildComputeInstanceSnippets(
   const configBlock = [
     `[${CLI_NAME}.${name}]`,
     `runtime   = "${runtime}"`,
-    `size      = "${input.size}"    # ${formatSize(input.size)}`,
+    `size      = "${cliSize}"    # ${formatSize(input.size)}`,
     `exposure  = "${input.access}"`,
     `instances = ${input.instances}`,
     `# region is locked to ${COMPUTE_REGION} at alpha`,
   ].join('\n')
 
-  const configToml = [`# supabase/config.toml`, ``, configBlock].join('\n')
+  const configToml = [
+    `# supabase/config.toml`,
+    `# Compute is experimental: also set compute = true under [experimental]`,
+    ``,
+    configBlock,
+  ].join('\n')
 
   const runtimeMeta = RUNTIMES[runtime] ?? RUNTIMES.node
   // The entrypoint metadata is "<run command> <filename>" — the filename is the last token.
   const entrypointFile = runtimeMeta.entrypoint.split(' ').pop()
+  const source =
+    runtime === 'dockerfile'
+      ? `a Dockerfile whose app serves plain HTTP on the port in $PORT (not 8080, the platform proxy uses it)`
+      : `a ${runtimeMeta.label} entrypoint (${entrypointFile})`
 
   const aiPrompt = [
     `Scaffold and deploy a Supabase Compute instance named "${name}" using the ${runtimeMeta.label} runtime:`,
     ``,
-    `1. Create a supabase/${CLI_NAME}/${name}/ directory with a ${runtimeMeta.label} entrypoint (${entrypointFile}) that responds with "Hello, world!".`,
+    `1. Create a supabase/${CLI_NAME}/${name}/ directory with ${source} that responds with "Hello, world!".`,
     ``,
-    `2. Add this block to supabase/config.toml:`,
+    `2. Add this block to supabase/config.toml, and set \`compute = true\` under the \`[experimental]\` table (add the table if it is missing) — the CLI hides the compute commands without it:`,
     '```toml',
     configBlock,
     '```',
     ``,
-    `3. Run \`supabase ${CLI_NAME} push ${name} --exposure ${input.access}\` to deploy it.`,
+    `3. Make sure the project is linked (\`supabase link\`), then run \`supabase ${CLI_NAME} push ${name} --exposure ${input.access}\` to deploy it.`,
   ].join('\n')
 
   const keyPlaceholder = input.access === 'public' ? '[YOUR ANON KEY]' : '[YOUR SERVICE ROLE KEY]'
@@ -115,12 +128,15 @@ export interface ComputeInstanceCliCommand {
   command: string
 }
 
+// `supabase compute logs` is deprecated in favour of the unified logs command.
+export const computeLogsCommand = (name: string) =>
+  `supabase logs --remote --service ${CLI_NAME} --resource ${safeName(name)}`
+
 export function buildComputeInstanceCliCommands(name: string): ComputeInstanceCliCommand[] {
   const slug = safeName(name)
   return [
-    { comment: 'Recreate the source locally', command: `supabase ${CLI_NAME} pull ${slug}` },
     { comment: 'Deploy a new version', command: `supabase ${CLI_NAME} push ${slug}` },
-    { comment: 'Stream logs', command: `supabase ${CLI_NAME} logs ${slug} --follow` },
+    { comment: 'View logs', command: computeLogsCommand(slug) },
     { comment: 'Delete the instance', command: `supabase ${CLI_NAME} delete ${slug}` },
   ]
 }

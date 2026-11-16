@@ -6,6 +6,7 @@ import { Button, InputGroup, InputGroupAddon, InputGroupInput } from 'ui'
 import { GenericSkeletonLoader } from 'ui-patterns/ShimmeringLoader'
 
 import { ComputeInstanceCommandLine } from '../ComputeInstanceCommandLine'
+import { computeLogsCommand } from '../computeInstanceSnippets'
 import { ComputeLogsColumnRender } from '@/components/interfaces/Settings/Logs/LogColumnRenderers/ComputeLogsColumnRender'
 import { EXPLORER_DATEPICKER_HELPERS } from '@/components/interfaces/Settings/Logs/Logs.constants'
 import {
@@ -21,7 +22,6 @@ import {
   type ComputeInstanceLogStream,
 } from '@/data/compute/compute-instance-logs-query'
 import { useDebouncedValue } from '@/hooks/misc/useDebouncedValue'
-import { CLI_NAME } from '@/lib/constants/compute'
 
 interface ComputeInstanceLogsTabProps {
   instanceName: string
@@ -121,12 +121,10 @@ export const ComputeInstanceLogsTab = ({ instanceName, stream }: ComputeInstance
               <div className="mx-auto max-w-md space-y-3 py-16 text-center">
                 <p className="text-sm text-foreground">No {label} in the selected time range</p>
                 <p className="text-sm text-foreground-lighter">
-                  Follow them from the Supabase CLI while you wait for traffic.
+                  View them from the Supabase CLI while you wait for traffic.
                 </p>
                 <div className="pt-1 text-left">
-                  <ComputeInstanceCommandLine
-                    command={`supabase ${CLI_NAME} logs ${instanceName} --follow`}
-                  />
+                  <ComputeInstanceCommandLine command={computeLogsCommand(instanceName)} />
                 </div>
               </div>
             }

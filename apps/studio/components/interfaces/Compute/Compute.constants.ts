@@ -71,8 +71,6 @@ export const computeInstanceUrl = ({
   name: string
 }) => (endpoint ? `${protocol}://${endpoint}/compute/v1/${name}` : undefined)
 
-export const LISTENING_PORT = 8080
-
 export interface RuntimeMeta {
   label: string
   baseImage: string
