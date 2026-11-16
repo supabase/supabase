@@ -13,7 +13,8 @@ const page: GoPageInput = {
     title: 'Plan your next stage of growth with Supabase at AWS re:Invent',
     subtitle: 'Build in a weekend, scale to millions',
     description:
-      "Book 1:1 time with our team while we're in Las Vegas.\nWe'll talk through where your build is headed and how to grow it. Bring your roadmap, your open questions, or a problem you're stuck on.\nPick a time below.",
+      "Book 1:1 time with our team while we're in Las Vegas.\nWe'll talk through where your build is headed and how to grow it.\nBring your roadmap, your open questions, or a problem you're stuck on.",
+    ctas: [{ label: 'Book a time', href: '#schedule', variant: 'primary' }],
   },
   sections: [
     {
