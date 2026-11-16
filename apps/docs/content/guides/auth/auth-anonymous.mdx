@@ -10,7 +10,7 @@ Calling `signInAnonymously()` creates an anonymous user. It behaves like a perma
 
 Like permanent users, anonymous users use the `authenticated` Postgres role when they access your project through the Data API. Their JWTs have an `is_anonymous` claim that you can use to tell them apart in RLS policies.
 
-An anonymous user is different from the `anon` API key. The key doesn't create a user, and it gives public access to your database through the `anonymous` Postgres role.
+An anonymous user is different from the `anon` API key. The key doesn't create a user, and it gives public access to your database through the `anon` Postgres role.
 
 Use anonymous sign-ins to build:
 
@@ -20,9 +20,7 @@ Use anonymous sign-ins to build:
 
 <Admonition type="caution">
 
-Review your existing RLS policies before enabling anonymous sign-ins. Anonymous users use the `authenticated` role. To distinguish between anonymous users and permanent users, your policies need to check the `is_anonymous` field of the user's JWT.
-
-See the [Access control section](#access-control) for more details.
+Review your existing RLS policies before enabling anonymous sign-ins. Anonymous users use the `authenticated` role, so any policy written for signed-in users also applies to them. To tell anonymous users apart from permanent users, see [Access control](#access-control).
 
 </Admonition>
 
@@ -405,8 +403,7 @@ To link an anonymous user to an existing account instead of creating a new perma
 const { data: anonData, error: anonError } = await supabase.auth.getSession()
 
 if (!anonData.session?.user?.is_anonymous) {
-  console.log('User is not anonymous. This flow only applies to anonymous users.')
-  return
+  throw new Error('User is not anonymous. This flow only applies to anonymous users.')
 }
 
 // 2. Attempt to update the user with the existing email
