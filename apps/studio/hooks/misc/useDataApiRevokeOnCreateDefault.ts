@@ -66,7 +66,10 @@ type DefaultPrivilegesExposureOptions =
  * the stale pre-sync value. If the user has dirtied the field, fire
  * immediately with their explicit value. Deduplicated via ref.
  */
-export const useTrackDefaultPrivilegesExposure = (options: DefaultPrivilegesExposureOptions) => {
+export const useTrackDefaultPrivilegesExposure = (
+  options: DefaultPrivilegesExposureOptions,
+  expectedDefaultOverride?: boolean
+) => {
   const track = useTrack()
   const flag = usePHFlag<boolean | string>('dataApiRevokeOnCreateDefault')
   const hasTracked = useRef(false)
@@ -79,7 +82,7 @@ export const useTrackDefaultPrivilegesExposure = (options: DefaultPrivilegesExpo
     if (flag === undefined) return
     if (surface === 'vercel' && !orgSlug) return
     // Gate on form-flag convergence unless the user explicitly dirtied the field.
-    const expectedDefault = !isInDataApiRevokeTreatment(flag)
+    const expectedDefault = expectedDefaultOverride ?? !isInDataApiRevokeTreatment(flag)
     if (!hasUserModified && dataApiDefaultPrivileges !== expectedDefault) return
     hasTracked.current = true
     track(
@@ -91,5 +94,13 @@ export const useTrackDefaultPrivilegesExposure = (options: DefaultPrivilegesExpo
       },
       surface === 'vercel' ? { organization: orgSlug } : undefined
     )
-  }, [flag, track, surface, dataApiDefaultPrivileges, hasUserModified, orgSlug])
+  }, [
+    flag,
+    track,
+    surface,
+    dataApiDefaultPrivileges,
+    hasUserModified,
+    orgSlug,
+    expectedDefaultOverride,
+  ])
 }

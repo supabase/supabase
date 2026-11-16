@@ -1316,7 +1316,7 @@ describe('project creation wizard', () => {
     })
   })
 
-  describe('security options', () => {
+  describe('data access options', () => {
     test('disabling the Data API sends an empty exposed-schemas list', async () => {
       mockWizardEndpoints()
       const onRequest = vi.fn()
@@ -1327,8 +1327,22 @@ describe('project creation wizard', () => {
       await fillProjectName('No Data API Project')
       await generateAndWaitForStrongPassword()
 
+      const apiAccess = screen.getByLabelText('Grant API access to new tables automatically')
+      expect(apiAccess).toBeVisible()
+      const apiWarning = 'Database queries with supabase-js will not work. Auth still works.'
+      expect(screen.queryByText(apiWarning)).not.toBeInTheDocument()
       await user.click(screen.getByLabelText('Enable Data API'))
-      await screen.findByText('Client libraries need Data API to query your database')
+      expect(
+        screen.queryByRole('checkbox', { name: 'Grant API access to new tables automatically' })
+      ).not.toBeInTheDocument()
+      expect(screen.getByText(apiWarning)).toBeVisible()
+      expect(screen.getByLabelText('Enable RLS on new tables automatically')).toBeEnabled()
+      await user.click(screen.getByLabelText('Enable Data API'))
+      expect(
+        screen.getByLabelText('Grant API access to new tables automatically')
+      ).not.toBeChecked()
+      expect(screen.queryByText(apiWarning)).not.toBeInTheDocument()
+      await user.click(screen.getByLabelText('Enable Data API'))
 
       fireEvent.click(screen.getByRole('button', { name: 'Create new project' }))
 
@@ -1348,7 +1362,25 @@ describe('project creation wizard', () => {
       await fillProjectName('Manual Privileges Project')
       await generateAndWaitForStrongPassword()
 
-      await user.click(screen.getByLabelText('Automatically expose new tables'))
+      const warning = 'New tables without RLS may allow anyone to read or change data.'
+      expect(
+        screen.getByLabelText('Grant API access to new tables automatically')
+      ).not.toBeChecked()
+      expect(screen.queryByText(warning)).not.toBeInTheDocument()
+      await user.click(screen.getByLabelText('Grant API access to new tables automatically'))
+      await waitFor(() => expect(screen.getByText(warning)).toBeVisible())
+      await user.click(screen.getByLabelText('Enable RLS on new tables automatically'))
+      await waitFor(() => expect(screen.queryByText(warning)).not.toBeInTheDocument())
+      expect(
+        screen.queryByText('Add RLS policies to control which records users can access.')
+      ).not.toBeInTheDocument()
+      await user.click(screen.getByLabelText('Enable RLS on new tables automatically'))
+      expect(screen.getByText(warning)).toBeInTheDocument()
+      await user.click(screen.getByLabelText('Grant API access to new tables automatically'))
+      await waitFor(() => expect(screen.queryByText(warning)).not.toBeInTheDocument())
+      expect(
+        screen.queryByText('Add RLS policies to control which records users can access.')
+      ).not.toBeInTheDocument()
 
       fireEvent.click(screen.getByRole('button', { name: 'Create new project' }))
 
@@ -1368,7 +1400,7 @@ describe('project creation wizard', () => {
       await fillProjectName('Auto RLS Project')
       await generateAndWaitForStrongPassword()
 
-      await user.click(screen.getByLabelText('Enable automatic RLS'))
+      await user.click(screen.getByLabelText('Enable RLS on new tables automatically'))
 
       fireEvent.click(screen.getByRole('button', { name: 'Create new project' }))
 
