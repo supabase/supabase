@@ -84,6 +84,46 @@ describe('alert issues hooks', () => {
     expect(result.current.data?.status).toBe('acknowledged')
   })
 
+  it('keeps the action result in the cached list when a refetch is still stale', async () => {
+    mswServer.use(
+      http.get(BASE, () => HttpResponse.json([ISSUE])),
+      http.post(`${BASE}/:alertIssueId/actions`, () =>
+        HttpResponse.json({ ...ISSUE, status: 'acknowledged', unread: undefined })
+      )
+    )
+
+    const { result } = customRenderHook(() => ({
+      list: useQuery({ ...alertIssuesQueryOptions({ projectRef: REF }), enabled: true }),
+      action: useAlertIssueActionMutation(),
+    }))
+    await waitFor(() => expect(result.current.list.isSuccess).toBe(true))
+
+    result.current.action.mutate({ projectRef: REF, alertIssueId: 'a1', action: 'acknowledge' })
+
+    await waitFor(() => expect(result.current.action.isSuccess).toBe(true))
+    await new Promise((resolve) => setTimeout(resolve, 50))
+    expect(result.current.list.data?.[0]).toMatchObject({ status: 'acknowledged', unread: true })
+  })
+
+  it('marks alert issues read in the cached list', async () => {
+    mswServer.use(
+      http.get(BASE, () => HttpResponse.json([ISSUE])),
+      http.post(`${BASE}/reads`, () => HttpResponse.json({ count: 1 }))
+    )
+
+    const { result } = customRenderHook(() => ({
+      list: useQuery({ ...alertIssuesQueryOptions({ projectRef: REF }), enabled: true }),
+      read: useAlertIssuesReadMutation(),
+    }))
+    await waitFor(() => expect(result.current.list.isSuccess).toBe(true))
+
+    result.current.read.mutate({ projectRef: REF, alertIssueIds: ['a1'], read: true })
+
+    await waitFor(() => expect(result.current.read.isSuccess).toBe(true))
+    await new Promise((resolve) => setTimeout(resolve, 50))
+    expect(result.current.list.data?.[0].unread).toBe(false)
+  })
+
   it('marks alert issues read', async () => {
     let received: unknown
     mswServer.use(

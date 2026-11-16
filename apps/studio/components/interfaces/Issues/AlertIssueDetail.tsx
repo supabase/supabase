@@ -65,7 +65,7 @@ export const AlertIssueDetailView = ({
         <article className="mx-auto flex w-full max-w-3xl flex-col gap-6 px-6 pb-16 pt-12">
           <header className="flex flex-col gap-2">
             <h1 className="text-2xl text-foreground">{issue.title}</h1>
-            <p className="flex flex-wrap items-center gap-2 text-sm text-foreground-light">
+            <div className="flex flex-wrap items-center gap-2 text-sm text-foreground-light">
               <Badge>{ALERT_ISSUE_STATUS_LABELS[issue.status]}</Badge>
               <span className="capitalize">{issue.severity}</span>
               <span aria-hidden className="text-foreground-muted">
@@ -76,7 +76,7 @@ export const AlertIssueDetailView = ({
                 ·
               </span>
               <span>{signalSummary}</span>
-            </p>
+            </div>
           </header>
           {issue.description && (
             <section aria-label="Description" className="text-base text-foreground-light">

@@ -68,6 +68,7 @@ describe('IssuesSidebar', () => {
 
     await user.click(link)
     await waitFor(() => expect(readBody).toEqual({ alert_issue_ids: ['a1'], read: true }))
+    expect(screen.queryByText('No open issues')).not.toBeInTheDocument()
   })
 
   it('searches, preserves filters in links, and clears an empty filtered list', async () => {

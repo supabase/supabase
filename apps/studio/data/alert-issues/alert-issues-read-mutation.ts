@@ -2,7 +2,7 @@ import { useMutation, useQueryClient } from '@tanstack/react-query'
 import { toast } from 'sonner'
 import z from 'zod/v4'
 
-import type { AlertIssuesError } from './alert-issues-query'
+import type { AlertIssuesData, AlertIssuesError } from './alert-issues-query'
 import { alertIssuesKeys } from './keys'
 import { fetchPost } from '@/data/fetchers'
 import { API_URL } from '@/lib/constants'
@@ -44,7 +44,15 @@ export const useAlertIssuesReadMutation = ({
   return useMutation({
     mutationFn: markAlertIssuesRead,
     async onSuccess(data, variables, context) {
-      await queryClient.invalidateQueries({ queryKey: alertIssuesKeys.list(variables.projectRef) })
+      // Reads are written asynchronously, so update the cached list directly.
+      const ids = new Set(variables.alertIssueIds)
+      queryClient.setQueryData<AlertIssuesData>(
+        alertIssuesKeys.list(variables.projectRef),
+        (issues) =>
+          issues?.map((issue) =>
+            ids.has(issue.alert_issue_id) ? { ...issue, unread: !variables.read } : issue
+          )
+      )
       await onSuccess?.(data, variables, context)
     },
     async onError(error, variables, context) {

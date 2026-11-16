@@ -2,7 +2,7 @@ import { useMutation, useQueryClient } from '@tanstack/react-query'
 import { toast } from 'sonner'
 
 import { alertIssueSchema, type AlertIssue } from './alert-issue.schema'
-import type { AlertIssuesError } from './alert-issues-query'
+import type { AlertIssuesData, AlertIssuesError } from './alert-issues-query'
 import { alertIssuesKeys } from './keys'
 import { fetchPost } from '@/data/fetchers'
 import { API_URL } from '@/lib/constants'
@@ -48,7 +48,15 @@ export const useAlertIssueActionMutation = ({
   return useMutation({
     mutationFn: applyAlertIssueAction,
     async onSuccess(data, variables, context) {
-      await queryClient.invalidateQueries({ queryKey: alertIssuesKeys.list(variables.projectRef) })
+      // The new version is written asynchronously, so a refetch right away can still
+      // return the previous one. Use the version the action returned instead.
+      queryClient.setQueryData<AlertIssuesData>(
+        alertIssuesKeys.list(variables.projectRef),
+        (issues) =>
+          issues?.map((issue) =>
+            issue.alert_issue_id === data.alert_issue_id ? { ...data, unread: issue.unread } : issue
+          )
+      )
       await onSuccess?.(data, variables, context)
     },
     async onError(error, variables, context) {

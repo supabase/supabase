@@ -1,3 +1,4 @@
+import { useQuery } from '@tanstack/react-query'
 import { useParams } from 'common'
 import { useRef } from 'react'
 import { Button } from 'ui'
@@ -7,9 +8,11 @@ import { GenericSkeletonLoader } from 'ui-patterns/ShimmeringLoader'
 import { AlertIssuesSection } from './AlertIssuesSection'
 import { IssuesFilterMenu } from './IssuesFilterMenu'
 import { IssuesListItem } from './IssuesListItem'
+import { sortActiveAlertIssues } from '@/components/interfaces/Issues/AlertIssues.utils'
 import { filterIssues } from '@/components/interfaces/Issues/Issues.utils'
 import { useIssueFilters } from '@/components/interfaces/Issues/useIssueFilters'
 import { AlertError } from '@/components/ui/AlertError'
+import { alertIssuesQueryOptions } from '@/data/alert-issues/alert-issues-query'
 import { useProjectIssues } from '@/data/issues/useProjectIssues'
 import { onSearchInputEscape } from '@/lib/keyboard'
 import { SHORTCUT_IDS } from '@/state/shortcuts/registry'
@@ -43,6 +46,9 @@ export const IssuesSidebar = () => {
     search: filters.q,
   })
   const hasFiltersApplied = activeFilterCount > 0 || filters.q.length > 0
+  const { data: alertIssues } = useQuery(alertIssuesQueryOptions({ projectRef: ref }))
+  const hasActiveAlertIssues = sortActiveAlertIssues(alertIssues ?? []).length > 0
+  const shouldShowEmptyState = issues.length === 0 && (hasFiltersApplied || !hasActiveAlertIssues)
 
   return (
     <div className="flex h-full flex-col">
@@ -70,7 +76,7 @@ export const IssuesSidebar = () => {
         <AlertIssuesSection />
         {isLoading && <GenericSkeletonLoader />}
         {isError && <AlertError error={error} subject="Failed to retrieve issues" />}
-        {isSuccess && issues.length === 0 && (
+        {isSuccess && shouldShowEmptyState && (
           <div className="flex flex-col gap-1 px-2 py-2">
             <p className="text-sm text-foreground-light">
               {hasFiltersApplied ? 'No issues match these filters' : 'No open issues'}
