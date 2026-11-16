@@ -61,15 +61,22 @@ vi.mock('@/lib/password-strength', () => ({
 
 vi.mock('@/lib/telemetry/track', () => ({ useTrack: () => vi.fn() }))
 
-// The real usePHFlag returns false outside the platform build, so PostHog flags are driven
-// through this map (set per render via `renderWizard({ posthogFlags })`).
+// The real usePHFlag returns false outside the platform build, so PostHog flags under test are
+// driven through this map (set per render via `renderWizard({ posthogFlags })`). Flags that
+// aren't set fall through to the real hook so other consumers in the wizard keep working.
 const mockPostHogFlags = vi.hoisted(() => ({
   current: {} as Record<string, boolean | string | undefined>,
 }))
-vi.mock(import('@/hooks/ui/useFlag'), async (importOriginal) => ({
-  ...(await importOriginal()),
-  usePHFlag: ((name: string) => mockPostHogFlags.current[name]) as never,
-}))
+vi.mock(import('@/hooks/ui/useFlag'), async (importOriginal) => {
+  const actual = await importOriginal()
+  return {
+    ...actual,
+    usePHFlag: ((name: string) =>
+      name in mockPostHogFlags.current
+        ? mockPostHogFlags.current[name]
+        : (actual.usePHFlag as (flagName: string) => unknown)(name)) as never,
+  }
+})
 
 vi.mock(import('common'), async (importOriginal) => {
   const actual = await importOriginal()
