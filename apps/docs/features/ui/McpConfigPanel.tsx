@@ -5,7 +5,7 @@ import { useIntersectionObserver } from '~/hooks/useIntersectionObserver'
 import { getCustomContent } from '~/lib/custom-content/getCustomContent'
 import { useProjectsInfiniteQuery } from '~/lib/fetch/projects-infinite'
 import { useSendTelemetryEvent } from '~/lib/telemetry'
-import { useIsLoggedIn, useIsUserLoading } from 'common'
+import { useIsLoggedIn, useIsUserLoading, useSearchParamsShallow } from 'common'
 import { Check, ChevronDown } from 'lucide-react'
 import { useTheme } from 'next-themes'
 import Link from 'next/link'
@@ -26,11 +26,14 @@ import {
 import { Admonition } from 'ui-patterns/Admonition'
 import {
   createMcpCopyHandler,
+  MCP_CLIENTS,
   MCP_HOSTED_AUTH_NOTE,
   McpConfigPanel as McpConfigPanelBase,
   type McpClient,
 } from 'ui-patterns/McpUrlBuilder'
 import { ShimmeringLoader } from 'ui-patterns/ShimmeringLoader'
+
+import { AGENT_CLIENT_PARAM } from './AgentPluginsPanel.data'
 
 type PlatformType = (typeof PLATFORMS)[number]['value']
 
@@ -265,10 +268,13 @@ function PlatformSelector({
 export function McpConfigPanel() {
   const [selectedProject, setSelectedProject] = useState<{ ref: string; name: string } | null>(null)
   const [selectedPlatform, setSelectedPlatform] = useState<'hosted' | 'local'>('hosted')
-  const [selectedClient, setSelectedClient] = useState<McpClient | null>(null)
   const { resolvedTheme } = useTheme()
   const sendTelemetryEvent = useSendTelemetryEvent()
   const { mcpServers } = getCustomContent(['mcp:servers'])
+  const searchParams = useSearchParamsShallow()
+  const selectedClient =
+    MCP_CLIENTS.find((client) => client.key === searchParams.get(AGENT_CLIENT_PARAM)) ??
+    MCP_CLIENTS[0]
 
   const isPlatform = selectedPlatform === 'hosted'
   const project = isPlatform ? selectedProject : null
@@ -305,6 +311,8 @@ export function McpConfigPanel() {
     }
   }
 
+  const handleClientSelect = (client: McpClient) => searchParams.set(AGENT_CLIENT_PARAM, client.key)
+
   return (
     <>
       <div className="not-prose">
@@ -323,6 +331,7 @@ export function McpConfigPanel() {
             : 'Project selection is only available for the hosted platform.'}
         </p>
         <McpConfigPanelBase
+          selectedClient={selectedClient}
           className="mt-6"
           projectRef={project?.ref}
           theme={resolvedTheme as 'light' | 'dark'}
@@ -331,7 +340,7 @@ export function McpConfigPanel() {
           nonPlatformUrl={mcpServers?.local}
           onCopyCallback={handleCopy}
           onInstallCallback={handleInstall}
-          onClientSelect={setSelectedClient}
+          onClientSelect={handleClientSelect}
         />
       </div>
       {isPlatform && (

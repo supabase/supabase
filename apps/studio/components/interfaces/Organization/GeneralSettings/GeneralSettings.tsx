@@ -1,6 +1,7 @@
 import {
   PageSection,
   PageSectionContent,
+  PageSectionDescription,
   PageSectionMeta,
   PageSectionSummary,
   PageSectionTitle,
@@ -17,15 +18,14 @@ export const GeneralSettings = () => {
 
   return (
     <>
-      <NoProjectsOnPaidOrgInfo />
-
       <PageSection>
         <PageSectionMeta>
           <PageSectionSummary>
             <PageSectionTitle>Organization details</PageSectionTitle>
           </PageSectionSummary>
         </PageSectionMeta>
-        <PageSectionContent>
+        <PageSectionContent className="flex flex-col gap-y-2">
+          <NoProjectsOnPaidOrgInfo />
           <OrganizationDetailsForm />
         </PageSectionContent>
       </PageSection>
@@ -45,7 +45,10 @@ export const GeneralSettings = () => {
         <PageSection>
           <PageSectionMeta>
             <PageSectionSummary>
-              <PageSectionTitle>Danger zone</PageSectionTitle>
+              <PageSectionTitle>Delete organization</PageSectionTitle>
+              <PageSectionDescription>
+                Permanently remove your organization and its projects.
+              </PageSectionDescription>
             </PageSectionSummary>
           </PageSectionMeta>
           <PageSectionContent>

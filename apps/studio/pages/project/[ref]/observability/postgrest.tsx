@@ -123,8 +123,7 @@ const PostgrestReport = () => {
       <ReportStickyNav
         content={
           <div className="flex flex-col gap-2 w-full">
-            <div className="ml-auto flex items-center gap-2 flex-wrap">
-              <DocsButton href={OBSERVABILITY_DOCS_HREFS.dataApi} topic={REPORT_TITLE} />
+            <div className="w-full flex items-center gap-2 flex-wrap">
               <ShortcutTooltip
                 shortcutId={SHORTCUT_IDS.OBSERVABILITY_REFRESH}
                 label="Refresh report"
@@ -153,7 +152,7 @@ const PostgrestReport = () => {
                 source="postgrestReportDateRange"
               />
               {selectedDateRange && (
-                <div className="flex items-center gap-x-2 text-xs">
+                <div className="order-last flex w-full flex-wrap items-center gap-x-2 text-xs xl:order-none xl:w-auto">
                   <p className="text-foreground-light">
                     {dayjs(selectedDateRange.period_start.date).format('MMM D, h:mma')}
                   </p>
@@ -165,6 +164,11 @@ const PostgrestReport = () => {
                   </p>
                 </div>
               )}
+              <DocsButton
+                href={OBSERVABILITY_DOCS_HREFS.dataApi}
+                topic={REPORT_TITLE}
+                className="ml-auto"
+              />
             </div>
             <ReportFilterBar
               filters={filters}

@@ -4,11 +4,14 @@ import { beforeEach, describe, expect, it, vi } from 'vitest'
 
 import PreferencesPage from '@/pages/account/me'
 
-const { mockIsPlatform, mockUseIsFeatureEnabled, mockUseProfile } = vi.hoisted(() => ({
+const { mockIsPlatform, mockUseIsFeatureEnabled, mockUseProfile, mockRouter } = vi.hoisted(() => ({
   mockIsPlatform: { value: true },
   mockUseIsFeatureEnabled: vi.fn(),
   mockUseProfile: vi.fn(),
+  mockRouter: { asPath: '/account/me', query: {}, replace: vi.fn() },
 }))
+
+vi.mock('next/router', () => ({ useRouter: () => mockRouter }))
 
 vi.mock('@/lib/constants', async () => {
   const actual = await vi.importActual<Record<string, unknown>>('@/lib/constants')
@@ -45,10 +48,6 @@ vi.mock('@/components/interfaces/Account/Preferences/ProfileInformation', () => 
   ProfileInformation: () => <div>ProfileInformation</div>,
 }))
 
-vi.mock('@/components/interfaces/Account/Preferences/AccountIdentities', () => ({
-  AccountIdentities: () => <div>AccountIdentities</div>,
-}))
-
 vi.mock('@/components/interfaces/Account/Preferences/AccountConnections', () => ({
   AccountConnections: () => <div>AccountConnections</div>,
 }))
@@ -83,6 +82,11 @@ vi.mock('@/components/ui/AlertError', () => ({
 
 describe('/account/me', () => {
   beforeEach(() => {
+    mockIsPlatform.value = true
+    mockRouter.asPath = '/account/me'
+    mockRouter.query = {}
+    mockRouter.replace.mockReset()
+    mockRouter.replace.mockResolvedValue(true)
     mockUseIsFeatureEnabled.mockClear()
     mockUseProfile.mockClear()
     mockUseIsFeatureEnabled.mockReturnValue({
@@ -104,7 +108,6 @@ describe('/account/me', () => {
     render(<PreferencesPage dehydratedState={{}} />)
 
     expect(screen.getByText('ProfileInformation')).toBeInTheDocument()
-    expect(screen.getByText('AccountIdentities')).toBeInTheDocument()
     expect(screen.getByText('AccountConnections')).toBeInTheDocument()
     expect(screen.getByText('ThemeSettings')).toBeInTheDocument()
     expect(screen.getByText('TimezoneSettings')).toBeInTheDocument()
@@ -112,6 +115,17 @@ describe('/account/me', () => {
     expect(screen.getByText('DashboardSettings')).toBeInTheDocument()
     expect(screen.getByText('AnalyticsSettings')).toBeInTheDocument()
     expect(screen.getByText('AccountDeletion')).toBeInTheDocument()
+  })
+
+  it.each([
+    '/account/me',
+    '/account/me#dashboard',
+    '/account/me#type=recovery',
+    '/account/me#access_token=test-access&refresh_token=test-refresh&type=email_change',
+  ])('keeps an ordinary Preferences visit at %s', (asPath) => {
+    mockRouter.asPath = asPath
+    render(<PreferencesPage dehydratedState={{}} />)
+    expect(mockRouter.replace).not.toHaveBeenCalled()
   })
 
   it('renders only local preferences on self-hosted', () => {
@@ -124,7 +138,6 @@ describe('/account/me', () => {
     expect(screen.getByText('HotkeySettings')).toBeInTheDocument()
     expect(screen.getByText('DashboardSettings')).toBeInTheDocument()
     expect(screen.queryByText('ProfileInformation')).not.toBeInTheDocument()
-    expect(screen.queryByText('AccountIdentities')).not.toBeInTheDocument()
     expect(screen.queryByText('AccountConnections')).not.toBeInTheDocument()
     expect(screen.queryByText('AnalyticsSettings')).not.toBeInTheDocument()
     expect(screen.queryByText('AccountDeletion')).not.toBeInTheDocument()

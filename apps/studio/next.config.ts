@@ -4,7 +4,6 @@ import bundleAnalyzer from '@next/bundle-analyzer'
 import { withSentryConfig } from '@sentry/nextjs'
 import type { NextConfig } from 'next'
 
-import { getAssetCdnOrigin } from './asset-cdn'
 import { getCSP } from './csp'
 import {
   getMaintenanceRedirects,
@@ -16,13 +15,6 @@ import {
 const withBundleAnalyzer = bundleAnalyzer({
   enabled: process.env.ANALYZE === 'true',
 })
-
-function getAssetPrefix() {
-  const assetCdnOrigin = getAssetCdnOrigin()
-  if (!assetCdnOrigin) return undefined
-
-  return `${assetCdnOrigin}/${process.env.SITE_NAME}/${process.env.VERCEL_GIT_COMMIT_SHA?.substring(0, 12) ?? 'unknown'}`
-}
 
 const isPlatform = process.env.NEXT_PUBLIC_IS_PLATFORM === 'true'
 
@@ -43,7 +35,6 @@ const marketplaceApiProtocol: 'http' | 'https' | null =
 // types to a different major version than studio's own next dependency.
 const nextConfig = {
   basePath: process.env.NEXT_PUBLIC_BASE_PATH,
-  assetPrefix: getAssetPrefix(),
   output: 'standalone',
   experimental: {
     clientRouterFilter: false,

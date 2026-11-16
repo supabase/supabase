@@ -19,8 +19,7 @@ export const TocMenu = ({ items, className }: TocMenuProps) => {
   const [isOpen, setIsOpen] = useState(false)
   const [drawerTop, setDrawerTop] = useState(0)
   const triggerRef = useRef<HTMLButtonElement>(null)
-  const anchors = new Set(Primitive.useActiveAnchors())
-  const activeIndex = items.findIndex((item) => anchors.has(item.url.slice(1)))
+  const activeIndex = Primitive.useTopActiveIndex(items)
   // the topmost visible heading, or the first one before any heading is in view
   const index = Math.max(activeIndex, 0)
 

@@ -10,7 +10,12 @@ export function mdAlternateAt(url: string): { 'text/markdown': string } {
   return { 'text/markdown': url }
 }
 
-export function mdAlternate(slug: string): { 'text/markdown': string } | undefined {
+export function mdUrl(slug: string): string | undefined {
   if (!SLUGS.has(slug)) return undefined
-  return mdAlternateAt(`${PROD_URL}/guides/${slug}.md`)
+  return `${PROD_URL}/guides/${slug}.md`
+}
+
+export function mdAlternate(slug: string): { 'text/markdown': string } | undefined {
+  const url = mdUrl(slug)
+  return url ? mdAlternateAt(url) : undefined
 }

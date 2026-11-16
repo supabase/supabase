@@ -5,6 +5,7 @@ import posthog, {
 } from 'posthog-js'
 
 import { safeSessionStorage } from './safe-storage'
+import { getTelemetryPlatform } from './telemetry-utils'
 
 export type { CapturedNetworkRequest, SessionRecordingOptions }
 
@@ -95,6 +96,13 @@ class PostHogClient {
       capture_pageview: false, // We'll manually track pageviews
       capture_pageleave: false, // We'll manually track page leaves
       ...buildSessionRecordingConfig(sessionReplay),
+      // Not posthog.register(): super properties persist in localStorage shared by every
+      // supabase.com app, so events sent before register() runs carry the last app's value.
+      before_send: (event) => {
+        const platform = getTelemetryPlatform()
+        if (event && platform) event.properties.platform = platform
+        return event
+      },
       loaded: (posthog) => {
         // Apply pending properties that were set before PostHog
         // initialized due to poor connection or user not accepting

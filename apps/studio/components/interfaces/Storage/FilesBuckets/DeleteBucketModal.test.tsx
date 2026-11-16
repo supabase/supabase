@@ -133,7 +133,7 @@ describe(`DeleteBucketModal`, () => {
   })
 
   it(`navigates from the deleted bucket's page to the buckets list`, async () => {
-    routerMock.setCurrentUrl(`/project/default/storage/files/buckets/${bucket.id}?delete=true`)
+    routerMock.setCurrentUrl(`/project/default/storage/files/buckets/${bucket.id}?action=delete`)
     const onClose = vi.fn()
     customRender(<Page onClose={onClose} />)
 

@@ -28,6 +28,7 @@ import { FilterPill } from '@/components/interfaces/QueryPerformance/components/
 import { SIDEBAR_KEYS } from '@/components/layouts/ProjectLayout/LayoutSidebar/LayoutSidebarProvider'
 import { FilterPopover } from '@/components/ui/FilterPopover'
 import { TwoOptionToggle } from '@/components/ui/TwoOptionToggle'
+import { isUserFaultForStatsStatement } from '@/data/database/pg-stat-statements-sqlstate'
 import { unguarded } from '@/data/fetchers'
 import { useExecuteSqlMutation } from '@/data/sql/execute-sql-mutation'
 import { useSelectedProjectQuery } from '@/hooks/misc/useSelectedProject'
@@ -185,6 +186,10 @@ export const QueryInsightsTable = ({
           projectRef: project?.ref,
           connectionString: project?.connectionString,
           sql: wrapWithRollback(safeSql`EXPLAIN ANALYZE ${requestQuery}`),
+          // The query text comes from pg_stat_statements, so the user wrote it
+          sqlOrigin: 'studio',
+          queryName: 'query-insights-explain',
+          isUserFaultSqlState: isUserFaultForStatsStatement,
           grant: unguarded.migrating,
         },
         {

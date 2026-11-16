@@ -29,6 +29,8 @@ export async function dropForeignTable({
   const { result } = await executeSql({
     projectRef,
     connectionString,
+    sqlOrigin: 'studio',
+    queryName: 'fdw-drop-foreign-table',
     sql,
     grant: unguarded.migrating,
   })

@@ -136,6 +136,12 @@
         "title": "supabase gen types",
         "slug": "supabase-gen-types",
         "type": "cli-command"
+      },
+      {
+        "id": "supabase-gen-bearer-jwt",
+        "title": "Generate a Bearer Auth JWT for accessing Data API",
+        "slug": "supabase-gen-bearer-jwt",
+        "type": "cli-command"
       }
     ]
   },
@@ -502,6 +508,18 @@
         "title": "supabase config push",
         "slug": "supabase-config-push",
         "type": "cli-command"
+      },
+      {
+        "id": "supabase-config-pull",
+        "title": "Pull remote config into supabase/config.toml",
+        "slug": "supabase-config-pull",
+        "type": "cli-command"
+      },
+      {
+        "id": "supabase-config-diff",
+        "title": "Diff local config against a remote project",
+        "slug": "supabase-config-diff",
+        "type": "cli-command"
       }
     ]
   },
@@ -801,6 +819,30 @@
   },
   {
     "type": "category",
+    "title": "Encryption",
+    "items": [
+      {
+        "id": "supabase-encryption",
+        "title": "Manage encryption keys",
+        "slug": "supabase-encryption",
+        "type": "cli-command"
+      },
+      {
+        "id": "supabase-encryption-get-root-key",
+        "title": "Get root encryption key",
+        "slug": "supabase-encryption-get-root-key",
+        "type": "cli-command"
+      },
+      {
+        "id": "supabase-encryption-update-root-key",
+        "title": "Update the root encryption key",
+        "slug": "supabase-encryption-update-root-key",
+        "type": "cli-command"
+      }
+    ]
+  },
+  {
+    "type": "category",
     "title": "Network Bans",
     "items": [
       {
@@ -944,6 +986,30 @@
       {
         "id": "supabase-notebooks-push",
         "title": "supabase notebooks push",
+        "slug": "supabase-notebooks-push",
+        "type": "cli-command"
+      }
+    ]
+  },
+  {
+    "type": "category",
+    "title": "Notebooks",
+    "items": [
+      {
+        "id": "supabase-notebooks",
+        "title": "Manage notebooks",
+        "slug": "supabase-notebooks",
+        "type": "cli-command"
+      },
+      {
+        "id": "supabase-notebooks-pull",
+        "title": "Pull notebooks from Supabase",
+        "slug": "supabase-notebooks-pull",
+        "type": "cli-command"
+      },
+      {
+        "id": "supabase-notebooks-push",
+        "title": "Push notebooks to Supabase",
         "slug": "supabase-notebooks-push",
         "type": "cli-command"
       }

@@ -1,4 +1,6 @@
 export const contentKeys = {
+  logsViews: (projectRef: string | undefined) =>
+    ['projects', projectRef, 'content', 'logs-views'] as const,
   allContentLists: (projectRef: string | undefined) => ['projects', projectRef, 'content'] as const,
   infiniteList: (
     projectRef: string | undefined,

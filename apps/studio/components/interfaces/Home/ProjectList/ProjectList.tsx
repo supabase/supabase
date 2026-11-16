@@ -1,4 +1,3 @@
-import { keepPreviousData } from '@tanstack/react-query'
 import { useDebounce } from '@uidotdev/usehooks'
 import { LOCAL_STORAGE_KEYS, useParams } from 'common'
 import { parseAsArrayOf, parseAsString, parseAsStringLiteral, useQueryState } from 'nuqs'
@@ -71,17 +70,12 @@ export const ProjectList = ({ organization: organization_, rewriteHref }: Projec
     isFetchingNextPage,
     hasNextPage,
     fetchNextPage,
-  } = useOrgProjectsInfiniteQuery(
-    {
-      slug,
-      sort,
-      search: search.length === 0 ? search : debouncedSearch,
-      statuses: filterStatus,
-    },
-    {
-      placeholderData: keepPreviousData,
-    }
-  )
+  } = useOrgProjectsInfiniteQuery({
+    slug,
+    sort,
+    search: search.length === 0 ? search : debouncedSearch,
+    statuses: filterStatus,
+  })
   const orgProjects =
     useMemo(() => data?.pages.flatMap((page) => page.projects), [data?.pages]) || []
 
