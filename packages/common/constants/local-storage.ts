@@ -1,5 +1,7 @@
 import { safeLocalStorage } from '../safe-storage'
 
+const ONBOARDING_SURVEY_FOLLOW_UP_PREFIX = 'supabase-onboarding-survey-follow-up-'
+
 export const LOCAL_STORAGE_KEYS = {
   /**
    * STUDIO
@@ -80,7 +82,6 @@ export const LOCAL_STORAGE_KEYS = {
   EXPAND_NAVIGATION_PANEL: 'supabase-expand-navigation-panel',
   GITHUB_AUTHORIZATION_STATE: 'supabase-github-authorization-state',
   // Notice banner keys
-  TERMS_OF_SERVICE_UPDATE: 'terms-of-service-update-v4-dismissed',
   API_KEYS_FEEDBACK_DISMISSED: (ref: string) => `supabase-api-keys-feedback-dismissed-${ref}`,
   SUPAVISOR_MAINTENANCE: (ref: string) => `supavisor-maintenance-2026-06-09-${ref}`,
   REPORT_DATERANGE: 'supabase-report-daterange',
@@ -128,6 +129,9 @@ export const LOCAL_STORAGE_KEYS = {
   SCOPED_TOKENS_MIGRATION_ADMONITION_DISMISSED: 'scoped-tokens-migration-admonition-dismissed',
   STORAGE_PUBLIC_BUCKET_SELECT_POLICY_WARNING_DISMISSED: (ref: string, bucketId: string) =>
     `storage-public-bucket-select-policy-warning-dismissed-${ref}-${bucketId}`,
+  ONBOARDING_SURVEY_FOLLOW_UP: (profileId: string, orgSlug: string) =>
+    `${ONBOARDING_SURVEY_FOLLOW_UP_PREFIX}${profileId}-${orgSlug}`,
+
   /**
    * COMMON
    */
@@ -141,6 +145,7 @@ export const LOCAL_STORAGE_KEYS = {
   SAVED_PROJECT: 'docs.ui.user.selected.project',
   SAVED_BRANCH: 'docs.ui.user.selected.branch',
   IA_NAV_FLAG: 'docs-ia-mvp-v1',
+  DOCS_PAGE_ACTION: 'docs.ui.page-action',
 
   HIDE_PROMO_TOAST: 'supabase-hide-promo-toast-lw15-ticket',
 
@@ -172,6 +177,7 @@ const LOCAL_STORAGE_KEYS_ALLOWLIST = [
   LOCAL_STORAGE_KEYS.LAST_SIGN_IN_METHOD,
   LOCAL_STORAGE_KEYS.HIDE_PROMO_TOAST,
   LOCAL_STORAGE_KEYS.BLOG_VIEW,
+  LOCAL_STORAGE_KEYS.DOCS_PAGE_ACTION,
   LOCAL_STORAGE_KEYS.AI_ASSISTANT_MCP_OPT_IN,
   LOCAL_STORAGE_KEYS.LINTER_SHOW_FOOTER,
   LOCAL_STORAGE_KEYS.SIDEBAR_BEHAVIOR,
@@ -183,7 +189,13 @@ const LOCAL_STORAGE_KEYS_ALLOWLIST = [
 export function clearLocalStorage() {
   for (const key of safeLocalStorage.keys()) {
     const isRecoveryReminder = key.startsWith('account-recovery-reminder:')
-    if (!LOCAL_STORAGE_KEYS_ALLOWLIST.includes(key) && !isRecoveryReminder) {
+    // Per-profile, and holds the new org's type and size until the follow-up saves them
+    const isOnboardingSurveyFollowUp = key.startsWith(ONBOARDING_SURVEY_FOLLOW_UP_PREFIX)
+    if (
+      !LOCAL_STORAGE_KEYS_ALLOWLIST.includes(key) &&
+      !isRecoveryReminder &&
+      !isOnboardingSurveyFollowUp
+    ) {
       safeLocalStorage.removeItem(key)
     }
   }

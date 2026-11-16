@@ -18,6 +18,12 @@ export const TOPICS = [
     visible: true,
   },
   {
+    name: 'Community',
+    description: 'Guides written by the Supabase community.',
+    pinned: false,
+    visible: true,
+  },
+  {
     name: 'Comparison',
     description: 'How Supabase compares to other databases and platforms.',
     pinned: false,
@@ -93,11 +99,12 @@ export const TOPICS = [
 
 export type Topic = (typeof TOPICS)[number]['name']
 
-type ContentCollection = 'guides' | 'troubleshooting' | 'faqs'
+type ContentCollection = 'guides' | 'troubleshooting' | 'faqs' | 'communityGuides'
 
 interface ListedTopicsParams {
   guides: { topics: readonly string[] }[]
   troubleshooting: { topics: readonly string[] }[]
+  communityGuides: { topics: readonly string[] }[]
 }
 
 interface IsInTopicParams {
@@ -112,6 +119,7 @@ export const TOPIC_NAMES = TOPICS.map((topic) => topic.name) as [Topic, ...Topic
 
 export const FORMAT_TOPICS: Topic[] = [
   'Migration',
+  'Community',
   'Comparison',
   'Rundowns',
   'Troubleshooting',
@@ -131,7 +139,7 @@ export const isInTopic = ({ collection, topics, topic }: IsInTopicParams): boole
 }
 
 // visible topics with at least one entry. the nav and the homepage only link to these
-export const getListedTopics = ({ guides, troubleshooting }: ListedTopicsParams) =>
+export const getListedTopics = ({ guides, troubleshooting, communityGuides }: ListedTopicsParams) =>
   TOPICS.filter(
     (topic) =>
       topic.visible &&
@@ -140,6 +148,9 @@ export const getListedTopics = ({ guides, troubleshooting }: ListedTopicsParams)
       ) ||
         troubleshooting.some((entry) =>
           isInTopic({ collection: 'troubleshooting', topics: entry.topics, topic: topic.name })
+        ) ||
+        communityGuides.some((entry) =>
+          isInTopic({ collection: 'communityGuides', topics: entry.topics, topic: topic.name })
         ))
   )
 

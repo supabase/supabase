@@ -23,6 +23,7 @@ import {
 } from 'common/sentry'
 
 import { MIRRORED_BREADCRUMBS } from '@/lib/breadcrumbs'
+import { applyStudioErrorPolicy } from '@/lib/errors/sentry-event-policy'
 import { sanitizeArrayOfObjects, sanitizeUrlHashParams } from '@/lib/sanitize'
 
 type Integration = Parameters<typeof Sentry.addIntegration>[0]
@@ -161,7 +162,7 @@ export function buildSentryClientOptions({
     // Enable performance monitoring
     tracesSampleRate: 0.02,
 
-    // Leave the error `sampleRate` unset (1.0). Error sampling is per tag in `ERROR_ROUTING` and
+    // Leave the error `sampleRate` unset (1.0). Error sampling is per tag and fault in `ERROR_ROUTING` and
     // applied in `beforeSend`; a global rate would multiply with it and also drop `alwaysCapture`.
 
     // Function form so Sentry's default integrations (browserSession,
@@ -196,7 +197,10 @@ export function buildSentryClientOptions({
       MIRRORED_BREADCRUMBS.pushBack(cleanedBreadcrumb)
       return cleanedBreadcrumb
     },
-    beforeSend(event, hint) {
+    beforeSend(rawEvent, hint) {
+      const event = applyStudioErrorPolicy(rawEvent, hint.originalException)
+      if (!event) return null
+
       if (!filterSentryEvent(event, { isPlatform: IS_PLATFORM, hasConsent: hasConsented() })) {
         return null
       }

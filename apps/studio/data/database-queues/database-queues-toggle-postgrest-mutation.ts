@@ -35,6 +35,8 @@ export async function toggleQueuesExposurePostgrest({
   const { result } = await executeSql({
     projectRef,
     connectionString,
+    sqlOrigin: 'studio',
+    queryName: 'toggle-queues-exposure',
     sql,
     queryKey: ['toggle-queues-exposure'],
     grant: unguarded.migrating,

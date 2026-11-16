@@ -35,6 +35,8 @@ export async function createDatabaseIndex({
   const { result } = await executeSql({
     projectRef,
     connectionString,
+    sqlOrigin: 'studio',
+    queryName: 'index-create',
     sql,
     queryKey: ['indexes', schema],
     grant: unguarded.migrating,

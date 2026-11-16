@@ -2,10 +2,33 @@
   "$schema": "./../../node_modules/turbo/schema.json",
   "extends": ["//"],
   "tasks": {
+    // Generates the gitignored __registry__ preview index, and formats the registry sources.
+    "build:registry": {
+      "outputs": ["__registry__/**"],
+    },
+    // Velite only wipes its output in production, so the mode changes what's left behind.
+    "build:content": {
+      "env": ["NODE_ENV"],
+      "outputs": [".velite/**"],
+    },
+    // Watches the MDX content next to `next dev`. Waits for the one-off content build so the
+    // two don't write .velite at the same time.
+    "dev:content": {
+      "dependsOn": ["build:content"],
+      "cache": false,
+      "persistent": true,
+    },
+    "dev": {
+      "dependsOn": ["build:registry", "build:content"],
+      "with": ["dev:content"],
+    },
+    "typecheck": {
+      "dependsOn": ["^typecheck", "build:registry", "build:content"],
+    },
     "build": {
-      "dependsOn": ["^build"],
+      "dependsOn": ["^build", "build:registry", "build:content"],
       "env": ["NODE_ENV", "NEXT_PUBLIC_BASE_PATH", "NEXT_PUBLIC_APP_URL"],
-      "outputs": [".next/**", "!.next/cache/**", "!.next/dev/**/*", ".velite/**"],
+      "outputs": [".next/**", "!.next/cache/**", "!.next/dev/**/*"],
     },
   },
 }

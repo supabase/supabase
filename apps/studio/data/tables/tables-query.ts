@@ -41,7 +41,15 @@ export async function getTables(
   const queryKey = ['tables', schema]
 
   const { result } = await executeSql(
-    { projectRef, connectionString, sql, queryKey, grant: unguarded.migrating },
+    {
+      projectRef,
+      connectionString,
+      sql,
+      sqlOrigin: 'studio',
+      queryName: 'tables',
+      queryKey,
+      grant: unguarded.migrating,
+    },
     signal
   )
   // Sort the data if the sortByName option is true
@@ -140,6 +148,8 @@ export async function getTablesPage(
     {
       projectRef,
       connectionString,
+      sqlOrigin: 'studio',
+      queryName: 'tables-infinite',
       sql,
       queryKey: [
         `project:${projectRef}`,

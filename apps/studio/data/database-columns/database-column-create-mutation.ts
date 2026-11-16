@@ -54,6 +54,8 @@ export async function createDatabaseColumn({
   const { result } = await executeSql({
     projectRef,
     connectionString,
+    sqlOrigin: 'studio',
+    queryName: 'column-create',
     sql,
     queryKey: ['column', 'create'],
     grant: unguarded.migrating,

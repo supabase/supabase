@@ -47,7 +47,7 @@ One such challenge was authentication. Good Tape started off with Auth0. When th
 
 More importantly, since Steinn was the only full-time developer, Good Tape needed a database solution that didn't put the burden of database debugging and support on their small team. At first, they went with a Postgres database on Fly, which was "not a managed solution but gave all the tools to feel like it was managed." But as they scaled, they started noticing limitations with reliability and performance.
 
-The critical moment for Good Tape came when their primary database went down, and in an event caused by internal network issues, one of their read replicas was promoted to be primary, leaving them with two active leaders. That caused the cluster to go into an irreparable state, from which they could not boot up again.
+The critical moment for Good Tape came when their primary database went down, and in an event caused by internal network issues, one of their [read replicas](https://supabase.com/docs/guides/platform/read-replicas) was promoted to be primary, leaving them with two active leaders. That caused the cluster to go into an irreparable state, from which they could not boot up again.
 
 <Quote img="jakob-steinn-goodtape.jpeg" caption="Jakob Steinn - Lead Developer at Good Tape">
   As we wanted more reliability, I have had to learn a lot more about databases. And that's
@@ -74,7 +74,7 @@ Good Tape migrated both their Postgres Fly database and Auth0 workloads to Supab
 
 Prior to Supabase, Steinn had spent three months of his time doing nothing but server infrastructure and incident response. With Supabase, he's been able to be entirely hands-off with the database. Moving to Supabase has had the quantitative effect of adding a full-time engineer to the Good Tape team and also the qualitative effect of freeing Steinn to focus on what he loves: building and improving the product.
 
-That includes initiatives like the Good Tape archive, where users can upload any file they want, including 4k Dolby Atmos videos, Good Tape will use Supabase Edge Functions as the translation layer to serve only the audio stream of the uploaded file, such as FLAC, OPUS or MP3. Another feature that Steinn is excited about is the new search capability built on top of pgvector. Supabase has not only enabled Good Tape to save backend engineering time, but it has also broadened the team's ambitions.
+That includes initiatives like the Good Tape archive, where users can upload any file they want, including 4k Dolby Atmos videos, Good Tape will use [Supabase Edge Functions](https://supabase.com/features/deno-edge-functions) as the translation layer to serve only the audio stream of the uploaded file, such as FLAC, OPUS or MP3. Another feature that Steinn is excited about is the new search capability built on top of [pgvector](/modules/vector). Supabase has not only enabled Good Tape to save backend engineering time, but it has also broadened the team's ambitions.
 
 In terms of costs, Good Tape has seen a remarkable reduction in backend expenses. Before migrating to Supabase's comprehensive backend solution, they were paying nearly $1,500 per month for authentication through Auth0, and their database-related expenses exceeded $2,600 per month with Fly. With the transition to Supabase, they not only lowered their total costs to $1,600, resulting in a 60% reduction in expenses, but they also saved valuable engineering time that allowed them to focus on their core product.
 

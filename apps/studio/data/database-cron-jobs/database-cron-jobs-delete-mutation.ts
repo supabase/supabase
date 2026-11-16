@@ -23,6 +23,8 @@ export async function deleteDatabaseCronJob({
   const { result } = await executeSql({
     projectRef,
     connectionString,
+    sqlOrigin: 'studio',
+    queryName: 'database-cron-jobs-delete',
     sql: safeSql`SELECT cron.unschedule(${literal(jobId)});`,
     queryKey: databaseCronJobsKeys.delete(),
     grant: unguarded.migrating,

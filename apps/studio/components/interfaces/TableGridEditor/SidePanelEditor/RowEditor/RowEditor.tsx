@@ -17,9 +17,13 @@ import {
   generateRowFields,
   generateRowObjectFromFields,
   generateUpdateRowPayload,
+  getPrimaryKeyMatch,
+  getTruncatedFieldNames,
+  mergeLargeValues,
   validateFields,
 } from './RowEditor.utils'
 import { TextEditor } from './TextEditor'
+import { useCopiedLargeValues } from './useCopiedLargeValues'
 import { getStableRowIdentifiers } from '@/components/grid/utils/queueOperationUtils'
 import { useIsQueueOperationsEnabled } from '@/components/interfaces/Account/Preferences/useDashboardSettings'
 import { useForeignKeyConstraintsQuery } from '@/data/database/foreign-key-constraints-query'
@@ -68,6 +72,13 @@ export const RowEditor = ({
   const isEditingJson = selectedValueForJsonEdit !== undefined
 
   const [loading, setLoading] = useState(false)
+
+  // Duplicating a row copies the values the grid truncated by fetching them in full
+  const copiedLargeValues = useCopiedLargeValues({
+    table: selectedTable,
+    onValuesLoaded: (values) =>
+      setRowFields((fields) => mergeLargeValues({ fields, values }).fields),
+  })
   const [createMore, setCreateMore] = useState(false)
   const [keepValues, setKeepValues] = useState(false)
 
@@ -97,19 +108,29 @@ export const RowEditor = ({
   )
 
   useEffect(() => {
-    if (visible) {
-      setErrors({})
-      if (duplicateFrom !== undefined) {
-        setRowFields(
-          generateReusedRowFields({
-            fields: generateRowFields(duplicateFrom, selectedTable, foreignKeys),
-            blankFields: generateRowFields(undefined, selectedTable, foreignKeys),
-          })
-        )
-      } else {
-        setRowFields(generateRowFields(row, selectedTable, foreignKeys))
-      }
+    if (!visible) {
+      copiedLargeValues.reset()
+      return
     }
+
+    setErrors({})
+    if (duplicateFrom === undefined) {
+      copiedLargeValues.reset()
+      setRowFields(generateRowFields(row, selectedTable, foreignKeys))
+      return
+    }
+
+    const sourceFields = generateRowFields(duplicateFrom, selectedTable, foreignKeys)
+    setRowFields(
+      generateReusedRowFields({
+        fields: sourceFields,
+        blankFields: generateRowFields(undefined, selectedTable, foreignKeys),
+      })
+    )
+    copiedLargeValues.load({
+      columns: getTruncatedFieldNames(sourceFields),
+      pkMatch: getPrimaryKeyMatch({ row: duplicateFrom, table: selectedTable }),
+    })
   }, [visible])
 
   const onUpdateField = (changes: Dictionary<any>) => {
@@ -141,6 +162,8 @@ export const RowEditor = ({
 
   const onSaveChanges = (e: React.FormEvent<HTMLFormElement>) => {
     e.preventDefault()
+    // Saving before the full values arrive would save blanks where values were expected
+    if (copiedLargeValues.isLoading) return
 
     const errors = validateFields(rowFields)
     setErrors(errors)
@@ -208,6 +231,7 @@ export const RowEditor = ({
           applyButtonLabel={applyChangesLabel}
           closePanel={closePanel}
           hideApply={!editable}
+          disableApply={copiedLargeValues.isLoading}
           visible={visible}
         >
           {isNewRecord && editable && (
@@ -243,7 +267,10 @@ export const RowEditor = ({
                         onEditJson={setSelectedValueForJsonEdit}
                         onEditText={setSelectedValueForTextEdit}
                         onSelectForeignKey={() => onOpenForeignRowSelector(field)}
-                        isEditable={editable}
+                        status={copiedLargeValues.statuses[field.name]}
+                        isEditable={
+                          editable && copiedLargeValues.statuses[field.name] !== 'loading'
+                        }
                         isNewRow={isNewRecord || '__tempId' in row}
                       />
                     )
@@ -272,7 +299,10 @@ export const RowEditor = ({
                           onEditText={setSelectedValueForTextEdit}
                           onEditJson={setSelectedValueForJsonEdit}
                           onSelectForeignKey={() => onOpenForeignRowSelector(field)}
-                          isEditable={editable}
+                          status={copiedLargeValues.statuses[field.name]}
+                          isEditable={
+                            editable && copiedLargeValues.statuses[field.name] !== 'loading'
+                          }
                           isNewRow={isNewRecord || '__tempId' in row}
                         />
                       )

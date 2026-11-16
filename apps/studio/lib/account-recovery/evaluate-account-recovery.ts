@@ -1,3 +1,5 @@
+import { isSingleOAuthIdentity } from './single-oauth-identity'
+
 export type AccountRecoveryFinding = {
   id:
     | 'recovery-codes-missing'
@@ -19,7 +21,6 @@ export type AccountRecoveryInput = {
     | { status: 'missing' }
     | { status: 'available'; remaining: number }
   features: {
-    hasSecuritySettings: boolean
     recoveryCodesEnabled: boolean
     passwordEnabled: boolean
   }
@@ -38,7 +39,7 @@ export const evaluateAccountRecovery = ({
   const hasOneFactor = verifiedFactorCount === 1
   let hasCodeFinding = false
 
-  if (features.hasSecuritySettings && features.recoveryCodesEnabled && verifiedFactorCount > 0) {
+  if (features.recoveryCodesEnabled && verifiedFactorCount > 0) {
     if (recoveryCodes.status === 'missing') {
       findings.push({
         id: 'recovery-codes-missing',
@@ -68,16 +69,11 @@ export const evaluateAccountRecovery = ({
   }
 
   const isCodeStatusUnknown = features.recoveryCodesEnabled && recoveryCodes.status === 'unknown'
-  if (features.hasSecuritySettings && hasOneFactor && !hasCodeFinding && !isCodeStatusUnknown) {
+  if (hasOneFactor && !hasCodeFinding && !isCodeStatusUnknown) {
     findings.push({ id: 'single-mfa-factor', severity: 'info', action: 'add-factor' })
   }
 
-  const hasOneOAuthIdentity =
-    identities.length === 1 &&
-    identities[0].provider !== 'email' &&
-    identities[0].provider !== 'phone' &&
-    !identities[0].provider.startsWith('sso')
-  if (features.passwordEnabled && email && hasOneOAuthIdentity) {
+  if (features.passwordEnabled && isSingleOAuthIdentity({ identities, email })) {
     findings.push({ id: 'single-oauth-identity', severity: 'warning', action: 'set-password' })
   }
 
