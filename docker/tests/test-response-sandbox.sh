@@ -149,16 +149,17 @@ chmod 755 "$fn_dir"
 chmod 644 "$fn_dir/index.ts"
 
 echo "--- Functions ---"
-check "GET HTML" "200" "$(fetch GET "$fn_url?type=text/html")"
+# Authenticated, so the checks also work when FUNCTIONS_VERIFY_JWT is true
+check "GET HTML" "200" "$(fetch GET "$fn_url?type=text/html" -H "Authorization: Bearer $ANON_KEY")"
 expect_sandboxed "GET HTML" "text/html"
 # Media types are case-insensitive for browsers
-check "GET Text/HTML" "200" "$(fetch GET "$fn_url?type=Text/HTML")"
+check "GET Text/HTML" "200" "$(fetch GET "$fn_url?type=Text/HTML" -H "Authorization: Bearer $ANON_KEY")"
 expect_sandboxed "GET Text/HTML" "text/html"
-check "GET SVG" "200" "$(fetch GET "$fn_url?type=image/svg%2Bxml")"
+check "GET SVG" "200" "$(fetch GET "$fn_url?type=image/svg%2Bxml" -H "Authorization: Bearer $ANON_KEY")"
 expect_sandboxed "GET SVG" "image/svg+xml"
-check "GET JSON" "200" "$(fetch GET "$fn_url?type=application/json")"
+check "GET JSON" "200" "$(fetch GET "$fn_url?type=application/json" -H "Authorization: Bearer $ANON_KEY")"
 expect_sandboxed "GET JSON" "application/json"
-check "POST HTML" "200" "$(fetch POST "$fn_url?type=text/html" -d x)"
+check "POST HTML" "200" "$(fetch POST "$fn_url?type=text/html" -H "Authorization: Bearer $ANON_KEY" -d x)"
 check "POST HTML: Content-Type is kept" "text/html" "$(media_type)"
 check "POST HTML: no CSP (not GET)" "" "$(header content-security-policy)"
 
