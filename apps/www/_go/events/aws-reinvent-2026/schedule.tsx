@@ -10,10 +10,10 @@ const page: GoPageInput = {
       'Book time with the Supabase team onsite at AWS re:Invent 2026. Talk architecture, migrations, and production Postgres with our engineers.',
   },
   hero: {
-    title: 'Meet with the Supabase team\nat AWS re:Invent',
+    title: 'Plan your next stage of growth with Supabase at AWS re:Invent',
     subtitle: 'Build in a weekend, scale to millions',
     description:
-      'Want to connect with the Supabase team?\nBook 1:1 time to meet our team using the scheduler below.',
+      "Book 1:1 time with our team while we're in Las Vegas. We'll talk through where your build is headed and how to grow it. Bring your roadmap, your open questions, or a problem you're stuck on.\nPick a time below.",
   },
   sections: [
     {
