@@ -1,4 +1,5 @@
 import type { GoPageInput } from 'marketing'
+import Script from 'next/script'
 
 const page: GoPageInput = {
   template: 'lead-gen',
@@ -16,11 +17,22 @@ const page: GoPageInput = {
   },
   sections: [
     {
-      type: 'hubspot-meeting',
+      type: 'single-column',
       id: 'schedule',
       title: 'Schedule a meeting',
       description: 'Choose a time that works for you. We will confirm by email.',
-      meetingSlug: 'wendie-cheung/aws-reinvent-2026',
+      children: (
+        <>
+          <div
+            className="meetings-iframe-container"
+            data-src="https://meetings.hubspot.com/wendie-cheung/aws-reinvent-2026?embed=true"
+          />
+          <Script
+            src="https://static.hsappstatic.net/MeetingsEmbed/ex/MeetingsEmbedCode.js"
+            strategy="afterInteractive"
+          />
+        </>
+      ),
     },
     {
       type: 'three-column',
