@@ -47,7 +47,8 @@ function isRequestedHost(origin: URL, headers: Headers): boolean {
   if (!forwardedHost) return host === origin.host
 
   // Kong rewrites Host to its upstream and leaves the port out of
-  // X-Forwarded-Host, so only the hostname can be compared there
+  // X-Forwarded-Host, so only the hostname can be compared there, and another
+  // port on the same hostname passes
   if (hostnameOf(host) !== hostnameOf(forwardedHost)) {
     return hostnameOf(forwardedHost) === origin.hostname
   }
