@@ -44,8 +44,8 @@ interface LogsViewsMenuProps {
 }
 
 // Plain icon triggers (not the full `Button` component, which has a fixed tiny
-// height) so these rows stay the same height as a text-only item like "Clear all
-// views" — `Button size="tiny"` would make every row taller than that.
+// height) so these rows stay the same height as a text-only item like "Clear
+// current view" — `Button size="tiny"` would make every row taller than that.
 const RowIconAction = ({
   icon,
   label,
@@ -273,7 +273,7 @@ export const LogsViewsMenu = ({
               <DropdownMenuSeparator />
               <DropdownMenuItem onSelect={onClearActiveView}>
                 <XIcon size={14} className="mr-2" />
-                Clear view
+                Clear current view
               </DropdownMenuItem>
             </>
           )}

@@ -153,13 +153,13 @@ describe('LogsViewsMenu', () => {
     expect(onDelete).toHaveBeenCalledWith('view-1')
   })
 
-  it('only shows "Clear all views" when a view is active', async () => {
+  it('only shows "Clear current view" when a view is active', async () => {
     customRender(<LogsViewsMenu {...baseProps} activeViewId={null} />)
     await openMenu()
-    expect(screen.queryByText('Clear all views')).not.toBeInTheDocument()
+    expect(screen.queryByText('Clear current view')).not.toBeInTheDocument()
   })
 
-  it('calls onClearActiveView when "Clear all views" is clicked', async () => {
+  it('calls onClearActiveView when "Clear current view" is clicked', async () => {
     const onClearActiveView = vi.fn()
     const view = makeView()
     customRender(
@@ -172,7 +172,7 @@ describe('LogsViewsMenu', () => {
     )
 
     await openMenu()
-    await userEvent.click(await screen.findByText('Clear all views'))
+    await userEvent.click(await screen.findByText('Clear current view'))
 
     expect(onClearActiveView).toHaveBeenCalledOnce()
   })
