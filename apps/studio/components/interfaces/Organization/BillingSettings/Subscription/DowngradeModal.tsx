@@ -104,8 +104,8 @@ export const DowngradeModal = ({
         </DialogHeader>
         <DialogSectionSeparator />
         <div className="px-5 py-4 text-foreground-light">
-          <div className="flex flex-col space-y-2">
-            {((previousProjectAddons.length ?? 0) > 0 || hasInstancesOnMicro) && (
+          {((previousProjectAddons.length ?? 0) > 0 || hasInstancesOnMicro) && (
+            <div className="flex flex-col space-y-2">
               <Admonition type="warning" title="Projects affected by the downgrade">
                 <ul className="!my-0 space-y-1 max-h-[100px] overflow-y-auto">
                   {previousProjectAddons.map((project) => (
@@ -125,19 +125,19 @@ export const DowngradeModal = ({
                     ))}
                 </ul>
               </Admonition>
-            )}
-          </div>
+            </div>
+          )}
 
           {hasPostCutoffProjects && (
             <Admonition
               type="warning"
-              className="mt-2"
+              className="mt-2 mb-4"
               title="Any custom email templates will be reset"
               description="Downgrading will reset your custom email templates to their defaults. You won’t be able to edit them unless you set up custom SMTP after downgrading."
             />
           )}
 
-          <ul className="mt-4 space-y-2 text-sm">
+          <ul className="flex flex-col gap-y-2 text-sm">
             <li className="flex items-center gap-3">
               <PauseCircleIcon size={18} />
               <span>Projects will be paused after a week of inactivity</span>

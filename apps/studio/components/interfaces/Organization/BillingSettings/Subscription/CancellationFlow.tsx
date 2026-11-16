@@ -3,7 +3,7 @@ import { ComponentProps, useEffect, useMemo, useState } from 'react'
 
 import { DowngradeModal } from './DowngradeModal'
 import { ExitSurveyModal } from './ExitSurveyModal'
-import MembersExceedLimitModal from './MembersExceedLimitModal'
+import { MembersExceedLimitModal } from './MembersExceedLimitModal'
 import { ButtonTooltip } from '@/components/ui/ButtonTooltip'
 import { useFreeProjectLimitCheckQuery } from '@/data/organizations/free-project-limit-check-query'
 import { useOrgProjectsInfiniteQuery } from '@/data/projects/org-projects-infinite-query'

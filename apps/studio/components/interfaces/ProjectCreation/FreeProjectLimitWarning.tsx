@@ -1,12 +1,11 @@
 import { useParams } from 'common'
 import { Admonition } from 'ui-patterns/Admonition'
 
-import { AffectedOrganizationsList } from '@/components/ui/AffectedOrganizationsList'
+import { ExceedFreeProjectLimitMembers } from '@/components/ui/ExceedFreeProjectLimitMembers'
 import { FreeProjectLimitActions } from '@/components/ui/FreeProjectLimitActions'
 import Panel from '@/components/ui/Panel'
 import { UpgradePlanButton } from '@/components/ui/UpgradePlanButton'
 import type { MemberWithFreeProjectLimit } from '@/data/organizations/free-project-limit-check-query'
-import { groupByOrganization } from '@/data/organizations/free-project-limit-check.utils'
 import { useOrganizationMembersQuery } from '@/data/organizations/organization-members-query'
 
 interface FreeProjectLimitWarningProps {
@@ -17,20 +16,21 @@ export const FreeProjectLimitWarning = ({ membersExceededLimit }: FreeProjectLim
   const { slug } = useParams()
   const { data: orgMembers } = useOrganizationMembersQuery({ slug })
   const hasMultipleMembers = (orgMembers ?? []).filter((member) => !member.invited_id).length > 1
-  const organizations = groupByOrganization(membersExceededLimit)
 
   return (
     <Panel.Content>
       <Admonition
         type="default"
-        title="Exceeding number of active Free Projects"
+        title="Unable to create project under Free Plan organization"
         description={
           <div className="space-y-3">
             <p className="text-sm leading-normal">
               Owners and administrators are limited in how many active Free Plan projects they can
-              have across all organizations. These members are over the limit:
+              have across all organizations.
             </p>
-            <AffectedOrganizationsList organizations={organizations} />
+
+            <ExceedFreeProjectLimitMembers membersExceededLimit={membersExceededLimit} />
+
             <FreeProjectLimitActions
               goal="create a free project in this organization"
               hasMultipleMembers={hasMultipleMembers}

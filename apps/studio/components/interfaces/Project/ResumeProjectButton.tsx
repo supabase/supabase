@@ -23,11 +23,10 @@ import { z } from 'zod'
 
 import { PostgresVersionSelector } from '@/components/interfaces/ProjectCreation/PostgresVersionSelector'
 import { extractPostgresVersionDetails } from '@/components/interfaces/ProjectCreation/ProjectCreation.utils'
-import { AffectedOrganizationsList } from '@/components/ui/AffectedOrganizationsList'
 import { ButtonTooltip } from '@/components/ui/ButtonTooltip'
+import { ExceedFreeProjectLimitMembers } from '@/components/ui/ExceedFreeProjectLimitMembers'
 import { FreeProjectLimitActions } from '@/components/ui/FreeProjectLimitActions'
 import { useFreeProjectLimitCheckQuery } from '@/data/organizations/free-project-limit-check-query'
-import { groupByOrganization } from '@/data/organizations/free-project-limit-check.utils'
 import { useOrganizationMembersQuery } from '@/data/organizations/organization-members-query'
 import { useSetProjectStatus } from '@/data/projects/project-detail-query'
 import { useProjectPauseStatusQuery } from '@/data/projects/project-pause-status-query'
@@ -88,7 +87,6 @@ export const ResumeProjectButton = ({
     { enabled: showFreeProjectLimitWarning }
   )
   const hasMultipleMembers = (orgMembers ?? []).filter((member) => !member.invited_id).length > 1
-  const affectedOrganizations = groupByOrganization(membersExceededLimit ?? [])
   const [billingBlockReason, setBillingBlockReason] = useState<string>()
 
   const { can: canResumeProject } = useAsyncCheckPermissionsV2(FGA_PERMISSIONS.PROJECT.ADMIN_WRITE)
@@ -242,16 +240,14 @@ export const ResumeProjectButton = ({
       >
         <DialogContent size="medium" className="gap-0 pb-0" aria-describedby={undefined}>
           <DialogHeader className="border-b">
-            <DialogTitle className="leading-normal">
-              Exceeding number of active Free Projects
-            </DialogTitle>
+            <DialogTitle className="leading-normal">Unable to resume project</DialogTitle>
           </DialogHeader>
           <DialogSection className="flex flex-col gap-y-2 text-sm">
             <p className="text-foreground-light">
               Owners and administrators are limited in how many active Free Plan projects they can
-              have across all organizations. These members are over the limit:
+              have across all organizations.
             </p>
-            <AffectedOrganizationsList organizations={affectedOrganizations} />
+            <ExceedFreeProjectLimitMembers membersExceededLimit={membersExceededLimit ?? []} />
             <FreeProjectLimitActions
               goal="resume this project"
               hasMultipleMembers={hasMultipleMembers}

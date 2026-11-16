@@ -15,13 +15,13 @@ export const FreeProjectLimitActions = ({
     <>
       <p className="text-sm text-foreground-light">{`To ${goal}, you can:`}</p>
       <ol className="pl-5 text-sm list-decimal text-foreground-light space-y-1">
-        <li>Upgrade one of the affected organizations to a paid plan.</li>
-        <li>Delete or pause any of the active Free Plan projects.</li>
+        <li>Upgrade any of the affected organizations listed above to a paid plan.</li>
+        <li>Delete or pause any of the active Free Plan projects listed above.</li>
         <li>
           <InlineLink href={`${DOCS_URL}/guides/platform/project-transfer`}>
             Transfer a project
           </InlineLink>{' '}
-          to a Free Plan organization and{' '}
+          under this organization to a Free Plan organization and{' '}
           <InlineLink href={`${DOCS_URL}/guides/platform/free-project-pausing`}>
             pause it
           </InlineLink>
