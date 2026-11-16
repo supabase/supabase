@@ -1,4 +1,6 @@
-import { PlayIcon } from 'lucide-react'
+import { CircleCheckIcon, Loader2Icon, PlayIcon } from 'lucide-react'
+import type { ComponentProps, ReactNode } from 'react'
+import { cn } from 'ui'
 
 import { type SqlSnippetSource } from '../../SQLEditor/querySource'
 import { type QueryResult } from '../types'
@@ -9,6 +11,8 @@ import { type ChartConfig } from '@/data/content/notebooks/notebook-schema'
 
 interface QueryResultRendererProps {
   result?: QueryResult
+  /** While a run is in flight the results region shows a loading state instead of the previous result. */
+  isExecuting?: boolean
   view?: 'table' | 'chart'
   chart?: ChartConfig
   /** The query that produced `result`, used to build the "Debug with Assistant" prompt on error. */
@@ -17,8 +21,30 @@ interface QueryResultRendererProps {
   onDebug?: (prompt: string) => void
 }
 
+interface QueryResultStateProps extends ComponentProps<'div'> {
+  icon: ReactNode
+  children: ReactNode
+}
+
+/** Centered icon-over-label state for the results region (idle, loading, empty). */
+const QueryResultState = ({ icon, children, className, ...props }: QueryResultStateProps) => (
+  <div
+    className={cn(
+      'flex min-h-32 w-full flex-1 flex-col items-center justify-center gap-y-2 p-6 text-center',
+      className
+    )}
+    {...props}
+  >
+    <span className="text-foreground-muted" aria-hidden>
+      {icon}
+    </span>
+    <p className="text-sm text-foreground-light">{children}</p>
+  </div>
+)
+
 export const QueryResultRenderer = ({
   result,
+  isExecuting = false,
   view,
   chart,
   sql,
@@ -27,12 +53,22 @@ export const QueryResultRenderer = ({
 }: QueryResultRendererProps) => {
   const { rows, error, autoLimit } = result ?? {}
 
+  if (isExecuting) {
+    return (
+      <QueryResultState
+        role="status"
+        icon={<Loader2Icon size={20} strokeWidth={1.5} className="animate-spin" />}
+      >
+        Running query…
+      </QueryResultState>
+    )
+  }
+
   if (!result) {
     return (
-      <div className="flex items-center gap-x-2 p-3 w-full">
-        <PlayIcon size={12} className="text-foreground-lighter" />
-        <p className="text-xs text-foreground-lighter">Run the query to see results</p>
-      </div>
+      <QueryResultState icon={<PlayIcon size={20} strokeWidth={1.5} />}>
+        Run the query to see results
+      </QueryResultState>
     )
   }
 
@@ -49,7 +85,11 @@ export const QueryResultRenderer = ({
   }
 
   if ((rows ?? []).length === 0) {
-    return <p className="text-xs text-foreground-lighter p-3">Success. No rows returned</p>
+    return (
+      <QueryResultState icon={<CircleCheckIcon size={20} strokeWidth={1.5} />}>
+        Success. No rows returned
+      </QueryResultState>
+    )
   }
 
   if (rows && rows.length > 0) {

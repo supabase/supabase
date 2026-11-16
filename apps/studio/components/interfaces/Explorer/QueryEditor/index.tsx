@@ -446,6 +446,7 @@ export const QueryEditor = forwardRef<QueryEditorHandle, QueryEditorProps>(funct
       <QueryResultRenderer
         view={view}
         result={result}
+        isExecuting={isExecuting}
         chart={display?.chart}
         sql={result?.sql}
         source={result?.source}
