@@ -7,6 +7,12 @@ import { z } from 'zod'
 import { toWebHandler } from '@/compat/next/api'
 import { apiWrapper } from '@/lib/api/apiWrapper'
 import {
+  deleteNotebook,
+  isNotebookPayload,
+  listNotebooks,
+  saveNotebook,
+} from '@/lib/api/self-hosted/notebooks'
+import {
   deleteSnippet,
   getSnippets,
   saveSnippet,
@@ -37,6 +43,7 @@ type GetResponseData =
   paths['/platform/projects/{ref}/content']['get']['responses']['200']['content']['application/json']
 
 const getRequestParamsSchema = z.object({
+  type: z.string().optional(),
   visibility: z.enum(['project', 'user']).optional(),
   name: z.string().optional(),
   limit: z
@@ -57,6 +64,16 @@ const handleGetAll = async (req: NextApiRequest, res: NextApiResponse<GetRespons
   }
 
   const params = result.data
+
+  if (params.type === 'notebook') {
+    try {
+      const notebooks = await listNotebooks({ name: params.name, limit: params.limit })
+      return res.status(200).json({ data: notebooks })
+    } catch (error) {
+      console.error('Error fetching notebooks:', error)
+      return res.status(500).json({ data: [] })
+    }
+  }
 
   // Platform specific endpoint
   if (params.visibility === 'project') {
@@ -80,6 +97,15 @@ const handleGetAll = async (req: NextApiRequest, res: NextApiResponse<GetRespons
 }
 
 const handlePut = async (req: NextApiRequest, res: NextApiResponse) => {
+  if (isNotebookPayload(req.body)) {
+    try {
+      return res.status(200).json(await saveNotebook(req.body))
+    } catch (error) {
+      console.error('Error saving notebook:', error)
+      return res.status(400).json({ error: 'Invalid notebook' })
+    }
+  }
+
   try {
     const updates = req.body
     const updatedSnippet = await updateSnippet(updates.id, updates)
@@ -123,7 +149,7 @@ const handleDelete = async (req: NextApiRequest, res: NextApiResponse) => {
 
   try {
     for (const id of snippetIds) {
-      await deleteSnippet(id)
+      if (!(await deleteNotebook(id))) await deleteSnippet(id)
     }
     res.setHeader('Content-Type', 'application/json')
     return res.status(200).send(snippetIds.map((id) => ({ id })))
