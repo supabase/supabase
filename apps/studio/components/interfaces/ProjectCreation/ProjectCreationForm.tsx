@@ -70,6 +70,7 @@ import {
 import { useCustomContent } from '@/hooks/custom-content/useCustomContent'
 import { useCheckEntitlements } from '@/hooks/misc/useCheckEntitlements'
 import { FGA_PERMISSIONS, useAsyncCheckPermissionsV2 } from '@/hooks/misc/useCheckPermissionsV2'
+import { useDataApiRevokeOnCreateDefaultEnabled } from '@/hooks/misc/useDataApiRevokeOnCreateDefault'
 import { useIsFeatureEnabled } from '@/hooks/misc/useIsFeatureEnabled'
 import { useLastVisitedOrganization } from '@/hooks/misc/useLastVisitedOrganization'
 import { useSelectedOrganizationQuery } from '@/hooks/misc/useSelectedOrganization'
@@ -158,6 +159,8 @@ export const ProjectCreationForm = ({
     'dataApiRevokeOnCreateDefault'
   )
 
+  const isDataApiRevokeOnCreateDefault = useDataApiRevokeOnCreateDefaultEnabled()
+
   const isNotOnHigherPlan = !['team', 'enterprise', 'platform'].includes(currentOrg?.plan.id ?? '')
 
   const [allProjects, setAllProjects] = useState<OrgProject[] | undefined>(undefined)
@@ -186,7 +189,7 @@ export const ProjectCreationForm = ({
       githubRepositoryName: '',
       instanceSize: canChooseInstanceSize ? sizes[0] : undefined,
       dataApi: true,
-      dataApiDefaultPrivileges: false,
+      dataApiDefaultPrivileges: isDataApiRevokeOnCreateDefault,
       enableRlsEventTrigger: false,
       postgresVersionSelection: '',
       useOrioleDb: false,
@@ -781,7 +784,7 @@ export const ProjectCreationForm = ({
             {projectCreationDisabled ? (
               <DisabledWarningDueToIncident title="Project creation is currently disabled" />
             ) : (
-              <div className="divide-y divide-border-border">
+              <div className="divide-y">
                 <OrganizationSelector
                   form={form}
                   disableOrganizationSelection={isVercelIntegrationFlow}

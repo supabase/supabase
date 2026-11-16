@@ -18,7 +18,10 @@ import { FormItemLayout } from 'ui-patterns/form/FormItemLayout/FormItemLayout'
 import { CreateProjectForm } from './ProjectCreation.schema'
 import { InlineLink } from '@/components/ui/InlineLink'
 import Panel from '@/components/ui/Panel'
-import { useTrackDefaultPrivilegesExposure } from '@/hooks/misc/useDataApiRevokeOnCreateDefault'
+import {
+  useDataApiRevokeOnCreateDefaultEnabled,
+  useTrackDefaultPrivilegesExposure,
+} from '@/hooks/misc/useDataApiRevokeOnCreateDefault'
 import { DOCS_URL } from '@/lib/constants'
 
 interface SecurityOptionsProps {
@@ -31,6 +34,8 @@ export const SecurityOptions = ({ form, layout = 'horizontal', surface }: Securi
   const { slug } = useParams()
   const apiAccessOptionsId = useId()
   const reduceMotion = useReducedMotion()
+  const isDataApiRevokeOnCreateDefault = useDataApiRevokeOnCreateDefaultEnabled()
+
   const dataApi = useWatch({ control: form.control, name: 'dataApi' })
   const dataApiDefaultPrivileges = useWatch({
     control: form.control,
@@ -38,6 +43,7 @@ export const SecurityOptions = ({ form, layout = 'horizontal', surface }: Securi
   })
   const enableRlsEventTrigger = useWatch({ control: form.control, name: 'enableRlsEventTrigger' })
   const { dirtyFields } = useFormState({ control: form.control })
+
   const hasUserModified = !!dirtyFields.dataApiDefaultPrivileges
 
   useTrackDefaultPrivilegesExposure(
@@ -52,8 +58,7 @@ export const SecurityOptions = ({ form, layout = 'horizontal', surface }: Securi
           orgSlug: slug,
           dataApiDefaultPrivileges: dataApiDefaultPrivileges ?? true,
           hasUserModified,
-        },
-    false
+        }
   )
 
   return (
@@ -118,26 +123,32 @@ export const SecurityOptions = ({ form, layout = 'horizontal', surface }: Securi
                         <FormDescription className="text-foreground-lighter">
                           Expose new tables in the public schema to the{' '}
                           <InlineLink href={`${DOCS_URL}/guides/api`}>Data API</InlineLink>.
-                          <AnimatePresence initial={false}>
-                            {field.value && !enableRlsEventTrigger && (
-                              <motion.span
-                                key="rls-warning"
-                                className="block overflow-hidden text-warning"
-                                initial={{ height: 0, opacity: 0 }}
-                                animate={{ height: 'auto', opacity: 1 }}
-                                exit={{ height: 0, opacity: 0 }}
-                                transition={{
-                                  duration: reduceMotion ? 0 : 0.18,
-                                  ease: [0.23, 1, 0.32, 1],
-                                }}
-                              >
-                                <span className="block pt-1">
-                                  Without RLS, anyone may be able to read, change or delete data in
-                                  new tables. Enable RLS below to restrict access.
-                                </span>
-                              </motion.span>
-                            )}
-                          </AnimatePresence>
+                          {isDataApiRevokeOnCreateDefault ? (
+                            <strong className="block text-foreground-light">
+                              We recommend disabling this to control access manually.
+                            </strong>
+                          ) : (
+                            <AnimatePresence initial={false}>
+                              {field.value && !enableRlsEventTrigger && (
+                                <motion.span
+                                  key="rls-warning"
+                                  className="block overflow-hidden text-warning"
+                                  initial={{ height: 0, opacity: 0 }}
+                                  animate={{ height: 'auto', opacity: 1 }}
+                                  exit={{ height: 0, opacity: 0 }}
+                                  transition={{
+                                    duration: reduceMotion ? 0 : 0.18,
+                                    ease: [0.23, 1, 0.32, 1],
+                                  }}
+                                >
+                                  <span className="block pt-1">
+                                    Without RLS, anyone may be able to read, change or delete data
+                                    in new tables. Enable RLS below to restrict access.
+                                  </span>
+                                </motion.span>
+                              )}
+                            </AnimatePresence>
+                          )}
                         </FormDescription>
                       </div>
                     </FormItem>
