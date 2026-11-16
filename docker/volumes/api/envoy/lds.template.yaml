@@ -1215,6 +1215,67 @@ resources:
                         end
                       end
 
+                # Neutralizes responses that browsers would render as HTML or SVG on
+                # Storage, REST and Functions (GET only), as the platform's API gateway
+                # does. Studio shares this origin, so script in user content would
+                # otherwise run with the dashboard's credentials.
+                - name: envoy.filters.http.lua
+                  typed_config:
+                    '@type': >-
+                      type.googleapis.com/envoy.extensions.filters.http.lua.v3.Lua
+                    inline_code: |
+                      local NAMESPACE = "supabase.sanitize"
+                      local CSP = "default-src 'none'; sandbox"
+
+                      local function in_scope(path, method)
+                        if path:sub(1, 12) == "/storage/v1/" or path:sub(1, 9) == "/rest/v1/" then
+                          return true
+                        end
+                        -- Functions may return HTML to other methods, as on the platform
+                        return path:sub(1, 14) == "/functions/v1/" and method == "GET"
+                      end
+
+                      function envoy_on_request(request_handle)
+                        local headers = request_handle:headers()
+                        local path = (headers:get(":path") or ""):match("^[^?#]*")
+                        if not in_scope(path, headers:get(":method")) then
+                          return
+                        end
+
+                        local metadata = request_handle:streamInfo():dynamicMetadata()
+                        metadata:set(NAMESPACE, "has_extension", path:find(".", 1, true) ~= nil)
+                        metadata:set(NAMESPACE, "html_path", path:lower():match("%.x?html?$") ~= nil)
+                      end
+
+                      function envoy_on_response(response_handle)
+                        local flags = response_handle:streamInfo():dynamicMetadata():get(NAMESPACE)
+                        if flags == nil then
+                          return
+                        end
+
+                        local headers = response_handle:headers()
+                        local content_type = (headers:get("content-type") or ""):lower()
+                        local function has(value)
+                          return content_type:find(value, 1, true) ~= nil
+                        end
+                        local html = flags.html_path or has("text/html") or has("application/xhtml")
+                          or has("text/xml") or has("application/xml")
+                        local svg = has("image/svg")
+                        if flags.has_extension and not html and not svg then
+                          return
+                        end
+
+                        headers:replace("x-content-type-options", "nosniff")
+                        if html then
+                          headers:replace("content-type", "text/plain")
+                          headers:replace("content-security-policy", CSP)
+                        elseif svg then
+                          -- Keeps the type so <img> still works; blocks script when opened directly
+                          headers:replace("content-security-policy", CSP)
+                          headers:replace("content-disposition", "attachment")
+                        end
+                      end
+
                 - name: envoy.filters.http.rbac
                   typed_config:
                     '@type': >-

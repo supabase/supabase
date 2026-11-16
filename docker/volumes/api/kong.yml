@@ -202,6 +202,39 @@ services:
           allow:
             - admin
             - anon
+      # Neutralizes responses that browsers would render as HTML or SVG, as the
+      # platform's API gateway does (reused by Storage and Functions below).
+      # Studio shares this origin, so script in user content would otherwise run
+      # with the dashboard's credentials.
+      - name: post-function
+        config:
+          header_filter:
+            - &sanitize_html |
+              local path = kong.request.get_path()
+              -- Functions may return HTML to other methods, as on the platform
+              if path:sub(1, 14) == "/functions/v1/" and kong.request.get_method() ~= "GET" then
+                return
+              end
+              local content_type = (kong.response.get_header("Content-Type") or ""):lower()
+              local function has(value)
+                return content_type:find(value, 1, true) ~= nil
+              end
+              local html = path:lower():match("%.x?html?$") ~= nil or has("text/html")
+                or has("application/xhtml") or has("text/xml") or has("application/xml")
+              local svg = has("image/svg")
+              if path:find(".", 1, true) and not html and not svg then
+                return
+              end
+              local csp = "default-src 'none'; sandbox"
+              kong.response.set_header("X-Content-Type-Options", "nosniff")
+              if html then
+                kong.response.set_header("Content-Type", "text/plain")
+                kong.response.set_header("Content-Security-Policy", csp)
+              elseif svg then
+                -- Keeps the type so <img> still works; blocks script when opened directly
+                kong.response.set_header("Content-Security-Policy", csp)
+                kong.response.set_header("Content-Disposition", "attachment")
+              end
 
   ## Secure GraphQL routes
   - name: graphql-v1
@@ -359,6 +392,8 @@ services:
               if auth == nil or auth == "" or auth:find("^%s*$") then
                 kong.service.request.clear_header("authorization")
               end
+          header_filter:
+            - *sanitize_html
 
   ## Edge Functions routes
   ##
@@ -406,6 +441,8 @@ services:
               if v == nil or v == "" or v:find("^%s*$") then
                 kong.service.request.clear_header("sb-api-key")
               end
+          header_filter:
+            - *sanitize_html
 
   ## OAuth 2.0 Authorization Server Metadata (RFC 8414)
   - name: well-known-oauth
