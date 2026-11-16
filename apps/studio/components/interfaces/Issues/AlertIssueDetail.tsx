@@ -1,11 +1,14 @@
 import { useQuery } from '@tanstack/react-query'
 import { useParams } from 'common'
 import dayjs from 'dayjs'
-import { BellIcon } from 'lucide-react'
+import { BellIcon, ExternalLinkIcon } from 'lucide-react'
+import type { ReactNode } from 'react'
 import { Badge, Button } from 'ui'
 import { Admonition } from 'ui-patterns/Admonition'
 import { GenericSkeletonLoader } from 'ui-patterns/ShimmeringLoader'
 
+import { AlertIssueComments } from './AlertIssueComments'
+import { AlertIssueLogEvents } from './AlertIssueLogEvents'
 import {
   ALERT_ISSUE_ACTION_LABELS,
   ALERT_ISSUE_STATUS_LABELS,
@@ -30,13 +33,20 @@ type AlertIssueDetailViewProps = {
   issue: AlertIssue
   onAction: (action: AlertIssueAction) => void
   isUpdating?: boolean
+  children?: ReactNode
 }
+
+const metadataText = (metadata: AlertIssue['metadata'], key: string) =>
+  typeof metadata[key] === 'string' ? metadata[key] : undefined
 
 export const AlertIssueDetailView = ({
   issue,
   onAction,
   isUpdating = false,
+  children,
 }: AlertIssueDetailViewProps) => {
+  const detail = metadataText(issue.metadata, 'detail')
+  const remediation = metadataText(issue.metadata, 'remediation')
   const identifiers = getIdentifierEntries(issue.identifiers)
   const signalSummary = `${issue.signal_count} ${issue.signal_count === 1 ? 'signal' : 'signals'}, last ${dayjs(issue.last_seen_at).fromNow()}`
 
@@ -83,6 +93,22 @@ export const AlertIssueDetailView = ({
               {issue.description}
             </section>
           )}
+          {(detail || remediation?.startsWith('https://')) && (
+            <section aria-label="Detail" className="flex flex-col gap-2">
+              {detail && <p className="text-sm text-foreground-light">{detail}</p>}
+              {remediation?.startsWith('https://') && (
+                <a
+                  href={remediation}
+                  target="_blank"
+                  rel="noreferrer noopener"
+                  className="inline-flex items-center gap-1 text-sm text-brand hover:underline"
+                >
+                  View remediation
+                  <ExternalLinkIcon size={12} aria-hidden />
+                </a>
+              )}
+            </section>
+          )}
           <section aria-label="Identifiers" className="flex flex-col gap-2">
             <h2 className="text-sm text-foreground">Identifiers</h2>
             <dl className="grid grid-cols-[max-content_1fr] gap-x-6 gap-y-1 font-mono text-xs">
@@ -100,6 +126,7 @@ export const AlertIssueDetailView = ({
               {JSON.stringify(issue.metadata, null, 2)}
             </pre>
           </section>
+          {children}
         </article>
       </div>
     </div>
@@ -137,5 +164,14 @@ export const AlertIssueDetail = () => {
     )
   }
 
-  return <AlertIssueDetailView issue={issue} onAction={handleAction} isUpdating={isUpdating} />
+  return (
+    <AlertIssueDetailView issue={issue} onAction={handleAction} isUpdating={isUpdating}>
+      {ref && (
+        <>
+          <AlertIssueLogEvents projectRef={ref} alertIssueId={issue.alert_issue_id} />
+          <AlertIssueComments projectRef={ref} alertIssueId={issue.alert_issue_id} />
+        </>
+      )}
+    </AlertIssueDetailView>
+  )
 }

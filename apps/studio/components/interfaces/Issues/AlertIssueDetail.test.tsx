@@ -60,4 +60,38 @@ describe('AlertIssueDetailView', () => {
 
     expect(screen.getByRole('button', { name: 'Resolve' })).toBeDisabled()
   })
+
+  it('shows the advisor detail and remediation link from metadata', () => {
+    customRender(
+      <AlertIssueDetailView
+        issue={{
+          ...issue,
+          metadata: {
+            detail: 'Table public.orders is public, but RLS has not been enabled.',
+            remediation:
+              'https://supabase.com/docs/guides/database/database-linter?lint=0013_rls_disabled_in_public',
+          },
+        }}
+        onAction={vi.fn()}
+      />
+    )
+
+    expect(
+      screen.getByText('Table public.orders is public, but RLS has not been enabled.')
+    ).toBeInTheDocument()
+    expect(screen.getByRole('link', { name: 'View remediation' })).toHaveAttribute(
+      'href',
+      'https://supabase.com/docs/guides/database/database-linter?lint=0013_rls_disabled_in_public'
+    )
+  })
+
+  it('renders extra sections passed as children', () => {
+    customRender(
+      <AlertIssueDetailView issue={issue} onAction={vi.fn()}>
+        <section aria-label="Comments">comments</section>
+      </AlertIssueDetailView>
+    )
+
+    expect(screen.getByRole('region', { name: 'Comments' })).toBeInTheDocument()
+  })
 })
