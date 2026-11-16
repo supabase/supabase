@@ -66,7 +66,9 @@ Delivery covers the data included by your publication and [initial sync selectio
 
 ## Are changes applied in order?
 
-Pipelines preserves change order within each table. Replication is asynchronous, so a successful source write does not mean the change is already available to destination queries. Changes from one source transaction can become visible separately, including across destination tables.
+Pipelines processes each table's changes in source order. Recovery can replay earlier changes after newer changes have already reached the destination. For append-only history, use the destination's change-sequence metadata rather than ingestion time to order events.
+
+Replication is asynchronous, so a successful source write does not mean the change is already available to destination queries. Changes from one source transaction can become visible separately, including across destination tables.
 
 During initial sync, queries can see an incomplete copy. Wait for the relevant tables to finish initial sync and catch up before treating the destination as a complete replica. A **Live** label or [zero replication lag](/docs/guides/database/replication/pipelines-monitoring#replication-lag-metrics) alone does not confirm query visibility or initial-sync completion.
 

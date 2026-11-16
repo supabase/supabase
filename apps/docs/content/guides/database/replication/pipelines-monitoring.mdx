@@ -142,9 +142,13 @@ Higher concurrency uses more source connections, and additional workers need mor
 | **Lost**                     | For a table-sync slot, retry the affected table. For the main slot, use the recovery procedure that follows.                                  |
 | **Unknown**                  | Check logs and slot details. If the state persists, contact support with the pipeline ID and error details.                                   |
 
-To recover a lost main slot, open **Edit pipeline > Advanced settings** and set **Invalidated slot behavior** to **Recreate slot**. Review the effects below, then save the changes and restart the pipeline. If it was stopped, start it after saving.
+Recovering a lost main slot **replaces every destination table**. Existing source rows are copied only for tables [selected for initial sync](/docs/guides/database/replication/pipelines#choosing-which-tables-to-copy); excluded tables resume with new changes only. Data processed again is [billed again](/docs/guides/platform/manage-your-usage/pipelines#how-data-processed-is-measured).
 
-**This replaces every destination table.** Existing source rows are copied only for tables [selected for initial sync](/docs/guides/database/replication/pipelines#choosing-which-tables-to-copy); excluded tables resume with new changes only. Data processed again is [billed again](/docs/guides/platform/manage-your-usage/pipelines#how-data-processed-is-measured).
+To recover a lost main slot:
+
+1. In the Supabase Dashboard, open **Edit pipeline > Advanced settings**.
+2. Set **Invalidated slot behavior** to **Recreate slot** and save the changes.
+3. If the pipeline is running, restart it. If it is stopped, start it.
 
 Alternatively, stop and delete the pipeline, then [create a new one](/docs/guides/database/replication/pipelines#setup-overview). Deletion automatically removes that pipeline's main slot, table-sync slots, and saved replication state when the source database is reachable. It leaves source tables, existing destination data, and the [shared Pipelines installation](/docs/guides/database/replication/pipelines-faq#what-happens-when-you-disable-pipelines) in place.
 

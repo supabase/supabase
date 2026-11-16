@@ -62,7 +62,7 @@ Repeated ingestion can still incur charges. Query visibility depends on BigQuery
 
 ## Query replicated data
 
-Query the generated view for each source table. Its name combines the source schema and table with an underscore, doubling any existing underscores: `public.orders` becomes `public_orders`, and `my_schema.orders` becomes `my__schema_orders`. Pipelines manages versioned physical tables behind the view and updates its target after a truncate. Queries tied directly to a physical table version can become stale or fail when that version is removed.
+Query the generated view for each source table. For names without leading or trailing underscores, its name combines the source schema and table with an underscore, doubling any existing underscores. For example, `public.orders` becomes `public_orders`, and `my_schema.orders` becomes `my__schema_orders`. Pipelines manages versioned physical tables behind the view and updates its target after a truncate. Queries tied directly to a physical table version can become stale or fail when that version is removed.
 
 <$Partial path="pipelines-table-names.mdx" />
 

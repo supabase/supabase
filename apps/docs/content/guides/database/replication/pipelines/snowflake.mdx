@@ -167,7 +167,7 @@ Validation checks authentication, database and schema visibility, and that `QUOT
 
 ### Destination table names
 
-Pipelines combines each Postgres schema and table name into one Snowflake table name. Existing underscores are doubled, the two names are joined with a single underscore, and the result is converted to uppercase:
+Pipelines combines each Postgres schema and table name into one Snowflake table name. For names without leading or trailing underscores, existing underscores are doubled and the names are joined with a single underscore. The result is converted to uppercase:
 
 | Postgres table         | Snowflake table          |
 | ---------------------- | ------------------------ |
@@ -199,7 +199,7 @@ Pipelines records changes as follows:
 
 An omitted value is stored as a `NULL` placeholder with its column ID in `_cdc_missing_columns`. The companion view carries forward its last supplied value. An explicit SQL `NULL` has no missing-column entry and replaces the previous value. Testing a cell for `NULL` alone cannot distinguish these cases.
 
-The companion view resolves omitted values automatically. For custom history processing, see the [ETL Snowflake reference](https://supabase.github.io/etl/reference/destinations/#snowflake).
+The companion view resolves omitted values automatically.
 
 The sequence number orders changes but is not a globally unique event ID. Initial-sync rows share the same value, so don't use it alone to deduplicate copied rows.
 
@@ -241,7 +241,7 @@ Additional limits apply:
 
 Pipelines supports adding, renaming, and dropping columns. The companion view updates to use the current column names.
 
-Pipelines receives supported schema changes through replication, including when no row changes follow them. Some schema changes can temporarily make the companion view unavailable while Pipelines updates it.
+Supported schema changes can remain pending until the table's next replicated row change. An idle table can retain its previous destination schema until then. Some schema changes can temporarily make the companion view unavailable while Pipelines updates it.
 
 Replicated columns remain nullable in Snowflake, and changes to existing column defaults are not propagated. Pipelines can copy supported literal defaults when creating a table or adding a column. Other defaults are omitted, although Postgres still supplies source values through replication. Partial-update support does not backfill arbitrary default expressions for untouched rows.
 
