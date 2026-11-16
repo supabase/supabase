@@ -1,6 +1,6 @@
 import { beforeEach, describe, expect, it, vi } from 'vitest'
 
-import { classifyResponseError } from './error-classification'
+import { classifyResponseError, isAuthFailure } from './error-classification'
 import { getErrorRouting } from '@/lib/errors/error-routing'
 import {
   ConnectionTimeoutError,
@@ -22,6 +22,7 @@ vi.mock('@/lib/helpers', () => ({ uuidv4: () => 'test-uuid' }))
 
 // Import after mocks are set up
 const { handleError } = await import('./fetchers')
+const { reportQueryError } = await import('@/lib/errors/report-studio-error')
 
 function throwAndCatch(error: unknown, options?: Parameters<typeof handleError>[1]): StudioError {
   try {
@@ -223,6 +224,32 @@ describe('handleError — error classification', () => {
           }),
         })
       )
+    })
+  })
+
+  describe('shouldReport', () => {
+    const skipAuthFailures = { shouldReport: (err: StudioError) => !isAuthFailure(err) }
+
+    it.each([401, 403])('throws but never reports a %s the caller expects', (code) => {
+      const err = throwAndCatch(
+        { message: 'No access token provided', code },
+        { ...skipAuthFailures, alwaysCapture: true, reportImmediately: true }
+      )
+      expect(err).toBeInstanceOf(UnclassifiedApiError)
+      reportQueryError(err)
+      expect(captureException).not.toHaveBeenCalled()
+    })
+
+    it('still reports errors the predicate keeps', () => {
+      const err = throwAndCatch({ message: 'boom', code: 400 }, skipAuthFailures)
+      reportQueryError(err)
+      expect(captureException).toHaveBeenCalledTimes(1)
+
+      throwAndCatch(
+        { message: 'boom', code: 500 },
+        { ...skipAuthFailures, alwaysCapture: true, reportImmediately: true }
+      )
+      expect(captureException).toHaveBeenCalledTimes(2)
     })
   })
 
