@@ -5,10 +5,12 @@ import { IS_TEST_ENV } from '@/lib/constants'
 import { useTrack } from '@/lib/telemetry/track'
 
 /**
- * Controls the default state of the "Grant API access to new tables automatically"
- * checkbox at project creation. When the flag is on, the checkbox defaults
- * to unchecked (i.e. revoke SQL runs). When off/absent, the checkbox defaults
- * to checked (current behaviour — default grants remain).
+ * Default value of the "Grant API access to new tables automatically" checkbox
+ * at project creation, driven by the `defaultNotExposedNewTables` flag (the
+ * return value is `!flag`). When the flag is on, the checkbox defaults to
+ * unchecked (i.e. revoke SQL runs). When the flag is off, or not loaded yet
+ * (`useFlag` returns false), it defaults to checked (current behaviour —
+ * default grants remain). Always returns false in tests.
  */
 export const useDataApiRevokeOnCreateDefaultEnabled = (): boolean => {
   const flag = useFlag('defaultNotExposedNewTables')
@@ -38,8 +40,8 @@ type DefaultPrivilegesExposureOptions =
 
 /**
  * Fires `project_creation_default_privileges_exposed` once per mount, once the
- * flag has resolved AND the form value is consistent with the flag's expected
- * default. The convergence gate avoids a render-ordering race: caller-side
+ * form value is consistent with the flag's expected default (`!flag`). The
+ * convergence gate avoids a render-ordering race: caller-side
  * sync effects (in /new/[slug] and the Vercel deploy flow) update the form
  * value when the flag resolves late, but child effects fire before parent
  * effects in the same commit, so without the gate the exposure would capture
@@ -56,7 +58,6 @@ export const useTrackDefaultPrivilegesExposure = (options: DefaultPrivilegesExpo
 
   useEffect(() => {
     if (hasTracked.current) return
-    if (flag === undefined) return
     if (surface === 'vercel' && !orgSlug) return
 
     // Gate on form-flag convergence unless the user explicitly dirtied the field.
