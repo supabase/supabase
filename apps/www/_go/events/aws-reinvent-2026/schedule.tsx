@@ -1,5 +1,4 @@
 import type { GoPageInput } from 'marketing'
-import Script from 'next/script'
 
 const page: GoPageInput = {
   template: 'lead-gen',
@@ -70,10 +69,9 @@ const page: GoPageInput = {
             className="meetings-iframe-container"
             data-src="https://meetings.hubspot.com/wendie-cheung/aws-reinvent-2026?embed=true"
           />
-          <Script
-            src="https://static.hsappstatic.net/MeetingsEmbed/ex/MeetingsEmbedCode.js"
-            strategy="afterInteractive"
-          />
+          {/* HubSpot's embed script must be a parser-inserted tag right after the container; next/script loads it after page load and misses the container. */}
+          {/* eslint-disable-next-line @next/next/no-sync-scripts */}
+          <script src="https://static.hsappstatic.net/MeetingsEmbed/ex/MeetingsEmbedCode.js" />
         </>
       ),
     },
