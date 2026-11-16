@@ -45,6 +45,7 @@ import {
   useGenerateToolRoutes,
 } from '@/components/layouts/Navigation/NavigationBar/NavigationBar.utils'
 import { ORG_SETTINGS_ROUTES } from '@/components/layouts/OrganizationLayout/OrganizationLayout.utils'
+import { useProjectIssues } from '@/data/issues/useProjectIssues'
 import { ProjectIndexPageLink } from '@/data/prefetchers/project.$ref'
 import { useHideSidebar } from '@/hooks/misc/useHideSidebar'
 import { useIsFeatureEnabled } from '@/hooks/misc/useIsFeatureEnabled'
@@ -277,6 +278,14 @@ const ProjectLinks = () => {
   const { ref } = useParams()
   const { data: project, isPending: isProjectPending } = useSelectedProjectQuery()
   const { securityLints, errorLints } = useLints()
+  const isIssuesInboxEnabled = useFlag('issuesInbox')
+  const { issues } = useProjectIssues({ projectRef: ref, enabled: isIssuesInboxEnabled })
+  const hasErrors = isIssuesInboxEnabled
+    ? issues.some((issue) => issue.severity === 'critical')
+    : errorLints.length > 0
+  const hasWarnings = isIssuesInboxEnabled
+    ? issues.some((issue) => issue.severity === 'warning')
+    : securityLints.length > 0
 
   const activeRoute = router.pathname.split('/')[3]
 
@@ -368,12 +377,7 @@ const ProjectLinks = () => {
                 >
                   {route.icon}
                   <span>{route.label}</span>
-                  {!route.disabled && (
-                    <ActiveDot
-                      hasErrors={errorLints.length > 0}
-                      hasWarnings={securityLints.length > 0}
-                    />
-                  )}
+                  {!route.disabled && <ActiveDot hasErrors={hasErrors} hasWarnings={hasWarnings} />}
                 </SideBarNavLink>
               )
             } else {
