@@ -79,7 +79,7 @@ export const TransferProjectButton = () => {
       transferPreviewData.errors.length > 0 && membersExceedingLimitCount > 0
     if (!isBlockedNoticeShown) return
 
-    track('project_transfer_blocked_notice_exposed', {
+    track('project_transfer_preview_failed', {
       sourcePlan: transferPreviewData.source_subscription_plan,
       targetPlan: transferPreviewData.target_subscription_plan,
       membersExceedingLimitCount,

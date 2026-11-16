@@ -2011,15 +2011,15 @@ export interface StudioBillingDowngradeBlockedModalOpenedEvent {
 }
 
 /**
- * User selected a target organization in the transfer project dialog and was shown the
- * notice saying members have reached their free project limits, which blocks the transfer.
+ * User selected a target organization in the transfer project dialog and the transfer
+ * preview failed because members have reached their free project limits.
  *
  * @group Events
  * @source studio
  * @page /dashboard/project/{ref}/settings/general
  */
-export interface ProjectTransferBlockedNoticeExposedEvent {
-  action: 'project_transfer_blocked_notice_exposed'
+export interface ProjectTransferPreviewFailedEvent {
+  action: 'project_transfer_preview_failed'
   properties: {
     /**
      * The plan type of the organization the project is transferred from.
@@ -4908,7 +4908,7 @@ export type TelemetryEvent =
   | StudioPricingPlanCtaClickedEvent
   | StudioBillingCancelSubscriptionClickedEvent
   | StudioBillingDowngradeBlockedModalOpenedEvent
-  | ProjectTransferBlockedNoticeExposedEvent
+  | ProjectTransferPreviewFailedEvent
   | StudioPricingSidePanelOpenedEvent
   | ReportsDatabaseGrafanaBannerClickedEvent
   | IndexAdvisorEnableButtonClickedEvent
