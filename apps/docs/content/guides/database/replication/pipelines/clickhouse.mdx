@@ -177,11 +177,9 @@ With `ReplacingMergeTree`, renaming or dropping a primary-key column or changing
 
 New scalar columns are made nullable when ClickHouse needs a value for historical rows and the source default cannot be represented safely. Adding `NOT NULL` keeps an existing destination column nullable. Defaults that cannot be translated are skipped; Postgres still supplies the source values through replication.
 
-A previously excluded column is added without a default. Historical rows read as `NULL` for scalar columns or empty arrays for array columns. Removing a published column drops its destination values; adding it again does not restore them.
-
 Source type changes that alter the mapped ClickHouse type are rejected, such as `integer` to `bigint`. Switching between `timestamp` and `timestamptz` is also rejected because it can change existing values. Changes that keep the mapped type, such as increasing a `varchar` length, continue without changing the destination type. [Reset the table](/docs/guides/database/replication/pipelines-monitoring#restarting-tables) to rebuild the schema after a rejected change.
 
-For type changes, unsupported changes, and interrupted schema changes, see the shared [schema-change behavior and recovery](/docs/guides/database/replication/pipelines#schema-change-support).
+For publication changes, type changes, and schema errors, see the shared [schema-change behavior and recovery](/docs/guides/database/replication/pipelines#schema-change-support).
 
 ## Troubleshooting
 

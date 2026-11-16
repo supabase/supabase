@@ -327,6 +327,8 @@ Publication changes do not all require a pipeline restart:
 | Change published operations (`insert`, `update`, `delete`, `truncate`) | Postgres changes which operations it sends without a pipeline restart. Previously omitted operations are not replayed.                              |
 | Change `publish_via_partition_root`                                    | Stop the pipeline before changing this option, then restart it to discover the new table identities. See [Partitioned tables](#partitioned-tables). |
 
+Removing a published column also removes its destination values. Including it again does not restore the removed values automatically. This applies across destinations. A [table reset](/docs/guides/database/replication/pipelines-monitoring#restarting-tables) copies current source values again when the column is published and the table is [selected for initial sync](#choosing-which-tables-to-copy).
+
 Changing a row filter affects future changes only: it neither copies newly included historical rows nor removes rows that no longer match. For tables that completed initial sync, a pipeline restart does not rebuild history. To rebuild it, include affected tables in initial sync and [reset those tables](/docs/guides/database/replication/pipelines-monitoring#restarting-tables).
 
 Wait for initial sync to finish before changing its filter; changing a filter does not update a copy already in progress.
@@ -347,7 +349,7 @@ Unsupported changes have different outcomes:
 
 Check [replication logs](/docs/guides/database/replication/pipelines-monitoring#viewing-logs) for warnings and errors after changing a replicated table.
 
-After a type change, or when a schema error cannot resume safely, resolve any source incompatibility and [reset the affected tables](/docs/guides/database/replication/pipelines-monitoring#restarting-tables). This rebuilds their destination schema and **deletes their existing destination data**. Select the tables for **Initial sync** to copy their current source rows again. Restarting the pipeline alone does not rebuild tables that completed initial sync. Do not repair managed destination objects manually.
+Some schema and publication changes require a [table reset](/docs/guides/database/replication/pipelines-monitoring#restarting-tables). A reset rebuilds the destination schema and **deletes existing destination data**. Resolve any source incompatibility before resetting. To copy current source rows again, select the tables for [**Initial sync**](#choosing-which-tables-to-copy) and apply the settings before resetting. Restarting the pipeline alone does not rebuild tables that completed initial sync. Do not repair managed destination objects manually.
 
 ## Limitations
 
