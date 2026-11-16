@@ -1,4 +1,5 @@
 import type { GoPageInput } from 'marketing'
+import Script from 'next/script'
 
 const page: GoPageInput = {
   template: 'lead-gen',
@@ -16,11 +17,64 @@ const page: GoPageInput = {
   },
   sections: [
     {
-      type: 'hubspot-meeting',
+      type: 'three-column',
+      id: 'growth-leads',
+      title: 'Meet our Growth Leads',
+      children: (
+        <>
+          <div className="flex flex-col items-center gap-4 rounded-xl border border-muted p-8 text-center">
+            <img
+              src="/images/blog/avatars/nate-asp.jpg"
+              alt="Nate Asp"
+              className="h-24 w-24 rounded-full object-cover"
+            />
+            <div className="flex flex-col gap-1">
+              <h3 className="text-foreground font-medium text-lg">Nate Asp</h3>
+              <p className="text-foreground-light text-sm">VP of Sales</p>
+            </div>
+          </div>
+          <div className="flex flex-col items-center gap-4 rounded-xl border border-muted p-8 text-center">
+            <img
+              src="/images/blog/avatars/brad-gyger.jpg"
+              alt="Brad Gyger"
+              className="h-24 w-24 rounded-full object-cover"
+            />
+            <div className="flex flex-col gap-1">
+              <h3 className="text-foreground font-medium text-lg">Brad Gyger</h3>
+              <p className="text-foreground-light text-sm">VP of Success</p>
+            </div>
+          </div>
+          <div className="flex flex-col items-center gap-4 rounded-xl border border-muted p-8 text-center">
+            <img
+              src="/images/blog/avatars/kris-talajic.png"
+              alt="Kris Talajic"
+              className="h-24 w-24 rounded-full object-cover"
+            />
+            <div className="flex flex-col gap-1">
+              <h3 className="text-foreground font-medium text-lg">Kris Talajic</h3>
+              <p className="text-foreground-light text-sm">Growth Lead</p>
+            </div>
+          </div>
+        </>
+      ),
+    },
+    {
+      type: 'single-column',
       id: 'schedule',
       title: 'Schedule a meeting',
       description: 'Choose a time that works for you. We will confirm by email.',
-      meetingSlug: 'wendie-cheung/aws-reinvent-2026',
+      children: (
+        <>
+          <div
+            className="meetings-iframe-container"
+            data-src="https://meetings.hubspot.com/wendie-cheung/aws-reinvent-2026?embed=true"
+          />
+          <Script
+            src="https://static.hsappstatic.net/MeetingsEmbed/ex/MeetingsEmbedCode.js"
+            strategy="afterInteractive"
+          />
+        </>
+      ),
     },
   ],
 }
