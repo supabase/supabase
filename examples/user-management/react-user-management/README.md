@@ -256,10 +256,8 @@ function App() {
 
   useEffect(() => {
     const loadClaims = async () => {
-      const {
-        data: { claims },
-      } = await supabase.auth.getClaims()
-      setClaims(claims)
+      const { data } = await supabase.auth.getClaims()
+      setClaims(data?.claims)
     }
 
     loadClaims()

@@ -37,7 +37,7 @@ export default function Account({ claims }) {
     return () => {
       ignore = true
     }
-  }, [claims])
+  }, [claims.sub])
 
   async function updateProfile(event, avatarUrl) {
     event.preventDefault()
