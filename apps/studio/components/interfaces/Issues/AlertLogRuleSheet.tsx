@@ -159,7 +159,7 @@ export const AlertLogRuleSheet = ({ projectRef, open, onClose }: AlertLogRuleShe
                   <FormItemLayout
                     layout="horizontal"
                     label="LQL filter"
-                    description="For example m.status:>=500 or m.function_id:stripe-webhook"
+                    description={`For example m.status:>=500 or m.function_id:"stripe-webhook"`}
                   >
                     <FormControl className="col-span-6">
                       <Textarea
