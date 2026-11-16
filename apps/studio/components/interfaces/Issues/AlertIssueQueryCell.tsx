@@ -29,7 +29,7 @@ export const AlertIssueQueryCell = ({ id, cell }: { id: string; cell: ReadyCell 
     <QueryEditor
       id={id}
       variant="embedded"
-      className="min-h-0"
+      className="h-full min-h-0"
       title={title}
       query={toQueryModel(cell, sql)}
       result={result}

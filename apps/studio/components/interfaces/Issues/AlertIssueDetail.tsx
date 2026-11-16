@@ -49,8 +49,10 @@ export const AlertIssueDetailView = ({
   investigation,
   children,
 }: AlertIssueDetailViewProps) => {
-  const detail = metadataText(issue.metadata, 'detail')
+  const metadataDetail = metadataText(issue.metadata, 'detail')
+  const detail = metadataDetail !== issue.description ? metadataDetail : undefined
   const remediation = metadataText(issue.metadata, 'remediation')
+  const remediationUrl = remediation?.startsWith('https://') ? remediation : undefined
   const identifiers = getIdentifierEntries(issue.identifiers)
   const signalSummary = `${issue.signal_count} ${issue.signal_count === 1 ? 'signal' : 'signals'}, last ${dayjs(issue.last_seen_at).fromNow()}`
 
@@ -97,13 +99,12 @@ export const AlertIssueDetailView = ({
               <Markdown content={issue.description} className="max-w-none text-foreground-light" />
             </section>
           )}
-          {investigation}
-          {(detail || remediation?.startsWith('https://')) && (
+          {(detail || remediationUrl) && (
             <section aria-label="Detail" className="flex flex-col gap-2">
               {detail && <p className="text-sm text-foreground-light">{detail}</p>}
-              {remediation?.startsWith('https://') && (
+              {remediationUrl && (
                 <a
-                  href={remediation}
+                  href={remediationUrl}
                   target="_blank"
                   rel="noreferrer noopener"
                   className="inline-flex items-center gap-1 text-sm text-brand hover:underline"
@@ -114,6 +115,8 @@ export const AlertIssueDetailView = ({
               )}
             </section>
           )}
+          {investigation}
+          {children}
           <section aria-label="Identifiers" className="flex flex-col gap-2">
             <h2 className="text-sm text-foreground">Identifiers</h2>
             <dl className="grid grid-cols-[max-content_1fr] gap-x-6 gap-y-1 font-mono text-xs">
@@ -131,7 +134,6 @@ export const AlertIssueDetailView = ({
               {JSON.stringify(issue.metadata, null, 2)}
             </pre>
           </section>
-          {children}
         </article>
       </div>
     </div>

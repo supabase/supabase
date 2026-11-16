@@ -85,6 +85,18 @@ describe('AlertIssueDetailView', () => {
     )
   })
 
+  it('does not repeat the advisor detail when it matches the description', () => {
+    const detail = 'Table public.orders is public, but RLS has not been enabled.'
+    customRender(
+      <AlertIssueDetailView
+        issue={{ ...issue, description: detail, metadata: { detail } }}
+        onAction={vi.fn()}
+      />
+    )
+
+    expect(screen.getAllByText(detail)).toHaveLength(1)
+  })
+
   it('renders the description as markdown with the investigation right after it', () => {
     customRender(
       <AlertIssueDetailView

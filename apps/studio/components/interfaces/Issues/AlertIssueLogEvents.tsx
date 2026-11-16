@@ -79,7 +79,7 @@ const LogEventsBody = ({ data }: { data: AlertLogEvents }) => {
           chartConfig={{ error_count: { label: 'Events' } }}
         />
       </div>
-      <ul className="overflow-hidden rounded-md border border-default">
+      <ul className="max-h-80 overflow-y-auto rounded-md border border-default">
         {data.events.map((event) => (
           <LogEventRow key={event.id} event={event} />
         ))}
