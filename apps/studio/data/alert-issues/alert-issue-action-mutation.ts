@@ -1,4 +1,4 @@
-import { useMutation, UseMutationOptions, useQueryClient } from '@tanstack/react-query'
+import { useMutation, useQueryClient } from '@tanstack/react-query'
 import { toast } from 'sonner'
 
 import { alertIssueSchema, type AlertIssue } from './alert-issue.schema'
@@ -7,6 +7,7 @@ import { alertIssuesKeys } from './keys'
 import { fetchPost } from '@/data/fetchers'
 import { API_URL } from '@/lib/constants'
 import { isStudioError } from '@/lib/errors/studio-errors'
+import type { UseCustomMutationOptions } from '@/types'
 
 export type AlertIssueAction = 'acknowledge' | 'snooze' | 'resolve' | 'reopen'
 
@@ -39,7 +40,7 @@ export const useAlertIssueActionMutation = ({
   onError,
   ...options
 }: Omit<
-  UseMutationOptions<AlertIssue, AlertIssuesError, AlertIssueActionVariables>,
+  UseCustomMutationOptions<AlertIssue, AlertIssuesError, AlertIssueActionVariables>,
   'mutationFn'
 > = {}) => {
   const queryClient = useQueryClient()

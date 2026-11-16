@@ -1,0 +1,141 @@
+import { useQuery } from '@tanstack/react-query'
+import { useParams } from 'common'
+import dayjs from 'dayjs'
+import { BellIcon } from 'lucide-react'
+import { Badge, Button } from 'ui'
+import { Admonition } from 'ui-patterns/Admonition'
+import { GenericSkeletonLoader } from 'ui-patterns/ShimmeringLoader'
+
+import {
+  ALERT_ISSUE_ACTION_LABELS,
+  ALERT_ISSUE_STATUS_LABELS,
+  getAlertIssueActions,
+  getIdentifierEntries,
+  getSnoozeUntil,
+} from './AlertIssues.utils'
+import {
+  ExplorerToolbar,
+  ExplorerToolbarIcon,
+  ExplorerToolbarTitle,
+} from '@/components/interfaces/Explorer/ExplorerToolbar'
+import { AlertError } from '@/components/ui/AlertError'
+import {
+  useAlertIssueActionMutation,
+  type AlertIssueAction,
+} from '@/data/alert-issues/alert-issue-action-mutation'
+import type { AlertIssue } from '@/data/alert-issues/alert-issue.schema'
+import { alertIssuesQueryOptions } from '@/data/alert-issues/alert-issues-query'
+
+type AlertIssueDetailViewProps = {
+  issue: AlertIssue
+  onAction: (action: AlertIssueAction) => void
+  isUpdating?: boolean
+}
+
+export const AlertIssueDetailView = ({
+  issue,
+  onAction,
+  isUpdating = false,
+}: AlertIssueDetailViewProps) => {
+  const identifiers = getIdentifierEntries(issue.identifiers)
+  const signalSummary = `${issue.signal_count} ${issue.signal_count === 1 ? 'signal' : 'signals'}, last ${dayjs(issue.last_seen_at).fromNow()}`
+
+  return (
+    <div className="flex h-full flex-col bg-card">
+      <ExplorerToolbar aria-label="Alert issue toolbar" className="md:h-(--header-height)">
+        <ExplorerToolbarIcon>
+          <BellIcon size={16} strokeWidth={2} />
+        </ExplorerToolbarIcon>
+        <ExplorerToolbarTitle className="text-foreground-light">{issue.title}</ExplorerToolbarTitle>
+        <div className="ml-auto flex items-center gap-2">
+          {getAlertIssueActions(issue.status).map((action) => (
+            <Button
+              key={action}
+              variant="default"
+              size="tiny"
+              disabled={isUpdating}
+              onClick={() => onAction(action)}
+            >
+              {ALERT_ISSUE_ACTION_LABELS[action]}
+            </Button>
+          ))}
+        </div>
+      </ExplorerToolbar>
+      <div className="min-h-0 flex-1 overflow-y-auto">
+        <article className="mx-auto flex w-full max-w-3xl flex-col gap-6 px-6 pb-16 pt-12">
+          <header className="flex flex-col gap-2">
+            <h1 className="text-2xl text-foreground">{issue.title}</h1>
+            <p className="flex flex-wrap items-center gap-2 text-sm text-foreground-light">
+              <Badge>{ALERT_ISSUE_STATUS_LABELS[issue.status]}</Badge>
+              <span className="capitalize">{issue.severity}</span>
+              <span aria-hidden className="text-foreground-muted">
+                ·
+              </span>
+              <span className="capitalize">{issue.category}</span>
+              <span aria-hidden className="text-foreground-muted">
+                ·
+              </span>
+              <span>{signalSummary}</span>
+            </p>
+          </header>
+          {issue.description && (
+            <section aria-label="Description" className="text-base text-foreground-light">
+              {issue.description}
+            </section>
+          )}
+          <section aria-label="Identifiers" className="flex flex-col gap-2">
+            <h2 className="text-sm text-foreground">Identifiers</h2>
+            <dl className="grid grid-cols-[max-content_1fr] gap-x-6 gap-y-1 font-mono text-xs">
+              {identifiers.map(([key, value]) => (
+                <div key={key} className="contents">
+                  <dt className="text-foreground-lighter">{key}</dt>
+                  <dd className="break-all text-foreground">{value}</dd>
+                </div>
+              ))}
+            </dl>
+          </section>
+          <section aria-label="Metadata" className="flex flex-col gap-2">
+            <h2 className="text-sm text-foreground">Metadata</h2>
+            <pre className="overflow-x-auto rounded-md bg-surface-200 p-3 text-xs text-foreground-light">
+              {JSON.stringify(issue.metadata, null, 2)}
+            </pre>
+          </section>
+        </article>
+      </div>
+    </div>
+  )
+}
+
+export const AlertIssueDetail = () => {
+  const { ref, alertIssueId } = useParams()
+  const { data, error, isPending, isError } = useQuery(alertIssuesQueryOptions({ projectRef: ref }))
+  const { mutate, isPending: isUpdating } = useAlertIssueActionMutation()
+  const issue = data?.find((item) => item.alert_issue_id === alertIssueId)
+
+  const handleAction = (action: AlertIssueAction) => {
+    if (!ref || !alertIssueId) return
+    mutate({
+      projectRef: ref,
+      alertIssueId,
+      action,
+      ...(action === 'snooze' && { until: getSnoozeUntil(new Date(), 1) }),
+    })
+  }
+
+  if (isPending) return <GenericSkeletonLoader className="p-6" />
+  if (isError) return <AlertError error={error} subject="Failed to retrieve alert issue" />
+  if (!issue) {
+    return (
+      <div className="flex h-full items-center justify-center bg-card p-6">
+        <Admonition
+          type="default"
+          className="max-w-md"
+          title="Alert issue not found"
+          description="It may be older than 7 days, or the link points to another project."
+        />
+      </div>
+    )
+  }
+
+  return <AlertIssueDetailView issue={issue} onAction={handleAction} isUpdating={isUpdating} />
+}

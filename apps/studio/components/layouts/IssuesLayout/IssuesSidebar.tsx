@@ -4,6 +4,7 @@ import { Button } from 'ui'
 import { InnerSideBarFilters, InnerSideBarFilterSearchInput } from 'ui-patterns/InnerSideMenu'
 import { GenericSkeletonLoader } from 'ui-patterns/ShimmeringLoader'
 
+import { AlertIssuesSection } from './AlertIssuesSection'
 import { IssuesFilterMenu } from './IssuesFilterMenu'
 import { IssuesListItem } from './IssuesListItem'
 import { filterIssues } from '@/components/interfaces/Issues/Issues.utils'
@@ -66,6 +67,7 @@ export const IssuesSidebar = () => {
       </div>
 
       <div className="flex min-h-0 flex-1 flex-col gap-px overflow-y-auto p-3">
+        <AlertIssuesSection />
         {isLoading && <GenericSkeletonLoader />}
         {isError && <AlertError error={error} subject="Failed to retrieve issues" />}
         {isSuccess && issues.length === 0 && (

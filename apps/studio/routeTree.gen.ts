@@ -270,6 +270,7 @@ import { Route as ProjectRefFunctionsFunctionSlugDetailsRouteImport } from './ro
 import { Route as ProjectRefFunctionsFunctionSlugInvocationsRouteImport } from './routes/project/$ref/functions/$functionSlug/invocations'
 import { Route as ProjectRefFunctionsFunctionSlugLogsRouteImport } from './routes/project/$ref/functions/$functionSlug/logs'
 import { Route as ProjectRefIntegrationsIdIndexRouteImport } from './routes/project/$ref/integrations/$id/index'
+import { Route as ProjectRefIssuesAlertsAlertIssueIdRouteImport } from './routes/project/$ref/issues/alerts/$alertIssueId'
 import { Route as ProjectRefLogsExplorerIndexRouteImport } from './routes/project/$ref/logs/explorer/index'
 import { Route as ProjectRefLogsExplorerRecentRouteImport } from './routes/project/$ref/logs/explorer/recent'
 import { Route as ProjectRefLogsExplorerSavedRouteImport } from './routes/project/$ref/logs/explorer/saved'
@@ -1772,6 +1773,12 @@ const ProjectRefIntegrationsIdIndexRoute =
     path: '/$id/',
     getParentRoute: () => ProjectRefIntegrationsRoute,
   } as any)
+const ProjectRefIssuesAlertsAlertIssueIdRoute =
+  ProjectRefIssuesAlertsAlertIssueIdRouteImport.update({
+    id: '/alerts/$alertIssueId',
+    path: '/alerts/$alertIssueId',
+    getParentRoute: () => ProjectRefIssuesRoute,
+  } as any)
 const ProjectRefLogsExplorerIndexRoute =
   ProjectRefLogsExplorerIndexRouteImport.update({
     id: '/explorer/',
@@ -2449,6 +2456,7 @@ export interface FileRoutesByFullPath {
   '/project/$ref/functions/$functionSlug/details': typeof ProjectRefFunctionsFunctionSlugDetailsRoute
   '/project/$ref/functions/$functionSlug/invocations': typeof ProjectRefFunctionsFunctionSlugInvocationsRoute
   '/project/$ref/functions/$functionSlug/logs': typeof ProjectRefFunctionsFunctionSlugLogsRoute
+  '/project/$ref/issues/alerts/$alertIssueId': typeof ProjectRefIssuesAlertsAlertIssueIdRoute
   '/project/$ref/logs/explorer/recent': typeof ProjectRefLogsExplorerRecentRoute
   '/project/$ref/logs/explorer/saved': typeof ProjectRefLogsExplorerSavedRoute
   '/project/$ref/logs/explorer/templates': typeof ProjectRefLogsExplorerTemplatesRoute
@@ -2765,6 +2773,7 @@ export interface FileRoutesByTo {
   '/project/$ref/functions/$functionSlug/details': typeof ProjectRefFunctionsFunctionSlugDetailsRoute
   '/project/$ref/functions/$functionSlug/invocations': typeof ProjectRefFunctionsFunctionSlugInvocationsRoute
   '/project/$ref/functions/$functionSlug/logs': typeof ProjectRefFunctionsFunctionSlugLogsRoute
+  '/project/$ref/issues/alerts/$alertIssueId': typeof ProjectRefIssuesAlertsAlertIssueIdRoute
   '/project/$ref/logs/explorer/recent': typeof ProjectRefLogsExplorerRecentRoute
   '/project/$ref/logs/explorer/saved': typeof ProjectRefLogsExplorerSavedRoute
   '/project/$ref/logs/explorer/templates': typeof ProjectRefLogsExplorerTemplatesRoute
@@ -3100,6 +3109,7 @@ export interface FileRoutesById {
   '/project/$ref/functions/$functionSlug/details': typeof ProjectRefFunctionsFunctionSlugDetailsRoute
   '/project/$ref/functions/$functionSlug/invocations': typeof ProjectRefFunctionsFunctionSlugInvocationsRoute
   '/project/$ref/functions/$functionSlug/logs': typeof ProjectRefFunctionsFunctionSlugLogsRoute
+  '/project/$ref/issues/alerts/$alertIssueId': typeof ProjectRefIssuesAlertsAlertIssueIdRoute
   '/project/$ref/logs/explorer/recent': typeof ProjectRefLogsExplorerRecentRoute
   '/project/$ref/logs/explorer/saved': typeof ProjectRefLogsExplorerSavedRoute
   '/project/$ref/logs/explorer/templates': typeof ProjectRefLogsExplorerTemplatesRoute
@@ -3434,6 +3444,7 @@ export interface FileRouteTypes {
     | '/project/$ref/functions/$functionSlug/details'
     | '/project/$ref/functions/$functionSlug/invocations'
     | '/project/$ref/functions/$functionSlug/logs'
+    | '/project/$ref/issues/alerts/$alertIssueId'
     | '/project/$ref/logs/explorer/recent'
     | '/project/$ref/logs/explorer/saved'
     | '/project/$ref/logs/explorer/templates'
@@ -3750,6 +3761,7 @@ export interface FileRouteTypes {
     | '/project/$ref/functions/$functionSlug/details'
     | '/project/$ref/functions/$functionSlug/invocations'
     | '/project/$ref/functions/$functionSlug/logs'
+    | '/project/$ref/issues/alerts/$alertIssueId'
     | '/project/$ref/logs/explorer/recent'
     | '/project/$ref/logs/explorer/saved'
     | '/project/$ref/logs/explorer/templates'
@@ -4084,6 +4096,7 @@ export interface FileRouteTypes {
     | '/project/$ref/functions/$functionSlug/details'
     | '/project/$ref/functions/$functionSlug/invocations'
     | '/project/$ref/functions/$functionSlug/logs'
+    | '/project/$ref/issues/alerts/$alertIssueId'
     | '/project/$ref/logs/explorer/recent'
     | '/project/$ref/logs/explorer/saved'
     | '/project/$ref/logs/explorer/templates'
@@ -6124,6 +6137,13 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof ProjectRefIntegrationsIdIndexRouteImport
       parentRoute: typeof ProjectRefIntegrationsRoute
     }
+    '/project/$ref/issues/alerts/$alertIssueId': {
+      id: '/project/$ref/issues/alerts/$alertIssueId'
+      path: '/alerts/$alertIssueId'
+      fullPath: '/project/$ref/issues/alerts/$alertIssueId'
+      preLoaderRoute: typeof ProjectRefIssuesAlertsAlertIssueIdRouteImport
+      parentRoute: typeof ProjectRefIssuesRoute
+    }
     '/project/$ref/logs/explorer/': {
       id: '/project/$ref/logs/explorer/'
       path: '/explorer'
@@ -7066,11 +7086,14 @@ const ProjectRefIntegrationsRouteWithChildren =
 interface ProjectRefIssuesRouteChildren {
   ProjectRefIssuesIdRoute: typeof ProjectRefIssuesIdRoute
   ProjectRefIssuesIndexRoute: typeof ProjectRefIssuesIndexRoute
+  ProjectRefIssuesAlertsAlertIssueIdRoute: typeof ProjectRefIssuesAlertsAlertIssueIdRoute
 }
 
 const ProjectRefIssuesRouteChildren: ProjectRefIssuesRouteChildren = {
   ProjectRefIssuesIdRoute: ProjectRefIssuesIdRoute,
   ProjectRefIssuesIndexRoute: ProjectRefIssuesIndexRoute,
+  ProjectRefIssuesAlertsAlertIssueIdRoute:
+    ProjectRefIssuesAlertsAlertIssueIdRoute,
 }
 
 const ProjectRefIssuesRouteWithChildren =

@@ -1,4 +1,4 @@
-import { useMutation, UseMutationOptions, useQueryClient } from '@tanstack/react-query'
+import { useMutation, useQueryClient } from '@tanstack/react-query'
 import { toast } from 'sonner'
 import z from 'zod/v4'
 
@@ -7,6 +7,7 @@ import { alertIssuesKeys } from './keys'
 import { fetchPost } from '@/data/fetchers'
 import { API_URL } from '@/lib/constants'
 import { isStudioError } from '@/lib/errors/studio-errors'
+import type { UseCustomMutationOptions } from '@/types'
 
 export type AlertIssuesReadVariables = {
   projectRef: string
@@ -35,7 +36,7 @@ export const useAlertIssuesReadMutation = ({
   onError,
   ...options
 }: Omit<
-  UseMutationOptions<AlertIssuesReadData, AlertIssuesError, AlertIssuesReadVariables>,
+  UseCustomMutationOptions<AlertIssuesReadData, AlertIssuesError, AlertIssuesReadVariables>,
   'mutationFn'
 > = {}) => {
   const queryClient = useQueryClient()

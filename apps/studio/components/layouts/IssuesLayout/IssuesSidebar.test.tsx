@@ -1,11 +1,13 @@
 import { screen, waitFor } from '@testing-library/react'
 import userEvent from '@testing-library/user-event'
+import { http, HttpResponse } from 'msw'
 import { describe, expect, it } from 'vitest'
 
 import { IssuesSidebar } from './IssuesSidebar'
 import type { Lint } from '@/data/lint/lint-query'
+import { API_URL } from '@/lib/constants'
 import { customRender } from '@/tests/lib/custom-render'
-import { addAPIMock } from '@/tests/lib/msw'
+import { addAPIMock, mswServer } from '@/tests/lib/msw'
 import { mockProjectGrantContext } from '@/tests/lib/project-grant-mocks'
 
 const lint: Lint = {
@@ -21,9 +23,56 @@ const lint: Lint = {
   cache_key: 'accounts-rls',
 }
 
+const ALERT_ISSUES_URL = `${API_URL}/platform/projects/:ref/alerts/issues`
+
+const alertIssue = {
+  alert_issue_id: 'a1',
+  status: 'open',
+  change: 'opened',
+  title: 'Edge function errors',
+  severity: 'major',
+  category: 'performance',
+  identifiers: { project: 'default' },
+  metadata: {},
+  signal_count: 1,
+  first_seen_at: '2026-11-16T10:00:00Z',
+  last_seen_at: '2026-11-16T10:00:00Z',
+  attention_at: '2026-11-16T10:00:00Z',
+  actor: 'system',
+  unread: true,
+}
+
 describe('IssuesSidebar', () => {
+  it('lists active alert issues and marks one read when opened', async () => {
+    mockProjectGrantContext({ ref: 'default' })
+    addAPIMock({ method: 'get', path: '/platform/projects/:ref/run-lints', response: [] })
+    let readBody: unknown
+    mswServer.use(
+      http.get(ALERT_ISSUES_URL, () =>
+        HttpResponse.json([
+          alertIssue,
+          { ...alertIssue, alert_issue_id: 'a2', title: 'Old outage', status: 'resolved' },
+        ])
+      ),
+      http.post(`${ALERT_ISSUES_URL}/reads`, async ({ request }) => {
+        readBody = await request.json()
+        return HttpResponse.json({ count: 1 })
+      })
+    )
+    const user = userEvent.setup()
+    customRender(<IssuesSidebar />)
+
+    const link = await screen.findByRole('link', { name: /Edge function errors/i })
+    expect(link).toHaveAttribute('href', '/project/default/issues/alerts/a1')
+    expect(screen.queryByRole('link', { name: /Old outage/i })).not.toBeInTheDocument()
+
+    await user.click(link)
+    await waitFor(() => expect(readBody).toEqual({ alert_issue_ids: ['a1'], read: true }))
+  })
+
   it('searches, preserves filters in links, and clears an empty filtered list', async () => {
     mockProjectGrantContext({ ref: 'default' })
+    mswServer.use(http.get(ALERT_ISSUES_URL, () => HttpResponse.json([])))
     addAPIMock({ method: 'get', path: '/platform/projects/:ref/run-lints', response: [lint] })
     const user = userEvent.setup()
     customRender(<IssuesSidebar />, { nuqs: { searchParams: '?category=security' } })
