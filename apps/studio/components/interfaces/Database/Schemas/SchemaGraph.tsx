@@ -4,7 +4,6 @@ import {
   BackgroundVariant,
   ColorMode,
   Edge,
-  MiniMap,
   Node,
   OnSelectionChangeParams,
   Panel,
@@ -19,7 +18,6 @@ import {
   Loader2Icon,
   PlusIcon,
 } from 'lucide-react'
-import { useTheme } from 'next-themes'
 import Link from 'next/link'
 import { useCallback, useEffect, useMemo, useRef, useState } from 'react'
 import { toast } from 'sonner'
@@ -52,6 +50,7 @@ import { DefaultEdge } from './DefaultEdge'
 import { FindTableSelector } from './FindTableSelector'
 import { SchemaGraphContextProvider, SchemaGraphContextType } from './SchemaGraphContext'
 import { SchemaGraphLegend } from './SchemaGraphLegend'
+import { SchemaGraphMiniMap } from './SchemaGraphMiniMap'
 import { EdgeData, TableNodeData } from './Schemas.constants'
 import {
   getEnumsAsMarkdown,
@@ -85,7 +84,6 @@ import { useTableEditorStateSnapshot } from '@/state/table-editor'
 
 export const SchemaGraph = () => {
   const { ref } = useParams()
-  const { resolvedTheme } = useTheme()
   const { data: project } = useSelectedProjectQuery()
   const { selectedSchema, setSelectedSchema } = useQuerySchemaState()
   const [selectedTable, setSelectedTable] = useState<SafePostgresTable | null>(null)
@@ -98,11 +96,6 @@ export const SchemaGraph = () => {
       setTimeout(() => setCopied(false), 2000)
     }
   }, [copied])
-
-  const miniMapNodeColor = '#111318'
-  const miniMapMaskColor = resolvedTheme?.includes('dark')
-    ? 'rgb(17, 19, 24, .8)'
-    : 'rgb(237, 237, 237, .8)'
 
   const reactFlowInstance = useReactFlow()
   const nodeTypes = useMemo(
@@ -597,13 +590,7 @@ export const SchemaGraph = () => {
                     variant={BackgroundVariant.Dots}
                     color={'inherit'}
                   />
-                  <MiniMap
-                    pannable
-                    zoomable
-                    nodeColor={miniMapNodeColor}
-                    maskColor={miniMapMaskColor}
-                    className="border rounded-md shadow-xs mb-11!"
-                  />
+                  <SchemaGraphMiniMap />
                   <SchemaGraphLegend />
                   {hasNextPage && (
                     <Panel position="bottom-center" className="mb-11!">
