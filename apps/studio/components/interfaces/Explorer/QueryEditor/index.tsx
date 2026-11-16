@@ -140,6 +140,8 @@ type QueryEditorProps = {
   onShowQueryChange: (showQuery: boolean) => void
   /** Disables editor run actions and hides the toolbar run button (e.g. while an external confirm footer owns the run). */
   isRunDisabled?: boolean
+  /** Set while the query runs outside this editor (e.g. an approved Assistant tool call). */
+  isExternallyExecuting?: boolean
   onTitleChange: (title: string) => void
   onSqlChange: (sql: string) => void
   onSqlCommit?: (sql: string) => void
@@ -172,6 +174,7 @@ export const QueryEditor = forwardRef<QueryEditorHandle, QueryEditorProps>(funct
     showQuery,
     onShowQueryChange,
     isRunDisabled = false,
+    isExternallyExecuting = false,
     onTitleChange,
     onSqlChange,
     onSqlCommit,
@@ -253,7 +256,7 @@ export const QueryEditor = forwardRef<QueryEditorHandle, QueryEditorProps>(funct
 
   const isResolvingDatabase =
     databaseIdentifier !== undefined && databaseIdentifier !== project?.ref && isLoadingDatabases
-  const isExecuting = isExecutingSql || isExecutingLogs
+  const isExecuting = isExecutingSql || isExecutingLogs || isExternallyExecuting
   const isBusy = isLoadingProject || isResolvingDatabase || isExecuting
 
   const handleRunQuery = async ({

@@ -11,7 +11,10 @@ import { type ChartConfig } from '@/data/content/notebooks/notebook-schema'
 
 interface QueryResultRendererProps {
   result?: QueryResult
-  /** While a run is in flight the results region shows a loading state instead of the previous result. */
+  /**
+   * While a run is in flight the results region shows a running state. Previous rows stay
+   * visible underneath, dimmed, so notebook cells keep their height instead of collapsing.
+   */
   isExecuting?: boolean
   view?: 'table' | 'chart'
   chart?: ChartConfig
@@ -26,11 +29,11 @@ interface QueryResultStateProps extends ComponentProps<'div'> {
   children: ReactNode
 }
 
-/** Centered icon-over-label state for the results region (idle, loading, empty). */
+/** Centered icon-over-label state for the results region (idle, running, empty). */
 const QueryResultState = ({ icon, children, className, ...props }: QueryResultStateProps) => (
   <div
     className={cn(
-      'flex min-h-32 w-full flex-1 flex-col items-center justify-center gap-y-2 p-6 text-center',
+      'flex w-full flex-1 flex-col items-center justify-center gap-y-2 px-6 py-8 text-center',
       className
     )}
     {...props}
@@ -40,6 +43,16 @@ const QueryResultState = ({ icon, children, className, ...props }: QueryResultSt
     </span>
     <p className="text-sm text-foreground-light">{children}</p>
   </div>
+)
+
+const RunningState = ({ className }: { className?: string }) => (
+  <QueryResultState
+    role="status"
+    className={className}
+    icon={<Loader2Icon size={20} strokeWidth={1.5} className="animate-spin" />}
+  >
+    Running query…
+  </QueryResultState>
 )
 
 export const QueryResultRenderer = ({
@@ -52,17 +65,9 @@ export const QueryResultRenderer = ({
   onDebug,
 }: QueryResultRendererProps) => {
   const { rows, error, autoLimit } = result ?? {}
+  const hasRows = rows !== undefined && rows.length > 0
 
-  if (isExecuting) {
-    return (
-      <QueryResultState
-        role="status"
-        icon={<Loader2Icon size={20} strokeWidth={1.5} className="animate-spin" />}
-      >
-        Running query…
-      </QueryResultState>
-    )
-  }
+  if (isExecuting && !hasRows) return <RunningState />
 
   if (!result) {
     return (
@@ -84,7 +89,7 @@ export const QueryResultRenderer = ({
     )
   }
 
-  if ((rows ?? []).length === 0) {
+  if (!hasRows) {
     return (
       <QueryResultState icon={<CircleCheckIcon size={20} strokeWidth={1.5} />}>
         Success. No rows returned
@@ -92,10 +97,21 @@ export const QueryResultRenderer = ({
     )
   }
 
-  if (rows && rows.length > 0) {
-    if (view === 'table') return <DataGridResults rows={rows} />
-    if (view === 'chart') return <QueryResultChart chart={chart} result={result} />
-  }
+  const rowsContent = (
+    <>
+      {view === 'table' && <DataGridResults rows={rows} />}
+      {view === 'chart' && <QueryResultChart chart={chart} result={result} />}
+    </>
+  )
 
-  return null
+  if (!isExecuting) return rowsContent
+
+  return (
+    <div className="relative flex min-h-0 w-full flex-1 flex-col">
+      <div className="pointer-events-none flex min-h-0 flex-1 flex-col opacity-40" aria-hidden>
+        {rowsContent}
+      </div>
+      <RunningState className="absolute inset-0" />
+    </div>
+  )
 }
