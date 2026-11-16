@@ -325,3 +325,48 @@ export const getDefaultSelectedFileId = (
 
   return (entrypointFile ?? files.find((file) => file.name === 'index.ts') ?? files[0])?.id
 }
+
+type FunctionZipFile = { name: string; content: string }
+
+// Decides where each function file lands inside the downloaded ZIP.
+// - `multipart`: names include the deploy path (possibly with `../` segments), so they're made
+//   relative to the function slug, and files that reach above the base are nested under `src/`.
+// - `eszip`: names are already relative to the function root, so they're kept exactly as-is.
+//   Running slug-relative logic on them would drop folders that happen to share the slug's name.
+export const getFunctionZipEntries = ({
+  files,
+  slug,
+  source,
+}: {
+  files: FunctionZipFile[]
+  slug: string
+  source: 'multipart' | 'eszip'
+}): { path: string; content: string }[] => {
+  if (source === 'eszip') return files.map(({ name, content }) => ({ path: name, content }))
+
+  const relativeNames = files.map(({ name }) => {
+    const nameSections = name.split('/')
+    const slugIndex = nameSections.indexOf(slug)
+    return nameSections.slice(slugIndex + 1)
+  })
+
+  const countParentDirs = (segments: string[]) => {
+    const firstRealSegment = segments.findIndex((segment) => segment !== '..')
+    return firstRealSegment === -1 ? segments.length : firstRealSegment
+  }
+
+  // The deepest `../` reach decides how many `src` levels are needed to keep files in place
+  const maxDepth = Math.max(0, ...relativeNames.map(countParentDirs))
+
+  return files.map(({ content }, index) => {
+    const segments = relativeNames[index]
+    const parentDirCount = countParentDirs(segments)
+    const remainingSegments = segments.slice(parentDirCount)
+    const depthFromBase = maxDepth - parentDirCount
+    const baseDirs = Array.from({ length: Math.max(depthFromBase, 0) }, (_, i) =>
+      i === 0 ? 'src' : `src${i}`
+    )
+
+    return { path: [...baseDirs, ...remainingSegments].join('/'), content }
+  })
+}

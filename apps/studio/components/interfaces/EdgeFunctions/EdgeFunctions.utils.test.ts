@@ -1,6 +1,10 @@
 import { describe, expect, it } from 'vitest'
 
-import { formatFunctionBodyToFiles, getDefaultSelectedFileId } from './EdgeFunctions.utils'
+import {
+  formatFunctionBodyToFiles,
+  getDefaultSelectedFileId,
+  getFunctionZipEntries,
+} from './EdgeFunctions.utils'
 
 describe('formatFunctionBodyToFiles', () => {
   it('returns no files when there is no entrypoint path', () => {
@@ -188,5 +192,37 @@ describe('getDefaultSelectedFileId', () => {
     const id = getDefaultSelectedFileId(files, entrypointPath)
 
     expect(files.find((f) => f.id === id)?.name).toBe('index.ts')
+  })
+})
+
+describe('getFunctionZipEntries', () => {
+  const paths = (entries: { path: string }[]) => entries.map((e) => e.path)
+
+  it('makes multipart file paths relative to the function slug', () => {
+    const files = [
+      { name: 'source/hello/index.ts', content: 'a' },
+      { name: 'source/hello/utils/helper.ts', content: 'b' },
+    ]
+    const entries = getFunctionZipEntries({ files, slug: 'hello', source: 'multipart' })
+    expect(paths(entries)).toEqual(['index.ts', 'utils/helper.ts'])
+  })
+
+  it('nests multipart files that reach above the base under src/', () => {
+    const files = [
+      { name: 'source/hello/index.ts', content: 'a' },
+      { name: 'source/hello/../shared/db.ts', content: 'b' },
+    ]
+    const entries = getFunctionZipEntries({ files, slug: 'hello', source: 'multipart' })
+    expect(paths(entries)).toEqual(['src/index.ts', 'shared/db.ts'])
+  })
+
+  it('keeps eszip file paths exactly as-is, even when a folder shares the slug name', () => {
+    const files = [
+      { name: 'index.ts', content: 'a' },
+      { name: 'auth/handler.ts', content: 'b' },
+      { name: 'handler.ts', content: 'c' },
+    ]
+    const entries = getFunctionZipEntries({ files, slug: 'auth', source: 'eszip' })
+    expect(paths(entries)).toEqual(['index.ts', 'auth/handler.ts', 'handler.ts'])
   })
 })
