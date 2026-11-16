@@ -43,7 +43,14 @@ interface ProviderFormProps {
   isActive: boolean
 }
 
-const doubleNegativeKeys = ['SMS_AUTOCONFIRM']
+const doubleNegativeKeys = ['SMS_AUTOCONFIRM', 'EXTERNAL_EMAIL_MAGIC_LINK_DISABLED']
+
+// Keys the backend may not return yet. Without a stored value we can't know the current
+// setting, so the field is hidden and never sent, to avoid changing it unintentionally.
+const optionalConfigKeys = ['EXTERNAL_EMAIL_MAGIC_LINK_DISABLED']
+
+const isMissingOptionalKey = (config: object, key: string) =>
+  optionalConfigKeys.includes(key) && (config as Record<string, unknown>)[key] === undefined
 
 export const ProviderForm = ({ config, provider, isActive }: ProviderFormProps) => {
   const { resolvedTheme } = useTheme()
@@ -126,6 +133,7 @@ export const ProviderForm = ({ config, provider, isActive }: ProviderFormProps) 
     Object.keys(values).map((x: string) => {
       if (doubleNegativeKeys.includes(x)) payload[x] = !values[x]
       if (payload[x] === '') payload[x] = null
+      if (isMissingOptionalKey(config, x)) delete payload[x]
     })
 
     // The backend uses empty string to represent no required characters in the password
@@ -218,6 +226,7 @@ export const ProviderForm = ({ config, provider, isActive }: ProviderFormProps) 
               />
 
               {Object.keys(provider.properties).map((x: string) => {
+                if (isMissingOptionalKey(config, x)) return null
                 const { entitlementKey } = provider.properties[x]
                 const hasAccess = entitlementKey == null || hasEntitlementAccess(entitlementKey)
 

@@ -19,6 +19,8 @@ Trace changed inputs through their observable effects. Check async sequencing an
 
 At external boundaries such as HTTP, parsed JSON, route parameters, storage, and callbacks, verify how values become trusted domain data. Keep useful inferred types and validate untrusted inputs where the contract requires it. Flag broad types propagated inward, assertion chains, non-null assertions, or unsafe casts when they hide an unproven invariant. `unknown` and runtime narrowing are appropriate at genuine boundaries; do not ban them mechanically or add a schema library without need.
 
+Audit every added or changed type assertion in the diff. At JSON/API/storage boundaries, validate with a focused schema and preserve its inferred type; do not accept moving a cast into a helper as a fix.
+
 Explain any surviving type assertion's invariant in the review evidence. Do not weaken types, suppress errors, or route values through `any` to make checks pass. Static typechecking and passing runtime tests provide different evidence.
 
 ## Structure and readability

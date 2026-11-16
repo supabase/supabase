@@ -57,6 +57,9 @@ interface PageLayoutProps {
  * @param className - Optional additional class names to be applied
  * @param size - Controls padding of the page header only, padding for the content to be controlled by PageContainer (Default: 'default')
  * @param isCompact - TBD (Default: false)
+ *
+ * @deprecated Prefer PageHeader, PageNav, and PageContainer.
+ * See /design-system/docs/ui-patterns/layout
  */
 export const PageLayout = ({
   children,
