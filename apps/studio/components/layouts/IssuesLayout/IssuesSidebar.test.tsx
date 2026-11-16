@@ -119,5 +119,8 @@ describe('IssuesSidebar', () => {
 
     expect(await screen.findByRole('dialog', { name: 'Alert issue types' })).toBeInTheDocument()
     expect(await screen.findByText('No alert issue types yet')).toBeInTheDocument()
+
+    await userEvent.click(screen.getByRole('button', { name: 'New log rule' }))
+    expect(await screen.findByRole('dialog', { name: 'New log rule' })).toBeInTheDocument()
   })
 })

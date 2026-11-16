@@ -44,6 +44,10 @@ describe('alert issues hooks', () => {
     expect(result.current.data).toEqual([ISSUE])
   })
 
+  it('refetches every 30 seconds so new alert issues appear while the page is open', () => {
+    expect(alertIssuesQueryOptions({ projectRef: REF }).refetchInterval).toBe(30_000)
+  })
+
   it('surfaces an invalid response as an error', async () => {
     mswServer.use(http.get(BASE, () => HttpResponse.json([{ alert_issue_id: 1 }])))
 

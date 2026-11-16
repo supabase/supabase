@@ -30,4 +30,6 @@ export const alertIssuesQueryOptions = ({ projectRef }: AlertIssuesVariables) =>
     queryKey: alertIssuesKeys.list(projectRef),
     queryFn: ({ signal }) => getAlertIssues({ projectRef }, signal),
     enabled: !IS_PLATFORM && typeof projectRef !== 'undefined',
+    // Scheduled alert runs open alert issues in the background, so poll for them.
+    refetchInterval: 30_000,
   })

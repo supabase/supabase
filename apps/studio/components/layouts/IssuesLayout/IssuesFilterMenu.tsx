@@ -17,6 +17,7 @@ import {
 } from 'ui'
 
 import { AlertIssueTypesDialog } from '@/components/interfaces/Issues/AlertIssueTypesDialog'
+import { AlertLogRuleSheet } from '@/components/interfaces/Issues/AlertLogRuleSheet'
 import {
   CATEGORY_LABELS,
   ISSUE_CATEGORIES,
@@ -70,6 +71,7 @@ const MultiSelectSub = <T extends string>({
 export const IssuesFilterMenu = () => {
   const { ref } = useParams()
   const [isAlertIssueTypesOpen, setIsAlertIssueTypesOpen] = useState(false)
+  const [isLogRuleOpen, setIsLogRuleOpen] = useState(false)
   // Alert issues are served by self-hosted Studio only until the platform API exposes them.
   const showAlertIssueTypes = !IS_PLATFORM && !!ref
   const isHealthAdvisorEnabled = useFlag('healthAdvisor')
@@ -130,6 +132,17 @@ export const IssuesFilterMenu = () => {
           projectRef={ref}
           open={isAlertIssueTypesOpen}
           onOpenChange={setIsAlertIssueTypesOpen}
+          onCreateRule={() => {
+            setIsAlertIssueTypesOpen(false)
+            setIsLogRuleOpen(true)
+          }}
+        />
+      )}
+      {showAlertIssueTypes && (
+        <AlertLogRuleSheet
+          projectRef={ref}
+          open={isLogRuleOpen}
+          onClose={() => setIsLogRuleOpen(false)}
         />
       )}
     </>
