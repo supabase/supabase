@@ -24,3 +24,32 @@ export const alertIssueSchema = z.object({
 
 export type AlertIssue = z.infer<typeof alertIssueSchema>
 export type AlertIssueStatus = z.infer<typeof alertIssueStatusSchema>
+
+export const alertIssueCommentSchema = z.object({
+  comment_id: z.string(),
+  alert_issue_id: z.string(),
+  author: z.string(),
+  body: z.string(),
+  created_at: z.string(),
+})
+
+export type AlertIssueComment = z.infer<typeof alertIssueCommentSchema>
+
+export const alertLogEventsSchema = z.object({
+  lql: z.string(),
+  source: z.string().nullish(),
+  from: z.string(),
+  to: z.string(),
+  total: z.number(),
+  buckets: z.array(z.object({ timestamp: z.string(), count: z.number() })),
+  events: z.array(
+    z.object({
+      id: z.string(),
+      timestamp: z.union([z.string(), z.number()]),
+      event_message: z.string().nullish(),
+      body: z.record(z.string(), z.unknown()).default({}),
+    })
+  ),
+})
+
+export type AlertLogEvents = z.infer<typeof alertLogEventsSchema>
