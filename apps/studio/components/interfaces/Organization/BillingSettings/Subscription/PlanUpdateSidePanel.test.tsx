@@ -124,7 +124,7 @@ vi.mock('./UpgradeModal', () => ({
 }))
 
 vi.mock('./MembersExceedLimitModal', () => ({
-  default: () => null,
+  MembersExceedLimitModal: () => null,
 }))
 
 vi.mock('./SubscriptionPlanUpdateDialog', () => ({
