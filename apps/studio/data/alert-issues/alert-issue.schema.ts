@@ -2,6 +2,14 @@ import z from 'zod/v4'
 
 export const alertIssueStatusSchema = z.enum(['open', 'acknowledged', 'snoozed', 'resolved'])
 
+export const alertIssueNotebookCellSchema = z.object({
+  title: z.string(),
+  source: z.enum(['database', 'logs']),
+  sql: z.string(),
+})
+
+export type AlertIssueNotebookCell = z.infer<typeof alertIssueNotebookCellSchema>
+
 export const alertIssueSchema = z.object({
   alert_issue_id: z.string(),
   status: alertIssueStatusSchema,
@@ -20,6 +28,7 @@ export const alertIssueSchema = z.object({
   snoozed_until: z.string().nullish(),
   actor: z.string(),
   unread: z.boolean().optional(),
+  notebook: z.array(alertIssueNotebookCellSchema).optional(),
 })
 
 export type AlertIssue = z.infer<typeof alertIssueSchema>
