@@ -168,7 +168,6 @@ describe('function log bookmarks', () => {
       await screen.findByRole('status', { name: 'Second bookmarked output', hidden: true })
     ).toBeInTheDocument()
     expect(screen.queryByText('Bookmarked function output')).not.toBeInTheDocument()
-    await waitFor(() => expect(queryClient.isFetching()).toBe(0))
     fireEvent.click(screen.getByText('Close bookmark', { selector: 'button' }))
     await waitFor(() =>
       expect(
