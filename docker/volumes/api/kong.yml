@@ -203,7 +203,9 @@ services:
             - admin
             - anon
       # Sanitizes responses that browsers would render as HTML or SVG, since
-      # Studio shares this origin (reused by Storage and Functions below).
+      # Studio shares this origin. `&sanitize_html` is a YAML anchor: the
+      # storage-v1 and functions-v1 services below reuse this same Lua code
+      # through the `*sanitize_html` alias, which YAML expands into a copy.
       - name: post-function
         config:
           header_filter:
@@ -391,6 +393,7 @@ services:
                 kong.service.request.clear_header("authorization")
               end
           header_filter:
+            # Same Lua code as the rest-v1 service (YAML alias of `&sanitize_html`)
             - *sanitize_html
 
   ## Edge Functions routes
@@ -440,6 +443,7 @@ services:
                 kong.service.request.clear_header("sb-api-key")
               end
           header_filter:
+            # Same Lua code as the rest-v1 service (YAML alias of `&sanitize_html`)
             - *sanitize_html
 
   ## OAuth 2.0 Authorization Server Metadata (RFC 8414)
