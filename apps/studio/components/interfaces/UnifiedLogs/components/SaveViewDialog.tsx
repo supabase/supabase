@@ -152,7 +152,7 @@ export const SaveViewDialog = ({
             )}
             {optionsSummary.length > 0 && (
               <div>
-                <p className="text-foreground-light mb-1">Options</p>
+                <p className="text-foreground-light mb-1">Log sources</p>
                 <div className="flex flex-wrap items-center gap-1.5">
                   {optionsSummary.map((row) => (
                     <OptionPill key={row.label} label={row.label} value={row.text} />
