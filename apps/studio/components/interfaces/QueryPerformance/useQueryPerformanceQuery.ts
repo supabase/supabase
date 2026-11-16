@@ -10,7 +10,11 @@ import { useInfiniteQuery, useQueryClient } from '@tanstack/react-query'
 
 import { PRESET_CONFIG } from '../Reports/Reports.constants'
 import { Presets } from '../Reports/Reports.types'
-import type { ComparisonOperator, NumericFilter } from '../Reports/v2/ReportsNumericFilter'
+import {
+  numericFilterSchema,
+  type ComparisonOperator,
+  type NumericFilter,
+} from '../Reports/v2/ReportsNumericFilter'
 import {
   QueryPerformanceRow,
   QueryPerformanceSort,
@@ -50,10 +54,11 @@ function numericFilterToSql(
   column: SafeSqlFragment,
   filter: NumericFilter | undefined
 ): SafeSqlFragment | undefined {
-  if (!filter || !Number.isFinite(filter.value)) return undefined
-  const operator = COMPARISON_OPERATOR_SQL[filter.operator]
-  if (!operator) return undefined
-  return safeSql`${column} ${operator} ${literal(filter.value)}`
+  // Filters come from URL params, so validate the shape before building SQL. The schema's
+  // operator enum also rules out inherited property names like `constructor`.
+  const parsed = numericFilterSchema.safeParse(filter)
+  if (!parsed.success || !Number.isFinite(parsed.data.value)) return undefined
+  return safeSql`${column} ${COMPARISON_OPERATOR_SQL[parsed.data.operator]} ${literal(parsed.data.value)}`
 }
 
 export function generateQueryPerformanceSql({

@@ -11,7 +11,10 @@ import { useQueryPerformanceInfiniteQuery } from '@/components/interfaces/QueryP
 import { PRESET_CONFIG } from '@/components/interfaces/Reports/Reports.constants'
 import { Presets } from '@/components/interfaces/Reports/Reports.types'
 import { queriesFactory } from '@/components/interfaces/Reports/Reports.utils'
-import { NumericFilter } from '@/components/interfaces/Reports/v2/ReportsNumericFilter'
+import {
+  NumericFilter,
+  numericFilterSchema,
+} from '@/components/interfaces/Reports/v2/ReportsNumericFilter'
 import { DefaultLayout } from '@/components/layouts/DefaultLayout'
 import ObservabilityLayout from '@/components/layouts/ObservabilityLayout/ObservabilityLayout'
 import { DatabaseSelector } from '@/components/ui/DatabaseSelector'
@@ -20,6 +23,11 @@ import { useSelectedProjectQuery } from '@/hooks/misc/useSelectedProject'
 import type { NextPageWithLayout } from '@/types'
 
 const REPORT_TITLE = 'Query Performance'
+
+const parseNumericFilter = (value: unknown): NumericFilter | null => {
+  const parsed = numericFilterSchema.safeParse(value)
+  return parsed.success ? parsed.data : null
+}
 
 const QueryPerformanceReport: NextPageWithLayout = () => {
   const { ref } = useParams()
@@ -42,12 +50,8 @@ const QueryPerformanceReport: NextPageWithLayout = () => {
     search: parseAsString.withDefault(''),
     roles: parseAsArrayOf(parseAsString).withDefault([]),
     sources: parseAsArrayOf(parseAsString).withDefault([]),
-    callsFilter: parseAsJson<NumericFilter | null>((value) =>
-      value === null || value === undefined ? null : (value as NumericFilter)
-    ),
-    totalTimeFilter: parseAsJson<NumericFilter | null>((value) =>
-      value === null || value === undefined ? null : (value as NumericFilter)
-    ),
+    callsFilter: parseAsJson(parseNumericFilter),
+    totalTimeFilter: parseAsJson(parseNumericFilter),
     indexAdvisor: parseAsString.withDefault('false'),
   })
 

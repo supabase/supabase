@@ -107,14 +107,17 @@ describe('generateQueryPerformanceSql', () => {
     expect(result.whereSql).toBe('')
   })
 
-  it('ignores a filter with an unknown operator', () => {
-    const result = generateQueryPerformanceSql({
-      preset: 'mostFrequentlyInvoked',
-      // URL params are not validated at runtime, so an injected operator must be dropped
-      callsFilter: { operator: '>= 0 OR 1=1 --' as never, value: 1 },
-    })
-    expect(result.whereSql).toBe('')
-  })
+  it.each(['>= 0 OR 1=1 --', 'constructor', '__proto__', 'toString'])(
+    'ignores a filter with the unknown operator %s',
+    (operator) => {
+      const result = generateQueryPerformanceSql({
+        preset: 'mostFrequentlyInvoked',
+        // URL params are not validated at runtime, so an injected operator must be dropped
+        callsFilter: { operator: operator as never, value: 1 },
+      })
+      expect(result.whereSql).toBe('')
+    }
+  )
 
   it('combines multiple WHERE conditions with AND', () => {
     const result = generateQueryPerformanceSql({
