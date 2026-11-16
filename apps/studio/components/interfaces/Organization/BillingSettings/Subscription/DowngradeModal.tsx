@@ -106,7 +106,7 @@ export const DowngradeModal = ({
         <div className="px-5 py-4 text-foreground-light">
           <div className="flex flex-col space-y-2">
             {((previousProjectAddons.length ?? 0) > 0 || hasInstancesOnMicro) && (
-              <Admonition type="warning">
+              <Admonition type="warning" title="Projects affected by the downgrade">
                 <ul className="!my-0 space-y-1 max-h-[100px] overflow-y-auto">
                   {previousProjectAddons.map((project) => (
                     <ProjectDowngradeListItem key={project.ref} projectAddon={project} />
