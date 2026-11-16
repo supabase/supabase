@@ -211,6 +211,10 @@ Report when the current value already meets the confirmed limit, regardless of h
 
 Run the Health query for two separate complete UTC days. Compare API Gateway `events`; report at least 1,000 events and twice the preceding count. If the preceding count is zero, report new observed traffic without a growth percentage. Apply the missing-source rules. Request growth is workload context, not a capacity limit or billing total.
 
+### Investigate high egress
+
+High request volume or large responses drive [Egress usage](/docs/guides/platform/manage-your-usage/egress#debug-usage) and can cause an unexpected bill. Use the egress debugging guide to rank API and Storage paths by request count, then decide whether to fix the source in your code or your Supabase configuration.
+
 ## Turn a detection into a diagnosis
 
 Report the check, outcome, project, observation time, window or snapshot, threshold, measured values and units, and an evidence identifier. Include one investigation link and a verification step. Separate observations from hypotheses; do not invent a cause or remediation SQL. Use the [troubleshooting guides](/kb/topics/troubleshooting) to investigate the evidence.

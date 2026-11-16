@@ -1,5 +1,10 @@
+import { ArrowRightIcon } from 'lucide-react'
+import { Button } from 'ui'
+
+import { EgressDebugButton } from './EgressDebugButton'
 import { dailyUsageToDataPoints } from './Usage.utils'
 import UsageSection from './UsageSection/UsageSection'
+import { ButtonTooltip } from '@/components/ui/ButtonTooltip'
 import { DataPoint } from '@/data/analytics/constants'
 import { PricingMetric, type OrgDailyUsageResponse } from '@/data/analytics/org-daily-stats-query'
 import type { OrgSubscription } from '@/data/subscriptions/types'
@@ -53,6 +58,28 @@ const Egress = ({
       currentBillingCycleSelected={currentBillingCycleSelected}
       startDate={startDate}
       endDate={endDate}
+      headerActions={
+        <>
+          {projectRef !== null ? (
+            <Button asChild iconRight={<ArrowRightIcon />}>
+              <a href={`/project/${projectRef}/observability/egress`}>
+                Investigate in Observability
+              </a>
+            </Button>
+          ) : (
+            <ButtonTooltip
+              disabled
+              iconRight={<ArrowRightIcon />}
+              tooltip={{
+                content: { side: 'bottom', text: 'Select a single project to investigate' },
+              }}
+            >
+              Investigate in Observability
+            </ButtonTooltip>
+          )}
+          <EgressDebugButton projectRef={projectRef} orgSlug={orgSlug} />
+        </>
+      }
     />
   )
 }

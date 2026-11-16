@@ -1,6 +1,7 @@
 import { ReactNode } from 'react'
 import { Admonition } from 'ui-patterns/Admonition'
 
+import { EgressBreakdownPanel } from './EgressBreakdownPanel'
 import { USAGE_APPROACHING_THRESHOLD } from '@/components/interfaces/Billing/Billing.constants'
 import { EgressType, PricingMetric } from '@/data/analytics/org-daily-stats-query'
 import type { OrgSubscription } from '@/data/subscriptions/types'
@@ -82,19 +83,20 @@ export const USAGE_CATEGORIES: (subscription?: OrgSubscription) => CategoryMeta[
       key: PricingMetric.EGRESS,
       attributes: [
         { key: EgressType.AUTH, name: 'Auth Egress', color: 'yellow' },
-        { key: EgressType.REST, name: 'PostgREST Egress', color: 'green' },
+        { key: EgressType.REST, name: 'REST API Egress', color: 'green' },
         { key: EgressType.STORAGE, name: 'Storage Egress', color: 'blue' },
         { key: EgressType.REALTIME, name: 'Realtime Egress', color: 'orange' },
-        { key: EgressType.FUNCTIONS, name: 'Functions Egress', color: 'purple' },
-        { key: EgressType.SUPAVISOR, name: 'Shared Pooler Egress', color: 'red' },
-        { key: EgressType.LOGDRAIN, name: 'Logdrain Egress', color: 'teal' },
+        { key: EgressType.FUNCTIONS, name: 'Edge Functions Egress', color: 'purple' },
+        { key: EgressType.SUPAVISOR, name: 'Connection Pooler Egress', color: 'red' },
+        { key: EgressType.LOGDRAIN, name: 'Log Drain Egress', color: 'teal' },
       ],
       name: 'Egress',
       unit: 'bytes',
       description:
-        'Contains any outgoing traffic including Database, Storage, Realtime, Auth, API, Edge Functions, Pooler and Log Drains.\nBilling is based on the total sum of uncached egress in GB throughout your billing period.\nEgress via cache hits is billed separately.',
+        'Egress is the data your project sent to clients this billing period. Every Supabase service that returns data adds to it: REST API, Storage, Auth, Realtime, Edge Functions, Connection Pooler, and Log Drains.\nSupabase bills the total uncached egress in GB for the period.\nCached egress is billed separately.',
       chartDescription:
         'The breakdown of different egress types is inclusive of cached egress, even though it is billed separately. The data refreshes every hour.',
+      additionalInfo: () => <EgressBreakdownPanel kind="rest" />,
       links: [
         {
           name: 'Documentation',
@@ -109,8 +111,9 @@ export const USAGE_CATEGORIES: (subscription?: OrgSubscription) => CategoryMeta[
       name: 'Cached Egress',
       unit: 'bytes',
       description:
-        'Contains any outgoing traffic that is served from a cache hit. Includes API, Storage and Edge Functions.\nBilling is based on the total sum of cached egress in GB throughout your billing period.',
+        'Cached egress is data the Supabase CDN delivered from a cache hit. It covers API, Storage, and Edge Functions.\nA cache hit does not make this traffic free. Cached egress has its own quota and a lower per-GB price than uncached egress.\nSupabase bills the total cached egress in GB for the period.',
       chartDescription: 'The data refreshes every hour.',
+      additionalInfo: () => <EgressBreakdownPanel kind="cache" />,
       links: [
         {
           name: 'Documentation',
