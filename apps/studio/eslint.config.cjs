@@ -64,6 +64,11 @@ const FETCH_TYPE_BYPASS_EXCEPTIONS = [
   'data/__templates/resource-update-mutation.ts',
   'data/log-drains/delete-log-drain-mutation.ts',
   // untyped `fetchGet` / `fetchPost`
+  // Self-hosted only until the platform API exposes /alerts/issues and api-types
+  // is regenerated; remove these three entries then and use the typed fetchers.
+  'data/alert-issues/alert-issues-query.ts',
+  'data/alert-issues/alert-issue-action-mutation.ts',
+  'data/alert-issues/alert-issues-read-mutation.ts',
   'lib/api/self-hosted/generate-types.ts',
   'routes/api/platform/auth/$ref/invite.ts',
   'routes/api/platform/auth/$ref/magiclink.ts',
