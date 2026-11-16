@@ -25,13 +25,10 @@ export const isInDataApiRevokeTreatment = (flag: boolean | string | undefined): 
 }
 
 /**
- * Default value of the "Grant API access to new tables automatically" checkbox
- * at project creation, driven by the PostHog `dataApiRevokeOnCreateDefault` flag (the
- * return value is `!isInDataApiRevokeTreatment(flag)`). When the flag is on,
- * the checkbox defaults to unchecked (i.e. revoke SQL runs). When the flag is
- * off, or not loaded yet (`usePHFlag` returns undefined), it defaults to
- * checked (current behaviour — default grants remain). Always returns false
- * in tests.
+ * Controls the default state of the "Grant API access to new tables automatically"
+ * checkbox at project creation. When the flag is on, the checkbox defaults
+ * to unchecked (i.e. revoke SQL runs). When off/absent, the checkbox defaults
+ * to checked (current behaviour — default grants remain).
  */
 export const useDataApiRevokeOnCreateDefaultEnabled = (): boolean => {
   const flag = usePHFlag<boolean | string>('dataApiRevokeOnCreateDefault')
@@ -43,7 +40,7 @@ export const useDataApiRevokeOnCreateDefaultEnabled = (): boolean => {
     return false
   }
 
-  return !isInDataApiRevokeTreatment(flag)
+  return isInDataApiRevokeTreatment(flag)
 }
 
 type DefaultPrivilegesExposureOptions =
@@ -81,12 +78,10 @@ export const useTrackDefaultPrivilegesExposure = (options: DefaultPrivilegesExpo
     if (hasTracked.current) return
     if (flag === undefined) return
     if (surface === 'vercel' && !orgSlug) return
-
     // Gate on form-flag convergence unless the user explicitly dirtied the field.
     const expectedDefault = !isInDataApiRevokeTreatment(flag)
     if (!hasUserModified && dataApiDefaultPrivileges !== expectedDefault) return
     hasTracked.current = true
-
     track(
       'project_creation_default_privileges_exposed',
       {

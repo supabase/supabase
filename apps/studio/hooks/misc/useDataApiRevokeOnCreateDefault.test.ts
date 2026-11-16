@@ -34,11 +34,11 @@ describe('useDataApiRevokeOnCreateDefaultEnabled', () => {
   })
 
   it.each([
-    [undefined, true],
-    ['control', true],
-    [true, false],
-    ['test', false],
-  ])('maps PostHog flag %s to the checkbox default %s', (flag, expected) => {
+    [undefined, false],
+    ['control', false],
+    [true, true],
+    ['test', true],
+  ])('maps PostHog flag %s to %s', (flag, expected) => {
     vi.mocked(usePHFlag).mockReturnValue(flag)
     const { result } = renderHook(() => useDataApiRevokeOnCreateDefaultEnabled())
     expect(result.current).toBe(expected)

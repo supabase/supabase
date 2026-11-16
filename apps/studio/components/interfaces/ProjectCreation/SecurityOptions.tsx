@@ -123,7 +123,7 @@ export const SecurityOptions = ({ form, layout = 'horizontal', surface }: Securi
                         <FormDescription className="text-foreground-lighter">
                           Expose new tables in the public schema to the{' '}
                           <InlineLink href={`${DOCS_URL}/guides/api`}>Data API</InlineLink>.
-                          {isDataApiRevokeOnCreateDefault ? (
+                          {!isDataApiRevokeOnCreateDefault ? (
                             <strong className="block text-foreground-light">
                               We recommend disabling this to control access manually.
                             </strong>
