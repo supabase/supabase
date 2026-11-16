@@ -13,9 +13,38 @@ function projectFilter(projectRef: string) {
   return { 'identifiers.project': projectRef }
 }
 
+function projectFilterParams(projectRef: string) {
+  return { 'filters[identifiers.project]': projectRef }
+}
+
+/** A failed Logflare request, keeping the HTTP status so routes can pass client errors through. */
+export class LogflareRequestError extends Error {
+  constructor(
+    message: string,
+    public status: number
+  ) {
+    super(message)
+    this.name = 'LogflareRequestError'
+  }
+}
+
+/** Logflare statuses that describe the request itself and are safe to return to the browser. */
+const CLIENT_ERROR_STATUSES = [400, 404, 409, 422]
+
+/** The status a self-hosted route should answer with for a failed Logflare request. */
+export function getProxyErrorStatus(error: Error) {
+  return error instanceof LogflareRequestError && CLIENT_ERROR_STATUSES.includes(error.status)
+    ? error.status
+    : 500
+}
+
 async function logflareRequest(
   path: string,
-  init: { method: 'GET' | 'POST'; searchParams?: Record<string, string>; body?: unknown }
+  init: {
+    method: 'GET' | 'POST' | 'DELETE'
+    searchParams?: Record<string, string>
+    body?: unknown
+  }
 ): Promise<WrappedResult<unknown>> {
   assertSelfHosted()
   assert(PROJECT_ANALYTICS_URL, 'PROJECT_ANALYTICS_URL is required')
@@ -37,6 +66,8 @@ async function logflareRequest(
       ...(init.body !== undefined && { body: JSON.stringify(init.body) }),
     })
 
+    if (response.status === 204) return { data: null, error: undefined }
+
     const result = await response.json()
 
     if (!response.ok) {
@@ -44,7 +75,7 @@ async function logflareRequest(
         typeof result?.error === 'string'
           ? result.error
           : (result?.error?.message ?? `Failed to reach Logflare: ${response.statusText}`)
-      return { data: undefined, error: new Error(message) }
+      return { data: undefined, error: new LogflareRequestError(message, response.status) }
     }
 
     return { data: result, error: undefined }
@@ -129,4 +160,155 @@ export function markAlertIssuesRead({
       filters: projectFilter(projectRef),
     },
   })
+}
+
+/**
+ * Lists the comments on one of the project's alert issues, oldest first.
+ *
+ * _Only call this from server-side self-hosted code._
+ */
+export function listAlertIssueComments({
+  projectRef,
+  alertIssueId,
+}: {
+  projectRef: string
+  alertIssueId: string
+}) {
+  return logflareRequest(`alerts/issues/${encodeURIComponent(alertIssueId)}/comments`, {
+    method: 'GET',
+    searchParams: projectFilterParams(projectRef),
+  })
+}
+
+/**
+ * Adds a comment to one of the project's alert issues as the dashboard user.
+ *
+ * _Only call this from server-side self-hosted code._
+ */
+export function createAlertIssueComment({
+  projectRef,
+  alertIssueId,
+  body,
+}: {
+  projectRef: string
+  alertIssueId: string
+  body: string
+}) {
+  return logflareRequest(`alerts/issues/${encodeURIComponent(alertIssueId)}/comments`, {
+    method: 'POST',
+    searchParams: projectFilterParams(projectRef),
+    body: { author: SELF_HOSTED_READER, body },
+  })
+}
+
+/**
+ * Returns the log events behind one of the project's alert issues, using the preview LQL of
+ * its alert issue type.
+ *
+ * _Only call this from server-side self-hosted code._
+ */
+export function getAlertIssueEvents({
+  projectRef,
+  alertIssueId,
+  from,
+  to,
+}: {
+  projectRef: string
+  alertIssueId: string
+  from?: string
+  to?: string
+}) {
+  return logflareRequest(`alerts/issues/${encodeURIComponent(alertIssueId)}/events`, {
+    method: 'GET',
+    searchParams: {
+      ...projectFilterParams(projectRef),
+      ...(from && { from }),
+      ...(to && { to }),
+    },
+  })
+}
+
+/**
+ * Runs an LQL filter over a time range and returns the matching log events.
+ *
+ * _Only call this from server-side self-hosted code._
+ */
+export function previewAlertRule({ lql, from, to }: { lql: string; from?: string; to?: string }) {
+  return logflareRequest('alerts/preview', {
+    method: 'POST',
+    body: { lql, ...(from && { from }), ...(to && { to }) },
+  })
+}
+
+/**
+ * Lists the alert issue types (managed and custom rules) with the project's silence state.
+ *
+ * _Only call this from server-side self-hosted code._
+ */
+export function listAlertIssueTypes({ projectRef }: { projectRef: string }) {
+  return logflareRequest('alerts/issue_types', {
+    method: 'GET',
+    searchParams: projectFilterParams(projectRef),
+  })
+}
+
+/**
+ * Creates a custom alert issue type: an LQL rule that Logflare evaluates on a schedule.
+ *
+ * _Only call this from server-side self-hosted code._
+ */
+export function createAlertIssueType({
+  projectRef,
+  ...rule
+}: {
+  projectRef: string
+  name: string
+  lql: string
+  severity: string
+  category: string
+  description?: string
+  group_by?: string[]
+}) {
+  return logflareRequest('alerts/issue_types', {
+    method: 'POST',
+    body: { ...rule, identifiers: { project: projectRef } },
+  })
+}
+
+/**
+ * Deletes a custom alert issue type.
+ *
+ * _Only call this from server-side self-hosted code._
+ */
+export function deleteAlertIssueType({ ruleKey }: { ruleKey: string }) {
+  return logflareRequest(`alerts/issue_types/${encodeURIComponent(ruleKey)}`, {
+    method: 'DELETE',
+  })
+}
+
+/**
+ * Silences an alert issue type for the project. Its alert issues are still recorded but hidden.
+ *
+ * _Only call this from server-side self-hosted code._
+ */
+export function createAlertSilence({
+  projectRef,
+  ruleKey,
+}: {
+  projectRef: string
+  ruleKey: string
+}) {
+  return logflareRequest('alerts/silences', {
+    method: 'POST',
+    body: { rule_key: ruleKey, matchers: { project: projectRef }, created_by: SELF_HOSTED_READER },
+  })
+}
+
+/**
+ * Deletes a silence.
+ *
+ * _Only call this from server-side self-hosted code._
+ */
+export function deleteAlertSilence({ silenceId }: { silenceId: string }) {
+  return logflareRequest(`alerts/silences/${encodeURIComponent(silenceId)}`, { method: 'DELETE' })
 }
