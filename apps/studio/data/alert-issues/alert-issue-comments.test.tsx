@@ -80,6 +80,30 @@ describe('alert issue comments', () => {
       expect(result.current.list.data?.map((comment) => comment.comment_id)).toEqual(['c1', 'c2'])
     )
   })
+
+  it('posts a comment as the Supabase Assistant', async () => {
+    let received: unknown
+    mswServer.use(
+      http.post(`${ISSUE_URL}/comments`, async ({ request }) => {
+        received = await request.json()
+        return HttpResponse.json(
+          { ...COMMENT, comment_id: 'c3', author: 'Supabase Assistant' },
+          { status: 201 }
+        )
+      })
+    )
+
+    const { result } = customRenderHook(() => useAlertIssueCommentCreateMutation())
+    result.current.mutate({
+      projectRef: REF,
+      alertIssueId: 'a1',
+      body: 'Found it',
+      asAssistant: true,
+    })
+
+    await waitFor(() => expect(result.current.isSuccess).toBe(true))
+    expect(received).toEqual({ body: 'Found it', as_assistant: true })
+  })
 })
 
 describe('alert issue events', () => {

@@ -11,7 +11,10 @@ import {
   listAlertIssueComments,
 } from '@/lib/api/self-hosted/alert-issues'
 
-const bodySchema = z.object({ body: z.string().trim().min(1).max(5000) })
+const bodySchema = z.object({
+  body: z.string().trim().min(1).max(5000),
+  as_assistant: z.boolean().optional(),
+})
 
 const nextHandler = (req: NextApiRequest, res: NextApiResponse) => apiWrapper(req, res, handler)
 
@@ -35,6 +38,7 @@ async function handler(req: NextApiRequest, res: NextApiResponse) {
       projectRef: ref,
       alertIssueId,
       body: body.data.body,
+      asAssistant: body.data.as_assistant,
     })
     if (error)
       return res.status(getProxyErrorStatus(error)).json({ error: { message: error.message } })

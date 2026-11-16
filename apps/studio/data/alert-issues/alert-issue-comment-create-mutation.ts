@@ -14,18 +14,21 @@ export type AlertIssueCommentCreateVariables = {
   projectRef: string
   alertIssueId: string
   body: string
+  /** Posts the comment as the Supabase Assistant instead of the dashboard user. */
+  asAssistant?: boolean
 }
 
 async function createAlertIssueComment({
   projectRef,
   alertIssueId,
   body,
+  asAssistant = false,
 }: AlertIssueCommentCreateVariables): Promise<AlertIssueComment> {
   if (!projectRef) throw new Error('projectRef is required')
 
   const response = await fetchPost<unknown>(
     `${API_URL}/platform/projects/${projectRef}/alerts/issues/${encodeURIComponent(alertIssueId)}/comments`,
-    { body }
+    asAssistant ? { body, as_assistant: true } : { body }
   )
   if (isStudioError(response)) throw response
 

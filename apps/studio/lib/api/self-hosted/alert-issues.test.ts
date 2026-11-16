@@ -140,6 +140,24 @@ describe('api/self-hosted/alert-issues', () => {
       expect(init.method).toBe('POST')
       expect(JSON.parse(init.body)).toEqual({ author: 'self-hosted', body: 'On it' })
     })
+
+    it('posts as the Supabase Assistant when asked', async () => {
+      fetchMock.mockResolvedValue(jsonResponse({ comment_id: 'c2' }))
+      const { createAlertIssueComment } = await loadModule()
+
+      await createAlertIssueComment({
+        projectRef: 'default',
+        alertIssueId: 'a1',
+        body: 'Here is what I found',
+        asAssistant: true,
+      })
+
+      const [, init] = fetchMock.mock.calls[0]
+      expect(JSON.parse(init.body)).toEqual({
+        author: 'Supabase Assistant',
+        body: 'Here is what I found',
+      })
+    })
   })
 
   describe('getAlertIssueEvents', () => {

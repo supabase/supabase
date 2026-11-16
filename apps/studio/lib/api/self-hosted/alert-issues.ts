@@ -180,8 +180,11 @@ export function listAlertIssueComments({
   })
 }
 
+const ASSISTANT_COMMENT_AUTHOR = 'Supabase Assistant'
+
 /**
- * Adds a comment to one of the project's alert issues as the dashboard user.
+ * Adds a comment to one of the project's alert issues as the dashboard user, or as the
+ * Supabase Assistant when `asAssistant` is set.
  *
  * _Only call this from server-side self-hosted code._
  */
@@ -189,15 +192,17 @@ export function createAlertIssueComment({
   projectRef,
   alertIssueId,
   body,
+  asAssistant = false,
 }: {
   projectRef: string
   alertIssueId: string
   body: string
+  asAssistant?: boolean
 }) {
   return logflareRequest(`alerts/issues/${encodeURIComponent(alertIssueId)}/comments`, {
     method: 'POST',
     searchParams: projectFilterParams(projectRef),
-    body: { author: SELF_HOSTED_READER, body },
+    body: { author: asAssistant ? ASSISTANT_COMMENT_AUTHOR : SELF_HOSTED_READER, body },
   })
 }
 
