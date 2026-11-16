@@ -592,7 +592,8 @@ export const SchemaGraph = () => {
                 >
                   <Background
                     gap={16}
-                    className="*:stroke-foreground-muted opacity-25"
+                    className="opacity-25"
+                    patternClassName="stroke-tertiary-foreground"
                     variant={BackgroundVariant.Dots}
                     color={'inherit'}
                   />
