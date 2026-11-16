@@ -43,11 +43,7 @@ export const AlertIssueNotebook = ({ issue, projectRef }: AlertIssueNotebookProp
       {cells.map((cell, index) => {
         const key = `${issue.alert_issue_id}-${index}`
         if (cell.status === 'ready') {
-          return (
-            <div key={key} className="h-96">
-              <AlertIssueQueryCell id={key} cell={cell} />
-            </div>
-          )
+          return <AlertIssueQueryCell key={key} id={key} cell={cell} />
         }
         return (
           <Admonition

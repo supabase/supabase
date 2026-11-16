@@ -1,5 +1,6 @@
 import { untrustedSql } from '@supabase/pg-meta'
 import { useState } from 'react'
+import { cn } from 'ui'
 
 import type { RenderedAlertIssueCell } from './AlertIssueNotebook.utils'
 import { QueryEditor, type ExplorerQueryModel } from '@/components/interfaces/Explorer/QueryEditor'
@@ -24,12 +25,17 @@ export const AlertIssueQueryCell = ({ id, cell }: { id: string; cell: ReadyCell 
   const [sql, setSql] = useState<string>(cell.sql)
   const [result, setResult] = useState<QueryResult>()
   const [showQuery, setShowQuery] = useState(true)
+  const [hasRun, setHasRun] = useState(false)
 
   return (
     <QueryEditor
       id={id}
       variant="embedded"
-      className="h-full min-h-0"
+      className={cn(
+        'min-h-0',
+        !hasRun &&
+          '[&_[data-slot=explorer-query-footer]]:hidden [&_[data-slot=explorer-query-results]]:hidden'
+      )}
       title={title}
       query={toQueryModel(cell, sql)}
       result={result}
@@ -38,6 +44,7 @@ export const AlertIssueQueryCell = ({ id, cell }: { id: string; cell: ReadyCell 
       onTitleChange={setTitle}
       onSqlChange={setSql}
       onResultChange={setResult}
+      onRun={() => setHasRun(true)}
     />
   )
 }
