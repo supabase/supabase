@@ -15,7 +15,7 @@ const customRenderers: CustomSectionRenderers = {
 // eslint-disable-next-line
 export default function GoPageRenderer({ page }: { page: GoPage }) {
   return (
-    <>
+    <div className={'theme' in page && page.theme === 'light' ? 'light bg-white' : undefined}>
       <SkipToContent href="#main" />
       <nav className="absolute top-0 left-0 right-0 z-10">
         <div className="max-w-7xl mx-auto flex items-center h-14 px-8">
@@ -46,6 +46,6 @@ export default function GoPageRenderer({ page }: { page: GoPage }) {
           </div>
         </div>
       </footer>
-    </>
+    </div>
   )
 }

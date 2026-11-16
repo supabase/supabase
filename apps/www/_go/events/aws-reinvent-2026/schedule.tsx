@@ -4,6 +4,7 @@ import Script from 'next/script'
 const page: GoPageInput = {
   template: 'lead-gen',
   slug: 'aws-reinvent/schedule',
+  theme: 'light',
   metadata: {
     title: 'Meet Supabase at AWS re:Invent 2026 | Supabase',
     description:
