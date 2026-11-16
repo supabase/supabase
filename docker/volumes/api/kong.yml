@@ -204,8 +204,9 @@ services:
             - anon
       # Sandboxes responses, since Studio shares this origin: a document opened
       # from these routes can't run script or submit forms. Subresources (<img>,
-      # fetch, downloads) ignore the policy, and media-src 'self' lets the browser's
-      # player load audio and video opened directly. `&sandbox_response` is a YAML anchor:
+      # fetch, downloads) ignore the policy. media-src 'self' lets the browser's player
+      # load audio and video opened directly, and style-src 'unsafe-inline' keeps
+      # inline styles in SVG files. `&sandbox_response` is a YAML anchor:
       # the storage-v1 and functions-v1 services below reuse this same Lua code
       # through the `*sandbox_response` alias, which YAML expands into a copy.
       - name: post-function
@@ -216,8 +217,10 @@ services:
               if kong.request.get_path():sub(1, 14) == "/functions/v1/" and kong.request.get_method() ~= "GET" then
                 return
               end
-              kong.response.set_header("Content-Security-Policy", "default-src 'none'; media-src 'self'; sandbox")
-              kong.response.set_header("X-Content-Type-Options", "nosniff")
+              kong.response.set_header(
+                "Content-Security-Policy",
+                "default-src 'none'; media-src 'self'; style-src 'unsafe-inline'; sandbox"
+              )
 
   ## Secure GraphQL routes
   - name: graphql-v1

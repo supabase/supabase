@@ -1218,7 +1218,8 @@ resources:
                 # Sandboxes responses on Storage, REST and Functions (GET only), since Studio
                 # shares this origin: a document opened from these routes can't run script
                 # or submit forms. Subresources (<img>, fetch, downloads) ignore the policy.
-                # media-src 'self' lets the browser's player load audio and video opened directly.
+                # media-src 'self' lets the browser's player load audio and video opened
+                # directly, and style-src 'unsafe-inline' keeps inline styles in SVG files.
                 - name: envoy.filters.http.lua
                   typed_config:
                     '@type': >-
@@ -1247,9 +1248,10 @@ resources:
                           return
                         end
 
-                        local headers = response_handle:headers()
-                        headers:replace("content-security-policy", "default-src 'none'; media-src 'self'; sandbox")
-                        headers:replace("x-content-type-options", "nosniff")
+                        response_handle:headers():replace(
+                          "content-security-policy",
+                          "default-src 'none'; media-src 'self'; style-src 'unsafe-inline'; sandbox"
+                        )
                       end
 
                 - name: envoy.filters.http.rbac

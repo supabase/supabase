@@ -257,14 +257,11 @@ The gateway listens on plain HTTP only and does not terminate TLS. For public de
 
 ### Sandboxed responses
 
-Studio is served from the same origin as the APIs, so the gateway adds these headers to responses on `/storage/v1/`, `/rest/v1/`, and `GET` requests to `/functions/v1/`:
+Studio is served from the same origin as the APIs, so the gateway adds `Content-Security-Policy: default-src 'none'; media-src 'self'; style-src 'unsafe-inline'; sandbox` to responses on `/storage/v1/`, `/rest/v1/`, and `GET` requests to `/functions/v1/`.
 
-- `Content-Security-Policy: default-src 'none'; media-src 'self'; sandbox`
-- `X-Content-Type-Options: nosniff`
+A document opened directly from these routes, such as an HTML page or an SVG image, still displays with its inline styles, but it can't run scripts, submit forms, or load other resources such as images and stylesheets. Images and media opened directly still display, and requests from your app, such as `fetch` calls and `<img>` tags, aren't affected.
 
-A document opened directly from these routes, such as an HTML page or an SVG image, still displays, but it can't run scripts or submit forms. Images and media opened directly still display, and requests from your app, such as `fetch` calls and `<img>` tags, aren't affected.
-
-The Kong configuration adds the same headers.
+The Kong configuration adds the same header.
 
 ## Customizing the configuration
 

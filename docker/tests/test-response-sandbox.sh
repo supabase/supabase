@@ -1,8 +1,8 @@
 #!/bin/sh
 #
 # Response sandboxing: the API gateway adds a sandbox Content-Security-Policy
-# and nosniff to Storage, REST and Functions (GET only) responses, since Studio
-# shares the gateway's origin. Content types are kept. Creates a temporary
+# to Storage, REST and Functions (GET only) responses, since Studio shares the
+# gateway's origin. Content types are kept. Creates a temporary
 # public bucket, function and database function, checks the response headers,
 # and removes them.
 #
@@ -14,7 +14,7 @@
 set -eu
 
 BASE_URL="${1:-http://localhost:8000}"
-CSP="default-src 'none'; media-src 'self'; sandbox"
+CSP="default-src 'none'; media-src 'self'; style-src 'unsafe-inline'; sandbox"
 
 if [ ! -f .env ] || [ ! -d volumes/functions ]; then
     echo "Error: run from the docker/ directory of the running stack."
@@ -87,13 +87,12 @@ psql_exec() {
     docker exec -i supabase-db psql -U postgres -d postgres -v ON_ERROR_STOP=1 -q -c "$1" >/dev/null
 }
 
-# expect_sandboxed <description> [media type]: sandbox CSP and nosniff, type kept
+# expect_sandboxed <description> [media type]: sandbox CSP, type kept
 expect_sandboxed() {
     if [ -n "${2:-}" ]; then
         check "$1: Content-Type is kept" "$2" "$(media_type)"
     fi
     check "$1: sandbox CSP" "$CSP" "$(header content-security-policy)"
-    check "$1: nosniff" "nosniff" "$(header x-content-type-options)"
 }
 
 # --- Storage ---------------------------------------------------------------

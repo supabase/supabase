@@ -102,10 +102,10 @@ check "ListBuckets returns valid response" "true" "$list_ok"
 
 # Some S3 clients (e.g. Cyberduck) reject S3 responses that aren't XML, and the
 # aws cli doesn't check, so read the Content-Type with a signed curl request.
-list_type=$(curl -s --max-time 30 -o /dev/null -w '%{content_type}' \
+list_result=$(curl -s --max-time 30 -o /dev/null -w '%{http_code} %{content_type}' \
     --aws-sigv4 "aws:amz:$REGION:s3" --user "$S3_ACCESS_KEY:$S3_SECRET_KEY" \
     -H 'x-amz-content-sha256: UNSIGNED-PAYLOAD' "$S3_ENDPOINT/" | cut -d';' -f1) || true
-check "ListBuckets Content-Type is XML" "application/xml" "$list_type"
+check "ListBuckets with curl succeeds and returns XML" "200 application/xml" "$list_result"
 
 # ---------------------------------------------
 # 2. S3 CreateBucket
