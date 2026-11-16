@@ -65,13 +65,18 @@ const FETCH_TYPE_BYPASS_EXCEPTIONS = [
   'data/log-drains/delete-log-drain-mutation.ts',
   // untyped `fetchGet` / `fetchPost`
   // Self-hosted only until the platform API exposes /alerts/issues and api-types
-  // is regenerated; remove these three entries then and use the typed fetchers.
+  // is regenerated; remove these alert-issues entries then and use the typed fetchers.
   'data/alert-issues/alert-issues-query.ts',
   'data/alert-issues/alert-issue-action-mutation.ts',
   'data/alert-issues/alert-issues-read-mutation.ts',
   'data/alert-issues/alert-issue-comments-query.ts',
   'data/alert-issues/alert-issue-comment-create-mutation.ts',
   'data/alert-issues/alert-issue-events-query.ts',
+  'data/alert-issues/alert-issue-types-query.ts',
+  'data/alert-issues/alert-issue-type-silence-mutation.ts',
+  'data/alert-issues/alert-issue-type-create-mutation.ts',
+  'data/alert-issues/alert-issue-type-delete-mutation.ts',
+  'data/alert-issues/alert-rule-preview-mutation.ts',
   'lib/api/self-hosted/generate-types.ts',
   'routes/api/platform/auth/$ref/invite.ts',
   'routes/api/platform/auth/$ref/magiclink.ts',

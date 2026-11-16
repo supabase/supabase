@@ -53,3 +53,19 @@ export const alertLogEventsSchema = z.object({
 })
 
 export type AlertLogEvents = z.infer<typeof alertLogEventsSchema>
+
+export const alertIssueTypeSchema = z.object({
+  rule_key: z.string(),
+  name: z.string(),
+  description: z.string().nullish(),
+  category: z.string(),
+  severity: z.string(),
+  managed: z.boolean(),
+  language: z.string().nullish(),
+  lql: z.string().nullish(),
+  group_by: z.array(z.string()).nullish(),
+  silenced: z.boolean(),
+  silence_id: z.coerce.string().nullish(),
+})
+
+export type AlertIssueType = z.infer<typeof alertIssueTypeSchema>
