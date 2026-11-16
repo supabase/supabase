@@ -3,10 +3,9 @@ import { renderHook } from '@testing-library/react'
 import { afterEach, beforeEach, describe, expect, it, vi } from 'vitest'
 
 import {
-  isInDataApiRevokeTreatment,
   useDataApiRevokeOnCreateDefaultEnabled,
   useTrackDefaultPrivilegesExposure,
-} from '../useDataApiRevokeOnCreateDefault'
+} from './useDataApiRevokeOnCreateDefault'
 import { usePHFlag } from '@/hooks/ui/useFlag'
 import * as constants from '@/lib/constants'
 import { useTrack } from '@/lib/telemetry/track'
@@ -26,21 +25,6 @@ vi.mock('@/lib/constants', async () => {
 vi.mock('@/lib/telemetry/track', () => ({
   useTrack: vi.fn(),
 }))
-
-describe('isInDataApiRevokeTreatment', () => {
-  // `true` is the current rollout shape; 'test'/'control' the future multivariate shape.
-  it.each([
-    [true, true],
-    ['test', true],
-    [false, false],
-    ['control', false],
-    [undefined, false],
-    ['something-else', false],
-    ['', false],
-  ])('maps flag %s to %s', (flag, expected) => {
-    expect(isInDataApiRevokeTreatment(flag)).toBe(expected)
-  })
-})
 
 // Flag-shape permutations are covered by isInDataApiRevokeTreatment above.
 describe('useDataApiRevokeOnCreateDefaultEnabled', () => {
