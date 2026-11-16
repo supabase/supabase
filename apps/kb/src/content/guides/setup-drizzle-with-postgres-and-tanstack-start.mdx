@@ -7,14 +7,12 @@ lastEdited: 2026-11-09
 
 This tutorial shows how to build a to-do app with [TanStack Start](https://tanstack.com/start), [Drizzle ORM](https://orm.drizzle.team), and a Postgres database. TanStack Start is a full-stack React framework, and Drizzle is a TypeScript ORM for SQL databases. You define your schema in TypeScript, migrate it with Drizzle Kit, and query it from server functions.
 
-Drizzle needs a Postgres database, and Supabase is an excellent place to host one. Every Supabase project is a full Postgres database, so Drizzle works with it through a standard driver and a connection string. You develop against a local Postgres database, then deploy the same migrations to a hosted Supabase project. At the end, you deploy the app to [Vercel](https://vercel.com).
+Drizzle needs a Postgres database, and Supabase is an excellent place to host one. Every Supabase project is a full Postgres database, so Drizzle works with it through a standard driver and a connection string. You develop against a local Postgres database that runs on your machine.
 
 ## Prerequisites
 
 - [Node.js](https://nodejs.org) 22 or later
 - [pnpm](https://pnpm.io) installed
-- A [Supabase project](/dashboard/project/_), to deploy to
-- A [Vercel](https://vercel.com) account, to deploy the app
 - A [container runtime](/docs/guides/local-development/cli/getting-started#running-a-local-supabase-project) on your machine.
 
 ## Set up the project
@@ -79,8 +77,6 @@ Supabase projects expose the `public` schema through an HTTP API, called the Dat
    ```text
    postgresql://postgres:postgres@127.0.0.1:54322/postgres
    ```
-
-For more options, see [`api.enabled`](/docs/guides/local-development/cli/config#api.enabled) in the CLI configuration reference.
 
 ### Set the database URL
 
@@ -166,13 +162,13 @@ import postgres from 'postgres'
 const databaseUrl = process.env.DATABASE_URL
 if (!databaseUrl) throw new Error('DATABASE_URL is not set')
 
-// Transaction mode poolers don't support prepared statements
-const client = postgres(databaseUrl, { prepare: false, max: 1 })
+const client = postgres(databaseUrl)
 
 export const db = drizzle(client)
 ```
 
-The `prepare: false` option lets the same code work against a pooled connection in transaction mode, which this guide uses in production. The `max: 1` option limits each serverless function instance to one database connection.
+> [!NOTE]
+> If you later connect through a transaction-mode connection pooler, such as the Supabase shared pooler, pass `{ prepare: false }` as the second argument to `postgres()`. For details, see [Connect to your database](/docs/guides/database/connecting-to-postgres).
 
 ### Create the server functions
 
@@ -190,13 +186,13 @@ export const getTodos = createServerFn({ method: 'GET' }).handler(async () => {
 })
 
 export const addTodo = createServerFn({ method: 'POST' })
-  .inputValidator((data: { title: string }) => data)
+  .validator((data: { title: string }) => data)
   .handler(async ({ data }) => {
     await db.insert(todos).values({ title: data.title })
   })
 
 export const toggleTodo = createServerFn({ method: 'POST' })
-  .inputValidator((data: { id: number }) => data)
+  .validator((data: { id: number }) => data)
   .handler(async ({ data }) => {
     await db
       .update(todos)
@@ -205,7 +201,7 @@ export const toggleTodo = createServerFn({ method: 'POST' })
   })
 
 export const deleteTodo = createServerFn({ method: 'POST' })
-  .inputValidator((data: { id: number }) => data)
+  .validator((data: { id: number }) => data)
   .handler(async ({ data }) => {
     await db.delete(todos).where(eq(todos.id, data.id))
   })
@@ -246,12 +242,12 @@ function Home() {
       <h1 className="mb-4 text-lg font-semibold">To-dos</h1>
       <form onSubmit={handleAdd} className="mb-4 flex gap-2">
         <input
-          className="w-full rounded-md border border-neutral-300 px-3 py-2 text-sm"
+          className="min-w-0 flex-1 rounded-md border border-neutral-300 px-3 py-2 text-sm"
           placeholder="What needs doing?"
           value={title}
           onChange={(e) => setTitle(e.target.value)}
         />
-        <button className="rounded-md bg-neutral-900 px-4 py-2 text-sm font-medium text-white hover:bg-neutral-700">
+        <button className="shrink-0 rounded-md bg-neutral-900 px-4 py-2 text-sm font-medium text-white hover:bg-neutral-700">
           Add
         </button>
       </form>
@@ -296,29 +292,9 @@ function Home() {
 
 2. Open your app at `http://localhost:3000`. Add a to-do, mark it complete, and delete it.
 
-## Deploy and update the schema
+## Update the schema
 
-Apply the migrations to your hosted Supabase project. When your data model changes later, generate a new migration and deploy again.
-
-### Deploy to your Supabase project
-
-1. In your project's [API settings](/dashboard/project/_/settings/api), turn off the Data API, as you did locally.
-
-2. In your project's [**Connect** panel](/dashboard/project/_?showConnect=true), copy the shared pooler connection string in session mode.
-
-3. Run the migrations against your hosted database. Replace the placeholder with your connection string:
-
-   ```bash
-   DATABASE_URL='<your-connection-string>' pnpm drizzle-kit migrate
-   ```
-
-   Drizzle Kit applies only the migrations that your database hasn't recorded yet.
-
-4. Deploy your app to [Vercel](https://vercel.com). Set the `DATABASE_URL` environment variable to the shared pooler connection string in transaction mode, which you can also copy from the **Connect** panel.
-
-Vercel runs your app as serverless functions, which work best with a pooled connection in transaction mode. If you deploy somewhere else, such as a long-running server, you might need a different connection string and client settings. For details on each option, see [Connect to your database](/docs/guides/database/connecting-to-postgres).
-
-### Update the schema
+When your data model changes, generate a new migration and apply it.
 
 1. In `src/db/schema.ts`, change the schema. For example, add a column to `todos`:
 
@@ -333,10 +309,10 @@ Vercel runs your app as serverless functions, which work best with a pooled conn
    pnpm drizzle-kit migrate
    ```
 
-3. Commit the new migration, then apply it to your hosted database as described in [Deploy to your Supabase project](#deploy-to-your-supabase-project).
+3. Commit the new migration.
 
 > [!CAUTION]
-> The `drizzle-kit push` command applies schema changes directly and doesn't create migration files. Use it for prototyping against a local database, and use `generate` and `migrate` for anything you deploy.
+> The `drizzle-kit push` command applies schema changes directly and doesn't create migration files. Use it for prototyping against a local database, and use `generate` and `migrate` to keep a record of your changes.
 
 To generate a Drizzle schema from tables that already exist in your database, run `pnpm drizzle-kit pull`.
 
