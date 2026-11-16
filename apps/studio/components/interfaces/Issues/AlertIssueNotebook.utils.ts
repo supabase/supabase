@@ -78,20 +78,18 @@ export function renderAlertIssueNotebook(issue: AlertIssue): RenderedAlertIssueC
   })
 }
 
-const escapeTableCell = (value: string) => value.replace(/\|/g, '\\|').replace(/\n/g, ' ')
+const inlineCode = (value: string) => `\`${value.replace(/[`\n]/g, ' ')}\``
 
 const summaryMarkdown = (issue: AlertIssue, alertIssueUrl: string) => {
   const identifiers = Object.entries(issue.identifiers)
     .filter((entry): entry is [string, string] => typeof entry[1] === 'string')
     .sort(([a], [b]) => a.localeCompare(b))
-    .map(([key, value]) => `| ${escapeTableCell(key)} | ${escapeTableCell(value)} |`)
+    .map(([key, value]) => `- ${key}: ${inlineCode(value)}`)
 
   return [
     `# ${issue.title}`,
     issue.description ?? '',
-    identifiers.length > 0
-      ? ['| Identifier | Value |', '| --- | --- |', ...identifiers].join('\n')
-      : '',
+    identifiers.join('\n'),
     `[View alert issue](${alertIssueUrl})`,
   ]
     .filter((part) => part.length > 0)

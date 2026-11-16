@@ -124,7 +124,7 @@ describe('buildAlertIssueNotebookCells', () => {
     const markdown = summary._tag === 'markdown_cell' ? summary.text : ''
     expect(markdown).toContain('# RLS Disabled in Public: public.orders')
     expect(markdown).toContain('Table `public.orders` is public')
-    expect(markdown).toContain('| table | orders |')
+    expect(markdown).toContain('- table: `orders`')
     expect(markdown).toContain(
       '[View alert issue](http://localhost:8082/project/default/issues/alerts/a1)'
     )
