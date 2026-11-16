@@ -450,13 +450,7 @@ describe('project creation wizard', () => {
             free_project_limit: 2,
             primary_email: 'member@example.com',
             username: 'member-1',
-            free_plan_organizations: [
-              {
-                slug: 'other-org',
-                organization_name: 'Other Org',
-                projects: [{ ref: 'abc', name: 'Active Project' }],
-              },
-            ],
+            free_plan_organizations: [],
           },
         ],
       })

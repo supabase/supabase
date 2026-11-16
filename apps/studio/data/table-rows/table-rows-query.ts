@@ -11,6 +11,7 @@ import { tableRowKeys } from './keys'
 import { parseSupaTable } from '@/components/grid/SupabaseGrid.utils'
 import { Filter, Sort, SupaRow, SupaTable } from '@/components/grid/types'
 import { ENTITY_TYPE } from '@/data/entity-types/entity-type-constants'
+import { isUserFaultForValues } from '@/data/error-classification'
 import { handleError, unguarded } from '@/data/fetchers'
 import { useConnectionStringForReadOps } from '@/data/read-replicas/replicas-query'
 import { executeSql } from '@/data/sql/execute-sql-mutation'
@@ -264,6 +265,7 @@ export const fetchAllTableRows = async ({
             sql: query,
             sqlOrigin: 'studio',
             queryName: 'table-rows-cursor',
+            isUserFaultSqlState: filters.length > 0 ? isUserFaultForValues : undefined,
             grant: unguarded.migrating,
           })
         )
@@ -303,6 +305,7 @@ export const fetchAllTableRows = async ({
             sql: query,
             sqlOrigin: 'studio',
             queryName: 'table-rows-page',
+            isUserFaultSqlState: filters.length > 0 ? isUserFaultForValues : undefined,
             grant: unguarded.migrating,
           })
         )
@@ -393,6 +396,7 @@ async function getTableRows(
         connectionString,
         sqlOrigin: 'studio',
         queryName: 'table-rows',
+        isUserFaultSqlState: filters?.length ? isUserFaultForValues : undefined,
         sql,
         queryKey: ['table-rows', table?.id],
         isRoleImpersonationEnabled: isRoleImpersonationEnabled(roleImpersonationState?.role),

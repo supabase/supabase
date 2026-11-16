@@ -1857,6 +1857,45 @@ export interface paths {
     patch?: never
     trace?: never
   }
+  '/platform/organizations/{slug}/oauth/approvals/{app_id}': {
+    parameters: {
+      query?: never
+      header?: never
+      path?: never
+      cookie?: never
+    }
+    get?: never
+    put?: never
+    post?: never
+    /** Revoke all grants of an oauth app in the organization */
+    delete: operations['OAuthApprovalsController_revokeOAuthAppApproval']
+    options?: never
+    head?: never
+    patch?: never
+    trace?: never
+  }
+  '/platform/organizations/{slug}/oauth/approvals/{app_id}/grants': {
+    parameters: {
+      query?: never
+      header?: never
+      path?: never
+      cookie?: never
+    }
+    /**
+     * List all grants for an approved OAuth app in an organization.
+     * @description Returns a cursor-paginated list of OAuth grants (both organization and member bound) approved for an OAuth app in this organization.
+     *
+     *     Use `page[after]` and `page[before]` to navigate pages and `page[size]` to control the number of approvals returned per page.
+     */
+    get: operations['OAuthApprovalsController_listGrants']
+    put?: never
+    post?: never
+    delete?: never
+    options?: never
+    head?: never
+    patch?: never
+    trace?: never
+  }
   '/platform/organizations/{slug}/oauth/apps': {
     parameters: {
       query?: never
@@ -2555,6 +2594,23 @@ export interface paths {
     put?: never
     post?: never
     delete?: never
+    options?: never
+    head?: never
+    patch?: never
+    trace?: never
+  }
+  '/platform/profile/oauth/grants/{grant_id}': {
+    parameters: {
+      query?: never
+      header?: never
+      path?: never
+      cookie?: never
+    }
+    get?: never
+    put?: never
+    post?: never
+    /** Revoke one of your own oauth grants */
+    delete: operations['OAuthGrantsController_revokeOAuthGrant']
     options?: never
     head?: never
     patch?: never
@@ -4373,6 +4429,26 @@ export interface paths {
      * @description Create a replication tenant and source. Requires bearer auth and an active, healthy project.
      */
     post: operations['TenantsSourcesController_createTenantSource']
+    delete?: never
+    options?: never
+    head?: never
+    patch?: never
+    trace?: never
+  }
+  '/platform/replication/regions': {
+    parameters: {
+      query?: never
+      header?: never
+      path?: never
+      cookie?: never
+    }
+    /**
+     * List available pipeline regions
+     * @description Returns available pipeline locations with display names, AWS region codes, and stable cluster IDs for routing.
+     */
+    get: operations['PipelineRegionsController_getRegions']
+    put?: never
+    post?: never
     delete?: never
     options?: never
     head?: never
@@ -8601,6 +8677,10 @@ export interface components {
               user: string
             }
           }
+        | {
+            /** @description Stored destination configuration could not be decoded. Read-only placeholder. */
+            unknown: Record<string, never>
+          }
       /**
        * @description Destination id
        * @example 2001
@@ -8846,6 +8926,10 @@ export interface components {
                  */
                 user: string
               }
+            }
+          | {
+              /** @description Stored destination configuration could not be decoded. Read-only placeholder. */
+              unknown: Record<string, never>
             }
         /**
          * @description Destination id
@@ -9689,6 +9773,7 @@ export interface components {
       EXTERNAL_DISCORD_ENABLED: boolean
       EXTERNAL_DISCORD_SECRET: string
       EXTERNAL_EMAIL_ENABLED: boolean
+      EXTERNAL_EMAIL_MAGIC_LINK_DISABLED: boolean
       EXTERNAL_FACEBOOK_CLIENT_ID: string
       EXTERNAL_FACEBOOK_EMAIL_OPTIONAL: boolean
       EXTERNAL_FACEBOOK_ENABLED: boolean
@@ -10345,6 +10430,96 @@ export interface components {
         prev: string | null
       }
     }
+    ListOAuthGrantsResponse_Output: {
+      data: {
+        attributes: {
+          /** @description Timestamp of the approval */
+          approved_at: string
+          /** @description Scopes approved by this grant */
+          approved_scopes: (
+            | 'analytics:read'
+            | 'analytics:write'
+            | 'analytics_config:read'
+            | 'analytics_config:write'
+            | 'auth:read'
+            | 'auth:write'
+            | 'database:read'
+            | 'database:write'
+            | 'domains:read'
+            | 'domains:write'
+            | 'edge_functions:read'
+            | 'edge_functions:write'
+            | 'environment:read'
+            | 'environment:write'
+            | 'organizations:read'
+            | 'organizations:write'
+            | 'projects:read'
+            | 'projects:write'
+            | 'rest:read'
+            | 'rest:write'
+            | 'secrets:read'
+            | 'secrets:write'
+            | 'storage:read'
+            | 'storage:write'
+          )[]
+          /**
+           * @description Whether the grant is bound to the organization or to a single member
+           * @enum {string}
+           */
+          kind: 'organization_bound' | 'member_bound'
+          /** @description Projects the grant is limited to, or null if it applies to all projects */
+          projects:
+            | {
+                /** @description Project name */
+                name: string
+                /** @description Project reference */
+                ref: string
+              }[]
+            | null
+          /** @description Member who approved the grant, or null for an organization-bound grant */
+          user: {
+            /** @description Member primary email, if the member has one */
+            email: string | null
+            /** @description Member user ID */
+            gotrue_id: string
+            /** @description Member username, for display when there is no email */
+            username: string
+          } | null
+        }
+        /**
+         * Format: uuid
+         * @description OAuth grant ID
+         */
+        id: string
+        /**
+         * @description Resource type.
+         * @enum {string}
+         */
+        type: 'oauth_grant'
+      }[]
+      links: {
+        /**
+         * @description URL path to the first page if available.
+         * @example /platform/organizations/my-org/oauth/approvals/my-app/grants?page[size]=10
+         */
+        first?: string | null
+        /**
+         * @description URL path to the last page if available.
+         * @example /platform/organizations/my-org/oauth/approvals/my-app/grants?page[size]=10&page[after]=019adf7d-4513-71ba-b264-21900edb4295
+         */
+        last?: string | null
+        /**
+         * @description URL path to the next page.
+         * @example /platform/organizations/my-org/oauth/approvals/my-app/grants?page[size]=10&page[after]=019adf7d-4513-7062-b292-78b86cc470a4
+         */
+        next: string | null
+        /**
+         * @description URL path to the previous page.
+         * @example /platform/organizations/my-org/oauth/approvals/my-app/grants?page[size]=10&page[before]=019adf7d-4513-74c5-bb9a-f1bc0f7a95d7
+         */
+        prev: string | null
+      }
+    }
     ListPlatformAppInstallationsResponse_Output: {
       installations: {
         /** Format: uuid */
@@ -10724,6 +10899,7 @@ export interface components {
     }
     OnboardingSurveyBody: {
       building?: string
+      can_code?: string
       heard_from?: string
       kind?: string
       size?: string
@@ -11251,6 +11427,18 @@ export interface components {
     PgbouncerStatusResponse_Output: {
       active: boolean
     }
+    PipelineRegionsResponse_Output: {
+      /** @description Configured default for this environment, used only when cluster_id is omitted. Invalid supplied IDs never fall back to it. */
+      default_cluster_id: string
+      regions: {
+        /** @description Immutable cluster ID stored in pipeline placements. Use this ID in requests; display names and region codes are not identifiers. */
+        cluster_id: string
+        /** @description Region code, or null for local development. */
+        region_code: string | null
+        /** @description Display name only. Renaming it does not change the cluster ID or routing. */
+        region_name: string
+      }[]
+    }
     PipelineReplicationStatusResponse_Output: {
       /** @description Stats about apply worker lag */
       apply_lag?: {
@@ -11420,6 +11608,11 @@ export interface components {
     }
     /** @description Pipeline */
     PipelineResponse_Output: {
+      /**
+       * @description Stable ID of the ETL cluster containing this pipeline; independent of its display name.
+       * @example 1
+       */
+      cluster_id: string
       /** @description Pipeline configuration */
       config: {
         /** @description Batch configuration */
@@ -11569,6 +11762,11 @@ export interface components {
     PipelinesResponse_Output: {
       /** @description List of pipelines */
       pipelines: {
+        /**
+         * @description Stable ID of the ETL cluster containing this pipeline; independent of its display name.
+         * @example 1
+         */
+        cluster_id: string
         /** @description Pipeline configuration */
         config: {
           /** @description Batch configuration */
@@ -14971,6 +15169,7 @@ export interface components {
       EXTERNAL_DISCORD_ENABLED?: boolean | null
       EXTERNAL_DISCORD_SECRET?: string | null
       EXTERNAL_EMAIL_ENABLED?: boolean | null
+      EXTERNAL_EMAIL_MAGIC_LINK_DISABLED?: boolean
       EXTERNAL_FACEBOOK_CLIENT_ID?: string | null
       EXTERNAL_FACEBOOK_EMAIL_OPTIONAL?: boolean | null
       EXTERNAL_FACEBOOK_ENABLED?: boolean | null
@@ -23914,6 +24113,101 @@ export interface operations {
       }
     }
   }
+  OAuthApprovalsController_revokeOAuthAppApproval: {
+    parameters: {
+      query?: never
+      header?: never
+      path: {
+        app_id: string
+        /** @description Organization slug */
+        slug: string
+      }
+      cookie?: never
+    }
+    requestBody?: never
+    responses: {
+      204: {
+        headers: {
+          [name: string]: unknown
+        }
+        content?: never
+      }
+      /** @description Unauthorized */
+      401: {
+        headers: {
+          [name: string]: unknown
+        }
+        content?: never
+      }
+      /** @description Forbidden action */
+      403: {
+        headers: {
+          [name: string]: unknown
+        }
+        content?: never
+      }
+      /** @description Rate limit exceeded */
+      429: {
+        headers: {
+          [name: string]: unknown
+        }
+        content?: never
+      }
+    }
+  }
+  OAuthApprovalsController_listGrants: {
+    parameters: {
+      query?: {
+        page?: {
+          after?: string
+          before?: string
+          size?: number
+        }
+        /** @description Sort field, prefixed with `-` for descending order. `user_email` sorts by the member email, falling back to username, and places the organization-bound grant (which has no user) first in ascending order and last in descending order. Defaults to `user_email`. */
+        sort?: 'user_email' | '-user_email' | 'approved_at' | '-approved_at'
+      }
+      header?: never
+      path: {
+        /** @description OAuth app ID */
+        app_id: string
+        /** @description Organization slug */
+        slug: string
+      }
+      cookie?: never
+    }
+    requestBody?: never
+    responses: {
+      200: {
+        headers: {
+          [name: string]: unknown
+        }
+        content: {
+          'application/json': components['schemas']['ListOAuthGrantsResponse_Output']
+        }
+      }
+      /** @description Unauthorized */
+      401: {
+        headers: {
+          [name: string]: unknown
+        }
+        content?: never
+      }
+      /** @description Forbidden action */
+      403: {
+        headers: {
+          [name: string]: unknown
+        }
+        content?: never
+      }
+      /** @description Rate limit exceeded */
+      429: {
+        headers: {
+          [name: string]: unknown
+        }
+        content?: never
+      }
+    }
+  }
   OAuthAppsController_listOAuthApps: {
     parameters: {
       query: {
@@ -26502,6 +26796,25 @@ export interface operations {
       }
       /** @description Failed to get user's OAuth grants */
       500: {
+        headers: {
+          [name: string]: unknown
+        }
+        content?: never
+      }
+    }
+  }
+  OAuthGrantsController_revokeOAuthGrant: {
+    parameters: {
+      query?: never
+      header?: never
+      path: {
+        grant_id: string
+      }
+      cookie?: never
+    }
+    requestBody?: never
+    responses: {
+      204: {
         headers: {
           [name: string]: unknown
         }
@@ -31603,7 +31916,10 @@ export interface operations {
   }
   DestinationsController_getDestinations: {
     parameters: {
-      query?: never
+      query?: {
+        /** @description Stable cluster ID from /platform/replication/regions; display names are not IDs. Only omission uses the environment default_cluster_id. Supplied IDs absent from the registry fail to resolve. */
+        cluster_id?: string
+      }
       header?: never
       path: {
         /** @description Project ref */
@@ -31654,7 +31970,10 @@ export interface operations {
   }
   DestinationsController_createDestination: {
     parameters: {
-      query?: never
+      query?: {
+        /** @description Stable cluster ID from /platform/replication/regions; display names are not IDs. Only omission uses the environment default_cluster_id. Supplied IDs absent from the registry fail to resolve. */
+        cluster_id?: string
+      }
       header?: never
       path: {
         /** @description Project ref */
@@ -31718,7 +32037,10 @@ export interface operations {
   }
   DestinationsPipelinesController_createDestinationPipeline: {
     parameters: {
-      query?: never
+      query?: {
+        /** @description Stable cluster ID from /platform/replication/regions; display names are not IDs. Only omission uses the environment default_cluster_id. Supplied IDs absent from the registry fail to resolve. */
+        cluster_id?: string
+      }
       header?: never
       path: {
         /** @description Project ref */
@@ -31764,6 +32086,13 @@ export interface operations {
         }
         content?: never
       }
+      /** @description Pipeline placement conflicts or the cluster pipeline limit is reached. */
+      409: {
+        headers: {
+          [name: string]: unknown
+        }
+        content?: never
+      }
       /** @description Rate limit exceeded */
       429: {
         headers: {
@@ -31782,7 +32111,10 @@ export interface operations {
   }
   DestinationsPipelinesController_updateDestinationPipeline: {
     parameters: {
-      query?: never
+      query?: {
+        /** @description Stable cluster ID from /platform/replication/regions; display names are not IDs. Only omission uses the environment default_cluster_id. Supplied IDs absent from the registry fail to resolve. */
+        cluster_id?: string
+      }
       header?: never
       path: {
         /** @description Destination id */
@@ -31848,7 +32180,10 @@ export interface operations {
   }
   DestinationsPipelinesController_deleteDestinationPipeline: {
     parameters: {
-      query?: never
+      query?: {
+        /** @description Stable cluster ID from /platform/replication/regions; display names are not IDs. Only omission uses the environment default_cluster_id. Supplied IDs absent from the registry fail to resolve. */
+        cluster_id?: string
+      }
       header?: never
       path: {
         /** @description Destination id */
@@ -31901,7 +32236,7 @@ export interface operations {
         }
         content?: never
       }
-      /** @description Pipeline is still active. */
+      /** @description Pipeline is active or another operation is in progress. */
       409: {
         headers: {
           [name: string]: unknown
@@ -31926,7 +32261,10 @@ export interface operations {
   }
   DestinationsController_getDestination: {
     parameters: {
-      query?: never
+      query?: {
+        /** @description Stable cluster ID from /platform/replication/regions; display names are not IDs. Only omission uses the environment default_cluster_id. Supplied IDs absent from the registry fail to resolve. */
+        cluster_id?: string
+      }
       header?: never
       path: {
         /** @description Destination id */
@@ -31979,7 +32317,10 @@ export interface operations {
   }
   DestinationsController_updateDestination: {
     parameters: {
-      query?: never
+      query?: {
+        /** @description Stable cluster ID from /platform/replication/regions; display names are not IDs. Only omission uses the environment default_cluster_id. Supplied IDs absent from the registry fail to resolve. */
+        cluster_id?: string
+      }
       header?: never
       path: {
         /** @description Destination id */
@@ -32043,7 +32384,10 @@ export interface operations {
   }
   DestinationsController_deleteDestination: {
     parameters: {
-      query?: never
+      query?: {
+        /** @description Stable cluster ID from /platform/replication/regions; display names are not IDs. Only omission uses the environment default_cluster_id. Supplied IDs absent from the registry fail to resolve. */
+        cluster_id?: string
+      }
       header?: never
       path: {
         /** @description Destination id */
@@ -32117,7 +32461,10 @@ export interface operations {
   }
   DestinationsController_validateDestination: {
     parameters: {
-      query?: never
+      query?: {
+        /** @description Stable cluster ID from /platform/replication/regions; display names are not IDs. Only omission uses the environment default_cluster_id. Supplied IDs absent from the registry fail to resolve. */
+        cluster_id?: string
+      }
       header?: never
       path: {
         /** @description Project ref */
@@ -32172,7 +32519,10 @@ export interface operations {
   }
   PipelinesController_getPipelines: {
     parameters: {
-      query?: never
+      query?: {
+        /** @description Stable cluster ID from /platform/replication/regions; display names are not IDs. Only omission uses the environment default_cluster_id. Supplied IDs absent from the registry fail to resolve. */
+        cluster_id?: string
+      }
       header?: never
       path: {
         /** @description Project ref */
@@ -32223,7 +32573,10 @@ export interface operations {
   }
   PipelinesController_createPipeline: {
     parameters: {
-      query?: never
+      query?: {
+        /** @description Stable cluster ID from /platform/replication/regions; display names are not IDs. Only omission uses the environment default_cluster_id. Supplied IDs absent from the registry fail to resolve. */
+        cluster_id?: string
+      }
       header?: never
       path: {
         /** @description Project ref */
@@ -32287,7 +32640,10 @@ export interface operations {
   }
   PipelinesController_getPipeline: {
     parameters: {
-      query?: never
+      query?: {
+        /** @description Stable cluster ID from /platform/replication/regions; display names are not IDs. Only omission uses the environment default_cluster_id. Supplied IDs absent from the registry fail to resolve. */
+        cluster_id?: string
+      }
       header?: never
       path: {
         /** @description Pipeline ID */
@@ -32340,7 +32696,10 @@ export interface operations {
   }
   PipelinesController_updatePipeline: {
     parameters: {
-      query?: never
+      query?: {
+        /** @description Stable cluster ID from /platform/replication/regions; display names are not IDs. Only omission uses the environment default_cluster_id. Supplied IDs absent from the registry fail to resolve. */
+        cluster_id?: string
+      }
       header?: never
       path: {
         /** @description Pipeline ID */
@@ -32404,7 +32763,10 @@ export interface operations {
   }
   PipelinesController_deletePipeline: {
     parameters: {
-      query?: never
+      query?: {
+        /** @description Stable cluster ID from /platform/replication/regions; display names are not IDs. Only omission uses the environment default_cluster_id. Supplied IDs absent from the registry fail to resolve. */
+        cluster_id?: string
+      }
       header?: never
       path: {
         /** @description Pipeline ID */
@@ -32453,7 +32815,7 @@ export interface operations {
         }
         content?: never
       }
-      /** @description Pipeline is still active. */
+      /** @description Pipeline is active or another operation is in progress. */
       409: {
         headers: {
           [name: string]: unknown
@@ -32478,7 +32840,10 @@ export interface operations {
   }
   PipelinesController_getPipelineReplicationStatus: {
     parameters: {
-      query?: never
+      query?: {
+        /** @description Stable cluster ID from /platform/replication/regions; display names are not IDs. Only omission uses the environment default_cluster_id. Supplied IDs absent from the registry fail to resolve. */
+        cluster_id?: string
+      }
       header?: never
       path: {
         /** @description Pipeline ID */
@@ -32531,7 +32896,10 @@ export interface operations {
   }
   PipelinesController_restartPipeline: {
     parameters: {
-      query?: never
+      query?: {
+        /** @description Stable cluster ID from /platform/replication/regions; display names are not IDs. Only omission uses the environment default_cluster_id. Supplied IDs absent from the registry fail to resolve. */
+        cluster_id?: string
+      }
       header?: never
       path: {
         /** @description Pipeline ID */
@@ -32598,7 +32966,10 @@ export interface operations {
   }
   PipelinesController_rollbackTables: {
     parameters: {
-      query?: never
+      query?: {
+        /** @description Stable cluster ID from /platform/replication/regions; display names are not IDs. Only omission uses the environment default_cluster_id. Supplied IDs absent from the registry fail to resolve. */
+        cluster_id?: string
+      }
       header?: never
       path: {
         /** @description Pipeline ID */
@@ -32664,7 +33035,10 @@ export interface operations {
   }
   PipelinesController_startPipeline: {
     parameters: {
-      query?: never
+      query?: {
+        /** @description Stable cluster ID from /platform/replication/regions; display names are not IDs. Only omission uses the environment default_cluster_id. Supplied IDs absent from the registry fail to resolve. */
+        cluster_id?: string
+      }
       header?: never
       path: {
         /** @description Pipeline ID */
@@ -32724,7 +33098,10 @@ export interface operations {
   }
   PipelinesController_getPipelineStatus: {
     parameters: {
-      query?: never
+      query?: {
+        /** @description Stable cluster ID from /platform/replication/regions; display names are not IDs. Only omission uses the environment default_cluster_id. Supplied IDs absent from the registry fail to resolve. */
+        cluster_id?: string
+      }
       header?: never
       path: {
         /** @description Pipeline ID */
@@ -32777,7 +33154,10 @@ export interface operations {
   }
   PipelinesController_stopPipeline: {
     parameters: {
-      query?: never
+      query?: {
+        /** @description Stable cluster ID from /platform/replication/regions; display names are not IDs. Only omission uses the environment default_cluster_id. Supplied IDs absent from the registry fail to resolve. */
+        cluster_id?: string
+      }
       header?: never
       path: {
         /** @description Pipeline ID */
@@ -32837,7 +33217,10 @@ export interface operations {
   }
   PipelinesController_getPipelineVersion: {
     parameters: {
-      query?: never
+      query?: {
+        /** @description Stable cluster ID from /platform/replication/regions; display names are not IDs. Only omission uses the environment default_cluster_id. Supplied IDs absent from the registry fail to resolve. */
+        cluster_id?: string
+      }
       header?: never
       path: {
         /** @description Pipeline ID */
@@ -32890,7 +33273,10 @@ export interface operations {
   }
   PipelinesController_updatePipelineVersion: {
     parameters: {
-      query?: never
+      query?: {
+        /** @description Stable cluster ID from /platform/replication/regions; display names are not IDs. Only omission uses the environment default_cluster_id. Supplied IDs absent from the registry fail to resolve. */
+        cluster_id?: string
+      }
       header?: never
       path: {
         /** @description Pipeline ID */
@@ -32954,7 +33340,10 @@ export interface operations {
   }
   PipelinesController_validatePipeline: {
     parameters: {
-      query?: never
+      query?: {
+        /** @description Stable cluster ID from /platform/replication/regions; display names are not IDs. Only omission uses the environment default_cluster_id. Supplied IDs absent from the registry fail to resolve. */
+        cluster_id?: string
+      }
       header?: never
       path: {
         /** @description Project ref */
@@ -33009,7 +33398,10 @@ export interface operations {
   }
   SourcesController_getSources: {
     parameters: {
-      query?: never
+      query?: {
+        /** @description Stable cluster ID from /platform/replication/regions; display names are not IDs. Only omission uses the environment default_cluster_id. Supplied IDs absent from the registry fail to resolve. */
+        cluster_id?: string
+      }
       header?: never
       path: {
         /** @description Project ref */
@@ -33060,7 +33452,10 @@ export interface operations {
   }
   SourcesController_createSource: {
     parameters: {
-      query?: never
+      query?: {
+        /** @description Stable cluster ID from /platform/replication/regions; display names are not IDs. Only omission uses the environment default_cluster_id. Supplied IDs absent from the registry fail to resolve. */
+        cluster_id?: string
+      }
       header?: never
       path: {
         /** @description Project ref */
@@ -33120,7 +33515,10 @@ export interface operations {
   }
   SourcesController_getPublications: {
     parameters: {
-      query?: never
+      query?: {
+        /** @description Stable cluster ID from /platform/replication/regions; display names are not IDs. Only omission uses the environment default_cluster_id. Supplied IDs absent from the registry fail to resolve. */
+        cluster_id?: string
+      }
       header?: never
       path: {
         /** @description Project ref */
@@ -33173,7 +33571,10 @@ export interface operations {
   }
   SourcesController_createPublication: {
     parameters: {
-      query?: never
+      query?: {
+        /** @description Stable cluster ID from /platform/replication/regions; display names are not IDs. Only omission uses the environment default_cluster_id. Supplied IDs absent from the registry fail to resolve. */
+        cluster_id?: string
+      }
       header?: never
       path: {
         /** @description Project ref */
@@ -33303,7 +33704,10 @@ export interface operations {
   }
   SourcesController_deletePublication: {
     parameters: {
-      query?: never
+      query?: {
+        /** @description Stable cluster ID from /platform/replication/regions; display names are not IDs. Only omission uses the environment default_cluster_id. Supplied IDs absent from the registry fail to resolve. */
+        cluster_id?: string
+      }
       header?: never
       path: {
         /** @description Publication name */
@@ -33427,7 +33831,10 @@ export interface operations {
   }
   SourcesController_getTables: {
     parameters: {
-      query?: never
+      query?: {
+        /** @description Stable cluster ID from /platform/replication/regions; display names are not IDs. Only omission uses the environment default_cluster_id. Supplied IDs absent from the registry fail to resolve. */
+        cluster_id?: string
+      }
       header?: never
       path: {
         /** @description Project ref */
@@ -33480,7 +33887,10 @@ export interface operations {
   }
   TenantsController_deleteTenant: {
     parameters: {
-      query?: never
+      query?: {
+        /** @description Stable cluster ID from /platform/replication/regions; display names are not IDs. Only omission uses the environment default_cluster_id. Supplied IDs absent from the registry fail to resolve. */
+        cluster_id?: string
+      }
       header?: never
       path: {
         /** @description Project ref */
@@ -33552,7 +33962,10 @@ export interface operations {
   }
   TenantsSourcesController_createTenantSource: {
     parameters: {
-      query?: never
+      query?: {
+        /** @description Stable cluster ID from /platform/replication/regions; display names are not IDs. Only omission uses the environment default_cluster_id. Supplied IDs absent from the registry fail to resolve. */
+        cluster_id?: string
+      }
       header?: never
       path: {
         /** @description Project ref */
@@ -33610,9 +34023,31 @@ export interface operations {
       }
     }
   }
-  V2SourcesController_getPublications: {
+  PipelineRegionsController_getRegions: {
     parameters: {
       query?: never
+      header?: never
+      path?: never
+      cookie?: never
+    }
+    requestBody?: never
+    responses: {
+      200: {
+        headers: {
+          [name: string]: unknown
+        }
+        content: {
+          'application/json': components['schemas']['PipelineRegionsResponse_Output']
+        }
+      }
+    }
+  }
+  V2SourcesController_getPublications: {
+    parameters: {
+      query?: {
+        /** @description Stable cluster ID from /platform/replication/regions; display names are not IDs. Only omission uses the environment default_cluster_id. Supplied IDs absent from the registry fail to resolve. */
+        cluster_id?: string
+      }
       header?: never
       path: {
         /** @description Project ref */
@@ -33665,7 +34100,10 @@ export interface operations {
   }
   V2SourcesController_getPublication: {
     parameters: {
-      query?: never
+      query?: {
+        /** @description Stable cluster ID from /platform/replication/regions; display names are not IDs. Only omission uses the environment default_cluster_id. Supplied IDs absent from the registry fail to resolve. */
+        cluster_id?: string
+      }
       header?: never
       path: {
         /** @description Publication name */
@@ -33727,7 +34165,10 @@ export interface operations {
   }
   V2SourcesController_putPublication: {
     parameters: {
-      query?: never
+      query?: {
+        /** @description Stable cluster ID from /platform/replication/regions; display names are not IDs. Only omission uses the environment default_cluster_id. Supplied IDs absent from the registry fail to resolve. */
+        cluster_id?: string
+      }
       header?: never
       path: {
         /** @description Publication name */
@@ -33804,7 +34245,10 @@ export interface operations {
   }
   V2SourcesController_deletePublication: {
     parameters: {
-      query?: never
+      query?: {
+        /** @description Stable cluster ID from /platform/replication/regions; display names are not IDs. Only omission uses the environment default_cluster_id. Supplied IDs absent from the registry fail to resolve. */
+        cluster_id?: string
+      }
       header?: never
       path: {
         /** @description Publication name */
@@ -33874,6 +34318,8 @@ export interface operations {
   V2SourcesController_getTables: {
     parameters: {
       query?: {
+        /** @description Stable cluster ID from /platform/replication/regions; display names are not IDs. Only omission uses the environment default_cluster_id. Supplied IDs absent from the registry fail to resolve. */
+        cluster_id?: string
         /** @description Restrict results to this schema */
         schema?: string
       }
@@ -33929,7 +34375,10 @@ export interface operations {
   }
   V2SourcesController_getTableColumns: {
     parameters: {
-      query?: never
+      query?: {
+        /** @description Stable cluster ID from /platform/replication/regions; display names are not IDs. Only omission uses the environment default_cluster_id. Supplied IDs absent from the registry fail to resolve. */
+        cluster_id?: string
+      }
       header?: never
       path: {
         /** @description Project ref */

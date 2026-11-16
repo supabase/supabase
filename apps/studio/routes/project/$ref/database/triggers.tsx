@@ -1,8 +1,9 @@
 import { createFileRoute, Outlet } from '@tanstack/react-router'
 
 import { PageLayout } from '@/components/layouts/PageLayout/PageLayout'
+import { AlertError } from '@/components/ui/AlertError'
 import { NoPermission } from '@/components/ui/NoPermission'
-import { FGA_PERMISSIONS, useAsyncCheckPermissionsV2 } from '@/hooks/misc/useCheckPermissionsV2'
+import { useGrant } from '@/lib/grants'
 
 export const Route = createFileRoute('/project/$ref/database/triggers')({
   component: TriggersShell,
@@ -13,12 +14,20 @@ export const Route = createFileRoute('/project/$ref/database/triggers')({
 
 function TriggersShell() {
   const { ref } = Route.useParams()
-  const { can: canReadTriggers, isSuccess: isPermissionsLoaded } = useAsyncCheckPermissionsV2(
-    FGA_PERMISSIONS.PROJECT.DATABASE_READ
+  const readGrant = useGrant(
+    'POST /platform/pg-meta/{ref}/query',
+    { projectRef: ref },
+    { variant: 'read' }
   )
 
-  if (isPermissionsLoaded && !canReadTriggers) {
+  if (readGrant.status === 'denied') {
     return <NoPermission isFullPage resourceText="view database triggers" />
+  }
+
+  if (readGrant.status === 'error') {
+    return (
+      <AlertError error={readGrant.error} subject="Failed to check database triggers permissions" />
+    )
   }
 
   return (

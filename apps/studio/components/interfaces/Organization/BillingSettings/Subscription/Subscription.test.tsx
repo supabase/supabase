@@ -1,18 +1,15 @@
-import { fireEvent, screen } from '@testing-library/react'
+import { fireEvent, screen, waitFor } from '@testing-library/react'
 import type { ReactNode } from 'react'
 import { beforeEach, describe, expect, it, vi } from 'vitest'
 
 import Subscription from './Subscription'
-import { render } from '@/tests/helpers'
+import { customRender as render } from '@/tests/lib/custom-render'
 
-const { mockSubscription, mockSetPanelKey, mockSelectedOrganization, mockPermissions } = vi.hoisted(
-  () => ({
-    mockSubscription: vi.fn(),
-    mockSetPanelKey: vi.fn(),
-    mockSelectedOrganization: vi.fn(),
-    mockPermissions: vi.fn(),
-  })
-)
+const { mockSubscription, mockSelectedOrganization, mockPermissions } = vi.hoisted(() => ({
+  mockSubscription: vi.fn(),
+  mockSelectedOrganization: vi.fn(),
+  mockPermissions: vi.fn(),
+}))
 
 vi.mock('common', async (importOriginal) => {
   const original = (await importOriginal()) as typeof import('common')
@@ -35,12 +32,6 @@ vi.mock('@/hooks/misc/useCheckPermissionsV2', async (importOriginal) => ({
 vi.mock('@/hooks/misc/useSelectedOrganization', () => ({
   useSelectedOrganizationQuery: () => ({
     data: mockSelectedOrganization(),
-  }),
-}))
-
-vi.mock('@/state/organization-settings', () => ({
-  useOrgSettingsPageStateSnapshot: () => ({
-    setPanelKey: mockSetPanelKey,
   }),
 }))
 
@@ -73,15 +64,17 @@ describe('Subscription', () => {
     })
   })
 
-  it('shows the plan-change CTA and opens the side panel when clicked', () => {
-    render(<Subscription />)
+  it('shows the plan-change CTA and opens the side panel when clicked', async () => {
+    const onUrlUpdate = vi.fn()
+    render(<Subscription />, { nuqs: { onUrlUpdate } })
     const button = screen.getByRole('button', { name: 'Change subscription plan' })
     expect(button).toBeInTheDocument()
-    expect(mockSetPanelKey).not.toHaveBeenCalled()
+    expect(onUrlUpdate).not.toHaveBeenCalled()
 
     fireEvent.click(button)
 
-    expect(mockSetPanelKey).toHaveBeenCalledWith('subscriptionPlan')
+    await waitFor(() => expect(onUrlUpdate).toHaveBeenCalledTimes(1))
+    expect(onUrlUpdate.mock.calls[0][0].searchParams.get('panel')).toBe('subscriptionPlan')
   })
 
   it('links to Compare plans and AWS Marketplace under More information', () => {

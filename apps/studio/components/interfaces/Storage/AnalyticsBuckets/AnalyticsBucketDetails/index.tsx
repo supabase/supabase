@@ -1,16 +1,13 @@
 import { useParams } from 'common'
 import { uniq } from 'lodash'
-import { Loader2Icon } from 'lucide-react'
 import { useRouter } from 'next/router'
 import { parseAsBoolean, useQueryState } from 'nuqs'
-import { useEffect, useMemo, useState } from 'react'
+import { useMemo } from 'react'
 import { Button, Card, CardContent } from 'ui'
-import { EmptyStatePresentational } from 'ui-patterns/EmptyStatePresentational'
 import { GenericTableLoader } from 'ui-patterns/ShimmeringLoader'
 
 import { DeleteAnalyticsBucketModal } from '../DeleteAnalyticsBucketModal'
 import { useSelectedAnalyticsBucket } from '../useSelectedAnalyticsBucket'
-import { HIDE_REPLICATION_USER_FLOW } from './AnalyticsBucketDetails.constants'
 import { ExtensionNeedsUpgrade, ExtensionNotInstalled, WrapperMissing } from './BucketCallouts'
 import { BucketHeader } from './BucketHeader'
 import { CreateTableInstructions } from './CreateTable/CreateTableInstructions'
@@ -50,21 +47,11 @@ export const AnalyticBucketDetails = () => {
     'delete',
     parseAsBoolean.withDefault(false).withOptions({ history: 'push', clearOnDefault: true })
   )
-  // [Joshen] Namespaces are now created asynchronously when the pipeline is started, so long poll after
-  // updating connected tables until namespaces are updated
-  // Namespace would just be the schema (Which is currently limited to public)
-  // Wrapper table would be {schema}_{table}_changelog
-  const [pollIntervalNamespaces, setPollIntervalNamespaces] = useState(0)
-  const [pollIntervalNamespaceTables, setPollIntervalNamespaceTables] = useState(0)
-
-  const {
-    publication,
-    icebergWrapper: wrapperInstance,
-    isLoadingWrapperInstance,
-  } = useAnalyticsBucketAssociatedEntities({
-    projectRef,
-    bucketId: bucket?.name,
-  })
+  const { icebergWrapper: wrapperInstance, isLoadingWrapperInstance } =
+    useAnalyticsBucketAssociatedEntities({
+      projectRef,
+      bucketId: bucket?.name,
+    })
 
   const wrapperValues = convertKVStringArrayToJson(wrapperInstance?.server_options ?? [])
   const integration = INTEGRATIONS.find((i) => i.id === 'iceberg_wrapper' && i.type === 'wrapper')
@@ -88,37 +75,10 @@ export const AnalyticBucketDetails = () => {
   })
   const wrappersExtension = extensionsData?.find((ext) => ext.name === 'wrappers')
 
-  const {
-    data: namespacesData = [],
-    isPending: isLoadingNamespaces,
-    isSuccess: isSuccessNamespaces,
-  } = useIcebergNamespacesQuery(
-    {
-      projectRef,
-      warehouse: wrapperValues.warehouse,
-    },
-    {
-      refetchInterval: (query) => {
-        const data = query.state.data
-        if (pollIntervalNamespaces === 0) return false
-
-        const publicationTableSchemas = publication?.tables.map((x) => x.schema) ?? []
-        const isSynced = !publicationTableSchemas.some((x) => !data?.includes(x))
-        if (isSynced) {
-          setPollIntervalNamespaces(0)
-          return false
-        }
-
-        return pollIntervalNamespaces
-      },
-    }
-  )
-
-  const publicationTableSchemas = (publication?.tables ?? []).map((x) => x.schema)
-  const isSyncedPublicationTableSchemasAndNamespaces = !publicationTableSchemas.some(
-    (x) => !namespacesData.includes(x)
-  )
-  const isPollingForData = pollIntervalNamespaces > 0 || pollIntervalNamespaceTables > 0
+  const { data: namespacesData = [], isPending: isLoadingNamespaces } = useIcebergNamespacesQuery({
+    projectRef,
+    warehouse: wrapperValues.warehouse,
+  })
 
   const namespaces = useMemo(() => {
     const fdwNamespaces = wrapperTables.map((t) => (t.table as string).split('.')[0])
@@ -135,12 +95,6 @@ export const AnalyticBucketDetails = () => {
       }
     })
   }, [wrapperTables, namespacesData])
-
-  useEffect(() => {
-    if (isSuccessNamespaces && !isSyncedPublicationTableSchemasAndNamespaces) {
-      setPollIntervalNamespaces(4000)
-    }
-  }, [isSuccessNamespaces, isSyncedPublicationTableSchemasAndNamespaces])
 
   return (
     <>
@@ -181,35 +135,16 @@ export const AnalyticBucketDetails = () => {
                 {isLoadingNamespaces || isLoadingWrapperInstance ? (
                   <GenericTableLoader headers={['Name']} />
                 ) : namespaces.length === 0 ? (
-                  <>
-                    {HIDE_REPLICATION_USER_FLOW ? (
-                      <CreateTableInstructions />
-                    ) : isPollingForData ? (
-                      <EmptyStatePresentational
-                        icon={
-                          <Loader2Icon
-                            size={24}
-                            strokeWidth={1.5}
-                            className="animate-spin text-foreground-muted"
-                          />
-                        }
-                        title="Connecting table(s) to bucket"
-                        description="Tables will be shown here once the connection is complete"
-                      />
-                    ) : null}
-                  </>
+                  <CreateTableInstructions />
                 ) : (
                   <div className="flex flex-col gap-y-10">
                     {namespaces.map(({ namespace, schema, tables }) => (
                       <NamespaceWithTables
                         key={namespace}
                         namespace={namespace}
-                        sourceType="direct"
                         schema={schema}
                         tables={tables as any}
                         wrapperValues={wrapperValues}
-                        pollIntervalNamespaceTables={pollIntervalNamespaceTables}
-                        setPollIntervalNamespaceTables={setPollIntervalNamespaceTables}
                       />
                     ))}
                   </div>

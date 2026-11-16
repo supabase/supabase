@@ -1,15 +1,131 @@
+import { SupabaseClient } from '@supabase/supabase-js'
 import { createFileRoute } from '@tanstack/react-router'
-import type { NextRequest } from 'next/server'
+import { ApplicationError, clippy, UserError } from 'ai-commands/edge'
+import OpenAI from 'openai'
 
-// docs.ts is already Web-native (Next edge runtime): takes `NextRequest`,
-// returns `Response`, and streams SSE back from OpenAI. Direct re-export —
-// no shim buffering needed.
-import docsHandler from '@/pages/api/ai/docs'
+const openAiKey = process.env.OPENAI_API_KEY
+const supabaseUrl = process.env.NEXT_PUBLIC_SUPABASE_URL
+const supabaseServiceKey = process.env.NEXT_PUBLIC_SUPABASE_ANON_KEY
+
+async function handler(req: Request) {
+  if (!openAiKey) {
+    return new Response(
+      JSON.stringify({
+        error: 'No OPENAI_API_KEY set. Create this environment variable to use AI features.',
+      }),
+      {
+        status: 500,
+        headers: { 'Content-Type': 'application/json' },
+      }
+    )
+  }
+
+  if (!supabaseUrl) {
+    return new Response(
+      JSON.stringify({
+        error:
+          'No NEXT_PUBLIC_SUPABASE_URL set. Create this environment variable to use AI features.',
+      }),
+      {
+        status: 500,
+        headers: { 'Content-Type': 'application/json' },
+      }
+    )
+  }
+
+  if (!supabaseServiceKey) {
+    return new Response(
+      JSON.stringify({
+        error:
+          'No NEXT_PUBLIC_SUPABASE_ANON_KEY set. Create this environment variable to use AI features.',
+      }),
+      {
+        status: 500,
+        headers: { 'Content-Type': 'application/json' },
+      }
+    )
+  }
+
+  const { method } = req
+
+  switch (method) {
+    case 'POST':
+      return handlePost(req)
+    default:
+      return new Response(
+        JSON.stringify({ data: null, error: { message: `Method ${method} Not Allowed` } }),
+        {
+          status: 405,
+          headers: { 'Content-Type': 'application/json', Allow: 'POST' },
+        }
+      )
+  }
+}
+
+async function handlePost(request: Request) {
+  const openai = new OpenAI({ apiKey: openAiKey })
+
+  const body = await (request.json() as Promise<{
+    messages: { content: string; role: 'user' | 'assistant' }[]
+  }>)
+
+  const { messages } = body
+
+  if (!messages) {
+    throw new UserError('Missing messages in request data')
+  }
+
+  const supabaseClient = new SupabaseClient(supabaseUrl!, supabaseServiceKey!)
+
+  try {
+    const response = await clippy(openai, supabaseClient, messages)
+
+    // Proxy the streamed SSE response from OpenAI
+    return new Response(response.body, {
+      headers: {
+        'Content-Type': 'text/event-stream',
+      },
+    })
+  } catch (error: unknown) {
+    console.error(error)
+    if (error instanceof UserError) {
+      return new Response(
+        JSON.stringify({
+          error: error.message,
+          data: error.data,
+        }),
+        {
+          status: 400,
+          headers: { 'Content-Type': 'application/json' },
+        }
+      )
+    } else if (error instanceof ApplicationError) {
+      // Print out application errors with their additional data
+      console.error(`${error.message}: ${JSON.stringify(error.data)}`)
+    } else {
+      // Print out unexpected errors as is to help with debugging
+      console.error(error)
+    }
+
+    console.log('Returning generic 500 ApplicationError to client')
+
+    // TODO: include more response info in debug environments
+    return new Response(
+      JSON.stringify({
+        error: 'There was an error processing your request',
+      }),
+      {
+        status: 500,
+        headers: { 'Content-Type': 'application/json' },
+      }
+    )
+  }
+}
 
 export const Route = createFileRoute('/api/ai/docs')({
   server: {
     handlers: {
-      POST: ({ request }) => docsHandler(request as NextRequest),
+      POST: ({ request }) => handler(request),
     },
   },
 })

@@ -1,3 +1,4 @@
+import { useQuery } from '@tanstack/react-query'
 import { DatabaseZapIcon, PlusIcon, SearchIcon } from 'lucide-react'
 import { parseAsJson, parseAsString, useQueryState } from 'nuqs'
 import { useMemo, useRef, useState } from 'react'
@@ -29,12 +30,13 @@ import { SIDEBAR_KEYS } from '@/components/layouts/ProjectLayout/LayoutSidebar/L
 import { AlertError } from '@/components/ui/AlertError'
 import { ButtonTooltip } from '@/components/ui/ButtonTooltip'
 import { DocsButton } from '@/components/ui/DocsButton'
+import { NoPermission } from '@/components/ui/NoPermission'
 import { Shortcut } from '@/components/ui/Shortcut'
 import { useDatabaseEventTriggerDeleteMutation } from '@/data/database-event-triggers/database-event-trigger-delete-mutation'
-import { useDatabaseEventTriggersQuery } from '@/data/database-event-triggers/database-event-triggers-query'
-import { FGA_PERMISSIONS, useAsyncCheckPermissionsV2 } from '@/hooks/misc/useCheckPermissionsV2'
+import { databaseEventTriggersQueryOptions } from '@/data/database-event-triggers/database-event-triggers-query'
 import { useSelectedProjectQuery } from '@/hooks/misc/useSelectedProject'
 import { DOCS_URL } from '@/lib/constants'
+import { getWriteGrantToastMessage, useGrant } from '@/lib/grants'
 import { onSearchInputEscape } from '@/lib/keyboard'
 import { EMPTY_ARR } from '@/lib/void'
 import { useAiAssistantStateSnapshot } from '@/state/ai-assistant-state'
@@ -66,19 +68,32 @@ export const EventTriggersList = () => {
     setInitialPrompt: setEditorPanelInitialPrompt,
   } = useEditorPanelStateSnapshot()
 
-  const { can: canUpdateEventTriggers } = useAsyncCheckPermissionsV2(
-    FGA_PERMISSIONS.PROJECT.DATABASE_WRITE
+  const readGrant = useGrant(
+    'POST /platform/pg-meta/{ref}/query',
+    { projectRef: project?.ref },
+    { variant: 'read' }
   )
+  const writeGrant = useGrant(
+    'POST /platform/pg-meta/{ref}/query',
+    { projectRef: project?.ref },
+    { variant: 'write' }
+  )
+  const canUpdateEventTriggers = writeGrant.status === 'granted'
 
   const {
     data: eventTriggers = EMPTY_ARR,
     error,
-    isPending,
+    isPending: isLoadingEventTriggers,
     isError,
-  } = useDatabaseEventTriggersQuery({
-    projectRef: project?.ref,
-    connectionString: project?.connectionString,
-  })
+  } = useQuery(
+    databaseEventTriggersQueryOptions({
+      projectRef: project?.ref,
+      connectionString: project?.connectionString,
+      grant: readGrant.grant,
+    })
+  )
+  const isPending =
+    readGrant.status === 'loading' || (readGrant.status === 'granted' && isLoadingEventTriggers)
 
   const { mutate: deleteEventTrigger, isPending: isDeletingEventTrigger } =
     useDatabaseEventTriggerDeleteMutation({
@@ -177,6 +192,16 @@ export const EventTriggersList = () => {
       !hasPostgresOwnerTriggers
     )
   }, [eventTriggers, ownerFilterValue])
+
+  if (readGrant.status === 'denied') {
+    return <NoPermission resourceText="view event triggers" />
+  }
+
+  if (readGrant.status === 'error') {
+    return (
+      <AlertError error={readGrant.error} subject="Failed to check event triggers permissions" />
+    )
+  }
 
   if (isPending) {
     return <GenericSkeletonLoader />
@@ -309,8 +334,13 @@ export const EventTriggersList = () => {
             return
           }
           if (!triggerToDelete) return
+          if (!writeGrant.grant) {
+            toast.error(getWriteGrantToastMessage(writeGrant.status, 'delete', 'event triggers'))
+            return
+          }
 
           deleteEventTrigger({
+            grant: writeGrant.grant,
             projectRef: project.ref,
             connectionString: project.connectionString,
             trigger: triggerToDelete,

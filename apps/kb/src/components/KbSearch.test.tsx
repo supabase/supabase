@@ -46,7 +46,7 @@ const resultsState: DocsSearchV2State = {
   status: 'results',
   key: 1,
   results: [result('/kb/guides/a'), result('/kb/guides/b'), result('/kb/guides/c')],
-  query: 'secret query',
+  query: 'storage policies',
 }
 
 describe('KbSearch telemetry', () => {
@@ -109,14 +109,16 @@ describe('KbSearch telemetry', () => {
       )
     })
 
-  it('sends kb_search_submitted with counts and no query text', () => {
+  it('sends kb_search_submitted with the query text and counts', () => {
     renderWithState(resultsState)
 
     expect(sentWith('kb_search_submitted')).toHaveLength(1)
-    expect(sentWith('kb_search_submitted')[0]).toMatchObject({
-      custom_properties: { queryLength: 12, resultCount: 3, hasResults: true },
+    expect(sentWith('kb_search_submitted')[0].custom_properties).toEqual({
+      query: 'storage policies',
+      queryLength: 16,
+      resultCount: 3,
+      hasResults: true,
     })
-    expect(JSON.stringify(sentWith('kb_search_submitted')[0])).not.toContain('secret')
   })
 
   it('posts to the telemetry endpoint with cookies and no auth header', () => {
@@ -146,6 +148,7 @@ describe('KbSearch telemetry', () => {
     renderWithState({ status: 'noResults', key: 1, query: 'zzz' })
 
     expect(sentWith('kb_search_submitted')[0].custom_properties).toEqual({
+      query: 'zzz',
       queryLength: 3,
       resultCount: 0,
       hasResults: false,

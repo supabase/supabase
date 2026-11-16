@@ -48,7 +48,7 @@ Other rules:
 - New code uses native TanStack APIs directly (no `next/router`, no `next/link`). The Next compat shim stays in place for code that still imports `next/*`.
 - `withAuth()` HOC → TanStack `beforeLoad` on the containing route/layout. Apply this at shared-layout level where possible.
 - Body moves and `pages/...` deletions happen in the FE-3106 cleanup PRs; mark each entry `[x] A→done` as its page is deleted.
-- Not migrated via this list: `pages/api/**` (Next API routes — separate migration), `_app.tsx`, `_document.tsx`, `_error`, `pages/org/_/[[...routeSlug]].tsx`, `pages/project/_/[[...routeSlug]].tsx` (catch-alls — revisit at the end).
+- Not migrated via this list: `_app.tsx`, `_document.tsx`, `_error`, `pages/org/_/[[...routeSlug]].tsx`, `pages/project/_/[[...routeSlug]].tsx` (catch-alls — revisit at the end).
 
 **Legend**
 
@@ -379,13 +379,12 @@ These are the layout-only TanStack files. Most hold a single product layout comp
 
 ## API routes
 
-**Strategy — shim + re-export.** `compat/next/api.ts` exposes
-`toWebHandler(nextHandler)` that adapts a `(req, res) => …` Next.js handler
-into a TanStack Start Web-fetch handler. Each `routes/api/...` file imports
-the default export from `pages/api/...`, wraps with `toWebHandler`, and
-registers via `createFileRoute(...).server.handlers`. `apiWrapper` and
-`apiAuthenticate` stay untouched — they run inside the shim, seeing a
-NextApiRequest-shaped `req` and a proxy `res`.
+**Strategy — shim.** Each `routes/api/...` file holds its handler
+(moved from `pages/api/...`, which is deleted, FE-3106), wraps it with
+`toWebHandler` from `compat/next/api.ts`, and registers it via
+`createFileRoute(...).server.handlers`. `apiWrapper` and
+`apiAuthenticate` run inside the shim, seeing a NextApiRequest-shaped
+`req` and a proxy `res`.
 
 **Path conventions** — `pages/api/foo/[bar]/baz.ts` → `routes/api/foo/$bar/baz.ts`;
 `pages/api/foo/[[...slug]].ts` → `routes/api/foo/$.ts`.
@@ -424,8 +423,7 @@ Web-natively from scratch:
 - `routes/api/mcp/index.ts` — uses MCP SDK's
   `WebStandardStreamableHTTPServerTransport` (`handleRequest(request)`
   returns a `Response` directly).
-- `pages/api/ai/docs.ts` was already edge-runtime / Web-Response native
-  — direct re-export, no shim involved.
+- `routes/api/ai/docs.ts` is Web-Response native — no shim involved.
 
 Tracking below is coarse — each bullet is a `pages/api/**` subtree. Check off
 once every file in the subtree has a `routes/api/**` counterpart. Expand into

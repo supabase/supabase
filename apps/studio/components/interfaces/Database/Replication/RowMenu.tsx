@@ -28,6 +28,10 @@ import { ShimmeringLoader } from 'ui-patterns/ShimmeringLoader'
 
 import { getStatusName } from './Pipeline.utils'
 import { PipelineStatusName } from './Replication.constants'
+import {
+  canModifyDestination,
+  type ReplicationDestinationType,
+} from './ReplicationDiagram/Nodes.utils'
 import { ReplicationPipelineStatusData } from '@/data/replication/pipeline-status-query'
 import { Pipeline } from '@/data/replication/pipelines-query'
 import { useRestartPipelineMutation } from '@/data/replication/restart-pipeline-mutation'
@@ -41,6 +45,7 @@ import {
 
 interface RowMenuProps {
   destinationId: number
+  destinationType: ReplicationDestinationType | undefined
   pipeline: Pipeline | undefined
   pipelineStatus?: ReplicationPipelineStatusData['status']
   error: StudioError | null
@@ -53,6 +58,7 @@ interface RowMenuProps {
 
 export const RowMenu = ({
   destinationId,
+  destinationType,
   pipeline,
   pipelineStatus,
   error,
@@ -79,6 +85,8 @@ export const RowMenu = ({
     : PipelineStatusRequestStatus.None
 
   const isPipelineRequestPending = !!pipeline && isRequestPending(pipeline.id)
+  const canModify = canModifyDestination(destinationType)
+  const shouldShowUpdate = canModify && hasUpdate
 
   // Show actions when not in a transitional state
   const canPerformActions =
@@ -91,13 +99,14 @@ export const RowMenu = ({
       statusName as PipelineStatusName
     )
 
-  // Show both stop and restart for started/failed states
-  const showStopAndRestart =
+  const shouldShowStop =
     canPerformActions &&
     (statusName === PipelineStatusName.STARTED || statusName === PipelineStatusName.FAILED)
+  const shouldShowRestart = canModify && shouldShowStop
 
   // Show only start for stopped state
-  const showStart = canPerformActions && statusName === PipelineStatusName.STOPPED
+  const shouldShowStart =
+    canModify && canPerformActions && statusName === PipelineStatusName.STOPPED
 
   const onEnablePipeline = async () => {
     if (!projectRef) return console.error('Project ref is required')
@@ -139,7 +148,7 @@ export const RowMenu = ({
   }
 
   return (
-    <div className="flex justify-end items-center space-x-2">
+    <div className="flex justify-end items-center gap-x-2">
       {isLoading && <ShimmeringLoader />}
 
       {isError && (
@@ -162,10 +171,12 @@ export const RowMenu = ({
             <Button
               variant="default"
               className="w-6.5 hit-area-1"
-              aria-label={hasUpdate ? 'Pipeline options, update available' : 'Pipeline options'}
+              aria-label={
+                shouldShowUpdate ? 'Pipeline options, update available' : 'Pipeline options'
+              }
               icon={<MoreVerticalIcon />}
             />
-            {hasUpdate && (
+            {shouldShowUpdate && (
               <span
                 className="absolute -top-0.5 -right-0.5 h-2 w-2 rounded-full bg-primary-bright"
                 aria-hidden
@@ -175,14 +186,14 @@ export const RowMenu = ({
         </DropdownMenuTrigger>
 
         <DropdownMenuContent side="bottom" align="end" className="w-44">
-          <DropdownMenuItem className="space-x-2" asChild disabled={!pipeline}>
+          <DropdownMenuItem className="gap-x-2" asChild disabled={!pipeline}>
             <Link href={`/project/${projectRef}/database/pipelines/${pipeline?.id}`}>
               <EyeIcon size={14} />
               <p>View details</p>
             </Link>
           </DropdownMenuItem>
           <DropdownMenuSeparator />
-          {hasUpdate && (
+          {shouldShowUpdate && (
             <>
               <DropdownMenuItem
                 className="gap-x-2"
@@ -199,22 +210,24 @@ export const RowMenu = ({
               <DropdownMenuSeparator />
             </>
           )}
-          {showStart && (
+          {shouldShowStart && (
             <>
-              <DropdownMenuItem className="space-x-2" onClick={onEnablePipeline}>
+              <DropdownMenuItem className="gap-x-2" onClick={onEnablePipeline}>
                 <PlayIcon size={14} />
                 <p>Start pipeline</p>
               </DropdownMenuItem>
               <DropdownMenuSeparator />
             </>
           )}
-          {showStopAndRestart && (
+          {shouldShowStop && (
             <>
-              <DropdownMenuItem className="space-x-2" onClick={onRestartPipeline}>
-                <RotateCcwIcon size={14} />
-                <p>Restart pipeline</p>
-              </DropdownMenuItem>
-              <DropdownMenuItem className="space-x-2" onClick={onDisablePipeline}>
+              {shouldShowRestart && (
+                <DropdownMenuItem className="gap-x-2" onClick={onRestartPipeline}>
+                  <RotateCcwIcon size={14} />
+                  <p>Restart pipeline</p>
+                </DropdownMenuItem>
+              )}
+              <DropdownMenuItem className="gap-x-2" onClick={onDisablePipeline}>
                 <CircleStopIcon size={14} />
                 <p>Stop pipeline</p>
               </DropdownMenuItem>
@@ -222,16 +235,18 @@ export const RowMenu = ({
             </>
           )}
 
+          {canModify && (
+            <DropdownMenuItem
+              className="gap-x-2"
+              onClick={() => setEdit(destinationId)}
+              disabled={isPipelineRequestPending}
+            >
+              <EditIcon size={14} />
+              <p>Edit pipeline</p>
+            </DropdownMenuItem>
+          )}
           <DropdownMenuItem
-            className="space-x-2"
-            onClick={() => setEdit(destinationId)}
-            disabled={isPipelineRequestPending}
-          >
-            <EditIcon size={14} />
-            <p>Edit pipeline</p>
-          </DropdownMenuItem>
-          <DropdownMenuItem
-            className="space-x-2"
+            className="gap-x-2"
             onClick={onDeleteClick}
             disabled={isPipelineRequestPending}
           >
