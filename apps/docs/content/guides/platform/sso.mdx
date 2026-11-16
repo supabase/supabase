@@ -106,15 +106,15 @@ Users will need to ensure they are signed in with the correct account when acces
 
 **Recommended workflow:**
 
-1. Create or verify at least one non-SSO owner account exists (required for safety).
-   - Use an email address that no one will sign in with through SSO.
-   - You can't invite an email that already belongs to an account in the organization.
+1. Create or verify a non-SSO owner account.
+   - This account is required so you can't lock yourself out of the organization.
+   - Use an email address that no one will use for SSO. You can't invite an email that already belongs to an account in the organization.
 2. Configure your SSO provider following one of our [provider-specific guides](#supported-providers)
 3. Start with auto-join **disabled** to test the configuration
 4. Test SSO sign-in with your own account or a test account
-   - If your own account is already a non-SSO member, remove it, then re-invite the email with an SSO-required invitation from the non-SSO owner account you set up in step 1.
+   - If your own account is already a non-SSO member, remove the account from the organization. Using the non-SSO owner account you set up in step 1, re-invite the same email with an SSO-required invitation.
    - Otherwise, use a separate test account.
-5. Once confirmed working, enable auto-join if desired
+5. After you confirm it works, enable auto-join if desired
 6. Thoroughly test using our [SSO Testing and Best Practices](/docs/guides/platform/sso/testing-best-practices) guide
 7. Invite users to the organization or let them auto-join on sign-in
 
