@@ -304,7 +304,7 @@ export const LogsViewsMenu = ({
         }}
       >
         <p className="text-sm text-foreground-light">
-          Are you sure you want to delete {deleteTarget?.name}?
+          {`Are you sure you want to delete "${deleteTarget?.name ?? ''}"? This will remove it for everyone in the project.`}
         </p>
       </ConfirmationModal>
     </>

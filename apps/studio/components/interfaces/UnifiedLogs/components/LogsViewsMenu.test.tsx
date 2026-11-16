@@ -145,6 +145,13 @@ describe('LogsViewsMenu', () => {
 
     await openMenu()
     await userEvent.click(screen.getByRole('button', { name: 'Delete Errors only' }))
+
+    expect(
+      await screen.findByText(
+        'Are you sure you want to delete "Errors only"? This will remove it for everyone in the project.'
+      )
+    ).toBeInTheDocument()
+
     await userEvent.click(await screen.findByRole('button', { name: 'Delete view' }))
 
     await waitFor(() =>
