@@ -53,9 +53,8 @@ and is gitignored. See `AGENTS.md` for how it works and what's intentionally lef
 
 ### Contributing to troubleshooting articles
 
-Troubleshooting articles (`/kb/troubleshooting/...`) aren't open for direct contributions. They're often drafted from
-support cases and can contain customer data before they're reviewed and published, so they go through an internal
-review process instead.
+Troubleshooting articles (`/kb/troubleshooting/...`) aren't open for direct contributions. They go through an internal
+review process before they're published.
 
 You can still suggest a fix: comment on the article's GitHub Discussion (linked at the bottom of each article as
 "Go to the GitHub discussion"), or [open an issue](https://github.com/supabase/supabase/issues/new/choose) that
