@@ -1,5 +1,6 @@
-import { useFlag } from 'common'
+import { useFlag, useParams } from 'common'
 import { ListFilterIcon } from 'lucide-react'
+import { useState } from 'react'
 import {
   Button,
   cn,
@@ -15,6 +16,7 @@ import {
   DropdownMenuTrigger,
 } from 'ui'
 
+import { AlertIssueTypesDialog } from '@/components/interfaces/Issues/AlertIssueTypesDialog'
 import {
   CATEGORY_LABELS,
   ISSUE_CATEGORIES,
@@ -22,6 +24,7 @@ import {
   SEVERITY_LABELS,
 } from '@/components/interfaces/Issues/Issues.constants'
 import { useIssueFilters } from '@/components/interfaces/Issues/useIssueFilters'
+import { IS_PLATFORM } from '@/lib/constants'
 
 const toggle = <T extends string>(values: T[], value: T) =>
   values.includes(value) ? values.filter((item) => item !== value) : [...values, value]
@@ -65,6 +68,10 @@ const MultiSelectSub = <T extends string>({
 )
 
 export const IssuesFilterMenu = () => {
+  const { ref } = useParams()
+  const [isAlertIssueTypesOpen, setIsAlertIssueTypesOpen] = useState(false)
+  // Alert issues are served by self-hosted Studio only until the platform API exposes them.
+  const showAlertIssueTypes = !IS_PLATFORM && !!ref
   const isHealthAdvisorEnabled = useFlag('healthAdvisor')
   const { filters, setFilters, activeFilterCount, clearFilters } = useIssueFilters()
   const hasFilters = activeFilterCount > 0
@@ -73,41 +80,58 @@ export const IssuesFilterMenu = () => {
   )
 
   return (
-    <DropdownMenu modal={false}>
-      <DropdownMenuTrigger asChild>
-        <Button
-          variant={hasFilters ? 'default' : 'text'}
-          size="tiny"
-          aria-label={hasFilters ? `Filters, ${activeFilterCount} active` : 'Filters'}
-          className={cn('h-[28px] shrink-0 px-1.5', !hasFilters && 'w-7')}
-          icon={<ListFilterIcon size={14} />}
-        >
-          {hasFilters ? activeFilterCount : null}
-        </Button>
-      </DropdownMenuTrigger>
-      <DropdownMenuContent align="end" className="w-52">
-        <DropdownMenuLabel>Filter</DropdownMenuLabel>
-        <MultiSelectSub
-          label="Severity"
-          options={ISSUE_SEVERITIES}
-          labels={SEVERITY_LABELS}
-          selected={filters.severity}
-          onChange={(severity) => setFilters({ severity })}
+    <>
+      <DropdownMenu modal={false}>
+        <DropdownMenuTrigger asChild>
+          <Button
+            variant={hasFilters ? 'default' : 'text'}
+            size="tiny"
+            aria-label={hasFilters ? `Filters, ${activeFilterCount} active` : 'Filters'}
+            className={cn('h-[28px] shrink-0 px-1.5', !hasFilters && 'w-7')}
+            icon={<ListFilterIcon size={14} />}
+          >
+            {hasFilters ? activeFilterCount : null}
+          </Button>
+        </DropdownMenuTrigger>
+        <DropdownMenuContent align="end" className="w-52">
+          <DropdownMenuLabel>Filter</DropdownMenuLabel>
+          <MultiSelectSub
+            label="Severity"
+            options={ISSUE_SEVERITIES}
+            labels={SEVERITY_LABELS}
+            selected={filters.severity}
+            onChange={(severity) => setFilters({ severity })}
+          />
+          <MultiSelectSub
+            label="Category"
+            options={categories}
+            labels={CATEGORY_LABELS}
+            selected={filters.category}
+            onChange={(category) => setFilters({ category })}
+          />
+          {hasFilters && (
+            <>
+              <DropdownMenuSeparator />
+              <DropdownMenuItem onSelect={clearFilters}>Clear filters</DropdownMenuItem>
+            </>
+          )}
+          {showAlertIssueTypes && (
+            <>
+              <DropdownMenuSeparator />
+              <DropdownMenuItem onSelect={() => setIsAlertIssueTypesOpen(true)}>
+                Manage alert issue types
+              </DropdownMenuItem>
+            </>
+          )}
+        </DropdownMenuContent>
+      </DropdownMenu>
+      {showAlertIssueTypes && isAlertIssueTypesOpen && (
+        <AlertIssueTypesDialog
+          projectRef={ref}
+          open={isAlertIssueTypesOpen}
+          onOpenChange={setIsAlertIssueTypesOpen}
         />
-        <MultiSelectSub
-          label="Category"
-          options={categories}
-          labels={CATEGORY_LABELS}
-          selected={filters.category}
-          onChange={(category) => setFilters({ category })}
-        />
-        {hasFilters && (
-          <>
-            <DropdownMenuSeparator />
-            <DropdownMenuItem onSelect={clearFilters}>Clear filters</DropdownMenuItem>
-          </>
-        )}
-      </DropdownMenuContent>
-    </DropdownMenu>
+      )}
+    </>
   )
 }

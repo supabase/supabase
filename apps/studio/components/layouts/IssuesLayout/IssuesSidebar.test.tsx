@@ -103,4 +103,21 @@ describe('IssuesSidebar', () => {
     )
     expect(search).toHaveValue('')
   })
+
+  it('opens the alert issue types from the filter menu', async () => {
+    mockProjectGrantContext({ ref: 'default' })
+    addAPIMock({ method: 'get', path: '/platform/projects/:ref/run-lints', response: [] })
+    mswServer.use(
+      http.get(ALERT_ISSUES_URL, () => HttpResponse.json([])),
+      http.get(`${API_URL}/platform/projects/:ref/alerts/issue-types`, () => HttpResponse.json([]))
+    )
+
+    customRender(<IssuesSidebar />)
+
+    await userEvent.click(screen.getByRole('button', { name: 'Filters' }))
+    await userEvent.click(await screen.findByRole('menuitem', { name: 'Manage alert issue types' }))
+
+    expect(await screen.findByRole('dialog', { name: 'Alert issue types' })).toBeInTheDocument()
+    expect(await screen.findByText('No alert issue types yet')).toBeInTheDocument()
+  })
 })
