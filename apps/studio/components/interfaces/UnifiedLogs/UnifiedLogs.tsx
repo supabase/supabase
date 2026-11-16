@@ -755,6 +755,25 @@ export const UnifiedLogs = ({
                   </div>
                 </div>
 
+                <ViewSuggestionBanner
+                  visible={showSaveViewSuggestion}
+                  title={`You've configured ${activeFilterCount} filters`}
+                  description="Would you like to save them as a view?"
+                  primaryLabel="Save"
+                  onPrimary={handleSaveCurrentView}
+                  onDismiss={handleDismissSuggestion}
+                />
+                <ViewSuggestionBanner
+                  visible={showUpdateViewSuggestion}
+                  title="You have modified your view"
+                  description={`Update "${truncateViewName(activeView?.name ?? '')}" with these changes?`}
+                  primaryLabel="Update"
+                  onPrimary={handleUpdateActiveView}
+                  onDismiss={handleDismissUpdateSuggestion}
+                  secondaryLabel={canCreateView ? 'Save as new' : undefined}
+                  onSecondary={canCreateView ? handleSaveCurrentView : undefined}
+                />
+
                 {isLoading ? (
                   <div className="h-[60px] flex items-center justify-center">
                     <Loader2Icon size={14} className="animate-spin text-foreground-lighter" />
@@ -780,24 +799,6 @@ export const UnifiedLogs = ({
                   projectRef={projectRef}
                 />
               )}
-              <ViewSuggestionBanner
-                visible={showSaveViewSuggestion}
-                title={`You've configured ${activeFilterCount} filters`}
-                description="Would you like to save them as a view?"
-                primaryLabel="Save"
-                onPrimary={handleSaveCurrentView}
-                onDismiss={handleDismissSuggestion}
-              />
-              <ViewSuggestionBanner
-                visible={showUpdateViewSuggestion}
-                title="You have modified your view"
-                description={`Update "${truncateViewName(activeView?.name ?? '')}" with these changes?`}
-                primaryLabel="Update"
-                onPrimary={handleUpdateActiveView}
-                onDismiss={handleDismissUpdateSuggestion}
-                secondaryLabel={canCreateView ? 'Save as new' : undefined}
-                onSecondary={canCreateView ? handleSaveCurrentView : undefined}
-              />
               <ResizablePanelGroup
                 key="main-logs"
                 className="flex-1 border-t"
