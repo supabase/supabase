@@ -63,6 +63,23 @@ vi.mock('@/lib/password-strength', () => ({
 
 vi.mock('@/lib/telemetry/track', () => ({ useTrack: () => vi.fn() }))
 
+// The real usePHFlag returns false outside the platform build, so PostHog flags under test are
+// driven through this map (set per render via `renderWizard({ posthogFlags })`). Flags that
+// aren't set fall through to the real hook so other consumers in the wizard keep working.
+const mockPostHogFlags = vi.hoisted(() => ({
+  current: {} as Record<string, boolean | string | undefined>,
+}))
+vi.mock(import('@/hooks/ui/useFlag'), async (importOriginal) => {
+  const actual = await importOriginal()
+  return {
+    ...actual,
+    usePHFlag: ((name: string) =>
+      name in mockPostHogFlags.current
+        ? mockPostHogFlags.current[name]
+        : (actual.usePHFlag as (flagName: string) => unknown)(name)) as never,
+  }
+})
+
 vi.mock(import('common'), async (importOriginal) => {
   const actual = await importOriginal()
   return {
@@ -310,8 +327,13 @@ const DEFAULT_FLAGS = {
 }
 
 async function renderWizard(
-  options: { flags?: Record<string, boolean | string>; isConfigCatStale?: boolean } = {}
+  options: {
+    flags?: Record<string, boolean | string>
+    posthogFlags?: Record<string, boolean | string>
+    isConfigCatStale?: boolean
+  } = {}
 ) {
+  mockPostHogFlags.current = options.posthogFlags ?? {}
   const profileContext = createMockProfileContext()
   return renderRoute(Route, {
     routeId: '/new/$slug',
@@ -1353,7 +1375,7 @@ describe('project creation wizard', () => {
       const onRequest = vi.fn()
       mockCreateProject(onRequest)
 
-      await renderWizard()
+      await renderWizard({ posthogFlags: { dataApiRevokeOnCreateDefault: true } })
 
       await fillProjectName('No Data API Project')
       await generateAndWaitForStrongPassword()
@@ -1389,7 +1411,7 @@ describe('project creation wizard', () => {
       const onRequest = vi.fn()
       mockCreateProject(onRequest)
 
-      await renderWizard()
+      await renderWizard({ posthogFlags: { dataApiRevokeOnCreateDefault: true } })
 
       await fillProjectName('Manual Privileges Project')
       await generateAndWaitForStrongPassword()
@@ -1421,6 +1443,24 @@ describe('project creation wizard', () => {
       const body = onRequest.mock.calls[0][0]
       expect(body.data_api_exposed_schemas).toBeUndefined()
       expect(body.data_api_revoke_default_privileges).toBe(true)
+    })
+
+    test('grants API access to new tables by default when dataApiRevokeOnCreateDefault is off', async () => {
+      mockWizardEndpoints()
+      const onRequest = vi.fn()
+      mockCreateProject(onRequest)
+
+      await renderWizard({ posthogFlags: { dataApiRevokeOnCreateDefault: false } })
+
+      await fillProjectName('Default Grants Project')
+      await generateAndWaitForStrongPassword()
+
+      expect(screen.getByLabelText('Grant API access to new tables automatically')).toBeChecked()
+
+      fireEvent.click(screen.getByRole('button', { name: 'Create new project' }))
+
+      await waitFor(() => expect(onRequest).toHaveBeenCalled())
+      expect(onRequest.mock.calls[0][0].data_api_revoke_default_privileges).toBe(false)
     })
 
     test('enabling automatic RLS sends the event-trigger SQL', async () => {

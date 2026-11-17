@@ -70,6 +70,10 @@ import {
 import { useCustomContent } from '@/hooks/custom-content/useCustomContent'
 import { useCheckEntitlements } from '@/hooks/misc/useCheckEntitlements'
 import { FGA_PERMISSIONS, useAsyncCheckPermissionsV2 } from '@/hooks/misc/useCheckPermissionsV2'
+import {
+  isInDataApiRevokeTreatment,
+  useDataApiRevokeOnCreateDefaultEnabled,
+} from '@/hooks/misc/useDataApiRevokeOnCreateDefault'
 import { useIsFeatureEnabled } from '@/hooks/misc/useIsFeatureEnabled'
 import { useLastVisitedOrganization } from '@/hooks/misc/useLastVisitedOrganization'
 import { useSelectedOrganizationQuery } from '@/hooks/misc/useSelectedOrganization'
@@ -157,6 +161,7 @@ export const ProjectCreationForm = ({
   const dataApiRevokeOnCreateDefaultFlag = usePHFlag<boolean | string>(
     'dataApiRevokeOnCreateDefault'
   )
+  const isDataApiRevokeOnCreateDefault = useDataApiRevokeOnCreateDefaultEnabled()
 
   const isNotOnHigherPlan = !['team', 'enterprise', 'platform'].includes(currentOrg?.plan.id ?? '')
 
@@ -186,14 +191,14 @@ export const ProjectCreationForm = ({
       githubRepositoryName: '',
       instanceSize: canChooseInstanceSize ? sizes[0] : undefined,
       dataApi: true,
-      dataApiDefaultPrivileges: false,
+      dataApiDefaultPrivileges: !isDataApiRevokeOnCreateDefault,
       enableRlsEventTrigger: false,
       postgresVersionSelection: '',
       useOrioleDb: false,
       shouldRunMigrations: true,
     },
   })
-  const { resetField, setError, setValue } = form
+  const { getFieldState, resetField, setError, setValue } = form
   const {
     instanceSize: watchedInstanceSize,
     cloudProvider,
@@ -223,6 +228,14 @@ export const ProjectCreationForm = ({
     enrollmentFlag: freeTierGeneralRegionEnrollment,
     selectionFlag: freeTierGeneralRegionSelection,
   })
+
+  // Read dirty state during render rather than depending on form.formState in the
+  // effect — form.formState is a Proxy that gets a new reference every render, which
+  // would re-fire this effect after each setValue and trigger an infinite loop.
+  const isDataApiDefaultPrivilegesDirty = getFieldState(
+    'dataApiDefaultPrivileges',
+    form.formState
+  ).isDirty
 
   // [Charis] Since the form is updated in a useEffect, there is an edge case
   // when switching from free to paid, where canChooseInstanceSize is true for
@@ -725,6 +738,18 @@ export const ProjectCreationForm = ({
   }, [githubRepositoryName, watchedProjectName, setValue])
 
   useEffect(() => {
+    if (dataApiRevokeOnCreateDefaultFlag === undefined) return
+    if (isDataApiDefaultPrivilegesDirty) return
+    setValue(
+      'dataApiDefaultPrivileges',
+      !isInDataApiRevokeTreatment(dataApiRevokeOnCreateDefaultFlag),
+      {
+        shouldDirty: false,
+      }
+    )
+  }, [dataApiRevokeOnCreateDefaultFlag, isDataApiDefaultPrivilegesDirty, setValue])
+
+  useEffect(() => {
     // This is to make the database.new redirect work correctly. The database.new redirect should be set to supabase.com/dashboard/new/last-visited-org
     if (slug === 'last-visited-org') {
       if (lastVisitedOrganization) {
@@ -781,7 +806,7 @@ export const ProjectCreationForm = ({
             {projectCreationDisabled ? (
               <DisabledWarningDueToIncident title="Project creation is currently disabled" />
             ) : (
-              <div className="divide-y divide-border-border">
+              <div className="divide-y">
                 <OrganizationSelector
                   form={form}
                   disableOrganizationSelection={isVercelIntegrationFlow}

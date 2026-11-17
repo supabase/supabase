@@ -25,7 +25,7 @@ export const isInDataApiRevokeTreatment = (flag: boolean | string | undefined): 
 }
 
 /**
- * Controls the default state of the "Automatically expose new tables"
+ * Controls the default state of the "Grant API access to new tables automatically"
  * checkbox at project creation. When the flag is on, the checkbox defaults
  * to unchecked (i.e. revoke SQL runs). When off/absent, the checkbox defaults
  * to checked (current behaviour — default grants remain).
@@ -66,10 +66,7 @@ type DefaultPrivilegesExposureOptions =
  * the stale pre-sync value. If the user has dirtied the field, fire
  * immediately with their explicit value. Deduplicated via ref.
  */
-export const useTrackDefaultPrivilegesExposure = (
-  options: DefaultPrivilegesExposureOptions,
-  expectedDefaultOverride?: boolean
-) => {
+export const useTrackDefaultPrivilegesExposure = (options: DefaultPrivilegesExposureOptions) => {
   const track = useTrack()
   const flag = usePHFlag<boolean | string>('dataApiRevokeOnCreateDefault')
   const hasTracked = useRef(false)
@@ -82,7 +79,7 @@ export const useTrackDefaultPrivilegesExposure = (
     if (flag === undefined) return
     if (surface === 'vercel' && !orgSlug) return
     // Gate on form-flag convergence unless the user explicitly dirtied the field.
-    const expectedDefault = expectedDefaultOverride ?? !isInDataApiRevokeTreatment(flag)
+    const expectedDefault = !isInDataApiRevokeTreatment(flag)
     if (!hasUserModified && dataApiDefaultPrivileges !== expectedDefault) return
     hasTracked.current = true
     track(
@@ -94,13 +91,5 @@ export const useTrackDefaultPrivilegesExposure = (
       },
       surface === 'vercel' ? { organization: orgSlug } : undefined
     )
-  }, [
-    flag,
-    track,
-    surface,
-    dataApiDefaultPrivileges,
-    hasUserModified,
-    orgSlug,
-    expectedDefaultOverride,
-  ])
+  }, [flag, track, surface, dataApiDefaultPrivileges, hasUserModified, orgSlug])
 }
