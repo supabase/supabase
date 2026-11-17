@@ -2,9 +2,9 @@ import { screen } from '@testing-library/react'
 import type { ReactNode } from 'react'
 import { beforeEach, describe, expect, it, vi } from 'vitest'
 
-import JWTSigningKeysPage from '@/pages/project/[ref]/settings/jwt/index'
-import { customRender as render } from '@/tests/lib/custom-render'
+import { Route } from '@/routes/project/$ref/settings/jwt/index'
 import { mockProjectGrantContext } from '@/tests/lib/project-grant-mocks'
+import { renderRoute } from '@/tests/lib/route-render'
 
 const { mockIsPlatform, mockUseDeploymentMode } = vi.hoisted(() => ({
   mockIsPlatform: { value: true },
@@ -27,16 +27,6 @@ vi.mock('@/hooks/misc/useDeploymentMode', () => ({
   useDeploymentMode: mockUseDeploymentMode,
 }))
 
-vi.mock('@/components/layouts/DefaultLayout', () => ({
-  __esModule: true,
-  default: ({ children }: { children: ReactNode }) => <div>{children}</div>,
-}))
-
-vi.mock('@/components/layouts/ProjectSettingsLayout/SettingsLayout', () => ({
-  __esModule: true,
-  default: ({ children }: { children: ReactNode }) => <div>{children}</div>,
-}))
-
 vi.mock('@/components/layouts/JWTKeys/JWTKeysLayout', () => ({
   __esModule: true,
   default: ({ children }: { children: ReactNode }) => <div>{children}</div>,
@@ -50,7 +40,13 @@ vi.mock('@/components/ui/LocalSetupGuide', () => ({
   LocalSetupGuide: () => <div>LocalSetupGuide</div>,
 }))
 
-describe('/project/[ref]/settings/jwt', () => {
+const renderJwtKeys = () =>
+  renderRoute(Route, {
+    routeId: '/project/$ref/settings/jwt/',
+    url: '/project/default/settings/jwt',
+  })
+
+describe('/project/$ref/settings/jwt', () => {
   beforeEach(() => {
     mockIsPlatform.value = true
     mockProjectGrantContext({ ref: 'default' })
@@ -62,7 +58,7 @@ describe('/project/[ref]/settings/jwt', () => {
   })
 
   it('renders the JWT signing keys table on platform', async () => {
-    render(<JWTSigningKeysPage dehydratedState={{}} />)
+    await renderJwtKeys()
 
     expect(await screen.findByText('JWTSecretKeysTable')).toBeInTheDocument()
     expect(screen.queryByText('LocalSetupGuide')).not.toBeInTheDocument()
@@ -71,13 +67,16 @@ describe('/project/[ref]/settings/jwt', () => {
   it.each([
     { mode: 'CLI', isCli: true, isSelfHosted: false },
     { mode: 'Docker', isCli: false, isSelfHosted: true },
-  ])('renders only the LocalSetupGuide on self-hosted ($mode mode)', ({ isCli, isSelfHosted }) => {
-    mockIsPlatform.value = false
-    mockUseDeploymentMode.mockReturnValue({ isPlatform: false, isCli, isSelfHosted })
+  ])(
+    'renders only the LocalSetupGuide on self-hosted ($mode mode)',
+    async ({ isCli, isSelfHosted }) => {
+      mockIsPlatform.value = false
+      mockUseDeploymentMode.mockReturnValue({ isPlatform: false, isCli, isSelfHosted })
 
-    render(<JWTSigningKeysPage dehydratedState={{}} />)
+      await renderJwtKeys()
 
-    expect(screen.queryByText('JWTSecretKeysTable')).not.toBeInTheDocument()
-    expect(screen.getAllByText('LocalSetupGuide')).toHaveLength(1)
-  })
+      expect(screen.queryByText('JWTSecretKeysTable')).not.toBeInTheDocument()
+      expect(screen.getAllByText('LocalSetupGuide')).toHaveLength(1)
+    }
+  )
 })

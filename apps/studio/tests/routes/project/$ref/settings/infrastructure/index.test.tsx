@@ -7,11 +7,11 @@ import { beforeEach, describe, expect, test, vi } from 'vitest'
 
 import { FGA_PERMISSIONS } from '@/hooks/misc/useCheckPermissionsV2'
 import type { ProfileContextType } from '@/lib/profile'
-import InfrastructurePage from '@/pages/project/[ref]/settings/infrastructure'
+import { Route } from '@/routes/project/$ref/settings/infrastructure/index'
 import { createMockOrganizationResponse } from '@/tests/helpers'
-import { customRender } from '@/tests/lib/custom-render'
 import { addAPIMock } from '@/tests/lib/msw'
 import { mockPermissions } from '@/tests/lib/msw-permissions'
+import { renderRoute } from '@/tests/lib/route-render'
 
 type ProjectDetailResponse = components['schemas']['ProjectDetailResponse_Output']
 type ProjectAddonsResponse = components['schemas']['ProjectAddonsResponse_Output']
@@ -327,12 +327,14 @@ function mockInfrastructureEndpoints() {
 }
 
 function renderInfrastructurePage() {
-  return customRender(<InfrastructurePage dehydratedState={{}} />, {
+  return renderRoute(Route, {
+    routeId: '/project/$ref/settings/infrastructure/',
+    url: `/project/${PROJECT_REF}/settings/infrastructure`,
     profileContext: PROFILE_CONTEXT,
   })
 }
 
-describe('/project/[ref]/settings/infrastructure', () => {
+describe('/project/$ref/settings/infrastructure', () => {
   beforeEach(() => {
     mockInfrastructureEndpoints()
     window.HTMLElement.prototype.scrollIntoView = vi.fn()
@@ -340,7 +342,7 @@ describe('/project/[ref]/settings/infrastructure', () => {
 
   test('loads the complete infrastructure page through MSW and resets an interaction', async () => {
     const user = userEvent.setup({ delay: null })
-    renderInfrastructurePage()
+    await renderInfrastructurePage()
 
     expect(screen.getByRole('heading', { name: 'Infrastructure', level: 1 })).toBeInTheDocument()
     expect(screen.getByText('Scaling')).toBeInTheDocument()
@@ -379,7 +381,7 @@ describe('/project/[ref]/settings/infrastructure', () => {
 
   test('focuses the recommended compute option after closing the add replica dialog', async () => {
     const user = userEvent.setup({ delay: null })
-    renderInfrastructurePage()
+    await renderInfrastructurePage()
 
     await user.click(await screen.findByRole('button', { name: 'Add read replica' }))
     await user.click(await screen.findByRole('button', { name: 'Change compute' }))
@@ -402,7 +404,7 @@ describe('/project/[ref]/settings/infrastructure', () => {
       },
     })
 
-    renderInfrastructurePage()
+    await renderInfrastructurePage()
 
     await user.click(await screen.findByText('Small'))
     await user.click(screen.getByRole('button', { name: 'Review changes' }))
@@ -456,7 +458,7 @@ describe('/project/[ref]/settings/infrastructure', () => {
       },
     })
 
-    renderInfrastructurePage()
+    await renderInfrastructurePage()
 
     expect(
       await screen.findByText("Compute size can't be changed on High Availability projects")
@@ -509,7 +511,7 @@ describe('/project/[ref]/settings/infrastructure', () => {
       },
     })
 
-    renderInfrastructurePage()
+    await renderInfrastructurePage()
 
     const diskSize = await screen.findByRole('spinbutton', { name: 'Disk size' })
     await waitFor(() => expect(diskSize).toHaveValue(100))
