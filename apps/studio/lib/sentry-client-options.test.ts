@@ -6,11 +6,48 @@ import {
   isBrowserWalletExtensionError,
   isCancellationRejection,
   isChallengeExpiredError,
+  isDocumentOnlyStackError,
   isUserAbortedOperation,
   shouldDropForSampleRate,
 } from './sentry-client-options'
 
 describe('Sentry beforeSend filtering functions', () => {
+  describe('isDocumentOnlyStackError', () => {
+    const eventWithFrames = (frames: StackFrame[]): SentryEvent => ({
+      exception: { values: [{ type: 'RangeError', stacktrace: { frames } }] },
+    })
+
+    it('returns true when every frame is the page URL', () => {
+      expect(
+        isDocumentOnlyStackError(
+          eventWithFrames([
+            { filename: 'https://supabase.com/dashboard/project/abc/functions', lineno: 202 },
+            { filename: 'https://supabase.com/dashboard/sign-in-mfa', lineno: 231 },
+          ])
+        )
+      ).toBe(true)
+    })
+
+    it('returns false when a frame is a script file', () => {
+      expect(
+        isDocumentOnlyStackError(
+          eventWithFrames([
+            { filename: 'https://supabase.com/dashboard/project/abc/sql', lineno: 231 },
+            { filename: 'https://supabase.com/dashboard/assets/index-abc123.js', lineno: 1 },
+          ])
+        )
+      ).toBe(false)
+    })
+
+    it('returns false for relative or app:// frames and for events with no frames', () => {
+      expect(isDocumentOnlyStackError(eventWithFrames([{ filename: 'app.js' }]))).toBe(false)
+      expect(
+        isDocumentOnlyStackError(eventWithFrames([{ filename: 'app:///dashboard/project' }]))
+      ).toBe(false)
+      expect(isDocumentOnlyStackError(eventWithFrames([]))).toBe(false)
+    })
+  })
+
   describe('isBrowserWalletExtensionError', () => {
     it('returns true for wallet-provider in abs_path', () => {
       const event: SentryEvent = {
@@ -529,6 +566,23 @@ describe('which errors Studio sends to Sentry', () => {
     }
     const hint = { originalException: new UserSqlError({ message: 'Failed to run sql query' }) }
     expect(await beforeSend(event, hint)).toBeNull()
+  })
+
+  it('drops errors whose frames all come from the HTML document', async () => {
+    const frames = [{ filename: 'https://supabase.com/dashboard/project/abc/sql', lineno: 231 }]
+    expect(
+      await beforeSend(
+        { type: undefined, exception: { values: [{ value: 'stack', stacktrace: { frames } }] } },
+        {}
+      )
+    ).toBeNull()
+
+    const crash: Parameters<typeof beforeSend>[0] = {
+      type: undefined,
+      tags: { globalErrorBoundary: true },
+      exception: { values: [{ value: 'stack', stacktrace: { frames } }] },
+    }
+    expect(await beforeSend(crash, {})).toBe(crash)
   })
 
   it('drops errors with no code location when they did not crash the page', async () => {

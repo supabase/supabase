@@ -41,6 +41,32 @@ export function isBrowserWalletExtensionError(event: Sentry.Event): boolean {
   })
 }
 
+const SCRIPT_FILE_PATH = /\.(m|c)?js$/i
+
+// A frame whose file is an http(s) page URL rather than a script file ran in an
+// inline <script> of the HTML document. Studio's own code ships only as script
+// files, so a stack made only of such frames comes from a script the browser or an
+// extension injected into the page (e.g. Chrome on iOS reports its injected
+// scripts at the page URL).
+function isDocumentFrame(frame: Sentry.StackFrame): boolean {
+  const filename = frame.filename || frame.abs_path
+  if (!filename) return false
+  try {
+    const url = new URL(filename)
+    if (url.protocol !== 'http:' && url.protocol !== 'https:') return false
+    return !SCRIPT_FILE_PATH.test(url.pathname)
+  } catch {
+    return false
+  }
+}
+
+// Filter errors whose stack frames all come from the HTML document, with no frame
+// from a script file. These are not actionable: no Studio code is on the stack.
+export function isDocumentOnlyStackError(event: Sentry.Event): boolean {
+  const frames = event.exception?.values?.flatMap((e) => e.stacktrace?.frames || []) || []
+  return frames.length > 0 && frames.every(isDocumentFrame)
+}
+
 // Filter user-aborted operations (intentional cancellations)
 // These are expected when users cancel requests or navigate away
 // Examples: SUPABASE-APP-BG6, SUPABASE-APP-BG7
@@ -213,6 +239,9 @@ export function buildSentryClientOptions({
       }
 
       if (isBrowserWalletExtensionError(event)) {
+        return null
+      }
+      if (!isErrorBoundaryCrash && isDocumentOnlyStackError(event)) {
         return null
       }
       if (isUserAbortedOperation(hint.originalException, event)) {
