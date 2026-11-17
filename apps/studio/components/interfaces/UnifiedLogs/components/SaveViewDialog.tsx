@@ -1,5 +1,5 @@
 import { zodResolver } from '@hookform/resolvers/zod'
-import { useMemo, type ReactNode } from 'react'
+import { useEffect, useMemo, useRef, type ReactNode } from 'react'
 import { useForm, useWatch } from 'react-hook-form'
 import {
   Button,
@@ -37,6 +37,7 @@ interface SaveViewDialogProps {
   viewOptions: Record<string, unknown>
   existingNames: string[]
   columnLabels: Record<string, string>
+  defaultName?: string
 }
 
 const defaultValues = { name: '' }
@@ -85,7 +86,9 @@ export const SaveViewDialog = ({
   viewOptions,
   existingNames,
   columnLabels,
+  defaultName,
 }: SaveViewDialogProps) => {
+  const nameInputRef = useRef<HTMLInputElement | null>(null)
   const schema = useMemo(
     () =>
       z.object({
@@ -109,6 +112,13 @@ export const SaveViewDialog = ({
   const { isSubmitting } = form.formState
   const name = useWatch({ control: form.control, name: 'name' })
   const isNameEmpty = name.trim().length === 0
+
+  const { reset } = form
+  useEffect(() => {
+    if (!visible) return
+    reset({ name: defaultName ?? '' })
+    if (defaultName) requestAnimationFrame(() => nameInputRef.current?.select())
+  }, [visible, defaultName, reset])
 
   const filterSummary = useMemo(
     () => buildFilterSummary(filters, columnLabels),
@@ -166,8 +176,9 @@ export const SaveViewDialog = ({
               </div>
             )}
           </div>
-          <p className="text-foreground-lighter">The time range isn't saved with this view.</p>
-          <p className="text-foreground-lighter">Visible to everyone in this project</p>
+          <p className="text-foreground-lighter">
+            Shared with this project. The time range isn't saved with this view.
+          </p>
         </DialogSection>
         <DialogSectionSeparator />
         <Form {...form}>
@@ -179,7 +190,15 @@ export const SaveViewDialog = ({
                 render={({ field }) => (
                   <FormItemLayout layout="vertical" label="Name">
                     <FormControl>
-                      <Input {...field} autoFocus placeholder="Enter a name for this view" />
+                      <Input
+                        {...field}
+                        ref={(element) => {
+                          field.ref(element)
+                          nameInputRef.current = element
+                        }}
+                        autoFocus
+                        placeholder="Enter a name for this view"
+                      />
                     </FormControl>
                   </FormItemLayout>
                 )}

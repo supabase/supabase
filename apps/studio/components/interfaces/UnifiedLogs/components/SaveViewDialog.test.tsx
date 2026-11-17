@@ -44,12 +44,36 @@ describe('SaveViewDialog', () => {
     expect(screen.getByText('user-123')).toBeInTheDocument()
   })
 
-  it("shows a note that the time range isn't saved", async () => {
+  it('shows the sharing and time range note', async () => {
     customRender(<SaveViewDialog {...baseProps} />)
 
     expect(
-      await screen.findByText("The time range isn't saved with this view.")
+      await screen.findByText(
+        "Shared with this project. The time range isn't saved with this view."
+      )
     ).toBeInTheDocument()
+  })
+
+  it('labels the options summary as log sources', async () => {
+    customRender(<SaveViewDialog {...baseProps} />)
+
+    expect(await screen.findByText('Log sources')).toBeInTheDocument()
+  })
+
+  it('prefills and selects the name when defaultName is given', async () => {
+    customRender(<SaveViewDialog {...baseProps} defaultName="Errors only" />)
+
+    const input = await screen.findByDisplayValue('Errors only')
+    await waitFor(() => {
+      expect((input as HTMLInputElement).selectionStart).toBe(0)
+      expect((input as HTMLInputElement).selectionEnd).toBe('Errors only'.length)
+    })
+  })
+
+  it('leaves the name empty when defaultName is omitted', async () => {
+    customRender(<SaveViewDialog {...baseProps} />)
+
+    expect(await screen.findByPlaceholderText('Enter a name for this view')).toHaveValue('')
   })
 
   it('disables saving and does not save when the name is empty', async () => {

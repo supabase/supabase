@@ -162,6 +162,7 @@ export const UnifiedLogs = ({
   } = useLogsViews()
   const [activeViewId, setActiveViewId] = useState<string | null>(null)
   const [saveDialogProject, setSaveDialogProject] = useState<string | null>(null)
+  const [saveDialogName, setSaveDialogName] = useState<string | null>(null)
   const isSaveViewDialogOpen = saveDialogProject !== null && saveDialogProject === projectRef
   const currentProjectRef = useRef(projectRef)
   currentProjectRef.current = projectRef
@@ -531,7 +532,8 @@ export const UnifiedLogs = ({
     }
   }
 
-  const handleSaveCurrentView = () => {
+  const handleSaveCurrentView = (defaultName?: string) => {
+    setSaveDialogName(defaultName ?? null)
     setSaveDialogProject(projectRef ?? null)
   }
 
@@ -774,7 +776,7 @@ export const UnifiedLogs = ({
                         onClearActiveView={handleClearActiveView}
                         onRename={(viewId, name) => updateSavedView(viewId, { name })}
                         onDelete={deleteSavedView}
-                        onSaveCurrentView={handleSaveCurrentView}
+                        onSaveCurrentView={() => handleSaveCurrentView()}
                         onRetry={retrySavedViews}
                       />
                     </motion.div>
@@ -789,7 +791,7 @@ export const UnifiedLogs = ({
                   onPrimary={handleUpdateActiveView}
                   onDismiss={handleDismissUpdateSuggestion}
                   secondaryLabel={canCreateView ? 'Save as new' : undefined}
-                  onSecondary={canCreateView ? handleSaveCurrentView : undefined}
+                  onSecondary={canCreateView ? () => handleSaveCurrentView() : undefined}
                 />
 
                 {isLoading ? (
@@ -877,6 +879,7 @@ export const UnifiedLogs = ({
         filters={currentDraft.filters}
         viewOptions={currentDraft.viewOptions}
         existingNames={savedViews.map((view) => view.name)}
+        defaultName={saveDialogName ?? undefined}
         columnLabels={columnLabels}
       />
     </>
