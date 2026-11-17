@@ -68,3 +68,47 @@ Run Studio with `LOGFLARE_URL` and `LOGFLARE_PRIVATE_ACCESS_TOKEN` instead of
 - Logflare: see `Logflare/logflare` → `docs/alert-issues-demo.md`
 - Alert issue rules with Terraform: see `supabase/terraform-provider-supabase-analytics` → `examples/alert-issues-demo/`
 - Initial investigations: see `supabase/o11y-team-tools` → `o11y-sre-agent/README.md`
+
+## Notifications
+
+Logflare decides when to notify: its notification policies match alert issue changes (opened,
+reopened, still firing after the repeat interval, resolved) and skip silenced, snoozed and
+acknowledged alert issues. It doesn't deliver anything itself. It posts each matched change as a
+signed event to the control plane, which fans it out.
+
+Self-hosted, Studio is the control plane: `POST /api/platform/alerts/notifications`. It checks the
+signature over the raw body, rejects anything older than five minutes, drops repeated event ids
+(remembered in memory, per Studio process) and delivers to the receivers the policy names.
+
+| Variable                               | Where    | What                                                      |
+| -------------------------------------- | -------- | --------------------------------------------------------- |
+| `ALERT_ISSUE_NOTIFIER_SECRET`          | Studio   | Shared secret for Logflare's `X-Logflare-Signature`       |
+| `ALERT_ISSUE_WEBHOOK_RECEIVERS`        | Studio   | JSON: receiver name → `{ "url", "secret" }`               |
+| `LOGFLARE_ALERT_ISSUE_NOTIFIER_URL`    | Logflare | `http://localhost:8082/api/platform/alerts/notifications` |
+| `LOGFLARE_ALERT_ISSUE_NOTIFIER_SECRET` | Logflare | The same value as `ALERT_ISSUE_NOTIFIER_SECRET`           |
+
+Receivers are configuration, not UI: policies name them, and Terraform manages the policies.
+Webhook requests follow the [Standard Webhooks](https://www.standardwebhooks.com/) spec
+(`webhook-id`, `webhook-timestamp`, `webhook-signature`). A `whsec_` secret holds the base64 key,
+as in the spec. The body is `{ type, occurred_at, data: { alert_issue, policy } }`, and
+`alert_issue.url` links to the alert issue in Studio (`NEXT_PUBLIC_SITE_URL`, else
+`SUPABASE_PUBLIC_URL`, else the request's origin). Studio retries 429s, 5xxs and network errors,
+three attempts with a 5 second timeout each.
+
+To watch deliveries, run a webhook sink and point a receiver at it:
+
+```sh
+npx --yes http-echo-server 9000   # or any server that logs request headers and bodies
+```
+
+```sh
+ALERT_ISSUE_NOTIFIER_SECRET=dev-notifier-secret \
+ALERT_ISSUE_WEBHOOK_RECEIVERS='{"ops":{"url":"http://localhost:9000/ops","secret":"whsec_ZGV2LXdlYmhvb2stc2VjcmV0"}}' \
+NEXT_PUBLIC_IS_PLATFORM=false pnpm dev
+```
+
+The issues button in the header shows the number of unread alert issues that aren't resolved,
+refreshed every 30 seconds, in mock mode too.
+
+On the hosted platform a control-plane service receives the same signed events and fans them out
+through the webhooks and email services; this route isn't served there.
