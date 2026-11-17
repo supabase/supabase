@@ -84,7 +84,7 @@ Deno.serve(
 
 `withOAuthProtectedResource()` tells a client where to sign in. It answers discovery requests and sends an OAuth challenge when a request has no token.
 
-`withSupabase({ auth: 'user' })` verifies the token and supplies the handler with the user’s [Supabase client](/docs/reference/javascript/initializing). Queries through that client run with the user’s identity, so Postgres applies the table’s RLS policies.
+`withSupabase({ auth: 'user' })` verifies the token and supplies the handler with the user’s [Supabase client](/docs/reference/javascript/introduction). Queries through that client run with the user’s identity, so Postgres applies the table’s RLS policies.
 
 The [MCP server guide](https://github.com/supabase/server/blob/main/docs/mcp.md) explains the middleware and request handling in detail.
 
