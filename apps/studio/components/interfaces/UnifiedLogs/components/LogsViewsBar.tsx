@@ -64,24 +64,25 @@ export const LogsViewsBar = ({
     ? "You don't have permission to save views"
     : 'Add a filter to save a view'
 
-  const saveAction = !!onSaveCurrentView && (
-    <ButtonTooltip
-      type="button"
-      size="tiny"
-      variant="text"
-      className="shrink-0 px-1.5"
-      icon={<PlusIcon />}
-      aria-label="Save current filters as a view"
-      disabled={!canSaveCurrentFilters}
-      onClick={onSaveCurrentView}
-      tooltip={{
-        content: {
-          side: 'bottom',
-          text: canSaveCurrentFilters ? 'Save current filters as a view' : saveDisabledReason,
-        },
-      }}
-    />
-  )
+  const renderSaveAction = (variant: 'default' | 'text') =>
+    !!onSaveCurrentView && (
+      <ButtonTooltip
+        type="button"
+        size="tiny"
+        variant={variant}
+        className="shrink-0 px-1.5"
+        icon={<PlusIcon />}
+        aria-label="Save current filters as a view"
+        disabled={!canSaveCurrentFilters}
+        onClick={onSaveCurrentView}
+        tooltip={{
+          content: {
+            side: 'bottom',
+            text: canSaveCurrentFilters ? 'Save current filters as a view' : saveDisabledReason,
+          },
+        }}
+      />
+    )
 
   return (
     <>
@@ -108,7 +109,7 @@ export const LogsViewsBar = ({
         {isEmpty && (
           <div className="flex items-center gap-1.5 text-xs text-foreground-lighter whitespace-nowrap px-2">
             <span>No saved views yet. Set some filters, then press</span>
-            {saveAction}
+            {renderSaveAction('default')}
             <span>to save them.</span>
           </div>
         )}
@@ -134,7 +135,7 @@ export const LogsViewsBar = ({
 
         {!isEmpty && (
           <>
-            {saveAction}
+            {renderSaveAction('text')}
             {activeViewId !== null && (
               <Button
                 size="tiny"
