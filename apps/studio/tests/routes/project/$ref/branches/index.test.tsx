@@ -4,18 +4,18 @@ import { describe, expect, test, vi } from 'vitest'
 
 import type { components } from '@/data/api'
 import { FGA_PERMISSIONS } from '@/hooks/misc/useCheckPermissionsV2'
-import BranchesPage from '@/pages/project/[ref]/branches'
+import { Route } from '@/routes/project/$ref/branches/index'
 import {
   BRANCH_TEST_SCOPE,
   createTestBranch,
   mockBranchProject,
   mockParentProjectPermissions,
 } from '@/tests/lib/branch-test-utils'
-import { customRender } from '@/tests/lib/custom-render'
 import { addAPIMock, type APIErrorBody } from '@/tests/lib/msw'
 import { mockPermissions, mockPermissionsError } from '@/tests/lib/msw-permissions'
 import { NO_PERMISSIONS } from '@/tests/lib/permissions-fixtures'
 import { createMockProfileContext } from '@/tests/lib/profile-helpers'
+import { renderRoute } from '@/tests/lib/route-render'
 
 vi.mock('common', async (importOriginal) => {
   const actual = await importOriginal<typeof import('common')>()
@@ -30,10 +30,6 @@ vi.mock('@/lib/constants', async (importOriginal) => {
   const actual = await importOriginal<typeof import('@/lib/constants')>()
   return { ...actual, IS_PLATFORM: true }
 })
-
-vi.mock('next/router', () => ({
-  useRouter: () => ({ push: vi.fn(), query: {}, pathname: '/project/[ref]/branches' }),
-}))
 
 const MAIN_BRANCH = createTestBranch({
   id: 'main-branch-id',
@@ -88,7 +84,9 @@ function mockEndpoints() {
 }
 
 const renderPage = () =>
-  customRender(<BranchesPage dehydratedState={{}} />, {
+  renderRoute(Route, {
+    routeId: '/project/$ref/branches/',
+    url: `/project/${BRANCH_TEST_SCOPE.branchRef}/branches`,
     profileContext: createMockProfileContext(),
   })
 
@@ -97,7 +95,7 @@ describe('BranchesPage', () => {
     mockEndpoints()
     mockParentProjectPermissions([FGA_PERMISSIONS.PROJECT.BRANCHING_DEVELOPMENT_READ])
 
-    renderPage()
+    await renderPage()
 
     expect(await screen.findByText('feature-x')).toBeInTheDocument()
     expect(screen.queryByText(/You need additional permissions/)).not.toBeInTheDocument()
@@ -107,7 +105,7 @@ describe('BranchesPage', () => {
     mockEndpoints()
     mockPermissions(NO_PERMISSIONS)
 
-    renderPage()
+    await renderPage()
 
     expect(
       await screen.findByText(/You need additional permissions to view this project's branches/)
@@ -119,7 +117,7 @@ describe('BranchesPage', () => {
     mockEndpoints()
     mockPermissionsError({ message: 'Permissions service unavailable' })
 
-    renderPage()
+    await renderPage()
 
     expect(
       await screen.findByText('Failed to check your permissions to view branches')
