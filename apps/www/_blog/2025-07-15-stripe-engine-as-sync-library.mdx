@@ -17,7 +17,7 @@ launchweek: '15'
 
 We're excited to announce that [`stripe-sync-engine`](https://github.com/supabase/stripe-sync-engine) is now available as a standalone npm package: [`@supabase/stripe-sync-engine`](https://www.npmjs.com/package/@supabase/stripe-sync-engine)!
 
-Previously distributed only as a Docker image (`supabase/stripe-sync-engine`), you can now plug this into any backend project—whether you're using Node.js, running Express on a server, or even deploying on Supabase Edge Functions.
+Previously distributed only as a Docker image (`supabase/stripe-sync-engine`), you can now plug this into any backend project—whether you're using Node.js, running Express on a server, or even deploying on [Supabase Edge Functions](/docs/guides/functions).
 
 Stripe-Sync-Engine is a webhook listener that transforms Stripe webhooks into structured Postgres inserts/updates. It listens to Stripe webhook events (like `invoice.payment_failed`, `customer.subscription.updated`, etc), normalizes and stores them in a relational format in Postgres.
 

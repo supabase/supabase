@@ -27,7 +27,7 @@ The v0.1 alpha introduces advanced connection pooling, automatic failovers, and 
 
 ## The Multigres Operator
 
-The Kubernetes Multigres Operator allows you to deploy and manage Multigres clusters on Kubernetes. To [get started](https://multigres.com/blog/deploying-the-multigres-operator), you need a Kubernetes cluster along with a location for backups configured. The backups can be a shared file system or a cloud storage bucket like AWS S3. It is also possible to run Multigres on a local Kind cluster.
+The Kubernetes Multigres Operator allows you to deploy and manage Multigres clusters on Kubernetes. To [get started](https://multigres.com/blog/deploying-the-multigres-operator), you need a Kubernetes cluster along with a location for backups configured. The backups can be a shared file system or a cloud [storage bucket](/docs/guides/storage/buckets/fundamentals) like AWS S3. It is also possible to run Multigres on a local Kind cluster.
 
 All the necessary images for running Multigres are publicly available.
 
@@ -46,7 +46,7 @@ For more information on HA, you may read the following posts:
 
 ## Connection Pooling
 
-Multigres ships its own connection pooling solution using a two-service architecture. It consists of a **multigateway** that accepts client connections and routes queries, and a **multipooler** that manages backend connections. This architecture provides some distinct advantages over a single-process pooler.
+Multigres ships its own connection pooling solution using a two-service architecture. It consists of a **multigateway** that accepts client connections and routes queries, and a **multipooler** that manages backend connections. This architecture provides some distinct advantages over a single-process [pooler](/docs/guides/database/connecting-to-postgres/pooling-and-limits).
 
 - **Traffic routing**: The integration with the HA system allows multigateway to transparently route connections to the current primary. During a failover, multigateway can hold requests until a new primary is promoted, thereby minimizing errors. Additionally, you can balance read load across multiple replicas. In the future, multigateway will handle routing of traffic to different shards.
 - **Context-aware pooling**: Multigres does not require you to [choose a pooling mode](https://multigres.com/blog/pooling-without-choosing-a-mode) like transaction, session, etc. This is because it has a built-in parser and understands the effects of each request. This allows it to track connection state and reuse them wherever applicable. If a request requires a stateful connection, like a transaction, the connection gets pinned to that client until the stateful requirement is satisfied.

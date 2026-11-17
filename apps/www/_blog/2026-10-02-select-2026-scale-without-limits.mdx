@@ -50,7 +50,7 @@ Our focus is to remove every scaling limitation from our users’ journey. That 
   <source src="/images/blog/select-2026-scale-without-limits/failover.mp4" type="video/mp4" />
 </video>
 
-Multigres is an open source operating system for Postgres, built by the team behind Vitess. It adds scalable connection pooling and automated multi-node failover to Postgres out-of-the-box. With Multigres, there's no separate pooler to run, and your app can connect far more clients than one Postgres instance can hold.
+Multigres is an open source operating system for Postgres, built by the team behind Vitess. It adds scalable connection pooling and automated multi-node failover to Postgres out-of-the-box. With Multigres, there's no separate [pooler](/docs/guides/database/connecting-to-postgres/pooling-and-limits) to run, and your app can connect far more clients than one Postgres instance can hold.
 
 Many developers are familiar with basic Primary / Standby HA architecture and its known issues. Traditionally, if the primary database fails before data has been replicated to the standby, those rows may be lost. In contrast, Multigres uses a generalized consensus protocol built on top of postgres synchronous replication. If a Multigres node fails, the cluster agrees on exactly which writes were committed before accepting new ones, then promotes a replica in seconds. You keep every committed write through the failover.
 

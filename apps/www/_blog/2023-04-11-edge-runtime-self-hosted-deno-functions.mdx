@@ -55,7 +55,7 @@ Self-hosting is not the only benefit of Edge Runtime. It will improve the local 
 
 ### Serve all functions
 
-Supabase CLI can now serve all local Edge Functions by running `supabase functions serve`. Previously, you could only serve a single Edge Function at a time. This was not a great experience for local development. Some of you even devised [clever hacks](https://github.com/orgs/supabase/discussions/6786) to get around this limitation.
+[Supabase CLI](/docs/guides/local-development/cli/getting-started) can now serve all local Edge Functions by running `supabase functions serve`. Previously, you could only serve a single Edge Function at a time. This was not a great experience for local development. Some of you even devised [clever hacks](https://github.com/orgs/supabase/discussions/6786) to get around this limitation.
 
 When you run `supabase functions serve`, the CLI uses Edge Runtime to serve all functions. It supports JWT verification, import maps, and passing custom environment variables. It hot-reloads local changes, giving you a seamless development experience.
 
@@ -151,7 +151,7 @@ serve(async (req: Request) => {
 
 ## What’s Next?
 
-Open-sourcing Edge Runtime is the first step of an exciting roadmap we have planned for Edge Functions. In the coming months, you will see tighter integrations with the rest of the Supabase ecosystem. Here are some sneak peeks at what is to come next.
+Open-sourcing Edge Runtime is the first step of an exciting roadmap we have planned for [Edge Functions](/docs/guides/functions). In the coming months, you will see tighter integrations with the rest of the Supabase ecosystem. Here are some sneak peeks at what is to come next.
 
 ### API Gateway to other Supabase services
 
@@ -207,7 +207,7 @@ try {
 
 Another exciting thing about shipping a custom JavaScript runtime is that we can control the available global objects in the runtime. In previous examples, you may noticed we used `EdgeRuntime` without importing a specific module to our function, this was possible because we exposed it as a global object in the runtime.
 
-We can introduce a `Supabase` global object that can provide platform specific features. For example, similar to `Deno.writeTextFile` , we can expose a `Supabase.writeTextFile` which can directly write a file to Supabase Storage.
+We can introduce a `Supabase` global object that can provide platform specific features. For example, similar to `Deno.writeTextFile` , we can expose a `Supabase.writeTextFile` which can directly write a file to [Supabase Storage](/docs/guides/storage).
 
 ## We 💚 Contributions
 

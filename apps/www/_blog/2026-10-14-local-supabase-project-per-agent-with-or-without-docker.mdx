@@ -15,7 +15,7 @@ imgThumb: '2026-10-14-local-supabase-project-per-agent-with-or-without-docker/th
 toc_depth: 2
 ---
 
-The Supabase CLI now runs several local projects on one machine, one per git worktree, and runs them without Docker. Each coding agent gets its own database to reset, migrate, and test against while the others keep working. Local projects start in seconds and use about a tenth of the memory, and the remote branch that picks up the work when a pull request opens is nearly five times faster.
+The [Supabase CLI](/docs/guides/local-development/cli/getting-started) now runs several local projects on one machine, one per git worktree, and runs them without Docker. Each coding agent gets its own database to reset, migrate, and test against while the others keep working. Local projects start in seconds and use about a tenth of the memory, and the remote branch that picks up the work when a pull request opens is nearly five times faster.
 
 Multiple projects and the native runtime ship in CLI v2.119.0 behind an experimental flag. Faster branches are on for every project today.
 
@@ -61,7 +61,7 @@ Nine idle projects now fit in the memory one used to take, which is what makes a
 
 ## No Docker required
 
-Agents increasingly work in hosted sandboxes and CI runners that have no container engine. The native runtime runs all 13 Supabase services as plain processes, at the same pinned versions as the Docker images, with the full Postgres extension set including pgvector. When Docker isn't available the CLI picks it for you, or select it directly:
+Agents increasingly work in hosted sandboxes and CI runners that have no container engine. The native runtime runs all 13 Supabase services as plain processes, at the same pinned versions as the Docker images, with the full Postgres extension set including [pgvector](/docs/guides/database/extensions/pgvector). When Docker isn't available the CLI picks it for you, or select it directly:
 
 ```bash
 supabase start --runtime native
@@ -71,7 +71,7 @@ It runs on Linux (amd64 and arm64, glibc 2.35 or later) and macOS 14 or later on
 
 ## Branches are ready nearly five times faster
 
-When the pull request opens, a remote branch gives reviewers a URL to point a build at, and that branch now arrives configured like the project it came from. Auth, Storage, network restrictions, and deployed Edge Functions all carry over at creation, with function bundles copied in parallel so a project with 40 functions comes up as fast as one with two. Secrets stay behind and production data stays out unless you choose to branch with it, so the branch is safe to hand to a reviewer the moment it's ready.
+When the pull request opens, a remote branch gives reviewers a URL to point a build at, and that branch now arrives configured like the project it came from. Auth, [Storage](/docs/guides/storage), network restrictions, and deployed [Edge Functions](/docs/guides/functions) all carry over at creation, with function bundles copied in parallel so a project with 40 functions comes up as fast as one with two. Secrets stay behind and production data stays out unless you choose to branch with it, so the branch is safe to hand to a reviewer the moment it's ready.
 
 | Time to ready         | Before September rollout | After | Improvement |
 | --------------------- | ------------------------ | ----- | ----------- |

@@ -146,7 +146,7 @@ For Android, open `android/app/src/main/AndroidManifest.xml` file and add the fo
   </manifest>
 ```
 
-After, we will add the deep link as one of the redirect URLs in our Supabase dashboard.
+After, we will add the deep link as one of the [redirect URLs](/docs/guides/auth/redirect-urls) in our Supabase dashboard.
 
 Go to `Authentication > URL Configuration` and add `mfa-app://callback/*` as a redirect URL. Make sure you don’t add any extra slashes or anything because if you do, deep linking will not work properly.
 

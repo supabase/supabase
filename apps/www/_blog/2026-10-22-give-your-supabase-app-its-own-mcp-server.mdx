@@ -53,7 +53,7 @@ You own that code. Add tools for the operations your product supports, change th
 
 The block uses the official MCP TypeScript SDK for the protocol and tool registration. The Supabase helpers handle the connection to Supabase Auth and the user’s client.
 
-The Supabase helpers also work in other backends that use standard Web `Request` and `Response` handlers, including Cloudflare Workers, and with other MCP libraries. To reuse logic that runs elsewhere, add the MCP endpoint there and set its public URL and your Supabase Auth URL so clients can find the right Auth server.
+The Supabase helpers also work in other backends that use standard Web `Request` and `Response` handlers, including Cloudflare Workers, and with other MCP libraries. To reuse logic that runs elsewhere, add the MCP endpoint there and set its public URL and your [Supabase Auth](/docs/guides/auth) URL so clients can find the right Auth server.
 
 ## Carry the user’s identity into every call
 
@@ -84,7 +84,7 @@ Deno.serve(
 
 `withOAuthProtectedResource()` tells a client where to sign in. It answers discovery requests and sends an OAuth challenge when a request has no token.
 
-`withSupabase({ auth: 'user' })` verifies the token and supplies the handler with the user’s Supabase client. Queries through that client run with the user’s identity, so Postgres applies the table’s RLS policies.
+`withSupabase({ auth: 'user' })` verifies the token and supplies the handler with the user’s [Supabase client](/docs/reference/javascript/initializing). Queries through that client run with the user’s identity, so Postgres applies the table’s RLS policies.
 
 The [MCP server guide](https://github.com/supabase/server/blob/main/docs/mcp.md) explains the middleware and request handling in detail.
 

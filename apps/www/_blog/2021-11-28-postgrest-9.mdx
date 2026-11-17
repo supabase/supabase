@@ -33,7 +33,7 @@ const { data, error } = await supabase
 ```
 
 With the new `!inner` keyword, you can now filter rows of the top-level table (`messages`) based on a filter (`eq`) of the embedded table (`users`).
-This works across all Supabase client libraries and you can use it with any of the available operators (`gt`, `in`, etc.)
+This works across all [Supabase client](/docs/reference/javascript/initializing) libraries and you can use it with any of the available operators (`gt`, `in`, etc.)
 
 [Read more](https://postgrest.org/en/v9.0/releases/v9.0.0.html#resource-embedding-with-top-level-filtering).
 

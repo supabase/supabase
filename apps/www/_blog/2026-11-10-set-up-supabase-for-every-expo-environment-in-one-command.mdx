@@ -42,7 +42,7 @@ A Supabase project holds one environment's data, so the integration gives each E
 
 ## Security findings in your build logs
 
-[Supabase Security and Performance Advisors](https://supabase.com/docs/guides/database/database-advisors) run from the EAS CLI, and their findings appear in the Expo build dashboard for connected projects. A table with Row Level Security disabled, or a foreign key without an index, shows up next to the build logs for the change that introduced it, before the build reaches store review.
+[Supabase Security and Performance Advisors](https://supabase.com/docs/guides/database/database-advisors) run from the EAS CLI, and their findings appear in the Expo build dashboard for connected projects. A table with [Row Level Security](/docs/guides/database/postgres/row-level-security) disabled, or a foreign key without an index, shows up next to the build logs for the change that introduced it, before the build reaches store review.
 
 ## Built for agents as much as developers
 
@@ -54,7 +54,7 @@ The teams getting the most out of Expo and Supabase together already work this w
 
 ## More than a database
 
-The project the CLI creates is the same full backend every Supabase app gets, so the features users expect from a mobile app are a configuration step away rather than a build. Users can sign in with Apple or Google and come back through a magic link that opens the app. They can upload a photo and only see the files they're allowed to see. A screen updates when the data behind it changes, and a push notification goes out when a row does. All of it runs on the Auth, Storage, Realtime, and Edge Functions already in the project, through the client the CLI installed.
+The project the CLI creates is the same full backend every Supabase app gets, so the features users expect from a mobile app are a configuration step away rather than a build. Users can sign in with Apple or Google and come back through a magic link that opens the app. They can upload a photo and only see the files they're allowed to see. A screen updates when the data behind it changes, and a push notification goes out when a row does. All of it runs on the [Auth](/docs/guides/auth), [Storage](/docs/guides/storage), [Realtime](/docs/guides/realtime), and [Edge Functions](/docs/guides/functions) already in the project, through the client the CLI installed.
 
 ## Why Expo built Supabase into the EAS CLI
 

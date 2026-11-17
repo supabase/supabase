@@ -38,7 +38,7 @@ New projects can disable the Data API entirely or change the default schema from
   zoomable={true}
 />
 
-Existing projects can disable the Data API in project settings. Once disabled, you can continue to use the database like standard Postgres (similar to RDS), connecting directly or through the connection pooler.
+Existing projects can disable the Data API in project settings. Once disabled, you can continue to use the database like standard Postgres (similar to RDS), connecting directly or through the [connection pooler](/docs/guides/database/connecting-to-postgres/pooling-and-limits).
 
 ## New API keys
 
@@ -207,7 +207,7 @@ We prioritize fast responses because slow acknowledgment reduces researcher part
 
 ### Scope
 
-The VDP covers Supabase platform infrastructure, including PostgREST exposure, authentication flows, service role isolation, Realtime subscriptions, Storage access controls, Edge Functions, and network segmentation. Researchers may only test their own projects. Automated scanning requires prior notice to security@supabase.io.
+The VDP covers Supabase platform infrastructure, including PostgREST exposure, authentication flows, service role isolation, Realtime subscriptions, Storage access controls, [Edge Functions](/docs/guides/functions), and network segmentation. Researchers may only test their own projects. Automated scanning requires prior notice to security@supabase.io.
 
 ### Recognition and bounties
 
@@ -244,7 +244,7 @@ Our leaked key detection currently uses GitHub's secret scanning API for post-co
 
 #### GraphQL disabled by default
 
-pg_graphql will be disabled by default on new projects. You can still enable it manually if needed, but it won't be exposed automatically to reduce the attack surface.
+[pg_graphql](/docs/guides/graphql) will be disabled by default on new projects. You can still enable it manually if needed, but it won't be exposed automatically to reduce the attack surface.
 
 #### Expanded Security Advisor lints
 
