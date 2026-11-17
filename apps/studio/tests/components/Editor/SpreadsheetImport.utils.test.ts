@@ -54,6 +54,11 @@ describe('SpreadsheetImport.utils: inferColumnType', () => {
     const type3 = inferColumnType('isRetired', mockData3)
     expect(type3).toBe('bool')
   })
+  test('should infer jsonb when some rows have no value', () => {
+    const mockData = [{ metadata: '{"a":1}' }, { metadata: null }, { metadata: '{"b":2}' }]
+    const type = inferColumnType('metadata', mockData)
+    expect(type).toBe('jsonb')
+  })
   test('should infer objects as jsonb types correctly', () => {
     const mockData = [{ name: 'bob', metadata: '{}' }]
     const type = inferColumnType('metadata', mockData)

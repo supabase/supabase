@@ -30,6 +30,12 @@ describe('SpreadsheetImport.utils: parseSpreadsheet', () => {
     expect(columnTypeMap.value).toBe('float8')
   })
 
+  test('should infer a numeric column whose header is an Object property name', async () => {
+    const file = new File(['constructor\n1\n2'], 'data.csv', { type: 'text/csv' })
+    const { columnTypeMap } = await parseSpreadsheet(file, () => {}, undefined)
+    expect(columnTypeMap.constructor).toBe('int8')
+  })
+
   test('should default a column with no values in any chunk to text', async () => {
     const file = makeCsvFile(() => '')
     const { columnTypeMap } = await parseInChunks(file)

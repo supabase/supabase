@@ -145,7 +145,7 @@ export const parseSpreadsheet = (
           const hasValue = data.some((row) => isObject(row) && hasCellValue(row[header]))
           if (!hasValue) return
           columnTypeMap[header] = mergeInferredColumnTypes(
-            columnTypeMap[header],
+            has(columnTypeMap, header) ? columnTypeMap[header] : undefined,
             inferColumnType(header, data)
           )
         })
@@ -258,7 +258,7 @@ export const inferColumnType = (column: string, rows: unknown[]): InferredColumn
 
   // Infer json type
   if (tryParseJson(columnData)) {
-    const isAllJson = columnDataAcrossRows.every((item) => tryParseJson(item))
+    const isAllJson = columnDataAcrossRows.filter(hasCellValue).every((item) => tryParseJson(item))
     if (isAllJson) {
       return 'jsonb'
     }
@@ -266,9 +266,9 @@ export const inferColumnType = (column: string, rows: unknown[]): InferredColumn
 
   // Infer datetime type
   if (Date.parse(String(columnData))) {
-    const isAllTimestamptz = columnDataAcrossRows.every((item) =>
-      dayjs(String(item), 'YYYY-MM-DD hh:mm:ss').isValid()
-    )
+    const isAllTimestamptz = columnDataAcrossRows
+      .filter(hasCellValue)
+      .every((item) => dayjs(String(item), 'YYYY-MM-DD hh:mm:ss').isValid())
 
     if (isAllTimestamptz) {
       return 'timestamptz'
