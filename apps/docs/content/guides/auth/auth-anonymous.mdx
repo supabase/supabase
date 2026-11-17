@@ -132,11 +132,12 @@ to authenticated
 using ( true );
 ```
 
-<Admonition type="caution" title="The claim stays true until the token refreshes">
+<Admonition type="caution" title="Linked users stay anonymous until the token refreshes">
 
-A policy on the `is_anonymous` claim refuses a guest who just became a permanent user. Linking an email, phone, or OAuth identity makes the user permanent in `auth.users` at once, but the access token the client already holds keeps `is_anonymous: true` until the session refreshes, which can take up to the JWT expiry time. Until then, the policy rejects the user's requests with error `42501`.
+If your policies check the `is_anonymous` claim, a guest who links an email, phone, or OAuth identity is still treated as anonymous until their session refreshes, which can take up to the JWT expiry time. Until then, their requests fail with error `42501`. Avoid this by either:
 
-To avoid this, either [refresh the session after linking](#refresh-the-session-after-linking), or check the current state of the user instead of the claim.
+- [Refreshing the session after linking](#refresh-the-session-after-linking)
+- Checking `is_anonymous` in `auth.users` instead of the claim, as shown below
 
 </Admonition>
 
