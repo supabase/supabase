@@ -1,4 +1,5 @@
 import { fireEvent, render, screen, waitFor } from '@testing-library/react'
+import userEvent from '@testing-library/user-event'
 import { ComponentProps, useState } from 'react'
 import { describe, expect, it, vi } from 'vitest'
 
@@ -219,18 +220,18 @@ describe('multi-select', () => {
     expect(trigger).not.toHaveTextContent('Apple') // "Apple" should not be selected anymore
   })
 
-  it('closes the dropdown when clicking outside the component', () => {
+  it('closes the dropdown when clicking outside the component', async () => {
     render(<MultiSelectDemo />)
 
     const trigger = screen.getByRole('combobox')
     fireEvent.click(trigger) // Open the dropdown
     expect(screen.getByText('Apple')).toBeInTheDocument() // Ensure it's open
 
-    fireEvent.click(document.body) // Click outside the component
+    userEvent.click(document.body) // Click outside the component
 
-    setTimeout(() => {
+    await waitFor(() => {
       expect(screen.queryByText('Apple')).not.toBeInTheDocument() // The dropdown should be closed
-    }, 100)
+    })
   })
 
   it('removes the last value when hitting Backspace', () => {
