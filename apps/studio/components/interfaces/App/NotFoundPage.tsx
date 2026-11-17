@@ -1,13 +1,11 @@
-import { NextPage } from 'next'
+import { Link } from '@tanstack/react-router'
 import { useTheme } from 'next-themes'
-import Image from 'next/legacy/image'
-import Link from 'next/link'
 import { useEffect, useState } from 'react'
 import { Button } from 'ui'
 
 import { BASE_PATH } from '@/lib/constants'
 
-const Error404: NextPage = ({}) => {
+export function NotFoundPage() {
   const { resolvedTheme } = useTheme()
   const [show404, setShow404] = useState<boolean>(false)
 
@@ -23,8 +21,8 @@ const Error404: NextPage = ({}) => {
         <nav className="relative flex items-center justify-between sm:h-10">
           <div className="flex shrink-0 grow items-center lg:grow-0">
             <div className="flex w-full items-center justify-between md:w-auto">
-              <Link href="/projects">
-                <Image
+              <Link to="/organizations">
+                <img
                   src={
                     resolvedTheme?.includes('dark')
                       ? `${BASE_PATH}/img/supabase-dark.svg`
@@ -59,12 +57,10 @@ const Error404: NextPage = ({}) => {
         </div>
         <div className="flex items-center space-x-4">
           <Button variant="primary" asChild size="small">
-            <Link href="/projects">Head back</Link>
+            <Link to="/organizations">Head back</Link>
           </Button>
         </div>
       </div>
     </div>
   )
 }
-
-export default Error404
