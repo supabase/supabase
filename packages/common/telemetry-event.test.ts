@@ -1,5 +1,6 @@
 import { beforeEach, describe, expect, it, vi } from 'vitest'
 
+import { posthogClient } from './posthog-client'
 import { sendTelemetryEvent } from './telemetry'
 import { buildTelemetryEventRequest } from './telemetry-event'
 
@@ -14,7 +15,7 @@ vi.mock('./consent-state', () => ({
   useConsentState: () => ({ hasAccepted: consent.value }),
 }))
 vi.mock('./telemetry-utils', () => ({
-  getSharedTelemetryData: () => ({ page_title: 'Page' }),
+  getSharedTelemetryData: () => ({ page_title: 'Page', session_id: 'cookie-session' }),
   getTelemetryCookieOptions: () => ({}),
   getTelemetryPlatform: () => platform.value,
 }))
@@ -91,6 +92,22 @@ describe('buildTelemetryEventRequest', () => {
 
     expect(unset?.body.custom_properties).toStrictEqual(event.properties)
     expect(set?.body.custom_properties).toStrictEqual({ ...event.properties, platform: 'kb' })
+  })
+
+  it('sends the live PostHog session id, and the cookie one until PostHog has loaded', () => {
+    const event = {
+      action: 'kb_search_submitted',
+      properties: { query: 'abc', queryLength: 3, resultCount: 1, hasResults: true },
+    } as const
+    const refreshSessionId = vi.spyOn(posthogClient, 'refreshSessionId')
+
+    refreshSessionId.mockReturnValueOnce('live-session')
+    const loaded = buildTelemetryEventRequest(API_URL, event)
+    refreshSessionId.mockReturnValueOnce(undefined)
+    const notLoaded = buildTelemetryEventRequest(API_URL, event)
+
+    expect(loaded?.body).toHaveProperty('session_id', 'live-session')
+    expect(notLoaded?.body).toHaveProperty('session_id', 'cookie-session')
   })
 
   it('builds the same endpoint whether the API URL has a trailing slash or /platform', () => {

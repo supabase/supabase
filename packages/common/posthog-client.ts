@@ -383,6 +383,22 @@ class PostHogClient {
   }
 
   /**
+   * Returns PostHog's session_id after counting this call as user activity, so an
+   * expired session rotates first, as it does when PostHog captures an event.
+   * Returns undefined until PostHog's `loaded` callback fires.
+   */
+  refreshSessionId(): string | undefined {
+    if (!this.initialized) return undefined
+
+    try {
+      return posthog.sessionManager?.checkAndGetSessionAndWindowId().sessionId
+    } catch (error) {
+      console.error('PostHog refreshSessionId failed:', error)
+      return undefined
+    }
+  }
+
+  /**
    * Captures an experiment exposure event with session-based deduplication.
    * Events are queued if PostHog is not yet initialized, then deduped on flush.
    */

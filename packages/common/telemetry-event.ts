@@ -2,6 +2,7 @@ import type { components } from 'api-types'
 
 import { hasConsented } from './consent-state'
 import { ensurePlatformSuffix } from './helpers'
+import { posthogClient } from './posthog-client'
 import type { TelemetryEvent } from './telemetry-constants'
 import { getSharedTelemetryData, getTelemetryPlatform } from './telemetry-utils'
 
@@ -28,8 +29,10 @@ export function buildTelemetryEventRequest(
   if (!hasConsented()) return null
 
   const platform = getTelemetryPlatform()
+  const liveSessionId = posthogClient.refreshSessionId()
   const body: EventBody = {
     ...getSharedTelemetryData(pathname),
+    ...(liveSessionId && { session_id: liveSessionId }),
     action: event.action,
     custom_properties: {
       ...('properties' in event ? event.properties : {}),
