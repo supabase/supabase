@@ -1194,8 +1194,8 @@ export const database: NavMenuConstant = {
           url: '/guides/database/query-optimization' as `/${string}`,
         },
         {
-          name: 'Database Advisors',
-          url: '/guides/observability/advisors' as `/${string}`,
+          name: 'Database issues',
+          url: '/guides/observability/issues' as `/${string}`,
         },
         { name: 'Testing your database', url: '/guides/database/testing' },
         {
@@ -3045,6 +3045,7 @@ export const telemetry: NavMenuConstant = {
         { name: 'Logs in the CLI', url: '/guides/observability/cli-logs' },
         { name: 'Log sources and fields', url: '/guides/observability/log-field-reference' },
         { name: 'Inspect the database', url: '/guides/observability/inspect' },
+        { name: 'Issues', url: '/guides/observability/issues' },
         { name: 'Advisors', url: '/guides/observability/advisors' },
         { name: 'Reports', url: '/guides/observability/reports' },
         {

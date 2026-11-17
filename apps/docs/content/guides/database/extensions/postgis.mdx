@@ -506,9 +506,9 @@ await supabase.Rpc("restaurants_in_view", new Dictionary<string, object>
 
 ## Troubleshooting
 
-### Security advisor flags `public.spatial_ref_sys`
+### Security issues flag `public.spatial_ref_sys`
 
-If `PostGIS` was installed in the `public` schema, the [Security Advisor](/dashboard/project/_/advisors/security) may report that `public.spatial_ref_sys` grants write access to the Data API roles (`anon`, `authenticated`), and that it can't be fixed by enabling RLS because your project's `postgres` role doesn't own the table.
+If `PostGIS` was installed in the `public` schema, a [security issue](/dashboard/project/_/issues?category=security) may report that `public.spatial_ref_sys` grants write access to the Data API roles (`anon`, `authenticated`), and that it can't be fixed by enabling RLS because your project's `postgres` role doesn't own the table.
 
 This is expected, not a data exposure risk: `spatial_ref_sys` is `PostGIS`'s built-in lookup table of coordinate system definitions, and it never holds your data. The actual problem is that `PostGIS` is installed in `public`, a schema the Data API exposes by default. Enabling RLS on the table isn't possible for your `postgres` role, and it isn't the fix. Follow the steps below to move `PostGIS` out of `public` yourself. They include a backup, since the default path drops and recreates the extension. To avoid the rebuild, contact Supabase Support instead.
 

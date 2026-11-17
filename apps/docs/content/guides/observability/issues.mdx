@@ -1,0 +1,73 @@
+---
+id: 'issues'
+title: 'Issues'
+description: 'Health, security, and performance issues you or an agent can check for in a project.'
+---
+
+Issues flag health, security, and performance problems in your project, such as elevated error rates, misconfigured RLS policies, or missing indexes. Each issue comes from a deterministic check that ships with the platform. You can use Issues alongside [Advisors](/docs/guides/observability/advisors), which is planned for deprecation in a future release.
+
+You or an agent can check for issues from:
+
+- Studio: [Health issues](/dashboard/project/_/issues?category=health), [Security issues](/dashboard/project/_/issues?category=security), and [Performance issues](/dashboard/project/_/issues?category=performance)
+- MCP: `get_issues`
+- CLI: [`supabase issues`](/docs/reference/cli/supabase-issues)
+- Management API: [security](/docs/reference/api/v1-get-security-advisors), [performance](/docs/reference/api/v1-get-performance-advisors), and [health](/docs/reference/api/v2-run-project-advisors) checks
+
+Some issues may be intentional, so check them against your intended schema and access model before you change anything. Health issues can take a while to clear after a fix, since the check measures error rates over a period of time.
+
+## Check issues with the CLI
+
+Run checks against your local database, or use `--remote` for your linked project:
+
+```sh
+supabase issues
+supabase issues --remote
+supabase issues --remote --type security --severity warning --fail-on warning
+supabase issues --remote --output-format json
+```
+
+`--type` accepts `all`, `security`, `performance`, or `health`, and defaults to `all`. `--severity` sets the minimum severity: `info`, `warning`, or `critical`. It defaults to `info`.
+
+Health checks require a remote project. Local databases and direct database URLs report health as `unavailable` with `--type all`. Explicit `--type health` rejects those targets. You can select another remote project with `--remote=<ref|branch|url>`.
+
+The CLI defaults to JSON when it detects an agent. Use `--agent no --output-format text` to request human-readable output explicitly.
+
+Text output summarizes each issue and its affected-resource count, followed by check coverage. Use `--output-format json` or `--output-format stream-json` for structured results. The legacy `-o` / `--output` flag is unsupported.
+
+`--fail-on` accepts `none`, `info`, `warning`, or `critical`, and defaults to `none`. It exits with status 1 when a displayed issue meets the threshold. Severity filtering happens first. An unavailable remote check also exits with status 1, even with `--fail-on none`.
+
+The [`supabase db advisors`](/docs/reference/cli/supabase-db-advisors) command is planned for deprecation in a future release. It retains its existing flags, defaults, output, and exit behavior.
+
+## Check issues with MCP
+
+Use `get_issues` with your project scope. For example, these tool arguments request security issues at warning severity or above:
+
+```json
+{
+  "project_id": "your-project-ref",
+  "type": "security",
+  "severity": "warning"
+}
+```
+
+`type` accepts `all`, `security`, `performance`, or `health`, and defaults to `all`. `severity` accepts `info`, `warning`, or `critical`, and defaults to `info`. A project-scoped MCP connection supplies `project_id` automatically.
+
+The `get_advisors` tool is planned for deprecation in a future release. It remains available for existing callers.
+
+## Interpret results
+
+CLI structured output and `get_issues` return `issues` and `checks`:
+
+- `issues` groups findings by check. Each issue includes its `id`, `title`, `description`, `severity`, `category`, `source`, `docs_url`, and `affected` resources.
+- Each `affected` entry preserves its resource, detail, severity, documentation URL, and finding ID. Filtering by severity retains all findings within a matching issue.
+- `checks` reports each requested category as `complete` or `unavailable`, with a reason when unavailable.
+
+Check IDs identify checks within a project, rather than persistent incidents. These interfaces inspect current findings; they do not dismiss issues or track their resolution.
+
+An empty `issues` list means no issues match your filter. Review `checks` before treating that result as clear: an unavailable check means the assessment is incomplete.
+
+The new interfaces normalize underlying lint levels: `INFO` becomes `info`, `WARN` becomes `warning`, and `ERROR` becomes `critical`. Existing Advisors API responses retain their lint-level names.
+
+## Available checks
+
+<DatabaseAdvisorsIndex />
