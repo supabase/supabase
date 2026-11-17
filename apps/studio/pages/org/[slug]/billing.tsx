@@ -2,29 +2,21 @@ import { useParams } from 'common'
 import { useEffect } from 'react'
 
 import { BillingSettings } from '@/components/interfaces/Organization/BillingSettings/BillingSettings'
+import { useOrgSettingsPanel } from '@/components/interfaces/Organization/BillingSettings/useOrgSettingsPanel'
 import { DefaultLayout } from '@/components/layouts/DefaultLayout'
 import OrganizationLayout from '@/components/layouts/OrganizationLayout'
 import { UnknownInterface } from '@/components/ui/UnknownInterface'
 import { useIsFeatureEnabled } from '@/hooks/misc/useIsFeatureEnabled'
-import {
-  ORG_SETTINGS_PANEL_KEYS,
-  useOrgSettingsPageStateSnapshot,
-} from '@/state/organization-settings'
 import type { NextPageWithLayout } from '@/types'
 
 const OrgBillingSettings: NextPageWithLayout = () => {
-  const { panel, slug } = useParams()
-  const snap = useOrgSettingsPageStateSnapshot()
+  const { slug } = useParams()
+  const { panel } = useOrgSettingsPanel()
 
   const showBilling = useIsFeatureEnabled('billing:all')
 
   useEffect(() => {
-    const allowedValues = ['subscriptionPlan', 'costControl']
-    if (panel && typeof panel === 'string' && allowedValues.includes(panel)) {
-      snap.setPanelKey(panel as ORG_SETTINGS_PANEL_KEYS)
-      document.getElementById('billing-page-top')?.scrollIntoView({ behavior: 'smooth' })
-    }
-    // eslint-disable-next-line react-hooks/exhaustive-deps
+    if (panel) document.getElementById('billing-page-top')?.scrollIntoView({ behavior: 'smooth' })
   }, [panel])
 
   if (!showBilling) {
