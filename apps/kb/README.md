@@ -48,6 +48,19 @@ review process before they're published.
 > links the article and describes the change. Pull requests for other `/kb` content, such as `src/content/guides/`,
 > are welcome.
 
+## Style guide
+
+In general, follow all the existing guidelines in the [Docs Style Guide](https://github.com/supabase/supabase/blob/master/apps/docs/style-guide/README.md).
+
+Additionally, stick to plain GitHub-Flavored Markdown:
+
+- No custom/JSX components in guide bodies — content is also exported as plain `.md` (see below), and a
+  component wouldn't survive that export.
+- For callouts, use GitHub's native alert syntax (`> [!NOTE]`, `> [!TIP]`, `> [!IMPORTANT]`, `> [!WARNING]`,
+  `> [!CAUTION]`) — the build renders these into the `Admonition` component for you
+  (`src/lib/mdx/rehype-admonitions.ts`). Don't import or use `Admonition` directly in content.
+- Frontmatter requires `title`, but see `src/content.config.ts` for the full schema.
+
 ## Workflows
 
 `.github/workflows/kb-troubleshooting-sync.yml` runs on pushes to `master` that touch `apps/kb/**` (or can be
