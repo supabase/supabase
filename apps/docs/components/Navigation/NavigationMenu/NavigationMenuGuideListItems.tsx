@@ -121,7 +121,7 @@ const ContentAccordionLink = React.memo(function ContentAccordionLink(props: any
               aria-current={activeItem ? 'page' : undefined}
               className={[
                 'flex items-center gap-2 w-full layout-v2:min-h-8 layout-v2:py-1.5',
-                'cursor-pointer transition text-sm',
+                'cursor-pointer transition text-sm text-left',
                 'focus-inset rounded-md',
                 activeItem
                   ? 'text-primary font-medium layout-v2:text-foreground layout-v2:[font-weight:inherit]'
