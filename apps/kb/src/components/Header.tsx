@@ -1,6 +1,8 @@
+import { AuthProvider, useIsLoggedIn, useIsUserLoading } from 'common/auth'
+import { DASHBOARD_PROJECTS_URL, DASHBOARD_SIGN_UP_URL } from 'common/constants/dashboard-urls'
 import { SearchTrigger } from 'docs-search/components'
 import { useCallback, useRef, useState } from 'react'
-import { Button } from 'ui'
+import { buttonVariants, cn } from 'ui'
 import { MobileNavThemeButton } from 'ui-patterns/MobileNav/MobileNavThemeButton'
 import { HeadingReel } from 'ui-patterns/Toc/heading-reel'
 import {
@@ -12,7 +14,7 @@ import {
 } from 'ui-patterns/TopNav/TopNavMenu'
 import { TopNavMenuToggle } from 'ui-patterns/TopNav/TopNavMenuToggle'
 
-import { getNavMenus, SIGN_UP_URL } from '../lib/nav'
+import { getNavMenus } from '../lib/nav'
 import type { Topic } from '../lib/topics'
 import { HeaderMenu, useThemeChoice } from './HeaderMenu'
 import { openKbSearch } from './KbSearch'
@@ -24,6 +26,10 @@ const MOBILE_MENU_ID = 'mobile-menu'
 export interface HeaderProps {
   topics: Topic[]
   currentPath: string
+}
+
+interface AccountLinkProps {
+  className?: string
 }
 
 export const Header = ({ topics, currentPath }: HeaderProps) => {
@@ -55,7 +61,7 @@ export const Header = ({ topics, currentPath }: HeaderProps) => {
   }, [])
 
   return (
-    <>
+    <AuthProvider>
       <nav
         ref={observePageTitle}
         className="relative h-(--header-height) border-default max-lg:border-b bg-background/90 backdrop-blur-xs dark:bg-background/95"
@@ -98,9 +104,7 @@ export const Header = ({ topics, currentPath }: HeaderProps) => {
             ) : (
               <SearchTrigger onClick={openKbSearch} placeholder="Search" />
             )}
-            <Button variant="primary" asChild className="hidden h-7.5 lg:inline-flex">
-              <a href={SIGN_UP_URL}>Sign up</a>
-            </Button>
+            <AccountLink className="hidden lg:inline-flex" />
             <HeaderMenu className="hidden lg:inline-flex" />
             <TopNavMenuToggle
               ref={menuButtonRef}
@@ -120,6 +124,33 @@ export const Header = ({ topics, currentPath }: HeaderProps) => {
         toggleRef={menuButtonRef}
         className="lg:hidden"
       />
+    </AuthProvider>
+  )
+}
+
+const AccountLink = ({ className }: AccountLinkProps) => {
+  const isLoggedIn = useIsLoggedIn()
+  const isUserLoading = useIsUserLoading()
+  const linkClassName = cn(buttonVariants({ variant: 'primary' }), 'h-7.5', className)
+
+  return (
+    <>
+      <span
+        hidden={!isUserLoading && isLoggedIn}
+        className={isUserLoading ? 'contents in-data-signed-in:hidden' : 'contents'}
+      >
+        <a href={DASHBOARD_SIGN_UP_URL} className={linkClassName}>
+          Sign up
+        </a>
+      </span>
+      <span
+        hidden={!isUserLoading && !isLoggedIn}
+        className={isUserLoading ? 'hidden in-data-signed-in:contents' : 'contents'}
+      >
+        <a href={DASHBOARD_PROJECTS_URL} className={linkClassName}>
+          Dashboard
+        </a>
+      </span>
     </>
   )
 }

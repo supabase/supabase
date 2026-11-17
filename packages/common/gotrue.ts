@@ -1,6 +1,7 @@
-import { AuthClient, navigatorLock, User } from '@supabase/auth-js'
+import { AuthClient, navigatorLock, type User } from '@supabase/auth-js'
 
 import { isBrowser } from './helpers'
+import { safeLocalStorage } from './safe-storage'
 
 export const STORAGE_KEY = process.env.NEXT_PUBLIC_STORAGE_KEY || 'supabase.dashboard.auth.token'
 export const AUTH_DEBUG_KEY =
@@ -11,28 +12,17 @@ export const AUTH_NAVIGATOR_LOCK_DISABLED_KEY =
   process.env.NEXT_PUBLIC_AUTH_NAVIGATOR_LOCK_KEY ||
   'supabase.dashboard.auth.navigatorLock.disabled'
 
-/**
- * Catches errors thrown when accessing localStorage. Safari with certain
- * security settings throws when localStorage is accessed.
- */
-function safeGetLocalStorage(key: string) {
-  try {
-    return globalThis?.localStorage?.getItem(key)
-  } catch {
-    return null
-  }
-}
-
 const debug =
-  process.env.NEXT_PUBLIC_IS_PLATFORM === 'true' && safeGetLocalStorage(AUTH_DEBUG_KEY) === 'true'
+  process.env.NEXT_PUBLIC_IS_PLATFORM === 'true' &&
+  safeLocalStorage.getItem(AUTH_DEBUG_KEY) === 'true'
 
 const persistedDebug =
   process.env.NEXT_PUBLIC_IS_PLATFORM === 'true' &&
-  safeGetLocalStorage(AUTH_DEBUG_PERSISTED_KEY) === 'true'
+  safeLocalStorage.getItem(AUTH_DEBUG_PERSISTED_KEY) === 'true'
 
 const shouldEnableNavigatorLock =
   process.env.NEXT_PUBLIC_IS_PLATFORM === 'true' &&
-  !(safeGetLocalStorage(AUTH_NAVIGATOR_LOCK_DISABLED_KEY) === 'true')
+  !(safeLocalStorage.getItem(AUTH_NAVIGATOR_LOCK_DISABLED_KEY) === 'true')
 
 const shouldDetectSessionInUrl = process.env.NEXT_PUBLIC_AUTH_DETECT_SESSION_IN_URL
   ? process.env.NEXT_PUBLIC_AUTH_DETECT_SESSION_IN_URL === 'true'
@@ -180,6 +170,18 @@ async function debuggableNavigatorLock<R>(
   }
 }
 
+/**
+ * Catches errors thrown when accessing localStorage. Safari with certain
+ * security settings throws when localStorage is accessed.
+ */
+const browserLocalStorage = (() => {
+  try {
+    return globalThis.localStorage
+  } catch {
+    return undefined
+  }
+})()
+
 export const gotrueClient = new AuthClient({
   url: process.env.NEXT_PUBLIC_GOTRUE_URL,
   storageKey: STORAGE_KEY,
@@ -188,8 +190,8 @@ export const gotrueClient = new AuthClient({
   lock: navigatorLockEnabled ? debuggableNavigatorLock : undefined,
   // TODO: Should this be enabled with a feature flag?
   experimental: { recoveryCodes: true },
-  ...('localStorage' in globalThis
-    ? { storage: globalThis.localStorage, userStorage: globalThis.localStorage }
+  ...(browserLocalStorage
+    ? { storage: browserLocalStorage, userStorage: browserLocalStorage }
     : null),
 })
 
