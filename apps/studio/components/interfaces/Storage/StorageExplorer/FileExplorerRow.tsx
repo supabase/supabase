@@ -97,17 +97,17 @@ const ArchivedRowIcon = ({ name, onOpen }: { name: string; onOpen?: () => void }
 
 const RowActionsMenu = ({ name, options }: { name: string; options: RowOption[] }) => (
   <DropdownMenu>
-    <DropdownMenuTrigger className="focus-ring rounded-sm">
-      <div className="storage-row-menu opacity-0">
-        <Tooltip>
-          <TooltipTrigger asChild>
+    <Tooltip>
+      <TooltipTrigger asChild aria-describedby={undefined}>
+        <DropdownMenuTrigger className="focus-ring rounded-sm">
+          <div className="storage-row-menu opacity-0">
             <MoreVerticalIcon size={16} />
-          </TooltipTrigger>
-          <TooltipContent side="bottom">{name} actions</TooltipContent>
-        </Tooltip>
-        <span className="sr-only">{name} actions</span>
-      </div>
-    </DropdownMenuTrigger>
+            <span className="sr-only">{name} actions</span>
+          </div>
+        </DropdownMenuTrigger>
+      </TooltipTrigger>
+      <TooltipContent side="bottom">{name} actions</TooltipContent>
+    </Tooltip>
     <DropdownMenuContent side="bottom" align="end">
       {options.map((option) => {
         if ((option?.children ?? []).length > 0) {
