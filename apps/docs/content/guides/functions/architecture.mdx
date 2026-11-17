@@ -16,7 +16,7 @@ To illustrate how edge functions operate, consider a photo-sharing app where use
   - A user uploads an original image to [Supabase Storage](/docs/guides/storage/quickstart).
   - When the user selects a filter, the client-side app (using the Supabase JavaScript SDK) invokes an edge function named something like "apply-filter."
   - The edge function:
-    1. Downloads the original image from Supabase Storage.
+    1. Downloads the original image from [Supabase Storage](/docs/guides/storage).
     2. Applies the filter using a library like ImageMagick.
     3. Uploads the processed image back to Storage.
     4. Returns the path to the filtered image to the client.
@@ -34,7 +34,7 @@ Deploying an edge function is straightforward and automated, requiring no manual
 
 - **Steps to Deploy**:
   1. Write the function code in your local Supabase project (e.g., in `supabase/functions/apply-filter/index.ts`).
-  2. Run the command `supabase functions deploy apply-filter` via the Supabase CLI.
+  2. Run the command `supabase functions deploy apply-filter` via the [Supabase CLI](/docs/guides/local-development/cli/getting-started).
   3. The CLI bundles the function and its dependencies into an **ESZip file**—a compact format created by Deno that includes a complete module graph for quick loading and execution.
   4. The bundled file is uploaded to Supabase's backend.
   5. Supabase generates a unique URL for the function, making it accessible globally.
