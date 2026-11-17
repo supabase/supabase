@@ -12,13 +12,17 @@ export const Route = createFileRoute('/project/$ref/logs/auth-logs')({
 
 function LogsPage() {
   const { data: project } = useSelectedProjectQuery()
-  const { can: canReadAuthLogs } = useAsyncCheckPermissionsV2(
+  const { can: canReadAuthLogs, isSuccess: isPermissionsLoaded } = useAsyncCheckPermissionsV2(
     FGA_PERMISSIONS.PROJECT.ANALYTICS_LOGS_READ
   )
 
-  return !canReadAuthLogs ? (
-    <NoPermission isFullPage resourceText="access your project's authentication logs" />
-  ) : !!project ? (
-    <LogsPreviewer condensedLayout projectRef={project!.ref} queryType="auth" />
+  if (!isPermissionsLoaded) return null
+
+  if (!canReadAuthLogs) {
+    return <NoPermission isFullPage resourceText="access your project's authentication logs" />
+  }
+
+  return !!project ? (
+    <LogsPreviewer condensedLayout projectRef={project.ref} queryType="auth" />
   ) : null
 }
