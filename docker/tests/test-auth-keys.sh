@@ -327,8 +327,22 @@ check "OAuth userinfo (no auth)" "true" "$(auth_reached GET /auth/v1/oauth/useri
 check "OAuth client registration (no auth)" "true" \
     "$(auth_reached POST /auth/v1/oauth/clients/register)"
 # The consent endpoints are called by the project's own app, with its API key.
-check "OAuth consent endpoints still need an API key" "false" \
-    "$(auth_reached GET /auth/v1/oauth/authorizations/test)"
+# Require the gateway's own 401 (no error_code), so a failed request or an
+# unrelated error can't pass this check.
+gateway_rejected() {
+    response=$(curl -s -w '\n%{http_code}' -X "$1" "$BASE_URL$2") || {
+        echo "request failed"
+        return
+    }
+    status=$(printf '%s\n' "$response" | tail -n 1)
+    if [ "$status" = "401" ] && ! printf '%s\n' "$response" | grep -q '"error_code"'; then
+        echo "true"
+    else
+        echo "false (HTTP $status)"
+    fi
+}
+check "OAuth consent endpoints still need an API key" "true" \
+    "$(gateway_rejected GET /auth/v1/oauth/authorizations/test)"
 
 echo ""
 echo "--- Realtime WebSocket upgrade ---"
