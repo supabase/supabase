@@ -38,6 +38,8 @@
         "compat/**/*.{ts,tsx}",
       ],
       "ignore": [
+        // Warehouse report client used from #53001; remove when its report lands.
+        "data/warehouse/warehouse-metrics-query.ts",
         "public/**",
         // one-off build/codegen scripts, run by hand or from package.json
         "scripts/**",
