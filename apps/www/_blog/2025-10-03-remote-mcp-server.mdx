@@ -31,7 +31,7 @@ On top of this, we're adding even more tools to Supabase MCP that we hope will m
 
 ## What is MCP?
 
-MCP stands for [Model Context Protocol](https://modelcontextprotocol.io/). It standardizes how Large Language Models (LLMs) talk to platforms like Supabase. We released the initial version of our Supabase MCP server back in April which allowed folks to connect their favorite AI tools (like [Cursor](https://www.cursor.com/) or [Claude Code](https://docs.anthropic.com/en/docs/claude-code/overview)) directly with Supabase. Since launch, we've added many new features:
+MCP stands for [Model Context Protocol](https://modelcontextprotocol.io/). It standardizes how Large Language Models (LLMs) talk to platforms like Supabase. We released the initial version of our Supabase MCP server back in April which allowed folks to connect their favorite AI tools (like [Cursor](https://cursor.com/) or [Claude Code](https://code.claude.com/docs/en/overview)) directly with Supabase. Since launch, we've added many new features:
 
 - Fetching and deploying Edge Functions
 - Fetching logs from any service in the Supabase stack
@@ -55,7 +55,7 @@ npx -y @supabase/mcp-server-supabase@latest ...
 
 This worked great at the time, because it meant that folks could connect their AI agents with Supabase immediately without a lot of infrastructure work on our end. But it came with some downsides:
 
-1. **Limited MCP clients:** Most web-based AI agents (like ChatGPT, Claude.ai, Builder.io) are limited to HTTP-based MCP servers due to the environments they run in. APIs like OpenAI's Response API also [have support for MCP](https://platform.openai.com/docs/guides/tools-remote-mcp) - but only with remote MCP servers, not `stdio`.
+1. **Limited MCP clients:** Most web-based AI agents (like ChatGPT, Claude.ai, Builder.io) are limited to HTTP-based MCP servers due to the environments they run in. APIs like OpenAI's Response API also [have support for MCP](https://developers.openai.com/api/docs/guides/tools-connectors-mcp) - but only with remote MCP servers, not `stdio`.
 2. **Authentication was clunky:** Folks needed to manually generate a personal access token (PAT) in order to authenticate with their Supabase account which added friction to the setup experience and not very secure (it was easy to accidentally commit this to source control).
 3. **Errors were hard to debug:** Not only did everyone need Node.js installed to run the server, they also needed to make sure their environment was configured correctly so that the correct version was used by each client (if you used `nvm`). Every operating system also had slight differences that required modifying the `npx` command accordingly.
 

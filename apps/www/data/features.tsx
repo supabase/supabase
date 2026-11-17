@@ -1209,7 +1209,7 @@ SSO with SAML provides the enterprise-grade authentication capabilities required
     icon: Lock,
     products: [PRODUCT_SHORTNAMES.AUTHENTICATION],
     heroImage: '',
-    docsUrl: 'https://supabase.com/docs/guides/auth/sso/auth-sso-saml',
+    docsUrl: 'https://supabase.com/docs/guides/auth/enterprise-sso/auth-sso-saml',
     slug: 'sso-with-saml',
     status: {
       stage: PRODUCT_STAGES.GA,
@@ -1514,7 +1514,7 @@ Supabase's RLS feature provides a powerful tool for implementing sophisticated a
     icon: Lock,
     products: [PRODUCT_SHORTNAMES.DATABASE, PRODUCT_SHORTNAMES.AUTHENTICATION],
     heroImage: `https://xguihxuzqibwxjnimxev.supabase.co/storage/v1/object/public/videos/marketing/website/supabase-rls.mp4`,
-    docsUrl: 'https://supabase.com/docs/guides/auth/row-level-security',
+    docsUrl: 'https://supabase.com/docs/guides/database/postgres/row-level-security',
     slug: 'row-level-security',
     status: {
       stage: PRODUCT_STAGES.GA,
@@ -1755,7 +1755,7 @@ Supabase's CDN significantly improves the performance and user experience of you
     icon: Cloud,
     products: [PRODUCT_SHORTNAMES.STORAGE],
     heroImage: '',
-    docsUrl: 'https://supabase.com/docs/guides/storage/cdn',
+    docsUrl: 'https://supabase.com/docs/guides/storage/cdn/fundamentals',
     slug: 'cdn',
     status: {
       stage: PRODUCT_STAGES.GA,
@@ -1879,7 +1879,7 @@ Automatic format optimization detects the capabilities of the user’s browser a
     icon: Image,
     products: [PRODUCT_SHORTNAMES.STORAGE],
     heroImage: 'https://www.youtube-nocookie.com/embed/dLqSmxX3r7I',
-    docsUrl: 'https://supabase.com/docs/guides/storage/image-transformations',
+    docsUrl: 'https://supabase.com/docs/guides/storage/serving/image-transformations',
     slug: 'image-transformations',
     status: {
       stage: PRODUCT_STAGES.GA,
@@ -2490,7 +2490,7 @@ By leveraging Role-Based Access Control, you can create a secure, scalable, and 
     products: [ADDITIONAL_PRODUCTS.PLATFORM],
     heroImage: 'https://www.youtube-nocookie.com/embed/168PHFnxkok',
     docsUrl:
-      'https://supabase.com/docs/guides/database/postgres/custom-claims-and-role-based-access-control-rbac',
+      'https://supabase.com/docs/guides/api/custom-claims-and-role-based-access-control-rbac',
     slug: 'role-based-access-control',
     status: {
       stage: PRODUCT_STAGES.GA,
@@ -2676,7 +2676,7 @@ This feature is particularly valuable for teams looking to enhance their applica
     products: [ADDITIONAL_PRODUCTS.PLATFORM],
     heroImage: '/images/features/logs-analytics.png',
     heroImageLight: '/images/features/logs-analytics-light.png',
-    docsUrl: 'https://supabase.com/docs/guides/monitoring-troubleshooting/logs',
+    docsUrl: 'https://supabase.com/docs/guides/observability/logs',
     blogUrl: 'https://supabase.com/blog/new-observability-features-in-supabase',
     slug: 'logs-analytics',
     status: {
@@ -3337,7 +3337,7 @@ Yes, the MCP Server can perform actions like creating tables, running queries, a
     icon: CloudCog,
     products: [PRODUCT_SHORTNAMES.DATABASE, ADDITIONAL_PRODUCTS.PLATFORM],
     heroImage: 'https://www.youtube-nocookie.com/embed/1SMldLoOhbg',
-    docsUrl: 'https://supabase.com/docs/guides/getting-started/mcp',
+    docsUrl: 'https://supabase.com/docs/guides/ai-tools/mcp',
     blogUrl: 'https://supabase.com/blog/mcp-server',
     slug: 'mcp-server',
     status: {

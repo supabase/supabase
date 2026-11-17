@@ -46,7 +46,7 @@ We've benchmarked the characteristics Supavisor exhibits under load before rolli
 We use a [custom load-testing application](https://github.com/supabase/benchmarks) to test the features of the Supabase platform. It consists of:
 
 1. Terraform scripts for creating a testing environment on AWS.
-2. k6 as the load generator. We used the k6 guides for [running large-scale tests](https://k6.io/docs/testing-guides/running-large-tests/) and [fine-tuning OS](https://k6.io/docs/misc/fine-tuning-os/) to tweak the config for AWS instances.
+2. k6 as the load generator. We used the k6 guides for [running large-scale tests](https://grafana.com/docs/k6/latest/testing-guides/running-large-tests/) and [fine-tuning OS](https://grafana.com/docs/k6/latest/set-up/fine-tune-os/) to tweak the config for AWS instances.
 3. Grafana + Prometheus for monitoring.
 
 To simulate 1,000,000 concurrent active connections, we used 20 AWS EC2 instances with 16 cores and 32GB of RAM. We ran the tests for up to 2 hours to ensure that the Supavisor can handle load over long periods.
