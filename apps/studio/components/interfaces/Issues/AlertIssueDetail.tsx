@@ -1,7 +1,7 @@
 import { useQuery } from '@tanstack/react-query'
 import { useParams } from 'common'
 import dayjs from 'dayjs'
-import { BellIcon, ExternalLinkIcon } from 'lucide-react'
+import { BellIcon, ExternalLinkIcon, SparklesIcon } from 'lucide-react'
 import type { ReactNode } from 'react'
 import { Badge, Button, Tabs, TabsContent, TabsList, TabsTrigger } from 'ui'
 import { Admonition } from 'ui-patterns/Admonition'
@@ -58,6 +58,9 @@ export const AlertIssueDetailView = ({
   const remediation = metadataText(issue.metadata, 'remediation')
   const remediationUrl = remediation?.startsWith('https://') ? remediation : undefined
   const identifiers = getIdentifierEntries(issue.identifiers)
+  const investigationStatus = issue.investigation?.status
+  const isInvestigationUnfinished =
+    investigationStatus === 'failed' || investigationStatus === 'timed_out'
   const signalSummary = `${issue.signal_count} ${issue.signal_count === 1 ? 'signal' : 'signals'}, last ${dayjs(issue.last_seen_at).fromNow()}`
 
   return (
@@ -96,8 +99,26 @@ export const AlertIssueDetailView = ({
                 ·
               </span>
               <span>{signalSummary}</span>
+              {investigationStatus === 'completed' && (
+                <>
+                  <span aria-hidden className="text-foreground-muted">
+                    ·
+                  </span>
+                  <span className="inline-flex items-center gap-1 text-brand">
+                    <SparklesIcon size={12} aria-hidden />
+                    Investigated by Supabase Assistant
+                  </span>
+                </>
+              )}
             </div>
           </header>
+          {isInvestigationUnfinished && (
+            <Admonition
+              type="default"
+              title="The initial investigation didn't finish"
+              description="Ask the Assistant about the finding to investigate it now."
+            />
+          )}
           <Tabs defaultValue="overview" className="flex flex-col gap-6">
             <TabsList className="gap-5">
               <TabsTrigger value="overview">Overview</TabsTrigger>

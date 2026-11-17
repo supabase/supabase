@@ -29,6 +29,7 @@ export const alertIssueSchema = z.object({
   actor: z.string(),
   unread: z.boolean().optional(),
   notebook: z.array(alertIssueNotebookCellSchema).optional(),
+  investigation: z.object({ status: z.string(), completed_at: z.string().nullish() }).nullish(),
 })
 
 export type AlertIssue = z.infer<typeof alertIssueSchema>

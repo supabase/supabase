@@ -45,6 +45,30 @@ describe('AlertIssueDetailView', () => {
     expect(screen.getByText(/"row_count": 3/)).toBeInTheDocument()
   })
 
+  it('credits the initial investigation when it completed', () => {
+    customRender(
+      <AlertIssueDetailView
+        issue={{ ...issue, investigation: { status: 'completed' } }}
+        onAction={vi.fn()}
+      />
+    )
+
+    expect(screen.getByText('Investigated by Supabase Assistant')).toBeInTheDocument()
+    expect(screen.queryByText("The initial investigation didn't finish")).not.toBeInTheDocument()
+  })
+
+  it('says when the initial investigation did not finish', () => {
+    customRender(
+      <AlertIssueDetailView
+        issue={{ ...issue, investigation: { status: 'timed_out' } }}
+        onAction={vi.fn()}
+      />
+    )
+
+    expect(screen.getByText("The initial investigation didn't finish")).toBeInTheDocument()
+    expect(screen.queryByText('Investigated by Supabase Assistant')).not.toBeInTheDocument()
+  })
+
   it('offers the actions for an open alert issue', async () => {
     const onAction = vi.fn()
     customRender(<AlertIssueDetailView issue={issue} onAction={onAction} />)
