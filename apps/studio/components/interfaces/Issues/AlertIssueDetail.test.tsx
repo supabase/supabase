@@ -50,6 +50,7 @@ describe('AlertIssueDetailView', () => {
       <AlertIssueDetailView
         issue={{ ...issue, investigation: { status: 'completed' } }}
         onAction={vi.fn()}
+        isOutOfScopeVisible
       />
     )
 
@@ -62,11 +63,30 @@ describe('AlertIssueDetailView', () => {
       <AlertIssueDetailView
         issue={{ ...issue, investigation: { status: 'timed_out' } }}
         onAction={vi.fn()}
+        isOutOfScopeVisible
       />
     )
 
     expect(screen.getByText("The initial investigation didn't finish")).toBeInTheDocument()
     expect(screen.queryByText('Investigated by Supabase Assistant')).not.toBeInTheDocument()
+  })
+
+  it('hides the investigation status while out-of-scope features are hidden', () => {
+    const { rerender } = customRender(
+      <AlertIssueDetailView
+        issue={{ ...issue, investigation: { status: 'completed' } }}
+        onAction={vi.fn()}
+      />
+    )
+    expect(screen.queryByText('Investigated by Supabase Assistant')).not.toBeInTheDocument()
+
+    rerender(
+      <AlertIssueDetailView
+        issue={{ ...issue, investigation: { status: 'failed' } }}
+        onAction={vi.fn()}
+      />
+    )
+    expect(screen.queryByText("The initial investigation didn't finish")).not.toBeInTheDocument()
   })
 
   it('offers the actions for an open alert issue', async () => {

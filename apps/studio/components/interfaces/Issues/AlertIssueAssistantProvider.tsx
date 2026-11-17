@@ -13,6 +13,7 @@ import {
   type AssistantStep,
   type AssistantStepResult,
 } from './AlertIssueAssistant.utils'
+import { useAlertIssuesOutOfScope } from './useAlertIssuesOutOfScope'
 import { useAlertIssueCommentCreateMutation } from '@/data/alert-issues/alert-issue-comment-create-mutation'
 import { alertIssueEventsQueryOptions } from '@/data/alert-issues/alert-issue-events-query'
 import type { AlertIssue } from '@/data/alert-issues/alert-issue.schema'
@@ -81,6 +82,7 @@ export const AlertIssueAssistantProvider = ({
   )
   const { mutateAsync: postComment } = useAlertIssueCommentCreateMutation()
   const [run, setRun] = useState<AssistantRunState | null>(null)
+  const { isOutOfScopeVisible } = useAlertIssuesOutOfScope()
   const isActive = useRef(true)
 
   useEffect(() => {
@@ -226,7 +228,9 @@ export const AlertIssueAssistantProvider = ({
   }
 
   return (
-    <AlertIssueAssistantContext.Provider value={{ run, isBusy: run !== null, prepare, start, ask }}>
+    <AlertIssueAssistantContext.Provider
+      value={isOutOfScopeVisible ? { run, isBusy: run !== null, prepare, start, ask } : null}
+    >
       {children}
     </AlertIssueAssistantContext.Provider>
   )

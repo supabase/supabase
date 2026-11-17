@@ -1,7 +1,8 @@
 import { fireEvent, screen, waitFor } from '@testing-library/react'
 import userEvent from '@testing-library/user-event'
+import { LOCAL_STORAGE_KEYS } from 'common'
 import { http, HttpResponse } from 'msw'
-import { describe, expect, it } from 'vitest'
+import { afterEach, beforeEach, describe, expect, it } from 'vitest'
 
 import { AlertIssueAskAssistant } from './AlertIssueAskAssistant'
 import { AlertIssueAssistantProvider } from './AlertIssueAssistantProvider'
@@ -88,7 +89,40 @@ const renderThread = (stepDelayMs = 0) =>
     </AlertIssueAssistantProvider>
   )
 
+const showOutOfScope = () =>
+  localStorage.setItem(LOCAL_STORAGE_KEYS.ALERT_ISSUES_OUT_OF_SCOPE_VISIBLE, 'true')
+
+afterEach(() => localStorage.removeItem(LOCAL_STORAGE_KEYS.ALERT_ISSUES_OUT_OF_SCOPE_VISIBLE))
+
+describe('AlertIssueAskAssistant with out-of-scope features hidden', () => {
+  it('shows no Ask Assistant button', () => {
+    mockApi()
+    renderThread()
+
+    expect(screen.getByRole('region', { name: 'Log events' })).toBeInTheDocument()
+    expect(screen.queryByRole('button', { name: 'Ask Assistant' })).not.toBeInTheDocument()
+  })
+
+  it('posts an @assistant mention as a plain comment', async () => {
+    const posted = mockApi()
+    renderThread()
+
+    const comment = await screen.findByRole('textbox', { name: 'Add a comment' })
+    await userEvent.type(comment, '@assistant what changed?')
+    fireEvent.submit(comment.closest('form')!)
+
+    await waitFor(() => expect(posted).toHaveLength(1))
+    await new Promise((resolve) => setTimeout(resolve, 50))
+    expect(posted).toHaveLength(1)
+    expect(
+      screen.queryByRole('listitem', { name: 'Supabase Assistant is responding' })
+    ).not.toBeInTheDocument()
+  })
+})
+
 describe('AlertIssueAskAssistant', () => {
+  beforeEach(showOutOfScope)
+
   it('renders only the block outside an alert issue assistant', () => {
     customRender(
       <AlertIssueAskAssistant context={{ kind: 'finding', label: 'the finding' }}>
@@ -104,7 +138,7 @@ describe('AlertIssueAskAssistant', () => {
     const posted = mockApi()
     renderThread()
 
-    await userEvent.click(screen.getByRole('button', { name: 'Ask Assistant' }))
+    await userEvent.click(await screen.findByRole('button', { name: 'Ask Assistant' }))
     await userEvent.click(await screen.findByRole('button', { name: 'Investigate further' }))
 
     await waitFor(() => expect(posted).toHaveLength(2))
@@ -121,7 +155,7 @@ describe('AlertIssueAskAssistant', () => {
     mockApi()
     renderThread(200)
 
-    await userEvent.click(screen.getByRole('button', { name: 'Ask Assistant' }))
+    await userEvent.click(await screen.findByRole('button', { name: 'Ask Assistant' }))
     await userEvent.click(await screen.findByRole('button', { name: 'Explain this' }))
 
     const steps = await screen.findByRole('list', { name: 'Assistant steps' })
@@ -136,7 +170,7 @@ describe('AlertIssueAskAssistant', () => {
     const posted = mockApi()
     renderThread()
 
-    await userEvent.click(screen.getByRole('button', { name: 'Ask Assistant' }))
+    await userEvent.click(await screen.findByRole('button', { name: 'Ask Assistant' }))
     const question = await screen.findByRole('textbox', { name: 'Ask the Assistant' })
     await userEvent.type(question, 'Why only stripe-webhook?')
     fireEvent.submit(question.closest('form')!)

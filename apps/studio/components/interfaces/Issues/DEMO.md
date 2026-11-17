@@ -36,15 +36,29 @@ self-hosted `docker/docker-compose.yml`, with `STUDIO_PG_META_URL` pointing at `
 - [ ] **Metadata tab**: any alert issue.
 - [ ] **Advisors and remediation**: the eight advisor alert issues, for example `RLS Disabled in Public: public.orders`.
 - [ ] **SQL cells and Open as notebook**: any advisor alert issue (needs postgres-meta).
-- [ ] **Ask Assistant**: hover over the finding, a SQL cell or the log events.
+- [ ] **Ask Assistant** (out of scope): hover over the finding, a SQL cell or the log events.
 - [ ] **Alert issue types and silences**: Filters → Manage alert issue types. Turning a type off hides its alert issues.
 - [ ] **Custom log rules**: Filters → Manage alert issue types → New log rule, for example source `function_logs`, filter `m.level:error`, group by `metadata.function_id`. Alert issues appear after the first scheduled run (60s, 5s when fast).
-- [ ] **Initial investigations**:
+- [ ] **Initial investigations** (out of scope):
   - `Edge Function errors: stripe-webhook` has a completed investigation and its report.
   - `Edge Function errors: send-email` timed out.
   - `Database connections near the limit` arrives 30s after the first request, stays hidden while its investigation runs (20s), then appears with the report. With `fast`: 3s and 2s.
 
 The investigation reports are scripted stand-ins for the o11y-sre-agent.
+
+### Out-of-scope features
+
+Agentic features are out of scope for this demo and hidden by default. Filters → **Show
+out-of-scope features** turns them on, and the setting is remembered in this browser.
+
+While they're hidden:
+
+- There are no Ask Assistant buttons, and mentioning `@assistant` in a comment posts a plain comment.
+- Comments from Supabase Assistant, including investigation reports, aren't shown.
+- The investigation status ("Investigated by Supabase Assistant", or the notice when it didn't finish) isn't shown.
+
+Everything else in the list above works the same either way. Alert issues that wait for an
+initial investigation still arrive late in mock mode, because the delay is on the server.
 
 ## Against real local servers
 

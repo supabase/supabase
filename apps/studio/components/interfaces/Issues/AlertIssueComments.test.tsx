@@ -1,7 +1,8 @@
 import { fireEvent, screen, waitFor } from '@testing-library/react'
 import userEvent from '@testing-library/user-event'
+import { LOCAL_STORAGE_KEYS } from 'common'
 import { http, HttpResponse } from 'msw'
-import { describe, expect, it } from 'vitest'
+import { afterEach, describe, expect, it } from 'vitest'
 
 import { AlertIssueComments } from './AlertIssueComments'
 import { API_URL } from '@/lib/constants'
@@ -10,13 +11,20 @@ import { mswServer } from '@/tests/lib/msw'
 
 const COMMENTS_URL = `${API_URL}/platform/projects/:ref/alerts/issues/:alertIssueId/comments`
 
-const comment = (id: string, body: string) => ({
+const comment = (id: string, body: string, author = 'self-hosted') => ({
   comment_id: id,
   alert_issue_id: 'a1',
-  author: 'self-hosted',
+  author,
   body,
   created_at: new Date().toISOString(),
 })
+
+const thread = [
+  comment('c1', '@assistant why is this failing?'),
+  comment('c2', 'The upstream API is timing out.', 'Supabase Assistant'),
+]
+
+afterEach(() => localStorage.removeItem(LOCAL_STORAGE_KEYS.ALERT_ISSUES_OUT_OF_SCOPE_VISIBLE))
 
 describe('AlertIssueComments', () => {
   it('lists comments and adds a new one', async () => {
@@ -52,5 +60,32 @@ describe('AlertIssueComments', () => {
     customRender(<AlertIssueComments projectRef="default" alertIssueId="a1" />)
 
     expect(await screen.findByText('No comments yet')).toBeInTheDocument()
+  })
+
+  it('hides assistant replies and mentions while out-of-scope features are hidden', async () => {
+    mswServer.use(http.get(COMMENTS_URL, () => HttpResponse.json(thread)))
+
+    customRender(<AlertIssueComments projectRef="default" alertIssueId="a1" />)
+
+    expect(await screen.findByText('@assistant why is this failing?')).toBeInTheDocument()
+    expect(screen.queryByText('The upstream API is timing out.')).not.toBeInTheDocument()
+    expect(screen.getByRole('textbox', { name: 'Add a comment' })).toHaveAttribute(
+      'placeholder',
+      'Add a comment'
+    )
+  })
+
+  it('shows assistant replies and mentions when out-of-scope features are shown', async () => {
+    localStorage.setItem(LOCAL_STORAGE_KEYS.ALERT_ISSUES_OUT_OF_SCOPE_VISIBLE, 'true')
+    mswServer.use(http.get(COMMENTS_URL, () => HttpResponse.json(thread)))
+
+    customRender(<AlertIssueComments projectRef="default" alertIssueId="a1" />)
+
+    expect(await screen.findByText('The upstream API is timing out.')).toBeInTheDocument()
+    expect(screen.getByText('@assistant')).toBeInTheDocument()
+    expect(screen.getByRole('textbox', { name: 'Add a comment' })).toHaveAttribute(
+      'placeholder',
+      'Add a comment, or mention @assistant'
+    )
   })
 })

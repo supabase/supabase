@@ -19,6 +19,7 @@ import {
   getIdentifierEntries,
   getSnoozeUntil,
 } from './AlertIssues.utils'
+import { useAlertIssuesOutOfScope } from './useAlertIssuesOutOfScope'
 import {
   ExplorerToolbar,
   ExplorerToolbarIcon,
@@ -39,6 +40,8 @@ type AlertIssueDetailViewProps = {
   isUpdating?: boolean
   investigation?: ReactNode
   comments?: ReactNode
+  /** Shows the out-of-scope (agentic) parts, such as the initial investigation status. */
+  isOutOfScopeVisible?: boolean
   children?: ReactNode
 }
 
@@ -51,6 +54,7 @@ export const AlertIssueDetailView = ({
   isUpdating = false,
   investigation,
   comments,
+  isOutOfScopeVisible = false,
   children,
 }: AlertIssueDetailViewProps) => {
   const metadataDetail = metadataText(issue.metadata, 'detail')
@@ -58,7 +62,7 @@ export const AlertIssueDetailView = ({
   const remediation = metadataText(issue.metadata, 'remediation')
   const remediationUrl = remediation?.startsWith('https://') ? remediation : undefined
   const identifiers = getIdentifierEntries(issue.identifiers)
-  const investigationStatus = issue.investigation?.status
+  const investigationStatus = isOutOfScopeVisible ? issue.investigation?.status : undefined
   const isInvestigationUnfinished =
     investigationStatus === 'failed' || investigationStatus === 'timed_out'
   const signalSummary = `${issue.signal_count} ${issue.signal_count === 1 ? 'signal' : 'signals'}, last ${dayjs(issue.last_seen_at).fromNow()}`
@@ -186,6 +190,7 @@ export const AlertIssueDetailView = ({
 
 export const AlertIssueDetail = () => {
   const { ref, alertIssueId } = useParams()
+  const { isOutOfScopeVisible } = useAlertIssuesOutOfScope()
   const { data, error, isPending, isError } = useQuery(alertIssuesQueryOptions({ projectRef: ref }))
   const { mutate, isPending: isUpdating } = useAlertIssueActionMutation()
   const issue = data?.find((item) => item.alert_issue_id === alertIssueId)
@@ -216,7 +221,14 @@ export const AlertIssueDetail = () => {
   }
 
   if (!ref)
-    return <AlertIssueDetailView issue={issue} onAction={handleAction} isUpdating={isUpdating} />
+    return (
+      <AlertIssueDetailView
+        issue={issue}
+        onAction={handleAction}
+        isUpdating={isUpdating}
+        isOutOfScopeVisible={isOutOfScopeVisible}
+      />
+    )
 
   return (
     <AlertIssueAssistantProvider key={issue.alert_issue_id} projectRef={ref} issue={issue}>
@@ -224,6 +236,7 @@ export const AlertIssueDetail = () => {
         issue={issue}
         onAction={handleAction}
         isUpdating={isUpdating}
+        isOutOfScopeVisible={isOutOfScopeVisible}
         investigation={<AlertIssueNotebook issue={issue} projectRef={ref} />}
         comments={<AlertIssueComments projectRef={ref} alertIssueId={issue.alert_issue_id} />}
       >
