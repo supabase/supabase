@@ -218,7 +218,7 @@ When the client asks for diagnostics, we load all statements alongside their ran
 
 Again, the type checker is very simple: Since we maintain a database connection, we can just ask Postgres to do the heavy lifting by `PREPARE`-ing the statement. If the statement contains a type issue, such as a missing column, the error is returned as diagnostics to the user.
 
-Our linter is heavily inspired by [Squawk](https://squawkhq.com). It takes the AST emitted by `libpg_query` and runs all configured rules on them. We spent some time optimizing the infrastructure of the linter in order to lower the barrier of contributing new rules and ask that the community [can support us there](https://github.com/supabase-community/postgres_lsp/issues/131).
+Our linter is heavily inspired by [Squawk](https://squawkhq.com). It takes the AST emitted by `libpg_query` and runs all configured rules on them. We spent some time optimizing the infrastructure of the linter in order to lower the barrier of contributing new rules and ask that the community [can support us there](https://github.com/supabase-community/postgres-language-server/issues/131).
 
 In the end, providing diagnostics happens without noticeable delay for the user (we promise the GIF was not edited 🤞):
 
