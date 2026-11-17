@@ -72,7 +72,7 @@ Enable the server, build a consent page in your app, register a client, and then
 
 When a client starts a sign-in, Auth redirects the user's browser to your consent page with an `authorization_id`. The page signs in the user if needed, shows which app is asking for access, and approves or denies the request. Build it with the `supabase.auth.oauth` methods in `supabase-js`. For a complete example, see [Build your authorization UI](/docs/guides/auth/oauth-server/getting-started#build-your-authorization-ui).
 
-Auth always redirects the browser to `SITE_URL` plus `OAUTH_SERVER_AUTHORIZATION_PATH`, with the `authorization_id` in the query string, so host the consent page there. To get the authorization details and to approve or deny the request, the page calls Auth's consent endpoints. Auth accepts these calls from the `SITE_URL` origin and from the origins in `ADDITIONAL_REDIRECT_URLS`. List an origin there as it is, for example `https://consent.example.com`. Auth compares the browser's origin, which has no path, so a pattern such as `https://consent.example.com/**` doesn't match it. Calls from any other origin fail with `unauthorized request origin`.
+Auth always redirects the browser to `SITE_URL` plus `OAUTH_SERVER_AUTHORIZATION_PATH`, with the `authorization_id` in the query string, so host the consent page there. To get the authorization details and to approve or deny the request, the page calls Auth's consent endpoints. Auth accepts these calls from the `SITE_URL` origin and from the origins in `ADDITIONAL_REDIRECT_URLS`. List an origin there as it is, for example `https://consent.example.com`. Auth compares the browser's origin, which has no path. A path wildcard such as `https://consent.example.com/**`, which matches any path on that site, doesn't match the origin. Calls from any other origin fail with `unauthorized request origin`.
 
 The page calls Auth with your publishable key and the user's session, like the rest of your app.
 
@@ -175,7 +175,7 @@ If the `error_description` is `oauth authorization path not configured`, set `OA
 
 ### Consent requests fail with `unauthorized request origin`
 
-The consent endpoints were called from an origin that Auth doesn't allow. Call them from the consent page at `SITE_URL` plus `OAUTH_SERVER_AUTHORIZATION_PATH`. If an app on another origin calls them, add its exact origin, such as `https://consent.example.com`, to `ADDITIONAL_REDIRECT_URLS`. A pattern with a path, such as `https://consent.example.com/**`, doesn't match an origin.
+The consent endpoints were called from an origin that Auth doesn't allow. Call them from the consent page at `SITE_URL` plus `OAUTH_SERVER_AUTHORIZATION_PATH`. If an app on another origin calls them, add its exact origin, such as `https://consent.example.com`, to `ADDITIONAL_REDIRECT_URLS`. A path wildcard such as `https://consent.example.com/**` doesn't match an origin.
 
 ### The token request fails with `Error generating ID token`
 
