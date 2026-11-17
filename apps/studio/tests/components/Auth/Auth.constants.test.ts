@@ -95,7 +95,9 @@ describe('Auth.constants: getSiteUrlError', () => {
     'http://localhost:3000',
     'http://127.0.0.1:3000',
     'com.example.app://callback',
+    'myapp://callback',
     'myapp://',
+    'exp://192.168.1.5:19000',
   ])('accepts %s', (url) => {
     expect(getSiteUrlError(url)).toBeUndefined()
   })
@@ -107,6 +109,14 @@ describe('Auth.constants: getSiteUrlError', () => {
     ['https://example.com/**', "Site URL can't contain wildcards"],
     ['example.com', 'Please provide a valid URL, such as https://example.com'],
     ['/auth/callback', 'Please provide a valid URL, such as https://example.com'],
+    ['localhost:3000', 'Please provide a valid URL, such as https://example.com'],
+    ['example.com:8080/auth', 'Please provide a valid URL, such as https://example.com'],
+    ['https:example.com', 'Please provide a valid URL, such as https://example.com'],
+    ['javascript:alert(1)', "Site URL can't use the javascript: protocol"],
+    ['JavaScript://example.com/%0Aalert(1)', "Site URL can't use the javascript: protocol"],
+    ['data:text/html,hello', "Site URL can't use the data: protocol"],
+    ['file:///tmp', "Site URL can't use the file: protocol"],
+    ['vbscript:msgbox(1)', "Site URL can't use the vbscript: protocol"],
   ])('rejects %s', (url, expected) => {
     expect(getSiteUrlError(url)).toBe(expected)
   })

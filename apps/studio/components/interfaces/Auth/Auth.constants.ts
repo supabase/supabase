@@ -60,6 +60,10 @@ export function getUrlCharacterError(url: string, label = 'URL'): string | undef
   return undefined
 }
 
+const INVALID_SITE_URL_MESSAGE = 'Please provide a valid URL, such as https://example.com'
+
+const UNSAFE_SITE_URL_PROTOCOLS = ['javascript:', 'data:', 'file:', 'vbscript:']
+
 export function getSiteUrlError(url: string): string | undefined {
   const characterError = getUrlCharacterError(url, 'Site URL')
   if (characterError) {
@@ -71,9 +75,23 @@ export function getSiteUrlError(url: string): string | undefined {
     return "Site URL can't contain wildcards"
   }
 
-  const isAbsoluteUrl = URL.canParse(url)
-  if (!isAbsoluteUrl) {
-    return 'Please provide a valid URL, such as https://example.com'
+  const isParsable = URL.canParse(url)
+  if (!isParsable) {
+    return INVALID_SITE_URL_MESSAGE
+  }
+
+  const { protocol, hostname } = new URL(url)
+  const isUnsafeProtocol = UNSAFE_SITE_URL_PROTOCOLS.includes(protocol)
+  if (isUnsafeProtocol) {
+    return `Site URL can't use the ${protocol} protocol`
+  }
+
+  // `localhost:3000` parses with `localhost:` as its scheme, so require `scheme://`
+  const hasAuthority = url.slice(protocol.length).startsWith('//')
+  const isWebUrl = protocol === 'http:' || protocol === 'https:'
+  const isMissingHost = !hasAuthority || (isWebUrl && hostname.length === 0)
+  if (isMissingHost) {
+    return INVALID_SITE_URL_MESSAGE
   }
 
   return undefined
