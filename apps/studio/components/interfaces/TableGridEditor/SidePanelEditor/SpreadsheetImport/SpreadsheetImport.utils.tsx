@@ -141,12 +141,13 @@ export const parseSpreadsheet = (
             : results.data
 
         headers.forEach((header) => {
-          const type = inferColumnType(header, data)
-          if (!has(columnTypeMap, header)) {
-            columnTypeMap[header] = type
-          } else if (columnTypeMap[header] !== type) {
-            columnTypeMap[header] = 'text'
-          }
+          // A chunk with no values for this column has nothing to say about its type
+          const hasValue = data.some((row) => isObject(row) && hasCellValue(row[header]))
+          if (!hasValue) return
+          columnTypeMap[header] = mergeInferredColumnTypes(
+            columnTypeMap[header],
+            inferColumnType(header, data)
+          )
         })
 
         if (chunkNumber === 0) {
@@ -167,6 +168,9 @@ export const parseSpreadsheet = (
         onProgressUpdate(progress > 1 ? 100 : Number((progress * 100).toFixed(2)))
       },
       complete: () => {
+        headers.forEach((header) => {
+          if (!has(columnTypeMap, header)) columnTypeMap[header] = 'text'
+        })
         const data = {
           headers,
           emptyStringAsNullHeaders:
@@ -188,8 +192,24 @@ export const revertSpreadsheet = (headers: string[], rows: any[]) => {
 
 export type InferredColumnType = 'int8' | 'float8' | 'bool' | 'jsonb' | 'timestamptz' | 'text'
 
+const hasCellValue = (value: unknown) => value !== null && value !== undefined
+
+/**
+ * Combine the types inferred for the same column from two chunks of a file.
+ * Integers in one chunk and decimals in another make a float8 column.
+ */
+const mergeInferredColumnTypes = (
+  current: InferredColumnType | undefined,
+  next: InferredColumnType
+): InferredColumnType => {
+  if (current === undefined || current === next) return next
+  const numericTypes: InferredColumnType[] = ['int8', 'float8']
+  if (numericTypes.includes(current) && numericTypes.includes(next)) return 'float8'
+  return 'text'
+}
+
 export const inferColumnType = (column: string, rows: unknown[]): InferredColumnType => {
-  // General strategy is to check the first row first, before checking across all the rows
+  // General strategy is to check the first value first, before checking across all the rows
   // to ensure uniformity in data type. Thinking we do this as an optimization instead of
   // checking all the rows up front.
 
@@ -201,8 +221,8 @@ export const inferColumnType = (column: string, rows: unknown[]): InferredColumn
     return 'text'
   }
 
-  const columnData = firstRow[column]
   const columnDataAcrossRows = rows.map((row) => (isObject(row) ? row[column] : undefined))
+  const columnData = columnDataAcrossRows.find(hasCellValue)
 
   // Unable to infer any type as there's no data, default to text
   if (columnData === undefined || columnData === null) {
