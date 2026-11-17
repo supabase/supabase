@@ -23,9 +23,6 @@ function getFilePaths(folderPath: string, baseFolder = ''): string[] {
       filepaths.push(...subFolderPaths)
     } else {
       const filePathRelativeToBase = path.join(baseFolder, file)
-      if (file !== '.DS_Store') {
-        filepaths.push(filePathRelativeToBase)
-      }
       filepaths.push(filePathRelativeToBase)
     }
   }
