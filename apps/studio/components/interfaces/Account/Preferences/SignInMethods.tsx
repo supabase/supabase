@@ -1,7 +1,7 @@
 import type { Provider } from '@supabase/auth-js'
 import { useFlag } from 'common'
 import dayjs from 'dayjs'
-import { EditIcon, MailIcon, UnlinkIcon } from 'lucide-react'
+import { EditIcon, LockIcon, MailIcon, UnlinkIcon } from 'lucide-react'
 import Link from 'next/link'
 import { useRouter } from 'next/router'
 import { useEffect, useMemo, useState } from 'react'
@@ -31,13 +31,17 @@ import {
 } from 'ui-patterns/PageSection'
 import { ShimmeringLoader } from 'ui-patterns/ShimmeringLoader'
 
-import { AddPasswordRow } from './AddPasswordRow'
+import { AddPasswordNotice } from './AddPasswordNotice'
 import {
   ChangeEmailAddressForm,
   GitHubChangeEmailAddress,
   SSOChangeEmailAddress,
 } from './ChangeEmailAddress'
-import { parseRedirectMessage, shouldShowAddPasswordRow } from './SignInMethods.utils'
+import {
+  canUnlinkIdentity,
+  parseRedirectMessage,
+  shouldShowAddPasswordRow,
+} from './SignInMethods.utils'
 import { AlertError } from '@/components/ui/AlertError'
 import { ButtonTooltip } from '@/components/ui/ButtonTooltip'
 import { IdentityProviderIcon } from '@/components/ui/ProviderIcon'
@@ -73,7 +77,6 @@ export const SignInMethods = ({
   const isAddAccountPasswordEnabled = useFlag('enableAccountPassword')
 
   const identities = data?.identities ?? []
-  const isManagedAccount = identities.some((identity) => identity.provider.startsWith('sso'))
   const hasSingleOAuthIdentity = isSingleOAuthIdentity({ identities, email: data?.email })
   const showAddPasswordRow =
     isAddAccountPasswordEnabled && shouldShowAddPasswordRow({ identities, email: data?.email })
@@ -108,6 +111,12 @@ export const SignInMethods = ({
     )
 
   const onConfirmUnlinkIdentity = async () => {
+    if (!selectedProviderUnlink) return
+    if (
+      !canUnlinkIdentity({ provider: selectedProviderUnlink, identityCount: identities.length })
+    ) {
+      return
+    }
     const identity = identities.find((i) => i.provider === selectedProviderUnlink)
     if (identity) unlinkIdentity(identity)
   }
@@ -154,7 +163,7 @@ export const SignInMethods = ({
       <PageSectionContent className="flex flex-col gap-4">
         {isError && <AlertError error={error} subject="Failed to retrieve sign-in methods" />}
         {isSuccess && showAddPasswordRow && !!data.email && (
-          <AddPasswordRow
+          <AddPasswordNotice
             email={data.email}
             providerName={
               hasSingleOAuthIdentity ? getProviderName(identities[0]?.provider) : undefined
@@ -172,9 +181,15 @@ export const SignInMethods = ({
             <div className="divide-y">
               {identities.map((identity) => {
                 const { identity_id, provider } = identity
+                const isSso = provider.startsWith('sso')
                 const username = identity.identity_data?.user_name
-                const providerDisplay = getProviderDisplay(provider)
-                const providerName = providerDisplay.displayName
+                const accountLabel = [
+                  !isSso && username !== identity.email ? username : undefined,
+                  identity.email,
+                ]
+                  .filter(Boolean)
+                  .join(' · ')
+                const providerName = getProviderName(provider)
                 const configuredProvider = getConfiguredExternalProvider(provider)
                 const canUpdateEmail = !configuredProvider
 
@@ -197,10 +212,12 @@ export const SignInMethods = ({
                             </Tooltip>
                           )}
                         </div>
-                        <p className="text-sm text-foreground-lighter">
-                          {!!username ? <span>{username} · </span> : null}
-                          {identity.email}
-                        </p>
+                        <p className="text-sm text-foreground-lighter">{accountLabel}</p>
+                        {isSso && (
+                          <p className="text-sm text-foreground-lighter">
+                            Your organization manages how you sign in.
+                          </p>
+                        )}
                       </div>
                     </div>
                     <div className="flex items-center gap-x-1">
@@ -225,8 +242,22 @@ export const SignInMethods = ({
                           icon={<UnlinkIcon />}
                           aria-label={`Unlink ${providerName} identity`}
                           className="w-7"
+                          disabled={
+                            !canUnlinkIdentity({
+                              provider,
+                              identityCount: identities.length,
+                            })
+                          }
                           onClick={() => setSelectedProviderUnlink(provider)}
-                          tooltip={{ content: { side: 'bottom', text: 'Unlink identity' } }}
+                          tooltip={{
+                            content: {
+                              side: 'bottom',
+                              text:
+                                provider === 'email'
+                                  ? 'Temporarily unavailable'
+                                  : 'Unlink identity',
+                            },
+                          }}
                         />
                       )}
                     </div>
@@ -264,11 +295,6 @@ export const SignInMethods = ({
             </div>
           )}
         </Card>
-        {isSuccess && isManagedAccount && (
-          <p className="text-sm text-foreground-light">
-            Your organization manages how you sign in.
-          </p>
-        )}
 
         <Dialog
           open={!!selectedProviderUpdateEmail}
@@ -279,9 +305,17 @@ export const SignInMethods = ({
           <DialogContent>
             <DialogHeader className="border-b">
               <DialogTitle>
-                {selectedProviderUpdateEmail !== 'email'
-                  ? `Updating email address for ${getProviderName(selectedProviderUpdateEmail)} identity`
-                  : 'Update email address'}
+                {selectedProviderUpdateEmail !== 'email' ? (
+                  <>
+                    Update email address for{' '}
+                    <span className="capitalize">
+                      {getProviderName(selectedProviderUpdateEmail)}
+                    </span>{' '}
+                    identity
+                  </>
+                ) : (
+                  'Update email address'
+                )}
               </DialogTitle>
             </DialogHeader>
             {selectedProviderUpdateEmail === 'github' ? (
@@ -318,6 +352,8 @@ export const SignInMethods = ({
 
 const SignInMethodIcon = ({ provider }: { provider: string }) => {
   const display = getProviderDisplay(provider)
+  const isSso = provider.startsWith('sso')
+  const OutlineIcon = isSso ? LockIcon : MailIcon
   return (
     <div
       className={cn(
@@ -325,8 +361,8 @@ const SignInMethodIcon = ({ provider }: { provider: string }) => {
         display.displayName === 'GitHub' ? 'bg-transparent' : 'bg-selection'
       )}
     >
-      {provider === 'email' ? (
-        <MailIcon size={18} strokeWidth={2.5} />
+      {isSso || provider === 'email' ? (
+        <OutlineIcon size={18} strokeWidth={2.5} className="text-foreground-lighter" />
       ) : (
         <IdentityProviderIcon display={display} size={30} />
       )}

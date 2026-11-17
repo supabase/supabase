@@ -1,4 +1,5 @@
 import { fireEvent, screen, waitFor, within } from '@testing-library/react'
+import userEvent from '@testing-library/user-event'
 import { mockAnimationsApi } from 'jsdom-testing-mocks'
 import { http, HttpResponse } from 'msw'
 import { beforeEach, describe, expect, it, vi } from 'vitest'
@@ -162,6 +163,24 @@ describe('SignInMethods', () => {
     expect(screen.queryByRole('button', { name: 'Add password' })).not.toBeInTheDocument()
   })
 
+  it('disables unlink for email while still allowing unlink for another identity', async () => {
+    mockGetUser([githubIdentity, emailIdentity])
+
+    renderSignInMethods()
+
+    expect(await screen.findByRole('link', { name: 'Change password' })).toBeInTheDocument()
+
+    const emailUnlink = screen.getByRole('button', { name: 'Unlink Email identity' })
+    expect(emailUnlink).toHaveAttribute('aria-disabled', 'true')
+    await userEvent.hover(emailUnlink)
+    expect(
+      await screen.findByRole('tooltip', { name: 'Temporarily unavailable' })
+    ).toBeInTheDocument()
+
+    const githubUnlink = screen.getByRole('button', { name: 'Unlink GitHub identity' })
+    expect(githubUnlink).not.toHaveAttribute('aria-disabled', 'true')
+  })
+
   it('does not offer to add a password when the feature flag is disabled', async () => {
     useFlagMock.mockReturnValue(false)
     mockGetUser([githubIdentity])
@@ -173,12 +192,14 @@ describe('SignInMethods', () => {
     expect(screen.queryByText('Email')).not.toBeInTheDocument()
   })
 
-  it('does not offer to add a password to SSO users', async () => {
-    mockGetUser([ssoIdentity])
+  it('shows a single email for managed SSO sign-in without offering password setup', async () => {
+    mockGetUser([{ ...ssoIdentity, identity_data: { user_name: EMAIL } }])
 
     renderSignInMethods()
 
     expect(await screen.findByText('SSO')).toBeInTheDocument()
+    expect(screen.getByText(EMAIL, { exact: true })).toBeInTheDocument()
+    expect(screen.queryByText(`${EMAIL} · ${EMAIL}`)).not.toBeInTheDocument()
     expect(screen.getByText('Your organization manages how you sign in.')).toBeInTheDocument()
     expect(screen.queryByRole('button', { name: 'Add password' })).not.toBeInTheDocument()
   })

@@ -182,6 +182,7 @@ export const AssistantQueryCell = ({
         roleImpersonationState={roleImpersonationState}
         display={display}
         isRunDisabled={isRunDisabled}
+        isExternallyExecuting={confirmState === 'approval-responded'}
         onTitleChange={handleTitleChange}
         onSqlChange={(sql) => setQuery((current) => setAssistantQuerySql(current, sql))}
         onSourceChange={handleSourceChange}

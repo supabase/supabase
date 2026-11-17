@@ -1,6 +1,6 @@
-import type { FlowDestination } from './DestinationPanel.types'
+import type { DestinationType } from './DestinationPanel.types'
 
-export const DESTINATION_DOCS_PATHS: Record<FlowDestination, string> = {
+export const DESTINATION_DOCS_PATHS: Record<DestinationType, string> = {
   BigQuery: '/guides/database/replication/pipelines/bigquery#configure-bigquery-as-a-destination',
   ClickHouse:
     '/guides/database/replication/pipelines/clickhouse#configure-clickhouse-as-a-destination',

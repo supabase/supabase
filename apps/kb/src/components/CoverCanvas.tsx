@@ -3,7 +3,7 @@ import { cn } from 'ui'
 import { toOpaque } from 'ui-patterns/GlyphLines'
 
 import { CELL_HEIGHT, CELL_WIDTH, clamp, fitEdges, uniformEdges } from '../lib/ascii/field'
-import { drawFluid, FLUID_RISE_MS } from '../lib/ascii/fluid'
+import { drawFluid } from '../lib/ascii/fluid'
 import { circlePoints, fillGlyphPath, GLYPH_FONT } from '../lib/ascii/glyph-path'
 import { createLayer, sizeLayers, tracePolygon } from '../lib/ascii/layer'
 import { easeInOutCubic } from '../lib/ascii/warp'
@@ -18,7 +18,8 @@ import {
   type IsoPoint,
   type IsoRing,
   type IsoView,
-} from '../lib/iso-shapes'
+} from 'ui-patterns/IsoShape/IsoShape.geometry'
+import { FLUID_RISE_MS } from 'ui-patterns/IsoShape/IsoShape.glyphs'
 import { ColorProbes, observeTheme, readProbeColor } from './ColorProbes'
 
 export interface CoverCanvasProps {

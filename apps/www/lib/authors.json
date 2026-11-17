@@ -53,6 +53,13 @@
     "author_image_url": "https://github.com/fracek.png"
   },
   {
+    "author_id": "grant_huston",
+    "author": "Grant Huston",
+    "position": "Growth",
+    "author_url": "https://www.linkedin.com/in/grant-huston/",
+    "author_image_url": "/images/blog/avatars/grant-huston.jpg"
+  },
+  {
     "author_id": "gurjeet",
     "author": "Gurjeet Singh",
     "username": "gurjeet",

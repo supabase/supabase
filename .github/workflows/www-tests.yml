@@ -8,7 +8,6 @@ on:
       - 'apps/www/**/*.ts*'
       - 'apps/www/package.json'
       - 'apps/www/turbo.jsonc'
-      - 'scripts/upload-static-assets.sh'
       - 'packages/common/sentry.ts'
       - 'packages/common/sentry.test.ts'
       - 'apps/www/next.config.mjs'

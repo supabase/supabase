@@ -38,6 +38,8 @@ async function getPublicBucketsWithSelectPolicies({
   const { result } = await executeSql<PublicBucketSelectPolicy[]>({
     projectRef,
     connectionString,
+    sqlOrigin: 'studio',
+    queryName: 'public-buckets-with-select-policies',
     sql: safeSql`
       SELECT b.id AS bucket_id, b.name AS bucket_name, p.policyname
       FROM storage.buckets b

@@ -1,6 +1,7 @@
 // GENERAL
 
 export * from './src/components/Button'
+export * from './src/components/Button/SplitButtonGroup'
 export * from './src/components/FloatingPlate'
 export * from './src/components/Icon/IconBackground'
 
@@ -20,6 +21,8 @@ export {
   removeAnchor,
   highlightSelectedNavItem,
 } from './src/components/CustomHTMLElements'
+export { CopyHeadingLinkButton } from './src/components/CustomHTMLElements/CopyHeadingLinkButton'
+export { CrossfadeIcon } from './src/components/CrossfadeIcon/CrossfadeIcon'
 
 // UTILITIES
 
