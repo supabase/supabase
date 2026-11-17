@@ -4,7 +4,7 @@ import userEvent from '@testing-library/user-event'
 import type { platformComponents as components } from 'api-types'
 import dayjs from 'dayjs'
 import { HttpResponse } from 'msw'
-import { beforeEach, expect, test } from 'vitest'
+import { beforeEach, expect, test, vi } from 'vitest'
 
 import { WarehouseMetricsReport } from './WarehouseMetricsReport'
 import { organizationKeys } from '@/data/organizations/keys'
@@ -65,10 +65,11 @@ const mockMetrics = (value: number | null) =>
     path: '/platform/warehouse/:ref/metrics',
     response: () => HttpResponse.json<WarehouseMetricsResponse>(response(value)),
   })
-const renderReport = () => {
+const renderReport = (enabled = true) => {
   const queryClient = new QueryClient({
     defaultOptions: { queries: { retry: false, staleTime: Infinity } },
   })
+  queryClient.setQueryData(['warehouse-configcat-flag', 'default'], enabled ? ['free-org'] : [])
   queryClient.setQueryData(projectKeys.detail('default'), { organization_id: 1 })
   queryClient.setQueryData(organizationKeys.list(), [
     { id: 1, slug: 'free-org', plan: { id: 'free' } },
@@ -105,15 +106,18 @@ test('renders measured zero as query activity', async () => {
   ).toBeInTheDocument()
   expect(screen.queryByText('No data in the selected period')).not.toBeInTheDocument()
 })
-test('offers setup when Warehouse has not been configured', async () => {
-  mockSetup('not_started')
-  mockMetrics(null)
-  renderReport()
-  expect(await screen.findByRole('link', { name: 'Set up Warehouse' })).toHaveAttribute(
-    'href',
-    '/project/default/integrations/warehouse/overview'
-  )
-})
+test.each(['not_started', 'disabled'] as const)(
+  'offers setup when Warehouse is %s',
+  async (status) => {
+    mockSetup(status)
+    mockMetrics(null)
+    renderReport()
+    expect(await screen.findByRole('link', { name: 'Set up Warehouse' })).toHaveAttribute(
+      'href',
+      '/project/default/integrations/warehouse/overview'
+    )
+  }
+)
 test('shows a request failure rather than a no-data state', async () => {
   addAPIMock({
     method: 'get',
@@ -172,4 +176,20 @@ test('shows the retention upgrade prompt instead of requesting seven days on a f
   await userEvent.click(screen.getByRole('button', { name: /Last 60 minutes/ }))
   await userEvent.click(screen.getByText('Last 7 days'))
   expect(await screen.findByRole('dialog')).toHaveTextContent('Report date range')
+})
+
+test('does not request Warehouse data without access', async () => {
+  const setupRequest = vi.fn(() => HttpResponse.json<Setup>(setup))
+  const metricsRequest = vi.fn(() => HttpResponse.json<WarehouseMetricsResponse>(response(null)))
+  addAPIMock({
+    method: 'get',
+    path: '/platform/warehouse/:ref/setup-status',
+    response: setupRequest,
+  })
+  addAPIMock({ method: 'get', path: '/platform/warehouse/:ref/metrics', response: metricsRequest })
+  renderReport(false)
+  expect(await screen.findByText('Warehouse metrics are unavailable')).toBeInTheDocument()
+  expect(screen.queryByRole('link', { name: 'Set up Warehouse' })).not.toBeInTheDocument()
+  expect(setupRequest).not.toHaveBeenCalled()
+  expect(metricsRequest).not.toHaveBeenCalled()
 })

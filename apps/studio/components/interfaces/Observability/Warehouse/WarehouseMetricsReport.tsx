@@ -20,10 +20,23 @@ import { InlineLink } from '@/components/ui/InlineLink'
 import { warehouseKeys } from '@/data/warehouse/keys'
 import { warehouseMetricsQueryOptions } from '@/data/warehouse/warehouse-metrics-query'
 import { useWarehouseSetupStatusQuery } from '@/data/warehouse/warehouse-setup-status-query'
+import { useIsWarehouseEnabled } from '@/hooks/misc/useIsWarehouseEnabled'
 import { useRefreshHandler, useReportDateRange } from '@/hooks/misc/useReportDateRange'
 import { IS_PLATFORM } from '@/lib/constants'
 
 export const WarehouseMetricsReport = () => {
+  const isWarehouseEnabled = useIsWarehouseEnabled()
+  if (!isWarehouseEnabled)
+    return (
+      <>
+        <ReportHeader title="Warehouse" showDatabaseSelector={false} />
+        <Admonition layout="responsive" title="Warehouse metrics are unavailable" />
+      </>
+    )
+  return <WarehouseMetricsReportContent />
+}
+
+const WarehouseMetricsReportContent = () => {
   const { ref } = useParams()
   const queryClient = useQueryClient()
   const {
@@ -134,7 +147,11 @@ export const WarehouseMetricsReport = () => {
         <EmptyStatePresentational
           icon={WarehouseIcon}
           title={isDisabled ? 'Warehouse is disabled' : 'Warehouse is not set up'}
-          description="Set up Warehouse to run analytical queries and monitor their activity here."
+          description={
+            isDisabled
+              ? 'Set up Warehouse again to query a replicated copy of your data and monitor its latency, failures, and capacity here.'
+              : 'Run analytical queries on a replicated copy of your data, then monitor query latency, failures, and capacity here.'
+          }
         >
           <Button asChild variant="default">
             <InlineLink
