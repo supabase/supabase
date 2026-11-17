@@ -248,7 +248,7 @@ const WarehouseWorkloadMetrics = () => {
           <WarehouseWorkloadChart
             title="Query rate"
             unit="/s"
-            description="Work started per second, including metadata lookups."
+            description="Queries started per second. Not a count of SQL statements."
             points={getWarehouseSummaryPoints(data, 'query_rate')}
             metric={rate}
             value={rate.value === null ? undefined : `${formatNumber(rate.value)}/s`}

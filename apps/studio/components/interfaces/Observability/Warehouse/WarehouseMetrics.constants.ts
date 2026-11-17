@@ -41,8 +41,7 @@ export const WAREHOUSE_METRICS_SECTIONS: readonly WarehouseSectionDef[] = [
       {
         id: 'query-rate',
         title: 'Query rate',
-        tooltip:
-          'Work started per second, including metadata lookups. Not a count of SQL statements.',
+        tooltip: 'Queries started per second. Not a count of SQL statements.',
         format: '/s',
         primaryMetric: 'query_rate',
         series: [{ metric: 'query_rate', label: 'Queries' }],
@@ -96,7 +95,7 @@ export const WAREHOUSE_METRICS_SECTIONS: readonly WarehouseSectionDef[] = [
         id: 'worker-wait',
         title: 'Time waiting for a worker',
         tooltip:
-          'Time spent acquiring a worker, measured per attempt including retries, rather than per query.',
+          'Time spent acquiring a worker, excluding SQL setup such as DuckLake connections, measured per attempt including retries rather than per query.',
         format: 'ms',
         primaryMetric: 'assignment_wait_p95',
         series: [
