@@ -27,38 +27,23 @@ const freePlanQueryClient = () => {
   return queryClient
 }
 
-describe('fixed report retention', () => {
+describe('organization log retention', () => {
   test.each([7, 30])(
-    'allows a %s-day range on a free plan without an upgrade prompt',
+    'requires an upgrade for a %s-day range beyond log retention',
     async (days) => {
-      const { result } = customRenderHook(
-        () =>
-          useReportDateRange(REPORT_DATERANGE_HELPER_LABELS.LAST_60_MINUTES, { retentionDays: 30 }),
-        { queryClient: freePlanQueryClient() }
-      )
+      const { result } = customRenderHook(() => useReportDateRange(), {
+        queryClient: freePlanQueryClient(),
+      })
       const from = dayjs().subtract(days, 'day').toISOString()
-      const to = dayjs().toISOString()
 
       await act(async () => {
-        expect(result.current.handleDatePickerChange({ from, to })).toBe(false)
+        expect(result.current.handleDatePickerChange({ from, to: dayjs().toISOString() })).toBe(
+          true
+        )
       })
 
-      expect(result.current.selectedDateRange.period_start.date).toBe(from)
-      expect(result.current.showUpgradePrompt).toBe(false)
+      expect(result.current.showUpgradePrompt).toBe(true)
+      expect(result.current.selectedDateRange.period_start.date).not.toBe(from)
     }
   )
-
-  test('preserves plan-based retention for existing reports', async () => {
-    const { result } = customRenderHook(() => useReportDateRange(), {
-      queryClient: freePlanQueryClient(),
-    })
-    const from = dayjs().subtract(7, 'day').toISOString()
-
-    await act(async () => {
-      expect(result.current.handleDatePickerChange({ from, to: dayjs().toISOString() })).toBe(true)
-    })
-
-    expect(result.current.showUpgradePrompt).toBe(true)
-    expect(result.current.selectedDateRange.period_start.date).not.toBe(from)
-  })
 })

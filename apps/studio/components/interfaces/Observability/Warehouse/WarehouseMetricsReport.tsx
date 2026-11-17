@@ -16,11 +16,7 @@ import {
 import { Admonition } from 'ui-patterns/Admonition'
 import { GenericSkeletonLoader } from 'ui-patterns/ShimmeringLoader'
 
-import {
-  getSectionAttributes,
-  WAREHOUSE_METRICS_MAX_RANGE_DAYS,
-  WAREHOUSE_METRICS_SECTIONS,
-} from './WarehouseMetrics.constants'
+import { getSectionAttributes, WAREHOUSE_METRICS_SECTIONS } from './WarehouseMetrics.constants'
 import {
   getWarehouseMetricsPageState,
   resolveWarehouseMetricsRange,
@@ -64,9 +60,7 @@ export const WarehouseMetricsReport = () => {
     datePickerValue,
     datePickerHelpers,
     handleDatePickerChange,
-  } = useReportDateRange(REPORT_DATERANGE_HELPER_LABELS.LAST_60_MINUTES, {
-    retentionDays: WAREHOUSE_METRICS_MAX_RANGE_DAYS,
-  })
+  } = useReportDateRange(REPORT_DATERANGE_HELPER_LABELS.LAST_60_MINUTES)
 
   // Out-of-range bounds are rewritten and in-range ones pass through unchanged,
   // so the query keys stay stable across renders.
@@ -254,7 +248,6 @@ export const WarehouseMetricsReport = () => {
               onSubmit={handleDatePickerChange}
               value={datePickerValue}
               helpers={datePickerHelpers}
-              retentionDays={WAREHOUSE_METRICS_MAX_RANGE_DAYS}
               open={showDatePicker}
               onOpenChange={setShowDatePicker}
               shortcutId={SHORTCUT_IDS.OBSERVABILITY_TOGGLE_DATE_PICKER}

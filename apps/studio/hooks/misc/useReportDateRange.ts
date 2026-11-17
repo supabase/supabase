@@ -78,12 +78,11 @@ export const useReportDateRange = (
   defaultHelper:
     | REPORT_DATERANGE_HELPER_LABELS
     | string
-    | ReportsDatetimeHelper = REPORT_DATERANGE_HELPER_LABELS.LAST_60_MINUTES,
-  { retentionDays }: { retentionDays?: number } = {}
+    | ReportsDatetimeHelper = REPORT_DATERANGE_HELPER_LABELS.LAST_60_MINUTES
 ) => {
   const { plan: orgPlan, isLoading: isOrgPlanLoading } = useCurrentOrgPlan()
   const { getEntitlementNumericValue } = useCheckEntitlements('log.retention_days')
-  const entitledToAuditLogDays = retentionDays ?? getEntitlementNumericValue()
+  const entitledToAuditLogDays = getEntitlementNumericValue()
   const [showUpgradePrompt, setShowUpgradePrompt] = useState(false)
 
   // Get filtered date picker helpers based on organization plan
@@ -169,15 +168,14 @@ export const useReportDateRange = (
         storedFrom.isValid() &&
         storedFrom.isAfter(now.subtract(90, 'day')) &&
         storedFrom.isBefore(now.add(1, 'day')) &&
-        (retentionDays !== undefined ||
-          !maybeShowUpgradePromptIfNotEntitled(timestampStartValue, entitledToAuditLogDays))
+        !maybeShowUpgradePromptIfNotEntitled(timestampStartValue, entitledToAuditLogDays)
       ) {
         return timestampStartValue
       }
     }
     // Return default without setting URL
     return getDefaultHelper().start
-  }, [timestampStartValue, getDefaultHelper, entitledToAuditLogDays, retentionDays])
+  }, [timestampStartValue, getDefaultHelper, entitledToAuditLogDays])
 
   const timestampEnd = useMemo(() => {
     if (timestampEndValue) {
@@ -257,9 +255,10 @@ export const useReportDateRange = (
   )
 
   const handleDatePickerChange = (values: DatePickerValue) => {
-    const shouldShowUpgradePrompt =
-      retentionDays === undefined &&
-      maybeShowUpgradePromptIfNotEntitled(values.from, entitledToAuditLogDays)
+    const shouldShowUpgradePrompt = maybeShowUpgradePromptIfNotEntitled(
+      values.from,
+      entitledToAuditLogDays
+    )
     if (shouldShowUpgradePrompt) {
       setShowUpgradePrompt(true)
       return true

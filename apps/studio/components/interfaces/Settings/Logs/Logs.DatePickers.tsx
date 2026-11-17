@@ -46,7 +46,6 @@ interface LogsDatePickerProps {
   buttonTriggerProps?: ButtonProps
   popoverContentProps?: typeof PopoverContent
   hideWarnings?: boolean
-  retentionDays?: number
   align?: 'start' | 'end' | 'center'
   open?: boolean
   onOpenChange?: (open: boolean) => void
@@ -66,7 +65,6 @@ export const LogsDatePicker = ({
   buttonTriggerProps,
   popoverContentProps,
   hideWarnings,
-  retentionDays,
   align = 'end',
   open: openProp,
   onOpenChange,
@@ -275,7 +273,7 @@ export const LogsDatePicker = ({
     LOGS_LARGE_DATE_RANGE_DAYS_THRESHOLD - 1
 
   const { getEntitlementNumericValue } = useCheckEntitlements('log.retention_days')
-  const entitledToAuditLogDays = retentionDays ?? getEntitlementNumericValue()
+  const entitledToAuditLogDays = getEntitlementNumericValue()
 
   const showHelperBadge = (helper?: DatetimeHelper) => {
     if (!helper) return false
