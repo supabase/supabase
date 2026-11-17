@@ -1,0 +1,44 @@
+{
+  "title": "Reference library index frontmatter",
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "type": "object",
+  "properties": {
+    "title": {
+      "type": "string"
+    },
+    "package": {
+      "description": "Package or binary name shown under the title, e.g. `@supabase/server`.",
+      "type": "string"
+    },
+    "repo": {
+      "description": "Source repository, linked from the package name.",
+      "type": "string",
+      "format": "uri"
+    },
+    "icon": {
+      "description": "Menu icon id shown next to the title, e.g. `reference-javascript`.",
+      "type": "string"
+    },
+    "version": {
+      "type": "string"
+    },
+    "description": {
+      "type": "string"
+    },
+    "category_order": {
+      "description": "Category ids in display order. Unlisted categories follow alphabetically.",
+      "type": "array",
+      "items": {
+        "type": "string"
+      }
+    },
+    "code_lang": {
+      "description": "Language used to label signatures.",
+      "type": "string"
+    }
+  },
+  "required": [
+    "title"
+  ],
+  "additionalProperties": false
+}
