@@ -173,6 +173,9 @@ export const LogsViewsBar = ({
 
       <RenameViewDialog
         view={renameTarget}
+        existingNames={views
+          .filter((view) => view.id !== renameTarget?.id)
+          .map((view) => view.name)}
         onCancel={() => setRenameTarget(null)}
         onRename={onRename}
       />

@@ -1,5 +1,5 @@
 import { zodResolver } from '@hookform/resolvers/zod'
-import { useEffect } from 'react'
+import { useEffect, useMemo } from 'react'
 import { useForm, useWatch } from 'react-hook-form'
 import {
   Button,
@@ -20,22 +20,37 @@ import * as z from 'zod'
 
 import { type LogsView } from '../UnifiedLogs.views'
 import { VIEW_NAME_MAX_LENGTH } from './SaveViewDialog'
-
-const schema = z.object({
-  name: z
-    .string()
-    .trim()
-    .min(1, 'Enter a name for this view')
-    .max(VIEW_NAME_MAX_LENGTH, `Keep the name to ${VIEW_NAME_MAX_LENGTH} characters or less.`),
-})
+import { isDuplicateViewName } from './SaveViewDialog.utils'
 
 interface RenameViewDialogProps {
   view: LogsView | null
+  existingNames?: string[]
   onCancel: () => void
   onRename: (id: string, name: string) => Promise<void>
 }
 
-export const RenameViewDialog = ({ view, onCancel, onRename }: RenameViewDialogProps) => {
+export const RenameViewDialog = ({
+  view,
+  existingNames = [],
+  onCancel,
+  onRename,
+}: RenameViewDialogProps) => {
+  const schema = useMemo(
+    () =>
+      z.object({
+        name: z
+          .string()
+          .trim()
+          .min(1, 'Enter a name for this view')
+          .max(VIEW_NAME_MAX_LENGTH, `Keep the name to ${VIEW_NAME_MAX_LENGTH} characters or less.`)
+          .refine(
+            (name) => !isDuplicateViewName(name, existingNames),
+            "That name's already taken. Try another."
+          ),
+      }),
+    [existingNames]
+  )
+
   const form = useForm<z.infer<typeof schema>>({
     resolver: zodResolver(schema),
     defaultValues: { name: '' },

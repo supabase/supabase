@@ -140,6 +140,48 @@ describe('LogsViewsBar', () => {
     expect(onRename).not.toHaveBeenCalled()
   })
 
+  it('rejects renaming a view to another view name', async () => {
+    const onRename = vi.fn()
+    customRender(
+      <LogsViewsBar
+        {...baseProps}
+        views={[makeView(), makeView({ id: 'view-2', name: 'Slow requests' })]}
+        onRename={onRename}
+      />
+    )
+
+    await openChipMenu('Errors only')
+    await userEvent.click(await screen.findByRole('menuitem', { name: 'Rename' }))
+
+    const input = await screen.findByDisplayValue('Errors only')
+    await userEvent.clear(input)
+    await userEvent.type(input, ' slow requests ')
+    await act(async () => fireEvent.click(screen.getByRole('button', { name: 'Rename view' })))
+
+    expect(await screen.findByText("That name's already taken. Try another.")).toBeInTheDocument()
+    expect(onRename).not.toHaveBeenCalled()
+  })
+
+  it('allows keeping a view its own name', async () => {
+    const onRename = vi.fn()
+    customRender(
+      <LogsViewsBar
+        {...baseProps}
+        views={[makeView(), makeView({ id: 'view-2', name: 'Slow requests' })]}
+        onRename={onRename}
+      />
+    )
+
+    await openChipMenu('Errors only')
+    await userEvent.click(await screen.findByRole('menuitem', { name: 'Rename' }))
+
+    await screen.findByDisplayValue('Errors only')
+    await act(async () => fireEvent.click(screen.getByRole('button', { name: 'Rename view' })))
+
+    await waitFor(() => expect(screen.queryByDisplayValue('Errors only')).toBeNull())
+    expect(screen.queryByText("That name's already taken. Try another.")).toBeNull()
+  })
+
   it('disables the rename submit when the name is cleared', async () => {
     const onRename = vi.fn()
     customRender(<LogsViewsBar {...baseProps} views={[makeView()]} onRename={onRename} />)
