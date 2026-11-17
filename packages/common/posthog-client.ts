@@ -5,7 +5,7 @@ import posthog, {
 } from 'posthog-js'
 
 import { safeSessionStorage } from './safe-storage'
-import { getTelemetryPlatform } from './telemetry-utils'
+import { getTelemetryCookieOptions, getTelemetryPlatform } from './telemetry-utils'
 
 export type { CapturedNetworkRequest, SessionRecordingOptions }
 
@@ -104,6 +104,11 @@ class PostHogClient {
         return event
       },
       loaded: (posthog) => {
+        // Subscribed before the flushes below: the first capture can rotate the session.
+        posthog.onSessionId((sessionId) => {
+          document.cookie = `session_id=${sessionId}; ${getTelemetryCookieOptions()}`
+        })
+
         // Apply pending properties that were set before PostHog
         // initialized due to poor connection or user not accepting
         // consent right away
