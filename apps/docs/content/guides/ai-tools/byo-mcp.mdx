@@ -126,7 +126,7 @@ pipeline([...], handler)
   handler                         MCP transport and your tools
 ```
 
-`withOAuthProtectedResource()` runs before the auth gate. It serves the OAuth Protected Resource Metadata document so clients can find your authorization server, and it adds the `WWW-Authenticate` challenge to unauthenticated responses. `withSupabase({ auth: 'user' })` rejects requests without a valid user token and gives your handler a [Supabase client](/docs/reference/javascript/initializing) scoped to that user. Anything the tools read or write goes through RLS.
+`withOAuthProtectedResource()` runs before the auth gate. It serves the OAuth Protected Resource Metadata document so clients can find your authorization server, and it adds the `WWW-Authenticate` challenge to unauthenticated responses. `withSupabase({ auth: 'user' })` rejects requests without a valid user token and gives your handler a [Supabase client](/docs/reference/javascript/introduction) scoped to that user. Anything the tools read or write goes through RLS.
 
 Two things must be in place beyond the prerequisites above:
 

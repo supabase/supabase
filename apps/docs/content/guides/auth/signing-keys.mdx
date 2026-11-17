@@ -107,7 +107,7 @@ GET https://project-id.supabase.co/auth/v1/.well-known/jwks.json
 
 Note that this is secure as public keys are irreversible and can only be used to verify the signature of JSON Web Tokens, but not create new ones.
 
-This discovery endpoint is cached by Supabase's edge servers for 10 minutes. Furthermore the [Supabase client](/docs/reference/javascript/initializing) libraries may cache the keys in memory for an additional 10 minutes. Your application may be using different caching behavior if you're not relying only on the Supabase client library.
+This discovery endpoint is cached by Supabase's edge servers for 10 minutes. Furthermore the [Supabase client](/docs/reference/javascript/introduction) libraries may cache the keys in memory for an additional 10 minutes. Your application may be using different caching behavior if you're not relying only on the Supabase client library.
 
 This multi-level cache is a trade-off allowing fast JWT verification without placing the Auth server in the hot path of your application, increasing its reliability and performance.
 

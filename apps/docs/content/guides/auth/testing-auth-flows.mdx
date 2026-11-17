@@ -16,7 +16,7 @@ The Supabase CLI sends every email from local Auth to Mailpit, an email testing 
    - **Project URL**: the local API URL, which is `http://127.0.0.1:54321` by default
    - **Publishable**: the local publishable key, which starts with `sb_publishable_`
    - **Mailpit**: the Mailpit URL, which is `http://127.0.0.1:54324` by default
-1. Connect your app to the local stack. Your app's [Supabase client](/docs/reference/javascript/initializing) reads a project URL and a publishable key from environment variables, which usually hold your hosted project's values. Replace them with the **Project URL** and **Publishable** key you copied from `supabase status`:
+1. Connect your app to the local stack. Your app's [Supabase client](/docs/reference/javascript/introduction) reads a project URL and a publishable key from environment variables, which usually hold your hosted project's values. Replace them with the **Project URL** and **Publishable** key you copied from `supabase status`:
 
    ```bash .env.local
    NEXT_PUBLIC_SUPABASE_URL=http://127.0.0.1:54321

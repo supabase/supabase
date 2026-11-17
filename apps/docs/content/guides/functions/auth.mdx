@@ -5,7 +5,7 @@ description: 'Authentication patterns for Supabase Edge Functions.'
 subtitle: 'Authentication patterns for Edge Functions'
 ---
 
-Secure an Edge Function by declaring which credentials it accepts. The `withSupabase` wrapper from the [`@supabase/server` package](https://github.com/supabase/server) on GitHub checks each caller against the `auth` mode you set. Your handler receives a preconfigured [Supabase client](/docs/reference/javascript/initializing) on `ctx`.
+Secure an Edge Function by declaring which credentials it accepts. The `withSupabase` wrapper from the [`@supabase/server` package](https://github.com/supabase/server) on GitHub checks each caller against the `auth` mode you set. Your handler receives a preconfigured [Supabase client](/docs/reference/javascript/introduction) on `ctx`.
 
 - [Choose an auth mode](#choose-an-auth-mode) compares the four modes. Start here if you aren't sure which one your function needs.
 - [Secure your function](#secure-your-function) has an example for each mode, plus how to combine modes and shape your own error response.
