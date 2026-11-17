@@ -1,9 +1,6 @@
-import { NextPage } from 'next'
-import Head from 'next/head'
-import { useRouter } from 'next/router'
+import { useLocation } from '@tanstack/react-router'
 import { cn } from 'ui'
 
-import { parseCatchAllRoute } from '@/compat/next/router'
 import {
   Header,
   LoadingCardView,
@@ -18,17 +15,17 @@ import { useCustomContent } from '@/hooks/custom-content/useCustomContent'
 import { withAuth } from '@/hooks/misc/withAuth'
 import { buildStudioPageTitle } from '@/lib/page-title'
 
-const GenericOrganizationPage: NextPage = () => {
-  const router = useRouter()
+function SelectOrganization() {
+  const { pathname, searchStr } = useLocation()
+  // `/org/_/billing` → ['billing']; the splat route nests under the `/org/_` route,
+  // which renders this page, so the trailing path is read from the location
+  const trailingSegments = pathname
+    .replace(/^\/org\/_\/?/, '')
+    .split('/')
+    .filter(Boolean)
+  const routeSlug = trailingSegments.length > 0 ? trailingSegments : undefined
   const { appTitle } = useCustomContent(['app:title'])
-  // Normalise the catch-all path across Next (`routeSlug: string[]`) and
-  // TanStack (`_splat: string`) so downstream URL building (buildOrgUrl)
-  // keeps working — see parseCatchAllRoute.
-  const { segments: routeSlug, queryParams } = parseCatchAllRoute(router.query, 'routeSlug')
-  const queryString =
-    Object.keys(queryParams).length > 0
-      ? new URLSearchParams(queryParams as Record<string, string>).toString()
-      : ''
+  const queryString = searchStr.replace(/^\?/, '')
 
   const { data: organizations, isPending: isLoading } = useOrganizationsQuery()
   const pageTitle = buildStudioPageTitle({
@@ -39,10 +36,8 @@ const GenericOrganizationPage: NextPage = () => {
 
   return (
     <>
-      <Head>
-        <title>{pageTitle}</title>
-        <meta name="description" content="Supabase Studio" />
-      </Head>
+      <title>{pageTitle}</title>
+      <meta name="description" content="Supabase Studio" />
       <Header />
       <PageLayout className="grow min-h-0" title="Select an organization to continue">
         <ScaffoldContainer>
@@ -81,4 +76,4 @@ const GenericOrganizationPage: NextPage = () => {
   )
 }
 
-export default withAuth(GenericOrganizationPage)
+export const SelectOrganizationPage = withAuth(SelectOrganization)
