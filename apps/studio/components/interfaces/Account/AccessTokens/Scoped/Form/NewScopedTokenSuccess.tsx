@@ -46,7 +46,8 @@ export const NewScopedTokenSuccess = ({
           <div className="space-y-1">
             <h3 className="text-sm text-foreground">Token created</h3>
             <p className="text-xs text-foreground-light">
-              Copy your new token{tokenName ? ` "${tokenName}"` : ''} and store it somewhere safe.
+              Copy your new token{tokenName ? <span>{` "${tokenName}"`}</span> : ''}{' '}
+              <span>and store it somewhere safe.</span>
             </p>
           </div>
 

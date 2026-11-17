@@ -95,6 +95,14 @@ describe('UnifiedLogs.queries (OTEL flat)', () => {
       expect(where).toContain(`NOT (source = 'function_logs')`)
     })
 
+    it('reads the path edge function rows store under request.pathname, falling back to request.path when it is missing', () => {
+      const sql = getUnifiedLogsQuery(withFilters('log_type:eq:edge function'))
+
+      expect(sql).toContain(
+        "source = 'function_edge_logs' AND log_attributes['request.pathname'] != '', log_attributes['request.pathname']"
+      )
+    })
+
     it('projects only Compute fields that exist on worker logs', () => {
       const sql = getUnifiedLogsQuery(withFilters('log_type:eq:compute'))
       const workerCondition =
@@ -105,7 +113,7 @@ describe('UnifiedLogs.queries (OTEL flat)', () => {
         `if(${workerCondition} OR source = 'etl_replication_logs', null, if(source = 'storage_logs', log_attributes['req.method'], log_attributes['request.method']))`
       )
       expect(sql).toContain(
-        `if(${workerCondition} OR source = 'etl_replication_logs', null, if(source = 'storage_logs', log_attributes['req.url'], log_attributes['request.path']))`
+        `if(${workerCondition} OR source = 'etl_replication_logs', null, multiIf(source = 'storage_logs', log_attributes['req.url'], source = 'function_edge_logs' AND log_attributes['request.pathname'] != '', log_attributes['request.pathname'], log_attributes['request.path']))`
       )
       expect(sql).toContain(
         `if(${workerCondition} OR source IN ('function_logs', 'etl_replication_logs'), log_attributes, map()) AS metadata`
@@ -137,7 +145,7 @@ describe('UnifiedLogs.queries (OTEL flat)', () => {
       expect(sql).toContain(`log_attributes['parsed.sql_state_code']`)
       expect(sql).toMatch(/END\) IN \('401'\)/)
       expect(sql).toContain(
-        `(if(source = 'storage_logs', log_attributes['req.url'], log_attributes['request.path'])) LIKE '%/customers%'`
+        `(multiIf(source = 'storage_logs', log_attributes['req.url'], source = 'function_edge_logs' AND log_attributes['request.pathname'] != '', log_attributes['request.pathname'], log_attributes['request.path'])) LIKE '%/customers%'`
       )
     })
 
@@ -163,12 +171,12 @@ describe('UnifiedLogs.queries (OTEL flat)', () => {
     it('flips LIKE to NOT LIKE when the pathname/host operator is `<>`', () => {
       const sql = getUnifiedLogsQuery(withFilters('pathname:neq:/health', 'host:neq:cdn.foo'))
       expect(sql).toContain(
-        `(if(source = 'storage_logs', log_attributes['req.url'], log_attributes['request.path'])) NOT LIKE '%/health%'`
+        `(multiIf(source = 'storage_logs', log_attributes['req.url'], source = 'function_edge_logs' AND log_attributes['request.pathname'] != '', log_attributes['request.pathname'], log_attributes['request.path'])) NOT LIKE '%/health%'`
       )
       expect(sql).toContain(`log_attributes['request.url'] NOT LIKE '%cdn.foo%'`)
     })
 
-    const pathExpr = `(if(source = 'storage_logs', log_attributes['req.url'], log_attributes['request.path']))`
+    const pathExpr = `(multiIf(source = 'storage_logs', log_attributes['req.url'], source = 'function_edge_logs' AND log_attributes['request.pathname'] != '', log_attributes['request.pathname'], log_attributes['request.path']))`
 
     it.each([
       ['pathname:ilike:Customers', `${pathExpr} ILIKE '%Customers%'`, null],
@@ -756,12 +764,11 @@ describe('Pipelines logs', () => {
     ['list', getUnifiedLogsQuery],
     ['counts', getLogsCountQuery],
     ['chart', getLogsChartQuery],
-  ])('uses the same source and string identity fallback for the %s', (_, buildQuery) => {
+  ])('uses only pipeline_id_v2 with the same source for the %s', (_, buildQuery) => {
     const sql = buildQuery(withFilters('log_type:eq:pipelines', `pipeline_id:eq:${pipelineId}`))
     expect(sql).toContain("source = 'etl_replication_logs'")
-    expect(sql).toContain(
-      "coalesce(nullIf(log_attributes['pipeline_id_v2'], ''), log_attributes['pipeline_id']) IN ('03dg2o5teb2eucxr9ggh3uie6')"
-    )
+    expect(sql).toContain("log_attributes['pipeline_id_v2'] IN ('03dg2o5teb2eucxr9ggh3uie6')")
+    expect(sql).not.toContain("log_attributes['pipeline_id']")
   })
 
   it('limits an identity-only filter to Pipelines logs', () => {
@@ -777,9 +784,7 @@ describe('Pipelines logs', () => {
       facet: 'pipeline_id',
       facetSearch: '03dg',
     })
-    expect(sql).toContain(
-      "coalesce(nullIf(log_attributes['pipeline_id_v2'], ''), log_attributes['pipeline_id'])"
-    )
+    expect(sql).toContain("log_attributes['pipeline_id_v2']")
     expect(sql).toContain("source = 'etl_replication_logs'")
     expect(sql).toContain("LIKE '%03dg%'")
     expect(sql).not.toContain("IN ('150')")
@@ -791,9 +796,7 @@ describe('Pipelines logs', () => {
       .split(/\bUNION ALL\b/)
       .find((branch) => branch.includes("facet = 'pipeline_id'"))
     expect(pipelineFacet).toBeDefined()
-    expect(pipelineFacet).toContain(
-      "coalesce(nullIf(log_attributes['pipeline_id_v2'], ''), log_attributes['pipeline_id'])"
-    )
+    expect(pipelineFacet).toContain("log_attributes['pipeline_id_v2']")
     expect(pipelineFacet).toContain("source = 'etl_replication_logs'")
     expect(pipelineFacet).not.toContain("IN ('150')")
   })
@@ -823,14 +826,17 @@ describe('Pipelines logs', () => {
     ['list', getUnifiedLogsQueryBQ],
     ['counts', getLogsCountQueryBQ],
     ['chart', getLogsChartQueryBQ],
-  ])('keeps the BigQuery %s compatible with an endpoint without the v2 column', (_, buildQuery) => {
-    const sql = buildQuery(withFilters('log_type:eq:pipelines', `pipeline_id:eq:${pipelineId}`))
-    expect(sql).toContain('from etl_replication_logs as pl')
-    expect(sql).toContain("json_value(to_json_string(pl), '$.pipeline_id_v2')")
-    expect(sql).toContain('cast(pl.pipeline_id as string)')
-    expect(sql).toContain("`pipeline_id` IN ('03dg2o5teb2eucxr9ggh3uie6')")
-    expect(sql).not.toContain('pl.pipeline_id_v2')
-  })
+  ])(
+    'reads only pipeline_id_v2 in the BigQuery %s without requiring a schema column',
+    (_, buildQuery) => {
+      const sql = buildQuery(withFilters('log_type:eq:pipelines', `pipeline_id:eq:${pipelineId}`))
+      expect(sql).toContain('from etl_replication_logs as pl')
+      expect(sql).toContain("json_value(to_json_string(pl), '$.pipeline_id_v2')")
+      expect(sql).not.toContain('cast(pl.pipeline_id as string)')
+      expect(sql).toContain("`pipeline_id` IN ('03dg2o5teb2eucxr9ggh3uie6')")
+      expect(sql).not.toContain('pl.pipeline_id_v2')
+    }
+  )
 
   it.each([getUnifiedLogsQuery, getUnifiedLogsQueryBQ])(
     'quotes an opaque identity safely',

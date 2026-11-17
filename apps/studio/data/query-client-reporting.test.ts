@@ -1,5 +1,7 @@
 import { beforeEach, describe, expect, it, vi } from 'vitest'
 
+import { PlatformError, UnclassifiedApiError } from '@/lib/errors/studio-errors'
+
 const captureException = vi.hoisted(() => vi.fn(() => 'event-123'))
 vi.mock('@sentry/nextjs', () => ({ captureException }))
 vi.mock('common', () => ({ IS_PLATFORM: false, getAccessToken: vi.fn() }))
@@ -69,5 +71,41 @@ describe('reporting errors from React Query', () => {
       expect.objectContaining({ _tag: 'UnexpectedError' }),
       expect.anything()
     )
+  })
+})
+
+describe('retry policy', () => {
+  const retry = client.getDefaultOptions().queries!.retry as (
+    failureCount: number,
+    error: unknown
+  ) => boolean
+
+  it.each([
+    '/platform/projects/{ref}/run-lints',
+    '/platform/organizations/{slug}/usage',
+    '/platform/pg-meta/{ref}/query',
+    '/v1/projects/{ref}/analytics/endpoints/logs.all',
+  ])('does not retry a server error from %s', (endpoint) => {
+    expect(retry(0, new PlatformError({ code: 500, endpoint }))).toBe(false)
+  })
+
+  it('still retries a rate limit from a skip-listed endpoint', () => {
+    const error = new UnclassifiedApiError({
+      code: 429,
+      endpoint: '/platform/pg-meta/{ref}/query',
+    })
+    expect(retry(0, error)).toBe(true)
+  })
+
+  it('retries a server error from another endpoint', () => {
+    expect(retry(0, new PlatformError({ code: 500, endpoint: '/platform/projects/{ref}' }))).toBe(
+      true
+    )
+  })
+
+  it('does not match concrete paths', () => {
+    expect(
+      retry(0, new PlatformError({ code: 500, endpoint: '/platform/pg-meta/abc/query' }))
+    ).toBe(true)
   })
 })

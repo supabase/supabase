@@ -35,9 +35,12 @@ const TocAnchorsProvider = ({ children }: PropsWithChildren) => {
       )
 
       const newHeadings = headings
-        .filter((heading) => heading.id)
+        // inactive tab panels stay mounted (hidden), so their headings aren't navigable
+        .filter(
+          (heading) => heading.id && !heading.closest('[role="tabpanel"][data-state="inactive"]')
+        )
         .map((heading) => {
-          const text = heading.textContent?.replace('#', '') || ''
+          const text = heading.textContent || ''
           const link = heading.id ? `#${heading.id}` : null
 
           const level = heading.tagName === 'H2' ? 2 : 3

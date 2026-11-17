@@ -36,6 +36,9 @@ export function useLocalStorage<T>(key: string, initialValue: T) {
   return [storedValue, setValue] as const
 }
 
+/** Query key `useLocalStorageQuery` caches `key` under, for writes made outside the hook. */
+export const getLocalStorageQueryKey = (key: string) => ['localStorage', key]
+
 /**
  * Hook to load/store values from local storage with an API similar
  * to `useState()`.
@@ -45,7 +48,7 @@ export function useLocalStorage<T>(key: string, initialValue: T) {
  */
 export function useLocalStorageQuery<T>(key: string, initialValue: T) {
   const queryClient = useQueryClient()
-  const queryKey = useMemo(() => ['localStorage', key], [key])
+  const queryKey = useMemo(() => getLocalStorageQueryKey(key), [key])
 
   const {
     error,

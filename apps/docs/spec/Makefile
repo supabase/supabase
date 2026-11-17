@@ -65,7 +65,7 @@ download.analytics.v0:
 ###############################################################################
 # `download.tsdoc.v2` now writes raw TypeDoc JSON directly under
 # `reference/javascript/v2/` — the new pipeline (`scripts/build-reference-content.ts`,
-# wired into `predev`/`prebuild` via `codegen:references:new`) walks those files
+# run as a turbo dependency of `dev` and `build` via `codegen:references:new`) walks those files
 # at build time, so no separate `dereference` / `combine` step is needed.
 transform: dereference.api.v1 dereference.auth.v1 dereference.storage.v0
 

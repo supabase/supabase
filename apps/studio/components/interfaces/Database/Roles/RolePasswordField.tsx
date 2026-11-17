@@ -54,7 +54,7 @@ export const RolePasswordField = ({
               >
                 Generate a password
               </button>
-              .
+              <span>.</span>
             </>
           }
         >

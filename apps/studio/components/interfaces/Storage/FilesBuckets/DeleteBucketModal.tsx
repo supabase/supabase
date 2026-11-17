@@ -36,8 +36,11 @@ export const DeleteBucketModal = ({ visible, bucket, onClose }: DeleteBucketModa
       // policy cleanup below (which can be slow) doesn't hold the loading state or block
       // the success feedback.
       toast.success(`Successfully deleted bucket ${bucket.id}`)
-      onClose()
-      if (bucketId) router.push(`/project/${projectRef}/storage/files`)
+      if (bucketId) {
+        await router.push(`/project/${projectRef}/storage/files`)
+      } else {
+        onClose()
+      }
 
       if (!project) return console.error('Project is required')
 
@@ -100,8 +103,13 @@ export const DeleteBucketModal = ({ visible, bucket, onClose }: DeleteBucketModa
       <p className="text-sm">
         Your bucket <span className="font-bold text-foreground">{bucket.id}</span> and all of its
         contents will be permanently deleted.
-        {isRetainingVersions &&
-          ' That includes every archived file and every retained version, which cannot be restored afterwards.'}
+        {isRetainingVersions && (
+          <span>
+            {
+              ' That includes every archived file and every retained version, which cannot be restored afterwards.'
+            }
+          </span>
+        )}
       </p>
     </TextConfirmModal>
   )

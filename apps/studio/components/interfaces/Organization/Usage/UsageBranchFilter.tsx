@@ -82,7 +82,7 @@ export const UsageBranchFilter = ({
             placeholder="Find branch..."
             handleReset={() => setSearch('')}
             onKeyDown={onSearchInputEscape(search, setSearch)}
-            className="text-base sm:text-sm"
+            className="text-sm"
           />
           <CommandList id={listboxId} className="max-h-[300px] overflow-y-auto overflow-x-hidden">
             <CommandEmpty>No branches found</CommandEmpty>

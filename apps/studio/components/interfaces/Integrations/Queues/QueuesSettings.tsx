@@ -291,8 +291,8 @@ export const QueuesSettings = () => {
                         >
                           <p className="m-0!">
                             Please ensure that the following {tablesWithoutRLS.length} queue
-                            {tablesWithoutRLS.length > 1 ? 's' : ''} have RLS enabled in order to
-                            prevent anonymous access.
+                            {tablesWithoutRLS.length > 1 ? <span>s</span> : ''}{' '}
+                            <span>have RLS enabled in order to prevent anonymous access.</span>
                           </p>
                           <ul className="list-disc pl-6">
                             {tablesWithoutRLS.map((x) => {
@@ -306,9 +306,11 @@ export const QueuesSettings = () => {
 
                           <Button className="mt-3" onClick={() => setRlsConfirmModalOpen(true)}>
                             Enable RLS on{' '}
-                            {tablesWithoutRLS.length === 1
-                              ? queueDisplayName(tablesWithoutRLS[0].name)
-                              : `${tablesWithoutRLS.length} queues`}
+                            {tablesWithoutRLS.length === 1 ? (
+                              queueDisplayName(tablesWithoutRLS[0].name)
+                            ) : (
+                              <span>{`${tablesWithoutRLS.length} queues`}</span>
+                            )}
                           </Button>
                         </Admonition>
                       )}

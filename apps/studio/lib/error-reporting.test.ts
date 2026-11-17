@@ -30,14 +30,14 @@ describe('captureCriticalError', () => {
     ['a whitelisted project name error', new Error('name should not contain a . string')],
     [
       'a 4XX StudioError',
-      classifyResponseError({ message: 'Not found', code: 404, requestPathname: '/api/test' }),
+      classifyResponseError({ message: 'Not found', code: 404, endpoint: '/api/test' }),
     ],
     [
       'a StudioError at the 4XX boundary (499)',
       classifyResponseError({
         message: 'Client closed request',
         code: 499,
-        requestPathname: '/api/test',
+        endpoint: '/api/test',
       }),
     ],
   ])('does not capture %s', (_, error) => {
@@ -59,23 +59,23 @@ describe('captureCriticalError', () => {
       classifyResponseError({
         message: 'Internal server error',
         code: 500,
-        requestPathname: '/api/test',
+        endpoint: '/api/test',
       }),
-      'requestPathname /api/test w/ message: Internal server error',
+      'endpoint /api/test w/ message: Internal server error',
     ],
     [
       'a 5XX StudioError',
       classifyResponseError({
         message: 'Gateway timeout',
         code: 504,
-        requestPathname: '/api/gateway',
+        endpoint: '/api/gateway',
       }),
-      'requestPathname /api/gateway w/ message: Gateway timeout',
+      'endpoint /api/gateway w/ message: Gateway timeout',
     ],
     [
-      'a StudioError without code or requestPathname',
+      'a StudioError without code or endpoint',
       classifyResponseError({ message: 'Unknown error' }),
-      'Response Error (no code or requestPathname) w/ message: Unknown error',
+      'Response Error (no code or endpoint) w/ message: Unknown error',
     ],
   ])('captures %s', (_, error, message) => {
     captureCriticalError(error, 'context')

@@ -62,6 +62,27 @@ describe('buildSpaRoutes', () => {
     ])
   })
 
+  it('serves prerendered pages from their own HTML ahead of the shell', () => {
+    const routes = buildSpaRoutes(
+      [filesystem, functionCatchAll],
+      '/__server',
+      IMMUTABLE,
+      '/dashboard',
+      [],
+      ['/sign-in']
+    )
+
+    expect(routes.slice(-3)).toEqual([
+      { src: '/dashboard/sign-in/?', dest: '/sign-in/index.html', caseSensitive: true },
+      { src: '/sign-in/?', dest: '/sign-in/index.html', caseSensitive: true },
+      { src: '/(.*)', dest: '/_shell.html' },
+    ])
+    const signIn = new RegExp(`^${routes.at(-3)!.src}$`)
+    expect(signIn.test('/dashboard/sign-in')).toBe(true)
+    expect(signIn.test('/dashboard/sign-in/')).toBe(true)
+    expect(signIn.test('/dashboard/sign-in-mfa')).toBe(false)
+  })
+
   it('fails loudly when Nitro output changes shape', () => {
     expect(() => buildSpaRoutes([functionCatchAll], '/__server', '/assets')).toThrow(
       /no \{ handle: "filesystem" \}/

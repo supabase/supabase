@@ -295,7 +295,7 @@ curl -s 'http://127.0.0.1:54321/functions/v1/mcp/oauth-protected-resource'
 }
 ```
 
-Both URLs use the public origin of your local stack, taken from the headers the gateway forwards, not the Docker-internal `http://kong:8000` that `SUPABASE_URL` holds inside the function. Supabase CLI 2.117.0 and later also injects the function slug, so the `resource` path stays canonical whatever sub-path a request arrives on.
+Both URLs use the public origin of your local stack, taken from the headers the gateway forwards, not the Docker-internal `http://kong:8000` that `SUPABASE_URL` holds inside the function. [Supabase CLI](/docs/guides/local-development/cli/getting-started) 2.117.0 and later also injects the function slug, so the `resource` path stays canonical whatever sub-path a request arrives on.
 
 #### Test with MCP Inspector
 

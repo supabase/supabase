@@ -16,10 +16,6 @@ export const deployment: NavMenuConstant = {
       url: '/guides/deployment/going-into-prod',
       enabled: productionChecklistEnabled,
     },
-    {
-      name: 'Shared responsibility model',
-      url: '/guides/deployment/shared-responsibility-model',
-    },
     { name: 'Maturity model', url: '/guides/deployment/maturity-model' },
     {
       name: 'Environments',

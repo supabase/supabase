@@ -102,8 +102,9 @@ export const CustomDomainsConfigureHostname = () => {
           <CardContent>
             <h4 className="text-sm mb-1">Configure a CNAME record</h4>
             <p className="text-sm text-foreground-light">
-              Set up a CNAME record for {domain ? <code>{domain}</code> : 'your custom domain'}{' '}
-              resolving to{' '}
+              Set up a CNAME record for{' '}
+              {domain ? <code>{domain}</code> : <span>your custom domain</span>}{' '}
+              <span>resolving to</span>{' '}
               {endpoint ? (
                 <span className="inline-flex items-center gap-x-1">
                   <code>{endpoint}</code>
@@ -115,10 +116,12 @@ export const CustomDomainsConfigureHostname = () => {
                   />
                 </span>
               ) : (
-                "your project's API URL"
+                <span>your project's API URL</span>
               )}{' '}
-              with as low a TTL as possible. If you're using Cloudflare as your DNS provider,
-              disable the proxy option.
+              <span>
+                with as low a TTL as possible. If you're using Cloudflare as your DNS provider,
+                disable the proxy option.
+              </span>
               <br />
               {trimmedDomain.includes('.') ? (
                 <>
@@ -127,7 +130,10 @@ export const CustomDomainsConfigureHostname = () => {
                   <code className="whitespace-nowrap">{trimmedDomain}</code>.
                 </>
               ) : (
-                'Some DNS providers expect only the subdomain label, while others accept the full hostname.'
+                <span>
+                  Some DNS providers expect only the subdomain label, while others accept the full
+                  hostname.
+                </span>
               )}
             </p>
           </CardContent>

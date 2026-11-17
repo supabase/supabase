@@ -19,6 +19,7 @@ import {
 import { TimestampInfo } from 'ui-patterns/TimestampInfo'
 
 import type { WebhookDelivery } from './PlatformWebhooks.types'
+import { isTestDelivery } from './PlatformWebhooks.utils'
 import { formatDeliveryStatus, statusBadgeVariant } from './PlatformWebhooksView.utils'
 import { getStatusLevel } from '@/components/interfaces/UnifiedLogs/UnifiedLogs.utils'
 import { DataTableColumnStatusCode } from '@/components/ui/DataTable/DataTableColumn/DataTableColumnStatusCode'
@@ -75,6 +76,9 @@ export const PlatformWebhooksDeliveryDetailsSheet = ({
               <Badge variant={statusBadgeVariant[selectedDelivery.status]}>
                 {formatDeliveryStatus(selectedDelivery.status)}
               </Badge>
+            )}
+            {selectedDelivery && isTestDelivery(selectedDelivery) && (
+              <Badge variant="success">Test</Badge>
             )}
           </div>
         </SheetHeader>

@@ -35,7 +35,7 @@ export function RowCountIndicator({
             </span>
             <ArrowRightIcon size={10} className="text-foreground-muted" />
             <span className="text-primary font-medium">
-              {formatRowCount(actualRows)} {actualRows === 1 ? 'row' : 'rows'}
+              {formatRowCount(actualRows)} {actualRows === 1 ? <span>row</span> : <span>rows</span>}
             </span>
           </div>
         </TooltipTrigger>
@@ -57,7 +57,7 @@ export function RowCountIndicator({
       <Tooltip>
         <TooltipTrigger asChild>
           <span className="text-foreground-light cursor-help">
-            {formatRowCount(actualRows)} {actualRows === 1 ? 'row' : 'rows'}
+            {formatRowCount(actualRows)} {actualRows === 1 ? <span>row</span> : <span>rows</span>}
           </span>
         </TooltipTrigger>
         <TooltipContent side="top" className="max-w-xs font-sans">
@@ -76,7 +76,8 @@ export function RowCountIndicator({
       <Tooltip>
         <TooltipTrigger asChild>
           <span className="text-foreground-muted cursor-help">
-            est. {formatRowCount(estimatedRows)} {estimatedRows === 1 ? 'row' : 'rows'}
+            est. {formatRowCount(estimatedRows)}{' '}
+            {estimatedRows === 1 ? <span>row</span> : <span>rows</span>}
           </span>
         </TooltipTrigger>
         <TooltipContent side="top" className="max-w-xs font-sans">

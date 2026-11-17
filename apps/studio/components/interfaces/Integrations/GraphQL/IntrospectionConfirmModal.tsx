@@ -111,7 +111,7 @@ const PreservedOptionKeys = ({ keys }: { keys: string[] }) => (
   <>
     {keys.map((k, i) => (
       <span key={k}>
-        {i > 0 && ', '}
+        {i > 0 && <span>{', '}</span>}
         <code>{k}</code>
       </span>
     ))}

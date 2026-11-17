@@ -30,6 +30,8 @@ export async function importForeignSchema({
   const { result } = await executeSql({
     projectRef,
     connectionString,
+    sqlOrigin: 'studio',
+    queryName: 'fdw-import-foreign-schema',
     sql,
     grant: unguarded.migrating,
   })

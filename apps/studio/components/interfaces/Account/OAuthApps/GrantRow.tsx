@@ -44,8 +44,8 @@ export const GrantRow = ({ grant }: OAuthAppsAuthorizedRowProps) => {
               {grant.app.name}
             </p>
             <p className="min-w-0 text-foreground-lighter">
-              {grant.projects?.length ?? 'All'}{' '}
-              {grant.projects?.length === 1 ? 'project' : 'projects'}
+              {grant.projects?.length ?? <span>All</span>}{' '}
+              {grant.projects?.length === 1 ? <span>project</span> : <span>projects</span>}
             </p>
           </div>
         </div>

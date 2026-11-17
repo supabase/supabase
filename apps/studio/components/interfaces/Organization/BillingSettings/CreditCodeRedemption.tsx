@@ -208,8 +208,10 @@ export const CreditCodeRedemption = ({
 
         {/* screen reader */}
         <div role="status" aria-live="polite" className="sr-only">
-          {!!codeRedemptionResult && `$${codeRedemptionResult.amount_cents / 100} credits applied.`}
-          {redemptionNotice && ` ${redemptionNotice}`}
+          {!!codeRedemptionResult && (
+            <span>{`$${codeRedemptionResult.amount_cents / 100} credits applied.`}</span>
+          )}
+          {redemptionNotice && <span>{` ${redemptionNotice}`}</span>}
         </div>
 
         {!!codeRedemptionResult ? (

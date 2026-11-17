@@ -107,6 +107,11 @@ export const resourcesMigrate: ContentListingGroup = {
       hasLightIcon: true,
       description: 'Migrate your Vercel Postgres database to Supabase.',
     },
+    {
+      title: 'InstantDB',
+      href: 'https://supabase.com/migrate/instantdb',
+      description: 'Migrate your InstantDB app to Supabase.',
+    },
   ],
 }
 

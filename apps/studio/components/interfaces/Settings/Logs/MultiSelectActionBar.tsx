@@ -54,7 +54,7 @@ export function MultiSelectActionBar({
       style={{ height: 40 }}
     >
       <span className="text-foreground-light font-mono text-xs">
-        {count} row{count !== 1 ? 's' : ''} selected
+        {`${count} ${count === 1 ? 'row' : 'rows'} selected`}
       </span>
 
       <div className="flex items-center gap-1 ml-auto">

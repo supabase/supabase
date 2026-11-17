@@ -126,9 +126,13 @@ export const AWSPrivateLinkForm = ({
         <SheetHeader>
           <SheetTitle>{isNew ? 'Add connection' : 'Connection details'}</SheetTitle>
           <SheetDescription>
-            {isNew
-              ? 'Enter an AWS account to connect. You’ll need to accept the share in AWS. '
-              : 'These values identify the resource share in AWS. '}
+            {isNew ? (
+              <span>
+                {'Enter an AWS account to connect. You’ll need to accept the share in AWS. '}
+              </span>
+            ) : (
+              <span>{'These values identify the resource share in AWS. '}</span>
+            )}
             <InlineLink href={`${DOCS_URL}/guides/platform/privatelink`}>Learn more</InlineLink>
           </SheetDescription>
         </SheetHeader>

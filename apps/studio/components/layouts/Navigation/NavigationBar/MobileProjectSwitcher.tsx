@@ -36,10 +36,12 @@ export function MobileProjectSwitcher() {
   const branchesGrant = useGrant('GET /v1/projects/{ref}/branches', {
     projectRef: branchesProjectRef,
   })
-  const { data: branches } = useQuery({
-    ...branchesQueryOptions({ projectRef: branchesProjectRef, grant: branchesGrant.grant }),
-    enabled: open && Boolean(project),
-  })
+  const { data: branches } = useQuery(
+    branchesQueryOptions(
+      { projectRef: branchesProjectRef, grant: branchesGrant.grant },
+      { enabled: open && Boolean(project) }
+    )
+  )
 
   const selectedBranch = branches?.find((b) => b.project_ref === ref)
   const { isMainBranch, branchDisplayName, selectedOrgInitial, organizationHref } =

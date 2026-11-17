@@ -12,7 +12,7 @@ import viteReact from '@vitejs/plugin-react'
 import { nitro } from 'nitro/vite'
 import { defineConfig, loadEnv, type Plugin } from 'vite'
 
-import { getCdnUrlForBuiltFile, getTanstackAssetCdnUrl } from './asset-cdn'
+import { PRERENDERED_ROUTES } from './lib/prerendered-routes'
 import { vercelSpaRoutes } from './scripts/vercel-spa-routes'
 import { getSecurityHeaders } from './security-headers'
 
@@ -39,7 +39,6 @@ const nextShims: Record<string, string> = {
   'next/navigation': path.join(compatRoot, 'navigation.ts'),
   'next/router': path.join(compatRoot, 'router.ts'),
   'next/script': path.join(compatRoot, 'script.tsx'),
-  'next/server': path.join(compatRoot, 'server.ts'),
 }
 
 // Combined compat + migration guard:
@@ -84,14 +83,11 @@ const RAW_TEXT_SPECIFIERS: Record<string, string> = {
 const RAW_TEXT_PREFIX = '\0studio-raw-text:'
 const RAW_TEXT_SUFFIX = '.js'
 
-// Mirror the raw-loader rules from next.config.ts: serve `*.md` files (used
-// by `static-data/integrations/*/overview.md` via
+// Serve `*.md` files (used by `static-data/integrations/*/overview.md` via
 // `static-data/integrations/overviews.ts`) and the Deno typings in
 // `public/deno/*.d.ts` as JS modules whose default export is the file's
-// text. Vite has `?raw` for this, but the query suffix would have to live
-// in shared app source where it breaks the webpack/turbopack raw-loader
-// rule, so the import specifiers stay query-free and this plugin does the
-// conversion for the Vite pipeline.
+// text. The import specifiers stay query-free (no `?raw`) and this plugin
+// does the conversion.
 //
 // The `.d.ts` files can't go through a plain `transform` like the `.md`
 // files do: the dep scanner's native scan pipeline skips JS transform/load
@@ -236,8 +232,7 @@ function umdAmdShortCircuit(): Plugin {
 // a function"). Deep imports (`lodash/isEqual`) fail harder: their plain-CJS
 // `require` throws "require is not defined". lodash-es is the same version as
 // real ESM, so both import styles just work. Client bundles are untouched —
-// resolution is gated on `options.ssr`, and the Next build doesn't read this
-// config.
+// resolution is gated on `options.ssr`.
 function ssrLodashEs(): Plugin {
   return {
     name: 'studio-ssr-lodash-es',
@@ -522,13 +517,11 @@ export default defineConfig(({ command, mode }) => {
     ) ?? 'undefined'
 
   // `MAINTENANCE_MODE` gates the "redirect everything to /maintenance" rule.
-  // It's deliberately unprefixed, and the other two consumers both read it at
-  // BUILD time: `next.config.ts` reads it in `redirects()`, which Next bakes
-  // into `routes-manifest.json` during `next build`, and `vercel.ts` reads it
-  // while emitting `vercel.json`. So flipping maintenance has always meant a
+  // It's deliberately unprefixed, and `vercel.ts` reads it at BUILD time
+  // while emitting `vercel.json`, so flipping maintenance has always meant a
   // rebuild/redeploy, never just a server restart. Inline it here on the same
   // terms so the isomorphic `beforeLoad` in `routes/__root.tsx` — which
-  // mirrors those rules for the TanStack runtime — can read it on the client
+  // mirrors those rules for the Node server — can read it on the client
   // too, without self-hosters having to set a second, NEXT_PUBLIC_-prefixed
   // var. Falls back to `''` (not left undefined) so the browser bundle never
   // ends up with a bare `process.env` reference.
@@ -547,6 +540,7 @@ export default defineConfig(({ command, mode }) => {
     'NEXT_PUBLIC_VERCEL_GIT_COMMIT_SHA',
     'NEXT_PUBLIC_SENTRY_SAMPLE_RATE_OTHER',
     'NEXT_PUBLIC_SENTRY_SAMPLE_RATE_OWNED',
+    'NEXT_PUBLIC_SENTRY_SAMPLE_RATE_USER_FAULT',
   ]) {
     publicEnvDefines[`process.env.${key}`] ??= 'undefined'
   }
@@ -556,19 +550,12 @@ export default defineConfig(({ command, mode }) => {
   // root path. vercel-spa-routes rewrites the browser's prefixed asset URLs
   // to that root path, including assets retained from older deployments.
   const basePath = env.NEXT_PUBLIC_BASE_PATH || undefined
-  // Client JS/CSS (and CSS-referenced fonts/images) load from the R2 asset CDN
-  // on production builds, uploaded by scripts/upload-static-assets.sh. Vite's
-  // base stays `/dashboard` so documents, server functions and API routes stay
-  // on Vercel. The shell's asset tags are rewritten by server.ts. Reads the
-  // process env, not `env`: the upload script only sees the process env, so a
-  // CDN switch set in a `.env*` file must not point the build at assets that
-  // were never uploaded.
-  const assetCdnUrl = command === 'build' ? getTanstackAssetCdnUrl(process.env) : undefined
+  // Self-hosted sign-in redirects straight to the default project, so there's nothing to prerender.
+  const prerenderedRoutes = env.NEXT_PUBLIC_IS_PLATFORM === 'true' ? PRERENDERED_ROUTES : []
   const shouldUploadSourceMaps =
     process.env.SKIP_ASSET_UPLOAD !== '1' && !!process.env.SENTRY_AUTH_TOKEN
 
-  // Self-hosted responses get next.config.ts's security headers via Nitro
-  // route rules. On Vercel they come from vercel.ts: a `/**` header route in
+  // Self-hosted responses get the security headers via Nitro route rules. On Vercel they come from vercel.ts: a `/**` header route in
   // the Build Output config would stop matching before Nitro's asset and
   // skew-cookie rules.
   const securityHeaders = Object.fromEntries(
@@ -597,12 +584,6 @@ export default defineConfig(({ command, mode }) => {
   return {
     server: {
       port: 3000,
-      watch: {
-        // Next's build output, left behind when switching from
-        // STUDIO_FRAMEWORK=next, includes a full node_modules copy under
-        // `.next/standalone`.
-        ignored: ['**/.next/**'],
-      },
     },
     preview: {
       // The prerender step (@tanstack/start-plugin-core) boots `vite preview`
@@ -631,8 +612,7 @@ export default defineConfig(({ command, mode }) => {
         // because the dev pipeline shims `process`. Point the bare import
         // at a shim that re-exports `@sentry/react` (same 10.x version —
         // it's what `@sentry/nextjs` wraps on the client) plus explicit
-        // stand-ins for the Next-only APIs. Next build (`build:next`)
-        // doesn't read this config and keeps the real package.
+        // stand-ins for the Next-only APIs.
         {
           find: /^@sentry\/nextjs$/,
           replacement: path.resolve(rootDir, 'compat/sentry-nextjs.ts'),
@@ -658,19 +638,7 @@ export default defineConfig(({ command, mode }) => {
     define: {
       ...publicEnvDefines,
       ...sharedDefines,
-      __STUDIO_ASSET_CDN_URL__: JSON.stringify(assetCdnUrl) ?? 'undefined',
     },
-    ...(assetCdnUrl && {
-      experimental: {
-        // Absolute CDN URLs for client assets referenced from JS and CSS. With
-        // this set, Vite's preload helper resolves a lazy chunk's deps against
-        // the importing chunk's URL, so they follow it to the CDN.
-        renderBuiltUrl(filename: string, { ssr }: { ssr: boolean }) {
-          if (ssr) return
-          return getCdnUrlForBuiltFile(filename, assetCdnUrl)
-        },
-      },
-    }),
     // Circular-dep workaround: pin shared library code into dedicated
     // chunks so per-component chunks don't import from a chunk that
     // (transitively) imports them back.
@@ -769,11 +737,9 @@ export default defineConfig(({ command, mode }) => {
       },
     },
     css: {
-      // Disable PostCSS auto-discovery. Studio's postcss.config.cjs is kept
-      // for the Next build (`build:next`) and uses `@tailwindcss/postcss`,
-      // but under Vite we let `@tailwindcss/vite` (added below) handle
-      // Tailwind v4 directives directly. Running both plugins on the same
-      // CSS would double-process Tailwind output.
+      // Disable PostCSS auto-discovery: `@tailwindcss/vite` (added below)
+      // handles Tailwind v4 directives directly, and a discovered PostCSS
+      // Tailwind plugin would double-process the output.
       postcss: { plugins: [] },
     },
     ssr: {
@@ -858,7 +824,7 @@ export default defineConfig(({ command, mode }) => {
         },
         // Documents from the static shell; only /api/* and /_serverFn/*
         // invoke the function.
-        modules: [vercelSpaRoutes({ basePath })],
+        modules: [vercelSpaRoutes({ basePath, prerenderedRoutes })],
         ...(!process.env.VERCEL && { routeRules: { '/**': { headers: securityHeaders } } }),
       }),
       tanstackStart({
@@ -866,6 +832,10 @@ export default defineConfig(({ command, mode }) => {
         spa: {
           enabled: true,
         },
+        // Only the listed pages: crawling would follow their links into signed-in pages
+        // such as /organizations.
+        prerender: { crawlLinks: false, autoStaticPathsDiscovery: false },
+        pages: prerenderedRoutes.map((path) => ({ path, prerender: { enabled: true } })),
         // Set `configuredBasepath` so `deriveRouterBasepath` short-circuits
         // its slash-stripping branch. See the basePath comment above.
         ...(basePath && { router: { basepath: basePath } }),
@@ -883,6 +853,7 @@ export default defineConfig(({ command, mode }) => {
         project: process.env.SENTRY_PROJECT ?? 'supabase-studio-tanstack',
         authToken: process.env.SENTRY_AUTH_TOKEN,
         autoInstrumentMiddleware: false,
+        silent: true,
         sourcemaps: {
           disable: !shouldUploadSourceMaps,
           // Intermediate SSR maps must survive until Nitro composes the final server maps.

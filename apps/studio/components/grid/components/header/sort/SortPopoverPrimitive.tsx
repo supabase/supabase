@@ -296,7 +296,10 @@ export const SortPopoverPrimitive = ({
                     className="my-1"
                     data-testid="table-editor-pick-column-to-sort-button"
                   >
-                    <span>Pick {localSorts.length > 1 ? 'another' : 'a'} column to sort by</span>
+                    <span>
+                      Pick {localSorts.length > 1 ? <span>another</span> : <span>a</span>}{' '}
+                      <span>column to sort by</span>
+                    </span>
                   </Button>
                 </DropdownControl>
               ) : (

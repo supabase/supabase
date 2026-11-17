@@ -47,6 +47,8 @@ export async function getExposedFunctions(
     {
       projectRef,
       connectionString,
+      sqlOrigin: 'studio',
+      queryName: 'exposed-functions',
       sql,
       queryKey: ['exposed-functions', page],
       grant: unguarded.migrating,

@@ -5,6 +5,7 @@ import Image from 'next/image'
 import Link from 'next/link'
 import { SkipToContent } from 'ui-patterns/SkipToContent'
 
+import { ForceLightTheme } from './ForceLightTheme'
 import TweetsSection from './TweetsSection'
 import type { GoPage } from '@/types/go'
 
@@ -14,8 +15,11 @@ const customRenderers: CustomSectionRenderers = {
 
 // eslint-disable-next-line
 export default function GoPageRenderer({ page }: { page: GoPage }) {
+  const isLight = 'theme' in page && page.theme === 'light'
+
   return (
-    <>
+    <div className={isLight ? 'bg-white' : undefined}>
+      {isLight && <ForceLightTheme />}
       <SkipToContent href="#main" />
       <nav className="absolute top-0 left-0 right-0 z-10">
         <div className="max-w-7xl mx-auto flex items-center h-14 px-8">
@@ -46,6 +50,6 @@ export default function GoPageRenderer({ page }: { page: GoPage }) {
           </div>
         </div>
       </footer>
-    </>
+    </div>
   )
 }

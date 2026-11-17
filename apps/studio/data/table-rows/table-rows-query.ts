@@ -11,6 +11,7 @@ import { tableRowKeys } from './keys'
 import { parseSupaTable } from '@/components/grid/SupabaseGrid.utils'
 import { Filter, Sort, SupaRow, SupaTable } from '@/components/grid/types'
 import { ENTITY_TYPE } from '@/data/entity-types/entity-type-constants'
+import { isUserFaultForValues } from '@/data/error-classification'
 import { handleError, unguarded } from '@/data/fetchers'
 import { useConnectionStringForReadOps } from '@/data/read-replicas/replicas-query'
 import { executeSql } from '@/data/sql/execute-sql-mutation'
@@ -123,10 +124,16 @@ export const getAllTableRowsSql = ({
   table,
   filters = [],
   sorts = [],
+  jsonColumnsAsText = false,
 }: {
   table: SupaTable
   filters?: Filter[]
   sorts?: Sort[]
+  /**
+   * Return json/jsonb columns as JSON text. Parsed values can't tell a JSON `null` from a SQL
+   * `NULL`, which matters when generating SQL.
+   */
+  jsonColumnsAsText?: boolean
 }): { sql: QueryFilter; cursorColumns: string[] | false } => {
   const query = new Query()
 
@@ -136,11 +143,20 @@ export const getAllTableRowsSql = ({
     )
     .map((column) => safeSql`${ident(column.name)}::text[]`)
 
+  // Appended after `*`, so these override the parsed columns of the same name
+  const jsonTextColumns = jsonColumnsAsText
+    ? table.columns
+        .filter(
+          (column) => column.format?.includes('json') && column.dataType.toLowerCase() !== 'array'
+        )
+        .map((column) => safeSql`${ident(column.name)}::text`)
+    : []
+
   let queryChains = query
     .from(table.name, table.schema ?? undefined)
     .select(
-      arrayBasedColumns.length > 0
-        ? joinSqlFragments([safeSql`*`, ...arrayBasedColumns], ',')
+      arrayBasedColumns.length > 0 || jsonTextColumns.length > 0
+        ? joinSqlFragments([safeSql`*`, ...arrayBasedColumns, ...jsonTextColumns], ',')
         : safeSql`*`
     )
 
@@ -215,12 +231,14 @@ export const fetchAllTableRows = async ({
   sorts = [],
   roleImpersonationState,
   progressCallback,
+  jsonColumnsAsText,
 }: {
   projectRef: string
   connectionString?: string | null
   table: SupaTable
   filters?: Filter[]
   sorts?: Sort[]
+  jsonColumnsAsText?: boolean
   roleImpersonationState?: RoleImpersonationState
   progressCallback?: (value: number) => void
 }) => {
@@ -234,6 +252,7 @@ export const fetchAllTableRows = async ({
     table,
     sorts,
     filters,
+    jsonColumnsAsText,
   })
 
   const rowsPerPage = 500
@@ -258,7 +277,15 @@ export const fetchAllTableRows = async ({
 
       try {
         const { result } = await executeWithRetry(async () =>
-          executeSql({ projectRef, connectionString, sql: query, grant: unguarded.migrating })
+          executeSql({
+            projectRef,
+            connectionString,
+            sql: query,
+            sqlOrigin: 'studio',
+            queryName: 'table-rows-cursor',
+            isUserFaultSqlState: filters.length > 0 ? isUserFaultForValues : undefined,
+            grant: unguarded.migrating,
+          })
         )
         rows.push(...result)
         progressCallback?.(rows.length)
@@ -290,7 +317,15 @@ export const fetchAllTableRows = async ({
 
       try {
         const { result } = await executeWithRetry(async () =>
-          executeSql({ projectRef, connectionString, sql: query, grant: unguarded.migrating })
+          executeSql({
+            projectRef,
+            connectionString,
+            sql: query,
+            sqlOrigin: 'studio',
+            queryName: 'table-rows-page',
+            isUserFaultSqlState: filters.length > 0 ? isUserFaultForValues : undefined,
+            grant: unguarded.migrating,
+          })
         )
         rows.push(...result)
         progressCallback?.(rows.length)
@@ -377,6 +412,9 @@ async function getTableRows(
       {
         projectRef,
         connectionString,
+        sqlOrigin: 'studio',
+        queryName: 'table-rows',
+        isUserFaultSqlState: filters?.length ? isUserFaultForValues : undefined,
         sql,
         queryKey: ['table-rows', table?.id],
         isRoleImpersonationEnabled: isRoleImpersonationEnabled(roleImpersonationState?.role),

@@ -72,6 +72,8 @@ Presence utilizes Broadcast as the transport layer, consolidating the state in a
 The neat thing about Presence is that if a user is suddenly disconnected (for example, they go offline), their state will be automatically removed from the shared state.
 If you've ever tried to build an “I'm online” feature which handles unexpected disconnects, you'll appreciate how useful this is.
 
+Want cursors and presence without wiring them up yourself? The [Realtime Cursor](https://supabase.com/library/docs/nextjs/realtime-cursor) and [Avatar Stack](https://supabase.com/library/docs/nextjs/realtime-avatar-stack) components in the Supabase UI Library are built on Broadcast and Presence.
+
 ## Client Library
 
 We've introduced new functionality into the [release candidate](https://supabase.com/blog/supabase-js-v2) version of `supabase-js`.

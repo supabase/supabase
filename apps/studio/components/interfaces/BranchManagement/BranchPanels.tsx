@@ -120,8 +120,8 @@ export const BranchRow = ({
           </TooltipTrigger>
           {((page === 'branches' && !branch.is_default) || page === 'merge-requests') && (
             <TooltipContent side="bottom">
-              {page === 'branches' && !branch.is_default && 'Switch to branch'}
-              {page === 'merge-requests' && 'View merge request'}
+              {page === 'branches' && !branch.is_default && <span>Switch to branch</span>}
+              {page === 'merge-requests' && <span>View merge request</span>}
             </TooltipContent>
           )}
         </Tooltip>
@@ -135,7 +135,7 @@ export const BranchRow = ({
           </p>
         ) : (
           <p className="text-xs text-foreground-lighter">
-            {daysFromNow > 1 ? 'Updated on' : 'Updated'}{' '}
+            {daysFromNow > 1 ? <span>Updated on</span> : <span>Updated</span>}{' '}
             <TimestampInfo
               utcTimestamp={branch.updated_at}
               label={daysFromNow <= 1 ? formattedTimeFromNow : undefined}

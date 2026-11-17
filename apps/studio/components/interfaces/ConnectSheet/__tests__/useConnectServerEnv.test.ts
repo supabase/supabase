@@ -1,25 +1,25 @@
 // @vitest-environment jsdom
+import { useQuery } from '@tanstack/react-query'
 import { act, renderHook } from '@testing-library/react'
 import { afterEach, beforeEach, describe, expect, it, vi } from 'vitest'
 
 import { useConnectServerEnv } from '../useConnectServerEnv'
 import { useRevealedSecret } from '@/components/interfaces/APIKeys/useRevealedSecret'
 import { getAPIKeysById } from '@/data/api-keys/api-key-id-query'
-import { useAPIKeys } from '@/data/api-keys/api-keys-query'
 import { useProjectApiUrl } from '@/data/config/project-endpoint-query'
-import { useAsyncCheckPermissionsV2 } from '@/hooks/misc/useCheckPermissionsV2'
+import { useGrant } from '@/lib/grants'
 
-vi.mock('@/hooks/misc/useCheckPermissionsV2', () => ({
-  useAsyncCheckPermissionsV2: vi.fn(),
-  FGA_PERMISSIONS: {
-    PROJECT: {},
-  },
+vi.mock('@/lib/grants', () => ({ useGrant: vi.fn() }))
+vi.mock('@tanstack/react-query', async (importOriginal) => ({
+  ...(await importOriginal<typeof import('@tanstack/react-query')>()),
+  useQuery: vi.fn(),
 }))
 vi.mock('@/data/config/project-endpoint-query', () => ({
   useProjectApiUrl: vi.fn(),
 }))
 vi.mock('@/data/api-keys/api-keys-query', () => ({
-  useAPIKeys: vi.fn(),
+  apiKeysQueryOptions: vi.fn(() => ({})),
+  getKeys: vi.fn(),
 }))
 vi.mock('@/data/api-keys/api-key-id-query', () => ({
   getAPIKeysById: vi.fn(),
@@ -42,15 +42,12 @@ function deferred<T>() {
 }
 
 beforeEach(() => {
-  vi.mocked(useAsyncCheckPermissionsV2).mockReturnValue({
-    can: true,
-    isLoading: false,
-  } as any)
+  vi.mocked(useGrant).mockReturnValue({ status: 'granted', grant: {} } as any)
   vi.mocked(useProjectApiUrl).mockReturnValue({
     data: 'https://test.supabase.co',
     isPending: false,
   } as any)
-  vi.mocked(useAPIKeys).mockReturnValue({
+  vi.mocked(useQuery).mockReturnValue({
     data: { secretKey: SECRET_KEY, publishableKey: { api_key: 'sb_publishable_x' } },
     isLoading: false,
   } as any)
@@ -68,6 +65,7 @@ describe('useConnectServerEnv secret reveal', () => {
       isLoading: false,
       reveal: revealMock,
       clear: clearMock,
+      revealGrant: { status: 'granted', grant: {} },
     } as any)
   })
 
@@ -155,6 +153,7 @@ describe('useConnectServerEnv secret reveal', () => {
       isLoading: false,
       reveal: revealMock.mockResolvedValue(SECRET_FULL),
       clear: clearMock,
+      revealGrant: { status: 'granted', grant: {} },
     } as any)
 
     const { result } = renderHook(() => useConnectServerEnv())

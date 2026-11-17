@@ -1,7 +1,6 @@
 import { memo } from 'react'
 
 import type { NavMenuSection } from '../Navigation.types'
-import { useCloseMenuOnRouteChange } from './NavigationMenu.utils'
 import NavigationMenuGuideList from './NavigationMenuGuideList'
 import NavigationMenuRefList from './NavigationMenuRefList'
 
@@ -303,8 +302,6 @@ const NavigationMenu = ({
 }) => {
   const level = menuId
   const menu = getMenuById(level)
-
-  useCloseMenuOnRouteChange()
 
   return getMenuElement(menu, { additionalNavItems })
 }

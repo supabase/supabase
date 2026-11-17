@@ -1,0 +1,143 @@
+---
+name: Loot Donkey
+title: How a two-person studio built an online multiplayer game on Supabase with no backend experience
+# Use meta_title to add a custom meta title. Otherwise it defaults to '{name} | Supabase Customer Stories':
+# meta_title:
+description: Loot Donkey is a two-person indie studio that makes Fool King, an asynchronous PvP auto-battler on Steam. It runs the game's whole multiplayer backend on Supabase.
+# Use meta_description to add a custom meta description. Otherwise it defaults to {description}:
+meta_description: How a two-person indie studio with no backend experience built the multiplayer backend for Fool King on Supabase in about a month.
+author: wendie_cheung
+author_title: Product Marketing
+logo: /images/customers/logos/on-light/loot-donkey.png
+logo_inverse: /images/customers/logos/on-dark/loot-donkey.png
+tags:
+  - supabase
+date: '2026-11-12'
+misc:
+  - { label: 'Company size', text: '2 people' }
+  - { label: 'Use case', text: 'Multiplayer game backend' }
+  - { label: 'Products used', text: 'Database, Auth, Edge Functions, Row Level Security' }
+about: 'Loot Donkey is a two-person studio that makes Fool King, an asynchronous PvP auto-battler game on Steam. Players build an army, send it into battle, and fight the saved armies of other players, which the game calls ghosts.'
+# "healthcare" | "fintech" | "ecommerce" | "education" | "gaming" | "media" | "real-estate" | "saas" | "social" | "analytics" | "ai" | "developer-tools"
+industry: ['gaming']
+# "startup" | "enterprise" | "indie_dev"
+company_size: 'indie_dev'
+# "Asia" | "Europe" | "North America" | "South America" | "Africa" | "Oceania"
+region: 'Europe'
+# "database" | "auth" | "storage" | "realtime" | "functions" | "vector"
+supabase_products: ['database', 'auth', 'functions']
+---
+
+<Quote>
+
+If Supabase didn't exist, I think the Fool King wouldn't exist in the way it does today.
+
+<div className="mt-4">Ben McInnes, co-founder of Loot Donkey</div>
+
+</Quote>
+
+Loot Donkey is a two-person studio that makes [Fool King](https://store.steampowered.com/app/4380860/Fool_King/), an asynchronous PvP auto-battler game on Steam. Players build an army, send it into battle, and fight the saved armies of other players, which the game calls ghosts. Between the two co-founders, Ben McInnes handles programming and mechanics, and Gareth Davies handles the art, animation, level design, and game world experience.
+
+## Building an online game without any backend experience
+
+With funding scarce for indie game studios, Loot Donkey's two co-founders kept the team small while building Fool King, an asynchronous PvP game where a player's army is saved and fought later by other players. That design only works with a backend that stores every army and serves it back to other players, and as the studio's programmer, Ben McInnes was the one who had to build it.
+
+<Quote>
+
+I've never done any backend engineering, and I have no experience with web stuff at all. It's still a magical box to me, even to this day.
+
+<div className="mt-4">Ben McInnes, co-founder of Loot Donkey</div>
+
+</Quote>
+
+## Choosing an open source starting point
+
+With no backend experience and limited funds, the studio needed a platform it could set up on its own and afford while the game was still a prototype. Supabase was the first platform Ben tried, and what caught his attention was that it is an open source alternative to Firebase.
+
+<Quote>
+
+I didn't want to be beholden to Google and the cost structures involved.
+
+<div className="mt-4">Ben McInnes, co-founder of Loot Donkey</div>
+
+</Quote>
+
+The features available on Supabase's Free plan also covered the studio's needs while the game was in prototype mode. The team moved to a paid plan only when it started pitching to publishers and wanted to be sure the project would not hit a limit during those conversations.
+
+At that development stage the game needed two features from a backend, a database to store each player's army and authentication to confirm which Steam player was connected, and Supabase's Database and Auth covered both.
+
+<Quote>
+
+I got things up and running very quickly, within a month or so, i went from having nothing built to having the backbone of the game, up and running.
+
+<div className="mt-4">Ben McInnes, co-founder of Loot Donkey</div>
+
+</Quote>
+
+Supabase made that build speed possible because the database and authentication were ready to use out of the box. Ben did not have to manually design a backend or spin up a server, which he says he would not have known how to do. He also found little friction throughout the setup and no sense of being locked in, so he could spend his time on the game experience instead of the infrastructure behind it.
+
+## Running the whole game on Supabase
+
+Fool King runs on a standard Supabase project with no other cloud services on top. When a player starts the game, Steam provides a session ticket, which an Edge Function checks against Steam's Web API before Supabase issues a session, so every player is a verified Steam user.
+
+Steam is not one of Supabase's built-in sign-in options, so Loot Donkey built this check as a custom Edge Function, and it has worked since implementation without issues.
+
+Once a player is signed in, each run is built from other players' ghosts. A run has 10 levels, with three ghost opponents on each of the first nine and the Fool King on the tenth. The game pulls these ghosts from the Postgres database and filters them so each one fits the run. For example, a realm is a tag that lets friends share a code and fight only each other's ghosts.
+
+Each ghost stores an army with every unit's position and upgrades, and it is uploaded when a battle starts. The win or loss is recorded on the server when the battle ends. Row Level Security limits each player to their own data, so no one can change another player's.
+
+This data design also shaped the decree system, where the player who beats the Fool King takes the throne and changes the rules for everyone else. The studio did not plan for a decree system from the start and it grew out of how easily the game's data could be stored and chained together.
+
+<Quote>
+
+The decree system came out of the fact that we could store and chain the data. The blobs of data we're pushing up all the time allowed us to iterate on ideas and mechanics quite quickly.
+
+<div className="mt-4">Ben McInnes, co-founder of Loot Donkey</div>
+
+</Quote>
+
+That flexibility meant the team never felt stuck as new ideas came up.
+
+Supabase's webhooks extend Fool King beyond the game itself. When data in the database changes, Supabase sends an event, and the studio uses these events to power a Discord bot. For example, the bot announces when the Fool King falls and shows the new king's loadout, which Ben says brings competitive players back into the game in an attempt to take the crown.
+
+## Spending the week on the game, not the backend
+
+The clearest result is how little the backend asks of the team now. Beyond opening the Supabase dashboard to check the day's runs and unique players, Ben also runs a second project as a dev sandbox, so new features can be tested without touching live player data.
+
+<Quote>
+
+On a week-to-week basis, it's zero. I set it up once and I've pretty much left it.
+
+<div className="mt-4">Ben McInnes, co-founder of Loot Donkey</div>
+
+</Quote>
+
+Running its own service would have been a whole other person's job for a small studio, Ben says. Instead, he reports no downtime and no issues during development, and the founders can put their spare time into the content and community work an indie studio has to do on its own, including producing videos and hosting Twitch streams.
+
+<Quote>
+
+In terms of the backend, I don't lose any sleep ... The thing that keeps me up at night now is game experience and balance.
+
+<div className="mt-4">Ben McInnes, co-founder of Loot Donkey</div>
+
+</Quote>
+
+## Getting ready for Early Access
+
+With the backend stable, Loot Donkey is focused on its Early Access launch. Aiming for an Early Access release in 2027, the studio is polishing the game experience for its 20,000+ Steam wishlists, and it is targeting a 1.0 release of Fool King in late 2027.
+
+Before its 1.0 launch, the team plans to connect with Supabase support to validate its stack for the surge in traffic. The team also expects Auth to carry over if the game eventually moves to other platforms. Ben's advice to other indie developers is to test demand early and to look at asynchronous PvP as a way into online play, because full-blown real-time multiplayer is hard to build.
+
+<Quote>
+
+I think it opens up an avenue for play and competition that maybe a lot of people may not think about, because they might think it's too hard.
+
+<div className="mt-4">Ben McInnes, co-founder of Loot Donkey</div>
+
+</Quote>
+
+## Key results
+
+- Built multi-player game backend in a month with no prior backend experience
+- Spends near zero time each week on backend maintenance
+- No downtime and no issues since game production and development began

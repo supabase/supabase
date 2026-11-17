@@ -1,6 +1,5 @@
 import { useQueryClient } from '@tanstack/react-query'
 import { getAccessToken } from 'common'
-import { useTheme } from 'next-themes'
 import Link from 'next/link'
 import { useRouter } from 'next/router'
 import { PropsWithChildren, useEffect, useState } from 'react'
@@ -14,6 +13,7 @@ import {
   LogoPair,
   SupabaseLogo,
 } from '@/components/layouts/InterstitialLayout'
+import { DisabledUntilHydrated } from '@/components/ui/DisabledUntilHydrated'
 import { DocsButton } from '@/components/ui/DocsButton'
 import { InlineLink } from '@/components/ui/InlineLink'
 import { IdentityProviderIcon } from '@/components/ui/ProviderIcon'
@@ -69,7 +69,6 @@ export const SignInLayout = ({
   children,
 }: PropsWithChildren<SignInLayoutProps>) => {
   const router = useRouter()
-  const { resolvedTheme } = useTheme()
   const queryClient = useQueryClient()
   const statusBanner = useStatusBanner({ signedOut: true })
   const showIncidentBanner = hasStatusBanner && statusBanner.type !== 'hidden'
@@ -78,8 +77,6 @@ export const SignInLayout = ({
   const { dashboardAuthLogoLinkUrl } = useCustomContent(['dashboard_auth:logo_link_url'])
   const marketingSiteUrl = dashboardAuthLogoLinkUrl ?? 'https://supabase.com'
 
-  // Addresses hydration issue with `resolvedTheme` as its undefined during SSR and the first (hydrating) client render
-  const [mounted, setMounted] = useState(false)
   const [quote, setQuote] = useState<Quote | null>(null)
 
   const verb = inboundFlow === 'sign-up' ? 'Sign up' : 'Sign in'
@@ -96,6 +93,8 @@ export const SignInLayout = ({
 
   // This useEffect redirects the user to MFA if they're already halfway signed in
   useEffect(() => {
+    let isUnmounted = false
+
     auth
       .initialize()
       .then(async ({ error }) => {
@@ -112,6 +111,7 @@ export const SignInLayout = ({
             // if there was a problem signing in via the url, don't redirect
             return
           }
+          if (isUnmounted) return
 
           if (data) {
             // we're already where we need to be
@@ -130,15 +130,17 @@ export const SignInLayout = ({
           }
 
           await queryClient.resetQueries()
-          router.push(getReturnToPath())
+          if (!isUnmounted) router.push(getReturnToPath())
         }
       })
       .catch(() => {}) // catch all errors thrown by auth methods
+
+    return () => {
+      isUnmounted = true
+    }
   }, [])
 
   useEffect(() => {
-    setMounted(true)
-
     // Weighted random selection
     // Calculate total weight (default weight is fallbackWeight for tweets without weight specified)
     const fallbackWeight = 1
@@ -197,7 +199,9 @@ export const SignInLayout = ({
           ) : undefined
         }
       >
-        <div className="px-6 pb-6">{children}</div>
+        <div className="px-6 pb-6">
+          <DisabledUntilHydrated>{children}</DisabledUntilHydrated>
+        </div>
       </InterstitialLayout>
     )
   }
@@ -222,13 +226,14 @@ export const SignInLayout = ({
               <div className="flex items-center justify-between w-full md:w-auto">
                 <Link href={logoLinkToMarketingSite ? marketingSiteUrl : '/organizations'}>
                   <img
-                    src={
-                      mounted && resolvedTheme?.includes('dark')
-                        ? `${BASE_PATH}/img/supabase-dark.svg`
-                        : `${BASE_PATH}/img/supabase-light.svg`
-                    }
+                    src={`${BASE_PATH}/img/supabase-light.svg`}
                     alt="Supabase Logo"
-                    className={largeLogo ? 'h-[48px]' : 'h-[24px]'}
+                    className={cn('dark:hidden', largeLogo ? 'h-[48px]' : 'h-[24px]')}
+                  />
+                  <img
+                    src={`${BASE_PATH}/img/supabase-dark.svg`}
+                    alt="Supabase Logo"
+                    className={cn('hidden dark:block', largeLogo ? 'h-[48px]' : 'h-[24px]')}
                   />
                 </Link>
               </div>
@@ -263,7 +268,7 @@ export const SignInLayout = ({
                 </div>
               )}
 
-              {children}
+              <DisabledUntilHydrated>{children}</DisabledUntilHydrated>
             </div>
 
             {showDisclaimer && showTos && (

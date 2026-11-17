@@ -430,6 +430,35 @@ describe('PlatformWebhooksEndpointDetails', () => {
     expect(onRetryDelivery).toHaveBeenCalledWith('pending-delivery')
   })
 
+  it('shows a Test badge on deliveries sent as test events', () => {
+    renderComponent({
+      deliveries: [
+        createDelivery({
+          id: 'test-delivery',
+          eventType: 'event.test',
+          eventPayload: { is_test: true },
+        }),
+      ],
+    })
+
+    expect(screen.getByText('Test')).toBeInTheDocument()
+  })
+
+  it('does not show a Test badge on real deliveries', () => {
+    renderComponent({
+      deliveries: [
+        createDelivery({ id: 'real-delivery', eventType: 'event.real', eventPayload: {} }),
+        createDelivery({
+          id: 'explicit-false',
+          eventType: 'event.false',
+          eventPayload: { is_test: false },
+        }),
+      ],
+    })
+
+    expect(screen.queryByText('Test')).not.toBeInTheDocument()
+  })
+
   it('renders a zero response code instead of the placeholder', () => {
     renderComponent({
       deliveries: [{ ...allDeliveries[0], id: 'org-delivery-zero', responseCode: 0 }],
