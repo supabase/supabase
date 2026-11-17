@@ -1,5 +1,7 @@
 import assert from 'node:assert'
 
+import { isAlertIssuesDemoMode } from './alert-issues-demo/mode'
+import { simulateLogflareRequest } from './alert-issues-demo/router'
 import { WrappedResult } from './types'
 import { assertSelfHosted } from './util'
 import { PROJECT_ANALYTICS_URL } from '@/lib/constants/api'
@@ -38,6 +40,24 @@ export function getProxyErrorStatus(error: Error) {
     : 500
 }
 
+function toWrappedResult(
+  status: number,
+  result: unknown,
+  statusText: string
+): WrappedResult<unknown> {
+  if (status === 204) return { data: null, error: undefined }
+  if (status >= 200 && status < 300) return { data: result, error: undefined }
+
+  const error = typeof result === 'object' && result !== null ? Reflect.get(result, 'error') : null
+  const message =
+    typeof error === 'string'
+      ? error
+      : typeof error?.message === 'string'
+        ? error.message
+        : `Failed to reach Logflare: ${statusText}`
+  return { data: undefined, error: new LogflareRequestError(message, status) }
+}
+
 async function logflareRequest(
   path: string,
   init: {
@@ -47,6 +67,12 @@ async function logflareRequest(
   }
 ): Promise<WrappedResult<unknown>> {
   assertSelfHosted()
+
+  if (isAlertIssuesDemoMode()) {
+    const { status, body } = simulateLogflareRequest(path, init)
+    return toWrappedResult(status, body, 'simulated request failed')
+  }
+
   assert(PROJECT_ANALYTICS_URL, 'PROJECT_ANALYTICS_URL is required')
   assert(process.env.LOGFLARE_PRIVATE_ACCESS_TOKEN, 'LOGFLARE_PRIVATE_ACCESS_TOKEN is required')
 
@@ -66,19 +92,8 @@ async function logflareRequest(
       ...(init.body !== undefined && { body: JSON.stringify(init.body) }),
     })
 
-    if (response.status === 204) return { data: null, error: undefined }
-
-    const result = await response.json()
-
-    if (!response.ok) {
-      const message =
-        typeof result?.error === 'string'
-          ? result.error
-          : (result?.error?.message ?? `Failed to reach Logflare: ${response.statusText}`)
-      return { data: undefined, error: new LogflareRequestError(message, response.status) }
-    }
-
-    return { data: result, error: undefined }
+    const result = response.status === 204 ? null : await response.json()
+    return toWrappedResult(response.status, result, response.statusText)
   } catch (error) {
     if (error instanceof Error) return { data: undefined, error }
     throw error
