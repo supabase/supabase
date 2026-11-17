@@ -1,6 +1,6 @@
 import { createFileRoute } from '@tanstack/react-router'
 import { IS_PLATFORM, useParams } from 'common'
-import { parseAsArrayOf, parseAsInteger, parseAsJson, parseAsString, useQueryStates } from 'nuqs'
+import { parseAsArrayOf, parseAsJson, parseAsString, useQueryStates } from 'nuqs'
 import { Admonition } from 'ui-patterns/Admonition'
 
 import { OBSERVABILITY_DOCS_HREFS } from '@/components/interfaces/Observability/Observability.constants'
@@ -12,7 +12,10 @@ import { useQueryPerformanceInfiniteQuery } from '@/components/interfaces/QueryP
 import { PRESET_CONFIG } from '@/components/interfaces/Reports/Reports.constants'
 import { Presets } from '@/components/interfaces/Reports/Reports.types'
 import { queriesFactory } from '@/components/interfaces/Reports/Reports.utils'
-import { NumericFilter } from '@/components/interfaces/Reports/v2/ReportsNumericFilter'
+import {
+  NumericFilter,
+  numericFilterSchema,
+} from '@/components/interfaces/Reports/v2/ReportsNumericFilter'
 import { DatabaseSelector } from '@/components/ui/DatabaseSelector'
 import { DocsButton } from '@/components/ui/DocsButton'
 import { useSelectedProjectQuery } from '@/hooks/misc/useSelectedProject'
@@ -26,6 +29,11 @@ export const Route = createFileRoute('/project/$ref/observability/query-performa
 
 const REPORT_TITLE = 'Query Performance'
 
+const parseNumericFilter = (value: unknown): NumericFilter | null => {
+  const parsed = numericFilterSchema.safeParse(value)
+  return parsed.success ? parsed.data : null
+}
+
 function QueryPerformanceReport() {
   const { ref } = useParams()
   const { data: project, isLoading: isLoadingProject } = useSelectedProjectQuery()
@@ -37,7 +45,7 @@ function QueryPerformanceReport() {
       search: searchQuery,
       roles,
       sources,
-      minCalls,
+      callsFilter: callsFilterRaw,
       totalTimeFilter: totalTimeFilterRaw,
       indexAdvisor,
     },
@@ -47,26 +55,18 @@ function QueryPerformanceReport() {
     search: parseAsString.withDefault(''),
     roles: parseAsArrayOf(parseAsString).withDefault([]),
     sources: parseAsArrayOf(parseAsString).withDefault([]),
-    minCalls: parseAsInteger,
-    totalTimeFilter: parseAsJson<NumericFilter | null>((value) =>
-      value === null || value === undefined ? null : (value as NumericFilter)
-    ),
+    callsFilter: parseAsJson(parseNumericFilter),
+    totalTimeFilter: parseAsJson(parseNumericFilter),
     indexAdvisor: parseAsString.withDefault('false'),
   })
 
-  const totalTimeFilter = totalTimeFilterRaw ?? null
+  const callsFilter = callsFilterRaw ?? undefined
+  const totalTimeFilter = totalTimeFilterRaw ?? undefined
 
   const config = PRESET_CONFIG[Presets.QUERY_PERFORMANCE]
   const hooks = queriesFactory(config.queries, ref ?? 'default')
   const queryHitRate = hooks.queryHitRate()
   const queryMetrics = hooks.queryMetrics()
-
-  const minTotalTime =
-    totalTimeFilter && totalTimeFilter.operator === '>'
-      ? totalTimeFilter.value
-      : totalTimeFilter && totalTimeFilter.operator === '>='
-        ? totalTimeFilter.value
-        : undefined
 
   const queryPerformanceQuery = useQueryPerformanceInfiniteQuery({
     searchQuery,
@@ -75,8 +75,8 @@ function QueryPerformanceReport() {
     roles,
     sources: sources as QuerySource[],
     runIndexAdvisor: isIndexAdvisorEnabled,
-    minCalls: minCalls ?? undefined,
-    minTotalTime,
+    callsFilter,
+    totalTimeFilter,
     filterIndexAdvisor: indexAdvisor === 'true',
   })
 
