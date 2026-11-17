@@ -38,8 +38,6 @@
         "compat/**/*.{ts,tsx}",
       ],
       "ignore": [
-        // Used by the Warehouse report extracted from #53001; remove when its consumer lands.
-        "components/interfaces/Observability/Warehouse/WarehouseMetrics.range.ts",
         "public/**",
         // one-off build/codegen scripts, run by hand or from package.json
         "scripts/**",

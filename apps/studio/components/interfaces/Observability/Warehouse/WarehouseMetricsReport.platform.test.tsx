@@ -1,9 +1,14 @@
-import { screen } from '@testing-library/react'
+import { QueryClient } from '@tanstack/react-query'
+import { screen, waitFor } from '@testing-library/react'
+import userEvent from '@testing-library/user-event'
 import type { platformComponents as components } from 'api-types'
+import dayjs from 'dayjs'
 import { HttpResponse } from 'msw'
 import { beforeEach, expect, test } from 'vitest'
 
 import { WarehouseMetricsReport } from './WarehouseMetricsReport'
+import { organizationKeys } from '@/data/organizations/keys'
+import { projectKeys } from '@/data/projects/keys'
 import type { WarehouseMetricsResponse } from '@/data/warehouse/warehouse-metrics-api-types'
 import { customRender } from '@/tests/lib/custom-render'
 import { addAPIMock, type APIErrorBody } from '@/tests/lib/msw'
@@ -60,6 +65,25 @@ const mockMetrics = (value: number | null) =>
     path: '/platform/warehouse/:ref/metrics',
     response: () => HttpResponse.json<WarehouseMetricsResponse>(response(value)),
   })
+const renderReport = () => {
+  const queryClient = new QueryClient({
+    defaultOptions: { queries: { retry: false, staleTime: Infinity } },
+  })
+  queryClient.setQueryData(projectKeys.detail('default'), { organization_id: 1 })
+  queryClient.setQueryData(organizationKeys.list(), [
+    { id: 1, slug: 'free-org', plan: { id: 'free' } },
+  ])
+  queryClient.setQueryData(organizationKeys.entitlements('free-org'), {
+    entitlements: [
+      {
+        feature: { key: 'log.retention_days' },
+        type: 'numeric',
+        config: { enabled: true, unlimited: false, value: 1 },
+      },
+    ],
+  })
+  return customRender(<WarehouseMetricsReport />, { queryClient, nuqs: { hasMemory: true } })
+}
 beforeEach(() => {
   mockSetup()
   addAPIMock({
@@ -68,23 +92,23 @@ beforeEach(() => {
     response: () => HttpResponse.json<APIErrorBody>({ message: 'Not found' }, { status: 404 }),
   })
 })
-test('shows an explicit last-hour empty state', async () => {
+test('shows no data for the selected period', async () => {
   mockMetrics(null)
-  customRender(<WarehouseMetricsReport />)
-  expect(await screen.findByText('No data in the last 60 minutes')).toBeInTheDocument()
+  renderReport()
+  expect(await screen.findByText('No data in the selected period')).toBeInTheDocument()
 })
 test('renders measured zero as query activity', async () => {
   mockMetrics(0)
-  customRender(<WarehouseMetricsReport />)
+  renderReport()
   expect(
     await screen.findByText('Queries started per second. Not a count of SQL statements.')
   ).toBeInTheDocument()
-  expect(screen.queryByText('No data in the last 60 minutes')).not.toBeInTheDocument()
+  expect(screen.queryByText('No data in the selected period')).not.toBeInTheDocument()
 })
 test('offers setup when Warehouse has not been configured', async () => {
   mockSetup('not_started')
   mockMetrics(null)
-  customRender(<WarehouseMetricsReport />)
+  renderReport()
   expect(await screen.findByRole('link', { name: 'Set up Warehouse' })).toHaveAttribute(
     'href',
     '/project/default/integrations/warehouse/overview'
@@ -96,6 +120,56 @@ test('shows a request failure rather than a no-data state', async () => {
     path: '/platform/warehouse/:ref/metrics',
     response: () => HttpResponse.json<APIErrorBody>({ message: 'Failed' }, { status: 500 }),
   })
-  customRender(<WarehouseMetricsReport />)
+  renderReport()
   expect(await screen.findByText('Failed to retrieve Warehouse metrics')).toBeInTheDocument()
+})
+
+test('requests the period selected in the date picker', async () => {
+  const requests: URL[] = []
+  addAPIMock({
+    method: 'get',
+    path: '/platform/warehouse/:ref/metrics',
+    response: ({ request }) => {
+      requests.push(new URL(request.url))
+      return HttpResponse.json<WarehouseMetricsResponse>(response(null))
+    },
+  })
+  renderReport()
+  await screen.findByText('No data in the selected period')
+  await userEvent.click(screen.getByRole('button', { name: /Last 60 minutes/ }))
+  await userEvent.click(screen.getByText('Last 24 hours'))
+  await waitFor(() => expect(requests.at(-1)?.searchParams.get('interval')).toBe('5m'))
+  const lastRequest = requests.at(-1)!
+  expect(
+    dayjs(lastRequest.searchParams.get('endDate')).diff(
+      dayjs(lastRequest.searchParams.get('startDate')),
+      'hour'
+    )
+  ).toBe(24)
+})
+
+test('refreshes report measurements', async () => {
+  let requests = 0
+  addAPIMock({
+    method: 'get',
+    path: '/platform/warehouse/:ref/metrics',
+    response: () => {
+      requests += 1
+      return HttpResponse.json<WarehouseMetricsResponse>(response(null))
+    },
+  })
+  renderReport()
+  await screen.findByText('No data in the selected period')
+  const before = requests
+  await userEvent.click(screen.getByRole('button', { name: 'Refresh report' }))
+  await waitFor(() => expect(requests).toBeGreaterThan(before))
+})
+
+test('shows the retention upgrade prompt instead of requesting seven days on a free plan', async () => {
+  mockMetrics(null)
+  renderReport()
+  await screen.findByText('No data in the selected period')
+  await userEvent.click(screen.getByRole('button', { name: /Last 60 minutes/ }))
+  await userEvent.click(screen.getByText('Last 7 days'))
+  expect(await screen.findByRole('dialog')).toHaveTextContent('Report date range')
 })
