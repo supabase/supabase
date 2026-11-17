@@ -35,11 +35,11 @@ import { LogsFilterBar } from './components/LogsFilterBar'
 import { getLogAttributeSources } from './components/LogsFilterBar.utils'
 import { LogsListPanel } from './components/LogsListPanel'
 import { LogsTable } from './components/LogsTable'
-import { getFilterCombinationKey, truncateViewName } from './components/LogsViews.utils'
+import { getFilterCombinationKey } from './components/LogsViews.utils'
 import { LogsViewsBar } from './components/LogsViewsBar'
 import { SaveViewDialog } from './components/SaveViewDialog'
 import { TooltipLabel } from './components/TooltipLabel'
-import { ViewSuggestionBanner } from './components/ViewSuggestionBanner'
+import { ViewModifiedPopover } from './components/ViewModifiedPopover'
 import { ServiceFlowPanel } from './ServiceFlowPanel'
 import { LOG_TYPES, PIPELINE_LOG_LEVEL_LABELS, SEARCH_PARAMS_PARSER } from './UnifiedLogs.constants'
 import { filterFields as defaultFilterFields } from './UnifiedLogs.fields'
@@ -167,6 +167,9 @@ export const UnifiedLogs = ({
   const currentProjectRef = useRef(projectRef)
   currentProjectRef.current = projectRef
   const [dismissedUpdateKey, setDismissedUpdateKey] = useState<string | null>(null)
+  const [isReviewingChanges, setIsReviewingChanges] = useState(false)
+  const activeChipRef = useRef<HTMLDivElement>(null)
+  const viewsToggleRef = useRef<HTMLButtonElement>(null)
   const computeAvailability = getComputeLogsAvailability({
     isPlatform: IS_PLATFORM,
     flagsLoaded,
@@ -498,14 +501,14 @@ export const UnifiedLogs = ({
   // Keyed by view + filter combination so dismissing re-shows if the user modifies
   // the view differently afterwards, and automatically "resets" once unmodified.
   const updateSuggestionKey = activeView ? `${activeView.id}:${filterCombinationKey}` : null
-  const showUpdateViewSuggestion =
+  const isViewModifiedUnacknowledged =
     showSavedViews &&
     !!activeView &&
-    canUpdateView &&
-    !isSavingView &&
     isActiveViewModified &&
     !isSaveViewDialogOpen &&
     updateSuggestionKey !== dismissedUpdateKey
+  const isViewModifiedPopoverOpen = isViewModifiedUnacknowledged || isReviewingChanges
+  const canReviewChanges = showSavedViews && !!activeView && isActiveViewModified
 
   const handleApplyView = (view: LogsView) => {
     const { params, dropped } = applyView(view, { filterableNames })
@@ -554,6 +557,17 @@ export const UnifiedLogs = ({
 
   const handleDismissUpdateSuggestion = () => {
     setDismissedUpdateKey(updateSuggestionKey)
+    setIsReviewingChanges(false)
+  }
+
+  useEffect(() => {
+    if (!isViewModifiedPopoverOpen || !isViewsBarOpen) return
+    activeChipRef.current?.scrollIntoView({ block: 'nearest', inline: 'nearest' })
+  }, [isViewModifiedPopoverOpen, isViewsBarOpen])
+
+  const handleResetActiveView = () => {
+    if (activeView) handleApplyView(activeView)
+    setIsReviewingChanges(false)
   }
 
   const applyFilterSearch = () => {
@@ -721,23 +735,35 @@ export const UnifiedLogs = ({
                       shortcutId={SHORTCUT_IDS.UNIFIED_LOGS_REFRESH}
                     />
                     {showSavedViews && (
-                      <ButtonTooltip
-                        size="tiny"
-                        variant={isViewsBarOpen ? 'primary' : 'default'}
-                        className="w-[26px]"
-                        icon={
-                          <Layers2Icon
-                            className={
-                              isViewsBarOpen ? 'text-primary-solid-foreground' : 'text-foreground'
-                            }
+                      <div className="relative">
+                        <ButtonTooltip
+                          ref={viewsToggleRef}
+                          size="tiny"
+                          variant={isViewsBarOpen ? 'primary' : 'default'}
+                          className="w-[26px]"
+                          icon={
+                            <Layers2Icon
+                              className={
+                                isViewsBarOpen ? 'text-primary-solid-foreground' : 'text-foreground'
+                              }
+                            />
+                          }
+                          aria-label="Saved views"
+                          aria-expanded={isViewsBarOpen}
+                          aria-controls={VIEWS_BAR_ID}
+                          onClick={() => setIsViewsBarOpen(!isViewsBarOpen)}
+                          tooltip={{ content: { side: 'bottom', text: 'Saved views' } }}
+                        />
+                        {!isViewsBarOpen && canReviewChanges && (
+                          <button
+                            type="button"
+                            aria-label={`Review changes to ${activeView?.name ?? ''}`}
+                            aria-expanded={isViewModifiedPopoverOpen}
+                            onClick={() => setIsReviewingChanges(true)}
+                            className="absolute top-0.5 right-0.5 h-1.5 w-1.5 rounded-full bg-warning"
                           />
-                        }
-                        aria-label="Saved views"
-                        aria-expanded={isViewsBarOpen}
-                        aria-controls={VIEWS_BAR_ID}
-                        onClick={() => setIsViewsBarOpen(!isViewsBarOpen)}
-                        tooltip={{ content: { side: 'bottom', text: 'Saved views' } }}
-                      />
+                        )}
+                      </div>
                     )}
                     <DataTableViewOptions />
                     <DownloadLogsButton searchParameters={searchParameters} />
@@ -772,6 +798,10 @@ export const UnifiedLogs = ({
                         canUpdate={canUpdateView}
                         canDelete={canDeleteView}
                         isPending={isSavingView}
+                        isActiveViewModified={isActiveViewModified}
+                        isReviewOpen={isViewModifiedPopoverOpen}
+                        activeChipRef={activeChipRef}
+                        onReviewChanges={() => setIsReviewingChanges(true)}
                         onApply={handleApplyView}
                         onClearActiveView={handleClearActiveView}
                         onRename={(viewId, name) => updateSavedView(viewId, { name })}
@@ -783,16 +813,9 @@ export const UnifiedLogs = ({
                   )}
                 </AnimatePresence>
 
-                <ViewSuggestionBanner
-                  visible={showUpdateViewSuggestion}
-                  title="You have modified your view"
-                  description={`Update "${truncateViewName(activeView?.name ?? '')}" with these changes?`}
-                  primaryLabel="Update"
-                  onPrimary={handleUpdateActiveView}
-                  onDismiss={handleDismissUpdateSuggestion}
-                  secondaryLabel={canCreateView ? 'Save as new' : undefined}
-                  onSecondary={canCreateView ? () => handleSaveCurrentView() : undefined}
-                />
+                <span aria-live="polite" className="sr-only">
+                  {canReviewChanges ? 'This view has been modified' : ''}
+                </span>
 
                 {isLoading ? (
                   <div className="h-[60px] flex items-center justify-center">
@@ -882,6 +905,24 @@ export const UnifiedLogs = ({
         defaultName={saveDialogName ?? undefined}
         columnLabels={columnLabels}
       />
+
+      {showSavedViews && !!activeView && (
+        <ViewModifiedPopover
+          open={isViewModifiedPopoverOpen}
+          onOpenChange={(open) => {
+            if (!open) handleDismissUpdateSuggestion()
+          }}
+          anchorRef={isViewsBarOpen ? activeChipRef : viewsToggleRef}
+          viewName={activeView.name}
+          canUpdate={canUpdateView}
+          canCreate={canCreateView}
+          isPending={isSavingView}
+          onUpdate={handleUpdateActiveView}
+          onSaveAsNew={() => handleSaveCurrentView(`${activeView.name} copy`)}
+          onReset={handleResetActiveView}
+          onDismiss={handleDismissUpdateSuggestion}
+        />
+      )}
     </>
   )
 }

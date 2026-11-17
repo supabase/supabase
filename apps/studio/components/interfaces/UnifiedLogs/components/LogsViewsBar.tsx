@@ -19,6 +19,10 @@ interface LogsViewsBarProps {
   canUpdate?: boolean
   canDelete?: boolean
   isPending?: boolean
+  isActiveViewModified?: boolean
+  isReviewOpen?: boolean
+  activeChipRef?: React.Ref<HTMLDivElement>
+  onReviewChanges?: () => void
   onApply: (view: LogsView) => void
   onClearActiveView: () => void
   onRename: (id: string, name: string) => Promise<void>
@@ -38,6 +42,10 @@ export const LogsViewsBar = ({
   canUpdate = true,
   canDelete = true,
   isPending = false,
+  isActiveViewModified = false,
+  isReviewOpen = false,
+  activeChipRef,
+  onReviewChanges,
   onApply,
   onClearActiveView,
   onRename,
@@ -96,9 +104,13 @@ export const LogsViewsBar = ({
               key={view.id}
               view={view}
               isActive={view.id === activeViewId}
+              isModified={view.id === activeViewId && isActiveViewModified}
+              isReviewOpen={isReviewOpen}
+              rootRef={view.id === activeViewId ? activeChipRef : undefined}
               canUpdate={canUpdate && !isPending}
               canDelete={canDelete && !isPending}
               onApply={onApply}
+              onReviewChanges={onReviewChanges}
               onRequestRename={setRenameTarget}
               onRequestDelete={setDeleteTarget}
             />

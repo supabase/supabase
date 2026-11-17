@@ -37,17 +37,25 @@ export const ChipLabelButton = ({
 export const LogsViewChip = ({
   view,
   isActive,
+  isModified = false,
+  isReviewOpen = false,
   canUpdate,
   canDelete,
+  rootRef,
   onApply,
+  onReviewChanges,
   onRequestRename,
   onRequestDelete,
 }: {
   view: LogsView
   isActive: boolean
+  isModified?: boolean
+  isReviewOpen?: boolean
   canUpdate: boolean
   canDelete: boolean
+  rootRef?: React.Ref<HTMLDivElement>
   onApply: (view: LogsView) => void
+  onReviewChanges?: () => void
   onRequestRename: (view: LogsView) => void
   onRequestDelete: (view: LogsView) => void
 }) => {
@@ -55,6 +63,7 @@ export const LogsViewChip = ({
 
   return (
     <div
+      ref={rootRef}
       className={cn(CHIP_CLASS, isActive && 'border-foreground-muted bg-surface-200')}
       data-testid={`logs-view-chip-${view.id}`}
     >
@@ -67,6 +76,18 @@ export const LogsViewChip = ({
         <Layers2Icon size={12} className="shrink-0 text-foreground-light" />
         <span className="truncate">{view.name}</span>
       </ChipLabelButton>
+
+      {isModified && !!onReviewChanges && (
+        <button
+          type="button"
+          aria-label={`Review changes to ${view.name}`}
+          aria-expanded={isReviewOpen}
+          onClick={onReviewChanges}
+          className="h-[18px] w-[18px] shrink-0 self-center rounded-sm p-0 flex items-center justify-center hover:bg-surface-600 focus-visible:z-20 focus-visible:ring-2 focus-visible:ring-ring"
+        >
+          <span className="h-1.5 w-1.5 rounded-full bg-warning" />
+        </button>
+      )}
 
       {hasMenu && (
         <DropdownMenu>
