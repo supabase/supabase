@@ -15,7 +15,7 @@ import {
 import { IS_PLATFORM, LOCAL_STORAGE_KEYS, useFeatureFlags, useFlag, useParams } from 'common'
 import { Loader2Icon, PanelLeftCloseIcon, PanelLeftOpenIcon } from 'lucide-react'
 import { useQueryStates } from 'nuqs'
-import { useEffect, useEffectEvent, useMemo, useRef, useState } from 'react'
+import { useEffect, useEffectEvent, useMemo, useRef, useState, type ReactNode } from 'react'
 import { toast } from 'sonner'
 import {
   Button,
@@ -59,7 +59,7 @@ import {
 } from './UnifiedLogs.hooks'
 import { isUserFilterUnreachable } from './UnifiedLogs.queries'
 import { ColumnSchema } from './UnifiedLogs.schema'
-import { UnifiedLogsScope } from './UnifiedLogs.types'
+import type { UnifiedLogsScope, UnifiedLogsToolbarSlots } from './UnifiedLogs.types'
 import {
   gateLogTypeFilters,
   gateLogTypeOptions,
@@ -126,12 +126,15 @@ interface UnifiedLogsProps {
   hasFilterSideBar?: boolean
   offeredFilters?: readonly string[]
   columnPreferencesKey?: string
+  /** Lays out the filter bar and actions in place of the default toolbar row. */
+  renderToolbar?: (slots: UnifiedLogsToolbarSlots) => ReactNode
 }
 
 export const UnifiedLogs = ({
   scope,
   hasFilterSideBar = true,
   offeredFilters,
+  renderToolbar,
   columnPreferencesKey,
 }: UnifiedLogsProps) => {
   useResetFocus()
@@ -678,7 +681,11 @@ export const UnifiedLogs = ({
               id="panel-right"
               className="flex max-w-full flex-1 flex-col overflow-hidden"
             >
-              <div ref={topBarRef} className="top-0 z-10 flex flex-col bg-background">
+              {/* A host that lays out the toolbar also owns the surface, so it paints the background. */}
+              <div
+                ref={topBarRef}
+                className={cn('top-0 z-10 flex flex-col', !renderToolbar && 'bg-background')}
+              >
                 {isError && flatData.length > 0 && (
                   <AlertError
                     error={error}
@@ -686,70 +693,80 @@ export const UnifiedLogs = ({
                     projectRef={projectRef}
                   />
                 )}
-                <div className="flex flex-wrap items-center gap-2 px-2 border-b">
-                  {hasFilterSideBar && (
-                    <>
-                      <ShortcutTooltip
-                        shortcutId={SHORTCUT_IDS.DATA_TABLE_TOGGLE_FILTERS}
-                        side="bottom"
-                      >
-                        <Button
-                          size="tiny"
-                          variant="text"
-                          icon={isFilterBarOpen ? <PanelLeftCloseIcon /> : <PanelLeftOpenIcon />}
-                          onClick={() => setIsFilterBarOpen((prev) => !prev)}
-                          className="hidden w-[26px] sm:flex"
-                          aria-label={isFilterBarOpen ? 'Hide filters' : 'Show filters'}
-                        />
-                      </ShortcutTooltip>
+                {renderToolbar ? (
+                  renderToolbar({
+                    filterBar: <LogsFilterBar offeredFilters={offeredFilters} />,
+                    isRefreshing: isRefetchingData,
+                    onRefresh: refetchAllData,
+                    searchParameters,
+                    fetchPreviousPage,
+                  })
+                ) : (
+                  <div className="flex flex-wrap items-center gap-2 px-2 border-b">
+                    {hasFilterSideBar && (
+                      <>
+                        <ShortcutTooltip
+                          shortcutId={SHORTCUT_IDS.DATA_TABLE_TOGGLE_FILTERS}
+                          side="bottom"
+                        >
+                          <Button
+                            size="tiny"
+                            variant="text"
+                            icon={isFilterBarOpen ? <PanelLeftCloseIcon /> : <PanelLeftOpenIcon />}
+                            onClick={() => setIsFilterBarOpen((prev) => !prev)}
+                            className="hidden w-[26px] sm:flex"
+                            aria-label={isFilterBarOpen ? 'Hide filters' : 'Show filters'}
+                          />
+                        </ShortcutTooltip>
 
-                      <div className="h-full border-r" />
-                    </>
-                  )}
-
-                  <div className="order-first w-full min-w-0 sm:order-0 sm:w-auto sm:flex-1 py-2">
-                    <LogsFilterBar offeredFilters={offeredFilters} />
-                  </div>
-
-                  {hasFilterSideBar && (
-                    <div className="block sm:hidden">
-                      <DataTableFilterControlsDrawer />
-                    </div>
-                  )}
-
-                  <div className="ml-auto flex items-center gap-x-2">
-                    <RefreshButton
-                      isLoading={isRefetchingData}
-                      onRefresh={refetchAllData}
-                      shortcutId={SHORTCUT_IDS.UNIFIED_LOGS_REFRESH}
-                    />
-                    {showSavedViews && (
-                      <LogsViewsMenu
-                        key={projectRef}
-                        views={savedViews}
-                        isLoading={isLoadingSavedViews}
-                        isError={isErrorSavedViews}
-                        activeViewId={activeView?.id ?? null}
-                        isPending={isSavingView}
-                        canUpdate={canUpdateView}
-                        canDelete={canDeleteView}
-                        onRetry={retrySavedViews}
-                        onApply={handleApplyView}
-                        onRename={(id, name) => updateSavedView(id, { name })}
-                        onDelete={deleteSavedView}
-                        onClearActiveView={handleClearActiveView}
-                      />
+                        <div className="h-full border-r" />
+                      </>
                     )}
-                    <DataTableViewOptions />
-                    <DownloadLogsButton searchParameters={searchParameters} />
-                    {fetchPreviousPage ? (
-                      <LiveButton
-                        fetchPreviousPage={fetchPreviousPage}
-                        searchParamsParser={SEARCH_PARAMS_PARSER}
+
+                    <div className="order-first w-full min-w-0 sm:order-0 sm:w-auto sm:flex-1 py-2">
+                      <LogsFilterBar offeredFilters={offeredFilters} />
+                    </div>
+
+                    {hasFilterSideBar && (
+                      <div className="block sm:hidden">
+                        <DataTableFilterControlsDrawer />
+                      </div>
+                    )}
+
+                    <div className="ml-auto flex items-center gap-x-2">
+                      <RefreshButton
+                        isLoading={isRefetchingData}
+                        onRefresh={refetchAllData}
+                        shortcutId={SHORTCUT_IDS.UNIFIED_LOGS_REFRESH}
                       />
-                    ) : null}
+                      {showSavedViews && (
+                        <LogsViewsMenu
+                          key={projectRef}
+                          views={savedViews}
+                          isLoading={isLoadingSavedViews}
+                          isError={isErrorSavedViews}
+                          activeViewId={activeView?.id ?? null}
+                          isPending={isSavingView}
+                          canUpdate={canUpdateView}
+                          canDelete={canDeleteView}
+                          onRetry={retrySavedViews}
+                          onApply={handleApplyView}
+                          onRename={(id, name) => updateSavedView(id, { name })}
+                          onDelete={deleteSavedView}
+                          onClearActiveView={handleClearActiveView}
+                        />
+                      )}
+                      <DataTableViewOptions />
+                      <DownloadLogsButton searchParameters={searchParameters} />
+                      {fetchPreviousPage ? (
+                        <LiveButton
+                          fetchPreviousPage={fetchPreviousPage}
+                          searchParamsParser={SEARCH_PARAMS_PARSER}
+                        />
+                      ) : null}
+                    </div>
                   </div>
-                </div>
+                )}
 
                 {isLoading ? (
                   <div className="h-[60px] flex items-center justify-center">
@@ -801,7 +818,7 @@ export const UnifiedLogs = ({
                   defaultSize="100"
                   minSize="10"
                   className={cn(
-                    'bg',
+                    !renderToolbar && 'bg',
                     isFetchingButNotPaginating && 'opacity-60 transition-opacity duration-150'
                   )}
                 >

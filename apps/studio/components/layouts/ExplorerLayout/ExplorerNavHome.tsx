@@ -7,6 +7,7 @@ import { Separator } from 'ui'
 import { ShimmeringLoader } from 'ui-patterns/ShimmeringLoader'
 
 import {
+  EXPLORER_LOGS_SECTION,
   EXPLORER_RESOURCE_SECTIONS,
   EXPLORER_TABLES_SECTION,
   LEVEL_OFFSET,
@@ -20,6 +21,7 @@ import { entityQueryId } from '@/components/interfaces/Explorer/entityQuery.util
 import { useCreateQuery, useOpenEntityQuery } from '@/components/interfaces/Explorer/hooks'
 import { useContentCountQuery } from '@/data/content/content-count-query'
 import { ENTITY_TYPE } from '@/data/entity-types/entity-type-constants'
+import { useIsFeatureEnabled } from '@/hooks/misc/useIsFeatureEnabled'
 import { useAiAssistantChatList } from '@/state/ai-assistant-state'
 
 /** Users are `auth.users`, opened like any other table rather than as a page of their own. */
@@ -59,6 +61,7 @@ export const ExplorerNavHome = ({
   const isUsersOpen = id === entityQueryId(AUTH_USERS)
 
   const chats = useAiAssistantChatList()
+  const isLogsEnabled = useIsFeatureEnabled('logs:all')
 
   const { data: notebookCountData, isPending } = useContentCountQuery({
     projectRef: ref,
@@ -102,6 +105,13 @@ export const ExplorerNavHome = ({
           <PlusIcon size={14} className="shrink-0 text-foreground-muted" />
         </button>
         <Separator className="my-2" />
+        {isLogsEnabled && (
+          <>
+            {/* What the project's services are doing, apart from both the data and saved work. */}
+            <ExplorerSectionRow section={EXPLORER_LOGS_SECTION} onSelect={onSelectLevel} />
+            <Separator className="my-2" />
+          </>
+        )}
         {/* Saved work, each with a list behind it. */}
         {EXPLORER_RESOURCE_SECTIONS.map((section) => (
           <ExplorerSectionRow

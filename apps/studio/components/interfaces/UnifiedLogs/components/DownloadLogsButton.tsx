@@ -4,7 +4,7 @@ import { DownloadIcon, SettingsIcon } from 'lucide-react'
 import Link from 'next/link'
 import { usePathname } from 'next/navigation'
 import Papa from 'papaparse'
-import { useEffect, useState } from 'react'
+import { useEffect, useState, type ReactElement } from 'react'
 import { toast } from 'sonner'
 import {
   Button,
@@ -37,9 +37,11 @@ const DEFAULT_DURATION = '1'
 
 interface DownloadLogsButtonProps {
   searchParameters: QuerySearchParamsType
+  /** Replaces the default icon button, so a host toolbar can use its own action style. */
+  trigger?: ReactElement
 }
 
-export const DownloadLogsButton = ({ searchParameters }: DownloadLogsButtonProps) => {
+export const DownloadLogsButton = ({ searchParameters, trigger }: DownloadLogsButtonProps) => {
   const { ref } = useParams()
   const pathname = usePathname()
   const isLogs = pathname?.includes?.('/logs') ?? false
@@ -103,11 +105,13 @@ export const DownloadLogsButton = ({ searchParameters }: DownloadLogsButtonProps
       <DropdownMenu open={isMenuOpen} onOpenChange={setIsMenuOpen}>
         <ShortcutTooltip shortcutId={SHORTCUT_IDS.UNIFIED_LOGS_DOWNLOAD} side="bottom">
           <DropdownMenuTrigger asChild>
-            <Button
-              className="w-[26px]"
-              icon={<DownloadIcon className="text-foreground" />}
-              aria-label="Download logs"
-            />
+            {trigger ?? (
+              <Button
+                className="w-[26px]"
+                icon={<DownloadIcon className="text-foreground" />}
+                aria-label="Download logs"
+              />
+            )}
           </DropdownMenuTrigger>
         </ShortcutTooltip>
         <DropdownMenuContent align="end" className="w-44">

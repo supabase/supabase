@@ -34,6 +34,7 @@ import { DataTableFilterTimerange } from '@/components/ui/DataTable/DataTableFil
 import { useDataTable } from '@/components/ui/DataTable/providers/DataTableProvider'
 import { otelLogKeysQueryOptions } from '@/data/logs/otel-log-keys-query'
 import { useUnifiedLogsBackend } from '@/data/logs/unified-logs-infinite-query'
+import { useFilterBarAiAction } from '@/hooks/misc/useFilterBarAiAction'
 import { useSelectedProjectQuery } from '@/hooks/misc/useSelectedProject'
 import { UUID_REGEX } from '@/lib/constants'
 import { SHORTCUT_IDS } from '@/state/shortcuts/registry'
@@ -132,7 +133,8 @@ export const LogsFilterBar = ({ offeredFilters }: LogsFilterBarProps) => {
       attributeDiscoveryStatus = 'Log attributes loaded.'
     }
   }
-  const attributeKeys = new Set(keyQueries.flatMap(({ data }) => data ?? []))
+  const discoveredAttributeKeys = keyQueries.flatMap(({ data }) => data ?? [])
+  const attributeKeys = new Set(discoveredAttributeKeys)
   if (isOtel && freeformText.trim()) attributeKeys.add(freeformText.trim())
   for (const condition of filters.conditions) {
     if (!('propertyName' in condition)) continue
@@ -201,6 +203,28 @@ export const LogsFilterBar = ({ offeredFilters }: LogsFilterBarProps) => {
     syncFromColumnFilters()
   }, [columnFilters, user])
 
+  // Only fields the AI can fill in from a prompt. The typed text is offered as an attribute for
+  // manual filtering, but it isn't a real one, so it stays out; so do User, which needs a
+  // resolved user id, and Time range, whose value has its own format.
+  const aiFilterProperties = [
+    ...filterProperties.filter(
+      (property) => property.name !== USER_PROPERTY && property.name !== TIME_RANGE_PROPERTY
+    ),
+    ...(isOtel ? discoveredAttributeKeys.map(logAttributeFilterId) : []).map(
+      buildAttributeFilterProperty
+    ),
+  ]
+  const { actions, isGenerating } = useFilterBarAiAction({
+    filterProperties: aiFilterProperties,
+    // Generated filters are complete, so apply them now rather than waiting for a blur.
+    onGenerate: (generated) => {
+      setFilters(generated)
+      onApply(generated)
+      setFreeformText('')
+    },
+  })
+  const isLoading = isFetching || isGenerating
+
   return (
     <div onFocusCapture={() => setHasFocusedFilterBar(true)}>
       <span role="status" aria-live="polite" aria-atomic="true" className="sr-only">
@@ -217,9 +241,10 @@ export const LogsFilterBar = ({ offeredFilters }: LogsFilterBarProps) => {
         onFilterChange={setFilters}
         onApply={onApply}
         onFreeformTextChange={setFreeformText}
-        isLoading={isFetching}
+        actions={actions}
+        isLoading={isLoading}
         icon={
-          isFetching ? (
+          isLoading ? (
             <LoaderCircleIcon className="h-4 w-4 animate-spin text-foreground-muted opacity-50" />
           ) : (
             <SearchIcon className="text-foreground-muted w-4 h-4 sticky" />

@@ -1,3 +1,4 @@
+import type { FetchPreviousPageOptions } from '@tanstack/react-query'
 import type { inferParserType } from 'nuqs'
 import type { ReactNode } from 'react'
 import type { z } from 'zod'
@@ -16,6 +17,18 @@ export type PageParam = { cursor: number; direction: 'next' | 'prev' } | undefin
 export type SearchParamsType = inferParserType<typeof SEARCH_PARAMS_PARSER>
 export type UnifiedLogsScope = z.infer<typeof unifiedLogsScopeSchema>
 export type QuerySearchParamsType = z.infer<typeof querySearchParamsSchema>
+
+/** What a host needs to lay out the logs toolbar its own way, in place of the default row. */
+export type UnifiedLogsToolbarSlots = {
+  /** The filter bar, already wired to the logs table. */
+  filterBar: ReactNode
+  isRefreshing: boolean
+  onRefresh: () => void
+  /** For the download menu, which exports what the current filters match. */
+  searchParameters: QuerySearchParamsType
+  /** Present when the current sort supports live tailing. */
+  fetchPreviousPage?: (options?: FetchPreviousPageOptions) => Promise<unknown>
+}
 
 /** ----------------------------------------- */
 

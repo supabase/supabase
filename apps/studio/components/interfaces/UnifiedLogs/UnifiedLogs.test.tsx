@@ -17,6 +17,7 @@ import {
 import { retrieveUnifiedLogs } from '@/data/logs/get-unified-logs'
 import { getUnifiedLogs } from '@/data/logs/unified-logs-infinite-query'
 import type { UnifiedLogsQueryRow } from '@/data/logs/unified-logs.utils'
+import { BASE_PATH } from '@/lib/constants'
 import { customRender, CustomWrapper } from '@/tests/lib/custom-render'
 import { addAPIMock, mswServer, type APIErrorBody } from '@/tests/lib/msw'
 
@@ -316,6 +317,61 @@ describe('UnifiedLogs', () => {
       expect(rowQuery).toContain("source = 'function_logs'")
       expect(rowQuery).not.toContain("IN ('500')")
     })
+  })
+
+  it('asks AI to filter with only real log fields, then applies its filters straight away', async () => {
+    const user = userEvent.setup()
+    const onUrlUpdate = vi.fn()
+    const queryClient = new QueryClient({ defaultOptions: { queries: { retry: false } } })
+    let aiRequest: unknown
+    addAPIMock({
+      method: 'post',
+      path: '/platform/projects/:ref/analytics/endpoints/logs.all.otel',
+      response: async ({ request }) => {
+        const { sql } = z.object({ sql: z.string() }).parse(await request.json())
+        return HttpResponse.json<AnalyticsResponse>({
+          result: sql.includes('arrayJoin(mapKeys') ? [{ key: 'request_id', n: 1 }] : [],
+        })
+      },
+    })
+    mswServer.use(
+      http.post(`${BASE_PATH}/api/ai/sql/filter-v1`, async ({ request }) => {
+        aiRequest = await request.json()
+        return HttpResponse.json({
+          logicalOperator: 'AND',
+          conditions: [{ propertyName: 'level', operator: '=', value: 'error' }],
+        })
+      })
+    )
+    customRender(
+      <FeatureFlagContext.Provider
+        value={{ configcat: { otelUnifiedLogs: true }, posthog: {}, hasLoaded: true }}
+      >
+        <UnifiedLogs hasFilterSideBar={false} />
+      </FeatureFlagContext.Provider>,
+      { queryClient, nuqs: { hasMemory: true, onUrlUpdate } }
+    )
+    expect(await screen.findByText('No results found')).toBeInTheDocument()
+
+    const input = screen.getByTestId('filter-bar-freeform-input')
+    await user.click(input)
+    expect(await screen.findByRole('option', { name: 'Attributes: request_id' })).toBeVisible()
+    // Typed text is also offered as an attribute to filter by by hand; the AI must not see it.
+    fireEvent.change(input, { target: { value: 'show me all errors' } })
+    await user.click(await screen.findByRole('option', { name: /Ask AI/ }))
+
+    await waitFor(() =>
+      expect(onUrlUpdate.mock.lastCall?.[0].searchParams.get('filter')).toBe('level:eq:error')
+    )
+    const { filterProperties } = z
+      .object({ filterProperties: z.array(z.object({ name: z.string() })) })
+      .parse(aiRequest)
+    const names = filterProperties.map(({ name }) => name)
+    expect(names).toEqual(expect.arrayContaining(['level', 'log_type', 'attribute.request_id']))
+    expect(names).not.toContain('attribute.show me all errors')
+    // User needs a resolved id and Time range its own format, so neither is the AI's to fill.
+    expect(names).not.toContain('user')
+    expect(names).not.toContain('date')
   })
 
   it('discovers attributes after opening the picker and applies manual keys across requests', async () => {

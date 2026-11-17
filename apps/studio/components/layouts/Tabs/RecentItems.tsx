@@ -21,6 +21,8 @@ export function getRecentItemHref(item: RecentItem, projectRef: string) {
       return `/project/${projectRef}/explorer/query/${item.metadata?.queryId}`
     case 'schema':
       return `/project/${projectRef}/explorer/schema?schema=${encodeURIComponent(item.metadata?.schema ?? 'public')}`
+    case 'logs':
+      return `/project/${projectRef}/explorer/logs`
     case 'r':
     case 'v':
     case 'm':

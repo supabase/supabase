@@ -1,23 +1,20 @@
 import { format } from 'date-fns'
 import { Loader2Icon } from 'lucide-react'
 import { useCallback, useEffect, useEffectEvent, useMemo, useRef, useState } from 'react'
-import { AiIconAnimation, Button, Calendar } from 'ui'
+import { Button, Calendar } from 'ui'
 import {
   CustomOptionProps,
   FilterBar,
   FilterBarHandle,
   FilterGroup,
-  FilterOption,
   FilterProperty,
   isGroup,
-  SerializableFilterProperty,
-  updateGroupAtPath,
 } from 'ui-patterns/FilterBar'
 
 import { columnToFilterProperty } from './FilterPopoverNew.utils'
 import { useTableFilter } from '@/components/grid/hooks/useTableFilter'
 import type { Filter } from '@/components/grid/types'
-import { useSqlFilterGenerateMutation } from '@/data/ai/sql-filter-mutation'
+import { useFilterBarAiAction } from '@/hooks/misc/useFilterBarAiAction'
 import { useTableEditorTableStateSnapshot } from '@/state/table-editor-table'
 
 export interface FilterPopoverProps {
@@ -86,39 +83,6 @@ function DatePickerOption({ onChange, onCancel, search }: CustomOptionProps) {
   )
 }
 
-type OptionLike = FilterOption | null | undefined
-
-const isOptionRecord = (value: unknown): value is Record<string, unknown> =>
-  typeof value === 'object' && value !== null
-
-const toOptionText = (option: OptionLike): string | null => {
-  if (typeof option === 'string') return option
-  if (!isOptionRecord(option)) return null
-
-  const value = 'value' in option ? option.value : undefined
-  const label = 'label' in option ? option.label : undefined
-  const hasValue = typeof value === 'string'
-  const hasLabel = typeof label === 'string'
-
-  if (hasValue && hasLabel) return value || label
-  if (hasLabel) return label
-  return null
-}
-
-function serializeFilterProperties(
-  filterProperties: FilterProperty[]
-): SerializableFilterProperty[] {
-  return filterProperties.map((property) => ({
-    label: property.label,
-    name: property.name,
-    type: property.type,
-    operators: property.operators,
-    options: Array.isArray(property.options)
-      ? property.options.map(toOptionText).filter((value): value is string => Boolean(value))
-      : undefined,
-  }))
-}
-
 export const FilterPopoverNew = ({
   isRefetching = false,
   onInputFocus,
@@ -129,7 +93,6 @@ export const FilterPopoverNew = ({
   const filterBarRef = useRef<FilterBarHandle>(null)
 
   const [freeformText, setFreeformText] = useState('')
-  const { mutateAsync: generateFilters, isPending: isGenerating } = useSqlFilterGenerateMutation()
 
   // Local state for the FilterBar — committed to the table state on apply only,
   // so transient edits don't fire data requests.
@@ -166,11 +129,6 @@ export const FilterPopoverNew = ({
     })
   }, [columns])
 
-  const serializableFilterProperties = useMemo(
-    () => serializeFilterProperties(filterProperties),
-    [filterProperties]
-  )
-
   // Transient edits stay local — onApply pushes to the table state.
   const handleFilterChange = useCallback((newFilterGroup: FilterGroup) => {
     setFilterGroup((prev) => {
@@ -197,36 +155,19 @@ export const FilterPopoverNew = ({
     [setFilters]
   )
 
-  const actions = useMemo(
-    () => [
-      {
-        value: 'ai-filter',
-        label: 'Filter by AI',
-        onSelect: async (
-          inputValue: string,
-          context: { path: number[]; activeFilters: FilterGroup }
-        ) => {
-          const prompt = inputValue.trim()
-          if (!prompt) return
+  const { actions, isGenerating } = useFilterBarAiAction({
+    filterProperties,
+    // Generated filters are complete, so apply them now rather than waiting for a blur.
+    onGenerate: (generated) => {
+      handleFilterChange(generated)
+      handleApply(generated)
+      setFreeformText('')
+    },
+  })
 
-          const aiGroup = await generateFilters({
-            prompt,
-            filterProperties: serializableFilterProperties,
-            currentPath: context.path ?? [],
-          })
-
-          const updatedGroup = updateGroupAtPath(context.activeFilters, context.path ?? [], aiGroup)
-          handleFilterChange(updatedGroup)
-          setFreeformText('')
-        },
-      },
-    ],
-    [generateFilters, serializableFilterProperties, handleFilterChange, setFreeformText]
-  )
-
-  const icon = isGenerating ? (
-    <AiIconAnimation size={16} loading />
-  ) : isRefetching ? (
+  // Generating filters and fetching rows read as one wait, so both show the same spinner.
+  const isLoading = isGenerating || isRefetching
+  const icon = isLoading ? (
     <Loader2Icon
       className="animate-spin text-primary h-4 w-4 shrink-0"
       aria-label="Loading table data"
@@ -244,7 +185,6 @@ export const FilterPopoverNew = ({
         freeformText={freeformText}
         onFreeformTextChange={setFreeformText}
         actions={actions}
-        isLoading={isGenerating}
         variant="pill"
         className="bg-transparent border-0 overflow-visible px-1.5 [&>div>div>div>input]:!text-xs"
         icon={icon}

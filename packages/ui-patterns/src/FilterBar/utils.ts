@@ -5,6 +5,7 @@ import {
   FilterGroup,
   FilterOperatorGroup,
   FilterOperatorObject,
+  FilterOption,
   FilterOptionObject,
   FilterProperty,
   GROUP_ORDER,
@@ -13,6 +14,7 @@ import {
   MenuItem,
   MenuItemGroup,
   ResolvedPropertyChange,
+  SerializableFilterProperty,
   SyncOptionsFunction,
 } from './types'
 
@@ -368,4 +370,28 @@ export function buildFilterPlaceholder(
   const aiSuffix = hasActions ? ' or ask AI' : ''
 
   return `Filter by ${propertyNames}${suffix}${aiSuffix}`
+}
+
+function getOptionText(option: FilterOption): string | null {
+  if (typeof option === 'string') return option
+  if (isFilterOptionObject(option)) return option.value || option.label
+  return option.label ?? null
+}
+
+/**
+ * The filter properties as plain data, for sending to an AI filter endpoint. Async and custom
+ * option sources can't be sent, so only a property's static option values go along.
+ */
+export function serializeFilterProperties(
+  filterProperties: FilterProperty[]
+): SerializableFilterProperty[] {
+  return filterProperties.map((property) => ({
+    label: property.label,
+    name: property.name,
+    type: property.type,
+    operators: property.operators,
+    options: Array.isArray(property.options)
+      ? property.options.map(getOptionText).filter((value): value is string => Boolean(value))
+      : undefined,
+  }))
 }

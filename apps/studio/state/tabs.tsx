@@ -19,7 +19,7 @@ import type { ENTITY_TYPE } from '@/data/entity-types/entity-type-constants'
 export const editorEntityTypes = {
   table: ['r', 'v', 'm', 'f', 'p'],
   sql: ['sql'],
-  explorer: ['notebook', 'query', 'chat', 'generated-page', 'schema'],
+  explorer: ['notebook', 'query', 'chat', 'generated-page', 'schema', 'logs'],
 }
 
 export type TabType =
@@ -30,6 +30,7 @@ export type TabType =
   | 'query'
   | 'chat'
   | 'generated-page'
+  | 'logs'
   | 'explorer-home'
 
 /**
@@ -43,6 +44,9 @@ export const isEphemeralTabType = (type: TabType) => EPHEMERAL_TAB_TYPES.has(typ
 
 /** Fixed id for Explorer's pinned, non-closable Home tab. */
 export const EXPLORER_HOME_TAB_ID = 'explorer-home'
+
+/** Fixed id for Explorer's single Logs tab, whose filters come from the sidebar's views. */
+export const EXPLORER_LOGS_TAB_ID = 'explorer-logs'
 
 /** Tab descriptor for Explorer's Home tab — shared by its trigger and its page. */
 export const EXPLORER_HOME_TAB: Tab = {
@@ -65,6 +69,7 @@ type CreateTabIdParams = {
   chat: { id: string }
   'generated-page': { id: string }
   schema: { schema: string }
+  logs: never
   view: never
   function: never
   new: never
@@ -84,6 +89,8 @@ export interface Tab {
     queryId?: string
     chatId?: string
     generatedPageId?: string
+    /** For the Logs tab, the filter search string last applied, restored on return to the tab. */
+    logsSearch?: string
     scrollTop?: number
     /**
      * For SQL tabs, which backend the snippet queries (`'database'` | `'logs'`),
@@ -363,7 +370,12 @@ export function createTabsState(projectRef: string) {
     },
     updateTab: (
       id: string,
-      updates: { label?: string; scrollTop?: number; sqlSource?: SqlSnippetSource }
+      updates: {
+        label?: string
+        scrollTop?: number
+        sqlSource?: SqlSnippetSource
+        logsSearch?: string
+      }
     ) => {
       const tab = store.tabsMap[id]
       if (!tab) return
@@ -381,6 +393,9 @@ export function createTabsState(projectRef: string) {
       }
       if ('scrollTop' in updates && tab.metadata) {
         tab.metadata.scrollTop = updates.scrollTop
+      }
+      if ('logsSearch' in updates && tab.metadata) {
+        tab.metadata.logsSearch = updates.logsSearch
       }
       // Backfill the immutable source onto a tab (and its recent item) that
       // predates the field, so its icon resolves correctly once the snippet loads.
@@ -485,6 +500,9 @@ export function createTabsState(projectRef: string) {
           router.push(
             `/project/${router.query.ref}/explorer/schema?schema=${encodeURIComponent(tab.metadata?.schema ?? 'public')}`
           )
+          break
+        case 'logs':
+          router.push(`/project/${router.query.ref}/explorer/logs${tab.metadata?.logsSearch ?? ''}`)
           break
         case 'explorer-home':
           router.push(`/project/${router.query.ref}/explorer`)
@@ -625,6 +643,7 @@ export function createTabsState(projectRef: string) {
             case 'notebook':
             case 'query':
             case 'chat':
+            case 'logs':
               router.push(`/project/${router.query.ref}/explorer`)
               break
             case 'r':
@@ -770,6 +789,8 @@ export function createTabId<T extends TabType>(type: T, params: CreateTabIdParam
       return `schema-${(params as CreateTabIdParams['schema']).schema}`
     case 'generated-page':
       return `generated-page-${(params as CreateTabIdParams['generated-page']).id}`
+    case 'logs':
+      return EXPLORER_LOGS_TAB_ID
     default:
       return ''
   }

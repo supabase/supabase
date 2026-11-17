@@ -1,6 +1,7 @@
 import {
   EyeIcon,
   LayoutDashboardIcon,
+  ListIcon,
   MapIcon,
   MessageSquareIcon,
   NotebookTextIcon,
@@ -48,6 +49,7 @@ interface EntityTypeIconProps {
     | 'query'
     | 'chat'
     | 'generated-page'
+    | 'logs'
     | 'explorer-home'
   size?: number
   strokeWidth?: number
@@ -133,6 +135,10 @@ export const EntityTypeIcon = ({
 
   if (type === 'schema') {
     return <MapIcon size={size} strokeWidth={strokeWidth} />
+  }
+
+  if (type === 'logs') {
+    return <ListIcon size={size} strokeWidth={strokeWidth} />
   }
 
   if (type === ENTITY_TYPE.VIEW) {

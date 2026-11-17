@@ -23,6 +23,7 @@ import { explorerNavLevelSchema } from './ExplorerLayout.constants'
 import { ExplorerNavChats } from './ExplorerNavChats'
 import { ExplorerNavHeader } from './ExplorerNavHeader'
 import { ExplorerNavHome } from './ExplorerNavHome'
+import { ExplorerNavLogs } from './ExplorerNavLogs'
 import { ExplorerNavNotebooks } from './ExplorerNavNotebooks'
 import { ExplorerNavTables } from './ExplorerNavTables'
 import { ExplorerPreferencesDropdown } from './ExplorerPreferencesDropdown'
@@ -105,6 +106,7 @@ export const ExplorerLayout = ({ browserTitle, children, title }: ExplorerLayout
                   <ExplorerNavHome key="home" onSelectLevel={setStoredLevel} />
                 )}
                 {level === 'tables' && <ExplorerNavTables key="tables" />}
+                {level === 'logs' && <ExplorerNavLogs key="logs" />}
                 {level === 'notebook' && <ExplorerNavNotebooks key="notebooks" />}
                 {level === 'chat' && <ExplorerNavChats key="chats" />}
               </AnimatePresence>

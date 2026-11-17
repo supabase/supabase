@@ -1,5 +1,5 @@
 import { GripVerticalIcon, Settings2Icon } from 'lucide-react'
-import { useId, useMemo, useState } from 'react'
+import { useId, useMemo, useState, type ReactElement } from 'react'
 import {
   Checkbox,
   Command,
@@ -17,7 +17,12 @@ import { ButtonTooltip } from '../ButtonTooltip'
 import { Sortable, SortableDragHandle, SortableItem } from './primitives/Sortable'
 import { useDataTable } from './providers/DataTableProvider'
 
-export function DataTableViewOptions() {
+interface DataTableViewOptionsProps {
+  /** Replaces the default icon button, so a host toolbar can use its own action style. */
+  trigger?: ReactElement
+}
+
+export function DataTableViewOptions({ trigger }: DataTableViewOptionsProps = {}) {
   const { table, enableColumnOrdering } = useDataTable()
   const [open, setOpen] = useState(false)
   const [drag, setDrag] = useState(false)
@@ -36,16 +41,15 @@ export function DataTableViewOptions() {
 
   return (
     <Popover open={open} onOpenChange={setOpen}>
-      <PopoverTrigger asChild>
-        <ButtonTooltip
-          size="tiny"
-          role="combobox"
-          aria-expanded={open}
-          aria-controls={listboxId}
-          className="w-[26px]"
-          icon={<Settings2Icon className="text-foreground" />}
-          tooltip={{ content: { side: 'bottom', text: 'Toggle column visibility' } }}
-        />
+      <PopoverTrigger asChild role="combobox" aria-expanded={open} aria-controls={listboxId}>
+        {trigger ?? (
+          <ButtonTooltip
+            size="tiny"
+            className="w-[26px]"
+            icon={<Settings2Icon className="text-foreground" />}
+            tooltip={{ content: { side: 'bottom', text: 'Toggle column visibility' } }}
+          />
+        )}
       </PopoverTrigger>
       <PopoverContent id={listboxId} side="bottom" align="end" className="w-[200px] p-0">
         <Command>

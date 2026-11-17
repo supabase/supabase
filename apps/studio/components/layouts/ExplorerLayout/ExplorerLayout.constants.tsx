@@ -1,5 +1,5 @@
 import { TableEditor } from 'icons'
-import { MessageSquareIcon, NotebookTextIcon } from 'lucide-react'
+import { ListIcon, MessageSquareIcon, NotebookTextIcon } from 'lucide-react'
 import { motion } from 'motion/react'
 import { type ComponentType, type PropsWithChildren, type ReactNode } from 'react'
 import { cn } from 'ui'
@@ -15,7 +15,7 @@ export type ExplorerResourceType = 'notebook' | 'chat'
  * A sidebar section below the root. Each is one level deep: anything that narrows a section,
  * like the tables' schema or object type, is a control within its panel, not another level.
  */
-export const explorerNavLevelSchema = z.enum(['tables', 'notebook', 'chat'])
+export const explorerNavLevelSchema = z.enum(['tables', 'logs', 'notebook', 'chat'])
 export type ExplorerNavLevel = z.infer<typeof explorerNavLevelSchema>
 
 type ExplorerNavIcon = ComponentType<{ size?: number; className?: string }>
@@ -42,6 +42,16 @@ export const EXPLORER_TABLES_SECTION: ExplorerSection = {
   icon: TableEditor,
 }
 
+/**
+ * The project's logs, in a group of their own between the database and saved work. Its panel
+ * lists views, each a set of filters for the Logs tab. It shares the Logs page's icon.
+ */
+export const EXPLORER_LOGS_SECTION: ExplorerSection = {
+  level: 'logs',
+  label: 'Logs',
+  icon: ListIcon,
+}
+
 /** Sections for the user's own work, below the tables and Run SQL, in display order. */
 export const EXPLORER_RESOURCE_SECTIONS: ExplorerSection[] = [
   { level: 'notebook', label: 'Notebooks', icon: EXPLORER_RESOURCES.notebook.icon },
@@ -50,6 +60,7 @@ export const EXPLORER_RESOURCE_SECTIONS: ExplorerSection[] = [
 
 export const EXPLORER_SECTIONS: ExplorerSection[] = [
   EXPLORER_TABLES_SECTION,
+  EXPLORER_LOGS_SECTION,
   ...EXPLORER_RESOURCE_SECTIONS,
 ]
 
