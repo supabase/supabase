@@ -168,8 +168,12 @@ gotrueClient.onAuthStateChange((_event, _session) => {})
  * Gets a current access token.
  *
  * Calls getSession, which will refresh the token if needed.
+ *
+ * getSession only refreshes a token that expires within a short margin. A caller whose server
+ * work outlives that margin (for example a long-running stream that forwards the token to other
+ * services) can pass `minValidityMs`: a token that expires sooner than that is refreshed first.
  */
-export async function getAccessToken() {
+export async function getAccessToken({ minValidityMs }: { minValidityMs?: number } = {}) {
   // ignore if server-side
   if (typeof window === 'undefined') return undefined
 
@@ -179,6 +183,19 @@ export async function getAccessToken() {
   } = await gotrueClient.getSession()
   if (error) {
     throw error
+  }
+
+  if (
+    session &&
+    minValidityMs !== undefined &&
+    session.expires_at !== undefined &&
+    session.expires_at * 1000 - Date.now() < minValidityMs
+  ) {
+    const { data, error: refreshError } = await gotrueClient.refreshSession()
+    // The current token is still valid for now, so a failed refresh falls back to it.
+    if (!refreshError && data.session) {
+      return data.session.access_token
+    }
   }
 
   return session?.access_token

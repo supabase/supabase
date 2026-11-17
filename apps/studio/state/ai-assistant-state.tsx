@@ -1,6 +1,6 @@
 import { Chat, type UIMessage as MessageType } from '@ai-sdk/react'
 import { DefaultChatTransport, lastAssistantMessageIsCompleteWithApprovalResponses } from 'ai'
-import { LOCAL_STORAGE_KEYS, safeLocalStorage } from 'common'
+import { getAccessToken, LOCAL_STORAGE_KEYS, safeLocalStorage } from 'common'
 import { DBSchema, IDBPDatabase, openDB } from 'idb'
 import { debounce } from 'lodash'
 import {
@@ -19,6 +19,7 @@ import type { AiSupportStatus } from '@/data/feedback/ai-chat-front-sync'
 import { constructHeaders } from '@/data/fetchers'
 import { getQueryClient } from '@/data/query-client'
 import { useSelectedProjectQuery } from '@/hooks/misc/useSelectedProject'
+import { ASSISTANT_TIMEOUT_MS } from '@/lib/ai/assistant-timeout'
 import { prepareMessagesForAPI } from '@/lib/ai/message-utils'
 import { isKnownAssistantModelId } from '@/lib/ai/model.utils'
 import type { AssistantModelId } from '@/lib/ai/model.utils'
@@ -127,6 +128,10 @@ const createInitialAiAssistantData = (): AiAssistantData => ({
 const DB_NAME = 'ai-assistant-db'
 const DB_VERSION = 1
 const STORE_NAME = 'assistantState'
+
+// How long the access token sent with a chat request must stay valid: the longest the server
+// streams a response, plus a margin for the request to reach it.
+const ASSISTANT_TOKEN_MIN_VALIDITY_MS = ASSISTANT_TIMEOUT_MS + 60_000
 
 interface AiAssistantDB extends DBSchema {
   [STORE_NAME]: {
@@ -313,7 +318,14 @@ function createChatInstance(
       },
       async prepareSendMessagesRequest({ messages, ...opts }) {
         const cleanedMessages = prepareMessagesForAPI(messages)
-        const headerData = await constructHeaders()
+        // The server forwards this token to other services for the whole response stream, so
+        // it must not expire before the stream can end.
+        const accessToken = await getAccessToken({
+          minValidityMs: ASSISTANT_TOKEN_MIN_VALIDITY_MS,
+        })
+        const headerData = await constructHeaders(
+          accessToken ? { Authorization: `Bearer ${accessToken}` } : undefined
+        )
         const authorizationHeader = headerData.get('Authorization')
 
         // Get the chat specific to this request to ensure we have the correct name
