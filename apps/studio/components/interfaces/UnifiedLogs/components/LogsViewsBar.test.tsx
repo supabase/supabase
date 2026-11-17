@@ -125,7 +125,7 @@ describe('LogsViewsBar', () => {
     await waitFor(() => expect(onRename).toHaveBeenCalledWith('view-1', 'Errors only - renamed'))
   })
 
-  it('does not rename when the dialog is cancelled', async () => {
+  it('confirms before discarding an edited rename', async () => {
     const onRename = vi.fn()
     customRender(<LogsViewsBar {...baseProps} views={[makeView()]} onRename={onRename} />)
 
@@ -136,7 +136,28 @@ describe('LogsViewsBar', () => {
     await userEvent.type(input, ' - discarded')
     await userEvent.click(screen.getByRole('button', { name: 'Cancel' }))
 
+    await userEvent.click(await screen.findByRole('button', { name: 'Keep editing' }))
+    expect(screen.getByDisplayValue('Errors only - discarded')).toBeInTheDocument()
+
+    await userEvent.click(screen.getByRole('button', { name: 'Cancel' }))
+    await userEvent.click(await screen.findByRole('button', { name: 'Discard changes' }))
+
     await waitFor(() => expect(screen.queryByDisplayValue(/discarded/)).toBeNull())
+    expect(onRename).not.toHaveBeenCalled()
+  })
+
+  it('closes an untouched rename dialog without confirming', async () => {
+    const onRename = vi.fn()
+    customRender(<LogsViewsBar {...baseProps} views={[makeView()]} onRename={onRename} />)
+
+    await openChipMenu('Errors only')
+    await userEvent.click(await screen.findByRole('menuitem', { name: 'Rename' }))
+
+    await screen.findByDisplayValue('Errors only')
+    await userEvent.click(screen.getByRole('button', { name: 'Cancel' }))
+
+    await waitFor(() => expect(screen.queryByDisplayValue('Errors only')).toBeNull())
+    expect(screen.queryByRole('button', { name: 'Discard changes' })).toBeNull()
     expect(onRename).not.toHaveBeenCalled()
   })
 

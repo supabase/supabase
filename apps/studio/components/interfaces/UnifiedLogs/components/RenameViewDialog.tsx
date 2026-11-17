@@ -21,6 +21,8 @@ import * as z from 'zod'
 import { type LogsView } from '../UnifiedLogs.views'
 import { VIEW_NAME_MAX_LENGTH } from './SaveViewDialog'
 import { isDuplicateViewName } from './SaveViewDialog.utils'
+import { DiscardChangesConfirmationDialog } from '@/components/ui-patterns/Dialogs/DiscardChangesConfirmationDialog'
+import { useConfirmOnClose } from '@/hooks/ui/useConfirmOnClose'
 
 interface RenameViewDialogProps {
   view: LogsView | null
@@ -55,7 +57,7 @@ export const RenameViewDialog = ({
     resolver: zodResolver(schema),
     defaultValues: { name: '' },
   })
-  const { isSubmitting } = form.formState
+  const { isSubmitting, isDirty } = form.formState
   const name = useWatch({ control: form.control, name: 'name' })
   const isNameEmpty = name.trim().length === 0
 
@@ -63,6 +65,12 @@ export const RenameViewDialog = ({
   useEffect(() => {
     if (view) reset({ name: view.name })
   }, [view, reset])
+
+  const {
+    confirmOnClose,
+    handleOpenChange,
+    modalProps: discardChangesModalProps,
+  } = useConfirmOnClose({ checkIsDirty: () => isDirty, onClose: onCancel })
 
   const onSubmit = async ({ name: nextName }: z.infer<typeof schema>) => {
     if (!view) return
@@ -75,48 +83,54 @@ export const RenameViewDialog = ({
   }
 
   return (
-    <Dialog
-      open={view !== null}
-      onOpenChange={() => {
-        if (!isSubmitting) onCancel()
-      }}
-    >
-      <DialogContent size="small">
-        <DialogHeader>
-          <DialogTitle>Rename view</DialogTitle>
-        </DialogHeader>
-        <DialogSectionSeparator />
-        <Form {...form}>
-          <form onSubmit={form.handleSubmit(onSubmit)} noValidate>
-            <DialogSection>
-              <FormField
-                control={form.control}
-                name="name"
-                render={({ field }) => (
-                  <FormItemLayout layout="vertical" label="Name">
-                    <FormControl>
-                      <Input {...field} autoFocus placeholder="Enter a name for this view" />
-                    </FormControl>
-                  </FormItemLayout>
-                )}
-              />
-            </DialogSection>
-            <DialogFooter>
-              <Button type="reset" onClick={onCancel} disabled={isSubmitting}>
-                Cancel
-              </Button>
-              <Button
-                variant="primary"
-                type="submit"
-                loading={isSubmitting}
-                disabled={isSubmitting || isNameEmpty}
-              >
-                Rename view
-              </Button>
-            </DialogFooter>
-          </form>
-        </Form>
-      </DialogContent>
-    </Dialog>
+    <>
+      <Dialog
+        open={view !== null}
+        onOpenChange={(nextOpen) => {
+          if (!isSubmitting) handleOpenChange(nextOpen)
+        }}
+      >
+        <DialogContent size="small">
+          <DialogHeader>
+            <DialogTitle>Rename view</DialogTitle>
+          </DialogHeader>
+          <DialogSectionSeparator />
+          <Form {...form}>
+            <form onSubmit={form.handleSubmit(onSubmit)} noValidate>
+              <DialogSection>
+                <FormField
+                  control={form.control}
+                  name="name"
+                  render={({ field }) => (
+                    <FormItemLayout layout="vertical" label="Name">
+                      <FormControl>
+                        <Input {...field} autoFocus placeholder="Enter a name for this view" />
+                      </FormControl>
+                    </FormItemLayout>
+                  )}
+                />
+              </DialogSection>
+              <DialogFooter>
+                <Button type="reset" onClick={confirmOnClose} disabled={isSubmitting}>
+                  Cancel
+                </Button>
+                <Button
+                  variant="primary"
+                  type="submit"
+                  loading={isSubmitting}
+                  disabled={isSubmitting || isNameEmpty}
+                >
+                  Rename view
+                </Button>
+              </DialogFooter>
+            </form>
+          </Form>
+        </DialogContent>
+      </Dialog>
+      <DiscardChangesConfirmationDialog
+        {...discardChangesModalProps}
+        description="Are you sure you want to discard your changes? The view will keep its current name."
+      />
+    </>
   )
 }
