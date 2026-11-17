@@ -97,6 +97,9 @@ test('shows no data for the selected period', async () => {
   mockMetrics(null)
   renderReport()
   expect(await screen.findByText('No data in the selected period')).toBeInTheDocument()
+  expect(screen.getByRole('status', { name: 'Report status' })).toHaveTextContent(
+    'Warehouse report: No data in the selected period'
+  )
 })
 test('renders measured zero as query activity', async () => {
   mockMetrics(0)

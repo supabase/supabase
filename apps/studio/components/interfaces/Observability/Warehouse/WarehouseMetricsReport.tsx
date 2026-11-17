@@ -105,6 +105,10 @@ const WarehouseMetricsReportContent = () => {
   })()
   const hasChartValues = points.some((point) => typeof point.value === 'number')
 
+  const reportStatus = hasChartValues
+    ? 'Warehouse report loaded'
+    : `Warehouse report: ${emptyMessage}`
+
   const renderContent = () => {
     if (!IS_PLATFORM)
       return (
@@ -219,7 +223,9 @@ const WarehouseMetricsReportContent = () => {
               type="button"
               aria-label="Refresh report"
               disabled={query.isFetching}
-              icon={<RefreshCwIcon className={query.isFetching ? 'animate-spin' : ''} />}
+              icon={
+                <RefreshCwIcon className={query.isFetching ? 'motion-safe:animate-spin' : ''} />
+              }
               onClick={handleRefresh}
             />
             <LogsDatePicker
@@ -234,12 +240,19 @@ const WarehouseMetricsReportContent = () => {
           </div>
         }
       >
-        {isRangeOk && range.isClamped && (
-          <p className="text-sm text-foreground-light">
-            This period was adjusted to the last 30 days of available metrics.
+        <div role="status">
+          {isRangeOk && range.isClamped && (
+            <p className="text-sm text-foreground-light">
+              This period was adjusted to the last 30 days of available metrics.
+            </p>
+          )}
+        </div>
+        <div className="relative">
+          <p role="status" aria-label="Report status" className="sr-only">
+            {query.isPending ? 'Loading Warehouse report' : reportStatus}
           </p>
-        )}
-        {renderContent()}
+          {renderContent()}
+        </div>
       </ReportStickyNav>
       <UpgradePrompt
         show={showUpgradePrompt}
