@@ -21,6 +21,7 @@ export const ChipLabelButton = ({
 }) => (
   <button
     type="button"
+    tabIndex={0}
     title={title}
     aria-current={isActive ? 'true' : undefined}
     onClick={onClick}
@@ -80,6 +81,7 @@ export const LogsViewChip = ({
       {isModified && !!onReviewChanges && (
         <button
           type="button"
+          tabIndex={0}
           aria-label={`Review changes to ${view.name}`}
           aria-expanded={isReviewOpen}
           onClick={onReviewChanges}
@@ -94,6 +96,7 @@ export const LogsViewChip = ({
           <DropdownMenuTrigger asChild>
             <button
               type="button"
+              tabIndex={0}
               aria-label={`Actions for ${view.name}`}
               className="h-[18px] w-[18px] shrink-0 self-center m-[3px] rounded-sm p-0 flex items-center justify-center text-foreground-lighter hover:text-foreground hover:bg-surface-600 focus-visible:z-20 focus-visible:ring-2 focus-visible:ring-ring"
             >
