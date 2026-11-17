@@ -2,11 +2,12 @@
 
 This directory contains the [Astro](https://astro.build) app for the Supabase Knowledge Base, served at [supabase.com/kb](https://supabase.com/kb).
 
-Content is organized into three collections under `src/content/`:
+Content is organized into 4 collections:
 
-- `guides/`: hand-written guides in Markdown or MDX, grouped by topic.
-- `faqs/`: short answers to common questions.
-- `troubleshooting/`: troubleshooting guides fetched from a private repo at build time (see below).
+- `src/content/guides/`: hand-written guides in Markdown or MDX, grouped by topic.
+- `src/content/faqs/`: short answers to common questions.
+- `src/data/community-guides.json`: Highlights other valuable, written resources from our Supabase community. Includes metadata on other written resources (URLs, titles, descriptions, and topics) so we can list these on `topics` pages.
+- `src/content/troubleshooting/`: troubleshooting guides fetched from a private repo at build time (see below).
 
 At build time, every page is also exported as a plain `.md` file, so the content can be read by LLM crawlers and other tools. Requests that send `Accept: text/markdown` receive these files directly.
 
