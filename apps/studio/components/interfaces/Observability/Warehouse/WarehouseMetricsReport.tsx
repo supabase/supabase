@@ -146,6 +146,14 @@ const WarehouseMetricsReportContent = () => {
       )
     if (query.isPending || (setup.isPending && !hasValues))
       return <GenericSkeletonLoader aria-label="Loading Warehouse report" />
+    if (setup.isError && !hasValues)
+      return (
+        <AlertError
+          projectRef={ref}
+          error={setup.error}
+          subject="Failed to retrieve Warehouse status"
+        />
+      )
     if (canShowSetup)
       return (
         <EmptyStatePresentational
