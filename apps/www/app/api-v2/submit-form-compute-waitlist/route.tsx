@@ -203,9 +203,8 @@ export async function POST(req: Request) {
   }
 }
 
-// Mirror the signup into Customer.io so waitlist members can be segmented and
-// emailed without a HubSpot sync. HubSpot stays the source of record: a
-// Customer.io failure is reported to Sentry and never fails the submission.
+// Mirror the signup into Customer.io. A Customer.io failure is reported to
+// Sentry and never fails the submission.
 // Never set `unsubscribed` or subscription preferences here, so a signup
 // can't resubscribe someone who opted out.
 const saveWaitlistSignupInCustomerIO = async (signup: {
@@ -229,14 +228,13 @@ const saveWaitlistSignupInCustomerIO = async (signup: {
     const now = new Date().toISOString()
     const timestamp = cio.isoToUnixTimestamp(now)
 
-    // Profile attributes drive segment membership. Names stay on the event
-    // so the form can't overwrite names already on existing profiles.
+    // Names stay on the event so the form can't overwrite names already on
+    // existing profiles.
     await cio.createOrUpdateProfile(signup.email, {
       compute_waitlist_joined_at: timestamp,
       ...(signup.projectRef ? { compute_project_ref: signup.projectRef } : {}),
     })
 
-    // The event only triggers campaigns.
     await cio.trackEvent(signup.email, {
       userId: signup.email,
       type: 'track',
