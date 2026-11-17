@@ -113,7 +113,7 @@ export const LogsViewsBar = ({
 
         {isLoading && (
           <div className={cn(CHIP_CLASS, 'items-center px-2')}>
-            <Loader2Icon size={12} className="animate-spin text-foreground-lighter" />
+            <Loader2Icon size={12} className="motion-safe:animate-spin text-foreground-lighter" />
           </div>
         )}
 
