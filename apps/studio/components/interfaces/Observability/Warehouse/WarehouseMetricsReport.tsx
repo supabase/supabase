@@ -1,10 +1,11 @@
 import { useQuery, useQueryClient } from '@tanstack/react-query'
 import { useParams } from 'common'
 import dayjs from 'dayjs'
-import { RefreshCwIcon } from 'lucide-react'
+import { RefreshCwIcon, WarehouseIcon } from 'lucide-react'
 import { Button, Card, CardContent } from 'ui'
 import { Admonition } from 'ui-patterns/Admonition'
 import { ChartLine } from 'ui-patterns/Chart'
+import { EmptyStatePresentational } from 'ui-patterns/EmptyStatePresentational'
 import { GenericSkeletonLoader } from 'ui-patterns/ShimmeringLoader'
 
 import { resolveWarehouseMetricsRange } from './WarehouseMetrics.range'
@@ -95,6 +96,7 @@ export const WarehouseMetricsReport = () => {
     if (!IS_PLATFORM)
       return (
         <Admonition
+          layout="responsive"
           title="Warehouse metrics are unavailable"
           description="Warehouse metrics are only available on the Supabase platform."
         />
@@ -102,6 +104,7 @@ export const WarehouseMetricsReport = () => {
     if (!isRangeOk)
       return (
         <Admonition
+          layout="responsive"
           title="This period is outside the available metrics history"
           description="Warehouse metrics cover the last 30 days. Choose a more recent period."
           actions={
@@ -128,17 +131,20 @@ export const WarehouseMetricsReport = () => {
       return <GenericSkeletonLoader aria-label="Loading Warehouse report" />
     if (canShowSetup)
       return (
-        <Admonition
+        <EmptyStatePresentational
+          icon={WarehouseIcon}
           title={isDisabled ? 'Warehouse is disabled' : 'Warehouse is not set up'}
           description="Set up Warehouse to run analytical queries and monitor their activity here."
-          actions={
-            <Button asChild variant="default">
-              <InlineLink href={`/project/${ref}/integrations/warehouse/overview`}>
-                Set up Warehouse
-              </InlineLink>
-            </Button>
-          }
-        />
+        >
+          <Button asChild variant="default">
+            <InlineLink
+              className="no-underline"
+              href={`/project/${ref}/integrations/warehouse/overview`}
+            >
+              Set up Warehouse
+            </InlineLink>
+          </Button>
+        </EmptyStatePresentational>
       )
     if (query.isError)
       return (
