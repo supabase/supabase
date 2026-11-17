@@ -88,10 +88,10 @@ Before handoff, run both passes from [Use with an AI agent](../../../apps/docs/s
 Run this after the compliance checklist, as a separate pass. A clean style review does not show that the page is true.
 
 1. List every behavior claim in the draft: what the feature accepts, rejects, returns, or requires.
-2. For each claim, open the source lines again at the shipped version (the linked PR's merge commit or the release tag). Do not check against your notes or an earlier summary of the code.
+2. For each claim, open the source lines again at the deployed version of the feature (its release tag or deployed commit). The linked PR's merge commit is not enough, because a later change can supersede it. If you cannot confirm the deployed version, flag the claim for reviewer confirmation in the handoff. Do not check against your notes or an earlier summary of the code.
 3. Compare the claim with every branch in those lines, including early returns, special cases, and fallbacks. If the code has an exception that the sentence leaves out, add the exception or narrow the sentence.
 4. Treat _any_, _all_, _always_, _only_, and _never_ as claims about every case. Keep them only when the code or a test covers every case.
-5. Put the file, line range, and version for each claim in the handoff, so a reviewer can check it.
+5. Put the file, line range, and deployed version for each claim in the handoff, so a reviewer can check it.
 
 When brevity and accuracy conflict, keep the sentence short and complete. Do not drop an exception to make a sentence read better.
 
