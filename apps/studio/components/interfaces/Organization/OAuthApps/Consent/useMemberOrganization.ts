@@ -7,8 +7,8 @@ import { useOAuthAppsAuthorizeOrganizationsQuery } from '@/data/oauth-apps/oauth
 import { OAuthAppsAuthorizeRequest } from '@/data/oauth-apps/types'
 
 export interface OAuthAppsAuthorizeScreenProps {
-  authId: string
-  request: OAuthAppsAuthorizeRequest
+  authId?: string
+  request?: OAuthAppsAuthorizeRequest
   organizationSlug?: string
   projectRef?: string | null
 }
@@ -22,7 +22,7 @@ export const useMemberOrganization = ({
   | { isPending: false; isError: true; error: Error; data: null }
   | { isPending: true; isError: false; error: null; data: null }
   | { isPending: false; isError: false; error: null; data: string } => {
-  const isProjectScopingModeEnabled = request.project_scoping_mode
+  const isProjectScopingModeEnabled = request?.project_scoping_mode
   const needsOrgResolution = isProjectScopingModeEnabled && !organizationSlug && projectRef !== null
   const identityQuery = useOAuthAppsAuthorizeOrganizationsQuery({ id: authId })
 
