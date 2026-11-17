@@ -18,7 +18,7 @@ This guide covers the server configuration for a Docker deployment. Your consent
 You need:
 
 - A running self-hosted Supabase instance. See [Self-hosting with Docker](/docs/guides/self-hosting/docker).
-- An asymmetric JWT signing key in `JWT_KEYS`. Auth signs OIDC ID tokens only with an asymmetric key. The setup script creates the key pair, or you can add it with `utils/add-new-auth-keys.sh`. See [New API keys and asymmetric authentication](/docs/guides/self-hosting/self-hosted-auth-keys).
+- An asymmetric JWT signing key in `JWT_KEYS`. Auth signs OIDC ID tokens only with an asymmetric key. The setup script creates the key pair. Otherwise, add it with `utils/add-new-auth-keys.sh`, which also replaces your `sb_` API keys. See [New API keys and asymmetric authentication](/docs/guides/self-hosting/self-hosted-auth-keys).
 - `API_EXTERNAL_URL` set to the public URL of Auth, for example `https://<your-domain>/auth/v1`. Auth uses it as the issuer and in the endpoint URLs it publishes to clients.
 - `SITE_URL` set to the URL of the app that hosts your consent page.
 - Your secret key, `SUPABASE_SECRET_KEY`, from your `.env` file. You need it to register clients.
@@ -179,4 +179,4 @@ Your consent page runs on an origin that Auth doesn't allow. Serve it from the s
 
 ### The token request fails with `Error generating ID token`
 
-The client requested the `openid` scope, and Auth signs tokens with a symmetric key. Add an asymmetric key pair with `sh utils/add-new-auth-keys.sh --update-env`, as described in [Before you begin](#before-you-begin). Auth, PostgREST, Realtime, Storage, and Edge Functions all read the new keys, so recreate all services with `sh run.sh recreate`. Then start the sign-in again: the failed request already used up its authorization code, so retrying it returns `invalid_grant`.
+The client requested the `openid` scope, and Auth signs tokens with a symmetric key. To add an asymmetric key pair, follow [Adding the new keys](/docs/guides/self-hosting/self-hosted-auth-keys#adding-the-new-keys). The script also replaces your `sb_` API keys, so update your clients with the new ones. Then start the sign-in again: the failed request already used up its authorization code, so retrying it returns `invalid_grant`.
