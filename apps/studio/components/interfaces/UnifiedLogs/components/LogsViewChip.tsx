@@ -64,7 +64,7 @@ export const LogsViewChip = ({
   return (
     <div
       ref={rootRef}
-      className={cn(CHIP_CLASS, isActive && 'border-foreground-muted bg-surface-200')}
+      className={cn(CHIP_CLASS, isActive && 'border-strong bg-surface-200')}
       data-testid={`logs-view-chip-${view.id}`}
     >
       <ChipLabelButton
@@ -95,12 +95,12 @@ export const LogsViewChip = ({
             <button
               type="button"
               aria-label={`Actions for ${view.name}`}
-              className="h-[18px] w-[18px] shrink-0 self-center m-[3px] rounded-sm p-0 flex items-center justify-center text-foreground-light hover:text-foreground hover:bg-surface-600 focus-visible:z-20 focus-visible:ring-2 focus-visible:ring-ring"
+              className="h-[18px] w-[18px] shrink-0 self-center m-[3px] rounded-sm p-0 flex items-center justify-center text-foreground-lighter hover:text-foreground hover:bg-surface-600 focus-visible:z-20 focus-visible:ring-2 focus-visible:ring-ring"
             >
               <MoreHorizontalIcon size={12} />
             </button>
           </DropdownMenuTrigger>
-          <DropdownMenuContent align="start">
+          <DropdownMenuContent align="center" sideOffset={8} className="w-40">
             {canUpdate && (
               <DropdownMenuItem onSelect={() => onRequestRename(view)}>
                 <EditIcon size={14} className="mr-2" />
