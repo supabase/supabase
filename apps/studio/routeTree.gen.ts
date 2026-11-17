@@ -114,6 +114,7 @@ import { Route as ApiAiSqlGenerateV4RouteImport } from './routes/api/ai/sql/gene
 import { Route as ApiAiSqlParseClientCodeRouteImport } from './routes/api/ai/sql/parse-client-code'
 import { Route as ApiAiSqlPolicyRouteImport } from './routes/api/ai/sql/policy'
 import { Route as ApiAiSqlTitleV2RouteImport } from './routes/api/ai/sql/title-v2'
+import { Route as ApiPlatformAlertsNotificationsRouteImport } from './routes/api/platform/alerts/notifications'
 import { Route as ApiPlatformIntegrationsSlugRouteImport } from './routes/api/platform/integrations/$slug'
 import { Route as ApiPlatformOrganizationsIndexRouteImport } from './routes/api/platform/organizations/index'
 import { Route as ApiPlatformProfileIndexRouteImport } from './routes/api/platform/profile/index'
@@ -883,6 +884,12 @@ const ApiAiSqlTitleV2Route = ApiAiSqlTitleV2RouteImport.update({
   path: '/api/ai/sql/title-v2',
   getParentRoute: () => rootRouteImport,
 } as any)
+const ApiPlatformAlertsNotificationsRoute =
+  ApiPlatformAlertsNotificationsRouteImport.update({
+    id: '/api/platform/alerts/notifications',
+    path: '/api/platform/alerts/notifications',
+    getParentRoute: () => rootRouteImport,
+  } as any)
 const ApiPlatformIntegrationsSlugRoute =
   ApiPlatformIntegrationsSlugRouteImport.update({
     id: '/api/platform/integrations/$slug',
@@ -2357,6 +2364,7 @@ export interface FileRoutesByFullPath {
   '/api/ai/sql/parse-client-code': typeof ApiAiSqlParseClientCodeRoute
   '/api/ai/sql/policy': typeof ApiAiSqlPolicyRoute
   '/api/ai/sql/title-v2': typeof ApiAiSqlTitleV2Route
+  '/api/platform/alerts/notifications': typeof ApiPlatformAlertsNotificationsRoute
   '/api/platform/integrations/$slug': typeof ApiPlatformIntegrationsSlugRoute
   '/api/platform/telemetry/event': typeof ApiPlatformTelemetryEventRoute
   '/project/$ref/advisors/health': typeof ProjectRefAdvisorsHealthRoute
@@ -2685,6 +2693,7 @@ export interface FileRoutesByTo {
   '/api/ai/sql/parse-client-code': typeof ApiAiSqlParseClientCodeRoute
   '/api/ai/sql/policy': typeof ApiAiSqlPolicyRoute
   '/api/ai/sql/title-v2': typeof ApiAiSqlTitleV2Route
+  '/api/platform/alerts/notifications': typeof ApiPlatformAlertsNotificationsRoute
   '/api/platform/integrations/$slug': typeof ApiPlatformIntegrationsSlugRoute
   '/api/platform/telemetry/event': typeof ApiPlatformTelemetryEventRoute
   '/project/$ref/advisors/health': typeof ProjectRefAdvisorsHealthRoute
@@ -3024,6 +3033,7 @@ export interface FileRoutesById {
   '/api/ai/sql/parse-client-code': typeof ApiAiSqlParseClientCodeRoute
   '/api/ai/sql/policy': typeof ApiAiSqlPolicyRoute
   '/api/ai/sql/title-v2': typeof ApiAiSqlTitleV2Route
+  '/api/platform/alerts/notifications': typeof ApiPlatformAlertsNotificationsRoute
   '/api/platform/integrations/$slug': typeof ApiPlatformIntegrationsSlugRoute
   '/api/platform/telemetry/event': typeof ApiPlatformTelemetryEventRoute
   '/project/$ref/advisors/health': typeof ProjectRefAdvisorsHealthRoute
@@ -3366,6 +3376,7 @@ export interface FileRouteTypes {
     | '/api/ai/sql/parse-client-code'
     | '/api/ai/sql/policy'
     | '/api/ai/sql/title-v2'
+    | '/api/platform/alerts/notifications'
     | '/api/platform/integrations/$slug'
     | '/api/platform/telemetry/event'
     | '/project/$ref/advisors/health'
@@ -3694,6 +3705,7 @@ export interface FileRouteTypes {
     | '/api/ai/sql/parse-client-code'
     | '/api/ai/sql/policy'
     | '/api/ai/sql/title-v2'
+    | '/api/platform/alerts/notifications'
     | '/api/platform/integrations/$slug'
     | '/api/platform/telemetry/event'
     | '/project/$ref/advisors/health'
@@ -4032,6 +4044,7 @@ export interface FileRouteTypes {
     | '/api/ai/sql/parse-client-code'
     | '/api/ai/sql/policy'
     | '/api/ai/sql/title-v2'
+    | '/api/platform/alerts/notifications'
     | '/api/platform/integrations/$slug'
     | '/api/platform/telemetry/event'
     | '/project/$ref/advisors/health'
@@ -4321,6 +4334,7 @@ export interface RootRouteChildren {
   ApiAiSqlParseClientCodeRoute: typeof ApiAiSqlParseClientCodeRoute
   ApiAiSqlPolicyRoute: typeof ApiAiSqlPolicyRoute
   ApiAiSqlTitleV2Route: typeof ApiAiSqlTitleV2Route
+  ApiPlatformAlertsNotificationsRoute: typeof ApiPlatformAlertsNotificationsRoute
   ApiPlatformIntegrationsSlugRoute: typeof ApiPlatformIntegrationsSlugRoute
   ApiPlatformTelemetryEventRoute: typeof ApiPlatformTelemetryEventRoute
   ApiPlatformOrganizationsIndexRoute: typeof ApiPlatformOrganizationsIndexRoute
@@ -5141,6 +5155,13 @@ declare module '@tanstack/react-router' {
       path: '/api/ai/sql/title-v2'
       fullPath: '/api/ai/sql/title-v2'
       preLoaderRoute: typeof ApiAiSqlTitleV2RouteImport
+      parentRoute: typeof rootRouteImport
+    }
+    '/api/platform/alerts/notifications': {
+      id: '/api/platform/alerts/notifications'
+      path: '/api/platform/alerts/notifications'
+      fullPath: '/api/platform/alerts/notifications'
+      preLoaderRoute: typeof ApiPlatformAlertsNotificationsRouteImport
       parentRoute: typeof rootRouteImport
     }
     '/api/platform/integrations/$slug': {
@@ -7601,6 +7622,7 @@ const rootRouteChildren: RootRouteChildren = {
   ApiAiSqlParseClientCodeRoute: ApiAiSqlParseClientCodeRoute,
   ApiAiSqlPolicyRoute: ApiAiSqlPolicyRoute,
   ApiAiSqlTitleV2Route: ApiAiSqlTitleV2Route,
+  ApiPlatformAlertsNotificationsRoute: ApiPlatformAlertsNotificationsRoute,
   ApiPlatformIntegrationsSlugRoute: ApiPlatformIntegrationsSlugRoute,
   ApiPlatformTelemetryEventRoute: ApiPlatformTelemetryEventRoute,
   ApiPlatformOrganizationsIndexRoute: ApiPlatformOrganizationsIndexRoute,
