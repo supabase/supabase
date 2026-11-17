@@ -16,10 +16,15 @@ describe('SpreadsheetImport.utils: inferColumnType', () => {
     const type = inferColumnType('id', mockData)
     expect(type).toBe('text')
   })
-  test('should default column type to text if the first row data value is null', () => {
+  test("should default column type to text if the first row data value is the string 'null'", () => {
     const mockData = [{ id: 'null', name: 'bob', age: '42' }]
     const type = inferColumnType('id', mockData)
     expect(type).toBe('text')
+  })
+  test('should infer from the first row that has a value', () => {
+    const mockData = [{ age: null }, { age: '42' }, { age: '7' }]
+    const type = inferColumnType('age', mockData)
+    expect(type).toBe('int8')
   })
   test('should infer integer types correctly', () => {
     const mockData = [{ name: 'bob', age: '42' }]
