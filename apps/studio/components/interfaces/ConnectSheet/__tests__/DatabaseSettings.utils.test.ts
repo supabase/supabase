@@ -69,7 +69,9 @@ describe('getSelfHostedPoolerStrings', () => {
 describe('getSelfHostedDirectStrings', () => {
   test('uses plain postgres user (no tenant id)', () => {
     const strings = getSelfHostedDirectStrings('db.example.com', 5432)
-    expect(strings.uri).toBe('postgresql://postgres:[YOUR-DATABASE-PASSWORD]@db.example.com:5432/postgres')
+    expect(strings.uri).toBe(
+      'postgresql://postgres:[YOUR-DATABASE-PASSWORD]@db.example.com:5432/postgres'
+    )
   })
 
   test('threads host, port, and database name through every format', () => {

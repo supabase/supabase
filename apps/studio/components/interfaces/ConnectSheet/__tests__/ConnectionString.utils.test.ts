@@ -71,7 +71,8 @@ describe('buildSafeConnectionString', () => {
   })
 
   test('preserves search params from the original URL', () => {
-    const uri = 'postgresql://postgres.proj:[YOUR-DATABASE-PASSWORD]@host:5432/postgres?sslmode=require'
+    const uri =
+      'postgresql://postgres.proj:[YOUR-DATABASE-PASSWORD]@host:5432/postgres?sslmode=require'
     const params = parseConnectionParams(uri)
     expect(buildSafeConnectionString(uri, params)).toContain('?sslmode=require')
   })
