@@ -9,8 +9,8 @@ import {
   GITHUB_IDENTITY_PROVIDER,
   type ExternalIdentityProviderConfig,
 } from '@/lib/external-identity-providers'
-import SignUpPage from '@/pages/sign-up'
-import { customRender } from '@/tests/lib/custom-render'
+import { Route } from '@/routes/_auth/sign-up'
+import { renderRoute } from '@/tests/lib/route-render'
 
 const mocks = vi.hoisted(() => ({
   focusProvider: undefined as ExternalIdentityProviderConfig | undefined,
@@ -59,14 +59,16 @@ vi.mock('@/hooks/misc/useIsFeatureEnabled', () => ({
   }),
 }))
 
-describe('SignUpPage', () => {
+const renderSignUp = () => renderRoute(Route, { routeId: '/_auth/sign-up', url: '/sign-up' })
+
+describe('/sign-up', () => {
   beforeEach(() => {
     mocks.focusProvider = undefined
   })
 
   test('hides social sign-up options after email sign-up succeeds', async () => {
     const user = userEvent.setup()
-    customRender(<SignUpPage dehydratedState={undefined} />)
+    await renderSignUp()
 
     expect(screen.getByRole('button', { name: 'Continue with GitHub' })).toBeInTheDocument()
     expect(screen.getByRole('button', { name: 'Continue with ChatGPT' })).toBeInTheDocument()
@@ -85,7 +87,7 @@ describe('SignUpPage', () => {
   test('hides the focused provider after email sign-up succeeds', async () => {
     const user = userEvent.setup()
     mocks.focusProvider = GITHUB_IDENTITY_PROVIDER
-    customRender(<SignUpPage dehydratedState={undefined} />)
+    await renderSignUp()
 
     expect(screen.getByRole('button', { name: 'Continue with GitHub' })).toBeInTheDocument()
     expect(screen.queryByText('Check your email')).not.toBeInTheDocument()

@@ -4,12 +4,12 @@ import { HttpResponse } from 'msw'
 import { toast } from 'sonner'
 import { expect, test, vi } from 'vitest'
 
-import { StripeProjectsLoginPage } from '@/pages/partners/stripe/projects/login'
-import { customRender } from '@/tests/lib/custom-render'
+import { Route } from '@/routes/_auth/partners/stripe/projects/login'
 import { addAPIMock, type APIErrorBody } from '@/tests/lib/msw'
+import { renderRoute } from '@/tests/lib/route-render'
 
-const mocks = vi.hoisted(() => ({
-  routerPush: vi.fn(),
+vi.mock('@/hooks/misc/withAuth', () => ({
+  withAuth: (Component: React.ComponentType) => Component,
 }))
 
 vi.mock('@tanstack/react-query', async (importOriginal) => {
@@ -34,10 +34,6 @@ vi.mock('common', async (importOriginal) => {
   const actual = await importOriginal<typeof import('common')>()
   return { ...actual, useParams: () => ({ ar_id: 'request-id' }) }
 })
-
-vi.mock('next/router', () => ({
-  useRouter: () => ({ isReady: true, push: mocks.routerPush }),
-}))
 
 vi.mock('sonner', () => ({
   toast: { error: vi.fn() },
@@ -64,7 +60,10 @@ test('shows confirmation failures inline and keeps authorization available', asy
       HttpResponse.json<APIErrorBody>({ message: 'Confirmation failed' }, { status: 500 }),
   })
 
-  customRender(<StripeProjectsLoginPage dehydratedState={undefined} />)
+  await renderRoute(Route, {
+    routeId: '/_auth/partners/stripe/projects/login',
+    url: '/partners/stripe/projects/login?ar_id=request-id',
+  })
 
   await user.click(screen.getByRole('button', { name: 'Authorize Stripe Projects' }))
 
