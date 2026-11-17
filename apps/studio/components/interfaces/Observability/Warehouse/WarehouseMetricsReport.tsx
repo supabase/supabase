@@ -2,6 +2,7 @@ import { useQuery, useQueryClient } from '@tanstack/react-query'
 import { useParams } from 'common'
 import dayjs from 'dayjs'
 import { RefreshCwIcon, WarehouseIcon } from 'lucide-react'
+import { useState } from 'react'
 import { Button, Card, CardContent } from 'ui'
 import { Admonition } from 'ui-patterns/Admonition'
 import { ChartLine } from 'ui-patterns/Chart'
@@ -17,12 +18,15 @@ import UpgradePrompt from '@/components/interfaces/Settings/Logs/UpgradePrompt'
 import { AlertError } from '@/components/ui/AlertError'
 import NoDataPlaceholder from '@/components/ui/Charts/NoDataPlaceholder'
 import { InlineLink } from '@/components/ui/InlineLink'
+import { ShortcutTooltip } from '@/components/ui/ShortcutTooltip'
 import { warehouseKeys } from '@/data/warehouse/keys'
 import { warehouseMetricsQueryOptions } from '@/data/warehouse/warehouse-metrics-query'
 import { useWarehouseSetupStatusQuery } from '@/data/warehouse/warehouse-setup-status-query'
 import { useIsWarehouseEnabled } from '@/hooks/misc/useIsWarehouseEnabled'
 import { useRefreshHandler, useReportDateRange } from '@/hooks/misc/useReportDateRange'
 import { IS_PLATFORM } from '@/lib/constants'
+import { SHORTCUT_IDS } from '@/state/shortcuts/registry'
+import { useShortcut } from '@/state/shortcuts/useShortcut'
 
 export const WarehouseMetricsReport = () => {
   const isWarehouseEnabled = useIsWarehouseEnabled()
@@ -39,6 +43,7 @@ export const WarehouseMetricsReport = () => {
 const WarehouseMetricsReportContent = () => {
   const { ref } = useParams()
   const queryClient = useQueryClient()
+  const [showDatePicker, setShowDatePicker] = useState(false)
   const {
     selectedDateRange,
     datePickerValue,
@@ -67,8 +72,16 @@ const WarehouseMetricsReportContent = () => {
     datePickerValue,
     datePickerHelpers,
     handleDatePickerChange,
-    () => queryClient.invalidateQueries({ queryKey: warehouseKeys.metricsAll(ref) })
+    () =>
+      Promise.all([
+        queryClient.invalidateQueries({ queryKey: warehouseKeys.metricsAll(ref) }),
+        queryClient.invalidateQueries({ queryKey: warehouseKeys.setupStatus(ref) }),
+      ])
   )
+  useShortcut(SHORTCUT_IDS.OBSERVABILITY_REFRESH, handleRefresh, { enabled: !query.isFetching })
+  useShortcut(SHORTCUT_IDS.OBSERVABILITY_TOGGLE_DATE_PICKER, () => {
+    setShowDatePicker((open) => !open)
+  })
   const metric = query.data?.metrics.find((item) => item.metric === 'query_rate')
   const hasLiveTables = setup.data?.tables.some((table) => table.state === 'live') ?? false
   const isNotSetUp = setup.data?.setup_status === 'not_started' && !hasLiveTables
@@ -227,19 +240,24 @@ const WarehouseMetricsReportContent = () => {
       <ReportStickyNav
         content={
           <div className="flex flex-wrap items-center gap-2">
-            <Button
-              type="button"
-              aria-label="Refresh report"
-              disabled={query.isFetching}
-              icon={
-                <RefreshCwIcon className={query.isFetching ? 'motion-safe:animate-spin' : ''} />
-              }
-              onClick={handleRefresh}
-            />
+            <ShortcutTooltip shortcutId={SHORTCUT_IDS.OBSERVABILITY_REFRESH} label="Refresh report">
+              <Button
+                type="button"
+                aria-label="Refresh report"
+                disabled={query.isFetching}
+                icon={
+                  <RefreshCwIcon className={query.isFetching ? 'motion-safe:animate-spin' : ''} />
+                }
+                onClick={handleRefresh}
+              />
+            </ShortcutTooltip>
             <LogsDatePicker
               value={datePickerValue}
               helpers={datePickerHelpers}
               onSubmit={handleDatePickerChange}
+              open={showDatePicker}
+              onOpenChange={setShowDatePicker}
+              shortcutId={SHORTCUT_IDS.OBSERVABILITY_TOGGLE_DATE_PICKER}
             />
             <p className="text-xs text-foreground-light">
               {dayjs(selectedDateRange.period_start.date).format('MMM D, h:mma')} to{' '}
