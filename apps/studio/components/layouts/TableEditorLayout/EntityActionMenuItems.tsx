@@ -56,16 +56,11 @@ const MENU_COMPONENTS = {
 }
 
 interface EntityActionMenuItemsProps {
-  /** Which menu primitives to render with: the row's "more options" dropdown or its context menu */
   variant: keyof typeof MENU_COMPONENTS
   groups: EntityActionGroup[]
   onSelectAction: (id: EntityActionId) => void
 }
 
-/**
- * Renders the actions from `getEntityActions` as menu items. Holds no action logic of its own, so
- * the dropdown and the context menu can't drift apart.
- */
 export const EntityActionMenuItems = ({
   variant,
   groups,
@@ -115,7 +110,6 @@ export const EntityActionMenuItems = ({
 
     if (action.disabledReason === undefined) return item
 
-    // Disabled items don't receive pointer events, so the tooltip hangs off a wrapper
     return (
       <Tooltip key={action.id}>
         <TooltipTrigger asChild>

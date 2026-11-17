@@ -19,10 +19,6 @@ type UseEntityActionHandlersParams = {
   onViewPartitions?: (id: number) => void
 }
 
-/**
- * Behaviour behind each action in `getEntityActions`. Returns the confirmation modals the export
- * actions may open, which the caller needs to render alongside the menu.
- */
 export const useEntityActionHandlers = ({
   entity,
   projectRef,

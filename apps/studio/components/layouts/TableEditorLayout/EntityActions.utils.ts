@@ -18,18 +18,13 @@ export type EntityActionId =
 export type EntityAction = {
   id: EntityActionId
   label: string
-  /** Navigates instead of running a handler */
   href?: string
-  /** Presence means the action is shown but can't be used; the value explains why */
   disabledReason?: string
-  /** Submenu items */
   children?: EntityAction[]
 }
 
-/** Actions are rendered in groups, with a separator between each non-empty group */
 export type EntityActionGroup = EntityAction[]
 
-// Used to determine the entity is a table and not a view or other unsupported entity type
 export function isTableLikeEntity(entity: { type?: string }) {
   return entity.type === ENTITY_TYPE.TABLE || entity.type === ENTITY_TYPE.PARTITIONED_TABLE
 }
@@ -46,6 +41,9 @@ type GetEntityActionsParams = {
  * Edit, duplicate and delete are applied by the side panel / dialogs mounted for the table that is
  * open in the editor, so they can only target the active entity. Everything else works off the
  * entity itself and is available from any row.
+ *
+ * This is temporary - we'll look into supporting edit, duplicate and delete from context menu in
+ * a separate PR, just that it requires a bit more surgery to decouple those actions from the router
  */
 export const getEntityActions = ({
   entity,
