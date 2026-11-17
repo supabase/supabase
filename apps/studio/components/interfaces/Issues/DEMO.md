@@ -98,7 +98,7 @@ three attempts with a 5 second timeout each.
 To watch deliveries, run a webhook sink and point a receiver at it:
 
 ```sh
-npx --yes http-echo-server 9000   # or any server that logs request headers and bodies
+node -e "require('http').createServer((req, res) => { let b = ''; req.on('data', (c) => (b += c)); req.on('end', () => { console.log(req.headers['webhook-id'], b); res.end() }) }).listen(9000)"
 ```
 
 ```sh
