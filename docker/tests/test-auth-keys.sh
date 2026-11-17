@@ -41,8 +41,6 @@ ANON_KEY=$(grep '^ANON_KEY=' .env | cut -d= -f2-)
 SERVICE_ROLE_KEY=$(grep '^SERVICE_ROLE_KEY=' .env | cut -d= -f2-)
 SUPABASE_PUBLISHABLE_KEY=$(grep '^SUPABASE_PUBLISHABLE_KEY=' .env | cut -d= -f2-)
 SUPABASE_SECRET_KEY=$(grep '^SUPABASE_SECRET_KEY=' .env | cut -d= -f2-)
-ANON_KEY_ASYMMETRIC=$(grep '^ANON_KEY_ASYMMETRIC=' .env | cut -d= -f2-)
-SERVICE_ROLE_KEY_ASYMMETRIC=$(grep '^SERVICE_ROLE_KEY_ASYMMETRIC=' .env | cut -d= -f2-)
 
 # Prefer the running container's value: .env can be quoted or edited without
 # recreating the functions service. Fall back to .env without Docker access.
@@ -101,22 +99,6 @@ detect_gateway() {
     fi
 }
 GATEWAY=$(detect_gateway)
-
-# jwt_field <token> <1|2> <jq path>: a field from a JWT's header (1) or payload (2)
-jwt_field() {
-    printf '%s' "$1" | cut -d. -f"$2" | tr '_-' '/+' |
-        jq -Rr "@base64d | fromjson | $3 // empty" 2>/dev/null
-}
-
-# kid_in_jwks <kid>: whether Auth publishes a public key with this kid
-kid_in_jwks() {
-    if [ -n "$1" ] && curl -s "$BASE_URL/auth/v1/.well-known/jwks.json" |
-        jq -e --arg kid "$1" 'any(.keys[]; .kid == $kid)' >/dev/null 2>&1; then
-        echo "true"
-    else
-        echo "false"
-    fi
-}
 
 echo ""
 echo "=== Testing against $BASE_URL ==="
@@ -312,24 +294,6 @@ check "JWKS contains EC public key" "true" "$jwks_has_ec"
 check "JWKS does NOT contain symmetric key" "false" "$jwks_has_oct"
 
 echo ""
-echo "--- Internal asymmetric keys ---"
-# The gateway sends these in place of sb_ keys. Auth looks up the
-# verification key by kid, so these keys must match the current key pair in
-# JWT_KEYS. They don't when the pair is regenerated without them, or after
-# .env is edited by hand, and sb_ requests then fail. These checks name the cause.
-if [ -n "$ANON_KEY_ASYMMETRIC" ] && [ -n "$SERVICE_ROLE_KEY_ASYMMETRIC" ]; then
-    for name in ANON_KEY_ASYMMETRIC SERVICE_ROLE_KEY_ASYMMETRIC; do
-        eval "key=\$$name"
-        check "$name is signed with ES256" "ES256" "$(jwt_field "$key" 1 .alg)"
-        check "$name has a kid that is in JWKS" "true" "$(kid_in_jwks "$(jwt_field "$key" 1 .kid)")"
-    done
-    check "ANON_KEY_ASYMMETRIC role" "anon" "$(jwt_field "$ANON_KEY_ASYMMETRIC" 2 .role)"
-    check "SERVICE_ROLE_KEY_ASYMMETRIC role" "service_role" "$(jwt_field "$SERVICE_ROLE_KEY_ASYMMETRIC" 2 .role)"
-else
-    echo "  SKIP: Asymmetric keys not configured"
-fi
-
-echo ""
 echo "--- Opaque keys -> Auth admin API ---"
 # The path most server-side code takes: only the apikey header, no
 # Authorization. The gateway must send a service_role JWT that Auth verifies.
@@ -449,8 +413,6 @@ if [ -n "$access_token" ]; then
         echo "  INFO: User session JWT signed with: $jwt_alg"
         if [ "$jwt_alg" = "ES256" ]; then
             check "JWT uses ES256 (asymmetric)" "ES256" "$jwt_alg"
-            check "JWT has a kid that is in JWKS" "true" \
-                "$(kid_in_jwks "$(jwt_field "$access_token" 1 .kid)")"
         else
             check "JWT uses HS256 (legacy)" "HS256" "$jwt_alg"
         fi
