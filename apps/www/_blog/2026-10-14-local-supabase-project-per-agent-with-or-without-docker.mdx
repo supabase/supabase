@@ -71,7 +71,7 @@ It runs on Linux (amd64 and arm64, glibc 2.35 or later) and macOS 14 or later on
 
 ## Branches are ready nearly five times faster
 
-When the pull request opens, a remote branch gives reviewers a URL to point a build at, and that branch now arrives configured like the project it came from. Auth, [Storage](/docs/guides/storage), network restrictions, and deployed [Edge Functions](/docs/guides/functions) all carry over at creation, with function bundles copied in parallel so a project with 40 functions comes up as fast as one with two. Secrets stay behind and production data stays out unless you choose to branch with it, so the branch is safe to hand to a reviewer the moment it's ready.
+When the pull request opens, a remote branch gives reviewers a URL to point a build at, and that branch now arrives configured like the project it came from. [Auth](/docs/guides/auth), [Storage](/docs/guides/storage), network restrictions, and deployed [Edge Functions](/docs/guides/functions) all carry over at creation, with function bundles copied in parallel so a project with 40 functions comes up as fast as one with two. Secrets stay behind and production data stays out unless you choose to branch with it, so the branch is safe to hand to a reviewer the moment it's ready.
 
 | Time to ready         | Before September rollout | After | Improvement |
 | --------------------- | ------------------------ | ----- | ----------- |

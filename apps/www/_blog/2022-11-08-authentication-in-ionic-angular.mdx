@@ -820,7 +820,7 @@ Authenticated users should have controls to create a new group and to sign out, 
 
 We already generated a service in the beginning, and here we can add the logic to create a connection to Supabase and a first function to create a new row in our `groups` table and to load all groups.
 
-Creating a group requires just a title, and we can gather the user ID from our authentication service to then call the `insert()` function from the [Supabase client](/docs/reference/javascript/introduction) to create a new record that we then return to the caller.
+Creating a group requires just a title, and we can gather the user ID from our authentication service to then call the `insert()` function from the Supabase client to create a new record that we then return to the caller.
 
 When we want to get a list of groups, we can use `select()` but since we have a [foreign key that references the users table](https://supabase.com/docs/reference/javascript/select?example=query-referenced-tables), we need to join that information so instead of just having the `creator` field we end up getting the actual email for that ID instead!
 
