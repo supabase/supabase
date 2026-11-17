@@ -1,17 +1,14 @@
-import { render, screen } from '@testing-library/react'
-import type { ReactNode } from 'react'
+import { screen } from '@testing-library/react'
 import { beforeEach, describe, expect, it, vi } from 'vitest'
 
-import PreferencesPage from '@/pages/account/me'
+import { Route } from '@/routes/_app/account/me'
+import { renderRoute } from '@/tests/lib/route-render'
 
-const { mockIsPlatform, mockUseIsFeatureEnabled, mockUseProfile, mockRouter } = vi.hoisted(() => ({
+const { mockIsPlatform, mockUseIsFeatureEnabled, mockUseProfile } = vi.hoisted(() => ({
   mockIsPlatform: { value: true },
   mockUseIsFeatureEnabled: vi.fn(),
   mockUseProfile: vi.fn(),
-  mockRouter: { asPath: '/account/me', query: {}, replace: vi.fn() },
 }))
-
-vi.mock('next/router', () => ({ useRouter: () => mockRouter }))
 
 vi.mock('@/lib/constants', async () => {
   const actual = await vi.importActual<Record<string, unknown>>('@/lib/constants')
@@ -29,19 +26,6 @@ vi.mock('@/hooks/misc/useIsFeatureEnabled', () => ({
 
 vi.mock('@/lib/profile', () => ({
   useProfile: mockUseProfile,
-}))
-
-vi.mock('@/components/layouts/AccountLayout/AccountLayout', () => ({
-  __esModule: true,
-  default: ({ children }: { children: ReactNode }) => <div>{children}</div>,
-}))
-
-vi.mock('@/components/layouts/AppLayout/AppLayout', () => ({
-  AppLayout: ({ children }: { children: ReactNode }) => <div>{children}</div>,
-}))
-
-vi.mock('@/components/layouts/DefaultLayout', () => ({
-  DefaultLayout: ({ children }: { children: ReactNode }) => <div>{children}</div>,
 }))
 
 vi.mock('@/components/interfaces/Account/Preferences/ProfileInformation', () => ({
@@ -80,13 +64,12 @@ vi.mock('@/components/ui/AlertError', () => ({
   AlertError: () => <div>AlertError</div>,
 }))
 
+const renderPreferences = (url = '/account/me') =>
+  renderRoute(Route, { routeId: '/_app/account/me', url })
+
 describe('/account/me', () => {
   beforeEach(() => {
     mockIsPlatform.value = true
-    mockRouter.asPath = '/account/me'
-    mockRouter.query = {}
-    mockRouter.replace.mockReset()
-    mockRouter.replace.mockResolvedValue(true)
     mockUseIsFeatureEnabled.mockClear()
     mockUseProfile.mockClear()
     mockUseIsFeatureEnabled.mockReturnValue({
@@ -102,10 +85,10 @@ describe('/account/me', () => {
     })
   })
 
-  it('renders hosted account sections on platform', () => {
+  it('renders hosted account sections on platform', async () => {
     mockIsPlatform.value = true
 
-    render(<PreferencesPage dehydratedState={{}} />)
+    await renderPreferences()
 
     expect(screen.getByText('ProfileInformation')).toBeInTheDocument()
     expect(screen.getByText('AccountConnections')).toBeInTheDocument()
@@ -122,16 +105,15 @@ describe('/account/me', () => {
     '/account/me#dashboard',
     '/account/me#type=recovery',
     '/account/me#access_token=test-access&refresh_token=test-refresh&type=email_change',
-  ])('keeps an ordinary Preferences visit at %s', (asPath) => {
-    mockRouter.asPath = asPath
-    render(<PreferencesPage dehydratedState={{}} />)
-    expect(mockRouter.replace).not.toHaveBeenCalled()
+  ])('keeps an ordinary Preferences visit at %s', async (url) => {
+    const { router } = await renderPreferences(url)
+    expect(router.state.location.pathname).toBe('/account/me')
   })
 
-  it('renders only local preferences on self-hosted', () => {
+  it('renders only local preferences on self-hosted', async () => {
     mockIsPlatform.value = false
 
-    render(<PreferencesPage dehydratedState={{}} />)
+    await renderPreferences()
 
     expect(screen.getByText('ThemeSettings')).toBeInTheDocument()
     expect(screen.getByText('TimezoneSettings')).toBeInTheDocument()
