@@ -101,7 +101,11 @@ export function generateQueryPerformanceSql({
     )
   }
   if (searchQuery.length > 0) {
-    whereConditions.push(safeSql`statements.query ~* ${literal(searchQuery)}`)
+    // Literal, case-insensitive substring match. A regex (~*) would make characters like `[`
+    // or `(` a SQL error while the user is still typing.
+    whereConditions.push(
+      safeSql`strpos(lower(statements.query), lower(${literal(searchQuery)})) > 0`
+    )
   }
   if (sources.includes('dashboard') && !sources.includes('non-dashboard')) {
     whereConditions.push(safeSql`statements.query ~* 'source: dashboard'`)

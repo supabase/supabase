@@ -32,8 +32,17 @@ describe('generateQueryPerformanceSql', () => {
       preset: 'mostFrequentlyInvoked',
       searchQuery: 'SELECT',
     })
-    expect(result.whereSql).toContain("statements.query ~* 'SELECT'")
+    expect(result.whereSql).toBe("strpos(lower(statements.query), lower('SELECT')) > 0")
   })
+
+  it.each(['[', 'pg_sleep(', '(unclosed', 'a\\b', "it's", '100%', 'under_score'])(
+    'treats %s in the search query as literal text',
+    (searchQuery) => {
+      const result = generateQueryPerformanceSql({ preset: 'mostFrequentlyInvoked', searchQuery })
+      expect(result.whereSql).not.toContain('~*')
+      expect(result.whereSql).toMatch(/^strpos\(lower\(statements\.query\), lower\(.+\)\) > 0$/)
+    }
+  )
 
   it('filters by dashboard source only', () => {
     const result = generateQueryPerformanceSql({
@@ -127,7 +136,7 @@ describe('generateQueryPerformanceSql', () => {
       callsFilter: { operator: '>=', value: 5 },
     })
     expect(result.whereSql).toContain("auth.rolname in ('postgres')")
-    expect(result.whereSql).toContain("statements.query ~* 'SELECT'")
+    expect(result.whereSql).toContain("lower('SELECT')")
     expect(result.whereSql).toContain('statements.calls >= 5')
     expect(result.whereSql.split(' AND ').length).toBe(3)
   })
