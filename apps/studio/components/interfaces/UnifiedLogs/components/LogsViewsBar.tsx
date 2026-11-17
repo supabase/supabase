@@ -32,6 +32,23 @@ interface LogsViewsBarProps {
   id?: string
 }
 
+const getStatusMessage = ({
+  isLoading,
+  isError,
+  isEmpty,
+  count,
+}: {
+  isLoading: boolean
+  isError: boolean
+  isEmpty: boolean
+  count: number
+}) => {
+  if (isLoading) return 'Loading saved views'
+  if (isError) return 'Failed to load saved views'
+  if (isEmpty) return 'No saved views'
+  return `${count} saved ${count === 1 ? 'view' : 'views'}`
+}
+
 export const LogsViewsBar = ({
   views,
   isLoading,
@@ -90,6 +107,10 @@ export const LogsViewsBar = ({
         id={id}
         className="flex items-center gap-1.5 px-2 py-2 border-b overflow-x-auto hide-scrollbar"
       >
+        <span role="status" aria-live="polite" className="sr-only">
+          {getStatusMessage({ isLoading, isError, isEmpty, count: views.length })}
+        </span>
+
         {isLoading && (
           <div className={cn(CHIP_CLASS, 'items-center px-2')}>
             <Loader2Icon size={12} className="animate-spin text-foreground-lighter" />

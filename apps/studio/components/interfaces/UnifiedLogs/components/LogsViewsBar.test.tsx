@@ -320,6 +320,29 @@ describe('LogsViewsBar', () => {
     expect(screen.queryByText(/No saved views yet/)).toBeNull()
   })
 
+  it('keeps a status region mounted and announces each outcome', () => {
+    const { rerender } = customRender(<LogsViewsBar {...baseProps} isLoading />)
+
+    expect(screen.getByRole('status')).toHaveTextContent('Loading saved views')
+
+    rerender(<LogsViewsBar {...baseProps} isError />)
+    expect(screen.getByRole('status')).toHaveTextContent('Failed to load saved views')
+
+    rerender(<LogsViewsBar {...baseProps} />)
+    expect(screen.getByRole('status')).toHaveTextContent('No saved views')
+
+    rerender(<LogsViewsBar {...baseProps} views={[makeView()]} />)
+    expect(screen.getByRole('status')).toHaveTextContent('1 saved view')
+
+    rerender(
+      <LogsViewsBar
+        {...baseProps}
+        views={[makeView(), makeView({ id: 'view-2', name: 'Slow requests' })]}
+      />
+    )
+    expect(screen.getByRole('status')).toHaveTextContent('2 saved views')
+  })
+
   it('shows an error state and retries', async () => {
     const onRetry = vi.fn()
     customRender(<LogsViewsBar {...baseProps} isError onRetry={onRetry} />)
