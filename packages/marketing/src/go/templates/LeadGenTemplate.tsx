@@ -11,7 +11,7 @@ export default function LeadGenTemplate({
 }) {
   return (
     <div className="flex flex-col gap-16 sm:gap-24">
-      <HeroSection section={page.hero} />
+      <HeroSection section={page.hero} strongGradient={page.theme === 'light'} />
       {page.sections?.map((section, i) => (
         <SectionRenderer
           key={i}

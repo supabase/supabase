@@ -348,7 +348,6 @@ describe('assertGrant', () => {
     'PATCH /v1/branches/{branch_id_or_ref}',
     'DELETE /v1/branches/{branch_id_or_ref}',
     'GET /v1/branches/{branch_id_or_ref}/diff',
-    'POST /v1/branches/{branch_id_or_ref}/merge',
     'POST /v1/branches/{branch_id_or_ref}/push',
     'POST /v1/branches/{branch_id_or_ref}/reset',
     'POST /v1/branches/{branch_id_or_ref}/restore',

@@ -4,13 +4,12 @@ import {
 } from '@sentry/tanstackstart-react'
 import { createMiddleware, createStart } from '@tanstack/react-start'
 
+import { isCrossOriginRequest } from '@/lib/api/cross-origin'
 import { BASE_PATH, IS_PLATFORM } from '@/lib/constants'
 import { isHostedSupportedApiPath } from '@/lib/hosted-api-allowlist'
 
-// Self-hosted-only API routes must 404 in platform (hosted) mode. Under the
-// Next pages router this lives in middleware (proxy.ts); TanStack Start has no
-// middleware runtime, so it's a global request middleware sharing the same
-// allowlist (lib/hosted-api-allowlist.ts). On Vercel every `/api/*` request
+// Self-hosted-only API routes must 404 in platform (hosted) mode, via a
+// global request middleware using the allowlist in lib/hosted-api-allowlist.ts. On Vercel every `/api/*` request
 // still reaches the function (pages are a static shell), so this covers all
 // API routes from one place.
 
@@ -31,6 +30,19 @@ const platformApiGuard = createMiddleware({ type: 'request' }).server(({ request
   return next()
 })
 
+// Self-hosted Studio has no session of its own, so a page on another site could
+// otherwise submit requests to it with the browser's cached dashboard credentials,
+// or with none at all on a local CLI stack (CSRF). Hosted authenticates with
+// tokens in headers, which browsers don't attach on their own. This covers every
+// server request, including API routes and server functions.
+const crossOriginGuard = createMiddleware({ type: 'request' }).server(({ request, next }) => {
+  if (!IS_PLATFORM && isCrossOriginRequest(request)) {
+    return Response.json({ message: 'Cross-origin request blocked' }, { status: 403 })
+  }
+
+  return next()
+})
+
 // Vercel's standard request pin keeps server functions compatible with the
 // current tab. Documents and the deployment check stay unpinned, so a reload
 // gets the latest version. Vite only defines the ID when protection is enabled.
@@ -41,11 +53,11 @@ const deploymentMiddleware = createMiddleware({ type: 'function' }).client(({ ne
 
 // Sentry's global middlewares go at the FRONT so they wrap the whole request /
 // server-function lifecycle — including errors that downstream code swallows
-// into a 500, which the manual `@sentry/nextjs` approach never sees. The SDK's
+// into a 500, which manual capture calls never see. The SDK's
 // Vite plugin can auto-wrap these arrays instead, but we disable that
 // (`autoInstrumentMiddleware: false` in vite.config.ts) and wire them
 // explicitly so the instrumentation is visible in source.
 export const startInstance = createStart(() => ({
-  requestMiddleware: [sentryGlobalRequestMiddleware, platformApiGuard],
+  requestMiddleware: [sentryGlobalRequestMiddleware, platformApiGuard, crossOriginGuard],
   functionMiddleware: [sentryGlobalFunctionMiddleware, deploymentMiddleware],
 }))

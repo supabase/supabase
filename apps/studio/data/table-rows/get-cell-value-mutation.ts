@@ -1,4 +1,4 @@
-import { ident } from '@supabase/pg-meta'
+import { ident, safeSql } from '@supabase/pg-meta'
 import { Query } from '@supabase/pg-meta/src/query'
 import { useMutation } from '@tanstack/react-query'
 import { toast } from 'sonner'
@@ -17,16 +17,22 @@ export type GetCellValueVariables = {
   column: string
   pkMatch: { [key: string]: any }
   roleImpersonationState?: RoleImpersonationState
+  /**
+   * Return the value as text. For json/jsonb columns this keeps the exact JSON text, whereas the
+   * default returns a parsed value that can lose number precision.
+   */
+  asText?: boolean
 }
 
 export function getCellValueSql({
   table,
   column,
   pkMatch,
-}: Pick<GetCellValueVariables, 'table' | 'column' | 'pkMatch'>) {
+  asText = false,
+}: Pick<GetCellValueVariables, 'table' | 'column' | 'pkMatch' | 'asText'>) {
   return new Query()
     .from(table.name, table.schema ?? undefined)
-    .select(ident(column))
+    .select(asText ? safeSql`${ident(column)}::text as ${ident(column)}` : ident(column))
     .match(pkMatch)
     .toSql()
 }
@@ -38,9 +44,10 @@ export async function getCellValue({
   column,
   pkMatch,
   roleImpersonationState,
+  asText,
 }: GetCellValueVariables) {
   const sql = wrapWithRoleImpersonation(
-    getCellValueSql({ table, column, pkMatch }),
+    getCellValueSql({ table, column, pkMatch, asText }),
     roleImpersonationState
   )
   const { result } = await executeSql({

@@ -1,56 +1,62 @@
-# Supabase Knowledgebase (human guidelines)
+# Supabase Knowledge Base
 
-Welcome to the [Supabase Knowledgebase](https://supabase.com/kb), which serves as a home for troubleshooting, migration, and other types of content that don't quite fit in the [Supabase Docs](https://supabase.com/docs).
+This directory contains the [Astro](https://astro.build) app for the Supabase Knowledge Base, served at [supabase.com/kb](https://supabase.com/kb).
 
-## Content
+Content is organized into three collections under `src/content/`:
 
-There are 3 buckets of content that live within the repo itself:
+- `guides/`: hand-written guides in Markdown or MDX, grouped by topic.
+- `faqs/`: short answers to common questions.
+- `troubleshooting/`: troubleshooting guides fetched from a private repo at build time (see below).
 
-- **Guides**: Walkthroughs, migrations, comparison content, etc. Lives in `src/content/guides/**.mdx`.
-- **FAQs**: Short, specific questions with direct answers. Lives in `src/content/faqs/**/**.mdx`.
-- **Community resources**: Community-produced guides or tutorials on other websites. Lives at `src/data/community-guides.json`.
+At build time, every page is also exported as a plain `.md` file, so the content can be read by LLM crawlers and other tools. Requests that send `Accept: text/markdown` receive these files directly.
 
-Additionally, the KB has **troubleshooting** topics (`src/content/troubleshooting/`), but this content lives in a private repo. See `AGENTS.md` for how it works and what's intentionally left out for now.
-
-### Style guide
-
-In general, follow all the existing guidelines in the [Docs Style Guide](https://github.com/supabase/supabase/blob/master/apps/docs/style-guide/README.md).
-
-Additionally, stick to plain GitHub-Flavored Markdown:
-
-- No custom/JSX components in guide bodies — content is also exported as plain `.md` (see below), and a
-  component wouldn't survive that export.
-- For callouts, use GitHub's native alert syntax (`> [!NOTE]`, `> [!TIP]`, `> [!IMPORTANT]`, `> [!WARNING]`,
-  `> [!CAUTION]`) — the build renders these into the `Admonition` component for you
-  (`src/lib/mdx/rehype-admonitions.ts`). Don't import or use `Admonition` directly in content.
-- Frontmatter requires `title`, but see `src/content.config.ts` for the full schema.
+Search is served by an API route in `api/search/`, backed by content indexed with `pnpm search:ingest`.
 
 ## Development
 
-Requires Node >=22.23.4 and pnpm. Install dependencies from the repository root with `pnpm install`, then start the dev server at [http://localhost:3008](http://localhost:3008):
+Run the dev server from the repository root or from `apps/kb`. It starts at http://localhost:3008/kb.
 
 ```sh
-# From the root directory of the repository
-pnpm dev:kb
-
-# From the apps/kb directory
-pnpm dev
+pnpm dev:kb   # from the root
+pnpm dev      # from apps/kb
 ```
 
-Troubleshooting content is fetched from a private repo, so it's only available locally if you have access and credentials set. From the `apps/kb` directory, copy `.env.example` to `.env.local`, then set `GH_TOKEN` to a literal token value (`.env.local` does not run shell commands). Alternatively, run `export GH_TOKEN=$(gh auth token)` in your shell, then run `pnpm fetch:federated-content` from the `apps/kb` directory. Guides, FAQs, and community guides work without any extra setup.
+Other commands, run from `apps/kb`:
 
-To check a production build locally, you need the same private repo access and `GH_TOKEN` described above. The build runs `fetch:federated-content` first, so it fails without credentials:
+| Command        | Action                    |
+| :------------- | :------------------------ |
+| `pnpm build`   | Build the production site |
+| `pnpm preview` | Preview the build locally |
+| `pnpm test`    | Run unit tests (vitest)   |
 
-```sh
-# From the root directory of the repository
-pnpm build:kb
+To write or edit guides, and for details on the Markdown export and routing, see [`AGENTS.md`](./AGENTS.md).
 
-# From the apps/kb directory
-pnpm build
-pnpm preview
-```
+## Federated troubleshooting content
 
-### Tests
+`src/content/troubleshooting/` isn't hand-written — it's fetched from a private repo by
+`scripts/federated-content/fetch-federated-content.ts` as part of the build (the `fetch:federated-content` task in `turbo.jsonc`)
+and is gitignored. See `AGENTS.md` for how it works and what's intentionally left out for now.
+
+### Contributing to troubleshooting articles
+
+Troubleshooting articles (`/kb/troubleshooting/...`) aren't open for direct contributions. They go through an internal
+review process before they're published.
+
+> [!NOTE]
+> You can still suggest a fix, comment on the article's GitHub Discussion (linked at the bottom of each article as
+> "Go to the GitHub discussion"), or [open an issue](https://github.com/supabase/supabase/issues/new/choose) that
+> links the article and describes the change. Pull requests for other `/kb` content, such as `src/content/guides/`,
+> are welcome.
+
+## Workflows
+
+`.github/workflows/kb-troubleshooting-sync.yml` runs on pushes to `master` that touch `apps/kb/**` (or can be
+triggered manually): it fetches troubleshooting content, creates a GitHub Discussion for any guide that doesn't have one yet
+(`sync:troubleshooting-entries`), and pushes title/content updates to discussions whose guide has since
+changed (`sync:troubleshooting-updates`). This is separate from kb's own build — it has real side effects
+(creating/updating Discussions, writing DB rows), so it never runs as part of `pnpm build`.
+
+## Tests
 
 Unit tests (vitest) live next to the code they cover, including the search API (`api/search/_search.test.ts`;
 the `_` prefix keeps Vercel from deploying it as a function). Run them from `apps/kb`:

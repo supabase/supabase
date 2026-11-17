@@ -211,7 +211,7 @@ suspend fun signInWithAzure() {
 <$Show if="sdk:csharp">
 <TabPanel id="csharp" label="C#">
 
-When your user signs in, call [`SignIn()`](/docs/reference/csharp/sign-in-with-oauth) with `Provider.Azure` as the provider. Request the `email` scope:
+When your user signs in, call [`SignIn()`](/docs/reference/csharp/auth-signinwithoauth) with `Provider.Azure` as the provider. Request the `email` scope:
 
 ```c#
 var state = await supabase.Auth.SignIn(Provider.Azure, new SignInOptions { Scopes = "email" });
@@ -274,7 +274,7 @@ suspend fun signOut() {
 <$Show if="sdk:csharp">
 <TabPanel id="csharp" label="C#">
 
-When your user signs out, call [SignOut()](/docs/reference/csharp/sign-out) to remove them from the browser session and any objects from local storage:
+When your user signs out, call [SignOut()](/docs/reference/csharp/auth-signout) to remove them from the browser session and any objects from local storage:
 
 ```c#
 await supabase.Auth.SignOut();

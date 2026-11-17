@@ -59,7 +59,6 @@ export const fgaRefinements = {
   'PATCH /v1/branches/{branch_id_or_ref}': branchVariants('write'),
   'DELETE /v1/branches/{branch_id_or_ref}': branchVariants('delete'),
   'GET /v1/branches/{branch_id_or_ref}/diff': branchVariants('write'),
-  'POST /v1/branches/{branch_id_or_ref}/merge': branchVariants('write'),
   'POST /v1/branches/{branch_id_or_ref}/push': branchVariants('write'),
   'POST /v1/branches/{branch_id_or_ref}/reset': branchVariants('write'),
   'POST /v1/branches/{branch_id_or_ref}/restore': branchVariants('write'),

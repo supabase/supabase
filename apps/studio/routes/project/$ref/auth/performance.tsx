@@ -1,14 +1,68 @@
 import { createFileRoute } from '@tanstack/react-router'
+import { useParams } from 'common'
+import { PageContainer } from 'ui-patterns/PageContainer'
+import {
+  PageHeader,
+  PageHeaderDescription,
+  PageHeaderMeta,
+  PageHeaderSummary,
+  PageHeaderTitle,
+} from 'ui-patterns/PageHeader'
+import { PageSection, PageSectionContent } from 'ui-patterns/PageSection'
+import { GenericSkeletonLoader } from 'ui-patterns/ShimmeringLoader'
 
-import PerformancePage from '@/pages/project/[ref]/auth/performance'
+import { PerformanceSettingsForm } from '@/components/interfaces/Auth/PerformanceSettingsForm'
+import { NoPermission } from '@/components/ui/NoPermission'
+import { UnknownInterface } from '@/components/ui/UnknownInterface'
+import { FGA_PERMISSIONS, useAsyncCheckPermissionsV2 } from '@/hooks/misc/useCheckPermissionsV2'
+import { useIsFeatureEnabled } from '@/hooks/misc/useIsFeatureEnabled'
 
 export const Route = createFileRoute('/project/$ref/auth/performance')({
-  component: AuthPerformanceRoute,
+  component: PerformancePage,
   staticData: {
     authLayoutTitle: 'Performance',
   },
 })
 
-function AuthPerformanceRoute() {
-  return <PerformancePage dehydratedState={undefined} />
+function PerformancePage() {
+  const { ref } = useParams()
+  const showPerformance = useIsFeatureEnabled('authentication:performance')
+
+  const { can: canReadAuthSettings, isSuccess: isPermissionsLoaded } = useAsyncCheckPermissionsV2(
+    FGA_PERMISSIONS.PROJECT.AUTH_CONFIG_READ
+  )
+
+  if (!showPerformance) {
+    return <UnknownInterface urlBack={`/project/${ref}/auth/providers`} />
+  }
+
+  if (isPermissionsLoaded && !canReadAuthSettings) {
+    return <NoPermission isFullPage resourceText="access your project's authentication settings" />
+  }
+
+  return (
+    <>
+      <PageHeader size="default">
+        <PageHeaderMeta>
+          <PageHeaderSummary>
+            <PageHeaderTitle>Performance</PageHeaderTitle>
+            <PageHeaderDescription>
+              Configure settings to optimize your Auth server's performance
+            </PageHeaderDescription>
+          </PageHeaderSummary>
+        </PageHeaderMeta>
+      </PageHeader>
+      <PageContainer size="default">
+        {!isPermissionsLoaded ? (
+          <PageSection>
+            <PageSectionContent>
+              <GenericSkeletonLoader />
+            </PageSectionContent>
+          </PageSection>
+        ) : (
+          <PerformanceSettingsForm />
+        )}
+      </PageContainer>
+    </>
+  )
 }

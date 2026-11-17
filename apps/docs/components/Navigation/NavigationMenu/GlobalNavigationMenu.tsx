@@ -141,11 +141,11 @@ export const MenuItemLabel = ({
 }: MenuItemLabelProps) => (
   <>
     {icon ? (
-      <span aria-hidden className="contents">
+      <span aria-hidden className="flex h-5 shrink-0 items-center self-start">
         {icon}
       </span>
     ) : null}
-    <span className="flex-1">{title}</span>
+    <span className="line-clamp-2 flex-1">{title}</span>
     {community ? <Badge>Community</Badge> : null}
     {isNew ? <Badge variant="success">New</Badge> : null}
     {experimental ? <Badge variant="warning">Experimental</Badge> : null}
@@ -171,7 +171,7 @@ export const MenuItem = React.forwardRef<
         ref={ref}
         className={cn(
           'group/menu-item flex items-center gap-2',
-          'w-full flex h-8 items-center text-foreground-light text-sm hover:text-foreground select-none rounded-md p-2 leading-none no-underline focus-ring focus-visible:text-foreground',
+          'w-full flex min-h-8 items-center text-foreground-light text-sm hover:text-foreground select-none rounded-md px-2 py-1.5 leading-5 no-underline focus-ring focus-visible:text-foreground',
           className
         )}
         {...props}

@@ -122,9 +122,7 @@ Supports slot behavior with `asChild` prop.
 
 ### Split with dropdown
 
-Pair a button with a chevron `DropdownMenu` trigger when there are variations of the same action, or alternative ways to accomplish the same goal. The default or most likely option should be used on the exposed button.
-
-When secondary actions are related but distinct (not alternatives to the primary action) display the primary action as a button and place the rest in an overflow menu instead. See [Table multiple actions](./table#multiple-actions).
+Use a split button when the menu offers variations of the same action. The main button runs the most common variation directly, and the attached chevron opens the alternatives. For example, “Export CSV” runs immediately while the menu offers “Export JSON”.
 
 <ComponentPreview name="button-split-dropdown" peekCode />
 
@@ -143,6 +141,22 @@ In [Admonition](../fragments/admonition#split-button-with-dropdown) actions with
 - It lets the hovered button paint the shared column, so the divider matches that button's edge color. At rest, the chevron trigger paints it.
 - It lifts the focused button above its neighbor.
 - It keeps the primary action from shrinking on press.
+
+### Dropdown button
+
+Use a single labeled button with a chevron when clicking anywhere on the button should open a menu. For example, a time-range button shows the current selection and opens the list of available ranges.
+
+<ComponentPreview name="button-dropdown" peekCode />
+
+### Button with more actions
+
+Keep the main action visible and put other actions for the same item or section in a separate ellipsis menu. For example, “Add pipeline” creates a pipeline, while the menu offers usage and settings for Pipelines. At the individual pipeline level, “Stop” stays visible while “Restart pipeline”, “Edit pipeline”, and “Delete pipeline” go in the menu.
+
+Use a primary or default button for the visible action based on its importance on the page. Keep a gap between the controls so they read as separate buttons. The order of the buttons depends on their context.
+
+Give the icon-only trigger an accessible name that identifies its context, such as “More actions for this pipeline”, and a short tooltip such as “More actions”. For table rows, see [Multiple actions](./table#multiple-actions).
+
+<ComponentPreview name="button-more-actions" peekCode />
 
 ## Default fill and floating buttons
 

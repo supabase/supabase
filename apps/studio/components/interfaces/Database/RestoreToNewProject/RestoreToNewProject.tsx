@@ -1,3 +1,4 @@
+import dayjs from 'dayjs'
 import { ChevronDownIcon, Loader2Icon } from 'lucide-react'
 import Link from 'next/link'
 import { useEffect, useState } from 'react'
@@ -70,6 +71,12 @@ export const RestoreToNewProject = () => {
   )
 
   const isActiveHealthy = project?.status === PROJECT_STATUS.ACTIVE_HEALTHY
+  const selectedBackup = cloneBackups?.backups.find((backup) => backup.id === selectedBackupId)
+  const selectedTime = recoveryTimeTarget
+    ? dayjs.unix(recoveryTimeTarget).toISOString()
+    : selectedBackup
+      ? dayjs(selectedBackup.inserted_at).toISOString()
+      : undefined
 
   const { can: canReadPhysicalBackups, isSuccess: isPermissionsLoaded } =
     useAsyncCheckPermissionsV2(FGA_PERMISSIONS.PROJECT.BACKUPS_READ)
@@ -260,7 +267,7 @@ export const RestoreToNewProject = () => {
           setShowConfirmationDialog(false)
           setShowNewProjectDialog(true)
         }}
-        additionalMonthlySpend={additionalMonthlySpend}
+        selectedTime={selectedTime}
       />
       <CreateNewProjectDialog
         open={showNewProjectDialog}
@@ -281,7 +288,7 @@ export const RestoreToNewProject = () => {
           <AlertTitle>Restoration in progress</AlertTitle>
           <AlertDescription>
             <p>
-              The new project {(restoringClone?.target_project as any)?.name || ''}{' '}
+              The new project {restoringClone?.target_project?.name || ''}{' '}
               <span>
                 is currently being created. You'll be able to restore again once the project is
                 ready.

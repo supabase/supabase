@@ -530,6 +530,7 @@ export interface OnboardingSurveySubmitButtonClickedEvent {
     surface: OnboardingSurveySurface
     hasKind: boolean
     hasBuilding: boolean
+    hasCanCode: boolean
   }
   groups: Partial<TelemetryGroups>
 }
@@ -561,6 +562,7 @@ export interface OnboardingSurveySubmitFailedEvent {
     surface: OnboardingSurveySurface
     hasKind: boolean
     hasBuilding: boolean
+    hasCanCode: boolean
   }
   groups: Partial<TelemetryGroups>
 }
@@ -1259,7 +1261,9 @@ export interface DocsAiPromptCopiedEvent {
 }
 
 /**
- * User clicked a curated orientation link from a content listings MDX component.
+ * User clicked a curated orientation link from a content listings MDX component, or a
+ * link card or quickstart link in the getting started stepper (`listingId` is
+ * `getting-started-stepper`).
  *
  * @group Events
  * @source docs
@@ -1287,6 +1291,53 @@ export interface ExampleLinkClickedEvent {
      * Path after examples/ in the GitHub URL, e.g. auth/nextjs.
      */
     examplePath: string
+  }
+}
+
+/**
+ * User copied a docs code block with its copy button, and the clipboard write succeeded.
+ *
+ * @group Events
+ * @source docs
+ */
+export interface DocsCodeCopiedEvent {
+  action: 'docs_code_copied'
+  properties: {
+    /**
+     * Language of the code block, such as `bash` or `ts`.
+     */
+    lang?: string
+    /**
+     * Identifier that a page gives a code block it measures, such as
+     * `getting-started-install`.
+     */
+    copyId?: string
+  }
+}
+
+/**
+ * User picked an option in the getting started stepper: how to start, a framework, or a
+ * feature for the agent prompt.
+ *
+ * @group Events
+ * @source docs
+ * @page /docs/guides/getting-started
+ */
+export interface DocsGettingStartedOptionClickedEvent {
+  action: 'docs_getting_started_option_clicked'
+  properties: {
+    /**
+     * Stepper step the option belongs to.
+     */
+    optionType: 'start' | 'framework' | 'feature'
+    /**
+     * Start option id, framework slug, or feature id.
+     */
+    optionId: string
+    /**
+     * For a feature, true when the click selected it and false when it cleared it.
+     */
+    isSelected?: boolean
   }
 }
 
@@ -1375,8 +1426,7 @@ export interface KbSearchClosedEvent {
 }
 
 /**
- * A knowledge base search returned, with or without results. The query text is left out
- * because it can contain personal data; only its length is sent.
+ * A knowledge base search returned, with or without results.
  *
  * @group Events
  * @source kb
@@ -1384,6 +1434,8 @@ export interface KbSearchClosedEvent {
 export interface KbSearchSubmittedEvent {
   action: 'kb_search_submitted'
   properties: {
+    /** The trimmed search term sent to the knowledge base search endpoint. */
+    query: string
     /** Length of the trimmed search term. */
     queryLength: number
     /** Number of results the search returned. */
@@ -1933,6 +1985,56 @@ export interface StudioBillingCancelSubscriptionClickedEvent {
     currentPlan: string
   }
   groups: Omit<TelemetryGroups, 'project'>
+}
+
+/**
+ * User confirmed a downgrade to the Free Plan and was shown the modal saying members
+ * have exceeded their free project limits, which blocks the downgrade.
+ *
+ * @group Events
+ * @source studio
+ * @page /billing or /billing?panel=subscriptionPlan
+ */
+export interface StudioBillingDowngradeBlockedModalOpenedEvent {
+  action: 'studio_billing_downgrade_blocked_modal_opened'
+  properties: {
+    /**
+     * The plan type the org is currently on.
+     */
+    currentPlan: string
+    /**
+     * Number of organization members over their free project limit.
+     */
+    membersExceedingLimitCount: number
+  }
+  groups: Omit<TelemetryGroups, 'project'>
+}
+
+/**
+ * User selected a target organization in the transfer project dialog and the transfer
+ * preview failed because members have reached their free project limits.
+ *
+ * @group Events
+ * @source studio
+ * @page /dashboard/project/{ref}/settings/general
+ */
+export interface ProjectTransferPreviewFailedEvent {
+  action: 'project_transfer_preview_failed'
+  properties: {
+    /**
+     * The plan type of the organization the project is transferred from.
+     */
+    sourcePlan: string
+    /**
+     * The plan type of the selected target organization.
+     */
+    targetPlan: string | null
+    /**
+     * Number of members over their free project limit.
+     */
+    membersExceedingLimitCount: number
+  }
+  groups: TelemetryGroups
 }
 
 /**
@@ -4756,6 +4858,8 @@ export type TelemetryEvent =
   | DocsAiPromptCopiedEvent
   | DocsContentListingClickedEvent
   | ExampleLinkClickedEvent
+  | DocsCodeCopiedEvent
+  | DocsGettingStartedOptionClickedEvent
   | DocsSearchV2OpenedEvent
   | DocsSearchV2SearchSubmittedEvent
   | DocsSearchV2ResultClickedEvent
@@ -4803,6 +4907,8 @@ export type TelemetryEvent =
   | StoragePublicBucketSelectPolicyWarningDismissButtonClickedEvent
   | StudioPricingPlanCtaClickedEvent
   | StudioBillingCancelSubscriptionClickedEvent
+  | StudioBillingDowngradeBlockedModalOpenedEvent
+  | ProjectTransferPreviewFailedEvent
   | StudioPricingSidePanelOpenedEvent
   | ReportsDatabaseGrafanaBannerClickedEvent
   | IndexAdvisorEnableButtonClickedEvent

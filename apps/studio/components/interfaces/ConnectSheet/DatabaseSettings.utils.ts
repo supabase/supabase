@@ -52,7 +52,7 @@ export const getSelfHostedPoolerStrings = (
   dbName: string = 'postgres'
 ): ConnectionStrings => {
   const user = 'postgres.[POOLER_TENANT_ID]'
-  const password = '[YOUR-PASSWORD]'
+  const password = '[YOUR-DATABASE-PASSWORD]'
 
   const uri = `postgresql://${user}:${password}@${dbHost}:${port}/${dbName}`
   const psql = `psql 'postgresql://${user}:${password}@${dbHost}:${port}/${dbName}'`
@@ -88,7 +88,7 @@ export const getSelfHostedDirectStrings = (
   dbName: string = 'postgres'
 ): ConnectionStrings => {
   const user = 'postgres'
-  const password = '[YOUR-PASSWORD]'
+  const password = '[YOUR-DATABASE-PASSWORD]'
 
   const uri = `postgresql://${user}:${password}@${dbHost}:${port}/${dbName}`
   const psql = `psql 'postgresql://${user}:${password}@${dbHost}:${port}/${dbName}'`
@@ -149,7 +149,7 @@ export const getConnectionStrings = ({
 } => {
   const isMd5 = poolingInfo?.connectionString.includes('options=reference')
   const { projectRef } = metadata
-  const password = '[YOUR-PASSWORD]'
+  const password = '[YOUR-DATABASE-PASSWORD]'
 
   // Direct connection variables
   const directUser = connectionInfo.db_user

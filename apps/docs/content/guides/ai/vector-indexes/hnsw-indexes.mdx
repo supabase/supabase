@@ -37,7 +37,7 @@ create index on items using hnsw (column_name vector_ip_ops);
 create index on items using hnsw (column_name vector_cosine_ops);
 ```
 
-For pgvector versions 0.7.0 and above, it's possible to create indexes on vectors with the following maximum dimensions:
+For [pgvector](/docs/guides/database/extensions/pgvector) versions 0.7.0 and above, it's possible to create indexes on vectors with the following maximum dimensions:
 
 - vector: up to 2,000 dimensions
 - halfvec: up to 4,000 dimensions
