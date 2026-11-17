@@ -14,7 +14,7 @@ imgThumb: '2026-10-28-orioledb-public-beta/thumb.png'
 toc_depth: 2
 ---
 
-OrioleDB, an [open-source](https://github.com/orioledb/orioledb) storage engine for Postgres, is now in public beta on every Supabase plan. We announced the public beta at [Supabase Select](https://supabase.com/blog/select-2026-scale-without-limits), alongside Multigres and DBArena. Pick OrioleDB when you create a project. It's billed the same as standard Postgres. Compute and disk resizing, read replicas, Postgres upgrades, and scheduled backups work. It's not ready for production yet.
+OrioleDB, an [open-source](https://github.com/orioledb/orioledb) storage engine for Postgres, is now in public beta on every Supabase plan. We announced the public beta at [Supabase Select](https://supabase.com/blog/select-2026-scale-without-limits), alongside Multigres and DBArena. Pick OrioleDB when you create a project. It's billed the same as standard Postgres. Compute and disk resizing, [read replicas](/docs/guides/platform/read-replicas), Postgres upgrades, and scheduled backups work. It's not ready for production yet.
 
 <div className="video-container">
   <iframe
@@ -52,7 +52,7 @@ We benchmark OrioleDB on [DBArena](https://dbarena.com/), our open benchmarking 
 
 When the data doesn’t fit in memory, OrioleDB had the highest throughput per dollar of any product at every compute size we tested. On an 8XL instance (32 vCPU, 128 GiB of RAM), it completed about 1.8x more transactions per minute than Supabase Postgres on heap storage, reaching 113,850 transactions per minute. At the Small size, at the same price, it delivered about 46% more throughput per dollar than heap. When the data fits in memory, the gap is smaller. OrioleDB was about 13% ahead of heap at Large and about 29% ahead at 8XL. At Small, heap came out ahead. You can [compare the results](https://dbarena.com/compare?bound=cache-exceeding&cols=supabase:8xlarge,orioledb:8xlarge) for any size and scenario.
 
-The performance benefits of OrioleDB depend on your workload. OrioleDB helps most with tables that are updated or deleted often, such as order status, inventory counts, job queues, and session data, since those are the tables where heap storage builds up the most bloat. It also helps when your data set is larger than memory, when many connections are reading and writing at once on a large instance, and when most queries look up rows by primary key. Read-mostly workloads that fit comfortably in memory will see a smaller difference. Workloads that depend on non-B-tree indexes, like pgvector HNSW, may not see gains yet, since those indexes run through an experimental bridge. We recommend benchmarking your own workload before drawing conclusions.
+The performance benefits of OrioleDB depend on your workload. [OrioleDB](/features/orioledb) helps most with tables that are updated or deleted often, such as order status, inventory counts, job queues, and session data, since those are the tables where heap storage builds up the most bloat. It also helps when your data set is larger than memory, when many connections are reading and writing at once on a large instance, and when most queries look up rows by primary key. Read-mostly workloads that fit comfortably in memory will see a smaller difference. Workloads that depend on non-B-tree indexes, like [pgvector](/docs/guides/database/extensions/pgvector) HNSW, may not see gains yet, since those indexes run through an experimental bridge. We recommend benchmarking your own workload before drawing conclusions.
 
 <Img
   alt="Benchmark derived from TPC-C: OrioleDB completed up to 1.8x more transactions per minute than the standard Postgres heap on an 8XL instance (32 vCPU, 128 GiB RAM) with data larger than memory and 128 clients. Results on dbarena.com."
@@ -77,7 +77,7 @@ create table orders (
 );
 ```
 
-To develop locally, initialize your project with the Supabase CLI (v2.119.0 or later):
+To develop locally, initialize your project with the [Supabase CLI](/features/cli) (v2.119.0 or later):
 
 ```bash
 supabase init --use-orioledb

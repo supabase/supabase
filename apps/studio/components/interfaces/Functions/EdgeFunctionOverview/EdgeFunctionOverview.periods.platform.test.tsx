@@ -1,4 +1,4 @@
-import { dehydrate, QueryClient } from '@tanstack/react-query'
+import { QueryClient } from '@tanstack/react-query'
 import { screen, waitFor } from '@testing-library/react'
 import userEvent from '@testing-library/user-event'
 import { FeatureFlagContext } from 'common'
@@ -11,10 +11,11 @@ import type { EdgeFunction } from '@/data/edge-functions/edge-function-query'
 import { edgeFunctionsKeys } from '@/data/edge-functions/keys'
 import { projectKeys } from '@/data/projects/keys'
 import { subscriptionKeys } from '@/data/subscriptions/keys'
-import OverviewPage from '@/pages/project/[ref]/functions/[functionSlug]/index'
+import { Route } from '@/routes/project/$ref/functions/$functionSlug/index'
 import { createMockProject } from '@/tests/helpers'
-import { customRender } from '@/tests/lib/custom-render'
+import { CustomWrapper } from '@/tests/lib/custom-render'
 import { addAPIMock } from '@/tests/lib/msw'
+import { renderRoute } from '@/tests/lib/route-render'
 
 afterEach(() => vi.useRealTimers())
 
@@ -63,12 +64,19 @@ it('loads the overview before feature flags and updates metrics with the selecte
     response: () => HttpResponse.json<{ result: never[] }>({ result: [] }),
   })
 
-  customRender(
-    <FeatureFlagContext.Provider value={{ configcat: {}, posthog: {}, hasLoaded: false }}>
-      <OverviewPage dehydratedState={dehydrate(queryClient)} />
-    </FeatureFlagContext.Provider>,
-    { queryClient }
-  )
+  await renderRoute(Route, {
+    routeId: '/project/$ref/functions/$functionSlug/',
+    url: '/project/default/functions/send-email',
+    renderOptions: {
+      wrapper: ({ children }) => (
+        <CustomWrapper queryClient={queryClient}>
+          <FeatureFlagContext.Provider value={{ configcat: {}, posthog: {}, hasLoaded: false }}>
+            {children}
+          </FeatureFlagContext.Provider>
+        </CustomWrapper>
+      ),
+    },
+  })
 
   expect(await screen.findByText('60ms')).toBeVisible()
   await user.click(screen.getByRole('button', { name: '15 min' }))

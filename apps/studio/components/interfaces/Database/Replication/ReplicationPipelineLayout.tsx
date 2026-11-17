@@ -366,11 +366,18 @@ export const ReplicationPipelineLayout = ({ children }: PropsWithChildren) => {
                   <DropdownMenuContent side="bottom" align="end" className="w-52">
                     {canRestart && (
                       <DropdownMenuItem
-                        className="gap-x-2"
+                        className="gap-x-2 items-start"
                         onClick={() => onLifecycleAction('restart')}
+                        aria-label="Restart pipeline"
+                        aria-description="Resume saved progress. Unfinished initial syncs start over."
                       >
-                        <RotateCcwIcon size={14} />
-                        <span>Restart pipeline</span>
+                        <RotateCcwIcon size={14} className="mt-0.5 shrink-0" />
+                        <div>
+                          <span>Restart pipeline</span>
+                          <p className="text-xs text-foreground-lighter">
+                            Resume saved progress. Unfinished initial syncs start over.
+                          </p>
+                        </div>
                       </DropdownMenuItem>
                     )}
                     {canStop && (
