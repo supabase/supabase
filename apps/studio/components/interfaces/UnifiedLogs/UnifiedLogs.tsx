@@ -671,6 +671,7 @@ export const UnifiedLogs = ({
                   isFilterBarOpen={isFilterBarOpen}
                   setIsFilterBarOpen={setIsFilterBarOpen}
                   dateRangeDisabled={{ after: new Date() }}
+                  onReset={() => setActiveViewId(null)}
                 />
                 <ResizableHandle withHandle />
               </>
