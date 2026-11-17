@@ -394,6 +394,19 @@ function redactLines(
   hideElidedLines: boolean = false
 ) {
   const contentLines = content.split('\n')
+  for (const [start, end] of lines) {
+    if (
+      !Number.isInteger(start) ||
+      !Number.isInteger(end) ||
+      start < 1 ||
+      start > contentLines.length ||
+      (end !== -1 && (end < start || end > contentLines.length))
+    ) {
+      throw new Error(
+        `Invalid $CodeSample line range [${start}, ${end}] for file with ${contentLines.length} lines`
+      )
+    }
+  }
   const preservedLines = lines.reduce((acc, [start, end], index, arr) => {
     if (!hideElidedLines && (index !== 0 || start !== 1)) {
       acc.push(_createElidedLine(lang, contentLines, start, end))
@@ -418,7 +431,7 @@ export function _createElidedLine(
   start: number,
   end: number
 ) {
-  const indentation = lines[start - 1].match(/^\s*/)?.[0] ?? ''
+  const indentation = lines[start - 1]?.match(/^\s*/)?.[0] ?? ''
 
   switch (lang) {
     case 'sql':
