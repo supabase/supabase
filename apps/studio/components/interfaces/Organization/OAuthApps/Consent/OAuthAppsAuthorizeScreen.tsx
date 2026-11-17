@@ -27,8 +27,8 @@ import { useOAuthAppsAuthorizeRequestQuery } from '@/data/oauth-apps/oauth-apps-
 import { useOAuthAppsPreflightValidationQuery } from '@/data/oauth-apps/oauth-apps-preflight-validation-query'
 import type {
   OAuthAppsAuthorizeRedirect,
-  OAuthAppsAuthorizeRoleValidationFailure,
   OAuthAuthorizeApproveRequest,
+  OAuthScopeValidationResult,
 } from '@/data/oauth-apps/types'
 import { getFailedProjects, getPreselectedProjectRefs } from '@/data/oauth-apps/types'
 import { useSignOut } from '@/lib/auth'
@@ -61,9 +61,7 @@ export const OAuthAppsAuthorizeScreen = ({
   const [selectedProjectRefs, setSelectedProjectRefs] = useState<string[]>([])
   const [allProjectsSelected, setAllProjectsSelected] = useState(false)
   const [approveRedirect, setApproveRedirect] = useState<OAuthAppsAuthorizeRedirect | null>(null)
-  const [roleFailure, setRoleFailure] = useState<OAuthAppsAuthorizeRoleValidationFailure | null>(
-    null
-  )
+  const [roleFailure, setRoleFailure] = useState<OAuthScopeValidationResult | null>(null)
 
   const {
     data: identity,
@@ -136,7 +134,8 @@ export const OAuthAppsAuthorizeScreen = ({
     if (!isProjectScopingModeEnabled) return
 
     const grant = preflightData.existing_grant
-    const hasAllProjectsGrant = grant !== null && grant.project_refs?.length === 0
+    const hasAllProjectsGrant =
+      grant !== null && (grant.project_refs == null || grant.project_refs?.length === 0)
 
     if (hasAllProjectsGrant && isProjectScopingModeEnabled) {
       setAllProjectsSelected(true)
@@ -161,7 +160,7 @@ export const OAuthAppsAuthorizeScreen = ({
     onError: (error) => {
       // TODO: cleanup when removing mock data
       // @ts-expect-error
-      setRoleFailure(error)
+      setRoleFailure(error.validation)
     },
   })
   const denyMutation = useOAuthAppsAuthorizeDenyMutation({

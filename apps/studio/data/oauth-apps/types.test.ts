@@ -100,24 +100,12 @@ describe('getFailedProjects', () => {
       failed_scopes: ['database:write' as const],
     }
 
-    expect(
-      getFailedProjects({
-        status: 'error',
-        error_code: 'role_validation_failed',
-        message: 'nope',
-        validation: { scope_target: 'projects', failures: [failure] },
-      })
-    ).toEqual([failure])
+    expect(getFailedProjects({ scope_target: 'projects', failures: [failure] })).toEqual([failure])
   })
 
   test('is empty for an organization-level failure', () => {
     expect(
-      getFailedProjects({
-        status: 'error',
-        error_code: 'role_validation_failed',
-        message: 'nope',
-        validation: { scope_target: 'organization', role: { name: 'read-only' } },
-      })
+      getFailedProjects({ scope_target: 'organization', role: { name: 'read-only' } })
     ).toEqual([])
   })
 

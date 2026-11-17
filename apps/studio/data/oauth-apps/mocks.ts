@@ -636,7 +636,12 @@ export function getMockOAuthAppsAuthorizeApproveResult(
   if (projectRefs === undefined || request.grant_kind === 'organization_bound') {
     const result = evaluateGrantEligibility(request, organization)
     if (result.validation_failure) {
-      throw result.validation_failure
+      throw {
+        status: 'error',
+        error_code: 'role_validation_failed',
+        message: 'Your role does not permit the requested scopes on all projects.',
+        validation: result.validation_failure,
+      }
     }
     return approved
   }

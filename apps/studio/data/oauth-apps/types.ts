@@ -112,10 +112,10 @@ export type OAuthAppsAuthorizeRoleValidationFailure = {
 export type OAuthAppsAuthorizeApproveResult = OAuthAppsAuthorizeRedirect
 
 export function getFailedProjects(
-  failure: OAuthAppsAuthorizeRoleValidationFailure | null | undefined
+  failure: OAuthScopeValidationResult | null | undefined
 ): OAuthScopeValidationProjectFailure[] {
   if (!failure) return []
-  return failure.validation.scope_target === 'projects' ? failure.validation.failures : []
+  return failure.scope_target === 'projects' ? failure.failures : []
 }
 
 export type OAuthAppsAuthorizePreflightSuccess = { status: 'success' }
