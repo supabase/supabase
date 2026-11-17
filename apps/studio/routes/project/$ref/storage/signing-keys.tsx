@@ -1,14 +1,10 @@
 import { createFileRoute } from '@tanstack/react-router'
 
-import StorageSigningKeysPage from '@/pages/project/[ref]/storage/signing-keys'
+import { UrlSigningKeys } from '@/components/interfaces/Storage/UrlSigningKeys/UrlSigningKeys'
 
 export const Route = createFileRoute('/project/$ref/storage/signing-keys')({
-  component: StorageSigningKeysRoute,
+  component: UrlSigningKeys,
   staticData: {
     storageLayoutTitle: 'URL Signing Keys',
   },
 })
-
-function StorageSigningKeysRoute() {
-  return <StorageSigningKeysPage dehydratedState={undefined} />
-}

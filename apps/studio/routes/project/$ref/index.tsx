@@ -1,7 +1,7 @@
 import { createFileRoute } from '@tanstack/react-router'
 
+import { ProjectHome } from '@/components/interfaces/ProjectHome/Home'
 import { ProjectLayoutWithAuth } from '@/components/layouts/ProjectLayout'
-import HomePage from '@/pages/project/[ref]/index'
 
 export const Route = createFileRoute('/project/$ref/')({
   component: ProjectHomeRoute,
@@ -10,7 +10,7 @@ export const Route = createFileRoute('/project/$ref/')({
 function ProjectHomeRoute() {
   return (
     <ProjectLayoutWithAuth>
-      <HomePage dehydratedState={undefined} />
+      <ProjectHome />
     </ProjectLayoutWithAuth>
   )
 }

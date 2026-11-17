@@ -34,6 +34,11 @@
           "description": "The maximum number of rows returned from a view, table, or stored procedure. Limits payload size for accidental or malicious requests.",
           "default": 1000
         },
+        "db_pool": {
+          "type": "integer",
+          "minimum": 1,
+          "description": "Maximum number of connections in the local PostgREST database pool. Left unset, the default pool size is unchanged."
+        },
         "auto_expose_new_tables": {
           "type": "boolean",
           "description": "Controls whether newly-created tables, views, sequences and functions in the `public` schema by `postgres` are reachable through the Data API roles (`anon`, `authenticated`, `service_role`) without explicit GRANTs. When unset, new entities are auto-exposed, matching the cloud default. Set to `false` to revoke the default Data API privileges so new entities require explicit GRANTs, matching a cloud project with the \"Default privileges for new entities\" toggle turned off."
@@ -1806,6 +1811,22 @@
               "type": "string",
               "description": "How the compute is reached: `public` gives it an internet-facing URL,\n`private` keeps it reachable only from inside the project. Every deploy\nsends a complete spec, so the value recorded here is what keeps a private\ncompute private; `--exposure` overrides it for one deploy. Defaults to\n`public`.",
               "examples": ["private"]
+            },
+            "secrets_scope": {
+              "anyOf": [
+                {
+                  "type": "string"
+                },
+                {
+                  "type": "array",
+                  "items": {
+                    "type": "string"
+                  }
+                }
+              ],
+              "description": "controls whether secrets are available: `all` gives access to all defined secrets,\n`supabase` exposes only the `SUPABASE_*` defaults, `none` hides all\nsecrets, `string[]` gives only the secrets named in the list.",
+              "default": "all",
+              "examples": ["all", ["STRIPE_KEY", "LLM_APIKEY"]]
             },
             "instances": {
               "type": "integer",

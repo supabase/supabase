@@ -1215,6 +1215,43 @@ resources:
                         end
                       end
 
+                # Sandboxes responses on Storage, REST and Functions, since Studio
+                # shares this origin: a document opened from these routes can't run script
+                # or submit forms. Subresources (<img>, fetch, downloads) ignore the policy.
+                # media-src 'self' lets the browser's player load audio and video opened
+                # directly, and style-src 'unsafe-inline' keeps inline styles in SVG files.
+                - name: envoy.filters.http.lua
+                  typed_config:
+                    '@type': >-
+                      type.googleapis.com/envoy.extensions.filters.http.lua.v3.Lua
+                    inline_code: |
+                      local NAMESPACE = "supabase.sandbox"
+
+                      local function in_scope(path)
+                        return path:sub(1, 12) == "/storage/v1/"
+                          or path:sub(1, 9) == "/rest/v1/"
+                          or path:sub(1, 14) == "/functions/v1/"
+                      end
+
+                      function envoy_on_request(request_handle)
+                        local headers = request_handle:headers()
+                        local path = (headers:get(":path") or ""):match("^[^?#]*")
+                        if in_scope(path) then
+                          request_handle:streamInfo():dynamicMetadata():set(NAMESPACE, "in_scope", true)
+                        end
+                      end
+
+                      function envoy_on_response(response_handle)
+                        if response_handle:streamInfo():dynamicMetadata():get(NAMESPACE) == nil then
+                          return
+                        end
+
+                        response_handle:headers():replace(
+                          "content-security-policy",
+                          "default-src 'none'; media-src 'self'; style-src 'unsafe-inline'; sandbox"
+                        )
+                      end
+
                 - name: envoy.filters.http.rbac
                   typed_config:
                     '@type': >-

@@ -8,10 +8,8 @@ import { isCrossOriginRequest } from '@/lib/api/cross-origin'
 import { BASE_PATH, IS_PLATFORM } from '@/lib/constants'
 import { isHostedSupportedApiPath } from '@/lib/hosted-api-allowlist'
 
-// Self-hosted-only API routes must 404 in platform (hosted) mode. Under the
-// Next pages router this lives in middleware (proxy.ts); TanStack Start has no
-// middleware runtime, so it's a global request middleware sharing the same
-// allowlist (lib/hosted-api-allowlist.ts). On Vercel every `/api/*` request
+// Self-hosted-only API routes must 404 in platform (hosted) mode, via a
+// global request middleware using the allowlist in lib/hosted-api-allowlist.ts. On Vercel every `/api/*` request
 // still reaches the function (pages are a static shell), so this covers all
 // API routes from one place.
 
@@ -55,7 +53,7 @@ const deploymentMiddleware = createMiddleware({ type: 'function' }).client(({ ne
 
 // Sentry's global middlewares go at the FRONT so they wrap the whole request /
 // server-function lifecycle — including errors that downstream code swallows
-// into a 500, which the manual `@sentry/nextjs` approach never sees. The SDK's
+// into a 500, which manual capture calls never see. The SDK's
 // Vite plugin can auto-wrap these arrays instead, but we disable that
 // (`autoInstrumentMiddleware: false` in vite.config.ts) and wire them
 // explicitly so the instrumentation is visible in source.

@@ -202,6 +202,21 @@ services:
           allow:
             - admin
             - anon
+      # Sandboxes responses, since Studio shares this origin: a document opened
+      # from these routes can't run script or submit forms. Subresources (<img>,
+      # fetch, downloads) ignore the policy. media-src 'self' lets the browser's player
+      # load audio and video opened directly, and style-src 'unsafe-inline' keeps
+      # inline styles in SVG files. `&sandbox_response` is a YAML anchor:
+      # the storage-v1 and functions-v1 services below reuse this same Lua code
+      # through the `*sandbox_response` alias, which YAML expands into a copy.
+      - name: post-function
+        config:
+          header_filter:
+            - &sandbox_response |
+              kong.response.set_header(
+                "Content-Security-Policy",
+                "default-src 'none'; media-src 'self'; style-src 'unsafe-inline'; sandbox"
+              )
 
   ## Secure GraphQL routes
   - name: graphql-v1
@@ -359,6 +374,9 @@ services:
               if auth == nil or auth == "" or auth:find("^%s*$") then
                 kong.service.request.clear_header("authorization")
               end
+          header_filter:
+            # Same Lua code as the rest-v1 service (YAML alias of `&sandbox_response`)
+            - *sandbox_response
 
   ## Edge Functions routes
   ##
@@ -406,6 +424,9 @@ services:
               if v == nil or v == "" or v:find("^%s*$") then
                 kong.service.request.clear_header("sb-api-key")
               end
+          header_filter:
+            # Same Lua code as the rest-v1 service (YAML alias of `&sandbox_response`)
+            - *sandbox_response
 
   ## OAuth 2.0 Authorization Server Metadata (RFC 8414)
   - name: well-known-oauth

@@ -1,4 +1,4 @@
-import type { ErrorEvent } from '@sentry/nextjs'
+import type { ErrorEvent } from '@sentry/react'
 import { describe, expect, it } from 'vitest'
 
 import { UserSqlError } from './errors/studio-errors'

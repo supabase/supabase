@@ -1,4 +1,4 @@
-import * as Sentry from '@sentry/nextjs'
+import * as Sentry from '@sentry/react'
 import { IS_PLATFORM, useFeatureFlags } from 'common'
 
 import { useLocalStorageQuery } from '@/hooks/misc/useLocalStorage'

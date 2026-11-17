@@ -8,9 +8,9 @@ export const Route = createFileRoute('/project/$ref/branches')({
 
 // BranchLayout sibling-file shell. Each leaf renders its own per-page
 // PageLayout (different titles + primary/secondary actions); we keep
-// that wrapping in the leaf route files via the page-side
-// `*PageWrapper` exports rather than trying to share PageLayout in the
-// shell — the shell deliberately stops at BranchLayout.
+// that wrapping in the leaf route files via their `*PageWrapper`
+// components rather than trying to share PageLayout in the shell — the
+// shell deliberately stops at BranchLayout.
 function BranchesShell() {
   return (
     <BranchLayout>

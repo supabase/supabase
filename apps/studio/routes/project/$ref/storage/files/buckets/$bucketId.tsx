@@ -1,9 +1,51 @@
-import { createFileRoute } from '@tanstack/react-router'
+import { createFileRoute, Link, useNavigate } from '@tanstack/react-router'
+import {
+  ChevronDownIcon,
+  FolderOpenIcon,
+  RefreshCwIcon,
+  SettingsIcon,
+  ShieldIcon,
+  Trash2Icon,
+} from 'lucide-react'
+import { parseAsStringLiteral, useQueryState } from 'nuqs'
+import { useEffect, useRef } from 'react'
+import { toast } from 'sonner'
+import {
+  Badge,
+  BreadcrumbItem,
+  BreadcrumbLink,
+  BreadcrumbList,
+  BreadcrumbPage,
+  BreadcrumbSeparator,
+  Button,
+  DropdownMenu,
+  DropdownMenuContent,
+  DropdownMenuItem,
+  DropdownMenuSeparator,
+  DropdownMenuTrigger,
+  Tooltip,
+  TooltipContent,
+  TooltipTrigger,
+} from 'ui'
+import { PageBreadcrumbs, PageBreadcrumbsActions } from 'ui-patterns/PageBreadcrumbs'
+import { PageContainer } from 'ui-patterns/PageContainer'
 
-import BucketPage from '@/pages/project/[ref]/storage/files/buckets/[bucketId]'
+import { BucketVersioningPill } from '@/components/interfaces/Storage/BucketVersioningPill'
+import { DeleteBucketModal } from '@/components/interfaces/Storage/FilesBuckets/DeleteBucketModal'
+import { EditBucketModal } from '@/components/interfaces/Storage/FilesBuckets/EditBucketModal'
+import { EmptyBucketModal } from '@/components/interfaces/Storage/FilesBuckets/EmptyBucketModal'
+import { PublicBucketWarning } from '@/components/interfaces/Storage/FilesBuckets/PublicBucketWarning'
+import { PurgeBucketCDNCacheModal } from '@/components/interfaces/Storage/FilesBuckets/PurgeBucketCDNCacheModal'
+import { useSelectedBucket } from '@/components/interfaces/Storage/FilesBuckets/useSelectedBucket'
+import { PUBLIC_BUCKET_TOOLTIP } from '@/components/interfaces/Storage/Storage.constants'
+import StorageBucketsError from '@/components/interfaces/Storage/StorageBucketsError'
+import { StorageExplorer } from '@/components/interfaces/Storage/StorageExplorer/StorageExplorer'
+import { useBucketPolicyCount } from '@/components/interfaces/Storage/useBucketPolicyCount'
+import { IS_PLATFORM } from '@/lib/constants'
+import { StorageExplorerStateContextProvider } from '@/state/storage-explorer'
 
 export const Route = createFileRoute('/project/$ref/storage/files/buckets/$bucketId')({
-  component: StorageFilesBucketRoute,
+  component: BucketPage,
   // Bucket detail pages skip StorageBucketsLayout — they render the
   // bucket UI full-bleed under StorageLayout only.
   staticData: {
@@ -12,6 +54,188 @@ export const Route = createFileRoute('/project/$ref/storage/files/buckets/$bucke
   },
 })
 
-function StorageFilesBucketRoute() {
-  return <BucketPage dehydratedState={undefined} />
+function BucketPage() {
+  const navigate = useNavigate()
+  const { bucketId, ref } = Route.useParams()
+  const { data: bucket, error, isSuccess, isError } = useSelectedBucket()
+
+  const [modalDisplayed, setModalDisplayed] = useQueryState(
+    'action',
+    parseAsStringLiteral(['edit', 'empty', 'delete', 'purgeCDNCache']).withOptions({
+      history: 'push',
+      clearOnDefault: true,
+    })
+  )
+
+  const menuTriggerRef = useRef<HTMLButtonElement | null>(null)
+
+  function restoreActionsButtonFocus() {
+    if (menuTriggerRef.current == null) return
+    menuTriggerRef.current.focus()
+  }
+
+  function closeModal() {
+    setModalDisplayed(null)
+    setTimeout(() => {
+      restoreActionsButtonFocus()
+    })
+  }
+
+  const { getPolicyCount } = useBucketPolicyCount()
+  const policyCount = bucket ? getPolicyCount(bucket.id) : 0
+
+  useEffect(() => {
+    if (isSuccess && !bucket) {
+      toast.info(`Bucket "${bucketId}" does not exist in your project`)
+      void navigate({ to: '/project/$ref/storage/files', params: { ref } })
+    }
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [isSuccess])
+
+  if (isError) {
+    return <StorageBucketsError error={error} />
+  }
+
+  return (
+    <StorageExplorerStateContextProvider key={`storage-explorer-state-${ref}`}>
+      <div className="w-full min-h-full flex flex-col items-stretch">
+        <PageBreadcrumbs
+          actions={
+            <PageBreadcrumbsActions>
+              <BucketVersioningPill bucket={bucket} />
+              <Button
+                asChild
+                variant="outline"
+                size="tiny"
+                icon={<ShieldIcon size={14} />}
+                iconRight={
+                  policyCount > 0 ? (
+                    <span className="w-4 h-4 bg-surface-200 text-foreground-light text-xs rounded-full flex items-center justify-center font-medium">
+                      {policyCount}
+                    </span>
+                  ) : undefined
+                }
+              >
+                <Link
+                  to="/project/$ref/storage/files/policies"
+                  params={{ ref }}
+                  search={{ search: bucket?.name ?? '' }}
+                >
+                  Policies
+                </Link>
+              </Button>
+              <DropdownMenu>
+                <DropdownMenuTrigger asChild>
+                  <Button
+                    ref={menuTriggerRef}
+                    variant="outline"
+                    size="tiny"
+                    iconRight={<ChevronDownIcon size={14} />}
+                  >
+                    Edit bucket
+                  </Button>
+                </DropdownMenuTrigger>
+                <DropdownMenuContent align="end" className="w-40">
+                  <DropdownMenuItem className="gap-x-2" onClick={() => setModalDisplayed('edit')}>
+                    <SettingsIcon size={12} />
+                    <p>Bucket settings</p>
+                  </DropdownMenuItem>
+                  <DropdownMenuSeparator />
+                  {IS_PLATFORM && (
+                    <DropdownMenuItem
+                      className="gap-x-2"
+                      onClick={() => setModalDisplayed('purgeCDNCache')}
+                    >
+                      <RefreshCwIcon size={12} />
+                      <p>Purge CDN cache</p>
+                    </DropdownMenuItem>
+                  )}
+                  <DropdownMenuItem className="gap-x-2" onClick={() => setModalDisplayed('empty')}>
+                    <FolderOpenIcon size={12} />
+                    <p>Empty bucket</p>
+                  </DropdownMenuItem>
+                  <DropdownMenuItem className="gap-x-2" onClick={() => setModalDisplayed('delete')}>
+                    <Trash2Icon size={12} />
+                    <p>Delete bucket</p>
+                  </DropdownMenuItem>
+                </DropdownMenuContent>
+              </DropdownMenu>
+            </PageBreadcrumbsActions>
+          }
+        >
+          <BreadcrumbList>
+            <BreadcrumbItem>
+              <BreadcrumbLink asChild>
+                <Link to="/project/$ref/storage/files" params={{ ref }}>
+                  Files
+                </Link>
+              </BreadcrumbLink>
+            </BreadcrumbItem>
+            <BreadcrumbSeparator />
+            <BreadcrumbItem>
+              <BreadcrumbLink asChild>
+                <Link to="/project/$ref/storage/files" params={{ ref }}>
+                  Buckets
+                </Link>
+              </BreadcrumbLink>
+            </BreadcrumbItem>
+            <BreadcrumbSeparator />
+            <BreadcrumbItem className="min-w-0">
+              <BreadcrumbPage className="flex min-w-0 items-center gap-2">
+                <span className="truncate">{bucketId}</span>
+                {bucket?.public && (
+                  <Tooltip>
+                    <TooltipTrigger asChild>
+                      <Badge variant="warning" className="flex shrink-0">
+                        Public
+                      </Badge>
+                    </TooltipTrigger>
+                    <TooltipContent side="bottom">{PUBLIC_BUCKET_TOOLTIP}</TooltipContent>
+                  </Tooltip>
+                )}
+              </BreadcrumbPage>
+            </BreadcrumbItem>
+          </BreadcrumbList>
+        </PageBreadcrumbs>
+
+        <PageContainer size="full" className="flex flex-1 min-h-0 flex-col px-0 xl:px-0">
+          {ref && bucketId && (
+            <div className="px-4 py-4 empty:hidden">
+              <PublicBucketWarning projectRef={ref} bucketId={bucketId} />
+            </div>
+          )}
+          <div className="flex-1 min-h-0">
+            <StorageExplorer />
+          </div>
+        </PageContainer>
+      </div>
+
+      {bucket && (
+        <>
+          <EditBucketModal
+            visible={modalDisplayed === 'edit'}
+            bucket={bucket}
+            onClose={() => closeModal()}
+          />
+          <EmptyBucketModal
+            visible={modalDisplayed === 'empty'}
+            bucket={bucket}
+            onClose={() => closeModal()}
+          />
+          <DeleteBucketModal
+            visible={modalDisplayed === 'delete'}
+            bucket={bucket}
+            onClose={() => closeModal()}
+          />
+          {IS_PLATFORM && (
+            <PurgeBucketCDNCacheModal
+              visible={modalDisplayed === 'purgeCDNCache'}
+              bucket={bucket}
+              onClose={() => closeModal()}
+            />
+          )}
+        </>
+      )}
+    </StorageExplorerStateContextProvider>
+  )
 }

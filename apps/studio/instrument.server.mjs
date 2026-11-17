@@ -1,5 +1,5 @@
-// Server-side Sentry init for the TanStack Start runtime. Mirrors
-// sentry.server.config.ts (Next) with the `@sentry/tanstackstart-react` SDK.
+// Server-side Sentry init for the TanStack Start runtime, using the
+// `@sentry/tanstackstart-react` SDK.
 // server.ts imports it first so it runs before the route tree evaluates.
 //
 // Reads process.env at call time (NEXT_PUBLIC_* are inlined at build time
