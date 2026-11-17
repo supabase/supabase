@@ -140,7 +140,7 @@ const ContentAccordionLink = React.memo(function ContentAccordionLink(props: any
                   )}
                   {props.subItem.name}
                 </div>
-                <NavSectionCaret />
+                <NavSectionCaret className="layout-v2:h-lh layout-v2:self-start" />
               </span>
             </Accordion.Trigger>
             <Accordion.Content asChild>

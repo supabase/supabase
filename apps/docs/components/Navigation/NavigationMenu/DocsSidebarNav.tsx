@@ -481,7 +481,7 @@ const LevelButton = ({ level, onLevelOpen, children }: LevelButtonProps) => {
       onClick={handleClick}
       className={cn(
         'group/level -ml-2 flex min-h-8 cursor-pointer items-center gap-2 rounded-md px-2 py-1.5',
-        'text-left text-sm leading-tight text-foreground-light transition-colors select-none',
+        'text-left text-sm leading-5 text-foreground-light transition-colors select-none',
         'focus-ring hover:bg-surface-200 hover:text-foreground focus-visible:text-foreground'
       )}
     >
@@ -594,7 +594,7 @@ const SidebarIcon = ({ icon }: SidebarIconProps) => {
 const LevelChevron = () => (
   <ChevronRight
     aria-hidden
-    className="size-4 shrink-0 text-foreground-muted group-hover/level:text-foreground-lighter group-focus-visible/level:text-foreground-lighter"
+    className="my-0.5 size-4 shrink-0 self-start text-foreground-muted group-hover/level:text-foreground-lighter group-focus-visible/level:text-foreground-lighter"
   />
 )
 
