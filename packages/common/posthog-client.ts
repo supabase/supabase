@@ -104,7 +104,9 @@ class PostHogClient {
         return event
       },
       loaded: (posthog) => {
-        // Subscribed before the flushes below: the first capture can rotate the session.
+        // Read first so onSessionId replays the id: a reload that finds the session unchanged
+        // reports no change. Subscribed before the flushes below, which can rotate it.
+        posthog.get_session_id()
         posthog.onSessionId((sessionId) => {
           document.cookie = `session_id=${sessionId}; ${getTelemetryCookieOptions()}`
         })
@@ -388,9 +390,8 @@ class PostHogClient {
   }
 
   /**
-   * Returns PostHog's session_id after counting this call as user activity, so an
-   * expired session rotates first, as it does when PostHog captures an event.
-   * Returns undefined until PostHog's `loaded` callback fires.
+   * Returns PostHog's session_id after counting this call as user activity: an expired
+   * session rotates first. Returns undefined until PostHog's `loaded` callback fires.
    */
   refreshSessionId(): string | undefined {
     if (!this.initialized) return undefined
