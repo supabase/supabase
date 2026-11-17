@@ -76,14 +76,14 @@ These are the layout-only TanStack files. Most hold a single product layout comp
 
 - [x] `routes/project/$ref.tsx` — DefaultLayout only. **Delta vs plan:** ProjectLayoutWithAuth omitted from the shell because product layouts (DatabaseLayout, AuthLayout, StorageLayout, …) already render `withAuth(... ProjectLayout ...)` internally — adding it here would double-wrap. The home page (`/project/$ref/index.tsx`) wraps itself in `ProjectLayoutWithAuth` since it has no product layout.
 - [x] `routes/project/$ref/database.tsx` — DatabaseLayout (reads `databaseLayoutTitle` from leaf `staticData`)
-- [x] `routes/project/$ref/database/triggers.tsx` — sub-shell with `PageLayout` + permission gate + nav items, inlined from `DatabaseTriggersLayout`. **Delta vs plan:** the existing `DatabaseTriggersLayout` component wraps `<DatabaseLayout title="Triggers">` internally, so re-using it inside the database.tsx shell would double-wrap. Inlined the inner part instead; the Next-side component is left untouched (still used by the `pages/...` files we re-export).
-- [x] `routes/project/$ref/database/pipelines.tsx` — sub-shell providing `PipelineRequestStatusProvider`, mirrors `PipelinesLayout` on the Next side. Sets `databaseLayoutTitle: 'Pipelines'` for the whole subtree so the provider stays a single instance across navigation between the Pipelines list and detail routes. Legacy Replication routes are retained only for redirects, while the replica detail route redirects to Infrastructure.
-- [x] `routes/project/$ref/auth.tsx` — AuthLayout (reads `authLayoutTitle` from leaf `staticData`). **Delta vs plan:** shell honours a `skipAuthLayout: true` opt-out in `staticData` for leaves whose own body or sub-layout already wraps in `AuthLayout` (`AuthProvidersLayout`, `AuthEmailsLayout`, `pages/.../auth/third-party.tsx`) — without it those routes would double-wrap (which also doubles `withAuth` + `ProjectLayout`).
+- [x] `routes/project/$ref/database/triggers.tsx` — sub-shell with `PageLayout` + permission gate + nav items, inlined from `DatabaseTriggersLayout`. **Delta vs plan:** the existing `DatabaseTriggersLayout` component wraps `<DatabaseLayout title="Triggers">` internally, so re-using it inside the database.tsx shell would double-wrap. Inlined the inner part instead; the Next-side component was deleted once the triggers pages moved into their routes.
+- [x] `routes/project/$ref/database/pipelines.tsx` — sub-shell providing `PipelineRequestStatusProvider`, mirrors the former Next-side `PipelinesLayout` (deleted once the pipelines pages moved into their routes). Sets `databaseLayoutTitle: 'Pipelines'` for the whole subtree so the provider stays a single instance across navigation between the Pipelines list and detail routes. Legacy Replication routes are retained only for redirects, while the replica detail route redirects to Infrastructure.
+- [x] `routes/project/$ref/auth.tsx` — AuthLayout (reads `authLayoutTitle` from leaf `staticData`). **Delta vs plan:** shell honours a `skipAuthLayout: true` opt-out in `staticData` for leaves whose own body or sub-layout already wraps in `AuthLayout` (`AuthProvidersLayout`, `AuthEmailsLayout`, `routes/project/$ref/auth/third-party.tsx`) — without it those routes would double-wrap (which also doubles `withAuth` + `ProjectLayout`).
 - ~~`routes/project/$ref/auth/templates.tsx` — AuthEmailsLayout~~ **Delta vs plan: not landed.** A unified `templates.tsx` sub-shell would force `templates/$templateId.tsx` (which uses plain `AuthLayout`, not `AuthEmailsLayout`) into the wrong wrapping. Instead `templates/index.tsx` and `auth/smtp.tsx` each set `skipAuthLayout: true` and wrap themselves in `AuthEmailsLayout`; `templates/$templateId.tsx` uses the standard auth shell with `authLayoutTitle: 'Emails'`.
 - [x] `routes/project/$ref/storage.tsx` — StorageLayout + StorageBucketsLayout (reads `storageLayoutTitle`, optional `skipStorageBucketsLayout`, `storageBucketsLayoutTitle`, `storageBucketsLayoutHideSubtitle` from leaf `staticData`). **Delta vs plan:** the shell wraps in BOTH StorageLayout and StorageBucketsLayout by default — every storage page except bucket-detail pages uses both. Bucket-detail pages set `skipStorageBucketsLayout: true`. `/storage/s3` uses `storageBucketsLayout{Title,HideSubtitle}` to override the inner header.
 - [x] `routes/project/$ref/realtime.tsx` — RealtimeLayout (reads `realtimeLayoutTitle` from leaf `staticData`)
 - [x] `routes/project/$ref/functions.tsx` — EdgeFunctionsLayout (reads `functionsLayoutTitle` from leaf `staticData`). Honours `skipFunctionsLayout: true` opt-out for the `$functionSlug` subtree, whose `EdgeFunctionDetailsLayout` already wraps `EdgeFunctionsLayout` internally — same pattern as auth.tsx. Sub-shell at `routes/project/$ref/functions/$functionSlug.tsx` provides `EdgeFunctionDetailsLayout` for all 5 slug leaves (reads `edgeFunctionDetailsTitle` from leaf staticData).
-- [x] `routes/project/$ref/branches.tsx` — BranchLayout only. **Delta vs plan:** the per-page `PageLayout` (with different titles + primary/secondary actions) stays in each leaf. Hoisted `BranchesPageWrapper` and `MergeRequestsPageWrapper` to top-level exports in their respective `pages/...` files so the route files can import + re-use the same wrapping.
+- [x] `routes/project/$ref/branches.tsx` — BranchLayout only. **Delta vs plan:** the per-page `PageLayout` (with different titles + primary/secondary actions) stays in each leaf. `BranchesPageWrapper` and `MergeRequestsPageWrapper` live in their respective leaf route files and wrap the page body there.
 - [x] `routes/project/$ref/logs.tsx` — LogsLayout (reads `logsLayoutTitle` from leaf staticData). Honours `skipLogsLayout: true` for `logs/index` (page handles its own ProjectLayout-wrapped content for the UnifiedLogs / no-permission cases). Refactored `pages/.../logs/index.tsx` to move the inline `<DefaultLayout>` into `getLayout` so it isn't duplicated when the TanStack project shell already provides DefaultLayout.
 - [x] `routes/project/$ref/observability.tsx` — ObservabilityLayout (reads `observabilityLayoutTitle` from leaf staticData)
 - [x] `routes/project/$ref/compute.tsx` — ComputeLayout (reads `computeLayoutTitle` from leaf `staticData`). Flag-gated: `ComputeLayout` itself redirects to the project home when `useFlag('compute')` is off, so the shell needs no extra guard.
@@ -113,22 +113,22 @@ These are the layout-only TanStack files. Most hold a single product layout comp
 
 ### App shell — `/org/$slug/*`
 
-- [x] A `routes/_app/org/$slug/index.tsx` ← `pages/org/[slug]/index.tsx`
-- [x] A `routes/_app/org/$slug/apps.tsx` ← `pages/org/[slug]/apps.tsx`
-- [x] A `routes/_app/org/$slug/audit.tsx` ← `pages/org/[slug]/audit.tsx`
-- [x] A `routes/_app/org/$slug/audit-log-drains.tsx` ← `pages/org/[slug]/audit-log-drains.tsx` (wraps in OrganizationSettingsLayout inline)
-- [x] A `routes/_app/org/$slug/billing.tsx` ← `pages/org/[slug]/billing.tsx`
-- [x] A `routes/_app/org/$slug/documents.tsx` ← `pages/org/[slug]/documents.tsx`
-- [x] A `routes/_app/org/$slug/general.tsx` ← `pages/org/[slug]/general.tsx`
-- [x] A `routes/_app/org/$slug/integrations.tsx` ← `pages/org/[slug]/integrations.tsx`
-- [x] A `routes/_app/org/$slug/security.tsx` ← `pages/org/[slug]/security.tsx`
-- [x] A `routes/_app/org/$slug/sso.tsx` ← `pages/org/[slug]/sso.tsx`
-- [x] A `routes/_app/org/$slug/team.tsx` ← `pages/org/[slug]/team.tsx`
-- [x] A `routes/_app/org/$slug/usage.tsx` ← `pages/org/[slug]/usage.tsx`
-- [x] A `routes/_app/org/$slug/private-apps/index.tsx` ← `pages/org/[slug]/private-apps/index.tsx`
-- [x] A `routes/_app/org/$slug/webhooks/index.tsx` ← `pages/org/[slug]/webhooks/index.tsx`
-- [x] A `routes/_app/org/$slug/webhooks/$endpointId.tsx` ← `pages/org/[slug]/webhooks/[endpointId].tsx`
-- [x] A `routes/_app/org/index.tsx` ← `pages/org/index.tsx` (redirect)
+- [x] A→done `routes/_app/org/$slug/index.tsx` ← `pages/org/[slug]/index.tsx`
+- [x] A→done `routes/_app/org/$slug/apps.tsx` ← `pages/org/[slug]/apps.tsx`
+- [x] A→done `routes/_app/org/$slug/audit.tsx` ← `pages/org/[slug]/audit.tsx`
+- [x] A→done `routes/_app/org/$slug/audit-log-drains.tsx` ← `pages/org/[slug]/audit-log-drains.tsx` (wraps in OrganizationSettingsLayout inline)
+- [x] A→done `routes/_app/org/$slug/billing.tsx` ← `pages/org/[slug]/billing.tsx`
+- [x] A→done `routes/_app/org/$slug/documents.tsx` ← `pages/org/[slug]/documents.tsx`
+- [x] A→done `routes/_app/org/$slug/general.tsx` ← `pages/org/[slug]/general.tsx`
+- [x] A→done `routes/_app/org/$slug/integrations.tsx` ← `pages/org/[slug]/integrations.tsx`
+- [x] A→done `routes/_app/org/$slug/security.tsx` ← `pages/org/[slug]/security.tsx`
+- [x] A→done `routes/_app/org/$slug/sso.tsx` ← `pages/org/[slug]/sso.tsx`
+- [x] A→done `routes/_app/org/$slug/team.tsx` ← `pages/org/[slug]/team.tsx`
+- [x] A→done `routes/_app/org/$slug/usage.tsx` ← `pages/org/[slug]/usage.tsx`
+- [x] A→done `routes/_app/org/$slug/private-apps/index.tsx` ← `pages/org/[slug]/private-apps/index.tsx`
+- [x] A→done `routes/_app/org/$slug/webhooks/index.tsx` ← `pages/org/[slug]/webhooks/index.tsx`
+- [x] A→done `routes/_app/org/$slug/webhooks/$endpointId.tsx` ← `pages/org/[slug]/webhooks/[endpointId].tsx`
+- [x] A→done `routes/_app/org/index.tsx` ← `pages/org/index.tsx` (redirect)
 
 ### App shell — top-level pages
 
@@ -151,102 +151,102 @@ These are the layout-only TanStack files. Most hold a single product layout comp
 
 ### Project shell — home
 
-- [x] A `routes/project/$ref/index.tsx` ← `pages/project/[ref]/index.tsx` (route wraps in `ProjectLayoutWithAuth` itself — see shell delta above)
-- [x] `routes/project/$ref/merge.tsx` ← `pages/project/[ref]/merge.tsx` (leaf wraps body in `ProjectLayoutWithAuth`; parent `project/$ref.tsx` shell provides DefaultLayout)
+- [x] A→done `routes/project/$ref/index.tsx` ← `pages/project/[ref]/index.tsx` (route wraps in `ProjectLayoutWithAuth` itself — see shell delta above)
+- [x] A→done `routes/project/$ref/merge.tsx` ← `pages/project/[ref]/merge.tsx` (leaf wraps body in `ProjectLayoutWithAuth`; parent `project/$ref.tsx` shell provides DefaultLayout)
 - [x] `routes/project/$ref/explorer.tsx` — converted from a leaf into a shell (`ExplorerLayout` + `Outlet`) to host the new `/explorer/notebook/$id` leaf; parent `project/$ref.tsx` shell still provides DefaultLayout.
 
 ### Project shell — `/api/*`
 
-- [x] `routes/project/$ref/api/index.tsx` ← `pages/project/[ref]/api/index.tsx` (redirect-only page; no extra wrap needed beyond the parent DefaultLayout shell)
+- [x] A→done `routes/project/$ref/api/index.tsx` ← `pages/project/[ref]/api/index.tsx` (redirect-only page; no extra wrap needed beyond the parent DefaultLayout shell)
 
 ### Project shell — `/database/*`
 
-- [x] A `routes/project/$ref/database/schemas.tsx` ← `pages/project/[ref]/database/schemas.tsx`
-- [x] A `routes/project/$ref/database/extensions.tsx` ← `pages/project/[ref]/database/extensions.tsx`
-- [x] A `routes/project/$ref/database/functions.tsx` ← `pages/project/[ref]/database/functions.tsx`
-- [x] A `routes/project/$ref/database/indexes.tsx` ← `pages/project/[ref]/database/indexes.tsx`
-- [x] A `routes/project/$ref/database/migrations.tsx` ← `pages/project/[ref]/database/migrations.tsx`
-- [x] A `routes/project/$ref/database/policies.tsx` ← `pages/project/[ref]/database/policies.tsx`
-- [x] A `routes/project/$ref/database/roles.tsx` ← `pages/project/[ref]/database/roles.tsx`
-- [x] A `routes/project/$ref/database/settings.tsx` ← `pages/project/[ref]/database/settings.tsx`
-- [x] A `routes/project/$ref/database/types.tsx` ← `pages/project/[ref]/database/types.tsx`
-- [x] A `routes/project/$ref/database/column-privileges.tsx` ← `pages/project/[ref]/database/column-privileges.tsx`
-- [x] A `routes/project/$ref/database/tables/index.tsx` ← `pages/project/[ref]/database/tables/index.tsx`
-- [x] A `routes/project/$ref/database/tables/$id.tsx` ← `pages/project/[ref]/database/tables/[id].tsx`
-- [x] A `routes/project/$ref/database/publications/index.tsx` ← `pages/project/[ref]/database/publications/index.tsx`
-- [x] A `routes/project/$ref/database/publications/$id.tsx` ← `pages/project/[ref]/database/publications/[id].tsx`
-- [x] A `routes/project/$ref/database/pipelines/index.tsx` ← `pages/project/[ref]/database/pipelines/index.tsx`
-- [x] A `routes/project/$ref/database/pipelines/new.tsx` ← `pages/project/[ref]/database/pipelines/new.tsx`
-- [x] A `routes/project/$ref/database/pipelines/$pipelineId.tsx` ← `pages/project/[ref]/database/pipelines/[pipelineId].tsx`
+- [x] A→done `routes/project/$ref/database/schemas.tsx` ← `pages/project/[ref]/database/schemas.tsx`
+- [x] A→done `routes/project/$ref/database/extensions.tsx` ← `pages/project/[ref]/database/extensions.tsx`
+- [x] A→done `routes/project/$ref/database/functions.tsx` ← `pages/project/[ref]/database/functions.tsx`
+- [x] A→done `routes/project/$ref/database/indexes.tsx` ← `pages/project/[ref]/database/indexes.tsx`
+- [x] A→done `routes/project/$ref/database/migrations.tsx` ← `pages/project/[ref]/database/migrations.tsx`
+- [x] A→done `routes/project/$ref/database/policies.tsx` ← `pages/project/[ref]/database/policies.tsx`
+- [x] A→done `routes/project/$ref/database/roles.tsx` ← `pages/project/[ref]/database/roles.tsx`
+- [x] A→done `routes/project/$ref/database/settings.tsx` ← `pages/project/[ref]/database/settings.tsx`
+- [x] A→done `routes/project/$ref/database/types.tsx` ← `pages/project/[ref]/database/types.tsx`
+- [x] A→done `routes/project/$ref/database/column-privileges.tsx` ← `pages/project/[ref]/database/column-privileges.tsx`
+- [x] A→done `routes/project/$ref/database/tables/index.tsx` ← `pages/project/[ref]/database/tables/index.tsx`
+- [x] A→done `routes/project/$ref/database/tables/$id.tsx` ← `pages/project/[ref]/database/tables/[id].tsx`
+- [x] A→done `routes/project/$ref/database/publications/index.tsx` ← `pages/project/[ref]/database/publications/index.tsx`
+- [x] A→done `routes/project/$ref/database/publications/$id.tsx` ← `pages/project/[ref]/database/publications/[id].tsx`
+- [x] A→done `routes/project/$ref/database/pipelines/index.tsx` ← `pages/project/[ref]/database/pipelines/index.tsx`
+- [x] A→done `routes/project/$ref/database/pipelines/new.tsx` ← `pages/project/[ref]/database/pipelines/new.tsx`
+- [x] A→done `routes/project/$ref/database/pipelines/$pipelineId.tsx` ← `pages/project/[ref]/database/pipelines/[pipelineId].tsx`
 - [x] A `routes/project/$ref/database/replication/replica/$replicaId.tsx` ← `pages/project/[ref]/database/replication/replica/[replicaId].tsx` (redirects to Infrastructure)
-- [x] A `routes/project/$ref/database/triggers/index.tsx` ← `pages/project/[ref]/database/triggers/index.tsx`
-- [x] A `routes/project/$ref/database/triggers/data.tsx` ← `pages/project/[ref]/database/triggers/data.tsx` (sub-shell at `database/triggers.tsx` provides PageLayout + nav, parent shell provides DatabaseLayout)
-- [x] A `routes/project/$ref/database/triggers/event.tsx` ← `pages/project/[ref]/database/triggers/event.tsx` (same as data)
-- [x] A `routes/project/$ref/database/backups/pitr.tsx` ← `pages/project/[ref]/database/backups/pitr.tsx`
-- [x] A `routes/project/$ref/database/backups/restore-to-new-project.tsx` ← `pages/project/[ref]/database/backups/restore-to-new-project.tsx`
-- [x] A `routes/project/$ref/database/backups/scheduled.tsx` ← `pages/project/[ref]/database/backups/scheduled.tsx`
+- [x] A→done `routes/project/$ref/database/triggers/index.tsx` ← `pages/project/[ref]/database/triggers/index.tsx`
+- [x] A→done `routes/project/$ref/database/triggers/data.tsx` ← `pages/project/[ref]/database/triggers/data.tsx` (sub-shell at `database/triggers.tsx` provides PageLayout + nav, parent shell provides DatabaseLayout)
+- [x] A→done `routes/project/$ref/database/triggers/event.tsx` ← `pages/project/[ref]/database/triggers/event.tsx` (same as data)
+- [x] A→done `routes/project/$ref/database/backups/pitr.tsx` ← `pages/project/[ref]/database/backups/pitr.tsx`
+- [x] A→done `routes/project/$ref/database/backups/restore-to-new-project.tsx` ← `pages/project/[ref]/database/backups/restore-to-new-project.tsx`
+- [x] A→done `routes/project/$ref/database/backups/scheduled.tsx` ← `pages/project/[ref]/database/backups/scheduled.tsx`
 
 ### Project shell — `/auth/*`
 
-- [x] A `routes/project/$ref/auth/overview.tsx` ← `pages/project/[ref]/auth/overview.tsx`
-- [x] A `routes/project/$ref/auth/users.tsx` ← `pages/project/[ref]/auth/users.tsx`
-- [x] A `routes/project/$ref/auth/providers.tsx` ← `pages/project/[ref]/auth/providers.tsx` (sets `skipAuthLayout: true`, wraps in `AuthProvidersLayout` directly)
-- [x] A `routes/project/$ref/auth/mfa.tsx` ← `pages/project/[ref]/auth/mfa.tsx`
-- [x] A `routes/project/$ref/auth/hooks.tsx` ← `pages/project/[ref]/auth/hooks.tsx`
-- [x] A `routes/project/$ref/auth/smtp.tsx` ← `pages/project/[ref]/auth/smtp.tsx` (sets `skipAuthLayout: true`, wraps in `AuthEmailsLayout` directly)
-- [x] A `routes/project/$ref/auth/sessions.tsx` ← `pages/project/[ref]/auth/sessions.tsx`
-- [x] A `routes/project/$ref/auth/passkeys.tsx` ← `pages/project/[ref]/auth/passkeys.tsx`
-- [x] A `routes/project/$ref/auth/performance.tsx` ← `pages/project/[ref]/auth/performance.tsx`
-- [x] A `routes/project/$ref/auth/protection.tsx` ← `pages/project/[ref]/auth/protection.tsx`
-- [x] A `routes/project/$ref/auth/rate-limits.tsx` ← `pages/project/[ref]/auth/rate-limits.tsx`
-- [x] A `routes/project/$ref/auth/third-party.tsx` ← `pages/project/[ref]/auth/third-party.tsx` (sets `skipAuthLayout: true` — page body inlines `<AuthProvidersLayout>` which already wraps `<AuthLayout>`)
-- [x] A `routes/project/$ref/auth/oauth-apps.tsx` ← `pages/project/[ref]/auth/oauth-apps.tsx`
-- [x] A `routes/project/$ref/auth/oauth-server.tsx` ← `pages/project/[ref]/auth/oauth-server.tsx`
-- [x] A `routes/project/$ref/auth/url-configuration.tsx` ← `pages/project/[ref]/auth/url-configuration.tsx`
-- [x] A `routes/project/$ref/auth/audit-logs.tsx` ← `pages/project/[ref]/auth/audit-logs.tsx`
-- [x] A `routes/project/$ref/auth/templates/index.tsx` ← `pages/project/[ref]/auth/templates/index.tsx` (sets `skipAuthLayout: true`, wraps in `AuthEmailsLayout` directly)
-- [x] A `routes/project/$ref/auth/templates/$templateId.tsx` ← `pages/project/[ref]/auth/templates/[templateId].tsx` (`authLayoutTitle: 'Emails'` — page uses plain `AuthLayout`, not `AuthEmailsLayout`)
+- [x] A→done `routes/project/$ref/auth/overview.tsx` ← `pages/project/[ref]/auth/overview.tsx`
+- [x] A→done `routes/project/$ref/auth/users.tsx` ← `pages/project/[ref]/auth/users.tsx`
+- [x] A→done `routes/project/$ref/auth/providers.tsx` ← `pages/project/[ref]/auth/providers.tsx` (sets `skipAuthLayout: true`, wraps in `AuthProvidersLayout` directly)
+- [x] A→done `routes/project/$ref/auth/mfa.tsx` ← `pages/project/[ref]/auth/mfa.tsx`
+- [x] A→done `routes/project/$ref/auth/hooks.tsx` ← `pages/project/[ref]/auth/hooks.tsx`
+- [x] A→done `routes/project/$ref/auth/smtp.tsx` ← `pages/project/[ref]/auth/smtp.tsx` (sets `skipAuthLayout: true`, wraps in `AuthEmailsLayout` directly)
+- [x] A→done `routes/project/$ref/auth/sessions.tsx` ← `pages/project/[ref]/auth/sessions.tsx`
+- [x] A→done `routes/project/$ref/auth/passkeys.tsx` ← `pages/project/[ref]/auth/passkeys.tsx`
+- [x] A→done `routes/project/$ref/auth/performance.tsx` ← `pages/project/[ref]/auth/performance.tsx`
+- [x] A→done `routes/project/$ref/auth/protection.tsx` ← `pages/project/[ref]/auth/protection.tsx`
+- [x] A→done `routes/project/$ref/auth/rate-limits.tsx` ← `pages/project/[ref]/auth/rate-limits.tsx`
+- [x] A→done `routes/project/$ref/auth/third-party.tsx` ← `pages/project/[ref]/auth/third-party.tsx` (sets `skipAuthLayout: true` — route body inlines `<AuthProvidersLayout>` which already wraps `<AuthLayout>`)
+- [x] A→done `routes/project/$ref/auth/oauth-apps.tsx` ← `pages/project/[ref]/auth/oauth-apps.tsx`
+- [x] A→done `routes/project/$ref/auth/oauth-server.tsx` ← `pages/project/[ref]/auth/oauth-server.tsx`
+- [x] A→done `routes/project/$ref/auth/url-configuration.tsx` ← `pages/project/[ref]/auth/url-configuration.tsx`
+- [x] A→done `routes/project/$ref/auth/audit-logs.tsx` ← `pages/project/[ref]/auth/audit-logs.tsx`
+- [x] A→done `routes/project/$ref/auth/templates/index.tsx` ← `pages/project/[ref]/auth/templates/index.tsx` (sets `skipAuthLayout: true`, wraps in `AuthEmailsLayout` directly)
+- [x] A→done `routes/project/$ref/auth/templates/$templateId.tsx` ← `pages/project/[ref]/auth/templates/[templateId].tsx` (`authLayoutTitle: 'Emails'` — page uses plain `AuthLayout`, not `AuthEmailsLayout`)
 
 ### Project shell — `/storage/*`
 
-- [x] A `routes/project/$ref/storage/s3.tsx` ← `pages/project/[ref]/storage/s3.tsx`
-- [x] A `routes/project/$ref/storage/signing-keys.tsx` ← `pages/project/[ref]/storage/signing-keys.tsx`
-- [x] A `routes/project/$ref/storage/files/index.tsx` ← `pages/project/[ref]/storage/files/index.tsx`
-- [x] A `routes/project/$ref/storage/files/policies.tsx` ← `pages/project/[ref]/storage/files/policies.tsx`
-- [x] A `routes/project/$ref/storage/files/settings.tsx` ← `pages/project/[ref]/storage/files/settings.tsx`
-- [x] A `routes/project/$ref/storage/files/buckets/$bucketId.tsx` ← `pages/project/[ref]/storage/files/buckets/[bucketId].tsx` (sets `skipStorageBucketsLayout: true`)
-- [x] A `routes/project/$ref/storage/analytics/index.tsx` ← `pages/project/[ref]/storage/analytics/index.tsx`
-- [x] A `routes/project/$ref/storage/analytics/buckets/$bucketId.tsx` ← `pages/project/[ref]/storage/analytics/buckets/[bucketId].tsx` (sets `skipStorageBucketsLayout: true`)
-- [x] A `routes/project/$ref/storage/vectors/index.tsx` ← `pages/project/[ref]/storage/vectors/index.tsx`
-- [x] A `routes/project/$ref/storage/vectors/buckets/$bucketId.tsx` ← `pages/project/[ref]/storage/vectors/buckets/[bucketId].tsx` (sets `skipStorageBucketsLayout: true`)
+- [x] A→done `routes/project/$ref/storage/s3.tsx` ← `pages/project/[ref]/storage/s3.tsx`
+- [x] A→done `routes/project/$ref/storage/signing-keys.tsx` ← `pages/project/[ref]/storage/signing-keys.tsx`
+- [x] A→done `routes/project/$ref/storage/files/index.tsx` ← `pages/project/[ref]/storage/files/index.tsx`
+- [x] A→done `routes/project/$ref/storage/files/policies.tsx` ← `pages/project/[ref]/storage/files/policies.tsx`
+- [x] A→done `routes/project/$ref/storage/files/settings.tsx` ← `pages/project/[ref]/storage/files/settings.tsx`
+- [x] A→done `routes/project/$ref/storage/files/buckets/$bucketId.tsx` ← `pages/project/[ref]/storage/files/buckets/[bucketId].tsx` (sets `skipStorageBucketsLayout: true`)
+- [x] A→done `routes/project/$ref/storage/analytics/index.tsx` ← `pages/project/[ref]/storage/analytics/index.tsx`
+- [x] A→done `routes/project/$ref/storage/analytics/buckets/$bucketId.tsx` ← `pages/project/[ref]/storage/analytics/buckets/[bucketId].tsx` (sets `skipStorageBucketsLayout: true`)
+- [x] A→done `routes/project/$ref/storage/vectors/index.tsx` ← `pages/project/[ref]/storage/vectors/index.tsx`
+- [x] A→done `routes/project/$ref/storage/vectors/buckets/$bucketId.tsx` ← `pages/project/[ref]/storage/vectors/buckets/[bucketId].tsx` (sets `skipStorageBucketsLayout: true`)
 
 ### Project shell — `/realtime/*`
 
-- [x] A `routes/project/$ref/realtime/inspector.tsx` ← `pages/project/[ref]/realtime/inspector.tsx`
-- [x] A `routes/project/$ref/realtime/policies.tsx` ← `pages/project/[ref]/realtime/policies.tsx`
-- [x] A `routes/project/$ref/realtime/settings.tsx` ← `pages/project/[ref]/realtime/settings.tsx`
+- [x] A→done `routes/project/$ref/realtime/inspector.tsx` ← `pages/project/[ref]/realtime/inspector.tsx`
+- [x] A→done `routes/project/$ref/realtime/policies.tsx` ← `pages/project/[ref]/realtime/policies.tsx`
+- [x] A→done `routes/project/$ref/realtime/settings.tsx` ← `pages/project/[ref]/realtime/settings.tsx`
 
 ### Project shell — `/compute/*`
 
-- [x] A `routes/project/$ref/compute/index.tsx` ← `pages/project/[ref]/compute/index.tsx`
-- [x] A `routes/project/$ref/compute/$name.tsx` ← `pages/project/[ref]/compute/[name].tsx`
-- [x] A `routes/project/$ref/compute/secrets.tsx` ← `pages/project/[ref]/compute/secrets.tsx`
+- [x] A→done `routes/project/$ref/compute/index.tsx` ← `pages/project/[ref]/compute/index.tsx`
+- [x] A→done `routes/project/$ref/compute/$name.tsx` ← `pages/project/[ref]/compute/[name].tsx`
+- [x] A→done `routes/project/$ref/compute/secrets.tsx` ← `pages/project/[ref]/compute/secrets.tsx`
 
 ### Project shell — `/functions/*`
 
-- [x] A `routes/project/$ref/functions/index.tsx` ← `pages/project/[ref]/functions/index.tsx` (route wraps in exported `EdgeFunctionsIndexPageWrapper` for the inline PageHeader + actions)
-- [x] A `routes/project/$ref/functions/new.tsx` ← `pages/project/[ref]/functions/new.tsx`
-- [x] A `routes/project/$ref/functions/secrets.tsx` ← `pages/project/[ref]/functions/secrets.tsx` (route wraps in exported `SecretsPageWrapper`)
-- [x] A `routes/project/$ref/functions/$functionSlug/index.tsx` ← `pages/project/[ref]/functions/[functionSlug]/index.tsx`
-- [x] A `routes/project/$ref/functions/$functionSlug/code.tsx` ← `pages/project/[ref]/functions/[functionSlug]/code.tsx`
-- [x] A `routes/project/$ref/functions/$functionSlug/details.tsx` ← `pages/project/[ref]/functions/[functionSlug]/details.tsx`
-- [x] A `routes/project/$ref/functions/$functionSlug/invocations.tsx` ← `pages/project/[ref]/functions/[functionSlug]/invocations.tsx`
-- [x] A `routes/project/$ref/functions/$functionSlug/logs.tsx` ← `pages/project/[ref]/functions/[functionSlug]/logs.tsx`
+- [x] A→done `routes/project/$ref/functions/index.tsx` ← `pages/project/[ref]/functions/index.tsx` (route wraps in `EdgeFunctionsIndexPageWrapper` for the inline PageHeader + actions)
+- [x] A→done `routes/project/$ref/functions/new.tsx` ← `pages/project/[ref]/functions/new.tsx`
+- [x] A→done `routes/project/$ref/functions/secrets.tsx` ← `pages/project/[ref]/functions/secrets.tsx` (route wraps in `SecretsPageWrapper`)
+- [x] A→done `routes/project/$ref/functions/$functionSlug/index.tsx` ← `pages/project/[ref]/functions/[functionSlug]/index.tsx`
+- [x] A→done `routes/project/$ref/functions/$functionSlug/code.tsx` ← `pages/project/[ref]/functions/[functionSlug]/code.tsx`
+- [x] A→done `routes/project/$ref/functions/$functionSlug/details.tsx` ← `pages/project/[ref]/functions/[functionSlug]/details.tsx`
+- [x] A→done `routes/project/$ref/functions/$functionSlug/invocations.tsx` ← `pages/project/[ref]/functions/[functionSlug]/invocations.tsx`
+- [x] A→done `routes/project/$ref/functions/$functionSlug/logs.tsx` ← `pages/project/[ref]/functions/[functionSlug]/logs.tsx`
 
 ### Project shell — `/branches/*`
 
-- [x] A `routes/project/$ref/branches/index.tsx` ← `pages/project/[ref]/branches/index.tsx` (route wraps in exported `BranchesPageWrapper` to preserve the page's `PageLayout` + Create-branch action)
-- [x] A `routes/project/$ref/branches/merge-requests.tsx` ← `pages/project/[ref]/branches/merge-requests.tsx` (route wraps in exported `MergeRequestsPageWrapper`)
+- [x] A→done `routes/project/$ref/branches/index.tsx` ← `pages/project/[ref]/branches/index.tsx` (route wraps in `BranchesPageWrapper` to preserve the page's `PageLayout` + Create-branch action)
+- [x] A→done `routes/project/$ref/branches/merge-requests.tsx` ← `pages/project/[ref]/branches/merge-requests.tsx` (route wraps in `MergeRequestsPageWrapper`)
 
 ### Project shell — `/logs/*`
 
