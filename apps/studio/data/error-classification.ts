@@ -194,6 +194,7 @@ const responseErrorBodySchema = z.object({
   endpoint: optional(z.string()),
   method: optional(z.string()),
   metadata: optional(z.record(z.string(), z.unknown())),
+  validation: optional(z.record(z.string(), z.unknown())),
   formattedError: optional(z.string()),
   position: optional(z.string()),
 })
@@ -337,6 +338,7 @@ export function parseResponseErrorBody(error: unknown): RawResponseError | undef
   const resolvedMessage = msg ?? message
   if (!resolvedMessage && code === undefined) return undefined
 
+  console.log('unclassified')
   return {
     ...rest,
     message: resolvedMessage,

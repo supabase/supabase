@@ -1,6 +1,8 @@
 import { capitalize } from 'lodash'
 
-import { OAuthScope } from '@/data/oauth-apps/types'
+import { OAuthAppsPreflightValidationData } from '@/data/oauth-apps/oauth-apps-preflight-validation-query'
+import { OAuthScope, OAuthScopeValidationResult } from '@/data/oauth-apps/types'
+import { OrgProject } from '@/data/projects/org-projects-infinite-query'
 
 export function groupScopesByLevel(scopes: string[]) {
   const read = new Set<string>()
@@ -141,4 +143,34 @@ export const extractPermissionAndLevelFromScope = (
 ): [ScopePermission, ScopeLevel] => {
   const [permission, level] = scope.split(':')
   return [permission as ScopePermission, level as ScopeLevel]
+}
+
+type OAuthScopeValidationProjectFailure = Extract<
+  OAuthScopeValidationResult,
+  { scope_target: 'projects' }
+>['failures'][number]
+
+export function getFailedProjects(
+  failure: OAuthScopeValidationResult | null | undefined
+): OAuthScopeValidationProjectFailure[] {
+  if (!failure) return []
+  return failure.scope_target === 'projects' ? failure.failures : []
+}
+
+export function getPreselectedProjectRefs({
+  existingGrant,
+  projectRef,
+  liveProjects,
+}: {
+  existingGrant: OAuthAppsPreflightValidationData['existing_grant']
+  projectRef: string | undefined
+  liveProjects: OrgProject[]
+}): string[] {
+  const liveRefs = new Set(liveProjects.map((project) => project.ref))
+  const candidates = existingGrant?.project_refs?.length
+    ? existingGrant.project_refs
+    : projectRef
+      ? [projectRef]
+      : []
+  return candidates.filter((ref) => liveRefs.has(ref))
 }

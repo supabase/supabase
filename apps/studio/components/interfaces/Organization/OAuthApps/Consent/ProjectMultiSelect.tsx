@@ -1,4 +1,5 @@
 import { useIntersectionObserver } from '@uidotdev/usehooks'
+import { components } from 'api-types'
 import { useEffect, useId } from 'react'
 import { Checkbox, cn } from 'ui'
 import {
@@ -10,13 +11,11 @@ import {
   MultiSelectorTrigger,
 } from 'ui-patterns/multi-select'
 
-import type { OAuthAppsAuthorizeOrganizationProject } from '@/data/oauth-apps/types'
-
 export const MAX_SELECTED_PROJECTS = 10
 
 export interface ProjectMultiSelectProps {
-  projects: OAuthAppsAuthorizeOrganizationProject[]
-  selectedProjects: OAuthAppsAuthorizeOrganizationProject[]
+  projects: components['schemas']['OrganizationProjectsResponse_Output']['projects']
+  selectedProjects: components['schemas']['OrganizationProjectsResponse_Output']['projects']
   onChange: (selectedProjects: string[]) => void
   maxSelected?: number
   error?: string
@@ -97,7 +96,9 @@ export const ProjectMultiSelect = ({
             onSearchChange={onSearchChange}
           >
             <MultiSelectorTrigger
+              id="projects"
               aria-labelledby={labelId}
+              aria-describedby="projects-description"
               label="Select projects..."
               badgeLimit={2}
               deletableBadge
@@ -128,17 +129,19 @@ export const ProjectMultiSelect = ({
             </MultiSelectorContent>
           </MultiSelector>
 
-          {hasFlagged && (
-            <p className="text-xs text-destructive">
-              {`${flaggedRefs.length} of ${selectedProjects.length} ${selectedProjects.length === 1 ? 'project' : 'projects'} unavailable`}
-            </p>
-          )}
-          {atCap && (
-            <p className="text-xs text-foreground-lighter">
-              Maximum reached. Deselect a project to choose a different one.
-            </p>
-          )}
-          {error && <p className="text-xs text-foreground-light">{error}</p>}
+          <div id="projects-description" aria-live="polite">
+            {hasFlagged && (
+              <p className="text-xs text-destructive">
+                {`${flaggedRefs.length} of ${selectedProjects.length} ${selectedProjects.length === 1 ? 'project' : 'projects'} unavailable`}
+              </p>
+            )}
+            {atCap && (
+              <p className="text-xs text-foreground-lighter">
+                Maximum reached. Deselect a project to choose a different one.
+              </p>
+            )}
+            {error && <p className="text-xs text-destructive">{error}</p>}
+          </div>
         </>
       )}
     </div>

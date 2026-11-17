@@ -1,27 +1,34 @@
 import { useQuery } from '@tanstack/react-query'
 
 import { oauthAppsKeys } from './keys'
-import { getMockOAuthAppsPreflightValidation, USE_MOCKS } from './mocks'
-import type { OAuthAppsAuthorizePreflightResult } from './types'
+import { isOAuthRoleValidationError } from './types'
+import { get, handleError } from '@/data/fetchers'
 import type { StudioError } from '@/lib/errors/studio-errors'
 import type { UseCustomQueryOptions } from '@/types'
 
 export type OAuthAppsPreflightValidationVariables = {
   slug?: string
-  appId?: string
+  auth_id?: string
 }
-
-export type { OAuthAppsAuthorizePreflightResult } from './types'
 
 export async function getOAuthAppsPreflightValidation({
   slug,
-  appId,
-}: OAuthAppsPreflightValidationVariables): Promise<OAuthAppsAuthorizePreflightResult> {
+  auth_id,
+}: OAuthAppsPreflightValidationVariables) {
   if (!slug) throw new Error('Organization slug is required')
-  if (!appId) throw new Error('App id is required')
-  if (!USE_MOCKS) throw new Error('OAuth app preflight validation is not yet implemented')
+  if (!auth_id) throw new Error('Authorization request id is required')
+  const { data, error } = await get(
+    '/platform/organizations/{slug}/oauth/authorizations/{id}/preflight',
+    {
+      params: { path: { slug, id: auth_id } },
+    }
+  )
 
-  return getMockOAuthAppsPreflightValidation(slug, appId)
+  if (error && isOAuthRoleValidationError(error)) {
+    throw error
+  }
+  if (error) handleError(error)
+  return data
 }
 
 export type OAuthAppsPreflightValidationData = Awaited<
@@ -30,7 +37,7 @@ export type OAuthAppsPreflightValidationData = Awaited<
 export type OAuthAppsPreflightValidationError = StudioError
 
 export const useOAuthAppsPreflightValidationQuery = <TData = OAuthAppsPreflightValidationData>(
-  { slug, appId }: OAuthAppsPreflightValidationVariables,
+  { slug, auth_id }: OAuthAppsPreflightValidationVariables,
   {
     enabled = true,
     ...options
@@ -41,8 +48,9 @@ export const useOAuthAppsPreflightValidationQuery = <TData = OAuthAppsPreflightV
   > = {}
 ) =>
   useQuery<OAuthAppsPreflightValidationData, OAuthAppsPreflightValidationError, TData>({
-    queryKey: oauthAppsKeys.preflightValidation(slug, appId),
-    queryFn: () => getOAuthAppsPreflightValidation({ slug, appId }),
-    enabled: enabled && USE_MOCKS && Boolean(slug) && Boolean(appId),
+    queryKey: oauthAppsKeys.preflightValidation(slug, auth_id),
+    queryFn: () => getOAuthAppsPreflightValidation({ slug, auth_id }),
+    enabled: enabled && Boolean(slug) && Boolean(auth_id),
+    retry: (_, error) => !isOAuthRoleValidationError(error),
     ...options,
   })

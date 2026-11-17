@@ -3,21 +3,31 @@ import { mockIntersectionObserver } from 'jsdom-testing-mocks'
 import { describe, expect, test, vi } from 'vitest'
 
 import { ProjectMultiSelect } from './ProjectMultiSelect'
-import { ADMINISTRATOR_ROLE, DEVELOPER_ROLE } from '@/data/oauth-apps/mocks'
-import type { OAuthAppsAuthorizeOrganizationProject } from '@/data/oauth-apps/types'
+import { OrgProject } from '@/data/projects/org-projects-infinite-query'
 import { customRender } from '@/tests/lib/custom-render'
 
-const PROJECTS: OAuthAppsAuthorizeOrganizationProject[] = [
-  { ref: 'project-1', name: 'production', role: ADMINISTRATOR_ROLE },
-  { ref: 'project-2', name: 'staging', role: DEVELOPER_ROLE },
+const createMockOrganizationProject = (project?: Partial<OrgProject>): OrgProject => ({
+  cloud_provider: '',
+  databases: [],
+  inserted_at: '',
+  integration_source: null,
+  is_branch: false,
+  name: '',
+  ref: '',
+  region: '',
+  status: 'ACTIVE_HEALTHY',
+  ...project,
+})
+
+const PROJECTS = [
+  createMockOrganizationProject({ ref: 'project-1', name: 'production' }),
+  createMockOrganizationProject({ ref: 'project-2', name: 'staging' }),
 ]
 
-const MANY_PROJECTS: OAuthAppsAuthorizeOrganizationProject[] = Array.from(
-  { length: 12 },
-  (_, index) => ({
+const MANY_PROJECTS = Array.from({ length: 12 }, (_, index) =>
+  createMockOrganizationProject({
     ref: `project-${index + 1}`,
     name: `project ${index + 1}`,
-    role: DEVELOPER_ROLE,
   })
 )
 
