@@ -22,7 +22,12 @@ import { FormItemLayout } from 'ui-patterns/form/FormItemLayout/FormItemLayout'
 import { SingleValueFieldArray } from 'ui-patterns/form/SingleValueFieldArray/SingleValueFieldArray'
 import * as z from 'zod'
 
-import { normalizeRedirectUrl, parseRedirectUrls, urlRegex } from '../Auth.constants'
+import {
+  getUrlCharacterError,
+  normalizeRedirectUrl,
+  parseRedirectUrls,
+  urlRegex,
+} from '../Auth.constants'
 import { useAuthConfigUpdateMutation } from '@/data/auth/auth-config-update-mutation'
 
 const MAX_URLS_LENGTH = 2 * 1024
@@ -51,11 +56,14 @@ const createRedirectUrlsSchema = (normalizedAllowList: string[]) => {
       const seenUrls = new Set<string>()
 
       data.urls.forEach((url, index) => {
-        if (!redirectUrlRegex.test(url.value)) {
+        const characterError = getUrlCharacterError(url.value)
+        const isValidUrl = redirectUrlRegex.test(url.value)
+
+        if (characterError || !isValidUrl) {
           ctx.addIssue({
             code: z.ZodIssueCode.custom,
             path: ['urls', index, 'value'],
-            message: 'Please provide a valid URL',
+            message: characterError ?? 'Please provide a valid URL',
           })
         }
 
