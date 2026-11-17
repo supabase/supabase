@@ -137,3 +137,14 @@ test('does not request Warehouse data without access', async () => {
   expect(setupRequest).not.toHaveBeenCalled()
   expect(metricsRequest).not.toHaveBeenCalled()
 })
+
+test('shows setup status failures when metrics cannot establish activity', async () => {
+  addAPIMock({
+    method: 'get',
+    path: '/platform/warehouse/:ref/setup-status',
+    response: () => HttpResponse.json<APIErrorBody>({ message: 'Failed' }, { status: 500 }),
+  })
+  mockMetrics(null)
+  renderReport()
+  expect(await screen.findByText('Failed to retrieve Warehouse status')).toBeInTheDocument()
+})
