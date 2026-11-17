@@ -80,9 +80,11 @@ export function CodeCopyButton({
 export function CodeBlockControls({
   content,
   defaultWrapped = false,
+  onCopied,
 }: {
   content: string
   defaultWrapped?: boolean
+  onCopied?: () => void
 }) {
   const [isWrapped, setIsWrapped] = useState(defaultWrapped)
   // Empty until the first toggle, so nothing is announced on mount
@@ -129,7 +131,7 @@ export function CodeBlockControls({
         </TooltipTrigger>
         <TooltipContent>{isWrapped ? 'Disable word wrap' : 'Enable word wrap'}</TooltipContent>
       </Tooltip>
-      <CodeCopyButton content={content} />
+      <CodeCopyButton content={content} onCopied={onCopied} />
     </div>
   )
 }

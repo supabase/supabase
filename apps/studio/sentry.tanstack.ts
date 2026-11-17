@@ -6,9 +6,7 @@
 // It is isomorphic by design: the `typeof window` guard below makes it a
 // no-op on the server.
 //
-// The Next build initializes Sentry via instrumentation-client.ts — a Next
-// convention file that nothing loads under TanStack Start. Without this init
-// every `Sentry.captureException` in the TanStack runtime (including the
+// Without this init every `Sentry.captureException` in the app (including the
 // globalErrorBoundary / routerErrorComponent captures in routes/__root.tsx)
 // would be a silent no-op.
 //
@@ -31,9 +29,8 @@ import { buildSentryClientOptions } from '@/lib/sentry-client-options'
 let isInitialized = false
 
 export function initSentryTanStackClient(router: AnyRouter) {
-  // Client-only: getRouter() also runs during SSR/prerender, and the TanStack
-  // build has no server-side Sentry story yet (the Next build's
-  // sentry.server.config.ts equivalent would live in a custom server entry).
+  // Client-only: getRouter() also runs during SSR/prerender; the server is
+  // initialized separately by instrument.server.mjs.
   if (typeof window === 'undefined') return
   // getRouter() is called once per pageload today; keep the guard so a future
   // second call can't double-init the client.

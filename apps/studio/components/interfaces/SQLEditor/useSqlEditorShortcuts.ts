@@ -38,7 +38,7 @@ export function useSqlEditorShortcuts({
   const openNewSnippet = useCallback(() => {
     if (!ref) return
     // skip=true bypasses the "load last visited snippet" redirect on /sql/new.
-    // Without it, the effect in pages/project/[ref]/sql/[id].tsx bounces back
+    // Without it, the effect in routes/project/$ref/sql/$id.tsx bounces back
     // to the previous snippet.
     router.push(`/project/${ref}/sql/new?skip=true`)
   }, [ref, router])

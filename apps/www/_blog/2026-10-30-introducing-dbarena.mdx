@@ -13,7 +13,7 @@ imgThumb: 2026-10-30-introducing-dbarena/thumb.png
 toc_depth: 2
 ---
 
-We're announcing [DBArena](https://dbarena.com/), a site that publishes benchmarks of hosted Postgres providers. The first results compare Supabase Postgres (with default storage), Supabase Postgres (with OrioleDB), Amazon RDS, and Google Cloud SQL at up to seven compute sizes, measured on throughput, price-performance, and latency.
+We're announcing [DBArena](https://dbarena.com/), a site that publishes benchmarks of hosted Postgres providers. The first results compare Supabase Postgres (with default storage), Supabase Postgres (with [OrioleDB](/features/orioledb)), Amazon RDS, and Google Cloud SQL at up to seven compute sizes, measured on throughput, price-performance, and latency.
 
 Supabase sponsors DBArena. The methodology is public, and all tools to run the benchmarks are open source. Each result includes a raw data file with the exact commands, configuration, and captured meta data, so you can rerun any test and compare your results with published ones.
 
@@ -32,7 +32,7 @@ The first release covers four products:
 - Amazon RDS for PostgreSQL
 - Google Cloud SQL for PostgreSQL (Enterprise edition)
 
-Each product is tested at up to seven compute tiers, from Small (2 vCPU, 2 GiB) to 8XLarge (32 vCPU, 128 GiB). Products are matched by vCPU count, and every test uses Postgres 17 with the provider's default configuration. Clients connect directly over TLS, without a connection pooler.
+Each product is tested at up to seven compute tiers, from Small (2 vCPU, 2 GiB) to 8XLarge (32 vCPU, 128 GiB). Products are matched by vCPU count, and every test uses Postgres 17 with the provider's default configuration. Clients connect directly over TLS, without a [connection pooler](/docs/guides/database/connecting-to-postgres/pooling-and-limits).
 
 Each tier is tested in two scenarios:
 

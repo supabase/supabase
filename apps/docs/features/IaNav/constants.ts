@@ -10,9 +10,12 @@ const VARIANTS: IaNavVariant[] = ['control', 'option-1']
 export const isIaNavVariant = (value: unknown): value is IaNavVariant =>
   VARIANTS.includes(value as IaNavVariant)
 
+// A forced variant is kept for the browser session, because links don't carry the query parameter.
+export const IA_NAV_OVERRIDE_KEY = 'docs-ia-mvp-v1-override'
+
 // runs before paint, so a visitor on option-1 never sees the control nav the server renders.
-// the url override wins over the value from the last visit
-export const IA_NAV_CACHE_SCRIPT = `try{var o=new URLSearchParams(location.search).get('${IA_NAV_FLAG}');var v=${JSON.stringify(VARIANTS)}.indexOf(o)>-1?o:localStorage.getItem('${LOCAL_STORAGE_KEYS.IA_NAV_FLAG}');if(v==='option-1')document.documentElement.dataset.iaNav='option-1'}catch(e){}`
+// the url override wins over the session override, which wins over the value from the last visit
+export const IA_NAV_CACHE_SCRIPT = `try{var V=${JSON.stringify(VARIANTS)};var o=new URLSearchParams(location.search).get('${IA_NAV_FLAG}');var s=V.indexOf(o)>-1?o:sessionStorage.getItem('${IA_NAV_OVERRIDE_KEY}');var v=V.indexOf(s)>-1?s:localStorage.getItem('${LOCAL_STORAGE_KEYS.IA_NAV_FLAG}');if(v==='option-1')document.documentElement.dataset.iaNav='option-1'}catch(e){}`
 
 export const IA_NAV_PENDING_CLASS = 'in-data-[ia-nav=option-1]:invisible'
 
