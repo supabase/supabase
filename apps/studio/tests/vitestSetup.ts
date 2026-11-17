@@ -1,6 +1,7 @@
 import './lib/disabled-matchers'
 
 import dayjs from 'dayjs'
+import advancedFormat from 'dayjs/plugin/advancedFormat'
 import relativeTime from 'dayjs/plugin/relativeTime'
 import timezone from 'dayjs/plugin/timezone'
 import utc from 'dayjs/plugin/utc'
@@ -10,6 +11,7 @@ import { afterAll, afterEach, beforeAll, vi } from 'vitest'
 import { mswServer } from './lib/msw'
 import { routerMock } from './lib/route-mock'
 
+dayjs.extend(advancedFormat)
 dayjs.extend(utc)
 dayjs.extend(timezone)
 dayjs.extend(relativeTime)
