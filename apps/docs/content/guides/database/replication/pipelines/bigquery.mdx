@@ -19,16 +19,16 @@ Check [replica identity and complete update rows](#replica-identity), especially
 
 Prepare these Google Cloud Platform (GCP) resources:
 
-1. **GCP account**: [Sign up for GCP](https://cloud.google.com/gcp) if you don't have one. In the destination project, make sure the [BigQuery API and BigQuery Storage API](https://cloud.google.com/bigquery/docs/service-dependencies) are enabled.
+1. **GCP account**: [Sign up for GCP](https://cloud.google.com/gcp) if you don't have one. In the destination project, make sure the [BigQuery API and BigQuery Storage API](https://docs.cloud.google.com/bigquery/docs/service-dependencies) are enabled.
 
 2. **BigQuery dataset**: Create a [BigQuery dataset](https://docs.cloud.google.com/bigquery/docs/datasets) in your GCP project
    - Use a dataset ID such as `supabase_replication`
-   - Choose a [dataset location](https://cloud.google.com/bigquery/docs/locations) near the [pipeline region](/docs/guides/database/replication/pipelines#region). You cannot change it after creation; it is independent of your Supabase project region.
+   - Choose a [dataset location](https://docs.cloud.google.com/bigquery/docs/locations) near the [pipeline region](/docs/guides/database/replication/pipelines#region). You cannot change it after creation; it is independent of your Supabase project region.
 
 3. **GCP service account key**: Create a [service account](https://docs.cloud.google.com/iam/docs/service-accounts-create) with appropriate permissions
    - Grant **BigQuery Data Editor** on the destination dataset
    - Grant **BigQuery Job User** on the GCP project
-   - [Create and download the JSON key file](https://cloud.google.com/iam/docs/keys-create-delete)
+   - [Create and download the JSON key file](https://docs.cloud.google.com/iam/docs/keys-create-delete)
 
    Treat the downloaded JSON as a secret. Don't commit or share it, and [delete the key](https://cloud.google.com/iam/docs/keys-create-delete#deleting) if it is exposed.
 
@@ -166,7 +166,7 @@ Column-list changes for tracked tables follow the [schema rules](#schema-change-
 - **Row size**: Each serialized row must fit within the Storage Write API's [20 MB append-request limit](https://cloud.google.com/bigquery/quotas#write-api-limits), including request metadata and encoding overhead.
 - **Columns**: BigQuery CDC supports at most 2,000 top-level columns
 - **Arrays**: Arrays can't contain `NULL` elements. A whole-array SQL `NULL` is stored as an empty array, so these two source values become indistinguishable.
-- **Numeric and JSON values**: BigQuery applies its destination [data-type limits](https://cloud.google.com/bigquery/docs/reference/standard-sql/data-types). Values can be rounded or rejected when they exceed the supported precision or range; Postgres values are not guaranteed to retain their exact representation.
+- **Numeric and JSON values**: BigQuery applies its destination [data-type limits](https://docs.cloud.google.com/bigquery/docs/reference/standard-sql/data-types). Values can be rounded or rejected when they exceed the supported precision or range; Postgres values are not guaranteed to retain their exact representation.
 - **BigQuery CDC tables**: While CDC is active, BigQuery doesn't support mutating DML such as `UPDATE`, `DELETE`, or `MERGE`, wildcard table queries, or search indexes on the destination table. See [BigQuery CDC limitations](https://cloud.google.com/bigquery/docs/change-data-capture#limitations) for the complete list.
 - **Managed objects**: Follow the [removal procedure](/docs/guides/database/replication/pipelines#removing-tables-from-replication) before deleting destination tables or views.
 
@@ -190,5 +190,5 @@ Use [pipeline monitoring](/docs/guides/database/replication/pipelines-monitoring
 
 ## Additional resources
 
-- [BigQuery documentation](https://cloud.google.com/bigquery/docs)
-- [BigQuery change data capture](https://cloud.google.com/bigquery/docs/change-data-capture)
+- [BigQuery documentation](https://docs.cloud.google.com/bigquery/docs)
+- [BigQuery change data capture](https://docs.cloud.google.com/bigquery/docs/change-data-capture)

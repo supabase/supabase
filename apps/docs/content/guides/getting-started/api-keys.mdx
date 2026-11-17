@@ -337,7 +337,7 @@ Exposing a secret key puts all of your project's data at risk. The rules below a
 - Use a separate secret key for each backend component. If one component leaks its key, you only rotate that one.
 - Rotate a leaked key as soon as you fix the cause of the leak. The browser block returns HTTP 401 Unauthorized, but an attacker can still use the key from other tools. For the steps, see [Rotate a leaked or compromised API key](/docs/guides/security/rotate-leaked-api-keys).
 
-Handle secret keys using [secure coding practices](https://owasp.org/www-project-secure-coding-practices-quick-reference-guide/stable-en/).
+Handle secret keys using [secure coding practices](https://owasp.github.io/www-project-secure-coding-practices-quick-reference-guide/stable-en/).
 
 ### Known limitations
 
