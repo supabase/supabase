@@ -2,6 +2,7 @@ import { beforeEach, describe, expect, it, vi } from 'vitest'
 
 import { classifyResponseError } from './error-classification'
 import { getErrorRouting } from '@/lib/errors/error-routing'
+import { reportQueryError } from '@/lib/errors/report-studio-error'
 import {
   ConnectionTimeoutError,
   isStudioError,
@@ -204,6 +205,32 @@ describe('handleError — error classification', () => {
         expect.any(NetworkUnreachableError),
         expect.objectContaining({ tags: expect.objectContaining({ sample_rate: 1 }) })
       )
+    })
+
+    it('never reports with skipReport, even with alwaysCapture or reportImmediately', () => {
+      const err = throwAndCatch(
+        { message: 'Content not found', code: 404 },
+        { skipReport: (e) => e.code === 404, alwaysCapture: true, reportImmediately: true }
+      )
+      expect(err).toBeInstanceOf(UnclassifiedApiError)
+      expect(err.reason).toBe('not_found')
+      expect(captureException).not.toHaveBeenCalled()
+    })
+
+    it('stops the query cache from reporting an error thrown with skipReport', () => {
+      const skipped = throwAndCatch(
+        { message: 'Content not found', code: 404 },
+        { skipReport: (e) => e.code === 404 }
+      )
+      reportQueryError(skipped)
+      expect(captureException).not.toHaveBeenCalled()
+
+      const reported = throwAndCatch(
+        { message: 'boom', code: 403 },
+        { skipReport: (e) => e.code === 404, alwaysCapture: true }
+      )
+      reportQueryError(reported)
+      expect(captureException).toHaveBeenCalledTimes(1)
     })
 
     it('reports an UnexpectedError that has a message, following its routing', () => {

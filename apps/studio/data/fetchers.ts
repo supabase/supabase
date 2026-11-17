@@ -275,6 +275,11 @@ type HandleErrorOptions = {
    * error after the last retry, so leave this unset there.
    */
   reportImmediately?: boolean
+  /**
+   * True for errors the caller handles as an expected state (for example a 404 for a resource the
+   * user deleted). Those are never sent to Sentry. Takes precedence over `alwaysCapture`.
+   */
+  skipReport?: (error: StudioError) => boolean
 }
 
 /**
@@ -286,7 +291,9 @@ type HandleErrorOptions = {
 export const handleError = (error: unknown, options: HandleErrorOptions = {}): never => {
   const raw = parseResponseErrorBody(error)
   const classified = raw ? classifyResponseError(raw) : classifyError(error)
-  if (options.reportImmediately) {
+  if (options.skipReport?.(classified)) {
+    deferStudioErrorReport(classified, { skip: true })
+  } else if (options.reportImmediately) {
     reportStudioError(classified, options.sentryContext, { force: options.alwaysCapture })
   } else {
     deferStudioErrorReport(classified, {

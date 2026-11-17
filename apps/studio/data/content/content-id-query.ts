@@ -56,7 +56,9 @@ export async function getSqlSnippetById(
     signal,
   })
 
-  if (error) throw handleError(error)
+  // A 404 means the snippet was deleted or never existed. Callers handle it (the SQL editor
+  // redirects to a new snippet), so it is not reported.
+  if (error) throw handleError(error, { skipReport: (err) => err.code === 404 })
   if (isLogsViewContent(data)) throw new Error('Saved log views cannot be opened as SQL queries')
   if (data.type === 'log_sql') return withSavedStatus(parseLogSqlSnippet(data))
   return remapWireSnippet(data, 'saved')
