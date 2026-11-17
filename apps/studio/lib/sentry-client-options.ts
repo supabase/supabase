@@ -1,11 +1,5 @@
 // Sentry client-side configuration. `sentry.tanstack.ts` calls `Sentry.init`
 // with these options from `getRouter()` (router.tsx).
-//
-// Keep every shared option in this builder so the two runtimes cannot drift.
-//
-// `@sentry/react` is what `@sentry/nextjs` wraps on the client (same 10.x
-// version, same module instance under pnpm), so building the options against
-// it works for both `Sentry.init`s.
 import * as Sentry from '@sentry/react'
 import { thirdPartyErrorFilterIntegration } from '@sentry/react'
 import { hasConsented } from 'common'
@@ -114,11 +108,8 @@ export interface SentryClientOptionsParams {
    * (`Client.sendSession` early-returns), so a build without a release sends
    * no Release Health traffic at all — errors and traces still flow.
    *
-   * The Next build must NOT pass this: `withSentryConfig` injects the release
-   * (`SENTRY_RELEASE` ?? the Vercel commit SHA) into the bundle at build time,
-   * and an explicit `release` key — even `undefined` — would override it.
-   * The TanStack/Vite build runs no Sentry bundler plugin, so it passes the
-   * commit SHA here instead (see sentry.tanstack.ts).
+   * The build runs no Sentry bundler plugin to inject one, so
+   * sentry.tanstack.ts passes the commit SHA.
    */
   release?: string
 }
@@ -146,8 +137,6 @@ export function buildSentryClientOptions({
     ...(process.env.NEXT_PUBLIC_SENTRY_ENVIRONMENT && {
       environment: process.env.NEXT_PUBLIC_SENTRY_ENVIRONMENT,
     }),
-    // Conditional spread: see the `release` doc comment above — the key must
-    // be ABSENT (not `undefined`) so the Next build's injected release wins.
     ...(release && { release }),
     // Setting this option to true will print useful information to the console while you're setting up Sentry.
     debug: false,

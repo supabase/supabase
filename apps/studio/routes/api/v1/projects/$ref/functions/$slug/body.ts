@@ -1,6 +1,6 @@
 import { createReadStream } from 'node:fs'
 import { Readable } from 'node:stream'
-import * as Sentry from '@sentry/nextjs'
+import * as Sentry from '@sentry/react'
 import { createFileRoute } from '@tanstack/react-router'
 
 import { getFunctionsArtifactStore } from '@/lib/api/self-hosted/functions'

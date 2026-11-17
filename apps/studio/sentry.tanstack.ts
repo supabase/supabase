@@ -15,12 +15,8 @@
 // `tanstackRouterBrowserTracingIntegration` needs at init time so the
 // pageload span is captured, not just later navigations.
 //
-// Imports `@sentry/react` directly (not `@sentry/nextjs`): this module never
-// runs on the Next build, and the real `@sentry/nextjs` doesn't export the
-// TanStack Router integration. Under Vite both ids resolve to the same
-// `@sentry/react` instance anyway (vite.config.ts aliases `@sentry/nextjs`
-// to compat/sentry-nextjs.ts), so app code capturing via `@sentry/nextjs`
-// reports through the client initialized here.
+// App code imports the same `@sentry/react` instance, so its captures report
+// through the client initialized here.
 import * as Sentry from '@sentry/react'
 import type { AnyRouter } from '@tanstack/react-router'
 
@@ -55,7 +51,7 @@ export function initSentryTanStackClient(router: AnyRouter) {
           // browser tracing integration turns EVERY one of them into a child
           // span of the pageload transaction. Measured over 7 days in the
           // supabase-app Sentry project, this build emitted ~3,500x the
-          // `resource.other` spans of the Next build on comparable pageload
+          // `resource.other` spans of the former Next build on comparable pageload
           // traffic, and `resource.*` was over half of all span volume in the
           // project. That burned the span budget, tripped Sentry's spike
           // protection, and made the pageload/throughput alerts fire (FE-4755).
@@ -69,10 +65,8 @@ export function initSentryTanStackClient(router: AnyRouter) {
       ],
       // Without a release the SDK silently drops session envelopes
       // (`Client.sendSession` early-returns), so Release Health sends nothing
-      // on this build. The Next build gets its release injected at build time
-      // by withSentryConfig, which resolves to the Vercel commit SHA; inline
-      // the same SHA here (vite.config.ts re-exposes VERCEL_GIT_COMMIT_SHA
-      // under the NEXT_PUBLIC_ name) so both builds report the same release.
+      // at all. Inline the Vercel commit SHA (vite.config.ts re-exposes
+      // VERCEL_GIT_COMMIT_SHA under the NEXT_PUBLIC_ name).
       // Unset outside Vercel (local/self-hosted), where sessions don't matter —
       // so session envelopes only fire on deploys, not on a local dev build.
       release: process.env.NEXT_PUBLIC_VERCEL_GIT_COMMIT_SHA,
