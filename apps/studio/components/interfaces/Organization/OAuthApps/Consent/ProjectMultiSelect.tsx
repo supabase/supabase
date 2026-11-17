@@ -102,7 +102,7 @@ export const ProjectMultiSelect = ({
               badgeLimit={2}
               deletableBadge
               renderValue={(value) =>
-                projects.find((project) => project.ref === value)?.name ?? value
+                selectedProjects.find((project) => project.ref === value)?.name ?? value
               }
             />
             <MultiSelectorContent>
