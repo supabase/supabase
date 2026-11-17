@@ -739,13 +739,11 @@ export const UnifiedLogs = ({
                         <ButtonTooltip
                           ref={viewsToggleRef}
                           size="tiny"
-                          variant={isViewsBarOpen ? 'primary' : 'default'}
+                          variant="default"
                           className="w-[26px]"
                           icon={
                             <Layers2Icon
-                              className={
-                                isViewsBarOpen ? 'text-primary-solid-foreground' : 'text-foreground'
-                              }
+                              className={isViewsBarOpen ? 'text-primary' : 'text-foreground'}
                             />
                           }
                           aria-label="Saved views"
