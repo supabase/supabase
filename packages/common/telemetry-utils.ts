@@ -45,19 +45,23 @@ function getPostHogSessionId(): string | null {
   return null
 }
 
+function getPageLocation() {
+  if (!isBrowser) return { pageUrl: '', search: '' }
+
+  try {
+    const url = new URL(window.location.href)
+    url.hash = ''
+    // Studio's Auth users page keeps its search term, often an end user's email, in `keywords`.
+    if (url.searchParams.has('keywords')) url.searchParams.set('keywords', 'redacted')
+    return { pageUrl: url.href, search: url.search }
+  } catch {
+    return { pageUrl: window.location.href.split('#')[0], search: window.location.search }
+  }
+}
+
 export function getSharedTelemetryData(pathname?: string) {
   const sessionId = getPostHogSessionId()
-  const pageUrl = (() => {
-    if (!isBrowser) return ''
-
-    try {
-      const url = new URL(window.location.href)
-      url.hash = ''
-      return url.href
-    } catch {
-      return window.location.href.split('#')[0]
-    }
-  })()
+  const { pageUrl, search } = getPageLocation()
 
   return {
     page_url: pageUrl,
@@ -68,7 +72,7 @@ export function getSharedTelemetryData(pathname?: string) {
       referrer: isBrowser ? document?.referrer : '',
       language: navigator.language ?? 'en-US',
       user_agent: navigator.userAgent,
-      search: isBrowser ? window.location.search : '',
+      search,
       viewport_height: isBrowser ? window.innerHeight : 0,
       viewport_width: isBrowser ? window.innerWidth : 0,
     },
