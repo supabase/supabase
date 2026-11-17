@@ -59,7 +59,7 @@ export const getWarehouseSummaryNotice = ({ availability, value }: WarehouseSumm
     case 'insufficient_data':
       return 'Not enough samples'
     case 'no_data':
-      return 'No samples in this period'
+      return 'No data in the last 60 minutes'
     case 'disabled':
       return 'Warehouse metrics are unavailable'
     case 'not_provisioned':

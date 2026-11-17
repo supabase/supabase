@@ -130,7 +130,7 @@ describe('Warehouse workload summary', () => {
   test('distinguishes missing telemetry from observed zero traffic', async () => {
     mockMetrics(response({ availability: 'no_data', series: [] }))
     customRender(<WarehouseObservabilitySection />)
-    expect(await screen.findAllByText('No samples in this period')).toHaveLength(4)
+    expect(await screen.findAllByText('No data in the last 60 minutes')).toHaveLength(4)
     expect(screen.getAllByText('Unavailable')).toHaveLength(4)
     expect(screen.queryByText('0/s')).not.toBeInTheDocument()
   })
