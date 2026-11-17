@@ -39,7 +39,9 @@ export function useInfiniteScroll({
     if (!container || !hasNextPage || isLoading || isFetchingNextPage) return
 
     const fetchIfNotScrollable = () => {
-      if (container.scrollHeight <= container.clientHeight) {
+      // A hidden container (display: none) reports 0 for both heights. Don't treat that as
+      // underfilled, or every page would be fetched while it's hidden.
+      if (container.clientHeight > 0 && container.scrollHeight <= container.clientHeight) {
         fetchNextPage({ cancelRefetch: false })
       }
     }

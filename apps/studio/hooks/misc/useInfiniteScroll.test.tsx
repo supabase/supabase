@@ -51,6 +51,20 @@ describe('useInfiniteScroll fill behavior', () => {
     expect(fetchNextPage).toHaveBeenCalledWith({ cancelRefetch: false })
   })
 
+  it('does not fetch when the container is hidden', () => {
+    const fetchNextPage = vi.fn()
+    const container = makeContainer(0, 0)
+    renderHook(() =>
+      useInfiniteScroll({
+        containerRef: makeRef(container),
+        hasNextPage: true,
+        fetchNextPage,
+        rowCount: 20,
+      })
+    )
+    expect(fetchNextPage).not.toHaveBeenCalled()
+  })
+
   it('does not fetch when the container is already scrollable', () => {
     const fetchNextPage = vi.fn()
     const container = makeContainer(1200, 900)
