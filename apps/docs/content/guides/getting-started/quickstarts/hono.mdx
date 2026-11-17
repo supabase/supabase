@@ -61,7 +61,7 @@ using (true);
 
 ## 8. Query data from the app
 
-The bootstrapped app already includes the route that reads your `instruments` table, in `src/index.tsx`. The middleware in `src/middleware/auth.middleware.ts` creates a request-scoped [Supabase client](/docs/reference/javascript/initializing), so `getSupabase(c)` returns a client that already carries the signed-in user's auth token. Your RLS policies apply to the query.
+The bootstrapped app already includes the route that reads your `instruments` table, in `src/index.tsx`. The middleware in `src/middleware/auth.middleware.ts` creates a request-scoped [Supabase client](/docs/reference/javascript/introduction), so `getSupabase(c)` returns a client that already carries the signed-in user's auth token. Your RLS policies apply to the query.
 
 ```tsx name=src/index.tsx
 app.get('/instruments', async (c) => {
