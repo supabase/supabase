@@ -6,14 +6,14 @@ import { MULTIGRES_SCHEMA_NAME, resolveHighAvailability } from '../useHighAvaila
 describe('filterSchemasForHighAvailability', () => {
   const schemas = [{ name: 'public' }, { name: MULTIGRES_SCHEMA_NAME }, { name: 'other' }]
 
-  it('removes the multigres schema on high availability projects', () => {
+  it('removes the multigres schema when shouldHideMultigresSchema is true (Multigres or Multigres Lite)', () => {
     expect(filterSchemasForHighAvailability(schemas, true)).toEqual([
       { name: 'public' },
       { name: 'other' },
     ])
   })
 
-  it('keeps all schemas on non high availability projects', () => {
+  it('keeps all schemas when shouldHideMultigresSchema is false', () => {
     expect(filterSchemasForHighAvailability(schemas, false)).toEqual(schemas)
   })
 })

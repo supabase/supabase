@@ -26,6 +26,7 @@ import { useSSLEnforcementUpdateMutation } from '@/data/ssl-enforcement/ssl-enfo
 import { useCustomContent } from '@/hooks/custom-content/useCustomContent'
 import { FGA_PERMISSIONS, useAsyncCheckPermissionsV2 } from '@/hooks/misc/useCheckPermissionsV2'
 import { useHighAvailability } from '@/hooks/misc/useHighAvailability'
+import { useProjectCapabilities } from '@/hooks/misc/useSelectedProject'
 import { DOCS_URL } from '@/lib/constants'
 
 export const SSLConfiguration = () => {
@@ -34,19 +35,27 @@ export const SSLConfiguration = () => {
 
   const { data: settings } = useProjectSettingsV2Query({ projectRef: ref })
 
-  // High Availability projects always enforce SSL and the API rejects any
-  // attempt to read or change the setting, so skip the query for them and
-  // show the setting as always on.
+  // Projects that require direct TLS negotiation (High Availability and
+  // Multigres Lite) always enforce SSL and the API rejects any attempt to
+  // read or change the setting, so skip the query for them and show the
+  // setting as always on.
   const { isHighAvailability, isPending: isHighAvailabilityPending } = useHighAvailability()
-  const canLoadSSLEnforcement = !isHighAvailability && !isHighAvailabilityPending
+  const capabilities = useProjectCapabilities()
+  // Fall back to the pre-capabilities `isHighAvailability` check (rather than
+  // a fixed default) so behavior for already-correct HA projects doesn't
+  // regress while the backend capabilities field is still rolling out.
+  const requiresDirectTlsNegotiation =
+    capabilities?.requiresDirectTlsNegotiation ?? isHighAvailability
+  const canLoadSSLEnforcement = !requiresDirectTlsNegotiation && !isHighAvailabilityPending
   const {
     data: sslEnforcementConfiguration,
     isPending: isSSLEnforcementPending,
     isSuccess: isSSLEnforcementSuccess,
   } = useSSLEnforcementQuery({ projectRef: ref }, { enabled: canLoadSSLEnforcement })
 
-  const isLoading = isHighAvailabilityPending || (!isHighAvailability && isSSLEnforcementPending)
-  const isSuccess = isHighAvailability || isSSLEnforcementSuccess
+  const isLoading =
+    isHighAvailabilityPending || (!requiresDirectTlsNegotiation && isSSLEnforcementPending)
+  const isSuccess = requiresDirectTlsNegotiation || isSSLEnforcementSuccess
   const { data: jitDbAccessConfiguration } = useJitDbAccessQuery({ projectRef: ref })
   const { mutateAsync: updateSSLEnforcement, isPending: isSubmitting } =
     useSSLEnforcementUpdateMutation({
@@ -67,7 +76,7 @@ export const SSLConfiguration = () => {
   // reflected here too, instead of relying on a mirrored local state that
   // would only resync on the initial load.
   const isEnforced =
-    isHighAvailability ||
+    requiresDirectTlsNegotiation ||
     (isSSLEnforcementSuccess &&
       sslEnforcementConfiguration.appliedSuccessfully &&
       sslEnforcementConfiguration.currentConfig.database)
@@ -86,14 +95,14 @@ export const SSLConfiguration = () => {
   const isSwitchDisabled =
     isLoading ||
     isSubmitting ||
-    isHighAvailability ||
+    requiresDirectTlsNegotiation ||
     !canUpdateSSLEnforcement ||
     !hasAccessToSSLEnforcement ||
     isTemporaryAccessEnabled
 
   let switchTooltipMessage: string | undefined
-  if (isHighAvailability) {
-    switchTooltipMessage = 'SSL is always enforced on High Availability projects'
+  if (requiresDirectTlsNegotiation) {
+    switchTooltipMessage = 'SSL is always enforced on this project'
   } else if (!canUpdateSSLEnforcement) {
     switchTooltipMessage =
       'You need additional permissions to update SSL enforcement for your project'

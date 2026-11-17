@@ -6,21 +6,21 @@ import type {
   StepContentProps,
 } from '@/components/interfaces/ConnectSheet/Connect.types'
 import { resolveOrmConnectionScenario } from '@/components/interfaces/ConnectSheet/OrmConnection.utils'
-import { useIsHighAvailability } from '@/hooks/misc/useSelectedProject'
+import { useIsHighAvailability, useProjectCapabilities } from '@/hooks/misc/useSelectedProject'
 
 function getEnvCode({
   connectionStringPooler,
   deploymentMode,
-  isHighAvailability,
+  hasConnectionPooling,
 }: {
   connectionStringPooler: ConnectionStringPooler
   deploymentMode: DeploymentMode
-  isHighAvailability: boolean
+  hasConnectionPooling: boolean
 }): string {
   const scenario = resolveOrmConnectionScenario({
     connectionStringPooler,
     deploymentMode,
-    isHighAvailability,
+    hasConnectionPooling,
   })
 
   switch (scenario) {
@@ -34,9 +34,9 @@ DATABASE_URL="${connectionStringPooler.direct}"
 # Connect to Postgres via the self-hosted transaction-mode pooler
 DATABASE_URL="${connectionStringPooler.transactionShared}"
 `
-    case 'high-availability':
+    case 'no-pooler':
       return `
-# Multigres does not support connection pooling — connect to Postgres directly
+# Multigres and Multigres Lite do not support connection pooling — connect to Postgres directly
 DATABASE_URL="${connectionStringPooler.direct}"
 `
     case 'dedicated-pooler':
@@ -62,7 +62,12 @@ DATABASE_URL="${connectionStringPooler.transactionShared}"
 
 const ContentFile = ({ connectionStringPooler, deploymentMode }: StepContentProps) => {
   const isHighAvailability = useIsHighAvailability()
-  const envCode = getEnvCode({ connectionStringPooler, deploymentMode, isHighAvailability })
+  const capabilities = useProjectCapabilities()
+  // Fall back to the pre-capabilities `isHighAvailability` check (rather than
+  // a fixed default) so behavior for already-correct HA projects doesn't
+  // regress while the backend capabilities field is still rolling out.
+  const hasConnectionPooling = capabilities?.hasConnectionPooling ?? !isHighAvailability
+  const envCode = getEnvCode({ connectionStringPooler, deploymentMode, hasConnectionPooling })
 
   const files = [
     {

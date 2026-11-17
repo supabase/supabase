@@ -30,7 +30,7 @@ import { useConnectionStringDatabases } from '@/components/interfaces/ConnectShe
 import { ResetDbPasswordDialog } from '@/components/interfaces/Settings/Database/DatabaseSettings/ResetDbPasswordDialog'
 import { InlineLink } from '@/components/ui/InlineLink'
 import { useCheckEntitlements } from '@/hooks/misc/useCheckEntitlements'
-import { useIsHighAvailability } from '@/hooks/misc/useSelectedProject'
+import { useIsHighAvailability, useProjectCapabilities } from '@/hooks/misc/useSelectedProject'
 import { DOCS_URL } from '@/lib/constants'
 import { useTrack } from '@/lib/telemetry/track'
 
@@ -51,6 +51,11 @@ function DirectConnectionContent({ state, deploymentMode }: StepContentProps) {
   const track = useTrack()
   const { hasAccess: hasDedicatedPooler } = useCheckEntitlements('dedicated_pooler')
   const isHighAvailability = useIsHighAvailability()
+  const capabilities = useProjectCapabilities()
+  // Fall back to the pre-capabilities `isHighAvailability` check (rather than
+  // a fixed default) so behavior for already-correct HA projects doesn't
+  // regress while the backend capabilities field is still rolling out.
+  const hasConnectionPooling = capabilities?.hasConnectionPooling ?? !isHighAvailability
   const [temporaryDatabasePassword, setTemporaryDatabasePassword] = useState('')
 
   const connectionSource = state.connectionSource
@@ -138,7 +143,7 @@ function DirectConnectionContent({ state, deploymentMode }: StepContentProps) {
 
   const showPasswordPlaceholder = connectionString.includes(PASSWORD_PLACEHOLDER)
   const showSelfHostedDirectNotice = deploymentMode.isSelfHosted && connectionMethod === 'direct'
-  const showPoolerTitle = deploymentMode.isPlatform && !!poolerBadge && !isHighAvailability
+  const showPoolerTitle = deploymentMode.isPlatform && !!poolerBadge && hasConnectionPooling
   const titleBadge = isLoadBalancerSelected ? 'Read-only' : poolerBadge
   const showTitleBadge = isLoadBalancerSelected || showPoolerTitle
   const showResetInTitle =

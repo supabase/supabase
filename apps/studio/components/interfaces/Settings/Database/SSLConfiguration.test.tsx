@@ -13,12 +13,17 @@ type SslEnforcementResponse = components['schemas']['SslEnforcementResponse_Outp
 type JitAccessConfigResponse =
   paths['/v1/projects/{ref}/jit-access']['get']['responses'][200]['content']['application/json']
 
-const { mockUseAsyncCheckPermissions, mockUseHighAvailability, mockUseSelectedProjectQuery } =
-  vi.hoisted(() => ({
-    mockUseAsyncCheckPermissions: vi.fn(),
-    mockUseHighAvailability: vi.fn(),
-    mockUseSelectedProjectQuery: vi.fn(),
-  }))
+const {
+  mockUseAsyncCheckPermissions,
+  mockUseHighAvailability,
+  mockUseProjectCapabilities,
+  mockUseSelectedProjectQuery,
+} = vi.hoisted(() => ({
+  mockUseAsyncCheckPermissions: vi.fn(),
+  mockUseHighAvailability: vi.fn(),
+  mockUseProjectCapabilities: vi.fn(),
+  mockUseSelectedProjectQuery: vi.fn(),
+}))
 
 vi.mock('@/hooks/misc/useCheckPermissionsV2', () => ({
   useAsyncCheckPermissionsV2: mockUseAsyncCheckPermissions,
@@ -31,9 +36,10 @@ vi.mock('@/hooks/misc/useHighAvailability', () => ({
 
 vi.mock('@/hooks/misc/useSelectedProject', () => ({
   useSelectedProjectQuery: mockUseSelectedProjectQuery,
+  useProjectCapabilities: mockUseProjectCapabilities,
 }))
 
-const HA_TOOLTIP = 'SSL is always enforced on High Availability projects'
+const HA_TOOLTIP = 'SSL is always enforced on this project'
 
 function mockProjectSettings() {
   addAPIMock({
@@ -89,6 +95,7 @@ function mockSSLEnforcement(config: SslEnforcementResponse) {
 describe('SSLConfiguration', () => {
   beforeEach(() => {
     mockUseSelectedProjectQuery.mockReturnValue({ data: { id: 1, ref: 'default' } })
+    mockUseProjectCapabilities.mockReturnValue(undefined)
     mockUseAsyncCheckPermissions.mockReturnValue({ can: true })
     mockProjectSettings()
     mockJitDbAccess()
@@ -114,6 +121,25 @@ describe('SSLConfiguration', () => {
     fireEvent.focus(sslSwitch.parentElement!)
     expect((await screen.findAllByText(HA_TOOLTIP)).length).toBeGreaterThan(0)
 
+    expect(sslEnforcementRequests.count).toBe(0)
+  })
+
+  it('shows SSL enforcement as always on for Multigres Lite projects', async () => {
+    mockUseHighAvailability.mockReturnValue({ isHighAvailability: false, isPending: false })
+    mockUseProjectCapabilities.mockReturnValue({
+      hasConnectionPooling: false,
+      requiresDirectTlsNegotiation: true,
+    })
+    const sslEnforcementRequests = mockSSLEnforcement({
+      appliedSuccessfully: true,
+      currentConfig: { database: false },
+    })
+
+    customRender(<SSLConfiguration />)
+
+    const sslSwitch = await screen.findByRole('switch')
+    expect(sslSwitch).toBeChecked()
+    expect(sslSwitch).toBeDisabled()
     expect(sslEnforcementRequests.count).toBe(0)
   })
 

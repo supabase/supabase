@@ -30,7 +30,7 @@ export function shouldShowIpv4AddonNotice({
   connectionMethod,
   useSharedPooler,
   hasIpv4Addon,
-  isHighAvailability,
+  hasConnectionPooling,
 }: {
   isAws: boolean
   isIpv4Enabled: boolean
@@ -39,16 +39,16 @@ export function shouldShowIpv4AddonNotice({
   connectionMethod: FieldValue
   useSharedPooler: FieldValue
   hasIpv4Addon: boolean
-  isHighAvailability: boolean
+  hasConnectionPooling: boolean
 }): boolean {
-  // The IPv4 add-on does not apply to Multigres connections
+  // The IPv4 add-on does not apply to Multigres or Multigres Lite connections
   if (
     !isPlatform ||
     !isAws ||
     !isIpv4Enabled ||
     mode !== 'direct' ||
     hasIpv4Addon ||
-    isHighAvailability
+    !hasConnectionPooling
   )
     return false
   return connectionMethod === 'direct' || (connectionMethod === 'transaction' && !useSharedPooler)

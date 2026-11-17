@@ -21,7 +21,7 @@ describe('resolveOrmConnectionScenario', () => {
     const scenario = resolveOrmConnectionScenario({
       connectionStringPooler: makePooler(),
       deploymentMode: cli,
-      isHighAvailability: false,
+      hasConnectionPooling: true,
     })
     expect(scenario).toBe('cli')
   })
@@ -30,25 +30,34 @@ describe('resolveOrmConnectionScenario', () => {
     const scenario = resolveOrmConnectionScenario({
       connectionStringPooler: makePooler(),
       deploymentMode: selfHosted,
-      isHighAvailability: false,
+      hasConnectionPooling: true,
     })
     expect(scenario).toBe('self-hosted')
   })
 
-  test('resolves high-availability for HA projects on platform', () => {
+  test('resolves no-pooler for HA projects on platform', () => {
     const scenario = resolveOrmConnectionScenario({
       connectionStringPooler: makePooler(),
       deploymentMode: platform,
-      isHighAvailability: true,
+      hasConnectionPooling: false,
     })
-    expect(scenario).toBe('high-availability')
+    expect(scenario).toBe('no-pooler')
   })
 
-  test('cli wins over the HA flag', () => {
+  test('resolves no-pooler for Multigres Lite projects on platform', () => {
+    const scenario = resolveOrmConnectionScenario({
+      connectionStringPooler: makePooler(),
+      deploymentMode: platform,
+      hasConnectionPooling: false,
+    })
+    expect(scenario).toBe('no-pooler')
+  })
+
+  test('cli wins over the no-pooling flag', () => {
     const scenario = resolveOrmConnectionScenario({
       connectionStringPooler: makePooler(),
       deploymentMode: cli,
-      isHighAvailability: true,
+      hasConnectionPooling: false,
     })
     expect(scenario).toBe('cli')
   })
@@ -61,7 +70,7 @@ describe('resolveOrmConnectionScenario', () => {
         ipv4SupportedForDedicatedPooler: true,
       }),
       deploymentMode: platform,
-      isHighAvailability: false,
+      hasConnectionPooling: true,
     })
     expect(scenario).toBe('dedicated-pooler')
   })
@@ -74,7 +83,7 @@ describe('resolveOrmConnectionScenario', () => {
         ipv4SupportedForDedicatedPooler: false,
       }),
       deploymentMode: platform,
-      isHighAvailability: false,
+      hasConnectionPooling: true,
     })
     expect(scenario).toBe('shared-pooler-with-dedicated-alternative')
   })
@@ -83,7 +92,7 @@ describe('resolveOrmConnectionScenario', () => {
     const scenario = resolveOrmConnectionScenario({
       connectionStringPooler: makePooler(),
       deploymentMode: platform,
-      isHighAvailability: false,
+      hasConnectionPooling: true,
     })
     expect(scenario).toBe('shared-pooler')
   })

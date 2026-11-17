@@ -7,7 +7,7 @@ import type {
 } from '@/components/interfaces/ConnectSheet/Connect.types'
 import { appendConnectionStringParams } from '@/components/interfaces/ConnectSheet/ConnectionString.utils'
 import { resolveOrmConnectionScenario } from '@/components/interfaces/ConnectSheet/OrmConnection.utils'
-import { useIsHighAvailability } from '@/hooks/misc/useSelectedProject'
+import { useIsHighAvailability, useProjectCapabilities } from '@/hooks/misc/useSelectedProject'
 
 const withPgbouncerParam = (uri: string | undefined) =>
   appendConnectionStringParams(uri ?? '', 'pgbouncer=true')
@@ -15,16 +15,16 @@ const withPgbouncerParam = (uri: string | undefined) =>
 function getEnvCode({
   connectionStringPooler,
   deploymentMode,
-  isHighAvailability,
+  hasConnectionPooling,
 }: {
   connectionStringPooler: ConnectionStringPooler
   deploymentMode: DeploymentMode
-  isHighAvailability: boolean
+  hasConnectionPooling: boolean
 }): string {
   const scenario = resolveOrmConnectionScenario({
     connectionStringPooler,
     deploymentMode,
-    isHighAvailability,
+    hasConnectionPooling,
   })
 
   switch (scenario) {
@@ -44,9 +44,9 @@ DATABASE_URL="${withPgbouncerParam(connectionStringPooler.transactionShared)}"
 # Connect to Postgres via the self-hosted session-mode pooler (used for migrations)
 DIRECT_URL="${connectionStringPooler.sessionShared}"
 `
-    case 'high-availability':
+    case 'no-pooler':
       return `
-# Multigres does not support connection pooling — connect to Postgres directly
+# Multigres and Multigres Lite do not support connection pooling — connect to Postgres directly
 DATABASE_URL="${connectionStringPooler.direct}"
 
 # Used for migrations
@@ -85,7 +85,12 @@ DIRECT_URL="${connectionStringPooler.sessionShared}"
 
 const ContentFile = ({ connectionStringPooler, deploymentMode }: StepContentProps) => {
   const isHighAvailability = useIsHighAvailability()
-  const envCode = getEnvCode({ connectionStringPooler, deploymentMode, isHighAvailability })
+  const capabilities = useProjectCapabilities()
+  // Fall back to the pre-capabilities `isHighAvailability` check (rather than
+  // a fixed default) so behavior for already-correct HA projects doesn't
+  // regress while the backend capabilities field is still rolling out.
+  const hasConnectionPooling = capabilities?.hasConnectionPooling ?? !isHighAvailability
+  const envCode = getEnvCode({ connectionStringPooler, deploymentMode, hasConnectionPooling })
 
   const files = [
     {

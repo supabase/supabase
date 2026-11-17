@@ -1,14 +1,14 @@
 import { describe, expect, test } from 'vitest'
 
 import {
-  appendHighAvailabilitySslParams,
+  appendDirectTlsNegotiationParams,
   buildConnectionStringPooler,
+  DIRECT_TLS_NEGOTIATION_SSL_PARAMS,
   getConnectionStrings,
   getHighAvailabilityLoadBalancerConnectionInfo,
   getSelfHostedDirectStrings,
   getSelfHostedPoolerStrings,
   HIGH_AVAILABILITY_LOAD_BALANCER_PORT,
-  HIGH_AVAILABILITY_SSL_PARAMS,
 } from '../DatabaseSettings.utils'
 import type { DeploymentMode } from '@/hooks/misc/useDeploymentMode'
 
@@ -99,7 +99,8 @@ describe('buildConnectionStringPooler', () => {
       connectionStringsShared: sharedPlatform,
       connectionStringsDedicated: dedicatedPlatform,
       ipv4Addon: true,
-      isHighAvailability: false,
+      hasConnectionPooling: true,
+      requiresDirectTlsNegotiation: false,
     })
 
     expect(result.transactionShared).toBe(sharedPlatform.pooler.uri)
@@ -116,7 +117,8 @@ describe('buildConnectionStringPooler', () => {
       connectionInfo,
       connectionStringsShared: sharedPlatform,
       ipv4Addon: false,
-      isHighAvailability: false,
+      hasConnectionPooling: true,
+      requiresDirectTlsNegotiation: false,
     })
     expect(result.ipv4SupportedForDedicatedPooler).toBe(false)
     expect(result.transactionDedicated).toBeUndefined()
@@ -130,7 +132,8 @@ describe('buildConnectionStringPooler', () => {
       connectionInfo,
       connectionStringsShared: sharedPlatform,
       ipv4Addon: false,
-      isHighAvailability: false,
+      hasConnectionPooling: true,
+      requiresDirectTlsNegotiation: false,
     })
 
     expect(result.direct).toBe(directUri)
@@ -147,7 +150,8 @@ describe('buildConnectionStringPooler', () => {
       connectionInfo: { db_host: 'supabase.example.com', db_port: 5432 },
       connectionStringsShared: sharedPlatform,
       ipv4Addon: true,
-      isHighAvailability: false,
+      hasConnectionPooling: true,
+      requiresDirectTlsNegotiation: false,
     })
 
     expect(result.transactionShared).toBe(
@@ -171,21 +175,23 @@ describe('buildConnectionStringPooler', () => {
       connectionInfo: { db_host: 'supabase.example.com', db_port: 0 },
       connectionStringsShared: sharedPlatform,
       ipv4Addon: false,
-      isHighAvailability: false,
+      hasConnectionPooling: true,
+      requiresDirectTlsNegotiation: false,
     })
     expect(result.sessionShared).toContain(':5432/postgres')
     expect(result.direct).toContain(':5432/postgres')
   })
 
-  test('platform high availability: collapses every slot to the direct URI with SSL params', () => {
-    const directUri = `${sharedPlatform.direct.uri}?${HIGH_AVAILABILITY_SSL_PARAMS}`
+  test('platform, no connection pooling (Multigres/Multigres Lite): collapses every slot to the direct URI with SSL params', () => {
+    const directUri = `${sharedPlatform.direct.uri}?${DIRECT_TLS_NEGOTIATION_SSL_PARAMS}`
     const result = buildConnectionStringPooler({
       deploymentMode: platform,
       connectionInfo,
       connectionStringsShared: sharedPlatform,
       connectionStringsDedicated: dedicatedPlatform,
       ipv4Addon: true,
-      isHighAvailability: true,
+      hasConnectionPooling: false,
+      requiresDirectTlsNegotiation: true,
     })
 
     expect(result.direct).toBe(directUri)
@@ -197,28 +203,53 @@ describe('buildConnectionStringPooler', () => {
     expect(result.sessionDedicated).toBeUndefined()
     expect(result.ipv4SupportedForDedicatedPooler).toBe(false)
   })
+
+  test('regression: Multigres Lite (high_availability=false) still gets direct-only, direct-TLS connection strings', () => {
+    // Multigres Lite is never HA (`high_availability: false`), but its
+    // capabilities carry the same `hasConnectionPooling: false` /
+    // `requiresDirectTlsNegotiation: true` as full Multigres — this is what
+    // used to be missed when the old `isHighAvailability` boolean was the
+    // only signal available, which would have shown Lite projects a
+    // nonexistent pooler and a connection string missing sslnegotiation.
+    const directUri = `${sharedPlatform.direct.uri}?${DIRECT_TLS_NEGOTIATION_SSL_PARAMS}`
+    const result = buildConnectionStringPooler({
+      deploymentMode: platform,
+      connectionInfo,
+      connectionStringsShared: sharedPlatform,
+      connectionStringsDedicated: dedicatedPlatform,
+      ipv4Addon: true,
+      hasConnectionPooling: false,
+      requiresDirectTlsNegotiation: true,
+    })
+
+    expect(result.direct).toBe(directUri)
+    expect(result.transactionShared).toBe(directUri)
+    expect(result.sessionShared).toBe(directUri)
+    expect(result.transactionDedicated).toBeUndefined()
+    expect(result.sessionDedicated).toBeUndefined()
+  })
 })
 
-describe('appendHighAvailabilitySslParams', () => {
+describe('appendDirectTlsNegotiationParams', () => {
   test('appends with ? when the URI has no query string', () => {
-    expect(appendHighAvailabilitySslParams('postgresql://u:p@host:5432/db')).toBe(
-      `postgresql://u:p@host:5432/db?${HIGH_AVAILABILITY_SSL_PARAMS}`
+    expect(appendDirectTlsNegotiationParams('postgresql://u:p@host:5432/db')).toBe(
+      `postgresql://u:p@host:5432/db?${DIRECT_TLS_NEGOTIATION_SSL_PARAMS}`
     )
   })
 
   test('appends with & when the URI already has a query string', () => {
-    expect(appendHighAvailabilitySslParams('postgresql://u:p@host:5432/db?options=x')).toBe(
-      `postgresql://u:p@host:5432/db?options=x&${HIGH_AVAILABILITY_SSL_PARAMS}`
+    expect(appendDirectTlsNegotiationParams('postgresql://u:p@host:5432/db?options=x')).toBe(
+      `postgresql://u:p@host:5432/db?options=x&${DIRECT_TLS_NEGOTIATION_SSL_PARAMS}`
     )
   })
 
   test('does not double-append when sslnegotiation is already present', () => {
-    const uri = `postgresql://u:p@host:5432/db?${HIGH_AVAILABILITY_SSL_PARAMS}`
-    expect(appendHighAvailabilitySslParams(uri)).toBe(uri)
+    const uri = `postgresql://u:p@host:5432/db?${DIRECT_TLS_NEGOTIATION_SSL_PARAMS}`
+    expect(appendDirectTlsNegotiationParams(uri)).toBe(uri)
   })
 
   test('leaves an empty string untouched', () => {
-    expect(appendHighAvailabilitySslParams('')).toBe('')
+    expect(appendDirectTlsNegotiationParams('')).toBe('')
   })
 })
 
@@ -255,11 +286,12 @@ describe('getHighAvailabilityLoadBalancerConnectionInfo', () => {
         metadata: { projectRef: 'proj' },
       }),
       ipv4Addon: false,
-      isHighAvailability: true,
+      hasConnectionPooling: false,
+      requiresDirectTlsNegotiation: true,
     })
 
     expect(result.direct).toBe(
-      `postgresql://postgres:[YOUR-PASSWORD]@db.proj.supabase.co:5433/postgres?${HIGH_AVAILABILITY_SSL_PARAMS}`
+      `postgresql://postgres:[YOUR-PASSWORD]@db.proj.supabase.co:5433/postgres?${DIRECT_TLS_NEGOTIATION_SSL_PARAMS}`
     )
   })
 })

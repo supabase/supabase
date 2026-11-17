@@ -20,6 +20,7 @@ import { Markdown } from '@/components/interfaces/Markdown'
 import { DocsButton } from '@/components/ui/DocsButton'
 import { useSupavisorConfigurationQuery } from '@/data/database/supavisor-configuration-query'
 import { useHighAvailability } from '@/hooks/misc/useHighAvailability'
+import { useProjectCapabilities } from '@/hooks/misc/useSelectedProject'
 import { DOCS_URL } from '@/lib/constants'
 import { useDatabaseSelectorStateSnapshot } from '@/state/database-selector'
 import { useDatabaseSettingsStateSnapshot } from '@/state/database-settings'
@@ -29,10 +30,15 @@ export const PoolingModesModal = () => {
   const snap = useDatabaseSettingsStateSnapshot()
   const state = useDatabaseSelectorStateSnapshot()
   const { isHighAvailability, isPending: isHighAvailabilityPending } = useHighAvailability()
+  const capabilities = useProjectCapabilities()
+  // Fall back to the pre-capabilities `isHighAvailability` check (rather than
+  // a fixed default) so behavior for already-correct HA projects doesn't
+  // regress while the backend capabilities field is still rolling out.
+  const hasConnectionPooling = capabilities?.hasConnectionPooling ?? !isHighAvailability
 
   const { data } = useSupavisorConfigurationQuery(
     { projectRef: projectRef },
-    { enabled: !isHighAvailability && !isHighAvailabilityPending }
+    { enabled: hasConnectionPooling && !isHighAvailabilityPending }
   )
   const primaryConfig = data?.find((x) => x.identifier === state.selectedDatabaseId)
 
@@ -41,7 +47,7 @@ export const PoolingModesModal = () => {
     if (el) el.scrollIntoView({ behavior: 'smooth', block: 'center' })
   }
 
-  if (isHighAvailability) return null
+  if (!hasConnectionPooling) return null
 
   return (
     <Dialog open={snap.showPoolingModeHelper} onOpenChange={snap.setShowPoolingModeHelper}>

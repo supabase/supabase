@@ -36,7 +36,11 @@ import { useCheckEntitlements } from '@/hooks/misc/useCheckEntitlements'
 import { useDeploymentMode } from '@/hooks/misc/useDeploymentMode'
 import { useIsDataApiEnabled } from '@/hooks/misc/useIsDataApiEnabled'
 import { useIsFeatureEnabled } from '@/hooks/misc/useIsFeatureEnabled'
-import { useIsAwsCloudProvider, useIsHighAvailability } from '@/hooks/misc/useSelectedProject'
+import {
+  useIsAwsCloudProvider,
+  useIsHighAvailability,
+  useProjectCapabilities,
+} from '@/hooks/misc/useSelectedProject'
 import { DOCS_URL } from '@/lib/constants'
 import { pluckObjectFields } from '@/lib/helpers'
 
@@ -52,17 +56,24 @@ interface ConnectStepsSectionProps {
 function useConnectionStringPooler(deploymentMode: DeploymentMode): ConnectionStringPooler {
   const { ref: projectRef } = useParams()
   const { hasAccess: allowPgBouncerSelection } = useCheckEntitlements('dedicated_pooler')
+  const capabilities = useProjectCapabilities()
+  // Fall back to the pre-capabilities `isHighAvailability` check (rather than
+  // a fixed default) so behavior for already-correct HA/Multigres projects
+  // doesn't regress while the backend capabilities field is still rolling out.
   const isHighAvailability = useIsHighAvailability()
+  const hasConnectionPooling = capabilities?.hasConnectionPooling ?? !isHighAvailability
+  const requiresDirectTlsNegotiation =
+    capabilities?.requiresDirectTlsNegotiation ?? isHighAvailability
 
   const { data: settings } = useProjectSettingsV2Query({ projectRef })
-  // Multigres has no pooler, so the pooler config endpoints don't apply
+  // Multigres and Multigres Lite have no pooler, so the pooler config endpoints don't apply
   const { data: pgbouncerConfig } = usePgbouncerConfigQuery(
     { projectRef },
-    { enabled: !isHighAvailability }
+    { enabled: hasConnectionPooling }
   )
   const { data: supavisorConfig } = useSupavisorConfigurationQuery(
     { projectRef },
-    { enabled: !isHighAvailability }
+    { enabled: hasConnectionPooling }
   )
   const { data: addons } = useProjectAddonsQuery({ projectRef })
   const { ipv4: ipv4Addon } = getAddons(addons?.selected_addons ?? [])
@@ -123,7 +134,8 @@ function useConnectionStringPooler(deploymentMode: DeploymentMode): ConnectionSt
         connectionStringsShared,
         connectionStringsDedicated,
         ipv4Addon: !!ipv4Addon,
-        isHighAvailability,
+        hasConnectionPooling,
+        requiresDirectTlsNegotiation,
       }),
     [
       deploymentMode,
@@ -131,7 +143,8 @@ function useConnectionStringPooler(deploymentMode: DeploymentMode): ConnectionSt
       connectionStringsShared,
       connectionStringsDedicated,
       ipv4Addon,
-      isHighAvailability,
+      hasConnectionPooling,
+      requiresDirectTlsNegotiation,
     ]
   )
 }
@@ -213,6 +226,11 @@ export function ConnectStepsSection({ steps, state, projectKeys }: ConnectStepsS
   const stepsContainerRef = useRef<HTMLDivElement | null>(null)
   const deploymentMode = useDeploymentMode()
   const isHighAvailability = useIsHighAvailability()
+  const capabilities = useProjectCapabilities()
+  // Fall back to the pre-capabilities `isHighAvailability` check (rather than
+  // a fixed default) so behavior for already-correct HA projects doesn't
+  // regress while the backend capabilities field is still rolling out.
+  const hasConnectionPooling = capabilities?.hasConnectionPooling ?? !isHighAvailability
   const connectionStringPooler = useConnectionStringPooler(deploymentMode)
 
   const { projectAddonsDedicatedIpv4Address } = useIsFeatureEnabled([
@@ -236,7 +254,7 @@ export function ConnectStepsSection({ steps, state, projectKeys }: ConnectStepsS
     connectionMethod: state.connectionMethod,
     useSharedPooler: state.useSharedPooler,
     hasIpv4Addon: !!ipv4Addon,
-    isHighAvailability,
+    hasConnectionPooling,
   })
   const showSessionPoolerNotice = shouldShowSessionPoolerNotice({
     isPlatform: deploymentMode.isPlatform,

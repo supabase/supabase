@@ -6,7 +6,7 @@ import type {
 export type OrmConnectionScenario =
   | 'cli'
   | 'self-hosted'
-  | 'high-availability'
+  | 'no-pooler'
   | 'dedicated-pooler'
   | 'shared-pooler-with-dedicated-alternative'
   | 'shared-pooler'
@@ -19,15 +19,15 @@ export type OrmConnectionScenario =
 export const resolveOrmConnectionScenario = ({
   connectionStringPooler,
   deploymentMode,
-  isHighAvailability,
+  hasConnectionPooling,
 }: {
   connectionStringPooler: ConnectionStringPooler
   deploymentMode: DeploymentMode
-  isHighAvailability: boolean
+  hasConnectionPooling: boolean
 }): OrmConnectionScenario => {
   if (deploymentMode.isCli) return 'cli'
   if (deploymentMode.isSelfHosted) return 'self-hosted'
-  if (isHighAvailability) return 'high-availability'
+  if (!hasConnectionPooling) return 'no-pooler'
 
   if (connectionStringPooler.transactionDedicated) {
     return connectionStringPooler.ipv4SupportedForDedicatedPooler
