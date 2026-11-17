@@ -1,6 +1,8 @@
 import { describe, expect, it } from 'vitest'
 
 import {
+  getSiteUrlError,
+  getUrlCharacterError,
   normalizeRedirectUrl,
   parseRedirectUrls,
   urlRegex,
@@ -32,7 +34,19 @@ describe('Auth.constants: urlRegex', () => {
   })
 
   it('should not match invalid URLs', () => {
-    const invalidUrls = ['supabase', 'mailto:test@gmail.com', 'hello world.com', 'email@domain.com']
+    const invalidUrls = [
+      'supabase',
+      'mailto:test@gmail.com',
+      'hello world.com',
+      'email@domain.com',
+      'https://my app.example.com',
+      'https://example.com/auth callback',
+      'https://a.example.com https://b.example.com',
+      'http://localhost:3000\\',
+      'https://example.com\\callback',
+      'myapp://callback\\',
+      'not a url chrome-extension://abcdefghijklmnop',
+    ]
 
     invalidUrls.forEach((url) => {
       expect(urlRegex().test(url)).toBe(false)
@@ -45,6 +59,11 @@ describe('Auth.constants: urlRegex', () => {
     expect(urlRegex({ excludeSimpleDomains: false }).test(simpleDomainUrl)).toBe(true)
   })
 
+  it('rejects whitespace and backslashes in simple domains too', () => {
+    expect(urlRegex({ excludeSimpleDomains: false }).test('smtp.example.com\\')).toBe(false)
+    expect(urlRegex({ excludeSimpleDomains: false }).test('smtp.example .com')).toBe(false)
+  })
+
   it('normalizes redirect URLs before saving', () => {
     expect(normalizeRedirectUrl('  https://example.com/path ,   ')).toBe('https://example.com/path')
   })
@@ -55,5 +74,40 @@ describe('Auth.constants: urlRegex', () => {
         'https://example.com/callback, https://example.com/callback  ,  https://example.com/next'
       )
     ).toEqual(['https://example.com/callback', 'https://example.com/next'])
+  })
+})
+
+describe('Auth.constants: getUrlCharacterError', () => {
+  it.each([
+    ['https://example.com/*', undefined],
+    ['https://my app.example.com', "URL can't contain spaces"],
+    ['https://example.com/\tcallback', "URL can't contain spaces"],
+    ['https://example.com\\', "URL can't contain backslashes"],
+  ])('%s', (url, expected) => {
+    expect(getUrlCharacterError(url)).toBe(expected)
+  })
+})
+
+describe('Auth.constants: getSiteUrlError', () => {
+  it.each([
+    'https://example.com',
+    'https://example.com/auth/callback?next=1',
+    'http://localhost:3000',
+    'http://127.0.0.1:3000',
+    'com.example.app://callback',
+    'myapp://',
+  ])('accepts %s', (url) => {
+    expect(getSiteUrlError(url)).toBeUndefined()
+  })
+
+  it.each([
+    ['https://my app.example.com', "Site URL can't contain spaces"],
+    ['http://localhost:3000\\', "Site URL can't contain backslashes"],
+    ['https://*.example.com', "Site URL can't contain wildcards"],
+    ['https://example.com/**', "Site URL can't contain wildcards"],
+    ['example.com', 'Please provide a valid URL, such as https://example.com'],
+    ['/auth/callback', 'Please provide a valid URL, such as https://example.com'],
+  ])('rejects %s', (url, expected) => {
+    expect(getSiteUrlError(url)).toBe(expected)
   })
 })
