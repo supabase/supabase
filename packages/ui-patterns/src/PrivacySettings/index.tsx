@@ -1,8 +1,9 @@
 'use client'
 
 import { useConsentState } from 'common/consent-state'
+import { getPrivacyLinkLabel, readVisitorCountry } from 'common/visitor-country'
 import Link from 'next/link'
-import { PropsWithChildren, useState } from 'react'
+import { PropsWithChildren, useEffect, useState } from 'react'
 import {
   Button,
   Dialog,
@@ -18,6 +19,12 @@ import {
 } from 'ui'
 
 import { Admonition } from '../Admonition'
+
+export const PrivacySettingsLabel = () => {
+  const [country, setCountry] = useState<string>()
+  useEffect(() => setCountry(readVisitorCountry(document.cookie)), [])
+  return <>{getPrivacyLinkLabel(country)}</>
+}
 
 interface PrivacySettingsProps {
   className?: string

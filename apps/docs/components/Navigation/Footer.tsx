@@ -1,6 +1,6 @@
+import { linkCells, secondaryLinks } from '~/data/footer'
 import Link from 'next/link'
 import { IconDiscord, IconGitHubSolid, IconTwitterX, IconYoutubeSolid } from 'ui'
-import { linkCells, secondaryLinks } from '~/data/footer'
 
 interface FooterProps {
   className?: string
@@ -59,8 +59,11 @@ export const FooterBottomRow = () => (
           </Link>
         ) : (
           Component && (
-            <Component key={item.title} className="text-xs text-foreground-lighter hover:underline">
-              {item.title}
+            <Component
+              key={item.title}
+              className="text-left text-xs text-foreground-lighter hover:underline"
+            >
+              {item.label ?? item.title}
             </Component>
           )
         )

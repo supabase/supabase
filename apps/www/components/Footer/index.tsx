@@ -250,7 +250,7 @@ const Footer = (props: Props) => {
                                 <Link href={link.url}>{children}</Link>
                               )
                             ) : (
-                              Component && <Component>{children}</Component>
+                              Component && <Component className="text-left">{children}</Component>
                             )}
                           </li>
                         )

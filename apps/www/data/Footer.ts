@@ -4,7 +4,8 @@ import {
   skillBasedSolutions,
   useCaseSolutions,
 } from 'data/Solutions'
-import { PrivacySettings } from 'ui-patterns/PrivacySettings'
+import { createElement } from 'react'
+import { PrivacySettings, PrivacySettingsLabel } from 'ui-patterns/PrivacySettings'
 
 const footerData = [
   {
@@ -204,7 +205,7 @@ const footerData = [
         url: '/privacy',
       },
       {
-        text: 'Privacy Settings',
+        text: createElement(PrivacySettingsLabel),
         component: PrivacySettings,
       },
       {
