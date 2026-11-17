@@ -2,11 +2,43 @@ import { z } from 'zod'
 
 const sourceMapSchema = z.object({ sourcesContent: z.array(z.string().nullable()).min(1) })
 
-// Bundles from the API use `source/...`; bundles built locally use `file:///source/...`
-const FUNCTION_SOURCE_PREFIXES = ['source/', 'file:///source/']
+const URL_SCHEME_PATTERN = /^[a-z][a-z0-9+.-]*:/i
+const LOCAL_FILE_PREFIX = 'file:///'
 
-// Extracts the function's own source files from an eszip bundle. The bundle also contains every
-// remote dependency (jsr/npm/https), which we leave out since the function imports them by specifier.
+// A bundle holds the function's own files next to remote dependencies (`https:`, `jsr:`, `npm:`),
+// plus internal entries (`vfs://N`, `---...---` markers). The function's files are the ones with
+// no URL scheme, e.g. `source/index.ts` or `<function-slug>/index.ts`; local builds prefix them
+// with `file:///`.
+const toLocalPath = (specifier: string): string | undefined => {
+  if (specifier.startsWith(LOCAL_FILE_PREFIX)) return specifier.slice(LOCAL_FILE_PREFIX.length)
+  if (specifier.startsWith('---') || URL_SCHEME_PATTERN.test(specifier)) return undefined
+  return specifier
+}
+
+// Every local file sits under one top-level folder (`source/`, or the function slug depending on
+// how the bundle was made), which isn't part of the function's own layout.
+const stripSharedRootFolder = (paths: string[]): string[] => {
+  const rootFolders = new Set(paths.map((path) => (path.includes('/') ? path.split('/')[0] : '')))
+  if (rootFolders.size !== 1) return paths
+
+  const [rootFolder] = rootFolders
+  return rootFolder === '' ? paths : paths.map((path) => path.slice(rootFolder.length + 1))
+}
+
+// Picks out the function's own files from a bundle's module specifiers, with their names relative
+// to the function root. Remote dependencies are left out since the function imports them by specifier.
+export const getFunctionFileSpecifiers = (
+  specifiers: string[]
+): { specifier: string; name: string }[] => {
+  const local = specifiers.flatMap((specifier) => {
+    const path = toLocalPath(specifier)
+    return path === undefined ? [] : [{ specifier, path }]
+  })
+  const names = stripSharedRootFolder(local.map(({ path }) => path))
+
+  return local.map(({ specifier }, index) => ({ specifier, name: names[index] }))
+}
+
 function safeJsonParse(text: string): unknown {
   try {
     return JSON.parse(text)
@@ -38,13 +70,16 @@ export async function extractFunctionSourcesFromEszip(
   const specifiers: string[] = await parser.parseBytes(eszip)
   await parser.load()
 
+  const functionFiles = getFunctionFileSpecifiers(specifiers)
+  if (functionFiles.length === 0) {
+    throw new Error('No function files found in the downloaded bundle')
+  }
+
   const files: { name: string; content: string }[] = []
-  for (const specifier of specifiers) {
-    const prefix = FUNCTION_SOURCE_PREFIXES.find((p) => specifier.startsWith(p))
-    if (!prefix) continue
+  for (const { specifier, name } of functionFiles) {
     const content =
       (await getOriginalSource(parser, specifier)) ?? (await parser.getModuleSource(specifier))
-    files.push({ name: specifier.slice(prefix.length), content: content ?? '' })
+    files.push({ name, content: content ?? '' })
   }
 
   return files

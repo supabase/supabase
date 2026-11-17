@@ -14,7 +14,7 @@ type EdgeFunctionBodyVariables = {
 }
 
 export function isFunctionBodyMaxSizeError(error?: { code?: number } | null) {
-  return error?.code === 507
+  return error?.code === 500
 }
 
 async function fetchFunctionBody(
