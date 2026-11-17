@@ -104,7 +104,7 @@ static associations = {
 
 ## Syncing the local DB with Supabase
 
-The [WatermelonDB docs](https://watermelondb.dev/docs) outline how to set up a sync function that talks with the backend server. In our case, the backend is a Postgres database hosted on Supabase. As indicated earlier, we'll implement the sync via two [Postgres functions](https://supabase.com/docs/guides/database/functions) called via Supabase RPC. This way, each sync is only two database calls (one push, one pull), and most of the logic is carried out directly within the database.
+The [WatermelonDB docs](https://watermelondb.dev/docs/) outline how to set up a sync function that talks with the backend server. In our case, the backend is a Postgres database hosted on Supabase. As indicated earlier, we'll implement the sync via two [Postgres functions](https://supabase.com/docs/guides/database/functions) called via Supabase RPC. This way, each sync is only two database calls (one push, one pull), and most of the logic is carried out directly within the database.
 
 ```typescript
 import { SyncDatabaseChangeSet, synchronize } from '@nozbe/watermelondb/sync'

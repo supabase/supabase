@@ -98,7 +98,7 @@ Embedding generation via `Supabase.ai` API is available today for all Edge Funct
 
 Generating embeddings in an Edge Function doesn't cost anything extra: we still charge on CPU usage. A typical embedding generation request should run in less than a 1s, even from a cold start. Typically it won't use more than 100-200ms of CPU time.
 
-Proprietary LLMs like OpenAI and Claude provide [APIs](https://developers.openai.com/api/docs/guides/embeddings) to generate text embeddings, charging per token. For example, OpenAI's `text-embedding-3-small` cost $0.02/1M tokens at the time of writing this post.
+Proprietary LLMs like OpenAI and Claude provide [APIs](https://platform.openai.com/docs/guides/embeddings) to generate text embeddings, charging per token. For example, OpenAI's `text-embedding-3-small` cost $0.02/1M tokens at the time of writing this post.
 
 Open source text embedding models provide similar performance to OpenAI's paid models. For example, the `gte-small` model, which operates on 384 dimensions, has an average of 61.36 compared to OpenAI's `text-embedding-3-small`, which is at 62.26 on the [MTEB leaderboard](https://huggingface.co/spaces/mteb/leaderboard), and they perform search faster with [fewer dimensions](https://supabase.com/blog/fewer-dimensions-are-better-pgvector).
 

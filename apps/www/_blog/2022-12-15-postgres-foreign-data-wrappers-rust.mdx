@@ -218,7 +218,7 @@ With several more [under development](https://github.com/supabase/wrappers/tree/
 | BigQuery    | ✅                                                 | ✅                                                 | ✅                                                 | ✅                                                 |
 | ClickHouse  | ✅                                                 | ✅                                                 | ✅                                                 | ✅                                                 |
 
-Wrappers used [pgx](https://github.com/pgcentralfoundation/pgrx), extending it with FDW support. pgx is a Postgres extension framework written in Rust. Wrappers is very similar to [Steampipe](https://steampipe.io/) or [Multicorn](https://multicorn.org/). We opted to develop our own framework for several reasons:
+Wrappers used [pgx](https://github.com/tcdi/pgx), extending it with FDW support. pgx is a Postgres extension framework written in Rust. Wrappers is very similar to [Steampipe](https://steampipe.io/) or [Multicorn](https://multicorn.org/). We opted to develop our own framework for several reasons:
 
 - The current state of FDWs is in disarray. It's hard to know which FDWs are supported and functional. We think there's a benefit to colocating all FDWs in a single repository using modern tooling. This makes contributing simpler and maintenance faster.
 - Wrappers has async support, which enables the development of RESTful API-based FDWs, like Stripe.

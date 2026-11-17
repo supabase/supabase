@@ -34,7 +34,7 @@ We’ve changed the name from `@supabase/supabase-auth-helpers` to `@supabase/au
 
 We’ve moved the Auth Helpers into a monorepo so that we can publish packages individually rather than using the same package name for every framework. Each package only includes relevant dependencies - (eg, Next.js helpers don’t include SvelteKit dependencies).
 
-We use [Turborepo](https://turborepo.dev/) for managing our monorepo pipelines and have been incredibly pleased with its caching and performance. For packaging, we use [changesets](https://github.com/changesets/changesets) and GitHub Actions to create the release and publish to the npm registry. Each library lives in its own directory inside of the [**packages**](https://github.com/supabase-community/auth-helpers/tree/main/packages) directory, with accompanying example applications making use of the library inside the [**examples**](https://github.com/supabase-community/auth-helpers/tree/main/examples) directory.
+We use [Turborepo](https://turborepo.org/) for managing our monorepo pipelines and have been incredibly pleased with its caching and performance. For packaging, we use [changesets](https://github.com/changesets/changesets) and GitHub Actions to create the release and publish to the npm registry. Each library lives in its own directory inside of the [**packages**](https://github.com/supabase-community/auth-helpers/tree/main/packages) directory, with accompanying example applications making use of the library inside the [**examples**](https://github.com/supabase-community/auth-helpers/tree/main/examples) directory.
 
 ## Migration path
 
@@ -46,7 +46,7 @@ Having good documentation is great, especially when there are [examples](https:/
 
 ## Coming soon
 
-Remix Auth Helpers are in the works. You can follow the development of this on our [GitHub repo](https://github.com/supabase/auth-helpers), or subscribe to our Supabase YouTube channel as we build it live on air.
+Remix Auth Helpers are in the works. You can follow the development of this on our [GitHub repo](https://github.com/supabase-community/auth-helpers), or subscribe to our Supabase YouTube channel as we build it live on air.
 
 <div className="video-container">
   <iframe

@@ -23,7 +23,7 @@ This article assumes you are comfortable with writing a basic application in Rea
 
 We will use the following tools
 
-- [Expo](https://docs.expo.dev/get-started/create-a-project/) - we used Expo SDK version 49.0.0 (React Native version 0.72)
+- [Expo](https://docs.expo.dev/get-started/create-a-new-app/) - we used Expo SDK version 49.0.0 (React Native version 0.72)
 - Supabase - create your account [here](https://database.new/) if you do not have one
 - IDE of your choosing
 
@@ -35,7 +35,7 @@ Using [`supabase-js`](/docs/reference/javascript/introduction) is the most conve
 
 ### Install supabase-js and dependencies
 
-After you have created your [Expo project](https://docs.expo.dev/get-started/create-a-project/), you can install `supabase-js` and the required dependencies using the following command:
+After you have created your [Expo project](https://docs.expo.dev/get-started/create-a-project), you can install `supabase-js` and the required dependencies using the following command:
 
 ```bash
 npx expo install @supabase/supabase-js @react-native-async-storage/async-storage react-native-url-polyfill
@@ -70,7 +70,7 @@ You can find your URL and anon key in the [API credentials section](/dashboard/p
 
 ### Encrypting the user session
 
-If you wish to encrypt the user's session information, you can use `aes-js` and store the encryption key in [Expo SecureStore](https://docs.expo.dev/versions/latest/sdk/securestore/). The [`aes-js` library](https://github.com/ricmoo/aes-js) is a reputable JavaScript-only implementation of the AES encryption algorithm in CTR mode. A new 256-bit encryption key is generated using the `react-native-get-random-values` library. This key is stored inside Expo's SecureStore, while the value is encrypted and placed inside AsyncStorage.
+If you wish to encrypt the user's session information, you can use `aes-js` and store the encryption key in [Expo SecureStore](https://docs.expo.dev/versions/latest/sdk/securestore). The [`aes-js` library](https://github.com/ricmoo/aes-js) is a reputable JavaScript-only implementation of the AES encryption algorithm in CTR mode. A new 256-bit encryption key is generated using the `react-native-get-random-values` library. This key is stored inside Expo's SecureStore, while the value is encrypted and placed inside AsyncStorage.
 
 Please make sure that:
 
@@ -355,7 +355,7 @@ export default function Auth() {
 }
 ```
 
-For the best user experience, it is recommended to use universal links which require a more elaborate setup. You can find the detailed setup instructions in the [Expo docs](https://docs.expo.dev/linking/into-your-app/).
+For the best user experience, it is recommended to use universal links which require a more elaborate setup. You can find the detailed setup instructions in the [Expo docs](https://docs.expo.dev/guides/deep-linking/).
 
 ## Native mobile login mechanisms
 

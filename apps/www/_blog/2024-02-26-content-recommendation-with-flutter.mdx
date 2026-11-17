@@ -116,7 +116,7 @@ const films = tmdbJson.results
 
 ### Step 3: Generate embeddings
 
-We can take the movie data from the previous step and generate embedding for each of them. Here, we are calling the [Open AI Embeddings API](https://developers.openai.com/api/docs/guides/embeddings) to convert the `overview` of each movie into embeddings. `overview` contains the summary of each movie, and is a good source to create embedding representing each of the movies.
+We can take the movie data from the previous step and generate embedding for each of them. Here, we are calling the [Open AI Embeddings API](https://platform.openai.com/docs/guides/embeddings) to convert the `overview` of each movie into embeddings. `overview` contains the summary of each movie, and is a good source to create embedding representing each of the movies.
 
 ```tsx
 const response = await fetch('https://api.openai.com/v1/embeddings', {

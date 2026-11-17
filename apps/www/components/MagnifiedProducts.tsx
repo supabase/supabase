@@ -174,7 +174,7 @@ const products = {
     description: 'Integrate your favorite ML-models to store, index and search vector embeddings.',
     description_short: '',
     label: '',
-    url: '/modules/vector',
+    url: '/vector',
   },
 }
 
