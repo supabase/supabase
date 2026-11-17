@@ -85,6 +85,9 @@
         "require-in-the-middle",
         // deliberate dependency-resolution pin (#45876), never imported
         "@babel/core",
+        // provides the `tsc` binary; the typecheck script runs it through
+        // `maybe-turbo`, so knip can't see the usage
+        "@typescript/native",
       ],
     },
   },
