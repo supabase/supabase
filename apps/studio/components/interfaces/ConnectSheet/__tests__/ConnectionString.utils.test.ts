@@ -30,7 +30,7 @@ describe('parseConnectionParams', () => {
 
   test('parses a platform-shaped connection string', () => {
     const uri =
-      'postgresql://postgres.projref:[YOUR-PASSWORD]@aws-0-eu-west-1.pooler.supabase.com:6543/postgres'
+      'postgresql://postgres.projref:[YOUR-DATABASE-PASSWORD]@aws-0-eu-west-1.pooler.supabase.com:6543/postgres'
     expect(parseConnectionParams(uri)).toEqual({
       host: 'aws-0-eu-west-1.pooler.supabase.com',
       port: '6543',
@@ -42,7 +42,7 @@ describe('parseConnectionParams', () => {
 
   test('keeps the query string in search', () => {
     const uri =
-      'postgresql://postgres:[YOUR-PASSWORD]@db.proj.supabase.co:5432/postgres?sslmode=require&sslnegotiation=direct'
+      'postgresql://postgres:[YOUR-DATABASE-PASSWORD]@db.proj.supabase.co:5432/postgres?sslmode=require&sslnegotiation=direct'
     expect(parseConnectionParams(uri).search).toBe('?sslmode=require&sslnegotiation=direct')
   })
 
@@ -50,7 +50,7 @@ describe('parseConnectionParams', () => {
     // The URL parser percent-encodes the `[`/`]` in self-hosted's POOLER_TENANT_ID placeholder.
     // parseConnectionParams must decode so the displayed user matches what we wrote.
     const uri =
-      'postgresql://postgres.[POOLER_TENANT_ID]:[YOUR-PASSWORD]@supabase.example.com:6543/postgres'
+      'postgresql://postgres.[POOLER_TENANT_ID]:[YOUR-DATABASE-PASSWORD]@supabase.example.com:6543/postgres'
     expect(parseConnectionParams(uri).user).toBe('postgres.[POOLER_TENANT_ID]')
   })
 })
@@ -62,7 +62,7 @@ describe('buildSafeConnectionString', () => {
 
   test('rebuilds the URL with PASSWORD_PLACEHOLDER and the parsed params (round-trips brackets)', () => {
     const uri =
-      'postgresql://postgres.[POOLER_TENANT_ID]:[YOUR-PASSWORD]@supabase.example.com:6543/postgres'
+      'postgresql://postgres.[POOLER_TENANT_ID]:[YOUR-DATABASE-PASSWORD]@supabase.example.com:6543/postgres'
     const params = parseConnectionParams(uri)
     const safe = buildSafeConnectionString(uri, params)
     expect(safe).toBe(
@@ -71,7 +71,7 @@ describe('buildSafeConnectionString', () => {
   })
 
   test('preserves search params from the original URL', () => {
-    const uri = 'postgresql://postgres.proj:[YOUR-PASSWORD]@host:5432/postgres?sslmode=require'
+    const uri = 'postgresql://postgres.proj:[YOUR-DATABASE-PASSWORD]@host:5432/postgres?sslmode=require'
     const params = parseConnectionParams(uri)
     expect(buildSafeConnectionString(uri, params)).toContain('?sslmode=require')
   })
