@@ -10,7 +10,7 @@
 #   - Running self-hosted Supabase instance
 #   - .env file with all keys configured
 #   - jq (for JSON parsing)
-#   - node >= 16 (for minting test tokens)
+#   - node >= 16 (for HS256 token minting test only)
 #   - docker access to supabase-db (for the effective role checks, skipped without it)
 #
 # The legacy HS256 groups are kept on purpose: they cover Auth's and PostgREST's
@@ -314,8 +314,9 @@ check "JWKS does NOT contain symmetric key" "false" "$jwks_has_oct"
 echo ""
 echo "--- Internal asymmetric keys ---"
 # The gateway sends these in place of sb_ keys. Auth looks up the
-# verification key by kid only, so a key without a kid fails there even
-# though PostgREST accepts it.
+# verification key by kid, so these keys must match the current key pair in
+# JWT_KEYS. They don't when the pair is regenerated without them, or after
+# .env is edited by hand, and sb_ requests then fail. These checks name the cause.
 if [ -n "$ANON_KEY_ASYMMETRIC" ] && [ -n "$SERVICE_ROLE_KEY_ASYMMETRIC" ]; then
     for name in ANON_KEY_ASYMMETRIC SERVICE_ROLE_KEY_ASYMMETRIC; do
         eval "key=\$$name"
@@ -601,53 +602,6 @@ if [ -n "$hs256_token" ]; then
             -H "Authorization: Bearer $hs256_token")"
 else
     echo "  SKIP: Could not mint HS256 token (node required)"
-fi
-
-# ---------------------------------------------
-# ES256 tokens with and without a kid
-# ---------------------------------------------
-
-echo ""
-echo "--- ES256 tokens with and without a kid ---"
-# Auth finds the verification key by kid. An ES256 token without one must be
-# rejected, which is how the gateway's internal keys would fail if they lost
-# their kid. The token with a kid shows the signing itself is valid.
-
-# mint_es256 <with-kid|without-kid>: a service_role token signed with the
-# EC private key from JWT_KEYS
-mint_es256() {
-    JWT_KEYS="$(grep '^JWT_KEYS=' .env | cut -d= -f2-)" MODE="$1" node -e "
-const crypto = require('crypto');
-const jwk = JSON.parse(process.env.JWT_KEYS).find((k) => k.kty === 'EC' && k.d);
-const header = { alg: 'ES256', typ: 'JWT' };
-if (process.env.MODE === 'with-kid') header.kid = jwk.kid;
-const now = Math.floor(Date.now() / 1000);
-const enc = (o) => Buffer.from(JSON.stringify(o)).toString('base64url');
-const input = enc(header) + '.' + enc({ role: 'service_role', iss: 'supabase', iat: now, exp: now + 300 });
-const key = crypto.createPrivateKey({ key: jwk, format: 'jwk' });
-const sig = crypto.sign('sha256', Buffer.from(input), { key, dsaEncoding: 'ieee-p1363' });
-console.log(input + '.' + sig.toString('base64url'));
-" 2>/dev/null
-}
-
-# admin_with_token <token>: status and Auth's error_code for an admin request
-admin_with_token() {
-    out=$(curl -s -w '\n%{http_code}' "$BASE_URL/auth/v1/admin/users?per_page=1" \
-        -H "apikey: $SERVICE_ROLE_KEY" -H "Authorization: Bearer $1")
-    code=$(printf '%s\n' "$out" | tail -n 1)
-    error_code=$(printf '%s\n' "$out" | sed '$d' | jq -r '.error_code // empty' 2>/dev/null)
-    echo "$code${error_code:+ $error_code}"
-}
-
-es256_with_kid=$(mint_es256 with-kid || true)
-es256_without_kid=$(mint_es256 without-kid || true)
-if [ -n "$es256_with_kid" ] && [ -n "$es256_without_kid" ]; then
-    check "ES256 service_role token with kid -> Auth admin" "200" \
-        "$(admin_with_token "$es256_with_kid")"
-    check "ES256 service_role token without kid -> rejected by Auth" "403 bad_jwt" \
-        "$(admin_with_token "$es256_without_kid")"
-else
-    echo "  SKIP: Could not mint ES256 tokens (needs an EC signing key in JWT_KEYS)"
 fi
 
 # ---------------------------------------------
