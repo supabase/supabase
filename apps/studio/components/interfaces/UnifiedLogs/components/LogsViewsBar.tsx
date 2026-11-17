@@ -57,11 +57,31 @@ export const LogsViewsBar = ({
   const [deleteTarget, setDeleteTarget] = useState<LogsView | null>(null)
   const [renameTarget, setRenameTarget] = useState<LogsView | null>(null)
 
+  const isEmpty = !isLoading && !isError && views.length === 0
   const hasFiltersToSave = activeFilterCount >= MIN_FILTERS_TO_SAVE
   const canSaveCurrentFilters = canCreate && hasFiltersToSave
   const saveDisabledReason = !canCreate
     ? "You don't have permission to save views"
     : 'Add a filter to save a view'
+
+  const saveAction = !!onSaveCurrentView && (
+    <ButtonTooltip
+      type="button"
+      size="tiny"
+      variant="default"
+      className="shrink-0 px-1.5"
+      icon={<PlusIcon />}
+      aria-label="Save current filters as a view"
+      disabled={!canSaveCurrentFilters}
+      onClick={onSaveCurrentView}
+      tooltip={{
+        content: {
+          side: 'bottom',
+          text: canSaveCurrentFilters ? 'Save current filters as a view' : saveDisabledReason,
+        },
+      }}
+    />
+  )
 
   return (
     <>
@@ -69,11 +89,13 @@ export const LogsViewsBar = ({
         id={id}
         className="flex items-center gap-1.5 px-2 py-2 border-b overflow-x-auto hide-scrollbar"
       >
-        <div className={CHIP_CLASS}>
-          <ChipLabelButton isActive={activeViewId === null} onClick={onClearActiveView}>
-            All logs
-          </ChipLabelButton>
-        </div>
+        {!isEmpty && (
+          <div className={CHIP_CLASS}>
+            <ChipLabelButton isActive={activeViewId === null} onClick={onClearActiveView}>
+              All logs
+            </ChipLabelButton>
+          </div>
+        )}
 
         {isLoading && (
           <div className={cn(CHIP_CLASS, 'items-center px-2')}>
@@ -91,10 +113,12 @@ export const LogsViewsBar = ({
           </div>
         )}
 
-        {!isLoading && !isError && views.length === 0 && (
-          <p className="text-xs text-foreground-lighter whitespace-nowrap">
-            No saved views yet. Set some filters, then press + to save them.
-          </p>
+        {isEmpty && (
+          <div className="flex items-center gap-1.5 text-xs text-foreground-lighter whitespace-nowrap px-2">
+            <span>No saved views yet. Set some filters, then press</span>
+            {saveAction}
+            <span>to save them.</span>
+          </div>
         )}
 
         {!isLoading &&
@@ -116,24 +140,7 @@ export const LogsViewsBar = ({
             />
           ))}
 
-        {!!onSaveCurrentView && (
-          <ButtonTooltip
-            type="button"
-            size="tiny"
-            variant="default"
-            className="shrink-0 px-1.5 ml-auto"
-            icon={<PlusIcon />}
-            aria-label="Save current filters as a view"
-            disabled={!canSaveCurrentFilters}
-            onClick={onSaveCurrentView}
-            tooltip={{
-              content: {
-                side: 'bottom',
-                text: canSaveCurrentFilters ? 'Save current filters as a view' : saveDisabledReason,
-              },
-            }}
-          />
-        )}
+        {!isEmpty && <div className="ml-auto shrink-0">{saveAction}</div>}
       </div>
 
       <RenameViewDialog

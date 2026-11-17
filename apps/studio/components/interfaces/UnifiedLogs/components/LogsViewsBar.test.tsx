@@ -296,12 +296,13 @@ describe('LogsViewsBar', () => {
     expect(onSaveCurrentView).not.toHaveBeenCalled()
   })
 
-  it('shows an empty state when there are no views', () => {
-    customRender(<LogsViewsBar {...baseProps} />)
+  it('shows an empty state without the All logs chip when there are no views', () => {
+    customRender(<LogsViewsBar {...baseProps} onSaveCurrentView={vi.fn()} />)
 
-    expect(
-      screen.getByText('No saved views yet. Set some filters, then press + to save them.')
-    ).toBeInTheDocument()
+    expect(screen.getByText('No saved views yet. Set some filters, then press')).toBeInTheDocument()
+    expect(screen.getByText('to save them.')).toBeInTheDocument()
+    expect(screen.getByRole('button', { name: SAVE_LABEL })).toBeInTheDocument()
+    expect(screen.queryByRole('button', { name: 'All logs' })).toBeNull()
   })
 
   it('shows a loading state instead of the empty state', () => {
