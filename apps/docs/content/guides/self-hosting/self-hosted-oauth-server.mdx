@@ -48,9 +48,9 @@ Enable the server, build a consent page in your app, register a client, and then
        # ... existing variables ...
 
        # OAuth 2.1 server
-       GOTRUE_OAUTH_SERVER_ENABLED: ${OAUTH_SERVER_ENABLED}
+       GOTRUE_OAUTH_SERVER_ENABLED: ${OAUTH_SERVER_ENABLED:-false}
        GOTRUE_OAUTH_SERVER_AUTHORIZATION_PATH: ${OAUTH_SERVER_AUTHORIZATION_PATH}
-       # GOTRUE_OAUTH_SERVER_ALLOW_DYNAMIC_REGISTRATION: ${OAUTH_SERVER_ALLOW_DYNAMIC_REGISTRATION}
+       GOTRUE_OAUTH_SERVER_ALLOW_DYNAMIC_REGISTRATION: ${OAUTH_SERVER_ALLOW_DYNAMIC_REGISTRATION:-false}
    ```
 
 3. Recreate the Auth container:
@@ -94,7 +94,7 @@ The response includes the `client_id`, which the third-party app needs to start 
 
 For a server-side app, set `client_type` to `confidential`. The response then includes a `client_secret`. Store it securely, because Auth doesn't show it again.
 
-Clients can also register themselves at `/auth/v1/oauth/clients/register` without an API key when you set `OAUTH_SERVER_ALLOW_DYNAMIC_REGISTRATION=true`.
+Clients can also register themselves at `/auth/v1/oauth/clients/register` without an API key. To allow it, set `OAUTH_SERVER_ALLOW_DYNAMIC_REGISTRATION=true` in your `.env` file, and then recreate the Auth container with `sh run.sh recreate auth`.
 
 <Admonition type="caution">
 
@@ -178,4 +178,4 @@ Your consent page runs on an origin that Auth doesn't allow. Serve it from the s
 
 ### The token request fails with `Error generating ID token`
 
-The client requested the `openid` scope, and Auth signs tokens with a symmetric key. Add an asymmetric key to `JWT_KEYS`, as described in [Before you begin](#before-you-begin).
+The client requested the `openid` scope, and Auth signs tokens with a symmetric key. Add an asymmetric key to `JWT_KEYS`, as described in [Before you begin](#before-you-begin), and recreate the Auth container. Then start the sign-in again: the failed request already used up its authorization code, so retrying it returns `invalid_grant`.
