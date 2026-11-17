@@ -3,6 +3,7 @@ import { CircleAlertIcon, LightbulbIcon } from 'lucide-react'
 import { useMemo } from 'react'
 import { cn } from 'ui'
 
+import { useUnreadAlertIssuesCount } from '@/components/interfaces/Issues/useUnreadAlertIssuesCount'
 import { SIDEBAR_KEYS } from '@/components/layouts/ProjectLayout/LayoutSidebar/LayoutSidebarProvider'
 import { useAdvisorSignals } from '@/components/ui/AdvisorPanel/useAdvisorSignals'
 import { ButtonTooltip } from '@/components/ui/ButtonTooltip'
@@ -19,6 +20,7 @@ export const AdvisorButton = ({ projectRef }: { projectRef?: string }) => {
 
   const { data: lints } = useProjectLintsQuery({ projectRef })
   const { data: signalItems } = useAdvisorSignals({ projectRef })
+  const unreadAlertIssuesCount = useUnreadAlertIssuesCount(projectRef)
 
   const { data: notificationsData } = useNotificationsV2Query(
     { filters: {}, limit: 20 },
@@ -47,6 +49,9 @@ export const AdvisorButton = ({ projectRef }: { projectRef?: string }) => {
 
   const label = isIssuesInboxEnabled ? 'Issues' : 'Advisor Center'
   const Icon = isIssuesInboxEnabled ? CircleAlertIcon : LightbulbIcon
+  const hasUnreadAlertIssues = unreadAlertIssuesCount > 0
+  const unreadAlertIssuesLabel = `${unreadAlertIssuesCount} unread alert ${unreadAlertIssuesCount === 1 ? 'issue' : 'issues'}`
+  const accessibleLabel = hasUnreadAlertIssues ? `${label}, ${unreadAlertIssuesLabel}` : label
 
   return (
     <div className="relative">
@@ -76,9 +81,19 @@ export const AdvisorButton = ({ projectRef }: { projectRef?: string }) => {
             isOpen && 'text-background group-hover:text-background'
           )}
         />
-        <span className="sr-only">{label}</span>
+        <span className="sr-only">{accessibleLabel}</span>
       </ButtonTooltip>
-      {hasCriticalIssues ? (
+      {hasUnreadAlertIssues ? (
+        <span
+          aria-hidden
+          className={cn(
+            'pointer-events-none absolute -top-1 -right-1 flex h-4 min-w-4 items-center justify-center rounded-full px-1 text-xs font-medium leading-none text-contrast',
+            hasCriticalIssues ? 'bg-destructive' : 'bg-brand'
+          )}
+        >
+          {unreadAlertIssuesCount > 9 ? '9+' : unreadAlertIssuesCount}
+        </span>
+      ) : hasCriticalIssues ? (
         <span
           className={cn(
             'absolute top-1.5 right-1.5 w-1.5 h-1.5 rounded-full',

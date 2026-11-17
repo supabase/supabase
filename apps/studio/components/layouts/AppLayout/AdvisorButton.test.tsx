@@ -22,8 +22,10 @@ const {
   mockUseProjectLintsQuery,
   mockUseNotificationsV2Query,
   mockUseAdvisorSignals,
+  mockUseUnreadAlertIssuesCount,
   mockToggleSidebar,
 } = vi.hoisted(() => ({
+  mockUseUnreadAlertIssuesCount: vi.fn(),
   mockUseProjectLintsQuery: vi.fn(),
   mockUseNotificationsV2Query: vi.fn(),
   mockUseAdvisorSignals: vi.fn(),
@@ -42,6 +44,10 @@ vi.mock('@/components/ui/AdvisorPanel/useAdvisorSignals', () => ({
   useAdvisorSignals: mockUseAdvisorSignals,
 }))
 
+vi.mock('@/components/interfaces/Issues/useUnreadAlertIssuesCount', () => ({
+  useUnreadAlertIssuesCount: mockUseUnreadAlertIssuesCount,
+}))
+
 vi.mock('@/state/sidebar-manager-state', () => ({
   useSidebarManagerSnapshot: () => ({
     toggleSidebar: mockToggleSidebar,
@@ -51,6 +57,7 @@ vi.mock('@/state/sidebar-manager-state', () => ({
 
 describe('AdvisorButton', () => {
   beforeEach(() => {
+    mockUseUnreadAlertIssuesCount.mockReturnValue(0)
     mockUseProjectLintsQuery.mockReturnValue({ data: [], isPending: false, isError: false })
     mockUseNotificationsV2Query.mockReturnValue({
       data: { pages: [[]] },
@@ -63,6 +70,31 @@ describe('AdvisorButton', () => {
       isError: false,
       dismissSignal: vi.fn(),
     })
+  })
+
+  it('shows the number of unread alert issues', () => {
+    mockUseUnreadAlertIssuesCount.mockReturnValue(3)
+
+    const { getByText, getByRole } = render(<AdvisorButton projectRef="project-ref" />)
+
+    expect(getByText('3', { selector: '[aria-hidden]' })).toBeInTheDocument()
+    expect(getByRole('button', { name: 'Issues, 3 unread alert issues' })).toBeInTheDocument()
+    expect(mockUseUnreadAlertIssuesCount).toHaveBeenCalledWith('project-ref')
+  })
+
+  it('caps the unread alert issues count at 9+', () => {
+    mockUseUnreadAlertIssuesCount.mockReturnValue(12)
+
+    const { getByText } = render(<AdvisorButton projectRef="project-ref" />)
+
+    expect(getByText('9+', { selector: '[aria-hidden]' })).toBeInTheDocument()
+  })
+
+  it('shows no count without unread alert issues', () => {
+    const { queryByText, getByRole } = render(<AdvisorButton projectRef="project-ref" />)
+
+    expect(queryByText('0')).not.toBeInTheDocument()
+    expect(getByRole('button', { name: 'Issues' })).toBeInTheDocument()
   })
 
   it('shows a warning dot when advisor signals are present', () => {
