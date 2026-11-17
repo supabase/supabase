@@ -46,8 +46,7 @@ const nextShims: Record<string, string> = {
 //   shim (acts like resolve.alias).
 // - Otherwise, if app source imports from `next` or `next/*`, fail the
 //   build so we catch unshimmed usage at build time during the migration.
-// - node_modules imports (e.g. @sentry/nextjs reaching into next) pass
-//   through untouched.
+// - node_modules imports pass through untouched.
 function nextCompat(): Plugin {
   return {
     name: 'studio-next-compat',
@@ -129,12 +128,11 @@ function rawTextLoader(): Plugin {
 // editorWorkerService / graphql workers on the main thread ("Could not
 // create web worker(s)..." console warning). graphiql also ships
 // `setup-workers/vite`, which imports the same three workers via Vite's
-// `?worker` suffix; importing that unconditionally would break the Next
-// build, so the swap happens here instead of in app source.
+// `?worker` suffix, but those imports don't belong in the server graph, so
+// the swap happens here (client builds only) instead of in app source.
 //
 // SSR resolution is left untouched: neither variant's `getWorker` ever runs
-// during SSR, and the webpack flavor is a plain global assignment while the
-// vite flavor's `?worker` imports don't belong in the server graph.
+// during SSR, and the webpack flavor is a plain global assignment.
 function graphiqlViteWorkers(): Plugin {
   return {
     name: 'studio-graphiql-vite-workers',
@@ -498,8 +496,7 @@ export default defineConfig(({ command, mode }) => {
     'VERCEL_BRANCH_URL',
     // Sentry release (sentry.tanstack.ts): the SDK silently drops session
     // envelopes when the client has no release, so Release Health would send
-    // nothing. The commit SHA is also what withSentryConfig resolves the Next
-    // build's release to, keeping release names aligned across both builds.
+    // nothing.
     'VERCEL_GIT_COMMIT_SHA',
   ] as const
   for (const key of vercelPublicVars) {
@@ -596,28 +593,6 @@ export default defineConfig(({ command, mode }) => {
     },
     resolve: {
       tsconfigPaths: true,
-      alias: [
-        // Blocking requires TanStack's native history API. Keep the original
-        // Next hook for the rollback runtime, which has no TanStack provider.
-        {
-          find: /^@\/hooks\/ui\/usePreventNavigationOnUnsavedChanges$/,
-          replacement: path.resolve(rootDir, 'compat/usePreventNavigationOnUnsavedChanges.ts'),
-        },
-        // `@sentry/nextjs`'s client entry drags in Next runtime internals
-        // (`next/dist/shared/lib/constants`), whose module scope evaluates
-        // `process?.features?.typescript` — optional chaining doesn't guard
-        // an undeclared `process` in the browser, so every built chunk
-        // containing it (e.g. table-editor) crashes at load with
-        // "ReferenceError: process is not defined". Dev is unaffected
-        // because the dev pipeline shims `process`. Point the bare import
-        // at a shim that re-exports `@sentry/react` (same 10.x version —
-        // it's what `@sentry/nextjs` wraps on the client) plus explicit
-        // stand-ins for the Next-only APIs.
-        {
-          find: /^@sentry\/nextjs$/,
-          replacement: path.resolve(rootDir, 'compat/sentry-nextjs.ts'),
-        },
-      ],
     },
     ...(basePath && { base: basePath }),
     optimizeDeps: {
@@ -767,10 +742,8 @@ export default defineConfig(({ command, mode }) => {
       // entire exports object `{ default: fn }`, and call sites like
       // `AwesomeDebouncePromise(fn, 500)` crash with "is not a function" at
       // SSR module evaluation. Surfaces on routes that load the table grid.
-      // `@sentry/nextjs` deliberately has no entry here: the resolve.alias
-      // above rewrites it to the `@sentry/react`-backed shim before SSR
-      // resolution ever sees the id, and `@sentry/react` ships real ESM
-      // ("import" condition → build/esm), so plain externalization works.
+      // `@sentry/react` ships real ESM ("import" condition → build/esm), so
+      // plain externalization works and it needs no entry here.
       // `tslib` is inlined for the BUILD only: Nitro's dev runner has no CJS
       // interop for the `tslib.js` that its ESM wrapper default-imports, and
       // every SSR request would 500. Left external in dev, Node loads it.
