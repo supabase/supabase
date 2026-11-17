@@ -507,8 +507,9 @@ export const UnifiedLogs = ({
     isActiveViewModified &&
     !isSaveViewDialogOpen &&
     updateSuggestionKey !== dismissedUpdateKey
-  const isViewModifiedPopoverOpen = isViewModifiedUnacknowledged || isReviewingChanges
   const canReviewChanges = showSavedViews && !!activeView && isActiveViewModified
+  const isViewModifiedPopoverOpen =
+    isViewModifiedUnacknowledged || (isReviewingChanges && canReviewChanges)
 
   const handleApplyView = (view: LogsView) => {
     const { params, dropped } = applyView(view, { filterableNames })
@@ -518,6 +519,7 @@ export const UnifiedLogs = ({
     setSorting(params.sort ? [params.sort] : [])
     setSearch(params)
     setActiveViewId(view.id)
+    setIsReviewingChanges(false)
   }
 
   const handleUpdateActiveView = async () => {
@@ -529,6 +531,7 @@ export const UnifiedLogs = ({
     })
     try {
       await updateSavedView(activeView.id, { filters, viewOptions })
+      setIsReviewingChanges(false)
       toast.success('View updated')
     } catch {
       return
@@ -755,6 +758,7 @@ export const UnifiedLogs = ({
                         {!isViewsBarOpen && canReviewChanges && (
                           <button
                             type="button"
+                            tabIndex={0}
                             aria-label={`Review changes to ${activeView?.name ?? ''}`}
                             aria-expanded={isViewModifiedPopoverOpen}
                             onClick={() => setIsReviewingChanges(true)}
