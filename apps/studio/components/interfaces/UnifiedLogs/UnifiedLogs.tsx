@@ -14,7 +14,7 @@ import {
 } from '@tanstack/react-table'
 import { IS_PLATFORM, LOCAL_STORAGE_KEYS, useFeatureFlags, useFlag, useParams } from 'common'
 import { Layers2Icon, Loader2Icon, PanelLeftCloseIcon, PanelLeftOpenIcon } from 'lucide-react'
-import { AnimatePresence, motion } from 'motion/react'
+import { AnimatePresence, motion, useReducedMotion } from 'motion/react'
 import { useQueryStates } from 'nuqs'
 import { useEffect, useEffectEvent, useMemo, useRef, useState } from 'react'
 import { toast } from 'sonner'
@@ -120,6 +120,8 @@ export const CHART_CONFIG = {
 const PipelineLevelOption = (option: Option) => <span className="text-xs">{option.label}</span>
 
 const VIEWS_BAR_ID = 'logs-views-bar'
+
+const VIEWS_BAR_SPRING = { type: 'spring', stiffness: 420, damping: 30, mass: 0.4 } as const
 
 interface UnifiedLogsProps {
   scope?: UnifiedLogsScope
@@ -627,6 +629,7 @@ export const UnifiedLogs = ({
   ])
 
   const isMobile = useIsMobile()
+  const reduceMotion = useReducedMotion()
   const [isFilterBarOpen, setIsFilterBarOpen] = useState(!isMobile)
 
   useShortcut(SHORTCUT_IDS.DATA_TABLE_TOGGLE_FILTERS, () => setIsFilterBarOpen((prev) => !prev), {
@@ -785,7 +788,7 @@ export const UnifiedLogs = ({
                       initial={{ opacity: 0, height: 0 }}
                       animate={{ opacity: 1, height: 'auto' }}
                       exit={{ opacity: 0, height: 0 }}
-                      transition={{ type: 'spring', stiffness: 420, damping: 30, mass: 0.4 }}
+                      transition={reduceMotion ? { duration: 0 } : VIEWS_BAR_SPRING}
                       className="overflow-hidden shrink-0"
                     >
                       <LogsViewsBar
