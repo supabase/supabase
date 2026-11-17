@@ -1,5 +1,10 @@
 import { spawn, ChildProcess } from 'child_process';
 import path from 'path';
+import { fileURLToPath } from 'url';
+
+// ESM-compatible __dirname equivalent
+const __filename = fileURLToPath(import.meta.url);
+const __dirname = path.dirname(__filename);
 
 // Resolve the path to the Next.js binary within the project.
 const nextBinary = path.resolve(__dirname, '../../node_modules/.bin/next');
@@ -62,7 +67,7 @@ nextProcess.on('exit', () => {
 // TanStack server entry (restored).
 // This placeholder satisfies the expected export for TanStack server integrations.
 // Replace with the actual implementation as needed.
-export const handler = async (event: any) => {
+export const handler = async () => {
   return {
     statusCode: 200,
     body: 'TanStack server entry placeholder',
