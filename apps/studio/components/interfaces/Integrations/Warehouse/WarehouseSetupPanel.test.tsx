@@ -8,14 +8,16 @@ import { useForm } from 'react-hook-form'
 import { Form } from 'ui'
 import { describe, expect, test, vi } from 'vitest'
 
+import { createMockWarehouseSetupStatusResponse } from './Warehouse.fixtures'
+import type { WarehouseSetupStatus } from './Warehouse.utils'
 import { WarehouseSetupPanel } from './WarehouseSetupPanel'
 import type { DestinationPanelSchemaType } from '@/components/interfaces/Database/Replication/DestinationPanel/DestinationForm/DestinationForm.schema'
 import { DuckLakeFields } from '@/components/interfaces/Database/Replication/DestinationPanel/DestinationForm/DuckLake/Fields'
 import type { ProjectDetail } from '@/data/projects/project-detail-query'
+import type { V2WarehouseSetupStatusResponse } from '@/data/warehouse/warehouse-setup-api-types'
 import { customRender } from '@/tests/lib/custom-render'
-import { addAPIMock, type APIErrorBody } from '@/tests/lib/msw'
+import { addAPIMock, type APIErrorBody, type V2APIErrorBody } from '@/tests/lib/msw'
 
-type SetupStatus = components['schemas']['WarehouseSetupStatusResponse_Output']
 type Destinations = components['schemas']['DestinationsResponse_Output']
 
 mockAnimationsApi()
@@ -80,19 +82,16 @@ function mockProject(isOrioleDb: boolean) {
 }
 
 function mockWarehouse(
-  status: SetupStatus['setup_status'] = 'not_started',
+  status: WarehouseSetupStatus = 'not_started',
   destinations: Destinations['destinations'] = []
 ) {
   addAPIMock({
     method: 'get',
-    path: '/platform/warehouse/:ref/setup-status',
+    path: '/v2/projects/:ref/warehouse/setups/current',
     response: () =>
-      HttpResponse.json<SetupStatus>({
-        setup_status: status,
-        steps: [],
-        tables: [],
-        fdw_status: null,
-      }),
+      HttpResponse.json<V2WarehouseSetupStatusResponse>(
+        createMockWarehouseSetupStatusResponse({ setup_status: status, fdw_status: null })
+      ),
   })
   addAPIMock({
     method: 'get',
@@ -230,5 +229,33 @@ describe('OrioleDB catalog restrictions', () => {
     expect(customOption).not.toBeDisabled()
     await userEvent.click(customOption)
     expect(screen.getByLabelText('Catalog URL')).toBeInTheDocument()
+  })
+})
+
+describe('Warehouse status errors', () => {
+  test('explains that Warehouse is unavailable locally when the replication API is not configured', async () => {
+    mockProject(false)
+    // The local-development notice reads the HTTP status and the message, which v2 returns as the
+    // `description`.
+    addAPIMock({
+      method: 'get',
+      path: '/v2/projects/:ref/warehouse/setups/current',
+      response: () =>
+        HttpResponse.json<V2APIErrorBody>(
+          {
+            error: {
+              code: 'warehouse_setup_unavailable',
+              message: 'Warehouse setup is unavailable',
+              description: 'The replication API URL is not configured.',
+            },
+          },
+          { status: 503 }
+        ),
+    })
+
+    customRender(<WarehouseSetupPanel />)
+
+    expect(await screen.findByText('Warehouse is unavailable locally')).toBeInTheDocument()
+    expect(screen.queryByText('Failed to load Warehouse status')).not.toBeInTheDocument()
   })
 })

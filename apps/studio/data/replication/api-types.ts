@@ -57,8 +57,6 @@ export type ReplicationCompatiblePaths = {
   [Path in keyof ApiPaths]: Path extends
     | `/platform/replication/${string}/pipelines${string}`
     | `/platform/replication/${string}/destinations-pipelines${string}`
-    | `/platform/warehouse/${string}/setup`
-    | `/platform/warehouse/${string}/setup-status`
     ? { [Method in keyof ApiPaths[Path]]: WireOperation<ApiPaths[Path][Method]> }
     : Path extends
           | '/platform/replication/{ref}/destinations'

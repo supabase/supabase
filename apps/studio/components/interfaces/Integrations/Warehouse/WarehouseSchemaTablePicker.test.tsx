@@ -5,19 +5,25 @@ import { mockAnimationsApi } from 'jsdom-testing-mocks'
 import { HttpResponse } from 'msw'
 import { describe, expect, test } from 'vitest'
 
+import { createMockWarehouseSetupResponse } from './Warehouse.fixtures'
 import { WarehouseSchemaTablePicker } from './WarehouseSchemaTablePicker'
 import type { SchemasData } from '@/data/database/schemas-query'
 import type { ProjectDetail } from '@/data/projects/project-detail-query'
 import type { TablesData } from '@/data/tables/tables-query'
-import { useWarehouseSetupMutation } from '@/data/warehouse/warehouse-setup-mutation'
+import type {
+  V2WarehouseSetupAcceptedResponse,
+  V2WarehouseSetupRequest,
+} from '@/data/warehouse/warehouse-setup-api-types'
+import {
+  useWarehouseSetupMutation,
+  type WarehouseSetupBody,
+} from '@/data/warehouse/warehouse-setup-mutation'
 import { customRender } from '@/tests/lib/custom-render'
-import { addAPIMock } from '@/tests/lib/msw'
+import { addAPIMock, type V2APIErrorBody } from '@/tests/lib/msw'
 
 type PublicationDetailsResponse = components['schemas']['PublicationDetailsResponse_Output']
 type ReplicationSourcesResponse = components['schemas']['SourcesResponse_Output']
 type RunQueryBody = components['schemas']['RunQueryBody']
-type WarehouseSetupBody = components['schemas']['WarehouseSetupBody']
-type WarehouseSetupResponse = components['schemas']['WarehouseSetupResponse_Output']
 
 mockAnimationsApi()
 
@@ -133,25 +139,33 @@ const mockPickerQueries = ({
   }
 }
 
+// Wired like `WarehouseSetupPanel`: the failure renders inline in the picker instead of as a toast.
 const WarehousePickerHarness = ({ isEditing = false }: { isEditing?: boolean }) => {
-  const setupMutation = useWarehouseSetupMutation()
+  const setupMutation = useWarehouseSetupMutation({ onError: () => {} })
   return (
     <WarehouseSchemaTablePicker
       isEditing={isEditing}
       isSubmitting={setupMutation.isPending}
+      error={setupMutation.error}
       onSubmit={(targets) => setupMutation.mutate({ projectRef: 'default', body: { targets } })}
     />
   )
 }
 
+// Captures the selection the picker sent. The v2 envelope around it is covered by the mutation's
+// own tests.
 const mockSetupMutation = () => {
   const requests: WarehouseSetupBody[] = []
   addAPIMock({
     method: 'post',
-    path: '/platform/warehouse/:ref/setup',
+    path: '/v2/projects/:ref/warehouse/setups',
     response: async ({ request }) => {
-      requests.push((await request.json()) as WarehouseSetupBody)
-      return HttpResponse.json<WarehouseSetupResponse>({ pipeline_id: '1', tables: [] })
+      const body = (await request.json()) as V2WarehouseSetupRequest
+      requests.push(body.data.attributes)
+      return HttpResponse.json<V2WarehouseSetupAcceptedResponse>(
+        createMockWarehouseSetupResponse(),
+        { status: 202 }
+      )
     },
   })
   return requests
@@ -177,6 +191,40 @@ describe('WarehouseSchemaTablePicker', () => {
     await waitFor(() =>
       expect(requests).toEqual([{ targets: [{ type: 'schema', schema: 'public' }] }])
     )
+  })
+
+  test('shows the reason the API gives for refusing the setup', async () => {
+    mockPickerQueries({ isEditing: false })
+    addAPIMock({
+      method: 'post',
+      path: '/v2/projects/:ref/warehouse/setups',
+      response: () =>
+        HttpResponse.json<V2APIErrorBody>(
+          {
+            error: {
+              code: 'warehouse_setup_invalid',
+              message: 'Warehouse setup configuration is invalid',
+              description: 'Project must be active and healthy.',
+            },
+          },
+          { status: 400 }
+        ),
+    })
+
+    customRender(<WarehousePickerHarness />)
+
+    fireEvent.click(await screen.findByRole('combobox', { name: 'Select tables to replicate' }))
+    await userEvent.click(screen.getAllByText('Select all')[1])
+    await userEvent.click(screen.getByRole('button', { name: 'Enable Warehouse' }))
+
+    expect(await screen.findByText('Failed to enable Warehouse')).toBeInTheDocument()
+    expect(
+      screen.getByText('Project must be active and healthy.', { exact: false })
+    ).toBeInTheDocument()
+    // The fixed title alone doesn't say what to fix, and a body the client can't read falls back
+    // to a generic message.
+    expect(screen.queryByText(/configuration is invalid/)).not.toBeInTheDocument()
+    expect(screen.queryByText(/API error happened/)).not.toBeInTheDocument()
   })
 
   test('keeps failed tables selected for retry and allows changing them', async () => {

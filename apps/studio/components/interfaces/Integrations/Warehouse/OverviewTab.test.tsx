@@ -8,18 +8,26 @@ import { HttpResponse } from 'msw'
 import { beforeEach, describe, expect, test, vi } from 'vitest'
 
 import { WarehouseOverviewTab } from './OverviewTab'
+import {
+  createMockWarehouseSetupResponse,
+  createMockWarehouseSetupStatusResponse,
+  type WarehouseSetupStatusOverrides,
+} from './Warehouse.fixtures'
+import type { WarehouseSetupStatus } from './Warehouse.utils'
 import type { SchemasData } from '@/data/database/schemas-query'
 import type { ProjectDetail } from '@/data/projects/project-detail-query'
 import type { TablesData } from '@/data/tables/tables-query'
+import type {
+  V2WarehouseSetupAcceptedResponse,
+  V2WarehouseSetupStatusResponse,
+} from '@/data/warehouse/warehouse-setup-api-types'
 import { customRender } from '@/tests/lib/custom-render'
-import { addAPIMock, type APIErrorBody } from '@/tests/lib/msw'
+import { addAPIMock, type APIErrorBody, type V2APIErrorBody } from '@/tests/lib/msw'
 
 type PublicationDetailsResponse = components['schemas']['PublicationDetailsResponse_Output']
 type ReplicationSourcesResponse = components['schemas']['SourcesResponse_Output']
 type RunQueryBody = components['schemas']['RunQueryBody']
-type WarehouseSetupStatusResponse = components['schemas']['WarehouseSetupStatusResponse_Output']
 type WarehouseDeleteResponse = components['schemas']['WarehouseDeleteResponse_Output']
-type WarehouseSetupResponse = components['schemas']['WarehouseSetupResponse_Output']
 
 const mockTrack = vi.fn()
 vi.mock('@/lib/telemetry/track', () => ({ useTrack: () => mockTrack }))
@@ -56,26 +64,23 @@ vi.mock('./WarehouseSchemaTablePicker', () => ({
 mockAnimationsApi()
 dayjs.extend(duration)
 
-const FDW_STATUS: WarehouseSetupStatusResponse['fdw_status'] = {
-  extension_available: true,
-  extension_installed: true,
-  foreign_schema_imported: true,
-  schema_created: true,
-  server_configured: true,
-  wrapper_installed: true,
-}
-
-const mockSetupStatus = (status: Partial<WarehouseSetupStatusResponse>) =>
+const mockSetupStatus = (status: WarehouseSetupStatusOverrides) =>
   addAPIMock({
     method: 'get',
-    path: '/platform/warehouse/:ref/setup-status',
+    path: '/v2/projects/:ref/warehouse/setups/current',
     response: () =>
-      HttpResponse.json<WarehouseSetupStatusResponse>({
-        fdw_status: FDW_STATUS,
-        setup_status: 'not_started',
-        steps: [],
-        tables: [],
-        ...status,
+      HttpResponse.json<V2WarehouseSetupStatusResponse>(
+        createMockWarehouseSetupStatusResponse(status)
+      ),
+  })
+
+const mockSetupAccepted = () =>
+  addAPIMock({
+    method: 'post',
+    path: '/v2/projects/:ref/warehouse/setups',
+    response: () =>
+      HttpResponse.json<V2WarehouseSetupAcceptedResponse>(createMockWarehouseSetupResponse(), {
+        status: 202,
       }),
   })
 
@@ -252,9 +257,18 @@ describe('WarehouseOverviewTab', () => {
     })
     addAPIMock({
       method: 'post',
-      path: '/platform/warehouse/:ref/setup',
+      path: '/v2/projects/:ref/warehouse/setups',
       response: () =>
-        HttpResponse.json<APIErrorBody>({ message: 'Retry could not be started' }, { status: 500 }),
+        HttpResponse.json<V2APIErrorBody>(
+          {
+            error: {
+              code: 'warehouse_setup_unavailable',
+              message: 'Warehouse setup is unavailable',
+              description: 'Retry could not be started',
+            },
+          },
+          { status: 503 }
+        ),
     })
 
     customRender(<WarehouseOverviewTab />)
@@ -314,11 +328,7 @@ describe('WarehouseOverviewTab', () => {
 
   test('tracks initial setup as enablement', async () => {
     mockSetupStatus({ setup_status: 'not_started' })
-    addAPIMock({
-      method: 'post',
-      path: '/platform/warehouse/:ref/setup',
-      response: () => HttpResponse.json<WarehouseSetupResponse>({ pipeline_id: '1', tables: [] }),
-    })
+    mockSetupAccepted()
 
     customRender(<WarehouseOverviewTab />)
 
@@ -335,11 +345,7 @@ describe('WarehouseOverviewTab', () => {
   test('does not track an edited table selection as enablement', async () => {
     mockSetupStatus({ setup_status: 'complete' })
     mockReplicatedTableQueries()
-    addAPIMock({
-      method: 'post',
-      path: '/platform/warehouse/:ref/setup',
-      response: () => HttpResponse.json<WarehouseSetupResponse>({ pipeline_id: '1', tables: [] }),
-    })
+    mockSetupAccepted()
 
     customRender(<WarehouseOverviewTab />)
 
@@ -392,17 +398,14 @@ describe('WarehouseOverviewTab', () => {
   })
 
   test('shows disable progress and polls until Warehouse can be enabled again', async () => {
-    let status: WarehouseSetupStatusResponse['setup_status'] = 'disabling'
+    let status: WarehouseSetupStatus = 'disabling'
     addAPIMock({
       method: 'get',
-      path: '/platform/warehouse/:ref/setup-status',
+      path: '/v2/projects/:ref/warehouse/setups/current',
       response: () =>
-        HttpResponse.json<WarehouseSetupStatusResponse>({
-          setup_status: status,
-          fdw_status: null,
-          tables: [],
-          steps: [],
-        }),
+        HttpResponse.json<V2WarehouseSetupStatusResponse>(
+          createMockWarehouseSetupStatusResponse({ setup_status: status, fdw_status: null })
+        ),
     })
     vi.useFakeTimers({ shouldAdvanceTime: true })
     try {
@@ -541,8 +544,18 @@ describe('WarehouseOverviewTab', () => {
   test('shows a status query failure without blocking an unrelated route', async () => {
     addAPIMock({
       method: 'get',
-      path: '/platform/warehouse/:ref/setup-status',
-      response: () => HttpResponse.json<APIErrorBody>({ message: 'Boom' }, { status: 500 }),
+      path: '/v2/projects/:ref/warehouse/setups/current',
+      response: () =>
+        HttpResponse.json<V2APIErrorBody>(
+          {
+            error: {
+              code: 'warehouse_setup_unavailable',
+              message: 'Warehouse setup is unavailable',
+              description: 'Boom',
+            },
+          },
+          { status: 503 }
+        ),
     })
     customRender(<WarehouseOverviewTab />)
 
