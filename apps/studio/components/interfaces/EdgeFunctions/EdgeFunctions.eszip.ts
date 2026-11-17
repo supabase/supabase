@@ -5,12 +5,31 @@ const sourceMapSchema = z.object({ sourcesContent: z.array(z.string().nullable()
 const URL_SCHEME_PATTERN = /^[a-z][a-z0-9+.-]*:/i
 const LOCAL_FILE_PREFIX = 'file:///'
 
+// `file:///` specifiers are URLs, so spaces, non-ASCII characters and `%` arrive percent-encoded
+// (`my%20file.ts`). Decode each segment so the entry name matches what relative imports reference.
+// Decoding per segment keeps the `/` separators, and an encoded slash stays encoded rather than
+// turning into a new directory.
+const decodeUrlPath = (path: string): string =>
+  path
+    .split('/')
+    .map((segment) => {
+      try {
+        const decoded = decodeURIComponent(segment)
+        return decoded.includes('/') ? segment : decoded
+      } catch {
+        return segment
+      }
+    })
+    .join('/')
+
 // A bundle holds the function's own files next to remote dependencies (`https:`, `jsr:`, `npm:`),
 // plus internal entries (`vfs://N`, `---...---` markers). The function's files are the ones with
 // no URL scheme, e.g. `source/index.ts` or `<function-slug>/index.ts`; local builds prefix them
 // with `file:///`.
 const toLocalPath = (specifier: string): string | undefined => {
-  if (specifier.startsWith(LOCAL_FILE_PREFIX)) return specifier.slice(LOCAL_FILE_PREFIX.length)
+  if (specifier.startsWith(LOCAL_FILE_PREFIX)) {
+    return decodeUrlPath(specifier.slice(LOCAL_FILE_PREFIX.length))
+  }
   if (specifier.startsWith('---') || URL_SCHEME_PATTERN.test(specifier)) return undefined
   return specifier
 }

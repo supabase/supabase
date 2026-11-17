@@ -196,7 +196,6 @@ const CodePage = () => {
             </Admonition>
           ) : (
             <AlertError
-              hideContactSupport
               className="max-w-xl"
               subject="Failed to load function code"
               description={

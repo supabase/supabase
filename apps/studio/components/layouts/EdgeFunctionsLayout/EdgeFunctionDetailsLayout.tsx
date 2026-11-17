@@ -174,6 +174,8 @@ const EdgeFunctionDetailsLayout = ({
     document.body.appendChild(link)
     link.click()
     link.parentNode?.removeChild(link)
+    // Deferred so the browser has started the download before the URL is released
+    setTimeout(() => URL.revokeObjectURL(blobURL), 0)
   }
 
   useEffect(() => {

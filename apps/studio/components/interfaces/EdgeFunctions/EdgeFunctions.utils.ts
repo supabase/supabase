@@ -358,14 +358,21 @@ export const getFunctionZipEntries = ({
   // The deepest `../` reach decides how many `src` levels are needed to keep files in place
   const maxDepth = Math.max(0, ...relativeNames.map(countParentDirs))
 
+  // The generated `src` folders must not share a name with a real top-level folder, otherwise
+  // e.g. `hello/index.ts` and `hello/../src/index.ts` would both end up at `src/index.ts`
+  const takenNames = new Set(relativeNames.map((segments) => segments[countParentDirs(segments)]))
+  const baseDirNames = Array.from({ length: maxDepth }, (_, i) => {
+    let name = i === 0 ? 'src' : `src${i}`
+    while (takenNames.has(name)) name += '_'
+    return name
+  })
+
   return files.map(({ content }, index) => {
     const segments = relativeNames[index]
     const parentDirCount = countParentDirs(segments)
     const remainingSegments = segments.slice(parentDirCount)
     const depthFromBase = maxDepth - parentDirCount
-    const baseDirs = Array.from({ length: Math.max(depthFromBase, 0) }, (_, i) =>
-      i === 0 ? 'src' : `src${i}`
-    )
+    const baseDirs = baseDirNames.slice(0, Math.max(depthFromBase, 0))
 
     return { path: [...baseDirs, ...remainingSegments].join('/'), content }
   })

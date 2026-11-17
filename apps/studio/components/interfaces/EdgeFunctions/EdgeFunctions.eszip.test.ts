@@ -74,6 +74,16 @@ describe('getFunctionFileSpecifiers', () => {
     ])
   })
 
+  it('decodes percent-encoded `file:///` paths without touching separators', () => {
+    const specifiers = [
+      'file:///source/index.ts',
+      'file:///source/my%20file.ts',
+      'file:///source/caf%C3%A9/100%25.ts',
+      'file:///source/bad%ZZname.ts',
+    ]
+    expect(names(specifiers)).toEqual(['index.ts', 'my file.ts', 'café/100%.ts', 'bad%ZZname.ts'])
+  })
+
   it('keeps names as-is when files do not share a root folder', () => {
     expect(names(['index.ts', 'utils/greet.ts'])).toEqual(['index.ts', 'utils/greet.ts'])
   })

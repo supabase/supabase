@@ -216,6 +216,17 @@ describe('getFunctionZipEntries', () => {
     expect(paths(entries)).toEqual(['src/index.ts', 'shared/db.ts'])
   })
 
+  it('never maps two multipart files to the same ZIP path when a real `src` folder exists', () => {
+    const files = [
+      { name: 'source/hello/index.ts', content: 'a' },
+      { name: 'source/hello/../src/index.ts', content: 'b' },
+    ]
+    const entries = getFunctionZipEntries({ files, slug: 'hello', source: 'multipart' })
+
+    expect(new Set(paths(entries)).size).toBe(2)
+    expect(paths(entries)).toEqual(['src_/index.ts', 'src/index.ts'])
+  })
+
   it('keeps eszip file paths exactly as-is, even when a folder shares the slug name', () => {
     const files = [
       { name: 'index.ts', content: 'a' },
