@@ -95,7 +95,7 @@ let supabase = SupabaseClient(
 
 ## Using RLS policies
 
-Once you've configured the [Supabase client](/docs/reference/javascript/introduction) library to use Clerk session tokens, you can use RLS policies to secure access to your project's database, Storage objects and Realtime channels.
+Once you've configured the Supabase client library to use Clerk session tokens, you can use RLS policies to secure access to your project's database, Storage objects and Realtime channels.
 
 The recommended way to design RLS policies with Clerk is to use claims present in your Clerk session token to allow or reject access to your project's data. Check [Clerk's docs](https://clerk.com/docs/backend-requests/resources/session-tokens) on the available JWT claims and their values.
 
