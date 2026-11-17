@@ -54,6 +54,18 @@
       // Local-run fallback credentials.
       "passThroughEnv": ["GH_TOKEN", "GITHUB_TOKEN"],
     },
+    // Fetches reference-beta definitions from library repos into content/reference-beta/.
+    // Not cached for the same reason as build:federated-content.
+    "build:federated-reference": {
+      "cache": false,
+      "env": [
+        "DOCS_GITHUB_APP_ID",
+        "DOCS_GITHUB_APP_INSTALLATION_ID",
+        "DOCS_GITHUB_APP_PRIVATE_KEY",
+      ],
+      // Local-run fallback credentials.
+      "passThroughEnv": ["GH_TOKEN", "GITHUB_TOKEN"],
+    },
     "build:guides-markdown": {
       "dependsOn": ["build:federated-content"],
       "inputs": [
@@ -89,9 +101,26 @@
       ],
       "outputs": ["public/markdown/reference/**"],
     },
+    "build:reference-beta-markdown": {
+      "dependsOn": ["build:federated-reference"],
+      "inputs": ["$TURBO_DEFAULT$", { "mode": "jit", "globs": ["content/reference-beta/**"] }],
+      "env": [
+        "CI",
+        "NODE_ENV",
+        "NEXT_PUBLIC_BASE_PATH",
+        "NEXT_PUBLIC_VERCEL_ENV",
+        "VERCEL_ENV",
+        "VERCEL_URL",
+      ],
+      "outputs": ["public/markdown/reference-beta/**"],
+    },
     // No script: generates the guide and reference markdown under public/markdown/.
     "build:markdown": {
-      "dependsOn": ["build:guides-markdown", "build:reference-markdown"],
+      "dependsOn": [
+        "build:guides-markdown",
+        "build:reference-markdown",
+        "build:reference-beta-markdown",
+      ],
     },
     "build:gz-archive": {
       "dependsOn": ["build:markdown"],
@@ -157,6 +186,7 @@
         "codegen:graphql",
         "codegen:examples",
         "codegen:references",
+        "build:federated-reference",
         "build:markdown",
         "build:gz-archive",
         "build:sitemap",
@@ -216,7 +246,12 @@
         "$TURBO_DEFAULT$",
         {
           "mode": "jit",
-          "globs": ["content/guides/**", "features/docs/generated/**", "spec/reference/**"],
+          "globs": [
+            "content/guides/**",
+            "content/reference-beta/**",
+            "features/docs/generated/**",
+            "spec/reference/**",
+          ],
         },
       ],
       "outputs": [".next/**", "!.next/cache/**"],
