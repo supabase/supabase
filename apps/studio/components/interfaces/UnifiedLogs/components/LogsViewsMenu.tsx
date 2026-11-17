@@ -1,7 +1,7 @@
 import {
   AlertCircleIcon,
-  BookmarkIcon,
   EditIcon,
+  Layers2Icon,
   LayersIcon,
   Loader2Icon,
   Trash2Icon,
@@ -204,7 +204,7 @@ export const LogsViewsMenu = ({
             variant={isViewActive ? 'primary' : 'default'}
             className="w-[26px]"
             icon={
-              <BookmarkIcon
+              <Layers2Icon
                 className={isViewActive ? 'text-primary-solid-foreground' : 'text-foreground'}
               />
             }
@@ -228,7 +228,7 @@ export const LogsViewsMenu = ({
             {!isLoading && !isError && views.length === 0 && (
               <div className="py-2">
                 <EmptyStatePresentational
-                  icon={BookmarkIcon}
+                  icon={Layers2Icon}
                   iconSize={20}
                   title="No saved views"
                   description="Save a collection of filters as a view."
