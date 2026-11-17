@@ -13,7 +13,8 @@ import {
   useReactTable,
 } from '@tanstack/react-table'
 import { IS_PLATFORM, LOCAL_STORAGE_KEYS, useFeatureFlags, useFlag, useParams } from 'common'
-import { Loader2Icon, PanelLeftCloseIcon, PanelLeftOpenIcon } from 'lucide-react'
+import { Layers2Icon, Loader2Icon, PanelLeftCloseIcon, PanelLeftOpenIcon } from 'lucide-react'
+import { AnimatePresence, motion } from 'motion/react'
 import { useQueryStates } from 'nuqs'
 import { useEffect, useEffectEvent, useMemo, useRef, useState } from 'react'
 import { toast } from 'sonner'
@@ -35,7 +36,7 @@ import { getLogAttributeSources } from './components/LogsFilterBar.utils'
 import { LogsListPanel } from './components/LogsListPanel'
 import { LogsTable } from './components/LogsTable'
 import { getFilterCombinationKey, truncateViewName } from './components/LogsViews.utils'
-import { LogsViewsMenu } from './components/LogsViewsMenu'
+import { LogsViewsBar } from './components/LogsViewsBar'
 import { SaveViewDialog } from './components/SaveViewDialog'
 import { TooltipLabel } from './components/TooltipLabel'
 import { ViewSuggestionBanner } from './components/ViewSuggestionBanner'
@@ -76,6 +77,7 @@ import {
 } from './UnifiedLogs.views'
 import { LOGS_SAVED_VIEWS_FLAG, useLogsViews } from './useLogsViews'
 import { AlertError } from '@/components/ui/AlertError'
+import { ButtonTooltip } from '@/components/ui/ButtonTooltip'
 import { LEVELS } from '@/components/ui/DataTable/DataTable.constants'
 import { Option } from '@/components/ui/DataTable/DataTable.types'
 import { arrSome, inDateRange } from '@/components/ui/DataTable/DataTable.utils'
@@ -116,6 +118,8 @@ export const CHART_CONFIG = {
 } satisfies ChartConfig
 
 const PipelineLevelOption = (option: Option) => <span className="text-xs">{option.label}</span>
+
+const VIEWS_BAR_ID = 'logs-views-bar'
 
 interface UnifiedLogsProps {
   scope?: UnifiedLogsScope
@@ -202,6 +206,13 @@ export const UnifiedLogs = ({
   const [sorting, setSorting] = useState<SortingState>(defaultColumnSorting)
   const [columnFilters, setColumnFilters] = useState<ColumnFiltersState>(defaultColumnFilters)
   const [localFilterOrigin, setLocalFilterOrigin] = useState<string | null>(null)
+
+  const [isViewsBarOpen, setIsViewsBarOpen] = useLocalStorageQuery<boolean>(
+    columnPreferencesKey
+      ? `${LOCAL_STORAGE_KEYS.UNIFIED_LOGS_VIEWS_BAR}-${columnPreferencesKey}`
+      : LOCAL_STORAGE_KEYS.UNIFIED_LOGS_VIEWS_BAR,
+    true
+  )
 
   const [dock, setDock] = useLocalStorageQuery<'bottom' | 'right'>(
     columnPreferencesKey
@@ -708,23 +719,22 @@ export const UnifiedLogs = ({
                       shortcutId={SHORTCUT_IDS.UNIFIED_LOGS_REFRESH}
                     />
                     {showSavedViews && (
-                      <LogsViewsMenu
-                        key={projectRef}
-                        views={savedViews}
-                        isLoading={isLoadingSavedViews}
-                        isError={isErrorSavedViews}
-                        activeViewId={activeView?.id ?? null}
-                        isPending={isSavingView}
-                        canUpdate={canUpdateView}
-                        canDelete={canDeleteView}
-                        canCreate={canCreateView}
-                        activeFilterCount={activeFilterCount}
-                        onRetry={retrySavedViews}
-                        onApply={handleApplyView}
-                        onRename={(id, name) => updateSavedView(id, { name })}
-                        onDelete={deleteSavedView}
-                        onClearActiveView={handleClearActiveView}
-                        onSaveCurrentView={handleSaveCurrentView}
+                      <ButtonTooltip
+                        size="tiny"
+                        variant={isViewsBarOpen ? 'primary' : 'default'}
+                        className="w-[26px]"
+                        icon={
+                          <Layers2Icon
+                            className={
+                              isViewsBarOpen ? 'text-primary-solid-foreground' : 'text-foreground'
+                            }
+                          />
+                        }
+                        aria-label="Saved views"
+                        aria-expanded={isViewsBarOpen}
+                        aria-controls={VIEWS_BAR_ID}
+                        onClick={() => setIsViewsBarOpen(!isViewsBarOpen)}
+                        tooltip={{ content: { side: 'bottom', text: 'Saved views' } }}
                       />
                     )}
                     <DataTableViewOptions />
@@ -737,6 +747,39 @@ export const UnifiedLogs = ({
                     ) : null}
                   </div>
                 </div>
+
+                <AnimatePresence initial={false}>
+                  {showSavedViews && isViewsBarOpen && (
+                    <motion.div
+                      key="logs-views-bar"
+                      initial={{ opacity: 0, height: 0 }}
+                      animate={{ opacity: 1, height: 'auto' }}
+                      exit={{ opacity: 0, height: 0 }}
+                      transition={{ type: 'spring', stiffness: 420, damping: 30, mass: 0.4 }}
+                      className="overflow-hidden shrink-0"
+                    >
+                      <LogsViewsBar
+                        key={projectRef}
+                        id={VIEWS_BAR_ID}
+                        views={savedViews}
+                        isLoading={isLoadingSavedViews}
+                        isError={isErrorSavedViews}
+                        activeViewId={activeView?.id ?? null}
+                        activeFilterCount={activeFilterCount}
+                        canCreate={canCreateView}
+                        canUpdate={canUpdateView}
+                        canDelete={canDeleteView}
+                        isPending={isSavingView}
+                        onApply={handleApplyView}
+                        onClearActiveView={handleClearActiveView}
+                        onRename={(viewId, name) => updateSavedView(viewId, { name })}
+                        onDelete={deleteSavedView}
+                        onSaveCurrentView={handleSaveCurrentView}
+                        onRetry={retrySavedViews}
+                      />
+                    </motion.div>
+                  )}
+                </AnimatePresence>
 
                 <ViewSuggestionBanner
                   visible={showUpdateViewSuggestion}
