@@ -4,7 +4,7 @@ import { Button, cn } from 'ui'
 import { ConfirmationModal } from 'ui-patterns/Dialogs/ConfirmationModal'
 
 import { type LogsView } from '../UnifiedLogs.views'
-import { CHIP_CLASS, ChipLabelButton, LogsViewChip } from './LogsViewChip'
+import { CHIP_CLASS, LogsViewChip } from './LogsViewChip'
 import { MIN_FILTERS_TO_SAVE } from './LogsViews.utils'
 import { RenameViewDialog } from './RenameViewDialog'
 import { ButtonTooltip } from '@/components/ui/ButtonTooltip'
@@ -68,7 +68,7 @@ export const LogsViewsBar = ({
     <ButtonTooltip
       type="button"
       size="tiny"
-      variant="default"
+      variant="text"
       className="shrink-0 px-1.5"
       icon={<PlusIcon />}
       aria-label="Save current filters as a view"
@@ -89,14 +89,6 @@ export const LogsViewsBar = ({
         id={id}
         className="flex items-center gap-1.5 px-2 py-2 border-b overflow-x-auto hide-scrollbar"
       >
-        {!isEmpty && (
-          <div className={CHIP_CLASS}>
-            <ChipLabelButton isActive={activeViewId === null} onClick={onClearActiveView}>
-              All logs
-            </ChipLabelButton>
-          </div>
-        )}
-
         {isLoading && (
           <div className={cn(CHIP_CLASS, 'items-center px-2')}>
             <Loader2Icon size={12} className="animate-spin text-foreground-lighter" />
@@ -140,7 +132,21 @@ export const LogsViewsBar = ({
             />
           ))}
 
-        {!isEmpty && <div className="ml-auto shrink-0">{saveAction}</div>}
+        {!isEmpty && (
+          <>
+            {saveAction}
+            {activeViewId !== null && (
+              <Button
+                size="tiny"
+                variant="text"
+                className="shrink-0 ml-auto text-foreground-lighter hover:text-foreground"
+                onClick={onClearActiveView}
+              >
+                Clear view
+              </Button>
+            )}
+          </>
+        )}
       </div>
 
       <RenameViewDialog

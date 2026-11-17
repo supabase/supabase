@@ -52,7 +52,7 @@ describe('LogsViewsBar', () => {
     expect(onApply).toHaveBeenCalledWith(view)
   })
 
-  it('clears the active view from the All logs chip', async () => {
+  it('clears the active view from the Clear button', async () => {
     const onClearActiveView = vi.fn()
     const view = makeView()
     customRender(
@@ -64,7 +64,7 @@ describe('LogsViewsBar', () => {
       />
     )
 
-    await userEvent.click(screen.getByRole('button', { name: 'All logs' }))
+    await userEvent.click(screen.getByRole('button', { name: 'Clear view' }))
 
     expect(onClearActiveView).toHaveBeenCalledOnce()
   })
@@ -77,17 +77,15 @@ describe('LogsViewsBar', () => {
       'aria-current',
       'true'
     )
-    expect(screen.getByRole('button', { name: 'All logs' })).not.toHaveAttribute('aria-current')
   })
 
-  it('marks All logs as current when no view is active', () => {
+  it('marks no chip as current when no view is active', () => {
     customRender(<LogsViewsBar {...baseProps} views={[makeView()]} activeViewId={null} />)
 
-    expect(screen.getByRole('button', { name: 'All logs' })).toHaveAttribute('aria-current', 'true')
     expect(screen.getByRole('button', { name: 'Errors only' })).not.toHaveAttribute('aria-current')
   })
 
-  it('renders an actions button on every view chip, active or not, but not on All logs', () => {
+  it('renders an actions button on every view chip, active or not', () => {
     const view = makeView()
     customRender(
       <LogsViewsBar
@@ -99,7 +97,18 @@ describe('LogsViewsBar', () => {
 
     expect(screen.getByRole('button', { name: 'Actions for Errors only' })).toBeInTheDocument()
     expect(screen.getByRole('button', { name: 'Actions for Slow requests' })).toBeInTheDocument()
-    expect(screen.queryByRole('button', { name: 'Actions for All logs' })).toBeNull()
+  })
+
+  it('only shows Clear view when a view is active', () => {
+    const view = makeView()
+    const { unmount } = customRender(<LogsViewsBar {...baseProps} views={[view]} />)
+
+    expect(screen.queryByRole('button', { name: 'Clear view' })).toBeNull()
+    unmount()
+
+    customRender(<LogsViewsBar {...baseProps} views={[view]} activeViewId={view.id} />)
+
+    expect(screen.getByRole('button', { name: 'Clear view' })).toBeInTheDocument()
   })
 
   it('renames a view from the chip menu dialog', async () => {
@@ -296,20 +305,19 @@ describe('LogsViewsBar', () => {
     expect(onSaveCurrentView).not.toHaveBeenCalled()
   })
 
-  it('shows an empty state without the All logs chip when there are no views', () => {
+  it('shows an empty state without the trailing actions when there are no views', () => {
     customRender(<LogsViewsBar {...baseProps} onSaveCurrentView={vi.fn()} />)
 
     expect(screen.getByText('No saved views yet. Set some filters, then press')).toBeInTheDocument()
     expect(screen.getByText('to save them.')).toBeInTheDocument()
     expect(screen.getByRole('button', { name: SAVE_LABEL })).toBeInTheDocument()
-    expect(screen.queryByRole('button', { name: 'All logs' })).toBeNull()
+    expect(screen.queryByRole('button', { name: 'Clear view' })).toBeNull()
   })
 
   it('shows a loading state instead of the empty state', () => {
     customRender(<LogsViewsBar {...baseProps} isLoading />)
 
     expect(screen.queryByText(/No saved views yet/)).toBeNull()
-    expect(screen.getByRole('button', { name: 'All logs' })).toBeInTheDocument()
   })
 
   it('shows an error state and retries', async () => {
