@@ -9,6 +9,7 @@ describe('describeSearchQuery', () => {
     ['service_role key', 2],
     ['  edge-functions  ', 1],
     ['how do i login', 4],
+    [`${'a'.repeat(16)} ${'b'.repeat(16)} ${'c'.repeat(6)}`, 3],
   ])('sends the text of the keyword-shaped term %j', (rawQuery, queryWordCount) => {
     const query = rawQuery.trim()
 
@@ -23,12 +24,14 @@ describe('describeSearchQuery', () => {
   it.each([
     ['a signed token', `eyJ${'a'.repeat(30)}.eyJ${'b'.repeat(30)}.${'c'.repeat(30)}`],
     ['a secret key', `sb_secret_${'a'.repeat(22)}_${'b'.repeat(8)}`],
+    ['a letters-only secret under the length limit', `sb_secret_${'a'.repeat(20)}`],
+    ['a project ref', 'abcdefghijklmnopqrst'],
     ['a connection string', 'postgresql://postgres:hunter2@db.example.com:5432/postgres'],
     ['an email address', 'person@example.com'],
     ['a user id', '3f2504e0-4f89-41d3-9a0c-0305e82c3301'],
     ['a phone number', '+15555550100'],
     ['a term with digits', 'error 42501'],
-    ['a letters-only term over the length limit', 'a'.repeat(41)],
+    ['letters-only parts that add up to over the length limit', 'abcdefghijklmn '.repeat(3).trim()],
   ])('leaves out the text of %s', (_label, rawQuery) => {
     const description = describeSearchQuery(rawQuery)
 

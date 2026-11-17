@@ -1369,8 +1369,10 @@ export interface SearchQueryProperties {
   /** Number of whitespace-separated words in the trimmed search term. */
   queryWordCount: number
   /**
-   * `keyword`: up to 4 letters-only words, 40 characters at most. `conversational`: 4 or more
-   * words that are not a keyword. `other`: anything else, such as an identifier or a pasted value.
+   * `keyword`: up to 4 letters-only parts of at most 16 letters each, joined by single spaces,
+   * hyphens or underscores, 40 characters at most. `conversational`: 4 or more words that are
+   * not a keyword, such as a question or pasted text. `other`: anything else, such as an
+   * identifier.
    */
   queryType: 'keyword' | 'conversational' | 'other'
 }
@@ -3383,7 +3385,8 @@ export interface CommandMenuCommandClickedEvent {
      */
     command_section?: string
     /**
-     * The search query that was active when the command was clicked
+     * The search query that was active when the command was clicked, present only when it is
+     * a keyword (see `SearchQueryProperties`)
      */
     search_query?: string
     /**

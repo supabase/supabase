@@ -1,5 +1,6 @@
 'use client'
 
+import { describeSearchQuery } from 'common/search-query-telemetry'
 import { forwardRef, type PropsWithChildren } from 'react'
 import { cn, CommandItem } from 'ui'
 
@@ -72,7 +73,7 @@ const CommandMenuItem = forwardRef<
           command_value: command.value,
           command_type: isActionCommand(command) ? ('action' as const) : ('route' as const),
           command_section: section,
-          search_query: query || undefined,
+          search_query: describeSearchQuery(query).query,
           result_path: isRouteCommand(command) ? command.route : undefined,
           app: telemetryContext.app,
         },
