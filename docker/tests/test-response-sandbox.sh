@@ -1,7 +1,7 @@
 #!/bin/sh
 #
 # Response sandboxing: the API gateway adds a sandbox Content-Security-Policy
-# to Storage, REST and Functions (GET only) responses, since Studio shares the
+# to Storage, REST and Functions responses, since Studio shares the
 # gateway's origin. Content types are kept. Creates a temporary
 # public bucket, function and database function, checks the response headers,
 # and removes them.
@@ -159,8 +159,7 @@ expect_sandboxed "GET SVG" "image/svg+xml"
 check "GET JSON" "200" "$(fetch GET "$fn_url?type=application/json" -H "Authorization: Bearer $ANON_KEY")"
 expect_sandboxed "GET JSON" "application/json"
 check "POST HTML" "200" "$(fetch POST "$fn_url?type=text/html" -H "Authorization: Bearer $ANON_KEY" -d x)"
-check "POST HTML: Content-Type is kept" "text/html" "$(media_type)"
-check "POST HTML: no CSP (not GET)" "" "$(header content-security-policy)"
+expect_sandboxed "POST HTML" "text/html"
 
 # --- REST ------------------------------------------------------------------
 

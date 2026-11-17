@@ -213,10 +213,6 @@ services:
         config:
           header_filter:
             - &sandbox_response |
-              -- Functions may return HTML pages to other methods
-              if kong.request.get_path():sub(1, 14) == "/functions/v1/" and kong.request.get_method() ~= "GET" then
-                return
-              end
               kong.response.set_header(
                 "Content-Security-Policy",
                 "default-src 'none'; media-src 'self'; style-src 'unsafe-inline'; sandbox"

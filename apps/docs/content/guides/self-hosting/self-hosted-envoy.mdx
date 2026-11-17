@@ -257,7 +257,7 @@ The gateway listens on plain HTTP only and does not terminate TLS. For public de
 
 ### Sandboxed responses
 
-Studio is served from the same origin as the APIs. The gateway adds this header to responses on `/storage/v1/`, `/rest/v1/`, and `GET` requests to `/functions/v1/`:
+Studio is served from the same origin as the APIs. The gateway adds this header to responses on `/storage/v1/`, `/rest/v1/`, and `/functions/v1/`:
 
 ```
 Content-Security-Policy: default-src 'none'; media-src 'self'; style-src 'unsafe-inline'; sandbox

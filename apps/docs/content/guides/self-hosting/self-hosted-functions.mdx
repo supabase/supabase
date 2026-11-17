@@ -299,7 +299,7 @@ A missing function, one that fails to start, or an unhandled error in your funct
 
 ### Scripts in HTML from a function don't run
 
-The API gateway adds a sandbox `Content-Security-Policy` to responses to `GET` requests, because Studio shares the gateway's origin. A page returned by a function still displays, but its scripts don't run, its forms can't be submitted, and it can't load images or stylesheets. Other request methods aren't affected. See [Sandboxed responses](/docs/guides/self-hosting/self-hosted-envoy#sandboxed-responses).
+The API gateway adds a sandbox `Content-Security-Policy` to function responses, because Studio shares the gateway's origin. A page returned by a function still displays, but its scripts don't run, its forms can't be submitted, and it can't load images or stylesheets. See [Sandboxed responses](/docs/guides/self-hosting/self-hosted-envoy#sandboxed-responses).
 
 ### Changes to function code not reflected after editing
 
