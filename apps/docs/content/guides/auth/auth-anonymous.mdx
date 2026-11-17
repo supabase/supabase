@@ -4,13 +4,7 @@ title: 'Anonymous sign-ins'
 subtitle: 'Create and use anonymous users to authenticate with Supabase'
 ---
 
-[Enable anonymous sign-ins](/dashboard/project/_/auth/providers) to give users an authenticated experience without asking for an email address, password, OAuth provider, or any other personally identifiable information (PII). Later, the user can link an authentication method to their account.
-
-Calling `signInAnonymously()` creates an anonymous user. It behaves like a permanent user, except the user can't access their account if they sign out, clear browsing data, or use another device.
-
-Like permanent users, anonymous users use the `authenticated` Postgres role when they access your project through the Data API. Their JWTs have an `is_anonymous` claim that you can use to tell them apart in RLS policies.
-
-An anonymous user is different from the `anon` API key. The key doesn't create a user, and it gives public access to your database through the `anon` Postgres role.
+[Enable anonymous sign-ins](/dashboard/project/_/auth/providers) to give users an authenticated experience without asking for an email address, password, OAuth provider, or other personally identifiable information (PII). Later, the user can link an authentication method and become a permanent user. On a self-hosted or local project, enable it in the [CLI configuration](/docs/guides/local-development/cli/config) instead.
 
 Use anonymous sign-ins to build:
 
@@ -18,15 +12,20 @@ Use anonymous sign-ins to build:
 - Full-feature demos without collecting personal information
 - Temporary or throwaway accounts
 
+## How anonymous users differ
+
+An anonymous user behaves like a permanent user, but loses access to their account when they sign out, clear browsing data, or use another device. Don't confuse an anonymous user with the `anon` API key, which doesn't create a user at all.
+
+|                                   | Anonymous user                  | Permanent user  | `anon` API key |
+| --------------------------------- | ------------------------------- | --------------- | -------------- |
+| Creates a user                    | Yes, with `signInAnonymously()` | Yes             | No             |
+| Postgres role                     | `authenticated`                 | `authenticated` | `anon`         |
+| `is_anonymous` claim              | `true`                          | `false`         | None           |
+| Survives sign-out or a new device | No                              | Yes             | Not applicable |
+
 <Admonition type="caution">
 
 Review your existing RLS policies before enabling anonymous sign-ins. Anonymous users use the `authenticated` role, so any policy written for signed-in users also applies to them. To tell anonymous users apart from permanent users, see [Access control](#access-control).
-
-</Admonition>
-
-<Admonition type="note" title="Self-hosting and local development">
-
-To enable anonymous sign-ins on a self-hosted or local project, update its configuration files and environment variables. See the [CLI configuration reference](/docs/guides/local-development/cli/config).
 
 </Admonition>
 
