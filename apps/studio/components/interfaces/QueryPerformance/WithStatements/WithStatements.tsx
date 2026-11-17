@@ -243,6 +243,7 @@ export const WithStatements = ({
         onRetry={handleRefresh}
         hasNextPage={hasNextPage}
         isFetchingNextPage={isFetchingNextPage}
+        isRefetching={isRefetching}
         fetchNextPage={fetchNextPage}
       />
       <div

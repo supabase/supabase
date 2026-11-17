@@ -5,6 +5,13 @@ import { isAtBottom } from '@/lib/helpers'
 interface UseInfiniteScrollOptions {
   isLoading?: boolean
   isFetchingNextPage?: boolean
+  /** True while a background refetch is in flight. */
+  isRefetching?: boolean
+  /**
+   * True when the last request failed. Pauses filling so a failing backend isn't retried in a
+   * loop, and re-checks once the error clears.
+   */
+  isError?: boolean
   hasNextPage?: boolean
   fetchNextPage: (options?: { cancelRefetch?: boolean }) => void
   /**
@@ -27,6 +34,8 @@ interface UseInfiniteScrollOptions {
 export function useInfiniteScroll({
   isLoading = false,
   isFetchingNextPage = false,
+  isRefetching = false,
+  isError = false,
   hasNextPage = false,
   fetchNextPage,
   containerRef,
@@ -36,7 +45,11 @@ export function useInfiniteScroll({
 
   useEffect(() => {
     const container = containerRef?.current?.element
-    if (!container || !hasNextPage || isLoading || isFetchingNextPage) return
+    // While refetching, fetchNextPage would only return the in-flight request, so wait for it
+    // to finish and re-check (this effect re-runs when the flag clears).
+    if (!container || !hasNextPage || isLoading || isFetchingNextPage || isRefetching || isError) {
+      return
+    }
 
     const fetchIfNotScrollable = () => {
       // A hidden container (display: none) reports 0 for both heights. Don't treat that as
@@ -52,7 +65,16 @@ export function useInfiniteScroll({
     const observer = new ResizeObserver(fetchIfNotScrollable)
     observer.observe(container)
     return () => observer.disconnect()
-  }, [containerRef, hasNextPage, isLoading, isFetchingNextPage, fetchNextPage, rowCount])
+  }, [
+    containerRef,
+    hasNextPage,
+    isLoading,
+    isFetchingNextPage,
+    isRefetching,
+    isError,
+    fetchNextPage,
+    rowCount,
+  ])
 
   return useCallback(
     (event: UIEvent<HTMLDivElement>) => {

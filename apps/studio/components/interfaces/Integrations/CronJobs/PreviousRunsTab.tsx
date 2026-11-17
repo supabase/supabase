@@ -159,6 +159,8 @@ export const PreviousRunsTab = () => {
     isPending: isLoadingCronJobRuns,
     isFetching,
     isFetchingNextPage,
+    isRefetching,
+    isError,
     hasNextPage,
     fetchNextPage,
   } = useCronJobRunsInfiniteQuery(
@@ -176,6 +178,8 @@ export const PreviousRunsTab = () => {
   const handleScroll = useInfiniteScroll({
     isLoading: isLoadingCronJobRuns,
     isFetchingNextPage,
+    isRefetching,
+    isError,
     hasNextPage,
     fetchNextPage,
     containerRef: gridRef,

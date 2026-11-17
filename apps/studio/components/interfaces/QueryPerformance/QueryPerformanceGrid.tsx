@@ -57,6 +57,7 @@ interface QueryPerformanceGridProps {
   onRetry?: () => void
   hasNextPage: boolean
   isFetchingNextPage: boolean
+  isRefetching: boolean
   fetchNextPage: (options?: { cancelRefetch?: boolean }) => void
 }
 
@@ -91,6 +92,7 @@ export const QueryPerformanceGrid = ({
   onRetry,
   hasNextPage,
   isFetchingNextPage,
+  isRefetching,
   fetchNextPage,
 }: QueryPerformanceGridProps) => {
   const { sort, setSortConfig } = useQueryPerformanceSort()
@@ -431,6 +433,8 @@ export const QueryPerformanceGrid = ({
   const handleScroll = useInfiniteScroll({
     isLoading,
     isFetchingNextPage,
+    isRefetching,
+    isError: !!error,
     hasNextPage,
     fetchNextPage,
     containerRef: gridRef,

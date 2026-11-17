@@ -51,6 +51,37 @@ describe('useInfiniteScroll fill behavior', () => {
     expect(fetchNextPage).toHaveBeenCalledWith({ cancelRefetch: false })
   })
 
+  it('does not retry in a loop after a failed fetch, and re-checks when the error clears', () => {
+    const fetchNextPage = vi.fn()
+    const containerRef = makeRef(makeContainer(400, 900))
+    const base = { containerRef, hasNextPage: true, fetchNextPage, rowCount: 20 }
+    const { rerender } = renderHook((props) => useInfiniteScroll(props), {
+      initialProps: { ...base, isFetchingNextPage: false, isError: false },
+    })
+    expect(fetchNextPage).toHaveBeenCalledTimes(1)
+
+    rerender({ ...base, isFetchingNextPage: true, isError: false })
+    // The request failed: fetching ends, but the page is still missing
+    rerender({ ...base, isFetchingNextPage: false, isError: true })
+    expect(fetchNextPage).toHaveBeenCalledTimes(1)
+
+    rerender({ ...base, isFetchingNextPage: false, isError: false })
+    expect(fetchNextPage).toHaveBeenCalledTimes(2)
+  })
+
+  it('waits for a background refetch to finish, then re-checks', () => {
+    const fetchNextPage = vi.fn()
+    const containerRef = makeRef(makeContainer(400, 900))
+    const base = { containerRef, hasNextPage: true, fetchNextPage, rowCount: 20 }
+    const { rerender } = renderHook((props) => useInfiniteScroll(props), {
+      initialProps: { ...base, isRefetching: true },
+    })
+    expect(fetchNextPage).not.toHaveBeenCalled()
+
+    rerender({ ...base, isRefetching: false })
+    expect(fetchNextPage).toHaveBeenCalledTimes(1)
+  })
+
   it('does not fetch when the container is hidden', () => {
     const fetchNextPage = vi.fn()
     const container = makeContainer(0, 0)

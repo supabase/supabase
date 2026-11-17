@@ -86,6 +86,8 @@ export const CronjobsTab = () => {
   const handleScroll = useInfiniteScroll({
     isLoading: grid.isLoading,
     isFetchingNextPage: grid.isFetchingNextPage,
+    isRefetching: grid.isRefetching,
+    isError: !!grid.error,
     hasNextPage: grid.hasNextPage,
     fetchNextPage: grid.fetchNextPage,
     containerRef: gridRef,
