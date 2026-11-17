@@ -21,7 +21,7 @@ import { ConfirmationModal } from 'ui-patterns/Dialogs/ConfirmationModal'
 import { EmptyStatePresentational } from 'ui-patterns/EmptyStatePresentational'
 
 import { type LogsView } from '../UnifiedLogs.views'
-import { MIN_FILTERS_TO_SAVE } from './SaveViewSuggestionBanner.utils'
+import { MIN_FILTERS_TO_SAVE } from './LogsViews.utils'
 import { ButtonTooltip } from '@/components/ui/ButtonTooltip'
 
 interface LogsViewsMenuProps {

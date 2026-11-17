@@ -34,14 +34,9 @@ import { LogsFilterBar } from './components/LogsFilterBar'
 import { getLogAttributeSources } from './components/LogsFilterBar.utils'
 import { LogsListPanel } from './components/LogsListPanel'
 import { LogsTable } from './components/LogsTable'
+import { getFilterCombinationKey, truncateViewName } from './components/LogsViews.utils'
 import { LogsViewsMenu } from './components/LogsViewsMenu'
 import { SaveViewDialog } from './components/SaveViewDialog'
-import {
-  getFilterCombinationKey,
-  isFilterComboAlreadySaved,
-  shouldShowSaveViewSuggestion,
-  truncateViewName,
-} from './components/SaveViewSuggestionBanner.utils'
 import { TooltipLabel } from './components/TooltipLabel'
 import { ViewSuggestionBanner } from './components/ViewSuggestionBanner'
 import { ServiceFlowPanel } from './ServiceFlowPanel'
@@ -166,7 +161,6 @@ export const UnifiedLogs = ({
   const isSaveViewDialogOpen = saveDialogProject !== null && saveDialogProject === projectRef
   const currentProjectRef = useRef(projectRef)
   currentProjectRef.current = projectRef
-  const [dismissedFilterKeys, setDismissedFilterKeys] = useState<Set<string>>(new Set())
   const [dismissedUpdateKey, setDismissedUpdateKey] = useState<string | null>(null)
   const computeAvailability = getComputeLogsAvailability({
     isPlatform: IS_PLATFORM,
@@ -489,14 +483,6 @@ export const UnifiedLogs = ({
     [logSource, search]
   )
   const filterCombinationKey = getFilterCombinationKey(search.filter)
-  const showSaveViewSuggestion = shouldShowSaveViewSuggestion({
-    isEnabled: showSavedViews && canCreateView && !isSavingView,
-    activeFilterCount,
-    hasActiveView: !!activeView,
-    isDialogOpen: isSaveViewDialogOpen,
-    isDismissed: dismissedFilterKeys.has(filterCombinationKey),
-    isAlreadySaved: isFilterComboAlreadySaved(currentDraft.filters, savedViews),
-  })
   // Keyed by view + filter combination so dismissing re-shows if the user modifies
   // the view differently afterwards, and automatically "resets" once unmodified.
   const updateSuggestionKey = activeView ? `${activeView.id}:${filterCombinationKey}` : null
@@ -551,10 +537,6 @@ export const UnifiedLogs = ({
       setSaveDialogProject(null)
     }
     toast.success('View saved')
-  }
-
-  const handleDismissSuggestion = () => {
-    setDismissedFilterKeys((prev) => new Set(prev).add(filterCombinationKey))
   }
 
   const handleDismissUpdateSuggestion = () => {
@@ -756,14 +738,6 @@ export const UnifiedLogs = ({
                   </div>
                 </div>
 
-                <ViewSuggestionBanner
-                  visible={showSaveViewSuggestion}
-                  title={`You've configured ${activeFilterCount} filters`}
-                  description="Would you like to save them as a view?"
-                  primaryLabel="Save"
-                  onPrimary={handleSaveCurrentView}
-                  onDismiss={handleDismissSuggestion}
-                />
                 <ViewSuggestionBanner
                   visible={showUpdateViewSuggestion}
                   title="You have modified your view"
