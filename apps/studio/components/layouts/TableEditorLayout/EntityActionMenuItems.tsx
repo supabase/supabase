@@ -73,8 +73,6 @@ export const EntityActionMenuItems = ({
 }: EntityActionMenuItemsProps) => {
   const { Item, Separator, Sub, SubTrigger, SubContent } = MENU_COMPONENTS[variant]
 
-  // The menu content is portalled but still bubbles React events to the row's link, which would
-  // navigate to the table. Items stop propagation for that reason.
   const renderAction = (action: EntityAction) => {
     if (action.children) {
       return (
