@@ -23,7 +23,7 @@ export function prepareMessagesForAPI(messages: UIMessage[]): UIMessage[] {
   const cleanedMessages = slicedMessages.map((_message) => {
     const message = _message as UIMessage & { results?: unknown }
     const cleanedMessage = { ...message } as UIMessage & { results?: unknown }
-    if (message.role === 'assistant' && message.results) {
+    if (message.role === 'assistant' && 'results' in cleanedMessage) {
       delete cleanedMessage.results
     }
     return cleanedMessage as UIMessage

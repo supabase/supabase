@@ -10,9 +10,9 @@ import { rateMessageResponseSchema } from '@/components/ui/AIAssistantPanel/Mess
 import type { AiOptInLevel } from '@/hooks/misc/useOrgOptedIntoAi'
 import { getAIDetails } from '@/lib/ai/ai-details'
 import { IS_TRACING_ENABLED } from '@/lib/ai/braintrust-logger'
+import { prepareMessagesForModel } from '@/lib/ai/generate-assistant-response.utils'
 import { getModel } from '@/lib/ai/model'
 import { DEFAULT_COMPLETION_MODEL } from '@/lib/ai/model.utils'
-import { sanitizeMessagePart } from '@/lib/ai/tools/tool-sanitizer'
 import { apiWrapper } from '@/lib/api/apiWrapper'
 
 async function handler(req: NextApiRequest, res: NextApiResponse) {
@@ -74,22 +74,7 @@ async function handlePost(req: NextApiRequest, res: NextApiResponse) {
     }
   }
 
-  // Only returns last 7 messages
-  // Filters out tool outputs based on opt-in level using sanitizeMessagePart
-  const messages = (rawMessages || []).slice(-7).map((msg: any) => {
-    if (msg && msg.role === 'assistant' && 'results' in msg) {
-      const cleanedMsg = { ...msg }
-      delete cleanedMsg.results
-      return cleanedMsg
-    }
-    if (msg && msg.role === 'assistant' && msg.parts) {
-      const cleanedParts = msg.parts.map((part: any) => {
-        return sanitizeMessagePart(part, aiOptInLevel)
-      })
-      return { ...msg, parts: cleanedParts }
-    }
-    return msg
-  })
+  const messages = prepareMessagesForModel(rawMessages, aiOptInLevel)
 
   try {
     const { modelParams, error: modelError } = await getModel({
