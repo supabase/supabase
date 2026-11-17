@@ -3,6 +3,7 @@
   "$id": "https://supabase.com/schemas/config/v1.json",
   "title": "Supabase CLI config (CliConfig)",
   "description": "The Supabase CLI's local project config document (supabase/config.toml or supabase/config.json).",
+  "allowTrailingCommas": true,
   "type": "object",
   "properties": {
     "project_id": {
@@ -146,6 +147,19 @@
           "anyOf": [
             {
               "type": "number"
+            },
+            {
+              "type": "string",
+              "pattern": "^env\\((.*)\\)$"
+            }
+          ]
+        },
+        "db_pool": {
+          "description": "Maximum number of connections in the local PostgREST database pool. Left unset, the default pool size is unchanged.",
+          "anyOf": [
+            {
+              "type": "integer",
+              "minimum": 1
             },
             {
               "type": "string",
@@ -898,6 +912,19 @@
             },
             "secure_password_change": {
               "description": "If enabled, users will need to reauthenticate or have logged in recently to change their password.",
+              "default": false,
+              "anyOf": [
+                {
+                  "type": "boolean"
+                },
+                {
+                  "type": "string",
+                  "pattern": "^env\\((.*)\\)$"
+                }
+              ]
+            },
+            "require_current_password": {
+              "description": "If enabled, users will need to provide their current password to change their password, unless they signed in with a one-time password, magic link, or recovery link.",
               "default": false,
               "anyOf": [
                 {
@@ -3303,7 +3330,7 @@
                 }
               },
               "additionalProperties": false,
-              "description": "Security checks run on each migration. Each rule takes \"error\", \"warn\" or \"off\"; a rule left unset uses \"warn\". When migrations run against --db-url, this section is read only from the local config.toml."
+              "description": "Security checks run on each migration. Each rule takes \"error\", \"warn\" or \"off\"; a rule left unset uses \"warn\". When migrations run against --db-url, this section is read only from the local config file."
             }
           },
           "additionalProperties": false
@@ -4217,6 +4244,26 @@
                   "description": "How the compute is reached: `public` gives it an internet-facing URL,\n`private` keeps it reachable only from inside the project. Every deploy\nsends a complete spec, so the value recorded here is what keeps a private\ncompute private; `--exposure` overrides it for one deploy. Defaults to\n`public`.",
                   "examples": ["private"]
                 },
+                "secrets_scope": {
+                  "anyOf": [
+                    {
+                      "type": "string"
+                    },
+                    {
+                      "type": "array",
+                      "items": {
+                        "type": "string"
+                      }
+                    },
+                    {
+                      "type": "string",
+                      "pattern": "^env\\((.*)\\)$"
+                    }
+                  ],
+                  "description": "controls whether secrets are available: `all` gives access to all defined secrets,\n`supabase` exposes only the `SUPABASE_*` defaults, `none` hides all\nsecrets, `string[]` gives only the secrets named in the list.",
+                  "default": "all",
+                  "examples": ["all", ["STRIPE_KEY", "LLM_APIKEY"]]
+                },
                 "instances": {
                   "description": "Number of instances to run. Every deploy sends a complete spec, so a count\nrecorded here is what keeps a scaled compute scaled; `--instances` overrides\nit for one deploy. Defaults to 1.",
                   "examples": [3],
@@ -4415,8 +4462,8 @@
               "properties": {
                 "version": {
                   "type": "string",
-                  "description": "Version specifier: `linked` (the linked project's version), `bundled` (the version shipped with this CLI), or an upstream version optionally followed by `-r<N>`. A `-orioledb` version is only valid for `database`.",
-                  "examples": ["bundled", "v2.197.0", "v1.30.2-r1", "17.6.1.200-orioledb"]
+                  "description": "Version specifier for every service without its own entry: `linked` (the linked project's version) or `bundled` (the version shipped with this CLI).",
+                  "examples": ["bundled", "linked"]
                 }
               },
               "required": ["version"],
@@ -4429,9 +4476,34 @@
                   "type": "string",
                   "description": "Version specifier: `linked` (the linked project's version), `bundled` (the version shipped with this CLI), or an upstream version optionally followed by `-r<N>`. A `-orioledb` version is only valid for `database`.",
                   "examples": ["bundled", "v2.197.0", "v1.30.2-r1", "17.6.1.200-orioledb"]
+                },
+                "container": {
+                  "type": "object",
+                  "properties": {
+                    "memory": {
+                      "type": "string",
+                      "description": "Memory limit for the service container, as a size such as `512MiB` or `1GiB` (1024-based, case-insensitive; a bare number is bytes). At least `6MiB`; swap is disabled.",
+                      "examples": ["512MiB", "1GiB"]
+                    },
+                    "cpus": {
+                      "description": "CPU limit for the service container, in CPUs; fractions down to `0.01` are allowed (for example `0.5`).",
+                      "examples": [0.5, 1, 2],
+                      "anyOf": [
+                        {
+                          "type": "number",
+                          "minimum": 0.01
+                        },
+                        {
+                          "type": "string",
+                          "pattern": "^env\\((.*)\\)$"
+                        }
+                      ]
+                    }
+                  },
+                  "additionalProperties": false,
+                  "description": "Resource limits applied to the service container. Used only when the local stack runs in containers (Docker or Podman); the native runtime ignores this table."
                 }
               },
-              "required": ["version"],
               "additionalProperties": false
             },
             "auth": {
@@ -4441,9 +4513,34 @@
                   "type": "string",
                   "description": "Version specifier: `linked` (the linked project's version), `bundled` (the version shipped with this CLI), or an upstream version optionally followed by `-r<N>`. A `-orioledb` version is only valid for `database`.",
                   "examples": ["bundled", "v2.197.0", "v1.30.2-r1", "17.6.1.200-orioledb"]
+                },
+                "container": {
+                  "type": "object",
+                  "properties": {
+                    "memory": {
+                      "type": "string",
+                      "description": "Memory limit for the service container, as a size such as `512MiB` or `1GiB` (1024-based, case-insensitive; a bare number is bytes). At least `6MiB`; swap is disabled.",
+                      "examples": ["512MiB", "1GiB"]
+                    },
+                    "cpus": {
+                      "description": "CPU limit for the service container, in CPUs; fractions down to `0.01` are allowed (for example `0.5`).",
+                      "examples": [0.5, 1, 2],
+                      "anyOf": [
+                        {
+                          "type": "number",
+                          "minimum": 0.01
+                        },
+                        {
+                          "type": "string",
+                          "pattern": "^env\\((.*)\\)$"
+                        }
+                      ]
+                    }
+                  },
+                  "additionalProperties": false,
+                  "description": "Resource limits applied to the service container. Used only when the local stack runs in containers (Docker or Podman); the native runtime ignores this table."
                 }
               },
-              "required": ["version"],
               "additionalProperties": false
             },
             "rest": {
@@ -4453,9 +4550,34 @@
                   "type": "string",
                   "description": "Version specifier: `linked` (the linked project's version), `bundled` (the version shipped with this CLI), or an upstream version optionally followed by `-r<N>`. A `-orioledb` version is only valid for `database`.",
                   "examples": ["bundled", "v2.197.0", "v1.30.2-r1", "17.6.1.200-orioledb"]
+                },
+                "container": {
+                  "type": "object",
+                  "properties": {
+                    "memory": {
+                      "type": "string",
+                      "description": "Memory limit for the service container, as a size such as `512MiB` or `1GiB` (1024-based, case-insensitive; a bare number is bytes). At least `6MiB`; swap is disabled.",
+                      "examples": ["512MiB", "1GiB"]
+                    },
+                    "cpus": {
+                      "description": "CPU limit for the service container, in CPUs; fractions down to `0.01` are allowed (for example `0.5`).",
+                      "examples": [0.5, 1, 2],
+                      "anyOf": [
+                        {
+                          "type": "number",
+                          "minimum": 0.01
+                        },
+                        {
+                          "type": "string",
+                          "pattern": "^env\\((.*)\\)$"
+                        }
+                      ]
+                    }
+                  },
+                  "additionalProperties": false,
+                  "description": "Resource limits applied to the service container. Used only when the local stack runs in containers (Docker or Podman); the native runtime ignores this table."
                 }
               },
-              "required": ["version"],
               "additionalProperties": false
             },
             "realtime": {
@@ -4465,9 +4587,34 @@
                   "type": "string",
                   "description": "Version specifier: `linked` (the linked project's version), `bundled` (the version shipped with this CLI), or an upstream version optionally followed by `-r<N>`. A `-orioledb` version is only valid for `database`.",
                   "examples": ["bundled", "v2.197.0", "v1.30.2-r1", "17.6.1.200-orioledb"]
+                },
+                "container": {
+                  "type": "object",
+                  "properties": {
+                    "memory": {
+                      "type": "string",
+                      "description": "Memory limit for the service container, as a size such as `512MiB` or `1GiB` (1024-based, case-insensitive; a bare number is bytes). At least `6MiB`; swap is disabled.",
+                      "examples": ["512MiB", "1GiB"]
+                    },
+                    "cpus": {
+                      "description": "CPU limit for the service container, in CPUs; fractions down to `0.01` are allowed (for example `0.5`).",
+                      "examples": [0.5, 1, 2],
+                      "anyOf": [
+                        {
+                          "type": "number",
+                          "minimum": 0.01
+                        },
+                        {
+                          "type": "string",
+                          "pattern": "^env\\((.*)\\)$"
+                        }
+                      ]
+                    }
+                  },
+                  "additionalProperties": false,
+                  "description": "Resource limits applied to the service container. Used only when the local stack runs in containers (Docker or Podman); the native runtime ignores this table."
                 }
               },
-              "required": ["version"],
               "additionalProperties": false
             },
             "storage": {
@@ -4477,9 +4624,34 @@
                   "type": "string",
                   "description": "Version specifier: `linked` (the linked project's version), `bundled` (the version shipped with this CLI), or an upstream version optionally followed by `-r<N>`. A `-orioledb` version is only valid for `database`.",
                   "examples": ["bundled", "v2.197.0", "v1.30.2-r1", "17.6.1.200-orioledb"]
+                },
+                "container": {
+                  "type": "object",
+                  "properties": {
+                    "memory": {
+                      "type": "string",
+                      "description": "Memory limit for the service container, as a size such as `512MiB` or `1GiB` (1024-based, case-insensitive; a bare number is bytes). At least `6MiB`; swap is disabled.",
+                      "examples": ["512MiB", "1GiB"]
+                    },
+                    "cpus": {
+                      "description": "CPU limit for the service container, in CPUs; fractions down to `0.01` are allowed (for example `0.5`).",
+                      "examples": [0.5, 1, 2],
+                      "anyOf": [
+                        {
+                          "type": "number",
+                          "minimum": 0.01
+                        },
+                        {
+                          "type": "string",
+                          "pattern": "^env\\((.*)\\)$"
+                        }
+                      ]
+                    }
+                  },
+                  "additionalProperties": false,
+                  "description": "Resource limits applied to the service container. Used only when the local stack runs in containers (Docker or Podman); the native runtime ignores this table."
                 }
               },
-              "required": ["version"],
               "additionalProperties": false
             },
             "imgproxy": {
@@ -4489,9 +4661,34 @@
                   "type": "string",
                   "description": "Version specifier: `linked` (the linked project's version), `bundled` (the version shipped with this CLI), or an upstream version optionally followed by `-r<N>`. A `-orioledb` version is only valid for `database`.",
                   "examples": ["bundled", "v2.197.0", "v1.30.2-r1", "17.6.1.200-orioledb"]
+                },
+                "container": {
+                  "type": "object",
+                  "properties": {
+                    "memory": {
+                      "type": "string",
+                      "description": "Memory limit for the service container, as a size such as `512MiB` or `1GiB` (1024-based, case-insensitive; a bare number is bytes). At least `6MiB`; swap is disabled.",
+                      "examples": ["512MiB", "1GiB"]
+                    },
+                    "cpus": {
+                      "description": "CPU limit for the service container, in CPUs; fractions down to `0.01` are allowed (for example `0.5`).",
+                      "examples": [0.5, 1, 2],
+                      "anyOf": [
+                        {
+                          "type": "number",
+                          "minimum": 0.01
+                        },
+                        {
+                          "type": "string",
+                          "pattern": "^env\\((.*)\\)$"
+                        }
+                      ]
+                    }
+                  },
+                  "additionalProperties": false,
+                  "description": "Resource limits applied to the service container. Used only when the local stack runs in containers (Docker or Podman); the native runtime ignores this table."
                 }
               },
-              "required": ["version"],
               "additionalProperties": false
             },
             "functions": {
@@ -4501,9 +4698,34 @@
                   "type": "string",
                   "description": "Version specifier: `linked` (the linked project's version), `bundled` (the version shipped with this CLI), or an upstream version optionally followed by `-r<N>`. A `-orioledb` version is only valid for `database`.",
                   "examples": ["bundled", "v2.197.0", "v1.30.2-r1", "17.6.1.200-orioledb"]
+                },
+                "container": {
+                  "type": "object",
+                  "properties": {
+                    "memory": {
+                      "type": "string",
+                      "description": "Memory limit for the service container, as a size such as `512MiB` or `1GiB` (1024-based, case-insensitive; a bare number is bytes). At least `6MiB`; swap is disabled.",
+                      "examples": ["512MiB", "1GiB"]
+                    },
+                    "cpus": {
+                      "description": "CPU limit for the service container, in CPUs; fractions down to `0.01` are allowed (for example `0.5`).",
+                      "examples": [0.5, 1, 2],
+                      "anyOf": [
+                        {
+                          "type": "number",
+                          "minimum": 0.01
+                        },
+                        {
+                          "type": "string",
+                          "pattern": "^env\\((.*)\\)$"
+                        }
+                      ]
+                    }
+                  },
+                  "additionalProperties": false,
+                  "description": "Resource limits applied to the service container. Used only when the local stack runs in containers (Docker or Podman); the native runtime ignores this table."
                 }
               },
-              "required": ["version"],
               "additionalProperties": false
             },
             "studio": {
@@ -4513,9 +4735,34 @@
                   "type": "string",
                   "description": "Version specifier: `linked` (the linked project's version), `bundled` (the version shipped with this CLI), or an upstream version optionally followed by `-r<N>`. A `-orioledb` version is only valid for `database`.",
                   "examples": ["bundled", "v2.197.0", "v1.30.2-r1", "17.6.1.200-orioledb"]
+                },
+                "container": {
+                  "type": "object",
+                  "properties": {
+                    "memory": {
+                      "type": "string",
+                      "description": "Memory limit for the service container, as a size such as `512MiB` or `1GiB` (1024-based, case-insensitive; a bare number is bytes). At least `6MiB`; swap is disabled.",
+                      "examples": ["512MiB", "1GiB"]
+                    },
+                    "cpus": {
+                      "description": "CPU limit for the service container, in CPUs; fractions down to `0.01` are allowed (for example `0.5`).",
+                      "examples": [0.5, 1, 2],
+                      "anyOf": [
+                        {
+                          "type": "number",
+                          "minimum": 0.01
+                        },
+                        {
+                          "type": "string",
+                          "pattern": "^env\\((.*)\\)$"
+                        }
+                      ]
+                    }
+                  },
+                  "additionalProperties": false,
+                  "description": "Resource limits applied to the service container. Used only when the local stack runs in containers (Docker or Podman); the native runtime ignores this table."
                 }
               },
-              "required": ["version"],
               "additionalProperties": false
             },
             "pgmeta": {
@@ -4525,9 +4772,34 @@
                   "type": "string",
                   "description": "Version specifier: `linked` (the linked project's version), `bundled` (the version shipped with this CLI), or an upstream version optionally followed by `-r<N>`. A `-orioledb` version is only valid for `database`.",
                   "examples": ["bundled", "v2.197.0", "v1.30.2-r1", "17.6.1.200-orioledb"]
+                },
+                "container": {
+                  "type": "object",
+                  "properties": {
+                    "memory": {
+                      "type": "string",
+                      "description": "Memory limit for the service container, as a size such as `512MiB` or `1GiB` (1024-based, case-insensitive; a bare number is bytes). At least `6MiB`; swap is disabled.",
+                      "examples": ["512MiB", "1GiB"]
+                    },
+                    "cpus": {
+                      "description": "CPU limit for the service container, in CPUs; fractions down to `0.01` are allowed (for example `0.5`).",
+                      "examples": [0.5, 1, 2],
+                      "anyOf": [
+                        {
+                          "type": "number",
+                          "minimum": 0.01
+                        },
+                        {
+                          "type": "string",
+                          "pattern": "^env\\((.*)\\)$"
+                        }
+                      ]
+                    }
+                  },
+                  "additionalProperties": false,
+                  "description": "Resource limits applied to the service container. Used only when the local stack runs in containers (Docker or Podman); the native runtime ignores this table."
                 }
               },
-              "required": ["version"],
               "additionalProperties": false
             },
             "mail": {
@@ -4537,9 +4809,34 @@
                   "type": "string",
                   "description": "Version specifier: `linked` (the linked project's version), `bundled` (the version shipped with this CLI), or an upstream version optionally followed by `-r<N>`. A `-orioledb` version is only valid for `database`.",
                   "examples": ["bundled", "v2.197.0", "v1.30.2-r1", "17.6.1.200-orioledb"]
+                },
+                "container": {
+                  "type": "object",
+                  "properties": {
+                    "memory": {
+                      "type": "string",
+                      "description": "Memory limit for the service container, as a size such as `512MiB` or `1GiB` (1024-based, case-insensitive; a bare number is bytes). At least `6MiB`; swap is disabled.",
+                      "examples": ["512MiB", "1GiB"]
+                    },
+                    "cpus": {
+                      "description": "CPU limit for the service container, in CPUs; fractions down to `0.01` are allowed (for example `0.5`).",
+                      "examples": [0.5, 1, 2],
+                      "anyOf": [
+                        {
+                          "type": "number",
+                          "minimum": 0.01
+                        },
+                        {
+                          "type": "string",
+                          "pattern": "^env\\((.*)\\)$"
+                        }
+                      ]
+                    }
+                  },
+                  "additionalProperties": false,
+                  "description": "Resource limits applied to the service container. Used only when the local stack runs in containers (Docker or Podman); the native runtime ignores this table."
                 }
               },
-              "required": ["version"],
               "additionalProperties": false
             },
             "analytics": {
@@ -4549,9 +4846,34 @@
                   "type": "string",
                   "description": "Version specifier: `linked` (the linked project's version), `bundled` (the version shipped with this CLI), or an upstream version optionally followed by `-r<N>`. A `-orioledb` version is only valid for `database`.",
                   "examples": ["bundled", "v2.197.0", "v1.30.2-r1", "17.6.1.200-orioledb"]
+                },
+                "container": {
+                  "type": "object",
+                  "properties": {
+                    "memory": {
+                      "type": "string",
+                      "description": "Memory limit for the service container, as a size such as `512MiB` or `1GiB` (1024-based, case-insensitive; a bare number is bytes). At least `6MiB`; swap is disabled.",
+                      "examples": ["512MiB", "1GiB"]
+                    },
+                    "cpus": {
+                      "description": "CPU limit for the service container, in CPUs; fractions down to `0.01` are allowed (for example `0.5`).",
+                      "examples": [0.5, 1, 2],
+                      "anyOf": [
+                        {
+                          "type": "number",
+                          "minimum": 0.01
+                        },
+                        {
+                          "type": "string",
+                          "pattern": "^env\\((.*)\\)$"
+                        }
+                      ]
+                    }
+                  },
+                  "additionalProperties": false,
+                  "description": "Resource limits applied to the service container. Used only when the local stack runs in containers (Docker or Podman); the native runtime ignores this table."
                 }
               },
-              "required": ["version"],
               "additionalProperties": false
             },
             "pooler": {
@@ -4561,14 +4883,39 @@
                   "type": "string",
                   "description": "Version specifier: `linked` (the linked project's version), `bundled` (the version shipped with this CLI), or an upstream version optionally followed by `-r<N>`. A `-orioledb` version is only valid for `database`.",
                   "examples": ["bundled", "v2.197.0", "v1.30.2-r1", "17.6.1.200-orioledb"]
+                },
+                "container": {
+                  "type": "object",
+                  "properties": {
+                    "memory": {
+                      "type": "string",
+                      "description": "Memory limit for the service container, as a size such as `512MiB` or `1GiB` (1024-based, case-insensitive; a bare number is bytes). At least `6MiB`; swap is disabled.",
+                      "examples": ["512MiB", "1GiB"]
+                    },
+                    "cpus": {
+                      "description": "CPU limit for the service container, in CPUs; fractions down to `0.01` are allowed (for example `0.5`).",
+                      "examples": [0.5, 1, 2],
+                      "anyOf": [
+                        {
+                          "type": "number",
+                          "minimum": 0.01
+                        },
+                        {
+                          "type": "string",
+                          "pattern": "^env\\((.*)\\)$"
+                        }
+                      ]
+                    }
+                  },
+                  "additionalProperties": false,
+                  "description": "Resource limits applied to the service container. Used only when the local stack runs in containers (Docker or Podman); the native runtime ignores this table."
                 }
               },
-              "required": ["version"],
               "additionalProperties": false
             }
           },
           "additionalProperties": false,
-          "description": "Per-service version specifiers for the local stack, keyed by service."
+          "description": "Per-service settings for the local stack, keyed by service: version specifiers and container resource limits."
         }
       },
       "additionalProperties": false,
@@ -4725,6 +5072,19 @@
                         "anyOf": [
                           {
                             "type": "number"
+                          },
+                          {
+                            "type": "string",
+                            "pattern": "^env\\((.*)\\)$"
+                          }
+                        ]
+                      },
+                      "db_pool": {
+                        "description": "Maximum number of connections in the local PostgREST database pool. Left unset, the default pool size is unchanged.",
+                        "anyOf": [
+                          {
+                            "type": "integer",
+                            "minimum": 1
                           },
                           {
                             "type": "string",
@@ -5477,6 +5837,19 @@
                           },
                           "secure_password_change": {
                             "description": "If enabled, users will need to reauthenticate or have logged in recently to change their password.",
+                            "default": false,
+                            "anyOf": [
+                              {
+                                "type": "boolean"
+                              },
+                              {
+                                "type": "string",
+                                "pattern": "^env\\((.*)\\)$"
+                              }
+                            ]
+                          },
+                          "require_current_password": {
+                            "description": "If enabled, users will need to provide their current password to change their password, unless they signed in with a one-time password, magic link, or recovery link.",
                             "default": false,
                             "anyOf": [
                               {
@@ -7882,7 +8255,7 @@
                               }
                             },
                             "additionalProperties": false,
-                            "description": "Security checks run on each migration. Each rule takes \"error\", \"warn\" or \"off\"; a rule left unset uses \"warn\". When migrations run against --db-url, this section is read only from the local config.toml."
+                            "description": "Security checks run on each migration. Each rule takes \"error\", \"warn\" or \"off\"; a rule left unset uses \"warn\". When migrations run against --db-url, this section is read only from the local config file."
                           }
                         },
                         "additionalProperties": false
@@ -8795,6 +9168,26 @@
                                 "type": "string",
                                 "description": "How the compute is reached: `public` gives it an internet-facing URL,\n`private` keeps it reachable only from inside the project. Every deploy\nsends a complete spec, so the value recorded here is what keeps a private\ncompute private; `--exposure` overrides it for one deploy. Defaults to\n`public`.",
                                 "examples": ["private"]
+                              },
+                              "secrets_scope": {
+                                "anyOf": [
+                                  {
+                                    "type": "string"
+                                  },
+                                  {
+                                    "type": "array",
+                                    "items": {
+                                      "type": "string"
+                                    }
+                                  },
+                                  {
+                                    "type": "string",
+                                    "pattern": "^env\\((.*)\\)$"
+                                  }
+                                ],
+                                "description": "controls whether secrets are available: `all` gives access to all defined secrets,\n`supabase` exposes only the `SUPABASE_*` defaults, `none` hides all\nsecrets, `string[]` gives only the secrets named in the list.",
+                                "default": "all",
+                                "examples": ["all", ["STRIPE_KEY", "LLM_APIKEY"]]
                               },
                               "instances": {
                                 "description": "Number of instances to run. Every deploy sends a complete spec, so a count\nrecorded here is what keeps a scaled compute scaled; `--instances` overrides\nit for one deploy. Defaults to 1.",

@@ -521,7 +521,7 @@ functions:
   - id: mfa-challenge-and-verify
     title: 'mfa.challengeAndVerify()'
     notes: |
-      - An [enrolled factor](/docs/swift/javascript/auth-mfa-enroll) is required before invoking `challengeAndVerify()`.
+      - An [enrolled factor](/docs/reference/swift/auth-mfa-enroll) is required before invoking `challengeAndVerify()`.
       - Executes [`mfa.challenge()`](/docs/reference/swift/auth-mfa-challenge) and [`mfa.verify()`](/docs/reference/swift/auth-mfa-verify) in a single step.
     examples:
       - id: challenge-and-verify

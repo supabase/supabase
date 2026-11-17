@@ -80,7 +80,7 @@ export const useProjectHealthLintsQuery = <TData = ProjectHealthLintsData>(
     ...options
   }: UseCustomQueryOptions<ProjectHealthLintsData, ProjectHealthLintsError, TData> = {}
 ) => {
-  const { data: project } = useSelectedProjectQuery()
+  const { data: project } = useSelectedProjectQuery({ enabled: enabled !== false })
   const isHealthAdvisorEnabled = useFlag('healthAdvisor')
   const isActive = project?.status === PROJECT_STATUS.ACTIVE_HEALTHY
 

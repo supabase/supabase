@@ -33,6 +33,8 @@ export async function getStripeSyncState(
     {
       projectRef,
       connectionString,
+      sqlOrigin: 'studio',
+      queryName: 'stripe-sync-state',
       sql: safeSql`
        SELECT started_at, closed_at, status FROM stripe.sync_runs WHERE status != 'pending' ORDER BY started_at DESC LIMIT 1;
       `,

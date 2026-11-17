@@ -1,4 +1,4 @@
-import { PLUGIN_CLIENTS } from '~/features/ui/AgentPluginsPanel.data'
+import { AGENT_CLIENT_PARAM, PLUGIN_CLIENTS } from '~/features/ui/AgentPluginsPanel.data'
 import type { ContentListingGroup } from '~/lib/content-listings.schema'
 import { MCP_CLIENT_DATA } from 'ui-patterns/McpUrlBuilder/clients.data'
 
@@ -98,9 +98,9 @@ function badgeFor(plugin: boolean, mcp: boolean): string {
   return 'MCP'
 }
 
-// Route to our own setup instructions rather than each vendor's external docs.
+// route to our own setup pages with the agent preselected, not vendor docs
 function hrefFor(agent: AgentEntry): string {
-  return agent.plugin ? '/guides/ai-tools/plugins' : '/guides/ai-tools/mcp'
+  return `/guides/ai-tools/${agent.plugin ? 'plugins' : 'mcp'}?${AGENT_CLIENT_PARAM}=${agent.key}`
 }
 
 export const aiToolsSupportedAgents: ContentListingGroup = {

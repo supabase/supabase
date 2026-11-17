@@ -29,6 +29,8 @@ export async function getSchemas(
     {
       projectRef,
       connectionString,
+      sqlOrigin: 'studio',
+      queryName: 'schemas',
       sql: pgMetaSchemasList.sql,
       queryKey: ['schemas'],
       grant: unguarded.migrating,

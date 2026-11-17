@@ -3,7 +3,11 @@ import { useMemo, useState } from 'react'
 import { Badge, cn } from 'ui'
 import { Admonition } from 'ui-patterns/Admonition'
 
-import { PERMISSION_MODE_LABEL, selectionToScopes } from '../../AccessToken.permissions'
+import {
+  PERMISSION_MODE_LABEL,
+  sanitizeSelection,
+  selectionToScopes,
+} from '../../AccessToken.permissions'
 import {
   groupFailingResources,
   TOKEN_ROLE_LABEL,
@@ -47,7 +51,10 @@ export const NewScopedTokenFormReview = ({
   permissionScopeMap,
 }: ReviewStepProps) => {
   const { data: organizations = [] } = useOrganizationsQuery()
-  const selection = values.permissions
+  const selection = useMemo(
+    () => sanitizeSelection(values.permissions, values.resourceAccess),
+    [values.permissions, values.resourceAccess]
+  )
   const grantedScopes = useMemo(() => selectionToScopes(selection), [selection])
 
   const hasExceedingCapabilities = access.exceedingEntryKeys.length > 0

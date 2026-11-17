@@ -396,15 +396,13 @@ describe('buildSentryClientOptions', () => {
     })
     expect(withRelease.release).toBe('abc123')
 
-    // The key must be ABSENT when no release is passed: on the Next build a
-    // `release: undefined` entry would override the release injected into
-    // @sentry/nextjs's init by withSentryConfig (options are spread last).
+    // The key is absent when no release is passed.
     const withoutRelease = buildSentryClientOptions({ includeThirdPartyErrorFilter: true })
     expect('release' in withoutRelease).toBe(false)
   })
 
   it('includes the third-party error filter only when the build annotates frames', () => {
-    // Next build: withSentryConfig injects the applicationKey metadata.
+    // Builds whose bundler annotates frames with the applicationKey.
     expect(
       getIntegrationNames(buildSentryClientOptions({ includeThirdPartyErrorFilter: true }))
     ).toContain('ThirdPartyErrorsFilter')
@@ -517,6 +515,20 @@ describe('which errors Studio sends to Sentry', () => {
 
     expect(await beforeSend(event, {})).toBeNull()
     expect(Math.random).not.toHaveBeenCalled()
+  })
+
+  it('drops user SQL errors even when something else captured them', async () => {
+    const { UserSqlError } = await import('@/lib/errors/studio-errors')
+    const event: Parameters<typeof beforeSend>[0] = {
+      type: undefined,
+      exception: {
+        values: [
+          { value: 'Failed to run sql query', stacktrace: { frames: [{ filename: 'app.js' }] } },
+        ],
+      },
+    }
+    const hint = { originalException: new UserSqlError({ message: 'Failed to run sql query' }) }
+    expect(await beforeSend(event, hint)).toBeNull()
   })
 
   it('drops errors with no code location when they did not crash the page', async () => {

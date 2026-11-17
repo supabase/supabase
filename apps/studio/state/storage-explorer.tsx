@@ -59,6 +59,7 @@ import { getOrRefreshTemporaryApiKey } from '@/data/api-keys/temp-api-keys-utils
 import { configKeys } from '@/data/config/keys'
 import { useProjectApiUrl } from '@/data/config/project-endpoint-query'
 import type { ProjectStorageConfigResponse } from '@/data/config/project-storage-config-query'
+import { isRequestAborted } from '@/data/error-classification'
 import { getQueryClient } from '@/data/query-client'
 import { deleteBucketObject } from '@/data/storage/bucket-object-delete-mutation'
 import { signBucketObjects } from '@/data/storage/bucket-object-sign-mutation'
@@ -381,7 +382,7 @@ export function createStorageExplorerState({
           index
         )
       } catch (error: any) {
-        if (error.name === 'AbortError') {
+        if (isRequestAborted(error)) {
           state.updateRowStatus({
             name: folderName,
             status: STORAGE_ROW_STATUS.READY,
@@ -441,7 +442,7 @@ export function createStorageExplorerState({
           return col
         })
       } catch (error: any) {
-        if (!error.message.includes('aborted')) {
+        if (!isRequestAborted(error)) {
           toast.error(`Failed to retrieve more folder contents: ${error.message}`)
         }
       }

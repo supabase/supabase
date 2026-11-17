@@ -13,7 +13,7 @@ import {
   MemoizedStorageBlock,
   MemoizedSupavisorBlock,
 } from './components/ServiceBlocks'
-import type { ServiceFlowBlockProps } from './types'
+import type { AddAttributeFilter, ServiceFlowBlockProps } from './types'
 import { CollapsibleDetailSection } from '@/components/ui/DataTable/CollapsibleDetailSection'
 
 type LogOverviewProps = Omit<ServiceFlowBlockProps, 'data'> & {
@@ -86,7 +86,7 @@ export function LogOverview({
 }: LogOverviewProps & {
   header?: ReactNode
   attributes?: ColumnSchema['metadata']
-  onAddAttributeFilter?: (key: string, value: string) => void
+  onAddAttributeFilter?: AddAttributeFilter
 }) {
   const Renderer = LOG_OVERVIEW_RENDERERS[props.data.log_type]
 

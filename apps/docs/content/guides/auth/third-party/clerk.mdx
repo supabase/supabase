@@ -14,7 +14,7 @@ Finally add a [new Third-Party Auth integration with Clerk](/dashboard/project/_
 
 ### Configure for local development or self-hosting
 
-When developing locally or self-hosting with the Supabase CLI, add the following config to your `supabase/config.toml` file:
+When developing locally or self-hosting with the [Supabase CLI](/docs/guides/local-development/cli/getting-started), add the following config to your `supabase/config.toml` file:
 
 ```toml
 [auth.third_party.clerk]
@@ -28,7 +28,7 @@ You will still need to configure your Clerk instance for Supabase compatibility.
 
 If you are not able to use [Clerk's Connect with Supabase page](https://dashboard.clerk.com/setup/supabase) to configure your Clerk instance for working with Supabase, follow these steps.
 
-1. Add the `role` claim to [Clerk session tokens](https://clerk.com/docs/backend-requests/resources/session-tokens) by [customizing them](https://clerk.com/docs/backend-requests/custom-session-token). End-users who are authenticated should have the `authenticated` value for the claim. If you have an advanced Postgres setup where authenticated end-users use different Postgres roles to access the database, adjust the value to use the correct role name.
+1. Add the `role` claim to [Clerk session tokens](https://clerk.com/docs/backend-requests/resources/session-tokens) by [customizing them](https://clerk.com/docs/backend-requests/custom-session-token). End-users who are authenticated should have the `authenticated` value for the claim. If you have an advanced Postgres setup where authenticated end-users use different [Postgres roles](/docs/guides/database/postgres/roles) to access the database, adjust the value to use the correct role name.
 2. Once all Clerk session tokens for your instance contain the `role` claim, add a [new Third-Party Auth integration with Clerk](/dashboard/project/_/auth/third-party) in the Supabase dashboard or register it in the CLI as instructed above.
 
 ## Setup the Supabase client library

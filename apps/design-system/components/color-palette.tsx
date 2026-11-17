@@ -40,10 +40,10 @@ const ColorPalette = () => {
   }
 
   return (
-    <div className="my-6 w-full">
+    <div className="my-6 w-full overflow-x-auto pb-2">
       <div className="flex min-w-[640px] flex-col gap-1">
         <div className={`grid gap-1 ${GRID_COLS}`}>
-          <div />
+          <div className="sticky left-0 z-10 bg-background" />
           {SCALE_STEPS.map((step) => (
             <div key={step} className="text-center font-mono text-[10px] text-foreground-lighter">
               {step}
@@ -54,7 +54,9 @@ const ColorPalette = () => {
           const slug = name.toLowerCase()
           return (
             <div key={slug} className={`grid items-center gap-1 ${GRID_COLS}`}>
-              <div className="pr-2 text-sm font-medium text-foreground">{name}</div>
+              <div className="sticky left-0 z-10 flex h-full items-center bg-background pr-2 text-sm font-medium text-foreground">
+                {name}
+              </div>
               {SCALE_STEPS.map((step) => {
                 const reference = `var(--color-${slug}-${step * 100})`
                 const isCopied = copied === reference

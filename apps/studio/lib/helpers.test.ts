@@ -526,6 +526,24 @@ describe('getSemanticVersion', () => {
 
     expect(result).toEqual(141088)
   })
+
+  it.each(['arm', 'arm64', 'x86_64', 'aarch64', 'amd64'])(
+    'should handle the %s architecture prefix',
+    (arch) => {
+      expect(getSemanticVersion(`supabase-postgres-${arch}-17.9.0.019`)).toEqual(1790019)
+    }
+  )
+
+  it('should handle a release suffix', () => {
+    expect(getSemanticVersion('supabase-postgres-14.1.0.99-vault-rc1')).toEqual(141099)
+  })
+
+  it.each(['supabase-postgres-custom-123', 'CUSTOM_AMI_SENTINEL'])(
+    'should return 0 for the non-version string %s',
+    (version) => {
+      expect(getSemanticVersion(version)).toEqual(0)
+    }
+  )
 })
 
 describe('getDatabaseMajorVersion', () => {
@@ -534,6 +552,20 @@ describe('getDatabaseMajorVersion', () => {
 
     expect(result).toEqual(14)
   })
+
+  it.each(['arm', 'arm64', 'x86_64', 'aarch64', 'amd64'])(
+    'should handle the %s architecture prefix',
+    (arch) => {
+      expect(getDatabaseMajorVersion(`supabase-postgres-${arch}-17.9.0.019`)).toEqual(17)
+    }
+  )
+
+  it.each(['supabase-postgres-custom-123', 'CUSTOM_AMI_SENTINEL'])(
+    'should return 0 for the non-version string %s',
+    (version) => {
+      expect(getDatabaseMajorVersion(version)).toEqual(0)
+    }
+  )
 })
 
 describe('getDistanceLatLonKM', () => {

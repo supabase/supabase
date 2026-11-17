@@ -1,4 +1,9 @@
-import { cube, type IsoBox, type IsoRing, type IsoView } from './iso-shapes'
+import {
+  cube,
+  type IsoBox,
+  type IsoRing,
+  type IsoView,
+} from 'ui-patterns/IsoShape/IsoShape.geometry'
 import type { Topic } from './topics'
 
 interface IsoComposition {
@@ -167,6 +172,10 @@ export const ISO_COMPOSITIONS: Record<Topic, IsoComposition> = {
     zoom: 0.645,
   },
   FAQs: {
+    titleAt: 'top',
+    boxes: FAQ_BLOCKS,
+  },
+  Community: {
     titleAt: 'top',
     boxes: FAQ_BLOCKS,
   },

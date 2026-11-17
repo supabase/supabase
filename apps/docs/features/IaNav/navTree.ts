@@ -18,7 +18,7 @@ export type NavTree = {
 
 type MenuEntry = Partial<NavMenuSection>
 
-const isEnabled = (item: { enabled?: boolean }) => item.enabled !== false
+export const isEnabled = (item: { enabled?: boolean }): boolean => item.enabled !== false
 
 function isRenderable(entry: MenuEntry): boolean {
   if (!isEnabled(entry)) return false
@@ -32,7 +32,7 @@ function entryNode(entry: MenuEntry): NavTreeNode {
   return { label: entry.name ?? '', children: children.map((child) => entryNode(child)) }
 }
 
-function isMenu(value: unknown): value is NavMenuConstant {
+export function isMenu(value: unknown): value is NavMenuConstant {
   return typeof value === 'object' && value !== null && 'title' in value && 'items' in value
 }
 
