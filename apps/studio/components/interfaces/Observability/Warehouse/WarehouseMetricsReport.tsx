@@ -81,6 +81,10 @@ const WarehouseMetricsReportContent = () => {
   })()
   const hasChartValues = points.some((point) => typeof point.value === 'number')
 
+  const reportStatus = hasChartValues
+    ? 'Warehouse report loaded'
+    : `Warehouse report: ${emptyMessage}`
+
   const renderContent = () => {
     if (!IS_PLATFORM)
       return (
@@ -163,7 +167,12 @@ const WarehouseMetricsReportContent = () => {
     <>
       <ReportHeader title="Warehouse" showDatabaseSelector={false} />
       <p className="text-sm text-foreground-light">Query activity in the last 60 minutes.</p>
-      {renderContent()}
+      <div className="relative">
+        <p role="status" className="sr-only">
+          {query.isPending ? 'Loading Warehouse report' : reportStatus}
+        </p>
+        {renderContent()}
+      </div>
     </>
   )
 }

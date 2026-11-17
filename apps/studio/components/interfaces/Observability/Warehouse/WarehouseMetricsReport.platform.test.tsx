@@ -88,6 +88,9 @@ test('shows an explicit last-hour empty state', async () => {
   mockMetrics(null)
   renderReport()
   expect(await screen.findByText('No data in the last 60 minutes')).toBeInTheDocument()
+  expect(screen.getByRole('status')).toHaveTextContent(
+    'Warehouse report: No data in the last 60 minutes'
+  )
 })
 test('renders measured zero as query activity', async () => {
   mockMetrics(0)
