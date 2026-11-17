@@ -124,7 +124,9 @@ export const ComputeInstanceLogsTab = ({ instanceName, stream }: ComputeInstance
                   View them from the Supabase CLI while you wait for traffic.
                 </p>
                 <div className="pt-1 text-left">
-                  <ComputeInstanceCommandLine command={computeLogsCommand(instanceName)} />
+                  <ComputeInstanceCommandLine
+                    command={computeLogsCommand(instanceName, stream === 'output' ? 'app' : stream)}
+                  />
                 </div>
               </div>
             }

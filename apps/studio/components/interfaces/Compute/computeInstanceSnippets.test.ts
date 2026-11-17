@@ -3,6 +3,7 @@ import { describe, expect, it } from 'vitest'
 import {
   buildComputeInstanceCliCommands,
   buildComputeInstanceSnippets,
+  computeLogsCommand,
   EXAMPLE_COMPUTE_INSTANCE,
 } from './computeInstanceSnippets'
 
@@ -66,7 +67,23 @@ describe('buildComputeInstanceCliCommands', () => {
     expect(commands.some(({ command }) => command.includes(' pull '))).toBe(false)
     expect(commands).toContainEqual({
       comment: 'View logs',
-      command: 'supabase logs --remote --service compute --resource embed',
+      command: 'supabase logs --remote --service compute --resource embed --since 24h',
     })
+  })
+
+  it('passes the log kind when given one', () => {
+    expect(computeLogsCommand('embed', 'app')).toBe(
+      'supabase logs --remote --service compute --resource embed --since 24h --kind app'
+    )
+  })
+
+  it('sets exposure on compute new so a plain push keeps it', () => {
+    const { cli, aiPrompt } = buildComputeInstanceSnippets(input({ access: 'private' }))
+
+    expect(cli).toContain(
+      'new my-instance --runtime node --size 2gb --exposure private --instances 1'
+    )
+    expect(cli).toMatch(/push my-instance$/m)
+    expect(aiPrompt).toContain('push my-instance --yes')
   })
 })

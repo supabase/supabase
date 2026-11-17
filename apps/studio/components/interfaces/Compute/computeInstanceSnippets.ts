@@ -48,8 +48,8 @@ export function buildComputeInstanceSnippets(
 
   const cli = [
     `export SUPABASE_EXPERIMENTAL_COMPUTE=1`,
-    `supabase ${CLI_NAME} new ${name} --runtime ${runtime}`,
-    `supabase ${CLI_NAME} push ${name} --instances ${input.instances} --exposure ${input.access}`,
+    `supabase ${CLI_NAME} new ${name} --runtime ${runtime} --size ${cliSize} --exposure ${input.access} --instances ${input.instances}`,
+    `supabase ${CLI_NAME} push ${name}`,
   ].join('\n')
 
   const curl = [
@@ -96,7 +96,9 @@ export function buildComputeInstanceSnippets(
     configBlock,
     '```',
     ``,
-    `3. Make sure the project is linked (\`supabase link\`), then run \`supabase ${CLI_NAME} push ${name} --exposure ${input.access}\` to deploy it.`,
+    `3. Make sure the CLI is logged in (\`supabase login\`) and the project is initialized (\`supabase init\`) and linked (\`supabase link\`).`,
+    ``,
+    `4. Ask me to confirm the deploy, then run \`supabase ${CLI_NAME} push ${name} --yes\`. Without \`--yes\` the command waits for interactive confirmation.`,
   ].join('\n')
 
   const javascript = [
@@ -127,8 +129,9 @@ export interface ComputeInstanceCliCommand {
 }
 
 // `supabase compute logs` is deprecated in favour of the unified logs command.
-export const computeLogsCommand = (name: string) =>
-  `supabase logs --remote --service ${CLI_NAME} --resource ${safeName(name)}`
+// --since matches the logs tab's default range; the CLI defaults to 1h.
+export const computeLogsCommand = (name: string, kind?: 'app' | 'requests' | 'builds') =>
+  `supabase logs --remote --service ${CLI_NAME} --resource ${safeName(name)} --since 24h${kind ? ` --kind ${kind}` : ''}`
 
 export function buildComputeInstanceCliCommands(name: string): ComputeInstanceCliCommand[] {
   const slug = safeName(name)
