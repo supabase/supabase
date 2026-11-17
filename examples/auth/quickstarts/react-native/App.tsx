@@ -9,13 +9,13 @@ export default function App() {
   const [claims, setClaims] = useState<JwtPayload | null>(null)
 
   useEffect(() => {
-    supabase.auth.getClaims().then(({ data: { claims } }) => {
-      setClaims(claims)
+    supabase.auth.getClaims().then(({ data }) => {
+      setClaims(data?.claims ?? null)
     })
 
     supabase.auth.onAuthStateChange(() => {
-      supabase.auth.getClaims().then(({ data: { claims } }) => {
-        setClaims(claims)
+      supabase.auth.getClaims().then(({ data }) => {
+        setClaims(data?.claims ?? null)
       })
     })
   }, [])
