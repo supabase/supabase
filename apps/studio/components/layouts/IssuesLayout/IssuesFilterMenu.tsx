@@ -24,6 +24,7 @@ import {
   ISSUE_SEVERITIES,
   SEVERITY_LABELS,
 } from '@/components/interfaces/Issues/Issues.constants'
+import { useAlertIssuesOutOfScope } from '@/components/interfaces/Issues/useAlertIssuesOutOfScope'
 import { useIssueFilters } from '@/components/interfaces/Issues/useIssueFilters'
 import { IS_PLATFORM } from '@/lib/constants'
 
@@ -75,6 +76,7 @@ export const IssuesFilterMenu = () => {
   // Alert issues are served by self-hosted Studio only until the platform API exposes them.
   const showAlertIssueTypes = !IS_PLATFORM && !!ref
   const isHealthAdvisorEnabled = useFlag('healthAdvisor')
+  const { isOutOfScopeVisible, setIsOutOfScopeVisible } = useAlertIssuesOutOfScope()
   const { filters, setFilters, activeFilterCount, clearFilters } = useIssueFilters()
   const hasFilters = activeFilterCount > 0
   const categories = ISSUE_CATEGORIES.filter(
@@ -123,6 +125,13 @@ export const IssuesFilterMenu = () => {
               <DropdownMenuItem onSelect={() => setIsAlertIssueTypesOpen(true)}>
                 Manage alert issue types
               </DropdownMenuItem>
+              <DropdownMenuCheckboxItem
+                checked={isOutOfScopeVisible}
+                onSelect={(event) => event.preventDefault()}
+                onCheckedChange={(checked) => setIsOutOfScopeVisible(checked)}
+              >
+                Show out-of-scope features
+              </DropdownMenuCheckboxItem>
             </>
           )}
         </DropdownMenuContent>

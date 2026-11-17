@@ -11,6 +11,7 @@ export const LOCAL_STORAGE_KEYS = {
     `supabase-ai-assistant-state-${projectRef}`,
   SIDEBAR_BEHAVIOR: 'supabase-sidebar-behavior',
   EXPLORER_PREFERENCES: 'supabase-explorer-preferences',
+  ALERT_ISSUES_OUT_OF_SCOPE_VISIBLE: 'supabase-alert-issues-out-of-scope-visible',
   PROJECTS_VIEW: 'projects-view',
   PROJECTS_FILTER: 'projects-filter',
   PROJECTS_SORT: 'projects-sort',
