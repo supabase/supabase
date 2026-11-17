@@ -84,12 +84,11 @@ const POST = async ({ request }: { request: Request }) => {
         },
       })
     }
-    const { email, amr } = data.claims
-    const isValidAmr = !!amr?.some(
-      (e) => (typeof e === 'string' ? e : e.method) === 'oauth_provider/authorization_code'
-    )
 
-    if (!isValidAmr || !email || !mcpAllowedUsers!.includes(email.toLowerCase())) {
+    const { client_id, role, email } = data.claims
+    const isOAuthAccessToken = !!client_id && role === 'authenticated'
+
+    if (!isOAuthAccessToken || !email || !mcpAllowedUsers!.includes(email.toLowerCase())) {
       return new Response(JSON.stringify({ error: 'Forbidden' }), {
         status: 403,
         headers: { 'Content-Type': 'application/json' },
