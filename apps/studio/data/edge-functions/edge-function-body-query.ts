@@ -19,7 +19,7 @@ export function isFunctionBodyMaxSizeError(error?: { code?: number } | null) {
 
 async function fetchFunctionBody(
   { projectRef, slug }: EdgeFunctionBodyVariables,
-  { multipart, signal }: { multipart: boolean; signal?: AbortSignal }
+  { multipart = true, signal }: { multipart: boolean; signal?: AbortSignal }
 ) {
   if (!projectRef) throw new Error('projectRef is required')
   if (!slug) throw new Error('slug is required')
@@ -91,7 +91,7 @@ export async function getEdgeFunctionBody(
 }
 
 export type EdgeFunctionBodyData = Awaited<ReturnType<typeof getEdgeFunctionBody>>
-export type EdgeFunctionBodyError = StudioError
+type EdgeFunctionBodyError = StudioError
 
 export const useEdgeFunctionBodyQuery = <TData = EdgeFunctionBodyData>(
   { projectRef, slug }: EdgeFunctionBodyVariables,

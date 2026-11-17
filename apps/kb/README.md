@@ -1,55 +1,52 @@
-# Astro Starter Kit: Basics
+# Supabase Knowledge Base
+
+This directory contains the [Astro](https://astro.build) app for the Supabase Knowledge Base, served at [supabase.com/kb](https://supabase.com/kb).
+
+Content is organized into three collections under `src/content/`:
+
+- `guides/`: hand-written guides in Markdown or MDX, grouped by topic.
+- `faqs/`: short answers to common questions.
+- `troubleshooting/`: troubleshooting guides fetched from a private repo at build time (see below).
+
+At build time, every page is also exported as a plain `.md` file, so the content can be read by LLM crawlers and other tools. Requests that send `Accept: text/markdown` receive these files directly.
+
+Search is served by an API route in `api/search/`, backed by content indexed with `pnpm search:ingest`.
+
+## Development
+
+Run the dev server from the repository root or from `apps/kb`. It starts at http://localhost:3008/kb.
 
 ```sh
-npm create astro@latest -- --template basics
+pnpm dev:kb   # from the root
+pnpm dev      # from apps/kb
 ```
 
-> 🧑‍🚀 **Seasoned astronaut?** Delete this file. Have fun!
+Other commands, run from `apps/kb`:
 
-## 🚀 Project Structure
+| Command        | Action                    |
+| :------------- | :------------------------ |
+| `pnpm build`   | Build the production site |
+| `pnpm preview` | Preview the build locally |
+| `pnpm test`    | Run unit tests (vitest)   |
 
-Inside of your Astro project, you'll see the following folders and files:
-
-```text
-/
-├── public/
-│   └── favicon.svg
-├── src
-│   ├── assets
-│   │   └── astro.svg
-│   ├── components
-│   │   └── Welcome.astro
-│   ├── layouts
-│   │   └── Layout.astro
-│   └── pages
-│       └── index.astro
-└── package.json
-```
-
-To learn more about the folder structure of an Astro project, refer to [our guide on project structure](https://docs.astro.build/en/basics/project-structure/).
-
-## 🧞 Commands
-
-All commands are run from the root of the project, from a terminal:
-
-| Command                   | Action                                           |
-| :------------------------ | :----------------------------------------------- |
-| `npm install`             | Installs dependencies                            |
-| `npm run dev`             | Starts local dev server at `localhost:4321`      |
-| `npm run build`           | Build your production site to `./dist/`          |
-| `npm run preview`         | Preview your build locally, before deploying     |
-| `npm run astro ...`       | Run CLI commands like `astro add`, `astro check` |
-| `npm run astro -- --help` | Get help using the Astro CLI                     |
-
-## 👀 Want to learn more?
-
-Feel free to check [our documentation](https://docs.astro.build) or jump into our [Discord server](https://astro.build/chat).
+To write or edit guides, and for details on the Markdown export and routing, see [`AGENTS.md`](./AGENTS.md).
 
 ## Federated troubleshooting content
 
 `src/content/troubleshooting/` isn't hand-written — it's fetched from a private repo by
 `scripts/federated-content/fetch-federated-content.ts` as part of the build (the `fetch:federated-content` task in `turbo.jsonc`)
 and is gitignored. See `AGENTS.md` for how it works and what's intentionally left out for now.
+
+### Contributing to troubleshooting articles
+
+Troubleshooting articles (`/kb/troubleshooting/...`) aren't open for direct contributions. They go through an internal
+review process before they're published.
+
+> [!NOTE]
+> You can still suggest a fix, comment on the article's GitHub Discussion (linked at the bottom of each article as
+> "Go to the GitHub discussion"), or [open an issue](https://github.com/supabase/supabase/issues/new/choose) that
+> links the article and describes the change. Pull requests for other `/kb` content, such as `src/content/guides/`,
+> are welcome.
 
 ## Workflows
 

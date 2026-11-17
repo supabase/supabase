@@ -104,11 +104,12 @@ These are the layout-only TanStack files. Most hold a single product layout comp
 
 ### App shell — `/account/*`
 
-- [x] A `routes/_app/account/me.tsx` ← `pages/account/me.tsx`
-- [x] A `routes/_app/account/security.tsx` ← `pages/account/security.tsx`
-- [x] A `routes/_app/account/audit.tsx` ← `pages/account/audit.tsx`
-- [x] A `routes/_app/account/tokens/index.tsx` ← `pages/account/tokens.tsx`
-- [x] A `routes/_app/account/tokens/scoped.tsx` ← `pages/account/tokens/scoped.tsx`
+- [x] A→done `routes/_app/account/me.tsx` ← `pages/account/me.tsx`
+- [x] A→done `routes/_app/account/security.tsx` ← `pages/account/security.tsx`
+- [x] A→done `routes/_app/account/audit.tsx` ← `pages/account/audit.tsx`
+- [x] A→done `routes/_app/account/apps.tsx` ← `pages/account/apps.tsx`
+- [x] A→done `routes/_app/account/tokens/index.tsx` ← `pages/account/tokens.tsx`
+- [x] A→done `routes/_app/account/tokens/scoped.tsx` ← `pages/account/tokens/scoped.tsx`
 
 ### App shell — `/org/$slug/*`
 
@@ -131,22 +132,22 @@ These are the layout-only TanStack files. Most hold a single product layout comp
 
 ### App shell — top-level pages
 
-- [x] A `routes/_app/organizations.tsx` ← `pages/organizations.tsx` (page default already withAuth-wrapped; PageLayout wraps body)
-- [x] `routes/_app/new/index.tsx` ← `pages/new/index.tsx` (inlines WizardLayout; sets `defaultLayoutHeaderTitle: 'New organization'` + `hideMobileMenu: true` on staticData). **Delta vs plan:** no `_app/new.tsx` sub-shell — `new/$slug` doesn't fit under \_app and uses a different inner wrapper (PageLayout), so a shared shell wouldn't share anything.
-- [x] A `routes/new/$slug.tsx` ← `pages/new/[slug].tsx` **Delta vs plan:** placed at top-level rather than under `_app/` — Next getLayout omits AppLayout and uses PageLayout (not WizardLayout) inside DefaultLayout, so leaf inlines the full DefaultLayout + PageLayout wrap itself.
-- [x] A `routes/aws-marketplace-onboarding.tsx` ← `pages/aws-marketplace-onboarding.tsx` **Delta vs plan:** placed at root rather than under `_app/` — page uses its own `LinkAwsMarketplaceLayout` and doesn't want `AppLayout` + `DefaultLayout` wrapping.
-- [x] A `routes/claim-project.tsx` ← `pages/claim-project.tsx` **Delta vs plan:** placed at root rather than under `_app/` — page uses its own `<Head>` + `<main>` layout and doesn't want `AppLayout` + `DefaultLayout` wrapping.
-- [x] A `routes/join.tsx` ← `pages/join.tsx` **Delta vs plan:** placed at root rather than under `_app/` — page uses a centered-div layout and doesn't want `AppLayout` + `DefaultLayout` wrapping.
-- [x] A `routes/stripe-atlas-application.tsx` ← `pages/stripe-atlas-application.tsx` (no `withAuth` — reachable logged in and logged out; uses `InterstitialLayout`, so no `AppLayout` + `DefaultLayout` wrapping)
-- [x] `routes/_app/support/new.tsx` ← `pages/support/new.tsx` (sets `hideMobileMenu: true` staticData; existing page is `withAuth`-wrapped so no beforeLoad migration needed yet)
-- [x] `routes/_app/support/link.tsx` ← `pages/support/link.tsx`
+- [x] A→done `routes/_app/organizations.tsx` ← `pages/organizations.tsx` (page default already withAuth-wrapped; PageLayout wraps body)
+- [x] A→done `routes/_app/new/index.tsx` ← `pages/new/index.tsx` (inlines WizardLayout; sets `defaultLayoutHeaderTitle: 'New organization'` + `hideMobileMenu: true` on staticData). **Delta vs plan:** no `_app/new.tsx` sub-shell — `new/$slug` doesn't fit under \_app and uses a different inner wrapper (PageLayout), so a shared shell wouldn't share anything.
+- [x] A→done `routes/new/$slug.tsx` ← `pages/new/[slug].tsx` **Delta vs plan:** placed at top-level rather than under `_app/` — Next getLayout omits AppLayout and uses PageLayout (not WizardLayout) inside DefaultLayout, so leaf inlines the full DefaultLayout + PageLayout wrap itself.
+- [x] A→done `routes/aws-marketplace-onboarding.tsx` ← `pages/aws-marketplace-onboarding.tsx` **Delta vs plan:** placed at root rather than under `_app/` — page uses its own `LinkAwsMarketplaceLayout` and doesn't want `AppLayout` + `DefaultLayout` wrapping.
+- [x] A→done `routes/claim-project.tsx` ← `pages/claim-project.tsx` **Delta vs plan:** placed at root rather than under `_app/` — page uses its own `<Head>` + `<main>` layout and doesn't want `AppLayout` + `DefaultLayout` wrapping.
+- [x] A→done `routes/join.tsx` ← `pages/join.tsx` **Delta vs plan:** placed at root rather than under `_app/` — page uses a centered-div layout and doesn't want `AppLayout` + `DefaultLayout` wrapping.
+- [x] A→done `routes/stripe-atlas-application.tsx` ← `pages/stripe-atlas-application.tsx` (no `withAuth` — reachable logged in and logged out; uses `InterstitialLayout`, so no `AppLayout` + `DefaultLayout` wrapping)
+- [x] A→done `routes/_app/support/new.tsx` ← `pages/support/new.tsx` (sets `hideMobileMenu: true` staticData; existing page is `withAuth`-wrapped so no beforeLoad migration needed yet)
+- [x] A→done `routes/_app/support/link.tsx` ← `pages/support/link.tsx`
 
 ### App shell — integrations
 
-- [x] A `routes/integrations/vercel/install.tsx` ← `pages/integrations/vercel/install.tsx`
-- [x] A `routes/integrations/vercel/$slug/marketplace/choose-project.tsx` ← `pages/integrations/vercel/[slug]/marketplace/choose-project.tsx`
-- [x] A `routes/integrations/vercel/$slug/deploy-button/new-project.tsx` ← `pages/integrations/vercel/[slug]/deploy-button/new-project.tsx`
-- [x] A `routes/integrations/github/authorize.tsx` ← `pages/integrations/github/authorize.tsx` **Delta vs plan:** placed at top-level rather than under `_app/` — Next page has no getLayout (renders bare), so adding AppLayout/DefaultLayout via \_app would be a behaviour change.
+- [x] A→done `routes/integrations/vercel/install.tsx` ← `pages/integrations/vercel/install.tsx`
+- [x] A→done `routes/integrations/vercel/$slug/marketplace/choose-project.tsx` ← `pages/integrations/vercel/[slug]/marketplace/choose-project.tsx`
+- [x] A→done `routes/integrations/vercel/$slug/deploy-button/new-project.tsx` ← `pages/integrations/vercel/[slug]/deploy-button/new-project.tsx`
+- [x] A→done `routes/integrations/github/authorize.tsx` ← `pages/integrations/github/authorize.tsx` **Delta vs plan:** placed at top-level rather than under `_app/` — Next page has no getLayout (renders bare), so adding AppLayout/DefaultLayout via \_app would be a behaviour change.
 
 ### Project shell — home
 
@@ -347,28 +348,28 @@ These are the layout-only TanStack files. Most hold a single product layout comp
 
 ### Auth shell — `/sign-in`, `/sign-up`, etc.
 
-- [x] A `routes/_auth/sign-in.tsx` ← `pages/sign-in.tsx`
-- [x] A `routes/_auth/sign-up.tsx` ← `pages/sign-up.tsx`
-- [x] A `routes/_auth/sign-in-sso.tsx` ← `pages/sign-in-sso.tsx`
-- [x] A `routes/_auth/sign-in-partner.tsx` ← `pages/sign-in-partner.tsx`
-- [x] A `routes/_auth/sign-in-mfa.tsx` ← `pages/sign-in-mfa.tsx` (page inlines SignInLayout)
-- [x] A `routes/_auth/sign-in-recovery-code.tsx` ← `pages/sign-in-recovery-code.tsx` (page inlines SignInLayout)
-- [x] A `routes/_auth/forgot-password.tsx` ← `pages/forgot-password.tsx`
-- [x] A `routes/_auth/forgot-password-mfa.tsx` ← `pages/forgot-password-mfa.tsx` (page inlines ForgotPasswordLayout)
-- [x] A `routes/_auth/reset-password.tsx` ← `pages/reset-password.tsx` (page default already withAuth-wrapped)
-- [x] A `routes/_auth/cli/login.tsx` ← `pages/cli/login.tsx` (page inlines APIAuthorizationLayout, withAuth)
-- [x] A `routes/_auth/partners/stripe/projects/login.tsx` ← `pages/partners/stripe/projects/login.tsx` (page inlines APIAuthorizationLayout, withAuth)
+- [x] A→done `routes/_auth/sign-in.tsx` ← `pages/sign-in.tsx`
+- [x] A→done `routes/_auth/sign-up.tsx` ← `pages/sign-up.tsx`
+- [x] A→done `routes/_auth/sign-in-sso.tsx` ← `pages/sign-in-sso.tsx`
+- [x] A→done `routes/_auth/sign-in-partner.tsx` ← `pages/sign-in-partner.tsx`
+- [x] A→done `routes/_auth/sign-in-mfa.tsx` ← `pages/sign-in-mfa.tsx` (page inlines SignInLayout)
+- [x] A→done `routes/_auth/sign-in-recovery-code.tsx` ← `pages/sign-in-recovery-code.tsx` (page inlines SignInLayout)
+- [x] A→done `routes/_auth/forgot-password.tsx` ← `pages/forgot-password.tsx`
+- [x] A→done `routes/_auth/forgot-password-mfa.tsx` ← `pages/forgot-password-mfa.tsx` (page inlines ForgotPasswordLayout)
+- [x] A→done `routes/_auth/reset-password.tsx` ← `pages/reset-password.tsx` (page default already withAuth-wrapped)
+- [x] A→done `routes/_auth/cli/login.tsx` ← `pages/cli/login.tsx` (page inlines APIAuthorizationLayout, withAuth)
+- [x] A→done `routes/_auth/partners/stripe/projects/login.tsx` ← `pages/partners/stripe/projects/login.tsx` (page inlines APIAuthorizationLayout, withAuth)
 
 ### Standalone (no shared shell)
 
 - [x] B `routes/index.tsx` — redirect-only root route. Mirrors the Next.js `redirects()` rules in `next.config.ts`: platform sends users to `/org` (or `/new/new-project` when deep-linked with `?next=new-project`), self-hosted sends them to `/project/default`. **Follow-up:** the redirect targets currently use `href` (full reload) because they were on the Next side when this was written; switch to `to` now that all of them live in the TanStack tree.
-- [x] A `routes/authorize.tsx` ← `pages/authorize.tsx` (APIAuthorizationLayout)
-- [x] A `routes/redeem.tsx` ← `pages/redeem.tsx` (RedeemCreditsLayout)
-- [x] A `routes/logout.tsx` ← `pages/logout.tsx`
-- [x] A `routes/maintenance.tsx` ← `pages/maintenance.tsx`
-- [x] A `routes/verify-email.tsx` ← `pages/verify-email.tsx`
-- [x] A `routes/support/csat.tsx` ← `pages/support/csat.tsx` (pre-auth support satisfaction survey; page brings its own `InterstitialLayout`, so it stays outside `_app/`.)
-- [x] A `routes/mcp/secrets.tsx` ← `pages/mcp/secrets.tsx` (MCP elicitation URL-mode handoff; page brings its own `InterstitialLayout`, so it stays outside `_app/`.)
+- [x] A→done `routes/authorize.tsx` ← `pages/authorize.tsx` (APIAuthorizationLayout)
+- [x] A→done `routes/redeem.tsx` ← `pages/redeem.tsx` (RedeemCreditsLayout)
+- [x] A→done `routes/logout.tsx` ← `pages/logout.tsx`
+- [x] A→done `routes/maintenance.tsx` ← `pages/maintenance.tsx`
+- [x] A→done `routes/verify-email.tsx` ← `pages/verify-email.tsx`
+- [x] A→done `routes/support/csat.tsx` ← `pages/support/csat.tsx` (pre-auth support satisfaction survey; page brings its own `InterstitialLayout`, so it stays outside `_app/`.)
+- [x] A→done `routes/mcp/secrets.tsx` ← `pages/mcp/secrets.tsx` (MCP elicitation URL-mode handoff; page brings its own `InterstitialLayout`, so it stays outside `_app/`.)
 
 ### Error pages (handled at root)
 
