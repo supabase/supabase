@@ -516,13 +516,13 @@ echo "--- Effective role in PostgREST ---"
 # Status codes don't show which role a request ran as. A temporary function
 # returns current_user, the role PostgREST switched to for the request.
 role_fn="test_keys_role_$$"
-if docker exec supabase-db psql -U postgres -d postgres -v ON_ERROR_STOP=1 -q -c \
+if docker exec supabase-db psql -U postgres -v ON_ERROR_STOP=1 -q -c \
     "create function public.$role_fn() returns text language sql as 'select current_user::text';
      notify pgrst, 'reload schema';" >/dev/null 2>&1; then
     # role_via [curl args]: the role the function reports, or the HTTP status
     role_via() {
         out=$(curl -s -w '\n%{http_code}' -X POST "$BASE_URL/rest/v1/rpc/$role_fn" \
-            -H "Content-Type: application/json" -d '{}' "$@")
+            -H "Content-Type: application/json" -H "Content-Profile: public" -d '{}' "$@")
         code=$(printf '%s\n' "$out" | tail -n 1)
         if [ "$code" = "200" ]; then
             printf '%s\n' "$out" | sed '$d' | jq -r '.'
@@ -556,7 +556,7 @@ if docker exec supabase-db psql -U postgres -d postgres -v ON_ERROR_STOP=1 -q -c
         fi
     fi
 
-    docker exec supabase-db psql -U postgres -d postgres -q -c \
+    docker exec supabase-db psql -U postgres -q -c \
         "drop function if exists public.$role_fn(); notify pgrst, 'reload schema';" >/dev/null 2>&1 || true
 else
     echo "  SKIP: Effective role checks (no docker access to supabase-db)"
