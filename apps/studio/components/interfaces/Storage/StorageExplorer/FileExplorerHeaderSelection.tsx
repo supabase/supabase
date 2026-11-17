@@ -1,5 +1,5 @@
 import { ArchiveIcon, DownloadIcon, MoveIcon, Trash2Icon, XIcon } from 'lucide-react'
-import { Button } from 'ui'
+import { Button, Tooltip, TooltipContent, TooltipTrigger } from 'ui'
 
 import { isVersioningActive } from '../StorageVersioning.constants'
 import { bulkActionBarClassName } from './storageExplorerChrome'
@@ -117,14 +117,21 @@ export const FileExplorerHeaderSelection = () => {
           </ButtonTooltip>
         </ShortcutTooltip>
 
-        <Button
-          variant="text"
-          size="tiny"
-          icon={<XIcon size={12} />}
-          title="Clear selection"
-          className="px-1.5 text-foreground-lighter hover:text-foreground"
-          onClick={() => clearSelectedItems()}
-        />
+        <Tooltip>
+          <TooltipTrigger asChild>
+            <Button
+              variant="text"
+              size="tiny"
+              icon={<XIcon size={12} />}
+              aria-label="Clear selection"
+              className="px-1.5 text-foreground-lighter hover:text-foreground"
+              onClick={() => clearSelectedItems()}
+              // Tooltip repeats the label; screen readers would read it twice
+              aria-describedby={undefined}
+            />
+          </TooltipTrigger>
+          <TooltipContent side="bottom">Clear selection</TooltipContent>
+        </Tooltip>
       </div>
     </div>
   )
