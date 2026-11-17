@@ -22,6 +22,7 @@ You need:
 - `API_EXTERNAL_URL` set to the public URL of Auth, for example `https://<your-domain>/auth/v1`. Auth uses it as the issuer and in the endpoint URLs it publishes to clients.
 - `SITE_URL` set to the URL of the app that hosts your consent page.
 - Your secret key, `SUPABASE_SECRET_KEY`, from your `.env` file. You need it to register clients.
+- An API gateway configuration that passes the OAuth 2.1 server endpoints to Auth without an API key. If you customized it, see [API gateway routes](#api-gateway-routes).
 
 ## Set up the OAuth 2.1 server
 
@@ -71,7 +72,7 @@ Enable the server, build a consent page in your app, register a client, and then
 
 When a client starts a sign-in, Auth redirects the user's browser to your consent page with an `authorization_id`. The page signs in the user if needed, shows which app is asking for access, and approves or denies the request. Build it with the `supabase.auth.oauth` methods in `supabase-js`. For a complete example, see [Build your authorization UI](/docs/guides/auth/oauth-server/getting-started#build-your-authorization-ui).
 
-Serve the consent page from the same origin as `SITE_URL`, or from an origin that matches an entry in `ADDITIONAL_REDIRECT_URLS`. Auth rejects consent requests from any other browser origin with `unauthorized request origin`.
+Serve the consent page from the same origin as `SITE_URL`. To serve it from another origin, add that origin to `ADDITIONAL_REDIRECT_URLS` as it is, for example `https://consent.example.com`. Auth compares the browser's origin, which has no path, so a pattern such as `https://consent.example.com/**` doesn't match it. Auth rejects consent requests from any other origin with `unauthorized request origin`.
 
 The page calls Auth with your publishable key and the user's session, like the rest of your app.
 
@@ -94,7 +95,7 @@ The response includes the `client_id`, which the third-party app needs to start 
 
 For a server-side app, set `client_type` to `confidential`. The response then includes a `client_secret`. Store it securely, because Auth doesn't show it again.
 
-Clients can also register themselves at `/auth/v1/oauth/clients/register` without an API key. To allow it, set `OAUTH_SERVER_ALLOW_DYNAMIC_REGISTRATION=true` in your `.env` file, and then recreate the Auth container with `sh run.sh recreate auth`.
+Clients can also register themselves at `/auth/v1/oauth/clients/register` without an API key, which the API gateway allows like the other OAuth 2.1 server endpoints. To allow it in Auth, set `OAUTH_SERVER_ALLOW_DYNAMIC_REGISTRATION=true` in your `.env` file, and then recreate the Auth container with `sh run.sh recreate auth`.
 
 <Admonition type="caution">
 
@@ -174,8 +175,8 @@ If the `error_description` is `oauth authorization path not configured`, set `OA
 
 ### Consent requests fail with `unauthorized request origin`
 
-Your consent page runs on an origin that Auth doesn't allow. Serve it from the same origin as `SITE_URL`, or add an entry that matches its origin to `ADDITIONAL_REDIRECT_URLS`.
+Your consent page runs on an origin that Auth doesn't allow. Serve it from the same origin as `SITE_URL`, or add its exact origin, such as `https://consent.example.com`, to `ADDITIONAL_REDIRECT_URLS`. A pattern with a path, such as `https://consent.example.com/**`, doesn't match an origin.
 
 ### The token request fails with `Error generating ID token`
 
-The client requested the `openid` scope, and Auth signs tokens with a symmetric key. Add an asymmetric key to `JWT_KEYS`, as described in [Before you begin](#before-you-begin), and recreate the Auth container. Then start the sign-in again: the failed request already used up its authorization code, so retrying it returns `invalid_grant`.
+The client requested the `openid` scope, and Auth signs tokens with a symmetric key. Add an asymmetric key pair with `sh utils/add-new-auth-keys.sh --update-env`, as described in [Before you begin](#before-you-begin). Auth, PostgREST, Realtime, Storage, and Edge Functions all read the new keys, so recreate all services with `sh run.sh recreate`. Then start the sign-in again: the failed request already used up its authorization code, so retrying it returns `invalid_grant`.
