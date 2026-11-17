@@ -1,6 +1,5 @@
 import { Admonition } from 'ui-patterns/Admonition'
 
-import { CONSENT_COPY } from './OAuthAppsAuthorizeScreen.utils'
 import { InlineLinkClassName } from '@/components/ui/InlineLink'
 
 export interface NoProjectsNoticeProps {
@@ -17,12 +16,15 @@ export const NoProjectsNotice = ({
   return (
     <Admonition
       type="default"
-      title={CONSENT_COPY.noProjects.title(organizationSlug)}
+      title={`No projects in ${organizationSlug}`}
       description={
         <>
-          <p>{CONSENT_COPY.noProjects.body(appName)}</p>
           <p>
-            {CONSENT_COPY.noProjects.prompt}{' '}
+            {appName} needs access to at least one project, and this organization doesn't have any
+            yet.
+          </p>
+          <p>
+            Expecting to see your projects?
             <button
               type="button"
               tabIndex={0}
