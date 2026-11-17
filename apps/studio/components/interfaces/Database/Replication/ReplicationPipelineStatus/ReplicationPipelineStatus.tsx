@@ -283,7 +283,7 @@ export const ReplicationPipelineStatus = () => {
                       ? '1 table stopped replicating'
                       : `${erroredTables.length} tables stopped replicating`
                   }
-                  description="The rest of the pipeline keeps running. Open a table’s error to see what went wrong, then reset it to resume."
+                  description="Open the error details before choosing recovery. Resetting a table clears its progress and replaces its destination data."
                   actions={
                     <Button
                       variant="default"

@@ -12,9 +12,6 @@
     "preinstall": "npx only-allow pnpm",
     "clean": "rimraf .turbo tsconfig.tsbuildinfo"
   },
-  "engines": {
-    "node": ">= 16"
-  },
   "keywords": [],
   "author": "",
   "license": "ISC",

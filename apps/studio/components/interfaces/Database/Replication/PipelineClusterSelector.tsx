@@ -9,7 +9,13 @@ import { replicationClustersQueryOptions } from '@/data/replication/clusters-que
 import { useReplicationClusterId } from '@/state/replication-cluster'
 
 /** Picks the region a new pipeline is created in. Hidden when there is only one region. */
-export const PipelineClusterSelector = ({ onChange }: { onChange?: () => void }) => {
+export const PipelineClusterSelector = ({
+  onChange,
+  disabled,
+}: {
+  onChange?: () => void
+  disabled?: boolean
+}) => {
   const [urlClusterId, setClusterId] = useQueryState(
     'cluster_id',
     parseAsString.withOptions({ history: 'replace' })
@@ -38,9 +44,10 @@ export const PipelineClusterSelector = ({ onChange }: { onChange?: () => void })
       description="The pipeline runs from this region. Destination connections originate here."
     >
       <PipelineRegionSelect
+        disabled={disabled || !preferredCluster.isReady}
         value={clusterId ?? data.default_cluster_id}
         onValueChange={(value) => {
-          void setClusterId(value === data.default_cluster_id ? null : value)
+          void setClusterId(value)
           onChange?.()
         }}
       />

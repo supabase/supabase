@@ -47,29 +47,34 @@ const CopyButton = forwardRef<HTMLButtonElement, CopyButtonProps>(
     }, [showCopied])
 
     return (
-      <Button
-        ref={ref}
-        onClick={(e) => {
-          const textToCopy = asyncText ? asyncText() : text
-          copyToClipboard(textToCopy, () => setShowCopied(true))
-          onClick?.(e)
-        }}
-        {...props}
-        variant={variant}
-        className={cn({ 'px-1.5': iconOnly }, className)}
-        icon={
-          showCopied ? (
-            <CheckIcon
-              strokeWidth={2}
-              className={cn(variant === 'primary' ? 'text-inherit' : 'text-primary')}
-            />
-          ) : (
-            (icon ?? <CopyIcon />)
-          )
-        }
-      >
-        {!iconOnly && <>{children ?? (showCopied ? copiedLabel : copyLabel)}</>}
-      </Button>
+      <>
+        <Button
+          ref={ref}
+          onClick={(e) => {
+            const textToCopy = asyncText ? asyncText() : text
+            copyToClipboard(textToCopy, () => setShowCopied(true))
+            onClick?.(e)
+          }}
+          {...props}
+          variant={variant}
+          className={cn({ 'px-1.5': iconOnly }, className)}
+          icon={
+            showCopied ? (
+              <CheckIcon
+                strokeWidth={2}
+                className={cn(variant === 'primary' ? 'text-inherit' : 'text-primary')}
+              />
+            ) : (
+              (icon ?? <CopyIcon />)
+            )
+          }
+        >
+          {!iconOnly && <>{children ?? (showCopied ? copiedLabel : copyLabel)}</>}
+        </Button>
+        <span aria-live="polite" className="sr-only">
+          {showCopied ? copiedLabel : ''}
+        </span>
+      </>
     )
   }
 )

@@ -21,6 +21,7 @@ async function fetchReplicationCostEstimate(
   if (!sourceId) throw new Error('sourceId is required')
   if (!publicationName) throw new Error('publicationName is required')
 
+  // Estimates read the project's database directly; this endpoint does not accept cluster_id.
   const { data, error } = await get(
     '/platform/replication/{ref}/sources/{source_id}/publications/{publication_name}/cost-estimate',
     {

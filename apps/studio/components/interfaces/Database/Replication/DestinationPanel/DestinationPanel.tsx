@@ -110,19 +110,30 @@ export const DestinationPanel = () => {
   // `null` until the user picks a region; until then a new pipeline starts in the preferred one.
   const [chosenClusterId, setChosenClusterId] = useState<string | undefined | null>(null)
   const creationClusterId = chosenClusterId === null ? preferredCluster.clusterId : chosenClusterId
-  const { ensureRegionSource } = useEnsurePipelineRegionSource(projectRef)
+  const {
+    ensureRegionSource,
+    isCreatingSource,
+    error: regionSourceError,
+    reset: resetRegionSource,
+  } = useEnsurePipelineRegionSource(projectRef)
   const handleRegionChange = (clusterId: string | undefined) => {
     setChosenClusterId(clusterId)
+    resetRegionSource()
     void ensureRegionSource(clusterId)
   }
 
   // A preselected non-default region needs the project's source, as an explicit pick does.
-  const ensuredPreferredClusterRef = useRef<string | undefined>(undefined)
+  const attemptedPreferredClusterRef = useRef<string | undefined>(undefined)
   useEffect(() => {
     const clusterId = preferredCluster.clusterId
     if (!visible || editMode || !showDestinationForm || chosenClusterId !== null) return
-    if (clusterId === undefined || ensuredPreferredClusterRef.current === clusterId) return
-    ensuredPreferredClusterRef.current = clusterId
+    if (
+      !preferredCluster.isReady ||
+      clusterId === undefined ||
+      attemptedPreferredClusterRef.current === clusterId
+    )
+      return
+    attemptedPreferredClusterRef.current = clusterId
     void ensureRegionSource(clusterId)
   }, [
     visible,
@@ -130,6 +141,7 @@ export const DestinationPanel = () => {
     showDestinationForm,
     chosenClusterId,
     preferredCluster.clusterId,
+    preferredCluster.isReady,
     ensureRegionSource,
   ])
 
@@ -138,7 +150,8 @@ export const DestinationPanel = () => {
     setDestinationType(null)
     setEdit(null)
     setChosenClusterId(null)
-    ensuredPreferredClusterRef.current = undefined
+    attemptedPreferredClusterRef.current = undefined
+    resetRegionSource()
   }
 
   const { confirmOnClose, handleOpenChange, modalProps } = useConfirmOnClose({
@@ -259,6 +272,23 @@ export const DestinationPanel = () => {
               <ReplicationClusterProvider
                 clusterId={editMode ? contextClusterId : creationClusterId}
               >
+                {regionSourceError && (
+                  <SheetSection>
+                    <AlertError
+                      error={regionSourceError}
+                      subject="Failed to prepare pipeline region"
+                      projectRef={projectRef}
+                      additionalActions={
+                        <Button
+                          loading={isCreatingSource}
+                          onClick={() => void ensureRegionSource(creationClusterId)}
+                        >
+                          Retry
+                        </Button>
+                      }
+                    />
+                  </SheetSection>
+                )}
                 <DestinationForm
                   visible={visible}
                   selectedType={destinationType ?? 'BigQuery'}
@@ -268,6 +298,7 @@ export const DestinationPanel = () => {
                   onClose={onClose}
                   onCancel={confirmOnClose}
                   onRegionChange={handleRegionChange}
+                  isPreparingRegion={isCreatingSource}
                 />
               </ReplicationClusterProvider>
             )}

@@ -85,6 +85,7 @@ const addPipelinesMock = (waitForResponse?: Promise<void>) =>
           {
             id: PIPELINE_ID,
             tenant_id: 't',
+            cluster_id: 'c',
             source_id: 1,
             source_name: 'main-db',
             destination_id: DESTINATION_ID,
@@ -94,7 +95,6 @@ const addPipelinesMock = (waitForResponse?: Promise<void>) =>
               publication_name: 'supabase_realtime',
               table_sync_copy: { type: 'include_all_tables' },
             },
-            cluster_id: '1',
           },
         ],
       })
@@ -366,7 +366,7 @@ describe('DestinationRow', () => {
     const row = (await screen.findByText('supabase_realtime')).closest('tr')
     expect(row).not.toBeNull()
     expect(screen.getByText(`#${PIPELINE_ID}`)).toBeVisible()
-    expect(screen.getByRole('button', { name: 'Copy pipeline ID' })).toHaveAttribute(
+    expect(screen.getByRole('button', { name: `Copy pipeline ID ${PIPELINE_ID}` })).toHaveAttribute(
       'title',
       PIPELINE_ID
     )
@@ -388,7 +388,9 @@ describe('DestinationRow', () => {
           </TableBody>
         </Table>
       )
-      const copyButton = await screen.findByRole('button', { name: 'Copy pipeline ID' })
+      const copyButton = await screen.findByRole('button', {
+        name: `Copy pipeline ID ${PIPELINE_ID}`,
+      })
       if (interaction === 'click') {
         await user.click(copyButton)
       } else {
@@ -396,6 +398,10 @@ describe('DestinationRow', () => {
         await user.keyboard('{Enter}')
       }
       expect(await navigator.clipboard.readText()).toBe(PIPELINE_ID)
+      expect(await screen.findByText(`Pipeline ID ${PIPELINE_ID} copied`)).toHaveAttribute(
+        'aria-live',
+        'polite'
+      )
       expect(routerMock.asPath).toBe('/project/default/database/pipelines')
     }
   )

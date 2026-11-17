@@ -232,9 +232,19 @@ export const RowMenu = ({
           {shouldShowStop && (
             <>
               {shouldShowRestart && (
-                <DropdownMenuItem className="gap-x-2" onClick={onRestartPipeline}>
-                  <RotateCcwIcon size={14} />
-                  <p>Restart pipeline</p>
+                <DropdownMenuItem
+                  className="gap-x-2 items-start"
+                  onClick={onRestartPipeline}
+                  aria-label="Restart pipeline"
+                  aria-description="Resume saved progress. Unfinished initial syncs start over."
+                >
+                  <RotateCcwIcon size={14} className="mt-0.5 shrink-0" />
+                  <div>
+                    <p>Restart pipeline</p>
+                    <p className="text-xs text-foreground-lighter">
+                      Resume saved progress. Unfinished initial syncs start over.
+                    </p>
+                  </div>
                 </DropdownMenuItem>
               )}
               <DropdownMenuItem className="gap-x-2" onClick={onDisablePipeline}>

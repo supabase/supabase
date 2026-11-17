@@ -77,6 +77,7 @@ interface DestinationFormProps {
   onClose: () => void
   onCancel?: () => void
   onRegionChange?: (clusterId: string | undefined) => void
+  isPreparingRegion?: boolean
 }
 
 export const DestinationForm = ({
@@ -88,6 +89,7 @@ export const DestinationForm = ({
   onClose,
   onCancel = onClose,
   onRegionChange,
+  isPreparingRegion = false,
 }: DestinationFormProps) => {
   const { ref: projectRef } = useParams()
   const isOrioleDb = useIsOrioleDb({ enabled: selectedType === 'DuckLake' })
@@ -266,6 +268,7 @@ export const DestinationForm = ({
   const isSubmitDisabled =
     isSaving ||
     (isManagedDuckLake && isDuckLakeProjectBlocked) ||
+    isPreparingRegion ||
     !isExistingConfigReady ||
     !isSuccessPublicationNames ||
     (!!publicationName && !isSuccessPublication) ||
@@ -500,7 +503,7 @@ export const DestinationForm = ({
         ) : (
           <Form {...form}>
             <form id={formId} onSubmit={form.handleSubmit(onSubmit)}>
-              <fieldset disabled={!isExistingConfigReady} className="contents">
+              <fieldset disabled={!isExistingConfigReady || isPreparingRegion} className="contents">
                 {shouldShowConnectionSection && (
                   <>
                     <PipelineConnectionSection type={selectedType} form={form}>
@@ -534,6 +537,7 @@ export const DestinationForm = ({
                           <PipelineRegionField
                             destinationType={selectedType}
                             onRegionChange={onRegionChange}
+                            disabled={isPreparingRegion}
                           />
                         )}
                         <PublicationSelection

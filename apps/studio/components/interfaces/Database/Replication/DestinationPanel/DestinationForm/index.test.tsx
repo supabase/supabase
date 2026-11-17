@@ -102,6 +102,7 @@ let pipelineTableIds = [101, 999]
 const getPipelineData = (): PipelineResponse => ({
   id: '8',
   tenant_id: 'tenant',
+  cluster_id: 'cluster',
   source_id: 42,
   source_name: 'postgres',
   destination_id: 7,
@@ -114,7 +115,6 @@ const getPipelineData = (): PipelineResponse => ({
     max_table_sync_workers: 4,
     max_copy_connections_per_table: 1,
   },
-  cluster_id: '1',
 })
 const project: ProjectDetail = {
   cloud_provider: 'AWS',

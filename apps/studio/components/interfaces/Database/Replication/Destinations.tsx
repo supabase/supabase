@@ -233,7 +233,7 @@ export const Destinations = () => {
   })
 
   const { error: destinationsError, isError: isDestinationsError } = destinationResults[0]
-  const isDestinationsLoading = destinationResults.every((result) => result.isPending)
+  const isDestinationsLoading = destinationResults.some((result) => result.isPending)
   const hasDestinations = clusterResults.some(({ destinations }) => destinations.length > 0)
   const hasFilteredDestinations = clusterResults.some(
     ({ filteredDestinations }) => filteredDestinations.length > 0

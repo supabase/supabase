@@ -1,39 +1,50 @@
-import { useQueryClient } from '@tanstack/react-query'
+import { useMutation, useQueryClient } from '@tanstack/react-query'
+import { useCallback } from 'react'
 import { toast } from 'sonner'
 
+import { classifyError } from '@/data/error-classification'
 import { useCreateTenantSourceMutation } from '@/data/replication/create-tenant-source-mutation'
 import { replicationSourcesQueryOptions } from '@/data/replication/sources-query'
 import type { StudioError } from '@/lib/errors/studio-errors'
 import { useReplicationClusterId } from '@/state/replication-cluster'
 
-/**
- * Replication is enabled in the default cluster, so another region gets the project's source the
- * first time a pipeline is created there.
- */
+/** Ensures a project's source exists before creating a pipeline in another region. */
 export const useEnsurePipelineRegionSource = (projectRef: string | undefined) => {
   const clusterId = useReplicationClusterId()
   const queryClient = useQueryClient()
-  const { mutateAsync: createTenantSource, isPending: isCreatingSource } =
-    useCreateTenantSourceMutation()
+  const { mutateAsync: createTenantSource } = useCreateTenantSourceMutation({ onError: () => {} })
+  const { mutateAsync, isPending, error, reset } = useMutation<
+    void,
+    StudioError,
+    string | undefined
+  >({
+    mutationFn: async (targetClusterId) => {
+      try {
+        if (!projectRef) throw new Error('projectRef is required')
+        const { sources } = await queryClient.ensureQueryData(
+          replicationSourcesQueryOptions({ projectRef, clusterId: targetClusterId })
+        )
+        if (!sources.some((source) => source.name === projectRef)) {
+          await createTenantSource({ projectRef, clusterId: targetClusterId })
+        }
+      } catch (error) {
+        throw classifyError(error)
+      }
+    },
+    onError: (error) => toast.error(`Failed to prepare pipeline region: ${error.message}`),
+  })
 
-  const ensureRegionSource = async (targetClusterId = clusterId) => {
-    if (!projectRef) return false
-    try {
-      const { sources } = await queryClient.ensureQueryData(
-        replicationSourcesQueryOptions({ projectRef, clusterId: targetClusterId })
-      )
-      if (sources.some((source) => source.name === projectRef)) return true
-    } catch (error) {
-      toast.error(`Failed to load the pipeline region: ${(error as StudioError).message}`)
-      return false
-    }
-    try {
-      await createTenantSource({ projectRef, clusterId: targetClusterId })
-      return true
-    } catch {
-      return false
-    }
-  }
+  const ensureRegionSource = useCallback(
+    async (targetClusterId = clusterId) => {
+      try {
+        await mutateAsync(targetClusterId)
+        return true
+      } catch {
+        return false
+      }
+    },
+    [clusterId, mutateAsync]
+  )
 
-  return { ensureRegionSource, isCreatingSource }
+  return { ensureRegionSource, isCreatingSource: isPending, error, reset }
 }

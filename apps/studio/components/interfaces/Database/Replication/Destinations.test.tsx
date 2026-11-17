@@ -518,6 +518,32 @@ describe('regions', () => {
     )
   })
 
+  test('keeps loading when an empty region finishes before another region', async () => {
+    mockRegions()
+    mockRegionResources()
+    let finishRegion = () => {}
+    const pendingRegion = new Promise<void>((resolve) => {
+      finishRegion = resolve
+    })
+    addAPIMock({
+      method: 'get',
+      path: '/platform/replication/:ref/destinations',
+      response: async ({ request }) => {
+        if (clusterOf(request) === '2') await pendingRegion
+        return HttpResponse.json<components['schemas']['DestinationsResponse_Output']>({
+          destinations: [],
+        })
+      },
+    })
+    renderRegions()
+
+    await waitFor(() => expect(screen.getByRole('button', { name: 'Add pipeline' })).toBeEnabled())
+    expect(screen.getByRole('status')).toHaveTextContent('Loading pipelines')
+    expect(screen.queryByRole('heading', { name: 'Add a pipeline' })).not.toBeInTheDocument()
+    finishRegion()
+    expect(await screen.findByRole('heading', { name: 'Add a pipeline' })).toBeInTheDocument()
+  })
+
   test('keeps other regions visible when one region fails', async () => {
     mockRegions()
     mockRegionResources({ failingCluster: '2' })

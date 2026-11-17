@@ -20,6 +20,7 @@ type PipelineReplicationStatusResponse =
 
 const pipeline: PipelineResponse = {
   id: '42',
+  cluster_id: 'cluster',
   config: { publication_name: 'analytics_publication' },
   destination_id: 7,
   destination_name: 'Analytics warehouse',
@@ -27,7 +28,6 @@ const pipeline: PipelineResponse = {
   source_id: 2,
   source_name: 'main-db',
   tenant_id: 'default',
-  cluster_id: '1',
 }
 
 const mockPipelineQueries = ({

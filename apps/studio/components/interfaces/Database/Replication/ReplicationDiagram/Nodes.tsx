@@ -101,9 +101,14 @@ export const ReplicationNode = ({
             </Tooltip>
           )}
         </div>
-        <p className="truncate text-foreground-light" title={destination?.name}>
-          {destination?.name}
-        </p>
+        <Tooltip>
+          <TooltipTrigger asChild>
+            <p tabIndex={0} className="truncate rounded-sm text-foreground-light focus-ring">
+              {destination?.name}
+            </p>
+          </TooltipTrigger>
+          <TooltipContent>{destination?.name}</TooltipContent>
+        </Tooltip>
         {pipeline && <PipelineId pipelineId={pipeline.id} className="self-start" />}
       </div>
       {type ? <DestinationLogo type={type} /> : null}

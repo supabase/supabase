@@ -2,6 +2,8 @@ import { QueryClient } from '@tanstack/react-query'
 import { fireEvent, screen, waitFor, within } from '@testing-library/react'
 import userEvent from '@testing-library/user-event'
 import type { components } from 'api-types'
+import { FeatureFlagContext } from 'common'
+import { mockAnimationsApi } from 'jsdom-testing-mocks'
 import { HttpResponse } from 'msw'
 import { parseAsString, useQueryState } from 'nuqs'
 import { useState } from 'react'
@@ -13,16 +15,22 @@ import {
   PipelineRegionField,
   PipelineRegionReadonly,
 } from './DestinationPanel/DestinationForm/PipelineRegionField'
+import { DestinationPanel } from './DestinationPanel/DestinationPanel'
 import { PipelineClusterScope } from './PipelineClusterScope'
 import { PipelineClusterSelector } from './PipelineClusterSelector'
+import { organizationKeys } from '@/data/organizations/keys'
+import type { OrganizationsData } from '@/data/organizations/organizations-query'
 import { getPreferredClusterId } from '@/data/replication/clusters-query'
 import { useCreateDestinationPipelineMutation } from '@/data/replication/create-destination-pipeline-mutation'
 import { useCreateTenantSourceMutation } from '@/data/replication/create-tenant-source-mutation'
 import { useReplicationPipelinesQuery } from '@/data/replication/pipelines-query'
 import { ReplicationClusterProvider } from '@/state/replication-cluster'
+import { PipelineRequestStatusProvider } from '@/state/replication-pipeline-request-status'
 import { customRender } from '@/tests/lib/custom-render'
 import { addAPIMock, type APIErrorBody } from '@/tests/lib/msw'
 import { routerMock } from '@/tests/lib/route-mock'
+
+mockAnimationsApi()
 
 type Pipeline = components['schemas']['PipelinesResponse_Output']['pipelines'][number]
 type Regions = components['schemas']['PipelineRegionsResponse_Output']
@@ -49,10 +57,12 @@ const Resources = ({ onCreated }: { onCreated?: () => void }) => {
   const { data } = useReplicationPipelinesQuery({ projectRef: 'default' }, { staleTime: Infinity })
   const source = useCreateTenantSourceMutation()
   const create = useCreateDestinationPipelineMutation({ onSuccess: onCreated })
+  const [isSelectorVisible, setIsSelectorVisible] = useState(true)
   const [selectedCluster] = useQueryState('cluster_id', parseAsString)
   return (
     <>
-      <PipelineClusterSelector />
+      {isSelectorVisible && <PipelineClusterSelector />}
+      <Button onClick={() => setIsSelectorVisible((visible) => !visible)}>Toggle selector</Button>
       <PipelineRegionReadonly />
       <p>{`Selected: ${selectedCluster ?? 'environment default'}`}</p>
       {data?.pipelines.map((item) => (
@@ -207,7 +217,7 @@ describe('pipeline region selection', () => {
     await waitFor(() => expect([...writes].sort()).toEqual(['pipeline:2', 'source:2']))
 
     await pickRegion('Singapore (ap-southeast-1)')
-    expect(await screen.findByText('Selected: environment default')).toBeInTheDocument()
+    expect(await screen.findByText('Selected: 1')).toBeInTheDocument()
     expect(screen.getByText('Singapore pipeline')).toBeInTheDocument()
   })
 
@@ -288,6 +298,26 @@ describe('pipeline region selection', () => {
     expect(await screen.findByText('Created in Singapore')).toBeInTheDocument()
   })
 
+  it('keeps an explicit default region when the destination step is revisited', async () => {
+    mockRegions()
+    mockProjectRegion('eu-central-1')
+    const { reads } = trackRequests()
+    renderScope()
+
+    await screen.findByText('Selected: 2')
+    await pickRegion('Singapore (ap-southeast-1)')
+    await screen.findByText('Singapore pipeline')
+    fireEvent.click(screen.getByRole('button', { name: 'Toggle selector' }))
+    fireEvent.click(screen.getByRole('button', { name: 'Toggle selector' }))
+
+    await waitFor(() =>
+      expect(screen.getByRole('combobox', { name: 'Pipeline region' })).toHaveTextContent(
+        'Singapore (ap-southeast-1)'
+      )
+    )
+    expect(reads).not.toContain('1')
+  })
+
   describe('region source for creation', () => {
     const EnsureSource = () => {
       const { ensureRegionSource } = useEnsurePipelineRegionSource('default')
@@ -346,6 +376,100 @@ describe('pipeline region selection', () => {
       expect(await screen.findByRole('button', { name: 'Ensure source: true' })).toBeInTheDocument()
       expect(writes).toEqual(expected)
     })
+  })
+
+  it('retries preferred-region setup in the open creation panel after a failure', async () => {
+    mockRegions()
+    mockProjectRegion('eu-central-1')
+    const { writes } = trackRequests()
+    addAPIMock({
+      method: 'get',
+      path: '/platform/replication/:ref/destinations',
+      response: () =>
+        HttpResponse.json<components['schemas']['DestinationsResponse_Output']>({
+          destinations: [],
+        }),
+    })
+    addAPIMock({
+      method: 'get',
+      path: '/platform/replication/:ref/sources',
+      response: ({ request }) =>
+        HttpResponse.json<components['schemas']['SourcesResponse_Output']>({
+          sources:
+            requestedCluster(request) === '2' && writes.length < 2
+              ? []
+              : [
+                  {
+                    id: 1,
+                    name: 'default',
+                    tenant_id: 'default',
+                    config: {
+                      host: 'localhost',
+                      port: 5432,
+                      name: 'postgres',
+                      username: 'postgres',
+                    },
+                  },
+                ],
+        }),
+    })
+    addAPIMock({
+      method: 'post',
+      path: '/platform/replication/:ref/tenants-sources',
+      response: ({ request }) => {
+        writes.push(`source:${requestedCluster(request)}`)
+        if (writes.length === 1)
+          return HttpResponse.json<APIErrorBody>({ message: 'Setup failed' }, { status: 400 })
+        return HttpResponse.json<components['schemas']['CreateTenantSourceResponse_Output']>({
+          tenant_id: 'default',
+          source_id: 1,
+        })
+      },
+    })
+    addAPIMock({
+      method: 'get',
+      path: '/platform/replication/v2/:ref/sources/:source_id/publications',
+      response: () =>
+        HttpResponse.json<components['schemas']['ReadPublicationsResponse_Output']>({
+          publications: [{ name: 'analytics' }],
+        }),
+    })
+    const queryClient = new QueryClient({
+      defaultOptions: { queries: { retry: false }, mutations: { retry: false } },
+    })
+    queryClient.setQueryData<OrganizationsData>(organizationKeys.list(), [])
+    customRender(
+      <FeatureFlagContext.Provider
+        value={{
+          hasLoaded: true,
+          configcat: {
+            etlEnableBigQueryPrivateAlpha: 'all',
+            etlEnableDucklakePrivateAlpha: '',
+            etlEnableSnowflakePrivateAlpha: '',
+            etlEnableClickHousePrivateAlpha: '',
+            pipelineCreationWizard: false,
+          },
+          posthog: {},
+        }}
+      >
+        <PipelineRequestStatusProvider>
+          <DestinationPanel />
+        </PipelineRequestStatusProvider>
+      </FeatureFlagContext.Provider>,
+      { queryClient, nuqs: { hasMemory: true, searchParams: '?destinationType=BigQuery' } }
+    )
+
+    expect(await screen.findByText('Failed to prepare pipeline region')).toBeInTheDocument()
+    await userEvent.click(screen.getByRole('button', { name: 'Retry' }))
+    await waitFor(() =>
+      expect(screen.queryByText('Failed to prepare pipeline region')).not.toBeInTheDocument()
+    )
+    expect(writes).toEqual(['source:2', 'source:2'])
+    expect(await screen.findByRole('combobox', { name: 'Pipeline region' })).toHaveTextContent(
+      'Frankfurt (eu-central-1)'
+    )
+    await userEvent.click(await screen.findByText('Select publication'))
+    expect(await screen.findByText('analytics')).toBeInTheDocument()
   })
 
   describe('side panel region field', () => {

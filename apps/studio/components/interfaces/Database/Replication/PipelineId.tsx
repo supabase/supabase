@@ -12,7 +12,8 @@ export const PipelineId = ({
   return (
     <CopyButton
       text={pipelineId}
-      aria-label="Copy pipeline ID"
+      aria-label={`Copy pipeline ID ${pipelineId}`}
+      copiedLabel={`Pipeline ID ${pipelineId} copied`}
       title={pipelineId}
       variant="text"
       className={cn(

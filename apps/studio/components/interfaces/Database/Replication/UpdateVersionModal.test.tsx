@@ -22,6 +22,7 @@ import { addAPIMock } from '@/tests/lib/msw'
 
 const pipeline: Pipeline = {
   id: '9',
+  cluster_id: 'cluster',
   tenant_id: 'test',
   source_id: 1,
   source_name: 'main',
@@ -29,7 +30,6 @@ const pipeline: Pipeline = {
   destination_name: 'Analytics',
   replicator_id: 1,
   config: { publication_name: 'analytics' },
-  cluster_id: '1',
 }
 
 const StatusView = () => {

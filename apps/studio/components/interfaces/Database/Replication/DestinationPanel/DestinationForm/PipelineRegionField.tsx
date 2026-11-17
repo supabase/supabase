@@ -43,11 +43,13 @@ export const PipelineRegionField = ({
   destinationType,
   className,
   onRegionChange,
+  disabled,
 }: {
   destinationType?: DestinationType
   className?: string
   /** Makes the region selectable when there is more than one region. */
   onRegionChange?: (clusterId: string | undefined) => void
+  disabled?: boolean
 }) => {
   const { hasMultipleRegions } = useReplicationClusterGroups()
   const { data } = useQuery(replicationClustersQueryOptions())
@@ -64,6 +66,7 @@ export const PipelineRegionField = ({
       {canSelectRegion ? (
         <PipelineRegionSelect
           className={className}
+          disabled={disabled}
           value={clusterId ?? data.default_cluster_id}
           onValueChange={(value) =>
             onRegionChange(toRequestClusterId(value, data.default_cluster_id))
@@ -80,15 +83,17 @@ export const PipelineRegionSelect = ({
   value,
   onValueChange,
   className,
+  disabled,
 }: {
   value: string
   onValueChange: (clusterId: string) => void
   className?: string
+  disabled?: boolean
 }) => {
   const { data } = useQuery(replicationClustersQueryOptions())
 
   return (
-    <Select value={value} onValueChange={onValueChange}>
+    <Select value={value} onValueChange={onValueChange} disabled={disabled}>
       <SelectTrigger aria-label="Pipeline region" className={className}>
         <SelectValue />
       </SelectTrigger>

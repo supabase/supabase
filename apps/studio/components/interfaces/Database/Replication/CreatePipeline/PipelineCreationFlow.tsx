@@ -194,7 +194,7 @@ export const PipelineCreationFlow = ({
                     }}
                     renderLogo={(value) => <DestinationLogo type={value} />}
                   />
-                  <PipelineClusterSelector onChange={resetValidation} />
+                  <PipelineClusterSelector onChange={resetValidation} disabled={isBusy} />
                 </div>
               )}
               {accessibleStep === 'connection' && (
