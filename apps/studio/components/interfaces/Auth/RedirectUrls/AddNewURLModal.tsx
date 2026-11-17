@@ -150,15 +150,16 @@ export const AddNewURLModal = ({ visible, allowList, onClose }: AddNewURLModalPr
         <DialogSectionSeparator />
         <Form {...form}>
           <form onSubmit={form.handleSubmit(onSubmit)}>
-            <DialogSection className="flex flex-col gap-y-2 px-0">
+            <DialogSection className="flex flex-col gap-y-2">
               <div className="flex flex-col gap-y-1">
                 <Label>URL</Label>
                 <p className="text-sm text-foreground-light">
                   Paste multiple URLs at once — one per line
                 </p>
               </div>
-              <ScrollArea className={cn(urls.length > 4 ? 'h-[220px]' : '')}>
-                <div className="px-5 py-1">
+              {/* offsets align rows with the label and leave room for the focus ring and scrollbar */}
+              <ScrollArea className={cn('-ml-1 -mr-4', urls.length > 4 ? 'h-[220px]' : '')}>
+                <div className="py-1 pl-1 pr-4">
                   <FormItemLayout className="[&>div>div]:mt-0">
                     <SingleValueFieldArray
                       control={form.control}
