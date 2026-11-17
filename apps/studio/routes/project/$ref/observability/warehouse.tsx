@@ -1,14 +1,19 @@
 import { createFileRoute } from '@tanstack/react-router'
 
-import WarehouseReport from '@/pages/project/[ref]/observability/warehouse'
+import { WarehouseMetricsReport } from '@/components/interfaces/Observability/Warehouse/WarehouseMetricsReport'
+import { ReportPadding } from '@/components/interfaces/Reports/ReportPadding'
 
 export const Route = createFileRoute('/project/$ref/observability/warehouse')({
-  component: ObservabilityWarehouseRoute,
+  component: WarehouseReport,
   staticData: {
     observabilityLayoutTitle: 'Warehouse',
   },
 })
 
-function ObservabilityWarehouseRoute() {
-  return <WarehouseReport dehydratedState={undefined} />
+function WarehouseReport() {
+  return (
+    <ReportPadding>
+      <WarehouseMetricsReport />
+    </ReportPadding>
+  )
 }

@@ -1,11 +1,5 @@
-// Shared Sentry server-side configuration for every Studio server runtime:
-//
-//   - Next (Node): `sentry.server.config.ts`, loaded by `instrumentation.ts`.
-//   - Next (edge): `sentry.edge.config.ts`.
-//   - TanStack Start (Nitro): `instrument.server.mjs`, imported first by `server.ts`.
-//
-// Keep every shared option here so the runtimes can't drift. Don't import
-// anything Next-specific: the TanStack server bundle imports this module.
+// Sentry server-side configuration, used by `instrument.server.mjs` (imported
+// first by `server.ts`).
 import type { init } from '@sentry/tanstackstart-react'
 
 import { applyStudioErrorPolicy } from '@/lib/errors/sentry-event-policy'
