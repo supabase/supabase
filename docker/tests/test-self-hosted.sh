@@ -517,6 +517,27 @@ check "/api/mcp blocked" "403" \
 check "/mcp blocked" "403" \
     "$(http_status "$BASE_URL/mcp")"
 
+echo "--- Studio routes: no CORS ---"
+# Studio sends only same-origin requests, and MCP clients aren't browsers, so
+# the gateway doesn't approve preflights or add CORS headers on these routes.
+# cors_allow_origin <path> [curl args]: Access-Control-Allow-Origin, or "none"
+cors_allow_origin() {
+    path="$1"
+    shift
+    value=$(curl -s -o /dev/null -D - --max-time 10 \
+        -H "Origin: https://other.example.com" "$@" "$BASE_URL$path" |
+        awk 'tolower($1) == "access-control-allow-origin:" { sub(/^[^:]*:[[:space:]]*/, ""); sub(/[[:space:]]*$/, ""); print }')
+    echo "${value:-none}"
+}
+for path in / /api/platform/pg-meta/default/query /mcp /api/mcp; do
+    check "Preflight to $path not approved" "none" \
+        "$(cors_allow_origin "$path" -X OPTIONS \
+            -H "Access-Control-Request-Method: POST" \
+            -H "Access-Control-Request-Headers: content-type")"
+done
+check "Cross-origin GET to Studio has no Allow-Origin" "none" \
+    "$(cors_allow_origin / -u "$DASHBOARD_USERNAME:$DASHBOARD_PASSWORD")"
+
 # ---------------------------------------------
 # 9. Realtime
 # ---------------------------------------------
