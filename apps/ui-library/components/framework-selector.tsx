@@ -1,7 +1,9 @@
 'use client'
 
-import { usePathname, useRouter } from 'next/navigation'
-import { Select, SelectContent, SelectGroup, SelectItem, SelectTrigger, SelectValue } from 'ui'
+import { Check, ChevronDown } from 'lucide-react'
+import Link from 'next/link'
+import { usePathname } from 'next/navigation'
+import { DropdownMenu, DropdownMenuContent, DropdownMenuItem, DropdownMenuTrigger } from 'ui'
 
 import { componentPages, frameworkTitles, oauthBlocks } from '@/config/docs'
 import { useFramework } from '@/context/framework-context'
@@ -17,7 +19,6 @@ export function FrameworkSelector() {
   const docTitle = pathParts[pathParts.length - 1]
   const framework = pathParts[pathParts.length - 2]
 
-  const router = useRouter()
   const { setFramework: setPreferredFramework } = useFramework()
   const selectedFramework = frameworks.includes(framework) ? framework : 'nextjs'
 
@@ -41,18 +42,11 @@ export function FrameworkSelector() {
     return null
   }
 
-  const onSelect = (value: string) => {
-    // Get current path parts
-    const currentPathParts = [...pathParts]
-    // Replace the framework part (second to last) with the new framework
-    currentPathParts[currentPathParts.length - 2] = value
-    // Build the new path
-    const newPath = currentPathParts.join('/')
-
-    router.push(newPath)
-
-    // Also update the context/localStorage for future use
-    setPreferredFramework(value as keyof typeof frameworkTitles)
+  // Build the URL for a framework by swapping the framework segment (second to last)
+  const getFrameworkHref = (value: string) => {
+    const parts = [...pathParts]
+    parts[parts.length - 2] = value
+    return parts.join('/')
   }
 
   const options =
@@ -62,22 +56,30 @@ export function FrameworkSelector() {
     })) || []
 
   return (
-    <Select value={selectedFramework} onValueChange={onSelect}>
-      <SelectTrigger
+    <DropdownMenu>
+      <DropdownMenuTrigger
         aria-label="Framework"
-        className="h-7 w-auto min-w-28 gap-2 rounded-md bg-surface-75 px-2 text-xs"
+        className="flex h-7 min-w-28 cursor-pointer items-center justify-between gap-2 rounded-md border-0 bg-surface-75 px-2 text-left text-xs ring-border-control transition-colors duration-200 focus-ring control-surface-shadows raised-control-surface"
       >
-        <SelectValue>{frameworkTitles[selectedFramework]}</SelectValue>
-      </SelectTrigger>
-      <SelectContent>
-        <SelectGroup>
-          {options.map((f) => (
-            <SelectItem key={f.value} value={f.value}>
+        <span className="truncate">{frameworkTitles[selectedFramework]}</span>
+        <ChevronDown className="h-4 w-4 shrink-0 text-foreground-lighter" strokeWidth={1.5} />
+      </DropdownMenuTrigger>
+      <DropdownMenuContent align="start">
+        {options.map((f) => (
+          <DropdownMenuItem key={f.value} asChild inset>
+            <Link
+              href={getFrameworkHref(f.value)}
+              aria-current={f.value === selectedFramework ? 'page' : undefined}
+              onClick={() => setPreferredFramework(f.value as keyof typeof frameworkTitles)}
+            >
+              {f.value === selectedFramework && (
+                <Check className="absolute left-2 h-4 w-4" strokeWidth={1.5} aria-hidden />
+              )}
               {f.label}
-            </SelectItem>
-          ))}
-        </SelectGroup>
-      </SelectContent>
-    </Select>
+            </Link>
+          </DropdownMenuItem>
+        ))}
+      </DropdownMenuContent>
+    </DropdownMenu>
   )
 }
