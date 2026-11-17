@@ -1,5 +1,6 @@
 import * as Sentry from '@sentry/nextjs'
 import { parseProjectRef } from '~/lib/compute-project-ref'
+import { CustomerioTrackClient } from '~/lib/customerio'
 
 const corsHeaders = {
   'Access-Control-Allow-Origin': '*',
@@ -180,6 +181,15 @@ export async function POST(req: Request) {
       })
     }
 
+    await saveWaitlistSignupInCustomerIO({
+      email,
+      firstName,
+      lastName,
+      company,
+      projectRef: parsedProjectRef,
+      useCase,
+    })
+
     return new Response(JSON.stringify({ message: 'Submission successful' }), {
       headers: { ...corsHeaders, 'Content-Type': 'application/json' },
       status: 200,
@@ -190,5 +200,60 @@ export async function POST(req: Request) {
       headers: { ...corsHeaders, 'Content-Type': 'application/json' },
       status: 500,
     })
+  }
+}
+
+// Mirror the signup into Customer.io so waitlist members can be segmented and
+// emailed without a HubSpot sync. HubSpot stays the source of record: a
+// Customer.io failure is reported to Sentry and never fails the submission.
+// Never set `unsubscribed` or subscription preferences here, so a signup
+// can't resubscribe someone who opted out.
+const saveWaitlistSignupInCustomerIO = async (signup: {
+  email: string
+  firstName: string
+  lastName: string
+  company?: string
+  projectRef: string | null
+  useCase?: string
+}) => {
+  const customerioSiteId = process.env.CUSTOMERIO_SITE_ID
+  const customerioApiKey = process.env.CUSTOMERIO_API_KEY
+
+  if (!customerioSiteId || !customerioApiKey) {
+    Sentry.captureException(new Error('Customer.io credentials not configured'))
+    return
+  }
+
+  try {
+    const cio = new CustomerioTrackClient(customerioSiteId, customerioApiKey)
+    const now = new Date().toISOString()
+    const timestamp = cio.isoToUnixTimestamp(now)
+
+    // Profile attributes drive segment membership. Names stay on the event
+    // so the form can't overwrite names already on existing profiles.
+    await cio.createOrUpdateProfile(signup.email, {
+      compute_waitlist_joined_at: timestamp,
+      ...(signup.projectRef ? { compute_project_ref: signup.projectRef } : {}),
+    })
+
+    // The event only triggers campaigns.
+    await cio.trackEvent(signup.email, {
+      userId: signup.email,
+      type: 'track',
+      event: 'waitlist_joined',
+      properties: {
+        waitlist: 'compute',
+        first_name: signup.firstName,
+        last_name: signup.lastName,
+        ...(signup.company ? { company: signup.company } : {}),
+        ...(signup.projectRef ? { project_ref: signup.projectRef } : {}),
+        ...(signup.useCase ? { use_case: signup.useCase } : {}),
+        source: 'compute_waitlist_form',
+        submitted_at: now,
+      },
+      timestamp,
+    })
+  } catch (error) {
+    Sentry.captureException(error)
   }
 }
