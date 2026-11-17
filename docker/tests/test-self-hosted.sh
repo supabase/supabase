@@ -520,12 +520,17 @@ check "/mcp blocked" "403" \
 echo "--- Studio routes: no CORS ---"
 # Studio sends only same-origin requests, and MCP clients aren't browsers, so
 # the gateway doesn't approve preflights or add CORS headers on these routes.
-# cors_allow_origin <path> [curl args]: Access-Control-Allow-Origin, or "none"
+# cors_allow_origin <path> [curl args]: Access-Control-Allow-Origin, "none" when
+# the response has no such header, or "request failed" when there's no response
 cors_allow_origin() {
     path="$1"
     shift
-    value=$(curl -s -o /dev/null -D - --max-time 10 \
-        -H "Origin: https://other.example.com" "$@" "$BASE_URL$path" |
+    response_headers=$(curl -s -o /dev/null -D - --max-time 10 \
+        -H "Origin: https://other.example.com" "$@" "$BASE_URL$path") || {
+        echo "request failed"
+        return
+    }
+    value=$(printf '%s\n' "$response_headers" |
         awk 'tolower($1) == "access-control-allow-origin:" { sub(/^[^:]*:[[:space:]]*/, ""); sub(/[[:space:]]*$/, ""); print }')
     echo "${value:-none}"
 }
