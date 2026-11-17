@@ -10,7 +10,13 @@
 #   - Running self-hosted Supabase instance
 #   - .env file with all keys configured
 #   - jq (for JSON parsing)
-#   - node >= 16 (for HS256 token minting test only)
+#   - node >= 16 (for minting test tokens)
+#   - docker access to supabase-db (for the effective role checks, skipped without it)
+#
+# The legacy HS256 groups are kept on purpose: they cover Auth's and PostgREST's
+# backward-compatible path. The sb_ key groups cover a different path: the
+# gateway translates the key into a pre-signed ES256 JWT, which each service
+# verifies against JWKS by its kid.
 #
 
 set -e
@@ -35,6 +41,8 @@ ANON_KEY=$(grep '^ANON_KEY=' .env | cut -d= -f2-)
 SERVICE_ROLE_KEY=$(grep '^SERVICE_ROLE_KEY=' .env | cut -d= -f2-)
 SUPABASE_PUBLISHABLE_KEY=$(grep '^SUPABASE_PUBLISHABLE_KEY=' .env | cut -d= -f2-)
 SUPABASE_SECRET_KEY=$(grep '^SUPABASE_SECRET_KEY=' .env | cut -d= -f2-)
+ANON_KEY_ASYMMETRIC=$(grep '^ANON_KEY_ASYMMETRIC=' .env | cut -d= -f2-)
+SERVICE_ROLE_KEY_ASYMMETRIC=$(grep '^SERVICE_ROLE_KEY_ASYMMETRIC=' .env | cut -d= -f2-)
 
 # Prefer the running container's value: .env can be quoted or edited without
 # recreating the functions service. Fall back to .env without Docker access.
@@ -93,6 +101,22 @@ detect_gateway() {
     fi
 }
 GATEWAY=$(detect_gateway)
+
+# jwt_field <token> <1|2> <jq path>: a field from a JWT's header (1) or payload (2)
+jwt_field() {
+    printf '%s' "$1" | cut -d. -f"$2" | tr '_-' '/+' |
+        jq -Rr "@base64d | fromjson | $3 // empty" 2>/dev/null
+}
+
+# kid_in_jwks <kid>: whether Auth publishes a public key with this kid
+kid_in_jwks() {
+    if [ -n "$1" ] && curl -s "$BASE_URL/auth/v1/.well-known/jwks.json" |
+        jq -e --arg kid "$1" 'any(.keys[]; .kid == $kid)' >/dev/null 2>&1; then
+        echo "true"
+    else
+        echo "false"
+    fi
+}
 
 echo ""
 echo "=== Testing against $BASE_URL ==="
@@ -288,6 +312,60 @@ check "JWKS contains EC public key" "true" "$jwks_has_ec"
 check "JWKS does NOT contain symmetric key" "false" "$jwks_has_oct"
 
 echo ""
+echo "--- Internal asymmetric keys ---"
+# The gateway sends these in place of sb_ keys. Auth looks up the
+# verification key by kid only, so a key without a kid fails there even
+# though PostgREST accepts it.
+if [ -n "$ANON_KEY_ASYMMETRIC" ] && [ -n "$SERVICE_ROLE_KEY_ASYMMETRIC" ]; then
+    for name in ANON_KEY_ASYMMETRIC SERVICE_ROLE_KEY_ASYMMETRIC; do
+        eval "key=\$$name"
+        check "$name is signed with ES256" "ES256" "$(jwt_field "$key" 1 .alg)"
+        check "$name has a kid that is in JWKS" "true" "$(kid_in_jwks "$(jwt_field "$key" 1 .kid)")"
+    done
+    check "ANON_KEY_ASYMMETRIC role" "anon" "$(jwt_field "$ANON_KEY_ASYMMETRIC" 2 .role)"
+    check "SERVICE_ROLE_KEY_ASYMMETRIC role" "service_role" "$(jwt_field "$SERVICE_ROLE_KEY_ASYMMETRIC" 2 .role)"
+else
+    echo "  SKIP: Asymmetric keys not configured"
+fi
+
+echo ""
+echo "--- Opaque keys -> Auth admin API ---"
+# The path most server-side code takes: only the apikey header, no
+# Authorization. The gateway must send a service_role JWT that Auth verifies.
+if [ -n "$SUPABASE_SECRET_KEY" ]; then
+    admin_email="test-keys-admin-$$@example.com"
+    admin_create=$(curl -s -w '\n%{http_code}' "$BASE_URL/auth/v1/admin/users" \
+        -X POST \
+        -H "apikey: $SUPABASE_SECRET_KEY" \
+        -H "Content-Type: application/json" \
+        -d "{\"email\":\"$admin_email\",\"password\":\"test-password-123456\",\"email_confirm\":true}")
+    check "SECRET_KEY, no Authorization -> create user" "200" \
+        "$(printf '%s\n' "$admin_create" | tail -n 1)"
+    admin_user_id=$(printf '%s\n' "$admin_create" | sed '$d' | jq -r '.id // empty' 2>/dev/null)
+
+    check "SECRET_KEY, no Authorization -> list users" "200" \
+        "$(http_status "$BASE_URL/auth/v1/admin/users?per_page=1" \
+            -H "apikey: $SUPABASE_SECRET_KEY")"
+    check "SECRET_KEY + Authorization: Bearer SECRET_KEY -> list users" "200" \
+        "$(http_status "$BASE_URL/auth/v1/admin/users?per_page=1" \
+            -H "apikey: $SUPABASE_SECRET_KEY" \
+            -H "Authorization: Bearer $SUPABASE_SECRET_KEY")"
+    # The publishable key maps to anon, which has no admin access.
+    check "PUBLISHABLE_KEY -> admin API rejected" "403" \
+        "$(http_status "$BASE_URL/auth/v1/admin/users?per_page=1" \
+            -H "apikey: $SUPABASE_PUBLISHABLE_KEY")"
+
+    if [ -n "$admin_user_id" ]; then
+        check "SECRET_KEY, no Authorization -> delete user" "200" \
+            "$(http_status "$BASE_URL/auth/v1/admin/users/$admin_user_id" \
+                -X DELETE \
+                -H "apikey: $SUPABASE_SECRET_KEY")"
+    fi
+else
+    echo "  SKIP: Opaque keys not configured"
+fi
+
+echo ""
 echo "--- OAuth and OIDC discovery ---"
 check "OIDC discovery (no auth)" "200" \
     "$(http_status "$BASE_URL/auth/v1/.well-known/openid-configuration")"
@@ -370,6 +448,8 @@ if [ -n "$access_token" ]; then
         echo "  INFO: User session JWT signed with: $jwt_alg"
         if [ "$jwt_alg" = "ES256" ]; then
             check "JWT uses ES256 (asymmetric)" "ES256" "$jwt_alg"
+            check "JWT has a kid that is in JWKS" "true" \
+                "$(kid_in_jwks "$(jwt_field "$access_token" 1 .kid)")"
         else
             check "JWT uses HS256 (legacy)" "HS256" "$jwt_alg"
         fi
@@ -426,6 +506,61 @@ else
     check "Sign in test user" "true" "false"
 fi
 
+# ---------------------------------------------
+# Effective role in PostgREST
+# ---------------------------------------------
+
+echo ""
+echo "--- Effective role in PostgREST ---"
+# Status codes don't show which role a request ran as. A temporary function
+# returns current_user, the role PostgREST switched to for the request.
+role_fn="test_keys_role_$$"
+if docker exec supabase-db psql -U postgres -d postgres -v ON_ERROR_STOP=1 -q -c \
+    "create function public.$role_fn() returns text language sql as 'select current_user::text';
+     notify pgrst, 'reload schema';" >/dev/null 2>&1; then
+    # role_via [curl args]: the role the function reports, or the HTTP status
+    role_via() {
+        out=$(curl -s -w '\n%{http_code}' -X POST "$BASE_URL/rest/v1/rpc/$role_fn" \
+            -H "Content-Type: application/json" -d '{}' "$@")
+        code=$(printf '%s\n' "$out" | tail -n 1)
+        if [ "$code" = "200" ]; then
+            printf '%s\n' "$out" | sed '$d' | jq -r '.'
+        else
+            echo "HTTP $code"
+        fi
+    }
+    # Wait for PostgREST to load the new function
+    i=0
+    while [ "$(role_via -H "apikey: $ANON_KEY")" != "anon" ] && [ "$i" -lt 20 ]; do
+        sleep 0.5
+        i=$((i + 1))
+    done
+
+    # Legacy keys are JWTs that clients send in both headers, as supabase-js
+    # does. With apikey alone, the role depends on the gateway: Envoy turns
+    # the apikey into a Bearer token, Kong doesn't, so PostgREST sees anon.
+    check "Legacy ANON_KEY (apikey + Bearer) runs as anon" "anon" \
+        "$(role_via -H "apikey: $ANON_KEY" -H "Authorization: Bearer $ANON_KEY")"
+    check "Legacy SERVICE_ROLE_KEY (apikey + Bearer) runs as service_role" "service_role" \
+        "$(role_via -H "apikey: $SERVICE_ROLE_KEY" -H "Authorization: Bearer $SERVICE_ROLE_KEY")"
+    # sb_ keys aren't JWTs: the gateway translates them, with no Authorization needed.
+    if [ -n "$SUPABASE_PUBLISHABLE_KEY" ]; then
+        check "PUBLISHABLE_KEY runs as anon" "anon" \
+            "$(role_via -H "apikey: $SUPABASE_PUBLISHABLE_KEY")"
+        check "SECRET_KEY runs as service_role" "service_role" \
+            "$(role_via -H "apikey: $SUPABASE_SECRET_KEY")"
+        if [ -n "$access_token" ]; then
+            check "PUBLISHABLE_KEY + user JWT runs as authenticated" "authenticated" \
+                "$(role_via -H "apikey: $SUPABASE_PUBLISHABLE_KEY" -H "Authorization: Bearer $access_token")"
+        fi
+    fi
+
+    docker exec supabase-db psql -U postgres -d postgres -q -c \
+        "drop function if exists public.$role_fn(); notify pgrst, 'reload schema';" >/dev/null 2>&1 || true
+else
+    echo "  SKIP: Effective role checks (no docker access to supabase-db)"
+fi
+
 # Clean up test user
 if [ -n "$test_user_id" ]; then
     curl -s -o /dev/null "$BASE_URL/auth/v1/admin/users/$test_user_id" \
@@ -466,6 +601,53 @@ if [ -n "$hs256_token" ]; then
             -H "Authorization: Bearer $hs256_token")"
 else
     echo "  SKIP: Could not mint HS256 token (node required)"
+fi
+
+# ---------------------------------------------
+# ES256 tokens with and without a kid
+# ---------------------------------------------
+
+echo ""
+echo "--- ES256 tokens with and without a kid ---"
+# Auth finds the verification key by kid. An ES256 token without one must be
+# rejected, which is how the gateway's internal keys would fail if they lost
+# their kid. The token with a kid shows the signing itself is valid.
+
+# mint_es256 <with-kid|without-kid>: a service_role token signed with the
+# EC private key from JWT_KEYS
+mint_es256() {
+    JWT_KEYS="$(grep '^JWT_KEYS=' .env | cut -d= -f2-)" MODE="$1" node -e "
+const crypto = require('crypto');
+const jwk = JSON.parse(process.env.JWT_KEYS).find((k) => k.kty === 'EC' && k.d);
+const header = { alg: 'ES256', typ: 'JWT' };
+if (process.env.MODE === 'with-kid') header.kid = jwk.kid;
+const now = Math.floor(Date.now() / 1000);
+const enc = (o) => Buffer.from(JSON.stringify(o)).toString('base64url');
+const input = enc(header) + '.' + enc({ role: 'service_role', iss: 'supabase', iat: now, exp: now + 300 });
+const key = crypto.createPrivateKey({ key: jwk, format: 'jwk' });
+const sig = crypto.sign('sha256', Buffer.from(input), { key, dsaEncoding: 'ieee-p1363' });
+console.log(input + '.' + sig.toString('base64url'));
+" 2>/dev/null
+}
+
+# admin_with_token <token>: status and Auth's error_code for an admin request
+admin_with_token() {
+    out=$(curl -s -w '\n%{http_code}' "$BASE_URL/auth/v1/admin/users?per_page=1" \
+        -H "apikey: $SERVICE_ROLE_KEY" -H "Authorization: Bearer $1")
+    code=$(printf '%s\n' "$out" | tail -n 1)
+    error_code=$(printf '%s\n' "$out" | sed '$d' | jq -r '.error_code // empty' 2>/dev/null)
+    echo "$code${error_code:+ $error_code}"
+}
+
+es256_with_kid=$(mint_es256 with-kid || true)
+es256_without_kid=$(mint_es256 without-kid || true)
+if [ -n "$es256_with_kid" ] && [ -n "$es256_without_kid" ]; then
+    check "ES256 service_role token with kid -> Auth admin" "200" \
+        "$(admin_with_token "$es256_with_kid")"
+    check "ES256 service_role token without kid -> rejected by Auth" "403 bad_jwt" \
+        "$(admin_with_token "$es256_without_kid")"
+else
+    echo "  SKIP: Could not mint ES256 tokens (needs an EC signing key in JWT_KEYS)"
 fi
 
 # ---------------------------------------------
