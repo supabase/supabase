@@ -6,7 +6,7 @@ import Footer from '../components/Footer.astro'
 import { Header } from '../components/Header'
 import { KbSearch } from '../components/KbSearch'
 import { PageTelemetryIsland } from '../components/PageTelemetryIsland'
-import { toSummary, toTroubleshootingSummary } from '../lib/guides'
+import { toCommunityGuideSummary, toSummary, toTroubleshootingSummary } from '../lib/guides'
 import { getListedTopics } from '../lib/topics'
 import '../styles/globals.css'
 import { canonicalUrl, serializeJsonLd } from '../lib/json-ld'
@@ -22,6 +22,7 @@ const { title, description, jsonLd } = Astro.props
 const navTopics = getListedTopics({
 	guides: (await getCollection('guides')).map(toSummary),
 	troubleshooting: (await getCollection('troubleshooting')).map(toTroubleshootingSummary),
+	communityGuides: (await getCollection('communityGuides')).map(toCommunityGuideSummary),
 }).map((topic) => topic.name)
 const faviconRoute = import.meta.env.DEV ? '/favicon/local' : '/favicon'
 const canonicalHref = canonicalUrl(Astro.url.pathname)

@@ -2,10 +2,7 @@ import { screen } from '@testing-library/react'
 import { describe, expect, test, vi } from 'vitest'
 
 import { OAuthAppsAuthorizeScreen } from './OAuthAppsAuthorizeScreen'
-import {
-  getMockOAuthAppsAuthorizeRequest,
-  OAUTH_APPS_MOCK_SCENARIOS,
-} from '@/data/oauth-apps/mocks'
+import { OAUTH_APPS_MOCK_SCENARIOS } from '@/data/oauth-apps/mocks'
 import { customRender } from '@/tests/lib/custom-render'
 
 vi.mock('@/data/oauth-apps/oauth-apps-authorize-approve-mutation', async (importOriginal) => {
@@ -23,7 +20,6 @@ describe('OAuthAppsAuthorizeScreen while the approve mutation is in flight', () 
     customRender(
       <OAuthAppsAuthorizeScreen
         authId={OAUTH_APPS_MOCK_SCENARIOS.vercelDeveloper}
-        request={getMockOAuthAppsAuthorizeRequest(OAUTH_APPS_MOCK_SCENARIOS.vercelDeveloper)}
         navigate={vi.fn()}
       />
     )

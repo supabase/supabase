@@ -25,7 +25,6 @@ import { WrapperDashboardIntegration } from '~/components/WrapperDashboardIntegr
 import { CodeSampleDummy, CodeSampleWrapper } from '~/features/directives/CodeSample.client'
 import { CodeTabs, NamedCodeBlock } from '~/features/directives/CodeTabs.components'
 import { MdxAnchor } from '~/features/docs/MdxAnchor'
-import { Accordion, AccordionItem } from '~/features/ui/Accordion'
 import { CodeBlock } from '~/features/ui/CodeBlock/CodeBlock'
 import { ShowUntil } from '~/features/ui/ShowUntil'
 import { TabPanel, Tabs } from '~/features/ui/Tabs'
@@ -38,6 +37,7 @@ import { Admonition, type AdmonitionProps } from 'ui-patterns/Admonition'
 import { GlassPanel } from 'ui-patterns/GlassPanel'
 import SqlToRest from 'ui-patterns/SqlToRest'
 
+import { GettingStartedStepper } from '../getting-started/GettingStartedStepper'
 import { AgentPluginsPanel } from '../ui/AgentPluginsPanel'
 import { AgentSetup } from '../ui/AgentSetup'
 import { AgentWatchSchedule } from '../ui/AgentWatchSchedule'
@@ -67,8 +67,6 @@ const Pre = (props: any) => {
 }
 
 const components = {
-  Accordion,
-  AccordionItem,
   Admonition: DocsAdmonition,
   AgentPluginsPanel,
   AgentSetup,
@@ -93,6 +91,7 @@ const components = {
   DatabaseAdvisorsIndex,
   ErrorCodes,
   Extensions,
+  GettingStartedStepper,
   GlassPanel,
   IconArrowDown: ArrowDown,
   IconCheck: Check,

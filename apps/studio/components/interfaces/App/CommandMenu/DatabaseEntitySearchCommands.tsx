@@ -1,6 +1,6 @@
 import { useQuery } from '@tanstack/react-query'
 import { useDebounce } from '@uidotdev/usehooks'
-import { DatabaseIcon, FunctionSquareIcon, ShieldIcon, ZapIcon } from 'lucide-react'
+import { FunctionSquareIcon, ShieldIcon, ZapIcon } from 'lucide-react'
 import type { ICommand } from 'ui-patterns/CommandMenu'
 import {
   useCommandMenuOpen,
@@ -11,20 +11,23 @@ import {
 
 import { COMMAND_MENU_SECTIONS } from './CommandMenu.utils'
 import {
+  getFunctionEditorRoute,
+  getPolicyEditorRoute,
+  getTableEditorRoute,
+  getTriggerEditorRoute,
+} from './DatabaseEntityRoutes.utils'
+import {
   ENTITY_SEARCH_DEBOUNCE_MS,
   formatFunctionSearchDetails,
   formatTableSearchDetails,
   formatTriggerSearchDetails,
   getEntitySearchQuery,
-  getFunctionEditorRoute,
-  getPolicyEditorRoute,
-  getTableEditorRoute,
-  getTriggerEditorRoute,
   matchesEntitySearch,
   matchesTableRelatedSearch,
   matchesTriggerSearch,
 } from './DatabaseEntitySearch.utils'
 import { orderCommandSectionsByPriority } from './ordering'
+import { EntityTypeIcon } from '@/components/ui/EntityTypeIcon'
 import { entitySearchQueryOptions } from '@/data/database/entity-search-query'
 import { useSelectedProjectQuery } from '@/hooks/misc/useSelectedProject'
 
@@ -32,6 +35,7 @@ import { useSelectedProjectQuery } from '@/hooks/misc/useSelectedProject'
 // menu's relevance sort, so a better-matching policy, trigger or function doesn't
 // jump above the tables
 const ENTITY_SEARCH_RELEVANCE_GROUP = 'database-entity-search'
+const COMMAND_ITEM_ICON_CLASS = 'text-foreground-light group-aria-selected:text-foreground'
 
 /**
  * Searches the project's database entities by name as the user types in the
@@ -82,17 +86,24 @@ export function useDatabaseEntitySearchCommands() {
 
   const tableCommands: ICommand[] = tables.map((table) => {
     const displayName = `${table.schema}.${table.name}`
+    const details = formatTableSearchDetails(table)
     return {
       id: `entity-search-table-${table.id}`,
       name: displayName,
       value: `entity-search-table-${table.id} ${displayName}`,
       forceMount: true,
-      icon: () => <DatabaseIcon />,
-      badge: () => (
-        <span className="text-xs text-foreground-lighter truncate pl-4 shrink-0">
-          {formatTableSearchDetails(table)}
+      icon: () => (
+        <span className="w-5 h-5 flex items-center justify-center shrink-0">
+          <EntityTypeIcon type={table.type} className={COMMAND_ITEM_ICON_CLASS} />
         </span>
       ),
+      badge: details
+        ? () => (
+            <span className="text-xs text-foreground-lighter truncate pl-4 shrink-0">
+              {details}
+            </span>
+          )
+        : undefined,
       route: getTableEditorRoute(projectRef, table),
     }
   })

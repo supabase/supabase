@@ -42,6 +42,7 @@ HTTP filter chain
   ├─ Lua: translate opaque keys in header
   ├─ Lua: mirror apikey to x-api-key (Realtime WS)
   ├─ Lua: synthesize Authorization header
+  ├─ Lua: sandbox responses (Storage, REST, Functions)
   ├─ RBAC  (global: service_role → /pg/, apikey → other API routes;
   │         per-route DENY override on /mcp and Realtime
   │         /api/tenants, /api/openapi)
@@ -253,6 +254,18 @@ The Envoy admin interface at `127.0.0.1:9901` exposes `/config_dump`, which cont
 The gateway listens on plain HTTP only and does not terminate TLS. For public deployments, terminate TLS at an upstream reverse proxy - the Docker setup ships `docker-compose.caddy.yml` and `docker-compose.nginx.yml` for this purpose.
 
 </Admonition>
+
+### Sandboxed responses
+
+Studio is served from the same origin as the APIs. The gateway adds this header to responses on `/storage/v1/`, `/rest/v1/`, and `/functions/v1/`:
+
+```
+Content-Security-Policy: default-src 'none'; media-src 'self'; style-src 'unsafe-inline'; sandbox
+```
+
+A document opened directly from these routes, such as an HTML page or an SVG file, still displays with its inline styles. It can't run scripts, submit forms, or load other resources such as images and stylesheets. Images and media opened directly still display. Requests from your app, such as `fetch` calls and `<img>` tags, aren't affected.
+
+The Kong configuration adds the same header.
 
 ## Customizing the configuration
 
