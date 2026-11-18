@@ -81,9 +81,14 @@ const WarehouseMetricsReportContent = () => {
   })()
   const hasChartValues = points.some((point) => typeof point.value === 'number')
 
-  const reportStatus = hasChartValues
-    ? 'Warehouse report loaded'
-    : `Warehouse report: ${emptyMessage}`
+  const reportStatus = (() => {
+    if (!IS_PLATFORM) return 'Warehouse metrics are unavailable'
+    if (query.isPending || (setup.isPending && !hasValues)) return 'Loading Warehouse report'
+    if (setup.isError && !hasValues) return 'Failed to retrieve Warehouse status'
+    if (canShowSetup) return isDisabled ? 'Warehouse is disabled' : 'Warehouse is not set up'
+    if (query.isError) return 'Failed to retrieve Warehouse metrics'
+    return hasChartValues ? 'Warehouse report loaded' : `Warehouse report: ${emptyMessage}`
+  })()
 
   const renderContent = () => {
     if (!IS_PLATFORM)
@@ -177,7 +182,7 @@ const WarehouseMetricsReportContent = () => {
       <p className="text-sm text-foreground-light">Query activity in the last 60 minutes.</p>
       <div className="relative">
         <p role="status" className="sr-only">
-          {query.isPending ? 'Loading Warehouse report' : reportStatus}
+          {reportStatus}
         </p>
         {renderContent()}
       </div>
