@@ -69,7 +69,7 @@ _Overview of Verification Flow_
 
 ## Enforcement via Row Level Security
 
-Using MFA without enforcing it is like buying an expensive door and never locking it. We love Postgres RLS at Supabase. To support RLS integration, JWTs issued by Supabase Auth now contain two additional pieces of information:
+Using MFA without enforcing it is like buying an expensive door and never locking it. We love Postgres RLS at Supabase. To support RLS integration, JWTs issued by [Supabase Auth](/docs/guides/auth) now contain two additional pieces of information:
 
 1. An Authenticator Assurance Level (AAL) claim. Use this to quickly identify the level of identity checks the user has performed. `aal1` is reserved for conventional sign in, while `aal2` is issued only after the user has verified with an additional factor.
 2. An Authenticator Method Reference (AMR) claim. Use this to identify all of the authentication methods used by the user. This is also useful if you wish to implement step-up login scenarios.
