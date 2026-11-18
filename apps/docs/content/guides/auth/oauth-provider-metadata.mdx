@@ -1,0 +1,107 @@
+---
+id: 'oauth-provider-metadata'
+title: 'OAuth provider user metadata'
+subtitle: 'Fields that each OAuth provider stores in user metadata and identity data'
+---
+
+When a user signs in with a social or OAuth provider, Supabase Auth copies the profile information returned by the provider into the user's metadata. The same data is stored in the `identity_data` of the matching [identity](/docs/guides/auth/identities).
+
+You can read it in these places:
+
+- `user.user_metadata` in the client libraries, which maps to the `raw_user_meta_data` column of `auth.users`.
+- `identity_data` on each entry of `user.identities`, which maps to the `identity_data` column of `auth.identities`.
+
+<Admonition type="caution">
+
+`user_metadata` can be edited by the signed-in user, so don't use it in authorization logic or RLS policies. Use `app_metadata` or your own tables for that.
+
+</Admonition>
+
+Which fields are present depends on the provider and on the scopes and permissions you request. Fields that the provider doesn't return are left out. Provider APIs change, so treat this page as a reference for what Supabase Auth maps, not as a guarantee of what each provider returns.
+
+## Common fields
+
+Every OAuth sign-in stores these fields:
+
+| Field            | Type      | Description                                                |
+| ---------------- | --------- | ---------------------------------------------------------- |
+| `iss`            | `string`  | The issuer or API host of the provider.                    |
+| `sub`            | `string`  | The user's unique ID at the provider.                      |
+| `provider_id`    | `string`  | The user's unique ID at the provider. Same value as `sub`. |
+| `email`          | `string`  | The user's primary email, when the provider returns one.   |
+| `email_verified` | `boolean` | Whether the provider reports the email as verified.        |
+| `phone_verified` | `boolean` | Always `false` for OAuth sign-ins.                         |
+
+Most providers also fill in some of the following fields. The last four are older fields that Supabase Auth keeps for backwards compatibility. Prefer `name`, `picture` and `preferred_username` in new code.
+
+| Field                | Type     | Description                                                     |
+| -------------------- | -------- | --------------------------------------------------------------- |
+| `name`               | `string` | The user's display name.                                        |
+| `picture`            | `string` | URL of the user's avatar.                                       |
+| `preferred_username` | `string` | The user's handle or username.                                  |
+| `nickname`           | `string` | An alternate display name.                                      |
+| `avatar_url`         | `string` | Same as `picture`. Kept for backwards compatibility.            |
+| `full_name`          | `string` | Same as `name`. Kept for backwards compatibility.               |
+| `user_name`          | `string` | Same as `preferred_username`. Kept for backwards compatibility. |
+| `slug`               | `string` | Handle on some providers. Kept for backwards compatibility.     |
+
+Provider-specific values that don't fit these fields are stored in a nested `custom_claims` object.
+
+## Fields by provider
+
+The table lists the fields that Supabase Auth sets in addition to the [common fields](#common-fields). The provider name is the value you pass to `signInWithOAuth`.
+
+| Provider                  | Fields                                                                                                                                                                                                                                      |
+| ------------------------- | ------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
+| `apple`                   | `custom_claims.is_private_email`, `custom_claims.auth_time` and `custom_claims.transfer_sub` when present. `name` and `full_name` are set only on the first sign-in, because Apple sends the name once.                                     |
+| `azure`                   | `preferred_username`, `full_name`, and `custom_claims` with the remaining ID token claims, minus standard protocol claims such as `aud`, `iss`, `exp`, `nonce` and `jti`.                                                                   |
+| `bitbucket`               | `name`, `picture`, `avatar_url`, `full_name`                                                                                                                                                                                                |
+| `discord`                 | `name` (formatted as `username#discriminator`), `picture`, `avatar_url`, `full_name`, `custom_claims.global_name`                                                                                                                           |
+| `facebook`                | `name`, `nickname`, `picture`, `avatar_url`, `full_name`, `slug`                                                                                                                                                                            |
+| `figma`                   | `name`, `avatar_url`, `full_name`                                                                                                                                                                                                           |
+| `fly`                     | `full_name`, `custom_claims.resource_owner_id`, `custom_claims.organizations`, `custom_claims.application`, `custom_claims.scope`, `custom_claims.created_at`                                                                               |
+| `github`                  | `name`, `preferred_username`, `avatar_url`, `full_name`, `user_name`                                                                                                                                                                        |
+| `gitlab`                  | `name`, `picture`, `avatar_url`, `full_name`                                                                                                                                                                                                |
+| `google`                  | `name`, `picture`, `avatar_url`, `full_name`. When signing in with a Google ID token, `custom_claims.hd` holds the hosted domain for Google Workspace accounts.                                                                             |
+| `kakao`                   | `name`, `preferred_username`, `avatar_url`, `full_name`, `user_name`                                                                                                                                                                        |
+| `keycloak`                | `name`, `full_name`, and `custom_claims` with every other claim returned by the userinfo endpoint                                                                                                                                           |
+| `linkedin_oidc`           | `name`, `given_name`, `family_name`, `locale`, `picture`                                                                                                                                                                                    |
+| `notion`                  | `name`, `picture`, `avatar_url`, `full_name`                                                                                                                                                                                                |
+| `slack_oidc`              | `name`, `picture`, `avatar_url`, `full_name`, `custom_claims["https://slack.com/team_id"]`                                                                                                                                                  |
+| `snapchat`                | `name`, `picture`, `avatar_url`, `full_name`, `slug`                                                                                                                                                                                        |
+| `spotify`                 | `name`, `picture`, `avatar_url`, `full_name`                                                                                                                                                                                                |
+| `twitch`                  | `name` (login), `nickname` (display name), `picture`, `avatar_url`, `full_name`, `slug`, `custom_claims.broadcaster_type`, `custom_claims.description`, `custom_claims.type`, `custom_claims.offline_image_url`, `custom_claims.view_count` |
+| `twitter` (X, OAuth 1.0a) | `name`, `preferred_username`, `picture`, `avatar_url`, `full_name`, `user_name`                                                                                                                                                             |
+| `x` (X, OAuth 2.0)        | `name`, `preferred_username`, `picture`, `profile`, `website`, `avatar_url`, `full_name`, `user_name`, `custom_claims.created_at`                                                                                                           |
+| `workos`                  | `name`, `full_name`, `custom_claims.connection_id`, `custom_claims.organization_id`                                                                                                                                                         |
+| `zoom`                    | `name`, `picture`, `avatar_url`, `full_name`                                                                                                                                                                                                |
+
+Deprecated provider names have the same shape as their replacements. For example, the deprecated `linkedin` provider returns the same fields as `linkedin_oidc` plus the legacy fields, and the deprecated `slack` provider returns the same fields as `slack_oidc`.
+
+## Example
+
+A GitHub sign-in produces `user_metadata` like this:
+
+```json
+{
+  "iss": "https://api.github.com",
+  "sub": "1234567",
+  "provider_id": "1234567",
+  "name": "Jane Doe",
+  "preferred_username": "janedoe",
+  "user_name": "janedoe",
+  "full_name": "Jane Doe",
+  "avatar_url": "https://avatars.githubusercontent.com/u/1234567?v=4",
+  "email": "jane@example.com",
+  "email_verified": true,
+  "phone_verified": false
+}
+```
+
+## Updating metadata on later sign-ins
+
+Each time a user signs in with a provider, Supabase Auth merges the latest values from the provider into `user_metadata` and `identity_data`. Fields that you added yourself with `updateUser({ data: { ... } })` are kept unless the provider returns a field with the same name, in which case the provider value overwrites yours. Store values you want to control under keys that providers don't use.
+
+## Custom OAuth and OIDC providers
+
+For [custom OAuth providers](/docs/guides/auth/custom-oauth-providers), claims that you list in the provider's custom claims allowlist are copied into `custom_claims`.

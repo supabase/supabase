@@ -736,6 +736,7 @@ export const auth: NavMenuConstant = {
       items: [
         { name: 'Users', url: '/guides/auth/users' },
         { name: 'Identities', url: '/guides/auth/identities' },
+        { name: 'OAuth Provider Metadata', url: '/guides/auth/oauth-provider-metadata' },
         {
           name: 'Sessions',
           url: '/guides/auth/sessions',
