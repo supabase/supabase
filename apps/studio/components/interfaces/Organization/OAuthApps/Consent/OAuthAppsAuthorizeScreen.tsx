@@ -1,5 +1,6 @@
 import { useQuery } from '@tanstack/react-query'
 import { useEffect, useMemo, useRef, useState } from 'react'
+import { toast } from 'sonner'
 import { Button } from 'ui'
 import { Admonition } from 'ui-patterns/Admonition'
 import { TimestampInfo } from 'ui-patterns/TimestampInfo'
@@ -142,14 +143,37 @@ export const OAuthAppsAuthorizeScreen = ({
     }
   }, [preflightData, preflightError])
 
+  const initialRefs = useMemo(() => {
+    const refs = new Set<string>()
+    if (preflightData?.existing_grant?.project_refs) {
+      preflightData.existing_grant.project_refs.forEach((ref) => refs.add(ref))
+    }
+    if (projectRef) {
+      refs.add(projectRef)
+    }
+    return Array.from(refs)
+  }, [preflightData?.existing_grant?.project_refs, projectRef])
+
+  const { data: initialProjectsData } = useOrgProjectsInfiniteQuery(
+    {
+      slug: memberOrg?.slug,
+      refs: initialRefs,
+    },
+    {
+      enabled: memberOrg != null && initialRefs.length > 0,
+    }
+  )
+
   const seeded = useRef(false)
   useEffect(() => {
-    if (seeded.current || !projects || !preflightData || !memberOrg) return
-    seeded.current = true
-    if (!isProjectScopingModeEnabled) return
+    if (seeded.current || !preflightData || !memberOrg) return
 
     const grant = preflightData.existing_grant
-    const hasAllProjectsGrant = grant !== null && grant?.project_refs?.length === 0
+    const hasAllProjectsGrant =
+      grant !== null && (grant?.project_refs == null || grant?.project_refs?.length === 0)
+    if (!hasAllProjectsGrant && !initialProjectsData) return
+
+    seeded.current = true
 
     if (hasAllProjectsGrant && isProjectScopingModeEnabled) {
       setAllProjectsSelected(true)
@@ -159,10 +183,10 @@ export const OAuthAppsAuthorizeScreen = ({
     const refs = getPreselectedProjectRefs({
       existingGrant: grant,
       projectRef,
-      liveProjects: projects,
+      liveProjects: initialProjectsData?.pages.flatMap((page) => page.projects) ?? [],
     })
     if (refs.length > 0) setSelectedProjectRefs(refs.slice(0, MAX_SELECTED_PROJECTS))
-  }, [preflightData, projects, memberOrg, isProjectScopingModeEnabled, projectRef])
+  }, [preflightData, initialProjectsData, memberOrg, isProjectScopingModeEnabled, projectRef])
 
   const { data: selectedProjectsData } = useOrgProjectsInfiniteQuery(
     {
@@ -189,6 +213,8 @@ export const OAuthAppsAuthorizeScreen = ({
     onError: (error) => {
       if (isOAuthRoleValidationError(error)) {
         setRoleFailure(error.validation)
+      } else {
+        toast.error(`Failed to authorize access to OAuth app: ${error.message}`)
       }
     },
   })

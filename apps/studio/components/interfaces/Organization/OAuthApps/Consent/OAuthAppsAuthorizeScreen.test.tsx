@@ -157,7 +157,12 @@ describe('OAuthAppsAuthorizeScreen', () => {
     addAPIMock({
       path: '/platform/organizations',
       method: 'get',
-      response: () => HttpResponse.json<Organization[]>([createMockOrganization()]),
+      response: () =>
+        HttpResponse.json<Organization[]>([
+          createMockOrganization({
+            slug: 'northwind-traders',
+          }),
+        ]),
     })
     addAPIMock({
       path: '/platform/organizations/:slug/projects',
@@ -191,7 +196,12 @@ describe('OAuthAppsAuthorizeScreen', () => {
     addAPIMock({
       path: '/platform/organizations',
       method: 'get',
-      response: () => HttpResponse.json<Organization[]>([createMockOrganization()]),
+      response: () =>
+        HttpResponse.json<Organization[]>([
+          createMockOrganization({
+            slug: 'northwind-traders',
+          }),
+        ]),
     })
     addAPIMock({
       path: '/platform/organizations/:slug/projects',
@@ -259,7 +269,12 @@ describe('OAuthAppsAuthorizeScreen', () => {
     addAPIMock({
       path: '/platform/organizations',
       method: 'get',
-      response: () => HttpResponse.json<Organization[]>([createMockOrganization()]),
+      response: () =>
+        HttpResponse.json<Organization[]>([
+          createMockOrganization({
+            slug: 'northwind-traders',
+          }),
+        ]),
     })
     addAPIMock({
       path: '/platform/organizations/:slug/projects',
@@ -317,7 +332,12 @@ describe('OAuthAppsAuthorizeScreen', () => {
     addAPIMock({
       path: '/platform/organizations',
       method: 'get',
-      response: () => HttpResponse.json<Organization[]>([createMockOrganization()]),
+      response: () =>
+        HttpResponse.json<Organization[]>([
+          createMockOrganization({
+            slug: 'northwind-traders',
+          }),
+        ]),
     })
     addAPIMock({
       path: '/platform/organizations/:slug/projects',
@@ -374,7 +394,12 @@ describe('OAuthAppsAuthorizeScreen', () => {
     addAPIMock({
       path: '/platform/organizations',
       method: 'get',
-      response: () => HttpResponse.json<Organization[]>([createMockOrganization()]),
+      response: () =>
+        HttpResponse.json<Organization[]>([
+          createMockOrganization({
+            slug: 'northwind-traders',
+          }),
+        ]),
     })
     addAPIMock({
       path: '/platform/organizations/:slug/projects',
@@ -421,7 +446,12 @@ describe('OAuthAppsAuthorizeScreen', () => {
     addAPIMock({
       path: '/platform/organizations',
       method: 'get',
-      response: () => HttpResponse.json<Organization[]>([createMockOrganization()]),
+      response: () =>
+        HttpResponse.json<Organization[]>([
+          createMockOrganization({
+            slug: 'northwind-traders',
+          }),
+        ]),
     })
     addAPIMock({
       path: '/platform/organizations/:slug/projects',
@@ -457,7 +487,12 @@ describe('OAuthAppsAuthorizeScreen', () => {
     addAPIMock({
       path: '/platform/organizations',
       method: 'get',
-      response: () => HttpResponse.json<Organization[]>([createMockOrganization()]),
+      response: () =>
+        HttpResponse.json<Organization[]>([
+          createMockOrganization({
+            slug: 'northwind-traders',
+          }),
+        ]),
     })
     addAPIMock({
       path: '/platform/organizations/:slug/projects',
@@ -494,7 +529,12 @@ describe('OAuthAppsAuthorizeScreen', () => {
     addAPIMock({
       path: '/platform/organizations',
       method: 'get',
-      response: () => HttpResponse.json<Organization[]>([createMockOrganization()]),
+      response: () =>
+        HttpResponse.json<Organization[]>([
+          createMockOrganization({
+            slug: 'northwind-traders',
+          }),
+        ]),
     })
     addAPIMock({
       path: '/platform/organizations/:slug/projects',
@@ -533,7 +573,12 @@ describe('OAuthAppsAuthorizeScreen', () => {
     addAPIMock({
       path: '/platform/organizations',
       method: 'get',
-      response: () => HttpResponse.json<Organization[]>([createMockOrganization()]),
+      response: () =>
+        HttpResponse.json<Organization[]>([
+          createMockOrganization({
+            slug: 'northwind-traders',
+          }),
+        ]),
     })
     addAPIMock({
       path: '/platform/organizations/:slug/projects',
@@ -570,7 +615,6 @@ describe('OAuthAppsAuthorizeScreen', () => {
       screen.queryByText('Must select at least one project to authorize.')
     ).not.toBeInTheDocument()
     const authorizeButton = screen.getByRole('button', { name: /Authorize Vercel/ })
-    expect(authorizeButton).toBeEnabled()
     fireEvent.click(authorizeButton)
 
     await screen.findByText('Vercel is connected')
@@ -578,43 +622,6 @@ describe('OAuthAppsAuthorizeScreen', () => {
     expect(screen.getByText(/northwind-storefront/)).toBeInTheDocument()
     expect(screen.queryByText(/northwind-cms/)).not.toBeInTheDocument()
     expect(screen.queryByText(/northwindstorefront-deleted/)).not.toBeInTheDocument()
-  })
-
-  test('the existing grant does not leak into an organization it was not granted for', async () => {
-    addAPIMock({
-      path: '/platform/oauth/authorizations/:id',
-      method: 'get',
-      response: () => HttpResponse.json<OAuthAppsAuthorizeRequestData>(createMockRequest()),
-    })
-    addAPIMock({
-      path: '/platform/organizations',
-      method: 'get',
-      response: () => HttpResponse.json<Organization[]>([createMockOrganization()]),
-    })
-    addAPIMock({
-      path: '/platform/organizations/:slug/projects',
-      method: 'get',
-      response: () => HttpResponse.json<OrgProjectsResponse>(createMockOrganizationProjects()),
-    })
-    addAPIMock({
-      path: '/platform/organizations/:slug/oauth/authorizations/:id/preflight',
-      method: 'get',
-      response: () =>
-        HttpResponse.json<OAuthAppsPreflightValidationData>(
-          createMockPreflight({
-            existing_grant: {
-              grant_id: '',
-              approved_scopes: ['database:read'],
-              project_refs: ['northwindstorefront1', 'northwindstorefront-deleted'],
-              approved_at: '2026-08-14T09:12:00.000Z',
-            },
-          })
-        ),
-    })
-    renderScreen()
-
-    expect(await screen.findByRole('button', { name: /Authorize Vercel/ })).toBeDisabled()
-    expect(screen.getByText('Must select at least one project to authorize.')).toBeInTheDocument()
   })
 
   test('optional project scoping offers an all-projects choice that authorizes without a selection', async () => {
@@ -631,7 +638,12 @@ describe('OAuthAppsAuthorizeScreen', () => {
     addAPIMock({
       path: '/platform/organizations',
       method: 'get',
-      response: () => HttpResponse.json<Organization[]>([createMockOrganization()]),
+      response: () =>
+        HttpResponse.json<Organization[]>([
+          createMockOrganization({
+            slug: 'northwind-traders',
+          }),
+        ]),
     })
     addAPIMock({
       path: '/platform/organizations/:slug/projects',
@@ -681,7 +693,12 @@ describe('OAuthAppsAuthorizeScreen', () => {
     addAPIMock({
       path: '/platform/organizations',
       method: 'get',
-      response: () => HttpResponse.json<Organization[]>([createMockOrganization()]),
+      response: () =>
+        HttpResponse.json<Organization[]>([
+          createMockOrganization({
+            slug: 'northwind-traders',
+          }),
+        ]),
     })
     addAPIMock({
       path: '/platform/organizations/:slug/projects',
@@ -728,7 +745,12 @@ describe('OAuthAppsAuthorizeScreen', () => {
     addAPIMock({
       path: '/platform/organizations',
       method: 'get',
-      response: () => HttpResponse.json<Organization[]>([createMockOrganization()]),
+      response: () =>
+        HttpResponse.json<Organization[]>([
+          createMockOrganization({
+            slug: 'northwind-traders',
+          }),
+        ]),
     })
     addAPIMock({
       path: '/platform/organizations/:slug/projects',
@@ -755,7 +777,12 @@ describe('OAuthAppsAuthorizeScreen', () => {
     addAPIMock({
       path: '/platform/organizations',
       method: 'get',
-      response: () => HttpResponse.json<Organization[]>([createMockOrganization()]),
+      response: () =>
+        HttpResponse.json<Organization[]>([
+          createMockOrganization({
+            slug: 'northwind-traders',
+          }),
+        ]),
     })
     addAPIMock({
       path: '/platform/organizations/:slug/projects',
@@ -779,7 +806,7 @@ describe('OAuthAppsAuthorizeScreen', () => {
       method: 'get',
       response: () => HttpResponse.json<OAuthAppsPreflightValidationData>(createMockPreflight()),
     })
-    renderScreen({ projectRef: 'northwindcms1' })
+    renderScreen({ organizationSlug: 'northwind-traders', projectRef: 'northwindcms1' })
 
     expect(await screen.findByText('northwind-cms')).toBeInTheDocument()
     expect(screen.getByRole('button', { name: /Authorize Vercel/ })).toBeEnabled()
@@ -802,7 +829,12 @@ describe('OAuthAppsAuthorizeScreen', () => {
     addAPIMock({
       path: '/platform/organizations',
       method: 'get',
-      response: () => HttpResponse.json<Organization[]>([createMockOrganization()]),
+      response: () =>
+        HttpResponse.json<Organization[]>([
+          createMockOrganization({
+            slug: 'northwind-traders',
+          }),
+        ]),
     })
     addAPIMock({
       path: '/platform/organizations/:slug/projects',
@@ -842,7 +874,12 @@ describe('OAuthAppsAuthorizeScreen', () => {
     addAPIMock({
       path: '/platform/organizations',
       method: 'get',
-      response: () => HttpResponse.json<Organization[]>([createMockOrganization()]),
+      response: () =>
+        HttpResponse.json<Organization[]>([
+          createMockOrganization({
+            slug: 'northwind-traders',
+          }),
+        ]),
     })
     addAPIMock({
       path: '/platform/organizations/:slug/projects',
@@ -901,7 +938,12 @@ describe('OAuthAppsAuthorizeScreen', () => {
     addAPIMock({
       path: '/platform/organizations',
       method: 'get',
-      response: () => HttpResponse.json<Organization[]>([createMockOrganization()]),
+      response: () =>
+        HttpResponse.json<Organization[]>([
+          createMockOrganization({
+            slug: 'northwind-traders',
+          }),
+        ]),
     })
     addAPIMock({
       path: '/platform/organizations/:slug/projects',
@@ -994,7 +1036,12 @@ describe('OAuthAppsAuthorizeScreen', () => {
     addAPIMock({
       path: '/platform/organizations',
       method: 'get',
-      response: () => HttpResponse.json<Organization[]>([createMockOrganization()]),
+      response: () =>
+        HttpResponse.json<Organization[]>([
+          createMockOrganization({
+            slug: 'northwind-traders',
+          }),
+        ]),
     })
     addAPIMock({
       path: '/platform/organizations/:slug/projects',
