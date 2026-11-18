@@ -68,6 +68,13 @@ const applyAndTrackMigrationsQuery = (query: string, name?: string) => {
             ) as version
           ) as candidate
         where candidate.version > coalesce(latest.version, '')
+          -- The one-hour bound on latest can exclude an existing version, e.g. when a
+          -- daylight saving change repeats an hour, so also skip versions already in use.
+          and not exists (
+            select 1
+            from supabase_migrations.schema_migrations as used
+            where used.version = candidate.version
+          )
         order by offset_seconds
         limit 1
       ),
