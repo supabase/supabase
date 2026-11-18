@@ -309,6 +309,42 @@ check "OAuth metadata at bare root path not routed to Auth" "false" \
     "$(oauth_metadata_reached /.well-known/oauth-authorization-server)"
 
 echo ""
+echo "--- OAuth server endpoints ---"
+# Third-party OAuth clients never have the project's API key, so these must
+# reach Auth without one. Auth answers with its own JSON error (error_code;
+# feature_disabled while the OAuth server is off, the default), while a
+# gateway 401 has no error_code.
+auth_reached() {
+    if curl -s -X "$1" "$BASE_URL$2" | grep -q '"error_code"'; then
+        echo "true"
+    else
+        echo "false"
+    fi
+}
+check "OAuth authorize (no auth)" "true" "$(auth_reached GET /auth/v1/oauth/authorize)"
+check "OAuth token (no auth)" "true" "$(auth_reached POST /auth/v1/oauth/token)"
+check "OAuth userinfo (no auth)" "true" "$(auth_reached GET /auth/v1/oauth/userinfo)"
+check "OAuth client registration (no auth)" "true" \
+    "$(auth_reached POST /auth/v1/oauth/clients/register)"
+# The consent endpoints are called by the project's own app, with its API key.
+# Require the gateway's own 401 (no error_code), so a failed request or an
+# unrelated error can't pass this check.
+gateway_rejected() {
+    response=$(curl -s -w '\n%{http_code}' -X "$1" "$BASE_URL$2") || {
+        echo "request failed"
+        return
+    }
+    status=$(printf '%s\n' "$response" | tail -n 1)
+    if [ "$status" = "401" ] && ! printf '%s\n' "$response" | grep -q '"error_code"'; then
+        echo "true"
+    else
+        echo "false (HTTP $status)"
+    fi
+}
+check "OAuth consent endpoints still need an API key" "true" \
+    "$(gateway_rejected GET /auth/v1/oauth/authorizations/test)"
+
+echo ""
 echo "--- Realtime WebSocket upgrade ---"
 # Test that WebSocket upgrade request gets through (expect 101 or non-401)
 # curl --max-time to prevent hanging on successful upgrade (101 keeps connection open)
