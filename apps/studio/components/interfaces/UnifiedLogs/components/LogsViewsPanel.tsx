@@ -1,12 +1,20 @@
-import { AlertCircleIcon, EditIcon, LayersIcon, Trash2Icon } from 'lucide-react'
+import { AlertCircleIcon, EditIcon, LayersIcon, MoreVerticalIcon, Trash2Icon } from 'lucide-react'
 import { FormEvent, KeyboardEvent, RefObject, useEffect, useRef, useState } from 'react'
-import { Button, cn, Input } from 'ui'
+import {
+  Button,
+  cn,
+  DropdownMenu,
+  DropdownMenuContent,
+  DropdownMenuItem,
+  DropdownMenuTrigger,
+  Input,
+} from 'ui'
 import { ConfirmationModal } from 'ui-patterns/Dialogs/ConfirmationModal'
 import { EmptyStatePresentational } from 'ui-patterns/EmptyStatePresentational'
 import { InnerSideBarFilters, InnerSideBarFilterSearchInput } from 'ui-patterns/InnerSideMenu'
 import { GenericSkeletonLoader } from 'ui-patterns/ShimmeringLoader'
 
-import { countActiveFilters, type LogsView } from '../UnifiedLogs.views'
+import { type LogsView } from '../UnifiedLogs.views'
 import { isDuplicateViewName, VIEW_NAME_MAX_LENGTH } from './LogsViews.utils'
 import { RenameViewDialog } from './RenameViewDialog'
 
@@ -33,8 +41,6 @@ const LogsViewRow = ({
   onRequestRename,
   onRequestDelete,
 }: LogsViewRowProps) => {
-  const filterCount = countActiveFilters(view)
-
   return (
     <div
       ref={isActive ? activeRowRef : undefined}
@@ -51,42 +57,48 @@ const LogsViewRow = ({
         className="flex min-w-0 flex-1 items-center gap-2 rounded-md py-1.5 text-left focus-ring"
       >
         <LayersIcon size={14} className="shrink-0 text-foreground-light" />
-        <span className="min-w-0 flex-1">
-          <span
-            className={cn(
-              'block truncate text-sm',
-              isActive ? 'text-foreground' : 'text-foreground-light'
-            )}
-            title={view.name}
-          >
-            {view.name}
-          </span>
-          <span className="block text-xs text-foreground-lighter">
-            <span>{filterCount === 1 ? '1 filter' : `${filterCount} filters`}</span>
-            {isActive && isModified && <span> · Modified</span>}
-          </span>
+        <span
+          className={cn(
+            'min-w-0 flex-1 truncate text-sm',
+            isActive ? 'text-foreground' : 'text-foreground-light'
+          )}
+          title={view.name}
+        >
+          {view.name}
         </span>
+        {isActive && isModified && (
+          <span className="shrink-0 text-xs text-foreground-lighter">Modified</span>
+        )}
       </button>
-      <div className="flex shrink-0 items-center gap-0.5 opacity-0 transition-opacity focus-within:opacity-100 group-hover:opacity-100">
-        <Button
-          size="tiny"
-          variant="text"
-          className="px-1"
-          disabled={!canUpdate}
-          icon={<EditIcon size={12} />}
-          aria-label={`Rename ${view.name}`}
-          onClick={() => onRequestRename(view)}
-        />
-        <Button
-          size="tiny"
-          variant="text"
-          className="px-1"
-          disabled={!canDelete}
-          icon={<Trash2Icon size={12} />}
-          aria-label={`Delete ${view.name}`}
-          onClick={() => onRequestDelete(view)}
-        />
-      </div>
+      <DropdownMenu>
+        <DropdownMenuTrigger asChild>
+          <Button
+            size="tiny"
+            variant="text"
+            className="px-1 opacity-0 transition-opacity data-[state=open]:opacity-100 focus-visible:opacity-100 group-hover:opacity-100"
+            icon={<MoreVerticalIcon size={14} />}
+            aria-label={`View options for ${view.name}`}
+          />
+        </DropdownMenuTrigger>
+        <DropdownMenuContent align="end" className="w-40">
+          <DropdownMenuItem
+            disabled={!canUpdate}
+            className="gap-x-2"
+            onSelect={() => onRequestRename(view)}
+          >
+            <EditIcon size={14} />
+            <span>Rename</span>
+          </DropdownMenuItem>
+          <DropdownMenuItem
+            disabled={!canDelete}
+            className="gap-x-2"
+            onSelect={() => onRequestDelete(view)}
+          >
+            <Trash2Icon size={14} />
+            <span>Delete</span>
+          </DropdownMenuItem>
+        </DropdownMenuContent>
+      </DropdownMenu>
     </div>
   )
 }

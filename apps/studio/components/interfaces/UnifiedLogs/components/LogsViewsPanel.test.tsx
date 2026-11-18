@@ -42,13 +42,41 @@ const baseProps = {
 }
 
 describe('LogsViewsPanel', () => {
-  it('lists each view with its filter count', async () => {
+  it('lists each view', async () => {
     customRender(<LogsViewsPanel {...baseProps} />)
 
     expect(await screen.findByText('Errors only')).toBeInTheDocument()
-    expect(screen.getByText('1 filter')).toBeInTheDocument()
     expect(screen.getByText('Auth failures')).toBeInTheDocument()
-    expect(screen.getByText('2 filters')).toBeInTheDocument()
+  })
+
+  it('offers rename and delete behind the row menu', async () => {
+    customRender(<LogsViewsPanel {...baseProps} />)
+
+    expect(screen.queryByRole('menuitem', { name: 'Rename' })).toBeNull()
+
+    await userEvent.click(
+      await screen.findByRole('button', { name: 'View options for Errors only' })
+    )
+
+    expect(await screen.findByRole('menuitem', { name: 'Rename' })).toBeInTheDocument()
+    expect(screen.getByRole('menuitem', { name: 'Delete' })).toBeInTheDocument()
+  })
+
+  it('disables the menu actions without write access', async () => {
+    customRender(<LogsViewsPanel {...baseProps} canUpdate={false} canDelete={false} />)
+
+    await userEvent.click(
+      await screen.findByRole('button', { name: 'View options for Errors only' })
+    )
+
+    expect(await screen.findByRole('menuitem', { name: 'Rename' })).toHaveAttribute(
+      'aria-disabled',
+      'true'
+    )
+    expect(screen.getByRole('menuitem', { name: 'Delete' })).toHaveAttribute(
+      'aria-disabled',
+      'true'
+    )
   })
 
   it('applies a view when its row is clicked', async () => {
@@ -63,7 +91,7 @@ describe('LogsViewsPanel', () => {
   it('marks the active view as modified', async () => {
     customRender(<LogsViewsPanel {...baseProps} activeViewId="view-1" isActiveViewModified />)
 
-    expect(await screen.findByText('· Modified')).toBeInTheDocument()
+    expect(await screen.findByText('Modified')).toBeInTheDocument()
   })
 
   it('filters the list by search', async () => {
