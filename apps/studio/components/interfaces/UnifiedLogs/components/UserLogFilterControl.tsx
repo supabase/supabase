@@ -50,8 +50,8 @@ export const UserLogFilterControl = () => {
 
   return (
     <AccordionItem value="user" className="border-none">
-      <div className="flex items-center gap-2 pr-2">
-        <AccordionTrigger className="flex-1 px-2 py-0 hover:no-underline data-[state=closed]:text-muted-foreground data-open:text-foreground focus-within:data-closed:text-foreground hover:data-closed:text-foreground">
+      <div className="flex items-center gap-2 px-1.5">
+        <AccordionTrigger className="flex-1 px-0 py-0 hover:no-underline data-[state=closed]:text-muted-foreground data-open:text-foreground focus-within:data-closed:text-foreground hover:data-closed:text-foreground">
           <div className="flex items-center gap-2 truncate py-2">
             <p className="text-sm">User</p>
           </div>
@@ -73,7 +73,7 @@ export const UserLogFilterControl = () => {
         ) : null}
       </div>
       <AccordionContent>
-        <div className="p-1 grid gap-2">
+        <div className="py-1 grid gap-2">
           <InputWithAddons
             placeholder="Search by email or id"
             leading={<SearchIcon size={14} className="text-foreground-lighter" />}

@@ -30,6 +30,10 @@ interface FilterSideBarProps {
   dateRangeDisabled?: DateRangeDisabled
   /** When set, the panel swaps the filters out for this section's content. */
   section?: FilterSideBarSection
+  /** Header action at the top level, e.g. an entry into `section`. */
+  headerAction?: ReactNode
+  /** Called alongside the built-in filter reset, for filter state the caller owns. */
+  onReset?: () => void
   onExitSection?: () => void
 }
 
@@ -38,6 +42,8 @@ export function FilterSideBar({
   setIsFilterBarOpen,
   dateRangeDisabled,
   section,
+  headerAction,
+  onReset,
   onExitSection,
 }: FilterSideBarProps) {
   const { ref } = useParams()
@@ -88,11 +94,21 @@ export function FilterSideBar({
             />
           ) : (
             <>
-              <div className="flex items-center gap-2">
+              <div className="flex min-w-0 items-center gap-2">
                 <h4 className="text-foreground text-sm">Logs</h4>
                 <Badge variant="default">Beta</Badge>
               </div>
-              {hasActiveFilters ? <DataTableResetButton onReset={() => setUser(null)} /> : null}
+              <div className="flex shrink-0 items-center gap-2">
+                {hasActiveFilters ? (
+                  <DataTableResetButton
+                    onReset={() => {
+                      setUser(null)
+                      onReset?.()
+                    }}
+                  />
+                ) : null}
+                {headerAction}
+              </div>
             </>
           )}
         </div>
@@ -118,17 +134,16 @@ export function FilterSideBar({
               animate={{ opacity: 1, x: 0 }}
               exit={{ opacity: 0, x: -levelOffset }}
               transition={levelTransition}
-              className="absolute inset-0 flex flex-col overflow-y-auto"
+              className="absolute inset-0 flex flex-col"
             >
               <UnifiedLogsBanner />
 
-              <div className="flex-1 px-4 py-1.5">
+              <div className="flex min-h-0 flex-1 flex-col gap-4 overflow-y-auto p-3">
                 <DataTableFilterControls
                   dateRangeDisabled={dateRangeDisabled}
                   itemsAfter={{ level: <UserLogFilterControl /> }}
                 />
                 <FeaturePreviewSidebarPanel
-                  className="my-4"
                   title="Capture your logs"
                   description="Send logs to your preferred observability or storage platform."
                   illustration={

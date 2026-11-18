@@ -14,7 +14,7 @@ import {
 } from '@tanstack/react-table'
 import { IS_PLATFORM, LOCAL_STORAGE_KEYS, useFeatureFlags, useFlag, useParams } from 'common'
 import {
-  LayersIcon,
+  Layers2Icon,
   Loader2Icon,
   PanelLeftCloseIcon,
   PanelLeftOpenIcon,
@@ -540,6 +540,14 @@ export const UnifiedLogs = ({
     handleApplyView(activeView)
   }
 
+  // The reset button clears the filters a view applied, so the view is no longer
+  // the thing on screen — drop it along with any pending modified-state prompts.
+  const handleClearActiveView = () => {
+    setActiveViewId(null)
+    setIsReviewingChanges(false)
+    setDismissedUpdateKey(null)
+  }
+
   const handleCreateView = async (name: string) => {
     const savedProjectRef = projectRef
     const input = serializeView({ name, logSource, search })
@@ -664,7 +672,26 @@ export const UnifiedLogs = ({
                   isFilterBarOpen={isFilterBarOpen}
                   setIsFilterBarOpen={setIsFilterBarOpen}
                   dateRangeDisabled={{ after: new Date() }}
+                  onReset={handleClearActiveView}
                   onExitSection={() => setIsViewsSectionOpen(false)}
+                  headerAction={
+                    showSavedViews ? (
+                      <ButtonTooltip
+                        size="tiny"
+                        variant="outline"
+                        className="size-7 shrink-0 px-0"
+                        icon={<Layers2Icon className={activeView ? 'text-brand-600' : undefined} />}
+                        aria-label="Saved views"
+                        tooltip={{
+                          content: {
+                            side: 'bottom',
+                            text: activeView ? `Saved views · ${activeView.name}` : 'Saved views',
+                          },
+                        }}
+                        onClick={handleOpenViewsSection}
+                      />
+                    ) : undefined
+                  }
                   section={
                     showSavedViews && isViewsSectionOpen
                       ? {
@@ -766,24 +793,6 @@ export const UnifiedLogs = ({
                       onRefresh={refetchAllData}
                       shortcutId={SHORTCUT_IDS.UNIFIED_LOGS_REFRESH}
                     />
-                    {showSavedViews && hasFilterSideBar && (
-                      <ButtonTooltip
-                        size="tiny"
-                        variant={isViewsSectionOpen && isFilterBarOpen ? 'primary' : 'default'}
-                        className="w-[26px]"
-                        icon={<LayersIcon />}
-                        aria-label="Saved views"
-                        aria-expanded={isViewsSectionOpen && isFilterBarOpen}
-                        tooltip={{ content: { side: 'bottom', text: 'Saved views' } }}
-                        onClick={() => {
-                          if (isViewsSectionOpen && isFilterBarOpen) {
-                            setIsViewsSectionOpen(false)
-                          } else {
-                            handleOpenViewsSection()
-                          }
-                        }}
-                      />
-                    )}
                     <DataTableViewOptions />
                     <DownloadLogsButton searchParameters={searchParameters} />
                     {fetchPreviousPage ? (

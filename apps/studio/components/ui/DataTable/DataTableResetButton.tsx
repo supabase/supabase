@@ -1,4 +1,4 @@
-import { XIcon } from 'lucide-react'
+import { RotateCwIcon } from 'lucide-react'
 import { Button } from 'ui'
 
 import { useDataTable } from './providers/DataTableProvider'
@@ -28,9 +28,14 @@ export function DataTableResetButton({ onReset }: DataTableResetButtonProps) {
       label="Reset filters"
       side="bottom"
     >
-      <Button size="tiny" variant="text" onClick={reset} icon={<XIcon />}>
-        Reset
-      </Button>
+      <Button
+        size="tiny"
+        variant="outline"
+        className="size-7 shrink-0 px-0"
+        onClick={reset}
+        aria-label="Reset filters"
+        icon={<RotateCwIcon />}
+      />
     </ShortcutTooltip>
   )
 }
