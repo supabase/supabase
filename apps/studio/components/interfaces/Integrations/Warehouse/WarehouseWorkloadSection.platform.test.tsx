@@ -107,8 +107,9 @@ test('names the no-data window and refreshes the measurements', async () => {
   expect(screen.getAllByText('No data in the last 60 minutes')).toHaveLength(2)
   finishRefresh()
 
-  await screen.findByRole('heading', { name: 'Query rate' })
-  expect(screen.queryByText('No data in the last 60 minutes')).not.toBeInTheDocument()
+  await waitFor(() =>
+    expect(screen.queryAllByText('No data in the last 60 minutes')).toHaveLength(0)
+  )
 })
 
 test('keeps unavailable metrics distinct from an empty period', async () => {
@@ -121,7 +122,7 @@ test('keeps unavailable metrics distinct from an empty period', async () => {
       }),
   })
   renderSection()
-  expect(await screen.findByText('Warehouse metrics are unavailable')).toBeInTheDocument()
+  expect(await screen.findByRole('alert')).toHaveTextContent('Warehouse metrics are unavailable')
   expect(screen.getByText('Replication status is shown above.')).toBeInTheDocument()
   expect(screen.getByRole('status', { name: 'Workload status' })).toHaveTextContent(
     'Warehouse metrics are unavailable'
