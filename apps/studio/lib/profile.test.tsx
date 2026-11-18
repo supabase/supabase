@@ -21,6 +21,12 @@ vi.mock('common', async (importOriginal) => {
 
 vi.mock('@sentry/react', () => ({ captureMessage: vi.fn(), captureException: vi.fn() }))
 vi.mock('@/lib/telemetry/track', () => ({ useTrack: () => vi.fn() }))
+const { mockPush, mockSignOut } = vi.hoisted(() => ({
+  mockPush: vi.fn(),
+  mockSignOut: vi.fn(),
+}))
+vi.mock('next/router', () => ({ useRouter: () => ({ push: mockPush }) }))
+vi.mock('./auth', () => ({ useSignOut: () => mockSignOut }))
 vi.mock('sonner', () => ({ toast: { error: vi.fn(), success: vi.fn() } }))
 
 const profileResponse = (username?: string) =>
@@ -62,6 +68,7 @@ const mockProfileGet = (responses: Array<'not-found' | 'found'>) => {
 describe('ProfileProvider profile creation', () => {
   beforeEach(() => {
     vi.clearAllMocks()
+    mockSignOut.mockResolvedValue(undefined)
   })
 
   it('creates the profile once when it does not exist', async () => {
@@ -101,7 +108,7 @@ describe('ProfileProvider profile creation', () => {
     expect(postSpy).toHaveBeenCalledTimes(1)
   })
 
-  it('does not loop POSTing when the profile is still not found after a 409', async () => {
+  it('signs out and redirects to sign in, without looping, when the profile is still not found after a 409', async () => {
     const getSpy = mockProfileGet(['not-found'])
     const postSpy = vi.fn()
     const conflictMessage = 'The email conflicts with an existing account'
@@ -118,12 +125,34 @@ describe('ProfileProvider profile creation', () => {
 
     // Initial GET, then the refetch triggered by the 409
     await waitFor(() => expect(getSpy).toHaveBeenCalledTimes(2))
-    await waitFor(() =>
-      expect(toast.error).toHaveBeenCalledWith(conflictMessage, expect.anything())
-    )
+    await waitFor(() => expect(mockPush).toHaveBeenCalledWith('/sign-in?reason=profile_conflict'))
+    expect(mockSignOut).toHaveBeenCalledTimes(1)
+    expect(mockPush).toHaveBeenCalledTimes(1)
     await new Promise((resolve) => setTimeout(resolve, 300))
     expect(postSpy).toHaveBeenCalledTimes(1)
     expect(getSpy).toHaveBeenCalledTimes(2)
+  })
+
+  it('recovers when the profile is still not found after a successful create', async () => {
+    const getSpy = mockProfileGet(['not-found', 'not-found', 'found'])
+    const postSpy = vi.fn()
+    addAPIMock({
+      method: 'post',
+      path: '/platform/profile',
+      response: () => {
+        postSpy()
+        return postSpy.mock.calls.length === 1
+          ? profileResponse()
+          : errorResponse('Profile already exists', 409)
+      },
+    })
+
+    renderProvider()
+
+    await waitFor(() => expect(screen.getByText('profile:new-user')).toBeInTheDocument())
+    expect(postSpy).toHaveBeenCalledTimes(2)
+    expect(getSpy).toHaveBeenCalledTimes(3)
+    expect(toast.error).not.toHaveBeenCalled()
   })
 
   it('retries creation on a server error', async () => {
