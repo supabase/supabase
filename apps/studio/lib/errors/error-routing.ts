@@ -52,7 +52,10 @@ export const ERROR_ROUTING = {
   },
   MalformedResponse: { platform: { sentrySampleRate: SAMPLE_ALWAYS } },
   PlatformError: { platform: { sentrySampleRate: SAMPLE_OTHER } },
-  UnclassifiedApiError: { studio: { sentrySampleRate: SAMPLE_OWNED } },
+  UnclassifiedApiError: {
+    user: { sentrySampleRate: SAMPLE_USER_FAULT }, // 401, no valid session
+    studio: { sentrySampleRate: SAMPLE_OWNED },
+  },
   DbConnectionTimeout: { platform: { sentrySampleRate: SAMPLE_OTHER } },
   UserSqlError: { user: { sentrySampleRate: SAMPLE_NEVER } },
   StudioSqlError: {
