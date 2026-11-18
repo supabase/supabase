@@ -49,7 +49,7 @@ export default async function Layout({ children }: RootLayoutProps) {
       <head />
       <body className={`${inter.className} antialiased`}>
         <TelemetryTagManager />
-        <FeatureFlagProvider API_URL={API_URL}>
+        <FeatureFlagProvider API_URL={API_URL} enabled={{ cc: true, ph: false }}>
           <Providers>
             {children}
             <Toaster />

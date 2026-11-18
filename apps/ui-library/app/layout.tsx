@@ -58,7 +58,7 @@ export default async function Layout({ children }: RootLayoutProps) {
         className={`${inter.variable} ${manrope.variable} ${sourceCodePro.variable} font-sans antialiased`}
       >
         <TelemetryTagManager />
-        <FeatureFlagProvider API_URL={API_URL}>
+        <FeatureFlagProvider API_URL={API_URL} enabled={{ cc: true, ph: false }}>
           <Providers>
             {children}
             <Toaster />
