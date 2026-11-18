@@ -1,6 +1,4 @@
 import { CheckCircle, FlaskConical, LifeBuoy, MessagesSquare, ScrollText } from 'lucide-react'
-import { createElement } from 'react'
-import { PrivacySettings, PrivacySettingsLabel } from 'ui-patterns/PrivacySettings'
 
 export const primaryLinks = [
   {
@@ -40,9 +38,4 @@ export const secondaryLinks = [
   },
   { title: 'Open Source', url: 'https://supabase.com/open-source' },
   { title: 'SupaSquad', url: 'https://supabase.com/supasquad' },
-  {
-    title: 'Privacy Settings',
-    label: createElement(PrivacySettingsLabel),
-    component: PrivacySettings,
-  },
 ]

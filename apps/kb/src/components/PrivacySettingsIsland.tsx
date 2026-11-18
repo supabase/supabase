@@ -2,8 +2,11 @@ import { PrivacySettings, PrivacySettingsLabel } from 'ui-patterns/PrivacySettin
 
 export function PrivacySettingsIsland() {
   return (
-    <PrivacySettings className="text-left text-xs text-foreground-lighter hover:underline">
-      <PrivacySettingsLabel />
-    </PrivacySettings>
+    <>
+      <span className="hidden text-xs text-foreground-lighter sm:inline">—</span>
+      <PrivacySettings className="text-left text-xs text-foreground-lighter hover:underline">
+        <PrivacySettingsLabel />
+      </PrivacySettings>
+    </>
   )
 }

@@ -4,8 +4,6 @@ import {
   skillBasedSolutions,
   useCaseSolutions,
 } from 'data/Solutions'
-import { createElement } from 'react'
-import { PrivacySettings, PrivacySettingsLabel } from 'ui-patterns/PrivacySettings'
 
 const footerData = [
   {
@@ -203,10 +201,6 @@ const footerData = [
       {
         text: 'Privacy Policy',
         url: '/privacy',
-      },
-      {
-        text: createElement(PrivacySettingsLabel),
-        component: PrivacySettings,
       },
       {
         text: 'Acceptable Use Policy',

@@ -1,6 +1,7 @@
 import { linkCells, secondaryLinks } from '~/data/footer'
 import Link from 'next/link'
 import { IconDiscord, IconGitHubSolid, IconTwitterX, IconYoutubeSolid } from 'ui'
+import { PrivacySettings, PrivacySettingsLabel } from 'ui-patterns/PrivacySettings'
 
 interface FooterProps {
   className?: string
@@ -42,34 +43,17 @@ export const Footer = ({ className }: FooterProps) => {
 }
 
 export const FooterBottomRow = () => (
-  <div className="flex gap-4 items-center justify-between">
-    <div className="flex flex-col lg:flex-row gap-3 ">
+  <div className="flex flex-col gap-3 sm:flex-row sm:flex-wrap sm:items-center sm:justify-between">
+    <div className="flex flex-col gap-1.5 sm:flex-row sm:gap-3">
       <Link href="https://supabase.com/" className="text-xs text-foreground-lighter">
         &copy; Supabase Inc
       </Link>
-      <span className="text-xs text-foreground-lighter">—</span>
-      {secondaryLinks.map(({ component: Component, ...item }) =>
-        item.url ? (
-          <Link
-            href={item.url}
-            key={item.url}
-            className="text-xs text-foreground-lighter hover:underline"
-          >
-            {item.title}
-          </Link>
-        ) : (
-          Component && (
-            <Component
-              key={item.title}
-              className="text-left text-xs text-foreground-lighter hover:underline"
-            >
-              {item.label ?? item.title}
-            </Component>
-          )
-        )
-      )}
+      <span className="hidden text-xs text-foreground-lighter sm:inline">—</span>
+      <PrivacySettings className="text-left text-xs text-foreground-lighter hover:underline">
+        <PrivacySettingsLabel />
+      </PrivacySettings>
     </div>
-    <div className="flex items-center gap-4">
+    <div className="order-last flex items-center gap-4 sm:order-none">
       <a
         href="https://twitter.com/supabase"
         className="text-foreground-muted hover:text-foreground transition"
@@ -101,6 +85,17 @@ export const FooterBottomRow = () => (
         <span className="sr-only">Youtube</span>
         <IconYoutubeSolid size={14} />
       </a>
+    </div>
+    <div className="flex flex-col gap-3 sm:basis-full sm:flex-row sm:flex-wrap">
+      {secondaryLinks.map((item) => (
+        <Link
+          href={item.url}
+          key={item.url}
+          className="text-xs text-foreground-lighter hover:underline"
+        >
+          {item.title}
+        </Link>
+      ))}
     </div>
   </div>
 )

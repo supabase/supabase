@@ -47,20 +47,12 @@ const secondaryLinks = [
 		}
 	</ul>
 	<hr class="border-default my-6" />
-	<div class="flex gap-4 items-center justify-between flex-wrap">
-		<div class="flex flex-col lg:flex-row gap-3">
+	<div class="flex flex-col gap-3 sm:flex-row sm:flex-wrap sm:items-center sm:justify-between">
+		<div class="flex flex-col gap-1.5 sm:flex-row sm:gap-3">
 			<a href="https://supabase.com/" class="text-xs text-foreground-lighter">&copy; Supabase Inc</a>
-			<span class="text-xs text-foreground-lighter">—</span>
-			{
-				secondaryLinks.map(({ title, url }) => (
-					<a href={url} class="text-xs text-foreground-lighter hover:underline">
-						{title}
-					</a>
-				))
-			}
 			<PrivacySettingsIsland client:only="react" />
 		</div>
-		<div class="flex items-center gap-4">
+		<div class="order-last flex items-center gap-4 sm:order-none">
 			<a href="https://twitter.com/supabase" class="text-foreground-muted hover:text-foreground transition">
 				<span class="sr-only">Twitter</span>
 				<IconTwitterX size={14} />
@@ -77,6 +69,15 @@ const secondaryLinks = [
 				<span class="sr-only">Youtube</span>
 				<IconYoutubeSolid size={14} />
 			</a>
+		</div>
+		<div class="flex flex-col gap-3 sm:basis-full sm:flex-row sm:flex-wrap">
+			{
+				secondaryLinks.map(({ title, url }) => (
+					<a href={url} class="text-xs text-foreground-lighter hover:underline">
+						{title}
+					</a>
+				))
+			}
 		</div>
 	</div>
 </footer>
