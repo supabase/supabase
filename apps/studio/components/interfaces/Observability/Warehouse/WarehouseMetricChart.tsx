@@ -29,24 +29,25 @@ export const WarehouseMetricChart = ({
         })
       : []
   const hasValues = points.some((point) => typeof point.value === 'number')
+
   return (
     <section aria-label={title}>
       <Card>
-        <CardContent className="space-y-4 p-4">
+        <CardContent className="flex flex-col gap-y-4 p-4">
           {hasValues ? (
             <>
               <h2 className="text-sm">{title}</h2>
               <p className="text-xs text-foreground-light">{description}</p>
               <ChartLine
-                className="h-64"
                 isFullHeight
+                showHighlightArea={false}
+                className="h-64"
                 data={points}
                 xKey="timestamp"
                 dataKey="value"
                 config={{ value: { label: `${title}${unit}`, color: 'var(--chart-1)' } }}
                 color="var(--chart-1)"
                 DateTimeFormat="MMM D, HH:mm"
-                showHighlightArea={false}
                 tooltipDetails={(_, __, value) => `${value}${unit}`}
               />
             </>
