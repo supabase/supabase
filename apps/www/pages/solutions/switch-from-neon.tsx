@@ -28,6 +28,8 @@ const Neon: NextPage = () => {
           description: content.metadata.metaDescription,
           url: `https://supabase.com/solutions/switch-from-neon`,
         }}
+        noindex={true}
+        nofollow={true}
       />
       <Layout className="overflow-visible">
         <SolutionsStickyNav activeItem={Solutions.neon} type="migration" />
