@@ -62,6 +62,7 @@ assert_path_absent() { # <path> <desc>
     if [ -e "$1" ]; then bad "$2 ($1 should not exist)"; else ok "$2"; fi
 }
 assert_file_equals() { # <file> <expected, printf %b escapes> <desc>
+    [ -f "$1" ] || { bad "$3 ($1 missing or not a regular file)"; return 0; }
     printf '%b' "$2" > "$WORK/expected"
     if cmp -s "$1" "$WORK/expected"; then ok "$3"; else
         bad "$3 ($1 differs from expected)"
