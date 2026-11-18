@@ -5,7 +5,7 @@ import { Image } from 'ui-patterns/Image'
 import BrowserFrame from '@/components/BrowserFrame'
 
 export default () => ({
-  metaTitle: 'Supabase Cron | Schedule Recurring Jobs in Postgres',
+  metaTitle: 'Supabase Cron | Schedule Recurring Cron Jobs in Postgres',
   metaDescription:
     'Supabase Cron is a Postgres Module that uses the pg_cron database extension to manage recurring tasks. Manage your Cron Jobs using any Postgres tooling.',
   metaImage: '/images/modules/cron/og.png',
@@ -17,7 +17,7 @@ export default () => ({
     subheader: (
       <>
         Supabase Cron is a Postgres Module that uses the pg_cron database extension to manage
-        recurring Jobs. Manage your Cron Jobs using any Postgres tooling.
+        recurring Cron Jobs. Manage your Cron Jobs using any Postgres tooling.
       </>
     ),
     icon: PRODUCT_MODULES['cron'].icon[24],
