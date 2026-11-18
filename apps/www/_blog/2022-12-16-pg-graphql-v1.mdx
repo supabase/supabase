@@ -27,7 +27,7 @@ Our philosophy when adding to the stack is to use existing open source tools whe
 
 ## Architecture
 
-Our first prototype of pg_graphql PostgreSQL extension had a parser written in C (libgraphqlparser) with all business logic of transpiling GraphQL to SQL **written** in SQL. We exposed the extensions sole SQL function `graphql.resolve(...)` over HTTP using PostgREST's [RPC functionality](https://postgrest.org/en/stable/api.html#s-procs). With this approach, the memory footprint was too small to measure when accessed over HTTP. While memory-use sent us down this path, we discovered that leaning into Postgres primitives lead to some incredible synergies. To name a few:
+Our first prototype of [pg_graphql](/docs/guides/graphql) PostgreSQL extension had a parser written in C (libgraphqlparser) with all business logic of transpiling GraphQL to SQL **written** in SQL. We exposed the extensions sole SQL function `graphql.resolve(...)` over HTTP using PostgREST's [RPC functionality](https://postgrest.org/en/stable/api.html#s-procs). With this approach, the memory footprint was too small to measure when accessed over HTTP. While memory-use sent us down this path, we discovered that leaning into Postgres primitives lead to some incredible synergies. To name a few:
 
 ### Security
 

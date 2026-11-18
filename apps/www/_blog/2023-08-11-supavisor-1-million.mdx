@@ -251,7 +251,7 @@ In the future, you connect to a distinct multi-tenant Supavisor cluster through 
   src="/images/blog/2023-08-11-supavisor-1-million/supavisor-tests--supavisor-and-supabase.png"
 />
 
-We ran 5,000 queries per second for each configuration, this time experimenting with `insert` query. To make the experiment more realistic, we enabled the PostGIS extension to store coordinates:
+We ran 5,000 queries per second for each configuration, this time experimenting with `insert` query. To make the experiment more realistic, we enabled the [PostGIS](/docs/guides/database/extensions/postgis) extension to store coordinates:
 
 ```sql
 insert into positions (
@@ -333,7 +333,7 @@ Supavisor will be added to the self-hosted stack as soon as we have tested it ac
 
 ## Conclusion
 
-Supavisor's vertical and horizontal scaling ability make it the optimal solution for developers who aim to create applications that can effortlessly scale, even under extreme workloads, avoiding issues such as "too many connections" and enabling the full power of edge functions and serverless.
+Supavisor's vertical and horizontal scaling ability make it the optimal solution for developers who aim to create applications that can effortlessly scale, even under extreme workloads, avoiding issues such as "too many connections" and enabling the full power of [edge functions](/docs/guides/functions) and serverless.
 
 If you are interested in exploring Supavisor's potential or want to implement its scalability in your upcoming project, check out [the GitHub repository](https://github.com/supabase/supavisor) to know more.
 
