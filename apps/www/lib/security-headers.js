@@ -97,57 +97,101 @@ function buildCsp({ env = process.env } = {}) {
   ].join('; ')
 }
 
-/**
- * @typedef {{ exact: string[], subtree: string[] }} PathExclusions
- */
+/** @param {string} text */
+const escapeRegExp = (text) => text.replace(/[.*+?^${}()|[\]\\]/g, '\\$&')
+
+const DEFAULT_PARAM_PATTERN = '[^/]+?'
 
 /**
- * Paths that www proxies to other apps. A rewrite without parameters excludes exactly its path,
- * for example /openapi.json. A rewrite with parameters excludes the static path before the first
- * parameter and everything below it, for example /dashboard/:path* excludes /dashboard.
- * @param {Rewrite[]} rewrites
- * @returns {PathExclusions}
+ * Converts a rewrite source to a regex that matches the same paths, without the leading slash.
+ * Follows the path-to-regexp syntax that Next.js uses: escaped characters, `:name`,
+ * `:name(pattern)`, and the `*`, `+` and `?` modifiers, which make the preceding slash part
+ * of the repeated or optional group.
+ * @param {string} source
  */
-function getProxiedPathExclusions(rewrites) {
-  const exact = new Set()
-  const subtree = new Set()
+function sourceToPattern(source) {
+  let pattern = ''
+  let i = 0
 
-  for (const rewrite of rewrites) {
-    // Internal rewrites start with a path. Anything else is a URL, or an env var that's unset locally.
-    if (rewrite.destination.startsWith('/')) continue
+  while (i < source.length) {
+    const char = source[i]
 
-    const segments = rewrite.source.replaceAll('\\.', '.').split('/').slice(1)
-    const firstDynamic = segments.findIndex((segment) => /[:(*]/.test(segment))
+    if (char === '\\') {
+      pattern += escapeRegExp(source[i + 1] ?? '')
+      i += 2
+      continue
+    }
 
-    if (firstDynamic === -1) {
-      exact.add(`/${segments.join('/')}`)
+    if (char !== ':' && char !== '(') {
+      pattern += escapeRegExp(char)
+      i += 1
+      continue
+    }
+
+    // A named parameter, optionally with its own pattern, or an unnamed group
+    if (char === ':') {
+      i += 1
+      while (i < source.length && /\w/.test(source[i])) i += 1
+    }
+
+    let paramPattern = DEFAULT_PARAM_PATTERN
+    if (source[i] === '(') {
+      let depth = 0
+      const patternStart = i + 1
+      for (; i < source.length; i += 1) {
+        if (source[i] === '\\') {
+          i += 1
+        } else if (source[i] === '(') {
+          depth += 1
+        } else if (source[i] === ')') {
+          depth -= 1
+          if (depth === 0) break
+        }
+      }
+      // Capturing groups would break the surrounding header source, so make them non-capturing
+      paramPattern = source.slice(patternStart, i).replace(/\((?!\?)/g, '(?:')
+      i += 1
+    }
+
+    const modifier = /[*+?]/.test(source[i] ?? '') ? source[i] : ''
+    if (modifier) i += 1
+
+    const segment = `(?:${paramPattern})`
+    const hasSlashPrefix = pattern.endsWith('/')
+    if (hasSlashPrefix && modifier) {
+      pattern = pattern.slice(0, -1)
+      if (modifier === '?') pattern += `(?:/${segment})?`
+      if (modifier === '*') pattern += `(?:/${segment}(?:/${segment})*)?`
+      if (modifier === '+') pattern += `/${segment}(?:/${segment})*`
     } else {
-      subtree.add(`/${segments.slice(0, firstDynamic).join('/')}`.replace(/(.)\/$/, '$1'))
+      pattern += `${segment}${modifier}`
     }
   }
 
-  const isInSubtree = (/** @type {string} */ path) =>
-    [...subtree].some((prefix) => path === prefix || path.startsWith(`${prefix}/`))
-
-  return {
-    exact: [...exact].filter((path) => !isInSubtree(path)),
-    subtree: [...subtree],
-  }
+  return pattern.replace(/^\//, '')
 }
 
-/** @param {string} path */
-const toPattern = (path) => path.slice(1).replace(/[.*+?^${}()|[\]\\]/g, '\\$&')
+/**
+ * Patterns for the paths that www proxies to other apps, one per external rewrite.
+ * @param {Rewrite[]} rewrites
+ * @returns {string[]}
+ */
+function getProxiedPathPatterns(rewrites) {
+  const patterns = rewrites
+    // Internal rewrites start with a path. Anything else is a URL, or an env var that's unset locally.
+    .filter((rewrite) => !rewrite.destination.startsWith('/'))
+    .map((rewrite) => sourceToPattern(rewrite.source))
+
+  return [...new Set(patterns)]
+}
 
 /**
  * Source that matches every path except the proxied ones.
- * @param {PathExclusions} exclusions
+ * @param {string[]} proxiedPatterns
  */
-function getWwwOwnedSource({ exact, subtree }) {
-  const excluded = [
-    ...exact.map((path) => `${toPattern(path)}$`),
-    ...subtree.map((path) => `${toPattern(path)}(?:/|$)`),
-  ]
-  return `/:path((?!(?:${excluded.join('|')})).*)`
+function getWwwOwnedSource(proxiedPatterns) {
+  if (proxiedPatterns.length === 0) return '/:path(.*)'
+  return `/:path((?!(?:${proxiedPatterns.map((pattern) => `${pattern}$`).join('|')})).*)`
 }
 
 /**
@@ -159,7 +203,7 @@ function getWwwOwnedSource({ exact, subtree }) {
 function getSecurityHeaderRules(rewrites, env = process.env) {
   return [
     {
-      source: getWwwOwnedSource(getProxiedPathExclusions(rewrites)),
+      source: getWwwOwnedSource(getProxiedPathPatterns(rewrites)),
       headers: [
         { key: 'X-Frame-Options', value: 'SAMEORIGIN' },
         { key: 'X-Content-Type-Options', value: 'nosniff' },
@@ -172,7 +216,7 @@ function getSecurityHeaderRules(rewrites, env = process.env) {
 
 module.exports = {
   buildCsp,
-  getProxiedPathExclusions,
+  getProxiedPathPatterns,
   getSecurityHeaderRules,
   getWwwOwnedSource,
 }

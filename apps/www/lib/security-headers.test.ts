@@ -3,7 +3,12 @@ import { pathToRegexp } from 'next/dist/compiled/path-to-regexp'
 import { describe, expect, it } from 'vitest'
 
 import rewrites from './rewrites'
-import { buildCsp, getProxiedPathExclusions, getSecurityHeaderRules } from './security-headers'
+import {
+  buildCsp,
+  getProxiedPathPatterns,
+  getSecurityHeaderRules,
+  getWwwOwnedSource,
+} from './security-headers'
 
 const PRODUCTION_ENV = {
   NODE_ENV: 'production',
@@ -87,60 +92,30 @@ describe('buildCsp', () => {
   })
 })
 
-describe('getProxiedPathExclusions', () => {
-  const { exact, subtree } = getProxiedPathExclusions(REWRITES)
-
-  it('excludes single-file rewrites exactly', () => {
-    expect(exact).toEqual(
-      expect.arrayContaining([
-        '/openapi.json',
-        '/.well-known/security.txt',
-        '/humans.txt',
-        '/lawyers.txt',
-        '/library.rsc',
-        '/design-system.rsc',
-      ])
-    )
-  })
-
-  it('excludes zones as subtrees', () => {
-    expect(subtree).toEqual(
-      expect.arrayContaining([
-        '/dashboard',
-        '/docs',
-        '/kb',
-        '/library',
-        '/library.segments',
-        '/design-system',
-        '/migrate/instantdb',
-        '/new-docs',
-      ])
-    )
-  })
-
-  it('does not widen exact rewrites or nested zones', () => {
-    expect(subtree).not.toContain('/openapi')
-    expect(subtree).not.toContain('/migrate')
-    expect(subtree).not.toContain('/.well-known')
-  })
-
-  it('drops exact paths that a subtree covers', () => {
-    expect(exact).not.toContain('/dashboard')
-    expect(exact).not.toContain('/kb')
-    expect(exact).not.toContain('/new-docs/')
-  })
-
+describe('getProxiedPathPatterns', () => {
   it('ignores internal rewrites', () => {
-    const all = [...exact, ...subtree]
-    expect(all).not.toContain('/feed.xml')
-    expect(all).not.toContain('/.well-known/ai-catalog.json')
+    expect(
+      getProxiedPathPatterns([
+        { source: '/feed.xml', destination: '/rss.xml' },
+        { source: '/:path*', destination: '/:path*' },
+      ])
+    ).toEqual([])
   })
 
   it('includes rewrites to unset env vars', () => {
     expect(
-      getProxiedPathExclusions([{ source: '/kb/:path*', destination: 'undefined/:path*' }])
-    ).toEqual({ exact: [], subtree: ['/kb'] })
+      getProxiedPathPatterns([{ source: '/kb/:path*', destination: 'undefined/:path*' }])
+    ).toHaveLength(1)
   })
+})
+
+describe('getWwwOwnedSource', () => {
+  it.each(['/', '/pricing', '/blog/some-post'])(
+    'matches every path when nothing is proxied: %s',
+    (path) => {
+      expect(matches(getWwwOwnedSource([]), path)).toBe(true)
+    }
+  )
 })
 
 describe('getSecurityHeaderRules', () => {
@@ -158,6 +133,7 @@ describe('getSecurityHeaderRules', () => {
     '/openapi-guide',
     '/library.json',
     '/libraryx',
+    '/library.segments/example',
     '/migrate',
     '/migrate/other',
     '/humans',
@@ -188,6 +164,56 @@ describe('getSecurityHeaderRules', () => {
     '/kb/some-article',
   ])('does not apply to the proxied path %s', (path) => {
     expect(matches(wwwRule.source, path)).toBe(false)
+  })
+
+  // Every path must get the www headers exactly when no external rewrite proxies it
+  const externalSources = REWRITES.filter((rewrite) => !rewrite.destination.startsWith('/')).map(
+    (rewrite) => rewrite.source
+  )
+  const SAMPLE_PATHS = [
+    '/',
+    '/pricing',
+    '/customers/maergo',
+    '/dashboard',
+    '/dashboard/project/abc',
+    '/dashboarding-guide',
+    '/docs',
+    '/docs/guides/auth',
+    '/docs.segments/a.segment.rsc',
+    '/docsearch',
+    '/library',
+    '/library.rsc',
+    '/library.json',
+    '/library.segments/a.segment.rsc',
+    '/library.segments/example',
+    '/library/example/x.segments/y.segment.rsc',
+    '/library/example/password-based-auth',
+    '/libraryx',
+    '/design-system.segments/a.segment.rsc',
+    '/design-system.segments/example',
+    '/kb',
+    '/kb/a/b',
+    '/evals/run',
+    '/migrate',
+    '/migrate/instantdb',
+    '/migrate/instantdb/step',
+    '/migrate/other',
+    '/new-docs',
+    '/new-docs/',
+    '/new-docs/guides',
+    '/humans.txt',
+    '/humans',
+    '/lawyers.txt',
+    '/.well-known/security.txt',
+    '/.well-known/ard.json',
+    '/openapi.json',
+    '/openapi',
+    '/feed.xml',
+  ]
+
+  it.each(SAMPLE_PATHS)('agrees with the rewrite sources for %s', (path) => {
+    const isProxied = externalSources.some((source) => matches(source, path))
+    expect(matches(wwwRule.source, path)).toBe(!isProxied)
   })
 
   it('sets the framing, sniffing and referrer headers', () => {
