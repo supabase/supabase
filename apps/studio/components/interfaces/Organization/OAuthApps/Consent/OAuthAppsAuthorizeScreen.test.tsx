@@ -136,7 +136,9 @@ describe('OAuthAppsAuthorizeScreen', () => {
 
     await screen.findByText('Permissions requested')
     expect(screen.queryByText('Want this scoped to one member?')).not.toBeInTheDocument()
-    expect(screen.queryByText(/This grant acts as you/)).not.toBeInTheDocument()
+    expect(
+      screen.queryByText(/The app can only use the permissions listed below/)
+    ).not.toBeInTheDocument()
     expect(screen.queryByText(/No admin approval is needed/)).not.toBeInTheDocument()
     expect(screen.queryByText(/This authorization will appear in Authorized apps/)).toBeNull()
   })
@@ -144,7 +146,9 @@ describe('OAuthAppsAuthorizeScreen', () => {
   test('shows the member-bound copy for a member-bound grant that picks projects', async () => {
     renderScreen()
 
-    expect(await screen.findByText(/This grant acts as you/)).toBeInTheDocument()
+    expect(
+      await screen.findByText(/The app can only use the permissions listed below/)
+    ).toBeInTheDocument()
     expect(screen.queryByText(/No admin approval is needed/)).toBeNull()
     expect(screen.queryByText('Want this scoped to one member?')).not.toBeInTheDocument()
     expect(screen.queryByText('This grant covers every project')).not.toBeInTheDocument()

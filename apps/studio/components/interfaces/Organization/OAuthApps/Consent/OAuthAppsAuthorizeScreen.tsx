@@ -388,7 +388,15 @@ export const OAuthAppsAuthorizeScreen = ({
           {canProceed && (
             <>
               <section className="flex flex-col gap-3">
-                <p className="text-sm text-foreground">Permissions requested</p>
+                <div className="space-y-1">
+                  <p className="text-sm text-foreground">Permissions requested</p>
+                  {grantKind === 'member_bound' && (
+                    <p className="text-xs text-foreground-lighter">
+                      The app can only use the permissions listed below, and only where your role
+                      allows them.
+                    </p>
+                  )}
+                </div>
                 {appDetails?.existing_grant?.approved_scopes && !databaseAccess ? (
                   <ScopeGroupCardWithDiff
                     scopes={request.scopes}
