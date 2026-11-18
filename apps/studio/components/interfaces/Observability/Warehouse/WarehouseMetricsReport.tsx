@@ -273,11 +273,15 @@ const WarehouseMetricsReportContent = () => {
             {query.isPending ? 'Loading Warehouse report' : reportStatus}
           </p>
           {renderContent()}
-          {isRangeOk && query.isSuccess && !canShowSetup && !(setup.isError && !hasValues) && (
-            <div className="mt-8">
-              <WarehouseLatencySection range={range} />
-            </div>
-          )}
+          {isRangeOk &&
+            query.isSuccess &&
+            !canShowSetup &&
+            !(setup.isError && !hasValues) &&
+            (!setup.isPending || hasValues) && (
+              <div className="mt-8">
+                <WarehouseLatencySection range={range} />
+              </div>
+            )}
         </div>
       </ReportStickyNav>
       <UpgradePrompt

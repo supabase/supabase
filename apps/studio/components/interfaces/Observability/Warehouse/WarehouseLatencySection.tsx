@@ -31,53 +31,65 @@ export const WarehouseLatencySection = ({
       interval: range.interval,
     })
   )
-  if (query.isPending) return <GenericSkeletonLoader aria-label="Loading latency metrics" />
-  if (query.isError)
+  const renderContent = () => {
+    if (query.isPending) return <GenericSkeletonLoader aria-label="Loading latency metrics" />
+    if (query.isError)
+      return (
+        <AlertError
+          projectRef={ref}
+          error={query.error}
+          subject="Failed to retrieve latency metrics"
+          additionalActions={<Button onClick={() => query.refetch()}>Retry</Button>}
+        />
+      )
+    const metric = (name: string) => query.data.metrics.find((item) => item.metric === name)
     return (
-      <AlertError
-        projectRef={ref}
-        error={query.error}
-        subject="Failed to retrieve latency metrics"
-        additionalActions={<Button onClick={() => query.refetch()}>Retry</Button>}
-      />
-    )
-  const metric = (name: string) => query.data.metrics.find((item) => item.metric === name)
-  return (
-    <div className="space-y-4">
-      <h2 className="text-base">Latency</h2>
-      <WarehouseMetricChart
-        title="Query duration"
-        description="Time until a query succeeds, fails, or is canceled, including worker waits and result streaming."
-        metric={metric('query_duration_p95')}
-        series={[
-          { metric: metric('query_duration_mean'), label: 'Average' },
-          { metric: metric('query_duration_p50'), label: 'p50' },
-          { metric: metric('query_duration_p95'), label: 'p95' },
-          { metric: metric('query_duration_p99'), label: 'p99' },
-        ]}
-        unit=" ms"
-        scale={1000}
-      />
-      <div className="grid gap-4 md:grid-cols-2">
+      <div className="space-y-4">
+        <h2 className="text-base">Latency</h2>
         <WarehouseMetricChart
-          title="Time waiting for a worker"
-          description="Time spent acquiring a worker, excluding SQL setup such as DuckLake connections, measured per attempt including retries rather than per query."
-          metric={metric('assignment_wait_p95')}
+          title="Query duration"
+          description="Time until a query succeeds, fails, or is canceled, including worker waits and result streaming."
+          metric={metric('query_duration_p95')}
           series={[
-            { metric: metric('assignment_wait_mean'), label: 'Average' },
-            { metric: metric('assignment_wait_p95'), label: 'p95' },
+            { metric: metric('query_duration_mean'), label: 'Average' },
+            { metric: metric('query_duration_p50'), label: 'p50' },
+            { metric: metric('query_duration_p95'), label: 'p95' },
+            { metric: metric('query_duration_p99'), label: 'p99' },
           ]}
           unit=" ms"
           scale={1000}
         />
-        <WarehouseMetricChart
-          title="Successful query duration"
-          description="Average successful query duration on a worker, including result streaming and client backpressure."
-          metric={metric('duckdb_duration_mean')}
-          unit=" ms"
-          scale={1000}
-        />
+        <div className="grid gap-4 md:grid-cols-2">
+          <WarehouseMetricChart
+            title="Time waiting for a worker"
+            description="Time spent acquiring a worker, excluding SQL setup such as DuckLake connections, measured per attempt including retries rather than per query."
+            metric={metric('assignment_wait_p95')}
+            series={[
+              { metric: metric('assignment_wait_mean'), label: 'Average' },
+              { metric: metric('assignment_wait_p95'), label: 'p95' },
+            ]}
+            unit=" ms"
+            scale={1000}
+          />
+          <WarehouseMetricChart
+            title="Successful query duration"
+            description="Average successful query duration on a worker, including result streaming and client backpressure."
+            metric={metric('duckdb_duration_mean')}
+            unit=" ms"
+            scale={1000}
+          />
+        </div>
       </div>
+    )
+  }
+
+  return (
+    <div className="relative">
+      <p role="status" className="sr-only">
+        {query.isPending && 'Loading latency metrics'}
+        {query.isSuccess && 'Latency metrics loaded'}
+      </p>
+      {renderContent()}
     </div>
   )
 }
