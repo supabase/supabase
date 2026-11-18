@@ -96,8 +96,6 @@ export const StorageSettings = () => {
     isLoading: isLoadingImageTransformationEntitlement,
   } = useCheckEntitlements('storage.image_transformations')
 
-  const isSpendCapOn =
-    organization?.plan.id === 'pro' && organization?.usage_billing_enabled === false
   const hasLimitedStorageAccess =
     !hasAccessToImageTransformations && !hasAccessToFileSizeConfiguration
 
@@ -110,6 +108,11 @@ export const StorageSettings = () => {
       return getEntitlementNumericValue() ?? STORAGE_FILE_SIZE_LIMIT_MAX_BYTES_CAPPED
     }
   }, [organization, isEntitlementUnlimited, getEntitlementNumericValue])
+
+  const isFileSizeReducedBySpendCap =
+    organization?.plan.id === 'pro' &&
+    organization?.usage_billing_enabled === false &&
+    maxBytes < STORAGE_FILE_SIZE_LIMIT_MAX_BYTES_UNCAPPED
 
   const isLoading =
     isLoadingProjectStorageConfig ||
@@ -394,7 +397,7 @@ export const StorageSettings = () => {
                           )} and unlock image transformations.`}
                         />
                       )}
-                      {isSpendCapOn && (
+                      {isFileSizeReducedBySpendCap && (
                         <UpgradeToPro
                           fullWidth
                           addon="spendCap"
