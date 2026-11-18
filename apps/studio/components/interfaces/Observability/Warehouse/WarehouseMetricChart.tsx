@@ -72,7 +72,7 @@ export const WarehouseMetricChart = ({
                 color="var(--chart-1)"
                 DateTimeFormat="MMM D, HH:mm"
                 showHighlightArea={false}
-                tooltipDetails={(_, __, value) => `${value}${unit}`}
+                tooltipDetails={(_, __, value) => `${value}${unit ? ` ${unit}` : ''}`}
               />
             </>
           ) : (
