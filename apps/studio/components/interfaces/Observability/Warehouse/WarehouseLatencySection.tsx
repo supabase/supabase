@@ -86,8 +86,8 @@ export const WarehouseLatencySection = ({
   return (
     <div className="relative">
       <p role="status" className="sr-only">
-        {query.isPending && 'Loading latency metrics'}
-        {query.isSuccess && 'Latency metrics loaded'}
+        {query.isPending && <span>Loading latency metrics</span>}
+        {query.isSuccess && <span>Latency metrics loaded</span>}
       </p>
       {renderContent()}
     </div>
