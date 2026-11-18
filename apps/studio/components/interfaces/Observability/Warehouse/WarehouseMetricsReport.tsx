@@ -3,12 +3,12 @@ import { useParams } from 'common'
 import dayjs from 'dayjs'
 import { RefreshCwIcon, WarehouseIcon } from 'lucide-react'
 import { useState } from 'react'
-import { Button, Card, CardContent } from 'ui'
+import { Button } from 'ui'
 import { Admonition } from 'ui-patterns/Admonition'
-import { ChartLine } from 'ui-patterns/Chart'
 import { EmptyStatePresentational } from 'ui-patterns/EmptyStatePresentational'
 import { GenericSkeletonLoader } from 'ui-patterns/ShimmeringLoader'
 
+import { getWarehouseMetricEmptyMessage, WarehouseMetricChart } from './WarehouseMetricChart'
 import { resolveWarehouseMetricsRange } from './WarehouseMetrics.range'
 import ReportHeader from '@/components/interfaces/Reports/ReportHeader'
 import { REPORT_DATERANGE_HELPER_LABELS } from '@/components/interfaces/Reports/Reports.constants'
@@ -16,7 +16,6 @@ import ReportStickyNav from '@/components/interfaces/Reports/ReportStickyNav'
 import { LogsDatePicker } from '@/components/interfaces/Settings/Logs/Logs.DatePickers'
 import UpgradePrompt from '@/components/interfaces/Settings/Logs/UpgradePrompt'
 import { AlertError } from '@/components/ui/AlertError'
-import NoDataPlaceholder from '@/components/ui/Charts/NoDataPlaceholder'
 import { InlineLink } from '@/components/ui/InlineLink'
 import { ShortcutTooltip } from '@/components/ui/ShortcutTooltip'
 import { warehouseKeys } from '@/data/warehouse/keys'
@@ -61,7 +60,13 @@ const WarehouseMetricsReportContent = () => {
   const query = useQuery(
     warehouseMetricsQueryOptions({
       projectRef: ref,
-      attributes: ['query_rate'],
+      attributes: [
+        'query_rate',
+        'query_in_flight',
+        'query_error_rate',
+        'query_timeout_rate',
+        'query_canceled_rate',
+      ],
       startDate: isRangeOk ? range.startDate : '',
       endDate: isRangeOk ? range.endDate : '',
       interval: isRangeOk ? range.interval : '1m',
@@ -88,36 +93,14 @@ const WarehouseMetricsReportContent = () => {
   const isNotSetUp = setup.data?.setup_status === 'not_started' && !hasLiveTables
   const isDisabled = setup.data?.setup_status === 'disabled' && !hasLiveTables
   const hasValues =
-    metric?.series.some((series) =>
-      series.points.some((point) => point.value !== null && Number.isFinite(point.value))
+    query.data?.metrics.some((item) =>
+      item.series.some((series) =>
+        series.points.some((point) => point.value !== null && Number.isFinite(point.value))
+      )
     ) ?? false
   const canShowSetup = !hasValues && (isNotSetUp || isDisabled)
-  const points =
-    metric?.series.length === 1
-      ? metric.series[0].points.map((point): Record<string, string | number> => {
-          const row: Record<string, string | number> = {
-            timestamp: new Date(point.timestamp * 1000).toISOString(),
-          }
-          if (point.value !== null && Number.isFinite(point.value)) row.value = point.value
-          return row
-        })
-      : []
-  const emptyMessage = (() => {
-    if (!metric || metric.series.length > 1) return 'Metrics are temporarily unavailable'
-    switch (metric.availability) {
-      case 'stale':
-        return 'No recent data'
-      case 'insufficient_data':
-        return 'Not enough data yet'
-      case 'unavailable':
-      case 'disabled':
-      case 'not_provisioned':
-        return 'Metrics are temporarily unavailable'
-      default:
-        return 'No data in the selected period'
-    }
-  })()
-  const hasChartValues = points.some((point) => typeof point.value === 'number')
+  const emptyMessage = getWarehouseMetricEmptyMessage(metric)
+  const hasChartValues = hasValues
 
   const reportStatus = hasChartValues
     ? 'Warehouse report loaded'
@@ -198,40 +181,51 @@ const WarehouseMetricsReportContent = () => {
         />
       )
     return (
-      <Card>
-        <CardContent className="space-y-4 p-4">
-          {hasChartValues ? (
-            <>
-              <h2 className="text-sm">Query rate</h2>
-              <p className="text-xs text-foreground-light">
-                Queries started per second. Not a count of SQL statements.
-              </p>
-              <ChartLine
-                className="h-64"
-                isFullHeight
-                data={points}
-                xKey="timestamp"
-                dataKey="value"
-                config={{ value: { label: 'Queries/s', color: 'var(--chart-1)' } }}
-                color="var(--chart-1)"
-                DateTimeFormat="MMM D, HH:mm"
-                showHighlightArea={false}
-                tooltipDetails={(_, __, value) => `${value}/s`}
-              />
-            </>
-          ) : (
-            <NoDataPlaceholder
-              attribute="Query rate"
-              size="normal"
-              hideTotalPlaceholder
-              message={emptyMessage}
-            />
-          )}
-          {hasChartValues && metric?.availability === 'partial' && (
-            <p className="text-xs text-foreground-light">Partial data</p>
-          )}
-        </CardContent>
-      </Card>
+      <div className="grid gap-4 md:grid-cols-2">
+        {[
+          {
+            metric: 'query_rate',
+            title: 'Query rate',
+            unit: '/s',
+            description: 'Queries started per second. Not a count of SQL statements.',
+          },
+          {
+            metric: 'query_in_flight',
+            title: 'Queries in progress',
+            unit: '',
+            description:
+              'Queries awaiting completion, including worker waits and result streaming.',
+          },
+          {
+            metric: 'query_error_rate',
+            title: 'Query errors',
+            unit: '/s',
+            description:
+              'Failed queries per second, including timeouts. Canceled queries are counted separately.',
+          },
+          {
+            metric: 'query_timeout_rate',
+            title: 'Timeouts (included in errors)',
+            unit: '/s',
+            description:
+              'Timed-out queries per second. These are already included in query errors.',
+          },
+          {
+            metric: 'query_canceled_rate',
+            title: 'Canceled queries',
+            unit: '/s',
+            description: 'Canceled queries per second, counted separately from errors.',
+          },
+        ].map((chart) => (
+          <WarehouseMetricChart
+            key={chart.metric}
+            metric={query.data?.metrics.find((item) => item.metric === chart.metric)}
+            title={chart.title}
+            description={chart.description}
+            unit={chart.unit}
+          />
+        ))}
+      </div>
     )
   }
 

@@ -1,5 +1,5 @@
 import { QueryClient } from '@tanstack/react-query'
-import { screen, waitFor } from '@testing-library/react'
+import { screen, waitFor, within } from '@testing-library/react'
 import userEvent from '@testing-library/user-event'
 import type { platformComponents as components } from 'api-types'
 import dayjs from 'dayjs'
@@ -245,4 +245,61 @@ test('opens the date picker with its report shortcut', async () => {
   await screen.findByText('No data in the selected period')
   await userEvent.keyboard('{Shift>}P{/Shift}')
   expect(await screen.findByText('Last 24 hours')).toBeVisible()
+})
+
+test('shows query outcomes without treating missing measurements as zero', async () => {
+  const data = response(null)
+  const metric = data.metrics[0]
+  data.metrics.push(
+    {
+      ...metric,
+      metric: 'query_in_flight',
+      availability: 'ok',
+      series: [{ ...metric.series[0], points: [{ timestamp: 1794877260, value: 0 }] }],
+    },
+    {
+      ...metric,
+      metric: 'query_error_rate',
+      availability: 'partial',
+      series: [{ ...metric.series[0], points: [{ timestamp: 1794877260, value: 0.1 }] }],
+    },
+    { ...metric, metric: 'query_timeout_rate', availability: 'no_data' },
+    { ...metric, metric: 'query_canceled_rate', availability: 'unavailable' }
+  )
+  addAPIMock({
+    method: 'get',
+    path: '/platform/warehouse/:ref/metrics',
+    response: ({ request }) => {
+      expect(new URL(request.url).searchParams.get('attributes')?.split(',')).toEqual([
+        'query_rate',
+        'query_in_flight',
+        'query_error_rate',
+        'query_timeout_rate',
+        'query_canceled_rate',
+      ])
+      return HttpResponse.json<WarehouseMetricsResponse>(data)
+    },
+  })
+  mockSetup('not_started')
+  renderReport()
+  const progress = await screen.findByRole('region', { name: 'Queries in progress' })
+  expect(
+    within(progress).getByText(
+      'Queries awaiting completion, including worker waits and result streaming.'
+    )
+  ).toBeInTheDocument()
+  expect(
+    within(screen.getByRole('region', { name: 'Query errors' })).getByText('Partial data')
+  ).toBeInTheDocument()
+  expect(
+    within(screen.getByRole('region', { name: 'Timeouts (included in errors)' })).getByText(
+      'No data in the selected period'
+    )
+  ).toBeInTheDocument()
+  expect(
+    within(screen.getByRole('region', { name: 'Canceled queries' })).getByText(
+      'Metrics are temporarily unavailable'
+    )
+  ).toBeInTheDocument()
+  expect(screen.queryByRole('link', { name: 'Set up Warehouse' })).not.toBeInTheDocument()
 })
