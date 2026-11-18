@@ -1,9 +1,10 @@
-import { AuthProvider, useIsLoggedIn, useIsUserLoading } from 'common/auth'
+import { AuthProvider } from 'common/auth'
 import { DASHBOARD_PROJECTS_URL, DASHBOARD_SIGN_UP_URL } from 'common/constants/dashboard-urls'
 import { SearchTrigger } from 'docs-search/components'
 import { useCallback, useRef, useState } from 'react'
 import { buttonVariants, cn } from 'ui'
 import { MobileNavThemeButton } from 'ui-patterns/MobileNav/MobileNavThemeButton'
+import { SignedInSwitch } from 'ui-patterns/SignedInSwitch/SignedInSwitch'
 import { HeadingReel } from 'ui-patterns/Toc/heading-reel'
 import {
   TopNavMenu,
@@ -129,28 +130,20 @@ export const Header = ({ topics, currentPath }: HeaderProps) => {
 }
 
 const AccountLink = ({ className }: AccountLinkProps) => {
-  const isLoggedIn = useIsLoggedIn()
-  const isUserLoading = useIsUserLoading()
   const linkClassName = cn(buttonVariants({ variant: 'primary' }), 'h-7.5', className)
 
   return (
-    <>
-      <span
-        hidden={!isUserLoading && isLoggedIn}
-        className={isUserLoading ? 'contents in-data-signed-in:hidden' : 'contents'}
-      >
-        <a href={DASHBOARD_SIGN_UP_URL} className={linkClassName}>
-          Sign up
-        </a>
-      </span>
-      <span
-        hidden={!isUserLoading && !isLoggedIn}
-        className={isUserLoading ? 'hidden in-data-signed-in:contents' : 'contents'}
-      >
+    <SignedInSwitch
+      signedIn={
         <a href={DASHBOARD_PROJECTS_URL} className={linkClassName}>
           Dashboard
         </a>
-      </span>
-    </>
+      }
+      signedOut={
+        <a href={DASHBOARD_SIGN_UP_URL} className={linkClassName}>
+          Sign up
+        </a>
+      }
+    />
   )
 }

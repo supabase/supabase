@@ -682,6 +682,10 @@
       "import": "./src/ShimmeringLoader/index.tsx",
       "types": "./src/ShimmeringLoader/index.tsx"
     },
+    "./SignedInSwitch/SignedInSwitch": {
+      "import": "./src/SignedInSwitch/SignedInSwitch.tsx",
+      "types": "./src/SignedInSwitch/SignedInSwitch.tsx"
+    },
     "./SimpleCodeBlock/SimpleCodeBlock": {
       "import": "./src/SimpleCodeBlock/SimpleCodeBlock.tsx",
       "types": "./src/SimpleCodeBlock/SimpleCodeBlock.tsx"

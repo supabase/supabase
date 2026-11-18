@@ -1,8 +1,8 @@
-import { useIsLoggedIn, useIsUserLoading } from 'common/auth'
 import { useState, type RefObject } from 'react'
 import { MobileNavAccountActions } from 'ui-patterns/MobileNav/MobileNavAccountActions'
 import { MobileNavDrawer } from 'ui-patterns/MobileNav/MobileNavDrawer'
 import { MobileNavTabs } from 'ui-patterns/MobileNav/MobileNavTabs'
+import { SignedInSwitch } from 'ui-patterns/SignedInSwitch/SignedInSwitch'
 
 import { type NavMenu } from '../lib/nav'
 import { EXTERNAL_LINKS } from './HeaderMenu'
@@ -44,7 +44,12 @@ export const MobileMenu = ({
       open={open}
       toggleRef={toggleRef}
       className={className}
-      footer={<MobileMenuAccountActions />}
+      footer={
+        <SignedInSwitch
+          signedIn={<MobileNavAccountActions isLoggedIn />}
+          signedOut={<MobileNavAccountActions isLoggedIn={false} />}
+        />
+      }
     >
       <nav aria-label="Menu" className="flex flex-col gap-6">
         <MobileNavTabs
@@ -92,27 +97,5 @@ export const MobileMenu = ({
         </ul>
       </nav>
     </MobileNavDrawer>
-  )
-}
-
-const MobileMenuAccountActions = () => {
-  const isLoggedIn = useIsLoggedIn()
-  const isUserLoading = useIsUserLoading()
-
-  return (
-    <>
-      <span
-        hidden={!isUserLoading && isLoggedIn}
-        className={isUserLoading ? 'contents in-data-signed-in:hidden' : 'contents'}
-      >
-        <MobileNavAccountActions isLoggedIn={false} />
-      </span>
-      <span
-        hidden={!isUserLoading && !isLoggedIn}
-        className={isUserLoading ? 'hidden in-data-signed-in:contents' : 'contents'}
-      >
-        <MobileNavAccountActions isLoggedIn />
-      </span>
-    </>
   )
 }
