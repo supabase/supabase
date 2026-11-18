@@ -40,6 +40,7 @@ import { LogsFilterBar } from './components/LogsFilterBar'
 import { getLogAttributeSources } from './components/LogsFilterBar.utils'
 import { LogsListPanel } from './components/LogsListPanel'
 import { LogsTable } from './components/LogsTable'
+import { isPresetViewId, PRESET_VIEWS } from './components/LogsViews.presets'
 import { getFilterCombinationKey, MIN_FILTERS_TO_SAVE } from './components/LogsViews.utils'
 import { LogsViewsPanel } from './components/LogsViewsPanel'
 import { TooltipLabel } from './components/TooltipLabel'
@@ -475,7 +476,11 @@ export const UnifiedLogs = ({
     () => new Set(filterFields.map((field) => field.value)),
     [filterFields]
   )
-  const activeView = savedViews.find((view) => view.id === activeViewId) ?? null
+  // Presets are resolved alongside saved views so applying one still tracks as
+  // the active view, even though it never exists in the content API.
+  const activeView =
+    [...PRESET_VIEWS, ...savedViews].find((view) => view.id === activeViewId) ?? null
+  const isActiveViewPreset = isPresetViewId(activeViewId)
   const isActiveViewModified = activeView ? isViewModified(activeView, search) : false
   const activeFilterCount = parseLogsFilterUrlParams(search.filter).length
   const logSource = getLogAttributeSources(searchParameters)[0] ?? 'edge_logs'
@@ -553,6 +558,18 @@ export const UnifiedLogs = ({
     setActiveViewId(null)
     setIsReviewingChanges(false)
     setDismissedUpdateKey(null)
+  }
+
+  const handleDuplicateView = async (view: LogsView, name: string) => {
+    const savedProjectRef = projectRef
+    const id = await createSavedView({
+      name,
+      logSource: view.logSource,
+      filters: view.filters,
+      viewOptions: view.viewOptions,
+    })
+    if (currentProjectRef.current === savedProjectRef) setActiveViewId(id)
+    toast.success('View saved')
   }
 
   const handleCreateView = async (name: string) => {
@@ -739,8 +756,10 @@ export const UnifiedLogs = ({
                               onRetry={retrySavedViews}
                               onApply={handleApplyView}
                               onReviewChanges={handleReviewChanges}
+                              canCreate={canCreateView}
                               onRename={(id, name) => updateSavedView(id, { name })}
                               onDelete={deleteSavedView}
+                              onDuplicate={handleDuplicateView}
                               onCancelSave={() => setSaveViewProjectRef(null)}
                               onSubmitSave={handleCreateView}
                             />
@@ -894,7 +913,7 @@ export const UnifiedLogs = ({
           onOpenChange={setIsReviewingChanges}
           anchorRef={activeViewRowRef}
           viewName={activeView.name}
-          canUpdate={canUpdateView}
+          canUpdate={canUpdateView && !isActiveViewPreset}
           canCreate={canCreateView}
           isPending={isSavingView}
           onUpdate={handleUpdateActiveView}

@@ -1,4 +1,11 @@
-import { AlertCircleIcon, EditIcon, Layers2Icon, MoreVerticalIcon, Trash2Icon } from 'lucide-react'
+import {
+  AlertCircleIcon,
+  CopyIcon,
+  EditIcon,
+  Layers2Icon,
+  MoreVerticalIcon,
+  Trash2Icon,
+} from 'lucide-react'
 import { RefObject, useState } from 'react'
 import {
   Button,
@@ -9,11 +16,11 @@ import {
   DropdownMenuTrigger,
 } from 'ui'
 import { ConfirmationModal } from 'ui-patterns/Dialogs/ConfirmationModal'
-import { EmptyStatePresentational } from 'ui-patterns/EmptyStatePresentational'
 import { InnerSideBarFilters, InnerSideBarFilterSearchInput } from 'ui-patterns/InnerSideMenu'
 import { GenericSkeletonLoader } from 'ui-patterns/ShimmeringLoader'
 
 import { type LogsView } from '../UnifiedLogs.views'
+import { PRESET_VIEWS } from './LogsViews.presets'
 import { ViewNameDialog } from './ViewNameDialog'
 
 interface LogsViewRowProps {
@@ -22,11 +29,16 @@ interface LogsViewRowProps {
   isModified: boolean
   canUpdate: boolean
   canDelete: boolean
+  /** Presets are read-only: they can be duplicated, but not renamed or deleted. */
+  isPreset?: boolean
+  description?: string
+  canCreate?: boolean
   activeRowRef?: RefObject<HTMLDivElement | null>
   onApply: (view: LogsView) => void
   onReviewChanges: () => void
   onRequestRename: (view: LogsView) => void
   onRequestDelete: (view: LogsView) => void
+  onRequestDuplicate: (view: LogsView) => void
 }
 
 const LogsViewRow = ({
@@ -35,11 +47,15 @@ const LogsViewRow = ({
   isModified,
   canUpdate,
   canDelete,
+  isPreset = false,
+  description,
+  canCreate = true,
   activeRowRef,
   onApply,
   onReviewChanges,
   onRequestRename,
   onRequestDelete,
+  onRequestDuplicate,
 }: LogsViewRowProps) => {
   // Re-applying a modified view would silently throw the edits away, so the row
   // offers the update/save/reset choices instead while it reads as modified.
@@ -67,7 +83,7 @@ const LogsViewRow = ({
             'min-w-0 flex-1 truncate text-sm',
             isActive ? 'text-foreground' : 'text-foreground-light'
           )}
-          title={view.name}
+          title={description ?? view.name}
         >
           {view.name}
         </span>
@@ -87,21 +103,33 @@ const LogsViewRow = ({
         </DropdownMenuTrigger>
         <DropdownMenuContent align="end" className="w-40">
           <DropdownMenuItem
-            disabled={!canUpdate}
+            disabled={!canCreate}
             className="gap-x-2"
-            onSelect={() => onRequestRename(view)}
+            onSelect={() => onRequestDuplicate(view)}
           >
-            <EditIcon size={14} />
-            <span>Rename</span>
+            <CopyIcon size={14} />
+            <span>Duplicate</span>
           </DropdownMenuItem>
-          <DropdownMenuItem
-            disabled={!canDelete}
-            className="gap-x-2"
-            onSelect={() => onRequestDelete(view)}
-          >
-            <Trash2Icon size={14} />
-            <span>Delete</span>
-          </DropdownMenuItem>
+          {!isPreset && (
+            <>
+              <DropdownMenuItem
+                disabled={!canUpdate}
+                className="gap-x-2"
+                onSelect={() => onRequestRename(view)}
+              >
+                <EditIcon size={14} />
+                <span>Rename</span>
+              </DropdownMenuItem>
+              <DropdownMenuItem
+                disabled={!canDelete}
+                className="gap-x-2"
+                onSelect={() => onRequestDelete(view)}
+              >
+                <Trash2Icon size={14} />
+                <span>Delete</span>
+              </DropdownMenuItem>
+            </>
+          )}
         </DropdownMenuContent>
       </DropdownMenu>
     </div>
@@ -115,6 +143,7 @@ interface LogsViewsPanelProps {
   isPending?: boolean
   canUpdate?: boolean
   canDelete?: boolean
+  canCreate?: boolean
   activeViewId: string | null
   isActiveViewModified?: boolean
   isSaving?: boolean
@@ -125,6 +154,7 @@ interface LogsViewsPanelProps {
   onReviewChanges: () => void
   onRename: (id: string, name: string) => Promise<void>
   onDelete: (id: string) => Promise<void>
+  onDuplicate: (view: LogsView, name: string) => Promise<void>
   onCancelSave: () => void
   onSubmitSave: (name: string) => Promise<void>
 }
@@ -136,6 +166,7 @@ export const LogsViewsPanel = ({
   isPending = false,
   canUpdate = true,
   canDelete = true,
+  canCreate = true,
   activeViewId,
   isActiveViewModified = false,
   isSaving = false,
@@ -145,22 +176,26 @@ export const LogsViewsPanel = ({
   onReviewChanges,
   onRename,
   onDelete,
+  onDuplicate,
   onCancelSave,
   onSubmitSave,
 }: LogsViewsPanelProps) => {
   const [search, setSearch] = useState('')
   const [renameTarget, setRenameTarget] = useState<LogsView | null>(null)
   const [deleteTarget, setDeleteTarget] = useState<LogsView | null>(null)
+  const [duplicateTarget, setDuplicateTarget] = useState<LogsView | null>(null)
 
-  const matchingViews = views.filter((view) =>
-    view.name.toLowerCase().includes(search.trim().toLowerCase())
-  )
-  const existingNames = views.map((view) => view.name)
+  const matches = (view: LogsView) => view.name.toLowerCase().includes(search.trim().toLowerCase())
+  const matchingPresets = PRESET_VIEWS.filter(matches)
+  const matchingViews = views.filter(matches)
+  // Presets are included so a saved view can't shadow a preset's name.
+  const existingNames = [...PRESET_VIEWS, ...views].map((view) => view.name)
+  const hasNoMatches = matchingPresets.length === 0 && matchingViews.length === 0
 
   return (
     <>
       <div className="flex min-h-0 flex-1 flex-col">
-        {views.length > 0 && (
+        {!isLoading && (
           <div className="px-3 pt-3">
             <InnerSideBarFilters className="w-full gap-0 p-0">
               <InnerSideBarFilterSearchInput
@@ -189,42 +224,90 @@ export const LogsViewsPanel = ({
             </div>
           )}
 
-          {!isLoading && !isError && views.length === 0 && !isSaving && (
-            <EmptyStatePresentational
-              icon={Layers2Icon}
-              iconSize={20}
-              title="No saved views"
-              description="Filter your logs, then save the combination to come back to it later."
-              className="border-0 bg-transparent px-2 py-2"
-              contentClassName="gap-y-1 [&_h3]:text-sm [&_p]:text-xs"
-            />
-          )}
-
-          {!isLoading && !isError && views.length > 0 && matchingViews.length === 0 && (
+          {!isLoading && !isError && hasNoMatches && (
             <p className="px-2 py-2 text-xs text-foreground-lighter">No views found</p>
           )}
 
-          {!isLoading && !isError && matchingViews.length > 0 && (
-            <div className="flex flex-col gap-0.5">
-              {matchingViews.map((view) => (
+          {!isLoading && !isError && matchingPresets.length > 0 && (
+            <section aria-labelledby="logs-preset-views-heading" className="flex flex-col gap-0.5">
+              <h3
+                id="logs-preset-views-heading"
+                className="mb-2 px-2 font-mono text-sm font-normal uppercase text-foreground-lighter"
+              >
+                Preset views
+              </h3>
+              {matchingPresets.map((view) => (
                 <LogsViewRow
                   key={view.id}
                   view={view}
+                  isPreset
+                  description={view.description}
                   isActive={view.id === activeViewId}
                   isModified={isActiveViewModified}
-                  canUpdate={canUpdate && !isPending}
-                  canDelete={canDelete && !isPending}
+                  canCreate={canCreate && !isPending}
+                  canUpdate={false}
+                  canDelete={false}
                   activeRowRef={activeRowRef}
                   onApply={onApply}
                   onReviewChanges={onReviewChanges}
                   onRequestRename={setRenameTarget}
                   onRequestDelete={setDeleteTarget}
+                  onRequestDuplicate={setDuplicateTarget}
                 />
               ))}
-            </div>
+            </section>
+          )}
+
+          {!isLoading && !isError && (
+            <section aria-labelledby="logs-saved-views-heading" className="flex flex-col gap-0.5">
+              <h3
+                id="logs-saved-views-heading"
+                className="mb-2 mt-4 px-2 font-mono text-sm font-normal uppercase text-foreground-lighter"
+              >
+                Saved views
+              </h3>
+              {views.length === 0 ? (
+                <p className="px-2 py-1 text-xs text-foreground-lighter">
+                  Filter your logs, then save the combination to come back to it later.
+                </p>
+              ) : (
+                matchingViews.map((view) => (
+                  <LogsViewRow
+                    key={view.id}
+                    view={view}
+                    isActive={view.id === activeViewId}
+                    isModified={isActiveViewModified}
+                    canCreate={canCreate && !isPending}
+                    canUpdate={canUpdate && !isPending}
+                    canDelete={canDelete && !isPending}
+                    activeRowRef={activeRowRef}
+                    onApply={onApply}
+                    onReviewChanges={onReviewChanges}
+                    onRequestRename={setRenameTarget}
+                    onRequestDelete={setDeleteTarget}
+                    onRequestDuplicate={setDuplicateTarget}
+                  />
+                ))
+              )}
+            </section>
           )}
         </div>
       </div>
+
+      <ViewNameDialog
+        open={duplicateTarget !== null}
+        title="Duplicate view"
+        confirmLabel="Save view"
+        initialName={duplicateTarget ? `${duplicateTarget.name} copy` : undefined}
+        existingNames={existingNames}
+        discardDescription="Are you sure you want to discard this name? The copy won't be saved."
+        onCancel={() => setDuplicateTarget(null)}
+        onSubmit={async (name) => {
+          if (!duplicateTarget) return
+          await onDuplicate(duplicateTarget, name)
+          setDuplicateTarget(null)
+        }}
+      />
 
       <ViewNameDialog
         open={isSaving}
@@ -245,7 +328,7 @@ export const LogsViewsPanel = ({
         discardDescription="Are you sure you want to discard your changes? The view will keep its current name."
         onCancel={() => setRenameTarget(null)}
         onSubmit={async (name) => {
-          if (!renameTarget) return
+          if (!renameTarget || name === renameTarget.name) return
           await onRename(renameTarget.id, name)
         }}
       />

@@ -251,6 +251,7 @@ describe('saved log views persistence', () => {
           isSaving
           onApply={vi.fn()}
           onReviewChanges={vi.fn()}
+          onDuplicate={vi.fn()}
           onRename={vi.fn()}
           onDelete={vi.fn()}
           onCancelSave={onCancelSave}

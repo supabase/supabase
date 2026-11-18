@@ -26,7 +26,7 @@ interface ViewNameDialogProps {
   open: boolean
   title: string
   confirmLabel: string
-  /** Pre-fills the input and lets an unchanged name close without submitting. */
+  /** Pre-fills the input. Callers decide whether an unchanged name is a no-op. */
   initialName?: string
   existingNames?: string[]
   discardDescription: string
@@ -81,7 +81,7 @@ export const ViewNameDialog = ({
 
   const handleSubmit = async ({ name: nextName }: z.infer<typeof schema>) => {
     try {
-      if (nextName !== initialName) await onSubmit(nextName)
+      await onSubmit(nextName)
       onCancel()
     } catch {
       // Leave the dialog open with the name intact so the user can retry.

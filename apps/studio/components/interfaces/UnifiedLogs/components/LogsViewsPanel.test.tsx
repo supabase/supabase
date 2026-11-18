@@ -36,6 +36,7 @@ const baseProps = {
   activeViewId: null,
   onApply: vi.fn(),
   onReviewChanges: vi.fn(),
+  onDuplicate: vi.fn(),
   onRename: vi.fn(),
   onDelete: vi.fn(),
   onCancelSave: vi.fn(),
@@ -160,11 +161,74 @@ describe('LogsViewsPanel', () => {
     expect(screen.queryByText('Errors only')).toBeNull()
   })
 
-  it('shows an empty state when there are no views', async () => {
+  it('still lists presets when the user has saved nothing', async () => {
     customRender(<LogsViewsPanel {...baseProps} views={[]} />)
 
-    expect(await screen.findByText('No saved views')).toBeInTheDocument()
-    expect(screen.queryByPlaceholderText('Search views')).toBeNull()
+    expect(await screen.findByRole('heading', { name: 'Preset views' })).toBeInTheDocument()
+    expect(screen.getByText('Errors')).toBeInTheDocument()
+    expect(screen.getByRole('heading', { name: 'Saved views' })).toBeInTheDocument()
+    expect(
+      screen.getByText('Filter your logs, then save the combination to come back to it later.')
+    ).toBeInTheDocument()
+  })
+
+  it('lists the presets above the saved views', async () => {
+    customRender(<LogsViewsPanel {...baseProps} />)
+
+    expect(await screen.findByRole('heading', { name: 'Preset views' })).toBeInTheDocument()
+    for (const name of ['Errors', 'Failed requests', 'Database health']) {
+      expect(screen.getByText(name)).toBeInTheDocument()
+    }
+  })
+
+  it('offers only Duplicate on a preset row', async () => {
+    customRender(<LogsViewsPanel {...baseProps} />)
+
+    await userEvent.click(await screen.findByRole('button', { name: 'View options for Errors' }))
+
+    expect(await screen.findByRole('menuitem', { name: 'Duplicate' })).toBeInTheDocument()
+    expect(screen.queryByRole('menuitem', { name: 'Rename' })).toBeNull()
+    expect(screen.queryByRole('menuitem', { name: 'Delete' })).toBeNull()
+  })
+
+  it('duplicates a preset into a saved view', async () => {
+    const onDuplicate = vi.fn().mockResolvedValue(undefined)
+    customRender(<LogsViewsPanel {...baseProps} onDuplicate={onDuplicate} />)
+
+    await userEvent.click(await screen.findByRole('button', { name: 'View options for Errors' }))
+    await userEvent.click(await screen.findByRole('menuitem', { name: 'Duplicate' }))
+
+    expect(await screen.findByRole('dialog', { name: 'Duplicate view' })).toBeInTheDocument()
+    expect(screen.getByPlaceholderText('Enter a name for this view')).toHaveValue('Errors copy')
+
+    fireEvent.click(screen.getByRole('button', { name: 'Save view' }))
+
+    await waitFor(() =>
+      expect(onDuplicate).toHaveBeenCalledWith(
+        expect.objectContaining({ id: 'preset:errors' }),
+        'Errors copy'
+      )
+    )
+  })
+
+  it('applies a preset like any other view', async () => {
+    const onApply = vi.fn()
+    customRender(<LogsViewsPanel {...baseProps} onApply={onApply} />)
+
+    await userEvent.click(await screen.findByText('Database health'))
+
+    expect(onApply).toHaveBeenCalledWith(expect.objectContaining({ id: 'preset:database-health' }))
+  })
+
+  it('searches across presets and saved views', async () => {
+    customRender(<LogsViewsPanel {...baseProps} />)
+
+    await userEvent.type(await screen.findByPlaceholderText('Search views'), 'err')
+
+    expect(screen.getByText('Errors')).toBeInTheDocument()
+    expect(screen.getByText('Errors only')).toBeInTheDocument()
+    expect(screen.queryByText('Database health')).toBeNull()
+    expect(screen.queryByText('Auth failures')).toBeNull()
   })
 
   it('offers a retry when loading failed', async () => {
