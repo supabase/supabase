@@ -264,7 +264,7 @@ const WarehouseMetricsReportContent = () => {
         <div role="status">
           {isRangeOk && range.isClamped && (
             <p className="text-sm text-foreground-light">
-              This period was adjusted to the last 30 days of available metrics.
+              The selected period was adjusted to fit the available metrics window.
             </p>
           )}
         </div>
