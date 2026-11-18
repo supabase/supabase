@@ -11,12 +11,6 @@ export const SEVERITY_LABELS: Record<IssueSeverity, string> = {
   info: 'Info',
 }
 
-export const SEVERITY_DOT_CLASSES: Record<IssueSeverity, string> = {
-  critical: 'bg-destructive',
-  warning: 'bg-warning',
-  info: 'bg-foreground-muted',
-}
-
 export const CATEGORY_LABELS: Record<IssueCategory, string> = {
   security: 'Security',
   performance: 'Performance',
