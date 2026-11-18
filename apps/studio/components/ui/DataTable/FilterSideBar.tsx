@@ -138,12 +138,13 @@ export function FilterSideBar({
             >
               <UnifiedLogsBanner />
 
-              <div className="flex min-h-0 flex-1 flex-col gap-4 overflow-y-auto p-3">
+              <div className="flex min-h-0 flex-1 flex-col gap-3 overflow-y-auto p-3">
                 <DataTableFilterControls
                   dateRangeDisabled={dateRangeDisabled}
                   itemsAfter={{ level: <UserLogFilterControl /> }}
                 />
                 <FeaturePreviewSidebarPanel
+                  className="mx-1.5 mb-2"
                   title="Capture your logs"
                   description="Send logs to your preferred observability or storage platform."
                   illustration={
