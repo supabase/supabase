@@ -8,9 +8,10 @@ import { Admonition } from 'ui-patterns/Admonition'
 import { EmptyStatePresentational } from 'ui-patterns/EmptyStatePresentational'
 import { GenericSkeletonLoader } from 'ui-patterns/ShimmeringLoader'
 
-import { getWarehouseMetricEmptyMessage, WarehouseMetricChart } from './WarehouseMetricChart'
+import { WarehouseMetricChart } from './WarehouseMetricChart'
 import { resolveWarehouseMetricsRange } from './WarehouseMetrics.range'
 import {
+  getEmptyMessage,
   getReportStatus,
   getReportView,
   getSetupPrompt,
@@ -138,7 +139,7 @@ const WarehouseMetricsReportContent = () => {
   const hasLiveTables = setup.data?.tables.some((table) => table.state === 'live') ?? false
   const hasValues = query.data?.metrics.some(hasAnyValues) ?? false
   const hasChartValues = hasValues
-  const emptyMessage = getWarehouseMetricEmptyMessage(metric)
+  const emptyMessage = getEmptyMessage(metric)
 
   const view = getReportView({
     isPlatform: IS_PLATFORM,
