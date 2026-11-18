@@ -12,7 +12,7 @@ export function CliFlagDefault({ flag }: { flag: CliFlag }) {
 
   return (
     <p className="text-sm text-foreground-light">
-      Default: <code>{String(value)}</code>
+      <strong>Default:</strong> <code>{String(value)}</code>
     </p>
   )
 }
