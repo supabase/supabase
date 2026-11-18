@@ -84,9 +84,9 @@ const WarehouseMetricsReportContent = () => {
   const reportStatus = (() => {
     if (!IS_PLATFORM) return 'Warehouse metrics are unavailable'
     if (query.isPending || (setup.isPending && !hasValues)) return 'Loading Warehouse report'
-    if (setup.isError && !hasValues) return 'Failed to retrieve Warehouse status'
+    if (setup.isError && !hasValues) return 'Could not load Warehouse setup status'
     if (canShowSetup) return isDisabled ? 'Warehouse is disabled' : 'Warehouse is not set up'
-    if (query.isError) return 'Failed to retrieve Warehouse metrics'
+    if (query.isError) return 'Could not load Warehouse metrics'
     return hasChartValues ? 'Warehouse report loaded' : `Warehouse report: ${emptyMessage}`
   })()
 
