@@ -498,6 +498,7 @@ export const OAuthAppsAuthorizeScreen = ({
                 onAllProjectsChange={setAllProjectsSelected}
                 onSearchChange={setSearch}
                 projects={projects ?? []}
+                selectedProjectRefs={selectedProjectRefs}
                 selectedProjects={selectedProjects ?? []}
                 onLoadMore={handleLoadMoreProjects}
               />

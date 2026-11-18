@@ -15,6 +15,7 @@ export const MAX_SELECTED_PROJECTS = 10
 
 export interface ProjectMultiSelectProps {
   projects: components['schemas']['OrganizationProjectsResponse_Output']['projects']
+  selectedProjectRefs: string[]
   selectedProjects: components['schemas']['OrganizationProjectsResponse_Output']['projects']
   onChange: (selectedProjects: string[]) => void
   maxSelected?: number
@@ -30,6 +31,7 @@ export interface ProjectMultiSelectProps {
 export const ProjectMultiSelect = ({
   projects,
   selectedProjects,
+  selectedProjectRefs,
   onChange,
   maxSelected = MAX_SELECTED_PROJECTS,
   error,
@@ -71,7 +73,7 @@ export const ProjectMultiSelect = ({
         </p>
         {!allProjectsSelected && showCounter && (
           <p className="text-xs text-foreground-lighter">
-            {selectedProjects.length}/{maxSelected}
+            {selectedProjectRefs.length}/{maxSelected}
           </p>
         )}
       </div>
@@ -91,7 +93,7 @@ export const ProjectMultiSelect = ({
       {!allProjectsSelected && (
         <>
           <MultiSelector
-            values={selectedProjects.map((p) => p.ref)}
+            values={selectedProjectRefs}
             onValuesChange={handleValuesChange}
             onSearchChange={onSearchChange}
           >
@@ -110,7 +112,7 @@ export const ProjectMultiSelect = ({
               <MultiSelectorInput placeholder="Search projects" showResetIcon />
               <MultiSelectorList emptyLabel="No projects found">
                 {projects.map((project) => {
-                  const isSelected = selectedProjects.some((p) => p.ref === project.ref)
+                  const isSelected = selectedProjectRefs.some((ref) => ref === project.ref)
                   return (
                     <MultiSelectorItem
                       key={project.ref}
@@ -134,7 +136,7 @@ export const ProjectMultiSelect = ({
       <div id="projects-description" aria-live="polite">
         {hasFlagged && (
           <p className="text-xs text-destructive">
-            {`${flaggedRefs.length} of ${selectedProjects.length} ${selectedProjects.length === 1 ? 'project' : 'projects'} unavailable`}
+            {`${flaggedRefs.length} of ${selectedProjectRefs} ${selectedProjects.length === 1 ? 'project' : 'projects'} unavailable`}
           </p>
         )}
         {atCap && (
