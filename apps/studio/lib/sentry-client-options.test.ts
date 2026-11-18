@@ -393,6 +393,13 @@ describe('tagBrowserTranslationError', () => {
     expect(event.tags?.page_translated).toBe(false)
   })
 
+  it('looks the page up itself when no answer is passed in', () => {
+    // Node test environment: there is no document, so the page counts as untranslated
+    const event = domError()
+    tagBrowserTranslationError(event)
+    expect(event.tags?.page_translated).toBe(false)
+  })
+
   it('keeps tags that are already set', () => {
     const event = { ...domError(), tags: { globalErrorBoundary: true, sample_rate: 1 } }
     tagBrowserTranslationError(event, false)
@@ -614,6 +621,22 @@ describe('which errors Studio sends to Sentry', () => {
         sample_rate: 0.05,
         codeSampleRate: '1',
       })
+    })
+
+    it('samples them even when the event has no stack frames', async () => {
+      vi.mocked(Math.random).mockReturnValueOnce(0.04)
+      const event = domErrorEvent()
+      event.exception!.values![0].stacktrace = undefined
+
+      expect(await beforeSend(event, {})).toBe(event)
+    })
+
+    it('still drops other errors that have no stack frames', async () => {
+      const event: Parameters<typeof beforeSend>[0] = {
+        type: undefined,
+        exception: { values: [{ type: 'Error', value: 'Application error' }] },
+      }
+      expect(await beforeSend(event, {})).toBeNull()
     })
 
     it('drops the rest of them', async () => {

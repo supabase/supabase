@@ -147,6 +147,14 @@ describe('browser-translation DOM errors', () => {
     expect(isBrowserTranslationDomError({})).toBe(false)
   })
 
+  it('matches the last exception, the main one, not the members of an AggregateError', () => {
+    const member = { type: 'NotFoundError', value: "Failed to execute 'removeChild' on 'Node'" }
+    const main = { type: 'AggregateError', value: 'Multiple errors' }
+
+    expect(isBrowserTranslationDomError({ exception: { values: [member, main] } })).toBe(false)
+    expect(isBrowserTranslationDomError({ exception: { values: [main, member] } })).toBe(true)
+  })
+
   it('keeps the generic null reads in the always-ignored list, and the DOM errors out of it', () => {
     expect(BROWSER_NOISE_IGNORE_ERRORS).toContain(
       "Cannot read properties of null (reading 'parentNode')"
@@ -186,6 +194,11 @@ describe('isPageTranslated', () => {
 
   it('detects Google Translate font wrappers', () => {
     expect(isPageTranslated(makeDoc([], true) as never)).toBe(true)
+  })
+
+  it('returns false for a document with no root element', () => {
+    const doc = { documentElement: null, querySelector: () => ({}) }
+    expect(isPageTranslated(doc as never)).toBe(false)
   })
 
   it('returns false for an untranslated page', () => {

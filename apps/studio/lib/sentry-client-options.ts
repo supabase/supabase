@@ -133,18 +133,16 @@ export function shouldDropForSampleRate(
 /**
  * Tags browser-translation DOM errors (insert/remove node crashes) so they are sampled at
  * `BROWSER_TRANSLATION_SAMPLE_RATE` by `shouldDropForSampleRate` and easy to filter in Sentry.
- * `page_translated` is best-effort. Leaves a `sample_rate` that is already set untouched.
+ * `page_translated` is best-effort and only looked up for matching events. Leaves a `sample_rate`
+ * that is already set untouched.
  */
-export function tagBrowserTranslationError(
-  event: Sentry.Event,
-  pageTranslated: boolean = isPageTranslated()
-): void {
+export function tagBrowserTranslationError(event: Sentry.Event, pageTranslated?: boolean): void {
   if (!isBrowserTranslationDomError(event)) return
   event.tags = {
     sample_rate: BROWSER_TRANSLATION_SAMPLE_RATE,
     ...event.tags,
     browser_translation: true,
-    page_translated: pageTranslated,
+    page_translated: pageTranslated ?? isPageTranslated(),
   }
 }
 
@@ -219,9 +217,12 @@ export function buildSentryClientOptions({
 
       // Drop events where every exception has no stack trace — these are not debuggable.
       // Exempt error boundary crashes: even without stack frames, a page crash is always worth reporting.
+      // Also exempt browser-translation errors: they only need counting, and dropping them here
+      // would skip the sample.
       const exceptions = event.exception?.values ?? []
       if (
         !isErrorBoundaryCrash &&
+        event.tags?.browser_translation !== true &&
         exceptions.length > 0 &&
         exceptions.every((ex) => !ex.stacktrace?.frames?.length)
       ) {

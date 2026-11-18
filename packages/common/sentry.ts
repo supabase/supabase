@@ -53,7 +53,7 @@ export function filterSentryEvent<T extends SentryEventTags>(
  * `ignoreErrors`; Studio leaves it out and samples the matches in `beforeSend` instead.
  *
  * Matched like Sentry's `ignoreErrors`: strings by substring, RegExps by test, against the event
- * message and each `Type: value` exception string.
+ * message and the last exception.
  */
 export const BROWSER_TRANSLATION_DOM_ERRORS: (string | RegExp)[] = [
   'Node.insertBefore: Child to insert before is not a child of this node',
@@ -77,11 +77,16 @@ function matchesPattern(text: string, pattern: string | RegExp): boolean {
 }
 
 export function isBrowserTranslationDomError(event: SentryExceptionEvent): boolean {
+  // Same candidates as Sentry's `ignoreErrors`: the event message and the last exception (the main
+  // one; an AggregateError's members come before it), as both `value` and `Type: value`.
+  const values = event.exception?.values ?? []
+  const lastException = values[values.length - 1]
   const candidates = [
     event.message,
-    ...(event.exception?.values ?? []).map((ex) =>
-      ex.type ? `${ex.type}: ${ex.value ?? ''}` : ex.value
-    ),
+    lastException?.value,
+    lastException?.value && lastException.type
+      ? `${lastException.type}: ${lastException.value}`
+      : undefined,
   ].filter((text): text is string => !!text)
 
   return candidates.some((text) =>
@@ -99,7 +104,8 @@ export function isPageTranslated(
     ? undefined
     : document
 ): boolean {
-  if (!doc) return false
+  // `documentElement` is null for a document with no root element
+  if (!doc?.documentElement) return false
   const classes = doc.documentElement.classList
   if (classes.contains('translated-ltr') || classes.contains('translated-rtl')) return true
   return doc.querySelector('font[style*="vertical-align: inherit"]') !== null
