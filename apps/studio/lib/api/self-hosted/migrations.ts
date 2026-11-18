@@ -34,29 +34,40 @@ const applyAndTrackMigrationsQuery = (query: string, name?: string) => {
 
     -- track statements in history table
     -- Versions have second precision, so a migration applied within the same second as
-    -- the previous one would reuse its version and fail on the primary key. Use the first
-    -- free second from now instead, and lock the table so concurrent migrations don't
-    -- race. Existing versions are only compared, never parsed, so rows that aren't valid
-    -- timestamps (e.g. 00000000000000_init) can't make the insert fail. If no second in
-    -- the next hour is free, the version is null and the not-null constraint rolls back
-    -- the migration instead of applying it untracked.
+    -- the previous one would reuse its version and fail on the primary key. Instead, use
+    -- the first second from now that is after the latest version, and lock the table so
+    -- concurrent migrations don't race. "Now" is read after the lock is taken, so a
+    -- migration that commits later always gets a later version.
+    -- Versions are only compared as text, never parsed, so rows that aren't valid
+    -- timestamps (e.g. 00000000000000_init) can't make the insert fail. Versions more
+    -- than an hour ahead are ignored, so a far-future row can't block new versions. If
+    -- no second in the next hour qualifies, the version is null and the not-null
+    -- constraint rolls back the migration instead of applying it untracked.
     lock table supabase_migrations.schema_migrations in share row exclusive mode;
     insert into supabase_migrations.schema_migrations (version, name, statements)
     values (
       (
+        with
+          window_start as (
+            select date_trunc('second', clock_timestamp()) as ts
+          ),
+          latest as (
+            select max(version) as version
+            from supabase_migrations.schema_migrations, window_start
+            where version ~ '^[0-9]{14}$'
+              and version <= to_char(window_start.ts + interval '1 hour', 'YYYYMMDDHH24MISS')
+          )
         select candidate.version
-        from generate_series(0, 3600) as offset_seconds,
+        from window_start,
+          latest,
+          generate_series(0, 3600) as offset_seconds,
           lateral (
             select to_char(
-              current_timestamp + make_interval(secs => offset_seconds),
+              window_start.ts + make_interval(secs => offset_seconds),
               'YYYYMMDDHH24MISS'
             ) as version
           ) as candidate
-        where not exists (
-          select 1
-          from supabase_migrations.schema_migrations as existing
-          where existing.version = candidate.version
-        )
+        where candidate.version > coalesce(latest.version, '')
         order by offset_seconds
         limit 1
       ),
