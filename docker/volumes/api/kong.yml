@@ -536,7 +536,6 @@ services:
       # 1. Comment out the 'request-termination' section above
       # 2. Uncomment the entire section below, including 'deny'
       # 3. Add your local IPs to the 'allow' list
-      #- name: cors
       #- name: ip-restriction
       #  config:
       #    allow:
@@ -545,6 +544,7 @@ services:
       #    deny: []
 
   ## Protected Dashboard - catch all remaining routes
+  ## No cors plugin: only Studio's own pages call these routes, from the same origin.
   - name: dashboard
     _comment: 'Studio: /* -> http://studio:3000/*'
     url: http://studio:3000/
@@ -554,7 +554,6 @@ services:
         paths:
           - /
     plugins:
-      - name: cors
       - name: basic-auth
         config:
           hide_credentials: true

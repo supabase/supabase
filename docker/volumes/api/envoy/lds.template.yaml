@@ -658,6 +658,10 @@ resources:
                               value: /api/mcp
                             append_action: ADD_IF_ABSENT
                         typed_per_filter_config:
+                          envoy.filters.http.cors:
+                            '@type': >-
+                              type.googleapis.com/envoy.config.route.v3.FilterConfig
+                            disabled: true
                           envoy.filters.http.basic_auth:
                             '@type': >-
                               type.googleapis.com/envoy.config.route.v3.FilterConfig
@@ -687,6 +691,10 @@ resources:
                               value: /mcp
                             append_action: ADD_IF_ABSENT
                         typed_per_filter_config:
+                          envoy.filters.http.cors:
+                            '@type': >-
+                              type.googleapis.com/envoy.config.route.v3.FilterConfig
+                            disabled: true
                           envoy.filters.http.basic_auth:
                             '@type': >-
                               type.googleapis.com/envoy.config.route.v3.FilterConfig
@@ -736,6 +744,13 @@ resources:
                               value: /
                             append_action: ADD_IF_ABSENT
                         typed_per_filter_config:
+                          # Studio's routes (here and on /mcp, /api/mcp) are called only by
+                          # Studio's own pages (same origin) and by MCP clients (not browsers),
+                          # so they don't answer CORS.
+                          envoy.filters.http.cors:
+                            '@type': >-
+                              type.googleapis.com/envoy.config.route.v3.FilterConfig
+                            disabled: true
                           envoy.filters.http.rbac:
                             '@type': >-
                               type.googleapis.com/envoy.extensions.filters.http.rbac.v3.RBACPerRoute
