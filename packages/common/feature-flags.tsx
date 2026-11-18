@@ -19,6 +19,7 @@ import { get, post } from './fetchWrappers'
 import { gotrueClient } from './gotrue'
 import { ensurePlatformSuffix } from './helpers'
 import { useParams } from './hooks'
+import { setTelemetryFeatureFlags } from './telemetry-event'
 
 type TrackFeatureFlagVariables = components['schemas']['TelemetryFeatureFlagBody']
 export type CallFeatureFlagsResponse =
@@ -263,6 +264,8 @@ export const FeatureFlagProvider = ({
       flagStore.hasLoaded = true
 
       if (mounted) {
+        // Before setStore: a child effect that sends an event on the re-render must already see these flags
+        setTelemetryFeatureFlags(flagStore.posthog)
         setStore(flagStore)
       }
     }

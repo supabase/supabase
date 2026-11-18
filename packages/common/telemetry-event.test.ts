@@ -1,7 +1,8 @@
 import { beforeEach, describe, expect, it, vi } from 'vitest'
 
 import { sendTelemetryEvent } from './telemetry'
-import { buildTelemetryEventRequest } from './telemetry-event'
+import type { TelemetryEvent } from './telemetry-constants'
+import { buildTelemetryEventRequest, setTelemetryFeatureFlags } from './telemetry-event'
 
 const { consent, platform, post } = vi.hoisted(() => ({
   consent: { value: true },
@@ -26,6 +27,7 @@ const API_URL = 'https://api.example.com'
 beforeEach(() => {
   consent.value = true
   platform.value = undefined
+  setTelemetryFeatureFlags({})
   post.mockClear()
 })
 
@@ -91,6 +93,30 @@ describe('buildTelemetryEventRequest', () => {
 
     expect(unset?.body.custom_properties).toStrictEqual(event.properties)
     expect(set?.body.custom_properties).toStrictEqual({ ...event.properties, platform: 'kb' })
+  })
+
+  it('stamps each PostHog flag as $feature/<key>, with the caller winning on the same key', () => {
+    const properties = { query: 'abc', queryLength: 3, resultCount: 1, hasResults: true }
+    setTelemetryFeatureFlags({ flagA: 'test', flagB: false })
+
+    const stamped = buildTelemetryEventRequest(API_URL, {
+      action: 'kb_search_submitted',
+      properties,
+    })
+    const overridden = buildTelemetryEventRequest(API_URL, {
+      action: 'kb_search_submitted',
+      properties: { ...properties, '$feature/flagA': 'control' },
+    } as TelemetryEvent)
+
+    expect(stamped?.body.custom_properties).toStrictEqual({
+      '$feature/flagA': 'test',
+      '$feature/flagB': false,
+      ...properties,
+    })
+    expect(overridden?.body.custom_properties).toMatchObject({
+      '$feature/flagA': 'control',
+      '$feature/flagB': false,
+    })
   })
 
   it('builds the same endpoint whether the API URL has a trailing slash or /platform', () => {
