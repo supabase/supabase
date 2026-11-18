@@ -36,9 +36,8 @@ export function getRouter() {
     basepath: process.env.NEXT_PUBLIC_BASE_PATH || undefined,
   })
 
-  // Sentry: nothing loads Next's convention files (instrumentation-client.ts)
-  // under TanStack Start, so init happens here — the earliest point with
-  // access to the router instance, which the tracing integration needs.
+  // Sentry init happens here — the earliest point with access to the router
+  // instance, which the tracing integration needs.
   // No-op on the server and when no DSN is configured (see module).
   initSentryTanStackClient(router)
 

@@ -46,8 +46,8 @@ datasource db {
 This loads the relevant Supabase connections strings from your `.env` file
 
 ```bash .env
-POSTGRES_PRISMA_URL="postgres://postgres.YOUR-PROJECT-REF:[YOUR-PASSWORD]@aws-0-[REGION].pooler.supabase.com:6543/postgres?pgbouncer=true&connection_limit=1" # Transaction Mode
-POSTGRES_URL_NON_POOLING="postgres://postgres.YOUR-PROJECT-REF:[YOUR-PASSWORD]@aws-0-[REGION].pooler.supabase.com:5432/postgres"  # Session Mode
+POSTGRES_PRISMA_URL="postgres://postgres.YOUR-PROJECT-REF:[YOUR-DATABASE-PASSWORD]@aws-0-[REGION].pooler.supabase.com:6543/postgres?pgbouncer=true&connection_limit=1" # Transaction Mode
+POSTGRES_URL_NON_POOLING="postgres://postgres.YOUR-PROJECT-REF:[YOUR-DATABASE-PASSWORD]@aws-0-[REGION].pooler.supabase.com:5432/postgres"  # Session Mode
 ```
 
 You can find the values in the [project connect page](/dashboard/project/_?showConnect=true) of your Supabase Dashboard.

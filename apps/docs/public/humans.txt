@@ -18,6 +18,7 @@ Aleksi Immonen
 Alex Hall
 Alex Hsu
 Alex Ives
+Alex Venter
 Alexander Alexandrov
 Alexander Korotkov
 Alexis Aguilar
@@ -129,6 +130,7 @@ Etienne Stalmans
 Evan Cummack
 Fabrizio Fenoglio
 Fady A
+Fallon Petty
 Farley Thomas
 Fatuma Abdullahi
 Felipe Stival

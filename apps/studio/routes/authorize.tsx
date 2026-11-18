@@ -2,10 +2,8 @@ import { createFileRoute, useLocation, useNavigate } from '@tanstack/react-route
 import { useFlag, useParams } from 'common'
 
 import { ApiAuthorizationScreen } from '@/components/interfaces/ApiAuthorization/ApiAuthorization'
-import { ApiAuthorizationLoadingScreen } from '@/components/interfaces/ApiAuthorization/ApiAuthorization.Loading'
 import { OAuthAppsAuthorizeScreen } from '@/components/interfaces/Organization/OAuthApps/Consent'
 import { OAUTH_APPS_MOCK_SCENARIOS, USE_MOCKS } from '@/data/oauth-apps/mocks'
-import { useOAuthAppsAuthorizeRequestQuery } from '@/data/oauth-apps/oauth-apps-authorize-request-query'
 import { withAuth } from '@/hooks/misc/withAuth'
 import { buildStudioPageTitle } from '@/lib/page-title'
 
@@ -50,27 +48,12 @@ function APIAuthorizationPage() {
   // first value when the param repeats, like Next's query arrays
   const projectRef = new URLSearchParams(searchStr).get('project_ref')
 
-  const { data: request } = useOAuthAppsAuthorizeRequestQuery(
-    { id: authId },
-    { enabled: isScopedOAuthFlowEnabled }
-  )
-
   if (isScopedOAuthFlowEnabled) {
-    if (!authId || !request) {
-      return (
-        <>
-          <title>{PAGE_TITLE}</title>
-          <ApiAuthorizationLoadingScreen />
-        </>
-      )
-    }
-
     return (
       <>
         <title>{PAGE_TITLE}</title>
         <OAuthAppsAuthorizeScreen
           authId={authId}
-          request={request}
           organizationSlug={organizationSlug}
           projectRef={projectRef}
           navigate={(destination) => void navigate({ href: destination })}

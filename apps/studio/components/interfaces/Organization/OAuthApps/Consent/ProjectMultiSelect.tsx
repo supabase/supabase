@@ -9,7 +9,6 @@ import {
   MultiSelectorTrigger,
 } from 'ui-patterns/multi-select'
 
-import { CONSENT_COPY } from './OAuthAppsAuthorizeScreen.utils'
 import type { OAuthAppsAuthorizeOrganizationProject } from '@/data/oauth-apps/types'
 
 export const MAX_SELECTED_PROJECTS = 10
@@ -63,12 +62,16 @@ export const ProjectMultiSelect = ({
         )}
       </div>
 
-      <label className="flex cursor-pointer items-center gap-2 py-1 text-sm text-foreground">
+      <label
+        htmlFor="select-all-projects"
+        className="flex cursor-pointer items-center gap-2 py-1 text-sm text-foreground"
+      >
         <Checkbox
+          id="select-all-projects"
           checked={allProjectsSelected}
           onCheckedChange={(checked) => onAllProjectsChange?.(checked === true)}
         />
-        {CONSENT_COPY.allProjectsOption}
+        All current and future projects
       </label>
 
       {!allProjectsSelected && (
@@ -108,7 +111,9 @@ export const ProjectMultiSelect = ({
             </p>
           )}
           {atCap && (
-            <p className="text-xs text-foreground-lighter">{CONSENT_COPY.maxProjectsReached}</p>
+            <p className="text-xs text-foreground-lighter">
+              Maximum reached. Deselect a project to choose a different one.
+            </p>
           )}
           {error && <p className="text-xs text-foreground-light">{error}</p>}
         </>
