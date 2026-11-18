@@ -5,6 +5,8 @@ subtitle: 'Configure your Supabase branches using configuration as code'
 
 This guide covers how to configure your Supabase branches, using the `config.toml` file. In one single file, you can configure all your branches, including branch settings and secrets.
 
+Branching also reads `supabase/config.json` and `supabase/config.jsonc`. See [Config file formats](/docs/guides/local-development/cli/config-formats).
+
 ## Branch configuration with remotes
 
 When Branching is enabled, your `config.toml` settings automatically sync to all ephemeral branches through a one-to-one mapping between your Git and Supabase branches.
@@ -19,7 +21,7 @@ For persistent branches that need specific settings, you can use the `[remotes]`
 
 Here's an example of configuring a separate seed script for a staging environment:
 
-```toml
+```toml name=supabase/config.toml
 [remotes.staging]
 project_id = "your-project-ref"
 
@@ -88,7 +90,7 @@ supabase secrets set SMTP_PASSWORD=your-password
 
 These secrets will be available to your branch's services and can be used in your configuration. For example, in your `config.toml`:
 
-```toml
+```toml name=supabase/config.toml
 [auth.smtp]
 host = "env(SMTP_HOST)"
 user = "env(SMTP_USER)"
@@ -137,7 +139,7 @@ npx supabase secrets set --env-file supabase/.env.keys
 
 Option A: Use encrypted values directly:
 
-```toml
+```toml name=supabase/config.toml
 [auth.external.github]
 enabled = true
 secret = "encrypted:<encrypted-value>"
@@ -145,7 +147,7 @@ secret = "encrypted:<encrypted-value>"
 
 Option B: Use environment variables:
 
-```toml
+```toml name=supabase/config.toml
 [auth.external.github]
 enabled = true
 client_id = "env(SUPABASE_AUTH_EXTERNAL_GITHUB_CLIENT_ID)"
@@ -218,7 +220,7 @@ When you commit your `.env.preview` file with encrypted values, the branching ex
 
 Here's an example of a complete multi-environment configuration:
 
-```toml
+```toml name=supabase/config.toml
 # Default configuration for all branches
 [api]
 enabled = true
@@ -267,7 +269,7 @@ Use the value from the `BRANCH PROJECT ID` column as your `project_id` in the re
 
 For feature branches that need specific settings:
 
-```toml
+```toml name=supabase/config.toml
 [remotes.feature-oauth]
 project_id = "feature-branch-ref"
 

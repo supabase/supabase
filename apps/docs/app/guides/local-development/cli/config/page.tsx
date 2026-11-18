@@ -52,9 +52,7 @@ const Config = () => {
 }
 
 async function Info({ parameter }: { parameter: Parameter }) {
-  const tomlOnly = parameter.tags?.includes('branching')
-  const jsonc =
-    parameter.usage && !tomlOnly ? await convertConfigTomlToJsonc(parameter.usage) : undefined
+  const jsonc = parameter.usage ? await convertConfigTomlToJsonc(parameter.usage) : undefined
 
   return (
     <div className="mt-8">
@@ -96,18 +94,14 @@ async function Info({ parameter }: { parameter: Parameter }) {
             {parameter.usage && (
               <div className="mb-4 scroll-mt-16 mt-0 ">
                 <p className="text-sm font-bold uppercase">Usage</p>
-                {jsonc ? (
-                  <ConfigCodeTabs>
-                    <TabPanel id={CONFIG_TOML_NAME} label={CONFIG_TOML_NAME}>
-                      <CodeBlock lang="toml" contents={parameter.usage} />
-                    </TabPanel>
-                    <TabPanel id={CONFIG_JSONC_NAME} label={CONFIG_JSONC_NAME}>
-                      <CodeBlock lang="jsonc" contents={jsonc} />
-                    </TabPanel>
-                  </ConfigCodeTabs>
-                ) : (
-                  <CodeBlock lang="toml" contents={parameter.usage} />
-                )}
+                <ConfigCodeTabs>
+                  <TabPanel id={CONFIG_TOML_NAME} label={CONFIG_TOML_NAME}>
+                    <CodeBlock lang="toml" contents={parameter.usage} />
+                  </TabPanel>
+                  <TabPanel id={CONFIG_JSONC_NAME} label={CONFIG_JSONC_NAME}>
+                    <CodeBlock lang="jsonc" contents={jsonc} />
+                  </TabPanel>
+                </ConfigCodeTabs>
               </div>
             )}
             {parameter.links && (
