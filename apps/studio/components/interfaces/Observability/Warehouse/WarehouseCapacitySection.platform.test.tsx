@@ -24,7 +24,7 @@ beforeEach(() =>
 const metric = (name: WarehouseMetric['metric']): WarehouseMetric => ({
   project_ref: 'default',
   metric: name,
-  unit: 'count',
+  unit: name === 'admission_rejection_rate' ? 'per_second' : 'grants',
   aggregation: 'mean',
   definition: name,
   requested: { metric: name, start: 100, end: 160, step: 60 },
@@ -122,4 +122,24 @@ test('limits large labelled responses and tells the user which series are shown'
   )
   expect(screen.getByText('Showing 12 of 13 series')).toBeInTheDocument()
   expect(screen.queryByText('Rejected requests · reason-12')).not.toBeInTheDocument()
+})
+
+test('keeps populated series when earlier labelled series have no measurements', () => {
+  const rejection = metric('admission_rejection_rate')
+  rejection.series = Array.from({ length: 13 }, (_, index) => ({
+    ...rejection.series[0],
+    labels: { reason: `reason-${index.toString().padStart(2, '0')}` },
+    points: [{ timestamp: 160, value: index === 12 ? 0 : null }],
+  }))
+  customRender(
+    <WarehouseMetricChart
+      metric={rejection}
+      title="Rejected requests"
+      description="By reason"
+      unit="/s"
+    />
+  )
+  expect(screen.getByText('Showing 12 of 13 series')).toBeInTheDocument()
+  expect(screen.getByText('Rejected requests · reason-12')).toBeInTheDocument()
+  expect(screen.queryByText('No data in the selected period')).not.toBeInTheDocument()
 })

@@ -41,7 +41,14 @@ export const WarehouseMetricChart = ({
   series?: WarehouseChartSeries[]
 }) => {
   const allSeries = expandWarehouseChartSeries(inputSeries)
-  const series = allSeries.slice(0, 12)
+  const hasMeasurements = (item: WarehouseChartSeries) =>
+    item.metric?.series.some((series) =>
+      series.points.some((point) => point.value !== null && Number.isFinite(point.value))
+    ) ?? false
+  const selectedSeries = [...allSeries]
+    .sort((a, b) => Number(hasMeasurements(b)) - Number(hasMeasurements(a)))
+    .slice(0, 12)
+  const series = allSeries.filter((item) => selectedSeries.includes(item))
   const points = getWarehouseChartPoints(series, scale)
   const keys = series.map((_, index) => `value${index}`)
   const config = Object.fromEntries(
