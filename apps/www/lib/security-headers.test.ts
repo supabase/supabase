@@ -116,6 +116,77 @@ describe('getWwwOwnedSource', () => {
       expect(matches(getWwwOwnedSource([]), path)).toBe(true)
     }
   )
+
+  // Paths that the www source must skip, because the rewrite proxies them
+  const proxiedBy = (source: string, path: string) => {
+    const wwwSource = getWwwOwnedSource(
+      getProxiedPathPatterns([{ source, destination: 'https://other.example.com' }])
+    )
+    return !matches(wwwSource, path)
+  }
+
+  it.each([
+    ['/:path*', '/pricing'],
+    ['/:path*', '/blog/some-post'],
+    ['/:slug?', '/pricing'],
+    ['/asset.:ext?', '/asset'],
+    ['/asset.:ext?', '/asset.json'],
+    ['/files/:slug(foo\\(bar\\))', '/files/foo(bar)'],
+    ['/kb/:path*', '/kb'],
+    ['/kb/:path*', '/kb/a/b'],
+  ])('excludes what %s proxies: %s', (source, path) => {
+    expect(matches(source, path)).toBe(true)
+    expect(proxiedBy(source, path)).toBe(true)
+  })
+
+  it.each([
+    ['/:slug?', '/blog/some-post'],
+    ['/asset.:ext?', '/assets'],
+    ['/files/:slug(foo\\(bar\\))', '/files/foobar'],
+    ['/kb/:path*', '/kbx'],
+  ])('keeps what %s does not proxy: %s', (source, path) => {
+    expect(matches(source, path)).toBe(false)
+    expect(proxiedBy(source, path)).toBe(false)
+  })
+
+  const SOURCES = [
+    '/:path*',
+    '/:slug?',
+    '/:slug+',
+    '/:lang?/guides/:page',
+    '/asset.:ext?',
+    '/files/:slug(foo\\(bar\\))',
+    '/kb/:path*',
+    '/docs/:slug+',
+    '/library\\.segments/:segment(.*)\\.segment\\.rsc',
+  ]
+  const PATHS = [
+    '/',
+    '/pricing',
+    '/blog/some-post',
+    '/a/b/c',
+    '/asset',
+    '/asset.json',
+    '/assets',
+    '/files/foo(bar)',
+    '/files/foobar',
+    '/guides/intro',
+    '/en/guides/intro',
+    '/kb',
+    '/kb/a/b',
+    '/kbx',
+    '/docs',
+    '/docs/a',
+    '/library.segments/a.segment.rsc',
+    '/library.segments/example',
+  ]
+
+  it.each(SOURCES.flatMap((source) => PATHS.map((path) => [source, path])))(
+    'agrees with the Next.js matcher for %s on %s',
+    (source, path) => {
+      expect(proxiedBy(source, path)).toBe(matches(source, path))
+    }
+  )
 })
 
 describe('getSecurityHeaderRules', () => {

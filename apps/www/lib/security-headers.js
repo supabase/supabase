@@ -97,78 +97,82 @@ function buildCsp({ env = process.env } = {}) {
   ].join('; ')
 }
 
-/** @param {string} text */
-const escapeRegExp = (text) => text.replace(/[.*+?^${}()|[\]\\]/g, '\\$&')
+// The path-to-regexp build and options that Next.js compiles route sources with
+// (next/dist/lib/build-custom-route.js)
+const { parse } = require('next/dist/compiled/path-to-regexp')
 
-const DEFAULT_PARAM_PATTERN = '[^/]+?'
+const PATH_TO_REGEXP_OPTIONS = { strict: true, sensitive: false, delimiter: '/' }
 
 /**
- * Converts a rewrite source to a regex that matches the same paths, without the leading slash.
- * Follows the path-to-regexp syntax that Next.js uses: escaped characters, `:name`,
- * `:name(pattern)`, and the `*`, `+` and `?` modifiers, which make the preceding slash part
- * of the repeated or optional group.
+ * @typedef {{ name: string | number, prefix: string, suffix: string, pattern: string, modifier: string }} Key
+ * @typedef {string | Key} Token
+ */
+
+/** Same escaping as path-to-regexp. @param {string} text */
+const escapeString = (text) => text.replace(/([.+*?=^!:${}()[\]|/\\])/g, '\\$1')
+
+/**
+ * Regex for one token, built like path-to-regexp's tokensToRegexp but with non-capturing groups,
+ * because the result goes inside a header source. Custom patterns are used as written, so escaped
+ * characters such as \( stay escaped.
+ * @param {Token} token
+ * @param {{ omitPrefix?: boolean }} [options] Leave out the first prefix, when the caller already consumed it
+ */
+function tokenToPattern(token, { omitPrefix = false } = {}) {
+  if (typeof token === 'string') return escapeString(token)
+
+  const prefix = escapeString(token.prefix)
+  const firstPrefix = omitPrefix ? '' : prefix
+  const suffix = escapeString(token.suffix)
+
+  if (!token.pattern) return `(?:${firstPrefix}${suffix})${omitPrefix ? '' : token.modifier}`
+
+  const pattern = `(?:${token.pattern})`
+  const isRepeated = token.modifier === '+' || token.modifier === '*'
+
+  if (!prefix && !suffix) return `(?:${pattern}${token.modifier})`
+
+  // The modifier applies to the prefix and suffix too, for example the dot in /asset.:ext?
+  const modifier =
+    omitPrefix || token.modifier === '+' ? '' : token.modifier === '*' ? '?' : token.modifier
+  const repeats = isRepeated ? `(?:${suffix}${prefix}${pattern})*` : ''
+  return `(?:${firstPrefix}${pattern}${repeats}${suffix})${modifier}`
+}
+
+/**
+ * Regex for the part of a path after its leading slash, for paths that a rewrite source matches.
+ * The www header source consumes the leading slash itself, so a root-level parameter such as
+ * /:path* or /:slug? needs its slash handled here instead of inside an optional group.
+ * @param {Token[]} tokens
+ * @returns {string}
+ */
+function tokensAfterRootSlash(tokens) {
+  const [first, ...rest] = tokens
+  const restPattern = rest.map((token) => tokenToPattern(token)).join('')
+
+  // Nothing left to match the leading slash
+  if (first === undefined) return '(?!)'
+
+  if (typeof first === 'string') {
+    if (!first.startsWith('/')) return '(?!)'
+    return `${escapeString(first.slice(1))}${restPattern}`
+  }
+
+  if (first.prefix !== '/') return '(?!)'
+
+  const present = `${tokenToPattern(first, { omitPrefix: true })}${restPattern}`
+  if (first.modifier !== '?' && first.modifier !== '*') return present
+
+  // An optional root parameter can also be absent, and then the next token takes the slash
+  return `(?:${present}|${tokensAfterRootSlash(rest)})`
+}
+
+/**
+ * Converts a rewrite source to a regex for the same paths, without their leading slash.
  * @param {string} source
  */
 function sourceToPattern(source) {
-  let pattern = ''
-  let i = 0
-
-  while (i < source.length) {
-    const char = source[i]
-
-    if (char === '\\') {
-      pattern += escapeRegExp(source[i + 1] ?? '')
-      i += 2
-      continue
-    }
-
-    if (char !== ':' && char !== '(') {
-      pattern += escapeRegExp(char)
-      i += 1
-      continue
-    }
-
-    // A named parameter, optionally with its own pattern, or an unnamed group
-    if (char === ':') {
-      i += 1
-      while (i < source.length && /\w/.test(source[i])) i += 1
-    }
-
-    let paramPattern = DEFAULT_PARAM_PATTERN
-    if (source[i] === '(') {
-      let depth = 0
-      const patternStart = i + 1
-      for (; i < source.length; i += 1) {
-        if (source[i] === '\\') {
-          i += 1
-        } else if (source[i] === '(') {
-          depth += 1
-        } else if (source[i] === ')') {
-          depth -= 1
-          if (depth === 0) break
-        }
-      }
-      // Capturing groups would break the surrounding header source, so make them non-capturing
-      paramPattern = source.slice(patternStart, i).replace(/\((?!\?)/g, '(?:')
-      i += 1
-    }
-
-    const modifier = /[*+?]/.test(source[i] ?? '') ? source[i] : ''
-    if (modifier) i += 1
-
-    const segment = `(?:${paramPattern})`
-    const hasSlashPrefix = pattern.endsWith('/')
-    if (hasSlashPrefix && modifier) {
-      pattern = pattern.slice(0, -1)
-      if (modifier === '?') pattern += `(?:/${segment})?`
-      if (modifier === '*') pattern += `(?:/${segment}(?:/${segment})*)?`
-      if (modifier === '+') pattern += `/${segment}(?:/${segment})*`
-    } else {
-      pattern += `${segment}${modifier}`
-    }
-  }
-
-  return pattern.replace(/^\//, '')
+  return tokensAfterRootSlash(parse(source, PATH_TO_REGEXP_OPTIONS))
 }
 
 /**
