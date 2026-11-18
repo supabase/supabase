@@ -48,6 +48,7 @@ const PLATFORM = [
 ]
 const EXPLORER = [
   'create_notebook',
+  'create_notebook_from_template',
   'delete_notebook',
   'get_notebook',
   'list_notebooks',

@@ -30,7 +30,9 @@ import { NotebookProposalRenderer, type NotebookProposalMode } from './NotebookP
 import { NotebookRunRenderer } from './NotebookRunRenderer'
 import { OptInRequest } from './OptInRequest'
 import { parseSupportRequestMessage, SupportRequestMessage } from './SupportRequestMessage'
+import { buildTemplateNotebook } from '@/components/interfaces/Explorer/templates'
 import { useMinimumDisplayTime } from '@/hooks/misc/useMinimumDisplayTime'
+import { contract as createNotebookFromTemplateContract } from '@/lib/ai/tools/create-notebook-from-template'
 import { contract as deployEdgeFunctionContract } from '@/lib/ai/tools/deploy-edge-function'
 import { contract as updateOptInLevelContract } from '@/lib/ai/tools/update-opt-in-level'
 
@@ -204,6 +206,12 @@ function MessagePartDeployEdgeFunction({ toolPart }: { toolPart: ToolUIPart }) {
   )
 }
 
+/** Shows a template proposal as the notebook it creates, so it gets the same preview as `create_notebook`. */
+function withTemplateNotebookInput(part: ToolUIPart): ToolUIPart {
+  const parsed = createNotebookFromTemplateContract.inputSchema.safeParse(part.input)
+  return parsed.success ? { ...part, input: buildTemplateNotebook(parsed.data.template) } : part
+}
+
 const NOTEBOOK_DRAFTING_LABEL: Record<NotebookProposalMode, string> = {
   create: 'Drafting notebook...',
   update: 'Drafting notebook update...',
@@ -329,6 +337,7 @@ const isWideMessagePart = (part: NonNullable<VercelMessage['parts']>[number]) =>
   part.type === 'tool-execute_sql' ||
   part.type === 'tool-query_logs' ||
   part.type === 'tool-create_notebook' ||
+  part.type === 'tool-create_notebook_from_template' ||
   part.type === 'tool-update_notebook' ||
   part.type === 'tool-delete_notebook' ||
   part.type === 'tool-run_notebook' ||
@@ -395,6 +404,14 @@ export const MessagePartSwitcher = memo(
         }
         case 'tool-create_notebook': {
           return <MessagePart.NotebookProposal toolPart={part} mode="create" />
+        }
+        case 'tool-create_notebook_from_template': {
+          return (
+            <MessagePart.NotebookProposal
+              toolPart={withTemplateNotebookInput(part)}
+              mode="create"
+            />
+          )
         }
         case 'tool-update_notebook': {
           return <MessagePart.NotebookProposal toolPart={part} mode="update" />

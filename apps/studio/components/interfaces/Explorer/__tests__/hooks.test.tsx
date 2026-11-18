@@ -1,7 +1,11 @@
+import { QueryClient, QueryClientProvider } from '@tanstack/react-query'
 import { act, renderHook } from '@testing-library/react'
+import type { ReactNode } from 'react'
 import { beforeEach, describe, expect, it, vi } from 'vitest'
 
-import { useCreateChat, useCreateQuery } from '../hooks'
+import { useCreateChat, useCreateQuery, useOpenNotebookTemplate } from '../hooks'
+import { notebooksState } from '@/state/notebooks/notebooks-state'
+import { addAPIMock } from '@/tests/lib/msw'
 
 const {
   mockCreateChat,
@@ -34,6 +38,9 @@ vi.mock('@/hooks/misc/useSelectedOrganization', () => ({
 }))
 vi.mock('@/lib/api/snippets.browser', () => ({
   generateUuid: () => 'query-new',
+}))
+vi.mock('@/lib/profile', () => ({
+  useProfile: () => ({ profile: { id: 1 } }),
 }))
 vi.mock('@/state/explorer-query', () => ({
   useExplorerQueryStateSnapshot: () => ({ createDraft: mockCreateDraft }),
@@ -158,5 +165,80 @@ describe('useCreateQuery', () => {
       name: undefined,
       autoRun: true,
     })
+  })
+})
+
+describe('useOpenNotebookTemplate', () => {
+  const wrapper = ({ children }: { children: ReactNode }) => (
+    <QueryClientProvider
+      client={new QueryClient({ defaultOptions: { queries: { retry: false } } })}
+    >
+      {children}
+    </QueryClientProvider>
+  )
+
+  const mockSavedNotebooks = (names: string[]) =>
+    addAPIMock({
+      method: 'get',
+      path: '/platform/projects/:ref/content',
+      response: {
+        data: names.map((name, index) => ({
+          id: `notebook-${index + 1}`,
+          name,
+          type: 'notebook' as const,
+          visibility: 'project' as const,
+          favorite: false,
+          owner_id: 1,
+          owner: { id: 1, username: 'owner' },
+          project_id: 1,
+          inserted_at: '2026-01-01T00:00:00.000Z',
+          updated_at: '2026-01-01T00:00:00.000Z',
+          updated_by: null,
+        })),
+      },
+    })
+
+  const openTemplate = async () => {
+    const { result } = renderHook(() => useOpenNotebookTemplate(), { wrapper })
+    await act(async () => {
+      await result.current.openNotebookTemplate({ name: 'Security audit', buildCells: () => [] })
+    })
+  }
+
+  beforeEach(() => {
+    for (const id of Object.keys(notebooksState.notebooks)) delete notebooksState.notebooks[id]
+  })
+
+  // Clicking a template again should take the user back to their notebook, not pile up copies
+  it('opens the saved notebook with the template name instead of adding another', async () => {
+    mockSavedNotebooks(['Security audit (old)', 'Security audit'])
+
+    await openTemplate()
+
+    expect(mockPush).toHaveBeenCalledExactlyOnceWith(
+      '/project/default/explorer/notebook/notebook-2'
+    )
+    expect(notebooksState.notebooks['query-new']).toBeUndefined()
+  })
+
+  it('creates the notebook when none has the template name', async () => {
+    mockSavedNotebooks(['Security audit (old)'])
+
+    await openTemplate()
+
+    expect(notebooksState.notebooks['query-new']?.notebook.name).toBe('Security audit')
+    expect(mockPush).toHaveBeenCalledExactlyOnceWith('/project/default/explorer/notebook/query-new')
+  })
+
+  // A notebook created moments ago may not be saved yet, so the server can't find it
+  it('opens a notebook created from the template that has not been saved yet', async () => {
+    mockSavedNotebooks([])
+    await openTemplate()
+    mockPush.mockClear()
+
+    await openTemplate()
+
+    expect(mockPush).toHaveBeenCalledExactlyOnceWith('/project/default/explorer/notebook/query-new')
+    expect(Object.keys(notebooksState.notebooks)).toEqual(['query-new'])
   })
 })

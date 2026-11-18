@@ -2,6 +2,7 @@ import assert from 'node:assert'
 import { tool, type ToolExecutionOptions } from 'ai'
 import { z } from 'zod'
 
+import { createTool as createCreateNotebookFromTemplateTool } from './create-notebook-from-template.server'
 import { createTool as createCreateNotebookTool } from './create-notebook.server'
 import { createTool as createDeleteNotebookTool } from './delete-notebook.server'
 import { createTool as createDeployEdgeFunctionTool } from './deploy-edge-function.server'
@@ -14,6 +15,10 @@ import { createTool as createRenameChatTool } from './rename-chat.server'
 import { createTool as createRunNotebookTool } from './run-notebook.server'
 import { createTool as createUpdateNotebookTool } from './update-notebook.server'
 import { createTool as createUpdateOptInLevelTool } from './update-opt-in-level.server'
+import {
+  buildTemplateNotebook,
+  type NotebookTemplateId,
+} from '@/components/interfaces/Explorer/templates'
 import {
   applyNotebookOperations,
   describeNotebookOperationError,
@@ -468,6 +473,7 @@ function createMockNotebookTools(store: MockNotebookStore) {
     get_notebook,
     run_notebook,
     create_notebook,
+    create_notebook_from_template,
     update_notebook,
     delete_notebook,
   } = {
@@ -476,6 +482,7 @@ function createMockNotebookTools(store: MockNotebookStore) {
     get_notebook: createGetNotebookTool(ctx),
     run_notebook: createRunNotebookTool(ctx),
     create_notebook: createCreateNotebookTool(ctx),
+    create_notebook_from_template: createCreateNotebookFromTemplateTool(ctx),
     update_notebook: createUpdateNotebookTool(ctx),
     delete_notebook: createDeleteNotebookTool(ctx),
   }
@@ -579,6 +586,18 @@ function createMockNotebookTools(store: MockNotebookStore) {
         _options: ToolExecutionOptions<unknown>
       ) => {
         const created = store.create({ name, description, content })
+        return { id: created.id, name: created.name }
+      },
+    },
+    create_notebook_from_template: {
+      ...create_notebook_from_template,
+      // Same reasoning as create_notebook's override above.
+      needsApproval: false,
+      execute: async (
+        { template }: { template: NotebookTemplateId },
+        _options: ToolExecutionOptions<unknown>
+      ) => {
+        const created = store.create(buildTemplateNotebook(template))
         return { id: created.id, name: created.name }
       },
     },

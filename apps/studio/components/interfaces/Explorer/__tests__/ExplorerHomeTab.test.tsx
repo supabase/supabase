@@ -22,7 +22,7 @@ vi.mock('common', async (importOriginal) => ({
 
 vi.mock('../hooks', () => ({
   useCreateQuery: () => ({ createQuery, projectRef: project.ref }),
-  useCreateNotebook: () => ({ createNotebook: vi.fn() }),
+  useOpenNotebookTemplate: () => ({ openNotebookTemplate: vi.fn() }),
   useCreateChat: () => ({ createChat: vi.fn() }),
 }))
 vi.mock('@/components/ui/AIAssistantPanel/AssistantChatForm', () => ({

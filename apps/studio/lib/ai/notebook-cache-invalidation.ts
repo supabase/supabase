@@ -12,12 +12,14 @@ export type NotebookCacheEffect =
 
 const NOTEBOOK_MUTATION_TOOLS = [
   'create_notebook',
+  'create_notebook_from_template',
   'update_notebook',
   'delete_notebook',
 ] as const satisfies readonly ContractToolName[]
 
 const NOTEBOOK_MUTATION_CONTRACTS = {
   'tool-create_notebook': TOOL_CONTRACTS.create_notebook,
+  'tool-create_notebook_from_template': TOOL_CONTRACTS.create_notebook_from_template,
   'tool-update_notebook': TOOL_CONTRACTS.update_notebook,
   'tool-delete_notebook': TOOL_CONTRACTS.delete_notebook,
 } as const

@@ -8,6 +8,7 @@ import {
   PG_BEST_PRACTICES,
   REALTIME_PROMPT,
   RLS_PROMPT,
+  SECURITY_AUDIT_PROMPT,
   STORAGE_PROMPT,
 } from '@/lib/ai/prompts'
 
@@ -18,6 +19,7 @@ const KNOWLEDGE = {
   edge_functions: EDGE_FUNCTION_PROMPT,
   realtime: REALTIME_PROMPT,
   logs: LOGS_PROMPT,
+  security_audit: SECURITY_AUDIT_PROMPT,
 } satisfies Record<KnowledgeName, string>
 
 export const createTool: ToolFactory<typeof contract> = (ctx) =>

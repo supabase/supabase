@@ -1,6 +1,9 @@
+import { useQueryClient } from '@tanstack/react-query'
 import { useRouter } from 'next/router'
-import { useEffect, useEffectEvent, useState } from 'react'
+import { useEffect, useEffectEvent, useRef, useState } from 'react'
 
+import { getContent } from '@/data/content/content-query'
+import { contentKeys } from '@/data/content/keys'
 import { useNotebookQuery } from '@/data/content/notebooks/notebook-query'
 import { useSelectedOrganizationQuery } from '@/hooks/misc/useSelectedOrganization'
 import { useSelectedProjectQuery } from '@/hooks/misc/useSelectedProject'
@@ -123,6 +126,65 @@ export const useCreateNotebook = () => {
   }
 
   return { createNotebook }
+}
+
+/**
+ * Opens a template's notebook when the project already has one with the template's name, so
+ * clicking a template again returns to the notebook instead of adding a duplicate. Otherwise
+ * creates it from the template.
+ */
+export const useOpenNotebookTemplate = () => {
+  const router = useRouter()
+  const queryClient = useQueryClient()
+  const { data: project } = useSelectedProjectQuery()
+  const notebooksSnap = useNotebooksStateSnapshot()
+  const { createNotebook } = useCreateNotebook()
+  // A second click while the lookup is in flight would otherwise create a second copy
+  const isOpeningRef = useRef(false)
+
+  const findSavedNotebookId = async (projectRef: string, name: string) => {
+    const filters = { type: 'notebook' as const, name, limit: 20 }
+    try {
+      const { content } = await queryClient.fetchQuery({
+        queryKey: contentKeys.list(projectRef, filters),
+        queryFn: ({ signal }) => getContent({ projectRef, ...filters }, signal),
+      })
+      return content.find((notebook) => notebook.name === name)?.id
+    } catch {
+      // Not finding it only risks a duplicate, so a failed lookup still creates the notebook
+      return undefined
+    }
+  }
+
+  const openNotebookTemplate = async ({
+    name,
+    buildCells,
+  }: {
+    name: string
+    buildCells: () => Notebooks.Content['cells']
+  }) => {
+    if (!project) return console.error('Project is required')
+    if (isOpeningRef.current) return
+    isOpeningRef.current = true
+
+    try {
+      // Checked first, since a notebook created moments ago may not be saved yet
+      const localId = Object.values(notebooksSnap.notebooks).find(
+        ({ projectRef, notebook }) => projectRef === project.ref && notebook.name === name
+      )?.notebook.id
+      const existingId = localId ?? (await findSavedNotebookId(project.ref, name))
+
+      if (existingId) {
+        router.push(`/project/${project.ref}/explorer/notebook/${existingId}`)
+      } else {
+        createNotebook({ name, cells: buildCells() })
+      }
+    } finally {
+      isOpeningRef.current = false
+    }
+  }
+
+  return { openNotebookTemplate }
 }
 
 export const useCreateChat = () => {

@@ -5,7 +5,7 @@ import { cn } from 'ui'
 
 import { isSqlStatement } from './ExplorerHomeTab.utils'
 import { ExplorerOnboarding } from './ExplorerOnboarding'
-import { useCreateChat, useCreateNotebook, useCreateQuery } from './hooks'
+import { useCreateChat, useCreateQuery, useOpenNotebookTemplate } from './hooks'
 import { NOTEBOOK_TEMPLATES } from './templates'
 import { useExplorerPreferences } from '@/components/interfaces/Account/Preferences/useExplorerPreferences'
 import { ActionCard } from '@/components/layouts/Tabs/ActionCard'
@@ -53,7 +53,7 @@ const ExplorerHomeQuery = () => {
 }
 
 const ExplorerHomeContent = () => {
-  const { createNotebook } = useCreateNotebook()
+  const { openNotebookTemplate } = useOpenNotebookTemplate()
   const { createQuery } = useCreateQuery()
   const { createChat } = useCreateChat()
 
@@ -92,26 +92,17 @@ const ExplorerHomeContent = () => {
           <AssistantAgentHarnessFooter />
 
           <section className="mt-6">
-            <div className="grid grid-cols-1 gap-4 sm:grid-cols-2">
-              <ActionCard
-                icon={<SquareCodeIcon className="h-4 w-4 text-foreground" strokeWidth={1.5} />}
-                title="Run SQL"
-                description="Write and run an ad-hoc query"
-                bgColor="bg-blue-500"
-                onClick={() => createQuery()}
-              />
-              <ActionCard
-                icon={<NotebookTextIcon className="h-4 w-4 text-foreground" strokeWidth={1.5} />}
-                title="Create a notebook"
-                description="Combine notes, queries, and results"
-                bgColor="bg-blue-500"
-                onClick={() => createNotebook()}
-              />
-            </div>
+            <ActionCard
+              icon={<SquareCodeIcon className="h-4 w-4 text-foreground" strokeWidth={1.5} />}
+              title="Run SQL"
+              description="Write and run an ad-hoc query"
+              bgColor="bg-blue-500"
+              onClick={() => createQuery()}
+            />
           </section>
 
           <section className="mt-8 flex flex-col gap-y-3">
-            <h2 className="text-sm font-medium text-foreground">Start with a template</h2>
+            <h2 className="text-sm font-medium text-foreground">Create a notebook</h2>
 
             <div className="grid grid-cols-1 gap-3 sm:grid-cols-3">
               {NOTEBOOK_TEMPLATES.map((template) => (
@@ -119,13 +110,19 @@ const ExplorerHomeContent = () => {
                   key={template.title}
                   icon={<NotebookTextIcon className="h-4 w-4 text-foreground" strokeWidth={1.5} />}
                   title={template.title}
-                  description={template.description}
                   bgColor="bg-blue-500"
                   onClick={() =>
-                    createNotebook({ name: template.title, cells: template.buildCells() })
+                    openNotebookTemplate({ name: template.title, buildCells: template.buildCells })
                   }
                 />
               ))}
+            </div>
+          </section>
+
+          <section className="mt-8 flex flex-col gap-y-3">
+            <h2 className="text-sm font-medium text-foreground">Ask the Assistant</h2>
+
+            <div className="grid grid-cols-1 gap-3 sm:grid-cols-3">
               {CHAT_TEMPLATES.map((template) => (
                 <ActionCard
                   key={template.title}

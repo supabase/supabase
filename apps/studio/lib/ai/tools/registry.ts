@@ -1,6 +1,7 @@
 import type { InferUITools, Tool, ToolUIPart, UIDataTypes, UIMessage } from 'ai'
 
 import { contract as createNotebook } from './create-notebook'
+import { contract as createNotebookFromTemplate } from './create-notebook-from-template'
 import { contract as deleteNotebook } from './delete-notebook'
 import { contract as deployEdgeFunction } from './deploy-edge-function'
 import { contract as escalateToHuman } from './escalate-to-human'
@@ -45,6 +46,7 @@ import type { AiOptInLevel } from '@/hooks/misc/useOrgOptedIntoAi'
  */
 export const TOOL_CONTRACTS = {
   create_notebook: createNotebook,
+  create_notebook_from_template: createNotebookFromTemplate,
   delete_notebook: deleteNotebook,
   deploy_edge_function: deployEdgeFunction,
   escalate_to_human: escalateToHuman,

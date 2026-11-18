@@ -1,16 +1,19 @@
+import { buildSecurityAuditCells } from './security-audit-template'
 import { createLogCellSkeleton, createMarkdownCellSkeleton, createQueryCellSkeleton } from './utils'
+import type { AgentCell, AgentNotebook } from '@/data/content/notebooks/notebook-schema'
 import type { Notebooks } from '@/types'
 
 export type NotebookTemplate = {
+  /** Stable id the Assistant uses to add a template, so it never retypes the cells. */
+  id: string
   title: string
-  description: string
   buildCells: () => Notebooks.Content['cells']
 }
 
-export const NOTEBOOK_TEMPLATES: NotebookTemplate[] = [
+export const NOTEBOOK_TEMPLATES = [
   {
+    id: 'database_health_check',
     title: 'Database health check',
-    description: 'Notebook template',
     buildCells: () => [
       createMarkdownCellSkeleton({
         content: [
@@ -115,8 +118,8 @@ export const NOTEBOOK_TEMPLATES: NotebookTemplate[] = [
     ],
   },
   {
+    id: 'user_growth',
     title: 'User growth',
-    description: 'Notebook template',
     buildCells: () => [
       createMarkdownCellSkeleton({
         content: [
@@ -249,102 +252,46 @@ export const NOTEBOOK_TEMPLATES: NotebookTemplate[] = [
     ],
   },
   {
-    title: 'Debug an error spike',
-    description: 'Notebook template',
-    buildCells: () => [
-      createMarkdownCellSkeleton({
-        content: [
-          '# Debug an error spike',
-          '',
-          'Start from the error rate over time, drill into which paths are failing, then check whether the database was slow at the same time.',
-        ].join('\n'),
-      }),
-      createMarkdownCellSkeleton({
-        content: [
-          '### Error rate over time',
-          '',
-          '`server_errors` (5xx responses) against `total_requests` per hour over the last two days. Use this to pin down when the spike actually started and whether it tracks with request volume (a traffic surge overwhelming something) or is climbing independently of it (a bad deploy or a downstream dependency failing).',
-        ].join('\n'),
-      }),
-      {
-        ...createLogCellSkeleton({
-          title: 'Error rate over time',
-          sql: [
-            '-- server error rate by hour',
-            'select',
-            '  toStartOfHour(timestamp) as hour,',
-            "  countIf(toInt32OrZero(log_attributes['response.status_code']) >= 500) as server_errors,",
-            '  count() as total_requests',
-            'from logs',
-            "where source = 'edge_logs'",
-            'group by hour',
-            'order by hour desc',
-            'limit 48',
-          ].join('\n'),
-          time_range: { _tag: 'relative_time_range', unit: 'day', amount: 2 },
-        }),
-        view: 'chart',
-        chart: {
-          type: 'line',
-          x_column: 'hour',
-          y_series: ['server_errors', 'total_requests'],
-          cumulative: false,
-          scale: 'linear',
-          show_labels: false,
-        },
-      },
-      createMarkdownCellSkeleton({
-        content: [
-          '### Top failing paths',
-          '',
-          "Once you've spotted the window, this narrows it down to which routes and status codes are actually erroring. A spike concentrated on one or two paths points to a specific endpoint or feature; errors spread evenly across most paths points to something more systemic, like a database or infra issue.",
-        ].join('\n'),
-      }),
-      createLogCellSkeleton({
-        title: 'Top failing paths',
-        sql: [
-          '-- paths with the most server errors',
-          'select',
-          "  log_attributes['request.path'] as path,",
-          "  toInt32OrZero(log_attributes['response.status_code']) as status,",
-          '  count() as errors',
-          'from logs',
-          "where source = 'edge_logs'",
-          "  and toInt32OrZero(log_attributes['response.status_code']) >= 500",
-          'group by path, status',
-          'order by errors desc',
-          'limit 20',
-        ].join('\n'),
-        time_range: { _tag: 'relative_time_range', unit: 'day', amount: 2 },
-      }),
-      createMarkdownCellSkeleton({
-        content: [
-          '### Slowest queries',
-          '',
-          "The most expensive queries by total execution time since `pg_stat_statements` was last reset. If the failing paths above line up with a query here that's slow or spiking in `calls`, the errors are likely timeouts or connection exhaustion caused by the database, not an application bug.",
-        ].join('\n'),
-      }),
-      createQueryCellSkeleton({
-        title: 'Slowest queries',
-        sql: [
-          'select',
-          '  calls,',
-          '  round(mean_exec_time::numeric, 2) as avg_ms,',
-          '  round(total_exec_time::numeric, 2) as total_ms,',
-          '  query',
-          'from pg_stat_statements',
-          'order by total_exec_time desc',
-          'limit 20;',
-        ].join('\n'),
-      }),
-      createMarkdownCellSkeleton({
-        content: [
-          '## Notes',
-          '',
-          '- Did the error spike line up with a slow or locked query?',
-          '- Which path should get a fix or a rollback first?',
-        ].join('\n'),
-      }),
-    ],
+    id: 'security_audit',
+    title: 'Security audit',
+    buildCells: buildSecurityAuditCells,
   },
+] as const satisfies readonly NotebookTemplate[]
+
+export type NotebookTemplateId = (typeof NOTEBOOK_TEMPLATES)[number]['id']
+
+export const NOTEBOOK_TEMPLATE_IDS = NOTEBOOK_TEMPLATES.map((template) => template.id) as [
+  NotebookTemplateId,
+  ...NotebookTemplateId[],
 ]
+
+const toAgentCell = (cell: Notebooks.Content['cells'][number]): AgentCell => {
+  switch (cell._tag) {
+    case 'markdown_cell':
+      return { _tag: cell._tag, text: cell.text }
+    case 'database_cell': {
+      const { _id, unchecked_sql, ...rest } = cell
+      return { ...rest, sql: unchecked_sql }
+    }
+    case 'log_cell': {
+      const { _id, unchecked_sql, ...rest } = cell
+      return { ...rest, sql: unchecked_sql }
+    }
+  }
+}
+
+/**
+ * A template as `create_notebook` input, so the Assistant's template tool can reuse the
+ * create proposal (preview and approval) and the server can save it the same way.
+ */
+export const buildTemplateNotebook = (
+  id: NotebookTemplateId
+): { name: string; content: AgentNotebook } => {
+  const template = NOTEBOOK_TEMPLATES.find((template) => template.id === id)
+  if (!template) throw new Error(`Unknown notebook template: ${id}`)
+
+  return {
+    name: template.title,
+    content: { schema_version: 1, cells: template.buildCells().map(toAgentCell) },
+  }
+}

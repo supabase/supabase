@@ -26,6 +26,7 @@ export const contract = {
 - \`rls\` — Row Level Security policies for database tables.
 - \`storage\` — Supabase Storage buckets, public/private bucket access, and \`storage.objects\` policies. Always load before creating Storage buckets or \`storage.objects\` policies.
 - \`edge_functions\` — Supabase Edge Functions
-- \`realtime\` — Supabase Realtime`,
+- \`realtime\` — Supabase Realtime
+- \`security_audit\` — What the anon key and signed-in users can reach. Always load before auditing or reviewing project security, including "is my project secure?"`,
   toModelOutput: (output: string) => output,
 } as const satisfies ToolContract

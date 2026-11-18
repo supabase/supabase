@@ -119,6 +119,7 @@ const BLOCK_TOOLS = new Set([
   'query_logs',
   'deploy_edge_function',
   'create_notebook',
+  'create_notebook_from_template',
   'update_notebook',
   'delete_notebook',
   'run_notebook',

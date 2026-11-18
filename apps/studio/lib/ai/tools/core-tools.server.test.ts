@@ -7,6 +7,10 @@ import { createTool as createLoadKnowledgeTool } from './load-knowledge.server'
 import { buildLocalTools } from './registry.server'
 import { createTool as createRenameChatTool } from './rename-chat.server'
 import type { ToolContext } from './types'
+import {
+  buildSecurityAuditGuide,
+  buildSecurityAuditQuery,
+} from '@/components/interfaces/Explorer/security-audit-template'
 import { unguarded } from '@/data/fetchers'
 import { executeSql } from '@/data/sql/execute-sql-mutation'
 import { NO_DATA_PERMISSIONS } from '@/lib/ai/tools/execute-sql-output'
@@ -63,6 +67,43 @@ describe('ai/tools core tools', () => {
       expect(result).toContain('iso_timestamp_start')
       expect(result).toContain('# Supabase logs SQL (ClickHouse)')
       expect(result).toContain('interactive query cell')
+    })
+
+    // The notebook is the recommended path, but a user who skips adding it still gets an
+    // audit. Both paths must run the same checks, so the fallback query comes from the
+    // template rather than a second copy that could drift.
+    it('should run security audits from the notebook, falling back to its checks', async () => {
+      const tools = createStudioTools({ aiOptInLevel: 'schema' })
+      if (!tools.load_knowledge.execute) throw new Error('execute is undefined')
+
+      const result = String(
+        await tools.load_knowledge.execute(
+          { name: 'security_audit' },
+          { toolCallId: 'test', messages: [], context: {} }
+        )
+      )
+
+      expect(result).toContain('template: "security_audit"')
+      expect(result).toContain('run_notebook')
+      expect(result).toContain(`\`\`\`sql\n${buildSecurityAuditQuery()}\n\`\`\``)
+      expect(result).toContain(buildSecurityAuditGuide())
+    })
+
+    // Findings go to the team as a notebook, where a database cell runs in one click, so fix
+    // SQL has to stay in markdown where nobody can apply it by accident.
+    it('should always save audit findings as a notebook, with fixes out of runnable cells', async () => {
+      const tools = createStudioTools({ aiOptInLevel: 'schema' })
+      if (!tools.load_knowledge.execute) throw new Error('execute is undefined')
+
+      const result = String(
+        await tools.load_knowledge.execute(
+          { name: 'security_audit' },
+          { toolCallId: 'test', messages: [], context: {} }
+        )
+      )
+
+      expect(result).toContain('Always finish an audit by saving its findings')
+      expect(result).toContain('Keep fix SQL in markdown code blocks, not query cells')
     })
 
     it('should have rename_chat hand the rename off to the client', async () => {

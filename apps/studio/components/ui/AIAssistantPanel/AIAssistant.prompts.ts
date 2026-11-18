@@ -4,7 +4,7 @@ import {
   DatabaseIcon,
   GaugeIcon,
   NotebookTextIcon,
-  ShieldCheckIcon,
+  ShieldAlertIcon,
   type LucideIcon,
 } from 'lucide-react'
 
@@ -21,14 +21,15 @@ export const CHAT_TEMPLATES: ChatTemplate[] = [
     initialMessage: 'Generate sample data for a blog with users, posts, and comments tables.',
   },
   {
-    title: 'Set up RLS policies',
-    icon: ShieldCheckIcon,
-    initialMessage: 'Create RLS policies to ensure users can only access their own data.',
-  },
-  {
     title: 'Build a notebook',
     icon: NotebookTextIcon,
     initialMessage: 'Build me a notebook that tracks weekly signups and active users.',
+  },
+  {
+    title: 'Audit project security',
+    icon: ShieldAlertIcon,
+    initialMessage:
+      "Audit my project's security. Find anything the public API key or a signed-in user can read, write, or call that they shouldn't.",
   },
 ]
 

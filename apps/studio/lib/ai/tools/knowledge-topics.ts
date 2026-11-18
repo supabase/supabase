@@ -6,6 +6,7 @@ export const KNOWLEDGE_TOPIC_LABELS = {
   edge_functions: 'Edge Functions',
   realtime: 'Realtime',
   logs: 'logs',
+  security_audit: 'security audits',
 } as const
 
 export type KnowledgeName = keyof typeof KNOWLEDGE_TOPIC_LABELS

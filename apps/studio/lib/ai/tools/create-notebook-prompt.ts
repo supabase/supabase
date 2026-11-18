@@ -10,6 +10,7 @@ import {
 export const CREATE_NOTEBOOK_PROMPT_GUIDANCE =
   `- Use \`create_notebook\` for a saved, shareable, multi-step investigation or dashboard the user will revisit — e.g. "build me a signup funnel notebook" or "create a notebook to track auth errors".
 - Use \`execute_sql\` for a single ad-hoc question with no need to persist it.
+- A notebook is also how to share what an investigation found. When the findings are worth passing to a team, offer to save them, with the evidence and suggested fixes, as a notebook.
 - When the request clearly calls for a notebook, call \`create_notebook\` directly; the tool handles user approval.
 
 Cell authoring rules, which also apply to cells you write with \`update_notebook\`:

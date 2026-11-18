@@ -1,5 +1,6 @@
 import type { ToolSet } from 'ai'
 
+import { createTool as createCreateNotebookFromTemplate } from './create-notebook-from-template.server'
 import { createTool as createCreateNotebook } from './create-notebook.server'
 import { createTool as createDeleteNotebook } from './delete-notebook.server'
 import { createTool as createDeployEdgeFunction } from './deploy-edge-function.server'
@@ -34,6 +35,7 @@ import { createTool as createUpdateOptInLevel } from './update-opt-in-level.serv
  */
 export const TOOL_FACTORIES = {
   create_notebook: createCreateNotebook,
+  create_notebook_from_template: createCreateNotebookFromTemplate,
   delete_notebook: createDeleteNotebook,
   deploy_edge_function: createDeployEdgeFunction,
   escalate_to_human: createEscalateToHuman,
