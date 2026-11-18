@@ -1,0 +1,68 @@
+---
+title: 'Best authentication providers for Next.js in 2026'
+description: 'Learn which authentication providers to consider for Next.js apps in 2026, including Supabase Auth, Clerk, Auth0, WorkOS, and Better Auth.'
+topics: ['Rundowns']
+lastEdited: 2026-11-16
+---
+
+In [Next.js](https://nextjs.org/), your code runs in several places: Server Components, Server Actions, Route Handlers, the proxy (called middleware before Next.js 16), and Client Components. Each one needs a way to know who the user is, so an authentication provider for Next.js needs to work across all of them, not only in the browser.
+
+When you compare providers, check how well they handle:
+
+- **Server-side sessions:** whether you can read the signed-in user in Server Components, Server Actions, and Route Handlers, not only in the browser.
+- **Session refresh:** how the provider keeps a session alive when a token expires, so users are not signed out unexpectedly.
+- **Authorization close to your data:** whether you can check the user where data is read or written.
+- **Pre-built UI and starter templates**, if you want to skip building sign-in forms.
+
+## Supabase Auth
+
+[Supabase Auth](/docs/guides/auth) is a great choice if you are starting a new Next.js project, if your Next.js project already uses Supabase, or if you want your users and your Next.js app data in the same Postgres database.
+
+Supabase Auth supports email and password sign-in, [magic links](/docs/guides/auth/auth-email-passwordless), [phone sign-in](/docs/guides/auth/phone-login), [social sign-in](/docs/guides/auth/social-sign-in), [anonymous sign-ins](/docs/guides/auth/auth-anonymous), and [MFA](/docs/guides/auth/auth-mfa). For B2B apps, it also supports [SAML 2.0 single sign-on](/docs/guides/auth/enterprise-sso), and you can turn your project into an [OAuth 2.1 and OpenID Connect identity provider](/docs/guides/auth/oauth-server) to authenticate third-party apps and AI agents. You can customize sign-in flows with [Auth Hooks](/docs/guides/auth/auth-hooks).
+
+Supabase Auth works natively with the [Data API](/docs/guides/api), [Storage](/docs/guides/storage), [Realtime](/docs/guides/realtime), and [Edge Functions](/docs/guides/functions), as well as [Row Level Security](/docs/guides/database/postgres/row-level-security) policies.
+
+For Next.js, the [`@supabase/ssr`](/docs/guides/auth/server-side/creating-a-client?queryGroups=framework&framework=nextjs) package stores the session in cookies, so it works in Server Components, Server Actions, Route Handlers, and Client Components. Supabase also offers [pre-built sign-in components for web](/library?category=Authentication) for Next.js.
+
+To get started, see the [Next.js quickstart](/docs/guides/auth/quickstarts/nextjs).
+
+## Clerk
+
+Clerk is a user management platform for web and mobile apps. It provides hosted sign-in and user management components for React and Next.js, plus session management.
+
+Choose Clerk if you want pre-built, hosted sign-in UI for your Next.js app and you do not need your users to live in your own database.
+
+If you want to use Clerk with the rest of the Supabase Platform, see the [Clerk integration with Supabase](/docs/guides/auth/third-party/clerk).
+
+## Auth0
+
+Auth0, owned by Okta, is an identity platform for consumer and enterprise apps. It offers hosted sign-in pages, social and enterprise connections, and multi-factor authentication.
+
+Choose Auth0 for a Next.js app if you already use it, or if you need an established platform with a wide range of enterprise connections.
+
+If you want to use Auth0 with the rest of the Supabase Platform, see the [Auth0 integration with Supabase](/docs/guides/auth/third-party/auth0). To move to Supabase Auth, see the [Auth0 migration guide](/kb/guides/migrate-from-auth0).
+
+## WorkOS
+
+WorkOS provides single sign-on (SSO) and directory sync, so your customers' IT teams can connect their own identity provider, and its AuthKit product handles user authentication.
+
+Choose WorkOS for a Next.js app if enterprise customers require SSO and directory sync before they will buy.
+
+If you want to use WorkOS with the rest of the Supabase Platform, see the [WorkOS integration with Supabase](/docs/guides/auth/third-party/workos).
+
+## Better Auth
+
+Better Auth is an open source authentication library for TypeScript apps. It runs inside your own app instead of as a hosted service, and can store users and sessions in your own database.
+
+Choose Better Auth if you want authentication to run as a library inside your Next.js app, with its logic in your own codebase instead of a separate service.
+
+Every Supabase project is a full Postgres database, so Better Auth can connect to it directly. To store Better Auth users and sessions in Supabase, see [Set up Better Auth with Supabase Declarative Schema](/kb/guides/setup-better-auth-with-declarative-schema).
+
+## When to choose which provider
+
+- **You are starting a new Next.js project, or already use Supabase:** Supabase Auth. Your users live in your Postgres database and you can integrate with Row Level Security policies.
+- **You want a working Next.js app with sign-in already built:** the Supabase Auth [`with-supabase` template](/docs/guides/auth/quickstarts/nextjs), or Clerk.
+- **You need an established platform with many enterprise connections, or already use it:** Auth0.
+- **Enterprise customers require SSO and directory sync:** WorkOS. Supabase Auth also supports [SAML 2.0 single sign-on](/docs/guides/auth/enterprise-sso) if you want it in the same service as the rest of your backend.
+- **You want authentication to run as a library inside your TypeScript app, instead of as a separate service:** Better Auth. You can use [Better Auth with a Supabase Postgres database](/kb/guides/setup-better-auth-with-declarative-schema).
+- **You already have users in another provider and want the rest of the Supabase Platform:** keep your provider and connect it through [third-party auth](/docs/guides/auth/third-party/overview), or migrate to Supabase Auth.

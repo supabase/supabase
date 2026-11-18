@@ -10,13 +10,22 @@ import { EmptyStatePresentational } from 'ui-patterns/EmptyStatePresentational'
 import { GenericSkeletonLoader } from 'ui-patterns/ShimmeringLoader'
 
 import { resolveWarehouseMetricsRange } from './WarehouseMetrics.range'
-import ReportHeader from '@/components/interfaces/Reports/ReportHeader'
+import {
+  getEmptyMessage,
+  getReportStatus,
+  getReportView,
+  getSetupPrompt,
+  hasAnyValues,
+  toChartPoints,
+  type ReportView,
+} from './WarehouseMetricsReport.utils'
+import { ReportHeader } from '@/components/interfaces/Reports/ReportHeader'
 import { REPORT_DATERANGE_HELPER_LABELS } from '@/components/interfaces/Reports/Reports.constants'
 import ReportStickyNav from '@/components/interfaces/Reports/ReportStickyNav'
 import { LogsDatePicker } from '@/components/interfaces/Settings/Logs/Logs.DatePickers'
 import UpgradePrompt from '@/components/interfaces/Settings/Logs/UpgradePrompt'
 import { AlertError } from '@/components/ui/AlertError'
-import NoDataPlaceholder from '@/components/ui/Charts/NoDataPlaceholder'
+import { NoDataPlaceholder } from '@/components/ui/Charts/NoDataPlaceholder'
 import { InlineLink } from '@/components/ui/InlineLink'
 import { ShortcutTooltip } from '@/components/ui/ShortcutTooltip'
 import { warehouseKeys } from '@/data/warehouse/keys'
@@ -30,14 +39,17 @@ import { useShortcut } from '@/state/shortcuts/useShortcut'
 
 export const WarehouseMetricsReport = () => {
   const isWarehouseEnabled = useIsWarehouseEnabled()
-  if (!isWarehouseEnabled)
-    return (
-      <>
-        <ReportHeader title="Warehouse" showDatabaseSelector={false} />
+
+  return (
+    <>
+      <ReportHeader title="Warehouse" showDatabaseSelector={false} />
+      {!isWarehouseEnabled ? (
         <Admonition layout="responsive" title="Warehouse metrics are unavailable" />
-      </>
-    )
-  return <WarehouseMetricsReportContent />
+      ) : (
+        <WarehouseMetricsReportContent />
+      )}
+    </>
+  )
 }
 
 const WarehouseMetricsReportContent = () => {
@@ -85,165 +97,40 @@ const WarehouseMetricsReportContent = () => {
   })
   const metric = query.data?.metrics.find((item) => item.metric === 'query_rate')
   const hasLiveTables = setup.data?.tables.some((table) => table.state === 'live') ?? false
-  const isNotSetUp = setup.data?.setup_status === 'not_started' && !hasLiveTables
-  const isDisabled = setup.data?.setup_status === 'disabled' && !hasLiveTables
-  const hasValues =
-    metric?.series.some((series) =>
-      series.points.some((point) => point.value !== null && Number.isFinite(point.value))
-    ) ?? false
-  const canShowSetup = !hasValues && (isNotSetUp || isDisabled)
-  const points =
-    metric?.series.length === 1
-      ? metric.series[0].points.map((point): Record<string, string | number> => {
-          const row: Record<string, string | number> = {
-            timestamp: new Date(point.timestamp * 1000).toISOString(),
-          }
-          if (point.value !== null && Number.isFinite(point.value)) row.value = point.value
-          return row
-        })
-      : []
-  const emptyMessage = (() => {
-    if (!metric || metric.series.length > 1) return 'Metrics are temporarily unavailable'
-    switch (metric.availability) {
-      case 'stale':
-        return 'No recent data'
-      case 'insufficient_data':
-        return 'Not enough data yet'
-      case 'unavailable':
-      case 'disabled':
-      case 'not_provisioned':
-        return 'Metrics are temporarily unavailable'
-      default:
-        return 'No data in the selected period'
-    }
-  })()
+  const hasValues = hasAnyValues(metric)
+  const points = toChartPoints(metric)
   const hasChartValues = points.some((point) => typeof point.value === 'number')
+  const emptyMessage = getEmptyMessage(metric, 'No data in the selected period')
 
-  const reportStatus = (() => {
-    if (!IS_PLATFORM) return 'Warehouse metrics are unavailable'
-    if (!isRangeOk) return 'This period is outside the available metrics history'
-    if (query.isPending || (setup.isPending && !hasValues)) return 'Loading Warehouse report'
-    if (setup.isError && !hasValues) return 'Could not load Warehouse setup status'
-    if (canShowSetup) return isDisabled ? 'Warehouse is disabled' : 'Warehouse is not set up'
-    if (query.isError) return 'Could not load Warehouse metrics'
-    return hasChartValues ? 'Warehouse report loaded' : `Warehouse report: ${emptyMessage}`
-  })()
+  const view = getReportView({
+    isPlatform: IS_PLATFORM,
+    isRangeValid: isRangeOk,
+    isLoading: query.isPending || (setup.isPending && !hasValues),
+    setupError: setup.isError && !hasValues ? setup.error : null,
+    setupPrompt: getSetupPrompt({
+      setupStatus: setup.data?.setup_status,
+      hasLiveTables,
+      hasValues,
+    }),
+    metricsError: query.isError ? query.error : null,
+    hasChartValues,
+  })
 
-  const renderContent = () => {
-    if (!IS_PLATFORM)
-      return (
-        <Admonition
-          layout="responsive"
-          title="Warehouse metrics are unavailable"
-          description="Warehouse metrics are only available on the Supabase platform."
-        />
-      )
-    if (!isRangeOk)
-      return (
-        <Admonition
-          layout="responsive"
-          title="This period is outside the available metrics history"
-          description="Warehouse metrics cover the last 30 days. Choose a more recent period."
-          actions={
-            <Button
-              onClick={() => {
-                const helper = datePickerHelpers.find(
-                  (item) => item.text === REPORT_DATERANGE_HELPER_LABELS.LAST_60_MINUTES
-                )
-                if (helper)
-                  handleDatePickerChange({
-                    from: helper.calcFrom(),
-                    to: helper.calcTo(),
-                    isHelper: true,
-                    text: helper.text,
-                  })
-              }}
-            >
-              Show last 60 minutes
-            </Button>
-          }
-        />
-      )
-    if (query.isPending || (setup.isPending && !hasValues))
-      return <GenericSkeletonLoader aria-label="Loading Warehouse report" />
-    if (setup.isError && !hasValues)
-      return (
-        <AlertError
-          projectRef={ref}
-          error={setup.error}
-          subject="Failed to retrieve Warehouse status"
-        />
-      )
-    if (canShowSetup)
-      return (
-        <EmptyStatePresentational
-          icon={WarehouseIcon}
-          title={isDisabled ? 'Warehouse is disabled' : 'Warehouse is not set up'}
-          description={
-            isDisabled
-              ? 'Set up Warehouse again to query a replicated copy of your data and monitor its latency, failures, and capacity here.'
-              : 'Run analytical queries on a replicated copy of your data, then monitor query latency, failures, and capacity here.'
-          }
-        >
-          <Button asChild variant="default">
-            <InlineLink
-              className="no-underline"
-              href={`/project/${ref}/integrations/warehouse/overview`}
-            >
-              Set up Warehouse
-            </InlineLink>
-          </Button>
-        </EmptyStatePresentational>
-      )
-    if (query.isError)
-      return (
-        <AlertError
-          projectRef={ref}
-          error={query.error}
-          subject="Failed to retrieve Warehouse metrics"
-        />
-      )
-    return (
-      <Card>
-        <CardContent className="space-y-4 p-4">
-          {hasChartValues ? (
-            <>
-              <h2 className="text-sm">Query rate</h2>
-              <p className="text-xs text-foreground-light">
-                Queries started per second. Not a count of SQL statements.
-              </p>
-              <ChartLine
-                className="h-64"
-                isFullHeight
-                data={points}
-                xKey="timestamp"
-                dataKey="value"
-                config={{ value: { label: 'Queries/s', color: 'var(--chart-1)' } }}
-                color="var(--chart-1)"
-                DateTimeFormat="MMM D, HH:mm"
-                showHighlightArea={false}
-                tooltipDetails={(_, __, value) => `${value}/s`}
-              />
-            </>
-          ) : (
-            <NoDataPlaceholder
-              attribute="Query rate"
-              size="normal"
-              hideTotalPlaceholder
-              message={emptyMessage}
-            />
-          )}
-          {hasChartValues && metric?.availability === 'partial' && (
-            <p className="text-xs text-foreground-light">Partial data</p>
-          )}
-        </CardContent>
-      </Card>
+  const handleResetRange = () => {
+    const helper = datePickerHelpers.find(
+      (item) => item.text === REPORT_DATERANGE_HELPER_LABELS.LAST_60_MINUTES
     )
+    if (!helper) return
+    handleDatePickerChange({
+      from: helper.calcFrom(),
+      to: helper.calcTo(),
+      isHelper: true,
+      text: helper.text,
+    })
   }
 
   return (
     <>
-      <ReportHeader title="Warehouse" showDatabaseSelector={false} />
       <ReportStickyNav
         content={
           <div className="flex flex-wrap items-center gap-2">
@@ -282,9 +169,16 @@ const WarehouseMetricsReportContent = () => {
         </div>
         <div className="relative">
           <p role="status" aria-label="Report status" className="sr-only">
-            {reportStatus}
+            {getReportStatus(view, emptyMessage)}
           </p>
-          {renderContent()}
+          <WarehouseMetricsBody
+            view={view}
+            projectRef={ref}
+            points={points}
+            emptyMessage={emptyMessage}
+            isPartial={metric?.availability === 'partial'}
+            onResetRange={handleResetRange}
+          />
         </div>
       </ReportStickyNav>
       <UpgradePrompt
@@ -296,4 +190,118 @@ const WarehouseMetricsReportContent = () => {
       />
     </>
   )
+}
+
+const WarehouseMetricsBody = ({
+  view,
+  projectRef,
+  points,
+  emptyMessage,
+  isPartial,
+  onResetRange,
+}: {
+  view: ReportView
+  projectRef?: string
+  points: Record<string, string | number>[]
+  emptyMessage: string
+  isPartial: boolean
+  onResetRange: () => void
+}) => {
+  switch (view.kind) {
+    case 'unsupported':
+      return (
+        <Admonition
+          layout="responsive"
+          title="Warehouse metrics are unavailable"
+          description="Warehouse metrics are only available on the Supabase platform."
+        />
+      )
+    case 'out-of-range':
+      return (
+        <Admonition
+          layout="responsive"
+          title="This period is outside the available metrics history"
+          description="Warehouse metrics cover the last 30 days. Choose a more recent period."
+          actions={<Button onClick={onResetRange}>Show last 60 minutes</Button>}
+        />
+      )
+    case 'loading':
+      return <GenericSkeletonLoader aria-label="Loading Warehouse report" />
+    case 'setup-error':
+      return (
+        <AlertError
+          projectRef={projectRef}
+          error={view.error}
+          subject="Failed to retrieve Warehouse status"
+        />
+      )
+    case 'setup': {
+      const isDisabled = view.prompt === 'disabled'
+      return (
+        <EmptyStatePresentational
+          icon={WarehouseIcon}
+          title={isDisabled ? 'Warehouse is disabled' : 'Warehouse is not set up'}
+          description={
+            isDisabled
+              ? 'Set up Warehouse again to query a replicated copy of your data and monitor its latency, failures, and capacity here.'
+              : 'Run analytical queries on a replicated copy of your data, then monitor query latency, failures, and capacity here.'
+          }
+        >
+          <Button asChild variant="default">
+            <InlineLink
+              className="no-underline"
+              href={`/project/${projectRef}/integrations/warehouse/overview`}
+            >
+              Set up Warehouse
+            </InlineLink>
+          </Button>
+        </EmptyStatePresentational>
+      )
+    }
+    case 'metrics-error':
+      return (
+        <AlertError
+          projectRef={projectRef}
+          error={view.error}
+          subject="Failed to retrieve Warehouse metrics"
+        />
+      )
+    case 'ready':
+      return (
+        <Card>
+          <CardContent className="space-y-4 p-4">
+            {view.hasChartValues ? (
+              <>
+                <h2 className="text-sm">Query rate</h2>
+                <p className="text-xs text-foreground-light">
+                  Queries started per second. Not a count of SQL statements.
+                </p>
+                <ChartLine
+                  className="h-64"
+                  isFullHeight
+                  data={points}
+                  xKey="timestamp"
+                  dataKey="value"
+                  config={{ value: { label: 'Queries/s', color: 'var(--chart-1)' } }}
+                  color="var(--chart-1)"
+                  DateTimeFormat="MMM D, HH:mm"
+                  showHighlightArea={false}
+                  tooltipDetails={(_, __, value) => `${value}/s`}
+                />
+              </>
+            ) : (
+              <NoDataPlaceholder
+                attribute="Query rate"
+                size="normal"
+                hideTotalPlaceholder
+                message={emptyMessage}
+              />
+            )}
+            {view.hasChartValues && isPartial && (
+              <p className="text-xs text-foreground-light">Partial data</p>
+            )}
+          </CardContent>
+        </Card>
+      )
+  }
 }

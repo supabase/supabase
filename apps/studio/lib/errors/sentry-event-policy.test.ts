@@ -1,4 +1,4 @@
-import type { Event } from '@sentry/nextjs'
+import type { Event } from '@sentry/react'
 import { describe, expect, it } from 'vitest'
 
 import { applyStudioErrorPolicy } from './sentry-event-policy'
