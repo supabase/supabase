@@ -692,6 +692,47 @@ export const UnifiedLogs = ({
                     projectRef={projectRef}
                   />
                 )}
+                <AnimatePresence initial={false}>
+                  {showSavedViews && isViewsBarOpen && (
+                    <motion.div
+                      key="logs-views-bar"
+                      initial={{ opacity: 0, height: 0 }}
+                      animate={{ opacity: 1, height: 'auto' }}
+                      exit={{ opacity: 0, height: 0 }}
+                      transition={reduceMotion ? { duration: 0 } : VIEWS_BAR_SPRING}
+                      className="overflow-hidden shrink-0"
+                    >
+                      <LogsViewsBar
+                        key={projectRef}
+                        id={VIEWS_BAR_ID}
+                        views={savedViews}
+                        isLoading={isLoadingSavedViews}
+                        isError={isErrorSavedViews}
+                        activeViewId={activeView?.id ?? null}
+                        activeFilterCount={activeFilterCount}
+                        canCreate={canCreateView}
+                        canUpdate={canUpdateView}
+                        canDelete={canDeleteView}
+                        isPending={isSavingView}
+                        isActiveViewModified={isActiveViewModified}
+                        isReviewOpen={isViewModifiedPopoverOpen}
+                        activeChipRef={activeChipRef}
+                        onReviewChanges={() => setIsReviewingChanges(true)}
+                        onApply={handleApplyView}
+                        onClearActiveView={handleClearActiveView}
+                        onRename={(viewId, name) => updateSavedView(viewId, { name })}
+                        onDelete={deleteSavedView}
+                        onSaveCurrentView={() => handleSaveCurrentView()}
+                        isSaving={isSavingNewView}
+                        saveNameSeed={saveViewNameSeed ?? undefined}
+                        onSubmitSave={handleCreateView}
+                        onCancelSave={() => setSaveViewProjectRef(null)}
+                        onRetry={retrySavedViews}
+                      />
+                    </motion.div>
+                  )}
+                </AnimatePresence>
+
                 <div className="flex flex-wrap items-center gap-2 px-2 border-b">
                   {hasFilterSideBar && (
                     <>
@@ -769,47 +810,6 @@ export const UnifiedLogs = ({
                     ) : null}
                   </div>
                 </div>
-
-                <AnimatePresence initial={false}>
-                  {showSavedViews && isViewsBarOpen && (
-                    <motion.div
-                      key="logs-views-bar"
-                      initial={{ opacity: 0, height: 0 }}
-                      animate={{ opacity: 1, height: 'auto' }}
-                      exit={{ opacity: 0, height: 0 }}
-                      transition={reduceMotion ? { duration: 0 } : VIEWS_BAR_SPRING}
-                      className="overflow-hidden shrink-0"
-                    >
-                      <LogsViewsBar
-                        key={projectRef}
-                        id={VIEWS_BAR_ID}
-                        views={savedViews}
-                        isLoading={isLoadingSavedViews}
-                        isError={isErrorSavedViews}
-                        activeViewId={activeView?.id ?? null}
-                        activeFilterCount={activeFilterCount}
-                        canCreate={canCreateView}
-                        canUpdate={canUpdateView}
-                        canDelete={canDeleteView}
-                        isPending={isSavingView}
-                        isActiveViewModified={isActiveViewModified}
-                        isReviewOpen={isViewModifiedPopoverOpen}
-                        activeChipRef={activeChipRef}
-                        onReviewChanges={() => setIsReviewingChanges(true)}
-                        onApply={handleApplyView}
-                        onClearActiveView={handleClearActiveView}
-                        onRename={(viewId, name) => updateSavedView(viewId, { name })}
-                        onDelete={deleteSavedView}
-                        onSaveCurrentView={() => handleSaveCurrentView()}
-                        isSaving={isSavingNewView}
-                        saveNameSeed={saveViewNameSeed ?? undefined}
-                        onSubmitSave={handleCreateView}
-                        onCancelSave={() => setSaveViewProjectRef(null)}
-                        onRetry={retrySavedViews}
-                      />
-                    </motion.div>
-                  )}
-                </AnimatePresence>
 
                 <span aria-live="polite" className="sr-only">
                   {canReviewChanges ? 'This view has been modified' : ''}
