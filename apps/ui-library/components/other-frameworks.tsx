@@ -8,9 +8,10 @@ import { frameworkTitles } from '@/config/docs'
  * every version of a block is reachable from the page HTML, not only from the framework menu.
  */
 export function OtherFrameworks({ slug }: { slug: string }) {
-  const [currentFramework, docName] = slug.split('/')
+  const [currentFramework, ...docPath] = slug.split('/')
+  const docName = docPath.join('/')
 
-  // Other versions are the docs with the same name under a different framework folder
+  // Other versions are the docs with the same path under a different framework folder
   const otherFrameworks = Object.keys(frameworkTitles).filter(
     (framework) =>
       framework !== currentFramework &&
