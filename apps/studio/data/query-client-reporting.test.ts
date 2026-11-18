@@ -3,7 +3,7 @@ import { beforeEach, describe, expect, it, vi } from 'vitest'
 import { PlatformError, UnclassifiedApiError } from '@/lib/errors/studio-errors'
 
 const captureException = vi.hoisted(() => vi.fn(() => 'event-123'))
-vi.mock('@sentry/nextjs', () => ({ captureException }))
+vi.mock('@sentry/react', () => ({ captureException }))
 vi.mock('common', () => ({ IS_PLATFORM: false, getAccessToken: vi.fn() }))
 vi.mock('@/lib/constants', () => ({ API_URL: 'http://localhost', IS_PLATFORM: false }))
 vi.mock('@/lib/helpers', () => ({ uuidv4: () => 'test-uuid' }))

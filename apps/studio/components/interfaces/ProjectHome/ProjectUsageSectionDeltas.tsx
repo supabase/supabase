@@ -8,7 +8,7 @@ import { Row } from 'ui-patterns/Row'
 
 import { isChartIntervalKey, resolveChartInterval } from './ChartInterval.utils'
 import {
-  buildSortedServiceCards,
+  buildServiceCards,
   computeSuccessAndNonSuccessRates,
   getBucketLogRange,
   isServiceDisabled,
@@ -126,7 +126,7 @@ export const ProjectUsageSectionDeltas = () => {
   )
 
   const services = useMemo(
-    () => buildSortedServiceCards(serviceBase, serviceData),
+    () => buildServiceCards(serviceBase, serviceData),
     [serviceBase, serviceData]
   )
 

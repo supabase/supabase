@@ -59,7 +59,7 @@ When in doubt, ask `ask-the-docs` rather than guessing — this classification i
 Before handing off, confirm:
 
 - [ ] Style guide followed, or the gap named explicitly in the handoff
-- [ ] Every behavior claim traces to the code read (ideally the linked PR), not just the PRD
+- [ ] Every behavior claim traces to the code read (ideally the linked PR), not just the PRD, checked claim by claim in the [accuracy pass](#accuracy-pass)
 - [ ] Every "why it matters" / positioning line traces to Linear/PM context or prior Frame/Shape output, not invented
 - [ ] Inferred or assumed material is flagged, not stated as fact
 - [ ] Content type confirmed as Guide/Troubleshooting (not something that belongs in generated Reference instead)
@@ -82,6 +82,18 @@ Before handoff, run both passes from [Use with an AI agent](../../../apps/docs/s
 - [ ] Voice, tense, and brevity follow [`01-voice-and-tone.md`](../../../apps/docs/style-guide/01-voice-and-tone.md)
 - [ ] Document type, section grouping, and chunking follow [`03-page-structure.md`](../../../apps/docs/style-guide/03-page-structure.md)
 - [ ] Admonitions, headings, links, and other components follow [`02-elements.md`](../../../apps/docs/style-guide/02-elements.md)
+
+### Accuracy pass
+
+Run this after the compliance checklist, as a separate pass. A clean style review does not show that the page is true. Run it in a fresh subagent that gets only the draft and the pinned version, so it checks the code and not the drafting agent's summary.
+
+1. List every behavior claim in the draft: what the feature accepts, rejects, returns, or requires. Include what each command or script the page tells readers to run changes, beyond its stated purpose.
+2. For each claim, open the source lines again at a pinned version: the commit your branch is based on, or the release tag when the code lives in another repo. Do not check against your notes or an earlier summary of the code.
+3. Compare the claim with every branch in those lines, including early returns, special cases, and fallbacks. If the code has an exception that the sentence leaves out, add the exception or narrow the sentence.
+4. Treat _any_, _all_, _always_, _only_, and _never_ as claims about every case. Keep them only when the code or a test covers every case.
+5. Put the file, line range, and version for each claim in the handoff, so a reviewer can check it.
+
+When brevity and accuracy conflict, keep the sentence short and complete. Do not drop an exception to make a sentence read better.
 
 ## Phase 2.6 — Moved or deleted pages (conditional)
 

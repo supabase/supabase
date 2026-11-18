@@ -12,7 +12,7 @@ After developing your project and deciding it's production ready, you should run
 
 ## Security
 
-The security checklist covers Row Level Security, SSL and network restrictions, account and organization access, Auth settings, and threat review. For the full list, see [Production security checklist](/docs/guides/security/production-checklist).
+The security checklist covers [Row Level Security](/docs/guides/database/postgres/row-level-security), SSL and network restrictions, account and organization access, Auth settings, and threat review. For the full list, see [Production security checklist](/docs/guides/security/production-checklist).
 
 ## Performance
 
@@ -94,4 +94,4 @@ Read more details in our [Shared Responsibility Model guide](/docs/guides/deploy
 ### Email link validity
 
 - When working with enterprise systems, email scanners may scan and make a `GET` request to the reset password link or sign-up link in your email. Since links in Supabase Auth are single-use, a user who opens an email post-scan to click on a link will receive an error. To get around this problem, consider altering the email template to replace the original magic link with a link to a domain you control. The domain can present the user with a "Sign-in" button, which redirects the user to the original magic link URL when clicked.
-- When using a custom SMTP service, some services might have link tracking enabled which may overwrite or deform the email confirmation links sent by Supabase Auth. To prevent this from happening, we recommend that you disable link tracking when using a custom SMTP service.
+- When using a custom SMTP service, some services might have link tracking enabled which may overwrite or deform the email confirmation links sent by [Supabase Auth](/docs/guides/auth). To prevent this from happening, we recommend that you disable link tracking when using a custom SMTP service.
