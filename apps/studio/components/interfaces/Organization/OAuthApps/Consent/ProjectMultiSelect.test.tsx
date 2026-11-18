@@ -41,6 +41,7 @@ describe('ProjectMultiSelect', () => {
   test('shows a placeholder when nothing is selected', () => {
     customRender(
       <ProjectMultiSelect
+        selectedProjectRefs={[]}
         projects={PROJECTS}
         selectedProjects={[]}
         onChange={vi.fn()}
@@ -60,6 +61,7 @@ describe('ProjectMultiSelect', () => {
     customRender(
       <ProjectMultiSelect
         projects={PROJECTS}
+        selectedProjectRefs={[PROJECTS[0].ref]}
         selectedProjects={[PROJECTS[0]]}
         onChange={vi.fn()}
         onSearchChange={vi.fn()}
@@ -77,6 +79,7 @@ describe('ProjectMultiSelect', () => {
       <ProjectMultiSelect
         projects={PROJECTS}
         selectedProjects={PROJECTS}
+        selectedProjectRefs={PROJECTS.map((p) => p.ref)}
         onChange={vi.fn()}
         onSearchChange={vi.fn()}
         onLoadMore={vi.fn()}
@@ -91,10 +94,12 @@ describe('ProjectMultiSelect', () => {
   })
 
   test('collapses the projects past the badge limit into a counter', () => {
+    const selectedProjects = projectsUpTo(3)
     customRender(
       <ProjectMultiSelect
         projects={MANY_PROJECTS}
-        selectedProjects={projectsUpTo(3)}
+        selectedProjects={selectedProjects}
+        selectedProjectRefs={selectedProjects.map((p) => p.ref)}
         onChange={vi.fn()}
         onSearchChange={vi.fn()}
         onLoadMore={vi.fn()}
@@ -115,6 +120,7 @@ describe('ProjectMultiSelect', () => {
       <ProjectMultiSelect
         projects={PROJECTS}
         selectedProjects={[]}
+        selectedProjectRefs={[]}
         onChange={onChange}
         onSearchChange={vi.fn()}
         onLoadMore={vi.fn()}
@@ -133,6 +139,7 @@ describe('ProjectMultiSelect', () => {
       <ProjectMultiSelect
         projects={PROJECTS}
         selectedProjects={[PROJECTS[0]]}
+        selectedProjectRefs={[PROJECTS[0].ref]}
         onChange={onChange}
         onSearchChange={vi.fn()}
         onLoadMore={vi.fn()}
@@ -150,6 +157,7 @@ describe('ProjectMultiSelect', () => {
       <ProjectMultiSelect
         projects={PROJECTS}
         selectedProjects={[]}
+        selectedProjectRefs={[]}
         onChange={vi.fn()}
         error="Must select at least one project to authorize."
         onSearchChange={vi.fn()}
@@ -166,6 +174,7 @@ describe('ProjectMultiSelect', () => {
       <ProjectMultiSelect
         projects={PROJECTS}
         selectedProjects={[]}
+        selectedProjectRefs={[]}
         onChange={vi.fn()}
         onSearchChange={vi.fn()}
         onLoadMore={vi.fn()}
@@ -189,6 +198,7 @@ describe('ProjectMultiSelect', () => {
       <ProjectMultiSelect
         projects={PROJECTS}
         selectedProjects={[]}
+        selectedProjectRefs={[]}
         onChange={vi.fn()}
         onSearchChange={vi.fn()}
         onLoadMore={vi.fn()}
@@ -206,10 +216,12 @@ describe('ProjectMultiSelect', () => {
   ])(
     'shows the counter from eight selected onward ($count selected)',
     ({ count, isCounterShown }) => {
+      const selectedProjects = projectsUpTo(count)
       customRender(
         <ProjectMultiSelect
           projects={MANY_PROJECTS}
-          selectedProjects={projectsUpTo(count)}
+          selectedProjects={selectedProjects}
+          selectedProjectRefs={selectedProjects.map((p) => p.ref)}
           onChange={vi.fn()}
           onSearchChange={vi.fn()}
           onLoadMore={vi.fn()}
@@ -222,10 +234,12 @@ describe('ProjectMultiSelect', () => {
 
   test('at nine selected the cap is not yet reached and a tenth can be added', () => {
     const onChange = vi.fn()
+    const selectedProjects = projectsUpTo(9)
     customRender(
       <ProjectMultiSelect
         projects={MANY_PROJECTS}
-        selectedProjects={projectsUpTo(9)}
+        selectedProjects={selectedProjects}
+        selectedProjectRefs={selectedProjects.map((p) => p.ref)}
         onChange={onChange}
         onSearchChange={vi.fn()}
         onLoadMore={vi.fn()}
@@ -242,10 +256,12 @@ describe('ProjectMultiSelect', () => {
   })
 
   test('at the cap it shows 10/10 and the helper text', () => {
+    const selectedProjects = projectsUpTo(10)
     customRender(
       <ProjectMultiSelect
         projects={MANY_PROJECTS}
-        selectedProjects={projectsUpTo(10)}
+        selectedProjects={selectedProjects}
+        selectedProjectRefs={selectedProjects.map((p) => p.ref)}
         onChange={vi.fn()}
         onSearchChange={vi.fn()}
         onLoadMore={vi.fn()}
@@ -258,10 +274,12 @@ describe('ProjectMultiSelect', () => {
 
   test('at the cap unselected options are disabled and cannot be selected', () => {
     const onChange = vi.fn()
+    const selectedProjects = projectsUpTo(10)
     customRender(
       <ProjectMultiSelect
         projects={MANY_PROJECTS}
-        selectedProjects={projectsUpTo(10)}
+        selectedProjects={selectedProjects}
+        selectedProjectRefs={selectedProjects.map((p) => p.ref)}
         onChange={onChange}
         onSearchChange={vi.fn()}
         onLoadMore={vi.fn()}
@@ -279,10 +297,12 @@ describe('ProjectMultiSelect', () => {
 
   test('the cap never blocks deselection, which re-enables the other options', () => {
     const onChange = vi.fn()
+    let selectedProjects = projectsUpTo(10)
     const { rerender } = customRender(
       <ProjectMultiSelect
         projects={MANY_PROJECTS}
-        selectedProjects={projectsUpTo(10)}
+        selectedProjects={selectedProjects}
+        selectedProjectRefs={selectedProjects.map((p) => p.ref)}
         onChange={onChange}
         onSearchChange={vi.fn()}
         onLoadMore={vi.fn()}
@@ -298,10 +318,12 @@ describe('ProjectMultiSelect', () => {
         .map((p) => p.ref)
     )
 
+    selectedProjects = projectsUpTo(0)
     rerender(
       <ProjectMultiSelect
         projects={MANY_PROJECTS}
-        selectedProjects={projectsUpTo(9)}
+        selectedProjects={selectedProjects}
+        selectedProjectRefs={selectedProjects.map((p) => p.ref)}
         onChange={onChange}
         onSearchChange={vi.fn()}
         onLoadMore={vi.fn()}
