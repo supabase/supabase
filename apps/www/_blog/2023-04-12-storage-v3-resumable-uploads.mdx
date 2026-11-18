@@ -82,7 +82,7 @@ const MyImage = (props) => {
 
 Authenticated users can now generate presigned URLs.
 
-These URLs can then be shared with other users who can then upload to storage without further authorization. For example, you can generate a presigned URL on your server (ahem, Edge Function).
+These URLs can then be shared with other users who can then upload to storage without further authorization. For example, you can generate a presigned URL on your server (ahem, [Edge Function](/docs/guides/functions)).
 
 Shoutout to community members [@abbit](https://github.com/abbit) and [@MagnusHJensen](https://github.com/MagnusHJensen) who [implemented](https://github.com/supabase/storage-api/pull/282) this feature on the Storage server and [@Rawnly](https://github.com/Rawnly) for the [client library bindings](https://github.com/supabase/storage-js/pull/152) 🎉.
 
@@ -122,7 +122,7 @@ First, why do we need Resumable Uploads, when the HTTP protocol has a standard m
 
 ### TUS - Resumable Protocol
 
-We use S3 to store your files and it implements a proprietary protocol for resumable uploads. At Supabase, we support existing open source communities when possible and so, instead of exposing the S3 protocol to our users, we implemented [TUS](https://tus.io/) (historically an acronym for Transloadit Upload Server, later renamed to The Upload Server). TUS is an open protocol for resumable file uploads. By leveraging an open protocol, developers can use existing libraries with Supabase Storage.
+We use S3 to store your files and it implements a proprietary protocol for resumable uploads. At Supabase, we support existing open source communities when possible and so, instead of exposing the S3 protocol to our users, we implemented [TUS](https://tus.io/) (historically an acronym for Transloadit Upload Server, later renamed to The Upload Server). TUS is an open protocol for resumable file uploads. By leveraging an open protocol, developers can use existing libraries with [Supabase Storage](/docs/guides/storage).
 
 TUS is a powerful protocol. It’s built on top of HTTP, making it easy to integrate your browser and mobile applications. Because of its open nature, a variety of powerful, drop-in clients and open-source libraries have been built around it. For example, at Supabase, we love [Uppy.js](https://uppy.io/docs/tus/), a multi-file uploader for TUS.
 

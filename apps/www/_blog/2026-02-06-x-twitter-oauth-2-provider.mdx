@@ -28,7 +28,7 @@ Setting up X / Twitter authentication takes a few steps:
 4. Copy your **Client ID** and **Client Secret** from the "Keys and tokens" section
 5. Enter these credentials in **Authentication > Providers > X / Twitter (OAuth 2.0)** in the Supabase dashboard
 
-Once configured, you can use the Supabase client libraries to authenticate users via X / Twitter:
+Once configured, you can use the [Supabase client](/docs/reference/javascript/introduction) libraries to authenticate users via X / Twitter:
 
 ```javascript
 const { data, error } = await supabase.auth.signInWithOAuth({

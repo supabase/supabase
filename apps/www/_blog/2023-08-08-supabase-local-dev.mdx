@@ -236,7 +236,7 @@ npx snaplet generate --sql > supabase/seed.sql
 
 Type generators introspect a PostgreSQL schema and automatically generate TypeScript definitions. This gives you [end-to-end type safety](https://www.youtube.com/watch?v=VSNgAIObBdw) from the database to the browser.
 
-In the past month, we've added relationship detection in supabase-js. Foreign keys are now included in the generated types so that supabase-js can detect whether a referenced table should be an array (one-to-many) or an object (many-to-one). We've also added Helper Types to improve the developer experience for common scenarios, like short-hand accessors:
+In the past month, we've added relationship detection in [supabase-js](/docs/reference/javascript/introduction). Foreign keys are now included in the generated types so that supabase-js can detect whether a referenced table should be an array (one-to-many) or an object (many-to-one). We've also added Helper Types to improve the developer experience for common scenarios, like short-hand accessors:
 
 ```tsx
 // Before
@@ -315,7 +315,7 @@ We’re starting with seed data. Any SQL with `./supabase/seed.sql` will populat
 
 Importantly, we _aren’t_ cloning production data until we find something appropriate for data security. We know that copy-on-write is an available option, and with the appropriate anonymization techniques it seems like a promising way to provide a “production-like” test environment.
 
-We’ll also need to figure out what this means for large files in Supabase Storage. Do you need to anonymize your photos and videos? This is a work in progress and we’re open to feedback.
+We’ll also need to figure out what this means for large files in [Supabase Storage](/docs/guides/storage). Do you need to anonymize your photos and videos? This is a work in progress and we’re open to feedback.
 
 Either way, we want to support _both_ seed data and anonymized production data, so that teams can choose their preference based on their risk profile. It makes sense to start with a seed.
 
