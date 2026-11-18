@@ -55,6 +55,15 @@ describe('describeSearchQuery', () => {
     expect(description.queryType).toBe('conversational')
   })
 
+  it('collapses repeated whitespace so a stray double space keeps a keyword a keyword', () => {
+    expect(describeSearchQuery('auth  \t policies')).toEqual({
+      query: 'auth policies',
+      queryLength: 13,
+      queryWordCount: 2,
+      queryType: 'keyword',
+    })
+  })
+
   it('describes an empty term without text', () => {
     expect(describeSearchQuery('   ')).toEqual({
       queryLength: 0,

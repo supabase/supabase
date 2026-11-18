@@ -16,7 +16,7 @@ function classifySearchQuery(query: string, wordCount: number): SearchQueryType 
 // People paste credentials and personal data into search boxes, so the text itself is sent
 // only for short letters-only terms: keys, tokens, emails, ids and project refs never match.
 export function describeSearchQuery(rawQuery: string): SearchQueryProperties {
-  const query = rawQuery.trim()
+  const query = rawQuery.trim().replace(/\s+/g, ' ')
   const queryWordCount = query ? query.split(/\s+/).length : 0
   const queryType = classifySearchQuery(query, queryWordCount)
 
