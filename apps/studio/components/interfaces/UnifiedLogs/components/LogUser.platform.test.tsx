@@ -215,7 +215,7 @@ describe('LogUser', () => {
         }),
       ],
     })
-    expect(await screen.findByText('No signed-in user')).toBeVisible()
+    expect(await screen.findByRole('heading', { name: 'No signed-in user' })).toBeVisible()
     expect(screen.getByText(/used the anon role/)).toBeVisible()
   })
 

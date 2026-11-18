@@ -107,7 +107,7 @@ from sensor_range;
 
 If you're a developer accessing PostgreSQL using a high-level programming language, the database driver you're using is likely based on a C library called libpq. For example, suppose your application performs several write operations within a short period, or your network has a higher latency. In that case, you may want to fire off several queries over the same network connection simultaneously, so you don't have to wait for a reply after each query. Under the hood, libpq can send multiple queries to PostgreSQL while maintaining a queue of queries that are waiting for results. This queue consumes additional memory on both the client and server. Developers can now take advantage of PostgreSQL 14's client-side query pipeline mode using clients built on top of the latest libpq library to accelerate app performance.
 
-Aside from query pipelining, the latest PostgreSQL 14 release brings several other enhancements to query parallelism, including improved performance of parallel sequential scans, parallel query execution capabilities for Foreign Data Wrappers, and the ability to run parallel queries when refreshing materialized views. With this, your PostgreSQL server can now do more work for you at a lower cost.
+Aside from query pipelining, the latest PostgreSQL 14 release brings several other enhancements to query parallelism, including improved performance of parallel sequential scans, parallel query execution capabilities for [Foreign Data Wrappers](/docs/guides/database/extensions/wrappers/overview), and the ability to run parallel queries when refreshing materialized views. With this, your PostgreSQL server can now do more work for you at a lower cost.
 
 ### Monitoring and troubleshooting queries
 

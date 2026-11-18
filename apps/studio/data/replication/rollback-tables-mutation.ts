@@ -90,7 +90,7 @@ export const useRollbackTablesMutation = ({
       ])
 
       if (onError === undefined) {
-        toast.error(`Failed to restart table replication: ${data.message}`)
+        toast.error(`Failed to reset tables: ${data.message}`)
       } else {
         onError(data, variables, context)
       }

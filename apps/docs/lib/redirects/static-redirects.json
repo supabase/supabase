@@ -1105,6 +1105,11 @@
     "permanent": true
   },
   {
+    "source": "/docs/guides/database/replication/pipelines-guarantees",
+    "destination": "/docs/guides/database/replication/pipelines-faq#can-data-be-processed-more-than-once",
+    "permanent": true
+  },
+  {
     "source": "/docs/guides/database/replication/replication-faq",
     "destination": "/docs/guides/database/replication/pipelines-faq",
     "permanent": true
