@@ -9,7 +9,7 @@ import { mdAlternates } from '@/lib/md-alternates'
 export const metadata: Metadata = {
   title: 'Storage | Supabase',
   description:
-    'An open source S3 compatible storage solution with unlimited scalability, for any file type.',
+    'An open source S3 compatible storage solution with unlimited scalability, for any file type. Create buckets for files, analytics, and vectors.',
   alternates: {
     ...canonicalAlternates('/storage'),
     ...mdAlternates('storage'),

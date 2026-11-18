@@ -2,7 +2,7 @@ import { Card, CardContent } from 'ui'
 import { ChartLine } from 'ui-patterns/Chart'
 
 import { getWarehouseChartPoints, type WarehouseChartSeries } from './WarehouseMetricChart.utils'
-import NoDataPlaceholder from '@/components/ui/Charts/NoDataPlaceholder'
+import { NoDataPlaceholder } from '@/components/ui/Charts/NoDataPlaceholder'
 import type { WarehouseMetric } from '@/data/warehouse/warehouse-metrics-api-types'
 
 export const getWarehouseMetricEmptyMessage = (metric?: WarehouseMetric) => {

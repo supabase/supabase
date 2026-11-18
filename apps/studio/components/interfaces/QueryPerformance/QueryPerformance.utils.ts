@@ -1,4 +1,4 @@
-import * as Sentry from '@sentry/nextjs'
+import * as Sentry from '@sentry/react'
 import dayjs from 'dayjs'
 import duration from 'dayjs/plugin/duration'
 
