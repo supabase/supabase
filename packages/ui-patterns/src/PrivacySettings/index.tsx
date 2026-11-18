@@ -23,8 +23,17 @@ import { Admonition } from '../Admonition'
 
 export const PrivacySettingsLabel = () => {
   const [country, setCountry] = useState<string>()
-  useEffect(() => setCountry(readVisitorCountry(document.cookie)), [])
-  return <>{getPrivacyLinkLabel(country)}</>
+  const [hasReadCountry, setHasReadCountry] = useState(false)
+
+  useEffect(() => {
+    setCountry(readVisitorCountry(document.cookie))
+    setHasReadCountry(true)
+  }, [])
+
+  // Hidden until the country cookie is read, so non-US visitors never see the US label flash.
+  return (
+    <span className={hasReadCountry ? undefined : 'invisible'}>{getPrivacyLinkLabel(country)}</span>
+  )
 }
 
 interface PrivacySettingsProps {
