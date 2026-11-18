@@ -1,4 +1,4 @@
-import * as Sentry from '@sentry/nextjs'
+import * as Sentry from '@sentry/react'
 import type { PGTablePrimaryKey } from '@supabase/pg-meta'
 import pgMeta, {
   getAddForeignKeySQL,

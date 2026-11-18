@@ -1,7 +1,7 @@
 import { afterEach, describe, expect, it, vi } from 'vitest'
 
 const sentry = vi.hoisted(() => ({ captureException: vi.fn(), captureMessage: vi.fn() }))
-vi.mock('@sentry/nextjs', () => sentry)
+vi.mock('@sentry/react', () => sentry)
 vi.mock('common', () => ({ IS_PLATFORM: false, getAccessToken: vi.fn() }))
 vi.mock('@/lib/constants', () => ({ API_URL: 'http://localhost' }))
 vi.mock('@/lib/helpers', () => ({ uuidv4: () => 'test-uuid' }))
