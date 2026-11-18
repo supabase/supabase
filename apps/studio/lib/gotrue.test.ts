@@ -151,7 +151,7 @@ describe('getReturnToPath', () => {
 
 describe('transient auth params', () => {
   const search =
-    '?error_description=Unable+to+exchange+external+code%3A+53f8&error=server_error&error_code=unexpected_failure&method=github&returnTo=%2Fnew'
+    '?error_description=Unable+to+exchange+external+code%3A+53f8&error=server_error&error_code=unexpected_failure&returnTo=%2Fnew'
 
   it('buildPathWithParams does not carry them into the new path', () => {
     // @ts-ignore
