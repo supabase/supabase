@@ -35,6 +35,7 @@ describe('PrivacySettingsIsland', () => {
 
     const link = container.querySelector('button')
     expect(link?.textContent).toBe('Do Not Sell or Share My Personal Information')
+    expect(link?.querySelector('span')?.classList.contains('invisible')).toBe(false)
 
     await act(async () => link!.click())
 
