@@ -104,8 +104,8 @@ You can add your own log messages using standard console methods:
 ```js
 import { withSupabase } from 'npm:@supabase/server@1'
 
-export default {
-  fetch: withSupabase({ auth: 'user' }, async (req) => {
+Deno.serve(
+  withSupabase({ auth: 'user' }, async (req) => {
     try {
       const { name } = await req.json()
 
@@ -132,8 +132,8 @@ export default {
         headers: { 'Content-Type': 'application/json' },
       })
     }
-  }),
-}
+  })
+)
 ```
 
 <Admonition type="note">
@@ -155,11 +155,11 @@ import { withSupabase } from 'npm:@supabase/server@1'
 
 // ❌ This doesn't work as expected
 
-export default {
-  fetch: withSupabase({ auth: 'user' }, async (req) => {
+Deno.serve(
+  withSupabase({ auth: 'user' }, async (req) => {
     console.log(`Headers: ${JSON.stringify(req.headers)}`) // Outputs: "{}"
-  }),
-}
+  })
+)
 ```
 
 The `req.headers` object appears empty because Headers objects don't store data in enumerable JavaScript properties, making them opaque to `JSON.stringify()`.
@@ -170,14 +170,14 @@ Instead, you have to convert headers to a plain object first, for example using 
 import { withSupabase } from 'npm:@supabase/server@1'
 
 // ✅ This works correctly
-export default {
-  fetch: withSupabase({ auth: 'user' }, async (req) => {
+Deno.serve(
+  withSupabase({ auth: 'user' }, async (req) => {
     const headersObject = Object.fromEntries(req.headers)
     const headersJson = JSON.stringify(headersObject, null, 2)
 
     console.log(`Request headers:\n${headersJson}`)
-  }),
-}
+  })
+)
 ```
 
 This results in something like:

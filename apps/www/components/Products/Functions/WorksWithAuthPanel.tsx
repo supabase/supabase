@@ -4,8 +4,8 @@ import CodeWindow from '~/components/CodeWindow'
 const code = `import { createClient } from 'jsr:@supabase/supabase-js@2'
 import { withSupabase } from 'npm:@supabase/server@1'
 
-export default {
-  fetch: withSupabase({ auth: 'user' }, async (req: Request) => {
+Deno.serve(
+  withSupabase({ auth: 'user' }, async (req: Request) => {
     // Create supabase client
     const supabase = createClient(
       Deno.env.get('SUPABASE_URL')!,
@@ -20,8 +20,8 @@ export default {
     // Get the session or user object
     const { data } = await supabase.auth.getUser()
     const user = data.user
-  }),
-}`
+  })
+)`
 
 const WorksWithAuthPanel = () => <CodeWindow code={code} showLineNumbers />
 

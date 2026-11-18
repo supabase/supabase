@@ -87,8 +87,8 @@ Build an Edge Function that accepts an input string and generates an embedding f
       ```ts ./supabase/functions/embed/index.ts
       import { withSupabase } from 'npm:@supabase/server@1'
 
-      export default {
-        fetch: withSupabase({ auth: 'publishable' }, async (req) => {
+      Deno.serve(
+        withSupabase({ auth: 'publishable' }, async (req) => {
           // Extract input string from JSON body
           const { input } = await req.json();
 
@@ -103,8 +103,8 @@ Build an Edge Function that accepts an input string and generates an embedding f
             JSON.stringify({ embedding }),
             { headers: { 'Content-Type': 'application/json' } }
           );
-        }),
-      }
+        })
+      )
       ```
 
     </StepHikeCompact.Code>

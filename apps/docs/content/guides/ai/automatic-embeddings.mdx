@@ -390,8 +390,8 @@ type Row = {
 const QUEUE_NAME = 'embedding_jobs'
 
 // Listen for HTTP requests
-export default {
-  fetch: withSupabase({ auth: 'user' }, async (req) => {
+Deno.serve(
+  withSupabase({ auth: 'user' }, async (req) => {
     if (req.method !== 'POST') {
       return new Response('expected POST request', { status: 405 })
     }
@@ -470,8 +470,8 @@ export default {
         },
       }
     )
-  }),
-}
+  })
+)
 
 /**
  * Generates an embedding for the given text.

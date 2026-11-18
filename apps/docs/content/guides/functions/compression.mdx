@@ -11,8 +11,8 @@ To decompress Gzip bodies, you can use `gunzipSync` from the `node:zlib` API to 
 import { gunzipSync } from 'node:zlib'
 import { withSupabase } from 'npm:@supabase/server@1'
 
-export default {
-  fetch: withSupabase({ auth: 'user' }, async (req) => {
+Deno.serve(
+  withSupabase({ auth: 'user' }, async (req) => {
     try {
       // Check if the request body is gzip compressed
       const contentEncoding = req.headers.get('content-encoding')
@@ -42,8 +42,8 @@ export default {
       console.error('Error:', error)
       return new Response('Error processing request', { status: 500 })
     }
-  }),
-}
+  })
+)
 ```
 
 <Admonition type="caution">

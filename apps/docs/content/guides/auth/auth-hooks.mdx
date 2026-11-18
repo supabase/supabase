@@ -117,8 +117,8 @@ Use the secret in conjunction with the Standard Webhooks package to verify the p
 import { Webhook } from 'https://esm.sh/standardwebhooks@1.0.0'
 import { withSupabase } from 'npm:@supabase/server@1'
 
-export default {
-  fetch: withSupabase({ auth: 'none' }, async (req) => {
+Deno.serve(
+  withSupabase({ auth: 'none' }, async (req) => {
     const payload = await req.text()
     const hookSecret = Deno.env.get('SEND_SMS_HOOK_SECRETS').replace('v1,whsec_', '')
     // Extract headers and security specific fields
@@ -128,8 +128,8 @@ export default {
 
     // Payload data is verified, continue with business logic here
     // ...
-  }),
-}
+  })
+)
 ```
 
 </TabPanel>

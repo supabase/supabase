@@ -51,8 +51,8 @@ async function processMessage(message: QueueMessage) {
   }
 }
 
-export default {
-  fetch: withSupabase({ auth: 'secret' }, async (req) => {
+Deno.serve(
+  withSupabase({ auth: 'secret' }, async (req) => {
     const { data: messages, error } = await supabase.schema('pgmq_public').rpc('read', {
       queue_name: queueName,
       sleep_seconds: 0, // Don't wait if queue is empty
@@ -97,8 +97,8 @@ export default {
         headers: { 'Content-Type': 'application/json' },
       }
     )
-  }),
-}
+  })
+)
 ```
 
 Every time this Edge Function is run it:

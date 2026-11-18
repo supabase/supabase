@@ -14,8 +14,8 @@ Within your Edge Functions, return proper HTTP status codes and error messages:
 ```tsx
 import { withSupabase } from 'npm:@supabase/server@1'
 
-export default {
-  fetch: withSupabase({ auth: 'user' }, async (req) => {
+Deno.serve(
+  withSupabase({ auth: 'user' }, async (req) => {
     try {
       // Your function logic here
       const result = await processRequest(req)
@@ -30,8 +30,8 @@ export default {
         status: 500,
       })
     }
-  }),
-}
+  })
+)
 ```
 
 **Best practices for function errors:**

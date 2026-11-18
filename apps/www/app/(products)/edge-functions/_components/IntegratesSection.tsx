@@ -1,4 +1,5 @@
 import { createHighlighter, type ThemeRegistration } from 'shiki'
+
 import { IntegratesSectionClient } from './IntegratesSectionClient'
 
 const supabaseDark: ThemeRegistration = {
@@ -94,8 +95,8 @@ const USE_CASES = [
     code: `import { createClient } from 'jsr:@supabase/supabase-js@2'
 import { withSupabase } from 'npm:@supabase/server@1'
 
-export default {
-  fetch: withSupabase({ auth: 'user' }, async () => {
+Deno.serve(
+  withSupabase({ auth: 'user' }, async () => {
     // These are automatically available — no setup needed
     const supabase = createClient(
       Deno.env.get('SUPABASE_URL')!,
@@ -104,8 +105,8 @@ export default {
 
     const { data } = await supabase.from('todos').select('*')
     return new Response(JSON.stringify(data))
-  }),
-}`,
+  })
+)`,
   },
   {
     icon: 'Database' as const,
@@ -153,8 +154,8 @@ execute function "supabase_functions"."http_request"(
     code: `import { createClient } from 'jsr:@supabase/supabase-js@2'
 import { withSupabase } from 'npm:@supabase/server@1'
 
-export default {
-  fetch: withSupabase({ auth: 'user' }, async (req: Request) => {
+Deno.serve(
+  withSupabase({ auth: 'user' }, async (req: Request) => {
     // Create supabase client
     const supabase = createClient(
       Deno.env.get('SUPABASE_URL')!,
@@ -169,8 +170,8 @@ export default {
     // Get the session or user object
     const { data } = await supabase.auth.getUser()
     const user = data.user
-  }),
-}`,
+  })
+)`,
   },
   {
     icon: 'HardDrive' as const,
@@ -180,8 +181,8 @@ export default {
     code: `import { createClient } from 'jsr:@supabase/supabase-js@2'
 import { withSupabase } from 'npm:@supabase/server@1'
 
-export default {
-  fetch: withSupabase({ auth: 'user' }, async (req: Request) => {
+Deno.serve(
+  withSupabase({ auth: 'user' }, async (req: Request) => {
     // Create supabase client
     const supabase = createClient(
       Deno.env.get('SUPABASE_URL')!,
@@ -196,8 +197,8 @@ export default {
         cacheControl: '31536000',
         upsert: false,
       })
-  }),
-}`,
+  })
+)`,
   },
 ]
 

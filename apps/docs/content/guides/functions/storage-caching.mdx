@@ -23,8 +23,8 @@ import { createClient } from 'npm:@supabase/supabase-js@2'
 
 const SUPABASE_SECRET_KEYS = JSON.parse(Deno.env.get('SUPABASE_SECRET_KEYS')!)
 
-export default {
-  fetch: withSupabase({ auth: 'user' }, async (req) => {
+Deno.serve(
+  withSupabase({ auth: 'user' }, async (req) => {
     const supabaseAdmin = createClient(
       Deno.env.get('SUPABASE_URL')!,
       // If you want to use a different api key, change 'default' to your preferred key name
@@ -48,8 +48,8 @@ export default {
     }
 
     return new Response(JSON.stringify({ path: data.path }))
-  }),
-}
+  })
+)
 ```
 
 <Admonition type="caution">
@@ -69,8 +69,8 @@ import { withSupabase } from 'npm:@supabase/server@1'
 
 const STORAGE_URL = 'https://your-project.supabase.co/storage/v1/object/public/images'
 
-export default {
-  fetch: withSupabase({ auth: 'user' }, async (req) => {
+Deno.serve(
+  withSupabase({ auth: 'user' }, async (req) => {
     const url = new URL(req.url)
     const username = url.searchParams.get('username')
 
@@ -102,6 +102,6 @@ export default {
     } catch (error) {
       return new Response('Error processing request', { status: 500 })
     }
-  }),
-}
+  })
+)
 ```

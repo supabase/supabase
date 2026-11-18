@@ -35,8 +35,8 @@ We'll design the function to take your user's query (via POST request) and forwa
 import OpenAI from 'https://deno.land/x/openai@v4.24.0/mod.ts'
 import { withSupabase } from 'npm:@supabase/server@1'
 
-export default {
-  fetch: withSupabase({ auth: 'none' }, async (req) => {
+Deno.serve(
+  withSupabase({ auth: 'none' }, async (req) => {
     const { query } = await req.json()
     const apiKey = Deno.env.get('OPENAI_API_KEY')
     const openai = new OpenAI({
@@ -56,8 +56,8 @@ export default {
     return new Response(reply, {
       headers: { 'Content-Type': 'text/plain' },
     })
-  }),
-}
+  })
+)
 ```
 
 Note that we are setting `stream` to `false` which will wait until the entire response is complete before returning. If you wish to stream GPT's response word-by-word back to your client, set `stream` to `true`.

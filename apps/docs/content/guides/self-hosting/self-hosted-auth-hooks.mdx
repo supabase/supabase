@@ -172,8 +172,8 @@ import { withSupabase } from 'npm:@supabase/server@1'
 // and try each secret in turn until wh.verify() succeeds.
 const hookSecret = Deno.env.get('SEND_SMS_HOOK_SECRET')?.replace('v1,whsec_', '')
 
-export default {
-  fetch: withSupabase({ auth: 'none' }, async (req) => {
+Deno.serve(
+  withSupabase({ auth: 'none' }, async (req) => {
     if (req.method !== 'POST') {
       return new Response('not allowed', { status: 400 })
     }
@@ -195,8 +195,8 @@ export default {
     return new Response(JSON.stringify({}), {
       headers: { 'Content-Type': 'application/json' },
     })
-  }),
-}
+  })
+)
 ```
 
 ### Step 2: Generate a webhook secret

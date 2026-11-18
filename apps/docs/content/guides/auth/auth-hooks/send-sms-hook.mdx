@@ -464,8 +464,8 @@ const sendTextMessage = async (
   return response.json()
 }
 
-export default {
-  fetch: withSupabase({ auth: 'none' }, async (req) => {
+Deno.serve(
+  withSupabase({ auth: 'none' }, async (req) => {
     const payload = await req.text()
     const base64_secret = Deno.env.get('SEND_SMS_HOOK_SECRET').replace('v1,whsec_', '')
     const headers = Object.fromEntries(req.headers)
@@ -521,8 +521,8 @@ export default {
         }
       )
     }
-  }),
-}
+  })
+)
 ```
 
 </TabPanel>
@@ -579,8 +579,8 @@ const sendMessage = async (
     return response.json();
 };
 
-export default {
-  fetch: withSupabase({ auth: 'none' }, async (req) => {
+Deno.serve(
+  withSupabase({ auth: 'none' }, async (req) => {
       const payload = await req.text();
       const base64_secret = Deno.env.get("SEND_SMS_HOOK_SECRET").replace('v1,whsec_', '');
       const headers = Object.fromEntries(req.headers);
@@ -638,8 +638,8 @@ export default {
               },
           );
       }
-  }),
-}
+  })
+)
 ```
 
 </TabPanel>

@@ -58,8 +58,8 @@ interface WebhookPayload {
   old_record: null | SoRecord
 }
 
-export default {
-  fetch: withSupabase({ auth: 'none' }, async (req) => {
+Deno.serve(
+  withSupabase({ auth: 'none' }, async (req) => {
     const payload: WebhookPayload = await req.json()
     const soRecord = payload.record
     const SUPABASE_SECRET_KEYS = JSON.parse(Deno.env.get('SUPABASE_SECRET_KEYS')!)
@@ -90,6 +90,6 @@ export default {
       .throwOnError()
 
     return new Response('ok')
-  }),
-}
+  })
+)
 ```

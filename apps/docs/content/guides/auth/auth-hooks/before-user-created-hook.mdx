@@ -493,8 +493,8 @@ import { withSupabase } from 'npm:@supabase/server@1'
 
 const allowedDomains = ['supabase.com', 'example.test']
 
-export default {
-  fetch: withSupabase({ auth: 'none' }, async (req) => {
+Deno.serve(
+  withSupabase({ auth: 'none' }, async (req) => {
     const payload = await req.text()
     const secret = Deno.env.get('BEFORE_USER_CREATED_HOOK_SECRET')?.replace('v1,whsec_', '')
     const headers = Object.fromEntries(req.headers)
@@ -524,8 +524,8 @@ export default {
         headers: { 'Content-Type': 'application/json' },
       })
     }
-  }),
-}
+  })
+)
 ```
 
 </TabPanel>
@@ -571,8 +571,8 @@ import { withSupabase } from 'npm:@supabase/server@1'
 
 const blockedProviders = ['discord']
 
-export default {
-  fetch: withSupabase({ auth: 'none' }, async (req) => {
+Deno.serve(
+  withSupabase({ auth: 'none' }, async (req) => {
     const payload = await req.text()
     const secret = Deno.env.get('BEFORE_USER_CREATED_HOOK_SECRET')?.replace('v1,whsec_', '')
     const headers = Object.fromEntries(req.headers)
@@ -598,8 +598,8 @@ export default {
     } catch {
       return new Response('{}', { status: 400 })
     }
-  }),
-}
+  })
+)
 ```
 
 </TabPanel>
@@ -739,8 +739,8 @@ const supabaseKey = Deno.env.get('SUPABASE_SECRET_KEY')
 const wh = new Webhook(whSecret)
 const supabase = createClient(supabaseUrl, supabaseKey)
 
-export default {
-  fetch: withSupabase({ auth: 'none' }, async (req) => {
+Deno.serve(
+  withSupabase({ auth: 'none' }, async (req) => {
     const payload = await req.text()
     const headers = Object.fromEntries(req.headers)
     try {
@@ -789,8 +789,8 @@ export default {
         }
       )
     }
-  }),
-}
+  })
+)
 ```
 
 </TabPanel>

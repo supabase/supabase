@@ -59,8 +59,8 @@ const supabase = createClient(
   SUPABASE_PUBLISHABLE_KEYS['default']
 )
 
-export default {
-  fetch: withSupabase({ auth: 'user' }, async (req) => {
+Deno.serve(
+  withSupabase({ auth: 'user' }, async (req) => {
     try {
       const { data, error } = await supabase.functions.invoke('other-function', {
         body: { foo: 'bar' },
@@ -88,8 +88,8 @@ export default {
       }
       throw err
     }
-  }),
-}
+  })
+)
 ```
 
 </TabPanel>
@@ -103,8 +103,8 @@ const SUPABASE_PUBLISHABLE_KEYS = JSON.parse(Deno.env.get('SUPABASE_PUBLISHABLE_
 // If you want to use a different api key, change 'default' to your preferred key name
 const SUPABASE_DEFAULT_PUBLISHABLE_KEY = SUPABASE_PUBLISHABLE_KEYS['default']
 
-export default {
-  fetch: withSupabase({ auth: 'user' }, async (req) => {
+Deno.serve(
+  withSupabase({ auth: 'user' }, async (req) => {
     try {
       const response = await fetch(`${Deno.env.get('SUPABASE_URL')}/functions/v1/other-function`, {
         method: 'POST',
@@ -132,8 +132,8 @@ export default {
       }
       throw err
     }
-  }),
-}
+  })
+)
 ```
 
 </TabPanel>
@@ -228,8 +228,8 @@ If your function is recursive, set a maximum depth to prevent unbounded call cha
 ```typescript
 import { withSupabase } from 'npm:@supabase/server@1'
 
-export default {
-  fetch: withSupabase({ auth: 'user' }, async (req) => {
+Deno.serve(
+  withSupabase({ auth: 'user' }, async (req) => {
     const { depth = 0, data } = await req.json()
 
     if (depth >= 5) {
@@ -244,8 +244,8 @@ export default {
     })
 
     return new Response(JSON.stringify(result))
-  }),
-}
+  })
+)
 ```
 
 ### 3. Use queues for large workloads
@@ -277,15 +277,15 @@ import { withSupabase } from 'npm:@supabase/server@1'
 
 import { save, transform, validate } from '../_shared/transform.ts'
 
-export default {
-  fetch: withSupabase({ auth: 'user' }, async (req) => {
+Deno.serve(
+  withSupabase({ auth: 'user' }, async (req) => {
     const data = await req.json()
     const validated = validate(data)
     const transformed = transform(validated)
     const result = await save(transformed)
     return new Response(JSON.stringify(result))
-  }),
-}
+  })
+)
 ```
 
 ### 5. Add delays for non-urgent processing

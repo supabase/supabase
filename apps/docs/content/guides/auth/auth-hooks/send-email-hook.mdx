@@ -575,8 +575,8 @@ import { withSupabase } from 'npm:@supabase/server@1'
 const resend = new Resend(Deno.env.get("RESEND_API_KEY") as string);
 const hookSecret = (Deno.env.get("SEND_EMAIL_HOOK_SECRET") as string).replace("v1,whsec_", "");
 
-export default {
-  fetch: withSupabase({ auth: 'none' }, async (req) => {
+Deno.serve(
+  withSupabase({ auth: 'none' }, async (req) => {
     if (req.method !== "POST") {
       return new Response("not allowed", { status: 400 });
     }
@@ -630,8 +630,8 @@ export default {
       status: 200,
       headers: responseHeaders,
     });
-  }),
-}
+  })
+)
 ```
 
 Deploy your edge function and [configure it as a hook](/dashboard/project/_/auth/hooks):
@@ -727,8 +727,8 @@ function generateConfirmationURL(email_data) {
   return `${baseUrl}?${params.toString()}`
 }
 
-export default {
-  fetch: withSupabase({ auth: 'none' }, async (req) => {
+Deno.serve(
+  withSupabase({ auth: 'none' }, async (req) => {
     const payload = await req.text()
     const serverToken = Deno.env.get('POSTMARK_SERVER_TOKEN')
     const headers = Object.fromEntries(req.headers)
@@ -793,8 +793,8 @@ export default {
         }
       )
     }
-  }),
-}
+  })
+)
 ```
 
 </TabPanel>
@@ -909,8 +909,8 @@ async function sendEmailWithSendGrid(user: any, email_data: any, apiKey: string)
     return await fetch(sendGridEndpoint, requestOptions);
 }
 
-export default {
-  fetch: withSupabase({ auth: 'none' }, async (req) => {
+Deno.serve(
+  withSupabase({ auth: 'none' }, async (req) => {
       const payload = await req.text();
       const postmarkServerToken = Deno.env.get("POSTMARK_SERVER_TOKEN");
       const sendGridApiKey = Deno.env.get("SENDGRID_API_KEY");
@@ -954,8 +954,8 @@ export default {
               }
           });
       }
-  }),
-}
+  })
+)
 ```
 
 </TabPanel> */}

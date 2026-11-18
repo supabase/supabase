@@ -108,8 +108,8 @@ import { createClient } from 'npm:@supabase/supabase-js@2'
 const SUPABASE_SECRET_KEYS = JSON.parse(Deno.env.get('SUPABASE_SECRET_KEYS')!)
 const supabase = createClient(Deno.env.get('SUPABASE_URL')!, SUPABASE_SECRET_KEYS['default'])
 
-export default {
-  fetch: withSupabase({ auth: 'user' }, async (req) => {
+Deno.serve(
+  withSupabase({ auth: 'user' }, async (req) => {
     const { roomId, message } = await req.json()
 
     // Verify the caller is allowed to post to this room before sending
@@ -121,8 +121,8 @@ export default {
     }
 
     return new Response(null, { status: 204 })
-  }),
-}
+  })
+)
 ```
 
 `httpSend()` requires `supabase-js` 2.76.0 or later. For other languages, call the [Broadcast REST API](/docs/guides/realtime/broadcast#broadcast-using-the-rest-api) directly.

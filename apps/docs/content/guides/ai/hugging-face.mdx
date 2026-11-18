@@ -99,8 +99,8 @@ import { withSupabase } from 'npm:@supabase/server@1'
 
 const hf = new HfInference(Deno.env.get('HUGGING_FACE_ACCESS_TOKEN'))
 
-export default {
-  fetch: withSupabase({ auth: 'none' }, async (req) => {
+Deno.serve(
+  withSupabase({ auth: 'none' }, async (req) => {
     const { prompt } = await req.json()
 
     const image = await hf.textToImage(
@@ -114,8 +114,8 @@ export default {
     )
 
     return new Response(image)
-  }),
-}
+  })
+)
 ```
 
 1. This function creates a new instance of `HfInference` using the `HUGGING_FACE_ACCESS_TOKEN` environment variable.

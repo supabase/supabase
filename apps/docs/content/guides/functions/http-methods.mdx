@@ -12,8 +12,8 @@ Edge Functions support **`GET`, `POST`, `PUT`, `PATCH`, `DELETE`, and `OPTIONS`*
 ```tsx
 import { withSupabase } from 'npm:@supabase/server@1'
 
-export default {
-  fetch: withSupabase({ auth: 'user' }, async (req) => {
+Deno.serve(
+  withSupabase({ auth: 'user' }, async (req) => {
     const { method, url } = req
     const { pathname } = new URL(url)
 
@@ -25,8 +25,8 @@ export default {
     }
 
     return new Response('Not found', { status: 404 })
-  }),
-}
+  })
+)
 ```
 
 Edge Functions allow you to build APIs without needing separate functions for each endpoint. This reduces cold starts and simplifies deployment while keeping your code organized.

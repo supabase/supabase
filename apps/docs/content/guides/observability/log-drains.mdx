@@ -51,15 +51,15 @@ import 'npm:@supabase/functions-js/edge-runtime.d.ts'
 
 import { withSupabase } from 'npm:@supabase/server@1'
 
-export default {
-  fetch: withSupabase({ auth: 'none' }, async (req) => {
+Deno.serve(
+  withSupabase({ auth: 'none' }, async (req) => {
     const data = await req.json()
     console.log(`Received ${data.length} logs, first log:\n ${JSON.stringify(data[0])}`)
     return new Response(JSON.stringify({ message: 'ok' }), {
       headers: { 'Content-Type': 'application/json' },
     })
-  }),
-}
+  })
+)
 ```
 
 Deploy it:
@@ -93,8 +93,8 @@ Gzip payloads can be decompressed using Node-compatible built-in APIs. See the E
 import { gunzipSync } from 'node:zlib'
 import { withSupabase } from 'npm:@supabase/server@1'
 
-export default {
-  fetch: withSupabase({ auth: 'none' }, async (req) => {
+Deno.serve(
+  withSupabase({ auth: 'none' }, async (req) => {
     try {
       const contentEncoding = req.headers.get('content-encoding')
       if (contentEncoding !== 'gzip') {
@@ -111,8 +111,8 @@ export default {
       console.error('Error:', error)
       return new Response('Error processing request', { status: 500 })
     }
-  }),
-}
+  })
+)
 ```
 
 </details>

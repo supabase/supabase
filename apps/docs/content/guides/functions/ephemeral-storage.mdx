@@ -55,8 +55,8 @@ You can use [Deno File System APIs](https://docs.deno.com/api/deno/file-system/)
 ```tsx
 import { withSupabase } from 'npm:@supabase/server@1'
 
-export default {
-  fetch: withSupabase({ auth: 'user' }, async (req) => {
+Deno.serve(
+  withSupabase({ auth: 'user' }, async (req) => {
     if (req.headers.get('content-type') !== 'application/zip') {
       return new Response('file must be a zip file', {
         status: 400,
@@ -73,8 +73,8 @@ export default {
 
     // Or process the file directly
     console.log(`Processing zip file: ${uploadId}, size: ${zipFile.length} bytes`)
-  }),
-}
+  })
+)
 ```
 
 ---
@@ -123,8 +123,8 @@ async function processZipFile(uploadId: string, filepath: string) {
   await zipReader.close()
 }
 
-export default {
-  fetch: withSupabase({ auth: 'user' }, async (req) => {
+Deno.serve(
+  withSupabase({ auth: 'user' }, async (req) => {
     const uploadId = crypto.randomUUID()
     const filepath = `/tmp/${uploadId}.zip`
 
@@ -137,8 +137,8 @@ export default {
     return new Response(JSON.stringify({ uploadId }), {
       headers: { 'Content-Type': 'application/json' },
     })
-  }),
-}
+  })
+)
 ```
 
 ### Image manipulation
@@ -148,8 +148,8 @@ Custom image manipulation workflows using [`magick-wasm`](/docs/guides/functions
 ```tsx
 import { withSupabase } from 'npm:@supabase/server@1'
 
-export default {
-  fetch: withSupabase({ auth: 'user' }, async (req) => {
+Deno.serve(
+  withSupabase({ auth: 'user' }, async (req) => {
     // Save uploaded image to temp storage
     const imagePath = `/tmp/input-${crypto.randomUUID()}.jpg`
     await Deno.writeFile(imagePath, req.body)
@@ -163,8 +163,8 @@ export default {
     return new Response(processedImage, {
       headers: { 'Content-Type': 'image/jpeg' },
     })
-  }),
-}
+  })
+)
 ```
 
 ---
@@ -194,11 +194,11 @@ setTimeout(() => {
   Deno.statSync('...') // 💣 ERROR! Deno.statSync is blocklisted on the current context
 })
 
-export default {
-  fetch: withSupabase({ auth: 'user' }, () => {
+Deno.serve(
+  withSupabase({ auth: 'user' }, () => {
     Deno.statSync('...') // 💣 ERROR! Deno.statSync is blocklisted on the current context
-  }),
-}
+  })
+)
 ```
 
 ---

@@ -172,8 +172,8 @@ const supabaseUrl = Deno.env.get('SUPABASE_URL')!
 const supabaseSecretKey = Deno.env.get('SUPABASE_SECRET_KEY')!
 const openaiApiKey = Deno.env.get('OPENAI_API_KEY')!
 
-export default {
-  fetch: withSupabase({ auth: 'none' }, async (req) => {
+Deno.serve(
+  withSupabase({ auth: 'none' }, async (req) => {
     // Grab the user's query from the JSON payload
     const { query } = await req.json()
 
@@ -203,8 +203,8 @@ export default {
     return new Response(JSON.stringify(documents), {
       headers: { 'Content-Type': 'application/json' },
     })
-  }),
-}
+  })
+)
 ```
 
 This uses OpenAI's `text-embedding-3-large` model to [generate embeddings](/docs/guides/ai/quickstarts/generate-text-embeddings) (shortened to 512 dimensions for faster retrieval). Swap in your preferred embedding model (and dimension size) accordingly.

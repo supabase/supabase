@@ -184,8 +184,8 @@ A common use case is customizing the `audience` claim for different OAuth client
 ```typescript
 import { withSupabase } from 'npm:@supabase/server@1'
 
-export default {
-  fetch: withSupabase({ auth: 'none' }, async (req) => {
+Deno.serve(
+  withSupabase({ auth: 'none' }, async (req) => {
     const { user, claims, client_id } = await req.json()
 
     // Customize audience based on OAuth client
@@ -217,8 +217,8 @@ export default {
     return new Response(JSON.stringify({ claims: {} }), {
       headers: { 'Content-Type': 'application/json' },
     })
-  }),
-}
+  })
+)
 ```
 
 The `audience` claim is especially important for:
@@ -235,8 +235,8 @@ You can also add custom claims and metadata based on the OAuth client:
 import { createClient } from 'https://esm.sh/@supabase/supabase-js@2'
 import { withSupabase } from 'npm:@supabase/server@1'
 
-export default {
-  fetch: withSupabase({ auth: 'none' }, async (req) => {
+Deno.serve(
+  withSupabase({ auth: 'none' }, async (req) => {
     const { user, claims, client_id } = await req.json()
 
     const supabase = createClient(
@@ -272,8 +272,8 @@ export default {
     return new Response(JSON.stringify({ claims: customClaims }), {
       headers: { 'Content-Type': 'application/json' },
     })
-  }),
-}
+  })
+)
 ```
 
 Use these custom claims in RLS:
