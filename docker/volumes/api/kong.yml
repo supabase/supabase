@@ -526,7 +526,7 @@ services:
       #    deny: []
 
   ## Protected Dashboard - catch all remaining routes
-  ## No cors plugin: Studio makes only same-origin requests.
+  ## No cors plugin: only Studio's own pages call these routes, from the same origin.
   - name: dashboard
     _comment: 'Studio: /* -> http://studio:3000/*'
     url: http://studio:3000/

@@ -518,8 +518,9 @@ check "/mcp blocked" "403" \
     "$(http_status "$BASE_URL/mcp")"
 
 echo "--- Studio routes: no CORS ---"
-# Studio sends only same-origin requests, and MCP clients aren't browsers, so
-# the gateway doesn't approve preflights or add CORS headers on these routes.
+# These routes are called only by Studio's own pages, from the same origin,
+# and by MCP clients, which aren't browsers, so the gateway doesn't approve
+# preflights or add CORS headers on them.
 # cors_allow_origin <path> [curl args]: Access-Control-Allow-Origin, "none" when
 # the response has no such header, or "request failed" when there's no response
 cors_allow_origin() {

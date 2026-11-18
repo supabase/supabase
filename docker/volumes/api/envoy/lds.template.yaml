@@ -700,8 +700,9 @@ resources:
                               value: /
                             append_action: ADD_IF_ABSENT
                         typed_per_filter_config:
-                          # Studio makes only same-origin requests, so its routes
-                          # (here and on /mcp, /api/mcp) don't answer CORS.
+                          # Studio's routes (here and on /mcp, /api/mcp) are called only by
+                          # Studio's own pages (same origin) and by MCP clients (not browsers),
+                          # so they don't answer CORS.
                           envoy.filters.http.cors:
                             '@type': >-
                               type.googleapis.com/envoy.config.route.v3.FilterConfig
