@@ -9,7 +9,7 @@
 
 [Supabase](https://supabase.com) adalah alternatif Firebase open source. Kami membangun fitur-fitur Firebase menggunakan alat bantu open source tingkat perusahaan.
 
-- [x] Basis Data Postgres yang dihosting. [Dokumen](https://supabase.com/docs/guides/database)
+- [x] Basis Data Postgres yang dihosting. [Dokumen](https://supabase.com/docs/guides/database/overview)
 - [x] Otentikasi dan Otorisasi. [Dokumen](https://supabase.com/docs/guides/auth)
 - [x] API yang dibuat secara otomatis.
   - [x] REST. [Dokumen](https://supabase.com/docs/guides/api#rest-api-overview)
@@ -56,7 +56,7 @@ Supabase adalah kombinasi dari alat sumber terbuka. Kami membangun fitur-fitur F
 **Arsitektur**
 
 Supabase adalah [platform yang di-host](https://supabase.com/dashboard). Anda bisa mendaftar dan mulai menggunakan Supabase tanpa menginstal apa pun.
-Anda juga bisa [menghosting sendiri](https://supabase.com/docs/guides/hosting/overview) dan [mengembangkan secara lokal](https://supabase.com/docs/guides/local-development).
+Anda juga bisa [menghosting sendiri](https://supabase.com/docs/guides/self-hosting) dan [mengembangkan secara lokal](https://supabase.com/docs/guides/local-development).
 
 ![Arsitektur](https://github.com/supabase/supabase/blob/master/apps/docs/public/img/supabase-architecture.svg)
 
@@ -64,7 +64,7 @@ Anda juga bisa [menghosting sendiri](https://supabase.com/docs/guides/hosting/ov
 - [Realtime](https://github.com/supabase/realtime) adalah server Elixir yang memungkinkan Anda untuk mendengarkan penyisipan, pembaruan, dan penghapusan PostgreSQL menggunakan websocket. Realtime melakukan polling terhadap fungsionalitas replikasi bawaan Postgres untuk perubahan database, mengkonversi perubahan ke JSON, kemudian menyiarkan JSON melalui websockets ke klien yang berwenang.
 - [PostgREST](http://postgrest.org/) adalah server web yang mengubah basis data PostgreSQL Anda secara langsung menjadi RESTful API
 - [pg_graphql](http://github.com/supabase/pg_graphql/) ekstensi PostgreSQL yang mengekspos API GraphQL
-- [Storage](https://github.com/supabase/storage-api) menyediakan antarmuka RESTful untuk mengelola File yang disimpan di S3, menggunakan Postgres untuk mengelola izin.
+- [Storage](https://github.com/supabase/storage) menyediakan antarmuka RESTful untuk mengelola File yang disimpan di S3, menggunakan Postgres untuk mengelola izin.
 - [postgres-meta](https://github.com/supabase/postgres-meta) adalah API RESTful untuk mengelola Postgres Anda, yang memungkinkan Anda untuk mengambil tabel, menambahkan peran, dan menjalankan kueri, dll.
 - [GoTrue](https://github.com/netlify/gotrue) adalah API berbasis SWT untuk mengelola pengguna dan menerbitkan token SWT.
 - [Kong](https://github.com/Kong/kong) adalah gateway API asli cloud.
@@ -84,9 +84,9 @@ Pendekatan kami untuk pustaka klien bersifat modular. Setiap sub-pustaka adalah 
     <th></th>
     <th>Supabase</th>
     <th><a href="https://github.com/postgrest/postgrest" target="_blank" rel="noopener noreferrer">PostgREST</a></th>
-    <th><a href="https://github.com/supabase/gotrue" target="_blank" rel="noopener noreferrer">GoTrue</a></th>
+    <th><a href="https://github.com/supabase/auth" target="_blank" rel="noopener noreferrer">GoTrue</a></th>
     <th><a href="https://github.com/supabase/realtime" target="_blank" rel="noopener noreferrer">Realtime</a></th>
-    <th><a href="https://github.com/supabase/storage-api" target="_blank" rel="noopener noreferrer">Storage</a></th>
+    <th><a href="https://github.com/supabase/storage" target="_blank" rel="noopener noreferrer">Storage</a></th>
     <th>Functions</th>
   </tr>
   <!-- TEMPLATE FOR NEW ROW -->
@@ -126,7 +126,7 @@ Pendekatan kami untuk pustaka klien bersifat modular. Setiap sub-pustaka adalah 
   
   <tr>
     <td>C#</td>
-    <td><a href="https://github.com/supabase-community/supabase-csharp" target="_blank" rel="noopener noreferrer">supabase-csharp</a></td>
+    <td><a href="https://github.com/supabase/supabase-csharp" target="_blank" rel="noopener noreferrer">supabase-csharp</a></td>
     <td><a href="https://github.com/supabase-community/postgrest-csharp" target="_blank" rel="noopener noreferrer">postgrest-csharp</a></td>
     <td><a href="https://github.com/supabase-community/gotrue-csharp" target="_blank" rel="noopener noreferrer">gotrue-csharp</a></td>
     <td><a href="https://github.com/supabase-community/realtime-csharp" target="_blank" rel="noopener noreferrer">realtime-csharp</a></td>
@@ -162,7 +162,7 @@ Pendekatan kami untuk pustaka klien bersifat modular. Setiap sub-pustaka adalah 
   </tr>
   <tr>
     <td>Python</td>
-    <td><a href="https://github.com/supabase-community/supabase-py" target="_blank" rel="noopener noreferrer">supabase-py</a></td>
+    <td><a href="https://github.com/supabase/supabase-py" target="_blank" rel="noopener noreferrer">supabase-py</a></td>
     <td><a href="https://github.com/supabase-community/postgrest-py" target="_blank" rel="noopener noreferrer">postgrest-py</a></td>
     <td><a href="https://github.com/supabase-community/gotrue-py" target="_blank" rel="noopener noreferrer">gotrue-py</a></td>
     <td><a href="https://github.com/supabase-community/realtime-py" target="_blank" rel="noopener noreferrer">realtime-py</a></td>

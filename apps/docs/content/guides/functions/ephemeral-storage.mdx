@@ -50,7 +50,7 @@ await Deno.writeTextFile('/s3/my-bucket/demo.txt', 'hello world')
 
 Ephemeral storage will reset on each function invocation. This means the files you write during an invocation can only be read within the same invocation.
 
-You can use [Deno File System APIs](https://docs.deno.com/api/deno/file-system) or the [`node:fs`](https://docs.deno.com/api/node/fs/) module to access the `/tmp` path.
+You can use [Deno File System APIs](https://docs.deno.com/api/deno/file-system/) or the [`node:fs`](https://docs.deno.com/api/node/fs/) module to access the `/tmp` path.
 
 ```tsx
 Deno.serve(async (req) => {

@@ -186,7 +186,7 @@ Providing a `statement` is required for most Solana wallets and this message wil
 
 If you are using a non-standard Solana wallet that does not register the `window.solana` object, or your user has multiple Solana wallets attached to the page you can disambiguate by providing the wallet object like so:
 
-- To use [Brave Wallet with Solana](https://wallet-docs.brave.com/solana):
+- To use [Brave Wallet with Solana](https://wallet-docs.brave.com/solana/):
   ```typescript
   const { data, error } = await supabase.auth.signInWithWeb3({
     chain: 'solana',

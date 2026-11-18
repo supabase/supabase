@@ -255,7 +255,7 @@ To authenticate the MCP server in a CI environment, create a personal access tok
 
 1. Navigate to your Supabase [access tokens](/dashboard/account/tokens) and generate a new token. Name the token based on its purpose, for example "Example App MCP CI token". Scope it to the project the server connects to, and grant only the permissions your enabled tools need. See [MCP tools](/docs/guides/platform/personal-access-tokens#mcp-tools) for the permission each tool requires.
 
-1. Pass the token to the `Authorization` header in your MCP server configuration. For example if you are using [Claude Code](https://docs.claude.com/en/docs/claude-code/github-actions), your MCP server configuration might look like this:
+1. Pass the token to the `Authorization` header in your MCP server configuration. For example if you are using [Claude Code](https://code.claude.com/docs/en/github-actions), your MCP server configuration might look like this:
 
    <McpCiConfigBlock />
 
