@@ -221,7 +221,9 @@ export const OAuthAppsAuthorizeScreen = ({
   const denyMutation = useOAuthAppsAuthorizeDenyMutation({
     onSuccess: () => {
       if (request) {
-        window.location.href = request.redirect_uri
+        const url = new URL(request.redirect_uri)
+        url.searchParams.append('error', 'access_denied')
+        window.location.href = url.toString()
       }
     },
   })

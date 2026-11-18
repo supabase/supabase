@@ -14,11 +14,11 @@ export async function denyOAuthAppsAuthorize({ slug, auth_id }: OAuthAppsAuthori
   if (!auth_id) throw new Error('Authorization request id is required')
   if (!slug) throw new Error('Organization slug is required')
 
-  const { error } = await del('/platform/organizations/{slug}/oauth/authorizations/{id}', {
+  const { data, error } = await del('/platform/organizations/{slug}/oauth/authorizations/{id}', {
     params: { path: { slug, id: auth_id } },
   })
   if (error) handleError(error)
-  return { url: null }
+  return data
 }
 
 type OAuthAppsAuthorizeDenyData = Awaited<ReturnType<typeof denyOAuthAppsAuthorize>>
