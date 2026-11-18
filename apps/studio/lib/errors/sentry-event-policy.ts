@@ -1,4 +1,4 @@
-import type { Event } from '@sentry/nextjs'
+import type { Event } from '@sentry/react'
 
 import { isNeverReportedError, isStudioError } from '@/lib/errors/studio-errors'
 
