@@ -42,7 +42,7 @@ A Supabase project holds one environment's data, so the integration gives each E
 
 ## Security findings in your build logs
 
-[Supabase Security and Performance Advisors](https://supabase.com/docs/guides/database/database-advisors) run from the EAS CLI, and their findings appear in the Expo build dashboard for connected projects. A table with [Row Level Security](/docs/guides/database/postgres/row-level-security) disabled, or a foreign key without an index, shows up next to the build logs for the change that introduced it, before the build reaches store review.
+[Supabase Security and Performance Advisors](https://supabase.com/docs/guides/observability/advisors) run from the EAS CLI, and their findings appear in the Expo build dashboard for connected projects. A table with [Row Level Security](/docs/guides/database/postgres/row-level-security) disabled, or a foreign key without an index, shows up next to the build logs for the change that introduced it, before the build reaches store review.
 
 ## Built for agents as much as developers
 
@@ -50,7 +50,7 @@ Every command in the integration runs without prompts and returns JSON, so an ag
 
 The teams getting the most out of Expo and Supabase together already work this way:
 
-[Quilia builds a client app for personal injury law firms](https://expo.dev/blog/iteration-speed-expo-supabase-ai), used by tens of thousands of people and maintained by one developer with a triage agent in the loop. The agent reads production through a read-only [Supabase MCP server](https://supabase.com/docs/guides/getting-started/mcp), fixes bugs against a development project, and ships several fixes a day through Expo Update. Most of them land before anyone reports the problem, and branches test the migrations in CI before anything merges.
+[Quilia builds a client app for personal injury law firms](https://expo.dev/blog/iteration-speed-expo-supabase-ai), used by tens of thousands of people and maintained by one developer with a triage agent in the loop. The agent reads production through a read-only [Supabase MCP server](https://supabase.com/docs/guides/ai-tools/mcp), fixes bugs against a development project, and ships several fixes a day through Expo Update. Most of them land before anyone reports the problem, and branches test the migrations in CI before anything merges.
 
 ## More than a database
 
