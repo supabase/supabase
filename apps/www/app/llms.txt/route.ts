@@ -97,6 +97,7 @@ export async function GET() {
     sourceLinks,
     '',
     '- [Knowledge Base](https://supabase.com/kb/sitemap.md)',
+    '- [Customer Stories](https://supabase.com/customers.md)',
     '',
     '## Pricing',
     '',

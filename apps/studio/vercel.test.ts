@@ -19,7 +19,6 @@ afterEach(() => {
 
 describe.each(['', '/dashboard'])('Vercel headers with base path "%s"', (basePath) => {
   it('leaves only exact deployment metadata paths to the handler cache policy', async () => {
-    vi.stubEnv('STUDIO_FRAMEWORK', 'tanstack')
     vi.stubEnv('NEXT_PUBLIC_BASE_PATH', basePath)
     const { config } = await import('./vercel')
     const compiled = getTransformedRoutes({ headers: config.headers })
@@ -60,18 +59,6 @@ describe.each(['', '/dashboard'])('Vercel headers with base path "%s"', (basePat
       expect(securityRule).toBeDefined()
     }
   })
-
-  it.each([undefined, 'next'])(
-    'leaves the Next.js Vercel config empty for framework %s',
-    async (framework) => {
-      vi.stubEnv('STUDIO_FRAMEWORK', framework)
-      vi.stubEnv('NEXT_PUBLIC_BASE_PATH', basePath)
-      const { config, default: defaultConfig } = await import('./vercel')
-
-      expect(config).toEqual({})
-      expect(defaultConfig).toBe(config)
-    }
-  )
 })
 
 describe.each(['', '/dashboard'])('TanStack content types with base path "%s"', (basePath) => {
@@ -79,7 +66,6 @@ describe.each(['', '/dashboard'])('TanStack content types with base path "%s"', 
 
   beforeEach(async () => {
     vi.resetModules()
-    vi.stubEnv('STUDIO_FRAMEWORK', 'tanstack')
     vi.stubEnv('NEXT_PUBLIC_BASE_PATH', basePath)
     const { config } = await import('./vercel')
     const result = getTransformedRoutes({ headers: config.headers })
@@ -145,7 +131,6 @@ describe.each(['', '/dashboard'])(
 
     beforeEach(async () => {
       vi.resetModules()
-      vi.stubEnv('STUDIO_FRAMEWORK', 'tanstack')
       vi.stubEnv('NEXT_PUBLIC_BASE_PATH', basePath)
       vi.stubEnv('NEXT_PUBLIC_IS_PLATFORM', 'true')
       vi.stubEnv('MAINTENANCE_MODE', 'true')

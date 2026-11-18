@@ -171,6 +171,26 @@ export function transformStatusCodeData(data: any[], statusCodes: string[]) {
 }
 
 /**
+ * Sums pivoted status code rows ({ timestamp, [status_code]: count }) into the
+ * warning (4xx) and error (5xx) counts shown in chart headers. Other codes only
+ * count towards the chart's total.
+ */
+export function getStatusClassCounts(rows: Record<string, unknown>[]) {
+  let warnings = 0
+  let errors = 0
+
+  for (const row of rows) {
+    for (const [key, value] of Object.entries(row)) {
+      if (typeof value !== 'number' || !/^\d{3}$/.test(key)) continue
+      if (key.startsWith('4')) warnings += value
+      else if (key.startsWith('5')) errors += value
+    }
+  }
+
+  return { warnings, errors }
+}
+
+/**
  * Extract distinct string values for a given field from data rows
  */
 export function extractDistinctValuesFromData(data: any[], field: string): string[] {

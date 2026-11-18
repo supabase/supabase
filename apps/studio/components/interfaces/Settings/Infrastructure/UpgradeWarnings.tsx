@@ -9,6 +9,7 @@ import {
   ProjectUpgradeEligibilityWarning,
 } from '@/data/config/project-upgrade-eligibility-query'
 import { DOCS_URL } from '@/lib/constants'
+import { pluralize } from '@/lib/helpers'
 
 export const ReadReplicasWarning = ({ latestPgVersion }: { latestPgVersion: string }) => {
   const { ref } = useParams()
@@ -137,6 +138,32 @@ const ValidationErrorItem = ({ error }: { error: ProjectUpgradeEligibilityValida
   )
 }
 
+const isEtlReplicationSlot = (error: ProjectUpgradeEligibilityValidationError) =>
+  error.type === 'active_replication_slot' && error.slot_name.startsWith('supabase_etl_')
+
+const isEtlApplySlot = (error: ProjectUpgradeEligibilityValidationError) =>
+  error.type === 'active_replication_slot' && error.slot_name.startsWith('supabase_etl_apply')
+
+const PipelinesValidationErrorItem = ({ pipelineCount }: { pipelineCount: number }) => {
+  const { ref: projectRef } = useParams()
+  const description =
+    pipelineCount > 0
+      ? `Stop all pipelines before upgrading (${pipelineCount} active ${pluralize(pipelineCount, 'pipeline')})`
+      : 'Stop all pipelines before upgrading'
+
+  return (
+    <li className="py-3 last:pb-0 flex flex-row gap-x-3 justify-between items-center">
+      <div className="flex flex-col gap-y-0.5 flex-1 min-w-0">
+        <h6 className="text-sm font-normal text-foreground">Active pipelines must be stopped</h6>
+        <p className="text-foreground-lighter text-xs">{description}</p>
+      </div>
+      <Button size="tiny" asChild>
+        <Link href={`/project/${projectRef}/database/pipelines`}>Manage</Link>
+      </Button>
+    </li>
+  )
+}
+
 export const ValidationErrorsWarning = ({
   validationErrors,
 }: {
@@ -144,17 +171,24 @@ export const ValidationErrorsWarning = ({
 }) => {
   if (validationErrors.length === 0) return null
 
+  // Pipelines create several replication slots; surface them as a single issue, counting
+  // pipelines via their apply slot (one per pipeline)
+  const hasEtlSlots = validationErrors.some(isEtlReplicationSlot)
+  const pipelineCount = validationErrors.filter(isEtlApplySlot).length
+  const otherErrors = validationErrors.filter((error) => !isEtlReplicationSlot(error))
+
   return (
     <Admonition type="note" showIcon={false} title="A newer version of Postgres is available">
-      <div className="flex flex-col gap-3">
+      <div className="flex flex-col">
         <p>
           The following issues must be resolved before upgrading.{' '}
           <InlineLink href={`${DOCS_URL}/guides/platform/upgrading`}>Learn more</InlineLink>
         </p>
-        <ul className="border-t border-border-muted flex flex-col divide-y divide-border-muted">
-          {validationErrors.map((error, idx) => (
+        <ul className="border-t border-border-muted flex flex-col divide-y divide-border-muted [&>li]:before:hidden pl-0!">
+          {otherErrors.map((error, idx) => (
             <ValidationErrorItem key={`${error.type}-${idx}`} error={error} />
           ))}
+          {hasEtlSlots && <PipelinesValidationErrorItem pipelineCount={pipelineCount} />}
         </ul>
       </div>
     </Admonition>

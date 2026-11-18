@@ -5,6 +5,7 @@ import type { Parameter } from '~/lib/refGenerator/refTypes'
 import specFile from '~/spec/cli_v1_config.yaml' with { type: 'yml' }
 import ReactMarkdown from 'react-markdown'
 import { Heading, Table } from 'ui'
+import { Admonition } from 'ui-patterns/Admonition'
 import { CodeBlock } from 'ui-patterns/CodeBlock'
 
 const meta = {
@@ -73,7 +74,13 @@ function Info({ parameter }: { parameter: Parameter }) {
             </div>
             <div className="mb-4 scroll-mt-16 mt-0 ">
               <p className="text-sm font-bold uppercase">Description</p>
-              <ReactMarkdown>{parameter.description}</ReactMarkdown>
+              <ReactMarkdown
+                components={{
+                  blockquote: ({ children }) => <Admonition type="note">{children}</Admonition>,
+                }}
+              >
+                {parameter.description}
+              </ReactMarkdown>
             </div>
             {parameter.usage && (
               <div className="mb-4 scroll-mt-16 mt-0 ">

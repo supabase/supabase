@@ -641,12 +641,7 @@ describe('OTEL filter translation', () => {
           logs
         where
           source = 'etl_replication_logs'
-          and (
-            coalesce(
-              nullIf(log_attributes['pipeline_id_v2'], ''),
-              log_attributes['pipeline_id']
-            ) = '42'
-          )
+          and (log_attributes['pipeline_id_v2'] = '42')
         order by
           timestamp desc
         limit
@@ -668,12 +663,7 @@ describe('OTEL filter translation', () => {
         logs
       where
         source = 'etl_replication_logs'
-        and (
-          coalesce(
-            nullIf(log_attributes['pipeline_id_v2'], ''),
-            log_attributes['pipeline_id']
-          ) = '42'
-        )
+        and (log_attributes['pipeline_id_v2'] = '42')
       order by
         timestamp desc
       limit

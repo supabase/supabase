@@ -537,11 +537,11 @@ The fields below are repeated for each provider. Substitute `<PROVIDER>` with on
 |---|---|---|---|---|
 | `GOTRUE_CUSTOM_OAUTH_ENABLED` | boolean |  | Enable user-defined custom OAuth/OIDC providers. | Default: `true` |
 | `GOTRUE_CUSTOM_OAUTH_MAX_PROVIDERS` | integer (count) |  | Maximum number of custom providers allowed. | Default: `0` (unlimited) |
-| `GOTRUE_OAUTH_SERVER_ALLOW_DYNAMIC_REGISTRATION` | boolean |  | Allow dynamic client registration on the OAuth server. |  |
-| `GOTRUE_OAUTH_SERVER_AUTHORIZATION_PATH` | string |  | Path prefix for the OAuth authorization endpoint. |  |
-| `GOTRUE_OAUTH_SERVER_AUTHORIZATION_TTL` | string (duration) |  | Lifetime of an authorization code. | Default: `10m` |
-| `GOTRUE_OAUTH_SERVER_DEFAULT_SCOPE` | string |  | Default scope returned to clients. | Default: `email` |
-| `GOTRUE_OAUTH_SERVER_ENABLED` | boolean |  | Enable the built-in OAuth authorization server. | Default: `false` |
+| `GOTRUE_OAUTH_SERVER_ALLOW_DYNAMIC_REGISTRATION` | boolean | Self-hosted | Let OAuth clients register themselves at `/oauth/clients/register` without an API key. | Default: `false`. Commented out in compose |
+| `GOTRUE_OAUTH_SERVER_AUTHORIZATION_PATH` | string | Self-hosted | Path of the consent page on `SITE_URL`. Auth redirects the browser there with an `authorization_id`. | Required when the OAuth server is enabled. Commented out in compose |
+| `GOTRUE_OAUTH_SERVER_AUTHORIZATION_TTL` | string (duration) |  | How long an authorization request stays valid, from the redirect until the client exchanges the code. | Default: `10m` |
+| `GOTRUE_OAUTH_SERVER_DEFAULT_SCOPE` | string |  | Scope used when a client doesn't request one. | Default: `email` |
+| `GOTRUE_OAUTH_SERVER_ENABLED` | boolean | Self-hosted | Enable the OAuth 2.1 server. See [Configure the OAuth 2.1 server](https://supabase.com/docs/guides/self-hosting/self-hosted-oauth-server). | Default: `false`. Commented out in compose |
 
 ### Phone / SMS
 

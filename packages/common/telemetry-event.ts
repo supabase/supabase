@@ -14,8 +14,18 @@ const KEEPALIVE_ACTIONS = new Set<TelemetryEvent['action']>([
   'www_pricing_plan_cta_clicked',
   'example_link_clicked',
   'kb_search_result_clicked',
+  'kb_search_closed',
   'agent_setup_clicked',
+  'view_as_markdown_clicked',
 ])
+
+let featureFlagProperties: Record<string, unknown> = {}
+
+export function setTelemetryFeatureFlags(flags: Record<string, unknown>) {
+  featureFlagProperties = Object.fromEntries(
+    Object.entries(flags).map(([key, value]) => [`$feature/${key}`, value])
+  )
+}
 
 // no auth imports here: apps without a dashboard session (kb) send events through this
 export function buildTelemetryEventRequest(
@@ -30,6 +40,7 @@ export function buildTelemetryEventRequest(
     ...getSharedTelemetryData(pathname),
     action: event.action,
     custom_properties: {
+      ...featureFlagProperties,
       ...('properties' in event ? event.properties : {}),
       ...(platform && { platform }),
     },

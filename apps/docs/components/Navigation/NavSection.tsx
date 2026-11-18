@@ -10,13 +10,16 @@ export const NavSectionCaret = ({ className }: { className?: string }) => (
 )
 
 export const NavSectionList = ({ className, ...props }: HTMLAttributes<HTMLUListElement>) => (
-  <ul className={cn('leading-5', className)} {...props} />
+  <ul
+    className={cn('leading-5 layout-v2:border-l layout-v2:border-muted layout-v2:pl-3', className)}
+    {...props}
+  />
 )
 
 export const NavSectionContent = ({ className, ...props }: HTMLAttributes<HTMLDivElement>) => (
   <div
     className={cn(
-      'border-l border-muted pl-3 ml-1 mt-0.5',
+      'border-l border-muted pl-3 ml-1 mt-0.5 layout-v2:border-l-0 layout-v2:pl-0',
       'overflow-hidden data-open:animate-slide-down data-closed:animate-slide-up motion-reduce:animate-none',
       className
     )}

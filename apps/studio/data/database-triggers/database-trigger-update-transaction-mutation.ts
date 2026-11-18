@@ -1,4 +1,5 @@
 import {
+  asWriteSql,
   getDatabaseTriggerUpdateSQL,
   type PGTrigger,
   type PGTriggerCreate,
@@ -8,8 +9,7 @@ import { useMutation, useQueryClient } from '@tanstack/react-query'
 import { toast } from 'sonner'
 
 import { databaseTriggerKeys } from './keys'
-import { unguarded } from '@/data/fetchers'
-import { executeSql } from '@/data/sql/execute-sql-mutation'
+import { executeSql, type PgMetaWriteGrant } from '@/data/sql/execute-sql-mutation'
 import type { StudioError } from '@/lib/errors/studio-errors'
 import type { UseCustomMutationOptions } from '@/types'
 
@@ -19,6 +19,7 @@ import type { UseCustomMutationOptions } from '@/types'
 
 export type DatabaseTriggerUpdateVariables = {
   projectRef: string
+  grant: PgMetaWriteGrant
   connectionString?: string | null
   originalTrigger: PGTrigger
   updatedTrigger: Omit<PGTriggerCreate, 'events'> &
@@ -27,6 +28,7 @@ export type DatabaseTriggerUpdateVariables = {
 
 export async function updateDatabaseTrigger({
   projectRef,
+  grant,
   connectionString,
   originalTrigger,
   updatedTrigger,
@@ -37,9 +39,9 @@ export async function updateDatabaseTrigger({
     connectionString,
     sqlOrigin: 'studio',
     queryName: 'trigger-update-transaction',
-    sql,
+    sql: asWriteSql(sql),
     queryKey: ['trigger', 'update', originalTrigger.id],
-    grant: unguarded.migrating,
+    grant,
   })
   return updatedTrigger
 }

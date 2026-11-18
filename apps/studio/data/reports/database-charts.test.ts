@@ -1,3 +1,4 @@
+import { INSTANCE_DISK_LIMITS } from 'shared-data'
 import { describe, expect, it } from 'vitest'
 
 import { getReportAttributesV2, shouldShowDiskIOBurstBalanceChart } from './database-charts'
@@ -105,6 +106,40 @@ describe('getReportAttributesV2 shared pooler chart', () => {
 })
 
 // Visibility permutations are covered by shouldShowDiskIOBurstBalanceChart below.
+describe('getReportAttributesV2 disk throughput reference line', () => {
+  const getMaxThroughputLine = (diskLimits?: (typeof INSTANCE_DISK_LIMITS)[string]) => {
+    const chart = getReportAttributesV2(
+      ENTITLED_FEATURES,
+      buildProject(),
+      {
+        attributes: { type: 'gp3', throughput_mbps: 1000, iops: 3000, size_gb: 100 },
+      } as Parameters<typeof getReportAttributesV2>[2],
+      undefined,
+      undefined,
+      false,
+      false,
+      false,
+      true,
+      diskLimits
+    ).find((chart) => chart.id === 'disk-throughput')
+    const line = (chart?.attributes ?? []).find(
+      (attribute) => typeof attribute === 'object' && attribute.attribute === 'disk_throughput_max'
+    )
+    return typeof line === 'object' ? line : undefined
+  }
+
+  it('caps the reference line at the compute limit when provisioned above it', () => {
+    // 1000 MB/s provisioned, but an m6g.large sustains at most 594 MB/s
+    const line = getMaxThroughputLine(INSTANCE_DISK_LIMITS['m6g.large'])
+    expect(line?.value).toBe(594 * 1024 * 1024)
+  })
+
+  it('keeps the provisioned value when the compute limit is higher', () => {
+    const line = getMaxThroughputLine(INSTANCE_DISK_LIMITS['m6i.large'])
+    expect(line?.value).toBe(1000 * 1024 * 1024)
+  })
+})
+
 describe('getReportAttributesV2 disk-io-burst-balance chart', () => {
   it('shows the chart for burstable non high availability projects', () => {
     expect(getBurstBalanceChart(buildProject())?.hide).toBe(false)
@@ -117,30 +152,49 @@ describe('getReportAttributesV2 disk-io-burst-balance chart', () => {
 
 describe('shouldShowDiskIOBurstBalanceChart', () => {
   it('shows the chart for burstable non high availability projects when the flag is on', () => {
-    expect(shouldShowDiskIOBurstBalanceChart(buildProject(), true)).toBe(true)
+    expect(
+      shouldShowDiskIOBurstBalanceChart(buildProject(), true, INSTANCE_DISK_LIMITS['t4g.micro'])
+    ).toBe(true)
   })
 
   it('hides the chart when the flag is off', () => {
-    expect(shouldShowDiskIOBurstBalanceChart(buildProject(), false)).toBe(false)
+    expect(
+      shouldShowDiskIOBurstBalanceChart(buildProject(), false, INSTANCE_DISK_LIMITS['t4g.micro'])
+    ).toBe(false)
   })
 
-  it('hides the chart for non burstable compute sizes', () => {
+  it('hides the chart for configurations whose baseline equals the maximum', () => {
     expect(
-      shouldShowDiskIOBurstBalanceChart(buildProject({ infra_compute_size: '4xlarge' }), true)
+      shouldShowDiskIOBurstBalanceChart(
+        buildProject({ infra_compute_size: '4xlarge' }),
+        true,
+        INSTANCE_DISK_LIMITS['m6g.4xlarge']
+      )
     ).toBe(false)
+  })
+
+  it('shows the chart for 4XL configurations that do burst', () => {
+    expect(
+      shouldShowDiskIOBurstBalanceChart(
+        buildProject({ infra_compute_size: '4xlarge' }),
+        true,
+        INSTANCE_DISK_LIMITS['m6i.4xlarge']
+      )
+    ).toBe(true)
   })
 
   it('hides the chart for high availability projects', () => {
     expect(
       shouldShowDiskIOBurstBalanceChart(
         buildProject({ high_availability: true, infra_compute_size: 'large' }),
-        true
+        true,
+        INSTANCE_DISK_LIMITS['m6g.large']
       )
     ).toBe(false)
   })
 
   it('hides the chart when the project is unknown', () => {
-    expect(shouldShowDiskIOBurstBalanceChart(undefined, true)).toBe(false)
+    expect(shouldShowDiskIOBurstBalanceChart(undefined, true, undefined)).toBe(false)
   })
 })
 

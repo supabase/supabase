@@ -137,7 +137,7 @@ interface TocTreeNode {
 }
 
 // a level 3 heading goes under the level 2 heading before it. a level 3 heading with no level 2 before it stays at the top level
-const toTocTree = (items: TOCItemType[]) =>
+export const toTocTree = (items: TOCItemType[]) =>
   items.reduce<TocTreeNode[]>((tree, item) => {
     const parent = tree.at(-1)
     if (item.depth === 3 && parent?.item.depth === 2) parent.children.push(item)
