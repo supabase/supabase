@@ -26,7 +26,7 @@ These errors are caused by issues in your function's code or logic which require
 **Cause:** Your Edge Function is throwing an unhandled error or resulting a 5XX code.
 
 ```ts
-import { withSupabase } from 'npm:@supabase/server@1'
+// ...
 
 function process() {
   throw new Error('Some unhandled error')
@@ -94,7 +94,7 @@ try {
 **Cause:** Your Edge Function threw an uncaught exception.
 
 ```ts
-import { withSupabase } from 'npm:@supabase/server@1'
+// ...
 
 function initSomething() {
   throw new Error('Some unhandled error')
@@ -126,7 +126,7 @@ export default {
 - Proxying an external service that returns an invalid HTTP status code
 
 ```ts
-import { withSupabase } from 'npm:@supabase/server@1'
+// ...
 
 export default {
   fetch: withSupabase({ auth: 'none' }, async (req) => {
@@ -146,7 +146,7 @@ export default {
 - For proxy endpoints, do not return the `fetch()` result directly; instead return a new `Response` wrapped in a try-catch block
 
 ```ts
-import { withSupabase } from 'npm:@supabase/server@1'
+// ...
 
 export default {
   fetch: withSupabase({ auth: 'none' }, async (req) => {
