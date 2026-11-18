@@ -31,6 +31,7 @@ function APIAuthorizationPage() {
       <>
         <title>{PAGE_TITLE}</title>
         <OAuthAppsAuthorizeScreen
+          key={authId}
           authId={authId}
           organizationSlug={organizationSlug && projectRef ? organizationSlug : undefined}
           projectRef={organizationSlug && projectRef ? projectRef : undefined}
