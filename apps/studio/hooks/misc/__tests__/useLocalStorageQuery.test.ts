@@ -111,4 +111,34 @@ describe('useLocalStorageQuery', () => {
     await waitFor(() => expect(result.current[0]).toBe(20))
     expect(window.localStorage.getItem('new-key')).toBe(JSON.stringify(20))
   })
+
+  it('succeeds and returns undefined when the initialValue is undefined and nothing is stored', async () => {
+    const { result } = customRenderHook(() =>
+      useLocalStorageQuery<string | undefined>('undefined-key', undefined)
+    )
+
+    await waitFor(() => expect(result.current[2].isSuccess).toBe(true))
+    expect(result.current[2].isError).toBe(false)
+    expect(result.current[0]).toBeUndefined()
+  })
+
+  it('stores, then clears, a value when the initialValue is undefined', async () => {
+    const { result } = customRenderHook(() =>
+      useLocalStorageQuery<string | undefined>('undefined-key', undefined)
+    )
+    await waitFor(() => expect(result.current[2].isSuccess).toBe(true))
+
+    act(() => {
+      result.current[1]('7day')
+    })
+    await waitFor(() => expect(result.current[0]).toBe('7day'))
+    expect(window.localStorage.getItem('undefined-key')).toBe(JSON.stringify('7day'))
+
+    act(() => {
+      result.current[1](undefined)
+    })
+    await waitFor(() => expect(result.current[0]).toBeUndefined())
+    expect(window.localStorage.getItem('undefined-key')).toBeNull()
+    expect(result.current[2].isError).toBe(false)
+  })
 })
