@@ -105,7 +105,7 @@ export const getIdentity = (gotrueUser: User) => {
   }
 }
 
-const TRANSIENT_AUTH_PARAMS = ['error', 'error_code', 'error_description', 'reason']
+const TRANSIENT_AUTH_PARAMS = ['error', 'error_code', 'error_description']
 
 const stripTransientAuthParams = (params: URLSearchParams) => {
   TRANSIENT_AUTH_PARAMS.forEach((key) => params.delete(key))
