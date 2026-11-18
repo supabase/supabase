@@ -74,7 +74,10 @@ test('shows worker starts and requests with their API labels', async () => {
       const starts = metric('activation_rate')
       starts.series.push({ ...starts.series[0], labels: { kind: 'cold', result: 'success' } })
       const requests = metric('rpc_rate')
-      requests.series.push({ ...requests.series[0], labels: { method: 'metadata', status: 'error' } })
+      requests.series.push({
+        ...requests.series[0],
+        labels: { method: 'metadata', status: 'error' },
+      })
       return HttpResponse.json<WarehouseMetricsResponse>({
         metrics: [
           starts,
