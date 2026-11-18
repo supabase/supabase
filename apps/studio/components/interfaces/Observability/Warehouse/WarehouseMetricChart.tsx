@@ -27,6 +27,7 @@ export const WarehouseMetricChart = ({
   description,
   unit,
   scale = 1,
+  emptyMessage,
   series = [{ metric, label: title }],
 }: {
   metric?: WarehouseMetric
@@ -34,6 +35,7 @@ export const WarehouseMetricChart = ({
   description: string
   unit: string
   scale?: number
+  emptyMessage?: string
   series?: WarehouseChartSeries[]
 }) => {
   const points = getWarehouseChartPoints(series, scale)
@@ -80,7 +82,11 @@ export const WarehouseMetricChart = ({
               attribute={title}
               size="normal"
               hideTotalPlaceholder
-              message={getWarehouseMetricEmptyMessage(metric)}
+              message={
+                metric?.availability === 'no_data' && emptyMessage
+                  ? emptyMessage
+                  : getWarehouseMetricEmptyMessage(metric)
+              }
             />
           )}
           {hasValues && series.some((item) => item.metric?.availability === 'partial') && (
