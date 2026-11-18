@@ -24,7 +24,9 @@ describe('prod smoke test: crawler pages return correct data', () => {
     expect(metaDescription.attr('content')).toBe('Supabase API reference for JavaScript: rangeLte')
 
     const canonical = $('link[rel="canonical"]')
-    expect(canonical.attr('href')).toBe('https://supabase.com/docs/reference/javascript/rangelte')
+    expect(canonical.attr('href')).toBe(
+      'https://supabase.com/docs/reference/javascript/using-filters-rangelte'
+    )
 
     const ogImage = $('meta[name="og:image"]')
     expect(ogImage.attr('content')).toBe('https://supabase.com/docs/img/supabase-og-image.png')
