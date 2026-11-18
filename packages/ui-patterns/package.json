@@ -443,6 +443,10 @@
       "import": "./src/GlyphLines/index.tsx",
       "types": "./src/GlyphLines/index.tsx"
     },
+    "./GlyphLines/start-glyph-lines": {
+      "import": "./src/GlyphLines/start-glyph-lines.ts",
+      "types": "./src/GlyphLines/start-glyph-lines.ts"
+    },
     "./Image/Image": {
       "import": "./src/Image/Image.tsx",
       "types": "./src/Image/Image.tsx"
