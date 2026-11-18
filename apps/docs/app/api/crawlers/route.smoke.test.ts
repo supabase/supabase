@@ -22,7 +22,7 @@ describe('prod smoke test: crawler pages return correct data', () => {
 
     const metaDescription = $('meta[name="description"]')
     expect(metaDescription.attr('content')).toBe(
-      'Supabase API reference for JavaScript: Less than or equal to a range'
+      'Supabase API reference for JavaScript: rangeLte'
     )
 
     const canonical = $('link[rel="canonical"]')
