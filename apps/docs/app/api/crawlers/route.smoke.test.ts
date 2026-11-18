@@ -21,9 +21,7 @@ describe('prod smoke test: crawler pages return correct data', () => {
     expect(title).toBe('JavaScript: rangeLte | Supabase Docs')
 
     const metaDescription = $('meta[name="description"]')
-    expect(metaDescription.attr('content')).toBe(
-      'Supabase API reference for JavaScript: rangeLte'
-    )
+    expect(metaDescription.attr('content')).toBe('Supabase API reference for JavaScript: rangeLte')
 
     const canonical = $('link[rel="canonical"]')
     expect(canonical.attr('href')).toBe('https://supabase.com/docs/reference/javascript/rangelte')
