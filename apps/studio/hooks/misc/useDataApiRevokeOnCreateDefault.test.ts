@@ -6,7 +6,7 @@ import {
   isInDataApiRevokeTreatment,
   useDataApiRevokeOnCreateDefaultEnabled,
   useTrackDefaultPrivilegesExposure,
-} from '../useDataApiRevokeOnCreateDefault'
+} from './useDataApiRevokeOnCreateDefault'
 import { usePHFlag } from '@/hooks/ui/useFlag'
 import * as constants from '@/lib/constants'
 import { useTrack } from '@/lib/telemetry/track'

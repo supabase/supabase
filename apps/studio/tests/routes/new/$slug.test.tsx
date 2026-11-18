@@ -63,6 +63,23 @@ vi.mock('@/lib/password-strength', () => ({
 
 vi.mock('@/lib/telemetry/track', () => ({ useTrack: () => vi.fn() }))
 
+// The real usePHFlag returns false outside the platform build, so PostHog flags under test are
+// driven through this map (set per render via `renderWizard({ posthogFlags })`). Flags that
+// aren't set fall through to the real hook so other consumers in the wizard keep working.
+const mockPostHogFlags = vi.hoisted(() => ({
+  current: {} as Record<string, boolean | string | undefined>,
+}))
+vi.mock(import('@/hooks/ui/useFlag'), async (importOriginal) => {
+  const actual = await importOriginal()
+  return {
+    ...actual,
+    usePHFlag: ((name: string) =>
+      name in mockPostHogFlags.current
+        ? mockPostHogFlags.current[name]
+        : (actual.usePHFlag as (flagName: string) => unknown)(name)) as never,
+  }
+})
+
 vi.mock(import('common'), async (importOriginal) => {
   const actual = await importOriginal()
   return {
@@ -310,8 +327,13 @@ const DEFAULT_FLAGS = {
 }
 
 async function renderWizard(
-  options: { flags?: Record<string, boolean | string>; isConfigCatStale?: boolean } = {}
+  options: {
+    flags?: Record<string, boolean | string>
+    posthogFlags?: Record<string, boolean | string>
+    isConfigCatStale?: boolean
+  } = {}
 ) {
+  mockPostHogFlags.current = options.posthogFlags ?? {}
   const profileContext = createMockProfileContext()
   return renderRoute(Route, {
     routeId: '/new/$slug',
@@ -1347,19 +1369,34 @@ describe('project creation wizard', () => {
     })
   })
 
-  describe('security options', () => {
+  describe('data access options', () => {
     test('disabling the Data API sends an empty exposed-schemas list', async () => {
       mockWizardEndpoints()
       const onRequest = vi.fn()
       mockCreateProject(onRequest)
 
-      await renderWizard()
+      await renderWizard({ posthogFlags: { dataApiRevokeOnCreateDefault: true } })
 
       await fillProjectName('No Data API Project')
       await generateAndWaitForStrongPassword()
 
+      const apiAccess = screen.getByLabelText('Grant API access to new tables automatically')
+      expect(apiAccess).toBeVisible()
+      const apiWarning =
+        'Client libraries like supabase-js need the Data API to query your database.'
+      expect(screen.queryByText(apiWarning)).not.toBeInTheDocument()
       await user.click(screen.getByLabelText('Enable Data API'))
-      await screen.findByText('Client libraries need Data API to query your database')
+      expect(
+        screen.queryByRole('checkbox', { name: 'Grant API access to new tables automatically' })
+      ).not.toBeInTheDocument()
+      expect(screen.getByText(apiWarning)).toBeVisible()
+      expect(screen.getByLabelText('Enable RLS on new tables automatically')).toBeEnabled()
+      await user.click(screen.getByLabelText('Enable Data API'))
+      expect(
+        screen.getByLabelText('Grant API access to new tables automatically')
+      ).not.toBeChecked()
+      expect(screen.queryByText(apiWarning)).not.toBeInTheDocument()
+      await user.click(screen.getByLabelText('Enable Data API'))
 
       fireEvent.click(screen.getByRole('button', { name: 'Create new project' }))
 
@@ -1374,12 +1411,31 @@ describe('project creation wizard', () => {
       const onRequest = vi.fn()
       mockCreateProject(onRequest)
 
-      await renderWizard()
+      await renderWizard({ posthogFlags: { dataApiRevokeOnCreateDefault: true } })
 
       await fillProjectName('Manual Privileges Project')
       await generateAndWaitForStrongPassword()
 
-      await user.click(screen.getByLabelText('Automatically expose new tables'))
+      const warning =
+        'Without RLS, anyone may be able to read, change or delete data in new tables. Enable RLS below to restrict access.'
+      expect(
+        screen.getByLabelText('Grant API access to new tables automatically')
+      ).not.toBeChecked()
+      expect(screen.queryByText(warning)).not.toBeInTheDocument()
+      await user.click(screen.getByLabelText('Grant API access to new tables automatically'))
+      await waitFor(() => expect(screen.getByText(warning)).toBeVisible())
+      await user.click(screen.getByLabelText('Enable RLS on new tables automatically'))
+      await waitFor(() => expect(screen.queryByText(warning)).not.toBeInTheDocument())
+      expect(
+        screen.queryByText('Add RLS policies to control which records users can access.')
+      ).not.toBeInTheDocument()
+      await user.click(screen.getByLabelText('Enable RLS on new tables automatically'))
+      expect(screen.getByText(warning)).toBeInTheDocument()
+      await user.click(screen.getByLabelText('Grant API access to new tables automatically'))
+      await waitFor(() => expect(screen.queryByText(warning)).not.toBeInTheDocument())
+      expect(
+        screen.queryByText('Add RLS policies to control which records users can access.')
+      ).not.toBeInTheDocument()
 
       fireEvent.click(screen.getByRole('button', { name: 'Create new project' }))
 
@@ -1387,6 +1443,24 @@ describe('project creation wizard', () => {
       const body = onRequest.mock.calls[0][0]
       expect(body.data_api_exposed_schemas).toBeUndefined()
       expect(body.data_api_revoke_default_privileges).toBe(true)
+    })
+
+    test('grants API access to new tables by default when dataApiRevokeOnCreateDefault is off', async () => {
+      mockWizardEndpoints()
+      const onRequest = vi.fn()
+      mockCreateProject(onRequest)
+
+      await renderWizard({ posthogFlags: { dataApiRevokeOnCreateDefault: false } })
+
+      await fillProjectName('Default Grants Project')
+      await generateAndWaitForStrongPassword()
+
+      expect(screen.getByLabelText('Grant API access to new tables automatically')).toBeChecked()
+
+      fireEvent.click(screen.getByRole('button', { name: 'Create new project' }))
+
+      await waitFor(() => expect(onRequest).toHaveBeenCalled())
+      expect(onRequest.mock.calls[0][0].data_api_revoke_default_privileges).toBe(false)
     })
 
     test('enabling automatic RLS sends the event-trigger SQL', async () => {
@@ -1399,7 +1473,7 @@ describe('project creation wizard', () => {
       await fillProjectName('Auto RLS Project')
       await generateAndWaitForStrongPassword()
 
-      await user.click(screen.getByLabelText('Enable automatic RLS'))
+      await user.click(screen.getByLabelText('Enable RLS on new tables automatically'))
 
       fireEvent.click(screen.getByRole('button', { name: 'Create new project' }))
 
