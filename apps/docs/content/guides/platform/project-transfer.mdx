@@ -380,46 +380,52 @@ A transfer moves a project between organizations. It can't move a project to a d
 
 ## Troubleshooting
 
-When a check fails, the Dashboard shows a **Project cannot be transferred** box with one or more messages. The Management API returns the same messages after the text `Transfer is not possible, due to the following reasons:`. The following sections list each message with its cause and fix.
+When a check fails, the Dashboard shows a **Project cannot be transferred** box with one or more messages. The Management API returns the same messages after the text `Transfer is not possible, due to the following reasons:`. The following tables list each message with its cause and fix.
 
 ### Role and membership messages
 
-The following messages are about your role in the two organizations:
+The following table lists the messages about your role in the two organizations:
 
-- `You must be an owner of the project to transfer a project.` You aren't an Owner of the source organization. Ask an Owner to transfer the project or to make you an Owner.
-- `You must be a member of the target organization to transfer a project.` The account you're signed in with isn't a member of the target organization. Ask for an invitation for this account. An SSO account counts as a separate account.
-- `You must have organization permissions within the target organization to transfer a project.` You have the **No access** role or only project-scoped roles in the target organization. Ask an Owner for a role for the whole organization.
-- `You must be an admin or owner of the target organization to claim a project.` This message appears when you claim a project that a partner platform created. Ask an Owner of the target organization for the Owner or Administrator role.
+| Message                                                                                        | Cause                                                                                                                     | Fix                                                                          |
+| ---------------------------------------------------------------------------------------------- | ------------------------------------------------------------------------------------------------------------------------- | ---------------------------------------------------------------------------- |
+| `You must be an owner of the project to transfer a project.`                                   | You aren't an Owner of the source organization.                                                                           | Ask an Owner to transfer the project or to make you an Owner.                |
+| `You must be a member of the target organization to transfer a project.`                       | The account you're signed in with isn't a member of the target organization. An SSO account counts as a separate account. | Ask for an invitation for this account.                                      |
+| `You must have organization permissions within the target organization to transfer a project.` | You have the **No access** role or only project-scoped roles in the target organization.                                  | Ask an Owner for a role for the whole organization.                          |
+| `You must be an admin or owner of the target organization to claim a project.`                 | You're claiming a project that a partner platform created.                                                                | Ask an Owner of the target organization for the Owner or Administrator role. |
 
 ### Billing and limit messages
 
-The following messages are about restrictions, invoices, and project limits:
+The following table lists the messages about restrictions, invoices, and project limits:
 
-- `This project can't be transferred to a Free organization while the source organization is in an active grace period or under service restrictions.` Both organizations are on the Free Plan and the source exceeded its quota. See [Usage restrictions on Free Plan organizations](#usage-restrictions-on-free-plan-organizations).
-- `There are overdue invoices in the organization(s)` You have unpaid invoices. See [Overdue invoices](#overdue-invoices).
-- `The target organization exceeds the free project limit when transferring this project.` An Owner or Administrator of the target organization is at their limit. See [Free project limit](#free-project-limit).
+| Message                                                                                                                                              | Cause                                                                      | Fix                                                                                                  |
+| ---------------------------------------------------------------------------------------------------------------------------------------------------- | -------------------------------------------------------------------------- | ---------------------------------------------------------------------------------------------------- |
+| `This project can't be transferred to a Free organization while the source organization is in an active grace period or under service restrictions.` | Both organizations are on the Free Plan and the source exceeded its quota. | See [Usage restrictions on Free Plan organizations](#usage-restrictions-on-free-plan-organizations). |
+| `There are overdue invoices in the organization(s)`                                                                                                  | You have unpaid invoices.                                                  | See [Overdue invoices](#overdue-invoices).                                                           |
+| `The target organization exceeds the free project limit when transferring this project.`                                                             | An Owner or Administrator of the target organization is at their limit.    | See [Free project limit](#free-project-limit).                                                       |
 
 ### Project feature messages
 
-The following messages are about the project's features and status:
+The following table lists the messages about the project's features and status:
 
-- `Project is currently connected to GitHub. Please disconnect the GitHub integration before transferring the project to another organization.` Disconnect the GitHub integration, then reconnect it after the transfer.
-- `Please remove linked project scoped role before transferring this project.` Remove every project-scoped role on the project, then assign the roles again in the target organization.
-- `The source project has preview branches that can't be transferred to an organization on a Free Plan.` Delete the project's preview and persistent branches.
-- `Log Drains must be removed from the project before transferring it to an organization that does not have access to Log Drains` Remove the project's log drains.
-- `Advanced MFA Phone must be removed from the project before transferring it to an organization that does not have access to Advanced MFA Phone` Turn off phone MFA in the project's Auth settings.
-- `Advanced MFA WebAuthn must be removed from the project before transferring it to an organization that does not have access to Advanced MFA WebAuthn` Turn off WebAuthn MFA in the project's Auth settings.
-- `Pipelines must be removed from the project before transferring it to an organization that does not have access to Pipelines` Remove Pipelines from the project.
-- `ETL is not available on Free Plan organizations, please delete all of your pipelines before transferring the project.` Delete all pipelines.
-- `The target organization does not have access to high availability projects.` Choose a target organization with high availability access.
-- `The target organization has reached its maximum number of high availability projects` Choose a different target organization, or remove a high availability project from the target.
-- `Project transfers with active AWS PrivateLink Associations are not supported. Please remove all AWS PrivateLink from project associations before transferring.` Remove the project's PrivateLink associations.
-- `The source organization has access to Vector Buckets, which is not available in the target organization.` Contact support to turn on vector buckets for the target organization.
-- `Project is provisioned via Stripe. Please deprovision the project through Stripe before transferring it to another organization.` See [Stripe Projects](#stripe-projects) before you remove anything in Stripe.
-- `Your project is currently restoring, please wait until restoration is complete.` Wait until the restore finishes.
-- `You are attempting to transfer a removed project.` The project was deleted and can't be transferred.
-- `One or more projects to be transferred are not part of source organization.` The project already moved, or the page is out of date. Reload the page and check which organization owns the project.
-- `Project transfers are temporarily disabled, please try again later.` Transfers are paused for all projects. Try again later.
+| Message                                                                                                                                                          | Cause                                                                                           | Fix                                                                                            |
+| ---------------------------------------------------------------------------------------------------------------------------------------------------------------- | ----------------------------------------------------------------------------------------------- | ---------------------------------------------------------------------------------------------- |
+| `Project is currently connected to GitHub. Please disconnect the GitHub integration before transferring the project to another organization.`                    | The project has a GitHub connection.                                                            | Disconnect the GitHub integration, then reconnect it after the transfer.                       |
+| `Please remove linked project scoped role before transferring this project.`                                                                                     | A member has a project-scoped role on the project.                                              | Remove every project-scoped role, then assign the roles again in the target organization.      |
+| `The source project has preview branches that can't be transferred to an organization on a Free Plan.`                                                           | The target organization is on the Free Plan and the project has preview or persistent branches. | Delete the project's preview and persistent branches.                                          |
+| `Log Drains must be removed from the project before transferring it to an organization that does not have access to Log Drains`                                  | The project has log drains and the target organization's plan doesn't include them.             | Remove the project's log drains.                                                               |
+| `Advanced MFA Phone must be removed from the project before transferring it to an organization that does not have access to Advanced MFA Phone`                  | The project uses phone MFA and the target organization's plan doesn't include it.               | Turn off phone MFA in the project's Auth settings.                                             |
+| `Advanced MFA WebAuthn must be removed from the project before transferring it to an organization that does not have access to Advanced MFA WebAuthn`            | The project uses WebAuthn MFA and the target organization's plan doesn't include it.            | Turn off WebAuthn MFA in the project's Auth settings.                                          |
+| `Pipelines must be removed from the project before transferring it to an organization that does not have access to Pipelines`                                    | The project uses Pipelines and the target organization doesn't have access to them.             | Remove Pipelines from the project.                                                             |
+| `ETL is not available on Free Plan organizations, please delete all of your pipelines before transferring the project.`                                          | The target organization is on the Free Plan and the project has pipelines.                      | Delete all pipelines.                                                                          |
+| `The target organization does not have access to high availability projects.`                                                                                    | The project uses high availability and the target organization doesn't have access to it.       | Choose a target organization with high availability access.                                    |
+| `The target organization has reached its maximum number of high availability projects`                                                                           | The transfer would put the target organization over its limit of high availability projects.    | Choose a different target organization, or remove a high availability project from the target. |
+| `Project transfers with active AWS PrivateLink Associations are not supported. Please remove all AWS PrivateLink from project associations before transferring.` | The project has AWS PrivateLink associations.                                                   | Remove the project's PrivateLink associations.                                                 |
+| `The source organization has access to Vector Buckets, which is not available in the target organization.`                                                       | The source organization has access to vector buckets and the target organization doesn't.       | Contact support to turn on vector buckets for the target organization.                         |
+| `Project is provisioned via Stripe. Please deprovision the project through Stripe before transferring it to another organization.`                               | The project is provisioned through Stripe Projects.                                             | See [Stripe Projects](#stripe-projects) before you remove anything in Stripe.                  |
+| `Your project is currently restoring, please wait until restoration is complete.`                                                                                | A restore is in progress.                                                                       | Wait until the restore finishes.                                                               |
+| `You are attempting to transfer a removed project.`                                                                                                              | The project was deleted.                                                                        | A deleted project can't be transferred.                                                        |
+| `One or more projects to be transferred are not part of source organization.`                                                                                    | The project already moved, or the page is out of date.                                          | Reload the page and check which organization owns the project.                                 |
+| `Project transfers are temporarily disabled, please try again later.`                                                                                            | Transfers are paused for all projects.                                                          | Try again later.                                                                               |
 
 ### The transfer button is missing or disabled
 
