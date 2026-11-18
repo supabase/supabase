@@ -77,7 +77,7 @@ These environments are always considered public because anyone can retrieve the 
 
 ### Postgres roles and Row Level Security
 
-Every key resolves to a built-in Postgres role, and that role is what your Row Level Security policies match on. Using a publishable key doesn't mean your user is anonymous: your application authenticates with the publishable key while your user authenticates separately through Supabase Auth with their own JWT.
+Every key resolves to a built-in [Postgres role](/docs/guides/database/postgres/roles), and that role is what your Row Level Security policies match on. Using a publishable key doesn't mean your user is anonymous: your application authenticates with the publishable key while your user authenticates separately through Supabase Auth with their own JWT.
 
 | Key             | User signed in through Supabase Auth | Postgres role   |
 | --------------- | ------------------------------------ | --------------- |
@@ -337,7 +337,7 @@ Exposing a secret key puts all of your project's data at risk. The rules below a
 - Use a separate secret key for each backend component. If one component leaks its key, you only rotate that one.
 - Rotate a leaked key as soon as you fix the cause of the leak. The browser block returns HTTP 401 Unauthorized, but an attacker can still use the key from other tools. For the steps, see [Rotate a leaked or compromised API key](/docs/guides/security/rotate-leaked-api-keys).
 
-Handle secret keys using [secure coding practices](https://owasp.org/www-project-secure-coding-practices-quick-reference-guide/stable-en/).
+Handle secret keys using [secure coding practices](https://owasp.github.io/www-project-secure-coding-practices-quick-reference-guide/stable-en/).
 
 ### Known limitations
 
