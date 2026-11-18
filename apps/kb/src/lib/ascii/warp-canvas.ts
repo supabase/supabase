@@ -447,7 +447,10 @@ export const startWarpCanvas = () => {
       bottom: Math.max(...covered.map((rect) => rect.bottom)) - origin.top + ANCHOR_MARGIN,
     }
     const throatBox = throat.getBoundingClientRect()
-    const throatY = (throatBox.top + throatBox.bottom) / 2 - origin.top + infall.getLift()
+    // the search can be mid-rise, so the throat uses its layout position without the current translate
+    const translateY =
+      Number.parseFloat(getComputedStyle(throat).translate.split(' ')[1] ?? '0') || 0
+    const throatY = (throatBox.top + throatBox.bottom) / 2 - origin.top - translateY
     baseShape = { cx: width / 2, rimY: throatY - 190, throatY, r0: THROAT_RADIUS }
     infall.measure({ origin, throat: { x: width / 2, y: throatY } })
     baseRadii = ringRadii({ r0: THROAT_RADIUS, maxRadius: Math.hypot(width, height * 3) })
@@ -463,6 +466,8 @@ export const startWarpCanvas = () => {
   const resizeObserver = new ResizeObserver(measure)
   resizeObserver.observe(host)
   resizeObserver.observe(anchor)
+  // a font swap moves the glyphs but does not resize the anchor, so the observer does not fire
+  document.fonts.addEventListener('loadingdone', measure)
   // a pinch zoom changes only the visual viewport scale, so the layers resize for it too
   visualViewport?.addEventListener('resize', measure)
 

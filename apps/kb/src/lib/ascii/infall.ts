@@ -39,7 +39,6 @@ interface InfallFrameParams {
 }
 
 interface Infall {
-  getLift: () => number
   measure: (params: InfallMeasureParams) => void
   advance: (dt: number) => void
   paint: (params: InfallFrameParams) => boolean
@@ -153,8 +152,6 @@ export const createInfall = ({ anchor }: CreateInfallParams): Infall => {
   const getSearch = () => anchor.querySelector<HTMLElement>('[data-warp-throat]')
 
   return {
-    // a risen search must not move the throat, so the canvas adds the lift back when it measures
-    getLift: () => (isConsumed ? lift : 0),
     measure: ({ origin, throat }) => {
       glyphs = measureInfall({ container: anchor, origin, throat })
       const copy = [...anchor.children]
