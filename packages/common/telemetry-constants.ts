@@ -1362,19 +1362,15 @@ export interface DocsSearchV2OpenedEvent {
  * term's text is sent only when it is a short letters-only keyword.
  */
 export interface SearchQueryProperties {
-  /** The trimmed search term, present only when `queryType` is `keyword`. */
-  query?: string
-  /** Length of the trimmed search term. */
-  queryLength: number
-  /** Number of whitespace-separated words in the trimmed search term. */
-  queryWordCount: number
   /**
-   * `keyword`: up to 4 letters-only parts of at most 16 letters each, joined by single spaces,
-   * hyphens or underscores, 40 characters at most. `conversational`: 4 or more words that are
-   * not a keyword, such as a question or pasted text. `other`: anything else, such as an
-   * identifier.
+   * The search term, present only when it is a keyword: up to 4 letters-only parts of at most
+   * 16 letters each, joined by single spaces, hyphens or underscores, 40 characters at most.
    */
-  queryType: 'keyword' | 'conversational' | 'other'
+  query?: string
+  /** Length of the search term, trimmed and with repeated whitespace collapsed. */
+  queryLength: number
+  /** Number of whitespace-separated words in the search term. */
+  queryWordCount: number
 }
 
 /**
@@ -3352,7 +3348,8 @@ export interface CommandMenuSearchSubmittedEvent {
   action: 'command_menu_search_submitted'
   properties: Omit<SearchQueryProperties, 'query'> & {
     /**
-     * Search term typed into the command menu input, present only when `queryType` is `keyword`
+     * Search term typed into the command menu input, present only when it is a keyword (see
+     * `SearchQueryProperties`)
      */
     value?: string
     /**

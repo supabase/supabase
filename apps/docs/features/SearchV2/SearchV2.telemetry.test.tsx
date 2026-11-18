@@ -315,7 +315,6 @@ describe('SearchV2 telemetry', () => {
           query: 'auth',
           queryLength: 4,
           queryWordCount: 1,
-          queryType: 'keyword',
           hasResults: true,
         },
       })
@@ -333,7 +332,6 @@ describe('SearchV2 telemetry', () => {
           query: 'zzz',
           queryLength: 3,
           queryWordCount: 1,
-          queryType: 'keyword',
           hasResults: false,
         },
       })
@@ -350,7 +348,6 @@ describe('SearchV2 telemetry', () => {
         properties: {
           queryLength: 18,
           queryWordCount: 1,
-          queryType: 'other',
           hasResults: false,
         },
       })
@@ -382,7 +379,6 @@ describe('SearchV2 telemetry', () => {
           query: 'auth',
           queryLength: 4,
           queryWordCount: 1,
-          queryType: 'keyword',
         },
       })
       // the link's own click handler closes the dialog before cmdk's onSelect reports the click
@@ -415,7 +411,6 @@ describe('SearchV2 telemetry', () => {
           query: 'auth',
           queryLength: 4,
           queryWordCount: 1,
-          queryType: 'keyword',
         },
       })
       expect(push).toHaveBeenCalledWith('/guides/auth')
@@ -442,7 +437,6 @@ describe('SearchV2 telemetry', () => {
           query: 'auth',
           queryLength: 4,
           queryWordCount: 1,
-          queryType: 'keyword',
         },
       })
     })

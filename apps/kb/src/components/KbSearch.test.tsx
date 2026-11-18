@@ -117,7 +117,6 @@ describe('KbSearch telemetry', () => {
       query: 'storage policies',
       queryLength: 16,
       queryWordCount: 2,
-      queryType: 'keyword',
       resultCount: 3,
       hasResults: true,
     })
@@ -153,7 +152,6 @@ describe('KbSearch telemetry', () => {
       query: 'zzz',
       queryLength: 3,
       queryWordCount: 1,
-      queryType: 'keyword',
       resultCount: 0,
       hasResults: false,
     })
@@ -165,7 +163,6 @@ describe('KbSearch telemetry', () => {
     expect(sentWith('kb_search_submitted')[0].custom_properties).toEqual({
       queryLength: 18,
       queryWordCount: 1,
-      queryType: 'other',
       resultCount: 0,
       hasResults: false,
     })

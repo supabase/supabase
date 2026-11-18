@@ -17,7 +17,6 @@ describe('describeSearchQuery', () => {
       query,
       queryLength: query.length,
       queryWordCount,
-      queryType: 'keyword',
     })
   })
 
@@ -37,22 +36,20 @@ describe('describeSearchQuery', () => {
 
     expect(description).not.toHaveProperty('query')
     expect(description.queryLength).toBe(rawQuery.length)
-    expect(description.queryType).toBe('other')
   })
 
-  it('labels a longer question as conversational and leaves out its text', () => {
+  it('leaves out the text of a longer question', () => {
     expect(describeSearchQuery('how do I set up the supabase mcp server')).toEqual({
       queryLength: 39,
       queryWordCount: 9,
-      queryType: 'conversational',
     })
   })
 
-  it('labels pasted multi-word text with a credential as conversational, without the text', () => {
-    const description = describeSearchQuery('connect fails with password=hunter2 on port 5432')
-
-    expect(description).not.toHaveProperty('query')
-    expect(description.queryType).toBe('conversational')
+  it('leaves out pasted multi-word text with a credential', () => {
+    expect(describeSearchQuery('connect fails with password=hunter2 on port 5432')).toEqual({
+      queryLength: 48,
+      queryWordCount: 7,
+    })
   })
 
   it('collapses repeated whitespace so a stray double space keeps a keyword a keyword', () => {
@@ -60,7 +57,6 @@ describe('describeSearchQuery', () => {
       query: 'auth policies',
       queryLength: 13,
       queryWordCount: 2,
-      queryType: 'keyword',
     })
   })
 
@@ -68,7 +64,6 @@ describe('describeSearchQuery', () => {
     expect(describeSearchQuery('   ')).toEqual({
       queryLength: 0,
       queryWordCount: 0,
-      queryType: 'other',
     })
   })
 })
