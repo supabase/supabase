@@ -109,5 +109,6 @@ const envVarsSet = () => {
 const webHandler = toWebHandler(nextHandler)
 
 export const Route = createFileRoute('/api/platform/projects/$ref/analytics/log-drains/$uuid')({
-  server: { handlers: { GET: webHandler, PUT: webHandler, DELETE: webHandler } },
+  // ANY routes unsupported methods to the handler so they get a 405 with an Allow header
+  server: { handlers: { GET: webHandler, PUT: webHandler, DELETE: webHandler, ANY: webHandler } },
 })

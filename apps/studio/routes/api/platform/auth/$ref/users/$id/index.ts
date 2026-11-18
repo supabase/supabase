@@ -41,5 +41,6 @@ const handleDelete = async (req: NextApiRequest, res: NextApiResponse) => {
 const webHandler = toWebHandler(nextHandler)
 
 export const Route = createFileRoute('/api/platform/auth/$ref/users/$id/')({
-  server: { handlers: { PATCH: webHandler, DELETE: webHandler } },
+  // ANY routes unsupported methods to the handler so they get a 405 with an Allow header
+  server: { handlers: { PATCH: webHandler, DELETE: webHandler, ANY: webHandler } },
 })
