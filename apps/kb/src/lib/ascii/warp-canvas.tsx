@@ -3,10 +3,10 @@ import { cn } from 'ui'
 import { toOpaque } from 'ui-patterns/GlyphLines'
 import { BEAM_ALPHA, hash, isBeamAt, rampGlyph } from 'ui-patterns/IsoShape/IsoShape.glyphs'
 
-import { clamp, drawStep, GLYPH_PITCH, phase, type PixelRect } from '../lib/ascii/field'
-import { fillGlyphPath, GLYPH_FONT } from '../lib/ascii/glyph-path'
-import { createInfall } from '../lib/ascii/infall'
-import { createLayer, sizeLayers } from '../lib/ascii/layer'
+import { clamp, drawStep, GLYPH_PITCH, phase, type PixelRect } from './field'
+import { fillGlyphPath, GLYPH_FONT } from './glyph-path'
+import { createInfall } from './infall'
+import { createLayer, sizeLayers } from './layer'
 import {
   easeInOutCubic,
   easeOutCubic,
@@ -18,8 +18,8 @@ import {
   type WarpCell,
   type WarpPoint,
   type WarpShape,
-} from '../lib/ascii/warp'
-import { ColorProbes, observeTheme, readProbeColor } from './ColorProbes'
+} from './warp'
+import { ColorProbes, observeTheme, readProbeColor } from '../../components/ColorProbes'
 
 export interface WarpCanvasProps {
   anchorRef: RefObject<HTMLElement | null>

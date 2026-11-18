@@ -15,12 +15,12 @@ import {
   ISO_SHAPES,
 } from 'ui-patterns/IsoShape/IsoShape.shapes'
 
-import { clamp } from '../lib/ascii/field'
-import { circlePoints, fillGlyphPath, GLYPH_FONT } from '../lib/ascii/glyph-path'
-import { sizeLayers } from '../lib/ascii/layer'
-import { easeInOutCubic } from '../lib/ascii/warp'
-import type { Topic } from '../lib/topics'
-import { ColorProbes, observeTheme, readProbeColor } from './ColorProbes'
+import { clamp } from './field'
+import { circlePoints, fillGlyphPath, GLYPH_FONT } from './glyph-path'
+import { sizeLayers } from './layer'
+import { easeInOutCubic } from './warp'
+import type { Topic } from '../topics'
+import { ColorProbes, observeTheme, readProbeColor } from '../../components/ColorProbes'
 
 export interface TopicShapeProps {
   topic: Topic

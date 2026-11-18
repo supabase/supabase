@@ -2,9 +2,9 @@ import { useCallback } from 'react'
 import { cn } from 'ui'
 import { toOpaque } from 'ui-patterns/GlyphLines'
 
-import { fillGlyphPath, GLYPH_FONT } from '../lib/ascii/glyph-path'
-import { sizeLayers } from '../lib/ascii/layer'
-import { observeTheme } from './ColorProbes'
+import { fillGlyphPath, GLYPH_FONT } from './glyph-path'
+import { sizeLayers } from './layer'
+import { observeTheme } from '../../components/ColorProbes'
 
 export interface FrameGlyphsProps {
   text: string

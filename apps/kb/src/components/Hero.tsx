@@ -2,14 +2,14 @@ import { Search } from 'lucide-react'
 import { useRef, useSyncExternalStore, type ReactNode } from 'react'
 import { cn, KeyboardShortcut } from 'ui'
 
+import { FrameGlyphs } from '../lib/ascii/frame-glyphs'
+import { TopicShape } from '../lib/ascii/topic-shape'
+import { WarpCanvas } from '../lib/ascii/warp-canvas'
 import type { Topic } from '../lib/topics'
 import { AsciiHoverText } from './AsciiHoverText'
-import { FrameGlyphs } from './FrameGlyphs'
 import { HeroGrid } from './HeroGrid'
 import { InfallText } from './InfallText'
 import { openKbSearch } from './KbSearch'
-import { TopicShape } from './TopicShape'
-import { WarpCanvas } from './WarpCanvas'
 
 export interface HeroProps {
   title: string
