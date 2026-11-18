@@ -263,12 +263,7 @@ export const OAuthAppsAuthorizeScreen = ({
     return <ApiAuthorizationInvalidScreen missingParameters={['auth_id']} />
   }
 
-  if (
-    isPendingRequest ||
-    isPendingIdentity ||
-    isPendingMemberOrg ||
-    (isPendingInitialProjects && initialRefs.length > 0)
-  ) {
+  if (isPendingRequest) {
     return <ApiAuthorizationLoadingScreen />
   }
 
@@ -344,6 +339,15 @@ export const OAuthAppsAuthorizeScreen = ({
         </div>
       </InterstitialLayout>
     )
+  }
+
+  if (
+    isPendingRequest ||
+    isPendingIdentity ||
+    isPendingMemberOrg ||
+    (isPendingInitialProjects && initialRefs.length > 0)
+  ) {
+    return <ApiAuthorizationLoadingScreen />
   }
 
   if (approveRedirect) {
