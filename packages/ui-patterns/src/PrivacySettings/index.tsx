@@ -6,6 +6,7 @@ import Link from 'next/link'
 import { PropsWithChildren, useEffect, useState } from 'react'
 import {
   Button,
+  cn,
   Dialog,
   DialogContent,
   DialogFooter,
@@ -32,6 +33,7 @@ interface PrivacySettingsProps {
 
 export const PrivacySettings = ({
   children,
+  className,
   ...props
 }: PropsWithChildren<PrivacySettingsProps>) => {
   const [isOpen, setIsOpen] = useState(false)
@@ -60,7 +62,11 @@ export const PrivacySettings = ({
   return (
     <Dialog open={isOpen} onOpenChange={(open) => setIsOpen(open)}>
       <DialogTrigger asChild>
-        <button {...props} onClick={() => setIsOpen(true)}>
+        <button
+          {...props}
+          className={cn('cursor-pointer', className)}
+          onClick={() => setIsOpen(true)}
+        >
           {children}
         </button>
       </DialogTrigger>
