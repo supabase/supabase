@@ -61,4 +61,3 @@ export const NoDataPlaceholder = ({
     </div>
   )
 }
-export default NoDataPlaceholder

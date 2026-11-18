@@ -29,4 +29,3 @@ export const ReportHeader = ({ title, showDatabaseSelector }: ReportHeaderProps)
     </div>
   )
 }
-export default ReportHeader
