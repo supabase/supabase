@@ -243,7 +243,7 @@ var channel = supabase.Realtime.Channel("room:lobby:messages");
 
 ### 4. Set up authorization
 
-Since we're using a private channel, you need to create a basic RLS policy on the `realtime.messages` table to allow authenticated users to connect. Row Level Security (RLS) policies control who can access your Realtime channels based on user authentication and custom rules:
+Since we're using a private channel, you need to create a basic RLS policy on the `realtime.messages` table to allow authenticated users to connect. [Row Level Security](/docs/guides/database/postgres/row-level-security) (RLS) policies control who can access your Realtime channels based on user authentication and custom rules:
 
 ```sql
 -- Allow authenticated users to receive broadcasts

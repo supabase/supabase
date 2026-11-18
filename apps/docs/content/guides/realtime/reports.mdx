@@ -278,7 +278,7 @@ height={625}
 
 ## (Write) Private Channel Subscription RLS Execution Time
 
-The (Write)Private Channel Subscription RLS Execution Time report helps you monitor the median time it takes to execute Row Level Security (RLS) policies when users publish messages to private channels. This metric is essential for understanding how RLS policy complexity impacts message publishing latency and overall broadcast performance.
+The (Write)Private Channel Subscription RLS Execution Time report helps you monitor the median time it takes to execute [Row Level Security](/docs/guides/database/postgres/row-level-security) (RLS) policies when users publish messages to private channels. This metric is essential for understanding how RLS policy complexity impacts message publishing latency and overall broadcast performance.
 
 The report displays the median RLS execution time in milliseconds, showing how long it takes to validate user permissions when publishing to private channels throughout the selected time period. When a user sends a broadcast message to a private channel, Realtime checks RLS policies on the `realtime.messages` table to determine if the user has write (INSERT) access. This authorization check happens for the first message sent and then it's cached. Complex RLS policies with joins, function calls, or missing indexes can significantly increase first message publishing latency.
 
