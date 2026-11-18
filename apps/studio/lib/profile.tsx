@@ -15,6 +15,7 @@ import { toast } from 'sonner'
 
 import { useSignOut } from './auth'
 import { getGitHubProfileImgUrl } from './github'
+import { CONFLICT_REFETCH_DELAYS_MS } from './profile.constants'
 import { organizationKeys } from '@/data/organizations/keys'
 import { permissionKeys } from '@/data/permissions/keys'
 import { usePermissionsQuery } from '@/data/permissions/permissions-query'
@@ -55,9 +56,25 @@ export const ProfileProvider = ({ children }: PropsWithChildren<{}>) => {
   // time the refetch returns "not found". Only a 409 latches (not the request itself), so a lagging
   // read replica after a successful create can still recover through another create + 409 + refetch.
   const conflictUserIdRef = useRef<string | undefined>(undefined)
-  // Set when the conflict can't be recovered from, to sign the user out and explain on /sign-in
-  const [isConflictSignOutPending, setIsConflictSignOutPending] = useState(false)
+  // The API's message, set when the conflict can't be recovered from: the user is signed out and told why
+  const [conflictSignOutMessage, setConflictSignOutMessage] = useState<string>()
   const isSigningOutForConflictRef = useRef(false)
+
+  const refetchProfileAfterConflict = async (message: string) => {
+    await queryClient.invalidateQueries({ queryKey: profileKeys.profile() })
+
+    for (const delayMs of CONFLICT_REFETCH_DELAYS_MS) {
+      if (queryClient.getQueryData(profileKeys.profile())) break
+      await new Promise((resolve) => setTimeout(resolve, delayMs))
+      await queryClient.refetchQueries({ queryKey: profileKeys.profile(), exact: true })
+    }
+
+    if (queryClient.getQueryData(profileKeys.profile())) {
+      conflictUserIdRef.current = undefined
+      return
+    }
+    setConflictSignOutMessage(message)
+  }
 
   const track = useTrack()
   const { mutate: createProfile, isPending: isCreatingProfile } = useProfileCreateMutation({
@@ -80,8 +97,10 @@ export const ProfileProvider = ({ children }: PropsWithChildren<{}>) => {
         // elsewhere), so the earlier "not found" is stale. Refetch rather than leaving the
         // user stuck on the cached error. Sentry capture is kept to monitor how often this occurs.
         Sentry.captureMessage('Profile already exists: ' + error.message)
-        conflictUserIdRef.current = user?.id
-        queryClient.invalidateQueries({ queryKey: profileKeys.profile() })
+        if (user?.id) {
+          conflictUserIdRef.current = user.id
+          void refetchProfileAfterConflict(error.message)
+        }
         queryClient.invalidateQueries({ queryKey: organizationKeys.list() })
         queryClient.invalidateQueries({ queryKey: permissionKeys.list() })
       } else {
@@ -106,31 +125,27 @@ export const ProfileProvider = ({ children }: PropsWithChildren<{}>) => {
   useEffect(() => {
     if (!isProfileNotFound || !user?.id) return
 
-    if (conflictUserIdRef.current === user.id) {
-      // Creation returned a 409 and the profile still can't be found (e.g. the email conflicts
-      // with another account), so retrying won't help. The user can't do anything without a
-      // profile, so send them back to sign in with the reason.
-      setIsConflictSignOutPending(true)
-      return
-    }
+    // A 409 is being recovered from (see refetchProfileAfterConflict), so don't create again
+    if (conflictUserIdRef.current === user.id) return
 
     createProfile()
   }, [isProfileNotFound, user?.id, createProfile])
 
   // Sign out before going to /sign-in, which would otherwise send a signed-in user back into the app
   useEffect(() => {
-    if (!isConflictSignOutPending || isSigningOutForConflictRef.current) return
+    if (conflictSignOutMessage === undefined || isSigningOutForConflictRef.current) return
 
     isSigningOutForConflictRef.current = true
+    toast.error(conflictSignOutMessage, { id: 'profile-create-conflict', duration: Infinity })
     signOut()
-      .then(() => router.push('/sign-in?reason=profile_conflict'))
+      .then(() => router.push('/sign-in'))
       .finally(() => {
         // A fresh sign-in gets a fresh attempt, rather than reusing this conflict
         conflictUserIdRef.current = undefined
         isSigningOutForConflictRef.current = false
-        setIsConflictSignOutPending(false)
+        setConflictSignOutMessage(undefined)
       })
-  }, [isConflictSignOutPending, signOut, router])
+  }, [conflictSignOutMessage, signOut, router])
 
   // [Alaister] If the user has a bad auth token, auth-js won't know about it
   // and will think the user is authenticated. Since fetching the profile happens

@@ -4,7 +4,6 @@ import { Button } from 'ui'
 
 import { SignInForm } from '@/components/interfaces/SignIn/SignInForm'
 import { SignInOptions } from '@/components/interfaces/SignIn/SignInOptions'
-import { SignInRedirectMessage } from '@/components/interfaces/SignIn/SignInRedirectMessage'
 import { SignInWithExternalProvider } from '@/components/interfaces/SignIn/SignInWithExternalProvider'
 import { AuthenticationLayout } from '@/components/layouts/AuthenticationLayout'
 import { SignInLayout } from '@/components/layouts/SignInLayout/SignInLayout'
@@ -38,7 +37,6 @@ function SignIn() {
         inboundFlow="sign-in"
         hasStatusBanner
       >
-        <SignInRedirectMessage />
         <SignInPage />
       </SignInLayout>
     </AuthenticationLayout>

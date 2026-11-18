@@ -27,6 +27,7 @@ const { mockPush, mockSignOut } = vi.hoisted(() => ({
 }))
 vi.mock('next/router', () => ({ useRouter: () => ({ push: mockPush }) }))
 vi.mock('./auth', () => ({ useSignOut: () => mockSignOut }))
+vi.mock('./profile.constants', () => ({ CONFLICT_REFETCH_DELAYS_MS: [10, 10, 10] }))
 vi.mock('sonner', () => ({ toast: { error: vi.fn(), success: vi.fn() } }))
 
 const profileResponse = (username?: string) =>
@@ -123,14 +124,31 @@ describe('ProfileProvider profile creation', () => {
 
     renderProvider()
 
-    // Initial GET, then the refetch triggered by the 409
-    await waitFor(() => expect(getSpy).toHaveBeenCalledTimes(2))
-    await waitFor(() => expect(mockPush).toHaveBeenCalledWith('/sign-in?reason=profile_conflict'))
+    await waitFor(() => expect(mockPush).toHaveBeenCalledWith('/sign-in'))
+    // The API's own message is shown, not one written by the dashboard
+    expect(toast.error).toHaveBeenCalledWith(conflictMessage, expect.anything())
     expect(mockSignOut).toHaveBeenCalledTimes(1)
     expect(mockPush).toHaveBeenCalledTimes(1)
     await new Promise((resolve) => setTimeout(resolve, 300))
     expect(postSpy).toHaveBeenCalledTimes(1)
-    expect(getSpy).toHaveBeenCalledTimes(2)
+    // Initial GET, the refetch after the 409, then one per backoff delay
+    expect(getSpy).toHaveBeenCalledTimes(5)
+  })
+
+  it('does not sign out when the profile shows up on a later refetch after a 409', async () => {
+    // Initial GET, the refetch after the 409 and the first backoff refetch are all stale
+    mockProfileGet(['not-found', 'not-found', 'not-found', 'found'])
+    addAPIMock({
+      method: 'post',
+      path: '/platform/profile',
+      response: () => errorResponse('Profile already exists', 409),
+    })
+
+    renderProvider()
+
+    await waitFor(() => expect(screen.getByText('profile:new-user')).toBeInTheDocument())
+    expect(mockSignOut).not.toHaveBeenCalled()
+    expect(toast.error).not.toHaveBeenCalled()
   })
 
   it('recovers when the profile is still not found after a successful create', async () => {
