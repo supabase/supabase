@@ -128,22 +128,22 @@ export const ProjectMultiSelect = ({
               </MultiSelectorList>
             </MultiSelectorContent>
           </MultiSelector>
-
-          <div id="projects-description" aria-live="polite">
-            {hasFlagged && (
-              <p className="text-xs text-destructive">
-                {`${flaggedRefs.length} of ${selectedProjects.length} ${selectedProjects.length === 1 ? 'project' : 'projects'} unavailable`}
-              </p>
-            )}
-            {atCap && (
-              <p className="text-xs text-foreground-lighter">
-                Maximum reached. Deselect a project to choose a different one.
-              </p>
-            )}
-            {error && <p className="text-xs text-destructive">{error}</p>}
-          </div>
         </>
       )}
+
+      <div id="projects-description" aria-live="polite">
+        {hasFlagged && (
+          <p className="text-xs text-destructive">
+            {`${flaggedRefs.length} of ${selectedProjects.length} ${selectedProjects.length === 1 ? 'project' : 'projects'} unavailable`}
+          </p>
+        )}
+        {atCap && (
+          <p className="text-xs text-foreground-lighter">
+            Maximum reached. Deselect a project to choose a different one.
+          </p>
+        )}
+        {error && <p className="text-xs text-destructive">{error}</p>}
+      </div>
     </div>
   )
 }
