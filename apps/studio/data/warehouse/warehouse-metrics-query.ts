@@ -68,8 +68,10 @@ export const warehouseMetricsQueryOptions = ({
       attributes.length <= MAX_ATTRIBUTES,
     retry: (failureCount: number, error: WarehouseMetricsError) =>
       shouldRetryWarehouseMetrics(failureCount, error),
-    retryDelay: (attemptIndex: number) =>
-      Math.min(1000 * 2 ** attemptIndex, 8000) + Math.random() * 500,
+    retryDelay: (attemptIndex: number, error: WarehouseMetricsError) => {
+      if (error.retryAfter !== undefined) return error.retryAfter * 1000
+      return Math.min(1000 * 2 ** attemptIndex, 8000) + Math.random() * 500
+    },
     refetchOnWindowFocus: false,
   })
 }
