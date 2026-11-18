@@ -34,28 +34,35 @@ const applyAndTrackMigrationsQuery = (query: string, name?: string) => {
 
     -- track statements in history table
     -- Versions have second precision, so a migration applied within the same second as
-    -- the previous one would reuse its version and fail on the primary key. In that case
-    -- use the second after the latest version, and lock the table so concurrent migrations
-    -- don't race. Only a latest version at or after the current time is parsed, so older
-    -- versions that aren't valid timestamps (e.g. 00000000000000_init) are never parsed.
+    -- the previous one would reuse its version and fail on the primary key. Use the first
+    -- free second from now instead, and lock the table so concurrent migrations don't
+    -- race. Existing versions are only compared, never parsed, so rows that aren't valid
+    -- timestamps (e.g. 00000000000000_init) can't make the insert fail. If no second in
+    -- the next hour is free, the version is null and the not-null constraint rolls back
+    -- the migration instead of applying it untracked.
     lock table supabase_migrations.schema_migrations in share row exclusive mode;
     insert into supabase_migrations.schema_migrations (version, name, statements)
-    select
-      to_char(
-        case
-          when latest.version >= to_char(current_timestamp, 'YYYYMMDDHH24MISS')
-            then to_timestamp(latest.version, 'YYYYMMDDHH24MISS') + interval '1 second'
-          else current_timestamp
-        end,
-        'YYYYMMDDHH24MISS'
+    values (
+      (
+        select candidate.version
+        from generate_series(0, 3600) as offset_seconds,
+          lateral (
+            select to_char(
+              current_timestamp + make_interval(secs => offset_seconds),
+              'YYYYMMDDHH24MISS'
+            ) as version
+          ) as candidate
+        where not exists (
+          select 1
+          from supabase_migrations.schema_migrations as existing
+          where existing.version = candidate.version
+        )
+        order by offset_seconds
+        limit 1
       ),
       ${quote(name)},
       array[${quote(query)}]
-    from (
-      select max(version) as version
-      from supabase_migrations.schema_migrations
-      where version ~ '^[0-9]{14}$'
-    ) as latest;
+    );
 
     commit;
   `
