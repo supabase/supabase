@@ -16,7 +16,7 @@ Keycloak OAuth consists of five broad steps:
 
 - Create a new client in your specified Keycloak realm.
 - Obtain the `issuer` from the "OpenID Endpoint Configuration". This will be used as the `Keycloak URL`.
-- Ensure that the new client has the "Client Protocol" set to `openid-connect` and the "Access Type" is set to "confidential".
+- Ensure that the new client has the **Client type** set to **OpenID Connect**, and that under **Capability config**, **Client authentication** and **Standard flow** are on.
 - The `Client ID` of the client created will be used as the `client id`.
 - Obtain the `Secret` from the credentials tab which will be used as the `client secret`.
 - Add the callback URL of your application to your allowlist.
@@ -43,11 +43,10 @@ The "Client ID" of the created client will serve as the `client_id` when you mak
 
 After you've created the client successfully, ensure that you set the following settings:
 
-1. The "Client Protocol" should be set to `openid-connect`.
-2. The "Access Type" should be set to "confidential".
-3. The "Valid Redirect URIs" should be set to: `https://<project-ref>.supabase.co/auth/v1/callback`.
+1. The **Client type** should be set to **OpenID Connect**.
+2. In **Capability config**, turn on **Client authentication** and leave **Standard flow** on.
+3. The **Valid redirect URIs** should be set to: `https://<project-ref>.supabase.co/auth/v1/callback`.
 
-![Obtain the client id, set the client protocol and access type](/docs/img/guides/auth-keycloak/keycloak-client-id.png)
 ![Set redirect uri](/docs/img/guides/auth-keycloak/keycloak-redirect-uri.png)
 
 ## Obtain the client secret
