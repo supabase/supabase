@@ -400,6 +400,26 @@ describe('tagBrowserTranslationError', () => {
     expect(event.tags?.page_translated).toBe(false)
   })
 
+  it('detects a translated page when no answer is passed in', () => {
+    vi.stubGlobal('document', {
+      documentElement: { classList: { contains: (cls: string) => cls === 'translated-ltr' } },
+      querySelector: () => null,
+    })
+    try {
+      const event = domError()
+      tagBrowserTranslationError(event)
+      expect(event.tags?.page_translated).toBe(true)
+    } finally {
+      vi.unstubAllGlobals()
+    }
+  })
+
+  it('uses the default rate when sample_rate is explicitly undefined', () => {
+    const event = { ...domError(), tags: { sample_rate: undefined } }
+    tagBrowserTranslationError(event, false)
+    expect(event.tags.sample_rate).toBe(0.05)
+  })
+
   it('keeps tags that are already set', () => {
     const event = { ...domError(), tags: { globalErrorBoundary: true, sample_rate: 1 } }
     tagBrowserTranslationError(event, false)

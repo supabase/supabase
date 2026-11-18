@@ -133,14 +133,15 @@ export function shouldDropForSampleRate(
 /**
  * Tags browser-translation DOM errors (insert/remove node crashes) so they are sampled at
  * `BROWSER_TRANSLATION_SAMPLE_RATE` by `shouldDropForSampleRate` and easy to filter in Sentry.
- * `page_translated` is best-effort and only looked up for matching events. Leaves a `sample_rate`
- * that is already set untouched.
+ * `page_translated` is best-effort and only looked up for matching events. Keeps a `sample_rate`
+ * that is already set, such as an explicit `1`.
  */
 export function tagBrowserTranslationError(event: Sentry.Event, pageTranslated?: boolean): void {
   if (!isBrowserTranslationDomError(event)) return
   event.tags = {
-    sample_rate: BROWSER_TRANSLATION_SAMPLE_RATE,
     ...event.tags,
+    // After the spread: an explicit `sample_rate: undefined` must not replace the default
+    sample_rate: event.tags?.sample_rate ?? BROWSER_TRANSLATION_SAMPLE_RATE,
     browser_translation: true,
     page_translated: pageTranslated ?? isPageTranslated(),
   }
