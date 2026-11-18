@@ -1,8 +1,8 @@
-import fg from 'fast-glob'
 import { readFileSync } from 'fs'
+import { join } from 'path'
+import fg from 'fast-glob'
 import { mdxToMarkdown } from 'mdast-util-mdx'
 import { toMarkdown } from 'mdast-util-to-markdown'
-import { join } from 'path'
 import { describe, expect, it } from 'vitest'
 
 import { codeTabsRemark } from './CodeTabs'

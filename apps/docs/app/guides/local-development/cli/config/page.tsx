@@ -7,13 +7,13 @@ import {
 import { ConfigCodeTabs } from '~/features/directives/ConfigFormats.components'
 import { GuideTemplate, newEditLink } from '~/features/docs/GuidesMdx.template'
 import { genGuideMeta } from '~/features/docs/GuidesMdx.utils'
+import { CodeBlock } from '~/features/ui/CodeBlock/CodeBlock'
+import { TabPanel } from '~/features/ui/Tabs'
 import type { Parameter } from '~/lib/refGenerator/refTypes'
 import specFile from '~/spec/cli_v1_config.yaml' with { type: 'yml' }
 import ReactMarkdown from 'react-markdown'
 import { Heading, Table } from 'ui'
 import { Admonition } from 'ui-patterns/Admonition'
-import { TabPanel } from '~/features/ui/Tabs'
-import { CodeBlock } from '~/features/ui/CodeBlock/CodeBlock'
 
 const meta = {
   title: 'Supabase CLI config',
