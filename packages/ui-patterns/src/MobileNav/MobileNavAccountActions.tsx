@@ -7,8 +7,6 @@ import { buttonVariants, cn } from 'ui'
 
 export interface MobileNavAccountActionsProps {
   isLoggedIn: boolean
-  onSignInClick?: () => void
-  onSignUpClick?: () => void
   className?: string
 }
 
@@ -17,8 +15,6 @@ const accountLinkClassName = (variant: 'default' | 'primary') =>
 
 export const MobileNavAccountActions = ({
   isLoggedIn,
-  onSignInClick,
-  onSignUpClick,
   className,
 }: MobileNavAccountActionsProps) => (
   <div className={cn('flex items-stretch gap-4', className)}>
@@ -28,18 +24,10 @@ export const MobileNavAccountActions = ({
       </a>
     ) : (
       <>
-        <a
-          href={DASHBOARD_SIGN_IN_URL}
-          onClick={onSignInClick}
-          className={accountLinkClassName('default')}
-        >
+        <a href={DASHBOARD_SIGN_IN_URL} className={accountLinkClassName('default')}>
           Sign in
         </a>
-        <a
-          href={DASHBOARD_SIGN_UP_URL}
-          onClick={onSignUpClick}
-          className={accountLinkClassName('primary')}
-        >
+        <a href={DASHBOARD_SIGN_UP_URL} className={accountLinkClassName('primary')}>
           Start your project
         </a>
       </>
