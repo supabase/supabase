@@ -141,7 +141,7 @@ MCP clients authenticate through OAuth 2.1, with Supabase Auth as the authorizat
 2. **Enable dynamic client registration.** MCP clients register themselves before starting an OAuth flow. Enable it under **Authentication** > **OAuth Server** in the dashboard. It lets any compatible client register, so review registered clients and let users revoke grants.
 3. **Host a consent screen.** Auth redirects users to your frontend to approve the client. The [OAuth Consent block](/library/docs/nextjs/oauth-consent) in the Supabase Library installs a ready-made `/oauth/consent` route for Next.js, React, React Router, and TanStack Start. Set the Auth **Site URL** to the origin that serves it.
 
-For local development, the same settings live in `supabase/config.toml`:
+For local development, the same settings live in your config file (`supabase/config.toml` or `supabase/config.jsonc`):
 
 ```toml name=supabase/config.toml
 [auth]
@@ -319,7 +319,7 @@ Run `/mcp` in Claude Code and authenticate. The same sign-in and consent flow ru
 
 ### Step 4: Deploy
 
-Link your project, push the Auth settings from `config.toml`, and deploy the function:
+Link your project, push the Auth settings from your config file, and deploy the function:
 
 ```bash
 supabase link --project-ref <your-project-ref>

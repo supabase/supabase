@@ -1892,7 +1892,7 @@ parameters:
     required: true
     description: |
       The project reference ID for a specific persistent Supabase branch.
-      This ID is used to configure branch-specific settings in your config.toml file for branches deployments.
+      This ID is used to configure branch-specific settings in your config file for branches deployments.
       All other configuration options available in the root config are also supported in the remotes block.
       For example, you can specify branch-specific database settings like so:
     usage: |

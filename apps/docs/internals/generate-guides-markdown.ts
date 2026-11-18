@@ -13,6 +13,7 @@ import { mdxjs } from 'micromark-extension-mdxjs'
 import { parse as parseToml } from 'smol-toml'
 import { mcpConfigPanelMarkdown as McpConfigPanel } from 'ui-patterns/McpUrlBuilder/McpConfigPanel.md'
 
+import { configFormatsRemark } from '~/features/directives/ConfigFormats'
 import { stripHeadingCustomIds } from './helpers'
 import { addBaseUrlPrefix, getInternalLinkBaseUrl, withDocsBasePath } from './internal-links'
 import { Admonition } from './markdown-schema/Admonition'
@@ -222,6 +223,7 @@ function parseFrontmatter(raw: string, frontmatter: FrontmatterFormat) {
 async function transformBody(content: string, data: Record<string, unknown>): Promise<string> {
   const tree = parseMdx(content)
   await inlinePartials(tree)
+  await configFormatsRemark()(tree as Root)
   addBaseUrlPrefix(tree)
   stripHeadingCustomIds(tree)
   applySchema(tree, SCHEMA)

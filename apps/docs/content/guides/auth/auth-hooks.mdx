@@ -146,11 +146,11 @@ Let us develop a Hook locally and then deploy it to the cloud. As a recap, hereâ
 | MFA Verification Attempt      | `mfa_verification_attempt`      | Each time a user tries to verify an MFA factor.    | Returns a decision on whether to reject the attempt and future ones, or to allow the user to keep trying. |
 | Password Verification Attempt | `password_verification_attempt` | Each time a user tries to sign in with a password. | Return a decision whether to allow the user to reject the attempt, or to allow the user to keep trying.   |
 
-Edit `config.toml` to set up the Auth Hook locally.
+Edit your config file (`supabase/config.toml` or `supabase/config.jsonc`) to set up the Auth Hook locally.
 
 <Admonition type="note">
   
-  The hook name used in the `config.toml` must correspond to one of the available Hooks listed above. For example, the Send SMS hook would be configured as: `[auth.hook.send_sms]`
+  The hook name used in the config file must correspond to one of the available Hooks listed above. For example, the Send SMS hook is configured under `auth.hook.send_sms`.
 
 </Admonition>
 
@@ -162,13 +162,12 @@ Edit `config.toml` to set up the Auth Hook locally.
   queryGroup="language"
 >
 <TabPanel id="sql" label="SQL">
-Modify the `auth.hook.<hook_name>` field and set `uri` to a value of `pg-functions://postgres/<schema>/<function_name>`
+Modify the `auth.hook.<hook_name>` field and set `uri` to a value of `pg-functions://postgres/<schema>/<function_name>`. For example, for the Custom Access Token hook:
 
-```
-[auth.hook.<hook_name>]
+```toml name=supabase/config.toml
+[auth.hook.custom_access_token]
 enabled = true
-uri = "pg-functions://...."
-
+uri = "pg-functions://postgres/public/custom_access_token_hook"
 ```
 
 You need to assign additional permissions so that Supabase Auth can access the hook as well as the tables it interacts with.

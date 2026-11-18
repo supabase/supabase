@@ -1,12 +1,12 @@
 ---
 id: 'managing-config'
 title: 'Managing config and secrets'
-description: 'Managing local configuration using config.toml.'
+description: 'Managing local configuration using your config file.'
 ---
 
-The Supabase CLI uses a `config.toml` file to manage local configuration. This file is located in the `supabase` directory of your project.
+The Supabase CLI uses a config file to manage local configuration. The file is `supabase/config.toml` or `supabase/config.jsonc`.
 
-With Supabase CLI 3.1.0 or later, you can use `supabase/config.jsonc` instead. To switch formats, see [Config file formats](/docs/guides/local-development/cli/config-formats).
+`supabase init` creates `config.toml`. With Supabase CLI 3.1.0 or later, you can use `config.jsonc` instead. To switch formats, see [Config file formats](/docs/guides/local-development/cli/config-formats).
 
 ## Config reference
 
@@ -14,7 +14,7 @@ The `config.toml` file is automatically created when you run `supabase init`.
 
 There are a wide variety of options available, which can be found in the [CLI Config Reference](/docs/guides/local-development/cli/config).
 
-For example, to enable the "Apple" OAuth provider for local development, you can append the following information to `config.toml`:
+For example, to enable the "Apple" OAuth provider for local development, you can append the following information to your config file:
 
 ```toml name=supabase/config.toml
 [auth.external.apple]
@@ -24,9 +24,9 @@ secret = ""
 redirect_uri = "" # Overrides the default auth redirectUrl.
 ```
 
-## Using secrets inside config.toml
+## Using secrets inside your config file [#using-secrets-inside-configtoml]
 
-You can reference environment variables within the `config.toml` file using the `env()` function. This will detect any values stored in an `.env` file at the root of your project directory. This is particularly useful for storing sensitive information like API keys, and any other values that you don't want to check into version control.
+You can reference environment variables within your config file using the `env()` function. This will detect any values stored in an `.env` file at the root of your project directory. This is particularly useful for storing sensitive information like API keys, and any other values that you don't want to check into version control.
 
 ```
 .
@@ -49,7 +49,7 @@ GITHUB_CLIENT_ID=""
 GITHUB_SECRET=""
 ```
 
-Then you would reference them inside of our `config.toml` like this:
+Then you would reference them inside of your config file like this:
 
 ```toml name=supabase/config.toml
 [auth.external.github]
@@ -65,6 +65,6 @@ For more advanced secrets management workflows, including:
 
 - **Using dotenvx for encrypted secrets**: Learn how to securely manage environment variables across different branches and environments
 - **Branch-specific secrets**: Understand how to manage secrets for different deployment environments
-- **Encrypted configuration values**: Use encrypted values directly in your `config.toml`
+- **Encrypted configuration values**: Use encrypted values directly in your config file
 
 See the [Managing secrets for branches](/docs/guides/deployment/branching/configuration#managing-secrets-for-branches) section in our branching documentation, or check out the [dotenvx example repository](https://github.com/supabase/supabase/blob/master/examples/slack-clone/nextjs-slack-clone-dotenvx/README.md) for a complete implementation.

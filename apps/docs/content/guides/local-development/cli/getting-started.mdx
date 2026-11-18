@@ -24,7 +24,7 @@ With two commands, you can set up and start a new local project:
 
 How you run a CLI command depends on how you install it. Homebrew, Scoop, and the Linux packages give you a global `supabase` command. Installing with npm, pnpm, yarn, or bun adds the CLI to one project instead, so you run it through your package runner as `npx supabase <command>`. This page writes every example as `supabase <command>`.
 
-The CLI is project-scoped either way. Most commands, including `start`, expect a directory that `supabase init` has already set up with a `supabase` directory and a `config.toml`. Run `init` first, then the rest from the same directory.
+The CLI is project-scoped either way. Most commands, including `start`, expect a directory that `supabase init` has already set up with a `supabase` directory and a config file. Run `init` first, then the rest from the same directory.
 
 </Admonition>
 
@@ -270,7 +270,7 @@ When you finish working, stop the stack. Stopping doesn't reset your local datab
 supabase stop
 ```
 
-With the default ports, `supabase start` runs one local project per machine, because every project's `config.toml` uses the same ports. To run several local projects or git worktrees at the same time, see [Running multiple local projects](/docs/guides/local-development/running-multiple-local-projects).
+With the default ports, `supabase start` runs one local project per machine, because every project's config file uses the same ports. To run several local projects or git worktrees at the same time, see [Running multiple local projects](/docs/guides/local-development/running-multiple-local-projects).
 
 ## Connect to a hosted project
 

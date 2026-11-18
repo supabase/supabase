@@ -17,7 +17,7 @@ Because the schema files are the source of truth, make every change by editing t
 
 <$Partial path="diff_engine_check.mdx" />
 
-This guide describes the workflow on `pg-delta`. The `db schema declarative` commands require it and won't run on the legacy engine. For a single run of `sync` or `generate` without changing `config.toml`, pass the `--experimental` flag. `db pull --declarative` runs regardless of the `[experimental.pgdelta]` setting, but only use it on `pg-delta`. On the legacy engine it leaves `db diff` unable to run. If your project is still on `migra`, follow [Declarative schemas on the legacy `migra` engine](#declarative-schemas-on-the-legacy-migra-engine) instead.
+This guide describes the workflow on `pg-delta`. The `db schema declarative` commands require it and won't run on the legacy engine. For a single run of `sync` or `generate` without changing your config file, pass the `--experimental` flag. `db pull --declarative` runs regardless of the `experimental.pgdelta` setting, but only use it on `pg-delta`. On the legacy engine it leaves `db diff` unable to run. If your project is still on `migra`, follow [Declarative schemas on the legacy `migra` engine](#declarative-schemas-on-the-legacy-migra-engine) instead.
 
 </Admonition>
 
@@ -348,7 +348,7 @@ With `pg_cron` enabled, declare each job in a SQL file under `supabase/schemas/`
 
 Two checks gate `sync` on a schema tree the CLI didn't generate:
 
-- If your migrations call `pg_net` (for example, [database webhooks](/docs/guides/database/webhooks)), add `[experimental.webhooks]` with `enabled = true` to `config.toml` first. The section isn't part of the default `init` template.
+- If your migrations call `pg_net` (for example, [database webhooks](/docs/guides/database/webhooks)), set `experimental.webhooks.enabled` to `true` in your config file first. The section isn't part of the default `init` template.
 - Declare the extensions your schema files depend on. The check trips for `pg_net` and for extensions your own migrations create. When it does, interactive `sync` offers to add the missing declaration and re-plan, or to stage a fresh export into a sibling `-next` directory and print the commands to adopt it. A non-interactive run only prints those commands. Extensions the local stack already ships, such as `pgcrypto` and `uuid-ossp`, don't trip the check even when undeclared, so declare them yourself.
 
 ## Declarative schemas on the legacy `migra` engine [#declarative-schemas-on-the-legacy-migra-engine]
@@ -357,12 +357,12 @@ Projects that set `enabled = false` under `[experimental.pgdelta]` can still use
 
 <Admonition type="caution">
 
-On the legacy engine, don't run `supabase db pull --declarative`. The command runs regardless of the `[experimental.pgdelta]` setting and writes a per-object tree meant for the `db schema declarative` commands. It also points `[db.migrations].schema_paths` in `config.toml` at that tree. The next local `db diff` applies the files in lexicographic order without resolving dependencies between them, so it fails when a file sorts before an object it depends on.
+On the legacy engine, don't run `supabase db pull --declarative`. The command runs regardless of the `experimental.pgdelta` setting and writes a per-object tree meant for the `db schema declarative` commands. It also points `db.migrations.schema_paths` in your config file at that tree. The next local `db diff` applies the files in lexicographic order without resolving dependencies between them, so it fails when a file sorts before an object it depends on.
 
 If you've already run it, [switch to `pg-delta`](#switching-to-pg-delta), or undo both changes:
 
 1. Delete the files the export wrote to the declarative directory (`supabase/schemas/` by default). Files that were already there are left in place.
-2. Restore `[db.migrations].schema_paths` in `config.toml` to its previous value, or remove it if the export added it.
+2. Restore `db.migrations.schema_paths` in your config file to its previous value, or remove it if the export added it.
 
 </Admonition>
 
@@ -389,7 +389,7 @@ As on `pg-delta`, changes made directly through Studio, the SQL editor, or `psql
 
 ### Ordering schema files on the legacy engine
 
-The legacy engine applies your schema files in lexicographic order. The order matters when tables reference each other, because the parent table must be created first. To control the order, list files or glob patterns under `[db.migrations].schema_paths` in `config.toml`. The CLI processes the entries in the order you list them: it expands each pattern, sorts that pattern's matches lexicographically, and skips any file an earlier entry already matched. This example always runs `employees.sql` first:
+The legacy engine applies your schema files in lexicographic order. The order matters when tables reference each other, because the parent table must be created first. To control the order, list files or glob patterns under `db.migrations.schema_paths` in your config file. The CLI processes the entries in the order you list them: it expands each pattern, sorts that pattern's matches lexicographically, and skips any file an earlier entry already matched. This example always runs `employees.sql` first:
 
 ```toml name=supabase/config.toml
 [db.migrations]

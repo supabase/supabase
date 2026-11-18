@@ -3,21 +3,21 @@ title: 'Configuration'
 subtitle: 'Configure your Supabase branches using configuration as code'
 ---
 
-This guide covers how to configure your Supabase branches, using the `config.toml` file. In one single file, you can configure all your branches, including branch settings and secrets.
+This guide covers how to configure your Supabase branches, using your config file (`supabase/config.toml` or `supabase/config.jsonc`). In one single file, you can configure all your branches, including branch settings and secrets.
 
-Branching also reads `supabase/config.json` and `supabase/config.jsonc`. See [Config file formats](/docs/guides/local-development/cli/config-formats).
+To switch formats, see [Config file formats](/docs/guides/local-development/cli/config-formats).
 
 ## Branch configuration with remotes
 
-When Branching is enabled, your `config.toml` settings automatically sync to all ephemeral branches through a one-to-one mapping between your Git and Supabase branches.
+When Branching is enabled, your config settings automatically sync to all ephemeral branches through a one-to-one mapping between your Git and Supabase branches.
 
 ### Basic configuration
 
-To update configuration for a Supabase branch, modify `config.toml` and push to git. The Supabase integration will detect the changes and apply them to the corresponding branch.
+To update configuration for a Supabase branch, modify your config file and push to git. The Supabase integration will detect the changes and apply them to the corresponding branch.
 
 ### Remote-specific configuration
 
-For persistent branches that need specific settings, you can use the `[remotes]` block in your `config.toml`. Each remote configuration must reference an existing project ID.
+For persistent branches that need specific settings, you can use a `remotes` entry in your config file. Each remote configuration must reference an existing project ID.
 
 Here's an example of configuring a separate seed script for a staging environment:
 
@@ -88,7 +88,7 @@ supabase secrets set SMTP_USER=your-username
 supabase secrets set SMTP_PASSWORD=your-password
 ```
 
-These secrets will be available to your branch's services and can be used in your configuration. For example, in your `config.toml`:
+These secrets will be available to your branch's services and can be used in your configuration. For example, in your config file:
 
 ```toml name=supabase/config.toml
 [auth.smtp]
@@ -135,7 +135,7 @@ This creates a new encryption key in `supabase/.env.preview` and a new decryptio
 npx supabase secrets set --env-file supabase/.env.keys
 ```
 
-3. Choose your configuration approach in `config.toml`:
+3. Choose your configuration approach in your config file:
 
 Option A: Use encrypted values directly:
 

@@ -45,9 +45,9 @@ We recommend this folder structure:
     └── config.toml
 ```
 
-## Using config.toml
+## Using the config file [#using-configtoml]
 
-Individual function configuration like [JWT verification](/docs/guides/local-development/cli/config#functions.function_name.verify_jwt) and [import map location](/docs/guides/local-development/cli/config#functions.function_name.import_map) can be set via the `config.toml` file.
+Individual function configuration like [JWT verification](/docs/guides/local-development/cli/config#functions.function_name.verify_jwt) and [import map location](/docs/guides/local-development/cli/config#functions.function_name.import_map) can be set in your config file (`supabase/config.toml` or `supabase/config.jsonc`).
 
 ```toml name=supabase/config.toml
 [functions.hello-world]
@@ -59,7 +59,7 @@ import_map = './import_map.json'
 
 When you create a new Edge Function, it will use TypeScript by default. However, it is possible to write and deploy Edge Functions using pure JavaScript.
 
-Save your Function as a JavaScript file (e.g. `index.js`) and then update the `supabase/config.toml` as follows:
+Save your Function as a JavaScript file (e.g. `index.js`) and then update your config file as follows:
 
 <Admonition type="note">
 

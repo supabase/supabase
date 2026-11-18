@@ -145,7 +145,7 @@ Create an Edge Function that embeds text and inserts it into the `documents` tab
    supabase functions new fireworks-embed
    ```
 
-2. In `supabase/config.toml`, turn off the platform JWT check for the function:
+2. In your config file (`supabase/config.toml` or `supabase/config.jsonc`), turn off the platform JWT check for the function:
 
    ```toml name=supabase/config.toml
    [functions.fireworks-embed]
@@ -265,7 +265,7 @@ The function composes the authenticated pipeline from [Deploy MCP servers](/docs
    supabase functions new mcp
    ```
 
-2. In `supabase/config.toml`, turn off the platform JWT check for the function. The function verifies tokens itself, and the gateway would otherwise reject the unauthenticated discovery request:
+2. In your config file, turn off the platform JWT check for the function. The function verifies tokens itself, and the gateway would otherwise reject the unauthenticated discovery request:
 
    ```toml name=supabase/config.toml
    [functions.mcp]

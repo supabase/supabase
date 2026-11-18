@@ -92,7 +92,7 @@ The maximum duration is capped based on the wall-clock, CPU, and memory limits. 
 
 When testing Edge Functions locally with [Supabase CLI](/docs/guides/local-development/cli/getting-started), the instances are terminated automatically after a request is completed. This will prevent background tasks from running to completion.
 
-To prevent that, you can update the `supabase/config.toml` with the following settings:
+To prevent that, you can update your config file (`supabase/config.toml` or `supabase/config.jsonc`) with the following settings:
 
 ```toml name=supabase/config.toml
 [edge_runtime]

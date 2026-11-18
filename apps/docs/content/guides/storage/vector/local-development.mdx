@@ -25,7 +25,7 @@ See [Vector Bucket limits](/docs/guides/storage/vector/limits) for the full comp
 </Admonition>
 ## Setting up local vector buckets
 
-Make sure you have the feature enabled in your `config.toml` file:
+Make sure you have the feature enabled in your config file (`supabase/config.toml` or `supabase/config.jsonc`):
 
 ```toml name=supabase/config.toml
 
@@ -36,7 +36,7 @@ enabled = true
 
 ### Declarative configuration
 
-You can define your vector buckets in the `config.toml` file using the following syntax:
+You can define your vector buckets in your config file using the following syntax:
 
 ```toml name=supabase/config.toml
 [storage.vector.buckets.documents-openai]

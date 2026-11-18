@@ -269,9 +269,9 @@ supabase functions deploy <function_name>
 
 ### Use Auth locally
 
-To use Auth locally, update your project's `supabase/config.toml` file that gets created after running `supabase init`. Add any providers you want, and set enabled to `true`.
+To use Auth locally, update your config file (`supabase/config.toml` or `supabase/config.jsonc`). Add any providers you want, and set enabled to `true`.
 
-```bash supabase/config.toml
+```toml name=supabase/config.toml
 [auth.external.github]
 enabled = true
 client_id = "env(SUPABASE_AUTH_GITHUB_CLIENT_ID)"
@@ -308,9 +308,9 @@ On the `pg-delta` engine, your RLS policies on `storage.objects` and `storage.bu
 supabase db pull --schema storage --remote
 ```
 
-The buckets and objects themselves are rows in the storage tables so they won't appear in your schema. You can instead define them via `supabase/config.toml` file. For example,
+The buckets and objects themselves are rows in the storage tables so they won't appear in your schema. You can instead define them in your config file. For example,
 
-```bash supabase/config.toml
+```toml name=supabase/config.toml
 [storage.buckets.images]
 public = false
 file_size_limit = "50MiB"
