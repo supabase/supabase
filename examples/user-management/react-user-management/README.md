@@ -119,7 +119,7 @@ If you want to build this app from scratch, follow these steps:
 
 ### Initialize a React App
 
-Use [Vite](https://vitejs.dev/guide/) to create a new React app:
+Use [Vite](https://vite.dev/guide/) to create a new React app:
 
 ```bash
 npm create vite@latest supabase-react -- --template react

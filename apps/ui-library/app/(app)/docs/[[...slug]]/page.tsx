@@ -14,6 +14,7 @@ import { CopyDocPrompt } from '@/components/copy-doc-prompt'
 import { FrameworkSelector } from '@/components/framework-selector'
 import { Mdx } from '@/components/mdx-components'
 import { OpenInV0Button } from '@/components/open-in-v0-button'
+import { OtherFrameworks } from '@/components/other-frameworks'
 import { SourcePanel } from '@/components/source-panel'
 import { libraryBlocks } from '@/config/library'
 import { canonicalAlternates, libraryUrl } from '@/lib/canonical'
@@ -160,6 +161,7 @@ export default async function DocPage(props: DocPageProps) {
         <Mdx code={doc.code} />
       </article>
       <div className="mx-auto max-w-2xl">
+        <OtherFrameworks slug={doc.slugAsParams} />
         <Link
           href="/"
           className="group flex w-full items-center justify-between border-t py-8 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring"

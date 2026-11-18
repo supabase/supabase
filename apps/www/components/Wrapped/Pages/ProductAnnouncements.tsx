@@ -37,7 +37,7 @@ const months: Month[] = [
       },
       {
         title: 'AI Prompt for writing Edge Functions',
-        url: 'https://supabase.com/docs/guides/getting-started/ai-prompts/edge-functions',
+        url: 'https://supabase.com/docs/guides/ai-tools/ai-prompts/edge-functions',
       },
     ],
   },
@@ -58,7 +58,7 @@ const months: Month[] = [
       },
       {
         title: 'Connect AI tools and LLMs to Supabase',
-        url: 'https://supabase.com/docs/guides/getting-started/mcp',
+        url: 'https://supabase.com/docs/guides/ai-tools/mcp',
       },
       {
         title: 'Third-party Auth is now a lot cheaper',
@@ -74,11 +74,11 @@ const months: Month[] = [
       },
       {
         title: 'HubSpot Foreign Data Wrapper',
-        url: 'https://fdw.dev/catalog/hubspot',
+        url: 'https://fdw.dev/catalog/hubspot/',
       },
       {
         title: 'Notion Foreign Data Wrapper',
-        url: 'https://fdw.dev/catalog/notion',
+        url: 'https://fdw.dev/catalog/notion/',
       },
       {
         title: 'SQL Editor in Dashboard',
@@ -224,7 +224,7 @@ const months: Month[] = [
       },
       {
         title: 'MCP Server Can Query Docs',
-        url: 'https://supabase.com/docs/guides/getting-started/mcp',
+        url: 'https://supabase.com/docs/guides/ai-tools/mcp',
       },
       {
         title: 'Iceberg Foreign Data Wrapper',
@@ -283,7 +283,7 @@ const months: Month[] = [
       },
       {
         title: 'Log Drains in Self-Hosted Supabase',
-        url: 'https://supabase.com/docs/guides/telemetry/log-drains',
+        url: 'https://supabase.com/docs/guides/observability/log-drains',
       },
     ],
   },
@@ -317,7 +317,7 @@ const months: Month[] = [
       },
       {
         title: 'Sign in with Your App',
-        url: 'https://www.supabase.com/blog/oauth2-provider',
+        url: 'https://supabase.com/blog/oauth2-provider',
       },
       {
         title: 'Supabase power for Amazon Kiro',
@@ -329,7 +329,7 @@ const months: Month[] = [
       },
       {
         title: 'Async Streaming to Postgres FDWs',
-        url: 'https://www.supabase.com/blog/adding-async-streaming-to-pg-fdw',
+        url: 'https://supabase.com/blog/adding-async-streaming-to-pg-fdw',
       },
       {
         title: 'Supabase Metrics API',
