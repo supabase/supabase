@@ -1992,6 +1992,56 @@ export interface StudioBillingCancelSubscriptionClickedEvent {
 }
 
 /**
+ * User confirmed a downgrade to the Free Plan and was shown the modal saying members
+ * have exceeded their free project limits, which blocks the downgrade.
+ *
+ * @group Events
+ * @source studio
+ * @page /billing or /billing?panel=subscriptionPlan
+ */
+export interface StudioBillingDowngradeBlockedModalOpenedEvent {
+  action: 'studio_billing_downgrade_blocked_modal_opened'
+  properties: {
+    /**
+     * The plan type the org is currently on.
+     */
+    currentPlan: string
+    /**
+     * Number of organization members over their free project limit.
+     */
+    membersExceedingLimitCount: number
+  }
+  groups: Omit<TelemetryGroups, 'project'>
+}
+
+/**
+ * User selected a target organization in the transfer project dialog and the transfer
+ * preview failed because members have reached their free project limits.
+ *
+ * @group Events
+ * @source studio
+ * @page /dashboard/project/{ref}/settings/general
+ */
+export interface ProjectTransferPreviewFailedEvent {
+  action: 'project_transfer_preview_failed'
+  properties: {
+    /**
+     * The plan type of the organization the project is transferred from.
+     */
+    sourcePlan: string
+    /**
+     * The plan type of the selected target organization.
+     */
+    targetPlan: string | null
+    /**
+     * Number of members over their free project limit.
+     */
+    membersExceedingLimitCount: number
+  }
+  groups: TelemetryGroups
+}
+
+/**
  * User clicked on the CTA button on a plan in the pricing side panel in studio.
  *
  * @group Events
@@ -4859,6 +4909,8 @@ export type TelemetryEvent =
   | StoragePublicBucketSelectPolicyWarningDismissButtonClickedEvent
   | StudioPricingPlanCtaClickedEvent
   | StudioBillingCancelSubscriptionClickedEvent
+  | StudioBillingDowngradeBlockedModalOpenedEvent
+  | ProjectTransferPreviewFailedEvent
   | StudioPricingSidePanelOpenedEvent
   | ReportsDatabaseGrafanaBannerClickedEvent
   | IndexAdvisorEnableButtonClickedEvent

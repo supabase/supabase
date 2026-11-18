@@ -34,8 +34,10 @@ import { useProjectTransferPreviewQuery } from '@/data/projects/project-transfer
 import { FGA_PERMISSIONS, useAsyncCheckPermissionsV2 } from '@/hooks/misc/useCheckPermissionsV2'
 import { useSelectedProjectQuery } from '@/hooks/misc/useSelectedProject'
 import { DOCS_URL } from '@/lib/constants'
+import { useTrack } from '@/lib/telemetry/track'
 
 export const TransferProjectButton = () => {
+  const track = useTrack()
   const { data: project } = useSelectedProjectQuery()
   const projectRef = project?.ref
   const projectOrgId = project?.organization_id
@@ -68,6 +70,21 @@ export const TransferProjectButton = () => {
     { enabled: !isTransferring && isOpen }
   )
   const queryClient = useQueryClient()
+
+  useEffect(() => {
+    if (transferPreviewData === undefined) return
+    const membersExceedingLimitCount =
+      transferPreviewData.members_exceeding_free_project_limit.length
+    const isBlockedNoticeShown =
+      transferPreviewData.errors.length > 0 && membersExceedingLimitCount > 0
+    if (!isBlockedNoticeShown) return
+
+    track('project_transfer_preview_failed', {
+      sourcePlan: transferPreviewData.source_subscription_plan,
+      targetPlan: transferPreviewData.target_subscription_plan,
+      membersExceedingLimitCount,
+    })
+  }, [transferPreviewData, track])
 
   useEffect(() => {
     if (isOpen) {
