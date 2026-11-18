@@ -13,7 +13,13 @@ import {
   useReactTable,
 } from '@tanstack/react-table'
 import { IS_PLATFORM, LOCAL_STORAGE_KEYS, useFeatureFlags, useFlag, useParams } from 'common'
-import { Loader2Icon, PanelLeftCloseIcon, PanelLeftOpenIcon } from 'lucide-react'
+import {
+  LayersIcon,
+  Loader2Icon,
+  PanelLeftCloseIcon,
+  PanelLeftOpenIcon,
+  PlusIcon,
+} from 'lucide-react'
 import { useQueryStates } from 'nuqs'
 import { useEffect, useEffectEvent, useMemo, useRef, useState } from 'react'
 import { toast } from 'sonner'
@@ -34,15 +40,10 @@ import { LogsFilterBar } from './components/LogsFilterBar'
 import { getLogAttributeSources } from './components/LogsFilterBar.utils'
 import { LogsListPanel } from './components/LogsListPanel'
 import { LogsTable } from './components/LogsTable'
-import { LogsViewsMenu } from './components/LogsViewsMenu'
-import { SaveViewDialog } from './components/SaveViewDialog'
-import {
-  getFilterCombinationKey,
-  isFilterComboAlreadySaved,
-  shouldShowSaveViewSuggestion,
-} from './components/SaveViewSuggestionBanner.utils'
+import { getFilterCombinationKey, MIN_FILTERS_TO_SAVE } from './components/LogsViews.utils'
+import { LogsViewsPanel } from './components/LogsViewsPanel'
 import { TooltipLabel } from './components/TooltipLabel'
-import { ViewSuggestionBanner } from './components/ViewSuggestionBanner'
+import { ViewModifiedPopover } from './components/ViewModifiedPopover'
 import { ServiceFlowPanel } from './ServiceFlowPanel'
 import { LOG_TYPES, PIPELINE_LOG_LEVEL_LABELS, SEARCH_PARAMS_PARSER } from './UnifiedLogs.constants'
 import { filterFields as defaultFilterFields } from './UnifiedLogs.fields'
@@ -71,15 +72,10 @@ import {
   isOfferedFilter,
   toQuerySearchParams,
 } from './UnifiedLogs.utils'
-import {
-  applyView,
-  isViewModified,
-  serializeView,
-  type LogsView,
-  type LogsViewDraft,
-} from './UnifiedLogs.views'
+import { applyView, isViewModified, serializeView, type LogsView } from './UnifiedLogs.views'
 import { LOGS_SAVED_VIEWS_FLAG, useLogsViews } from './useLogsViews'
 import { AlertError } from '@/components/ui/AlertError'
+import { ButtonTooltip } from '@/components/ui/ButtonTooltip'
 import { LEVELS } from '@/components/ui/DataTable/DataTable.constants'
 import { Option } from '@/components/ui/DataTable/DataTable.types'
 import { arrSome, inDateRange } from '@/components/ui/DataTable/DataTable.utils'
@@ -160,13 +156,17 @@ export const UnifiedLogs = ({
     canDelete: canDeleteView,
     retry: retrySavedViews,
   } = useLogsViews()
+  const isMobile = useIsMobile()
+  const [isFilterBarOpen, setIsFilterBarOpen] = useState(!isMobile)
   const [activeViewId, setActiveViewId] = useState<string | null>(null)
-  const [saveDialogProject, setSaveDialogProject] = useState<string | null>(null)
-  const isSaveViewDialogOpen = saveDialogProject !== null && saveDialogProject === projectRef
+  const [isViewsSectionOpen, setIsViewsSectionOpen] = useState(false)
+  const [saveViewProjectRef, setSaveViewProjectRef] = useState<string | null>(null)
+  const isSavingNewView = saveViewProjectRef !== null && saveViewProjectRef === projectRef
   const currentProjectRef = useRef(projectRef)
   currentProjectRef.current = projectRef
-  const [dismissedFilterKeys, setDismissedFilterKeys] = useState<Set<string>>(new Set())
   const [dismissedUpdateKey, setDismissedUpdateKey] = useState<string | null>(null)
+  const [isReviewingChanges, setIsReviewingChanges] = useState(false)
+  const activeViewRowRef = useRef<HTMLDivElement>(null)
   const computeAvailability = getComputeLogsAvailability({
     isPlatform: IS_PLATFORM,
     flagsLoaded,
@@ -475,38 +475,27 @@ export const UnifiedLogs = ({
     () => new Set(filterFields.map((field) => field.value)),
     [filterFields]
   )
-  const columnLabels = useMemo(
-    () => Object.fromEntries(filterFields.map((field) => [field.value, field.label])),
-    [filterFields]
-  )
   const activeView = savedViews.find((view) => view.id === activeViewId) ?? null
   const isActiveViewModified = activeView ? isViewModified(activeView, search) : false
   const activeFilterCount = parseLogsFilterUrlParams(search.filter).length
   const logSource = getLogAttributeSources(searchParameters)[0] ?? 'edge_logs'
-  const currentDraft = useMemo(
-    () => serializeView({ name: '', logSource, search }),
-    [logSource, search]
-  )
   const filterCombinationKey = getFilterCombinationKey(search.filter)
-  const showSaveViewSuggestion = shouldShowSaveViewSuggestion({
-    isEnabled: showSavedViews && canCreateView && !isSavingView,
-    activeFilterCount,
-    hasActiveView: !!activeView,
-    isDialogOpen: isSaveViewDialogOpen,
-    isDismissed: dismissedFilterKeys.has(filterCombinationKey),
-    isAlreadySaved: isFilterComboAlreadySaved(currentDraft.filters, savedViews),
-  })
   // Keyed by view + filter combination so dismissing re-shows if the user modifies
   // the view differently afterwards, and automatically "resets" once unmodified.
   const updateSuggestionKey = activeView ? `${activeView.id}:${filterCombinationKey}` : null
-  const showUpdateViewSuggestion =
+  const isViewModifiedUnacknowledged =
     showSavedViews &&
     !!activeView &&
-    canUpdateView &&
-    !isSavingView &&
     isActiveViewModified &&
-    !isSaveViewDialogOpen &&
+    !isSavingNewView &&
     updateSuggestionKey !== dismissedUpdateKey
+  const canReviewChanges = showSavedViews && !!activeView && isActiveViewModified
+  // The popover anchors to the active row, so it can only show while the views
+  // section is the visible level of the sidebar.
+  const isViewModifiedPopoverOpen =
+    isViewsSectionOpen &&
+    isFilterBarOpen &&
+    (isViewModifiedUnacknowledged || (isReviewingChanges && canReviewChanges))
 
   const handleApplyView = (view: LogsView) => {
     const { params, dropped } = applyView(view, { filterableNames })
@@ -516,6 +505,12 @@ export const UnifiedLogs = ({
     setSorting(params.sort ? [params.sort] : [])
     setSearch(params)
     setActiveViewId(view.id)
+    setIsReviewingChanges(false)
+  }
+
+  const handleOpenViewsSection = () => {
+    setIsViewsSectionOpen(true)
+    setIsFilterBarOpen(true)
   }
 
   const handleUpdateActiveView = async () => {
@@ -527,37 +522,39 @@ export const UnifiedLogs = ({
     })
     try {
       await updateSavedView(activeView.id, { filters, viewOptions })
+      setIsReviewingChanges(false)
+      setDismissedUpdateKey(null)
       toast.success('View updated')
     } catch {
       return
     }
   }
 
-  const handleSaveCurrentView = () => {
-    setSaveDialogProject(projectRef ?? null)
+  const handleStartSaveView = () => {
+    handleOpenViewsSection()
+    setSaveViewProjectRef(projectRef ?? null)
   }
 
-  const handleClearActiveView = () => {
-    table.resetColumnFilters()
-    setActiveViewId(null)
+  const handleResetToActiveView = () => {
+    if (!activeView) return
+    handleApplyView(activeView)
   }
 
-  const handleCreateView = async (input: LogsViewDraft) => {
+  const handleCreateView = async (name: string) => {
     const savedProjectRef = projectRef
+    const input = serializeView({ name, logSource, search })
     const id = await createSavedView(input)
     if (currentProjectRef.current === savedProjectRef) {
       setActiveViewId(id)
-      setSaveDialogProject(null)
+      setSaveViewProjectRef(null)
+      setIsReviewingChanges(false)
     }
     toast.success('View saved')
   }
 
-  const handleDismissSuggestion = () => {
-    setDismissedFilterKeys((prev) => new Set(prev).add(filterCombinationKey))
-  }
-
   const handleDismissUpdateSuggestion = () => {
     setDismissedUpdateKey(updateSuggestionKey)
+    setIsReviewingChanges(false)
   }
 
   const applyFilterSearch = () => {
@@ -613,9 +610,6 @@ export const UnifiedLogs = ({
     hasUrlSelectionChanged,
   ])
 
-  const isMobile = useIsMobile()
-  const [isFilterBarOpen, setIsFilterBarOpen] = useState(!isMobile)
-
   useShortcut(SHORTCUT_IDS.DATA_TABLE_TOGGLE_FILTERS, () => setIsFilterBarOpen((prev) => !prev), {
     enabled: hasFilterSideBar,
     registerInCommandMenu: true,
@@ -670,6 +664,55 @@ export const UnifiedLogs = ({
                   isFilterBarOpen={isFilterBarOpen}
                   setIsFilterBarOpen={setIsFilterBarOpen}
                   dateRangeDisabled={{ after: new Date() }}
+                  onExitSection={() => setIsViewsSectionOpen(false)}
+                  section={
+                    showSavedViews && isViewsSectionOpen
+                      ? {
+                          label: 'Views',
+                          action: canCreateView ? (
+                            <ButtonTooltip
+                              size="tiny"
+                              variant="outline"
+                              className="size-7 shrink-0 px-0"
+                              icon={<PlusIcon />}
+                              aria-label="Save current filters as a view"
+                              disabled={isSavingNewView || activeFilterCount < MIN_FILTERS_TO_SAVE}
+                              tooltip={{
+                                content: {
+                                  side: 'bottom',
+                                  text:
+                                    activeFilterCount < MIN_FILTERS_TO_SAVE
+                                      ? 'Add a filter to save a view'
+                                      : 'Save current filters as a view',
+                                },
+                              }}
+                              onClick={handleStartSaveView}
+                            />
+                          ) : undefined,
+                          content: (
+                            <LogsViewsPanel
+                              key={projectRef}
+                              views={savedViews}
+                              isLoading={isLoadingSavedViews}
+                              isError={isErrorSavedViews}
+                              isPending={isSavingView}
+                              canUpdate={canUpdateView}
+                              canDelete={canDeleteView}
+                              activeViewId={activeView?.id ?? null}
+                              isActiveViewModified={isActiveViewModified}
+                              isSaving={isSavingNewView}
+                              activeRowRef={activeViewRowRef}
+                              onRetry={retrySavedViews}
+                              onApply={handleApplyView}
+                              onRename={(id, name) => updateSavedView(id, { name })}
+                              onDelete={deleteSavedView}
+                              onCancelSave={() => setSaveViewProjectRef(null)}
+                              onSubmitSave={handleCreateView}
+                            />
+                          ),
+                        }
+                      : undefined
+                  }
                 />
                 <ResizableHandle withHandle />
               </>
@@ -723,21 +766,22 @@ export const UnifiedLogs = ({
                       onRefresh={refetchAllData}
                       shortcutId={SHORTCUT_IDS.UNIFIED_LOGS_REFRESH}
                     />
-                    {showSavedViews && (
-                      <LogsViewsMenu
-                        key={projectRef}
-                        views={savedViews}
-                        isLoading={isLoadingSavedViews}
-                        isError={isErrorSavedViews}
-                        activeViewId={activeView?.id ?? null}
-                        isPending={isSavingView}
-                        canUpdate={canUpdateView}
-                        canDelete={canDeleteView}
-                        onRetry={retrySavedViews}
-                        onApply={handleApplyView}
-                        onRename={(id, name) => updateSavedView(id, { name })}
-                        onDelete={deleteSavedView}
-                        onClearActiveView={handleClearActiveView}
+                    {showSavedViews && hasFilterSideBar && (
+                      <ButtonTooltip
+                        size="tiny"
+                        variant={isViewsSectionOpen && isFilterBarOpen ? 'primary' : 'default'}
+                        className="w-[26px]"
+                        icon={<LayersIcon />}
+                        aria-label="Saved views"
+                        aria-expanded={isViewsSectionOpen && isFilterBarOpen}
+                        tooltip={{ content: { side: 'bottom', text: 'Saved views' } }}
+                        onClick={() => {
+                          if (isViewsSectionOpen && isFilterBarOpen) {
+                            setIsViewsSectionOpen(false)
+                          } else {
+                            handleOpenViewsSection()
+                          }
+                        }}
                       />
                     )}
                     <DataTableViewOptions />
@@ -776,22 +820,6 @@ export const UnifiedLogs = ({
                   projectRef={projectRef}
                 />
               )}
-              <ViewSuggestionBanner
-                visible={showSaveViewSuggestion}
-                title={`You've configured ${activeFilterCount} filters`}
-                description="Would you like to save them as a view?"
-                primaryLabel="Save"
-                onPrimary={handleSaveCurrentView}
-                onDismiss={handleDismissSuggestion}
-              />
-              <ViewSuggestionBanner
-                visible={showUpdateViewSuggestion}
-                title="You have modified your view"
-                description="Would you like to update?"
-                primaryLabel="Update"
-                onPrimary={handleUpdateActiveView}
-                onDismiss={handleDismissUpdateSuggestion}
-              />
               <ResizablePanelGroup
                 key="main-logs"
                 className="flex-1 border-t"
@@ -843,17 +871,21 @@ export const UnifiedLogs = ({
           </ResizablePanelGroup>
         </DataTableSideBarLayout>
       </DataTableProvider>
-      <SaveViewDialog
-        key={projectRef}
-        visible={isSaveViewDialogOpen}
-        onCancel={() => setSaveDialogProject(null)}
-        onSave={handleCreateView}
-        logSource={logSource}
-        filters={currentDraft.filters}
-        viewOptions={currentDraft.viewOptions}
-        existingNames={savedViews.map((view) => view.name)}
-        columnLabels={columnLabels}
-      />
+      {showSavedViews && activeView && (
+        <ViewModifiedPopover
+          open={isViewModifiedPopoverOpen}
+          onOpenChange={setIsReviewingChanges}
+          anchorRef={activeViewRowRef}
+          viewName={activeView.name}
+          canUpdate={canUpdateView}
+          canCreate={canCreateView}
+          isPending={isSavingView}
+          onUpdate={handleUpdateActiveView}
+          onSaveAsNew={handleStartSaveView}
+          onReset={handleResetToActiveView}
+          onDismiss={handleDismissUpdateSuggestion}
+        />
+      )}
     </>
   )
 }
