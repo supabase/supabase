@@ -56,7 +56,7 @@ For a walkthrough of the day-to-day commands on `pg-delta`, see [Local developme
 
 If your project opted out by setting `experimental.pgdelta.enabled` to `false`, switching is a one-time change to your config file followed by a catch-up migration. Do it on a branch so you can review everything before it reaches your team.
 
-1. Remove `experimental.pgdelta.enabled` from your config file, or set it to `true`:
+1. Remove `experimental.pgdelta.enabled` from your config file, or set it to `true`. If `SUPABASE_EXPERIMENTAL_PGDELTA_ENABLED=false` is set in your shell or a project `.env` file, remove it too:
 
    ```toml name=supabase/config.toml
    [experimental.pgdelta]

@@ -103,7 +103,7 @@ Once enabled, your project will expose the necessary OAuth endpoints:
 
 To test OAuth flows with external applications, you can expose your local Supabase instance using a tunnel solution (such as [ngrok](https://ngrok.com/) or [Cloudflare Tunnel](https://developers.cloudflare.com/cloudflare-one/networks/connectors/cloudflare-tunnel/)).
 
-When using a tunnel, configure the `jwt_issuer` field in your config file to match your tunnel URL:
+When using a tunnel, set `auth.jwt_issuer` in your config file to match your tunnel URL:
 
 ```toml name=supabase/config.toml
 [auth]
