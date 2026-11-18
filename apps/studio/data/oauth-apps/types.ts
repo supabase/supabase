@@ -46,6 +46,7 @@ export type OAuthAppsAuthorizeOrganizationProject = {
 
 export type OAuthExistingGrant = {
   approved_scopes: OAuthScope[] | null
+  databaseAccessMode?: 'read' | 'write'
   project_refs: string[]
   approved_at: string
 }

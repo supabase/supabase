@@ -67,9 +67,13 @@ type ScopeLevel = OAuthScope extends `${string}:${infer Level}` ? Level : never
 export const getDiffBetweenScopes = ({
   scopes,
   previousScopes,
+  databaseAccess,
+  previousDatabaseAccess,
 }: {
   scopes: OAuthScope[]
   previousScopes: OAuthScope[]
+  databaseAccess?: 'read' | 'write'
+  previousDatabaseAccess?: 'read' | 'write'
 }) => {
   const unchanged: ScopeGroup = { 'read-write': [], write: [], read: [] }
   const changed: DiffScopeGroup = { 'read-write': [], write: [], read: [], removed: [] }
@@ -77,7 +81,13 @@ export const getDiffBetweenScopes = ({
   const permissionsWithLevel = getPermissionsWithLevel(scopes)
   const previousPermissionsWithLevel = getPermissionsWithLevel(previousScopes)
 
-  const permissionsKeys = Object.keys(permissionsWithLevel) as ScopePermission[]
+  if (databaseAccess)
+    permissionsWithLevel.table_data = databaseAccess === 'write' ? 'read-write' : 'read'
+  if (previousDatabaseAccess)
+    previousPermissionsWithLevel.table_data =
+      previousDatabaseAccess === 'write' ? 'read-write' : 'read'
+
+  const permissionsKeys = Object.keys(permissionsWithLevel) as (ScopePermission | 'table_data')[]
   for (const permission of permissionsKeys) {
     // New permission
     if (!previousPermissionsWithLevel[permission]) {
@@ -99,7 +109,10 @@ export const getDiffBetweenScopes = ({
   }
 
   // Now detect removed permissions
-  const previousPermissionsKeys = Object.keys(previousPermissionsWithLevel) as ScopePermission[]
+  const previousPermissionsKeys = Object.keys(previousPermissionsWithLevel) as (
+    | ScopePermission
+    | 'table_data'
+  )[]
   for (const permission of previousPermissionsKeys) {
     if (permissionsWithLevel[permission] == null) {
       changed.removed.push({
@@ -113,7 +126,7 @@ export const getDiffBetweenScopes = ({
 }
 
 export const getPermissionsWithLevel = (scopes: OAuthScope[]) => {
-  const scopesWithLevel: Partial<Record<ScopePermission, ScopeGroupLevel>> = {}
+  const scopesWithLevel: Partial<Record<ScopePermission | 'table_data', ScopeGroupLevel>> = {}
 
   for (const scope of scopes) {
     const [permission, level] = extractPermissionAndLevelFromScope(scope)

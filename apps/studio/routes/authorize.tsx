@@ -29,6 +29,7 @@ const PAGE_TITLE = buildStudioPageTitle({ section: 'Authorize API Access', brand
 const MOCK_SCENARIOS: Record<string, { authId: string; organizationSlug?: string }> = {
   trusted_partner_write: { authId: OAUTH_APPS_MOCK_SCENARIOS.trustedPartnerWrite },
   trusted_partner_mixed: { authId: OAUTH_APPS_MOCK_SCENARIOS.trustedPartnerMixed },
+  trusted_partner_reconsent: { authId: OAUTH_APPS_MOCK_SCENARIOS.trustedPartnerReconsent },
   trusted_partner_read: { authId: OAUTH_APPS_MOCK_SCENARIOS.trustedPartnerRead },
   trusted_partner_blocked: { authId: OAUTH_APPS_MOCK_SCENARIOS.trustedPartnerBlocked },
   default: { authId: OAUTH_APPS_MOCK_SCENARIOS.vercelDeveloper },
@@ -63,6 +64,7 @@ const CONSENT_PREVIEWS = [
     label: 'Partner · blocked project',
     project: 'northwindcms1',
   },
+  { value: 'trusted_partner_reconsent', label: 'Returning partner · Table data upgrade' },
   { value: 'reconsent', label: 'Returning app · changed permissions' },
   { value: 'dynamic_client', label: 'Unverified app' },
   { value: 'org_bound_all', label: 'App · organization-wide' },

@@ -32,6 +32,7 @@ export const OAUTH_APPS_MOCK_SCENARIOS = {
   vercelAllProjects: 'mock-vercel-all-projects',
   vercelReconsentAllProjects: 'mock-vercel-reconsent-all-projects',
   trustedPartnerRead: 'mock-trusted-partner-read',
+  trustedPartnerReconsent: 'mock-trusted-partner-reconsent',
   trustedPartnerWrite: 'mock-trusted-partner-write',
   trustedPartnerMixed: 'mock-trusted-partner-mixed',
   trustedPartnerBlocked: 'mock-trusted-partner-blocked',
@@ -167,6 +168,11 @@ const MOCK_AUTHORIZE_REQUESTS: Record<string, OAuthAppsAuthorizeRequest> = {
   [OAUTH_APPS_MOCK_SCENARIOS.vercelAllProjects]: VERCEL_ALL_PROJECTS_REQUEST,
   [OAUTH_APPS_MOCK_SCENARIOS.vercelReconsentAllProjects]: VERCEL_OPTIONAL_PROJECTS_REQUEST,
   [OAUTH_APPS_MOCK_SCENARIOS.trustedPartnerRead]: TRUSTED_PARTNER_REQUEST,
+  [OAUTH_APPS_MOCK_SCENARIOS.trustedPartnerReconsent]: {
+    ...TRUSTED_PARTNER_REQUEST,
+    app_id: 'partner-example-returning',
+    databaseAccess: { role: 'partner_example_user', mode: 'write' },
+  },
   [OAUTH_APPS_MOCK_SCENARIOS.trustedPartnerWrite]: {
     ...TRUSTED_PARTNER_REQUEST,
     databaseAccess: { role: 'partner_example_user', mode: 'write' },
@@ -241,6 +247,7 @@ const TRUSTED_PARTNER_IDENTITY: OAuthAppsAuthorizeIdentity = {
 
 const MOCK_IDENTITIES: Record<string, OAuthAppsAuthorizeIdentity> = {
   [OAUTH_APPS_MOCK_SCENARIOS.trustedPartnerRead]: TRUSTED_PARTNER_IDENTITY,
+  [OAUTH_APPS_MOCK_SCENARIOS.trustedPartnerReconsent]: TRUSTED_PARTNER_IDENTITY,
   [OAUTH_APPS_MOCK_SCENARIOS.trustedPartnerWrite]: TRUSTED_PARTNER_IDENTITY,
   [OAUTH_APPS_MOCK_SCENARIOS.trustedPartnerMixed]: TRUSTED_PARTNER_IDENTITY,
   [OAUTH_APPS_MOCK_SCENARIOS.trustedPartnerBlocked]: TRUSTED_PARTNER_IDENTITY,
@@ -351,6 +358,16 @@ const DEFAULT_ORG_APP_DETAILS: OAuthOrgAppDetails = {
 }
 
 const MOCK_ORG_APP_DETAILS: Record<string, Record<string, OAuthOrgAppDetails>> = {
+  'northwind-traders': {
+    'partner-example-returning': {
+      existing_grant: {
+        approved_scopes: ['projects:read'],
+        databaseAccessMode: 'read',
+        project_refs: ['northwindstorefront1'],
+        approved_at: '2026-08-14T09:12:00.000Z',
+      },
+    },
+  },
   'tailspin-toys': {
     vercel: { existing_grant: TAILSPIN_VERCEL_EXISTING_GRANT },
     'vercel-optional': { existing_grant: TAILSPIN_VERCEL_OPTIONAL_EXISTING_GRANT },

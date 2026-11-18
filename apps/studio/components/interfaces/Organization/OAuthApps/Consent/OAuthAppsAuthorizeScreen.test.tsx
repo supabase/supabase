@@ -221,7 +221,7 @@ describe('OAuthAppsAuthorizeScreen', () => {
     expect(await screen.findByText('All current and future projects')).toBeInTheDocument()
     expect(screen.getByRole('button', { name: /Authorize Vercel/ })).toBeDisabled()
 
-    fireEvent.click(screen.getByRole('checkbox'))
+    fireEvent.click(screen.getByRole('radio', { name: 'All current and future projects' }))
 
     expect(screen.queryByRole('combobox')).not.toBeInTheDocument()
     const authorizeButton = screen.getByRole('button', { name: /Authorize Vercel/ })
@@ -235,7 +235,9 @@ describe('OAuthAppsAuthorizeScreen', () => {
   test('re-consent of an all-projects grant preselects the all-projects choice', async () => {
     renderScreen({ authId: OAUTH_APPS_MOCK_SCENARIOS.vercelReconsentAllProjects })
 
-    expect(await screen.findByRole('checkbox')).toBeChecked()
+    expect(
+      await screen.findByRole('radio', { name: 'All current and future projects' })
+    ).toBeChecked()
     expect(screen.getByRole('button', { name: /Authorize Vercel/ })).toBeEnabled()
   })
 
@@ -291,20 +293,26 @@ describe('OAuthAppsAuthorizeScreen', () => {
     expect(screen.getByRole('combobox')).not.toHaveTextContent('tailspin-warehouse')
   })
 
+  test('shows the change in Table data access for a returning partner', async () => {
+    renderScreen({ authId: OAUTH_APPS_MOCK_SCENARIOS.trustedPartnerReconsent })
+
+    const changes = await screen.findByRole('list', { name: 'Permission changes' })
+    expect(changes).toHaveTextContent('Table dataReadRead-write')
+    expect(screen.getByText('Already granted (1)')).toBeInTheDocument()
+    expect(screen.queryByRole('radio', { name: 'All current and future projects' })).toBeNull()
+  })
+
   test('reconsent shows the permissions differences, with previous permissions collapsed', async () => {
     renderScreen({
       authId: OAUTH_APPS_MOCK_SCENARIOS.vercelReconsent,
     })
 
     await screen.findByText('Already granted (2)')
-    const findSpanWithText = (text: string) =>
-      screen.findByText((_, element) => element?.textContent == text, { selector: 'span' })
-    await findSpanWithText('Environment (New)')
-    await findSpanWithText('Analytics (Upgraded from Read)')
-    await findSpanWithText('Secrets (Demoted from Read-write)')
-    await findSpanWithText('Edge Functions (New)')
-    await findSpanWithText('Storage (New)')
-    await findSpanWithText('Rest (Read)')
+    const changes = screen.getByRole('list', { name: 'Permission changes' })
+    expect(changes).toHaveTextContent('EnvironmentAddedRead-write')
+    expect(changes).toHaveTextContent('AnalyticsReadRead-write')
+    expect(changes).toHaveTextContent('SecretsRead-writeRead')
+    expect(changes).toHaveTextContent('RestReadRemoved')
 
     expect(screen.queryByText('Database management')).toBeNull()
     fireEvent.click(screen.getByText('Already granted (2)'))

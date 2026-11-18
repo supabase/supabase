@@ -122,7 +122,7 @@ export const OAuthAppsAuthorizeScreen = ({
 
     const grant = appDetails.existing_grant
     const hasAllProjectsGrant = grant !== null && grant.project_refs.length === 0
-    if (hasAllProjectsGrant && isProjectScopingModeEnabled) {
+    if (hasAllProjectsGrant && !request?.databaseAccess) {
       setAllProjectsSelected(true)
       return
     }
@@ -133,7 +133,14 @@ export const OAuthAppsAuthorizeScreen = ({
       liveProjects: projects,
     })
     if (refs.length > 0) setSelectedProjectRefs(refs.slice(0, MAX_SELECTED_PROJECTS))
-  }, [appDetails, projects, memberOrg, isProjectScopingModeEnabled, projectRef])
+  }, [
+    appDetails,
+    projects,
+    memberOrg,
+    isProjectScopingModeEnabled,
+    projectRef,
+    request?.databaseAccess,
+  ])
 
   const preflightQuery = useOAuthAppsPreflightValidationQuery(
     {
@@ -375,9 +382,9 @@ export const OAuthAppsAuthorizeScreen = ({
                 <DatabaseAccessProjectIssues
                   projects={blockedProjects}
                   role={databaseAccess.role}
-                  onRemove={() =>
+                  onRemove={(ref) =>
                     setSelectedProjectRefs((refs) =>
-                      refs.filter((ref) => !blockedProjects.some((project) => project.ref === ref))
+                      refs.filter((selectedRef) => selectedRef !== ref)
                     )
                   }
                 />
@@ -397,10 +404,12 @@ export const OAuthAppsAuthorizeScreen = ({
                     </p>
                   )}
                 </div>
-                {appDetails?.existing_grant?.approved_scopes && !databaseAccess ? (
+                {appDetails?.existing_grant?.approved_scopes ? (
                   <ScopeGroupCardWithDiff
                     scopes={request.scopes}
                     previousScopes={appDetails.existing_grant.approved_scopes}
+                    databaseAccess={databaseAccess?.mode}
+                    previousDatabaseAccess={appDetails.existing_grant.databaseAccessMode}
                   />
                 ) : (
                   <ScopeGroupCard scopes={request.scopes} databaseAccess={databaseAccess?.mode} />

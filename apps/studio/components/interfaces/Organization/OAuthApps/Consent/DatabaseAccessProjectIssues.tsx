@@ -1,6 +1,5 @@
 import { Link } from '@tanstack/react-router'
 import { Button } from 'ui'
-import { Admonition } from 'ui-patterns/Admonition'
 
 import type { OAuthAppsAuthorizeRequest } from '@/data/oauth-apps/types'
 
@@ -14,7 +13,7 @@ export function DatabaseAccessProjectIssues({
 }: {
   projects: { ref: string; name: string; issue: ProjectIssue }[]
   role: string
-  onRemove: () => void
+  onRemove: (ref: string) => void
 }) {
   const issueDetails = {
     postgres_upgrade_required: {
@@ -35,24 +34,41 @@ export function DatabaseAccessProjectIssues({
   } as const
 
   return (
-    <Admonition type="warning" title="Fix or remove these projects to continue">
-      <ul className="mb-3 list-disc space-y-1 pl-4">
+    <section
+      className="rounded-md border bg-surface-75 px-4"
+      aria-label="Projects that need changes"
+    >
+      <h3 className="pt-3 text-sm font-medium">Projects that need changes</h3>
+      <ul className="divide-y text-xs">
         {projects.map(({ ref, name, issue }) => {
           const { description, action, to } = issueDetails[issue]
           return (
-            <li key={ref}>
-              <span className="font-medium">{name}</span>
-              <span className="block">{description}</span>
-              <Link className="underline" to={to} params={{ ref }} target="_blank" rel="noreferrer">
-                {action}
-              </Link>
+            <li key={ref} className="flex items-start justify-between gap-2 py-3">
+              <div className="space-y-1">
+                <span className="font-medium">{name}</span>
+                <span className="block">{description}</span>
+                <Link
+                  className="underline"
+                  to={to}
+                  params={{ ref }}
+                  target="_blank"
+                  rel="noreferrer"
+                >
+                  {action}
+                </Link>
+              </div>
+              <Button
+                variant="text"
+                size="tiny"
+                aria-label={`Remove ${name}`}
+                onClick={() => onRemove(ref)}
+              >
+                Remove
+              </Button>
             </li>
           )
         })}
       </ul>
-      <Button variant="default" onClick={onRemove}>
-        Remove blocked projects
-      </Button>
-    </Admonition>
+    </section>
   )
 }
