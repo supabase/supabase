@@ -5,6 +5,7 @@ import { TimestampInfo } from 'ui-patterns/TimestampInfo'
 
 import { AuthorizeSuccessScreen } from './AuthorizeSuccessScreen'
 import { AuthorizingAsCard } from './AuthorizingAsCard'
+import { DatabaseAccessProjectIssues } from './DatabaseAccessProjectIssues'
 import { NoProjectsNotice } from './NoProjectsNotice'
 import { MAX_SELECTED_PROJECTS, ProjectMultiSelect } from './ProjectMultiSelect'
 import { ScopeGroupCard } from './ScopeGroupCard'
@@ -170,6 +171,13 @@ export const OAuthAppsAuthorizeScreen = ({
     selectedProjectRefs.includes(project.ref)
   )
 
+  const databaseAccess = request?.databaseAccess
+  const blockedProjects = grantedProjects.flatMap((project) => {
+    const issue = databaseAccess?.projectIssues?.[project.ref]
+    return issue ? [{ ref: project.ref, name: project.name, issue }] : []
+  })
+  const hasBlockedProjects = blockedProjects.length > 0
+
   const flaggedRefs = getFailedProjects(roleFailure)
     .map((project) => project.ref)
     .filter((ref) => selectedProjectRefs.includes(ref))
@@ -190,7 +198,7 @@ export const OAuthAppsAuthorizeScreen = ({
     return (
       <InterstitialLayout
         title="Application authorization"
-        description="An application wants to access your Supabase Account"
+        description="An application wants to access your Supabase account."
       >
         <div className="flex flex-col gap-6 px-6 pb-6">
           <AlertError subject="An error occurred while loading your data" error={requestError} />
@@ -203,7 +211,7 @@ export const OAuthAppsAuthorizeScreen = ({
       <InterstitialLayout
         logo={<DestinationLogo name={request.name} />}
         title={`Authorize ${request.name}`}
-        description="This application wants to access your Supabase Account"
+        description="This application wants to access your Supabase account."
       >
         <div className="flex flex-col gap-6 px-6 pb-6">
           <AlertError subject="An error occurred while loading your data" error={identityError} />
@@ -217,7 +225,7 @@ export const OAuthAppsAuthorizeScreen = ({
       <InterstitialLayout
         logo={<DestinationLogo name={request.name} />}
         title={`Authorize ${request.name}`}
-        description="This application wants to access your Supabase Account"
+        description="This application wants to access your Supabase account."
       >
         <div className="flex flex-col gap-6 px-6 pb-6">
           <AlertError subject="An error occurred while loading your data" error={errorAppDetails} />
@@ -231,7 +239,7 @@ export const OAuthAppsAuthorizeScreen = ({
       <InterstitialLayout
         logo={<DestinationLogo name={request.name} />}
         title={`Authorize ${request.name}`}
-        description="This application wants to access your Supabase Account"
+        description="This application wants to access your Supabase account."
       >
         <div className="flex flex-col gap-6 px-6 pb-6">
           <AlertError
@@ -279,7 +287,7 @@ export const OAuthAppsAuthorizeScreen = ({
     setSelectedProjectRefs((refs) => refs.filter((ref) => !flaggedRefs.includes(ref)))
 
   const handleApprove = () => {
-    if (hasNoSelection) return
+    if (hasNoSelection || hasBlockedProjects) return
     const approveBody: OAuthAuthorizeApproveRequest = usesSelectedProjects
       ? { project_refs: selectedProjectRefs }
       : {}
@@ -296,7 +304,8 @@ export const OAuthAppsAuthorizeScreen = ({
       ? null
       : `Cancelling will redirect you to ${request.redirect_uri} with access denied.`
 
-  const cannotApprove = preflightQuery.data?.status === 'error' || hasNoSelection
+  const cannotApprove =
+    preflightQuery.data?.status === 'error' || hasNoSelection || hasBlockedProjects
 
   return (
     <InterstitialLayout
@@ -314,18 +323,11 @@ export const OAuthAppsAuthorizeScreen = ({
             . It's now asking for different access.
           </>
         ) : (
-          'This application wants to access your Supabase Account'
+          'This application wants to access your Supabase account.'
         )
       }
     >
       <div className="flex flex-col gap-6 px-6 pb-6">
-        {preflightQuery.data?.status === 'error' && (
-          <Admonition
-            type="warning"
-            title={`Couldn't authorize ${request.name}`}
-            description={`Your Read-only role in ${memberOrg} can't grant write access. Ask an admin to change your role, or switch organization.`}
-          />
-        )}
         {hasRoleFailure && (
           <Admonition
             type="warning"
@@ -367,8 +369,19 @@ export const OAuthAppsAuthorizeScreen = ({
                 flaggedRefs={flaggedRefs}
                 unavailableRefs={getFailedProjects(roleFailure).map((project) => project.ref)}
                 allProjectsSelected={allProjectsSelected}
-                onAllProjectsChange={setAllProjectsSelected}
+                onAllProjectsChange={databaseAccess ? undefined : setAllProjectsSelected}
               />
+              {hasBlockedProjects && databaseAccess && (
+                <DatabaseAccessProjectIssues
+                  projects={blockedProjects}
+                  role={databaseAccess.role}
+                  onRemove={() =>
+                    setSelectedProjectRefs((refs) =>
+                      refs.filter((ref) => !blockedProjects.some((project) => project.ref === ref))
+                    )
+                  }
+                />
+              )}
             </div>
           )}
 
@@ -376,37 +389,27 @@ export const OAuthAppsAuthorizeScreen = ({
             <>
               <section className="flex flex-col gap-3">
                 <p className="text-sm text-foreground">Permissions requested</p>
-                {appDetails?.existing_grant?.approved_scopes ? (
+                {appDetails?.existing_grant?.approved_scopes && !databaseAccess ? (
                   <ScopeGroupCardWithDiff
                     scopes={request.scopes}
                     previousScopes={appDetails.existing_grant.approved_scopes}
                   />
                 ) : (
-                  <ScopeGroupCard scopes={request.scopes} />
+                  <ScopeGroupCard scopes={request.scopes} databaseAccess={databaseAccess?.mode} />
                 )}
-                <p className="text-xs text-foreground-lighter">
-                  Authorizing {request.name} grants it access to the permissions
-                  {isProjectScopingModeEnabled && !allProjectsSelected ? (
-                    <span>{' and selected projects '}</span>
-                  ) : (
-                    ' '
-                  )}
-                  <span>above.</span>
-                </p>
               </section>
-
-              {grantKind === 'organization_bound' && (
-                <Admonition
-                  type="default"
-                  title="Want this scoped to one member?"
-                  description={`Have them authorize ${request.name} from their own account. Authorizing here gives it your Administrator access on every project, including ones created later.`}
-                />
-              )}
             </>
           )}
         </fieldset>
 
         <div className="flex flex-col gap-2">
+          {preflightQuery.data?.status === 'error' && (
+            <Admonition
+              type="warning"
+              title={`Couldn't authorize ${request.name}`}
+              description={`Your Read-only role in ${memberOrg} can't grant write access. Ask an admin to change your role, or switch organization.`}
+            />
+          )}
           {canProceed ? (
             <Button
               block
@@ -430,22 +433,14 @@ export const OAuthAppsAuthorizeScreen = ({
           )}
         </div>
 
-        <div className="flex flex-col gap-4 border-t pt-6 text-xs text-foreground-lighter">
+        <div className="flex flex-col gap-4 border-t pt-6 text-center text-xs text-foreground-lighter">
           {footerMessage ? (
             <p>{footerMessage}</p>
           ) : (
-            <>
-              <p>
-                {grantKind === 'member_bound' && (
-                  <span>{'No admin approval is needed if your role permits this access. '}</span>
-                )}
-                <span>This authorization will appear in Authorized apps.</span>
-              </p>
-              <p>
-                Authorizing will redirect you to{' '}
-                <span className="text-foreground">{request.redirect_uri}</span>
-              </p>
-            </>
+            <p>
+              Authorizing will redirect you to{' '}
+              <span className="text-foreground">{request.redirect_uri}</span>
+            </p>
           )}
         </div>
       </div>

@@ -23,6 +23,13 @@ export type OAuthAppsAuthorizeRequest = OAuthAppsAuthorizeLiveFields & {
   grant_kind: OAuthGrantKind
   project_scoping_mode: boolean
   scopes: OAuthScope[]
+  databaseAccess?: {
+    role: string
+    mode: 'read' | 'write'
+    projectIssues?: Partial<
+      Record<string, 'postgres_upgrade_required' | 'ssl_enforcement_required' | 'role_conflict'>
+    >
+  }
 }
 
 export type OAuthOrganizationRole = {

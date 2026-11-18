@@ -62,17 +62,19 @@ export const ProjectMultiSelect = ({
         )}
       </div>
 
-      <label
-        htmlFor="select-all-projects"
-        className="flex cursor-pointer items-center gap-2 py-1 text-sm text-foreground"
-      >
-        <Checkbox
-          id="select-all-projects"
-          checked={allProjectsSelected}
-          onCheckedChange={(checked) => onAllProjectsChange?.(checked === true)}
-        />
-        All current and future projects
-      </label>
+      {onAllProjectsChange && (
+        <label
+          htmlFor="select-all-projects"
+          className="flex cursor-pointer items-center gap-2 py-1 text-sm text-foreground"
+        >
+          <Checkbox
+            id="select-all-projects"
+            checked={allProjectsSelected}
+            onCheckedChange={(checked) => onAllProjectsChange(checked === true)}
+          />
+          All current and future projects
+        </label>
+      )}
 
       {!allProjectsSelected && (
         <>

@@ -109,7 +109,7 @@ describe('OAuthAppsAuthorizeScreen', () => {
 
     expect(screen.getByText('Permissions granted')).toBeInTheDocument()
     expect(screen.queryByText('Permissions requested')).not.toBeInTheDocument()
-    expect(screen.getByText('Database, Environment, Analytics')).toBeInTheDocument()
+    expect(screen.getByText('Database management, Environment, Analytics')).toBeInTheDocument()
     expect(screen.getByText('Secrets, Projects, Edge Functions, Storage')).toBeInTheDocument()
   })
 
@@ -128,29 +128,21 @@ describe('OAuthAppsAuthorizeScreen', () => {
     expect(screen.getByText(/admin@example\.com/)).toBeInTheDocument()
   })
 
-  test('tells the member an organization-bound grant is shared, exactly once, without the member-bound copy', async () => {
+  test('keeps organization-bound consent focused on the requested access', async () => {
     renderScreen({ authId: OAUTH_APPS_MOCK_SCENARIOS.kemalBot })
 
-    expect(await screen.findAllByText('Want this scoped to one member?')).toHaveLength(1)
-    expect(
-      screen.getAllByText(
-        'Have them authorize kemal-bot from their own account. Authorizing here gives it your Administrator access on every project, including ones created later.'
-      )
-    ).toHaveLength(1)
+    await screen.findByText('Permissions requested')
+    expect(screen.queryByText('Want this scoped to one member?')).not.toBeInTheDocument()
     expect(screen.queryByText(/This grant acts as you/)).not.toBeInTheDocument()
     expect(screen.queryByText(/No admin approval is needed/)).not.toBeInTheDocument()
-    expect(
-      screen.getByText(/This authorization will appear in Authorized apps/)
-    ).toBeInTheDocument()
+    expect(screen.queryByText(/This authorization will appear in Authorized apps/)).toBeNull()
   })
 
   test('shows the member-bound copy for a member-bound grant that picks projects', async () => {
     renderScreen()
 
-    expect(
-      await screen.findByText(/No admin approval is needed if your role permits this access/)
-    ).toBeInTheDocument()
-    expect(screen.getByText(/This grant acts as you/)).toBeInTheDocument()
+    expect(await screen.findByText(/This grant acts as you/)).toBeInTheDocument()
+    expect(screen.queryByText(/No admin approval is needed/)).toBeNull()
     expect(screen.queryByText('Want this scoped to one member?')).not.toBeInTheDocument()
     expect(screen.queryByText('This grant covers every project')).not.toBeInTheDocument()
   })
@@ -307,9 +299,9 @@ describe('OAuthAppsAuthorizeScreen', () => {
     await findSpanWithText('Storage (New)')
     await findSpanWithText('Rest (Read)')
 
-    expect(screen.queryByText('Database')).toBeNull()
+    expect(screen.queryByText('Database management')).toBeNull()
     fireEvent.click(screen.getByText('Already granted (2)'))
-    await screen.findByText('Database')
+    await screen.findByText('Database management')
   })
 })
 

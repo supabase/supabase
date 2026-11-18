@@ -6,10 +6,16 @@ import type { OAuthScope } from '@/data/oauth-apps/types'
 
 export interface ScopeGroupCardProps {
   scopes: OAuthScope[]
+  databaseAccess?: 'read' | 'write'
 }
 
-export const ScopeGroupCard = ({ scopes }: ScopeGroupCardProps) => {
-  const scopeGroups = useMemo(() => groupScopesByLevel(scopes), [scopes])
+export const ScopeGroupCard = ({ scopes, databaseAccess }: ScopeGroupCardProps) => {
+  const scopeGroups = useMemo(() => {
+    const groups = groupScopesByLevel(scopes)
+    if (databaseAccess)
+      groups[databaseAccess === 'write' ? 'read-write' : 'read'].push('table_data')
+    return groups
+  }, [scopes, databaseAccess])
 
   return (
     <div className="divide-y rounded-md border bg-surface-75 px-4">

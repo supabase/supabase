@@ -18,6 +18,10 @@ function Authorize() {
 const PAGE_TITLE = buildStudioPageTitle({ section: 'Authorize API Access', brand: 'Supabase' })
 
 const MOCK_SCENARIOS: Record<string, { authId: string; organizationSlug?: string }> = {
+  trusted_partner_write: { authId: OAUTH_APPS_MOCK_SCENARIOS.trustedPartnerWrite },
+  trusted_partner_mixed: { authId: OAUTH_APPS_MOCK_SCENARIOS.trustedPartnerMixed },
+  trusted_partner_read: { authId: OAUTH_APPS_MOCK_SCENARIOS.trustedPartnerRead },
+  trusted_partner_blocked: { authId: OAUTH_APPS_MOCK_SCENARIOS.trustedPartnerBlocked },
   default: { authId: OAUTH_APPS_MOCK_SCENARIOS.vercelDeveloper },
   reconsent: { authId: OAUTH_APPS_MOCK_SCENARIOS.vercelReconsent },
   reconsent_all_projects: { authId: OAUTH_APPS_MOCK_SCENARIOS.vercelReconsentAllProjects },

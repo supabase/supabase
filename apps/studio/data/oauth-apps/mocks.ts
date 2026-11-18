@@ -31,6 +31,10 @@ export const OAUTH_APPS_MOCK_SCENARIOS = {
   vercelOptionalProjects: 'mock-vercel-optional-projects',
   vercelAllProjects: 'mock-vercel-all-projects',
   vercelReconsentAllProjects: 'mock-vercel-reconsent-all-projects',
+  trustedPartnerRead: 'mock-trusted-partner-read',
+  trustedPartnerWrite: 'mock-trusted-partner-write',
+  trustedPartnerMixed: 'mock-trusted-partner-mixed',
+  trustedPartnerBlocked: 'mock-trusted-partner-blocked',
   kemalBot: 'mock-kemal-bot',
   kemalBotOrgWide: 'mock-kemal-bot-org-wide',
   dynamicMcpClient: 'mock-dynamic-mcp-client',
@@ -141,6 +145,17 @@ const KEMAL_BOT_ORG_WIDE_REQUEST: OAuthAppsAuthorizeRequest = {
   project_scoping_mode: false,
 }
 
+const TRUSTED_PARTNER_REQUEST: OAuthAppsAuthorizeRequest = {
+  ...KEMAL_BOT_REQUEST,
+  app_id: 'partner-example',
+  app_name: 'Example Partner',
+  name: 'Example Partner',
+  website: 'https://partner.example.com',
+  domain: 'partner.example.com',
+  redirect_uri: 'https://partner.example.com/callback',
+  databaseAccess: { role: 'partner_example_user', mode: 'read' },
+}
+
 const MOCK_AUTHORIZE_REQUESTS: Record<string, OAuthAppsAuthorizeRequest> = {
   [OAUTH_APPS_MOCK_SCENARIOS.vercelDeveloper]: VERCEL_REQUEST,
   [OAUTH_APPS_MOCK_SCENARIOS.vercelReadOnly]: VERCEL_REQUEST,
@@ -151,6 +166,28 @@ const MOCK_AUTHORIZE_REQUESTS: Record<string, OAuthAppsAuthorizeRequest> = {
   [OAUTH_APPS_MOCK_SCENARIOS.vercelOptionalProjects]: VERCEL_OPTIONAL_PROJECTS_REQUEST,
   [OAUTH_APPS_MOCK_SCENARIOS.vercelAllProjects]: VERCEL_ALL_PROJECTS_REQUEST,
   [OAUTH_APPS_MOCK_SCENARIOS.vercelReconsentAllProjects]: VERCEL_OPTIONAL_PROJECTS_REQUEST,
+  [OAUTH_APPS_MOCK_SCENARIOS.trustedPartnerRead]: TRUSTED_PARTNER_REQUEST,
+  [OAUTH_APPS_MOCK_SCENARIOS.trustedPartnerWrite]: {
+    ...TRUSTED_PARTNER_REQUEST,
+    databaseAccess: { role: 'partner_example_user', mode: 'write' },
+  },
+  [OAUTH_APPS_MOCK_SCENARIOS.trustedPartnerMixed]: {
+    ...TRUSTED_PARTNER_REQUEST,
+    scopes: VERCEL_REQUEST.scopes,
+    databaseAccess: { role: 'partner_example_user', mode: 'write' },
+  },
+  [OAUTH_APPS_MOCK_SCENARIOS.trustedPartnerBlocked]: {
+    ...TRUSTED_PARTNER_REQUEST,
+    databaseAccess: {
+      role: 'partner_example_user',
+      mode: 'write',
+      projectIssues: {
+        northwindcms1: 'postgres_upgrade_required',
+        fabrikamapi1: 'ssl_enforcement_required',
+        fabrikamjobs1: 'role_conflict',
+      },
+    },
+  },
   [OAUTH_APPS_MOCK_SCENARIOS.kemalBot]: KEMAL_BOT_REQUEST,
   [OAUTH_APPS_MOCK_SCENARIOS.kemalBotOrgWide]: KEMAL_BOT_ORG_WIDE_REQUEST,
   [OAUTH_APPS_MOCK_SCENARIOS.dynamicMcpClient]: DYNAMIC_MCP_CLIENT_REQUEST,
@@ -197,7 +234,16 @@ const LITWARE_DEVELOPER: OAuthOrganizationRole = {
   default_role: DEVELOPER_ROLE,
 }
 
+const TRUSTED_PARTNER_IDENTITY: OAuthAppsAuthorizeIdentity = {
+  email: 'admin@example.com',
+  organizations: [{ ...NORTHWIND_TRADERS_DEVELOPER, default_role: OWNER_ROLE }],
+}
+
 const MOCK_IDENTITIES: Record<string, OAuthAppsAuthorizeIdentity> = {
+  [OAUTH_APPS_MOCK_SCENARIOS.trustedPartnerRead]: TRUSTED_PARTNER_IDENTITY,
+  [OAUTH_APPS_MOCK_SCENARIOS.trustedPartnerWrite]: TRUSTED_PARTNER_IDENTITY,
+  [OAUTH_APPS_MOCK_SCENARIOS.trustedPartnerMixed]: TRUSTED_PARTNER_IDENTITY,
+  [OAUTH_APPS_MOCK_SCENARIOS.trustedPartnerBlocked]: TRUSTED_PARTNER_IDENTITY,
   [OAUTH_APPS_MOCK_SCENARIOS.vercelDeveloper]: {
     email: 'admin@example.com',
     organizations: [NORTHWIND_TRADERS_DEVELOPER, CONTOSO_LABS],
