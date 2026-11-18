@@ -96,7 +96,13 @@ describe('buildTelemetryEventRequest', () => {
   })
 
   it('stamps each PostHog flag as $feature/<key>, with the caller winning on the same key', () => {
-    const properties = { query: 'abc', queryLength: 3, resultCount: 1, hasResults: true }
+    const properties = {
+      query: 'abc',
+      queryLength: 3,
+      queryWordCount: 1,
+      resultCount: 1,
+      hasResults: true,
+    }
     setTelemetryFeatureFlags({ flagA: 'test', flagB: false })
 
     const stamped = buildTelemetryEventRequest(API_URL, {
