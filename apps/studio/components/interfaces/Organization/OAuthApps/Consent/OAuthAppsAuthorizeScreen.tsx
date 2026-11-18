@@ -238,7 +238,9 @@ export const OAuthAppsAuthorizeScreen = ({
   const isSubmitting = approveMutation.isPending || denyMutation.isPending
   const hasProjects = (projects?.length ?? 0) > 0
 
-  const isBlockedOnProjects = isProjectScopingModeEnabled && !isPendingProjects && !hasProjects
+  // If there are no projects because of a search, we must not block users from changing their search query
+  const isBlockedOnProjects =
+    isProjectScopingModeEnabled && !isPendingProjects && !hasProjects && search.length !== 0
   const canProceed = !isBlockedOnProjects
 
   const grantedProjects = (projects ?? []).filter((project) =>
