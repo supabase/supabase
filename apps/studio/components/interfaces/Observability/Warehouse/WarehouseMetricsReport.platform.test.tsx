@@ -163,17 +163,21 @@ test('refreshes report measurements without changing the selected period', async
     path: '/platform/warehouse/:ref/metrics',
     response: () => {
       requests += 1
-      return HttpResponse.json<WarehouseMetricsResponse>(response(null))
+      return HttpResponse.json<WarehouseMetricsResponse>(response(requests > 2 ? 4 : null))
     },
   })
   renderReport()
   await screen.findByText('No data in the selected period')
   await userEvent.click(screen.getByRole('button', { name: /Last 60 minutes/ }))
   await userEvent.click(screen.getByText('Last 24 hours'))
-  await screen.findByRole('button', { name: /Last 24 hours/ })
+  await waitFor(() => expect(requests).toBe(2))
+  await waitFor(() => expect(screen.getByRole('button', { name: 'Refresh report' })).toBeEnabled())
   const before = requests
   await userEvent.keyboard('{Shift>}R{/Shift}')
-  await waitFor(() => expect(requests).toBeGreaterThan(before))
+  expect(
+    await screen.findByText('Queries started per second. Not a count of SQL statements.')
+  ).toBeInTheDocument()
+  expect(requests).toBeGreaterThan(before)
   expect(screen.getByRole('button', { name: /Last 24 hours/ })).toBeInTheDocument()
 })
 

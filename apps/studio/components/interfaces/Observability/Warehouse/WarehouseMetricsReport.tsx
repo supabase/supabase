@@ -72,11 +72,12 @@ const WarehouseMetricsReportContent = () => {
     datePickerValue,
     datePickerHelpers,
     handleDatePickerChange,
-    () =>
-      Promise.all([
+    async () => {
+      await Promise.all([
         queryClient.invalidateQueries({ queryKey: warehouseKeys.metricsAll(ref) }),
         queryClient.invalidateQueries({ queryKey: warehouseKeys.setupStatus(ref) }),
       ])
+    }
   )
   useShortcut(SHORTCUT_IDS.OBSERVABILITY_REFRESH, handleRefresh, { enabled: !query.isFetching })
   useShortcut(SHORTCUT_IDS.OBSERVABILITY_TOGGLE_DATE_PICKER, () => {
