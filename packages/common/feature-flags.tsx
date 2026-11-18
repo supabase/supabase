@@ -16,6 +16,7 @@ import { useAuth, useUser } from './auth'
 import { getFlags as getDefaultConfigCatFlags } from './configcat'
 import { hasConsented } from './consent-state'
 import { get, post } from './fetchWrappers'
+import { gotrueClient } from './gotrue'
 import { ensurePlatformSuffix } from './helpers'
 import { useParams } from './hooks'
 
@@ -133,6 +134,19 @@ export const FeatureFlagProvider = ({
     posthog: {},
     hasLoaded: false,
   })
+
+  // The flags endpoint rejects the pre-MFA token of a user with MFA enabled, and verifying
+  // the challenge changes none of the fetch inputs, so the verification has to trigger a refetch.
+  const [mfaVerifiedCount, setMfaVerifiedCount] = useState(0)
+  useEffect(() => {
+    const {
+      data: { subscription },
+    } = gotrueClient.onAuthStateChange((event) => {
+      if (event === 'MFA_CHALLENGE_VERIFIED') setMfaVerifiedCount((count) => count + 1)
+    })
+
+    return subscription.unsubscribe
+  }, [])
 
   useEffect(() => {
     let mounted = true
@@ -284,6 +298,7 @@ export const FeatureFlagProvider = ({
     resolvedOrganizationSlug,
     resolvedProjectRef,
     getConfigCatFlags,
+    mfaVerifiedCount,
   ])
 
   // Memoized so consumers only re-render when the flags or their staleness change
