@@ -98,7 +98,7 @@ Remote delivery solved a different problem for Flick: shipping new content witho
   source of stress that's now gone.
 </Quote>
 
-### Under the hood: AWS
+## Under the hood: AWS
 
 Behind all of this, Flick's Supabase project runs on AWS. Supabase runs the project's dedicated Postgres database on Amazon EC2 compute, and that database holds the merged saves and Steam purchase records that keep Art of Solitaire consistent across iOS, Android, and Steam, while Supabase Auth on the same AWS infrastructure handles the passwordless sign-in. For a team of two, that means the servers under the game are infrastructure Flick doesn't have to host, patch, or maintain itself, even when a new deck has to ship on a deadline.
 
