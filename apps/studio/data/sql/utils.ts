@@ -1,5 +1,7 @@
 import { literal, safeSql, type SafeSqlFragment } from '@supabase/pg-meta'
 
+import errorLinks from './error-links.postgres.json'
+
 /**
  * Pick which lines to render for a SQL editor error.
  *
@@ -17,6 +19,36 @@ export function getSqlErrorLines(error: { message?: string; formattedError?: str
 
   const messageLines = (error.message?.split('\n') ?? []).filter((x) => x.length > 0)
   return messageLines.length > 1 ? messageLines : []
+}
+
+/**
+ * Extracts the 5 character Postgres SQLSTATE from a SQL editor error, e.g. `42501` from
+ * `ERROR:  42501: permission denied for table users`. Returns undefined when the error
+ * has no SQLSTATE (for example upstream timeouts or network errors).
+ */
+export function getSqlErrorCode(error: {
+  message?: string
+  formattedError?: string
+}): string | undefined {
+  const text = error.formattedError ?? error.message ?? ''
+  return text.match(/^ERROR:\s+([0-9A-Z]{5}):/m)?.[1]
+}
+
+/**
+ * Returns the /kb troubleshooting article for a Postgres SQLSTATE, or undefined when the code
+ * has no article.
+ *
+ * `error-links.postgres.json` is the "postgres" slice of https://supabase.com/kb/error-links.json,
+ * generated from the supabase/troubleshooting frontmatter. Refresh it with
+ * `node scripts/update-sql-error-links.mjs` from apps/studio.
+ */
+export function getSqlErrorDocUrl(code: string): string | undefined {
+  const links = errorLinks as Record<string, string | undefined>
+  return Object.hasOwn(links, code)
+    ? links[code]
+    : Object.hasOwn(links, code.toUpperCase())
+      ? links[code.toUpperCase()]
+      : undefined
 }
 
 /**

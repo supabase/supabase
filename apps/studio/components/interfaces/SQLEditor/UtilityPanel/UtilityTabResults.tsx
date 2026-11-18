@@ -8,7 +8,7 @@ import { AiAssistantDropdown } from '@/components/ui/AiAssistantDropdown'
 import CopyButton from '@/components/ui/CopyButton'
 import { DataGridResults } from '@/components/ui/DataGridResults'
 import { InlineLink, InlineLinkClassName } from '@/components/ui/InlineLink'
-import { getSqlErrorLines } from '@/data/sql/utils'
+import { getSqlErrorCode, getSqlErrorDocUrl, getSqlErrorLines } from '@/data/sql/utils'
 import { DOCS_URL } from '@/lib/constants'
 import { useDatabaseSelectorStateSnapshot } from '@/state/database-selector'
 import { useSqlEditorSessionSnapshot } from '@/state/sql-editor/sql-editor-session-state'
@@ -47,6 +47,8 @@ export const UtilityTabResults = forwardRef<HTMLDivElement, UtilityTabResultsPro
       )
     } else if (result?.error) {
       const errorLines = getSqlErrorLines(result.error)
+      const errorCode = getSqlErrorCode(result.error)
+      const errorDocUrl = errorCode ? getSqlErrorDocUrl(errorCode) : undefined
       const readReplicaError =
         state.selectedDatabaseId !== ref &&
         result.error.message.includes('in a read-only transaction')
@@ -98,6 +100,12 @@ export const UtilityTabResults = forwardRef<HTMLDivElement, UtilityTabResultsPro
                   <p className="text-sm text-foreground-light">
                     Note: A limit of {result.autoLimit} was applied to your query. If this was the
                     cause of a syntax error, try selecting "No limit" instead and re-run the query.
+                  </p>
+                )}
+                {errorDocUrl && (
+                  <p className="text-sm text-foreground-light flex items-center gap-x-1">
+                    <InlineLink href={errorDocUrl}>Troubleshoot this error</InlineLink>
+                    <ExternalLinkIcon size={12} />
                   </p>
                 )}
                 {readReplicaError && (

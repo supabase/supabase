@@ -1,0 +1,21 @@
+{
+  "01006": "https://supabase.com/kb/troubleshooting/custom-role-inherits-privileges-that-were-not-explicitly-granted",
+  "01007": "https://supabase.com/kb/troubleshooting/revoking-access-to-pg_net-objects-has-no-effect",
+  "22021": "https://supabase.com/kb/troubleshooting/error-invalid-byte-sequence-for-encoding-utf8-0x00-when-accessing-triggers-or-webhooks",
+  "23505": "https://supabase.com/kb/troubleshooting/inserting-into-sequenceserial-table-causes-duplicate-key-violates-unique-constraint-error-pi6DnC",
+  "25006": "https://supabase.com/kb/troubleshooting/resolving-cannot-execute-update-in-a-read-only-transaction-on-transaction-pooler-connections",
+  "28000": "https://supabase.com/kb/troubleshooting/error-no-pghbaconf-entry-for-host-xxxxxxxxxxx-user-postgres-database-postgres-ssl-off-GOt5Ja",
+  "28P01": "https://supabase.com/kb/troubleshooting/fatal-password-authentication-failed",
+  "3F000": "https://supabase.com/kb/troubleshooting/schema-pg_pgrst_no_exposed_schemas-does-not-exist",
+  "40001": "https://supabase.com/kb/troubleshooting/high-cpu-and-infinite-transaction-retries-when-using-custom-error-codes-in-rpc-functions",
+  "42501": "https://supabase.com/kb/troubleshooting/database-api-42501-errors",
+  "42703": "https://supabase.com/kb/troubleshooting/postgrest-error-400-column-example_tableexample_column-does-not-exist-when-using-or-operators",
+  "42P01": "https://supabase.com/kb/troubleshooting/resolving-42p01-relation-does-not-exist-error-W4_9-V",
+  "42P05": "https://supabase.com/kb/troubleshooting/error-prepared-statement-xxx-already-exists-3laqeM",
+  "42P17": "https://supabase.com/kb/troubleshooting/storage-error-database-schema-is-incompatible-when-uploading-files",
+  "53300": "https://supabase.com/kb/troubleshooting/database-error-remaining-connection-slots-are-reserved-for-non-replication-superuser-connections-3V3nIb",
+  "54000": "https://supabase.com/kb/troubleshooting/error-index-row-size-exceeds-btree-version-4-maximum-for-index-LMmoeU",
+  "57014": "https://supabase.com/kb/troubleshooting/canceling-statement-due-to-statement-timeout-581wFv",
+  "ECONNREFUSED": "https://supabase.com/kb/troubleshooting/error-connection-refused-when-trying-to-connect-to-supabase-database-hwG0Dr",
+  "HV000": "https://supabase.com/kb/troubleshooting/FWD-wrappers-error-component-verification-failed"
+}
