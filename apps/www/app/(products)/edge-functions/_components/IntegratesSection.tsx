@@ -96,7 +96,7 @@ const USE_CASES = [
 import { withSupabase } from 'npm:@supabase/server@1'
 
 Deno.serve(
-  withSupabase({ auth: 'user' }, async () => {
+  withSupabase({ auth: 'none' }, async () => {
     // These are automatically available — no setup needed
     const supabase = createClient(
       Deno.env.get('SUPABASE_URL')!,
@@ -182,7 +182,7 @@ Deno.serve(
 import { withSupabase } from 'npm:@supabase/server@1'
 
 Deno.serve(
-  withSupabase({ auth: 'user' }, async (req: Request) => {
+  withSupabase({ auth: 'none' }, async (req: Request) => {
     // Create supabase client
     const supabase = createClient(
       Deno.env.get('SUPABASE_URL')!,

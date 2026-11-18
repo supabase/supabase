@@ -5,7 +5,7 @@ const code = `import { createClient } from 'jsr:@supabase/supabase-js@2'
 import { withSupabase } from 'npm:@supabase/server@1'
 
 Deno.serve(
-  withSupabase({ auth: 'user' }, async (req: Request) => {
+  withSupabase({ auth: 'none' }, async (req: Request) => {
     // Create supabase client
     const supabase = createClient(
       Deno.env.get('SUPABASE_URL')!,

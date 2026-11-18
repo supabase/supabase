@@ -24,7 +24,7 @@ import { createClient } from 'npm:@supabase/supabase-js@2'
 const SUPABASE_SECRET_KEYS = JSON.parse(Deno.env.get('SUPABASE_SECRET_KEYS')!)
 
 Deno.serve(
-  withSupabase({ auth: 'user' }, async (req) => {
+  withSupabase({ auth: 'none' }, async (req) => {
     const supabaseAdmin = createClient(
       Deno.env.get('SUPABASE_URL')!,
       // If you want to use a different api key, change 'default' to your preferred key name
@@ -70,7 +70,7 @@ import { withSupabase } from 'npm:@supabase/server@1'
 const STORAGE_URL = 'https://your-project.supabase.co/storage/v1/object/public/images'
 
 Deno.serve(
-  withSupabase({ auth: 'user' }, async (req) => {
+  withSupabase({ auth: 'none' }, async (req) => {
     const url = new URL(req.url)
     const username = url.searchParams.get('username')
 

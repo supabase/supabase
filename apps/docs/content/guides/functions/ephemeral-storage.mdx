@@ -56,7 +56,7 @@ You can use [Deno File System APIs](https://docs.deno.com/api/deno/file-system/)
 import { withSupabase } from 'npm:@supabase/server@1'
 
 Deno.serve(
-  withSupabase({ auth: 'user' }, async (req) => {
+  withSupabase({ auth: 'none' }, async (req) => {
     if (req.headers.get('content-type') !== 'application/zip') {
       return new Response('file must be a zip file', {
         status: 400,
@@ -124,7 +124,7 @@ async function processZipFile(uploadId: string, filepath: string) {
 }
 
 Deno.serve(
-  withSupabase({ auth: 'user' }, async (req) => {
+  withSupabase({ auth: 'none' }, async (req) => {
     const uploadId = crypto.randomUUID()
     const filepath = `/tmp/${uploadId}.zip`
 
@@ -149,7 +149,7 @@ Custom image manipulation workflows using [`magick-wasm`](/docs/guides/functions
 import { withSupabase } from 'npm:@supabase/server@1'
 
 Deno.serve(
-  withSupabase({ auth: 'user' }, async (req) => {
+  withSupabase({ auth: 'none' }, async (req) => {
     // Save uploaded image to temp storage
     const imagePath = `/tmp/input-${crypto.randomUUID()}.jpg`
     await Deno.writeFile(imagePath, req.body)
@@ -195,7 +195,7 @@ setTimeout(() => {
 })
 
 Deno.serve(
-  withSupabase({ auth: 'user' }, () => {
+  withSupabase({ auth: 'none' }, () => {
     Deno.statSync('...') // 💣 ERROR! Deno.statSync is blocklisted on the current context
   })
 )

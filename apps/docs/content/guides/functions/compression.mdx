@@ -12,7 +12,7 @@ import { gunzipSync } from 'node:zlib'
 import { withSupabase } from 'npm:@supabase/server@1'
 
 Deno.serve(
-  withSupabase({ auth: 'user' }, async (req) => {
+  withSupabase({ auth: 'none' }, async (req) => {
     try {
       // Check if the request body is gzip compressed
       const contentEncoding = req.headers.get('content-encoding')

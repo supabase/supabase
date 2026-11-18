@@ -105,7 +105,7 @@ You can add your own log messages using standard console methods:
 import { withSupabase } from 'npm:@supabase/server@1'
 
 Deno.serve(
-  withSupabase({ auth: 'user' }, async (req) => {
+  withSupabase({ auth: 'none' }, async (req) => {
     try {
       const { name } = await req.json()
 
@@ -156,7 +156,7 @@ import { withSupabase } from 'npm:@supabase/server@1'
 // ❌ This doesn't work as expected
 
 Deno.serve(
-  withSupabase({ auth: 'user' }, async (req) => {
+  withSupabase({ auth: 'none' }, async (req) => {
     console.log(`Headers: ${JSON.stringify(req.headers)}`) // Outputs: "{}"
   })
 )
@@ -171,7 +171,7 @@ import { withSupabase } from 'npm:@supabase/server@1'
 
 // ✅ This works correctly
 Deno.serve(
-  withSupabase({ auth: 'user' }, async (req) => {
+  withSupabase({ auth: 'none' }, async (req) => {
     const headersObject = Object.fromEntries(req.headers)
     const headersJson = JSON.stringify(headersObject, null, 2)
 

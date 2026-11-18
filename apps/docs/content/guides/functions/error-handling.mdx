@@ -15,7 +15,7 @@ Within your Edge Functions, return proper HTTP status codes and error messages:
 import { withSupabase } from 'npm:@supabase/server@1'
 
 Deno.serve(
-  withSupabase({ auth: 'user' }, async (req) => {
+  withSupabase({ auth: 'none' }, async (req) => {
     try {
       // Your function logic here
       const result = await processRequest(req)

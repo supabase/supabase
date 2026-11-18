@@ -391,7 +391,7 @@ const QUEUE_NAME = 'embedding_jobs'
 
 // Listen for HTTP requests
 Deno.serve(
-  withSupabase({ auth: 'user' }, async (req) => {
+  withSupabase({ auth: 'none' }, async (req) => {
     if (req.method !== 'POST') {
       return new Response('expected POST request', { status: 405 })
     }
