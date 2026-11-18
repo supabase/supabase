@@ -2,6 +2,7 @@
 import { describe, expect, it } from 'vitest'
 
 import {
+  buildPathWithParams,
   buildSignUpReturnPath,
   DEFAULT_FALLBACK_PATH,
   DEFAULT_SIGNUP_RETURN_PATH,
@@ -145,6 +146,29 @@ describe('getReturnToPath', () => {
     window.location = { search: '?returnTo=%2Fmcp%2Fsecrets' }
 
     expect(getReturnToPath()).toBe('/mcp/secrets')
+  })
+})
+
+describe('transient auth params', () => {
+  const search =
+    '?error_description=Unable+to+exchange+external+code%3A+53f8&error=server_error&error_code=unexpected_failure&method=github&returnTo=%2Fnew'
+
+  it('buildPathWithParams does not carry them into the new path', () => {
+    // @ts-ignore
+    delete window.location
+    // @ts-ignore
+    window.location = { search }
+
+    expect(buildPathWithParams('/sign-in-mfa')).toBe('/sign-in-mfa?returnTo=%2Fnew')
+  })
+
+  it('getReturnToPath does not append them to the destination', () => {
+    // @ts-ignore
+    delete window.location
+    // @ts-ignore
+    window.location = { search }
+
+    expect(getReturnToPath()).toBe('/new')
   })
 })
 
