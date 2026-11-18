@@ -13,6 +13,7 @@ import { MAX_SELECTED_PROJECTS, ProjectMultiSelect } from './ProjectMultiSelect'
 import { ScopeGroupCard } from './ScopeGroupCard'
 import { ScopeGroupCardWithDiff } from './ScopeGroupCardWithDiff'
 import { useMemberOrganization } from './useMemberOrganization'
+import { ApiAuthorizationInvalidScreen } from '@/components/interfaces/ApiAuthorization/ApiAuthorization.Invalid'
 import { ApiAuthorizationLoadingScreen } from '@/components/interfaces/ApiAuthorization/ApiAuthorization.Loading'
 import {
   DestinationLogo,
@@ -255,6 +256,10 @@ export const OAuthAppsAuthorizeScreen = ({
 
   const usesSelectedProjects = isProjectScopingModeEnabled && !allProjectsSelected
   const hasNoSelection = usesSelectedProjects && selectedProjectRefs.length === 0
+
+  if (!authId) {
+    return <ApiAuthorizationInvalidScreen missingParameters={['auth_id']} />
+  }
 
   if (
     isPendingRequest ||
