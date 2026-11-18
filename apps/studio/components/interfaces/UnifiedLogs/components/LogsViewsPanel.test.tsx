@@ -35,6 +35,7 @@ const baseProps = {
   isError: false,
   activeViewId: null,
   onApply: vi.fn(),
+  onReviewChanges: vi.fn(),
   onRename: vi.fn(),
   onDelete: vi.fn(),
   onCancelSave: vi.fn(),
@@ -94,6 +95,62 @@ describe('LogsViewsPanel', () => {
     expect(await screen.findByText('Modified')).toBeInTheDocument()
   })
 
+  it('reviews changes instead of re-applying when the active view is modified', async () => {
+    const onApply = vi.fn()
+    const onReviewChanges = vi.fn()
+    customRender(
+      <LogsViewsPanel
+        {...baseProps}
+        activeViewId="view-1"
+        isActiveViewModified
+        onApply={onApply}
+        onReviewChanges={onReviewChanges}
+      />
+    )
+
+    await userEvent.click(await screen.findByText('Errors only'))
+
+    expect(onReviewChanges).toHaveBeenCalledOnce()
+    expect(onApply).not.toHaveBeenCalled()
+  })
+
+  it('re-applies the active view when it is unmodified', async () => {
+    const onApply = vi.fn()
+    const onReviewChanges = vi.fn()
+    customRender(
+      <LogsViewsPanel
+        {...baseProps}
+        activeViewId="view-1"
+        onApply={onApply}
+        onReviewChanges={onReviewChanges}
+      />
+    )
+
+    await userEvent.click(await screen.findByText('Errors only'))
+
+    expect(onApply).toHaveBeenCalledWith(errorsView)
+    expect(onReviewChanges).not.toHaveBeenCalled()
+  })
+
+  it('applies a different view normally while another is modified', async () => {
+    const onApply = vi.fn()
+    const onReviewChanges = vi.fn()
+    customRender(
+      <LogsViewsPanel
+        {...baseProps}
+        activeViewId="view-1"
+        isActiveViewModified
+        onApply={onApply}
+        onReviewChanges={onReviewChanges}
+      />
+    )
+
+    await userEvent.click(await screen.findByText('Auth failures'))
+
+    expect(onApply).toHaveBeenCalledWith(authView)
+    expect(onReviewChanges).not.toHaveBeenCalled()
+  })
+
   it('filters the list by search', async () => {
     customRender(<LogsViewsPanel {...baseProps} />)
 
@@ -119,7 +176,17 @@ describe('LogsViewsPanel', () => {
     expect(onRetry).toHaveBeenCalledOnce()
   })
 
-  it('submits a trimmed name from the save row', async () => {
+  it('opens the save dialog only while saving', async () => {
+    const { rerender } = customRender(<LogsViewsPanel {...baseProps} />)
+
+    expect(screen.queryByRole('dialog', { name: 'Save view' })).toBeNull()
+
+    rerender(<LogsViewsPanel {...baseProps} isSaving />)
+
+    expect(await screen.findByRole('dialog', { name: 'Save view' })).toBeInTheDocument()
+  })
+
+  it('submits a trimmed name from the save dialog', async () => {
     const onSubmitSave = vi.fn().mockResolvedValue(undefined)
     customRender(<LogsViewsPanel {...baseProps} isSaving onSubmitSave={onSubmitSave} />)
 
@@ -128,7 +195,7 @@ describe('LogsViewsPanel', () => {
     fireEvent.change(await screen.findByPlaceholderText('Enter a name for this view'), {
       target: { value: '  Slow requests  ' },
     })
-    fireEvent.click(screen.getByRole('button', { name: 'Save' }))
+    fireEvent.click(screen.getByRole('button', { name: 'Save view' }))
 
     await waitFor(() => expect(onSubmitSave).toHaveBeenCalledWith('Slow requests'))
   })
@@ -137,13 +204,12 @@ describe('LogsViewsPanel', () => {
     const onSubmitSave = vi.fn()
     customRender(<LogsViewsPanel {...baseProps} isSaving onSubmitSave={onSubmitSave} />)
 
-    await userEvent.type(
-      await screen.findByPlaceholderText('Enter a name for this view'),
-      'errors only'
-    )
+    fireEvent.change(await screen.findByPlaceholderText('Enter a name for this view'), {
+      target: { value: 'errors only' },
+    })
+    fireEvent.click(screen.getByRole('button', { name: 'Save view' }))
 
     expect(await screen.findByText("That name's already taken. Try another.")).toBeInTheDocument()
-    expect(screen.getByRole('button', { name: 'Save' })).toBeDisabled()
     expect(onSubmitSave).not.toHaveBeenCalled()
   })
 
@@ -153,19 +219,33 @@ describe('LogsViewsPanel', () => {
 
     const input = await screen.findByPlaceholderText('Enter a name for this view')
     fireEvent.change(input, { target: { value: 'Retry me' } })
-    fireEvent.click(screen.getByRole('button', { name: 'Save' }))
+    fireEvent.click(screen.getByRole('button', { name: 'Save view' }))
 
     await waitFor(() => expect(onSubmitSave).toHaveBeenCalledWith('Retry me'))
     expect(input).toHaveValue('Retry me')
-    await waitFor(() => expect(screen.getByRole('button', { name: 'Save' })).not.toBeDisabled())
+    await waitFor(() =>
+      expect(screen.getByRole('button', { name: 'Save view' })).not.toBeDisabled()
+    )
   })
 
-  it('cancels the save row', async () => {
+  it('cancels the save dialog', async () => {
     const onCancelSave = vi.fn()
     customRender(<LogsViewsPanel {...baseProps} isSaving onCancelSave={onCancelSave} />)
 
     await userEvent.click(await screen.findByRole('button', { name: 'Cancel' }))
 
     expect(onCancelSave).toHaveBeenCalledOnce()
+  })
+
+  it('opens the rename dialog pre-filled from the row menu', async () => {
+    customRender(<LogsViewsPanel {...baseProps} />)
+
+    await userEvent.click(
+      await screen.findByRole('button', { name: 'View options for Errors only' })
+    )
+    await userEvent.click(await screen.findByRole('menuitem', { name: 'Rename' }))
+
+    expect(await screen.findByRole('dialog', { name: 'Rename view' })).toBeInTheDocument()
+    expect(screen.getByPlaceholderText('Enter a name for this view')).toHaveValue('Errors only')
   })
 })

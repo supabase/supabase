@@ -540,6 +540,13 @@ export const UnifiedLogs = ({
     handleApplyView(activeView)
   }
 
+  // Clearing the dismissal means the prompt is available again for this view +
+  // filter combination, including after leaving and re-entering the section.
+  const handleReviewChanges = () => {
+    setDismissedUpdateKey(null)
+    setIsReviewingChanges(true)
+  }
+
   // The reset button clears the filters a view applied, so the view is no longer
   // the thing on screen — drop it along with any pending modified-state prompts.
   const handleClearActiveView = () => {
@@ -731,6 +738,7 @@ export const UnifiedLogs = ({
                               activeRowRef={activeViewRowRef}
                               onRetry={retrySavedViews}
                               onApply={handleApplyView}
+                              onReviewChanges={handleReviewChanges}
                               onRename={(id, name) => updateSavedView(id, { name })}
                               onDelete={deleteSavedView}
                               onCancelSave={() => setSaveViewProjectRef(null)}

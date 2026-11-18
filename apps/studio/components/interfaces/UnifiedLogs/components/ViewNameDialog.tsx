@@ -18,24 +18,32 @@ import {
 import { FormItemLayout } from 'ui-patterns/form/FormItemLayout/FormItemLayout'
 import * as z from 'zod'
 
-import { type LogsView } from '../UnifiedLogs.views'
 import { isDuplicateViewName, VIEW_NAME_MAX_LENGTH } from './LogsViews.utils'
 import { DiscardChangesConfirmationDialog } from '@/components/ui-patterns/Dialogs/DiscardChangesConfirmationDialog'
 import { useConfirmOnClose } from '@/hooks/ui/useConfirmOnClose'
 
-interface RenameViewDialogProps {
-  view: LogsView | null
+interface ViewNameDialogProps {
+  open: boolean
+  title: string
+  confirmLabel: string
+  /** Pre-fills the input and lets an unchanged name close without submitting. */
+  initialName?: string
   existingNames?: string[]
+  discardDescription: string
   onCancel: () => void
-  onRename: (id: string, name: string) => Promise<void>
+  onSubmit: (name: string) => Promise<void>
 }
 
-export const RenameViewDialog = ({
-  view,
+export const ViewNameDialog = ({
+  open,
+  title,
+  confirmLabel,
+  initialName,
   existingNames = [],
+  discardDescription,
   onCancel,
-  onRename,
-}: RenameViewDialogProps) => {
+  onSubmit,
+}: ViewNameDialogProps) => {
   const schema = useMemo(
     () =>
       z.object({
@@ -62,8 +70,8 @@ export const RenameViewDialog = ({
 
   const { reset } = form
   useEffect(() => {
-    if (view) reset({ name: view.name })
-  }, [view, reset])
+    if (open) reset({ name: initialName ?? '' })
+  }, [open, initialName, reset])
 
   const {
     confirmOnClose,
@@ -71,31 +79,30 @@ export const RenameViewDialog = ({
     modalProps: discardChangesModalProps,
   } = useConfirmOnClose({ checkIsDirty: () => isDirty, onClose: onCancel })
 
-  const onSubmit = async ({ name: nextName }: z.infer<typeof schema>) => {
-    if (!view) return
+  const handleSubmit = async ({ name: nextName }: z.infer<typeof schema>) => {
     try {
-      if (nextName !== view.name) await onRename(view.id, nextName)
+      if (nextName !== initialName) await onSubmit(nextName)
       onCancel()
     } catch {
-      return
+      // Leave the dialog open with the name intact so the user can retry.
     }
   }
 
   return (
     <>
       <Dialog
-        open={view !== null}
+        open={open}
         onOpenChange={(nextOpen) => {
           if (!isSubmitting) handleOpenChange(nextOpen)
         }}
       >
         <DialogContent size="small">
           <DialogHeader>
-            <DialogTitle>Rename view</DialogTitle>
+            <DialogTitle>{title}</DialogTitle>
           </DialogHeader>
           <DialogSectionSeparator />
           <Form {...form}>
-            <form onSubmit={form.handleSubmit(onSubmit)} noValidate>
+            <form onSubmit={form.handleSubmit(handleSubmit)} noValidate>
               <DialogSection>
                 <FormField
                   control={form.control}
@@ -119,7 +126,7 @@ export const RenameViewDialog = ({
                   loading={isSubmitting}
                   disabled={isSubmitting || isNameEmpty}
                 >
-                  Rename view
+                  {confirmLabel}
                 </Button>
               </DialogFooter>
             </form>
@@ -128,7 +135,7 @@ export const RenameViewDialog = ({
       </Dialog>
       <DiscardChangesConfirmationDialog
         {...discardChangesModalProps}
-        description="Are you sure you want to discard your changes? The view will keep its current name."
+        description={discardDescription}
       />
     </>
   )

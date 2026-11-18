@@ -1,5 +1,5 @@
-import { AlertCircleIcon, EditIcon, LayersIcon, MoreVerticalIcon, Trash2Icon } from 'lucide-react'
-import { FormEvent, KeyboardEvent, RefObject, useEffect, useRef, useState } from 'react'
+import { AlertCircleIcon, EditIcon, Layers2Icon, MoreVerticalIcon, Trash2Icon } from 'lucide-react'
+import { RefObject, useState } from 'react'
 import {
   Button,
   cn,
@@ -7,7 +7,6 @@ import {
   DropdownMenuContent,
   DropdownMenuItem,
   DropdownMenuTrigger,
-  Input,
 } from 'ui'
 import { ConfirmationModal } from 'ui-patterns/Dialogs/ConfirmationModal'
 import { EmptyStatePresentational } from 'ui-patterns/EmptyStatePresentational'
@@ -15,8 +14,7 @@ import { InnerSideBarFilters, InnerSideBarFilterSearchInput } from 'ui-patterns/
 import { GenericSkeletonLoader } from 'ui-patterns/ShimmeringLoader'
 
 import { type LogsView } from '../UnifiedLogs.views'
-import { isDuplicateViewName, VIEW_NAME_MAX_LENGTH } from './LogsViews.utils'
-import { RenameViewDialog } from './RenameViewDialog'
+import { ViewNameDialog } from './ViewNameDialog'
 
 interface LogsViewRowProps {
   view: LogsView
@@ -26,6 +24,7 @@ interface LogsViewRowProps {
   canDelete: boolean
   activeRowRef?: RefObject<HTMLDivElement | null>
   onApply: (view: LogsView) => void
+  onReviewChanges: () => void
   onRequestRename: (view: LogsView) => void
   onRequestDelete: (view: LogsView) => void
 }
@@ -38,9 +37,14 @@ const LogsViewRow = ({
   canDelete,
   activeRowRef,
   onApply,
+  onReviewChanges,
   onRequestRename,
   onRequestDelete,
 }: LogsViewRowProps) => {
+  // Re-applying a modified view would silently throw the edits away, so the row
+  // offers the update/save/reset choices instead while it reads as modified.
+  const isModifiedActive = isActive && isModified
+
   return (
     <div
       ref={isActive ? activeRowRef : undefined}
@@ -52,11 +56,12 @@ const LogsViewRow = ({
       <button
         type="button"
         tabIndex={0}
-        onClick={() => onApply(view)}
+        onClick={() => (isModifiedActive ? onReviewChanges() : onApply(view))}
         aria-current={isActive}
+        aria-label={isModifiedActive ? `${view.name} — review changes` : undefined}
         className="flex min-w-0 flex-1 items-center gap-2 rounded-md py-1.5 text-left focus-ring"
       >
-        <LayersIcon size={14} className="shrink-0 text-foreground-light" />
+        <Layers2Icon size={14} className="shrink-0 text-foreground-light" />
         <span
           className={cn(
             'min-w-0 flex-1 truncate text-sm',
@@ -66,7 +71,7 @@ const LogsViewRow = ({
         >
           {view.name}
         </span>
-        {isActive && isModified && (
+        {isModifiedActive && (
           <span className="shrink-0 text-xs text-foreground-lighter">Modified</span>
         )}
       </button>
@@ -103,79 +108,6 @@ const LogsViewRow = ({
   )
 }
 
-interface SaveViewRowProps {
-  existingNames: string[]
-  isPending: boolean
-  onCancel: () => void
-  onSubmit: (name: string) => Promise<void>
-}
-
-const SaveViewRow = ({ existingNames, isPending, onCancel, onSubmit }: SaveViewRowProps) => {
-  const [name, setName] = useState('')
-  const [isSubmitting, setIsSubmitting] = useState(false)
-  const inputRef = useRef<HTMLInputElement>(null)
-
-  useEffect(() => {
-    inputRef.current?.focus()
-    inputRef.current?.select()
-  }, [])
-
-  const trimmed = name.trim()
-  const isDuplicate = isDuplicateViewName(trimmed, existingNames)
-  const isBusy = isPending || isSubmitting
-  const canSubmit = trimmed.length > 0 && !isDuplicate && !isBusy
-
-  const handleSubmit = async (event: FormEvent) => {
-    event.preventDefault()
-    if (!canSubmit) return
-    setIsSubmitting(true)
-    try {
-      await onSubmit(trimmed)
-    } catch {
-      // Leave the form open with the name intact so the user can retry.
-    } finally {
-      setIsSubmitting(false)
-    }
-  }
-
-  const handleKeyDown = (event: KeyboardEvent<HTMLInputElement>) => {
-    if (event.key === 'Escape') {
-      event.preventDefault()
-      onCancel()
-    }
-  }
-
-  return (
-    <form onSubmit={handleSubmit} className="flex flex-col gap-2 px-3 py-2">
-      <Input
-        ref={inputRef}
-        size="tiny"
-        value={name}
-        maxLength={VIEW_NAME_MAX_LENGTH}
-        placeholder="Enter a name for this view"
-        aria-label="Name for this view"
-        aria-invalid={isDuplicate}
-        aria-describedby={isDuplicate ? 'logs-view-name-error' : undefined}
-        onChange={(event) => setName(event.target.value)}
-        onKeyDown={handleKeyDown}
-      />
-      {isDuplicate && (
-        <p id="logs-view-name-error" className="text-xs text-destructive-600">
-          That name's already taken. Try another.
-        </p>
-      )}
-      <div className="flex items-center justify-end gap-2">
-        <Button size="tiny" variant="default" onClick={onCancel} disabled={isBusy}>
-          Cancel
-        </Button>
-        <Button size="tiny" type="submit" loading={isBusy} disabled={!canSubmit}>
-          Save
-        </Button>
-      </div>
-    </form>
-  )
-}
-
 interface LogsViewsPanelProps {
   views: LogsView[]
   isLoading: boolean
@@ -189,6 +121,8 @@ interface LogsViewsPanelProps {
   activeRowRef?: RefObject<HTMLDivElement | null>
   onRetry?: () => void
   onApply: (view: LogsView) => void
+  /** Clicking the active view while it reads as modified. */
+  onReviewChanges: () => void
   onRename: (id: string, name: string) => Promise<void>
   onDelete: (id: string) => Promise<void>
   onCancelSave: () => void
@@ -208,6 +142,7 @@ export const LogsViewsPanel = ({
   activeRowRef,
   onRetry,
   onApply,
+  onReviewChanges,
   onRename,
   onDelete,
   onCancelSave,
@@ -239,15 +174,6 @@ export const LogsViewsPanel = ({
           </div>
         )}
 
-        {isSaving && (
-          <SaveViewRow
-            existingNames={existingNames}
-            isPending={isPending}
-            onCancel={onCancelSave}
-            onSubmit={onSubmitSave}
-          />
-        )}
-
         <div className="min-h-0 flex-1 overflow-y-auto p-3">
           {isLoading && <GenericSkeletonLoader />}
 
@@ -265,7 +191,7 @@ export const LogsViewsPanel = ({
 
           {!isLoading && !isError && views.length === 0 && !isSaving && (
             <EmptyStatePresentational
-              icon={LayersIcon}
+              icon={Layers2Icon}
               iconSize={20}
               title="No saved views"
               description="Filter your logs, then save the combination to come back to it later."
@@ -290,6 +216,7 @@ export const LogsViewsPanel = ({
                   canDelete={canDelete && !isPending}
                   activeRowRef={activeRowRef}
                   onApply={onApply}
+                  onReviewChanges={onReviewChanges}
                   onRequestRename={setRenameTarget}
                   onRequestDelete={setDeleteTarget}
                 />
@@ -299,13 +226,27 @@ export const LogsViewsPanel = ({
         </div>
       </div>
 
-      <RenameViewDialog
-        view={renameTarget}
+      <ViewNameDialog
+        open={isSaving}
+        title="Save view"
+        confirmLabel="Save view"
+        existingNames={existingNames}
+        discardDescription="Are you sure you want to discard this name? The view won't be saved."
+        onCancel={onCancelSave}
+        onSubmit={onSubmitSave}
+      />
+
+      <ViewNameDialog
+        open={renameTarget !== null}
+        title="Rename view"
+        confirmLabel="Rename view"
+        initialName={renameTarget?.name}
         existingNames={existingNames.filter((name) => name !== renameTarget?.name)}
+        discardDescription="Are you sure you want to discard your changes? The view will keep its current name."
         onCancel={() => setRenameTarget(null)}
-        onRename={async (id, name) => {
-          await onRename(id, name)
-          setRenameTarget(null)
+        onSubmit={async (name) => {
+          if (!renameTarget) return
+          await onRename(renameTarget.id, name)
         }}
       />
 

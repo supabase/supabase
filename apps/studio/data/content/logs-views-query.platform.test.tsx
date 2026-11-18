@@ -250,6 +250,7 @@ describe('saved log views persistence', () => {
           activeViewId={null}
           isSaving
           onApply={vi.fn()}
+          onReviewChanges={vi.fn()}
           onRename={vi.fn()}
           onDelete={vi.fn()}
           onCancelSave={onCancelSave}
@@ -268,14 +269,16 @@ describe('saved log views persistence', () => {
     fireEvent.change(await screen.findByPlaceholderText('Enter a name for this view'), {
       target: { value: 'Retry me' },
     })
-    fireEvent.click(screen.getByRole('button', { name: 'Save' }))
-    await waitFor(() => expect(screen.getByRole('button', { name: 'Save' })).toBeDisabled())
-    await waitFor(() => expect(screen.getByRole('button', { name: 'Save' })).not.toBeDisabled())
+    fireEvent.click(screen.getByRole('button', { name: 'Save view' }))
+    await waitFor(() => expect(screen.getByRole('button', { name: 'Save view' })).toBeDisabled())
+    await waitFor(() =>
+      expect(screen.getByRole('button', { name: 'Save view' })).not.toBeDisabled()
+    )
     expect(onSuccess).not.toHaveBeenCalled()
     expect(onCancelSave).not.toHaveBeenCalled()
     expect(screen.getByPlaceholderText('Enter a name for this view')).toHaveValue('Retry me')
     shouldFail = false
-    fireEvent.click(screen.getByRole('button', { name: 'Save' }))
+    fireEvent.click(screen.getByRole('button', { name: 'Save view' }))
     await waitFor(() => expect(onSuccess).toHaveBeenCalledOnce())
   })
 
