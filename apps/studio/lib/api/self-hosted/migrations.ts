@@ -34,22 +34,28 @@ const applyAndTrackMigrationsQuery = (query: string, name?: string) => {
 
     -- track statements in history table
     -- Versions have second precision, so a migration applied within the same second as
-    -- the previous one would reuse its version and fail on the primary key. Use the next
-    -- free second instead, and lock the table so concurrent migrations don't race.
+    -- the previous one would reuse its version and fail on the primary key. In that case
+    -- use the second after the latest version, and lock the table so concurrent migrations
+    -- don't race. Only a latest version at or after the current time is parsed, so older
+    -- versions that aren't valid timestamps (e.g. 00000000000000_init) are never parsed.
     lock table supabase_migrations.schema_migrations in share row exclusive mode;
     insert into supabase_migrations.schema_migrations (version, name, statements)
     select
       to_char(
-        greatest(
-          current_timestamp,
-          max(to_timestamp(version, 'YYYYMMDDHH24MISS')) + interval '1 second'
-        ),
+        case
+          when latest.version >= to_char(current_timestamp, 'YYYYMMDDHH24MISS')
+            then to_timestamp(latest.version, 'YYYYMMDDHH24MISS') + interval '1 second'
+          else current_timestamp
+        end,
         'YYYYMMDDHH24MISS'
       ),
       ${quote(name)},
       array[${quote(query)}]
-    from supabase_migrations.schema_migrations
-    where version ~ '^[0-9]{14}$';
+    from (
+      select max(version) as version
+      from supabase_migrations.schema_migrations
+      where version ~ '^[0-9]{14}$'
+    ) as latest;
 
     commit;
   `
