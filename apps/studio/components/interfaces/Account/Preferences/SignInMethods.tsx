@@ -113,11 +113,6 @@ export const SignInMethods = ({
   const getProviderName = (provider?: string) =>
     provider ? getProviderDisplay(provider).displayName : undefined
 
-  const getConfiguredExternalProvider = (provider: string) =>
-    connectableExternalProviders.find(
-      ({ id, authProvider }) => provider === id || provider === authProvider
-    )
-
   const onConfirmUnlinkIdentity = async () => {
     if (!selectedProviderUnlink) return
     if (
@@ -199,8 +194,6 @@ export const SignInMethods = ({
                   .filter(Boolean)
                   .join(' · ')
                 const providerName = getProviderName(provider)
-                const configuredProvider = getConfiguredExternalProvider(provider)
-                const canUpdateEmail = !configuredProvider
 
                 return (
                   <Fragment key={identity_id}>
@@ -236,16 +229,14 @@ export const SignInMethods = ({
                         </div>
                       </div>
                       <div className="flex shrink-0 items-center gap-x-1">
-                        {canUpdateEmail && (
-                          <ButtonTooltip
-                            variant="default"
-                            size="tiny"
-                            icon={<EditIcon size={14} strokeWidth={2} />}
-                            aria-label="Update email address"
-                            onClick={() => setSelectedProviderUpdateEmail(provider)}
-                            tooltip={{ content: { side: 'top', text: 'Update email address' } }}
-                          />
-                        )}
+                        <ButtonTooltip
+                          variant="default"
+                          size="tiny"
+                          icon={<EditIcon size={14} strokeWidth={2} />}
+                          aria-label="Update email address"
+                          onClick={() => setSelectedProviderUpdateEmail(provider)}
+                          tooltip={{ content: { side: 'top', text: 'Update email address' } }}
+                        />
                         {identities.length > 1 && provider !== 'email' && (
                           <ButtonTooltip
                             variant="default"
