@@ -61,6 +61,13 @@ assert_path_exists() { # <path> <desc>
 assert_path_absent() { # <path> <desc>
     if [ -e "$1" ]; then bad "$2 ($1 should not exist)"; else ok "$2"; fi
 }
+assert_file_equals() { # <file> <expected, printf %b escapes> <desc>
+    printf '%b' "$2" > "$WORK/expected"
+    if cmp -s "$1" "$WORK/expected"; then ok "$3"; else
+        bad "$3 ($1 differs from expected)"
+        sed 's/^/        > /' "$1" 2>/dev/null || true
+    fi
+}
 
 # portable in-place sed (BSD + GNU): sedi <expr> <file>
 sedi() { sed "$1" "$2" > "$2.tmp" && mv "$2.tmp" "$2"; }
@@ -246,18 +253,16 @@ fi
 assert_file_contains  "volumes/snippets/user.sql" "USER_SNIPPET"     "snippets left untouched"
 # seed.sql is the only file that is BOTH shipped in the target snapshot AND
 # gitignored, so it is the real is_excluded coverage.
-# Assert the user's content survives AND no vendor content / conflict markers
-# leaked in - i.e. the file was skipped, not merged/conflicted.
-assert_file_contains         "volumes/snippets/seed.sql" "USER SEED"   "gitignored snippet: user content kept"
-assert_file_missing_pattern  "volumes/snippets/seed.sql" "VENDOR SEED" "gitignored snippet: no vendor content"
-assert_file_missing_pattern  "volumes/snippets/seed.sql" "<<<<<<<"     "gitignored snippet: not conflicted (skipped)"
+# The file must be byte-identical to the user's fixture - i.e. skipped, not
+# merged/conflicted (no vendor content, no markers, nothing appended).
+assert_file_equals "volumes/snippets/seed.sql" 'USER SEED\n' "gitignored snippet: skipped (user content unchanged)"
 assert_file_contains  "volumes/functions/my-fn/index.ts" "user fn"   "custom edge fn left untouched"
 assert_file_contains  "volumes/functions/main/index.ts" "target main" "vendor main/index.ts updated"
 # hello/index.ts is allowlisted (un-ignored) in .gitignore, so it is vendor-owned:
 # it must 3-way merge, not be skipped - upstream change and user edit both land.
-assert_file_contains         "volumes/functions/hello/index.ts" "greeting=target" "vendor hello/index.ts updated"
-assert_file_contains         "volumes/functions/hello/index.ts" "user hello"      "vendor hello/index.ts: user edit merged"
-assert_file_missing_pattern  "volumes/functions/hello/index.ts" "<<<<<<<"         "vendor hello/index.ts: merged cleanly"
+# Exact result: no retained base line, no dropped/duplicated lines, no markers.
+assert_file_equals "volumes/functions/hello/index.ts" 'greeting=target\nmiddle\ntail\nuser hello\n' \
+    "vendor hello/index.ts: clean 3-way merge (upstream change + user edit)"
 
 echo ""
 echo "=== update.sh: clean apply (no conflict) advances the stamp and exits 0 ==="
