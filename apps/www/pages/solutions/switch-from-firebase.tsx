@@ -28,8 +28,6 @@ const Firebase: NextPage = () => {
           description: content.metadata.metaDescription,
           url: `https://supabase.com/solutions/switch-from-firebase`,
         }}
-        noindex={true}
-        nofollow={true}
       />
       <Layout className="overflow-visible">
         <SolutionsStickyNav activeItem={Solutions.firebase} type="migration" />
