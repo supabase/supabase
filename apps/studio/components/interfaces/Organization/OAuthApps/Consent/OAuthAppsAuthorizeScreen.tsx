@@ -235,7 +235,7 @@ export const OAuthAppsAuthorizeScreen = ({
     },
   })
 
-  const isSubmitting = approveMutation.isPending
+  const isSubmitting = approveMutation.isPending || denyMutation.isPending
   const hasProjects = (projects?.length ?? 0) > 0
 
   const isBlockedOnProjects = isProjectScopingModeEnabled && !isPendingProjects && !hasProjects
