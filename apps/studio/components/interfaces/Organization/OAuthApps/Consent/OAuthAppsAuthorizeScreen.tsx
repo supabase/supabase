@@ -157,6 +157,7 @@ export const OAuthAppsAuthorizeScreen = ({
 
   const {
     data: initialProjectsData,
+    isPending: isPendingInitialProjects,
     isError: isErrorInitialProjects,
     error: initialProjectsError,
   } = useOrgProjectsInfiniteQuery(
@@ -255,7 +256,12 @@ export const OAuthAppsAuthorizeScreen = ({
   const usesSelectedProjects = isProjectScopingModeEnabled && !allProjectsSelected
   const hasNoSelection = usesSelectedProjects && selectedProjectRefs.length === 0
 
-  if (isPendingRequest || isPendingIdentity || isPendingMemberOrg) {
+  if (
+    isPendingRequest ||
+    isPendingIdentity ||
+    isPendingMemberOrg ||
+    (isPendingInitialProjects && initialRefs.length > 0)
+  ) {
     return <ApiAuthorizationLoadingScreen />
   }
 
