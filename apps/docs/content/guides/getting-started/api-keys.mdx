@@ -77,7 +77,7 @@ These environments are always considered public because anyone can retrieve the 
 
 ### Postgres roles and Row Level Security
 
-Every key resolves to a built-in Postgres role, and that role is what your Row Level Security policies match on. Using a publishable key doesn't mean your user is anonymous: your application authenticates with the publishable key while your user authenticates separately through Supabase Auth with their own JWT.
+Every key resolves to a built-in [Postgres role](/docs/guides/database/postgres/roles), and that role is what your Row Level Security policies match on. Using a publishable key doesn't mean your user is anonymous: your application authenticates with the publishable key while your user authenticates separately through Supabase Auth with their own JWT.
 
 | Key             | User signed in through Supabase Auth | Postgres role   |
 | --------------- | ------------------------------------ | --------------- |

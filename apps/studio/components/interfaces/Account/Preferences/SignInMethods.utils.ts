@@ -23,11 +23,9 @@ export const shouldShowAddPasswordRow = ({
 /**
  * Whether unlinking a linked identity is allowed.
  *
- * Email unlink is temporarily blocked (control stays visible but disabled): Auth
- * leaves `encrypted_password` after unlinking the email identity, so the UI can
- * claim the password is gone while the old password still works and re-adding
- * fails with "Current password required". Re-enable once Auth clears the
- * password hash on email unlink.
+ * Passwords can be changed but not removed. Keep email unlink blocked until
+ * email identifiers can be managed independently of password status in Studio:
+ * Auth retains the password after unlinking the email identity.
  */
 export const canUnlinkIdentity = ({
   provider,
