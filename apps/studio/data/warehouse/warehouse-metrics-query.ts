@@ -43,9 +43,10 @@ async function getWarehouseMetrics(
   return data
 }
 
-/** Only capacity (503) and throttling (429) errors are worth retrying, and only twice. */
+/** Retry throttling and server errors at most twice. */
 export const shouldRetryWarehouseMetrics = (failureCount: number, error: StudioError) =>
-  failureCount < MAX_RETRIES && (error.code === 503 || error.code === 429)
+  failureCount < MAX_RETRIES &&
+  (error.code === 429 || (typeof error.code === 'number' && error.code >= 500))
 
 export const warehouseMetricsQueryOptions = ({
   projectRef,

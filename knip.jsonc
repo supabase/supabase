@@ -38,10 +38,6 @@
         "compat/**/*.{ts,tsx}",
       ],
       "ignore": [
-        // Warehouse chart model used from #53001; remove when its report lands.
-        "components/interfaces/Observability/Warehouse/WarehouseMetrics.model.ts",
-        // Warehouse report client used from #53001; remove when its report lands.
-        "data/warehouse/warehouse-metrics-query.ts",
         "public/**",
         // one-off build/codegen scripts, run by hand or from package.json
         "scripts/**",
