@@ -316,18 +316,102 @@ The following sections cover handing a project to someone else, lost access, par
 
 Projects belong to organizations, not to user accounts. To give a project to another person or a client, move the project to their organization or hand over your whole organization.
 
-**Option 1: Move the project to their organization**
+#### Option 1: Move the project to their organization
+
+<Tabs scrollable size="small" type="underlined" defaultActiveId="dashboard" queryGroup="method">
+<TabPanel id="dashboard" label="Dashboard">
 
 1. Ask the recipient to create an organization and invite you with a role for the whole organization. The Read-only role is enough.
 2. Accept the invitation.
 3. [Transfer the project](#transfer-a-project) to their organization.
 4. Leave their organization, or ask the recipient to remove you.
 
-**Option 2: Hand over the whole organization**
+</TabPanel>
+<TabPanel id="api" label="Management API">
+
+1. Ask the recipient to create an organization and invite you with a role for the whole organization. On the Team Plan or Enterprise Plan, the recipient can use the [create organization invitations](/docs/reference/api/v2-create-organization-invitations) endpoint. On other plans, the recipient invites you from the Dashboard.
+2. Accept the invitation from the invitation email. The Management API has no endpoint for accepting an invitation.
+3. Transfer the project with the Management API. See [Transfer a project](#transfer-a-project).
+4. Ask the recipient to remove you with the [remove organization members](/docs/reference/api/v2-remove-organization-members) endpoint. Only an Owner of their organization can call it. To leave without their help, click **Leave team** in the organization's [team settings](/dashboard/org/_/team).
+
+</TabPanel>
+</Tabs>
+
+#### Option 2: Hand over the whole organization
+
+<Tabs scrollable size="small" type="underlined" defaultActiveId="dashboard" queryGroup="method">
+<TabPanel id="dashboard" label="Dashboard">
 
 1. Invite the recipient to your organization as an **Owner**, or promote a member to **Owner**.
 2. After the recipient accepts, replace or remove your payment method in the organization's [billing settings](/dashboard/org/_/billing). The payment method stays with the organization and can still be charged after you leave.
 3. In the organization's [team settings](/dashboard/org/_/team), click **Leave team**.
+
+</TabPanel>
+<TabPanel id="api" label="Management API">
+
+1. Create an [access token](/dashboard/account/tokens). If you scope the token, grant **Organization Members** with **Read-write** access and **Organization Settings** with **Read-write** access.
+2. Set the token and the organization's slug:
+
+   ```bash
+   export SUPABASE_ACCESS_TOKEN="your-access-token"
+   export ORG_SLUG="your-organization-slug"
+   ```
+
+3. Make the recipient an Owner. Both of the following requests need the Team Plan or Enterprise Plan. On other plans, use the Dashboard for this step.
+
+   If the recipient isn't a member of the organization, invite them with the [create organization invitations](/docs/reference/api/v2-create-organization-invitations) endpoint:
+
+   ```bash
+   export RECIPIENT_EMAIL="recipient@example.com"
+
+   curl -X POST "https://api.supabase.com/v2/organizations/$ORG_SLUG/members/invitations" \
+     -H "Authorization: Bearer $SUPABASE_ACCESS_TOKEN" \
+     -H "Content-Type: application/json" \
+     -d @- <<EOF
+   {
+     "data": [
+       {
+         "type": "organization_invitation",
+         "attributes": { "email": "$RECIPIENT_EMAIL", "role": "owner" }
+       }
+     ]
+   }
+   EOF
+   ```
+
+   If the recipient is already a member, find their `id` with the [list organization members](/docs/reference/api/v2-list-organization-members) endpoint. Then change their role with the [assign organization member role](/docs/reference/api/v2-assign-organization-member-role) endpoint:
+
+   ```bash
+   curl "https://api.supabase.com/v2/organizations/$ORG_SLUG/members" \
+     -H "Authorization: Bearer $SUPABASE_ACCESS_TOKEN"
+
+   export MEMBER_ID="recipient-member-id"
+
+   curl -X PATCH "https://api.supabase.com/v2/organizations/$ORG_SLUG/members/$MEMBER_ID/roles" \
+     -H "Authorization: Bearer $SUPABASE_ACCESS_TOKEN" \
+     -H "Content-Type: application/json" \
+     -d @- <<EOF
+   {
+     "data": {
+       "type": "organization_member_role",
+       "attributes": { "role": "owner" }
+     }
+   }
+   EOF
+   ```
+
+4. After the recipient is an Owner, replace or remove your payment method in the organization's [billing settings](/dashboard/org/_/billing). The Management API has no endpoint for payment methods. The payment method stays with the organization and can still be charged after you leave.
+5. Remove yourself with the [remove organization members](/docs/reference/api/v2-remove-organization-members) endpoint. Use your own `id` from the list of members. The request fails while you're the only Owner.
+
+   ```bash
+   export MEMBER_ID="your-member-id"
+
+   curl -X DELETE "https://api.supabase.com/v2/organizations/$ORG_SLUG/members/$MEMBER_ID" \
+     -H "Authorization: Bearer $SUPABASE_ACCESS_TOKEN"
+   ```
+
+</TabPanel>
+</Tabs>
 
 If the organization's billing email is your address, it changes to a remaining Owner's address when you leave. A billing email set to any other address stays the same.
 
