@@ -92,17 +92,20 @@ const USE_CASES = [
     paragraph: 'Pre-populated environment variables required to access your Supabase project',
     lang: 'javascript' as const,
     code: `import { createClient } from 'jsr:@supabase/supabase-js@2'
+import { withSupabase } from 'npm:@supabase/server@1'
 
-Deno.serve(async () => {
-  // These are automatically available — no setup needed
-  const supabase = createClient(
-    Deno.env.get('SUPABASE_URL')!,
-    Deno.env.get('SUPABASE_ANON_KEY')!
-  )
+export default {
+  fetch: withSupabase({ auth: 'user' }, async () => {
+    // These are automatically available — no setup needed
+    const supabase = createClient(
+      Deno.env.get('SUPABASE_URL')!,
+      Deno.env.get('SUPABASE_ANON_KEY')!
+    )
 
-  const { data } = await supabase.from('todos').select('*')
-  return new Response(JSON.stringify(data))
-})`,
+    const { data } = await supabase.from('todos').select('*')
+    return new Response(JSON.stringify(data))
+  }),
+}`,
   },
   {
     icon: 'Database' as const,
@@ -148,23 +151,26 @@ execute function "supabase_functions"."http_request"(
     paragraph: 'Verify users and enforce permissions directly inside your Edge Functions',
     lang: 'javascript' as const,
     code: `import { createClient } from 'jsr:@supabase/supabase-js@2'
+import { withSupabase } from 'npm:@supabase/server@1'
 
-Deno.serve(async (req: Request) => {
-  // Create supabase client
-  const supabase = createClient(
-    Deno.env.get('SUPABASE_URL')!,
-    Deno.env.get('SUPABASE_SERVICE_ROLE_KEY')!,
-    { global: {
-        headers: {
-          Authorization: req.headers.get('Authorization')!}
-        }
-    }
-  )
+export default {
+  fetch: withSupabase({ auth: 'user' }, async (req: Request) => {
+    // Create supabase client
+    const supabase = createClient(
+      Deno.env.get('SUPABASE_URL')!,
+      Deno.env.get('SUPABASE_SERVICE_ROLE_KEY')!,
+      { global: {
+          headers: {
+            Authorization: req.headers.get('Authorization')!}
+          }
+      }
+    )
 
-  // Get the session or user object
-  const { data } = await supabase.auth.getUser()
-  const user = data.user
-})`,
+    // Get the session or user object
+    const { data } = await supabase.auth.getUser()
+    const user = data.user
+  }),
+}`,
   },
   {
     icon: 'HardDrive' as const,
@@ -172,23 +178,26 @@ Deno.serve(async (req: Request) => {
     paragraph: 'Upload, transform, and serve files with built-in caching from your Edge Functions',
     lang: 'javascript' as const,
     code: `import { createClient } from 'jsr:@supabase/supabase-js@2'
+import { withSupabase } from 'npm:@supabase/server@1'
 
-Deno.serve(async (req: Request) => {
-  // Create supabase client
-  const supabase = createClient(
-    Deno.env.get('SUPABASE_URL')!,
-    Deno.env.get('SUPABASE_SERVICE_ROLE_KEY')!
-  )
+export default {
+  fetch: withSupabase({ auth: 'user' }, async (req: Request) => {
+    // Create supabase client
+    const supabase = createClient(
+      Deno.env.get('SUPABASE_URL')!,
+      Deno.env.get('SUPABASE_SERVICE_ROLE_KEY')!
+    )
 
-  // Upload image to storage
-  const { data, error } = await supabase.storage
-    .from('images')
-    .upload('filename.png', file, {
-      contentType: 'image/png',
-      cacheControl: '31536000',
-      upsert: false,
-    })
-})`,
+    // Upload image to storage
+    const { data, error } = await supabase.storage
+      .from('images')
+      .upload('filename.png', file, {
+        contentType: 'image/png',
+        cacheControl: '31536000',
+        upsert: false,
+      })
+  }),
+}`,
   },
 ]
 
