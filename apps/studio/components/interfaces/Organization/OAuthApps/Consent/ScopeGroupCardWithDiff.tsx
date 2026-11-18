@@ -5,11 +5,10 @@ import { Button, Collapsible, CollapsibleContent, CollapsibleTrigger } from 'ui'
 
 import {
   DiffScopePermission,
-  formatPermissionName,
   getDiffBetweenScopes,
   ScopeGroupLevel,
 } from './OAuthAppsAuthorizeScreen.utils'
-import { ScopeGroupCardItem } from './ScopeGroupCardItem'
+import { ScopeGroupCardItem, ScopePermissionLabel } from './ScopeGroupCardItem'
 import type { OAuthScope } from '@/data/oauth-apps/types'
 
 export interface ScopeGroupCardProps {
@@ -85,7 +84,7 @@ const DiffScopeGroupItem = ({
         {permissions.map((permission, index) => (
           <Fragment key={permission.permission}>
             <span className="inline-block">
-              {formatPermissionName(permission.permission)}{' '}
+              <ScopePermissionLabel permission={permission.permission} />{' '}
               <span className="text-foreground-lighter">
                 (<DiffDescription level={level} previousLevel={permission.previousLevel} />)
               </span>

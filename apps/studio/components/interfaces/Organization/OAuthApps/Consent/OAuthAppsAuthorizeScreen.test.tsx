@@ -109,7 +109,10 @@ describe('OAuthAppsAuthorizeScreen', () => {
 
     expect(screen.getByText('Permissions granted')).toBeInTheDocument()
     expect(screen.queryByText('Permissions requested')).not.toBeInTheDocument()
-    expect(screen.getByText('Database management, Environment, Analytics')).toBeInTheDocument()
+    const databaseManagement = screen.getByRole('button', { name: 'Database management' })
+    expect(databaseManagement.parentElement).toHaveTextContent(
+      'Database management, Environment, Analytics'
+    )
     expect(screen.getByText('Secrets, Projects, Edge Functions, Storage')).toBeInTheDocument()
   })
 
