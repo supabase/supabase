@@ -429,19 +429,6 @@ export const OAuthAppsAuthorizeScreen = ({
             description={preflightError.message}
           />
         )}
-        {roleFailure?.scope_target === 'organization' && (
-          <Admonition
-            type="warning"
-            title={`Couldn't authorize ${request.name}`}
-            description={
-              <span>
-                Your <strong>{roleFailure.role.name}</strong> role in{' '}
-                <strong>{memberOrg.name}</strong> can't grant the requested access. Ask an admin to
-                change your role, or switch organization.
-              </span>
-            }
-          />
-        )}
         {roleFailure?.scope_target === 'all_projects' && !request.project_scoping_mode && (
           <Admonition
             type="warning"
