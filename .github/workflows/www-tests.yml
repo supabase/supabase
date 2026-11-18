@@ -8,8 +8,6 @@ on:
       - 'apps/www/**/*.ts*'
       - 'apps/www/package.json'
       - 'apps/www/turbo.jsonc'
-      # www imports `common` in many places (and its Sentry test project loads it in jsdom), so any
-      # change there can break these tests.
       - 'packages/common/**/*.ts*'
       - 'packages/common/package.json'
       - 'apps/www/next.config.mjs'

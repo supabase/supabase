@@ -17,7 +17,6 @@ export const detectBrowser = () => {
 
 export const isBrowser = typeof window !== 'undefined'
 
-// This runs on import, and jsdom test environments have no `matchMedia`.
 const prefersReducedMotionMediaQuery =
   isBrowser &&
   typeof window.matchMedia === 'function' &&
