@@ -41,4 +41,11 @@ import { PageBreadcrumbs, PageBreadcrumbsActions } from 'ui-patterns/PageBreadcr
 
 `PageBreadcrumbs` uses `PageContainer` with `size="full"` for width and padding. It does not depend on `PageHeader`.
 
-Place it as a sibling above `PageHeader` and page content, not inside `PageHeader`. For legacy pages that still nest breadcrumbs inside `PageHeader`, use `PageHeaderBreadcrumb` instead.
+Place it as a sibling above `PageHeader` and page content, not inside `PageHeader`.
+
+<Admonition type="deprecation" title="PageHeaderBreadcrumb is deprecated">
+
+Do not nest breadcrumbs inside `PageHeader`. Prefer `PageBreadcrumbs` for new pages. See
+[Layout patterns](../ui-patterns/layout).
+
+</Admonition>

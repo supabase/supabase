@@ -62,4 +62,11 @@ Compound header for page context: optional icon, title, description, and aside a
 - `PageHeaderDescription` — supporting text
 - `PageHeaderAside` — actions when meta is shown
 
-Legacy sub-components `PageHeaderBreadcrumb` and `PageHeaderNavigationTabs` remain for existing pages; prefer [Page Breadcrumbs](./page-breadcrumbs) and [Page Nav](./page-nav) for new work.
+<Admonition type="deprecation" title="PageHeaderBreadcrumb and PageHeaderNavigationTabs are deprecated">
+
+Do not nest breadcrumbs or tab navigation inside `PageHeader` for new work. Use
+[Page Breadcrumbs](./page-breadcrumbs) and [Page Nav](./page-nav) as siblings above the
+header. See [Layout patterns](../ui-patterns/layout). Existing pages may keep the legacy
+sub-components until they migrate.
+
+</Admonition>

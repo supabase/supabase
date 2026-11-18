@@ -154,3 +154,27 @@ Some parents are full width because a child needs it. The parent chrome stays co
 - **[Page Container](../fragments/page-container)** — max-width and padding (`small`, `default`, `full`, …)
 - **[Page Header](../fragments/page-header)** — optional title block (meta, icon, aside)
 - **[Page Section](../fragments/page-section)** — titled content blocks and section-level actions
+
+## Migrating from Studio PageLayout and Scaffold
+
+<Admonition type="deprecation" title="Studio PageLayout and Scaffold page chrome are deprecated">
+
+Do not use `PageLayout` (`apps/studio/components/layouts/PageLayout`) or `Scaffold*`
+width, header, and section helpers for new pages. Compose pages with the components above.
+Existing call sites can migrate opportunistically.
+
+</Admonition>
+
+| Legacy (Studio) | Use instead |
+| --------------- | ----------- |
+| `PageLayout` | [Page Breadcrumbs](../fragments/page-breadcrumbs), [Page Nav](../fragments/page-nav), [Page Header](../fragments/page-header), and [Page Container](../fragments/page-container) as siblings |
+| Studio `PageHeader` (`layouts/PageLayout/PageHeader`) | [Page Header](../fragments/page-header) from `ui-patterns` |
+| `PageHeaderBreadcrumb` | [Page Breadcrumbs](../fragments/page-breadcrumbs) |
+| `PageHeaderNavigationTabs` | [Page Nav](../fragments/page-nav) wrapping `NavMenu` |
+| `ScaffoldContainer` | [Page Container](../fragments/page-container) |
+| `ScaffoldHeader` / `ScaffoldTitle` / `ScaffoldDescription` | [Page Header](../fragments/page-header) compound API |
+| `ScaffoldSection` / `ScaffoldSectionTitle` / `ScaffoldSectionDescription` / `ScaffoldSectionDetail` / `ScaffoldSectionContent` | [Page Section](../fragments/page-section) compound API |
+| `ScaffoldContainerLegacy` | [Page Container](../fragments/page-container) |
+| `FormHeader` (settings section bands) | [Page Section](../fragments/page-section) title, description, and aside |
+
+Toolbar helpers such as `ScaffoldFilterAndContent` and `ScaffoldActionsContainer` are not part of this page-chrome migration. Keep them until a list or filter pattern replaces them.

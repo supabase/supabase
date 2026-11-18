@@ -14,7 +14,10 @@ demo file before composing new UI.
 
 Docs: `apps/design-system/content/docs/ui-patterns/layout.mdx`
 
-Build pages with `PageContainer`, `PageHeader`, and `PageSection`.
+Build pages with `PageBreadcrumbs`, `PageNav`, `PageHeader`, `PageContainer`, and `PageSection`
+from `ui-patterns`. Do **not** use Studio `PageLayout`, Studio `PageHeader`
+(`layouts/PageLayout/PageHeader`), or `Scaffold*` page-chrome helpers for new work — see the
+migration table on the layout doc.
 
 | Content type      | `size`      |
 | ----------------- | ----------- |
@@ -24,6 +27,7 @@ Build pages with `PageContainer`, `PageHeader`, and `PageSection`.
 
 - If filters/search exist on a list page, align table actions with the filters (don't use `PageHeaderAside`/`PageSectionAside` for those actions)
 - If no filters, actions can go in `PageHeaderAside` or `PageSectionAside`
+- Prefer `PageNav` over `PageHeaderNavigationTabs`, and `PageBreadcrumbs` over `PageHeaderBreadcrumb`
 
 Demos: `page-layout-settings.tsx`, `page-layout-list.tsx`, `page-layout-list-simple.tsx`, `page-layout-detail.tsx`
 (all in `apps/design-system/registry/default/example/`)
