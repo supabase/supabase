@@ -1,9 +1,10 @@
-import RefSubLayout from '~/layouts/ref/RefSubLayout'
-
-import spec from '~/spec/cli_v1_commands.yaml' with { type: 'yaml' }
 import Param from '~/components/Params'
-import { isFeatureEnabled } from 'common'
+import RefSubLayout from '~/layouts/ref/RefSubLayout'
 import { getCustomContent } from '~/lib/custom-content/getCustomContent'
+import spec from '~/spec/cli_v1_commands.yaml' with { type: 'yaml' }
+import { isFeatureEnabled } from 'common'
+
+import { CliFlagDefault } from './CliFlagDefault'
 
 const { cliDisableCustomProfiles } = isFeatureEnabled(['cli:disable_custom_profiles'])
 
@@ -37,7 +38,9 @@ const CliGlobalFlagsHandler = () => {
                 key={flag.id}
                 id={`${spec.id}-${flag.id}`}
                 isOptional={flag.required === undefined ? true : !flag.required}
-              ></Param>
+              >
+                <CliFlagDefault flag={flag} />
+              </Param>
             )
           })}
         </ul>
