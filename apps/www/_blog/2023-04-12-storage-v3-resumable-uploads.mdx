@@ -179,7 +179,7 @@ And there you have it, with a few lines of code, you can support parallel, resum
 
 There were a few technical challenges we faced while implementing TUS in Supabase Storage.
 
-Storage is powered by our [Storage-API service](https://github.com/supabase/storage-api), a Node.js server that interfaces with different storage backends (like AWS S3). It is fully integrated with the Supabase ecosystem, making it easy to protect files with Postgres RLS policies.
+Storage is powered by our [Storage-API service](https://github.com/supabase/storage), a Node.js server that interfaces with different storage backends (like AWS S3). It is fully integrated with the Supabase ecosystem, making it easy to protect files with Postgres RLS policies.
 
 To implement the TUS protocol, we use [tus-node-server](https://github.com/tus/tus-node-server), which was recently ported to Typescript. It was only missing a few features we needed:
 
