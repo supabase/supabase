@@ -33,12 +33,23 @@ const applyAndTrackMigrationsQuery = (query: string, name?: string) => {
     ${query};
 
     -- track statements in history table
+    -- Versions have second precision, so a migration applied within the same second as
+    -- the previous one would reuse its version and fail on the primary key. Use the next
+    -- free second instead, and lock the table so concurrent migrations don't race.
+    lock table supabase_migrations.schema_migrations in share row exclusive mode;
     insert into supabase_migrations.schema_migrations (version, name, statements)
-    values (
-      to_char(current_timestamp, 'YYYYMMDDHH24MISS'),
+    select
+      to_char(
+        greatest(
+          current_timestamp,
+          max(to_timestamp(version, 'YYYYMMDDHH24MISS')) + interval '1 second'
+        ),
+        'YYYYMMDDHH24MISS'
+      ),
       ${quote(name)},
       array[${quote(query)}]
-    );
+    from supabase_migrations.schema_migrations
+    where version ~ '^[0-9]{14}$';
 
     commit;
   `
