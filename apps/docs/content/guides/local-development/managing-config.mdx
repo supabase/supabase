@@ -14,7 +14,7 @@ The `config.toml` file is automatically created when you run `supabase init`.
 
 There are a wide variety of options available, which can be found in the [CLI Config Reference](/docs/guides/local-development/cli/config).
 
-For example, to enable the "Apple" OAuth provider for local development, add the following to your config file, merging it into any existing `auth.external.apple` entry. Fill in your client ID and set `SUPABASE_AUTH_EXTERNAL_APPLE_SECRET` in your `.env` file, as described in [Using secrets inside your config file](#using-secrets-inside-configtoml):
+For example, to enable the "Apple" OAuth provider for local development, add the following to your config file, merging its keys into the `auth`, `auth.external`, and `auth.external.apple` entries your file already has instead of adding a second copy. Fill in your client ID and set `SUPABASE_AUTH_EXTERNAL_APPLE_SECRET` in your `.env` file, as described in [Using secrets inside your config file](#using-secrets-inside-configtoml):
 
 ```toml name=supabase/config.toml
 [auth.external.apple]

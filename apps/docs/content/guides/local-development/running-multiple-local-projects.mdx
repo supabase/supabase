@@ -99,7 +99,7 @@ SUPABASE_EXPERIMENTAL_STACK=1 supabase init
 For an app that already has a config file, remove the port lines from each app that you want to run in parallel:
 
 1. Open your config file in your app directory.
-2. Delete these keys. In `config.toml`, you can comment them out instead:
+2. Delete these keys, each with its value. In JSON or JSONC, also remove the comma the deleted key leaves behind. In `config.toml`, you can comment them out instead:
    - `port` under `api`, `db`, `db.pooler`, `studio`, `local_smtp`, and `analytics`
    - `shadow_port` under `db`
    - `inspector_port` under `edge_runtime`
