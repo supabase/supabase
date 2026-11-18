@@ -1,4 +1,4 @@
-import { useQuery, useQueryClient } from '@tanstack/react-query'
+import { useIsFetching, useQuery, useQueryClient } from '@tanstack/react-query'
 import { useParams } from 'common'
 import dayjs from 'dayjs'
 import { RefreshCwIcon, WarehouseIcon } from 'lucide-react'
@@ -8,6 +8,7 @@ import { Admonition } from 'ui-patterns/Admonition'
 import { EmptyStatePresentational } from 'ui-patterns/EmptyStatePresentational'
 import { GenericSkeletonLoader } from 'ui-patterns/ShimmeringLoader'
 
+import { WarehouseLatencySection } from './WarehouseLatencySection'
 import { getWarehouseMetricEmptyMessage, WarehouseMetricChart } from './WarehouseMetricChart'
 import { resolveWarehouseMetricsRange } from './WarehouseMetrics.range'
 import ReportHeader from '@/components/interfaces/Reports/ReportHeader'
@@ -73,6 +74,7 @@ const WarehouseMetricsReportContent = () => {
       enabled: isRangeOk,
     })
   )
+  const isFetching = useIsFetching({ queryKey: warehouseKeys.metricsAll(ref) }) > 0
   const handleRefresh = useRefreshHandler(
     datePickerValue,
     datePickerHelpers,
@@ -84,7 +86,7 @@ const WarehouseMetricsReportContent = () => {
       ])
     }
   )
-  useShortcut(SHORTCUT_IDS.OBSERVABILITY_REFRESH, handleRefresh, { enabled: !query.isFetching })
+  useShortcut(SHORTCUT_IDS.OBSERVABILITY_REFRESH, handleRefresh, { enabled: !isFetching })
   useShortcut(SHORTCUT_IDS.OBSERVABILITY_TOGGLE_DATE_PICKER, () => {
     setShowDatePicker((open) => !open)
   })
@@ -239,10 +241,8 @@ const WarehouseMetricsReportContent = () => {
               <Button
                 type="button"
                 aria-label="Refresh report"
-                disabled={query.isFetching}
-                icon={
-                  <RefreshCwIcon className={query.isFetching ? 'motion-safe:animate-spin' : ''} />
-                }
+                disabled={isFetching}
+                icon={<RefreshCwIcon className={isFetching ? 'motion-safe:animate-spin' : ''} />}
                 onClick={handleRefresh}
               />
             </ShortcutTooltip>
@@ -273,6 +273,11 @@ const WarehouseMetricsReportContent = () => {
             {query.isPending ? 'Loading Warehouse report' : reportStatus}
           </p>
           {renderContent()}
+          {isRangeOk && query.isSuccess && !canShowSetup && !(setup.isError && !hasValues) && (
+            <div className="mt-8">
+              <WarehouseLatencySection range={range} />
+            </div>
+          )}
         </div>
       </ReportStickyNav>
       <UpgradePrompt

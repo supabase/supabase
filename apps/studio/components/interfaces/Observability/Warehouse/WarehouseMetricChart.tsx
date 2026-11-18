@@ -1,6 +1,7 @@
 import { Card, CardContent } from 'ui'
 import { ChartLine } from 'ui-patterns/Chart'
 
+import { getWarehouseChartPoints, type WarehouseChartSeries } from './WarehouseMetricChart.utils'
 import NoDataPlaceholder from '@/components/ui/Charts/NoDataPlaceholder'
 import type { WarehouseMetric } from '@/data/warehouse/warehouse-metrics-api-types'
 
@@ -26,24 +27,27 @@ export const WarehouseMetricChart = ({
   description,
   unit,
   scale = 1,
+  series = [{ metric, label: title }],
 }: {
   metric?: WarehouseMetric
   title: string
   description: string
   unit: string
   scale?: number
+  series?: WarehouseChartSeries[]
 }) => {
-  const points =
-    metric?.series.length === 1
-      ? metric.series[0].points.map((point): Record<string, string | number> => {
-          const row: Record<string, string | number> = {
-            timestamp: new Date(point.timestamp * 1000).toISOString(),
-          }
-          if (point.value !== null && Number.isFinite(point.value)) row.value = point.value * scale
-          return row
-        })
-      : []
-  const hasValues = points.some((point) => typeof point.value === 'number')
+  const points = getWarehouseChartPoints(series, scale)
+  const keys = series.map((_, index) => `value${index}`)
+  const config = Object.fromEntries(
+    series.map((item, index) => [
+      keys[index],
+      { label: item.label, color: `var(--chart-${index + 1})` },
+    ])
+  )
+  const hasValues = points.some((point) => keys.some((key) => typeof point[key] === 'number'))
+  const hasUnavailableSeries = series.some(
+    (item) => !item.metric || !['ok', 'partial'].includes(item.metric.availability)
+  )
   return (
     <section aria-label={title}>
       <Card>
@@ -52,13 +56,19 @@ export const WarehouseMetricChart = ({
             <>
               <h2 className="text-sm">{title}</h2>
               <p className="text-xs text-foreground-light">{description}</p>
+              {series.length > 1 && (
+                <p className="text-xs text-foreground-light">
+                  {series.map((item) => item.label).join(' · ')}
+                </p>
+              )}
               <ChartLine
                 className="h-64"
                 isFullHeight
                 data={points}
                 xKey="timestamp"
-                dataKey="value"
-                config={{ value: { label: `${title}${unit}`, color: 'var(--chart-1)' } }}
+                dataKey={keys[0]}
+                dataKeys={keys}
+                config={config}
                 color="var(--chart-1)"
                 DateTimeFormat="MMM D, HH:mm"
                 showHighlightArea={false}
@@ -73,8 +83,11 @@ export const WarehouseMetricChart = ({
               message={getWarehouseMetricEmptyMessage(metric)}
             />
           )}
-          {hasValues && metric?.availability === 'partial' && (
+          {hasValues && series.some((item) => item.metric?.availability === 'partial') && (
             <p className="text-xs text-foreground-light">Partial data</p>
+          )}
+          {hasValues && hasUnavailableSeries && (
+            <p className="text-xs text-foreground-light">Some measurements are unavailable</p>
           )}
         </CardContent>
       </Card>
