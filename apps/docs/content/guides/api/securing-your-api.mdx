@@ -47,7 +47,7 @@ To revoke these privileges as well, see [Revoke default privileges](#revoke-defa
 
 Supabase is changing the platform default to revoke these automatic grants so that exposure becomes opt-in. See [the platform defaults discussion](https://github.com/orgs/supabase/discussions/45329) in the Supabase GitHub discussions.
 
-Default privileges apply only to objects created after they change. Disabling **Automatically expose new tables**, running `alter default privileges` to revoke privileges, and the platform default change don't remove grants from existing tables, so those tables stay reachable through the Data API. To remove Data API access from an existing table, revoke its grants:
+Once changed, default privileges only apply to newly created objects; existing tables stay reachable through the Data API. To remove Data API access from an existing table, revoke its grants:
 
 ```sql
 revoke all on table public.your_table from anon, authenticated, service_role;
