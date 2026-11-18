@@ -131,5 +131,15 @@ const TriggerIcon = ({ user }: TriggerIconProps) => {
   if (typeof avatarUrl !== 'string' || avatarUrl === '') {
     return <UserIcon aria-hidden className="size-4" strokeWidth={1.5} />
   }
-  return <img src={avatarUrl} alt="" className="size-full object-cover" />
+  // a failed background paints nothing, so the person icon stays visible. a failed img draws a broken icon
+  return (
+    <>
+      <UserIcon aria-hidden className="size-4" strokeWidth={1.5} />
+      <span
+        aria-hidden
+        className="absolute inset-0 bg-cover bg-center"
+        style={{ backgroundImage: `url(${JSON.stringify(avatarUrl)})` }}
+      />
+    </>
+  )
 }
