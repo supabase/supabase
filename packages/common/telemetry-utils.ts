@@ -87,10 +87,7 @@ function getPageLocation() {
     url.hash = ''
     return { pageUrl: redactUrlKeywords(url.href), search: redactUrlKeywords(url.search) }
   } catch {
-    return {
-      pageUrl: redactUrlKeywords(window.location.href.split('#')[0]),
-      search: redactUrlKeywords(window.location.search),
-    }
+    return { pageUrl: window.location.href.split('#')[0], search: window.location.search }
   }
 }
 
