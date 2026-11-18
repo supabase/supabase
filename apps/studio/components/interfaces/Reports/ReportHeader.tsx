@@ -8,7 +8,7 @@ interface ReportHeaderProps {
   showDatabaseSelector?: boolean
 }
 
-const ReportHeader = ({ title, showDatabaseSelector }: ReportHeaderProps) => {
+export const ReportHeader = ({ title, showDatabaseSelector }: ReportHeaderProps) => {
   const router = useRouter()
   const { ref } = useParams()
   const { db, chart, ...params } = router.query

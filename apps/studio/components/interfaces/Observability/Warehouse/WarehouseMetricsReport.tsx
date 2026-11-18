@@ -9,9 +9,10 @@ import { ChartLine } from 'ui-patterns/Chart'
 import { EmptyStatePresentational } from 'ui-patterns/EmptyStatePresentational'
 import { GenericSkeletonLoader } from 'ui-patterns/ShimmeringLoader'
 
-import ReportHeader from '@/components/interfaces/Reports/ReportHeader'
+import { getEmptyMessage, getReportStatus } from './WarehouseMetricsReport.utils'
+import { ReportHeader } from '@/components/interfaces/Reports/ReportHeader'
 import { AlertError } from '@/components/ui/AlertError'
-import NoDataPlaceholder from '@/components/ui/Charts/NoDataPlaceholder'
+import { NoDataPlaceholder } from '@/components/ui/Charts/NoDataPlaceholder'
 import { InlineLink } from '@/components/ui/InlineLink'
 import { warehouseMetricsQueryOptions } from '@/data/warehouse/warehouse-metrics-query'
 import { useWarehouseSetupStatusQuery } from '@/data/warehouse/warehouse-setup-status-query'
@@ -20,14 +21,17 @@ import { IS_PLATFORM } from '@/lib/constants'
 
 export const WarehouseMetricsReport = () => {
   const isWarehouseEnabled = useIsWarehouseEnabled()
-  if (!isWarehouseEnabled)
-    return (
-      <>
-        <ReportHeader title="Warehouse" showDatabaseSelector={false} />
+
+  return (
+    <>
+      <ReportHeader title="Warehouse" showDatabaseSelector={false} />
+      {!isWarehouseEnabled ? (
         <Admonition layout="responsive" title="Warehouse metrics are unavailable" />
-      </>
-    )
-  return <WarehouseMetricsReportContent />
+      ) : (
+        <WarehouseMetricsReportContent />
+      )}
+    </>
+  )
 }
 
 const WarehouseMetricsReportContent = () => {
@@ -36,7 +40,9 @@ const WarehouseMetricsReportContent = () => {
     const end = dayjs().startOf('minute')
     return { startDate: end.subtract(1, 'hour').toISOString(), endDate: end.toISOString() }
   })
+
   const setup = useWarehouseSetupStatusQuery({ projectRef: ref }, { enabled: IS_PLATFORM })
+
   const query = useQuery(
     warehouseMetricsQueryOptions({
       projectRef: ref,
@@ -64,34 +70,22 @@ const WarehouseMetricsReportContent = () => {
           return row
         })
       : []
-  const emptyMessage = (() => {
-    if (!metric || metric.series.length > 1) return 'Metrics are temporarily unavailable'
-    switch (metric.availability) {
-      case 'stale':
-        return 'No recent data'
-      case 'insufficient_data':
-        return 'Not enough data yet'
-      case 'unavailable':
-      case 'disabled':
-      case 'not_provisioned':
-        return 'Metrics are temporarily unavailable'
-      default:
-        return 'No data in the last 60 minutes'
-    }
-  })()
+  const emptyMessage = getEmptyMessage(metric)
   const hasChartValues = points.some((point) => typeof point.value === 'number')
 
-  const reportStatus = (() => {
-    if (!IS_PLATFORM) return 'Warehouse metrics are unavailable'
-    if (query.isPending || (setup.isPending && !hasValues)) return 'Loading Warehouse report'
-    if (setup.isError && !hasValues) return 'Could not load Warehouse setup status'
-    if (canShowSetup) return isDisabled ? 'Warehouse is disabled' : 'Warehouse is not set up'
-    if (query.isError) return 'Could not load Warehouse metrics'
-    return hasChartValues ? 'Warehouse report loaded' : `Warehouse report: ${emptyMessage}`
-  })()
+  const reportStatus = getReportStatus({
+    isPlatform: IS_PLATFORM,
+    isLoading: query.isPending || (setup.isPending && !hasValues),
+    hasSetupError: setup.isError && !hasValues,
+    canShowSetup,
+    isDisabled,
+    hasMetricsError: query.isError,
+    hasChartValues,
+    emptyMessage,
+  })
 
   const renderContent = () => {
-    if (!IS_PLATFORM)
+    if (!IS_PLATFORM) {
       return (
         <Admonition
           layout="responsive"
@@ -99,9 +93,13 @@ const WarehouseMetricsReportContent = () => {
           description="Warehouse metrics are only available on the Supabase platform."
         />
       )
-    if (query.isPending || (setup.isPending && !hasValues))
+    }
+
+    if (query.isPending || (setup.isPending && !hasValues)) {
       return <GenericSkeletonLoader aria-label="Loading Warehouse report" />
-    if (setup.isError && !hasValues)
+    }
+
+    if (setup.isError && !hasValues) {
       return (
         <AlertError
           projectRef={ref}
@@ -109,7 +107,9 @@ const WarehouseMetricsReportContent = () => {
           subject="Failed to retrieve Warehouse status"
         />
       )
-    if (canShowSetup)
+    }
+
+    if (canShowSetup) {
       return (
         <EmptyStatePresentational
           icon={WarehouseIcon}
@@ -130,7 +130,9 @@ const WarehouseMetricsReportContent = () => {
           </Button>
         </EmptyStatePresentational>
       )
-    if (query.isError)
+    }
+
+    if (query.isError) {
       return (
         <AlertError
           projectRef={ref}
@@ -138,6 +140,8 @@ const WarehouseMetricsReportContent = () => {
           subject="Failed to retrieve Warehouse metrics"
         />
       )
+    }
+
     return (
       <Card>
         <CardContent className="space-y-4 p-4">
@@ -178,7 +182,6 @@ const WarehouseMetricsReportContent = () => {
 
   return (
     <>
-      <ReportHeader title="Warehouse" showDatabaseSelector={false} />
       <p className="text-sm text-foreground-light">Query activity in the last 60 minutes.</p>
       <div className="relative">
         <p role="status" className="sr-only">

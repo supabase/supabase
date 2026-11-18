@@ -17,7 +17,8 @@ interface NoDataPlaceholderProps {
   hideTotalPlaceholder?: boolean
   docsUrl?: string
 }
-const NoDataPlaceholder = ({
+
+export const NoDataPlaceholder = ({
   attribute,
   message = 'No data to show',
   description,
