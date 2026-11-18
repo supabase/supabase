@@ -317,6 +317,47 @@ to authenticated
 using ( (select auth.uid()) = user_id );
 ```
 
+#### Rows shared by two users
+
+Some rows belong to two users at once, such as an order that both its buyer and its seller can see. Store each user in their own column, and check both columns in the same policy. This `orders` table has a `buyer_id` and a `seller_id`:
+
+```sql
+create table orders (
+  id bigint generated always as identity primary key,
+  buyer_id uuid not null references auth.users,
+  seller_id uuid not null references auth.users,
+  total numeric
+);
+
+alter table orders enable row level security;
+
+revoke all on table orders from anon, authenticated;
+grant select, update on table orders to authenticated;
+```
+
+The select policy lets either user read the order:
+
+```sql
+create policy "Buyers and sellers can view their orders."
+on orders for select
+to authenticated
+using ( (select auth.uid()) in (buyer_id, seller_id) );
+```
+
+The update policy uses the same expression in `using` and `with check`, so either user can update the order, but the updated row must still include them as the buyer or the seller:
+
+```sql
+create policy "Buyers and sellers can update their orders."
+on orders for update
+to authenticated
+using ( (select auth.uid()) in (buyer_id, seller_id) )
+with check ( (select auth.uid()) in (buyer_id, seller_id) );
+```
+
+This pattern needs no `security definer` function, because a plain policy can check both columns of the row. Use a security definer function when the check reads another table, as in [Use security definer functions](#use-security-definer-functions).
+
+Give `buyer_id` and `seller_id` each their own index. A multi-column index only helps queries that filter on its leading column, so one index on both columns doesn't cover a filter on `seller_id`. See [Add indexes](#add-indexes).
+
 #### Policy tests
 
 When you adapt those four policies to a table, add this file for that table. The path is `supabase/tests/<table>_rls_test.sql`. For a table users share, also assert that a member who is not the owner can perform the operations its policies allow, and that a non-member cannot.
