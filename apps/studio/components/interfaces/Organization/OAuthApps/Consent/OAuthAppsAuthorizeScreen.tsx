@@ -136,11 +136,12 @@ export const OAuthAppsAuthorizeScreen = ({
 
   useEffect(() => {
     if (preflightData?.validation_failure) {
-      setRoleFailure(preflightData.validation_failure)
+      return setRoleFailure(preflightData.validation_failure)
     }
     if (isOAuthRoleValidationError(preflightError)) {
-      setRoleFailure(preflightError.validation)
+      return setRoleFailure(preflightError.validation)
     }
+    setRoleFailure(null)
   }, [preflightData, preflightError])
 
   const initialRefs = useMemo(() => {
