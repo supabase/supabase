@@ -4,12 +4,17 @@ import { REPLICATION_METADATA_FRESHNESS_MS } from './constants'
 import { replicationKeys } from './keys'
 import { get, handleError } from '@/data/fetchers'
 import type { StudioError } from '@/lib/errors/studio-errors'
+import { useReplicationClusterId } from '@/state/replication-cluster'
 import type { UseCustomQueryOptions } from '@/types'
 
-type ReplicationPublicationNamesParams = { projectRef?: string; sourceId?: number }
+type ReplicationPublicationNamesParams = {
+  projectRef?: string
+  sourceId?: number
+  clusterId?: string
+}
 
 async function fetchReplicationPublicationNames(
-  { projectRef, sourceId }: ReplicationPublicationNamesParams,
+  { projectRef, sourceId, clusterId }: ReplicationPublicationNamesParams,
   signal?: AbortSignal
 ) {
   if (!projectRef) throw new Error('projectRef is required')
@@ -18,7 +23,7 @@ async function fetchReplicationPublicationNames(
   const { data, error } = await get(
     '/platform/replication/v2/{ref}/sources/{source_id}/publications',
     {
-      params: { path: { ref: projectRef, source_id: sourceId } },
+      params: { path: { ref: projectRef, source_id: sourceId }, query: { cluster_id: clusterId } },
       signal,
     }
   )
@@ -39,18 +44,24 @@ type ReplicationPublicationNamesQueryOptions<TData> = Omit<
 > & { enabled?: boolean }
 
 export const replicationPublicationNamesQueryOptions = <TData = ReplicationPublicationNamesData>(
-  { projectRef, sourceId }: ReplicationPublicationNamesParams,
+  { projectRef, sourceId, clusterId }: ReplicationPublicationNamesParams,
   { enabled = true, ...options }: ReplicationPublicationNamesQueryOptions<TData> = {}
 ) =>
   queryOptions<ReplicationPublicationNamesData, StudioError, TData>({
-    queryKey: replicationKeys.publicationNames(projectRef, sourceId),
-    queryFn: ({ signal }) => fetchReplicationPublicationNames({ projectRef, sourceId }, signal),
+    queryKey: replicationKeys.publicationNames(projectRef, sourceId, clusterId),
+    queryFn: ({ signal }) =>
+      fetchReplicationPublicationNames({ projectRef, sourceId, clusterId }, signal),
     enabled: enabled && typeof projectRef !== 'undefined' && typeof sourceId !== 'undefined',
     staleTime: REPLICATION_METADATA_FRESHNESS_MS,
     ...options,
   })
 
 export const useReplicationPublicationNamesQuery = <TData = ReplicationPublicationNamesData>(
-  { projectRef, sourceId }: ReplicationPublicationNamesParams,
+  { projectRef, sourceId, clusterId: requestedClusterId }: ReplicationPublicationNamesParams,
   options: ReplicationPublicationNamesQueryOptions<TData> = {}
-) => useQuery(replicationPublicationNamesQueryOptions({ projectRef, sourceId }, options))
+) => {
+  const clusterId = useReplicationClusterId(requestedClusterId)
+  return useQuery(
+    replicationPublicationNamesQueryOptions({ projectRef, sourceId, clusterId }, options)
+  )
+}

@@ -6,11 +6,13 @@ import { pipelineIdSchema } from './pipeline-id'
 import { replicationPollingOptions } from './polling'
 import { get, handleError } from '@/data/fetchers'
 import type { StudioError } from '@/lib/errors/studio-errors'
+import { useReplicationClusterId } from '@/state/replication-cluster'
 import type { UseCustomQueryOptions } from '@/types'
 
 export type ReplicationPipelineReplicationStatusVariables = {
   projectRef?: string
   pipelineId?: string
+  clusterId?: string
 }
 
 export type ReplicationPipelineReplicationStatusError = StudioError
@@ -19,7 +21,7 @@ export type ReplicationPipelineTableStatus =
   components['schemas']['PipelineReplicationStatusResponse_Output']['table_statuses'][number]
 
 async function fetchReplicationPipelineReplicationStatus(
-  { projectRef, pipelineId }: ReplicationPipelineReplicationStatusVariables,
+  { projectRef, pipelineId, clusterId }: ReplicationPipelineReplicationStatusVariables,
   signal?: AbortSignal
 ) {
   if (!projectRef) throw new Error('projectRef is required')
@@ -28,7 +30,10 @@ async function fetchReplicationPipelineReplicationStatus(
   const { data, error } = await get(
     '/platform/replication/{ref}/pipelines/{pipeline_id}/replication-status',
     {
-      params: { path: { ref: projectRef, pipeline_id: pipelineId } },
+      params: {
+        path: { ref: projectRef, pipeline_id: pipelineId },
+        query: { cluster_id: clusterId },
+      },
       signal,
     }
   )
@@ -48,15 +53,16 @@ export const replicationPipelineReplicationStatusQueryOptions = <
 >({
   projectRef,
   pipelineId,
+  clusterId,
 }: ReplicationPipelineReplicationStatusVariables) =>
   queryOptions<
     ReplicationPipelineReplicationStatusData,
     ReplicationPipelineReplicationStatusError,
     TData
   >({
-    queryKey: replicationKeys.pipelinesReplicationStatus(projectRef, pipelineId),
+    queryKey: replicationKeys.pipelinesReplicationStatus(projectRef, pipelineId, clusterId),
     queryFn: ({ signal }) =>
-      fetchReplicationPipelineReplicationStatus({ projectRef, pipelineId }, signal),
+      fetchReplicationPipelineReplicationStatus({ projectRef, pipelineId, clusterId }, signal),
     ...replicationPollingOptions,
     enabled: typeof projectRef !== 'undefined' && typeof pipelineId !== 'undefined',
   })
@@ -70,16 +76,18 @@ export const useReplicationPipelineReplicationStatusQuery = <
     ReplicationPipelineReplicationStatusError,
     TData
   > = {}
-) =>
-  useQuery<
+) => {
+  const clusterId = useReplicationClusterId(variables.clusterId)
+  return useQuery<
     ReplicationPipelineReplicationStatusData,
     ReplicationPipelineReplicationStatusError,
     TData
   >({
-    ...replicationPipelineReplicationStatusQueryOptions<TData>(variables),
+    ...replicationPipelineReplicationStatusQueryOptions<TData>({ ...variables, clusterId }),
     ...options,
     enabled:
       options.enabled !== false &&
       typeof variables.projectRef !== 'undefined' &&
       typeof variables.pipelineId !== 'undefined',
   })
+}

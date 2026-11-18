@@ -53,3 +53,20 @@ test('keeps the copy action available and reports a failed clipboard write', asy
   expect(screen.getByRole('button', { name: 'Copy' })).toBeInTheDocument()
   expect(screen.queryByRole('button', { name: 'Copied' })).not.toBeInTheDocument()
 })
+
+test('announces successful copies when custom children keep the visible label unchanged', async () => {
+  mockClipboard(() => Promise.resolve())
+  customRender(
+    <CopyButton
+      text="00150"
+      aria-label="Copy pipeline ID 00150"
+      copiedLabel="Pipeline ID 00150 copied"
+    >
+      #00150
+    </CopyButton>
+  )
+  expect(screen.queryByText('Pipeline ID 00150 copied')).not.toBeInTheDocument()
+  fireEvent.click(screen.getByRole('button', { name: 'Copy pipeline ID 00150' }))
+  expect(await screen.findByText('Pipeline ID 00150 copied')).toHaveAttribute('aria-live', 'polite')
+  expect(screen.getByRole('button', { name: 'Copy pipeline ID 00150' })).toHaveTextContent('#00150')
+})

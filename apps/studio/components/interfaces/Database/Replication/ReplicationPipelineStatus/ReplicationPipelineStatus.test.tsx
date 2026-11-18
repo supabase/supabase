@@ -1,4 +1,4 @@
-import { screen, within } from '@testing-library/react'
+import { screen, waitFor, within } from '@testing-library/react'
 import type { components } from 'api-types'
 import { HttpResponse } from 'msw'
 import { describe, expect, test, vi } from 'vitest'
@@ -6,7 +6,7 @@ import { describe, expect, test, vi } from 'vitest'
 import { ReplicationPipelineStatus } from './ReplicationPipelineStatus'
 import { PipelineRequestStatusProvider } from '@/state/replication-pipeline-request-status'
 import { customRender } from '@/tests/lib/custom-render'
-import { addAPIMock } from '@/tests/lib/msw'
+import { addAPIMock, type APIErrorBody } from '@/tests/lib/msw'
 
 vi.mock('common', async (importOriginal) => ({
   ...(await importOriginal<typeof import('common')>()),
@@ -32,8 +32,12 @@ const pipeline: PipelineResponse = {
 
 const mockPipelineQueries = ({
   tableStatuses = [],
+  statusName = 'started',
+  healthUnavailable = false,
 }: {
   tableStatuses?: PipelineReplicationStatusResponse['table_statuses']
+  statusName?: PipelineStatusResponse['status']['name']
+  healthUnavailable?: boolean
 } = {}) => {
   addAPIMock({
     method: 'get',
@@ -46,28 +50,88 @@ const mockPipelineQueries = ({
     response: () =>
       HttpResponse.json<PipelineStatusResponse>({
         pipeline_id: '42',
-        status: { name: 'started' },
+        status: { name: statusName },
       }),
   })
   addAPIMock({
     method: 'get',
     path: '/platform/replication/:ref/pipelines/:pipeline_id/replication-status',
     response: () =>
-      HttpResponse.json<PipelineReplicationStatusResponse>({
-        pipeline_id: '42',
-        apply_lag: {
-          active: true,
-          wal_status: 'reserved',
-          restart_lsn_bytes: 0,
-          confirmed_flush_lsn_bytes: 0,
-          safe_wal_size_bytes: null,
-        },
-        table_statuses: tableStatuses,
-      }),
+      healthUnavailable
+        ? HttpResponse.json<APIErrorBody>({ message: 'Unavailable' }, { status: 503 })
+        : HttpResponse.json<PipelineReplicationStatusResponse>({
+            pipeline_id: '42',
+            apply_lag: {
+              active: true,
+              wal_status: 'reserved',
+              restart_lsn_bytes: 0,
+              confirmed_flush_lsn_bytes: 0,
+              safe_wal_size_bytes: null,
+            },
+            table_statuses: tableStatuses,
+          }),
   })
 }
 
 describe('ReplicationPipelineStatus', () => {
+  test.each([
+    { label: 'Live', state: { name: 'following_wal' } },
+    {
+      label: 'Error',
+      state: {
+        name: 'error',
+        reason: 'Write failed',
+        retry_policy: { policy: 'manual_retry' },
+      },
+    },
+  ] as const)('marks a stopped table’s $label state as last reported', async ({ label, state }) => {
+    mockPipelineQueries({
+      statusName: 'stopped',
+      tableStatuses: [
+        {
+          id: 1,
+          schema: 'public',
+          name: 'events',
+          table_id: 1,
+          table_name: 'public.events',
+          state,
+        },
+      ],
+    })
+    customRender(
+      <PipelineRequestStatusProvider>
+        <ReplicationPipelineStatus />
+      </PipelineRequestStatusProvider>
+    )
+
+    expect(await screen.findByText(`Last: ${label}`)).toBeVisible()
+    expect(screen.queryByText('Streaming changes as they happen')).not.toBeInTheDocument()
+    expect(screen.queryByText(/The rest of the pipeline keeps running/)).not.toBeInTheDocument()
+  })
+
+  test.each(['stopped', 'started'] as const)(
+    'shows unavailable live updates only while the pipeline is running (%s)',
+    async (statusName) => {
+      mockPipelineQueries({ statusName, healthUnavailable: true })
+      customRender(
+        <PipelineRequestStatusProvider>
+          <ReplicationPipelineStatus />
+        </PipelineRequestStatusProvider>
+      )
+
+      await waitFor(() => expect(screen.getByRole('status')).toBeEmptyDOMElement())
+      if (statusName === 'stopped') {
+        expect(screen.getByText('Pipeline stopped')).toBeVisible()
+        expect(
+          screen.getByText('Start the pipeline to replicate changes and view table status.')
+        ).toBeVisible()
+        expect(screen.queryByText('Live updates paused')).not.toBeInTheDocument()
+      } else {
+        expect(screen.getByText('Live updates paused')).toBeVisible()
+      }
+    }
+  )
+
   test('preserves the overview structure while pipeline details load', async () => {
     let resolvePipeline: (value: PipelineResponse) => void = () => {}
     let resolvePipelineStatus: (value: PipelineStatusResponse) => void = () => {}
@@ -180,6 +244,7 @@ describe('ReplicationPipelineStatus', () => {
     )
 
     const table = screen.getByRole('table')
+    expect(within(table).getByText('Live')).toBeVisible()
     const tableNames = within(table)
       .getAllByRole('row')
       .map((row) => within(row).queryAllByRole('cell')[0]?.textContent)

@@ -1,3 +1,4 @@
+import { useQuery } from '@tanstack/react-query'
 import { createFileRoute, useNavigate } from '@tanstack/react-router'
 import { useFeatureFlags, useParams } from 'common'
 import { useEffect } from 'react'
@@ -12,7 +13,7 @@ import {
   useIsPipelinesDuckLakeEnabled,
   useIsPipelinesSnowflakeEnabled,
 } from '@/components/interfaces/Database/Replication/useIsPipelinesEnabled'
-import { useReplicationSourcesQuery } from '@/data/replication/sources-query'
+import { replicationSourcesQueryOptions } from '@/data/replication/sources-query'
 import { useHighAvailability } from '@/hooks/misc/useHighAvailability'
 import { useIsFeatureEnabled } from '@/hooks/misc/useIsFeatureEnabled'
 import { useSelectedOrganizationQuery } from '@/hooks/misc/useSelectedOrganization'
@@ -45,10 +46,12 @@ function PipelineCreationPage() {
   const isProjectAccessLoading =
     isLoading || (isEnabled && (!hasLoaded || isOrganizationPending || isPending))
   const canAccessFlow = isEnabled && !isHighAvailability && canUseReplication
-  const sources = useReplicationSourcesQuery(
-    { projectRef: ref },
-    { enabled: !isProjectAccessLoading && canAccessFlow, refetchOnMount: 'always' }
-  )
+  // Enablement lives in the default cluster; other regions get a source on demand.
+  const sources = useQuery({
+    ...replicationSourcesQueryOptions({ projectRef: ref }),
+    enabled: !!ref && !isProjectAccessLoading && canAccessFlow,
+    refetchOnMount: 'always',
+  })
   const hasSource = sources.data?.sources.some((source) => source.name === ref) === true
   const isAccessLoading =
     !ref || isProjectAccessLoading || (canAccessFlow && !sources.isFetchedAfterMount)

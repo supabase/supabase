@@ -45,7 +45,11 @@ describe('getPipelineStateNotice', () => {
         statusName,
         tableStatuses: liveTables(3),
       })
-    ).toMatchObject({ type, showLogsLink })
+    ).toMatchObject({
+      type,
+      showLogsLink,
+      description: expect.stringContaining('Table states below'),
+    })
   })
 
   test('reports a requested transition ahead of the API status', () => {
@@ -57,6 +61,19 @@ describe('getPipelineStateNotice', () => {
       })?.title
     ).toBe('Starting pipeline')
   })
+
+  test.each(['failed', 'stopped'] as const)(
+    'does not refer to missing table states when the pipeline is %s',
+    (statusName) => {
+      expect(
+        getPipelineStateNotice({
+          requestStatus: PipelineStatusRequestStatus.None,
+          statusName,
+          tableStatuses: [],
+        })?.description
+      ).not.toContain('below')
+    }
+  )
 
   test('distinguishes copying tables from queued tables', () => {
     expect(

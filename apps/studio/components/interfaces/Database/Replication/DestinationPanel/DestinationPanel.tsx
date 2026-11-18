@@ -2,7 +2,7 @@ import { useFeatureFlags, useParams } from 'common'
 import { ArrowUpRightIcon } from 'lucide-react'
 import Link from 'next/link'
 import { parseAsInteger, parseAsStringEnum, useQueryState } from 'nuqs'
-import { useEffect, useRef } from 'react'
+import { useEffect, useRef, useState } from 'react'
 import { toast } from 'sonner'
 import {
   Button,
@@ -17,12 +17,14 @@ import {
 import { Admonition } from 'ui-patterns/Admonition'
 import { GenericSkeletonLoader } from 'ui-patterns/ShimmeringLoader'
 
+import { useEnsurePipelineRegionSource } from '../CreatePipeline/useEnsurePipelineRegionSource'
 import { EnablePipelinesCallout } from '../EnablePipelinesCallout'
 import { PipelineStatusName } from '../Replication.constants'
 import { canModifyDestination } from '../ReplicationDiagram/Nodes.utils'
 import { UnknownDestinationNotice } from '../UnknownDestinationNotice'
 import { useDestinationInformation } from '../useDestinationInformation'
 import { useIsPipelinesEnabled } from '../useIsPipelinesEnabled'
+import { usePreferredPipelineClusterId } from '../usePreferredPipelineClusterId'
 import { DestinationForm } from './DestinationForm'
 import { DESTINATION_DOCS_PATHS } from './DestinationPanel.constants'
 import { DestinationType } from './DestinationPanel.types'
@@ -35,6 +37,7 @@ import { checkLocalPipelinesNotSetUp } from '@/data/replication/utils'
 import { useSelectedOrganizationQuery } from '@/hooks/misc/useSelectedOrganization'
 import { useConfirmOnClose } from '@/hooks/ui/useConfirmOnClose'
 import { DOCS_URL, IS_PLATFORM } from '@/lib/constants'
+import { ReplicationClusterProvider, useReplicationClusterId } from '@/state/replication-cluster'
 
 export const DestinationPanel = () => {
   const { ref: projectRef } = useParams()
@@ -102,10 +105,53 @@ export const DestinationPanel = () => {
 
   const checkIsDirtyRef = useRef<() => boolean>(() => false)
 
+  const contextClusterId = useReplicationClusterId()
+  const preferredCluster = usePreferredPipelineClusterId()
+  // `null` until the user picks a region; until then a new pipeline starts in the preferred one.
+  const [chosenClusterId, setChosenClusterId] = useState<string | undefined | null>(null)
+  const creationClusterId = chosenClusterId === null ? preferredCluster.clusterId : chosenClusterId
+  const {
+    ensureRegionSource,
+    isCreatingSource,
+    error: regionSourceError,
+    reset: resetRegionSource,
+  } = useEnsurePipelineRegionSource(projectRef)
+  const handleRegionChange = (clusterId: string | undefined) => {
+    setChosenClusterId(clusterId)
+    resetRegionSource()
+    void ensureRegionSource(clusterId)
+  }
+
+  // A preselected non-default region needs the project's source, as an explicit pick does.
+  const attemptedPreferredClusterRef = useRef<string | undefined>(undefined)
+  useEffect(() => {
+    const clusterId = preferredCluster.clusterId
+    if (!visible || editMode || !showDestinationForm || chosenClusterId !== null) return
+    if (
+      !preferredCluster.isReady ||
+      clusterId === undefined ||
+      attemptedPreferredClusterRef.current === clusterId
+    )
+      return
+    attemptedPreferredClusterRef.current = clusterId
+    void ensureRegionSource(clusterId)
+  }, [
+    visible,
+    editMode,
+    showDestinationForm,
+    chosenClusterId,
+    preferredCluster.clusterId,
+    preferredCluster.isReady,
+    ensureRegionSource,
+  ])
+
   const onClose = () => {
     checkIsDirtyRef.current = () => false
     setDestinationType(null)
     setEdit(null)
+    setChosenClusterId(null)
+    attemptedPreferredClusterRef.current = undefined
+    resetRegionSource()
   }
 
   const { confirmOnClose, handleOpenChange, modalProps } = useConfirmOnClose({
@@ -223,15 +269,38 @@ export const DestinationPanel = () => {
               </div>
             )}
             {showDestinationForm && (
-              <DestinationForm
-                visible={visible}
-                selectedType={destinationType ?? 'BigQuery'}
-                existingDestination={existingDestination}
-                typeSelection={pipelinesTypeSelection}
-                checkIsDirtyRef={checkIsDirtyRef}
-                onClose={onClose}
-                onCancel={confirmOnClose}
-              />
+              <ReplicationClusterProvider
+                clusterId={editMode ? contextClusterId : creationClusterId}
+              >
+                {regionSourceError && (
+                  <SheetSection>
+                    <AlertError
+                      error={regionSourceError}
+                      subject="Failed to prepare pipeline region"
+                      projectRef={projectRef}
+                      additionalActions={
+                        <Button
+                          loading={isCreatingSource}
+                          onClick={() => void ensureRegionSource(creationClusterId)}
+                        >
+                          Retry
+                        </Button>
+                      }
+                    />
+                  </SheetSection>
+                )}
+                <DestinationForm
+                  visible={visible}
+                  selectedType={destinationType ?? 'BigQuery'}
+                  existingDestination={existingDestination}
+                  typeSelection={pipelinesTypeSelection}
+                  checkIsDirtyRef={checkIsDirtyRef}
+                  onClose={onClose}
+                  onCancel={confirmOnClose}
+                  onRegionChange={handleRegionChange}
+                  isPreparingRegion={isCreatingSource}
+                />
+              </ReplicationClusterProvider>
             )}
           </div>
         </SheetContent>

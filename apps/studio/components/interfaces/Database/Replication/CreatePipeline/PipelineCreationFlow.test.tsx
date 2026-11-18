@@ -8,6 +8,7 @@ import { NuqsAdapter } from 'nuqs/adapters/react'
 import { beforeEach, describe, expect, it, vi } from 'vitest'
 
 import { PipelineCreationFlow as CreationFlow } from './PipelineCreationFlow'
+import type { ReplicationClustersData } from '@/data/replication/clusters-query'
 import type { ReplicationCostEstimateData } from '@/data/replication/cost-estimate-query'
 import { replicationKeys } from '@/data/replication/keys'
 import { DOCS_URL } from '@/lib/constants'
@@ -192,6 +193,72 @@ const renderWizard = (
   })
 
 describe('PipelineCreationFlow', () => {
+  it('locks the selected region while source lookup is pending', async () => {
+    const queryClient = new QueryClient({ defaultOptions: { queries: { retry: false } } })
+    queryClient.setQueryData<ReplicationClustersData>(replicationKeys.clusters(), {
+      default_cluster_id: '1',
+      regions: [
+        { cluster_id: '1', region_name: 'Singapore', region_code: 'ap-southeast-1' },
+        { cluster_id: '2', region_name: 'Frankfurt', region_code: 'eu-central-1' },
+      ],
+    })
+    addAPIMock({
+      method: 'get',
+      path: '/platform/projects/:ref',
+      response: () =>
+        HttpResponse.json<components['schemas']['ProjectDetailResponse_Output']>({
+          id: 1,
+          ref: 'default',
+          name: 'Project',
+          organization_id: 1,
+          status: 'ACTIVE_HEALTHY',
+          cloud_provider: 'AWS',
+          region: 'ap-southeast-1',
+          db_host: 'db.default.supabase.co',
+          restUrl: 'https://default.supabase.co',
+          connectionString: null,
+          inserted_at: '2026-01-01T00:00:00Z',
+          updated_at: '2026-01-01T00:00:00Z',
+          subscription_id: 'subscription',
+          is_branch_enabled: false,
+          is_physical_backups_enabled: false,
+          high_availability: false,
+          integration_source: null,
+        }),
+    })
+    let finishLookup = () => {}
+    const pendingLookup = new Promise<void>((resolve) => {
+      finishLookup = resolve
+    })
+    addAPIMock({
+      method: 'get',
+      path: '/platform/replication/:ref/sources',
+      response: async () => {
+        await pendingLookup
+        return HttpResponse.json<components['schemas']['SourcesResponse_Output']>({
+          sources: [
+            {
+              id: 1,
+              name: 'default',
+              tenant_id: 'default',
+              config: { host: 'localhost', port: 5432, name: 'postgres', username: 'postgres' },
+            },
+          ],
+        })
+      },
+    })
+    renderWizard(<PipelineCreationFlow availableDestinations={['BigQuery']} onClose={vi.fn()} />, {
+      queryClient,
+    })
+    const selector = await screen.findByRole('combobox', { name: 'Pipeline region' })
+    await waitFor(() => expect(selector).toBeEnabled())
+    clickContinue()
+    await waitFor(() => expect(selector).toBeDisabled())
+    expect(screen.queryByLabelText('Pipeline name')).not.toBeInTheDocument()
+    finishLookup()
+    expect(await screen.findByLabelText('Pipeline name')).toBeInTheDocument()
+  })
+
   it('keeps header navigation pending until dirty changes are discarded', async () => {
     const push = vi.spyOn(router, 'push')
     customRender(
