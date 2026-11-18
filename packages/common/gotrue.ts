@@ -3,7 +3,30 @@ import { AuthClient, navigatorLock, type User } from '@supabase/auth-js'
 import { isBrowser } from './helpers'
 import { safeLocalStorage } from './safe-storage'
 
+interface StoredUser {
+  user?: { user_metadata?: { avatar_url?: unknown } }
+}
+
 export const STORAGE_KEY = process.env.NEXT_PUBLIC_STORAGE_KEY || 'supabase.dashboard.auth.token'
+
+// the page inlines this function's source, so it must not use anything outside its own body
+const markSignedIn = (sessionKey: string) => {
+  try {
+    if (!localStorage.getItem(sessionKey)) return
+    const root = document.documentElement
+    root.setAttribute('data-signed-in', '')
+    const stored: StoredUser | null = JSON.parse(
+      localStorage.getItem(`${sessionKey}-user`) ?? 'null'
+    )
+    const avatarUrl = stored?.user?.user_metadata?.avatar_url
+    if (typeof avatarUrl === 'string' && avatarUrl) {
+      root.style.setProperty('--signed-in-avatar', `url(${JSON.stringify(avatarUrl)})`)
+    }
+  } catch {}
+}
+
+// auth loads after hydration, so this marks the page and its avatar before first paint
+export const SIGNED_IN_HINT_SCRIPT = `(${markSignedIn.toString()})(${JSON.stringify(STORAGE_KEY)})`
 export const AUTH_DEBUG_KEY =
   process.env.NEXT_PUBLIC_AUTH_DEBUG_KEY || 'supabase.dashboard.auth.debug'
 export const AUTH_DEBUG_PERSISTED_KEY =
