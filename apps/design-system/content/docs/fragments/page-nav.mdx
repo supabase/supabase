@@ -52,11 +52,4 @@ Set `size` to match the sibling `PageHeader` and page content so the tabs line u
 <PageContainer size="large">…</PageContainer>
 ```
 
-Place it directly below `PageBreadcrumbs` and outside `PageHeader`.
-
-<Admonition type="deprecation" title="PageHeaderNavigationTabs is deprecated">
-
-Do not put tab navigation inside `PageHeader`. Prefer `PageNav` wrapping `NavMenu` for new
-pages. See [Layout patterns](../ui-patterns/layout).
-
-</Admonition>
+Place it directly below `PageBreadcrumbs` and outside `PageHeader`. For legacy pages, `PageHeaderNavigationTabs` remains available on `PageHeader`.
