@@ -8,7 +8,7 @@ Replace a leaked secret key or `service_role` key with a new secret key, then re
 
 ## Prerequisites
 
-Fix the root cause of the leak before you rotate anything. Otherwise the new key can leak the same way. The [OWASP Risk Rating Methodology](https://owasp.org/www-community/OWASP_Risk_Rating_Methodology) helps you judge the severity of the incident and plan your next steps. If someone is actively using the leaked key, retire it right away with the steps in [Retire the compromised key](#retire-the-compromised-key), even though components that still use it stop working until you replace it.
+Fix the root cause of the leak before you rotate anything. Otherwise the new key can leak the same way. The [OWASP Risk Rating Methodology](https://community.owasp.org/OWASP_Risk_Rating_Methodology) helps you judge the severity of the incident and plan your next steps. If someone is actively using the leaked key, retire it right away with the steps in [Retire the compromised key](#retire-the-compromised-key), even though components that still use it stop working until you replace it.
 
 To follow the Management API path, you also need:
 
