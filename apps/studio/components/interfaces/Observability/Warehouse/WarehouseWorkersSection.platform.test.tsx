@@ -73,12 +73,14 @@ test('shows worker starts and requests with their API labels', async () => {
       ])
       const starts = metric('activation_rate')
       starts.series.push({ ...starts.series[0], labels: { kind: 'cold', result: 'success' } })
+      const requests = metric('rpc_rate')
+      requests.series.push({ ...requests.series[0], labels: { method: 'metadata', status: 'error' } })
       return HttpResponse.json<WarehouseMetricsResponse>({
         metrics: [
           starts,
           metric('activation_duration_mean'),
           metric('activation_duration_p95'),
-          metric('rpc_rate'),
+          requests,
           metric('rpc_duration_mean'),
           metric('rpc_duration_p95'),
         ],
@@ -90,6 +92,9 @@ test('shows worker starts and requests with their API labels', async () => {
   expect(within(starts).getByText(/warm/)).toBeInTheDocument()
   expect(within(starts).getByText(/cold/)).toBeInTheDocument()
   expect(screen.getByRole('region', { name: 'Worker start time' })).toBeInTheDocument()
+  const requests = screen.getByRole('region', { name: 'Requests by method' })
+  expect(within(requests).getByText('Requests by method · query · ok')).toBeInTheDocument()
+  expect(within(requests).getByText('Requests by method · metadata · error')).toBeInTheDocument()
   expect(screen.getByRole('region', { name: 'Request duration' })).toBeInTheDocument()
   expect(screen.getByText(/split by method and status. Not a count/)).toBeInTheDocument()
   expect(screen.getByText('Worker metrics loaded')).toBeInTheDocument()
