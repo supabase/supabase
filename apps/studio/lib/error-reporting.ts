@@ -1,4 +1,4 @@
-import * as Sentry from '@sentry/nextjs'
+import * as Sentry from '@sentry/react'
 
 import type { StudioError } from '@/lib/errors/studio-errors'
 import { isStudioError } from '@/lib/errors/studio-errors'

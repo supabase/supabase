@@ -1,4 +1,4 @@
-import * as Sentry from '@sentry/nextjs'
+import * as Sentry from '@sentry/react'
 
 import { getErrorRouting, SAMPLE_ALWAYS, SAMPLE_NEVER } from './error-routing'
 import { classifyError } from '@/data/error-classification'
