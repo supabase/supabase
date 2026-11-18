@@ -26,6 +26,7 @@ import { AlertError } from '@/components/ui/AlertError'
 import { InlineLink } from '@/components/ui/InlineLink'
 import { ShortcutTooltip } from '@/components/ui/ShortcutTooltip'
 import { warehouseKeys } from '@/data/warehouse/keys'
+import { type WarehouseMetricName } from '@/data/warehouse/warehouse-metrics-api-types'
 import type { WarehouseMetricsData } from '@/data/warehouse/warehouse-metrics-query'
 import { warehouseMetricsQueryOptions } from '@/data/warehouse/warehouse-metrics-query'
 import { useWarehouseSetupStatusQuery } from '@/data/warehouse/warehouse-setup-status-query'
@@ -34,6 +35,45 @@ import { useRefreshHandler, useReportDateRange } from '@/hooks/misc/useReportDat
 import { IS_PLATFORM } from '@/lib/constants'
 import { SHORTCUT_IDS } from '@/state/shortcuts/registry'
 import { useShortcut } from '@/state/shortcuts/useShortcut'
+
+const WAREHOUSE_METRICS: {
+  metric: WarehouseMetricName
+  title: string
+  unit: string
+  description: string
+}[] = [
+  {
+    metric: 'query_rate',
+    title: 'Query rate',
+    unit: '/s',
+    description: 'Queries started per second. Not a count of SQL statements.',
+  },
+  {
+    metric: 'query_in_flight',
+    title: 'Queries in progress',
+    unit: '',
+    description: 'Queries awaiting completion, including worker waits and result streaming.',
+  },
+  {
+    metric: 'query_error_rate',
+    title: 'Query errors',
+    unit: '/s',
+    description:
+      'Failed queries per second, including timeouts. Canceled queries are counted separately.',
+  },
+  {
+    metric: 'query_timeout_rate',
+    title: 'Timeouts (included in errors)',
+    unit: '/s',
+    description: 'Timed-out queries per second. These are already included in query errors.',
+  },
+  {
+    metric: 'query_canceled_rate',
+    title: 'Canceled queries',
+    unit: '/s',
+    description: 'Canceled queries per second, counted separately from errors.',
+  },
+]
 
 export const WarehouseMetricsReport = () => {
   const isWarehouseEnabled = useIsWarehouseEnabled()
@@ -71,13 +111,7 @@ const WarehouseMetricsReportContent = () => {
   const query = useQuery(
     warehouseMetricsQueryOptions({
       projectRef: ref,
-      attributes: [
-        'query_rate',
-        'query_in_flight',
-        'query_error_rate',
-        'query_timeout_rate',
-        'query_canceled_rate',
-      ],
+      attributes: WAREHOUSE_METRICS.map((x) => x.metric),
       startDate: isRangeOk ? range.startDate : '',
       endDate: isRangeOk ? range.endDate : '',
       interval: isRangeOk ? range.interval : '1m',
@@ -267,41 +301,7 @@ const WarehouseMetricsBody = ({
     case 'ready':
       return (
         <div className="grid gap-4 md:grid-cols-2">
-          {[
-            {
-              metric: 'query_rate',
-              title: 'Query rate',
-              unit: '/s',
-              description: 'Queries started per second. Not a count of SQL statements.',
-            },
-            {
-              metric: 'query_in_flight',
-              title: 'Queries in progress',
-              unit: '',
-              description:
-                'Queries awaiting completion, including worker waits and result streaming.',
-            },
-            {
-              metric: 'query_error_rate',
-              title: 'Query errors',
-              unit: '/s',
-              description:
-                'Failed queries per second, including timeouts. Canceled queries are counted separately.',
-            },
-            {
-              metric: 'query_timeout_rate',
-              title: 'Timeouts (included in errors)',
-              unit: '/s',
-              description:
-                'Timed-out queries per second. These are already included in query errors.',
-            },
-            {
-              metric: 'query_canceled_rate',
-              title: 'Canceled queries',
-              unit: '/s',
-              description: 'Canceled queries per second, counted separately from errors.',
-            },
-          ].map((chart) => (
+          {WAREHOUSE_METRICS.map((chart) => (
             <WarehouseMetricChart
               key={chart.metric}
               metric={data?.metrics.find((item) => item.metric === chart.metric)}
