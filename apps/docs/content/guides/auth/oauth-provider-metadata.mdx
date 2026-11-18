@@ -17,20 +17,20 @@ You can read it in these places:
 
 </Admonition>
 
-Which fields are present depends on the provider and on the scopes and permissions you request. Fields that the provider doesn't return are left out. Provider APIs change, so treat this page as a reference for what Supabase Auth maps, not as a guarantee of what each provider returns.
+Which fields are present depends on the provider and on the scopes and permissions you request. Fields that the provider doesn't return are left out, except `email_verified` and `phone_verified`, which are always present. Provider APIs change, so treat this page as a reference for what Supabase Auth maps, not as a guarantee of what each provider returns.
 
 ## Common fields
 
 Every OAuth sign-in stores these fields:
 
-| Field            | Type      | Description                                                |
-| ---------------- | --------- | ---------------------------------------------------------- |
-| `iss`            | `string`  | The issuer or API host of the provider.                    |
-| `sub`            | `string`  | The user's unique ID at the provider.                      |
-| `provider_id`    | `string`  | The user's unique ID at the provider. Same value as `sub`. |
-| `email`          | `string`  | The user's primary email, when the provider returns one.   |
-| `email_verified` | `boolean` | Whether the provider reports the email as verified.        |
-| `phone_verified` | `boolean` | Always `false` for OAuth sign-ins.                         |
+| Field            | Type      | Description                                                                                              |
+| ---------------- | --------- | -------------------------------------------------------------------------------------------------------- |
+| `iss`            | `string`  | The issuer or API host of the provider.                                                                  |
+| `sub`            | `string`  | The user's unique ID at the provider.                                                                    |
+| `provider_id`    | `string`  | The user's unique ID at the provider. Same value as `sub`.                                               |
+| `email`          | `string`  | The email that Auth selected: the one the provider marks as primary, otherwise the last one it returned. |
+| `email_verified` | `boolean` | Whether the provider reports the email as verified.                                                      |
+| `phone_verified` | `boolean` | `false` for built-in providers.                                                                          |
 
 Most providers also fill in some of the following fields. The last four are older fields that Supabase Auth keeps for backwards compatibility. Prefer `name`, `picture` and `preferred_username` in new code.
 
@@ -73,10 +73,11 @@ The table lists the fields that Supabase Auth sets in addition to the [common fi
 | `twitch`                  | `name` (login), `nickname` (display name), `picture`, `avatar_url`, `full_name`, `slug`, `custom_claims.broadcaster_type`, `custom_claims.description`, `custom_claims.type`, `custom_claims.offline_image_url`, `custom_claims.view_count` |
 | `twitter` (X, OAuth 1.0a) | `name`, `preferred_username`, `picture`, `avatar_url`, `full_name`, `user_name`                                                                                                                                                             |
 | `x` (X, OAuth 2.0)        | `name`, `preferred_username`, `picture`, `profile`, `website`, `avatar_url`, `full_name`, `user_name`, `custom_claims.created_at`                                                                                                           |
+| `vercel_marketplace`      | `name`, `picture`. `sub` and `provider_id` are `global_user_id:<id>` when the token has a `global_user_id`. The email is always marked as verified.                                                                                         |
 | `workos`                  | `name`, `full_name`, `custom_claims.connection_id`, `custom_claims.organization_id`                                                                                                                                                         |
 | `zoom`                    | `name`, `picture`, `avatar_url`, `full_name`                                                                                                                                                                                                |
 
-Deprecated provider names have the same shape as their replacements. For example, the deprecated `linkedin` provider returns the same fields as `linkedin_oidc` plus the legacy fields, and the deprecated `slack` provider returns the same fields as `slack_oidc`.
+The deprecated `slack` provider returns the same fields as `slack_oidc`. The deprecated `linkedin` provider returns `name`, `picture`, `avatar_url` and `full_name`.
 
 ## Example
 
@@ -100,7 +101,9 @@ A GitHub sign-in produces `user_metadata` like this:
 
 ## Updating metadata on later sign-ins
 
-Each time a user signs in with a provider, Supabase Auth merges the latest values from the provider into `user_metadata` and `identity_data`. Fields that you added yourself with `updateUser({ data: { ... } })` are kept unless the provider returns a field with the same name, in which case the provider value overwrites yours. Store values you want to control under keys that providers don't use.
+Each time a user signs in with a provider, Supabase Auth merges the provider's values into `user_metadata`. Fields that you added yourself with `updateUser({ data: { ... } })` are kept unless the provider returns a field with the same name, in which case the provider value overwrites yours. Store values you want to control under keys that providers don't use. `custom_claims` is one key, so it is replaced as a whole. Fields that a provider stops returning stay in `user_metadata`.
+
+`identity_data` is replaced with the provider's latest values on each sign-in. For example, the Apple name that Apple sends only on the first sign-in stays in `user_metadata` but is gone from `identity_data` after the next sign-in.
 
 ## Custom OAuth and OIDC providers
 
