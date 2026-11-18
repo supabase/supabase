@@ -4,228 +4,132 @@ title: 'Find and use your API keys'
 description: 'Find your Supabase publishable and secret keys, set them in your environment, and use the right one in client code, backend code, and Edge Functions.'
 ---
 
-Get your Supabase publishable and secret keys, then use the right one in your client, your backend, and your Edge Functions. When you finish, each component of your app calls your project with a key that matches where it runs.
+Get your Supabase publishable and secret keys, then use the right one in your client, your backend, and your Edge Functions. When you finish, each part of your app calls your project with a key that matches where it runs.
 
 ## Overview
 
-Every request to your Supabase project carries an API key. The key identifies what is calling your project, and [Supabase Auth](/docs/guides/auth) identifies who is calling, when someone is signed in. To learn how keys map to Postgres roles and Row Level Security, see [How API keys work](/docs/guides/getting-started/how-api-keys-work).
+Every request to your project carries an API key. Use the publishable key in code you ship and the secret key in code you control. To learn how keys map to Postgres roles and Row Level Security, see [How API keys work](/docs/guides/getting-started/how-api-keys-work).
 
-Pick the key by asking where the code runs.
+| Where the code runs                                   | Use this key    |
+| ----------------------------------------------------- | --------------- |
+| Anything you ship: browser, mobile app, CLI, script   | Publishable key |
+| Anything you control: server, Edge Function, cron job | Secret key      |
 
-| Where the code runs                                   | Use this key    | Because                                                               |
-| ----------------------------------------------------- | --------------- | --------------------------------------------------------------------- |
-| Anything you ship: browser, mobile app, CLI, script   | Publishable key | Anyone can read it, so it only reaches what Row Level Security allows |
-| Anything you control: server, Edge Function, cron job | Secret key      | It bypasses Row Level Security, so it must never leave your control   |
-
-Think of your project's data as a building. The publishable key is taped to the front door, and it only opens the lobby. The secret key is the master key, and it stays in your pocket.
-
-To swap keys in an application that already ships legacy keys, follow [Migrating to new API keys](/docs/guides/getting-started/migrating-to-new-api-keys) instead.
+To replace legacy keys in an application that already ships them, see [Migrating to new API keys](/docs/guides/getting-started/migrating-to-new-api-keys).
 
 <$Partial path="api_keys_deprecation.mdx" />
 
 ## Prerequisites
 
-- A Supabase project.
-- A signed-in Dashboard session, to copy a key value. The CLI and Management API paths also need their own credentials, shown in each tab.
-- At least one publishable or secret key. If your project has none yet, create them in the [**Settings > API Keys**](/dashboard/project/_/settings/api-keys/) section of the Dashboard.
+- **A Supabase project.** [Create one](/dashboard/new/_) if you don't have one.
+- **A signed-in Dashboard session.** [Sign in](/dashboard/projects) to copy your keys.
+- **A publishable key and a secret key.** Create them in [**Settings > API Keys**](/dashboard/project/_/settings/api-keys/).
 
 ## Procedure
 
-### Set your variable names
+You will name your variables, copy your keys, then use them in client, backend, and Edge Function code.
 
-Getting a key into an app has two halves. You copy the value, which needs a signed-in Dashboard session, and your code reads it by name. The key itself never belongs in source code, so start by setting these names in `.env`:
+### 1. Set your variable names
 
-```bash .env
-# Safe to expose to the browser. Prefix per your framework.
-NEXT_PUBLIC_SUPABASE_URL=https://your-project.supabase.co
-NEXT_PUBLIC_SUPABASE_PUBLISHABLE_KEY=sb_publishable_...
+Your code reads keys by name, so add the names before the values.
 
-# Server-only. Never prefix these, or your bundler will ship the key.
-SUPABASE_URL=https://your-project.supabase.co
-SUPABASE_SECRET_KEY=sb_secret_...
-```
+1. Add the browser-safe names, prefixed as your framework requires:
 
-### Find your keys
-
-Pick the path that matches where you are working.
-
-Every path below reads keys that already exist. If your project has no publishable or secret key yet, create them first in the [**Settings > API Keys**](/dashboard/project/_/settings/api-keys/) section of the Dashboard.
-
-<Tabs
-  scrollable
-  size="small"
-  type="underlined"
-  defaultActiveId="dashboard"
-  queryGroup="retrieval-method"
->
-<TabPanel id="dashboard" label="Dashboard">
-
-Use the Dashboard when you are setting up a project by hand. It needs nothing but a signed-in session.
-
-1. Open your project's [**Connect** dialog](/dashboard/project/_?showConnect=true). It shows the URL and publishable key for the framework you select, ready to paste into `.env`.
-2. To pick a specific key, or to see every key your project has, open the [**Settings > API Keys**](/dashboard/project/_/settings/api-keys/) section of the Dashboard instead. Every key lives there, legacy or not, and there is no separate **Settings > API** page.
-3. Copy each value into `.env` under the variable names above.
-
-</TabPanel>
-<TabPanel id="cli" label="Supabase CLI">
-
-Use the CLI to script setup, or to read the keys for a preview branch. This path needs the Supabase CLI, so [install it](/docs/guides/local-development/cli/getting-started#installing-the-supabase-cli) first.
-
-1. Sign in, if you haven't already:
-
-   ```bash
-   supabase login
+   ```bash .env
+   NEXT_PUBLIC_SUPABASE_URL=https://your-project.supabase.co
+   NEXT_PUBLIC_SUPABASE_PUBLISHABLE_KEY=sb_publishable_...
    ```
 
-2. Find the project ref, if you don't know it:
+2. Add the server-only names, with no prefix so your bundler never ships them:
 
-   ```bash
-   supabase projects list
+   ```bash .env
+   SUPABASE_URL=https://your-project.supabase.co
+   SUPABASE_SECRET_KEY=sb_secret_...
    ```
 
-3. List the keys for that project:
+### 2. Copy your keys
 
-   ```bash
-   supabase projects api-keys --remote=your-project-ref
+Copy the values from the Dashboard. To use the CLI, the Management API, or a local stack instead, see [Get your keys](/docs/guides/getting-started/api-keys-reference#get-your-keys).
+
+1. Open your project's [**Connect** dialog](/dashboard/project/_?showConnect=true) and copy the URL and publishable key.
+
+2. Open [**Settings > API Keys**](/dashboard/project/_/settings/api-keys/) and copy the secret key.
+
+3. Paste each value into `.env` under the names from phase 1.
+
+### 3. Use the publishable key in client code
+
+Use the publishable key in any code that reaches a user's device.
+
+1. Open the file where you create your client, such as `lib/supabase.ts`.
+
+2. Pass the publishable key to `createClient`:
+
+   ```ts lib/supabase.ts
+   import { createClient } from '@supabase/supabase-js'
+
+   export const supabase = createClient(
+     process.env.NEXT_PUBLIC_SUPABASE_URL!,
+     process.env.NEXT_PUBLIC_SUPABASE_PUBLISHABLE_KEY!
+   )
    ```
 
-Pass the branch's own project ref to read the keys for a preview branch. A branch has its own keys, and the command returns the linked project's keys when you omit `--remote`.
+3. Enable Row Level Security on every table before you deploy. See [Limits of publishable keys](/docs/guides/getting-started/how-api-keys-work#limits-of-publishable-keys).
 
-</TabPanel>
-<TabPanel id="management-api" label="Management API">
+### 4. Use the secret key in backend code
 
-Use the Management API to fetch keys from your own tooling, such as a deploy script or an internal provisioning service.
+Use the secret key only in code that never reaches a user's device.
 
-Authenticate with a [personal access token](/dashboard/account/tokens). An OAuth application needs the `secrets:read` scope. A personal access token [you've scoped](/docs/guides/platform/personal-access-tokens) needs the **API Keys** permission with **Read** access. To reveal key values with `reveal=true`, as the example below does, the token also needs **API Key Secrets** with **Read** access. Without the required scope or permissions, the request returns 403 Forbidden.
+1. Open the server-only file where you create your admin client, such as `server/supabase.ts`.
 
-```bash
-export PROJECT_REF="your-project-ref"
-export SUPABASE_ACCESS_TOKEN="your-personal-access-token"
+2. Pass the secret key to `createClient`:
 
-curl -X GET "https://api.supabase.com/v1/projects/$PROJECT_REF/api-keys?reveal=true" \
-  -H "Authorization: Bearer $SUPABASE_ACCESS_TOKEN" \
-  | jq '.[] | {name, type}'
-```
+   ```ts server/supabase.ts
+   import { createClient } from '@supabase/supabase-js'
 
-`reveal=true` includes the key values in the response, and this `jq` filter drops them again so they stay out of your terminal. Write the values straight into your secret store rather than printing them, because anything on standard output lands in your CI logs. See [Get project API keys](/docs/reference/api/v1-get-project-api-keys) for the full response.
-
-</TabPanel>
-<TabPanel id="local" label="Local stack">
-
-A local stack mints its own keys. They are unrelated to your hosted project's keys, so a local key never grants access to your hosted data.
-
-This path needs the Supabase CLI and a container runtime. See [Running a local Supabase project](/docs/guides/local-development/cli/getting-started#running-a-local-supabase-project) for both.
-
-1. Start the stack:
-
-   ```bash
-   supabase start
+   export const supabaseAdmin = createClient(
+     process.env.SUPABASE_URL!,
+     process.env.SUPABASE_SECRET_KEY!
+   )
    ```
 
-   The publishable and secret keys are in the output, under **Authentication Keys**.
+### 5. Use the secret key in an Edge Function
 
-2. Print them again at any time while the stack is running:
+Use the [`@supabase/server`](/docs/guides/functions/auth) SDK, which gives your function a privileged client without exposing the key. To read the key from the environment instead, see [Edge Functions](/docs/guides/getting-started/api-keys-reference#edge-functions).
 
-   ```bash
-   supabase status
+1. Wrap your handler in `withSupabase` and use the client on `ctx`:
+
+   ```ts supabase/functions/roster/index.ts
+   import { withSupabase } from 'npm:@supabase/server@1'
+
+   export default {
+     fetch: withSupabase({ auth: 'secret' }, async (_req, ctx) => {
+       const { data } = await ctx.supabaseAdmin.from('profiles').select('email')
+       return Response.json({ data })
+     }),
+   }
    ```
 
-</TabPanel>
-</Tabs>
+2. Turn off JWT verification for the function, because it's called with a secret key:
 
-### Use a publishable key in client code
-
-Pass the publishable key to `createClient` in any code that reaches a user's device.
-
-```ts lib/supabase.ts
-import { createClient } from '@supabase/supabase-js'
-
-export const supabase = createClient(
-  process.env.NEXT_PUBLIC_SUPABASE_URL!,
-  process.env.NEXT_PUBLIC_SUPABASE_PUBLISHABLE_KEY!
-)
-```
-
-Row Level Security decides what this client can reach, so enable it on every table before you deploy.
-
-### Use a secret key in backend code
-
-Pass the secret key to `createClient` only in code that never reaches a user's device, such as a server route or a worker.
-
-```ts server/supabase.ts
-import { createClient } from '@supabase/supabase-js'
-
-export const supabaseAdmin = createClient(
-  process.env.SUPABASE_URL!,
-  process.env.SUPABASE_SECRET_KEY!
-)
-```
-
-#### Inside an Edge Function
-
-Don't read the key from the environment inside an Edge Function. Use the [`@supabase/server`](/docs/guides/functions/auth) SDK instead. It verifies the caller's secret key for you and hands back a privileged client on `ctx`, so the key never appears in your code.
-
-```ts supabase/functions/roster/index.ts
-import { withSupabase } from 'npm:@supabase/server@1'
-
-export default {
-  fetch: withSupabase({ auth: 'secret' }, async (_req, ctx) => {
-    // ctx.supabaseAdmin bypasses Row Level Security
-    const { data } = await ctx.supabaseAdmin.from('profiles').select('email')
-    return Response.json({ data })
-  }),
-}
-```
-
-Set `verify_jwt = false` for a function called with a secret key rather than a user's token.
-
-```toml supabase/config.toml
-[functions.roster]
-verify_jwt = false
-```
-
-If you build the client yourself instead of using the SDK, read the key from `SUPABASE_SECRET_KEYS`. The runtime injects it as a JSON dictionary keyed by key name, so pick the one you want.
-
-```ts supabase/functions/roster/index.ts
-import { createClient } from 'npm:@supabase/supabase-js@2'
-
-const secretKeys = JSON.parse(Deno.env.get('SUPABASE_SECRET_KEYS')!)
-
-const supabaseAdmin = createClient(Deno.env.get('SUPABASE_URL')!, secretKeys['default'])
-```
-
-`SUPABASE_ANON_KEY` and `SUPABASE_SERVICE_ROLE_KEY` still exist in the runtime, but they carry the legacy keys, so reading them keeps you on the deprecated path. See [Environment variables](/docs/guides/functions/secrets) for the full list of injected variables.
-
-If you are replacing legacy keys in an existing application rather than starting fresh, follow [Migrating to new API keys](/docs/guides/getting-started/migrating-to-new-api-keys).
-
-### Rotate a leaked or compromised key [#leaked-key]
-
-To replace a leaked secret key or `service_role` key and retire the compromised one, see [Rotate a leaked or compromised API key](/docs/guides/security/rotate-leaked-api-keys).
+   ```toml supabase/config.toml
+   [functions.roster]
+   verify_jwt = false
+   ```
 
 ## Verify
 
-Run a query from your client with the publishable key, such as `supabase.from('your_table').select()`. A result, or an empty list because Row Level Security matched no rows, means the key works. An authentication error means the key is wrong or missing.
+Confirm your client reaches your project with the publishable key.
+
+1. Run a query from your client, such as `supabase.from('your_table').select()`.
+
+2. Check the result. A result, or an empty list, means the key works. An authentication error means the key is wrong or missing.
 
 ## Next steps
 
+These pages cover other ways to get keys, how keys work, and what to do if one leaks.
+
+- [Get your keys](/docs/guides/getting-started/api-keys-reference#get-your-keys): the CLI, the Management API, and a local stack.
 - [How API keys work](/docs/guides/getting-started/how-api-keys-work): what each key identifies, and the Postgres role it maps to.
 - [API keys reference](/docs/guides/getting-started/api-keys-reference): key formats, rules for handling secret keys, and known limitations.
 - [Rotate a leaked or compromised API key](/docs/guides/security/rotate-leaked-api-keys): replace a key that leaked.
-
-## Moved sections
-
-### Which key do you use?
-
-The table is in [Overview](#overview).
-
-### How API keys work
-
-See [How API keys work](/docs/guides/getting-started/how-api-keys-work).
-
-### Key types
-
-See [Key types](/docs/guides/getting-started/api-keys-reference#key-types) in the API keys reference.
-
-### Security reference
-
-See [Handling secret keys safely](/docs/guides/getting-started/api-keys-reference#handling-secret-keys-safely), [Known limitations](/docs/guides/getting-started/api-keys-reference#known-limitations), and [Limits of publishable keys](/docs/guides/getting-started/how-api-keys-work#limits-of-publishable-keys).
