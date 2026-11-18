@@ -127,7 +127,7 @@ check_logs rest \
 
 check_logs realtime \
     'Starting Realtime' \
-    'Connected to Postgres database' \
+    'Tenant set-up successfully' \
     'Janitor started' \
     'Starting MetricsCleaner'
 
