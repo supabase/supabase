@@ -2,6 +2,7 @@ import { Fragment, type ReactNode } from 'react'
 import { Tooltip, TooltipContent, TooltipTrigger } from 'ui'
 
 import { formatPermissionName } from './OAuthAppsAuthorizeScreen.utils'
+import { TOOLTIP_UNDERLINE_CLASS_NAME } from '@/components/ui/tooltip-styles'
 
 export const ScopeGroupCardItem = ({
   label,
@@ -39,10 +40,8 @@ export function ScopePermissionLabel({ permission }: { permission: string }) {
 
   return (
     <Tooltip>
-      <TooltipTrigger className="underline decoration-dotted underline-offset-4">
-        {label}
-      </TooltipTrigger>
-      <TooltipContent side="bottom" className="max-w-60">
+      <TooltipTrigger className={TOOLTIP_UNDERLINE_CLASS_NAME}>{label}</TooltipTrigger>
+      <TooltipContent side="top" className="max-w-60">
         {description}
       </TooltipContent>
     </Tooltip>
