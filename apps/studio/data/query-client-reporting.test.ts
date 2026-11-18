@@ -55,6 +55,45 @@ describe('reporting errors from React Query', () => {
     expect(captureException).toHaveBeenCalledTimes(1)
   })
 
+  it('does not report a query error that the meta marks as handled', async () => {
+    const isHandledError = (error: { code?: number }) => error.code === 404
+    const fail = (code: number) => async () => {
+      handleError({ message: 'boom', code })
+    }
+
+    await expect(
+      client.fetchQuery({
+        queryKey: ['c'],
+        queryFn: fail(404),
+        retry: false,
+        meta: { isHandledError },
+      })
+    ).rejects.toMatchObject({ code: 404 })
+    expect(captureException).not.toHaveBeenCalled()
+
+    await expect(
+      client.fetchQuery({
+        queryKey: ['d'],
+        queryFn: fail(500),
+        retry: false,
+        meta: { isHandledError },
+      })
+    ).rejects.toMatchObject({ code: 500 })
+    expect(captureException).toHaveBeenCalledTimes(1)
+  })
+
+  it('does not report a mutation error that the meta marks as handled', async () => {
+    const mutation = client.getMutationCache().build(client, {
+      mutationFn: async () => {
+        handleError({ message: 'boom', code: 404 }, { alwaysCapture: true })
+      },
+      meta: { isHandledError: (error) => error.code === 404 },
+    })
+
+    await expect(mutation.execute(undefined)).rejects.toMatchObject({ code: 404 })
+    expect(captureException).not.toHaveBeenCalled()
+  })
+
   it('classifies and reports an error a query function throws itself', async () => {
     await expect(
       client.fetchQuery({
