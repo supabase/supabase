@@ -1,8 +1,18 @@
 import { createFileRoute } from '@tanstack/react-router'
-import Head from 'next/head'
+import { useParams } from 'common'
+import { useMemo, useState } from 'react'
+import { Admonition } from 'ui-patterns/Admonition'
+import { ShimmeringLoader } from 'ui-patterns/ShimmeringLoader'
 
+import { ProjectClaimBenefits } from '@/components/interfaces/Organization/ProjectClaim/benefits'
+import { ProjectClaimChooseOrg } from '@/components/interfaces/Organization/ProjectClaim/choose-org'
+import { ProjectClaimConfirm } from '@/components/interfaces/Organization/ProjectClaim/confirm'
+import { ProjectClaimLayout } from '@/components/interfaces/Organization/ProjectClaim/layout'
+import { useApiAuthorizationQuery } from '@/data/api-authorization/api-authorization-query'
+import { useOrganizationProjectClaimQuery } from '@/data/organizations/organization-project-claim-query'
+import { useOrganizationsQuery } from '@/data/organizations/organizations-query'
 import { useCustomContent } from '@/hooks/custom-content/useCustomContent'
-import ClaimProjectPage from '@/pages/claim-project'
+import { withAuth } from '@/hooks/misc/withAuth'
 
 export const Route = createFileRoute('/claim-project')({
   component: ClaimProject,
@@ -13,12 +23,104 @@ function ClaimProject() {
 
   return (
     <>
-      <Head>
-        <title>{`Claim project | ${appTitle ?? 'Supabase'}`}</title>
-      </Head>
+      <title>{`Claim project | ${appTitle ?? 'Supabase'}`}</title>
       <main className="flex flex-col w-full min-h-screen overflow-y-auto">
-        <ClaimProjectPage dehydratedState={undefined} />
+        <ClaimProjectPageWithAuth />
       </main>
     </>
   )
 }
+
+function ClaimProjectPage() {
+  const { auth_id, token: claimToken } = useParams()
+  const [selectedOrgSlug, setSelectedOrgSlug] = useState<string>()
+  const [step, setStep] = useState<'choose-org' | 'benefits' | 'confirm'>('choose-org')
+
+  const {
+    data: requester,
+    isPending: isLoadingRequester,
+    isError: isErrorRequester,
+    error: errorRequester,
+  } = useApiAuthorizationQuery({ id: auth_id })
+  const { data: organizations } = useOrganizationsQuery()
+
+  const selectedOrganization = useMemo(() => {
+    return (organizations || []).find((org) => org.slug === selectedOrgSlug)
+  }, [selectedOrgSlug, organizations])
+
+  const {
+    data: projectClaim,
+    error: errorProjectClaim,
+    isError: isErrorProjectClaim,
+    isPending: isLoadingProjectClaim,
+    isSuccess: isSuccessProjectClaim,
+  } = useOrganizationProjectClaimQuery(
+    {
+      slug: selectedOrgSlug!,
+      token: claimToken!,
+    },
+    {
+      enabled: !!claimToken && !!selectedOrgSlug,
+    }
+  )
+
+  if ((selectedOrgSlug && claimToken && isLoadingProjectClaim) || isLoadingRequester) {
+    return (
+      <ProjectClaimLayout title="Claim a project" className="py-6">
+        <div className="space-y-2">
+          <ShimmeringLoader />
+          <ShimmeringLoader className="w-3/4" />
+          <ShimmeringLoader className="w-1/2" />
+        </div>
+      </ProjectClaimLayout>
+    )
+  }
+
+  if ((selectedOrgSlug && claimToken && isErrorProjectClaim) || isErrorRequester) {
+    return (
+      <ProjectClaimLayout title="Claim a project" className="py-6">
+        <Admonition type="warning" title="Failed to retrieve project claim request details">
+          <p>Please retry your claim request from the requesting app</p>
+          {!!errorProjectClaim && <p className="mt-2">Error: {errorProjectClaim?.message}</p>}
+          {!!errorRequester && <p className="mt-2">Error: {errorRequester?.message}</p>}
+        </Admonition>
+      </ProjectClaimLayout>
+    )
+  }
+
+  if (step === 'choose-org' || !selectedOrganization) {
+    return (
+      <ProjectClaimChooseOrg
+        onChoose={(orgSlug) => {
+          setSelectedOrgSlug(orgSlug)
+          setStep('benefits')
+        }}
+      />
+    )
+  }
+
+  if (isSuccessProjectClaim) {
+    if (step === 'benefits') {
+      return (
+        <ProjectClaimBenefits
+          projectClaim={projectClaim}
+          requester={requester}
+          onContinue={() => setStep('confirm')}
+        />
+      )
+    }
+
+    return (
+      <ProjectClaimConfirm
+        setStep={setStep}
+        selectedOrganization={selectedOrganization}
+        projectClaim={projectClaim}
+        requester={requester}
+      />
+    )
+  }
+
+  return null
+}
+
+const ClaimProjectPageWithAuth = withAuth(ClaimProjectPage)

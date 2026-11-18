@@ -1,14 +1,68 @@
 import { createFileRoute } from '@tanstack/react-router'
+import { useParams } from 'common'
+import { PageContainer } from 'ui-patterns/PageContainer'
+import {
+  PageHeader,
+  PageHeaderDescription,
+  PageHeaderMeta,
+  PageHeaderSummary,
+  PageHeaderTitle,
+} from 'ui-patterns/PageHeader'
+import { PageSection, PageSectionContent } from 'ui-patterns/PageSection'
+import { GenericSkeletonLoader } from 'ui-patterns/ShimmeringLoader'
 
-import ProtectionPage from '@/pages/project/[ref]/auth/protection'
+import { ProtectionAuthSettingsForm } from '@/components/interfaces/Auth/ProtectionAuthSettingsForm/ProtectionAuthSettingsForm'
+import { NoPermission } from '@/components/ui/NoPermission'
+import { UnknownInterface } from '@/components/ui/UnknownInterface'
+import { FGA_PERMISSIONS, useAsyncCheckPermissionsV2 } from '@/hooks/misc/useCheckPermissionsV2'
+import { useIsFeatureEnabled } from '@/hooks/misc/useIsFeatureEnabled'
 
 export const Route = createFileRoute('/project/$ref/auth/protection')({
-  component: AuthProtectionRoute,
+  component: ProtectionPage,
   staticData: {
     authLayoutTitle: 'Attack Protection',
   },
 })
 
-function AuthProtectionRoute() {
-  return <ProtectionPage dehydratedState={undefined} />
+function ProtectionPage() {
+  const { ref } = useParams()
+  const showAttackProtection = useIsFeatureEnabled('authentication:attack_protection')
+
+  const { can: canReadAuthSettings, isSuccess: isPermissionsLoaded } = useAsyncCheckPermissionsV2(
+    FGA_PERMISSIONS.PROJECT.AUTH_CONFIG_READ
+  )
+
+  if (!showAttackProtection) {
+    return <UnknownInterface urlBack={`/project/${ref}/auth/users`} />
+  }
+
+  if (isPermissionsLoaded && !canReadAuthSettings) {
+    return <NoPermission isFullPage resourceText="access your project's auth provider settings" />
+  }
+
+  return (
+    <>
+      <PageHeader size="default">
+        <PageHeaderMeta>
+          <PageHeaderSummary>
+            <PageHeaderTitle>Attack Protection</PageHeaderTitle>
+            <PageHeaderDescription>
+              Configure security settings to protect your project from attacks
+            </PageHeaderDescription>
+          </PageHeaderSummary>
+        </PageHeaderMeta>
+      </PageHeader>
+      <PageContainer size="default">
+        {!isPermissionsLoaded ? (
+          <PageSection>
+            <PageSectionContent>
+              <GenericSkeletonLoader />
+            </PageSectionContent>
+          </PageSection>
+        ) : (
+          <ProtectionAuthSettingsForm />
+        )}
+      </PageContainer>
+    </>
+  )
 }

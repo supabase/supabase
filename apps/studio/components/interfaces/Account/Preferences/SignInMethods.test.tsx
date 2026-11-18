@@ -1,5 +1,10 @@
+import {
+  createMemoryHistory,
+  createRootRoute,
+  createRouter,
+  RouterContextProvider,
+} from '@tanstack/react-router'
 import { fireEvent, screen, waitFor, within } from '@testing-library/react'
-import userEvent from '@testing-library/user-event'
 import { mockAnimationsApi } from 'jsdom-testing-mocks'
 import { http, HttpResponse } from 'msw'
 import { beforeEach, describe, expect, it, vi } from 'vitest'
@@ -95,7 +100,17 @@ const renderSignInMethods = (searchParams = '') => {
     )
   )
 
-  return customRender(<SignInMethods />, { nuqs: { searchParams } })
+  const router = createRouter({
+    routeTree: createRootRoute(),
+    history: createMemoryHistory({ initialEntries: ['/account/security'] }),
+  })
+
+  return customRender(
+    <RouterContextProvider router={router}>
+      <SignInMethods />
+    </RouterContextProvider>,
+    { nuqs: { searchParams } }
+  )
 }
 
 const openAddPasswordDialog = async () => {
@@ -118,12 +133,16 @@ describe('SignInMethods', () => {
     renderSignInMethods()
 
     expect(await screen.findByRole('button', { name: 'Add password' })).toBeInTheDocument()
-    expect(screen.queryByText('Email')).not.toBeInTheDocument()
+    expect(screen.queryByText('Email address')).not.toBeInTheDocument()
+    expect(screen.getByText(`Add a password to sign in with ${EMAIL}`)).toBeInTheDocument()
+    expect(screen.getByRole('group', { name: 'Password' })).toBeInTheDocument()
+    expect(screen.getByText('Add a password for email sign-in')).toBeInTheDocument()
     expect(
       screen.getByText(
         `Use ${EMAIL} and a password as another way to sign in if you lose access to GitHub.`
       )
     ).toBeInTheDocument()
+    expect(screen.getAllByRole('button', { name: 'Add password' })).toHaveLength(1)
     expect(screen.queryByRole('link', { name: 'Change password' })).not.toBeInTheDocument()
   })
 
@@ -137,8 +156,9 @@ describe('SignInMethods', () => {
 
     expect(await screen.findByText('google')).toBeInTheDocument()
     expect(screen.getByText('GitHub')).toBeInTheDocument()
-    expect(screen.queryByText('Email')).not.toBeInTheDocument()
-    expect(screen.getByText(`Add a password to sign in with ${EMAIL}.`)).toBeInTheDocument()
+    expect(screen.queryByText('Email address')).not.toBeInTheDocument()
+    expect(screen.getByText(`Add a password to sign in with ${EMAIL}`)).toBeInTheDocument()
+    expect(screen.queryByText('Add a password for email sign-in')).not.toBeInTheDocument()
     expect(screen.getAllByRole('button', { name: 'Add password' })).toHaveLength(1)
   })
 
@@ -163,22 +183,31 @@ describe('SignInMethods', () => {
     expect(screen.queryByRole('button', { name: 'Add password' })).not.toBeInTheDocument()
   })
 
-  it('disables unlink for email while still allowing unlink for another identity', async () => {
+  it('separates email updates and password changes without offering to remove either', async () => {
     mockGetUser([githubIdentity, emailIdentity])
 
     renderSignInMethods()
 
-    expect(await screen.findByRole('link', { name: 'Change password' })).toBeInTheDocument()
-
-    const emailUnlink = screen.getByRole('button', { name: 'Unlink Email identity' })
-    expect(emailUnlink).toHaveAttribute('aria-disabled', 'true')
-    await userEvent.hover(emailUnlink)
+    expect(await screen.findByText('Email address')).toBeInTheDocument()
+    expect(screen.getByText('Password', { exact: true })).toBeInTheDocument()
+    expect(screen.getByText('Configured')).toBeInTheDocument()
     expect(
-      await screen.findByRole('tooltip', { name: 'Temporarily unavailable' })
-    ).toBeInTheDocument()
+      within(screen.getByRole('group', { name: 'Password' })).getByRole('link', {
+        name: 'Change password',
+      })
+    ).toHaveAttribute('href', '/reset-password?type=change')
+    expect(
+      screen.queryByRole('button', { name: /Unlink Email|Unlink Password|Remove password/i })
+    ).not.toBeInTheDocument()
 
     const githubUnlink = screen.getByRole('button', { name: 'Unlink GitHub identity' })
     expect(githubUnlink).not.toHaveAttribute('aria-disabled', 'true')
+    fireEvent.click(
+      within(screen.getByRole('group', { name: 'Email address' })).getByRole('button', {
+        name: 'Update email address',
+      })
+    )
+    expect(await screen.findByRole('dialog', { name: 'Update email address' })).toBeInTheDocument()
   })
 
   it('does not offer to add a password when the feature flag is disabled', async () => {
@@ -189,7 +218,7 @@ describe('SignInMethods', () => {
 
     expect(await screen.findByText('GitHub')).toBeInTheDocument()
     expect(screen.queryByRole('button', { name: 'Add password' })).not.toBeInTheDocument()
-    expect(screen.queryByText('Email')).not.toBeInTheDocument()
+    expect(screen.queryByText('Email address')).not.toBeInTheDocument()
   })
 
   it('shows a single email for managed SSO sign-in without offering password setup', async () => {
@@ -200,7 +229,7 @@ describe('SignInMethods', () => {
     expect(await screen.findByText('SSO')).toBeInTheDocument()
     expect(screen.getByText(EMAIL, { exact: true })).toBeInTheDocument()
     expect(screen.queryByText(`${EMAIL} · ${EMAIL}`)).not.toBeInTheDocument()
-    expect(screen.getByText('Your organization manages how you sign in.')).toBeInTheDocument()
+    expect(screen.getByText('Managed by your organization')).toBeInTheDocument()
     expect(screen.queryByRole('button', { name: 'Add password' })).not.toBeInTheDocument()
   })
 

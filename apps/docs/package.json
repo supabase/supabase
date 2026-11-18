@@ -55,7 +55,7 @@
     "@octokit/graphql": "^8.0.0",
     "@octokit/plugin-retry": "^8.1.0",
     "@sentry/nextjs": "catalog:",
-    "@supabase/config": "^1.7.0",
+    "@supabase/config": "^1.8.0",
     "@supabase/supabase-js": "catalog:",
     "@tanstack/react-query": "~5.83.0",
     "acorn": "^8.11.3",
