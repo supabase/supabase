@@ -319,7 +319,7 @@ using ( (select auth.uid()) = user_id );
 
 #### Rows shared by two users
 
-Some rows belong to two users at once, such as an order that both its buyer and its seller can see. Store each user in their own column, and check both columns in the same policy. This `orders` table has a `buyer_id` and a `seller_id`:
+Some rows belong to two users at once, such as an order that both its buyer and its seller can see. Store each user in their own column, and check both columns in the same policy. The following examples use an `orders` table where each row has a `buyer_id` and a `seller_id`:
 
 ```sql
 create table orders (
