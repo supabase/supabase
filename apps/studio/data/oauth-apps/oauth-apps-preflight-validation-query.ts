@@ -56,7 +56,7 @@ export const useOAuthAppsPreflightValidationQuery = <TData = OAuthAppsPreflightV
     retry: (failureCount, error) => {
       if (isOAuthRoleValidationError(error)) return false
       const defaultOptions = queryClient.getDefaultOptions()
-      if (defaultOptions.queries?.retry) {
+      if (defaultOptions.queries?.retry != null) {
         if (typeof defaultOptions.queries.retry === 'function') {
           return defaultOptions.queries.retry(failureCount, error)
         }
