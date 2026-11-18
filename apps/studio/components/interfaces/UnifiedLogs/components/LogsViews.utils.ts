@@ -1,5 +1,12 @@
 export const MIN_FILTERS_TO_SAVE = 1
 
+export const VIEW_NAME_MAX_LENGTH = 64
+
+export const isDuplicateViewName = (name: string, existingNames: string[]): boolean => {
+  const normalized = name.trim().toLowerCase()
+  return existingNames.some((existing) => existing.trim().toLowerCase() === normalized)
+}
+
 const MAX_VIEW_NAME_IN_COPY = 32
 
 export const truncateViewName = (name: string): string =>

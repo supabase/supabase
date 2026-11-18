@@ -1,6 +1,6 @@
 import { describe, expect, it } from 'vitest'
 
-import { getFilterCombinationKey, truncateViewName } from './LogsViews.utils'
+import { getFilterCombinationKey, isDuplicateViewName, truncateViewName } from './LogsViews.utils'
 
 describe('truncateViewName', () => {
   it('leaves a short name untouched', () => {
@@ -27,5 +27,15 @@ describe('getFilterCombinationKey', () => {
     expect(getFilterCombinationKey(null)).toBe('')
     expect(getFilterCombinationKey(undefined)).toBe('')
     expect(getFilterCombinationKey([])).toBe('')
+  })
+})
+
+describe('isDuplicateViewName', () => {
+  it('matches regardless of case or surrounding whitespace', () => {
+    expect(isDuplicateViewName(' Errors Only ', ['errors only'])).toBe(true)
+  })
+
+  it('does not match a genuinely different name', () => {
+    expect(isDuplicateViewName('Errors only', ['Slow requests'])).toBe(false)
   })
 })

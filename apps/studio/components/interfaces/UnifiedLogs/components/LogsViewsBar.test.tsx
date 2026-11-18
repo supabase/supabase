@@ -416,4 +416,152 @@ describe('LogsViewsBar', () => {
 
     expect(onRetry).toHaveBeenCalledOnce()
   })
+
+  describe('inline save form', () => {
+    const saveProps = { ...baseProps, isSaving: true }
+
+    it('hides the pills and the + button while saving', () => {
+      customRender(
+        <LogsViewsBar
+          {...saveProps}
+          views={[makeView()]}
+          activeFilterCount={1}
+          onSaveCurrentView={vi.fn()}
+        />
+      )
+
+      expect(screen.queryByRole('button', { name: 'Errors only' })).toBeNull()
+      expect(screen.queryByRole('button', { name: SAVE_LABEL })).toBeNull()
+    })
+
+    it('leaves the name empty when no seed is given', async () => {
+      customRender(<LogsViewsBar {...saveProps} />)
+
+      expect(await screen.findByPlaceholderText('Enter a name for this view')).toHaveValue('')
+    })
+
+    it('prefills and selects the name when a seed is given', async () => {
+      customRender(<LogsViewsBar {...saveProps} saveNameSeed="Errors only copy" />)
+
+      const input = await screen.findByDisplayValue('Errors only copy')
+      await waitFor(() => {
+        expect((input as HTMLInputElement).selectionStart).toBe(0)
+        expect((input as HTMLInputElement).selectionEnd).toBe('Errors only copy'.length)
+      })
+    })
+
+    it('disables saving and does not save when the name is empty', async () => {
+      const onSubmitSave = vi.fn()
+      customRender(<LogsViewsBar {...saveProps} onSubmitSave={onSubmitSave} />)
+
+      const saveButton = await screen.findByRole('button', { name: 'Save' })
+      expect(saveButton).toBeDisabled()
+
+      fireEvent.click(saveButton)
+
+      expect(onSubmitSave).not.toHaveBeenCalled()
+    })
+
+    it('disables saving and does not save when the name is only whitespace', async () => {
+      const onSubmitSave = vi.fn()
+      customRender(<LogsViewsBar {...saveProps} onSubmitSave={onSubmitSave} />)
+
+      const input = await screen.findByPlaceholderText('Enter a name for this view')
+      fireEvent.change(input, { target: { value: '   ' } })
+
+      const saveButton = screen.getByRole('button', { name: 'Save' })
+      await waitFor(() => expect(saveButton).toBeDisabled())
+
+      fireEvent.click(saveButton)
+
+      expect(onSubmitSave).not.toHaveBeenCalled()
+    })
+
+    it('shows an inline error and does not save one character over the limit', async () => {
+      const onSubmitSave = vi.fn()
+      customRender(<LogsViewsBar {...saveProps} onSubmitSave={onSubmitSave} />)
+
+      const input = await screen.findByPlaceholderText('Enter a name for this view')
+      fireEvent.change(input, { target: { value: 'a'.repeat(65) } })
+      fireEvent.click(screen.getByRole('button', { name: 'Save' }))
+
+      expect(await screen.findByText('Keep the name to 64 characters or less.')).toBeInTheDocument()
+      expect(onSubmitSave).not.toHaveBeenCalled()
+    })
+
+    it('enables saving for a normal name and trims it before saving', async () => {
+      const onSubmitSave = vi.fn()
+      customRender(<LogsViewsBar {...saveProps} onSubmitSave={onSubmitSave} />)
+
+      const input = await screen.findByPlaceholderText('Enter a name for this view')
+      fireEvent.change(input, { target: { value: '  Errors only  ' } })
+
+      const saveButton = screen.getByRole('button', { name: 'Save' })
+      await waitFor(() => expect(saveButton).toBeEnabled())
+      await act(async () => fireEvent.click(saveButton))
+
+      await waitFor(() => expect(onSubmitSave).toHaveBeenCalledOnce())
+      expect(onSubmitSave).toHaveBeenCalledWith('Errors only')
+    })
+
+    it('shows an inline error and does not save when the name is a duplicate (case/whitespace insensitive)', async () => {
+      const onSubmitSave = vi.fn()
+      customRender(
+        <LogsViewsBar
+          {...saveProps}
+          views={[makeView({ name: 'Existing view' })]}
+          onSubmitSave={onSubmitSave}
+        />
+      )
+
+      const input = await screen.findByPlaceholderText('Enter a name for this view')
+      fireEvent.change(input, { target: { value: ' existing view ' } })
+      fireEvent.click(screen.getByRole('button', { name: 'Save' }))
+
+      expect(await screen.findByText("That name's already taken. Try another.")).toBeInTheDocument()
+      expect(onSubmitSave).not.toHaveBeenCalled()
+    })
+
+    it('saves and closes when the name is valid and unique', async () => {
+      const onSubmitSave = vi.fn()
+      const onCancelSave = vi.fn()
+      customRender(
+        <LogsViewsBar {...saveProps} onSubmitSave={onSubmitSave} onCancelSave={onCancelSave} />
+      )
+
+      const input = await screen.findByPlaceholderText('Enter a name for this view')
+      await userEvent.type(input, 'Errors only')
+      await act(async () => fireEvent.click(screen.getByRole('button', { name: 'Save' })))
+
+      await waitFor(() => expect(onSubmitSave).toHaveBeenCalledOnce())
+      expect(onSubmitSave).toHaveBeenCalledWith('Errors only')
+      await waitFor(() => expect(onCancelSave).toHaveBeenCalledOnce())
+    })
+
+    it('cancels without saving from the Cancel button', async () => {
+      const onSubmitSave = vi.fn()
+      const onCancelSave = vi.fn()
+      customRender(
+        <LogsViewsBar {...saveProps} onSubmitSave={onSubmitSave} onCancelSave={onCancelSave} />
+      )
+
+      const input = await screen.findByPlaceholderText('Enter a name for this view')
+      await userEvent.type(input, 'Draft name')
+      await userEvent.click(screen.getByRole('button', { name: 'Cancel' }))
+
+      expect(onCancelSave).toHaveBeenCalledOnce()
+      expect(onSubmitSave).not.toHaveBeenCalled()
+    })
+
+    it('cancels without saving on Escape', async () => {
+      const onCancelSave = vi.fn()
+      customRender(<LogsViewsBar {...saveProps} onCancelSave={onCancelSave} />)
+
+      const input = await screen.findByPlaceholderText('Enter a name for this view')
+      await userEvent.type(input, 'Draft name')
+      await userEvent.keyboard('{Escape}')
+
+      expect(onCancelSave).toHaveBeenCalledOnce()
+    })
+  })
 })

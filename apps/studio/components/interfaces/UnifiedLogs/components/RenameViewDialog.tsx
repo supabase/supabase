@@ -19,8 +19,7 @@ import { FormItemLayout } from 'ui-patterns/form/FormItemLayout/FormItemLayout'
 import * as z from 'zod'
 
 import { type LogsView } from '../UnifiedLogs.views'
-import { VIEW_NAME_MAX_LENGTH } from './SaveViewDialog'
-import { isDuplicateViewName } from './SaveViewDialog.utils'
+import { isDuplicateViewName, VIEW_NAME_MAX_LENGTH } from './LogsViews.utils'
 import { DiscardChangesConfirmationDialog } from '@/components/ui-patterns/Dialogs/DiscardChangesConfirmationDialog'
 import { useConfirmOnClose } from '@/hooks/ui/useConfirmOnClose'
 

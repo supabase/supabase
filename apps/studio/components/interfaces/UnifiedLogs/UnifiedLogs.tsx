@@ -37,7 +37,6 @@ import { LogsListPanel } from './components/LogsListPanel'
 import { LogsTable } from './components/LogsTable'
 import { getFilterCombinationKey } from './components/LogsViews.utils'
 import { LogsViewsBar } from './components/LogsViewsBar'
-import { SaveViewDialog } from './components/SaveViewDialog'
 import { TooltipLabel } from './components/TooltipLabel'
 import { ViewModifiedPopover } from './components/ViewModifiedPopover'
 import { ServiceFlowPanel } from './ServiceFlowPanel'
@@ -68,13 +67,7 @@ import {
   isOfferedFilter,
   toQuerySearchParams,
 } from './UnifiedLogs.utils'
-import {
-  applyView,
-  isViewModified,
-  serializeView,
-  type LogsView,
-  type LogsViewDraft,
-} from './UnifiedLogs.views'
+import { applyView, isViewModified, serializeView, type LogsView } from './UnifiedLogs.views'
 import { LOGS_SAVED_VIEWS_FLAG, useLogsViews } from './useLogsViews'
 import { AlertError } from '@/components/ui/AlertError'
 import { ButtonTooltip } from '@/components/ui/ButtonTooltip'
@@ -163,9 +156,9 @@ export const UnifiedLogs = ({
     retry: retrySavedViews,
   } = useLogsViews()
   const [activeViewId, setActiveViewId] = useState<string | null>(null)
-  const [saveDialogProject, setSaveDialogProject] = useState<string | null>(null)
-  const [saveDialogName, setSaveDialogName] = useState<string | null>(null)
-  const isSaveViewDialogOpen = saveDialogProject !== null && saveDialogProject === projectRef
+  const [saveViewProjectRef, setSaveViewProjectRef] = useState<string | null>(null)
+  const [saveViewNameSeed, setSaveViewNameSeed] = useState<string | null>(null)
+  const isSavingNewView = saveViewProjectRef !== null && saveViewProjectRef === projectRef
   const currentProjectRef = useRef(projectRef)
   currentProjectRef.current = projectRef
   const [dismissedUpdateKey, setDismissedUpdateKey] = useState<string | null>(null)
@@ -487,10 +480,6 @@ export const UnifiedLogs = ({
     () => new Set(filterFields.map((field) => field.value)),
     [filterFields]
   )
-  const columnLabels = useMemo(
-    () => Object.fromEntries(filterFields.map((field) => [field.value, field.label])),
-    [filterFields]
-  )
   const activeView = savedViews.find((view) => view.id === activeViewId) ?? null
   const isActiveViewModified = activeView ? isViewModified(activeView, search) : false
   const activeFilterCount = parseLogsFilterUrlParams(search.filter).length
@@ -507,7 +496,7 @@ export const UnifiedLogs = ({
     showSavedViews &&
     !!activeView &&
     isActiveViewModified &&
-    !isSaveViewDialogOpen &&
+    !isSavingNewView &&
     updateSuggestionKey !== dismissedUpdateKey
   const canReviewChanges = showSavedViews && !!activeView && isActiveViewModified
   const isViewModifiedPopoverOpen =
@@ -541,8 +530,8 @@ export const UnifiedLogs = ({
   }
 
   const handleSaveCurrentView = (defaultName?: string) => {
-    setSaveDialogName(defaultName ?? null)
-    setSaveDialogProject(projectRef ?? null)
+    setSaveViewNameSeed(defaultName ?? null)
+    setSaveViewProjectRef(projectRef ?? null)
   }
 
   const handleClearActiveView = () => {
@@ -550,12 +539,12 @@ export const UnifiedLogs = ({
     setActiveViewId(null)
   }
 
-  const handleCreateView = async (input: LogsViewDraft) => {
+  const handleCreateView = async (name: string) => {
     const savedProjectRef = projectRef
-    const id = await createSavedView(input)
+    const id = await createSavedView({ ...currentDraft, name })
     if (currentProjectRef.current === savedProjectRef) {
       setActiveViewId(id)
-      setSaveDialogProject(null)
+      setSaveViewProjectRef(null)
     }
     toast.success('View saved')
   }
@@ -812,6 +801,10 @@ export const UnifiedLogs = ({
                         onRename={(viewId, name) => updateSavedView(viewId, { name })}
                         onDelete={deleteSavedView}
                         onSaveCurrentView={() => handleSaveCurrentView()}
+                        isSaving={isSavingNewView}
+                        saveNameSeed={saveViewNameSeed ?? undefined}
+                        onSubmitSave={handleCreateView}
+                        onCancelSave={() => setSaveViewProjectRef(null)}
                         onRetry={retrySavedViews}
                       />
                     </motion.div>
@@ -898,18 +891,6 @@ export const UnifiedLogs = ({
           </ResizablePanelGroup>
         </DataTableSideBarLayout>
       </DataTableProvider>
-      <SaveViewDialog
-        key={projectRef}
-        visible={isSaveViewDialogOpen}
-        onCancel={() => setSaveDialogProject(null)}
-        onSave={handleCreateView}
-        logSource={logSource}
-        filters={currentDraft.filters}
-        viewOptions={currentDraft.viewOptions}
-        existingNames={savedViews.map((view) => view.name)}
-        defaultName={saveDialogName ?? undefined}
-        columnLabels={columnLabels}
-      />
 
       {showSavedViews && !!activeView && (
         <ViewModifiedPopover
