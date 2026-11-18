@@ -136,7 +136,7 @@ export async function buildStressFunctions(
     create procedure stress.build_functions(n int) language plpgsql as $$
     begin
       for i in 0..n-1 loop
-        execute format('create function stress.fn_%s(a int) returns int language sql as ''select a''', i);
+        execute format('create function stress.fn_%s(a int) returns int language sql as ''select a -- reads stress.t_0''', i);
         execute format('create function stress_ext.fn_%s() returns int language sql as ''select 1''', i);
         execute format('alter extension pgcrypto add function stress_ext.fn_%s()', i);
         if i % 100 = 99 then commit; end if;

@@ -59,10 +59,17 @@ export const fgaRefinements = {
   'PATCH /v1/branches/{branch_id_or_ref}': branchVariants('write'),
   'DELETE /v1/branches/{branch_id_or_ref}': branchVariants('delete'),
   'GET /v1/branches/{branch_id_or_ref}/diff': branchVariants('write'),
-  'POST /v1/branches/{branch_id_or_ref}/merge': branchVariants('write'),
   'POST /v1/branches/{branch_id_or_ref}/push': branchVariants('write'),
   'POST /v1/branches/{branch_id_or_ref}/reset': branchVariants('write'),
   'POST /v1/branches/{branch_id_or_ref}/restore': branchVariants('write'),
+  'POST /platform/pg-meta/{ref}/query': {
+    base: [['database_read']],
+    variants: {
+      read: { requires: [['database_read']] },
+      write: { requires: [['database_write']] },
+    },
+    variantRequired: true,
+  },
   'GET /v1/projects/{ref}/api-keys': {
     base: [['api_gateway_keys_read'], ['api_gateway_keys_read', 'api_gateway_keys_secret_read']],
     variants: {

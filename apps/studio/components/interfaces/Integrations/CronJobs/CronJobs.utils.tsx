@@ -28,27 +28,22 @@ const unwrapSqlLiteral = (token: string) => {
 }
 
 /**
- * Splits the argument list of a `jsonb_build_object(...)` call into its individual
- * values, honoring single-quoted SQL string literals (with '' escapes) and nested
- * parentheses. A naive split on ',' corrupts a header name or value that legitimately
- * contains a comma or parenthesis, which then gets persisted on save and no longer
- * matches what the user entered.
+ * Splits a SQL argument list starting after its `(`, respecting quotes and nested parentheses.
+ * Returns the raw arguments and the index of the closing `)`, or undefined if unbalanced.
  */
-const parseJsonBuildObjectArgs = (command: string) => {
-  const match = command.match(/headers:=jsonb_build_object\s*\(/i)
-  if (!match || match.index === undefined) return []
-
+const splitSqlArgs = (sql: string, start: number) => {
   const args: string[] = []
   let current = ''
   let depth = 1
   let inQuote = false
   let hasContent = false
+  let i = start
 
-  for (let i = match.index + match[0].length; i < command.length && depth > 0; i++) {
-    const char = command[i]
+  for (; i < sql.length; i++) {
+    const char = sql[i]
 
     if (inQuote) {
-      if (char === "'" && command[i + 1] === "'") {
+      if (char === "'" && sql[i + 1] === "'") {
         current += "''"
         i++
         continue
@@ -67,7 +62,8 @@ const parseJsonBuildObjectArgs = (command: string) => {
       current += char
     } else if (char === ')') {
       depth--
-      if (depth > 0) current += char
+      if (depth === 0) break
+      current += char
     } else if (char === ',' && depth === 1) {
       args.push(current)
       current = ''
@@ -77,12 +73,60 @@ const parseJsonBuildObjectArgs = (command: string) => {
     }
   }
 
-  // Unbalanced parentheses: bail rather than emit mangled fragments.
-  if (depth !== 0) return []
+  if (depth !== 0) return undefined
 
   if (hasContent || args.length > 0) args.push(current)
 
-  return args.map(unwrapSqlLiteral)
+  return { args, end: i }
+}
+
+const parseJsonBuildObjectArgs = (command: string) => {
+  const match = command.match(/headers:=jsonb_build_object\s*\(/i)
+  if (!match || match.index === undefined) return []
+
+  const result = splitSqlArgs(command, match.index + match[0].length)
+  return result ? result.args.map(unwrapSqlLiteral) : []
+}
+
+const SQL_STRING_LITERAL = /^e?'(?:''|[^'])*'$/i
+const SQL_STRING_LITERAL_WITH_CAST = /^e?'(?:''|[^'])*'(?:\s*::\s*(?:jsonb|json|text))?$/i
+
+const isJsonBuildObjectOfLiterals = (value: string) => {
+  const match = value.match(/^jsonb_build_object\s*\(/i)
+  if (!match) return false
+  const result = splitSqlArgs(value, match[0].length)
+  if (!result || value.slice(result.end + 1).trim().length > 0) return false
+  return result.args.every((arg) => SQL_STRING_LITERAL.test(arg.trim()))
+}
+
+// The HTTP form rebuilds the command from its fields, so anything else is edited as a SQL snippet
+const isFormRepresentableHttpCommand = (command: string) => {
+  const match = command.match(/^select\s+net\.(http_get|http_post)\s*\(/i)
+  if (!match) return false
+
+  const result = splitSqlArgs(command, match[0].length)
+  if (!result) return false
+  if (!/^\s*;?\s*$/.test(command.slice(result.end + 1))) return false
+
+  return result.args.every((arg) => {
+    const namedArg = arg.trim().match(/^([a-z_]+)\s*:=\s*([\s\S]*)$/i)
+    if (!namedArg) return false
+    const name = namedArg[1].toLowerCase()
+    const value = namedArg[2].trim()
+
+    switch (name) {
+      case 'url':
+        return SQL_STRING_LITERAL.test(value)
+      case 'body':
+        return SQL_STRING_LITERAL_WITH_CAST.test(value)
+      case 'headers':
+        return SQL_STRING_LITERAL_WITH_CAST.test(value) || isJsonBuildObjectOfLiterals(value)
+      case 'timeout_milliseconds':
+        return /^\d+$/.test(value)
+      default:
+        return false
+    }
+  })
 }
 
 export function buildCronCreateQuery(
@@ -142,7 +186,10 @@ export const parseCronJobCommand = (
 ): CronJobType => {
   const command = originalCommand.replaceAll('$$', ' ').replaceAll(/\n/g, ' ').trim()
 
-  if (command.toLocaleLowerCase().match(/^select\s+net\./)) {
+  if (
+    command.toLocaleLowerCase().match(/^select\s+net\./) &&
+    isFormRepresentableHttpCommand(command)
+  ) {
     const methodMatch = command.match(/select\s+net\.([^']+)\(\s*url:=/i)
     const method = methodMatch?.[1] || ''
 

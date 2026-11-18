@@ -2,6 +2,7 @@ import { joinSqlFragments, literal, safeSql } from '@supabase/pg-meta/src/pg-for
 import { useQuery } from '@tanstack/react-query'
 
 import { databaseKeys } from './keys'
+import { isUserFaultForStatsStatement } from '@/data/database/pg-stat-statements-sqlstate'
 import { unguarded } from '@/data/fetchers'
 import { executeSql } from '@/data/sql/execute-sql-mutation'
 import type { StudioError } from '@/lib/errors/studio-errors'
@@ -34,6 +35,9 @@ export async function getInvolvedIndexesInSelectQuery({
       projectRef,
       connectionString,
       queryKey: ['involved-indexes-explain-query'],
+      sqlOrigin: 'studio',
+      queryName: 'involved-indexes-explain-query',
+      isUserFaultSqlState: isUserFaultForStatsStatement,
       sql: safeSql`
         create or replace function pg_temp.explain_query(query text) returns jsonb
         language plpgsql
@@ -117,6 +121,8 @@ export async function getInvolvedIndexesInSelectQuery({
       projectRef,
       connectionString,
       queryKey: ['involved-indexes-names'],
+      sqlOrigin: 'studio',
+      queryName: 'involved-indexes-names',
       sql: safeSql`select schemaname as schema, tablename as table, indexname as name from pg_indexes where indexname in (${joinSqlFragments(involvedIndexes.map(literal), ', ')});`,
       grant: unguarded.migrating,
     })

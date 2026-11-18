@@ -1,3 +1,4 @@
+import { useQuery } from '@tanstack/react-query'
 import { LOCAL_STORAGE_KEYS, useParams } from 'common'
 import { ShieldCheckIcon, XIcon } from 'lucide-react'
 import { useMemo, useState } from 'react'
@@ -20,10 +21,10 @@ import { CodeBlock } from 'ui-patterns/CodeBlock'
 import { AUTO_ENABLE_RLS_EVENT_TRIGGER_SQL } from '@/components/interfaces/Database/Triggers/EventTriggersList/EventTriggers.constants'
 import { ButtonTooltip } from '@/components/ui/ButtonTooltip'
 import { useDatabaseEventTriggerCreateMutation } from '@/data/database-event-triggers/database-event-trigger-create-mutation'
-import { useDatabaseEventTriggersQuery } from '@/data/database-event-triggers/database-event-triggers-query'
-import { FGA_PERMISSIONS, useAsyncCheckPermissionsV2 } from '@/hooks/misc/useCheckPermissionsV2'
+import { databaseEventTriggersQueryOptions } from '@/data/database-event-triggers/database-event-triggers-query'
 import { useLocalStorageQuery } from '@/hooks/misc/useLocalStorage'
 import { useSelectedProjectQuery } from '@/hooks/misc/useSelectedProject'
+import { getWriteGrantToastMessage, getWriteGrantTooltip, useGrant } from '@/lib/grants'
 import { useTrack } from '@/lib/telemetry/track'
 
 export const AutoEnableRLSNotice = ({ iconOnly }: { iconOnly?: boolean }) => {
@@ -38,11 +39,18 @@ export const AutoEnableRLSNotice = ({ iconOnly }: { iconOnly?: boolean }) => {
     false
   )
 
-  const { data: eventTriggers = [], isLoading: isLoadingEventTriggers } =
-    useDatabaseEventTriggersQuery({
+  const readGrant = useGrant(
+    'POST /platform/pg-meta/{ref}/query',
+    { projectRef: project?.ref },
+    { variant: 'read' }
+  )
+  const { data: eventTriggers = [], isLoading: isLoadingEventTriggers } = useQuery(
+    databaseEventTriggersQueryOptions({
       projectRef: project?.ref,
       connectionString: project?.connectionString,
+      grant: readGrant.grant,
     })
+  )
   const hasDefaultTrigger = useMemo(
     () =>
       eventTriggers.some(
@@ -51,6 +59,8 @@ export const AutoEnableRLSNotice = ({ iconOnly }: { iconOnly?: boolean }) => {
     [eventTriggers]
   )
 
+  // Without a read grant we can't tell whether the trigger exists, so don't offer to create it
+  if (readGrant.status !== 'granted') return null
   if (!projectRef || isLoadingEventTriggers || hasDefaultTrigger) return null
 
   if (iconOnly) {
@@ -86,8 +96,10 @@ const CreateEnsureRLSTriggerDialog = ({ iconOnly }: { iconOnly?: boolean }) => {
 
   const [open, setOpen] = useState(false)
 
-  const { can: canCreateTriggers } = useAsyncCheckPermissionsV2(
-    FGA_PERMISSIONS.PROJECT.DATABASE_WRITE
+  const writeGrant = useGrant(
+    'POST /platform/pg-meta/{ref}/query',
+    { projectRef: project?.ref },
+    { variant: 'write' }
   )
 
   const { mutate: createEventTrigger, isPending: isCreating } =
@@ -102,9 +114,14 @@ const CreateEnsureRLSTriggerDialog = ({ iconOnly }: { iconOnly?: boolean }) => {
 
   const handleCreateTrigger = () => {
     if (!project) return
+    if (!writeGrant.grant) {
+      toast.error(getWriteGrantToastMessage(writeGrant.status, 'create', 'triggers'))
+      return
+    }
     track('rls_event_trigger_banner_create_button_clicked')
     createEventTrigger({
       projectRef: project.ref,
+      grant: writeGrant.grant,
       connectionString: project.connectionString,
       sql: AUTO_ENABLE_RLS_EVENT_TRIGGER_SQL,
     })
@@ -158,15 +175,13 @@ const CreateEnsureRLSTriggerDialog = ({ iconOnly }: { iconOnly?: boolean }) => {
           </Button>
           <ButtonTooltip
             variant="primary"
-            disabled={!canCreateTriggers}
+            disabled={!writeGrant.grant}
             loading={isCreating}
             onClick={handleCreateTrigger}
             tooltip={{
               content: {
                 side: 'bottom',
-                text: !canCreateTriggers
-                  ? 'You need additional permissions to create triggers'
-                  : undefined,
+                text: getWriteGrantTooltip(writeGrant.status, 'create', 'triggers'),
               },
             }}
           >

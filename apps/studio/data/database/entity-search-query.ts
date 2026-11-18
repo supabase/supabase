@@ -13,15 +13,24 @@ export type EntitySearchVariables = {
   query: string
 }
 
+const relationFields = {
+  id: z.number(),
+  schema: z.string(),
+  name: z.string(),
+}
+
 const entitySearchResultSchema = z.object({
   tables: z.array(
-    z.object({
-      id: z.number(),
-      schema: z.string(),
-      name: z.string(),
-      rls_enabled: z.boolean(),
-      policy_count: z.number(),
-    })
+    z.discriminatedUnion('type', [
+      z.object({
+        ...relationFields,
+        type: z.enum(['r', 'p']),
+        rls_enabled: z.boolean(),
+        policy_count: z.number(),
+      }),
+      z.object({ ...relationFields, type: z.literal('v'), security_invoker: z.boolean() }),
+      z.object({ ...relationFields, type: z.enum(['m', 'f']) }),
+    ])
   ),
   policies: z.array(
     z.object({
@@ -66,6 +75,8 @@ async function getEntitySearch(
     {
       projectRef,
       connectionString,
+      sqlOrigin: 'studio',
+      queryName: 'entity-search',
       sql: getSearchEntitiesSql({ query }),
       queryKey: ['entity-search'],
       grant: unguarded.migrating,

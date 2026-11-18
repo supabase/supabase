@@ -5,6 +5,7 @@ import type { TOCItemType } from 'ui-patterns/Toc/types'
 import { CodeBlockControlsIsland } from '../components/CodeBlockControlsIsland'
 import { FeaturedSection } from '../components/FeaturedSection'
 import { GuideSidebar } from '../components/GuideSidebar'
+import { HeadingLinksIsland } from '../components/HeadingLinksIsland'
 import { formatDisplayDate, toIsoDay } from '../lib/format-date'
 import { TocHeaderMenu } from '../components/TocHeaderMenu'
 import type { RelatedGuides } from '../lib/guides'
@@ -54,7 +55,7 @@ const markdownUrl = `${pagePath.replace(import.meta.env.BASE_URL, `${import.meta
 		)
 	}
 	<div class="section-container lg:grid lg:grid-cols-3 lg:gap-6">
-		<article class="prose prose-img:rounded-lg max-w-none min-w-0 py-16 lg:col-span-2">
+		<article class="prose prose-img:rounded-lg prose-headings:scroll-mt-12 max-w-none min-w-0 py-16 lg:col-span-2">
 			<div class="not-prose mb-12 flex flex-wrap items-center justify-between gap-x-4 gap-y-2 text-sm">
 				<Breadcrumb>
 					<BreadcrumbList>
@@ -101,6 +102,7 @@ const markdownUrl = `${pagePath.replace(import.meta.env.BASE_URL, `${import.meta
 			</header>
 			<slot />
 			<CodeBlockControlsIsland client:only="react" />
+			<HeadingLinksIsland client:only="react" />
 			<div class="not-prose mt-12 -ml-5 lg:hidden">
 				<GuideSidebar
 					client:visible

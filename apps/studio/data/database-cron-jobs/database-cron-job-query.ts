@@ -26,6 +26,8 @@ export async function getDatabaseCronJob({
   const { result } = await executeSql({
     projectRef,
     connectionString,
+    sqlOrigin: 'studio',
+    queryName: 'cron-job',
     sql: !!id
       ? safeSql`SELECT * FROM cron.job where jobid = ${literal(id)};`
       : safeSql`SELECT * FROM cron.job where jobname = ${literal(name)};`,

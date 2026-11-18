@@ -47,7 +47,7 @@ const CommandMenuList = forwardRef<
                 {section.commands
                   .filter((command) => !command.defaultHidden || query)
                   .map((command) => (
-                    <CommandMenuItem key={command.id} command={command}>
+                    <CommandMenuItem key={command.id} command={command} section={section.name}>
                       <TextHighlighter>{command.name}</TextHighlighter>
                     </CommandMenuItem>
                   ))}

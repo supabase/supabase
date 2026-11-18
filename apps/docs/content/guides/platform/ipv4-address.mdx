@@ -109,7 +109,7 @@ IPv6 unless IPv4 Add-On is enabled
 
 ```sh
 # Example direct connection string
-postgresql://postgres:[YOUR-PASSWORD]@db.ajrbwkcuthywfihaarmflo.supabase.co:5432/postgres
+postgresql://postgres:[YOUR-DATABASE-PASSWORD]@db.ajrbwkcuthywfihaarmflo.supabase.co:5432/postgres
 ```
 
 ### Dedicated pooler (port 6543)
@@ -118,7 +118,7 @@ IPv6 unless IPv4 Add-On is enabled
 
 ```sh
 # Example dedicated pooler string
-postgresql://postgres:[YOUR-PASSWORD]@db.ajrbwkcuthywfihaarmflo.supabase.co:6543/postgres
+postgresql://postgres:[YOUR-DATABASE-PASSWORD]@db.ajrbwkcuthywfihaarmflo.supabase.co:6543/postgres
 ```
 
 ### Shared pooler, transaction mode (port 6543)
@@ -127,7 +127,7 @@ Always uses an IPv4 address
 
 ```sh
 # Example transaction string
-postgresql://postgres.ajrbwkcuthywddfihrmflo:[YOUR-PASSWORD]@aws-0-us-east-1.pooler.supabase.com:6543/postgres
+postgresql://postgres.ajrbwkcuthywddfihrmflo:[YOUR-DATABASE-PASSWORD]@aws-0-us-east-1.pooler.supabase.com:6543/postgres
 ```
 
 ### Shared pooler, session mode (port 5432)
@@ -136,7 +136,7 @@ Always uses an IPv4 address
 
 ```sh
 # Example session string
-postgresql://postgres.ajrbwkcuthywfddihrmflo:[YOUR-PASSWORD]@aws-0-us-east-1.pooler.supabase.com:5432/postgres
+postgresql://postgres.ajrbwkcuthywfddihrmflo:[YOUR-DATABASE-PASSWORD]@aws-0-us-east-1.pooler.supabase.com:5432/postgres
 ```
 
 <$Show if="billing:all">

@@ -1,14 +1,232 @@
 import { createFileRoute } from '@tanstack/react-router'
+import dayjs from 'dayjs'
+import { ArrowRightIcon, ExternalLinkIcon, RefreshCwIcon } from 'lucide-react'
+import { useState } from 'react'
+import { Button } from 'ui'
 
-import StorageReport from '@/pages/project/[ref]/observability/storage'
+import { OBSERVABILITY_DOCS_HREFS } from '@/components/interfaces/Observability/Observability.constants'
+import {
+  NetworkTrafficRenderer,
+  ResponseSpeedChartRenderer,
+  TopApiRoutesRenderer,
+  TotalRequestsChartRenderer,
+} from '@/components/interfaces/Reports/renderers/ApiRenderers'
+import {
+  CacheHitRateChartRenderer,
+  TopCacheMissesRenderer,
+} from '@/components/interfaces/Reports/renderers/StorageRenderers'
+import ReportFilterBar from '@/components/interfaces/Reports/ReportFilterBar'
+import ReportHeader from '@/components/interfaces/Reports/ReportHeader'
+import { ReportPadding } from '@/components/interfaces/Reports/ReportPadding'
+import { REPORT_DATERANGE_HELPER_LABELS } from '@/components/interfaces/Reports/Reports.constants'
+import ReportStickyNav from '@/components/interfaces/Reports/ReportStickyNav'
+import ReportWidget from '@/components/interfaces/Reports/ReportWidget'
+import {
+  DatePickerValue,
+  LogsDatePicker,
+} from '@/components/interfaces/Settings/Logs/Logs.DatePickers'
+import UpgradePrompt from '@/components/interfaces/Settings/Logs/UpgradePrompt'
+import { DocsButton } from '@/components/ui/DocsButton'
+import { ObservabilityLink } from '@/components/ui/ObservabilityLink'
+import { ShortcutTooltip } from '@/components/ui/ShortcutTooltip'
+import { useStorageReport } from '@/data/reports/storage-report-query'
+import { useRefreshHandler, useReportDateRange } from '@/hooks/misc/useReportDateRange'
+import { DOCS_URL } from '@/lib/constants'
+import { SHORTCUT_IDS } from '@/state/shortcuts/registry'
+import { useShortcut } from '@/state/shortcuts/useShortcut'
 
 export const Route = createFileRoute('/project/$ref/observability/storage')({
-  component: ObservabilityStorageRoute,
+  component: StorageReport,
   staticData: {
     observabilityLayoutTitle: 'Storage',
   },
 })
 
-function ObservabilityStorageRoute() {
-  return <StorageReport dehydratedState={undefined} />
+const REPORT_TITLE = 'Storage'
+
+function StorageReport() {
+  const report = useStorageReport()
+
+  const {
+    data,
+    error,
+    filters,
+    isLoading,
+    params,
+    mergeParams,
+    removeFilters,
+    addFilter,
+    refresh,
+  } = report
+
+  const {
+    datePickerHelpers,
+    datePickerValue,
+    handleDatePickerChange: handleDatePickerChangeFromHook,
+    showUpgradePrompt,
+    setShowUpgradePrompt,
+    selectedDateRange,
+  } = useReportDateRange(REPORT_DATERANGE_HELPER_LABELS.LAST_60_MINUTES)
+
+  const handleDatepickerChange = (vals: DatePickerValue) => {
+    const promptShown = handleDatePickerChangeFromHook(vals)
+    if (!promptShown) {
+      mergeParams({
+        iso_timestamp_start: vals.from ?? '',
+        iso_timestamp_end: vals.to ?? '',
+      })
+    }
+  }
+
+  const onRefreshReport = useRefreshHandler(
+    datePickerValue,
+    datePickerHelpers,
+    handleDatepickerChange,
+    refresh
+  )
+
+  const [showDatePicker, setShowDatePicker] = useState(false)
+
+  useShortcut(SHORTCUT_IDS.OBSERVABILITY_REFRESH, onRefreshReport, {
+    enabled: !report.isLoading,
+  })
+  useShortcut(SHORTCUT_IDS.OBSERVABILITY_TOGGLE_DATE_PICKER, () => {
+    setShowDatePicker((open) => !open)
+  })
+
+  return (
+    <ReportPadding>
+      <ReportHeader title={REPORT_TITLE} showDatabaseSelector={false} />
+      <ReportStickyNav
+        content={
+          <div className="flex flex-col gap-2 w-full">
+            <div className="w-full flex items-center gap-2 flex-wrap">
+              <ShortcutTooltip
+                shortcutId={SHORTCUT_IDS.OBSERVABILITY_REFRESH}
+                label="Refresh report"
+                side="bottom"
+              >
+                <Button
+                  disabled={report.isLoading}
+                  icon={<RefreshCwIcon className={report.isLoading ? 'animate-spin' : ''} />}
+                  className="w-7"
+                  onClick={onRefreshReport}
+                />
+              </ShortcutTooltip>
+              <LogsDatePicker
+                onSubmit={handleDatepickerChange}
+                value={datePickerValue}
+                helpers={datePickerHelpers}
+                open={showDatePicker}
+                onOpenChange={setShowDatePicker}
+                shortcutId={SHORTCUT_IDS.OBSERVABILITY_TOGGLE_DATE_PICKER}
+              />
+              {selectedDateRange && (
+                <div className="order-last flex w-full flex-wrap items-center gap-x-2 text-xs xl:order-none xl:w-auto">
+                  <p className="text-foreground-light">
+                    {dayjs(selectedDateRange.period_start.date).format('MMM D, h:mma')}
+                  </p>
+                  <p className="text-foreground-light">
+                    <ArrowRightIcon size={12} />
+                  </p>
+                  <p className="text-foreground-light">
+                    {dayjs(selectedDateRange.period_end.date).format('MMM D, h:mma')}
+                  </p>
+                </div>
+              )}
+              <UpgradePrompt
+                show={showUpgradePrompt}
+                setShowUpgradePrompt={setShowUpgradePrompt}
+                title="Report date range"
+                description="Report data can be stored for a maximum of 3 months depending on the plan that your project is on."
+                source="storageReportDateRange"
+              />
+              <DocsButton
+                href={OBSERVABILITY_DOCS_HREFS.storage}
+                topic={REPORT_TITLE}
+                className="ml-auto"
+              />
+            </div>
+            <ReportFilterBar
+              onRemoveFilters={removeFilters}
+              onDatepickerChange={handleDatepickerChange}
+              datepickerFrom={params.totalRequests.iso_timestamp_start}
+              datepickerTo={params.totalRequests.iso_timestamp_end}
+              onAddFilter={addFilter}
+              isLoading={isLoading}
+              filters={filters}
+              selectedProduct="storage"
+              hideDatepicker={true}
+              datepickerHelpers={datePickerHelpers}
+              initialDatePickerValue={datePickerValue}
+              className="w-full"
+              showDatabaseSelector={false}
+            />
+          </div>
+        }
+      >
+        <div className="mt-8 flex flex-col gap-4">
+          <ReportWidget
+            isLoading={isLoading}
+            params={params.totalRequests}
+            title="Total Requests"
+            data={data.totalRequests || []}
+            error={error.totalRequest}
+            renderer={TotalRequestsChartRenderer}
+            append={TopApiRoutesRenderer}
+            appendProps={{ data: data.topRoutes || [], params: params.topRoutes }}
+          />
+          <ReportWidget
+            isLoading={isLoading}
+            params={params.responseSpeed}
+            title="Response Speed"
+            tooltip="Average response speed of a request (in ms)"
+            data={data.responseSpeed || []}
+            error={error.responseSpeed}
+            renderer={ResponseSpeedChartRenderer}
+            appendProps={{ data: data.topSlowRoutes || [], params: params.topSlowRoutes }}
+            append={TopApiRoutesRenderer}
+          />
+          <ReportWidget
+            isLoading={isLoading}
+            params={params.networkTraffic}
+            error={error.networkTraffic}
+            title="Network Traffic"
+            tooltip="Ingress is measured from request logs."
+            data={data.networkTraffic || []}
+            renderer={NetworkTrafficRenderer}
+          />
+
+          <ReportWidget
+            isLoading={isLoading}
+            params={params.cacheHitRate}
+            title="Request Caching"
+            tooltip={
+              <div>
+                The number of storage requests that are cached at the edge level. A higher number of
+                hits is better.{' '}
+                <span className="flex items-center gap-1 text-foreground-lighter">
+                  <a
+                    href={`${DOCS_URL}/guides/storage/cdn/fundamentals`}
+                    target="_blank"
+                    rel="noreferrer"
+                  >
+                    Read More
+                  </a>
+                  <ExternalLinkIcon className="w-3 h-3" />
+                </span>
+              </div>
+            }
+            data={data.cacheHitRate || []}
+            renderer={CacheHitRateChartRenderer}
+            append={TopCacheMissesRenderer}
+            appendProps={{ data: data.topCacheMisses || [] }}
+          />
+        </div>
+      </ReportStickyNav>
+      <div className="py-8">
+        <ObservabilityLink />
+      </div>
+    </ReportPadding>
+  )
 }

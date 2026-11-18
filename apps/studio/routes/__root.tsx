@@ -1,12 +1,8 @@
 /// <reference types="vite/client" />
 
-import { LocaleProvider } from '@/lib/i18n/LocaleProvider'
-
 import 'react-data-grid/lib/styles.css'
 import '@/styles/code.css'
-// Vite-only: defines @font-face for the custom fonts. The Next pipeline
-// (pages/_app.tsx) loads these via next/font instead, so this import has no
-// counterpart there — but dropping it under Vite makes the browser fall back
+// Defines @font-face for the custom fonts; without it the browser falls back
 // to system fonts.
 import '@/styles/fonts.css'
 import '@/styles/graphiql-base.css'
@@ -73,7 +69,9 @@ import { FeaturePreviewContextProvider } from '@/components/interfaces/App/Featu
 import { FeaturePreviewModal } from '@/components/interfaces/App/FeaturePreview/FeaturePreviewModal'
 import { IndirectTaxDeclarationModal } from '@/components/interfaces/App/IndirectTaxDeclarationModal'
 import { MonacoThemeProvider } from '@/components/interfaces/App/MonacoThemeProvider'
+import { NotFoundPage } from '@/components/interfaces/App/NotFoundPage'
 import { RouteValidationWrapper } from '@/components/interfaces/App/RouteValidationWrapper'
+import { ServerErrorPage } from '@/components/interfaces/App/ServerErrorPage'
 import { ShellFallback } from '@/components/interfaces/App/ShellFallback'
 import { MainScrollContainerProvider } from '@/components/layouts/MainScrollContainerContext'
 import { BannerStackProvider } from '@/components/ui/BannerStack/BannerStackProvider'
@@ -90,6 +88,7 @@ import { toUnixSecondsString } from '@/lib/configcat-attributes'
 import { configureMonacoLoader } from '@/lib/configure-monaco-loader'
 import { API_URL, BASE_PATH, IS_PLATFORM, useDefaultProvider } from '@/lib/constants'
 import { TimezoneProvider, useTimezone } from '@/lib/datetime'
+import { LocaleProvider } from '@/lib/i18n/LocaleProvider'
 import { splitInternalUrl } from '@/lib/internal-url'
 // Custom adapter instead of `nuqs/adapters/tanstack-router` — the stock one
 // injects a trailing slash before the query on every nuqs write (see module).
@@ -99,8 +98,6 @@ import { ProfileProvider } from '@/lib/profile'
 import { Telemetry } from '@/lib/telemetry'
 import { ToastErrorTracker } from '@/lib/toast-errors'
 import { Toaster } from '@/lib/toaster'
-import Error404 from '@/pages/404'
-import Error500 from '@/pages/500'
 import { matchRedirect } from '@/redirects.shared'
 import { AiAssistantStateContextProvider } from '@/state/ai-assistant-state'
 
@@ -162,7 +159,7 @@ const IS_NON_PROD_ENV =
   process.env.NEXT_PUBLIC_ENVIRONMENT === 'local' ||
   process.env.NEXT_PUBLIC_ENVIRONMENT === 'staging'
 
-// Mirrors the `MAINTENANCE_MODE` reads in `next.config.ts` and `vercel.ts`.
+// Mirrors the `MAINTENANCE_MODE` read in `vercel.ts`.
 // The var is unprefixed, so vite.config.ts inlines it explicitly (see the
 // define there) rather than it arriving via the NEXT_PUBLIC_ sweep — that
 // keeps the toggle a single build-time env var across all three runtimes.
@@ -293,7 +290,7 @@ const errorBoundaryHandler = (error: Error, _info: ErrorInfo) => {
 }
 
 function NotFound() {
-  return <Error404 />
+  return <NotFoundPage />
 }
 
 function ErrorBoundaryRoute({ error }: ErrorComponentProps) {
@@ -318,11 +315,11 @@ function ErrorBoundaryRoute({ error }: ErrorComponentProps) {
   }, [error, isReloading])
 
   if (isReloading) return null
-  return <Error500 />
+  return <ServerErrorPage />
 }
 
 export const Route = createRootRouteWithContext<RouterContext>()({
-  // Mirrors the redirect rules in `next.config.ts` / `vercel.ts`. Vercel's
+  // Mirrors the redirect rules in `vercel.ts`. Vercel's
   // edge layer already handles these for the platform deploy; this is the
   // self-hosted (Node-server) fallback and the client-side safety net.
   beforeLoad: ({ location }) => {

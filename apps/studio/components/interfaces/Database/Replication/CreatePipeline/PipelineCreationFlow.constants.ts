@@ -1,4 +1,4 @@
-import type { FlowDestination } from '../DestinationPanel/DestinationPanel.types'
+import type { DestinationType } from '../DestinationPanel/DestinationPanel.types'
 
 export const PIPELINE_CREATION_STEPS = [
   {
@@ -11,7 +11,7 @@ export const PIPELINE_CREATION_STEPS = [
     id: 'connection',
     label: 'Connection',
     title: 'Authorize the destination',
-    description: (destination: FlowDestination) =>
+    description: (destination: DestinationType) =>
       `Name this pipeline and enter credentials for ${destination}.`,
   },
   {

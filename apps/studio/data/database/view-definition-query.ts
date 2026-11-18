@@ -28,6 +28,8 @@ export async function getViewDefinition(
     {
       projectRef,
       connectionString,
+      sqlOrigin: 'studio',
+      queryName: 'view-definition',
       sql,
       queryKey: ['view-definition', id, includeCreateStatement ?? false],
       grant: unguarded.migrating,

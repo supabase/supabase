@@ -3,8 +3,11 @@ import { TooltipProvider } from 'ui'
 import { describe, expect, it } from 'vitest'
 
 import { McpConfigPanel } from './McpConfigPanel'
+import { MCP_CLIENTS } from './mcpClients'
 
 const props = {
+  selectedClient: MCP_CLIENTS[0],
+  onClientSelect: () => {},
   isPlatform: true,
   platformUrl: 'https://mcp.supabase.com/mcp',
   nonPlatformUrl: 'http://localhost:54321/mcp',

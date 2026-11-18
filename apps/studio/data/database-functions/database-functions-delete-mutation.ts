@@ -1,23 +1,24 @@
-import pgMeta from '@supabase/pg-meta'
+import pgMeta, { asWriteSql } from '@supabase/pg-meta'
 import { useMutation, useQueryClient } from '@tanstack/react-query'
 import { toast } from 'sonner'
 import { z } from 'zod'
 
 import { SavedDatabaseFunction } from './database-functions-query'
 import { databaseKeys } from '@/data/database/keys'
-import { unguarded } from '@/data/fetchers'
-import { executeSql } from '@/data/sql/execute-sql-mutation'
+import { executeSql, type PgMetaWriteGrant } from '@/data/sql/execute-sql-mutation'
 import type { StudioError } from '@/lib/errors/studio-errors'
 import type { UseCustomMutationOptions } from '@/types'
 
 export type DatabaseFunctionDeleteVariables = {
   projectRef: string
+  grant: PgMetaWriteGrant
   connectionString?: string | null
   func: SavedDatabaseFunction
 }
 
 export async function deleteDatabaseFunction({
   projectRef,
+  grant,
   connectionString,
   func,
 }: DatabaseFunctionDeleteVariables) {
@@ -26,9 +27,11 @@ export async function deleteDatabaseFunction({
   const { result } = await executeSql({
     projectRef,
     connectionString,
-    sql,
+    sqlOrigin: 'studio',
+    queryName: 'functions-delete',
+    sql: asWriteSql(sql),
     queryKey: ['functions', 'delete', func.id.toString()],
-    grant: unguarded.migrating,
+    grant,
   })
 
   return result as z.infer<typeof zod>
