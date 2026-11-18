@@ -138,7 +138,7 @@ describe('/authorize', () => {
   test('renders loading interstitial while the authorization request loads', async () => {
     flags.consent = true
 
-    await renderAuthorize()
+    await renderAuthorize('/authorize?auth_id=some_id')
 
     expect(screen.getByText('Loading...')).toBeInTheDocument()
   })
