@@ -153,14 +153,14 @@ export const WarehouseSchemaTablePicker = ({
             <PageSectionTitle>Tables</PageSectionTitle>
             <PageSectionDescription>
               {isEditing
-                ? 'Tables currently replicating are selected. Changes apply on save.'
-                : 'Choose which schemas or tables to replicate. You can change this at any time.'}
+                ? 'Tables currently replicating.'
+                : 'Data available to analytical queries.'}
             </PageSectionDescription>
           </PageSectionSummary>
         </PageSectionMeta>
         <PageSectionContent>
           <Card>
-            <CardContent>
+            <CardContent aria-label="Loading tables" aria-busy="true">
               <GenericSkeletonLoader />
             </CardContent>
           </Card>
@@ -205,9 +205,7 @@ export const WarehouseSchemaTablePicker = ({
         <PageSectionSummary>
           <PageSectionTitle>Tables</PageSectionTitle>
           <PageSectionDescription>
-            {isEditing
-              ? 'Tables currently replicating are selected. Changes apply on save.'
-              : 'Choose which schemas or tables to replicate. You can change this at any time.'}
+            {isEditing ? 'Tables currently replicating.' : 'Data available to analytical queries.'}
           </PageSectionDescription>
         </PageSectionSummary>
       </PageSectionMeta>
@@ -331,7 +329,7 @@ export const WarehouseSchemaTablePicker = ({
               loading={isSubmitting}
               onClick={handleSubmit}
             >
-              {isEditing ? 'Update replicated tables' : 'Enable Warehouse'}
+              {isEditing ? 'Save' : 'Replicate'}
             </Button>
           </CardFooter>
         </Card>

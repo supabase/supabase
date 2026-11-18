@@ -1,16 +1,19 @@
 import { useParams } from 'common'
 import { useEffect, useRef, useState } from 'react'
-import { Button } from 'ui'
+import { Button, Card, CardContent } from 'ui'
 import { Admonition } from 'ui-patterns/Admonition'
-import { GenericSkeletonLoader } from 'ui-patterns/ShimmeringLoader'
 
 import { isWarehouseSettingUp, type WarehouseSetupTarget } from './Warehouse.utils'
 import { WarehouseConnectSection } from './WarehouseConnectSection'
 import { WarehouseDisableCard } from './WarehouseDisableCard'
+import { WarehouseLoadingState } from './WarehouseLoadingState'
+import { WarehouseObservabilitySection } from './WarehouseObservabilitySection'
 import { WarehouseSchemaTablePicker } from './WarehouseSchemaTablePicker'
 import {
   WarehouseEnablingProgress,
   WarehouseReplicatedTablesSection,
+  WarehouseSelectedTablesSection,
+  WarehouseStatusPreview,
 } from './WarehouseTableStatusList'
 import { AlertError } from '@/components/ui/AlertError'
 import { useReplicationDestinationsQuery } from '@/data/replication/destinations-query'
@@ -124,7 +127,15 @@ const WarehouseSetupPanelContent = ({
     )
   }
 
-  if (isPending) return <GenericSkeletonLoader />
+  const loadingState = (
+    <Card>
+      <CardContent>
+        <WarehouseLoadingState />
+      </CardContent>
+    </Card>
+  )
+
+  if (isPending) return loadingState
 
   // Warehouse rides on the replication API, which isn't wired up in local development. Same
   // treatment Pipelines gives it, so a local dev doesn't read this as a broken build.
@@ -150,12 +161,12 @@ const WarehouseSetupPanelContent = ({
       />
     )
   }
-  if (!data) return <GenericSkeletonLoader />
+  if (!data) return loadingState
 
   const status = data.setup_status
 
   if (shouldCheckCatalogCompatibility) {
-    if (isProjectPending && !isProjectFetched) return <GenericSkeletonLoader />
+    if (isProjectPending && !isProjectFetched) return loadingState
     if (!isProjectSuccess || isOrioleDb === undefined) {
       return (
         <AlertError
@@ -171,7 +182,7 @@ const WarehouseSetupPanelContent = ({
       )
     }
     if (isOrioleDb) {
-      if (isDestinationsPending && !isDestinationsFetched) return <GenericSkeletonLoader />
+      if (isDestinationsPending && !isDestinationsFetched) return loadingState
       if (!isDestinationsSuccess) {
         return (
           <AlertError
@@ -215,16 +226,26 @@ const WarehouseSetupPanelContent = ({
 
   if (status === 'not_started' || status === 'disabled') {
     return (
-      <WarehouseSchemaTablePicker
-        onSubmit={handleSetup}
-        isSubmitting={setupMutation.isPending}
-        error={setupMutation.error}
-      />
+      <>
+        <WarehouseSchemaTablePicker
+          onSubmit={handleSetup}
+          isSubmitting={setupMutation.isPending}
+          error={setupMutation.error}
+        />
+        <WarehouseStatusPreview />
+        <WarehouseObservabilitySection mode="example" />
+      </>
     )
   }
 
   if (isWarehouseSettingUp(status)) {
-    return <WarehouseEnablingProgress status={data} />
+    return (
+      <>
+        <WarehouseSelectedTablesSection tables={data.tables} />
+        <WarehouseEnablingProgress status={data} />
+        <WarehouseObservabilitySection mode="waiting" />
+      </>
+    )
   }
 
   if (status === 'disabling') {
@@ -283,13 +304,14 @@ const WarehouseSetupPanelContent = ({
 
   return (
     <>
-      <WarehouseReplicatedTablesSection tables={data.tables} />
       <WarehouseSchemaTablePicker
         isEditing
         onSubmit={handleSetup}
         isSubmitting={setupMutation.isPending}
         error={setupMutation.error}
       />
+      <WarehouseReplicatedTablesSection tables={data.tables} />
+      <WarehouseObservabilitySection />
       <WarehouseConnectSection />
       <WarehouseDisableCard />
     </>

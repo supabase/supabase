@@ -36,8 +36,9 @@ const getNotProvisionedContent = (setupStatus?: WarehouseSetupStatus) => {
   return {
     type: 'default' as const,
     title: 'Warehouse is not set up',
-    description: 'Choose which schemas or tables to replicate in order to connect to Warehouse.',
-    action: 'Choose tables',
+    description:
+      'Run analytical queries on a replicated copy of your data, keeping that query work off your primary database. Set up Warehouse to get connection details.',
+    action: 'Set up Warehouse',
   }
 }
 

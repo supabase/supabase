@@ -20,6 +20,7 @@ export const OBSERVABILITY_NAV_SHORTCUT_IDS = {
   NAV_OBSERVABILITY_FUNCTIONS: 'nav.observability-functions',
   NAV_OBSERVABILITY_STORAGE: 'nav.observability-storage',
   NAV_OBSERVABILITY_REALTIME: 'nav.observability-realtime',
+  NAV_OBSERVABILITY_WAREHOUSE: 'nav.observability-warehouse',
 }
 
 export type ObservabilityNavShortcutId =
@@ -93,6 +94,13 @@ export const observabilityNavRegistry: RegistryDefinations<ObservabilityNavShort
     id: OBSERVABILITY_NAV_SHORTCUT_IDS.NAV_OBSERVABILITY_REALTIME,
     label: 'Go to Realtime',
     sequence: ['U', 'L'],
+    showInSettings: false,
+    referenceGroup: SHORTCUT_REFERENCE_GROUPS.NAVIGATION_OBSERVABILITY,
+  },
+  [OBSERVABILITY_NAV_SHORTCUT_IDS.NAV_OBSERVABILITY_WAREHOUSE]: {
+    id: OBSERVABILITY_NAV_SHORTCUT_IDS.NAV_OBSERVABILITY_WAREHOUSE,
+    label: 'Go to Warehouse',
+    sequence: ['U', 'W'],
     showInSettings: false,
     referenceGroup: SHORTCUT_REFERENCE_GROUPS.NAVIGATION_OBSERVABILITY,
   },

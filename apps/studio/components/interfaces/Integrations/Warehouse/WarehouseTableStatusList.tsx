@@ -160,3 +160,76 @@ export const WarehouseEnablingProgress = ({ status }: WarehouseEnablingProgressP
     </PageSection>
   )
 }
+
+export const WarehouseStatusPreview = () => (
+  <PageSection className="pt-5!">
+    <PageSectionMeta>
+      <PageSectionSummary>
+        <PageSectionTitle>Status</PageSectionTitle>
+        <PageSectionDescription>Replication progress and data freshness.</PageSectionDescription>
+      </PageSectionSummary>
+    </PageSectionMeta>
+    <PageSectionContent>
+      <div role="img" aria-label="Replication status preview">
+        <div inert aria-hidden="true" className="pointer-events-none grayscale">
+          <Card>
+            <CardContent className="p-0">
+              <Table>
+                <TableHeader>
+                  <TableRow>
+                    <TableHead>Table</TableHead>
+                    <TableHead className="w-48">Lag</TableHead>
+                    <TableHead className="w-36">Status</TableHead>
+                  </TableRow>
+                </TableHeader>
+                <TableBody>
+                  {['w-28', 'w-36'].map((width) => (
+                    <TableRow key={width}>
+                      <TableCell>
+                        <div className={`h-4 rounded bg-surface-200 opacity-50 ${width}`} />
+                      </TableCell>
+                      <TableCell>
+                        <div className="h-4 w-20 rounded bg-surface-200 opacity-50" />
+                      </TableCell>
+                      <TableCell>
+                        <span className="inline-flex items-center gap-x-2 opacity-50">
+                          <span className="h-2 w-2 shrink-0 rounded-full bg-surface-200" />
+                          <span className="block h-4 w-12 rounded bg-surface-200" />
+                        </span>
+                      </TableCell>
+                    </TableRow>
+                  ))}
+                </TableBody>
+              </Table>
+            </CardContent>
+          </Card>
+        </div>
+      </div>
+    </PageSectionContent>
+  </PageSection>
+)
+
+export const WarehouseSelectedTablesSection = ({ tables }: WarehouseTableStatusListProps) => (
+  <PageSection className="pt-5!">
+    <PageSectionMeta>
+      <PageSectionSummary>
+        <PageSectionTitle>Tables</PageSectionTitle>
+        <PageSectionDescription>Tables selected for replication.</PageSectionDescription>
+      </PageSectionSummary>
+    </PageSectionMeta>
+    <PageSectionContent>
+      <Card>
+        <CardContent>
+          <ul className="space-y-2 text-sm">
+            {tables.map((table) => (
+              <li key={`${table.schema}.${table.name}`}>
+                {table.schema}.{table.name}
+              </li>
+            ))}
+            {tables.length === 0 && <li>Preparing the selected tables.</li>}
+          </ul>
+        </CardContent>
+      </Card>
+    </PageSectionContent>
+  </PageSection>
+)
