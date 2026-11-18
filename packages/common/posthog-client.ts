@@ -5,7 +5,7 @@ import posthog, {
 } from 'posthog-js'
 
 import { safeSessionStorage } from './safe-storage'
-import { getTelemetryPlatform } from './telemetry-utils'
+import { getTelemetryPlatform, redactEventUrlKeywords } from './telemetry-utils'
 
 export type { CapturedNetworkRequest, SessionRecordingOptions }
 
@@ -103,6 +103,7 @@ class PostHogClient {
       before_send: (event) => {
         const platform = getTelemetryPlatform()
         if (event && platform) event.properties.platform = platform
+        if (event) redactEventUrlKeywords(event)
         return event
       },
       loaded: (posthog) => {
