@@ -43,50 +43,15 @@ export const Footer = ({ className }: FooterProps) => {
 }
 
 export const FooterBottomRow = () => (
-  <div className="flex flex-col gap-3 sm:flex-row sm:flex-wrap sm:items-center sm:justify-between">
-    <div className="flex flex-col gap-1.5 sm:flex-row sm:gap-3">
+  <div className="flex flex-wrap items-center justify-between gap-x-4 gap-y-3">
+    <div className="flex min-w-0 flex-wrap items-center gap-x-4 gap-y-3">
       <Link href="https://supabase.com/" className="text-xs text-foreground-lighter">
         &copy; Supabase Inc
       </Link>
-      <span className="hidden text-xs text-foreground-lighter sm:inline">—</span>
+      <span className="text-xs text-foreground-lighter">—</span>
       <PrivacySettings className="text-left text-xs text-foreground-lighter hover:underline">
         <PrivacySettingsLabel />
       </PrivacySettings>
-    </div>
-    <div className="order-last flex items-center gap-4 sm:order-none">
-      <a
-        href="https://twitter.com/supabase"
-        className="text-foreground-muted hover:text-foreground transition"
-      >
-        <span className="sr-only">Twitter</span>
-        <IconTwitterX size={14} />
-      </a>
-
-      <a
-        href="https://github.com/supabase"
-        className="text-foreground-muted hover:text-foreground transition"
-      >
-        <span className="sr-only">GitHub</span>
-        <IconGitHubSolid size={14} />
-      </a>
-
-      <a
-        href="https://discord.supabase.com/"
-        className="text-foreground-muted hover:text-foreground transition"
-      >
-        <span className="sr-only">Discord</span>
-        <IconDiscord size={14} />
-      </a>
-
-      <a
-        href="https://youtube.com/c/supabase"
-        className="text-foreground-muted hover:text-foreground transition"
-      >
-        <span className="sr-only">Youtube</span>
-        <IconYoutubeSolid size={14} />
-      </a>
-    </div>
-    <div className="flex flex-col gap-3 sm:basis-full sm:flex-row sm:flex-wrap">
       {secondaryLinks.map((item) => (
         <Link
           href={item.url}
@@ -96,6 +61,39 @@ export const FooterBottomRow = () => (
           {item.title}
         </Link>
       ))}
+    </div>
+    <div className="flex items-center gap-4">
+      <a
+        href="https://twitter.com/supabase"
+        className="text-foreground-muted transition hover:text-foreground"
+      >
+        <span className="sr-only">Twitter</span>
+        <IconTwitterX size={14} />
+      </a>
+
+      <a
+        href="https://github.com/supabase"
+        className="text-foreground-muted transition hover:text-foreground"
+      >
+        <span className="sr-only">GitHub</span>
+        <IconGitHubSolid size={14} />
+      </a>
+
+      <a
+        href="https://discord.supabase.com/"
+        className="text-foreground-muted transition hover:text-foreground"
+      >
+        <span className="sr-only">Discord</span>
+        <IconDiscord size={14} />
+      </a>
+
+      <a
+        href="https://youtube.com/c/supabase"
+        className="text-foreground-muted transition hover:text-foreground"
+      >
+        <span className="sr-only">Youtube</span>
+        <IconYoutubeSolid size={14} />
+      </a>
     </div>
   </div>
 )
