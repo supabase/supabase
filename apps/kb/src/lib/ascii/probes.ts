@@ -1,3 +1,10 @@
+export const WARP_PROBES = {
+  line: 'text-border-stronger',
+  surface: 'text-background',
+  glyph: 'text-foreground-lighter',
+  beam: 'text-brand',
+} as const
+
 export const readProbeColor = (probeRoot: HTMLElement, role: string): string => {
   const probe = probeRoot.querySelector<HTMLElement>(`[data-probe="${role}"]`)
   return probe ? getComputedStyle(probe).color : 'transparent'

@@ -82,6 +82,7 @@ const pageTitle = title ? `${title} | Supabase Knowledge Base` : 'Supabase Knowl
 		<meta name="twitter:creator" content="@supabase" />
 		<meta name="twitter:image" content={ogImage} />
 		{jsonLd && <script type="application/ld+json" is:inline set:html={serializeJsonLd(jsonLd)} />}
+		<slot name="head" />
 	</head>
 	<body class="flex min-h-dvh flex-col">
 		<div class="sticky top-0 z-40">
