@@ -102,34 +102,38 @@ Your functions automatically capture several types of events:
 You can add your own log messages using standard console methods:
 
 ```js
-Deno.serve(async (req) => {
-  try {
-    const { name } = await req.json()
+import { withSupabase } from 'npm:@supabase/server@1'
 
-    if (!name) {
-      // Log a warning message
-      console.warn('Empty name parameter received')
+export default {
+  fetch: withSupabase({ auth: 'user' }, async (req) => {
+    try {
+      const { name } = await req.json()
+
+      if (!name) {
+        // Log a warning message
+        console.warn('Empty name parameter received')
+      }
+
+      // Log a message
+      console.log(`Processing request for: ${name}`)
+
+      const data = {
+        message: `Hello ${name || 'Guest'}!`,
+      }
+
+      return new Response(JSON.stringify(data), {
+        headers: { 'Content-Type': 'application/json' },
+      })
+    } catch (error) {
+      // Log an error message
+      console.error(`Request processing failed: ${error.message}`)
+      return new Response(JSON.stringify({ error: 'Internal Server Error' }), {
+        status: 500,
+        headers: { 'Content-Type': 'application/json' },
+      })
     }
-
-    // Log a message
-    console.log(`Processing request for: ${name}`)
-
-    const data = {
-      message: `Hello ${name || 'Guest'}!`,
-    }
-
-    return new Response(JSON.stringify(data), {
-      headers: { 'Content-Type': 'application/json' },
-    })
-  } catch (error) {
-    // Log an error message
-    console.error(`Request processing failed: ${error.message}`)
-    return new Response(JSON.stringify({ error: 'Internal Server Error' }), {
-      status: 500,
-      headers: { 'Content-Type': 'application/json' },
-    })
-  }
-})
+  }),
+}
 ```
 
 <Admonition type="note">
@@ -147,11 +151,15 @@ A custom log message can contain up to 10,000 characters. A function can log up 
 When debugging Edge Functions, a common mistake is to try to log headers to the developer console via code like this:
 
 ```ts index.ts
+import { withSupabase } from 'npm:@supabase/server@1'
+
 // ❌ This doesn't work as expected
 
-Deno.serve(async (req) => {
-  console.log(`Headers: ${JSON.stringify(req.headers)}`) // Outputs: "{}"
-})
+export default {
+  fetch: withSupabase({ auth: 'user' }, async (req) => {
+    console.log(`Headers: ${JSON.stringify(req.headers)}`) // Outputs: "{}"
+  }),
+}
 ```
 
 The `req.headers` object appears empty because Headers objects don't store data in enumerable JavaScript properties, making them opaque to `JSON.stringify()`.
@@ -159,13 +167,17 @@ The `req.headers` object appears empty because Headers objects don't store data 
 Instead, you have to convert headers to a plain object first, for example using `Object.fromEntries`.
 
 ```ts index.ts
-// ✅ This works correctly
-Deno.serve(async (req) => {
-  const headersObject = Object.fromEntries(req.headers)
-  const headersJson = JSON.stringify(headersObject, null, 2)
+import { withSupabase } from 'npm:@supabase/server@1'
 
-  console.log(`Request headers:\n${headersJson}`)
-})
+// ✅ This works correctly
+export default {
+  fetch: withSupabase({ auth: 'user' }, async (req) => {
+    const headersObject = Object.fromEntries(req.headers)
+    const headersJson = JSON.stringify(headersObject, null, 2)
+
+    console.log(`Request headers:\n${headersJson}`)
+  }),
+}
 ```
 
 This results in something like:

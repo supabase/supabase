@@ -68,70 +68,74 @@ We recommend registering a single webhooks processor that dispatches events to d
 // Setup type definitions for built-in Supabase Runtime APIs
 import 'jsr:@supabase/functions-js/edge-runtime.d.ts'
 
+import { withSupabase } from 'npm:@supabase/server@1'
+
 console.log('Branching notification booted!')
 const slack = Deno.env.get('SLACK_WEBHOOK_URL') ?? ''
 
-Deno.serve(async (request) => {
-  const body = await request.json()
-  const blocks = [
-    {
-      type: 'header',
-      text: {
-        type: 'plain_text',
-        text: `Action run ${body.data.action_run.failure ? 'failed' : 'completed'}`,
-        emoji: true,
+export default {
+  fetch: withSupabase({ auth: 'none' }, async (request) => {
+    const body = await request.json()
+    const blocks = [
+      {
+        type: 'header',
+        text: {
+          type: 'plain_text',
+          text: `Action run ${body.data.action_run.failure ? 'failed' : 'completed'}`,
+          emoji: true,
+        },
       },
-    },
-    {
-      type: 'section',
-      fields: [
-        {
-          type: 'mrkdwn',
-          text: `*Branch ref:*\n${body.data.project_ref}`,
-        },
-        {
-          type: 'mrkdwn',
-          text: `*Run ID:*\n${body.data.action_run.id}`,
-        },
-      ],
-    },
-    {
-      type: 'section',
-      fields: [
-        {
-          type: 'mrkdwn',
-          text: `*Started at:*\n${body.data.action_run.created_at}`,
-        },
-        {
-          type: 'mrkdwn',
-          text: `*Completed at:*\n${body.timestamp}`,
-        },
-      ],
-    },
-    {
-      type: 'section',
-      text: {
-        type: 'mrkdwn',
-        text: `<${body.data.details_url}|View logs>`,
+      {
+        type: 'section',
+        fields: [
+          {
+            type: 'mrkdwn',
+            text: `*Branch ref:*\n${body.data.project_ref}`,
+          },
+          {
+            type: 'mrkdwn',
+            text: `*Run ID:*\n${body.data.action_run.id}`,
+          },
+        ],
       },
-    },
-  ]
-  const resp = await fetch(slack, {
-    method: 'POST',
-    body: JSON.stringify({
-      blocks,
-    }),
-  })
-  const message = await resp.text()
-  return new Response(
-    JSON.stringify({
-      message,
-    }),
-    {
-      status: 200,
-    }
-  )
-})
+      {
+        type: 'section',
+        fields: [
+          {
+            type: 'mrkdwn',
+            text: `*Started at:*\n${body.data.action_run.created_at}`,
+          },
+          {
+            type: 'mrkdwn',
+            text: `*Completed at:*\n${body.timestamp}`,
+          },
+        ],
+      },
+      {
+        type: 'section',
+        text: {
+          type: 'mrkdwn',
+          text: `<${body.data.details_url}|View logs>`,
+        },
+      },
+    ]
+    const resp = await fetch(slack, {
+      method: 'POST',
+      body: JSON.stringify({
+        blocks,
+      }),
+    })
+    const message = await resp.text()
+    return new Response(
+      JSON.stringify({
+        message,
+      }),
+      {
+        status: 200,
+      }
+    )
+  }),
+}
 ```
 
 <StepHikeCompact>

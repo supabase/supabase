@@ -570,65 +570,68 @@ Add the following code to your edge function:
 ```javascript
 import { Webhook } from "https://esm.sh/standardwebhooks@1.0.0";
 import { Resend } from "npm:resend";
+import { withSupabase } from 'npm:@supabase/server@1'
 
 const resend = new Resend(Deno.env.get("RESEND_API_KEY") as string);
 const hookSecret = (Deno.env.get("SEND_EMAIL_HOOK_SECRET") as string).replace("v1,whsec_", "");
 
-Deno.serve(async (req) => {
-  if (req.method !== "POST") {
-    return new Response("not allowed", { status: 400 });
-  }
-
-  const payload = await req.text();
-  const headers = Object.fromEntries(req.headers);
-  const wh = new Webhook(hookSecret);
-  try {
-    const { user, email_data } = wh.verify(payload, headers) as {
-      user: {
-        email: string;
-      };
-      email_data: {
-        token: string;
-        token_hash: string;
-        redirect_to: string;
-        email_action_type: string;
-        site_url: string;
-        token_new: string;
-        token_hash_new: string;
-      };
-    };
-
-    const { error } = await resend.emails.send({
-      from: "welcome <onboarding@example.com>",
-      to: [user.email],
-      subject: "Welcome to my site!",
-      text: `Confirm you signup with this code: ${email_data.token}`,
-    });
-    if (error) {
-      throw error;
+export default {
+  fetch: withSupabase({ auth: 'none' }, async (req) => {
+    if (req.method !== "POST") {
+      return new Response("not allowed", { status: 400 });
     }
-  } catch (error) {
-    return new Response(
-      JSON.stringify({
-        error: {
-          http_code: error.code,
-          message: error.message,
-        },
-      }),
-      {
-        status: 401,
-        headers: { "Content-Type": "application/json" },
-      },
-    );
-  }
 
-  const responseHeaders = new Headers();
-  responseHeaders.set("Content-Type", "application/json");
-  return new Response(JSON.stringify({}), {
-    status: 200,
-    headers: responseHeaders,
-  });
-});
+    const payload = await req.text();
+    const headers = Object.fromEntries(req.headers);
+    const wh = new Webhook(hookSecret);
+    try {
+      const { user, email_data } = wh.verify(payload, headers) as {
+        user: {
+          email: string;
+        };
+        email_data: {
+          token: string;
+          token_hash: string;
+          redirect_to: string;
+          email_action_type: string;
+          site_url: string;
+          token_new: string;
+          token_hash_new: string;
+        };
+      };
+
+      const { error } = await resend.emails.send({
+        from: "welcome <onboarding@example.com>",
+        to: [user.email],
+        subject: "Welcome to my site!",
+        text: `Confirm you signup with this code: ${email_data.token}`,
+      });
+      if (error) {
+        throw error;
+      }
+    } catch (error) {
+      return new Response(
+        JSON.stringify({
+          error: {
+            http_code: error.code,
+            message: error.message,
+          },
+        }),
+        {
+          status: 401,
+          headers: { "Content-Type": "application/json" },
+        },
+      );
+    }
+
+    const responseHeaders = new Headers();
+    responseHeaders.set("Content-Type", "application/json");
+    return new Response(JSON.stringify({}), {
+      status: 200,
+      headers: responseHeaders,
+    });
+  }),
+}
 ```
 
 Deploy your edge function and [configure it as a hook](/dashboard/project/_/auth/hooks):
@@ -644,6 +647,7 @@ Your company is expanding to France and Spain. As part of expansion efforts, the
 ```javascript
 import { readAll } from 'https://deno.land/std/io/read_all.ts'
 import { Webhook } from 'https://esm.sh/standardwebhooks@1.0.0'
+import { withSupabase } from 'npm:@supabase/server@1'
 
 const postmarkEndpoint = 'https://api.postmarkapp.com/email'
 // Replace this with your email
@@ -723,72 +727,74 @@ function generateConfirmationURL(email_data) {
   return `${baseUrl}?${params.toString()}`
 }
 
-Deno.serve(async (req) => {
-  const payload = await req.text()
-  const serverToken = Deno.env.get('POSTMARK_SERVER_TOKEN')
-  const headers = Object.fromEntries(req.headers)
-  const base64_secret = Deno.env.get('SEND_EMAIL_HOOK_SECRET').replace('v1,whsec_', '')
-  const wh = new Webhook(base64_secret)
-  const { user, email_data } = wh.verify(payload, headers)
+export default {
+  fetch: withSupabase({ auth: 'none' }, async (req) => {
+    const payload = await req.text()
+    const serverToken = Deno.env.get('POSTMARK_SERVER_TOKEN')
+    const headers = Object.fromEntries(req.headers)
+    const base64_secret = Deno.env.get('SEND_EMAIL_HOOK_SECRET').replace('v1,whsec_', '')
+    const wh = new Webhook(base64_secret)
+    const { user, email_data } = wh.verify(payload, headers)
 
-  const language = (user.user_metadata && user.user_metadata.i18n) || 'en'
-  const subject = subjects[language][email_data.email_action_type] || 'Notification'
+    const language = (user.user_metadata && user.user_metadata.i18n) || 'en'
+    const subject = subjects[language][email_data.email_action_type] || 'Notification'
 
-  let template = templates[language][email_data.email_action_type]
-  const confirmation_url = generateConfirmationURL(email_data)
-  let htmlBody = template
-    .replace('{{confirmation_url}}', confirmation_url)
-    .replace('{{token}}', email_data.token || '')
-    .replace('{{new_token}}', email_data.new_token || '')
-    .replace('{{site_url}}', email_data.site_url || '')
-    .replace('{{old_email}}', email_data.old_email || '')
-    .replace('{{new_email}}', user.new_email || '')
+    let template = templates[language][email_data.email_action_type]
+    const confirmation_url = generateConfirmationURL(email_data)
+    let htmlBody = template
+      .replace('{{confirmation_url}}', confirmation_url)
+      .replace('{{token}}', email_data.token || '')
+      .replace('{{new_token}}', email_data.new_token || '')
+      .replace('{{site_url}}', email_data.site_url || '')
+      .replace('{{old_email}}', email_data.old_email || '')
+      .replace('{{new_email}}', user.new_email || '')
 
-  const requestOptions = {
-    method: 'POST',
-    headers: {
-      'Content-Type': 'application/json',
-      Accept: 'application/json',
-      'X-Postmark-Server-Token': serverToken,
-    },
-    body: JSON.stringify({
-      From: FROM_EMAIL,
-      To: user.email,
-      Subject: subject,
-      HtmlBody: htmlBody,
-    }),
-  }
-
-  try {
-    const response = await fetch(postmarkEndpoint, requestOptions)
-    if (!response.ok) {
-      const errorData = await response.json()
-      throw new Error(`Failed to send email: ${errorData.Message}`)
+    const requestOptions = {
+      method: 'POST',
+      headers: {
+        'Content-Type': 'application/json',
+        Accept: 'application/json',
+        'X-Postmark-Server-Token': serverToken,
+      },
+      body: JSON.stringify({
+        From: FROM_EMAIL,
+        To: user.email,
+        Subject: subject,
+        HtmlBody: htmlBody,
+      }),
     }
-    return new Response(
-      JSON.stringify({
-        message: 'Email sent successfully.',
-      }),
-      {
-        headers: {
-          'Content-Type': 'application/json',
-        },
+
+    try {
+      const response = await fetch(postmarkEndpoint, requestOptions)
+      if (!response.ok) {
+        const errorData = await response.json()
+        throw new Error(`Failed to send email: ${errorData.Message}`)
       }
-    )
-  } catch (error) {
-    return new Response(
-      JSON.stringify({
-        error: `Failed to process the request: ${error.message}`,
-      }),
-      {
-        status: 500,
-        headers: {
-          'Content-Type': 'application/json',
-        },
-      }
-    )
-  }
-})
+      return new Response(
+        JSON.stringify({
+          message: 'Email sent successfully.',
+        }),
+        {
+          headers: {
+            'Content-Type': 'application/json',
+          },
+        }
+      )
+    } catch (error) {
+      return new Response(
+        JSON.stringify({
+          error: `Failed to process the request: ${error.message}`,
+        }),
+        {
+          status: 500,
+          headers: {
+            'Content-Type': 'application/json',
+          },
+        }
+      )
+    }
+  }),
+}
 ```
 
 </TabPanel>
@@ -797,6 +803,8 @@ Your company is rapidly growing and depends heavily on email signups. You'd like
 Ensure that you have configured `POSTMARK_SERVER_TOKEN`, `SENDGRID_API_KEY` and `SEND_EMAIL_HOOK_SECRET` in your `.env` file.
 
 ```javascript
+import { withSupabase } from 'npm:@supabase/server@1'
+
 import {
     Webhook
 } from "https://esm.sh/standardwebhooks@1.0.0";
@@ -901,51 +909,53 @@ async function sendEmailWithSendGrid(user: any, email_data: any, apiKey: string)
     return await fetch(sendGridEndpoint, requestOptions);
 }
 
-Deno.serve(async (req) => {
-    const payload = await req.text();
-    const postmarkServerToken = Deno.env.get("POSTMARK_SERVER_TOKEN");
-    const sendGridApiKey = Deno.env.get("SENDGRID_API_KEY");
-    const headers = Object.fromEntries(req.headers);
-    const base64_secret = Deno.env.get('SEND_EMAIL_HOOK_SECRET').replace('v1,whsec_', '');
-    const wh = new Webhook(base64_secret);
-    const {
-        user,
-        email_data
-    } = wh.verify(payload, headers);
+export default {
+  fetch: withSupabase({ auth: 'none' }, async (req) => {
+      const payload = await req.text();
+      const postmarkServerToken = Deno.env.get("POSTMARK_SERVER_TOKEN");
+      const sendGridApiKey = Deno.env.get("SENDGRID_API_KEY");
+      const headers = Object.fromEntries(req.headers);
+      const base64_secret = Deno.env.get('SEND_EMAIL_HOOK_SECRET').replace('v1,whsec_', '');
+      const wh = new Webhook(base64_secret);
+      const {
+          user,
+          email_data
+      } = wh.verify(payload, headers);
 
-    try {
-        // Try sending email using Postmark
-        let response = await sendEmailWithPostmark(user, email_data, postmarkServerToken!);
+      try {
+          // Try sending email using Postmark
+          let response = await sendEmailWithPostmark(user, email_data, postmarkServerToken!);
 
-        if (!response.ok) {
-            // If Postmark fails, try SendGrid
-            console.error(`Primary email send failed: ${await response.text()}`);
-            response = await sendEmailWithSendGrid(user, email_data, sendGridApiKey!);
+          if (!response.ok) {
+              // If Postmark fails, try SendGrid
+              console.error(`Primary email send failed: ${await response.text()}`);
+              response = await sendEmailWithSendGrid(user, email_data, sendGridApiKey!);
 
-            if (!response.ok) {
-                const errorData = await response.json();
-                throw new Error(`Failed to send email via backup: ${errorData.errors[0].message}`);
-            }
-        }
+              if (!response.ok) {
+                  const errorData = await response.json();
+                  throw new Error(`Failed to send email via backup: ${errorData.errors[0].message}`);
+              }
+          }
 
-        return new Response(JSON.stringify({
-            message: "Email sent successfully."
-        }), {
-            headers: {
-                "Content-Type": "application/json"
-            }
-        });
-    } catch (error) {
-        return new Response(JSON.stringify({
-            error: `Failed to process the request: ${error.message}`
-        }), {
-            status: 500,
-            headers: {
-                "Content-Type": "application/json"
-            }
-        });
-    }
-});
+          return new Response(JSON.stringify({
+              message: "Email sent successfully."
+          }), {
+              headers: {
+                  "Content-Type": "application/json"
+              }
+          });
+      } catch (error) {
+          return new Response(JSON.stringify({
+              error: `Failed to process the request: ${error.message}`
+          }), {
+              status: 500,
+              headers: {
+                  "Content-Type": "application/json"
+              }
+          });
+      }
+  }),
+}
 ```
 
 </TabPanel> */}

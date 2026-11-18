@@ -85,22 +85,26 @@ Build an Edge Function that accepts an input string and generates an embedding f
     <StepHikeCompact.Code>
 
       ```ts ./supabase/functions/embed/index.ts
-      Deno.serve(async (req) => {
-        // Extract input string from JSON body
-        const { input } = await req.json();
+      import { withSupabase } from 'npm:@supabase/server@1'
 
-        // Generate the embedding from the user input
-        const embedding = await session.run(input, {
-          mean_pool: true,
-          normalize: true,
-        });
+      export default {
+        fetch: withSupabase({ auth: 'publishable' }, async (req) => {
+          // Extract input string from JSON body
+          const { input } = await req.json();
 
-        // Return the embedding
-        return new Response(
-          JSON.stringify({ embedding }),
-          { headers: { 'Content-Type': 'application/json' } }
-        );
-      });
+          // Generate the embedding from the user input
+          const embedding = await session.run(input, {
+            mean_pool: true,
+            normalize: true,
+          });
+
+          // Return the embedding
+          return new Response(
+            JSON.stringify({ embedding }),
+            { headers: { 'Content-Type': 'application/json' } }
+          );
+        }),
+      }
       ```
 
     </StepHikeCompact.Code>

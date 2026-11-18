@@ -422,6 +422,7 @@ import { Webhook } from 'https://esm.sh/standardwebhooks@1.0.0'
 import { readAll } from 'https://deno.land/std/io/read_all.ts'
 import { Twilio } from 'https://cdn.skypack.dev/twilio'
 import * as base64 from 'https://denopkg.com/chiefbiiko/base64/mod.ts'
+import { withSupabase } from 'npm:@supabase/server@1'
 
 const accountSid: string | undefined = Deno.env.get('TWILIO_ACCOUNT_SID')
 const authToken: string | undefined = Deno.env.get('TWILIO_AUTH_TOKEN')
@@ -463,63 +464,65 @@ const sendTextMessage = async (
   return response.json()
 }
 
-Deno.serve(async (req) => {
-  const payload = await req.text()
-  const base64_secret = Deno.env.get('SEND_SMS_HOOK_SECRET').replace('v1,whsec_', '')
-  const headers = Object.fromEntries(req.headers)
-  const wh = new Webhook(base64_secret)
-  try {
-    const { user, sms } = wh.verify(payload, headers)
-    const messageBody = `Your OTP is: ${sms.otp}`
-    const response = await sendTextMessage(
-      messageBody,
-      accountSid,
-      authToken,
-      fromNumber,
-      user.phone
-    )
-    if (response.status !== 'queued') {
+export default {
+  fetch: withSupabase({ auth: 'none' }, async (req) => {
+    const payload = await req.text()
+    const base64_secret = Deno.env.get('SEND_SMS_HOOK_SECRET').replace('v1,whsec_', '')
+    const headers = Object.fromEntries(req.headers)
+    const wh = new Webhook(base64_secret)
+    try {
+      const { user, sms } = wh.verify(payload, headers)
+      const messageBody = `Your OTP is: ${sms.otp}`
+      const response = await sendTextMessage(
+        messageBody,
+        accountSid,
+        authToken,
+        fromNumber,
+        user.phone
+      )
+      if (response.status !== 'queued') {
+        return new Response(
+          JSON.stringify({
+            error: {
+              http_code: response.code,
+              message: `Failed to send SMS: ${response.message}. More info: ${response.more_info}`,
+            },
+          }),
+          {
+            status: response.status,
+            headers: {
+              'Content-Type': 'application/json',
+            },
+          }
+        )
+      }
+      return new Response(
+        JSON.stringify({}),
+        {
+          status: 200,
+          headers: {
+            'Content-Type': 'application/json',
+          },
+        }
+      )
+    } catch (error) {
       return new Response(
         JSON.stringify({
           error: {
-            http_code: response.code,
-            message: `Failed to send SMS: ${response.message}. More info: ${response.more_info}`,
-          },
+            http_code: 500,
+            message: `Failed to send sms: ${JSON.stringify(error)}`,
+          }
         }),
         {
-          status: response.status,
+          status: 500,
           headers: {
             'Content-Type': 'application/json',
           },
         }
       )
     }
-    return new Response(
-      JSON.stringify({}),
-      {
-        status: 200,
-        headers: {
-          'Content-Type': 'application/json',
-        },
-      }
-    )
-  } catch (error) {
-    return new Response(
-      JSON.stringify({
-        error: {
-          http_code: 500,
-          message: `Failed to send sms: ${JSON.stringify(error)}`,
-        }
-      }),
-      {
-        status: 500,
-        headers: {
-          'Content-Type': 'application/json',
-        },
-      }
-    )
-  }
-})
+  }),
+}
 ```
 
 </TabPanel>
@@ -531,6 +534,7 @@ Your company is expanding into Latin America and would like to use WhatsApp for 
 import { Webhook } from "https://esm.sh/standardwebhooks@1.0.0";
 import { readAll } from "https://deno.land/std/io/read_all.ts";
 import * as base64 from "https://denopkg.com/chiefbiiko/base64/mod.ts";
+import { withSupabase } from 'npm:@supabase/server@1'
 
 const accountSid: string | undefined = Deno.env.get("TWILIO_ACCOUNT_SID");
 const authToken: string | undefined = Deno.env.get("TWILIO_AUTH_TOKEN");
@@ -575,65 +579,67 @@ const sendMessage = async (
     return response.json();
 };
 
-Deno.serve(async (req) => {
-    const payload = await req.text();
-    const base64_secret = Deno.env.get("SEND_SMS_HOOK_SECRET").replace('v1,whsec_', '');
-    const headers = Object.fromEntries(req.headers);
-    const wh = new Webhook(base64_secret);
-    try {
-        const {
-            user,
-            sms
-        } = wh.verify(payload, headers);
-        const messageBody = `Your OTP is: ${sms.otp}`;
-        const userPhoneNumber = user.phone;
-        const countryCode = userPhoneNumber.substring(1, userPhoneNumber.indexOf(userPhoneNumber.match(/\d/)!));
+export default {
+  fetch: withSupabase({ auth: 'none' }, async (req) => {
+      const payload = await req.text();
+      const base64_secret = Deno.env.get("SEND_SMS_HOOK_SECRET").replace('v1,whsec_', '');
+      const headers = Object.fromEntries(req.headers);
+      const wh = new Webhook(base64_secret);
+      try {
+          const {
+              user,
+              sms
+          } = wh.verify(payload, headers);
+          const messageBody = `Your OTP is: ${sms.otp}`;
+          const userPhoneNumber = user.phone;
+          const countryCode = userPhoneNumber.substring(1, userPhoneNumber.indexOf(userPhoneNumber.match(/\d/)!));
 
-        const useWhatsApp = latinAmericanCountryCodes.includes(countryCode);
+          const useWhatsApp = latinAmericanCountryCodes.includes(countryCode);
 
-        const response = await sendMessage(
-            messageBody,
-            accountSid,
-            authToken,
-            fromNumber,
-            userPhoneNumber,
-            useWhatsApp,
-        );
+          const response = await sendMessage(
+              messageBody,
+              accountSid,
+              authToken,
+              fromNumber,
+              userPhoneNumber,
+              useWhatsApp,
+          );
 
-        if (response.status !== "queued") {
-            return new Response(
-                JSON.stringify({
-                    error: `Failed to send message, Error Code: ${response.code} ${response.message} ${response.more_info}`,
-                }), {
-                    status: response.status,
-                    headers: {
-                        "Content-Type": "application/json",
-                    },
-                },
-            );
-        }
-        return new Response(
-            JSON.stringify({
-                message: "Message sent successfully."
-            }), {
-                headers: {
-                    "Content-Type": "application/json",
-                },
-            },
-        );
-    } catch (error) {
-        return new Response(
-            JSON.stringify({
-                error: `Failed to process the request: ${error}`
-            }), {
-                status: 500,
-                headers: {
-                    "Content-Type": "application/json",
-                },
-            },
-        );
-    }
-});
+          if (response.status !== "queued") {
+              return new Response(
+                  JSON.stringify({
+                      error: `Failed to send message, Error Code: ${response.code} ${response.message} ${response.more_info}`,
+                  }), {
+                      status: response.status,
+                      headers: {
+                          "Content-Type": "application/json",
+                      },
+                  },
+              );
+          }
+          return new Response(
+              JSON.stringify({
+                  message: "Message sent successfully."
+              }), {
+                  headers: {
+                      "Content-Type": "application/json",
+                  },
+              },
+          );
+      } catch (error) {
+          return new Response(
+              JSON.stringify({
+                  error: `Failed to process the request: ${error}`
+              }), {
+                  status: 500,
+                  headers: {
+                      "Content-Type": "application/json",
+                  },
+              },
+          );
+      }
+  }),
+}
 ```
 
 </TabPanel>

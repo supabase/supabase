@@ -10,19 +10,23 @@ subtitle: Handle different request types in a single function to create efficien
 Edge Functions support **`GET`, `POST`, `PUT`, `PATCH`, `DELETE`, and `OPTIONS`**. This means you can build complete REST APIs in a single function:
 
 ```tsx
-Deno.serve(async (req) => {
-  const { method, url } = req
-  const { pathname } = new URL(url)
+import { withSupabase } from 'npm:@supabase/server@1'
 
-  // Route based on method and path
-  if (method === 'GET' && pathname === '/users') {
-    return getAllUsers()
-  } else if (method === 'POST' && pathname === '/users') {
-    return createUser(req)
-  }
+export default {
+  fetch: withSupabase({ auth: 'user' }, async (req) => {
+    const { method, url } = req
+    const { pathname } = new URL(url)
 
-  return new Response('Not found', { status: 404 })
-})
+    // Route based on method and path
+    if (method === 'GET' && pathname === '/users') {
+      return getAllUsers()
+    } else if (method === 'POST' && pathname === '/users') {
+      return createUser(req)
+    }
+
+    return new Response('Not found', { status: 404 })
+  }),
+}
 ```
 
 Edge Functions allow you to build APIs without needing separate functions for each endpoint. This reduces cold starts and simplifies deployment while keeping your code organized.

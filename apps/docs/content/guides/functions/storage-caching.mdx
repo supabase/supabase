@@ -18,35 +18,38 @@ Edge Functions work seamlessly with [Supabase Storage](/docs/guides/storage). Th
 Use the [Supabase client](/docs/reference/javascript/introduction) to upload files directly from your Edge Functions. You'll need the secret key for server-side storage operations:
 
 ```typescript
+import { withSupabase } from 'npm:@supabase/server@1'
 import { createClient } from 'npm:@supabase/supabase-js@2'
 
 const SUPABASE_SECRET_KEYS = JSON.parse(Deno.env.get('SUPABASE_SECRET_KEYS')!)
 
-Deno.serve(async (req) => {
-  const supabaseAdmin = createClient(
-    Deno.env.get('SUPABASE_URL')!,
-    // If you want to use a different api key, change 'default' to your preferred key name
-    SUPABASE_SECRET_KEYS['default']
-  )
+export default {
+  fetch: withSupabase({ auth: 'user' }, async (req) => {
+    const supabaseAdmin = createClient(
+      Deno.env.get('SUPABASE_URL')!,
+      // If you want to use a different api key, change 'default' to your preferred key name
+      SUPABASE_SECRET_KEYS['default']
+    )
 
-  // Generate your content
-  const fileContent = await generateImage()
+    // Generate your content
+    const fileContent = await generateImage()
 
-  // Upload to storage
-  const { data, error } = await supabaseAdmin.storage
-    .from('images')
-    .upload(`generated/${filename}.png`, fileContent.body!, {
-      contentType: 'image/png',
-      cacheControl: '3600',
-      upsert: false,
-    })
+    // Upload to storage
+    const { data, error } = await supabaseAdmin.storage
+      .from('images')
+      .upload(`generated/${filename}.png`, fileContent.body!, {
+        contentType: 'image/png',
+        cacheControl: '3600',
+        upsert: false,
+      })
 
-  if (error) {
-    throw error
-  }
+    if (error) {
+      throw error
+    }
 
-  return new Response(JSON.stringify({ path: data.path }))
-})
+    return new Response(JSON.stringify({ path: data.path }))
+  }),
+}
 ```
 
 <Admonition type="caution">
@@ -62,39 +65,43 @@ Always use one of the `SUPABASE_SECRET_KEYS` for server-side operations. Never e
 Check storage before generating new content to improve performance:
 
 ```typescript
+import { withSupabase } from 'npm:@supabase/server@1'
+
 const STORAGE_URL = 'https://your-project.supabase.co/storage/v1/object/public/images'
 
-Deno.serve(async (req) => {
-  const url = new URL(req.url)
-  const username = url.searchParams.get('username')
+export default {
+  fetch: withSupabase({ auth: 'user' }, async (req) => {
+    const url = new URL(req.url)
+    const username = url.searchParams.get('username')
 
-  try {
-    // Try to get existing file from storage first
-    const storageResponse = await fetch(`${STORAGE_URL}/avatars/${username}.png`)
+    try {
+      // Try to get existing file from storage first
+      const storageResponse = await fetch(`${STORAGE_URL}/avatars/${username}.png`)
 
-    if (storageResponse.ok) {
-      // File exists in storage, return it directly
-      return storageResponse
+      if (storageResponse.ok) {
+        // File exists in storage, return it directly
+        return storageResponse
+      }
+
+      // File doesn't exist, generate it
+      const generatedImage = await generateAvatar(username)
+
+      // Upload to storage for future requests
+      const { error } = await supabaseAdmin.storage
+        .from('images')
+        .upload(`avatars/${username}.png`, generatedImage.body!, {
+          contentType: 'image/png',
+          cacheControl: '86400', // Cache for 24 hours
+        })
+
+      if (error) {
+        console.error('Upload failed:', error)
+      }
+
+      return generatedImage
+    } catch (error) {
+      return new Response('Error processing request', { status: 500 })
     }
-
-    // File doesn't exist, generate it
-    const generatedImage = await generateAvatar(username)
-
-    // Upload to storage for future requests
-    const { error } = await supabaseAdmin.storage
-      .from('images')
-      .upload(`avatars/${username}.png`, generatedImage.body!, {
-        contentType: 'image/png',
-        cacheControl: '86400', // Cache for 24 hours
-      })
-
-    if (error) {
-      console.error('Upload failed:', error)
-    }
-
-    return generatedImage
-  } catch (error) {
-    return new Response('Error processing request', { status: 500 })
-  }
-})
+  }),
+}
 ```

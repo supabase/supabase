@@ -53,24 +53,28 @@ Ephemeral storage will reset on each function invocation. This means the files y
 You can use [Deno File System APIs](https://docs.deno.com/api/deno/file-system/) or the [`node:fs`](https://docs.deno.com/api/node/fs/) module to access the `/tmp` path.
 
 ```tsx
-Deno.serve(async (req) => {
-  if (req.headers.get('content-type') !== 'application/zip') {
-    return new Response('file must be a zip file', {
-      status: 400,
-    })
-  }
+import { withSupabase } from 'npm:@supabase/server@1'
 
-  const uploadId = crypto.randomUUID()
-  await Deno.writeFile('/tmp/' + uploadId, req.body)
+export default {
+  fetch: withSupabase({ auth: 'user' }, async (req) => {
+    if (req.headers.get('content-type') !== 'application/zip') {
+      return new Response('file must be a zip file', {
+        status: 400,
+      })
+    }
 
-  // E.g. extract and process the zip file
-  const zipFile = await Deno.readFile('/tmp/' + uploadId)
-  // You could use a zip library to extract contents
-  const extracted = await extractZip(zipFile)
+    const uploadId = crypto.randomUUID()
+    await Deno.writeFile('/tmp/' + uploadId, req.body)
 
-  // Or process the file directly
-  console.log(`Processing zip file: ${uploadId}, size: ${zipFile.length} bytes`)
-})
+    // E.g. extract and process the zip file
+    const zipFile = await Deno.readFile('/tmp/' + uploadId)
+    // You could use a zip library to extract contents
+    const extracted = await extractZip(zipFile)
+
+    // Or process the file directly
+    console.log(`Processing zip file: ${uploadId}, size: ${zipFile.length} bytes`)
+  }),
+}
 ```
 
 ---
@@ -88,6 +92,7 @@ You can write the zip file to ephemeral storage first, then use a background tas
 ```tsx
 import { BlobWriter, ZipReader } from 'https://deno.land/x/zipjs/index.js'
 import { createClient } from 'jsr:@supabase/supabase-js@2'
+import { withSupabase } from 'npm:@supabase/server@1'
 
 const SUPABASE_SECRET_KEYS = JSON.parse(Deno.env.get('SUPABASE_SECRET_KEYS')!)
 // If you want to use a different api key, change 'default' to your preferred key name
@@ -118,20 +123,22 @@ async function processZipFile(uploadId: string, filepath: string) {
   await zipReader.close()
 }
 
-Deno.serve(async (req) => {
-  const uploadId = crypto.randomUUID()
-  const filepath = `/tmp/${uploadId}.zip`
+export default {
+  fetch: withSupabase({ auth: 'user' }, async (req) => {
+    const uploadId = crypto.randomUUID()
+    const filepath = `/tmp/${uploadId}.zip`
 
-  // Write zip to ephemeral storage
-  await Deno.writeFile(filepath, req.body)
+    // Write zip to ephemeral storage
+    await Deno.writeFile(filepath, req.body)
 
-  // Process in background to avoid memory limits
-  EdgeRuntime.waitUntil(processZipFile(uploadId, filepath))
+    // Process in background to avoid memory limits
+    EdgeRuntime.waitUntil(processZipFile(uploadId, filepath))
 
-  return new Response(JSON.stringify({ uploadId }), {
-    headers: { 'Content-Type': 'application/json' },
-  })
-})
+    return new Response(JSON.stringify({ uploadId }), {
+      headers: { 'Content-Type': 'application/json' },
+    })
+  }),
+}
 ```
 
 ### Image manipulation
@@ -139,21 +146,25 @@ Deno.serve(async (req) => {
 Custom image manipulation workflows using [`magick-wasm`](/docs/guides/functions/examples/image-manipulation).
 
 ```tsx
-Deno.serve(async (req) => {
-  // Save uploaded image to temp storage
-  const imagePath = `/tmp/input-${crypto.randomUUID()}.jpg`
-  await Deno.writeFile(imagePath, req.body)
+import { withSupabase } from 'npm:@supabase/server@1'
 
-  // Process image with magick-wasm
-  const processedPath = `/tmp/output-${crypto.randomUUID()}.jpg`
-  // ... image manipulation logic
+export default {
+  fetch: withSupabase({ auth: 'user' }, async (req) => {
+    // Save uploaded image to temp storage
+    const imagePath = `/tmp/input-${crypto.randomUUID()}.jpg`
+    await Deno.writeFile(imagePath, req.body)
 
-  // Read processed image and return
-  const processedImage = await Deno.readFile(processedPath)
-  return new Response(processedImage, {
-    headers: { 'Content-Type': 'image/jpeg' },
-  })
-})
+    // Process image with magick-wasm
+    const processedPath = `/tmp/output-${crypto.randomUUID()}.jpg`
+    // ... image manipulation logic
+
+    // Read processed image and return
+    const processedImage = await Deno.readFile(processedPath)
+    return new Response(processedImage, {
+      headers: { 'Content-Type': 'image/jpeg' },
+    })
+  }),
+}
 ```
 
 ---
@@ -175,15 +186,19 @@ You can safely use the following synchronous Deno APIs (and their Node counterpa
 **Keep in mind** that the sync APIs are available only during initial script evaluation and aren’t supported in callbacks like HTTP handlers or `setTimeout`.
 
 ```tsx
+import { withSupabase } from 'npm:@supabase/server@1'
+
 Deno.statSync('...') // ✅
 
 setTimeout(() => {
   Deno.statSync('...') // 💣 ERROR! Deno.statSync is blocklisted on the current context
 })
 
-Deno.serve(() => {
-  Deno.statSync('...') // 💣 ERROR! Deno.statSync is blocklisted on the current context
-})
+export default {
+  fetch: withSupabase({ auth: 'user' }, () => {
+    Deno.statSync('...') // 💣 ERROR! Deno.statSync is blocklisted on the current context
+  }),
+}
 ```
 
 ---

@@ -16,6 +16,7 @@ This is a [Supabase Edge Function](/docs/guides/functions) that reads 5 messages
 ```tsx
 import 'jsr:@supabase/functions-js/edge-runtime.d.ts'
 
+import { withSupabase } from 'npm:@supabase/server@1'
 import { createClient } from 'npm:@supabase/supabase-js@2'
 
 const supabaseUrl = 'supabaseURL'
@@ -50,52 +51,54 @@ async function processMessage(message: QueueMessage) {
   }
 }
 
-Deno.serve(async (req) => {
-  const { data: messages, error } = await supabase.schema('pgmq_public').rpc('read', {
-    queue_name: queueName,
-    sleep_seconds: 0, // Don't wait if queue is empty
-    n: 5, // Read 5 messages off the queue
-  })
-
-  if (error) {
-    console.error(`Error reading from ${queueName} queue:`, error)
-    return new Response(JSON.stringify({ error: error.message }), {
-      status: 500,
-      headers: { 'Content-Type': 'application/json' },
+export default {
+  fetch: withSupabase({ auth: 'secret' }, async (req) => {
+    const { data: messages, error } = await supabase.schema('pgmq_public').rpc('read', {
+      queue_name: queueName,
+      sleep_seconds: 0, // Don't wait if queue is empty
+      n: 5, // Read 5 messages off the queue
     })
-  }
 
-  if (!messages || messages.length === 0) {
-    console.log('No messages in workflow_messages queue')
-    return new Response(JSON.stringify({ message: 'No messages in queue' }), {
-      status: 200,
-      headers: { 'Content-Type': 'application/json' },
-    })
-  }
-
-  console.log(`Found ${messages.length} messages to process`)
-
-  // Process each message that was read off the queue
-  for (const message of messages) {
-    try {
-      await processMessage(message as QueueMessage)
-    } catch (error) {
-      console.error(`Error processing message ${message.msg_id}:`, error)
+    if (error) {
+      console.error(`Error reading from ${queueName} queue:`, error)
+      return new Response(JSON.stringify({ error: error.message }), {
+        status: 500,
+        headers: { 'Content-Type': 'application/json' },
+      })
     }
-  }
 
-  // Return immediately while background processing continues
-  return new Response(
-    JSON.stringify({
-      message: `Processing ${messages.length} messages in background`,
-      count: messages.length,
-    }),
-    {
-      status: 200,
-      headers: { 'Content-Type': 'application/json' },
+    if (!messages || messages.length === 0) {
+      console.log('No messages in workflow_messages queue')
+      return new Response(JSON.stringify({ message: 'No messages in queue' }), {
+        status: 200,
+        headers: { 'Content-Type': 'application/json' },
+      })
     }
-  )
-})
+
+    console.log(`Found ${messages.length} messages to process`)
+
+    // Process each message that was read off the queue
+    for (const message of messages) {
+      try {
+        await processMessage(message as QueueMessage)
+      } catch (error) {
+        console.error(`Error processing message ${message.msg_id}:`, error)
+      }
+    }
+
+    // Return immediately while background processing continues
+    return new Response(
+      JSON.stringify({
+        message: `Processing ${messages.length} messages in background`,
+        count: messages.length,
+      }),
+      {
+        status: 200,
+        headers: { 'Content-Type': 'application/json' },
+      }
+    )
+  }),
+}
 ```
 
 Every time this Edge Function is run it:

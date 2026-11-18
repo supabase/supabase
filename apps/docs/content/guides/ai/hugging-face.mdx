@@ -95,24 +95,27 @@ Modify the Edge Function to import Hugging Face's inference client and perform a
 
 ```ts
 import { HfInference } from 'https://esm.sh/@huggingface/inference@2.3.2'
+import { withSupabase } from 'npm:@supabase/server@1'
 
 const hf = new HfInference(Deno.env.get('HUGGING_FACE_ACCESS_TOKEN'))
 
-Deno.serve(async (req) => {
-  const { prompt } = await req.json()
+export default {
+  fetch: withSupabase({ auth: 'none' }, async (req) => {
+    const { prompt } = await req.json()
 
-  const image = await hf.textToImage(
-    {
-      inputs: prompt,
-      model: 'stabilityai/stable-diffusion-2',
-    },
-    {
-      use_cache: false,
-    }
-  )
+    const image = await hf.textToImage(
+      {
+        inputs: prompt,
+        model: 'stabilityai/stable-diffusion-2',
+      },
+      {
+        use_cache: false,
+      }
+    )
 
-  return new Response(image)
-})
+    return new Response(image)
+  }),
+}
 ```
 
 1. This function creates a new instance of `HfInference` using the `HUGGING_FACE_ACCESS_TOKEN` environment variable.

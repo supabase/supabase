@@ -49,6 +49,7 @@ When the rate limit is exceeded, calling another Edge Function throws a `RateLim
 
 ```typescript
 import { createClient } from 'jsr:@supabase/supabase-js@2'
+import { withSupabase } from 'npm:@supabase/server@1'
 
 const SUPABASE_PUBLISHABLE_KEYS = JSON.parse(Deno.env.get('SUPABASE_PUBLISHABLE_KEYS')!)
 
@@ -58,35 +59,37 @@ const supabase = createClient(
   SUPABASE_PUBLISHABLE_KEYS['default']
 )
 
-Deno.serve(async (req) => {
-  try {
-    const { data, error } = await supabase.functions.invoke('other-function', {
-      body: { foo: 'bar' },
-    })
+export default {
+  fetch: withSupabase({ auth: 'user' }, async (req) => {
+    try {
+      const { data, error } = await supabase.functions.invoke('other-function', {
+        body: { foo: 'bar' },
+      })
 
-    if (error) throw error
+      if (error) throw error
 
-    return new Response(JSON.stringify(data), {
-      headers: { 'Content-Type': 'application/json' },
-    })
-  } catch (err) {
-    if (err instanceof Deno.errors.RateLimitError) {
-      // Use retryAfterMs to tell the client when to retry
-      const retryAfterSeconds = Math.ceil(err.retryAfterMs / 1000)
-      return new Response(
-        JSON.stringify({ error: 'Service temporarily unavailable. Please retry later.' }),
-        {
-          status: 429,
-          headers: {
-            'Content-Type': 'application/json',
-            'Retry-After': retryAfterSeconds.toString(),
-          },
-        }
-      )
+      return new Response(JSON.stringify(data), {
+        headers: { 'Content-Type': 'application/json' },
+      })
+    } catch (err) {
+      if (err instanceof Deno.errors.RateLimitError) {
+        // Use retryAfterMs to tell the client when to retry
+        const retryAfterSeconds = Math.ceil(err.retryAfterMs / 1000)
+        return new Response(
+          JSON.stringify({ error: 'Service temporarily unavailable. Please retry later.' }),
+          {
+            status: 429,
+            headers: {
+              'Content-Type': 'application/json',
+              'Retry-After': retryAfterSeconds.toString(),
+            },
+          }
+        )
+      }
+      throw err
     }
-    throw err
-  }
-})
+  }),
+}
 ```
 
 </TabPanel>
@@ -94,39 +97,43 @@ Deno.serve(async (req) => {
 <TabPanel id="fetch" label="fetch">
 
 ```typescript
+import { withSupabase } from 'npm:@supabase/server@1'
+
 const SUPABASE_PUBLISHABLE_KEYS = JSON.parse(Deno.env.get('SUPABASE_PUBLISHABLE_KEYS')!)
 // If you want to use a different api key, change 'default' to your preferred key name
 const SUPABASE_DEFAULT_PUBLISHABLE_KEY = SUPABASE_PUBLISHABLE_KEYS['default']
 
-Deno.serve(async (req) => {
-  try {
-    const response = await fetch(`${Deno.env.get('SUPABASE_URL')}/functions/v1/other-function`, {
-      method: 'POST',
-      headers: {
-        apikey: SUPABASE_DEFAULT_PUBLISHABLE_KEY,
-        'Content-Type': 'application/json',
-      },
-      body: JSON.stringify({ foo: 'bar' }),
-    })
-    return response
-  } catch (err) {
-    if (err instanceof Deno.errors.RateLimitError) {
-      // Use retryAfterMs to tell the client when to retry
-      const retryAfterSeconds = Math.ceil(err.retryAfterMs / 1000)
-      return new Response(
-        JSON.stringify({ error: 'Service temporarily unavailable. Please retry later.' }),
-        {
-          status: 429,
-          headers: {
-            'Content-Type': 'application/json',
-            'Retry-After': retryAfterSeconds.toString(),
-          },
-        }
-      )
+export default {
+  fetch: withSupabase({ auth: 'user' }, async (req) => {
+    try {
+      const response = await fetch(`${Deno.env.get('SUPABASE_URL')}/functions/v1/other-function`, {
+        method: 'POST',
+        headers: {
+          apikey: SUPABASE_DEFAULT_PUBLISHABLE_KEY,
+          'Content-Type': 'application/json',
+        },
+        body: JSON.stringify({ foo: 'bar' }),
+      })
+      return response
+    } catch (err) {
+      if (err instanceof Deno.errors.RateLimitError) {
+        // Use retryAfterMs to tell the client when to retry
+        const retryAfterSeconds = Math.ceil(err.retryAfterMs / 1000)
+        return new Response(
+          JSON.stringify({ error: 'Service temporarily unavailable. Please retry later.' }),
+          {
+            status: 429,
+            headers: {
+              'Content-Type': 'application/json',
+              'Retry-After': retryAfterSeconds.toString(),
+            },
+          }
+        )
+      }
+      throw err
     }
-    throw err
-  }
-})
+  }),
+}
 ```
 
 </TabPanel>
@@ -219,22 +226,26 @@ await supabase.functions.invoke('process-items', { body: { items } })
 If your function is recursive, set a maximum depth to prevent unbounded call chains:
 
 ```typescript
-Deno.serve(async (req) => {
-  const { depth = 0, data } = await req.json()
+import { withSupabase } from 'npm:@supabase/server@1'
 
-  if (depth >= 5) {
-    // Stop recursion at max depth
-    return new Response(JSON.stringify({ result: data }))
-  }
+export default {
+  fetch: withSupabase({ auth: 'user' }, async (req) => {
+    const { depth = 0, data } = await req.json()
 
-  // Process and recurse with incremented depth
-  const processed = processData(data)
-  const { data: result } = await supabase.functions.invoke('my-function', {
-    body: { depth: depth + 1, data: processed },
-  })
+    if (depth >= 5) {
+      // Stop recursion at max depth
+      return new Response(JSON.stringify({ result: data }))
+    }
 
-  return new Response(JSON.stringify(result))
-})
+    // Process and recurse with incremented depth
+    const processed = processData(data)
+    const { data: result } = await supabase.functions.invoke('my-function', {
+      body: { depth: depth + 1, data: processed },
+    })
+
+    return new Response(JSON.stringify(result))
+  }),
+}
 ```
 
 ### 3. Use queues for large workloads
@@ -262,15 +273,19 @@ export async function save(data: any) {
 
 ```typescript
 // supabase/functions/process-data/index.ts
+import { withSupabase } from 'npm:@supabase/server@1'
+
 import { save, transform, validate } from '../_shared/transform.ts'
 
-Deno.serve(async (req) => {
-  const data = await req.json()
-  const validated = validate(data)
-  const transformed = transform(validated)
-  const result = await save(transformed)
-  return new Response(JSON.stringify(result))
-})
+export default {
+  fetch: withSupabase({ auth: 'user' }, async (req) => {
+    const data = await req.json()
+    const validated = validate(data)
+    const transformed = transform(validated)
+    const result = await save(transformed)
+    return new Response(JSON.stringify(result))
+  }),
+}
 ```
 
 ### 5. Add delays for non-urgent processing

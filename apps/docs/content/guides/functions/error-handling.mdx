@@ -12,22 +12,26 @@ Implementing the right error responses and client-side handling helps with debug
 Within your Edge Functions, return proper HTTP status codes and error messages:
 
 ```tsx
-Deno.serve(async (req) => {
-  try {
-    // Your function logic here
-    const result = await processRequest(req)
-    return new Response(JSON.stringify(result), {
-      headers: { 'Content-Type': 'application/json' },
-      status: 200,
-    })
-  } catch (error) {
-    console.error('Function error:', error)
-    return new Response(JSON.stringify({ error: 'Internal Server Error' }), {
-      headers: { 'Content-Type': 'application/json' },
-      status: 500,
-    })
-  }
-})
+import { withSupabase } from 'npm:@supabase/server@1'
+
+export default {
+  fetch: withSupabase({ auth: 'user' }, async (req) => {
+    try {
+      // Your function logic here
+      const result = await processRequest(req)
+      return new Response(JSON.stringify(result), {
+        headers: { 'Content-Type': 'application/json' },
+        status: 200,
+      })
+    } catch (error) {
+      console.error('Function error:', error)
+      return new Response(JSON.stringify({ error: 'Internal Server Error' }), {
+        headers: { 'Content-Type': 'application/json' },
+        status: 500,
+      })
+    }
+  }),
+}
 ```
 
 **Best practices for function errors:**

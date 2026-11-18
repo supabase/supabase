@@ -164,6 +164,7 @@ from
 In practice, you will likely be calling this from the [Supabase client](/docs/reference/javascript/introduction) or through a custom backend layer. Here is a quick example of how you might call this from an [Edge Function](/docs/guides/functions) using JavaScript:
 
 ```tsx
+import { withSupabase } from 'npm:@supabase/server@1'
 import { createClient } from 'npm:@supabase/supabase-js@2'
 import OpenAI from 'npm:openai'
 
@@ -171,37 +172,39 @@ const supabaseUrl = Deno.env.get('SUPABASE_URL')!
 const supabaseSecretKey = Deno.env.get('SUPABASE_SECRET_KEY')!
 const openaiApiKey = Deno.env.get('OPENAI_API_KEY')!
 
-Deno.serve(async (req) => {
-  // Grab the user's query from the JSON payload
-  const { query } = await req.json()
+export default {
+  fetch: withSupabase({ auth: 'none' }, async (req) => {
+    // Grab the user's query from the JSON payload
+    const { query } = await req.json()
 
-  // Instantiate OpenAI client
-  const openai = new OpenAI({ apiKey: openaiApiKey })
+    // Instantiate OpenAI client
+    const openai = new OpenAI({ apiKey: openaiApiKey })
 
-  // Generate a one-time embedding for the user's query
-  const embeddingResponse = await openai.embeddings.create({
-    model: 'text-embedding-3-large',
-    input: query,
-    dimensions: 512,
-  })
+    // Generate a one-time embedding for the user's query
+    const embeddingResponse = await openai.embeddings.create({
+      model: 'text-embedding-3-large',
+      input: query,
+      dimensions: 512,
+    })
 
-  const [{ embedding }] = embeddingResponse.data
+    const [{ embedding }] = embeddingResponse.data
 
-  // Instantiate the Supabase client
-  // (replace service role key with user's JWT if using Supabase auth and RLS)
-  const supabase = createClient(supabaseUrl, supabaseServiceRoleKey)
+    // Instantiate the Supabase client
+    // (replace service role key with user's JWT if using Supabase auth and RLS)
+    const supabase = createClient(supabaseUrl, supabaseServiceRoleKey)
 
-  // Call hybrid_search Postgres function via RPC
-  const { data: documents } = await supabase.rpc('hybrid_search', {
-    query_text: query,
-    query_embedding: embedding,
-    match_count: 10,
-  })
+    // Call hybrid_search Postgres function via RPC
+    const { data: documents } = await supabase.rpc('hybrid_search', {
+      query_text: query,
+      query_embedding: embedding,
+      match_count: 10,
+    })
 
-  return new Response(JSON.stringify(documents), {
-    headers: { 'Content-Type': 'application/json' },
-  })
-})
+    return new Response(JSON.stringify(documents), {
+      headers: { 'Content-Type': 'application/json' },
+    })
+  }),
+}
 ```
 
 This uses OpenAI's `text-embedding-3-large` model to [generate embeddings](/docs/guides/ai/quickstarts/generate-text-embeddings) (shortened to 512 dimensions for faster retrieval). Swap in your preferred embedding model (and dimension size) accordingly.

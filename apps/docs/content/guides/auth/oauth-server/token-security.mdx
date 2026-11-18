@@ -182,39 +182,43 @@ Custom Access Token Hooks are triggered for **all** token issuance. Use `client_
 A common use case is customizing the `audience` claim for different OAuth clients. This allows third-party services to validate that tokens were issued specifically for them:
 
 ```typescript
-Deno.serve(async (req) => {
-  const { user, claims, client_id } = await req.json()
+import { withSupabase } from 'npm:@supabase/server@1'
 
-  // Customize audience based on OAuth client
-  if (client_id === 'mobile-app-client-id') {
-    return new Response(
-      JSON.stringify({
-        claims: {
-          aud: 'https://api.myapp.com',
-          app_version: '2.0.0',
-        },
-      }),
-      { headers: { 'Content-Type': 'application/json' } }
-    )
-  }
+export default {
+  fetch: withSupabase({ auth: 'none' }, async (req) => {
+    const { user, claims, client_id } = await req.json()
 
-  if (client_id === 'analytics-partner-id') {
-    return new Response(
-      JSON.stringify({
-        claims: {
-          aud: 'https://analytics.partner.com',
-          access_level: 'read-only',
-        },
-      }),
-      { headers: { 'Content-Type': 'application/json' } }
-    )
-  }
+    // Customize audience based on OAuth client
+    if (client_id === 'mobile-app-client-id') {
+      return new Response(
+        JSON.stringify({
+          claims: {
+            aud: 'https://api.myapp.com',
+            app_version: '2.0.0',
+          },
+        }),
+        { headers: { 'Content-Type': 'application/json' } }
+      )
+    }
 
-  // Default audience for non-OAuth flows
-  return new Response(JSON.stringify({ claims: {} }), {
-    headers: { 'Content-Type': 'application/json' },
-  })
-})
+    if (client_id === 'analytics-partner-id') {
+      return new Response(
+        JSON.stringify({
+          claims: {
+            aud: 'https://analytics.partner.com',
+            access_level: 'read-only',
+          },
+        }),
+        { headers: { 'Content-Type': 'application/json' } }
+      )
+    }
+
+    // Default audience for non-OAuth flows
+    return new Response(JSON.stringify({ claims: {} }), {
+      headers: { 'Content-Type': 'application/json' },
+    })
+  }),
+}
 ```
 
 The `audience` claim is especially important for:
@@ -229,41 +233,47 @@ You can also add custom claims and metadata based on the OAuth client:
 
 ```typescript
 import { createClient } from 'https://esm.sh/@supabase/supabase-js@2'
+import { withSupabase } from 'npm:@supabase/server@1'
 
-Deno.serve(async (req) => {
-  const { user, claims, client_id } = await req.json()
+export default {
+  fetch: withSupabase({ auth: 'none' }, async (req) => {
+    const { user, claims, client_id } = await req.json()
 
-  const supabase = createClient(Deno.env.get('SUPABASE_URL')!, Deno.env.get('SUPABASE_SECRET_KEY')!)
+    const supabase = createClient(
+      Deno.env.get('SUPABASE_URL')!,
+      Deno.env.get('SUPABASE_SECRET_KEY')!
+    )
 
-  // Add custom claims based on OAuth client
-  let customClaims = {}
+    // Add custom claims based on OAuth client
+    let customClaims = {}
 
-  if (client_id === 'mobile-app-client-id') {
-    customClaims.aud = 'https://mobile.myapp.com'
-    customClaims.app_version = '2.0.0'
-    customClaims.platform = 'mobile'
-  } else if (client_id === 'analytics-client-id') {
-    customClaims.aud = 'https://analytics.myapp.com'
-    customClaims.read_only = true
-    customClaims.data_retention_days = 90
-  } else if (client_id?.startsWith('mcp-')) {
-    // MCP AI agents
-    const { data: agent } = await supabase
-      .from('approved_ai_agents')
-      .select('name, max_data_retention_days')
-      .eq('client_id', client_id)
-      .single()
+    if (client_id === 'mobile-app-client-id') {
+      customClaims.aud = 'https://mobile.myapp.com'
+      customClaims.app_version = '2.0.0'
+      customClaims.platform = 'mobile'
+    } else if (client_id === 'analytics-client-id') {
+      customClaims.aud = 'https://analytics.myapp.com'
+      customClaims.read_only = true
+      customClaims.data_retention_days = 90
+    } else if (client_id?.startsWith('mcp-')) {
+      // MCP AI agents
+      const { data: agent } = await supabase
+        .from('approved_ai_agents')
+        .select('name, max_data_retention_days')
+        .eq('client_id', client_id)
+        .single()
 
-    customClaims.aud = `https://mcp.myapp.com/${client_id}`
-    customClaims.ai_agent = true
-    customClaims.agent_name = agent?.name
-    customClaims.max_retention = agent?.max_data_retention_days
-  }
+      customClaims.aud = `https://mcp.myapp.com/${client_id}`
+      customClaims.ai_agent = true
+      customClaims.agent_name = agent?.name
+      customClaims.max_retention = agent?.max_data_retention_days
+    }
 
-  return new Response(JSON.stringify({ claims: customClaims }), {
-    headers: { 'Content-Type': 'application/json' },
-  })
-})
+    return new Response(JSON.stringify({ claims: customClaims }), {
+      headers: { 'Content-Type': 'application/json' },
+    })
+  }),
+}
 ```
 
 Use these custom claims in RLS:

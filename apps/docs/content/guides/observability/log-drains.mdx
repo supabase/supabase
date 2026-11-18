@@ -49,13 +49,17 @@ Update the function body to log the incoming payload:
 ```ts
 import 'npm:@supabase/functions-js/edge-runtime.d.ts'
 
-Deno.serve(async (req) => {
-  const data = await req.json()
-  console.log(`Received ${data.length} logs, first log:\n ${JSON.stringify(data[0])}`)
-  return new Response(JSON.stringify({ message: 'ok' }), {
-    headers: { 'Content-Type': 'application/json' },
-  })
-})
+import { withSupabase } from 'npm:@supabase/server@1'
+
+export default {
+  fetch: withSupabase({ auth: 'none' }, async (req) => {
+    const data = await req.json()
+    console.log(`Received ${data.length} logs, first log:\n ${JSON.stringify(data[0])}`)
+    return new Response(JSON.stringify({ message: 'ok' }), {
+      headers: { 'Content-Type': 'application/json' },
+    })
+  }),
+}
 ```
 
 Deploy it:
@@ -87,25 +91,28 @@ Gzip payloads can be decompressed using Node-compatible built-in APIs. See the E
 
 ```ts
 import { gunzipSync } from 'node:zlib'
+import { withSupabase } from 'npm:@supabase/server@1'
 
-Deno.serve(async (req) => {
-  try {
-    const contentEncoding = req.headers.get('content-encoding')
-    if (contentEncoding !== 'gzip') {
-      return new Response('Request body is not gzip compressed', { status: 400 })
+export default {
+  fetch: withSupabase({ auth: 'none' }, async (req) => {
+    try {
+      const contentEncoding = req.headers.get('content-encoding')
+      if (contentEncoding !== 'gzip') {
+        return new Response('Request body is not gzip compressed', { status: 400 })
+      }
+
+      const compressedBody = await req.arrayBuffer()
+      const decompressedBody = gunzipSync(new Uint8Array(compressedBody))
+      const data = JSON.parse(new TextDecoder().decode(decompressedBody))
+      console.log(`Received: ${data.length} logs.`)
+
+      return new Response('ok', { headers: { 'Content-Type': 'text/plain' } })
+    } catch (error) {
+      console.error('Error:', error)
+      return new Response('Error processing request', { status: 500 })
     }
-
-    const compressedBody = await req.arrayBuffer()
-    const decompressedBody = gunzipSync(new Uint8Array(compressedBody))
-    const data = JSON.parse(new TextDecoder().decode(decompressedBody))
-    console.log(`Received: ${data.length} logs.`)
-
-    return new Response('ok', { headers: { 'Content-Type': 'text/plain' } })
-  } catch (error) {
-    console.error('Error:', error)
-    return new Response('Error processing request', { status: 500 })
-  }
-})
+  }),
+}
 ```
 
 </details>
