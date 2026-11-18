@@ -1,6 +1,6 @@
 import { useCallback } from 'react'
 import { cn } from 'ui'
-import { toOpaque } from 'ui-patterns/GlyphLines'
+import { flattenColor } from 'ui-patterns/GlyphLines/flatten-color'
 
 import { fillGlyphPath, GLYPH_FONT } from './glyph-path'
 import { sizeLayers } from './layer'
@@ -52,7 +52,7 @@ export const FrameGlyphs = ({ text, className }: FrameGlyphsProps) => {
         drawnKey = key
 
         sizeLayers({ contexts: [ctx], width: box.width, height: box.height })
-        ctx.fillStyle = toOpaque(style.color, style.caretColor)
+        ctx.fillStyle = flattenColor({ color: style.color, surface: style.caretColor })
         ctx.font = GLYPH_FONT
         ctx.textAlign = 'center'
         ctx.textBaseline = 'middle'

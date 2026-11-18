@@ -1,6 +1,8 @@
 import { useCallback, type RefObject } from 'react'
 import { cn } from 'ui'
 
+import { flattenColor } from './flatten-color'
+
 export interface GlyphLinesProps {
   linesRef: RefObject<SVGSVGElement | null>
   text: string
@@ -31,28 +33,6 @@ const GLYPH_SIZE = 2.2
 const PULSE_LENGTH = 140
 // px past the canvas edge where glyphs still draw, so a glyph does not pop in at the edge
 const EDGE = 24
-
-const opaqueColors = new Map<string, string>()
-
-// border tokens have alpha, and alpha adds up where glyphs overlap. so glyphs draw in the opaque color the token gives over the surface
-export const toOpaque = (color: string, surface: string): string => {
-  if (color === surface) return color
-  const key = `${color}|${surface}`
-  const cached = opaqueColors.get(key)
-  if (cached) return cached
-  const probe = document.createElement('canvas').getContext('2d', { willReadFrequently: true })
-  if (!probe) return color
-  probe.canvas.width = 1
-  probe.canvas.height = 1
-  probe.fillStyle = surface
-  probe.fillRect(0, 0, 1, 1)
-  probe.fillStyle = color
-  probe.fillRect(0, 0, 1, 1)
-  const [red, green, blue] = probe.getImageData(0, 0, 1, 1).data
-  const opaque = `rgb(${red} ${green} ${blue})`
-  opaqueColors.set(key, opaque)
-  return opaque
-}
 
 const startGlyphLines = ({
   canvas,
@@ -131,7 +111,7 @@ const startGlyphLines = ({
       layer.width = width
       layer.height = height
       layerContext.setTransform(ratio, 0, 0, ratio, 0, 0)
-      const color = toOpaque(style.color, style.caretColor)
+      const color = flattenColor({ color: style.color, surface: style.caretColor })
       layerContext.font = font
       layerContext.textAlign = 'center'
       layerContext.textBaseline = 'middle'
@@ -177,10 +157,10 @@ const startGlyphLines = ({
       .map((pulse) => ({ ...pulse, head: pulse.head + pulse.speed * elapsed }))
       .filter((pulse) => (pulse.end - pulse.head) * Math.sign(pulse.speed) > 0)
     context.setTransform(ratio, 0, 0, ratio, 0, 0)
-    const pulseColor = toOpaque(
-      style.getPropertyValue('--glyph-lines-pulse') || style.color,
-      style.caretColor
-    )
+    const pulseColor = flattenColor({
+      color: style.getPropertyValue('--glyph-lines-pulse') || style.color,
+      surface: style.caretColor,
+    })
     context.fillStyle = pulseColor
     context.shadowColor = pulseColor
     context.shadowBlur = 4

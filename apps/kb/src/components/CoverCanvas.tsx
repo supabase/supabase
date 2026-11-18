@@ -1,6 +1,6 @@
 import { useCallback, type RefObject } from 'react'
 import { cn } from 'ui'
-import { toOpaque } from 'ui-patterns/GlyphLines'
+import { flattenColor } from 'ui-patterns/GlyphLines/flatten-color'
 
 import { CELL_HEIGHT, CELL_WIDTH, clamp, fitEdges, uniformEdges } from '../lib/ascii/field'
 import { drawFluid } from '../lib/ascii/fluid'
@@ -98,7 +98,7 @@ const clearPath = (ctx: CanvasRenderingContext2D) => {
 const readPalette = (probeRoot: HTMLElement): Palette => {
   const read = (role: keyof typeof PROBES) => readProbeColor(probeRoot, role)
   return {
-    line: toOpaque(read('line'), read('surface')),
+    line: flattenColor({ color: read('line'), surface: read('surface') }),
     surface: read('surface'),
     fluid: read('fluid'),
     beam: read('beam'),

@@ -1,6 +1,6 @@
 import { useCallback, type RefObject } from 'react'
 import { cn } from 'ui'
-import { toOpaque } from 'ui-patterns/GlyphLines'
+import { flattenColor } from 'ui-patterns/GlyphLines/flatten-color'
 import { BEAM_ALPHA, hash, isBeamAt, rampGlyph } from 'ui-patterns/IsoShape/IsoShape.glyphs'
 
 import { clamp, drawStep, GLYPH_PITCH, phase, type PixelRect } from './field'
@@ -154,7 +154,7 @@ const distance = (a: WarpPoint, b: WarpPoint) => Math.hypot(a.x - b.x, a.y - b.y
 const readPalette = (probeRoot: HTMLElement): Palette => {
   const read = (role: keyof typeof PROBES) => readProbeColor(probeRoot, role)
   return {
-    line: toOpaque(read('line'), read('surface')),
+    line: flattenColor({ color: read('line'), surface: read('surface') }),
     surface: read('surface'),
     glyph: read('glyph'),
     beam: read('beam'),

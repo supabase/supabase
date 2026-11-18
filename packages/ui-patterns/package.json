@@ -435,6 +435,10 @@
       "import": "./src/GlassPanel/index.tsx",
       "types": "./src/GlassPanel/index.tsx"
     },
+    "./GlyphLines/flatten-color": {
+      "import": "./src/GlyphLines/flatten-color.ts",
+      "types": "./src/GlyphLines/flatten-color.ts"
+    },
     "./GlyphLines": {
       "import": "./src/GlyphLines/index.tsx",
       "types": "./src/GlyphLines/index.tsx"

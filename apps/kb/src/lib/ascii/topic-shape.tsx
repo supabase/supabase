@@ -1,6 +1,6 @@
 import { useCallback } from 'react'
 import { cn } from 'ui'
-import { toOpaque } from 'ui-patterns/GlyphLines'
+import { flattenColor } from 'ui-patterns/GlyphLines/flatten-color'
 import {
   compositionBounds,
   paintOrder,
@@ -106,7 +106,10 @@ export const TopicShape = ({ topic, text, isMirrored, className }: TopicShapePro
 
         ctx.clearRect(0, 0, width, height)
         const fillColor = readProbeColor(probeRoot, 'fill')
-        const lineColor = toOpaque(readProbeColor(probeRoot, 'line'), fillColor)
+        const lineColor = flattenColor({
+          color: readProbeColor(probeRoot, 'line'),
+          surface: fillColor,
+        })
         ctx.font = GLYPH_FONT
         ctx.textAlign = 'center'
         ctx.textBaseline = 'middle'
