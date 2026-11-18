@@ -38,11 +38,10 @@ function getPostHogOrigin(env) {
 }
 
 /**
- * @param {{ env: Env, allowEval: boolean }} options
+ * @param {Env} env
  * @returns {string[]}
  */
-function getScriptSrc({ env, allowEval }) {
-  const isDev = env.NODE_ENV === 'development'
+function getScriptSrc(env) {
   const isPreview = isPreviewOrStaging(env)
 
   const sources = [
@@ -50,8 +49,11 @@ function getScriptSrc({ env, allowEval }) {
     // Next.js inline scripts, next-themes, the GTM bootstrap and a few page loaders are inline.
     // A nonce needs dynamic rendering, and most of www is static.
     "'unsafe-inline'",
-    // Client-side MDX evaluation (see EVAL_ROUTE_SOURCES), and Next.js in development
-    allowEval || isDev ? "'unsafe-eval'" : undefined,
+    // MDXClient (next-mdx-remote-client) evaluates MDX with the Function constructor on the
+    // changelog, customer, event, alternative and partner catalog pages. A per-route policy
+    // doesn't work: client-side navigation keeps the CSP of the document that was loaded first.
+    // Next.js also needs it in development.
+    "'unsafe-eval'",
     // Google Tag Manager through Stape (packages/common/telemetry.tsx)
     'https://ss.supabase.com',
     // PostHog (packages/common/posthog-client.ts)
@@ -83,11 +85,11 @@ function getScriptSrc({ env, allowEval }) {
 }
 
 /**
- * @param {{ env?: Env, allowEval?: boolean }} [options]
+ * @param {{ env?: Env }} [options]
  */
-function buildCsp({ env = process.env, allowEval = false } = {}) {
+function buildCsp({ env = process.env } = {}) {
   return [
-    `script-src ${getScriptSrc({ env, allowEval }).join(' ')}`,
+    `script-src ${getScriptSrc(env).join(' ')}`,
     "object-src 'none'",
     "base-uri 'self'",
     "form-action 'self'",
@@ -96,48 +98,60 @@ function buildCsp({ env = process.env, allowEval = false } = {}) {
 }
 
 /**
- * Pages that render MDX on the client with next-mdx-remote-client's MDXClient, which evaluates
- * code with the Function constructor and needs 'unsafe-eval'.
+ * @typedef {{ exact: string[], subtree: string[] }} PathExclusions
  */
-const EVAL_ROUTE_SOURCES = [
-  // pages/changelog.tsx, pages/changelog/[slug].tsx
-  '/changelog/:path*',
-  // pages/customers/[slug].tsx
-  '/customers/:slug',
-  // pages/events/[slug].tsx
-  '/events/:slug',
-  // pages/alternatives/[slug].tsx (layouts/comparison.tsx)
-  '/alternatives/:slug',
-  // app/partners/catalog/[slug]/PartnerCatalogDetail.tsx
-  '/partners/catalog/:slug',
-]
 
 /**
- * First path segment of every rewrite that proxies to another app.
+ * Paths that www proxies to other apps. A rewrite without parameters excludes exactly its path,
+ * for example /openapi.json. A rewrite with parameters excludes the static path before the first
+ * parameter and everything below it, for example /dashboard/:path* excludes /dashboard.
  * @param {Rewrite[]} rewrites
- * @returns {string[]}
+ * @returns {PathExclusions}
  */
-function getProxiedPathPrefixes(rewrites) {
-  const prefixes = rewrites
+function getProxiedPathExclusions(rewrites) {
+  const exact = new Set()
+  const subtree = new Set()
+
+  for (const rewrite of rewrites) {
     // Internal rewrites start with a path. Anything else is a URL, or an env var that's unset locally.
-    .filter((rewrite) => !rewrite.destination.startsWith('/'))
-    .map((rewrite) => rewrite.source.match(/^\/([A-Za-z0-9_-]+)/)?.[1])
-    .filter((prefix) => prefix !== undefined)
+    if (rewrite.destination.startsWith('/')) continue
 
-  return [...new Set(prefixes)]
+    const segments = rewrite.source.replaceAll('\\.', '.').split('/').slice(1)
+    const firstDynamic = segments.findIndex((segment) => /[:(*]/.test(segment))
+
+    if (firstDynamic === -1) {
+      exact.add(`/${segments.join('/')}`)
+    } else {
+      subtree.add(`/${segments.slice(0, firstDynamic).join('/')}`.replace(/(.)\/$/, '$1'))
+    }
+  }
+
+  const isInSubtree = (/** @type {string} */ path) =>
+    [...subtree].some((prefix) => path === prefix || path.startsWith(`${prefix}/`))
+
+  return {
+    exact: [...exact].filter((path) => !isInSubtree(path)),
+    subtree: [...subtree],
+  }
 }
 
+/** @param {string} path */
+const toPattern = (path) => path.slice(1).replace(/[.*+?^${}()|[\]\\]/g, '\\$&')
+
 /**
- * Source that matches every path except the proxied prefixes and anything below them.
- * @param {string[]} proxiedPrefixes
+ * Source that matches every path except the proxied ones.
+ * @param {PathExclusions} exclusions
  */
-function getWwwOwnedSource(proxiedPrefixes) {
-  return `/:path((?!(?:${proxiedPrefixes.join('|')})(?:/|\\.|$)).*)`
+function getWwwOwnedSource({ exact, subtree }) {
+  const excluded = [
+    ...exact.map((path) => `${toPattern(path)}$`),
+    ...subtree.map((path) => `${toPattern(path)}(?:/|$)`),
+  ]
+  return `/:path((?!(?:${excluded.join('|')})).*)`
 }
 
 /**
- * Header rules for next.config.mjs. Rules for the eval routes come last, because Next.js uses
- * the last matching rule for a header key.
+ * Header rules for next.config.mjs.
  * @param {Rewrite[]} rewrites
  * @param {Env} [env]
  * @returns {HeaderRule[]}
@@ -145,25 +159,20 @@ function getWwwOwnedSource(proxiedPrefixes) {
 function getSecurityHeaderRules(rewrites, env = process.env) {
   return [
     {
-      source: getWwwOwnedSource(getProxiedPathPrefixes(rewrites)),
+      source: getWwwOwnedSource(getProxiedPathExclusions(rewrites)),
       headers: [
         { key: 'X-Frame-Options', value: 'SAMEORIGIN' },
         { key: 'X-Content-Type-Options', value: 'nosniff' },
         { key: 'Referrer-Policy', value: 'strict-origin-when-cross-origin' },
-        { key: 'Content-Security-Policy', value: buildCsp({ env, allowEval: false }) },
+        { key: 'Content-Security-Policy', value: buildCsp({ env }) },
       ],
     },
-    ...EVAL_ROUTE_SOURCES.map((source) => ({
-      source,
-      headers: [{ key: 'Content-Security-Policy', value: buildCsp({ env, allowEval: true }) }],
-    })),
   ]
 }
 
 module.exports = {
-  EVAL_ROUTE_SOURCES,
   buildCsp,
-  getProxiedPathPrefixes,
+  getProxiedPathExclusions,
   getSecurityHeaderRules,
   getWwwOwnedSource,
 }

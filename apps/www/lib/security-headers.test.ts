@@ -3,12 +3,7 @@ import { pathToRegexp } from 'next/dist/compiled/path-to-regexp'
 import { describe, expect, it } from 'vitest'
 
 import rewrites from './rewrites'
-import {
-  buildCsp,
-  EVAL_ROUTE_SOURCES,
-  getProxiedPathPrefixes,
-  getSecurityHeaderRules,
-} from './security-headers'
+import { buildCsp, getProxiedPathExclusions, getSecurityHeaderRules } from './security-headers'
 
 const PRODUCTION_ENV = {
   NODE_ENV: 'production',
@@ -21,6 +16,12 @@ const PREVIEW_ENV = {
   NEXT_PUBLIC_POSTHOG_HOST: 'https://ph.supabase.green',
 }
 
+// The docs zone is only rewritten in production
+const REWRITES = [
+  ...rewrites,
+  { source: '/docs/:path*', destination: 'https://docs.example.com/:path*' },
+]
+
 const matches = (source: string, path: string) =>
   pathToRegexp(source, [], { strict: true, sensitive: false, delimiter: '/' }).test(path)
 
@@ -31,15 +32,8 @@ const scriptSrc = (csp: string) =>
     .split(' ')
     .slice(1)
 
-const cspFor = (rules: ReturnType<typeof getSecurityHeaderRules>, path: string) =>
-  rules
-    .filter((rule) => matches(rule.source, path))
-    .flatMap((rule) => rule.headers)
-    .filter((header) => header.key === 'Content-Security-Policy')
-    .at(-1)?.value
-
 describe('buildCsp', () => {
-  it('builds a strict production policy', () => {
+  it('builds the production policy', () => {
     const csp = buildCsp({ env: PRODUCTION_ENV })
 
     expect(csp).toContain("object-src 'none'")
@@ -52,11 +46,11 @@ describe('buildCsp', () => {
       expect.arrayContaining([
         "'self'",
         "'unsafe-inline'",
+        "'unsafe-eval'",
         'https://ss.supabase.com',
         'https://ph.supabase.com',
       ])
     )
-    expect(sources).not.toContain("'unsafe-eval'")
     expect(sources).not.toContain('https://vercel.live')
     expect(sources).not.toContain('https://ph.supabase.green')
     expect(sources.some((source) => source.includes('unpkg.com'))).toBe(false)
@@ -64,12 +58,12 @@ describe('buildCsp', () => {
     expect(sources.some((source) => source === 'https://cdn.jsdelivr.net')).toBe(false)
   })
 
-  it('allows eval only when asked', () => {
-    expect(scriptSrc(buildCsp({ env: PRODUCTION_ENV, allowEval: true }))).toContain("'unsafe-eval'")
-  })
-
-  it('allows eval in development', () => {
-    expect(scriptSrc(buildCsp({ env: { NODE_ENV: 'development' } }))).toContain("'unsafe-eval'")
+  it.each([
+    ['production', PRODUCTION_ENV],
+    ['preview', PREVIEW_ENV],
+    ['development', { NODE_ENV: 'development' }],
+  ])('allows eval in %s, where MDX pages evaluate on the client', (_, env) => {
+    expect(scriptSrc(buildCsp({ env }))).toContain("'unsafe-eval'")
   })
 
   it('allows the preview hosts on preview and staging', () => {
@@ -80,7 +74,6 @@ describe('buildCsp', () => {
       const sources = scriptSrc(buildCsp({ env }))
       expect(sources).toContain('https://vercel.live')
       expect(sources).toContain('https://ph.supabase.green')
-      expect(sources).not.toContain("'unsafe-eval'")
     }
   })
 
@@ -94,49 +87,104 @@ describe('buildCsp', () => {
   })
 })
 
-describe('getProxiedPathPrefixes', () => {
-  it('finds the zones that www proxies', () => {
-    const prefixes = getProxiedPathPrefixes(rewrites)
-    expect(prefixes).toEqual(
-      expect.arrayContaining(['dashboard', 'library', 'design-system', 'kb', 'evals', 'migrate'])
+describe('getProxiedPathExclusions', () => {
+  const { exact, subtree } = getProxiedPathExclusions(REWRITES)
+
+  it('excludes single-file rewrites exactly', () => {
+    expect(exact).toEqual(
+      expect.arrayContaining([
+        '/openapi.json',
+        '/.well-known/security.txt',
+        '/humans.txt',
+        '/lawyers.txt',
+        '/library.rsc',
+        '/design-system.rsc',
+      ])
     )
   })
 
+  it('excludes zones as subtrees', () => {
+    expect(subtree).toEqual(
+      expect.arrayContaining([
+        '/dashboard',
+        '/docs',
+        '/kb',
+        '/library',
+        '/library.segments',
+        '/design-system',
+        '/migrate/instantdb',
+        '/new-docs',
+      ])
+    )
+  })
+
+  it('does not widen exact rewrites or nested zones', () => {
+    expect(subtree).not.toContain('/openapi')
+    expect(subtree).not.toContain('/migrate')
+    expect(subtree).not.toContain('/.well-known')
+  })
+
+  it('drops exact paths that a subtree covers', () => {
+    expect(exact).not.toContain('/dashboard')
+    expect(exact).not.toContain('/kb')
+    expect(exact).not.toContain('/new-docs/')
+  })
+
   it('ignores internal rewrites', () => {
-    const prefixes = getProxiedPathPrefixes(rewrites)
-    expect(prefixes).not.toContain('feed')
-    expect(prefixes).not.toContain('path')
+    const all = [...exact, ...subtree]
+    expect(all).not.toContain('/feed.xml')
+    expect(all).not.toContain('/.well-known/ai-catalog.json')
   })
 
   it('includes rewrites to unset env vars', () => {
     expect(
-      getProxiedPathPrefixes([{ source: '/docs/:path*', destination: 'undefined/:path*' }])
-    ).toEqual(['docs'])
+      getProxiedPathExclusions([{ source: '/kb/:path*', destination: 'undefined/:path*' }])
+    ).toEqual({ exact: [], subtree: ['/kb'] })
   })
 })
 
 describe('getSecurityHeaderRules', () => {
-  const rules = getSecurityHeaderRules(
-    [...rewrites, { source: '/docs/:path*', destination: 'https://docs.example.com/:path*' }],
-    PRODUCTION_ENV
-  )
+  const rules = getSecurityHeaderRules(REWRITES, PRODUCTION_ENV)
   const [wwwRule] = rules
 
-  it.each(['/', '/pricing', '/blog/some-post', '/changelog', '/dashboarding-guide', '/docsearch'])(
-    'applies to the www page %s',
-    (path) => {
-      expect(matches(wwwRule.source, path)).toBe(true)
-    }
-  )
+  it.each([
+    '/',
+    '/pricing',
+    '/blog/some-post',
+    '/customers',
+    '/customers/maergo',
+    '/changelog',
+    '/openapi',
+    '/openapi-guide',
+    '/library.json',
+    '/libraryx',
+    '/migrate',
+    '/migrate/other',
+    '/humans',
+    '/.well-known/ard.json',
+    '/dashboarding-guide',
+    '/docsearch',
+  ])('applies to the www path %s', (path) => {
+    expect(matches(wwwRule.source, path)).toBe(true)
+  })
 
   it.each([
+    '/.well-known/security.txt',
+    '/openapi.json',
+    '/humans.txt',
     '/dashboard',
     '/dashboard/project/abc',
     '/docs',
     '/docs/guides/auth',
-    '/library/example/password-based-auth',
+    '/library',
     '/library.rsc',
+    '/library.segments/a.segment.rsc',
+    '/library/example/x.segments/y.segment.rsc',
+    '/library/example/password-based-auth',
     '/design-system/docs',
+    '/migrate/instantdb',
+    '/migrate/instantdb/step',
+    '/new-docs/',
     '/kb/some-article',
   ])('does not apply to the proxied path %s', (path) => {
     expect(matches(wwwRule.source, path)).toBe(false)
@@ -152,25 +200,10 @@ describe('getSecurityHeaderRules', () => {
     )
   })
 
-  it.each([
-    '/changelog',
-    '/changelog/some-entry',
-    '/customers/acme',
-    '/events/meetup',
-    '/alternatives/acme',
-    '/partners/catalog/acme',
-  ])('allows eval on the MDX client page %s', (path) => {
-    expect(scriptSrc(cspFor(rules, path)!)).toContain("'unsafe-eval'")
-  })
-
-  it.each(['/', '/blog/some-post', '/customers', '/events', '/partners/catalog'])(
-    'does not allow eval on %s',
-    (path) => {
-      expect(scriptSrc(cspFor(rules, path)!)).not.toContain("'unsafe-eval'")
-    }
-  )
-
-  it('covers every eval route', () => {
-    expect(rules.slice(1).map((rule) => rule.source)).toEqual(EVAL_ROUTE_SOURCES)
+  it('uses one CSP for every www page, so client-side navigation keeps a working policy', () => {
+    const cspRules = rules.filter((rule) =>
+      rule.headers.some((header) => header.key === 'Content-Security-Policy')
+    )
+    expect(cspRules).toHaveLength(1)
   })
 })
