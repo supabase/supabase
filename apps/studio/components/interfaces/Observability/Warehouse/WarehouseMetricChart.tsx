@@ -36,7 +36,7 @@ export const WarehouseMetricChart = ({
   metric?: WarehouseMetric
   title: string
   description: string
-  unit: string
+  unit?: string
   scale?: number
   series?: WarehouseChartSeries[]
 }) => {
