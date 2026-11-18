@@ -3,6 +3,7 @@ import { Loader2Icon } from 'lucide-react'
 import { useRouter } from 'next/router'
 import { parseAsBoolean, parseAsString, useQueryState } from 'nuqs'
 import { MouseEvent, useEffect, useMemo, useRef, useState } from 'react'
+import type { DataGridHandle } from 'react-data-grid'
 import { toast } from 'sonner'
 import { LoadingLine } from 'ui'
 import { Admonition } from 'ui-patterns/Admonition'
@@ -81,11 +82,16 @@ export const CronjobsTab = () => {
     [track, setCronJobForEditing, setCronJobForDeletion]
   )
 
+  const gridRef = useRef<DataGridHandle>(null)
   const handleScroll = useInfiniteScroll({
     isLoading: grid.isLoading,
     isFetchingNextPage: grid.isFetchingNextPage,
+    isRefetching: grid.isRefetching,
+    isError: !!grid.error,
     hasNextPage: grid.hasNextPage,
     fetchNextPage: grid.fetchNextPage,
+    containerRef: gridRef,
+    rowCount: grid.rows.length,
   })
 
   const onOpenCreateJobSheet = () => {
@@ -165,6 +171,7 @@ export const CronjobsTab = () => {
             />
           )}
           <CronJobsTabDataGrid
+            gridRef={gridRef}
             columns={columns}
             rows={grid.rows}
             isLoading={grid.isLoading}

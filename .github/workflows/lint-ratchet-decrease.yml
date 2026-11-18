@@ -23,6 +23,7 @@ jobs:
             apps/design-system
             apps/ui-library
             apps/learn
+            apps/kb
             packages
             patches
 
@@ -71,7 +72,7 @@ jobs:
           # Keep going past an app that regressed so the others still get decreased;
           # the job fails at the end if any app did.
           failed=""
-          APPS="www docs design-system ui-library learn"
+          APPS="www docs design-system ui-library learn kb"
           for app in $APPS; do
             pnpm --filter "./apps/$app" run lint:ratchet --decrease-baselines || failed="$failed $app"
           done

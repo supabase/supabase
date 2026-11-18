@@ -128,6 +128,73 @@ testRunner('table editor', () => {
     ).toBeVisible()
   })
 
+  test('sidebar context menu acts on the row it was opened from', async ({ page, ref }) => {
+    const activeTableName = 'pw_table_ctx_active'
+    const otherTableName = 'pw_table_ctx_other'
+
+    await using _ = await withSetupCleanup(
+      async () => {
+        await createTable(activeTableName, 'pw_column')
+        await createTable(otherTableName, 'pw_column')
+      },
+      async () => {
+        await dropTable(activeTableName)
+        await dropTable(otherTableName)
+      }
+    )
+
+    const tableEditorLoadWait = createApiResponseWaiter(
+      page,
+      'pg-meta',
+      ref,
+      'query?key=entity-types-public-'
+    )
+    await page.goto(toUrl(`/project/${ref}/editor?schema=public`))
+    await tableEditorLoadWait
+
+    await page.getByRole('button', { name: `View ${activeTableName}`, exact: true }).click()
+    await page.waitForURL(/\/editor\/\d+\?schema=public$/)
+    const activeTableUrl = page.url()
+
+    // Right-clicking a table that isn't open disables the actions that only apply to the open table
+    const otherTableRow = page.getByRole('button', { name: `View ${otherTableName}`, exact: true })
+    await otherTableRow.click({ button: 'right' })
+    for (const name of ['Edit table', 'Duplicate table', 'Delete table']) {
+      await expect(
+        page.getByRole('menuitem', { name }),
+        `${name} should be disabled for a table that isn't open`
+      ).toBeDisabled()
+    }
+
+    // The other actions work on the row that was right-clicked, without opening it
+    await page.getByRole('menuitem', { name: 'Copy name' }).click()
+    await expectClipboardValue({ page, value: otherTableName, exact: true })
+    await expect(
+      page,
+      'Right-clicking another table should not navigate away from the open table'
+    ).toHaveURL(activeTableUrl)
+
+    // Right-clicking the open table lets you delete it
+    await page
+      .getByRole('button', { name: `View ${activeTableName}`, exact: true })
+      .click({ button: 'right' })
+    await page.getByRole('menuitem', { name: 'Delete table' }).click()
+    const confirmDialog = page.getByRole('dialog', {
+      name: `Confirm deletion of table "${activeTableName}"`,
+    })
+    await expect(confirmDialog, 'Delete confirmation should be for the open table').toBeVisible()
+    await confirmDialog.getByRole('button', { name: 'Cancel' }).click()
+    await expect(confirmDialog).not.toBeVisible()
+
+    // View policies links to the row that was right-clicked
+    await otherTableRow.click({ button: 'right' })
+    await page.getByRole('menuitem', { name: 'View policies' }).click()
+    await expect(
+      page,
+      'View policies should navigate to the policies page for the right-clicked table'
+    ).toHaveURL(/\/database\/policies\?schema=public&search=\d+$/)
+  })
+
   test('switching schemas work as expected', async ({ page, ref }) => {
     const authTableSso = 'identities'
     const authTableMfa = 'mfa_factors'

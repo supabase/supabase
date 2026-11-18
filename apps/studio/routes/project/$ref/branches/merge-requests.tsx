@@ -1,8 +1,42 @@
-import { createFileRoute } from '@tanstack/react-router'
+import { useQuery } from '@tanstack/react-query'
+import { createFileRoute, useNavigate } from '@tanstack/react-router'
+import { useParams } from 'common'
+import { partition } from 'lodash'
+import { ArrowRightIcon, GitMergeIcon, MoreVerticalIcon, ShieldIcon, XIcon } from 'lucide-react'
+import { PropsWithChildren } from 'react'
+import { toast } from 'sonner'
+import {
+  Button,
+  DropdownMenu,
+  DropdownMenuContent,
+  DropdownMenuItem,
+  DropdownMenuTrigger,
+  Tooltip,
+  TooltipContent,
+  TooltipTrigger,
+} from 'ui'
+import { GenericSkeletonLoader } from 'ui-patterns/ShimmeringLoader'
 
-import MergeRequestsPage, {
-  MergeRequestsPageWrapper,
-} from '@/pages/project/[ref]/branches/merge-requests'
+import {
+  BranchManagementSection,
+  BranchRow,
+} from '@/components/interfaces/BranchManagement/BranchPanels'
+import { BranchSelector } from '@/components/interfaces/BranchManagement/BranchSelector'
+import { PullRequestsEmptyState } from '@/components/interfaces/BranchManagement/EmptyStates'
+import { PageLayout } from '@/components/layouts/PageLayout/PageLayout'
+import { ScaffoldContainer, ScaffoldSection } from '@/components/layouts/Scaffold'
+import { AlertError } from '@/components/ui/AlertError'
+import { DocsButton } from '@/components/ui/DocsButton'
+import { NoPermission } from '@/components/ui/NoPermission'
+import { useBranchUpdateMutation } from '@/data/branches/branch-update-mutation'
+import { branchesQueryOptions, type Branch } from '@/data/branches/branches-query'
+import { useGitHubConnectionsQuery } from '@/data/integrations/github-connections-query'
+import { useBranchGrant } from '@/hooks/branches/useBranchGrant'
+import { useSelectedOrganizationQuery } from '@/hooks/misc/useSelectedOrganization'
+import { useSelectedProjectQuery } from '@/hooks/misc/useSelectedProject'
+import { DOCS_URL } from '@/lib/constants'
+import { useGrant } from '@/lib/grants'
+import { useTrack } from '@/lib/telemetry/track'
 
 export const Route = createFileRoute('/project/$ref/branches/merge-requests')({
   component: MergeRequestsRoute,
@@ -11,7 +45,374 @@ export const Route = createFileRoute('/project/$ref/branches/merge-requests')({
 function MergeRequestsRoute() {
   return (
     <MergeRequestsPageWrapper>
-      <MergeRequestsPage dehydratedState={undefined} />
+      <MergeRequestsPage />
     </MergeRequestsPageWrapper>
+  )
+}
+
+function MergeRequestsPage() {
+  const navigate = useNavigate()
+  const { ref } = useParams()
+  const { data: project } = useSelectedProjectQuery()
+  const { data: selectedOrg } = useSelectedOrganizationQuery()
+
+  const isBranch = project?.parent_project_ref !== undefined
+  const projectRef =
+    project !== undefined ? (isBranch ? project.parent_project_ref : ref) : undefined
+
+  const branchesGrant = useGrant('GET /v1/projects/{ref}/branches', { projectRef })
+  const updateBranchGrant = useBranchGrant('PATCH /v1/branches/{branch_id_or_ref}', {
+    projectRef,
+    isDefault: false,
+  })
+
+  const {
+    data: connections,
+    error: connectionsError,
+    isError: isErrorConnections,
+  } = useGitHubConnectionsQuery({
+    organizationId: selectedOrg?.id,
+  })
+
+  const {
+    data: branches = [],
+    error: branchesError,
+    isPending: isLoadingBranches,
+    isError: isErrorBranches,
+  } = useQuery(branchesQueryOptions({ projectRef, grant: branchesGrant.grant }))
+  const [[mainBranch], previewBranchesUnsorted] = partition(branches, (branch) => branch.is_default)
+  const previewBranches = previewBranchesUnsorted.sort((a, b) =>
+    new Date(a.updated_at) < new Date(b.updated_at) ? 1 : -1
+  )
+
+  const mergeRequestBranches = previewBranches.filter(
+    (branch) =>
+      branch.pr_number !== undefined ||
+      (branch.review_requested_at !== undefined && branch.review_requested_at !== null)
+  )
+
+  const currentBranch = branches?.find((branch) => branch.project_ref === ref)
+  const isCurrentBranchReadyForReview = !!currentBranch?.review_requested_at
+
+  const githubConnection = connections?.find((connection) => connection.project.ref === projectRef)
+  const repo = githubConnection?.repository.name ?? ''
+
+  const isError = isErrorConnections || isErrorBranches
+
+  const isGithubConnected = githubConnection !== undefined
+
+  const track = useTrack()
+
+  const { mutate: updateBranch, isPending: isUpdating } = useBranchUpdateMutation({
+    onError: () => {
+      toast.error(`Failed to update the branch`)
+    },
+  })
+
+  const handleMarkBranchForReview = ({
+    project_ref: branchRef,
+    parent_project_ref: projectRef,
+    persistent,
+  }: Branch) => {
+    if (updateBranchGrant.status !== 'granted') return
+    updateBranch(
+      {
+        grant: updateBranchGrant.grant,
+        branchRef,
+        projectRef,
+        requestReview: true,
+      },
+      {
+        onSuccess: () => {
+          toast.success('Merge request created')
+
+          track(
+            'branch_create_merge_request_button_clicked',
+            {
+              branchType: persistent ? 'persistent' : 'preview',
+              origin: 'merge_page',
+            },
+            { project: projectRef }
+          )
+
+          void navigate({ to: '/project/$ref/merge', params: { ref: branchRef } })
+        },
+      }
+    )
+  }
+
+  const handleCloseMergeRequest = ({
+    project_ref: branchRef,
+    parent_project_ref: projectRef,
+  }: Branch) => {
+    if (updateBranchGrant.status !== 'granted') return
+    updateBranch(
+      {
+        grant: updateBranchGrant.grant,
+        branchRef,
+        projectRef,
+        requestReview: false,
+      },
+      {
+        onSuccess: () => {
+          toast.success('Merge request closed')
+
+          track('branch_close_merge_request_button_clicked', undefined, {
+            project: projectRef,
+          })
+        },
+      }
+    )
+  }
+
+  const generateCreatePullRequestURL = (branch?: string) => {
+    if (githubConnection === undefined) return 'https://github.com'
+
+    return branch !== undefined
+      ? `https://github.com/${githubConnection.repository.name}/compare/${mainBranch?.git_branch}...${branch}`
+      : `https://github.com/${githubConnection.repository.name}/compare`
+  }
+
+  return (
+    <ScaffoldContainer>
+      <ScaffoldSection>
+        <div className="col-span-12">
+          <div className="space-y-4">
+            {branchesGrant.status === 'denied' && (
+              <NoPermission resourceText="view this project's branches" />
+            )}
+            {branchesGrant.status === 'error' && (
+              <AlertError
+                error={branchesGrant.error}
+                subject="Failed to check your permissions to view branches"
+              />
+            )}
+            {(branchesGrant.status === 'loading' || branchesGrant.status === 'granted') && (
+              <>
+                {isErrorConnections && (
+                  <AlertError
+                    error={connectionsError}
+                    subject="Failed to retrieve GitHub integration connection"
+                  />
+                )}
+
+                {isErrorBranches && (
+                  <AlertError error={branchesError} subject="Failed to retrieve preview branches" />
+                )}
+
+                {!isError && (
+                  <div className="space-y-4">
+                    {isBranch && !isCurrentBranchReadyForReview && currentBranch && (
+                      <div className="rounded-sm border rounded-lg bg-background px-6 py-4">
+                        <div className="flex items-center justify-between">
+                          <div className="flex items-center gap-2 text-sm text-foreground-light">
+                            <GitMergeIcon strokeWidth={1.5} size={16} className="text-primary" />
+                            <span className="text-foreground">{currentBranch.name}</span>
+                            last viewed
+                          </div>
+                          <Button
+                            variant="primary"
+                            size="tiny"
+                            loading={currentBranch && isUpdating}
+                            disabled={updateBranchGrant.status !== 'granted'}
+                            onClick={() =>
+                              currentBranch && handleMarkBranchForReview(currentBranch)
+                            }
+                          >
+                            Create merge request
+                          </Button>
+                        </div>
+                      </div>
+                    )}
+                    <BranchManagementSection
+                      header={`${mergeRequestBranches.length} merge requests`}
+                    >
+                      {isLoadingBranches ? (
+                        <div className="p-4">
+                          <GenericSkeletonLoader />
+                        </div>
+                      ) : mergeRequestBranches.length > 0 ? (
+                        mergeRequestBranches.map((branch) => {
+                          const isPR = branch.pr_number !== undefined
+                          const rowLink = isPR
+                            ? `https://github.com/${repo}/pull/${branch.pr_number}`
+                            : `/project/${branch.project_ref}/merge`
+                          return (
+                            <BranchRow
+                              isGithubConnected={isGithubConnected}
+                              key={branch.id}
+                              label={
+                                <div className="flex items-center gap-x-4">
+                                  {branch.name}
+                                  <ArrowRightIcon
+                                    size={14}
+                                    strokeWidth={1.5}
+                                    className="text-foreground-lighter"
+                                  />
+                                  <div className="flex items-center gap-x-2">
+                                    {branch.pr_number ? (
+                                      <p className="text-foreground-lighter">#{branch.pr_number}</p>
+                                    ) : (
+                                      <>
+                                        <ShieldIcon
+                                          size={14}
+                                          strokeWidth={1.5}
+                                          className="text-warning"
+                                        />
+                                        <p className="text-foreground-lighter">{mainBranch.name}</p>
+                                      </>
+                                    )}
+                                  </div>
+                                </div>
+                              }
+                              repo={repo}
+                              branch={branch}
+                              rowLink={rowLink}
+                              external={isPR}
+                              rowActions={
+                                // We always want to show the action button to close a merge request
+                                // when user has requested review from dashboard. It doesn't matter
+                                // whether the branch is linked to a GitHub PR.
+                                branch.review_requested_at && (
+                                  <DropdownMenu>
+                                    <Tooltip>
+                                      <TooltipTrigger asChild>
+                                        <DropdownMenuTrigger asChild>
+                                          <Button
+                                            aria-label="Manage merge request"
+                                            variant="text"
+                                            className="px-1"
+                                            icon={<MoreVerticalIcon />}
+                                            onClick={(e) => e.stopPropagation()}
+                                          />
+                                        </DropdownMenuTrigger>
+                                      </TooltipTrigger>
+                                      <TooltipContent side="bottom">
+                                        Manage merge request
+                                      </TooltipContent>
+                                    </Tooltip>
+                                    <DropdownMenuContent className="w-56" side="bottom" align="end">
+                                      <Tooltip>
+                                        <DropdownMenuItem
+                                          className="gap-x-2"
+                                          disabled={
+                                            isUpdating || updateBranchGrant.status !== 'granted'
+                                          }
+                                          onSelect={(e) => {
+                                            e.stopPropagation()
+                                            handleCloseMergeRequest(branch)
+                                          }}
+                                        >
+                                          <XIcon size={14} /> Close this merge request
+                                        </DropdownMenuItem>
+                                      </Tooltip>
+                                    </DropdownMenuContent>
+                                  </DropdownMenu>
+                                )
+                              }
+                            />
+                          )
+                        })
+                      ) : (
+                        <PullRequestsEmptyState
+                          url={generateCreatePullRequestURL()}
+                          projectRef={projectRef ?? '_'}
+                          branches={previewBranches}
+                          onBranchSelected={handleMarkBranchForReview}
+                          isUpdating={isUpdating}
+                          hasGithubConnection={!!githubConnection}
+                        />
+                      )}
+                    </BranchManagementSection>
+                  </div>
+                )}
+              </>
+            )}
+          </div>
+        </div>
+      </ScaffoldSection>
+    </ScaffoldContainer>
+  )
+}
+
+const MergeRequestsPageWrapper = ({ children }: PropsWithChildren<{}>) => {
+  const navigate = useNavigate()
+  const { ref } = useParams()
+  const { data: project } = useSelectedProjectQuery()
+
+  const isBranch = project?.parent_project_ref !== undefined
+  const projectRef =
+    project !== undefined ? (isBranch ? project.parent_project_ref : ref) : undefined
+
+  const branchesGrant = useGrant('GET /v1/projects/{ref}/branches', { projectRef })
+  const updateBranchGrant = useBranchGrant('PATCH /v1/branches/{branch_id_or_ref}', {
+    projectRef,
+    isDefault: false,
+  })
+
+  const { data: branches } = useQuery(
+    branchesQueryOptions({ projectRef, grant: branchesGrant.grant })
+  )
+  const previewBranches = (branches || []).filter((b) => !b.is_default)
+  const canListBranches = branchesGrant.status !== 'error' && branchesGrant.status !== 'denied'
+
+  const track = useTrack()
+
+  const { mutate: updateBranch, isPending: isUpdating } = useBranchUpdateMutation({
+    onError: () => {
+      toast.error(`Failed to update the branch`)
+    },
+  })
+
+  const handleMarkBranchForReview = ({
+    project_ref: branchRef,
+    parent_project_ref: projectRef,
+    persistent,
+  }: Branch) => {
+    if (updateBranchGrant.status !== 'granted') return
+    updateBranch(
+      {
+        grant: updateBranchGrant.grant,
+        branchRef,
+        projectRef,
+        requestReview: true,
+      },
+      {
+        onSuccess: () => {
+          toast.success('Merge request created')
+
+          track(
+            'branch_create_merge_request_button_clicked',
+            {
+              branchType: persistent ? 'persistent' : 'preview',
+              origin: 'branch_selector',
+            },
+            { project: projectRef }
+          )
+
+          void navigate({ to: '/project/$ref/merge', params: { ref: branchRef } })
+        },
+      }
+    )
+  }
+
+  return (
+    <PageLayout
+      title="Merge requests"
+      subtitle="Review and merge changes from one branch into another"
+      primaryActions={
+        canListBranches && (
+          <BranchSelector
+            branches={previewBranches}
+            onBranchSelected={handleMarkBranchForReview}
+            disabled={!projectRef || updateBranchGrant.status !== 'granted'}
+            isUpdating={isUpdating}
+          />
+        )
+      }
+      secondaryActions={<DocsButton href={`${DOCS_URL}/guides/platform/branching`} />}
+    >
+      {children}
+    </PageLayout>
   )
 }

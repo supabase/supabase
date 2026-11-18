@@ -19,7 +19,7 @@ vi.mock('common', async (importOriginal) => {
   }
 })
 
-vi.mock('@sentry/nextjs', () => ({ captureMessage: vi.fn(), captureException: vi.fn() }))
+vi.mock('@sentry/react', () => ({ captureMessage: vi.fn(), captureException: vi.fn() }))
 vi.mock('@/lib/telemetry/track', () => ({ useTrack: () => vi.fn() }))
 vi.mock('sonner', () => ({ toast: { error: vi.fn(), success: vi.fn() } }))
 

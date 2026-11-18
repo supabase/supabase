@@ -187,6 +187,22 @@ Use an admonition when the content needs emphasis, or prose when it doesn't.
 Put the information in the sentence, or in a linked section when it's substantial enough
 to need one.
 
+#### Expandable content
+
+For optional detail
+the reader can skip, such as a long walkthrough or reference table, use an HTML native
+`<details>` element with a `<summary>`. Don't hide content the reader needs to finish
+the task.
+
+```mdx
+<details>
+<summary>Install Postgres and psql</summary>
+
+Content goes here, separated from the tags by blank lines.
+
+</details>
+```
+
 ## Steps and code
 
 ### Procedures

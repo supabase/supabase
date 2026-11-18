@@ -16,6 +16,7 @@ import { useAuth, useUser } from './auth'
 import { getFlags as getDefaultConfigCatFlags } from './configcat'
 import { hasConsented } from './consent-state'
 import { get, post } from './fetchWrappers'
+import { gotrueClient } from './gotrue'
 import { ensurePlatformSuffix } from './helpers'
 import { useParams } from './hooks'
 
@@ -272,8 +273,14 @@ export const FeatureFlagProvider = ({
     // which subsequently all getValueAsync() calls are served from there
     processFlags()
 
+    // The flags endpoint refuses the pre-MFA token of a user with MFA enabled
+    const { data: auth } = gotrueClient.onAuthStateChange((event) => {
+      if (event === 'MFA_CHALLENGE_VERIFIED') processFlags()
+    })
+
     return () => {
       mounted = false
+      auth.subscription.unsubscribe()
     }
   }, [
     enabled,

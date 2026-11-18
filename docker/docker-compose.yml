@@ -224,6 +224,12 @@ services:
       # Optional, defaults to API_EXTERNAL_URL if not set
       # GOTRUE_SAML_EXTERNAL_URL: ${SAML_EXTERNAL_URL}
 
+      # OAuth 2.1 server
+      # See: https://supabase.com/docs/guides/self-hosting/self-hosted-oauth-server
+      # GOTRUE_OAUTH_SERVER_ENABLED: ${OAUTH_SERVER_ENABLED:-false}
+      # GOTRUE_OAUTH_SERVER_AUTHORIZATION_PATH: ${OAUTH_SERVER_AUTHORIZATION_PATH}
+      # GOTRUE_OAUTH_SERVER_ALLOW_DYNAMIC_REGISTRATION: ${OAUTH_SERVER_ALLOW_DYNAMIC_REGISTRATION:-false}
+
       # Uncomment to enable custom access token hook.
       # See: https://supabase.com/docs/guides/auth/auth-hooks for
       # full list of hooks and additional details about custom_access_token_hook

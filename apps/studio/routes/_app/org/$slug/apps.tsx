@@ -1,7 +1,14 @@
 import { createFileRoute } from '@tanstack/react-router'
+import {
+  PageHeader,
+  PageHeaderDescription,
+  PageHeaderMeta,
+  PageHeaderSummary,
+  PageHeaderTitle,
+} from 'ui-patterns/PageHeader'
 
+import { OAuthApps } from '@/components/interfaces/Organization/OAuthApps/OAuthApps'
 import { OrganizationSettingsLayout } from '@/components/layouts/ProjectLayout/OrganizationSettingsLayout'
-import OrgOAuthAppsPage from '@/pages/org/[slug]/apps'
 
 export const Route = createFileRoute('/_app/org/$slug/apps')({
   component: OrgApps,
@@ -13,7 +20,25 @@ export const Route = createFileRoute('/_app/org/$slug/apps')({
 function OrgApps() {
   return (
     <OrganizationSettingsLayout>
-      <OrgOAuthAppsPage dehydratedState={undefined} />
+      <OrgOAuthAppsPage />
     </OrganizationSettingsLayout>
+  )
+}
+
+function OrgOAuthAppsPage() {
+  return (
+    <>
+      <PageHeader size="default">
+        <PageHeaderMeta>
+          <PageHeaderSummary>
+            <PageHeaderTitle>OAuth Apps</PageHeaderTitle>
+            <PageHeaderDescription>
+              Published and authorized OAuth applications
+            </PageHeaderDescription>
+          </PageHeaderSummary>
+        </PageHeaderMeta>
+      </PageHeader>
+      <OAuthApps />
+    </>
   )
 }
