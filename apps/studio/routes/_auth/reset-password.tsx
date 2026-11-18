@@ -1,20 +1,30 @@
 import { createFileRoute } from '@tanstack/react-router'
 
+import { ResetPasswordForm } from '@/components/interfaces/SignIn/ResetPasswordForm'
 import { ForgotPasswordLayout } from '@/components/layouts/SignInLayout/ForgotPasswordLayout'
-import ResetPasswordPage from '@/pages/reset-password'
+import { withAuth } from '@/hooks/misc/withAuth'
 
 export const Route = createFileRoute('/_auth/reset-password')({
   component: ResetPassword,
 })
 
 function ResetPassword() {
-  // Next page default export is already wrapped in withAuth — session guard runs inline.
   return (
     <ForgotPasswordLayout
       heading="Change your password"
       subheading="Welcome back! Choose a new strong password and save it to proceed"
     >
-      <ResetPasswordPage dehydratedState={undefined} />
+      <ResetPasswordPageWithAuth />
     </ForgotPasswordLayout>
   )
 }
+
+function ResetPasswordPage() {
+  return (
+    <div className="flex flex-col gap-4">
+      <ResetPasswordForm />
+    </div>
+  )
+}
+
+const ResetPasswordPageWithAuth = withAuth(ResetPasswordPage)
