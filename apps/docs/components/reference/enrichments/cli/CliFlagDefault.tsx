@@ -7,8 +7,8 @@ type CliFlag = {
 export function CliFlagDefault({ flag }: { flag: CliFlag }) {
   const value = flag.default_value
   if (value == null || value === '') return null
-  // The CLI spec includes a <metavariable> in the name of flags that take a value.
-  if (!flag.required && String(value) === 'false' && !flag.name.includes('<')) return null
+  // Required values use " <value>"; optional values use "[=<value>]" in the CLI spec.
+  if (!flag.required && String(value) === 'false' && !flag.name.includes(' <')) return null
 
   return (
     <p className="text-sm text-foreground-light">

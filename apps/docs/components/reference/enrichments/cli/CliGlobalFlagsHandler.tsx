@@ -18,7 +18,7 @@ const CliGlobalFlagsHandler = () => {
   const processedFlags = spec.flags.map((flag: any) => {
     if (flag.id === 'profile' && !cliDisableCustomProfiles) {
       return {
-        id: 'profile',
+        ...flag,
         name: `--profile ${cliProfile}`,
         description: `use ${cliProfile} profile for connecting to Supabase API`,
       }
