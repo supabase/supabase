@@ -63,6 +63,8 @@ When an HTTP request is sent to Edge Functions, you can use Supabase Auth to sec
 This creates a new function at `supabase/functions/hello-world/index.ts` with this starter code:
 
 ```tsx
+import { withSupabase } from 'npm:@supabase/server@1'
+
 export default {
   fetch: withSupabase({ auth: ['publishable', 'secret'] }, async (req, ctx) => {
     const { name } = await req.json()
@@ -87,7 +89,7 @@ The `supabase functions new` command also optionally creates Deno configuration 
 After starting Docker, start the local development server to test your function:
 
 ```bash
-supabase start  # Start all Supabase services
+supabase start
 supabase functions serve hello-world
 ```
 
