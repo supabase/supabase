@@ -1,4 +1,5 @@
 import { fireEvent, screen } from '@testing-library/react'
+import { mockIntersectionObserver } from 'jsdom-testing-mocks'
 import { describe, expect, test, vi } from 'vitest'
 
 import { ProjectMultiSelect } from './ProjectMultiSelect'
@@ -20,13 +21,23 @@ const MANY_PROJECTS: OAuthAppsAuthorizeOrganizationProject[] = Array.from(
   })
 )
 
-const refsUpTo = (count: number) => MANY_PROJECTS.slice(0, count).map((project) => project.ref)
+const projectsUpTo = (count: number) => MANY_PROJECTS.slice(0, count)
 
 const CAP_HELPER_TEXT = 'Maximum reached. Deselect a project to choose a different one.'
 
+mockIntersectionObserver()
+
 describe('ProjectMultiSelect', () => {
   test('shows a placeholder when nothing is selected', () => {
-    customRender(<ProjectMultiSelect projects={PROJECTS} selectedRefs={[]} onChange={vi.fn()} />)
+    customRender(
+      <ProjectMultiSelect
+        projects={PROJECTS}
+        selectedProjects={[]}
+        onChange={vi.fn()}
+        onSearchChange={vi.fn()}
+        onLoadMore={vi.fn()}
+      />
+    )
 
     expect(screen.getByRole('combobox')).toHaveTextContent('Select projects...')
     expect(
@@ -37,7 +48,13 @@ describe('ProjectMultiSelect', () => {
 
   test('renders a single selected project by name in the trigger', () => {
     customRender(
-      <ProjectMultiSelect projects={PROJECTS} selectedRefs={['project-1']} onChange={vi.fn()} />
+      <ProjectMultiSelect
+        projects={PROJECTS}
+        selectedProjects={[PROJECTS[0]]}
+        onChange={vi.fn()}
+        onSearchChange={vi.fn()}
+        onLoadMore={vi.fn()}
+      />
     )
 
     const trigger = screen.getByRole('combobox')
@@ -49,8 +66,10 @@ describe('ProjectMultiSelect', () => {
     customRender(
       <ProjectMultiSelect
         projects={PROJECTS}
-        selectedRefs={['project-1', 'project-2']}
+        selectedProjects={PROJECTS}
         onChange={vi.fn()}
+        onSearchChange={vi.fn()}
+        onLoadMore={vi.fn()}
       />
     )
 
@@ -63,7 +82,13 @@ describe('ProjectMultiSelect', () => {
 
   test('collapses the projects past the badge limit into a counter', () => {
     customRender(
-      <ProjectMultiSelect projects={MANY_PROJECTS} selectedRefs={refsUpTo(3)} onChange={vi.fn()} />
+      <ProjectMultiSelect
+        projects={MANY_PROJECTS}
+        selectedProjects={projectsUpTo(3)}
+        onChange={vi.fn()}
+        onSearchChange={vi.fn()}
+        onLoadMore={vi.fn()}
+      />
     )
 
     const trigger = screen.getByRole('combobox')
@@ -76,7 +101,15 @@ describe('ProjectMultiSelect', () => {
 
   test('fires onChange with the toggled id added', () => {
     const onChange = vi.fn()
-    customRender(<ProjectMultiSelect projects={PROJECTS} selectedRefs={[]} onChange={onChange} />)
+    customRender(
+      <ProjectMultiSelect
+        projects={PROJECTS}
+        selectedProjects={[]}
+        onChange={onChange}
+        onSearchChange={vi.fn()}
+        onLoadMore={vi.fn()}
+      />
+    )
 
     fireEvent.click(screen.getByRole('combobox'))
     fireEvent.click(screen.getByText('production'))
@@ -87,7 +120,13 @@ describe('ProjectMultiSelect', () => {
   test('fires onChange with the toggled id removed', () => {
     const onChange = vi.fn()
     customRender(
-      <ProjectMultiSelect projects={PROJECTS} selectedRefs={['project-1']} onChange={onChange} />
+      <ProjectMultiSelect
+        projects={PROJECTS}
+        selectedProjects={[PROJECTS[0]]}
+        onChange={onChange}
+        onSearchChange={vi.fn()}
+        onLoadMore={vi.fn()}
+      />
     )
 
     fireEvent.click(screen.getByRole('combobox'))
@@ -100,9 +139,11 @@ describe('ProjectMultiSelect', () => {
     customRender(
       <ProjectMultiSelect
         projects={PROJECTS}
-        selectedRefs={[]}
+        selectedProjects={[]}
         onChange={vi.fn()}
         error="Must select at least one project to authorize."
+        onSearchChange={vi.fn()}
+        onLoadMore={vi.fn()}
       />
     )
 
@@ -111,7 +152,15 @@ describe('ProjectMultiSelect', () => {
   })
 
   test('search filters the visible project rows', () => {
-    customRender(<ProjectMultiSelect projects={PROJECTS} selectedRefs={[]} onChange={vi.fn()} />)
+    customRender(
+      <ProjectMultiSelect
+        projects={PROJECTS}
+        selectedProjects={[]}
+        onChange={vi.fn()}
+        onSearchChange={vi.fn()}
+        onLoadMore={vi.fn()}
+      />
+    )
 
     fireEvent.click(screen.getByRole('combobox'))
     expect(screen.getByText('production')).toBeInTheDocument()
@@ -126,7 +175,15 @@ describe('ProjectMultiSelect', () => {
   })
 
   test('has no select-all control', () => {
-    customRender(<ProjectMultiSelect projects={PROJECTS} selectedRefs={[]} onChange={vi.fn()} />)
+    customRender(
+      <ProjectMultiSelect
+        projects={PROJECTS}
+        selectedProjects={[]}
+        onChange={vi.fn()}
+        onSearchChange={vi.fn()}
+        onLoadMore={vi.fn()}
+      />
+    )
 
     fireEvent.click(screen.getByRole('combobox'))
 
@@ -142,8 +199,10 @@ describe('ProjectMultiSelect', () => {
       customRender(
         <ProjectMultiSelect
           projects={MANY_PROJECTS}
-          selectedRefs={refsUpTo(count)}
+          selectedProjects={projectsUpTo(count)}
           onChange={vi.fn()}
+          onSearchChange={vi.fn()}
+          onLoadMore={vi.fn()}
         />
       )
 
@@ -154,7 +213,13 @@ describe('ProjectMultiSelect', () => {
   test('at nine selected the cap is not yet reached and a tenth can be added', () => {
     const onChange = vi.fn()
     customRender(
-      <ProjectMultiSelect projects={MANY_PROJECTS} selectedRefs={refsUpTo(9)} onChange={onChange} />
+      <ProjectMultiSelect
+        projects={MANY_PROJECTS}
+        selectedProjects={projectsUpTo(9)}
+        onChange={onChange}
+        onSearchChange={vi.fn()}
+        onLoadMore={vi.fn()}
+      />
     )
 
     expect(screen.getByText('9/10')).toBeInTheDocument()
@@ -163,12 +228,18 @@ describe('ProjectMultiSelect', () => {
     fireEvent.click(screen.getByRole('combobox'))
     fireEvent.click(screen.getByText('project 10'))
 
-    expect(onChange).toHaveBeenCalledWith(refsUpTo(10))
+    expect(onChange).toHaveBeenCalledWith(projectsUpTo(10).map((p) => p.ref))
   })
 
   test('at the cap it shows 10/10 and the helper text', () => {
     customRender(
-      <ProjectMultiSelect projects={MANY_PROJECTS} selectedRefs={refsUpTo(10)} onChange={vi.fn()} />
+      <ProjectMultiSelect
+        projects={MANY_PROJECTS}
+        selectedProjects={projectsUpTo(10)}
+        onChange={vi.fn()}
+        onSearchChange={vi.fn()}
+        onLoadMore={vi.fn()}
+      />
     )
 
     expect(screen.getByText('10/10')).toBeInTheDocument()
@@ -180,8 +251,10 @@ describe('ProjectMultiSelect', () => {
     customRender(
       <ProjectMultiSelect
         projects={MANY_PROJECTS}
-        selectedRefs={refsUpTo(10)}
+        selectedProjects={projectsUpTo(10)}
         onChange={onChange}
+        onSearchChange={vi.fn()}
+        onLoadMore={vi.fn()}
       />
     )
 
@@ -199,18 +272,30 @@ describe('ProjectMultiSelect', () => {
     const { rerender } = customRender(
       <ProjectMultiSelect
         projects={MANY_PROJECTS}
-        selectedRefs={refsUpTo(10)}
+        selectedProjects={projectsUpTo(10)}
         onChange={onChange}
+        onSearchChange={vi.fn()}
+        onLoadMore={vi.fn()}
       />
     )
 
     fireEvent.click(screen.getByRole('combobox'))
     fireEvent.click(screen.getByRole('option', { name: 'project 1' }))
 
-    expect(onChange).toHaveBeenCalledWith(refsUpTo(10).slice(1))
+    expect(onChange).toHaveBeenCalledWith(
+      projectsUpTo(10)
+        .slice(1)
+        .map((p) => p.ref)
+    )
 
     rerender(
-      <ProjectMultiSelect projects={MANY_PROJECTS} selectedRefs={refsUpTo(9)} onChange={onChange} />
+      <ProjectMultiSelect
+        projects={MANY_PROJECTS}
+        selectedProjects={projectsUpTo(9)}
+        onChange={onChange}
+        onSearchChange={vi.fn()}
+        onLoadMore={vi.fn()}
+      />
     )
 
     expect(screen.queryByText(CAP_HELPER_TEXT)).not.toBeInTheDocument()
