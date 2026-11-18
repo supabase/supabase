@@ -91,6 +91,7 @@ test('shows worker starts and requests with their API labels', async () => {
     },
   })
   renderSection()
+  expect(screen.getByRole('status')).toHaveTextContent('Loading worker metrics')
   const starts = await screen.findByRole('region', { name: 'Worker starts' })
   expect(within(starts).getByText(/warm/)).toBeInTheDocument()
   expect(within(starts).getByText(/cold/)).toBeInTheDocument()
@@ -112,4 +113,5 @@ test('keeps worker failures recoverable', async () => {
   renderSection()
   expect(await screen.findByText('Failed to retrieve worker metrics')).toBeInTheDocument()
   expect(screen.getByRole('button', { name: 'Retry' })).toBeInTheDocument()
+  expect(screen.getByRole('status')).toHaveTextContent('Could not load worker metrics')
 })

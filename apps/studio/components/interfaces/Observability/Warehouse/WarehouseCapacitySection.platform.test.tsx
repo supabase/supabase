@@ -82,6 +82,7 @@ test('shows capacity limits and labelled rejection reasons without dropping zero
     },
   })
   renderSection()
+  expect(screen.getByRole('status')).toHaveTextContent('Loading capacity metrics')
   expect(await screen.findByRole('region', { name: 'Worker slots' })).toBeInTheDocument()
   expect(screen.getByRole('list', { name: 'Rejected requests series' })).toHaveTextContent(
     'Rejected requests · disabledRejected requests · overloaded'
@@ -104,6 +105,7 @@ test('keeps capacity errors recoverable', async () => {
   renderSection()
   expect(await screen.findByText('Failed to retrieve capacity metrics')).toBeInTheDocument()
   expect(screen.getByRole('button', { name: 'Retry' })).toBeInTheDocument()
+  expect(screen.getByRole('status')).toHaveTextContent('Could not load capacity metrics')
 })
 
 test('limits large labelled responses and tells the user which series are shown', () => {

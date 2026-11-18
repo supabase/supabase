@@ -396,15 +396,13 @@ describe('buildSentryClientOptions', () => {
     })
     expect(withRelease.release).toBe('abc123')
 
-    // The key must be ABSENT when no release is passed: on the Next build a
-    // `release: undefined` entry would override the release injected into
-    // @sentry/nextjs's init by withSentryConfig (options are spread last).
+    // The key is absent when no release is passed.
     const withoutRelease = buildSentryClientOptions({ includeThirdPartyErrorFilter: true })
     expect('release' in withoutRelease).toBe(false)
   })
 
   it('includes the third-party error filter only when the build annotates frames', () => {
-    // Next build: withSentryConfig injects the applicationKey metadata.
+    // Builds whose bundler annotates frames with the applicationKey.
     expect(
       getIntegrationNames(buildSentryClientOptions({ includeThirdPartyErrorFilter: true }))
     ).toContain('ThirdPartyErrorsFilter')

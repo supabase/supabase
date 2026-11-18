@@ -179,7 +179,9 @@ export const ComputeInstanceOverviewTab = ({ instance }: ComputeInstanceOverview
             )}
             <SettingsRow label="Listening port">
               <span className="font-mono text-xs text-foreground-light">
-                $PORT → {LISTENING_PORT}
+                {instance.access === 'public'
+                  ? `$PORT → ${LISTENING_PORT}`
+                  : 'None (background worker)'}
               </span>
             </SettingsRow>
           </div>
@@ -214,26 +216,30 @@ export const ComputeInstanceOverviewTab = ({ instance }: ComputeInstanceOverview
         </PageSectionContent>
       </PageSection>
 
-      <PageSection>
-        <PageSectionMeta>
-          <PageSectionSummary>
-            <PageSectionTitle>How to call</PageSectionTitle>
-            <PageSectionDescription>Call the instance over its gateway URL.</PageSectionDescription>
-          </PageSectionSummary>
-        </PageSectionMeta>
-        <PageSectionContent>
-          <ComputeInstanceSnippetTabs
-            input={{
-              name: instance.name,
-              runtime: instance.runtime,
-              size: instance.size,
-              access: instance.access,
-              instances: instance.declaredInstances,
-            }}
-            tabs={COMPUTE_INSTANCE_CALL_TABS}
-          />
-        </PageSectionContent>
-      </PageSection>
+      {instance.access === 'public' && (
+        <PageSection>
+          <PageSectionMeta>
+            <PageSectionSummary>
+              <PageSectionTitle>How to call</PageSectionTitle>
+              <PageSectionDescription>
+                Call the instance over its gateway URL.
+              </PageSectionDescription>
+            </PageSectionSummary>
+          </PageSectionMeta>
+          <PageSectionContent>
+            <ComputeInstanceSnippetTabs
+              input={{
+                name: instance.name,
+                runtime: instance.runtime,
+                size: instance.size,
+                access: instance.access,
+                instances: instance.declaredInstances,
+              }}
+              tabs={COMPUTE_INSTANCE_CALL_TABS}
+            />
+          </PageSectionContent>
+        </PageSection>
+      )}
 
       <PageSection>
         <PageSectionMeta>

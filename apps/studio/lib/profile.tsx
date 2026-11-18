@@ -1,4 +1,4 @@
-import * as Sentry from '@sentry/nextjs'
+import * as Sentry from '@sentry/react'
 import { useQueryClient } from '@tanstack/react-query'
 import { useIsLoggedIn, useUser } from 'common'
 import { useRouter } from 'next/router'
