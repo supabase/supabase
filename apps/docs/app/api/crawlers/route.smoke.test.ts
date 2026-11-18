@@ -18,7 +18,7 @@ describe('prod smoke test: crawler pages return correct data', () => {
 
     const $ = load(text)
     const title = $('title').text()
-    expect(title).toBe('JavaScript: Less than or equal to a range | Supabase Docs')
+    expect(title).toBe('JavaScript: rangeLte | Supabase Docs')
 
     const metaDescription = $('meta[name="description"]')
     expect(metaDescription.attr('content')).toBe(
@@ -54,7 +54,7 @@ describe('prod smoke test: crawler pages return correct data', () => {
 
     const $ = load(text)
     const h1 = $('h1').text()
-    expect(h1).toBe('JavaScript: Less than or equal to a range')
+    expect(h1).toBe('JavaScript: rangeLte')
 
     const description = $('h1').next().text()
     expect(description).toBe(
