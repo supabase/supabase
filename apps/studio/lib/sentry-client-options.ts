@@ -6,7 +6,10 @@ import { hasConsented } from 'common'
 import { IS_PLATFORM } from 'common/constants/environment'
 import {
   BROWSER_NOISE_IGNORE_ERRORS,
+  BROWSER_TRANSLATION_SAMPLE_RATE,
   filterSentryEvent,
+  isBrowserTranslationDomError,
+  isPageTranslated,
   isSentryErrorBoundaryCrash,
 } from 'common/sentry'
 
@@ -127,6 +130,24 @@ export function shouldDropForSampleRate(
   return random() >= rate
 }
 
+/**
+ * Tags browser-translation DOM errors (insert/remove node crashes) so they are sampled at
+ * `BROWSER_TRANSLATION_SAMPLE_RATE` by `shouldDropForSampleRate` and easy to filter in Sentry.
+ * `page_translated` is best-effort. Leaves a `sample_rate` that is already set untouched.
+ */
+export function tagBrowserTranslationError(
+  event: Sentry.Event,
+  pageTranslated: boolean = isPageTranslated()
+): void {
+  if (!isBrowserTranslationDomError(event)) return
+  event.tags = {
+    sample_rate: BROWSER_TRANSLATION_SAMPLE_RATE,
+    ...event.tags,
+    browser_translation: true,
+    page_translated: pageTranslated,
+  }
+}
+
 export function buildSentryClientOptions({
   includeThirdPartyErrorFilter,
   extraIntegrations = [],
@@ -182,6 +203,9 @@ export function buildSentryClientOptions({
     beforeSend(rawEvent, hint) {
       const event = applyStudioErrorPolicy(rawEvent, hint.originalException)
       if (!event) return null
+
+      // Must run before `filterSentryEvent`, which skips its 1% sampling for tagged events.
+      tagBrowserTranslationError(event)
 
       if (!filterSentryEvent(event, { isPlatform: IS_PLATFORM, hasConsent: hasConsented() })) {
         return null
