@@ -1090,7 +1090,7 @@ SECURITY DEFINER SET search_path = ''
 AS $$
 BEGIN
     PERFORM realtime.broadcast_changes(
-	    'topic:' || NEW.id::text,   -- topic
+	    'topic:' || coalesce(NEW.id, OLD.id)::text,   -- topic
 		   TG_OP,                          -- event
 		   TG_OP,                          -- operation
 		   TG_TABLE_NAME,                  -- table
