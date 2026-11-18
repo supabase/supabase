@@ -920,6 +920,7 @@ The fields below are repeated for each provider. Substitute `<PROVIDER>` with on
 | `REBALANCE_CHECK_INTERVAL_IN_MS` | integer (ms) | Self-hosted | Interval (ms) used to check whether a process is in the right region. | Default: 10 minutes. |
 | `REGION` | string | Self-hosted | Region name for the current node. Used in logs, latency reporting, and region-aware routing. | No default. Also rendered in the admin dashboard layout. |
 | `REGION_MAPPING` | JSON | Self-hosted | Custom mapping of platform regions to tenant regions, as a JSON object with string keys and values. | When unset, the hardcoded default mapping is used. Must be a JSON object or boot fails. |
+| `RELEASE_COOKIE` | string | Self-hosted | Erlang distribution cookie: the shared secret cluster nodes use to trust each other. | When unset, the self-hosted Realtime entrypoint (`volumes/realtime/docker-entrypoint.sh`) generates a random ephemeral cookie on start. Set it explicitly (same value on every node, 63 characters or fewer) only for a multi-node cluster; when discovery is enabled it also serves as the libcluster Postgres `LISTEN` channel name, which Postgres caps at 63 bytes. |
 | `REQUEST_ID_BAGGAGE_KEY` | string | Self-hosted | OTEL Baggage key used as the request ID. | Default: `request-id`. |
 | `RPC_TIMEOUT` | integer (ms) | Self-hosted | Timeout (ms) for generic RPC calls. | Default: 30 seconds. |
 | `RUN_JANITOR` | boolean | Both | Enable the tenant janitor and metrics cleaner tasks. | Default: `false`. |
@@ -1438,8 +1439,8 @@ The fields below are repeated for each provider. Substitute `<PROVIDER>` with on
 | `PROXY_PORT` | integer | | Generic Postgres proxy listener port (mode: `proxy`). | Default: `5412` |
 | `PROXY_PORT_SESSION` | integer | | Postgres session-mode proxy listener port. | Default: `5432` |
 | `PROXY_PORT_TRANSACTION` | integer | | Postgres transaction-mode proxy listener port. | Default: `6543` |
-| `REGION` | string | Self-hosted | Region label used in logger metadata and as the default for `LOCATION_KEY`. | Falls back to `FLY_REGION`. Self-hosted: `local` |
-| `RELEASE_COOKIE` | string | Self-hosted | Erlang distribution cookie: the shared secret cluster nodes use to trust each other. | When unset, the self-hosted Realtime entrypoint generates a random ephemeral cookie on start. Set it explicitly (same value on every node, 63 characters or fewer) only for a multi-node cluster; it also serves as the libcluster Postgres `LISTEN` channel name, which Postgres caps at 63 bytes. |
+| `REGION` | string | Self-hosted | Region label used in logger metadata and as the default for `LOCATION_KEY`. Also used in the libcluster Postgres channel name when `CLUSTER_ID`/`LOCATION_ID` are unset (Supavisor builds `supavisor_<region>_<maj>_<min>`). | Falls back to `FLY_REGION`. Self-hosted: `local` |
+| `RELEASE_COOKIE` | string | | Erlang distribution cookie. Read by the release scripts. | Optional |
 | `RELEASE_DISTRIBUTION` | string | | Erlang release distribution mode. Set to `name` by `rel/env.sh.eex`. | Default: `name` |
 | `RELEASE_NODE` | string | | Erlang release node name (`<NODE_NAME>@<NODE_IP>`). Set by `rel/env.sh.eex`. | Computed at startup |
 | `RELEASE_ROOT` | path | | Release root directory. Used to locate `runtime.exs` during hot upgrades. | Set by the release scripts |

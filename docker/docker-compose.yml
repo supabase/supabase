@@ -337,7 +337,7 @@ services:
       RUN_JANITOR: "true"
       DISABLE_HEALTHCHECK_LOGGING: "true"
     volumes:
-      - ./volumes/realtime/docker-entrypoint.sh:/docker-entrypoint.sh:ro
+      - ./volumes/realtime/docker-entrypoint.sh:/docker-entrypoint.sh:ro,z
     # Overriding entrypoint clears the image's default command, so restore it.
     entrypoint: ["/bin/sh", "/docker-entrypoint.sh"]
     command: ["/app/bin/server"]
