@@ -6,6 +6,7 @@ import { CELL_HEIGHT, CELL_WIDTH, clamp, fitEdges, uniformEdges } from '../lib/a
 import { drawFluid } from '../lib/ascii/fluid'
 import { circlePoints, fillGlyphPath, GLYPH_FONT } from '../lib/ascii/glyph-path'
 import { createLayer, sizeLayers, tracePolygon } from '../lib/ascii/layer'
+import { observeTheme, readProbeColor } from '../lib/ascii/probes'
 import { easeInOutCubic } from '../lib/ascii/warp'
 import {
   compositionBounds,
@@ -20,7 +21,7 @@ import {
   type IsoView,
 } from 'ui-patterns/IsoShape/IsoShape.geometry'
 import { FLUID_RISE_MS } from 'ui-patterns/IsoShape/IsoShape.glyphs'
-import { ColorProbes, observeTheme, readProbeColor } from './ColorProbes'
+import { ColorProbes } from './ColorProbes'
 
 export interface CoverCanvasProps {
   boxes: IsoBox[]

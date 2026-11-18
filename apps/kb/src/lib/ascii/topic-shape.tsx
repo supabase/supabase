@@ -20,7 +20,8 @@ import { circlePoints, fillGlyphPath, GLYPH_FONT } from './glyph-path'
 import { sizeLayers } from './layer'
 import { easeInOutCubic } from './warp'
 import type { Topic } from '../topics'
-import { ColorProbes, observeTheme, readProbeColor } from '../../components/ColorProbes'
+import { ColorProbes } from '../../components/ColorProbes'
+import { observeTheme, readProbeColor } from './probes'
 
 export interface TopicShapeProps {
   topic: Topic

@@ -4,7 +4,7 @@ import { flattenColor } from 'ui-patterns/GlyphLines/flatten-color'
 
 import { fillGlyphPath, GLYPH_FONT } from './glyph-path'
 import { sizeLayers } from './layer'
-import { observeTheme } from '../../components/ColorProbes'
+import { observeTheme } from './probes'
 
 export interface FrameGlyphsProps {
   text: string

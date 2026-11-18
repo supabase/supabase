@@ -19,7 +19,8 @@ import {
   type WarpPoint,
   type WarpShape,
 } from './warp'
-import { ColorProbes, observeTheme, readProbeColor } from '../../components/ColorProbes'
+import { ColorProbes } from '../../components/ColorProbes'
+import { observeTheme, readProbeColor } from './probes'
 
 export interface WarpCanvasProps {
   anchorRef: RefObject<HTMLElement | null>
