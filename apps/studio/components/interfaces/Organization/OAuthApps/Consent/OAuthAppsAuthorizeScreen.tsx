@@ -307,23 +307,6 @@ export const OAuthAppsAuthorizeScreen = ({
     )
   }
 
-  if (isErrorInitialProjects) {
-    return (
-      <InterstitialLayout
-        logo={<DestinationLogo name={request.name} />}
-        title={`Authorize ${request.name}`}
-        description="This application wants to access your Supabase Account"
-      >
-        <div className="flex flex-col gap-6 px-6 pb-6">
-          <AlertError
-            error={initialProjectsError}
-            subject="We couldn't find the organization for this application authorization"
-          />
-        </div>
-      </InterstitialLayout>
-    )
-  }
-
   if (isErrorMemberOrg) {
     return (
       <InterstitialLayout
@@ -335,6 +318,23 @@ export const OAuthAppsAuthorizeScreen = ({
           <AlertError
             error={memberOrgError}
             subject="We couldn't find the organization for this application authorization"
+          />
+        </div>
+      </InterstitialLayout>
+    )
+  }
+
+  if (isErrorInitialProjects && isProjectScopingModeEnabled) {
+    return (
+      <InterstitialLayout
+        logo={<DestinationLogo name={request.name} />}
+        title={`Authorize ${request.name}`}
+        description="This application wants to access your Supabase Account"
+      >
+        <div className="flex flex-col gap-6 px-6 pb-6">
+          <AlertError
+            error={initialProjectsError}
+            subject="Failed to load projects for this authorization"
           />
         </div>
       </InterstitialLayout>
