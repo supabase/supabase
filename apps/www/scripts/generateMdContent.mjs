@@ -133,7 +133,7 @@ async function ingestMdxSection(section) {
         const slug = `${section.urlPrefix}/${deriveSlug(filename, section.stripDatePrefix)}`
         const body = await mdxBodyToMarkdown(parsed.content)
         const content = matter.stringify(body, pickFields(data, section.frontmatterFields))
-        return { slug, content }
+        return { slug, content, data }
       } catch (err) {
         throw new Error(`${section.dir}/${filename}: ${err.message}`, { cause: err })
       }
@@ -167,7 +167,16 @@ for (const section of MDX_SECTIONS) {
   console.log(`📚 Ingesting ${section.dir}...`)
   const sectionEntries = await ingestMdxSection(section)
   console.log(`   ${sectionEntries.length} entries`)
-  mdxEntries.push(...sectionEntries)
+  mdxEntries.push(...sectionEntries.map(({ slug, content }) => ({ slug, content })))
+  if (section.urlPrefix === 'customers') {
+    const links = sectionEntries
+      .sort((a, b) => String(b.data.date).localeCompare(String(a.data.date)))
+      .map((e) => `- [${e.data.name}](https://supabase.com/${e.slug}.md): ${e.data.title}`)
+    mdxEntries.push({
+      slug: 'customers',
+      content: `# Supabase Customer Stories\n\n${links.join('\n')}\n`,
+    })
+  }
 }
 
 const allEntries = [...staticEntries, ...mdxEntries]
