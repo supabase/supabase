@@ -1,0 +1,148 @@
+---
+id: 'api-keys-reference'
+title: 'API keys reference'
+description: 'Look up Supabase API key types and formats, the rules for handling secret keys, and the known limitations of publishable and secret keys.'
+---
+
+This page lists the API key types, the other ways to get your keys, the rules for handling secret keys, and the known limitations of publishable and secret keys.
+
+## Key types
+
+Supabase supports four types of API keys:
+
+| Type                                                       | Format                                                           | Privileges | Availability                                              | Use                                                                                                                                                                                                                                                                                                     |
+| ---------------------------------------------------------- | ---------------------------------------------------------------- | ---------- | --------------------------------------------------------- | ------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
+| Publishable&nbsp;key                                       | <span className="whitespace-nowrap!">`sb_publishable_...`</span> | Low        | <span className="whitespace-nowrap!">Platform, CLI</span> | Safe to expose online: web page, mobile or desktop app, GitHub actions, CLIs, source code.                                                                                                                                                                                                              |
+| Secret&nbsp;keys                                           | <span className="whitespace-nowrap!">`sb_secret_...`</span>      | Elevated   | <span className="whitespace-nowrap!">Platform, CLI</span> | Only use in backend components of your app, such as servers, APIs with their own authorization checks, [Edge Functions](/docs/guides/functions), and microservices. They provide full access to your project's data, bypassing [Row Level Security](/docs/guides/database/postgres/row-level-security). |
+| <span className="whitespace-nowrap!">`anon`</span>         | JWT (long-lived)                                                 | Low        | <span className="whitespace-nowrap!">Platform, CLI</span> | Legacy version of publishable keys.                                                                                                                                                                                                                                                                     |
+| <span className="whitespace-nowrap!">`service_role`</span> | JWT (long-lived)                                                 | Elevated   | <span className="whitespace-nowrap!">Platform, CLI</span> | Legacy version of secret keys.                                                                                                                                                                                                                                                                          |
+
+Publishable and secret keys are short strings, not JWTs. If a tool, tutorial, or AI assistant tells you to copy a long key that begins with `eyJ`, it was written for the legacy keys.
+
+Running `supabase start` prints a publishable key and a secret key for your local project. The local secret key takes the place of the local `service_role` key. See the [CLI getting started guide](/docs/guides/local-development/cli/getting-started) for the full output.
+
+## Get your keys
+
+Each path below returns the publishable and secret keys that already exist in your project. The Dashboard path is in [Find and use your API keys](/docs/guides/getting-started/api-keys). If your project has no keys yet, create them in the [**Settings > API Keys**](/dashboard/project/_/settings/api-keys/) section of the Dashboard first.
+
+### Supabase CLI
+
+Use the CLI to script setup, or to read the keys for a preview branch. [Install the CLI](/docs/guides/local-development/cli/getting-started#installing-the-supabase-cli) first.
+
+1. Sign in, if you haven't already:
+
+   ```bash
+   supabase login
+   ```
+
+2. Find the project ref, if you don't know it:
+
+   ```bash
+   supabase projects list
+   ```
+
+3. List the keys for that project:
+
+   ```bash
+   supabase projects api-keys --remote=your-project-ref
+   ```
+
+Pass the branch's own project ref to read the keys for a preview branch. A branch has its own keys, and the command returns the linked project's keys when you omit `--remote`.
+
+### Management API
+
+Use the Management API to fetch keys from your own tooling, such as a deploy script or an internal provisioning service.
+
+1. Create a [personal access token](/dashboard/account/tokens). An OAuth application needs the `secrets:read` scope. A personal access token [you've scoped](/docs/guides/platform/personal-access-tokens) needs the **API Keys** permission with **Read** access. To reveal key values with `reveal=true`, as the next step does, the token also needs **API Key Secrets** with **Read** access. Without the required scope or permissions, the request returns 403 Forbidden.
+
+2. Request the keys:
+
+   ```bash
+   export PROJECT_REF="your-project-ref"
+   export SUPABASE_ACCESS_TOKEN="your-personal-access-token"
+
+   curl -X GET "https://api.supabase.com/v1/projects/$PROJECT_REF/api-keys?reveal=true" \
+     -H "Authorization: Bearer $SUPABASE_ACCESS_TOKEN" \
+     | jq '.[] | {name, type}'
+   ```
+
+`reveal=true` includes the key values in the response, and this `jq` filter drops them again so they stay out of your terminal. Write the values straight into your secret store rather than printing them, because anything on standard output lands in your CI logs. See [Get project API keys](/docs/reference/api/v1-get-project-api-keys) for the full response.
+
+### Local stack
+
+A local stack mints its own keys. They are unrelated to your hosted project's keys, so a local key never grants access to your hosted data. See [Running a local Supabase project](/docs/guides/local-development/cli/getting-started#running-a-local-supabase-project) for the CLI and container runtime it needs.
+
+1. Start the stack. The publishable and secret keys are in the output, under **Authentication Keys**.
+
+   ```bash
+   supabase start
+   ```
+
+2. Print them again at any time while the stack is running:
+
+   ```bash
+   supabase status
+   ```
+
+## Edge Functions
+
+The [`@supabase/server`](/docs/guides/functions/auth) SDK is the recommended way to use a secret key in an Edge Function, as shown in [Find and use your API keys](/docs/guides/getting-started/api-keys). If you build the client yourself instead, read the key from `SUPABASE_SECRET_KEYS`. The runtime injects it as a JSON dictionary keyed by key name, so pick the one you want.
+
+```ts supabase/functions/roster/index.ts
+import { createClient } from 'npm:@supabase/supabase-js@2'
+
+const secretKeys = JSON.parse(Deno.env.get('SUPABASE_SECRET_KEYS')!)
+
+const supabaseAdmin = createClient(Deno.env.get('SUPABASE_URL')!, secretKeys['default'])
+```
+
+`SUPABASE_ANON_KEY` and `SUPABASE_SERVICE_ROLE_KEY` still exist in the runtime, but they carry the legacy keys, so reading them keeps you on the deprecated path. See [Environment variables](/docs/guides/functions/secrets) for the full list of injected variables.
+
+## Handling secret keys safely
+
+Exposing a secret key puts all of your project's data at risk. The rules below are grouped by the kind of mistake they prevent.
+
+**Where a secret key must never appear**
+
+- A web page, a public document, source code, or a bundled mobile, desktop, or CLI package.
+- A browser, even on `localhost`.
+
+**How a secret key must never travel**
+
+- Over chat, email, or SMS.
+- In a URL or a query parameter, because those are often logged.
+- In a request header, until you have log sanitization in place.
+- Over plain HTTP, or to any host other than your project's Supabase endpoint.
+
+**What must never be written down**
+
+- Don't log a key, even one that looks invalid. A typo today can reveal the real key later.
+- If you must record a key, log no more than 6 characters from the random part after its prefix.
+- To record which key was used, store a SHA256 hash of it instead.
+
+**Storing and sharing a secret key**
+
+- Work with secret keys only on computers you fully own or control.
+- Encrypt keys stored in files or environment variables.
+- Keep keys out of source control, including CI scripts. Use the tool's own secrets storage instead.
+- Share keys through an encrypted transfer tool, such as the one in your password manager. Better still, have the other person read the key from the [**Settings > API Keys**](/dashboard/project/_/settings/api-keys/) section of the Dashboard.
+
+**Limiting the damage of a leak**
+
+- Use a separate secret key for each backend component. If one component leaks its key, you only rotate that one.
+- Rotate a leaked key as soon as you fix the cause of the leak. The browser block returns HTTP 401 Unauthorized, but an attacker can still use the key from other tools. For the steps, see [Rotate a leaked or compromised API key](/docs/guides/security/rotate-leaked-api-keys).
+
+Handle secret keys using [secure coding practices](https://owasp.org/www-project-secure-coding-practices-quick-reference-guide/stable-en/).
+
+## Known limitations
+
+Publishable and secret keys aren't JWTs, which creates a few compatibility differences to plan for:
+
+- Send publishable and secret keys on the `apikey` header, not on `Authorization: Bearer`. Because the keys aren't JWTs, anything that tries to verify one as a JWT fails. For migration compatibility the `verify_jwt` platform check accepts them on either header, but passing that check doesn't authenticate the caller. See [Authorization headers](/docs/guides/functions/auth-headers).
+- Edge Functions need to authorize API keys in code. The `verify_jwt` check alone doesn't authenticate a caller that sends only an API key. Use the `@supabase/server` SDK, as shown in [Securing Edge Functions](/docs/guides/functions/auth), rather than relying on the platform check.
+- Public Realtime connections last a maximum of 24 hours, unless the connection is upgraded to user-level authentication through Supabase Auth or a supported [third-party auth provider](/docs/guides/auth/third-party/overview).
+
+## Related
+
+- [How API keys work](/docs/guides/getting-started/how-api-keys-work): what each key identifies and the Postgres role it maps to.
+- [Find and use your API keys](/docs/guides/getting-started/api-keys): get a key and wire it into your code.
