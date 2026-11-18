@@ -20,12 +20,18 @@ function ProjectBillingUsage() {
     if (!organization) return
 
     if (['cpu', 'ram', 'disk_io'].includes(hash)) {
-      void navigate({ to: '/project/$ref/settings/infrastructure', params: { ref }, hash })
+      void navigate({
+        to: '/project/$ref/settings/infrastructure',
+        params: { ref },
+        hash,
+        replace: true,
+      })
     } else {
       void navigate({
         to: '/org/$slug/usage',
         params: { slug: organization.slug },
         search: { projectRef: ref },
+        replace: true,
       })
     }
   }, [hash, organization, ref, navigate])

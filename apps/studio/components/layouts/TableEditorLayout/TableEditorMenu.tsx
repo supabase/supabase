@@ -165,7 +165,7 @@ export const TableEditorMenu = () => {
       projectRef: project?.ref!,
       id: Number(id),
       isLocked: isSchemaLocked,
-      onExportCLI: () => onSelectExportCLI(Number(id)),
+      onExportCLI: onSelectExportCLI,
       apiAccessMap: apiAccessByTableName,
       onViewPartitions: setPartitionParentId,
     }),

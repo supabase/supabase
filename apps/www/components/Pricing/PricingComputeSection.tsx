@@ -128,7 +128,7 @@ const PricingComputeSection = () => {
           </div>
 
           <Button asChild size="tiny">
-            <a href="https://supabase.com/docs/guides/platform/compute-add-ons">
+            <a href="https://supabase.com/docs/guides/platform/compute-and-disk">
               Learn about Compute add-ons
             </a>
           </Button>
@@ -169,7 +169,7 @@ const PricingComputeSection = () => {
                   </a>{' '}
                   or{' '}
                   <a
-                    href="https://supabase.com/docs/guides/platform/compute-add-ons"
+                    href="https://supabase.com/docs/guides/platform/compute-and-disk"
                     target="_blank"
                     className="transition text-primary hover:text-brand-600"
                   >

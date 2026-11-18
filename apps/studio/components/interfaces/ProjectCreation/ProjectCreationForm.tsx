@@ -806,7 +806,7 @@ export const ProjectCreationForm = ({
             {projectCreationDisabled ? (
               <DisabledWarningDueToIncident title="Project creation is currently disabled" />
             ) : (
-              <div className="divide-y divide-border-border">
+              <div className="divide-y">
                 <OrganizationSelector
                   form={form}
                   disableOrganizationSelection={isVercelIntegrationFlow}

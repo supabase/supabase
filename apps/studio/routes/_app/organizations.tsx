@@ -49,11 +49,13 @@ function OrganizationsPage() {
   } = useOrganizationsQuery()
 
   const organizationCreationEnabled = useIsFeatureEnabled('organizations:create')
+  const searchTerm = search.trim().toLowerCase()
   const filteredOrganizations =
-    search.length === 0
+    searchTerm.length === 0
       ? organizations
       : organizations?.filter(
-          (x) => x.name.toLowerCase().includes(search) || x.slug.toLowerCase().includes(search)
+          (x) =>
+            x.name.toLowerCase().includes(searchTerm) || x.slug.toLowerCase().includes(searchTerm)
         )
 
   return (
@@ -83,8 +85,8 @@ function OrganizationsPage() {
 
           {isSuccess && organizations.length === 0 && !isError && <NoOrganizationsState />}
 
-          {search.length > 0 && filteredOrganizations.length === 0 && (
-            <NoSearchResults searchString={search} />
+          {searchTerm.length > 0 && filteredOrganizations.length === 0 && (
+            <NoSearchResults searchString={search.trim()} />
           )}
 
           <div className="grid gap-4 md:grid-cols-2 lg:grid-cols-3">

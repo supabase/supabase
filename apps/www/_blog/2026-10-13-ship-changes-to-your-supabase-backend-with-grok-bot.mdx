@@ -16,7 +16,7 @@ toc_depth: 2
 
 Supabase is joining the SpaceXAI Partner Network. With Grok Bot connected to Cursor, anyone on your team can request a change in chat, and Cursor builds and runs it against your Supabase backend through the [Supabase MCP server](https://supabase.com/docs/guides/ai-tools/mcp).
 
-Grok Bot takes a request from the person who needs it, in the place they already work, and hands it to Cursor as scoped engineering work. Cursor writes and runs the code, and through the Supabase MCP server, it can query the database, inspect the schema, read logs, and deploy Supabase Edge Functions, all inside the one Supabase project where the data already lives.
+Grok Bot takes a request from the person who needs it, in the place they already work, and hands it to Cursor as scoped engineering work. Cursor writes and runs the code, and through the Supabase MCP server, it can query the database, inspect the schema, read logs, and deploy [Supabase Edge Functions](/docs/guides/functions), all inside the one Supabase project where the data already lives.
 
 <div className="video-container">
   <iframe
@@ -30,7 +30,7 @@ Grok Bot takes a request from the person who needs it, in the place they already
 
 ## Agents work the way developers do
 
-To see what that looks like in practice, we analyzed millions of Supabase tool calls from Cursor sessions. When an agent runs a query against a Supabase database, the next call is another query 92% of the time: it investigates, tests, fixes, and checks its work rather than looking something up and stopping. Ask why signups dropped last week, and Cursor narrows to a single broken referral source in a dozen steps.
+To see what that looks like in practice, we analyzed millions of Supabase tool calls from Cursor sessions. When an agent runs a query against a [Supabase database](/docs/guides/database/overview), the next call is another query 92% of the time: it investigates, tests, fixes, and checks its work rather than looking something up and stopping. Ask why signups dropped last week, and Cursor narrows to a single broken referral source in a dozen steps.
 
 Mistakes don't break the loop. When a query fails, the next call is another `execute_sql` 79% of the time, and only about 2% of errors end the session, so a query written against `created` instead of `created_at` gets corrected without anyone stepping in. Tell Cursor a Stripe webhook is failing, and it pulls the logs, checks the payments table, patches the Edge Function, and redeploys.
 
