@@ -1,11 +1,14 @@
 // @vitest-environment jsdom
-import { afterEach, describe, expect, it } from 'vitest'
+import { afterEach, describe, expect, it, vi } from 'vitest'
 
 import {
   getSharedTelemetryData,
   redactEventUrlKeywords,
   redactUrlKeywords,
 } from './telemetry-utils'
+
+// The real module reads window.matchMedia on import, which jsdom does not implement.
+vi.mock('./helpers', () => ({ isBrowser: true }))
 
 const USERS_PAGE = 'https://supabase.com/dashboard/project/abc/auth/users'
 
