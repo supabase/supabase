@@ -12,6 +12,7 @@ import { WarehouseCapacitySection } from './WarehouseCapacitySection'
 import { WarehouseLatencySection } from './WarehouseLatencySection'
 import { getWarehouseMetricEmptyMessage, WarehouseMetricChart } from './WarehouseMetricChart'
 import { resolveWarehouseMetricsRange } from './WarehouseMetrics.range'
+import { WarehouseWorkersSection } from './WarehouseWorkersSection'
 import ReportHeader from '@/components/interfaces/Reports/ReportHeader'
 import { REPORT_DATERANGE_HELPER_LABELS } from '@/components/interfaces/Reports/Reports.constants'
 import ReportStickyNav from '@/components/interfaces/Reports/ReportStickyNav'
@@ -289,6 +290,9 @@ const WarehouseMetricsReportContent = () => {
                 <WarehouseLatencySection range={range} />
                 <div className="mt-8">
                   <WarehouseCapacitySection range={range} />
+                </div>
+                <div className="mt-8">
+                  <WarehouseWorkersSection range={range} />
                 </div>
               </div>
             )}
