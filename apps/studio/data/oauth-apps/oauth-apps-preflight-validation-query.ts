@@ -12,16 +12,17 @@ export type OAuthAppsPreflightValidationVariables = {
   auth_id?: string
 }
 
-export async function getOAuthAppsPreflightValidation({
-  slug,
-  auth_id,
-}: OAuthAppsPreflightValidationVariables) {
+export async function getOAuthAppsPreflightValidation(
+  { slug, auth_id }: OAuthAppsPreflightValidationVariables,
+  signal?: AbortSignal
+) {
   if (!slug) throw new Error('Organization slug is required')
   if (!auth_id) throw new Error('Authorization request id is required')
   const { data, error } = await get(
     '/platform/organizations/{slug}/oauth/authorizations/{id}/preflight',
     {
       params: { path: { slug, id: auth_id } },
+      signal,
     }
   )
 
@@ -51,7 +52,7 @@ export const useOAuthAppsPreflightValidationQuery = <TData = OAuthAppsPreflightV
   const queryClient = useQueryClient()
   return useQuery<OAuthAppsPreflightValidationData, OAuthAppsPreflightValidationError, TData>({
     queryKey: oauthAppsKeys.preflightValidation(slug, auth_id),
-    queryFn: () => getOAuthAppsPreflightValidation({ slug, auth_id }),
+    queryFn: ({ signal }) => getOAuthAppsPreflightValidation({ slug, auth_id }, signal),
     enabled: enabled && Boolean(slug) && Boolean(auth_id),
     retry: (failureCount, error) => {
       if (isOAuthRoleValidationError(error)) return false
