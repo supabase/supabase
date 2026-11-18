@@ -286,8 +286,8 @@ The function composes the authenticated pipeline from [Deploy MCP servers](/docs
      baseURL: 'https://api.fireworks.ai/inference/v1',
    })
 
-   Deno.serve(
-     pipeline(
+   export default {
+     fetch: pipeline(
        [withOAuthProtectedResource(), withSupabase({ auth: 'user' })],
        async (req, { supabase }) => {
          // A fresh server per request: Edge Functions are stateless
@@ -343,8 +343,8 @@ The function composes the authenticated pipeline from [Deploy MCP servers](/docs
 
          return handler.fetch(req)
        }
-     )
-   )
+     ),
+   }
    ```
 
 4. Deploy the function:

@@ -8,8 +8,8 @@ import { z } from 'zod'
 
 import type { Database } from './database.types.ts'
 
-Deno.serve(
-  pipeline(
+export default {
+  fetch: pipeline(
     // 1. OAuth discovery for MCP clients, 2. verify the user's token and scope a client to them
     [withOAuthProtectedResource(), withSupabase<Database>({ auth: 'user' })],
     async (req, { supabase }) => {
@@ -54,5 +54,5 @@ Deno.serve(
 
       return handler.fetch(req)
     }
-  )
-)
+  ),
+}

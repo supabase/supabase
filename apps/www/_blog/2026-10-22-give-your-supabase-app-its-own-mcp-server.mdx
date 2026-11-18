@@ -71,15 +71,15 @@ import {
   withSupabase,
 } from 'npm:@supabase/server@1'
 
-Deno.serve(
-  pipeline(
+export default {
+  fetch: pipeline(
     [
       withOAuthProtectedResource(),
       withSupabase({ auth: 'user' }),
     ],
     handleMcp,
   ),
-)
+}
 ```
 
 `withOAuthProtectedResource()` tells a client where to sign in. It answers discovery requests and sends an OAuth challenge when a request has no token.

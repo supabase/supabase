@@ -78,9 +78,9 @@ async function handleMcp(request: Request, ctx: SupabaseContext): Promise<Respon
 
 // The handler is passed inline so TypeScript infers its context from the entries.
 // Passing `handleMcp` directly collapses the inferred context to `object`.
-Deno.serve(
-  pipeline(
+export default {
+  fetch: pipeline(
     [withOAuthProtectedResource(), withSupabase({ auth: 'user', cors: { headers: CORS_HEADERS } })],
     (request, ctx) => handleMcp(request, ctx)
-  )
-)
+  ),
+}

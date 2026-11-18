@@ -87,15 +87,15 @@ On Supabase Edge Functions, or any runtime with a `fetch`-style handler, [`@supa
 import { pipeline } from 'npm:@supabase/middleware@1'
 import { withOAuthProtectedResource, withSupabase } from 'npm:@supabase/server@1'
 
-Deno.serve(
-  pipeline(
+export default {
+  fetch: pipeline(
     [withOAuthProtectedResource(), withSupabase({ auth: 'user' })],
     async (req, { supabase }) => {
       // supabase is scoped to the signed-in user; hand it to your MCP tools
       return mcpHandler(req, supabase)
     }
-  )
-)
+  ),
+}
 ```
 
 The [MCP Server block](/library/docs/headless/mcp) in the Supabase Library packages this as an installable Edge Function, and the [OAuth Consent block](/library/docs/nextjs/oauth-consent) provides the consent screen. See [Deploy MCP servers](/docs/guides/ai-tools/byo-mcp) for the full setup.

@@ -77,12 +77,12 @@ The function is a `pipeline` from `@supabase/middleware` with two entries from
 `@supabase/server`, in this order:
 
 ```ts
-Deno.serve(
-  pipeline(
+export default {
+  fetch: pipeline(
     [withOAuthProtectedResource(), withSupabase({ auth: 'user', cors: { headers: CORS_HEADERS } })],
     handleMcp
-  )
-)
+  ),
+}
 ```
 
 `withOAuthProtectedResource()` runs before the auth gate. It serves RFC 9728
