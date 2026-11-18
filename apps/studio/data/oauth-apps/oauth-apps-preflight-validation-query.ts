@@ -1,5 +1,6 @@
-import { useQuery } from '@tanstack/react-query'
+import { useQuery, useQueryClient } from '@tanstack/react-query'
 
+import { MAX_RETRY_FAILURE_COUNT } from '../query-client'
 import { oauthAppsKeys } from './keys'
 import { isOAuthRoleValidationError } from './types'
 import { get, handleError } from '@/data/fetchers'
@@ -46,11 +47,26 @@ export const useOAuthAppsPreflightValidationQuery = <TData = OAuthAppsPreflightV
     OAuthAppsPreflightValidationError,
     TData
   > = {}
-) =>
-  useQuery<OAuthAppsPreflightValidationData, OAuthAppsPreflightValidationError, TData>({
+) => {
+  const queryClient = useQueryClient()
+  return useQuery<OAuthAppsPreflightValidationData, OAuthAppsPreflightValidationError, TData>({
     queryKey: oauthAppsKeys.preflightValidation(slug, auth_id),
     queryFn: () => getOAuthAppsPreflightValidation({ slug, auth_id }),
     enabled: enabled && Boolean(slug) && Boolean(auth_id),
-    retry: (_, error) => !isOAuthRoleValidationError(error),
+    retry: (failureCount, error) => {
+      if (isOAuthRoleValidationError(error)) return false
+      const defaultOptions = queryClient.getDefaultOptions()
+      if (defaultOptions.queries?.retry) {
+        if (typeof defaultOptions.queries.retry === 'function') {
+          return defaultOptions.queries.retry(failureCount, error)
+        }
+        if (typeof defaultOptions.queries.retry === 'number') {
+          return failureCount < defaultOptions.queries.retry
+        }
+        return defaultOptions.queries.retry
+      }
+      return failureCount < MAX_RETRY_FAILURE_COUNT
+    },
     ...options,
   })
+}
