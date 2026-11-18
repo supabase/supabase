@@ -4,6 +4,7 @@ import {
   FeatureFlagProvider,
   gotrueClient,
   useFeatureFlags,
+  type CallFeatureFlagsResponse,
   type FeatureFlagContextType,
 } from 'common'
 import { HttpResponse } from 'msw'
@@ -12,7 +13,7 @@ import { describe, expect, it, vi } from 'vitest'
 
 import { API_URL } from '@/lib/constants'
 import { createMockAuthContext, createMockSession } from '@/tests/lib/auth-helpers'
-import { addAPIMock } from '@/tests/lib/msw'
+import { addAPIMock, type APIErrorBody } from '@/tests/lib/msw'
 
 type AuthContextValue = ComponentProps<typeof AuthContext.Provider>['value']
 type ConfigCatFlagsFetcher = NonNullable<
@@ -101,8 +102,11 @@ describe('FeatureFlagProvider PostHog flags for a user with MFA enabled', () => 
       path: '/platform/telemetry/feature-flags',
       response: () =>
         isMfaVerified
-          ? HttpResponse.json({ someExperiment: 'variant' })
-          : HttpResponse.json({ message: 'Insufficient AAL: MFA required' }, { status: 403 }),
+          ? HttpResponse.json<CallFeatureFlagsResponse>({ someExperiment: 'variant' })
+          : HttpResponse.json<APIErrorBody>(
+              { message: 'Insufficient AAL: MFA required' },
+              { status: 403 }
+            ),
     })
 
     render(
