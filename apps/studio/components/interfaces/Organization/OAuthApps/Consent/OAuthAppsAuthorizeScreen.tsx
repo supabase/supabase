@@ -155,7 +155,11 @@ export const OAuthAppsAuthorizeScreen = ({
     return Array.from(refs)
   }, [preflightData?.existing_grant?.project_refs, projectRef])
 
-  const { data: initialProjectsData } = useOrgProjectsInfiniteQuery(
+  const {
+    data: initialProjectsData,
+    isError: isErrorInitialProjects,
+    error: initialProjectsError,
+  } = useOrgProjectsInfiniteQuery(
     {
       slug: memberOrg?.slug,
       refs: initialRefs,
@@ -290,6 +294,23 @@ export const OAuthAppsAuthorizeScreen = ({
       >
         <div className="flex flex-col gap-6 px-6 pb-6">
           <AlertError subject="An error occurred while loading your data" error={preflightError} />
+        </div>
+      </InterstitialLayout>
+    )
+  }
+
+  if (isErrorInitialProjects) {
+    return (
+      <InterstitialLayout
+        logo={<DestinationLogo name={request.name} />}
+        title={`Authorize ${request.name}`}
+        description="This application wants to access your Supabase Account"
+      >
+        <div className="flex flex-col gap-6 px-6 pb-6">
+          <AlertError
+            error={initialProjectsError}
+            subject="We couldn't find the organization for this application authorization"
+          />
         </div>
       </InterstitialLayout>
     )
