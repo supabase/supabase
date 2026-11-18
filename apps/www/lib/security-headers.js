@@ -99,7 +99,7 @@ function buildCsp({ env = process.env } = {}) {
 
 // The path-to-regexp build and options that Next.js compiles route sources with
 // (next/dist/lib/build-custom-route.js)
-const { parse } = require('next/dist/compiled/path-to-regexp')
+const { parse, pathToRegexp } = require('next/dist/compiled/path-to-regexp')
 
 const PATH_TO_REGEXP_OPTIONS = { strict: true, sensitive: false, delimiter: '/' }
 
@@ -116,16 +116,19 @@ const escapeString = (text) => text.replace(/([.+*?=^!:${}()[\]|/\\])/g, '\\$1')
  * because the result goes inside a header source. Custom patterns are used as written, so escaped
  * characters such as \( stay escaped.
  * @param {Token} token
- * @param {{ omitPrefix?: boolean }} [options] Leave out the first prefix, when the caller already consumed it
+ * @param {{ atRoot?: boolean }} [options] The token takes the path's leading slash, which the
+ *   www header source consumes itself. Drop the first slash of its first prefix and treat the
+ *   token as present: the caller handles the absent case of an optional token.
  */
-function tokenToPattern(token, { omitPrefix = false } = {}) {
-  if (typeof token === 'string') return escapeString(token)
+function tokenToPattern(token, { atRoot = false } = {}) {
+  if (typeof token === 'string') return escapeString(atRoot ? token.slice(1) : token)
 
   const prefix = escapeString(token.prefix)
-  const firstPrefix = omitPrefix ? '' : prefix
+  // Only the first occurrence loses its slash. Repetitions keep the full prefix.
+  const firstPrefix = atRoot ? escapeString(token.prefix.slice(1)) : prefix
   const suffix = escapeString(token.suffix)
 
-  if (!token.pattern) return `(?:${firstPrefix}${suffix})${omitPrefix ? '' : token.modifier}`
+  if (!token.pattern) return `(?:${firstPrefix}${suffix})${atRoot ? '' : token.modifier}`
 
   const pattern = `(?:${token.pattern})`
   const isRepeated = token.modifier === '+' || token.modifier === '*'
@@ -134,10 +137,14 @@ function tokenToPattern(token, { omitPrefix = false } = {}) {
 
   // The modifier applies to the prefix and suffix too, for example the dot in /asset.:ext?
   const modifier =
-    omitPrefix || token.modifier === '+' ? '' : token.modifier === '*' ? '?' : token.modifier
+    atRoot || token.modifier === '+' ? '' : token.modifier === '*' ? '?' : token.modifier
   const repeats = isRepeated ? `(?:${suffix}${prefix}${pattern})*` : ''
   return `(?:${firstPrefix}${pattern}${repeats}${suffix})${modifier}`
 }
+
+/** @param {Token} token */
+const startsWithSlash = (token) =>
+  typeof token === 'string' ? token.startsWith('/') : token.prefix.startsWith('/')
 
 /**
  * Regex for the part of a path after its leading slash, for paths that a rewrite source matches.
@@ -150,18 +157,23 @@ function tokensAfterRootSlash(tokens) {
   const [first, ...rest] = tokens
   const restPattern = rest.map((token) => tokenToPattern(token)).join('')
 
-  // Nothing left to match the leading slash
+  // Nothing is left to match the leading slash. Next's trailing-slash rule covers the empty
+  // match, see sourceToPattern.
   if (first === undefined) return '(?!)'
 
-  if (typeof first === 'string') {
-    if (!first.startsWith('/')) return '(?!)'
-    return `${escapeString(first.slice(1))}${restPattern}`
+  if (!startsWithSlash(first)) {
+    // A literal or prefix without a slash can't match the leading slash
+    if (typeof first === 'string' || first.prefix) return '(?!)'
+    // A parameter without a prefix could match the slash with its own pattern
+    throw new Error(
+      `Unsupported rewrite source for the www security headers: ${JSON.stringify(first)}`
+    )
   }
 
-  if (first.prefix !== '/') return '(?!)'
-
-  const present = `${tokenToPattern(first, { omitPrefix: true })}${restPattern}`
-  if (first.modifier !== '?' && first.modifier !== '*') return present
+  const present = `${tokenToPattern(first, { atRoot: true })}${restPattern}`
+  if (typeof first === 'string' || (first.modifier !== '?' && first.modifier !== '*')) {
+    return present
+  }
 
   // An optional root parameter can also be absent, and then the next token takes the slash
   return `(?:${present}|${tokensAfterRootSlash(rest)})`
@@ -169,10 +181,15 @@ function tokensAfterRootSlash(tokens) {
 
 /**
  * Converts a rewrite source to a regex for the same paths, without their leading slash.
+ * Next.js lets every custom route match an optional trailing slash (modifyRouteRegex in
+ * next/dist/lib/redirect-status.js). So a source that matches the empty path, such as /:slug?,
+ * also matches /, which leaves nothing after the leading slash.
  * @param {string} source
  */
 function sourceToPattern(source) {
-  return tokensAfterRootSlash(parse(source, PATH_TO_REGEXP_OPTIONS))
+  const pattern = `${tokensAfterRootSlash(parse(source, PATH_TO_REGEXP_OPTIONS))}(?:\\/)?`
+  const matchesEmptyPath = pathToRegexp(source, [], PATH_TO_REGEXP_OPTIONS).test('')
+  return matchesEmptyPath ? `(?:${pattern}|)` : pattern
 }
 
 /**

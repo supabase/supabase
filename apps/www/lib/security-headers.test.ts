@@ -1,5 +1,4 @@
-// Next.js compiles header sources with this matcher (next/dist/lib/build-custom-route.js)
-import { pathToRegexp } from 'next/dist/compiled/path-to-regexp'
+import { buildCustomRoute } from 'next/dist/lib/build-custom-route'
 import { describe, expect, it } from 'vitest'
 
 import rewrites from './rewrites'
@@ -27,8 +26,14 @@ const REWRITES = [
   { source: '/docs/:path*', destination: 'https://docs.example.com/:path*' },
 ]
 
-const matches = (source: string, path: string) =>
-  pathToRegexp(source, [], { strict: true, sensitive: false, delimiter: '/' }).test(path)
+// Next.js's full custom-route matcher, including its optional trailing slash
+const toRegExp = (regex: string) => new RegExp(regex, 'i')
+const rewriteMatches = (source: string, path: string) =>
+  toRegExp(
+    buildCustomRoute('rewrite', { source, destination: 'https://other.example.com' }).regex
+  ).test(path)
+const headerMatches = (source: string, path: string) =>
+  toRegExp(buildCustomRoute('header', { source, headers: [] }).regex).test(path)
 
 const scriptSrc = (csp: string) =>
   csp
@@ -113,7 +118,7 @@ describe('getWwwOwnedSource', () => {
   it.each(['/', '/pricing', '/blog/some-post'])(
     'matches every path when nothing is proxied: %s',
     (path) => {
-      expect(matches(getWwwOwnedSource([]), path)).toBe(true)
+      expect(headerMatches(getWwwOwnedSource([]), path)).toBe(true)
     }
   )
 
@@ -122,20 +127,25 @@ describe('getWwwOwnedSource', () => {
     const wwwSource = getWwwOwnedSource(
       getProxiedPathPatterns([{ source, destination: 'https://other.example.com' }])
     )
-    return !matches(wwwSource, path)
+    return !headerMatches(wwwSource, path)
   }
 
   it.each([
     ['/:path*', '/pricing'],
     ['/:path*', '/blog/some-post'],
     ['/:slug?', '/pricing'],
+    ['/:slug?', '/'],
+    ['/:path*', '/'],
+    ['/:lang?{/guides/:page}', '/guides/intro'],
+    ['/:lang?{/guides/:page}', '/en/guides/intro'],
+    ['/kb/:path*', '/kb/'],
     ['/asset.:ext?', '/asset'],
     ['/asset.:ext?', '/asset.json'],
     ['/files/:slug(foo\\(bar\\))', '/files/foo(bar)'],
     ['/kb/:path*', '/kb'],
     ['/kb/:path*', '/kb/a/b'],
   ])('excludes what %s proxies: %s', (source, path) => {
-    expect(matches(source, path)).toBe(true)
+    expect(rewriteMatches(source, path)).toBe(true)
     expect(proxiedBy(source, path)).toBe(true)
   })
 
@@ -145,7 +155,7 @@ describe('getWwwOwnedSource', () => {
     ['/files/:slug(foo\\(bar\\))', '/files/foobar'],
     ['/kb/:path*', '/kbx'],
   ])('keeps what %s does not proxy: %s', (source, path) => {
-    expect(matches(source, path)).toBe(false)
+    expect(rewriteMatches(source, path)).toBe(false)
     expect(proxiedBy(source, path)).toBe(false)
   })
 
@@ -154,6 +164,7 @@ describe('getWwwOwnedSource', () => {
     '/:slug?',
     '/:slug+',
     '/:lang?/guides/:page',
+    '/:lang?{/guides/:page}',
     '/asset.:ext?',
     '/files/:slug(foo\\(bar\\))',
     '/kb/:path*',
@@ -163,16 +174,19 @@ describe('getWwwOwnedSource', () => {
   const PATHS = [
     '/',
     '/pricing',
+    '/pricing/',
     '/blog/some-post',
     '/a/b/c',
     '/asset',
     '/asset.json',
+    '/asset.json/',
     '/assets',
     '/files/foo(bar)',
     '/files/foobar',
     '/guides/intro',
     '/en/guides/intro',
     '/kb',
+    '/kb/',
     '/kb/a/b',
     '/kbx',
     '/docs',
@@ -184,7 +198,7 @@ describe('getWwwOwnedSource', () => {
   it.each(SOURCES.flatMap((source) => PATHS.map((path) => [source, path])))(
     'agrees with the Next.js matcher for %s on %s',
     (source, path) => {
-      expect(proxiedBy(source, path)).toBe(matches(source, path))
+      expect(proxiedBy(source, path)).toBe(rewriteMatches(source, path))
     }
   )
 })
@@ -212,7 +226,7 @@ describe('getSecurityHeaderRules', () => {
     '/dashboarding-guide',
     '/docsearch',
   ])('applies to the www path %s', (path) => {
-    expect(matches(wwwRule.source, path)).toBe(true)
+    expect(headerMatches(wwwRule.source, path)).toBe(true)
   })
 
   it.each([
@@ -234,7 +248,7 @@ describe('getSecurityHeaderRules', () => {
     '/new-docs/',
     '/kb/some-article',
   ])('does not apply to the proxied path %s', (path) => {
-    expect(matches(wwwRule.source, path)).toBe(false)
+    expect(headerMatches(wwwRule.source, path)).toBe(false)
   })
 
   // Every path must get the www headers exactly when no external rewrite proxies it
@@ -283,8 +297,8 @@ describe('getSecurityHeaderRules', () => {
   ]
 
   it.each(SAMPLE_PATHS)('agrees with the rewrite sources for %s', (path) => {
-    const isProxied = externalSources.some((source) => matches(source, path))
-    expect(matches(wwwRule.source, path)).toBe(!isProxied)
+    const isProxied = externalSources.some((source) => rewriteMatches(source, path))
+    expect(headerMatches(wwwRule.source, path)).toBe(!isProxied)
   })
 
   it('sets the framing, sniffing and referrer headers', () => {
