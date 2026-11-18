@@ -27,7 +27,7 @@ const metric = (name: WarehouseMetric['metric']): WarehouseMetric => ({
   aggregation: 'mean',
   definition: name,
   requested: { metric: name, start: 100, end: 160, step: 60 },
-  effective: { start: 100, end: 160, step: 60 },
+  effective: { start: 100, end: 160, step: 60, rate_window_seconds: 60 },
   scrape_interval_seconds: 60,
   last_sample_at: 160,
   availability: 'ok',
