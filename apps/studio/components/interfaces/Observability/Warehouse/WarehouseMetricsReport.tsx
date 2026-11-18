@@ -8,6 +8,7 @@ import { Admonition } from 'ui-patterns/Admonition'
 import { EmptyStatePresentational } from 'ui-patterns/EmptyStatePresentational'
 import { GenericSkeletonLoader } from 'ui-patterns/ShimmeringLoader'
 
+import { WarehouseCapacitySection } from './WarehouseCapacitySection'
 import { WarehouseLatencySection } from './WarehouseLatencySection'
 import { getWarehouseMetricEmptyMessage, WarehouseMetricChart } from './WarehouseMetricChart'
 import { resolveWarehouseMetricsRange } from './WarehouseMetrics.range'
@@ -286,6 +287,9 @@ const WarehouseMetricsReportContent = () => {
             (!setup.isPending || hasValues) && (
               <div className="mt-8">
                 <WarehouseLatencySection range={range} />
+                <div className="mt-8">
+                  <WarehouseCapacitySection range={range} />
+                </div>
               </div>
             )}
         </div>

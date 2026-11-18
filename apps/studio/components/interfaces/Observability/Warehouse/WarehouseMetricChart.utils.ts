@@ -2,6 +2,30 @@ import type { WarehouseMetric } from '@/data/warehouse/warehouse-metrics-api-typ
 
 export type WarehouseChartSeries = { metric?: WarehouseMetric; label: string }
 
+const getLabelKey = (labels: Record<string, string>) =>
+  Object.keys(labels)
+    .sort()
+    .map((key) => `${key}=${labels[key]}`)
+    .join('|')
+
+export const expandWarehouseChartSeries = (series: WarehouseChartSeries[]) =>
+  series.flatMap(({ metric, label }) => {
+    if (!metric || metric.series.length === 0) return [{ metric, label }]
+    return [...metric.series]
+      .sort((a, b) => getLabelKey(a.labels).localeCompare(getLabelKey(b.labels)))
+      .map((item) => ({
+        metric: { ...metric, series: [item] },
+        label: [
+          label,
+          ...Object.keys(item.labels)
+            .sort()
+            .map((key) => item.labels[key]),
+        ]
+          .filter(Boolean)
+          .join(' · '),
+      }))
+  })
+
 export const getWarehouseChartPoints = (series: WarehouseChartSeries[], scale: number) => {
   const rows = new Map<number, Record<string, string | number>>()
   series.forEach(({ metric }, index) => {
