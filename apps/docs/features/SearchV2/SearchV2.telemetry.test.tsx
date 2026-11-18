@@ -311,12 +311,7 @@ describe('SearchV2 telemetry', () => {
       expect(sendTelemetryEvent).toHaveBeenCalledTimes(1)
       expect(sendTelemetryEvent).toHaveBeenCalledWith({
         action: 'docs_search_v2_search_submitted',
-        properties: {
-          query: 'auth',
-          queryLength: 4,
-          queryWordCount: 1,
-          hasResults: true,
-        },
+        properties: { query: 'auth', queryLength: 4, queryWordCount: 1, hasResults: true },
       })
     })
 
@@ -328,12 +323,7 @@ describe('SearchV2 telemetry', () => {
 
       expect(sendTelemetryEvent).toHaveBeenCalledWith({
         action: 'docs_search_v2_search_submitted',
-        properties: {
-          query: 'zzz',
-          queryLength: 3,
-          queryWordCount: 1,
-          hasResults: false,
-        },
+        properties: { query: 'zzz', queryLength: 3, queryWordCount: 1, hasResults: false },
       })
     })
 
@@ -345,11 +335,7 @@ describe('SearchV2 telemetry', () => {
 
       expect(sendTelemetryEvent).toHaveBeenCalledWith({
         action: 'docs_search_v2_search_submitted',
-        properties: {
-          queryLength: 18,
-          queryWordCount: 1,
-          hasResults: false,
-        },
+        properties: { queryLength: 18, queryWordCount: 1, hasResults: false },
       })
     })
 
