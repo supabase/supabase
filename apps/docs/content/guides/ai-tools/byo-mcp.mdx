@@ -113,7 +113,7 @@ Your MCP server is at `https://<your-project-ref>.supabase.co/functions/v1/mcp`.
 
 ## Add authentication
 
-Most servers act on user data, and then the question is who the caller is. With Supabase Auth as the OAuth 2.1 authorization server, users sign in with their existing accounts, approve the MCP client once, and every tool call runs as that user. Your RLS policies decide what each client can see, with no per-tool authorization code.
+Most servers act on user data, and then the question is who the caller is. With [Supabase Auth](/docs/guides/auth) as the OAuth 2.1 authorization server, users sign in with their existing accounts, approve the MCP client once, and every tool call runs as that user. Your RLS policies decide what each client can see, with no per-tool authorization code.
 
 ### How it works
 
@@ -126,7 +126,7 @@ pipeline([...], handler)
   handler                         MCP transport and your tools
 ```
 
-`withOAuthProtectedResource()` runs before the auth gate. It serves the OAuth Protected Resource Metadata document so clients can find your authorization server, and it adds the `WWW-Authenticate` challenge to unauthenticated responses. `withSupabase({ auth: 'user' })` rejects requests without a valid user token and gives your handler a Supabase client scoped to that user. Anything the tools read or write goes through RLS.
+`withOAuthProtectedResource()` runs before the auth gate. It serves the OAuth Protected Resource Metadata document so clients can find your authorization server, and it adds the `WWW-Authenticate` challenge to unauthenticated responses. `withSupabase({ auth: 'user' })` rejects requests without a valid user token and gives your handler a [Supabase client](/docs/reference/javascript/introduction) scoped to that user. Anything the tools read or write goes through RLS.
 
 Two things must be in place beyond the prerequisites above:
 

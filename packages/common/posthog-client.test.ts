@@ -105,3 +105,21 @@ describe('PostHogClient consent', () => {
     )
   })
 })
+
+describe('PostHogClient before_send', () => {
+  it('redacts the keywords url param from properties the SDK fills in itself', async () => {
+    vi.clearAllMocks()
+    const client = await loadClient()
+    client.init()
+    const usersPage = 'https://supabase.com/dashboard/project/abc/auth/users'
+    const leakingUrl = `${usersPage}?keywords=person%40example.com`
+
+    const sent = initConfig().before_send({
+      properties: { $current_url: leakingUrl, $session_entry_url: leakingUrl },
+      $set_once: { $initial_referrer: leakingUrl },
+    })
+
+    expect(JSON.stringify(sent)).not.toContain('person')
+    expect(sent.properties.$session_entry_url).toBe(`${usersPage}?keywords=redacted`)
+  })
+})

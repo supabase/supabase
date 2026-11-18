@@ -187,7 +187,7 @@ export default {
 }
 ```
 
-`export default { fetch }` is equivalent to `Deno.serve(...)`: both define a request handler. The `fetch` style is portable across Edge Functions, Cloudflare Workers, and Bun, so prefer it if you want the same function to run in more than one environment. `Deno.serve` keeps working on Edge Functions, so you can leave it in place during a migration and switch later.
+`export default { fetch }` is equivalent to `Deno.serve(...)`: both define a request handler. The `fetch` style is portable across [Edge Functions](/docs/guides/functions), Cloudflare Workers, and Bun, so prefer it if you want the same function to run in more than one environment. `Deno.serve` keeps working on Edge Functions, so you can leave it in place during a migration and switch later.
 
 A good way to try this is to duplicate one of your functions and migrate the copy first. See [Securing Edge Functions](/docs/guides/functions/auth) for every auth mode and use case, and [Authorization headers](/docs/guides/functions/auth-headers) for how the headers work.
 

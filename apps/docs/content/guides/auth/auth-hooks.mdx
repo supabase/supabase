@@ -62,7 +62,7 @@ Sign the payload and grant permissions selectively in order to guard the integri
 
 When you configure a Postgres function as a hook, Supabase will automatically apply the following grants to the function for these reasons:
 
-- Allow the `supabase_auth_admin` role to execute the function. The `supabase_auth_admin` role is the Postgres role that is used by Supabase Auth to make requests to your database.
+- Allow the `supabase_auth_admin` role to execute the function. The `supabase_auth_admin` role is the [Postgres role](/docs/guides/database/postgres/roles) that is used by Supabase Auth to make requests to your database.
 - Revoke permissions from other roles (e.g. `anon`, `authenticated`, `public`) to ensure the function is not accessible by Supabase Data APIs.
 
 ```sql
@@ -244,7 +244,7 @@ secrets = "env(SEND_SMS_HOOK_SECRETS)"
 
 <Admonition type="note">
 
-`host.docker.internal` is a special DNS name used in Docker to allow a container to access the host machine's network. This allows the Auth container to reach your HTTP function, no matter if it's a Supabase Edge Function or a custom endpoint.
+`host.docker.internal` is a special DNS name used in Docker to allow a container to access the host machine's network. This allows the Auth container to reach your HTTP function, no matter if it's a [Supabase Edge Function](/docs/guides/functions) or a custom endpoint.
 
 </Admonition>
 

@@ -183,7 +183,7 @@ values
   ('Understanding Vector Databases', 'Vector databases are specialized...');
 ```
 
-This will kick off the embedding pipeline within a Supabase Edge Function. If you were to immediately query for the document you just inserted, the `embedding` column will be empty:
+This will kick off the embedding pipeline within a [Supabase Edge Function](/docs/guides/functions). If you were to immediately query for the document you just inserted, the `embedding` column will be empty:
 
 ```sql
 select id, embedding

@@ -147,7 +147,7 @@ const partnersPageData = {
       {
         title: 'OAuth App',
         description: 'Control organizations and projects programmatically.',
-        href: 'https://supabase.com/docs/guides/integrations/build-a-supabase-integration',
+        href: 'https://supabase.com/docs/guides/integrations/build-a-supabase-oauth-integration',
         icon: <Key size={18} strokeWidth={1.5} />,
       },
       {
@@ -171,7 +171,7 @@ const partnersPageData = {
       {
         title: 'Log drains',
         description: 'Receive project logs from Pro, Team, and Enterprise projects.',
-        href: 'https://supabase.com/docs/guides/platform/log-drains',
+        href: 'https://supabase.com/docs/guides/observability/log-drains',
         icon: <FileText size={18} strokeWidth={1.5} />,
       },
       {
