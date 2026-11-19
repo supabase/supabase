@@ -227,7 +227,16 @@ describe('getFunctionZipEntries', () => {
     expect(paths(entries)).toEqual(['src_/index.ts', 'src/index.ts'])
   })
 
-  it('keeps eszip file paths exactly as-is, even when a folder shares the slug name', () => {
+  it('normalizes multipart paths with `..` in the middle so none escape the ZIP root', () => {
+    const files = [
+      { name: 'source/hello/index.ts', content: 'a' },
+      { name: 'source/hello/utils/../../../etc/passwd', content: 'b' },
+    ]
+    const entries = getFunctionZipEntries({ files, slug: 'hello', source: 'multipart' })
+    expect(paths(entries)).toEqual(['src/src1/index.ts', 'etc/passwd'])
+  })
+
+  it('keeps eszip file paths as-is, even when a folder shares the slug name', () => {
     const files = [
       { name: 'index.ts', content: 'a' },
       { name: 'auth/handler.ts', content: 'b' },
@@ -235,5 +244,48 @@ describe('getFunctionZipEntries', () => {
     ]
     const entries = getFunctionZipEntries({ files, slug: 'auth', source: 'eszip' })
     expect(paths(entries)).toEqual(['index.ts', 'auth/handler.ts', 'handler.ts'])
+  })
+
+  it('nests eszip files under src/ when shared files reach above the function root', () => {
+    const files = [
+      { name: 'index.ts', content: 'a' },
+      { name: '../_shared/cors.ts', content: 'b' },
+    ]
+    const eszipEntries = getFunctionZipEntries({ files, slug: 'hello', source: 'eszip' })
+    const multipartEntries = getFunctionZipEntries({
+      files: [
+        { name: 'source/hello/index.ts', content: 'a' },
+        { name: 'source/hello/../_shared/cors.ts', content: 'b' },
+      ],
+      slug: 'hello',
+      source: 'multipart',
+    })
+
+    expect(paths(eszipEntries)).toEqual(['src/index.ts', '_shared/cors.ts'])
+    expect(eszipEntries).toEqual(multipartEntries)
+  })
+
+  it('never produces eszip paths that escape the ZIP root', () => {
+    const files = [
+      { name: 'index.ts', content: 'a' },
+      { name: '../../evil.ts', content: 'b' },
+      { name: '/etc/passwd', content: 'c' },
+      { name: 'utils/./../../x.ts', content: 'd' },
+      { name: 'a//b\\..\\..\\..\\win.ts', content: 'e' },
+    ]
+    const entries = getFunctionZipEntries({ files, slug: 'hello', source: 'eszip' })
+
+    expect(paths(entries)).toEqual([
+      'src/src1/index.ts',
+      'evil.ts',
+      'src/src1/etc/passwd',
+      'src/x.ts',
+      'src/win.ts',
+    ])
+    for (const path of paths(entries)) {
+      expect(path.startsWith('/')).toBe(false)
+      expect(path.split('/')).not.toContain('..')
+      expect(path.split('/')).not.toContain('')
+    }
   })
 })

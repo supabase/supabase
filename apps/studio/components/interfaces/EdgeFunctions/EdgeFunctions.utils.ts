@@ -328,11 +328,23 @@ export const getDefaultSelectedFileId = (
 
 type FunctionZipFile = { name: string; content: string }
 
-// Decides where each function file lands inside the downloaded ZIP.
-// - `multipart`: names include the deploy path (possibly with `../` segments), so they're made
-//   relative to the function slug, and files that reach above the base are nested under `src/`.
-// - `eszip`: names are already relative to the function root, so they're kept exactly as-is.
-//   Running slug-relative logic on them would drop folders that happen to share the slug's name.
+// Resolves `.`, empty (e.g. from a leading `/`) and inner `..` segments, so the only `..` left are
+// leading ones that reach above the base, e.g. `a/../../b` becomes `../b`.
+const normalizePathSegments = (path: string): string[] =>
+  path.split(/[\\/]/).reduce<string[]>((segments, segment) => {
+    if (segment === '' || segment === '.') return segments
+    if (segment === '..' && segments.length > 0 && segments[segments.length - 1] !== '..') {
+      return segments.slice(0, -1)
+    }
+    return [...segments, segment]
+  }, [])
+
+// Decides where each function file lands inside the downloaded ZIP. Paths are normalized so no
+// entry can escape the extraction folder, and files that reach above the base (`../_shared`) are
+// kept in place by nesting everything else under `src/`.
+// - `multipart`: names include the deploy path, so they're first made relative to the function slug.
+// - `eszip`: names are already relative to the function root. Running slug-relative logic on them
+//   would drop folders that happen to share the slug's name.
 export const getFunctionZipEntries = ({
   files,
   slug,
@@ -342,12 +354,11 @@ export const getFunctionZipEntries = ({
   slug: string
   source: 'multipart' | 'eszip'
 }): { path: string; content: string }[] => {
-  if (source === 'eszip') return files.map(({ name, content }) => ({ path: name, content }))
-
   const relativeNames = files.map(({ name }) => {
+    if (source === 'eszip') return normalizePathSegments(name)
     const nameSections = name.split('/')
     const slugIndex = nameSections.indexOf(slug)
-    return nameSections.slice(slugIndex + 1)
+    return normalizePathSegments(nameSections.slice(slugIndex + 1).join('/'))
   })
 
   const countParentDirs = (segments: string[]) => {

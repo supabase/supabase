@@ -84,6 +84,12 @@ describe('getFunctionFileSpecifiers', () => {
     expect(names(specifiers)).toEqual(['index.ts', 'my file.ts', 'café/100%.ts', 'bad%ZZname.ts'])
   })
 
+  it('keeps `../` in names of shared files outside the function root, for the ZIP to resolve', () => {
+    expect(
+      names(['file:///source/index.ts', 'file:///source/../_shared/cors.ts', 'source/../../x.ts'])
+    ).toEqual(['index.ts', '../_shared/cors.ts', '../../x.ts'])
+  })
+
   it('keeps names as-is when files do not share a root folder', () => {
     expect(names(['index.ts', 'utils/greet.ts'])).toEqual(['index.ts', 'utils/greet.ts'])
   })

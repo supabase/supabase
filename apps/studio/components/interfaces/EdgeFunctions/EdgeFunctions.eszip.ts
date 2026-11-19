@@ -86,20 +86,25 @@ export async function extractFunctionSourcesFromEszip(
   const { Parser } = await import('@deno/eszip')
 
   const parser = await Parser.createInstance()
-  const specifiers: string[] = await parser.parseBytes(eszip)
-  await parser.load()
+  try {
+    const specifiers: string[] = await parser.parseBytes(eszip)
+    await parser.load()
 
-  const functionFiles = getFunctionFileSpecifiers(specifiers)
-  if (functionFiles.length === 0) {
-    throw new Error('No function files found in the downloaded bundle')
+    const functionFiles = getFunctionFileSpecifiers(specifiers)
+    if (functionFiles.length === 0) {
+      throw new Error('No function files found in the downloaded bundle')
+    }
+
+    const files: { name: string; content: string }[] = []
+    for (const { specifier, name } of functionFiles) {
+      const content =
+        (await getOriginalSource(parser, specifier)) ?? (await parser.getModuleSource(specifier))
+      files.push({ name, content: content ?? '' })
+    }
+
+    return files
+  } finally {
+    // Releases the WASM-side memory holding the whole bundle
+    parser.free()
   }
-
-  const files: { name: string; content: string }[] = []
-  for (const { specifier, name } of functionFiles) {
-    const content =
-      (await getOriginalSource(parser, specifier)) ?? (await parser.getModuleSource(specifier))
-    files.push({ name, content: content ?? '' })
-  }
-
-  return files
 }

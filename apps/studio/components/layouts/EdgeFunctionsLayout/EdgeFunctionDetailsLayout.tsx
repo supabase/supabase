@@ -44,6 +44,7 @@ import { useEdgeFunctionQuery } from '@/data/edge-functions/edge-function-query'
 import { FGA_PERMISSIONS, useAsyncCheckPermissionsV2 } from '@/hooks/misc/useCheckPermissionsV2'
 import { withAuth } from '@/hooks/misc/withAuth'
 import { DOCS_URL } from '@/lib/constants'
+import { getErrorMessage } from '@/lib/get-error-message'
 import { useTrack } from '@/lib/telemetry/track'
 import { SHORTCUT_IDS } from '@/state/shortcuts/registry'
 
@@ -67,6 +68,7 @@ const EdgeFunctionDetailsLayout = ({
 
   const [isOpen, setIsOpen] = useState(false)
   const [isDownloadOpen, setIsDownloadOpen] = useState(false)
+  const [isDownloading, setIsDownloading] = useState(false)
 
   const {
     data: selectedFunction,
@@ -134,7 +136,7 @@ const EdgeFunctionDetailsLayout = ({
       ]
     : []
 
-  const downloadFunction = async () => {
+  const downloadFunctionZip = async () => {
     const isExceedMaxSize = isFunctionBodyMaxSizeError(filesError)
     if (filesError && !isExceedMaxSize) {
       return toast.error('Failed to retrieve edge function files')
@@ -155,7 +157,7 @@ const EdgeFunctionDetailsLayout = ({
         zipEntries = getFunctionZipEntries({ files, slug: functionSlug ?? '', source: 'eszip' })
       } catch (error) {
         return toast.error(
-          `Failed to download edge function: ${error instanceof Error ? error.message : 'Unknown error'}`
+          `Failed to download edge function: ${getErrorMessage(error, 'Unknown error')}`
         )
       }
     }
@@ -176,6 +178,16 @@ const EdgeFunctionDetailsLayout = ({
     link.parentNode?.removeChild(link)
     // Deferred so the browser has started the download before the URL is released
     setTimeout(() => URL.revokeObjectURL(blobURL), 0)
+  }
+
+  const handleDownloadZip = async () => {
+    if (isDownloading) return
+    setIsDownloading(true)
+    try {
+      await downloadFunctionZip()
+    } finally {
+      setIsDownloading(false)
+    }
   }
 
   useEffect(() => {
@@ -271,7 +283,8 @@ const EdgeFunctionDetailsLayout = ({
                         variant="text"
                         className="w-min hover:bg-transparent"
                         icon={<FileArchiveIcon />}
-                        onClick={downloadFunction}
+                        loading={isDownloading}
+                        onClick={handleDownloadZip}
                       >
                         Download as ZIP
                       </Button>
