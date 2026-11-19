@@ -417,6 +417,26 @@ export const OAuthAppsAuthorizeScreen = ({
             />
           )}
 
+          {canProceed && !cannotGrantRequestedAccess && sslProjects.length > 0 && (
+            <Admonition
+              type="note"
+              title="SSL enforcement"
+              description="Setup will enable SSL enforcement on these projects. Clients without SSL will no longer connect."
+            >
+              <div
+                role="list"
+                aria-label="Projects that will require SSL"
+                className="divide-y text-xs"
+              >
+                {sslProjects.map(({ ref, name }) => (
+                  <div key={ref} role="listitem" className="py-1.5 font-medium text-foreground">
+                    {name}
+                  </div>
+                ))}
+              </div>
+            </Admonition>
+          )}
+
           {canProceed && !cannotGrantRequestedAccess && (
             <>
               <section className="flex flex-col gap-3">
@@ -460,36 +480,14 @@ export const OAuthAppsAuthorizeScreen = ({
           )}
         </fieldset>
 
-        {(cannotGrantRequestedAccess || (canProceed && sslProjects.length > 0)) && (
-          <div className="flex flex-col gap-2">
-            {cannotGrantRequestedAccess && (
-              <Admonition
-                type="warning"
-                title="You don’t have permission to authorize this application"
-                description={`Your role in “${memberOrg}” can’t grant the requested access. Ask an admin or switch organizations.`}
-              />
-            )}
-            {canProceed && !cannotGrantRequestedAccess && sslProjects.length > 0 && (
-              <Admonition
-                type="note"
-                title="SSL enforcement"
-                description="Setup will enable SSL enforcement on these projects. Clients without SSL will no longer connect."
-              >
-                <div
-                  role="list"
-                  aria-label="Projects that will require SSL"
-                  className="divide-y text-xs"
-                >
-                  {sslProjects.map(({ ref, name }) => (
-                    <div key={ref} role="listitem" className="py-1.5 font-medium text-foreground">
-                      {name}
-                    </div>
-                  ))}
-                </div>
-              </Admonition>
-            )}
-          </div>
+        {cannotGrantRequestedAccess && (
+          <Admonition
+            type="warning"
+            title="You don’t have permission to authorize this application"
+            description={`Your role in “${memberOrg}” can’t grant the requested access. Ask an admin or switch organizations.`}
+          />
         )}
+
         <div className="flex flex-col gap-2">
           {canProceed ? (
             <ButtonTooltip
