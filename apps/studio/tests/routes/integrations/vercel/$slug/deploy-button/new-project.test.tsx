@@ -8,14 +8,6 @@ import { Route } from '@/routes/integrations/vercel/$slug/deploy-button/new-proj
 import { mswServer } from '@/tests/lib/msw'
 import { renderRoute } from '@/tests/lib/route-render'
 
-vi.mock(import('common'), async (importOriginal) => {
-  const actual = await importOriginal()
-  return {
-    ...actual,
-    useParams: () => ({ slug: 'acme', currentProjectId: 'vercel-project-id' }),
-  }
-})
-
 vi.mock('@/components/interfaces/ProjectCreation/ProjectCreationForm', () => ({
   ProjectCreationForm: ({ onCreateSuccess }: { onCreateSuccess: (ref: string) => void }) => (
     <button tabIndex={0} onClick={() => onCreateSuccess('project-ref')}>
@@ -48,7 +40,7 @@ test('shows a recoverable partial-success state without recreating the project',
 
   await renderRoute(Route, {
     routeId: '/integrations/vercel/$slug/deploy-button/new-project',
-    url: '/integrations/vercel/acme/deploy-button/new-project',
+    url: '/integrations/vercel/acme/deploy-button/new-project?currentProjectId=vercel-project-id',
   })
 
   await user.click(await screen.findByRole('button', { name: 'Create project' }))

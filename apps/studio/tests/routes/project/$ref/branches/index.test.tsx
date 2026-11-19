@@ -22,7 +22,6 @@ vi.mock('common', async (importOriginal) => {
   return {
     ...actual,
     useIsLoggedIn: () => true,
-    useParams: () => ({ ref: BRANCH_TEST_SCOPE.branchRef }),
   }
 })
 
