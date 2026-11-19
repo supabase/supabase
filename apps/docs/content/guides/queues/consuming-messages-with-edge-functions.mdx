@@ -1,13 +1,14 @@
 ---
 title: Consuming Supabase Queue Messages with Edge Functions
 subtitle: 'Learn how to consume Supabase Queue messages server-side with a Supabase Edge Function'
+description: 'Read Supabase Queue messages in an Edge Function, process each one, and delete it when done, so failed messages stay on the queue and run again next time.'
 ---
 
-This guide helps you read & process queue messages server-side with a Supabase Edge Function. Read [Queues API Reference](/docs/guides/queues/api) for more details on our API.
+Read and process queue messages server-side with a Supabase Edge Function. For more details on the API, see the [Queues API reference](/docs/guides/queues/api).
 
 ## Concepts
 
-Supabase Queues is a pull-based Message Queue consisting of three main components: Queues, Messages, and Queue Types. You should already be familiar with the [Queues Quickstart](/docs/guides/queues/quickstart).
+Supabase Queues is a pull-based Message Queue consisting of three main components: Queues, Messages, and Queue Types. You need to be familiar with the [Queues Quickstart](/docs/guides/queues/quickstart).
 
 ### Consuming messages in an Edge Function
 
