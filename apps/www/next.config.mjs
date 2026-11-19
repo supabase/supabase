@@ -9,6 +9,7 @@ import remarkGfm from 'remark-gfm'
 import redirects from './lib/redirects.js'
 import remotePatterns from './lib/remotePatterns.js'
 import rewrites from './lib/rewrites.js'
+import securityHeaders from './lib/security-headers.js'
 
 const withMDX = nextMdx({
   extension: /\.mdx?$/,
@@ -29,6 +30,8 @@ const withMDX = nextMdx({
     providerImportSource: '@mdx-js/react',
   },
 })
+
+const { getSecurityHeaderRules } = securityHeaders
 
 const withBundleAnalyzer = bundleAnalyzer({
   enabled: process.env.ANALYZE === 'true',
@@ -179,6 +182,7 @@ const nextConfig = {
           },
         ],
       },
+      ...getSecurityHeaderRules(rewrites),
       {
         source: '/(docs|blog|kb|library)/:path*',
         headers: [
