@@ -83,8 +83,8 @@ export interface RuntimeMeta {
 // Keyed by the `spec.runtime` values the Management API returns.
 export const RUNTIMES: Record<string, RuntimeMeta> = {
   node: {
-    label: 'Node.js 26',
-    baseImage: 'node:26-slim',
+    label: 'Node.js 24',
+    baseImage: 'node:24-slim',
     entrypoint: 'node index.js',
     swatchClassName: 'bg-[#5FA04E]',
   },
