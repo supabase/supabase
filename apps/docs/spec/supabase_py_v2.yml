@@ -2881,10 +2881,18 @@ functions:
         type: CreateOAuthClientParams
         description: Parameters for creating a new OAuth client.
         subContent:
-          - name: name
+          - name: client_name
             isOptional: false
             type: string
             description: The name of the OAuth client.
+          - name: client_uri
+            isOptional: true
+            type: string
+            description: URL of the client application's homepage.
+          - name: logo_uri
+            isOptional: true
+            type: string
+            description: URL of the client application's logo.
           - name: redirect_uris
             isOptional: false
             type: list[string]
@@ -2897,14 +2905,10 @@ functions:
             isOptional: true
             type: list[string]
             description: List of allowed response types.
-          - name: client_type
+          - name: scope
             isOptional: true
             type: string
-            description: The client type.
-          - name: registration_type
-            isOptional: true
-            type: string
-            description: The registration type.
+            description: Space-separated list of scope values.
     examples:
       - id: create-oauth-client
         name: Create OAuth client
@@ -2912,7 +2916,7 @@ functions:
           ```python
           response = supabase.auth.admin.oauth.create_client(
               {
-                  "name": "My OAuth Client",
+                  "client_name": "My OAuth Client",
                   "redirect_uris": ["https://example.com/callback"]
               }
           )
@@ -2936,10 +2940,18 @@ functions:
         type: UpdateOAuthClientParams
         description: Parameters for updating the OAuth client.
         subContent:
-          - name: name
+          - name: client_name
             isOptional: true
             type: string
             description: The name of the OAuth client.
+          - name: client_uri
+            isOptional: true
+            type: string
+            description: URL of the client application's homepage.
+          - name: logo_uri
+            isOptional: true
+            type: string
+            description: URL of the client application's logo.
           - name: redirect_uris
             isOptional: true
             type: list[string]
@@ -2952,15 +2964,19 @@ functions:
             isOptional: true
             type: list[string]
             description: List of allowed response types.
+          - name: scope
+            isOptional: true
+            type: string
+            description: Space-separated list of scope values.
     examples:
       - id: update-oauth-client
         name: Update OAuth client
         code: |
           ```python
           response = supabase.auth.admin.oauth.update_client(
-              "client-id",
+              "00000000-0000-0000-0000-000000000000",
               {
-                  "name": "Updated OAuth Client",
+                  "client_name": "Updated OAuth Client",
                   "redirect_uris": ["https://example.com/callback", "https://example.com/callback2"]
               }
           )
@@ -9116,12 +9132,14 @@ functions:
         name: Put vectors
         code: |
           ```python
+          from storage3.types import VectorObject, VectorData
+
           supabase.storage.vectors().from_("vectors-bucket").index("my-index").put([
-              {
-                  "key": "vector-1",
-                  "data": {"float32": [0.1, 0.2, 0.3]},
-                  "metadata": {"category": "example"}
-              }
+              VectorObject(
+                  key="vector-1",
+                  data=VectorData(float32=[0.1, 0.2, 0.3]),
+                  metadata={"category": "example"}
+              )
           ])
           ```
 
