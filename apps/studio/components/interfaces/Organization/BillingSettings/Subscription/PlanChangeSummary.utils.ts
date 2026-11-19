@@ -208,8 +208,12 @@ export function getDueTodayBreakdown(
   }
 }
 
+/** A project on its way down bills no compute either, so it belongs with the paused ones. */
 export const getPausedProjects = (projects: OrgProject[]) =>
-  projects.filter((project) => project.status === PROJECT_STATUS.INACTIVE)
+  projects.filter(
+    (project) =>
+      project.status === PROJECT_STATUS.INACTIVE || project.status === PROJECT_STATUS.PAUSING
+  )
 
 export const getActiveProjects = (projects: OrgProject[]) =>
   projects.filter(

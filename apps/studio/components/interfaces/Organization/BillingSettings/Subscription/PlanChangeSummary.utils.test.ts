@@ -293,15 +293,16 @@ describe('getDueTodayBreakdown', () => {
 })
 
 describe('getPausedProjects', () => {
-  it('picks out only inactive projects', () => {
+  it('picks out projects that are paused or on their way to paused', () => {
     const projects = [
       { ref: 'a', name: 'a', status: 'ACTIVE_HEALTHY' },
       { ref: 'b', name: 'b', status: 'INACTIVE' },
       { ref: 'c', name: 'c', status: 'COMING_UP' },
       { ref: 'd', name: 'd', status: 'INACTIVE' },
+      { ref: 'e', name: 'e', status: 'PAUSING' },
     ] as OrgProject[]
 
-    expect(getPausedProjects(projects).map((project) => project.ref)).toEqual(['b', 'd'])
+    expect(getPausedProjects(projects).map((project) => project.ref)).toEqual(['b', 'd', 'e'])
   })
 })
 
