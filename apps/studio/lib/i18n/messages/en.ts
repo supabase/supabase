@@ -15,6 +15,7 @@ export const en = {
   'account.preferences.language.description':
     'Choose the language used in the dashboard. Anything that is not translated yet is shown in English.',
   'account.preferences.language.label': 'Display language',
+  'account.preferences.language.saveError': 'Could not save your language preference.',
 
   'account.preferences.timezone.title': 'Timezone',
   'account.preferences.timezone.description':

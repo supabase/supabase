@@ -15,6 +15,7 @@ export const ja: Partial<Record<MessageKey, string>> = {
   'account.preferences.language.description':
     'ダッシュボードで使う言語を選びます。まだ翻訳されていない部分は英語で表示されます。',
   'account.preferences.language.label': '表示言語',
+  'account.preferences.language.saveError': '言語設定を保存できませんでした。',
 
   'account.preferences.timezone.title': 'タイムゾーン',
   'account.preferences.timezone.description':

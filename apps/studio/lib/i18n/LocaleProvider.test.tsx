@@ -1,8 +1,8 @@
-import { QueryClient } from '@tanstack/react-query'
+import { QueryCache, QueryClient } from '@tanstack/react-query'
 import { act, renderHook, waitFor } from '@testing-library/react'
 import { LOCAL_STORAGE_KEYS } from 'common'
 import { StrictMode, type ReactNode } from 'react'
-import { afterEach, describe, expect, it } from 'vitest'
+import { afterEach, describe, expect, it, vi } from 'vitest'
 
 import { LocaleProvider, useTranslation } from './LocaleProvider'
 import { getLocalStorageQueryKey } from '@/hooks/misc/useLocalStorage'
@@ -15,7 +15,11 @@ const storageKey = LOCAL_STORAGE_KEYS.UI_LOCALE
 const renderTranslation = async (stored?: string, { isStrictMode = false } = {}) => {
   if (stored !== undefined) localStorage.setItem(storageKey, stored)
 
-  const queryClient = new QueryClient({ defaultOptions: { queries: { retry: false } } })
+  const onQueryError = vi.fn()
+  const queryClient = new QueryClient({
+    queryCache: new QueryCache({ onError: onQueryError }),
+    defaultOptions: { queries: { retry: false } },
+  })
   const wrapper = ({ children }: { children: ReactNode }) => {
     const content = (
       <CustomWrapper queryClient={queryClient}>
@@ -31,7 +35,7 @@ const renderTranslation = async (stored?: string, { isStrictMode = false } = {})
       queryClient.getQueryState(getLocalStorageQueryKey(storageKey))?.status
     )
   )
-  return rendered
+  return { ...rendered, queryClient, onQueryError }
 }
 
 afterEach(() => {
@@ -74,9 +78,11 @@ describe('LocaleProvider', () => {
   )
 
   it('treats a stored value that is not valid JSON as English', async () => {
-    const { result } = await renderTranslation('not json')
+    const { result, queryClient, onQueryError } = await renderTranslation('not json')
 
     expect(result.current.locale).toBe('en')
+    expect(queryClient.getQueryState(getLocalStorageQueryKey(storageKey))?.status).toBe('success')
+    expect(onQueryError).not.toHaveBeenCalled()
   })
 
   it('preserves the English document language when the preference changes', async () => {

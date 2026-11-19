@@ -39,6 +39,7 @@ import { TranslatedText } from '@/lib/i18n/TranslatedText'
 import { useTrack } from '@/lib/telemetry/track'
 
 const AUTO_OPTION_VALUE = '__auto__'
+const AUTO_OPTION_ENGLISH = resolveMessage('en', 'account.preferences.timezone.autoDetect').text
 
 const AutoDetectedTimezoneText = ({
   className,
@@ -166,6 +167,7 @@ export const TimezoneSettings = () => {
                             key={AUTO_OPTION_VALUE}
                             lang={autoDetect.lang}
                             value={`${autoDetect.text} ${browserTimezone}`}
+                            keywords={[AUTO_OPTION_ENGLISH]}
                             onSelect={() => handleSelect('')}
                           >
                             <div className="flex flex-col">

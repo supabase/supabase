@@ -1,7 +1,8 @@
 import { screen, within } from '@testing-library/react'
 import userEvent from '@testing-library/user-event'
 import { LOCAL_STORAGE_KEYS } from 'common'
-import { afterEach, beforeEach, describe, expect, it } from 'vitest'
+import { Toaster } from 'sonner'
+import { afterEach, beforeEach, describe, expect, it, vi } from 'vitest'
 
 import { LanguageSettings } from './LanguageSettings'
 import { TimezoneSettings } from './TimezoneSettings'
@@ -14,6 +15,7 @@ const renderLanguageSettings = () =>
   customRender(
     <LocaleProvider>
       <LanguageSettings />
+      <Toaster />
     </LocaleProvider>
   )
 
@@ -56,6 +58,35 @@ describe('LanguageSettings', () => {
     expect(screen.getByRole('combobox', { name: '表示言語' })).toHaveAttribute('lang', 'ja')
   })
 
+  it('keeps the prior choice and reports a failed storage write', async () => {
+    localStorage.setItem(LOCAL_STORAGE_KEYS.UI_LOCALE, JSON.stringify('ja'))
+    const user = userEvent.setup()
+    renderLanguageSettings()
+
+    const picker = await screen.findByRole('combobox', { name: '表示言語' })
+    const originalSetItem = Storage.prototype.setItem
+    const write = vi.spyOn(Storage.prototype, 'setItem').mockImplementation(function (
+      this: Storage,
+      key,
+      value
+    ) {
+      if (key === LOCAL_STORAGE_KEYS.UI_LOCALE)
+        throw new DOMException('Storage full', 'QuotaExceededError')
+      return originalSetItem.call(this, key, value)
+    })
+    try {
+      await user.click(picker)
+      await user.click(await screen.findByRole('option', { name: 'English' }))
+
+      const error = await screen.findByText('言語設定を保存できませんでした。')
+      expect(error).toHaveAttribute('lang', 'ja')
+      expect(picker).toHaveTextContent('日本語')
+      expect(localStorage.getItem(LOCAL_STORAGE_KEYS.UI_LOCALE)).toBe('"ja"')
+    } finally {
+      write.mockRestore()
+    }
+  })
+
   it('shows English when rendered without a provider', () => {
     customRender(<LanguageSettings />)
 
@@ -85,6 +116,35 @@ describe('partially translated preferences', () => {
     expect(picker).toHaveTextContent(`自動検出（${timezone}）`)
     expect(within(picker).getByText(/^自動検出/)).toHaveAttribute('lang', 'ja')
     expect(within(picker).getByText(timezone)).toHaveAttribute('lang', 'en')
+  })
+
+  it('finds and selects auto detection using English or Japanese while Studio is in Japanese', async () => {
+    localStorage.setItem(LOCAL_STORAGE_KEYS.UI_LOCALE, JSON.stringify('ja'))
+    localStorage.setItem(LOCAL_STORAGE_KEYS.UI_TIMEZONE, JSON.stringify('America/New_York'))
+    const user = userEvent.setup()
+    customRender(
+      <LocaleProvider>
+        <TimezoneProvider>
+          <TimezoneSettings />
+        </TimezoneProvider>
+      </LocaleProvider>
+    )
+
+    await user.click(await screen.findByRole('combobox', { name: '表示タイムゾーン' }))
+    const search = screen.getByPlaceholderText('タイムゾーンを検索…')
+    await user.type(search, 'Auto detect')
+    expect(await screen.findByRole('option', { name: /自動検出/ })).toBeVisible()
+
+    await user.clear(search)
+    await user.type(search, '自動検出')
+    expect(await screen.findByRole('option', { name: /自動検出/ })).toBeVisible()
+
+    await user.clear(search)
+    await user.type(search, guessLocalTimezone())
+    await user.click(await screen.findByRole('option', { name: /自動検出/ }))
+    expect(await screen.findByRole('combobox', { name: '表示タイムゾーン' })).toHaveTextContent(
+      '自動検出'
+    )
   })
 
   it('keeps untranslated content English and marks translated controls and portal content', async () => {

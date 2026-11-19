@@ -1,3 +1,4 @@
+import { toast } from 'sonner'
 import {
   Card,
   CardContent,
@@ -26,6 +27,12 @@ export const LanguageSettings = () => {
   const { locale, setLocale } = useTranslation()
   const label = resolveMessage(locale, 'account.preferences.language.label')
 
+  const handleLanguageChange = (value: string) => {
+    if (!setLocale(parseLocale(value))) {
+      toast.warning(<TranslatedText messageKey="account.preferences.language.saveError" />)
+    }
+  }
+
   return (
     <PageSection>
       <PageSectionMeta>
@@ -46,7 +53,7 @@ export const LanguageSettings = () => {
               label={<span lang={label.lang}>{label.text}</span>}
               layout="flex-row-reverse"
             >
-              <Select value={locale} onValueChange={(value) => setLocale(parseLocale(value))}>
+              <Select value={locale} onValueChange={handleLanguageChange}>
                 <SelectTrigger aria-label={label.text} lang={label.lang}>
                   <SelectValue>
                     <span lang={locale}>{LOCALE_LABELS[locale]}</span>

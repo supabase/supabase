@@ -46,4 +46,4 @@ yet is shown in English.
 - Docs, the marketing site, and everything outside Studio.
 - Most Studio screens. Only the Preferences page header, Language, and Timezone are translated so far.
 - Choosing a library. This layer deliberately adds no i18n library so that choice stays open
-  and reuses `zod` and `useLocalStorageQuery`.
+  and reuses `zod` and the existing storage adapter and query cache.
