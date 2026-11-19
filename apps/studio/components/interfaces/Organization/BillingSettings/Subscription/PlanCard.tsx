@@ -10,6 +10,16 @@ import { RequestUpgradeToBillingOwners } from '@/components/ui/RequestUpgradeToB
 import { MANAGED_BY } from '@/lib/constants/infrastructure'
 import { formatCurrency } from '@/lib/helpers'
 
+/**
+ * Subheadlines for the plans someone can upgrade to, written for a customer deciding
+ * whether to pay rather than for the marketing pricing page. Plans without an entry fall
+ * back to the shared `plan.description`, which `shared-data` also gives the pricing page.
+ */
+const PLAN_BENEFIT_HEADLINES: Partial<Record<PricingInformation['id'], string>> = {
+  tier_pro: 'More compute, daily backups, no pausing, and email support whenever you need it.',
+  tier_team: 'Compliance, access controls, and priority support for teams shipping to production.',
+}
+
 export interface PlanCardProps {
   plan: PricingInformation
   price: number
@@ -120,7 +130,7 @@ export function PlanCard({
         </div>
 
         <p className="text-foreground-light text-[13px] leading-4 mb-4 min-h-12 line-clamp-3">
-          {plan.description}
+          {PLAN_BENEFIT_HEADLINES[plan.id] ?? plan.description}
         </p>
 
         {ctaButton}
