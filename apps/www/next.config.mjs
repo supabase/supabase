@@ -211,6 +211,15 @@ const nextConfig = {
           },
         ],
       },
+      {
+        source: '/sla',
+        headers: [
+          {
+            key: 'X-Robots-Tag',
+            value: 'noindex, nofollow',
+          },
+        ],
+      },
     ]
   },
   async rewrites() {
