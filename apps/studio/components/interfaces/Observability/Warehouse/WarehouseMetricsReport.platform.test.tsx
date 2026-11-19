@@ -162,7 +162,7 @@ test('refreshes report measurements without changing the selected period', async
     method: 'get',
     path: '/platform/warehouse/:ref/metrics',
     response: ({ request }) => {
-      if (new URL(request.url).searchParams.get('attributes')?.includes('query_duration'))
+      if (!new URL(request.url).searchParams.get('attributes')?.split(',').includes('query_rate'))
         return HttpResponse.json<WarehouseMetricsResponse>({ metrics: [] })
       requests += 1
       return HttpResponse.json<WarehouseMetricsResponse>(response(requests > 2 ? 4 : null))
@@ -272,7 +272,7 @@ test('shows query outcomes without treating missing measurements as zero', async
     method: 'get',
     path: '/platform/warehouse/:ref/metrics',
     response: ({ request }) => {
-      if (new URL(request.url).searchParams.get('attributes')?.includes('query_duration'))
+      if (!new URL(request.url).searchParams.get('attributes')?.split(',').includes('query_rate'))
         return HttpResponse.json<WarehouseMetricsResponse>({ metrics: [] })
       expect(new URL(request.url).searchParams.get('attributes')?.split(',')).toEqual([
         'query_rate',

@@ -2,12 +2,17 @@ import { useReducedMotion } from 'common'
 import { Card, CardContent } from 'ui'
 import { ChartLine } from 'ui-patterns/Chart'
 
-import { getWarehouseChartPoints, type WarehouseChartSeries } from './WarehouseMetricChart.utils'
+import {
+  expandWarehouseChartSeries,
+  getWarehouseChartPoints,
+  getWarehouseSeriesRank,
+  type WarehouseChartSeries,
+} from './WarehouseMetricChart.utils'
 import { NoDataPlaceholder } from '@/components/ui/Charts/NoDataPlaceholder'
 import type { WarehouseMetric } from '@/data/warehouse/warehouse-metrics-api-types'
 
 export const getWarehouseMetricEmptyMessage = (metric?: WarehouseMetric) => {
-  if (!metric || metric.series.length > 1) return 'Metrics are temporarily unavailable'
+  if (!metric) return 'Metrics are temporarily unavailable'
   switch (metric.availability) {
     case 'stale':
       return 'No recent data'
@@ -29,29 +34,40 @@ export const WarehouseMetricChart = ({
   unit,
   scale = 1,
   emptyMessage,
-  series = [{ metric, label: title }],
+  series: inputSeries = [{ metric, label: title }],
 }: {
   metric?: WarehouseMetric
   title: string
   description: string
-  unit: string
+  unit?: string
   scale?: number
   emptyMessage?: string
   series?: WarehouseChartSeries[]
 }) => {
   const prefersReducedMotion = useReducedMotion()
 
+  const allSeries = expandWarehouseChartSeries(inputSeries)
+  const selectedSeries = [...allSeries]
+    .sort((a, b) => getWarehouseSeriesRank(b) - getWarehouseSeriesRank(a))
+    .slice(0, 12)
+  const series = allSeries.filter((item) => selectedSeries.includes(item))
+
   const points = getWarehouseChartPoints(series, scale)
   const keys = series.map((_, index) => `value${index}`)
   const config = Object.fromEntries(
     series.map((item, index) => [
       keys[index],
-      { label: item.label, color: `var(--chart-${index + 1})` },
+      { label: item.label, color: `var(--chart-${(index % 8) + 1})` },
     ])
   )
   const hasValues = points.some((point) => keys.some((key) => typeof point[key] === 'number'))
   const hasUnavailableSeries = series.some(
-    (item) => !item.metric || !['ok', 'partial'].includes(item.metric.availability)
+    (item) =>
+      !item.metric ||
+      !['ok', 'partial'].includes(item.metric.availability) ||
+      !item.metric.series.some((series) =>
+        series.points.some((point) => point.value !== null && Number.isFinite(point.value))
+      )
   )
   return (
     <section aria-label={title}>
@@ -62,9 +78,21 @@ export const WarehouseMetricChart = ({
               <h2 className="text-sm">{title}</h2>
               <p className="text-xs text-foreground-light">{description}</p>
               {series.length > 1 && (
-                <p className="text-xs text-foreground-light">
-                  {series.map((item) => item.label).join(' · ')}
-                </p>
+                <ul
+                  className="flex flex-wrap gap-x-4 gap-y-1 text-xs text-foreground-light"
+                  aria-label={`${title} series`}
+                >
+                  {series.map((item, index) => (
+                    <li key={keys[index]} className="flex items-center gap-1.5">
+                      <span
+                        className="h-2 w-2 rounded-sm"
+                        style={{ backgroundColor: `var(--chart-${(index % 8) + 1})` }}
+                        aria-hidden="true"
+                      />
+                      {item.label}
+                    </li>
+                  ))}
+                </ul>
               )}
               <ChartLine
                 className="h-64 [&_.recharts-surface:focus-visible]:outline-solid [&_.recharts-surface:focus-visible]:outline-2 [&_.recharts-surface:focus-visible]:outline-brand"
@@ -79,7 +107,7 @@ export const WarehouseMetricChart = ({
                 color="var(--chart-1)"
                 DateTimeFormat="MMM D, HH:mm"
                 showHighlightArea={false}
-                tooltipDetails={(_, __, value) => `${value}${unit ? ` ${unit}` : ''}`}
+                tooltipDetails={unit ? (_, __, value) => `${value} ${unit}` : undefined}
               />
             </>
           ) : (
@@ -93,6 +121,11 @@ export const WarehouseMetricChart = ({
                   : getWarehouseMetricEmptyMessage(metric)
               }
             />
+          )}
+          {allSeries.length > series.length && (
+            <p className="text-xs text-foreground-light">
+              Showing {series.length} of {allSeries.length} series
+            </p>
           )}
           {hasValues && series.some((item) => item.metric?.availability === 'partial') && (
             <p className="text-xs text-foreground-light">Partial data</p>
