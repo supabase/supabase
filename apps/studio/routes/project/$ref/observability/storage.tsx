@@ -16,7 +16,7 @@ import {
   TopCacheMissesRenderer,
 } from '@/components/interfaces/Reports/renderers/StorageRenderers'
 import ReportFilterBar from '@/components/interfaces/Reports/ReportFilterBar'
-import ReportHeader from '@/components/interfaces/Reports/ReportHeader'
+import { ReportHeader } from '@/components/interfaces/Reports/ReportHeader'
 import { ReportPadding } from '@/components/interfaces/Reports/ReportPadding'
 import { REPORT_DATERANGE_HELPER_LABELS } from '@/components/interfaces/Reports/Reports.constants'
 import ReportStickyNav from '@/components/interfaces/Reports/ReportStickyNav'
