@@ -47,7 +47,7 @@ export const WarehouseWorkersSection = ({
   const renderContent = () => {
     switch (query.status) {
       case 'pending':
-        return <GenericSkeletonLoader aria-label="Loading worker metrics" />
+        return <GenericSkeletonLoader />
       case 'error':
         return (
           <AlertError
@@ -78,7 +78,7 @@ export const WarehouseWorkersSection = ({
                   { metric: metric('activation_duration_mean'), label: 'Average' },
                   { metric: metric('activation_duration_p95'), label: 'p95' },
                 ]}
-                unit=" ms"
+                unit="ms"
                 scale={1000}
               />
             </div>
@@ -96,7 +96,7 @@ export const WarehouseWorkersSection = ({
                 { metric: metric('rpc_duration_mean'), label: 'Average' },
                 { metric: metric('rpc_duration_p95'), label: 'p95' },
               ]}
-              unit=" ms"
+              unit="ms"
               scale={1000}
             />
           </div>
