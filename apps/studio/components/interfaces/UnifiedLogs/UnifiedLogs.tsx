@@ -686,7 +686,7 @@ export const UnifiedLogs = ({
                     projectRef={projectRef}
                   />
                 )}
-                <div className="flex flex-wrap items-center gap-2 px-2 border-b">
+                <div className="flex flex-wrap items-center gap-0 border-b px-0 sm:gap-2 sm:px-2">
                   {hasFilterSideBar && (
                     <>
                       <ShortcutTooltip
@@ -703,21 +703,20 @@ export const UnifiedLogs = ({
                         />
                       </ShortcutTooltip>
 
-                      <div className="h-full border-r" />
+                      <div className="hidden h-full border-r sm:block" />
                     </>
                   )}
 
-                  <div className="order-first w-full min-w-0 sm:order-0 sm:w-auto sm:flex-1 py-2">
+                  <div className="order-first w-full min-w-0 px-2 py-2 sm:order-none sm:w-auto sm:flex-1 sm:px-0">
                     <LogsFilterBar offeredFilters={offeredFilters} />
                   </div>
 
-                  {hasFilterSideBar && (
-                    <div className="block sm:hidden">
-                      <DataTableFilterControlsDrawer />
-                    </div>
-                  )}
-
-                  <div className="ml-auto flex items-center gap-x-2">
+                  <div className="order-last flex w-full items-center justify-end gap-x-2 border-t px-2 pt-2 pb-2 sm:order-none sm:ml-auto sm:w-auto sm:justify-start sm:border-t-0 sm:px-0 sm:pt-0 sm:pb-0">
+                    {hasFilterSideBar && (
+                      <div className="mr-auto block sm:hidden">
+                        <DataTableFilterControlsDrawer />
+                      </div>
+                    )}
                     <RefreshButton
                       isLoading={isRefetchingData}
                       onRefresh={refetchAllData}
