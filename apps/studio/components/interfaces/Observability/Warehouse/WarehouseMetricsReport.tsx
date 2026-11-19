@@ -185,14 +185,10 @@ const WarehouseMetricsReportContent = () => {
             onResetRange={handleResetRange}
           />
           {view.kind === 'ready' && range.status === 'ok' && (
-            <div className="mt-8">
+            <div className="flex flex-col gap-y-8 mt-8">
               <WarehouseLatencySection range={range} />
-              <div className="mt-8">
-                <WarehouseCapacitySection range={range} />
-                <div className="mt-8">
-                  <WarehouseWorkersSection range={range} />
-                </div>
-              </div>
+              <WarehouseCapacitySection range={range} />
+              <WarehouseWorkersSection range={range} />
             </div>
           )}
         </div>

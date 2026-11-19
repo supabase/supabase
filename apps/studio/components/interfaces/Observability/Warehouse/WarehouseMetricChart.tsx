@@ -4,6 +4,7 @@ import { ChartLine } from 'ui-patterns/Chart'
 import {
   expandWarehouseChartSeries,
   getWarehouseChartPoints,
+  getWarehouseSeriesRank,
   type WarehouseChartSeries,
 } from './WarehouseMetricChart.utils'
 import { NoDataPlaceholder } from '@/components/ui/Charts/NoDataPlaceholder'
@@ -36,17 +37,13 @@ export const WarehouseMetricChart = ({
   metric?: WarehouseMetric
   title: string
   description: string
-  unit: string
+  unit?: string
   scale?: number
   series?: WarehouseChartSeries[]
 }) => {
   const allSeries = expandWarehouseChartSeries(inputSeries)
-  const hasMeasurements = (item: WarehouseChartSeries) =>
-    item.metric?.series.some((series) =>
-      series.points.some((point) => point.value !== null && Number.isFinite(point.value))
-    ) ?? false
   const selectedSeries = [...allSeries]
-    .sort((a, b) => Number(hasMeasurements(b)) - Number(hasMeasurements(a)))
+    .sort((a, b) => getWarehouseSeriesRank(b) - getWarehouseSeriesRank(a))
     .slice(0, 12)
   const series = allSeries.filter((item) => selectedSeries.includes(item))
   const points = getWarehouseChartPoints(series, scale)
@@ -102,7 +99,7 @@ export const WarehouseMetricChart = ({
                 color="var(--chart-1)"
                 DateTimeFormat="MMM D, HH:mm"
                 showHighlightArea={false}
-                tooltipDetails={(_, __, value) => `${value}${unit}`}
+                tooltipDetails={unit ? (_, __, value) => `${value}${unit}` : undefined}
               />
             </>
           ) : (

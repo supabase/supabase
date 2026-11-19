@@ -6,6 +6,7 @@ import { GenericSkeletonLoader } from 'ui-patterns/ShimmeringLoader'
 import { WarehouseMetricChart } from './WarehouseMetricChart'
 import type { WarehouseMetricsRange } from './WarehouseMetrics.range'
 import { AlertError } from '@/components/ui/AlertError'
+import type { WarehouseMetricName } from '@/data/warehouse/warehouse-metrics-api-types'
 import { warehouseMetricsQueryOptions } from '@/data/warehouse/warehouse-metrics-query'
 
 const getCapacityStatus = (view: 'pending' | 'error' | 'success') => {
@@ -19,6 +20,14 @@ const getCapacityStatus = (view: 'pending' | 'error' | 'success') => {
   }
 }
 
+const CAPACITY_METRICS: WarehouseMetricName[] = [
+  'worker_admission_limit',
+  'worker_admission_occupied',
+  'worker_admission_active',
+  'worker_admission_pending',
+  'admission_rejection_rate',
+]
+
 export const WarehouseCapacitySection = ({
   range,
 }: {
@@ -29,67 +38,52 @@ export const WarehouseCapacitySection = ({
   const query = useQuery(
     warehouseMetricsQueryOptions({
       projectRef: ref,
-      attributes: [
-        'worker_admission_limit',
-        'worker_admission_occupied',
-        'worker_admission_active',
-        'worker_admission_pending',
-        'admission_rejection_rate',
-      ],
+      attributes: CAPACITY_METRICS,
       startDate: range.startDate,
       endDate: range.endDate,
       interval: range.interval,
     })
   )
 
-  const renderContent = () => {
-    switch (query.status) {
-      case 'pending':
-        return <GenericSkeletonLoader aria-label="Loading capacity metrics" />
-      case 'error':
-        return (
-          <AlertError
-            projectRef={ref}
-            error={query.error}
-            subject="Failed to retrieve capacity metrics"
-            additionalActions={<Button onClick={() => query.refetch()}>Retry</Button>}
-          />
-        )
-      case 'success': {
-        const metric = (name: string) => query.data.metrics.find((item) => item.metric === name)
-        return (
-          <div className="space-y-4">
-            <h2 className="text-base">Capacity</h2>
-            <WarehouseMetricChart
-              title="Worker slots"
-              description="Worker capacity grants in use or pending connection, compared with the slot limit. Grants are not SQL query counts."
-              metric={metric('worker_admission_occupied')}
-              series={[
-                { metric: metric('worker_admission_limit'), label: 'Limit' },
-                { metric: metric('worker_admission_occupied'), label: 'In use' },
-                { metric: metric('worker_admission_active'), label: 'Active grants' },
-                { metric: metric('worker_admission_pending'), label: 'Pending grants' },
-              ]}
-              unit=""
-            />
-            <WarehouseMetricChart
-              title="Rejected requests"
-              description="Requests per second turned away before they could run, split by reason."
-              metric={metric('admission_rejection_rate')}
-              unit="/s"
-            />
-          </div>
-        )
-      }
-    }
-  }
+  const getMetric = (name: WarehouseMetricName) =>
+    query.data?.metrics.find((item) => item.metric === name)
 
   return (
-    <div className="relative">
+    <div className="relative space-y-4">
       <p role="status" className="sr-only">
         {getCapacityStatus(query.status)}
       </p>
-      {renderContent()}
+      <h2 className="text-base">Capacity</h2>
+      {query.isPending && <GenericSkeletonLoader aria-label="Loading capacity metrics" />}
+      {query.isError && (
+        <AlertError
+          projectRef={ref}
+          error={query.error}
+          subject="Failed to retrieve capacity metrics"
+          additionalActions={<Button onClick={() => query.refetch()}>Retry</Button>}
+        />
+      )}
+      {query.isSuccess && (
+        <>
+          <WarehouseMetricChart
+            title="Worker slots"
+            description="Worker capacity grants in use or pending connection, compared with the slot limit. Grants are not SQL query counts."
+            metric={getMetric('worker_admission_occupied')}
+            series={[
+              { metric: getMetric('worker_admission_limit'), label: 'Limit' },
+              { metric: getMetric('worker_admission_occupied'), label: 'In use' },
+              { metric: getMetric('worker_admission_active'), label: 'Active grants' },
+              { metric: getMetric('worker_admission_pending'), label: 'Pending grants' },
+            ]}
+          />
+          <WarehouseMetricChart
+            title="Rejected requests"
+            description="Requests per second turned away before they could run, split by reason."
+            metric={getMetric('admission_rejection_rate')}
+            unit="/s"
+          />
+        </>
+      )}
     </div>
   )
 }

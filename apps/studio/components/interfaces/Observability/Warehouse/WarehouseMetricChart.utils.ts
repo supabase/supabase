@@ -26,6 +26,15 @@ export const expandWarehouseChartSeries = (series: WarehouseChartSeries[]) =>
       }))
   })
 
+export const getWarehouseSeriesRank = ({ metric }: WarehouseChartSeries) => {
+  const points = metric?.series.flatMap((series) => series.points) ?? []
+  const measuredPoints = points.filter(
+    (point) => point.value !== null && Number.isFinite(point.value)
+  )
+  if (measuredPoints.some((point) => point.value !== 0)) return 2
+  return measuredPoints.length > 0 ? 1 : 0
+}
+
 export const getWarehouseChartPoints = (series: WarehouseChartSeries[], scale: number) => {
   const rows = new Map<number, Record<string, string | number>>()
   series.forEach(({ metric }, index) => {
