@@ -10,10 +10,14 @@ export function Hero() {
           <Badge variant="warning">Private Alpha</Badge>
         </div>
         <div className="grid grid-cols-1 lg:grid-cols-2 gap-4 items-end">
-          <h1 className="text-foreground text-3xl sm:text-5xl sm:leading-none">
-            <span className="flex items-center gap-3">Compute</span>
-            <span className="text-foreground-lighter block">for agentic workloads</span>
-          </h1>
+          <div>
+            <h1 className="text-foreground text-3xl sm:text-5xl sm:leading-none">
+              <span className="flex items-center gap-3">Compute</span>
+            </h1>
+            <p className="font-heading font-medium tracking-normal text-foreground-lighter text-3xl sm:text-5xl sm:leading-none">
+              for agentic workloads
+            </p>
+          </div>
           <p className="text-foreground-lighter text-sm lg:text-base text-balance">
             Agent sandboxes and always-on backend services running inside your Supabase project —
             next to your data, behind your auth.

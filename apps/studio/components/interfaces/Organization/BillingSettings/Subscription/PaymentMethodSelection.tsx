@@ -33,7 +33,6 @@ import type { CustomerAddress, CustomerTaxId } from '@/data/organizations/types'
 import { SetupIntentResponse } from '@/data/stripe/setup-intent-mutation'
 import { useSelectedOrganizationQuery } from '@/hooks/misc/useSelectedOrganization'
 import { STRIPE_PUBLIC_KEY } from '@/lib/constants'
-import { useOrgSettingsPageStateSnapshot } from '@/state/organization-settings'
 
 const stripePromise = loadStripe(STRIPE_PUBLIC_KEY)
 
@@ -82,7 +81,6 @@ const PaymentMethodSelection = forwardRef(function PaymentMethodSelection(
   ref
 ) {
   const { slug } = useParams()
-  const snap = useOrgSettingsPageStateSnapshot()
   const { data: selectedOrganization } = useSelectedOrganizationQuery()
   const [captchaToken, setCaptchaToken] = useState<string | null>(null)
   const [captchaRef, setCaptchaRef] = useState<HCaptcha | null>(null)
@@ -280,7 +278,6 @@ const PaymentMethodSelection = forwardRef(function PaymentMethodSelection(
               onClick={() => {
                 if (onClose) {
                   onClose()
-                  snap.setPanelKey(undefined)
                   const el = document.getElementById('address')
                   if (el) el.scrollIntoView({ behavior: 'smooth', block: 'center' })
                 }

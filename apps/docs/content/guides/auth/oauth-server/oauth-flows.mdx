@@ -412,7 +412,7 @@ The following scopes are currently supported:
 
 **Default scope:** When no scope is specified in the authorization request, the default scope is `email`.
 
-Scopes affect what information is included in ID tokens and returned by the UserInfo endpoint. All OAuth access tokens have full access to user data (same as regular session tokens), with the addition of the `client_id` claim. Use Row Level Security policies with the `client_id` claim to control which data each OAuth client can access.
+Scopes affect what information is included in ID tokens and returned by the UserInfo endpoint. All OAuth access tokens have full access to user data (same as regular session tokens), with the addition of the `client_id` claim. Use [Row Level Security](/docs/guides/database/postgres/row-level-security) policies with the `client_id` claim to control which data each OAuth client can access.
 
 <Admonition type="note">
 

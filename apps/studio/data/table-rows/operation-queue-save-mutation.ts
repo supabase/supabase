@@ -8,6 +8,7 @@ import { getTableRowCreateSql } from './table-row-create-mutation'
 import { getTableRowDeleteSql } from './table-row-delete-mutation'
 import { getTableRowUpdateSql } from './table-row-update-mutation'
 import type { PendingAddRow } from '@/components/grid/types'
+import { isUserFaultForValues } from '@/data/error-classification'
 import { unguarded } from '@/data/fetchers'
 import { executeSql } from '@/data/sql/execute-sql-mutation'
 import type { StudioError } from '@/lib/errors/studio-errors'
@@ -170,6 +171,7 @@ export async function saveOperationQueue({
     connectionString,
     sqlOrigin: 'studio',
     queryName: 'operation-queue-save',
+    isUserFaultSqlState: isUserFaultForValues,
     sql,
     isRoleImpersonationEnabled: isRoleImpersonationEnabled(roleImpersonationState?.role),
     queryKey: ['operation-queue-save'],

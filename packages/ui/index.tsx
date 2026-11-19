@@ -21,6 +21,8 @@ export {
   removeAnchor,
   highlightSelectedNavItem,
 } from './src/components/CustomHTMLElements'
+export { CopyHeadingLinkButton } from './src/components/CustomHTMLElements/CopyHeadingLinkButton'
+export { CrossfadeIcon } from './src/components/CrossfadeIcon/CrossfadeIcon'
 
 // UTILITIES
 

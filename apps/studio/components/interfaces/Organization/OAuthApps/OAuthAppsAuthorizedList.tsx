@@ -133,7 +133,7 @@ export const OAuthAppsAuthorizedList = () => {
                       <Fragment key={pageIndex}>
                         {page.data.map((approval, index) => (
                           <OAuthAppsAuthorizedRow
-                            key={approval.app.id}
+                            key={approval.id}
                             approval={approval}
                             className={cn(
                               pageIndex === data.pages.length - 1 &&

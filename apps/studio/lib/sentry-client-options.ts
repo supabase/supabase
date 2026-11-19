@@ -1,17 +1,5 @@
-// Shared Sentry client-side configuration for BOTH Studio builds:
-//
-//   - Next (pages router): `instrumentation-client.ts` — a Next convention
-//     file, auto-loaded by Next only — calls `Sentry.init` with these options.
-//   - TanStack Start (Vite): `sentry.tanstack.ts` calls `Sentry.init`
-//     with these options from `getRouter()` (router.tsx). TanStack Start does
-//     not load Next's convention files, so without its own init every
-//     `Sentry.captureException` there would be a silent no-op.
-//
-// Keep every shared option in this builder so the two runtimes cannot drift.
-//
-// `@sentry/react` is what `@sentry/nextjs` wraps on the client (same 10.x
-// version, same module instance under pnpm), so building the options against
-// it works for both `Sentry.init`s.
+// Sentry client-side configuration. `sentry.tanstack.ts` calls `Sentry.init`
+// with these options from `getRouter()` (router.tsx).
 import * as Sentry from '@sentry/react'
 import { thirdPartyErrorFilterIntegration } from '@sentry/react'
 import { hasConsented } from 'common'
@@ -89,8 +77,8 @@ export function isChallengeExpiredError(error: unknown, event: Sentry.Event): bo
 }
 
 // Tag errors whose stack trace only contains third-party frames (browser extensions,
-// injected scripts, etc.). This uses build-time code annotation via the applicationKey
-// in next.config.ts to reliably distinguish our code from third-party code.
+// injected scripts, etc.). This relies on build-time code annotation via the
+// `supabase-studio` applicationKey to reliably distinguish our code from third-party code.
 // We use 'apply-tag' instead of 'drop' so that beforeSend can exempt error boundary
 // crashes — these may originate in third-party code but are caused by first-party bugs.
 function buildThirdPartyErrorFilterIntegration(): Integration {
@@ -105,8 +93,7 @@ export interface SentryClientOptionsParams {
    * Whether to include `thirdPartyErrorFilterIntegration`.
    *
    * Only enable this on builds whose bundler annotates stack frames with the
-   * `supabase-studio` applicationKey (the Next build does, via
-   * `withSentryConfig` in next.config.ts). On a build WITHOUT the annotation
+   * `supabase-studio` applicationKey. On a build WITHOUT the annotation
    * no frame carries first-party metadata, so the integration tags EVERY
    * event `third_party_code: true` and `beforeSend` would then drop all
    * non-error-boundary events.
@@ -121,11 +108,8 @@ export interface SentryClientOptionsParams {
    * (`Client.sendSession` early-returns), so a build without a release sends
    * no Release Health traffic at all — errors and traces still flow.
    *
-   * The Next build must NOT pass this: `withSentryConfig` injects the release
-   * (`SENTRY_RELEASE` ?? the Vercel commit SHA) into the bundle at build time,
-   * and an explicit `release` key — even `undefined` — would override it.
-   * The TanStack/Vite build runs no Sentry bundler plugin, so it passes the
-   * commit SHA here instead (see sentry.tanstack.ts).
+   * The build runs no Sentry bundler plugin to inject one, so
+   * sentry.tanstack.ts passes the commit SHA.
    */
   release?: string
 }
@@ -153,8 +137,6 @@ export function buildSentryClientOptions({
     ...(process.env.NEXT_PUBLIC_SENTRY_ENVIRONMENT && {
       environment: process.env.NEXT_PUBLIC_SENTRY_ENVIRONMENT,
     }),
-    // Conditional spread: see the `release` doc comment above — the key must
-    // be ABSENT (not `undefined`) so the Next build's injected release wins.
     ...(release && { release }),
     // Setting this option to true will print useful information to the console while you're setting up Sentry.
     debug: false,
@@ -162,7 +144,7 @@ export function buildSentryClientOptions({
     // Enable performance monitoring
     tracesSampleRate: 0.02,
 
-    // Leave the error `sampleRate` unset (1.0). Error sampling is per tag in `ERROR_ROUTING` and
+    // Leave the error `sampleRate` unset (1.0). Error sampling is per tag and fault in `ERROR_ROUTING` and
     // applied in `beforeSend`; a global rate would multiply with it and also drop `alwaysCapture`.
 
     // Function form so Sentry's default integrations (browserSession,

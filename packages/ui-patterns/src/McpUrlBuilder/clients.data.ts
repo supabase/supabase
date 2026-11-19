@@ -334,10 +334,11 @@ export const MCP_CLIENT_DATA: McpClientData[] = [
       return {
         $schema: 'https://opencode.ai/config.json',
         mcp: {
-          supabase: {
-            type: 'remote',
-            url: mcpUrl,
-            enabled: true,
+          servers: {
+            supabase: {
+              type: 'remote',
+              url: mcpUrl,
+            },
           },
         },
       }

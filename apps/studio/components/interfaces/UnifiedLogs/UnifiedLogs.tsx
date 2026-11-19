@@ -16,6 +16,7 @@ import { IS_PLATFORM, LOCAL_STORAGE_KEYS, useFeatureFlags, useFlag, useParams } 
 import { Loader2Icon, PanelLeftCloseIcon, PanelLeftOpenIcon } from 'lucide-react'
 import { useQueryStates } from 'nuqs'
 import { useEffect, useEffectEvent, useMemo, useRef, useState } from 'react'
+import { toast } from 'sonner'
 import {
   Button,
   ChartConfig,
@@ -30,9 +31,18 @@ import { RefreshButton } from '../../ui/DataTable/RefreshButton'
 import { generateDynamicColumns, UNIFIED_LOGS_COLUMNS } from './components/Columns'
 import { DownloadLogsButton } from './components/DownloadLogsButton'
 import { LogsFilterBar } from './components/LogsFilterBar'
+import { getLogAttributeSources } from './components/LogsFilterBar.utils'
 import { LogsListPanel } from './components/LogsListPanel'
 import { LogsTable } from './components/LogsTable'
+import { LogsViewsMenu } from './components/LogsViewsMenu'
+import { SaveViewDialog } from './components/SaveViewDialog'
+import {
+  getFilterCombinationKey,
+  isFilterComboAlreadySaved,
+  shouldShowSaveViewSuggestion,
+} from './components/SaveViewSuggestionBanner.utils'
 import { TooltipLabel } from './components/TooltipLabel'
+import { ViewSuggestionBanner } from './components/ViewSuggestionBanner'
 import { ServiceFlowPanel } from './ServiceFlowPanel'
 import { LOG_TYPES, PIPELINE_LOG_LEVEL_LABELS, SEARCH_PARAMS_PARSER } from './UnifiedLogs.constants'
 import { filterFields as defaultFilterFields } from './UnifiedLogs.fields'
@@ -61,6 +71,14 @@ import {
   isOfferedFilter,
   toQuerySearchParams,
 } from './UnifiedLogs.utils'
+import {
+  applyView,
+  isViewModified,
+  serializeView,
+  type LogsView,
+  type LogsViewDraft,
+} from './UnifiedLogs.views'
+import { LOGS_SAVED_VIEWS_FLAG, useLogsViews } from './useLogsViews'
 import { AlertError } from '@/components/ui/AlertError'
 import { LEVELS } from '@/components/ui/DataTable/DataTable.constants'
 import { Option } from '@/components/ui/DataTable/DataTable.types'
@@ -127,6 +145,28 @@ export const UnifiedLogs = ({
   const canShowPipelinesLogs = showPipelinesLogs || isLoadingPipelinesLogs
   const { hasLoaded: flagsLoaded } = useFeatureFlags()
   const computeEnabled = useFlag('compute')
+  const savedViewsFlag = useFlag(LOGS_SAVED_VIEWS_FLAG)
+  const showSavedViews = IS_PLATFORM && savedViewsFlag
+  const {
+    views: savedViews,
+    isLoading: isLoadingSavedViews,
+    isError: isErrorSavedViews,
+    createView: createSavedView,
+    updateView: updateSavedView,
+    deleteView: deleteSavedView,
+    isPending: isSavingView,
+    canCreate: canCreateView,
+    canUpdate: canUpdateView,
+    canDelete: canDeleteView,
+    retry: retrySavedViews,
+  } = useLogsViews()
+  const [activeViewId, setActiveViewId] = useState<string | null>(null)
+  const [saveDialogProject, setSaveDialogProject] = useState<string | null>(null)
+  const isSaveViewDialogOpen = saveDialogProject !== null && saveDialogProject === projectRef
+  const currentProjectRef = useRef(projectRef)
+  currentProjectRef.current = projectRef
+  const [dismissedFilterKeys, setDismissedFilterKeys] = useState<Set<string>>(new Set())
+  const [dismissedUpdateKey, setDismissedUpdateKey] = useState<string | null>(null)
   const computeAvailability = getComputeLogsAvailability({
     isPlatform: IS_PLATFORM,
     flagsLoaded,
@@ -431,6 +471,95 @@ export const UnifiedLogs = ({
     })
   }, [facets, offeredFilters, queryLogTypeVisibility, isPipelinesLogsView])
 
+  const filterableNames = useMemo(
+    () => new Set(filterFields.map((field) => field.value)),
+    [filterFields]
+  )
+  const columnLabels = useMemo(
+    () => Object.fromEntries(filterFields.map((field) => [field.value, field.label])),
+    [filterFields]
+  )
+  const activeView = savedViews.find((view) => view.id === activeViewId) ?? null
+  const isActiveViewModified = activeView ? isViewModified(activeView, search) : false
+  const activeFilterCount = parseLogsFilterUrlParams(search.filter).length
+  const logSource = getLogAttributeSources(searchParameters)[0] ?? 'edge_logs'
+  const currentDraft = useMemo(
+    () => serializeView({ name: '', logSource, search }),
+    [logSource, search]
+  )
+  const filterCombinationKey = getFilterCombinationKey(search.filter)
+  const showSaveViewSuggestion = shouldShowSaveViewSuggestion({
+    isEnabled: showSavedViews && canCreateView && !isSavingView,
+    activeFilterCount,
+    hasActiveView: !!activeView,
+    isDialogOpen: isSaveViewDialogOpen,
+    isDismissed: dismissedFilterKeys.has(filterCombinationKey),
+    isAlreadySaved: isFilterComboAlreadySaved(currentDraft.filters, savedViews),
+  })
+  // Keyed by view + filter combination so dismissing re-shows if the user modifies
+  // the view differently afterwards, and automatically "resets" once unmodified.
+  const updateSuggestionKey = activeView ? `${activeView.id}:${filterCombinationKey}` : null
+  const showUpdateViewSuggestion =
+    showSavedViews &&
+    !!activeView &&
+    canUpdateView &&
+    !isSavingView &&
+    isActiveViewModified &&
+    !isSaveViewDialogOpen &&
+    updateSuggestionKey !== dismissedUpdateKey
+
+  const handleApplyView = (view: LogsView) => {
+    const { params, dropped } = applyView(view, { filterableNames })
+    if (dropped.length > 0) {
+      console.warn(`Saved view "${view.name}" dropped unknown filters/options:`, dropped)
+    }
+    setSorting(params.sort ? [params.sort] : [])
+    setSearch(params)
+    setActiveViewId(view.id)
+  }
+
+  const handleUpdateActiveView = async () => {
+    if (!activeView) return
+    const { filters, viewOptions } = serializeView({
+      name: activeView.name,
+      logSource: activeView.logSource,
+      search,
+    })
+    try {
+      await updateSavedView(activeView.id, { filters, viewOptions })
+      toast.success('View updated')
+    } catch {
+      return
+    }
+  }
+
+  const handleSaveCurrentView = () => {
+    setSaveDialogProject(projectRef ?? null)
+  }
+
+  const handleClearActiveView = () => {
+    table.resetColumnFilters()
+    setActiveViewId(null)
+  }
+
+  const handleCreateView = async (input: LogsViewDraft) => {
+    const savedProjectRef = projectRef
+    const id = await createSavedView(input)
+    if (currentProjectRef.current === savedProjectRef) {
+      setActiveViewId(id)
+      setSaveDialogProject(null)
+    }
+    toast.success('View saved')
+  }
+
+  const handleDismissSuggestion = () => {
+    setDismissedFilterKeys((prev) => new Set(prev).add(filterCombinationKey))
+  }
+
+  const handleDismissUpdateSuggestion = () => {
+    setDismissedUpdateKey(updateSuggestionKey)
+  }
+
   const applyFilterSearch = () => {
     const offeredColumnFilters = columnFilters.filter(
       ({ id }) =>
@@ -505,178 +634,226 @@ export const UnifiedLogs = ({
   }, [isMobile])
 
   return (
-    <DataTableProvider
-      table={table}
-      error={error}
-      columns={UNIFIED_LOGS_COLUMNS}
-      filterFields={filterFields}
-      columnFilters={columnFilters}
-      sorting={sorting}
-      rowSelection={rowSelection}
-      openRowId={openRowId}
-      setOpenRowId={setOpenRowId}
-      onSelectRow={handleSelectRow}
-      columnOrder={columnOrder}
-      columnVisibility={columnVisibility}
-      searchParameters={searchParameters}
-      hasPendingFilterChange={localFilterOrigin === urlFilterScope}
-      enableColumnOrdering={true}
-      isFetching={isFetching}
-      isError={isError}
-      isLoading={isLoading}
-      isLoadingCounts={isLoadingCounts}
-      getFacetedUniqueValues={getFacetedUniqueValues(facets)}
-    >
-      <DataTableSideBarLayout topBarHeight={topBarHeight}>
-        <ResizablePanelGroup
-          orientation="horizontal"
-          autoSaveId={columnPreferencesKey ? `logs-layout-${columnPreferencesKey}` : 'logs-layout'}
-        >
-          {hasFilterSideBar && (
-            <>
-              <FilterSideBar
-                isFilterBarOpen={isFilterBarOpen}
-                setIsFilterBarOpen={setIsFilterBarOpen}
-                dateRangeDisabled={{ after: new Date() }}
-              />
-              <ResizableHandle withHandle />
-            </>
-          )}
-          <ResizablePanel
-            id="panel-right"
-            className="flex max-w-full flex-1 flex-col overflow-hidden"
+    <>
+      <DataTableProvider
+        table={table}
+        error={error}
+        columns={UNIFIED_LOGS_COLUMNS}
+        filterFields={filterFields}
+        columnFilters={columnFilters}
+        sorting={sorting}
+        rowSelection={rowSelection}
+        openRowId={openRowId}
+        setOpenRowId={setOpenRowId}
+        onSelectRow={handleSelectRow}
+        columnOrder={columnOrder}
+        columnVisibility={columnVisibility}
+        searchParameters={searchParameters}
+        hasPendingFilterChange={localFilterOrigin === urlFilterScope}
+        enableColumnOrdering={true}
+        isFetching={isFetching}
+        isError={isError}
+        isLoading={isLoading}
+        isLoadingCounts={isLoadingCounts}
+        getFacetedUniqueValues={getFacetedUniqueValues(facets)}
+      >
+        <DataTableSideBarLayout topBarHeight={topBarHeight}>
+          <ResizablePanelGroup
+            orientation="horizontal"
+            autoSaveId={
+              columnPreferencesKey ? `logs-layout-${columnPreferencesKey}` : 'logs-layout'
+            }
           >
-            <div ref={topBarRef} className="top-0 z-10 flex flex-col bg-background">
-              {isError && flatData.length > 0 && (
+            {hasFilterSideBar && (
+              <>
+                <FilterSideBar
+                  isFilterBarOpen={isFilterBarOpen}
+                  setIsFilterBarOpen={setIsFilterBarOpen}
+                  dateRangeDisabled={{ after: new Date() }}
+                />
+                <ResizableHandle withHandle />
+              </>
+            )}
+            <ResizablePanel
+              id="panel-right"
+              className="flex max-w-full flex-1 flex-col overflow-hidden"
+            >
+              <div ref={topBarRef} className="top-0 z-10 flex flex-col bg-background">
+                {isError && flatData.length > 0 && (
+                  <AlertError
+                    error={error}
+                    subject="Failed to refresh logs"
+                    projectRef={projectRef}
+                  />
+                )}
+                <div className="flex flex-wrap items-center gap-2 px-2 border-b">
+                  {hasFilterSideBar && (
+                    <>
+                      <ShortcutTooltip
+                        shortcutId={SHORTCUT_IDS.DATA_TABLE_TOGGLE_FILTERS}
+                        side="bottom"
+                      >
+                        <Button
+                          size="tiny"
+                          variant="text"
+                          icon={isFilterBarOpen ? <PanelLeftCloseIcon /> : <PanelLeftOpenIcon />}
+                          onClick={() => setIsFilterBarOpen((prev) => !prev)}
+                          className="hidden w-[26px] sm:flex"
+                          aria-label={isFilterBarOpen ? 'Hide filters' : 'Show filters'}
+                        />
+                      </ShortcutTooltip>
+
+                      <div className="h-full border-r" />
+                    </>
+                  )}
+
+                  <div className="order-first w-full min-w-0 sm:order-0 sm:w-auto sm:flex-1 py-2">
+                    <LogsFilterBar offeredFilters={offeredFilters} />
+                  </div>
+
+                  {hasFilterSideBar && (
+                    <div className="block sm:hidden">
+                      <DataTableFilterControlsDrawer />
+                    </div>
+                  )}
+
+                  <div className="ml-auto flex items-center gap-x-2">
+                    <RefreshButton
+                      isLoading={isRefetchingData}
+                      onRefresh={refetchAllData}
+                      shortcutId={SHORTCUT_IDS.UNIFIED_LOGS_REFRESH}
+                    />
+                    {showSavedViews && (
+                      <LogsViewsMenu
+                        key={projectRef}
+                        views={savedViews}
+                        isLoading={isLoadingSavedViews}
+                        isError={isErrorSavedViews}
+                        activeViewId={activeView?.id ?? null}
+                        isPending={isSavingView}
+                        canUpdate={canUpdateView}
+                        canDelete={canDeleteView}
+                        onRetry={retrySavedViews}
+                        onApply={handleApplyView}
+                        onRename={(id, name) => updateSavedView(id, { name })}
+                        onDelete={deleteSavedView}
+                        onClearActiveView={handleClearActiveView}
+                      />
+                    )}
+                    <DataTableViewOptions />
+                    <DownloadLogsButton searchParameters={searchParameters} />
+                    {fetchPreviousPage ? (
+                      <LiveButton
+                        fetchPreviousPage={fetchPreviousPage}
+                        searchParamsParser={SEARCH_PARAMS_PARSER}
+                      />
+                    ) : null}
+                  </div>
+                </div>
+
+                {isLoading ? (
+                  <div className="h-[60px] flex items-center justify-center">
+                    <Loader2Icon size={14} className="animate-spin text-foreground-lighter" />
+                  </div>
+                ) : (
+                  <TimelineChart
+                    data={unifiedLogsChart}
+                    className={cn(
+                      '-mb-1.5 mt-1.5',
+                      isFetchingCharts && 'opacity-60 transition-opacity duration-150'
+                    )}
+                    columnId="timestamp"
+                    filterColumnId="date"
+                    chartConfig={filteredChartConfig}
+                  />
+                )}
+              </div>
+
+              {selectedLogQuery.isError && (
                 <AlertError
-                  error={error}
-                  subject="Failed to refresh logs"
+                  error={selectedLogQuery.error}
+                  subject="Failed to retrieve logs"
                   projectRef={projectRef}
                 />
               )}
-              <div className="flex flex-wrap items-center gap-2 px-2 border-b">
-                {hasFilterSideBar && (
-                  <>
-                    <ShortcutTooltip
-                      shortcutId={SHORTCUT_IDS.DATA_TABLE_TOGGLE_FILTERS}
-                      side="bottom"
-                    >
-                      <Button
-                        size="tiny"
-                        variant="text"
-                        icon={isFilterBarOpen ? <PanelLeftCloseIcon /> : <PanelLeftOpenIcon />}
-                        onClick={() => setIsFilterBarOpen((prev) => !prev)}
-                        className="hidden w-[26px] sm:flex"
-                        aria-label={isFilterBarOpen ? 'Hide filters' : 'Show filters'}
-                      />
-                    </ShortcutTooltip>
+              <ViewSuggestionBanner
+                visible={showSaveViewSuggestion}
+                title={`You've configured ${activeFilterCount} filters`}
+                description="Would you like to save them as a view?"
+                primaryLabel="Save"
+                onPrimary={handleSaveCurrentView}
+                onDismiss={handleDismissSuggestion}
+              />
+              <ViewSuggestionBanner
+                visible={showUpdateViewSuggestion}
+                title="You have modified your view"
+                description="Would you like to update?"
+                primaryLabel="Update"
+                onPrimary={handleUpdateActiveView}
+                onDismiss={handleDismissUpdateSuggestion}
+              />
+              <ResizablePanelGroup
+                key="main-logs"
+                className="flex-1 border-t"
+                orientation={dock === 'bottom' ? 'vertical' : 'horizontal'}
+              >
+                <ResizablePanel
+                  defaultSize="100"
+                  minSize="10"
+                  className={cn(
+                    'bg',
+                    isFetchingButNotPaginating && 'opacity-60 transition-opacity duration-150'
+                  )}
+                >
+                  <LogsTable
+                    columns={UNIFIED_LOGS_COLUMNS}
+                    totalRows={totalDBRowCount}
+                    filterRows={filterDBRowCount}
+                    totalRowsFetched={totalFetched}
+                    fetchNextPage={fetchNextPage}
+                    hasNextPage={hasNextPage}
+                    setColumnOrder={setColumnOrder}
+                    setColumnVisibility={setColumnVisibility}
+                    emptyStateMessage={
+                      isUserFilterUnreachable(searchParameters) ? (
+                        <div className="text-sm flex flex-col gap-y-1">
+                          <p className="text-foreground-light">No results found</p>
+                          <p className="text-foreground-lighter">
+                            Filtering by user is only supported for Auth and API Gateway log types
+                          </p>
+                        </div>
+                      ) : undefined
+                    }
+                  />
+                </ResizablePanel>
 
-                    <div className="h-full border-r" />
+                {!!openRowId && !!selectedRow && (
+                  <>
+                    {selectedRows.length === 1 && <LogsListPanel selectedRow={selectedRow} />}
+                    <ServiceFlowPanel
+                      dock={dock}
+                      setDock={setDock}
+                      selectedRows={selectedRows.map((row) => row.original)}
+                      searchParameters={searchParameters}
+                    />
                   </>
                 )}
-
-                <div className="order-first w-full min-w-0 sm:order-0 sm:w-auto sm:flex-1 py-2">
-                  <LogsFilterBar offeredFilters={offeredFilters} />
-                </div>
-
-                {hasFilterSideBar && (
-                  <div className="block sm:hidden">
-                    <DataTableFilterControlsDrawer />
-                  </div>
-                )}
-
-                <div className="ml-auto flex items-center gap-x-2">
-                  <RefreshButton
-                    isLoading={isRefetchingData}
-                    onRefresh={refetchAllData}
-                    shortcutId={SHORTCUT_IDS.UNIFIED_LOGS_REFRESH}
-                  />
-                  <DataTableViewOptions />
-                  <DownloadLogsButton searchParameters={searchParameters} />
-                  {fetchPreviousPage ? (
-                    <LiveButton
-                      fetchPreviousPage={fetchPreviousPage}
-                      searchParamsParser={SEARCH_PARAMS_PARSER}
-                    />
-                  ) : null}
-                </div>
-              </div>
-
-              {isLoading ? (
-                <div className="h-[60px] flex items-center justify-center">
-                  <Loader2Icon size={14} className="animate-spin text-foreground-lighter" />
-                </div>
-              ) : (
-                <TimelineChart
-                  data={unifiedLogsChart}
-                  className={cn(
-                    '-mb-1.5 mt-1.5',
-                    isFetchingCharts && 'opacity-60 transition-opacity duration-150'
-                  )}
-                  columnId="timestamp"
-                  filterColumnId="date"
-                  chartConfig={filteredChartConfig}
-                />
-              )}
-            </div>
-
-            {selectedLogQuery.isError && (
-              <AlertError
-                error={selectedLogQuery.error}
-                subject="Failed to retrieve logs"
-                projectRef={projectRef}
-              />
-            )}
-            <ResizablePanelGroup
-              key="main-logs"
-              className="flex-1 border-t"
-              orientation={dock === 'bottom' ? 'vertical' : 'horizontal'}
-            >
-              <ResizablePanel
-                defaultSize="100"
-                minSize="10"
-                className={cn(
-                  'bg',
-                  isFetchingButNotPaginating && 'opacity-60 transition-opacity duration-150'
-                )}
-              >
-                <LogsTable
-                  columns={UNIFIED_LOGS_COLUMNS}
-                  totalRows={totalDBRowCount}
-                  filterRows={filterDBRowCount}
-                  totalRowsFetched={totalFetched}
-                  fetchNextPage={fetchNextPage}
-                  hasNextPage={hasNextPage}
-                  setColumnOrder={setColumnOrder}
-                  setColumnVisibility={setColumnVisibility}
-                  emptyStateMessage={
-                    isUserFilterUnreachable(searchParameters) ? (
-                      <div className="text-sm flex flex-col gap-y-1">
-                        <p className="text-foreground-light">No results found</p>
-                        <p className="text-foreground-lighter">
-                          Filtering by user is only supported for Auth and API Gateway log types
-                        </p>
-                      </div>
-                    ) : undefined
-                  }
-                />
-              </ResizablePanel>
-
-              {!!openRowId && !!selectedRow && (
-                <>
-                  {selectedRows.length === 1 && <LogsListPanel selectedRow={selectedRow} />}
-                  <ServiceFlowPanel
-                    dock={dock}
-                    setDock={setDock}
-                    selectedRows={selectedRows.map((row) => row.original)}
-                    searchParameters={searchParameters}
-                  />
-                </>
-              )}
-            </ResizablePanelGroup>
-          </ResizablePanel>
-        </ResizablePanelGroup>
-      </DataTableSideBarLayout>
-    </DataTableProvider>
+              </ResizablePanelGroup>
+            </ResizablePanel>
+          </ResizablePanelGroup>
+        </DataTableSideBarLayout>
+      </DataTableProvider>
+      <SaveViewDialog
+        key={projectRef}
+        visible={isSaveViewDialogOpen}
+        onCancel={() => setSaveDialogProject(null)}
+        onSave={handleCreateView}
+        logSource={logSource}
+        filters={currentDraft.filters}
+        viewOptions={currentDraft.viewOptions}
+        existingNames={savedViews.map((view) => view.name)}
+        columnLabels={columnLabels}
+      />
+    </>
   )
 }

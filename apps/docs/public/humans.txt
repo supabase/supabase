@@ -18,6 +18,7 @@ Aleksi Immonen
 Alex Hall
 Alex Hsu
 Alex Ives
+Alex Venter
 Alexander Alexandrov
 Alexander Korotkov
 Alexis Aguilar
@@ -129,6 +130,7 @@ Etienne Stalmans
 Evan Cummack
 Fabrizio Fenoglio
 Fady A
+Fallon Petty
 Farley Thomas
 Fatuma Abdullahi
 Felipe Stival
@@ -167,6 +169,7 @@ Inian P
 Iryna Deans
 Isaac Dawson
 Ivan Vasilov
+Jagpreet Singh
 Jamie Boyd
 Jake Ng
 Jared Patterson
@@ -274,6 +277,7 @@ Mike Podobnik
 Miranda Limonczenko
 Monica Khoury
 Mrinal Paliwal
+Musa Jundi
 Mykhailo Mischa Lieibenson
 Nara Kasbergen Kwon
 Natalie Roberge
@@ -356,6 +360,7 @@ Sreyas Udayavarman
 Stephanie Jackson (stejacks)
 Stephen Denham
 Stephen Morgan
+Steve Abrams
 Steve Chavez
 Steven Eubank
 Stojan Dimitrovski

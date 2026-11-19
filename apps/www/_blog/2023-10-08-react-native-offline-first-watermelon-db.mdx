@@ -18,7 +18,7 @@ Using the [Supabase JavaScript Client](https://supabase.com/docs/reference/javas
 
 This has multiple advantages, the obvious being that the app can be used offline. But even when the app is used online, the user experience still profits from this approach as reading and updating data feels instantaneous as it happens on the device first and is then synced in the background. The approach also has drawbacks: Data can become stale, and if it is changed in multiple places while offline, data conflicts can occur.
 
-There are sophisticated database technologies like CRDT (conflict-free replicated data type), which are also making their way into mobile apps. For our example, we will not reach for a CRDT and instead use WatermelonDB, an open-source solution built on SQLite that includes a sync engine and applies the simple strategy of just letting the latest change of a record win. Follow along to build a React Native/Expo app that uses WatermelonDB as the offline-first data store and syncs to a Supabase backend using Remote Procedure Calls and Supabase Realtime to trigger sync on other devices.
+There are sophisticated database technologies like CRDT (conflict-free replicated data type), which are also making their way into mobile apps. For our example, we will not reach for a CRDT and instead use WatermelonDB, an open-source solution built on SQLite that includes a sync engine and applies the simple strategy of just letting the latest change of a record win. Follow along to build a React Native/Expo app that uses WatermelonDB as the offline-first data store and syncs to a Supabase backend using Remote Procedure Calls and [Supabase Realtime](/docs/guides/realtime) to trigger sync on other devices.
 
 The approach described in this blog post was developed while building [Share My Stack](https://sharemystack.com/). This mobile app allows people to curate and share their personal productivity stack as well as their favorite development stack. The app is available on the [App Store](https://apps.apple.com/us/app/share-my-stack/id6450111644), and the complete source code is available on [GitHub](https://github.com/bndkt/sharemystack/) for educational purposes. Here is a little demo of what the result looks like when using the app on two separate devices:
 
@@ -104,7 +104,7 @@ static associations = {
 
 ## Syncing the local DB with Supabase
 
-The [WatermelonDB docs](https://watermelondb.dev/docs/) outline how to set up a sync function that talks with the backend server. In our case, the backend is a Postgres database hosted on Supabase. As indicated earlier, we'll implement the sync via two [Postgres functions](https://supabase.com/docs/guides/database/functions) called via Supabase RPC. This way, each sync is only two database calls (one push, one pull), and most of the logic is carried out directly within the database.
+The [WatermelonDB docs](https://watermelondb.dev/docs) outline how to set up a sync function that talks with the backend server. In our case, the backend is a Postgres database hosted on Supabase. As indicated earlier, we'll implement the sync via two [Postgres functions](https://supabase.com/docs/guides/database/functions) called via Supabase RPC. This way, each sync is only two database calls (one push, one pull), and most of the logic is carried out directly within the database.
 
 ```typescript
 import { SyncDatabaseChangeSet, synchronize } from '@nozbe/watermelondb/sync'

@@ -4,7 +4,7 @@ import { createContext, use, useCallback, useEffect, useMemo, useState } from 'r
 import type { ComponentProps, CSSProperties } from 'react'
 import { cn } from 'ui'
 
-import { useTrace } from './Trace'
+import { useTrace, useView } from './Trace'
 import type { TimeScale, WaterfallProps } from './types'
 import { createTimeScale } from './utils'
 
@@ -27,6 +27,7 @@ export function Waterfall({
   ...props
 }: WaterfallProps) {
   const { bounds } = useTrace()
+  const { window } = useView()
   const [element, setElement] = useState<HTMLDivElement | null>(null)
   const [width, setWidth] = useState(0)
   const [height, setHeight] = useState(0)
@@ -45,10 +46,11 @@ export function Waterfall({
     return () => observer.disconnect()
   }, [element])
 
-  const [start, end] = bounds
+  const [start, end] = window
+  const origin = bounds[0]
   const scale = useMemo(
-    () => createTimeScale([start, end], Math.max(0, width - treeWidth)),
-    [start, end, width, treeWidth]
+    () => createTimeScale([start, end], Math.max(0, width - treeWidth), origin),
+    [start, end, width, treeWidth, origin]
   )
 
   return (
@@ -78,6 +80,7 @@ export function Waterfall({
 
 export function Ruler({ className, children, ...props }: ComponentProps<'div'>) {
   const scale = useWaterfallScale()
+  const { isZoomed } = useView()
 
   return (
     <div
@@ -105,7 +108,7 @@ export function Ruler({ className, children, ...props }: ComponentProps<'div'>) 
             className={cn(
               'absolute inset-y-0',
               tick.fraction > 0 && 'border-l border-strong',
-              LIVE_GROWTH_TRANSITION
+              !isZoomed && LIVE_GROWTH_TRANSITION
             )}
             style={{ left: `${tick.fraction * 100}%` }}
           >
@@ -121,6 +124,7 @@ export function Ruler({ className, children, ...props }: ComponentProps<'div'>) 
 
 export function Grid({ className, ...props }: ComponentProps<'div'>) {
   const scale = useWaterfallScale()
+  const { isZoomed } = useView()
 
   return (
     <div data-trace-grid-anchor className="relative z-0 h-0 shrink-0">
@@ -138,7 +142,10 @@ export function Grid({ className, ...props }: ComponentProps<'div'>) {
             <div
               key={tick.ms}
               data-trace-gridline
-              className={cn('absolute inset-y-0 border-l border-muted', LIVE_GROWTH_TRANSITION)}
+              className={cn(
+                'absolute inset-y-0 border-l border-muted',
+                !isZoomed && LIVE_GROWTH_TRANSITION
+              )}
               style={{ left: `${tick.fraction * 100}%` }}
             />
           ) : null
@@ -151,6 +158,7 @@ export function Grid({ className, ...props }: ComponentProps<'div'>) {
 export function Cursor({ className, ...props }: ComponentProps<'div'>) {
   const scale = useWaterfallScale()
   const { isLive, nowMs } = useTrace()
+  const { isZoomed } = useView()
   const fraction = scale.toFraction(nowMs)
   if (!isLive || fraction < 0 || fraction > 1) return null
 
@@ -167,7 +175,10 @@ export function Cursor({ className, ...props }: ComponentProps<'div'>) {
       >
         <div
           data-trace-cursor
-          className={cn('absolute inset-y-0 border-l border-brand', LIVE_GROWTH_TRANSITION)}
+          className={cn(
+            'absolute inset-y-0 border-l border-brand',
+            !isZoomed && LIVE_GROWTH_TRANSITION
+          )}
           style={{ left: `${fraction * 100}%` }}
         >
           <span className="absolute -left-[0.5px] top-(--trace-ruler-height) size-1.5 -translate-x-1/2 -translate-y-1/2 rounded-full bg-brand" />
