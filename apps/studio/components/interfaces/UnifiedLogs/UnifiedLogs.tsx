@@ -669,8 +669,10 @@ export const UnifiedLogs = ({
   useEffect(() => {
     if (isMobile) {
       setIsFilterBarOpen(false)
+      setIsViewsSectionOpen(false)
     } else {
       setIsFilterBarOpen(true)
+      setIsMobileViewsDrawerOpen(false)
     }
   }, [isMobile])
 
