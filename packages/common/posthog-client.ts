@@ -122,8 +122,8 @@ class PostHogClient {
         // reports no change. Subscribed before the flushes below, which can rotate it.
         posthog.get_session_id()
         posthog.onSessionId((sessionId) => {
-          // An opt-out, here or in another tab, resets the session, and the id minted after it
-          // would restore the cookie that withdrawing consent cleared.
+          // Skip while opted out, here or in another tab: an opt-out resets the session, and
+          // writing the new id would restore the cookie that withdrawing consent cleared.
           if (this.optedOut || posthog.has_opted_out_capturing()) return
           document.cookie = `session_id=${sessionId}; ${getTelemetryCookieOptions()}`
         })
