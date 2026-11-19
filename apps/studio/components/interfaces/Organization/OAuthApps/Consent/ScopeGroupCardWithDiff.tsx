@@ -1,7 +1,11 @@
 import { MinusIcon, PlusIcon } from 'lucide-react'
 import { cn } from 'ui'
 
-import { getDiffBetweenScopes, ScopeGroupLevel } from './OAuthAppsAuthorizeScreen.utils'
+import {
+  formatPermissionName,
+  getDiffBetweenScopes,
+  ScopeGroupLevel,
+} from './OAuthAppsAuthorizeScreen.utils'
 import { ScopePermissionLabel } from './ScopeGroupCardItem'
 
 export interface ScopeGroupCardProps {
@@ -49,7 +53,7 @@ export const ScopeGroupCardWithDiff = (props: ScopeGroupCardProps) => {
                   key={permission}
                   className={cn(
                     'flex items-center justify-between gap-2 py-2',
-                    status === 'Added' && 'text-green-1100',
+                    status === 'Added' && 'text-success',
                     status === 'Removed' && 'text-destructive',
                     status === 'Unchanged' && 'text-foreground-light'
                   )}
@@ -61,7 +65,11 @@ export const ScopeGroupCardWithDiff = (props: ScopeGroupCardProps) => {
                     )}
                     {status === 'Unchanged' && <span className="w-3 shrink-0" aria-hidden />}
                     <span className={cn('font-medium', status === 'Removed' && 'line-through')}>
-                      <ScopePermissionLabel permission={permission} />
+                      {status === 'Removed' ? (
+                        formatPermissionName(permission)
+                      ) : (
+                        <ScopePermissionLabel permission={permission} />
+                      )}
                     </span>
                   </span>
                   <span className={cn(status === 'Unchanged' && 'text-foreground-lighter')}>
