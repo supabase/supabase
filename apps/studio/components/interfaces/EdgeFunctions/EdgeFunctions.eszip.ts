@@ -82,6 +82,12 @@ async function getOriginalSource(
 export async function extractFunctionSourcesFromEszip(
   eszip: Uint8Array
 ): Promise<{ name: string; content: string }[]> {
+  // Browser-only: the guard lets server builds drop `@deno/eszip` and its Node deps entirely.
+  // Vitest runs node tests as SSR, so it's let through there.
+  if (import.meta.env.SSR && !import.meta.env.VITEST) {
+    throw new Error('Edge function bundles can only be extracted in the browser')
+  }
+
   // Lazy so the WASM parser is only loaded when someone actually downloads an oversized function
   const { Parser } = await import('@deno/eszip')
 
