@@ -190,8 +190,9 @@ testRunner('table editor', () => {
     await expect(confirmDialog).not.toBeVisible()
     await expect(page.getByRole('menu')).toHaveCount(0)
 
-    // "More options" is available on a table that isn't open, and using it doesn't open that table
-    await otherTableRow.hover()
+    // "More options" is available on a table that isn't open, and using it doesn't open that table.
+    // Click it directly: hovering the row first can land on its "Unrestricted" / Data API badge,
+    // whose tooltip opens to the right and covers this button
     await page.getByRole('button', { name: `More options for ${otherTableName}` }).click()
     await expect(
       page.getByRole('menuitem', { name: 'Delete table' }),
