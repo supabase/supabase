@@ -845,7 +845,7 @@ export const UnifiedLogs = ({
                               variant="text"
                               className="w-[26px]"
                               icon={<Layers2Icon className={savedViewsIconClassName} />}
-                              aria-label="Saved views"
+                              aria-label={getSavedViewsTooltip()}
                             />
                           </DrawerTrigger>
                           <DrawerContent className="max-h-[calc(100dvh-4rem)]">
