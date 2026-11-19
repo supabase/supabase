@@ -107,7 +107,7 @@ export const FileExplorerRowEditing = ({
           onSubmit={(event) => onSaveItemName(itemName.trim() || item.name, event)}
         >
           <input
-            aria-label={item.name}
+            aria-label={item.type === STORAGE_ROW_TYPES.FILE ? 'File name' : 'Folder name'}
             autoFocus
             ref={inputRef}
             className="storage-row-input ml-3 h-full bg-inherit p-0 px-1 text-sm"
