@@ -20,6 +20,7 @@ import {
   SupabaseLogo,
 } from '@/components/layouts/InterstitialLayout'
 import { AlertError } from '@/components/ui/AlertError'
+import { ButtonTooltip } from '@/components/ui/ButtonTooltip'
 import { useOAuthAppsAuthorizeApproveMutation } from '@/data/oauth-apps/oauth-apps-authorize-approve-mutation'
 import { useOAuthAppsAuthorizeDenyMutation } from '@/data/oauth-apps/oauth-apps-authorize-deny-mutation'
 import { useOAuthAppsAuthorizeOrganizationProjectsQuery } from '@/data/oauth-apps/oauth-apps-authorize-organization-projects-query'
@@ -404,6 +405,18 @@ export const OAuthAppsAuthorizeScreen = ({
             </div>
           )}
 
+          {canProceed && blockedProjects.length > 0 && (
+            <DatabaseAccessProjectIssues
+              projects={blockedProjects}
+              onRemove={
+                usesSelectedProjects
+                  ? (ref) =>
+                      setSelectedProjectRefs((refs) => refs.filter((selected) => selected !== ref))
+                  : undefined
+              }
+            />
+          )}
+
           {canProceed && (
             <>
               <section className="flex flex-col gap-3">
@@ -474,21 +487,19 @@ export const OAuthAppsAuthorizeScreen = ({
               </div>
             </Admonition>
           )}
-          {canProceed && blockedProjects.length > 0 && (
-            <DatabaseAccessProjectIssues
-              projects={blockedProjects}
-              onRemove={
-                usesSelectedProjects
-                  ? (ref) =>
-                      setSelectedProjectRefs((refs) => refs.filter((selected) => selected !== ref))
-                  : undefined
-              }
-            />
-          )}
-
           {canProceed ? (
-            <Button
+            <ButtonTooltip
               block
+              tooltip={{
+                content: {
+                  side: 'top',
+                  text: hasBlockedProjects
+                    ? usesSelectedProjects
+                      ? 'Fix or remove the projects listed above.'
+                      : 'Fix the projects listed above.'
+                    : undefined,
+                },
+              }}
               variant={primaryActionVariant}
               loading={isSubmitting || isPendingPreflight}
               disabled={cannotApprove}
@@ -496,7 +507,7 @@ export const OAuthAppsAuthorizeScreen = ({
               onClick={hasRoleFailure ? handleDeselectFlagged : handleApprove}
             >
               {isSubmitting ? 'Authorizing...' : primaryActionLabel}
-            </Button>
+            </ButtonTooltip>
           ) : (
             <Button block variant="primary" onClick={handleSwitchOrg}>
               Switch organization
