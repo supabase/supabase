@@ -23,6 +23,7 @@ of work or audience, or background past a short paragraph. Background goes to an
 4. **Required**: `## <Task>`, the happy-path procedure, or `## Procedure` if the task repeats the title.
 5. **Optional**: `## Verify`, if there is something to check. A numbered procedure with a command or request and the output that means it worked.
 6. **Required**: `## Next steps`: two to four links, each with a reason.
+7. **Optional**: `## Related resources`, last on the page. Links to related pages that aren't a next action, each with a reason, so readers and agents can find connected information.
 
 Repeat item 4 for each stage or variant of the task, per
 [Branch procedures by what differs](#branch-procedures-by-what-differs).
@@ -115,6 +116,12 @@ To keep going, use these pages:
 
 - [Row Level Security](/docs/guides/database/postgres/row-level-security): write policies so users can read their own rows.
 - [API keys](/docs/guides/getting-started/api-keys): choose the right key for each client.
+
+## Related resources
+
+To read more about the ideas behind this task, see these pages:
+
+- [Securing your data](/docs/guides/database/secure-data): how Postgres roles and RLS protect your data.
 ````
 
 ## Not recommended and Recommended
@@ -128,3 +135,4 @@ To keep going, use these pages:
 - [ ] One unit of work, one audience, a value statement naming the result, and prerequisites that hold only what the reader needs before step 1, each linked.
 - [ ] Every heading has a sentence under it and every list a lead-in sentence. Past six steps, numbered H3 phases that keep their old anchors.
 - [ ] Steps and copy-paste code are on the page, complex actions link out, and any Verify is numbered and names the output.
+- [ ] Next steps end the task, and any Related resources come last, each link with a reason.
