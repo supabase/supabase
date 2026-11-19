@@ -71,11 +71,15 @@ export interface PlanChangeSummary {
   addons: AddonLine[]
   /** Projects the organization will be billed for on the new plan. */
   projectCount: number
-  /** Every line item on the new monthly invoice, including usage items. */
+  /** Every line item on the new monthly invoice, including usage items and tax. */
   monthlyTotal: number
+  /** Tax on the monthly invoice, folded into the total rather than shown as its own row. */
+  monthlyTax: { amount: number; ratePercentage: number | null } | null
 }
 
 const isPlanItem = (item: BreakdownItem) => item.description?.toLowerCase().includes('plan')
+
+const isTaxItem = (item: BreakdownItem) => item.description?.toLowerCase().startsWith('tax')
 
 const isComputeCreditItem = (item: BreakdownItem) =>
   item.description?.toLowerCase().startsWith('compute credit')
@@ -121,13 +125,21 @@ export function getPlanChangeSummary(
   })
 
   const addons: AddonLine[] = breakdown
-    .filter((item) => !isPlanItem(item) && !isComputeItem(item) && !isComputeCreditItem(item))
+    .filter(
+      (item) =>
+        !isPlanItem(item) && !isComputeItem(item) && !isComputeCreditItem(item) && !isTaxItem(item)
+    )
     .map((item) => ({
       description: item.description,
       amount: item.total_price,
       projectCount: item.breakdown?.length ?? 0,
       unitPriceDesc: item.unit_price_desc,
     }))
+
+  const monthlyTaxAmount = breakdown.filter(isTaxItem).reduce((sum, i) => sum + i.total_price, 0)
+  const monthlyTotal = breakdown.reduce((sum, item) => sum + item.total_price, 0)
+  const taxableSubtotal = monthlyTotal - monthlyTaxAmount
+  const upfrontTaxRate = preview?.upfront_charge?.tax?.tax_rate_percentage
 
   const computeSubtotal = computeItems.reduce((sum, item) => sum + item.total_price, 0)
   const perProjectMonthlyPrice =
@@ -142,7 +154,16 @@ export function getPlanChangeSummary(
       perProjectMonthlyPrice === null ? null : perProjectMonthlyPrice / BILLABLE_HOURS_PER_MONTH,
     addons,
     projectCount: preview?.number_of_projects ?? computeProjects.length,
-    monthlyTotal: breakdown.reduce((sum, item) => sum + item.total_price, 0),
+    monthlyTotal,
+    monthlyTax:
+      monthlyTaxAmount > 0
+        ? {
+            amount: monthlyTaxAmount,
+            ratePercentage:
+              upfrontTaxRate ??
+              (taxableSubtotal > 0 ? (monthlyTaxAmount / taxableSubtotal) * 100 : null),
+          }
+        : null,
   }
 }
 

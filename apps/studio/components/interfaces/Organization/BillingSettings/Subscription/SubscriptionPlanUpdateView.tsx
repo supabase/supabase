@@ -14,12 +14,12 @@ import PaymentMethodSelection from './PaymentMethodSelection'
 import { PlanChangeBill } from './PlanChangeBill'
 import { PlanChangeNotes } from './PlanChangeNotes'
 import {
+  formatRoundedCurrency,
   getDueTodayBreakdown,
   getPausedProjects,
   getPlanChangeSummary,
 } from './PlanChangeSummary.utils'
 import { FullScreenPanel } from './PlanUpdatePanelShell'
-import { hasPlanBenefits, PlanUpgradeBenefits } from './PlanUpgradeBenefits'
 import { getStripeElementsAppearanceOptions } from '@/components/interfaces/Billing/Payment/Payment.utils'
 import { PaymentConfirmation } from '@/components/interfaces/Billing/Payment/PaymentConfirmation'
 import type { PaymentMethodElementRef } from '@/components/interfaces/Billing/Payment/PaymentMethods/NewPaymentMethodElement'
@@ -241,11 +241,13 @@ export const SubscriptionPlanUpdateView = ({
   }, [isDowngrade, currentPlanMeta?.features, subscriptionPlanMeta?.features])
 
   const exampleProjectRef = summary.computeProjects[0]?.ref ?? projects[0]?.ref
-  const hasProjectsToLeaveBehind = summary.computeProjects.length > 1 || pausedProjects.length > 0
   const showPaymentMethodSelection =
     !billingViaPartner && subscriptionPreviewInitialized && changeType === 'upgrade'
 
-  const confirmLabel = isDowngrade ? `Downgrade to ${newPlanName}` : `Upgrade to ${newPlanName}`
+  const hasPaymentDueToday = subscriptionPreviewInitialized && !isDowngrade && dueToday.dueToday > 0
+  const confirmLabel = isDowngrade
+    ? `Downgrade to ${newPlanName}`
+    : `Upgrade to ${newPlanName}${hasPaymentDueToday ? ` · pay ${formatRoundedCurrency(dueToday.dueToday)} today` : ''}`
 
   return (
     <FullScreenPanel
@@ -255,7 +257,7 @@ export const SubscriptionPlanUpdateView = ({
     >
       <div className="w-full overflow-hidden rounded-md border bg-surface-100">
         <div className="grid grid-cols-1 items-stretch md:grid-cols-2 xl:grid-cols-5">
-          {/* Billing — first in the DOM so it stacks above the benefits on narrow screens */}
+          {/* Billing — first in the DOM so it stacks above the payment form on narrow screens */}
           <div className="flex flex-col gap-6 p-8 xl:col-span-3">
             <div>
               <h1 className="sr-only">
@@ -294,64 +296,10 @@ export const SubscriptionPlanUpdateView = ({
             )}
 
             {!isCondensed && subscriptionPreviewInitialized && (
-              <PlanChangeNotes
-                exampleProjectRef={exampleProjectRef}
-                hasProjectsToLeaveBehind={hasProjectsToLeaveBehind}
-              />
+              <PlanChangeNotes exampleProjectRef={exampleProjectRef} />
             )}
 
-            {billingViaPartner && (
-              <p className="text-sm text-foreground-light">
-                This organization is billed through our partner{' '}
-                {billingPartnerLabel(billingPartner)}.{' '}
-                {/* @ts-ignore [Joshen] Might be API types issue */}
-                {billingPartner === 'aws' ? (
-                  <>The organization's credit balance will be decreased accordingly.</>
-                ) : (
-                  <>You will be charged by them directly.</>
-                )}
-              </p>
-            )}
-
-            {showPaymentMethodSelection && (
-              <div className="border-t pt-6">
-                <PaymentMethodSelection
-                  ref={paymentMethodSelectionRef}
-                  selectedPaymentMethod={selectedPaymentMethod}
-                  onSelectPaymentMethod={(pm) => setSelectedPaymentMethod(pm)}
-                  readOnly={isChangeInProgress}
-                  onAddressChange={onAddressChange}
-                  onTaxIdChange={onTaxIdChange}
-                  useAsDefaultBillingAddress={useAsDefaultBillingAddress}
-                  onUseAsDefaultBillingAddressChange={onUseAsDefaultBillingAddressChange}
-                  onClose={onClose}
-                />
-              </div>
-            )}
-
-            {subscriptionPreviewInitialized && !isDowngrade && (
-              <DueTodayRow
-                breakdown={dueToday}
-                planName={newPlanName}
-                currentPlanName={currentPlanName}
-              />
-            )}
-
-            <Button
-              loading={isChangeInProgress}
-              disabled={subscriptionPreviewIsLoading || subscriptionPreviewIsFetching}
-              variant="primary"
-              onClick={onUpdateSubscription}
-              size="medium"
-              block
-            >
-              {confirmLabel}
-            </Button>
-          </div>
-
-          {/* Benefits */}
-          <div className="border-t bg-surface-200 p-8 md:border-l md:border-t-0 xl:col-span-2">
-            {isDowngrade ? (
+            {isDowngrade && (
               <div>
                 <h2 className="mb-1 text-sm text-foreground">Features you'll lose</h2>
                 <p className="mb-4 text-xs text-foreground-light">
@@ -376,9 +324,61 @@ export const SubscriptionPlanUpdateView = ({
                   ))}
                 </ul>
               </div>
-            ) : (
-              hasPlanBenefits(selectedTier) && <PlanUpgradeBenefits tier={selectedTier} />
             )}
+
+            {billingViaPartner && (
+              <p className="text-sm text-foreground-light">
+                This organization is billed through our partner{' '}
+                {billingPartnerLabel(billingPartner)}.{' '}
+                {/* @ts-ignore [Joshen] Might be API types issue */}
+                {billingPartner === 'aws' ? (
+                  <>The organization's credit balance will be decreased accordingly.</>
+                ) : (
+                  <>You will be charged by them directly.</>
+                )}
+              </p>
+            )}
+          </div>
+
+          {/* Payment */}
+          <div className="flex flex-col gap-6 border-t bg-surface-200 p-8 md:border-l md:border-t-0 xl:col-span-2">
+            {showPaymentMethodSelection && (
+              <div>
+                <PaymentMethodSelection
+                  ref={paymentMethodSelectionRef}
+                  selectedPaymentMethod={selectedPaymentMethod}
+                  onSelectPaymentMethod={(pm) => setSelectedPaymentMethod(pm)}
+                  readOnly={isChangeInProgress}
+                  onAddressChange={onAddressChange}
+                  onTaxIdChange={onTaxIdChange}
+                  useAsDefaultBillingAddress={useAsDefaultBillingAddress}
+                  onUseAsDefaultBillingAddressChange={onUseAsDefaultBillingAddressChange}
+                  onClose={onClose}
+                />
+              </div>
+            )}
+
+            <div className="mt-auto flex flex-col gap-6 border-t pt-6">
+              {subscriptionPreviewInitialized && !isDowngrade && (
+                <DueTodayRow
+                  breakdown={dueToday}
+                  planName={newPlanName}
+                  currentPlanName={currentPlanName}
+                  monthlyTotal={summary.monthlyTotal}
+                />
+              )}
+
+              <Button
+                loading={isChangeInProgress}
+                disabled={subscriptionPreviewIsLoading || subscriptionPreviewIsFetching}
+                variant="primary"
+                onClick={onUpdateSubscription}
+                size="medium"
+                block
+              >
+                {confirmLabel}
+              </Button>
+            </div>
           </div>
         </div>
       </div>

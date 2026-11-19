@@ -331,15 +331,7 @@ export const NewPaymentMethodElement = forwardRef(
     return (
       <div className="space-y-2">
         <p className="text-sm text-foreground-lighter">
-          Please ensure CVC and postal codes match what’s on file for your card. If you are prompted
-          to confirm a phone number/email, you are likely connected to{' '}
-          <a
-            className="underline"
-            href="https://support.link.com/questions/how-do-i-update-my-information-with-link"
-          >
-            Stripe Link
-          </a>
-          . Opt out of it by clicking the "X" symbol.
+          Please ensure CVC and postal codes match what’s on file for your card.
         </p>
 
         <PaymentElement
