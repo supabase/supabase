@@ -1,5 +1,5 @@
-import { createFileRoute, useLocation, useNavigate } from '@tanstack/react-router'
-import { useFlag } from 'common'
+import { createFileRoute, useNavigate } from '@tanstack/react-router'
+import { useFlag, useParams } from 'common'
 
 import { ApiAuthorizationScreen } from '@/components/interfaces/ApiAuthorization/ApiAuthorization'
 import { OAuthAppsAuthorizeScreen } from '@/components/interfaces/Organization/OAuthApps/Consent'
@@ -18,23 +18,18 @@ const PAGE_TITLE = buildStudioPageTitle({ section: 'Authorize API Access', brand
 
 function APIAuthorizationPage() {
   const navigate = useNavigate()
-  const { searchStr } = useLocation()
+  const { auth_id, organization_slug, project_ref } = useParams()
   const isScopedOAuthConsentEnabled = useFlag('enableScopedOAuthConsent')
-
-  // first value when the param repeats, like Next's query arrays
-  const projectRef = new URLSearchParams(searchStr).get('project_ref')
-  const authId = new URLSearchParams(searchStr).get('auth_id') ?? undefined
-  const organizationSlug = new URLSearchParams(searchStr).get('organization_slug') ?? undefined
 
   if (isScopedOAuthConsentEnabled) {
     return (
       <>
         <title>{PAGE_TITLE}</title>
         <OAuthAppsAuthorizeScreen
-          key={authId}
-          authId={authId}
-          organizationSlug={organizationSlug && projectRef ? organizationSlug : undefined}
-          projectRef={organizationSlug && projectRef ? projectRef : undefined}
+          key={auth_id}
+          authId={auth_id}
+          organizationSlug={organization_slug && project_ref ? organization_slug : undefined}
+          projectRef={organization_slug && project_ref ? project_ref : undefined}
           navigate={(destination) => navigate({ href: destination })}
         />
       </>
@@ -45,8 +40,8 @@ function APIAuthorizationPage() {
     <>
       <title>{PAGE_TITLE}</title>
       <ApiAuthorizationScreen
-        auth_id={authId}
-        organization_slug={organizationSlug}
+        auth_id={auth_id}
+        organization_slug={organization_slug}
         navigate={(destination) => void navigate({ href: destination })}
       />
     </>

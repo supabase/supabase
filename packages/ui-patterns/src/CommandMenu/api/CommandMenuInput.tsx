@@ -1,6 +1,7 @@
 'use client'
 
 import { useBreakpoint, useDebounce } from 'common'
+import { describeSearchQuery } from 'common/search-query-telemetry'
 import { forwardRef, useCallback, useEffect, useRef, useState } from 'react'
 import type React from 'react'
 import { cn, CommandInput } from 'ui'
@@ -72,10 +73,12 @@ const CommandMenuInput = forwardRef<
   const inputTelemetryEvent = useCallback(
     (value: string) => {
       if (telemetryContext?.onTelemetry) {
+        const { query, ...queryShape } = describeSearchQuery(value)
         const event = {
           action: 'command_menu_search_submitted' as const,
           properties: {
-            value: value,
+            ...(query !== undefined && { value: query }),
+            ...queryShape,
             app: telemetryContext.app,
           },
           groups: {},

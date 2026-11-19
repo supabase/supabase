@@ -1,7 +1,7 @@
 clispec: '001'
 info:
   id: cli
-  version: 3.1.0
+  version: 3.2.0
   title: Supabase CLI
   language: sh
   source: https://github.com/supabase/cli
@@ -588,10 +588,71 @@ commands:
       - management-api
     links: []
     subcommands:
+      - supabase-config-convert
       - supabase-config-diff
       - supabase-config-pull
       - supabase-config-push
+      - supabase-config-validate
     flags: []
+  - id: supabase-config-convert
+    title: supabase config convert
+    summary: Convert config.toml to config.jsonc
+    description: |
+
+
+      Converts `supabase/config.toml` to `supabase/config.jsonc` and moves the TOML file to `supabase/config.toml.bak`. Comments are carried over as `//` comments and the document gets a `$schema` entry, so editors validate it against the hosted config schema.
+
+      The conversion reads the file as written: values keep their meaning, `env(NAME)` references are copied as text, and nothing is resolved from your environment. Numbers are written in JSON form, so `0x1F` becomes `31` and `1_000` becomes `1000`. The converted document is parsed again and compared with the original before anything is written; if the two differ, the file is not valid UTF-8, or it holds a value JSON cannot represent (a TOML date, `inf` or `nan`), the command refuses and leaves `config.toml` untouched.
+
+      Comments keep their place by these rules: a comment directly above a key or table leads it; a comment block directly below a key or table, followed by a blank line or another table, trails it; a comment block with blank lines on both sides leads the next entry, or the commented-out example that follows it; a comment on the same line as a key or table header stays on that line. Comments inside a multi-line array of plain values stay beside their elements. Comments inside nested arrays or inline tables cannot be placed, so this command does not keep them in place: they move to the line above their key and the command lists each one.
+
+      Commented-out TOML examples become commented-out JSONC members, so removing the `//` from one member gives valid JSONC. A commented `# key = value` stays in the object it follows as `// "key": value,`. A commented table (`# [auth.hook.custom_access_token]` and the keys under it) is written as a commented object inside the nearest enclosing table that exists, merged with other examples under the same missing parent, and moves with the comment lines directly above it; it sits before the first later-defined entry of that table, or at the end of the table when none follows. Comments that do not parse as a single TOML key or table header stay as plain `//` comments.
+
+      Two kinds of commented example are copied as plain comments or need care when uncommented. Examples inside an array of tables (`[[name]]`, commented or not) stay as plain `//` comments. When a table lists alternative values for the same key (`# key = "a"` then `# key = "b"`), both become commented members, so uncomment only one of them.
+
+      `--dry-run` prints the converted document to stdout and writes nothing. If the project has `.vscode/settings.json`, the command also adds the schema domain to `json.schemaDownload.trustedDomains` there, keeping its comments; the file is never created.
+
+      Everyone on the project needs Supabase CLI 3.1.0 or later: older CLIs ignore `config.jsonc` and run with defaults. The command ends with a summary of the files it created, moved and updated, any relocated comments, this compatibility note and the undo command; with `--dry-run` the same summary, as a preview, goes to stderr.
+
+      If only `supabase/config.json` or `supabase/config.jsonc` exists, the command reports that there is nothing to convert and exits 0. It fails when `config.toml` and a JSON config both exist, because the JSON file takes precedence; delete it first to convert `config.toml` again. The legacy global `-o`/`--output` flag is not supported; use `--output-format json|stream-json` for a machine-readable result.
+
+      ## Undo
+
+      Move the backup back and remove the JSONC file:
+
+      ```sh
+      mv -- supabase/config.toml.bak supabase/config.toml && rm -- supabase/config.jsonc
+      ```
+
+      If a backup from an earlier conversion already exists, the command uses the next free name (`config.toml.2.bak`, and so on). The printed undo command names that backup, with paths relative to the directory you ran the command from; on Windows it is the PowerShell equivalent.
+
+      ## After converting
+
+      - Delete `supabase/config.toml.bak` once you no longer need the undo, so it is not committed. It stays outside `supabase/.temp` because `supabase unlink` and `supabase projects delete` remove that directory.
+      - Commit the conversion on its own. The history of the old file stays available with `git log -- supabase/config.toml`.
+      - Search the repository, CI workflows and Dockerfiles for `config.toml` and update any references.
+      - Bump pinned Supabase CLI versions (for example `supabase/setup-cli`) to 3.1.0 or later.
+
+      ```sh
+      supabase config convert --dry-run
+      supabase config convert
+      ```
+    examples:
+      - id: example-1
+        name: Preview the converted config.jsonc without writing it
+        code: supabase config convert --dry-run
+      - id: example-2
+        name: Convert supabase/config.toml to supabase/config.jsonc
+        code: supabase config convert
+    tags: []
+    links: []
+    usage: supabase config convert [flags]
+    subcommands: []
+    flags:
+      - id: dry-run
+        name: --dry-run
+        description: Print the converted config.jsonc to stdout without writing any file.
+        default_value: 'false'
   - id: supabase-config-diff
     title: supabase config diff
     summary: Diff local config against a remote project
@@ -750,6 +811,129 @@ commands:
       - id: remote
         name: --remote[=<ref|branch>]
         description: 'Target another project: --remote=<ref|branch>. Defaults to the linked project.'
+        default_value: 'false'
+  - id: supabase-config-validate
+    title: supabase config validate
+    summary: Validate the project config file
+    description: |
+
+
+      Checks the project config file (`supabase/config.toml`, `config.json` or `config.jsonc`) and reports every problem in one pass, each with its key path and `file:line:column`. It never modifies a project file and never contacts the Supabase API.
+
+      ## What is checked
+
+      1. The file parses (TOML or JSONC).
+      2. The schema version is one this CLI reads.
+      3. Only one config file applies: `config.json` and `config.jsonc` together is an error, and `config.toml` next to a JSON file is reported as shadowed (the JSON file is the one used).
+      4. With `--resolve-env` only, the `.env*` files load.
+      5. Removed keys, unknown keys (with a `did you mean` suggestion when one is close), values of the wrong type, enum or range, and missing required keys.
+      6. The config rules `supabase start` applies before it touches Docker, such as a missing provider secret or an unreadable `content_path` file. This does not cover Docker, ports or image pulls.
+      7. Every `[remotes.<name>]` block, merged over the base config. Its problems carry the remote name, and a problem the base already has is reported once.
+
+      Stages 1 to 3 and, with `--resolve-env`, stage 4 stop the run when they fail, because later checks cannot be computed; the report says where it stopped (`complete: false`, `stopped_at` in JSON). Everything from stage 5 on is reported together. `complete` is also `false` when a whole table had to be treated as unknown.
+
+      ## Secrets
+
+      The report shows key paths and `file:line:column`, never source text or values, in text and JSON alike (see [ADR 0034](https://github.com/supabase/cli/blob/develop/docs/adr/0034-config-diagnostics-print-no-source-text.md)). Environment variables are read only with `--resolve-env`, and `SUPABASE_*` key overrides are never read: the command validates the file as committed.
+
+      ## `env()` references
+
+      By default the command never reads the shell or any `.env*` file. A value written as `env(NAME)` is unknown: it is never an error by itself, and a check that reads it is not run. The report says how many values come from `env()` and how many checks were not run, and JSON lists them in `deferred` (`check`, `remote`, `waits_on`) with the count in `unknown_values`.
+
+      With `--resolve-env` the command reads the shell and the `.env*` files (`supabase/` then the project root, selected by `SUPABASE_ENV`) and checks each value like a literal. A set value is validated and never printed. A variable that is unset (`env_unset`) or empty (`env_empty`, including a shell variable set to `""`, which hides a `.env` value) is reported with every place it is used, for example `NAME is not set. It is used at 12:3, 40:7`. It is an error when a check could not run without it or when it feeds a key that only accepts a number, boolean or one of a fixed set of values, and a warning otherwise. Warnings never change the exit code. An unreadable or unparseable `.env*` file stops the run at `env_file`.
+
+      ## Two config files
+
+      `config.json` and `config.jsonc` together is an error. `config.toml` next to a JSON file reports `shadowed_file`.
+
+      ## Example
+
+      ```text
+        ✗ db.major_version  unsupported Postgres version
+          supabase/config.toml:9:17
+          help: use one of 14, 15, 17
+
+      ✗ 1 error in supabase/config.toml
+      ```
+
+      ```json
+      {
+        "schema_version": 1,
+        "valid": false,
+        "complete": true,
+        "file": "supabase/config.toml",
+        "format": "toml",
+        "remotes": [],
+        "unknown_values": 0,
+        "deferred": [],
+        "errors": [
+          {
+            "code": "invalid_value",
+            "severity": "error",
+            "key": "db.major_version",
+            "path": "db.major_version",
+            "reason": "unsupported Postgres version",
+            "help": "use one of 14, 15, 17",
+            "line": 9,
+            "column": 17,
+            "end_line": 9,
+            "end_column": 19
+          }
+        ],
+        "warnings": [],
+        "message": "supabase/config.toml has 1 problem"
+      }
+      ```
+
+      Problem codes: `syntax`, `file_conflict`, `schema_version`, `removed_key`, `unknown_key`, `invalid_type`, `invalid_enum`, `invalid_value`, `missing_required`, `remote_project_id`, `env_file`, `env_unset`, `env_empty`, `deprecated_key`, `shadowed_file`, `unrecognized_schema`. Failures before a report exists (no config file, bad `--workdir`) use the generic `{"_tag":"Error",...}` envelope.
+
+      The exit code is `0` when valid and `1` when there are errors. `-o/--output` is not supported; use `--output-format`.
+
+      ## CI and pre-commit
+
+      ```yaml
+      - run: supabase config validate
+      ```
+
+      ```yaml
+      repos:
+        - repo: local
+          hooks:
+            - id: supabase-config-validate
+              name: supabase config validate
+              entry: supabase config validate
+              language: system
+              files: ^supabase/config\.(toml|jsonc?)$
+              pass_filenames: false
+      ```
+
+      ```sh
+      supabase config validate
+      supabase config validate --workdir path/to/project
+      supabase config validate --output-format json
+      supabase config validate --resolve-env
+      ```
+    examples:
+      - id: example-1
+        name: Validate supabase/config.toml, config.json or config.jsonc
+        code: supabase config validate
+      - id: example-2
+        name: Validate the config of another project directory
+        code: supabase config validate --workdir path/to/project
+      - id: example-3
+        name: Print the report as JSON for scripts and agents
+        code: supabase config validate --output-format json
+      - id: example-4
+        name: Also check the values that env() references take from the shell and .env files
+        code: supabase config validate --resolve-env
+    tags: []
+    links: []
+    usage: supabase config validate [flags]
+    subcommands: []
+    flags:
+      - id: resolve-env
+        name: --resolve-env
+        description: Read the shell and .env files, and check the values env() references supply. Without it, env() values are left unchecked.
         default_value: 'false'
   - id: supabase-db
     title: supabase db

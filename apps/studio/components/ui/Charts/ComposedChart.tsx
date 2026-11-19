@@ -49,7 +49,7 @@ import {
   getThresholdZoneXBounds,
   getThresholdZoneYBounds,
 } from './ComposedChartThresholdZones.utils'
-import NoDataPlaceholder from './NoDataPlaceholder'
+import { NoDataPlaceholder } from './NoDataPlaceholder'
 import { ThresholdZoneLine } from './ThresholdZoneLine'
 import { ChartHighlight } from './useChartHighlight'
 import { useChartHoverState } from './useChartHoverState'

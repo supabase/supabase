@@ -19,13 +19,11 @@ vi.mock('@/hooks/misc/withAuth', () => ({
 }))
 
 const flags = vi.hoisted(() => ({ consent: false }))
-const params = vi.hoisted(() => ({ current: {} as Record<string, string | undefined> }))
 
 vi.mock('common', async (importOriginal) => {
   const actual = await importOriginal<typeof import('common')>()
   return {
     ...actual,
-    useParams: () => params.current,
     useFlag: (key: string) => key === 'enableScopedOAuthConsent' && flags.consent,
   }
 })
@@ -132,7 +130,6 @@ describe('/authorize', () => {
 
   afterEach(() => {
     flags.consent = false
-    params.current = {}
   })
 
   test('renders loading interstitial while the authorization request loads', async () => {
@@ -232,5 +229,6 @@ describe('/authorize', () => {
     )
 
     expect(await screen.findByText('northwind-cms')).toBeInTheDocument()
+    expect(screen.getByRole('button', { name: /Authorize Vercel/ })).toBeEnabled()
   })
 })
