@@ -190,7 +190,6 @@ const MOCK_AUTHORIZE_REQUESTS: Record<string, OAuthAppsAuthorizeRequest> = {
       projectIssues: {
         northwindcms1: 'postgres_upgrade_required',
         fabrikamapi1: 'ssl_enforcement_required',
-        fabrikamjobs1: 'role_conflict',
       },
     },
   },

@@ -1,3 +1,4 @@
+import { createFileRoute } from '@tanstack/react-router'
 import { fireEvent, screen, waitFor } from '@testing-library/react'
 import { describe, expect, test, vi } from 'vitest'
 
@@ -6,6 +7,7 @@ import { MAX_SELECTED_PROJECTS } from './ProjectMultiSelect'
 import { OAUTH_APPS_MOCK_SCENARIOS } from '@/data/oauth-apps/mocks'
 import type { OAuthAppsAuthorizeRequest } from '@/data/oauth-apps/types'
 import { customRender } from '@/tests/lib/custom-render'
+import { renderRoute } from '@/tests/lib/route-render'
 
 type RenderScreenOptions = {
   authId?: string
@@ -291,6 +293,30 @@ describe('OAuthAppsAuthorizeScreen', () => {
 
     expect(await screen.findByText('tailspin-shop')).toBeInTheDocument()
     expect(screen.getByRole('combobox')).not.toHaveTextContent('tailspin-warehouse')
+  })
+
+  test('blocks a Postgres upgrade but allows consent with an SSL notice', async () => {
+    const route = createFileRoute('/authorize')({
+      component: () => (
+        <OAuthAppsAuthorizeScreen
+          authId={OAUTH_APPS_MOCK_SCENARIOS.trustedPartnerBlocked}
+          projectRef="northwindcms1"
+          navigate={vi.fn()}
+        />
+      ),
+    })
+    await renderRoute(route, { routeId: '/authorize', url: '/authorize' })
+
+    const remove = await screen.findByRole('button', { name: 'Remove northwind-cms' })
+    const authorize = screen.getByRole('button', { name: 'Authorize Example Partner' })
+    expect(authorize).toBeDisabled()
+    fireEvent.click(remove)
+    selectProject('fabrikam-api')
+
+    expect(screen.getByRole('region', { name: 'SSL enforcement' })).toHaveTextContent(
+      'fabrikam-api'
+    )
+    expect(authorize).toBeEnabled()
   })
 
   test('shows the change in Table data access for a returning partner', async () => {

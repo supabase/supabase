@@ -27,7 +27,7 @@ export type OAuthAppsAuthorizeRequest = OAuthAppsAuthorizeLiveFields & {
     role: string
     mode: 'read' | 'write'
     projectIssues?: Partial<
-      Record<string, 'postgres_upgrade_required' | 'ssl_enforcement_required' | 'role_conflict'>
+      Record<string, 'postgres_upgrade_required' | 'ssl_enforcement_required'>
     >
   }
 }

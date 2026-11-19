@@ -179,10 +179,15 @@ export const OAuthAppsAuthorizeScreen = ({
   )
 
   const databaseAccess = request?.databaseAccess
-  const blockedProjects = grantedProjects.flatMap((project) => {
-    const issue = databaseAccess?.projectIssues?.[project.ref]
-    return issue ? [{ ref: project.ref, name: project.name, issue }] : []
-  })
+  const usesSelectedProjects = isProjectScopingModeEnabled && !allProjectsSelected
+  const projectsInGrant = usesSelectedProjects ? grantedProjects : (projects ?? [])
+  const readinessIssues = databaseAccess?.projectIssues
+  const blockedProjects = projectsInGrant.filter(
+    ({ ref }) => readinessIssues?.[ref] === 'postgres_upgrade_required'
+  )
+  const sslProjects = projectsInGrant.filter(
+    ({ ref }) => readinessIssues?.[ref] === 'ssl_enforcement_required'
+  )
   const hasBlockedProjects = blockedProjects.length > 0
 
   const flaggedRefs = getFailedProjects(roleFailure)
@@ -194,7 +199,6 @@ export const OAuthAppsAuthorizeScreen = ({
     : `Authorize ${request?.name}`
   const primaryActionVariant = hasRoleFailure || isSubmitting ? 'default' : 'primary'
 
-  const usesSelectedProjects = isProjectScopingModeEnabled && !allProjectsSelected
   const hasNoSelection = usesSelectedProjects && selectedProjectRefs.length === 0
 
   if (isPendingRequest || isPendingIdentity || isPendingMemberOrg) {
@@ -375,21 +379,37 @@ export const OAuthAppsAuthorizeScreen = ({
                 }
                 flaggedRefs={flaggedRefs}
                 unavailableRefs={getFailedProjects(roleFailure).map((project) => project.ref)}
+                readinessIssueRefs={Object.keys(readinessIssues ?? {})}
                 allProjectsSelected={allProjectsSelected}
                 onAllProjectsChange={databaseAccess ? undefined : setAllProjectsSelected}
               />
-              {hasBlockedProjects && databaseAccess && (
-                <DatabaseAccessProjectIssues
-                  projects={blockedProjects}
-                  role={databaseAccess.role}
-                  onRemove={(ref) =>
-                    setSelectedProjectRefs((refs) =>
-                      refs.filter((selectedRef) => selectedRef !== ref)
-                    )
-                  }
-                />
-              )}
             </div>
+          )}
+
+          {canProceed && hasBlockedProjects && (
+            <DatabaseAccessProjectIssues
+              projects={blockedProjects}
+              onRemove={
+                usesSelectedProjects
+                  ? (ref) =>
+                      setSelectedProjectRefs((refs) => refs.filter((selected) => selected !== ref))
+                  : undefined
+              }
+            />
+          )}
+
+          {canProceed && sslProjects.length > 0 && (
+            <section
+              aria-label="SSL enforcement"
+              className="space-y-1 text-xs text-foreground-light"
+            >
+              <h3 className="font-medium text-foreground">SSL enforcement during setup</h3>
+              <p>
+                Supabase will require encrypted connections on{' '}
+                {sslProjects.map(({ name }) => name).join(', ')}. Clients that connect without SSL
+                will no longer be able to connect.
+              </p>
+            </section>
           )}
 
           {canProceed && (

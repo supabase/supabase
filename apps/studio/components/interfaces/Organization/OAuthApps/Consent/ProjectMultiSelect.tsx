@@ -21,6 +21,7 @@ export interface ProjectMultiSelectProps {
   error?: string
   flaggedRefs?: string[]
   unavailableRefs?: string[]
+  readinessIssueRefs?: string[]
   allProjectsSelected?: boolean
   onAllProjectsChange?: (selected: boolean) => void
 }
@@ -33,6 +34,7 @@ export const ProjectMultiSelect = ({
   error,
   flaggedRefs = [],
   unavailableRefs = [],
+  readinessIssueRefs = [],
   allProjectsSelected = false,
   onAllProjectsChange,
 }: ProjectMultiSelectProps) => {
@@ -101,6 +103,15 @@ export const ProjectMultiSelect = ({
                     value={project.ref}
                     disabled={atCap && !selectedRefs.includes(project.ref)}
                   >
+                    {readinessIssueRefs.includes(project.ref) && (
+                      <>
+                        <span
+                          className="mr-2 inline-block size-1.5 shrink-0 rounded-full bg-warning"
+                          aria-hidden
+                        />
+                        <span className="sr-only">Database setup notice: </span>
+                      </>
+                    )}
                     {project.name}
                     {unavailableRefs.includes(project.ref) && (
                       <span className="text-foreground-lighter"> - Unavailable</span>
