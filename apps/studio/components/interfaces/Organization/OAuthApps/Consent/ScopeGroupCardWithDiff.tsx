@@ -16,9 +16,9 @@ export interface ScopeGroupCardProps {
 }
 
 const scopeLabels: Record<ScopeGroupLevel, string> = {
-  'read-write': 'Read-write',
+  'read-write': 'Read and write',
   write: 'Write',
-  read: 'Read',
+  read: 'Read only',
 }
 
 const scopeLevels = ['read-write', 'write', 'read'] as const
@@ -46,7 +46,9 @@ export const ScopeGroupCardWithDiff = (props: ScopeGroupCardProps) => {
 
         return (
           <div key={level} className="rounded-md border bg-surface-75 px-4 text-xs">
-            <p className="py-2 font-mono uppercase text-foreground-light">{scopeLabels[level]}</p>
+            <h3 className="py-2 font-mono text-xs! uppercase text-foreground-light font-normal!">
+              {scopeLabels[level]}
+            </h3>
             <ul className="divide-y border-t" aria-label={scopeLabels[level]}>
               {rows.map(({ permission, status }) => (
                 <li

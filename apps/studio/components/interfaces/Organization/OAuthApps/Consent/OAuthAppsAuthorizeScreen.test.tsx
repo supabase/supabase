@@ -329,11 +329,11 @@ describe('OAuthAppsAuthorizeScreen', () => {
   test('shows the change in Table data access for a returning partner', async () => {
     renderScreen({ authId: OAUTH_APPS_MOCK_SCENARIOS.trustedPartnerReconsent })
 
-    expect(await screen.findByRole('list', { name: 'Read-write' })).toHaveTextContent(
+    expect(await screen.findByRole('list', { name: 'Read and write' })).toHaveTextContent(
       'Table dataAdded'
     )
-    expect(screen.getByRole('list', { name: 'Read' })).toHaveTextContent('Table dataRemoved')
-    expect(screen.getByRole('list', { name: 'Read' })).toHaveTextContent('ProjectsUnchanged')
+    expect(screen.getByRole('list', { name: 'Read only' })).toHaveTextContent('Table dataRemoved')
+    expect(screen.getByRole('list', { name: 'Read only' })).toHaveTextContent('ProjectsUnchanged')
     expect(screen.queryByRole('radio', { name: 'All current and future projects' })).toBeNull()
   })
 
@@ -342,8 +342,8 @@ describe('OAuthAppsAuthorizeScreen', () => {
       authId: OAUTH_APPS_MOCK_SCENARIOS.vercelReconsent,
     })
 
-    const readWrite = await screen.findByRole('list', { name: 'Read-write' })
-    const read = screen.getByRole('list', { name: 'Read' })
+    const readWrite = await screen.findByRole('list', { name: 'Read and write' })
+    const read = screen.getByRole('list', { name: 'Read only' })
     expect(readWrite).toHaveTextContent('EnvironmentAdded')
     expect(readWrite).toHaveTextContent('AnalyticsAdded')
     expect(read).toHaveTextContent('AnalyticsRemoved')

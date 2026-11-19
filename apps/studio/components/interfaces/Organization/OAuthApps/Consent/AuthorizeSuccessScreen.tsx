@@ -54,7 +54,7 @@ export const AuthorizeSuccessScreen = ({
       </div>
 
       <section className="flex flex-col gap-3">
-        <p className="text-xs text-foreground">Permissions granted</p>
+        <h2 className="text-xs text-foreground">Permissions granted</h2>
         {grant.scopes == null ? (
           <div className="divide-y rounded-md border bg-surface-75 px-4">
             <p className="font-mono text-xs uppercase text-foreground-light">No scopes</p>

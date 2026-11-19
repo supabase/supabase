@@ -452,7 +452,7 @@ export const OAuthAppsAuthorizeScreen = ({
             <>
               <section className="flex flex-col gap-3">
                 <div className="space-y-1">
-                  <p className="text-sm text-foreground font-medium">Permissions requested</p>
+                  <h2 className="text-sm text-foreground font-medium">Permissions requested</h2>
                   {grantKind === 'member_bound' && (
                     <p className="text-xs text-foreground-lighter">
                       The app can only use the permissions listed below, and only where your role

@@ -17,7 +17,7 @@ export function DatabaseAccessProjectIssues({
   return (
     <Admonition
       type="warning"
-      title="These projects require changes first"
+      title="These projects require changes"
       description={onRemove ? 'Fix or remove them to continue.' : 'Fix them to continue.'}
     >
       <div className="mt-1 divide-y text-xs">

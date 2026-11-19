@@ -14,7 +14,7 @@ export const ScopeGroupCardItem = ({
   if (permissions.length === 0) return null
   return (
     <div className="flex flex-col gap-2 py-3">
-      <p className="font-mono text-xs uppercase text-foreground-light">{label}</p>
+      <h3 className="font-mono text-xs! uppercase text-foreground-light font-normal!">{label}</h3>
       <p className="text-xs font-medium text-foreground">
         {permissions.map((permission, index) => (
           <Fragment key={permission}>

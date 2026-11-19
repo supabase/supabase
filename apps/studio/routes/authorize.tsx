@@ -14,6 +14,7 @@ import { ApiAuthorizationScreen } from '@/components/interfaces/ApiAuthorization
 import { OAuthAppsAuthorizeScreen } from '@/components/interfaces/Organization/OAuthApps/Consent'
 import { OAUTH_APPS_MOCK_SCENARIOS, USE_MOCKS } from '@/data/oauth-apps/mocks'
 import { withAuth } from '@/hooks/misc/withAuth'
+import { IS_STAGING_OR_LOCAL } from '@/lib/constants'
 import { buildStudioPageTitle } from '@/lib/page-title'
 
 export const Route = createFileRoute('/authorize')({
@@ -79,11 +80,12 @@ function APIAuthorizationPage() {
   const { searchStr } = useLocation()
   const { auth_id, organization_slug, mock_scenario } = useParams()
   const isScopedOAuthConsentEnabled = useFlag('enableScopedOAuthConsent')
-  const localConsentPreview = import.meta.env.DEV
-    ? CONSENT_PREVIEWS.find(({ value }) => value === mock_scenario)
-    : undefined
+  const consentPreview =
+    !auth_id && (import.meta.env.DEV || IS_STAGING_OR_LOCAL)
+      ? CONSENT_PREVIEWS.find(({ value }) => value === mock_scenario)
+      : undefined
   const isScopedOAuthFlowEnabled =
-    USE_MOCKS && (isScopedOAuthConsentEnabled || Boolean(localConsentPreview))
+    USE_MOCKS && (isScopedOAuthConsentEnabled || Boolean(consentPreview))
 
   const mockScenario = USE_MOCKS
     ? (MOCK_SCENARIOS[mock_scenario ?? 'default'] ?? MOCK_SCENARIOS.default)
@@ -98,7 +100,7 @@ function APIAuthorizationPage() {
     return (
       <>
         <title>{PAGE_TITLE}</title>
-        {localConsentPreview && (
+        {consentPreview && (
           <div className="fixed bottom-3 right-3 z-50 sm:bottom-auto sm:top-3">
             <DropdownMenu>
               <DropdownMenuTrigger asChild>
@@ -106,9 +108,9 @@ function APIAuthorizationPage() {
                   size="tiny"
                   variant="default"
                   iconRight={<ChevronDownIcon />}
-                  aria-label={`Consent preview: ${localConsentPreview.label}`}
+                  aria-label={`Consent preview: ${consentPreview.label}`}
                 >
-                  {localConsentPreview.label}
+                  {consentPreview.label}
                 </Button>
               </DropdownMenuTrigger>
               <DropdownMenuContent align="end">
@@ -133,7 +135,7 @@ function APIAuthorizationPage() {
           </div>
         )}
         <OAuthAppsAuthorizeScreen
-          key={localConsentPreview?.value}
+          key={consentPreview?.value}
           authId={authId}
           organizationSlug={organizationSlug}
           projectRef={projectRef}

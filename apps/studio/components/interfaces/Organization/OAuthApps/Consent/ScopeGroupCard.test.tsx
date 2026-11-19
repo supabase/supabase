@@ -16,11 +16,11 @@ const SCOPE_GROUPS: OAuthScope[] = [
 ]
 
 describe('ScopeGroupCard', () => {
-  test('renders READ and READ-WRITE badge labels', () => {
+  test('renders READ ONLY and READ AND WRITE badge labels', () => {
     customRender(<ScopeGroupCard scopes={SCOPE_GROUPS} />)
 
-    expect(screen.getByText('READ-WRITE')).toBeInTheDocument()
-    expect(screen.getByText('READ')).toBeInTheDocument()
+    expect(screen.getByText('READ AND WRITE')).toBeInTheDocument()
+    expect(screen.getByText('READ ONLY')).toBeInTheDocument()
   })
 
   test('renders a WRITE badge for a write-only group', () => {
@@ -41,6 +41,5 @@ describe('ScopeGroupCard', () => {
     customRender(<ScopeGroupCard scopes={SCOPE_GROUPS} />)
 
     expect(screen.queryByText('Read-only for your role')).not.toBeInTheDocument()
-    expect(screen.queryByText('READ + WRITE')).not.toBeInTheDocument()
   })
 })

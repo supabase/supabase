@@ -132,12 +132,7 @@ export function getFailedProjects(
 export type OAuthAppsAuthorizePreflightSuccess = { status: 'success' }
 
 export type OAuthAppsAuthorizePreflightResult = {
-  existing_grant: {
-    approved_at: string
-    approved_scopes: string[] | null
-    grant_id: string
-    project_refs: string[] | null
-  } | null
+  existing_grant: OAuthExistingGrant | null
   validation_failure: {
     failed_scopes: string[]
     role: {
