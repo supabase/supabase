@@ -43,6 +43,15 @@ Before drafting, classify what's actually being asked for against `apps/docs`'s 
 
 When in doubt, ask `ask-the-docs` rather than guessing — this classification is the one call in this skill most likely to be wrong if made from outside knowledge of the app.
 
+## Phase 1.6 — Template gate
+
+Before drafting, pick the page's template and confirm it with the requester.
+
+1. Match the page's purpose, reader question, and Information Type to a row in [Choose a template](../../../apps/docs/style-guide/03-page-structure.md#choose-a-template). Load only that template file.
+2. Tell the requester which template you chose, why, and the headings it requires. Wait for a yes or a different choice. If the requester is unavailable, go ahead with the template you recommend and record the choice in the handoff. If the page spans two templates, say so and propose a split.
+3. If no row fits, say so and ask. Don't invent a structure.
+4. Draft from the template's headings, and run its checklist in Phase 2.5.
+
 ## Phase 2 — Draft
 
 - Follow `apps/docs` MDX conventions (component usage, frontmatter, code sample wiring) — see [`ask-the-docs`](../ask-the-docs/SKILL.md) for the pipeline details rather than re-deriving them.
@@ -81,6 +90,7 @@ Before handoff, run both passes from [Use with an AI agent](../../../apps/docs/s
 - [ ] Terminology matches [`WORD_LIST.md`](../../../apps/docs/style-guide/WORD_LIST.md) (including any terms flagged as imprecise, not just spelling/capitalization)
 - [ ] Voice, tense, and brevity follow [`01-voice-and-tone.md`](../../../apps/docs/style-guide/01-voice-and-tone.md)
 - [ ] Document type, section grouping, and chunking follow [`03-page-structure.md`](../../../apps/docs/style-guide/03-page-structure.md)
+- [ ] The page follows the template named in [Choose a template](../../../apps/docs/style-guide/03-page-structure.md#choose-a-template)
 - [ ] Admonitions, headings, links, and other components follow [`02-elements.md`](../../../apps/docs/style-guide/02-elements.md)
 
 ### Accuracy pass
