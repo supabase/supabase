@@ -37,6 +37,7 @@ import {
   convertFromBytes,
   convertToBytes,
   encodeBucketLimitErrorMessage,
+  isFileSizeReducedBySpendCap,
 } from './StorageSettings.utils'
 import { ValidateSizeLimit } from './StorageSettings.ValidateSizeLimit'
 import { AlertError } from '@/components/ui/AlertError'
@@ -109,10 +110,12 @@ export const StorageSettings = () => {
     }
   }, [organization, isEntitlementUnlimited, getEntitlementNumericValue])
 
-  const isFileSizeReducedBySpendCap =
-    organization?.plan.id === 'pro' &&
-    organization?.usage_billing_enabled === false &&
-    maxBytes < STORAGE_FILE_SIZE_LIMIT_MAX_BYTES_UNCAPPED
+  const showSpendCapBanner = isFileSizeReducedBySpendCap({
+    planId: organization?.plan.id,
+    isUsageBillingEnabled: organization?.usage_billing_enabled,
+    entitledMaxBytes: getEntitlementNumericValue(),
+    isEntitlementUnlimited: isEntitlementUnlimited(),
+  })
 
   const isLoading =
     isLoadingProjectStorageConfig ||
@@ -397,7 +400,7 @@ export const StorageSettings = () => {
                           )} and unlock image transformations.`}
                         />
                       )}
-                      {isFileSizeReducedBySpendCap && (
+                      {showSpendCapBanner && (
                         <UpgradeToPro
                           fullWidth
                           addon="spendCap"
