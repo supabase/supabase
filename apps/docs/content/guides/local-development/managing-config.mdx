@@ -14,7 +14,7 @@ There are a wide variety of options available, which can be found in the [CLI Co
 
 For example, to enable the "Apple" OAuth provider for local development, add the following to your config file. Merge its keys into the entries your file already has instead of adding a second copy. Fill in your client ID and set `SUPABASE_AUTH_EXTERNAL_APPLE_SECRET` in your `.env` file, as described in [Using secrets inside your config file](#using-secrets-inside-configtoml):
 
-```toml name=supabase/config.toml
+```toml supabase/config.toml
 [auth.external.apple]
 enabled = true
 client_id = ""
@@ -49,7 +49,7 @@ GITHUB_SECRET=""
 
 Then you would reference them in your config file like this:
 
-```toml name=supabase/config.toml
+```toml supabase/config.toml
 [auth.external.github]
 enabled = true
 client_id = "env(GITHUB_CLIENT_ID)"

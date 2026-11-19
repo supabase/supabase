@@ -391,7 +391,7 @@ As on `pg-delta`, changes made directly through Studio, the SQL editor, or `psql
 
 The legacy engine applies your schema files in lexicographic order. The order matters when tables reference each other, because the parent table must be created first. To control the order, list files or glob patterns under `db.migrations.schema_paths` in your config file. The CLI processes the entries in the order you list them: it expands each pattern, sorts that pattern's matches lexicographically, and skips any file an earlier entry already matched. This example always runs `employees.sql` first:
 
-```toml name=supabase/config.toml
+```toml supabase/config.toml
 [db.migrations]
 schema_paths = [
   "./schemas/employees.sql",

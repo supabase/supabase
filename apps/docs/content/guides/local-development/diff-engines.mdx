@@ -17,7 +17,7 @@ A diff engine compares two database states and generates the SQL that turns one 
 
 To use the legacy `migra` engine for every run, set `enabled = false`:
 
-```toml name=supabase/config.toml
+```toml supabase/config.toml
 [experimental.pgdelta]
 enabled = false
 ```
@@ -58,7 +58,7 @@ If your project opted out by setting `experimental.pgdelta.enabled` to `false`, 
 
 1. Remove `experimental.pgdelta.enabled` from your config file, or set it to `true`. If `SUPABASE_EXPERIMENTAL_PGDELTA_ENABLED=false` is set in your shell or a project `.env` file, remove it too:
 
-   ```toml name=supabase/config.toml
+   ```toml supabase/config.toml
    [experimental.pgdelta]
    enabled = true
    ```

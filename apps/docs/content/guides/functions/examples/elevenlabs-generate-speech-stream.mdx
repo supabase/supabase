@@ -35,7 +35,7 @@ supabase init
 
 You can configure the [Supabase CLI](/docs/guides/local-development/cli/getting-started) to automatically generate a storage bucket by adding this configuration in your config file (`supabase/config.toml` or `supabase/config.jsonc`):
 
-```toml name=supabase/config.toml
+```toml supabase/config.toml
 [storage.buckets.audio]
 public = false
 file_size_limit = "50MiB"
@@ -53,7 +53,7 @@ Upon running `supabase start` this will create a new storage bucket in your loca
 
 To use background tasks in Supabase Edge Functions when developing locally, you need to add the following configuration in your config file:
 
-```toml name=supabase/config.toml
+```toml supabase/config.toml
 [edge_runtime]
 policy = "per_worker"
 ```

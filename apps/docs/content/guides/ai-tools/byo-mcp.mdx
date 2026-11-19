@@ -67,7 +67,7 @@ Deno.serve((req) => handler.fetch(req))
 
 The gateway verifies a JWT on every request by default. A public server has no JWT, so turn that off for this function:
 
-```toml name=supabase/config.toml
+```toml supabase/config.toml
 [functions.mcp]
 verify_jwt = false
 ```
@@ -143,7 +143,7 @@ MCP clients authenticate through OAuth 2.1, with Supabase Auth as the authorizat
 
 For local development, the same settings live in your config file (`supabase/config.toml` or `supabase/config.jsonc`):
 
-```toml name=supabase/config.toml
+```toml supabase/config.toml
 [auth]
 site_url = "http://localhost:3000"
 

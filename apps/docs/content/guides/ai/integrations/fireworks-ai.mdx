@@ -147,7 +147,7 @@ Create an [Edge Function](/docs/guides/functions) that embeds text and inserts i
 
 2. In your config file (`supabase/config.toml` or `supabase/config.jsonc`), turn off the platform JWT check for the function:
 
-   ```toml name=supabase/config.toml
+   ```toml supabase/config.toml
    [functions.fireworks-embed]
    verify_jwt = false
    ```
@@ -267,7 +267,7 @@ The function composes the authenticated pipeline from [Deploy MCP servers](/docs
 
 2. In your config file, turn off the platform JWT check for the function. The function verifies tokens itself, and the gateway would otherwise reject the unauthenticated discovery request:
 
-   ```toml name=supabase/config.toml
+   ```toml supabase/config.toml
    [functions.mcp]
    verify_jwt = false
    ```

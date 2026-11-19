@@ -53,7 +53,7 @@ In the dashboard navigate to your project's [Authentication Providers](/dashboar
 
 In the CLI add the following config to your config file (`supabase/config.toml` or `supabase/config.jsonc`):
 
-```toml name=supabase/config.toml
+```toml supabase/config.toml
 [auth.web3.solana]
 enabled = true
 
@@ -72,7 +72,7 @@ Control your project's exposure by configuring in the dashboard:
 
 Or in the CLI:
 
-```toml name=supabase/config.toml
+```toml supabase/config.toml
 [auth.rate_limit]
 # Number of Web3 logins that can be made in a 5 minute interval per IP address.
 web3 = 30

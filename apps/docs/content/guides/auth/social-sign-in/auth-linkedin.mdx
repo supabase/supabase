@@ -204,7 +204,7 @@ We are replacing the _LinkedIn_ provider with a new _LinkedIn (OIDC)_ provider t
 
 Developers using the [Supabase CLI](/docs/guides/local-development/cli/getting-started) to test their LinkedIn OAuth application should also update their config file (`supabase/config.toml` or `supabase/config.jsonc`) to make use of the new provider:
 
-```toml name=supabase/config.toml
+```toml supabase/config.toml
 [auth.external.linkedin_oidc]
 enabled = true
 client_id = "env(SUPABASE_AUTH_EXTERNAL_LINKEDIN_OIDC_CLIENT_ID)"

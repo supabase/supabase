@@ -164,7 +164,7 @@ Edit your config file (`supabase/config.toml` or `supabase/config.jsonc`) to set
 <TabPanel id="sql" label="SQL">
 Modify the `auth.hook.<hook_name>` field and set `uri` to a value of `pg-functions://postgres/<schema>/<function_name>`. For example, for the Custom Access Token hook:
 
-```toml name=supabase/config.toml
+```toml supabase/config.toml
 [auth.hook.custom_access_token]
 enabled = true
 uri = "pg-functions://postgres/public/custom_access_token_hook"
@@ -234,7 +234,7 @@ You can visit `SQL Editor > Templates` for hook templates.
 <TabPanel id="http" label="HTTP">
 Modify the `auth.hook.<hook_name>` field and set `uri` to a valid HTTP URI. For example, the `send_sms` hook would take the following fields:
 
-```toml name=supabase/config.toml
+```toml supabase/config.toml
 [auth.hook.send_sms]
 enabled = true
 uri = "http://host.docker.internal:54321/functions/v1/send_sms"

@@ -27,7 +27,7 @@ See [Vector Bucket limits](/docs/guides/storage/vector/limits) for the full comp
 
 Make sure you have the feature enabled in your config file (`supabase/config.toml` or `supabase/config.jsonc`):
 
-```toml name=supabase/config.toml
+```toml supabase/config.toml
 
 # Store vector embeddings in S3 for large and durable datasets
 [storage.vector]
@@ -38,7 +38,7 @@ enabled = true
 
 You can define your vector buckets in your config file using the following syntax:
 
-```toml name=supabase/config.toml
+```toml supabase/config.toml
 [storage.vector.buckets.documents-openai]
 [storage.vector.buckets.images]
 ```
