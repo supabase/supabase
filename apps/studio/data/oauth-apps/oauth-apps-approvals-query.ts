@@ -45,6 +45,10 @@ export const useOAuthApprovalsQuery = <TData = OAuthApprovalsData>(
     queryFn: ({ pageParam }) => getOAuthApprovals({ slug, cursor: pageParam }),
     enabled: enabled && Boolean(slug),
     initialPageParam: cursor,
-    getNextPageParam: (lastPage) => lastPage.links.next,
+    getNextPageParam: (lastPage) =>
+      lastPage.links.next
+        ? // The URL second paramater does not matter as we only want to extract the search params
+          new URL(lastPage.links.next, 'http://localhost').searchParams.get('page[after]')
+        : null,
     ...options,
   })

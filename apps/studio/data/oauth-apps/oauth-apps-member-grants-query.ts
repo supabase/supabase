@@ -51,7 +51,11 @@ export const useOAuthAppMemberGrantsQuery = <TData = OAuthAppMemberGrantsData>(
     queryKey: oauthAppsKeys.appMemberGrants(slug, appId, cursor),
     queryFn: ({ pageParam }) => getOAuthAppMemberGrants({ slug, appId, cursor: pageParam }),
     initialPageParam: cursor,
-    getNextPageParam: (lastPage) => lastPage.links.next,
+    getNextPageParam: (lastPage) =>
+      lastPage.links.next
+        ? // The URL second paramater does not matter as we only want to extract the search params
+          new URL(lastPage.links.next, 'http://localhost').searchParams.get('page[after]')
+        : null,
     enabled: enabled && Boolean(slug) && Boolean(appId),
     ...options,
   })

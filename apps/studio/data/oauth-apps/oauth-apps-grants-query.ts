@@ -39,6 +39,10 @@ export const useOAuthGrantsQuery = <TData = OAuthGrantsData>(
     queryKey: oauthAppsKeys.grants(cursor),
     queryFn: ({ pageParam }) => getOAuthGrants({ cursor: pageParam }),
     initialPageParam: cursor,
-    getNextPageParam: (lastPage) => lastPage.links.next,
+    getNextPageParam: (lastPage) =>
+      lastPage.links.next
+        ? // The URL second paramater does not matter as we only want to extract the search params
+          new URL(lastPage.links.next, 'http://localhost').searchParams.get('page[after]')
+        : null,
     ...options,
   })
