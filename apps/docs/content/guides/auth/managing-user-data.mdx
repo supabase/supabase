@@ -60,6 +60,12 @@ create trigger on_auth_user_created
   for each row execute procedure public.handle_new_user();
 ```
 
+<Admonition type="caution">
+
+An unqualified name in this function, such as `profiles`, makes every sign-up fail: Auth rolls back the new user and returns `Database error saving new user`. Auth inserts the row into `auth.users` as the `supabase_auth_admin` role, whose search path is only `auth`, and `set search_path = ''` empties the path inside the function. Either way, the function can't find objects in `public` by name. Keep `security definer set search_path = ''`, and put the schema in front of every table, function, and type that isn't built in, such as `public.profiles`. For why the search path stays empty, see [Security `definer` vs `invoker`](/docs/guides/database/functions#security-definer-vs-invoker).
+
+</Admonition>
+
 ## Adding and retrieving user metadata
 
 You can assign metadata to users on sign up:
