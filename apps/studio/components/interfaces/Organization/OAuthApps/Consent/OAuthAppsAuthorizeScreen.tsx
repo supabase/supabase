@@ -438,8 +438,8 @@ export const OAuthAppsAuthorizeScreen = ({
           {preflightData?.validation_failure != null && (
             <Admonition
               type="warning"
-              title={`Couldn't authorize ${request.name}`}
-              description={`Your Read-only role in ${memberOrg} can't grant write access. Ask an admin to change your role, or switch organization.`}
+              title="You don’t have permission to authorize this app"
+              description={`Your role in ${memberOrg} can’t grant the requested access. Ask an admin or switch organizations.`}
             />
           )}
           {canProceed && sslProjects.length > 0 && (

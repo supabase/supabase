@@ -308,7 +308,7 @@ describe('OAuthAppsAuthorizeScreen', () => {
     })
     await renderRoute(route, { routeId: '/authorize', url: '/authorize' })
 
-    expect(await screen.findByText('These projects block authorization')).toBeInTheDocument()
+    expect(await screen.findByText('These projects require changes first')).toBeInTheDocument()
     expect(screen.getByRole('combobox')).toHaveTextContent('Database setup notice: northwind-cms')
     const remove = await screen.findByRole('button', { name: 'Remove northwind-cms' })
     const authorize = screen.getByRole('button', { name: 'Authorize Example Partner' })
@@ -338,10 +338,10 @@ describe('OAuthAppsAuthorizeScreen', () => {
 
     await screen.findByText('Already granted (2)')
     const changes = screen.getByRole('list', { name: 'Permission changes' })
-    expect(changes).toHaveTextContent('EnvironmentAddedRead-write')
+    expect(changes).toHaveTextContent('EnvironmentAdded· Read-write')
     expect(changes).toHaveTextContent('AnalyticsReadRead-write')
     expect(changes).toHaveTextContent('SecretsRead-writeRead')
-    expect(changes).toHaveTextContent('RestReadRemoved')
+    expect(changes).toHaveTextContent('RestRemoved· Read')
 
     expect(screen.queryByText('Database management')).toBeNull()
     fireEvent.click(screen.getByText('Already granted (2)'))

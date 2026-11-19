@@ -48,16 +48,24 @@ export const ScopeGroupCardWithDiff = (props: ScopeGroupCardProps) => {
                 <ScopePermissionLabel permission={permission} />
               </span>
               <span className="flex items-center gap-1.5">
-                {previousLevel ? (
-                  <span className="text-foreground-light">{scopeLabels[previousLevel]}</span>
-                ) : (
-                  <span className="text-brand">Added</span>
+                {previousLevel && nextLevel && (
+                  <>
+                    <span className="text-foreground-light">{scopeLabels[previousLevel]}</span>
+                    <ArrowRightIcon size={12} className="text-foreground-muted" aria-hidden />
+                    <span>{scopeLabels[nextLevel]}</span>
+                  </>
                 )}
-                <ArrowRightIcon size={12} className="text-foreground-muted" aria-hidden />
-                {nextLevel ? (
-                  <span>{scopeLabels[nextLevel]}</span>
-                ) : (
-                  <span className="text-destructive">Removed</span>
+                {!previousLevel && nextLevel && (
+                  <>
+                    <span>Added</span>
+                    <span className="text-foreground-light">· {scopeLabels[nextLevel]}</span>
+                  </>
+                )}
+                {previousLevel && !nextLevel && (
+                  <>
+                    <span>Removed</span>
+                    <span className="text-foreground-light">· {scopeLabels[previousLevel]}</span>
+                  </>
                 )}
               </span>
             </li>

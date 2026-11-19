@@ -17,7 +17,7 @@ export function DatabaseAccessProjectIssues({
   return (
     <Admonition
       type="warning"
-      title="These projects block authorization"
+      title="These projects require changes first"
       description={onRemove ? 'Fix or remove them to continue.' : 'Fix them to continue.'}
     >
       <div className="divide-y text-xs">
@@ -38,7 +38,7 @@ export function DatabaseAccessProjectIssues({
                 aria-label={`Remove ${name}`}
                 onClick={() => onRemove(ref)}
                 icon={<XIcon />}
-                tooltip={{ content: { side: 'top', text: `Remove ${name}` } }}
+                tooltip={{ content: { side: 'top', text: 'Remove project' } }}
               />
             )}
           </div>
