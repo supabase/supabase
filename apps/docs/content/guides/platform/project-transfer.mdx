@@ -22,16 +22,16 @@ The Supabase Dashboard checks every requirement when you select a target organiz
 Your account must meet the following requirements:
 
 - You're an **Owner** of the source organization. An Administrator can't transfer projects.
-- You're a member of the target organization with a role for the whole organization: Owner, Administrator, Developer, or Read-only. The **No access** role and project-scoped roles don't qualify. For more information about roles, see [Access control](/docs/guides/platform/access-control).
-- You use one account for both organizations, and that account doesn't sign in with single sign-on (SSO). An SSO account and a non-SSO account with the same email address are separate accounts. For more information, see [Enable SSO for your organization](/docs/guides/platform/sso).
+- You're a member of the target organization with a role for the whole organization: Owner, Administrator, or Developer. On the Team Plan and Enterprise Plan, the Read-only role also qualifies. The **No access** role and project-scoped roles don't qualify. For more information about roles, see [Access control](/docs/guides/platform/access-control).
+- You use the same account in both organizations. An account that signs in with single sign-on (SSO) and a non-SSO account with the same email address are separate accounts, so a role held by one doesn't count for the other. If your SSO account isn't a member of both organizations, use a non-SSO account that is. For more information, see [Enable SSO for your organization](/docs/guides/platform/sso).
 
 The project and the source organization must meet the following requirements:
 
 - The project has no GitHub connection. Disconnect the [GitHub integration](/docs/guides/deployment/branching/github-integration), then reconnect it after the transfer.
-- No member has a project-scoped role on the project. Remove those roles, then assign them again in the target organization after the transfer.
-- If both organizations are on the Free Plan, the source organization has no usage restriction. See [Usage restrictions on Free Plan organizations](#usage-restrictions-on-free-plan-organizations).
-- You have no overdue invoices. See [Overdue invoices](#overdue-invoices).
-- The project doesn't use a feature that the target organization lacks. See [Features that block a transfer](#features-that-block-a-transfer).
+- No member has a project-scoped role on the project. Remove those roles before the transfer. To assign them again afterwards, the target organization must be on the Team Plan or Enterprise Plan.
+- If both organizations are on the Free Plan, the source organization has no usage restriction. See the [Usage restrictions on Free Plan organizations](#usage-restrictions-on-free-plan-organizations) section.
+- If the source organization is on the Free Plan or Pro Plan, you have no overdue invoices. See the [Overdue invoices](#overdue-invoices) section.
+- The project doesn't use a feature that the target organization lacks. See the [Features that block a transfer](#features-that-block-a-transfer) section.
 
 ### Usage restrictions on Free Plan organizations
 
@@ -41,12 +41,18 @@ A Free Plan organization that exceeded its quota can't transfer projects to anot
 This project can't be transferred to a Free organization while the source organization is in an active grace period or under service restrictions. Resolve the restriction or upgrade the source organization before transferring.
 ```
 
-The block applies only when both organizations are on the Free Plan. It stays in place after your usage drops back under the quota. The restriction notice clears automatically if you continue to stay under plan limits for multiple billing cycles. For more information, see [What is a grace period and does it reset after usage drops?](/docs/guides/platform/billing-faq#what-is-a-grace-period-and-does-it-reset-after-usage-drops).
+The block applies only when both organizations are on the Free Plan. It stays in place in all of the following cases:
+
+- Your usage drops back under the quota.
+- The grace period ends.
+- The restriction on the organization is lifted.
+
+The block ends when the restriction notice clears from the source organization. The notice clears automatically if you continue to stay under plan limits for multiple billing cycles. For more information, see [What is a grace period and does it reset after usage drops?](/docs/guides/platform/billing-faq#what-is-a-grace-period-and-does-it-reset-after-usage-drops).
 
 To transfer without waiting, use either of these options:
 
-- Upgrade the source organization to the Pro Plan. The upgrade lifts the restriction.
-- Transfer the project to an organization on the Pro Plan or above.
+- Upgrade the source organization to the Pro Plan. The upgrade lifts the restriction. The plan fee applies to the whole organization. For the cost, see [Pricing](/pricing).
+- Transfer the project to an organization on the Pro Plan and above.
 
 Supabase support can't lift a restriction to allow a transfer.
 
@@ -71,7 +77,7 @@ Some features block a transfer until you remove them or choose a different targe
 | [Preview and persistent branches](/docs/guides/deployment/branching)                                  | The target organization is on the Free Plan                                 | Delete the branches                                                   |
 | [Log drains](/docs/guides/observability/log-drains)                                                   | The target organization is on the Free Plan                                 | Remove the log drains                                                 |
 | [Advanced multi-factor authentication (MFA)](/docs/guides/auth/auth-mfa/phone) with phone or WebAuthn | The target organization is on the Free Plan                                 | Turn off phone and WebAuthn MFA                                       |
-| [Pipelines](/docs/guides/database/replication)                                                        | The target organization is on the Free Plan                                 | Delete all pipelines                                                  |
+| [Pipelines](/docs/guides/database/replication/pipelines)                                              | The target organization is on the Free Plan                                 | Delete all pipelines                                                  |
 | High availability                                                                                     | The target organization has no high availability access or capacity         | Choose a target organization with high availability access            |
 | [AWS PrivateLink](/docs/guides/platform/privatelink)                                                  | The project has a PrivateLink association                                   | Remove the PrivateLink associations                                   |
 | [Vector buckets](/docs/guides/storage/vector/creating-vector-buckets)                                 | The source organization has access to vector buckets and the target doesn't | Contact support to turn on vector buckets for the target organization |
@@ -84,7 +90,7 @@ Compliance settings don't block a transfer. If your project is a HIPAA project, 
 
 <Admonition type="caution">
 
-A transfer can't be undone. To move a project back, transfer it again, which runs the same checks. A second transfer doesn't restore add-ons that a move to the Free Plan removed.
+A transfer to a Free Plan organization removes add-ons, and transferring the project back doesn't restore them. A transfer has no undo. To move a project back, transfer it again, which runs the same checks.
 
 </Admonition>
 
@@ -109,8 +115,8 @@ The checks run when you select the target organization. A **Project cannot be tr
   }}
   className="max-w-[600px] mx-auto! border rounded-md"
 
-width={677}
-height={224}
+width={1530}
+height={408}
 />
 
 <Image
@@ -121,14 +127,14 @@ height={224}
   }}
   className="max-w-[600px] mx-auto!"
 
-width={773}
-height={581}
+width={1540}
+height={910}
 />
 
 </TabPanel>
 <TabPanel id="api" label="Management API">
 
-1. Create an [access token](/dashboard/account/tokens). If you scope the token, include both the source and the target organization, and grant the following permissions. For more information, see [Personal access tokens](/docs/guides/platform/personal-access-tokens).
+1. Create an [access token](/dashboard/account/tokens). For a scoped token, under **Resource access**, select **Organization**, choose both the source and the target organization, and grant the following permissions. A token with **Project** access can't preview or transfer a project. For more information, see [Personal access tokens](/docs/guides/platform/personal-access-tokens).
    - **Project Settings** with **Read** access, for the preview
    - **Organization Settings** with **Read-write** access, for the transfer
    - **Organization Members** with **Read** access, for the check on the target organization
@@ -156,7 +162,7 @@ height={581}
    EOF
    ```
 
-   The response has a `valid` field and lists of `errors`, `warnings`, and `info` messages. Continue when `valid` is `true`.
+   The response has a `valid` field under `data.attributes`, next to lists of `errors`, `warnings`, and `info` messages. Continue when `valid` is `true`.
 
 4. Transfer the project:
 
@@ -173,6 +179,8 @@ height={581}
    }
    EOF
    ```
+
+   A successful transfer returns `200` with an empty body.
 
 For the full request and response schemas, see [Preview a project transfer](/docs/reference/api/v2-preview-a-project-transfer) and [Transfer a project](/docs/reference/api/v2-transfer-a-project) in the Management API reference.
 
@@ -203,7 +211,7 @@ The following identifiers also stay the same, so your apps keep working without 
 - The JWT secret and signing keys
 - The database connection strings and the pooler host
 
-Read replicas and branches move with the project when the target organization is on the Pro Plan or above.
+Read replicas and branches move with the project when the target organization is on the Pro Plan and above.
 
 Update your apps or tools in the following cases:
 
@@ -213,21 +221,27 @@ Update your apps or tools in the following cases:
 
 ### Downtime
 
-A transfer causes downtime only when it changes the project's compute size. That happens when you move a project on compute larger than Nano to a Free Plan organization. The following table lists the downtime for each direction.
+A transfer restarts the database only when it changes the project's compute size. That happens when you move a project on compute larger than Nano to a Free Plan organization. The following table lists the database downtime for each direction.
 
-| Transfer                                                          | Downtime                                           |
-| ----------------------------------------------------------------- | -------------------------------------------------- |
-| Between two organizations on the same plan                        | None                                               |
-| From the Free Plan to the Pro Plan or above                       | None                                               |
-| Between two different plans, Pro Plan or above                    | None                                               |
-| From the Pro Plan or above to the Free Plan, compute above Nano   | About a minute, while the project restarts on Nano |
-| From the Pro Plan or above to the Free Plan, compute already Nano | None                                               |
+| Transfer                                                           | Downtime                                           |
+| ------------------------------------------------------------------ | -------------------------------------------------- |
+| Between two organizations on the same plan                         | None                                               |
+| From the Free Plan to the Pro Plan and above                       | None                                               |
+| Between two different plans, Pro Plan and above                    | None                                               |
+| From the Pro Plan and above to the Free Plan, compute above Nano   | About a minute, while the project restarts on Nano |
+| From the Pro Plan and above to the Free Plan, compute already Nano | None                                               |
 
-The restart begins within seconds of confirming the transfer.
+The restart is queued when you confirm the transfer, and usually begins within seconds.
 
-Removing the IPv4 add-on or a custom domain doesn't restart the project, but connections that use them stop working. See [What the transfer removes](#what-the-transfer-removes).
+A transfer to a Free Plan organization also restarts other services:
 
-A project that moves from the Free Plan to the Pro Plan or above keeps its Nano compute. You can upgrade it to Micro at no extra cost. See [Compute and disk](/docs/guides/platform/compute-and-disk).
+- The Auth service restarts to apply the Free Plan settings, even when the compute size doesn't change.
+- Removing a custom domain or vanity subdomain restarts the Auth service and the API gateway. Requests to the custom domain stop working.
+- Removing the IPv4 add-on doesn't restart the project, but connections to the IPv4 address stop working.
+
+For the full list, see the [What the transfer removes](#what-the-transfer-removes) section.
+
+A project that moves from the Free Plan to the Pro Plan and above keeps its Nano compute. You can upgrade it to Micro at no extra cost. See [Compute and disk](/docs/guides/platform/compute-and-disk).
 
 ### Billing
 
@@ -239,14 +253,14 @@ The following stay with each organization:
 
 - **Subscription and plan fee.** The transfer doesn't change or prorate either organization's subscription.
 - **Credit balance.** Credits stay with the source organization. To move credits to another organization, [contact support](https://supabase.help).
-- **Compute credits.** Each organization's compute credits apply to its own compute hours.
+- **Compute Credits.** Each organization's Compute Credits apply to its own compute hours. They cover one project on Nano or Micro compute, so every further project adds compute costs. See [Manage Compute usage](/docs/guides/platform/manage-your-usage/compute).
 - **Payment method and billing details.** The target organization pays with its own payment method. The payment method, billing address, and billing email never move with a project.
 
-When you select a target organization, the Dashboard shows how the transfer changes that organization's compute costs.
+When you move a Free Plan project to an organization on the Pro Plan and above that already has active projects, the Dashboard shows the added monthly compute cost before you confirm.
 
 ### Access and tokens
 
-A transfer doesn't change anyone's membership or role. Your role in the target organization applies to the project after the transfer. For example, an Owner of the source organization who has the Read-only role in the target organization gets read-only access to the project. Members of the source organization who aren't members of the target organization lose access to the project.
+A transfer doesn't change anyone's membership or role. Your role in the target organization applies to the project after the transfer. For example, an Owner of the source organization who has the Developer role in the target organization gets Developer access to the project. Members of the source organization who aren't members of the target organization lose access to the project.
 
 Personal access tokens for the Management API behave differently depending on their scope. The following table lists each case.
 
@@ -263,9 +277,9 @@ You might need to re-authorize connected apps for the target organization. That 
 
 The project moves to the target organization as soon as you confirm. Changes that come from the target plan, such as a compute change, finish within minutes.
 
-Supabase doesn't send an email about a transfer. To get notified, subscribe to the [`v1.project.transferred`](/docs/guides/platform/webhooks/events#v1projecttransferred) platform webhook event, which fires for both organizations.
+Supabase doesn't send an email about a transfer. Organizations with access to [Platform Webhooks](/docs/guides/platform/webhooks), an early access feature, can subscribe to the [`v1.project.transferred`](/docs/guides/platform/webhooks/events#v1projecttransferred) event, which fires for both organizations.
 
-The transfer appears in the source organization's [audit log](/docs/guides/security/platform-audit-logs). Activity after the transfer appears in the target organization's audit log.
+The transfer appears in your [account audit log](/dashboard/account/audit). On the Team Plan and Enterprise Plan, it also appears in the source organization's [audit log](/docs/guides/security/platform-audit-logs). Activity after the transfer appears in the target organization's audit log.
 
 ## Transfer to a Free Plan organization
 
@@ -273,19 +287,21 @@ A project that moves to a Free Plan organization loses the features that the Fre
 
 ### What the transfer removes
 
-The transfer removes the following automatically. The Dashboard lists the affected add-ons before you confirm.
+The Dashboard lists the affected add-ons before you confirm. The transfer removes or changes the following automatically:
 
 | Item                               | What happens                                                                                                                                                                  |
 | ---------------------------------- | ----------------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
-| Compute                            | Changes to Nano. A project on larger compute restarts. See [Downtime](#downtime).                                                                                             |
-| Point-in-Time Recovery             | The add-on is removed, and the **Backups** page no longer lists backups.                                                                                                      |
+| Compute                            | Changes to Nano. A project on larger compute restarts. See the [Downtime](#downtime) section.                                                                                 |
+| Point-in-Time Recovery             | The add-on is removed.                                                                                                                                                        |
+| Backups                            | The **Backups** page no longer lists backups, because the Free Plan doesn't include them.                                                                                     |
 | Read replicas                      | Removed.                                                                                                                                                                      |
 | Custom domain and vanity subdomain | Removed. Point your clients back to the project's default `supabase.co` URL.                                                                                                  |
 | IPv4 add-on                        | Removed. Direct connections become IPv6 only. On an IPv4-only network, connect through the [shared pooler](/docs/guides/database/connecting-to-postgres#pooler-session-mode). |
 | Branching                          | Turned off for the project.                                                                                                                                                   |
 | Auth features                      | SAML sign-in, session time-boxing, the session inactivity timeout, and leaked password protection are turned off.                                                             |
-| Email templates                    | Reset to the defaults, if the project sends email through the default email provider.                                                                                         |
-| Realtime and Storage settings      | Settings above the Free Plan limits are reset, and image transformations are turned off.                                                                                      |
+| Email templates                    | Reset to the defaults for some projects that send email through the default email provider. Projects with custom SMTP or a Send Email hook keep their templates.              |
+| Realtime settings                  | Settings above the Free Plan limits are reset.                                                                                                                                |
+| Storage features                   | Image transformations, analytics buckets, and CDN cache purging are turned off. The global file size limit returns to the Free Plan limit.                                    |
 
 The transfer doesn't remove branches, log drains, Advanced MFA, or Pipelines. Remove them yourself first, because each one blocks a transfer to the Free Plan. See [Features that block a transfer](#features-that-block-a-transfer).
 
@@ -296,17 +312,23 @@ The free project limit is counted for each member, not for each organization. Ev
 When the transfer would put a member over the limit, the Dashboard lists the affected members. To continue, use one of these options:
 
 - Ask each listed member to pause or delete one of their Free Plan projects, or to upgrade one of their Free Plan organizations.
-- Change the member's role in the target organization's [team settings](/dashboard/org/_/team).
-- Transfer the project to an organization on the Pro Plan or above.
+- Change the member's role to Developer in the target organization's [team settings](/dashboard/org/_/team). The limit counts only Owners and Administrators.
+- Transfer the project to an organization on the Pro Plan and above.
 
-### Pause a project from the Pro Plan or above
+### Pause a project from the Pro Plan or Team Plan
 
-Projects in an organization on the Pro Plan or above can't be paused. To pause one:
+Projects in an organization on the Pro Plan or Team Plan can't be paused. To pause one:
 
-1. Transfer the project to a Free Plan organization.
+1. Transfer the project to a Free Plan organization where you're an Owner or Administrator. Other roles can't pause a project.
 2. Pause the project in its [general settings](/dashboard/project/_/settings/general), or with the Management API's [pause a project](/docs/reference/api/v1-pause-a-project) endpoint.
 
-You can also transfer a project that's already paused. It stays paused after the transfer. For more information about pausing, see [Project pausing](/docs/guides/platform/free-project-pausing).
+Before you use this route, check the following:
+
+- The transfer removes add-ons and features that the Free Plan doesn't include, and a second transfer doesn't restore them. See the [What the transfer removes](#what-the-transfer-removes) section.
+- The transfer runs every check in the [Check the requirements](#check-the-requirements) section, including overdue invoices and the free project limit.
+- On the Free Plan, you can resume a paused project only if its database is 1 GB or smaller. To resume a larger project, first transfer the paused project to an organization on the Pro Plan and above.
+
+You can transfer a project that's already paused. It stays paused after the transfer. For more information about pausing and the time limit for resuming, see [Project pausing](/docs/guides/platform/free-project-pausing).
 
 ## Other transfer scenarios
 
@@ -314,42 +336,36 @@ The following sections cover handing a project to someone else, lost access, par
 
 ### Give a project to another person
 
-Projects belong to organizations, not to user accounts. To give a project to another person or a client, move the project to their organization or hand over your whole organization.
+Projects belong to organizations, not to user accounts. To give a project to another person or a client, or to move it to a new account of your own, move the project to their organization or hand over your whole organization.
+
+<Admonition type="caution">
+
+Leaving an organization permanently deletes the content you saved in its projects: SQL snippets, including shared ones, custom reports, and Log Explorer queries. Copy anything that you or the recipient need before you leave.
+
+</Admonition>
 
 #### Option 1: Move the project to their organization
 
-<Tabs scrollable size="small" type="underlined" defaultActiveId="dashboard" queryGroup="method">
-<TabPanel id="dashboard" label="Dashboard">
-
-1. Ask the recipient to create an organization and invite you with a role for the whole organization. The Read-only role is enough.
-2. Accept the invitation.
-3. [Transfer the project](#transfer-a-project) to their organization.
-4. Leave their organization, or ask the recipient to remove you.
-
-</TabPanel>
-<TabPanel id="api" label="Management API">
-
-1. Ask the recipient to create an organization and invite you with a role for the whole organization. On the Team Plan or Enterprise Plan, the recipient can use the [create organization invitations](/docs/reference/api/v2-create-organization-invitations) endpoint. On other plans, the recipient invites you from the Dashboard.
+1. Ask the recipient to create an organization and invite you with a role for the whole organization. The Developer role is enough. On the Team Plan or Enterprise Plan, the recipient can also send the invitation with the [create organization invitations](/docs/reference/api/v2-create-organization-invitations) endpoint.
 2. Accept the invitation from the invitation email. The Management API has no endpoint for accepting an invitation.
-3. Transfer the project with the Management API. See [Transfer a project](#transfer-a-project).
-4. Ask the recipient to remove you with the [remove organization members](/docs/reference/api/v2-remove-organization-members) endpoint. Only an Owner of their organization can call it. To leave without their help, click **Leave team** in the organization's [team settings](/dashboard/org/_/team).
-
-</TabPanel>
-</Tabs>
+3. [Transfer the project](#transfer-a-project) to their organization, with the Dashboard or the Management API steps in that section.
+4. In their organization's [team settings](/dashboard/org/_/team), click **Leave team**. The recipient can also remove you, from the same page or with the [remove organization members](/docs/reference/api/v2-remove-organization-members) endpoint.
 
 #### Option 2: Hand over the whole organization
+
+You can't add an Owner from Supabase to an organization managed through the [Vercel Marketplace](/docs/guides/integrations/vercel-marketplace). Give the person the `owner` role on your Vercel team instead.
 
 <Tabs scrollable size="small" type="underlined" defaultActiveId="dashboard" queryGroup="method">
 <TabPanel id="dashboard" label="Dashboard">
 
 1. Invite the recipient to your organization as an **Owner**, or promote a member to **Owner**.
-2. After the recipient accepts, replace or remove your payment method in the organization's [billing settings](/dashboard/org/_/billing). The payment method stays with the organization and can still be charged after you leave.
+2. After the recipient accepts, ask them to add their payment method in the organization's [billing settings](/dashboard/org/_/billing) and to select **Use this card**. Then delete your card. You can't delete the card that's active. A payment method that stays with the organization can still be charged after you leave.
 3. In the organization's [team settings](/dashboard/org/_/team), click **Leave team**.
 
 </TabPanel>
 <TabPanel id="api" label="Management API">
 
-1. Create an [access token](/dashboard/account/tokens). If you scope the token, grant **Organization Members** with **Read-write** access and **Organization Settings** with **Read-write** access.
+1. Create an [access token](/dashboard/account/tokens). For a scoped token, under **Resource access**, select **Organization**, choose the organization, and grant **Organization Members** with **Read-write** access and **Organization Settings** with **Read-write** access.
 2. Set the token and the organization's slug:
 
    ```bash
@@ -379,12 +395,16 @@ Projects belong to organizations, not to user accounts. To give a project to ano
    EOF
    ```
 
-   If the recipient is already a member, find their `id` with the [list organization members](/docs/reference/api/v2-list-organization-members) endpoint. Then change their role with the [assign organization member role](/docs/reference/api/v2-assign-organization-member-role) endpoint:
+   If the recipient is already a member, find their `id` with the [list organization members](/docs/reference/api/v2-list-organization-members) endpoint. Filter by their email address, because the endpoint returns one page of members at a time:
 
    ```bash
-   curl "https://api.supabase.com/v2/organizations/$ORG_SLUG/members" \
+   curl -g "https://api.supabase.com/v2/organizations/$ORG_SLUG/members?filter[primary_email]=$RECIPIENT_EMAIL" \
      -H "Authorization: Bearer $SUPABASE_ACCESS_TOKEN"
+   ```
 
+   Copy the `id` from the response. Then change their role with the [assign organization member role](/docs/reference/api/v2-assign-organization-member-role) endpoint:
+
+   ```bash
    export MEMBER_ID="recipient-member-id"
 
    curl -X PATCH "https://api.supabase.com/v2/organizations/$ORG_SLUG/members/$MEMBER_ID/roles" \
@@ -400,7 +420,7 @@ Projects belong to organizations, not to user accounts. To give a project to ano
    EOF
    ```
 
-4. After the recipient is an Owner, replace or remove your payment method in the organization's [billing settings](/dashboard/org/_/billing). The Management API has no endpoint for payment methods. The payment method stays with the organization and can still be charged after you leave.
+4. After the recipient is an Owner, ask them to add their payment method in the organization's [billing settings](/dashboard/org/_/billing) and to select **Use this card**. Then delete your card. The Management API has no endpoint for payment methods. A payment method that stays with the organization can still be charged after you leave.
 5. Remove yourself with the [remove organization members](/docs/reference/api/v2-remove-organization-members) endpoint. Use your own `id` from the list of members. The request fails while you're the only Owner.
 
    ```bash
@@ -436,7 +456,7 @@ Uninstalling the Vercel Marketplace integration deletes every project still in t
 To move projects from a Vercel-managed organization to a Supabase-managed organization:
 
 1. [Transfer each project](#transfer-a-project). The transfer removes the linked storage resource from your Vercel project.
-2. In Vercel, install the Supabase integration and connect each project again. Reconnect the integration to restore environment variables.
+2. On the target organization's [**Integrations**](/dashboard/org/_/integrations) page, click **Install Vercel integration**, then click **Add new project connection** for each project. Reconnect the integration to restore environment variables.
 3. After every project is out of the Vercel-managed organization, uninstall the Marketplace integration in Vercel.
 
 ### Other partner-managed projects
@@ -464,59 +484,63 @@ A transfer moves a project between organizations. It can't move a project to a d
 
 ## Troubleshooting
 
-When a check fails, the Dashboard shows a **Project cannot be transferred** box with one or more messages. The Management API returns the same messages after the text `Transfer is not possible, due to the following reasons:`. The following tables list each message with its cause and fix.
+When a check fails, the Dashboard shows a **Project cannot be transferred** box with one or more messages. The Management API's preview endpoint returns the same messages in its `errors` list. The transfer endpoint returns HTTP `400` with the messages after the text `Transfer is not possible, due to the following reasons:`.
+
+The following tables list each message with its cause and fix. Some long messages are shortened to their first sentences, so match on the start of the message.
 
 ### Role and membership messages
 
 The following table lists the messages about your role in the two organizations:
 
-| Message                                                                                      | Cause                                                                                                                     | Fix                                                                          |
-| -------------------------------------------------------------------------------------------- | ------------------------------------------------------------------------------------------------------------------------- | ---------------------------------------------------------------------------- |
-| You must be an owner of the project to transfer a project.                                   | You aren't an Owner of the source organization.                                                                           | Ask an Owner to transfer the project or to make you an Owner.                |
-| You must be a member of the target organization to transfer a project.                       | The account you're signed in with isn't a member of the target organization. An SSO account counts as a separate account. | Ask for an invitation for this account.                                      |
-| You must have organization permissions within the target organization to transfer a project. | You have the **No access** role or only project-scoped roles in the target organization.                                  | Ask an Owner for a role for the whole organization.                          |
-| You must be an admin or owner of the target organization to claim a project.                 | You're claiming a project that a partner platform created.                                                                | Ask an Owner of the target organization for the Owner or Administrator role. |
+| Message                                                                                      | Cause                                                                                                                                                  | Fix                                                                                                     |
+| -------------------------------------------------------------------------------------------- | ------------------------------------------------------------------------------------------------------------------------------------------------------ | ------------------------------------------------------------------------------------------------------- |
+| You must be an owner of the project to transfer a project.                                   | You aren't an Owner of the source organization.                                                                                                        | Ask an Owner to transfer the project or to make you an Owner.                                           |
+| You must be a member of the target organization to transfer a project.                       | The account you're signed in with isn't a member of the target organization. An SSO account counts as a separate account.                              | Ask for an invitation for this account.                                                                 |
+| You must have organization permissions within the target organization to transfer a project. | You have the **No access** role or only project-scoped roles in the target organization, or your access token doesn't include the target organization. | Ask an Owner for a role for the whole organization, or create a token that includes both organizations. |
 
 ### Billing and limit messages
 
 The following table lists the messages about restrictions, invoices, and project limits:
 
-| Message                                                                                                                                            | Cause                                                                      | Fix                                                                                                  |
-| -------------------------------------------------------------------------------------------------------------------------------------------------- | -------------------------------------------------------------------------- | ---------------------------------------------------------------------------------------------------- |
-| This project can't be transferred to a Free organization while the source organization is in an active grace period or under service restrictions. | Both organizations are on the Free Plan and the source exceeded its quota. | See [Usage restrictions on Free Plan organizations](#usage-restrictions-on-free-plan-organizations). |
-| There are overdue invoices in the organization(s)                                                                                                  | You have unpaid invoices.                                                  | See [Overdue invoices](#overdue-invoices).                                                           |
-| The target organization exceeds the free project limit when transferring this project.                                                             | An Owner or Administrator of the target organization is at their limit.    | See [Free project limit](#free-project-limit).                                                       |
+| Message                                                                                                                                            | Cause                                                                        | Fix                                                                                                  |
+| -------------------------------------------------------------------------------------------------------------------------------------------------- | ---------------------------------------------------------------------------- | ---------------------------------------------------------------------------------------------------- |
+| This project can't be transferred to a Free organization while the source organization is in an active grace period or under service restrictions. | Both organizations are on the Free Plan and the source exceeded its quota.   | See [Usage restrictions on Free Plan organizations](#usage-restrictions-on-free-plan-organizations). |
+| There are overdue invoices in the organization(s)                                                                                                  | An organization where you're an Owner or Administrator has overdue invoices. | See [Overdue invoices](#overdue-invoices).                                                           |
+| The target organization exceeds the free project limit when transferring this project.                                                             | An Owner or Administrator of the target organization is at their limit.      | See [Free project limit](#free-project-limit).                                                       |
 
 ### Project feature messages
 
 The following table lists the messages about the project's features and status:
 
-| Message                                                                                                                                                        | Cause                                                                                           | Fix                                                                                            |
-| -------------------------------------------------------------------------------------------------------------------------------------------------------------- | ----------------------------------------------------------------------------------------------- | ---------------------------------------------------------------------------------------------- |
-| Project is currently connected to GitHub. Please disconnect the GitHub integration before transferring the project to another organization.                    | The project has a GitHub connection.                                                            | Disconnect the GitHub integration, then reconnect it after the transfer.                       |
-| Please remove linked project scoped role before transferring this project.                                                                                     | A member has a project-scoped role on the project.                                              | Remove every project-scoped role, then assign the roles again in the target organization.      |
-| The source project has preview branches that can't be transferred to an organization on a Free Plan.                                                           | The target organization is on the Free Plan and the project has preview or persistent branches. | Delete the project's preview and persistent branches.                                          |
-| Log Drains must be removed from the project before transferring it to an organization that does not have access to Log Drains                                  | The project has log drains and the target organization's plan doesn't include them.             | Remove the project's log drains.                                                               |
-| Advanced MFA Phone must be removed from the project before transferring it to an organization that does not have access to Advanced MFA Phone                  | The project uses phone MFA and the target organization's plan doesn't include it.               | Turn off phone MFA in the project's Auth settings.                                             |
-| Advanced MFA WebAuthn must be removed from the project before transferring it to an organization that does not have access to Advanced MFA WebAuthn            | The project uses WebAuthn MFA and the target organization's plan doesn't include it.            | Turn off WebAuthn MFA in the project's Auth settings.                                          |
-| Pipelines must be removed from the project before transferring it to an organization that does not have access to Pipelines                                    | The project uses Pipelines and the target organization doesn't have access to them.             | Remove Pipelines from the project.                                                             |
-| ETL is not available on Free Plan organizations, please delete all of your pipelines before transferring the project.                                          | The target organization is on the Free Plan and the project has pipelines.                      | Delete all pipelines.                                                                          |
-| The target organization does not have access to high availability projects.                                                                                    | The project uses high availability and the target organization doesn't have access to it.       | Choose a target organization with high availability access.                                    |
-| The target organization has reached its maximum number of high availability projects                                                                           | The transfer would put the target organization over its limit of high availability projects.    | Choose a different target organization, or remove a high availability project from the target. |
-| Project transfers with active AWS PrivateLink Associations are not supported. Please remove all AWS PrivateLink from project associations before transferring. | The project has AWS PrivateLink associations.                                                   | Remove the project's PrivateLink associations.                                                 |
-| The source organization has access to Vector Buckets, which is not available in the target organization.                                                       | The source organization has access to vector buckets and the target organization doesn't.       | Contact support to turn on vector buckets for the target organization.                         |
-| Project is provisioned via Stripe. Please deprovision the project through Stripe before transferring it to another organization.                               | The project is provisioned through Stripe Projects.                                             | See [Stripe Projects](#stripe-projects) before you remove anything in Stripe.                  |
-| Your project is currently restoring, please wait until restoration is complete.                                                                                | A restore is in progress.                                                                       | Wait until the restore finishes.                                                               |
-| You are attempting to transfer a removed project.                                                                                                              | The project was deleted.                                                                        | A deleted project can't be transferred.                                                        |
-| One or more projects to be transferred are not part of source organization.                                                                                    | The project already moved, or the page is out of date.                                          | Reload the page and check which organization owns the project.                                 |
-| Project transfers are temporarily disabled, please try again later.                                                                                            | Transfers are paused for all projects.                                                          | Try again later.                                                                               |
+| Message                                                                                                                                                        | Cause                                                                                                | Fix                                                                                            |
+| -------------------------------------------------------------------------------------------------------------------------------------------------------------- | ---------------------------------------------------------------------------------------------------- | ---------------------------------------------------------------------------------------------- |
+| Project is currently connected to GitHub. Please disconnect the GitHub integration before transferring the project to another organization.                    | The project has a GitHub connection.                                                                 | Disconnect the GitHub integration, then reconnect it after the transfer.                       |
+| Please remove linked project scoped role before transferring this project.                                                                                     | A member has a project-scoped role on the project.                                                   | Remove every project-scoped role, then assign the roles again in the target organization.      |
+| The source project has preview branches that can't be transferred to an organization on a Free Plan.                                                           | The target organization is on the Free Plan and the project has preview or persistent branches.      | Delete the project's preview and persistent branches.                                          |
+| Log Drains must be removed from the project before transferring it to an organization that does not have access to Log Drains                                  | The project has log drains and the target organization's plan doesn't include them.                  | Remove the project's log drains.                                                               |
+| Advanced MFA Phone must be removed from the project before transferring it to an organization that does not have access to Advanced MFA Phone                  | The project uses phone MFA and the target organization's plan doesn't include it.                    | Turn off phone MFA in the project's Auth settings.                                             |
+| Advanced MFA WebAuthn must be removed from the project before transferring it to an organization that does not have access to Advanced MFA WebAuthn            | The project uses WebAuthn MFA and the target organization's plan doesn't include it.                 | Turn off WebAuthn MFA in the project's Auth settings.                                          |
+| Pipelines must be removed from the project before transferring it to an organization that does not have access to Pipelines                                    | The project uses Pipelines and the target organization doesn't have access to them.                  | Remove Pipelines from the project.                                                             |
+| ETL is not available on Free Plan organizations, please delete all of your pipelines before transferring the project.                                          | The target organization is on the Free Plan and the project has pipelines.                           | Delete all pipelines.                                                                          |
+| The target organization does not have access to high availability projects.                                                                                    | The project uses high availability and the target organization doesn't have access to it.            | Choose a target organization with high availability access.                                    |
+| The target organization has reached its maximum number of high availability projects                                                                           | The transfer would put the target organization over its limit of high availability projects.         | Choose a different target organization, or remove a high availability project from the target. |
+| Project transfers with active AWS PrivateLink Associations are not supported. Please remove all AWS PrivateLink from project associations before transferring. | The project has AWS PrivateLink associations.                                                        | Remove the project's PrivateLink associations.                                                 |
+| The source organization has access to Vector Buckets, which is not available in the target organization.                                                       | The source organization has access to vector buckets and the target organization doesn't.            | Contact support to turn on vector buckets for the target organization.                         |
+| Project is provisioned via Stripe. Please deprovision the project through Stripe before transferring it to another organization.                               | The project is provisioned through Stripe Projects.                                                  | See [Stripe Projects](#stripe-projects) before you remove anything in Stripe.                  |
+| Your project is currently restoring, please wait until restoration is complete.                                                                                | A restore is in progress.                                                                            | Wait until the restore finishes.                                                               |
+| Cannot transfer project to the organization it already belongs to.                                                                                             | The target organization is the project's current organization. The project might have moved already. | Check which organization owns the project.                                                     |
+| One or more projects to be transferred are not part of source organization.                                                                                    | The project's organization changed while the transfer was running.                                   | Reload the page and check which organization owns the project.                                 |
+| Project transfers are temporarily disabled, please try again later.                                                                                            | Transfers are paused for all projects.                                                               | Try again later.                                                                               |
 
 ### The transfer button is missing or disabled
 
-- **The Transfer project section is missing.** You're viewing a preview branch. Open the main project instead.
-- **Transfer project is disabled.** The tooltip shows `You need additional permissions to transfer this project`. Only an Owner of the source organization can transfer.
-- **Transfer Project in the dialog is disabled.** A check is failing. Read the **Project cannot be transferred** box.
+- **The Transfer project section is missing.** You're viewing a branch. Open the main project instead.
+- **Transfer project is disabled.** The tooltip gives the reason:
+  - `You need additional permissions to transfer this project`: only an Owner of the source organization can transfer.
+  - `Project transfers are temporarily disabled, please try again later.`: transfers are paused for all projects.
+- **The dialog shows `You do not have any organizations you can transfer your project to.`** Your account is a member of no other organization. Create an organization, or ask for an invitation to one.
+- **Transfer Project in the dialog is disabled.** No target organization is selected, the checks are still running, or a check is failing. Read the **Project cannot be transferred** box.
 
 ### The transfer fails after you confirm
 
-If you see a `Failed to transfer project` message after you confirm, compare the text after the colon with the messages in the preceding tables. If the text matches none of them, check which organization owns the project before you try again.
+If you see a message that starts with `Failed to transfer project:` after you confirm, compare the rest of the message with the messages in the preceding tables. If the text matches none of them, check which organization owns the project before you try again.
