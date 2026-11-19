@@ -36,7 +36,7 @@ If you use a custom IAM role, see the [required permissions](#custom-iam-permiss
 
 ## Configure BigQuery as a destination
 
-Follow [Set up Pipelines](/docs/guides/database/replication/pipelines#setup-overview) to enable Pipelines, select **BigQuery**, and configure the publication and initial sync. Then enter:
+Follow [Set up Pipelines](/docs/guides/database/replication/pipelines#setup-overview) to enable Pipelines and select **BigQuery**. In the **Pipeline creation wizard** preview, enter the settings below on **Connection** and click **Continue** to validate them before choosing the publication and initial sync on **Data**. In the destination form, configure the connection and data settings together.
 
 | Field                   | Value                                                                            |
 | ----------------------- | -------------------------------------------------------------------------------- |
@@ -105,8 +105,6 @@ Choose a supported Postgres replica identity:
 
 BigQuery upserts require complete new rows. Postgres can omit unchanged out-of-line TOAST values; `REPLICA IDENTITY FULL` supplies the old row so Pipelines can reconstruct them.
 
-If replication fails on a partial update row, set full replica identity and restart the pipeline. The change affects only new WAL: incompatible retained updates can still require a [table reset](/docs/guides/database/replication/pipelines-monitoring#restarting-tables).
-
 Check a table's current replica identity:
 
 ```sql
@@ -128,7 +126,15 @@ Set full replica identity when a table has toasted columns and update replicatio
 alter table public.your_table replica identity full;
 ```
 
-`REPLICA IDENTITY FULL` increases WAL volume by logging the complete old row for updates and deletes.
+For a partitioned table, run the statement on the parent and each partition. Postgres applies replica identity per table. `REPLICA IDENTITY FULL` increases WAL volume by logging the complete old row for updates and deletes.
+
+If replication has already failed on a partial update, use [**Reset table**](/docs/guides/database/replication/pipelines-monitoring#restarting-tables) on the affected table after changing its replica identity. The change applies only to new write-ahead log (WAL) records. The reset lets the table resume from a new replication position past the incompatible update.
+
+<Admonition type="danger">
+
+Resetting a table deletes its existing BigQuery data when replication resumes. Include the table in **Initial sync** before resetting if you want to copy its current source rows again.
+
+</Admonition>
 
 ## Column names
 

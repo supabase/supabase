@@ -135,9 +135,23 @@ Resetting a table drops and recreates its table and, for `ReplacingMergeTree`, i
 
 `REPLICA IDENTITY NOTHING` cannot support updates or deletes.
 
-Use `REPLICA IDENTITY FULL` for tables whose updates can omit unchanged out-of-line TOAST values. It lets Pipelines reconstruct the complete new row. Changing replica identity affects only new WAL; incompatible retained updates can still require a [table reset](/docs/guides/database/replication/pipelines-monitoring#restarting-tables).
-
 Array elements can be `NULL`. A whole-array SQL `NULL` is stored as an empty array, so these two source values become indistinguishable.
+
+### Recover from partial updates
+
+Use `REPLICA IDENTITY FULL` for tables whose updates can omit unchanged out-of-line TOAST values. It lets Pipelines reconstruct the complete new row. Run this statement on the source table and, for a partitioned table, on each of its partitions:
+
+```sql
+alter table public.your_table replica identity full;
+```
+
+If replication has already failed on a partial update, use [**Reset table**](/docs/guides/database/replication/pipelines-monitoring#restarting-tables) on the affected table. Changing replica identity applies only to new write-ahead log (WAL) records. The reset lets the table resume from a new replication position past the incompatible update.
+
+<Admonition type="danger">
+
+Resetting a table deletes its existing ClickHouse data when replication resumes, including any append-only history in a `MergeTree` table. Include the table in **Initial sync** before resetting if you want to copy its current source rows again.
+
+</Admonition>
 
 ## Type mapping
 
