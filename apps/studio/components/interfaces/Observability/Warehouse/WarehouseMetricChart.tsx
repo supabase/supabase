@@ -8,24 +8,9 @@ import {
   getWarehouseSeriesRank,
   type WarehouseChartSeries,
 } from './WarehouseMetricChart.utils'
+import { getEmptyMessage } from './WarehouseMetricsReport.utils'
 import { NoDataPlaceholder } from '@/components/ui/Charts/NoDataPlaceholder'
 import type { WarehouseMetric } from '@/data/warehouse/warehouse-metrics-api-types'
-
-export const getWarehouseMetricEmptyMessage = (metric?: WarehouseMetric) => {
-  if (!metric) return 'Metrics are temporarily unavailable'
-  switch (metric.availability) {
-    case 'stale':
-      return 'No recent data'
-    case 'insufficient_data':
-      return 'Not enough data yet'
-    case 'unavailable':
-    case 'disabled':
-    case 'not_provisioned':
-      return 'Metrics are temporarily unavailable'
-    default:
-      return 'No data in the selected period'
-  }
-}
 
 export const WarehouseMetricChart = ({
   metric,
@@ -113,7 +98,7 @@ export const WarehouseMetricChart = ({
               attribute={title}
               size="normal"
               hideTotalPlaceholder
-              message={getWarehouseMetricEmptyMessage(metric)}
+              message={getEmptyMessage(metric)}
             />
           )}
           {allSeries.length > series.length && (
