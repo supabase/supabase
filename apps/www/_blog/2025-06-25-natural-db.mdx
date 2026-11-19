@@ -46,7 +46,7 @@ Three complementary memory types maintain conversation continuity:
 
 ### Scheduled Prompts
 
-The system achieves autonomy through scheduled prompts which are powered by pg_cron through a dedicated tool. Scheduled prompts call the same edge functions as a normal prompt via pg_net and can therefore use all the same tools.
+The system achieves autonomy through scheduled prompts which are powered by [pg_cron](/docs/guides/database/extensions/pg_cron) through a dedicated tool. Scheduled prompts call the same edge functions as a normal prompt via pg_net and can therefore use all the same tools.
 
 **Example**: "Every Sunday at 6 PM, analyze my portfolio performance and research market trends"
 
@@ -85,7 +85,7 @@ Through Zapier's MCP integration, your assistant can:
 
 ### Input/Output Integration
 
-The system uses a Telegram Bot as the default interface which calls an edge function via webhook. You can change this to whatever interface you want, for example a web page, voice or other.
+The system uses a Telegram Bot as the default interface which calls an [edge function](/docs/guides/functions) via webhook. You can change this to whatever interface you want, for example a web page, voice or other.
 
 ### Self-Evolving System Prompt
 

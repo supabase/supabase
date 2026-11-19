@@ -12,13 +12,13 @@ You need:
 
 - A working self-hosted Supabase installation. See [Self-Hosting with Docker](/docs/guides/self-hosting/docker).
 - For Postgres function hooks: access to the database service to create functions.
-- For HTTP endpoint hooks: a reachable HTTPS endpoint or a local Edge Function.
+- For HTTP endpoint hooks: a reachable HTTPS endpoint or a local [Edge Function](/docs/guides/functions).
 
 ## How hooks work
 
 For hook implementation details (input/output schemas, SQL and HTTP examples), see [Auth Hooks](/docs/guides/auth/auth-hooks).
 
-Supabase Auth can call a **hook** at specific lifecycle events during the auth flow. Each hook can be configured with the following environment variables:
+[Supabase Auth](/docs/guides/auth) can call a **hook** at specific lifecycle events during the auth flow. Each hook can be configured with the following environment variables:
 
 - `GOTRUE_HOOK_{HOOK_NAME}_ENABLED`: Enable the hook (`true`/`false`)
 - `GOTRUE_HOOK_{HOOK_NAME}_URI`: The hook endpoint

@@ -10,7 +10,7 @@ import {
   DatePickerValue,
   LogsDatePicker,
 } from '@/components/interfaces/Settings/Logs/Logs.DatePickers'
-import { maybeShowUpgradePromptIfNotEntitled } from '@/components/interfaces/Settings/Logs/Logs.utils'
+import { isStartOutsideRetention } from '@/components/interfaces/Settings/Logs/Logs.utils'
 import UpgradePrompt from '@/components/interfaces/Settings/Logs/UpgradePrompt'
 import { useCheckEntitlements } from '@/hooks/misc/useCheckEntitlements'
 
@@ -44,10 +44,7 @@ export function DataTableFilterTimerange<TData>({
 
   const handleDatePickerChange = (vals: DatePickerValue) => {
     // Check if the selected date range exceeds the plan limits
-    const shouldShowUpgradePrompt = maybeShowUpgradePromptIfNotEntitled(
-      vals.from,
-      entitledToAuditLogDays
-    )
+    const shouldShowUpgradePrompt = isStartOutsideRetention(vals.from, entitledToAuditLogDays)
 
     if (shouldShowUpgradePrompt) {
       setShowUpgradePrompt(true)

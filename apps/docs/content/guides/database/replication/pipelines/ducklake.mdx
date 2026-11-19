@@ -17,14 +17,14 @@ Insert-only tables don't require a primary key or replica identity. Updates and 
 
 DuckLake stores metadata in a Postgres catalog and data in object storage. Pipelines offers two ways to set them up:
 
-- **Use this Supabase project**: Pipelines uses this project's Postgres database as the catalog and a Storage bucket in the same project as object storage. It also creates the connection credentials.
+- **Use this Supabase project**: Pipelines uses this project's Postgres database as the catalog and a [Storage bucket](/docs/guides/storage/buckets/fundamentals) in the same project as object storage. It also creates the connection credentials.
 - **Enter connection details**: You provide the catalog URL and the storage credentials.
 
 To read the replicated data, you also need a compatible query engine.
 
 | Component        | Purpose                                                                                                                             |
 | ---------------- | ----------------------------------------------------------------------------------------------------------------------------------- |
-| Postgres catalog | Stores DuckLake schemas, snapshots, file references, and other metadata. This is not a copy of the replicated table data.           |
+| Postgres catalog | Stores DuckLake schemas, snapshots, file references, and small inlined data changes.                                                |
 | Object storage   | Stores Parquet data and delete files under an `s3://` path.                                                                         |
 | Query engine     | Reads the catalog and object storage. Pipelines doesn't include a DuckLake query endpoint; use DuckDB or another compatible engine. |
 
@@ -32,7 +32,7 @@ You can query replicated tables, but treat them and their underlying catalog and
 
 ## Configure DuckLake as a destination [#choose-a-configuration-mode]
 
-Follow [Set up Pipelines](/docs/guides/database/replication/pipelines#setup-overview). In **Add pipeline**, select **DuckLake**, enter a **Pipeline name**, choose a **Publication**, and set **Initial sync**. Then choose how to configure the catalog and storage.
+Follow [Set up Pipelines](/docs/guides/database/replication/pipelines#setup-overview) to enable Pipelines and select **DuckLake**. In the **Pipeline creation wizard** preview, configure the catalog and storage on **Connection**, then click **Continue** to validate the settings before choosing the publication and initial sync on **Data**. In the destination form, configure the connection and data settings together.
 
 ### Use this Supabase project [#use-supabase]
 
@@ -48,8 +48,7 @@ To configure the destination:
 1. Select **Use this Supabase project** under **Configuration method**.
 2. Enter the **Metadata schema**.
 3. Choose the **Bucket**. Select **New bucket** at the bottom of the bucket list if you haven't created one yet.
-4. Optionally adjust **Pool size** under **Advanced settings**. It allows 1 to 6 concurrent DuckDB connections; the default is 4.
-5. Click **Start pipeline**. Review any validation warnings, then confirm the estimated cost with **Create and start pipeline**.
+4. Optionally adjust **Pool size** under **Advanced settings** to tune destination concurrency and resource use.
 
 Credential-provisioning warnings are expected before creation: catalog and Storage credentials are provisioned when you save the destination. Review the metadata schema and bucket before proceeding.
 
@@ -76,17 +75,28 @@ Select **Enter connection details** under **Configuration method**, then configu
 - **Use SSL**: Choose **On** for HTTPS, or **Off** if your provider requires HTTP
 - **Metadata schema**: A unique Postgres schema for DuckLake metadata, using only letters, numbers, and underscores
 
-Optionally adjust **Pool size** under **Advanced settings**. It allows 1 to 6 concurrent DuckDB connections; the default is 4. Click **Start pipeline**, review the validation results, then confirm the estimated cost with **Create and start pipeline**.
+Optionally adjust **Pool size** under **Advanced settings** to tune destination concurrency and resource use.
 
 The catalog URL and storage credentials are stored as secrets and aren't returned after creation. When editing the destination, leave a secret field empty to keep its stored value, or enter a new value to replace it.
+
+### Start the pipeline
+
+- In the wizard, check the initial sync estimate on **Review** and click **Start pipeline**. If validation returns warnings, review them before confirming with **Start pipeline anyway**.
+- In the destination form, click **Start pipeline** to run validation. Confirm any warnings using the [destination form steps](/docs/guides/database/replication/pipelines#destination-form), then review the initial sync estimate and click **Create and start pipeline**.
 
 ## How replication works
 
 Pipelines creates current-state tables, copies rows according to the [initial sync selection](/docs/guides/database/replication/pipelines#choosing-which-tables-to-copy), then applies published changes and supported schema changes.
 
-Source schema and table names are preserved, while ASCII uppercase letters in column names are converted to lowercase. DuckDB compares schema, table, and column identifiers without ASCII case distinctions, so don't publish names that differ only by ASCII case. Use distinct lowercase column names. Source column names matching the generated `supabase_etl_ducklake_dropped_<ordinal>_<hash>` shape are reserved for schema-change recovery.
+Source schema and table names are preserved, while ASCII uppercase letters in column names are converted to lowercase. DuckDB compares schema, table, and column identifiers without ASCII case distinctions, so don't publish names that differ only by ASCII case. Use distinct lowercase column names.
 
-A source `TRUNCATE` truncates the DuckLake table. A [table restart](/docs/guides/database/replication/pipelines-monitoring#restarting-tables) drops and recreates it. [Removing a table from the publication](/docs/guides/database/replication/pipelines#removing-tables-from-replication) leaves its destination data in place.
+A source `TRUNCATE` truncates the DuckLake table. A [table reset](/docs/guides/database/replication/pipelines-monitoring#restarting-tables) drops and recreates it. [Removing a table from the publication](/docs/guides/database/replication/pipelines#removing-tables-from-replication) leaves its destination data in place.
+
+### Delivery and replay
+
+DuckLake applies ongoing row changes to managed tables exactly once. It commits data changes and their replay progress together, then skips already committed changes during recovery.
+
+This includes inserts into tables without a primary key. Identical rows that represent separate source inserts are preserved. An interrupted initial sync can instead discard its partial data and copy the table again. See [delivery guarantees](/docs/guides/database/replication/pipelines-faq#can-data-be-processed-more-than-once) for ordering and recovery limits.
 
 ## Query replicated data [#query-the-destination]
 
@@ -113,7 +123,13 @@ See the [DuckDB connection guide](https://ducklake.select/docs/stable/duckdb/usa
 | `REPLICA IDENTITY NOTHING`                       | Insert-only. Inserts replicate, but updates and deletes don't contain an identity that DuckLake can match safely.      |
 | `REPLICA IDENTITY DEFAULT` without a primary key | Insert-only. Add a key, configure a replica-identity index, or use full identity before publishing updates or deletes. |
 
-Replica-identity changes affect only new WAL. If retained updates or deletes still fail after a pipeline restart, [restart replication for the affected table](/docs/guides/database/replication/pipelines-monitoring#restarting-tables).
+Replica-identity changes affect only new WAL. If retained updates or deletes still fail after a pipeline restart, [reset the affected table](/docs/guides/database/replication/pipelines-monitoring#restarting-tables).
+
+<Admonition type="caution">
+
+For tables using `REPLICA IDENTITY FULL` without a nondeferrable primary key, a replicated column named `rowid` can make one update or delete affect all identical rows. Avoid this column name in any letter case so DuckLake can distinguish duplicate rows.
+
+</Admonition>
 
 ## Type mapping
 
@@ -154,9 +170,7 @@ Pipelines supports:
 
 New columns are created as nullable so existing destination rows remain valid. Adding `NOT NULL` keeps an existing destination column nullable. Supported defaults are stored in DuckLake metadata; other defaults are skipped. Postgres still supplies the source values through replication.
 
-Previously excluded columns are added without a default, leaving historical rows `NULL`. Removing a published column drops its destination values; adding it again does not restore them.
-
-For type changes, unsupported changes, and interrupted schema changes, see the shared [schema-change behavior and recovery](/docs/guides/database/replication/pipelines#schema-change-support).
+For publication changes, type changes, and schema errors, see the shared [schema-change behavior and recovery](/docs/guides/database/replication/pipelines#schema-change-support).
 
 ## Troubleshooting
 

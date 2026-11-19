@@ -4,6 +4,8 @@ import RefSubLayout from '~/layouts/ref/RefSubLayout'
 import { getCustomContent } from '~/lib/custom-content/getCustomContent'
 import { isFeatureEnabled } from 'common'
 
+import { CliFlagDefault } from './CliFlagDefault'
+
 const { cliDisableCustomProfiles } = isFeatureEnabled(['cli:disable_custom_profiles'])
 
 const CliGlobalFlagsHandler = async ({ version }: { version?: string }) => {
@@ -15,18 +17,16 @@ const CliGlobalFlagsHandler = async ({ version }: { version?: string }) => {
     : undefined
 
   // Transform the flags based on feature flags
-  const processedFlags = spec.flags.map(
-    (flag): { id: string; name: string; description: string; required?: boolean } => {
-      if (flag.id === 'profile' && !cliDisableCustomProfiles) {
-        return {
-          id: 'profile',
-          name: `--profile ${cliProfile}`,
-          description: `use ${cliProfile} profile for connecting to Supabase API`,
-        }
+  const processedFlags = spec.flags.map((flag) => {
+    if (flag.id === 'profile' && !cliDisableCustomProfiles) {
+      return {
+        ...flag,
+        name: `--profile ${cliProfile}`,
+        description: `use ${cliProfile} profile for connecting to Supabase API`,
       }
-      return flag
     }
-  )
+    return flag
+  })
 
   return (
     <RefSubLayout.EducationRow className="not-prose">
@@ -40,7 +40,9 @@ const CliGlobalFlagsHandler = async ({ version }: { version?: string }) => {
                 key={flag.id}
                 id={`${spec.info.id}-${flag.id}`}
                 isOptional={flag.required === undefined ? true : !flag.required}
-              ></Param>
+              >
+                <CliFlagDefault flag={flag} />
+              </Param>
             )
           })}
         </ul>

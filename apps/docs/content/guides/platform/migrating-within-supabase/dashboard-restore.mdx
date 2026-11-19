@@ -44,7 +44,7 @@ Dashboard backups are only available for older projects that still use logical b
 
 Here are some things that are not stored directly in your database and will require you to re-create or setup on the new project:
 
-    - Edge Functions
+    - [Edge Functions](/docs/guides/functions)
     - Auth Settings and API keys
     - Realtime settings
     - Database extensions and settings
@@ -63,14 +63,14 @@ Here are some things that are not stored directly in your database and will requ
 
       </Admonition>
 
-      Session pooler connection string:
+      Session [pooler](/docs/guides/database/connecting-to-postgres/pooling-and-limits) connection string:
       ```bash
-        postgresql://postgres.[PROJECT-REF]:[YOUR-PASSWORD]@aws-0-us-east-1.pooler.supabase.com:5432/postgres
+        postgresql://postgres.[PROJECT-REF]:[YOUR-DATABASE-PASSWORD]@aws-0-us-east-1.pooler.supabase.com:5432/postgres
       ```
 
       Direct connection string:
       ```bash
-        postgresql://postgres:[YOUR-PASSWORD]@db.[PROJECT-REF].supabase.co:5432/postgres
+        postgresql://postgres:[YOUR-DATABASE-PASSWORD]@db.[PROJECT-REF].supabase.co:5432/postgres
       ```
     </StepHikeCompact.Details>
 
@@ -84,7 +84,7 @@ Here are some things that are not stored directly in your database and will requ
     </Admonition>
     Reset the password in the [Database Settings](/dashboard/project/_/database/settings).
 
-    Replace ```[YOUR-PASSWORD]``` in the connection string with the database password.
+    Replace ```[YOUR-DATABASE-PASSWORD]``` in the connection string with the database password.
 
   </StepHikeCompact.Details>
 </StepHikeCompact.Step>

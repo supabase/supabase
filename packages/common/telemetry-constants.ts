@@ -1359,6 +1359,22 @@ export interface DocsSearchV2OpenedEvent {
 }
 
 /**
+ * How a search term is reported. Free text can contain credentials and personal data, so the
+ * term's text is sent only when it is a short letters-only keyword.
+ */
+export interface SearchQueryProperties {
+  /**
+   * The search term, present only when it is a keyword: up to 4 letters-only parts of at most
+   * 16 letters each, joined by single spaces, hyphens or underscores, 40 characters at most.
+   */
+  query?: string
+  /** Length of the search term, trimmed and with repeated whitespace collapsed. */
+  queryLength: number
+  /** Number of whitespace-separated words in the search term. */
+  queryWordCount: number
+}
+
+/**
  * User's search term was sent to the Search V2 endpoint.
  *
  * @group Events
@@ -1366,11 +1382,7 @@ export interface DocsSearchV2OpenedEvent {
  */
 export interface DocsSearchV2SearchSubmittedEvent {
   action: 'docs_search_v2_search_submitted'
-  properties: {
-    /**
-     * The search term sent to the Search V2 endpoint.
-     */
-    query: string
+  properties: SearchQueryProperties & {
     /**
      * Whether the Search V2 endpoint returned at least one result for the query.
      */
@@ -1386,15 +1398,11 @@ export interface DocsSearchV2SearchSubmittedEvent {
  */
 export interface DocsSearchV2ResultClickedEvent {
   action: 'docs_search_v2_result_clicked'
-  properties: {
+  properties: SearchQueryProperties & {
     /**
      * The path of the result that was activated.
      */
     resultPath: string
-    /**
-     * The search term whose results were showing when the result was activated.
-     */
-    query: string
   }
 }
 
@@ -1434,11 +1442,7 @@ export interface KbSearchClosedEvent {
  */
 export interface KbSearchSubmittedEvent {
   action: 'kb_search_submitted'
-  properties: {
-    /** The trimmed search term sent to the knowledge base search endpoint. */
-    query: string
-    /** Length of the trimmed search term. */
-    queryLength: number
+  properties: SearchQueryProperties & {
     /** Number of results the search returned. */
     resultCount: number
     /** Whether the search returned at least one result. */
@@ -1986,6 +1990,56 @@ export interface StudioBillingCancelSubscriptionClickedEvent {
     currentPlan: string
   }
   groups: Omit<TelemetryGroups, 'project'>
+}
+
+/**
+ * User confirmed a downgrade to the Free Plan and was shown the modal saying members
+ * have exceeded their free project limits, which blocks the downgrade.
+ *
+ * @group Events
+ * @source studio
+ * @page /billing or /billing?panel=subscriptionPlan
+ */
+export interface StudioBillingDowngradeBlockedModalOpenedEvent {
+  action: 'studio_billing_downgrade_blocked_modal_opened'
+  properties: {
+    /**
+     * The plan type the org is currently on.
+     */
+    currentPlan: string
+    /**
+     * Number of organization members over their free project limit.
+     */
+    membersExceedingLimitCount: number
+  }
+  groups: Omit<TelemetryGroups, 'project'>
+}
+
+/**
+ * User selected a target organization in the transfer project dialog and the transfer
+ * preview failed because members have reached their free project limits.
+ *
+ * @group Events
+ * @source studio
+ * @page /dashboard/project/{ref}/settings/general
+ */
+export interface ProjectTransferPreviewFailedEvent {
+  action: 'project_transfer_preview_failed'
+  properties: {
+    /**
+     * The plan type of the organization the project is transferred from.
+     */
+    sourcePlan: string
+    /**
+     * The plan type of the selected target organization.
+     */
+    targetPlan: string | null
+    /**
+     * Number of members over their free project limit.
+     */
+    membersExceedingLimitCount: number
+  }
+  groups: TelemetryGroups
 }
 
 /**
@@ -3300,10 +3354,6 @@ export interface AuthUsersSearchSubmittedEvent {
      */
     user_type?: string
     /**
-     * The keywords being searched for
-     */
-    keywords?: string
-    /**
      * The column being filtered on, e.g. email, phone
      * (only included if filtering by a specific column and not all columns)
      */
@@ -3347,11 +3397,12 @@ export interface CommandMenuOpenedEvent {
  */
 export interface CommandMenuSearchSubmittedEvent {
   action: 'command_menu_search_submitted'
-  properties: {
+  properties: Omit<SearchQueryProperties, 'query'> & {
     /**
-     * Search term typed into the command menu input
+     * Search term typed into the command menu input, present only when it is a keyword (see
+     * `SearchQueryProperties`)
      */
-    value: string
+    value?: string
     /**
      * In which app the command input was typed
      */
@@ -3382,7 +3433,8 @@ export interface CommandMenuCommandClickedEvent {
      */
     command_section?: string
     /**
-     * The search query that was active when the command was clicked
+     * The search query that was active when the command was clicked, present only when it is
+     * a keyword (see `SearchQueryProperties`)
      */
     search_query?: string
     /**
@@ -4858,6 +4910,8 @@ export type TelemetryEvent =
   | StoragePublicBucketSelectPolicyWarningDismissButtonClickedEvent
   | StudioPricingPlanCtaClickedEvent
   | StudioBillingCancelSubscriptionClickedEvent
+  | StudioBillingDowngradeBlockedModalOpenedEvent
+  | ProjectTransferPreviewFailedEvent
   | StudioPricingSidePanelOpenedEvent
   | ReportsDatabaseGrafanaBannerClickedEvent
   | IndexAdvisorEnableButtonClickedEvent

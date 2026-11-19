@@ -91,7 +91,7 @@ It's natural to take your Firebase structure and copy it one-to-one onto Supabas
 
 ### The stack today
 
-Today VideoGen runs on TypeScript, React, and Supabase, with serverless services on Google Cloud, where Postgres holds the relational data the Teams plan depends on and Auth handles sign-in. Over time the team moved more business logic out of its TypeScript server and into Postgres functions, which is more efficient, while large video files stay off Supabase Storage because VideoGen runs its own encoding and renditions.
+Today VideoGen runs on TypeScript, React, and Supabase, with serverless services on Google Cloud, where Postgres holds the relational data the Teams plan depends on and Auth handles sign-in. Over time the team moved more business logic out of its TypeScript server and into [Postgres functions](https://supabase.com/docs/guides/database/functions), which is more efficient, while large video files stay off Supabase Storage because VideoGen runs its own encoding and renditions.
 
 Realtime powers the collaboration within VideoGen, so pages update live and teams of users can edit the same project at once.
 

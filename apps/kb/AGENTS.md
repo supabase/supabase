@@ -37,7 +37,13 @@ pnpm build
 
 ## Authoring content
 
-Content lives under `src/content/guides/*.{md,mdx}`. Keep it plain GitHub-Flavored Markdown:
+Content lives in 3 places:
+
+- `src/content/guides/**.mdx`: Narrative content, walkthroughs, migrations, etc.
+- `src/content/faqs/**/**.mdx`: Short, specific questions (defined in the frontmatter). Answers to the main question in the first sentence of the body.
+- `src/data/community-guides.json`: Highlights other valuable, written resources from our Supabase community. Includes metadata on other written resources (URLs, titles, descriptions, and topics) so we can list these on `topics` pages.
+
+For content patterns, stick to plain GitHub-Flavored Markdown:
 
 - No custom/JSX components in guide bodies — content is also exported as plain `.md` (see below), and a
   component wouldn't survive that export.
@@ -46,6 +52,8 @@ Content lives under `src/content/guides/*.{md,mdx}`. Keep it plain GitHub-Flavor
   (`src/lib/mdx/rehype-admonitions.ts`). Don't import or use `Admonition` directly in content.
 - Frontmatter requires `title`, `description`, and `topics` (values must match `TOPIC_NAMES` in
   `src/lib/topics.ts`); `pinned` and `github_url` are optional. See `src/content.config.ts` for the full schema.
+
+Otherwise, follow all the existing guidelines in the [Docs Style Guide](https://github.com/supabase/supabase/blob/master/apps/docs/style-guide/README.md).
 
 ## Pages and markdown export
 
