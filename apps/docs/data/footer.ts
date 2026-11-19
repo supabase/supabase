@@ -38,6 +38,6 @@ export const secondaryLinks = [
     url: 'https://github.com/supabase/supabase/blob/master/apps/docs/CONTRIBUTING.md',
   },
   { title: 'Open Source', url: 'https://supabase.com/open-source' },
-  { title: 'SupaSquad', url: 'https://supabase.com/supasquad' },
+  { title: 'SupaSquad', url: 'https://supabase.com/open-source/contributing/supasquad' },
   { title: 'Privacy Settings', component: PrivacySettings },
 ]

@@ -9,7 +9,7 @@
 
 [Supabase](https://supabase.com)は、オープンソースの Firebase 代替製品です。エンタープライズグレードのオープンソースツールを使って、Firebase の機能を構築しています。
 
-- [x] ホスティングされた Postgres データベース [Docs](https://supabase.com/docs/guides/database)
+- [x] ホスティングされた Postgres データベース [Docs](https://supabase.com/docs/guides/database/overview)
 - [x] 認証・認可 [Docs](https://supabase.com/docs/guides/auth)
 - [x] API を自動生成
   - [x] REST [Docs](https://supabase.com/docs/guides/api#rest-api-overview)
@@ -56,14 +56,14 @@ Supabase は、オープンソースのツールを組み合わせてできて�
 **現在のアーキテクチャ**
 
 Supabase は[ホスティングされたプラットフォーム](https://supabase.com/dashboard)です。登録するだけで、何もインストールせずに使い始めることができます。
-さらに、 [セルフホスティング](https://supabase.com/docs/guides/hosting/overview) や [ローカル開発](https://supabase.com/docs/guides/local-development)も可能です。
+さらに、 [セルフホスティング](https://supabase.com/docs/guides/self-hosting) や [ローカル開発](https://supabase.com/docs/guides/local-development)も可能です。
 
 ![アーキテクチャー](https://github.com/supabase/supabase/blob/master/apps/docs/public/img/supabase-architecture.svg)
 
 - [PostgreSQL](https://www.postgresql.org/)は、30 年以上にわたって開発・改善されてきたオブジェクトリレーショナルデータベースシステムで、信頼性、機能の堅牢性、パフォーマンスの面で高い評価を得ています。
 - [Realtime](https://github.com/supabase/realtime)は、PostgreSQL の insert、update、delete の情報を WebSocket で受信できる Elixir サーバです。Supabase は Postgres に組み込まれたレプリケーション機能をリッスンし、レプリケーションのバイトストリームを JSON に変換し、その JSON を WebSocket でブロードキャストします。
 - [PostgREST](http://postgrest.org/)は、PostgreSQL データベースを RESTful API に直接変換するウェブサーバです。
-- [Storage](https://github.com/supabase/storage-api)は、S3 に保存されたファイルを管理するための RESTful なインターフェイスで、パーミッションの管理には Postgres を使用しています。
+- [Storage](https://github.com/supabase/storage)は、S3 に保存されたファイルを管理するための RESTful なインターフェイスで、パーミッションの管理には Postgres を使用しています。
 - [postgres-meta](https://github.com/supabase/postgres-meta) は、Postgres を管理するための RESTful API で、テーブルの取得、ロールの追加、クエリの実行などを行うことができます。
 - [GoTrue](https://github.com/netlify/gotrue) は、ユーザー管理と SWT トークン発行のための SWT ベースの API です。
 - [Kong](https://github.com/Kong/kong) は、クラウドネイティブな API ゲートウェイです。
@@ -82,9 +82,9 @@ Supabase クライアントライブラリはモジュール化されていま�
     <th></th>
     <th>Supabase</th>
     <th><a href="https://github.com/postgrest/postgrest" target="_blank" rel="noopener noreferrer">PostgREST</a></th>
-    <th><a href="https://github.com/supabase/gotrue" target="_blank" rel="noopener noreferrer">GoTrue</a></th>
+    <th><a href="https://github.com/supabase/auth" target="_blank" rel="noopener noreferrer">GoTrue</a></th>
     <th><a href="https://github.com/supabase/realtime" target="_blank" rel="noopener noreferrer">Realtime</a></th>
-    <th><a href="https://github.com/supabase/storage-api" target="_blank" rel="noopener noreferrer">Storage</a></th>
+    <th><a href="https://github.com/supabase/storage" target="_blank" rel="noopener noreferrer">Storage</a></th>
     <th>Functions</th>
   </tr>
   <!-- TEMPLATE FOR NEW ROW -->
@@ -111,7 +111,7 @@ Supabase クライアントライブラリはモジュール化されていま�
   <th colspan="7">💚 コミュニティ 💚</th>
   <tr>
     <td>C#</td>
-    <td><a href="https://github.com/supabase-community/supabase-csharp" target="_blank" rel="noopener noreferrer">supabase-csharp</a></td>
+    <td><a href="https://github.com/supabase/supabase-csharp" target="_blank" rel="noopener noreferrer">supabase-csharp</a></td>
     <td><a href="https://github.com/supabase-community/postgrest-csharp" target="_blank" rel="noopener noreferrer">postgrest-csharp</a></td>
     <td><a href="https://github.com/supabase-community/gotrue-csharp" target="_blank" rel="noopener noreferrer">gotrue-csharp</a></td>
     <td><a href="https://github.com/supabase-community/realtime-csharp" target="_blank" rel="noopener noreferrer">realtime-csharp</a></td>
@@ -156,7 +156,7 @@ Supabase クライアントライブラリはモジュール化されていま�
   </tr>
   <tr>
     <td>Python</td>
-    <td><a href="https://github.com/supabase-community/supabase-py" target="_blank" rel="noopener noreferrer">supabase-py</a></td>
+    <td><a href="https://github.com/supabase/supabase-py" target="_blank" rel="noopener noreferrer">supabase-py</a></td>
     <td><a href="https://github.com/supabase-community/postgrest-py" target="_blank" rel="noopener noreferrer">postgrest-py</a></td>
     <td><a href="https://github.com/supabase-community/gotrue-py" target="_blank" rel="noopener noreferrer">gotrue-py</a></td>
     <td><a href="https://github.com/supabase-community/realtime-py" target="_blank" rel="noopener noreferrer">realtime-py</a></td>

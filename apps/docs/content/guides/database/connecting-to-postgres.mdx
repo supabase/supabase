@@ -44,7 +44,7 @@ For every Postgres connection mode, the string comes from the same place:
 1. Open your project in the [Supabase Dashboard](/dashboard/project/_).
 2. Click **Connect** at the top of the page.
 3. Choose the connection method you picked above.
-4. Copy the string and replace `[YOUR-PASSWORD]` with your database password. [Percent-encode](https://en.wikipedia.org/wiki/Percent-encoding) any reserved characters it contains, such as `&`, `#`, `?`, or a space.
+4. Copy the string and replace `[YOUR-DATABASE-PASSWORD]` with your database password. [Percent-encode](https://en.wikipedia.org/wiki/Percent-encoding) any reserved characters it contains, such as `&`, `#`, `?`, or a space.
 
 The sections below show what each string looks like and when to use it. Take the host, port, and username from the string you copied rather than typing the bracketed placeholders literally. The pooler host in particular can't be composed from your region, and pooled connections use a different username from direct connections. Both are covered under [Endpoints and IP versions](#endpoints-and-ip-versions).
 
@@ -59,7 +59,7 @@ Direct connections are on IPv6, or on IPv4 if the project has the [IPv4 add-on](
 </Admonition>
 
 ```txt
-postgresql://postgres:[YOUR-PASSWORD]@db.[PROJECT-REF].supabase.co:5432/postgres
+postgresql://postgres:[YOUR-DATABASE-PASSWORD]@db.[PROJECT-REF].supabase.co:5432/postgres
 ```
 
 Get this string from the Supabase Dashboard by clicking [Connect](/dashboard/project/_?showConnect=true).
@@ -69,18 +69,18 @@ Get this string from the Supabase Dashboard by clicking [Connect](/dashboard/pro
 The session mode connection string connects to your Postgres instance through the shared pooler ([Supavisor](https://supabase.github.io/supavisor/)). Use it as an alternative to a direct connection when you connect from an IPv4-only network.
 
 ```txt
-postgresql://postgres.[PROJECT-REF]:[YOUR-PASSWORD]@[POOLER-HOST]:5432/postgres
+postgresql://postgres.[PROJECT-REF]:[YOUR-DATABASE-PASSWORD]@[POOLER-HOST]:5432/postgres
 ```
 
 Get this string from the Supabase Dashboard by clicking [Connect](/dashboard/project/_?showConnect=true&method=session) and choosing **Session pooler**.
 
 ### Shared pooler, transaction mode [#pooler-transaction-mode]
 
-The transaction mode connection string connects to your Postgres instance through the shared pooler in transaction-pooling mode. Use it for serverless and edge functions, which open many short-lived connections.
+The transaction mode connection string connects to your Postgres instance through the shared pooler in transaction-pooling mode. Use it for serverless and [edge functions](/docs/guides/functions), which open many short-lived connections.
 
 <Admonition type="caution">
 
-The shared pooler doesn't support [prepared statements](https://postgresql.org/docs/current/sql-prepare.html) in transaction mode. To avoid errors, turn them off in your connection library. See [Transaction mode limitations](#transaction-mode-limitations) for the setting your driver uses and for the other session-state features this affects.
+The shared pooler doesn't support [prepared statements](https://www.postgresql.org/docs/current/sql-prepare.html) in transaction mode. To avoid errors, turn them off in your connection library. See [Transaction mode limitations](#transaction-mode-limitations) for the setting your driver uses and for the other session-state features this affects.
 
 </Admonition>
 
@@ -91,7 +91,7 @@ Transaction mode does not support [query pipelining](https://www.postgresql.org/
 </Admonition>
 
 ```txt
-postgresql://postgres.[PROJECT-REF]:[YOUR-PASSWORD]@[POOLER-HOST]:6543/postgres
+postgresql://postgres.[PROJECT-REF]:[YOUR-DATABASE-PASSWORD]@[POOLER-HOST]:6543/postgres
 ```
 
 Get this string from the Supabase Dashboard by clicking [Connect](/dashboard/project/_?showConnect=true&method=transaction) and choosing **Transaction pooler**.
@@ -101,7 +101,7 @@ Get this string from the Supabase Dashboard by clicking [Connect](/dashboard/pro
 On the Pro Plan and above, Supabase provisions a dedicated pooler (PgBouncer) that runs alongside your Postgres database. Use it for high-load applications. The dedicated pooler runs in transaction mode only. For session mode, use the [shared pooler](#pooler-session-mode). Unlike the shared pooler, it supports prepared statements on PgBouncer 1.21 and later. It is reachable over IPv6, or over IPv4 if the project has the [IPv4 add-on](/docs/guides/platform/ipv4-address).
 
 ```txt
-postgresql://postgres:[YOUR-PASSWORD]@db.[PROJECT-REF].supabase.co:6543/postgres
+postgresql://postgres:[YOUR-DATABASE-PASSWORD]@db.[PROJECT-REF].supabase.co:6543/postgres
 ```
 
 Get this string from the Supabase Dashboard by clicking [Connect](/dashboard/project/_?showConnect=true&method=transaction).

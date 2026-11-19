@@ -61,6 +61,14 @@ assert_path_exists() { # <path> <desc>
 assert_path_absent() { # <path> <desc>
     if [ -e "$1" ]; then bad "$2 ($1 should not exist)"; else ok "$2"; fi
 }
+assert_file_equals() { # <file> <expected, printf %b escapes> <desc>
+    [ -f "$1" ] || { bad "$3 ($1 missing or not a regular file)"; return 0; }
+    printf '%b' "$2" > "$WORK/expected"
+    if cmp -s "$1" "$WORK/expected"; then ok "$3"; else
+        bad "$3 ($1 differs from expected)"
+        sed 's/^/        > /' "$1" 2>/dev/null || true
+    fi
+}
 
 # portable in-place sed (BSD + GNU): sedi <expr> <file>
 sedi() { sed "$1" "$2" > "$2.tmp" && mv "$2.tmp" "$2"; }
@@ -91,6 +99,10 @@ printf 'remove me\n'  > docker/old-only.txt
 cp "$DOCKER_DIR/.gitignore" docker/.gitignore
 mkdir -p docker/volumes/functions/main
 printf 'base main\n' > docker/volumes/functions/main/index.ts
+# hello/index.ts ships in every release and is allowlisted in .gitignore, so it
+# is a vendor file: it 3-way merges like main/index.ts (user edits survive).
+mkdir -p docker/volumes/functions/hello
+printf 'greeting=base\nmiddle\ntail\n' > docker/volumes/functions/hello/index.ts
 git add -A && git commit -qm base && git tag self-hosted/v0.9.0
 
 # target commit
@@ -109,8 +121,7 @@ NEW_KEY=new-default
 EOF
 printf 'brand new\n' > docker/new-only.txt
 printf 'target main\n' > docker/volumes/functions/main/index.ts
-mkdir -p docker/volumes/functions/hello
-printf 'target hello\n' > docker/volumes/functions/hello/index.ts
+printf 'greeting=target\nmiddle\ntail\n' > docker/volumes/functions/hello/index.ts
 # A gitignored sample under volumes/snippets shipped by upstream: must NOT
 # overwrite the user's file of the same name (exercises is_excluded directly).
 mkdir -p docker/volumes/snippets
@@ -139,7 +150,7 @@ cat > docker/upgrades.json <<'EOF'
 EOF
 git rm -q docker/old-only.txt
 git add -A
-git add -f docker/volumes/functions/hello/index.ts docker/volumes/snippets/seed.sql
+git add -f docker/volumes/snippets/seed.sql
 # Release tag for the target / default-target (latest self-hosted/v*) path.
 git commit -qm target && git tag self-hosted/v1.1.0
 
@@ -180,9 +191,8 @@ make_deploy() { # <dir> [conflict]
     # user file at the SAME path as the vendor snippet shipped at target:
     # is_excluded must skip it so the user's content survives.
     printf 'USER SEED\n' > "$d/volumes/snippets/seed.sql"
-    # legacy sample fn in snapshot at target but gitignored - must not overwrite
-    mkdir -p "$d/volumes/functions/hello"
-    printf 'user hello\n' > "$d/volumes/functions/hello/index.ts"
+    # user edits the vendor sample fn on a line upstream doesn't touch -> clean merge
+    printf 'user hello\n' >> "$d/volumes/functions/hello/index.ts"
     # version stamp pointing at the base (ref only; update.sh derives the rest)
     printf 'ref=self-hosted/v0.9.0\n' > "$d/.supabase-version"
     if [ "$_mode" = "conflict" ]; then
@@ -242,18 +252,18 @@ else
     bad "no backup archive"
 fi
 assert_file_contains  "volumes/snippets/user.sql" "USER_SNIPPET"     "snippets left untouched"
-# seed.sql and hello/index.ts are the only files that are BOTH shipped in the
-# target snapshot AND gitignored, so they are the real is_excluded coverage.
-# Assert the user's content survives AND no vendor content / conflict markers
-# leaked in - i.e. the file was skipped, not merged/conflicted.
-assert_file_contains         "volumes/snippets/seed.sql" "USER SEED"   "gitignored snippet: user content kept"
-assert_file_missing_pattern  "volumes/snippets/seed.sql" "VENDOR SEED" "gitignored snippet: no vendor content"
-assert_file_missing_pattern  "volumes/snippets/seed.sql" "<<<<<<<"     "gitignored snippet: not conflicted (skipped)"
+# seed.sql is the only file that is BOTH shipped in the target snapshot AND
+# gitignored, so it is the real is_excluded coverage.
+# The file must be byte-identical to the user's fixture - i.e. skipped, not
+# merged/conflicted (no vendor content, no markers, nothing appended).
+assert_file_equals "volumes/snippets/seed.sql" 'USER SEED\n' "gitignored snippet: skipped (user content unchanged)"
 assert_file_contains  "volumes/functions/my-fn/index.ts" "user fn"   "custom edge fn left untouched"
 assert_file_contains  "volumes/functions/main/index.ts" "target main" "vendor main/index.ts updated"
-assert_file_contains         "volumes/functions/hello/index.ts" "user hello"   "gitignored fn: user content kept"
-assert_file_missing_pattern  "volumes/functions/hello/index.ts" "target hello" "gitignored fn: no vendor content"
-assert_file_missing_pattern  "volumes/functions/hello/index.ts" "<<<<<<<"      "gitignored fn: not conflicted (skipped)"
+# hello/index.ts is allowlisted (un-ignored) in .gitignore, so it is vendor-owned:
+# it must 3-way merge, not be skipped - upstream change and user edit both land.
+# Exact result: no retained base line, no dropped/duplicated lines, no markers.
+assert_file_equals "volumes/functions/hello/index.ts" 'greeting=target\nmiddle\ntail\nuser hello\n' \
+    "vendor hello/index.ts: clean 3-way merge (upstream change + user edit)"
 
 echo ""
 echo "=== update.sh: clean apply (no conflict) advances the stamp and exits 0 ==="

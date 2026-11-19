@@ -24,7 +24,7 @@ import { Admonition } from 'ui-patterns/Admonition'
 
 import { ButtonTooltip } from '@/components/ui/ButtonTooltip'
 import BarChart from '@/components/ui/Charts/BarChart'
-import NoDataPlaceholder from '@/components/ui/Charts/NoDataPlaceholder'
+import { NoDataPlaceholder } from '@/components/ui/Charts/NoDataPlaceholder'
 import { getCumulativeResults } from '@/components/ui/QueryBlock/QueryBlock.utils'
 import { useLocalStorageQuery } from '@/hooks/misc/useLocalStorage'
 

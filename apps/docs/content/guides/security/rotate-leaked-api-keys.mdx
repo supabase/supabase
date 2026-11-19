@@ -8,7 +8,7 @@ Replace a leaked secret key or `service_role` key with a new secret key, then re
 
 ## Prerequisites
 
-Fix the root cause of the leak before you rotate anything. Otherwise the new key can leak the same way. The [OWASP Risk Rating Methodology](https://owasp.org/www-community/OWASP_Risk_Rating_Methodology) helps you judge the severity of the incident and plan your next steps. If someone is actively using the leaked key, retire it right away with the steps in [Retire the compromised key](#retire-the-compromised-key), even though components that still use it stop working until you replace it.
+Fix the root cause of the leak before you rotate anything. Otherwise the new key can leak the same way. The [OWASP Risk Rating Methodology](https://community.owasp.org/OWASP_Risk_Rating_Methodology) helps you judge the severity of the incident and plan your next steps. If someone is actively using the leaked key, retire it right away with the steps in [Retire the compromised key](#retire-the-compromised-key), even though components that still use it stop working until you replace it.
 
 To follow the Management API path, you also need:
 
@@ -55,7 +55,7 @@ curl --fail-with-body -X POST "https://api.supabase.com/v1/projects/$PROJECT_REF
 
 To move your application to the new key:
 
-1. Replace the compromised key with the new secret key everywhere your application uses it. If an Edge Function checks the key with `withSupabase({ auth: 'secret' })`, it accepts only the secret key named `default`. Update it to accept the new key by name, for example `auth: 'secret:rotated_secret_key'`. For details, see [Service-to-service calls](/docs/guides/functions/auth#service-to-service-calls). If a Database Webhook or `pg_net` call sends the legacy `service_role` key on the `Authorization: Bearer` header, send the new secret key on the `apikey` header instead. For details, see [Database Webhooks and `pg_net`](/docs/guides/getting-started/migrating-to-new-api-keys#database-webhooks-and-pgnet).
+1. Replace the compromised key with the new secret key everywhere your application uses it. If an [Edge Function](/docs/guides/functions) checks the key with `withSupabase({ auth: 'secret' })`, it accepts only the secret key named `default`. Update it to accept the new key by name, for example `auth: 'secret:rotated_secret_key'`. For details, see [Service-to-service calls](/docs/guides/functions/auth#service-to-service-calls). If a Database Webhook or `pg_net` call sends the legacy `service_role` key on the `Authorization: Bearer` header, send the new secret key on the `apikey` header instead. For details, see [Database Webhooks and `pg_net`](/docs/guides/getting-started/migrating-to-new-api-keys#database-webhooks-and-pgnet).
 2. If the compromised key is a legacy `service_role` key, also replace the legacy `anon` key with a [publishable key](/docs/guides/getting-started/migrating-to-new-api-keys) in your browser and mobile clients. Retiring the compromised key deactivates both legacy keys.
 3. Confirm that every component now uses the new key.
 
