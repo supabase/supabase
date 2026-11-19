@@ -202,6 +202,30 @@ Verify both guides and reference output when `generate-reference-markdown.ts` or
 
 MDX prose, partials, navigation — no pipeline or example changes.
 
+**Read the change as a reader first.** A change can pass every checklist item and
+still read wrong on the page. Before the checklist:
+
+1. Read the whole page that the change edits, not only the diff: every heading, and
+   the full sections around the change.
+2. Read each page and section that the change links to, and search
+   `apps/docs/content/` for other pages on the same topic.
+3. Find what the change is for: the linked issue, or the PR's Problem section. Check
+   that the page now does that for the reader.
+
+Report each way the change reads wrong on the page. The following problems are
+common, but they aren't the full list:
+
+- Content tied to the same problem that the change left as it was, such as a
+  screenshot of an old UI.
+- New text that breaks the pattern of the sections around it, or makes a nearby
+  sentence untrue, such as "the steps above".
+- A fact that another section or page already states.
+- Detail that only explains one reporter's case, or an admonition that holds the
+  main explanation.
+- The first question a reader asks next, left unanswered, or a command whose side
+  effect the page doesn't name.
+- Two sections that send the reader to each other.
+
 Check the prose against the [style guide](../../../apps/docs/style-guide/README.md) yourself. No CI or local
 check covers style or terminology. CodeRabbit reviews style, terminology, and
 structure on `apps/docs/content/**/*.mdx`, but only once the PR is open.
@@ -214,6 +238,7 @@ the author didn't introduce.
 
 Checklist:
 
+- [ ] Read the change as a reader (above), and each problem is reported
 - [ ] Voice follows [`01-voice-and-tone.md`](../../../apps/docs/style-guide/01-voice-and-tone.md)
 - [ ] Section grouping and chunking follow [`03-page-structure.md`](../../../apps/docs/style-guide/03-page-structure.md)
 - [ ] Components follow [`02-elements.md`](../../../apps/docs/style-guide/02-elements.md)
