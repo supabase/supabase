@@ -45,6 +45,7 @@ export const DueTodayRow = ({
   monthlyTotal,
 }: DueTodayRowProps) => {
   const { planAmount, creditBalance, proratedCredit, tax, dueToday, isReduced } = breakdown
+  const hasCreditsApplied = creditBalance > 0 || proratedCredit > 0
 
   return (
     <div className="flex items-start justify-between gap-4">
@@ -67,13 +68,17 @@ export const DueTodayRow = ({
               <InfoIcon size={14} className="text-foreground-lighter" aria-hidden="true" />
             </TooltipTrigger>
             <TooltipContent side="top" align="end" className="w-72 p-3">
-              <p className="mb-1 text-foreground">Credits applied</p>
-              <p className="mb-2 text-foreground-light">
-                {creditBalance > 0
-                  ? "Your organization's credit balance is applied to this first payment. Next month is the regular plan price."
-                  : `Time you have already paid for on ${currentPlanName ?? 'your current plan'} is credited against this payment.`}
-              </p>
-              <div className="border-t pt-1">
+              {hasCreditsApplied && (
+                <>
+                  <p className="mb-1 text-foreground">Credits applied</p>
+                  <p className="mb-2 text-foreground-light">
+                    {creditBalance > 0
+                      ? "Your organization's credit balance is applied to this first payment. Next month is the regular plan price."
+                      : `Time you have already paid for on ${currentPlanName ?? 'your current plan'} is credited against this payment.`}
+                  </p>
+                </>
+              )}
+              <div className={cn('pt-1', hasCreditsApplied && 'border-t')}>
                 <TooltipLine label={`${planName} Plan`} amount={planAmount} />
                 {creditBalance > 0 && (
                   <TooltipLine label="Credit balance" amount={creditBalance} isCredit />
@@ -88,6 +93,11 @@ export const DueTodayRow = ({
                 {tax && <TooltipLine label={`Tax (${tax.ratePercentage}%)`} amount={tax.amount} />}
                 <TooltipLine label="Due today" amount={dueToday} className="border-t" />
               </div>
+              <p className="mt-2 text-foreground-lighter">
+                The plan fee is charged upfront. Compute and other usage is billed at the end of
+                each billing cycle, for an estimated{' '}
+                <span translate="no">{formatRoundedCurrency(monthlyTotal)}</span> per month.
+              </p>
               {breakdown.isTaxEstimateUnavailable && (
                 <p className="mt-2 text-foreground-lighter">
                   Tax could not be estimated and may be applied separately.
@@ -96,9 +106,6 @@ export const DueTodayRow = ({
             </TooltipContent>
           </Tooltip>
         </div>
-        <p className="text-xs text-foreground-lighter" translate="no">
-          then {formatRoundedCurrency(monthlyTotal)}/month
-        </p>
       </div>
     </div>
   )

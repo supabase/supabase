@@ -344,6 +344,7 @@ export const SubscriptionPlanUpdateView = ({
           <div className="flex flex-col gap-6 border-t bg-surface-200 p-8 md:border-l md:border-t-0 xl:col-span-2">
             {showPaymentMethodSelection && (
               <div>
+                <h2 className="mb-4 text-base font-medium text-foreground">Payment details</h2>
                 <PaymentMethodSelection
                   ref={paymentMethodSelectionRef}
                   selectedPaymentMethod={selectedPaymentMethod}
