@@ -50,10 +50,10 @@ export const OAuthAppsAuthorizedList = () => {
   })
 
   useEffect(() => {
-    if (hasNextPage && entry?.isIntersecting) {
+    if (hasNextPage && entry?.isIntersecting && !isFetchingNextPage) {
       fetchNextPage()
     }
-  }, [hasNextPage, entry?.isIntersecting, fetchNextPage])
+  }, [hasNextPage, entry?.isIntersecting, fetchNextPage, isFetchingNextPage])
 
   const statusText = useMemo(() => {
     if (isFetchingNextPage) return 'Loading more authorized apps...'
