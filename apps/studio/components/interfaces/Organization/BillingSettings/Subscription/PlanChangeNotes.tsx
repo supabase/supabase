@@ -26,8 +26,8 @@ interface PlanChangeNotesProps {
 export const PlanChangeNotes = ({ exampleProjectRef }: PlanChangeNotesProps) => (
   <ul className="space-y-3">
     <Note icon={<ClockIcon size={16} />}>
-      <span className="text-foreground">Projects never pause on Pro.</span> Each project is a
-      dedicated server that runs and bills around the clock, even when idle.{' '}
+      <span className="text-foreground">Projects never pause on Pro.</span> Every project bills
+      around the clock, even when idle.{' '}
       <a
         href={`${DOCS_URL}/guides/platform/project-transfer`}
         target="_blank"
@@ -36,12 +36,11 @@ export const PlanChangeNotes = ({ exampleProjectRef }: PlanChangeNotesProps) => 
       >
         Transfer
       </a>{' '}
-      to Free or delete a project to stop its charges.
+      or delete one to stop its charges.
     </Note>
 
     <Note icon={<TrendingUpIcon size={16} />}>
-      <span className="text-foreground">Upgrade your compute resources later.</span> Upgrade to
-      Micro Compute in{' '}
+      <span className="text-foreground">Compute stays as it is.</span> Upgrade to Micro in{' '}
       {exampleProjectRef ? (
         <a
           href={getInfrastructurePath(exampleProjectRef)}
@@ -54,7 +53,7 @@ export const PlanChangeNotes = ({ exampleProjectRef }: PlanChangeNotesProps) => 
       ) : (
         <span>Infrastructure settings</span>
       )}{' '}
-      <span>when a short restart suits you. The price stays the same.</span>
+      <span>at the same price, after a short restart.</span>
     </Note>
 
     <Note icon={<RefreshCwIcon size={16} />}>
