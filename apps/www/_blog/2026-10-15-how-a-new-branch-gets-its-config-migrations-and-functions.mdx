@@ -17,7 +17,7 @@ toc_depth: 3
 
 Supabase branches are their own projects, so three things have to land on one before you can use it: settings, schema, and [edge functions](/features/deno-edge-functions). We run all three mostly in parallel when you create the branch.
 
-You create a preview branch to test a schema change. About 20 seconds later (the median), the branch is ready, with your tables, settings, and Edge Functions in place. When a branch takes longer than expected, or a step fails, you need to know what ran in between.
+You create a preview branch to test a schema change. About 20 seconds later (the median), the branch is ready, with your tables, settings, and [Edge Functions](/docs/guides/functions) in place. When a branch takes longer than expected, or a step fails, you need to know what ran in between.
 
 This post walks through how a branching workflow runs in Supabase, what gets copied from your main project, where your migrations and functions come from, what order the steps run in, and what you see when something fails.
 
@@ -65,7 +65,7 @@ If your main project enforces SSL, we apply SSL enforcement to the branch before
 
 Next, the `infra_update` job applies the Auth, Data API, and Realtime config and restarts Auth and the Data API so they pick it up. When that job finishes, the `configure` step goes `EXITED`. If `update_config` or `infra_update` fails, `configure` goes `DEAD`.
 
-Two more jobs run alongside these: one applies your network restrictions to the branch when your main project has them, and one registers the branch with the connection pooler. Both, along with SSL enforcement, retry on their own. They don't hold up `configure` or fail the branch.
+Two more jobs run alongside these: one applies your network restrictions to the branch when your main project has them, and one registers the branch with the connection [pooler](/docs/guides/database/connecting-to-postgres/pooling-and-limits). Both, along with SSL enforcement, retry on their own. They don't hold up `configure` or fail the branch.
 
 ### Letting your repo's settings win
 

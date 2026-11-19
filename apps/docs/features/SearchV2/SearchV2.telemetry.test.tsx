@@ -311,7 +311,7 @@ describe('SearchV2 telemetry', () => {
       expect(sendTelemetryEvent).toHaveBeenCalledTimes(1)
       expect(sendTelemetryEvent).toHaveBeenCalledWith({
         action: 'docs_search_v2_search_submitted',
-        properties: { query: 'auth', hasResults: true },
+        properties: { query: 'auth', queryLength: 4, queryWordCount: 1, hasResults: true },
       })
     })
 
@@ -323,7 +323,19 @@ describe('SearchV2 telemetry', () => {
 
       expect(sendTelemetryEvent).toHaveBeenCalledWith({
         action: 'docs_search_v2_search_submitted',
-        properties: { query: 'zzz', hasResults: false },
+        properties: { query: 'zzz', queryLength: 3, queryWordCount: 1, hasResults: false },
+      })
+    })
+
+    it('leaves the query text out when it is not a keyword', () => {
+      const view = openDialog()
+      sendTelemetryEvent.mockClear()
+
+      setSearchState(view, { status: 'noResults', key: 1, query: 'person@example.com' })
+
+      expect(sendTelemetryEvent).toHaveBeenCalledWith({
+        action: 'docs_search_v2_search_submitted',
+        properties: { queryLength: 18, queryWordCount: 1, hasResults: false },
       })
     })
 
@@ -348,7 +360,12 @@ describe('SearchV2 telemetry', () => {
 
       expect(sendTelemetryEvent).toHaveBeenCalledWith({
         action: 'docs_search_v2_result_clicked',
-        properties: { resultPath: '/guides/auth', query: 'auth' },
+        properties: {
+          resultPath: '/guides/auth',
+          query: 'auth',
+          queryLength: 4,
+          queryWordCount: 1,
+        },
       })
       // the link's own click handler closes the dialog before cmdk's onSelect reports the click
       expect(eventActions()).toEqual(['docs_search_v2_closed', 'docs_search_v2_result_clicked'])
@@ -375,7 +392,12 @@ describe('SearchV2 telemetry', () => {
 
       expect(sendTelemetryEvent).toHaveBeenCalledWith({
         action: 'docs_search_v2_result_clicked',
-        properties: { resultPath: '/guides/auth', query: 'auth' },
+        properties: {
+          resultPath: '/guides/auth',
+          query: 'auth',
+          queryLength: 4,
+          queryWordCount: 1,
+        },
       })
       expect(push).toHaveBeenCalledWith('/guides/auth')
       expect(eventActions()).toEqual(['docs_search_v2_result_clicked', 'docs_search_v2_closed'])
@@ -396,7 +418,12 @@ describe('SearchV2 telemetry', () => {
 
       expect(sendTelemetryEvent).toHaveBeenCalledWith({
         action: 'docs_search_v2_result_clicked',
-        properties: { resultPath: '/guides/auth', query: 'auth' },
+        properties: {
+          resultPath: '/guides/auth',
+          query: 'auth',
+          queryLength: 4,
+          queryWordCount: 1,
+        },
       })
     })
   })

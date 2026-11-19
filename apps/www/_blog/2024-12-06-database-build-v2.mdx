@@ -121,7 +121,7 @@ In the case of database.build, we need to connect directly to APIs like OpenAI's
 
 ### Service workers
 
-If you've ever dug into database.build's [source code](https://github.com/supabase-community/database-build), you'll know that we heavily use Vercel's [AI SDK](https://sdk.vercel.ai/docs/introduction) to simplify LLM streaming and client side tool calls. Vercel has built a great DX around inference by providing convenient hooks like `useChat()` to manage AI chat messages in React.
+If you've ever dug into database.build's [source code](https://github.com/supabase-community/database-build), you'll know that we heavily use Vercel's [AI SDK](https://ai-sdk.dev/docs/introduction) to simplify LLM streaming and client side tool calls. Vercel has built a great DX around inference by providing convenient hooks like `useChat()` to manage AI chat messages in React.
 
 The challenge with Vercel's AI SDK for BYO-LLM is that the SDK expects a client-server API structure.` useChat()` connects to a server-side `/api/chat` route that is responsible for sending these messages downstream to the appropriate provider. In normal situations, this is the best architecture to protect API keys and custom logic on the server side. In our case though where users dynamically provide their own API keys, our preference is to send downstream requests directly from the browser. If we wish to continue using our existing `useChat()` infrastructure, we need a way to intercept requests to `/api/chat` and handle them ourselves in-browser.
 

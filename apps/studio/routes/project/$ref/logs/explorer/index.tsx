@@ -25,7 +25,7 @@ import {
 import { UpdateSavedQueryModal } from '@/components/interfaces/Settings/Logs/Logs.UpdateSavedQueryModal'
 import {
   checkForLimitClause,
-  maybeShowUpgradePromptIfNotEntitled,
+  isStartOutsideRetention,
   useEditorHints,
 } from '@/components/interfaces/Settings/Logs/Logs.utils'
 import {
@@ -398,7 +398,7 @@ function LogsExplorerPage() {
   const handleDateChange = (value: DatePickerValue) => {
     setDatePickerValue(value)
     const resolvedRange = resolveLogDateRange(value)
-    const shouldShowUpgradePrompt = maybeShowUpgradePromptIfNotEntitled(
+    const shouldShowUpgradePrompt = isStartOutsideRetention(
       resolvedRange.from,
       entitledToAuditLogDays
     )
@@ -469,7 +469,7 @@ function LogsExplorerPage() {
   // Show the prompt on page load based on query params
   useEffect(() => {
     if (timestampStart) {
-      const shouldShowUpgradePrompt = maybeShowUpgradePromptIfNotEntitled(
+      const shouldShowUpgradePrompt = isStartOutsideRetention(
         timestampStart,
         entitledToAuditLogDays
       )

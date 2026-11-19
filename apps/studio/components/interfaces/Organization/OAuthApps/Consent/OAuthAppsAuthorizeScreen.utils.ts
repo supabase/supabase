@@ -2,7 +2,7 @@ import { capitalize } from 'lodash'
 
 import { OAuthScope } from '@/data/oauth-apps/types'
 
-export function groupScopesByLevel(scopes: OAuthScope[]) {
+export function groupScopesByLevel(scopes: string[]) {
   const read = new Set<string>()
   const write = new Set<string>()
   const readWrite = new Set<string>()
@@ -66,8 +66,8 @@ export const getDiffBetweenScopes = ({
   scopes,
   previousScopes,
 }: {
-  scopes: OAuthScope[]
-  previousScopes: OAuthScope[]
+  scopes: string[]
+  previousScopes: string[]
 }) => {
   const unchanged: ScopeGroup = { 'read-write': [], write: [], read: [] }
   const changed: DiffScopeGroup = { 'read-write': [], write: [], read: [], removed: [] }
@@ -110,7 +110,7 @@ export const getDiffBetweenScopes = ({
   return { unchanged, changed }
 }
 
-export const getPermissionsWithLevel = (scopes: OAuthScope[]) => {
+export const getPermissionsWithLevel = (scopes: string[]) => {
   const scopesWithLevel: Partial<Record<ScopePermission, ScopeGroupLevel>> = {}
 
   for (const scope of scopes) {
@@ -137,7 +137,7 @@ export const getPermissionsWithLevel = (scopes: OAuthScope[]) => {
 }
 
 export const extractPermissionAndLevelFromScope = (
-  scope: OAuthScope
+  scope: string
 ): [ScopePermission, ScopeLevel] => {
   const [permission, level] = scope.split(':')
   return [permission as ScopePermission, level as ScopeLevel]
