@@ -33,7 +33,6 @@ export function groupScopesByLevel(scopes: string[]) {
 }
 
 export function formatPermissionName(name: string) {
-  if (name === 'database') return 'Database management'
   if (name === 'table_data') return 'Table data'
   return name
     .split('_')

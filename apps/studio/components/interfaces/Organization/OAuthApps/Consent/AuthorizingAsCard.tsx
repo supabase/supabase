@@ -48,6 +48,11 @@ export const AuthorizingAsCard = ({
           </div>
         )}
       </div>
+      {request.grant_kind === 'member_bound' && (
+        <p className="text-xs text-foreground-lighter">
+          This grant acts as you, it can never do more than your role in this organization allows.
+        </p>
+      )}
     </section>
   )
 }

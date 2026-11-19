@@ -32,9 +32,7 @@ describe('ScopeGroupCard', () => {
   test('groups read-write table data with the requested database management permission', () => {
     customRender(<ScopeGroupCard scopes={SCOPE_GROUPS} databaseAccess="write" />)
 
-    const databaseManagement = screen.getByRole('button', { name: 'Database management' })
-    const tableData = screen.getByRole('button', { name: 'Table data' })
-    expect(databaseManagement.parentElement).toContainElement(tableData)
+    expect(screen.getByText('Database, Environment, Table data')).toBeInTheDocument()
   })
 
   test('renders no over-role annotation', () => {

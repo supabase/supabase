@@ -1,6 +1,6 @@
 import { useIntersectionObserver } from '@uidotdev/usehooks'
 import { useEffect, useId } from 'react'
-import { cn, RadioGroup, RadioGroupItem } from 'ui'
+import { Checkbox, cn } from 'ui'
 import {
   MultiSelector,
   MultiSelectorContent,
@@ -97,21 +97,17 @@ export const ProjectMultiSelect = ({
       </div>
 
       {onAllProjectsChange && (
-        <RadioGroup
-          aria-labelledby={labelId}
-          value={allProjectsSelected ? 'all' : 'selected'}
-          onValueChange={(value) => onAllProjectsChange(value === 'all')}
-          className="gap-2 py-1"
+        <label
+          htmlFor="select-all-projects"
+          className="flex cursor-pointer items-center gap-2 py-1 text-sm text-foreground"
         >
-          <label className="flex cursor-pointer items-center gap-2 text-sm">
-            <RadioGroupItem value="selected" />
-            Selected projects only
-          </label>
-          <label className="flex cursor-pointer items-center gap-2 text-sm">
-            <RadioGroupItem value="all" />
-            All current and future projects
-          </label>
-        </RadioGroup>
+          <Checkbox
+            id="select-all-projects"
+            checked={allProjectsSelected}
+            onCheckedChange={(checked) => onAllProjectsChange?.(checked === true)}
+          />
+          All current and future projects
+        </label>
       )}
 
       {!allProjectsSelected && (
