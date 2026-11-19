@@ -2,6 +2,7 @@ import { z } from 'zod'
 
 import { DEFAULT_SYSTEM_SCHEMAS } from './constants'
 import { filterByList } from './helpers'
+import { queryIntent, type QueryIntent } from './intent'
 import {
   ident,
   joinSqlFragments,
@@ -61,6 +62,7 @@ function list({
 } = {}): {
   sql: SafeSqlFragment
   zod: typeof pgPolicyArrayZod
+  intent: QueryIntent
 } {
   let sql = safeSql`
     with policies as (${POLICIES_SQL})
@@ -84,6 +86,13 @@ function list({
   return {
     sql,
     zod: pgPolicyArrayZod,
+    intent: queryIntent('policies.list', {
+      includeSystemSchemas,
+      includedSchemas,
+      excludedSchemas,
+      limit,
+      offset,
+    }),
   }
 }
 

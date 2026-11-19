@@ -2,6 +2,7 @@ import { z } from 'zod'
 
 import { DEFAULT_SYSTEM_SCHEMAS } from './constants'
 import { coalesceRowsToArray, filterByList } from './helpers'
+import { queryIntent, type QueryIntent } from './intent'
 import { ident, literal, safeSql, type SafeSqlFragment } from './pg-format'
 import { pgColumnArrayZod } from './pg-meta-columns'
 import { COLUMNS_SQL } from './sql/columns'
@@ -47,6 +48,7 @@ export function list<T extends boolean | undefined = true>(
 ): {
   sql: SafeSqlFragment
   zod: z.ZodType<ViewBasedOnIncludeColumns<T>[]>
+  intent: QueryIntent
 } {
   let sql = generateEnrichedViewsSql({ includeColumns })
   const filter = filterByList(
@@ -66,6 +68,14 @@ export function list<T extends boolean | undefined = true>(
   return {
     sql,
     zod: pgViewArrayZod,
+    intent: queryIntent('views.list', {
+      includeSystemSchemas,
+      includedSchemas,
+      excludedSchemas,
+      limit,
+      offset,
+      includeColumns,
+    }),
   }
 }
 

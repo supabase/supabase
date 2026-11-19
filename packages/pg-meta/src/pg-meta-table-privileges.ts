@@ -2,6 +2,7 @@ import { z } from 'zod'
 
 import { DEFAULT_SYSTEM_SCHEMAS } from './constants'
 import { filterByList } from './helpers'
+import { queryIntent, type QueryIntent } from './intent'
 import {
   ident,
   joinSqlFragments,
@@ -59,6 +60,7 @@ function list({
 } = {}): {
   sql: SafeSqlFragment
   zod: typeof pgTablePrivilegesArrayZod
+  intent: QueryIntent
 } {
   const filter = filterByList(
     includedSchemas,
@@ -81,6 +83,13 @@ from table_privileges
   return {
     sql,
     zod: pgTablePrivilegesArrayZod,
+    intent: queryIntent('table-privileges.list', {
+      includeSystemSchemas,
+      includedSchemas,
+      excludedSchemas,
+      limit,
+      offset,
+    }),
   }
 }
 

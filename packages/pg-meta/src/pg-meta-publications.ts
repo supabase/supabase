@@ -1,5 +1,6 @@
 import { z } from 'zod'
 
+import { queryIntent, type QueryIntent } from './intent'
 import { ident, joinSqlFragments, literal, safeSql, type SafeSqlFragment } from './pg-format'
 import { PUBLICATIONS_SQL } from './sql/publications'
 
@@ -34,6 +35,7 @@ function list({
 } = {}): {
   sql: SafeSqlFragment
   zod: typeof pgPublicationArrayZod
+  intent: QueryIntent
 } {
   let sql = safeSql`with publications as (${PUBLICATIONS_SQL}) select * from publications`
   if (limit) {
@@ -45,6 +47,7 @@ function list({
   return {
     sql,
     zod: pgPublicationArrayZod,
+    intent: queryIntent('publications.list', { limit, offset }),
   }
 }
 

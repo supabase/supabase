@@ -1,6 +1,7 @@
 import { z } from 'zod'
 
 import { DEFAULT_SYSTEM_SCHEMAS } from './constants'
+import { queryIntent, type QueryIntent } from './intent'
 import { ident, joinSqlFragments, literal, safeSql, type SafeSqlFragment } from './pg-format'
 import { SCHEMAS_SQL } from './sql/schemas'
 
@@ -26,6 +27,7 @@ function list({
 } = {}): {
   sql: SafeSqlFragment
   zod: typeof pgSchemaArrayZod
+  intent: QueryIntent
 } {
   let sql = SCHEMAS_SQL
   if (!includeSystemSchemas) {
@@ -40,6 +42,7 @@ function list({
   return {
     sql,
     zod: pgSchemaArrayZod,
+    intent: queryIntent('schemas.list', { includeSystemSchemas, limit, offset }),
   }
 }
 

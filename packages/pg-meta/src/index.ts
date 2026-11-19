@@ -51,6 +51,8 @@ export type {
   DisplayableSqlFragment,
 } from './pg-format'
 
+export { queryIntent } from './intent'
+export type { QueryIntent, QueryIntentArgs, QueryIntentId } from './intent'
 export type { PGTable, PGTablePrimaryKey, PGTableRelationship } from './pg-meta-tables'
 export type { PGColumn } from './pg-meta-columns'
 export type { PGPolicy } from './pg-meta-policies'

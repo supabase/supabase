@@ -1,5 +1,6 @@
 import { z } from 'zod'
 
+import { queryIntent, type QueryIntent } from './intent'
 import { ident, literal, safeSql, type SafeSqlFragment } from './pg-format'
 import { EXTENSIONS_SQL } from './sql/extensions'
 
@@ -25,6 +26,7 @@ function list({
 } = {}): {
   sql: SafeSqlFragment
   zod: typeof pgExtensionArrayZod
+  intent: QueryIntent
 } {
   let sql = EXTENSIONS_SQL
   if (limit) {
@@ -36,6 +38,7 @@ function list({
   return {
     sql,
     zod: pgExtensionArrayZod,
+    intent: queryIntent('extensions.list', { limit, offset }),
   }
 }
 

@@ -1,5 +1,6 @@
 import { z } from 'zod'
 
+import { queryIntent, type QueryIntent } from './intent'
 import { ident, joinSqlFragments, literal, safeSql, type SafeSqlFragment } from './pg-format'
 import { ROLES_SQL } from './sql/roles'
 
@@ -34,6 +35,7 @@ function list({
 } = {}): {
   sql: SafeSqlFragment
   zod: typeof pgRoleArrayZod
+  intent: QueryIntent
 } {
   let sql = safeSql`
 with
@@ -65,6 +67,7 @@ where
   return {
     sql,
     zod: pgRoleArrayZod,
+    intent: queryIntent('roles.list', { includeDefaultRoles, limit, offset }),
   }
 }
 

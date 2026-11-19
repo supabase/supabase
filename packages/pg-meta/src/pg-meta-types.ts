@@ -2,6 +2,7 @@ import { z } from 'zod'
 
 import { DEFAULT_SYSTEM_SCHEMAS } from './constants'
 import { filterByList } from './helpers'
+import { queryIntent, type QueryIntent } from './intent'
 import { literal, safeSql, type SafeSqlFragment } from './pg-format'
 import { TYPES_SQL } from './sql/types'
 
@@ -40,6 +41,7 @@ function list({
 } = {}): {
   sql: SafeSqlFragment
   zod: typeof pgTypeArrayZod
+  intent: QueryIntent
 } {
   let sql = TYPES_SQL
   if (!includeArrayTypes) {
@@ -67,6 +69,14 @@ function list({
   return {
     sql,
     zod: pgTypeArrayZod,
+    intent: queryIntent('types.list', {
+      includeArrayTypes,
+      includeSystemSchemas,
+      includedSchemas,
+      excludedSchemas,
+      limit,
+      offset,
+    }),
   }
 }
 

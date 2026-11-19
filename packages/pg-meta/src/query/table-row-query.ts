@@ -148,16 +148,17 @@ export function getPagination(page?: number, size: number = DEFAULT_PAGE_SIZE) {
   return { from, to }
 }
 
-export const getTableRowsSql = ({
+/**
+ * The filtered, ordered and paginated `select *` that `getTableRowsSql` wraps with its truncation.
+ */
+export const getTableRowsBaseSql = ({
   table,
   filters = [],
   sorts = [],
   page,
   limit,
-  maxCharacters = MAX_CHARACTERS,
-  maxArraySize = MAX_ARRAY_SIZE,
   sortExcludedColumns = [],
-}: BuildTableRowsQueryArgs): SafeSqlFragment => {
+}: Omit<BuildTableRowsQueryArgs, 'maxCharacters' | 'maxArraySize'>): SafeSqlFragment => {
   if (!table || !table.columns) return safeSql``
 
   const query = new Query()
@@ -196,11 +197,26 @@ export const getTableRowsSql = ({
   // getPagination is expecting to start from 0
   const { from, to } = getPagination((page ?? 1) - 1, limit)
 
+  return queryChains.range(from, to).toSql({ isCTE: false, isFinal: false })
+}
+
+export const getTableRowsSql = ({
+  table,
+  filters = [],
+  sorts = [],
+  page,
+  limit,
+  maxCharacters = MAX_CHARACTERS,
+  maxArraySize = MAX_ARRAY_SIZE,
+  sortExcludedColumns = [],
+}: BuildTableRowsQueryArgs): SafeSqlFragment => {
+  if (!table || !table.columns) return safeSql``
+
   // To have efficient query, we use CTE optimization, to first reduce the number of rows and order them in the right place
   // filtering, applying limits and order by, then we can apply selection with some conditional logic to truncate large columns
   // allowing postgres to only truncate the columns within the subset that we'll return instead of attemting to do it on
   // all the rows within the table
-  const baseSelectQuery = safeSql`with _base_query as (${queryChains.range(from, to).toSql({ isCTE: false, isFinal: false })})`
+  const baseSelectQuery = safeSql`with _base_query as (${getTableRowsBaseSql({ table, filters, sorts, page, limit, sortExcludedColumns })})`
 
   const allColumnNames = table.columns
     .sort((a, b) => a.ordinal_position - b.ordinal_position)
@@ -287,5 +303,6 @@ export const getTableRowsSql = ({
 export default {
   shouldTruncateColumn,
   getTableRowsSql,
+  getTableRowsBaseSql,
   getDefaultOrderByColumns,
 }

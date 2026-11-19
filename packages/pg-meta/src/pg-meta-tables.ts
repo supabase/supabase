@@ -2,6 +2,7 @@ import { z } from 'zod'
 
 import { DEFAULT_SYSTEM_SCHEMAS } from './constants'
 import { coalesceRowsToArray, filterByList } from './helpers'
+import { queryIntent, type QueryIntent } from './intent'
 import {
   ident,
   joinSqlFragments,
@@ -93,6 +94,7 @@ function list<T extends boolean | undefined = true>(
 ): {
   sql: SafeSqlFragment
   zod: z.ZodType<TableBasedOnIncludeColumns<T>[]>
+  intent: QueryIntent
 } {
   let sql = generateEnrichedTablesSql({ includeColumns })
   const filter = filterByList(
@@ -112,12 +114,21 @@ function list<T extends boolean | undefined = true>(
   return {
     sql,
     zod: pgTableArrayZod,
+    intent: queryIntent('tables.list', {
+      includeSystemSchemas,
+      includedSchemas,
+      excludedSchemas,
+      limit,
+      offset,
+      includeColumns,
+    }),
   }
 }
 
 function retrieve(identifier: TableIdentifier): {
   sql: SafeSqlFragment
   zod: z.ZodType<TableWithColumns>
+  intent: QueryIntent
 } {
   const whereClause = getIdentifierWhereClause(identifier)
 
@@ -145,6 +156,7 @@ function retrieve(identifier: TableIdentifier): {
   return {
     sql,
     zod: pgTableZod,
+    intent: queryIntent('tables.retrieve', identifier),
   }
 }
 
