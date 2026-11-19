@@ -113,7 +113,7 @@ val supabase = createSupabaseClient(
 }
 ```
 
-Don't install the Auth plugin with `install(Auth)` on a client that sets `accessToken`, because supabase-kt throws an error when it creates the client. Users sign in and out with Firebase Auth, so this client can't use Supabase Auth methods such as `supabase.auth.signInWith`.
+On a client that sets `accessToken`, leave out the Auth plugin (`install(Auth)`). supabase-kt throws an error when it creates the client.
 
 </TabPanel>
 </$Show>
@@ -138,12 +138,14 @@ val supabase = createSupabaseClient(
 }
 ```
 
-Don't install the Auth plugin with `install(Auth)` on a client that sets `accessToken`, because supabase-kt throws an error when it creates the client. Users sign in and out with Firebase Auth, so this client can't use Supabase Auth methods such as `supabase.auth.signInWith`.
+On a client that sets `accessToken`, leave out the Auth plugin (`install(Auth)`). supabase-kt throws an error when it creates the client.
 
 </TabPanel>
 </$Show>
 
 </Tabs>
+
+A client that sets `accessToken` can't use Supabase Auth methods, such as `signInWithPassword`. Sign users in and out with Firebase Auth instead.
 
 ## Add a new Third-Party Auth integration to your project
 
