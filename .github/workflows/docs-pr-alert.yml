@@ -1,7 +1,8 @@
 name: Post docs PRs to Slack
 
-# Posts a docs PR to #team-docs whenever it's ready for review: when it's
-# opened as ready, and every time a draft is marked ready.
+# Posts a docs PR to #team-docs-alerts whenever it's ready for review: when
+# it's opened as ready, and every time a draft is marked ready. Reuses the
+# webhook from docs-master-alert.yml.
 # pull_request_target is used so fork PRs can read the webhook secret. This
 # workflow only reads the event payload. It never checks out or runs PR code.
 on:
