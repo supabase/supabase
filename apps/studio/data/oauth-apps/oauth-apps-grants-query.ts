@@ -24,10 +24,7 @@ export type OAuthGrantsError = StudioError
 
 export const useOAuthGrantsQuery = <TData = OAuthGrantsData>(
   { cursor }: OAuthGrantsVariables = {},
-  {
-    enabled = true,
-    ...options
-  }: UseCustomInfiniteQueryOptions<
+  options: UseCustomInfiniteQueryOptions<
     OAuthGrantsData,
     OAuthGrantsError,
     InfiniteData<TData>,
