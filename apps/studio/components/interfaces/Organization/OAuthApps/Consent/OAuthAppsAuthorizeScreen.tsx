@@ -452,7 +452,7 @@ export const OAuthAppsAuthorizeScreen = ({
             <>
               <section className="flex flex-col gap-3">
                 <div className="space-y-1">
-                  <p className="text-sm text-foreground">Permissions requested</p>
+                  <p className="text-sm text-foreground font-medium">Permissions requested</p>
                   {grantKind === 'member_bound' && (
                     <p className="text-xs text-foreground-lighter">
                       The app can only use the permissions listed below, and only where your role
@@ -476,13 +476,11 @@ export const OAuthAppsAuthorizeScreen = ({
                 {databaseAccess && (
                   <Admonition
                     type="warning"
+                    title="Direct database access"
                     description={
-                      <>
-                        This app will be able to connect directly to your database and read rows
-                        that your access rules normally hide.
-                        {databaseAccess.mode === 'write' &&
-                          ' It will also be able to change data and database structure.'}
-                      </>
+                      databaseAccess.mode === 'write'
+                        ? 'The app will be able to read rows that your access rules normally hide, and change data and database structure.'
+                        : 'The app will be able to read rows that your access rules normally hide.'
                     }
                   />
                 )}

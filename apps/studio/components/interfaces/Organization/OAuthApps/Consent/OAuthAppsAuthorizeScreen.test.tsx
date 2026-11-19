@@ -308,7 +308,7 @@ describe('OAuthAppsAuthorizeScreen', () => {
     })
     await renderRoute(route, { routeId: '/authorize', url: '/authorize' })
 
-    expect(await screen.findByText('These projects require changes first')).toBeInTheDocument()
+    expect(await screen.findByText('Needs Postgres 17 or later.')).toBeInTheDocument()
     expect(screen.getByRole('combobox')).toHaveTextContent('Database setup notice: northwind-cms')
     const remove = await screen.findByRole('button', { name: 'Remove northwind-cms' })
     const authorize = screen.getByRole('button', { name: 'Authorize Example Partner' })
