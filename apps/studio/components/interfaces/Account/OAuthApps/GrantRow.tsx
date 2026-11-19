@@ -22,15 +22,16 @@ import { GrantProjectsDialogContent } from './GrantProjectsDialogContent'
 import { OAuthGrant } from '@/data/oauth-apps/oauth-apps-grants-query'
 
 export interface OAuthAppsAuthorizedRowProps {
+  className?: string
   grant: OAuthGrant
 }
 
-export const GrantRow = ({ grant }: OAuthAppsAuthorizedRowProps) => {
+export const GrantRow = ({ className, grant }: OAuthAppsAuthorizedRowProps) => {
   const [isDialogOpen, setIsDialogOpen] = useState(false)
   const [dialogContent, setDialogContent] = useState<'projects' | 'disconnect' | null>(null)
   const menuTriggerRef = useRef<HTMLButtonElement | null>(null)
   return (
-    <TableRow>
+    <TableRow className={className}>
       <TableCell>
         <div className="flex items-center gap-x-3">
           <div
