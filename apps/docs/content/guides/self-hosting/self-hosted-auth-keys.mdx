@@ -189,7 +189,7 @@ Regenerating asymmetric keys invalidates all ES256 user sessions. Plan a mainten
 
 ## How it works
 
-Requests via `supabase-js` include two headers for every service except Edge Functions:
+Requests via `supabase-js` include two headers for every service except [Edge Functions](/docs/guides/functions):
 
 - `apikey` - the API key (`sb_` or legacy JWT)
 - `Authorization` - when unauthenticated, the client SDK copies the API key here (`Bearer sb_publishable_xxx` or `Bearer eyJ...`). When authenticated, this contains the user session JWT minted by Auth.

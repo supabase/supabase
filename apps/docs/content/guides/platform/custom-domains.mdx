@@ -107,7 +107,7 @@ Before you activate your domain, prepare your applications and integrations for 
 To prevent issues for your users, follow these steps:
 
 1. For each of your Supabase OAuth providers:
-   - In the provider's developer console (not in the Supabase dashboard), find the OAuth application and add the custom domain Supabase Auth callback URL **in addition to the Supabase project URL.** Example:
+   - In the provider's developer console (not in the Supabase dashboard), find the OAuth application and add the custom domain [Supabase Auth](/docs/guides/auth) callback URL **in addition to the Supabase project URL.** Example:
      - `https://abcdefghijklmnopqrst.supabase.co/auth/v1/callback` **and**
      - `https://api.example.com/auth/v1/callback`
    - [Sign in with Twitter](/docs/guides/auth/social-sign-in/auth-twitter) uses cookies bound to the project's domain. Make sure your frontend code uses the custom domain instead of the default project's domain.

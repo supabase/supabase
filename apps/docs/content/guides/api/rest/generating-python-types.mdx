@@ -80,16 +80,16 @@ client = create_client("YOUR_SUPABASE_URL", "YOUR_SUPABASE_KEY")
 movies = client.table("movies")
 
 # Select
-selected = [PublicMovies(m) for m in movies.select("*").execute().data]
+selected = [PublicMovies.model_validate(m) for m in movies.select("*").execute().data]
 
 # Insert
-inserted = [PublicMovies(m) for m in movies.insert(PublicMoviesInsert(name="foo", data="bar")) \
-                                          .execute().data]
+inserted = [PublicMovies.model_validate(m) for m in movies.insert(PublicMoviesInsert(name="foo", data="bar")) \
+                                                         .execute().data]
 
 # Update
-updated  = [PublicMovies(m) for m in movies.update(PublicMoviesUpdate(name="bar")) \
-                                        .eq("id", 5) \
-                                        .execute().data]
+updated  = [PublicMovies.model_validate(m) for m in movies.update(PublicMoviesUpdate(name="bar")) \
+                                                       .eq("id", 5) \
+                                                       .execute().data]
 ```
 
 ## Update types automatically with GitHub Actions
@@ -150,5 +150,5 @@ jobs:
 
 ## Resources
 
-- [Generating Supabase types with GitHub Actions](https://blog.esteetey.dev/how-to-create-and-test-a-github-action-that-generates-types-from-supabase-database)
+- [Generating Supabase types with GitHub Actions](https://www.esteetey.dev/blog/how-to-create-and-test-a-github-action-that-generates-types-from-supabase-database)
 - [Generating TypeScript Types](/docs/guides/api/rest/generating-types)

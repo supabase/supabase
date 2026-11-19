@@ -695,7 +695,7 @@ fun GoogleSignInButton() {
 
 ### Using Google sign-in with Kotlin Multiplatform
 
-When using [Compose Multiplatform](https://www.jetbrains.com/lp/compose-multiplatform/), you can use the [compose-auth](https://github.com/supabase-community/supabase-kt-plugins/tree/main/ComposeAuth) plugin.
+When using [Compose Multiplatform](https://kotlinlang.org/compose-multiplatform/), you can use the [compose-auth](https://github.com/supabase-community/supabase-kt-plugins/tree/main/ComposeAuth) plugin.
 
 - On Android it uses the system's [Credential Manager](https://developer.android.com/identity/sign-in/credential-manager-siwg). [Setup guide](https://github.com/supabase-community/supabase-kt-plugins/blob/main/ComposeAuth/README.md#native-google-auth-on-android)
 - On iOS it uses the [`GoogleSignIn-iOS` library](https://github.com/google/GoogleSignIn-iOS). [Setup guide](https://github.com/supabase-community/supabase-kt-plugins/blob/main/ComposeAuth/README.md#native-google-auth-on-ios)
@@ -749,7 +749,7 @@ Button(onClick = { authState.startFlow() }) {
 
 ### Using native sign in for Chrome extensions
 
-Similar to the native sign in for Android, you can use the Chrome browser's [identity APIs](https://developer.chrome.com/docs/extensions/reference/identity/) to launch an authentication flow.
+Similar to the native sign in for Android, you can use the Chrome browser's [identity APIs](https://developer.chrome.com/docs/extensions/reference/api/identity) to launch an authentication flow.
 
 First, you need to configure your `manifest.json` file like so:
 

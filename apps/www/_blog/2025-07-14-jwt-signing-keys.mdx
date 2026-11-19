@@ -83,7 +83,7 @@ Supabase generates a new **standby** key pair: one private key (used to create a
 
 ### 3. Rotate to asymmetric JWTs
 
-When you’re ready, rotate the keys. This tells Supabase Auth to begin issuing JWTs signed with the new private key.
+When you’re ready, rotate the keys. This tells [Supabase Auth](/docs/guides/auth) to begin issuing JWTs signed with the new private key.
 
 Importantly though, `anon`, `service_role` and any existing non-expired Auth JWT **remain valid and accepted**.
 

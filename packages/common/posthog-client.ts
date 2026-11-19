@@ -5,7 +5,7 @@ import posthog, {
 } from 'posthog-js'
 
 import { safeSessionStorage } from './safe-storage'
-import { getTelemetryPlatform } from './telemetry-utils'
+import { getTelemetryPlatform, redactEventUrlKeywords } from './telemetry-utils'
 
 export type { CapturedNetworkRequest, SessionRecordingOptions }
 
@@ -97,12 +97,16 @@ class PostHogClient {
       capture_pageview: false, // We'll manually track pageviews
       capture_pageleave: false, // We'll manually track page leaves
       opt_out_persistence_by_default: true,
+      // Despite the name, 0 turns off the 5-minute and tab-focus flag reloads. Flags still
+      // load on init, identify and group changes.
+      remote_config_refresh_interval_ms: 0,
       ...buildSessionRecordingConfig(sessionReplay),
       // Not posthog.register(): super properties persist in localStorage shared by every
       // supabase.com app, so events sent before register() runs carry the last app's value.
       before_send: (event) => {
         const platform = getTelemetryPlatform()
         if (event && platform) event.properties.platform = platform
+        if (event) redactEventUrlKeywords(event)
         return event
       },
       loaded: (posthog) => {
