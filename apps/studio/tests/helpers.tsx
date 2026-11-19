@@ -48,7 +48,7 @@ export const clickDropdown = (elem: HTMLElement) => {
   )
 }
 
-export const createMockOrganization = (details: Partial<Organization>): Organization => {
+export const createMockOrganization = (details: Partial<Organization> = {}): Organization => {
   const base: Organization = {
     id: 1,
     name: 'Organization 1',
