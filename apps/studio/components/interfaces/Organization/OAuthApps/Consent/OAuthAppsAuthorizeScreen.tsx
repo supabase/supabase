@@ -333,6 +333,7 @@ export const OAuthAppsAuthorizeScreen = ({
       : `Cancelling will redirect you to ${request.redirect_uri} with access denied.`
 
   const cannotGrantRequestedAccess = preflightData?.validation_failure != null
+  const showSslNotice = !cannotGrantRequestedAccess && sslProjects.length > 0
   const cannotApprove = cannotGrantRequestedAccess || hasNoSelection || hasBlockedProjects
 
   return (
@@ -348,7 +349,7 @@ export const OAuthAppsAuthorizeScreen = ({
               utcTimestamp={preflightData.existing_grant.approved_at}
               labelFormat="D MMM YYYY"
             />
-            . It's now asking for different access.
+            . It’s now asking for different access.
           </>
         ) : (
           'This application wants to access your Supabase account.'
@@ -384,58 +385,48 @@ export const OAuthAppsAuthorizeScreen = ({
             />
           )}
 
-          {canProceed && isProjectScopingModeEnabled && (
-            <div className="flex flex-col gap-2">
-              <ProjectMultiSelect
-                onChange={setSelectedProjectRefs}
-                maxSelected={MAX_SELECTED_PROJECTS}
-                error={
-                  hasNoSelection ? 'Must select at least one project to authorize.' : undefined
-                }
-                flaggedRefs={flaggedRefs}
-                unavailableRefs={getFailedProjects(roleFailure).map((project) => project.ref)}
-                readinessIssues={readinessIssues}
-                allProjectsSelected={allProjectsSelected}
-                onAllProjectsChange={databaseAccess ? undefined : setAllProjectsSelected}
-                onSearchChange={setSearch}
-                projects={projects ?? []}
-                selectedProjects={selectedProjects ?? []}
-                onLoadMore={handleLoadMoreProjects}
-              />
-            </div>
-          )}
+          {canProceed &&
+            (isProjectScopingModeEnabled || blockedProjects.length > 0 || showSslNotice) && (
+              <div className="flex flex-col gap-2">
+                {isProjectScopingModeEnabled && (
+                  <ProjectMultiSelect
+                    onChange={setSelectedProjectRefs}
+                    maxSelected={MAX_SELECTED_PROJECTS}
+                    error={
+                      hasNoSelection ? 'Must select at least one project to authorize.' : undefined
+                    }
+                    flaggedRefs={flaggedRefs}
+                    unavailableRefs={getFailedProjects(roleFailure).map((project) => project.ref)}
+                    readinessIssues={readinessIssues}
+                    allProjectsSelected={allProjectsSelected}
+                    onAllProjectsChange={databaseAccess ? undefined : setAllProjectsSelected}
+                    onSearchChange={setSearch}
+                    projects={projects ?? []}
+                    selectedProjects={selectedProjects ?? []}
+                    onLoadMore={handleLoadMoreProjects}
+                  />
+                )}
 
-          {canProceed && blockedProjects.length > 0 && (
-            <DatabaseAccessProjectIssues
-              projects={blockedProjects}
-              onRemove={
-                usesSelectedProjects
-                  ? (ref) =>
-                      setSelectedProjectRefs((refs) => refs.filter((selected) => selected !== ref))
-                  : undefined
-              }
-            />
-          )}
+                {blockedProjects.length > 0 && (
+                  <DatabaseAccessProjectIssues
+                    projects={blockedProjects}
+                    canDeselectProjects={usesSelectedProjects}
+                  />
+                )}
 
-          {canProceed && !cannotGrantRequestedAccess && sslProjects.length > 0 && (
-            <Admonition
-              type="note"
-              title="SSL enforcement"
-              description="Setup will enable SSL enforcement on these projects. Clients without SSL will no longer connect."
-            >
-              <div
-                role="list"
-                aria-label="Projects that will require SSL"
-                className="divide-y text-xs"
-              >
-                {sslProjects.map(({ ref, name }) => (
-                  <div key={ref} role="listitem" className="py-1.5 font-medium text-foreground">
-                    {name}
-                  </div>
-                ))}
+                {showSslNotice && (
+                  <Admonition
+                    type="note"
+                    title="SSL enforcement"
+                    description="Setup will enable SSL enforcement on these projects. Clients without SSL will no longer connect."
+                  >
+                    <p className="text-xs font-medium text-foreground">
+                      {sslProjects.map(({ name }) => name).join(', ')}
+                    </p>
+                  </Admonition>
+                )}
               </div>
-            </Admonition>
-          )}
+            )}
 
           {canProceed && !cannotGrantRequestedAccess && (
             <>
@@ -497,7 +488,7 @@ export const OAuthAppsAuthorizeScreen = ({
                   side: 'top',
                   text: hasBlockedProjects
                     ? usesSelectedProjects
-                      ? 'Fix or remove the projects listed above.'
+                      ? 'Fix or deselect the projects listed above.'
                       : 'Fix the projects listed above.'
                     : undefined,
                 },

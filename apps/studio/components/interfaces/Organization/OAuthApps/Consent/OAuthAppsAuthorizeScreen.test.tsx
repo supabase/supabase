@@ -310,19 +310,16 @@ describe('OAuthAppsAuthorizeScreen', () => {
 
     expect(await screen.findByText('These projects require changes first')).toBeInTheDocument()
     expect(screen.getByRole('combobox')).toHaveTextContent('Database setup notice: northwind-cms')
-    const remove = await screen.findByRole('button', { name: 'Remove northwind-cms' })
     const authorize = screen.getByRole('button', { name: 'Authorize Example Partner' })
     expect(authorize).toHaveAttribute('aria-disabled', 'true')
     fireEvent.focus(authorize)
     expect(await screen.findByRole('tooltip')).toHaveTextContent(
-      'Fix or remove the projects listed above.'
+      'Fix or deselect the projects listed above.'
     )
-    fireEvent.click(remove)
-    await selectProject(/fabrikam-api/)
+    await selectProject(/northwind-cms/)
+    await toggleProject(/fabrikam-api/)
 
-    expect(
-      await screen.findByRole('list', { name: 'Projects that will require SSL' })
-    ).toHaveTextContent('fabrikam-api')
+    expect(await screen.findByText('SSL enforcement')).toBeInTheDocument()
     expect(authorize).toBeEnabled()
   })
 
