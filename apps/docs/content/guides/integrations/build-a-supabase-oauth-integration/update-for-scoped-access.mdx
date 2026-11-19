@@ -31,31 +31,31 @@ A member can't approve your app when their role doesn't cover every scope it req
 
 The following table lists the lowest role that can authorize each scope. Higher roles can also authorize it. When the person selects specific projects, the consent screen checks their role on each selected project.
 
-| Scope                    | Lowest role   | Requests that return `403` for some roles                           |
-| ------------------------ | ------------- | ------------------------------------------------------------------- |
-| `analytics:read`         | Read-only     |                                                                     |
-| `analytics:write`        | Administrator |                                                                     |
-| `analytics_config:read`  | Developer     |                                                                     |
-| `analytics_config:write` | Administrator |                                                                     |
-| `auth:read`              | Read-only     |                                                                     |
-| `auth:write`             | Administrator |                                                                     |
-| `database:read`          | Read-only     |                                                                     |
-| `database:write`         | Developer     | Developers get `403` when they change database configuration.       |
-| `domains:read`           | Administrator |                                                                     |
-| `domains:write`          | Administrator |                                                                     |
-| `edge_functions:read`    | Read-only     |                                                                     |
-| `edge_functions:write`   | Developer     |                                                                     |
-| `environment:read`       | Read-only     |                                                                     |
+| Scope                    | Lowest role   | Requests that return `403` for some roles                            |
+| ------------------------ | ------------- | -------------------------------------------------------------------- |
+| `analytics:read`         | Read-only     |                                                                      |
+| `analytics:write`        | Administrator |                                                                      |
+| `analytics_config:read`  | Developer     |                                                                      |
+| `analytics_config:write` | Administrator |                                                                      |
+| `auth:read`              | Read-only     |                                                                      |
+| `auth:write`             | Administrator |                                                                      |
+| `database:read`          | Read-only     |                                                                      |
+| `database:write`         | Developer     | Developers get `403` when they change database configuration.        |
+| `domains:read`           | Administrator |                                                                      |
+| `domains:write`          | Administrator |                                                                      |
+| `edge_functions:read`    | Read-only     |                                                                      |
+| `edge_functions:write`   | Developer     |                                                                      |
+| `environment:read`       | Read-only     |                                                                      |
 | `environment:write`      | Developer     | Developers get `403` when they create or delete a production branch. |
-| `organizations:read`     | Read-only     |                                                                     |
-| `projects:read`          | Read-only     |                                                                     |
-| `projects:write`         | Administrator | Administrators get `403` when they transfer a project.              |
-| `rest:read`              | Read-only     |                                                                     |
-| `rest:write`             | Administrator |                                                                     |
-| `secrets:read`           | Developer     |                                                                     |
-| `secrets:write`          | Administrator |                                                                     |
-| `storage:read`           | Read-only     |                                                                     |
-| `storage:write`          | Administrator |                                                                     |
+| `organizations:read`     | Read-only     |                                                                      |
+| `projects:read`          | Read-only     |                                                                      |
+| `projects:write`         | Administrator | Administrators get `403` when they transfer a project.               |
+| `rest:read`              | Read-only     |                                                                      |
+| `rest:write`             | Administrator |                                                                      |
+| `secrets:read`           | Developer     |                                                                      |
+| `secrets:write`          | Administrator |                                                                      |
+| `storage:read`           | Read-only     |                                                                      |
+| `storage:write`          | Administrator |                                                                      |
 
 Some roles can authorize a scope even though they can't call every endpoint it covers. For example, Developers can authorize `database:write` so they can run SQL, but they get `403` when they change database configuration. The last column of the table lists these cases. They apply to every app, whether or not you turn on partial grants.
 
@@ -78,10 +78,10 @@ Don't call endpoints that need a missing scope. They return `403 Forbidden`, and
 
 The token has the access of the member's current role. Handle these responses on every Management API call:
 
-| Response                              | Cause                                                       | What to do                                                           |
-| ------------------------------------- | ----------------------------------------------------------- | -------------------------------------------------------------------- |
-| `403 Forbidden`                       | The member's role no longer covers the request.             | Show a message that names the missing access. Offer to re-authorize. |
-| `401 Unauthorized`, or refresh fails  | The member left the organization, or the grant was revoked. | Delete the stored connection and ask the person to connect again.    |
+| Response                             | Cause                                                       | What to do                                                           |
+| ------------------------------------ | ----------------------------------------------------------- | -------------------------------------------------------------------- |
+| `403 Forbidden`                      | The member's role no longer covers the request.             | Show a message that names the missing access. Offer to re-authorize. |
+| `401 Unauthorized`, or refresh fails | The member left the organization, or the grant was revoked. | Delete the stored connection and ask the person to connect again.    |
 
 ## Project selection
 
