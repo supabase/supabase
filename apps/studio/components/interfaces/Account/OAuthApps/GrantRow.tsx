@@ -19,41 +19,50 @@ import { TimestampInfo } from 'ui-patterns/TimestampInfo'
 
 import { GrantDisconnectDialogContent } from './GrantDisconnectDialogContent'
 import { GrantProjectsDialogContent } from './GrantProjectsDialogContent'
-import type { MemberOauthGrantItem } from '@/data/oauth-apps/types'
+import { OAuthGrant } from '@/data/oauth-apps/oauth-apps-grants-query'
 
 export interface OAuthAppsAuthorizedRowProps {
-  grant: MemberOauthGrantItem
+  className?: string
+  grant: OAuthGrant
 }
 
-export const GrantRow = ({ grant }: OAuthAppsAuthorizedRowProps) => {
+export const GrantRow = ({ className, grant }: OAuthAppsAuthorizedRowProps) => {
   const [isDialogOpen, setIsDialogOpen] = useState(false)
   const [dialogContent, setDialogContent] = useState<'projects' | 'disconnect' | null>(null)
   const menuTriggerRef = useRef<HTMLButtonElement | null>(null)
   return (
-    <TableRow>
+    <TableRow className={className}>
       <TableCell>
         <div className="flex items-center gap-x-3">
           <div
             className="flex h-[30px] w-[30px] shrink-0 items-center justify-center rounded-full border border-control bg-cover bg-center bg-no-repeat text-xs"
-            style={{ backgroundImage: grant.app.icon ? `url('${grant.app.icon}')` : 'none' }}
+            style={{
+              backgroundImage: grant.attributes.app.icon
+                ? `url('${grant.attributes.app.icon}')`
+                : 'none',
+            }}
           >
-            {!!grant.app.icon ? '' : grant.app.name[0]}
+            {!!grant.attributes.app.icon ? '' : grant.attributes.app.name[0]}
           </div>
           <div className="flex flex-col">
-            <p className="min-w-0 truncate" title={grant.app.name}>
-              {grant.app.name}
+            <p className="min-w-0 truncate" title={grant.attributes.app.name}>
+              {grant.attributes.app.name}
             </p>
             <p className="min-w-0 text-foreground-lighter">
-              {grant.projects?.length ?? <span>All</span>}{' '}
-              {grant.projects?.length === 1 ? <span>project</span> : <span>projects</span>}
+              {grant.attributes.projects?.length ?? <span>All</span>}{' '}
+              {grant.attributes.projects?.length === 1 ? (
+                <span>project</span>
+              ) : (
+                <span>projects</span>
+              )}
             </p>
           </div>
         </div>
       </TableCell>
-      <TableCell>{grant.organization.name}</TableCell>
+      <TableCell>{grant.attributes.organization.name}</TableCell>
       <TableCell>
         <TimestampInfo
-          utcTimestamp={grant.approved_at ?? ''}
+          utcTimestamp={grant.attributes.approved_at ?? ''}
           labelFormat="DD MMM YYYY"
           className="text-sm"
         />
@@ -88,7 +97,7 @@ export const GrantRow = ({ grant }: OAuthAppsAuthorizedRowProps) => {
               <TooltipContent side="bottom">Manage app</TooltipContent>
             </Tooltip>
             <DropdownMenuContent align="end" side="bottom" className="w-40">
-              {grant.projects != null && grant.projects.length > 0 && (
+              {grant.attributes.projects != null && grant.attributes.projects.length > 0 && (
                 <>
                   <DialogTrigger asChild>
                     <DropdownMenuItem

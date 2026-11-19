@@ -213,6 +213,7 @@
     "require-in-the-middle": "^8.0.0",
     "tsconfig": "workspace:*",
     "tsx": "catalog:",
+    "type-fest": "5.6.0",
     "typescript": "catalog:",
     "vite": "catalog:",
     "vitest": "catalog:"
