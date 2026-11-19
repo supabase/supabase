@@ -5,6 +5,7 @@ import { InfoTooltip } from 'ui-patterns/info-tooltip'
 
 import { SectionContent } from '../SectionContent'
 import { CategoryAttribute } from '../Usage.constants'
+import { UsageProjectName } from '../UsageProjectName'
 import Panel from '@/components/ui/Panel'
 import { PricingMetric } from '@/data/analytics/org-daily-stats-query'
 import type { OrgSubscription } from '@/data/subscriptions/types'
@@ -22,6 +23,7 @@ export interface DatabaseSizeUsageProps {
 }
 
 const DatabaseSizeUsage = ({
+  projectRef,
   attribute,
   subscription,
   usage,
@@ -110,7 +112,11 @@ const DatabaseSizeUsage = ({
                   >
                     <div className="flex justify-between">
                       <span className="text-foreground-light flex items-center gap-2">
-                        {project.name}
+                        <UsageProjectName
+                          name={project.name}
+                          projectRef={project.ref}
+                          selectedProjectRef={projectRef}
+                        />
                       </span>
                       <Button asChild size={'tiny'}>
                         <Link
