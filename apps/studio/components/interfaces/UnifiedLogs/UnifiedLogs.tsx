@@ -915,6 +915,7 @@ export const UnifiedLogs = ({
           viewName={activeView.name}
           canUpdate={canUpdateView && !isActiveViewPreset}
           canCreate={canCreateView}
+          isPreset={isActiveViewPreset}
           isPending={isSavingView}
           onUpdate={handleUpdateActiveView}
           onSaveAsNew={handleStartSaveView}

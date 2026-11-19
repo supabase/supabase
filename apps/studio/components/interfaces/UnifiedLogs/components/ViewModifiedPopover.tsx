@@ -11,6 +11,7 @@ interface ViewModifiedPopoverProps {
   viewName: string
   canUpdate?: boolean
   canCreate?: boolean
+  isPreset?: boolean
   isPending?: boolean
   onUpdate: () => void
   onSaveAsNew: () => void
@@ -25,6 +26,7 @@ export const ViewModifiedPopover = ({
   viewName,
   canUpdate = true,
   canCreate = true,
+  isPreset = false,
   isPending = false,
   onUpdate,
   onSaveAsNew,
@@ -32,6 +34,13 @@ export const ViewModifiedPopover = ({
   onDismiss,
 }: ViewModifiedPopoverProps) => {
   const canWrite = canUpdate || canCreate
+
+  const getDescription = () => {
+    if (isPreset) return "Preset views can't be updated. Save these filters as a new view instead."
+    if (canUpdate)
+      return `Update "${truncateViewName(viewName)}" for everyone in the project, or save these filters as a new view.`
+    return 'These filters have not been saved.'
+  }
 
   return (
     <Popover open={open} onOpenChange={onOpenChange} modal={false}>
@@ -56,9 +65,7 @@ export const ViewModifiedPopover = ({
           />
         </div>
 
-        <p className="text-xs text-foreground-light px-4 pt-1">
-          {`Update "${truncateViewName(viewName)}" for everyone in the project, or save these filters as a new view.`}
-        </p>
+        <p className="text-xs text-foreground-light px-4 pt-1">{getDescription()}</p>
 
         {!canWrite && (
           <p className="text-xs text-foreground-lighter px-4 pt-2">
