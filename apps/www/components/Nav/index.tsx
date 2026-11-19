@@ -1,6 +1,5 @@
 'use client'
 
-import { useIsLoggedIn, useIsUserLoading, useUser } from 'common'
 import ScrollProgress from 'components/ScrollProgress'
 import { getMenu } from 'data/nav'
 import { DevToolbarTrigger } from 'dev-tools'
@@ -20,14 +19,14 @@ import {
   NavigationMenuTrigger,
   NavigationMenuViewport,
 } from 'ui'
-import { AuthenticatedDropdownMenu } from 'ui-patterns/AuthenticatedDropdownMenu'
+import { SignedInSwitch } from 'ui-patterns/SignedInSwitch/SignedInSwitch'
 import { TopNavMenuToggle } from 'ui-patterns/TopNav/TopNavMenuToggle'
 
+import { AccountMenu } from './AccountMenu'
 import GitHubButton from './GitHubButton'
 import MenuItem from './MenuItem'
 import { MobileMenu } from './MobileMenu'
 import RightClickBrandLogo from './RightClickBrandLogo'
-import useDropdownMenu from './useDropdownMenu'
 import { DASHBOARD_SIGN_IN_URL, DASHBOARD_SIGN_UP_URL } from '@/lib/dashboard-links'
 
 interface Props {
@@ -51,9 +50,6 @@ const Nav = ({ hideNavbar, stickyNavbar = true }: Props) => {
     setVisibleDropdown(value)
     if (!openedDropdowns.includes(value)) setOpenedDropdowns([...openedDropdowns, value])
   }
-  const isLoggedIn = useIsLoggedIn()
-  const isUserLoading = useIsUserLoading()
-  const user = useUser()
   const menu = getMenu()
   const dropdownTitles: string[] = menu.primaryNav
     .filter((menuItem) => menuItem.hasDropdown)
@@ -63,7 +59,6 @@ const Nav = ({ hideNavbar, stickyNavbar = true }: Props) => {
     return dropdownTitles.indexOf(title) < dropdownTitles.indexOf(visibleDropdown) ? 'start' : 'end'
   }
   const sendTelemetryEvent = useSendTelemetryEvent()
-  const userMenu = useDropdownMenu(user)
 
   const isGAWeekSection = pathname?.startsWith('/ga-week')
   const isStateOfStartupsPage = pathname?.startsWith('/state-of-startups')
@@ -195,15 +190,10 @@ const Nav = ({ hideNavbar, stickyNavbar = true }: Props) => {
                 </NavigationMenu>
               </div>
               <div className="flex items-center gap-2 opacity-0 animate-fade-in scale-100! delay-300">
-                <div
-                  className={cn(
-                    'flex items-center gap-2 transition-opacity',
-                    isUserLoading ? 'opacity-0' : 'opacity-100'
-                  )}
-                >
-                  <DevToolbarTrigger />
-                  <GitHubButton />
-                  {isLoggedIn ? (
+                <DevToolbarTrigger />
+                <GitHubButton />
+                <SignedInSwitch
+                  signedIn={
                     <>
                       {isStateOfStartupsPage ? (
                         <FloatingPlate rounded="md" className="hidden lg:inline-flex">
@@ -216,9 +206,10 @@ const Nav = ({ hideNavbar, stickyNavbar = true }: Props) => {
                           <a href="/dashboard/projects">Dashboard</a>
                         </Button>
                       )}
-                      <AuthenticatedDropdownMenu menu={userMenu} user={user} site="www" />
+                      <AccountMenu />
                     </>
-                  ) : (
+                  }
+                  signedOut={
                     <>
                       {isStateOfStartupsPage ? (
                         <FloatingPlate rounded="md" className="hidden lg:inline-flex">
@@ -265,8 +256,8 @@ const Nav = ({ hideNavbar, stickyNavbar = true }: Props) => {
                         </a>
                       </Button>
                     </>
-                  )}
-                </div>
+                  }
+                />
               </div>
             </div>
             <TopNavMenuToggle
