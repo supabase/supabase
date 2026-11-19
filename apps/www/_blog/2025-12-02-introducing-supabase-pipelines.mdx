@@ -109,7 +109,7 @@ After changing your publication, restart the pipeline from the Dashboard actions
 
 Read replicas and Pipelines solve different problems.
 
-Read replicas help when you need to scale concurrent queries, but they're still Postgres. They don't make analytics faster.
+[Read replicas](/docs/guides/platform/read-replicas) help when you need to scale concurrent queries, but they're still Postgres. They don't make analytics faster.
 
 Pipelines moves your data to systems built for analytics, keeping heavy analytical queries away from your production database. Query performance, storage format, compression, and destination costs depend on the destination you choose.
 

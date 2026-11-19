@@ -60,7 +60,7 @@ docs = vx.get_or_create_collection(
 )
 ```
 
-In the example, we're using the `gte-small` model, but any model compatible with [sentence transformers](https://www.sbert.net/docs/pretrained_models.html) can be used in its place.
+In the example, we're using the `gte-small` model, but any model compatible with [sentence transformers](https://www.sbert.net/docs/sentence_transformer/pretrained_models.html) can be used in its place.
 
 Once the adapter is registered with the collection we can upsert data using plain text and records are automatically converted to vectors:
 
@@ -158,11 +158,11 @@ One of the coolest ideas we’ve seen so far is the ability to support Hugging F
 
 ![Hugging Face from the browser example](/images/blog/launch-week-8/day-1/hugging-face-from-the-browser-middleware.png)
 
-This is great for search, where you might want to “debounce” the user query as they type. Of course, this is only helpful if you have a database that allows access from the browser. Fortunately, Supabase provides that functionality using Postgres Row Level Security and PostgREST:
+This is great for search, where you might want to “debounce” the user query as they type. Of course, this is only helpful if you have a database that allows access from the browser. Fortunately, Supabase provides that functionality using Postgres [Row Level Security](/docs/guides/database/postgres/row-level-security) and PostgREST:
 
 ![Hugging Face from the browser with postgREST](/images/blog/launch-week-8/day-1/hugging-face-from-the-browser-postgrest.png)
 
-For example, if we were storing image embeddings inside our database, we could provide search functionality using a simple Postgres function, powered by pgvector:
+For example, if we were storing image embeddings inside our database, we could provide search functionality using a simple Postgres function, powered by [pgvector](/docs/guides/database/extensions/pgvector):
 
 ```sql
 create function match_images (
@@ -240,4 +240,4 @@ And no matter your language preference, remember to jump into the [Hugging Face 
 - [Launch Week 8](https://supabase.com/launch-week)
 - [Coding the stars - an interactive constellation with Three.js and React Three Fiber](https://supabase.com/blog/interactive-constellation-threejs-react-three-fiber)
 - [Why we'll stay remote](https://supabase.com/blog/why-supabase-remote)
-- [Postgres Language Server](https://github.com/supabase/postgres_lsp)
+- [Postgres Language Server](https://github.com/supabase-community/postgres-language-server)

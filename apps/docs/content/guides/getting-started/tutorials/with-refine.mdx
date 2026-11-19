@@ -175,7 +175,7 @@ lines={[[1, -1]]}
 meta="name=src/components/auth.tsx"
 />
 
-The [`useLogin()`](https://refine.dev/docs/api-reference/core/hooks/authentication/useLogin/) Refine auth hook to grab the `mutate: login` method to use inside `handleLogin()` function and `isLoading` state for the form submission. The `useLogin()` hook conveniently offers access to `authProvider.login` method for authenticating the user with OTP.
+The [`useLogin()`](https://refine.dev/core/docs/authentication/hooks/use-login/) Refine auth hook to grab the `mutate: login` method to use inside `handleLogin()` function and `isLoading` state for the form submission. The `useLogin()` hook conveniently offers access to `authProvider.login` method for authenticating the user with OTP.
 
 ### Account page
 
@@ -189,7 +189,7 @@ lines={[[1, 3], [8, 43], [69, -1]]}
 meta="name=src/components/account.tsx"
 />
 
-This uses three Refine hooks, namely the [`useGetIdentity()`](https://refine.dev/docs/api-reference/core/hooks/authentication/useGetIdentity/), [`useLogOut()`](https://refine.dev/docs/api-reference/core/hooks/authentication/useLogout/) and [`useForm()`](https://refine.dev/docs/packages/documentation/react-hook-form/useForm/) hooks.
+This uses three Refine hooks, namely the [`useGetIdentity()`](https://refine.dev/core/docs/authentication/hooks/use-get-identity/), [`useLogOut()`](https://refine.dev/core/docs/authentication/hooks/use-logout/) and [`useForm()`](https://refine.dev/core/docs/packages/react-hook-form/use-form/) hooks.
 
 `useGetIdentity()` is a auth hook that gets the identity of the authenticated user. It grabs the current user by invoking the `authProvider.getIdentity` method under the hood.
 

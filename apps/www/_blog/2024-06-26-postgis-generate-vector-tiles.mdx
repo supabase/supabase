@@ -69,7 +69,7 @@ PG_USE_COPY=true ogr2ogr -f pgdump places.sql places.geojson
 
 ## Import location data into Supabase
 
-Enable the PostGIS extension on your Supabase Database on a dedicated separate `gis` schema. To do so you can navigate to the [SQL Editor](/dashboard/project/_/sql/new) and run the following SQL, or you can enable the extension from the [Database Extensions Settings](/dashboard/project/_/database/extensions).
+Enable the PostGIS extension on your [Supabase Database](/docs/guides/database/overview) on a dedicated separate `gis` schema. To do so you can navigate to the [SQL Editor](/dashboard/project/_/sql/new) and run the following SQL, or you can enable the extension from the [Database Extensions Settings](/dashboard/project/_/database/extensions).
 
 As PostGIS can be quite compute heavy, we recommend enabling it on a dedicated separate schema, for example, named `gis`!
 
@@ -88,7 +88,7 @@ You can find the credentials in the [project connect page](/dashboard/project/_?
 
 ### Enable RLS and create a public read policy
 
-We want the places data to be available publicly, so we can create a row level security policy that enables public read access.
+We want the places data to be available publicly, so we can create a [row level security](/docs/guides/database/postgres/row-level-security) policy that enables public read access.
 
 In your Supabase Dashboard, navigate to the [SQL Editor](/dashboard/project/_/sql/new) and run the following:
 
@@ -153,7 +153,7 @@ To limit the amount of data sent over the wire, we limit the amount of metadata 
 
 ## Use supabase-js to fetch vector tiles from MapLibre GL client
 
-You can find the full `index.html` code on [GitHub](https://github.com/bdon/supabase-vector-tile/blob/main/index.html). Here we'll highlight how to add a new protocol to MapLibreGL to fetch the bas64 encoded binary vector tile data via supabase-js so that MapLibre GL can fetch and render the data as your users interact with the map:
+You can find the full `index.html` code on [GitHub](https://github.com/bdon/supabase-vector-tile/blob/main/index.html). Here we'll highlight how to add a new protocol to MapLibreGL to fetch the bas64 encoded binary vector tile data via [supabase-js](/docs/reference/javascript/introduction) so that MapLibre GL can fetch and render the data as your users interact with the map:
 
 ```js index.html
 const client = supabase.createClient('your-supabase-api-url', 'your-supabase-anon-key')

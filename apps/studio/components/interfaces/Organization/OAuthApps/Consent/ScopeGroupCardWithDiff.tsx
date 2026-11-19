@@ -3,11 +3,10 @@ import { Button, Collapsible, CollapsibleContent, CollapsibleTrigger } from 'ui'
 
 import { getDiffBetweenScopes, ScopeGroupLevel } from './OAuthAppsAuthorizeScreen.utils'
 import { ScopeGroupCardItem, ScopePermissionLabel } from './ScopeGroupCardItem'
-import type { OAuthScope } from '@/data/oauth-apps/types'
 
 export interface ScopeGroupCardProps {
-  scopes: OAuthScope[]
-  previousScopes: OAuthScope[]
+  scopes: string[]
+  previousScopes: string[]
   databaseAccess?: 'read' | 'write'
   previousDatabaseAccess?: 'read' | 'write'
 }
