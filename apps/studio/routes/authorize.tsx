@@ -14,7 +14,7 @@ import { ApiAuthorizationScreen } from '@/components/interfaces/ApiAuthorization
 import { OAuthAppsAuthorizeScreen } from '@/components/interfaces/Organization/OAuthApps/Consent'
 import { OAUTH_APPS_MOCK_SCENARIOS, USE_MOCKS } from '@/data/oauth-apps/mocks'
 import { withAuth } from '@/hooks/misc/withAuth'
-import { IS_STAGING_OR_LOCAL } from '@/lib/constants'
+import { BASE_PATH, IS_STAGING_OR_LOCAL } from '@/lib/constants'
 import { buildStudioPageTitle } from '@/lib/page-title'
 
 export const Route = createFileRoute('/authorize')({
@@ -121,7 +121,7 @@ function APIAuthorizationPage() {
                     if (!preview) return
                     const search = new URLSearchParams({ mock_scenario: preview.value })
                     if (preview.project) search.set('project_ref', preview.project)
-                    void navigate({ href: `/authorize?${search}`, replace: true })
+                    void navigate({ href: `${BASE_PATH}/authorize?${search}`, replace: true })
                   }}
                 >
                   {CONSENT_PREVIEWS.map(({ value, label }) => (
