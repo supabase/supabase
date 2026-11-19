@@ -1,3 +1,4 @@
+import { escapeIlikeLiteral } from '../../../helpers'
 import { literal, safeSql, type SafeSqlFragment } from '../../../pg-format'
 
 export const getCronJobsMinimalSql = ({
@@ -10,7 +11,7 @@ export const getCronJobsMinimalSql = ({
   limit: number
 }): SafeSqlFragment => {
   const searchClause = searchTerm
-    ? safeSql`WHERE job.jobname ILIKE ${literal(`%${searchTerm}%`)}`
+    ? safeSql`WHERE job.jobname ILIKE ${literal(`%${escapeIlikeLiteral(searchTerm)}%`)}`
     : safeSql``
   return safeSql`
 SELECT
@@ -37,7 +38,7 @@ export const getCronJobsSql = ({
   limit: number
 }): SafeSqlFragment => {
   const searchClause = searchTerm
-    ? safeSql`WHERE job.jobname ILIKE ${literal(`%${searchTerm}%`)}`
+    ? safeSql`WHERE job.jobname ILIKE ${literal(`%${escapeIlikeLiteral(searchTerm)}%`)}`
     : safeSql``
   return safeSql`
 WITH latest_runs AS (
