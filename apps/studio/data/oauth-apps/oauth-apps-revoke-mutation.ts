@@ -1,7 +1,7 @@
 import { useMutation, useQueryClient } from '@tanstack/react-query'
 import { toast } from 'sonner'
 
-import { handleError, post } from '../fetchers'
+import { del, handleError } from '../fetchers'
 import { oauthAppsKeys } from './keys'
 import type { StudioError } from '@/lib/errors/studio-errors'
 import type { UseCustomMutationOptions } from '@/types'
@@ -14,26 +14,23 @@ export type OAuthAppRevokeVariables = {
 export async function revokeOAuthApp({ slug, appId }: OAuthAppRevokeVariables) {
   if (!slug) throw new Error('Organization slug is required')
   if (!appId) throw new Error('App id is required')
-  const { data, error } = await post('/platform/organizations/{slug}/oauth/apps/{id}/revoke', {
-    params: { path: { slug, id: appId } },
+  const { error } = await del('/platform/organizations/{slug}/oauth/approvals/{app_id}', {
+    params: { path: { slug, app_id: appId } },
   })
   if (error) handleError(error)
-  return data
 }
-
-export type OAuthAppRevokeData = Awaited<ReturnType<typeof revokeOAuthApp>>
 
 export const useOAuthAppRevokeMutation = ({
   onError,
   onSuccess,
   ...options
 }: Omit<
-  UseCustomMutationOptions<OAuthAppRevokeData, StudioError, OAuthAppRevokeVariables>,
+  UseCustomMutationOptions<void, StudioError, OAuthAppRevokeVariables>,
   'mutationFn'
 > = {}) => {
   const queryClient = useQueryClient()
 
-  return useMutation<OAuthAppRevokeData, StudioError, OAuthAppRevokeVariables>({
+  return useMutation<void, StudioError, OAuthAppRevokeVariables>({
     mutationFn: (vars) => revokeOAuthApp(vars),
     async onSuccess(data, variables, context) {
       // Revoking an app deletes every row for (app_id, organization_id), both kinds — the

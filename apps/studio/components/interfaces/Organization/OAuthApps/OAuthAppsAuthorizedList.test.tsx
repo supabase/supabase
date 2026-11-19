@@ -13,7 +13,6 @@ import {
   OAuthAppMemberGrant,
   OAuthAppMemberGrantsData,
 } from '@/data/oauth-apps/oauth-apps-member-grants-query'
-import { OAuthAppRevokeData } from '@/data/oauth-apps/oauth-apps-revoke-mutation'
 import { customRender } from '@/tests/lib/custom-render'
 import { addAPIMock } from '@/tests/lib/msw'
 
@@ -227,14 +226,9 @@ describe('OAuthAppsAuthorizedList', () => {
       response: () => HttpResponse.json<OAuthAppMemberGrantsData>(createMockMemberGrants()),
     })
     addAPIMock({
-      path: '/platform/organizations/:slug/oauth/apps/:id/revoke',
-      method: 'post',
-      response: () =>
-        HttpResponse.json<OAuthAppRevokeData>({
-          id: '',
-          name: '',
-          website: '',
-        }),
+      path: '/platform/organizations/:slug/oauth/approvals/:app_id',
+      method: 'delete',
+      response: () => new HttpResponse('', { status: 200 }),
     })
     customRender(<OAuthAppsAuthorizedList />)
 
