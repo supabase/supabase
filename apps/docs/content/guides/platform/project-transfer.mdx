@@ -366,11 +366,12 @@ You can't add an Owner from Supabase to an organization managed through the [Ver
 <TabPanel id="api" label="Management API">
 
 1. Create an [access token](/dashboard/account/tokens). For a scoped token, under **Resource access**, select **Organization**, choose the organization, and grant **Organization Members** with **Read-write** access and **Organization Settings** with **Read-write** access.
-2. Set the token and the organization's slug:
+2. Set the token, the organization's slug, and the recipient's email address:
 
    ```bash
    export SUPABASE_ACCESS_TOKEN="your-access-token"
    export ORG_SLUG="your-organization-slug"
+   export RECIPIENT_EMAIL="recipient@example.com"
    ```
 
 3. Make the recipient an Owner. Both of the following requests need the Team Plan or Enterprise Plan. On other plans, use the Dashboard for this step.
@@ -378,8 +379,6 @@ You can't add an Owner from Supabase to an organization managed through the [Ver
    If the recipient isn't a member of the organization, invite them with the [create organization invitations](/docs/reference/api/v2-create-organization-invitations) endpoint:
 
    ```bash
-   export RECIPIENT_EMAIL="recipient@example.com"
-
    curl -X POST "https://api.supabase.com/v2/organizations/$ORG_SLUG/members/invitations" \
      -H "Authorization: Bearer $SUPABASE_ACCESS_TOKEN" \
      -H "Content-Type: application/json" \
