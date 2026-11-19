@@ -17,6 +17,7 @@ const KEEPALIVE_ACTIONS = new Set<TelemetryEvent['action']>([
   'kb_search_closed',
   'agent_setup_clicked',
   'view_as_markdown_clicked',
+  'docs_layout_updated',
 ])
 
 let featureFlagProperties: Record<string, unknown> = {}

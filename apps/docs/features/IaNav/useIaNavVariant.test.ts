@@ -1,11 +1,12 @@
 // @vitest-environment jsdom
-import { renderHook } from '@testing-library/react'
+import { act, renderHook } from '@testing-library/react'
 import { posthogClient, useFeatureFlags, useSearchParamsShallow } from 'common'
 import { LOCAL_STORAGE_KEYS } from 'common/constants/local-storage'
 import { afterEach, beforeEach, describe, expect, it, vi } from 'vitest'
 
 import { IA_NAV_FLAG, IA_NAV_OVERRIDE_KEY } from './constants'
 import { IaNavRouteProvider } from './IaNavRouteProvider'
+import { setLayoutChoice } from './layoutChoice'
 import { useIaNavVariant } from './useIaNavVariant'
 
 vi.mock('common', () => ({
@@ -164,6 +165,50 @@ describe('useIaNavVariant', () => {
 
     expect(result.current).toBe('control')
     expect(localStorage.getItem(LOCAL_STORAGE_KEYS.IA_NAV_FLAG)).toBe('false')
+  })
+
+  it('keeps the layout the user picked over the flag, with no exposure', () => {
+    setLayoutChoice('control')
+
+    const { result } = renderVariant({ flagValue: 'option-1' })
+
+    expect(result.current).toBe('control')
+    expect(captureExposure).not.toHaveBeenCalled()
+  })
+
+  it('switches every reader when the user picks a layout', () => {
+    const { result } = renderVariant({ flagValue: 'control' })
+
+    act(() => setLayoutChoice('option-1'))
+
+    expect(result.current).toBe('option-1')
+  })
+
+  it('lets a picked layout replace a forced session variant', () => {
+    sessionStorage.setItem(IA_NAV_OVERRIDE_KEY, 'option-1')
+    setLayoutChoice('control')
+
+    const { result } = renderVariant({ flagValue: 'option-1' })
+
+    expect(result.current).toBe('control')
+  })
+
+  it('drops a session override when the user picks the layout already saved', () => {
+    setLayoutChoice('control')
+    sessionStorage.setItem(IA_NAV_OVERRIDE_KEY, 'option-1')
+    const { result } = renderVariant({ flagValue: 'control' })
+
+    act(() => setLayoutChoice('control'))
+
+    expect(result.current).toBe('control')
+  })
+
+  it('lets the url override win over the picked layout', () => {
+    setLayoutChoice('control')
+
+    const { result } = renderVariant({ flagValue: 'control', override: 'option-1' })
+
+    expect(result.current).toBe('option-1')
   })
 })
 
