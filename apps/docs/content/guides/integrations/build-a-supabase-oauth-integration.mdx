@@ -5,13 +5,15 @@ subtitle: "This guide steps through building a Supabase Integration using OAuth2
 description: 'Build a Supabase Integration using OAuth2 and the Management API.'
 ---
 
-Using OAuth2.0 you can retrieve an access and refresh token that grant your application full access to the [Management API](/docs/reference/api/introduction) on behalf of the user.
+Using OAuth2.0 you can retrieve an access and refresh token that grant your application access to the [Management API](/docs/reference/api/introduction) on behalf of the user.
 
 ## Create an OAuth app
 
 1. In your organization's settings, navigate to the [**OAuth Apps**](/dashboard/org/_/apps) tab.
 2. In the upper-right section of the page, click **Add application**.
 3. Fill in the required details and click **Confirm**.
+
+To limit what your app can access, turn on scoped access in your app's settings. Any member can then authorize your app with their own role, or people can choose which projects it can reach. For details, see [Scoped access for OAuth apps](/docs/guides/integrations/build-a-supabase-oauth-integration/scoped-access).
 
 ## Show a "Connect Supabase" button
 
@@ -32,6 +34,7 @@ Within your app's UI, redirect the user to [`https://api.supabase.com/v1/oauth/a
 - `response_type`: Set this to `code`.
 - `state`: Information about the state of your app. Note that `redirect_uri` and `state` together cannot exceed 4kB in size.
 - `organization_slug`: The slug of the organization you want to connect to. This is optional, but if provided, it will pre-select the organization for the user.
+- `project_ref`: The ref of a project to preselect on the consent screen. This is optional, and applies only if your app asks for specific projects.
 - [Recommended] PKCE: We strongly recommend using the PKCE flow for increased security. Generate a random value before taking the user to the authorize endpoint. This value is called code verifier. Hash it with SHA256 and include it as the `code_challenge` parameter, while setting `code_challenge_method` to `S256`. In the next step, you would need to provide the code verifier to get the first access and refresh token.
 - [Deprecated] `scope`: Scopes are configured when you create your OAuth app. Read the [docs](/docs/guides/integrations/build-a-supabase-oauth-integration/oauth-scopes) for more details.
 
@@ -58,6 +61,8 @@ Once the user consents to providing API access to your OAuth App, Supabase will 
 
 - `code`: An authorization code you should exchange with Supabase to get the access and refresh token.
 - `state`: The value you provided in the previous step, to help you associate the request with the user. The `state` property returned here should be compared to the `state` you sent previously.
+
+If the person cancels on the consent screen, the URL contains `error=access_denied` and your `state` instead of `code`.
 
 Exchange the authorization code for an access and refresh token by calling [`POST https://api.supabase.com/v1/oauth/token`](https://api.supabase.com/api/v1#tag/oauth/POST/v1/oauth/token) with the following query parameters as content-type `application/x-www-form-urlencoded`:
 
@@ -108,11 +113,15 @@ router.get('/connect-supabase/oauth2/callback', async (ctx) => {
 
 Find the full example on [GitHub](https://github.com/supabase/supabase/tree/master/examples/edge-functions/supabase/functions/connect-supabase).
 
+The token response includes `scope`, the scopes the grant includes, and `project_refs`, the projects it covers. `project_refs` is `null` when the grant covers every project in the organization. For how to use them, see [Update your app for scoped access](/docs/guides/integrations/build-a-supabase-oauth-integration/update-for-scoped-access#read-granted-projects-from-the-token-response).
+
 ## Refreshing an access token
 
 You can use the [`POST /v1/oauth/token`](https://api.supabase.com/api/v1#tag/oauth/POST/v1/oauth/token) endpoint to refresh an access token using the refresh token returned at the end of the previous section.
 
 If the user has revoked access to your application, you will not be able to refresh a token. Furthermore, access tokens will stop working. Make sure you handle HTTP Unauthorized errors when calling any Supabase API.
+
+If your app uses member permissions, refreshing also fails when the member who authorized your app leaves the organization.
 
 ## Calling the Management API
 

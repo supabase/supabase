@@ -41,3 +41,7 @@ You can update scopes of your OAuth app at any time, but existing OAuth app user
 | `Secrets`        | `Write` | Create or update a project's secrets<br/>Update a project's pgsodium configuration                                                                                                                                                                                                     |
 | `Storage`        | `Read`  | Retrieve a project's storage buckets.                                                                                                                                                                                                                                                  |
 |                  |
+
+## Scopes and member roles
+
+If your app uses [member permissions](/docs/guides/integrations/build-a-supabase-oauth-integration/scoped-access#member-permissions), a member can approve it only when their role covers every scope it requests. For the lowest role that can authorize each scope, see [Request only the scopes you need](/docs/guides/integrations/build-a-supabase-oauth-integration/update-for-scoped-access#request-only-the-scopes-you-need).
