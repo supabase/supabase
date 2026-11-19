@@ -87,7 +87,7 @@ const WarehouseMetricsReportContent = () => {
       enabled: isRangeOk,
     })
   )
-  const isFetching = useIsFetching({ queryKey: warehouseKeys.metricsAll(ref) }) > 0
+  const isFetching = useIsFetching({ queryKey: warehouseKeys.metrics(ref) }) > 0
 
   const handleRefresh = useRefreshHandler(
     datePickerValue,
@@ -95,7 +95,7 @@ const WarehouseMetricsReportContent = () => {
     handleDatePickerChange,
     async () => {
       await Promise.all([
-        queryClient.invalidateQueries({ queryKey: warehouseKeys.metricsAll(ref) }),
+        queryClient.invalidateQueries({ queryKey: warehouseKeys.metrics(ref) }),
         queryClient.invalidateQueries({ queryKey: warehouseKeys.setupStatus(ref) }),
       ])
     }
