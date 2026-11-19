@@ -170,6 +170,7 @@ export const UnifiedLogs = ({
   const [isFilterBarOpen, setIsFilterBarOpen] = useState(!isMobile)
   const [activeViewId, setActiveViewId] = useState<string | null>(null)
   const [isViewsSectionOpen, setIsViewsSectionOpen] = useState(false)
+  const [isMobileViewsDrawerOpen, setIsMobileViewsDrawerOpen] = useState(false)
   const [saveViewProjectRef, setSaveViewProjectRef] = useState<string | null>(null)
   const isSavingNewView = saveViewProjectRef !== null && saveViewProjectRef === projectRef
   const currentProjectRef = useRef(projectRef)
@@ -509,12 +510,11 @@ export const UnifiedLogs = ({
     !isSavingNewView &&
     updateSuggestionKey !== dismissedUpdateKey
   const canReviewChanges = showSavedViews && !!activeView && isActiveViewModified
-  // The popover anchors to the active row, so it can only show while the views
-  // section is the visible level of the sidebar.
+  // The popover anchors to the active row, so it can only show while that row is
+  // visible — either the desktop sidebar's Views section, or the mobile drawer.
   const isViewModifiedPopoverOpen =
-    isViewsSectionOpen &&
+    ((isViewsSectionOpen && isFilterBarOpen) || isMobileViewsDrawerOpen) &&
     isActiveViewRowMounted &&
-    isFilterBarOpen &&
     (isViewModifiedUnacknowledged || (isReviewingChanges && canReviewChanges))
 
   const handleApplyView = (view: LogsView) => {
@@ -837,7 +837,10 @@ export const UnifiedLogs = ({
                     <div className="flex items-center gap-x-1 sm:hidden">
                       <DataTableFilterControlsDrawer />
                       {showSavedViews && (
-                        <Drawer>
+                        <Drawer
+                          open={isMobileViewsDrawerOpen}
+                          onOpenChange={setIsMobileViewsDrawerOpen}
+                        >
                           <DrawerTrigger asChild>
                             <Button
                               size="tiny"
