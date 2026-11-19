@@ -1,0 +1,146 @@
+---
+title: 'Update your app for scoped access'
+subtitle: 'Store per-member connections, read granted projects, and handle new errors'
+description: 'Change how your OAuth integration stores connections, reads granted projects, and handles 403 errors before you turn on scoped access settings.'
+---
+
+Update your integration so it keeps working when you turn on scoped access. Each setting changes an assumption your code may rely on. To learn what each setting does, see [Scoped access for OAuth apps](/docs/guides/integrations/build-a-supabase-oauth-integration/scoped-access).
+
+- [Member permissions](#member-permissions) covers storing a connection per member and handling role changes. Start here if you plan to turn on **Use the permissions of the person who connects**.
+- [Project selection](#project-selection) covers reading granted projects and letting people add projects. Start here if you plan to turn on **Ask for specific projects**.
+
+## Member permissions
+
+### Store a connection per member
+
+Any member can authorize your app, and each authorization creates a separate grant. Key each stored connection by your user and the Supabase organization, so a second member's authorization doesn't overwrite the first.
+
+```sql
+create table supabase_connections (
+  user_id uuid not null references users (id),
+  organization_slug text not null,
+  access_token text not null,
+  refresh_token text not null,
+  primary key (user_id, organization_slug)
+);
+```
+
+### Request only the scopes you need
+
+A member can't approve your app when their role doesn't cover every scope it requests. The consent screen shows them a warning, and your app doesn't receive a redirect. Remove any scope your app doesn't use from your app's settings.
+
+The following table lists the lowest role that can authorize each scope. Higher roles can also authorize it. When the person selects specific projects, the consent screen checks their role on each selected project.
+
+| Scope                    | Lowest role   | Requests that return `403` for some roles                           |
+| ------------------------ | ------------- | ------------------------------------------------------------------- |
+| `analytics:read`         | Read-only     |                                                                     |
+| `analytics:write`        | Administrator |                                                                     |
+| `analytics_config:read`  | Developer     |                                                                     |
+| `analytics_config:write` | Administrator |                                                                     |
+| `auth:read`              | Read-only     |                                                                     |
+| `auth:write`             | Administrator |                                                                     |
+| `database:read`          | Read-only     |                                                                     |
+| `database:write`         | Developer     | Developers get `403` when they change database configuration.       |
+| `domains:read`           | Administrator |                                                                     |
+| `domains:write`          | Administrator |                                                                     |
+| `edge_functions:read`    | Read-only     |                                                                     |
+| `edge_functions:write`   | Developer     |                                                                     |
+| `environment:read`       | Read-only     |                                                                     |
+| `environment:write`      | Developer     | Developers get `403` when they create or delete a production branch. |
+| `organizations:read`     | Read-only     |                                                                     |
+| `projects:read`          | Read-only     |                                                                     |
+| `projects:write`         | Administrator | Administrators get `403` when they transfer a project.              |
+| `rest:read`              | Read-only     |                                                                     |
+| `rest:write`             | Administrator |                                                                     |
+| `secrets:read`           | Developer     |                                                                     |
+| `secrets:write`          | Administrator |                                                                     |
+| `storage:read`           | Read-only     |                                                                     |
+| `storage:write`          | Administrator |                                                                     |
+
+Some roles can authorize a scope even though they can't call every endpoint it covers. For example, Developers can authorize `database:write` so they can run SQL, but they get `403` when they change database configuration. The last column of the table lists these cases. They apply to every app, whether or not you turn on partial grants.
+
+If your app must work for members whose role can't grant some of its scopes, turn on partial grants. See [Handle scopes missing from the grant](#handle-scopes-missing-from-the-grant).
+
+### Handle scopes missing from the grant
+
+With [partial grants](/docs/guides/integrations/build-a-supabase-oauth-integration/scoped-access#partial-grants) turned on, a grant can include fewer scopes than your app requests. You can't turn on partial grants in the dashboard. Set `allow_partial_grants` to `true` when you create or update your app with the [Management API](/docs/reference/api/introduction).
+
+Compare the `scope` field in the token response with the scopes your app needs, and hide or disable features that need a missing scope.
+
+```ts
+const granted = new Set(tokens.scope.split(' '))
+const canManageProjects = granted.has('projects:write')
+```
+
+Don't call endpoints that need a missing scope. They return `403 Forbidden`, and the person can't fix that from your app.
+
+### Handle role changes and removed members
+
+The token has the access of the member's current role. Handle these responses on every Management API call:
+
+| Response                              | Cause                                                       | What to do                                                           |
+| ------------------------------------- | ----------------------------------------------------------- | -------------------------------------------------------------------- |
+| `403 Forbidden`                       | The member's role no longer covers the request.             | Show a message that names the missing access. Offer to re-authorize. |
+| `401 Unauthorized`, or refresh fails  | The member left the organization, or the grant was revoked. | Delete the stored connection and ask the person to connect again.    |
+
+## Project selection
+
+### Read granted projects from the token response
+
+The person can choose **All current and future projects** or select specific projects, so your app can receive either kind of grant. Read the token response rather than assuming access to every project.
+
+The token response always includes `project_refs`. When the person selects specific projects, it lists them:
+
+```json
+{
+  "access_token": "<access_token>",
+  "refresh_token": "<refresh_token>",
+  "token_type": "Bearer",
+  "expires_in": 86400,
+  "scope": "projects:read database:write",
+  "project_refs": ["abcdefghijklmnopqrst", "tsrqponmlkjihgfedcba"]
+}
+```
+
+When the grant covers every project, `project_refs` is `null`. This happens when the person chooses **All current and future projects**, and for apps that don't ask for specific projects. Treat the grant as covering every project in the organization, including projects created later.
+
+Store `project_refs` with the connection, or record that the grant covers all projects:
+
+```ts
+const grant =
+  tokens.project_refs === null
+    ? { kind: 'all' }
+    : { kind: 'specific', projectRefs: tokens.project_refs }
+```
+
+For a specific-project grant, only call project endpoints for the stored refs. `GET /v1/projects` returns only the granted projects for either kind of grant, so you can also use it to list what your app can reach.
+
+### Preselect a project
+
+If a person starts the connection from a specific project, pass its ref as `project_ref` when you [redirect to the authorize URL](/docs/guides/integrations/build-a-supabase-oauth-integration#redirecting-to-the-authorize-url). The consent screen selects that project for them. You can pass `organization_slug` as well to preselect the organization.
+
+```ts
+const url = new URL('https://api.supabase.com/v1/oauth/authorize')
+url.searchParams.set('client_id', clientId)
+url.searchParams.set('redirect_uri', redirectUri)
+url.searchParams.set('response_type', 'code')
+url.searchParams.set('project_ref', 'abcdefghijklmnopqrst')
+```
+
+### Let people add projects
+
+For a specific-project grant, projects created after authorization aren't part of the grant. To add a project, send the person through authorization again. The consent screen starts with their current selection, and the person can add projects or switch to **All current and future projects**.
+
+The new selection replaces the old one. If the person deselects a project, your app loses access to it. After re-authorization, replace the stored grant with the one from the new token response.
+
+### Handle a project your app can't reach
+
+For a specific-project grant, a request for a project outside the grant returns `403 Forbidden`. When your app references a project that's missing from `project_refs`, show it as not connected and offer to re-authorize.
+
+## Handle a canceled authorization
+
+If the person cancels on the consent screen, Supabase redirects to your redirect URL with `error=access_denied` and the `state` you sent. Show the person that the connection wasn't made and let them try again.
+
+## Next steps
+
+Before you turn on a setting for your production app, run through the scenarios in [Test scoped access on a staging app](/docs/guides/integrations/build-a-supabase-oauth-integration/test-scoped-access).

@@ -1,0 +1,42 @@
+---
+title: 'Manage OAuth app access'
+subtitle: 'Control which OAuth apps can reach the projects in your organization'
+description: 'See which OAuth apps members have authorized, which projects each grant covers, and revoke access for one member or the whole organization.'
+---
+
+Review the OAuth apps authorized in your organization and revoke access you no longer want. Some apps let any member authorize them with that member's own permissions, so one app can have several grants in your organization.
+
+## Authorization emails
+
+When a member authorizes an app that uses member permissions, organization Owners and Administrators receive an email. The email names the app and the member. The app can access only what that member's role allows. If the app asks for specific projects, it can access only the projects the member chose.
+
+To review or revoke the grant, follow the steps in [Review authorized apps](#review-authorized-apps).
+
+## Review authorized apps
+
+1. In your organization's settings, go to the **OAuth Apps** tab.
+2. Under **Authorized apps**, find the app.
+3. Open the app's menu and select **View grants**.
+
+Each grant shows the member who authorized the app and the projects it covers, either all current and future projects or a list of specific projects.
+
+## Revoke an app for the organization
+
+Revoking an app ends every grant for it in your organization, including grants created by individual members. The app's tokens stop working immediately.
+
+1. In your organization's settings, go to the **OAuth Apps** tab.
+2. Under **Authorized apps**, find the app.
+3. Open the app's menu and select **Revoke**.
+4. Confirm the revocation.
+
+## Revoke your own grant
+
+Any member can review and revoke the apps they authorized.
+
+1. Go to your account settings.
+2. Open the **OAuth Apps** tab.
+3. Find the app and click **Revoke**.
+
+## When a grant ends on its own
+
+A grant tied to a member ends when that member leaves the organization. If an administrator lowers the member's role, the app keeps the grant but loses any access the new role doesn't cover.
