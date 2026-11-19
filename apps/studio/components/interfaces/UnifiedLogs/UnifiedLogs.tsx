@@ -161,6 +161,10 @@ export const UnifiedLogs = ({
   const [isFilterBarOpen, setIsFilterBarOpen] = useState(!isMobile)
   const [activeViewId, setActiveViewId] = useState<string | null>(null)
   const [isViewsSectionOpen, setIsViewsSectionOpen] = useState(false)
+  const [isViewsSectionReady, setIsViewsSectionReady] = useState(false)
+  useEffect(() => {
+    setIsViewsSectionReady(isViewsSectionOpen)
+  }, [isViewsSectionOpen])
   const [saveViewProjectRef, setSaveViewProjectRef] = useState<string | null>(null)
   const isSavingNewView = saveViewProjectRef !== null && saveViewProjectRef === projectRef
   const currentProjectRef = useRef(projectRef)
@@ -499,6 +503,7 @@ export const UnifiedLogs = ({
   // section is the visible level of the sidebar.
   const isViewModifiedPopoverOpen =
     isViewsSectionOpen &&
+    isViewsSectionReady &&
     isFilterBarOpen &&
     (isViewModifiedUnacknowledged || (isReviewingChanges && canReviewChanges))
 
