@@ -38,7 +38,7 @@ You do not need any other Supabase product to use the database. Auth, Storage, R
 
 ## Links
 
-- Documentation: https://supabase.com/docs/guides/database
+- Documentation: https://supabase.com/docs/guides/database/overview
 - Connect to your database: https://supabase.com/docs/guides/database/connecting-to-postgres
 - Pricing: https://supabase.com/pricing.md
 - API Reference: https://supabase.com/docs/reference/javascript/select

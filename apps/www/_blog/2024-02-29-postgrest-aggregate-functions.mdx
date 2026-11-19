@@ -18,7 +18,7 @@ As a bit of background, aggregate functions are a database feature that allow yo
 
 In this post, we’ll go through a few examples of some of the neat things you can do with this new feature. We’ll also discuss the importance of ensuring you have the appropriate safeguards in place to prevent potential performance issues that may arise when using aggregate functions.
 
-For the most complete information, please be sure to refer to [the section on aggregate functions in the documentation](https://postgrest.org/en/v12.0/references/api/aggregate_functions.html).
+For the most complete information, please be sure to refer to [the section on aggregate functions in the documentation](https://docs.postgrest.org/en/v12/references/api/aggregate_functions.html).
 
 ## The Basics of Aggregate Functions
 
@@ -94,7 +94,7 @@ Generally speaking, aggregate functions can be used with other PostgREST feature
 
 ## Aggregate Functions and Embedded Resources
 
-Aggregate functions also play nicely with [embedded resources](https://postgrest.org/en/stable/references/api/resource_embedding.html), opening up a world of potential use cases.
+Aggregate functions also play nicely with [embedded resources](https://docs.postgrest.org/en/stable/references/api/resource_embedding.html), opening up a world of potential use cases.
 
 Building on the previous examples, let’s say that we have a table called `directors` that has a **one-to-many relationship** with our `movies` table from before. We’ll be using a couple of columns from the `directors` table in this section: `name` and `country`.
 
