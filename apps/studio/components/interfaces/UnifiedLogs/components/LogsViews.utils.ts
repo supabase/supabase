@@ -14,10 +14,6 @@ export const truncateViewName = (name: string): string =>
     ? name
     : `${name.slice(0, MAX_VIEW_NAME_IN_COPY - 1).trimEnd()}…`
 
-// Order-independent so two filter sets with the same conditions in a different
-// order count as "the same combination" for dismissal purposes. JSON-encoded
-// rather than delimiter-joined since filter values are free text and can
-// contain the delimiter itself (e.g. an ILIKE search for "a|b").
 export const getFilterCombinationKey = (filter: string[] | null | undefined): string => {
   if (!filter || filter.length === 0) return ''
   return JSON.stringify([...filter].sort())

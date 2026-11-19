@@ -269,8 +269,6 @@ describe('LogsViewsPanel', () => {
     const onSubmitSave = vi.fn().mockResolvedValue(undefined)
     customRender(<LogsViewsPanel {...baseProps} isSaving onSubmitSave={onSubmitSave} />)
 
-    // `fireEvent` rather than `userEvent`: jsdom only runs the submit default
-    // action for the former, so a submit button click is otherwise swallowed.
     fireEvent.change(await screen.findByPlaceholderText('Enter a name for this view'), {
       target: { value: '  Slow requests  ' },
     })

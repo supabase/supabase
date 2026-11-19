@@ -26,7 +26,6 @@ interface ViewNameDialogProps {
   open: boolean
   title: string
   confirmLabel: string
-  /** Pre-fills the input. Callers decide whether an unchanged name is a no-op. */
   initialName?: string
   existingNames?: string[]
   discardDescription: string
@@ -83,9 +82,7 @@ export const ViewNameDialog = ({
     try {
       await onSubmit(nextName)
       onCancel()
-    } catch {
-      // Leave the dialog open with the name intact so the user can retry.
-    }
+    } catch {}
   }
 
   return (

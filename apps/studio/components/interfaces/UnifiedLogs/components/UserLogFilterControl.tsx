@@ -40,9 +40,6 @@ export const UserLogFilterControl = () => {
     [data?.pages]
   )
 
-  // Only one user can be filtered on at a time — keep the current selection visible (and
-  // checked) even if it falls outside the current search results, e.g. right after loading
-  // from a deep link.
   const options: UserOption[] =
     user && !results.some((u) => u.id === user) ? [{ id: user, email: null }, ...results] : results
 

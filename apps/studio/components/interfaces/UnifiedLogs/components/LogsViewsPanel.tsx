@@ -29,7 +29,6 @@ interface LogsViewRowProps {
   isModified: boolean
   canUpdate: boolean
   canDelete: boolean
-  /** Presets are read-only: they can be duplicated, but not renamed or deleted. */
   isPreset?: boolean
   description?: string
   canCreate?: boolean
@@ -57,8 +56,6 @@ const LogsViewRow = ({
   onRequestDelete,
   onRequestDuplicate,
 }: LogsViewRowProps) => {
-  // Re-applying a modified view would silently throw the edits away, so the row
-  // offers the update/save/reset choices instead while it reads as modified.
   const isModifiedActive = isActive && isModified
 
   return (
@@ -150,7 +147,6 @@ interface LogsViewsPanelProps {
   activeRowRef?: Ref<HTMLDivElement>
   onRetry?: () => void
   onApply: (view: LogsView) => void
-  /** Clicking the active view while it reads as modified. */
   onReviewChanges: () => void
   onRename: (id: string, name: string) => Promise<void>
   onDelete: (id: string) => Promise<void>
@@ -188,7 +184,6 @@ export const LogsViewsPanel = ({
   const matches = (view: LogsView) => view.name.toLowerCase().includes(search.trim().toLowerCase())
   const matchingPresets = PRESET_VIEWS.filter(matches)
   const matchingViews = views.filter(matches)
-  // Presets are included so a saved view can't shadow a preset's name.
   const existingNames = [...PRESET_VIEWS, ...views].map((view) => view.name)
   const hasNoMatches = matchingPresets.length === 0 && matchingViews.length === 0
 

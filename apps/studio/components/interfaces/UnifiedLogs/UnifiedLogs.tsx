@@ -147,7 +147,6 @@ export const UnifiedLogs = ({
   const [search, setSearch] = useQueryStates(SEARCH_PARAMS_PARSER)
   const showMultigresLogs = useShowMultigresLogs()
   const { showPipelinesLogs, isLoading: isLoadingPipelinesLogs } = useShowPipelinesLogs()
-  // Keep linked Pipelines filters until replication sources load.
   const canShowPipelinesLogs = showPipelinesLogs || isLoadingPipelinesLogs
   const { hasLoaded: flagsLoaded } = useFeatureFlags()
   const computeEnabled = useFlag('compute')
@@ -179,10 +178,6 @@ export const UnifiedLogs = ({
   const [isReviewingChanges, setIsReviewingChanges] = useState(false)
   const activeViewRowRef = useRef<HTMLDivElement | null>(null)
   const [isActiveViewRowMounted, setIsActiveViewRowMounted] = useState(false)
-  // The sidebar and mobile drawer each mount their own LogsViewsPanel instance,
-  // so each gets its own registration slot — otherwise one surface detaching
-  // its row (e.g. the drawer closing) can clear the anchor for a row that's
-  // still mounted on the other surface.
   const sidebarActiveViewRowRef = useRef<HTMLDivElement | null>(null)
   const mobileActiveViewRowRef = useRef<HTMLDivElement | null>(null)
   const syncActiveViewRow = useCallback(() => {
@@ -255,8 +250,6 @@ export const UnifiedLogs = ({
   const { columnVisibility, setColumnVisibility, columnOrder, setColumnOrder } =
     useLogsTableColumns(columnPreferencesKey)
 
-  // Create a stable query key object by removing nulls/undefined, id, and live
-  // Mainly to prevent the react queries from unnecessarily re-fetching
   const queryLogTypeVisibility = useMemo(
     () =>
       getLogTypeVisibility(
@@ -352,7 +345,6 @@ export const UnifiedLogs = ({
 
   const isRefetchingData = isFetching || isFetchingCounts || isFetchingCharts
 
-  // Only fade when filtering (not when loading more data or live mode)
   const isFetchingButNotPaginating = isFetching && !isFetchingNextPage && !isFetchingPreviousPage
 
   const flatData: ColumnSchema[] = useMemo(
@@ -384,7 +376,6 @@ export const UnifiedLogs = ({
   const facets = counts?.facets
   const totalFetched = flatData?.length
 
-  // Create a filtered version of the chart config based on level filters in the URL.
   const filteredChartConfig = useMemo(() => {
     const levelFilters = parseLogsFilterUrlParams(search.filter).filter((f) => f.column === 'level')
     const included = levelFilters.filter((f) => f.operator === '=').map((f) => f.value)
@@ -405,7 +396,6 @@ export const UnifiedLogs = ({
   const getRowClassName = (row: Row<ColumnSchema>) =>
     getLogRowClassName(row.original, liveMode.timestamp)
 
-  // Generate dynamic columns based on current data
   const { columns: dynamicColumns, columnVisibility: dynamicColumnVisibility } = useMemo(() => {
     return generateDynamicColumns({ data: tableData })
   }, [tableData])
@@ -456,8 +446,6 @@ export const UnifiedLogs = ({
     else clearSelection()
   }
 
-  // Will need to refactor this bit
-  // - Each facet just handles its own state, rather than getting passed down like this
   const filterFields = useMemo(() => {
     const canFilterByPipeline = queryLogTypeVisibility.pipelines !== false
     const gatedFields = gateLogTypeOptions(
@@ -483,10 +471,8 @@ export const UnifiedLogs = ({
       }
       const facetsField = facets?.[field.value]
 
-      // If no facets data available, use the predefined field
       if (!facetsField) return field
 
-      // For hardcoded enum fields, keep the predefined options (facets only used for counts)
       if (field.value === 'log_type' || field.value === 'method' || field.value === 'level') {
         const fieldWithCounts = {
           ...field,
@@ -497,7 +483,6 @@ export const UnifiedLogs = ({
         return fieldWithCounts
       }
 
-      // For dynamic fields, use faceted options
       const options: Option[] = facetsField.rows.map(({ value, total }) => ({
         label: `${value}`,
         value,
@@ -512,8 +497,6 @@ export const UnifiedLogs = ({
     () => new Set(filterFields.map((field) => field.value)),
     [filterFields]
   )
-  // Presets are resolved alongside saved views so applying one still tracks as
-  // the active view, even though it never exists in the content API.
   const activeView =
     [...PRESET_VIEWS, ...savedViews].find((view) => view.id === activeViewId) ?? null
   const isActiveViewPreset = isPresetViewId(activeViewId)
@@ -521,8 +504,6 @@ export const UnifiedLogs = ({
   const activeFilterCount = parseLogsFilterUrlParams(search.filter).length
   const logSource = getLogAttributeSources(searchParameters)[0] ?? 'edge_logs'
   const filterCombinationKey = getFilterCombinationKey(search.filter)
-  // Keyed by view + filter combination so dismissing re-shows if the user modifies
-  // the view differently afterwards, and automatically "resets" once unmodified.
   const updateSuggestionKey = activeView ? `${activeView.id}:${filterCombinationKey}` : null
   const isViewModifiedUnacknowledged =
     showSavedViews &&
@@ -531,8 +512,6 @@ export const UnifiedLogs = ({
     !isSavingNewView &&
     updateSuggestionKey !== dismissedUpdateKey
   const canReviewChanges = showSavedViews && !!activeView && isActiveViewModified
-  // The popover anchors to the active row, so it can only show while that row is
-  // visible — either the desktop sidebar's Views section, or the mobile drawer.
   const isViewModifiedPopoverOpen =
     ((isViewsSectionOpen && isFilterBarOpen) || isMobileViewsDrawerOpen) &&
     isActiveViewRowMounted &&
@@ -581,15 +560,11 @@ export const UnifiedLogs = ({
     handleApplyView(activeView)
   }
 
-  // Clearing the dismissal means the prompt is available again for this view +
-  // filter combination, including after leaving and re-entering the section.
   const handleReviewChanges = () => {
     setDismissedUpdateKey(null)
     setIsReviewingChanges(true)
   }
 
-  // The reset button clears the filters a view applied, so the view is no longer
-  // the thing on screen — drop it along with any pending modified-state prompts.
   const handleClearActiveView = () => {
     setActiveViewId(null)
     setIsReviewingChanges(false)
@@ -654,7 +629,6 @@ export const UnifiedLogs = ({
     if (missingSelectedId && (!selectedLogQuery.isSuccess || isPlaceholderData)) return
 
     if (openRowId && !selectedRow) {
-      // Clear both uuid and logId when the open row no longer exists in data
       setSearch({ id: null })
       setOpenRowId(undefined)
     } else if (openRowId && selectedRow) {
@@ -662,7 +636,6 @@ export const UnifiedLogs = ({
       const logType = LOG_TYPES.find((type) => type === selectedRow.original.log_type)
       if (logType) track('unified_logs_row_clicked', { logType })
     } else if (!openRowId && search.id) {
-      // Clear the URL parameter when no row is open
       setSearch({ id: null })
       if (missingSelectedId) clearSelection()
     }
