@@ -174,10 +174,6 @@ const footerData = [
         text: 'Open Source',
         url: '/open-source',
       },
-      {
-        text: 'DevTo',
-        url: 'https://dev.to/supabase',
-      },
     ],
   },
   {
