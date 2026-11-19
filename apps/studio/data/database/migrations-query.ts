@@ -1,4 +1,4 @@
-import { getMigrationsSql } from '@supabase/pg-meta'
+import { getMigrationsSql, queryIntent } from '@supabase/pg-meta'
 import { useQuery } from '@tanstack/react-query'
 
 import { databaseKeys } from './keys'
@@ -32,6 +32,7 @@ export async function getMigrations(
         projectRef,
         connectionString,
         sql,
+        intent: queryIntent('migrations.list', {}),
         sqlOrigin: 'studio',
         queryName: 'migrations',
         queryKey: ['migrations'],

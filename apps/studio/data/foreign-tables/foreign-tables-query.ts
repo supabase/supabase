@@ -18,13 +18,15 @@ export async function getForeignTables(
   { projectRef, connectionString, schemas }: ForeignTablesVariables,
   signal?: AbortSignal
 ) {
+  const { sql, intent } = pgMeta.foreignTables.list({ includedSchemas: schemas })
   const { result } = await executeSql(
     {
       projectRef,
       connectionString,
       sqlOrigin: 'studio',
       queryName: 'foreign-tables',
-      sql: pgMeta.foreignTables.list({ includedSchemas: schemas }).sql,
+      sql,
+      intent,
       queryKey: ['foreign-tables', schemas].filter(Boolean),
       grant: unguarded.migrating,
     },

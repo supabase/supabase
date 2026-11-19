@@ -23,7 +23,7 @@ export async function getDatabasePolicies(
 ) {
   if (!projectRef) throw new Error('projectRef is required')
 
-  const { sql } = pgMeta.policies.list({ includedSchemas: schemas })
+  const { sql, intent } = pgMeta.policies.list({ includedSchemas: schemas })
   const { result } = await executeSql(
     {
       projectRef,
@@ -31,6 +31,7 @@ export async function getDatabasePolicies(
       sqlOrigin: 'studio',
       queryName: 'policies',
       sql,
+      intent,
       queryKey: ['policies', schemas],
       grant: unguarded.migrating,
     },

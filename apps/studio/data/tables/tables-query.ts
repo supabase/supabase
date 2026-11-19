@@ -1,4 +1,4 @@
-import pgMeta, { getTablesPaginatedSql, type PGTable } from '@supabase/pg-meta'
+import pgMeta, { getTablesPaginatedSql, queryIntent, type PGTable } from '@supabase/pg-meta'
 import { InfiniteData, useInfiniteQuery, useQuery, useQueryClient } from '@tanstack/react-query'
 import { sortBy } from 'lodash'
 import { useCallback } from 'react'
@@ -34,10 +34,10 @@ export async function getTables(
   signal?: AbortSignal
 ) {
   if (!projectRef) throw new Error('projectRef is required')
-  const sql = pgMeta.tables.list({
+  const { sql, intent } = pgMeta.tables.list({
     includeColumns,
     includedSchemas: schema ? [schema] : undefined,
-  }).sql
+  })
   const queryKey = ['tables', schema]
 
   const { result } = await executeSql(
@@ -45,6 +45,7 @@ export async function getTables(
       projectRef,
       connectionString,
       sql,
+      intent,
       sqlOrigin: 'studio',
       queryName: 'tables',
       queryKey,
@@ -142,7 +143,8 @@ export async function getTablesPage(
     throw new Error('projectRef is required')
   }
 
-  const sql = getTablesPaginatedSql({ schema, includeColumns, limit, afterOid, nameFilter })
+  const args = { schema, includeColumns, limit, afterOid, nameFilter }
+  const sql = getTablesPaginatedSql(args)
 
   const { result } = await executeSql(
     {
@@ -151,6 +153,7 @@ export async function getTablesPage(
       sqlOrigin: 'studio',
       queryName: 'tables-infinite',
       sql,
+      intent: queryIntent('tables.paginated', args),
       queryKey: [
         `project:${projectRef}`,
         `schema:${schema}`,

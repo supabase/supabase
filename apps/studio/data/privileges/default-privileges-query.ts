@@ -1,4 +1,4 @@
-import { getDefaultPrivilegesStateSql } from '@supabase/pg-meta'
+import { getDefaultPrivilegesStateSql, queryIntent } from '@supabase/pg-meta'
 import { queryOptions } from '@tanstack/react-query'
 
 import { privilegeKeys } from './keys'
@@ -27,6 +27,7 @@ export async function getDefaultPrivilegesState(
       sqlOrigin: 'studio',
       queryName: 'default-privileges-state',
       sql,
+      intent: queryIntent('default-privileges.state', { schema }),
       queryKey: ['default-privileges-state'],
       grant: unguarded.migrating,
     },

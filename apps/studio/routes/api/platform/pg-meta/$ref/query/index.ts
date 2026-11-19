@@ -5,6 +5,7 @@ import { toWebHandler } from '@/compat/next/api'
 import { constructHeaders } from '@/lib/api/apiHelpers'
 import { apiWrapper } from '@/lib/api/apiWrapper'
 import { executeQuery } from '@/lib/api/self-hosted/query'
+import { answerSparkIntent, SparkQueryError } from '@/lib/api/self-hosted/spark'
 import { PgMetaDatabaseError } from '@/lib/api/self-hosted/types'
 
 const nextHandler = (req: NextApiRequest, res: NextApiResponse) =>
@@ -24,6 +25,18 @@ async function handler(req: NextApiRequest, res: NextApiResponse) {
 
 const handlePost = async (req: NextApiRequest, res: NextApiResponse) => {
   const { query } = req.body
+
+  // TEMPORARY: a local Spark project answers Studio's catalog intents from its schema description
+  // until Spark's pg_catalog runs pg-meta's SQL; everything else goes to pg-meta below.
+  try {
+    const answered = await answerSparkIntent(req.body)
+    if (answered !== undefined) return res.status(200).json(answered)
+  } catch (error) {
+    const statusCode = error instanceof SparkQueryError ? error.statusCode : 500
+    const message = error instanceof Error ? error.message : String(error)
+    return res.status(statusCode).json({ message, formattedError: message })
+  }
+
   const headers = constructHeaders(req.headers)
   const { data, error } = await executeQuery({ query, headers })
 

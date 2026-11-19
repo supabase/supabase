@@ -19,7 +19,7 @@ export async function getViews(
 ) {
   if (!projectRef) throw new Error('projectRef is required')
 
-  const { sql } = pgMeta.views.list({ includedSchemas: schemas })
+  const { sql, intent } = pgMeta.views.list({ includedSchemas: schemas })
   const { result } = await executeSql(
     {
       projectRef,
@@ -27,6 +27,7 @@ export async function getViews(
       sqlOrigin: 'studio',
       queryName: 'views',
       sql,
+      intent,
       queryKey: ['views', schemas].filter(Boolean),
       grant: unguarded.migrating,
     },

@@ -60,6 +60,7 @@ import { useVisibleKey } from '@/hooks/ui/useVisibleKey'
 import { type ApiPrivilegesByRole } from '@/lib/data-api-types'
 import { isObjectContainingKeys } from '@/lib/helpers'
 import type { SafePostgresTable } from '@/lib/postgres-types'
+import { isSparkProject } from '@/lib/spark-project'
 import { useTrack } from '@/lib/telemetry/track'
 import type { DeepReadonly, Prettify } from '@/lib/type-helpers'
 import { useGetImpersonatedRoleState } from '@/state/role-impersonation-state'
@@ -555,6 +556,8 @@ export const SidePanelEditor = ({
     privileges: DeepReadonly<ApiPrivilegesByRole>
   ) => {
     if (!project) return console.error('Project is required')
+    // Spark gives the API roles their grants on a new table and cannot run the grant DO loop.
+    if (isSparkProject(project)) return
 
     try {
       await updateApiPrivileges({

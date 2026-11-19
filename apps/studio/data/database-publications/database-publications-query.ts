@@ -19,7 +19,7 @@ export async function getDatabasePublications(
 ) {
   if (!projectRef) throw new Error('projectRef is required')
 
-  const { sql } = pgMeta.publications.list()
+  const { sql, intent } = pgMeta.publications.list()
   const { result } = await executeSql(
     {
       projectRef,
@@ -27,6 +27,7 @@ export async function getDatabasePublications(
       sqlOrigin: 'studio',
       queryName: 'publications',
       sql,
+      intent,
       queryKey: ['publications'].filter(Boolean),
       grant: unguarded.migrating,
     },

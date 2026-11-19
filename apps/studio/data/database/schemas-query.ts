@@ -32,6 +32,7 @@ export async function getSchemas(
       sqlOrigin: 'studio',
       queryName: 'schemas',
       sql: pgMetaSchemasList.sql,
+      intent: pgMetaSchemasList.intent,
       queryKey: ['schemas'],
       grant: unguarded.migrating,
     },

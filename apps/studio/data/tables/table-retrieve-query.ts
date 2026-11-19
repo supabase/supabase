@@ -20,7 +20,7 @@ export async function getTable(
   { projectRef, connectionString, name, schema }: TablesVariables,
   signal?: AbortSignal
 ): Promise<SafePostgresTable> {
-  const { sql, zod } = pgMeta.tables.retrieve({ name, schema })
+  const { sql, zod, intent } = pgMeta.tables.retrieve({ name, schema })
 
   const { result } = await executeSql(
     {
@@ -29,6 +29,7 @@ export async function getTable(
       sqlOrigin: 'studio',
       queryName: 'table-retrieve',
       sql,
+      intent,
       queryKey: tableKeys.retrieve(projectRef, name, schema),
       grant: unguarded.migrating,
     },

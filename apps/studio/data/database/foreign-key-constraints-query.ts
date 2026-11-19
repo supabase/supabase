@@ -1,4 +1,4 @@
-import { getForeignKeyConstraintsSql } from '@supabase/pg-meta'
+import { getForeignKeyConstraintsSql, queryIntent } from '@supabase/pg-meta'
 import { QueryClient, useQuery } from '@tanstack/react-query'
 import { IS_PLATFORM } from 'common'
 
@@ -63,6 +63,7 @@ export async function getForeignKeyConstraints(
       sqlOrigin: 'studio',
       queryName: 'foreign-key-constraints',
       sql,
+      intent: queryIntent('foreign-keys.list', { schema }),
       queryKey: ['foreign-key-constraints', schema],
       grant: unguarded.migrating,
     },

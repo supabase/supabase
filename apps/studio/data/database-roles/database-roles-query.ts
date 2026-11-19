@@ -28,6 +28,7 @@ export async function getDatabaseRoles(
       sqlOrigin: 'studio',
       queryName: 'database-roles',
       sql: pgMetaRolesList.sql,
+      intent: pgMetaRolesList.intent,
       queryKey: ['database-roles'],
       grant: unguarded.migrating,
     },

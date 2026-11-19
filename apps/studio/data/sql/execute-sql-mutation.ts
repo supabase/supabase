@@ -1,6 +1,7 @@
 import {
   ROLE_IMPERSONATION_NO_RESULTS,
   ROLE_IMPERSONATION_SQL_LINE_COUNT,
+  type QueryIntent,
   type SafeSqlFragment,
   type WriteSqlFragment,
 } from '@supabase/pg-meta'
@@ -93,6 +94,12 @@ type BaseVariables = SqlSource & {
    * Intended to be used for interfaces that heavily rely on queries on the DB
    * */
   preflightCheck?: boolean
+  /**
+   * Which question `sql` answers, from the pg-meta builder that built it. Sent next to the SQL;
+   * Postgres runs the SQL and ignores it. Leave it out when `sql` is wrapped (role impersonation)
+   * or edited after the builder, since the intent would no longer describe it.
+   */
+  intent?: QueryIntent
 }
 
 /** Read SQL runs with a read grant or a write grant. */
@@ -149,6 +156,7 @@ export async function executeSql<T = any>(
     isRoleImpersonationEnabled = false,
     isStatementTimeoutDisabled = false,
     preflightCheck = false,
+    intent,
   }: ReadSqlVariables | WriteSqlVariables,
   signal?: AbortSignal,
   headersInit?: HeadersInit,
@@ -205,6 +213,7 @@ export async function executeSql<T = any>(
         body: {
           query: `explain ${sql}`,
           disable_statement_timeout: isStatementTimeoutDisabled,
+          ...(intent && { intent: 'explain', args: { intent: intent.id } }),
         },
         params: {
           ...options.params,
@@ -229,7 +238,11 @@ export async function executeSql<T = any>(
       queryKey?.filter((seg) => typeof seg === 'string' || typeof seg === 'number').join('-') ?? ''
     const result = await post(QUERY_SOURCE_REGISTRY.database.endpoint, {
       ...options,
-      body: { query: sql, disable_statement_timeout: isStatementTimeoutDisabled },
+      body: {
+        query: sql,
+        disable_statement_timeout: isStatementTimeoutDisabled,
+        ...(intent && { intent: intent.id, args: intent.args }),
+      },
       params: {
         ...options.params,
         // @ts-expect-error: This is just a client side thing to identify queries better

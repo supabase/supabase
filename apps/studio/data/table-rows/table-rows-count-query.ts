@@ -1,4 +1,4 @@
-import { getTableRowsCountSql } from '@supabase/pg-meta'
+import { getTableRowsCountSql, queryIntent } from '@supabase/pg-meta'
 import { formatPatternMatchFilterValue } from '@supabase/pg-meta/src/query/table-row-query'
 import { QueryClient, useQuery, useQueryClient } from '@tanstack/react-query'
 import { IS_PLATFORM } from 'common'
@@ -84,6 +84,13 @@ export async function getTableRowsCount(
       queryName: 'table-rows-count',
       isUserFaultSqlState: filters?.length ? isUserFaultForValues : undefined,
       sql,
+      intent: isRoleImpersonationEnabled(roleImpersonationState?.role)
+        ? undefined
+        : queryIntent('rows.count', {
+            schema: entity.schema,
+            name: entity.name,
+            filters: formattedFilters,
+          }),
       queryKey: ['table-rows-count', table.id],
       isRoleImpersonationEnabled: isRoleImpersonationEnabled(roleImpersonationState?.role),
       grant: unguarded.migrating,

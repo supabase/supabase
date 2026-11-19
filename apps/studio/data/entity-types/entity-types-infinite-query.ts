@@ -1,4 +1,4 @@
-import { getEntityTypesSQL } from '@supabase/pg-meta'
+import { getEntityTypesSQL, queryIntent } from '@supabase/pg-meta'
 import { InfiniteData, QueryClient, useInfiniteQuery } from '@tanstack/react-query'
 
 import { ENTITY_TYPE } from './entity-type-constants'
@@ -53,7 +53,7 @@ export async function getEntityTypes(
   }: EntityTypesVariables,
   signal?: AbortSignal
 ) {
-  const sql = getEntityTypesSQL({
+  const args = {
     schemas,
     sort,
     filterTypes,
@@ -62,7 +62,8 @@ export async function getEntityTypes(
     search,
     limit,
     page,
-  })
+  }
+  const sql = getEntityTypesSQL(args)
 
   const { result } = await executeSql(
     {
@@ -71,6 +72,7 @@ export async function getEntityTypes(
       sqlOrigin: 'studio',
       queryName: 'entity-types',
       sql,
+      intent: queryIntent('entities.list', args),
       queryKey: ['entity-types', ...schemas, page],
       grant: unguarded.migrating,
     },

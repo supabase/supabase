@@ -1,4 +1,4 @@
-import { getIndexesSQL } from '@supabase/pg-meta'
+import { getIndexesSQL, queryIntent } from '@supabase/pg-meta'
 import { useQuery } from '@tanstack/react-query'
 
 import { databaseIndexesKeys } from './keys'
@@ -41,6 +41,7 @@ export async function getIndexes(
       sqlOrigin: 'studio',
       queryName: 'indexes',
       sql,
+      intent: queryIntent('indexes.list', { schema }),
       queryKey: ['indexes', schema],
       grant: unguarded.migrating,
     },

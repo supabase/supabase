@@ -1,4 +1,10 @@
-import { ident, joinSqlFragments, ROLE_IMPERSONATION_NO_RESULTS, safeSql } from '@supabase/pg-meta'
+import {
+  ident,
+  joinSqlFragments,
+  queryIntent,
+  ROLE_IMPERSONATION_NO_RESULTS,
+  safeSql,
+} from '@supabase/pg-meta'
 import { Query, type QueryFilter } from '@supabase/pg-meta/src/query'
 import {
   formatPatternMatchFilterValue,
@@ -416,6 +422,17 @@ async function getTableRows(
         queryName: 'table-rows',
         isUserFaultSqlState: filters?.length ? isUserFaultForValues : undefined,
         sql,
+        intent: isRoleImpersonationEnabled(roleImpersonationState?.role)
+          ? undefined
+          : queryIntent('rows.read', {
+              schema: entity.schema,
+              name: entity.name,
+              filters,
+              sorts,
+              page,
+              limit,
+              sortExcludedColumns: excludedColumns,
+            }),
         queryKey: ['table-rows', table?.id],
         isRoleImpersonationEnabled: isRoleImpersonationEnabled(roleImpersonationState?.role),
         preflightCheck,

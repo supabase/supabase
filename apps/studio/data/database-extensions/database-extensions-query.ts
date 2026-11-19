@@ -1,3 +1,4 @@
+import { queryIntent } from '@supabase/pg-meta'
 import { getDatabaseExtensionsSQL } from '@supabase/pg-meta/src'
 import { useQuery } from '@tanstack/react-query'
 import { components } from 'api-types'
@@ -32,6 +33,7 @@ export async function getDatabaseExtensions(
       sqlOrigin: 'studio',
       queryName: 'database-extensions',
       sql,
+      intent: queryIntent('extensions.list', {}),
       queryKey: ['database-extensions'],
       grant: unguarded.migrating,
     },

@@ -1,4 +1,4 @@
-import { getTableEditorSql } from '@supabase/pg-meta'
+import { getTableEditorSql, queryIntent } from '@supabase/pg-meta'
 import { QueryClient, queryOptions, useQuery } from '@tanstack/react-query'
 
 import { tableEditorKeys } from './keys'
@@ -33,6 +33,7 @@ export async function getTableEditor(
       sqlOrigin: 'studio',
       queryName: 'table-editor',
       sql,
+      intent: queryIntent('entity.definition', { id }),
       queryKey: ['table-editor', id],
       grant: unguarded.migrating,
     },

@@ -1,4 +1,4 @@
-import { getTableConstraintsSql } from '@supabase/pg-meta'
+import { getTableConstraintsSql, queryIntent } from '@supabase/pg-meta'
 import { useQuery } from '@tanstack/react-query'
 
 import { databaseKeys } from './keys'
@@ -48,6 +48,7 @@ export async function getTableConstraints(
       sqlOrigin: 'studio',
       queryName: 'table-constraints',
       sql,
+      intent: queryIntent('table-constraints.list', { id }),
       queryKey: ['table-constraints', id],
       grant: unguarded.migrating,
     },

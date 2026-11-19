@@ -1,3 +1,4 @@
+import { queryIntent } from '@supabase/pg-meta'
 import { safeSql } from '@supabase/pg-meta/src/pg-format'
 
 import { databaseEventTriggerKeys } from './keys'
@@ -68,6 +69,7 @@ export async function getDatabaseEventTriggers(
       sqlOrigin: 'studio',
       queryName: 'database-event-triggers',
       sql: EVENT_TRIGGERS_SQL,
+      intent: queryIntent('event-triggers.list', {}),
       queryKey: databaseEventTriggerKeys.list(projectRef),
       grant,
     },

@@ -1,4 +1,4 @@
-import { getFDWsSql } from '@supabase/pg-meta'
+import { getFDWsSql, queryIntent } from '@supabase/pg-meta'
 import { useQuery } from '@tanstack/react-query'
 
 import { fdwKeys } from './keys'
@@ -46,6 +46,7 @@ export async function getFDWs(
       projectRef,
       connectionString,
       sql,
+      intent: queryIntent('fdws.list', {}),
       sqlOrigin: 'studio',
       queryName: 'fdws',
       queryKey: ['fdws'],

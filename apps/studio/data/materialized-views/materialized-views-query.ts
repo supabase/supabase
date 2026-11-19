@@ -19,7 +19,7 @@ export async function getMaterializedViews(
 ) {
   if (!projectRef) throw new Error('projectRef is required')
 
-  const { sql } = pgMeta.materializedViews.list({ includedSchemas: schemas })
+  const { sql, intent } = pgMeta.materializedViews.list({ includedSchemas: schemas })
 
   const { result } = await executeSql(
     {
@@ -28,6 +28,7 @@ export async function getMaterializedViews(
       sqlOrigin: 'studio',
       queryName: 'materialized-views',
       sql,
+      intent,
       queryKey: ['materialized-views', schemas].filter(Boolean),
       grant: unguarded.migrating,
     },

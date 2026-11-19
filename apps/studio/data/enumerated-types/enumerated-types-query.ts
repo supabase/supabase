@@ -22,7 +22,7 @@ export async function getEnumeratedTypes(
 ) {
   if (!projectRef) throw new Error('projectRef is required')
 
-  const { sql } = pgMeta.types.list({ includedSchemas: schemas })
+  const { sql, intent } = pgMeta.types.list({ includedSchemas: schemas })
   const { result } = await executeSql(
     {
       projectRef,
@@ -30,6 +30,7 @@ export async function getEnumeratedTypes(
       sqlOrigin: 'studio',
       queryName: 'types',
       sql,
+      intent,
       queryKey: ['types'],
       grant: unguarded.migrating,
     },
