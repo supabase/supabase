@@ -442,7 +442,7 @@ export const PlanChangeBill = ({
         <div className="flex items-end justify-between gap-4">
           <div>
             <p className="text-base text-foreground">Estimated monthly total</p>
-            <p className="text-sm text-foreground-light">Plus usage beyond plan quotas</p>
+            <p className="text-xs text-foreground-lighter">Plus usage beyond plan quotas</p>
           </div>
           <MonthlyTotal total={summary.monthlyTotal} tax={summary.monthlyTax} />
         </div>

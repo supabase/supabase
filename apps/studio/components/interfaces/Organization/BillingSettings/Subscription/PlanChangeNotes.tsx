@@ -26,8 +26,8 @@ interface PlanChangeNotesProps {
 export const PlanChangeNotes = ({ exampleProjectRef }: PlanChangeNotesProps) => (
   <ul className="space-y-3">
     <Note icon={<ClockIcon size={16} />}>
-      <span className="text-foreground">Projects never pause on Pro.</span> Each one is a dedicated
-      server that runs and bills around the clock, even when idle.{' '}
+      <span className="text-foreground">Projects never pause on Pro.</span> Each project is a
+      dedicated server that runs and bills around the clock, even when idle.{' '}
       <a
         href={`${DOCS_URL}/guides/platform/project-transfer`}
         target="_blank"
