@@ -429,6 +429,14 @@ export const OAuthAppsAuthorizeScreen = ({
                     databaseAccess={databaseAccess?.mode}
                   />
                 ) : null}
+                {databaseAccess && (
+                  <p className="text-xs text-foreground-light">
+                    This app can connect directly to your database and read rows that your access
+                    rules normally hide.
+                    {databaseAccess.mode === 'write' &&
+                      ' It can also change data and database structure.'}
+                  </p>
+                )}
               </section>
             </>
           )}
