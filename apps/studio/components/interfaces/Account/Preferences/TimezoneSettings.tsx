@@ -40,6 +40,30 @@ import { useTrack } from '@/lib/telemetry/track'
 
 const AUTO_OPTION_VALUE = '__auto__'
 
+const AutoDetectedTimezoneText = ({
+  className,
+  messageKey,
+  timezone,
+}: {
+  className?: string
+  messageKey:
+    | 'account.preferences.timezone.descriptionAuto'
+    | 'account.preferences.timezone.autoDetectWithZone'
+  timezone: string
+}) => {
+  const { locale } = useTranslation()
+  const { text, lang } = resolveMessage(locale, messageKey)
+  const [before, after] = text.split('{timezone}')
+
+  return (
+    <span className={className} lang={lang}>
+      {before}
+      {after !== undefined && <span lang="en">{timezone}</span>}
+      {after}
+    </span>
+  )
+}
+
 export const TimezoneSettings = () => {
   const track = useTrack()
   const { locale } = useTranslation()
@@ -55,13 +79,6 @@ export const TimezoneSettings = () => {
   const triggerLabel = useMemo(() => getTimezoneLabelByIana(timezone), [timezone])
   const label = resolveMessage(locale, 'account.preferences.timezone.label')
   const autoDetect = resolveMessage(locale, 'account.preferences.timezone.autoDetect')
-  const autoDetectWithZone = resolveMessage(
-    locale,
-    'account.preferences.timezone.autoDetectWithZone',
-    {
-      timezone,
-    }
-  )
   const searchPlaceholder = resolveMessage(locale, 'account.preferences.timezone.searchPlaceholder')
 
   const handleSelect = (nextStored: string) => {
@@ -97,9 +114,9 @@ export const TimezoneSettings = () => {
               layout="flex-row-reverse"
               description={
                 isAutoDetected ? (
-                  <TranslatedText
+                  <AutoDetectedTimezoneText
                     messageKey="account.preferences.timezone.descriptionAuto"
-                    params={{ timezone: browserTimezone }}
+                    timezone={browserTimezone}
                   />
                 ) : (
                   <TranslatedText messageKey="account.preferences.timezone.descriptionManual" />
@@ -118,12 +135,17 @@ export const TimezoneSettings = () => {
                   >
                     <span className="flex min-w-0 items-center gap-2">
                       <GlobeIcon aria-hidden="true" className="h-4 w-4 shrink-0" />
-                      <span
-                        className="truncate"
-                        lang={isAutoDetected ? autoDetectWithZone.lang : 'en'}
-                      >
-                        {isAutoDetected ? autoDetectWithZone.text : triggerLabel}
-                      </span>
+                      {isAutoDetected ? (
+                        <AutoDetectedTimezoneText
+                          className="truncate"
+                          messageKey="account.preferences.timezone.autoDetectWithZone"
+                          timezone={timezone}
+                        />
+                      ) : (
+                        <span className="truncate" lang="en">
+                          {triggerLabel}
+                        </span>
+                      )}
                     </span>
                   </ComboboxTrigger>
                 </PopoverTrigger>

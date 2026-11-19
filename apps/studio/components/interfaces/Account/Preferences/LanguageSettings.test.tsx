@@ -6,6 +6,7 @@ import { afterEach, beforeEach, describe, expect, it } from 'vitest'
 import { LanguageSettings } from './LanguageSettings'
 import { TimezoneSettings } from './TimezoneSettings'
 import { TimezoneProvider } from '@/lib/datetime'
+import { guessLocalTimezone } from '@/lib/dayjs'
 import { LocaleProvider } from '@/lib/i18n/LocaleProvider'
 import { customRender } from '@/tests/lib/custom-render'
 
@@ -63,6 +64,29 @@ describe('LanguageSettings', () => {
 })
 
 describe('partially translated preferences', () => {
+  it('marks auto-detected timezone names as English in Japanese text', async () => {
+    localStorage.setItem(LOCAL_STORAGE_KEYS.UI_LOCALE, JSON.stringify('ja'))
+    const timezone = guessLocalTimezone()
+
+    customRender(
+      <LocaleProvider>
+        <TimezoneProvider>
+          <TimezoneSettings />
+        </TimezoneProvider>
+      </LocaleProvider>
+    )
+
+    const picker = await screen.findByRole('combobox', { name: '表示タイムゾーン' })
+    const description = screen.getByText(/^ブラウザの設定から自動で検出しました/)
+    expect(description).toHaveAttribute('lang', 'ja')
+    expect(description).toHaveTextContent(`ブラウザの設定から自動で検出しました（${timezone}）。`)
+    expect(within(description).getByText(timezone)).toHaveAttribute('lang', 'en')
+
+    expect(picker).toHaveTextContent(`自動検出（${timezone}）`)
+    expect(within(picker).getByText(/^自動検出/)).toHaveAttribute('lang', 'ja')
+    expect(within(picker).getByText(timezone)).toHaveAttribute('lang', 'en')
+  })
+
   it('keeps untranslated content English and marks translated controls and portal content', async () => {
     localStorage.setItem(LOCAL_STORAGE_KEYS.UI_LOCALE, JSON.stringify('ja'))
     const storedTimezone = JSON.stringify('Asia/Tokyo')
