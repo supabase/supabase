@@ -192,9 +192,20 @@ export const LogsViewsPanel = ({
   const existingNames = [...PRESET_VIEWS, ...views].map((view) => view.name)
   const hasNoMatches = matchingPresets.length === 0 && matchingViews.length === 0
 
+  const getViewsStatusText = () => {
+    if (isLoading) return 'Loading views...'
+    if (isError) return 'Failed to load views.'
+    if (hasNoMatches) return 'No views found'
+    const count = matchingPresets.length + matchingViews.length
+    return `${count} ${count === 1 ? 'view' : 'views'} found`
+  }
+
   return (
     <>
       <div className="flex min-h-0 flex-1 flex-col">
+        <span role="status" aria-live="polite" aria-atomic="true" className="sr-only">
+          {getViewsStatusText()}
+        </span>
         {!isLoading && (
           <div className="px-3 pt-3">
             <InnerSideBarFilters className="w-full gap-0 p-0">

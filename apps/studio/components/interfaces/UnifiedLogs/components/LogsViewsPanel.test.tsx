@@ -240,6 +240,21 @@ describe('LogsViewsPanel', () => {
     expect(onRetry).toHaveBeenCalledOnce()
   })
 
+  it('announces loading, errors, and the result count via a status region', async () => {
+    const { rerender } = customRender(<LogsViewsPanel {...baseProps} isLoading />)
+
+    expect(screen.getByRole('status')).toHaveTextContent('Loading views...')
+
+    rerender(<LogsViewsPanel {...baseProps} isError />)
+    expect(screen.getByRole('status')).toHaveTextContent('Failed to load views.')
+
+    rerender(<LogsViewsPanel {...baseProps} />)
+    expect(screen.getByRole('status')).toHaveTextContent('5 views found')
+
+    await userEvent.type(await screen.findByPlaceholderText('Search views'), 'nonexistent')
+    expect(screen.getByRole('status')).toHaveTextContent('No views found')
+  })
+
   it('opens the save dialog only while saving', async () => {
     const { rerender } = customRender(<LogsViewsPanel {...baseProps} />)
 
