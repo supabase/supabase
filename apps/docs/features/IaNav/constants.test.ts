@@ -57,6 +57,24 @@ describe('IA_NAV_CACHE_SCRIPT', () => {
     expect(document.documentElement.dataset.iaNav).toBeUndefined()
   })
 
+  it('marks the page from the picked layout over a cached control', () => {
+    localStorage.setItem(LOCAL_STORAGE_KEYS.IA_NAV_FLAG, 'control')
+    localStorage.setItem(LOCAL_STORAGE_KEYS.DOCS_LAYOUT_CHOICE, 'option-1')
+
+    runCacheScript()
+
+    expect(document.documentElement.dataset.iaNav).toBe('option-1')
+  })
+
+  it('leaves the page unmarked when the picked layout is control over a cached option-1', () => {
+    localStorage.setItem(LOCAL_STORAGE_KEYS.IA_NAV_FLAG, 'option-1')
+    localStorage.setItem(LOCAL_STORAGE_KEYS.DOCS_LAYOUT_CHOICE, 'control')
+
+    runCacheScript()
+
+    expect(document.documentElement.dataset.iaNav).toBeUndefined()
+  })
+
   it('leaves the page unmarked when the url forces control over a cached option-1', () => {
     localStorage.setItem(LOCAL_STORAGE_KEYS.IA_NAV_FLAG, 'option-1')
     window.history.replaceState(null, '', `/?${IA_NAV_FLAG}=control`)

@@ -12,6 +12,7 @@ import {
   type IaNavVariant,
 } from './constants'
 import { useIaNavRouteVariant } from './IaNavRouteProvider'
+import { subscribeToLayoutChoice, useLayoutChoice } from './layoutChoice'
 
 const subscribeToNothing = () => () => {}
 
@@ -29,7 +30,7 @@ const readKnownFlag = () => {
 }
 
 /**
- * Reads the `docs-ia-mvp-v1` PostHog experiment flag.
+ * Reads the `docs-ia-mvp-v1` PostHog experiment flag. A layout the user picked wins over the flag.
  * While the flags load, or when the posthog request fails, it uses the value from the last visit.
  * If neither is known, it returns `'control'`, the current navigation.
  */
@@ -38,9 +39,16 @@ export function useIaNavVariant(): IaNavVariant {
   const { hasAccepted } = useConsentState()
   const searchParams = useSearchParamsShallow()
   const routeVariant = useIaNavRouteVariant()
-  const sessionOverride = useSyncExternalStore(subscribeToNothing, readSessionOverride, () => null)
+  // a layout pick clears the session override, so the override reads again on each pick
+  const sessionOverride = useSyncExternalStore(
+    subscribeToLayoutChoice,
+    readSessionOverride,
+    () => null
+  )
+  const layoutChoice = useLayoutChoice()
   const urlOverride = searchParams.get(IA_NAV_FLAG)
-  const override = routeVariant ?? (isVariant(urlOverride) ? urlOverride : sessionOverride)
+  const override =
+    routeVariant ?? (isVariant(urlOverride) ? urlOverride : sessionOverride) ?? layoutChoice
   // the value known before the flags load. it is null on the server and on a first visit
   const knownFlag = useSyncExternalStore(subscribeToNothing, readKnownFlag, () => null)
 
@@ -66,13 +74,22 @@ export function useIaNavVariant(): IaNavVariant {
 
   useEffect(() => {
     // the cached flag can be stale, so only the loaded flag records an exposure
-    if (!hasPosthogFlags || !isAssigned || routeVariant) return
+    // a layout the user picked is not the flag assignment, so it records no exposure
+    if (!hasPosthogFlags || !isAssigned || routeVariant || layoutChoice) return
     // useSearchParamsShallow is empty until its own effect runs, so read the URL directly.
     const urlOverride = new URLSearchParams(window.location.search).get(IA_NAV_FLAG)
     if (isVariant(urlOverride) || sessionOverride) return
 
     posthogClient.captureExperimentExposure(IA_NAV_FLAG, { variant: flagVariant }, hasAccepted)
-  }, [hasPosthogFlags, isAssigned, routeVariant, sessionOverride, flagVariant, hasAccepted])
+  }, [
+    hasPosthogFlags,
+    isAssigned,
+    routeVariant,
+    layoutChoice,
+    sessionOverride,
+    flagVariant,
+    hasAccepted,
+  ])
 
   return isVariant(override) ? override : flagVariant
 }
