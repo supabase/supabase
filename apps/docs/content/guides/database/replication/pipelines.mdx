@@ -30,7 +30,7 @@ Pipelines charges for configured pipeline hours, initial sync data, and ongoing 
 
 ## Setup overview
 
-Prepare your destination, then enable and configure Pipelines in the Dashboard. You can create a Postgres publication during setup to select the data to replicate.
+The Dashboard is the supported way to enable Pipelines and create a managed pipeline. Prepare your destination before setup. To select the data to replicate, create a Postgres publication in the Dashboard during setup or [create it with SQL](#creating-a-publication-with-sql) ahead of time.
 
 ### Step 1: Prepare your destination [#step-1-create-a-postgres-publication]
 
@@ -239,7 +239,7 @@ create publication pub_users_subset
 for table users (id, email, created_at);
 ```
 
-For updates and deletes, the column list must include all replica-identity columns. With `REPLICA IDENTITY FULL`, that means all columns, so you cannot publish a subset. Also check your destination's source table requirements.
+For updates and deletes, a column list must include all replica identity columns. With `REPLICA IDENTITY FULL`, omit the list entirely. Postgres rejects source updates and deletes if a publication that sends those operations specifies a column list for the table, even if it names every column. Review the columns before removing a list because the publication can then replicate previously excluded columns. Also check your destination's source table requirements.
 
 ### Filtering rows with a predicate
 

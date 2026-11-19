@@ -120,7 +120,9 @@ where n.nspname = 'public' and c.relname = 'your_table';
 
 The `replica_identity` value is `d` for default, `f` for full, `i` for index, and `n` for nothing.
 
-Set full replica identity when a table has toasted columns and update replication must be reliable:
+Before setting `REPLICA IDENTITY FULL`, check the [column lists](/docs/guides/database/replication/pipelines#selecting-specific-columns) in every publication that sends updates or deletes for this table. Full replica identity requires omitting the list entirely. Remove a list only if all columns can be replicated to the publication's subscribers.
+
+Run the following SQL using the source project's [SQL Editor](/dashboard/project/_/sql) in the Supabase Dashboard or with `psql` over a direct connection. To connect with `psql`, see [Direct connection](/docs/guides/database/connecting-to-postgres#direct-connection).
 
 ```sql
 alter table public.your_table replica identity full;
