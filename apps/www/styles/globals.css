@@ -88,7 +88,7 @@
 
 @utility split-line {
   --split-line-width: 1.5px;
-  --split-gap: 7px;
+  --split-gap: 6px;
   background-color: transparent;
   background-image:
     linear-gradient(currentColor, currentColor), linear-gradient(currentColor, currentColor);
@@ -99,11 +99,6 @@
     top center,
     bottom center;
   background-repeat: no-repeat;
-}
-
-@utility split-line-sm {
-  @apply split-line;
-  --split-gap: 5.5px;
 }
 
 @utility slider-split-thumb {
@@ -178,8 +173,6 @@
   --animate-pulse-radar: pulse-radar 3s linear infinite;
   --animate-slide-in: slideIn 250ms ease-in both;
   --animate-draw-line: draw-line 1.8s linear both;
-  --animate-tick-pass: tick-pass 300ms ease-out both;
-  --animate-step-pass: step-pass 300ms ease-out both;
   --animate-reveal-hatch: reveal-hatch 2.4s cubic-bezier(0.4, 0, 1, 1) 1.8s both;
 
   --delay-1200: 1200ms;
@@ -199,20 +192,6 @@
   --text-9xl: 7.875rem;
   --font-weight-normal: 450;
   --ease-crossfade: cubic-bezier(0.2, 0, 0, 1);
-}
-
-@keyframes step-pass {
-  50% {
-    opacity: 1;
-    height: 32px;
-  }
-}
-
-@keyframes tick-pass {
-  50% {
-    opacity: 1;
-    scale: 1 1.6;
-  }
 }
 
 @keyframes draw-line {

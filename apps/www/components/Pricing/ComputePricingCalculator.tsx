@@ -227,9 +227,12 @@ const ComputePricingCalculator = ({
                 activeStep={findSliderComputeValue(activeInstance)[0] - 1}
               >
                 <Slider
-                  onValueChange={(value) => handleUpdateInstance(activeInstance.position, value)}
+                  // position 0 only shows the start of the track, so a press on it selects micro
+                  onValueChange={(value) =>
+                    handleUpdateInstance(activeInstance.position, [Math.max(1, value[0])])
+                  }
                   value={findSliderComputeValue(activeInstance)}
-                  min={1}
+                  min={0}
                   key={`${index}-${activeInstance.position}`}
                   max={priceSteps.length}
                   step={1}
@@ -309,14 +312,14 @@ const SliderSteps = ({
 }) => {
   const [hoveredTick, setHoveredTick] = useState<number | null>(null)
   const [isPointerFocus, setIsPointerFocus] = useState(false)
-  const lastStep = stepCount - 1
-  const tickCount = lastStep * TICKS_PER_STEP + 1
-  const hoveredStep = hoveredTick === null ? null : Math.round(hoveredTick / TICKS_PER_STEP)
-  const previewStep = hoveredStep === activeStep ? null : hoveredStep
-  const [sweep, setSweep] = useState({ from: activeStep, to: activeStep, id: 0 })
+  // the track starts one step before the first size, so the slider reads as a track at micro
+  const tickCount = stepCount * TICKS_PER_STEP + 1
+  const hoveredStep = hoveredTick === null ? null : Math.round(hoveredTick / TICKS_PER_STEP) - 1
+  const previewStep = hoveredStep === activeStep || hoveredStep === -1 ? null : hoveredStep
+  const [fillChange, setFillChange] = useState({ from: activeStep, to: activeStep })
 
-  if (sweep.to !== activeStep) {
-    setSweep({ from: sweep.to, to: activeStep, id: sweep.id + 1 })
+  if (fillChange.to !== activeStep) {
+    setFillChange({ from: fillChange.to, to: activeStep })
   }
 
   const handlePointerMove = (event: PointerEvent<HTMLDivElement>) => {
@@ -324,9 +327,11 @@ const SliderSteps = ({
     const rect = event.currentTarget.getBoundingClientRect()
     const ratio = Math.min(Math.max((event.clientX - rect.left) / rect.width, 0), 1)
     const tick = Math.round(ratio * (tickCount - 1))
-    const step = Math.round(tick / TICKS_PER_STEP)
+    const step = Math.round(tick / TICKS_PER_STEP) - 1
     setHoveredTick(tick)
-    onStepPreview(step === activeStep ? null : step)
+    onStepPreview(step === activeStep || step === -1 ? null : step)
+    // a pointer move ends the fill delays, so hover changes stay instant
+    if (fillChange.from !== fillChange.to) setFillChange({ from: activeStep, to: activeStep })
   }
 
   const handlePointerLeave = () => {
@@ -358,41 +363,36 @@ const SliderSteps = ({
     >
       <div aria-hidden="true" className="pointer-events-none absolute inset-y-0 inset-x-0.75">
         {Array.from({ length: tickCount }, (_, tick) => {
-          const step = tick / TICKS_PER_STEP
+          const step = tick / TICKS_PER_STEP - 1
           const isStep = Number.isInteger(step)
           const hoverDistance = hoveredTick === null ? Infinity : Math.abs(tick - hoveredTick)
-          const sweepProgress = (step - sweep.from) / (sweep.to - sweep.from)
-          const isSwept = sweepProgress > 0 && sweepProgress < 1
-          const activeDistance = Math.abs(tick - activeStep * TICKS_PER_STEP)
-          const nearest = Math.min(hoverDistance, activeDistance)
-          const growth = nearest <= 3 && step !== activeStep ? 1 + (4 - nearest) * 0.2 : 1
+          const activeTick = (activeStep + 1) * TICKS_PER_STEP
+          // ticks before the selection ramp up toward it, and ticks after it stay at rest
+          const fill = tick < activeTick ? tick / activeTick : 0
+          const hoverGrowth = hoverDistance <= 3 ? 1 + (4 - hoverDistance) * 0.2 : 1
+          const growth = step === activeStep ? 1 : Math.max(1 + fill * 0.6, hoverGrowth)
+          const restOpacity = isStep ? 0.3 : 0.12
 
           return (
             <span
-              // a new key restarts the pass animation on every selection change
-              key={isSwept ? `${tick}-${sweep.id}` : tick}
+              key={tick}
               className={cn(
                 'absolute top-1/2 -translate-1/2',
                 'motion-safe:transition-[scale,height,opacity] motion-safe:duration-150 motion-safe:ease-out',
-                isStep ? 'w-1 split-line-sm text-foreground' : 'h-3 w-px bg-foreground',
-                isSwept &&
-                  (isStep ? 'motion-safe:animate-step-pass' : 'motion-safe:animate-tick-pass')
+                isStep ? 'w-1 split-line text-foreground' : 'h-3 w-px bg-foreground'
               )}
               style={{
-                animationDelay: isSwept ? `${sweepProgress * 150}ms` : undefined,
-                left: `${(step / lastStep) * 100}%`,
+                // ticks between the old and the new step change in order, starting at the old step
+                transitionDelay: `${Math.min(Math.max((step - fillChange.from) / (fillChange.to - fillChange.from), 0), 1) * 150 || 0}ms`,
+                left: `${(tick / (tickCount - 1)) * 100}%`,
                 opacity:
                   step === activeStep
                     ? 0
                     : step === previewStep
                       ? 1
-                      : Math.max(
-                          isStep ? 0.3 : 0.12,
-                          1 - hoverDistance * 0.2,
-                          1 - activeDistance * 0.2
-                        ),
-                // steps grow in height, not scale, so the gap keeps its size
-                height: isStep ? `${Math.min(26 * growth, 32)}px` : undefined,
+                      : restOpacity + (1 - restOpacity) * fill,
+                // steps grow in height, not scale, so the gap keeps its size. even heights keep the gap on whole pixels
+                height: isStep ? `${Math.round(Math.min(26 * growth, 32) / 2) * 2}px` : undefined,
                 scale: isStep ? undefined : `1 ${growth}`,
               }}
             />
