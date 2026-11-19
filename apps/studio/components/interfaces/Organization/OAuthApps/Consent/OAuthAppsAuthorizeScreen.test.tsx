@@ -110,7 +110,10 @@ describe('OAuthAppsAuthorizeScreen', () => {
 
     expect(screen.getByText('Permissions granted')).toBeInTheDocument()
     expect(screen.queryByText('Permissions requested')).not.toBeInTheDocument()
-    expect(screen.getByText('Database, Environment, Analytics')).toBeInTheDocument()
+    const databaseManagement = screen.getByRole('button', { name: 'Database management' })
+    expect(databaseManagement.parentElement).toHaveTextContent(
+      'Database management, Environment, Analytics'
+    )
     expect(screen.getByText('Secrets, Projects, Edge Functions, Storage')).toBeInTheDocument()
   })
 
@@ -129,29 +132,25 @@ describe('OAuthAppsAuthorizeScreen', () => {
     expect(screen.getByText(/admin@example\.com/)).toBeInTheDocument()
   })
 
-  test('tells the member an organization-bound grant is shared, exactly once, without the member-bound copy', async () => {
+  test('keeps organization-bound consent focused on the requested access', async () => {
     renderScreen({ authId: OAUTH_APPS_MOCK_SCENARIOS.kemalBot })
 
-    expect(await screen.findAllByText('Want this scoped to one member?')).toHaveLength(1)
+    await screen.findByText('Permissions requested')
+    expect(screen.queryByText('Want this scoped to one member?')).not.toBeInTheDocument()
     expect(
-      screen.getAllByText(
-        'Have them authorize kemal-bot from their own account. Authorizing here gives it your Administrator access on every project, including ones created later.'
-      )
-    ).toHaveLength(1)
-    expect(screen.queryByText(/This grant acts as you/)).not.toBeInTheDocument()
+      screen.queryByText(/The app can only use the permissions listed below/)
+    ).not.toBeInTheDocument()
     expect(screen.queryByText(/No admin approval is needed/)).not.toBeInTheDocument()
-    expect(
-      screen.getByText(/This authorization will appear in Authorized apps/)
-    ).toBeInTheDocument()
+    expect(screen.queryByText(/This authorization will appear in Authorized apps/)).toBeNull()
   })
 
   test('shows the member-bound copy for a member-bound grant that picks projects', async () => {
     renderScreen()
 
     expect(
-      await screen.findByText(/No admin approval is needed if your role permits this access/)
+      await screen.findByText(/The app can only use the permissions listed below/)
     ).toBeInTheDocument()
-    expect(screen.getByText(/This grant acts as you/)).toBeInTheDocument()
+    expect(screen.queryByText(/No admin approval is needed/)).toBeNull()
     expect(screen.queryByText('Want this scoped to one member?')).not.toBeInTheDocument()
     expect(screen.queryByText('This grant covers every project')).not.toBeInTheDocument()
   })
@@ -225,7 +224,7 @@ describe('OAuthAppsAuthorizeScreen', () => {
     expect(await screen.findByText('All current and future projects')).toBeInTheDocument()
     expect(screen.getByRole('button', { name: /Authorize Vercel/ })).toBeDisabled()
 
-    fireEvent.click(screen.getByRole('checkbox'))
+    fireEvent.click(screen.getByRole('radio', { name: 'All current and future projects' }))
 
     expect(screen.queryByRole('combobox')).not.toBeInTheDocument()
     const authorizeButton = screen.getByRole('button', { name: /Authorize Vercel/ })
@@ -240,7 +239,7 @@ describe('OAuthAppsAuthorizeScreen', () => {
     renderScreen({ authId: OAUTH_APPS_MOCK_SCENARIOS.vercelReconsentAllProjects })
 
     await waitFor(() => {
-      expect(screen.getByRole('checkbox')).toBeChecked()
+      expect(screen.getByRole('radio', { name: 'All current and future projects' })).toBeChecked()
     })
     await enabledAuthorizeButton()
   })
@@ -326,10 +325,10 @@ describe('OAuthAppsAuthorizeScreen', () => {
   test('shows the change in Table data access for a returning partner', async () => {
     renderScreen({ authId: OAUTH_APPS_MOCK_SCENARIOS.trustedPartnerReconsent })
 
-    expect(await screen.findByText('(Upgraded from Read)')).toBeInTheDocument()
-    expect(screen.getByText('Table data', { exact: false })).toBeInTheDocument()
+    const changes = await screen.findByRole('list', { name: 'Permission changes' })
+    expect(changes).toHaveTextContent('Table dataReadRead-write')
     expect(screen.getByText('Already granted (1)')).toBeInTheDocument()
-    expect(screen.queryByRole('checkbox')).toBeNull()
+    expect(screen.queryByRole('radio', { name: 'All current and future projects' })).toBeNull()
   })
 
   test('reconsent shows the permissions differences, with previous permissions collapsed', async () => {
@@ -338,18 +337,15 @@ describe('OAuthAppsAuthorizeScreen', () => {
     })
 
     await screen.findByText('Already granted (2)')
-    const findSpanWithText = (text: string) =>
-      screen.findByText((_, element) => element?.textContent == text, { selector: 'span' })
-    await findSpanWithText('Environment (New)')
-    await findSpanWithText('Analytics (Upgraded from Read)')
-    await findSpanWithText('Secrets (Demoted from Read-write)')
-    await findSpanWithText('Edge Functions (New)')
-    await findSpanWithText('Storage (New)')
-    await findSpanWithText('Rest (Read)')
+    const changes = screen.getByRole('list', { name: 'Permission changes' })
+    expect(changes).toHaveTextContent('EnvironmentAddedRead-write')
+    expect(changes).toHaveTextContent('AnalyticsReadRead-write')
+    expect(changes).toHaveTextContent('SecretsRead-writeRead')
+    expect(changes).toHaveTextContent('RestReadRemoved')
 
-    expect(screen.queryByText('Database')).toBeNull()
+    expect(screen.queryByText('Database management')).toBeNull()
     fireEvent.click(screen.getByText('Already granted (2)'))
-    await screen.findByText('Database')
+    await screen.findByText('Database management')
   })
 })
 
