@@ -106,7 +106,12 @@ export const OAuthAppsAuthorizedList = () => {
                   >
                     <span className="sr-only">Application icon</span>
                   </TableHead>
-                  <TableHead className={cn('pl-0', !hasAuthorizedApps && 'text-foreground-muted')}>
+                  <TableHead
+                    className={cn(
+                      hasAuthorizedApps && 'pl-0',
+                      !hasAuthorizedApps && 'text-foreground-muted'
+                    )}
+                  >
                     App
                   </TableHead>
                   <TableHead className={cn(!hasAuthorizedApps && 'text-foreground-muted')}>
