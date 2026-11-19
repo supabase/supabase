@@ -14,7 +14,8 @@ export function routeAwareHook<TArgs extends unknown[], TRouteResult, TFallbackR
   useFallbackHook: (...args: TArgs) => TFallbackResult
 ) {
   return function useRouteAware(...args: TArgs): TRouteResult | TFallbackResult {
-    const useHook = useContext(RenderedRouteContext) ? useRouteHook : useFallbackHook
+    const isRenderedRoute = useContext(RenderedRouteContext)
+    const useHook = isRenderedRoute ? useRouteHook : useFallbackHook
     return useHook(...args)
   }
 }

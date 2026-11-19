@@ -49,6 +49,9 @@ it('exposes path and search params from the route URL to Next-style router hooks
   await act(() => router.navigate({ href: '/project/xyz/probe?query-tab=sql' }))
 
   expect(readOutput('params')).toEqual({ ref: 'xyz', queryTab: 'sql' })
-  expect(readOutput('router')).toEqual({ ref: 'xyz', 'query-tab': 'sql' })
+  const nextQuery = { ref: 'xyz', 'query-tab': 'sql' }
+  expect(readOutput('router')).toEqual(nextQuery)
+  expect(readOutput('compat router')).toEqual(nextQuery)
+  expect(screen.getByLabelText('as path')).toHaveTextContent('/project/xyz/probe?query-tab=sql')
   expect(screen.getByLabelText('pathname')).toHaveTextContent('/project/xyz/probe')
 })
