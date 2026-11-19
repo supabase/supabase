@@ -426,10 +426,10 @@ export const OAuthAppsAuthorizeScreen = ({
               <div
                 role="list"
                 aria-label="Projects that will require SSL"
-                className="divide-y rounded-md border bg-surface-100 px-2 text-xs"
+                className="mt-2 divide-y text-xs"
               >
                 {sslProjects.map(({ ref, name }) => (
-                  <div key={ref} role="listitem" className="py-1.5 font-medium text-foreground">
+                  <div key={ref} role="listitem" className="py-2 font-medium text-foreground">
                     {name}
                   </div>
                 ))}

@@ -20,16 +20,16 @@ export function DatabaseAccessProjectIssues({
       title="These projects require changes first"
       description={onRemove ? 'Fix or remove them to continue.' : 'Fix them to continue.'}
     >
-      <div className="mt-1 divide-y rounded-md border bg-surface-100 px-2 text-xs">
+      <div className="mt-1 divide-y text-xs">
         {projects.map(({ ref, name, issue }) => (
-          <div key={ref} className="flex items-center justify-between gap-1 py-1.5">
-            <div>
-              <p className="font-medium text-foreground">{name}</p>
-              <p>
+          <div key={ref} className="flex items-center justify-between gap-2 py-2">
+            <div className="min-w-0 leading-snug">
+              <div className="font-medium text-foreground">{name}</div>
+              <div>
                 {issue === 'postgres_upgrade_required'
                   ? 'Needs Postgres 17 or later.'
                   : 'The database is currently unavailable.'}
-              </p>
+              </div>
             </div>
             {onRemove && (
               <ButtonTooltip
