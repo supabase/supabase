@@ -179,10 +179,31 @@ export const UnifiedLogs = ({
   const [isReviewingChanges, setIsReviewingChanges] = useState(false)
   const activeViewRowRef = useRef<HTMLDivElement | null>(null)
   const [isActiveViewRowMounted, setIsActiveViewRowMounted] = useState(false)
-  const setActiveViewRow = useCallback((node: HTMLDivElement | null) => {
+  // The sidebar and mobile drawer each mount their own LogsViewsPanel instance,
+  // so each gets its own registration slot — otherwise one surface detaching
+  // its row (e.g. the drawer closing) can clear the anchor for a row that's
+  // still mounted on the other surface.
+  const sidebarActiveViewRowRef = useRef<HTMLDivElement | null>(null)
+  const mobileActiveViewRowRef = useRef<HTMLDivElement | null>(null)
+  const syncActiveViewRow = useCallback(() => {
+    const node = sidebarActiveViewRowRef.current ?? mobileActiveViewRowRef.current
     activeViewRowRef.current = node
     setIsActiveViewRowMounted(node !== null)
   }, [])
+  const setSidebarActiveViewRow = useCallback(
+    (node: HTMLDivElement | null) => {
+      sidebarActiveViewRowRef.current = node
+      syncActiveViewRow()
+    },
+    [syncActiveViewRow]
+  )
+  const setMobileActiveViewRow = useCallback(
+    (node: HTMLDivElement | null) => {
+      mobileActiveViewRowRef.current = node
+      syncActiveViewRow()
+    },
+    [syncActiveViewRow]
+  )
   const computeAvailability = getComputeLogsAvailability({
     isPlatform: IS_PLATFORM,
     flagsLoaded,
@@ -707,7 +728,7 @@ export const UnifiedLogs = ({
     />
   ) : undefined
 
-  const viewsPanel = (
+  const renderViewsPanel = (activeRowRef: (node: HTMLDivElement | null) => void) => (
     <LogsViewsPanel
       key={projectRef}
       views={savedViews}
@@ -719,7 +740,7 @@ export const UnifiedLogs = ({
       activeViewId={activeView?.id ?? null}
       isActiveViewModified={isActiveViewModified}
       isSaving={isSavingNewView}
-      activeRowRef={setActiveViewRow}
+      activeRowRef={activeRowRef}
       onRetry={retrySavedViews}
       onApply={handleApplyView}
       onReviewChanges={handleReviewChanges}
@@ -731,6 +752,8 @@ export const UnifiedLogs = ({
       onSubmitSave={handleCreateView}
     />
   )
+  const sidebarViewsPanel = renderViewsPanel(setSidebarActiveViewRow)
+  const mobileViewsPanel = renderViewsPanel(setMobileActiveViewRow)
 
   return (
     <>
@@ -791,7 +814,7 @@ export const UnifiedLogs = ({
                   }
                   section={
                     showSavedViews && isViewsSectionOpen
-                      ? { label: 'Views', action: saveViewAction, content: viewsPanel }
+                      ? { label: 'Views', action: saveViewAction, content: sidebarViewsPanel }
                       : undefined
                   }
                 />
@@ -861,7 +884,7 @@ export const UnifiedLogs = ({
                               {saveViewAction}
                             </DrawerHeader>
                             <div className="flex min-h-0 flex-1 flex-col overflow-y-auto">
-                              {viewsPanel}
+                              {mobileViewsPanel}
                             </div>
                             <DrawerFooter>
                               <DrawerClose asChild>
