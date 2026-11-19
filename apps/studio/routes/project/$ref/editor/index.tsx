@@ -2,7 +2,9 @@ import { createFileRoute, useNavigate } from '@tanstack/react-router'
 import { useEffect } from 'react'
 
 import { buildTableEditorUrl } from '@/components/grid/SupabaseGrid.utils'
+import DeleteConfirmationDialogs from '@/components/interfaces/TableGridEditor/DeleteConfirmationDialogs'
 import { SidePanelEditor } from '@/components/interfaces/TableGridEditor/SidePanelEditor/SidePanelEditor'
+import { useCloseDeletedTableTab } from '@/components/interfaces/TableGridEditor/useCloseDeletedTableTab'
 import { NewTab } from '@/components/layouts/Tabs/NewTab'
 import { useDashboardHistory } from '@/hooks/misc/useDashboardHistory'
 import { useQuerySchemaState } from '@/hooks/misc/useSchemaQueryState'
@@ -15,6 +17,7 @@ export const Route = createFileRoute('/project/$ref/editor/')({
 
 function TableEditorPage() {
   const navigate = useNavigate()
+  const { closeDeletedTableTab } = useCloseDeletedTableTab()
   const { ref: projectRef } = Route.useParams()
   const tabStore = useTabsStateSnapshot()
   const { selectedSchema } = useQuerySchemaState()
@@ -77,6 +80,7 @@ function TableEditorPage() {
     <>
       <NewTab />
       <SidePanelEditor onTableCreated={onTableCreated} />
+      <DeleteConfirmationDialogs onTableDeleted={closeDeletedTableTab} />
     </>
   )
 }

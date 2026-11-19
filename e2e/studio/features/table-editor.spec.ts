@@ -156,14 +156,14 @@ testRunner('table editor', () => {
     await page.waitForURL(/\/editor\/\d+\?schema=public$/)
     const activeTableUrl = page.url()
 
-    // Right-clicking a table that isn't open disables the actions that only apply to the open table
+    // Every action is available for a table that isn't open
     const otherTableRow = page.getByRole('button', { name: `View ${otherTableName}`, exact: true })
     await otherTableRow.click({ button: 'right' })
     for (const name of ['Edit table', 'Duplicate table', 'Delete table']) {
       await expect(
         page.getByRole('menuitem', { name }),
-        `${name} should be disabled for a table that isn't open`
-      ).toBeDisabled()
+        `${name} should be enabled for a table that isn't open`
+      ).toBeEnabled()
     }
 
     // The other actions work on the row that was right-clicked, without opening it
@@ -190,8 +190,38 @@ testRunner('table editor', () => {
     await expect(confirmDialog).not.toBeVisible()
     await expect(page.getByRole('menu')).toHaveCount(0)
 
-    // View policies links to the row that was right-clicked
+    // Deleting a table that isn't open deletes it, and leaves the open table alone
     await otherTableRow.click({ button: 'right' })
+    await page.getByRole('menuitem', { name: 'Delete table' }).click()
+    const deleteOtherDialog = page.getByRole('dialog', {
+      name: `Confirm deletion of table "${otherTableName}"`,
+    })
+    await expect(
+      deleteOtherDialog,
+      'Delete confirmation should be for the right-clicked table, not the open one'
+    ).toBeVisible()
+    const deletePromise = waitForApiResponse(page, 'pg-meta', ref, 'query?key=table-delete-', {
+      method: 'POST',
+    })
+    await deleteOtherDialog.getByRole('button', { name: 'Delete' }).click()
+    await deletePromise
+    await expect(
+      otherTableRow,
+      'The right-clicked table should be gone from the sidebar'
+    ).not.toBeVisible()
+    await expect(
+      page.getByRole('button', { name: `View ${activeTableName}`, exact: true }),
+      'The open table should still exist'
+    ).toBeVisible()
+    await expect(page, 'Deleting another table should not change the open table').toHaveURL(
+      activeTableUrl
+    )
+    await expect(page.getByRole('menu')).toHaveCount(0)
+
+    // View policies from the context menu links to that table's policies
+    await page
+      .getByRole('button', { name: `View ${activeTableName}`, exact: true })
+      .click({ button: 'right' })
     await page.getByRole('menuitem', { name: 'View policies' }).click()
     await expect(
       page,

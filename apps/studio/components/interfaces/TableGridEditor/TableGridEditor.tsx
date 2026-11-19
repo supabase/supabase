@@ -10,6 +10,7 @@ import { GenericSkeletonLoader } from 'ui-patterns/ShimmeringLoader'
 import DeleteConfirmationDialogs from './DeleteConfirmationDialogs'
 import { SidePanelEditor } from './SidePanelEditor/SidePanelEditor'
 import { TableDefinition } from './TableDefinition'
+import { useCloseDeletedTableTab } from './useCloseDeletedTableTab'
 import { SupabaseGrid } from '@/components/grid/SupabaseGrid'
 import { useSyncTableEditorStateFromLocalStorageWithUrl } from '@/components/grid/SupabaseGrid.utils'
 import {
@@ -25,7 +26,7 @@ import { useDashboardHistory } from '@/hooks/misc/useDashboardHistory'
 import { useQuerySchemaState } from '@/hooks/misc/useSchemaQueryState'
 import { useIsProtectedSchema } from '@/hooks/useProtectedSchemas'
 import { TableEditorTableStateContextProvider } from '@/state/table-editor-table'
-import { createTabId, useTabsStateSnapshot } from '@/state/tabs'
+import { useTabsStateSnapshot } from '@/state/tabs'
 
 export interface TableGridEditorProps {
   isLoadingSelectedTable?: boolean
@@ -65,19 +66,7 @@ export const TableGridEditor = ({
     [projectRef, router, selectedSchema]
   )
 
-  const onTableDeleted = useCallback(async () => {
-    // For simplicity for now, we just open the first table within the same schema
-    if (selectedTable) {
-      // Close tab
-      const tabId = createTabId(selectedTable.entity_type, { id: selectedTable.id })
-      tabs.handleTabClose({
-        id: tabId,
-        router,
-        editor: 'table',
-        onClearDashboardHistory: () => setLastVisitedTable(undefined),
-      })
-    }
-  }, [router, selectedTable, setLastVisitedTable, tabs])
+  const { closeDeletedTableTab } = useCloseDeletedTableTab()
 
   const { isSchemaLocked } = useIsProtectedSchema({ schema: selectedTable?.schema ?? '' })
 
@@ -178,7 +167,7 @@ export const TableGridEditor = ({
 
           <DeleteConfirmationDialogs
             selectedTable={selectedTable}
-            onTableDeleted={onTableDeleted}
+            onTableDeleted={closeDeletedTableTab}
           />
         </TableEditorTableStateContextProvider>
       )}

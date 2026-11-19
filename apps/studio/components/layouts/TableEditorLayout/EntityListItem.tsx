@@ -166,7 +166,7 @@ export const EntityListItem = ({
     return text.charAt(0).toUpperCase() + text.slice(1)
   }
 
-  const actionGroups = getEntityActions({ entity, projectRef, isActive, isLocked })
+  const actionGroups = getEntityActions({ entity, projectRef, isLocked })
   const { onSelectAction, modals } = useEntityActionHandlers({
     entity,
     projectRef,
