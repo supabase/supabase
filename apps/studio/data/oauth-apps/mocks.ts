@@ -37,6 +37,7 @@ export const OAUTH_APPS_MOCK_SCENARIOS = {
   trustedPartnerMixed: 'mock-trusted-partner-mixed',
   trustedPartnerBlocked: 'mock-trusted-partner-blocked',
   trustedPartnerMultipleBlocked: 'mock-trusted-partner-multiple-blocked',
+  trustedPartnerOrgWideBlocked: 'mock-trusted-partner-org-wide-blocked',
   kemalBot: 'mock-kemal-bot',
   kemalBotOrgWide: 'mock-kemal-bot-org-wide',
   dynamicMcpClient: 'mock-dynamic-mcp-client',
@@ -154,6 +155,22 @@ const TRUSTED_PARTNER_REQUEST: OAuthAppsAuthorizeRequest = {
   databaseAccess: { role: 'partner_example_user', mode: 'read' },
 }
 
+const TRUSTED_PARTNER_MULTIPLE_BLOCKED: OAuthAppsAuthorizeRequest = {
+  ...TRUSTED_PARTNER_REQUEST,
+  app_id: 'partner-example-multiple-blocked',
+  databaseAccess: {
+    role: 'partner_example_user',
+    mode: 'write',
+    projectIssues: {
+      northwindcms1: 'postgres_upgrade_required',
+      fabrikamjobs1: 'project_unavailable',
+      fabrikamapi1: 'ssl_enforcement_required',
+      northwindreporting1: 'postgres_upgrade_required',
+      northwindwarehouse1: 'ssl_enforcement_required',
+    },
+  },
+}
+
 const MOCK_AUTHORIZE_REQUESTS: Record<string, OAuthAppsAuthorizeRequest> = {
   [OAUTH_APPS_MOCK_SCENARIOS.vercelDeveloper]: VERCEL_REQUEST,
   [OAUTH_APPS_MOCK_SCENARIOS.vercelReadOnly]: VERCEL_REQUEST,
@@ -190,20 +207,11 @@ const MOCK_AUTHORIZE_REQUESTS: Record<string, OAuthAppsAuthorizeRequest> = {
       },
     },
   },
-  [OAUTH_APPS_MOCK_SCENARIOS.trustedPartnerMultipleBlocked]: {
-    ...TRUSTED_PARTNER_REQUEST,
-    app_id: 'partner-example-multiple-blocked',
-    databaseAccess: {
-      role: 'partner_example_user',
-      mode: 'write',
-      projectIssues: {
-        northwindcms1: 'postgres_upgrade_required',
-        fabrikamjobs1: 'project_unavailable',
-        fabrikamapi1: 'ssl_enforcement_required',
-        northwindreporting1: 'postgres_upgrade_required',
-        northwindwarehouse1: 'ssl_enforcement_required',
-      },
-    },
+  [OAUTH_APPS_MOCK_SCENARIOS.trustedPartnerMultipleBlocked]: TRUSTED_PARTNER_MULTIPLE_BLOCKED,
+  [OAUTH_APPS_MOCK_SCENARIOS.trustedPartnerOrgWideBlocked]: {
+    ...TRUSTED_PARTNER_MULTIPLE_BLOCKED,
+    app_id: 'partner-example-org-wide-blocked',
+    project_scoping_mode: false,
   },
   [OAUTH_APPS_MOCK_SCENARIOS.kemalBot]: KEMAL_BOT_REQUEST,
   [OAUTH_APPS_MOCK_SCENARIOS.kemalBotOrgWide]: KEMAL_BOT_ORG_WIDE_REQUEST,
@@ -263,6 +271,7 @@ const MOCK_IDENTITIES: Record<string, OAuthAppsAuthorizeIdentity> = {
   [OAUTH_APPS_MOCK_SCENARIOS.trustedPartnerMixed]: TRUSTED_PARTNER_IDENTITY,
   [OAUTH_APPS_MOCK_SCENARIOS.trustedPartnerBlocked]: TRUSTED_PARTNER_IDENTITY,
   [OAUTH_APPS_MOCK_SCENARIOS.trustedPartnerMultipleBlocked]: TRUSTED_PARTNER_IDENTITY,
+  [OAUTH_APPS_MOCK_SCENARIOS.trustedPartnerOrgWideBlocked]: TRUSTED_PARTNER_IDENTITY,
   [OAUTH_APPS_MOCK_SCENARIOS.vercelDeveloper]: {
     email: 'admin@example.com',
     organizations: [NORTHWIND_TRADERS_DEVELOPER, CONTOSO_LABS],

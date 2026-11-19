@@ -326,6 +326,22 @@ describe('OAuthAppsAuthorizeScreen', () => {
     expect(authorize).toBeEnabled()
   })
 
+  test('shows organization-wide project issues without letting the member deselect projects', async () => {
+    renderScreen({ authId: OAUTH_APPS_MOCK_SCENARIOS.trustedPartnerOrgWideBlocked })
+
+    expect(await screen.findAllByText('Needs Postgres 17 or later.')).toHaveLength(2)
+    expect(screen.getByText('The database is currently unavailable.')).toBeInTheDocument()
+    expect(screen.getByRole('list', { name: 'Projects that will require SSL' })).toHaveTextContent(
+      'northwind-warehouse'
+    )
+    expect(screen.queryByRole('combobox')).not.toBeInTheDocument()
+    expect(screen.queryByRole('button', { name: /^Remove / })).not.toBeInTheDocument()
+    expect(screen.getByRole('button', { name: 'Authorize Example Partner' })).toHaveAttribute(
+      'aria-disabled',
+      'true'
+    )
+  })
+
   test('shows the change in Table data access for a returning partner', async () => {
     renderScreen({ authId: OAUTH_APPS_MOCK_SCENARIOS.trustedPartnerReconsent })
 

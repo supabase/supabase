@@ -36,6 +36,9 @@ const MOCK_SCENARIOS: Record<string, { authId: string; organizationSlug?: string
   trusted_partner_multiple_blocked: {
     authId: OAUTH_APPS_MOCK_SCENARIOS.trustedPartnerMultipleBlocked,
   },
+  trusted_partner_org_wide_blocked: {
+    authId: OAUTH_APPS_MOCK_SCENARIOS.trustedPartnerOrgWideBlocked,
+  },
   default: { authId: OAUTH_APPS_MOCK_SCENARIOS.vercelDeveloper },
   reconsent: { authId: OAUTH_APPS_MOCK_SCENARIOS.vercelReconsent },
   reconsent_all_projects: { authId: OAUTH_APPS_MOCK_SCENARIOS.vercelReconsentAllProjects },
@@ -69,6 +72,7 @@ const CONSENT_PREVIEWS = [
     project: 'northwindcms1',
   },
   { value: 'trusted_partner_multiple_blocked', label: 'Partner · blocked projects' },
+  { value: 'trusted_partner_org_wide_blocked', label: 'Partner · organization-wide blockers' },
   { value: 'trusted_partner_reconsent', label: 'Returning partner · Table data upgrade' },
   { value: 'reconsent', label: 'Returning app · changed permissions' },
   { value: 'dynamic_client', label: 'Unverified app' },
