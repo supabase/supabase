@@ -145,7 +145,7 @@ On a client that sets `accessToken`, leave out the Auth plugin (`install(Auth)`)
 
 </Tabs>
 
-A client that sets `accessToken` can't use Supabase Auth methods such as `signInWithPassword`. Sign users in and out with Firebase Auth instead. To use Supabase Auth as well, create a second client without `accessToken`.
+A client that sets `accessToken` can't use Supabase Auth methods such as `signInWithPassword`. On that client, sign users in and out with Firebase Auth. To use Supabase Auth as well, create a second client without `accessToken`. Send each user's requests with the client that matches how they signed in.
 
 ## Add a new Third-Party Auth integration to your project
 
