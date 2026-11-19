@@ -96,10 +96,7 @@ export function getReportStatus(view: ReportView, emptyMessage: string) {
   }
 }
 
-export function getEmptyMessage(
-  metric?: WarehouseMetric,
-  noDataMessage = 'No data in the last 60 minutes'
-) {
+export function getEmptyMessage(metric?: WarehouseMetric) {
   if (!metric || metric.series.length > 1) return 'Metrics are temporarily unavailable'
   switch (metric.availability) {
     case 'stale':
@@ -111,6 +108,6 @@ export function getEmptyMessage(
     case 'not_provisioned':
       return 'Metrics are temporarily unavailable'
     default:
-      return noDataMessage
+      return 'No data in the selected period'
   }
 }
