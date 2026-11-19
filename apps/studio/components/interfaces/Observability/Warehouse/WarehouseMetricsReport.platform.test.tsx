@@ -1,6 +1,8 @@
 import { QueryClient } from '@tanstack/react-query'
-import { screen } from '@testing-library/react'
+import { screen, waitFor } from '@testing-library/react'
+import userEvent from '@testing-library/user-event'
 import type { platformComponents as components } from 'api-types'
+import dayjs from 'dayjs'
 import { HttpResponse } from 'msw'
 import { beforeEach, expect, test, vi } from 'vitest'
 
@@ -67,15 +69,22 @@ const renderReport = (enabled = true) => {
   const queryClient = new QueryClient({
     defaultOptions: { queries: { retry: false, staleTime: Infinity } },
   })
+  queryClient.setQueryData(['warehouse-configcat-flag', 'default'], enabled ? ['free-org'] : [])
   queryClient.setQueryData(projectKeys.detail('default'), { organization_id: 1 })
-  queryClient.setQueryData(organizationKeys.list(), [{ id: 1, slug: 'warehouse-org' }])
-  queryClient.setQueryData(
-    ['warehouse-configcat-flag', 'default'],
-    enabled ? ['warehouse-org'] : []
-  )
-  return customRender(<WarehouseMetricsReport />, { queryClient })
+  queryClient.setQueryData(organizationKeys.list(), [
+    { id: 1, slug: 'free-org', plan: { id: 'free' } },
+  ])
+  queryClient.setQueryData(organizationKeys.entitlements('free-org'), {
+    entitlements: [
+      {
+        feature: { key: 'log.retention_days' },
+        type: 'numeric',
+        config: { enabled: true, unlimited: false, value: 1 },
+      },
+    ],
+  })
+  return customRender(<WarehouseMetricsReport />, { queryClient, nuqs: { hasMemory: true } })
 }
-
 beforeEach(() => {
   mockSetup()
   addAPIMock({
@@ -84,12 +93,12 @@ beforeEach(() => {
     response: () => HttpResponse.json<APIErrorBody>({ message: 'Not found' }, { status: 404 }),
   })
 })
-test('shows an explicit last-hour empty state', async () => {
+test('shows no data for the selected period', async () => {
   mockMetrics(null)
   renderReport()
-  expect(await screen.findByText('No data in the last 60 minutes')).toBeInTheDocument()
-  expect(screen.getByRole('status')).toHaveTextContent(
-    'Warehouse report: No data in the last 60 minutes'
+  expect(await screen.findByText('No data in the selected period')).toBeInTheDocument()
+  expect(screen.getByRole('status', { name: 'Report status' })).toHaveTextContent(
+    'Warehouse report: No data in the selected period'
   )
 })
 test('renders measured zero as query activity', async () => {
@@ -98,7 +107,7 @@ test('renders measured zero as query activity', async () => {
   expect(
     await screen.findByText('Queries started per second. Not a count of SQL statements.')
   ).toBeInTheDocument()
-  expect(screen.queryByText('No data in the last 60 minutes')).not.toBeInTheDocument()
+  expect(screen.queryByText('No data in the selected period')).not.toBeInTheDocument()
 })
 test.each(['not_started', 'disabled'] as const)(
   'offers setup when Warehouse is %s',
@@ -120,6 +129,68 @@ test('shows a request failure rather than a no-data state', async () => {
   })
   renderReport()
   expect(await screen.findByText('Failed to retrieve Warehouse metrics')).toBeInTheDocument()
+})
+
+test('requests the period selected in the date picker', async () => {
+  const requests: URL[] = []
+  addAPIMock({
+    method: 'get',
+    path: '/platform/warehouse/:ref/metrics',
+    response: ({ request }) => {
+      requests.push(new URL(request.url))
+      return HttpResponse.json<WarehouseMetricsResponse>(response(null))
+    },
+  })
+  renderReport()
+  await screen.findByText('No data in the selected period')
+  await userEvent.click(screen.getByRole('button', { name: /Last 60 minutes/ }))
+  await userEvent.click(screen.getByText('Last 24 hours'))
+  await waitFor(() => expect(requests.at(-1)?.searchParams.get('interval')).toBe('5m'))
+  const lastRequest = requests.at(-1)!
+  expect(
+    dayjs(lastRequest.searchParams.get('endDate')).diff(
+      dayjs(lastRequest.searchParams.get('startDate')),
+      'hour',
+      true
+    )
+  ).toBeCloseTo(24, 2)
+})
+
+test('refreshes report measurements without changing the selected period', async () => {
+  let requests = 0
+  addAPIMock({
+    method: 'get',
+    path: '/platform/warehouse/:ref/metrics',
+    response: () => {
+      requests += 1
+      return HttpResponse.json<WarehouseMetricsResponse>(response(requests > 2 ? 4 : null))
+    },
+  })
+  renderReport()
+  await screen.findByText('No data in the selected period')
+  await userEvent.click(screen.getByRole('button', { name: /Last 60 minutes/ }))
+  await userEvent.click(screen.getByText('Last 24 hours'))
+  await waitFor(() => expect(requests).toBe(2))
+  await waitFor(() => expect(screen.getByRole('button', { name: 'Refresh report' })).toBeEnabled())
+  const before = requests
+  await userEvent.keyboard('{Shift>}R{/Shift}')
+  expect(
+    await screen.findByText('Queries started per second. Not a count of SQL statements.')
+  ).toBeInTheDocument()
+  expect(requests).toBeGreaterThan(before)
+  expect(screen.getByRole('button', { name: /Last 24 hours/ })).toBeInTheDocument()
+})
+
+test('shows the retention upgrade prompt instead of requesting seven days on a free plan', async () => {
+  const metricsRequest = vi.fn(() => HttpResponse.json<WarehouseMetricsResponse>(response(null)))
+  addAPIMock({ method: 'get', path: '/platform/warehouse/:ref/metrics', response: metricsRequest })
+  renderReport()
+  await screen.findByText('No data in the selected period')
+  await userEvent.click(screen.getByRole('button', { name: /Last 60 minutes/ }))
+  const requestsBefore = metricsRequest.mock.calls.length
+  await userEvent.click(screen.getByText('Last 7 days'))
+  expect(await screen.findByRole('dialog')).toHaveTextContent('Report date range')
+  expect(metricsRequest).toHaveBeenCalledTimes(requestsBefore)
 })
 
 test('does not request Warehouse data without access', async () => {
@@ -147,4 +218,31 @@ test('shows setup status failures when metrics cannot establish activity', async
   mockMetrics(null)
   renderReport()
   expect(await screen.findByText('Failed to retrieve Warehouse status')).toBeInTheDocument()
+})
+
+test('refresh recovers a failed setup status request', async () => {
+  let requests = 0
+  addAPIMock({
+    method: 'get',
+    path: '/platform/warehouse/:ref/setup-status',
+    response: () => {
+      requests += 1
+      return requests === 1
+        ? HttpResponse.json<APIErrorBody>({ message: 'Failed' }, { status: 500 })
+        : HttpResponse.json<Setup>(setup)
+    },
+  })
+  mockMetrics(null)
+  renderReport()
+  await screen.findByText('Failed to retrieve Warehouse status')
+  await userEvent.click(screen.getByRole('button', { name: 'Refresh report' }))
+  expect(await screen.findByText('No data in the selected period')).toBeInTheDocument()
+})
+
+test('opens the date picker with its report shortcut', async () => {
+  mockMetrics(null)
+  renderReport()
+  await screen.findByText('No data in the selected period')
+  await userEvent.keyboard('{Shift>}P{/Shift}')
+  expect(await screen.findByText('Last 24 hours')).toBeVisible()
 })
