@@ -76,11 +76,11 @@ Get this string from the Supabase Dashboard by clicking [Connect](/dashboard/pro
 
 ### Shared pooler, transaction mode [#pooler-transaction-mode]
 
-The transaction mode connection string connects to your Postgres instance through the shared pooler in transaction-pooling mode. Use it for serverless and edge functions, which open many short-lived connections.
+The transaction mode connection string connects to your Postgres instance through the shared pooler in transaction-pooling mode. Use it for serverless and [edge functions](/docs/guides/functions), which open many short-lived connections.
 
 <Admonition type="caution">
 
-The shared pooler doesn't support [prepared statements](https://postgresql.org/docs/current/sql-prepare.html) in transaction mode. To avoid errors, turn them off in your connection library. See [Transaction mode limitations](#transaction-mode-limitations) for the setting your driver uses and for the other session-state features this affects.
+The shared pooler doesn't support [prepared statements](https://www.postgresql.org/docs/current/sql-prepare.html) in transaction mode. To avoid errors, turn them off in your connection library. See [Transaction mode limitations](#transaction-mode-limitations) for the setting your driver uses and for the other session-state features this affects.
 
 </Admonition>
 

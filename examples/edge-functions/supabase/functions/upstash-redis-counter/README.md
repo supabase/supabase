@@ -1,6 +1,6 @@
 # Upstash Redis in Supabase Edge Functions
 
-A Redis counter example that stores a [hash](https://redis.io/commands/hincrby/) of function invocation count per region.
+A Redis counter example that stores a [hash](https://redis.io/docs/latest/commands/hincrby/) of function invocation count per region.
 
 ## Redis database setup
 

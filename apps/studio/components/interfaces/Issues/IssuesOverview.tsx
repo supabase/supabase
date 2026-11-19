@@ -1,7 +1,6 @@
 import { useFlag, useParams } from 'common'
 import { ChevronRightIcon } from 'lucide-react'
 import Link from 'next/link'
-import { cn } from 'ui'
 import { GenericSkeletonLoader } from 'ui-patterns/ShimmeringLoader'
 
 import {
@@ -9,12 +8,13 @@ import {
   CATEGORY_LABELS,
   ISSUE_CATEGORIES,
   ISSUE_SEVERITIES,
-  SEVERITY_DOT_CLASSES,
   SEVERITY_LABELS,
 } from './Issues.constants'
 import { IssuesLegacyRedirect } from './IssuesLegacyRedirect'
+import { SeverityIndicator } from './SeverityIndicator'
 import { AlertError } from '@/components/ui/AlertError'
 import { DocsButton } from '@/components/ui/DocsButton'
+import type { IssueSeverity } from '@/data/issues/issue.types'
 import { useProjectIssues } from '@/data/issues/useProjectIssues'
 import { DOCS_URL } from '@/lib/constants'
 
@@ -63,7 +63,7 @@ export const IssuesOverview = () => {
                   key={severity}
                   label={SEVERITY_LABELS[severity]}
                   value={severityCounts[severity] ?? 0}
-                  dotClassName={SEVERITY_DOT_CLASSES[severity]}
+                  severity={severity}
                   href={`/project/${ref}/issues?severity=${severity}`}
                 />
               ))}
@@ -110,19 +110,19 @@ const StatCard = ({
   label,
   value,
   href,
-  dotClassName,
+  severity,
 }: {
   label: string
   value: number
   href: string
-  dotClassName?: string
+  severity?: IssueSeverity
 }) => (
   <Link
     href={href}
     className="flex flex-col gap-1 rounded-md border bg-card px-4 py-3 hover:border-strong"
   >
     <span className="flex items-center gap-1.5 text-xs text-foreground-lighter">
-      {dotClassName && <span className={cn('size-1.5 rounded-full', dotClassName)} />}
+      {severity && <SeverityIndicator severity={severity} aria-hidden />}
       {label}
     </span>
     <span className="text-2xl tabular-nums text-foreground">{value}</span>

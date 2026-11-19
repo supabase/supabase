@@ -2,10 +2,9 @@ import { useMemo } from 'react'
 
 import { groupScopesByLevel } from './OAuthAppsAuthorizeScreen.utils'
 import { ScopeGroupCardItem } from './ScopeGroupCardItem'
-import type { OAuthScope } from '@/data/oauth-apps/types'
 
 export interface ScopeGroupCardProps {
-  scopes: OAuthScope[]
+  scopes: string[]
 }
 
 export const ScopeGroupCard = ({ scopes }: ScopeGroupCardProps) => {
