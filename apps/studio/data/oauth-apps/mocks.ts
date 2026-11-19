@@ -36,6 +36,7 @@ export const OAUTH_APPS_MOCK_SCENARIOS = {
   trustedPartnerWrite: 'mock-trusted-partner-write',
   trustedPartnerMixed: 'mock-trusted-partner-mixed',
   trustedPartnerBlocked: 'mock-trusted-partner-blocked',
+  trustedPartnerMultipleBlocked: 'mock-trusted-partner-multiple-blocked',
   kemalBot: 'mock-kemal-bot',
   kemalBotOrgWide: 'mock-kemal-bot-org-wide',
   dynamicMcpClient: 'mock-dynamic-mcp-client',
@@ -189,6 +190,18 @@ const MOCK_AUTHORIZE_REQUESTS: Record<string, OAuthAppsAuthorizeRequest> = {
       },
     },
   },
+  [OAUTH_APPS_MOCK_SCENARIOS.trustedPartnerMultipleBlocked]: {
+    ...TRUSTED_PARTNER_REQUEST,
+    app_id: 'partner-example-multiple-blocked',
+    databaseAccess: {
+      role: 'partner_example_user',
+      mode: 'write',
+      projectIssues: {
+        northwindcms1: 'postgres_upgrade_required',
+        fabrikamjobs1: 'project_unavailable',
+      },
+    },
+  },
   [OAUTH_APPS_MOCK_SCENARIOS.kemalBot]: KEMAL_BOT_REQUEST,
   [OAUTH_APPS_MOCK_SCENARIOS.kemalBotOrgWide]: KEMAL_BOT_ORG_WIDE_REQUEST,
   [OAUTH_APPS_MOCK_SCENARIOS.dynamicMcpClient]: DYNAMIC_MCP_CLIENT_REQUEST,
@@ -246,6 +259,7 @@ const MOCK_IDENTITIES: Record<string, OAuthAppsAuthorizeIdentity> = {
   [OAUTH_APPS_MOCK_SCENARIOS.trustedPartnerWrite]: TRUSTED_PARTNER_IDENTITY,
   [OAUTH_APPS_MOCK_SCENARIOS.trustedPartnerMixed]: TRUSTED_PARTNER_IDENTITY,
   [OAUTH_APPS_MOCK_SCENARIOS.trustedPartnerBlocked]: TRUSTED_PARTNER_IDENTITY,
+  [OAUTH_APPS_MOCK_SCENARIOS.trustedPartnerMultipleBlocked]: TRUSTED_PARTNER_IDENTITY,
   [OAUTH_APPS_MOCK_SCENARIOS.vercelDeveloper]: {
     email: 'admin@example.com',
     organizations: [NORTHWIND_TRADERS_DEVELOPER, CONTOSO_LABS],
@@ -356,6 +370,15 @@ const DEFAULT_ORG_APP_DETAILS: OAuthOrgAppDetails = {
 
 const MOCK_ORG_APP_DETAILS: Record<string, Record<string, OAuthOrgAppDetails>> = {
   'northwind-traders': {
+    'partner-example-multiple-blocked': {
+      existing_grant: {
+        grant_id: 'PARTNER_EXAMPLE_MULTIPLE_BLOCKED',
+        approved_scopes: ['projects:read'],
+        databaseAccessMode: 'read',
+        project_refs: ['northwindcms1', 'fabrikamjobs1'],
+        approved_at: '2026-08-14T09:12:00.000Z',
+      },
+    },
     'partner-example-returning': {
       existing_grant: {
         grant_id: 'PARTNER_EXAMPLE_RETURNING',

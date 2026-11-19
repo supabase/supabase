@@ -193,14 +193,17 @@ export const OAuthAppsAuthorizeScreen = ({
   const usesSelectedProjects = isProjectScopingModeEnabled && !allProjectsSelected
   const projectsInGrant = usesSelectedProjects ? (selectedProjects ?? []) : (projects ?? [])
   const readinessIssues = databaseAccess?.projectIssues
-  const blockedProjects = projectsInGrant.filter(
-    ({ ref }) => readinessIssues?.[ref] === 'postgres_upgrade_required'
-  )
+  const blockedProjects = projectsInGrant.flatMap(({ ref, name }) => {
+    const issue = readinessIssues?.[ref]
+    return issue && issue !== 'ssl_enforcement_required' ? [{ ref, name, issue }] : []
+  })
   const sslProjects = projectsInGrant.filter(
     ({ ref }) => readinessIssues?.[ref] === 'ssl_enforcement_required'
   )
   const hasBlockedProjects = usesSelectedProjects
-    ? selectedProjectRefs.some((ref) => readinessIssues?.[ref] === 'postgres_upgrade_required')
+    ? selectedProjectRefs.some((ref) =>
+        Boolean(readinessIssues?.[ref] && readinessIssues[ref] !== 'ssl_enforcement_required')
+      )
     : blockedProjects.length > 0
 
   const flaggedRefs = getFailedProjects(roleFailure)

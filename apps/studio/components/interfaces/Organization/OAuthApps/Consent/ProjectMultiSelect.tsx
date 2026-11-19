@@ -10,7 +10,10 @@ import {
   MultiSelectorTrigger,
 } from 'ui-patterns/multi-select'
 
-import type { OAuthAppsAuthorizeOrganizationProject } from '@/data/oauth-apps/types'
+import type {
+  OAuthAppsAuthorizeOrganizationProject,
+  OAuthAppsAuthorizeRequest,
+} from '@/data/oauth-apps/types'
 
 export const MAX_SELECTED_PROJECTS = 10
 
@@ -22,9 +25,7 @@ export interface ProjectMultiSelectProps {
   error?: string
   flaggedRefs?: string[]
   unavailableRefs?: string[]
-  readinessIssues?: Partial<
-    Record<string, 'postgres_upgrade_required' | 'ssl_enforcement_required'>
-  >
+  readinessIssues?: NonNullable<OAuthAppsAuthorizeRequest['databaseAccess']>['projectIssues']
   allProjectsSelected?: boolean
   onAllProjectsChange?: (selected: boolean) => void
   onSearchChange: (query: string) => void
@@ -72,7 +73,7 @@ export const ProjectMultiSelect = ({
           <span
             className={cn(
               'mr-1.5 inline-block size-1.5 rounded-full group-data-[state=open]:hidden',
-              readinessIssues[ref] === 'postgres_upgrade_required'
+              readinessIssues[ref] !== 'ssl_enforcement_required'
                 ? 'bg-warning'
                 : 'bg-foreground-muted'
             )}
@@ -157,15 +158,16 @@ export const ProjectMultiSelect = ({
                             <span className="text-foreground-lighter"> - Unavailable</span>
                           )}
                         </span>
-                        {readinessIssues[project.ref] === 'postgres_upgrade_required' && (
-                          <>
-                            <span
-                              className="size-1.5 shrink-0 rounded-full bg-warning"
-                              aria-hidden
-                            />
-                            <span className="sr-only">Needs Postgres 17 or later</span>
-                          </>
-                        )}
+                        {readinessIssues[project.ref] &&
+                          readinessIssues[project.ref] !== 'ssl_enforcement_required' && (
+                            <>
+                              <span
+                                className="size-1.5 shrink-0 rounded-full bg-warning"
+                                aria-hidden
+                              />
+                              <span className="sr-only">Blocks authorization</span>
+                            </>
+                          )}
                         {readinessIssues[project.ref] === 'ssl_enforcement_required' && (
                           <>
                             <span
