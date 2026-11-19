@@ -75,7 +75,7 @@ export const ProjectMultiSelect = ({
               'mr-1.5 inline-block size-1.5 rounded-full group-data-[state=open]:hidden',
               readinessIssues[ref] !== 'ssl_enforcement_required'
                 ? 'bg-warning'
-                : 'bg-foreground-muted'
+                : 'bg-foreground-muted/75'
             )}
             aria-hidden
           />
@@ -171,7 +171,7 @@ export const ProjectMultiSelect = ({
                         {readinessIssues[project.ref] === 'ssl_enforcement_required' && (
                           <>
                             <span
-                              className="size-1.5 shrink-0 rounded-full bg-foreground-muted"
+                              className="size-1.5 shrink-0 rounded-full bg-foreground-muted/75"
                               aria-hidden
                             />
                             <span className="sr-only">SSL enforcement will be enabled</span>
