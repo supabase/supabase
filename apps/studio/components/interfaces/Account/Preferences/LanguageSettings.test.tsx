@@ -65,7 +65,8 @@ describe('LanguageSettings', () => {
 describe('partially translated preferences', () => {
   it('keeps untranslated content English and marks translated controls and portal content', async () => {
     localStorage.setItem(LOCAL_STORAGE_KEYS.UI_LOCALE, JSON.stringify('ja'))
-    const storedTimezone = localStorage.getItem(LOCAL_STORAGE_KEYS.UI_TIMEZONE)
+    const storedTimezone = JSON.stringify('Asia/Tokyo')
+    localStorage.setItem(LOCAL_STORAGE_KEYS.UI_TIMEZONE, storedTimezone)
     const user = userEvent.setup()
 
     customRender(

@@ -26,7 +26,9 @@ const renderTranslation = async (stored?: string, { isStrictMode = false } = {})
   const rendered = renderHook(() => useTranslation(), { wrapper })
 
   await waitFor(() =>
-    expect(queryClient.getQueryState(['localStorage', storageKey])?.status).not.toBe('pending')
+    expect(['success', 'error']).toContain(
+      queryClient.getQueryState(['localStorage', storageKey])?.status
+    )
   )
   return rendered
 }
