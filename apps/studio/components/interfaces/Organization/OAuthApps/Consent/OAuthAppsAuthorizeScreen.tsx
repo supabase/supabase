@@ -332,8 +332,8 @@ export const OAuthAppsAuthorizeScreen = ({
       ? null
       : `Cancelling will redirect you to ${request.redirect_uri} with access denied.`
 
-  const cannotApprove =
-    preflightData?.validation_failure != null || hasNoSelection || hasBlockedProjects
+  const cannotGrantRequestedAccess = preflightData?.validation_failure != null
+  const cannotApprove = cannotGrantRequestedAccess || hasNoSelection || hasBlockedProjects
 
   return (
     <InterstitialLayout
@@ -417,7 +417,7 @@ export const OAuthAppsAuthorizeScreen = ({
             />
           )}
 
-          {canProceed && (
+          {canProceed && !cannotGrantRequestedAccess && (
             <>
               <section className="flex flex-col gap-3">
                 <div className="space-y-1">
@@ -460,33 +460,37 @@ export const OAuthAppsAuthorizeScreen = ({
           )}
         </fieldset>
 
-        <div className="flex flex-col gap-2">
-          {preflightData?.validation_failure != null && (
-            <Admonition
-              type="warning"
-              title="You don’t have permission to authorize this app"
-              description={`Your role in ${memberOrg} can’t grant the requested access. Ask an admin or switch organizations.`}
-            />
-          )}
-          {canProceed && sslProjects.length > 0 && (
-            <Admonition
-              type="note"
-              title="SSL enforcement"
-              description="Setup will enable SSL enforcement on these projects. Clients without SSL will no longer connect."
-            >
-              <div
-                role="list"
-                aria-label="Projects that will require SSL"
-                className="divide-y text-xs"
+        {(cannotGrantRequestedAccess || (canProceed && sslProjects.length > 0)) && (
+          <div className="flex flex-col gap-2">
+            {cannotGrantRequestedAccess && (
+              <Admonition
+                type="warning"
+                title="You don’t have permission to authorize this application"
+                description={`Your role in “${memberOrg}” can’t grant the requested access. Ask an admin or switch organizations.`}
+              />
+            )}
+            {canProceed && !cannotGrantRequestedAccess && sslProjects.length > 0 && (
+              <Admonition
+                type="note"
+                title="SSL enforcement"
+                description="Setup will enable SSL enforcement on these projects. Clients without SSL will no longer connect."
               >
-                {sslProjects.map(({ ref, name }) => (
-                  <div key={ref} role="listitem" className="py-1.5 font-medium text-foreground">
-                    {name}
-                  </div>
-                ))}
-              </div>
-            </Admonition>
-          )}
+                <div
+                  role="list"
+                  aria-label="Projects that will require SSL"
+                  className="divide-y text-xs"
+                >
+                  {sslProjects.map(({ ref, name }) => (
+                    <div key={ref} role="listitem" className="py-1.5 font-medium text-foreground">
+                      {name}
+                    </div>
+                  ))}
+                </div>
+              </Admonition>
+            )}
+          </div>
+        )}
+        <div className="flex flex-col gap-2">
           {canProceed ? (
             <ButtonTooltip
               block

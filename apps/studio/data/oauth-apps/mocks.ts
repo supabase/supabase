@@ -199,6 +199,7 @@ const MOCK_AUTHORIZE_REQUESTS: Record<string, OAuthAppsAuthorizeRequest> = {
       projectIssues: {
         northwindcms1: 'postgres_upgrade_required',
         fabrikamjobs1: 'project_unavailable',
+        fabrikamapi1: 'ssl_enforcement_required',
       },
     },
   },
@@ -375,7 +376,7 @@ const MOCK_ORG_APP_DETAILS: Record<string, Record<string, OAuthOrgAppDetails>> =
         grant_id: 'PARTNER_EXAMPLE_MULTIPLE_BLOCKED',
         approved_scopes: ['projects:read'],
         databaseAccessMode: 'read',
-        project_refs: ['northwindcms1', 'fabrikamjobs1'],
+        project_refs: ['northwindcms1', 'fabrikamjobs1', 'fabrikamapi1'],
         approved_at: '2026-08-14T09:12:00.000Z',
       },
     },
