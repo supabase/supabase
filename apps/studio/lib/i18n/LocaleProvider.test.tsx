@@ -5,6 +5,7 @@ import { StrictMode, type ReactNode } from 'react'
 import { afterEach, describe, expect, it } from 'vitest'
 
 import { LocaleProvider, useTranslation } from './LocaleProvider'
+import { getLocalStorageQueryKey } from '@/hooks/misc/useLocalStorage'
 import { CustomWrapper } from '@/tests/lib/custom-render'
 
 const storageKey = LOCAL_STORAGE_KEYS.UI_LOCALE
@@ -27,7 +28,7 @@ const renderTranslation = async (stored?: string, { isStrictMode = false } = {})
 
   await waitFor(() =>
     expect(['success', 'error']).toContain(
-      queryClient.getQueryState(['localStorage', storageKey])?.status
+      queryClient.getQueryState(getLocalStorageQueryKey(storageKey))?.status
     )
   )
   return rendered

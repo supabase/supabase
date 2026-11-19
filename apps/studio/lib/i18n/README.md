@@ -34,6 +34,10 @@ yet is shown in English.
 1. Add the code to `LOCALES` and a label (written in that language) to `LOCALE_LABELS` in
    `locales.ts`.
 2. Create `messages/<code>.ts` and register it in `translate.ts`.
+3. Include the new catalog in `messages/messages.test.ts` so its keys and placeholders are
+   checked against English. Add the catalog to the `translate.test.ts` fixtures and cover
+   translated lookup and English fallback. If either `locales.test.ts` or
+   `LocaleProvider.test.tsx` treats the new locale as unsupported, update those cases.
 
 ## Not covered yet
 
