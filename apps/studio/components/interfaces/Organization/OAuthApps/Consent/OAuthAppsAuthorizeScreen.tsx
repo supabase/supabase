@@ -426,7 +426,7 @@ export const OAuthAppsAuthorizeScreen = ({
               <div
                 role="list"
                 aria-label="Projects that will require SSL"
-                className="divide-y rounded-md border px-2 text-xs"
+                className="divide-y rounded-md border bg-surface-100 px-2 text-xs"
               >
                 {sslProjects.map(({ ref, name }) => (
                   <div key={ref} role="listitem" className="py-1.5 font-medium text-foreground">
@@ -467,10 +467,10 @@ export const OAuthAppsAuthorizeScreen = ({
                     type="warning"
                     description={
                       <>
-                        This app can connect directly to your database and read rows that your
-                        access rules normally hide.
+                        This app will be able to connect directly to your database and read rows
+                        that your access rules normally hide.
                         {databaseAccess.mode === 'write' &&
-                          ' It can also change data and database structure.'}
+                          ' It will also be able to change data and database structure.'}
                       </>
                     }
                   />

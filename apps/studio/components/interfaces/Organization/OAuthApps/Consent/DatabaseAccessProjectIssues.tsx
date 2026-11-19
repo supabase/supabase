@@ -20,9 +20,9 @@ export function DatabaseAccessProjectIssues({
       title="These projects require changes first"
       description={onRemove ? 'Fix or remove them to continue.' : 'Fix them to continue.'}
     >
-      <div className="divide-y rounded-md border px-2 text-xs">
+      <div className="mt-1 divide-y rounded-md border bg-surface-100 px-2 text-xs">
         {projects.map(({ ref, name, issue }) => (
-          <div key={ref} className="flex items-center justify-between gap-2 py-1.5">
+          <div key={ref} className="flex items-center justify-between gap-1 py-1.5">
             <div>
               <p className="font-medium text-foreground">{name}</p>
               <p>
