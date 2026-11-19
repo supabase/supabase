@@ -9,7 +9,7 @@
 
 [Supabase](https://supabase.com) একটি ওপেন সোর্স ফায়ারবেস বিকল্প। আমরা এন্টারপ্রাইজ-গ্রেড ওপেন সোর্স সরঞ্জাম ব্যবহার করে ফায়ারবেসের বৈশিষ্ট্যগুলি তৈরি করছি।
 
-- [x] হোস্ট করা পোস্টগ্রেস ডাটাবেস. [ডক্স](https://supabase.com/docs/guides/database)
+- [x] হোস্ট করা পোস্টগ্রেস ডাটাবেস. [ডক্স](https://supabase.com/docs/guides/database/overview)
 - [x] অথেনটিকেশন এবং অথরাইজড . [ডক্স](https://supabase.com/docs/guides/auth)
 - [x] স্বয়ংক্রিয়ভাবে তৈরি এপিআই.
   - [x] রেস্ট. [ডক্স](https://supabase.com/docs/guides/api#rest-api-overview)
@@ -56,14 +56,14 @@ Supabase হল ওপেন সোর্স টুলের সংমিশ্�
 **স্থাপত্য**
 
 সুপাবেস হল একটি [হোস্ট করা প্ল্যাটফর্ম](https://supabase.com/dashboard)। আপনি সাইন আপ করে এবং কিছু ইনস্টল না করে সুপাবেস ব্যবহার শুরু করতে পারেন।
-এছাড়াও আপনি [স্ব-হোস্ট](https://supabase.com/docs/guides/hosting/overview) এবং [ডেভেলপ লোকালি](https://supabase.com/docs/guides/local-development) করতে পারেন।
+এছাড়াও আপনি [স্ব-হোস্ট](https://supabase.com/docs/guides/self-hosting) এবং [ডেভেলপ লোকালি](https://supabase.com/docs/guides/local-development) করতে পারেন।
 
 ![আর্কিটেকচার](https://github.com/supabase/supabase/blob/master/apps/docs/public/img/supabase-architecture.svg)
 
 - [PostgreSQL](https://www.postgresql.org/) হল একটি অবজেক্ট-রিলেশনাল ডাটাবেস সিস্টেম যার 30 বছরের বেশি সক্রিয় বিকাশ রয়েছে যা এটিকে নির্ভরযোগ্যতা, বৈশিষ্ট্যের দৃঢ়তা এবং কর্মক্ষমতার জন্য একটি শক্তিশালী খ্যাতি অর্জন করেছে।
 - [রিয়েলটাইম](https://github.com/supabase/realtime) হল একটি Elixir সার্ভার যা আপনাকে ওয়েবসকেট ব্যবহার করে PostgreSQL সন্নিবেশ, আপডেট এবং মুছে ফেলা শুনতে দেয়। ডাটাবেস পরিবর্তনের জন্য রিয়েলটাইম পোল পোস্টগ্রেসের অন্তর্নির্মিত প্রতিলিপি কার্যকারিতা, পরিবর্তনগুলিকে JSON-এ রূপান্তরিত করে, তারপর অনুমোদিত ক্লায়েন্টদের কাছে ওয়েবসকেটের মাধ্যমে JSON সম্প্রচার করে।
 - [PostgREST](http://postgrest.org/) একটি ওয়েব সার্ভার যা আপনার PostgreSQL ডাটাবেসকে সরাসরি একটি রেস্টফুল এপিআইতে পরিণত করে।
-- [স্টোরেজ](https://github.com/supabase/storage-api) অনুমতিগুলি পরিচালনা করতে পোস্টগ্রেস ব্যবহার করে S3-এ সঞ্চিত ফাইলগুলি পরিচালনা করার জন্য একটি রেস্টফুল ইন্টারফেস প্রদান করে।
+- [স্টোরেজ](https://github.com/supabase/storage) অনুমতিগুলি পরিচালনা করতে পোস্টগ্রেস ব্যবহার করে S3-এ সঞ্চিত ফাইলগুলি পরিচালনা করার জন্য একটি রেস্টফুল ইন্টারফেস প্রদান করে।
 - [পোস্টগ্রেস-মেটা](https://github.com/supabase/postgres-meta) হল আপনার পোস্টগ্রেস পরিচালনা করার জন্য একটি রেস্টফুল এপিআই, যা আপনাকে টেবিল আনতে, ভূমিকা যোগ করতে এবং কোয়েরি চালানোর অনুমতি দেয়।
 - [গোট্রু](https://github.com/netlify/gotrue) ব্যবহারকারীদের পরিচালনা এবং SWT টোকেন ইস্যু করার জন্য একটি SWT ভিত্তিক এপিআই
 - [কং](https://github.com/Kong/kong) হল একটি ক্লাউড-নেটিভ এপিআই গেটওয়ে।
@@ -82,9 +82,9 @@ Supabase হল ওপেন সোর্স টুলের সংমিশ্�
     <th></th>
     <th>Supabase</th>
     <th><a href="https://github.com/postgrest/postgrest" target="_blank" rel="noopener noreferrer">PostgREST</a></th>
-    <th><a href="https://github.com/supabase/gotrue" target="_blank" rel="noopener noreferrer">গোট্রু</a></th>
+    <th><a href="https://github.com/supabase/auth" target="_blank" rel="noopener noreferrer">গোট্রু</a></th>
     <th><a href="https://github.com/supabase/realtime" target="_blank" rel="noopener noreferrer">রিয়েলটাইম</a></th>
-    <th><a href="https://github.com/supabase/storage-api" target="_blank" rel="noopener noreferrer">স্টোরেজ</a></th>
+    <th><a href="https://github.com/supabase/storage" target="_blank" rel="noopener noreferrer">স্টোরেজ</a></th>
   </tr>
   <!-- নতুন সারির জন্য টেমপ্লেট -->
   <!-- সারি শুরু করুন
@@ -109,7 +109,7 @@ Supabase হল ওপেন সোর্স টুলের সংমিশ্�
   <th colspan="6">💚 সম্প্রদায় 💚</th>
   <tr>
     <td>C#</td>
-    <td><a href="https://github.com/supabase-community/supabase-csharp" target="_blank" rel="noopener noreferrer">supabase-csharp</a></td>
+    <td><a href="https://github.com/supabase/supabase-csharp" target="_blank" rel="noopener noreferrer">supabase-csharp</a></td>
     <td><a href="https://github.com/supabase-community/postgrest-csharp" target="_blank" rel="noopener noreferrer">postgrest-csharp</a></td>
     <td><a href="https://github.com/supabase-community/gotrue-csharp" target="_blank" rel="noopener noreferrer">গোট্রু-csharp</a></td>
     <td><a href="https://github.com/supabase-community/realtime-csharp" target="_blank" rel="noopener noreferrer">রিয়েলটাইম-csharp</a></td>
@@ -149,7 +149,7 @@ Supabase হল ওপেন সোর্স টুলের সংমিশ্�
   </tr>
   <tr>
     <td>পাইথন</td>
-    <td><a href="https://github.com/supabase-community/supabase-py" target="_blank" rel="noopener noreferrer">supabase-py</a></td>
+    <td><a href="https://github.com/supabase/supabase-py" target="_blank" rel="noopener noreferrer">supabase-py</a></td>
     <td><a href="https://github.com/supabase-community/postgrest-py" target="_blank" rel="noopener noreferrer">postgrest-py</a></td>
     <td><a href="https://github.com/supabase-community/gotrue-py" target="_blank" rel="noopener noreferrer">গোট্রু-py</a></td>
     <td><a href="https://github.com/supabase-community/realtime-py" target="_blank" rel="noopener noreferrer">রিয়েলটাইম-py</a></td>

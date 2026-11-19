@@ -21,7 +21,7 @@ This means you can commit the configuration for all of your Projects and Branche
 
 The Supabase CLI started as a way to bootstrap the entire Supabase stack on your local machine. It uses exactly the same infra as our hosted platform, giving you unlimited Supabase projects for local testing and offline usage.
 
-In the last 2 years, the CLI has grown to more than 180,000 weekly installs. Nearly 85% of these come from Continuous Integration/Deployment environments like GitHub Actions. Some of the popular CI/CD use cases include migrating production databases, deploying functions, and running pgTAP tests. With this in mind, we started focusing on the CLI as a deployment tool for the v2 release.
+In the last 2 years, the CLI has grown to more than 180,000 weekly installs. Nearly 85% of these come from Continuous Integration/Deployment environments like GitHub Actions. Some of the popular CI/CD use cases include migrating production databases, deploying functions, and running [pgTAP](/docs/guides/database/extensions/pgtap) tests. With this in mind, we started focusing on the CLI as a deployment tool for the v2 release.
 
 ## Configuration as Code using the Supabase CLI
 
@@ -73,7 +73,7 @@ The Supabase website uses several [Edge Functions](https://github.com/supabase/s
 verify_jwt = false
 ```
 
-If you are using a monorepo (like the [@supabase/supabase](https://github.com/supabase/supabase) GitHub repository), you may also want to customize the paths to your function’s entrypoint and import map files. This is especially useful for code sharing between your frontend application and Edge Functions.
+If you are using a monorepo (like the [@supabase/supabase](https://github.com/supabase/supabase) GitHub repository), you may also want to customize the paths to your function’s entrypoint and import map files. This is especially useful for code sharing between your frontend application and [Edge Functions](/docs/guides/functions).
 
 <Admonition type="note" title="Setting Edge Function secrets">
 
@@ -94,7 +94,7 @@ When developing locally, we can add a `[storage.buckets]` block to `config.toml`
 objects_path = "./assets"
 ```
 
-In our case, the assets are small enough (< 1MB) to be committed and tracked in git. This allows branching to automatically seed these objects to Supabase Storage for preview. Larger files like videos are best uploaded to Supabase Storage via AWS S3 CLI.
+In our case, the assets are small enough (< 1MB) to be committed and tracked in git. This allows branching to automatically seed these objects to [Supabase Storage](/docs/guides/storage) for preview. Larger files like videos are best uploaded to Supabase Storage via AWS S3 CLI.
 
 View the [Storage config](/docs/guides/local-development/cli/config#storage-config) docs.
 
@@ -107,7 +107,7 @@ While Supabase manages the Postgres default settings based on your database comp
 track_commit_timestamp = true
 ```
 
-Our Management API automatically figures out if one or more parameters require restarting the database. If not, the config will be applied by simply sending `SIGUP` to Postgres process.
+Our [Management API](/docs/reference/api/introduction) automatically figures out if one or more parameters require restarting the database. If not, the config will be applied by simply sending `SIGUP` to Postgres process.
 
 Moreover, you can now enable database webhooks using `[experimental]` config block. This feature allows your database to call HTTP endpoints directly from Postgres functions.
 

@@ -57,7 +57,7 @@ export const WarehouseMetricChart = ({
   return (
     <section aria-label={title}>
       <Card>
-        <CardContent className="space-y-4 p-4">
+        <CardContent className="flex flex-col gap-y-4 p-4">
           {hasValues ? (
             <>
               <h2 className="text-sm">{title}</h2>

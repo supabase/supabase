@@ -1,27 +1,36 @@
-import { useQuery } from '@tanstack/react-query'
+import { InfiniteData, useInfiniteQuery } from '@tanstack/react-query'
 
 import { oauthAppsKeys } from './keys'
 import { getMockOAuthAppsAuthorizeOrganizationProjects, USE_MOCKS } from './mocks'
 import type { StudioError } from '@/lib/errors/studio-errors'
-import type { UseCustomQueryOptions } from '@/types'
+import type { UseCustomInfiniteQueryOptions } from '@/types'
 
 export type OAuthAppsAuthorizeOrganizationProjectsVariables = {
-  id?: string
-  slug?: string
+  slug?: string | null
+  sort?: 'name_asc' | 'name_desc' | 'created_asc' | 'created_desc'
+  search?: string
+  page?: number
+  statuses?: string[]
 }
 
 export type { OAuthAppsAuthorizeOrganizationProject } from './types'
 
 export async function getOAuthAppsAuthorizeOrganizationProjects({
-  id,
   slug,
 }: OAuthAppsAuthorizeOrganizationProjectsVariables) {
-  if (!id) throw new Error('Authorization request id is required')
   if (!slug) throw new Error('Organization slug is required')
   if (!USE_MOCKS)
     throw new Error('OAuth app authorization organization projects are not yet implemented')
 
-  return getMockOAuthAppsAuthorizeOrganizationProjects(slug)
+  const data = getMockOAuthAppsAuthorizeOrganizationProjects(slug)
+  return {
+    projects: data,
+    pagination: {
+      count: data.length,
+      limit: 20,
+      offset: 0,
+    },
+  }
 }
 
 export type OAuthAppsAuthorizeOrganizationProjectsData = Awaited<
@@ -32,23 +41,31 @@ export type OAuthAppsAuthorizeOrganizationProjectsError = StudioError
 export const useOAuthAppsAuthorizeOrganizationProjectsQuery = <
   TData = OAuthAppsAuthorizeOrganizationProjectsData,
 >(
-  { id, slug }: OAuthAppsAuthorizeOrganizationProjectsVariables,
+  {
+    slug,
+    sort = 'name_asc',
+    search,
+    statuses = [],
+  }: OAuthAppsAuthorizeOrganizationProjectsVariables,
   {
     enabled = true,
     ...options
-  }: UseCustomQueryOptions<
+  }: UseCustomInfiniteQueryOptions<
     OAuthAppsAuthorizeOrganizationProjectsData,
     OAuthAppsAuthorizeOrganizationProjectsError,
-    TData
+    InfiniteData<TData>,
+    readonly unknown[],
+    number | undefined
   > = {}
 ) =>
-  useQuery<
-    OAuthAppsAuthorizeOrganizationProjectsData,
-    OAuthAppsAuthorizeOrganizationProjectsError,
-    TData
-  >({
-    queryKey: oauthAppsKeys.authorizeOrganizationProjects(id, slug),
-    queryFn: () => getOAuthAppsAuthorizeOrganizationProjects({ id, slug }),
-    enabled: enabled && USE_MOCKS && Boolean(id) && Boolean(slug),
+  useInfiniteQuery({
+    queryKey: oauthAppsKeys.authorizeOrganizationProjects(slug, { sort, search, statuses }),
+    queryFn: () => getOAuthAppsAuthorizeOrganizationProjects({ slug, sort, search, statuses }),
+    enabled: enabled && Boolean(slug),
+    initialPageParam: 0,
+    placeholderData: (previousData) => previousData,
+    getNextPageParam() {
+      return undefined
+    },
     ...options,
   })

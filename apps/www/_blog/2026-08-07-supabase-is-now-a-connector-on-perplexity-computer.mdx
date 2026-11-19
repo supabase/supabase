@@ -34,7 +34,7 @@ The connector handles the kind of work you'd normally context-switch into the Su
 
 - Answer questions about production data: ask which tables grew the most this week, and Computer runs the query and answers.
 - Debug from a support ticket: pull a user record, check their last sign-in, and find their failed payments in one prompt.
-- Test Edge Functions: invoke `send-welcome-email` with a test payload without leaving the chat.
+- Test [Edge Functions](/docs/guides/functions): invoke `send-welcome-email` with a test payload without leaving the chat.
 - Put recurring queries on a schedule: Computer runs your weekly growth query and posts the report to Slack every Monday.
 
 Because Computer spans your other tools, a single prompt can too. For example, join Stripe cancellation events with your Supabase behavioral data to find where users drop off, then ship the fix through a GitHub PR.

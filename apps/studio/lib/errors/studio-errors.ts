@@ -121,8 +121,10 @@ export class PlatformError extends studioError('PlatformError', {
   retryable: () => true,
 }) {}
 
+// A 401 means the browser sent no valid session token (signed out, or the session expired), which
+// the user fixes by signing in again. Other 4xx statuses stay Studio's until a rule refines them.
 export class UnclassifiedApiError extends studioError('UnclassifiedApiError', {
-  fault: 'studio',
+  fault: ({ code }) => (code === 401 ? 'user' : 'studio'),
   classifiedBy: 'default',
   reasons: ['client_error', 'unauthorized', 'forbidden', 'not_found', 'rate_limited'],
   retryable: ({ code }) => code === 429,

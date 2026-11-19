@@ -704,7 +704,7 @@ functions:
         isSpotlight: false
         description: |
           - When the third-party provider successfully authenticates the user, the provider redirects the user to the URL specified in the `redirectTo` parameter. This parameter defaults to the [`SITE_URL`](/docs/guides/auth/redirect-urls). It does not redirect the user immediately after invoking this method.
-          - See [redirect URLs and wildcards](docs/guides/auth/redirect-urls#use-wildcards-in-redirect-urls) to add additional redirect URLs to your project.
+          - See [redirect URLs and wildcards](/docs/guides/auth/redirect-urls#use-wildcards-in-redirect-urls) to add additional redirect URLs to your project.
         code: |
           ```python
           response = supabase.auth.sign_in_with_oauth(
@@ -3093,7 +3093,7 @@ functions:
       To update the user's password, see [`update_user()`](/docs/reference/python/auth-updateuser).
       - When the user clicks the reset link in the email they are redirected back to your application.
       You can configure the URL that the user is redirected to with the `redirectTo` parameter.
-      See [redirect URLs and wildcards](docs/guides/auth/redirect-urls#use-wildcards-in-redirect-urls) to add additional redirect URLs to your project.
+      See [redirect URLs and wildcards](/docs/guides/auth/redirect-urls#use-wildcards-in-redirect-urls) to add additional redirect URLs to your project.
       - After the user has been redirected successfully, prompt them for a new password and call `update_user()`:
       ```python
       response = supabase.auth.update_user(
