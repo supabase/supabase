@@ -1,8 +1,8 @@
-import { ArrowRightIcon, ChevronsUpDownIcon } from 'lucide-react'
-import { Button, Collapsible, CollapsibleContent, CollapsibleTrigger } from 'ui'
+import { MinusIcon, PlusIcon } from 'lucide-react'
+import { cn } from 'ui'
 
 import { getDiffBetweenScopes, ScopeGroupLevel } from './OAuthAppsAuthorizeScreen.utils'
-import { ScopeGroupCardItem, ScopePermissionLabel } from './ScopeGroupCardItem'
+import { ScopePermissionLabel } from './ScopeGroupCardItem'
 
 export interface ScopeGroupCardProps {
   scopes: string[]
@@ -12,86 +12,64 @@ export interface ScopeGroupCardProps {
 }
 
 const scopeLabels: Record<ScopeGroupLevel, string> = {
-  read: 'Read',
-  write: 'Write',
   'read-write': 'Read-write',
+  write: 'Write',
+  read: 'Read',
 }
+
+const scopeLevels = ['read-write', 'write', 'read'] as const
 
 export const ScopeGroupCardWithDiff = (props: ScopeGroupCardProps) => {
   const diff = getDiffBetweenScopes(props)
-  const changedPermissions = (['read-write', 'write', 'read', 'removed'] as const).flatMap(
-    (level) =>
-      diff.changed[level].map((entry) => ({
-        ...entry,
-        nextLevel: level === 'removed' ? undefined : level,
-      }))
-  )
-
-  const unchangedPermissionsCount =
-    diff.unchanged['read-write'].length +
-    diff.unchanged['write'].length +
-    diff.unchanged['read'].length
+  const removedPermissions = [
+    ...diff.changed.removed,
+    ...scopeLevels.flatMap((level) =>
+      diff.changed[level].filter(({ previousLevel }) => previousLevel)
+    ),
+  ]
 
   return (
-    <>
-      {changedPermissions.length > 0 && (
-        <ul
-          className="divide-y rounded-md border bg-surface-75 px-4 text-xs"
-          aria-label="Permission changes"
-        >
-          {changedPermissions.map(({ permission, previousLevel, nextLevel }) => (
-            <li
-              key={permission}
-              className="flex flex-wrap items-center justify-between gap-x-3 gap-y-1 py-2"
-            >
-              <span className="font-medium">
-                <ScopePermissionLabel permission={permission} />
-              </span>
-              <span className="flex items-center gap-1.5">
-                {previousLevel && nextLevel && (
-                  <>
-                    <span className="text-foreground-light">{scopeLabels[previousLevel]}</span>
-                    <ArrowRightIcon size={12} className="text-foreground-muted" aria-hidden />
-                    <span>{scopeLabels[nextLevel]}</span>
-                  </>
-                )}
-                {!previousLevel && nextLevel && (
-                  <>
-                    <span>Added</span>
-                    <span className="text-foreground-light">· {scopeLabels[nextLevel]}</span>
-                  </>
-                )}
-                {previousLevel && !nextLevel && (
-                  <>
-                    <span>Removed</span>
-                    <span className="text-foreground-light">· {scopeLabels[previousLevel]}</span>
-                  </>
-                )}
-              </span>
-            </li>
-          ))}
-        </ul>
-      )}
-      <Collapsible className="flex flex-col gap-2">
-        <CollapsibleTrigger asChild>
-          <Button
-            block
-            iconRight={<ChevronsUpDownIcon className="h-4 w-4" />}
-            variant="text"
-            size="tiny"
-            className="p-0 flex justify-center text-foreground-lighter"
-          >
-            <span>Already granted ({unchangedPermissionsCount})</span>
-          </Button>
-        </CollapsibleTrigger>
-        <CollapsibleContent>
-          <div className="divide-y rounded-md border bg-surface-75 px-4">
-            <ScopeGroupCardItem label="READ-WRITE" permissions={diff.unchanged['read-write']} />
-            <ScopeGroupCardItem label="WRITE" permissions={diff.unchanged['write']} />
-            <ScopeGroupCardItem label="READ" permissions={diff.unchanged['read']} />
+    <div className="space-y-2">
+      {scopeLevels.map((level) => {
+        const rows = [
+          ...diff.changed[level].map(({ permission }) => ({ permission, status: 'Added' })),
+          ...removedPermissions
+            .filter(({ previousLevel }) => previousLevel === level)
+            .map(({ permission }) => ({ permission, status: 'Removed' })),
+          ...diff.unchanged[level].map((permission) => ({ permission, status: 'Unchanged' })),
+        ]
+        if (rows.length === 0) return null
+
+        return (
+          <div key={level} className="rounded-md border bg-surface-75 px-4 text-xs">
+            <p className="py-2 font-mono uppercase text-foreground-light">{scopeLabels[level]}</p>
+            <ul className="divide-y border-t" aria-label={scopeLabels[level]}>
+              {rows.map(({ permission, status }) => (
+                <li
+                  key={permission}
+                  className={cn(
+                    'flex items-center justify-between gap-2 py-2',
+                    status === 'Added' && 'text-primary',
+                    status === 'Removed' && 'text-destructive',
+                    status === 'Unchanged' && 'text-foreground-light'
+                  )}
+                >
+                  <span className="flex min-w-0 items-center gap-1.5">
+                    {status === 'Added' && <PlusIcon size={12} className="shrink-0" aria-hidden />}
+                    {status === 'Removed' && (
+                      <MinusIcon size={12} className="shrink-0" aria-hidden />
+                    )}
+                    <span className={cn('font-medium', status === 'Removed' && 'line-through')}>
+                      <ScopePermissionLabel permission={permission} />
+                    </span>
+                  </span>
+                  <span>{status}</span>
+                </li>
+              ))}
+            </ul>
           </div>
-        </CollapsibleContent>
-      </Collapsible>
-    </>
+        )
+      })}
+    </div>
   )
 }

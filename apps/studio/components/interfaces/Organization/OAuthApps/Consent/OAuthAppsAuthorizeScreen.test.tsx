@@ -325,27 +325,28 @@ describe('OAuthAppsAuthorizeScreen', () => {
   test('shows the change in Table data access for a returning partner', async () => {
     renderScreen({ authId: OAUTH_APPS_MOCK_SCENARIOS.trustedPartnerReconsent })
 
-    const changes = await screen.findByRole('list', { name: 'Permission changes' })
-    expect(changes).toHaveTextContent('Table dataReadRead-write')
-    expect(screen.getByText('Already granted (1)')).toBeInTheDocument()
+    expect(await screen.findByRole('list', { name: 'Read-write' })).toHaveTextContent(
+      'Table dataAdded'
+    )
+    expect(screen.getByRole('list', { name: 'Read' })).toHaveTextContent('Table dataRemoved')
+    expect(screen.getByRole('list', { name: 'Read' })).toHaveTextContent('ProjectsUnchanged')
     expect(screen.queryByRole('radio', { name: 'All current and future projects' })).toBeNull()
   })
 
-  test('reconsent shows the permissions differences, with previous permissions collapsed', async () => {
+  test('reconsent groups added, removed, and unchanged permissions by access level', async () => {
     renderScreen({
       authId: OAUTH_APPS_MOCK_SCENARIOS.vercelReconsent,
     })
 
-    await screen.findByText('Already granted (2)')
-    const changes = screen.getByRole('list', { name: 'Permission changes' })
-    expect(changes).toHaveTextContent('EnvironmentAdded· Read-write')
-    expect(changes).toHaveTextContent('AnalyticsReadRead-write')
-    expect(changes).toHaveTextContent('SecretsRead-writeRead')
-    expect(changes).toHaveTextContent('RestRemoved· Read')
-
-    expect(screen.queryByText('Database management')).toBeNull()
-    fireEvent.click(screen.getByText('Already granted (2)'))
-    await screen.findByText('Database management')
+    const readWrite = await screen.findByRole('list', { name: 'Read-write' })
+    const read = screen.getByRole('list', { name: 'Read' })
+    expect(readWrite).toHaveTextContent('EnvironmentAdded')
+    expect(readWrite).toHaveTextContent('AnalyticsAdded')
+    expect(read).toHaveTextContent('AnalyticsRemoved')
+    expect(readWrite).toHaveTextContent('SecretsRemoved')
+    expect(read).toHaveTextContent('SecretsAdded')
+    expect(read).toHaveTextContent('RestRemoved')
+    expect(readWrite).toHaveTextContent('Database managementUnchanged')
   })
 })
 
