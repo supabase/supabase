@@ -1,10 +1,11 @@
 import { type TOCHeader } from '~/components/GuidesSidebar'
+import { CodeTabs } from '~/features/directives/CodeTabs.components'
 import {
+  CONFIG_FORMAT_QUERY_GROUP,
   CONFIG_JSONC_NAME,
   CONFIG_TOML_NAME,
   convertConfigTomlToJsonc,
 } from '~/features/directives/ConfigFormats'
-import { ConfigCodeTabs } from '~/features/directives/ConfigFormats.components'
 import { GuideTemplate, newEditLink } from '~/features/docs/GuidesMdx.template'
 import { genGuideMeta } from '~/features/docs/GuidesMdx.utils'
 import { CodeBlock } from '~/features/ui/CodeBlock/CodeBlock'
@@ -94,14 +95,14 @@ async function Info({ parameter }: { parameter: Parameter }) {
             {parameter.usage && (
               <div className="mb-4 scroll-mt-16 mt-0 ">
                 <p className="text-sm font-bold uppercase">Usage</p>
-                <ConfigCodeTabs>
-                  <TabPanel id={CONFIG_TOML_NAME} label={CONFIG_TOML_NAME}>
+                <CodeTabs queryGroup={CONFIG_FORMAT_QUERY_GROUP}>
+                  <TabPanel id="toml" label={CONFIG_TOML_NAME}>
                     <CodeBlock lang="toml" contents={parameter.usage} />
                   </TabPanel>
-                  <TabPanel id={CONFIG_JSONC_NAME} label={CONFIG_JSONC_NAME}>
+                  <TabPanel id="jsonc" label={CONFIG_JSONC_NAME}>
                     <CodeBlock lang="jsonc" contents={jsonc} />
                   </TabPanel>
-                </ConfigCodeTabs>
+                </CodeTabs>
               </div>
             )}
             {parameter.links && (

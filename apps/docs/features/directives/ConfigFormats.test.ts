@@ -17,9 +17,12 @@ async function render(mdx: string, { withCodeTabs = false } = {}) {
 }
 
 describe('ConfigFormats', () => {
-  it('should render a standalone config.toml fence as ConfigCodeTabs', async () => {
+  it.each([
+    ['positional', 'supabase/config.toml'],
+    ['name=', 'name=supabase/config.toml'],
+  ])('should render a standalone config.toml fence (%s) as synced CodeTabs', async (_, meta) => {
     const output = await render(`
-\`\`\`toml name=supabase/config.toml
+\`\`\`toml ${meta}
 [auth]
 enabled = true
 \`\`\`
@@ -27,15 +30,15 @@ enabled = true
 
     expect(output).toEqual(
       `
-<ConfigCodeTabs>
-  <TabPanel id="supabase/config.toml" label="supabase/config.toml">
+<CodeTabs queryGroup="config-format">
+  <TabPanel id="toml" label="supabase/config.toml">
     \`\`\`toml
     [auth]
     enabled = true
     \`\`\`
   </TabPanel>
 
-  <TabPanel id="supabase/config.jsonc" label="supabase/config.jsonc">
+  <TabPanel id="jsonc" label="supabase/config.jsonc">
     \`\`\`jsonc
     {
       "auth": {
@@ -44,17 +47,20 @@ enabled = true
     }
     \`\`\`
   </TabPanel>
-</ConfigCodeTabs>
+</CodeTabs>
 `.trimStart()
     )
   })
 
-  it('should add a jsonc tab to a config.toml fence inside CodeTabs', async () => {
+  it.each([
+    ['positional', 'supabase/config.toml'],
+    ['name=', 'name=supabase/config.toml'],
+  ])('should add a jsonc tab to a config.toml fence (%s) inside CodeTabs', async (_, meta) => {
     const output = await render(
       `
 <$CodeTabs>
 
-\`\`\`toml name=supabase/config.toml
+\`\`\`toml ${meta}
 [auth]
 enabled = true
 \`\`\`
@@ -102,13 +108,13 @@ console.log('hi')
     const output = await render(`
 1. Edit the config:
 
-   \`\`\`toml name=supabase/config.toml
+   \`\`\`toml supabase/config.toml
    [auth]
    enabled = true
    \`\`\`
 `)
 
-    expect(output).toContain('<ConfigCodeTabs>')
+    expect(output).toContain('<CodeTabs queryGroup="config-format">')
     expect(output).toContain('```jsonc')
   })
 
@@ -122,6 +128,11 @@ enabled = true
 \`\`\`toml name=pyproject.toml
 [tool.poetry]
 name = "x"
+\`\`\`
+
+\`\`\`toml supabase/functions/config.toml
+[x]
+y = 1
 \`\`\`
 `.trim()
 
@@ -164,10 +175,11 @@ name = "x"
 
     for (const file of files) {
       const source = readFileSync(file, 'utf-8')
-      if (!source.includes('name=supabase/config.toml')) continue
+      const fences = source.match(/^\s*```toml (name=)?supabase\/config\.toml\b/gm) ?? []
+      if (fences.length === 0) continue
       try {
         await configFormatsRemark()(fromDocsMarkdown(source))
-        converted += (source.match(/name=supabase\/config\.toml/g) ?? []).length
+        converted += fences.length
       } catch (err) {
         failures.push(`${file}: ${(err as Error).message}`)
       }

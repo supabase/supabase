@@ -24,7 +24,6 @@ import { TerraformProviderSchema } from '~/components/TerraformProviderSchema'
 import { WrapperDashboardIntegration } from '~/components/WrapperDashboardIntegration'
 import { CodeSampleDummy, CodeSampleWrapper } from '~/features/directives/CodeSample.client'
 import { CodeTabs, NamedCodeBlock } from '~/features/directives/CodeTabs.components'
-import { ConfigCodeTabs } from '~/features/directives/ConfigFormats.components'
 import { MdxAnchor } from '~/features/docs/MdxAnchor'
 import { CodeBlock } from '~/features/ui/CodeBlock/CodeBlock'
 import { ShowUntil } from '~/features/ui/ShowUntil'
@@ -87,7 +86,6 @@ const components = {
   CodeSampleWrapper,
   CodeTabs,
   ComputeDiskLimitsTable,
-  ConfigCodeTabs,
   CustomContent,
   ContentListings,
   DatabaseAdvisorsIndex,
