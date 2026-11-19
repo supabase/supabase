@@ -118,6 +118,13 @@ Finally this multi-level cache is cleared every 20 minutes, or longer if you hav
 - **Urgent key revocation.** If you are in a security incident where a signing key must be urgently revoked, due to the multi-level cache your application components may still trust and authenticate JWTs signed with the revoked key. Supabase products (Auth, Data API, Storage, Realtime) **do not rely on this cache and revocation is instantaneous.** Should this be an issue for you, ensure you've built a cache busting mechanism as part of your app's backend infrastructure.
 - **Quick key creation and rotation.** If you're migrating away from the legacy JWT secret or when only using the `supabase.auth.getClaims()` method this case is handled for you automatically. If you're verifying JWTs on your own, without the help of the Supabase client library, ensure that **all caches in your app** have picked up the newly created standby key before proceeding to rotation.
 
+If you use asymmetric signing keys and your backend can't reach the discovery endpoint, for example because outbound HTTPS requests are blocked, you can copy the public keys into your app and load them when it starts. Verifying a JWT then needs no network call. Copy every asymmetric key that isn't revoked: the in-use key, the standby key if you have one, and any previously used key. To get the public keys, do one of the following:
+
+- Request the discovery endpoint from a machine that can reach it. The response is one JSON Web Key Set with every trusted public key.
+- In the Supabase Dashboard, go to the [JWT signing keys](/dashboard/project/_/settings/jwt) page. Open the **More options** (⋮) menu next to a key, select **View key details**, and copy the **Public key set (JSON Web Key Set format)**. Each key's dialog contains only that key, so repeat this for each of those keys and combine their `keys` arrays into one key set.
+
+Copied keys act as a cache that never expires, so neither problem in the preceding list resolves on its own. Your app no longer learns about rotation or revocation. Before you rotate to a standby key, add it to your app and deploy. After you revoke a key, remove it from your app yourself, or your app keeps trusting JWTs signed with it.
+
 ## Choosing the right signing algorithm
 
 To strike the right balance between performance, security and ease-of-use, JWT signing keys are based on capabilities available in the [Web Crypto API](https://developer.mozilla.org/en-US/docs/Web/API/Web_Crypto_API).
