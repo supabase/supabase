@@ -152,12 +152,14 @@ export const ProjectMultiSelect = ({
                             <span className="text-foreground-lighter"> - Unavailable</span>
                           )}
                         </span>
-                        {readinessIssues[project.ref] && (
-                          <span className="text-right text-xs text-warning">
-                            {readinessIssues[project.ref] === 'postgres_upgrade_required'
-                              ? 'Needs Postgres 17 or later'
-                              : 'SSL will be enabled'}
-                          </span>
+                        {readinessIssues[project.ref] === 'postgres_upgrade_required' && (
+                          <>
+                            <span
+                              className="size-1.5 shrink-0 rounded-full bg-warning"
+                              aria-hidden
+                            />
+                            <span className="sr-only">Needs Postgres 17 or later</span>
+                          </>
                         )}
                       </span>
                     </MultiSelectorItem>

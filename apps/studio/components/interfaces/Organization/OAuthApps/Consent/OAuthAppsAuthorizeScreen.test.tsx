@@ -316,9 +316,9 @@ describe('OAuthAppsAuthorizeScreen', () => {
     fireEvent.click(remove)
     await selectProject(/fabrikam-api/)
 
-    expect(await screen.findByRole('region', { name: 'SSL enforcement' })).toHaveTextContent(
-      'fabrikam-api'
-    )
+    expect(
+      await screen.findByRole('list', { name: 'Projects that will require SSL' })
+    ).toHaveTextContent('fabrikam-api')
     expect(authorize).toBeEnabled()
   })
 

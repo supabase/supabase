@@ -401,20 +401,6 @@ export const OAuthAppsAuthorizeScreen = ({
             </div>
           )}
 
-          {canProceed && sslProjects.length > 0 && (
-            <section
-              aria-label="SSL enforcement"
-              className="space-y-1 text-xs text-foreground-light"
-            >
-              <h3 className="font-medium text-foreground">SSL enforcement during setup</h3>
-              <p>
-                Supabase will require encrypted connections on{' '}
-                {sslProjects.map(({ name }) => name).join(', ')}. Clients that connect without SSL
-                will no longer be able to connect.
-              </p>
-            </section>
-          )}
-
           {canProceed && (
             <>
               <section className="flex flex-col gap-3">
@@ -452,6 +438,22 @@ export const OAuthAppsAuthorizeScreen = ({
               title={`Couldn't authorize ${request.name}`}
               description={`Your Read-only role in ${memberOrg} can't grant write access. Ask an admin to change your role, or switch organization.`}
             />
+          )}
+          {canProceed && sslProjects.length > 0 && (
+            <Admonition type="note" title="SSL will be enabled during setup">
+              <p className="text-xs">Clients without SSL will no longer connect.</p>
+              <div
+                role="list"
+                aria-label="Projects that will require SSL"
+                className="divide-y text-xs"
+              >
+                {sslProjects.map(({ ref, name }) => (
+                  <div key={ref} role="listitem" className="py-1.5 font-medium text-foreground">
+                    {name}
+                  </div>
+                ))}
+              </div>
+            </Admonition>
           )}
           {canProceed && blockedProjects.length > 0 && (
             <DatabaseAccessProjectIssues

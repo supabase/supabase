@@ -14,9 +14,10 @@ export function DatabaseAccessProjectIssues({
       <div className="divide-y text-xs">
         {projects.map(({ ref, name }) => (
           <div key={ref} className="flex items-center justify-between gap-2 py-1.5">
-            <p>
-              <span className="font-medium">{name}</span> needs Postgres 17 or later.
-            </p>
+            <div>
+              <p className="font-medium text-foreground">{name}</p>
+              <p>Needs Postgres 17 or later.</p>
+            </div>
             {onRemove && (
               <Button
                 variant="text"
