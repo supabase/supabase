@@ -348,7 +348,7 @@ export const OAuthAppsAuthorizeScreen = ({
               utcTimestamp={preflightData.existing_grant.approved_at}
               labelFormat="D MMM YYYY"
             />
-            . It's now asking for different access.
+            . It’s now asking for different access.
           </>
         ) : (
           'This application wants to access your Supabase account.'
@@ -420,7 +420,7 @@ export const OAuthAppsAuthorizeScreen = ({
           {canProceed && !cannotGrantRequestedAccess && sslProjects.length > 0 && (
             <Admonition
               type="note"
-              title="SSL enforcement"
+              title="SSL enforcement will be enabled"
               description="Setup will enable SSL enforcement on these projects. Clients without SSL will no longer connect."
             >
               <div
