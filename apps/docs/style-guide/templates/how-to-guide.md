@@ -135,4 +135,4 @@ To read more about the ideas behind this task, see these pages:
 - [ ] One unit of work, one audience, a value statement naming the result, and prerequisites that hold only what the reader needs before step 1, each linked.
 - [ ] Every heading has a sentence under it and every list a lead-in sentence. Past six steps, numbered H3 phases that keep their old anchors.
 - [ ] Steps and copy-paste code are on the page, complex actions link out, and any Verify is numbered and names the output.
-- [ ] Next steps end the task, and any Related resources come last, each link with a reason.
+- [ ] Next steps hold two to four links, any Related resources come last, and each link has a reason.
