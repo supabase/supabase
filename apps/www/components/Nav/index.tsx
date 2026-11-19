@@ -28,6 +28,7 @@ import MenuItem from './MenuItem'
 import { MobileMenu } from './MobileMenu'
 import RightClickBrandLogo from './RightClickBrandLogo'
 import useDropdownMenu from './useDropdownMenu'
+import { DASHBOARD_SIGN_IN_URL, DASHBOARD_SIGN_UP_URL } from '@/lib/dashboard-links'
 
 interface Props {
   hideNavbar: boolean
@@ -223,7 +224,7 @@ const Nav = ({ hideNavbar, stickyNavbar = true }: Props) => {
                         <FloatingPlate rounded="md" className="hidden lg:inline-flex">
                           <Button asChild>
                             <a
-                              href="https://supabase.com/dashboard"
+                              href={DASHBOARD_SIGN_IN_URL}
                               onClick={() =>
                                 sendTelemetryEvent({
                                   action: 'sign_in_button_clicked',
@@ -238,7 +239,7 @@ const Nav = ({ hideNavbar, stickyNavbar = true }: Props) => {
                       ) : (
                         <Button className="hidden lg:inline-flex" asChild>
                           <a
-                            href="https://supabase.com/dashboard"
+                            href={DASHBOARD_SIGN_IN_URL}
                             onClick={() =>
                               sendTelemetryEvent({
                                 action: 'sign_in_button_clicked',
@@ -252,7 +253,7 @@ const Nav = ({ hideNavbar, stickyNavbar = true }: Props) => {
                       )}
                       <Button variant="primary" className="hidden lg:inline-flex" asChild>
                         <a
-                          href="https://supabase.com/dashboard/sign-up"
+                          href={DASHBOARD_SIGN_UP_URL}
                           onClick={() =>
                             sendTelemetryEvent({
                               action: 'start_project_button_clicked',
