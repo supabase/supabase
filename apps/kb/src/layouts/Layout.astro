@@ -5,7 +5,8 @@ import { ConsentIsland } from '../components/ConsentIsland'
 import Footer from '../components/Footer.astro'
 import { Header } from '../components/Header'
 import { KbSearch } from '../components/KbSearch'
-import { toSummary, toTroubleshootingSummary } from '../lib/guides'
+import { PageTelemetryIsland } from '../components/PageTelemetryIsland'
+import { toCommunityGuideSummary, toSummary, toTroubleshootingSummary } from '../lib/guides'
 import { getListedTopics } from '../lib/topics'
 import '../styles/globals.css'
 import { canonicalUrl, serializeJsonLd } from '../lib/json-ld'
@@ -21,12 +22,15 @@ const { title, description, jsonLd } = Astro.props
 const navTopics = getListedTopics({
 	guides: (await getCollection('guides')).map(toSummary),
 	troubleshooting: (await getCollection('troubleshooting')).map(toTroubleshootingSummary),
+	communityGuides: (await getCollection('communityGuides')).map(toCommunityGuideSummary),
 }).map((topic) => topic.name)
 const faviconRoute = import.meta.env.DEV ? '/favicon/local' : '/favicon'
 const canonicalHref = canonicalUrl(Astro.url.pathname)
-const ogImage = title
-	? `https://obuldanrptloktxcffvn.supabase.co/functions/v1/og-images?site=kb&title=${encodeURIComponent(title)}&description=${encodeURIComponent(description ?? 'undefined')}`
-	: 'https://supabase.com/docs/img/supabase-og-image.png'
+const miscUrl = import.meta.env.MISC_URL
+const ogImage =
+	title && miscUrl
+		? `${miscUrl}/functions/v1/og-images?site=kb&title=${encodeURIComponent(title)}&description=${encodeURIComponent(description ?? 'undefined')}`
+		: 'https://supabase.com/docs/img/supabase-og-image.png'
 const pageTitle = title ? `${title} | Supabase Knowledge Base` : 'Supabase Knowledge Base'
 ---
 
@@ -38,14 +42,14 @@ const pageTitle = title ? `${title} | Supabase Knowledge Base` : 'Supabase Knowl
 		{description && <meta name="description" content={description} />}
 		<script is:inline>
 			// Set data-theme on <html> before first paint, so the page doesn't flash
-			// the wrong theme while this loads. Defaults to dark, and "system" follows the
+			// the wrong theme while this loads. Defaults to "system", which follows the
 			// OS preference, including changes mid-session (choices come from components/HeaderMenu.tsx).
 			;(function () {
 				var systemDark = window.matchMedia('(prefers-color-scheme: dark)')
 				var applyTheme = function () {
 					try {
 						var stored = localStorage.getItem('theme')
-						var theme = stored === 'system' ? (systemDark.matches ? 'dark' : 'light') : stored === 'light' ? 'light' : 'dark'
+						var theme = stored === 'light' || stored === 'dark' ? stored : systemDark.matches ? 'dark' : 'light'
 						document.documentElement.setAttribute('data-theme', theme)
 					} catch (_) {}
 				}
@@ -90,6 +94,7 @@ const pageTitle = title ? `${title} | Supabase Knowledge Base` : 'Supabase Knowl
 		<Footer />
 		<KbSearch client:load />
 		<ConsentIsland client:only="react" />
+		<PageTelemetryIsland client:only="react" />
 	</body>
 </html>
 

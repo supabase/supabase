@@ -4,10 +4,12 @@ Supabase is 100% remote.
 
 Aaron Brooks
 Aaron Byrne
+Adam Howard
 Adam Mohammed
 Adam Mokan
 Adam Whitlock
 Aditya Maruvada
+Adrian Johnson
 AJ Matias
 Akash Manimaran
 Akilesh Sethu
@@ -15,12 +17,15 @@ Alaister Young
 Aleksi Immonen
 Alex Hall
 Alex Hsu
+Alex Ives
+Alex Venter
 Alexander Alexandrov
 Alexander Korotkov
 Alexis Aguilar
 Ali Waseem
 Alice Crosbie
 Allan S
+Alpar Torok
 Amir Issaei
 Amogh Rao
 Amy Q
@@ -45,7 +50,9 @@ Barry Roodt
 Ben Fritsch
 Beng Eu
 Benjamin Coenen
+Benoit Ammermann
 Beth Long
+Bob Van Landuyt
 Bobbie Soedirgo
 Brad Deam
 Brad Gyger
@@ -123,6 +130,7 @@ Etienne Stalmans
 Evan Cummack
 Fabrizio Fenoglio
 Fady A
+Fallon Petty
 Farley Thomas
 Fatuma Abdullahi
 Felipe Stival
@@ -156,10 +164,12 @@ Hieu Pham
 Hunter Luckow
 Ignacio Dobronich
 Illia Basalaiev
+Ilya Kobets
 Inian P
 Iryna Deans
 Isaac Dawson
 Ivan Vasilov
+Jagpreet Singh
 Jamie Boyd
 Jake Ng
 Jared Patterson
@@ -185,11 +195,13 @@ Joey Freeland
 Joey Lei
 John Fitzgerald
 John Jarvis
+John Kerry
 John Murret
 Joel Martin
 Johan Bergström
 John Pena
 Jon M
+Jonathan Eng
 Jonathan Smock
 Jonny Summers-Muir
 Jordan McQueen
@@ -226,10 +238,11 @@ Laurence Isla
 Leandro Pereira
 Leigh Anne Applewhite
 Lenny Urbanowski
-Leonardo Santiago
+Levon Galstyan
 Liam Cloud Hogan
 Lindsay Moss
 Lovro Mažgon
+Lucie Zhao
 Lukas Bernert
 Lukas Klingsbo
 Łukasz Korbasiewicz
@@ -254,6 +267,7 @@ Matthias Luft
 Mats Kindahl
 Meg Corren
 Mert Yerekapan
+Michael Zalimeni
 Michal Kleczek
 Michal Olszewski
 Michelle Jubrey
@@ -263,10 +277,13 @@ Mike Podobnik
 Miranda Limonczenko
 Monica Khoury
 Mrinal Paliwal
+Musa Jundi
 Mykhailo Mischa Lieibenson
 Nara Kasbergen Kwon
 Natalie Roberge
+Neil Brookes
 Nick B
+Nick Clark
 Nick Littman
 Nick Nowlan
 Nicola Ferraro
@@ -279,6 +296,7 @@ Oli R
 Pamela Chia
 Patricia Szasz
 Patrick Crane
+Patrick Knight
 Paul Bauer
 Paul Copplestone
 Paul Ibeabuchi
@@ -306,6 +324,7 @@ Robert Vojta
 Rodrigo Esteves
 Rodrigo Mansueli
 Román Cuellar
+Roman Gruhn
 Roman Hernandez
 Ronan Lehane
 Rory Hunter
@@ -325,6 +344,7 @@ Santos Flores de Leon
 Sasi Kanumuri
 Sara Read
 Satya Rohith Gannamanedi
+Satyanarayana Uppada
 Sean Geoghegan
 Sean Oliver
 Sean Romberg
@@ -340,6 +360,7 @@ Sreyas Udayavarman
 Stephanie Jackson (stejacks)
 Stephen Denham
 Stephen Morgan
+Steve Abrams
 Steve Chavez
 Steven Eubank
 Stojan Dimitrovski
@@ -355,6 +376,7 @@ Terry Sutton
 Terry Wilcox
 Thanya Nitithatsanakul
 Thomas E
+Thomas Krennwallner
 Tim Frietas
 Tim Palmer
 Timothy Lim
@@ -375,6 +397,7 @@ Warda Bibi
 Warwick Mitchell
 Wen Bo Xie
 Wendie Cheung
+Yann Braga
 Yara Lacerda
 Yorvi Arias
 Yuliya Marinova

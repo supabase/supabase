@@ -77,8 +77,11 @@ export const CustomDomainActivate = ({ projectRef, customDomain }: CustomDomainA
             >
               <p>
                 Your custom domain CNAME record for <code>{customDomain.hostname}</code> should
-                resolve to {endpoint ? <code>{endpoint}</code> : "your project's API URL"}. If
-                you're using Cloudflare as your DNS provider, disable the proxy option.
+                resolve to{' '}
+                {endpoint ? <code>{endpoint}</code> : <span>your project's API URL</span>}
+                <span>
+                  . If you're using Cloudflare as your DNS provider, disable the proxy option.
+                </span>
               </p>
             </Admonition>
           </div>

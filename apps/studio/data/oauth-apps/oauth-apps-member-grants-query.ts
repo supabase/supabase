@@ -3,7 +3,8 @@ import { InfiniteData, useInfiniteQuery } from '@tanstack/react-query'
 import { oauthAppsKeys } from './keys'
 import { getMockOAuthAppGrants, USE_MOCKS } from './mocks'
 import type { ListOrgAppGrantsResponse } from './types'
-import type { ResponseError, UseCustomInfiniteQueryOptions } from '@/types'
+import type { StudioError } from '@/lib/errors/studio-errors'
+import type { UseCustomInfiniteQueryOptions } from '@/types'
 
 export type OAuthAppMemberGrantsVariables = {
   slug?: string
@@ -26,7 +27,7 @@ export async function getOAuthAppMemberGrants({
 }
 
 export type OAuthAppMemberGrantsData = Awaited<ReturnType<typeof getOAuthAppMemberGrants>>
-export type OAuthAppMemberGrantsError = ResponseError
+export type OAuthAppMemberGrantsError = StudioError
 
 export const useOAuthAppMemberGrantsQuery = <TData = OAuthAppMemberGrantsData>(
   { slug, appId, cursor }: OAuthAppMemberGrantsVariables,

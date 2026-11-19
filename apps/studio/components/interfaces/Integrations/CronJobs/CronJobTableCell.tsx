@@ -229,13 +229,17 @@ export const CronJobTableCell = ({
             dialogOverlayProps={{ onClick: (e) => e.stopPropagation() }}
           >
             <DialogHeader>
-              <DialogTitle>{active ? 'Disable' : 'Enable'} cron job</DialogTitle>
+              <DialogTitle>
+                {active ? <span>Disable</span> : <span>Enable</span>} <span>cron job</span>
+              </DialogTitle>
             </DialogHeader>
             <DialogSectionSeparator />
             <DialogSection>
               <p className="text-sm">
-                Are you sure you want to {active ? 'disable' : 'enable'} the cron job "{jobname}
-                "?{' '}
+                Are you sure you want to {active ? <span>disable</span> : <span>enable</span>}{' '}
+                <span>the cron job "</span>
+                {jobname}
+                <span>"?</span>{' '}
               </p>
             </DialogSection>
             <DialogFooter>

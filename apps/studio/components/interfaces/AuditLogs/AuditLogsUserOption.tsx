@@ -19,7 +19,7 @@ export const AuditLogsUserOption = ({ slug, onChange }: AuditLogsUserOptionProps
       <CommandInput
         showResetIcon
         placeholder="Find member..."
-        className="text-base sm:text-sm"
+        className="text-sm"
         // FilterBar keeps focus on the chip's input, so move it here for cmdk's arrow/enter keys
         autoFocus
       />

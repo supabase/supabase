@@ -3,7 +3,8 @@ import { keepPreviousData, useQuery } from '@tanstack/react-query'
 import { organizationKeys } from './keys'
 import type { CustomerAddress, CustomerTaxId } from './types'
 import { handleError, post } from '@/data/fetchers'
-import type { ResponseError, UseCustomQueryOptions } from '@/types'
+import type { StudioError } from '@/lib/errors/studio-errors'
+import type { UseCustomQueryOptions } from '@/types'
 
 export type OrganizationCreationPreviewVariables = {
   tier?: string
@@ -54,9 +55,9 @@ export const useOrganizationCreationPreview = <TData = OrganizationCreationPrevi
   {
     enabled = true,
     ...options
-  }: UseCustomQueryOptions<OrganizationCreationPreviewData, ResponseError, TData> = {}
+  }: UseCustomQueryOptions<OrganizationCreationPreviewData, StudioError, TData> = {}
 ) =>
-  useQuery<OrganizationCreationPreviewData, ResponseError, TData>({
+  useQuery<OrganizationCreationPreviewData, StudioError, TData>({
     queryKey: organizationKeys.creationPreview(tier, {
       address: address as Record<string, unknown> | undefined,
       taxId: taxId as Record<string, unknown> | undefined,

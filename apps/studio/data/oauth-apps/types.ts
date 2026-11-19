@@ -1,31 +1,54 @@
-import type { components } from 'api-types'
-
+import { OAuthAppsAuthorizeRequestData } from './oauth-apps-authorize-request-query'
 import type { OrganizationRole } from '@/data/organization-members/organization-roles-query'
 
-type LiveAuthorizeRequest = components['schemas']['GetOAuthAuthorizationResponse_Output']
+export type OAuthScope = NonNullable<OAuthAppsAuthorizeRequestData['scopes']>[number]
 
-export type OAuthAppsAuthorizeLiveFields = Pick<
-  LiveAuthorizeRequest,
-  'name' | 'website' | 'domain' | 'icon' | 'redirect_uri' | 'registration_type' | 'expires_at'
->
+export type OAuthValidationRole = {
+  name: 'owner' | 'administrator' | 'developer' | 'read-only' | 'no-access'
+}
 
-export type OAuthScope = NonNullable<LiveAuthorizeRequest['scopes']>[number]
+export type OAuthScopeValidationResult =
+  | {
+      scope_target: 'organization'
+      role: OAuthValidationRole
+    }
+  | {
+      scope_target: 'all_projects'
+      role: OAuthValidationRole
+      failed_scopes: string[]
+    }
+  | {
+      scope_target: 'projects'
+      failures: Array<{
+        ref: string
+        role: OAuthValidationRole
+        failed_scopes: string[]
+      }>
+    }
 
-export function isWriteScope(scope: OAuthScope): boolean {
-  return scope.endsWith(':write')
+type OAuthAppsAuthorizeRoleValidationFailure = {
+  status: 'error'
+  error_code: 'role_validation_failed'
+  message: string
+  validation: OAuthScopeValidationResult
+}
+
+// fetch rejects with a OAuthRoleValidationException
+export function isOAuthRoleValidationError(
+  err: unknown
+): err is OAuthAppsAuthorizeRoleValidationFailure {
+  return (
+    typeof err === 'object' &&
+    err !== null &&
+    'error_code' in err &&
+    err.error_code === 'role_validation_failed'
+  )
 }
 
 export type OAuthGrantKind = 'organization_bound' | 'member_bound'
 
-export type OAuthAppsAuthorizeRequest = OAuthAppsAuthorizeLiveFields & {
-  app_id: string
-  app_name: string
-  grant_kind: OAuthGrantKind
-  project_scoping_mode: boolean
-  scopes: OAuthScope[]
-}
-
 export type OAuthOrganizationRole = {
+  id: string
   slug: string
   name: string
   default_role: OrganizationRole
@@ -34,127 +57,34 @@ export type OAuthOrganizationRole = {
 export type OAuthAppsAuthorizeOrganizationProject = {
   ref: string
   name: string
+  organization_id: number
   role: OrganizationRole
-}
-
-export type OAuthExistingGrant = {
-  approved_scopes: OAuthScope[] | null
-  project_refs: string[]
-  approved_at: string
-}
-
-export type OAuthOrgAppDetails = {
-  existing_grant: OAuthExistingGrant | null
-}
-
-export function getPreselectedProjectRefs({
-  existingGrant,
-  projectRef,
-  liveProjects,
-}: {
-  existingGrant: OAuthExistingGrant | null
-  projectRef: string | null
-  liveProjects: OAuthAppsAuthorizeOrganizationProject[]
-}): string[] {
-  const liveRefs = new Set(liveProjects.map((project) => project.ref))
-  const candidates = existingGrant?.project_refs.length
-    ? existingGrant.project_refs
-    : projectRef
-      ? [projectRef]
-      : []
-  return candidates.filter((ref) => liveRefs.has(ref))
-}
-
-export type OAuthAuthorizeApproveRequest = {
-  // not allowed when project_scoping_mode is false.
-  // when project_scoping_mode is true, if omitted, this means all projects
-  project_refs?: string[]
-}
-
-export type OAuthAppsAuthorizeRedirect =
-  components['schemas']['ApproveAuthorizationResponse_Output']
-
-export type OAuthScopeValidationResult =
-  | {
-      scope_target: 'organization'
-      role: OrganizationRole
-    }
-  | {
-      scope_target: 'all_projects'
-      role: OrganizationRole
-      failed_scopes: OAuthScope[]
-    }
-  | {
-      scope_target: 'projects'
-      failures: Array<{
-        ref: string
-        name: string
-        role: OrganizationRole
-        failed_scopes: OAuthScope[]
-      }>
-    }
-
-export type OAuthScopeValidationProjectFailure = Extract<
-  OAuthScopeValidationResult,
-  { scope_target: 'projects' }
->['failures'][number]
-
-export type OAuthAppsAuthorizeRoleValidationFailure = {
-  status: 'error'
-  error_code: 'role_validation_failed'
-  message: string
-  validation: OAuthScopeValidationResult
-}
-
-export type OAuthAppsAuthorizeApproveResult =
-  | OAuthAppsAuthorizeRedirect
-  | OAuthAppsAuthorizeRoleValidationFailure
-
-export function isRoleValidationFailure(
-  result: OAuthAppsAuthorizeApproveResult
-): result is OAuthAppsAuthorizeRoleValidationFailure {
-  return 'error_code' in result && result.error_code === 'role_validation_failed'
-}
-
-export function getFailedProjects(
-  failure: OAuthAppsAuthorizeRoleValidationFailure | null | undefined
-): OAuthScopeValidationProjectFailure[] {
-  if (!failure) return []
-  return failure.validation.scope_target === 'projects' ? failure.validation.failures : []
-}
-
-export type OAuthAppsAuthorizePreflightSuccess = { status: 'success' }
-
-export type OAuthAppsAuthorizePreflightResult =
-  | OAuthAppsAuthorizePreflightSuccess
-  | OAuthAppsAuthorizeRoleValidationFailure
-
-export function isPreflightValidationFailure(
-  result: OAuthAppsAuthorizePreflightResult
-): result is OAuthAppsAuthorizeRoleValidationFailure {
-  return 'error_code' in result && result.error_code === 'role_validation_failed'
 }
 
 export type OAuthApprovalTarget = 'organization' | 'members' | 'organization_and_members'
 
 export type OAuthApprovalItem = {
-  app: {
-    id: string
-    name: string
-    created_by: string
-    icon: string | null
+  id: string
+  type: 'oauth_app'
+  attributes: {
+    app: {
+      name: string
+      created_by: string | null
+      icon: string | null
+    }
+    last_approved_at: string
+    target: OAuthApprovalTarget
+    org_grant: {
+      grant_id: string
+      approved_scopes: string[]
+      approved_at: string
+    } | null
   }
-  grant_target: OAuthApprovalTarget
-  org_grant: {
-    grant_id: string
-    approved_scopes: string[]
-    approved_at: string
-  } | null
 }
 
 export type ListOAuthApprovalsResponse = {
   data: OAuthApprovalItem[]
-  pagination: { next_cursor: string | null }
+  links: { next: string | null }
 }
 
 export type OAuthGrantProject = {

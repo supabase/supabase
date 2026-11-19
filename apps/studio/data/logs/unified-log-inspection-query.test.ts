@@ -4,6 +4,7 @@ import { describe, expect, it } from 'vitest'
 import { z } from 'zod'
 
 import { getUnifiedLogInspection } from './unified-log-inspection-query'
+import { postgresStatementFields } from '@/components/interfaces/UnifiedLogs/ServiceFlow/config/serviceFlowFields'
 import { createUnifiedLogsSearch } from '@/components/interfaces/UnifiedLogs/UnifiedLogs.utils'
 import { addAPIMock } from '@/tests/lib/msw'
 
@@ -83,5 +84,36 @@ describe('unified log inspection scope', () => {
     ).resolves.toMatchObject({ result: [{ id: 'aa11' }] })
     expect(queries).toHaveLength(2)
     for (const sql of queries) expect(sql).not.toContain("log_attributes['function_id']")
+  })
+})
+
+describe('Postgres inspection hints', () => {
+  it('retrieves the Postgres hint for the statement overview on BigQuery', async () => {
+    const queries: string[] = []
+    addAPIMock({
+      method: 'post',
+      path: '/platform/projects/:ref/analytics/endpoints/logs.all',
+      response: async ({ request }) => {
+        queries.push(requestSchema.parse(await request.json()).sql)
+        return HttpResponse.json<AnalyticsResponse>({ result: [{ hint: 'Check the column name' }] })
+      },
+    })
+    const data = await getUnifiedLogInspection({
+      projectRef: 'default',
+      logId: 'postgres-log',
+      type: 'postgres',
+      search: createUnifiedLogsSearch(),
+      useOtel: false,
+    })
+    expect(queries[0]).toContain('pgl_parsed.hint as hint')
+    const hint = postgresStatementFields.find((field) => field.id === 'hint')
+    expect(hint?.getValue({}, data?.result?.[0])).toBe('Check the column name')
+  })
+
+  it('shows the hint from OTEL attributes in the statement overview', () => {
+    const hint = postgresStatementFields.find((field) => field.id === 'hint')
+    expect(hint?.getValue({}, { 'parsed.hint': 'Check the column name' })).toBe(
+      'Check the column name'
+    )
   })
 })

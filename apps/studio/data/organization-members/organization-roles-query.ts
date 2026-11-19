@@ -3,7 +3,8 @@ import type { components } from 'api-types'
 
 import { organizationKeys } from './keys'
 import { get, handleError } from '@/data/fetchers'
-import type { ResponseError, UseCustomQueryOptions } from '@/types'
+import type { StudioError } from '@/lib/errors/studio-errors'
+import type { UseCustomQueryOptions } from '@/types'
 
 export const FIXED_ROLE_ORDER = ['Owner', 'Administrator', 'Developer', 'Read-only', 'None']
 export type OrganizationRolesVariables = { slug?: string }
@@ -30,7 +31,7 @@ export async function getOrganizationRoles(
 }
 
 export type OrganizationRolesData = Awaited<ReturnType<typeof getOrganizationRoles>>
-export type OrganizationRolesError = ResponseError
+export type OrganizationRolesError = StudioError
 
 export const useOrganizationRolesV2Query = <TData = OrganizationRolesData>(
   { slug }: OrganizationRolesVariables,

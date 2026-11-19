@@ -6,11 +6,14 @@ import {
   DatabaseIcon,
   NetworkIcon,
   TerminalIcon,
+  WorkflowIcon,
 } from 'lucide-react'
 import { Tooltip, TooltipContent, TooltipTrigger } from 'ui'
 
 interface LogTypeIconProps {
   type: string
+  /** Name for the tooltip and screen readers; defaults to `type`. */
+  label?: string
   size?: number
   strokeWidth?: number
   className?: string
@@ -31,11 +34,13 @@ const ICON_MAP = new Map<string, IconComponent>([
   ['supavisor', CableIcon],
   ['pgbouncer', CableIcon],
   ['multigres', NetworkIcon],
+  ['pipelines', WorkflowIcon],
   ['compute', Compute],
 ])
 
 export const LogTypeIcon = ({
   type,
+  label = type,
   size = 14,
   strokeWidth = 1.5,
   className,
@@ -45,12 +50,12 @@ export const LogTypeIcon = ({
   return (
     <Tooltip>
       <TooltipTrigger asChild>
-        <span className="inline-flex" role="img" aria-label={type}>
+        <span className="inline-flex" role="img" aria-label={label}>
           <Icon size={size} strokeWidth={strokeWidth} className={className} />
         </span>
       </TooltipTrigger>
       <TooltipContent side="left">
-        <div className="text-xs">{type}</div>
+        <div className="text-xs">{label}</div>
       </TooltipContent>
     </Tooltip>
   )

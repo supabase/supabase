@@ -21,6 +21,9 @@ export const SUPABASE_ROLES = [
   'supabase_etl_admin',
 ] as const
 
+// Roles managed by Supabase whose names carry a variable suffix, e.g. support_ro_<id>
+export const SUPABASE_ROLE_PREFIXES = ['support_ro_'] as const
+
 // [Joshen] This was originally in the Roles mobx store
 // Just keeping it for now in case we need to differ it from ^ SUPABASE_ROLES
 export const SYSTEM_ROLES = [

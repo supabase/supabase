@@ -34,6 +34,7 @@ export const TopicCover = ({ title, description, topics, date, className }: Topi
         nudgeY={composition.nudgeY}
         zoom={composition.zoom}
         keepOutRef={textRef}
+        text={`${title} + ${description} + `.toUpperCase()}
       />
       <div
         ref={textRef}

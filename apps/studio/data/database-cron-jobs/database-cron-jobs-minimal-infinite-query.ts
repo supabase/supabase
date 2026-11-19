@@ -9,7 +9,8 @@ import {
 import { databaseCronJobsKeys } from './keys'
 import { unguarded } from '@/data/fetchers'
 import { executeSql } from '@/data/sql/execute-sql-mutation'
-import type { ResponseError, UseCustomInfiniteQueryOptions } from '@/types'
+import type { StudioError } from '@/lib/errors/studio-errors'
+import type { UseCustomInfiniteQueryOptions } from '@/types'
 
 export async function getDatabaseCronJobsMinimal({
   projectRef,
@@ -22,6 +23,8 @@ export async function getDatabaseCronJobsMinimal({
   const { result } = await executeSql({
     projectRef,
     connectionString,
+    sqlOrigin: 'studio',
+    queryName: 'cron-jobs-minimal',
     sql: getCronJobsMinimalSql({ searchTerm, page, limit: CRON_JOBS_PAGE_LIMIT }),
     queryKey: ['cron-jobs-minimal'],
     grant: unguarded.migrating,
@@ -31,7 +34,7 @@ export async function getDatabaseCronJobsMinimal({
 }
 
 type DatabaseCronJobsMinimalInfiniteData = CronJob[]
-type DatabaseCronJobsMinimalInfiniteError = ResponseError
+type DatabaseCronJobsMinimalInfiniteError = StudioError
 
 export const useCronJobsMinimalInfiniteQuery = <TData = DatabaseCronJobsMinimalInfiniteData>(
   { projectRef, connectionString, searchTerm }: DatabaseCronJobRunsVariables,

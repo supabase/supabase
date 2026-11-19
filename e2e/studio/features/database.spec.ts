@@ -837,6 +837,14 @@ test.describe('Database', () => {
       await page.getByRole('switch').nth(0).click()
       await page.getByRole('switch').nth(1).click()
       await page.getByRole('switch').nth(2).click()
+
+      // the password field only shows once login is enabled
+      const passwordInput = page.getByLabel('Password', { exact: true })
+      await expect(passwordInput).toHaveValue('')
+      await page.getByRole('button', { name: 'Generate a password' }).click()
+      await expect(passwordInput, 'Generated password should fill the field').not.toHaveValue('')
+      await expect(page.getByText('Password generated')).toBeAttached()
+
       await page.getByRole('button', { name: 'Save' }).click()
       await expect(
         page.getByText(`Successfully created new role: ${databaseRoleName}`),

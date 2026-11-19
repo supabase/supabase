@@ -3,6 +3,7 @@ import {
   CodeIcon,
   GlobeIcon,
   HardDriveIcon,
+  HashIcon,
   LockIcon,
   MonitorDotIcon,
   PackageOpenIcon,
@@ -23,9 +24,10 @@ import {
   locationAdditionalFields,
   locationPrimaryField,
   networkPrimaryFields,
-  postgresDetailsFields,
-  postgresPrimaryFields,
+  postgresSessionFields,
+  postgresStatementFields,
   postgrestPrimaryFields,
+  postgresTransactionFields,
   postgrestResponseFields,
   storageDetailsFields,
   storagePrimaryFields,
@@ -118,12 +120,17 @@ export const storageBlockConfig: BlockConfig = {
 
 export const postgresBlockConfig: BlockConfig = {
   title: 'Postgres',
-  primaryFields: postgresPrimaryFields,
+  primaryFields: postgresStatementFields,
   sections: [
     {
-      title: 'Connection & Session Details',
+      title: 'Session',
       icon: CableIcon,
-      fields: postgresDetailsFields,
+      fields: postgresSessionFields,
+    },
+    {
+      title: 'Transaction',
+      icon: HashIcon,
+      fields: postgresTransactionFields,
     },
   ],
 }

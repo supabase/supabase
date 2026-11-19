@@ -3,7 +3,8 @@ import { toast } from 'sonner'
 
 import { BannedIPKeys } from './keys'
 import { del, handleError, unguarded } from '@/data/fetchers'
-import type { ResponseError, UseCustomMutationOptions } from '@/types'
+import type { StudioError } from '@/lib/errors/studio-errors'
+import type { UseCustomMutationOptions } from '@/types'
 
 export type IPDeleteVariables = {
   projectRef: string
@@ -31,11 +32,11 @@ export const useBannedIPsDeleteMutation = ({
   onError,
   ...options
 }: Omit<
-  UseCustomMutationOptions<IPDeleteData, ResponseError, IPDeleteVariables>,
+  UseCustomMutationOptions<IPDeleteData, StudioError, IPDeleteVariables>,
   'mutationFn'
 > = {}) => {
   const queryClient = useQueryClient()
-  return useMutation<IPDeleteData, ResponseError, IPDeleteVariables>({
+  return useMutation<IPDeleteData, StudioError, IPDeleteVariables>({
     mutationFn: (vars) => deleteBannedIPs(vars),
     async onSuccess(data, variables, context) {
       const { projectRef } = variables

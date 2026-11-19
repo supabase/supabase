@@ -2,6 +2,7 @@ import {
   ROLE_IMPERSONATION_NO_RESULTS,
   ROLE_IMPERSONATION_SQL_LINE_COUNT,
   type SafeSqlFragment,
+  type WriteSqlFragment,
 } from '@supabase/pg-meta'
 import { DEFAULT_PLATFORM_APPLICATION_NAME } from '@supabase/pg-meta/src/constants'
 import { useMutation, useQueryClient, type QueryKey } from '@tanstack/react-query'
@@ -11,13 +12,15 @@ import {
   calculateSummary,
   createNodeTree,
 } from '@/components/interfaces/ExplainVisualizer/ExplainVisualizer.parser'
+import { classifySqlResponseError, type IsUserFaultSqlState } from '@/data/error-classification'
 import { handleError as handleErrorFetchers, post, type Unguarded } from '@/data/fetchers'
 import { QUERY_SOURCE_REGISTRY } from '@/data/query-sources/query-source-registry'
 import { MB } from '@/lib/constants'
-import type { GrantFor } from '@/lib/grants'
+import type { StudioError } from '@/lib/errors/studio-errors'
+import type { Grant, GrantForVariants } from '@/lib/grants'
 import { sqlEventParser } from '@/lib/sql-event-parser'
 import { useTrack } from '@/lib/telemetry/track'
-import { ResponseError, UseCustomMutationOptions } from '@/types'
+import { UseCustomMutationOptions } from '@/types'
 
 // [Joshen] Intention is that we invalidate all database related keys whenever running a mutation related query
 // So we attempt to ignore all the non-related query keys. We could probably look into grouping our query keys better
@@ -46,13 +49,40 @@ export type QueryResponseError = {
   severity: string
 }
 
-type ExecuteSqlVariables = {
+/**
+ * Who wrote the SQL, and for Studio SQL, its name in error reports.
+ *
+ * - `'user'`: SQL the user or an AI agent wrote, in whole or in part (SQL editor, AI tools, policy
+ *   and function editors). Its errors are never sent to Sentry.
+ * - `'studio'`: SQL Studio composes. Its errors are reported without the Postgres message, which can
+ *   contain user data, so `queryName` identifies the query instead. Use a static kebab-case name
+ *   (`table-rows`, `trigger-update`), never a value that includes IDs, schemas, or user input.
+ */
+type SqlSource =
+  | { sqlOrigin: 'user'; queryName?: string; isUserFaultSqlState?: never }
+  | {
+      sqlOrigin: 'studio'
+      queryName: string
+      /**
+       * For SQL that embeds user input. A failure whose SQLSTATE this accepts is the user's fault,
+       * not Studio's. Pass `isUserFaultForValues` for typed values or `isUserFaultForSql` for
+       * user-written SQL (see `data/error-classification.ts`).
+       */
+      isUserFaultSqlState?: IsUserFaultSqlState
+    }
+
+type PgMetaQuery = 'POST /platform/pg-meta/{ref}/query'
+export type PgMetaReadGrant = GrantForVariants<'post', '/platform/pg-meta/{ref}/query'>
+export type PgMetaWriteGrant = Grant<PgMetaQuery, 'write'>
+
+/** A plain `SafeSqlFragment` is read SQL. The optional brand lets it be assigned here. */
+type ReadSqlFragment = SafeSqlFragment & { readonly __sqlIntent?: 'read' }
+
+type BaseVariables = SqlSource & {
   projectRef?: string
-  grant: GrantFor<'post', '/platform/pg-meta/{ref}/query'> | Unguarded
   connectionString?: string | null
-  sql: SafeSqlFragment
   queryKey?: QueryKey
-  handleError?: (error: ResponseError) => { result: any }
+  handleError?: (error: StudioError) => { result: any }
   isRoleImpersonationEnabled?: boolean
   /**
    * Disables transaction mode - should be used only for manual queries ran via the SQL Editor
@@ -65,7 +95,19 @@ type ExecuteSqlVariables = {
   preflightCheck?: boolean
 }
 
-type ExecuteSqlMutationVariables = ExecuteSqlVariables & {
+/** Read SQL runs with a read grant or a write grant. */
+type ReadSqlVariables = BaseVariables & {
+  sql: ReadSqlFragment
+  grant: PgMetaReadGrant | Unguarded
+}
+
+/** SQL marked with `asWriteSql` needs a `write` grant. */
+type WriteSqlVariables = BaseVariables & {
+  sql: WriteSqlFragment
+  grant: PgMetaWriteGrant | Unguarded
+}
+
+export type ExecuteSqlMutationVariables = (ReadSqlVariables | WriteSqlVariables) & {
   autoLimit?: number
   contextualInvalidation?: boolean
 }
@@ -76,23 +118,44 @@ type ExecuteSqlMutationVariables = ExecuteSqlVariables & {
  * @throws {Error}
  */
 export async function executeSql<T = any>(
+  variables: WriteSqlVariables,
+  signal?: AbortSignal,
+  headersInit?: HeadersInit,
+  fetcherOverride?: (options: {
+    query: string
+    headers?: HeadersInit
+  }) => Promise<{ data: T } | { error: Error }>
+): Promise<{ result: T }>
+export async function executeSql<T = any>(
+  variables: ReadSqlVariables,
+  signal?: AbortSignal,
+  headersInit?: HeadersInit,
+  fetcherOverride?: (options: {
+    query: string
+    headers?: HeadersInit
+  }) => Promise<{ data: T } | { error: Error }>
+): Promise<{ result: T }>
+export async function executeSql<T = any>(
   {
     projectRef,
     connectionString,
     sql,
+    sqlOrigin,
+    queryName,
+    isUserFaultSqlState,
     grant,
     queryKey,
     handleError,
     isRoleImpersonationEnabled = false,
     isStatementTimeoutDisabled = false,
     preflightCheck = false,
-  }: ExecuteSqlVariables,
+  }: ReadSqlVariables | WriteSqlVariables,
   signal?: AbortSignal,
   headersInit?: HeadersInit,
   fetcherOverride?: (options: {
     query: string
     headers?: HeadersInit
-  }) => Promise<{ data: T } | { error: ResponseError }>
+  }) => Promise<{ data: T } | { error: Error }>
 ): Promise<{ result: T }> {
   if (!projectRef) throw new Error('projectRef is required')
 
@@ -208,8 +271,13 @@ export async function executeSql<T = any>(
       error = updatedError as any
     }
 
-    if (handleError !== undefined) return handleError(error as any)
-    else handleErrorFetchers(error)
+    const classified = classifySqlResponseError(error, {
+      origin: sqlOrigin,
+      queryName,
+      isUserFaultSqlState,
+    })
+    if (handleError !== undefined) return handleError(classified)
+    handleErrorFetchers(classified)
   }
 
   if (
@@ -237,7 +305,9 @@ export const useExecuteSqlMutation = ({
   const track = useTrack()
 
   return useMutation<ExecuteSqlData, QueryResponseError, ExecuteSqlMutationVariables>({
-    mutationFn: (args) => executeSql(args),
+    // args is ReadSqlVariables | WriteSqlVariables, already checked at mutate().
+    // TS can't match a union against separate overloads, so pick one; the runtime path is identical.
+    mutationFn: (args) => executeSql(args as ReadSqlVariables),
     async onSuccess(data, variables, context) {
       const { contextualInvalidation, sql, projectRef } = variables
 

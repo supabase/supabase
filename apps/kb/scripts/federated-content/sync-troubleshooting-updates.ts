@@ -1,49 +1,36 @@
 // Pushes title/content updates to already-synced GitHub Discussions when the
-// local troubleshooting guide has changed. Compares a stored checksum against
-// a freshly computed one — never the discussion's live content — so this is
-// immune to whatever GitHub does internally to stored title/body. A null
-// checksum (a row created before this column existed) always counts as
-// changed. Updates target the discussion directly via the row's stored
-// github_id — no need to list/paginate the category's discussions. Run after
-// sync-troubleshooting-entries.ts, from CI only. Pass --dry-run to log
-// without writing anything.
+// local guide's checksum differs from the one stored on its row (a null
+// checksum counts as changed). Guides are matched to rows by exact slug; a
+// guide with no row is skipped (sync-troubleshooting-entries.ts creates it).
+// The discussion is updated first and the checksum stored second, so a failed
+// DB write only means the next run pushes the same content again.
+//
+// Run after sync-troubleshooting-entries.ts, from CI only.
+//
+// --dry-run is read-only: prints each discussion it would update (url, id,
+// old -> new checksum) and updates nothing.
 import '../utils/dotenv.js'
 
-import { createHash } from 'node:crypto'
-import { readdir, readFile } from 'node:fs/promises'
-import { dirname, join } from 'node:path'
-import { fileURLToPath } from 'node:url'
-import { Octokit } from '@octokit/core'
-import { retry } from '@octokit/plugin-retry'
-import { createClient } from '@supabase/supabase-js'
-import matter from 'gray-matter'
-
-import { githubAuthOptions } from './github-auth.ts'
-
-const SCRIPT_DIR = dirname(fileURLToPath(import.meta.url))
-const TROUBLESHOOTING_DIRECTORY = join(SCRIPT_DIR, '../../src/content/troubleshooting')
+import { createPacer, isRateLimitError, readMinIntervalMs } from './github-throttle.ts'
+import {
+  computeChecksum,
+  createDb,
+  createOctokit,
+  fetchAllEntries,
+  readLocalGuides,
+  type EntryRow,
+  type RetryOctokitInstance,
+} from './troubleshooting-sync-shared.ts'
 
 const DRY_RUN = process.argv.includes('--dry-run')
+const LOG = '[sync-troubleshooting-updates]'
 
-const RetryOctokit = Octokit.plugin(retry)
-const octokit = new RetryOctokit(githubAuthOptions())
-
-async function readLocalGuides(): Promise<Array<{ slug: string; title: string; body: string }>> {
-  const filenames = (await readdir(TROUBLESHOOTING_DIRECTORY)).filter((f) => f.endsWith('.mdx'))
-  return Promise.all(
-    filenames.map(async (filename) => {
-      const raw = await readFile(join(TROUBLESHOOTING_DIRECTORY, filename), 'utf-8')
-      const { data, content: body } = matter(raw)
-      return { slug: filename.replace(/\.mdx$/, ''), title: data.title as string, body }
-    })
-  )
-}
-
-function computeChecksum(title: string, body: string): string {
-  return createHash('sha256').update(JSON.stringify({ title, body })).digest('hex')
-}
-
-async function updateDiscussion(discussionId: string, title: string, body: string): Promise<void> {
+async function updateDiscussion(
+  octokit: RetryOctokitInstance,
+  discussionId: string,
+  title: string,
+  body: string
+): Promise<void> {
   const mutation = `
     mutation UpdateDiscussionMutation($discussionId: ID!, $title: String!, $body: String!) {
       updateDiscussion(input: { discussionId: $discussionId, title: $title, body: $body }) {
@@ -51,65 +38,116 @@ async function updateDiscussion(discussionId: string, title: string, body: strin
       }
     }
   `
-  await octokit.graphql(mutation, { discussionId, title, body })
+  // retries: 0 disables @octokit/plugin-retry; mutations are sent once.
+  await octokit.graphql(mutation, { discussionId, title, body, request: { retries: 0 } })
 }
 
 async function syncDiscussionUpdates() {
   const guides = await readLocalGuides()
-  const db = createClient(
-    process.env.SUPABASE_URL as string,
-    process.env.SUPABASE_SERVICE_ROLE_KEY as string
-  )
+  const db = createDb()
+  const octokit = createOctokit()
+  const entries = await fetchAllEntries(db)
 
-  const { data: rows, error } = await db
-    .from('troubleshooting_entries')
-    .select('slug, github_id, checksum')
-    .in(
-      'slug',
-      guides.map((guide) => guide.slug)
-    )
-  if (error) throw error
+  const entryBySlug = new Map<string, EntryRow>()
+  for (const entry of entries) if (entry.slug) entryBySlug.set(entry.slug, entry)
 
-  const rowBySlug = new Map((rows ?? []).map((row) => [row.slug, row]))
-
-  let updatedCount = 0
+  let unchanged = 0
+  let withoutRow = 0
+  let updated = 0
+  let noStoredChecksum = 0
   const failures: string[] = []
+  const notAttempted: string[] = []
+
+  const minIntervalMs = readMinIntervalMs()
+  const pace = createPacer(minIntervalMs)
+  let rateLimited = false
+
+  console.log(
+    `${LOG} ${guides.length} local guide(s), ${entries.length} row(s)${DRY_RUN ? ' (dry run)' : ''}.`
+  )
+  if (DRY_RUN) {
+    console.log(
+      `  (pacing: at least ${minIntervalMs}ms between updates; a failed update is not retried)`
+    )
+  }
 
   for (const guide of guides) {
-    const row = rowBySlug.get(guide.slug)
-    if (!row) continue // not synced yet — sync-troubleshooting-entries.ts handles that
+    const row = entryBySlug.get(guide.slug)
+    if (!row) {
+      withoutRow++
+      continue
+    }
 
     const newChecksum = computeChecksum(guide.title, guide.body)
-    if (row.checksum !== null && row.checksum === newChecksum) continue
+    if (row.checksum && row.checksum === newChecksum) {
+      unchanged++
+      continue
+    }
 
-    console.log(
-      `[sync-troubleshooting-updates] Content changed for ${guide.slug}${DRY_RUN ? ' (dry run)' : ''}`
-    )
+    if (!row.github_id) {
+      console.error(`${LOG} ${guide.slug}: row ${row.id} has no github_id, cannot update.`)
+      failures.push(guide.slug)
+      continue
+    }
+
+    const reason = row.checksum ? 'content changed' : 'no stored checksum'
+    if (!row.checksum) noStoredChecksum++
+
     if (DRY_RUN) {
-      updatedCount++
+      console.log(`  ~ ${guide.slug}`)
+      console.log(`      reason:      ${reason}`)
+      console.log(`      discussion:  UPDATE ${row.github_url} (${row.github_id})`)
+      console.log(`      title:       ${guide.title}`)
+      console.log(`      body:        ${guide.body.length} chars`)
+      console.log(
+        `      row:         UPDATE row ${row.id} { checksum: ${row.checksum ?? 'null'} -> ${newChecksum} }`
+      )
+      updated++
+      continue
+    }
+
+    // After a rate limit the next calls would fail too: stop, next run resumes.
+    if (rateLimited) {
+      notAttempted.push(guide.slug)
       continue
     }
 
     try {
-      await updateDiscussion(row.github_id, guide.title, guide.body)
-      const { error: updateError } = await db
+      await pace()
+      await updateDiscussion(octokit, row.github_id, guide.title, guide.body)
+      const { error } = await db
         .from('troubleshooting_entries')
         .update({ checksum: newChecksum })
-        .eq('slug', guide.slug)
-      if (updateError) throw updateError
-      updatedCount++
+        .eq('id', row.id)
+      if (error) throw error
+      console.log(`  - updated ${guide.slug} (${reason}) -> ${row.github_url}`)
+      updated++
     } catch (err) {
-      console.error(`[sync-troubleshooting-updates] Failed to update ${guide.slug}:`, err)
+      console.error(`${LOG} Failed to update ${guide.slug}:`, err)
       failures.push(guide.slug)
+      if (isRateLimitError(err)) rateLimited = true
     }
   }
 
-  console.log(`[sync-troubleshooting-updates] Updated ${updatedCount} discussion(s).`)
+  console.log(
+    `\n${LOG} ${DRY_RUN ? 'Would update' : 'Updated'} ${updated} discussion(s) ` +
+      `(${updated - noStoredChecksum} changed, ${noStoredChecksum} with no stored checksum); ` +
+      `${unchanged} unchanged, ${withoutRow} without a row yet.`
+  )
+  if (notAttempted.length > 0) {
+    console.error(
+      `${LOG} Stopped early: GitHub rate-limited the request. ${notAttempted.length} discussion(s) not ` +
+        `attempted, the next run will pick them up (or raise --delay-ms): ${notAttempted.join(', ')}`
+    )
+    process.exitCode = 1
+  }
   if (failures.length > 0) {
-    throw new Error(`Failed to sync: ${failures.join(', ')}`)
+    console.error(`${LOG} Failed: ${failures.join(', ')}`)
+    process.exitCode = 1
   }
 }
 
 syncDiscussionUpdates().catch((error) => {
-  throw error
+  console.error(error)
+  process.exit(1)
 })

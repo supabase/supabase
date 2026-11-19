@@ -8,6 +8,7 @@ import { Admonition } from 'ui-patterns/Admonition'
 import { ShimmeringLoader } from 'ui-patterns/ShimmeringLoader'
 
 import { ProjectUpdateDisabledTooltip } from '../ProjectUpdateDisabledTooltip'
+import { useOrgSettingsPanel } from '../useOrgSettingsPanel'
 import { SpendCapSidePanel } from './SpendCapSidePanel'
 import {
   ScaffoldSection,
@@ -24,12 +25,11 @@ import { FGA_PERMISSIONS, useAsyncCheckPermissionsV2 } from '@/hooks/misc/useChe
 import { useSelectedOrganizationQuery } from '@/hooks/misc/useSelectedOrganization'
 import { BASE_PATH, DOCS_URL } from '@/lib/constants'
 import { MANAGED_BY } from '@/lib/constants/infrastructure'
-import { useOrgSettingsPageStateSnapshot } from '@/state/organization-settings'
 
 export const CostControl = () => {
   const { slug } = useParams()
   const { resolvedTheme } = useTheme()
-  const snap = useOrgSettingsPageStateSnapshot()
+  const { setPanel } = useOrgSettingsPanel()
   const { data: selectedOrganization } = useSelectedOrganizationQuery()
 
   const projectUpdateDisabled = useFlag('disableProjectCreationAndUpdate')
@@ -125,15 +125,18 @@ export const CostControl = () => {
                         } plan`}
                         description={
                           <>
-                            {currentPlan?.name || ''} plan requires you to have spend cap off at all
-                            times. Your projects will never become unresponsive. Only when your{' '}
+                            {currentPlan?.name || ''}{' '}
+                            <span>
+                              plan requires you to have spend cap off at all times. Your projects
+                              will never become unresponsive. Only when your
+                            </span>{' '}
                             <Link
                               href={`/org/${slug}/usage`}
                               className="text-green-900 transition hover:text-green-1000"
                             >
                               included usage
                             </Link>{' '}
-                            is exceeded will you be charged for any additional usage.
+                            <span>is exceeded will you be charged for any additional usage.</span>
                           </>
                         }
                       />
@@ -166,7 +169,8 @@ export const CostControl = () => {
                     </div>
                     <div>
                       <p className="mb-1">
-                        Spend cap is {isUsageBillingEnabled ? 'disabled' : 'enabled'}
+                        Spend cap is{' '}
+                        {isUsageBillingEnabled ? <span>disabled</span> : <span>enabled</span>}
                       </p>
                       <p className="text-sm text-foreground-light">
                         {isUsageBillingEnabled ? (
@@ -183,7 +187,7 @@ export const CostControl = () => {
                         <Button
                           className="mt-4 pointer-events-auto"
                           disabled={!canChangeTier}
-                          onClick={() => snap.setPanelKey('costControl')}
+                          onClick={() => setPanel('costControl')}
                         >
                           Change spend cap
                         </Button>

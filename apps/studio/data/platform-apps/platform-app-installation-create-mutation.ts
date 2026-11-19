@@ -4,7 +4,8 @@ import { toast } from 'sonner'
 
 import { platformAppKeys } from './keys'
 import { handleError, post, unguarded } from '@/data/fetchers'
-import type { ResponseError, UseCustomMutationOptions } from '@/types'
+import type { StudioError } from '@/lib/errors/studio-errors'
+import type { UseCustomMutationOptions } from '@/types'
 
 export type PlatformAppInstallationCreateVariables = {
   slug: string
@@ -35,7 +36,7 @@ export const usePlatformAppInstallationCreateMutation = ({
 }: Omit<
   UseCustomMutationOptions<
     PlatformAppInstallationCreateData,
-    ResponseError,
+    StudioError,
     PlatformAppInstallationCreateVariables
   >,
   'mutationFn'
@@ -44,7 +45,7 @@ export const usePlatformAppInstallationCreateMutation = ({
 
   return useMutation<
     PlatformAppInstallationCreateData,
-    ResponseError,
+    StudioError,
     PlatformAppInstallationCreateVariables
   >({
     mutationFn: (vars) => createPlatformAppInstallation(vars),

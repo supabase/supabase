@@ -8,11 +8,13 @@ export const FunctionEditor = ({
   language,
   focused,
   setFocused,
+  isReadOnly = false,
 }: {
   field: any
   language: string
   focused: boolean
   setFocused: (b: boolean) => void
+  isReadOnly?: boolean
 }) => {
   return (
     <div className={cn('rounded-md relative group grow')}>
@@ -24,6 +26,7 @@ export const FunctionEditor = ({
             placeholder={language === 'plpgsql' ? `BEGIN\n\nEND;` : undefined}
             value={field.value}
             onInputChange={field.onChange}
+            isReadOnly={isReadOnly}
           />
         )}
       </FormControl>

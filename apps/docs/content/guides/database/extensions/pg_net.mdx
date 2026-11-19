@@ -147,7 +147,7 @@ request_id
 
 Creates an HTTP DELETE request, returning the request's ID. HTTP requests are not started until the transaction is committed.
 
-### Signature [#post-signature]
+### Signature [#delete-signature]
 
 <Admonition type="caution">
 
@@ -352,7 +352,7 @@ select net.worker_restart();
 
 ### Invoke a Supabase Edge Function
 
-Make a POST request to a Supabase Edge Function with auth header and JSON body payload:
+Make a POST request to a [Supabase Edge Function](/docs/guides/functions) with auth header and JSON body payload:
 
 ```sql
 select

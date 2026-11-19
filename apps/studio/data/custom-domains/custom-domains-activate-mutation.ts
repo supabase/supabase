@@ -3,7 +3,8 @@ import { toast } from 'sonner'
 
 import { customDomainKeys } from './keys'
 import { handleError, post, unguarded } from '@/data/fetchers'
-import type { ResponseError, UseCustomMutationOptions } from '@/types'
+import type { StudioError } from '@/lib/errors/studio-errors'
+import type { UseCustomMutationOptions } from '@/types'
 
 export type CustomDomainActivateVariables = {
   projectRef: string
@@ -26,12 +27,12 @@ export const useCustomDomainActivateMutation = ({
   onError,
   ...options
 }: Omit<
-  UseCustomMutationOptions<CustomDomainActivateData, ResponseError, CustomDomainActivateVariables>,
+  UseCustomMutationOptions<CustomDomainActivateData, StudioError, CustomDomainActivateVariables>,
   'mutationFn'
 > = {}) => {
   const queryClient = useQueryClient()
 
-  return useMutation<CustomDomainActivateData, ResponseError, CustomDomainActivateVariables>({
+  return useMutation<CustomDomainActivateData, StudioError, CustomDomainActivateVariables>({
     mutationFn: (vars) => activateCustomDomain(vars),
     async onSuccess(data, variables, context) {
       const { projectRef } = variables

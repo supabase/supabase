@@ -3,7 +3,8 @@ import { components } from 'api-types'
 
 import { edgeFunctionsKeys } from './keys'
 import { get, handleError, unguarded } from '@/data/fetchers'
-import type { ResponseError, UseCustomQueryOptions } from '@/types'
+import type { StudioError } from '@/lib/errors/studio-errors'
+import type { UseCustomQueryOptions } from '@/types'
 
 export type EdgeFunctionsVariables = { projectRef?: string }
 
@@ -26,7 +27,7 @@ export async function getEdgeFunctions(
 }
 
 export type EdgeFunctionsData = Awaited<ReturnType<typeof getEdgeFunctions>>
-export type EdgeFunctionsError = ResponseError
+export type EdgeFunctionsError = StudioError
 
 export const useEdgeFunctionsQuery = <TData = EdgeFunctionsData>(
   { projectRef }: EdgeFunctionsVariables,

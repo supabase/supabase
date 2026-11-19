@@ -272,7 +272,7 @@ const data: () => {
       ),
       subheading:
         'Copy these prompts into your AI editor to scaffold agent infrastructure on Supabase:',
-      docsUrl: 'https://supabase.com/docs/guides/getting-started/ai-prompts',
+      docsUrl: 'https://supabase.com/docs/guides/ai-tools/ai-prompts',
       leftFooter: (
         <div className="grid grid-cols-5 divide-x divide-y rounded-lg overflow-hidden border">
           {frameworks.map((framework) => (

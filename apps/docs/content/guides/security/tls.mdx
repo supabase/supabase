@@ -6,7 +6,7 @@ description: 'TLS versions and cipher suites supported by Supabase project APIs,
 
 Your project's APIs accept only HTTPS connections. Use the TLS versions and cipher suites on this page to check whether a client can connect, or to answer findings from a security scan.
 
-These settings apply to your project's default domain, `<project_ref>.supabase.co`, and to [custom domains](/docs/guides/platform/custom-domains). It covers every service on that domain: Auth, the Data API, Storage, Realtime, and Edge Functions. For direct Postgres connections and connections through the pooler, see [Postgres SSL Enforcement](/docs/guides/platform/ssl-enforcement).
+These settings apply to your project's default domain, `<project_ref>.supabase.co`, and to [custom domains](/docs/guides/platform/custom-domains). It covers every service on that domain: Auth, the Data API, Storage, Realtime, and Edge Functions. For direct Postgres connections and connections through the [pooler](/docs/guides/database/connecting-to-postgres/pooling-and-limits), see [Postgres SSL Enforcement](/docs/guides/platform/ssl-enforcement).
 
 <Admonition type="deprecation" title="Outdated TLS 1.2 cipher suites are deprecated">
 
@@ -81,6 +81,6 @@ Check the TLS configuration your application actually uses: its operating system
 
 ### Update affected clients
 
-Update the affected client's operating system, runtime, or TLS library to a version that supports TLS 1.3 or a supported TLS 1.2 cipher suite. For error messages and workarounds for clients you can't update, see [troubleshooting guides](/kb/topics/troubleshooting).
+Update the affected client's operating system, runtime, or TLS library to a version that supports TLS 1.3 or a [supported TLS 1.2 cipher suite](/kb/troubleshooting/tls-handshake-failures-after-cbc-cipher-removal). For error messages and workarounds for clients you can't update, see [troubleshooting guides](/kb/topics/troubleshooting).
 
 If you can't update your clients before the removal date, [open a support ticket](/dashboard/support/new).

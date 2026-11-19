@@ -6,8 +6,9 @@ import { databaseQueuesKeys } from './keys'
 import { databaseKeys } from '@/data/database/keys'
 import { unguarded } from '@/data/fetchers'
 import { executeSql } from '@/data/sql/execute-sql-mutation'
+import type { StudioError } from '@/lib/errors/studio-errors'
 import { isGreaterThanOrEqual } from '@/lib/semver'
-import type { ResponseError, UseCustomMutationOptions } from '@/types'
+import type { UseCustomMutationOptions } from '@/types'
 
 export type DatabaseQueueExposePostgrestVariables = {
   projectRef: string
@@ -34,6 +35,8 @@ export async function toggleQueuesExposurePostgrest({
   const { result } = await executeSql({
     projectRef,
     connectionString,
+    sqlOrigin: 'studio',
+    queryName: 'toggle-queues-exposure',
     sql,
     queryKey: ['toggle-queues-exposure'],
     grant: unguarded.migrating,
@@ -51,7 +54,7 @@ export const useDatabaseQueueToggleExposeMutation = ({
 }: Omit<
   UseCustomMutationOptions<
     DatabaseQueueExposePostgrestData,
-    ResponseError,
+    StudioError,
     DatabaseQueueExposePostgrestVariables
   >,
   'mutationFn'
@@ -60,7 +63,7 @@ export const useDatabaseQueueToggleExposeMutation = ({
 
   return useMutation<
     DatabaseQueueExposePostgrestData,
-    ResponseError,
+    StudioError,
     DatabaseQueueExposePostgrestVariables
   >({
     mutationFn: (vars) => toggleQueuesExposurePostgrest(vars),

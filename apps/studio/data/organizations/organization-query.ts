@@ -4,7 +4,8 @@ import { platformComponents as components } from 'api-types'
 import { organizationKeys } from './keys'
 import { getManagedByFromOrganizationPartner } from './managed-by-utils'
 import { get, handleError } from '@/data/fetchers'
-import type { ResponseError, UseCustomQueryOptions } from '@/types'
+import type { StudioError } from '@/lib/errors/studio-errors'
+import type { UseCustomQueryOptions } from '@/types'
 
 export type OrganizationVariables = { slug?: string }
 export type OrganizationDetail = components['schemas']['OrganizationSlugResponse_Output']
@@ -31,7 +32,7 @@ export async function getOrganization({ slug }: OrganizationVariables, signal?: 
 }
 
 export type OrganizationsData = Awaited<ReturnType<typeof getOrganization>>
-export type OrganizationsError = ResponseError
+export type OrganizationsError = StudioError
 
 export const useOrganizationQuery = <TData = OrganizationsData>(
   { slug }: OrganizationVariables,

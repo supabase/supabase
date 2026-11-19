@@ -82,9 +82,10 @@ export const OptInRequest = ({
               {requiredLabel ? `${requiredLabel} access needed` : 'Review opt-in level'}
             </p>
             <p className="text-foreground-light">
-              {requiredLabel &&
-                `The Assistant needs the ${requiredLabel} opt-in level to answer this. `}
-              Your organization is set to {AI_OPT_IN_LEVEL_LABELS[aiOptInLevel]}.
+              {requiredLabel && (
+                <span>{`The Assistant needs the ${requiredLabel} opt-in level to answer this. `}</span>
+              )}
+              {`Your organization is set to ${AI_OPT_IN_LEVEL_LABELS[aiOptInLevel]}.`}
             </p>
           </div>
         ) : (

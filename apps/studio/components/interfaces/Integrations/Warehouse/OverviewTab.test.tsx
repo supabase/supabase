@@ -21,18 +21,8 @@ type WarehouseSetupStatusResponse = components['schemas']['WarehouseSetupStatusR
 type WarehouseDeleteResponse = components['schemas']['WarehouseDeleteResponse_Output']
 type WarehouseSetupResponse = components['schemas']['WarehouseSetupResponse_Output']
 
-// Both integration shells are live, and the flag reads a context plus ConfigCat that
-// `customRender` doesn't provide.
-const mockIsMarketplaceEnabled = vi.fn(() => false)
 const mockTrack = vi.fn()
-vi.mock('@/components/interfaces/App/FeaturePreview/FeaturePreviewContext', () => ({
-  useIsMarketplaceEnabled: () => mockIsMarketplaceEnabled(),
-}))
 vi.mock('@/lib/telemetry/track', () => ({ useTrack: () => mockTrack }))
-
-vi.mock('../Integration/IntegrationOverviewTab', () => ({
-  IntegrationOverviewTab: ({ children }: { children: React.ReactNode }) => <div>{children}</div>,
-}))
 
 vi.mock('sonner', () => ({
   toast: { success: vi.fn(), error: vi.fn() },
@@ -89,27 +79,11 @@ const mockSetupStatus = (status: Partial<WarehouseSetupStatusResponse>) =>
       }),
   })
 
-const mockProject = () =>
-  addAPIMock({
-    method: 'get',
-    path: '/platform/projects/:ref',
-    // @ts-expect-error partial project response used by AlertError
-    response: {
-      cloud_provider: 'localhost',
-      id: 1,
-      inserted_at: '2021-08-02T06:40:40.646Z',
-      name: 'Default Project',
-      organization_id: 1,
-      ref: 'default',
-      region: 'local',
-      status: 'ACTIVE_HEALTHY',
-    },
-  })
-
-const REPLICATION_PROJECT: ProjectDetail = {
+const PROJECT: ProjectDetail = {
   cloud_provider: 'AWS',
   connectionString: 'postgresql://postgres@localhost:5432/postgres',
   db_host: 'db.default.supabase.co',
+  dbVersion: 'supabase-postgres-17.6.1.001',
   high_availability: false,
   id: 1,
   inserted_at: '2026-01-01T00:00:00.000Z',
@@ -173,10 +147,9 @@ const PUBLICATION_TABLES: PublicationDetailsResponse['tables'] = [
   { id: 3, schema: 'analytics', name: 'events', kind: 'table', partition_parent_id: null },
 ]
 
-// The disable card reads what is currently replicated from these four queries.
+// The disable card reads what is currently replicated from these queries.
 const mockReplicatedTableQueries = () => {
   const publicationRequests: string[] = []
-  addAPIMock({ method: 'get', path: '/platform/projects/:ref', response: REPLICATION_PROJECT })
   addAPIMock({
     method: 'post',
     path: '/platform/pg-meta/:ref/query',
@@ -222,23 +195,19 @@ const mockReplicatedTableQueries = () => {
 
 describe('WarehouseOverviewTab', () => {
   beforeEach(() => {
-    mockIsMarketplaceEnabled.mockReturnValue(true)
     mockTrack.mockClear()
+    addAPIMock({ method: 'get', path: '/platform/projects/:ref', response: PROJECT })
   })
 
-  test.each([false, true])(
-    'offers only the picker before setup (marketplace: %s)',
-    async (isMarketplaceEnabled) => {
-      mockIsMarketplaceEnabled.mockReturnValue(isMarketplaceEnabled)
-      mockSetupStatus({ setup_status: 'not_started' })
+  test('offers only the picker before setup', async () => {
+    mockSetupStatus({ setup_status: 'not_started' })
 
-      customRender(<WarehouseOverviewTab />)
+    customRender(<WarehouseOverviewTab />)
 
-      expect(await screen.findByText('Replicated tables picker')).toBeInTheDocument()
-      expect(screen.queryByText('External access')).not.toBeInTheDocument()
-      expect(screen.queryByRole('button', { name: 'Disable Warehouse' })).not.toBeInTheDocument()
-    }
-  )
+    expect(await screen.findByText('Replicated tables picker')).toBeInTheDocument()
+    expect(screen.queryByText('External access')).not.toBeInTheDocument()
+    expect(screen.queryByRole('button', { name: 'Disable Warehouse' })).not.toBeInTheDocument()
+  })
 
   test.each(['setting_up', 'copying'] as const)(
     'shows setup progress for %s',
@@ -276,7 +245,6 @@ describe('WarehouseOverviewTab', () => {
   )
 
   test('keeps the table picker available after setup fails and shows the latest retry error', async () => {
-    mockProject()
     mockSetupStatus({
       setup_status: 'error',
       steps: [{ name: 'warehouse_copy', status: 'error', message: 'Initial setup failed' }],
@@ -349,7 +317,7 @@ describe('WarehouseOverviewTab', () => {
     addAPIMock({
       method: 'post',
       path: '/platform/warehouse/:ref/setup',
-      response: () => HttpResponse.json<WarehouseSetupResponse>({ pipeline_id: 1, tables: [] }),
+      response: () => HttpResponse.json<WarehouseSetupResponse>({ pipeline_id: '1', tables: [] }),
     })
 
     customRender(<WarehouseOverviewTab />)
@@ -370,7 +338,7 @@ describe('WarehouseOverviewTab', () => {
     addAPIMock({
       method: 'post',
       path: '/platform/warehouse/:ref/setup',
-      response: () => HttpResponse.json<WarehouseSetupResponse>({ pipeline_id: 1, tables: [] }),
+      response: () => HttpResponse.json<WarehouseSetupResponse>({ pipeline_id: '1', tables: [] }),
     })
 
     customRender(<WarehouseOverviewTab />)
@@ -453,7 +421,6 @@ describe('WarehouseOverviewTab', () => {
   test.each([false, true])(
     'retries failed cleanup with the saved delete_data option (%s)',
     async (shouldDeleteData) => {
-      mockProject()
       mockSetupStatus({
         setup_status: 'deletion_failed',
         error: 'Storage cleanup failed',
@@ -577,8 +544,6 @@ describe('WarehouseOverviewTab', () => {
       path: '/platform/warehouse/:ref/setup-status',
       response: () => HttpResponse.json<APIErrorBody>({ message: 'Boom' }, { status: 500 }),
     })
-    mockProject()
-
     customRender(<WarehouseOverviewTab />)
 
     expect(await screen.findByText('Failed to load Warehouse status')).toBeInTheDocument()

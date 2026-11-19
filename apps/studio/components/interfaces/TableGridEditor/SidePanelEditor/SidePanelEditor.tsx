@@ -1,4 +1,4 @@
-import * as Sentry from '@sentry/nextjs'
+import * as Sentry from '@sentry/react'
 import type { PGTable } from '@supabase/pg-meta'
 import { useQueryClient } from '@tanstack/react-query'
 import { useParams } from 'common'
@@ -892,6 +892,7 @@ export const SidePanelEditor = ({
         <RowEditor
           row={snap.sidePanel?.type === 'row' ? snap.sidePanel.row : undefined}
           selectedTable={selectedTable}
+          duplicateFrom={snap.sidePanel?.type === 'row' ? snap.sidePanel.duplicateFrom : undefined}
           visible={snap.sidePanel?.type === 'row'}
           editable={editable}
           closePanel={onClosePanel}

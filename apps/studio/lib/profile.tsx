@@ -1,4 +1,4 @@
-import * as Sentry from '@sentry/nextjs'
+import * as Sentry from '@sentry/react'
 import { useQueryClient } from '@tanstack/react-query'
 import { useIsLoggedIn, useUser } from 'common'
 import { useRouter } from 'next/router'
@@ -16,12 +16,12 @@ import { useProfileCreateMutation } from '@/data/profile/profile-create-mutation
 import { useProfileIdentitiesQuery } from '@/data/profile/profile-identities-query'
 import { useProfileQuery } from '@/data/profile/profile-query'
 import type { Profile } from '@/data/profile/types'
+import type { StudioError } from '@/lib/errors/studio-errors'
 import { useTrack } from '@/lib/telemetry/track'
-import type { ResponseError } from '@/types'
 
 export type ProfileContextType = {
   profile: Profile | undefined
-  error: ResponseError | null
+  error: StudioError | null
   isLoading: boolean
   isError: boolean
   isSuccess: boolean

@@ -16,13 +16,13 @@ export function useUnifiedLogsPathnameOptions(value: string, options?: Option[])
   const [inputValue, setInputValue] = useState('')
   const { ref: projectRef } = useParams()
   const { hasLoaded: flagsLoaded } = useFeatureFlags()
-  const { table, searchParameters, columnFilters, filterFields, hasPendingFilterChange } =
-    useDataTable<unknown, unknown, QuerySearchParamsType>()
+  const { table, searchParameters, columnFilters, hasPendingFilterChange } = useDataTable<
+    unknown,
+    unknown,
+    QuerySearchParamsType
+  >()
   const debouncedSearch = useDebounce(inputValue, 700)
 
-  const filterableNames = new Set(
-    filterFields.filter((field) => field.type !== 'timerange').map((field) => String(field.value))
-  )
   const dateValue = columnFilters.find((filter) => filter.id === 'date')?.value
   const date =
     Array.isArray(dateValue) &&
@@ -33,7 +33,9 @@ export function useUnifiedLogsPathnameOptions(value: string, options?: Option[])
   const scopedSearch = hasPendingFilterChange
     ? {
         ...searchParameters,
-        filter: logsFiltersToUrlParams(columnFiltersToLogsFilters(columnFilters, filterableNames)),
+        filter: logsFiltersToUrlParams(
+          columnFiltersToLogsFilters(columnFilters.filter(({ id }) => id !== 'date'))
+        ),
         date,
       }
     : searchParameters

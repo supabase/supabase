@@ -1,13 +1,23 @@
 import * as NavItems from '~/components/Navigation/NavigationMenu/NavigationMenu.constants'
+import { REFERENCES } from '~/content/navigation.references'
+import { isEnabled } from '~/features/IaNav/navTree'
 
 export interface BreadcrumbItem {
   name?: string
   title?: string
   url?: string
+  icon?: string
+  version?: ReferenceVersion
+}
+
+interface ReferenceVersion {
+  library: string
+  current: string
 }
 
 const SECTION_PATH_TO_KEY: Record<string, keyof typeof NavItems> = {
   ai: 'ai',
+  'ai-tools': 'ai_tools',
   api: 'api',
   auth: 'auth',
   contributing: 'contributing',
@@ -29,11 +39,11 @@ const SECTION_PATH_TO_KEY: Record<string, keyof typeof NavItems> = {
   observability: 'telemetry',
 }
 
-function getSectionMenu(pathname: string) {
+function getSectionMenu(pathname: string, navItems: typeof NavItems) {
   const trimmed = pathname.replace(/^\/guides\/?/, '')
   const top = trimmed.split('/')[0]
   const key = SECTION_PATH_TO_KEY[top] ?? 'gettingstarted'
-  return (NavItems as Record<string, any>)[key]
+  return (navItems as Record<string, any>)[key]
 }
 
 function findMenuItemByUrl(
@@ -53,7 +63,55 @@ function findMenuItemByUrl(
   return null
 }
 
-export function resolveBreadcrumbs(pathname: string): BreadcrumbItem[] {
+const getReferenceLibPath = (href: string) => href.split('/')[2]
+
+export const getCrumbName = (crumb: BreadcrumbItem) => crumb.title || crumb.name
+
+const resolveReferenceBreadcrumbs = (
+  pathname: string,
+  navItems: typeof NavItems
+): BreadcrumbItem[] => {
+  const libPath = getReferenceLibPath(pathname)
+  const reference = Object.values(REFERENCES).find((reference) => reference.libPath === libPath)
+  if (!reference) return []
+
+  // library items carry a reference level, so a renamed section label still finds them
+  const library = navItems.GLOBAL_MENU_ITEMS.flat()
+    .flatMap((section) => section.menuItems?.flat() ?? [])
+    .find(
+      (item) =>
+        item.level?.startsWith('reference_') &&
+        item.href?.startsWith('/') &&
+        isEnabled(item) &&
+        getReferenceLibPath(item.href) === libPath
+    )
+
+  const versions: readonly string[] = reference.versions
+  // an older version sits in the url after the library, and the latest has no segment
+  const requestedVersion = pathname.split('/')[3]
+  const version =
+    versions.length > 1
+      ? {
+          library: libPath,
+          current: versions.find((item) => item === requestedVersion) ?? versions[0],
+        }
+      : undefined
+
+  return [
+    { name: 'Home', url: '/reference' },
+    library
+      ? { name: library.label, url: library.href, icon: library.icon, version }
+      : { name: reference.name, url: `/reference/${libPath}`, icon: reference.icon, version },
+  ]
+}
+
+export function resolveBreadcrumbs(
+  pathname: string,
+  navItems: typeof NavItems = NavItems
+): BreadcrumbItem[] {
+  if (pathname.startsWith('/reference/')) {
+    return resolveReferenceBreadcrumbs(pathname, navItems)
+  }
   if (pathname.startsWith('/guides/getting-started/ai-prompts')) {
     return [
       { name: 'Getting started', url: '/guides/getting-started' },
@@ -68,6 +126,11 @@ export function resolveBreadcrumbs(pathname: string): BreadcrumbItem[] {
       { name: 'Agent Skills', url: '/guides/getting-started/ai-skills' },
     ]
   }
-  const menu = getSectionMenu(pathname)
-  return findMenuItemByUrl(menu, pathname) ?? []
+  const menu = getSectionMenu(pathname, navItems)
+  const chain = findMenuItemByUrl(menu, pathname) ?? []
+  // an accordion and its first page can share a url and a name, so the chain would repeat it
+  return chain.filter((crumb, index) => {
+    const parent = chain[index - 1]
+    return !parent || parent.url !== crumb.url || getCrumbName(parent) !== getCrumbName(crumb)
+  })
 }

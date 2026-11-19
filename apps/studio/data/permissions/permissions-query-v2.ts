@@ -4,7 +4,8 @@ import { useIsLoggedIn } from 'common'
 import { permissionKeys } from './keys'
 import { get, handleError } from '@/data/fetchers'
 import { IS_PLATFORM } from '@/lib/constants'
-import type { ResponseError, UseCustomQueryOptions } from '@/types'
+import type { StudioError } from '@/lib/errors/studio-errors'
+import type { UseCustomQueryOptions } from '@/types'
 
 export async function getPermissionsV2(signal?: AbortSignal) {
   const { data, error } = await get('/platform/profile/permissions/v2', { signal })
@@ -24,7 +25,7 @@ export async function getPermissionsV2(signal?: AbortSignal) {
 }
 
 export type PermissionsV2Data = Awaited<ReturnType<typeof getPermissionsV2>>
-export type PermissionsV2Error = ResponseError
+export type PermissionsV2Error = StudioError
 
 export const permissionsQueryOptionsV2 = () =>
   queryOptions({

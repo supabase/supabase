@@ -11,7 +11,7 @@ import {
 import { buildPipelineApiConfig } from './utils'
 
 describe('buildPipelineApiConfig', () => {
-  it('maps selective initial-copy configuration to the ETL API shape', () => {
+  it('maps selective initial-copy configuration to the Pipelines API shape', () => {
     expect(
       buildPipelineApiConfig({
         publicationName: 'analytics',

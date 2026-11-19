@@ -3,7 +3,8 @@ import { toast } from 'sonner'
 
 import type { ExtendedSupportCategories } from '@/components/interfaces/Support/Support.constants'
 import { handleError, patch, unguarded } from '@/data/fetchers'
-import type { ResponseError, UseCustomMutationOptions } from '@/types'
+import type { StudioError } from '@/lib/errors/studio-errors'
+import type { UseCustomMutationOptions } from '@/types'
 
 export type LinkSupportTicketVariables = {
   conversation_id: string
@@ -54,10 +55,10 @@ export const useLinkSupportTicketMutation = ({
   onError,
   ...options
 }: Omit<
-  UseCustomMutationOptions<LinkSupportTicketData, ResponseError, LinkSupportTicketVariables>,
+  UseCustomMutationOptions<LinkSupportTicketData, StudioError, LinkSupportTicketVariables>,
   'mutationFn'
 > = {}) => {
-  return useMutation<LinkSupportTicketData, ResponseError, LinkSupportTicketVariables>({
+  return useMutation<LinkSupportTicketData, StudioError, LinkSupportTicketVariables>({
     mutationFn: (vars) => linkSupportTicket(vars),
     async onSuccess(data, variables, context) {
       await onSuccess?.(data, variables, context)

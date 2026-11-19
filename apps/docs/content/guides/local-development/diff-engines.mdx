@@ -7,22 +7,20 @@ subtitle: 'How the Supabase CLI generates migrations, which engine your project 
 
 A diff engine compares two database states and generates the SQL that turns one into the other. It powers `supabase db diff`, `supabase db pull`, and the `supabase db schema declarative` commands. The CLI ships two engines, and the same command can behave differently depending on which one your project uses. This page explains how to tell which engine you're on, what differs between them, and how to move an existing project from one to the other.
 
-[`pg-delta`](https://github.com/supabase/pg-toolbelt/tree/main/packages/pg-delta) is Supabase's open source engine and the default for projects created with a recent `supabase init`. Rather than parsing SQL to understand your schema, it loads each state into a real Postgres instance and reads the result from the catalog. It models entities the legacy engine missed, such as comments, domains, roles, publication membership, and the security invoker setting on views, and it supports Postgres 14 through 18. It ships under the `[experimental.pgdelta]` config namespace and remains pre-1.0.
+[`pg-delta`](https://github.com/supabase/pg-toolbelt/tree/main/packages/pg-delta) is Supabase's open source engine and the default for every project. Rather than parsing SQL to understand your schema, it loads each state into a real Postgres instance and reads the result from the catalog. It models entities the legacy engine missed, such as comments, domains, roles, publication membership, and the security invoker setting on views, and it supports Postgres 14 through 18. It ships under the `[experimental.pgdelta]` config namespace and remains pre-1.0.
 
-[`migra`](https://github.com/djrobstep/migra) is `djrobstep`'s open source Python library for diffing Postgres schemas, and the CLI has shelled out to it since before `pg-delta` existed. It compares two live Postgres databases and generates the SQL that turns one into the other, the mechanism behind `supabase db diff`. Projects that haven't opted in to `pg-delta` continue to use it, and every command they relied on keeps working.
+[`migra`](https://github.com/djrobstep/migra) is `djrobstep`'s open source Python library for diffing Postgres schemas, and the CLI has shelled out to it since before `pg-delta` existed. It compares two live Postgres databases and generates the SQL that turns one into the other, the mechanism behind `supabase db diff`. Projects that set `enabled = false` under `[experimental.pgdelta]` use it, and every command they rely on keeps working.
 
 ## Which engine your project uses
 
 <$Partial path="diff_engine_check.mdx" />
 
-Projects created with a recent `supabase init` use `pg-delta` because `init` writes this into `config.toml`:
+To use the legacy `migra` engine for every run, set `enabled = false`:
 
 ```toml name=supabase/config.toml
 [experimental.pgdelta]
-enabled = true
+enabled = false
 ```
-
-Existing projects without that section keep the legacy `migra` engine until they add it. See [Switch an existing project to `pg-delta`](#switch-an-existing-project-to-pg-delta).
 
 To switch engines for a single run without changing `config.toml`, the flag depends on the command:
 
@@ -32,9 +30,7 @@ To switch engines for a single run without changing `config.toml`, the flag depe
 | `db pull`                                   | `--diff-engine pg-delta` | `--diff-engine migra` |
 | `db schema declarative generate` and `sync` | `--experimental`         | Not available         |
 
-For `db diff` and `db pull`, setting `SUPABASE_EXPERIMENTAL_PG_DELTA=1` in your shell or in `supabase/.env` has the same effect as `enabled = true`. An explicit engine flag on the command still wins.
-
-To opt out entirely, set `enabled = false` under `[experimental.pgdelta]`.
+For `db diff` and `db pull`, setting `SUPABASE_EXPERIMENTAL_PGDELTA_ENABLED=false` in your shell or in `supabase/.env` has the same effect as `enabled = false`. An explicit engine flag on the command still wins.
 
 ## What differs between the engines
 
@@ -58,9 +54,9 @@ For a walkthrough of the day-to-day commands on `pg-delta`, see [Local developme
 
 ## Switch an existing project to `pg-delta` [#switch-an-existing-project-to-pg-delta]
 
-Switching is a one-time change to `config.toml` followed by a catch-up migration. Do it on a branch so you can review everything before it reaches your team.
+If your project opted out with `enabled = false`, switching is a one-time change to `config.toml` followed by a catch-up migration. Do it on a branch so you can review everything before it reaches your team.
 
-1. Add the engine setting to `config.toml`:
+1. Remove `enabled = false` from `config.toml`, or set it to `true`:
 
    ```toml name=supabase/config.toml
    [experimental.pgdelta]
@@ -72,7 +68,7 @@ Switching is a one-time change to `config.toml` followed by a catch-up migration
 3. Pull once against your linked project to create a catch-up migration:
 
    ```bash
-   supabase db pull
+   supabase db pull --remote
    ```
 
    If your history was built from legacy diffs, it doesn't mention objects the legacy engine didn't track, such as comments, domains, roles, and publication membership. This first pull captures them in a single catch-up migration. Your remote database already has these objects, so accept the prompt to record the migration as applied and review the file like any other generated migration. If your baseline came from the legacy engine's `pg_dump` path, it already contains those objects, and this pull reports "No schema changes found". There is nothing to commit in that case. See [Cleaning up generated migrations](/docs/guides/local-development/cli-workflows#cleaning-up-generated-migrations).
@@ -87,6 +83,6 @@ Switching is a one-time change to `config.toml` followed by a catch-up migration
 
 6. Optionally, add `supabase db diff --strict-coverage` to CI so untracked objects fail the job instead of producing warnings. See [Managing environments](/docs/guides/deployment/managing-environments).
 
-If you deploy through the [GitHub integration](/docs/guides/deployment/branching/github-integration), branching runs every migration inside a transaction and doesn't honor the `-- pg-delta: transaction=false` directive. A migration that carries it applies with `supabase db push` but fails when branching deploys it.
+If you deploy through the [GitHub integration](/docs/guides/deployment/branching/github-integration), branching runs every migration inside a transaction and doesn't honor the `-- pg-delta: transaction=false` directive. A migration that carries it applies with `supabase db push --remote` but fails when branching deploys it.
 
 To go back, set `enabled = false` under `[experimental.pgdelta]`, or use the per-command flags above for a single run. Migrations already generated by `pg-delta` are plain SQL and keep working on either engine.

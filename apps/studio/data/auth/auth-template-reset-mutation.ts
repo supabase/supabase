@@ -7,7 +7,8 @@ import { type AuthTemplateResetType } from '@/components/interfaces/Auth/EmailTe
 import { configKeys } from '@/data/config/keys'
 import { handleError, post } from '@/data/fetchers'
 import { lintKeys } from '@/data/lint/keys'
-import type { ResponseError, UseCustomMutationOptions } from '@/types'
+import type { StudioError } from '@/lib/errors/studio-errors'
+import type { UseCustomMutationOptions } from '@/types'
 
 type AuthTemplateResetVariables = {
   projectRef: string
@@ -30,12 +31,12 @@ export const useAuthTemplateResetMutation = ({
   onError,
   ...options
 }: Omit<
-  UseCustomMutationOptions<AuthTemplateResetData, ResponseError, AuthTemplateResetVariables>,
+  UseCustomMutationOptions<AuthTemplateResetData, StudioError, AuthTemplateResetVariables>,
   'mutationFn'
 > = {}) => {
   const queryClient = useQueryClient()
 
-  return useMutation<AuthTemplateResetData, ResponseError, AuthTemplateResetVariables>({
+  return useMutation<AuthTemplateResetData, StudioError, AuthTemplateResetVariables>({
     mutationFn: (vars) => resetAuthTemplate(vars),
     async onSuccess(data, variables, context) {
       const { projectRef } = variables

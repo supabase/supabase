@@ -3,7 +3,8 @@ import { toast } from 'sonner'
 
 import { handleError, post, unguarded } from '@/data/fetchers'
 import { usageKeys } from '@/data/usage/keys'
-import type { ResponseError, UseCustomMutationOptions } from '@/types'
+import type { StudioError } from '@/lib/errors/studio-errors'
+import type { UseCustomMutationOptions } from '@/types'
 
 export type ProjectDiskResizeVariables = {
   projectRef: string
@@ -36,12 +37,12 @@ export const useProjectDiskResizeMutation = ({
   onError,
   ...options
 }: Omit<
-  UseCustomMutationOptions<ProjectDiskResizeData, ResponseError, ProjectDiskResizeVariables>,
+  UseCustomMutationOptions<ProjectDiskResizeData, StudioError, ProjectDiskResizeVariables>,
   'mutationFn'
 > = {}) => {
   const queryClient = useQueryClient()
 
-  return useMutation<ProjectDiskResizeData, ResponseError, ProjectDiskResizeVariables>({
+  return useMutation<ProjectDiskResizeData, StudioError, ProjectDiskResizeVariables>({
     mutationFn: (vars) => resizeProjectDisk(vars),
     async onSuccess(data, variables, context) {
       const { projectRef } = variables

@@ -3,7 +3,8 @@ import { toast } from 'sonner'
 
 import { replicationKeys } from './keys'
 import { handleError, put } from '@/data/fetchers'
-import type { ResponseError, UseCustomMutationOptions } from '@/types'
+import type { StudioError } from '@/lib/errors/studio-errors'
+import type { UseCustomMutationOptions } from '@/types'
 
 export type CreatePublicationParams = {
   projectRef: string
@@ -46,12 +47,12 @@ export const useCreatePublicationMutation = ({
   onError,
   ...options
 }: Omit<
-  UseCustomMutationOptions<CreatePublicationData, ResponseError, CreatePublicationParams>,
+  UseCustomMutationOptions<CreatePublicationData, StudioError, CreatePublicationParams>,
   'mutationFn'
 > = {}) => {
   const queryClient = useQueryClient()
 
-  return useMutation<CreatePublicationData, ResponseError, CreatePublicationParams>({
+  return useMutation<CreatePublicationData, StudioError, CreatePublicationParams>({
     mutationFn: (vars) => createPublication(vars),
     async onSuccess(data, variables, context) {
       const { projectRef, sourceId } = variables

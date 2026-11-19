@@ -127,13 +127,14 @@ partial describes.
 ## Discovery surfaces
 
 A new quickstart must appear in the navigation menu, and optionally in the content
-listing and the framework grid:
+listing, the framework grid, and the getting started stepper:
 
 - `apps/docs/components/Navigation/NavigationMenu/NavigationMenu.constants.ts` — required
 - `apps/docs/data/content-listings/getting-started.data.ts` — optional
-- `apps/docs/components/FrameworkQuickstarts.tsx` — optional
+- `apps/docs/components/FrameworkQuickstarts.constants.ts` — optional
+- `FRAMEWORK_GROUPS` in `apps/docs/features/getting-started/GettingStarted.frameworks.ts` — optional
 
-Both optional surfaces need an icon in `apps/docs/public/img/icons/`, so a guide stays
+The optional surfaces need an icon in `apps/docs/public/img/icons/`, so a guide stays
 out of them until the framework's icon is one Supabase can use. Spring Boot is the
 current example. The content listing also accepts an icon chip
 (`{ kind: 'server', color: '#64748B', bg: 'rgba(100,116,139,0.1)' }`) in place of a

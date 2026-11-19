@@ -36,8 +36,19 @@ const FEATURES = [
   },
   {
     title: 'Fully integrated',
-    description:
-      'Auth without any external services. Built-in authentication, authorization, and user management.',
+    description: (
+      <>
+        Auth without any external services. Built-in authentication, authorization, and user
+        management. Use{' '}
+        <a
+          href="/library?category=Authentication"
+          className="text-foreground underline underline-offset-2 hover:text-foreground-light"
+        >
+          prebuilt UI components
+        </a>
+        .
+      </>
+    ),
     visual: IntegratedSkeleton,
   },
   {

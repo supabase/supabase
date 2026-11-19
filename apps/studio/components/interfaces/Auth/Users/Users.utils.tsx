@@ -439,7 +439,9 @@ export const formatUserColumns = ({
                 }}
               >
                 <CopyIcon size={12} />
-                <span>Copy {col.id === 'id' ? col.name : col.name.toLowerCase()}</span>
+                <span>
+                  Copy {col.id === 'id' ? <span>{col.name}</span> : col.name.toLowerCase()}
+                </span>
               </ContextMenuItem>
 
               <ContextMenuSeparator />

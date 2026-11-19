@@ -480,6 +480,22 @@ describe('useConnectState', () => {
         })
         expect(result.current.state.mcpFeatures).toEqual(['docs', 'database'])
       })
+
+      test('platform enables notebooks but not storage by default', () => {
+        Object.assign(deploymentModeMock, PLATFORM)
+        const { result } = renderHook(() => useConnectState({ mode: 'framework' }))
+        act(() => {
+          result.current.setMode('mcp')
+        })
+
+        const features = result.current.state.mcpFeatures
+        expect(features).toContain('database')
+        expect(features).not.toContain('storage')
+        expect(features).toContain('notebooks')
+
+        const options = result.current.getFieldOptions('mcpFeatures').map((o) => o.value)
+        expect(options).toContain('storage')
+      })
     })
   })
 })

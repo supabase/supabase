@@ -1,41 +1,10 @@
 import { capitalize } from 'lodash'
 
-import { OAuthScope } from '@/data/oauth-apps/types'
+import { OAuthAppsPreflightValidationData } from '@/data/oauth-apps/oauth-apps-preflight-validation-query'
+import { OAuthScope, OAuthScopeValidationResult } from '@/data/oauth-apps/types'
+import { OrgProject } from '@/data/projects/org-projects-infinite-query'
 
-export const CONSENT_COPY = {
-  allProjectsOption: 'All current and future projects',
-  selectionRequired: 'Must select at least one project to authorize.',
-  maxProjectsReached: 'Maximum reached. Deselect a project to choose a different one.',
-  organizationBoundGrant: {
-    title: 'Want this scoped to one member?',
-    description: (appName: string) =>
-      `Have them authorize ${appName} from their own account. Authorizing here gives it your Administrator access on every project, including ones created later.`,
-  },
-  coversEveryProject: {
-    title: 'This grant covers every project',
-    description: (appName: string, organizationSlug: string) =>
-      `${appName} can reach every project in ${organizationSlug}, including ones created later.`,
-  },
-  noProjects: {
-    title: (organizationSlug: string) => `No projects in ${organizationSlug}`,
-    body: (appName: string) =>
-      `${appName} needs access to at least one project, and this organization doesn't have any yet.`,
-    prompt: 'Expecting to see your projects?',
-  },
-  roleFailure: {
-    title: (count: number) =>
-      count === 1 ? "Couldn't authorize 1 project" : `Couldn't authorize ${count} projects`,
-    description: (appName: string) =>
-      `${appName} needs write access but your role is read-only on the projects highlighted. Deselect them to continue.`,
-  },
-  roleFailureAllProjects: {
-    title: (appName: string) => `Couldn't authorize ${appName}`,
-    description: (orgName: string) =>
-      `Your Read-only role in ${orgName} can't grant write access. Ask an admin to change your role, or switch organization.`,
-  },
-} as const
-
-export function groupScopesByLevel(scopes: OAuthScope[]) {
+export function groupScopesByLevel(scopes: string[]) {
   const read = new Set<string>()
   const write = new Set<string>()
   const readWrite = new Set<string>()
@@ -99,8 +68,8 @@ export const getDiffBetweenScopes = ({
   scopes,
   previousScopes,
 }: {
-  scopes: OAuthScope[]
-  previousScopes: OAuthScope[]
+  scopes: string[]
+  previousScopes: string[]
 }) => {
   const unchanged: ScopeGroup = { 'read-write': [], write: [], read: [] }
   const changed: DiffScopeGroup = { 'read-write': [], write: [], read: [], removed: [] }
@@ -143,7 +112,7 @@ export const getDiffBetweenScopes = ({
   return { unchanged, changed }
 }
 
-export const getPermissionsWithLevel = (scopes: OAuthScope[]) => {
+export const getPermissionsWithLevel = (scopes: string[]) => {
   const scopesWithLevel: Partial<Record<ScopePermission, ScopeGroupLevel>> = {}
 
   for (const scope of scopes) {
@@ -170,8 +139,38 @@ export const getPermissionsWithLevel = (scopes: OAuthScope[]) => {
 }
 
 export const extractPermissionAndLevelFromScope = (
-  scope: OAuthScope
+  scope: string
 ): [ScopePermission, ScopeLevel] => {
   const [permission, level] = scope.split(':')
   return [permission as ScopePermission, level as ScopeLevel]
+}
+
+type OAuthScopeValidationProjectFailure = Extract<
+  OAuthScopeValidationResult,
+  { scope_target: 'projects' }
+>['failures'][number]
+
+export function getFailedProjects(
+  failure: OAuthScopeValidationResult | null | undefined
+): OAuthScopeValidationProjectFailure[] {
+  if (!failure) return []
+  return failure.scope_target === 'projects' ? failure.failures : []
+}
+
+export function getPreselectedProjectRefs({
+  existingGrant,
+  projectRef,
+  liveProjects,
+}: {
+  existingGrant: OAuthAppsPreflightValidationData['existing_grant']
+  projectRef: string | undefined
+  liveProjects: OrgProject[]
+}): string[] {
+  const liveRefs = new Set(liveProjects.map((project) => project.ref))
+  const candidates = existingGrant?.project_refs?.length
+    ? existingGrant.project_refs
+    : projectRef
+      ? [projectRef]
+      : []
+  return candidates.filter((ref) => liveRefs.has(ref))
 }

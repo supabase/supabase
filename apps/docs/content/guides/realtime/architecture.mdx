@@ -30,7 +30,7 @@ Client-facing WebSocket servers need to handle many concurrent connections. Elix
 
 ## Channels
 
-Channels are implemented using [Phoenix Channels](https://hexdocs.pm/phoenix/channels.html) which uses [Phoenix.PubSub](https://hexdocs.pm/phoenix_pubsub/Phoenix.PubSub.html) with the default `Phoenix.PubSub.PG2` adapter.
+Channels are implemented using [Phoenix Channels](https://phoenix.hexdocs.pm/channels.html) which uses [Phoenix.PubSub](https://phoenix-pubsub.hexdocs.pm/Phoenix.PubSub.html) with the default `Phoenix.PubSub.PG2` adapter.
 
 The PG2 adapter uses Erlang [process groups](https://www.erlang.org/docs/18/man/pg2.html) to implement the PubSub model where a publisher can send messages to many subscribers.
 

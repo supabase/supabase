@@ -41,9 +41,10 @@ export function FilterSideBar({
   return (
     <ResizablePanel
       panelRef={panelRef}
-      minSize={256}
-      defaultSize={265}
-      maxSize={512}
+      minSize="256px"
+      defaultSize="265px"
+      maxSize="512px"
+      groupResizeBehavior="preserve-pixel-size"
       id="panel-left"
       collapsible
       onResize={(size) => {
@@ -55,10 +56,10 @@ export function FilterSideBar({
       }}
       className={cn('flex flex-col w-full')}
     >
-      <div className="border-b border-border px-4 md:top-0">
-        <div className="flex h-[48px] items-center justify-between gap-3">
+      <div className="border-b border-border px-6 md:top-0">
+        <div className="flex min-h-(--header-height) items-center justify-between gap-2">
           <div className="flex items-center gap-2">
-            <p className="text-foreground text-lg">Logs</p>
+            <h4 className="text-foreground text-sm">Logs</h4>
             <Badge variant="default">Beta</Badge>
           </div>
           {table.getState().columnFilters.length || user ? (
@@ -69,13 +70,13 @@ export function FilterSideBar({
 
       <UnifiedLogsBanner />
 
-      <div className="flex-1 p-2 sm:overflow-y-scroll">
+      <div className="flex-1 px-4 py-1.5 sm:overflow-y-scroll">
         <DataTableFilterControls
           dateRangeDisabled={dateRangeDisabled}
           itemsAfter={{ level: <UserLogFilterControl /> }}
         />
         <FeaturePreviewSidebarPanel
-          className="mx-2 my-4"
+          className="my-4"
           title="Capture your logs"
           description="Send logs to your preferred observability or storage platform."
           illustration={

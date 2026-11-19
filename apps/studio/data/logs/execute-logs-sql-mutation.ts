@@ -108,7 +108,7 @@ export interface ExecuteLogsSqlResult {
  * response. Transport failures throw; a structured 200-body error is returned
  * in `error` alongside empty `rows`.
  *
- * @throws {ResponseError} on transport failure (via `executeAnalyticsSql`).
+ * @throws {StudioError} on transport failure (via `executeAnalyticsSql`).
  */
 export async function executeLogsSql({
   projectRef,

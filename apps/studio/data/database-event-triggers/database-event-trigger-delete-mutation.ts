@@ -1,32 +1,36 @@
-import { ident, safeSql } from '@supabase/pg-meta/src/pg-format'
+import { asWriteSql, ident, safeSql } from '@supabase/pg-meta/src/pg-format'
 import { useMutation, useQueryClient } from '@tanstack/react-query'
 import { toast } from 'sonner'
 
 import type { DatabaseEventTrigger } from './database-event-triggers-query'
 import { databaseEventTriggerKeys } from './keys'
-import { unguarded } from '@/data/fetchers'
-import { executeSql } from '@/data/sql/execute-sql-mutation'
-import type { ResponseError, UseCustomMutationOptions } from '@/types'
+import { executeSql, type PgMetaWriteGrant } from '@/data/sql/execute-sql-mutation'
+import type { StudioError } from '@/lib/errors/studio-errors'
+import type { UseCustomMutationOptions } from '@/types'
 
 export type DatabaseEventTriggerDeleteVariables = {
   trigger: DatabaseEventTrigger
   projectRef: string
+  grant: PgMetaWriteGrant
   connectionString?: string | null
 }
 
 export async function deleteDatabaseEventTrigger({
   trigger,
   projectRef,
+  grant,
   connectionString,
 }: DatabaseEventTriggerDeleteVariables) {
-  const sql = safeSql`DROP EVENT TRIGGER IF EXISTS ${ident(trigger.name)};`
+  const sql = asWriteSql(safeSql`DROP EVENT TRIGGER IF EXISTS ${ident(trigger.name)};`)
 
   const { result } = await executeSql({
     projectRef,
     connectionString,
+    sqlOrigin: 'studio',
+    queryName: 'event-trigger-delete',
     sql,
     queryKey: ['event-trigger', 'delete', trigger.oid],
-    grant: unguarded.migrating,
+    grant,
   })
 
   return result
@@ -41,7 +45,7 @@ export const useDatabaseEventTriggerDeleteMutation = ({
 }: Omit<
   UseCustomMutationOptions<
     DatabaseEventTriggerDeleteData,
-    ResponseError,
+    StudioError,
     DatabaseEventTriggerDeleteVariables
   >,
   'mutationFn'
@@ -50,7 +54,7 @@ export const useDatabaseEventTriggerDeleteMutation = ({
 
   return useMutation<
     DatabaseEventTriggerDeleteData,
-    ResponseError,
+    StudioError,
     DatabaseEventTriggerDeleteVariables
   >({
     mutationFn: (vars) => deleteDatabaseEventTrigger(vars),

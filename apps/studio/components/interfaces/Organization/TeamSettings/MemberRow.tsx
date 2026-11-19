@@ -86,7 +86,10 @@ export const MemberRow = memo(function MemberRow({
       role="row"
       aria-rowindex={index + 2}
       style={style}
-      className={cn(MEMBERS_GRID_CLASS, 'border-b hover:bg-surface-200 transition-colors')}
+      className={cn(
+        MEMBERS_GRID_CLASS,
+        'border-b last:border-0 hover:bg-surface-200 transition-colors'
+      )}
     >
       <div role="cell" className="min-w-0">
         <div className="flex items-center gap-x-4 min-w-0">

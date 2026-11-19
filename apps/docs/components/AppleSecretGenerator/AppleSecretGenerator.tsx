@@ -1,4 +1,4 @@
-import { useState } from 'react'
+import { useId, useState } from 'react'
 import { Button, Input } from 'ui'
 import { Admonition } from 'ui-patterns/Admonition'
 import { Input as DataInput } from 'ui-patterns/DataInputs/Input'
@@ -104,10 +104,15 @@ const AppleSecretGenerator = () => {
   const [secretKey, setSecretKey] = useState('')
   const [expiresAt, setExpiresAt] = useState('')
   const [error, setError] = useState('')
+  const id = useId()
+  const accountId = `${id}-account-id`
+  const serviceId = `${id}-service-id`
+  const keyId = `${id}-key-id`
 
   return (
     <div className="flex flex-col gap-3">
       <FormItemLayout
+        id={accountId}
         isReactForm={false}
         layout="vertical"
         label="Account ID"
@@ -115,12 +120,14 @@ const AppleSecretGenerator = () => {
         labelOptional="required"
       >
         <Input
+          id={accountId}
           placeholder="Apple Developer account ID, 10 alphanumeric digits"
           value={teamID}
           onChange={(e) => setTeamID(e.target.value.trim())}
         />
       </FormItemLayout>
       <FormItemLayout
+        id={serviceId}
         isReactForm={false}
         layout="vertical"
         label="Service ID"
@@ -128,12 +135,14 @@ const AppleSecretGenerator = () => {
         labelOptional="required"
       >
         <Input
+          id={serviceId}
           placeholder="ID of the service, example: com.example.app.service"
           value={serviceID}
           onChange={(e) => setServiceID(e.target.value.trim())}
         />
       </FormItemLayout>
       <FormItemLayout
+        id={keyId}
         isReactForm={false}
         layout="vertical"
         label="Key ID"
@@ -141,6 +150,7 @@ const AppleSecretGenerator = () => {
         labelOptional="(optional)"
       >
         <Input
+          id={keyId}
           placeholder="Extracted from filename, AuthKey_XXXXXXXXXX.p8"
           value={keyID}
           onChange={(e) => setKeyID(e.target.value.trim())}

@@ -44,7 +44,9 @@ export function MobileMenuContent({
   const { ref } = useParams()
   const { data: project } = useSelectedProjectQuery()
   const pathname = getPathnameWithoutQuery(router.asPath, router.pathname)
-  const activeRoute = getPathSegment(pathname, 3)
+  const isIssuesInboxEnabled = useFlag('issuesInbox')
+  const sectionKey = getPathSegment(pathname, 3)
+  const activeRoute = sectionKey === 'advisors' && isIssuesInboxEnabled ? 'issues' : sectionKey
 
   const { viewLevel, selectedSectionKey, handleTopLevelClick, handleBackToTop } =
     useMobileMenuNavigation({
@@ -118,7 +120,6 @@ export function MobileMenuContent({
   const SectionMenuContent = sectionKeyToShow ? getProductMenuComponent(sectionKeyToShow) : null
   const hasCurrentProductHeader =
     viewLevel === 'section' && sectionKeyToShow === currentSectionKey && !!currentProductMenuHeader
-  const pageSegment = getPathSegment(pathname, 4)
 
   const renderRoute = (route: Route, isActive: boolean) => (
     <TopLevelRouteItem
@@ -193,13 +194,7 @@ export function MobileMenuContent({
               currentProductMenu
             ) : SectionMenuContent ? (
               <React.Suspense fallback={<GenericSkeletonLoader className="p-4" />}>
-                {sectionKeyToShow === 'advisors' ? (
-                  <SectionMenuContent
-                    {...({ page: pageSegment } as React.ComponentProps<typeof SectionMenuContent>)}
-                  />
-                ) : (
-                  <SectionMenuContent />
-                )}
+                <SectionMenuContent />
               </React.Suspense>
             ) : null}
           </div>

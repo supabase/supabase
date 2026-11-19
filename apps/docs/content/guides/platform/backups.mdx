@@ -85,31 +85,20 @@ Point-in-Time Recovery (PITR) allows you to back up a project at shorter interva
 
 Pro, Team and Enterprise Plan projects can enable PITR as an add-on.
 
-Projects that want to use PITR must also use at least a Small compute add-on to ensure smooth functioning.
+PITR is available on all compute sizes.
 
 </Admonition>
 
-<Accordion
-  type="default"
-  chevronAlign="right"
-  justified
-  size="medium"
-  className="text-foreground-light mt-8 mb-6"
->
-    <AccordionItem
-      header="How PITR works"
-      id="item-1"
-    >
+<details>
+<summary>How PITR works</summary>
 
-    As [covered in this blog post](/blog/postgresql-physical-logical-backups), a combination of physical backups and [Write Ahead Log (WAL)](https://www.postgresql.org/docs/current/wal-intro.html) file archiving makes PITR possible. Physical backups provide a snapshot of the underlying directory of the database, while WAL files contain records of every change the database processes.
+As [covered in this blog post](/blog/postgresql-physical-logical-backups), a combination of physical backups and [Write Ahead Log (WAL)](https://www.postgresql.org/docs/current/wal-intro.html) file archiving makes PITR possible. Physical backups provide a snapshot of the underlying directory of the database, while WAL files contain records of every change the database processes.
 
-    We use [WAL-G](https://github.com/wal-g/wal-g), an open source archival and restoration tool, to handle both aspects of PITR. Daily, we take a snapshot of the database and send it to our storage servers. Throughout the day, as database transactions occur, we generate and upload WAL files.
+We use [WAL-G](https://github.com/wal-g/wal-g), an open source archival and restoration tool, to handle both aspects of PITR. Daily, we take a snapshot of the database and send it to our storage servers. Throughout the day, as database transactions occur, we generate and upload WAL files.
 
-    By default, we back up WAL files at two-minute intervals. If these files exceed a certain file size threshold, we back them up immediately. During periods of high transaction volume, WAL file backups therefore become more frequent. Conversely, when the database has no activity, we do not make WAL file backups. Overall, in the worst case scenario, PITR achieves a Recovery Point Objective (RPO) of two minutes.
+By default, we back up WAL files at two-minute intervals. If these files exceed a certain file size threshold, we back them up immediately. During periods of high transaction volume, WAL file backups therefore become more frequent. Conversely, when the database has no activity, we do not make WAL file backups. Overall, in the worst case scenario, PITR achieves a Recovery Point Objective (RPO) of two minutes.
 
-    </AccordionItem>
-
-</Accordion>
+</details>
 
 <Admonition type="note">
 
@@ -127,6 +116,14 @@ The latest restore point of the project could be significantly behind the curren
 
 ### Restoration process [#pitr-restoration-process]
 
+<Admonition type="caution">
+
+Restoring to an earlier point in time replaces the current database state. Any changes made after the selected restore point aren't included.
+
+To preserve your current data, [restore to a new project](#restore-to-a-new-project) first.
+
+</Admonition>
+
 ![PITR: Calendar view](/docs/img/backups-pitr-calendar-view.png)
 
 A date and time picker appears when you click the **Start a restore** button. The process only proceeds if the selected date and time fall within the earliest and latest recovery points.
@@ -142,6 +139,8 @@ After selecting your desired recovery point, the Dashboard prompts you to review
 ### Downloading backups after disabling PITR
 
 When you disable PITR, we still take all new backups as physical backups only. You can still use physical backups for restoration, but they are not available for direct download. If you need to download a backup after disabling PITR, you need to take a manual [legacy logical backup using the Supabase CLI or pg_dump](/docs/guides/platform/migrating-within-supabase/backup-restore#back-up-database-using-the-cli).
+
+To download a logical backup, see [Download logical backups](/kb/troubleshooting/download-logical-backups).
 
 ## Restore to a new project
 

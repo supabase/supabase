@@ -14,7 +14,7 @@ import { useOrganizationUpdateMutation } from '@/data/organizations/organization
 import { invalidateOrganizationsQuery } from '@/data/organizations/organizations-query'
 import { FGA_PERMISSIONS, useAsyncCheckPermissionsV2 } from '@/hooks/misc/useCheckPermissionsV2'
 import { useSelectedOrganizationQuery } from '@/hooks/misc/useSelectedOrganization'
-import type { ResponseError } from '@/types'
+import type { StudioError } from '@/lib/errors/studio-errors'
 
 const OrgDetailsSchema = z.object({
   name: z.string().min(1, 'Organization name is required'),
@@ -50,7 +50,7 @@ export const OrganizationDetailsForm = () => {
           invalidateOrganizationsQuery(queryClient)
           toast.success('Successfully updated organization name')
         },
-        onError: (error: ResponseError) => {
+        onError: (error: StudioError) => {
           toast.error(`Failed to update organization name: ${error.message}`)
         },
       }
@@ -74,7 +74,7 @@ export const OrganizationDetailsForm = () => {
         onSubmit={orgDetailsForm.handleSubmit(onUpdateOrganizationDetails)}
       >
         <Card>
-          <CardContent>
+          <CardContent className="md:px-8">
             <FormField
               control={orgDetailsForm.control}
               name="name"
@@ -87,7 +87,7 @@ export const OrganizationDetailsForm = () => {
               )}
             />
           </CardContent>
-          <CardContent>
+          <CardContent className="md:px-8">
             <FormItemLayout label="Organization slug" layout="flex-row-reverse">
               <PasswordInput copy disabled id="slug" value={selectedOrganization?.slug ?? ''} />
             </FormItemLayout>

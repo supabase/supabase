@@ -7,8 +7,9 @@ import { z } from 'zod'
 import { tableKeys } from './keys'
 import { unguarded } from '@/data/fetchers'
 import { executeSql } from '@/data/sql/execute-sql-mutation'
+import type { StudioError } from '@/lib/errors/studio-errors'
 import type { SafePostgresTable } from '@/lib/postgres-types'
-import type { ResponseError, UseCustomInfiniteQueryOptions, UseCustomQueryOptions } from '@/types'
+import type { UseCustomInfiniteQueryOptions, UseCustomQueryOptions } from '@/types'
 
 export type TablesVariables = {
   projectRef?: string
@@ -40,7 +41,15 @@ export async function getTables(
   const queryKey = ['tables', schema]
 
   const { result } = await executeSql(
-    { projectRef, connectionString, sql, queryKey, grant: unguarded.migrating },
+    {
+      projectRef,
+      connectionString,
+      sql,
+      sqlOrigin: 'studio',
+      queryName: 'tables',
+      queryKey,
+      grant: unguarded.migrating,
+    },
     signal
   )
   // Sort the data if the sortByName option is true
@@ -50,7 +59,7 @@ export async function getTables(
   return result as SafePostgresTable[]
 }
 
-export type TablesError = ResponseError
+export type TablesError = StudioError
 
 export const useTablesQuery = <TData = TablesData>(
   vars: TablesVariables,
@@ -139,6 +148,8 @@ export async function getTablesPage(
     {
       projectRef,
       connectionString,
+      sqlOrigin: 'studio',
+      queryName: 'tables-infinite',
       sql,
       queryKey: [
         `project:${projectRef}`,

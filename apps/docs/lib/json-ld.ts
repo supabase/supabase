@@ -80,9 +80,15 @@ interface TechArticleSchemaInput {
   url: string
   headline: string
   description?: string
+  dateModified?: string
 }
 
-export function techArticleSchema({ url, headline, description }: TechArticleSchemaInput) {
+export function techArticleSchema({
+  url,
+  headline,
+  description,
+  dateModified,
+}: TechArticleSchemaInput) {
   return {
     '@context': 'https://schema.org',
     '@type': 'TechArticle',
@@ -94,6 +100,7 @@ export function techArticleSchema({ url, headline, description }: TechArticleSch
     url,
     headline,
     description,
+    dateModified,
     inLanguage: 'en',
     publisher: PUBLISHER,
   }

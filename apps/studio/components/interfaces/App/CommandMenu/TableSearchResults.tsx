@@ -121,8 +121,9 @@ export function TableSearchResults({ debouncedFilterString }: TableSearchResults
                   </span>
                 ) : (
                   <span>
-                    Total: {totalTables.toLocaleString()} table{totalTables !== 1 ? 's' : ''}
-                    {hasNextTablesPage ? ' loaded' : ''}
+                    Total: {totalTables.toLocaleString()} table
+                    {totalTables !== 1 ? <span>s</span> : ''}
+                    {hasNextTablesPage ? <span>{' loaded'}</span> : ''}
                   </span>
                 )}
               </div>

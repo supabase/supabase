@@ -2,10 +2,59 @@
   "$schema": "./../../node_modules/turbo/schema.json",
   "extends": ["//"],
   "tasks": {
+    // Generated artifacts are gitignored, so tasks downstream of an uncached task list the
+    // files it writes in `inputs` explicitly, in "jit" mode so they're hashed after that task
+    // runs. Otherwise a cache hit could restore output built from stale remote content.
+
+    // Fetches the troubleshooting guides from a private GitHub repo into src/content/troubleshooting/.
+    // Not cached: the inputs are remote, so a cache restore could resurrect stale content.
+    "fetch:federated-content": {
+      "cache": false,
+      "passThroughEnv": [
+        "KB_GITHUB_APP_ID",
+        "KB_GITHUB_APP_INSTALLATION_ID",
+        "KB_GITHUB_APP_PRIVATE_KEY",
+        // Local-run fallback credentials.
+        "GH_TOKEN",
+        "GITHUB_TOKEN",
+      ],
+    },
+    "generate:markdown": {
+      "dependsOn": ["fetch:federated-content"],
+      "inputs": ["$TURBO_DEFAULT$", { "mode": "jit", "globs": ["src/content/**"] }],
+      "env": ["VERCEL_ENV", "VERCEL_URL"],
+      "passThroughEnv": [
+        "KB_GITHUB_APP_ID",
+        "KB_GITHUB_APP_INSTALLATION_ID",
+        "KB_GITHUB_APP_PRIVATE_KEY",
+        "SUPABASE_URL",
+        "SUPABASE_SERVICE_ROLE_KEY",
+      ],
+      "outputs": ["public/markdown/**"],
+    },
     "build": {
-      "dependsOn": ["^build"],
-      "inputs": ["$TURBO_DEFAULT$"],
+      "dependsOn": ["^build", "generate:markdown"],
+      "inputs": [
+        "$TURBO_DEFAULT$",
+        { "mode": "jit", "globs": ["src/content/**", "public/markdown/**"] },
+      ],
+      // astro.config.mjs inlines every NEXT_PUBLIC_* var into the client bundle, and Astro exposes
+      // PUBLIC_* (client) and other vars such as MISC_URL (server) through import.meta.env.
+      // SUPABASE_URL picks the project that src/lib/troubleshooting-db.ts reads metadata from.
+      "env": ["NEXT_PUBLIC_*", "PUBLIC_*", "MISC_URL", "SUPABASE_URL", "NODE_ENV", "VERCEL_ENV"],
+      "passThroughEnv": [
+        "SUPABASE_SERVICE_ROLE_KEY",
+        "KB_GITHUB_APP_ID",
+        "KB_GITHUB_APP_INSTALLATION_ID",
+        "KB_GITHUB_APP_PRIVATE_KEY",
+      ],
       "outputs": ["dist/**"],
+    },
+    // Write to a remote database, so never cached.
+    "search:ingest": {
+      "dependsOn": ["generate:markdown"],
+      "cache": false,
+      "passThroughEnv": ["SUPABASE_URL", "SUPABASE_SERVICE_ROLE_KEY"],
     },
   },
 }

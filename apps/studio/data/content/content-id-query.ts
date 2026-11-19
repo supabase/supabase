@@ -4,9 +4,11 @@ import { components } from 'api-types'
 import type { Content } from './content-query'
 import { remapSqlContentField, remapWireSnippet } from './content-remap'
 import { contentKeys } from './keys'
-import type { SnippetWithContent } from './sql-folders-query'
+import { isLogsViewContent, parseLogSqlSnippet } from './log-content-schema'
+import { withSavedStatus, type SnippetWithContent } from './sql-folders-query'
 import { get, handleError } from '@/data/fetchers'
-import type { ResponseError, UseCustomQueryOptions } from '@/types'
+import type { StudioError } from '@/lib/errors/studio-errors'
+import type { UseCustomQueryOptions } from '@/types'
 
 export type GetUserContentByIdResponse = Omit<
   components['schemas']['GetUserContentByIdResponse_Output'],
@@ -30,11 +32,13 @@ export async function getContentById(
   })
 
   if (error) throw handleError(error)
+  if (isLogsViewContent(data)) throw new Error('Saved log views cannot be opened as SQL queries')
+  if (data.type === 'log_sql') return parseLogSqlSnippet(data)
   return remapSqlContentField(data as unknown as GetUserContentByIdResponse)
 }
 
 export type ContentIdData = Awaited<ReturnType<typeof getContentById>>
-export type ContentIdError = ResponseError
+export type ContentIdError = StudioError
 
 // SQL-editor-specific fetch: the editor only ever loads SQL snippets, so the
 // content body is typed as SQL content and the result is a SnippetWithContent
@@ -53,6 +57,8 @@ export async function getSqlSnippetById(
   })
 
   if (error) throw handleError(error)
+  if (isLogsViewContent(data)) throw new Error('Saved log views cannot be opened as SQL queries')
+  if (data.type === 'log_sql') return withSavedStatus(parseLogSqlSnippet(data))
   return remapWireSnippet(data, 'saved')
 }
 

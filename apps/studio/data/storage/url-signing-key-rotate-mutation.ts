@@ -3,7 +3,8 @@ import { toast } from 'sonner'
 
 import { storageKeys } from './keys'
 import { handleError, post } from '@/data/fetchers'
-import type { ResponseError, UseCustomMutationOptions } from '@/types'
+import type { StudioError } from '@/lib/errors/studio-errors'
+import type { UseCustomMutationOptions } from '@/types'
 
 type UrlSigningKeyRotateVariables = {
   projectRef?: string
@@ -31,12 +32,12 @@ export const useUrlSigningKeyRotateMutation = ({
   onError,
   ...options
 }: Omit<
-  UseCustomMutationOptions<UrlSigningKeyRotateData, ResponseError, UrlSigningKeyRotateVariables>,
+  UseCustomMutationOptions<UrlSigningKeyRotateData, StudioError, UrlSigningKeyRotateVariables>,
   'mutationFn'
 > = {}) => {
   const queryClient = useQueryClient()
 
-  return useMutation<UrlSigningKeyRotateData, ResponseError, UrlSigningKeyRotateVariables>({
+  return useMutation<UrlSigningKeyRotateData, StudioError, UrlSigningKeyRotateVariables>({
     mutationFn: (vars) => rotateUrlSigningKey(vars),
     async onSuccess(data, variables, context) {
       await queryClient.invalidateQueries({

@@ -52,6 +52,7 @@ export function getMessageTokenCount(
       tokensPerMessage = 4 // every message follows <|start|>{role/name}\n{content}<|end|>\n
       tokensPerName = -1 // if there's a name, the role is omitted
       break
+    case 'gpt-6-luna':
     case 'gpt-4o-mini-2024-07-18':
       tokensPerMessage = 3
       tokensPerName = 1
@@ -96,6 +97,9 @@ export function getMaxTokenCount(model: string): number {
       return 4097
     case 'gpt-4-0314':
       return 4097
+    case 'gpt-6-luna':
+      // Preserve the previous input allowance with the larger completion budget.
+      return 5120
     case 'gpt-4o-mini-2024-07-18':
       return 4097
     default:

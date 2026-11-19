@@ -1,6 +1,11 @@
 module.exports = [
   {
     permanent: true,
+    source: '/brand-assets',
+    destination: '/brand',
+  },
+  {
+    permanent: true,
     source: '/images/customers/logos/light/:path*',
     destination: '/images/customers/logos/on-dark/:path*',
   },
@@ -19,6 +24,11 @@ module.exports = [
     permanent: true,
     source: '/blog/rss.xml',
     destination: '/rss.xml',
+  },
+  {
+    permanent: true,
+    source: '/blog/sitemap.xml',
+    destination: '/sitemap_www.xml',
   },
   {
     permanent: true,
@@ -857,6 +867,11 @@ module.exports = [
   },
   {
     permanent: true,
+    source: '/partners/sitemap.xml',
+    destination: '/sitemap_www.xml',
+  },
+  {
+    permanent: true,
     source: '/partners/integrations/atomic_crm',
     destination: '/partners/catalog',
   },
@@ -917,6 +932,11 @@ module.exports = [
     permanent: true,
     source: '/contact/mfa',
     destination: '/docs/guides/auth/auth-mfa',
+  },
+  {
+    permanent: true,
+    source: '/nextjs',
+    destination: '/docs/guides/getting-started/tutorials/with-nextjs',
   },
   {
     permanent: false,

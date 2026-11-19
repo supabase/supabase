@@ -1,7 +1,18 @@
+import * as Sentry from '@sentry/node'
 import { createClient, type SupabaseClient } from '@supabase/supabase-js'
 
 import { corsHeaders } from './_cors.js'
 import type { Database, KbSearchResult } from './_types.js'
+
+// `vercel dev` sets VERCEL_ENV to 'development'. Elsewhere, Sentry stays disabled without a DSN (tests).
+const IS_DEV = process.env.VERCEL_ENV === 'development'
+
+if (!IS_DEV) {
+  Sentry.init({
+    dsn: process.env.SENTRY_DSN,
+    environment: process.env.VERCEL_ENV,
+  })
+}
 
 let client: SupabaseClient<Database> | undefined
 function supabase() {
@@ -33,45 +44,61 @@ export function OPTIONS() {
 }
 
 export async function GET(request: Request) {
-  const { searchParams } = new URL(request.url)
-  const query = searchParams.get('q')?.trim()
-  const limit = Number(searchParams.get('limit')) || 10
-  const includeContent = searchParams.get('content') === 'true'
-  if (!query)
-    return Response.json({ error: 'Missing q parameter' }, { status: 400, headers: corsHeaders })
+  try {
+    const { searchParams } = new URL(request.url)
+    const query = searchParams.get('q')?.trim()
+    const limit = Number(searchParams.get('limit')) || 10
+    const includeContent = searchParams.get('content') === 'true'
+    if (!query)
+      return Response.json({ error: 'Missing q parameter' }, { status: 400, headers: corsHeaders })
 
-  const { data, error } = await supabase().rpc('search_kb', {
-    query_text: query,
-    match_limit: limit,
-  })
-  if (error) {
-    console.error('Error running kb search:', error)
+    const { data, error } = await supabase().rpc('search_kb', {
+      query_text: query,
+      match_limit: limit,
+    })
+    if (error) {
+      console.error('Error running kb search:', error)
+      Sentry.captureException(new Error(error.message), {
+        tags: { route: 'kb-search' },
+        extra: { query, limit, error },
+      })
+      // the function can be frozen as soon as it responds, so send the event first
+      await Sentry.flush(2000)
+      return Response.json(
+        { error: 'There was an error processing your request' },
+        { status: 500, headers: corsHeaders }
+      )
+    }
+
+    let results: KbSearchResult[] = data.map((row) => ({
+      title: row.page_title,
+      // slugs keep the case of the content file, same as the pages and their markdown exports
+      href: `https://supabase.com/${row.slug}`,
+      heading: row.heading,
+      headingPath: row.heading_path,
+      excerpt: row.excerpt,
+      score: row.score,
+    }))
+
+    if (includeContent) {
+      results = await Promise.all(
+        results.map(async (result) => ({ ...result, content: await fetchContent(result.href) }))
+      )
+    }
+
+    return Response.json(results, {
+      headers: {
+        ...corsHeaders,
+        'Cache-Control': 'public, s-maxage=3600, stale-while-revalidate=300',
+      },
+    })
+  } catch (error) {
+    console.error('Error handling kb search request:', error)
+    Sentry.captureException(error, { tags: { route: 'kb-search' } })
+    await Sentry.flush(2000)
     return Response.json(
       { error: 'There was an error processing your request' },
       { status: 500, headers: corsHeaders }
     )
   }
-
-  let results: KbSearchResult[] = data.map((row) => ({
-    title: row.page_title,
-    // slugs keep the case of the content file, same as the pages and their markdown exports
-    href: `https://supabase.com/${row.slug}`,
-    heading: row.heading,
-    headingPath: row.heading_path,
-    excerpt: row.excerpt,
-    score: row.score,
-  }))
-
-  if (includeContent) {
-    results = await Promise.all(
-      results.map(async (result) => ({ ...result, content: await fetchContent(result.href) }))
-    )
-  }
-
-  return Response.json(results, {
-    headers: {
-      ...corsHeaders,
-      'Cache-Control': 'public, s-maxage=3600, stale-while-revalidate=300',
-    },
-  })
 }

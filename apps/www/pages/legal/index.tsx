@@ -21,11 +21,6 @@ const sections = [
         type: 'document' as const,
       },
       {
-        label: 'Service Level Agreement',
-        href: '/sla',
-        type: 'document' as const,
-      },
-      {
         label: 'Business Associate Agreement',
         href: '/legal/customer-resources/business-associate-agreement',
         type: 'document' as const,
@@ -49,6 +44,11 @@ const sections = [
       {
         label: 'Data Residency and Transfers FAQ',
         href: '/legal/privacy-resources/data-residency-and-transfers-faq',
+        type: 'document' as const,
+      },
+      {
+        label: 'Candidate Privacy Notice',
+        href: '/legal/privacy-resources/candidate-privacy-notice',
         type: 'document' as const,
       },
     ],

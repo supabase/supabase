@@ -12,8 +12,8 @@ export const SSOAdvancedSettings = ({ form }: { form: UseFormReturn<SSOConfigFor
     title="Advanced settings"
     description={
       <>
-        Required for enterprise-managed MCP authentication.{' '}
-        <InlineLink href={`${DOCS_URL}/guides/platform/sso/enterprise-mcp-authentication`}>
+        Required for enterprise-managed MCP authorization.{' '}
+        <InlineLink href={`${DOCS_URL}/guides/platform/sso/enterprise-mcp-authorization`}>
           Learn more
         </InlineLink>
         .
@@ -27,7 +27,7 @@ export const SSOAdvancedSettings = ({ form }: { form: UseFormReturn<SSOConfigFor
         <FormItemLayout
           layout="flex-row-reverse"
           label="ID-JAG Issuer"
-          description="The ID-JAG issuer URL of your identity provider."
+          description="Enter the issuer URL of your identity provider or Claude so that Supabase can verify your members' ID-JAGs."
         >
           <FormControl>
             <Input placeholder="https://your-org.okta.com" {...field} />

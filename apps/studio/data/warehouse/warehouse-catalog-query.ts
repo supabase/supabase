@@ -3,7 +3,8 @@ import { components } from 'api-types'
 
 import { warehouseKeys } from './keys'
 import { get, handleError } from '@/data/fetchers'
-import type { ResponseError, UseCustomQueryOptions } from '@/types'
+import type { StudioError } from '@/lib/errors/studio-errors'
+import type { UseCustomQueryOptions } from '@/types'
 
 export type WarehouseCatalogResponse = components['schemas']['WarehouseCatalogResponse_Output']
 
@@ -33,9 +34,9 @@ export const useWarehouseCatalogQuery = <TData = WarehouseCatalogData>(
   {
     enabled = true,
     ...options
-  }: UseCustomQueryOptions<WarehouseCatalogData, ResponseError, TData> = {}
+  }: UseCustomQueryOptions<WarehouseCatalogData, StudioError, TData> = {}
 ) =>
-  useQuery<WarehouseCatalogData, ResponseError, TData>({
+  useQuery<WarehouseCatalogData, StudioError, TData>({
     queryKey: warehouseKeys.catalog(projectRef),
     queryFn: ({ signal }) => getWarehouseCatalog({ projectRef }, signal),
     enabled: enabled && typeof projectRef !== 'undefined',

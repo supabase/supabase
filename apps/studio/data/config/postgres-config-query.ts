@@ -2,7 +2,7 @@ import { queryOptions } from '@tanstack/react-query'
 
 import { configKeys } from './keys'
 import { get, handleError, unguarded } from '@/data/fetchers'
-import type { ResponseError } from '@/types'
+import type { StudioError } from '@/lib/errors/studio-errors'
 
 export type PostgresConfigurationVariables = {
   projectRef?: string
@@ -25,7 +25,7 @@ export async function getPostgresConfiguration(
 }
 
 export type PostgresConfigurationData = Awaited<ReturnType<typeof getPostgresConfiguration>>
-export type PostgresConfigurationError = ResponseError
+export type PostgresConfigurationError = StudioError
 
 export const postgresConfigurationQueryOptions = (
   { projectRef }: PostgresConfigurationVariables,

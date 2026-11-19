@@ -53,7 +53,8 @@ export function buildStaticFileSrc(basePath: string, entries: StaticEntry[]): st
 /**
  * After `handle: filesystem`: only `/_serverFn/*` and `/api/*` reach the
  * function, a missing hashed chunk 404s instead of becoming the HTML shell,
- * and everything else is the shell.
+ * prerendered pages are served from their own HTML, and everything else is
+ * the shell.
  *
  * @param assetsPrefix `/assets`, or `/_vercel/immutable/<salt>/nitro` with
  * `vercel.immutableStaticFiles`.
@@ -64,13 +65,16 @@ export function buildStaticFileSrc(basePath: string, entries: StaticEntry[]): st
  * the root. A rewrite ends routing, so a prefixed request for a missing
  * hashed chunk 404s at its root destination rather than reaching the shell.
  * @param staticEntries Top-level entries of the static output directory.
+ * @param prerenderedRoutes Page paths (without `basePath`) that TanStack Start
+ * prerenders to `<path>/index.html` at the root of the static output.
  */
 export function buildSpaRoutes(
   generated: Route[],
   functionDest: string,
   assetsPrefix: string,
   basePath = '',
-  staticEntries: StaticEntry[] = []
+  staticEntries: StaticEntry[] = [],
+  prerenderedRoutes: string[] = []
 ): Route[] {
   const fsIndex = generated.findIndex((r) => r.handle === 'filesystem')
   if (fsIndex === -1) {
@@ -99,11 +103,22 @@ export function buildSpaRoutes(
     ]),
     { src: `${assetsPrefix}/(.*)`, status: 404 },
     ...(staticFileSrc ? [{ src: staticFileSrc, dest: '/$1' }] : []),
+    ...prerenderedRoutes.flatMap((route) =>
+      prefixes.map((prefix) => ({
+        src: `${escapeRegExp(`${prefix}${route}`)}/?`,
+        dest: `${route}/index.html`,
+        // `isPrerenderedRoute()` is case-sensitive, so other casings must get the shell.
+        caseSensitive: true,
+      }))
+    ),
     { src: '/(.*)', dest: SHELL_PATH },
   ]
 }
 
-export function vercelSpaRoutes({ basePath = '' }: { basePath?: string } = {}): NitroModule {
+export function vercelSpaRoutes({
+  basePath = '',
+  prerenderedRoutes = [],
+}: { basePath?: string; prerenderedRoutes?: string[] } = {}): NitroModule {
   return {
     name: 'vercel-spa-routes',
     setup(nitro) {
@@ -124,7 +139,8 @@ export function vercelSpaRoutes({ basePath = '' }: { basePath?: string } = {}): 
           functionDest,
           assetsPrefix,
           basePath,
-          staticEntries
+          staticEntries,
+          prerenderedRoutes
         )
         await writeFile(configPath, JSON.stringify(config, null, 2))
         nitro.logger.success(

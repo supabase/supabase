@@ -7,4 +7,5 @@ export const contract = {
     environments: new Set(['platform']),
   },
   needsApproval: false,
+  promptGuidance: `- Use \`get_advisors\` to identify project issues; if unavailable, suggest the user use the Supabase dashboard.`,
 } as const satisfies RemoteToolContract

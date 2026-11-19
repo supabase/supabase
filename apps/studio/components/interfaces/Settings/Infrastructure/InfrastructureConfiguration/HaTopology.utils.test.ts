@@ -8,17 +8,18 @@ import {
   selectTopologyPoolers,
 } from './HaTopology.utils'
 import type { Multipooler } from '@/data/ha-admin/ha-cluster-poolers-query'
+import { haClusterPoolersResponseSchema } from '@/data/ha-admin/ha-cluster-poolers-query'
 
 const primaryPooler = (overrides: Partial<Multipooler> = {}): Multipooler => ({
   id: { cell: 'eu-central-1a', name: 'pooler-1' },
-  shardKey: { database: 'postgres', shard: '0' },
+  shardRef: { database: 'postgres', shard: '0' },
   routingState: { role: 'ROUTING_ROLE_PRIMARY' },
   ...overrides,
 })
 
 const replicaPooler = (overrides: Partial<Multipooler> = {}): Multipooler => ({
   id: { cell: 'eu-central-1b', name: 'pooler-2' },
-  shardKey: { database: 'postgres', shard: '0' },
+  shardRef: { database: 'postgres', shard: '0' },
   routingState: { role: 'ROUTING_ROLE_REPLICA' },
   ...overrides,
 })
@@ -92,12 +93,23 @@ describe('formatCellAsAvailabilityZone', () => {
 })
 
 describe('selectTopologyPoolers', () => {
+  it.each([{}, { shardRef: {} }, { shardKey: {} }])(
+    'handles omitted shard identity fields from the API: %j',
+    (pooler) => {
+      const data = haClusterPoolersResponseSchema.parse({ poolers: [pooler] })
+      const topology = buildHaTopology({ gateways: [], poolers: selectTopologyPoolers(data) })
+
+      expect(topology.shards).toHaveLength(1)
+      expect(topology.shards[0].id).toBe('//')
+    }
+  )
+
   it('projects poolers down to identity, shard, and routing role', () => {
     const projected = selectTopologyPoolers({
       poolers: [
         {
           id: { cell: 'cell-1', name: 'p-1' },
-          shardKey: { database: 'postgres', tableGroup: 'default', shard: '0-inf' },
+          shardRef: { database: 'postgres', tableGroup: 'default', shard: '0-inf' },
           type: 'PRIMARY',
           hostname: 'some-host',
           servingStatus: 'DRAINING',
@@ -116,7 +128,7 @@ describe('selectTopologyPoolers', () => {
     expect(projected).toEqual([
       {
         id: { cell: 'cell-1', name: 'p-1' },
-        shardKey: { database: 'postgres', tableGroup: 'default', shard: '0-inf' },
+        shardRef: { database: 'postgres', tableGroup: 'default', shard: '0-inf' },
         routingState: {
           role: 'ROUTING_ROLE_PRIMARY',
           rule: { coordinatorTerm: '2', leaderSubterm: '1' },
@@ -129,7 +141,7 @@ describe('selectTopologyPoolers', () => {
   it('preserves omitted fields as undefined and handles an empty response', () => {
     expect(selectTopologyPoolers({})).toEqual([])
     expect(selectTopologyPoolers({ poolers: [{}] })).toEqual([
-      { id: undefined, shardKey: undefined, routingState: undefined, type: undefined },
+      { id: undefined, shardRef: undefined, routingState: undefined, type: undefined },
     ])
   })
 })
@@ -153,28 +165,28 @@ describe('buildHaTopology', () => {
     expect(topology.shards[0].replicas).toEqual([replicaB, replicaC])
   })
 
-  it('splits poolers with different shard keys into separate shards', () => {
+  it('splits poolers with different shard refs into separate shards', () => {
     const topology = buildHaTopology({
       gateways: [],
       poolers: [
-        primaryPooler({ shardKey: { database: 'postgres', shard: '1' } }),
+        primaryPooler({ shardRef: { database: 'postgres', shard: '1' } }),
         primaryPooler({
           id: { cell: 'eu-central-1b', name: 'pooler-9' },
-          shardKey: { database: 'postgres', shard: '0' },
+          shardRef: { database: 'postgres', shard: '0' },
         }),
       ],
     })
 
     expect(topology.shards).toHaveLength(2)
     expect(topology.shards.map((shard) => shard.name)).toEqual(['Shard 1', 'Shard 2'])
-    expect(topology.shards[0].primary?.shardKey?.shard).toBe('0')
-    expect(topology.shards[1].primary?.shardKey?.shard).toBe('1')
+    expect(topology.shards[0].primary?.shardRef?.shard).toBe('0')
+    expect(topology.shards[1].primary?.shardRef?.shard).toBe('1')
   })
 
-  it('groups poolers with omitted shard keys into a single shard', () => {
+  it('groups poolers with omitted shard refs into a single shard', () => {
     const topology = buildHaTopology({
       gateways: [],
-      poolers: [primaryPooler({ shardKey: undefined }), replicaPooler({ shardKey: undefined })],
+      poolers: [primaryPooler({ shardRef: undefined }), replicaPooler({ shardRef: undefined })],
     })
 
     expect(topology.shards).toHaveLength(1)
@@ -269,7 +281,7 @@ describe('buildHaTopology', () => {
 
   it('never dedupes records with omitted identity', () => {
     const identityless = (overrides: Partial<Multipooler> = {}): Multipooler => ({
-      shardKey: { database: 'postgres', shard: '0' },
+      shardRef: { database: 'postgres', shard: '0' },
       routingState: { role: 'ROUTING_ROLE_REPLICA' },
       ...overrides,
     })

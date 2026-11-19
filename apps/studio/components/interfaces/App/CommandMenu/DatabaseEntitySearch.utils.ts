@@ -1,6 +1,11 @@
 import { SEARCH_ENTITIES_MAX_QUERY_LENGTH } from '@supabase/pg-meta'
 
-import type { EntitySearchTable } from '@/data/database/entity-search-query'
+import type {
+  EntitySearchFunction,
+  EntitySearchPolicy,
+  EntitySearchTable,
+  EntitySearchTrigger,
+} from '@/data/database/entity-search-query'
 
 // Each search runs SQL against the user's database, so keep it to queries that
 // are specific enough to be useful: short queries match too broadly to be worth
@@ -38,17 +43,59 @@ export function matchesEntitySearch(
   return schema.toLowerCase().startsWith(schemaPart) && lowerName.includes(namePart)
 }
 
-export function formatTableSearchDetails({
-  policy_count,
-  rls_enabled,
-}: Pick<EntitySearchTable, 'policy_count' | 'rls_enabled'>) {
-  const policies = `${policy_count} ${policy_count === 1 ? 'policy' : 'policies'}`
-  return `${policies} • RLS ${rls_enabled ? 'enabled' : 'disabled'}`
+/**
+ * Client-side mirror of how policies and triggers are matched in
+ * getSearchEntitiesSql: the entity's own name contains the query, or its table
+ * matches it. Used to narrow results from a previous search while the current
+ * one is still in flight.
+ */
+export function matchesTableRelatedSearch(
+  { name, schema, table }: Pick<EntitySearchPolicy, 'name' | 'schema' | 'table'>,
+  query: string
+) {
+  if (name.toLowerCase().includes(query.toLowerCase())) return true
+  return matchesEntitySearch({ schema, name: table }, query)
 }
 
-export function getTableEditorRoute(
-  projectRef: string,
-  table: Pick<EntitySearchTable, 'id' | 'schema'>
-): `/${string}` {
-  return `/project/${projectRef}/editor/${table.id}?schema=${encodeURIComponent(table.schema)}`
+export function formatTableSearchDetails(table: EntitySearchTable) {
+  if (table.type === 'r' || table.type === 'p') {
+    const policies = `${table.policy_count} ${table.policy_count === 1 ? 'policy' : 'policies'}`
+    return `${policies} • RLS ${table.rls_enabled ? 'enabled' : 'disabled'}`
+  }
+  if (table.type === 'v') return table.security_invoker ? 'Security invoker' : 'Security definer'
+  return ''
+}
+
+// Triggers found through their function don't match by name or table, so say which
+// function they run instead of their timing
+export function formatTriggerSearchDetails({
+  activation,
+  events,
+  schema,
+  table,
+  matched_function,
+}: Pick<EntitySearchTrigger, 'activation' | 'events' | 'schema' | 'table' | 'matched_function'>) {
+  if (matched_function) return `Runs ${matched_function}`
+  return `${activation} ${events.join(' OR ')} on ${schema}.${table}`
+}
+
+/**
+ * Client-side mirror of how triggers are matched in getSearchEntitiesSql: like
+ * policies, by name or table, plus triggers found through the function they run.
+ */
+export function matchesTriggerSearch(
+  trigger: Pick<EntitySearchTrigger, 'name' | 'schema' | 'table' | 'matched_function'>,
+  query: string
+) {
+  if (matchesTableRelatedSearch(trigger, query)) return true
+  return trigger.matched_function?.toLowerCase().includes(query.toLowerCase()) ?? false
+}
+
+export function formatFunctionSearchDetails({
+  type,
+  args,
+}: Pick<EntitySearchFunction, 'type' | 'args'>) {
+  const procedure = type === 'procedure' ? 'procedure' : ''
+  if (args.length === 0) return procedure
+  return `${procedure} (${args})`.trim()
 }

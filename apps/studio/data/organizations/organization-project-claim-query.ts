@@ -2,7 +2,8 @@ import { useQuery } from '@tanstack/react-query'
 
 import { organizationKeys } from './keys'
 import { get, handleError, unguarded } from '@/data/fetchers'
-import type { ResponseError, UseCustomQueryOptions } from '@/types'
+import type { StudioError } from '@/lib/errors/studio-errors'
+import type { UseCustomQueryOptions } from '@/types'
 
 type OrganizationProjectClaimVariables = {
   slug: string
@@ -63,7 +64,7 @@ async function getOrganizationProjectClaim(
 }
 
 export type OrganizationProjectClaimData = Awaited<ReturnType<typeof getOrganizationProjectClaim>>
-export type OrganizationProjectClaimError = ResponseError
+export type OrganizationProjectClaimError = StudioError
 
 export const useOrganizationProjectClaimQuery = <TData = OrganizationProjectClaimData>(
   { slug, token }: OrganizationProjectClaimVariables,

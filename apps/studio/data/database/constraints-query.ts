@@ -4,7 +4,8 @@ import { useQuery } from '@tanstack/react-query'
 import { databaseKeys } from './keys'
 import { unguarded } from '@/data/fetchers'
 import { executeSql } from '@/data/sql/execute-sql-mutation'
-import { ResponseError, UseCustomQueryOptions } from '@/types'
+import type { StudioError } from '@/lib/errors/studio-errors'
+import { UseCustomQueryOptions } from '@/types'
 
 type GetTableConstraintsVariables = {
   id?: number
@@ -31,7 +32,7 @@ export type TableConstraintsVariables = GetTableConstraintsVariables & {
 }
 
 export type TableConstraintsData = Constraint[]
-export type TableConstraintsError = ResponseError
+export type TableConstraintsError = StudioError
 
 export async function getTableConstraints(
   { projectRef, connectionString, id }: TableConstraintsVariables,
@@ -44,6 +45,8 @@ export async function getTableConstraints(
     {
       projectRef,
       connectionString,
+      sqlOrigin: 'studio',
+      queryName: 'table-constraints',
       sql,
       queryKey: ['table-constraints', id],
       grant: unguarded.migrating,

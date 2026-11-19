@@ -1,15 +1,20 @@
 import { getMultipartBoundary, parseMultipartStream } from '@mjackson/multipart-parser'
-import * as Sentry from '@sentry/nextjs'
+import * as Sentry from '@sentry/react'
 import { useQuery } from '@tanstack/react-query'
 
 import { edgeFunctionsKeys } from './keys'
 import { FileData } from '@/components/ui/FileExplorerAndEditor/FileExplorerAndEditor.types'
 import { get, handleError, unguarded } from '@/data/fetchers'
-import type { ResponseError, UseCustomQueryOptions } from '@/types'
+import type { StudioError } from '@/lib/errors/studio-errors'
+import type { UseCustomQueryOptions } from '@/types'
 
 type EdgeFunctionBodyVariables = {
   projectRef?: string
   slug?: string
+}
+
+export function isFunctionBodyMaxSizeError(error?: { code?: number } | null) {
+  return error?.code === 507
 }
 
 export async function getEdgeFunctionBody(
@@ -70,7 +75,7 @@ export async function getEdgeFunctionBody(
 }
 
 export type EdgeFunctionBodyData = Awaited<ReturnType<typeof getEdgeFunctionBody>>
-export type EdgeFunctionBodyError = ResponseError
+export type EdgeFunctionBodyError = StudioError
 
 export const useEdgeFunctionBodyQuery = <TData = EdgeFunctionBodyData>(
   { projectRef, slug }: EdgeFunctionBodyVariables,

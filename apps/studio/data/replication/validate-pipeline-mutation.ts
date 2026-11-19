@@ -4,7 +4,8 @@ import { components } from 'api-types'
 import { type TableSyncCopyConfig } from './types'
 import { buildPipelineApiConfig } from './utils'
 import { handleError, post } from '@/data/fetchers'
-import type { ResponseError, UseCustomMutationOptions } from '@/types'
+import type { StudioError } from '@/lib/errors/studio-errors'
+import type { UseCustomMutationOptions } from '@/types'
 
 type ValidatePipelineParams = {
   projectRef: string
@@ -58,11 +59,11 @@ type ValidatePipelineData = Awaited<ReturnType<typeof validatePipeline>>
 
 export const useValidatePipelineMutation = (
   options?: Omit<
-    UseCustomMutationOptions<ValidatePipelineData, ResponseError, ValidatePipelineParams>,
+    UseCustomMutationOptions<ValidatePipelineData, StudioError, ValidatePipelineParams>,
     'mutationFn'
   >
 ) => {
-  return useMutation<ValidatePipelineData, ResponseError, ValidatePipelineParams>({
+  return useMutation<ValidatePipelineData, StudioError, ValidatePipelineParams>({
     mutationFn: (vars) => validatePipeline(vars),
     ...options,
   })

@@ -2,7 +2,6 @@ import { ToolSet } from 'ai'
 import { IS_PLATFORM } from 'common'
 
 import { filterToolsByOptInLevel } from '../tool-filter'
-import { getFallbackTools } from './fallback-tools'
 import { getMcpTools } from './mcp-tools'
 import { buildLocalTools } from './registry.server'
 import type { ToolRequirement } from './types'
@@ -46,15 +45,7 @@ export const getTools = async ({
 
   let tools: ToolSet = {}
 
-  if (!IS_PLATFORM) {
-    tools = getFallbackTools({
-      projectRef,
-      connectionString,
-      authorization,
-      aiOptInLevel,
-      includeSchemaMetadata: aiOptInLevel !== 'disabled',
-    })
-  } else if (accessToken) {
+  if (IS_PLATFORM && accessToken) {
     try {
       tools = await getMcpTools({
         accessToken,

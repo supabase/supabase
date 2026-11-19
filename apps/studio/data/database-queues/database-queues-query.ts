@@ -4,7 +4,8 @@ import { useQuery } from '@tanstack/react-query'
 import { databaseQueuesKeys } from './keys'
 import { unguarded } from '@/data/fetchers'
 import { executeSql } from '@/data/sql/execute-sql-mutation'
-import type { ResponseError, UseCustomQueryOptions } from '@/types'
+import type { StudioError } from '@/lib/errors/studio-errors'
+import type { UseCustomQueryOptions } from '@/types'
 
 export type DatabaseQueuesVariables = {
   projectRef?: string
@@ -26,6 +27,8 @@ export async function getDatabaseQueues({ projectRef, connectionString }: Databa
   const { result } = await executeSql({
     projectRef,
     connectionString,
+    sqlOrigin: 'studio',
+    queryName: 'list-queues',
     sql: queueSqlQuery,
     queryKey: ['list-queues'],
     grant: unguarded.migrating,
@@ -34,7 +37,7 @@ export async function getDatabaseQueues({ projectRef, connectionString }: Databa
 }
 
 export type DatabaseQueueData = PostgresQueue[]
-export type DatabaseQueueError = ResponseError
+export type DatabaseQueueError = StudioError
 
 export const useQueuesQuery = <TData = DatabaseQueueData>(
   { projectRef, connectionString }: DatabaseQueuesVariables,

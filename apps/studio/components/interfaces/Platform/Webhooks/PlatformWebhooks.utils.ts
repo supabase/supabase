@@ -33,6 +33,9 @@ export const getTestWebhookEventType = (
   fallbackEventTypes: string[]
 ) => subscribedEventTypes.find((eventType) => eventType !== '*') ?? fallbackEventTypes[0]
 
+export const isTestDelivery = (delivery: Pick<WebhookDelivery, 'eventPayload'>) =>
+  delivery.eventPayload.is_test === true
+
 const normalizeSearch = (value: string) => value.trim().toLowerCase()
 
 export const filterWebhookEndpoints = (endpoints: WebhookEndpoint[], search: string) => {
@@ -44,17 +47,4 @@ export const filterWebhookEndpoints = (endpoints: WebhookEndpoint[], search: str
       `${getWebhookEndpointDisplayName(endpoint)} ${endpoint.url} ${endpoint.description}`.toLowerCase()
     return haystack.includes(normalizedSearch)
   })
-}
-
-export const filterWebhookDeliveries = (deliveries: WebhookDelivery[], search: string) => {
-  const normalizedSearch = normalizeSearch(search)
-
-  return deliveries
-    .filter((delivery) => {
-      if (normalizedSearch.length === 0) return true
-      const haystack =
-        `${delivery.eventType ?? ''} ${delivery.status} ${delivery.responseCode ?? ''}`.toLowerCase()
-      return haystack.includes(normalizedSearch)
-    })
-    .sort((a, b) => new Date(b.attemptAt).getTime() - new Date(a.attemptAt).getTime())
 }
