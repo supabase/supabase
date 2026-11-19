@@ -143,7 +143,7 @@ The common thread: a system needs the current state of selected production data 
 
 ## The mistake we see most often
 
-Some developers discover Realtime's Postgres Changes feature and think: "I can use this to replicate data from one system to another." They write 20 lines of code with supabase-js, subscribe to table changes, and pipe them into another system.
+Some developers discover Realtime's Postgres Changes feature and think: "I can use this to replicate data from one system to another." They write 20 lines of code with [supabase-js](/docs/reference/javascript/introduction), subscribe to table changes, and pipe them into another system.
 
 It works great in development. It even works fine in production for a while. Then a WebSocket connection drops for a few seconds and data goes missing. Or the subscribing process restarts and misses a batch of changes. Or load spikes and the sequential RLS authorization checks cannot keep up.
 

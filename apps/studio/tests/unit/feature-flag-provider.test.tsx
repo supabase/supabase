@@ -1,14 +1,19 @@
-import { render, waitFor } from '@testing-library/react'
+import { act, render, waitFor } from '@testing-library/react'
 import {
   AuthContext,
   FeatureFlagProvider,
+  gotrueClient,
   useFeatureFlags,
+  type CallFeatureFlagsResponse,
   type FeatureFlagContextType,
 } from 'common'
+import { HttpResponse } from 'msw'
 import type { ComponentProps } from 'react'
 import { describe, expect, it, vi } from 'vitest'
 
+import { API_URL } from '@/lib/constants'
 import { createMockAuthContext, createMockSession } from '@/tests/lib/auth-helpers'
+import { addAPIMock, type APIErrorBody } from '@/tests/lib/msw'
 
 type AuthContextValue = ComponentProps<typeof AuthContext.Provider>['value']
 type ConfigCatFlagsFetcher = NonNullable<
@@ -84,5 +89,43 @@ describe('FeatureFlagProvider hasFlagsForSignedInUser', () => {
 
     landRefetch()
     await waitFor(() => expect(flags.hasFlagsForSignedInUser).toBe(true))
+  })
+})
+
+describe('FeatureFlagProvider PostHog flags for a user with MFA enabled', () => {
+  it('loads the flags refused to the pre-MFA token once the challenge is verified', async () => {
+    const onAuthStateChange = vi.spyOn(gotrueClient, 'onAuthStateChange')
+    const session = createMockSession()
+    let isMfaVerified = false
+    addAPIMock({
+      method: 'get',
+      path: '/platform/telemetry/feature-flags',
+      response: () =>
+        isMfaVerified
+          ? HttpResponse.json<CallFeatureFlagsResponse>({ someExperiment: 'variant' })
+          : HttpResponse.json<APIErrorBody>(
+              { message: 'Insufficient AAL: MFA required' },
+              { status: 403 }
+            ),
+    })
+
+    render(
+      <AuthContext.Provider value={createMockAuthContext({ session })}>
+        <FeatureFlagProvider API_URL={API_URL} enabled={{ cc: false, ph: true }}>
+          <FlagsProbe />
+        </FeatureFlagProvider>
+      </AuthContext.Provider>
+    )
+    await flagsLoaded()
+    expect(flags.posthog).not.toHaveProperty('someExperiment')
+
+    isMfaVerified = true
+    act(() => {
+      onAuthStateChange.mock.calls.forEach(([notifySubscriber]) =>
+        notifySubscriber('MFA_CHALLENGE_VERIFIED', session)
+      )
+    })
+
+    await waitFor(() => expect(flags.posthog).toEqual({ someExperiment: 'variant' }))
   })
 })

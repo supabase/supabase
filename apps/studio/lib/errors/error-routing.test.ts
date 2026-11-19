@@ -13,6 +13,7 @@ import {
   PlatformError,
   RequestAbortedError,
   StudioSqlError,
+  UnclassifiedApiError,
   UnexpectedError,
   UserSqlError,
 } from './studio-errors'
@@ -44,6 +45,16 @@ describe('getErrorRouting', () => {
     ],
     ['NetworkUnreachable', new NetworkUnreachableError({}), SAMPLE_OTHER],
     ['PlatformError', new PlatformError({}), SAMPLE_OTHER],
+    [
+      'UnclassifiedApiError 401',
+      new UnclassifiedApiError({ code: 401, reason: 'unauthorized' }),
+      SAMPLE_USER_FAULT,
+    ],
+    [
+      'UnclassifiedApiError 403',
+      new UnclassifiedApiError({ code: 403, reason: 'forbidden' }),
+      SAMPLE_OWNED,
+    ],
     ['UnexpectedError', new UnexpectedError({}), SAMPLE_OWNED],
   ])('routes %s', (_, error, rate) => {
     expect(getErrorRouting(error).sentrySampleRate).toBe(rate)

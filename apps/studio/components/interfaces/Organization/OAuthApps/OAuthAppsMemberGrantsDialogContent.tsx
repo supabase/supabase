@@ -39,10 +39,7 @@ export const OAuthAppsMemberGrantsDialogContent = ({
     hasNextPage,
     fetchNextPage,
     isFetchingNextPage,
-  } = useOAuthAppMemberGrantsQuery(
-    { slug, appId: approval?.app?.id },
-    { enabled: Boolean(approval) }
-  )
+  } = useOAuthAppMemberGrantsQuery({ slug, appId: approval?.id }, { enabled: Boolean(approval) })
 
   const [sentinelRef, entry] = useIntersectionObserver({
     root: null,
@@ -71,7 +68,7 @@ export const OAuthAppsMemberGrantsDialogContent = ({
   return (
     <DialogContent size="medium" {...props}>
       <DialogHeader>
-        <DialogTitle>Member grants for {approval.app.name}</DialogTitle>
+        <DialogTitle>Member grants for {approval.attributes.app.name}</DialogTitle>
       </DialogHeader>
       <DialogSectionSeparator />
 

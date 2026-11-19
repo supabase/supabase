@@ -1,5 +1,6 @@
 import { useQuery } from '@tanstack/react-query'
 import { components } from 'api-types'
+import { useIsLoggedIn } from 'common'
 
 import { serviceStatusKeys } from './keys'
 import { get, handleError, unguarded } from '@/data/fetchers'
@@ -48,10 +49,13 @@ export const useProjectServiceStatusQuery = <TData = ProjectServiceStatusData>(
     enabled = true,
     ...options
   }: UseCustomQueryOptions<ProjectServiceStatusData, ProjectServiceStatusError, TData> = {}
-) =>
-  useQuery<ProjectServiceStatusData, ProjectServiceStatusError, TData>({
+) => {
+  const isLoggedIn = useIsLoggedIn()
+
+  return useQuery<ProjectServiceStatusData, ProjectServiceStatusError, TData>({
     queryKey: serviceStatusKeys.serviceStatus(projectRef),
     queryFn: ({ signal }) => getProjectServiceStatus({ projectRef }, signal),
-    enabled: enabled && typeof projectRef !== 'undefined',
+    enabled: enabled && isLoggedIn && typeof projectRef !== 'undefined',
     ...options,
   })
+}

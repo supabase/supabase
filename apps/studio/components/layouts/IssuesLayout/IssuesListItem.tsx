@@ -1,15 +1,12 @@
 import Link from 'next/link'
 import { cn } from 'ui'
 
-import {
-  CATEGORY_LABELS,
-  SEVERITY_DOT_CLASSES,
-  SEVERITY_LABELS,
-} from '@/components/interfaces/Issues/Issues.constants'
+import { CATEGORY_LABELS } from '@/components/interfaces/Issues/Issues.constants'
 import {
   getIssueTelemetryProperties,
   summarizeAffected,
 } from '@/components/interfaces/Issues/Issues.utils'
+import { SeverityIndicator } from '@/components/interfaces/Issues/SeverityIndicator'
 import type { Issue } from '@/data/issues/issue.types'
 import { useTrack } from '@/lib/telemetry/track'
 
@@ -44,14 +41,10 @@ export const IssuesListItem = ({ issue, href, isActive }: IssueRowProps) => {
       )}
     >
       <span className="flex items-center gap-2">
-        <span
-          className={cn('size-1.5 shrink-0 rounded-full', SEVERITY_DOT_CLASSES[issue.severity])}
-          role="img"
-          aria-label={SEVERITY_LABELS[issue.severity]}
-        />
+        <SeverityIndicator severity={issue.severity} />
         <span className="flex-1 truncate">{issue.title}</span>
       </span>
-      <span className="truncate pl-3.5 text-sm text-foreground-lighter">
+      <span className="truncate pl-5 text-sm text-foreground-lighter">
         {CATEGORY_LABELS[issue.category]}
         {affectedSummary && <span> · {affectedSummary}</span>}
       </span>

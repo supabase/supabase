@@ -23,7 +23,7 @@ Our [Integrations Marketplace](/docs/guides/integrations) continues to grow. Thi
 
 ### AWS RDS
 
-We’ve worked with the RDS team to build out the pg_tle extension and tooling and integrating it into Supabase. These changes are a stepping stone towards running the Supabase stack on AWS RDS. Special shoutout to [@jkatz](https://github.com/jkatz), who was an instrumental collaborator and the rest of the RDS team who have been helping to transition [PL/Rust](https://github.com/tcdi/plrust) into a Trusted Language.
+We’ve worked with the RDS team to build out the pg_tle extension and tooling and integrating it into Supabase. These changes are a stepping stone towards running the Supabase stack on AWS RDS. Special shoutout to [@jkatz](https://github.com/jkatz), who was an instrumental collaborator and the rest of the RDS team who have been helping to transition [PL/Rust](https://github.com/pgcentralfoundation/plrust) into a Trusted Language.
 
 [Read the press announcement on Amazon.com.](https://aws.amazon.com/blogs/opensource/supabase-makes-extensions-easier-for-developers-with-trusted-language-extensions-for-postgresql/)
 
@@ -65,7 +65,7 @@ The RedwoodJS team has contributed a new framework [Quick Start](/docs/guides/ge
 
 ### Dart Edge for Supabase Edge Functions
 
-Dart Edge, built by [Invertase](https://invertase.io/), allows developers to write edge functions in Dart. Previously, Flutter developers had to use TypeScript for their edge functions, as it was the only supported language. However, with Dart Edge, Flutter developers can write backend code using their favorite programming language, Dart!
+Dart Edge, built by [Invertase](https://invertase.io/), allows developers to write edge functions in Dart. Previously, Flutter developers had to use TypeScript for their [edge functions](/docs/guides/functions), as it was the only supported language. However, with Dart Edge, Flutter developers can write backend code using their favorite programming language, Dart!
 
 [Check out the guide.](/docs/guides/functions/dart-edge)
 
@@ -150,10 +150,10 @@ In the past few months, the community has rallied and shipped 3 new client libra
   - [Documentation](/docs/reference/swift/introduction) | [Source Code](https://github.com/supabase/supabase-swift)
   - Shout-out to: [grsouza](https://github.com/grsouza) & [@maail](https://github.com/maail)
 - Python:
-  - [Documentation](/docs/reference/python/initializing) | [Source Code](https://github.com/supabase-community/supabase-py)
+  - [Documentation](/docs/reference/python/initializing) | [Source Code](https://github.com/supabase/supabase-py)
   - Shout-out to: @
 - C#
-  - [Documentation](/docs/reference/csharp/introduction) | [Source Code](https://github.com/supabase-community/supabase-csharp)
+  - [Documentation](/docs/reference/csharp/introduction) | [Source Code](https://github.com/supabase/supabase-csharp)
   - Maintainers: [@acupofjose](https://github.com/acupofjose), [@veleek](https://github.com/veleek), and [@rhuanbarros](https://github.com/rhuanbarros)
 
 These libraries are in various stages of readiness, so if you find anything that can be improved don’t hesitate to jump into the source code and help out.
@@ -188,7 +188,7 @@ We’ve submitted a number of patches to the Postgres Core:
 
 We continue to support the development of [OrioleDB](https://github.com/orioledb/orioledb), who are building scalable storage mechanisms for Postgres using table access methods. The OrioleDB extension is now version [Alpha12](https://github.com/orioledb/orioledb/releases/tag/alpha12) and compatible with Postgres 15.
 
-This release includes various improvements and fixes, including parallel sequential scan of OrioleDB relations. This allows multi-CPU systems to speed up select queries that involve sequential scans. It’s an analogue of heap parallel scan in Postgres core but for index-organized tables. With this base, we’re now implementing methods to build Orioledb indexes using many parallel workers.
+This release includes various improvements and fixes, including parallel sequential scan of [OrioleDB](/docs/guides/database/orioledb) relations. This allows multi-CPU systems to speed up select queries that involve sequential scans. It’s an analogue of heap parallel scan in Postgres core but for index-organized tables. With this base, we’re now implementing methods to build Orioledb indexes using many parallel workers.
 
 [Read the release notes.](https://github.com/orioledb/orioledb/releases/tag/alpha12)
 
