@@ -22,7 +22,7 @@ import {
 } from 'lucide-react'
 import { useQueryStates } from 'nuqs'
 import { VisuallyHidden } from 'radix-ui'
-import { useEffect, useEffectEvent, useMemo, useRef, useState } from 'react'
+import { useCallback, useEffect, useEffectEvent, useMemo, useRef, useState } from 'react'
 import { toast } from 'sonner'
 import {
   Button,
@@ -170,17 +170,18 @@ export const UnifiedLogs = ({
   const [isFilterBarOpen, setIsFilterBarOpen] = useState(!isMobile)
   const [activeViewId, setActiveViewId] = useState<string | null>(null)
   const [isViewsSectionOpen, setIsViewsSectionOpen] = useState(false)
-  const [isViewsSectionReady, setIsViewsSectionReady] = useState(false)
-  useEffect(() => {
-    setIsViewsSectionReady(isViewsSectionOpen)
-  }, [isViewsSectionOpen])
   const [saveViewProjectRef, setSaveViewProjectRef] = useState<string | null>(null)
   const isSavingNewView = saveViewProjectRef !== null && saveViewProjectRef === projectRef
   const currentProjectRef = useRef(projectRef)
   currentProjectRef.current = projectRef
   const [dismissedUpdateKey, setDismissedUpdateKey] = useState<string | null>(null)
   const [isReviewingChanges, setIsReviewingChanges] = useState(false)
-  const activeViewRowRef = useRef<HTMLDivElement>(null)
+  const activeViewRowRef = useRef<HTMLDivElement | null>(null)
+  const [isActiveViewRowMounted, setIsActiveViewRowMounted] = useState(false)
+  const setActiveViewRow = useCallback((node: HTMLDivElement | null) => {
+    activeViewRowRef.current = node
+    setIsActiveViewRowMounted(node !== null)
+  }, [])
   const computeAvailability = getComputeLogsAvailability({
     isPlatform: IS_PLATFORM,
     flagsLoaded,
@@ -512,7 +513,7 @@ export const UnifiedLogs = ({
   // section is the visible level of the sidebar.
   const isViewModifiedPopoverOpen =
     isViewsSectionOpen &&
-    isViewsSectionReady &&
+    isActiveViewRowMounted &&
     isFilterBarOpen &&
     (isViewModifiedUnacknowledged || (isReviewingChanges && canReviewChanges))
 
@@ -530,6 +531,7 @@ export const UnifiedLogs = ({
   const handleOpenViewsSection = () => {
     setIsViewsSectionOpen(true)
     setIsFilterBarOpen(true)
+    setDismissedUpdateKey(null)
   }
 
   const handleUpdateActiveView = async () => {
@@ -672,6 +674,16 @@ export const UnifiedLogs = ({
     }
   }, [isMobile])
 
+  const savedViewsIconClassName = cn(
+    activeView && !isActiveViewModified && 'text-brand-600',
+    isActiveViewModified && 'text-warning'
+  )
+  const getSavedViewsTooltip = () => {
+    if (!activeView) return 'Saved views'
+    if (isActiveViewModified) return `Saved views · ${activeView.name} (modified)`
+    return `Saved views · ${activeView.name}`
+  }
+
   const saveViewAction = canCreateView ? (
     <ButtonTooltip
       size="tiny"
@@ -705,7 +717,7 @@ export const UnifiedLogs = ({
       activeViewId={activeView?.id ?? null}
       isActiveViewModified={isActiveViewModified}
       isSaving={isSavingNewView}
-      activeRowRef={activeViewRowRef}
+      activeRowRef={setActiveViewRow}
       onRetry={retrySavedViews}
       onApply={handleApplyView}
       onReviewChanges={handleReviewChanges}
@@ -763,12 +775,12 @@ export const UnifiedLogs = ({
                         size="tiny"
                         variant="outline"
                         className="size-7 shrink-0 px-0"
-                        icon={<Layers2Icon className={activeView ? 'text-brand-600' : undefined} />}
+                        icon={<Layers2Icon className={savedViewsIconClassName} />}
                         aria-label="Saved views"
                         tooltip={{
                           content: {
                             side: 'bottom',
-                            text: activeView ? `Saved views · ${activeView.name}` : 'Saved views',
+                            text: getSavedViewsTooltip(),
                           },
                         }}
                         onClick={handleOpenViewsSection}
@@ -831,11 +843,7 @@ export const UnifiedLogs = ({
                               size="tiny"
                               variant="text"
                               className="w-[26px]"
-                              icon={
-                                <Layers2Icon
-                                  className={activeView ? 'text-brand-600' : undefined}
-                                />
-                              }
+                              icon={<Layers2Icon className={savedViewsIconClassName} />}
                               aria-label="Saved views"
                             />
                           </DrawerTrigger>

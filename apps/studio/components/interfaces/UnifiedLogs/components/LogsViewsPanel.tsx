@@ -6,7 +6,7 @@ import {
   MoreVerticalIcon,
   Trash2Icon,
 } from 'lucide-react'
-import { RefObject, useState } from 'react'
+import { Ref, useState } from 'react'
 import {
   Button,
   cn,
@@ -33,7 +33,7 @@ interface LogsViewRowProps {
   isPreset?: boolean
   description?: string
   canCreate?: boolean
-  activeRowRef?: RefObject<HTMLDivElement | null>
+  activeRowRef?: Ref<HTMLDivElement>
   onApply: (view: LogsView) => void
   onReviewChanges: () => void
   onRequestRename: (view: LogsView) => void
@@ -147,7 +147,7 @@ interface LogsViewsPanelProps {
   activeViewId: string | null
   isActiveViewModified?: boolean
   isSaving?: boolean
-  activeRowRef?: RefObject<HTMLDivElement | null>
+  activeRowRef?: Ref<HTMLDivElement>
   onRetry?: () => void
   onApply: (view: LogsView) => void
   /** Clicking the active view while it reads as modified. */
