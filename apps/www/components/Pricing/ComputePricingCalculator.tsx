@@ -117,12 +117,7 @@ const ComputePricingCalculator = ({
               <ToggleGroupItem
                 key={plan.name}
                 value={plan.name}
-                className={cn(
-                  'w-full h-6 border-transparent',
-                  internalPlan.name === plan.name
-                    ? 'bg-surface-200 text-foreground data-[state=on]:bg-surface-400 data-[state=on]:text-foreground'
-                    : 'hover:bg-surface-200'
-                )}
+                className="w-full h-6 border-transparent"
               >
                 {plan.name}
               </ToggleGroupItem>

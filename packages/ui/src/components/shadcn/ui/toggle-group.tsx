@@ -17,7 +17,7 @@ const segmentIndicatorOptions = {
   insetByPadding: false,
 }
 
-const segmentedSelfPaint = 'data-[state=on]:bg-overlay-hover aria-checked:bg-overlay-hover'
+const segmentedSelfPaint = 'data-[state=on]:bg-overlay-hover'
 
 const segmentedToneVariants = cva('', {
   variants: {
