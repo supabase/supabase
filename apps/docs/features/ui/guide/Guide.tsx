@@ -1,8 +1,9 @@
 'use client'
 
-import GuidesTableOfContents from '~/components/GuidesSidebar'
+import { GuidesSidebar as GuidesTableOfContents } from '~/components/GuidesSidebar'
 import { TocAnchorsProvider } from '~/features/docs/GuidesMdx.client'
 import { type GuideFrontmatter } from '~/lib/docs'
+import { mdToPlainText } from '~/lib/md-to-plain-text'
 import { createContext, useContext, type ReactNode } from 'react'
 import { cn } from 'ui'
 
@@ -38,7 +39,8 @@ export function Guide({ meta, children, className }: GuideProps) {
               'relative',
               'transition-all ease-out',
               'duration-100',
-              hideToc ? 'col-span-12' : 'col-span-12 md:col-span-8'
+              hideToc ? 'col-span-12' : 'col-span-12 md:col-span-8',
+              'layout-v2:md:col-span-12 layout-v2:w-full layout-v2:max-w-docs-content layout-v2:mx-auto'
             )}
           >
             {children}
@@ -46,6 +48,7 @@ export function Guide({ meta, children, className }: GuideProps) {
           {!hideToc && (
             <GuidesTableOfContents
               video={meta?.tocVideo}
+              videoTitle={meta?.title ? mdToPlainText(meta.title) : undefined}
               className={cn(
                 'hidden md:flex',
                 'md:col-span-3 md:col-start-10',
@@ -53,10 +56,9 @@ export function Guide({ meta, children, className }: GuideProps) {
                 'sticky',
                 /**
                  * --header-height: height of nav
-                 * 1px: height of nav border
                  * 3rem: content padding
                  */
-                'top-[calc(var(--header-height)+1px+3rem)]',
+                'top-[calc(var(--header-height)+3rem)]',
                 // 4rem accounts for 3rem of top padding + 1rem of extra breathing room
                 'max-h-[calc(100vh-var(--header-height)-4rem)]'
               )}

@@ -1,4 +1,4 @@
-import { ExternalLink } from 'lucide-react'
+import { ExternalLinkIcon } from 'lucide-react'
 import Link from 'next/link'
 import { PropsWithChildren } from 'react'
 import { Badge } from 'ui'
@@ -48,7 +48,7 @@ export const SectionContent = ({
                         <Link href={link.url} target="_blank" rel="noreferrer">
                           <div className="inline-flex items-center space-x-2 text-foreground-light hover:text-foreground transition">
                             <p className="text-sm">{link.name}</p>
-                            <ExternalLink size={16} strokeWidth={1.5} />
+                            <ExternalLinkIcon size={16} strokeWidth={1.5} />
                           </div>
                         </Link>
                       </div>

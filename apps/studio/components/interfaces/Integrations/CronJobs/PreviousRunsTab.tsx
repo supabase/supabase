@@ -1,8 +1,8 @@
 import { useParams } from 'common'
 import dayjs from 'dayjs'
-import { CircleCheck, CircleX, Loader } from 'lucide-react'
-import { useMemo } from 'react'
-import DataGrid, { Column, Row } from 'react-data-grid'
+import { CircleCheckIcon, CircleXIcon, LoaderIcon } from 'lucide-react'
+import { useMemo, useRef } from 'react'
+import DataGrid, { Column, DataGridHandle, Row } from 'react-data-grid'
 import { cn, LoadingLine, Tooltip, TooltipContent, TooltipTrigger } from 'ui'
 import { CodeBlock } from 'ui-patterns/CodeBlock'
 import { GenericSkeletonLoader } from 'ui-patterns/ShimmeringLoader'
@@ -47,7 +47,7 @@ const cronJobColumns = [
               align="start"
               className="min-w-[200px] max-w-[300px] text-wrap p-0"
             >
-              <p className="text-xs font-mono px-2 py-1 border-b bg-surface-100">Message</p>
+              <p className="text-xs font-mono px-2 py-1 border-b bg-muted">Message</p>
               <CodeBlock
                 hideLineNumbers
                 language="sql"
@@ -159,6 +159,8 @@ export const PreviousRunsTab = () => {
     isPending: isLoadingCronJobRuns,
     isFetching,
     isFetchingNextPage,
+    isRefetching,
+    isError,
     hasNextPage,
     fetchNextPage,
   } = useCronJobRunsInfiniteQuery(
@@ -172,17 +174,23 @@ export const PreviousRunsTab = () => {
 
   const cronJobRuns = useMemo(() => data?.pages.flatMap((p) => p) || [], [data?.pages])
 
+  const gridRef = useRef<DataGridHandle>(null)
   const handleScroll = useInfiniteScroll({
     isLoading: isLoadingCronJobRuns,
     isFetchingNextPage,
+    isRefetching,
+    isError,
     hasNextPage,
     fetchNextPage,
+    containerRef: gridRef,
+    rowCount: cronJobRuns.length,
   })
 
   return (
     <div className="h-full flex flex-col">
       <LoadingLine loading={isFetching} />
       <DataGrid
+        ref={gridRef}
         className="grow border-t-0! border-b-0!"
         rowHeight={44}
         headerRowHeight={36}
@@ -223,7 +231,7 @@ function StatusBadge({ status }: StatusBadgeProps) {
   if (status === 'succeeded') {
     return (
       <span className="text-brand-600 flex items-center gap-1 text-xs">
-        <CircleCheck size={14} /> Succeeded
+        <CircleCheckIcon size={14} /> Succeeded
       </span>
     )
   }
@@ -231,7 +239,7 @@ function StatusBadge({ status }: StatusBadgeProps) {
   if (status === 'failed') {
     return (
       <span className="text-destructive flex items-center gap-1 text-xs">
-        <CircleX size={14} /> Failed
+        <CircleXIcon size={14} /> Failed
       </span>
     )
   }
@@ -239,7 +247,7 @@ function StatusBadge({ status }: StatusBadgeProps) {
   if (['running', 'starting', 'sending', 'connecting'].includes(status)) {
     return (
       <span className="text-_secondary flex items-center gap-1 text-xs">
-        <Loader size={14} className="animate-spin" /> Running
+        <LoaderIcon size={14} className="animate-spin" /> Running
       </span>
     )
   }

@@ -5,6 +5,7 @@ import {
   postgresBlockConfig,
   postgrestBlockConfig,
   storageBlockConfig,
+  supavisorBlockConfig,
 } from '../config/blockConfigs'
 import { createBlock } from './shared/Block'
 
@@ -26,3 +27,6 @@ MemoizedStorageBlock.displayName = 'MemoizedStorageBlock'
 
 export const MemoizedPostgresBlock = createBlock(postgresBlockConfig)
 MemoizedPostgresBlock.displayName = 'MemoizedPostgresBlock'
+
+export const MemoizedSupavisorBlock = createBlock(supavisorBlockConfig)
+MemoizedSupavisorBlock.displayName = 'MemoizedSupavisorBlock'

@@ -1,4 +1,12 @@
-import { Eye, GitBranch, NotebookText, ScrollText, Table2 } from 'lucide-react'
+import {
+  EyeIcon,
+  GitBranchIcon,
+  MessageSquareIcon,
+  NotebookTextIcon,
+  ScrollTextIcon,
+  SquareCodeIcon,
+  Table2Icon,
+} from 'lucide-react'
 import { cn, SQL_ICON } from 'ui'
 
 import type { SqlSnippetSource } from '@/components/interfaces/SQLEditor/querySource'
@@ -18,7 +26,7 @@ export const LogsSnippetIcon = ({
   strokeWidth?: number
   className?: string
 }) => (
-  <ScrollText
+  <ScrollTextIcon
     size={size}
     strokeWidth={strokeWidth}
     className={cn('transition-colors', className)}
@@ -26,20 +34,38 @@ export const LogsSnippetIcon = ({
 )
 
 interface EntityTypeIconProps {
-  type: 'sql' | 'schema' | 'new' | 'r' | 'v' | 'm' | 'f' | 'p' | 'notebook'
+  type:
+    | 'sql'
+    | 'schema'
+    | 'new'
+    | 'r'
+    | 'v'
+    | 'm'
+    | 'f'
+    | 'p'
+    | 'notebook'
+    | 'query'
+    | 'chat'
+    | 'explorer-home'
   size?: number
   strokeWidth?: number
   isActive?: boolean
   sqlSource?: SqlSnippetSource
+  isPartition?: boolean
+  className?: string
 }
 
 export const EntityTypeIcon = ({
-  type,
+  type: entityType,
   size = 15,
   strokeWidth = 1.5,
   isActive,
   sqlSource,
+  isPartition = false,
+  className,
 }: EntityTypeIconProps) => {
+  const type = isPartition ? ENTITY_TYPE.PARTITIONED_TABLE : entityType
+
   if (type === 'sql' && sqlSource === 'logs') {
     return (
       <LogsSnippetIcon
@@ -73,38 +99,48 @@ export const EntityTypeIcon = ({
 
   if (type === ENTITY_TYPE.TABLE) {
     return (
-      <Table2
+      <Table2Icon
         size={size}
         strokeWidth={strokeWidth}
         className={cn(
           'text-foreground-muted group-hover:text-foreground-lighter group-aria-selected:text-foreground',
           isActive && 'text-foreground-light',
-          'transition-colors'
+          'transition-colors',
+          className
         )}
       />
     )
   }
 
   if (type === 'schema') {
-    return <GitBranch size={size} strokeWidth={strokeWidth} />
+    return <GitBranchIcon size={size} strokeWidth={strokeWidth} />
   }
 
   if (type === ENTITY_TYPE.VIEW) {
     return (
-      <Eye
+      <EyeIcon
         size={size}
         strokeWidth={strokeWidth}
         className={cn(
-          'text-foreground-muted group-hover:text-foreground-lighter',
+          'text-foreground-muted group-hover:text-foreground-lighter group-aria-selected:text-foreground',
           isActive && 'text-foreground-lighter',
-          'transition-colors'
+          'transition-colors',
+          className
         )}
       />
     )
   }
 
   if (type === 'notebook') {
-    return <NotebookText size={size} strokeWidth={strokeWidth} className={''} />
+    return <NotebookTextIcon size={size} strokeWidth={strokeWidth} className={''} />
+  }
+
+  if (type === 'query') {
+    return <SquareCodeIcon size={size} strokeWidth={strokeWidth} />
+  }
+
+  if (type === 'chat') {
+    return <MessageSquareIcon size={size} strokeWidth={strokeWidth} />
   }
 
   return (
@@ -115,7 +151,9 @@ export const EntityTypeIcon = ({
           'text-warning-600/80 dark:text-yellow-900 bg-yellow-500',
         type === ENTITY_TYPE.MATERIALIZED_VIEW && 'text-purple-1100 bg-purple-500',
         type === ENTITY_TYPE.PARTITIONED_TABLE &&
-          'text-foreground-light bg-surface-400 dark:bg-border-stronger'
+          (isPartition
+            ? 'text-blue-1100 bg-blue-500 dark:bg-blue-500'
+            : 'text-foreground bg-blue-700 dark:bg-blue-800')
       )}
     >
       {Object.entries(ENTITY_TYPE)

@@ -6,10 +6,10 @@ import {
   type DocsSearchResult as Page,
   type DocsSearchResultSection as PageSection,
 } from 'common'
-import { Book, ChevronRight, Github, Hash, Loader2, MessageSquare, Search } from 'lucide-react'
+import { describeSearchQuery } from 'common/search-query-telemetry'
+import { Book, ChevronRight, Hash, Loader2, MessageSquare, Search } from 'lucide-react'
 import { useCallback, useEffect, useRef } from 'react'
-import { Button, cn, CommandGroup, CommandItem, CommandList } from 'ui'
-import { StatusIcon } from 'ui/src/components/StatusIcon'
+import { Button, cn, CommandGroup, CommandItem, CommandList, GithubIcon, StatusIcon } from 'ui'
 
 import {
   Breadcrumb,
@@ -89,7 +89,7 @@ const DocsSearchPage = () => {
         properties: {
           command_name: name,
           command_type: 'route',
-          search_query: query || undefined,
+          search_query: describeSearchQuery(query).query,
           result_path: path,
           app: telemetryContext.app,
         },
@@ -302,7 +302,7 @@ const DocsSearchPage = () => {
           <div className="p-6 flex flex-col items-center gap-6 mt-4 text-foreground-light">
             <StatusIcon variant="default" />
             <p className="text-sm text-foreground-light text-center">No results found.</p>
-            <Button size="tiny" variant="default" onClick={handleResetPrompt}>
+            <Button size="tiny" onClick={handleResetPrompt}>
               Try again?
             </Button>
           </div>
@@ -314,7 +314,7 @@ const DocsSearchPage = () => {
               Sorry, looks like we&apos;re having some issues with search!
             </p>
             <p className="text-sm text-foreground-lighter">Please try again in a bit.</p>
-            <Button size="tiny" variant="default" onClick={handleResetPrompt}>
+            <Button size="tiny" onClick={handleResetPrompt}>
               Try again?
             </Button>
           </div>
@@ -348,7 +348,7 @@ export function getPageIcon(page: Page) {
     case PageType.Troubleshooting:
       return <Book strokeWidth={1.5} className="mr-0! w-4! h-4!" />
     case PageType.GithubDiscussion:
-      return <Github strokeWidth={1.5} className="mr-0! w-4! h-4!" />
+      return <GithubIcon strokeWidth={1.5} className="mr-0! w-4! h-4!" />
     default:
       throw new Error(`Unknown page type '${page.type}'`)
   }

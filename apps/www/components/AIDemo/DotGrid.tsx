@@ -1,5 +1,5 @@
+import { motion } from 'motion/react'
 import React from 'react'
-import { motion } from 'framer-motion'
 
 interface DotGridProps {
   rows: number

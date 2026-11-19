@@ -1,24 +1,11 @@
 'use client'
 
 import { isFeatureEnabled } from 'common'
-import { Menu } from 'lucide-react'
 import { useTheme } from 'next-themes'
 import Link from 'next/link'
-import React, { Fragment } from 'react'
-import {
-  buttonVariants,
-  cn,
-  DropdownMenu,
-  DropdownMenuContent,
-  DropdownMenuGroup,
-  DropdownMenuItem,
-  DropdownMenuLabel,
-  DropdownMenuRadioGroup,
-  DropdownMenuRadioItem,
-  DropdownMenuSeparator,
-  DropdownMenuTrigger,
-  singleThemes,
-} from 'ui'
+import { Fragment } from 'react'
+import { DropdownMenuItem, DropdownMenuSeparator } from 'ui'
+import { TopNavDropdown, TopNavThemeGroup } from 'ui-patterns/TopNav/TopNavDropdown'
 
 import MenuIconPicker from './MenuIconPicker'
 
@@ -60,64 +47,27 @@ const menu = [
   ],
 ]
 
-const TopNavDropdown = () => {
+const DocsTopNavDropdown = () => {
   const { theme, setTheme } = useTheme()
 
   return (
-    <DropdownMenu modal={false}>
-      <DropdownMenuTrigger asChild className="flex">
-        <button
-          tabIndex={0}
-          title="Menu dropdown button"
-          className={cn(
-            buttonVariants({ variant: 'default' }),
-            'text-foreground-light border-default w-[30px] min-w-[30px] h-[30px] data-open:bg-overlay-hover/30 hover:border-strong data-open:border-stronger hover:bg-overlay-hover/50! bg-transparent'
-          )}
-        >
-          <Menu size={18} strokeWidth={1} />
-        </button>
-      </DropdownMenuTrigger>
-      <DropdownMenuContent side="bottom" align="end" className="w-52">
-        {menu.map((menuSection, sectionIdx) => (
-          <Fragment key={`topnav--${sectionIdx}`}>
-            {sectionIdx !== 0 && <DropdownMenuSeparator key={`topnav--${sectionIdx}`} />}
-            {menuSection.map((sectionItem, itemIdx) => (
-              <Link
-                key={`topnav-${sectionItem.label}-${sectionIdx}-${itemIdx}`}
-                href={sectionItem.href}
-                {...sectionItem.otherProps}
-              >
-                <DropdownMenuItem className="space-x-2" onClick={() => {}}>
-                  {sectionItem.icon && (
-                    <MenuIconPicker icon={sectionItem.icon} className="text-foreground-lighter" />
-                  )}
-                  <p>{sectionItem.label}</p>
-                </DropdownMenuItem>
+    <TopNavDropdown>
+      {menu.map((menuSection) => (
+        <Fragment key={menuSection[0].label}>
+          {menuSection.map((sectionItem) => (
+            <DropdownMenuItem key={sectionItem.label} asChild className="gap-2">
+              <Link href={sectionItem.href} {...sectionItem.otherProps}>
+                <MenuIconPicker icon={sectionItem.icon} className="text-foreground-lighter" />
+                {sectionItem.label}
               </Link>
-            ))}
-          </Fragment>
-        ))}
-        <DropdownMenuSeparator />
-        <DropdownMenuGroup>
-          <DropdownMenuLabel>Theme</DropdownMenuLabel>
-          <DropdownMenuRadioGroup
-            value={theme}
-            onValueChange={(value) => {
-              setTheme(value)
-            }}
-          >
-            {singleThemes
-              .filter((x) => x.value === 'light' || x.value === 'dark' || x.value === 'system')
-              .map((theme) => (
-                <DropdownMenuRadioItem key={`topnav-theme-${theme.value}`} value={theme.value}>
-                  {theme.name}
-                </DropdownMenuRadioItem>
-              ))}
-          </DropdownMenuRadioGroup>
-        </DropdownMenuGroup>
-      </DropdownMenuContent>
-    </DropdownMenu>
+            </DropdownMenuItem>
+          ))}
+          <DropdownMenuSeparator />
+        </Fragment>
+      ))}
+      <TopNavThemeGroup value={theme} onValueChange={setTheme} />
+    </TopNavDropdown>
   )
 }
 
-export default TopNavDropdown
+export default DocsTopNavDropdown

@@ -1,14 +1,14 @@
 import { useEffect, useState } from 'react'
 
 import { useCheckEntitlements } from './useCheckEntitlements'
-import { maybeShowUpgradePromptIfNotEntitled } from '@/components/interfaces/Settings/Logs/Logs.utils'
+import { isStartOutsideRetention } from '@/components/interfaces/Settings/Logs/Logs.utils'
 
 export const useUpgradePrompt = (from: string) => {
   const [showUpgradePrompt, setShowUpgradePrompt] = useState(false)
   const { getEntitlementNumericValue } = useCheckEntitlements('log.retention_days')
   const entitledToAuditLogDays = getEntitlementNumericValue()
 
-  const shouldShowUpgradePrompt = maybeShowUpgradePromptIfNotEntitled(from, entitledToAuditLogDays)
+  const shouldShowUpgradePrompt = isStartOutsideRetention(from, entitledToAuditLogDays)
 
   useEffect(() => {
     if (shouldShowUpgradePrompt) {

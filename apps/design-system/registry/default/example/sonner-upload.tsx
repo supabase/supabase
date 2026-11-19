@@ -5,6 +5,8 @@ import { Button, Progress } from 'ui'
 export default function SonnerUpload() {
   const uploadPromise = (files: number, toastId: number) => {
     toast.loading(<UploadContent progress={0} files={files} />, {
+      // Important, set icon to null to avoid having the default loading icon as we display it ourselves in UploadContent
+      icon: null,
       id: toastId,
     })
 
@@ -36,7 +38,7 @@ export default function SonnerUpload() {
       {progress >= 100 ? (
         <Check className="text-foreground mt-0.5" size={16} strokeWidth={4} />
       ) : (
-        <Loader2 className="animate-spin text-foreground-muted mt-0.5" size={16} />
+        <Loader2 className="motion-safe:animate-spin text-foreground-muted mt-0.5" size={16} />
       )}
       <div className="flex flex-col gap-2 w-full">
         <div className="flex w-full justify-between">
@@ -60,7 +62,6 @@ export default function SonnerUpload() {
   return (
     <div className="flex flex-col gap-3">
       <Button
-        variant="default"
         onClick={async () => {
           // random id
           const toastId = Math.random()

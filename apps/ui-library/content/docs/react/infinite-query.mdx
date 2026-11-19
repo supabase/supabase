@@ -1,20 +1,15 @@
 ---
 title: Infinite Query Hook
-description: React hook for infinite lists, fetching data from Supabase.
+description: 'React hook for infinite lists, fetching data from Supabase.'
+preview: |-
+  <BlockOverview name="infinite-query-hook" showFiles>
+    <BlockPreview name="infinite-list-demo" />
+  </BlockOverview>
 ---
-
-<BlockPreview name="infinite-list-demo" />
 
 ## Installation
 
-<BlockItem
-  name="infinite-query-hook"
-  description="Installs the Infinite List component and necessary Supabase client setup."
-/>
-
-## Folder structure
-
-<RegistryBlock itemName="infinite-query-hook" />
+<BlockItem name="infinite-query-hook" />
 
 ## Introduction
 
@@ -23,7 +18,7 @@ The hook is fully typed, provided you have generated and setup your database typ
 
 ## Adding types
 
-Before using this hook, we **highly** recommend you setup database types in your project. This will make the hook fully-typesafe. More info about generating Typescript types from database schema [here](https://supabase.com/docs/guides/api/rest/generating-types)
+Before using this hook, we **highly** recommend you setup database types in your project. This will make the hook fully-typesafe. More info about generating TypeScript types from database schema [here](https://supabase.com/docs/guides/api/rest/generating-types).
 
 ## Props
 
@@ -278,14 +273,14 @@ export const InfiniteListDemo = () => {
 <Callout>
   The Todo List table has Row Level Security (RLS) enabled by default. Feel free disable it
   temporarily while testing. With RLS enabled, you will get an [empty
-  array](https://supabase.com/docs/guides/troubleshooting/why-is-my-select-returning-an-empty-data-array-and-i-have-data-in-the-table-xvOPgx)
+  array](https://supabase.com/kb/troubleshooting/why-is-my-select-returning-an-empty-data-array-and-i-have-data-in-the-table-xvOPgx)
   of results by default. [Read
   more](https://supabase.com/docs/guides/database/postgres/row-level-security) about RLS.
 </Callout>
 
 ## Further reading
 
-- [Generating Typescript types from the database](https://supabase.com/docs/reference/javascript/typescript-support)
+- [Generating TypeScript types from the database](https://supabase.com/docs/reference/javascript/typescript-support)
 - [Supabase Database API](https://supabase.com/docs/reference/javascript/select)
 - [Supabase Pagination](https://supabase.com/docs/reference/javascript/select#pagination)
 - [Intersection Observer API](https://developer.mozilla.org/en-US/docs/Web/API/Intersection_Observer_API)

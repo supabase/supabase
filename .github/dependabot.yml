@@ -6,3 +6,22 @@ updates:
       interval: 'weekly'
     cooldown:
       default-days: 7
+  # `pnpm-workspace.yaml`'s `minimumReleaseAge: 4320` (3 days) rejects any
+  # dependency version younger than 3 days old during `pnpm install`. Without
+  # a cooldown, Dependabot proposes the newest release the moment it's
+  # published, so its PRs are structurally guaranteed to fail CI/Vercel until
+  # the proposed version happens to age past the pnpm gate on its own. This
+  # cooldown holds Dependabot's proposals back until they've already cleared
+  # (with a one-day margin for scheduling/CI latency) pnpm's minimum release
+  # age, so the version pnpm sees is always old enough to be accepted.
+  - package-ecosystem: 'npm'
+    directories:
+      - '/'
+      - '/apps/*'
+      - '/packages/*'
+      - '/blocks/*'
+      - '/e2e/*'
+    schedule:
+      interval: 'weekly'
+    cooldown:
+      default-days: 4

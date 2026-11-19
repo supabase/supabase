@@ -1,5 +1,4 @@
 import { zodResolver } from '@hookform/resolvers/zod'
-import { PermissionAction } from '@supabase/shared-types/out/constants'
 import { useParams } from 'common'
 import { capitalize } from 'lodash'
 import Link from 'next/link'
@@ -46,10 +45,12 @@ import { usePgbouncerConfigQuery } from '@/data/database/pgbouncer-config-query'
 import { usePgbouncerConfigurationUpdateMutation } from '@/data/database/pgbouncer-config-update-mutation'
 import { useProjectAddonsQuery } from '@/data/subscriptions/project-addons-query'
 import { useCheckEntitlements } from '@/hooks/misc/useCheckEntitlements'
-import { useAsyncCheckPermissions } from '@/hooks/misc/useCheckPermissions'
+import { FGA_PERMISSIONS, useAsyncCheckPermissionsV2 } from '@/hooks/misc/useCheckPermissionsV2'
 import { useHighAvailability } from '@/hooks/misc/useHighAvailability'
-import { useSelectedProjectQuery } from '@/hooks/misc/useSelectedProject'
+import { useIsFeatureEnabled } from '@/hooks/misc/useIsFeatureEnabled'
+import { useIsAwsCloudProvider, useSelectedProjectQuery } from '@/hooks/misc/useSelectedProject'
 import { DOCS_URL } from '@/lib/constants'
+import { preprocessEmptyNumberInput } from '@/lib/forms/zod-number-input'
 
 const formId = 'pooling-configuration-form'
 const HIGH_AVAILABILITY_MAX_CLIENT_CONNECTIONS = 100_000
@@ -57,14 +58,8 @@ const HA_DISABLED_TITLE =
   'Connection pooling settings are managed automatically on High Availability projects'
 
 const PoolingConfigurationFormSchema = z.object({
-  default_pool_size: z.preprocess(
-    (val) => (val === '' || val === null || val === undefined ? undefined : val),
-    z.coerce.number().optional()
-  ),
-  max_client_conn: z.preprocess(
-    (val) => (val === '' || val === null || val === undefined ? undefined : val),
-    z.coerce.number().optional()
-  ),
+  default_pool_size: preprocessEmptyNumberInput(z.coerce.number().optional()),
+  max_client_conn: preprocessEmptyNumberInput(z.coerce.number().optional()),
 })
 
 /**
@@ -72,14 +67,18 @@ const PoolingConfigurationFormSchema = z.object({
  */
 export const ConnectionPooling = () => {
   const { ref: projectRef } = useParams()
+  const isAws = useIsAwsCloudProvider()
   const { data: project } = useSelectedProjectQuery()
   const { isHighAvailability, isPending: isHighAvailabilityPending } = useHighAvailability()
   const canLoadPoolingConfig = !isHighAvailability && !isHighAvailabilityPending
-  const { can: canUpdateConnectionPoolingConfiguration } = useAsyncCheckPermissions(
-    PermissionAction.UPDATE,
-    'projects',
-    { resource: { project_id: project?.id } }
+
+  const { can: canUpdateConnectionPoolingConfiguration } = useAsyncCheckPermissionsV2(
+    FGA_PERMISSIONS.PROJECT.DATABASE_POOLING_CONFIG_WRITE
   )
+
+  const { projectAddonsDedicatedIpv4Address } = useIsFeatureEnabled([
+    'project_addons:dedicated_ipv4_address',
+  ])
 
   const {
     data: pgbouncerConfig,
@@ -127,15 +126,22 @@ export const ConnectionPooling = () => {
   const connectionPoolingUnavailable = pgbouncerConfig?.pool_mode === null
   const ignoreStartupParameters = pgbouncerConfig?.ignore_startup_parameters
 
-  const onSubmit: SubmitHandler<z.infer<typeof PoolingConfigurationFormSchema>> = async (data) => {
-    const { default_pool_size } = data
+  const showIpv4Callout =
+    isAws &&
+    projectAddonsDedicatedIpv4Address &&
+    isSuccessAddons &&
+    !isHighAvailability &&
+    !disablePoolModeSelection &&
+    !hasIpv4Addon
 
+  const onSubmit: SubmitHandler<z.infer<typeof PoolingConfigurationFormSchema>> = async (data) => {
     if (!projectRef || isHighAvailability) return
 
+    const { default_pool_size } = data
     updatePoolerConfig(
       {
         ref: projectRef,
-        default_pool_size: default_pool_size === null ? undefined : default_pool_size,
+        default_pool_size: default_pool_size === undefined ? null : default_pool_size,
         ignore_startup_parameters: ignoreStartupParameters ?? '',
       },
       {
@@ -143,7 +149,8 @@ export const ConnectionPooling = () => {
           toast.success(`Successfully updated pooler configuration`)
           if (data) {
             form.reset({
-              default_pool_size: data.default_pool_size,
+              default_pool_size: data.default_pool_size ?? undefined,
+              max_client_conn: data.max_client_conn ?? undefined,
             })
           }
         },
@@ -170,7 +177,7 @@ export const ConnectionPooling = () => {
         </PageSectionSummary>
         <PageSectionAside>
           <DocsButton
-            href={`${DOCS_URL}/guides/database/connecting-to-postgres#connection-pooler`}
+            href={`${DOCS_URL}/guides/database/connecting-to-postgres/pooling-and-limits#how-connection-pooling-works`}
           />
         </PageSectionAside>
       </PageSectionMeta>
@@ -192,14 +199,14 @@ export const ConnectionPooling = () => {
           />
         )}
 
-        {isSuccessAddons && !isHighAvailability && !disablePoolModeSelection && !hasIpv4Addon && (
+        {showIpv4Callout && (
           <Admonition
             type="default"
             layout="responsive"
             title="Dedicated pooler uses IPv6 by default"
             description="Connections from IPv4-only networks require enabling the IPv4 add-on on your project instance."
             actions={
-              <Button variant="default" asChild>
+              <Button asChild>
                 <Link href={`/project/${projectRef}/settings/addons?panel=ipv4`}>
                   Enable IPv4 add-on
                 </Link>

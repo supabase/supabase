@@ -8,6 +8,7 @@ import { FC } from 'react'
 import { Button, cn } from 'ui'
 
 import CostControlAnimation from './CostControlAnimation'
+import { isCrossZoneHref } from '@/lib/cross-zone'
 
 const addons = [
   {
@@ -96,15 +97,16 @@ const AddonCard = ({ addon }: any) => {
           </p>
         </div>
         <div className="flex items-center gap-4 mt-4">
-          <Button
-            asChild
-            size="tiny"
-            variant="default"
-            iconRight={<ArrowUpRight className="w-4 h-4" />}
-          >
-            <Link href={addon.ctaLink} target={addon.ctaTarget}>
-              {addon.ctaText}
-            </Link>
+          <Button asChild size="tiny" iconRight={<ArrowUpRight className="w-4 h-4" />}>
+            {isCrossZoneHref(addon.ctaLink) ? (
+              <a href={addon.ctaLink} target={addon.ctaTarget}>
+                {addon.ctaText}
+              </a>
+            ) : (
+              <Link href={addon.ctaLink} target={addon.ctaTarget}>
+                {addon.ctaText}
+              </Link>
+            )}
           </Button>
         </div>
       </div>
@@ -157,6 +159,10 @@ const AddonCard = ({ addon }: any) => {
     <div className={containerClasses}>
       <HighlightCard />
     </div>
+  ) : isCrossZoneHref(addon.ctaLink) ? (
+    <a href={addon.ctaLink} className={containerClasses} target={addon.ctaTarget}>
+      <SmallCard />
+    </a>
   ) : (
     <Link href={addon.ctaLink} className={containerClasses} target={addon.ctaTarget}>
       <SmallCard />

@@ -19,18 +19,21 @@ See installation instructions for the [Popover](/docs/components/popover#install
 ```tsx
 'use client'
 
-import { Check, ChevronsUpDown } from 'lucide-react'
+import { Check } from 'lucide-react'
 import * as React from 'react'
-
-import { Button } from '@/components/ui/button'
 import {
+  ComboboxTrigger,
   Command,
   CommandEmpty,
   CommandGroup,
   CommandInput,
   CommandItem,
-} from '@/components/ui/command'
-import { Popover, PopoverContent, PopoverTrigger } from '@/components/ui/popover'
+  CommandList,
+  Popover,
+  PopoverContent,
+  PopoverTrigger,
+} from 'ui'
+
 import { cn } from '@/lib/utils'
 
 const frameworks = [
@@ -63,17 +66,15 @@ export function ComboboxDemo() {
   return (
     <Popover open={open} onOpenChange={setOpen}>
       <PopoverTrigger asChild>
-        <Button
-          variant="outline"
-          role="combobox"
+        <ComboboxTrigger
           aria-expanded={open}
-          className="w-[200px] justify-between"
+          data-state={open ? 'open' : 'closed'}
+          className={cn('w-[200px]', !value && 'text-foreground-lighter')}
         >
           {value
             ? frameworks.find((framework) => framework.value === value)?.label
             : 'Select framework...'}
-          <ChevronsUpDown className="ml-2 h-4 w-4 shrink-0 opacity-50" />
-        </Button>
+        </ComboboxTrigger>
       </PopoverTrigger>
       <PopoverContent className="w-[200px] p-0">
         <Command>
@@ -131,3 +132,9 @@ You can create a responsive combobox by using the `<Popover />` on desktop and t
 ### Form
 
 <ComponentPreview name="combobox-form" />
+
+### Create from list
+
+When users can create an option while choosing one, give the action a clear verb label and place it at the bottom of the list, separated from the existing options. Keep the current selection in place while they create the new option.
+
+<ComponentPreview name="combobox-create-option" peekCode wide />

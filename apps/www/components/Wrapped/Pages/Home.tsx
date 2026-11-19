@@ -1,9 +1,10 @@
 'use client'
 
-import { AnimatePresence, motion } from 'framer-motion'
+import { useBreakpoint } from 'common'
+import { AnimatePresence, motion } from 'motion/react'
 import { useEffect, useRef, useState } from 'react'
 import { cn } from 'ui'
-import { useBreakpoint } from 'common'
+
 import { AnimatedGridBackground } from '../AnimatedGridBackground'
 
 const stats = [
@@ -193,7 +194,7 @@ function FloatingStatBubbles() {
             },
           }}
         >
-          <p className="text-sm font-mono font-medium text-brand-link dark:text-brand whitespace-nowrap">
+          <p className="text-sm font-mono font-medium text-primary whitespace-nowrap">
             {bubble.stat.value}
           </p>
           <p className="text-xs text-foreground-light whitespace-nowrap">{bubble.stat.label}</p>

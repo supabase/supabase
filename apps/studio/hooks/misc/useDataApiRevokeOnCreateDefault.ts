@@ -25,7 +25,7 @@ export const isInDataApiRevokeTreatment = (flag: boolean | string | undefined): 
 }
 
 /**
- * Controls the default state of the "Automatically expose new tables"
+ * Controls the default state of the "Grant API access to new tables automatically"
  * checkbox at project creation. When the flag is on, the checkbox defaults
  * to unchecked (i.e. revoke SQL runs). When off/absent, the checkbox defaults
  * to checked (current behaviour — default grants remain).

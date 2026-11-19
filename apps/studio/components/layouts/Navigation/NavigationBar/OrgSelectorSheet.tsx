@@ -1,4 +1,4 @@
-import { Boxes } from 'lucide-react'
+import { BoxesIcon } from 'lucide-react'
 import { SheetHeader, SheetTitle, Tabs, TabsContent, TabsList, TabsTrigger } from 'ui'
 import MobileSheetNav from 'ui-patterns/MobileSheetNav/MobileSheetNav'
 
@@ -42,7 +42,7 @@ export function OrgSelectorSheet({
               value="organization"
               className="text-xs flex flex-col items-center gap-1.5 px-4 py-3 data-[state=active]:border-0"
             >
-              <Boxes className="shrink-0" size={16} strokeWidth={1.5} />
+              <BoxesIcon className="shrink-0" size={16} strokeWidth={1.5} />
               <span className="truncate max-w-full text-xs leading-tight" title={orgLabel}>
                 {orgLabel}
               </span>

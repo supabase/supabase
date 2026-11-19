@@ -1,4 +1,4 @@
-import { motion } from 'framer-motion'
+import { motion } from 'motion/react'
 
 import { EntityTypeIcon } from '@/components/ui/EntityTypeIcon'
 import { useTabsStateSnapshot } from '@/state/tabs'

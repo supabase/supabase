@@ -17,14 +17,7 @@ describe('isTimeMetric', () => {
 })
 
 describe('formatTime', () => {
-  it('formats a timestamp into a human-readable date string', () => {
-    const ts = new Date('2024-01-15T14:30:00Z').getTime()
-    const result = formatTime(ts)
-    expect(typeof result).toBe('string')
-    expect(result.length).toBeGreaterThan(0)
-  })
-
-  it('includes the month and day', () => {
+  it('formats a timestamp to include the month and day', () => {
     const ts = new Date('2024-06-01T10:00:00Z').getTime()
     const result = formatTime(ts)
     expect(result).toMatch(/Jun/)

@@ -9,7 +9,7 @@
 
 [Supabase](https://supabase.com) je open source alternativa Firebaseu. Izgrađujemo funkcionalnosti Firebasea koristeći enterprise-grade open source alate.
 
-- [x] Hostana Postgres baza podataka. [Dokumentacija](https://supabase.com/docs/guides/database)
+- [x] Hostana Postgres baza podataka. [Dokumentacija](https://supabase.com/docs/guides/database/overview)
 - [x] Autentifikacija i autorizacija. [Dokumentacija](https://supabase.com/docs/guides/auth)
 - [x] Automatski generirani API-ji.
   - [x] REST. [Dokumentacija](https://supabase.com/docs/guides/api#rest-api-overview)
@@ -47,15 +47,15 @@ Supabase je kombinacija alata otvorenog koda. Izgrađujemo funkcionalnosti Fireb
 **Arhitektura**
 
 Supabase je [hostana platforma](https://supabase.com/dashboard). Možete se registrirati i odmah počet koristiti Supabase bez ikakvih instalacija.
-Također možete ju [samostalno hostati](https://supabase.com/docs/guides/hosting/overview) i [razvijati lokalno](https://supabase.com/docs/guides/local-development).
+Također možete ju [samostalno hostati](https://supabase.com/docs/guides/self-hosting) i [razvijati lokalno](https://supabase.com/docs/guides/local-development).
 
-![Arhitektura](apps/docs/public/img/supabase-architecture.svg)
+![Arhitektura](https://raw.githubusercontent.com/supabase/supabase/master/apps/docs/public/img/supabase-architecture.svg)
 
 - [Postgres](https://www.postgresql.org/) je objektno-relacijska baza podataka koja je aktivno u razvoju preko 30 godina i na glasu je kao jako pouzdana, robusna i performantna.
 - [Realtime](https://github.com/supabase/realtime) je Elixir server koji vam dopušta da prisluškujete unose, ažuriranja i brisanja u PostgreSQL bazi koristeći websockete. Realtime prati Postgres-ovu funkcionalnost repliciranja i osluškuje promjene u bazi podataka, te iste upakira u JSON, na kraju emitira taj JSON preko websocketa do autoriziranih klijenata.
 - [PostgREST](http://postgrest.org/) je web server koji pretvara vašu PostgreSQL bazu podataka u RESTful API.
-- [GoTrue](https://github.com/supabase/gotrue) je API koji koristi JWT za upravaljanje korisnika i izdavanje JWT tokena.
-- [Storage](https://github.com/supabase/storage-api) pruža RESTful sučelje za upravljanje datoteka spremljenih u S3, koristeći Postgres za upravljanje dozvola.
+- [GoTrue](https://github.com/supabase/auth) je API koji koristi JWT za upravaljanje korisnika i izdavanje JWT tokena.
+- [Storage](https://github.com/supabase/storage) pruža RESTful sučelje za upravljanje datoteka spremljenih u S3, koristeći Postgres za upravljanje dozvola.
 - [pg_graphql](http://github.com/supabase/pg_graphql/) je PostgreSQL ekstenzija koja pruža Graphql API.
 - [postgres-meta](https://github.com/supabase/postgres-meta) je RESTful API za upravljanje vaše Postgres baze podatake, dopuštajući vam da dohvatite tablice, dodate uloge, i izvršite upite prema bazi, itd.
 - [Kong](https://github.com/Kong/kong) je cloud-native API gateway.
@@ -75,9 +75,9 @@ Naš pristup za klijentske knjižnice je modularan. Svaka pod-knjižnica je samo
     <th></th>
     <th>Supabase</th>
     <th><a href="https://github.com/postgrest/postgrest" target="_blank" rel="noopener noreferrer">PostgREST</a></th>
-    <th><a href="https://github.com/supabase/gotrue" target="_blank" rel="noopener noreferrer">GoTrue</a></th>
+    <th><a href="https://github.com/supabase/auth" target="_blank" rel="noopener noreferrer">GoTrue</a></th>
     <th><a href="https://github.com/supabase/realtime" target="_blank" rel="noopener noreferrer">Realtime</a></th>
-    <th><a href="https://github.com/supabase/storage-api" target="_blank" rel="noopener noreferrer">Storage</a></th>
+    <th><a href="https://github.com/supabase/storage" target="_blank" rel="noopener noreferrer">Storage</a></th>
     <th>Functions</th>
   </tr>
   <!-- TEMPLATE FOR NEW ROW -->
@@ -135,7 +135,7 @@ Naš pristup za klijentske knjižnice je modularan. Svaka pod-knjižnica je samo
   <!-- notranslate -->
   <tr>
     <td>C#</td>
-    <td><a href="https://github.com/supabase-community/supabase-csharp" target="_blank" rel="noopener noreferrer">supabase-csharp</a></td>
+    <td><a href="https://github.com/supabase/supabase-csharp" target="_blank" rel="noopener noreferrer">supabase-csharp</a></td>
     <td><a href="https://github.com/supabase-community/postgrest-csharp" target="_blank" rel="noopener noreferrer">postgrest-csharp</a></td>
     <td><a href="https://github.com/supabase-community/gotrue-csharp" target="_blank" rel="noopener noreferrer">gotrue-csharp</a></td>
     <td><a href="https://github.com/supabase-community/realtime-csharp" target="_blank" rel="noopener noreferrer">realtime-csharp</a></td>
@@ -204,7 +204,7 @@ Naš pristup za klijentske knjižnice je modularan. Svaka pod-knjižnica je samo
 
 ## Značke
 
-![Made with Supabase](./apps/www/public/badge-made-with-supabase.svg)
+![Made with Supabase](https://supabase.com/badge-made-with-supabase.svg)
 
 ```md
 [![Made with Supabase](https://supabase.com/badge-made-with-supabase.svg)](https://supabase.com)
@@ -221,7 +221,7 @@ Naš pristup za klijentske knjižnice je modularan. Svaka pod-knjižnica je samo
 </a>
 ```
 
-![Made with Supabase (dark)](./apps/www/public/badge-made-with-supabase-dark.svg)
+![Made with Supabase (dark)](https://supabase.com/badge-made-with-supabase-dark.svg)
 
 ```md
 [![Made with Supabase](https://supabase.com/badge-made-with-supabase-dark.svg)](https://supabase.com)

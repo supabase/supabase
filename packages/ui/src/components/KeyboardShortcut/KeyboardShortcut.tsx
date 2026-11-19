@@ -29,7 +29,7 @@ const KEY_SYMBOLS: Record<string, string | ((isMac: boolean) => string)> = {
 
 type KeyboardShortcutProps = {
   keys: string[]
-  variant?: 'pill' | 'inline'
+  variant?: 'pill' | 'inline' | 'keycaps'
   className?: string
 }
 
@@ -51,13 +51,28 @@ export const KeyboardShortcut = ({ keys, variant = 'pill', className }: Keyboard
   const resolvedKeys = keys.map((key) => resolveKeyLabel(key, isMac))
   const shortcutLabel = formatShortcutLabel(resolvedKeys)
 
+  if (variant === 'keycaps') {
+    return (
+      <span className={cn('inline-flex shrink-0 items-center gap-0.5', className)}>
+        {resolvedKeys.map((key) => (
+          <kbd
+            key={key}
+            className="inline-flex h-4 min-w-4 items-center justify-center rounded border border-border-muted bg-surface-300 px-0.5 font-sans text-[11px] leading-none text-foreground-light"
+          >
+            {key}
+          </kbd>
+        ))}
+      </span>
+    )
+  }
+
   return (
     <span
       className={cn(
         'inline-flex whitespace-nowrap shrink-0',
         variant === 'pill'
           ? 'items-center text-[11px] leading-none tracking-[-0.025em] text-foreground-light bg-surface-200/50 dark:bg-surface-100/50 rounded px-[5px] py-[3px] border border-border-muted'
-          : 'items-baseline text-[11px] leading-[inherit] text-foreground/40',
+          : 'items-baseline text-[11px] leading-[inherit]',
         className
       )}
     >

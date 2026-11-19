@@ -4,12 +4,12 @@ import { Admonition } from 'ui-patterns/Admonition'
 
 import { OrganizationInviteByToken } from '@/data/organization-members/organization-invitation-token-query'
 import { useSignOut } from '@/lib/auth'
+import type { StudioError } from '@/lib/errors/studio-errors'
 import { useProfile } from '@/lib/profile'
-import type { ResponseError } from '@/types'
 
 interface OrganizationInviteError {
   data?: OrganizationInviteByToken
-  error?: ResponseError | null
+  error?: StudioError | null
   isError: boolean
   isInvalidInvite?: boolean
 }
@@ -64,7 +64,7 @@ export const OrganizationInviteError = ({
             )
           }
         />
-        <Button variant="default" block onClick={handleSignOut}>
+        <Button block onClick={handleSignOut}>
           Sign out
         </Button>
       </div>

@@ -1,6 +1,6 @@
 import { describe, expect, it } from 'vitest'
 
-import { guideSlug, troubleshootingSlug } from './markdown-sources'
+import { guideSlug } from './markdown-sources'
 
 describe('guideSlug', () => {
   it('strips the content/guides prefix and .mdx extension, keeping nested path', () => {
@@ -9,13 +9,5 @@ describe('guideSlug', () => {
 
   it('handles a top-level guide', () => {
     expect(guideSlug('content/guides/getting-started.mdx')).toBe('getting-started')
-  })
-})
-
-describe('troubleshootingSlug', () => {
-  it('flattens to a troubleshooting/<filename> slug', () => {
-    expect(troubleshootingSlug('content/troubleshooting/all-about-egress-a_Sg_e.mdx')).toBe(
-      'troubleshooting/all-about-egress-a_Sg_e'
-    )
   })
 })

@@ -16,7 +16,7 @@ import type { McpOnCopyCallback } from '../types'
  * instructions module stays importable by the Node markdown build, which can't
  * resolve static png imports.
  */
-const INSTRUCTION_ASSETS: Record<string, StaticImageData> = {
+const INSTRUCTION_ASSETS: Record<string, StaticImageData | string> = {
   'antigravity-auth': antigravityAuthenticateScreenshot,
 }
 
@@ -61,11 +61,15 @@ function reactRenderers(onCopy: (type?: McpOnCopyCallback) => void): Renderers {
         href={node.url}
         target="_blank"
         rel="noopener noreferrer"
-        className="text-brand-link hover:underline"
+        className="text-primary hover:underline"
       >
         {children}
       </a>
     ),
+    heading: (node, children) => {
+      const Tag = `h${node.depth}` as 'h1' | 'h2' | 'h3' | 'h4' | 'h5' | 'h6'
+      return <Tag className="text-sm font-medium text-foreground">{children}</Tag>
+    },
     paragraph: (_node, children) => <p className="text-xs text-foreground-light">{children}</p>,
     code: (node) => (
       <CodeBlock

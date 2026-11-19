@@ -6,8 +6,9 @@ import {
   FieldLabel,
   FieldSet,
   FieldTitle,
-} from 'ui/src/components/shadcn/ui/field'
-import { RadioGroup, RadioGroupItem } from 'ui/src/components/shadcn/ui/radio-group'
+  RadioGroup,
+  RadioGroupItem,
+} from 'ui'
 
 export default function FieldChoiceCard() {
   return (

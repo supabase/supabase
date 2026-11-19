@@ -1,5 +1,4 @@
 import { useQuery } from '@tanstack/react-query'
-import { useFlag } from 'common'
 
 import { executeAnalyticsSql } from './execute-analytics-sql'
 import { logsKeys } from './keys'
@@ -8,11 +7,14 @@ import {
   getUnifiedLogsISOStartEnd,
   UNIFIED_LOGS_QUERY_OPTIONS,
   UnifiedLogsVariables,
+  useUnifiedLogsBackend,
 } from './unified-logs-infinite-query'
 import { getLogsCountQuery } from '@/components/interfaces/UnifiedLogs/UnifiedLogs.queries'
 import { getLogsCountQuery as getLogsCountQueryBq } from '@/components/interfaces/UnifiedLogs/UnifiedLogs.queries.bq'
 import { FacetMetadataSchema } from '@/components/interfaces/UnifiedLogs/UnifiedLogs.schema'
-import { ResponseError, UseCustomQueryOptions } from '@/types'
+import { handleError } from '@/data/fetchers'
+import type { StudioError } from '@/lib/errors/studio-errors'
+import { UseCustomQueryOptions } from '@/types'
 
 // Trimmed client-side because the OTEL endpoint rejects LIMIT BY, so the count
 // query can't cap rows per facet in SQL.
@@ -38,6 +40,8 @@ export async function getUnifiedLogsCount(
     iso_timestamp_end: isoTimestampEnd,
     signal,
   })
+
+  if (data.error) handleError(typeof data.error === 'string' ? new Error(data.error) : data.error)
 
   const facets: Record<string, FacetMetadataSchema> = {}
   const countsByFacet: Record<string, Map<string, number>> = {}
@@ -81,7 +85,7 @@ export async function getUnifiedLogsCount(
 }
 
 export type UnifiedLogsCountData = Awaited<ReturnType<typeof getUnifiedLogsCount>>
-export type UnifiedLogsCountError = ResponseError
+export type UnifiedLogsCountError = StudioError
 
 export const useUnifiedLogsCountQuery = <TData = UnifiedLogsCountData>(
   { projectRef, search }: UnifiedLogsVariables,
@@ -90,7 +94,7 @@ export const useUnifiedLogsCountQuery = <TData = UnifiedLogsCountData>(
     ...options
   }: UseCustomQueryOptions<UnifiedLogsCountData, UnifiedLogsCountError, TData> = {}
 ) => {
-  const useOtel = useFlag('otelUnifiedLogs')
+  const useOtel = useUnifiedLogsBackend(search)
   return useQuery<UnifiedLogsCountData, UnifiedLogsCountError, TData>({
     queryKey: [...logsKeys.unifiedLogsCount(projectRef, search), { otel: useOtel }],
     queryFn: ({ signal }) => getUnifiedLogsCount({ projectRef, search, useOtel }, signal),

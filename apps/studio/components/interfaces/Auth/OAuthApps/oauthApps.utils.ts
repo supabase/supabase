@@ -27,8 +27,8 @@ export function filterOAuthApps({
     // Filter by search string
     if (searchString) {
       const searchLower = searchString.toLowerCase()
-      const matchesName = app.client_name.toLowerCase().includes(searchLower)
-      const matchesClientId = app.client_id.toLowerCase().includes(searchLower)
+      const matchesName = app.client_name?.toLowerCase().includes(searchLower) ?? false
+      const matchesClientId = app.client_id?.toLowerCase().includes(searchLower) ?? false
       if (!matchesName && !matchesClientId) {
         return false
       }

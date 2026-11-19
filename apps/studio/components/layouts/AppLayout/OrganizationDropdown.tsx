@@ -1,5 +1,5 @@
 import { useParams } from 'common'
-import { Boxes } from 'lucide-react'
+import { BoxesIcon } from 'lucide-react'
 import Link from 'next/link'
 import { useRouter } from 'next/router'
 import { useState } from 'react'
@@ -17,15 +17,8 @@ import PartnerIcon from '@/components/ui/PartnerIcon'
 import { useOrganizationsQuery } from '@/data/organizations/organizations-query'
 import { useIsFeatureEnabled } from '@/hooks/misc/useIsFeatureEnabled'
 import { useSelectedOrganizationQuery } from '@/hooks/misc/useSelectedOrganization'
-import { useTrackExperimentExposure } from '@/hooks/misc/useTrackExperimentExposure'
-import { usePHFlag } from '@/hooks/ui/useFlag'
 import { MANAGED_BY } from '@/lib/constants/infrastructure'
 import { useTrack } from '@/lib/telemetry/track'
-
-// GROWTH-775. Delete this block and the `trailingContent` branch below once the readout
-// lands — either inline the linked badge for everyone, or revert to the plain one.
-const PLAN_BADGE_UPGRADE_EXPERIMENT_ID = 'plan_badge_upgrade'
-type PlanBadgeUpgradeVariant = 'control' | 'test'
 
 interface OrganizationDropdownProps {
   embedded?: boolean
@@ -52,19 +45,13 @@ export const OrganizationDropdown = ({
   const slug = selectedOrganization?.slug
   const orgName = selectedOrganization?.name
 
-  // GROWTH-775 experiment: in the `test` arm the Free plan badge links into the upgrade
-  // funnel. Partner-managed orgs are excluded — they change plans at the partner, and
-  // PlanUpdateSidePanel disables every paid tier for them, so they can't convert here.
-  const planBadgeFlag = usePHFlag<PlanBadgeUpgradeVariant | false>('planBadgeUpgrade')
-  const isUpgradableOrg =
+  // The Free plan badge links into the upgrade funnel. Partner-managed orgs are excluded: they
+  // change plans at the partner, and PlanUpdateSidePanel disables every paid tier for them.
+  const showPlanBadgeUpgrade =
+    !!slug &&
     selectedOrganization?.plan.id === 'free' &&
     selectedOrganization.managed_by === MANAGED_BY.SUPABASE &&
     !selectedOrganization.billing_partner
-  const isInPlanBadgeExperiment = planBadgeFlag === 'control' || planBadgeFlag === 'test'
-  const planBadgeVariant = isUpgradableOrg && isInPlanBadgeExperiment ? planBadgeFlag : undefined
-  useTrackExperimentExposure(PLAN_BADGE_UPGRADE_EXPERIMENT_ID, planBadgeVariant)
-
-  const showPlanBadgeUpgrade = planBadgeVariant === 'test' && !!slug
 
   const [open, setOpen] = useState(false)
   const close = useEmbeddedCloseHandler(embedded, onClose, setOpen)
@@ -101,7 +88,7 @@ export const OrganizationDropdown = ({
       linkHref={slug ? `/org/${slug}` : '/organizations'}
       linkContent={
         <>
-          <Boxes size={14} strokeWidth={1.5} className="text-foreground-lighter" />
+          <BoxesIcon size={14} strokeWidth={1.5} className="text-foreground-lighter" />
           <span
             className={cn(
               'md:max-w-32 lg:max-w-none truncate hidden md:block',
@@ -111,8 +98,8 @@ export const OrganizationDropdown = ({
             {orgName ?? 'Select an organization'}
           </span>
           {!!selectedOrganization && <PartnerIcon organization={selectedOrganization} />}
-          {/* In the experiment's `test` arm the badge is rendered as a clickable sibling
-              (via `trailingContent`) instead, to avoid nesting an `<a>` inside the org link. */}
+          {/* When upgradable, the badge is rendered as a clickable sibling (via `trailingContent`)
+              instead, to avoid nesting an `<a>` inside the org link. */}
           {!!selectedOrganization && !showPlanBadgeUpgrade && (
             <Badge variant="default">{selectedOrganization?.plan.name}</Badge>
           )}

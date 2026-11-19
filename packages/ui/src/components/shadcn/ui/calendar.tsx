@@ -83,7 +83,8 @@ function Calendar({ className, classNames, showOutsideDays = true, ...props }: C
           day_button
         ),
         selected: cn(
-          !fullDateRangeSelected && 'bg-brand-400! dark:bg-brand-500! text-foreground rounded-md',
+          !fullDateRangeSelected &&
+            'bg-primary-bright/70! dark:bg-primary-bright/25! text-foreground rounded-md',
           selected
         ),
         // Plain accent — range/selected fills use ! so they still win when today is in the selection
@@ -94,15 +95,17 @@ function Calendar({ className, classNames, showOutsideDays = true, ...props }: C
         ),
         disabled: cn('text-foreground-muted opacity-50', disabled),
         range_start: cn(
-          fullDateRangeSelected && 'bg-brand-400! dark:bg-brand-500! text-foreground rounded-l-md',
+          fullDateRangeSelected &&
+            'bg-primary-bright/70! dark:bg-primary-bright/25! text-foreground rounded-l-md',
           range_start
         ),
         range_middle: cn(
-          'bg-brand-200! dark:bg-brand-400! text-foreground rounded-none',
+          'bg-primary-bright/25! dark:bg-primary-bright/12! text-foreground rounded-none',
           range_middle
         ),
         range_end: cn(
-          fullDateRangeSelected && 'bg-brand-400! dark:bg-brand-500! text-foreground rounded-r-md',
+          fullDateRangeSelected &&
+            'bg-primary-bright/70! dark:bg-primary-bright/25! text-foreground rounded-r-md',
           range_end
         ),
         hidden: cn('invisible', hidden),

@@ -1,6 +1,6 @@
 import type { components } from '@/data/api'
 
-type ProjectStatus = components['schemas']['ProjectDetailResponse']['status']
+type ProjectStatus = components['schemas']['ProjectDetailResponse_Output']['status']
 
 const STORAGE_KEY = 'devToolbar:projectStatusOverrides'
 

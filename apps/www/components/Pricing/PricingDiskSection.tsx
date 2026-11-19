@@ -1,13 +1,13 @@
-import { Button } from 'ui'
-import Panel from '../Panel'
-import Link from 'next/link'
 import { ArrowUpRight } from 'lucide-react'
+import { Button } from 'ui'
+
+import Panel from '../Panel'
 
 const diskTypes = [
   {
     name: 'General Purpose',
     tagline: 'Balance between price and performance',
-    maxSize: '16 TB',
+    maxSize: '64 TB',
     size: '8 GB included\nthen $0.125 per GB',
     iops: '3,000 IOPS included\nthen $0.024 per IOPS',
     throughput: '125 MB/s included\nthen $0.095 per MB/s',
@@ -73,7 +73,7 @@ const PricingDiskSection = () => (
             <tbody key={`${diskType.name}-mobile`}>
               <tr>
                 <th className="py-3 pl-4 text-left font-medium pt-16 lg:pt-3 w-[60%]">Disk Type</th>
-                <td className="px-4 py-3 text-brand pt-16 lg:pt-3">{diskType.name}</td>
+                <td className="px-4 py-3 text-primary pt-16 lg:pt-3">{diskType.name}</td>
               </tr>
               <tr>
                 <th className="py-3 pl-4 text-left font-medium ">Max Size</th>
@@ -101,10 +101,10 @@ const PricingDiskSection = () => (
       </div>
     </Panel>
     <div className="mt-8 flex justify-center">
-      <Button asChild size="tiny" variant="default" iconRight={<ArrowUpRight className="w-4" />}>
-        <Link href="https://supabase.com/docs/guides/platform/compute-and-disk#disk">
+      <Button asChild size="tiny" iconRight={<ArrowUpRight className="w-4" />}>
+        <a href="https://supabase.com/docs/guides/platform/compute-and-disk#disk">
           Learn about advanced disk config
-        </Link>
+        </a>
       </Button>
     </div>
   </div>

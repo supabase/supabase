@@ -5,24 +5,15 @@ import { OrganizationDropdown } from './OrganizationDropdown'
 import { MANAGED_BY } from '@/lib/constants/infrastructure'
 import { createMockOrganization, render } from '@/tests/helpers'
 
-const {
-  mockUseIsFeatureEnabled,
-  mockUseOrganizationsQuery,
-  mockUseSelectedOrganizationQuery,
-  mockUsePHFlag,
-} = vi.hoisted(() => ({
-  mockUseIsFeatureEnabled: vi.fn(),
-  mockUseOrganizationsQuery: vi.fn(),
-  mockUseSelectedOrganizationQuery: vi.fn(),
-  mockUsePHFlag: vi.fn(),
-}))
+const { mockUseIsFeatureEnabled, mockUseOrganizationsQuery, mockUseSelectedOrganizationQuery } =
+  vi.hoisted(() => ({
+    mockUseIsFeatureEnabled: vi.fn(),
+    mockUseOrganizationsQuery: vi.fn(),
+    mockUseSelectedOrganizationQuery: vi.fn(),
+  }))
 
 vi.mock('@/hooks/misc/useIsFeatureEnabled', () => ({
   useIsFeatureEnabled: mockUseIsFeatureEnabled,
-}))
-
-vi.mock('@/hooks/ui/useFlag', () => ({
-  usePHFlag: mockUsePHFlag,
 }))
 
 vi.mock('@/data/organizations/organizations-query', () => ({
@@ -38,12 +29,14 @@ vi.mock('@/components/ui/PartnerIcon', () => ({
     organization.managed_by === MANAGED_BY.SUPABASE ? null : <div data-testid="partner-icon" />,
 }))
 
+const findUpgradeLink = () =>
+  screen
+    .getAllByRole('link')
+    .find((link) => link.getAttribute('href')?.includes('panel=subscriptionPlan'))
+
 describe('OrganizationDropdown', () => {
   beforeEach(() => {
-    vi.clearAllMocks()
     mockUseIsFeatureEnabled.mockReturnValue(false)
-    // Default to the control arm so the plan badge stays inline (non-clickable).
-    mockUsePHFlag.mockReturnValue('control')
     mockUseOrganizationsQuery.mockReturnValue({
       data: [
         createMockOrganization({ slug: 'org-one', name: 'Org One' }),
@@ -84,8 +77,7 @@ describe('OrganizationDropdown', () => {
     expect(within(selectedLink).queryByTestId('partner-icon')).toBeNull()
   })
 
-  it('renders the plan badge as an upgrade link in the experiment test arm', () => {
-    mockUsePHFlag.mockReturnValue('test')
+  it('renders the plan badge as an upgrade link for a Free Supabase-managed org', () => {
     mockUseSelectedOrganizationQuery.mockReturnValue({
       data: createMockOrganization({ slug: 'org-one', name: 'Org One' }),
     })
@@ -99,8 +91,7 @@ describe('OrganizationDropdown', () => {
     expect(screen.getByRole('link', { name: /org one/i })).toHaveAttribute('href', '/org/org-one')
   })
 
-  it('keeps the plan badge inline for a partner-managed org in the test arm', () => {
-    mockUsePHFlag.mockReturnValue('test')
+  it('keeps the plan badge inline for a partner-managed org', () => {
     mockUseSelectedOrganizationQuery.mockReturnValue({
       data: createMockOrganization({
         slug: 'org-one',
@@ -112,23 +103,47 @@ describe('OrganizationDropdown', () => {
     render(<OrganizationDropdown />)
 
     // Partner-managed orgs can't change plans here, so they never get the upgrade link.
-    const upgradeLink = screen
-      .getAllByRole('link')
-      .find((link) => link.getAttribute('href')?.includes('panel=subscriptionPlan'))
-    expect(upgradeLink).toBeUndefined()
+    expect(findUpgradeLink()).toBeUndefined()
   })
 
-  it('keeps the plan badge non-clickable in the control arm', () => {
+  it('keeps the plan badge inline for an org with a billing partner', () => {
     mockUseSelectedOrganizationQuery.mockReturnValue({
-      data: createMockOrganization({ slug: 'org-one', name: 'Org One' }),
+      data: createMockOrganization({
+        slug: 'org-one',
+        name: 'Org One',
+        billing_partner: 'aws_marketplace',
+      }),
     })
 
     render(<OrganizationDropdown />)
 
-    const upgradeLink = screen
-      .getAllByRole('link')
-      .find((link) => link.getAttribute('href')?.includes('panel=subscriptionPlan'))
-    expect(upgradeLink).toBeUndefined()
+    expect(findUpgradeLink()).toBeUndefined()
+  })
+
+  it('keeps the plan badge inline for an org on a paid plan', () => {
+    mockUseSelectedOrganizationQuery.mockReturnValue({
+      data: createMockOrganization({
+        slug: 'org-one',
+        name: 'Org One',
+        plan: { id: 'pro', name: 'Pro' },
+      }),
+    })
+
+    render(<OrganizationDropdown />)
+
+    expect(findUpgradeLink()).toBeUndefined()
     expect(screen.getByRole('link', { name: /org one/i })).toHaveAttribute('href', '/org/org-one')
+  })
+
+  it('renders organization command items as links', () => {
+    mockUseSelectedOrganizationQuery.mockReturnValue({
+      data: createMockOrganization({ slug: 'org-one', name: 'Org One' }),
+    })
+
+    render(<OrganizationDropdown embedded />)
+
+    const organizationLink = screen.getByRole('link', { name: /org two/i })
+    expect(within(organizationLink).getByRole('option')).toBeInTheDocument()
+    expect(organizationLink).toHaveAttribute('href', '/org/org-two')
   })
 })

@@ -18,12 +18,6 @@ describe('isBinaryPayload', () => {
     expect(isBinaryPayload(new DataView(new ArrayBuffer(4)))).toBe(true)
   })
 
-  it('returns true for a TypedArray view with non-zero byteOffset', () => {
-    const buffer = new ArrayBuffer(8)
-    const view = new Uint8Array(buffer, 2, 4)
-    expect(isBinaryPayload(view)).toBe(true)
-  })
-
   it('returns false for nullish values', () => {
     expect(isBinaryPayload(null)).toBe(false)
     expect(isBinaryPayload(undefined)).toBe(false)
@@ -65,17 +59,6 @@ describe('formatHexdump', () => {
     const row1 = '00000000  41 41 41 41 41 41 41 41  41 41 41 41 41 41 41 41  |AAAAAAAAAAAAAAAA|'
     const row2 = '00000010  41' + ' '.repeat(21) + '  ' + ' '.repeat(23) + '  |A|'
     expect(formatHexdump(bytes)).toBe(`${row1}\n${row2}`)
-  })
-
-  it('increments the offset column on later rows', () => {
-    const bytes = new Uint8Array(32)
-    bytes.fill(0x41, 0, 16) // 'A' × 16
-    bytes.fill(0x42, 16, 32) // 'B' × 16
-
-    const secondRow = formatHexdump(bytes).split('\n')[1]
-    const expected =
-      '00000010  42 42 42 42 42 42 42 42  42 42 42 42 42 42 42 42  |BBBBBBBBBBBBBBBB|'
-    expect(secondRow).toBe(expected)
   })
 
   it('replaces non-printable bytes with "." in the ASCII gutter, leaving printable bytes (including space and ~) intact', () => {

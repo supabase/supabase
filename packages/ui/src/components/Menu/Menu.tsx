@@ -74,7 +74,8 @@ export const menuItemVariants = cva(
       {
         type: 'border',
         active: true,
-        className: 'text-foreground-muted border-l border-brand group-hover:border-brand',
+        className:
+          'text-foreground-muted border-l border-primary-bright group-hover:border-primary-bright',
       },
       {
         type: 'border',

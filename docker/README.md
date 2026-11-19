@@ -85,7 +85,7 @@ Share your self-hosting experience:
 Before deploying to production, you must:
 - [Update](https://supabase.com/docs/guides/self-hosting/docker#configuring-and-securing-supabase) all default passwords and secrets in the `.env` file
 - Review and update CORS settings
-- Consider setting up a secure proxy in front of self-hosted Supabase
+- Set up a [secure proxy](https://supabase.com/docs/guides/self-hosting/self-hosted-proxy-https) in front of your self-hosted Supabase
 - Review and adjust network security configuration (ACLs, etc.)
 - Set up proper backup procedures
 

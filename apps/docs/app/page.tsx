@@ -5,7 +5,7 @@ import { cn } from 'ui'
 import { TextLink } from 'ui-patterns/TextLink'
 
 import { FrameworkQuickstarts } from '@/components/FrameworkQuickstarts'
-import { MIGRATION_PAGES } from '@/components/Navigation/NavigationMenu/NavigationMenu.constants'
+import { resourcesMigrate } from '@/data/content-listings/resources.data'
 import { GlassPanelWithIconPicker } from '@/features/ui/GlassPanelWithIconPicker'
 import { IconLinkImage, IconLinkList, IconLinkMenuIcon } from '@/features/ui/IconLink'
 import HomeLayout from '@/layouts/HomeLayout'
@@ -19,6 +19,11 @@ const { sdkCsharp, sdkDart, sdkKotlin, sdkPython, sdkSwift } = isFeatureEnabled(
   'sdk:swift',
 ])
 
+const SECTION_CLASS_NAME = cn(
+  'flex flex-col gap-6 py-12 lg:grid lg:grid-cols-12 lg:gap-x-16',
+  'layout-v2:lg:flex layout-v2:@3xl:grid layout-v2:@3xl:grid-cols-12 layout-v2:@3xl:gap-x-16'
+)
+
 const generateMetadata = async (_, parent: ResolvingMetadata): Promise<Metadata> => {
   const parentAlternates = (await parent).alternates
 
@@ -28,10 +33,7 @@ const generateMetadata = async (_, parent: ResolvingMetadata): Promise<Metadata>
       ...(parentAlternates && {
         languages: parentAlternates.languages || undefined,
         media: parentAlternates.media || undefined,
-        types: {
-          ...(parentAlternates.types ?? {}),
-          'text/markdown': 'https://supabase.com/llms-full.txt',
-        },
+        types: parentAlternates.types || undefined,
       }),
     },
   }
@@ -54,7 +56,6 @@ const products = [
     href: '/guides/auth',
     description:
       'Add and manage email and password, passwordless, OAuth, and mobile logins to your project through a suite of identity providers and APIs.',
-    span: 'col-span-12 md:col-span-6',
   },
   {
     title: 'Storage',
@@ -177,7 +178,7 @@ const additionalResources = [
     title: 'AI tools',
     description: 'Develop with Supabase AI-first using plugins, MCP, and skills.',
     icon: 'ai-tools',
-    href: '/guides/ai',
+    href: '/guides/ai-tools',
   },
   {
     title: 'Platform guides',
@@ -214,19 +215,19 @@ const additionalResources = [
     title: 'Troubleshooting',
     description: 'Our troubleshooting guide for solutions to common Supabase issues.',
     icon: 'troubleshooting',
-    href: '/guides/troubleshooting',
+    href: 'https://supabase.com/kb/topics/troubleshooting',
   },
 ]
 
-const migrationGuides = [...MIGRATION_PAGES]
-  .sort((a, b) => (a.name || '').localeCompare(b.name || ''))
+const migrationGuides = [...resourcesMigrate.items]
+  .sort((a, b) => a.title.localeCompare(b.title))
   .flatMap((guide) => {
-    if (!guide.name || !guide.url || typeof guide.icon !== 'string') return []
+    if (!guide.href || typeof guide.icon !== 'string') return []
 
     return [
       {
-        title: guide.name,
-        href: guide.url,
+        title: guide.title,
+        href: guide.href,
         icon: <IconLinkImage path={guide.icon} hasLightIcon={guide.hasLightIcon} />,
       },
     ]
@@ -236,7 +237,7 @@ const HomePage = () => (
   <HomeLayout>
     <div className="flex flex-col">
       {isFeatureEnabled('docs:full_getting_started') && (
-        <div className="flex flex-col gap-6 border-b py-12 lg:grid lg:grid-cols-12 lg:gap-x-16">
+        <div className={cn(SECTION_CLASS_NAME, 'border-b')}>
           <div className="col-span-4 flex flex-col gap-1 [&_h2]:m-0">
             <h2 id="connect-a-framework" className="group scroll-mt-24">
               Connect a framework
@@ -251,7 +252,7 @@ const HomePage = () => (
           </div>
         </div>
       )}
-      <div className="flex flex-col gap-6 border-b py-12 lg:grid lg:grid-cols-12 lg:gap-x-16">
+      <div className={cn(SECTION_CLASS_NAME, 'border-b')}>
         <div className="col-span-4 flex flex-col gap-1 [&_h2]:m-0">
           <h2 id="products" className="group scroll-mt-24">
             Build your backend
@@ -267,7 +268,13 @@ const HomePage = () => (
         >
           {products.map((product) => {
             return (
-              <li key={product.title} className={cn(product.span ?? 'col-span-12 md:col-span-6')}>
+              <li
+                key={product.title}
+                className={cn(
+                  product.span ??
+                    'col-span-12 md:col-span-6 layout-v2:md:col-span-12 layout-v2:@xl:col-span-6'
+                )}
+              >
                 <Link href={product.href} passHref>
                   <GlassPanelWithIconPicker {...product}>
                     {product.description}
@@ -279,7 +286,7 @@ const HomePage = () => (
         </ul>
       </div>
 
-      <div className="flex flex-col gap-6 border-b py-12 lg:grid lg:grid-cols-12 lg:gap-x-16">
+      <div className={cn(SECTION_CLASS_NAME, 'border-b')}>
         <div className="col-span-4 flex flex-col gap-1 [&_h2]:m-0">
           <h2 id="postgres-integrations" className="scroll-mt-24">
             Extend your database
@@ -299,7 +306,7 @@ const HomePage = () => (
         />
       </div>
 
-      <div className="flex flex-col gap-6 border-b py-12 lg:grid lg:grid-cols-12 lg:gap-x-16">
+      <div className={cn(SECTION_CLASS_NAME, 'border-b')}>
         <div className="col-span-4 flex flex-col gap-1 [&_h2]:m-0 [&_h3]:m-0">
           <h2 id="client-libraries" className="group scroll-mt-24">
             Use a client library
@@ -322,7 +329,7 @@ const HomePage = () => (
         />
       </div>
       {isFeatureEnabled('docs:full_getting_started') && (
-        <div className="flex flex-col gap-6 border-b py-12 lg:grid lg:grid-cols-12 lg:gap-x-16">
+        <div className={cn(SECTION_CLASS_NAME, 'border-b')}>
           <div className="col-span-4 flex flex-col gap-1 [&_h2]:m-0">
             <h2 id="migrate-to-supabase" className="group scroll-mt-24">
               Migrate to Supabase
@@ -333,7 +340,7 @@ const HomePage = () => (
             <TextLink
               label="Explore more resources"
               url="/guides/resources"
-              className="no-underline text-brand-link text-sm"
+              className="no-underline text-primary text-sm"
             />
           </div>
 
@@ -345,7 +352,7 @@ const HomePage = () => (
         </div>
       )}
 
-      <div className="flex flex-col gap-6 border-b py-12 lg:grid lg:grid-cols-12 lg:gap-x-16">
+      <div className={cn(SECTION_CLASS_NAME, 'border-b')}>
         <div className="col-span-4 flex flex-col gap-1 [&_h2]:m-0">
           <h2 id="additional-resources" className="group scroll-mt-24">
             Explore more
@@ -361,7 +368,10 @@ const HomePage = () => (
         >
           {additionalResources.map((resource) => {
             return (
-              <li key={resource.title} className="col-span-12 md:col-span-6">
+              <li
+                key={resource.title}
+                className="col-span-12 md:col-span-6 layout-v2:md:col-span-12 layout-v2:@xl:col-span-6"
+              >
                 <Link
                   href={resource.href}
                   passHref
@@ -377,7 +387,7 @@ const HomePage = () => (
         </ul>
       </div>
       {isFeatureEnabled('docs:full_getting_started') && (
-        <div className="flex flex-col gap-6 py-12 lg:grid lg:grid-cols-12 lg:gap-x-16">
+        <div className={SECTION_CLASS_NAME}>
           <div className="col-span-4 flex flex-col gap-1">
             <div className="md:max-w-xs 2xl:max-w-none">
               <div className="flex items-center gap-3 mb-3 text-brand-600">
@@ -391,7 +401,7 @@ const HomePage = () => (
               <TextLink
                 label="More on self-hosting"
                 url="/guides/self-hosting"
-                className="no-underline text-brand-link text-sm"
+                className="no-underline text-primary text-sm"
               />
             </div>
           </div>

@@ -13,7 +13,7 @@ import {
   verticalListSortingStrategy,
 } from '@dnd-kit/sortable'
 import { zodResolver } from '@hookform/resolvers/zod'
-import { AlertCircle, ExternalLink, Plus } from 'lucide-react'
+import { AlertCircleIcon, ExternalLinkIcon, PlusIcon } from 'lucide-react'
 import Link from 'next/link'
 import { useEffect, useRef } from 'react'
 import { useFieldArray, useForm } from 'react-hook-form'
@@ -184,19 +184,14 @@ const CreateEnumeratedTypeSidePanel = ({
                 Values
               </span>
               <Alert>
-                <AlertCircle strokeWidth={1.5} />
+                <AlertCircleIcon strokeWidth={1.5} />
                 <AlertTitle>After creation, values cannot be deleted or sorted</AlertTitle>
                 <AlertDescription>
                   <p className="leading-normal! track">
                     You will need to delete and recreate the enumerated type with the updated values
                     instead.
                   </p>
-                  <Button
-                    asChild
-                    variant="default"
-                    icon={<ExternalLink strokeWidth={1.5} />}
-                    className="mt-2"
-                  >
+                  <Button asChild icon={<ExternalLinkIcon strokeWidth={1.5} />} className="mt-2">
                     <Link
                       href="https://www.postgresql.org/message-id/21012.1459434338%40sss.pgh.pa.us"
                       target="_blank"
@@ -228,15 +223,11 @@ const CreateEnumeratedTypeSidePanel = ({
               </DndContext>
             </div>
 
-            <Button
-              variant="default"
-              icon={<Plus strokeWidth={1.5} />}
-              onClick={() => append({ value: '' })}
-            >
+            <Button icon={<PlusIcon strokeWidth={1.5} />} onClick={() => append({ value: '' })}>
               Add value
             </Button>
 
-            <Button ref={submitRef} type="submit" variant="default" className="hidden">
+            <Button ref={submitRef} type="submit" className="hidden">
               Update
             </Button>
           </form>

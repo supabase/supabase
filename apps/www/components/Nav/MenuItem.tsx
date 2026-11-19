@@ -1,7 +1,9 @@
 import { ChevronRight } from 'lucide-react'
 import Link from 'next/link'
 import React from 'react'
-import { cn } from 'ui'
+import { Badge, cn } from 'ui'
+
+import { isCrossZoneHref } from '@/lib/cross-zone'
 
 const MenuItem = React.forwardRef<
   React.ElementRef<'a'>,
@@ -10,6 +12,10 @@ const MenuItem = React.forwardRef<
     icon?: string
     hasChevron?: boolean
     hoverColor?: 'foreground' | 'brand'
+    badge?: {
+      label: string
+      variant?: 'default' | 'warning' | 'success' | 'destructive' | 'secondary'
+    }
   }
 >(
   (
@@ -22,67 +28,70 @@ const MenuItem = React.forwardRef<
       hasChevron,
       children,
       hoverColor = 'foreground',
+      badge,
       ...props
     },
     ref
   ) => {
-    return (
-      <Link
-        href={href}
-        ref={ref}
-        className={cn(
-          'group/menu-item flex items-center text-foreground-light text-sm hover:text-foreground select-none gap-3 rounded-md p-2 leading-none no-underline focus-ring focus-visible:text-foreground',
-          description && 'items-center',
-          className
+    const content = children ?? (
+      <>
+        {icon && (
+          <div className="shrink-0 border bg-surface-200 min-w-10 w-10 h-10 flex items-center justify-center rounded-lg">
+            <svg
+              className="h-5 w-5 group-hover/menu-item:text-foreground group-focus-visible/menu-item:text-foreground"
+              xmlns="http://www.w3.org/2000/svg"
+              fill="none"
+              viewBox="0 0 24 24"
+              aria-hidden="true"
+            >
+              <path
+                strokeLinecap="round"
+                strokeLinejoin="round"
+                strokeWidth="1.5"
+                d={icon}
+                stroke="currentColor"
+              />
+            </svg>
+          </div>
         )}
-        {...props}
-      >
-        {children ?? (
-          <>
-            {icon && (
-              <div className="shrink-0 border bg-surface-200 min-w-10 w-10 h-10 flex items-center justify-center rounded-lg">
-                <svg
-                  className="h-5 w-5 group-hover/menu-item:text-foreground group-focus-visible/menu-item:text-foreground"
-                  xmlns="http://www.w3.org/2000/svg"
-                  fill="none"
-                  viewBox="0 0 24 24"
-                  aria-hidden="true"
-                >
-                  <path
-                    strokeLinecap="round"
-                    strokeLinejoin="round"
-                    strokeWidth="1.5"
-                    d={icon}
-                    stroke="currentColor"
-                  />
-                </svg>
-              </div>
-            )}
-            <div className="flex flex-col justify-center">
-              <div className="flex items-center gap-1">
-                <p
-                  className={cn(
-                    'leading-snug text-foreground',
-                    hoverColor === 'brand' && 'group-hover/menu-item:text-brand-link'
-                  )}
-                >
-                  {title}
-                </p>
-                {hasChevron && (
-                  <ChevronRight
-                    strokeWidth={2}
-                    className="w-3 h-3 text-foreground transition-all will-change-transform -translate-x-1 opacity-0 group-hover/menu-item:translate-x-0 group-hover/menu-item:opacity-100"
-                  />
-                )}
-              </div>
-              {description && (
-                <p className="line-clamp-2 leading-snug text-foreground-lighter group-hover/menu-item:text-foreground-light group-focus-visible/menu-item:text-foreground-light text-xs">
-                  {description}
-                </p>
+        <div className="flex flex-col justify-center">
+          <div className="flex items-center gap-1">
+            <p
+              className={cn(
+                'leading-snug text-foreground',
+                hoverColor === 'brand' && 'group-hover/menu-item:text-primary'
               )}
-            </div>
-          </>
-        )}
+            >
+              {title}
+            </p>
+            {badge && <Badge variant={badge.variant}>{badge.label}</Badge>}
+            {hasChevron && (
+              <ChevronRight
+                strokeWidth={2}
+                className="w-3 h-3 text-foreground transition-all will-change-transform -translate-x-1 opacity-0 group-hover/menu-item:translate-x-0 group-hover/menu-item:opacity-100"
+              />
+            )}
+          </div>
+          {description && (
+            <p className="line-clamp-2 leading-snug text-foreground-lighter group-hover/menu-item:text-foreground-light group-focus-visible/menu-item:text-foreground-light text-xs">
+              {description}
+            </p>
+          )}
+        </div>
+      </>
+    )
+    const linkClassName = cn(
+      'group/menu-item flex items-center text-foreground-light text-sm hover:text-foreground select-none gap-3 rounded-md p-2 leading-none no-underline focus-ring focus-visible:text-foreground',
+      description && 'items-center',
+      className
+    )
+    return isCrossZoneHref(href) ? (
+      <a href={href} ref={ref} className={linkClassName} {...props}>
+        {content}
+      </a>
+    ) : (
+      <Link href={href} ref={ref} className={linkClassName} {...props}>
+        {content}
       </Link>
     )
   }

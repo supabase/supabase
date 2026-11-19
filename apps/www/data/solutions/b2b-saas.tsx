@@ -1,4 +1,5 @@
 import { CubeIcon } from '@heroicons/react/outline'
+import { DASHBOARD_SIGN_UP_URL } from '@/lib/dashboard-links'
 import { useBreakpoint } from 'common'
 import {
   Check,
@@ -91,7 +92,7 @@ const data: () => {
       ctas: [
         {
           label: 'Start your project',
-          href: 'https://supabase.com/dashboard',
+          href: DASHBOARD_SIGN_UP_URL,
           type: 'primary' as any,
           onClick: () =>
             sendTelemetryEvent({
@@ -224,7 +225,7 @@ const data: () => {
           Or, start with <span className="text-foreground">Supabase AI Prompts</span>
         </>
       ),
-      docsUrl: 'https://supabase.com/docs/guides/getting-started/ai-prompts',
+      docsUrl: 'https://supabase.com/docs/guides/ai-tools/ai-prompts',
       leftFooter: (
         <div className="grid grid-cols-5 divide-x divide-y rounded-lg overflow-hidden border">
           {frameworks.map((framework) => (
@@ -238,16 +239,14 @@ const data: () => {
           title: 'Bootstrap Next.js app with Supabase Auth',
           code: 'Set up Supabase Auth with Next.js: install @supabase/supabase-js and @supabase/ssr, configure environment variables, create browser and server clients, and add middleware for token refresh.',
           language: 'markdown',
-          docsUrl:
-            'https://supabase.com/docs/guides/getting-started/ai-prompts/nextjs-supabase-auth',
+          docsUrl: 'https://supabase.com/docs/guides/ai-tools/ai-prompts/nextjs-supabase-auth',
         },
         {
           id: 'rls-policies',
           title: 'Create RLS policies',
           code: "Generate Row Level Security policies for tenant isolation. Retrieve your schema, then write policies that restrict users to their tenant's data using the auth.uid() or custom claims.",
           language: 'markdown',
-          docsUrl:
-            'https://supabase.com/docs/guides/getting-started/ai-prompts/database-rls-policies',
+          docsUrl: 'https://supabase.com/docs/guides/ai-tools/ai-prompts/database-rls-policies',
         },
       ],
     },

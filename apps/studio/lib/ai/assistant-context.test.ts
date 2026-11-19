@@ -10,6 +10,7 @@ describe('buildAssistantContextMessages', () => {
       projectRef: 'abcdefghijklmnopqrst',
       chatName: 'Slow queries',
       schemasString: SCHEMAS,
+      now: new Date('2026-08-20T06:53:00.000Z'),
     })
 
     expect(messages).toHaveLength(1)
@@ -17,6 +18,8 @@ describe('buildAssistantContextMessages', () => {
     expect(messages[0].content).toContain('abcdefghijklmnopqrst')
     expect(messages[0].content).toContain(SCHEMAS)
     expect(messages[0].content).toContain('Slow queries')
+    expect(messages[0].content).toContain('2026-08-20T06:53:00.000Z')
+    expect(messages[0].content).toContain('iso_timestamp_start')
   })
 
   it('omits the project message when there is nothing to say', () => {
@@ -27,6 +30,16 @@ describe('buildAssistantContextMessages', () => {
     expect(messages).toEqual([])
   })
 
+  it('tells the model the current opt-in level so it does not ask for access it has', () => {
+    const messages = buildAssistantContextMessages({
+      schemasString: NO_SCHEMA_ACCESS_MESSAGE,
+      aiOptInLevel: 'schema_and_log_and_data',
+    })
+
+    expect(messages).toHaveLength(1)
+    expect(messages[0].content).toContain('schema_and_log_and_data')
+  })
+
   it('adds the support instructions in support mode', () => {
     const messages = buildAssistantContextMessages({
       schemasString: NO_SCHEMA_ACCESS_MESSAGE,
@@ -34,7 +47,7 @@ describe('buildAssistantContextMessages', () => {
     })
 
     expect(messages).toHaveLength(1)
-    expect(messages[0].content).toContain('escalate_to_human')
+    expect(messages[0].content).toContain('active support chat')
   })
 
   it('adds ClickHouse instructions when the conversation attached a logs query', () => {
@@ -51,6 +64,7 @@ describe('buildAssistantContextMessages', () => {
     // ...and the table reference, so it doesn't invent BigQuery-style unnests.
     expect(logsContext).toContain('log_attributes')
     expect(logsContext).toContain("where source = 'edge_logs'")
+    expect(logsContext).not.toContain('cannot run')
   })
 
   it('adds nothing extra for a database-only conversation', () => {

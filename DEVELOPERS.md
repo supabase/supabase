@@ -37,7 +37,7 @@ You will need to install and configure the following dependencies on your machin
 - [**Node.js**](https://nodejs.org) (version as documented in [`.nvmrc`](./.nvmrc))
 - [**pnpm**](https://pnpm.io/) (version as documented in the `packageManager` field in [`package.json`](./package.json))
 - [**make**](https://www.gnu.org/software/make/) (or the equivalent to `build-essentials` for your OS)
-- [**Docker**](https://docs.docker.com/get-docker/) (to run studio locally)
+- [**Docker**](https://docs.docker.com/get-started/get-docker/) (to run studio locally)
 
 ## Local development
 
@@ -127,7 +127,7 @@ To run Studio locally, you'll need to setup Docker in addition to your NextJS fr
 
 #### Prerequisites
 
-First, make sure you have the Docker installed on your device. You can download and install it from [here](https://docs.docker.com/get-docker/).
+First, make sure you have the Docker installed on your device. You can download and install it from [here](https://docs.docker.com/get-started/get-docker/).
 
 #### Get Started
 
@@ -175,7 +175,10 @@ We review PRs in the order of their submission. We try to accept the earliest on
 
 ### Add a redirect
 
-Create a new entry in the [`redirects.js`](https://github.com/supabase/supabase/blob/master/apps/www/lib/redirects.js) file in our main site.
+Where the redirect goes depends on the URL:
+
+- **`/docs` URLs:** add the entry to [`apps/docs/lib/redirects/`](https://github.com/supabase/supabase/blob/master/apps/docs/lib/redirects/README.md). Static one-to-one entries go in `static-redirects.json`, and entries with params, splats, or conditions go in `dynamic-redirects.js`.
+- **All other URLs:** add the entry to [`redirects.js`](https://github.com/supabase/supabase/blob/master/apps/www/lib/redirects.js) in the main site.
 
 ---
 

@@ -8,7 +8,7 @@ import {
   ReportsDatetimeHelper,
 } from '@/components/interfaces/Reports/Reports.constants'
 import { DatePickerValue } from '@/components/interfaces/Settings/Logs/Logs.DatePickers'
-import { maybeShowUpgradePromptIfNotEntitled } from '@/components/interfaces/Settings/Logs/Logs.utils'
+import { isStartOutsideRetention } from '@/components/interfaces/Settings/Logs/Logs.utils'
 import { AnalyticsInterval } from '@/data/analytics/constants'
 import { useCheckEntitlements } from '@/hooks/misc/useCheckEntitlements'
 import { useCurrentOrgPlan } from '@/hooks/misc/useCurrentOrgPlan'
@@ -21,6 +21,26 @@ export const getIntervalGranularity = (from: string, to: string): AnalyticsInter
   if (diffInHours <= 12) return '2m'
   if (diffInDays <= 7) return '1h'
   return '1d'
+}
+
+export const resolveHelperFromUrl = (
+  isHelper: boolean,
+  helperText: string
+): ReportsDatetimeHelper | undefined => {
+  if (!isHelper || helperText === '') return undefined
+  return REPORTS_DATEPICKER_HELPERS.find((helper) => helper.text === helperText)
+}
+
+const resolveHelperFromArgument = (
+  defaultHelper: REPORT_DATERANGE_HELPER_LABELS | string | ReportsDatetimeHelper
+): ReportsDatetimeHelper | undefined => {
+  if (typeof defaultHelper === 'string') {
+    return REPORTS_DATEPICKER_HELPERS.find((helper) => helper.text === defaultHelper)
+  }
+  if (defaultHelper && typeof defaultHelper === 'object' && 'text' in defaultHelper) {
+    return defaultHelper
+  }
+  return undefined
 }
 
 export const DATERANGE_LIMITS: { [key: string]: number } = {
@@ -91,15 +111,9 @@ export const useReportDateRange = (
   )
 
   const getDefaultHelper = useCallback(() => {
-    let targetHelper: ReportsDatetimeHelper | undefined
-
-    if (typeof defaultHelper === 'string') {
-      // Find helper by text (supports both enum values and direct strings)
-      targetHelper = REPORTS_DATEPICKER_HELPERS.find((helper) => helper.text === defaultHelper)
-    } else if (defaultHelper && typeof defaultHelper === 'object' && 'text' in defaultHelper) {
-      // Use the provided helper object directly
-      targetHelper = defaultHelper
-    }
+    const targetHelper =
+      resolveHelperFromUrl(Boolean(isHelperValue), helperTextValue ?? '') ??
+      resolveHelperFromArgument(defaultHelper)
 
     // Check if the target helper is available for the current entitlement
     if (targetHelper && hasAccessToHelper(targetHelper)) {
@@ -142,7 +156,7 @@ export const useReportDateRange = (
       end: defaultEnd,
       helper: { isHelper: false },
     }
-  }, [defaultHelper, hasAccessToHelper])
+  }, [defaultHelper, hasAccessToHelper, helperTextValue, isHelperValue])
 
   // Get current effective values (from URL or defaults, but don't set URL)
   const timestampStart = useMemo(() => {
@@ -154,7 +168,7 @@ export const useReportDateRange = (
         storedFrom.isValid() &&
         storedFrom.isAfter(now.subtract(90, 'day')) &&
         storedFrom.isBefore(now.add(1, 'day')) &&
-        !maybeShowUpgradePromptIfNotEntitled(timestampStartValue, entitledToAuditLogDays)
+        !isStartOutsideRetention(timestampStartValue, entitledToAuditLogDays)
       ) {
         return timestampStartValue
       }
@@ -241,10 +255,7 @@ export const useReportDateRange = (
   )
 
   const handleDatePickerChange = (values: DatePickerValue) => {
-    const shouldShowUpgradePrompt = maybeShowUpgradePromptIfNotEntitled(
-      values.from,
-      entitledToAuditLogDays
-    )
+    const shouldShowUpgradePrompt = isStartOutsideRetention(values.from, entitledToAuditLogDays)
     if (shouldShowUpgradePrompt) {
       setShowUpgradePrompt(true)
       return true

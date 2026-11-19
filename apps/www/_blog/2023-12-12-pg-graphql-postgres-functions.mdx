@@ -15,7 +15,7 @@ imgSocial: lwx-pg-graphql/pg-graphql-og.png
 imgThumb: lwx-pg-graphql/pg-graphql-thumb.png
 ---
 
-Supabase GraphQL (pg_graphql) 1.4+ supports the most requested feature: Postgres functions a.k.a. User Defined Functions (UDFs). This addition marks a significant improvement in GraphQL flexibility at Supabase, both as a novel approach to defining entry points into the Graph and as an escape hatch for users to implement custom/complex operations.
+[Supabase GraphQL](https://supabase.com/docs/guides/graphql) (pg_graphql) 1.4+ supports the most requested feature: Postgres functions a.k.a. User Defined Functions (UDFs). This addition marks a significant improvement in GraphQL flexibility at Supabase, both as a novel approach to defining entry points into the Graph and as an escape hatch for users to implement custom/complex operations.
 
 As with all entities in Supabase GraphQL, UDFs support is based on automatically reflecting parts of the SQL schema. The feature allow for the execution of custom SQL logic within GraphQL queries to help support complex, user defined, server-side operations with a simple GraphQL interface.
 
@@ -205,7 +205,7 @@ We look forward to implementing support for many of these features in coming rel
 
 ## Takeaways
 
-If you're an existing Supabase user, but new to GraphQL, head over to [GraphiQL built right into Supabase Studio](https://supabase.com/dashboard/project/_/api/graphiql) for your project to interactively explore your projects through the GraphQL API. User defined function support is new in pg_graphql 1.4+. You can check your project's GraphQL version with:
+If you're an existing Supabase user, but new to GraphQL, head over to [GraphiQL built right into Supabase Studio](https://supabase.com/dashboard/project/_/integrations/graphiql) for your project to interactively explore your projects through the GraphQL API. User defined function support is new in pg_graphql 1.4+. You can check your project's GraphQL version with:
 
 ```sql
 select *
@@ -213,7 +213,7 @@ from pg_available_extensions
 where name = 'pg_graphql';
 ```
 
-To upgrade, check out [our upgrade guide](https://supabase.com/docs/guides/platform/migrating-and-upgrading-projects).
+To upgrade, check out [our upgrade guide](https://supabase.com/docs/guides/platform/upgrading).
 
 For new Supabase users, [creating a new project](http://database.new) will get you the latest version of Supabase GraphQL with UDF support.
 

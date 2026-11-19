@@ -1,6 +1,6 @@
 import { IS_PLATFORM, useParams } from 'common'
 import saveAs from 'file-saver'
-import { ChevronDown, Copy, Download, Settings } from 'lucide-react'
+import { ChevronDownIcon, CopyIcon, DownloadIcon, SettingsIcon } from 'lucide-react'
 import Link from 'next/link'
 import { usePathname } from 'next/navigation'
 import { useMemo } from 'react'
@@ -15,6 +15,7 @@ import {
   KeyboardShortcut,
 } from 'ui'
 
+import { ButtonTooltip } from './ButtonTooltip'
 import {
   convertResultsToCSV,
   convertResultsToJSON,
@@ -28,7 +29,7 @@ interface DownloadResultsButtonProps {
   variant?: 'text' | 'default'
   text?: string
   align?: 'start' | 'center' | 'end'
-  results: any[]
+  results: readonly any[]
   fileName: string
   enableCopyShortcuts?: boolean
   onDownloadAsCSV?: () => void
@@ -127,52 +128,66 @@ export const DownloadResultsButton = ({
   return (
     <DropdownMenu>
       <DropdownMenuTrigger asChild>
-        <Button
-          variant={variant}
-          icon={iconOnly ? <Download /> : undefined}
-          iconRight={iconOnly ? undefined : <ChevronDown />}
-          disabled={results.length === 0}
-          className={iconOnly ? 'w-7' : ''}
-        >
-          {!iconOnly && text}
-        </Button>
+        {iconOnly ? (
+          <ButtonTooltip
+            variant={variant}
+            aria-label="Download results"
+            aria-describedby={undefined}
+            icon={<DownloadIcon />}
+            disabled={results.length === 0}
+            className="w-7"
+            tooltip={{ content: { side: 'bottom', text: 'Download results' } }}
+          />
+        ) : (
+          <Button variant={variant} iconRight={<ChevronDownIcon />} disabled={results.length === 0}>
+            {text}
+          </Button>
+        )}
       </DropdownMenuTrigger>
-      <DropdownMenuContent align={align} className="w-60">
+      <DropdownMenuContent align={align} className={enableCopyShortcuts ? 'w-60' : 'w-44'}>
         {isLogs && IS_PLATFORM && (
           <DropdownMenuItem asChild className="gap-x-2">
             <Link href={`/project/${ref}/settings/log-drains`}>
-              <Settings size={14} />
+              <SettingsIcon size={14} />
               <p>Add a Log Drain</p>
             </Link>
           </DropdownMenuItem>
         )}
         <DropdownMenuItem onClick={copyAsMarkdown} className="gap-x-2">
-          <Copy size={14} />
+          <CopyIcon size={14} />
           <p>Copy as Markdown</p>
-          <span className="ml-auto">
-            <KeyboardShortcut keys={['Shift', 'Meta', 'm']} />
-          </span>
+          {enableCopyShortcuts && (
+            <span className="ml-auto">
+              <KeyboardShortcut keys={['Shift', 'Meta', 'm']} />
+            </span>
+          )}
         </DropdownMenuItem>
         <DropdownMenuItem onClick={copyAsJSON} className="gap-x-2">
-          <Copy size={14} />
+          <CopyIcon size={14} />
           <p>Copy as JSON</p>
-          <span className="ml-auto">
-            <KeyboardShortcut keys={['Shift', 'Meta', 'j']} />
-          </span>
+          {enableCopyShortcuts && (
+            <span className="ml-auto">
+              <KeyboardShortcut keys={['Shift', 'Meta', 'j']} />
+            </span>
+          )}
         </DropdownMenuItem>
         <DropdownMenuItem onClick={copyAsCSV} className="gap-x-2">
-          <Copy size={14} />
+          <CopyIcon size={14} />
           <p>Copy as CSV</p>
-          <span className="ml-auto">
-            <KeyboardShortcut keys={['Shift', 'Meta', 'c']} />
-          </span>
+          {enableCopyShortcuts && (
+            <span className="ml-auto">
+              <KeyboardShortcut keys={['Shift', 'Meta', 'c']} />
+            </span>
+          )}
         </DropdownMenuItem>
         <DropdownMenuItem className="gap-x-2" onClick={() => downloadAsCSV()}>
-          <Download size={14} />
+          <DownloadIcon size={14} />
           <p>Download CSV</p>
-          <span className="ml-auto">
-            <KeyboardShortcut keys={['Shift', 'Meta', 'd']} />
-          </span>
+          {enableCopyShortcuts && (
+            <span className="ml-auto">
+              <KeyboardShortcut keys={['Shift', 'Meta', 'd']} />
+            </span>
+          )}
         </DropdownMenuItem>
       </DropdownMenuContent>
     </DropdownMenu>

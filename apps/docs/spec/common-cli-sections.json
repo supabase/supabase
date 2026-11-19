@@ -36,9 +36,33 @@
         "type": "cli-command"
       },
       {
+        "id": "supabase-logout",
+        "title": "Log out and delete access tokens locally",
+        "slug": "supabase-logout",
+        "type": "cli-command"
+      },
+      {
+        "id": "supabase-whoami",
+        "title": "Show the current user",
+        "slug": "supabase-whoami",
+        "type": "cli-command"
+      },
+      {
         "id": "supabase-link",
         "title": "Link to a Supabase project",
         "slug": "supabase-link",
+        "type": "cli-command"
+      },
+      {
+        "id": "supabase-unlink",
+        "title": "Unlink a Supabase project",
+        "slug": "supabase-unlink",
+        "type": "cli-command"
+      },
+      {
+        "id": "supabase-pull",
+        "title": "Pull remote project state into the local checkout",
+        "slug": "supabase-pull",
         "type": "cli-command"
       },
       {
@@ -106,6 +130,12 @@
         "title": "Generate types (Postgres schema)",
         "slug": "supabase-gen-types",
         "type": "cli-command"
+      },
+      {
+        "id": "supabase-gen-bearer-jwt",
+        "title": "Generate a Bearer Auth JWT for accessing Data API",
+        "slug": "supabase-gen-bearer-jwt",
+        "type": "cli-command"
       }
     ]
   },
@@ -156,9 +186,45 @@
         "type": "cli-command"
       },
       {
+        "id": "supabase-db-advisors",
+        "title": "Check database for security and performance issues",
+        "slug": "supabase-db-advisors",
+        "type": "cli-command"
+      },
+      {
+        "id": "supabase-db-query",
+        "title": "Execute a SQL query against the database",
+        "slug": "supabase-db-query",
+        "type": "cli-command"
+      },
+      {
         "id": "supabase-db-start",
         "title": "Start only the local database",
         "slug": "supabase-db-start",
+        "type": "cli-command"
+      },
+      {
+        "id": "supabase-db-schema",
+        "title": "Manage database schema",
+        "slug": "supabase-db-schema",
+        "type": "cli-command"
+      },
+      {
+        "id": "supabase-db-schema-declarative",
+        "title": "Manage declarative database schemas",
+        "slug": "supabase-db-schema-declarative",
+        "type": "cli-command"
+      },
+      {
+        "id": "supabase-db-schema-declarative-sync",
+        "title": "Generate a new migration from declarative schema",
+        "slug": "supabase-db-schema-declarative-sync",
+        "type": "cli-command"
+      },
+      {
+        "id": "supabase-db-schema-declarative-generate",
+        "title": "Generate declarative schema from a database",
+        "slug": "supabase-db-schema-declarative-generate",
         "type": "cli-command"
       }
     ]
@@ -239,6 +305,12 @@
     "type": "category",
     "title": "Inspect",
     "items": [
+      {
+        "id": "supabase-inspect",
+        "title": "Inspect project tools",
+        "slug": "supabase-inspect",
+        "type": "cli-command"
+      },
       {
         "id": "supabase-inspect-db",
         "title": "Inspect database statistics",
@@ -408,6 +480,18 @@
         "title": "Push config from a local file",
         "slug": "supabase-config-push",
         "type": "cli-command"
+      },
+      {
+        "id": "supabase-config-pull",
+        "title": "Pull remote config into supabase/config.toml",
+        "slug": "supabase-config-pull",
+        "type": "cli-command"
+      },
+      {
+        "id": "supabase-config-diff",
+        "title": "Diff local config against a remote project",
+        "slug": "supabase-config-diff",
+        "type": "cli-command"
       }
     ]
   },
@@ -462,11 +546,29 @@
         "title": "Delete a preview branch",
         "slug": "supabase-branches-delete",
         "type": "cli-command"
+      }
+    ]
+  },
+  {
+    "type": "category",
+    "title": "Backups",
+    "items": [
+      {
+        "id": "supabase-backups",
+        "title": "Manage physical backups",
+        "slug": "supabase-backups",
+        "type": "cli-command"
       },
       {
-        "id": "supabase-branches-disable",
-        "title": "Disable preview branching",
-        "slug": "supabase-branches-disable",
+        "id": "supabase-backups-list",
+        "title": "List available physical backups",
+        "slug": "supabase-backups-list",
+        "type": "cli-command"
+      },
+      {
+        "id": "supabase-backups-restore",
+        "title": "Restore to a specific timestamp using PITR",
+        "slug": "supabase-backups-restore",
         "type": "cli-command"
       }
     ]
@@ -713,6 +815,30 @@
   },
   {
     "type": "category",
+    "title": "Encryption",
+    "items": [
+      {
+        "id": "supabase-encryption",
+        "title": "Manage encryption keys",
+        "slug": "supabase-encryption",
+        "type": "cli-command"
+      },
+      {
+        "id": "supabase-encryption-get-root-key",
+        "title": "Get root encryption key",
+        "slug": "supabase-encryption-get-root-key",
+        "type": "cli-command"
+      },
+      {
+        "id": "supabase-encryption-update-root-key",
+        "title": "Update the root encryption key",
+        "slug": "supabase-encryption-update-root-key",
+        "type": "cli-command"
+      }
+    ]
+  },
+  {
+    "type": "category",
     "title": "Network Bans",
     "items": [
       {
@@ -839,6 +965,30 @@
   },
   {
     "type": "category",
+    "title": "Notebooks",
+    "items": [
+      {
+        "id": "supabase-notebooks",
+        "title": "Manage notebooks",
+        "slug": "supabase-notebooks",
+        "type": "cli-command"
+      },
+      {
+        "id": "supabase-notebooks-pull",
+        "title": "Pull notebooks from Supabase",
+        "slug": "supabase-notebooks-pull",
+        "type": "cli-command"
+      },
+      {
+        "id": "supabase-notebooks-push",
+        "title": "Push notebooks to Supabase",
+        "slug": "supabase-notebooks-push",
+        "type": "cli-command"
+      }
+    ]
+  },
+  {
+    "type": "category",
     "title": "Services",
     "items": [
       {
@@ -893,6 +1043,72 @@
         "id": "supabase-telemetry",
         "title": "Manage CLI telemetry settings",
         "slug": "supabase-telemetry",
+        "type": "cli-command"
+      },
+      {
+        "id": "supabase-telemetry-enable",
+        "title": "Enable telemetry",
+        "slug": "supabase-telemetry-enable",
+        "type": "cli-command"
+      },
+      {
+        "id": "supabase-telemetry-disable",
+        "title": "Disable telemetry",
+        "slug": "supabase-telemetry-disable",
+        "type": "cli-command"
+      },
+      {
+        "id": "supabase-telemetry-status",
+        "title": "Show telemetry status",
+        "slug": "supabase-telemetry-status",
+        "type": "cli-command"
+      }
+    ]
+  },
+  {
+    "type": "category",
+    "title": "Feedback",
+    "items": [
+      {
+        "id": "supabase-feedback",
+        "title": "Send feedback to the Supabase team",
+        "slug": "supabase-feedback",
+        "type": "cli-command"
+      },
+      {
+        "id": "supabase-feedback-add",
+        "title": "Send feedback",
+        "slug": "supabase-feedback-add",
+        "type": "cli-command"
+      },
+      {
+        "id": "supabase-feedback-delete",
+        "title": "Delete previously submitted feedback",
+        "slug": "supabase-feedback-delete",
+        "type": "cli-command"
+      },
+      {
+        "id": "supabase-issue",
+        "title": "Open GitHub issue forms",
+        "slug": "supabase-issue",
+        "type": "cli-command"
+      },
+      {
+        "id": "supabase-issue-bug",
+        "title": "Open a bug report",
+        "slug": "supabase-issue-bug",
+        "type": "cli-command"
+      },
+      {
+        "id": "supabase-issue-docs",
+        "title": "Open a documentation issue",
+        "slug": "supabase-issue-docs",
+        "type": "cli-command"
+      },
+      {
+        "id": "supabase-issue-feature",
+        "title": "Open a feature request",
+        "slug": "supabase-issue-feature",
         "type": "cli-command"
       }
     ]

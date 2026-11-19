@@ -4,13 +4,15 @@ import { components } from 'api-types'
 import { storageCredentialsKeys } from './s3-access-key-keys'
 import { get, handleError } from '@/data/fetchers'
 import { IS_PLATFORM } from '@/lib/constants'
-import type { ResponseError, UseCustomQueryOptions } from '@/types'
+import type { StudioError } from '@/lib/errors/studio-errors'
+import type { UseCustomQueryOptions } from '@/types'
 
 type StorageCredentialsVariables = { projectRef?: string }
 
-export type S3AccessKey = components['schemas']['GetStorageCredentialsResponse']['data'][number] & {
-  access_key: string
-}
+export type S3AccessKey =
+  components['schemas']['GetStorageCredentialsResponse_Output']['data'][number] & {
+    access_key: string
+  }
 
 async function fetchStorageCredentials(
   { projectRef }: StorageCredentialsVariables,
@@ -34,9 +36,9 @@ export const useStorageCredentialsQuery = <TData = StorageCredentialsData>(
   {
     enabled = true,
     ...options
-  }: UseCustomQueryOptions<StorageCredentialsData, ResponseError, TData> = {}
+  }: UseCustomQueryOptions<StorageCredentialsData, StudioError, TData> = {}
 ) =>
-  useQuery<StorageCredentialsData, ResponseError, TData>({
+  useQuery<StorageCredentialsData, StudioError, TData>({
     queryKey: storageCredentialsKeys.credentials(projectRef),
     queryFn: ({ signal }) => fetchStorageCredentials({ projectRef }, signal),
     enabled: enabled && IS_PLATFORM && typeof projectRef !== 'undefined',

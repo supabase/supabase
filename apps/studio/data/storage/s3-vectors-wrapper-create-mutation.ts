@@ -1,4 +1,3 @@
-import { PermissionAction } from '@supabase/shared-types/out/constants'
 import { IS_PLATFORM } from 'common'
 
 import { useLocalS3KeysQuery } from '../misc/local-s3-keys-query'
@@ -6,13 +5,12 @@ import { useS3AccessKeyCreateMutation } from './s3-access-key-create-mutation'
 import { WRAPPERS } from '@/components/interfaces/Integrations/Wrappers/Wrappers.constants'
 import { getVectorURI } from '@/components/interfaces/Storage/StorageSettings/StorageSettings.utils'
 import {
-  getVectorBucketFDWName,
   getVectorBucketFDWServerName,
   getVectorBucketS3KeyName,
 } from '@/components/interfaces/Storage/VectorBuckets/VectorBuckets.utils'
 import { useProjectSettingsV2Query } from '@/data/config/project-settings-v2-query'
 import { FDWCreateVariables, useFDWCreateMutation } from '@/data/fdw/fdw-create-mutation'
-import { useAsyncCheckPermissions } from '@/hooks/misc/useCheckPermissions'
+import { FGA_PERMISSIONS, useAsyncCheckPermissionsV2 } from '@/hooks/misc/useCheckPermissionsV2'
 import { useDeploymentMode } from '@/hooks/misc/useDeploymentMode'
 import { useSelectedProjectQuery } from '@/hooks/misc/useSelectedProject'
 
@@ -39,9 +37,8 @@ export const useS3VectorsWrapperCreateMutation = () => {
 
   const wrapperMeta = WRAPPERS.find((wrapper) => wrapper.name === 's3_vectors_wrapper')
 
-  const { can: canCreateCredentials } = useAsyncCheckPermissions(
-    PermissionAction.STORAGE_ADMIN_WRITE,
-    '*'
+  const { can: canCreateCredentials } = useAsyncCheckPermissionsV2(
+    FGA_PERMISSIONS.PROJECT.STORAGE_CONFIG_WRITE
   )
 
   const { mutateAsync: createS3AccessKey, isPending: isCreatingS3AccessKey } =
@@ -74,7 +71,6 @@ export const useS3VectorsWrapperCreateMutation = () => {
       )
     }
 
-    const wrapperName = getVectorBucketFDWName(bucketName)
     const serverName = getVectorBucketFDWServerName(bucketName)
 
     const params: FDWCreateVariables = {
@@ -82,7 +78,6 @@ export const useS3VectorsWrapperCreateMutation = () => {
       connectionString: project?.connectionString,
       wrapperMeta: wrapperMeta!,
       formState: {
-        wrapper_name: wrapperName,
         server_name: serverName,
         vault_access_key_id: accessKey,
         vault_secret_access_key: secretKey,

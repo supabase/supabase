@@ -1,13 +1,9 @@
 import { describe, expect, test } from 'vitest'
 
-import {
-  getEnumsAsMarkdown,
-  getPoliciesAsMarkdown,
-  getSchemaAsMarkdown,
-  getTableDefinitionAsMarkdown,
-} from './Schemas.utils'
+import { getEnumsAsMarkdown, getPoliciesAsMarkdown, getSchemaAsMarkdown } from './Schemas.utils'
 
 describe('Schemas.utils', () => {
+  // getSchemaAsMarkdown composes getTableDefinitionAsMarkdown per table, so this covers both
   test('getSchemaAsMarkdown returns properly formatted markdown', () => {
     const schema = 'public'
     const tables = [
@@ -120,65 +116,6 @@ An excellent description
 
 `)
   })
-  test('getTableDefinitionAsMarkdown returns properly formatted markdown', () => {
-    const table = {
-      ref: 'default',
-      id: 20999,
-      name: 'test',
-      description: 'An excellent description',
-      schema: 'public',
-      isForeign: false,
-      columns: [
-        {
-          id: '20999.1',
-          isPrimary: true,
-          name: 'id',
-          format: 'int8',
-          isNullable: false,
-          isUnique: false,
-          isUpdateable: true,
-          isIdentity: true,
-          description: '',
-        },
-        {
-          id: '20999.2',
-          isPrimary: false,
-          name: 'created_at',
-          format: 'timestamptz',
-          isNullable: false,
-          isUnique: false,
-          isUpdateable: true,
-          isIdentity: false,
-          description: '',
-        },
-        {
-          id: '20999.3',
-          isPrimary: false,
-          name: 'user_id',
-          format: 'uuid',
-          isNullable: true,
-          isUnique: false,
-          isUpdateable: true,
-          isIdentity: false,
-          description: '',
-        },
-      ],
-    }
-    const result = getTableDefinitionAsMarkdown(table)
-    expect(result).toBe(`## Table \`test\`
-
-An excellent description
-
-### Columns
-
-| Name | Type | Constraints |
-|------|------|-------------|
-| \`id\` | \`int8\` | Primary Identity |
-| \`created_at\` | \`timestamptz\` |  |
-| \`user_id\` | \`uuid\` |  Nullable |
-`)
-  })
-
   test('getEnumsAsMarkdown returns formatted enum section', () => {
     const enums = [
       { name: 'order_status', schema: 'public', enums: ['pending', 'processing', 'shipped'] },

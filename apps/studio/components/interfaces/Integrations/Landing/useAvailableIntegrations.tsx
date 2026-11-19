@@ -6,20 +6,20 @@ import {
   useFlag,
 } from 'common'
 import { fullImageUrl } from 'common/marketplace-client'
-import { Boxes } from 'lucide-react'
+import { BoxesIcon } from 'lucide-react'
 import dynamic from 'next/dynamic'
 import Image from 'next/image'
 import { useContext, useMemo } from 'react'
 import { cn } from 'ui'
 
 import { INTEGRATIONS, Loading, type IntegrationDefinition } from './Integrations.constants'
-import { useIsMarketplaceEnabled } from '@/components/interfaces/App/FeaturePreview/FeaturePreviewContext'
 import {
   useMarketplaceIntegrationsQuery,
   type MarketplaceIntegration,
 } from '@/data/marketplace/integrations-query'
 import { useCLIReleaseVersionQuery } from '@/data/misc/cli-release-version-query'
 import { useIsFeatureEnabled } from '@/hooks/misc/useIsFeatureEnabled'
+import { useIsWarehouseEnabled } from '@/hooks/misc/useIsWarehouseEnabled'
 
 const renderMarketplaceLogo = (listingLogo?: string | null) => {
   const MarketplaceLogo = ({ className, ...props }: { className?: string } = {}) => (
@@ -33,7 +33,7 @@ const renderMarketplaceLogo = (listingLogo?: string | null) => {
           {...props}
         />
       ) : (
-        <Boxes className={cn('inset-0 p-2 text-black w-full h-full', className)} {...props} />
+        <BoxesIcon className={cn('inset-0 p-2 text-black w-full h-full', className)} {...props} />
       )}
     </div>
   )
@@ -55,16 +55,10 @@ const isPreviewEnabled = (featureFlags: FeatureFlagContextType, listingSlug: str
 
 const useMarketplaceListings = () => {
   const { hasLoaded } = useContext(FeatureFlagContext)
-  const isMarketplaceEnabled = useIsMarketplaceEnabled()
-
-  const { data: marketplaceData, error } = useMarketplaceIntegrationsQuery({
-    enabled: isMarketplaceEnabled,
-  })
-  const isPending =
-    IS_PLATFORM && (!hasLoaded || (isMarketplaceEnabled && !marketplaceData && !error))
-  const isSuccess =
-    !IS_PLATFORM || (hasLoaded && (!isMarketplaceEnabled || (!!marketplaceData && !error)))
-  const isError = IS_PLATFORM && isMarketplaceEnabled && !!error
+  const { data: marketplaceData, error } = useMarketplaceIntegrationsQuery()
+  const isPending = IS_PLATFORM && (!hasLoaded || (!marketplaceData && !error))
+  const isSuccess = !IS_PLATFORM || (hasLoaded && !!marketplaceData && !error)
+  const isError = IS_PLATFORM && !!error
 
   // This flag can globally enable preview listings for all partners for a given user (i.e. for Supabase users)
   const previewAllListingsEnabled = useFlag<boolean>('previewMarketplaceListingsEnabled')
@@ -92,6 +86,7 @@ const useMarketplaceListings = () => {
  */
 export const useAvailableIntegrations = () => {
   const { integrationsWrappers } = useIsFeatureEnabled(['integrations:wrappers'])
+  const isWarehouseAvailable = useIsWarehouseEnabled()
 
   const { data: cliData } = useCLIReleaseVersionQuery()
   const isCLI = !!cliData?.current
@@ -106,7 +101,7 @@ export const useAvailableIntegrations = () => {
 
   // [Joshen] Format marketplace integrations into existing ones for now
   // Likely that we might need to change, but can look into separately
-  // Wrappers from marketplace are excluded here — they are merged into the
+  // Wrappers from marketplace are excluded here. They are merged into the
   // hardcoded studio wrappers below as content overrides.
   const marketplaceIntegrations: IntegrationDefinition[] = useMemo(
     () =>
@@ -176,16 +171,6 @@ export const useAvailableIntegrations = () => {
             ],
             navigate: ({ pageId = 'overview' }) => {
               switch (pageId) {
-                case 'overview':
-                  return dynamic(
-                    () =>
-                      import('@/components/interfaces/Integrations/Integration/MarketplaceIntegrationOverviewTab').then(
-                        (mod) => mod.MarketplaceIntegrationOverviewTab
-                      ),
-                    {
-                      loading: Loading,
-                    }
-                  )
                 case 'settings':
                   return dynamic(
                     () =>
@@ -228,6 +213,13 @@ export const useAvailableIntegrations = () => {
         return false
       }
 
+      // Warehouse is gated to an allow-list of orgs, and the API rejects every
+      // `/platform/warehouse/{ref}/*` call for the rest, so hide it entirely instead of showing an
+      // integration whose every request would fail.
+      if (integration.id === 'warehouse' && !isWarehouseAvailable) {
+        return false
+      }
+
       return true
     }).map((integration) => {
       const isWrapper = integration.type === 'wrapper'
@@ -266,7 +258,7 @@ export const useAvailableIntegrations = () => {
         ...Object.fromEntries(Object.entries(overrides).filter(([, v]) => v != null)),
       }
     })
-  }, [integrationsWrappers, isCLI, marketplaceWrappers])
+  }, [integrationsWrappers, isCLI, isWarehouseAvailable, marketplaceWrappers])
 
   const dataWithMarketplace = useMemo(() => {
     return [...marketplaceIntegrations, ...allIntegrations].sort((a, b) =>

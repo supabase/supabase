@@ -4,8 +4,11 @@ import { useMutation, useQueryClient } from '@tanstack/react-query'
 import { toast } from 'sonner'
 
 import { databasePoliciesKeys } from './keys'
+import { isUserFaultForSql } from '@/data/error-classification'
+import { unguarded } from '@/data/fetchers'
 import { executeSql } from '@/data/sql/execute-sql-mutation'
-import type { ResponseError, UseCustomMutationOptions } from '@/types'
+import type { StudioError } from '@/lib/errors/studio-errors'
+import type { UseCustomMutationOptions } from '@/types'
 
 export type CreatePolicyBody = {
   name: string
@@ -37,7 +40,12 @@ export async function createDatabasePolicy({
     projectRef,
     connectionString,
     sql,
+    // Studio composes the statement, but the user wrote the expressions and bodies Postgres parses
+    sqlOrigin: 'studio',
+    queryName: 'database-policy-create',
+    isUserFaultSqlState: isUserFaultForSql,
     queryKey: ['policy', 'create'],
+    grant: unguarded.migrating,
   })
 
   return result
@@ -50,12 +58,12 @@ export const useDatabasePolicyCreateMutation = ({
   onError,
   ...options
 }: Omit<
-  UseCustomMutationOptions<DatabasePolicyCreateData, ResponseError, DatabasePolicyCreateVariables>,
+  UseCustomMutationOptions<DatabasePolicyCreateData, StudioError, DatabasePolicyCreateVariables>,
   'mutationFn'
 > = {}) => {
   const queryClient = useQueryClient()
 
-  return useMutation<DatabasePolicyCreateData, ResponseError, DatabasePolicyCreateVariables>({
+  return useMutation<DatabasePolicyCreateData, StudioError, DatabasePolicyCreateVariables>({
     mutationFn: (vars) => createDatabasePolicy(vars),
     async onSuccess(data, variables, context) {
       const { projectRef } = variables

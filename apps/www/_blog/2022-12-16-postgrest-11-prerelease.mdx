@@ -15,7 +15,7 @@ toc_depth: 3
 ---
 
 PostgREST 11 is not wrapped up yet, however a pre-release with the **[latest features and fixes](https://github.com/PostgREST/postgrest/releases/tag/v10.1.1.20221212)**
-is available on the Supabase CLI.
+is available on the [Supabase CLI](https://supabase.com/docs/reference/cli/introduction).
 
 In this blog post we'll cover some of the improved querying capabilities: spreading related tables, related orders and anti-joins.
 
@@ -216,7 +216,7 @@ const { data, error } = await supabase
 ```
 
 This was already possible with the `!inner` modifier([introduced on PostgREST 9](https://supabase.com/blog/postgrest-9#resource-embedding-with-inner-joins))
-but the `not null` filter is more flexible and can be used with an [or filter](https://supabase.com/docs/reference/javascript/or) to combine related tables' conditions.
+but the `not null` filter is more flexible and can be used with an [or filter](https://supabase.com/docs/reference/javascript/using-filters-or) to combine related tables' conditions.
 
 ## Try it out
 

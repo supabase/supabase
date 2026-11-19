@@ -1,4 +1,4 @@
-import { Minus } from 'lucide-react'
+import { MinusIcon } from 'lucide-react'
 import { cn } from 'ui'
 
 export const DataTableColumnStatusCode = ({
@@ -33,7 +33,7 @@ export const DataTableColumnStatusCode = ({
   }
 
   if (!value) {
-    return <Minus className="h-4 w-4 text-muted-foreground/50" />
+    return <MinusIcon className="h-4 w-4 text-muted-foreground/50" />
   }
 
   return (

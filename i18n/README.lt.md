@@ -9,7 +9,7 @@
 
 [Supabase](https://supabase.com) yra atvirojo kodo „Firebase" alternatyva. Kuriame „Firebase" funkcijas naudodami įmonių-lygmens atvirojo kodo įrankius.
 
-- [x] Prieglobos Postgres duomenų bazė. [Dokumentai](https://supabase.com/docs/guides/database)
+- [x] Prieglobos Postgres duomenų bazė. [Dokumentai](https://supabase.com/docs/guides/database/overview)
 - [x] Autentifikacijos nustatymas ir autorizavimas. [Dokumentai](https://supabase.com/docs/guides/auth)
 - [x] Automatiškai generuojami API.
   - [x] REST. [Dokumentai](https://supabase.com/docs/guides/api#rest-api-overview)
@@ -56,7 +56,7 @@ Norėdami sužinoti, kaip prisidėti, apsilankykite [Getting Started](../DEVELOP
 **Architektūra**
 
 Supabase yra [prieglobos platforma](https://supabase.com/dashboard). Galite užsiregistruoti ir pradėti naudotis "Supabase" nieko neįdiegę.
-Taip pat galite [savarankiškai talpinti](https://supabase.com/docs/guides/hosting/overview) ir [kurti vietoje](https://supabase.com/docs/guides/local-development).
+Taip pat galite [savarankiškai talpinti](https://supabase.com/docs/guides/self-hosting) ir [kurti vietoje](https://supabase.com/docs/guides/local-development).
 
 ![Architektūra](https://github.com/supabase/supabase/blob/master/apps/docs/public/img/supabase-architecture.svg)
 
@@ -64,7 +64,7 @@ Taip pat galite [savarankiškai talpinti](https://supabase.com/docs/guides/hosti
 - [Realtime](https://github.com/supabase/realtime) - tai "Elixir" serveris, leidžiantis klausytis "PostgreSQL" įterpimų, atnaujinimų ir ištrynimų naudojant žiniatinklio lizdus. "Realtime" apklausia "Postgres" integruotą replikavimo funkciją dėl duomenų bazės pakeitimų, konvertuoja pakeitimus į JSON ir transliuoja JSON per žiniatinklio lizdus įgaliotiems klientams.
 - [PostgREST](http://postgrest.org/) - tai žiniatinklio serveris, kuris paverčia jūsų "PostgreSQL" duomenų bazę tiesiogiai į RESTful API
 - [pg_graphql](http://github.com/supabase/pg_graphql/) - "PostgreSQL" plėtinys, kuris atveria GraphQL API
-- [Storage](https://github.com/supabase/storage-api) - tai REST sąsaja, skirta S3 saugomiems failams valdyti, naudojant "Postgres" leidimams valdyti.
+- [Storage](https://github.com/supabase/storage) - tai REST sąsaja, skirta S3 saugomiems failams valdyti, naudojant "Postgres" leidimams valdyti.
 - [postgres-meta](https://github.com/supabase/postgres-meta) - tai RESTful API, skirta "Postgres" valdymui, leidžianti gauti lenteles, pridėti vaidmenis, vykdyti užklausas ir t. t.
 - [GoTrue](https://github.com/netlify/gotrue) yra SWT pagrįsta API, skirta naudotojams valdyti ir SWT žetonams išduoti.
 - [Kong](https://github.com/Kong/kong) - tai debesijos API vartai.
@@ -84,9 +84,9 @@ Mūsų požiūris į klientų bibliotekas yra modulinis. Kiekviena dalinė bibli
     <th></th>
     <th>Supabase</th>
     <th><a href="https://github.com/postgrest/postgrest" target="_blank" rel="noopener noreferrer">PostgREST</a></th>
-    <th><a href="https://github.com/supabase/gotrue" target="_blank" rel="noopener noreferrer">GoTrue</a></th>
+    <th><a href="https://github.com/supabase/auth" target="_blank" rel="noopener noreferrer">GoTrue</a></th>
     <th><a href="https://github.com/supabase/realtime" target="_blank" rel="noopener noreferrer">Realtime</a></th>
-    <th><a href="https://github.com/supabase/storage-api" target="_blank" rel="noopener noreferrer">Storage</a></th>
+    <th><a href="https://github.com/supabase/storage" target="_blank" rel="noopener noreferrer">Storage</a></th>
     <th>Functions</th>
   </tr>
   <!-- TEMPLATE FOR NEW ROW -->
@@ -126,7 +126,7 @@ Mūsų požiūris į klientų bibliotekas yra modulinis. Kiekviena dalinė bibli
   
   <tr>
     <td>C#</td>
-    <td><a href="https://github.com/supabase-community/supabase-csharp" target="_blank" rel="noopener noreferrer">supabase-csharp</a></td>
+    <td><a href="https://github.com/supabase/supabase-csharp" target="_blank" rel="noopener noreferrer">supabase-csharp</a></td>
     <td><a href="https://github.com/supabase-community/postgrest-csharp" target="_blank" rel="noopener noreferrer">postgrest-csharp</a></td>
     <td><a href="https://github.com/supabase-community/gotrue-csharp" target="_blank" rel="noopener noreferrer">gotrue-csharp</a></td>
     <td><a href="https://github.com/supabase-community/realtime-csharp" target="_blank" rel="noopener noreferrer">realtime-csharp</a></td>
@@ -162,7 +162,7 @@ Mūsų požiūris į klientų bibliotekas yra modulinis. Kiekviena dalinė bibli
   </tr>
   <tr>
     <td>Python</td>
-    <td><a href="https://github.com/supabase-community/supabase-py" target="_blank" rel="noopener noreferrer">supabase-py</a></td>
+    <td><a href="https://github.com/supabase/supabase-py" target="_blank" rel="noopener noreferrer">supabase-py</a></td>
     <td><a href="https://github.com/supabase-community/postgrest-py" target="_blank" rel="noopener noreferrer">postgrest-py</a></td>
     <td><a href="https://github.com/supabase-community/gotrue-py" target="_blank" rel="noopener noreferrer">gotrue-py</a></td>
     <td><a href="https://github.com/supabase-community/realtime-py" target="_blank" rel="noopener noreferrer">realtime-py</a></td>

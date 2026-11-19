@@ -1,4 +1,15 @@
-import { Clock, Heart, ScrollText, Server, SquareStack, Telescope } from 'lucide-react'
+import {
+  Boxes,
+  Clock,
+  Hammer,
+  Heart,
+  Rocket,
+  ScrollText,
+  Server,
+  Settings2,
+  SquareStack,
+  Telescope,
+} from 'lucide-react'
 
 import {
   IconBranching,
@@ -30,7 +41,6 @@ import {
   IconMenuSwift,
   IconSecurity,
   IconSupport,
-  IconTroubleshooting,
   IconUI,
 } from './MenuIcons'
 
@@ -96,8 +106,6 @@ function getMenuIcon(menuKey: string, width: number = 16, height: number = 16, c
       return <IconSecurity width={width} height={height} className={className} />
     case 'telemetry':
       return <Telescope width={width} height={height} className={className} />
-    case 'troubleshooting':
-      return <IconTroubleshooting width={width} height={height} className={className} />
     case 'changelog':
       return <ScrollText width={width} height={height} className={className} />
     case 'contributing':
@@ -110,6 +118,14 @@ function getMenuIcon(menuKey: string, width: number = 16, height: number = 16, c
       return <SquareStack width={width} height={height} className={className} />
     case 'ui':
       return <IconUI width={width} height={height} className={className} />
+    case 'products':
+      return <Boxes width={width} height={height} className={className} />
+    case 'build':
+      return <Hammer width={width} height={height} className={className} />
+    case 'develop':
+      return <Rocket width={width} height={height} className={className} />
+    case 'manage':
+      return <Settings2 width={width} height={height} className={className} />
     default:
       return <IconMenuPlatform width={width} height={height} className={className} />
   }

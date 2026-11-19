@@ -22,7 +22,7 @@ Today we're open sourcing [`supabase/evals`](https://github.com/supabase/evals),
 
 ## Why we built this
 
-Agents are becoming a primary way people build with Supabase, interacting through our CLI, MCP server, agent skills, and docs. We needed a way to understand how agents perform across all of these Supabase surfaces, not just one tool in isolation. By tracking where agents stumble, we can make intentional fixes and verify they hold instead of regressing, and test new features confidently before shipping.
+Agents are becoming a primary way people build with Supabase, interacting through our [CLI](/docs/guides/local-development/cli/getting-started), [MCP server](/docs/guides/ai-tools/mcp), [agent skills](/docs/guides/ai-tools/ai-skills), and docs. We needed a way to understand how agents perform across all of these Supabase surfaces, not just one tool in isolation. By tracking where agents stumble, we can make intentional fixes and verify they hold instead of regressing, and test new features confidently before shipping.
 
 ## How we approached it
 
@@ -62,7 +62,7 @@ Across our benchmark, agents already pass most scenarios with no skill loaded at
 
 #### Our newer libraries aren't sufficiently discoverable
 
-We [recently released](https://supabase.com/blog/introducing-supabase-server) `@supabase/server` to simplify boilerplate of writing secure Edge Functions. When tasked with writing edge functions though, agents still choose to verify auth by hand with `supabase-js`. We've since published a ["Which package to choose"](https://supabase.com/docs/guides/auth/choosing-a-server-package) guide to clarify when to use each package, as a reference for agents.
+We [recently released](https://supabase.com/blog/introducing-supabase-server) `@supabase/server` to simplify boilerplate of writing secure Edge Functions. When tasked with writing [edge functions](/docs/guides/functions) though, agents still choose to verify auth by hand with `supabase-js`. We've since published a ["Which package to choose"](https://supabase.com/docs/guides/auth/choosing-a-server-package) guide to clarify when to use each package, as a reference for agents.
 
 #### Skill activation is uneven
 

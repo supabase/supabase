@@ -24,6 +24,7 @@ import { ThemeToggle } from 'ui-patterns/ThemeToggle'
 
 import useDarkLaunchWeeks from '../../hooks/useDarkLaunchWeeks'
 import SectionContainer from '../Layouts/SectionContainer'
+import { isCrossZoneHref } from '@/lib/cross-zone'
 
 interface Props {
   className?: string
@@ -89,7 +90,7 @@ const Footer = (props: Props) => {
         <SectionContainer className="grid grid-cols-2 md:flex items-center justify-between text-foreground md:justify-center gap-8 md:gap-16 xl:gap-28 py-6! md:py-10! text-sm">
           <div className="flex flex-col md:flex-row gap-2 md:items-center">
             We protect your data.
-            <Link href="/security" className="text-brand-link hover:underline">
+            <Link href="/security" className="text-primary hover:underline">
               More on Security
             </Link>
           </div>
@@ -118,6 +119,8 @@ const Footer = (props: Props) => {
             </Link>
             <div className="flex space-x-5">
               <a
+                target="_blank"
+                rel="noopener noreferrer"
                 href="https://twitter.com/supabase"
                 className="text-foreground-lighter hover:text-foreground transition"
               >
@@ -126,6 +129,8 @@ const Footer = (props: Props) => {
               </a>
 
               <a
+                target="_blank"
+                rel="noopener noreferrer"
                 href="https://github.com/supabase"
                 className="text-foreground-lighter hover:text-foreground transition"
               >
@@ -134,6 +139,8 @@ const Footer = (props: Props) => {
               </a>
 
               <a
+                target="_blank"
+                rel="noopener noreferrer"
                 href="https://discord.supabase.com/"
                 className="text-foreground-lighter hover:text-foreground transition"
               >
@@ -142,6 +149,8 @@ const Footer = (props: Props) => {
               </a>
 
               <a
+                target="_blank"
+                rel="noopener noreferrer"
                 href="https://youtube.com/c/supabase"
                 className="text-foreground-lighter hover:text-foreground transition"
               >
@@ -150,6 +159,8 @@ const Footer = (props: Props) => {
               </a>
 
               <a
+                target="_blank"
+                rel="noopener noreferrer"
                 href="https://www.tiktok.com/@supabase.com"
                 className="text-foreground-lighter hover:text-foreground transition"
               >
@@ -158,6 +169,8 @@ const Footer = (props: Props) => {
               </a>
 
               <a
+                target="_blank"
+                rel="noopener noreferrer"
                 href="https://www.instagram.com/supabasecom"
                 className="text-foreground-lighter hover:text-foreground transition"
               >
@@ -168,7 +181,7 @@ const Footer = (props: Props) => {
             <div>
               {newsletterStatus === 'success' ? (
                 <div className="flex flex-col gap-1">
-                  <p className="text-brand-link text-sm">Thanks for subscribing!</p>
+                  <p className="text-primary text-sm">Thanks for subscribing!</p>
                   <p className="text-foreground-lighter text-xs">
                     You'll hear from us when we publish our next newsletter issue.
                   </p>
@@ -231,7 +244,7 @@ const Footer = (props: Props) => {
                         return (
                           <li key={`${segment.title}_link_${idx}`}>
                             {link.url ? (
-                              link.url.startsWith('https') ? (
+                              link.url.startsWith('https') || isCrossZoneHref(link.url) ? (
                                 <a href={link.url}>{children}</a>
                               ) : (
                                 <Link href={link.url}>{children}</Link>

@@ -1,10 +1,10 @@
 import { useEffect, useRef, type ComponentPropsWithoutRef, type ReactNode } from 'react'
 
-// Next/Script handles ordering, deduplication, and load callbacks for
-// third-party scripts. Under Vite we have no orchestrator — render a
-// `<script>` and approximate the callback contract. Studio doesn't
-// currently mount any <Script>, but the surface is shimmed
-// comprehensively so the migration doesn't catch anyone out later.
+// Client-only port of next/script (next/dist/client/script.js) for the
+// TanStack build. React never executes <script> elements it renders on the
+// client, so, like Next, we inject the script imperatively in an effect and
+// render nothing. Scripts are deduped by `id` (or `src`) at module level, so
+// remounts and duplicate instances don't execute the same script twice.
 
 type Strategy = 'beforeInteractive' | 'afterInteractive' | 'lazyOnload' | 'worker'
 
@@ -12,96 +12,170 @@ interface ScriptProps extends Omit<
   ComponentPropsWithoutRef<'script'>,
   'children' | 'onLoad' | 'onError'
 > {
-  // Accepted-and-dropped in this shim — the browser handles network
-  // priority via the regular `<script>` element; we don't reorder.
   strategy?: Strategy
-  // Children as the script body (inline scripts) are also accepted via
-  // dangerouslySetInnerHTML; Next allows either. We honour both.
+  // Inline body, as an alternative to dangerouslySetInnerHTML.
   children?: ReactNode
   onLoad?: (e: Event) => void
   onReady?: () => void
   onError?: (e: Event | string) => void
 }
 
-// eslint-disable-next-line no-restricted-exports
-export default function Script({
-  strategy: _strategy,
-  children,
-  dangerouslySetInnerHTML,
-  onLoad,
-  onError,
-  onReady,
-  src,
-  id,
-  ...rest
-}: ScriptProps) {
-  const ref = useRef<HTMLScriptElement | null>(null)
-  const readyFiredRef = useRef(false)
+// src -> promise settled when that remote script loads.
+const ScriptCache = new Map<string, Promise<void>>()
+// Keys (id || src) of scripts that have finished loading.
+const LoadCache = new Set<string>()
 
-  // onReady fires once the script has loaded (or immediately on mount
-  // if it's already been loaded by a previous instance with the same
-  // id). Approximate by firing once after mount when the element is
-  // present and either has no src (inline) or has finished loading.
-  useEffect(() => {
-    const node = ref.current
-    if (!node || !onReady || readyFiredRef.current) return
-    if (!src) {
-      // Inline script — body executed synchronously on mount.
-      readyFiredRef.current = true
-      onReady()
-      return
-    }
-    if (node.dataset.loaded === 'true') {
-      readyFiredRef.current = true
-      onReady()
-    }
-  }, [onReady, src])
+const DOMAttributeNames: Record<string, string> = {
+  acceptCharset: 'accept-charset',
+  className: 'class',
+  htmlFor: 'for',
+  httpEquiv: 'http-equiv',
+  noModule: 'noModule',
+}
 
-  const handleLoad = (e: Event | React.SyntheticEvent<HTMLScriptElement>) => {
-    const node = ref.current
-    if (node) node.dataset.loaded = 'true'
-    onLoad?.(e as Event)
-    if (onReady && !readyFiredRef.current) {
-      readyFiredRef.current = true
-      onReady()
+const ignoreProps = [
+  'onLoad',
+  'onReady',
+  'dangerouslySetInnerHTML',
+  'children',
+  'onError',
+  'strategy',
+  'stylesheets',
+]
+
+const isBooleanScriptAttribute = (attr: string) => ['async', 'defer', 'noModule'].includes(attr)
+
+function setAttributesFromProps(el: HTMLScriptElement, props: ScriptProps) {
+  for (const [p, value] of Object.entries(props)) {
+    if (ignoreProps.includes(p) || value === undefined) continue
+    const attr = DOMAttributeNames[p] || p.toLowerCase()
+    if (isBooleanScriptAttribute(attr)) {
+      Reflect.set(el, attr, !!value)
+    } else {
+      el.setAttribute(attr, String(value))
+    }
+    // Setting then removing clears falsy booleans, including the implicit
+    // force-async on dynamically inserted scripts.
+    if (value === false || (isBooleanScriptAttribute(attr) && (!value || value === 'false'))) {
+      el.setAttribute(attr, '')
+      el.removeAttribute(attr)
     }
   }
+}
 
-  const handleError = (e: Event | React.SyntheticEvent<HTMLScriptElement>) => {
-    onError?.(e as Event)
-  }
+const requestIdleCallback = (cb: () => void) => {
+  if (typeof window.requestIdleCallback === 'function') window.requestIdleCallback(cb)
+  else window.setTimeout(cb, 1)
+}
 
-  // For inline scripts, `children` is preferred over
-  // dangerouslySetInnerHTML when both are present (matches Next).
-  if (children !== undefined) {
-    return (
-      <script
-        {...rest}
-        id={id}
-        ref={ref}
-        onLoad={handleLoad}
-        onError={handleError}
-        dangerouslySetInnerHTML={{
-          __html: typeof children === 'string' ? children : '',
-        }}
-      />
+function loadScript(props: ScriptProps) {
+  const {
+    src,
+    id,
+    onLoad,
+    onReady,
+    dangerouslySetInnerHTML,
+    children,
+    strategy = 'afterInteractive',
+    onError,
+  } = props
+  const cacheKey = id || src
+
+  if (cacheKey && LoadCache.has(cacheKey)) return
+
+  // Same remote script already loading: don't inject again, but still run
+  // this instance's callbacks once it settles.
+  const pending = src ? ScriptCache.get(src) : undefined
+  if (pending) {
+    pending.then(
+      () => {
+        if (cacheKey) LoadCache.add(cacheKey)
+        onLoad?.(new Event('load'))
+        onReady?.()
+      },
+      (e) => onError?.(e)
     )
+    return
   }
 
-  return (
-    // This shim mirrors next/script for the TanStack build (where vite aliases
-    // `next/script` to this file via nextCompat). Call sites that opt for an
-    // explicit `async`/`defer` already pass it through via {...rest}; we don't
-    // force one here because Next's <Script> doesn't either at this layer.
-    // eslint-disable-next-line @next/next/no-sync-scripts
-    <script
-      {...rest}
-      id={id}
-      src={src}
-      ref={ref}
-      onLoad={handleLoad}
-      onError={handleError}
-      dangerouslySetInnerHTML={dangerouslySetInnerHTML}
-    />
-  )
+  const afterLoad = () => {
+    onReady?.()
+    if (cacheKey) LoadCache.add(cacheKey)
+  }
+
+  const el = document.createElement('script')
+  const loadPromise = new Promise<void>((resolve, reject) => {
+    el.addEventListener('load', (e) => {
+      resolve()
+      onLoad?.(e)
+      afterLoad()
+    })
+    el.addEventListener('error', (e) => reject(e))
+  })
+  // Stays rejected for instances waiting on it. Dropping the failed entry
+  // lets a later mount retry the script instead of treating it as loaded.
+  loadPromise.catch((e) => {
+    if (src) ScriptCache.delete(src)
+    el.remove()
+    onError?.(e)
+  })
+
+  if (dangerouslySetInnerHTML) {
+    el.innerHTML = String(dangerouslySetInnerHTML.__html || '')
+    afterLoad()
+  } else if (children) {
+    el.textContent =
+      typeof children === 'string' ? children : Array.isArray(children) ? children.join('') : ''
+    afterLoad()
+  } else if (src) {
+    el.src = src
+    // Added to LoadCache only once the load event fires.
+    ScriptCache.set(src, loadPromise)
+  }
+
+  setAttributesFromProps(el, props)
+  el.setAttribute('data-nscript', strategy)
+  document.body.appendChild(el)
+}
+
+function loadLazyScript(props: ScriptProps) {
+  if (document.readyState === 'complete') {
+    requestIdleCallback(() => loadScript(props))
+  } else {
+    window.addEventListener('load', () => requestIdleCallback(() => loadScript(props)), {
+      once: true,
+    })
+  }
+}
+
+// eslint-disable-next-line no-restricted-exports
+export default function Script(props: ScriptProps) {
+  const { id, src = '', onReady, strategy = 'afterInteractive' } = props
+
+  // Fire onReady on a remount when the script already loaded. The ref guards
+  // against StrictMode's double effect run, as in Next.
+  const hasOnReadyEffectCalled = useRef(false)
+  useEffect(() => {
+    const cacheKey = id || src
+    if (!hasOnReadyEffectCalled.current) {
+      if (onReady && cacheKey && LoadCache.has(cacheKey)) onReady()
+      hasOnReadyEffectCalled.current = true
+    }
+  }, [onReady, id, src])
+
+  const hasLoadScriptEffectCalled = useRef(false)
+  useEffect(() => {
+    if (hasLoadScriptEffectCalled.current) return
+    hasLoadScriptEffectCalled.current = true
+    if (strategy === 'lazyOnload') {
+      loadLazyScript(props)
+    } else {
+      // Studio is a client-rendered SPA with no Next document to inject into
+      // or Partytown worker, so beforeInteractive and worker scripts load
+      // after mount like afterInteractive.
+      loadScript(props)
+    }
+  }, [props, strategy])
+
+  return null
 }

@@ -41,7 +41,7 @@ npm install @supabase/supabase-js
 
 And finally, save the environment variables in the `src/environments/environment.ts` file.
 All you need are the API URL and the key that you copied [earlier](#get-api-details).
-These variables will be exposed on the browser, and that's fine as [Row Level Security](/docs/guides/auth#row-level-security) is enabled on the Database.
+These variables will be exposed on the browser, and that's fine as [Row Level Security](/docs/guides/database/postgres/row-level-security) is enabled on the Database.
 
 <$CodeSample
 path="/user-management/ionic-angular-user-management/src/environments/environment.ts"
@@ -57,9 +57,9 @@ lines={[[1, -1]]}
 meta="name=src/app/supabase.service.ts"
 />
 
-### Set up a login route
+### Set up a sign-in route
 
-Set up a route to manage logins and signups. Use Magic Links so users can sign in with their email without using passwords.
+Set up a route to manage sign-ins and sign-ups. Use Magic Links so users can sign in with their email without using passwords.
 Create a `LoginPage` with the `ionic g page login` Ionic CLI command.
 
 <$CodeSample

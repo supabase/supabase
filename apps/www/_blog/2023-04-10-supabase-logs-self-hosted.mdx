@@ -14,11 +14,11 @@ imgSocial: launch-week-7/day-1-supabase-logs-self-hosted/day-1-supabase-logs-sel
 imgThumb: launch-week-7/day-1-supabase-logs-self-hosted/day-1-supabase-logs-self-hosted-thumb.jpg
 ---
 
-Today, we’re releasing Supabase Logs for both self-hosted users and CLI development.
+Today, we’re releasing [Supabase Logs](https://supabase.com/features/logs-analytics) for both self-hosted users and CLI development.
 
 ## Logflare Introduction
 
-Since [Logflare joined Supabase](https://supabase.com/blog/supabase-acquires-logflare) over a year ago it’s been quietly handling over 1 billion log events every day. These events come from various tools in the Supabase infrastructure - the API gateway, Postgres databases, Storage, Edge Functions, Auth, and Realtime.
+Since [Logflare joined Supabase](https://supabase.com/blog/supabase-acquires-logflare) over a year ago it’s been quietly handling over 1 billion log events every day. These events come from various tools in the Supabase infrastructure - the API gateway, Postgres databases, [Storage](/docs/guides/storage), [Edge Functions](/docs/guides/functions), [Auth](/docs/guides/auth), and [Realtime](/docs/guides/realtime).
 
 Logflare is a multi-node, highly available Elixir cluster, ingesting the log events and storing them into BigQuery for Supabase and Logflare’s customers. On average, the cluster has 6 nodes handling every spike our customers throw at it.
 
@@ -165,7 +165,7 @@ Along with the parser, we invested a lot of effort into transforming the multi-t
 
 ## What’s Next?
 
-To further integrate Logflare into the Supabase platform, we are building out 2 main areas: Management API, Multiple Backends.
+To further integrate Logflare into the Supabase platform, we are building out 2 main areas: [Management API](https://logflare.app/swaggerui), Multiple Backends.
 
 ### Management API
 
@@ -183,7 +183,7 @@ Contact us at growth@supabase.com to get in early on that waitlist.
 
 Logflare currently supports a BigQuery backend. We plan to add support for other analytics-optimized databases, like Clickhouse. We will also support pushing data to other web services, making Logflare a good fit for any data pipeline.
 
-This will benefit the Supabase CLI: once Postgres support is available, Logflare will be able to integrate seamlessly, without the BigQuery requirement.
+This will benefit the [Supabase CLI](/docs/guides/local-development/cli/getting-started): once Postgres support is available, Logflare will be able to integrate seamlessly, without the BigQuery requirement.
 
 ## Wrapping Up
 

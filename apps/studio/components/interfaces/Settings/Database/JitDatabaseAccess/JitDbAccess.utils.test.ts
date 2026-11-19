@@ -121,6 +121,7 @@ describe('getJitMemberOptions', () => {
     const organizationMembers: OrganizationMembersData = [
       {
         gotrue_id: 'de305d54-75b4-431b-adb2-eb6b9e546014',
+        avatar_url: null,
         primary_email: 'active@example.com',
         username: 'Active User',
         is_sso_user: false,
@@ -130,6 +131,7 @@ describe('getJitMemberOptions', () => {
       },
       {
         gotrue_id: '',
+        avatar_url: null,
         invited_id: 123,
         invited_at: '2026-03-01T00:00:00.000Z',
         primary_email: 'expired-invite@example.com',

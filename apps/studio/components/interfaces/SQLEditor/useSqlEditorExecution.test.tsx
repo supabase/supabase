@@ -207,6 +207,7 @@ describe('useSqlEditorExecution', () => {
         {
           identifier: 'replica-1',
           connectionString,
+          connection_string_read_only: connectionString,
           cloud_provider: 'AWS',
           db_host: 'db.replica.supabase.co',
           db_name: 'postgres',

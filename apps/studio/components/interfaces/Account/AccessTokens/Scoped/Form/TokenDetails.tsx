@@ -14,6 +14,7 @@ import {
   SelectValue,
   useWatch,
 } from 'ui'
+import { Admonition } from 'ui-patterns/Admonition'
 import {
   DatePicker,
   DatePickerButton,
@@ -35,6 +36,7 @@ interface TokenDetailsProps {
 }
 
 export const TokenDetails = ({ control, setValue }: TokenDetailsProps) => {
+  const expiresAt = useWatch({ control, name: 'expiresAt' })
   const customExpiryDate = useWatch({ control, name: 'customExpiryDate' })
   const maxExpiryDate = getMaxCustomExpiryDate().toDate()
 
@@ -59,9 +61,9 @@ export const TokenDetails = ({ control, setValue }: TokenDetailsProps) => {
         name="tokenName"
         control={control}
         render={({ field }) => (
-          <FormItemLayout name="tokenName" label="Name" layout="flex-row-reverse">
+          <FormItemLayout label="Name" layout="flex-row-reverse">
             <FormControl>
-              <Input id="tokenName" {...field} placeholder="e.g. CI deploy token" />
+              <Input {...field} placeholder="e.g. CI deploy token" />
             </FormControl>
           </FormItemLayout>
         )}
@@ -72,25 +74,25 @@ export const TokenDetails = ({ control, setValue }: TokenDetailsProps) => {
         name="expiresAt"
         control={control}
         render={({ field }) => (
-          <FormItemLayout name="expiresAt" label="Expires in" layout="flex-row-reverse">
+          <FormItemLayout label="Expires in" layout="flex-row-reverse">
             <div className="flex gap-2 w-full">
-              <FormControl className="grow">
-                <Select value={field.value} onValueChange={handleExpiryChange}>
+              <Select value={field.value} onValueChange={handleExpiryChange}>
+                <FormControl className="grow">
                   <SelectTrigger>
                     <SelectValue placeholder="Select an expiry" />
                   </SelectTrigger>
-                  <SelectContent>
-                    {EXPIRY_OPTIONS.map((option) => (
-                      <SelectItem key={option.value} value={option.value}>
-                        <span className="flex items-center gap-2">
-                          {option.label}
-                          {option.recommended && <Badge variant="success">Recommended</Badge>}
-                        </span>
-                      </SelectItem>
-                    ))}
-                  </SelectContent>
-                </Select>
-              </FormControl>
+                </FormControl>
+                <SelectContent>
+                  {EXPIRY_OPTIONS.map((option) => (
+                    <SelectItem key={option.value} value={option.value}>
+                      <span className="flex items-center gap-2">
+                        {option.label}
+                        {option.recommended && <Badge variant="success">Recommended</Badge>}
+                      </span>
+                    </SelectItem>
+                  ))}
+                </SelectContent>
+              </Select>
 
               {field.value === 'custom' && (
                 <FormField
@@ -136,6 +138,15 @@ export const TokenDetails = ({ control, setValue }: TokenDetailsProps) => {
           </FormItemLayout>
         )}
       />
+
+      {expiresAt === 'never' && (
+        <Admonition
+          type="warning"
+          className="mb-0"
+          title="This token never expires"
+          description="Anyone with the token keeps access until you delete it."
+        />
+      )}
     </section>
   )
 }

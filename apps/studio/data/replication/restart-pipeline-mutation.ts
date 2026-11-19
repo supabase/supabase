@@ -2,11 +2,12 @@ import { useMutation, useQueryClient } from '@tanstack/react-query'
 
 import { replicationKeys } from './keys'
 import { handleError, post } from '@/data/fetchers'
-import type { ResponseError, UseCustomMutationOptions } from '@/types'
+import type { StudioError } from '@/lib/errors/studio-errors'
+import type { UseCustomMutationOptions } from '@/types'
 
 export type RestartPipelineParams = {
   projectRef: string
-  pipelineId: number
+  pipelineId: string
 }
 
 export async function restartPipeline(
@@ -36,31 +37,21 @@ export const useRestartPipelineMutation = ({
   onError,
   ...options
 }: Omit<
-  UseCustomMutationOptions<RestartPipelineData, ResponseError, RestartPipelineParams>,
+  UseCustomMutationOptions<RestartPipelineData, StudioError, RestartPipelineParams>,
   'mutationFn'
 > = {}) => {
   const queryClient = useQueryClient()
 
-  return useMutation<RestartPipelineData, ResponseError, RestartPipelineParams>({
+  return useMutation<RestartPipelineData, StudioError, RestartPipelineParams>({
     mutationFn: (vars) => restartPipeline(vars),
     async onSuccess(data, variables, context) {
       const { projectRef, pipelineId } = variables
 
-      await queryClient.invalidateQueries({
-        queryKey: replicationKeys.pipelinesStatus(projectRef, pipelineId),
-      })
-
-      // [Joshen] We're manually updating the query client here as the pipeline status is async
-      // So setting it so starting while letting long poll update the actual status thereafter
-      queryClient.setQueriesData(
+      await queryClient.invalidateQueries(
         {
           queryKey: replicationKeys.pipelinesStatus(projectRef, pipelineId),
-          exact: true,
         },
-        (prev) => {
-          if (!prev) return prev
-          return { ...prev, status: { name: 'starting' } }
-        }
+        { cancelRefetch: false }
       )
 
       await onSuccess?.(data, variables, context)
@@ -68,6 +59,13 @@ export const useRestartPipelineMutation = ({
     // No default error toast here: callers already show one from their try/catch around
     // mutateAsync, so a default here would double up. onError is only for opt-in callers.
     async onError(data, variables, context) {
+      await queryClient.invalidateQueries(
+        {
+          queryKey: replicationKeys.pipelinesStatus(variables.projectRef, variables.pipelineId),
+        },
+        { cancelRefetch: false }
+      )
+
       await onError?.(data, variables, context)
     },
     ...options,

@@ -56,6 +56,18 @@ export function findConditionByPath(group: FilterGroup, path: number[]): FilterC
   return null
 }
 
+export function collectConditions(
+  group: FilterGroup,
+  path: number[] = []
+): { condition: FilterCondition; path: number[] }[] {
+  return group.conditions.flatMap((condition, index) => {
+    const currentPath = [...path, index]
+    return isGroup(condition)
+      ? collectConditions(condition, currentPath)
+      : [{ condition, path: currentPath }]
+  })
+}
+
 export function isCustomOptionObject(option: any): option is CustomOptionObject {
   return typeof option === 'object' && option !== null && 'component' in option
 }
@@ -154,11 +166,15 @@ export function addFilterToGroup(
   }
 }
 
-export function addGroupToGroup(group: FilterGroup, path: number[]): FilterGroup {
+export function addGroupToGroup(
+  group: FilterGroup,
+  path: number[],
+  logicalOperator: FilterGroup['logicalOperator'] = 'AND'
+): FilterGroup {
   if (path.length === 0) {
     return {
       ...group,
-      conditions: [...group.conditions, { logicalOperator: 'AND', conditions: [] }],
+      conditions: [...group.conditions, { logicalOperator, conditions: [] }],
     }
   }
 
@@ -166,7 +182,7 @@ export function addGroupToGroup(group: FilterGroup, path: number[]): FilterGroup
   return {
     ...group,
     conditions: group.conditions.map((condition, i) =>
-      i === current ? addGroupToGroup(condition as FilterGroup, rest) : condition
+      i === current ? addGroupToGroup(condition as FilterGroup, rest, logicalOperator) : condition
     ),
   }
 }

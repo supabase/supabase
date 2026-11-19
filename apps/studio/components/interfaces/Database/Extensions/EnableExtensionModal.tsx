@@ -1,10 +1,10 @@
-import { zodResolver } from '@hookform/resolvers/zod'
-import { useMemo } from 'react'
-import { useForm, useWatch } from 'react-hook-form'
+import { ident, safeSql } from '@supabase/pg-meta'
 import { toast } from 'sonner'
 import {
-  Badge,
   Button,
+  Card,
+  CardContent,
+  cn,
   Dialog,
   DialogContent,
   DialogFooter,
@@ -12,43 +12,22 @@ import {
   DialogSection,
   DialogSectionSeparator,
   DialogTitle,
-  Form,
-  FormControl,
-  FormField,
-  Input,
-  Select,
-  SelectContent,
-  SelectItem,
-  SelectSeparator,
-  SelectTrigger,
-  SelectValue,
 } from 'ui'
 import { Admonition } from 'ui-patterns/Admonition'
-import { FormItemLayout } from 'ui-patterns/form/FormItemLayout/FormItemLayout'
-import { ShimmeringLoader } from 'ui-patterns/ShimmeringLoader'
-import * as z from 'zod'
+import { CodeBlock } from 'ui-patterns/CodeBlock'
+import {
+  DialogDisclosure,
+  DialogDisclosureContent,
+  DialogDisclosureTrigger,
+} from 'ui-patterns/DialogDisclosure'
 
-import { extensionsWithRecommendedSchemas } from './Extensions.constants'
 import { DocsButton } from '@/components/ui/DocsButton'
 import { useDatabaseExtensionEnableMutation } from '@/data/database-extensions/database-extension-enable-mutation'
 import { type DatabaseExtension } from '@/data/database-extensions/database-extensions-query'
-import { useSchemasQuery } from '@/data/database/schemas-query'
-import { useSchemasFilteredForHighAvailability } from '@/hooks/misc/useHighAvailability'
 import { useIsOrioleDb, useSelectedProjectQuery } from '@/hooks/misc/useSelectedProject'
-import { useProtectedSchemas } from '@/hooks/useProtectedSchemas'
 import { DOCS_URL } from '@/lib/constants'
 
 const orioleExtCallOuts = ['vector', 'postgis']
-
-const FormSchema = z.object({ name: z.string(), schema: z.string() }).superRefine((val, ctx) => {
-  if (val.schema === 'custom' && val.name.length === 0) {
-    ctx.addIssue({
-      code: z.ZodIssueCode.custom,
-      path: ['name'],
-      message: 'Please provide a name for the schema',
-    })
-  }
-})
 
 interface EnableExtensionModalProps {
   visible: boolean
@@ -62,32 +41,13 @@ export const EnableExtensionModal = ({
   onCancel,
 }: EnableExtensionModalProps) => {
   const isOrioleDb = useIsOrioleDb()
+
   const { data: project } = useSelectedProjectQuery()
-  const { data: protectedSchemas } = useProtectedSchemas({ excludeSchemas: ['extensions'] })
-
-  const recommendedSchema = extensionsWithRecommendedSchemas[extension.name]
-
-  const { data: schemas = [], isPending: isLoading } = useSchemasQuery(
-    {
-      projectRef: project?.ref,
-      connectionString: project?.connectionString,
-    },
-    { enabled: visible }
-  )
-  const visibleSchemas = useSchemasFilteredForHighAvailability(schemas)
-  const availableSchemas = useMemo(
-    () =>
-      visibleSchemas.filter(
-        (schema) =>
-          schema.name === recommendedSchema ||
-          !protectedSchemas.some((protectedSchema) => protectedSchema.name === schema.name)
-      ),
-    [visibleSchemas, recommendedSchema, protectedSchemas]
-  )
 
   // [Joshen] Hard-coding pg_cron here as this is enforced on our end (Not via pg_available_extension_versions)
   const defaultSchema =
     extension.name === 'pg_cron' ? 'pg_catalog' : extension.default_version_schema
+  const hasFixedSchema = defaultSchema != null
 
   const { mutate: enableExtension, isPending: isEnabling } = useDatabaseExtensionEnableMutation({
     onSuccess: () => {
@@ -99,33 +59,16 @@ export const EnableExtensionModal = ({
     },
   })
 
-  const defaultValues = { name: extension.name, schema: recommendedSchema ?? 'extensions' }
-  const form = useForm<z.infer<typeof FormSchema>>({
-    mode: 'onBlur',
-    reValidateMode: 'onBlur',
-    resolver: zodResolver(FormSchema),
-    defaultValues,
-  })
-  const schema = useWatch({ control: form.control, name: 'schema' })
-
-  const onSubmit = async (values: z.infer<typeof FormSchema>) => {
+  const onConfirmEnable = async () => {
     if (project === undefined) return console.error('Project is required')
-
-    const schema =
-      defaultSchema !== undefined && defaultSchema !== null
-        ? defaultSchema
-        : values.schema === 'custom'
-          ? values.name
-          : values.schema
 
     enableExtension({
       projectRef: project.ref,
       connectionString: project?.connectionString,
-      schema,
+      schema: defaultSchema ?? 'extensions',
       name: extension.name,
       version: extension.default_version,
       cascade: true,
-      createSchema: !schema.startsWith('pg_'),
     })
   }
 
@@ -136,7 +79,7 @@ export const EnableExtensionModal = ({
         if (!open) onCancel()
       }}
     >
-      <DialogContent size="small" aria-describedby={undefined}>
+      <DialogContent size="small" className="min-w-0 overflow-hidden" aria-describedby={undefined}>
         <DialogHeader>
           <DialogTitle>Enable {extension.name}</DialogTitle>
         </DialogHeader>
@@ -157,113 +100,66 @@ export const EnableExtensionModal = ({
           </Admonition>
         )}
 
-        <DialogSection>
-          <Form {...form}>
-            <form id="enable-extensions-form" onSubmit={form.handleSubmit(onSubmit)}>
-              {isLoading ? (
-                <div className="space-y-2">
-                  <ShimmeringLoader />
-                  <div className="w-3/4">
-                    <ShimmeringLoader />
-                  </div>
-                </div>
-              ) : !!defaultSchema ? (
-                <div className="flex flex-col gap-y-2">
-                  <FormItemLayout
-                    isReactForm={false}
-                    label="Select a schema to enable the extension for"
-                  >
-                    <Input disabled value={defaultSchema} />
-                  </FormItemLayout>
-                  <p className="text-sm text-foreground-light">
-                    Extension must be installed in the "{defaultSchema}" schema.
-                  </p>
-                </div>
-              ) : (
-                <div className="flex flex-col gap-y-2">
-                  <FormField
-                    key="schema"
-                    name="schema"
-                    control={form.control}
-                    render={({ field }) => (
-                      <FormItemLayout
-                        name="schema"
-                        label="Select a schema to enable the extension for"
-                      >
-                        <FormControl>
-                          <Select
-                            value={field.value}
-                            onValueChange={field.onChange}
-                            disabled={!!defaultSchema}
-                          >
-                            <SelectTrigger>
-                              <SelectValue placeholder="Select a schema" />
-                            </SelectTrigger>
-                            <SelectContent>
-                              <SelectItem value="custom">
-                                Create a new schema{' '}
-                                <code className="text-code-inline">{extension.name}</code>
-                              </SelectItem>
-                              <SelectSeparator />
-                              {availableSchemas.map((schema) => {
-                                return (
-                                  <SelectItem key={schema.id} value={schema.name}>
-                                    {schema.name}
-                                    {schema.name === recommendedSchema ? (
-                                      <Badge className="ml-2" variant="success">
-                                        Recommended
-                                      </Badge>
-                                    ) : !defaultSchema && schema.name === 'extensions' ? (
-                                      <Badge className="ml-2">Default</Badge>
-                                    ) : null}
-                                  </SelectItem>
-                                )
-                              })}
-                            </SelectContent>
-                          </Select>
-                        </FormControl>
-                      </FormItemLayout>
-                    )}
-                  />
+        <DialogSection className="flex flex-col gap-y-4">
+          <p className="text-sm text-foreground-light">
+            {hasFixedSchema
+              ? 'This extension must be installed in the schema below.'
+              : 'This extension will be installed in the schema below.'}
+          </p>
 
-                  {!!recommendedSchema && (
-                    <p className="text-sm text-foreground-light">
-                      Use the "{recommendedSchema}" schema for full compatibility with related
-                      features.
-                    </p>
-                  )}
-
-                  {schema === 'custom' && (
-                    <FormField
-                      key="name"
-                      name="name"
-                      control={form.control}
-                      render={({ field }) => (
-                        <FormItemLayout name="name" label="Schema name">
-                          <FormControl>
-                            <Input {...field} />
-                          </FormControl>
-                        </FormItemLayout>
-                      )}
-                    />
-                  )}
-                </div>
-              )}
-            </form>
-          </Form>
+          <Card>
+            <CardContent className="divide-y text-sm p-0">
+              <div className="flex items-center justify-between px-3 py-2.5">
+                <p className="text-foreground-lighter">Extension</p>
+                <code>{extension.name}</code>
+              </div>
+              <div className="flex items-center justify-between px-3 py-2.5">
+                <p className="text-foreground-lighter">Schema</p>
+                <code data-testid="enable-extension-schema">{defaultSchema ?? 'extensions'}</code>
+              </div>
+            </CardContent>
+          </Card>
         </DialogSection>
 
+        {!hasFixedSchema && (
+          <>
+            <DialogSectionSeparator />
+            <DialogDisclosure>
+              <DialogDisclosureTrigger className="py-4 px-4 md:px-5">
+                <span>Install in a different schema</span>
+              </DialogDisclosureTrigger>
+              <DialogDisclosureContent>
+                <DialogSection className="pt-1 min-w-0 flex flex-col gap-y-3">
+                  <div className="text-sm text-foreground-light flex flex-col gap-y-3">
+                    <p>
+                      We recommend using the <code>extensions</code> schema to keep extension
+                      objects separate from your own tables.
+                    </p>
+                    <p>
+                      To use another schema, run the following in the SQL Editor. Replace{' '}
+                      <code>target_schema</code> with an existing schema name.
+                    </p>
+                  </div>
+                  <CodeBlock
+                    language="pgsql"
+                    hideLineNumbers
+                    wrapLongLines
+                    wrapperClassName={cn('min-w-0 max-w-full [&_pre]:px-3 [&_pre]:py-3')}
+                    className="[&_code]:text-xs"
+                    value={safeSql`create extension if not exists ${ident(extension.name)} schema target_schema;`}
+                  />
+                </DialogSection>
+              </DialogDisclosureContent>
+            </DialogDisclosure>
+          </>
+        )}
+
         <DialogFooter>
-          <Button variant="default" disabled={isEnabling} onClick={() => onCancel()}>
+          <Button disabled={isEnabling} onClick={() => onCancel()}>
             Cancel
           </Button>
-          <Button
-            type="submit"
-            form="enable-extensions-form"
-            loading={isEnabling}
-            disabled={isLoading || isEnabling}
-          >
-            Enable extension
+          <Button variant="primary" loading={isEnabling} onClick={() => onConfirmEnable()}>
+            Enable
           </Button>
         </DialogFooter>
       </DialogContent>

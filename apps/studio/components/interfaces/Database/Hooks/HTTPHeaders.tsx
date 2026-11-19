@@ -1,4 +1,4 @@
-import { PermissionAction } from '@supabase/shared-types/out/constants'
+import { useQuery } from '@tanstack/react-query'
 import { useParams } from 'common'
 import { UseFormReturn } from 'react-hook-form'
 import { useWatch } from 'ui'
@@ -6,13 +6,14 @@ import { KeyValueFieldArray } from 'ui-patterns/form/KeyValueFieldArray/KeyValue
 
 import { WebhookFormValues } from './EditHookPanel.constants'
 import { buildEdgeFunctionHeaderAddActions } from '@/components/interfaces/Functions/httpHeaderAddActions'
+import { ApiKeysAccessNote } from '@/components/ui/ApiKeysAccessNote'
 import {
   FormSection,
   FormSectionContent,
   FormSectionLabel,
 } from '@/components/ui/Forms/FormSection'
-import { useAPIKeys } from '@/data/api-keys/api-keys-query'
-import { useAsyncCheckPermissions } from '@/hooks/misc/useCheckPermissions'
+import { getKeys, revealedApiKeysQueryOptions } from '@/data/api-keys/api-keys-query'
+import { useGrant } from '@/lib/grants'
 import { uuidv4 } from '@/lib/helpers'
 
 interface HTTPHeadersProps {
@@ -21,14 +22,13 @@ interface HTTPHeadersProps {
 
 export const HTTPHeaders = ({ form }: HTTPHeadersProps) => {
   const { ref } = useParams()
-  const { can: canReadAPIKeys } = useAsyncCheckPermissions(PermissionAction.SECRETS_READ, '*')
-
-  const { data: apiKeyData } = useAPIKeys(
-    {
-      projectRef: ref,
-      reveal: true,
-    },
-    { enabled: canReadAPIKeys }
+  const apiKeysGrant = useGrant(
+    'GET /v1/projects/{ref}/api-keys',
+    { projectRef: ref },
+    { variant: 'reveal' }
+  )
+  const { data: apiKeyData } = useQuery(
+    revealedApiKeysQueryOptions({ projectRef: ref, grant: apiKeysGrant.grant }, { select: getKeys })
   )
   const { serviceKey, secretKey } = apiKeyData ?? {}
   const apiKey = secretKey?.api_key ?? serviceKey?.api_key ?? '[YOUR API KEY]'
@@ -38,7 +38,6 @@ export const HTTPHeaders = ({ form }: HTTPHeadersProps) => {
     functionType === 'supabase_function'
       ? buildEdgeFunctionHeaderAddActions({
           apiKey,
-          includeApiKeyHeader: serviceKey?.type === 'secret',
           createRow: (name: string, value: string) => ({ id: uuidv4(), name, value }),
         })
       : []
@@ -56,9 +55,15 @@ export const HTTPHeaders = ({ form }: HTTPHeadersProps) => {
           createEmptyRow={() => ({ id: uuidv4(), name: '', value: '' })}
           keyPlaceholder="Header name"
           valuePlaceholder="Header value"
-          addLabel="Add a new header"
+          addLabel="Add header"
           addActions={addActions}
         />
+        {functionType === 'supabase_function' && (
+          <ApiKeysAccessNote
+            grant={apiKeysGrant}
+            fallback="The Authorization header uses a placeholder you can replace."
+          />
+        )}
       </FormSectionContent>
     </FormSection>
   )

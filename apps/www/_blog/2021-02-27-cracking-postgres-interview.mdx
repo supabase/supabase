@@ -24,7 +24,7 @@ Here, we're going to focus on PostgreSQL interview questions that are aimed to u
 
 ### Know how to model 1-M, M-M, 1-1 relationships. And know how to use foreign keys.
 
-A review of [database normalization](https://ocw.mit.edu/courses/civil-and-environmental-engineering/1-264j-database-internet-and-systems-integration-technologies-fall-2013/lecture-notes-exercises/MIT1_264JF13_lect_10.pdf) is a great place to start when thinking about how to correctly model relationships. However if you don't have the time to read through lecture notes, head over to [DBDesigner](https://app.dbdesigner.net/designer/schema/guest_template) and inspect their example schema. The table StudentCourses is a great example of how to model a Many-to-Many relationship, by using a join table. (side note: you can export these visual schemas to SQL using Ctrl+E). Modelling your data correctly is arguably the most important part of any software project, writing applications becomes a breeze if you can get the data layer right.
+A review of [database normalization](https://ocw.mit.edu/courses/civil-and-environmental-engineering/1-264j-database-internet-and-systems-integration-technologies-fall-2013/lecture-notes-exercises/MIT1_264JF13_lect_10.pdf) is a great place to start when thinking about how to correctly model relationships. However if you don't have the time to read through lecture notes, head over to [DBDesigner](https://erd.dbdesigner.net/designer/schema/guest_template) and inspect their example schema. The table StudentCourses is a great example of how to model a Many-to-Many relationship, by using a join table. (side note: you can export these visual schemas to SQL using Ctrl+E). Modelling your data correctly is arguably the most important part of any software project, writing applications becomes a breeze if you can get the data layer right.
 
 ### Know how to use pg rich type system: [arrays](https://www.postgresql.org/docs/current/arrays.html), [domains](https://www.postgresql.org/docs/current/domains.html), [JSONB](https://www.postgresql.org/docs/13/datatype-json.html), [timestamptz](https://www.postgresql.org/docs/current/functions-datetime.html), [enums](https://www.postgresql.org/docs/13/datatype-enum.html)
 
@@ -96,7 +96,7 @@ GRANT INSERT ON students TO PUBLIC;
 
 ### Know how to do RLS - Policies
 
-We use Row Level Security in Supabase as a way to grant/restrict access on a row level basis. For example if you're writing a Discord clone, perhaps only a given user should be able to write their own messages:
+We use [Row Level Security](/docs/guides/database/postgres/row-level-security) in Supabase as a way to grant/restrict access on a row level basis. For example if you're writing a Discord clone, perhaps only a given user should be able to write their own messages:
 
 ```sql
 CREATE POLICY "Individuals can only write their own messages." ON messages FOR
@@ -165,6 +165,6 @@ Thanks Steve Chavez for providing all the good bits of this post :)
 - [Implementing "seen by" functionality with Postgres](https://supabase.com/blog/seen-by-in-postgresql)
 - [Partial data dumps using Postgres Row Level Security](https://supabase.com/blog/partial-postgresql-data-dumps-with-rls)
 - [Postgres Views](https://supabase.com/blog/postgresql-views)
-- [Postgres Auditing in 150 lines of SQL](https://supabase.com/blog/audit)
+- [Postgres Auditing in 150 lines of SQL](https://supabase.com/blog/postgres-audit)
 - [What are PostgreSQL Templates?](https://supabase.com/blog/postgresql-templates)
 - [Realtime Postgres RLS on Supabase](https://supabase.com/blog/realtime-row-level-security-in-postgresql)

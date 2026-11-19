@@ -1,9 +1,11 @@
 import { InfiniteData, useInfiniteQuery } from '@tanstack/react-query'
+import { useIsLoggedIn } from 'common'
 
 import { notificationKeys } from './keys'
 import type { components } from '@/data/api'
 import { get, handleError } from '@/data/fetchers'
-import type { ResponseError, UseCustomInfiniteQueryOptions } from '@/types'
+import type { StudioError } from '@/lib/errors/studio-errors'
+import type { UseCustomInfiniteQueryOptions } from '@/types'
 
 const NOTIFICATIONS_PAGE_LIMIT = 10
 
@@ -18,7 +20,7 @@ export type NotificationVariables = {
   }
 }
 
-export type Notification = components['schemas']['NotificationResponse']
+export type Notification = components['schemas']['NotificationResponse_Output']
 
 /**
  * Notification Data - This is not typed from the API end as it's meant to be open-ended
@@ -60,7 +62,7 @@ export async function getNotifications(options: NotificationVariables, signal?: 
 }
 
 export type NotificationsData = Awaited<ReturnType<typeof getNotifications>>
-export type NotificationsError = ResponseError
+export type NotificationsError = StudioError
 
 export const useNotificationsV2Query = <TData = NotificationsData>(
   { status, filters, limit = NOTIFICATIONS_PAGE_LIMIT }: Omit<NotificationVariables, 'page'>,
@@ -75,11 +77,13 @@ export const useNotificationsV2Query = <TData = NotificationsData>(
     number | undefined
   > = {}
 ) => {
+  const isLoggedIn = useIsLoggedIn()
+
   return useInfiniteQuery({
     queryKey: notificationKeys.listV2({ status, filters, limit }),
     queryFn: ({ signal, pageParam }) =>
       getNotifications({ status, filters, limit, page: pageParam }, signal),
-    enabled: enabled,
+    enabled: (enabled ?? true) && isLoggedIn,
     initialPageParam: 0,
     getNextPageParam(lastPage, pages) {
       const page = pages.length

@@ -2,10 +2,12 @@ import pgMeta from '@supabase/pg-meta'
 import { useMutation, useQueryClient } from '@tanstack/react-query'
 import { toast } from 'sonner'
 
-import { tableKeys } from './keys'
+import { unguarded } from '@/data/fetchers'
 import { privilegeKeys } from '@/data/privileges/keys'
 import { executeSql } from '@/data/sql/execute-sql-mutation'
-import type { ResponseError, UseCustomMutationOptions } from '@/types'
+import { invalidateTableMetadata } from '@/data/tables/table-metadata-invalidation'
+import type { StudioError } from '@/lib/errors/studio-errors'
+import type { UseCustomMutationOptions } from '@/types'
 
 export type CreateTableBody = {
   name: string
@@ -26,8 +28,11 @@ export async function createTable({ projectRef, connectionString, payload }: Tab
   const { result } = await executeSql<void>({
     projectRef,
     connectionString,
+    sqlOrigin: 'studio',
+    queryName: 'table-create',
     sql,
     queryKey: ['table', 'create'],
+    grant: unguarded.migrating,
   })
 
   return result
@@ -40,22 +45,22 @@ export const useTableCreateMutation = ({
   onError,
   ...options
 }: Omit<
-  UseCustomMutationOptions<TableCreateData, ResponseError, TableCreateVariables>,
+  UseCustomMutationOptions<TableCreateData, StudioError, TableCreateVariables>,
   'mutationFn'
 > = {}) => {
   const queryClient = useQueryClient()
 
-  return useMutation<TableCreateData, ResponseError, TableCreateVariables>({
+  return useMutation<TableCreateData, StudioError, TableCreateVariables>({
     mutationFn: (vars) => createTable(vars),
     async onSuccess(data, variables, context) {
       const { projectRef, payload } = variables
 
       await Promise.all([
-        queryClient.invalidateQueries({
-          queryKey: tableKeys.list(projectRef, payload.schema, { includeColumns: true }),
-        }),
-        queryClient.invalidateQueries({
-          queryKey: tableKeys.list(projectRef, payload.schema, { includeColumns: false }),
+        invalidateTableMetadata(queryClient, {
+          projectRef,
+          schema: payload.schema,
+          tableName: payload.name,
+          includeLint: true,
         }),
         queryClient.invalidateQueries({
           queryKey: privilegeKeys.tablePrivilegesList(projectRef),

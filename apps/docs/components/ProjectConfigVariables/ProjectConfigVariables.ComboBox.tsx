@@ -83,7 +83,6 @@ export function ComboBox<Opt extends ComboBoxOption>({
       <PopoverTrigger asChild>
         <Button
           variant="outline"
-          role="combobox"
           disabled={disabled}
           aria-expanded={open}
           className={cn(
@@ -95,17 +94,18 @@ export function ComboBox<Opt extends ComboBoxOption>({
             className
           )}
         >
+          <span className="sr-only">{name}: </span>
           {selectedDisplayName ??
             (isLoading && options.length > 0
               ? 'Loading...'
               : options.length === 0
                 ? `No ${name} found`
                 : `Select a ${name}...`)}
-          <ChevronsUpDown className="ml-2 h-4 w-4 shrink-0 opacity-50" />
+          <ChevronsUpDown className="ml-2 h-4 w-4 shrink-0 opacity-50" aria-hidden />
         </Button>
       </PopoverTrigger>
       <PopoverContent className="p-0" side="bottom" align="start">
-        <Command shouldFilter={useCommandSearch}>
+        <Command shouldFilter={useCommandSearch} label={`Search ${name}`}>
           <CommandInput
             placeholder={`Search ${name}...`}
             className="border-none ring-0"
@@ -114,7 +114,10 @@ export function ComboBox<Opt extends ComboBoxOption>({
             onValueChange={setSearch}
             handleReset={() => setSearch('')}
           />
-          <CommandList>
+          <span className="sr-only" role="status">
+            {!isLoading && search.length > 0 && options.length === 0 ? `No ${name} found` : ''}
+          </span>
+          <CommandList label={`${name} options`}>
             <CommandGroup>
               {isLoading ? (
                 <div className="px-2 py-1 flex flex-col gap-2">
@@ -124,7 +127,7 @@ export function ComboBox<Opt extends ComboBoxOption>({
               ) : (
                 <>
                   {search.length > 0 && options.length === 0 && (
-                    <p className="text-xs text-center text-foreground-lighter py-3">
+                    <p className="text-xs text-center text-foreground-lighter py-3" aria-hidden>
                       No {name}s found based on your search
                     </p>
                   )}
@@ -145,6 +148,7 @@ export function ComboBox<Opt extends ComboBoxOption>({
                             'mr-2 h-4 w-4',
                             selectedOption === option.value ? 'opacity-100' : 'opacity-0'
                           )}
+                          aria-hidden
                         />
                         {option.displayName}
                       </CommandItem>

@@ -10,9 +10,11 @@ import {
   pgmqQueueTable,
 } from '@/components/interfaces/Integrations/Queues/Queues.utils'
 import { QUEUE_MESSAGE_TYPE } from '@/components/interfaces/Integrations/Queues/SingleQueue/Queue.utils'
+import { unguarded } from '@/data/fetchers'
 import { executeSql } from '@/data/sql/execute-sql-mutation'
 import { DATE_FORMAT } from '@/lib/constants'
-import type { ResponseError, UseCustomInfiniteQueryOptions } from '@/types'
+import type { StudioError } from '@/lib/errors/studio-errors'
+import type { UseCustomInfiniteQueryOptions } from '@/types'
 
 export type DatabaseQueueVariables = {
   projectRef?: string
@@ -97,13 +99,16 @@ export async function getDatabaseQueue({
   const { result } = await executeSql({
     projectRef,
     connectionString,
+    sqlOrigin: 'studio',
+    queryName: 'database-queue-messages-infinite',
     sql,
+    grant: unguarded.migrating,
   })
   return result as DatabaseQueueData
 }
 
 export type DatabaseQueueData = PostgresQueueMessage[]
-export type DatabaseQueueError = ResponseError
+export type DatabaseQueueError = StudioError
 
 export const useQueueMessagesInfiniteQuery = <TData = DatabaseQueueData>(
   { projectRef, connectionString, queueName, status }: DatabaseQueueVariables,

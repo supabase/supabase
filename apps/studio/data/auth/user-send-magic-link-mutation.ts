@@ -3,7 +3,8 @@ import { toast } from 'sonner'
 
 import type { User } from './users-infinite-query'
 import { handleError, post } from '@/data/fetchers'
-import type { ResponseError, UseCustomMutationOptions } from '@/types'
+import type { StudioError } from '@/lib/errors/studio-errors'
+import type { UseCustomMutationOptions } from '@/types'
 
 export type UserSendMagicLinkVariables = {
   projectRef: string
@@ -28,10 +29,10 @@ export const useUserSendMagicLinkMutation = ({
   onError,
   ...options
 }: Omit<
-  UseCustomMutationOptions<UserSendMagicLinkData, ResponseError, UserSendMagicLinkVariables>,
+  UseCustomMutationOptions<UserSendMagicLinkData, StudioError, UserSendMagicLinkVariables>,
   'mutationFn'
 > = {}) => {
-  return useMutation<UserSendMagicLinkData, ResponseError, UserSendMagicLinkVariables>({
+  return useMutation<UserSendMagicLinkData, StudioError, UserSendMagicLinkVariables>({
     mutationFn: (vars) => sendMagicLink(vars),
     async onSuccess(data, variables, context) {
       // [Joshen] If we need to invalidate any queries

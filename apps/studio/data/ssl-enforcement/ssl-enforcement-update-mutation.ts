@@ -2,9 +2,11 @@ import { useMutation, useQueryClient } from '@tanstack/react-query'
 import { toast } from 'sonner'
 
 import { sslEnforcementKeys } from './keys'
-import { handleError, put } from '@/data/fetchers'
+import { configKeys } from '@/data/config/keys'
+import { handleError, put, unguarded } from '@/data/fetchers'
 import { jitDbAccessKeys } from '@/data/jit-db-access/keys'
-import type { ResponseError, UseCustomMutationOptions } from '@/types'
+import type { StudioError } from '@/lib/errors/studio-errors'
+import type { UseCustomMutationOptions } from '@/types'
 
 export type SSLEnforcementUpdateVariables = {
   projectRef: string
@@ -26,6 +28,7 @@ export async function updateSSLEnforcement({
   const { data, error } = await put(`/v1/projects/{ref}/ssl-enforcement`, {
     params: { path: { ref: projectRef } },
     body: { requestedConfig },
+    grant: unguarded.migrating,
   })
 
   if (error) handleError(error)
@@ -39,12 +42,12 @@ export const useSSLEnforcementUpdateMutation = ({
   onError,
   ...options
 }: Omit<
-  UseCustomMutationOptions<SSLEnforcementUpdateData, ResponseError, SSLEnforcementUpdateVariables>,
+  UseCustomMutationOptions<SSLEnforcementUpdateData, StudioError, SSLEnforcementUpdateVariables>,
   'mutationFn'
 > = {}) => {
   const queryClient = useQueryClient()
 
-  return useMutation<SSLEnforcementUpdateData, ResponseError, SSLEnforcementUpdateVariables>({
+  return useMutation<SSLEnforcementUpdateData, StudioError, SSLEnforcementUpdateVariables>({
     mutationFn: (vars) => updateSSLEnforcement(vars),
     async onSuccess(data, variables, context) {
       const { projectRef } = variables
@@ -52,6 +55,7 @@ export const useSSLEnforcementUpdateMutation = ({
       // JIT DB access can report `unavailableReason: 'ssl_enforcement_required'`,
       // so its status needs to be refetched whenever SSL enforcement changes.
       await queryClient.invalidateQueries({ queryKey: jitDbAccessKeys.list(projectRef) })
+      await queryClient.invalidateQueries({ queryKey: configKeys.projectConfig(projectRef) })
       await onSuccess?.(data, variables, context)
     },
     async onError(data, variables, context) {

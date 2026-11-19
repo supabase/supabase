@@ -1,4 +1,4 @@
-import { Eye, Unlock } from 'lucide-react'
+import { EyeIcon, UnlockIcon } from 'lucide-react'
 import { useState } from 'react'
 import { toast } from 'sonner'
 import ConfirmationModal from 'ui-patterns/Dialogs/ConfirmationModal'
@@ -37,7 +37,12 @@ export const MakeReportSnippetPublicModal = ({
       upsertContent(
         {
           projectRef,
-          payload: { ...item, visibility: 'project', folder_id: null },
+          payload: {
+            ...item,
+            description: item.description ?? undefined,
+            visibility: 'project',
+            folder_id: null,
+          },
         },
         {
           onSuccess: () => {
@@ -72,11 +77,11 @@ export const MakeReportSnippetPublicModal = ({
     >
       <ul className="text-sm text-foreground-light space-y-5">
         <li className="flex gap-3 items-center">
-          <Eye size={16} />
+          <EyeIcon size={16} />
           <span>Project members will have read-only access to this snippet.</span>
         </li>
         <li className="flex gap-3 items-center">
-          <Unlock size={16} />
+          <UnlockIcon size={16} />
           <span>Project members can duplicate it to their personal snippets.</span>
         </li>
       </ul>

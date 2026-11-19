@@ -3,6 +3,7 @@ import { InfiniteData, useInfiniteQuery } from '@tanstack/react-query'
 import { Content } from './content-query'
 import { remapSqlContentFields } from './content-remap'
 import { contentKeys } from './keys'
+import { getLogSqlSnippetPage } from './logs-view-content'
 import { SNIPPET_PAGE_LIMIT, withSavedStatus, type SnippetWithContent } from './sql-folders-query'
 import { get } from '@/data/fetchers'
 import type { UseCustomInfiniteQueryOptions } from '@/types'
@@ -31,6 +32,14 @@ export async function getSqlSnippets(
     throw new Error('projectRef is required for getSqlSnippets')
   }
 
+  if (type === 'log_sql') {
+    const { rows, cursor: nextCursor } = await getLogSqlSnippetPage(
+      { projectRef, name, visibility, favorite, sort, cursor, limit: SNIPPET_PAGE_LIMIT },
+      signal
+    )
+    return { cursor: nextCursor, contents: rows.map(withSavedStatus) }
+  }
+
   const sortOrder = sort === 'name' ? 'asc' : 'desc'
 
   const { data, error } = await get('/platform/projects/{ref}/content', {
@@ -40,7 +49,7 @@ export async function getSqlSnippets(
         type,
         cursor,
         visibility,
-        favorite,
+        favorite: favorite?.toString(),
         name,
         limit: SNIPPET_PAGE_LIMIT.toString(),
         sort_by: sort,

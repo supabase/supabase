@@ -1,25 +1,55 @@
-import { screen } from '@testing-library/dom'
-import userEvent from '@testing-library/user-event'
-import { expect, test, vi } from 'vitest'
+import { act, fireEvent, screen, waitFor } from '@testing-library/react'
+import { Toaster } from 'sonner'
+import { afterEach, beforeEach, expect, test, vi } from 'vitest'
 
 import CopyButton from '@/components/ui/CopyButton'
-import { render } from '@/tests/helpers'
+import { customRender } from '@/tests/lib/custom-render'
 
-test('shows copied text', async () => {
-  const callback = vi.fn()
-  render(<CopyButton text="some text" onClick={callback} />)
-  await userEvent.click(await screen.findByText('Copy'))
-  await screen.findByText('Copied')
-  expect(callback).toBeCalled()
+const clipboardDescriptor = Object.getOwnPropertyDescriptor(navigator, 'clipboard')
+
+beforeEach(() => {
+  vi.spyOn(document, 'hasFocus').mockReturnValue(true)
+  vi.stubGlobal('ClipboardItem', undefined)
 })
 
-test('does not show a green copied icon for primary buttons', async () => {
-  const { container } = render(<CopyButton text="some text" variant="primary" />)
+afterEach(() => {
+  vi.restoreAllMocks()
+  vi.unstubAllGlobals()
+  if (clipboardDescriptor) Object.defineProperty(navigator, 'clipboard', clipboardDescriptor)
+  else Reflect.deleteProperty(navigator, 'clipboard')
+})
 
-  await userEvent.click(await screen.findByText('Copy'))
-  await screen.findByText('Copied')
+function mockClipboard(writeText: (text: string) => Promise<void>) {
+  Object.defineProperty(navigator, 'clipboard', { configurable: true, value: { writeText } })
+}
 
-  const icon = container.querySelector('svg')
-  expect(icon).toHaveClass('text-inherit')
-  expect(icon).not.toHaveClass('text-brand')
+test('confirms copied text only after the clipboard write succeeds', async () => {
+  let resolveWrite: () => void = () => {}
+  const pendingWrite = new Promise<void>((resolve) => {
+    resolveWrite = resolve
+  })
+  const writeText = vi.fn(() => pendingWrite)
+  mockClipboard(writeText)
+  const onClick = vi.fn()
+  customRender(<CopyButton asyncText={() => Promise.resolve('some text')} onClick={onClick} />)
+  fireEvent.click(screen.getByRole('button', { name: 'Copy' }))
+  await waitFor(() => expect(writeText).toHaveBeenCalledWith('some text'))
+  expect(screen.getByRole('button', { name: 'Copy' })).toBeInTheDocument()
+  expect(onClick).toHaveBeenCalledOnce()
+  await act(async () => resolveWrite())
+  expect(await screen.findByRole('button', { name: 'Copied' })).toBeInTheDocument()
+})
+
+test('keeps the copy action available and reports a failed clipboard write', async () => {
+  mockClipboard(() => Promise.reject(new Error('Clipboard denied')))
+  customRender(
+    <>
+      <CopyButton text="some text" />
+      <Toaster />
+    </>
+  )
+  fireEvent.click(screen.getByRole('button', { name: 'Copy' }))
+  expect(await screen.findByText('Unable to copy to clipboard')).toBeInTheDocument()
+  expect(screen.getByRole('button', { name: 'Copy' })).toBeInTheDocument()
+  expect(screen.queryByRole('button', { name: 'Copied' })).not.toBeInTheDocument()
 })

@@ -16,7 +16,7 @@ toc_depth: 2
 
 Today we're open-sourcing an EXPERIMENTAL extension for CRDTs, `pg_crdt`. The GitHub repo is [here](https://github.com/supabase/pg_crdt). There are [instructions](https://github.com/supabase/pg_crdt#installation) for running it locally in the README.
 
-When we released the new [multiplayer features](/blog/supabase-realtime-multiplayer-general-availability) for our Realtime engine,
+When we released the new [multiplayer features](/blog/supabase-realtime-multiplayer-general-availability) for our [Realtime](/realtime) engine,
 it took 30 minutes for someone to ask if we'd add CRDT support.
 
 > _Anyone from Supabase here, do you have any plans to build in support for CRDT toolkits such as Yjs or AutoMerge for these features? It would make working with them so much easier if there was a plug and play backend._
@@ -86,7 +86,7 @@ a) find a merge strategy for an entire row, while simultaneously:
 
 b) finding a merge strategy for every data type _within_ that row (especially with the number of data types available through extensions)
 
-It's possible that developers will need to be selective about their “level” of offline support, at least if they plan to use an “incumbent” databases. For the cases, a simple “last write wins” strategy is probably acceptable (see the excellent [Replicache](https://doc.replicache.dev/examples/repliear) and [Watermelon](https://nozbe.github.io/WatermelonDB/) libraries), but there will be important pieces of their application where it is not.
+It's possible that developers will need to be selective about their “level” of offline support, at least if they plan to use an “incumbent” databases. For the cases, a simple “last write wins” strategy is probably acceptable (see the excellent [Replicache](https://doc.replicache.dev/examples/repliear) and [Watermelon](https://watermelondb.dev/) libraries), but there will be important pieces of their application where it is not.
 
 Take this table of blog posts as an example:
 
@@ -118,7 +118,7 @@ The `content` column is now a [Yjs Doc](https://docs.yjs.dev/api/y.doc). Updates
 
 ### Support for Yjs, Automerge, and beyond
 
-The Yjs and Automerge teams have done some excellent work to create Rust libraries for their CRDTs implementations. It was relatively trivial to wrap the libraries into a Postgres extension using the [pgx](https://github.com/tcdi/pgx) framework.
+The Yjs and Automerge teams have done some excellent work to create Rust libraries for their CRDTs implementations. It was relatively trivial to wrap the libraries into a Postgres extension using the [pgx](https://github.com/pgcentralfoundation/pgrx) framework.
 
 At this stage it makes sense to give developers as many choices as possible in one extension. The CRDT space is nascent the algorithms are rapidly changing.
 

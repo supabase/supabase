@@ -2,7 +2,7 @@ import type { ConnectionStringMethod } from './Connect.constants'
 import type { ConnectionStringPooler } from './Connect.types'
 
 export const DEFAULT_PORT = '5432'
-export const PASSWORD_PLACEHOLDER = '[YOUR-PASSWORD]'
+export const PASSWORD_PLACEHOLDER = '[YOUR-DATABASE-PASSWORD]'
 
 /** Appends query params to a connection string, joining with `?` or `&` as needed */
 export const appendConnectionStringParams = (uri: string, params: string) =>
@@ -106,6 +106,27 @@ export const buildJdbcString = (params: ConnectionParams) => {
     ? `&${params.search.slice(1).replace('sslnegotiation=', 'sslNegotiation=')}`
     : ''
   return `jdbc:postgresql://${params.host}:${params.port}/${params.database}?user=${params.user}&password=${PASSWORD_PLACEHOLDER}${extraParams}`
+}
+
+/**
+ * Ensures a connection string's query params carry `sslmode=require` without
+ * dropping params the URI already has (e.g. `options=reference%3D...` or
+ * `sslnegotiation=direct`).
+ */
+export const withRequiredSslmode = (search: string) => {
+  if (!search) return '?sslmode=require'
+  if (search.includes('sslmode=')) return search
+  return `${search}&sslmode=require`
+}
+
+export const buildDotnetConnectionString = (params: ConnectionParams) => {
+  // Multigres only accepts direct SSL negotiation; Npgsql (9+) spells it
+  // `SSL Negotiation=Direct` and throws on the parameter in older versions,
+  // so only emit it when the resolved URI carries the param.
+  const sslNegotiation = params.search.includes('sslnegotiation=direct')
+    ? ';SSL Negotiation=Direct'
+    : ''
+  return `Host=${params.host};Port=${params.port};Database=${params.database};Username=${params.user};Password=${PASSWORD_PLACEHOLDER};SSL Mode=Require;Trust Server Certificate=true${sslNegotiation}`
 }
 
 export const buildConnectionStringWithPassword = (

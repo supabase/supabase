@@ -16,6 +16,7 @@ import {
   getJobRunDetailsPageCountKey,
 } from '@/data/database-cron-jobs/keys'
 import { useScheduleCronJobRunDetailsCleanupMutation } from '@/data/database-cron-jobs/schedule-clean-up-mutation'
+import { unguarded } from '@/data/fetchers'
 import { useExecuteSqlMutation } from '@/data/sql/execute-sql-mutation'
 
 // Delay between batches to allow other queries to proceed (in milliseconds)
@@ -82,8 +83,11 @@ export const useCronJobsCleanupActions = ({
         const pageCountResult = await executeSql({
           projectRef,
           connectionString,
+          sqlOrigin: 'studio',
+          queryName: 'cron-job-run-details-page-count',
           sql: getJobRunDetailsPageCountSql(),
           queryKey: getJobRunDetailsPageCountKey(projectRef),
+          grant: unguarded.migrating,
         })
 
         const rawTotalPages = pageCountResult.result?.[0]?.num_pages ?? 0
@@ -130,8 +134,11 @@ export const useCronJobsCleanupActions = ({
           const deleteResult = await executeSql({
             projectRef,
             connectionString,
+            sqlOrigin: 'studio',
+            queryName: 'cron-job-run-details-delete-by-ctid',
             sql: getDeleteOldCronJobRunDetailsByCtidSql(interval, startPage, endPage),
             queryKey: getDeleteOldCronJobRunDetailsByCtidKey(projectRef, interval, startPage),
+            grant: unguarded.migrating,
           })
 
           const deletedCount = deleteResult.result?.[0]?.deleted_count ?? 0

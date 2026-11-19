@@ -2,7 +2,7 @@ import { LOCAL_STORAGE_KEYS } from 'common'
 import dynamic from 'next/dynamic'
 import { useRouter } from 'next/router'
 import { parseAsString, useQueryState } from 'nuqs'
-import { useEffect, useEffectEvent, type PropsWithChildren } from 'react'
+import { useEffect, useEffectEvent, useRef, type PropsWithChildren } from 'react'
 
 import { getSupportLinkQueryParams } from '@/components/ui/HelpPanel/HelpPanel.utils'
 import { useLatest } from '@/hooks/misc/useLatest'
@@ -57,7 +57,6 @@ export const LayoutSidebarProvider = ({ children }: PropsWithChildren) => {
     router.query.ref as string | undefined
   )
 
-  const sidebarURLParamRef = useLatest(sidebarURLParam)
   const sidebarLocalStorageRef = useLatest(sidebarLocalStorage)
 
   useRegisterSidebar(SIDEBAR_KEYS.AI_ASSISTANT, () => <AIAssistant />, {}, !!project)
@@ -89,31 +88,45 @@ export const LayoutSidebarProvider = ({ children }: PropsWithChildren) => {
     }
   )
 
+  const previousSidebarIdRef = useRef<string | undefined>(undefined)
+
   useEffect(() => {
-    if (!!project) {
-      if (activeSidebar) {
-        onSidebarChanged(activeSidebar.id as (typeof SIDEBAR_KEYS)[keyof typeof SIDEBAR_KEYS])
-        setSidebarLocalStorage(activeSidebar.id)
-      } else {
-        setSidebarLocalStorage('')
-        setSidebarUrlParam(null)
-      }
+    const previousSidebarId = previousSidebarIdRef.current
+    previousSidebarIdRef.current = activeSidebar?.id
+
+    // unregistering (e.g. project switch) isn't a user close
+    const isClosedByUser =
+      !activeSidebar &&
+      previousSidebarId !== undefined &&
+      previousSidebarId in sidebarManagerState.sidebars
+    if (isClosedByUser) {
+      setSidebarUrlParam(null)
     }
+
+    if (!project) {
+      return
+    }
+
+    if (activeSidebar) {
+      onSidebarChanged(activeSidebar.id as (typeof SIDEBAR_KEYS)[keyof typeof SIDEBAR_KEYS])
+      setSidebarLocalStorage(activeSidebar.id)
+      return
+    }
+
+    setSidebarLocalStorage('')
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [activeSidebar])
 
-  // Handle toggling of sidebars on page init
   // Prioritize URL params first, then local storage
   useEffect(() => {
     if (router.isReady && isLoadedLocalStorage) {
       if (
-        typeof sidebarURLParamRef.current === 'string' &&
+        typeof sidebarURLParam === 'string' &&
         Object.values(SIDEBAR_KEYS).includes(
-          sidebarURLParamRef.current as (typeof SIDEBAR_KEYS)[keyof typeof SIDEBAR_KEYS]
+          sidebarURLParam as (typeof SIDEBAR_KEYS)[keyof typeof SIDEBAR_KEYS]
         )
       ) {
-        console.log('Open sidebar based on URL')
-        openSidebar(sidebarURLParamRef.current)
+        openSidebar(sidebarURLParam)
       } else if (
         !!sidebarLocalStorageRef.current &&
         Object.values(SIDEBAR_KEYS).includes(
@@ -124,7 +137,7 @@ export const LayoutSidebarProvider = ({ children }: PropsWithChildren) => {
       }
     }
     // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, [router.isReady, isLoadedLocalStorage])
+  }, [router.isReady, isLoadedLocalStorage, sidebarURLParam])
 
   return <>{children}</>
 }

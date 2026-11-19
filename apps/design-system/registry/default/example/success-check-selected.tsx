@@ -23,13 +23,13 @@ export default function SuccessCheckSelected() {
             className={cn(
               'relative flex w-full items-center rounded-md border px-4 py-3 text-left text-sm transition-colors',
               isSelected
-                ? 'border-brand bg-brand-200/20 pr-10 dark:bg-brand-300'
+                ? 'border-primary-bright bg-primary-bright/10 pr-10'
                 : 'hover:border-default hover:bg-surface-200'
             )}
           >
             {option}
             {isSelected && (
-              <SuccessCheck className="pointer-events-none absolute right-3 top-1/2 -translate-y-1/2" />
+              <SuccessCheck className="pointer-events-none absolute right-3 top-1/2 -translate-y-1/2 border-primary-bright bg-primary-bright text-black" />
             )}
           </button>
         )

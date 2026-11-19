@@ -1,15 +1,16 @@
 import {
-  Cable,
-  Code,
-  Globe,
-  HardDrive,
-  Lock,
-  MonitorDot,
-  PackageOpen,
-  ReceiptText,
-  Server,
-  ShieldCheck,
-  Zap,
+  CableIcon,
+  CodeIcon,
+  GlobeIcon,
+  HardDriveIcon,
+  HashIcon,
+  LockIcon,
+  MonitorDotIcon,
+  PackageOpenIcon,
+  ReceiptTextIcon,
+  ServerIcon,
+  ShieldCheckIcon,
+  ZapIcon,
 } from 'lucide-react'
 
 import { BlockConfig } from '../components/shared/Block'
@@ -23,12 +24,16 @@ import {
   locationAdditionalFields,
   locationPrimaryField,
   networkPrimaryFields,
-  postgresDetailsFields,
-  postgresPrimaryFields,
+  postgresSessionFields,
+  postgresStatementFields,
   postgrestPrimaryFields,
+  postgresTransactionFields,
   postgrestResponseFields,
   storageDetailsFields,
   storagePrimaryFields,
+  supavisorNodeFields,
+  supavisorPrimaryFields,
+  supavisorSourceFields,
   techDetailsFields,
   userAdditionalFields,
   userPrimaryField,
@@ -36,18 +41,18 @@ import {
 
 export const authBlockConfig: BlockConfig = {
   title: 'Authentication',
-  icon: Lock,
+  icon: LockIcon,
   primaryFields: authPrimaryFields,
 }
 
 export const postgrestBlockConfig: BlockConfig = {
   title: 'Data API',
-  icon: Server,
+  icon: ServerIcon,
   primaryFields: postgrestPrimaryFields,
   sections: [
     {
       title: 'Response Details',
-      icon: ReceiptText,
+      icon: ReceiptTextIcon,
       fields: postgrestResponseFields,
     },
   ],
@@ -55,7 +60,7 @@ export const postgrestBlockConfig: BlockConfig = {
 
 export const networkBlockConfig: BlockConfig = {
   title: 'Network',
-  icon: Globe,
+  icon: GlobeIcon,
   primaryFields: networkPrimaryFields,
   sections: [
     {
@@ -76,12 +81,12 @@ export const networkBlockConfig: BlockConfig = {
     },
     {
       title: 'Authorization',
-      icon: ShieldCheck,
+      icon: ShieldCheckIcon,
       fields: authorizationFields,
     },
     {
       title: 'Tech Details',
-      icon: MonitorDot,
+      icon: MonitorDotIcon,
       fields: techDetailsFields,
     },
   ],
@@ -89,12 +94,12 @@ export const networkBlockConfig: BlockConfig = {
 
 export const edgeFunctionBlockConfig: BlockConfig = {
   title: 'Edge Function',
-  icon: Zap,
+  icon: ZapIcon,
   primaryFields: edgeFunctionPrimaryFields,
   sections: [
     {
       title: 'Function Details',
-      icon: Code,
+      icon: CodeIcon,
       fields: edgeFunctionDetailsFields,
     },
   ],
@@ -102,12 +107,12 @@ export const edgeFunctionBlockConfig: BlockConfig = {
 
 export const storageBlockConfig: BlockConfig = {
   title: 'Storage',
-  icon: HardDrive,
+  icon: HardDriveIcon,
   primaryFields: storagePrimaryFields,
   sections: [
     {
       title: 'Storage Details',
-      icon: PackageOpen,
+      icon: PackageOpenIcon,
       fields: storageDetailsFields,
     },
   ],
@@ -115,12 +120,35 @@ export const storageBlockConfig: BlockConfig = {
 
 export const postgresBlockConfig: BlockConfig = {
   title: 'Postgres',
-  primaryFields: postgresPrimaryFields,
+  primaryFields: postgresStatementFields,
   sections: [
     {
-      title: 'Connection & Session Details',
-      icon: Cable,
-      fields: postgresDetailsFields,
+      title: 'Session',
+      icon: CableIcon,
+      fields: postgresSessionFields,
+    },
+    {
+      title: 'Transaction',
+      icon: HashIcon,
+      fields: postgresTransactionFields,
+    },
+  ],
+}
+
+export const supavisorBlockConfig: BlockConfig = {
+  title: 'Supavisor',
+  icon: CableIcon,
+  primaryFields: supavisorPrimaryFields,
+  sections: [
+    {
+      title: 'Node Details',
+      icon: ServerIcon,
+      fields: supavisorNodeFields,
+    },
+    {
+      title: 'Source',
+      icon: CodeIcon,
+      fields: supavisorSourceFields,
     },
   ],
 }

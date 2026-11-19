@@ -110,7 +110,7 @@ export const Devs = () => {
         <div className="flex flex-col justify-end h-full px-4 py-0 relative">
           <div className="flex justify-between items-center">
             <h2 className="font-medium tracking-tighter text-6xl md:text-7xl lg:text-[5.6rem] translate-y-2 lg:translate-y-[10px]">
-              Devs <span className="text-brand">love</span> Supabase
+              Devs <span className="text-primary">love</span> Supabase
             </h2>
           </div>
         </div>
@@ -130,7 +130,7 @@ export const Devs = () => {
           className="relative max-w-240 mx-auto border-x border-b p-8 bg-surface-75 w-[95%] md:w-full"
         >
           <div className="flex flex-col gap-2">
-            <p className="text-4xl md:text-5xl font-mono font-medium text-brand tracking-tighter">
+            <p className="text-4xl md:text-5xl font-mono font-medium text-primary tracking-tighter">
               <AnimatedCounter
                 value={stat.number}
                 increment={stat.increment}
@@ -160,7 +160,7 @@ export const Devs = () => {
                     <div className="flex flex-col gap-2">
                       <div className="flex flex-col">
                         <p
-                          className={`text-2xl md:text-3xl font-mono font-medium tracking-tighter ${stat.increment > 0 ? 'text-brand' : 'text-foreground'}`}
+                          className={`text-2xl md:text-3xl font-mono font-medium tracking-tighter ${stat.increment > 0 ? 'text-primary' : 'text-foreground'}`}
                         >
                           {stat.suffix ? (
                             <>

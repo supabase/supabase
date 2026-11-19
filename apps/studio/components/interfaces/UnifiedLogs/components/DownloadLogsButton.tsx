@@ -1,6 +1,6 @@
 import { IS_PLATFORM, useParams } from 'common'
 import saveAs from 'file-saver'
-import { Download, Settings } from 'lucide-react'
+import { DownloadIcon, SettingsIcon } from 'lucide-react'
 import Link from 'next/link'
 import { usePathname } from 'next/navigation'
 import Papa from 'papaparse'
@@ -104,9 +104,8 @@ export const DownloadLogsButton = ({ searchParameters }: DownloadLogsButtonProps
         <ShortcutTooltip shortcutId={SHORTCUT_IDS.UNIFIED_LOGS_DOWNLOAD} side="bottom">
           <DropdownMenuTrigger asChild>
             <Button
-              variant="default"
               className="w-[26px]"
-              icon={<Download className="text-foreground" />}
+              icon={<DownloadIcon className="text-foreground" />}
               aria-label="Download logs"
             />
           </DropdownMenuTrigger>
@@ -115,17 +114,17 @@ export const DownloadLogsButton = ({ searchParameters }: DownloadLogsButtonProps
           {isLogs && IS_PLATFORM && (
             <DropdownMenuItem asChild className="gap-x-2">
               <Link href={`/project/${ref}/settings/log-drains`}>
-                <Settings size={14} />
+                <SettingsIcon size={14} />
                 <p>Add a Log Drain</p>
               </Link>
             </DropdownMenuItem>
           )}
           <DropdownMenuItem onClick={() => setSelectedFormat('csv')} className="gap-x-2">
-            <Download size={14} />
+            <DownloadIcon size={14} />
             <p>Download as CSV</p>
           </DropdownMenuItem>
           <DropdownMenuItem onClick={() => setSelectedFormat('json')} className="gap-x-2">
-            <Download size={14} />
+            <DownloadIcon size={14} />
             <p>Download as JSON</p>
           </DropdownMenuItem>
         </DropdownMenuContent>
@@ -174,11 +173,7 @@ export const DownloadLogsButton = ({ searchParameters }: DownloadLogsButtonProps
             )}
           </DialogSection>
           <DialogFooter>
-            <Button
-              variant="default"
-              disabled={isPending}
-              onClick={() => setSelectedFormat(undefined)}
-            >
+            <Button disabled={isPending} onClick={() => setSelectedFormat(undefined)}>
               Cancel
             </Button>
             <Button variant="primary" loading={isPending} onClick={onExportData}>

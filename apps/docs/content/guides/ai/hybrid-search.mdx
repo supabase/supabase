@@ -204,7 +204,7 @@ Deno.serve(async (req) => {
 })
 ```
 
-This uses OpenAI's `text-embedding-3-large` model to generate embeddings (shortened to 512 dimensions for faster retrieval). Swap in your preferred embedding model (and dimension size) accordingly.
+This uses OpenAI's `text-embedding-3-large` model to [generate embeddings](/docs/guides/ai/quickstarts/generate-text-embeddings) (shortened to 512 dimensions for faster retrieval). Swap in your preferred embedding model (and dimension size) accordingly.
 
 To test this, make a `POST` request to the function's endpoint while passing in a JSON payload containing the user's query. Here is an example `POST` request using cURL:
 

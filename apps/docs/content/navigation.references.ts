@@ -44,6 +44,33 @@ export const REFERENCES = {
       },
     },
   },
+  middleware: {
+    type: 'sdk',
+    name: 'Middleware',
+    library: '@supabase/middleware',
+    libPath: 'middleware',
+    versions: ['v1'],
+    typeSpec: true,
+    icon: 'reference-javascript',
+    meta: {
+      v1: {
+        libId: 'reference_middleware_v1',
+      },
+    },
+  },
+  tanstack_db: {
+    type: 'sdk',
+    name: 'TanStack DB',
+    library: '@supabase-labs/tanstack-db',
+    libPath: 'tanstack_db',
+    versions: ['v1'],
+    icon: 'reference-javascript',
+    meta: {
+      v1: {
+        libId: 'reference_tanstack_db_v1',
+      },
+    },
+  },
   dart: {
     type: 'sdk',
     name: 'Flutter',
@@ -70,9 +97,13 @@ export const REFERENCES = {
     name: 'C#',
     library: 'supabase-csharp',
     libPath: 'csharp',
-    versions: ['v1', 'v0'],
+    versions: ['v8', 'v1', 'v0'],
     icon: 'reference-csharp',
     meta: {
+      v8: {
+        libId: 'reference_csharp_v8',
+        specFile: 'supabase_csharp_v8',
+      },
       v1: {
         libId: 'reference_csharp_v1',
         specFile: 'supabase_csharp_v1',

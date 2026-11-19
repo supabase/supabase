@@ -14,7 +14,7 @@ toc_depth: 3
 
 Every Launch Week is an opportunity for Supabase to experiment, try some spicy new designs, and dogfood our own technology. During our previous Launch Week we [took Generative AI for a spin](https://supabase.com/blog/designing-with-ai-midjourney). This time we decided to shoot for the stars.
 
-For [Launch Week 8](https://supabase.com/launch-week/), we wanted to make the user-generated tickets a central piece of the launch week theme. To do this, we built a “constellation” of stars - an animated night sky where every user signup was represented as a star, in the form of an “8” shape.
+For [Launch Week 8](https://supabase.com/launch-week), we wanted to make the user-generated tickets a central piece of the launch week theme. To do this, we built a “constellation” of stars - an animated night sky where every user signup was represented as a star, in the form of an “8” shape.
 
 <Img src="/images/blog/lw8-constellation-breakdown/lw8-early-design.png" caption="Early design" />
 
@@ -22,7 +22,7 @@ We could approach this animation in a few ways.
 
 For example, animating the `stroke-dashoffset` on an SVG path, similar to <Link children="this" href="https://css-tricks.com/svg-line-animation-works/" target="_blank" /> example, was a good option, but it would have been difficult to randomize and change the shape at a later stage. Other approaches included 2D animation libraries, like <Link children="Framer Motion" href="https://www.framer.com/motion/animation/" target="_blank" />, <Link children="gsap" href="https://greensock.com/gsap/" target="_blank" /> or <Link children="PixiJS" href="https://pixijs.com/" target="_blank" />.
 
-Ultimately we decided to take <Link href="https://threejs.org/" target="_blank" children="Three.js" /> for a spin using [React Three Fiber](https://docs.pmnd.rs/react-three-fiber/getting-started/introduction) (R3F) giving us a more powerful toolset to enable us to achieve the best possible result.
+Ultimately we decided to take <Link href="https://threejs.org/" target="_blank" children="Three.js" /> for a spin using [React Three Fiber](https://r3f.docs.pmnd.rs/getting-started/introduction) (R3F) giving us a more powerful toolset to enable us to achieve the best possible result.
 
 Learning Three.js is not a walk in the park but R3F abstracted many of its complexities such as cameras and renderers, to name a few. If you're new to R3F, some of the core primitives they provide for a basic scene include:
 
@@ -164,7 +164,7 @@ To move the particle around the screen we are going to leverage a few different 
 
 ### useFrame
 
-Generally, the most optimal way to animate things in a browser viewport, using javascript, is by leveraging a method called <Link href="https://developer.mozilla.org/en-US/docs/Web/API/window/requestAnimationFrame" target="_blank" children="requestAnimationFrame" />, which _“tells the browser that you wish to perform an animation and requests that the browser calls a specified function to update an animation right before the next repaint.”_. R3F has a similar hook called <Link href="https://docs.pmnd.rs/react-three-fiber/tutorials/basic-animations" target="_blank" children="useFrame" /> that lets you execute code on every frame of Fiber's render loop. We’ll use this to change the position of the particles over time in a few moments.
+Generally, the most optimal way to animate things in a browser viewport, using javascript, is by leveraging a method called <Link href="https://developer.mozilla.org/en-US/docs/Web/API/window/requestAnimationFrame" target="_blank" children="requestAnimationFrame" />, which _“tells the browser that you wish to perform an animation and requests that the browser calls a specified function to update an animation right before the next repaint.”_. R3F has a similar hook called <Link href="https://r3f.docs.pmnd.rs/tutorials/basic-animations" target="_blank" children="useFrame" /> that lets you execute code on every frame of Fiber's render loop. We’ll use this to change the position of the particles over time in a few moments.
 
 ### Using time as an animation variable
 
@@ -256,7 +256,7 @@ Honestly, this was the result of a lot of playing and tweaking around, and we ce
 
 <Img src="/images/blog/lw8-constellation-breakdown/lw8-constellation-gui-demo.png" wide={true} />
 
-What really helped to visualize the shape, gather feedback, and decide on a final design was adding a GUI to play around with the values. You can try for yourself by appending `#debug` to the [supabase.com/launch-week#debu](http://supabase.com/launch-week#debug)[g](http://supabase.com/launch-weekdebug) url. Go crazy with it.
+What really helped to visualize the shape, gather feedback, and decide on a final design was adding a GUI to play around with the values. You can try for yourself by appending `#debug` to the [supabase.com/launch-week#debug](https://supabase.com/launch-week#debug) url. Go crazy with it.
 
 We used the <Link href="https://github.com/dataarts/dat.gui" children="dat.gui" target="_blank"/> library:
 

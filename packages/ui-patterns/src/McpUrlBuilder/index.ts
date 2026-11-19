@@ -9,6 +9,7 @@ export {
   FEATURE_GROUPS_NON_PLATFORM,
   MCP_CLIENT_GROUPS,
   MCP_CLIENT_DATA,
+  MCP_HOSTED_AUTH_NOTE,
 } from './clients.data'
 export type { McpClientData } from './clients.data'
 export { MCP_CLIENTS } from './mcpClients'

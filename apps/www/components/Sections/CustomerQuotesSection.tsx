@@ -1,8 +1,8 @@
 import SectionContainer from '~/components/Layouts/SectionContainer'
 import CustomersVisual from '~/components/Products/VectorAI/CustomersVisual'
 import { getAnimation, INITIAL_BOTTOM } from '~/lib/animations'
-import { domAnimation, LazyMotion, m, useInView } from 'framer-motion'
 import { ArrowUpRight } from 'lucide-react'
+import { domAnimation, LazyMotion, m, useInView } from 'motion/react'
 import { useTheme } from 'next-themes'
 import Image from 'next/image'
 import Link from 'next/link'
@@ -75,7 +75,7 @@ const CustomerQuotesSection = (props: Props) => {
             {customer.author}, {customer.role}
           </p>
           {customer.url && (
-            <div className="text-brand-link border-t mt-4 pt-4 cursor-pointer text-sm flex items-center justify-between">
+            <div className="text-primary border-t mt-4 pt-4 cursor-pointer text-sm flex items-center justify-between">
               <span>Read Customer Story</span>
               <ArrowUpRight />
             </div>

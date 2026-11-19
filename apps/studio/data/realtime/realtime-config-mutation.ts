@@ -3,17 +3,24 @@ import { toast } from 'sonner'
 
 import { realtimeKeys } from './keys'
 import type { components } from '@/data/api'
+import { configKeys } from '@/data/config/keys'
 import { handleError, patch } from '@/data/fetchers'
-import type { ResponseError, UseCustomMutationOptions } from '@/types'
+import type { StudioError } from '@/lib/errors/studio-errors'
+import type { UseCustomMutationOptions } from '@/types'
+
+export type RealtimeConfigurationUpdateBody = components['schemas']['UpdateRealtimeConfigBody'] & {
+  postgres_changes_pool?: number
+}
 
 export type RealtimeConfigurationUpdateVariables = {
   ref: string
-} & components['schemas']['UpdateRealtimeConfigBody']
+} & RealtimeConfigurationUpdateBody
 
 export async function updateRealtimeConfiguration({
   ref,
   private_only,
   connection_pool,
+  postgres_changes_pool,
   max_concurrent_users,
   max_events_per_second,
   max_bytes_per_second,
@@ -30,6 +37,7 @@ export async function updateRealtimeConfiguration({
     body: {
       private_only,
       connection_pool,
+      postgres_changes_pool,
       max_concurrent_users,
       max_events_per_second,
       max_bytes_per_second,
@@ -54,7 +62,7 @@ export const useRealtimeConfigurationUpdateMutation = ({
 }: Omit<
   UseCustomMutationOptions<
     RealtimeConfigurationUpdateData,
-    ResponseError,
+    StudioError,
     RealtimeConfigurationUpdateVariables
   >,
   'mutationFn'
@@ -63,13 +71,16 @@ export const useRealtimeConfigurationUpdateMutation = ({
 
   return useMutation<
     RealtimeConfigurationUpdateData,
-    ResponseError,
+    StudioError,
     RealtimeConfigurationUpdateVariables
   >({
     mutationFn: (vars) => updateRealtimeConfiguration(vars),
     async onSuccess(data, variables, context) {
       const { ref } = variables
-      await queryClient.invalidateQueries({ queryKey: realtimeKeys.configuration(ref) })
+      await Promise.all([
+        queryClient.invalidateQueries({ queryKey: realtimeKeys.configuration(ref) }),
+        queryClient.invalidateQueries({ queryKey: configKeys.projectConfig(ref) }),
+      ])
       await onSuccess?.(data, variables, context)
     },
     async onError(data, variables, context) {

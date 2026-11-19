@@ -107,13 +107,13 @@ export const highlightSelectedNavItem = (id: string) => {
   const navMenuItems = document.querySelectorAll<HTMLAnchorElement>('.function-link-item a')
 
   // find any currently active items and remove them
-  const currentActiveItems = document.querySelectorAll('.function-link-list .text-brand')
-  currentActiveItems.forEach((item) => item.classList.remove('text-brand'))
+  const currentActiveItems = document.querySelectorAll('.function-link-list .text-primary')
+  currentActiveItems.forEach((item) => item.classList.remove('text-primary'))
 
   // Add active class to the current item
   navMenuItems.forEach((item) => {
     if (item.href.split('/').at(-1) === id) {
-      item.classList.add('text-brand')
+      item.classList.add('text-primary')
     }
   })
 }
