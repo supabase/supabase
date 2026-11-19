@@ -216,6 +216,7 @@ Checklist:
 
 - [ ] Voice follows [`01-voice-and-tone.md`](../../../apps/docs/style-guide/01-voice-and-tone.md)
 - [ ] Section grouping and chunking follow [`03-page-structure.md`](../../../apps/docs/style-guide/03-page-structure.md)
+- [ ] When the page's row in [Choose a template](../../../apps/docs/style-guide/03-page-structure.md#choose-a-template) names a template, the page follows it and passes that template's checklist. A misfit section that `edit-the-docs` kept in place and noted for a split-out is a recommendation to raise, not a failure
 - [ ] Components follow [`02-elements.md`](../../../apps/docs/style-guide/02-elements.md)
 - [ ] Terminology matches [`WORD_LIST.md`](../../../apps/docs/style-guide/WORD_LIST.md)
 - [ ] Frontmatter valid (`title`, `description` where required)
