@@ -408,7 +408,7 @@ export const StorageSettings = () => {
                           source="storageSizeLimit"
                           featureProposition="increase the file upload size limits in Storage"
                           buttonText="Disable spend cap"
-                          primaryText="Reduced max upload file size limit due to spend cap"
+                          primaryText={`Max upload file size limit reduced to ${formatBytes(maxBytes)} due to spend cap`}
                           secondaryText={`Disable your spend cap to allow file uploads of up to ${formatBytes(
                             STORAGE_FILE_SIZE_LIMIT_MAX_BYTES_UNCAPPED
                           )}.`}
