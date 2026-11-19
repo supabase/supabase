@@ -1,3 +1,4 @@
+import { useReducedMotion } from 'common'
 import { Card, CardContent } from 'ui'
 import { ChartLine } from 'ui-patterns/Chart'
 
@@ -36,6 +37,8 @@ export const WarehouseMetricChart = ({
   scale?: number
   series?: WarehouseChartSeries[]
 }) => {
+  const prefersReducedMotion = useReducedMotion()
+
   const points = getWarehouseChartPoints(series, scale)
   const keys = series.map((_, index) => `value${index}`)
   const config = Object.fromEntries(
@@ -62,7 +65,9 @@ export const WarehouseMetricChart = ({
                 </p>
               )}
               <ChartLine
-                className="h-64"
+                className="h-64 [&_.recharts-surface:focus-visible]:outline-solid [&_.recharts-surface:focus-visible]:outline-2 [&_.recharts-surface:focus-visible]:outline-brand"
+                accessibilityLayer
+                isAnimationActive={!prefersReducedMotion}
                 isFullHeight
                 data={points}
                 xKey="timestamp"

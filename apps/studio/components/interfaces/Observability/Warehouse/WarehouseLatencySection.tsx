@@ -55,7 +55,7 @@ export const WarehouseLatencySection = ({
           additionalActions={<Button onClick={() => query.refetch()}>Retry</Button>}
         />
       )}
-      {query.isSuccess && (
+      {query.data && (
         <>
           <WarehouseMetricChart
             title="Query duration"
