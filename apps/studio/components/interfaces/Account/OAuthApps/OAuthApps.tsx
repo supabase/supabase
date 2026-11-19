@@ -88,7 +88,7 @@ export const OAuthApps = () => {
                     {data.pages.map((page, pageIndex) => (
                       <Fragment key={pageIndex}>
                         {page.data.map((grant) => (
-                          <GrantRow key={grant.grant_id} grant={grant} />
+                          <GrantRow key={grant.id} grant={grant} />
                         ))}
                       </Fragment>
                     ))}

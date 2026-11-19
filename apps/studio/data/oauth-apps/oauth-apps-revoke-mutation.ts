@@ -1,8 +1,8 @@
 import { useMutation, useQueryClient } from '@tanstack/react-query'
 import { toast } from 'sonner'
 
+import { handleError, post } from '../fetchers'
 import { oauthAppsKeys } from './keys'
-import { USE_MOCKS } from './mocks'
 import type { StudioError } from '@/lib/errors/studio-errors'
 import type { UseCustomMutationOptions } from '@/types'
 
@@ -14,12 +14,14 @@ export type OAuthAppRevokeVariables = {
 export async function revokeOAuthApp({ slug, appId }: OAuthAppRevokeVariables) {
   if (!slug) throw new Error('Organization slug is required')
   if (!appId) throw new Error('App id is required')
-  if (!USE_MOCKS) throw new Error('OAuth app revocation is not yet implemented')
-
-  return { id: appId }
+  const { data, error } = await post('/platform/organizations/{slug}/oauth/apps/{id}/revoke', {
+    params: { path: { slug, id: appId } },
+  })
+  if (error) handleError(error)
+  return data
 }
 
-type OAuthAppRevokeData = Awaited<ReturnType<typeof revokeOAuthApp>>
+export type OAuthAppRevokeData = Awaited<ReturnType<typeof revokeOAuthApp>>
 
 export const useOAuthAppRevokeMutation = ({
   onError,
