@@ -22,7 +22,6 @@ vi.mock('common', async () => {
     get IS_PLATFORM() {
       return mockIsPlatform.value
     },
-    useParams: () => ({ ref: 'project-ref' }),
   }
 })
 

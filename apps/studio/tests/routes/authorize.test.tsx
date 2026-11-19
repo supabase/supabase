@@ -10,13 +10,11 @@ vi.mock('@/hooks/misc/withAuth', () => ({
 }))
 
 const flags = vi.hoisted(() => ({ consent: false }))
-const params = vi.hoisted(() => ({ current: {} as Record<string, string | undefined> }))
 
 vi.mock('common', async (importOriginal) => {
   const actual = await importOriginal<typeof import('common')>()
   return {
     ...actual,
-    useParams: () => params.current,
     useFlag: (key: string) => key === 'enableScopedOAuthConsent' && flags.consent,
   }
 })
@@ -52,7 +50,6 @@ const renderAuthorize = (url = '/authorize') =>
 describe('/authorize', () => {
   afterEach(() => {
     flags.consent = false
-    params.current = {}
   })
 
   test('renders loading interstitial while the authorization request loads', async () => {
@@ -90,9 +87,7 @@ describe('/authorize', () => {
 
   test('org_bound_all renders without a picker and covers every project', async () => {
     flags.consent = true
-    params.current = { mock_scenario: 'org_bound_all' }
-
-    await renderAuthorize()
+    await renderAuthorize('/authorize?mock_scenario=org_bound_all')
 
     expect(await screen.findByText('All projects, including future ones')).toBeInTheDocument()
     expect(screen.queryByRole('combobox')).not.toBeInTheDocument()
@@ -101,9 +96,7 @@ describe('/authorize', () => {
 
   test('user_bound_all renders without a picker and covers every project', async () => {
     flags.consent = true
-    params.current = { mock_scenario: 'user_bound_all' }
-
-    await renderAuthorize()
+    await renderAuthorize('/authorize?mock_scenario=user_bound_all')
 
     expect(await screen.findByText('All projects, including future ones')).toBeInTheDocument()
     expect(screen.queryByRole('combobox')).not.toBeInTheDocument()
