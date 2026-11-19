@@ -1,78 +1,7 @@
-import type { components } from 'api-types'
-
+import { OAuthAppsAuthorizeRequestData } from './oauth-apps-authorize-request-query'
 import type { OrganizationRole } from '@/data/organization-members/organization-roles-query'
 
-type LiveAuthorizeRequest = components['schemas']['GetOAuthAuthorizationResponse_Output']
-
-export type OAuthAppsAuthorizeLiveFields = Pick<
-  LiveAuthorizeRequest,
-  'name' | 'website' | 'domain' | 'icon' | 'redirect_uri' | 'registration_type' | 'expires_at'
->
-
-export type OAuthScope = NonNullable<LiveAuthorizeRequest['scopes']>[number]
-
-export function isWriteScope(scope: string): boolean {
-  return scope.endsWith(':write')
-}
-
-export type OAuthGrantKind = 'organization_bound' | 'member_bound'
-
-export type OAuthAppsAuthorizeRequest = OAuthAppsAuthorizeLiveFields & {
-  app_id: string
-  grant_kind: OAuthGrantKind
-  project_scoping_mode: boolean
-  scopes?: string[]
-}
-
-export type OAuthOrganizationRole = {
-  slug: string
-  name: string
-  default_role: OrganizationRole
-}
-
-export type OAuthAppsAuthorizeOrganizationProject = {
-  ref: string
-  name: string
-  role: OrganizationRole
-}
-
-export type OAuthExistingGrant = {
-  grant_id: string
-  approved_scopes: string[] | null
-  project_refs: string[] | null
-  approved_at: string
-}
-
-export type OAuthOrgAppDetails = {
-  existing_grant: OAuthExistingGrant | null
-}
-
-export function getPreselectedProjectRefs({
-  existingGrant,
-  projectRef,
-  liveProjects,
-}: {
-  existingGrant: OAuthExistingGrant | null
-  projectRef: string | null
-  liveProjects: OAuthAppsAuthorizeOrganizationProject[]
-}): string[] {
-  const liveRefs = new Set(liveProjects.map((project) => project.ref))
-  const candidates = existingGrant?.project_refs?.length
-    ? existingGrant.project_refs
-    : projectRef
-      ? [projectRef]
-      : []
-  return candidates.filter((ref) => liveRefs.has(ref))
-}
-
-export type OAuthAuthorizeApproveRequest = {
-  // not allowed when project_scoping_mode is false.
-  // when project_scoping_mode is true, if omitted, this means all projects
-  project_refs?: string[]
-}
-
-export type OAuthAppsAuthorizeRedirect =
-  components['schemas']['ApproveAuthorizationResponse_Output']
+export type OAuthScope = NonNullable<OAuthAppsAuthorizeRequestData['scopes']>[number]
 
 export type OAuthValidationRole = {
   name: 'owner' | 'administrator' | 'developer' | 'read-only' | 'no-access'
@@ -97,43 +26,39 @@ export type OAuthScopeValidationResult =
       }>
     }
 
-export type OAuthScopeValidationProjectFailure = Extract<
-  OAuthScopeValidationResult,
-  { scope_target: 'projects' }
->['failures'][number]
-
-export type OAuthAppsAuthorizeRoleValidationFailure = {
+type OAuthAppsAuthorizeRoleValidationFailure = {
   status: 'error'
   error_code: 'role_validation_failed'
   message: string
   validation: OAuthScopeValidationResult
 }
 
-export type OAuthAppsAuthorizeApproveResult = OAuthAppsAuthorizeRedirect
-
-export function getFailedProjects(
-  failure: OAuthScopeValidationResult | null | undefined
-): OAuthScopeValidationProjectFailure[] {
-  if (!failure) return []
-  return failure.scope_target === 'projects' ? failure.failures : []
+// fetch rejects with a OAuthRoleValidationException
+export function isOAuthRoleValidationError(
+  err: unknown
+): err is OAuthAppsAuthorizeRoleValidationFailure {
+  return (
+    typeof err === 'object' &&
+    err !== null &&
+    'error_code' in err &&
+    err.error_code === 'role_validation_failed'
+  )
 }
 
-export type OAuthAppsAuthorizePreflightSuccess = { status: 'success' }
+export type OAuthGrantKind = 'organization_bound' | 'member_bound'
 
-export type OAuthAppsAuthorizePreflightResult = {
-  existing_grant: {
-    approved_at: string
-    approved_scopes: string[] | null
-    grant_id: string
-    project_refs: string[] | null
-  } | null
-  validation_failure: {
-    failed_scopes: string[]
-    role: {
-      name: 'owner' | 'administrator' | 'developer' | 'read-only' | 'no-access'
-    }
-    scope_target: 'all_projects'
-  } | null
+export type OAuthOrganizationRole = {
+  id: string
+  slug: string
+  name: string
+  default_role: OrganizationRole
+}
+
+export type OAuthAppsAuthorizeOrganizationProject = {
+  ref: string
+  name: string
+  organization_id: number
+  role: OrganizationRole
 }
 
 export type OAuthApprovalTarget = 'organization' | 'members' | 'organization_and_members'
