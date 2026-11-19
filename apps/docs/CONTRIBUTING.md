@@ -106,6 +106,8 @@ To merge anyway:
 
 Reference docs are produced from the reference specs and library source code. A common spec file contains shared function and endpoint definitions, and library-specific spec files contain further details.
 
+JavaScript v2 and the other libraries in `SUPPORTS_NEW_REFERENCE_PROCESS` ([`features/docs/Reference.constants.ts`](https://github.com/supabase/supabase/blob/master/apps/docs/features/docs/Reference.constants.ts)) use the new reference pipeline, built from TypeDoc output plus the committed `config.json` and `partials/` under `spec/reference/<lib>/<version>/`. For that workflow, see the [reference pipeline README](https://github.com/supabase/supabase/blob/master/apps/docs/spec/reference/README.md). Dart v2 is also on the new pipeline, but its content is still written in `spec/supabase_dart_v2.yml` and converted by a script, as the README's "Non-TypeDoc sources" section describes. The spec file steps below apply to libraries on the legacy YAML pipeline.
+
 ### Common spec file
 
 Each type of library, such as a language SDK or CLI, has a common spec file. For example, see the [spec file for the language SDKs](https://github.com/supabase/supabase/blob/master/apps/docs/spec/common-client-libs-sections.json). This file contains definitions for the common SDK functions:
@@ -116,11 +118,11 @@ Each type of library, such as a language SDK or CLI, has a common spec file. For
 - `product`: Identifies the Supabase product that owns the function. For example, database operations are owned by `database`, and Auth operations are owned by `auth`.
 - `type`: Uses `function` for a structured function definition or `markdown` for a prose explainer section
 
-To add a new function, manually add an entry to this common file.
+To add a new function to a legacy-pipeline reference, manually add an entry to this common file.
 
 ### Specific spec file
 
-Each library also has its own spec file containing library-specific details. For example, see the [JavaScript SDK spec file](https://github.com/supabase/supabase/blob/master/apps/docs/spec/supabase_js_v2.yml).
+Each legacy-pipeline library also has its own spec file containing library-specific details. For example, see the [Python SDK spec file](https://github.com/supabase/supabase/blob/master/apps/docs/spec/supabase_py_v2.yml). The legacy pipeline covers JavaScript v1, Dart v1, C# v0, v1, and v8, Swift v1 and v2, Kotlin v1, v2, and v3, and Python v2.
 
 The functions listed in this file match the ones defined in the common spec file.
 
