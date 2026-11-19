@@ -28,6 +28,10 @@ describe('getFilterCombinationKey', () => {
     expect(getFilterCombinationKey(undefined)).toBe('')
     expect(getFilterCombinationKey([])).toBe('')
   })
+
+  it('does not collide when a value contains the delimiter', () => {
+    expect(getFilterCombinationKey(['a|b'])).not.toBe(getFilterCombinationKey(['a', 'b']))
+  })
 })
 
 describe('isDuplicateViewName', () => {
