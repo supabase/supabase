@@ -23,9 +23,6 @@ function getFilePaths(folderPath: string, baseFolder = ''): string[] {
       filepaths.push(...subFolderPaths)
     } else {
       const filePathRelativeToBase = path.join(baseFolder, file)
-      if (file !== '.DS_Store') {
-        filepaths.push(filePathRelativeToBase)
-      }
       filepaths.push(filePathRelativeToBase)
     }
   }
@@ -34,7 +31,7 @@ function getFilePaths(folderPath: string, baseFolder = ''): string[] {
 }
 
 async function getFileNames(_req: NextApiRequest, res: NextApiResponse) {
-  const folderPath = path.join(process.cwd(), 'components/interfaces/Home/Connect/content')
+  const folderPath = path.join(process.cwd(), 'components/interfaces/ConnectSheet/content')
   const filepaths = getFilePaths(folderPath)
   res.statusCode = 200
   res.json(filepaths)

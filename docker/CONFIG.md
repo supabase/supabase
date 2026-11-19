@@ -860,7 +860,7 @@ The fields below are repeated for each provider. Substitute `<PROVIDER>` with on
 | `CLUSTER` | string | Self-hosted | Cluster name added to log metadata. | No default. Read by `Realtime.Application.start/2`. |
 | `CLUSTER_SECRET_ID` | string | Self-hosted | AWS Secrets Manager secret ID holding the cluster CA cert/key. | Used by `run.sh` `generate_certs` when `GENERATE_CLUSTER_CERTS` is set. |
 | `CLUSTER_SECRET_REGION` | string | Self-hosted | AWS region for `CLUSTER_SECRET_ID`. | Used by `run.sh` `generate_certs` when `GENERATE_CLUSTER_CERTS` is set. |
-| `CLUSTER_STRATEGIES` | string (CSV) | Self-hosted | Comma-separated list of libcluster backends to enable. Supported: `EPMD`, `DNS`, `POSTGRES`. | Default: `EPMD` outside production, `POSTGRES` in production. |
+| `CLUSTER_STRATEGIES` | string (CSV) | Self-hosted | Comma-separated list of libcluster backends to enable. Supported: `EPMD`, `DNS`, `POSTGRES`. An empty value disables cluster discovery. | Default: `POSTGRES`. The self-hosted compose sets it empty, since a single node has no peers to discover. |
 | `CONNECT_ERROR_BACKOFF_MS` | integer (ms) | Self-hosted | Delay (ms) before returning a WebSocket connection error to the client. Slows down reconnect storms. | Default: `2000` (2 seconds). |
 | `CONNECT_PARTITION_SLOTS` | integer (count) | Self-hosted | Number of dynamic supervisor partitions for the `Connect` / `ReplicationConnect` processes. | Default: `System.schedulers_online() * 2`. |
 | `DASHBOARD_AUTH` | enum | Self-hosted | Authentication method for the admin dashboard (`/admin`). Accepted: `basic_auth` (requires `DASHBOARD_USER` and `DASHBOARD_PASSWORD`) or `zta` (requires `CF_TEAM_DOMAIN`). | Default: `basic_auth`. |
@@ -883,7 +883,8 @@ The fields below are repeated for each provider. Substitute `<PROVIDER>` with on
 | `DB_SSL_CA_CERT` | path | Self-hosted | Path to a CA trust store used when `DB_SSL=true`. Enables server certificate verification. | When unset and `DB_SSL=true`, falls back to `verify: :verify_none`. |
 | `DB_USER` | string | Both | Postgres user. | Default: `supabase_admin`. |
 | `DISABLE_HEALTHCHECK_LOGGING` | boolean | Self-hosted | Disables request logging for `/healthcheck` and `/api/tenants/:tenant_id/health`. | Default: `false`. |
-| `DNS_NODES` | string | Both | DNS query used by the libcluster `DNS` strategy. | No default. Only consulted when `CLUSTER_STRATEGIES` contains `DNS`. |
+| `DNS_NODES` | string | CLI | DNS query used by the libcluster `DNS` strategy. | No default. Only consulted when `CLUSTER_STRATEGIES` contains `DNS`. |
+| `GEN_RPC_SOCKET_IP` | string | Self-hosted | IP address the internal gen_rpc listener binds to. | Default: `0.0.0.0`. Must be a valid IPv4/IPv6 address or the service refuses to start. The self-hosted compose sets `127.0.0.1` so the listener is not reachable from other containers on a single node. |
 | `HTTP_DYNAMIC_BUFFER_MAX` | integer (bytes) | Self-hosted | Maximum buffer size (bytes) for HTTP connections (Cowboy dynamic buffer). | Must be set together with `HTTP_DYNAMIC_BUFFER_MIN`. |
 | `HTTP_DYNAMIC_BUFFER_MIN` | integer (bytes) | Self-hosted | Minimum buffer size (bytes) for HTTP connections (Cowboy dynamic buffer). | Must be set together with `HTTP_DYNAMIC_BUFFER_MAX`. |
 | `JANITOR_CHILDREN_TIMEOUT` | integer (ms) | Self-hosted | Timeout (ms) for each janitor child task. | Default: `5000`. Only used when `RUN_JANITOR=true`. |
@@ -919,6 +920,7 @@ The fields below are repeated for each provider. Substitute `<PROVIDER>` with on
 | `REBALANCE_CHECK_INTERVAL_IN_MS` | integer (ms) | Self-hosted | Interval (ms) used to check whether a process is in the right region. | Default: 10 minutes. |
 | `REGION` | string | Self-hosted | Region name for the current node. Used in logs, latency reporting, and region-aware routing. | No default. Also rendered in the admin dashboard layout. |
 | `REGION_MAPPING` | JSON | Self-hosted | Custom mapping of platform regions to tenant regions, as a JSON object with string keys and values. | When unset, the hardcoded default mapping is used. Must be a JSON object or boot fails. |
+| `RELEASE_COOKIE` | string | Self-hosted | Erlang distribution cookie: the shared secret cluster nodes use to trust each other. | When unset, the self-hosted Realtime entrypoint (`volumes/realtime/docker-entrypoint.sh`) generates a random ephemeral cookie on start. Set it explicitly (same value on every node, 63 characters or fewer) only for a multi-node cluster; when discovery is enabled it also serves as the libcluster Postgres `LISTEN` channel name, which Postgres caps at 63 bytes. |
 | `REQUEST_ID_BAGGAGE_KEY` | string | Self-hosted | OTEL Baggage key used as the request ID. | Default: `request-id`. |
 | `RPC_TIMEOUT` | integer (ms) | Self-hosted | Timeout (ms) for generic RPC calls. | Default: 30 seconds. |
 | `RUN_JANITOR` | boolean | Both | Enable the tenant janitor and metrics cleaner tasks. | Default: `false`. |
@@ -1437,7 +1439,7 @@ The fields below are repeated for each provider. Substitute `<PROVIDER>` with on
 | `PROXY_PORT` | integer | | Generic Postgres proxy listener port (mode: `proxy`). | Default: `5412` |
 | `PROXY_PORT_SESSION` | integer | | Postgres session-mode proxy listener port. | Default: `5432` |
 | `PROXY_PORT_TRANSACTION` | integer | | Postgres transaction-mode proxy listener port. | Default: `6543` |
-| `REGION` | string | Self-hosted | Region label used in logger metadata and as the default for `LOCATION_KEY`. Also used in the libcluster Postgres channel name when `CLUSTER_ID`/`LOCATION_ID` are unset. | Falls back to `FLY_REGION`. Self-hosted: `local` |
+| `REGION` | string | Self-hosted | Region label used in logger metadata and as the default for `LOCATION_KEY`. Also used in the libcluster Postgres channel name when `CLUSTER_ID`/`LOCATION_ID` are unset (Supavisor builds `supavisor_<region>_<maj>_<min>`). | Falls back to `FLY_REGION`. Self-hosted: `local` |
 | `RELEASE_COOKIE` | string | | Erlang distribution cookie. Read by the release scripts. | Optional |
 | `RELEASE_DISTRIBUTION` | string | | Erlang release distribution mode. Set to `name` by `rel/env.sh.eex`. | Default: `name` |
 | `RELEASE_NODE` | string | | Erlang release node name (`<NODE_NAME>@<NODE_IP>`). Set by `rel/env.sh.eex`. | Computed at startup |

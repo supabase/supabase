@@ -10,14 +10,6 @@ const { mockUseIsFeatureEnabled, mockUseJwtSecretUpdatingStatusQuery } = vi.hois
   mockUseJwtSecretUpdatingStatusQuery: vi.fn(),
 }))
 
-vi.mock('common', async () => {
-  const actual = await vi.importActual<Record<string, unknown>>('common')
-  return {
-    ...actual,
-    useParams: () => ({ ref: 'project-ref' }),
-  }
-})
-
 vi.mock('@/hooks/misc/useIsFeatureEnabled', () => ({
   useIsFeatureEnabled: mockUseIsFeatureEnabled,
 }))

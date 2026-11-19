@@ -160,7 +160,7 @@ That's it for the [`dbdev`](http://database.new) announcement, but a package ind
 
 and more.
 
-For example, you could apply a deny listing to your API using `hdr.in_deny_list()` in a row level security policy or view:
+For example, you could apply a deny listing to your API using `hdr.in_deny_list()` in a [row level security](/docs/guides/database/postgres/row-level-security) policy or view:
 
 ```sql
 select
@@ -234,7 +234,7 @@ A [Trusted Language Extension (TLE)](https://github.com/aws/pg_tle) is a [Postgr
 
 For a more in-depth explanation of Trusted Language Extensions checkout [AWS's pg_tle on Supabase blog post](https://aws.amazon.com/blogs/opensource/supabase-makes-extensions-easier-for-developers-with-trusted-language-extensions-for-postgresql/) or dive into the code at [github.com/aws/pg_tle](https://github.com/aws/pg_tle).
 
-A recent development in the PostgreSQL extension ecosystem is the 1.0 release of a new trusted language, [`pl/rust`](https://github.com/tcdi/plrust), allowing users to define SQL functions written in Rust. As a compiled language, `pl/rust` functions can execute an order of magnitude faster than `pl/pgSQL` for computationally heavy workloads. That closes the biggest capability gap between native extensions with C components and TLEs. `pl/rust` hasn’t released to Supabase yet, but we’re excited about rolling it out in the coming weeks.
+A recent development in the PostgreSQL extension ecosystem is the 1.0 release of a new trusted language, [`pl/rust`](https://github.com/pgcentralfoundation/plrust), allowing users to define SQL functions written in Rust. As a compiled language, `pl/rust` functions can execute an order of magnitude faster than `pl/pgSQL` for computationally heavy workloads. That closes the biggest capability gap between native extensions with C components and TLEs. `pl/rust` hasn’t released to Supabase yet, but we’re excited about rolling it out in the coming weeks.
 
 ## Please Give Feedback
 

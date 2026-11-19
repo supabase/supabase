@@ -3,6 +3,7 @@ import { InfiniteData, useInfiniteQuery } from '@tanstack/react-query'
 import { oauthAppsKeys } from './keys'
 import { getMockOAuthApprovals, USE_MOCKS } from './mocks'
 import type { ListOAuthApprovalsResponse } from './types'
+import { get, handleError } from '@/data/fetchers'
 import type { StudioError } from '@/lib/errors/studio-errors'
 import type { UseCustomInfiniteQueryOptions } from '@/types'
 
@@ -18,9 +19,16 @@ export async function getOAuthApprovals({
   cursor,
 }: OAuthApprovalsVariables): Promise<ListOAuthApprovalsResponse> {
   if (!slug) throw new Error('Organization slug is required')
-  if (!USE_MOCKS) throw new Error('OAuth app approvals are not yet implemented')
+  if (USE_MOCKS) {
+    return getMockOAuthApprovals(cursor)
+  }
 
-  return getMockOAuthApprovals(cursor)
+  const { data, error } = await get('/platform/organizations/{slug}/oauth/approvals', {
+    params: { path: { slug }, query: { page: { after: cursor } } },
+  })
+
+  if (error) handleError(error)
+  return data
 }
 
 export type OAuthApprovalsData = Awaited<ReturnType<typeof getOAuthApprovals>>

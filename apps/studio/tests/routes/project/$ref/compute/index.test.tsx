@@ -2,21 +2,18 @@ import { QueryClient } from '@tanstack/react-query'
 import { fireEvent, screen } from '@testing-library/react'
 import type { components } from 'api-types'
 import { http, HttpResponse } from 'msw'
-import { beforeEach, describe, expect, it } from 'vitest'
+import { describe, expect, it } from 'vitest'
 
 import { computeQueryOptions } from '@/data/compute/compute-query'
 import { API_URL } from '@/lib/constants'
 import { PRODUCT_NAME } from '@/lib/constants/compute'
 import { Route } from '@/routes/project/$ref/compute/index'
 import { addAPIMock, mswServer, type APIErrorBody } from '@/tests/lib/msw'
-import { routerMock } from '@/tests/lib/route-mock'
 import { renderRoute } from '@/tests/lib/route-render'
 
 type ListComputeInstancesResponse = components['schemas']['V2ListComputeInstancesResponse_Output']
 type ComputeInstanceDatum = ListComputeInstancesResponse['data'][number]
 
-// `tests/vitestSetup.ts` mocks `common`'s useParams to always answer with this ref, so the page
-// reads it no matter what the router URL says.
 const PROJECT_REF = 'default'
 
 const computeInstanceDatum = (
@@ -60,10 +57,6 @@ const renderComputePage = async () => {
 }
 
 describe('/project/[ref]/compute', () => {
-  beforeEach(() => {
-    routerMock.setCurrentUrl(`/project/${PROJECT_REF}/compute`)
-  })
-
   it('lists the instances the API returns', async () => {
     mockComputeInstancesList([
       computeInstanceDatum('embed'),
