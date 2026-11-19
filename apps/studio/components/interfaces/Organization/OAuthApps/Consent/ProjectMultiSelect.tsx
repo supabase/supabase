@@ -63,6 +63,18 @@ export const ProjectMultiSelect = ({
     onChange(nextRefs)
   }
 
+  const renderProjectName = (ref: string, name: string) => (
+    <>
+      {readinessIssueRefs.includes(ref) && (
+        <>
+          <span className="mr-1.5 inline-block size-1.5 rounded-full bg-warning" aria-hidden />
+          <span className="sr-only">Database setup notice: </span>
+        </>
+      )}
+      {name}
+    </>
+  )
+
   return (
     <div className="flex w-full flex-col gap-2">
       <div className="flex items-center justify-between gap-2">
@@ -110,7 +122,10 @@ export const ProjectMultiSelect = ({
               badgeLimit={2}
               deletableBadge
               renderValue={(value) =>
-                selectedProjects.find((project) => project.ref === value)?.name ?? value
+                renderProjectName(
+                  value,
+                  selectedProjects.find((project) => project.ref === value)?.name ?? value
+                )
               }
             />
             <MultiSelectorContent>
@@ -124,7 +139,7 @@ export const ProjectMultiSelect = ({
                       value={project.ref}
                       disabled={atCap && !isSelected}
                     >
-                      {project.name}
+                      {renderProjectName(project.ref, project.name)}
                       {unavailableRefs.includes(project.ref) && (
                         <span className="text-foreground-lighter"> - Unavailable</span>
                       )}

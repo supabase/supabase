@@ -40,11 +40,11 @@ async function enabledAuthorizeButton(name = /Authorize Vercel/) {
   return button
 }
 
-async function toggleProject(projectName: string) {
+async function toggleProject(projectName: string | RegExp) {
   fireEvent.click(await screen.findByRole('option', { name: projectName }))
 }
 
-async function selectProject(projectName: string) {
+async function selectProject(projectName: string | RegExp) {
   fireEvent.click(await screen.findByRole('combobox'))
   await toggleProject(projectName)
 }
@@ -308,11 +308,13 @@ describe('OAuthAppsAuthorizeScreen', () => {
     })
     await renderRoute(route, { routeId: '/authorize', url: '/authorize' })
 
+    expect(await screen.findByText('Project upgrade required')).toBeInTheDocument()
+    expect(screen.getByRole('combobox')).toHaveTextContent('Database setup notice: northwind-cms')
     const remove = await screen.findByRole('button', { name: 'Remove northwind-cms' })
     const authorize = screen.getByRole('button', { name: 'Authorize Example Partner' })
     expect(authorize).toBeDisabled()
     fireEvent.click(remove)
-    selectProject('fabrikam-api')
+    await selectProject(/fabrikam-api/)
 
     expect(await screen.findByRole('region', { name: 'SSL enforcement' })).toHaveTextContent(
       'fabrikam-api'

@@ -401,18 +401,6 @@ export const OAuthAppsAuthorizeScreen = ({
             </div>
           )}
 
-          {canProceed && blockedProjects.length > 0 && (
-            <DatabaseAccessProjectIssues
-              projects={blockedProjects}
-              onRemove={
-                usesSelectedProjects
-                  ? (ref) =>
-                      setSelectedProjectRefs((refs) => refs.filter((selected) => selected !== ref))
-                  : undefined
-              }
-            />
-          )}
-
           {canProceed && sslProjects.length > 0 && (
             <section
               aria-label="SSL enforcement"
@@ -465,6 +453,18 @@ export const OAuthAppsAuthorizeScreen = ({
               description={`Your Read-only role in ${memberOrg} can't grant write access. Ask an admin to change your role, or switch organization.`}
             />
           )}
+          {canProceed && blockedProjects.length > 0 && (
+            <DatabaseAccessProjectIssues
+              projects={blockedProjects}
+              onRemove={
+                usesSelectedProjects
+                  ? (ref) =>
+                      setSelectedProjectRefs((refs) => refs.filter((selected) => selected !== ref))
+                  : undefined
+              }
+            />
+          )}
+
           {canProceed ? (
             <Button
               block
