@@ -189,7 +189,6 @@ export const DestinationPanel = () => {
             )}
             {showNoDestinations && (
               <div className="grow overflow-auto min-h-0">
-                {pipelinesTypeSelection}
                 <NoDestinationsAvailable />
               </div>
             )}
