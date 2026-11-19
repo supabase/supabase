@@ -440,8 +440,11 @@ export const OAuthAppsAuthorizeScreen = ({
             />
           )}
           {canProceed && sslProjects.length > 0 && (
-            <Admonition type="note" title="SSL will be enabled during setup">
-              <p className="text-xs">Clients without SSL will no longer connect.</p>
+            <Admonition
+              type="note"
+              title="SSL enforcement"
+              description="Setup will enable SSL enforcement on these projects. Clients without SSL will no longer connect."
+            >
               <div
                 role="list"
                 aria-label="Projects that will require SSL"

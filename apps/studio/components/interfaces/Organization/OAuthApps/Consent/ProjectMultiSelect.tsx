@@ -70,7 +70,12 @@ export const ProjectMultiSelect = ({
       {readinessIssues[ref] && (
         <>
           <span
-            className="mr-1.5 inline-block size-1.5 rounded-full bg-warning group-data-[state=open]:hidden"
+            className={cn(
+              'mr-1.5 inline-block size-1.5 rounded-full group-data-[state=open]:hidden',
+              readinessIssues[ref] === 'postgres_upgrade_required'
+                ? 'bg-warning'
+                : 'bg-foreground-muted'
+            )}
             aria-hidden
           />
           <span className="sr-only">Database setup notice: </span>
@@ -159,6 +164,15 @@ export const ProjectMultiSelect = ({
                               aria-hidden
                             />
                             <span className="sr-only">Needs Postgres 17 or later</span>
+                          </>
+                        )}
+                        {readinessIssues[project.ref] === 'ssl_enforcement_required' && (
+                          <>
+                            <span
+                              className="size-1.5 shrink-0 rounded-full bg-foreground-muted"
+                              aria-hidden
+                            />
+                            <span className="sr-only">SSL enforcement will be enabled</span>
                           </>
                         )}
                       </span>
