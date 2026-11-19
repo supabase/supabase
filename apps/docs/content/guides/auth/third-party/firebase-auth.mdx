@@ -113,6 +113,8 @@ val supabase = createSupabaseClient(
 }
 ```
 
+Don't install the Auth plugin with `install(Auth)` on a client that sets `accessToken`, because supabase-kt throws an error when it creates the client. Users sign in and out with Firebase Auth, so this client can't use Supabase Auth methods such as `supabase.auth.signInWith`.
+
 </TabPanel>
 </$Show>
 
@@ -135,6 +137,8 @@ val supabase = createSupabaseClient(
     }
 }
 ```
+
+Don't install the Auth plugin with `install(Auth)` on a client that sets `accessToken`, because supabase-kt throws an error when it creates the client. Users sign in and out with Firebase Auth, so this client can't use Supabase Auth methods such as `supabase.auth.signInWith`.
 
 </TabPanel>
 </$Show>
