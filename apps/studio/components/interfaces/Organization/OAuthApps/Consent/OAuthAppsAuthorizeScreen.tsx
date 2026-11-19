@@ -384,58 +384,69 @@ export const OAuthAppsAuthorizeScreen = ({
             />
           )}
 
-          {canProceed && isProjectScopingModeEnabled && (
-            <div className="flex flex-col gap-2">
-              <ProjectMultiSelect
-                onChange={setSelectedProjectRefs}
-                maxSelected={MAX_SELECTED_PROJECTS}
-                error={
-                  hasNoSelection ? 'Must select at least one project to authorize.' : undefined
-                }
-                flaggedRefs={flaggedRefs}
-                unavailableRefs={getFailedProjects(roleFailure).map((project) => project.ref)}
-                readinessIssues={readinessIssues}
-                allProjectsSelected={allProjectsSelected}
-                onAllProjectsChange={databaseAccess ? undefined : setAllProjectsSelected}
-                onSearchChange={setSearch}
-                projects={projects ?? []}
-                selectedProjects={selectedProjects ?? []}
-                onLoadMore={handleLoadMoreProjects}
-              />
-            </div>
-          )}
-
-          {canProceed && blockedProjects.length > 0 && (
-            <DatabaseAccessProjectIssues
-              projects={blockedProjects}
-              onRemove={
-                usesSelectedProjects
-                  ? (ref) =>
-                      setSelectedProjectRefs((refs) => refs.filter((selected) => selected !== ref))
-                  : undefined
-              }
-            />
-          )}
-
-          {canProceed && !cannotGrantRequestedAccess && sslProjects.length > 0 && (
-            <Admonition
-              type="note"
-              title="SSL enforcement will be enabled"
-              description="Setup will enable SSL enforcement on these projects. Clients without SSL will no longer connect."
-            >
-              <div
-                role="list"
-                aria-label="Projects that will require SSL"
-                className="mt-2 divide-y text-xs"
-              >
-                {sslProjects.map(({ ref, name }) => (
-                  <div key={ref} role="listitem" className="py-2 font-medium text-foreground">
-                    {name}
+          {canProceed &&
+            (isProjectScopingModeEnabled ||
+              blockedProjects.length > 0 ||
+              (!cannotGrantRequestedAccess && sslProjects.length > 0)) && (
+              <div className="flex flex-col gap-2">
+                {canProceed && isProjectScopingModeEnabled && (
+                  <div className="flex flex-col gap-2">
+                    <ProjectMultiSelect
+                      onChange={setSelectedProjectRefs}
+                      maxSelected={MAX_SELECTED_PROJECTS}
+                      error={
+                        hasNoSelection
+                          ? 'Must select at least one project to authorize.'
+                          : undefined
+                      }
+                      flaggedRefs={flaggedRefs}
+                      unavailableRefs={getFailedProjects(roleFailure).map((project) => project.ref)}
+                      readinessIssues={readinessIssues}
+                      allProjectsSelected={allProjectsSelected}
+                      onAllProjectsChange={databaseAccess ? undefined : setAllProjectsSelected}
+                      onSearchChange={setSearch}
+                      projects={projects ?? []}
+                      selectedProjects={selectedProjects ?? []}
+                      onLoadMore={handleLoadMoreProjects}
+                    />
                   </div>
-                ))}
+                )}
+
+                {canProceed && blockedProjects.length > 0 && (
+                  <DatabaseAccessProjectIssues
+                    projects={blockedProjects}
+                    onRemove={
+                      usesSelectedProjects
+                        ? (ref) =>
+                            setSelectedProjectRefs((refs) =>
+                              refs.filter((selected) => selected !== ref)
+                            )
+                        : undefined
+                    }
+                  />
+                )}
+
+                {canProceed && !cannotGrantRequestedAccess && sslProjects.length > 0 && (
+                  <Admonition
+                    type="note"
+                    title="SSL enforcement will be enabled"
+                    description="Setup will enable SSL enforcement on these projects. Clients without SSL will no longer connect."
+                  >
+                    <div
+                      role="list"
+                      aria-label="Projects that will require SSL"
+                      className="mt-2 divide-y text-xs"
+                    >
+                      {sslProjects.map(({ ref, name }) => (
+                        <div key={ref} role="listitem" className="py-2 font-medium text-foreground">
+                          {name}
+                        </div>
+                      ))}
+                    </div>
+                  </Admonition>
+                )}
               </div>
-            </Admonition>
-          )}
+            )}
 
           {canProceed && !cannotGrantRequestedAccess && (
             <>
