@@ -1,6 +1,6 @@
 # Supabase Monorepo
 
-pnpm 11 + Turborepo monorepo. Requires Node 24 (see `.nvmrc`).
+pnpm 12 + Turborepo monorepo. Requires Node 24 (see `.nvmrc`).
 
 ## Structure
 
