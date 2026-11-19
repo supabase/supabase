@@ -190,6 +190,26 @@ testRunner('table editor', () => {
     await expect(confirmDialog).not.toBeVisible()
     await expect(page.getByRole('menu')).toHaveCount(0)
 
+    // "More options" is available on a table that isn't open, and using it doesn't open that table
+    await otherTableRow.hover()
+    await page.getByRole('button', { name: `More options for ${otherTableName}` }).click()
+    await expect(
+      page.getByRole('menuitem', { name: 'Delete table' }),
+      'Delete table should be enabled in the "More options" menu of a table that is not open'
+    ).toBeEnabled()
+    await page.getByRole('menuitem', { name: 'Export data' }).click()
+    await expect(
+      page.getByRole('menuitem', { name: 'Export table as CSV' }),
+      'Export data should open its submenu'
+    ).toBeVisible()
+    await expect(
+      page,
+      'Opening the "More options" menu should not navigate to the table'
+    ).toHaveURL(activeTableUrl)
+    await page.keyboard.press('Escape')
+    await page.keyboard.press('Escape')
+    await expect(page.getByRole('menu')).toHaveCount(0)
+
     // Deleting a table that isn't open deletes it, and leaves the open table alone
     await otherTableRow.click({ button: 'right' })
     await page.getByRole('menuitem', { name: 'Delete table' }).click()

@@ -94,12 +94,7 @@ export const EntityActionMenuItems = ({
     }
 
     return (
-      <Item
-        key={action.id}
-        className="gap-x-2"
-        onClick={(e) => e.stopPropagation()}
-        onSelect={() => onSelectAction(action.id)}
-      >
+      <Item key={action.id} className="gap-x-2" onSelect={() => onSelectAction(action.id)}>
         {content}
       </Item>
     )
