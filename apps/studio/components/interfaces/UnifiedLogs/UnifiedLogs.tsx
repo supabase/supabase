@@ -583,7 +583,7 @@ export const UnifiedLogs = ({
       filters: view.filters,
       viewOptions: view.viewOptions,
     })
-    if (currentProjectRef.current === savedProjectRef) setActiveViewId(id)
+    if (currentProjectRef.current === savedProjectRef) handleApplyView({ ...view, id, name })
     toast.success('View saved')
   }
 
