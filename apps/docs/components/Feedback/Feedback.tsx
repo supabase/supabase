@@ -4,7 +4,15 @@ import { createClient } from '@supabase/supabase-js'
 import { IS_PLATFORM } from '~/lib/constants'
 import { useSendTelemetryEvent } from '~/lib/telemetry'
 import { gotrueClient, useConstant, useIsLoggedIn, type Database } from 'common'
-import { Bug, Check, MessageSquareQuote, ThumbsDown, ThumbsUp, X } from 'lucide-react'
+import {
+  Bug,
+  Check,
+  MessageSquare,
+  MessageSquareQuote,
+  ThumbsDown,
+  ThumbsUp,
+  X,
+} from 'lucide-react'
 import { usePathname } from 'next/navigation'
 import {
   forwardRef,
@@ -15,6 +23,7 @@ import {
   type MouseEventHandler,
   type ReactElement,
 } from 'react'
+import { flushSync } from 'react-dom'
 import { Button, cn, Tooltip, TooltipContent, TooltipTrigger } from 'ui'
 
 import { getSanitizedTabParams } from './Feedback.utils'
@@ -91,10 +100,13 @@ function Feedback({ className, variant = 'default' }: FeedbackProps) {
   const [state, dispatch] = useReducer(reducer, initialState)
   const [modalOpen, setModalOpen] = useState(false)
   const feedbackButtonRef = useRef<HTMLButtonElement>(null)
+  const firstVoteRef = useRef<HTMLButtonElement>(null)
 
   const pathname = usePathname() ?? ''
   const sendTelemetryEvent = useSendTelemetryEvent()
   const isRail = variant === 'rail'
+  const [isRevealed, setIsRevealed] = useState(false)
+  const isOpen = !isRail || isRevealed
   const supabaseUrl = process.env.NEXT_PUBLIC_SUPABASE_URL
   const supabaseAnonKey = process.env.NEXT_PUBLIC_SUPABASE_ANON_KEY
   const supabase = useConstant(() =>
@@ -130,6 +142,19 @@ function Feedback({ className, variant = 'default' }: FeedbackProps) {
       // Wait for element to show up first
     }, 700)
   }
+
+  const handleFeedbackOpen = () => {
+    // the vote buttons are invisible until the state commits, so focus waits for the render
+    flushSync(() => setIsRevealed(true))
+    firstVoteRef.current?.focus()
+  }
+
+  const staggerItemClass = (delayClass: string) =>
+    cn(
+      'flex transition duration-200 ease-out',
+      delayClass,
+      !isOpen && 'invisible translate-y-1 opacity-0 motion-reduce:translate-y-0'
+    )
 
   function refocusButton() {
     setTimeout(() => {
@@ -169,91 +194,98 @@ function Feedback({ className, variant = 'default' }: FeedbackProps) {
           style={{ '--container-flex-gap': '0.5rem' } as CSSProperties}
           className={cn('relative flex items-center', !isRail && 'gap-2')}
         >
-          <FeedbackTooltip label={NO_LABEL} isEnabled={isRail}>
-            <Button
-              variant={isRail ? 'text' : 'outline'}
-              rounded={!isRail}
-              className={cn(
-                isRail ? 'size-8 p-0 hover:bg-transparent' : 'px-1 w-7 h-7',
-                'text-foreground-light',
-                '[transition-property:opacity,transform,color] [transition-duration:150ms,250ms,250ms]',
-                'motion-reduce:[transition-duration:150ms,1ms,300ms]',
-                '[transition-timing-function:cubic-bezier(.76,0,.23,1)]',
-                !isNo && 'hover:text-warning focus-visible:text-warning',
-                !isNo && !isRail && 'hover:border-warning-500',
-                isNo &&
-                  (isRail
-                    ? 'text-warning disabled:opacity-100'
-                    : 'bg-warning text-warning-200 border-warning! disabled:opacity-100'),
-                !showNo && 'opacity-0 invisible'
-              )}
-              // the label repeats the tooltip, so the button drops the description radix adds
-              aria-label={isRail ? NO_LABEL : undefined}
-              aria-describedby={undefined}
-              onClick={() => handleVote('no')}
-              disabled={state.type === StateType.Followup}
-            >
-              {isRail ? (
-                <ThumbsDown aria-hidden className="size-4" />
-              ) : (
-                <X size={14} strokeWidth={2} className="text-current" />
-              )}
-              <span className="sr-only">No</span>
-            </Button>
-          </FeedbackTooltip>
-          <FeedbackTooltip label={YES_LABEL} isEnabled={isRail}>
-            <Button
-              variant={isRail ? 'text' : 'outline'}
-              rounded={!isRail}
-              className={cn(
-                isRail ? 'size-8 p-0 hover:bg-transparent' : 'px-1 w-7 h-7',
-                'text-foreground-light',
-                '[transition-property:opacity,transform,color] [transition-duration:150ms,250ms,250ms]',
-                'motion-reduce:[transition-duration:150ms,1ms,300ms]',
-                '[transition-timing-function:cubic-bezier(.76,0,.23,1)]',
-                !isYes && 'hover:text-brand-600 focus-visible:text-brand-600',
-                !isYes && !isRail && 'hover:border-brand-500',
-                isYes &&
-                  (isRail
-                    ? 'text-brand-600 disabled:opacity-100 -translate-x-full'
-                    : 'bg-brand-default text-brand-200 border-brand-default! disabled:opacity-100 -translate-x-[calc(100%+var(--container-inline-flex-gap,0.5rem))]'),
-                !showYes && 'opacity-0 invisible'
-              )}
-              aria-label={isRail ? YES_LABEL : undefined}
-              aria-describedby={undefined}
-              onClick={() => handleVote('yes')}
-              disabled={state.type === StateType.Followup}
-            >
-              {isRail ? (
-                <ThumbsUp aria-hidden className="size-4" />
-              ) : (
-                <Check size={14} strokeWidth={2} />
-              )}
-              <span className="sr-only">Yes</span>
-            </Button>
-          </FeedbackTooltip>
-          {isRail ? (
-            <FeedbackTooltip label="Report a bug on GitHub" isEnabled>
+          <span className={staggerItemClass('delay-0')}>
+            <FeedbackTooltip label={NO_LABEL} isEnabled={isRail}>
               <Button
-                asChild
-                variant="text"
+                ref={firstVoteRef}
+                variant={isRail ? 'text' : 'outline'}
+                rounded={!isRail}
                 className={cn(
-                  'size-8 p-0 text-foreground-light transition-opacity hover:bg-transparent',
-                  'hover:text-foreground focus-visible:text-foreground',
-                  state.type === StateType.Followup && 'opacity-0 invisible'
+                  isRail ? 'size-8 p-0 hover:bg-transparent' : 'px-1 w-7 h-7',
+                  'text-foreground-light',
+                  '[transition-property:opacity,transform,color] [transition-duration:150ms,250ms,250ms]',
+                  'motion-reduce:[transition-duration:150ms,1ms,300ms]',
+                  '[transition-timing-function:cubic-bezier(.76,0,.23,1)]',
+                  !isNo && 'hover:text-warning focus-visible:text-warning',
+                  !isNo && !isRail && 'hover:border-warning-500',
+                  isNo &&
+                    (isRail
+                      ? 'text-warning disabled:opacity-100'
+                      : 'bg-warning text-warning-200 border-warning! disabled:opacity-100'),
+                  !showNo && 'opacity-0 invisible'
                 )}
+                // the label repeats the tooltip, so the button drops the description radix adds
+                aria-label={isRail ? NO_LABEL : undefined}
+                aria-describedby={undefined}
+                onClick={() => handleVote('no')}
+                disabled={state.type === StateType.Followup}
               >
-                <a
-                  href="https://github.com/supabase/supabase/issues/new/choose"
-                  target="_blank"
-                  rel="noopener noreferrer"
-                  aria-label="Report a bug on GitHub"
-                  aria-describedby={undefined}
-                >
-                  <Bug aria-hidden className="size-4" />
-                </a>
+                {isRail ? (
+                  <ThumbsDown aria-hidden className="size-4" />
+                ) : (
+                  <X size={14} strokeWidth={2} className="text-current" />
+                )}
+                <span className="sr-only">No</span>
               </Button>
             </FeedbackTooltip>
+          </span>
+          <span className={staggerItemClass('delay-50')}>
+            <FeedbackTooltip label={YES_LABEL} isEnabled={isRail}>
+              <Button
+                variant={isRail ? 'text' : 'outline'}
+                rounded={!isRail}
+                className={cn(
+                  isRail ? 'size-8 p-0 hover:bg-transparent' : 'px-1 w-7 h-7',
+                  'text-foreground-light',
+                  '[transition-property:opacity,transform,color] [transition-duration:150ms,250ms,250ms]',
+                  'motion-reduce:[transition-duration:150ms,1ms,300ms]',
+                  '[transition-timing-function:cubic-bezier(.76,0,.23,1)]',
+                  !isYes && 'hover:text-brand-600 focus-visible:text-brand-600',
+                  !isYes && !isRail && 'hover:border-brand-500',
+                  isYes &&
+                    (isRail
+                      ? 'text-brand-600 disabled:opacity-100 -translate-x-full'
+                      : 'bg-brand-default text-brand-200 border-brand-default! disabled:opacity-100 -translate-x-[calc(100%+var(--container-inline-flex-gap,0.5rem))]'),
+                  !showYes && 'opacity-0 invisible'
+                )}
+                aria-label={isRail ? YES_LABEL : undefined}
+                aria-describedby={undefined}
+                onClick={() => handleVote('yes')}
+                disabled={state.type === StateType.Followup}
+              >
+                {isRail ? (
+                  <ThumbsUp aria-hidden className="size-4" />
+                ) : (
+                  <Check size={14} strokeWidth={2} />
+                )}
+                <span className="sr-only">Yes</span>
+              </Button>
+            </FeedbackTooltip>
+          </span>
+          {isRail ? (
+            <span className={staggerItemClass('delay-100')}>
+              <FeedbackTooltip label="Report a bug on GitHub" isEnabled>
+                <Button
+                  asChild
+                  variant="text"
+                  className={cn(
+                    'size-8 p-0 text-foreground-light transition-opacity hover:bg-transparent',
+                    'hover:text-foreground focus-visible:text-foreground',
+                    state.type === StateType.Followup && 'opacity-0 invisible'
+                  )}
+                >
+                  <a
+                    href="https://github.com/supabase/supabase/issues/new/choose"
+                    target="_blank"
+                    rel="noopener noreferrer"
+                    aria-label="Report a bug on GitHub"
+                    aria-describedby={undefined}
+                  >
+                    <Bug aria-hidden className="size-4" />
+                  </a>
+                </Button>
+              </FeedbackTooltip>
+            </span>
           ) : null}
         </div>
         <div
@@ -286,6 +318,23 @@ function Feedback({ className, variant = 'default' }: FeedbackProps) {
             </>
           )}
         </div>
+        {isRail ? (
+          <button
+            type="button"
+            tabIndex={0}
+            className={cn(
+              'absolute inset-0 flex h-8 items-center gap-2 rounded-md py-2 pr-2 pl-1.5',
+              'text-sm text-foreground-light hover:bg-surface-200 hover:text-foreground',
+              'focus-ring focus-visible:bg-surface-200 focus-visible:text-foreground',
+              'transition-[opacity,scale,visibility,color,background-color] duration-150 ease-out',
+              isOpen && 'invisible opacity-0 motion-safe:scale-95'
+            )}
+            onClick={handleFeedbackOpen}
+          >
+            <MessageSquare aria-hidden className="size-4 text-foreground-lighter" />
+            Give feedback
+          </button>
+        ) : null}
       </div>
       <FeedbackModal
         visible={modalOpen}
