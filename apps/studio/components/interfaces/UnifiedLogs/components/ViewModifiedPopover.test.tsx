@@ -109,6 +109,29 @@ describe('ViewModifiedPopover', () => {
     expect(screen.getByRole('button', { name: 'Update view' })).toBeInTheDocument()
   })
 
+  it('explains a preset cannot be updated and offers save as new', async () => {
+    customRender(<ViewModifiedPopover {...baseProps} isPreset canUpdate={false} />)
+
+    expect(
+      await screen.findByText(
+        "Preset views can't be updated. Save these filters as a new view instead."
+      )
+    ).toBeInTheDocument()
+    expect(screen.getByRole('button', { name: 'Save as new' })).toBeInTheDocument()
+  })
+
+  it('explains a preset cannot be updated or saved without write access', async () => {
+    customRender(
+      <ViewModifiedPopover {...baseProps} isPreset canUpdate={false} canCreate={false} />
+    )
+
+    expect(
+      await screen.findByText("Preset views can't be updated. Reset to discard these filters.")
+    ).toBeInTheDocument()
+    expect(screen.queryByRole('button', { name: 'Save as new' })).toBeNull()
+    expect(screen.getByRole('button', { name: 'Reset' })).toBeInTheDocument()
+  })
+
   it('explains read-only access and keeps Reset when neither is allowed', async () => {
     customRender(<ViewModifiedPopover {...baseProps} canUpdate={false} canCreate={false} />)
 

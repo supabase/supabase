@@ -36,7 +36,10 @@ export const ViewModifiedPopover = ({
   const canWrite = canUpdate || canCreate
 
   const getDescription = () => {
-    if (isPreset) return "Preset views can't be updated. Save these filters as a new view instead."
+    if (isPreset)
+      return canCreate
+        ? "Preset views can't be updated. Save these filters as a new view instead."
+        : "Preset views can't be updated. Reset to discard these filters."
     if (canUpdate)
       return `Update "${truncateViewName(viewName)}" for everyone in the project, or save these filters as a new view.`
     return 'These filters have not been saved.'
