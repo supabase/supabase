@@ -22,7 +22,9 @@ export interface ProjectMultiSelectProps {
   error?: string
   flaggedRefs?: string[]
   unavailableRefs?: string[]
-  readinessIssueRefs?: string[]
+  readinessIssues?: Partial<
+    Record<string, 'postgres_upgrade_required' | 'ssl_enforcement_required'>
+  >
   allProjectsSelected?: boolean
   onAllProjectsChange?: (selected: boolean) => void
   onSearchChange: (query: string) => void
@@ -37,7 +39,7 @@ export const ProjectMultiSelect = ({
   error,
   flaggedRefs = [],
   unavailableRefs = [],
-  readinessIssueRefs = [],
+  readinessIssues = {},
   allProjectsSelected = false,
   onAllProjectsChange,
   onSearchChange,
@@ -65,9 +67,12 @@ export const ProjectMultiSelect = ({
 
   const renderProjectName = (ref: string, name: string) => (
     <>
-      {readinessIssueRefs.includes(ref) && (
+      {readinessIssues[ref] && (
         <>
-          <span className="mr-1.5 inline-block size-1.5 rounded-full bg-warning" aria-hidden />
+          <span
+            className="mr-1.5 inline-block size-1.5 rounded-full bg-warning group-data-[state=open]:hidden"
+            aria-hidden
+          />
           <span className="sr-only">Database setup notice: </span>
         </>
       )}
@@ -118,6 +123,7 @@ export const ProjectMultiSelect = ({
           >
             <MultiSelectorTrigger
               aria-labelledby={labelId}
+              className="group"
               label="Select projects..."
               badgeLimit={2}
               deletableBadge
@@ -139,10 +145,21 @@ export const ProjectMultiSelect = ({
                       value={project.ref}
                       disabled={atCap && !isSelected}
                     >
-                      {renderProjectName(project.ref, project.name)}
-                      {unavailableRefs.includes(project.ref) && (
-                        <span className="text-foreground-lighter"> - Unavailable</span>
-                      )}
+                      <span className="flex min-w-0 flex-1 items-center justify-between gap-2">
+                        <span>
+                          {project.name}
+                          {unavailableRefs.includes(project.ref) && (
+                            <span className="text-foreground-lighter"> - Unavailable</span>
+                          )}
+                        </span>
+                        {readinessIssues[project.ref] && (
+                          <span className="text-right text-xs text-warning">
+                            {readinessIssues[project.ref] === 'postgres_upgrade_required'
+                              ? 'Needs Postgres 17 or later'
+                              : 'SSL will be enabled'}
+                          </span>
+                        )}
+                      </span>
                     </MultiSelectorItem>
                   )
                 })}

@@ -390,7 +390,7 @@ export const OAuthAppsAuthorizeScreen = ({
                 }
                 flaggedRefs={flaggedRefs}
                 unavailableRefs={getFailedProjects(roleFailure).map((project) => project.ref)}
-                readinessIssueRefs={Object.keys(readinessIssues ?? {})}
+                readinessIssues={readinessIssues}
                 allProjectsSelected={allProjectsSelected}
                 onAllProjectsChange={databaseAccess ? undefined : setAllProjectsSelected}
                 onSearchChange={setSearch}

@@ -1,3 +1,4 @@
+import { XIcon } from 'lucide-react'
 import { Button } from 'ui'
 import { Admonition } from 'ui-patterns/Admonition'
 
@@ -10,9 +11,9 @@ export function DatabaseAccessProjectIssues({
 }) {
   return (
     <Admonition type="warning" title="Project upgrade required">
-      <ul className="text-xs">
+      <div className="divide-y text-xs">
         {projects.map(({ ref, name }) => (
-          <li key={ref} className="flex items-start justify-between gap-2 py-3">
+          <div key={ref} className="flex items-center justify-between gap-2 py-1.5">
             <p>
               <span className="font-medium">{name}</span> needs Postgres 17 or later.
             </p>
@@ -22,13 +23,12 @@ export function DatabaseAccessProjectIssues({
                 size="tiny"
                 aria-label={`Remove ${name}`}
                 onClick={() => onRemove(ref)}
-              >
-                Remove
-              </Button>
+                icon={<XIcon />}
+              />
             )}
-          </li>
+          </div>
         ))}
-      </ul>
+      </div>
     </Admonition>
   )
 }
