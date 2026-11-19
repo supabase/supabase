@@ -1,5 +1,5 @@
 import { QueryClient } from '@tanstack/react-query'
-import { screen } from '@testing-library/react'
+import { act, screen, waitFor } from '@testing-library/react'
 import { HttpResponse } from 'msw'
 import { beforeEach, expect, test } from 'vitest'
 
@@ -42,7 +42,9 @@ const metric = (name: WarehouseMetric['metric']): WarehouseMetric => ({
     },
   ],
 })
-const renderSection = () =>
+const renderSection = (
+  queryClient = new QueryClient({ defaultOptions: { queries: { retry: false } } })
+) =>
   customRender(
     <WarehouseLatencySection
       range={{
@@ -53,7 +55,7 @@ const renderSection = () =>
         isClamped: false,
       }}
     />,
-    { queryClient: new QueryClient({ defaultOptions: { queries: { retry: false } } }) }
+    { queryClient }
   )
 
 test('shows latency charts and their timing boundaries', async () => {
@@ -109,4 +111,29 @@ test('aligns percentiles preserving gaps and zeroes, and converts seconds to mil
     { timestamp: new Date(160000).toISOString(), value0: 250, value1: 500 },
     { timestamp: new Date(220000).toISOString(), value1: 0 },
   ])
+})
+
+test('keeps latency charts available when refreshing fails', async () => {
+  let shouldFail = false
+  addAPIMock({
+    method: 'get',
+    path: '/platform/warehouse/:ref/metrics',
+    response: () =>
+      shouldFail
+        ? HttpResponse.json<APIErrorBody>({ message: 'Failed' }, { status: 400 })
+        : HttpResponse.json<WarehouseMetricsResponse>({ metrics: [metric('query_duration_p95')] }),
+  })
+  const queryClient = new QueryClient({ defaultOptions: { queries: { retry: false } } })
+  renderSection(queryClient)
+  expect(await screen.findByRole('region', { name: 'Query duration' })).toBeInTheDocument()
+
+  shouldFail = true
+  await act(async () => {
+    await queryClient.invalidateQueries()
+  })
+  await waitFor(() =>
+    expect(screen.getByText('Failed to retrieve latency metrics')).toBeInTheDocument()
+  )
+  expect(screen.getByRole('region', { name: 'Query duration' })).toBeInTheDocument()
+  expect(screen.getByRole('button', { name: 'Retry' })).toBeInTheDocument()
 })

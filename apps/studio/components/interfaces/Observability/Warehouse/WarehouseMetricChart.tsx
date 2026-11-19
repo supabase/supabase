@@ -1,3 +1,4 @@
+import { useReducedMotion } from 'common'
 import { Card, CardContent } from 'ui'
 import { ChartLine } from 'ui-patterns/Chart'
 
@@ -41,11 +42,14 @@ export const WarehouseMetricChart = ({
   scale?: number
   series?: WarehouseChartSeries[]
 }) => {
+  const prefersReducedMotion = useReducedMotion()
+
   const allSeries = expandWarehouseChartSeries(inputSeries)
   const selectedSeries = [...allSeries]
     .sort((a, b) => getWarehouseSeriesRank(b) - getWarehouseSeriesRank(a))
     .slice(0, 12)
   const series = allSeries.filter((item) => selectedSeries.includes(item))
+
   const points = getWarehouseChartPoints(series, scale)
   const keys = series.map((_, index) => `value${index}`)
   const config = Object.fromEntries(
@@ -89,7 +93,9 @@ export const WarehouseMetricChart = ({
                 </ul>
               )}
               <ChartLine
-                className="h-64"
+                className="h-64 [&_.recharts-surface:focus-visible]:outline-solid [&_.recharts-surface:focus-visible]:outline-2 [&_.recharts-surface:focus-visible]:outline-brand"
+                accessibilityLayer
+                isAnimationActive={!prefersReducedMotion}
                 isFullHeight
                 data={points}
                 xKey="timestamp"
@@ -99,7 +105,7 @@ export const WarehouseMetricChart = ({
                 color="var(--chart-1)"
                 DateTimeFormat="MMM D, HH:mm"
                 showHighlightArea={false}
-                tooltipDetails={unit ? (_, __, value) => `${value}${unit}` : undefined}
+                tooltipDetails={unit ? (_, __, value) => `${value} ${unit}` : undefined}
               />
             </>
           ) : (
