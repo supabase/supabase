@@ -83,6 +83,7 @@ export const plans: PricingInformation[] = [
       'Project-scoped and read-only access',
       'HIPAA available as paid add-on',
       'SSO for Supabase Dashboard',
+      'Supports AWS PrivateLink',
       'Priority email support & SLAs',
       'Daily backups stored for 14 days',
       '28-day log retention',
@@ -99,7 +100,6 @@ export const plans: PricingInformation[] = [
     features: [
       'Technical Account Management',
       'Uptime SLAs',
-      'Supports AWS PrivateLink',
       '24×7×365 premium enterprise support',
       'Private Slack channel',
       'Custom Security Questionnaires',
