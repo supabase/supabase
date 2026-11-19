@@ -288,7 +288,7 @@ pg-delta is now the default schema diff engine for every project, so the SQL tha
 
 Under pg-delta, `[db.migrations].schema_paths` and the declarative files in `supabase/schemas` are no longer inputs to `db diff` or to a migration-style `db pull`. The "edit `supabase/schemas`, then run `db diff -f`" workflow no longer picks up your edits. Use `supabase db schema declarative sync` to generate migrations from [declarative schema](/docs/guides/local-development/declarative-database-schemas) files.
 
-To keep using migra for every run, set this in `supabase/config.toml`:
+To keep using migra for every run, set this in your config file:
 
 ```toml name=supabase/config.toml
 [experimental.pgdelta]

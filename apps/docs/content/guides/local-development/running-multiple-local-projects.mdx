@@ -51,20 +51,20 @@ You need:
 
 - Supabase CLI v2.119.0 or later. See [Install and run the CLI](/docs/guides/local-development/cli/getting-started).
 - A container engine or a supported platform. The Docker runtime needs a running Docker or Podman engine, and is the recommended runtime for several local projects at the same time. The native runtime needs no container engine but runs only on macOS on Apple silicon and on Linux for `amd64` and `arm64`. See [Choose a runtime](#choose-a-runtime).
-- An app directory initialized with `supabase init`, or a directory without a `supabase/config.toml`, `supabase/config.json`, or `supabase/config.jsonc`. Without a config file, the local project starts with default settings and doesn't create a config file.
+- An app directory initialized with `supabase init`, or a directory without a config file. Without a config file, the local project starts with default settings and doesn't create a config file.
 
 ## Turn on the stack commands
 
 The `supabase stack` commands exist only when the `experimental.stack` setting is on. Without it, `supabase stack` commands fail with `Unknown subcommand "stack"`.
 
-1. In your config file (`supabase/config.toml`, `supabase/config.jsonc`, or `supabase/config.json`) in your app directory, set `experimental.stack` to `true`. If your config file doesn't have an `experimental` entry yet, add one:
+1. In your app directory, open your config file (`supabase/config.toml`, `supabase/config.jsonc`, or `supabase/config.json`) and set `experimental.stack` to `true`. If the file doesn't have an `experimental` entry yet, add one:
 
    ```toml name=supabase/config.toml
    [experimental]
    stack = true
    ```
 
-   Don't add a second `[experimental]` table. In `config.toml`, a duplicate table makes the file invalid. The stack commands then stay off. Commands that read the config fail with `failed to load config`.
+   In `config.toml`, don't add a second `[experimental]` table: a duplicate table makes the file invalid. The stack commands then stay off. Commands that read the config fail with `failed to load config`.
 
    In a directory without a config file, set the environment variable instead:
 

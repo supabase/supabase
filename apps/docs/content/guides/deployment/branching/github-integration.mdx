@@ -99,7 +99,7 @@ Supabase applies the settings in your config file on top of the configuration co
 
 The `configure` step compares the `db`, `api`, `auth`, `storage`, and `experimental` sections of your config file with the branch's current settings and updates the ones that differ. The migrate, seed, and deploy steps read the other sections, such as `functions` and `db.seed`. If your repository has no config file, the step only turns on Database Webhooks.
 
-On a persistent branch, including your production branch, the step runs only when a `[remotes]` block names that branch's project ID. For the `[remotes]` syntax, see [Remote-specific configuration](/docs/guides/deployment/branching/configuration#remote-specific-configuration).
+On a persistent branch, including your production branch, the step runs only when a `remotes` entry names that branch's project ID. For the `remotes` syntax, see [Remote-specific configuration](/docs/guides/deployment/branching/configuration#remote-specific-configuration).
 
 A comment is added to your PR with the deployment status of your preview branch.
 

@@ -442,7 +442,7 @@ When `supabase db diff` or `db schema declarative sync` generates a migration, r
 
 ### What `pg-delta` output looks like
 
-Generated SQL uses uppercase keywords, wrapped at a maximum width of 180 characters. You can override this with `experimental.pgdelta.format_options` in your config file, or set it to `"null"` to emit raw statements with no formatting applied.
+Generated SQL uses uppercase keywords, wrapped at a maximum width of 180 characters. You can override this with `experimental.pgdelta.format_options` in your config file, or set it to the string `"null"` to emit raw statements with no formatting applied.
 
 Most changes produce a single migration file. When a change crosses a transaction boundary (for example `alter type ... add value` followed by a check constraint that uses the new enum value, which can't run in the same transaction), the CLI may write one ordered migration file per unit instead. The extra files carry a numeric segment suffix, such as `<timestamp>_add-status_1.sql` and `<timestamp+1s>_add-status_2.sql`. Commit all of them.
 

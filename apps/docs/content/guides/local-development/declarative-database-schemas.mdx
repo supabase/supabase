@@ -288,7 +288,7 @@ This writes per-object SQL files under `supabase/schemas/` (or the directory set
 CLI versions before 2.115.0 wrote the declarative tree to `supabase/database`. Version 2.115.0 and later read `supabase/schemas` and warn when `supabase/database` holds schema files, `supabase/schemas` is empty, and `declarative_schema_path` is unset. To clear the warning, do one of the following:
 
 - Move the tree to `supabase/schemas/`.
-- Keep the tree in place and set `declarative_schema_path = "./database"` under `[experimental.pgdelta]`.
+- Keep the tree in place and set `experimental.pgdelta.declarative_schema_path` to `"./database"`.
 
 </Admonition>
 
@@ -353,7 +353,7 @@ Two checks gate `sync` on a schema tree the CLI didn't generate:
 
 ## Declarative schemas on the legacy `migra` engine [#declarative-schemas-on-the-legacy-migra-engine]
 
-Projects that set `enabled = false` under `[experimental.pgdelta]` can still use declarative schemas. The workflow has the same shape, but the commands differ, and the `db schema declarative` commands aren't available. See [Diff engines](/docs/guides/local-development/diff-engines) for how to check which engine you're on and how the engines compare.
+Projects that set `experimental.pgdelta.enabled` to `false` can still use declarative schemas. The workflow has the same shape, but the commands differ, and the `db schema declarative` commands aren't available. See [Diff engines](/docs/guides/local-development/diff-engines) for how to check which engine you're on and how the engines compare.
 
 <Admonition type="caution">
 

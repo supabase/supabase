@@ -98,7 +98,7 @@ The CLI resolves every config value, whether it comes from your config file or a
 1. A command-line flag.
 2. A shell environment variable.
 3. A project env file.
-4. Your config file: `supabase/config.json`, `supabase/config.jsonc`, or `supabase/config.toml`. A JSON file wins over `config.toml` when both exist. Keep only one of `config.json` and `config.jsonc`. A matched `remotes.<name>` entry takes precedence over the base config.
+4. Your config file: `supabase/config.json`, `supabase/config.jsonc`, or `supabase/config.toml`. A JSON file wins over `config.toml` when both exist. Having both `config.json` and `config.jsonc` is an error. A matched `remotes.<name>` entry takes precedence over the base config.
 5. The default.
 
 For what the config file holds, see [Managing config and secrets](/docs/guides/local-development/managing-config).
@@ -129,15 +129,15 @@ A `[remotes.<name>]` block applies when its `project_id` equals the project ref 
 
 ### Common settings [#common-settings]
 
-| Setting                  | Flag                                                                         | Environment variable                    | Config file                      |
-| ------------------------ | ---------------------------------------------------------------------------- | --------------------------------------- | -------------------------------- |
-| Hosted database password | `--password`                                                                 | `SUPABASE_DB_PASSWORD`                  | —                                |
-| Seeding                  | `--include-seed` on `db push`, `--no-seed` on `db reset`                     | `SUPABASE_DB_SEED_ENABLED`              | `[db.seed] enabled`              |
-| Diff engine              | `--use-pg-delta` or `--use-migra` on `db diff`, `--diff-engine` on `db pull` | `SUPABASE_EXPERIMENTAL_PGDELTA_ENABLED` | `[experimental.pgdelta] enabled` |
-| Studio port              | —                                                                            | `SUPABASE_STUDIO_PORT`                  | `[studio] port`                  |
-| Project directory        | `--workdir`                                                                  | `SUPABASE_WORKDIR`                      | —                                |
+| Setting                  | Flag                                                                         | Environment variable                    | Config file                    |
+| ------------------------ | ---------------------------------------------------------------------------- | --------------------------------------- | ------------------------------ |
+| Hosted database password | `--password`                                                                 | `SUPABASE_DB_PASSWORD`                  | —                              |
+| Seeding                  | `--include-seed` on `db push`, `--no-seed` on `db reset`                     | `SUPABASE_DB_SEED_ENABLED`              | `db.seed.enabled`              |
+| Diff engine              | `--use-pg-delta` or `--use-migra` on `db diff`, `--diff-engine` on `db pull` | `SUPABASE_EXPERIMENTAL_PGDELTA_ENABLED` | `experimental.pgdelta.enabled` |
+| Studio port              | —                                                                            | `SUPABASE_STUDIO_PORT`                  | `studio.port`                  |
+| Project directory        | `--workdir`                                                                  | `SUPABASE_WORKDIR`                      | —                              |
 
-Any config key can be set from the environment as `SUPABASE_` plus the key's path in upper case, with `_` between the parts. `[studio] port` is `SUPABASE_STUDIO_PORT`, and `[db.seed] enabled` is `SUPABASE_DB_SEED_ENABLED`. A key inside an optional section, such as an auth provider, applies only when that section exists in your config.
+Any config key can be set from the environment as `SUPABASE_` plus the key's path in upper case, with `_` between the parts. `studio.port` is `SUPABASE_STUDIO_PORT`, and `db.seed.enabled` is `SUPABASE_DB_SEED_ENABLED`. A key inside an optional section, such as an auth provider, applies only when that section exists in your config.
 
 The database password has two separate settings:
 

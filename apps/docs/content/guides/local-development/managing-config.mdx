@@ -10,11 +10,9 @@ The [Supabase CLI](/docs/guides/local-development/cli/getting-started) uses a co
 
 ## Config reference
 
-The `config.toml` file is automatically created when you run `supabase init`.
-
 There are a wide variety of options available, which can be found in the [CLI Config Reference](/docs/guides/local-development/cli/config).
 
-For example, to enable the "Apple" OAuth provider for local development, add the following to your config file, merging its keys into the `auth`, `auth.external`, and `auth.external.apple` entries your file already has instead of adding a second copy. Fill in your client ID and set `SUPABASE_AUTH_EXTERNAL_APPLE_SECRET` in your `.env` file, as described in [Using secrets inside your config file](#using-secrets-inside-configtoml):
+For example, to enable the "Apple" OAuth provider for local development, add the following to your config file. Merge its keys into the entries your file already has instead of adding a second copy. Fill in your client ID and set `SUPABASE_AUTH_EXTERNAL_APPLE_SECRET` in your `.env` file, as described in [Using secrets inside your config file](#using-secrets-inside-configtoml):
 
 ```toml name=supabase/config.toml
 [auth.external.apple]
@@ -26,7 +24,7 @@ redirect_uri = "" # Overrides the default auth redirectUrl.
 
 ## Using secrets inside your config file [#using-secrets-inside-configtoml]
 
-You can reference environment variables within your config file using the `env()` function. This will detect any values stored in an `.env` file at the root of your project directory. This is particularly useful for storing sensitive information like API keys, and any other values that you don't want to check into version control.
+You can reference environment variables within your config file using the `env()` function. The CLI reads any values stored in an `.env` file at the root of your project directory. This is particularly useful for storing sensitive information like API keys, and any other values that you don't want to check into version control.
 
 ```
 .
@@ -49,7 +47,7 @@ GITHUB_CLIENT_ID=""
 GITHUB_SECRET=""
 ```
 
-Then you would reference them inside of your config file like this:
+Then you would reference them in your config file like this:
 
 ```toml name=supabase/config.toml
 [auth.external.github]

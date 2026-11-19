@@ -134,7 +134,7 @@ Preview branches auto-pause after inactivity. First connections after pause may 
 
 If configuration changes aren't applying:
 
-1. **Syntax errors**: Run `supabase config validate` (CLI 3.2.0 or later) to check your config file
+1. **Syntax errors**: Run `supabase config validate` to check your config file. This command needs CLI 3.2.0 or later
 2. **Git sync**: Ensure changes are committed and pushed
 3. **Branch refresh**: Try deleting and recreating the branch
 4. **Persistent branch**: Configuration runs on a persistent branch, including your production branch, only when a `remotes` entry names its project ID. For the `remotes` syntax, see [Remote-specific configuration](/docs/guides/deployment/branching/configuration#remote-specific-configuration)
