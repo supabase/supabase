@@ -2101,6 +2101,9 @@ importers:
       '@types/mdx-js__react':
         specifier: ^1.5.6
         version: 1.5.6
+      '@types/node':
+        specifier: 'catalog:'
+        version: 26.6.6
       '@types/parse-numeric-range':
         specifier: ^0.0.1
         version: 0.0.1
@@ -2157,10 +2160,10 @@ importers:
         version: 14.0.0
       vite:
         specifier: 'catalog:'
-        version: 8.3.5(@types/node@24.19.0)(esbuild@0.28.2)(jiti@2.7.0)(sass@1.77.4)(terser@5.48.0)(tsx@4.22.4)(yaml@2.9.1)
+        version: 8.3.5(@types/node@26.6.6)(esbuild@0.28.2)(jiti@2.7.0)(sass@1.77.4)(terser@5.48.0)(tsx@4.22.4)(yaml@2.9.1)
       vitest:
         specifier: 'catalog:'
-        version: 5.0.0(@opentelemetry/api@1.9.1)(@types/node@24.19.0)(@vitest/coverage-v8@5.0.0)(happy-dom@20.14.5)(jsdom@28.1.0(@noble/hashes@1.8.0)(supports-color@8.1.1))(msw@2.11.3(@types/node@26.6.6)(typescript@6.0.2))(vite@8.3.5(@types/node@24.19.0)(esbuild@0.28.2)(jiti@2.7.0)(sass@1.77.4)(terser@5.48.0)(tsx@4.22.4)(yaml@2.9.1))
+        version: 5.0.0(@opentelemetry/api@1.9.1)(@types/node@26.6.6)(@vitest/coverage-v8@5.0.0)(@vitest/ui@5.0.5)(happy-dom@20.14.5)(jsdom@28.1.0(@noble/hashes@1.8.0)(supports-color@8.1.1))(msw@2.11.3(@types/node@26.6.6)(typescript@6.0.2))(vite@8.3.5(@types/node@26.6.6)(esbuild@0.28.2)(jiti@2.7.0)(sass@1.77.4)(terser@5.48.0)(tsx@4.22.4)(yaml@2.9.1))
       zod:
         specifier: 'catalog:'
         version: 3.25.76
@@ -2776,10 +2779,10 @@ importers:
         version: 6.0.2
       vite:
         specifier: 'catalog:'
-        version: 8.3.5(@types/node@24.19.0)(esbuild@0.28.2)(jiti@2.7.0)(sass@1.77.4)(terser@5.48.0)(tsx@4.22.4)(yaml@2.9.1)
+        version: 8.3.5(@types/node@26.6.6)(esbuild@0.28.2)(jiti@2.7.0)(sass@1.77.4)(terser@5.48.0)(tsx@4.22.4)(yaml@2.9.1)
       vitest:
         specifier: 'catalog:'
-        version: 5.0.0(@opentelemetry/api@1.9.1)(@types/node@24.19.0)(@vitest/coverage-v8@5.0.0)(happy-dom@20.14.5)(jsdom@28.1.0(@noble/hashes@1.8.0)(supports-color@8.1.1))(msw@2.11.3(@types/node@26.6.6)(typescript@6.0.2))(vite@8.3.5(@types/node@24.19.0)(esbuild@0.28.2)(jiti@2.7.0)(sass@1.77.4)(terser@5.48.0)(tsx@4.22.4)(yaml@2.9.1))
+        version: 5.0.0(@opentelemetry/api@1.9.1)(@types/node@26.6.6)(@vitest/coverage-v8@5.0.0)(@vitest/ui@5.0.5)(happy-dom@20.14.5)(jsdom@28.1.0(@noble/hashes@1.8.0)(supports-color@8.1.1))(msw@2.11.3(@types/node@26.6.6)(typescript@6.0.2))(vite@8.3.5(@types/node@26.6.6)(esbuild@0.28.2)(jiti@2.7.0)(sass@1.77.4)(terser@5.48.0)(tsx@4.22.4)(yaml@2.9.1))
 
   packages/shared-data:
     dependencies:
@@ -27113,7 +27116,7 @@ snapshots:
 
   '@types/pg@8.11.11':
     dependencies:
-      '@types/node': 24.19.0
+      '@types/node': 26.6.6
       pg-protocol: 1.7.1
       pg-types: 4.0.2
 
@@ -27187,7 +27190,7 @@ snapshots:
 
   '@types/ws@8.18.2':
     dependencies:
-      '@types/node': 24.19.0
+      '@types/node': 26.6.6
 
   '@types/zxcvbn@4.4.2': {}
 
@@ -27569,16 +27572,6 @@ snapshots:
   '@vitest/istanbul-lib-report@1.0.1':
     dependencies:
       '@vitest/istanbul-lib-coverage': 1.0.1
-
-  '@vitest/mocker@5.0.0(msw@2.11.3(@types/node@26.6.6)(typescript@6.0.2))(vite@8.3.5(@types/node@24.19.0)(esbuild@0.28.2)(jiti@2.7.0)(sass@1.77.4)(terser@5.48.0)(tsx@4.22.4)(yaml@2.9.1))':
-    dependencies:
-      '@jridgewell/trace-mapping': 0.3.31
-      '@vitest/spy': 5.0.0
-      estree-walker: 3.0.3
-      magic-string: 1.4.5
-    optionalDependencies:
-      msw: 2.11.3(@types/node@26.6.6)(typescript@6.0.2)
-      vite: 8.3.5(@types/node@24.19.0)(esbuild@0.28.2)(jiti@2.7.0)(sass@1.77.4)(terser@5.48.0)(tsx@4.22.4)(yaml@2.9.1)
 
   '@vitest/mocker@5.0.0(msw@2.11.3(@types/node@26.6.6)(typescript@6.0.2))(vite@8.3.5(@types/node@26.6.6)(esbuild@0.28.2)(jiti@2.7.0)(sass@1.77.4)(terser@5.48.0)(tsx@4.22.4)(yaml@2.9.1))':
     dependencies:
@@ -28617,7 +28610,7 @@ snapshots:
 
   buffer-image-size@0.6.4:
     dependencies:
-      '@types/node': 24.19.0
+      '@types/node': 26.6.6
 
   buffer@6.0.3:
     dependencies:
@@ -31231,7 +31224,7 @@ snapshots:
 
   happy-dom@20.14.5:
     dependencies:
-      '@types/node': 24.19.0
+      '@types/node': 26.6.6
       '@types/whatwg-mimetype': 3.0.2
       '@types/ws': 8.18.2
       buffer-image-size: 0.6.4
@@ -32042,7 +32035,7 @@ snapshots:
 
   jest-worker@27.5.1:
     dependencies:
-      '@types/node': 24.19.0
+      '@types/node': 26.6.6
       merge-stream: 2.0.0
       supports-color: 8.1.1
 
@@ -38124,23 +38117,6 @@ snapshots:
       tsx: 4.22.4
       yaml: 2.9.1
 
-  vite@8.3.5(@types/node@24.19.0)(esbuild@0.28.2)(jiti@2.7.0)(sass@1.77.4)(terser@5.48.0)(tsx@4.22.4)(yaml@2.9.1):
-    dependencies:
-      lightningcss: 1.33.0
-      picomatch: 4.0.7
-      postcss: 8.5.28
-      rolldown: 1.2.15
-      tinyglobby: 0.2.17
-    optionalDependencies:
-      '@types/node': 24.19.0
-      esbuild: 0.28.2
-      fsevents: 2.3.3
-      jiti: 2.7.0
-      sass: 1.77.4
-      terser: 5.48.0
-      tsx: 4.22.4
-      yaml: 2.9.1
-
   vite@8.3.5(@types/node@26.6.6)(esbuild@0.28.1)(jiti@2.7.0)(sass@1.77.4)(terser@5.48.0)(tsx@4.22.4)(yaml@2.9.1):
     dependencies:
       lightningcss: 1.33.0
@@ -38216,31 +38192,6 @@ snapshots:
   vitefu@1.1.3(vite@8.3.8(@types/node@26.6.6)(esbuild@0.28.2)(jiti@2.7.0)(sass@1.77.4)(terser@5.51.2)(tsx@4.22.4)(yaml@2.9.1)):
     optionalDependencies:
       vite: 8.3.8(@types/node@26.6.6)(esbuild@0.28.2)(jiti@2.7.0)(sass@1.77.4)(terser@5.51.2)(tsx@4.22.4)(yaml@2.9.1)
-
-  vitest@5.0.0(@opentelemetry/api@1.9.1)(@types/node@24.19.0)(@vitest/coverage-v8@5.0.0)(happy-dom@20.14.5)(jsdom@28.1.0(@noble/hashes@1.8.0)(supports-color@8.1.1))(msw@2.11.3(@types/node@26.6.6)(typescript@6.0.2))(vite@8.3.5(@types/node@24.19.0)(esbuild@0.28.2)(jiti@2.7.0)(sass@1.77.4)(terser@5.48.0)(tsx@4.22.4)(yaml@2.9.1)):
-    dependencies:
-      '@types/chai': 5.2.2
-      '@vitest/mocker': 5.0.0(msw@2.11.3(@types/node@26.6.6)(typescript@6.0.2))(vite@8.3.5(@types/node@24.19.0)(esbuild@0.28.2)(jiti@2.7.0)(sass@1.77.4)(terser@5.48.0)(tsx@4.22.4)(yaml@2.9.1))
-      chai: 6.2.2
-      es-module-lexer: 2.3.2
-      expect-type: 1.4.0
-      magic-string: 1.4.3
-      obug: 2.1.4
-      picomatch: 4.0.7
-      std-env: 4.3.0
-      tinybench: 6.1.4
-      tinyexec: 1.3.0
-      tinyglobby: 0.2.17
-      vite: 8.3.5(@types/node@24.19.0)(esbuild@0.28.2)(jiti@2.7.0)(sass@1.77.4)(terser@5.48.0)(tsx@4.22.4)(yaml@2.9.1)
-      why-is-node-running: 2.3.0
-    optionalDependencies:
-      '@opentelemetry/api': 1.9.1
-      '@types/node': 24.19.0
-      '@vitest/coverage-v8': 5.0.0(vitest@5.0.0)
-      happy-dom: 20.14.5
-      jsdom: 28.1.0(@noble/hashes@1.8.0)(supports-color@8.1.1)
-    transitivePeerDependencies:
-      - msw
 
   vitest@5.0.0(@opentelemetry/api@1.9.1)(@types/node@26.6.6)(@vitest/coverage-v8@5.0.0)(@vitest/ui@5.0.5)(happy-dom@20.14.5)(jsdom@28.1.0(@noble/hashes@1.8.0)(supports-color@8.1.1))(msw@2.11.3(@types/node@26.6.6)(typescript@6.0.2))(vite@8.3.5(@types/node@26.6.6)(esbuild@0.28.2)(jiti@2.7.0)(sass@1.77.4)(terser@5.48.0)(tsx@4.22.4)(yaml@2.9.1)):
     dependencies:
