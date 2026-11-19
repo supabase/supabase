@@ -7,6 +7,7 @@ export type SetupPrompt = 'not_started' | 'disabled'
 export type ReportView =
   | { kind: 'unsupported' }
   | { kind: 'loading' }
+  | { kind: 'out-of-range' }
   | { kind: 'setup-error'; error: ErrorLike }
   | { kind: 'setup'; prompt: SetupPrompt }
   | { kind: 'metrics-error'; error: ErrorLike }
@@ -52,6 +53,7 @@ export function getSetupPrompt({
 // Order matters: the first matching state wins.
 export function getReportView({
   isPlatform,
+  isRangeValid = true,
   isLoading,
   setupError,
   setupPrompt,
@@ -59,6 +61,7 @@ export function getReportView({
   hasChartValues,
 }: {
   isPlatform: boolean
+  isRangeValid?: boolean
   isLoading: boolean
   setupError: ErrorLike | null
   setupPrompt: SetupPrompt | undefined
@@ -66,6 +69,7 @@ export function getReportView({
   hasChartValues: boolean
 }): ReportView {
   if (!isPlatform) return { kind: 'unsupported' }
+  if (!isRangeValid) return { kind: 'out-of-range' }
   if (isLoading) return { kind: 'loading' }
   if (setupError) return { kind: 'setup-error', error: setupError }
   if (setupPrompt) return { kind: 'setup', prompt: setupPrompt }
@@ -77,6 +81,8 @@ export function getReportStatus(view: ReportView, emptyMessage: string) {
   switch (view.kind) {
     case 'unsupported':
       return 'Warehouse metrics are unavailable'
+    case 'out-of-range':
+      return 'This period is outside the available metrics history'
     case 'loading':
       return 'Loading Warehouse report'
     case 'setup-error':
@@ -90,7 +96,10 @@ export function getReportStatus(view: ReportView, emptyMessage: string) {
   }
 }
 
-export function getEmptyMessage(metric?: WarehouseMetric) {
+export function getEmptyMessage(
+  metric?: WarehouseMetric,
+  noDataMessage = 'No data in the last 60 minutes'
+) {
   if (!metric || metric.series.length > 1) return 'Metrics are temporarily unavailable'
   switch (metric.availability) {
     case 'stale':
@@ -102,6 +111,6 @@ export function getEmptyMessage(metric?: WarehouseMetric) {
     case 'not_provisioned':
       return 'Metrics are temporarily unavailable'
     default:
-      return 'No data in the last 60 minutes'
+      return noDataMessage
   }
 }

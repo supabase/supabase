@@ -30,6 +30,7 @@ describe('getReportView', () => {
   it.each([
     ['not on platform', { isPlatform: false, isLoading: true }, 'unsupported'],
     ['loading', { isLoading: true, setupError: error }, 'loading'],
+    ['invalid range', { isRangeValid: false, isLoading: true }, 'out-of-range'],
     [
       'setup error',
       { setupError: error, setupPrompt: 'disabled', metricsError: error },
@@ -44,6 +45,12 @@ describe('getReportView', () => {
 })
 
 describe('getReportStatus', () => {
+  it('announces the invalid-range fallback', () => {
+    expect(getReportStatus({ kind: 'out-of-range' }, '')).toBe(
+      'This period is outside the available metrics history'
+    )
+  })
+
   it('announces the empty message when there is nothing to chart', () => {
     const view = getReportView({
       isPlatform: true,
