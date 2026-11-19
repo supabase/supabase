@@ -21,12 +21,21 @@ import {
   PlusIcon,
 } from 'lucide-react'
 import { useQueryStates } from 'nuqs'
+import { VisuallyHidden } from 'radix-ui'
 import { useEffect, useEffectEvent, useMemo, useRef, useState } from 'react'
 import { toast } from 'sonner'
 import {
   Button,
   ChartConfig,
   cn,
+  Drawer,
+  DrawerClose,
+  DrawerContent,
+  DrawerDescription,
+  DrawerFooter,
+  DrawerHeader,
+  DrawerTitle,
+  DrawerTrigger,
   ResizableHandle,
   ResizablePanel,
   ResizablePanelGroup,
@@ -541,7 +550,6 @@ export const UnifiedLogs = ({
   }
 
   const handleStartSaveView = () => {
-    handleOpenViewsSection()
     setSaveViewProjectRef(projectRef ?? null)
   }
 
@@ -664,6 +672,52 @@ export const UnifiedLogs = ({
     }
   }, [isMobile])
 
+  const saveViewAction = canCreateView ? (
+    <ButtonTooltip
+      size="tiny"
+      variant="outline"
+      className="size-7 shrink-0 px-0"
+      icon={<PlusIcon />}
+      aria-label="Save current filters as a view"
+      disabled={isSavingNewView || activeFilterCount < MIN_FILTERS_TO_SAVE}
+      tooltip={{
+        content: {
+          side: 'bottom',
+          text:
+            activeFilterCount < MIN_FILTERS_TO_SAVE
+              ? 'Add a filter to save a view'
+              : 'Save current filters as a view',
+        },
+      }}
+      onClick={handleStartSaveView}
+    />
+  ) : undefined
+
+  const viewsPanel = (
+    <LogsViewsPanel
+      key={projectRef}
+      views={savedViews}
+      isLoading={isLoadingSavedViews}
+      isError={isErrorSavedViews}
+      isPending={isSavingView}
+      canUpdate={canUpdateView}
+      canDelete={canDeleteView}
+      activeViewId={activeView?.id ?? null}
+      isActiveViewModified={isActiveViewModified}
+      isSaving={isSavingNewView}
+      activeRowRef={activeViewRowRef}
+      onRetry={retrySavedViews}
+      onApply={handleApplyView}
+      onReviewChanges={handleReviewChanges}
+      canCreate={canCreateView}
+      onRename={(id, name) => updateSavedView(id, { name })}
+      onDelete={deleteSavedView}
+      onDuplicate={handleDuplicateView}
+      onCancelSave={() => setSaveViewProjectRef(null)}
+      onSubmitSave={handleCreateView}
+    />
+  )
+
   return (
     <>
       <DataTableProvider
@@ -723,53 +777,7 @@ export const UnifiedLogs = ({
                   }
                   section={
                     showSavedViews && isViewsSectionOpen
-                      ? {
-                          label: 'Views',
-                          action: canCreateView ? (
-                            <ButtonTooltip
-                              size="tiny"
-                              variant="outline"
-                              className="size-7 shrink-0 px-0"
-                              icon={<PlusIcon />}
-                              aria-label="Save current filters as a view"
-                              disabled={isSavingNewView || activeFilterCount < MIN_FILTERS_TO_SAVE}
-                              tooltip={{
-                                content: {
-                                  side: 'bottom',
-                                  text:
-                                    activeFilterCount < MIN_FILTERS_TO_SAVE
-                                      ? 'Add a filter to save a view'
-                                      : 'Save current filters as a view',
-                                },
-                              }}
-                              onClick={handleStartSaveView}
-                            />
-                          ) : undefined,
-                          content: (
-                            <LogsViewsPanel
-                              key={projectRef}
-                              views={savedViews}
-                              isLoading={isLoadingSavedViews}
-                              isError={isErrorSavedViews}
-                              isPending={isSavingView}
-                              canUpdate={canUpdateView}
-                              canDelete={canDeleteView}
-                              activeViewId={activeView?.id ?? null}
-                              isActiveViewModified={isActiveViewModified}
-                              isSaving={isSavingNewView}
-                              activeRowRef={activeViewRowRef}
-                              onRetry={retrySavedViews}
-                              onApply={handleApplyView}
-                              onReviewChanges={handleReviewChanges}
-                              canCreate={canCreateView}
-                              onRename={(id, name) => updateSavedView(id, { name })}
-                              onDelete={deleteSavedView}
-                              onDuplicate={handleDuplicateView}
-                              onCancelSave={() => setSaveViewProjectRef(null)}
-                              onSubmitSave={handleCreateView}
-                            />
-                          ),
-                        }
+                      ? { label: 'Views', action: saveViewAction, content: viewsPanel }
                       : undefined
                   }
                 />
@@ -814,8 +822,44 @@ export const UnifiedLogs = ({
                   </div>
 
                   {hasFilterSideBar && (
-                    <div className="block sm:hidden">
+                    <div className="flex items-center gap-x-1 sm:hidden">
                       <DataTableFilterControlsDrawer />
+                      {showSavedViews && (
+                        <Drawer>
+                          <DrawerTrigger asChild>
+                            <Button
+                              size="tiny"
+                              variant="text"
+                              className="w-[26px]"
+                              icon={
+                                <Layers2Icon
+                                  className={activeView ? 'text-brand-600' : undefined}
+                                />
+                              }
+                              aria-label="Saved views"
+                            />
+                          </DrawerTrigger>
+                          <DrawerContent className="max-h-[calc(100dvh-4rem)]">
+                            <DrawerHeader className="flex flex-row items-center justify-between">
+                              <DrawerTitle>Views</DrawerTitle>
+                              <VisuallyHidden.VisuallyHidden>
+                                <DrawerDescription>Apply or manage saved views</DrawerDescription>
+                              </VisuallyHidden.VisuallyHidden>
+                              {saveViewAction}
+                            </DrawerHeader>
+                            <div className="flex min-h-0 flex-1 flex-col overflow-y-auto">
+                              {viewsPanel}
+                            </div>
+                            <DrawerFooter>
+                              <DrawerClose asChild>
+                                <Button variant="outline" className="w-full">
+                                  Close
+                                </Button>
+                              </DrawerClose>
+                            </DrawerFooter>
+                          </DrawerContent>
+                        </Drawer>
+                      )}
                     </div>
                   )}
 
