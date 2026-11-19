@@ -1,3 +1,4 @@
+import { QueryClient } from '@tanstack/react-query'
 import { act, screen, waitFor, within } from '@testing-library/react'
 import userEvent from '@testing-library/user-event'
 import { mockAnimationsApi } from 'jsdom-testing-mocks'
@@ -8,6 +9,7 @@ import { describe, expect, it, vi } from 'vitest'
 
 import { DeleteConfirmationDialogs } from './DeleteConfirmationDialogs'
 import { ENTITY_TYPE } from '@/data/entity-types/entity-type-constants'
+import { tableEditorKeys } from '@/data/table-editor/keys'
 import type { Entity } from '@/data/table-editor/table-editor-types'
 import { TableEditorStateContextProvider, useTableEditorStateSnapshot } from '@/state/table-editor'
 import { customRender } from '@/tests/lib/custom-render'
@@ -47,7 +49,7 @@ const UnmountableHost = ({ children }: PropsWithChildren) => {
 
 const mockApi = (
   entityType: ENTITY_TYPE,
-  { onDeleteRequest }: { onDeleteRequest?: () => void } = {}
+  { onDeleteRequest }: { onDeleteRequest?: () => void | Promise<void> } = {}
 ) => {
   const statements: string[] = []
   let isDeleted = false
@@ -81,7 +83,7 @@ const mockApi = (
       }
       statements.push(((await request.json()) as { query: string }).query)
       isDeleted = true
-      onDeleteRequest?.()
+      await onDeleteRequest?.()
       return HttpResponse.json([])
     },
   })
@@ -168,6 +170,44 @@ describe('DeleteConfirmationDialogs', () => {
     await user.click(within(dialog).getByRole('button', { name: 'Delete' }))
 
     await waitFor(() => expect(screen.queryByRole('dialog')).not.toBeInTheDocument())
+    await waitFor(() =>
+      expect(onTableDeleted).toHaveBeenCalledWith(
+        expect.objectContaining({ id: TARGET.id, name: TARGET.name })
+      )
+    )
+  })
+
+  it('still reports the deletion when the deleted table disappears before the delete settles', async () => {
+    const user = userEvent.setup()
+    const onTableDeleted = vi.fn()
+    const queryClient = new QueryClient({
+      defaultOptions: { queries: { retry: false }, mutations: { retry: false } },
+    })
+    // The refetch that follows a delete lands while the delete is still finishing, so the table the
+    // dialogs were showing no longer exists by the time the delete reports success
+    mockApi(ENTITY_TYPE.TABLE, {
+      onDeleteRequest: () =>
+        act(async () => {
+          queryClient.setQueryData(tableEditorKeys.tableEditor('default', TARGET.id), null)
+          // Let the resulting render happen before the delete responds
+          await new Promise((resolve) => setTimeout(resolve, 0))
+        }),
+    })
+
+    customRender(
+      <TableEditorStateContextProvider>
+        <OpenDialogButton action="onDeleteTable" />
+        <DeleteConfirmationDialogs selectedTable={OPEN_TABLE} onTableDeleted={onTableDeleted} />
+      </TableEditorStateContextProvider>,
+      { queryClient }
+    )
+
+    await user.click(screen.getByRole('button', { name: 'Open dialog' }))
+    const dialog = await screen.findByRole('dialog', {
+      name: `Confirm deletion of table "${TARGET.name}"`,
+    })
+    await user.click(within(dialog).getByRole('button', { name: 'Delete' }))
+
     await waitFor(() =>
       expect(onTableDeleted).toHaveBeenCalledWith(
         expect.objectContaining({ id: TARGET.id, name: TARGET.name })

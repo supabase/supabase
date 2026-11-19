@@ -78,10 +78,9 @@ export const DeleteConfirmationDialogs = ({
       snap.closeConfirmationDialog()
     },
   })
-  const { mutate: deleteTable } = useTableDeleteMutation({
+  const { mutateAsync: deleteTable } = useTableDeleteMutation({
     onSuccess: async (_, variables) => {
       toast.success(`Successfully deleted table "${variables.name}"`)
-      if (targetTable) onTableDeleted?.(targetTable)
     },
     onError: (error, variables) => {
       toast.error(`Failed to delete ${variables.name}: ${error.message}`)
@@ -91,10 +90,9 @@ export const DeleteConfirmationDialogs = ({
     },
   })
 
-  const { mutate: deleteView } = useViewDeleteMutation({
+  const { mutateAsync: deleteView } = useViewDeleteMutation({
     onSuccess: async (_, variables) => {
       toast.success(`Successfully deleted view "${variables.name}"`)
-      if (targetTable) onTableDeleted?.(targetTable)
     },
     onError: (error, variables) => {
       toast.error(`Failed to delete ${variables.name}: ${error.message}`)
@@ -104,10 +102,9 @@ export const DeleteConfirmationDialogs = ({
     },
   })
 
-  const { mutate: deleteMaterializedView } = useMaterializedViewDeleteMutation({
+  const { mutateAsync: deleteMaterializedView } = useMaterializedViewDeleteMutation({
     onSuccess: async (_, variables) => {
       toast.success(`Successfully deleted materialized view "${variables.name}"`)
-      if (targetTable) onTableDeleted?.(targetTable)
     },
     onError: (error, variables) => {
       toast.error(`Failed to delete ${variables.name}: ${error.message}`)
@@ -195,42 +192,63 @@ export const DeleteConfirmationDialogs = ({
     if (snap.confirmationDialog?.type !== 'table') return
     if (!project || !targetTable) return
 
-    deleteTable({
-      projectRef: project.ref,
-      connectionString: project.connectionString,
-      id: targetTable.id,
-      name: targetTable.name,
-      schema: targetTable.schema,
-      cascade: isDeleteWithCascade,
-    })
+    // Not read from `targetTable` after the delete: once the table is gone its query empties it
+    const deletedEntity = targetTable
+    try {
+      await deleteTable({
+        projectRef: project.ref,
+        connectionString: project.connectionString,
+        id: deletedEntity.id,
+        name: deletedEntity.name,
+        schema: deletedEntity.schema,
+        cascade: isDeleteWithCascade,
+      })
+    } catch {
+      return // Reported by the mutation's onError
+    }
+    onTableDeleted?.(deletedEntity)
   }
 
   const onConfirmDeleteView = async () => {
     if (snap.confirmationDialog?.type !== 'view') return
     if (!project || !targetTable) return
 
-    deleteView({
-      projectRef: project.ref,
-      connectionString: project.connectionString,
-      id: targetTable.id,
-      name: targetTable.name,
-      schema: targetTable.schema,
-      cascade: isDeleteWithCascade,
-    })
+    // Not read from `targetTable` after the delete: once the table is gone its query empties it
+    const deletedEntity = targetTable
+    try {
+      await deleteView({
+        projectRef: project.ref,
+        connectionString: project.connectionString,
+        id: deletedEntity.id,
+        name: deletedEntity.name,
+        schema: deletedEntity.schema,
+        cascade: isDeleteWithCascade,
+      })
+    } catch {
+      return // Reported by the mutation's onError
+    }
+    onTableDeleted?.(deletedEntity)
   }
 
   const onConfirmDeleteMaterializedView = async () => {
     if (snap.confirmationDialog?.type !== 'materialized-view') return
     if (!project || !targetTable) return
 
-    deleteMaterializedView({
-      projectRef: project.ref,
-      connectionString: project.connectionString,
-      id: targetTable.id,
-      name: targetTable.name,
-      schema: targetTable.schema,
-      cascade: isDeleteWithCascade,
-    })
+    // Not read from `targetTable` after the delete: once the table is gone its query empties it
+    const deletedEntity = targetTable
+    try {
+      await deleteMaterializedView({
+        projectRef: project.ref,
+        connectionString: project.connectionString,
+        id: deletedEntity.id,
+        name: deletedEntity.name,
+        schema: deletedEntity.schema,
+        cascade: isDeleteWithCascade,
+      })
+    } catch {
+      return // Reported by the mutation's onError
+    }
+    onTableDeleted?.(deletedEntity)
   }
 
   const isPartitionedTableDialogOpen =
