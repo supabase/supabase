@@ -126,22 +126,28 @@ test('limits large labelled responses and tells the user which series are shown'
   expect(screen.queryByText('Rejected requests · reason-12')).not.toBeInTheDocument()
 })
 
-test('keeps populated series when earlier labelled series have no measurements', () => {
-  const rejection = metric('admission_rejection_rate')
-  rejection.series = Array.from({ length: 13 }, (_, index) => ({
-    ...rejection.series[0],
-    labels: { reason: `reason-${index.toString().padStart(2, '0')}` },
-    points: [{ timestamp: 160, value: index === 12 ? 0 : null }],
-  }))
-  customRender(
-    <WarehouseMetricChart
-      metric={rejection}
-      title="Rejected requests"
-      description="By reason"
-      unit="/s"
-    />
-  )
-  expect(screen.getByText('Showing 12 of 13 series')).toBeInTheDocument()
-  expect(screen.getByText('Rejected requests · reason-12')).toBeInTheDocument()
-  expect(screen.queryByText('No data in the selected period')).not.toBeInTheDocument()
-})
+test.each([
+  { earlierValue: null, lastValue: 0 },
+  { earlierValue: 0, lastValue: 1 },
+])(
+  'keeps activity ahead of empty or zero-only series ($earlierValue)',
+  ({ earlierValue, lastValue }) => {
+    const rejection = metric('admission_rejection_rate')
+    rejection.series = Array.from({ length: 13 }, (_, index) => ({
+      ...rejection.series[0],
+      labels: { reason: `reason-${index.toString().padStart(2, '0')}` },
+      points: [{ timestamp: 160, value: index === 12 ? lastValue : earlierValue }],
+    }))
+    customRender(
+      <WarehouseMetricChart
+        metric={rejection}
+        title="Rejected requests"
+        description="By reason"
+        unit="/s"
+      />
+    )
+    expect(screen.getByText('Showing 12 of 13 series')).toBeInTheDocument()
+    expect(screen.getByText('Rejected requests · reason-12')).toBeInTheDocument()
+    expect(screen.queryByText('No data in the selected period')).not.toBeInTheDocument()
+  }
+)
