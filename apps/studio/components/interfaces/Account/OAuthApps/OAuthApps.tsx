@@ -35,10 +35,10 @@ export const OAuthApps = () => {
   })
 
   useEffect(() => {
-    if (hasNextPage && entry?.isIntersecting && !isFetchingNextPage) {
+    if (hasNextPage && entry?.isIntersecting && !isFetchingNextPage && !isError) {
       fetchNextPage()
     }
-  }, [hasNextPage, entry?.isIntersecting, fetchNextPage, isFetchingNextPage])
+  }, [hasNextPage, entry?.isIntersecting, fetchNextPage, isFetchingNextPage, isError])
 
   return (
     <PageSection id="authorized-apps">
