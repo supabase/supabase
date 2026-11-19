@@ -1,11 +1,12 @@
-import { screen, waitFor, within } from '@testing-library/react'
+import { act, screen, waitFor, within } from '@testing-library/react'
 import userEvent from '@testing-library/user-event'
 import { mockAnimationsApi } from 'jsdom-testing-mocks'
 import { HttpResponse } from 'msw'
+import { useState, type PropsWithChildren } from 'react'
 import { Button } from 'ui'
 import { describe, expect, it, vi } from 'vitest'
 
-import DeleteConfirmationDialogs from './DeleteConfirmationDialogs'
+import { DeleteConfirmationDialogs } from './DeleteConfirmationDialogs'
 import { ENTITY_TYPE } from '@/data/entity-types/entity-type-constants'
 import type { Entity } from '@/data/table-editor/table-editor-types'
 import { TableEditorStateContextProvider, useTableEditorStateSnapshot } from '@/state/table-editor'
@@ -35,8 +36,21 @@ const OpenDialogButton = ({ action }: { action: DeleteAction }) => {
   return <Button onClick={() => snap[action](TARGET.id)}>Open dialog</Button>
 }
 
-const mockApi = (entityType: ENTITY_TYPE) => {
+// Lets a test unmount the dialogs while a delete is still in flight, as happens when the deleted
+// table is the one open in the grid and the page swaps to "table not found"
+let unmountDialogs: () => void = () => {}
+const UnmountableHost = ({ children }: PropsWithChildren) => {
+  const [isMounted, setIsMounted] = useState(true)
+  unmountDialogs = () => setIsMounted(false)
+  return isMounted ? <>{children}</> : null
+}
+
+const mockApi = (
+  entityType: ENTITY_TYPE,
+  { onDeleteRequest }: { onDeleteRequest?: () => void } = {}
+) => {
   const statements: string[] = []
+  let isDeleted = false
 
   // useSelectedProjectQuery
   addAPIMock({
@@ -61,9 +75,13 @@ const mockApi = (entityType: ENTITY_TYPE) => {
     response: async ({ request }) => {
       const queryName = new URL(request.url).searchParams.get('key') ?? ''
       if (queryName.startsWith('table-editor')) {
-        return HttpResponse.json([{ entity: { ...TARGET, entity_type: entityType, columns: [] } }])
+        return HttpResponse.json(
+          isDeleted ? [] : [{ entity: { ...TARGET, entity_type: entityType, columns: [] } }]
+        )
       }
       statements.push(((await request.json()) as { query: string }).query)
+      isDeleted = true
+      onDeleteRequest?.()
       return HttpResponse.json([])
     },
   })
@@ -126,6 +144,36 @@ describe('DeleteConfirmationDialogs', () => {
       await waitFor(() => expect(screen.queryByRole('dialog')).not.toBeInTheDocument())
     }
   )
+
+  it('still reports the deletion when the dialogs unmount while the delete is in flight', async () => {
+    const user = userEvent.setup()
+    const onTableDeleted = vi.fn()
+    mockApi(ENTITY_TYPE.TABLE, {
+      onDeleteRequest: () => act(() => unmountDialogs()),
+    })
+
+    customRender(
+      <TableEditorStateContextProvider>
+        <OpenDialogButton action="onDeleteTable" />
+        <UnmountableHost>
+          <DeleteConfirmationDialogs selectedTable={OPEN_TABLE} onTableDeleted={onTableDeleted} />
+        </UnmountableHost>
+      </TableEditorStateContextProvider>
+    )
+
+    await user.click(screen.getByRole('button', { name: 'Open dialog' }))
+    const dialog = await screen.findByRole('dialog', {
+      name: `Confirm deletion of table "${TARGET.name}"`,
+    })
+    await user.click(within(dialog).getByRole('button', { name: 'Delete' }))
+
+    await waitFor(() => expect(screen.queryByRole('dialog')).not.toBeInTheDocument())
+    await waitFor(() =>
+      expect(onTableDeleted).toHaveBeenCalledWith(
+        expect.objectContaining({ id: TARGET.id, name: TARGET.name })
+      )
+    )
+  })
 
   it('does not delete anything when the dialog is cancelled', async () => {
     const user = userEvent.setup()

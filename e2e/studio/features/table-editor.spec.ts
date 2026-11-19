@@ -249,6 +249,54 @@ testRunner('table editor', () => {
     ).toHaveURL(/\/database\/policies\?schema=public&search=\d+$/)
   })
 
+  test('deleting the open table from its context menu closes its tab', async ({ page, ref }) => {
+    const tableName = 'pw_table_ctx_delete_open'
+
+    await using _ = await withSetupCleanup(
+      async () => {
+        await createTable(tableName, 'pw_column')
+      },
+      async () => {
+        await dropTable(tableName)
+      }
+    )
+
+    const tableEditorLoadWait = createApiResponseWaiter(
+      page,
+      'pg-meta',
+      ref,
+      'query?key=entity-types-public-'
+    )
+    await page.goto(toUrl(`/project/${ref}/editor?schema=public`))
+    await tableEditorLoadWait
+
+    const tableRow = page.getByRole('button', { name: `View ${tableName}`, exact: true })
+    await tableRow.click()
+    await page.waitForURL(/\/editor\/\d+\?schema=public$/)
+    const tableUrl = page.url()
+
+    await tableRow.click({ button: 'right' })
+    await page.getByRole('menuitem', { name: 'Delete table' }).click()
+    const confirmDialog = page.getByRole('dialog', {
+      name: `Confirm deletion of table "${tableName}"`,
+    })
+    const deletePromise = waitForApiResponse(page, 'pg-meta', ref, 'query?key=table-delete-', {
+      method: 'POST',
+    })
+    await confirmDialog.getByRole('button', { name: 'Delete' }).click()
+    await deletePromise
+
+    await expect(tableRow, 'The deleted table should be gone from the sidebar').not.toBeVisible()
+    await expect(
+      page,
+      'Deleting the open table should close its tab and leave its page'
+    ).not.toHaveURL(tableUrl)
+    await expect(
+      page.getByText(/Unable to find your table/),
+      'Should not be left on the "table not found" page'
+    ).not.toBeVisible()
+  })
+
   test('switching schemas work as expected', async ({ page, ref }) => {
     const authTableSso = 'identities'
     const authTableMfa = 'mfa_factors'

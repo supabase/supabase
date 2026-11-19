@@ -5,7 +5,7 @@ import { PageSection, PageSectionContent } from 'ui-patterns/PageSection'
 import { ShimmeringLoader } from 'ui-patterns/ShimmeringLoader'
 
 import { ColumnList } from '@/components/interfaces/Database/Tables/ColumnList'
-import DeleteConfirmationDialogs from '@/components/interfaces/TableGridEditor/DeleteConfirmationDialogs'
+import { DeleteConfirmationDialogs } from '@/components/interfaces/TableGridEditor/DeleteConfirmationDialogs'
 import { SidePanelEditor } from '@/components/interfaces/TableGridEditor/SidePanelEditor/SidePanelEditor'
 import { PageLayout } from '@/components/layouts/PageLayout/PageLayout'
 import { useTableEditorQuery } from '@/data/table-editor/table-editor-query'

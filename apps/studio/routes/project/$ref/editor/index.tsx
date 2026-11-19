@@ -2,7 +2,7 @@ import { createFileRoute, useNavigate } from '@tanstack/react-router'
 import { useEffect } from 'react'
 
 import { buildTableEditorUrl } from '@/components/grid/SupabaseGrid.utils'
-import DeleteConfirmationDialogs from '@/components/interfaces/TableGridEditor/DeleteConfirmationDialogs'
+import { DeleteConfirmationDialogs } from '@/components/interfaces/TableGridEditor/DeleteConfirmationDialogs'
 import { SidePanelEditor } from '@/components/interfaces/TableGridEditor/SidePanelEditor/SidePanelEditor'
 import { useCloseDeletedTableTab } from '@/components/interfaces/TableGridEditor/useCloseDeletedTableTab'
 import { NewTab } from '@/components/layouts/Tabs/NewTab'

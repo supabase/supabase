@@ -7,7 +7,7 @@ import { Button } from 'ui'
 import { Admonition } from 'ui-patterns/Admonition'
 import { GenericSkeletonLoader } from 'ui-patterns/ShimmeringLoader'
 
-import DeleteConfirmationDialogs from './DeleteConfirmationDialogs'
+import { DeleteConfirmationDialogs } from './DeleteConfirmationDialogs'
 import { SidePanelEditor } from './SidePanelEditor/SidePanelEditor'
 import { TableDefinition } from './TableDefinition'
 import { useCloseDeletedTableTab } from './useCloseDeletedTableTab'
@@ -73,13 +73,17 @@ export const TableGridEditor = ({
   // NOTE: DO NOT PUT HOOKS AFTER THIS LINE
   if (isLoadingSelectedTable || !projectRef) {
     return (
-      <div className="flex flex-col">
-        <div className="h-10 bg-dash-sidebar dark:bg-surface-100" />
-        <div className="h-9 border-y" />
-        <div className="p-2 col-span-full">
-          <GenericSkeletonLoader />
+      <>
+        <div className="flex flex-col">
+          <div className="h-10 bg-dash-sidebar dark:bg-surface-100" />
+          <div className="h-9 border-y" />
+          <div className="p-2 col-span-full">
+            <GenericSkeletonLoader />
+          </div>
         </div>
-      </div>
+        <SidePanelEditor onTableCreated={onTableCreated} />
+        <DeleteConfirmationDialogs onTableDeleted={closeDeletedTableTab} />
+      </>
     )
   }
 
@@ -171,6 +175,8 @@ export const TableGridEditor = ({
           />
         </TableEditorTableStateContextProvider>
       )}
+
+      {!selectedTable && <DeleteConfirmationDialogs onTableDeleted={closeDeletedTableTab} />}
 
       <SidePanelEditor
         editable={editable}

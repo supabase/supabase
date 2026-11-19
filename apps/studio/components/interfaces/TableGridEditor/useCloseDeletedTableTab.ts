@@ -1,8 +1,11 @@
-import { useRouter } from 'next/router'
+import { useNavigate } from '@tanstack/react-router'
+import { useParams } from 'common'
 
 import type { Entity } from '@/data/table-editor/table-editor-types'
 import { useDashboardHistory } from '@/hooks/misc/useDashboardHistory'
-import { createTabId, useTabsStateSnapshot } from '@/state/tabs'
+import { useQuerySchemaState } from '@/hooks/misc/useSchemaQueryState'
+import { splitInternalUrl } from '@/lib/internal-url'
+import { createTabId, useTabsStateSnapshot, type TabRouter } from '@/state/tabs'
 
 /**
  * Closes the tab of a table, view or materialized view that has just been deleted. The tab store
@@ -10,10 +13,19 @@ import { createTabId, useTabsStateSnapshot } from '@/state/tabs'
  * leaves the current page alone.
  */
 export const useCloseDeletedTableTab = () => {
-  // `tabs.handleTabClose` still takes a Next-shaped router
-  const router = useRouter()
+  const navigate = useNavigate()
+  const { ref } = useParams()
+  const { selectedSchema } = useQuerySchemaState()
   const tabs = useTabsStateSnapshot()
   const { setLastVisitedTable } = useDashboardHistory()
+
+  const router: TabRouter = {
+    push: (url) => {
+      const { to, search } = splitInternalUrl(url)
+      return navigate({ to, search })
+    },
+    query: { ref, schema: selectedSchema },
+  }
 
   const closeDeletedTableTab = (table: Entity) => {
     tabs.handleTabClose({

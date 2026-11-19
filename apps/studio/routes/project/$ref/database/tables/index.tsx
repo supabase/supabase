@@ -4,7 +4,7 @@ import { PageContainer } from 'ui-patterns/PageContainer'
 import { PageSection, PageSectionContent } from 'ui-patterns/PageSection'
 
 import { TableList } from '@/components/interfaces/Database/Tables/TableList'
-import DeleteConfirmationDialogs from '@/components/interfaces/TableGridEditor/DeleteConfirmationDialogs'
+import { DeleteConfirmationDialogs } from '@/components/interfaces/TableGridEditor/DeleteConfirmationDialogs'
 import { SidePanelEditor } from '@/components/interfaces/TableGridEditor/SidePanelEditor/SidePanelEditor'
 import { useTableActions } from '@/components/interfaces/TableGridEditor/useTableActions'
 import { PageLayout } from '@/components/layouts/PageLayout/PageLayout'
