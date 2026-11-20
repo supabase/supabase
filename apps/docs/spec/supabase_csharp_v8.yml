@@ -34,7 +34,7 @@ functions:
       - ASP.NET Core and Blazor: `AddSupabase()` does not call `InitializeAsync()` on the client it creates. `AutoConnectRealtime` and restoring a persisted session only happen in `InitializeAsync()`, so call it yourself if you rely on either. `Subscribe()` on a Realtime channel connects the socket on its own.
       - ASP.NET Core and Blazor: if an `ILoggerFactory` is registered in the service provider and you did not set `SupabaseOptions.LoggerFactory`, the client uses it.
       - Keep the key out of source control and read it from configuration, such as user secrets or an environment variable. Use a publishable or anon key unless the code runs on the server and needs to bypass Row Level Security.
-      - See [Client-side tracing](/docs/guides/observability/client-side-tracing?language=csharp) for traces and metrics.
+      - OpenTelemetry: the SDK emits traces and metrics through `System.Diagnostics` and propagates trace context. See [client-side tracing](/docs/guides/observability/client-side-tracing?language=csharp).
       - `SupabaseOptions.ThirdPartyAccessToken` authenticates the client through a third-party auth provider instead of Supabase Auth.
     examples:
       - id: csharp-init-standard
