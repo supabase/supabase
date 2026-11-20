@@ -895,7 +895,7 @@ With self-send enabled, each message delivered back to the sender is billed as a
   <$Show if="sdk:kotlin">
   <TabPanel id="kotlin" label="Kotlin">
 
-    By default, broadcast messages are only sent to other clients. You can broadcast messages back to the sender by setting Broadcast's `acknowledgeBroadcasts` parameter to `true`.
+    To have the Realtime servers acknowledge each message you send, set Broadcast's `acknowledgeBroadcasts` parameter to `true`.
 
     ```kotlin
     val myChannel = supabase.channel("room-2") {
