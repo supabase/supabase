@@ -176,8 +176,24 @@ export const REFERENCES = {
     type: 'cli',
     name: 'CLI',
     libPath: 'cli',
-    versions: [],
+    // versions[0] is the latest stable release and is served at the unversioned URL.
+    versions: ['v3', 'v2'],
     icon: 'reference-cli',
+    meta: {
+      v3: {
+        libId: 'reference_cli',
+        specFile: 'cli_v3_commands',
+        sectionsFile: 'common-cli-v3-sections',
+        // docs/ref/ folder holding the version's MDX pages (global flags, migration guide)
+        mdxDir: 'cli/v3',
+      },
+      v2: {
+        libId: 'reference_cli',
+        specFile: 'cli_v2_commands',
+        sectionsFile: 'common-cli-sections',
+        mdxDir: 'cli',
+      },
+    },
   },
   api: {
     type: 'api',

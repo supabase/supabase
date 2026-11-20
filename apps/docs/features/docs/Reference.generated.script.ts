@@ -2,13 +2,13 @@ import { mkdir, readFile, writeFile } from 'node:fs/promises'
 import { dirname, join } from 'node:path'
 import { fileURLToPath } from 'node:url'
 import { clientSdkIds, REFERENCES } from '~/content/navigation.references'
+import { loadCliSpecFile } from '~/features/docs/Reference.cliSpec'
 import { SUPPORTS_NEW_REFERENCE_PROCESS } from '~/features/docs/Reference.constants'
 import type { AbbrevApiReferenceSection } from '~/features/docs/Reference.utils'
 import { deepFilterRec } from '~/features/helpers.fn'
 import type { Json } from '~/features/helpers.types'
 import authSpec from '~/spec/auth_v1_openapi.json' with { type: 'json' }
 import apiCommonSections from '~/spec/common-api-sections.json' with { type: 'json' }
-import cliCommonSections from '~/spec/common-cli-sections.json' with { type: 'json' }
 import commonClientLibSections from '~/spec/common-client-libs-sections.json' with { type: 'json' }
 import selfHostingAnalyticsCommonSections from '~/spec/common-self-hosting-analytics-sections.json' with { type: 'json' }
 import selfHostingAuthCommonSections from '~/spec/common-self-hosting-auth-sections.json'
@@ -110,16 +110,43 @@ function genClientSdkSectionTree(
   return validSections
 }
 
-async function genCliSectionTree(): Promise<AbbrevApiReferenceSection[]> {
-  const cliSpec = await getSpec('cli_v1_commands', { ext: 'yaml' })
+async function genCliSectionTree(
+  version: keyof typeof REFERENCES.cli.meta
+): Promise<AbbrevApiReferenceSection[]> {
+  const { specFile, sectionsFile } = REFERENCES.cli.meta[version]
+  const cliSpec = await loadCliSpecFile(SPEC_DIRECTORY, specFile)
+  const commonSections = JSON.parse(
+    await readFile(join(SPEC_DIRECTORY, `${sectionsFile}.json`), 'utf-8')
+  ) as AbbrevApiReferenceSection[]
 
-  const validSections = deepFilterRec(
-    cliCommonSections as AbbrevApiReferenceSection[],
-    'items',
-    (section) =>
-      section.type === 'cli-command' ? cliSpec.commands.some(({ id }) => id === section.id) : true
+  // Fail instead of silently dropping or hiding commands, so the sidebar and
+  // the spec cannot drift apart.
+  const commandIds = new Set(cliSpec.commands.map(({ id }) => id))
+  const sectionIds = new Set(
+    flattenCommonClientLibSections(commonSections)
+      .filter((section) => section.type === 'cli-command')
+      .map(({ id }) => id)
   )
-  return validSections
+  const sectionsWithoutCommand = [...sectionIds].filter((id) => !commandIds.has(id))
+  const commandsWithoutSection = [...commandIds].filter((id) => !sectionIds.has(id))
+  if (sectionsWithoutCommand.length > 0 || commandsWithoutSection.length > 0) {
+    const list = (ids: string[]) => ids.map((id) => `    - ${id}`).join('\n')
+    throw new Error(
+      [
+        `CLI ${version} sections (${sectionsFile}.json) and spec (${specFile}.yaml) are out of sync.`,
+        sectionsWithoutCommand.length > 0
+          ? `  Sections with no matching command in the spec:\n${list(sectionsWithoutCommand)}`
+          : '',
+        commandsWithoutSection.length > 0
+          ? `  Spec commands with no section in ${sectionsFile}.json:\n${list(commandsWithoutSection)}`
+          : '',
+      ]
+        .filter(Boolean)
+        .join('\n')
+    )
+  }
+
+  return commonSections
 }
 
 function genApiSectionTree(endpointsById: Map<string, IApiEndPoint>): AbbrevApiReferenceSection[] {
@@ -211,32 +238,36 @@ async function writeSdkReferenceSections() {
 }
 
 async function writeCliReferenceSections() {
-  const cliSectionTree = await genCliSectionTree()
-  const pendingCliSectionTreeWrite = writeFile(
-    join(GENERATED_DIRECTORY, 'cli.latest.sections.json'),
-    JSON.stringify(cliSectionTree)
-  )
+  return Promise.all(
+    REFERENCES.cli.versions.map(async (version) => {
+      const cliSectionTree = await genCliSectionTree(version)
+      const pendingCliSectionTreeWrite = writeFile(
+        join(GENERATED_DIRECTORY, `cli.${version}.sections.json`),
+        JSON.stringify(cliSectionTree)
+      )
 
-  const flattenedCliSections = flattenCommonClientLibSections(cliSectionTree)
-  const pendingFlattenedCliSectionsWrite = writeFile(
-    join(GENERATED_DIRECTORY, 'cli.latest.flat.json'),
-    JSON.stringify(flattenedCliSections)
-  )
+      const flattenedCliSections = flattenCommonClientLibSections(cliSectionTree)
+      const pendingFlattenedCliSectionsWrite = writeFile(
+        join(GENERATED_DIRECTORY, `cli.${version}.flat.json`),
+        JSON.stringify(flattenedCliSections)
+      )
 
-  const cliSectionsBySlug = keyBy(
-    flattenedCliSections.filter(({ slug }) => !!slug),
-    (section) => section.slug
-  )
-  const pendingCliSlugDictionaryWrite = writeFile(
-    join(GENERATED_DIRECTORY, 'cli.latest.bySlug.json'),
-    JSON.stringify(cliSectionsBySlug)
-  )
+      const cliSectionsBySlug = keyBy(
+        flattenedCliSections.filter(({ slug }) => !!slug),
+        (section) => section.slug
+      )
+      const pendingCliSlugDictionaryWrite = writeFile(
+        join(GENERATED_DIRECTORY, `cli.${version}.bySlug.json`),
+        JSON.stringify(cliSectionsBySlug)
+      )
 
-  return Promise.all([
-    pendingCliSectionTreeWrite,
-    pendingFlattenedCliSectionsWrite,
-    pendingCliSlugDictionaryWrite,
-  ])
+      return Promise.all([
+        pendingCliSectionTreeWrite,
+        pendingFlattenedCliSectionsWrite,
+        pendingCliSlugDictionaryWrite,
+      ])
+    })
+  )
 }
 
 async function writeApiReferenceSections() {
@@ -416,6 +447,7 @@ async function run() {
     ])
   } catch (err) {
     console.error(err)
+    process.exitCode = 1
   }
 }
 

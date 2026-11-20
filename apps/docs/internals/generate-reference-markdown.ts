@@ -2,12 +2,12 @@ import fs from 'node:fs/promises'
 import path from 'node:path'
 import { isFeatureEnabled, type Feature } from 'common/enabled-features'
 import matter from 'gray-matter'
-import yaml from 'js-yaml'
 import { fromMarkdown } from 'mdast-util-from-markdown'
 import { gfmFromMarkdown, gfmToMarkdown } from 'mdast-util-gfm'
 import { toMarkdown } from 'mdast-util-to-markdown'
 import { gfm } from 'micromark-extension-gfm'
 
+import { cliLlmsTxt } from '../features/docs/Reference.cli'
 import { addBaseUrlPrefix } from './internal-links'
 
 const GENERATED = path.join(process.cwd(), 'features/docs/generated')
@@ -71,8 +71,6 @@ type ApiRef = RefBase & {
 
 type CliRef = RefBase & {
   kind: 'cli'
-  sectionsPath: string
-  cliSpecPath: string
 }
 
 type Ref = SdkLegacyRef | SdkNewRef | ApiRef | CliRef
@@ -91,8 +89,6 @@ const REFERENCES: Ref[] = [
     title: 'Supabase CLI Reference',
     outFile: 'cli.md',
     mdxDir: path.join(MDX_ROOT, 'cli'),
-    sectionsPath: path.join(GENERATED, 'cli.latest.sections.json'),
-    cliSpecPath: path.join(process.cwd(), 'spec/cli_v1_commands.yaml'),
   },
   {
     kind: 'sdk-new',
@@ -401,42 +397,6 @@ async function renderApi(ref: ApiRef): Promise<string> {
   return parts.join('\n\n') + '\n'
 }
 
-async function renderCli(ref: CliRef): Promise<string> {
-  type Command = {
-    id: string
-    title?: string
-    summary?: string
-    description?: string
-    usage?: string
-  }
-  const [sections, spec] = await Promise.all([
-    readJson<Section[]>(ref.sectionsPath),
-    fs.readFile(ref.cliSpecPath, 'utf8').then((raw) => yaml.load(raw) as { commands: Command[] }),
-  ])
-  const cmdsById = new Map((spec.commands ?? []).map((c) => [c.id, c]))
-
-  const parts: string[] = [`# ${ref.title}`]
-  for (const section of flatten(sections)) {
-    if (section.type === 'category' && section.title) {
-      parts.push(`## ${section.title}`)
-      continue
-    }
-    if (section.type === 'markdown') {
-      const md = await renderMarkdownSection(ref.mdxDir, section)
-      if (md) parts.push(md)
-      continue
-    }
-    if (section.type !== 'cli-command' || !section.id) continue
-    const cmd = cmdsById.get(section.id)
-    if (!cmd) continue
-    const block = [`## ${cmd.summary || cmd.title || section.title || section.id}`]
-    if (cmd.description?.trim()) block.push(cmd.description.trim())
-    if (cmd.usage?.trim()) block.push('```sh\n' + cmd.usage.trim() + '\n```')
-    parts.push(block.join('\n\n'))
-  }
-  return parts.join('\n\n') + '\n'
-}
-
 async function generate() {
   await fs.mkdir(OUT_DIR, { recursive: true })
   const sharedTypeSpec = await readJson<TypeSpec>(
@@ -459,7 +419,8 @@ async function generate() {
           output = await renderApi(ref)
           break
         case 'cli':
-          output = await renderCli(ref)
+          // Served as /llms/cli.txt: an index of the per-command Markdown pages
+          output = await cliLlmsTxt()
           break
       }
       const tree = fromMarkdown(output, {

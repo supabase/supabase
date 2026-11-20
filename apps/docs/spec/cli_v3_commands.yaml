@@ -1,7 +1,8 @@
-clispec: '001'
+clispec: '002'
+prerelease: true
 info:
   id: cli
-  version: 3.2.0
+  version: latest
   title: Supabase CLI
   language: sh
   source: https://github.com/supabase/cli
@@ -160,8 +161,20 @@ commands:
         default_value: '0'
   - id: supabase-bootstrap
     title: supabase bootstrap
-    summary: Bootstrap a Supabase project from a starter template
-    description: Bootstrap a Supabase project from a starter template.
+    summary: Create a project from a starter template
+    description: |-
+      Create a new hosted Supabase project from a starter template and link it to a local directory. Use it to go from nothing to a running project with one command.
+
+      The command prompts for a working directory, downloads the template, creates the project, links it, writes its connection settings to `.env`, and pushes the template's migrations. It logs you in first if needed.
+
+      Creating a project is a hosted change, so the command asks for confirmation before it starts.
+    examples:
+      - id: example-1
+        name: Pick a starter template interactively
+        code: supabase bootstrap
+      - id: example-2
+        name: Bootstrap from a named starter template
+        code: supabase bootstrap my-template
     tags:
       - quick-start
     links: []
@@ -170,7 +183,7 @@ commands:
     flags:
       - id: password
         name: -p, --password <string>
-        description: Password to your remote Postgres database.
+        description: Password for the new project's Postgres database.
         default_value: ''
   - id: supabase-branches
     title: supabase branches
@@ -454,10 +467,8 @@ commands:
             type: string
   - id: supabase-completion
     title: supabase completion
-    summary: Generate the autocompletion script for the specified shell
-    description: |-
-      Generate the autocompletion script for supabase for the specified shell.
-      See each sub-command's help for details on how to use the generated script.
+    summary: Generate shell completion scripts
+    description: Print a shell completion script for `supabase` to stdout. Run the subcommand for your shell and follow its help to load the script.
     tags:
       - other-commands
     links: []
@@ -469,7 +480,7 @@ commands:
     flags: []
   - id: supabase-completion-bash
     title: supabase completion bash
-    summary: Generate the autocompletion script for bash
+    summary: Generate the Bash completion script
     description: |-
       Generate the autocompletion script for the bash shell.
 
@@ -491,6 +502,10 @@ commands:
           supabase completion bash > $(brew --prefix)/etc/bash_completion.d/supabase
 
       You will need to start a new shell for this setup to take effect.
+    examples:
+      - id: example-1
+        name: Load completions in the current bash session
+        code: source <(supabase completion bash)
     tags: []
     links: []
     usage: supabase completion bash [flags]
@@ -498,11 +513,11 @@ commands:
     flags:
       - id: no-descriptions
         name: --no-descriptions
-        description: disable completion descriptions
+        description: Omit descriptions from the generated completions.
         default_value: 'false'
   - id: supabase-completion-fish
     title: supabase completion fish
-    summary: Generate the autocompletion script for fish
+    summary: Generate the fish completion script
     description: |-
       Generate the autocompletion script for the fish shell.
 
@@ -515,6 +530,10 @@ commands:
           supabase completion fish > ~/.config/fish/completions/supabase.fish
 
       You will need to start a new shell for this setup to take effect.
+    examples:
+      - id: example-1
+        name: Load completions in the current fish session
+        code: supabase completion fish | source
     tags: []
     links: []
     usage: supabase completion fish [flags]
@@ -522,11 +541,11 @@ commands:
     flags:
       - id: no-descriptions
         name: --no-descriptions
-        description: disable completion descriptions
+        description: Omit descriptions from the generated completions.
         default_value: 'false'
   - id: supabase-completion-powershell
     title: supabase completion powershell
-    summary: Generate the autocompletion script for powershell
+    summary: Generate the PowerShell completion script
     description: |-
       Generate the autocompletion script for powershell.
 
@@ -536,6 +555,10 @@ commands:
 
       To load completions for every new session, add the output of the above command
       to your powershell profile.
+    examples:
+      - id: example-1
+        name: Load completions in the current PowerShell session
+        code: supabase completion powershell | Out-String | Invoke-Expression
     tags: []
     links: []
     usage: supabase completion powershell [flags]
@@ -543,11 +566,11 @@ commands:
     flags:
       - id: no-descriptions
         name: --no-descriptions
-        description: disable completion descriptions
+        description: Omit descriptions from the generated completions.
         default_value: 'false'
   - id: supabase-completion-zsh
     title: supabase completion zsh
-    summary: Generate the autocompletion script for zsh
+    summary: Generate the Zsh completion script
     description: |-
       Generate the autocompletion script for the zsh shell.
 
@@ -571,6 +594,10 @@ commands:
           supabase completion zsh > $(brew --prefix)/share/zsh/site-functions/_supabase
 
       You will need to start a new shell for this setup to take effect.
+    examples:
+      - id: example-1
+        name: Load completions in the current zsh session
+        code: source <(supabase completion zsh)
     tags: []
     links: []
     usage: supabase completion zsh [flags]
@@ -578,7 +605,7 @@ commands:
     flags:
       - id: no-descriptions
         name: --no-descriptions
-        description: disable completion descriptions
+        description: Omit descriptions from the generated completions.
         default_value: 'false'
   - id: supabase-config
     title: supabase config
@@ -588,71 +615,10 @@ commands:
       - management-api
     links: []
     subcommands:
-      - supabase-config-convert
       - supabase-config-diff
       - supabase-config-pull
       - supabase-config-push
-      - supabase-config-validate
     flags: []
-  - id: supabase-config-convert
-    title: supabase config convert
-    summary: Convert config.toml to config.jsonc
-    description: |
-
-
-      Converts `supabase/config.toml` to `supabase/config.jsonc` and moves the TOML file to `supabase/config.toml.bak`. Comments are carried over as `//` comments and the document gets a `$schema` entry, so editors validate it against the hosted config schema.
-
-      The conversion reads the file as written: values keep their meaning, `env(NAME)` references are copied as text, and nothing is resolved from your environment. Numbers are written in JSON form, so `0x1F` becomes `31` and `1_000` becomes `1000`. The converted document is parsed again and compared with the original before anything is written; if the two differ, the file is not valid UTF-8, or it holds a value JSON cannot represent (a TOML date, `inf` or `nan`), the command refuses and leaves `config.toml` untouched.
-
-      Comments keep their place by these rules: a comment directly above a key or table leads it; a comment block directly below a key or table, followed by a blank line or another table, trails it; a comment block with blank lines on both sides leads the next entry, or the commented-out example that follows it; a comment on the same line as a key or table header stays on that line. Comments inside a multi-line array of plain values stay beside their elements. Comments inside nested arrays or inline tables cannot be placed, so this command does not keep them in place: they move to the line above their key and the command lists each one.
-
-      Commented-out TOML examples become commented-out JSONC members, so removing the `//` from one member gives valid JSONC. A commented `# key = value` stays in the object it follows as `// "key": value,`. A commented table (`# [auth.hook.custom_access_token]` and the keys under it) is written as a commented object inside the nearest enclosing table that exists, merged with other examples under the same missing parent, and moves with the comment lines directly above it; it sits before the first later-defined entry of that table, or at the end of the table when none follows. Comments that do not parse as a single TOML key or table header stay as plain `//` comments.
-
-      Two kinds of commented example are copied as plain comments or need care when uncommented. Examples inside an array of tables (`[[name]]`, commented or not) stay as plain `//` comments. When a table lists alternative values for the same key (`# key = "a"` then `# key = "b"`), both become commented members, so uncomment only one of them.
-
-      `--dry-run` prints the converted document to stdout and writes nothing. If the project has `.vscode/settings.json`, the command also adds the schema domain to `json.schemaDownload.trustedDomains` there, keeping its comments; the file is never created.
-
-      Everyone on the project needs Supabase CLI 3.1.0 or later: older CLIs ignore `config.jsonc` and run with defaults. The command ends with a summary of the files it created, moved and updated, any relocated comments, this compatibility note and the undo command; with `--dry-run` the same summary, as a preview, goes to stderr.
-
-      If only `supabase/config.json` or `supabase/config.jsonc` exists, the command reports that there is nothing to convert and exits 0. It fails when `config.toml` and a JSON config both exist, because the JSON file takes precedence; delete it first to convert `config.toml` again. The legacy global `-o`/`--output` flag is not supported; use `--output-format json|stream-json` for a machine-readable result.
-
-      ## Undo
-
-      Move the backup back and remove the JSONC file:
-
-      ```sh
-      mv -- supabase/config.toml.bak supabase/config.toml && rm -- supabase/config.jsonc
-      ```
-
-      If a backup from an earlier conversion already exists, the command uses the next free name (`config.toml.2.bak`, and so on). The printed undo command names that backup, with paths relative to the directory you ran the command from; on Windows it is the PowerShell equivalent.
-
-      ## After converting
-
-      - Delete `supabase/config.toml.bak` once you no longer need the undo, so it is not committed. It stays outside `supabase/.temp` because `supabase unlink` and `supabase projects delete` remove that directory.
-      - Commit the conversion on its own. The history of the old file stays available with `git log -- supabase/config.toml`.
-      - Search the repository, CI workflows and Dockerfiles for `config.toml` and update any references.
-      - Bump pinned Supabase CLI versions (for example `supabase/setup-cli`) to 3.1.0 or later.
-
-      ```sh
-      supabase config convert --dry-run
-      supabase config convert
-      ```
-    examples:
-      - id: example-1
-        name: Preview the converted config.jsonc without writing it
-        code: supabase config convert --dry-run
-      - id: example-2
-        name: Convert supabase/config.toml to supabase/config.jsonc
-        code: supabase config convert
-    tags: []
-    links: []
-    usage: supabase config convert [flags]
-    subcommands: []
-    flags:
-      - id: dry-run
-        name: --dry-run
-        description: Print the converted config.jsonc to stdout without writing any file.
-        default_value: 'false'
   - id: supabase-config-diff
     title: supabase config diff
     summary: Diff local config against a remote project
@@ -694,7 +660,7 @@ commands:
         default_value: 'false'
   - id: supabase-config-pull
     title: supabase config pull
-    summary: Pull remote config into the project config file
+    summary: Pull remote config into supabase/config.toml
     description: |
 
 
@@ -750,7 +716,7 @@ commands:
         name: Pull from the linked project into the config root
         code: supabase config pull
       - id: example-2
-        name: Pull from the 'staging' branch into remotes.staging
+        name: Pull from the 'staging' branch into [remotes.staging]
         code: supabase config pull --remote=staging
       - id: example-3
         name: Preview the changes without writing the config file
@@ -766,7 +732,7 @@ commands:
         default_value: 'false'
       - id: force
         name: --force
-        description: Write even when the project config file has uncommitted changes in git.
+        description: Write even when supabase/config.toml has uncommitted changes in git.
         default_value: 'false'
       - id: remote
         name: --remote[=<ref|branch>]
@@ -811,129 +777,6 @@ commands:
       - id: remote
         name: --remote[=<ref|branch>]
         description: 'Target another project: --remote=<ref|branch>. Defaults to the linked project.'
-        default_value: 'false'
-  - id: supabase-config-validate
-    title: supabase config validate
-    summary: Validate the project config file
-    description: |
-
-
-      Checks the project config file (`supabase/config.toml`, `config.json` or `config.jsonc`) and reports every problem in one pass, each with its key path and `file:line:column`. It never modifies a project file and never contacts the Supabase API.
-
-      ## What is checked
-
-      1. The file parses (TOML or JSONC).
-      2. The schema version is one this CLI reads.
-      3. Only one config file applies: `config.json` and `config.jsonc` together is an error, and `config.toml` next to a JSON file is reported as shadowed (the JSON file is the one used).
-      4. With `--resolve-env` only, the `.env*` files load.
-      5. Removed keys, unknown keys (with a `did you mean` suggestion when one is close), values of the wrong type, enum or range, and missing required keys.
-      6. The config rules `supabase start` applies before it touches Docker, such as a missing provider secret or an unreadable `content_path` file. This does not cover Docker, ports or image pulls.
-      7. Every `[remotes.<name>]` block, merged over the base config. Its problems carry the remote name, and a problem the base already has is reported once.
-
-      Stages 1 to 3 and, with `--resolve-env`, stage 4 stop the run when they fail, because later checks cannot be computed; the report says where it stopped (`complete: false`, `stopped_at` in JSON). Everything from stage 5 on is reported together. `complete` is also `false` when a whole table had to be treated as unknown.
-
-      ## Secrets
-
-      The report shows key paths and `file:line:column`, never source text or values, in text and JSON alike (see [ADR 0034](https://github.com/supabase/cli/blob/develop/docs/adr/0034-config-diagnostics-print-no-source-text.md)). Environment variables are read only with `--resolve-env`, and `SUPABASE_*` key overrides are never read: the command validates the file as committed.
-
-      ## `env()` references
-
-      By default the command never reads the shell or any `.env*` file. A value written as `env(NAME)` is unknown: it is never an error by itself, and a check that reads it is not run. The report says how many values come from `env()` and how many checks were not run, and JSON lists them in `deferred` (`check`, `remote`, `waits_on`) with the count in `unknown_values`.
-
-      With `--resolve-env` the command reads the shell and the `.env*` files (`supabase/` then the project root, selected by `SUPABASE_ENV`) and checks each value like a literal. A set value is validated and never printed. A variable that is unset (`env_unset`) or empty (`env_empty`, including a shell variable set to `""`, which hides a `.env` value) is reported with every place it is used, for example `NAME is not set. It is used at 12:3, 40:7`. It is an error when a check could not run without it or when it feeds a key that only accepts a number, boolean or one of a fixed set of values, and a warning otherwise. Warnings never change the exit code. An unreadable or unparseable `.env*` file stops the run at `env_file`.
-
-      ## Two config files
-
-      `config.json` and `config.jsonc` together is an error. `config.toml` next to a JSON file reports `shadowed_file`.
-
-      ## Example
-
-      ```text
-        ✗ db.major_version  unsupported Postgres version
-          supabase/config.toml:9:17
-          help: use one of 14, 15, 17
-
-      ✗ 1 error in supabase/config.toml
-      ```
-
-      ```json
-      {
-        "schema_version": 1,
-        "valid": false,
-        "complete": true,
-        "file": "supabase/config.toml",
-        "format": "toml",
-        "remotes": [],
-        "unknown_values": 0,
-        "deferred": [],
-        "errors": [
-          {
-            "code": "invalid_value",
-            "severity": "error",
-            "key": "db.major_version",
-            "path": "db.major_version",
-            "reason": "unsupported Postgres version",
-            "help": "use one of 14, 15, 17",
-            "line": 9,
-            "column": 17,
-            "end_line": 9,
-            "end_column": 19
-          }
-        ],
-        "warnings": [],
-        "message": "supabase/config.toml has 1 problem"
-      }
-      ```
-
-      Problem codes: `syntax`, `file_conflict`, `schema_version`, `removed_key`, `unknown_key`, `invalid_type`, `invalid_enum`, `invalid_value`, `missing_required`, `remote_project_id`, `env_file`, `env_unset`, `env_empty`, `deprecated_key`, `shadowed_file`, `unrecognized_schema`. Failures before a report exists (no config file, bad `--workdir`) use the generic `{"_tag":"Error",...}` envelope.
-
-      The exit code is `0` when valid and `1` when there are errors. `-o/--output` is not supported; use `--output-format`.
-
-      ## CI and pre-commit
-
-      ```yaml
-      - run: supabase config validate
-      ```
-
-      ```yaml
-      repos:
-        - repo: local
-          hooks:
-            - id: supabase-config-validate
-              name: supabase config validate
-              entry: supabase config validate
-              language: system
-              files: ^supabase/config\.(toml|jsonc?)$
-              pass_filenames: false
-      ```
-
-      ```sh
-      supabase config validate
-      supabase config validate --workdir path/to/project
-      supabase config validate --output-format json
-      supabase config validate --resolve-env
-      ```
-    examples:
-      - id: example-1
-        name: Validate supabase/config.toml, config.json or config.jsonc
-        code: supabase config validate
-      - id: example-2
-        name: Validate the config of another project directory
-        code: supabase config validate --workdir path/to/project
-      - id: example-3
-        name: Print the report as JSON for scripts and agents
-        code: supabase config validate --output-format json
-      - id: example-4
-        name: Also check the values that env() references take from the shell and .env files
-        code: supabase config validate --resolve-env
-    tags: []
-    links: []
-    usage: supabase config validate [flags]
-    subcommands: []
-    flags:
-      - id: resolve-env
-        name: --resolve-env
-        description: Read the shell and .env files, and check the values env() references supply. Without it, env() values are left unchecked.
         default_value: 'false'
   - id: supabase-db
     title: supabase db
@@ -1315,8 +1158,6 @@ commands:
     title: supabase db pull
     summary: Pull schema from a database
     description: |
-
-
       Pulls schema changes from a database. A new migration file will be created under `supabase/migrations` directory.
 
       Pulls from the local database by default. Pass `--remote` to pull from the linked project, which requires your local project to be linked by running `supabase link`. Pass `--remote=<ref|branch|url>` to pull from another project, a branch of the linked project, or a database URL such as a self-hosted database. In a linked checkout, a run without `--remote` prints a hint naming the linked project. The command prints a `Target:` line on stderr naming the database it resolved.
@@ -1426,12 +1267,19 @@ commands:
         name: --strict-coverage
         description: Fail when bundled pg-delta finds schema objects it cannot manage instead of leaving them unmanaged.
         default_value: 'false'
+    breaking_changes:
+      - id: target-flags-default
+        major: 3
+        summary: Bare `db push` / `db pull` now target the local database instead of the linked project; pass `--remote` to reach the linked project.
+        direction: changed
+        flags:
+          - --remote
+          - --linked
+        migration_url: /docs/reference/cli/v3/migrating-from-v2#target-flags-default
   - id: supabase-db-push
     title: supabase db push
     summary: Push new migrations to a database
     description: |
-
-
       Pushes all local migrations to a database.
 
       Pushes to the local database by default. Pass `--remote` to push to the linked project, which requires your local project to be linked by running `supabase link`. Pass `--remote=<ref|branch|url>` to push to another project, a branch of the linked project, or a database URL such as a self-hosted database. In a linked checkout, a run without `--remote` prints a hint naming the linked project. The command prints a `Target:` line on stderr naming the database it resolved.
@@ -1496,8 +1344,17 @@ commands:
         default_value: 'false'
       - id: skip-vault
         name: --skip-vault
-        description: Skip updating vault secrets from the config file.
+        description: Skip updating vault secrets from config.toml.
         default_value: 'false'
+    breaking_changes:
+      - id: target-flags-default
+        major: 3
+        summary: Bare `db push` / `db pull` now target the local database instead of the linked project; pass `--remote` to reach the linked project.
+        direction: changed
+        flags:
+          - --remote
+          - --linked
+        migration_url: /docs/reference/cli/v3/migrating-from-v2#target-flags-default
   - id: supabase-db-query
     title: supabase db query
     summary: Execute a SQL query against the database
@@ -1605,7 +1462,7 @@ commands:
         default_value: 'false'
       - id: sql-paths
         name: --sql-paths <strings>
-        description: Override db.seed.sql_paths for this reset. May be repeated; each value accepts a SQL file path or glob pattern relative to the supabase directory and force-enables seeding.
+        description: Override [db.seed].sql_paths for this reset. May be repeated; each value accepts a SQL file path or glob pattern relative to the supabase directory and force-enables seeding.
         default_value: '[]'
       - id: version
         name: --version <string>
@@ -1781,7 +1638,7 @@ commands:
   - id: supabase-domains
     title: supabase domains
     summary: Manage custom domain names for Supabase projects
-    description: Manage custom domain names for Supabase projects. Use of custom domains and vanity subdomains is mutually exclusive.
+    description: Serve your project on your own domain name instead of the Supabase-provisioned subdomain. Custom domains and vanity subdomains are mutually exclusive.
     tags:
       - management-api
     links: []
@@ -1798,13 +1655,11 @@ commands:
     description: |
 
 
-      Activates the custom hostname configuration for a project.
+      Makes your project respond to requests on its custom hostname. Use it once your hostname is set up and you are ready to switch over from the Supabase-provisioned subdomain.
 
-      This reconfigures your Supabase project to respond to requests on your custom hostname.
+      After the custom hostname is activated, your project's third-party auth providers will no longer function on the Supabase-provisioned subdomain. See [Prepare to activate your domain](/docs/guides/platform/custom-domains#prepare-to-activate-your-domain) for the steps to follow first.
 
-      After the custom hostname is activated, your project's third-party auth providers will no longer function on the Supabase-provisioned subdomain. Please refer to [Prepare to activate your domain](/docs/guides/platform/custom-domains#prepare-to-activate-your-domain) section in our documentation to learn more about the steps you need to follow.
-
-      Asks for confirmation before activating, with a default of No. Pass `--yes` (or set `SUPABASE_YES` in the shell) to run without a prompt, which JSON output and non-interactive runs require.
+      It asks for confirmation before activating, with a default of No. Pass `--yes` (or set `SUPABASE_YES` in the shell) to run without a prompt, which JSON output and non-interactive runs require.
     examples:
       - id: example-1
         name: Activate the custom hostname for a project
@@ -1821,7 +1676,7 @@ commands:
   - id: supabase-domains-create
     title: supabase domains create
     summary: Create a custom hostname
-    description: Create a custom hostname for your Supabase project. Expects your custom hostname to have a CNAME record to your Supabase project's subdomain.
+    description: Starts custom domain setup for your project. Before you run it, add a CNAME record from your hostname to your project's Supabase subdomain. Then run `supabase domains reverify` until verification completes, and `supabase domains activate` to switch over.
     examples:
       - id: example-1
         name: Create a custom hostname for a project
@@ -1833,7 +1688,7 @@ commands:
     flags:
       - id: custom-hostname
         name: --custom-hostname <string>
-        description: The custom hostname to use for your Supabase project.
+        description: The custom hostname to use for the project.
         required: true
         default_value: ''
       - id: remote
@@ -1843,7 +1698,7 @@ commands:
   - id: supabase-domains-delete
     title: supabase domains delete
     summary: Delete the custom hostname config
-    description: Deletes the custom hostname config for your project.
+    description: Removes the custom hostname configuration so the project is served only on its Supabase-provisioned domain. Use it to start over, or to move to a vanity subdomain.
     examples:
       - id: example-1
         name: Delete the custom hostname config for a project
@@ -1860,7 +1715,7 @@ commands:
   - id: supabase-domains-get
     title: supabase domains get
     summary: Get the current custom hostname config
-    description: Retrieve the custom hostname config for your project, as stored in the Supabase platform.
+    description: Checks where custom domain setup stands for your project, including any DNS records you still need to add.
     examples:
       - id: example-1
         name: Get the custom hostname config for a project
@@ -1877,7 +1732,7 @@ commands:
   - id: supabase-domains-reverify
     title: supabase domains reverify
     summary: Re-verify the custom hostname config
-    description: Re-verify the custom hostname config for your project.
+    description: Asks Supabase to check your DNS records again. Run it after you add or change the CNAME or TXT records for your hostname.
     examples:
       - id: example-1
         name: Re-verify the custom hostname for a project
@@ -1930,8 +1785,8 @@ commands:
         default_value: 'false'
   - id: supabase-feedback
     title: supabase feedback
-    summary: Send feedback to the Supabase team
-    description: Send feedback about the Supabase CLI to the Supabase team.
+    summary: Send or delete CLI feedback
+    description: Tell the Supabase team what works and what does not in the CLI, or delete feedback you sent earlier using its deletion token.
     tags:
       - other-commands
     links: []
@@ -1942,7 +1797,7 @@ commands:
   - id: supabase-feedback-add
     title: supabase feedback add
     summary: Send feedback to the Supabase team
-    description: Send quick feedback about the Supabase CLI to the Supabase team.
+    description: Send a short note about a papercut, bug, or idea. The CLI prints a deletion token you can use to remove the feedback later.
     examples:
       - id: example-1
         name: Send quick feedback about a papercut in one line
@@ -1960,12 +1815,12 @@ commands:
     flags:
       - id: project-ref
         name: --project-ref <string>
-        description: Project ref to attribute the feedback to (defaults to SUPABASE_PROJECT_ID, then the linked project).
+        description: Project ref to attribute the feedback to, instead of SUPABASE_PROJECT_ID or the linked project.
         default_value: ''
   - id: supabase-feedback-delete
     title: supabase feedback delete
-    summary: Delete previously submitted feedback
-    description: Delete previously submitted feedback using its deletion token.
+    summary: Delete submitted feedback
+    description: Remove feedback you sent earlier. Use the deletion token printed when you submitted it.
     examples:
       - id: example-1
         name: Delete feedback using the token printed when it was submitted
@@ -1977,7 +1832,7 @@ commands:
     flags:
       - id: project-ref
         name: --project-ref <string>
-        description: Project ref of the Supabase project the feedback was submitted with.
+        description: Project ref the feedback was submitted with.
         default_value: ''
   - id: supabase-functions
     title: supabase functions
@@ -2369,17 +2224,15 @@ commands:
             type: '[ internal | public ]'
   - id: supabase-init
     title: supabase init
-    summary: Initialize a local project
+    summary: Set up a project for local development
     description: |
 
 
-      Initialize configurations for Supabase local development.
+      Creates `supabase/config.toml` in the current directory, the starting point for local development with `supabase start`. Run it once in each project.
 
-      A `supabase/config.toml` file is created in your current working directory. This configuration is specific to each local project.
+      The `supabase` directory can also hold other project files, such as `migrations`, `functions`, and `tests`.
 
-      > You may override the directory path by specifying the `SUPABASE_WORKDIR` environment variable or `--workdir` flag.
-
-      In addition to `config.toml`, the `supabase` directory may also contain other Supabase objects, such as `migrations`, `functions`, `tests`, etc.
+      To use another directory, set the `SUPABASE_WORKDIR` environment variable or pass the `--workdir` flag.
 
       To use OrioleDB as the Postgres storage engine, run `supabase init --use-orioledb`. The command writes the OrioleDB version to `db.orioledb_version` in `supabase/config.toml`; `--experimental` is not required.
     examples:
@@ -2403,20 +2256,20 @@ commands:
     flags:
       - id: force
         name: --force
-        description: Write a fresh supabase/config.toml, replacing an existing config.toml and removing any config.json or config.jsonc.
+        description: Overwrite an existing supabase/config.toml.
         default_value: 'false'
       - id: interactive
         name: -i, --interactive
-        description: Enables interactive mode to configure IDE settings.
+        description: Prompt to generate IDE settings for Deno.
         default_value: 'false'
       - id: use-orioledb
         name: --use-orioledb
-        description: Use OrioleDB storage engine for Postgres.
+        description: Use the OrioleDB storage engine for Postgres.
         default_value: 'false'
   - id: supabase-inspect
     title: supabase inspect
     summary: Inspect project tools
-    description: Tools to inspect your Supabase project.
+    description: Diagnose the health and performance of a project's Postgres database, or export every inspection result as CSV.
     tags:
       - local-dev
     links: []
@@ -2427,14 +2280,13 @@ commands:
   - id: supabase-inspect-db
     title: supabase inspect db
     summary: Inspect database
-    description: Tools to inspect your Supabase database. They inspect the local database by default; pass --remote for the linked project, or --remote=<ref|branch|url> for another database.
+    description: Run diagnostics on locks, query performance, indexes, table sizes, vacuuming, and connections. Subcommands inspect the local database by default; pass --remote for the linked project, or --remote=<ref|branch|url> for another database.
     tags: []
     links: []
     subcommands:
       - supabase-inspect-db-bloat
       - supabase-inspect-db-blocking
       - supabase-inspect-db-calls
-      - supabase-inspect-db-collation-drift
       - supabase-inspect-db-db-stats
       - supabase-inspect-db-index-stats
       - supabase-inspect-db-locks
@@ -2454,9 +2306,11 @@ commands:
     description: |
 
 
-      This command displays an estimation of table "bloat" - Due to Postgres' [MVCC](https://www.postgresql.org/docs/current/mvcc.html) when data is updated or deleted new rows are created and old rows are made invisible and marked as "dead tuples". Usually the [autovaccum](https://supabase.com/docs/guides/platform/database-size#vacuum-operations) process will asynchronously clean the dead tuples. Sometimes the autovaccum is unable to work fast enough to reduce or prevent tables from becoming bloated. High bloat can slow down queries, cause excessive IOPS and waste space in your database.
+      Estimate how much space each table and index wastes on dead tuples. Use it to find relations where autovacuum is not keeping up.
 
-      Tables with a high bloat ratio should be investigated to see if there are vacuuming is not quick enough or there are other issues.
+      When data is updated or deleted, Postgres keeps the old row versions as "dead tuples" under [MVCC](https://www.postgresql.org/docs/current/mvcc.html) until [autovacuum](https://supabase.com/docs/guides/platform/database-size#vacuum-operations) cleans them. High bloat can slow queries, cause excessive IOPS, and waste space.
+
+      Investigate tables with a high bloat ratio to see whether vacuuming is too slow or something else is wrong.
 
       ```
           TYPE  │ SCHEMA NAME │        OBJECT NAME         │ BLOAT │ WASTE
@@ -2466,6 +2320,13 @@ commands:
           table │ public      │ happy_table                │   1.0 │ 1472 kB
           index │ public      │ happy_table::my_nice_index │   0.7 │ 880 kB
       ```
+    examples:
+      - id: example-1
+        name: Estimate dead-tuple bloat on the local database
+        code: supabase inspect db bloat
+      - id: example-2
+        name: Estimate bloat on the linked project
+        code: supabase inspect db bloat --remote
     tags: []
     links: []
     usage: supabase inspect db bloat [flags]
@@ -2481,13 +2342,20 @@ commands:
     description: |
 
 
-      This command shows you statements that are currently holding locks and blocking, as well as the statement that is being blocked. This can be used in conjunction with `inspect db locks` to determine which statements need to be terminated in order to resolve lock contention.
+      List statements that hold locks and the statements they block. Use it together with `inspect db locks` to decide which statements to terminate to resolve lock contention.
 
       ```
           BLOCKED PID │ BLOCKING STATEMENT           │ BLOCKING DURATION │ BLOCKING PID │ BLOCKED STATEMENT                                                                      │ BLOCKED DURATION
         ──────────────┼──────────────────────────────┼───────────────────┼──────────────┼────────────────────────────────────────────────────────────────────────────────────────┼───────────────────
           253         │ select count(*) from mytable │ 00:00:03.838314   │        13495 │ UPDATE "mytable" SET "updated_at" = '2023─08─03 14:07:04.746688' WHERE "id" = 83719341 │ 00:00:03.821826
       ```
+    examples:
+      - id: example-1
+        name: Show blocked statements on the local database
+        code: supabase inspect db blocking
+      - id: example-2
+        name: Show blocked statements on the linked project
+        code: supabase inspect db blocking --remote
     tags: []
     links: []
     usage: supabase inspect db blocking [flags]
@@ -2503,9 +2371,9 @@ commands:
     description: |
 
 
-      This command is much like the `supabase inspect db outliers` command, but ordered by the number of times a statement has been called.
+      List statements from `pg_stat_statements` ordered by how many times they were called. Use it to find the queries that run most often and are good candidates for optimization.
 
-      You can use this information to see which queries are called most often, which can potentially be good candidates for optimisation.
+      It works like `supabase inspect db outliers`, but sorts by call count instead of total execution time.
 
       ```
 
@@ -2516,6 +2384,13 @@ commands:
           INSERT INTO users (email, name) VALUES ($1, $2)│ 00:40:11.616882      │ 0.8%                          │       54,003 │ 00:00:00.000322
 
       ```
+    examples:
+      - id: example-1
+        name: List the most frequently called queries on the local database
+        code: supabase inspect db calls
+      - id: example-2
+        name: List the most frequently called queries on the linked project
+        code: supabase inspect db calls --remote
     tags: []
     links: []
     usage: supabase inspect db calls [flags]
@@ -2525,34 +2400,17 @@ commands:
         name: --remote[=<ref|branch|url>]
         description: 'Target a remote database: the linked project, or --remote=<ref|branch|url>.'
         default_value: 'false'
-  - id: supabase-inspect-db-collation-drift
-    title: supabase inspect db collation-drift
-    summary: Show indexes affected by collation version drift
-    description: |-
-      Show indexes affected by collation version drift, with the fix workflow.
-
-      Postgres stores btree indexes on text columns in sorted order, using rules from
-      the system collation library (glibc or ICU). When that library is upgraded the
-      rules can change, and indexes built under the old rules are no longer correctly
-      ordered. Postgres reports no error: queries may quietly return missing rows,
-      sort incorrectly, or let duplicates past a unique constraint.
-
-      The output lists the affected indexes and the exact statements to verify
-      (amcheck), rebuild (REINDEX CONCURRENTLY), and record the new version — in the
-      order they must be run. This command itself is read-only.
-    tags: []
-    links: []
-    usage: supabase inspect db collation-drift [flags]
-    subcommands: []
-    flags:
-      - id: remote
-        name: --remote[=<ref|branch|url>]
-        description: 'Target a remote database: the linked project, or --remote=<ref|branch|url>.'
-        default_value: 'false'
   - id: supabase-inspect-db-db-stats
     title: supabase inspect db db-stats
     summary: Show database stats
-    description: Show stats such as cache hit rates, total sizes, and WAL size.
+    description: Report cache hit rates, database, table, index and TOAST sizes, WAL size, and the time since statistics were reset. Start here for a quick health check of a database.
+    examples:
+      - id: example-1
+        name: Show database stats for the local database
+        code: supabase inspect db db-stats
+      - id: example-2
+        name: Show database stats for the linked project
+        code: supabase inspect db db-stats --remote
     tags: []
     links: []
     usage: supabase inspect db db-stats [flags]
@@ -2565,7 +2423,14 @@ commands:
   - id: supabase-inspect-db-index-stats
     title: supabase inspect db index-stats
     summary: Show index stats
-    description: Show combined index size, usage percent, scan counts, and unused status.
+    description: Report each index with its table, columns, size, the share of scans that used it, and whether it is unused. Use it to find large or unused indexes.
+    examples:
+      - id: example-1
+        name: Show index stats for the local database
+        code: supabase inspect db index-stats
+      - id: example-2
+        name: Show index stats for the linked project
+        code: supabase inspect db index-stats --remote
     tags: []
     links: []
     usage: supabase inspect db index-stats [flags]
@@ -2581,15 +2446,22 @@ commands:
     description: |
 
 
-      This command displays queries that have taken out an exclusive lock on a relation. Exclusive locks typically prevent other operations on that relation from taking place, and can be a cause of "hung" queries that are waiting for a lock to be granted.
+      List queries that hold an exclusive lock on a relation. Exclusive locks block other operations on that relation and can cause "hung" queries that wait for a lock.
 
-      If you see a query that is hanging for a very long time or causing blocking issues you may consider killing the query by connecting to the database and running `SELECT pg_cancel_backend(PID);` to cancel the query. If the query still does not stop you can force a hard stop by running `SELECT pg_terminate_backend(PID);`
+      To stop a query that hangs or blocks others, connect to the database and run `SELECT pg_cancel_backend(PID);`. If it keeps running, force it to stop with `SELECT pg_terminate_backend(PID);`.
 
       ```
            PID   │ RELNAME │ TRANSACTION ID │ GRANTED │                  QUERY                  │   AGE
         ─────────┼─────────┼────────────────┼─────────┼─────────────────────────────────────────┼───────────
           328112 │ null    │              0 │ t       │ SELECT * FROM logs;                     │ 00:04:20
       ```
+    examples:
+      - id: example-1
+        name: Show exclusive locks on the local database
+        code: supabase inspect db locks
+      - id: example-2
+        name: Show exclusive locks on the linked project
+        code: supabase inspect db locks --remote
     tags: []
     links: []
     usage: supabase inspect db locks [flags]
@@ -2605,7 +2477,7 @@ commands:
     description: |
 
 
-      This command displays currently running queries, that have been running for longer than 5 minutes, descending by duration. Very long running queries can be a source of multiple issues, such as preventing DDL statements completing or vacuum being unable to update `relfrozenxid`.
+      List queries that have been running for longer than 5 minutes, longest first. Very long-running queries can prevent DDL statements from completing or stop vacuum from updating `relfrozenxid`.
 
       ```
         PID  │     DURATION    │                                         QUERY
@@ -2614,6 +2486,13 @@ commands:
        19465 | 02:26:05.542653 | EXPLAIN SELECT  "students".* FROM "students"  WHERE "students"."id" = 1889881 LIMIT 1
        19632 | 02:24:46.962818 | EXPLAIN SELECT  "students".* FROM "students"  WHERE "students"."id" = 1581884 LIMIT 1
       ```
+    examples:
+      - id: example-1
+        name: Show long-running queries on the local database
+        code: supabase inspect db long-running-queries
+      - id: example-2
+        name: Show long-running queries on the linked project
+        code: supabase inspect db long-running-queries --remote
     tags: []
     links: []
     usage: supabase inspect db long-running-queries [flags]
@@ -2629,9 +2508,9 @@ commands:
     description: |
 
 
-      This command displays statements, obtained from `pg_stat_statements`, ordered by the amount of time to execute in aggregate. This includes the statement itself, the total execution time for that statement, the proportion of total execution time for all statements that statement has taken up, the number of times that statement has been called, and the amount of time that statement spent on synchronous I/O (reading/writing from the file system).
+      List statements from `pg_stat_statements` ordered by total execution time. For each one it shows the statement, its total execution time, its share of all execution time, how often it was called, and the time spent on synchronous I/O (reading and writing the file system).
 
-      Typically, an efficient query will have an appropriate ratio of calls to total execution time, with as little time spent on I/O as possible. Queries that have a high total execution time but low call count should be investigated to improve their performance. Queries that have a high proportion of execution time being spent on synchronous I/O should also be investigated.
+      An efficient query has a reasonable ratio of calls to total execution time and spends as little time on I/O as possible. Investigate queries with a high total execution time but a low call count, and queries that spend a large share of their time on synchronous I/O.
 
       ```
 
@@ -2643,6 +2522,13 @@ commands:
        INSERT INTO usage_events (id, retaine.. │ 01:42:59.436532  │ 0.8%                    │ 12,328,187   │ 00:00:00
        SELECT * FROM usage_events WHERE (alp.. │ 01:18:10.754354  │ 0.6%                    │ 102,114,301  │ 00:00:00
       ```
+    examples:
+      - id: example-1
+        name: List the slowest queries by total execution time on the local database
+        code: supabase inspect db outliers
+      - id: example-2
+        name: List the slowest queries by total execution time on the linked project
+        code: supabase inspect db outliers --remote
     tags: []
     links: []
     usage: supabase inspect db outliers [flags]
@@ -2658,9 +2544,9 @@ commands:
     description: |
 
 
-      This command shows information about [logical replication slots](https://www.postgresql.org/docs/current/logical-replication.html) that are setup on the database. It shows if the slot is active, the state of the WAL sender process ('startup', 'catchup', 'streaming', 'backup', 'stopping') the replication client address and the replication lag in GB.
+      Show the [logical replication slots](https://www.postgresql.org/docs/current/logical-replication.html) on the database. For each slot it shows whether it is active, the state of the WAL sender process (`startup`, `catchup`, `streaming`, `backup` or `stopping`), the client address, and the replication lag in GB.
 
-      This command is useful to check that the amount of replication lag is as low as possible, replication lag can occur due to network latency issues, slow disk I/O, long running transactions or lack of ability for the subscriber to consume WAL fast enough.
+      Use it to check that replication lag stays low. Lag can come from network latency, slow disk I/O, long-running transactions, or a subscriber that cannot consume WAL fast enough.
 
       ```
                              NAME                    │ ACTIVE │ STATE   │ REPLICATION CLIENT ADDRESS │ REPLICATION LAG GB
@@ -2668,6 +2554,13 @@ commands:
           supabase_realtime_replication_slot         │ t      │ N/A     │ N/A                        │                  0
           datastream                                 │ t      │ catchup │ 24.201.24.106              │                 45
       ```
+    examples:
+      - id: example-1
+        name: Show replication slots on the local database
+        code: supabase inspect db replication-slots
+      - id: example-2
+        name: Show replication slots on the linked project
+        code: supabase inspect db replication-slots --remote
     tags: []
     links: []
     usage: supabase inspect db replication-slots [flags]
@@ -2680,7 +2573,14 @@ commands:
   - id: supabase-inspect-db-role-stats
     title: supabase inspect db role-stats
     summary: Show role stats
-    description: Show information about roles on the database.
+    description: Report each role with its active connections, connection limit, and custom configuration. Use it to see which role uses the most connections.
+    examples:
+      - id: example-1
+        name: Show role stats for the local database
+        code: supabase inspect db role-stats
+      - id: example-2
+        name: Show role stats for the linked project
+        code: supabase inspect db role-stats --remote
     tags: []
     links: []
     usage: supabase inspect db role-stats [flags]
@@ -2693,7 +2593,14 @@ commands:
   - id: supabase-inspect-db-table-stats
     title: supabase inspect db table-stats
     summary: Show table stats
-    description: Show combined table size, index size, and estimated row count.
+    description: Report each table with its table, index and total size, estimated row count, and sequential scan count. Use it to find the largest tables and how they are scanned.
+    examples:
+      - id: example-1
+        name: Show table stats for the local database
+        code: supabase inspect db table-stats
+      - id: example-2
+        name: Show table stats for the linked project
+        code: supabase inspect db table-stats --remote
     tags: []
     links: []
     usage: supabase inspect db table-stats [flags]
@@ -2709,9 +2616,11 @@ commands:
     description: |
 
 
-      This command displays TOAST table sizes and dead chunk counts for every ordinary user table that has a TOAST relation (materialized views and partitioned parents are not listed). When a row exceeds ~2 kB, Postgres compresses and/or moves its largest variable-length values (TEXT, JSONB, bytea) out-of-line into a companion TOAST table. TOAST Size includes the TOAST index; Total Size also includes the table's own indexes. Autovacuum runs on the TOAST table independently from the main heap, so it can accumulate dead chunks even when the parent table looks healthy by its own dead-tuple count.
+      Show TOAST table sizes and dead chunk counts for each ordinary user table that has a TOAST relation. Materialized views and partitioned parents are not listed.
 
-      A table that appears fine by `vacuum-stats` or `bloat` alone can still have significant TOAST bloat that wastes disk space and slows reads. High `TOAST Dead %` values indicate that autovacuum is not keeping up with the TOAST table and a manual `VACUUM` may be needed.
+      When a row exceeds about 2 kB, Postgres compresses or moves its largest variable-length values (such as `text`, `jsonb` and `bytea`) into a companion TOAST table. TOAST Size includes the TOAST index, and Total Size also includes the table's own indexes.
+
+      Autovacuum runs on the TOAST table separately from the main heap, so a table that looks healthy in `vacuum-stats` or `bloat` can still have TOAST bloat. A high `TOAST Dead %` means autovacuum is not keeping up, and you may need to run `VACUUM` manually.
 
       ```
                TABLE          │ TOTAL SIZE │ HEAP SIZE │ TOAST SIZE │ TOAST LIVE CHUNKS │ TOAST DEAD CHUNKS │ TOAST DEAD % │  LAST AUTOVACUUM   │ LAST VACUUM
@@ -2720,6 +2629,13 @@ commands:
        public.media_assets    │ 905 MB     │ 120 MB    │ 770 MB     │             80000 │               200 │          0.2 │ 2024-03-02 01:45   │
        public.messages        │ 365 MB     │ 280 MB    │ 60 MB      │             95000 │                 0 │          0.0 │ 2024-03-02 03:10   │
       ```
+    examples:
+      - id: example-1
+        name: Show TOAST sizes on the local database
+        code: supabase inspect db toast-sizes
+      - id: example-2
+        name: Show TOAST sizes on the linked project
+        code: supabase inspect db toast-sizes --remote
     tags: []
     links: []
     usage: supabase inspect db toast-sizes [flags]
@@ -2735,15 +2651,15 @@ commands:
     description: |
 
 
-      This command analyzes table I/O patterns to show read/write activity ratios based on block-level operations. It combines data from PostgreSQL's `pg_stat_user_tables` (for tuple operations) and `pg_statio_user_tables` (for block I/O) to categorize each table's workload profile.
+      Show how read-heavy or write-heavy each table is, based on block-level I/O. It combines tuple operations from `pg_stat_user_tables` with block I/O from `pg_statio_user_tables`.
 
-      The command classifies tables into categories:
+      Each table gets one of these categories:
 
-      - **Read-Heavy** - Read operations are more than 5x write operations (e.g., 1:10, 1:50)
-      - **Write-Heavy** - Write operations are more than 20% of read operations (e.g., 1:2, 1:4, 2:1, 10:1)
-      - **Balanced** - Mixed workload where writes are between 20% and 500% of reads
-      - **Read-Only** - Only read operations detected
-      - **Write-Only** - Only write operations detected
+      - **Read-Heavy**: read operations are more than 5x write operations (for example 1:10 or 1:50).
+      - **Write-Heavy**: write operations are more than 20% of read operations (for example 1:2, 1:4, 2:1 or 10:1).
+      - **Balanced**: mixed workload where writes are between 20% and 500% of reads.
+      - **Read-Only**: only read operations detected.
+      - **Write-Only**: only write operations detected.
 
       ```
       SCHEMA │ TABLE        │ BLOCKS READ │ WRITE TUPLES │ BLOCKS WRITE │ ACTIVITY RATIO
@@ -2755,7 +2671,14 @@ commands:
       auth   │ audit_logs   │           0 │        98,234│       12,341 │ Write-Only
       ```
 
-      **Note:** This command only displays tables that have had both read and write activity. Tables with no I/O operations are not shown. The classification ratio threshold (default: 5:1) determines when a table is considered "heavy" in one direction versus balanced.
+      Only tables with both read and write activity are shown. The ratio threshold that separates "heavy" from balanced is 5:1.
+    examples:
+      - id: example-1
+        name: Show read/write ratios on the local database
+        code: supabase inspect db traffic-profile
+      - id: example-2
+        name: Show read/write ratios on the linked project
+        code: supabase inspect db traffic-profile --remote
     tags: []
     links: []
     usage: supabase inspect db traffic-profile [flags]
@@ -2771,9 +2694,9 @@ commands:
     description: |
 
 
-      This shows you stats about the vacuum activities for each table. Due to Postgres' [MVCC](https://www.postgresql.org/docs/current/mvcc.html) when data is updated or deleted new rows are created and old rows are made invisible and marked as "dead tuples". Usually the [autovaccum](https://supabase.com/docs/guides/platform/database-size#vacuum-operations) process will aysnchronously clean the dead tuples.
+      Show vacuum activity for each table: when it was last vacuumed and auto vacuumed, its row count and dead row count, and whether autovacuum is expected to run.
 
-      The command lists when the last vacuum and last auto vacuum took place, the row count on the table as well as the count of dead rows and whether autovacuum is expected to run or not. If the number of dead rows is much higher than the row count, or if an autovacuum is expected but has not been performed for some time, this can indicate that autovacuum is not able to keep up and that your vacuum settings need to be tweaked or that you require more compute or disk IOPS to allow autovaccum to complete.
+      Postgres keeps old row versions as dead tuples under [MVCC](https://www.postgresql.org/docs/current/mvcc.html) until [autovacuum](https://supabase.com/docs/guides/platform/database-size#vacuum-operations) cleans them. If the dead row count is much higher than the row count, or an expected autovacuum has not run for some time, autovacuum may not be keeping up. Tune your vacuum settings or add compute or disk IOPS.
 
       ```
               SCHEMA        │              TABLE               │ LAST VACUUM │ LAST AUTO VACUUM │      ROW COUNT       │ DEAD ROW COUNT │ EXPECT AUTOVACUUM?
@@ -2786,6 +2709,13 @@ commands:
        supabase_migrations  │ schema_migrations                │             │                  │             No stats │              0 │ no
 
       ```
+    examples:
+      - id: example-1
+        name: Show vacuum stats on the local database
+        code: supabase inspect db vacuum-stats
+      - id: example-2
+        name: Show vacuum stats on the linked project
+        code: supabase inspect db vacuum-stats --remote
     tags: []
     links: []
     usage: supabase inspect db vacuum-stats [flags]
@@ -2801,9 +2731,13 @@ commands:
     description: |
 
 
-      This command lists user tables sorted by their transaction ID (XID) age, oldest first. PostgreSQL's transaction ID space wraps around at about 2.1 billion transactions. Once a table's XID age passes `autovacuum_freeze_max_age` (200 million by default), autovacuum forces a freeze on it; if the age keeps growing toward the wraparound limit, PostgreSQL stops assigning new transaction IDs to protect the data. `transactions_remaining` is the headroom to a 2 billion threshold, kept below the real limit as a safety margin.
+      List user tables sorted by transaction ID (XID) age, oldest first. Use it to catch tables that are approaching transaction ID wraparound.
 
-      Tables with an XID age above 1.5 billion transactions (`transactions_remaining` below 500 million) should be treated as urgent: manual `VACUUM FREEZE` or a tuned autovacuum run is needed. The list covers ordinary user tables only: it leaves out materialized views, TOAST tables and Supabase-managed schemas, so it does not show the database-wide age. Check `SELECT age(datfrozenxid) FROM pg_database WHERE datname = current_database()` for that.
+      Transaction IDs wrap around at about 2.1 billion transactions. Once a table's XID age passes `autovacuum_freeze_max_age` (200 million by default), autovacuum forces a freeze. If the age keeps growing toward the limit, Postgres stops assigning new transaction IDs to protect the data.
+
+      `transactions_remaining` is the headroom to a 2 billion threshold, kept below the real limit as a safety margin. Treat tables with an XID age above 1.5 billion (`transactions_remaining` below 500 million) as urgent, and run a manual `VACUUM FREEZE` or tune autovacuum.
+
+      The list covers ordinary user tables only. It leaves out materialized views, TOAST tables, and Supabase-managed schemas, so it does not show the database-wide age. For that, run `SELECT age(datfrozenxid) FROM pg_database WHERE datname = current_database()`.
 
       ```
                 TABLE          │  XID AGE  │ TRANSACTIONS REMAINING
@@ -2812,6 +2746,13 @@ commands:
        public.users            │ 500000000 │           1500000000
        public.sessions         │ 120000000 │           1880000000
       ```
+    examples:
+      - id: example-1
+        name: Show XID age on the local database
+        code: supabase inspect db xid-age
+      - id: example-2
+        name: Show XID age on the linked project
+        code: supabase inspect db xid-age --remote
     tags: []
     links: []
     usage: supabase inspect db xid-age [flags]
@@ -2823,8 +2764,15 @@ commands:
         default_value: 'false'
   - id: supabase-inspect-report
     title: supabase inspect report
-    summary: Generate a CSV output for all inspect commands
-    description: Generate a CSV output for all inspect commands. It reports on the local database by default; pass --remote for the linked project, or --remote=<ref|branch|url> for another database.
+    summary: Export all inspect results as CSV files
+    description: Run every inspect query and write each result to its own CSV file in a dated folder, then check the results against a set of rules and print a summary. It reports on the local database by default; pass --remote for the linked project, or --remote=<ref|branch|url> for another database.
+    examples:
+      - id: example-1
+        name: Write CSV reports for the local database
+        code: supabase inspect report
+      - id: example-2
+        name: Write CSV reports for the linked project to ./reports
+        code: supabase inspect report --remote --output-dir ./reports
     tags: []
     links: []
     usage: supabase inspect report [flags]
@@ -2832,7 +2780,7 @@ commands:
     flags:
       - id: output-dir
         name: --output-dir <string>
-        description: Path to save CSV files in.
+        description: Directory to create the dated report folder in.
         default_value: '.'
       - id: remote
         name: --remote[=<ref|branch|url>]
@@ -2840,8 +2788,8 @@ commands:
         default_value: 'false'
   - id: supabase-issue
     title: supabase issue
-    summary: Open GitHub issue forms
-    description: Open Supabase CLI GitHub issue forms.
+    summary: Open a GitHub issue form
+    description: Open a prefilled Supabase CLI issue form on GitHub to report a bug, request a feature, or flag a documentation problem. Use the flags to prefill form fields, or pass --no-browser to print the URL instead.
     tags:
       - other-commands
     links: []
@@ -2853,7 +2801,7 @@ commands:
   - id: supabase-issue-bug
     title: supabase issue bug
     summary: Open a bug report
-    description: Open a GitHub bug report with local CLI details prefilled.
+    description: Report a problem with the CLI. The form opens with your local CLI details already filled in.
     examples:
       - id: example-1
         name: Open a prefilled bug report for a failing command
@@ -2872,7 +2820,7 @@ commands:
         default_value: ''
       - id: additional-context
         name: --additional-context <string>
-        description: Extra context to prefill on the issue form.
+        description: Extra context to prefill on the form.
         default_value: ''
       - id: area
         name: --area <string>
@@ -2892,20 +2840,20 @@ commands:
         default_value: ''
       - id: expected-behavior
         name: --expected-behavior <string>
-        description: Expected behavior.
+        description: What you expected to happen.
         default_value: ''
       - id: no-browser
         name: --no-browser
-        description: Print the issue form URL without opening a browser.
+        description: Print the form URL without opening a browser.
         default_value: 'false'
       - id: reproduce
         name: --reproduce <string>
-        description: Steps to reproduce.
+        description: Steps to reproduce the problem.
         default_value: ''
   - id: supabase-issue-docs
     title: supabase issue docs
     summary: Open a documentation issue
-    description: Open a GitHub documentation issue with useful context prefilled.
+    description: Report documentation that is confusing, missing, or incorrect.
     examples:
       - id: example-1
         name: Open a prefilled documentation issue
@@ -2917,11 +2865,11 @@ commands:
     flags:
       - id: additional-context
         name: --additional-context <string>
-        description: Extra context to prefill on the issue form.
+        description: Extra context to prefill on the form.
         default_value: ''
       - id: improvement
         name: --improvement <string>
-        description: Suggested documentation improvement.
+        description: Suggested improvement to the documentation.
         default_value: ''
       - id: issue-type
         name: --issue-type <string>
@@ -2933,7 +2881,7 @@ commands:
         default_value: ''
       - id: no-browser
         name: --no-browser
-        description: Print the issue form URL without opening a browser.
+        description: Print the form URL without opening a browser.
         default_value: 'false'
       - id: problem
         name: --problem <string>
@@ -2942,7 +2890,7 @@ commands:
   - id: supabase-issue-feature
     title: supabase issue feature
     summary: Open a feature request
-    description: Open a GitHub feature request with useful context prefilled.
+    description: Propose a new CLI feature or an improvement to an existing one.
     examples:
       - id: example-1
         name: Open a prefilled feature request
@@ -2954,11 +2902,11 @@ commands:
     flags:
       - id: additional-context
         name: --additional-context <string>
-        description: Extra context to prefill on the issue form.
+        description: Extra context to prefill on the form.
         default_value: ''
       - id: alternatives
         name: --alternatives <string>
-        description: Alternatives considered.
+        description: Alternatives you considered.
         default_value: ''
       - id: area
         name: --area <string>
@@ -2966,11 +2914,11 @@ commands:
         default_value: ''
       - id: existing-issues
         name: --existing-issues
-        description: Prefill the existing issues checklist.
+        description: Prefill the checklist item for having searched existing issues.
         default_value: 'false'
       - id: no-browser
         name: --no-browser
-        description: Print the issue form URL without opening a browser.
+        description: Print the form URL without opening a browser.
         default_value: 'false'
       - id: problem
         name: --problem <string>
@@ -2978,23 +2926,21 @@ commands:
         default_value: ''
       - id: proposed-solution
         name: --proposed-solution <string>
-        description: Proposed solution.
+        description: Solution you would like to see.
         default_value: ''
   - id: supabase-link
     title: supabase link
-    summary: Link to a Supabase project
+    summary: Link to a hosted Supabase project
     description: |
+      Connects the current directory to a hosted Supabase project so commands such as `db push` and `db pull` target it. Pass the project ref, or the name of one of its branches, as the argument: `supabase link <ref>`. The `--project-ref` flag still works.
 
+      The CLI fetches PostgREST configuration from the Supabase platform and validates it against your local configuration file.
 
-      Link your local development project to a hosted Supabase project. Pass the project ref, or the name of one of its branches, as the argument: `supabase link <ref>`. The `--project-ref` flag still works.
+      If you provide a database password, the CLI also validates the database settings and saves the password in native credentials storage when available.
 
-      PostgREST configurations are fetched from the Supabase platform and validated against your local configuration file.
+      > To avoid the database password prompt, such as in a CI environment, set the `SUPABASE_DB_PASSWORD` environment variable.
 
-      Optionally, database settings can be validated if you provide a password. Your database password is saved in native credentials storage if available.
-
-      > If you do not want to be prompted for the database password, such as in a CI environment, you may specify it explicitly via the `SUPABASE_DB_PASSWORD` environment variable.
-
-      Passing `--remote` to commands like `db dump`, `db push`, and `db pull` targets the linked project, so it must be linked first.
+      Commands that accept `--remote`, like `db dump`, `db push`, and `db pull`, target the linked project, so link it first.
     examples:
       - id: basic-usage
         name: Basic usage
@@ -3022,25 +2968,23 @@ commands:
     flags:
       - id: project-ref
         name: --project-ref <string>
-        description: Project ref of the Supabase project, or the name of one of its branches.
+        description: Project ref, or the name of one of its branches; deprecated in favor of the argument.
         default_value: ''
       - id: skip-pooler
         name: --skip-pooler
-        description: Use direct connection instead of pooler.
+        description: Use a direct connection instead of the connection pooler.
         default_value: 'false'
   - id: supabase-login
     title: supabase login
-    summary: Authenticate using an access token
+    summary: Log in to your Supabase account
     description: |
 
 
-      Connect the Supabase CLI to your Supabase account by logging in with your [personal access token](https://supabase.com/dashboard/account/tokens).
+      Signs the CLI in to your Supabase account, so commands that use the Management API can manage your projects, functions, secrets, and more. By default it opens the browser to complete the login; pass a [personal access token](https://supabase.com/dashboard/account/tokens) with `--token` to skip that.
 
-      Your access token is stored securely in native credentials storage (the operating system keyring). If native credentials storage is unavailable, it will be written to a plain text file at `<SUPABASE_HOME or ~/.supabase>/access-token`.
+      The token is stored in native credentials storage (the operating system keyring). If that is unavailable, it is written to a plain text file at `<SUPABASE_HOME or ~/.supabase>/access-token`.
 
-      > If this behavior is not desired, such as in a CI environment, you may skip login by specifying the `SUPABASE_ACCESS_TOKEN` environment variable in other commands.
-
-      The Supabase CLI uses the stored token to access Management APIs for projects, functions, secrets, etc.
+      > In CI or other environments where you do not want to log in, set the `SUPABASE_ACCESS_TOKEN` environment variable instead.
 
       > The Management API client retries retryable failures up to 5 times by default. Set `SUPABASE_API_MAX_RETRIES` to change that. It counts retries after the first attempt, so `0` sends each request once.
     examples:
@@ -3059,164 +3003,30 @@ commands:
     flags:
       - id: name
         name: --name <string>
-        description: Name that will be used to store token in your settings.
+        description: Name to store the token under in your settings.
         default_value: built-in token name generator
       - id: no-browser
         name: --no-browser
-        description: Do not open browser automatically.
+        description: Print the login URL without opening a browser.
         default_value: 'false'
       - id: token
         name: --token <string>
-        description: Use provided token instead of automatic login flow.
+        description: Access token to store instead of using the browser login flow.
         default_value: ''
   - id: supabase-logout
     title: supabase logout
-    summary: Log out and delete access tokens locally
-    description: Log out and delete access tokens locally.
+    summary: Log out and delete local credentials
+    description: Log out of your Supabase account by deleting the stored access token and project database passwords from this machine. The tokens are not revoked on supabase.com.
+    examples:
+      - id: example-1
+        name: Delete the stored access token
+        code: supabase logout
     tags:
       - local-dev
     links: []
     usage: supabase logout [flags]
     subcommands: []
     flags: []
-  - id: supabase-logs
-    title: supabase logs
-    summary: Browse local or hosted logs. Arrows select, Enter details, C copies, L loads more logs, and q quits. Custom SQL uses L to rerun. Pipes and machine output read once. Explicit --output-format text disables the viewer. Use --output-format json|stream-json for structured output; -o/--output is unsupported.
-    description: Browse local or hosted logs. Arrows select, Enter details, C copies, L loads more logs, and q quits. Custom SQL uses L to rerun. Pipes and machine output read once. Explicit --output-format text disables the viewer. Use --output-format json|stream-json for structured output; -o/--output is unsupported.
-    examples:
-      - id: example-1
-        name: Browse hosted Postgres errors
-        code: supabase logs --remote --service postgres --level error --since 30m
-      - id: example-2
-        name: Read plain text once
-        code: supabase logs --remote --service auth --search "invalid token" --output-format text
-      - id: example-3
-        name: Export full records as JSON
-        code: supabase logs --remote --service postgres --output-format json
-      - id: example-4
-        name: Query hosted logs with SQL from stdin
-        code: cat errors.sql | supabase logs --remote --file - --output-format json
-    tags:
-      - management-api
-      - local-dev
-    links: []
-    usage: supabase logs [subcommand] [flags]
-    subcommands:
-      - supabase-logs-sources
-    flags:
-      - id: file
-        name: --file <string>
-        description: Read custom hosted log SQL from a file; use - to read stdin.
-        default_value: ''
-      - id: from
-        name: --from <string>
-        description: Start at a UTC timestamp ending in Z.
-        default_value: ''
-      - id: kind
-        name: --kind <[ app | requests | builds ]>
-        description: Compute stream; requires --service compute.
-        default_value: ''
-        accepted_values:
-          - id: app
-            name: app
-            type: '[ app | requests | builds ]'
-          - id: requests
-            name: requests
-            type: '[ app | requests | builds ]'
-          - id: builds
-            name: builds
-            type: '[ app | requests | builds ]'
-      - id: level
-        name: --level <string>
-        description: Severity filter; repeat for several levels.
-        default_value: '[]'
-        accepted_values:
-          - id: error
-            name: error
-            type: string
-          - id: warn
-            name: warn
-            type: string
-          - id: warning
-            name: warning
-            type: string
-          - id: info
-            name: info
-            type: string
-          - id: debug
-            name: debug
-            type: string
-          - id: log
-            name: log
-            type: string
-          - id: notice
-            name: notice
-            type: string
-      - id: limit
-        name: --limit <int>
-        description: Initial filtered history count (default 100, maximum 1000). SQL controls its own LIMIT.
-        default_value: '0'
-      - id: remote
-        name: --remote[=<ref|branch>]
-        description: 'Target a remote log source: the linked project, or --remote=<ref|branch>.'
-        default_value: 'false'
-      - id: resource
-        name: --resource <string>
-        description: Compute name or function ID remotely, or a local instance ID.
-        default_value: ''
-      - id: search
-        name: --search <string>
-        description: Case-insensitive message substring (hosted only).
-        default_value: ''
-      - id: service
-        name: --service <strings>
-        description: Service selector; repeat for multiple services. See logs sources.
-        default_value: '[]'
-      - id: since
-        name: --since <string>
-        description: Duration or UTC timestamp; defaults to 1h. Local stacks also accept start.
-        default_value: ''
-      - id: sql
-        name: --sql <string>
-        description: Custom hosted log SQL; requires --remote. L reruns the query.
-        default_value: ''
-      - id: stack
-        name: --stack <string>
-        description: Select a local stack by name.
-        default_value: ''
-      - id: stack-id
-        name: --stack-id <string>
-        description: Select a local stack by ID.
-        default_value: ''
-      - id: to
-        name: --to <string>
-        description: Initial end at a UTC timestamp ending in Z. L advances to now.
-        default_value: ''
-  - id: supabase-logs-sources
-    title: supabase logs sources
-    summary: List supported sources and filters. Hosted entries describe capabilities and do not imply that rows exist. Local entries list retained stack instances. Use --output-format json|stream-json for structured output; -o/--output is unsupported.
-    description: List supported sources and filters. Hosted entries describe capabilities and do not imply that rows exist. Local entries list retained stack instances. Use --output-format json|stream-json for structured output; -o/--output is unsupported.
-    tags: []
-    links: []
-    usage: supabase logs sources [flags]
-    subcommands: []
-    flags:
-      - id: remote
-        name: --remote[=<ref|branch>]
-        description: 'Target a remote log source: the linked project, or --remote=<ref|branch>.'
-        default_value: 'false'
-      - id: service
-        name: --service <string>
-        description: Describe one service.
-        default_value: ''
-      - id: stack
-        name: --stack <string>
-        description: Select a local stack by name.
-        default_value: ''
-      - id: stack-id
-        name: --stack-id <string>
-        description: Select a local stack by ID.
-        default_value: ''
   - id: supabase-migration
     title: supabase migration
     summary: Manage database migration scripts
@@ -3509,9 +3319,7 @@ commands:
     description: |
 
 
-      Network bans are IPs that get temporarily blocked if their traffic pattern looks abusive (e.g. multiple failed auth attempts).
-
-      The subcommands help you view the current bans, and unblock IPs if desired.
+      Lists and lifts temporary bans on IP addresses. An IP is banned when its traffic looks abusive, for example after multiple failed auth attempts.
 
       `remove` asks for confirmation (default No) before unblocking. Pass `--yes` to confirm without asking; JSON, stream-json, `-o` and non-interactive runs fail without it.
     tags:
@@ -3524,7 +3332,11 @@ commands:
   - id: supabase-network-bans-get
     title: supabase network-bans get
     summary: Get the current network bans
-    description: Get the current network bans.
+    description: Lists the IP addresses currently banned from connecting to your project's database.
+    examples:
+      - id: example-1
+        name: List banned IPs for a project
+        code: supabase network-bans get --experimental --remote=<project-ref>
     tags: []
     links: []
     usage: supabase network-bans get [flags]
@@ -3542,7 +3354,14 @@ commands:
   - id: supabase-network-bans-remove
     title: supabase network-bans remove
     summary: Remove a network ban
-    description: Remove a network ban.
+    description: Unblocks banned IP addresses. If you pass no IP, it unblocks the IP address of the machine you run it from.
+    examples:
+      - id: example-1
+        name: Unban a single IP address
+        code: supabase network-bans remove --db-unban-ip 203.0.113.7 --experimental --remote=<project-ref>
+      - id: example-2
+        name: Unban the IP address of this machine
+        code: supabase network-bans remove --experimental --remote=<project-ref>
     tags: []
     links: []
     usage: supabase network-bans remove [flags]
@@ -3550,7 +3369,7 @@ commands:
     flags:
       - id: db-unban-ip
         name: --db-unban-ip <strings>
-        description: IP to allow DB connections from.
+        description: IP address to unblock, comma-separated or repeated.
         default_value: '[]'
       - id: remote
         name: --remote[=<ref|branch>]
@@ -3564,7 +3383,7 @@ commands:
   - id: supabase-network-restrictions
     title: supabase network-restrictions
     summary: Manage network restrictions
-    description: Manage network restrictions.
+    description: Limit which IP ranges can connect directly to your project's database.
     tags:
       - management-api
     links: []
@@ -3575,7 +3394,11 @@ commands:
   - id: supabase-network-restrictions-get
     title: supabase network-restrictions get
     summary: Get the current network restrictions
-    description: Get the current network restrictions.
+    description: Shows the CIDR ranges allowed to connect to your project's database, and whether they are applied.
+    examples:
+      - id: example-1
+        name: Show the allowed CIDR ranges for a project
+        code: supabase network-restrictions get --experimental --remote=<project-ref>
     tags: []
     links: []
     usage: supabase network-restrictions get [flags]
@@ -3593,7 +3416,14 @@ commands:
   - id: supabase-network-restrictions-update
     title: supabase network-restrictions update
     summary: Update network restrictions
-    description: Update network restrictions.
+    description: Sets the CIDR ranges allowed to connect to your project's database. By default the ranges you pass replace the existing ones; use `--append` to add to them.
+    examples:
+      - id: example-1
+        name: Replace the allowed CIDR ranges
+        code: supabase network-restrictions update --db-allow-cidr 203.0.113.0/24 --experimental --remote=<project-ref>
+      - id: example-2
+        name: Add a CIDR range to the existing ones
+        code: supabase network-restrictions update --db-allow-cidr 198.51.100.0/24 --append --experimental --remote=<project-ref>
     tags: []
     links: []
     usage: supabase network-restrictions update [flags]
@@ -3605,11 +3435,11 @@ commands:
         default_value: 'false'
       - id: bypass-cidr-checks
         name: --bypass-cidr-checks
-        description: Bypass some of the CIDR validation checks.
+        description: Allow private IP ranges that CIDR validation would otherwise reject.
         default_value: 'false'
       - id: db-allow-cidr
         name: --db-allow-cidr <strings>
-        description: CIDR to allow DB connections from.
+        description: CIDR range allowed to connect to the database, comma-separated or repeated.
         default_value: '[]'
       - id: remote
         name: --remote[=<ref|branch>]
@@ -3703,7 +3533,7 @@ commands:
   - id: supabase-postgres-config
     title: supabase postgres-config
     summary: Manage Postgres database config
-    description: Manage Postgres database config.
+    description: Inspect and override Postgres settings for your project's database.
     tags:
       - management-api
     links: []
@@ -3715,7 +3545,11 @@ commands:
   - id: supabase-postgres-config-delete
     title: supabase postgres-config delete
     summary: Delete Postgres database config overrides
-    description: Delete specific Postgres database config overrides.
+    description: Removes the named overrides so those settings return to their defaults. The database restarts afterwards unless you pass `--no-restart`.
+    examples:
+      - id: example-1
+        name: Delete a Postgres config override
+        code: supabase postgres-config delete --config work_mem --experimental --remote=<project-ref>
     tags: []
     links: []
     usage: supabase postgres-config delete [flags]
@@ -3723,7 +3557,7 @@ commands:
     flags:
       - id: config
         name: --config <strings>
-        description: Config keys to delete (comma-separated)
+        description: Config keys to delete, comma-separated or repeated.
         default_value: '[]'
       - id: no-restart
         name: --no-restart
@@ -3741,7 +3575,11 @@ commands:
   - id: supabase-postgres-config-get
     title: supabase postgres-config get
     summary: Get Postgres database config
-    description: Get the current Postgres database config overrides.
+    description: Shows the custom Postgres settings you have set for your project.
+    examples:
+      - id: example-1
+        name: Show the Postgres config overrides of a project
+        code: supabase postgres-config get --experimental --remote=<project-ref>
     tags: []
     links: []
     usage: supabase postgres-config get [flags]
@@ -3762,9 +3600,18 @@ commands:
     description: |
 
 
-      Overriding the default Postgres config could result in unstable database behavior.
+      Sets Postgres setting overrides for your project. Overriding the default Postgres config could result in unstable database behavior.
+
       Custom configuration also overrides the optimizations generated based on the compute add-ons in use.
+
       The update asks for confirmation (default No) before changing the overrides. Pass `--yes` to confirm without asking; JSON, stream-json, `-o` and non-interactive runs fail without it.
+    examples:
+      - id: example-1
+        name: Set a Postgres config override
+        code: supabase postgres-config update --config work_mem=100MB --experimental --remote=<project-ref>
+      - id: example-2
+        name: Replace all overrides without restarting
+        code: supabase postgres-config update --config work_mem=100MB --replace-existing-overrides --no-restart --experimental --remote=<project-ref>
     tags: []
     links: []
     usage: supabase postgres-config update [flags]
@@ -3772,7 +3619,7 @@ commands:
     flags:
       - id: config
         name: --config <strings>
-        description: Config overrides specified as a 'key=value' pair
+        description: Config override as a `key=value` pair, comma-separated or repeated.
         default_value: '[]'
       - id: no-restart
         name: --no-restart
@@ -3784,7 +3631,7 @@ commands:
         default_value: 'false'
       - id: replace-existing-overrides
         name: --replace-existing-overrides
-        description: If true, replaces all existing overrides with the ones provided. If false (default), merges existing overrides with the ones provided.
+        description: Replace all existing overrides with the ones provided instead of merging them.
         default_value: 'false'
       - id: experimental
         name: --experimental
@@ -4001,37 +3848,167 @@ commands:
       - id: example-1
         name: List all projects
         code: supabase projects list
+        response: |2+
+          
+
+             LINKED | ORG ID               | REFERENCE ID         | NAME       | REGION                   | CREATED AT (UTC)
+            --------|----------------------|----------------------|------------|--------------------------|---------------------
+               ●    | qzrwtxnbvclphkmdsjyg | xkvpqmdrbtwnjzhcuaoe | My Project | East US (North Virginia) | 2025-03-14 09:21:07
+                    | mhdgfkwpsyjzbtlcvqne | gyfsleibnmkwxrdqzthv | Staging    | West EU (Ireland)        | 2025-06-02 15:48:33
+
       - id: example-2
         name: Machine-readable JSON output
         code: supabase projects list --output-format json
+        response: |
+          {"projects":[{"id":"xkvpqmdrbtwnjzhcuaoe","ref":"xkvpqmdrbtwnjzhcuaoe","organization_id":"qzrwtxnbvclphkmdsjyg","organization_slug":"qzrwtxnbvclphkmdsjyg","name":"My Project","region":"us-east-1","status":"ACTIVE_HEALTHY","database":{"host":"db.xkvpqmdrbtwnjzhcuaoe.supabase.red","version":"17.6.1.084","postgres_engine":"17","release_channel":"ga"},"created_at":"2025-03-14T09:21:07Z","linked":true},{"id":"gyfsleibnmkwxrdqzthv","ref":"gyfsleibnmkwxrdqzthv","organization_id":"mhdgfkwpsyjzbtlcvqne","organization_slug":"mhdgfkwpsyjzbtlcvqne","name":"Staging","region":"eu-west-1","status":"ACTIVE_HEALTHY","database":{"host":"db.gyfsleibnmkwxrdqzthv.supabase.red","version":"17.6.1.111","postgres_engine":"17","release_channel":"ga"},"created_at":"2025-06-02T15:48:33Z","linked":false}],"message":""}
     tags: []
     links: []
     usage: supabase projects list [flags]
     subcommands: []
     flags: []
+    json_output_schema:
+      $schema: https://json-schema.org/draft/2020-12/schema
+      type: object
+      properties:
+        projects:
+          type: array
+          items:
+            type: object
+            properties:
+              id:
+                type: string
+                description: 'Deprecated: Use `ref` instead.'
+              ref:
+                type: string
+                description: Project ref
+                minLength: 20
+                maxLength: 20
+                pattern: ^[a-z]+$
+              organization_id:
+                type: string
+                description: 'Deprecated: Use `organization_slug` instead.'
+              organization_slug:
+                type: string
+                description: Organization slug
+                pattern: ^[\w-]+$
+              name:
+                type: string
+                description: Name of your project
+              region:
+                type: string
+                description: Region of your project
+              created_at:
+                type: string
+                description: Creation timestamp
+              status:
+                anyOf:
+                  - type: string
+                    enum:
+                      - INACTIVE
+                      - ACTIVE_HEALTHY
+                      - ACTIVE_UNHEALTHY
+                      - COMING_UP
+                      - UNKNOWN
+                      - GOING_DOWN
+                      - INIT_FAILED
+                      - REMOVED
+                      - RESTORING
+                      - UPGRADING
+                      - PAUSING
+                      - RESTORE_FAILED
+                      - RESTARTING
+                      - PAUSE_FAILED
+                      - RESIZING
+                  - {}
+              database:
+                type: object
+                properties:
+                  host:
+                    type: string
+                    description: Database host
+                  version:
+                    type: string
+                    description: Database version
+                  postgres_engine:
+                    type: string
+                    description: Database engine
+                  release_channel:
+                    type: string
+                    description: Release channel
+                required:
+                  - host
+                  - version
+                  - postgres_engine
+                  - release_channel
+                additionalProperties: true
+              linked:
+                type: boolean
+                description: Whether this is the project linked to the current directory
+            required:
+              - id
+              - ref
+              - organization_id
+              - organization_slug
+              - name
+              - region
+              - created_at
+              - status
+              - database
+              - linked
+            additionalProperties: true
+            description: A project the logged-in user can access
+        message:
+          type: string
+          description: Always empty for this command
+      required:
+        - projects
+        - message
+      additionalProperties: true
   - id: supabase-pull
     title: supabase pull
-    summary: Pull remote project state into the local checkout
+    summary: Pull remote project state locally
     description: |
 
 
-      Refreshes local project state from a linked Supabase project or branch in one step, instead of running `config pull`, `db pull`, `migration fetch`, and `functions download` individually. It runs four steps, always in this order: pull config into `supabase/config.toml`, optionally fetch the remote migration history table into `supabase/migrations`, pull the database schema into `supabase/migrations` (also updating that database's own migration history table), and download every Edge Function's source into `supabase/functions`. The order is fixed rather than parallel: the database step depends on `db.major_version` in the config file the first step may have just changed, and on the local migration history the second step may have just populated.
+      Refreshes your local project from a linked Supabase project or branch in one step, instead of running `config pull`, `db pull`, `migration fetch`, and `functions download` separately. Use it to sync a checkout with what is deployed.
 
-      Pass `--remote=<ref|branch>` to target a specific project, or the name (or UUID) of a branch of the currently linked project — values that are exactly 20 lowercase letters are always treated as project refs. Without it, the linked project is the target. `--project-ref` still works in v3 but is deprecated and removed in v4; use `--remote`. `--remote-label` overrides the `[remotes.*]` block the config step would otherwise reuse or create for that target, identically to `config pull`'s own flag of the same name (see `supabase config pull`'s docs for the reuse/creation rules it follows).
+      It runs four steps in a fixed order: pull the config into `supabase/config.toml`, optionally fetch the remote migration history into `supabase/migrations`, pull the database schema into `supabase/migrations`, and download every Edge Function's source into `supabase/functions`. The order matters because the database step depends on `db.major_version` in the config and on the local migration history.
 
-      On a fresh checkout, the migration history step runs automatically even without `--with-migration-history`, whenever `supabase/migrations` is missing or a raw directory listing of it turns up no entries at all — the same "existing files" check `migration fetch` itself uses, so a directory holding only a `.gitkeep`/`README.md` already counts as non-empty for this purpose (the listing is unfiltered — any entry at all disqualifies it) and the two commands never disagree about it. There's nothing local to overwrite when the directory is truly empty or missing, and it's what lets the database step run at all: without it, `db pull` would hard-fail comparing an empty local directory against a remote project that already has migration history. Pass `--with-migration-history` to force a re-fetch whenever the directory already has any files in it, including only non-migration ones — unlike the bootstrap case, this DOES overwrite: any local migration file that shares a name with a remote history entry is replaced.
+      **This command is not purely a local refresh.** Pulling the database schema also updates that database's migration history table on the **remote** project, as `db pull` does.
 
-      `supabase pull` prints the resolved target once (`Target: …` on stderr), then shows one confirmation before writing anything, covering all four steps. It opens by naming the target (`Pulling from project <ref>`, or with `(branch "<name>")` appended when the target is a branch), then lists the four steps in the order they run: the config step's part is a real diff, computed the same way `config diff`/`config pull` compute theirs (or "No config differences found." when there is nothing to change); the migration-history line only appears when that step will actually run this invocation, and calls out that it overwrites same-named local files when it's running because of `--with-migration-history` rather than the bootstrap case; the database line notes that it also updates the remote migration history table and requires Docker; the functions line describes the download. `--dry-run` prints this exact same disclosure body — not a placeholder or a status-only summary — before exiting without writing or changing anything.
+      ## Target
 
-      Because the database step records the pulled migration in the remote migration history table, the confirmation is a hosted-mutation consent that defaults to **No**: `Pull project state and update the remote migration history table on <target>?`. Declining exits non-zero with `context canceled` and nothing is written. `--yes`, or `SUPABASE_YES` set in the shell environment, confirms it; a `SUPABASE_YES` in `supabase/.env` does not. `--output-format json|stream-json` and non-interactive runs cannot prompt, so they need `--yes`; an answer piped to stdin is ignored. `--yes` also lets the database connection remove a network ban that blocks the temporary login role; without it the step fails and suggests re-running with `--yes`, or running `supabase network-bans remove --remote=<ref>` for the project whose ban blocked the connection.
+      Pass `--remote=<ref|branch>` to pull from a specific project, or from the name or UUID of a branch of the linked project. Values that are exactly 20 lowercase letters are always treated as project refs. Without it, the linked project is the target. `--project-ref` still works in v3 but is deprecated and removed in v4.
 
-      `supabase pull` checks THREE locations for uncommitted or untracked changes in git before writing: `supabase/config.toml` (or `config.json`), `supabase/migrations`, and `supabase/functions`. The config check only fires when the config step itself has work to write — a config that's already fully converged with the target never triggers it. The other two fire unconditionally: the database step always attempts to run and has no way to know in advance whether it will find schema drift and write into `supabase/migrations`, and the functions step always runs with no equivalent "nothing to do" signal available without calling the API first — so both are checked every run to avoid silently missing real uncommitted work. Each location's dirty state is tracked separately: the confirmation body and any abort message name exactly which path(s) are actually dirty, e.g. `supabase/config.toml has uncommitted or untracked changes...` for one, or `supabase/config.toml, supabase/migrations, and supabase/functions have uncommitted or untracked changes...` when all three are. `--force` writes even when any of the three is dirty — without it, an interactive run's confirmation body carries the warning, and every other case (non-interactive, machine output format, or `--yes` on any TTY) aborts outright rather than silently overwriting local edits.
+      `--remote-label` overrides the `[remotes.*]` block the config step would otherwise reuse or create for that target, as in `config pull`.
 
-      **This command is not purely a local, read-only refresh.** Pulling the database schema also updates that database's own migration history table on the **remote** project — the same behavior `db pull` has always had — not just a local file write. The database step also requires Docker (it runs a shadow Postgres container, and — on the very first pull — a `pg_dump` container) to compute the schema diff. Without Docker running, that one step fails and is reported as such, but the other three steps (config, migration history, functions) still run and complete normally; a project with nothing in its database yet can still successfully pull its config and functions without Docker installed.
+      ## Migration history
 
-      If the database is already in sync with the local migrations, that step reports `unchanged` rather than failing — this differs from running `supabase db pull` directly, which treats "nothing to pull" as an error condition.
+      On a fresh checkout, the migration history step runs automatically whenever `supabase/migrations` is missing or has no entries at all. A directory holding only a `.gitkeep` or `README.md` counts as non-empty. This is the same check `migration fetch` uses, and it lets the database step run without failing on an empty local directory.
 
-      Storage bucket definitions are not pulled by this command: the Management API doesn't currently return enough detail (file size limits, allowed MIME types, the storage backend path) to populate `storage.buckets` config faithfully.
+      Pass `--with-migration-history` to fetch again when the directory already has files. This overwrites any local migration file that shares a name with a remote history entry.
+
+      ## Confirmation
+
+      The command prints the resolved target once (`Target: ...` on stderr), then asks for one confirmation before writing anything. The prompt lists the four steps, including a real config diff (or "No config differences found.") and a note that the database step requires Docker. `--dry-run` prints this same disclosure and exits without writing or changing anything.
+
+      Because the database step records the migration in the remote history table, the prompt defaults to **No**. Declining exits non-zero with `context canceled`. `--yes`, or `SUPABASE_YES` set in the shell environment, confirms it; a `SUPABASE_YES` in `supabase/.env` does not. `--output-format json|stream-json` and non-interactive runs cannot prompt, so they need `--yes`; an answer piped to stdin is ignored.
+
+      `--yes` also lets the database connection remove a network ban that blocks the temporary login role. Without it, the step fails and suggests re-running with `--yes` or running `supabase network-bans remove --remote=<ref>`.
+
+      ## Uncommitted changes
+
+      Before writing, the command checks git for uncommitted or untracked changes in `supabase/config.toml` (or `config.json`), `supabase/migrations`, and `supabase/functions`. The config check only applies when the config step has something to write; the other two apply on every run. The confirmation and any abort message name exactly which paths are dirty.
+
+      `--force` writes even when a path is dirty. Without it, an interactive run shows a warning in the prompt, and every other run (non-interactive, machine output, or `--yes`) aborts rather than overwrite local edits.
+
+      ## Docker and limits
+
+      The database step needs Docker, because it runs a shadow Postgres container and, on the first pull, a `pg_dump` container. Without Docker that step fails and is reported, but the config, migration history, and functions steps still complete.
+
+      If the database already matches the local migrations, the step reports `unchanged`. Running `supabase db pull` directly treats that case as an error.
+
+      Storage bucket definitions are not pulled, because the Management API doesn't return enough detail to populate `storage.buckets` faithfully.
 
       ## Example
 
@@ -4082,7 +4059,7 @@ commands:
         default_value: 'false'
       - id: force
         name: --force
-        description: Write even when the project config file, supabase/migrations, or supabase/functions has uncommitted or untracked changes in git.
+        description: Write even when supabase/config.toml, supabase/migrations, or supabase/functions has uncommitted changes in git.
         default_value: 'false'
       - id: remote
         name: --remote[=<ref|branch>]
@@ -4090,11 +4067,11 @@ commands:
         default_value: 'false'
       - id: remote-label
         name: --remote-label <string>
-        description: Name of the [remotes.*] block the config step writes into, overriding the block it would otherwise reuse or create.
+        description: Name of the [remotes.*] block the config step writes into.
         default_value: ''
       - id: with-migration-history
         name: --with-migration-history
-        description: Fetch the remote migration history table into supabase/migrations, even when it already has files. Runs automatically when supabase/migrations is missing or empty.
+        description: Fetch the remote migration history into supabase/migrations even when it already has files.
         default_value: 'false'
   - id: supabase-secrets
     title: supabase secrets
@@ -4203,7 +4180,7 @@ commands:
   - id: supabase-seed
     title: supabase seed
     summary: Seed a Supabase project
-    description: Seed a Supabase project from its config file.
+    description: Seed a Supabase project from supabase/config.toml.
     tags:
       - local-dev
     links: []
@@ -4212,8 +4189,8 @@ commands:
     flags: []
   - id: supabase-seed-buckets
     title: supabase seed buckets
-    summary: Seed buckets declared in storage.buckets
-    description: Seed buckets declared in storage.buckets.
+    summary: Seed buckets declared in [storage.buckets]
+    description: Seed buckets declared in [storage.buckets].
     tags: []
     links: []
     usage: supabase seed buckets [flags]
@@ -4284,7 +4261,7 @@ commands:
   - id: supabase-ssl-enforcement
     title: supabase ssl-enforcement
     summary: Manage SSL enforcement
-    description: Manage SSL enforcement configuration.
+    description: Control whether your project's database rejects connections that do not use SSL.
     tags:
       - management-api
     links: []
@@ -4295,7 +4272,11 @@ commands:
   - id: supabase-ssl-enforcement-get
     title: supabase ssl-enforcement get
     summary: Get SSL enforcement configuration
-    description: Get the current SSL enforcement configuration.
+    description: Shows whether SSL enforcement is enabled for external database connections.
+    examples:
+      - id: example-1
+        name: Show the SSL enforcement setting of a project
+        code: supabase ssl-enforcement get --experimental --remote=<project-ref>
     tags: []
     links: []
     usage: supabase ssl-enforcement get [flags]
@@ -4313,7 +4294,14 @@ commands:
   - id: supabase-ssl-enforcement-update
     title: supabase ssl-enforcement update
     summary: Update SSL enforcement configuration
-    description: Update SSL enforcement configuration.
+    description: Turns SSL enforcement on or off for external database connections. Pass exactly one of `--enable-db-ssl-enforcement` or `--disable-db-ssl-enforcement`.
+    examples:
+      - id: example-1
+        name: Require SSL for database connections
+        code: supabase ssl-enforcement update --enable-db-ssl-enforcement --experimental --remote=<project-ref>
+      - id: example-2
+        name: Stop requiring SSL for database connections
+        code: supabase ssl-enforcement update --disable-db-ssl-enforcement --experimental --remote=<project-ref>
     tags: []
     links: []
     usage: supabase ssl-enforcement update [flags]
@@ -4321,11 +4309,11 @@ commands:
     flags:
       - id: disable-db-ssl-enforcement
         name: --disable-db-ssl-enforcement
-        description: Whether the DB should disable SSL enforcement for all external connections.
+        description: Stop requiring SSL for external database connections.
         default_value: 'false'
       - id: enable-db-ssl-enforcement
         name: --enable-db-ssl-enforcement
-        description: Whether the DB should enable SSL enforcement for all external connections.
+        description: Require SSL for all external database connections.
         default_value: 'false'
       - id: remote
         name: --remote[=<ref|branch>]
@@ -4339,7 +4327,7 @@ commands:
   - id: supabase-sso
     title: supabase sso
     summary: Manage Single Sign-On (SSO) authentication
-    description: Manage Single Sign-On (SSO) authentication for projects.
+    description: Let users sign in to your project through your organization's SAML 2.0 identity provider.
     tags:
       - management-api
     links: []
@@ -4354,7 +4342,7 @@ commands:
   - id: supabase-sso-add
     title: supabase sso add
     summary: Add a new SSO identity provider
-    description: Add and configure a new connection to a SSO identity provider to your Supabase project.
+    description: Connects a SAML 2.0 identity provider to your project. Provide its metadata with `--metadata-url` or `--metadata-file`.
     examples:
       - id: basic-usage
         name: Add with Metadata URL
@@ -4387,23 +4375,23 @@ commands:
     flags:
       - id: attribute-mapping-file
         name: --attribute-mapping-file <string>
-        description: File containing a JSON mapping between SAML attributes to custom JWT claims.
+        description: Path to a JSON file mapping SAML attributes to custom JWT claims.
         default_value: ''
       - id: domains
         name: --domains <strings>
-        description: Comma separated list of email domains to associate with the added identity provider.
+        description: Email domains to associate with the identity provider, comma-separated or repeated.
         default_value: '[]'
       - id: metadata-file
         name: --metadata-file <string>
-        description: File containing a SAML 2.0 Metadata XML document describing the identity provider.
+        description: Path to a SAML 2.0 Metadata XML file describing the identity provider.
         default_value: ''
       - id: metadata-url
         name: --metadata-url <string>
-        description: URL pointing to a SAML 2.0 Metadata XML document describing the identity provider.
+        description: URL of a SAML 2.0 Metadata XML document describing the identity provider.
         default_value: ''
       - id: name-id-format
         name: --name-id-format <string>
-        description: URI reference representing the classification of string-based identifier information.
+        description: SAML name ID format URI used to identify users.
         default_value: ''
         accepted_values:
           - id: urn:oasis:names:tc:SAML:1.1:nameid-format:emailAddress
@@ -4424,11 +4412,11 @@ commands:
         default_value: 'false'
       - id: skip-url-validation
         name: --skip-url-validation
-        description: Skip local validation of the SAML 2.0 Metadata URL (HTTPS requirement, live GET probe, and UTF-8 body decode). Use in air-gapped CI where the IDP is not reachable from the build agent.
+        description: Skip local validation of the metadata URL, such as in CI where the identity provider is unreachable.
         default_value: 'false'
       - id: type
         name: -t, --type <[ saml ]>
-        description: Type of identity provider (according to supported protocol).
+        description: Type of identity provider, based on its protocol.
         required: true
         default_value: ''
         accepted_values:
@@ -4438,7 +4426,7 @@ commands:
   - id: supabase-sso-info
     title: supabase sso info
     summary: Returns the SAML SSO settings required for the identity provider
-    description: Returns all of the important SSO information necessary for your project to be registered with a SAML 2.0 compatible identity provider.
+    description: Shows the values your identity provider needs to register your project, such as the ACS URL and the SP Entity ID.
     examples:
       - id: basic-usage
         name: Show project information
@@ -4456,7 +4444,7 @@ commands:
   - id: supabase-sso-list
     title: supabase sso list
     summary: List all SSO identity providers
-    description: List all SSO identity providers for a project.
+    description: Shows the identity providers connected to your project, with their IDs and email domains.
     examples:
       - id: example-1
         name: List all SSO providers for a project
@@ -4473,7 +4461,7 @@ commands:
   - id: supabase-sso-remove
     title: supabase sso remove
     summary: Remove an existing SSO identity provider
-    description: Remove a connection to an already added SSO identity provider. Removing the provider will prevent existing users from logging in. Please treat this command with care.
+    description: Disconnects an identity provider from your project. Existing users of that provider can no longer sign in, so use it with care.
     examples:
       - id: basic-usage
         name: Remove a provider
@@ -4495,7 +4483,7 @@ commands:
   - id: supabase-sso-show
     title: supabase sso show
     summary: Show information about an SSO identity provider
-    description: Provides the information about an established connection to an identity provider. You can use --metadata to obtain the raw SAML 2.0 Metadata XML document stored in your project's configuration.
+    description: Shows the settings of a connected identity provider. Use `--metadata` to print the raw SAML 2.0 Metadata XML stored in your project instead.
     examples:
       - id: basic-usage
         name: Show information
@@ -4521,7 +4509,7 @@ commands:
     flags:
       - id: metadata
         name: --metadata
-        description: Show SAML 2.0 XML Metadata only
+        description: Print only the SAML 2.0 Metadata XML.
         default_value: 'false'
       - id: remote
         name: --remote[=<ref|branch>]
@@ -4530,7 +4518,7 @@ commands:
   - id: supabase-sso-update
     title: supabase sso update
     summary: Update information about an SSO identity provider
-    description: Update the configuration settings of a already added SSO identity provider.
+    description: Changes the email domains, metadata, attribute mapping or name ID format of a connected identity provider.
     examples:
       - id: basic-usage
         name: Replace domains
@@ -4560,27 +4548,27 @@ commands:
     flags:
       - id: add-domains
         name: --add-domains <strings>
-        description: Add this comma separated list of email domains to the identity provider.
+        description: Email domains to add to the identity provider, comma-separated or repeated.
         default_value: '[]'
       - id: attribute-mapping-file
         name: --attribute-mapping-file <string>
-        description: File containing a JSON mapping between SAML attributes to custom JWT claims.
+        description: Path to a JSON file mapping SAML attributes to custom JWT claims.
         default_value: ''
       - id: domains
         name: --domains <strings>
-        description: Replace domains with this comma separated list of email domains.
+        description: Email domains that replace the current list, comma-separated or repeated.
         default_value: '[]'
       - id: metadata-file
         name: --metadata-file <string>
-        description: File containing a SAML 2.0 Metadata XML document describing the identity provider.
+        description: Path to a SAML 2.0 Metadata XML file describing the identity provider.
         default_value: ''
       - id: metadata-url
         name: --metadata-url <string>
-        description: URL pointing to a SAML 2.0 Metadata XML document describing the identity provider.
+        description: URL of a SAML 2.0 Metadata XML document describing the identity provider.
         default_value: ''
       - id: name-id-format
         name: --name-id-format <string>
-        description: URI reference representing the classification of string-based identifier information.
+        description: SAML name ID format URI used to identify users.
         default_value: ''
         accepted_values:
           - id: urn:oasis:names:tc:SAML:1.1:nameid-format:emailAddress
@@ -4601,29 +4589,27 @@ commands:
         default_value: 'false'
       - id: remove-domains
         name: --remove-domains <strings>
-        description: Remove this comma separated list of email domains from the identity provider.
+        description: Email domains to remove from the identity provider, comma-separated or repeated.
         default_value: '[]'
       - id: skip-url-validation
         name: --skip-url-validation
-        description: Skip local validation of the SAML 2.0 Metadata URL (HTTPS requirement, live GET probe, and UTF-8 body decode). Use in air-gapped CI where the IDP is not reachable from the build agent.
+        description: Skip local validation of the metadata URL, such as in CI where the identity provider is unreachable.
         default_value: 'false'
   - id: supabase-start
     title: supabase start
-    summary: Start local Supabase stack
+    summary: Start the local Supabase stack
     description: |
 
 
-      Starts the Supabase local development stack.
+      Runs the Supabase local development stack (Postgres, Auth, Storage, Studio, and more) in Docker. Requires a `supabase/config.toml`, which `supabase init` creates.
 
-      Requires `supabase/config.toml` to be created in your current working directory by running `supabase init`.
+      All service containers start by default. Skip the ones you don't need with `-x`, either as a comma-separated list such as `-x gotrue,imgproxy` or by repeating the flag.
 
-      All service containers are started by default. You can exclude those not needed by passing in `-x` flag. To exclude multiple containers, either pass in a comma separated string, such as `-x gotrue,imgproxy`, or specify `-x` flag multiple times.
+      > Starting all services needs at least 7GB of RAM.
 
-      > It is recommended to have at least 7GB of RAM to start all services.
+      The CLI health-checks the started containers. Pass `--ignore-health-check` to continue past unhealthy services.
 
-      Health checks are automatically added to verify the started containers. Use `--ignore-health-check` flag to ignore these errors.
-
-      > If the CLI is running inside a dev container with the Docker socket bind-mounted, set the `SUPABASE_SERVICES_HOSTNAME` environment variable to the hostname reachable from inside that container, such as `host.docker.internal`.
+      > If the CLI runs inside a dev container with the Docker socket bind-mounted, set `SUPABASE_SERVICES_HOSTNAME` to a hostname reachable from inside that container, such as `host.docker.internal`.
     examples:
       - id: basic-usage
         name: Basic usage
@@ -4654,23 +4640,21 @@ commands:
     flags:
       - id: exclude
         name: -x, --exclude <strings>
-        description: Names of containers to not start. [gotrue,realtime,storage-api,imgproxy,kong,mailpit,postgrest,postgres-meta,studio,edge-runtime,logflare,vector,supavisor]
+        description: Containers to skip, as repeated flags or a comma-separated list. [gotrue,realtime,storage-api,imgproxy,kong,mailpit,postgrest,postgres-meta,studio,edge-runtime,logflare,vector,supavisor]
         default_value: '[]'
       - id: ignore-health-check
         name: --ignore-health-check
-        description: Ignore unhealthy services and exit 0
+        description: Ignore unhealthy services and exit 0.
         default_value: 'false'
   - id: supabase-status
     title: supabase status
-    summary: Show status of local Supabase containers
+    summary: Show the local Supabase stack status
     description: |
 
 
-      Shows status of the Supabase local development stack.
+      Prints the URLs, keys, and database connection string of the running local stack. The stack must already be running, started with `supabase start` or `supabase db start`.
 
-      Requires the local development stack to be started by running `supabase start` or `supabase db start`.
-
-      You can export the connection parameters for [initializing supabase-js](https://supabase.com/docs/reference/javascript/initializing) locally by specifying the `-o env` flag. Supported parameters include `JWT_SECRET`, `ANON_KEY`, and `SERVICE_ROLE_KEY`.
+      To export the connection parameters for [initializing supabase-js](https://supabase.com/docs/reference/javascript/initializing) locally, pass `-o env`. The output includes `JWT_SECRET`, `ANON_KEY`, and `SERVICE_ROLE_KEY`.
     examples:
       - id: basic-usage
         name: Basic usage
@@ -4715,21 +4699,19 @@ commands:
     flags:
       - id: override-name
         name: --override-name <strings>
-        description: Override specific variable names.
+        description: Rename an exported variable, as key=NAME pairs or a comma-separated list.
         default_value: '[]'
   - id: supabase-stop
     title: supabase stop
-    summary: Stop all local Supabase containers
+    summary: Stop the local Supabase stack
     description: |
 
 
-      Stops the Supabase local development stack.
+      Stops the containers of the local development stack. Requires a `supabase/config.toml`, which `supabase init` creates.
 
-      Requires `supabase/config.toml` to be created in your current working directory by running `supabase init`.
+      Docker volumes are kept, so your data survives a restart. Pass `--no-backup` to delete them and reset your local data.
 
-      All Docker resources are maintained across restarts. Use `--no-backup` flag to reset your local development data between restarts.
-
-      Use the `--all` flag to stop all local Supabase projects instances on the machine. Use with caution with `--no-backup` as it will delete all supabase local projects data.
+      Pass `--all` to stop every local Supabase project on the machine. Take care combining it with `--no-backup`, which deletes the data of all of them.
     examples:
       - id: basic-usage
         name: Basic usage
@@ -4750,11 +4732,11 @@ commands:
     flags:
       - id: all
         name: --all
-        description: Stop all local Supabase instances from all projects across the machine.
+        description: Stop the local Supabase stacks of every project on this machine.
         default_value: 'false'
       - id: no-backup
         name: --no-backup
-        description: Deletes all data volumes after stopping.
+        description: Delete all data volumes after stopping.
         default_value: 'false'
       - id: project-id
         name: --project-id <string>
@@ -4900,8 +4882,8 @@ commands:
         default_value: 'false'
   - id: supabase-telemetry
     title: supabase telemetry
-    summary: Manage telemetry
-    description: Manage CLI telemetry settings.
+    summary: Manage CLI telemetry
+    description: Turn anonymous CLI usage telemetry on or off, or check whether it is on.
     tags:
       - local-dev
     links: []
@@ -4912,8 +4894,12 @@ commands:
     flags: []
   - id: supabase-telemetry-disable
     title: supabase telemetry disable
-    summary: Disable telemetry
-    description: Disable CLI telemetry.
+    summary: Disable CLI telemetry
+    description: Turn off anonymous CLI usage telemetry for this machine.
+    examples:
+      - id: example-1
+        name: Turn telemetry off
+        code: supabase telemetry disable
     tags: []
     links: []
     usage: supabase telemetry disable [flags]
@@ -4921,8 +4907,12 @@ commands:
     flags: []
   - id: supabase-telemetry-enable
     title: supabase telemetry enable
-    summary: Enable telemetry
-    description: Enable CLI telemetry.
+    summary: Enable CLI telemetry
+    description: Turn on anonymous CLI usage telemetry for this machine.
+    examples:
+      - id: example-1
+        name: Turn telemetry on
+        code: supabase telemetry enable
     tags: []
     links: []
     usage: supabase telemetry enable [flags]
@@ -4930,8 +4920,12 @@ commands:
     flags: []
   - id: supabase-telemetry-status
     title: supabase telemetry status
-    summary: Show telemetry status
-    description: Show CLI telemetry status.
+    summary: Show CLI telemetry status
+    description: Print whether CLI telemetry is currently enabled or disabled.
+    examples:
+      - id: example-1
+        name: Check whether telemetry is on
+        code: supabase telemetry status
     tags: []
     links: []
     usage: supabase telemetry status [flags]
@@ -5005,8 +4999,15 @@ commands:
             type: '[ pgtap ]'
   - id: supabase-unlink
     title: supabase unlink
-    summary: Unlink a Supabase project
-    description: Unlink a Supabase project.
+    summary: Unlink from the hosted Supabase project
+    description: |-
+      Remove the link between the local project and its hosted Supabase project. Use it before linking to a different project.
+
+      The command deletes the local `supabase/.temp` directory and the stored database password for the linked project. Your access token is left untouched.
+    examples:
+      - id: example-1
+        name: Unlink the current directory from its hosted project
+        code: supabase unlink
     tags:
       - local-dev
     links: []
@@ -5019,9 +5020,7 @@ commands:
     description: |
 
 
-      Manage vanity subdomains for Supabase projects.
-
-      Usage of vanity subdomains and custom domains is mutually exclusive.
+      Gives your project a branded hostname under the Supabase domain instead of the project ref. Vanity subdomains and custom domains are mutually exclusive.
 
       `activate` and `delete` ask for confirmation, with a default of No. Pass `--yes` (or set `SUPABASE_YES` in the shell) to run without a prompt, which JSON output and non-interactive runs require.
     tags:
@@ -5036,7 +5035,11 @@ commands:
   - id: supabase-vanity-subdomains-activate
     title: supabase vanity-subdomains activate
     summary: Activate a vanity subdomain
-    description: Activate a vanity subdomain for your Supabase project. This reconfigures your Supabase project to respond to requests on your vanity subdomain. After the vanity subdomain is activated, your project's auth services will no longer function on the {project-ref}.{supabase-domain} hostname.
+    description: Makes your project respond to requests on the vanity subdomain you choose. After activation, your project's auth services no longer work on the `{project-ref}.{supabase-domain}` hostname.
+    examples:
+      - id: example-1
+        name: Activate a vanity subdomain for a project
+        code: supabase vanity-subdomains activate --desired-subdomain my-app --experimental --remote=<project-ref>
     tags: []
     links: []
     usage: supabase vanity-subdomains activate [flags]
@@ -5044,7 +5047,7 @@ commands:
     flags:
       - id: desired-subdomain
         name: --desired-subdomain <string>
-        description: The desired vanity subdomain to use for your Supabase project.
+        description: The vanity subdomain to use for the project.
         required: true
         default_value: ''
       - id: remote
@@ -5059,7 +5062,11 @@ commands:
   - id: supabase-vanity-subdomains-check-availability
     title: supabase vanity-subdomains check-availability
     summary: Check subdomain availability
-    description: Checks if a desired subdomain is available for use.
+    description: Tells you whether a subdomain is free to use. Run it before `supabase vanity-subdomains activate`.
+    examples:
+      - id: example-1
+        name: Check whether a subdomain is available
+        code: supabase vanity-subdomains check-availability --desired-subdomain my-app --experimental --remote=<project-ref>
     tags: []
     links: []
     usage: supabase vanity-subdomains check-availability [flags]
@@ -5067,7 +5074,7 @@ commands:
     flags:
       - id: desired-subdomain
         name: --desired-subdomain <string>
-        description: The desired vanity subdomain to use for your Supabase project.
+        description: The vanity subdomain to check.
         required: true
         default_value: ''
       - id: remote
@@ -5082,7 +5089,11 @@ commands:
   - id: supabase-vanity-subdomains-delete
     title: supabase vanity-subdomains delete
     summary: Delete the vanity subdomain
-    description: Deletes the vanity subdomain for a project, and reverts to using the project ref for routing.
+    description: Removes the vanity subdomain, so requests are routed by project ref again.
+    examples:
+      - id: example-1
+        name: Delete the vanity subdomain of a project
+        code: supabase vanity-subdomains delete --experimental --remote=<project-ref>
     tags: []
     links: []
     usage: supabase vanity-subdomains delete [flags]
@@ -5100,7 +5111,11 @@ commands:
   - id: supabase-vanity-subdomains-get
     title: supabase vanity-subdomains get
     summary: Get the current vanity subdomain
-    description: Get the current vanity subdomain.
+    description: Shows the vanity subdomain configured for your project, along with its status.
+    examples:
+      - id: example-1
+        name: Show the vanity subdomain of a project
+        code: supabase vanity-subdomains get --experimental --remote=<project-ref>
     tags: []
     links: []
     usage: supabase vanity-subdomains get [flags]

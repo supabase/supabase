@@ -84,15 +84,15 @@ export const REFERENCES: Reference[] = [
   legacyLib('kotlin', 'v3', 'Kotlin Reference', 'supabase_kt_v3.yml'),
   {
     id: 'cli',
-    version: 'latest',
+    version: 'v3',
     title: 'CLI Reference',
     load: () =>
       new CliReferenceLoader(
         'cli',
         '/reference/cli',
         { title: 'CLI Reference' },
-        'spec/cli_v1_commands.yaml',
-        'spec/common-cli-sections.json'
+        'spec/cli_v3_commands.yaml',
+        'spec/common-cli-v3-sections.json'
       ).load(),
   },
   {
@@ -197,8 +197,7 @@ async function toPageRow(reference: Reference): Promise<ReferenceRow> {
       .map((line) => line.trim())
       .find((line) => line && !/^(<|#|-|\||```)/.test(line)) ?? ''
   const description = plainText(paragraph)
-  // /docs/reference/cli redirects to a page that doesn't exist
-  const slug = reference.id === 'cli' ? 'reference/cli/introduction' : `reference/${reference.id}`
+  const slug = `reference/${reference.id}`
   return {
     slug,
     file_path: slug,
@@ -224,7 +223,9 @@ export async function buildReferenceRows(reference: Reference): Promise<Referenc
   const rows = new Map<string, ReferenceRow>()
   for (const source of sources) {
     const row = toSectionRow(reference, source)
-    const sectionSlug = row.slug.split('/').pop()
+    // CLI pages nest by command (`reference/cli/db/push`), so match on the section itself
+    const sectionSlug =
+      source instanceof CliReferenceSource ? source.refSection.slug : row.slug.split('/').pop()
     if (rendered.has(sectionSlug) && !rows.has(row.slug)) rows.set(row.slug, row)
   }
   if (rows.size === 0) {

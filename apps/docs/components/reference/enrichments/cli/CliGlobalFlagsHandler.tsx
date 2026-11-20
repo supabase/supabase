@@ -1,21 +1,23 @@
 import Param from '~/components/Params'
+import { getCliSpec } from '~/features/docs/Reference.generated.singleton'
 import RefSubLayout from '~/layouts/ref/RefSubLayout'
 import { getCustomContent } from '~/lib/custom-content/getCustomContent'
-import spec from '~/spec/cli_v1_commands.yaml' with { type: 'yaml' }
 import { isFeatureEnabled } from 'common'
 
 import { CliFlagDefault } from './CliFlagDefault'
 
 const { cliDisableCustomProfiles } = isFeatureEnabled(['cli:disable_custom_profiles'])
 
-const CliGlobalFlagsHandler = () => {
+const CliGlobalFlagsHandler = async ({ version }: { version?: string }) => {
+  const spec = await getCliSpec(version)
+
   // Only fetch cliProfile when custom profiles are enabled
   const cliProfile = !cliDisableCustomProfiles
     ? getCustomContent(['cli:profile'] as any).cliProfile
     : undefined
 
   // Transform the flags based on feature flags
-  const processedFlags = spec.flags.map((flag: any) => {
+  const processedFlags = spec.flags.map((flag) => {
     if (flag.id === 'profile' && !cliDisableCustomProfiles) {
       return {
         ...flag,
@@ -36,7 +38,7 @@ const CliGlobalFlagsHandler = () => {
               <Param
                 {...flag}
                 key={flag.id}
-                id={`${spec.id}-${flag.id}`}
+                id={`${spec.info.id}-${flag.id}`}
                 isOptional={flag.required === undefined ? true : !flag.required}
               >
                 <CliFlagDefault flag={flag} />

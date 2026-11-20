@@ -50,6 +50,18 @@ export async function ClientLibIntroduction({
   )
 }
 
+export function PrereleaseAlert({ className }: { className?: string }) {
+  return (
+    <Alert variant="warning" className={cn('not-prose', className)}>
+      <AlertTriangle />
+      <AlertTitle className="font-medium">Prerelease</AlertTitle>
+      <AlertDescription>
+        You are viewing docs for an unreleased version. Details may change before release.
+      </AlertDescription>
+    </Alert>
+  )
+}
+
 export function OldVersionAlert({ libPath, className }: { libPath: string; className?: string }) {
   return (
     <Alert variant="warning" className={cn('not-prose', className)}>
