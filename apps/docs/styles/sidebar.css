@@ -5,8 +5,8 @@
 }
 
 @media (prefers-reduced-motion: no-preference) {
-  .docs-sidebar-level[data-level-enter] > a,
-  .docs-sidebar-level[data-level-enter] ul:not(ul ul) > li {
+  .docs-sidebar-level[data-level-enter]:has(> a) ul:not(ul ul) > li,
+  .docs-sidebar-level[data-level-enter] ul:not(ul ul) > li:not(:first-child) {
     animation: docs-sidebar-level-enter 400ms cubic-bezier(0.33, 1, 0.68, 1) backwards;
     animation-delay: calc(40ms * var(--docs-sidebar-index));
   }
