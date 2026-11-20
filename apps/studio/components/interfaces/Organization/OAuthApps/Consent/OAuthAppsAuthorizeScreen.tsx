@@ -39,14 +39,12 @@ export interface OAuthAppsAuthorizeScreenProps {
   authId?: string
   organizationSlug?: string
   projectRef?: string
-  navigate: (destination: string) => void
 }
 
 export const OAuthAppsAuthorizeScreen = ({
   authId,
   organizationSlug: initialOrganizationSlug,
   projectRef,
-  navigate,
 }: OAuthAppsAuthorizeScreenProps) => {
   const signOut = useSignOut()
 
@@ -388,8 +386,6 @@ export const OAuthAppsAuthorizeScreen = ({
     await signOut()
     window.location.reload()
   }
-
-  const handleSwitchOrg = () => navigate('/organizations')
 
   const handleDeselectFlagged = () =>
     setSelectedProjectRefs((refs) => refs.filter((ref) => !flaggedRefs.includes(ref)))
