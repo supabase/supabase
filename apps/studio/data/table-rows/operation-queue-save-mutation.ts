@@ -1,4 +1,5 @@
 import {
+  isPopulateRecordGap,
   joinSqlFragments,
   readColumnFormats,
   safeSql,
@@ -208,7 +209,8 @@ export async function saveOperationQueue({
       const tableIds = [...new Set(operations.map((operation) => operation.tableId))]
       const formats = await Promise.all(tableIds.map((id) => readColumnFormats(query, id)))
       return save(new Map(tableIds.map((id, index) => [id, formats[index]])))
-    }
+    },
+    isPopulateRecordGap
   )
 
   return { result }

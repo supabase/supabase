@@ -1,4 +1,9 @@
-import { readColumnFormats, withCatalogFallback, type ColumnFormat } from '@supabase/pg-meta'
+import {
+  isPopulateRecordGap,
+  readColumnFormats,
+  withCatalogFallback,
+  type ColumnFormat,
+} from '@supabase/pg-meta'
 import { Query } from '@supabase/pg-meta/src/query'
 import { useMutation, useQueryClient } from '@tanstack/react-query'
 import { toast } from 'sonner'
@@ -95,7 +100,8 @@ export async function updateTableRow({
           }),
           table.id
         )
-      )
+      ),
+    isPopulateRecordGap
   )
 }
 

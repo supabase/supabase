@@ -46,7 +46,8 @@ function truncateArray(
     maxArraySize,
   }: { isJson: boolean; maxCharacters: number; maxArraySize: number }
 ) {
-  if (!Array.isArray(value) || byteLength(arrayText(value)) <= maxCharacters) return value
+  if (!Array.isArray(value) || byteLength(arrayText(value, { isJson })) <= maxCharacters)
+    return value
   const marker = isJson ? { truncated: true } : '...'
   const head = value.slice(0, maxArraySize)
   return [...head, Array.isArray(value[0]) ? markerShaped(value[0], marker) : marker]

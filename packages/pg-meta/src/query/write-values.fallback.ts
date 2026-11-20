@@ -32,15 +32,20 @@ export async function readColumnFormats(
 
 const ARRAY_ELEMENT_NEEDS_QUOTES = /^$|^null$|[{}",\\\s]/i
 
-function arrayElement(value: unknown): string {
+const quoteArrayElement = (text: string) => `"${text.replace(/["\\]/g, '\\$&')}"`
+
+function arrayElement(value: unknown, isJson: boolean): string {
   if (value === null || value === undefined) return 'NULL'
-  if (Array.isArray(value)) return arrayText(value)
+  if (Array.isArray(value)) return arrayText(value, { isJson })
+  // A json element keeps its JSON text: the string "false" must not read as the JSON `false`.
+  if (isJson) return quoteArrayElement(JSON.stringify(value))
   const text = typeof value === 'object' ? JSON.stringify(value) : String(value)
-  return ARRAY_ELEMENT_NEEDS_QUOTES.test(text) ? `"${text.replace(/["\\]/g, '\\$&')}"` : text
+  return ARRAY_ELEMENT_NEEDS_QUOTES.test(text) ? quoteArrayElement(text) : text
 }
 
 /** Postgres's text form of an array, which is also its input form. */
-export const arrayText = (value: unknown[]): string => `{${value.map(arrayElement).join(',')}}`
+export const arrayText = (value: unknown[], { isJson = false } = {}): string =>
+  `{${value.map((element) => arrayElement(element, isJson)).join(',')}}`
 
 /**
  * A literal that reads as `value` does through `json(b)_populate_record` into a column of `format`:
@@ -49,7 +54,9 @@ export const arrayText = (value: unknown[]): string => `{${value.map(arrayElemen
 export function columnValueLiteral(value: unknown, format: string | undefined): SafeSqlFragment {
   if (value === null || value === undefined) return safeSql`null`
   if (format !== undefined && JSON_FORMATS.has(format)) return literal(JSON.stringify(value))
-  if (Array.isArray(value)) return literal(arrayText(value))
+  if (Array.isArray(value)) {
+    return literal(arrayText(value, { isJson: JSON_FORMATS.has(format?.slice(1) ?? '') }))
+  }
   if (typeof value === 'boolean') return value ? safeSql`true` : safeSql`false`
   if (typeof value === 'object') return literal(JSON.stringify(value))
   return literal(value)

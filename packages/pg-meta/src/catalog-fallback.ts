@@ -17,11 +17,18 @@ const GAP_SQLSTATES = new Set(['0A000', '42P01', '42883', '42704', '3F000'])
 
 // turso refuses these constructs with a syntax error (42601) instead of 0A000.
 const SYNTAX_REFUSALS =
-  /^(?:unnest currently requires exactly one array|ORDER BY may not be used with non-aggregate|SELECT requires at least one column or expression)/i
+  /^(?:unnest currently requires exactly one array|ORDER BY may not be used with non-aggregate)/i
 
-// A missing object is a gap when it is turso's wording ("no such function: x") or a catalog object;
-// Postgres's own `relation "x" does not exist` for a user's table must reach the caller unchanged.
-const MISSING_CATALOG_OBJECT = /^no such (?:table|function|column): |\bpg_[a-z_]+\b/i
+// turso's wording for a missing object, which Postgres never uses: Postgres's own
+// `relation "x" does not exist` (even for a user table named `pg_x`) reaches the caller unchanged.
+// Spark reports the session schema `pg_temp` missing in Postgres's words.
+const MISSING_CATALOG_OBJECT =
+  /^no such (?:table|function|column): |^schema "pg_temp" does not exist$/i
+
+// Spark's refusals of what the table editor writes with: `json(b)_populate_record(set)`, and the
+// column-less `select` of an all-default row.
+const POPULATE_RECORD_REFUSAL =
+  /^(?:no such (?:function|table): jsonb?_populate_record(?:set)?|SELECT requires at least one column or expression)$/i
 
 // For an error that carries no SQLSTATE.
 const GAP_MESSAGE =
@@ -69,15 +76,34 @@ export function isCatalogGap(error: unknown): boolean {
   return GAP_SQLSTATES.has(state) && MISSING_CATALOG_OBJECT.test(message)
 }
 
-/** Runs `run`; when it fails with a catalog gap, returns `fallback()` instead. */
+/**
+ * Whether a table editor write failed only because the database lacks `json(b)_populate_record(set)`.
+ * Narrower than `isCatalogGap`: a write is retried only when the database refused it before running
+ * it, never after a trigger may have had side effects.
+ */
+export function isPopulateRecordGap(error: unknown): boolean {
+  const state = sqlStateOf(error)
+  return (
+    (state === '42883' || state === '42P01' || state === '42601') &&
+    POPULATE_RECORD_REFUSAL.test(messageOf(error))
+  )
+}
+
+/** Whether the database refused a `DO` block as such, not a statement the block ran. */
+export function isDoBlockGap(error: unknown): boolean {
+  return sqlStateOf(error) === '0A000' && /^DO is not supported$/i.test(messageOf(error))
+}
+
+/** Runs `run`; when it fails with a gap `isGap` accepts, returns `fallback()` instead. */
 export async function withCatalogFallback<T>(
   run: () => Promise<T>,
-  fallback: () => Promise<T>
+  fallback: () => Promise<T>,
+  isGap: (error: unknown) => boolean = isCatalogGap
 ): Promise<T> {
   try {
     return await run()
   } catch (error) {
-    if (!isCatalogGap(error)) throw error
+    if (!isGap(error)) throw error
     return fallback()
   }
 }

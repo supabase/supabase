@@ -36,6 +36,8 @@ export * from './sql/studio/integrations'
 // TEMPORARY fallbacks for a partial pg_catalog (Spark on turso); see `catalog-fallback.ts`.
 export {
   isCatalogGap,
+  isDoBlockGap,
+  isPopulateRecordGap,
   withCatalogFallback,
   type CatalogQuery,
   type CatalogRow,
@@ -46,6 +48,11 @@ export {
   retrieveTableFallback,
 } from './sql/tables.fallback'
 export { withParsedPolicyRoles } from './sql/policies.fallback'
+export {
+  getTablePrivilegesStatementsFallback,
+  listTablePrivilegesFallback,
+} from './sql/table-privileges.fallback'
+export type { TablePrivilegesGrant, TablePrivilegesRevoke } from './pg-meta-table-privileges'
 export { getTableEditorFallback } from './sql/studio/table-editor/table.fallback'
 export { getEntityTypesFallback } from './sql/studio/table-editor/entities.fallback'
 export { getMigrationsFallback } from './sql/studio/database/migrations.fallback'

@@ -1,4 +1,9 @@
-import pgMeta, { isCatalogGap } from '@supabase/pg-meta'
+import pgMeta, {
+  getTablePrivilegesStatementsFallback,
+  isDoBlockGap,
+  withCatalogFallback,
+  type TablePrivilegesGrant,
+} from '@supabase/pg-meta'
 import { joinSqlFragments, type SafeSqlFragment } from '@supabase/pg-meta/src/pg-format'
 import { useMutation, useQueryClient } from '@tanstack/react-query'
 import { toast } from 'sonner'
@@ -7,6 +12,7 @@ import { invalidateTablePrivilegesQuery } from './table-privileges-query'
 import type { ConnectionVars } from '@/data/common.types'
 import { unguarded } from '@/data/fetchers'
 import { lintKeys } from '@/data/lint/keys'
+import { catalogFallbackQuery } from '@/data/sql/catalog-fallback-query'
 import { executeSql } from '@/data/sql/execute-sql-mutation'
 import {
   API_ACCESS_ROLES,
@@ -19,8 +25,6 @@ import type { UseCustomMutationOptions } from '@/types'
 export type TableApiAccessPrivilegesVariables = ConnectionVars & {
   relationId: number
   privileges: DeepReadonly<ApiPrivilegesByRole>
-  /** The table was just created, so a database that grants the API roles itself can skip this. */
-  isNewTable?: boolean
 }
 
 export async function updateTableApiAccessPrivileges({
@@ -28,9 +32,10 @@ export async function updateTableApiAccessPrivileges({
   connectionString,
   relationId,
   privileges,
-  isNewTable = false,
 }: TableApiAccessPrivilegesVariables) {
   const sqlStatements: Array<SafeSqlFragment> = []
+  const grants: TablePrivilegesGrant[] = []
+  const revokes: TablePrivilegesGrant[] = []
 
   for (const role of API_ACCESS_ROLES) {
     const rolePrivileges = privileges[role]
@@ -46,6 +51,7 @@ export async function updateTableApiAccessPrivileges({
         privilegeType,
         relationId,
       }))
+      revokes.push(...revokeGrants)
       const revokeSql = pgMeta.tablePrivileges.revoke(revokeGrants).sql
       if (revokeSql) sqlStatements.push(revokeSql)
     }
@@ -57,6 +63,7 @@ export async function updateTableApiAccessPrivileges({
         privilegeType,
         relationId,
       }))
+      grants.push(...grantGrants)
       const grantSql = pgMeta.tablePrivileges.grant(grantGrants).sql
       if (grantSql) sqlStatements.push(grantSql)
     }
@@ -66,23 +73,27 @@ export async function updateTableApiAccessPrivileges({
     return null
   }
 
-  try {
-    const { result } = await executeSql<[]>({
-      projectRef,
-      connectionString,
-      sqlOrigin: 'studio',
-      queryName: 'table-api-access-update-privileges',
-      sql: joinSqlFragments(sqlStatements, '\n'),
-      queryKey: ['table-api-access', 'update-privileges'],
-      grant: unguarded.migrating,
-    })
-    return result
-  } catch (error) {
-    // TEMPORARY: Spark cannot run this DO loop and grants the API roles on a new table itself.
-    // Delete once Spark runs `DO`.
-    if (isNewTable && isCatalogGap(error)) return null
-    throw error
+  const variables = {
+    projectRef,
+    connectionString,
+    queryName: 'table-api-access-update-privileges',
+    queryKey: ['table-api-access', 'update-privileges'],
+    grant: unguarded.migrating,
   }
+  const run = async (sql: SafeSqlFragment) =>
+    (await executeSql<[]>({ ...variables, sqlOrigin: 'studio', sql })).result
+
+  return withCatalogFallback(
+    () => run(joinSqlFragments(sqlStatements, '\n')),
+    async () =>
+      run(
+        await getTablePrivilegesStatementsFallback(catalogFallbackQuery(variables), {
+          grants,
+          revokes,
+        })
+      ),
+    isDoBlockGap
+  )
 }
 
 type UpdateTableApiAccessPrivilegesData = Awaited<ReturnType<typeof updateTableApiAccessPrivileges>>
