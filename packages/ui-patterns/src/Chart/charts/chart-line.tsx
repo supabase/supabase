@@ -88,10 +88,6 @@ export interface ChartLineProps {
   }
   strokeWidth?: number
   referenceLines?: ChartReferenceLine[]
-  /** Enables Recharts keyboard navigation. Defaults to false. */
-  accessibilityLayer?: boolean
-  /** Controls area animation. Omit to use the Recharts default. */
-  isAnimationActive?: boolean
 }
 
 // [Joshen] JFYI - shouldn't rely on xKey's value to determine if its a time-based format
@@ -120,8 +116,6 @@ export const ChartLine = ({
   YAxisProps,
   strokeWidth = 1.5,
   referenceLines,
-  accessibilityLayer = false,
-  isAnimationActive,
 }: ChartLineProps) => {
   const [focusDataIndex, setFocusDataIndex] = useState<number | null>(null)
   const gradientPrefix = `chart-line-fill-${useId().replace(/:/g, '')}`
@@ -214,7 +208,6 @@ export const ChartLine = ({
       >
         <RechartAreaChart
           data={data}
-          accessibilityLayer={accessibilityLayer}
           syncId={syncId}
           margin={margin}
           style={{ cursor: chartCursor }}
@@ -336,7 +329,6 @@ export const ChartLine = ({
             <Area
               key={key}
               type="step"
-              isAnimationActive={isAnimationActive}
               dataKey={key}
               fill={`url(#${gradientPrefix}-${index})`}
               fillOpacity={0.1}
