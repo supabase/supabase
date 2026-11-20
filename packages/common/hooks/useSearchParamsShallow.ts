@@ -14,7 +14,7 @@ import { useCallback, useEffect, useId, useMemo, useReducer, useRef } from 'reac
 const useSearchParamsShallow = () => {
   const EVENT_NAME = 'supabase.events.packages.common.useSearchParamsShallow'
   const id = useId()
-  const timeoutHandle = useRef<ReturnType<typeof setTimeout>>()
+  const timeoutHandle = useRef<ReturnType<typeof setTimeout> | undefined>(undefined)
 
   const reducer = useCallback(
     (_: URLSearchParams, action: { target: 'int' | 'ext'; newParams: URLSearchParams }) => {

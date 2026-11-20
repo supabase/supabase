@@ -59,10 +59,13 @@ vi.mock('~/lib/supabase', () => ({
 describe('/api/graphql searchDocs', () => {
   beforeAll(() => {
     vi.spyOn(console, 'error').mockImplementation(() => {})
+    // KB search is a network call; return no KB results
+    vi.stubGlobal('fetch', () => Promise.resolve(Response.json([])))
   })
 
   afterAll(() => {
     vi.restoreAllMocks()
+    vi.unstubAllGlobals()
     vi.doUnmock('~/lib/openAi')
     vi.doUnmock('~/lib/supabase')
   })

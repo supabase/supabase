@@ -1,9 +1,9 @@
-import React, { useRef } from 'react'
-import Image from 'next/image'
-import { useTheme } from 'next-themes'
-import { LazyMotion, domAnimation, m, useInView } from 'framer-motion'
-import { INITIAL_BOTTOM, getAnimation } from '~/lib/animations'
+import { getAnimation, INITIAL_BOTTOM } from '~/lib/animations'
 import { useBreakpoint } from 'common'
+import { domAnimation, LazyMotion, m, useInView } from 'motion/react'
+import { useTheme } from 'next-themes'
+import Image from 'next/image'
+import React, { useRef } from 'react'
 
 const IntegrationsImage = () => {
   const ref = useRef(null)
@@ -36,7 +36,7 @@ const IntegrationsImage = () => {
         animate={isInView ? animate : initial}
         className="relative w-full h-full"
       >
-        <div className="w-full aspect-[2/1] md:aspect-[3/1]">
+        <div className="w-full aspect-2/1 md:aspect-3/1">
           <ResolvedImage />
         </div>
       </m.div>

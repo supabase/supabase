@@ -7,6 +7,7 @@ export type SidebarLink = {
   isActive?: boolean
   subitemsKey?: string // I dont think this is being used at all
   onClick?: () => Promise<void>
+  shortcutId?: import('@/state/shortcuts/registry').ShortcutId
 }
 
 export type SidebarSection = {

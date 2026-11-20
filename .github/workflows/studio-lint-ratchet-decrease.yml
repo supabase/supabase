@@ -1,0 +1,127 @@
+name: Decrease studio lint ratchet baselines
+
+on:
+  schedule:
+    - cron: '0 0 * * SUN'
+  workflow_dispatch:
+
+permissions:
+  contents: write
+  pull-requests: write
+
+jobs:
+  decrease-baselines:
+    runs-on: blacksmith-4vcpu-ubuntu-2404
+
+    steps:
+      - uses: actions/checkout@9c091bb21b7c1c1d1991bb908d89e4e9dddfe3e0 # v7.0.0
+        with:
+          persist-credentials: false
+          sparse-checkout: |
+            .github
+            apps/studio
+            packages
+            patches
+
+      - uses: pnpm/action-setup@0ebf47130e4866e96fce0953f49152a61190b271 # v6.0.9
+        name: Install pnpm
+        with:
+          run_install: false
+
+      - name: Use Node.js
+        uses: actions/setup-node@49933ea5288caeca8642d1e84afbd3f7d6820020 # v4.4.0
+        with:
+          node-version-file: '.nvmrc'
+          cache: 'pnpm'
+
+      - name: Install deps
+        run: pnpm install --frozen-lockfile
+
+      - name: Generate token
+        id: app-token
+        uses: actions/create-github-app-token@bcd2ba49218906704ab6c1aa796996da409d3eb1 # v3.2.0
+        with:
+          client-id: ${{ vars.GH_AUTOFIX_APP_CLIENT_ID }}
+          private-key: ${{ secrets.GH_AUTOFIX_PRIVATE_KEY }}
+          permission-contents: write
+          permission-pull-requests: write
+
+      - name: Decrease ESLint ratchet baselines and open PR
+        id: decrease-baselines
+        env:
+          GH_TOKEN: ${{ steps.app-token.outputs.token }}
+          DEFAULT_BRANCH: ${{ github.event.repository.default_branch }}
+        run: |
+          set -eo pipefail
+          DEFAULT_BRANCH=${DEFAULT_BRANCH:-master}
+
+          BRANCH="bot/decrease-eslint-ratchet-baselines"
+
+          git fetch origin "$DEFAULT_BRANCH" --depth=1
+          if git ls-remote --exit-code --heads origin "$BRANCH" > /dev/null 2>&1; then
+            git fetch origin "$BRANCH":"$BRANCH" --depth=1
+            git switch "$BRANCH"
+            git reset --hard "origin/$DEFAULT_BRANCH"
+          else
+            git switch --create "$BRANCH" "origin/$DEFAULT_BRANCH"
+          fi
+
+          pnpm --filter studio run lint:ratchet --decrease-baselines
+
+          if git diff --quiet; then
+            echo "No baseline updates detected."
+            echo "changed=false" >> "$GITHUB_OUTPUT"
+            exit 0
+          fi
+
+          git config user.name 'github-actions[bot]'
+          git config user.email 'github-actions[bot]@users.noreply.github.com'
+
+          git add apps/studio/.github/eslint-rule-baselines.json
+          git commit --message "chore: decrease ESLint ratchet baselines"
+          git -c credential.helper= push --force "https://x-access-token:${GH_TOKEN}@github.com/${GITHUB_REPOSITORY}.git" "HEAD:${BRANCH}"
+
+          pr_url=$(gh pr list --state open --head "$BRANCH" --json url --jq '.[0].url // ""' 2>/dev/null || echo "")
+          if [ -z "$pr_url" ]; then
+            pr_url=$(gh pr create \
+              --title "[bot] Decrease ESLint ratchet baselines" \
+              --body "Automated weekly decrease of ESLint ratchet baselines." \
+              --base "$DEFAULT_BRANCH" \
+              --head "$BRANCH")
+          else
+            gh pr comment "$pr_url" --body "Updated ESLint ratchet baselines with the latest weekly decreases."
+          fi
+
+          echo "changed=true" >> "$GITHUB_OUTPUT"
+          echo "pr_url=$pr_url" >> "$GITHUB_OUTPUT"
+
+      - name: 'Notify #team-frontend about rules that hit a zero baseline'
+        if: steps.decrease-baselines.outputs.changed == 'true'
+        env:
+          PR_URL: ${{ steps.decrease-baselines.outputs.pr_url }}
+          SLACK_WEBHOOK_URL: ${{ secrets.SLACK_DASHBOARD_WEBHOOK_URL }}
+        run: |
+          set -euo pipefail
+
+          zero_rules=$(jq -r '.rules | to_entries | map(select(.value == 0 and (.key | startswith("shadcn/") | not)) | .key) | join(", ")' apps/studio/.github/eslint-rule-baselines.json)
+
+          if [ -z "$zero_rules" ]; then
+            echo "No rules dropped to a baseline of 0; nothing to notify."
+            exit 0
+          fi
+
+          if [ -z "${SLACK_WEBHOOK_URL:-}" ]; then
+            echo "::warning::SLACK_DASHBOARD_WEBHOOK_URL secret is not set; skipping Slack notification for zero-baseline rules: $zero_rules"
+            exit 0
+          fi
+
+          pr_number="${PR_URL##*/}"
+          text="<@U0A1BRW39PC> the weekly ratchet-baseline job just dropped these rules to 0 in <${PR_URL}|#${pr_number}>: ${zero_rules}. Can you remove them from ratchet tracking and bump their ESLint severity to \"error\"?"
+
+          payload=$(jq -n --arg text "$text" '{text: $text}')
+
+          if ! curl --fail --silent --show-error -X POST "$SLACK_WEBHOOK_URL" \
+            -H 'Content-Type: application/json' \
+            -d "$payload"; then
+            echo "::warning::Failed to post Slack notification for zero-baseline rules: $zero_rules"
+          fi

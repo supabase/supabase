@@ -1,6 +1,6 @@
 import Param from '~/components/Params'
-import { genGuideMeta } from '~/features/docs/GuidesMdx.utils'
 import { GuideTemplate, newEditLink } from '~/features/docs/GuidesMdx.template'
+import { genGuideMeta } from '~/features/docs/GuidesMdx.utils'
 import { MDXRemoteBase } from '~/features/docs/MdxBase'
 import specAnalyticsV0 from '~/spec/analytics_v0_config.yaml' with { type: 'yml' }
 
@@ -21,8 +21,9 @@ const AnalyticsConfigPage = async () => {
     <GuideTemplate
       meta={meta}
       editLink={newEditLink(
-        'supabase/supabase/blob/master/apps/docs/app/guides/(with-sidebar)/self-hosting/analytics/config/page.tsx'
+        'supabase/supabase/blob/master/apps/docs/app/guides/self-hosting/analytics/config/page.tsx'
       )}
+      pathname="/guides/self-hosting/analytics/config"
     >
       <MDXRemoteBase source={descriptionMdx} />
 

@@ -1,21 +1,22 @@
 import type { IncomingHttpHeaders } from 'node:http'
 import { beforeEach, describe, expect, it, vi } from 'vitest'
+
 import {
   commaSeparatedStringIntoArray,
   constructHeaders,
   fromNodeHeaders,
+  getBearerToken,
   toSnakeCase,
   zBooleanString,
 } from './apiHelpers'
 
-vi.mock('lib/constants', () => ({
+vi.mock('@/lib/constants', () => ({
   IS_PLATFORM: false,
 }))
 
 describe('apiHelpers', () => {
   describe('constructHeaders', () => {
     beforeEach(() => {
-      process.env.READ_ONLY_API_KEY = 'test-readonly-key'
       process.env.SUPABASE_SERVICE_KEY = 'test-service-key'
     })
 
@@ -254,6 +255,38 @@ describe('apiHelpers', () => {
       expect(result.get('authorization')).toBe('Bearer token')
       expect(result.get('x-empty')).toBeNull()
       expect(result.get('x-custom')).toBe('value1, value2')
+    })
+  })
+
+  describe('getBearerToken', () => {
+    it.each([
+      ['Bearer abc.def', 'abc.def'],
+      ['bearer abc.def', 'abc.def'],
+      ['BEARER \t abc.def  ', 'abc.def'],
+    ])('returns the token from %j', (header, expected) => {
+      expect(getBearerToken(header)).toBe(expected)
+    })
+
+    it.each([
+      ['missing', undefined],
+      ['array-valued', ['Bearer a', 'Bearer b']],
+      ['wrong scheme', 'Basic abc'],
+      ['no separator', 'Bearerabc'],
+      ['empty token', 'Bearer'],
+      ['whitespace-only token', 'Bearer    '],
+    ])('returns null for a %s header', (_, header) => {
+      expect(getBearerToken(header)).toBeNull()
+    })
+
+    it('handles a long whitespace run in linear time', () => {
+      const header = `Bearer${' '.repeat(100_000)}\n`
+
+      const start = performance.now()
+      const token = getBearerToken(header)
+      const elapsed = performance.now() - start
+
+      expect(token).toBeNull()
+      expect(elapsed).toBeLessThan(100)
     })
   })
 })

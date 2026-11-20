@@ -9,11 +9,11 @@ import {
   XAxis,
   YAxis,
 } from 'recharts'
-
-import { DataPoint } from 'data/analytics/constants'
 import { cn } from 'ui'
+
 import { Attribute, COLOR_MAP } from './Usage.constants'
 import { MultiAttributeTooltipContent, SingleAttributeTooltipContent } from './UsageChartTooltips'
+import { DataPoint } from '@/data/analytics/constants'
 
 // [Joshen] This BarChart is specifically for usage, hence not a reusable component, and not
 // replacing the existing BarChart in ui/Charts

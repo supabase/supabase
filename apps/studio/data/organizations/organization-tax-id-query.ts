@@ -1,11 +1,11 @@
-import { PermissionAction } from '@supabase/shared-types/out/constants'
-import { useQuery, UseQueryOptions } from '@tanstack/react-query'
-
+import { useQuery } from '@tanstack/react-query'
 import { components } from 'api-types'
-import { get, handleError } from 'data/fetchers'
-import { useAsyncCheckPermissions } from 'hooks/misc/useCheckPermissions'
-import type { ResponseError } from 'types'
+
 import { organizationKeys } from './keys'
+import { get, handleError } from '@/data/fetchers'
+import { FGA_PERMISSIONS, useAsyncCheckPermissionsV2 } from '@/hooks/misc/useCheckPermissionsV2'
+import type { StudioError } from '@/lib/errors/studio-errors'
+import type { UseCustomQueryOptions } from '@/types'
 
 export type OrganizationTaxIdVariables = {
   slug?: string
@@ -23,30 +23,27 @@ export async function getOrganizationTaxId(
   })
   if (error) throw handleError(error)
 
-  return (data as components['schemas']['TaxIdResponse']).tax_id
+  return (data as components['schemas']['TaxIdResponse_Output']).tax_id
 }
 
 export type OrganizationTaxIdData = Awaited<ReturnType<typeof getOrganizationTaxId>>
-export type OrganizationTaxIdError = ResponseError
+export type OrganizationTaxIdError = StudioError
 
 export const useOrganizationTaxIdQuery = <TData = OrganizationTaxIdData>(
   { slug }: OrganizationTaxIdVariables,
   {
     enabled = true,
     ...options
-  }: UseQueryOptions<OrganizationTaxIdData, OrganizationTaxIdError, TData> = {}
+  }: UseCustomQueryOptions<OrganizationTaxIdData, OrganizationTaxIdError, TData> = {}
 ) => {
-  const { can: canReadSubscriptions } = useAsyncCheckPermissions(
-    PermissionAction.BILLING_READ,
-    'stripe.tax_ids'
+  const { can: canReadSubscriptions } = useAsyncCheckPermissionsV2(
+    FGA_PERMISSIONS.ORGANIZATION.BILLING_READ
   )
 
-  return useQuery<OrganizationTaxIdData, OrganizationTaxIdError, TData>(
-    organizationKeys.taxId(slug),
-    ({ signal }) => getOrganizationTaxId({ slug }, signal),
-    {
-      enabled: enabled && typeof slug !== 'undefined' && canReadSubscriptions,
-      ...options,
-    }
-  )
+  return useQuery<OrganizationTaxIdData, OrganizationTaxIdError, TData>({
+    queryKey: organizationKeys.taxId(slug),
+    queryFn: ({ signal }) => getOrganizationTaxId({ slug }, signal),
+    enabled: enabled && typeof slug !== 'undefined' && canReadSubscriptions,
+    ...options,
+  })
 }

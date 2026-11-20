@@ -1,22 +1,103 @@
-import { ChevronDown } from 'lucide-react'
+import { ChevronDownIcon } from 'lucide-react'
 import Link from 'next/link'
-import { useMemo, useState } from 'react'
-
-import ShimmeringLoader from 'components/ui/ShimmeringLoader'
-import { useOrganizationsQuery } from 'data/organizations/organizations-query'
 import { parseAsString, useQueryState } from 'nuqs'
-import { Organization } from 'types'
-import { Badge, Button, Card, CardHeader, CardTitle, Input_Shadcn_ } from 'ui'
+import { useMemo, useState } from 'react'
+import { Badge, Button, Card, CardHeader, CardTitle, Input } from 'ui'
+import { ShimmeringLoader } from 'ui-patterns/ShimmeringLoader'
+
+import { ButtonTooltip } from './ButtonTooltip'
+import { useFreeProjectLimitCheckQuery } from '@/data/organizations/free-project-limit-check-query'
+import { useOrganizationsQuery } from '@/data/organizations/organizations-query'
+import type { Organization } from '@/types'
 
 export interface ProjectClaimChooseOrgProps {
-  onSelect: (org: Organization) => void
+  onSelect: (orgSlug: string) => void
   maxOrgsToShow?: number
+  canCreateNewOrg: boolean
 }
 
-export function OrganizationSelector({ onSelect, maxOrgsToShow = 5 }: ProjectClaimChooseOrgProps) {
+const OrganizationCard = ({
+  org,
+  onSelect,
+}: {
+  org: Organization
+  onSelect: (orgSlug: string) => void
+}) => {
+  const isFreePlan = org.plan?.id === 'free'
+  const { data: membersExceededLimit, isSuccess } = useFreeProjectLimitCheckQuery(
+    { slug: org.slug },
+    { enabled: isFreePlan }
+  )
+  const hasMembersExceedingFreeTierLimit = (membersExceededLimit || []).length > 0
+  const freePlanWithExceedingLimits = isFreePlan && hasMembersExceedingFreeTierLimit
+
+  return (
+    <Card
+      key={org.id}
+      className="hover:bg-surface-200 rounded-none first:rounded-t-lg last:rounded-b-lg -mb-px"
+    >
+      <CardHeader className="flex flex-row justify-between border-none space-y-0 space-x-2">
+        <CardTitle className="flex items-center gap-2 min-w-0 flex-1">
+          <span className="truncate min-w-0" title={org.name}>
+            {org.name}
+          </span>
+          <Badge className="shrink-0">{org.plan?.name}</Badge>
+        </CardTitle>
+        <ButtonTooltip
+          tooltip={{
+            content: {
+              text:
+                isSuccess && freePlanWithExceedingLimits ? (
+                  <div className="flex flex-col gap-y-2 w-96 p-2">
+                    <p className="leading-normal">
+                      Owners and administrators are limited in how many active Free Plan projects
+                      they can have across all organizations. Members over the limit:
+                    </p>
+
+                    <ul className="pl-6 list-disc">
+                      {membersExceededLimit?.map((member, idx: number) => (
+                        <li key={`member-${idx}`}>
+                          <span>{`${member.primary_email} (Limit: ${member.free_project_limit} free projects)`}</span>
+                          <ul className="text-foreground-light list-disc pl-4">
+                            {member.free_plan_organizations.map((org) => (
+                              <li key={org.slug || org.organization_name}>
+                                {org.organization_name}:{' '}
+                                {org.projects.map((x) => x.name).join(', ')}
+                              </li>
+                            ))}
+                          </ul>
+                        </li>
+                      ))}
+                    </ul>
+
+                    <p className="leading-normal">
+                      They will need to delete, pause, or upgrade one or more of these projects
+                      before you can create a free project within this organization.
+                    </p>
+                  </div>
+                ) : undefined,
+            },
+          }}
+          size="small"
+          className="shrink-0"
+          onClick={() => onSelect(org.slug)}
+          disabled={isSuccess && freePlanWithExceedingLimits}
+        >
+          Choose
+        </ButtonTooltip>
+      </CardHeader>
+    </Card>
+  )
+}
+
+export function OrganizationSelector({
+  onSelect,
+  maxOrgsToShow = 5,
+  canCreateNewOrg,
+}: ProjectClaimChooseOrgProps) {
   const {
     data: organizations = [],
-    isLoading: isLoadingOrgs,
+    isPending: isLoadingOrgs,
     isSuccess: isSuccessOrgs,
     isError: isErrorOrgs,
   } = useOrganizationsQuery()
@@ -43,6 +124,11 @@ export function OrganizationSelector({ onSelect, maxOrgsToShow = 5 }: ProjectCla
 
   searchParams.set('returnTo', pathname)
 
+  const onSelectOrg = (orgSlug: string) => {
+    onSelect(orgSlug)
+    setSearch('')
+  }
+
   return (
     <div className="w-full flex flex-col gap-y-4">
       {isLoadingOrgs ? (
@@ -55,7 +141,7 @@ export function OrganizationSelector({ onSelect, maxOrgsToShow = 5 }: ProjectCla
         </span>
       ) : (
         <>
-          <Input_Shadcn_
+          <Input
             type="text"
             value={search}
             onChange={(e) => setSearch(e.target.value)}
@@ -66,40 +152,17 @@ export function OrganizationSelector({ onSelect, maxOrgsToShow = 5 }: ProjectCla
               <div className="text-center text-foreground-light py-6">No organizations found.</div>
             )}
             {filteredOrgs.map((org) => (
-              <Card
-                key={org.id}
-                className="hover:bg-surface-200 rounded-none first:rounded-t-lg last:rounded-b-lg -mb-px"
-              >
-                <CardHeader className="flex flex-row justify-between border-none space-y-0 space-x-2">
-                  <CardTitle className="flex items-center gap-2 min-w-0 flex-1">
-                    <span className="truncate min-w-0" title={org.name}>
-                      {org.name}
-                    </span>
-                    <Badge className="shrink-0">{org.plan?.name}</Badge>
-                  </CardTitle>
-                  <Button
-                    size="small"
-                    onClick={() => {
-                      onSelect(org)
-                      setSearch('')
-                    }}
-                    className="shrink-0"
-                  >
-                    Choose
-                  </Button>
-                </CardHeader>
-              </Card>
+              <OrganizationCard key={org.id} org={org} onSelect={onSelectOrg} />
             ))}
             {organizations.length > maxOrgsToShow && !showAll && !search && (
               <div className="flex justify-center py-2">
                 <Button
-                  icon={<ChevronDown className="w-4 h-4" />}
+                  icon={<ChevronDownIcon className="w-4 h-4" />}
                   size="tiny"
                   onClick={() => {
                     setSearch('')
                     setShowAll(true)
                   }}
-                  type="default"
                 >
                   Show all organizations
                 </Button>
@@ -108,14 +171,16 @@ export function OrganizationSelector({ onSelect, maxOrgsToShow = 5 }: ProjectCla
           </div>
         </>
       )}
-      <Card className="flex items-center justify-between border-dashed pr-6">
-        <CardHeader className="border-none">
-          <CardTitle>Need a new organization?</CardTitle>
-        </CardHeader>
-        <Button size="small" className="" asChild type="default">
-          <Link href={`/new?${searchParams.toString()}`}>New Organization</Link>
-        </Button>
-      </Card>
+      {canCreateNewOrg && (
+        <Card className="flex items-center justify-between border-dashed pr-6">
+          <CardHeader className="border-none">
+            <CardTitle>Need a new organization?</CardTitle>
+          </CardHeader>
+          <Button size="small" className="" asChild>
+            <Link href={`/new?${searchParams.toString()}`}>New Organization</Link>
+          </Button>
+        </Card>
+      )}
     </div>
   )
 }

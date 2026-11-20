@@ -1,11 +1,11 @@
-import { PermissionAction } from '@supabase/shared-types/out/constants'
-import { useQuery, UseQueryOptions } from '@tanstack/react-query'
-
-import { get, handleError } from 'data/fetchers'
-import { useAsyncCheckPermissions } from 'hooks/misc/useCheckPermissions'
-import type { ResponseError } from 'types'
-import { organizationKeys } from './keys'
+import { useQuery } from '@tanstack/react-query'
 import { IS_PLATFORM } from 'common'
+
+import { organizationKeys } from './keys'
+import { get, handleError } from '@/data/fetchers'
+import { FGA_PERMISSIONS, useAsyncCheckPermissionsV2 } from '@/hooks/misc/useCheckPermissionsV2'
+import type { StudioError } from '@/lib/errors/studio-errors'
+import type { UseCustomQueryOptions } from '@/types'
 
 export type OrganizationCustomerProfileVariables = {
   slug?: string
@@ -33,28 +33,32 @@ export async function getOrganizationCustomerProfile(
 export type OrganizationCustomerProfileData = Awaited<
   ReturnType<typeof getOrganizationCustomerProfile>
 >
-export type OrganizationCustomerProfileError = ResponseError
+export type OrganizationCustomerProfileError = StudioError
 
 export const useOrganizationCustomerProfileQuery = <TData = OrganizationCustomerProfileData>(
   { slug }: OrganizationCustomerProfileVariables,
   {
     enabled = true,
     ...options
-  }: UseQueryOptions<OrganizationCustomerProfileData, OrganizationCustomerProfileError, TData> = {}
+  }: UseCustomQueryOptions<
+    OrganizationCustomerProfileData,
+    OrganizationCustomerProfileError,
+    TData
+  > = {}
 ) => {
   // [Joshen] Thinking it makes sense to add this check at the RQ level - prevent
   // unnecessary requests, although this behaviour still needs handling on the UI
-  const { can: canReadCustomerProfile } = useAsyncCheckPermissions(
-    PermissionAction.BILLING_READ,
-    'stripe.customer'
-  )
-
-  return useQuery<OrganizationCustomerProfileData, OrganizationCustomerProfileError, TData>(
-    organizationKeys.customerProfile(slug),
-    ({ signal }) => getOrganizationCustomerProfile({ slug }, signal),
+  const { can: canReadCustomerProfile } = useAsyncCheckPermissionsV2(
+    FGA_PERMISSIONS.ORGANIZATION.BILLING_READ,
     {
-      enabled: IS_PLATFORM && enabled && canReadCustomerProfile && typeof slug !== 'undefined',
-      ...options,
+      organizationSlug: slug,
     }
   )
+
+  return useQuery<OrganizationCustomerProfileData, OrganizationCustomerProfileError, TData>({
+    queryKey: organizationKeys.customerProfile(slug),
+    queryFn: ({ signal }) => getOrganizationCustomerProfile({ slug }, signal),
+    enabled: IS_PLATFORM && enabled && canReadCustomerProfile && typeof slug !== 'undefined',
+    ...options,
+  })
 }

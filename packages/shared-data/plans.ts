@@ -1,7 +1,7 @@
 export type PlanId = 'free' | 'pro' | 'team' | 'enterprise'
 
 export interface PricingInformation {
-  id: string
+  id: 'tier_free' | 'tier_pro' | 'tier_team' | 'tier_enterprise'
   planId: PlanId
   name: string
   nameBadge?: string
@@ -33,13 +33,13 @@ export const plans: PricingInformation[] = [
     features: [
       'Unlimited API requests',
       '50,000 monthly active users',
-      ['500 MB database size', 'Shared CPU • 500 MB RAM'],
+      ['500 MB database size', 'Shared CPU • 500 MB RAM'],
       ['5 GB egress'],
       ['5 GB cached egress'],
       '1 GB file storage',
       'Community support',
     ],
-    footer: 'Free projects are paused after 1 week of inactivity. Limit of 2 active projects.',
+    footer: 'Free projects are paused after 1 week of inactivity.\nLimit of 2 active projects.',
     cta: 'Start for Free',
   },
   {
@@ -50,18 +50,19 @@ export const plans: PricingInformation[] = [
     costUnit: '/ month',
     href: 'https://supabase.com/dashboard/new?plan=pro',
     priceLabel: 'From',
-    warning: '$10 in compute credits included',
+    warning: 'Includes one project running on Micro compute.',
     priceMonthly: 25,
     description: 'For production applications with the power to scale.',
     features: [
       ['100,000 monthly active users', 'then $0.00325 per MAU'],
-      ['8 GB disk size per project', 'then $0.125 per GB'],
-      ['250 GB egress', 'then $0.09 per GB'],
-      ['250 GB cached egress', 'then $0.03 per GB'],
-      ['100 GB file storage', 'then $0.021 per GB'],
+      ['8 GB disk size per project', 'then $0.125 per GB'],
+      ['250 GB egress', 'then $0.09 per GB'],
+      ['250 GB cached egress', 'then $0.03 per GB'],
+      ['100 GB file storage', 'then $0.0213 per GB'],
       'Email support',
       'Daily backups stored for 7 days',
       '7-day log retention',
+      ['Add Log Drains', 'additional $60 per drain, per project'],
     ],
     preface: 'Everything in the Free Plan, plus:',
     cta: 'Get Started',
@@ -74,15 +75,17 @@ export const plans: PricingInformation[] = [
     costUnit: '/ month',
     href: 'https://supabase.com/dashboard/new?plan=team',
     priceLabel: 'From',
-    warning: '$10 in compute credits included',
+    warning: 'Includes one project running on Micro compute.',
     priceMonthly: 599,
     description: 'Add features such as SSO, control over backups, and industry certifications.',
     features: [
-      'SOC2',
+      'SOC2 & ISO 27001',
       'Project-scoped and read-only access',
       'HIPAA available as paid add-on',
       'SSO for Supabase Dashboard',
+      'Supports AWS PrivateLink',
       'Priority email support & SLAs',
+      'Supports AWS PrivateLink',
       'Daily backups stored for 14 days',
       '28-day log retention',
     ],
@@ -96,16 +99,15 @@ export const plans: PricingInformation[] = [
     href: 'https://forms.supabase.com/enterprise',
     description: 'For large-scale applications running Internet scale workloads.',
     features: [
-      'Designated Support manager',
+      'Technical Account Management',
       'Uptime SLAs',
-      'BYO Cloud supported',
       '24×7×365 premium enterprise support',
       'Private Slack channel',
       'Custom Security Questionnaires',
     ],
     priceLabel: '',
     priceMonthly: 'Custom',
-    preface: '',
-    cta: 'Contact Us',
+    preface: 'Everything in the Team Plan, plus:',
+    cta: 'Contact us',
   },
 ] as const

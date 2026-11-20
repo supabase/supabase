@@ -1,8 +1,9 @@
-import { PostgresMaterializedView, PostgresTable, PostgresView } from '@supabase/postgres-meta'
-import { PostgresForeignTable } from '@supabase/postgres-meta/dist/lib/types'
-import { ENTITY_TYPE } from 'data/entity-types/entity-type-constants'
+import { PGForeignTable, PGMaterializedView, PGView } from '@supabase/pg-meta'
 
-// [Joshen] We just need name, description, rows, size, and the number of columns
+import { ENTITY_TYPE } from '@/data/entity-types/entity-type-constants'
+import type { SafePostgresTable } from '@/lib/postgres-types'
+
+// [Joshen] We just need name, schema, description, rows, size, and the number of columns
 // Just missing partitioned tables as missing pg-meta support
 export const formatAllEntities = ({
   tables = [],
@@ -10,10 +11,10 @@ export const formatAllEntities = ({
   materializedViews = [],
   foreignTables = [],
 }: {
-  tables?: PostgresTable[]
-  views?: PostgresView[]
-  materializedViews?: PostgresMaterializedView[]
-  foreignTables?: PostgresForeignTable[]
+  tables?: SafePostgresTable[]
+  views?: PGView[]
+  materializedViews?: PGMaterializedView[]
+  foreignTables?: PGForeignTable[]
 }) => {
   const formattedTables = tables.map((x) => {
     return {
@@ -30,6 +31,7 @@ export const formatAllEntities = ({
       id: x.id,
       name: x.name,
       comment: x.comment,
+      schema: x.schema,
       rows: undefined,
       size: undefined,
       columns: x.columns ?? [],
@@ -42,6 +44,7 @@ export const formatAllEntities = ({
       id: x.id,
       name: x.name,
       comment: x.comment,
+      schema: x.schema,
       rows: undefined,
       size: undefined,
       columns: x.columns ?? [],
@@ -54,6 +57,7 @@ export const formatAllEntities = ({
       id: x.id,
       name: x.name,
       comment: x.comment,
+      schema: x.schema,
       rows: undefined,
       size: undefined,
       columns: x.columns ?? [],

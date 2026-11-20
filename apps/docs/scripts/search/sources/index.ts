@@ -1,19 +1,15 @@
 import { type GuideModel } from '../../../resources/guide/guideModel.js'
 import { GuideModelLoader } from '../../../resources/guide/guideModelLoader.js'
-import {
-  GitHubDiscussionLoader,
-  type GitHubDiscussionSource,
-  fetchDiscussions,
-} from './github-discussion.js'
 import { LintWarningsGuideLoader, type LintWarningsGuideSource } from './lint-warnings-guide.js'
 import { MarkdownLoader, type MarkdownSource } from './markdown.js'
-import { IntegrationLoader, type IntegrationSource, fetchPartners } from './partner-integrations.js'
+import { fetchPartners, IntegrationLoader, type IntegrationSource } from './partner-integrations.js'
 import {
-  CliReferenceLoader,
-  type CliReferenceSource,
   ClientLibReferenceLoader,
-  type ClientLibReferenceSource,
+  CliReferenceLoader,
+  loadClientLibReferenceFromNewPipeline,
   OpenApiReferenceLoader,
+  type ClientLibReferenceSource,
+  type CliReferenceSource,
   type OpenApiReferenceSource,
 } from './reference-doc.js'
 
@@ -22,7 +18,6 @@ export type SearchSource =
   | OpenApiReferenceSource
   | ClientLibReferenceSource
   | CliReferenceSource
-  | GitHubDiscussionSource
   | IntegrationSource
   | LintWarningsGuideSource
 
@@ -43,23 +38,63 @@ export async function fetchOpenApiReferenceSource() {
 }
 
 export async function fetchJsLibReferenceSource() {
-  return new ClientLibReferenceLoader(
-    'js-lib',
-    '/reference/javascript',
-    { title: 'JavaScript Reference', language: 'JavaScript' },
-    'spec/supabase_js_v2.yml',
-    'spec/common-client-libs-sections.json'
-  ).load()
+  // JS v2 is driven by the new reference pipeline. Ingest search sources from
+  // the generated `content/reference/javascript/v2/` outputs so embeddings
+  // never drift from what the renderer shows.
+  return loadClientLibReferenceFromNewPipeline({
+    source: 'js-lib',
+    path: '/reference/javascript',
+    meta: { title: 'JavaScript Reference', language: 'JavaScript' },
+    contentDir: 'content/reference/javascript/v2',
+  })
+}
+
+export async function fetchServerLibReferenceSource() {
+  // Server SDK is driven by the new reference pipeline. Ingest search sources
+  // from the generated `content/reference/server/v1/` outputs so embeddings
+  // never drift from what the renderer shows.
+  return loadClientLibReferenceFromNewPipeline({
+    source: 'server-lib',
+    path: '/reference/server',
+    meta: { title: 'Server Reference', language: 'TypeScript' },
+    contentDir: 'content/reference/server/v1',
+  })
+}
+
+export async function fetchMiddlewareLibReferenceSource() {
+  // Middleware SDK is driven by the new reference pipeline. Ingest search
+  // sources from the generated `content/reference/middleware/v1/` outputs so
+  // embeddings never drift from what the renderer shows.
+  return loadClientLibReferenceFromNewPipeline({
+    source: 'middleware-lib',
+    path: '/reference/middleware',
+    meta: { title: 'Middleware Reference', language: 'TypeScript' },
+    contentDir: 'content/reference/middleware/v1',
+  })
+}
+
+export async function fetchTanstackDbLibReferenceSource() {
+  // TanStack DB is driven by the new reference pipeline. Ingest search sources
+  // from the generated `content/reference/tanstack_db/v1/` outputs so
+  // embeddings never drift from what the renderer shows.
+  return loadClientLibReferenceFromNewPipeline({
+    source: 'tanstack-db-lib',
+    path: '/reference/tanstack_db',
+    meta: { title: 'TanStack DB Reference', language: 'TypeScript' },
+    contentDir: 'content/reference/tanstack_db/v1',
+  })
 }
 
 export async function fetchDartLibReferenceSource() {
-  return new ClientLibReferenceLoader(
-    'dart-lib',
-    '/reference/dart',
-    { title: 'Dart Reference', language: 'Dart' },
-    'spec/supabase_dart_v2.yml',
-    'spec/common-client-libs-sections.json'
-  ).load()
+  // Dart v2 is driven by the new reference pipeline. Ingest search sources from
+  // the generated `content/reference/dart/v2/` outputs so embeddings never
+  // drift from what the renderer shows.
+  return loadClientLibReferenceFromNewPipeline({
+    source: 'dart-lib',
+    path: '/reference/dart',
+    meta: { title: 'Dart Reference', language: 'Dart' },
+    contentDir: 'content/reference/dart/v2',
+  })
 }
 
 export async function fetchPythonLibReferenceSource() {
@@ -77,7 +112,7 @@ export async function fetchCSharpLibReferenceSource() {
     'csharp-lib',
     '/reference/csharp',
     { title: 'C# Reference', language: 'C#' },
-    'spec/supabase_csharp_v0.yml',
+    'spec/supabase_csharp_v8.yml',
     'spec/common-client-libs-sections.json'
   ).load()
 }
@@ -115,7 +150,7 @@ export async function fetchCliLibReferenceSource() {
 export async function fetchLintWarningsGuideSources() {
   return new LintWarningsGuideLoader(
     'guide',
-    '/guides/database/database-advisors',
+    '/guides/observability/advisors',
     'supabase',
     'splinter',
     'main',
@@ -131,6 +166,9 @@ export async function fetchAllSources(fullIndex: boolean) {
   const lintWarningsGuideSources = fetchLintWarningsGuideSources()
   const openApiReferenceSource = fetchOpenApiReferenceSource()
   const jsLibReferenceSource = fetchJsLibReferenceSource()
+  const serverLibReferenceSource = fullIndex ? fetchServerLibReferenceSource() : []
+  const middlewareLibReferenceSource = fullIndex ? fetchMiddlewareLibReferenceSource() : []
+  const tanstackDbLibReferenceSource = fullIndex ? fetchTanstackDbLibReferenceSource() : []
   const dartLibReferenceSource = fullIndex ? fetchDartLibReferenceSource() : []
   const pythonLibReferenceSource = fullIndex ? fetchPythonLibReferenceSource() : []
   const cSharpLibReferenceSource = fullIndex ? fetchCSharpLibReferenceSource() : []
@@ -150,26 +188,18 @@ export async function fetchAllSources(fullIndex: boolean) {
         .then((data) => data.flat())
     : []
 
-  const githubDiscussionSources = fetchDiscussions(
-    'supabase',
-    'supabase',
-    'DIC_kwDODMpXOc4CUvEr' // 'Troubleshooting' category
-  )
-    .then((discussions) =>
-      Promise.all(
-        discussions.map((discussion) =>
-          new GitHubDiscussionLoader('supabase/supabase', discussion).load()
-        )
-      )
-    )
-    .then((data) => data.flat())
-
-  const sources: SearchSource[] = (
+  // Type assertion required because ReferenceLoader.load() returns Promise<BaseSource[]>
+  // which widens the inferred union type. All concrete sources in this array are valid
+  // SearchSource types (MarkdownSource, OpenApiReferenceSource, etc.).
+  const sources = (
     await Promise.all([
       guideSources,
       lintWarningsGuideSources,
       openApiReferenceSource,
       jsLibReferenceSource,
+      serverLibReferenceSource,
+      middlewareLibReferenceSource,
+      tanstackDbLibReferenceSource,
       dartLibReferenceSource,
       pythonLibReferenceSource,
       cSharpLibReferenceSource,
@@ -177,9 +207,8 @@ export async function fetchAllSources(fullIndex: boolean) {
       ktLibReferenceSource,
       cliReferenceSource,
       partnerIntegrationSources,
-      githubDiscussionSources,
     ])
-  ).flat()
+  ).flat() as SearchSource[]
 
   return sources
 }

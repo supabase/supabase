@@ -1,0 +1,34 @@
+{
+  "$schema": "./node_modules/turbo/schema.json",
+  "ui": "stream",
+  "cacheMaxAge": "14d",
+  // Turbo refuses to start a run with more persistent tasks than this. `turbo run dev` for the
+  // whole repo has 11 of them (including `with` sidecars) and needs at least 12, so the default
+  // of 10 is too low. Kept close to the default because it also caps parallel builds.
+  "concurrency": "16",
+  "tasks": {
+    "build": {
+      "dependsOn": ["^build"],
+      "outputs": ["dist/**", ".next/**", "!.next/cache/**/*", "!.next/dev/**/*"],
+    },
+    "lint": {
+      "outputs": [],
+    },
+    "clean": {
+      "outputs": [],
+      "cache": false,
+      "outputLogs": "errors-only",
+    },
+    "dev": {
+      "cache": false,
+      "persistent": true,
+    },
+    "test": {
+      "cache": false,
+    },
+    "typecheck": {
+      "dependsOn": ["^typecheck"],
+      "outputs": [],
+    },
+  },
+}

@@ -5,15 +5,15 @@ author: ant_wilson
 author_title: Supabase
 author_url: https://github.com/awalias
 author_image_url: https://github.com/awalias.png
-image: replit-og.jpg
-thumb: replit-og.jpg
+imgSocial: replit-og.jpg
+imgThumb: replit-og.jpg
 categories:
   - engineering
 tags:
   - replit
   - node-js
   - postgres
-date: '03-11-2021'
+date: '2021-03-11'
 video: https://www.youtube.com/v/lQ5iIxaYduI
 ---
 
@@ -21,7 +21,7 @@ video: https://www.youtube.com/v/lQ5iIxaYduI
 
 They support a ton of different languages and execution environments and even recently introduced a simple key value store you can use to persist data.
 
-As a Replit user, if you want to access larger amounts of data direct from your repl, or if you fancy accessing some super-powerful query tools, at some point you may want to start interacting with a relational database. Supabase is a good fit here; just like Replit, you don't need to worry about servers, and hosting, you can just click a few buttons and get a fully featured relational database which you can start communicating with directly from javacript, using supabase-js.
+As a Replit user, if you want to access larger amounts of data direct from your repl, or if you fancy accessing some super-powerful query tools, at some point you may want to start interacting with a relational database. Supabase is a good fit here; just like Replit, you don't need to worry about servers, and hosting, you can just click a few buttons and get a fully featured relational database which you can start communicating with directly from javacript, using [supabase-js](/docs/reference/javascript/introduction).
 
 <div className="video-container">
   <iframe
@@ -93,7 +93,7 @@ const main = async() => {
 main()
 ```
 
-Once this is working, if you want to learn more about the [query interface](/docs/reference/javascript/filter) you might want to try some of these challenges:
+Once this is working, if you want to learn more about the [query interface](/docs/reference/javascript/using-filters-filter) you might want to try some of these challenges:
 
 ```jsx
 // 1. List all the countries in Antarctica
@@ -127,11 +127,11 @@ const { data, error } = await supabase
   .select('name, country_id')
   .neq('name', 'The shire')
 
-// full docs here: /docs/reference/javascript/filter
+// full docs here: /docs/reference/javascript/using-filters-filter
 ```
 
 We look forward to showing off some more Supabase + Replit examples.
 
 You can find my example repl here: [https://repl.it/@awalias/supabase-test#index.js](https://repl.it/@awalias/supabase-test#index.js)
 
-Supabase has a Free Plan, head over to [https://supabase.com/dashboard](https://supabase.com/dashboard) to get started.
+Supabase has a [Free Plan](/pricing), head over to [https://supabase.com/dashboard](https://supabase.com/dashboard) to get started.

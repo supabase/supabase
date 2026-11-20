@@ -1,12 +1,13 @@
+import { useParams } from 'common'
 import { useRouter } from 'next/router'
 import { toast } from 'sonner'
-
-import { useParams } from 'common'
-import { useContentDeleteMutation } from 'data/content/content-delete-mutation'
-import { Snippet } from 'data/content/sql-folders-query'
-import { useSqlEditorV2StateSnapshot } from 'state/sql-editor-v2'
-import { createTabId, useTabsStateSnapshot } from 'state/tabs'
 import ConfirmationModal from 'ui-patterns/Dialogs/ConfirmationModal'
+
+import { useContentDeleteMutation } from '@/data/content/content-delete-mutation'
+import { Snippet } from '@/data/content/sql-folders-query'
+import { useDashboardHistory } from '@/hooks/misc/useDashboardHistory'
+import { useSqlEditorV2StateSnapshot } from '@/state/sql-editor/sql-editor-state'
+import { createTabId, useTabsStateSnapshot } from '@/state/tabs'
 
 export const DeleteSnippetsModal = ({
   snippets,
@@ -21,8 +22,13 @@ export const DeleteSnippetsModal = ({
   const { ref: projectRef, id } = useParams()
   const tabs = useTabsStateSnapshot()
   const snapV2 = useSqlEditorV2StateSnapshot()
+  const { clearSnippetsFromHistory } = useDashboardHistory()
 
   const postDeleteCleanup = (ids: string[]) => {
+    // Purge the deleted snippets from dashboard history first, so that navigating
+    // to the SQL editor doesn't redirect back to a deleted snippet
+    clearSnippetsFromHistory(ids)
+
     if (!!id && ids.includes(id)) {
       const openedSQLTabs = tabs.openTabs.filter((x) => x.startsWith('sql-') && !x.includes(id))
       if (openedSQLTabs.length > 0) {
@@ -37,7 +43,7 @@ export const DeleteSnippetsModal = ({
     if (ids.length > 0) ids.forEach((id) => snapV2.removeSnippet(id))
   }
 
-  const { mutate: deleteContent, isLoading: isDeleting } = useContentDeleteMutation({
+  const { mutate: deleteContent, isPending: isDeleting } = useContentDeleteMutation({
     onSuccess: (data) => {
       toast.success(
         `Successfully deleted ${snippets.length.toLocaleString()} quer${snippets.length > 1 ? 'ies' : 'y'}`
@@ -89,9 +95,11 @@ export const DeleteSnippetsModal = ({
     >
       <p className="text-sm">
         This action cannot be undone.{' '}
-        {snippets.length === 1
-          ? `Are you sure you want to delete '${snippets[0]?.name}'?`
-          : `Are you sure you want to delete the selected ${snippets.length} quer${snippets.length > 1 ? 'ies' : 'y'}?`}
+        {snippets.length === 1 ? (
+          <span>{`Are you sure you want to delete '${snippets[0]?.name}'?`}</span>
+        ) : (
+          <span>{`Are you sure you want to delete the selected ${snippets.length} quer${snippets.length > 1 ? 'ies' : 'y'}?`}</span>
+        )}
       </p>
     </ConfirmationModal>
   )

@@ -1,6 +1,7 @@
+import * as React from 'react'
+
 import { ClassLabel } from '@/components/class-label'
 import { ExampleLabel } from '@/components/example-label'
-import * as React from 'react'
 
 export default function Demo() {
   return (

@@ -1,9 +1,12 @@
-import { useQuery, UseQueryOptions } from '@tanstack/react-query'
+import { literal, safeSql } from '@supabase/pg-meta/src/pg-format'
+import { useQuery } from '@tanstack/react-query'
 
-import { executeSql } from 'data/sql/execute-sql-query'
-import { ResponseError } from 'types'
 import { CronJob } from './database-cron-jobs-infinite-query'
 import { databaseCronJobsKeys } from './keys'
+import { unguarded } from '@/data/fetchers'
+import { executeSql } from '@/data/sql/execute-sql-mutation'
+import type { StudioError } from '@/lib/errors/studio-errors'
+import type { UseCustomQueryOptions } from '@/types'
 
 export type DatabaseCronJobVariables = {
   projectRef?: string
@@ -23,33 +26,34 @@ export async function getDatabaseCronJob({
   const { result } = await executeSql({
     projectRef,
     connectionString,
+    sqlOrigin: 'studio',
+    queryName: 'cron-job',
     sql: !!id
-      ? `SELECT * FROM cron.job where jobid = ${id};`
-      : `SELECT * FROM cron.job where jobname = '${name}';`,
-    queryKey: ['cron-job', id],
+      ? safeSql`SELECT * FROM cron.job where jobid = ${literal(id)};`
+      : safeSql`SELECT * FROM cron.job where jobname = ${literal(name)};`,
+    queryKey: ['cron-job', id ?? name],
+    grant: unguarded.migrating,
   })
 
-  return result[0]
+  return (result[0] ?? null) as CronJob | null
 }
 
-export type DatabaseCronJobData = CronJob
-export type DatabaseCronJobError = ResponseError
+export type DatabaseCronJobData = CronJob | null
+export type DatabaseCronJobError = StudioError
 
 export const useCronJobQuery = <TData = DatabaseCronJobData>(
   { projectRef, connectionString, id, name }: DatabaseCronJobVariables,
   {
     enabled = true,
     ...options
-  }: UseQueryOptions<DatabaseCronJobData, DatabaseCronJobError, TData> = {}
+  }: UseCustomQueryOptions<DatabaseCronJobData, DatabaseCronJobError, TData> = {}
 ) =>
-  useQuery<DatabaseCronJobData, DatabaseCronJobError, TData>(
-    databaseCronJobsKeys.job(projectRef, id ?? name),
-    () => getDatabaseCronJob({ projectRef, connectionString, id }),
-    {
-      enabled:
-        enabled &&
-        typeof projectRef !== 'undefined' &&
-        (typeof id !== 'undefined' || typeof name !== 'undefined'),
-      ...options,
-    }
-  )
+  useQuery<DatabaseCronJobData, DatabaseCronJobError, TData>({
+    queryKey: databaseCronJobsKeys.job(projectRef, id ?? name),
+    queryFn: () => getDatabaseCronJob({ projectRef, connectionString, id, name }),
+    enabled:
+      enabled &&
+      typeof projectRef !== 'undefined' &&
+      (typeof id !== 'undefined' || typeof name !== 'undefined'),
+    ...options,
+  })

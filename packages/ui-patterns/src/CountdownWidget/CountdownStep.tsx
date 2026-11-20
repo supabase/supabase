@@ -26,7 +26,7 @@ function CountdownStep({ value, unit, showCard = true, size = 'small' }: Countdo
       className={cn(
         'uppercase tracking-[0.05rem] text-sm',
         showCard
-          ? 'rounded-md p-[1px] overflow-hidden bg-gradient-to-b from-border-muted to-border-muted/20'
+          ? 'rounded-md p-px overflow-hidden bg-linear-to-b from-border-muted to-border-muted/20'
           : 'tracking-[0.1rem]',
         isLarge && 'text-lg'
       )}

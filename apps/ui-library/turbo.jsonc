@@ -1,0 +1,72 @@
+{
+  "$schema": "./../../node_modules/turbo/schema.json",
+  "extends": ["//"],
+  "tasks": {
+    // Regenerates the committed registry JSON (public/r) and the preview index. CI runs this
+    // directly and checks `git status`, so the output has to stay deterministic.
+    "build:registry": {
+      "inputs": ["$TURBO_DEFAULT$", "!public/r/**", "!__registry__/**"],
+      "outputs": ["public/r/**", "__registry__/**"],
+    },
+    "build:content": {
+      "outputs": [".velite/**"],
+    },
+    // Inlines the registry JSON from public/r into the markdown, so it needs build:registry.
+    // Shares public/markdown/ with build:markdown-index, so only claim this script's own files.
+    "build:markdown": {
+      "dependsOn": ["build:registry"],
+      "outputs": ["public/markdown/docs/**", "public/markdown/manifest.json"],
+    },
+    "build:markdown-index": {
+      "outputs": ["public/markdown/index.md", "public/llms.txt"],
+    },
+    // Watches the MDX content next to `next dev`. Waits for the one-off content build so the
+    // two don't write .velite at the same time.
+    "dev:content": {
+      "dependsOn": ["build:content"],
+      "cache": false,
+      "persistent": true,
+    },
+    "dev": {
+      "dependsOn": ["build:registry", "build:content", "build:markdown", "build:markdown-index"],
+      "with": ["dev:content"],
+    },
+    "test": {
+      "dependsOn": ["build:markdown"],
+    },
+    "typecheck": {
+      "dependsOn": ["^typecheck", "build:content", "build:markdown"],
+    },
+    "build": {
+      "dependsOn": [
+        "^build",
+        "build:registry",
+        "build:content",
+        "build:markdown",
+        "build:markdown-index",
+      ],
+      "env": [
+        "NEXT_PUBLIC_BASE_PATH",
+        "NEXT_PUBLIC_APP_URL",
+        "NEXT_PUBLIC_VERCEL_TARGET_ENV",
+        "NEXT_PUBLIC_VERCEL_BRANCH_URL",
+        "NEXT_PUBLIC_API_URL",
+        "NODE_ENV",
+        "HIDE_TAILWIND_INDICATOR",
+        // These envs are used in the packages
+        "NEXT_PUBLIC_STORAGE_KEY",
+        "NEXT_PUBLIC_AUTH_DEBUG_KEY",
+        "NEXT_PUBLIC_AUTH_PERSISTED_KEY",
+        "NEXT_PUBLIC_AUTH_NAVIGATOR_LOCK_KEY",
+        "NEXT_PUBLIC_AUTH_DETECT_SESSION_IN_URL",
+        "NEXT_PUBLIC_GOOGLE_TAG_MANAGER_ID",
+        "NEXT_PUBLIC_GOTRUE_URL",
+        "NEXT_PUBLIC_SUPABASE_ANON_KEY",
+        "NEXT_PUBLIC_USERCENTRICS_RULESET_ID",
+        "SUPABASE_MANAGEMENT_API_TOKEN",
+        "OPENAI_API_KEY",
+      ],
+      "outputs": [".next/**", "!.next/cache/**", "!.next/dev/**/*"],
+    },
+  },
+}

@@ -7,31 +7,21 @@ subtitle: 'Tips for getting started with Edge Functions.'
 
 Here are a few recommendations when you first start developing Edge Functions.
 
-### Skipping authorization checks
-
-By default, Edge Functions require a valid JWT in the authorization header. If you want to use Edge Functions without Authorization checks (commonly used for Stripe webhooks), you can pass the `--no-verify-jwt` flag when serving your Edge Functions locally.
-
-```bash
-supabase functions serve hello-world --no-verify-jwt
-```
-
-Be careful when using this flag, as it will allow anyone to invoke your Edge Function without a valid JWT. The Supabase client libraries automatically handle authorization.
-
-### Using HTTP methods
+## Using HTTP methods
 
 Edge Functions support `GET`, `POST`, `PUT`, `PATCH`, `DELETE`, and `OPTIONS`. A Function can be designed to perform different actions based on a request's HTTP method. See the [example on building a RESTful service](https://github.com/supabase/supabase/tree/master/examples/edge-functions/supabase/functions/restful-tasks) to learn how to handle different HTTP methods in your Function.
 
-<Admonition type="caution" label="HTML not supported">
+<Admonition type="caution" title="HTML not supported">
 
 HTML content is not supported. `GET` requests that return `text/html` will be rewritten to `text/plain`.
 
 </Admonition>
 
-### Naming Edge Functions
+## Naming Edge Functions
 
 We recommend using hyphens to name functions because hyphens are the most URL-friendly of all the naming conventions (snake_case, camelCase, PascalCase).
 
-### Organizing your Edge Functions
+## Organizing your Edge Functions
 
 We recommend developing "fat functions". This means that you should develop few large functions, rather than many small functions. One common pattern when developing Functions is that you need to share code between two or more Functions. To do this, you can store any shared code in a folder prefixed with an underscore (`_`). We also recommend a separate folder for [Unit Tests](/docs/guides/functions/unit-test) including the name of the function followed by a `-test` suffix.
 We recommend this folder structure:
@@ -41,8 +31,8 @@ We recommend this folder structure:
     ├── functions
     │   ├── import_map.json # A top-level import map to use across functions.
     │   ├── _shared
-    │   │   ├── supabaseAdmin.ts # Supabase client with SERVICE_ROLE key.
-    │   │   └── supabaseClient.ts # Supabase client with ANON key.
+    │   │   ├── supabaseAdmin.ts # Supabase client with SECRET key.
+    │   │   └── supabaseClient.ts # Supabase client with PUBLISHABLE key.
     │   │   └── cors.ts # Reusable CORS headers.
     │   ├── function-one # Use hyphens to name functions.
     │   │   └── index.ts
@@ -55,9 +45,9 @@ We recommend this folder structure:
     └── config.toml
 ```
 
-### Using config.toml
+## Using config.toml
 
-Individual function configuration like [JWT verification](/docs/guides/cli/config#functions.function_name.verify_jwt) and [import map location](/docs/guides/cli/config#functions.function_name.import_map) can be set via the `config.toml` file.
+Individual function configuration like [JWT verification](/docs/guides/local-development/cli/config#functions.function_name.verify_jwt) and [import map location](/docs/guides/local-development/cli/config#functions.function_name.import_map) can be set via the `config.toml` file.
 
 ```toml supabase/config.toml
 [functions.hello-world]
@@ -65,7 +55,7 @@ verify_jwt = false
 import_map = './import_map.json'
 ```
 
-### Not using TypeScript
+## Not using TypeScript
 
 When you create a new Edge Function, it will use TypeScript by default. However, it is possible to write and deploy Edge Functions using pure JavaScript.
 
@@ -85,12 +75,12 @@ entrypoint = './functions/hello-world/index.js' # path must be relative to confi
 
 You can use any `.ts`, `.js`, `.tsx`, `.jsx` or `.mjs` file as the `entrypoint` for a Function.
 
-### Error handling
+## Error handling
 
 The `supabase-js` library provides several error types that you can use to handle errors that might occur when invoking Edge Functions:
 
 ```js
-import { FunctionsHttpError, FunctionsRelayError, FunctionsFetchError } from '@supabase/supabase-js'
+import { FunctionsFetchError, FunctionsHttpError, FunctionsRelayError } from '@supabase/supabase-js'
 
 const { data, error } = await supabase.functions.invoke('hello', {
   headers: { 'my-custom-header': 'my-custom-header-value' },
@@ -107,7 +97,43 @@ if (error instanceof FunctionsHttpError) {
 }
 ```
 
-### Database Functions vs Edge Functions
+## Sending Realtime messages
+
+To send a [Broadcast](/docs/guides/realtime/broadcast) message from an Edge Function, call `httpSend()` without subscribing to the channel. `httpSend()` sends the message in a single HTTP request, so no connection stays open:
+
+```ts
+import { createClient } from 'npm:@supabase/supabase-js@2'
+
+const SUPABASE_SECRET_KEYS = JSON.parse(Deno.env.get('SUPABASE_SECRET_KEYS')!)
+const supabase = createClient(Deno.env.get('SUPABASE_URL')!, SUPABASE_SECRET_KEYS['default'])
+
+Deno.serve(async (req) => {
+  const { roomId, message } = await req.json()
+
+  // Verify the caller is allowed to post to this room before sending
+  const channel = supabase.channel(`room:${roomId}`)
+  try {
+    await channel.httpSend('new-message', { message })
+  } finally {
+    await supabase.removeChannel(channel)
+  }
+
+  return new Response(null, { status: 204 })
+})
+```
+
+`httpSend()` requires `supabase-js` 2.76.0 or later. For other languages, call the [Broadcast REST API](/docs/guides/realtime/broadcast#broadcast-using-the-rest-api) directly.
+
+### Why not subscribe to the channel
+
+Subscribing from an Edge Function opens more connections than you might expect, and you're billed for each one:
+
+- Each worker that subscribes opens its own WebSocket connection and keeps it until the worker shuts down.
+- Under load, a function can run many workers at once.
+- Every connection counts toward [Realtime Peak Connections](/docs/guides/platform/manage-your-usage/realtime-peak-connections).
+- Every subscribed worker counts as a recipient of each message on the channel, which adds to [Realtime Messages](/docs/guides/platform/manage-your-usage/realtime-messages).
+
+## Database Functions vs Edge Functions
 
 For data-intensive operations we recommend using [Database Functions](/docs/guides/database/functions), which are executed within your database and can be called remotely using the [REST and GraphQL API](/docs/guides/api).
 

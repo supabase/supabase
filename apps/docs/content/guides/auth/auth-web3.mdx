@@ -13,7 +13,7 @@ Supported Web3 wallets:
 
 ## How does it work?
 
-Sign in with Web3 utilizes the [EIP 4361](https://eips.ethereum.org/EIPS/eip-4361) standard to authenticate wallet addresses off-chain. This standard is widely supported by the Ethereum and Solana ecosystems, making it the best choice for verifying wallet ownership.
+Sign in with Web3 uses the [EIP 4361](https://eips.ethereum.org/EIPS/eip-4361) standard to authenticate wallet addresses off-chain. This standard is widely supported by the Ethereum and Solana ecosystems, making it the best choice for verifying wallet ownership.
 
 Authentication works by asking the Web3 wallet application to sign a predefined message with the user's wallet. This message is parsed both by the Web3 wallet application and Supabase Auth to verify its validity and purpose, before creating a user account or session.
 
@@ -186,7 +186,7 @@ Providing a `statement` is required for most Solana wallets and this message wil
 
 If you are using a non-standard Solana wallet that does not register the `window.solana` object, or your user has multiple Solana wallets attached to the page you can disambiguate by providing the wallet object like so:
 
-- To use [Brave Wallet with Solana](https://wallet-docs.brave.com/solana):
+- To use [Brave Wallet with Solana](https://wallet-docs.brave.com/solana/):
   ```typescript
   const { data, error } = await supabase.auth.signInWithWeb3({
     chain: 'solana',
@@ -209,7 +209,7 @@ If you are using a non-standard Solana wallet that does not register the `window
 
 Although the `window.solana` global scope JavaScript API is an unofficial standard, there still are subtle differences between wallet applications. The Solana ecosystem has provided the [Solana Wallet Adapter](https://solana.com/developers/courses/intro-to-solana/interact-with-wallets#solanas-wallet-adapter) system based on the [Wallet Standard](https://github.com/wallet-standard/wallet-standard) to simplify ease of development.
 
-The Supabase JavaScript Client Library supports signing in with this approach too. Follow the [Solana Interact with Wallets](https://solana.com/developers/courses/intro-to-solana/interact-with-wallets) guide on how to install and configure your application.
+The [Supabase JavaScript Client](/docs/reference/javascript/introduction) Library supports signing in with this approach too. Follow the [Solana Interact with Wallets](https://solana.com/developers/courses/intro-to-solana/interact-with-wallets) guide on how to install and configure your application.
 
 Below is a short example on using a `<SignInButton />` component that uses the `useWallet()` React hook to obtain the connected wallet and sign the user in with it:
 
@@ -260,8 +260,8 @@ function App() {
 
 ## Frequently asked questions
 
-### How to associate an email address, phone number or social login to a user signing in with Web3?
+### How to associate an email address, phone number or social sign-in to a user signing in with Web3?
 
 Web3 wallets don't expose any identifying information about the user other than their wallet address (public key). This is why accounts that were created using Sign in with Web3 don't have any email address or phone number associated.
 
-To associate an email address, phone number or other social login with their account you can use the `supabase.auth.updateUser()` or `supabase.auth.linkIdentity()` APIs.
+To associate an email address, phone number or other social sign-in with their account you can use the `supabase.auth.updateUser()` or `supabase.auth.linkIdentity()` APIs.

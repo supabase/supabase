@@ -1,8 +1,9 @@
-import type { Dictionary } from 'types'
+import type { InferredColumnType } from './SpreadsheetImport.utils'
+import type { Dictionary } from '@/types'
 
 export interface SpreadsheetData {
   headers: string[]
-  rows: any[]
+  rows: unknown[]
   rowCount: number
-  columnTypeMap: Dictionary<string>
+  columnTypeMap: Dictionary<InferredColumnType>
 }

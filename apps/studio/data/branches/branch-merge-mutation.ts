@@ -1,21 +1,38 @@
-import { useMutation, UseMutationOptions, useQueryClient } from '@tanstack/react-query'
+import { useMutation, useQueryClient } from '@tanstack/react-query'
 import { toast } from 'sonner'
 
-import { handleError, post } from 'data/fetchers'
-import type { ResponseError } from 'types'
+import { getBranchDiff, type BranchDiffGrant } from './branch-diff-query'
 import { branchKeys } from './keys'
-import { getBranchDiff } from './branch-diff-query'
-import { upsertMigration } from '../database/migration-upsert-mutation'
+import { upsertMigration } from '@/data/database/migration-upsert-mutation'
+import { handleError, post } from '@/data/fetchers'
+import type { StudioError } from '@/lib/errors/studio-errors'
+import type { GrantFor } from '@/lib/grants'
+import type { UseCustomMutationOptions } from '@/types'
+
+export type BranchMergeGrant = GrantFor<'post', '/v1/branches/{branch_id_or_ref}/merge'>
 
 export type BranchMergeVariables = {
+  grant: BranchMergeGrant
+  diffGrant: BranchDiffGrant
   branchProjectRef: string
   baseProjectRef: string
   migration_version?: string
+  pgdelta?: boolean
 }
 
-export async function mergeBranch({ branchProjectRef, migration_version }: BranchMergeVariables) {
+export async function mergeBranch({
+  branchProjectRef,
+  migration_version,
+  pgdelta,
+  grant,
+  diffGrant,
+}: BranchMergeVariables) {
   // Step 1: Get the diff output from the branch
-  const diffContent = await getBranchDiff({ branchRef: branchProjectRef })
+  const diffContent = await getBranchDiff({
+    branchRef: branchProjectRef,
+    pgdelta,
+    grant: diffGrant,
+  })
 
   let migrationCreated = false
 
@@ -38,6 +55,7 @@ export async function mergeBranch({ branchProjectRef, migration_version }: Branc
   const { data, error } = await post('/v1/branches/{branch_id_or_ref}/merge', {
     params: { path: { branch_id_or_ref: branchProjectRef } },
     body: { migration_version },
+    grant,
   })
 
   if (error) {
@@ -59,28 +77,26 @@ export const useBranchMergeMutation = ({
   onError,
   ...options
 }: Omit<
-  UseMutationOptions<BranchMergeData, ResponseError, BranchMergeVariables>,
+  UseCustomMutationOptions<BranchMergeData, StudioError, BranchMergeVariables>,
   'mutationFn'
 > = {}) => {
   const queryClient = useQueryClient()
-  return useMutation<BranchMergeData, ResponseError, BranchMergeVariables>(
-    (vars) => mergeBranch(vars),
-    {
-      async onSuccess(data, variables, context) {
-        const { baseProjectRef } = variables
-        await queryClient.invalidateQueries(branchKeys.list(baseProjectRef))
-        await onSuccess?.(data, variables, context)
-      },
-      async onError(data, variables, context) {
-        if (onError === undefined) {
-          let errorMessage = data.message || 'Unknown error occurred'
+  return useMutation<BranchMergeData, StudioError, BranchMergeVariables>({
+    mutationFn: (vars) => mergeBranch(vars),
+    async onSuccess(data, variables, context) {
+      const { baseProjectRef } = variables
+      await queryClient.invalidateQueries({ queryKey: branchKeys.list(baseProjectRef) })
+      await onSuccess?.(data, variables, context)
+    },
+    async onError(data, variables, context) {
+      if (onError === undefined) {
+        let errorMessage = data.message || 'Unknown error occurred'
 
-          toast.error(`Failed to merge branch: ${errorMessage}`)
-        } else {
-          onError(data, variables, context)
-        }
-      },
-      ...options,
-    }
-  )
+        toast.error(`Failed to merge branch: ${errorMessage}`)
+      } else {
+        onError(data, variables, context)
+      }
+    },
+    ...options,
+  })
 }

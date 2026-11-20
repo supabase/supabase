@@ -1,23 +1,29 @@
-import { useQuery, UseQueryOptions } from '@tanstack/react-query'
 import { components } from 'api-types'
-import { get, handleError } from 'data/fetchers'
-import { ResponseError } from 'types'
+
 import { jwtSigningKeysKeys } from './keys'
+import { get, handleError } from '@/data/fetchers'
+import { grantedQueryOptions, type GrantedQueryCallerOptions } from '@/data/granted-query-options'
+import type { StudioError } from '@/lib/errors/studio-errors'
+import type { GrantFor } from '@/lib/grants'
 
-export type JWTSigningKey = components['schemas']['SigningKeyResponse']
+export type JWTSigningKey = components['schemas']['SigningKeyResponse_Output']
+export type JWTAlgorithm = components['schemas']['SigningKeyResponse_Output']['algorithm']
 
-export type JWTAlgorithm = components['schemas']['SigningKeyResponse']['algorithm']
+export type JWTSigningKeysGrant = GrantFor<'get', '/v1/projects/{ref}/config/auth/signing-keys'>
 
 interface JWTSigningKeysVariables {
   projectRef?: string
+  grant?: JWTSigningKeysGrant
 }
 
-async function getJWTSigningKeys({ projectRef }: JWTSigningKeysVariables, signal?: AbortSignal) {
-  if (!projectRef) throw new Error('projectRef is required')
-
+async function getJWTSigningKeys(
+  { projectRef, grant }: { projectRef: string; grant: JWTSigningKeysGrant },
+  signal?: AbortSignal
+) {
   const { data, error } = await get(`/v1/projects/{ref}/config/auth/signing-keys`, {
     params: { path: { ref: projectRef } },
     signal,
+    grant,
   })
 
   if (error) {
@@ -28,16 +34,24 @@ async function getJWTSigningKeys({ projectRef }: JWTSigningKeysVariables, signal
 }
 
 export type JWTSigningKeysData = Awaited<ReturnType<typeof getJWTSigningKeys>>
+export type JWTSigningKeysError = StudioError
 
-export const useJWTSigningKeysQuery = <TData = JWTSigningKeysData>(
-  { projectRef }: JWTSigningKeysVariables,
-  { enabled, ...options }: UseQueryOptions<JWTSigningKeysData, ResponseError, TData> = {}
+export const jwtSigningKeysQueryOptions = <TData = JWTSigningKeysData>(
+  { projectRef, grant }: JWTSigningKeysVariables,
+  options?: GrantedQueryCallerOptions<
+    JWTSigningKeysData,
+    JWTSigningKeysError,
+    TData,
+    ReturnType<typeof jwtSigningKeysKeys.list>
+  >
 ) =>
-  useQuery<JWTSigningKeysData, ResponseError, TData>(
-    jwtSigningKeysKeys.list(projectRef),
-    ({ signal }) => getJWTSigningKeys({ projectRef }, signal),
+  grantedQueryOptions(
     {
-      enabled: enabled && !!projectRef,
-      ...options,
-    }
+      queryKey: jwtSigningKeysKeys.list(projectRef),
+      queryFn:
+        projectRef && grant
+          ? ({ signal }) => getJWTSigningKeys({ projectRef, grant }, signal)
+          : undefined,
+    },
+    options
   )

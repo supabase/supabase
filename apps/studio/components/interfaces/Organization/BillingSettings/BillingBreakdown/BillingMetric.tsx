@@ -1,14 +1,17 @@
+import { ChevronRightIcon } from 'lucide-react'
 import Link from 'next/link'
-
-import { PricingMetric } from 'data/analytics/org-daily-stats-query'
-import type { OrgSubscription } from 'data/subscriptions/types'
-import type { OrgUsageResponse } from 'data/usage/org-usage-query'
-import { formatCurrency } from 'lib/helpers'
-import { ChevronRight } from 'lucide-react'
 import { useMemo } from 'react'
-import { Button, cn, HoverCard, HoverCardContent, HoverCardTrigger } from 'ui'
+import { cn, Tooltip, TooltipContent, TooltipTrigger } from 'ui'
+
 import { billingMetricUnit, formatUsage } from '../helpers'
 import { Metric, USAGE_APPROACHING_THRESHOLD } from './BillingBreakdown.constants'
+import { UsageProjectName } from '@/components/interfaces/Organization/Usage/UsageProjectName'
+import { InlineLink } from '@/components/ui/InlineLink'
+import { UpgradePlanButton } from '@/components/ui/UpgradePlanButton'
+import { PricingMetric } from '@/data/analytics/org-daily-stats-query'
+import type { OrgSubscription } from '@/data/subscriptions/types'
+import type { OrgUsageResponse } from '@/data/usage/org-usage-query'
+import { formatCurrency } from '@/lib/helpers'
 
 export interface BillingMetricProps {
   idx: number
@@ -17,7 +20,7 @@ export interface BillingMetricProps {
   usage: OrgUsageResponse
   subscription: OrgSubscription
   relativeToSubscription: boolean
-  className?: string
+  projectRef?: string | null
 }
 
 export const BillingMetric = ({
@@ -26,7 +29,7 @@ export const BillingMetric = ({
   usage,
   subscription,
   relativeToSubscription,
-  className,
+  projectRef,
 }: BillingMetricProps) => {
   const usageMeta = usage.usages.find((x) => x.metric === metric.key)
 
@@ -46,11 +49,15 @@ export const BillingMetric = ({
         : usageMeta.usage.toLocaleString() + (metric.unitName ? ` ${metric.unitName}` : '')
     } else {
       return metric.units === 'bytes' || metric.units === 'gigabytes'
-        ? `${usageMeta.usage.toLocaleString() ?? 0} / ${usageMeta.pricing_free_units ?? 0} GB`
+        ? `${usageMeta.usage.toLocaleString() ?? 0} / ${usageMeta.pricing_free_units?.toLocaleString() ?? 0} GB`
         : `${usageMeta.usage.toLocaleString()} / ${usageMeta.pricing_free_units?.toLocaleString()}` +
             (metric.unitName ? ` ${metric.unitName}` : '')
     }
   }, [usageMeta, relativeToSubscription, metric])
+
+  const isLogMetricOnNonPlatformPlan =
+    (metric.key === PricingMetric.LOG_INGESTION || metric.key === PricingMetric.LOG_QUERYING) &&
+    subscription?.plan.id !== 'platform'
 
   const sortedProjectAllocations = useMemo(() => {
     if (!usageMeta || !usageMeta.project_allocations) return []
@@ -79,27 +86,33 @@ export const BillingMetric = ({
         : `(${(+(usageRatio * 100).toFixed(0)).toLocaleString()}%)`
 
   return (
-    <HoverCard openDelay={50} closeDelay={200}>
-      <HoverCardTrigger asChild>
-        <div className={cn('flex items-center justify-between', className)}>
+    <Tooltip delayDuration={100}>
+      <TooltipTrigger asChild>
+        <div className={cn('flex items-center justify-between')}>
           {metric.anchor ? (
             <Link href={`/org/${slug}/usage#${metric.anchor}`} className="block w-full group">
               <div className="group flex items-center gap-1">
-                <p className="text-sm text-foreground-light group-hover:text-foreground transition cursor-pointer">
-                  {metric.name}
+                <p className="text-sm text-foreground-light group-hover:text-foreground transition cursor-pointer items-center">
+                  <span>{metric.name}</span>
                 </p>
                 {usageMeta.available_in_plan && (
                   <span className="text-foreground-muted transition inline-block group-hover:transform group-hover:translate-x-0.5">
-                    <ChevronRight strokeWidth={1.5} size={16} className="transition" />
+                    <ChevronRightIcon strokeWidth={1.5} size={16} className="transition" />
                   </span>
                 )}
               </div>
               <span className="text-sm">{usageLabel}</span>&nbsp;
               {relativeToSubscription && usageMeta.cost && usageMeta.cost > 0 ? (
-                <span className="text-sm" translate="no">
+                <span
+                  className={cn('text-sm', isLogMetricOnNonPlatformPlan && 'line-through')}
+                  translate="no"
+                >
                   ({formatCurrency(usageMeta.cost)})
                 </span>
-              ) : usageMeta.available_in_plan && !usageMeta.unlimited && relativeToSubscription ? (
+              ) : usageMeta.available_in_plan &&
+                usageMeta.pricing_free_units !== 0 &&
+                !usageMeta.unlimited &&
+                relativeToSubscription ? (
                 <span className="text-sm">{percentageLabel}</span>
               ) : null}
             </Link>
@@ -111,7 +124,10 @@ export const BillingMetric = ({
                 <span className="text-sm" translate="no">
                   ({formatCurrency(usageMeta.cost)})
                 </span>
-              ) : usageMeta.available_in_plan && !usageMeta.unlimited && relativeToSubscription ? (
+              ) : usageMeta.available_in_plan &&
+                usageMeta.pricing_free_units !== 0 &&
+                !usageMeta.unlimited &&
+                relativeToSubscription ? (
                 <span className="text-sm">{percentageLabel}</span>
               ) : null}
             </div>
@@ -119,7 +135,9 @@ export const BillingMetric = ({
 
           {usageMeta.available_in_plan ? (
             <div>
-              {relativeToSubscription && !usageMeta.unlimited ? (
+              {relativeToSubscription &&
+              !usageMeta.unlimited &&
+              usageMeta.pricing_free_units !== 0 ? (
                 <svg className="h-8 w-8 -rotate-90 transform">
                   <circle
                     cx={15}
@@ -143,12 +161,12 @@ export const BillingMetric = ({
                     strokeWidth={4}
                     className={
                       isUsageBillingEnabled
-                        ? 'text-gray-dark-800'
+                        ? 'text-foreground-lighter'
                         : isExceededLimit
                           ? 'text-red-900'
                           : isApproachingLimit
                             ? 'text-yellow-1000'
-                            : 'text-gray-dark-800'
+                            : 'text-foreground-lighter'
                     }
                   />
                 </svg>
@@ -156,51 +174,64 @@ export const BillingMetric = ({
             </div>
           ) : (
             <div>
-              <Button type="default" asChild>
-                <Link
-                  href={`/org/${slug}/billing?panel=subscriptionPlan&source=billingBreakdownUsage${metric.anchor}`}
-                >
-                  Upgrade
-                </Link>
-              </Button>
+              <UpgradePlanButton
+                source={`billingBreakdownUsage${metric.anchor}`}
+                featureProposition={`to use ${metric.name}`}
+              >
+                Upgrade
+              </UpgradePlanButton>
             </div>
           )}
         </div>
-      </HoverCardTrigger>
+      </TooltipTrigger>
       {usageMeta.available_in_plan && (
-        <HoverCardContent side="bottom" align="end" className="w-[500px]" animate="slide-in">
-          <div className="text-sm">
+        <TooltipContent side="bottom" align="start" className="max-w-[400px]" alignOffset={-15}>
+          <div className="text-xs flex flex-col gap-y-2">
             <p className="font-medium" translate="no">
               {usageMeta.unit_price_desc}
             </p>
 
             {metric.tip && (
-              <div className="my-2">
-                <p className="text-sm">
-                  {metric.tip}{' '}
-                  {metric.docLink && (
-                    <Link
-                      href={metric.docLink.url}
-                      target="_blank"
-                      className="transition text-brand hover:text-brand-600 underline"
-                    >
-                      {metric.docLink.title}
-                    </Link>
-                  )}
-                </p>
-              </div>
+              <p className="text-foreground-light">
+                {metric.tip}{' '}
+                {metric.docLink && (
+                  <Link
+                    href={metric.docLink.url}
+                    target="_blank"
+                    className="transition text-primary hover:text-primary-hover underline"
+                  >
+                    {metric.docLink.title}
+                  </Link>
+                )}
+              </p>
             )}
 
-            {subscription.usage_billing_enabled === false &&
-              relativeToSubscription &&
-              (isApproachingLimit || isExceededLimit) && (
-                <div className="my-2">
-                  <p className="text-sm">
-                    Exceeding your plans included usage will lead to restrictions to your project.
-                    Upgrade to a usage-based plan or disable the spend cap to avoid restrictions.
+            {metric.key === PricingMetric.LOG_QUERYING && isLogMetricOnNonPlatformPlan ? (
+              <p className="text-foreground-light">
+                We won't enforce this metric until known mis-reporting issues are resolved.{' '}
+                <InlineLink href="https://github.com/orgs/supabase/discussions/50925">
+                  Share feedback on GitHub.
+                </InlineLink>
+              </p>
+            ) : (
+              <>
+                {isLogMetricOnNonPlatformPlan && (
+                  <p className="text-foreground-light">
+                    Billing and enforcement will only start after the grace period ends in early
+                    2027.
                   </p>
-                </div>
-              )}
+                )}
+                {subscription.usage_billing_enabled === false &&
+                  relativeToSubscription &&
+                  (isApproachingLimit || isExceededLimit) && (
+                    <p className="text-foreground-light">
+                      {isLogMetricOnNonPlatformPlan
+                        ? 'Enforcement will only start after the grace period ends in early 2027. Reduce your usage, upgrade to a usage-based plan or disable the spend cap to avoid restrictions.'
+                        : 'Exceeding your plans included usage will lead to restrictions to your project. Upgrade to a usage-based plan or disable the spend cap to avoid restrictions.'}
+                    </p>
+                  )}
+              </>
+            )}
 
             {sortedProjectAllocations && sortedProjectAllocations.length > 0 && (
               <table className="list-disc w-full">
@@ -210,23 +241,28 @@ export const BillingMetric = ({
                     <th className="text-right">Usage</th>
                   </tr>
                 </thead>
-                <tbody>
+                <tbody className="[&>tr:last-child>td]:pb-1">
                   {sortedProjectAllocations.map((allocation) => (
                     <tr key={`${usageMeta.metric}_${allocation.ref}`}>
-                      <td>{allocation.name}</td>
-                      <td className="text-right">
+                      <td className="text-foreground-light">
+                        <UsageProjectName
+                          name={allocation.name}
+                          projectRef={allocation.ref}
+                          selectedProjectRef={projectRef}
+                        />
+                      </td>
+                      <td className="text-foreground-light text-right">
                         {formatUsage(usageMeta.metric as PricingMetric, allocation)}
                       </td>
                     </tr>
                   ))}
-                  <tr></tr>
                 </tbody>
                 <tfoot>
                   <tr>
-                    <td className="py-2 border-t text-left">
+                    <td className="py-1 border-t text-left">
                       Total{unit && <span> ({unit})</span>}
                     </td>
-                    <td className="py-2 border-t text-right">
+                    <td className="py-1 border-t text-right">
                       {formatUsage(usageMeta.metric as PricingMetric, {
                         usage: usageMeta.usage_original,
                       })}{' '}
@@ -236,8 +272,8 @@ export const BillingMetric = ({
               </table>
             )}
           </div>
-        </HoverCardContent>
+        </TooltipContent>
       )}
-    </HoverCard>
+    </Tooltip>
   )
 }

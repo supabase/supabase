@@ -4,7 +4,7 @@ subtitle: 'Scalability Benchmarks for Supabase Realtime.'
 description: 'Scalability Benchmarks for Supabase Realtime.'
 ---
 
-This guide explores the scalability of Realtime's features: Broadcast, Presence, and Postgres Changes.
+This guide explores the scalability of Realtime's features: Broadcast, Presence, and [Postgres Changes](/docs/guides/realtime/postgres-changes).
 
 ## Methodology
 
@@ -137,7 +137,7 @@ This workload demonstrates Realtime's capability to handle high-scale scenarios 
 
 ### Realtime Auth
 
-This workload demonstrates Realtime's capability to handle large amounts of new connections per second and channel joins per second with Authentication Row Level Security (RLS) enabled for these channels. The test simulates a scenario where large volumes of users connect to realtime and participate in auth protected communications. Each virtual user (VU):
+This workload demonstrates Realtime's capability to handle large amounts of new connections per second and channel joins per second with Authentication [Row Level Security](/docs/guides/database/postgres/row-level-security) (RLS) enabled for these channels. The test simulates a scenario where large volumes of users connect to realtime and participate in auth protected communications. Each virtual user (VU):
 
 - Establishes and maintains a WebSocket connection (2.5 minutes)
 - Joins 2 broadcast channels

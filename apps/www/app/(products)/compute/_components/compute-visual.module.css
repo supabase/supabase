@@ -1,0 +1,19 @@
+/* Marching-dashes flow on the connector lines between sources, workloads, and
+ * the application. Every connector path is authored source -> target, so a
+ * negative offset makes the dashes travel in the direction of the flow. */
+.flow {
+  stroke-dasharray: 3 9;
+  animation: flow 0.9s linear infinite;
+}
+
+@keyframes flow {
+  to {
+    stroke-dashoffset: -12;
+  }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .flow {
+    animation: none;
+  }
+}

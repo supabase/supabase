@@ -1,4 +1,5 @@
-import { describe, it, expect } from 'vitest'
+import { describe, expect, it } from 'vitest'
+
 import { isNonNullable } from './isNonNullable.js'
 
 describe(`isNonNullable`, () => {
@@ -14,7 +15,6 @@ describe(`isNonNullable`, () => {
     // Falsy
     [``, true],
     [NaN, true],
-    [0, true],
     [0, true],
     [false, true],
     // Type coercion

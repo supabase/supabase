@@ -1,7 +1,8 @@
 'use client'
 
-import { client } from '@/registry/default/platform/platform-kit-nextjs/lib/management-api'
 import { useQuery } from '@tanstack/react-query'
+
+import { client } from '@/registry/default/platform/platform-kit-nextjs/lib/management-api'
 
 // GET Logs
 const getLogs = async ({

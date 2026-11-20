@@ -1,9 +1,9 @@
-import { useIsFeatureEnabled } from 'hooks/misc/useIsFeatureEnabled'
 import ContentSnippet from '../ContentSnippet'
 import { DOCS_CONTENT } from '../ProjectAPIDocs.constants'
 import type { ContentProps } from './Content.types'
+import { useIsFeatureEnabled } from '@/hooks/misc/useIsFeatureEnabled'
 
-const UserManagement = ({ language, apikey, endpoint }: ContentProps) => {
+export const UserManagement = ({ language, apikey, endpoint }: ContentProps) => {
   const { authenticationSignInProviders } = useIsFeatureEnabled([
     'authentication:sign_in_providers',
   ])
@@ -87,5 +87,3 @@ const UserManagement = ({ language, apikey, endpoint }: ContentProps) => {
     </>
   )
 }
-
-export default UserManagement

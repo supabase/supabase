@@ -1,20 +1,25 @@
-import { useMutation, UseMutationOptions, useQueryClient } from '@tanstack/react-query'
+import pgMeta, { asWriteSql } from '@supabase/pg-meta'
+import type { PGFunctionCreate } from '@supabase/pg-meta/src/pg-meta-functions'
+import { useMutation, useQueryClient } from '@tanstack/react-query'
 import { toast } from 'sonner'
 import { z } from 'zod'
 
-import pgMeta from '@supabase/pg-meta'
-import { databaseKeys } from 'data/database/keys'
-import { executeSql } from 'data/sql/execute-sql-query'
-import type { ResponseError } from 'types'
+import { databaseKeys } from '@/data/database/keys'
+import { isUserFaultForSql } from '@/data/error-classification'
+import { executeSql, type PgMetaWriteGrant } from '@/data/sql/execute-sql-mutation'
+import type { StudioError } from '@/lib/errors/studio-errors'
+import type { UseCustomMutationOptions } from '@/types'
 
 export type DatabaseFunctionCreateVariables = {
   projectRef: string
+  grant: PgMetaWriteGrant
   connectionString?: string | null
-  payload: z.infer<typeof pgMeta.functions.pgFunctionCreateZod>
+  payload: PGFunctionCreate
 }
 
 export async function createDatabaseFunction({
   projectRef,
+  grant,
   connectionString,
   payload,
 }: DatabaseFunctionCreateVariables) {
@@ -23,8 +28,13 @@ export async function createDatabaseFunction({
   const { result } = await executeSql({
     projectRef,
     connectionString,
-    sql,
+    sql: asWriteSql(sql),
+    // Studio composes the statement, but the user wrote the expressions and bodies Postgres parses
+    sqlOrigin: 'studio',
+    queryName: 'database-function-create',
+    isUserFaultSqlState: isUserFaultForSql,
     queryKey: ['functions', 'create'],
+    grant,
   })
 
   return result as z.infer<typeof zod>
@@ -37,27 +47,29 @@ export const useDatabaseFunctionCreateMutation = ({
   onError,
   ...options
 }: Omit<
-  UseMutationOptions<DatabaseFunctionCreateData, ResponseError, DatabaseFunctionCreateVariables>,
+  UseCustomMutationOptions<
+    DatabaseFunctionCreateData,
+    StudioError,
+    DatabaseFunctionCreateVariables
+  >,
   'mutationFn'
 > = {}) => {
   const queryClient = useQueryClient()
 
-  return useMutation<DatabaseFunctionCreateData, ResponseError, DatabaseFunctionCreateVariables>(
-    (vars) => createDatabaseFunction(vars),
-    {
-      async onSuccess(data, variables, context) {
-        const { projectRef } = variables
-        await queryClient.invalidateQueries(databaseKeys.databaseFunctions(projectRef))
-        await onSuccess?.(data, variables, context)
-      },
-      async onError(data, variables, context) {
-        if (onError === undefined) {
-          toast.error(`Failed to create database function: ${data.message}`)
-        } else {
-          onError(data, variables, context)
-        }
-      },
-      ...options,
-    }
-  )
+  return useMutation<DatabaseFunctionCreateData, StudioError, DatabaseFunctionCreateVariables>({
+    mutationFn: (vars) => createDatabaseFunction(vars),
+    async onSuccess(data, variables, context) {
+      const { projectRef } = variables
+      await queryClient.invalidateQueries({ queryKey: databaseKeys.databaseFunctions(projectRef) })
+      await onSuccess?.(data, variables, context)
+    },
+    async onError(data, variables, context) {
+      if (onError === undefined) {
+        toast.error(`Failed to create database function: ${data.message}`)
+      } else {
+        onError(data, variables, context)
+      }
+    },
+    ...options,
+  })
 }

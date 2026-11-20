@@ -1,19 +1,23 @@
-import { useMutation, UseMutationOptions, useQueryClient } from '@tanstack/react-query'
-import { toast } from 'sonner'
-import pgMeta from '@supabase/pg-meta'
-import type { ResponseError } from 'types'
-import { databaseTriggerKeys } from './keys'
-import { executeSql } from 'data/sql/execute-sql-query'
+import pgMeta, { asWriteSql } from '@supabase/pg-meta'
 import { PGTriggerCreate } from '@supabase/pg-meta/src/pg-meta-triggers'
+import { useMutation, useQueryClient } from '@tanstack/react-query'
+import { toast } from 'sonner'
+
+import { databaseTriggerKeys } from './keys'
+import { executeSql, type PgMetaWriteGrant } from '@/data/sql/execute-sql-mutation'
+import type { StudioError } from '@/lib/errors/studio-errors'
+import type { UseCustomMutationOptions } from '@/types'
 
 export type DatabaseTriggerCreateVariables = {
   projectRef: string
+  grant: PgMetaWriteGrant
   connectionString?: string | null
   payload: PGTriggerCreate
 }
 
 export async function createDatabaseTrigger({
   projectRef,
+  grant,
   connectionString,
   payload,
 }: DatabaseTriggerCreateVariables) {
@@ -22,8 +26,11 @@ export async function createDatabaseTrigger({
   const { result } = await executeSql({
     projectRef,
     connectionString,
-    sql,
+    sqlOrigin: 'studio',
+    queryName: 'trigger-create',
+    sql: asWriteSql(sql),
     queryKey: ['trigger', 'create'],
+    grant,
   })
 
   return result
@@ -36,27 +43,25 @@ export const useDatabaseTriggerCreateMutation = ({
   onError,
   ...options
 }: Omit<
-  UseMutationOptions<DatabaseTriggerCreateData, ResponseError, DatabaseTriggerCreateVariables>,
+  UseCustomMutationOptions<DatabaseTriggerCreateData, StudioError, DatabaseTriggerCreateVariables>,
   'mutationFn'
 > = {}) => {
   const queryClient = useQueryClient()
 
-  return useMutation<DatabaseTriggerCreateData, ResponseError, DatabaseTriggerCreateVariables>(
-    (vars) => createDatabaseTrigger(vars),
-    {
-      async onSuccess(data, variables, context) {
-        const { projectRef } = variables
-        await queryClient.invalidateQueries(databaseTriggerKeys.list(projectRef))
-        await onSuccess?.(data, variables, context)
-      },
-      async onError(data, variables, context) {
-        if (onError === undefined) {
-          toast.error(`Failed to create database trigger: ${data.message}`)
-        } else {
-          onError(data, variables, context)
-        }
-      },
-      ...options,
-    }
-  )
+  return useMutation<DatabaseTriggerCreateData, StudioError, DatabaseTriggerCreateVariables>({
+    mutationFn: (vars) => createDatabaseTrigger(vars),
+    async onSuccess(data, variables, context) {
+      const { projectRef } = variables
+      await queryClient.invalidateQueries({ queryKey: databaseTriggerKeys.list(projectRef) })
+      await onSuccess?.(data, variables, context)
+    },
+    async onError(data, variables, context) {
+      if (onError === undefined) {
+        toast.error(`Failed to create database trigger: ${data.message}`)
+      } else {
+        onError(data, variables, context)
+      }
+    },
+    ...options,
+  })
 }

@@ -1,33 +1,93 @@
-import posthog from 'posthog-js'
-import { PostHogConfig } from 'posthog-js'
+import posthog, {
+  type CapturedNetworkRequest,
+  type PostHogConfig,
+  type SessionRecordingOptions,
+} from 'posthog-js'
+
+import { safeSessionStorage } from './safe-storage'
+import {
+  getTelemetryCookieOptions,
+  getTelemetryPlatform,
+  redactEventUrlKeywords,
+} from './telemetry-utils'
+
+export type { CapturedNetworkRequest, SessionRecordingOptions }
 
 // Limit the max number of queued events
 // (e.g. if a user navigates around a lot before accepting consent)
 const MAX_PENDING_EVENTS = 20
 
+export interface ClientTelemetryEvent {
+  id: string
+  timestamp: number
+  eventType: 'capture' | 'identify' | 'pageview' | 'pageleave'
+  eventName: string
+  distinctId?: string
+  properties?: Record<string, unknown>
+}
+
+type ClientTelemetryListener = (event: ClientTelemetryEvent) => void
+
 interface PostHogClientConfig {
   apiKey?: string
   apiHost?: string
+  uiHost?: string
+}
+
+interface PostHogInitOptions {
+  hasConsent?: boolean
+  /**
+   * Masking policy for session replay. Omit to disable recording, which every app
+   * sharing this PostHog project does unless it passes a policy of its own.
+   */
+  sessionReplay?: SessionRecordingOptions
+}
+
+/**
+ * Enables session recording when given a masking config, and disables it when
+ * given nothing.
+ */
+export function buildSessionRecordingConfig(
+  sessionReplay?: SessionRecordingOptions
+): Partial<PostHogConfig> {
+  return {
+    disable_session_recording: !sessionReplay,
+    // Console output is not in the DOM, so text masking cannot reach it.
+    enable_recording_console_log: false,
+    ...(sessionReplay && { session_recording: sessionReplay }),
+  }
 }
 
 class PostHogClient {
+  /** True after posthog.init() is called (prevents double-init) */
+  private initStarted = false
+  /** True after the `loaded` callback fires, meaning PostHog has fully bootstrapped */
   private initialized = false
   private pendingGroups: Record<string, string> = {}
   private pendingIdentification: { userId: string; properties?: Record<string, any> } | null = null
   private pendingEvents: Array<{ event: string; properties: Record<string, any> }> = []
+  private pendingExposures: Array<{ experimentId: string; properties: Record<string, any> }> = []
   private config: PostHogClientConfig
   private readonly maxPendingEvents = MAX_PENDING_EVENTS
+  private devListeners: Set<ClientTelemetryListener> = new Set()
+  private pendingFeatureFlagCallbacks: Set<() => void> = new Set()
+  private optedOut = false
 
   constructor(config: PostHogClientConfig = {}) {
+    const apiHost =
+      config.apiHost || process.env.NEXT_PUBLIC_POSTHOG_HOST || 'https://ph.supabase.green'
+    const uiHost =
+      config.uiHost || process.env.NEXT_PUBLIC_POSTHOG_UI_HOST || 'https://eu.posthog.com'
+
     this.config = {
       apiKey: config.apiKey || process.env.NEXT_PUBLIC_POSTHOG_KEY,
-      apiHost:
-        config.apiHost || process.env.NEXT_PUBLIC_POSTHOG_HOST || 'https://ph.supabase.green',
+      apiHost,
+      uiHost,
     }
   }
 
-  init(hasConsent: boolean = true) {
-    if (this.initialized || typeof window === 'undefined' || !hasConsent) return
+  init({ hasConsent = true, sessionReplay }: PostHogInitOptions = {}) {
+    if (this.initStarted || typeof window === 'undefined' || !hasConsent) return
 
     if (!this.config.apiKey) {
       console.warn('PostHog API key not found. Skipping initialization.')
@@ -36,10 +96,38 @@ class PostHogClient {
 
     const config: Partial<PostHogConfig> = {
       api_host: this.config.apiHost,
+      ui_host: this.config.uiHost,
       autocapture: false, // We'll manually track events
       capture_pageview: false, // We'll manually track pageviews
       capture_pageleave: false, // We'll manually track page leaves
+      opt_out_persistence_by_default: true,
+      // Despite the name, 0 turns off the 5-minute and tab-focus flag reloads. Flags still
+      // load on init, identify and group changes.
+      remote_config_refresh_interval_ms: 0,
+      ...buildSessionRecordingConfig(sessionReplay),
+      // Not posthog.register(): super properties persist in localStorage shared by every
+      // supabase.com app, so events sent before register() runs carry the last app's value.
+      before_send: (event) => {
+        const platform = getTelemetryPlatform()
+        if (event && platform) event.properties.platform = platform
+        if (event) redactEventUrlKeywords(event)
+        return event
+      },
       loaded: (posthog) => {
+        // init() only runs with consent. Clear an earlier opt-out before the flushes below,
+        // which capture() would otherwise drop.
+        this.optIn()
+
+        // Read first so onSessionId replays the id: a reload that finds the session unchanged
+        // reports no change. Subscribed before the flushes below, which can rotate it.
+        posthog.get_session_id()
+        posthog.onSessionId((sessionId) => {
+          // Skip while opted out, here or in another tab: an opt-out resets the session, and
+          // writing the new id would restore the cookie that withdrawing consent cleared.
+          if (this.optedOut || posthog.has_opted_out_capturing()) return
+          document.cookie = `session_id=${sessionId}; ${getTelemetryCookieOptions()}`
+        })
+
         // Apply pending properties that were set before PostHog
         // initialized due to poor connection or user not accepting
         // consent right away
@@ -72,11 +160,23 @@ class PostHogClient {
           }
         })
         this.pendingEvents = []
+
+        this.initialized = true
+
+        // Flush any pending experiment exposures (with deduplication)
+        this.pendingExposures.forEach(({ experimentId, properties }) => {
+          this.fireExposureIfNew(experimentId, properties)
+        })
+        this.pendingExposures = []
       },
     }
 
+    this.initStarted = true
     posthog.init(this.config.apiKey, config)
-    this.initialized = true
+
+    // Register any feature flag callbacks that were queued before init
+    this.pendingFeatureFlagCallbacks.forEach((cb) => posthog.onFeatureFlags(cb))
+    this.pendingFeatureFlagCallbacks.clear()
   }
 
   capturePageView(properties: Record<string, any>, hasConsent: boolean = true) {
@@ -101,6 +201,8 @@ class PostHogClient {
       }
 
       posthog.capture('$pageview', properties, { transport: 'sendBeacon' })
+
+      this.emitToDevListeners('pageview', '$pageview', properties)
     } catch (error) {
       console.error('PostHog pageview capture failed:', error)
     }
@@ -122,6 +224,8 @@ class PostHogClient {
     try {
       // Use sendBeacon for page leave to survive tab close
       posthog.capture('$pageleave', properties, { transport: 'sendBeacon' })
+
+      this.emitToDevListeners('pageleave', '$pageleave', properties)
     } catch (error) {
       console.error('PostHog pageleave capture failed:', error)
     }
@@ -131,16 +235,292 @@ class PostHogClient {
     if (!hasConsent) return
 
     if (!this.initialized) {
-      // Queue the identification for when PostHog initializes
-      this.pendingIdentification = { userId, properties }
+      // Queue the identification for when PostHog initializes. Merge properties
+      // across pre-init calls for the same user so callers don't clobber each
+      // other (e.g. useTelemetryIdentify sets gotrue_id, then a separate effect
+      // sets org_count — both should land when the SDK flushes).
+      const pending = this.pendingIdentification
+      this.pendingIdentification =
+        pending && pending.userId === userId
+          ? { userId, properties: { ...pending.properties, ...properties } }
+          : { userId, properties }
       return
     }
 
     try {
       posthog.identify(userId, properties)
+
+      this.emitToDevListeners('identify', '$identify', { userId, ...properties })
     } catch (error) {
       console.error('PostHog identify failed:', error)
     }
+  }
+
+  reset() {
+    this.pendingIdentification = null
+    this.pendingGroups = {}
+    this.pendingEvents = []
+    this.pendingExposures = []
+
+    if (!this.initStarted) return
+
+    try {
+      // posthog.reset() clears the stored opt-out, so a sign-out would otherwise resume capture.
+      // The stored value covers an opt-out made in another tab.
+      const wasOptedOut = this.optedOut || posthog.has_opted_out_capturing()
+      posthog.reset()
+      if (wasOptedOut) posthog.opt_out_capturing()
+    } catch (error) {
+      console.error('PostHog reset failed:', error)
+    }
+  }
+
+  optOut() {
+    this.optedOut = true
+    this.reset()
+  }
+
+  optIn() {
+    this.optedOut = false
+    if (!this.initStarted) return
+
+    try {
+      if (posthog.has_opted_out_capturing()) {
+        posthog.opt_in_capturing({ captureEventName: false })
+      }
+    } catch (error) {
+      console.error('PostHog opt in failed:', error)
+    }
+  }
+
+  /**
+   * Returns PostHog's distinct_id, which holds first-touch attribution data.
+   * Falls back to reading from PostHog cookie if SDK isn't initialized yet
+   * (e.g., immediately after OAuth redirect before PostHog loads).
+   */
+  getDistinctId(): string | undefined {
+    if (this.initialized) {
+      try {
+        return posthog.get_distinct_id()
+      } catch (error) {
+        console.error('PostHog getDistinctId failed:', error)
+      }
+    }
+
+    // Fallback: parse distinct_id from PostHog cookie
+    return this.getDistinctIdFromCookie()
+  }
+
+  /**
+   * Parse distinct_id from PostHog cookie.
+   * PostHog stores data in a cookie named `ph_<api_key>_posthog` with format:
+   * { distinct_id: "...", ... }
+   */
+  private getDistinctIdFromCookie(): string | undefined {
+    if (typeof document === 'undefined') return undefined
+
+    try {
+      const cookieName = `ph_${this.config.apiKey}_posthog`
+      const cookies = document.cookie.split(';')
+
+      for (const cookie of cookies) {
+        const trimmed = cookie.trim()
+        const eqIndex = trimmed.indexOf('=')
+        if (eqIndex === -1) continue
+
+        const name = trimmed.substring(0, eqIndex)
+        if (name !== cookieName) continue
+
+        // Use substring instead of split to handle '=' chars in the value
+        const cookieValue = decodeURIComponent(trimmed.substring(eqIndex + 1))
+        const phData = JSON.parse(cookieValue)
+
+        if (phData.distinct_id && typeof phData.distinct_id === 'string') {
+          return phData.distinct_id
+        }
+      }
+    } catch {
+      // No op, cookie may not exist (first visit) or be malformed
+    }
+
+    return undefined
+  }
+
+  /**
+   * Returns the current value of a person property as stored locally by posthog-js.
+   * Returns undefined if PostHog hasn't initialized or the property hasn't been set.
+   * Use this to gate behavior on whether a property has actually landed in the SDK
+   * (e.g., waiting for an identify to complete before evaluating flag-dependent UI).
+   *
+   * Person properties set via `identify(id, props)` are stored under the
+   * `$stored_person_properties` bucket in persistence — `get_property(key)`
+   * reads top-level super properties, not person properties, so we index in.
+   */
+  getPersonProperty(key: string): unknown {
+    if (!this.initialized) return undefined
+    try {
+      const stored = posthog.get_property('$stored_person_properties')
+      if (!stored || typeof stored !== 'object') return undefined
+      return (stored as Record<string, unknown>)[key]
+    } catch {
+      return undefined
+    }
+  }
+
+  /**
+   * Returns a PostHog feature flag value directly from the client-side SDK.
+   * Use this for www/docs pages where server-side evaluation lacks full person context.
+   * In local dev, DevToolbar overrides (x-ph-flag-overrides cookie) take priority.
+   */
+  getFeatureFlag(key: string): string | boolean | undefined {
+    if (typeof document === 'undefined') return undefined
+
+    if (process.env.NODE_ENV === 'development') {
+      try {
+        const cookieEntry = document.cookie
+          .split(';')
+          .map((c) => c.trim())
+          .find((c) => c.startsWith('x-ph-flag-overrides='))
+        if (cookieEntry) {
+          const overrides = JSON.parse(
+            decodeURIComponent(cookieEntry.substring('x-ph-flag-overrides='.length))
+          )
+          if (key in overrides) return overrides[key]
+        }
+      } catch {}
+    }
+
+    if (!this.initialized) return undefined
+
+    try {
+      return posthog.getFeatureFlag(key)
+    } catch {
+      return undefined
+    }
+  }
+
+  /**
+   * Subscribe to PostHog feature flag loads/reloads.
+   * Returns an unsubscribe function.
+   */
+  onFeatureFlags(callback: () => void): () => void {
+    if (!this.initStarted) {
+      // Queue until init() is called
+      this.pendingFeatureFlagCallbacks.add(callback)
+      return () => this.pendingFeatureFlagCallbacks.delete(callback)
+    }
+    if (typeof posthog.onFeatureFlags !== 'function') return () => {}
+    return posthog.onFeatureFlags(callback) ?? (() => {})
+  }
+
+  /**
+   * Returns PostHog's session_id for the current session.
+   * Returns undefined until PostHog's `loaded` callback fires.
+   */
+  getSessionId(): string | undefined {
+    if (!this.initialized) return undefined
+
+    try {
+      return posthog.get_session_id()
+    } catch (error) {
+      console.error('PostHog getSessionId failed:', error)
+      return undefined
+    }
+  }
+
+  /**
+   * Returns PostHog's session_id after counting this call as user activity: an expired
+   * session rotates first. Returns undefined until PostHog's `loaded` callback fires.
+   */
+  refreshSessionId(): string | undefined {
+    if (!this.initialized) return undefined
+
+    try {
+      return posthog.sessionManager?.checkAndGetSessionAndWindowId().sessionId
+    } catch (error) {
+      console.error('PostHog refreshSessionId failed:', error)
+      return undefined
+    }
+  }
+
+  /**
+   * Captures an experiment exposure event with session-based deduplication.
+   * Events are queued if PostHog is not yet initialized, then deduped on flush.
+   */
+  captureExperimentExposure(
+    experimentId: string,
+    properties: Record<string, any>,
+    hasConsent: boolean = true
+  ) {
+    if (!hasConsent) return
+
+    if (!this.initialized) {
+      // Only queue if not already queued for this experiment (first exposure wins)
+      if (!this.pendingExposures.some((e) => e.experimentId === experimentId)) {
+        if (this.pendingExposures.length >= this.maxPendingEvents) {
+          this.pendingExposures.shift()
+        }
+        this.pendingExposures.push({ experimentId, properties })
+      }
+      return
+    }
+
+    this.fireExposureIfNew(experimentId, properties)
+  }
+
+  private fireExposureIfNew(experimentId: string, properties: Record<string, any>) {
+    const sessionId = this.getSessionId()
+    if (!sessionId) return
+
+    const storageKey = `ph_exposed:${experimentId}`
+
+    try {
+      if (safeSessionStorage.getItem(storageKey) === sessionId) return
+
+      const eventName = `${experimentId}_experiment_exposed`
+      posthog.capture(eventName, { experiment_id: experimentId, ...properties })
+      safeSessionStorage.setItem(storageKey, sessionId)
+    } catch (error) {
+      console.error('PostHog experiment exposure capture failed:', error)
+    }
+  }
+
+  subscribeToEvents(listener: ClientTelemetryListener): () => void {
+    this.devListeners.add(listener)
+    return () => this.devListeners.delete(listener)
+  }
+
+  private emitToDevListeners(
+    eventType: ClientTelemetryEvent['eventType'],
+    eventName: string,
+    properties?: Record<string, unknown>
+  ) {
+    if (this.devListeners.size === 0) return
+
+    let distinctId: string | undefined
+    try {
+      const id = posthog.get_distinct_id?.()
+      if (id && id.length > 0) {
+        distinctId = id
+      }
+    } catch {}
+
+    const event: ClientTelemetryEvent = {
+      id: `client-${Date.now()}-${Math.random().toString(36).slice(2, 9)}`,
+      timestamp: Date.now(),
+      eventType,
+      eventName,
+      distinctId,
+      properties,
+    }
+
+    this.devListeners.forEach((listener) => {
+      try {
+        listener(event)
+      } catch (e) {
+        console.error('Dev telemetry listener error:', e)
+      }
+    })
   }
 }
 

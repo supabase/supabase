@@ -1,22 +1,16 @@
-import { NgModule } from '@angular/core';
-import { BrowserModule } from '@angular/platform-browser';
+import { NgModule } from '@angular/core'
+import { BrowserModule } from '@angular/platform-browser'
+import { ReactiveFormsModule } from '@angular/forms'
 
-import { AppComponent } from './app';
-import { AuthComponent } from './auth/auth';
-import { AccountComponent } from './account/account';
-import { ReactiveFormsModule } from '@angular/forms';
-import { AvatarComponent } from './avatar/avatar';
+import { AppComponent } from './app.component'
+import { AuthComponent } from './auth/auth.component'
+import { AccountComponent } from './account/account.component'
+import { AvatarComponent } from './avatar/avatar.component'
 
 @NgModule({
-  declarations: [
-    AppComponent,
-    AuthComponent,
-    AccountComponent,
-    AvatarComponent,
-  ],
+  declarations: [AppComponent, AuthComponent, AccountComponent, AvatarComponent],
   imports: [BrowserModule, ReactiveFormsModule],
   providers: [],
   bootstrap: [AppComponent],
-  exports: [AppComponent, AuthComponent, AccountComponent, AvatarComponent],
 })
 export class AppModule {}

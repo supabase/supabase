@@ -1,4 +1,4 @@
-import { handleError, post } from 'data/fetchers'
+import { handleError, post } from '@/data/fetchers'
 
 interface getTemporaryAPIKeyVariables {
   projectRef?: string
@@ -6,8 +6,7 @@ interface getTemporaryAPIKeyVariables {
   expiry?: number
 }
 
-// [Joshen] This one specifically shouldn't need a useQuery hook since the expiry is meant to be short lived
-// Used in storage explorer and realtime inspector.
+// Used in storage explorer, realtime inspector and OAuth Server apps.
 export async function getTemporaryAPIKey(
   { projectRef, expiry = 300 }: getTemporaryAPIKeyVariables,
   signal?: AbortSignal
@@ -25,6 +24,7 @@ export async function getTemporaryAPIKey(
     signal,
   })
 
-  if (error) handleError(error)
+  // Called directly (see temp-api-keys-utils), not through a query
+  if (error) handleError(error, { reportImmediately: true })
   return data
 }

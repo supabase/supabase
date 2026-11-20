@@ -1,9 +1,10 @@
 'use client'
 
+import { PostgrestQueryBuilder, type PostgrestClientOptions } from '@supabase/postgrest-js'
+import { type SupabaseClient } from '@supabase/supabase-js'
+import { useEffect, useMemo, useRef, useSyncExternalStore } from 'react'
+
 import { createClient } from '@/registry/default/fixtures/lib/supabase/client'
-import { PostgrestQueryBuilder } from '@supabase/postgrest-js'
-import { SupabaseClient } from '@supabase/supabase-js'
-import { useEffect, useRef, useSyncExternalStore } from 'react'
 
 const supabase = createClient()
 
@@ -27,7 +28,13 @@ type Database =
         },
         U
       >
-    : never
+    : {
+        public: {
+          Tables: Record<string, any>
+          Views: Record<string, any>
+          Functions: Record<string, any>
+        }
+      }
 
 // Change this to the database schema you want to use
 type DatabaseSchema = Database['public']
@@ -38,8 +45,16 @@ type SupabaseTableName = keyof DatabaseSchema['Tables']
 // Extracts the table definition from the database type
 type SupabaseTableData<T extends SupabaseTableName> = DatabaseSchema['Tables'][T]['Row']
 
+// Default client options for PostgrestQueryBuilder
+type DefaultClientOptions = PostgrestClientOptions
+
 type SupabaseSelectBuilder<T extends SupabaseTableName> = ReturnType<
-  PostgrestQueryBuilder<DatabaseSchema, DatabaseSchema['Tables'][T], T>['select']
+  PostgrestQueryBuilder<
+    DefaultClientOptions,
+    DatabaseSchema,
+    DatabaseSchema['Tables'][T],
+    T
+  >['select']
 >
 
 // A function that modifies the query. Can be used to sort, filter, etc. If .range is used, it will be overwritten.
@@ -56,6 +71,9 @@ interface UseInfiniteQueryProps<T extends SupabaseTableName, Query extends strin
   pageSize?: number
   // A function that modifies the query. Can be used to sort, filter, etc. If .range is used, it will be overwritten.
   trailingQuery?: SupabaseQueryHandler<T>
+  // Optional key that identifies the current trailing query shape (e.g. filters/sort/search).
+  // When this changes, the internal store is recreated so stale paginated rows are discarded.
+  trailingQueryKey?: unknown
 }
 
 interface StoreState<TData> {
@@ -70,10 +88,17 @@ interface StoreState<TData> {
 
 type Listener = () => void
 
+interface StoreProps<T extends SupabaseTableName> {
+  tableName: T
+  columns?: string
+  pageSize?: number
+  getTrailingQuery: () => SupabaseQueryHandler<T> | undefined
+}
+
 function createStore<TData extends SupabaseTableData<T>, T extends SupabaseTableName>(
-  props: UseInfiniteQueryProps<T>
+  props: StoreProps<T>
 ) {
-  const { tableName, columns = '*', pageSize = 20, trailingQuery } = props
+  const { tableName, columns = '*', pageSize = 20, getTrailingQuery } = props
 
   let state: StoreState<TData> = {
     data: [],
@@ -105,6 +130,7 @@ function createStore<TData extends SupabaseTableData<T>, T extends SupabaseTable
       .from(tableName)
       .select(columns, { count: 'exact' }) as unknown as SupabaseSelectBuilder<T>
 
+    const trailingQuery = getTrailingQuery()
     if (trailingQuery) {
       query = trailingQuery(query)
     }
@@ -114,12 +140,8 @@ function createStore<TData extends SupabaseTableData<T>, T extends SupabaseTable
       console.error('An unexpected error occurred:', error)
       setState({ error })
     } else {
-      const deduplicatedData = ((newData || []) as TData[]).filter(
-        (item) => !state.data.find((old) => old.id === item.id)
-      )
-
       setState({
-        data: [...state.data, ...deduplicatedData],
+        data: [...state.data, ...(newData as TData[])],
         count: count || 0,
         isSuccess: true,
         error: null,
@@ -165,29 +187,37 @@ function useInfiniteQuery<
   TData extends SupabaseTableData<T>,
   T extends SupabaseTableName = SupabaseTableName,
 >(props: UseInfiniteQueryProps<T>) {
-  const storeRef = useRef(createStore<TData, T>(props))
+  const tableName = props.tableName
+  const columns = props.columns ?? '*'
+  const pageSize = props.pageSize ?? 20
+  const trailingQuery = props.trailingQuery
+  const trailingQueryKey = props.trailingQueryKey
+  const trailingQueryRef = useRef(trailingQuery)
+
+  trailingQueryRef.current = trailingQuery
+
+  const store = useMemo(
+    () =>
+      createStore<TData, T>({
+        tableName,
+        columns,
+        pageSize,
+        getTrailingQuery: () => trailingQueryRef.current,
+      }),
+    [tableName, columns, pageSize, trailingQueryKey]
+  )
 
   const state = useSyncExternalStore(
-    storeRef.current.subscribe,
-    () => storeRef.current.getState(),
+    store.subscribe,
+    () => store.getState(),
     () => initialState as StoreState<TData>
   )
 
   useEffect(() => {
-    // Recreate store if props change
-    if (
-      storeRef.current.getState().hasInitialFetch &&
-      (props.tableName !== props.tableName ||
-        props.columns !== props.columns ||
-        props.pageSize !== props.pageSize)
-    ) {
-      storeRef.current = createStore<TData, T>(props)
-    }
-
     if (!state.hasInitialFetch && typeof window !== 'undefined') {
-      storeRef.current.initialize()
+      store.initialize()
     }
-  }, [props.tableName, props.columns, props.pageSize, state.hasInitialFetch])
+  }, [state.hasInitialFetch, store])
 
   return {
     data: state.data,
@@ -197,7 +227,7 @@ function useInfiniteQuery<
     isFetching: state.isFetching,
     error: state.error,
     hasMore: state.count > state.data.length,
-    fetchNextPage: storeRef.current.fetchNextPage,
+    fetchNextPage: store.fetchNextPage,
   }
 }
 

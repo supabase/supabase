@@ -1,4 +1,5 @@
 import { useMemo } from 'react'
+
 import { ProgressBar } from './DecorativeProgressBar'
 
 interface StateOfStartupsHeaderProps {
@@ -7,12 +8,12 @@ interface StateOfStartupsHeaderProps {
 
 const DiagonalStripes = () => (
   <div
-    className="flex-grow"
+    className="grow"
     style={{
       backgroundImage: `repeating-linear-gradient(
         45deg,
-        hsl(var(--border-muted)) 0px,
-        hsl(var(--border-muted)) 1px,
+        var(--border-muted) 0px,
+        var(--border-muted) 1px,
         transparent 1px,
         transparent 8px
       )`,
@@ -29,7 +30,7 @@ const HeaderProgressBar = ({
   progressBgColor?: string
   progressFgColor?: string
 }) => (
-  <div className="flex-grow">
+  <div className="grow">
     <ProgressBar
       className="h-full"
       backgroundClassName={progressBgColor}
@@ -89,13 +90,13 @@ export function StateOfStartupsHeader({ showProgressBars = true }: StateOfStartu
 
   return (
     <header className="mt-16 md:mt-32">
-      <div className="max-w-[60rem] ml-8 md:mx-auto">
+      <div className="max-w-240 ml-8 md:mx-auto">
         <div className="flex flex-col gap-0.5 md:gap-1">
           <h1 className="sr-only">State of Startups 2025</h1>
           <TextBlock
             text="State"
             bgColor="bg-brand-300"
-            textColor="text-brand"
+            textColor="text-primary"
             showProgressBar={showProgressBars}
             delay={randomDelays[0]}
             progressBgColor="bg-surface-400 dark:bg-surface-300"
@@ -104,7 +105,7 @@ export function StateOfStartupsHeader({ showProgressBars = true }: StateOfStartu
           <TextBlock
             text="of"
             bgColor="bg-brand-300"
-            textColor="text-brand"
+            textColor="text-primary"
             showProgressBar={showProgressBars}
             delay={randomDelays[1]}
             progressBgColor="bg-surface-400 dark:bg-surface-300"
@@ -112,12 +113,12 @@ export function StateOfStartupsHeader({ showProgressBars = true }: StateOfStartu
           />
           <TextBlock
             text="Startups"
-            bgColor="bg-brand"
+            bgColor="bg-brand-default"
             textColor="text-background dark:text-brand-200"
             showProgressBar={showProgressBars}
             delay={randomDelays[2]}
             progressBgColor="bg-surface-400 dark:bg-surface-300"
-            progressFgColor="bg-brand dark:bg-brand"
+            progressFgColor="bg-brand-default dark:bg-brand-default"
           />
           <TextBlock
             text="2025"

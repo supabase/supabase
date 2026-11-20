@@ -1,13 +1,24 @@
 import {
-  FilterGroup,
-  FilterCondition,
-  FilterProperty,
-  CustomOptionObject,
-  FilterOptionObject,
   AsyncOptionsFunction,
-  SyncOptionsFunction,
+  CustomOptionObject,
+  FilterCondition,
+  FilterGroup,
+  FilterOperatorGroup,
+  FilterOperatorObject,
+  FilterOptionObject,
+  FilterProperty,
+  GROUP_ORDER,
+  GroupedMenuItem,
   isGroup,
+  MenuItem,
+  MenuItemGroup,
+  ResolvedPropertyChange,
+  SyncOptionsFunction,
 } from './types'
+
+export function pathsEqual(a: number[], b: number[]): boolean {
+  return a.length === b.length && a.every((v, i) => v === b[i])
+}
 
 export function findGroupByPath(group: FilterGroup, path: number[]): FilterGroup | null {
   if (path.length === 0) return group
@@ -45,12 +56,30 @@ export function findConditionByPath(group: FilterGroup, path: number[]): FilterC
   return null
 }
 
+export function collectConditions(
+  group: FilterGroup,
+  path: number[] = []
+): { condition: FilterCondition; path: number[] }[] {
+  return group.conditions.flatMap((condition, index) => {
+    const currentPath = [...path, index]
+    return isGroup(condition)
+      ? collectConditions(condition, currentPath)
+      : [{ condition, path: currentPath }]
+  })
+}
+
 export function isCustomOptionObject(option: any): option is CustomOptionObject {
   return typeof option === 'object' && option !== null && 'component' in option
 }
 
 export function isFilterOptionObject(option: any): option is FilterOptionObject {
   return typeof option === 'object' && option !== null && 'value' in option && 'label' in option
+}
+
+export function isFilterOperatorObject(operator: any): operator is FilterOperatorObject {
+  return (
+    typeof operator === 'object' && operator !== null && 'value' in operator && 'label' in operator
+  )
 }
 
 export function isAsyncOptionsFunction(
@@ -124,10 +153,7 @@ export function addFilterToGroup(
   if (path.length === 0) {
     return {
       ...group,
-      conditions: [
-        ...group.conditions,
-        { propertyName: property.name, value: '', operator: property.operators?.[0] || '=' },
-      ],
+      conditions: [...group.conditions, { propertyName: property.name, value: '', operator: '' }],
     }
   }
 
@@ -140,11 +166,15 @@ export function addFilterToGroup(
   }
 }
 
-export function addGroupToGroup(group: FilterGroup, path: number[]): FilterGroup {
+export function addGroupToGroup(
+  group: FilterGroup,
+  path: number[],
+  logicalOperator: FilterGroup['logicalOperator'] = 'AND'
+): FilterGroup {
   if (path.length === 0) {
     return {
       ...group,
-      conditions: [...group.conditions, { logicalOperator: 'AND', conditions: [] }],
+      conditions: [...group.conditions, { logicalOperator, conditions: [] }],
     }
   }
 
@@ -152,7 +182,7 @@ export function addGroupToGroup(group: FilterGroup, path: number[]): FilterGroup
   return {
     ...group,
     conditions: group.conditions.map((condition, i) =>
-      i === current ? addGroupToGroup(condition as FilterGroup, rest) : condition
+      i === current ? addGroupToGroup(condition as FilterGroup, rest, logicalOperator) : condition
     ),
   }
 }
@@ -211,6 +241,54 @@ export function updateNestedOperator(
   }
 }
 
+export function updateNestedPropertyName(
+  group: FilterGroup,
+  path: number[],
+  newPropertyName: string,
+  newOperator?: string,
+  newValue?: string
+): FilterGroup {
+  return updateNestedFilter(group, path, (condition) => ({
+    ...condition,
+    propertyName: newPropertyName,
+    ...(newOperator !== undefined ? { operator: newOperator } : {}),
+    ...(newValue !== undefined ? { value: newValue } : {}),
+  }))
+}
+
+export function resolvePropertyChange(
+  currentOperator: string,
+  currentValue: string,
+  newProperty: FilterProperty
+): ResolvedPropertyChange {
+  if (!currentOperator || !newProperty.operators) {
+    return { operator: '', value: '', focusTarget: 'operator' }
+  }
+
+  const operatorValues = newProperty.operators.map((op) =>
+    isFilterOperatorObject(op) ? op.value : op
+  )
+
+  if (!operatorValues.includes(currentOperator)) {
+    return { operator: '', value: '', focusTarget: 'operator' }
+  }
+
+  if (!currentValue) {
+    return { operator: currentOperator, value: '', focusTarget: 'value' }
+  }
+
+  if (newProperty.options && Array.isArray(newProperty.options)) {
+    // New property has fixed options — only preserve value if it's in the list
+    const optionValues = newProperty.options.map((opt) =>
+      typeof opt === 'string' ? opt : 'value' in opt ? opt.value : ''
+    )
+    const preservedValue = optionValues.includes(currentValue) ? currentValue : ''
+    return { operator: currentOperator, value: preservedValue, focusTarget: 'value' }
+  }
+
+  return { operator: currentOperator, value: currentValue, focusTarget: 'value' }
+}
+
 export function updateNestedLogicalOperator(group: FilterGroup, path: number[]): FilterGroup {
   if (path.length === 0) {
     return {
@@ -248,4 +326,46 @@ export function updateGroupAtPath(
       index === current ? updateGroupAtPath(condition as FilterGroup, rest, newGroup) : condition
     ),
   }
+}
+
+export function groupMenuItemsByOperator(items: MenuItem[]): MenuItemGroup[] {
+  const grouped = items.reduce<Map<FilterOperatorGroup, GroupedMenuItem[]>>((acc, item, index) => {
+    const group: FilterOperatorGroup = item.group ?? 'uncategorized'
+    const existing = acc.get(group) ?? []
+    acc.set(group, [...existing, { item, index }])
+    return acc
+  }, new Map())
+
+  return GROUP_ORDER.filter((groupKey) => grouped.has(groupKey)).map((groupKey) => ({
+    group: groupKey,
+    items: grouped.get(groupKey) ?? [],
+  }))
+}
+
+export function getActionItemLabel(item: MenuItem): string {
+  if (item.isAction && item.actionInputValue) {
+    return `Ask AI: "${item.actionInputValue}"`
+  }
+  return item.label
+}
+
+export function buildFilterPlaceholder(
+  filterProperties: FilterProperty[],
+  options: { maxProperties?: number; hasActions?: boolean } = {}
+): string {
+  const { maxProperties = 3, hasActions = false } = options
+
+  if (filterProperties.length === 0) {
+    return hasActions ? 'Add filters or ask AI...' : 'Add filters...'
+  }
+
+  const propertyNames = filterProperties
+    .slice(0, maxProperties)
+    .map((prop) => prop.label)
+    .join(', ')
+
+  const suffix = filterProperties.length > maxProperties ? '...' : ''
+  const aiSuffix = hasActions ? ' or ask AI' : ''
+
+  return `Filter by ${propertyNames}${suffix}${aiSuffix}`
 }

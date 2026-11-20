@@ -1,0 +1,126 @@
+---
+id: 'pipelines-faq'
+title: 'Pipelines FAQ'
+description: 'Frequently asked questions about Supabase Pipelines.'
+subtitle: 'Common questions and answers about Supabase Pipelines.'
+sidebar_label: 'FAQ'
+---
+
+<$Partial path="pipelines-public-alpha.mdx" />
+
+## Which plans support Pipelines?
+
+Pipelines is in public alpha on Pro, Team, and Enterprise plans. Go to **Database > Pipelines** to see the destinations available for your project and [set up a pipeline](/docs/guides/database/replication/pipelines#setup-overview). If Studio shows **No Pipelines destinations are available for this project**, [contact support](/dashboard/support/new).
+
+Pipeline creation is unavailable for High Availability projects. For those projects, **Database > Pipelines** shows the High Availability cluster topology.
+
+## What destinations are supported?
+
+BigQuery, ClickHouse, DuckLake, and Snowflake are in public alpha. For setup guides, see [supported destinations](/docs/guides/database/replication#supported-destinations).
+
+## Does the destination's region affect performance?
+
+Yes. Distance between the source, pipeline, and destination adds network latency and can reduce throughput. Choose resources near the [managed pipeline region](/docs/guides/database/replication/pipelines#region), prioritizing the destination if you can optimize only one side.
+
+## What does Pipelines install in the database?
+
+Pipelines installs objects in your project's Postgres database to track replication and support schema changes:
+
+- An `etl` schema containing internal tables for replication state and progress, source table schemas, destination mappings, and migration history.
+- Helper functions in `etl` that read table definitions and prepare schema-change messages.
+- A database event trigger, `supabase_etl_ddl_message_trigger`, that runs after `ALTER TABLE` and `ALTER PUBLICATION`. It writes schema-change information for published tables to the write-ahead log (WAL), so Pipelines can process supported changes alongside row changes.
+
+Each pipeline also uses replication slots to track its position in WAL. See [initial sync and table-sync slots](/docs/guides/database/replication/pipelines-monitoring#initial-sync-and-table-sync-slots) for how these retain changes during replication.
+
+<Admonition type="caution">
+
+The `etl` schema is reserved for Pipelines. If your application already uses a schema named `etl`, rename it and update references to it before enabling Pipelines. Do not add application objects to the Pipelines-managed schema or include it in a publication.
+
+</Admonition>
+
+To remove the installed objects, delete all pipelines, then [disable Pipelines](#what-happens-when-you-disable-pipelines).
+
+## What does Pipelines check before creating a pipeline?
+
+The Dashboard validates source access, replication capacity, publication tables, and destination connectivity and requirements. **Required** issues block creation; **Warnings** require review. See [creation checks](/docs/guides/database/replication/pipelines#creation-checks).
+
+## What schema changes are supported?
+
+Support differs by destination. Check the [schema-change guides](/docs/guides/database/replication/pipelines#schema-change-support) before changing column types, defaults, keys, or constraints.
+
+## Can changes be delivered more than once? [#can-data-be-processed-more-than-once]
+
+Yes. Pipelines provides at-least-once delivery, so retries and recovery can send a change more than once. A destination write can succeed before the pipeline saves its progress. Recovery then sends the change again.
+
+Each destination handles repeated changes differently:
+
+| Destination                                                                                                 | Guarantee for ongoing row changes                                                                                                                     |
+| ----------------------------------------------------------------------------------------------------------- | ----------------------------------------------------------------------------------------------------------------------------------------------------- |
+| [BigQuery](/docs/guides/database/replication/pipelines/bigquery#delivery-and-replay)                        | At-least-once ingestion with idempotent updates. Repeating a change leaves current state unchanged, and older replays cannot overwrite newer changes. |
+| [ClickHouse: ReplacingMergeTree](/docs/guides/database/replication/pipelines/clickhouse#replacingmergetree) | At-least-once ingestion with deduplicated current-state results through the generated view. The base table can contain repeated versions.             |
+| [ClickHouse: MergeTree](/docs/guides/database/replication/pipelines/clickhouse#mergetree)                   | At-least-once ingestion. Append-only history can contain repeated events.                                                                             |
+| [DuckLake](/docs/guides/database/replication/pipelines/ducklake#delivery-and-replay)                        | Exactly-once application of row changes to managed tables. Already committed changes are skipped during recovery.                                     |
+| [Snowflake](/docs/guides/database/replication/pipelines/snowflake#delivery-and-replay)                      | Exactly-once ingestion into managed tables through committed-offset recovery.                                                                         |
+
+These guarantees cover the data and views Pipelines maintains. Downstream systems need their own protection against repeated processing. Replayed data can also be [billed again](/docs/guides/platform/manage-your-usage/pipelines#how-data-processed-is-measured).
+
+Delivery covers the data included by your publication and [initial sync selection](/docs/guides/database/replication/pipelines#choosing-which-tables-to-copy). Recovery depends on Postgres retaining required changes; see [lost-slot recovery](#what-does-a-lost-slot-status-mean).
+
+## Are changes applied in order?
+
+Pipelines processes each table's changes in source order. Recovery can replay earlier changes after newer changes have already reached the destination.
+
+Replication is asynchronous, so a successful source write does not mean the change is already available to destination queries. Changes from one source transaction can become visible separately, including across destination tables.
+
+During initial sync, queries can see an incomplete copy. Wait for the relevant tables to finish initial sync and catch up before treating the destination as a complete replica. A **Live** label or [zero replication lag](/docs/guides/database/replication/pipelines-monitoring#replication-lag-metrics) alone does not confirm query visibility or initial-sync completion.
+
+## What happens if I restart during initial sync?
+
+If you restart while a table is copying or catching up after its copy, that table starts its entire initial sync again. Its partial destination data is deleted when it resumes. It does not continue from the last copied row or batch.
+
+Tables that completed initial sync resume from saved replication progress. A pipeline restart does not deliberately rebuild those tables. To rebuild a completed table, use [Reset table](/docs/guides/database/replication/pipelines-monitoring#restarting-tables).
+
+Resetting a table on an active pipeline also restarts the pipeline. Other tables' unfinished initial syncs therefore start over too. Data copied again is [billed again](/docs/guides/platform/manage-your-usage/pipelines#how-data-processed-is-measured).
+
+## Why is a table not being replicated?
+
+Check that:
+
+- The table is published. If you added it after starting the pipeline, [restart the pipeline to discover it](/docs/guides/database/replication/pipelines#adding-or-removing-tables).
+- The table and published columns satisfy the destination's primary-key and replica-identity requirements.
+- [Publication row filters](/docs/guides/database/replication/pipelines#filtering-rows-with-a-predicate) include the expected rows.
+- Missing columns aren't generated; Pipelines skips generated columns.
+
+If new changes arrive but existing rows are missing, check the [initial sync selection](/docs/guides/database/replication/pipelines#choosing-which-tables-to-copy). [Changing a row filter](/docs/guides/database/replication/pipelines#other-publication-changes) also does not copy newly included historical rows.
+
+If inserts work but updates or deletes fail, review the source table requirements for [BigQuery](/docs/guides/database/replication/pipelines/bigquery#source-table-requirements), [ClickHouse](/docs/guides/database/replication/pipelines/clickhouse#source-table-requirements), [DuckLake](/docs/guides/database/replication/pipelines/ducklake#source-table-requirements), or [Snowflake](/docs/guides/database/replication/pipelines/snowflake#source-table-requirements).
+
+## Why is a table in error state?
+
+An initial sync or ongoing replication operation failed, for example after an unsupported schema change. Some errors retry automatically; others require resetting the affected tables. See [Table errors](/docs/guides/database/replication/pipelines-monitoring#table-errors) for diagnosis and [Resetting tables](/docs/guides/database/replication/pipelines-monitoring#restarting-tables) for the procedure and its effects.
+
+## Why is a pipeline failed or stopped?
+
+**Failed** reports a startup or runtime error and can recover automatically. **Stopped** requires a manual start. Follow [pipeline error recovery](/docs/guides/database/replication/pipelines-monitoring#pipeline-errors) to diagnose the cause before restarting.
+
+## Why is replication lag increasing?
+
+Postgres is producing WAL faster than Pipelines confirms progress. Follow [Investigate the lag](/docs/guides/database/replication/pipelines-monitoring#investigate-the-lag) to distinguish source activity, destination throughput, and connectivity problems.
+
+## What does a `Lost` slot status mean?
+
+Required WAL is gone, so replication cannot continue from that slot. Follow [slot recovery](/docs/guides/database/replication/pipelines-monitoring#respond-based-on-the-slot-status); recovery scope depends on whether the main slot or a table-sync slot was lost. A fresh initial sync can restore current source rows, but it cannot restore missing change history.
+
+## What happens if a table is deleted at the destination?
+
+Deleting or modifying managed objects can stop replication and require a new initial sync. To remove one safely, [remove the source table from the publication](/docs/guides/database/replication/pipelines#removing-tables-from-replication) and restart the pipeline before deleting its destination table.
+
+## What happens when a project becomes inactive or moves to the Free Plan?
+
+Project inactivity stops its pipelines. Start them manually after restarting the project. Downgrading to the Free Plan deletes its pipelines.
+
+## What happens when you disable Pipelines?
+
+Disabling Pipelines removes its database event trigger and the entire Pipelines-managed `etl` schema, including its tables and helper functions. Your source application tables and existing destination data remain.
+
+Delete all pipelines first, then follow [Disabling Pipelines](/docs/guides/database/replication/pipelines#disabling-pipelines). Deleting the pipelines alone does not remove the shared database installation.

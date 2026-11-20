@@ -1,12 +1,15 @@
-import { useInfiniteQuery, UseInfiniteQueryOptions } from '@tanstack/react-query'
+import { InfiniteData, useInfiniteQuery } from '@tanstack/react-query'
 
-import { get, handleError } from 'data/fetchers'
 import { Content, ContentType } from './content-query'
+import { remapSqlContentFields } from './content-remap'
 import { contentKeys } from './keys'
+import { getLogSqlSnippetPage } from './logs-view-content'
+import { get, handleError } from '@/data/fetchers'
+import { UseCustomInfiniteQueryOptions } from '@/types'
 
 interface GetContentVariables {
   projectRef?: string
-  cursor?: string
+  cursor?: string | undefined
   type: ContentType
   name?: string
   limit?: number
@@ -15,10 +18,20 @@ interface GetContentVariables {
 
 export async function getContent(
   { projectRef, type, name, limit = 10, sort, cursor }: GetContentVariables,
-  signal?: AbortSignal
+  signal?: AbortSignal,
+  headers?: HeadersInit
 ) {
   if (typeof projectRef === 'undefined') {
     throw new Error('projectRef is required for getContent')
+  }
+
+  if (type === 'log_sql') {
+    const { rows, cursor: nextCursor } = await getLogSqlSnippetPage(
+      { projectRef, name, limit, sort, cursor },
+      signal,
+      headers
+    )
+    return { cursor: nextCursor, content: rows }
   }
 
   const { data, error } = await get('/platform/projects/{ref}/content', {
@@ -32,6 +45,7 @@ export async function getContent(
         cursor,
       },
     },
+    headers,
     signal,
   })
 
@@ -39,7 +53,7 @@ export async function getContent(
 
   return {
     cursor: data.cursor,
-    content: data.data as unknown as Content[],
+    content: remapSqlContentFields(data.data as unknown as Content[]),
   }
 }
 
@@ -48,16 +62,24 @@ export type ContentError = unknown
 
 export const useContentInfiniteQuery = <TData = ContentData>(
   { projectRef, type, name, limit, sort }: GetContentVariables,
-  { enabled = true, ...options }: UseInfiniteQueryOptions<ContentData, ContentError, TData> = {}
+  {
+    enabled = true,
+    ...options
+  }: UseCustomInfiniteQueryOptions<
+    ContentData,
+    ContentError,
+    InfiniteData<TData>,
+    readonly unknown[],
+    string | undefined
+  > = {}
 ) => {
-  return useInfiniteQuery<ContentData, ContentError, TData>(
-    contentKeys.infiniteList(projectRef, { type, name, limit, sort }),
-    ({ signal, pageParam }) =>
+  return useInfiniteQuery({
+    queryKey: contentKeys.infiniteList(projectRef, { type, name, limit, sort }),
+    queryFn: ({ signal, pageParam }) =>
       getContent({ projectRef, type, name, limit, sort, cursor: pageParam }, signal),
-    {
-      enabled: enabled && typeof projectRef !== 'undefined',
-      getNextPageParam: (lastPage) => lastPage.cursor,
-      ...options,
-    }
-  )
+    enabled: enabled && typeof projectRef !== 'undefined',
+    initialPageParam: undefined,
+    getNextPageParam: (lastPage) => lastPage.cursor,
+    ...options,
+  })
 }

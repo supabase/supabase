@@ -18,7 +18,9 @@ export const detectBrowser = () => {
 export const isBrowser = typeof window !== 'undefined'
 
 const prefersReducedMotionMediaQuery =
-  isBrowser && window.matchMedia('(prefers-reduced-motion: reduce)')
+  isBrowser &&
+  typeof window.matchMedia === 'function' &&
+  window.matchMedia('(prefers-reduced-motion: reduce)')
 
 /**
  * @returns boolean value If the user has expressed their preference for reduced motion.
@@ -38,7 +40,9 @@ export const useReducedMotion = (): boolean => {
 }
 
 export function ensurePlatformSuffix(apiUrl: string) {
-  return apiUrl.endsWith('/platform') ? apiUrl : `${apiUrl}/platform`
+  let base = apiUrl
+  while (base.endsWith('/')) base = base.slice(0, -1)
+  return base.endsWith('/platform') ? base : `${base}/platform`
 }
 
 export function mergeRefs<T>(...refs: React.Ref<T>[]): React.RefCallback<T> {

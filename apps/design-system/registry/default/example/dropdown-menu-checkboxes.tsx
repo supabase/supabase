@@ -1,7 +1,6 @@
 'use client'
 
 import * as React from 'react'
-
 import {
   Button,
   DropdownMenu,
@@ -23,7 +22,7 @@ export default function DropdownMenuCheckboxes() {
   return (
     <DropdownMenu>
       <DropdownMenuTrigger asChild>
-        <Button type="outline">Open</Button>
+        <Button variant="outline">Open</Button>
       </DropdownMenuTrigger>
       <DropdownMenuContent className="w-56">
         <DropdownMenuLabel>Appearance</DropdownMenuLabel>

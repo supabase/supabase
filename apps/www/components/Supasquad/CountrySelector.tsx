@@ -1,9 +1,9 @@
 import {
-  Select_Shadcn_ as Select,
-  SelectContent_Shadcn_ as SelectContent,
-  SelectItem_Shadcn_ as SelectItem,
-  SelectTrigger_Shadcn_ as SelectTrigger,
-  SelectValue_Shadcn_ as SelectValue,
+  Select as Select,
+  SelectContent as SelectContent,
+  SelectItem as SelectItem,
+  SelectTrigger as SelectTrigger,
+  SelectValue as SelectValue,
 } from 'ui'
 
 // Country data with flags and names (alphabetically sorted)
@@ -170,7 +170,7 @@ export function CountrySelector({
 }: CountrySelectorProps) {
   return (
     <Select value={value} onValueChange={onValueChange}>
-      <SelectTrigger className="w-full !bg-foreground/[.026]">
+      <SelectTrigger className="w-full bg-foreground/[.026]!">
         <SelectValue placeholder={placeholder}>
           {value && (
             <span className="flex items-center gap-2">

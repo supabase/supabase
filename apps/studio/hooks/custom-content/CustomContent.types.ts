@@ -1,7 +1,15 @@
 import type { CloudProvider } from 'shared-data'
 
 export type CustomContentTypes = {
+  appTitle: string
+
   dashboardAuthCustomProvider: string
+
+  dashboardAuthCustomProviders: string[]
+
+  dashboardAuthLogoLinkUrl: string
+
+  docsRowLevelSecurityGuidePath: string
 
   organizationLegalDocuments: {
     id: string
@@ -31,4 +39,6 @@ export type CustomContentTypes = {
   infraAwsNimbusLabel: string
 
   sslCertificateUrl: string
+
+  statusPageVisibilityFieldIds: Array<string>
 }

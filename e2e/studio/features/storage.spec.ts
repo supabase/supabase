@@ -1,0 +1,689 @@
+import path from 'path'
+import { expect } from '@playwright/test'
+
+import { env } from '../env.config.js'
+import { expectClipboardValue } from '../utils/clipboard.js'
+import {
+  createBucket,
+  createFolder,
+  deleteBucket,
+  deleteItem,
+  downloadFile,
+  getStorageRowNameInput,
+  navigateToBucket,
+  navigateToStorageFiles,
+  renameItem,
+  uploadFile,
+} from '../utils/storage-helpers.js'
+import {
+  createBucket as createBucketViaApi,
+  deleteBucket as deleteBucketViaApi,
+} from '../utils/storage/index.js'
+import { test, withSetupCleanup } from '../utils/test.js'
+import { waitForApiResponse } from '../utils/wait-for-response.js'
+
+const bucketNamePrefix = 'pw_bucket'
+
+test.describe('Storage', () => {
+  test.beforeEach(async ({ page, ref }) => {
+    await navigateToStorageFiles(page, ref)
+  })
+
+  test('can navigate to storage page', async ({ page, ref }) => {
+    await expect(
+      page.getByRole('button', { name: 'New bucket' }),
+      'New bucket button should be visible'
+    ).toBeVisible()
+
+    // Verify we're on the storage files page
+    await expect(page).toHaveURL(new RegExp(`/project/${ref}/storage/files`))
+  })
+
+  test('can create a private bucket', async ({ page, ref }) => {
+    const bucketName = `${bucketNamePrefix}_private`
+
+    await using _ = await withSetupCleanup(
+      async () => {
+        // Nothing
+      },
+      async () => {
+        await deleteBucketViaApi(bucketName)
+      }
+    )
+    await createBucket(page, ref, bucketName, false)
+
+    // Verify it's marked as private (no "Public" badge should be visible)
+    const bucketRow = page.getByRole('row').filter({ hasText: bucketName })
+    await expect(bucketRow, 'Bucket row should be visible').toBeVisible()
+    await expect(
+      bucketRow.getByText('Public'),
+      'Private bucket should not have Public badge'
+    ).not.toBeVisible()
+  })
+
+  test('can create a public bucket', async ({ page, ref }) => {
+    const bucketName = `${bucketNamePrefix}_public`
+
+    await using _ = await withSetupCleanup(
+      async () => {
+        // Nothing
+      },
+      async () => {
+        await deleteBucketViaApi(bucketName)
+      }
+    )
+    await createBucket(page, ref, bucketName, true)
+
+    // Verify it's marked as public - wait for the badge to appear
+    const bucketRow = page.getByRole('row').filter({ hasText: bucketName })
+    await expect(bucketRow, 'Bucket row should be visible').toBeVisible()
+
+    // The Public badge should be visible within the bucket row
+    await expect(
+      bucketRow.getByText('Public', { exact: true }),
+      'Bucket should be marked as Public'
+    ).toBeVisible()
+  })
+
+  test('can edit bucket settings', async ({ page, ref }) => {
+    const bucketName = `${bucketNamePrefix}_edit`
+
+    // Create a fresh private bucket via API
+    await using _ = await withSetupCleanup(
+      async () => {
+        await createBucketViaApi(bucketName, false)
+      },
+      async () => {
+        await deleteBucketViaApi(bucketName)
+      }
+    )
+    await navigateToStorageFiles(page, ref)
+
+    // Navigate to the bucket
+    await navigateToBucket(page, ref, bucketName)
+
+    // Open edit bucket dropdown
+    await page.getByRole('button', { name: 'Edit bucket' }).click()
+    await page.getByRole('menuitem', { name: 'Bucket settings' }).click()
+
+    // Toggle public setting
+    const publicToggle = page.getByRole('switch', { name: 'Public bucket' })
+    await expect(publicToggle, 'Public toggle should be visible').toBeVisible()
+    await publicToggle.click()
+
+    // Save changes
+    const apiPromise = waitForApiResponse(page, 'storage', ref, `buckets/${bucketName}`, {
+      method: 'PATCH',
+    })
+    await page.getByRole('button', { name: 'Save' }).click()
+    await apiPromise
+
+    // Verify the bucket is now public
+    await expect(
+      page.getByText('Public').first(),
+      'Bucket should now be marked as Public'
+    ).toBeVisible()
+  })
+
+  test('can delete a bucket', async ({ page, ref }) => {
+    const bucketName = `${bucketNamePrefix}_delbkt`
+
+    // Create a bucket via API
+    await using _ = await withSetupCleanup(
+      async () => {
+        await createBucketViaApi(bucketName, false)
+      },
+      async () => {
+        await deleteBucketViaApi(bucketName)
+      }
+    )
+    await navigateToStorageFiles(page, ref)
+
+    // Delete it via UI
+    await deleteBucket(page, ref, bucketName)
+
+    // Verify it's gone
+    await expect(
+      page.getByRole('row').filter({ hasText: bucketName }),
+      'Bucket should not be visible after deletion'
+    ).not.toBeVisible()
+  })
+
+  test('can search for buckets', async ({ page, ref }) => {
+    const bucketName1 = `${bucketNamePrefix}_search_1`
+    const bucketName2 = `${bucketNamePrefix}_search_2`
+
+    // Create two buckets via API
+    await using _ = await withSetupCleanup(
+      async () => {
+        await createBucketViaApi(bucketName1, false)
+        await createBucketViaApi(bucketName2, false)
+      },
+      async () => {
+        await deleteBucketViaApi(bucketName1)
+        await deleteBucketViaApi(bucketName2)
+      }
+    )
+    await navigateToStorageFiles(page, ref)
+
+    // Search for first bucket
+    const searchInput = page.getByPlaceholder('Search for a bucket')
+    await searchInput.fill('search_1')
+
+    // Verify only first bucket is visible
+    await expect(
+      page.getByRole('row').filter({ hasText: bucketName1 }),
+      'First bucket should be visible in search results'
+    ).toBeVisible()
+    await expect(
+      page.getByRole('row').filter({ hasText: bucketName2 }),
+      'Second bucket should not be visible in search results'
+    ).not.toBeVisible()
+
+    // Clear search
+    await searchInput.clear()
+
+    // Verify both buckets are visible
+    await expect(
+      page.getByRole('row').filter({ hasText: bucketName1 }),
+      'First bucket should be visible after clearing search'
+    ).toBeVisible()
+    await expect(
+      page.getByRole('row').filter({ hasText: bucketName2 }),
+      'Second bucket should be visible after clearing search'
+    ).toBeVisible()
+  })
+
+  test('can upload a file', async ({ page, ref }) => {
+    const bucketName = `${bucketNamePrefix}_upload`
+    const fileName = 'test-file.txt'
+
+    // Create a bucket via API and navigate to it
+    await using _ = await withSetupCleanup(
+      async () => {
+        await createBucketViaApi(bucketName, false)
+      },
+      async () => {
+        await deleteBucketViaApi(bucketName)
+      }
+    )
+    await navigateToStorageFiles(page, ref)
+    await navigateToBucket(page, ref, bucketName)
+
+    // Upload a file
+    const filePath = path.join(import.meta.dirname, 'files', fileName)
+    await uploadFile(page, filePath, fileName)
+  })
+
+  test('can create a folder', async ({ page, ref }) => {
+    const bucketName = `${bucketNamePrefix}_newfolder`
+    const folderName = 'test_folder'
+
+    // Create a bucket via API and navigate to it
+    await using _ = await withSetupCleanup(
+      async () => {
+        await createBucketViaApi(bucketName, false)
+      },
+      async () => {
+        await deleteBucketViaApi(bucketName)
+      }
+    )
+    await navigateToStorageFiles(page, ref)
+    await navigateToBucket(page, ref, bucketName)
+
+    // Create a folder
+    await createFolder(page, folderName)
+  })
+
+  test('deep links to a nested folder and file via the URL', async ({ page, ref }) => {
+    const bucketName = `${bucketNamePrefix}_deeplink`
+    const folderName = 'deeplink_folder'
+    const fileName = 'test-file.txt'
+
+    await using _ = await withSetupCleanup(
+      async () => {
+        await createBucketViaApi(bucketName, false)
+      },
+      async () => {
+        await deleteBucketViaApi(bucketName)
+      }
+    )
+    await navigateToStorageFiles(page, ref)
+    await navigateToBucket(page, ref, bucketName)
+
+    // Creating a folder drills into it, so the upload lands inside the folder
+    await createFolder(page, folderName)
+    await expect(page.getByText('Drop your files here')).toBeVisible()
+    const filePath = path.join(import.meta.dirname, 'files', fileName)
+    await uploadFile(page, filePath, fileName)
+
+    // Reload at the bucket root so opening the folder is a real navigation rather than
+    // the store drilling in on its own — only the former pushes a history entry
+    await navigateToStorageFiles(page, ref)
+    await navigateToBucket(page, ref, bucketName)
+    await page.getByTitle(folderName).click()
+    // Compare the parsed params rather than regex-matching the URL, so dots and other
+    // regex metacharacters in file names are treated literally
+    await expect(page).toHaveURL((url) => url.searchParams.get('path') === folderName)
+
+    // Opening the file records it in the URL alongside the folder
+    await page.getByTitle(fileName).click()
+    await expect(page).toHaveURL((url) => url.searchParams.get('path') === folderName)
+    await expect(page).toHaveURL((url) => url.searchParams.get('preview') === fileName)
+
+    // A reload restores the same location rather than dropping back to bucket root
+    const deepLink = page.url()
+    await page.reload()
+    await expect(
+      page.getByTitle(fileName),
+      'File should still be visible after reloading the deep link'
+    ).toBeVisible()
+    expect(page.url()).toBe(deepLink)
+
+    // Back walks up out of the folder
+    await page.goBack()
+    await expect(page).toHaveURL((url) => url.searchParams.get('path') === null)
+    await expect(
+      page.getByTitle(folderName),
+      'Should be back at bucket root showing the folder'
+    ).toBeVisible()
+
+    await deleteBucketViaApi(bucketName)
+  })
+
+  test('can rename a file', async ({ page, ref }) => {
+    const bucketName = `${bucketNamePrefix}_rename_file`
+    const fileName = 'test-file.txt'
+    const newFileName = 'renamed-file.txt'
+
+    // Create a bucket via API, navigate to it, and upload a file
+    await using _ = await withSetupCleanup(
+      async () => {
+        await createBucketViaApi(bucketName, false)
+      },
+      async () => {
+        await deleteBucketViaApi(bucketName)
+      }
+    )
+    await navigateToStorageFiles(page, ref)
+    await navigateToBucket(page, ref, bucketName)
+
+    const filePath = path.join(import.meta.dirname, 'files', fileName)
+    await uploadFile(page, filePath, fileName)
+
+    // Rename the file
+    await renameItem(page, fileName, newFileName)
+  })
+
+  test('can rename a folder', async ({ page, ref }) => {
+    const bucketName = `${bucketNamePrefix}_mvdir`
+    const folderName = 'old_folder'
+    const newFolderName = 'new_folder'
+
+    // Create a bucket via API, navigate to it, and create a folder
+    await using _ = await withSetupCleanup(
+      async () => {
+        await createBucketViaApi(bucketName, false)
+      },
+      async () => {
+        await deleteBucketViaApi(bucketName)
+      }
+    )
+    await navigateToStorageFiles(page, ref)
+    await navigateToBucket(page, ref, bucketName)
+
+    await createFolder(page, folderName)
+
+    // Rename the folder
+    await renameItem(page, folderName, newFolderName)
+  })
+
+  test('can copy a file url regardless of the opened folders', async ({ page, ref }) => {
+    const bucketName = `${bucketNamePrefix}_urls`
+    const folderName = 'test_folder'
+    const rootFileName = 'test-file.txt'
+    const rootFilePath = path.join(import.meta.dirname, 'files', rootFileName)
+    const folderFileName = 'test-file-2.txt'
+    const folderFilePath = path.join(import.meta.dirname, 'files', folderFileName)
+
+    // Create a bucket via API and navigate to it
+    await using _ = await withSetupCleanup(
+      async () => {
+        await createBucketViaApi(bucketName, true)
+      },
+      async () => {
+        await deleteBucketViaApi(bucketName)
+      }
+    )
+    await navigateToStorageFiles(page, ref)
+    await navigateToBucket(page, ref, bucketName)
+    await uploadFile(page, rootFilePath, rootFileName)
+    // Create a folder
+    await createFolder(page, folderName)
+    // Wait for the folder file input
+    await expect(page.getByText('Drop your files here')).toBeVisible()
+    await uploadFile(page, folderFilePath, folderFileName)
+
+    // Right-click on the folder file to open context menu
+    const folderFile = page.getByTitle(folderFileName)
+    await folderFile.click({ button: 'right' })
+    await page.getByRole('menuitem', { name: 'Get URL' }).click()
+    await expectClipboardValue({
+      page,
+      value: `storage/v1/object/public/${bucketName}/${folderName}/${folderFileName}`,
+    })
+    await expect(page.getByRole('menuitem', { name: 'Get URL' })).not.toBeVisible()
+
+    // Right-click on the root file to open context menu while the folder is still open
+    const rootFile = page.getByTitle(rootFileName)
+    await rootFile.click({ button: 'right' })
+    await page.getByRole('menuitem', { name: 'Get URL' }).click()
+    await expectClipboardValue({
+      page,
+      value: `storage/v1/object/public/${bucketName}/${rootFileName}`,
+    })
+    await expect(page.getByRole('menuitem', { name: 'Get URL' })).not.toBeVisible()
+
+    // Click the actions button on the folder file to open dropdown menu
+    await page.getByRole('button', { name: `${folderFileName} actions` }).click()
+    await page.getByRole('menuitem', { name: 'Get URL' }).click()
+    await expectClipboardValue({
+      page,
+      value: `storage/v1/object/public/${bucketName}/${folderName}/${folderFileName}`,
+    })
+    await expect(page.getByRole('menuitem', { name: 'Get URL' })).not.toBeVisible()
+
+    // Click the actions button on the root file to open dropdown menu while the folder is still open
+    await page.getByRole('button', { name: `${rootFileName} actions` }).click()
+    await page.getByRole('menuitem', { name: 'Get URL' }).click()
+    await expectClipboardValue({
+      page,
+      value: `storage/v1/object/public/${bucketName}/${rootFileName}`,
+    })
+    await expect(page.getByRole('menuitem', { name: 'Get URL' })).not.toBeVisible()
+
+    // Click the folder file to open its preview pane
+    await folderFile.click()
+    await page.getByRole('button', { name: 'Get URL' }).click()
+    await expectClipboardValue({
+      page,
+      value: `storage/v1/object/public/${bucketName}/${folderName}/${folderFileName}`,
+    })
+
+    // Click the root file to open its preview pane while folder is still open
+    await rootFile.click()
+    await page.getByRole('button', { name: 'Get URL' }).click()
+    await expectClipboardValue({
+      page,
+      value: `storage/v1/object/public/${bucketName}/${rootFileName}`,
+    })
+  })
+
+  test('resets folder name when renaming with empty string', async ({ page, ref }) => {
+    const bucketName = `${bucketNamePrefix}_reset_enter`
+    const folderName = 'folder_to_rename'
+
+    // Create a bucket via API, navigate to it, and create a folder
+    await using _ = await withSetupCleanup(
+      async () => {
+        await createBucketViaApi(bucketName, false)
+      },
+      async () => {
+        await deleteBucketViaApi(bucketName)
+      }
+    )
+    await navigateToStorageFiles(page, ref)
+    await navigateToBucket(page, ref, bucketName)
+    await createFolder(page, folderName)
+
+    // Right-click on the folder to open context menu
+    const folder = page.getByTitle(folderName)
+    await expect(folder, `Folder ${folderName} should be visible`).toBeVisible()
+    await folder.click({ button: 'right' })
+
+    // Click rename option from context menu
+    await page.getByRole('menuitem', { name: 'Rename' }).click()
+
+    // Clear the input and press Enter with empty name
+    const nameInput = getStorageRowNameInput(page)
+    await expect(nameInput, 'Rename input should be visible').toBeVisible()
+    await nameInput.clear()
+    await nameInput.press('Enter')
+
+    // Verify the input disappears (edit mode exits)
+    await expect(nameInput, 'Input should disappear after pressing Enter').not.toBeVisible()
+
+    // Verify the folder name is reset to original
+    await expect(
+      page.getByTitle(folderName),
+      'Folder should retain its original name'
+    ).toBeVisible()
+  })
+
+  test('resets folder name when clicking outside with empty string', async ({ page, ref }) => {
+    const bucketName = `${bucketNamePrefix}_reset_blur`
+    const folderName = 'folder_to_blur'
+
+    // Create a bucket via API, navigate to it, and create a folder
+    await using _ = await withSetupCleanup(
+      async () => {
+        await createBucketViaApi(bucketName, false)
+      },
+      async () => {
+        await deleteBucketViaApi(bucketName)
+      }
+    )
+    await navigateToStorageFiles(page, ref)
+    await navigateToBucket(page, ref, bucketName)
+    await createFolder(page, folderName)
+
+    // Right-click on the folder to open context menu
+    const folder = page.getByTitle(folderName)
+    await expect(folder, `Folder ${folderName} should be visible`).toBeVisible()
+    await folder.click({ button: 'right' })
+
+    // Click rename option from context menu
+    await page.getByRole('menuitem', { name: 'Rename' }).click()
+
+    // Clear the input and click outside to blur
+    const nameInput = getStorageRowNameInput(page)
+    await expect(nameInput, 'Rename input should be visible').toBeVisible()
+    await nameInput.clear()
+
+    // Click outside the input to trigger blur
+    await page.getByRole('button', { name: 'Edit bucket' }).click()
+
+    // Verify the folder name is reset to original
+    await expect(
+      page.getByTitle(folderName),
+      'Folder should retain its original name after blur'
+    ).toBeVisible()
+  })
+
+  test('resets storage view when switching buckets', async ({ page, ref }) => {
+    const bucketName = `${bucketNamePrefix}_navigation`
+    const bucketName2 = `${bucketNamePrefix}2_navigation`
+    const folderName = 'folder_navigation'
+    const fileName = 'test-file.txt'
+
+    // Create 2 bucket via API, navigate to the first
+    await using _ = await withSetupCleanup(
+      async () => {
+        await createBucketViaApi(bucketName, false)
+        await createBucketViaApi(bucketName2, false)
+      },
+      async () => {
+        await deleteBucketViaApi(bucketName)
+        await deleteBucketViaApi(bucketName2)
+      }
+    )
+    await navigateToStorageFiles(page, ref)
+    await navigateToBucket(page, ref, bucketName)
+
+    // create a folder and add a file
+    await createFolder(page, folderName)
+    // Open the folder
+    await page.getByTitle(folderName).click()
+    const filePath = path.join(import.meta.dirname, 'files', fileName)
+    await uploadFile(page, filePath, fileName)
+
+    // Navigate to bucket list
+    await page.getByRole('link', { name: 'Files' }).nth(1).click()
+    // Navigate to the 2nd bucket
+    await navigateToBucket(page, ref, bucketName2)
+    await expect(page.getByTitle(fileName)).not.toBeVisible()
+  })
+
+  test('can delete a file', async ({ page, ref }) => {
+    const bucketName = `${bucketNamePrefix}_delete_file`
+    const fileName = 'test-file.txt'
+
+    // Create a bucket via API, navigate to it, and upload a file
+    await using _ = await withSetupCleanup(
+      async () => {
+        await createBucketViaApi(bucketName, false)
+      },
+      async () => {
+        await deleteBucketViaApi(bucketName)
+      }
+    )
+    await navigateToStorageFiles(page, ref)
+    await navigateToBucket(page, ref, bucketName)
+
+    const filePath = path.join(import.meta.dirname, 'files', fileName)
+    await uploadFile(page, filePath, fileName)
+
+    // Delete the file
+    await deleteItem(page, fileName)
+  })
+
+  test('Deleting a file preserves the current filter', async ({ page, ref }) => {
+    const bucketName = `${bucketNamePrefix}_delete_file_filter`
+    const fileName = 'test-file.txt'
+
+    // Create a bucket via API, navigate to it, and upload a file
+    await using _ = await withSetupCleanup(
+      async () => {
+        await createBucketViaApi(bucketName, false)
+      },
+      async () => {
+        await deleteBucketViaApi(bucketName)
+      }
+    )
+    await navigateToStorageFiles(page, ref)
+    await navigateToBucket(page, ref, bucketName)
+
+    await uploadFile(
+      page,
+      path.join(import.meta.dirname, 'files', 'test-file.txt'),
+      'test-file.txt'
+    )
+    await uploadFile(
+      page,
+      path.join(import.meta.dirname, 'files', 'test-file-2.txt'),
+      'test-file-2.txt'
+    )
+    await uploadFile(
+      page,
+      path.join(import.meta.dirname, 'files', 'another-file.txt'),
+      'another-file.txt'
+    )
+    await page.getByPlaceholder('Search in root directory...').fill('test')
+    await expect(page.getByTitle('another-file.txt')).toHaveCount(0)
+    await expect(page.getByTitle('test-file.txt')).toHaveCount(1)
+    await expect(page.getByTitle('test-file-2.txt')).toHaveCount(1)
+
+    // Delete the file
+    await deleteItem(page, fileName)
+
+    // Check the filter is still applied
+    await expect(page.getByTitle('test-file.txt')).toHaveCount(0)
+    await expect(page.getByTitle('test-file-2.txt')).toHaveCount(1)
+    await expect(page.getByTitle('another-file.txt')).toHaveCount(0)
+  })
+
+  test('can delete a folder', async ({ page, ref }) => {
+    const bucketName = `${bucketNamePrefix}_delete_folder`
+    const folderName = 'test_folder'
+
+    // Create a bucket via API, navigate to it, and create a folder
+    await using _ = await withSetupCleanup(
+      async () => {
+        await createBucketViaApi(bucketName, false)
+      },
+      async () => {
+        await deleteBucketViaApi(bucketName)
+      }
+    )
+    await navigateToStorageFiles(page, ref)
+    await navigateToBucket(page, ref, bucketName)
+    await createFolder(page, folderName)
+
+    // Delete the folder
+    await deleteItem(page, folderName)
+  })
+
+  test('can download a file', async ({ page, ref }) => {
+    const bucketName = `${bucketNamePrefix}_download`
+    const fileName = 'test-file.txt'
+
+    // Create a bucket via API, navigate to it, and upload a file
+    await using _ = await withSetupCleanup(
+      async () => {
+        await createBucketViaApi(bucketName, false)
+      },
+      async () => {
+        await deleteBucketViaApi(bucketName)
+      }
+    )
+    await navigateToStorageFiles(page, ref)
+    await navigateToBucket(page, ref, bucketName)
+
+    const filePath = path.join(import.meta.dirname, 'files', fileName)
+    await uploadFile(page, filePath, fileName)
+
+    // Download the file
+    await downloadFile(page, fileName)
+  })
+})
+
+test.describe('Storage Settings - Self Hosted', () => {
+  test.skip(env.IS_PLATFORM, 'Storage settings are only disabled on self-hosted')
+
+  test('settings tab should not be visible in navigation', async ({ page, ref }) => {
+    // Navigate to storage files page
+    await page.goto(`/project/${ref}/storage/files`)
+
+    // Wait for the page to load
+    await expect(
+      page.getByRole('button', { name: 'New bucket' }),
+      'New bucket button should be visible'
+    ).toBeVisible()
+
+    // Verify Buckets and Policies tabs are visible but Settings is not
+    // Use href patterns to avoid matching other "Settings" links in the sidebar
+    await expect(
+      page.getByRole('link', { name: 'Buckets' }).filter({ hasText: /^Buckets$/ }),
+      'Buckets tab should be visible'
+    ).toBeVisible()
+    await expect(
+      page.getByRole('link', { name: 'Policies' }).filter({ hasText: /^Policies$/ }),
+      'Policies tab should be visible'
+    ).toBeVisible()
+    await expect(
+      page.locator(`a[href="/project/${ref}/storage/files/settings"]`),
+      'Settings tab should NOT be visible for self-hosted'
+    ).not.toBeVisible()
+  })
+
+  test('direct navigation to settings page should show error', async ({ page, ref }) => {
+    // Navigate directly to the settings page
+    await page.goto(`/project/${ref}/storage/files/settings`)
+
+    // Should show an error message indicating settings are not available
+    await expect(
+      page.getByText('Storage settings are not available for self-hosted projects'),
+      'Error message should be visible'
+    ).toBeVisible()
+  })
+})

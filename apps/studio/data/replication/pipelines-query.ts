@@ -1,8 +1,11 @@
-import { UseQueryOptions, useQuery } from '@tanstack/react-query'
+import { useQuery } from '@tanstack/react-query'
 
-import { get, handleError } from 'data/fetchers'
-import { ResponseError } from 'types'
 import { replicationKeys } from './keys'
+import { pipelineIdSchema } from './pipeline-id'
+import { checkReplicationFeatureFlagRetry } from './utils'
+import { get, handleError } from '@/data/fetchers'
+import type { StudioError } from '@/lib/errors/studio-errors'
+import type { UseCustomQueryOptions } from '@/types'
 
 type ReplicationPipelinesParams = { projectRef?: string }
 
@@ -16,11 +19,15 @@ async function fetchReplicationPipelines(
     params: { path: { ref: projectRef } },
     signal,
   })
-  if (error) {
-    handleError(error)
-  }
 
-  return data
+  if (error) handleError(error)
+  return {
+    ...data,
+    pipelines: data.pipelines.map((pipeline) => ({
+      ...pipeline,
+      id: pipelineIdSchema.parse(pipeline.id),
+    })),
+  }
 }
 
 export type ReplicationPipelinesData = Awaited<ReturnType<typeof fetchReplicationPipelines>>
@@ -31,10 +38,13 @@ export const useReplicationPipelinesQuery = <TData = ReplicationPipelinesData>(
   {
     enabled = true,
     ...options
-  }: UseQueryOptions<ReplicationPipelinesData, ResponseError, TData> = {}
+  }: UseCustomQueryOptions<ReplicationPipelinesData, StudioError, TData> = {}
 ) =>
-  useQuery<ReplicationPipelinesData, ResponseError, TData>(
-    replicationKeys.pipelines(projectRef),
-    ({ signal }) => fetchReplicationPipelines({ projectRef }, signal),
-    { enabled: enabled && typeof projectRef !== 'undefined', ...options }
-  )
+  useQuery<ReplicationPipelinesData, StudioError, TData>({
+    queryKey: replicationKeys.pipelines(projectRef),
+    queryFn: ({ signal }) => fetchReplicationPipelines({ projectRef }, signal),
+    enabled: enabled && typeof projectRef !== 'undefined',
+    refetchOnWindowFocus: false,
+    retry: checkReplicationFeatureFlagRetry,
+    ...options,
+  })

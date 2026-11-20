@@ -1,9 +1,10 @@
-import { useMutation, UseMutationOptions, useQueryClient } from '@tanstack/react-query'
+import { useMutation, useQueryClient } from '@tanstack/react-query'
 import { toast } from 'sonner'
 
-import { handleError, post } from 'data/fetchers'
-import type { ResponseError } from 'types'
 import { configKeys } from './keys'
+import { handleError, post } from '@/data/fetchers'
+import type { StudioError } from '@/lib/errors/studio-errors'
+import type { UseCustomMutationOptions } from '@/types'
 
 export type UpdateDiskAutoscaleConfigVariables = {
   projectRef?: string
@@ -41,9 +42,9 @@ export const useUpdateDiskAutoscaleConfigMutation = ({
   onError,
   ...options
 }: Omit<
-  UseMutationOptions<
+  UseCustomMutationOptions<
     UpdateDiskAutoscaleConfigData,
-    ResponseError,
+    StudioError,
     UpdateDiskAutoscaleConfigVariables
   >,
   'mutationFn'
@@ -51,12 +52,13 @@ export const useUpdateDiskAutoscaleConfigMutation = ({
   const queryClient = useQueryClient()
   return useMutation<
     UpdateDiskAutoscaleConfigData,
-    ResponseError,
+    StudioError,
     UpdateDiskAutoscaleConfigVariables
-  >((vars) => updateDiskAutoscaleConfig(vars), {
+  >({
+    mutationFn: (vars) => updateDiskAutoscaleConfig(vars),
     async onSuccess(data, variables, context) {
       const { projectRef } = variables
-      await queryClient.invalidateQueries(configKeys.diskAutoscaleConfig(projectRef))
+      await queryClient.invalidateQueries({ queryKey: configKeys.diskAutoscaleConfig(projectRef) })
       await onSuccess?.(data, variables, context)
     },
     async onError(data, variables, context) {

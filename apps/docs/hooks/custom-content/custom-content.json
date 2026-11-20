@@ -1,7 +1,0 @@
-{
-  "homepage:heading": "Supabase Documentation",
-  "navigation:logo_url": {
-    "light": "/docs/supabase-light.svg",
-    "dark": "/docs/supabase-dark.svg"
-  }
-}

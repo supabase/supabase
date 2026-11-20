@@ -1,13 +1,25 @@
 import pgMeta from '@supabase/pg-meta'
-import { useMutation, UseMutationOptions, useQueryClient } from '@tanstack/react-query'
+import type { SafeSqlFragment } from '@supabase/pg-meta'
+import { useMutation, useQueryClient } from '@tanstack/react-query'
 import { toast } from 'sonner'
 
-import type { components } from 'data/api'
-import { executeSql } from 'data/sql/execute-sql-query'
-import type { ResponseError } from 'types'
 import { databasePoliciesKeys } from './keys'
+import { isUserFaultForSql } from '@/data/error-classification'
+import { unguarded } from '@/data/fetchers'
+import { executeSql } from '@/data/sql/execute-sql-mutation'
+import type { StudioError } from '@/lib/errors/studio-errors'
+import type { UseCustomMutationOptions } from '@/types'
 
-type CreatePolicyBody = components['schemas']['CreatePolicyBody']
+export type CreatePolicyBody = {
+  name: string
+  table: string
+  schema?: string
+  definition?: SafeSqlFragment
+  check?: SafeSqlFragment
+  action?: 'PERMISSIVE' | 'RESTRICTIVE'
+  command?: 'SELECT' | 'INSERT' | 'UPDATE' | 'DELETE' | 'ALL'
+  roles?: string[]
+}
 
 export type DatabasePolicyCreateVariables = {
   projectRef: string
@@ -28,7 +40,12 @@ export async function createDatabasePolicy({
     projectRef,
     connectionString,
     sql,
+    // Studio composes the statement, but the user wrote the expressions and bodies Postgres parses
+    sqlOrigin: 'studio',
+    queryName: 'database-policy-create',
+    isUserFaultSqlState: isUserFaultForSql,
     queryKey: ['policy', 'create'],
+    grant: unguarded.migrating,
   })
 
   return result
@@ -41,27 +58,25 @@ export const useDatabasePolicyCreateMutation = ({
   onError,
   ...options
 }: Omit<
-  UseMutationOptions<DatabasePolicyCreateData, ResponseError, DatabasePolicyCreateVariables>,
+  UseCustomMutationOptions<DatabasePolicyCreateData, StudioError, DatabasePolicyCreateVariables>,
   'mutationFn'
 > = {}) => {
   const queryClient = useQueryClient()
 
-  return useMutation<DatabasePolicyCreateData, ResponseError, DatabasePolicyCreateVariables>(
-    (vars) => createDatabasePolicy(vars),
-    {
-      async onSuccess(data, variables, context) {
-        const { projectRef } = variables
-        await queryClient.invalidateQueries(databasePoliciesKeys.list(projectRef))
-        await onSuccess?.(data, variables, context)
-      },
-      async onError(data, variables, context) {
-        if (onError === undefined) {
-          toast.error(`Failed to create database policy: ${data.message}`)
-        } else {
-          onError(data, variables, context)
-        }
-      },
-      ...options,
-    }
-  )
+  return useMutation<DatabasePolicyCreateData, StudioError, DatabasePolicyCreateVariables>({
+    mutationFn: (vars) => createDatabasePolicy(vars),
+    async onSuccess(data, variables, context) {
+      const { projectRef } = variables
+      await queryClient.invalidateQueries({ queryKey: databasePoliciesKeys.list(projectRef) })
+      await onSuccess?.(data, variables, context)
+    },
+    async onError(data, variables, context) {
+      if (onError === undefined) {
+        toast.error(`Failed to create database policy: ${data.message}`)
+      } else {
+        onError(data, variables, context)
+      }
+    },
+    ...options,
+  })
 }

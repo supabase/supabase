@@ -20,9 +20,8 @@ export function FeaturePreviewSidebarPanel({
     <div
       className={cn(
         'rounded-lg border p-4 space-y-3',
-        'bg-muted/10 border-border/50',
         // Force left alignment and override any centering
-        'text-left [&_*]:text-left [&_div]:items-start',
+        'text-left **:text-left [&_div]:items-start',
         className
       )}
     >

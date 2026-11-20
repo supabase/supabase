@@ -1,65 +1,144 @@
-import { PermissionAction } from '@supabase/shared-types/out/constants'
-import dayjs from 'dayjs'
-import Link from 'next/link'
-import { useEffect, useMemo, useState } from 'react'
-
+import { useQuery } from '@tanstack/react-query'
 import { useParams } from 'common'
-import { ScaffoldContainer, ScaffoldHeader, ScaffoldTitle } from 'components/layouts/Scaffold'
-import AlertError from 'components/ui/AlertError'
-import DateRangePicker from 'components/ui/DateRangePicker'
-import NoPermission from 'components/ui/NoPermission'
-import ShimmeringLoader from 'components/ui/ShimmeringLoader'
-import { useProjectsQuery } from 'data/projects/projects-query'
-import { useOrgSubscriptionQuery } from 'data/subscriptions/org-subscription-query'
-import { useAsyncCheckPermissions } from 'hooks/misc/useCheckPermissions'
-import { useSelectedOrganizationQuery } from 'hooks/misc/useSelectedOrganization'
-import { TIME_PERIODS_BILLING, TIME_PERIODS_REPORTS } from 'lib/constants/metrics'
-import {
-  cn,
-  Select_Shadcn_,
-  SelectContent_Shadcn_,
-  SelectGroup_Shadcn_,
-  SelectItem_Shadcn_,
-  SelectTrigger_Shadcn_,
-  SelectValue_Shadcn_,
-} from 'ui'
-import { Admonition } from 'ui-patterns'
+import dayjs from 'dayjs'
+import { ChartAreaIcon, CheckIcon, ChevronDownIcon } from 'lucide-react'
+import { useQueryStates } from 'nuqs'
+import { useMemo, useState } from 'react'
+import { Button, cn, CommandGroup, CommandItem } from 'ui'
+import { Admonition } from 'ui-patterns/Admonition'
+import { ShimmeringLoader } from 'ui-patterns/ShimmeringLoader'
+
 import { Restriction } from '../BillingSettings/Restriction'
+import ActiveCompute from './ActiveCompute'
 import Activity from './Activity'
 import Compute from './Compute'
 import Egress from './Egress'
+import OrgLogUsage from './OrgLogUsage'
+import { Pipelines } from './Pipelines'
 import SizeAndCounts from './SizeAndCounts'
 import { TotalUsage } from './TotalUsage'
+import { getUsageBranchOptions, resolveUsageProjectRef, usageFilterParsers } from './Usage.utils'
+import { UsageBranchFilter } from './UsageBranchFilter'
+import { UsageFilterNotice } from './UsageFilterNotice'
+import {
+  ScaffoldContainer,
+  ScaffoldHeader,
+  ScaffoldSection,
+  ScaffoldTitle,
+} from '@/components/layouts/Scaffold'
+import { AlertError } from '@/components/ui/AlertError'
+import { DateRangePicker } from '@/components/ui/DateRangePicker'
+import { HighAvailabilityDisabledEmptyState } from '@/components/ui/HighAvailability/HighAvailabilityDisabledEmptyState'
+import { NoPermission } from '@/components/ui/NoPermission'
+import { OrganizationProjectSelector } from '@/components/ui/OrganizationProjectSelector'
+import { useOrgDailyStatsQuery } from '@/data/analytics/org-daily-stats-query'
+import { branchesQueryOptions } from '@/data/branches/branches-query'
+import { useProjectDetailQuery } from '@/data/projects/project-detail-query'
+import { useOrgSubscriptionQuery } from '@/data/subscriptions/org-subscription-query'
+import { FGA_PERMISSIONS, useAsyncCheckPermissionsV2 } from '@/hooks/misc/useCheckPermissionsV2'
+import { resolveHighAvailability } from '@/hooks/misc/useHighAvailability'
+import { TIME_PERIODS_BILLING, TIME_PERIODS_REPORTS } from '@/lib/constants/metrics'
+import { useGrant } from '@/lib/grants'
 
 export const Usage = () => {
-  const { slug, projectRef } = useParams()
+  const { slug } = useParams()
+
   const [dateRange, setDateRange] = useState<any>()
-  const [selectedProjectRefInputValue, setSelectedProjectRefInputValue] = useState<
-    string | undefined
-  >('all-projects')
 
-  // [Alaister] 'all-projects' is not a valid project ref, it's just used as an extra
-  // state for the select input. As such we need to remove it for the selected project ref
-  const selectedProjectRef =
-    selectedProjectRefInputValue === 'all-projects' ? undefined : selectedProjectRefInputValue
+  const [{ projectRef, branchRef }, setUsageFilter] = useQueryStates(usageFilterParsers)
+  const [openProjectSelector, setOpenProjectSelector] = useState(false)
 
-  const { can: canReadSubscriptions, isLoading: isLoadingPermissions } = useAsyncCheckPermissions(
-    PermissionAction.BILLING_READ,
-    'stripe.subscriptions'
+  const {
+    data: requestedProject,
+    isPending: isLoadingRequestedProject,
+    isError: isErrorRequestedProject,
+    error: requestedProjectError,
+  } = useProjectDetailQuery({
+    ref: projectRef ?? undefined,
+  })
+  const parentProjectRef = requestedProject?.parent_project_ref
+  const {
+    data: parentProject,
+    isPending: isLoadingParentProject,
+    isError: isErrorParentProject,
+    error: parentProjectError,
+  } = useProjectDetailQuery({ ref: parentProjectRef ?? undefined })
+  const selectedProjectRef = parentProjectRef ?? projectRef
+  const selectedBranchRef = branchRef ?? (parentProjectRef ? projectRef : null)
+  const selectedProject = parentProjectRef ? parentProject : requestedProject
+  const isLoadingSelectedProject =
+    !!projectRef && (isLoadingRequestedProject || (!!parentProjectRef && isLoadingParentProject))
+  const isErrorSelectedProject =
+    isErrorRequestedProject || (!!parentProjectRef && isErrorParentProject)
+  const selectedProjectError = requestedProjectError ?? parentProjectError
+  const isHighAvailability = resolveHighAvailability(selectedProject)
+  const canLoadProjectUsage =
+    !selectedProjectRef ||
+    (!isLoadingSelectedProject && !isErrorSelectedProject && !isHighAvailability)
+
+  const isBranchesQueryEnabled = !!selectedProject && !isHighAvailability
+  const branchesGrant = useGrant('GET /v1/projects/{ref}/branches', {
+    projectRef: selectedProjectRef ?? undefined,
+  })
+  const {
+    data: branches,
+    isPending: isPendingBranchesQuery,
+    isError: isErrorBranchesQuery,
+    isSuccess: isSuccessBranches,
+    error: branchesQueryError,
+  } = useQuery(
+    branchesQueryOptions(
+      {
+        projectRef: selectedProjectRef ?? undefined,
+        grant: branchesGrant.grant,
+      },
+      { enabled: isBranchesQueryEnabled }
+    )
+  )
+  const isPendingBranches =
+    isBranchesQueryEnabled &&
+    (branchesGrant.status === 'loading' ||
+      (branchesGrant.status === 'granted' && isPendingBranchesQuery))
+  const isLoadingBranches = isPendingBranches
+  const isErrorBranches = isErrorBranchesQuery || branchesGrant.status === 'error'
+  const branchesError = branchesGrant.status === 'error' ? branchesGrant.error : branchesQueryError
+  const branchOptions = useMemo(() => getUsageBranchOptions(branches), [branches])
+  const usageProjectRef = resolveUsageProjectRef(
+    selectedProjectRef,
+    branchOptions,
+    selectedBranchRef
+  )
+  const selectedBranch = branchOptions.find(
+    (branch) => branch.project_ref === usageProjectRef && branch.project_ref !== selectedProjectRef
+  )
+  const isProjectLookupBlocked = !!selectedProjectRef && isErrorSelectedProject
+  const isResolvingBranch =
+    !!selectedProjectRef && !!selectedBranchRef && isPendingBranches && !isProjectLookupBlocked
+  const isBranchLookupBlocked = !!selectedBranchRef && isErrorBranches
+  const isBranchLookupDenied = !!selectedBranchRef && branchesGrant.status === 'denied'
+  const isBranchUnavailable =
+    !!selectedBranchRef && isSuccessBranches && usageProjectRef !== selectedBranchRef
+  const canShowUsage =
+    !isLoadingSelectedProject &&
+    !isResolvingBranch &&
+    !isBranchLookupBlocked &&
+    !isBranchLookupDenied &&
+    !isProjectLookupBlocked
+  const canLoadUsage = canLoadProjectUsage && canShowUsage
+
+  const { can: canReadSubscriptions, isLoading: isLoadingPermissions } = useAsyncCheckPermissionsV2(
+    FGA_PERMISSIONS.ORGANIZATION.BILLING_READ
   )
 
-  const { data: organization } = useSelectedOrganizationQuery()
-  const { data, isSuccess } = useProjectsQuery()
   const {
     data: subscription,
     error: subscriptionError,
     isLoading: isLoadingSubscription,
     isError: isErrorSubscription,
     isSuccess: isSuccessSubscription,
-  } = useOrgSubscriptionQuery({ orgSlug: slug })
-
-  const orgProjects = (data?.projects ?? []).filter(
-    (project) => project.organization_id === organization?.id
+  } = useOrgSubscriptionQuery(
+    { orgSlug: slug },
+    { enabled: canReadSubscriptions && !isHighAvailability }
   )
 
   const billingCycleStart = useMemo(() => {
@@ -105,28 +184,41 @@ export const Usage = () => {
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [dateRange, subscription])
 
-  const selectedProject = selectedProjectRef
-    ? orgProjects?.find((it) => it.ref === selectedProjectRef)
-    : undefined
+  const {
+    data: orgDailyStats,
+    error: orgDailyStatsError,
+    isPending: isLoadingOrgDailyStats,
+    isError: isErrorOrgDailyStats,
+  } = useOrgDailyStatsQuery(
+    {
+      orgSlug: slug,
+      projectRef: usageProjectRef ?? undefined,
+      startDate,
+      endDate,
+    },
+    { enabled: canLoadUsage }
+  )
 
-  useEffect(() => {
-    if (projectRef && isSuccess && orgProjects !== undefined) {
-      if (orgProjects.find((project) => project.ref === projectRef)) {
-        setSelectedProjectRefInputValue(projectRef)
-      }
-    }
-    // [Joshen] Since we're already looking at isSuccess
-    // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, [projectRef, isSuccess])
+  if (isHighAvailability) {
+    return (
+      <div className="flex flex-1 items-center justify-center p-6">
+        <HighAvailabilityDisabledEmptyState
+          icon={ChartAreaIcon}
+          title="Usage unavailable on High Availability projects"
+          description="Usage insights for High Availability projects are coming soon."
+        />
+      </div>
+    )
+  }
 
   return (
     <>
       <ScaffoldContainer>
-        <ScaffoldHeader>
+        <ScaffoldHeader className="pt-8">
           <ScaffoldTitle>Usage</ScaffoldTitle>
         </ScaffoldHeader>
       </ScaffoldContainer>
-      <div className="sticky top-0 border-b bg-sidebar z-[1] overflow-hidden">
+      <div className="sticky top-0 border-b bg-sidebar z-1">
         <ScaffoldContainer>
           <div className="py-4 flex items-center space-x-4">
             {isLoadingSubscription || isLoadingPermissions ? (
@@ -151,7 +243,7 @@ export const Usage = () => {
 
             {isSuccessSubscription && (
               <div className="flex lg:items-center items-start gap-3 flex-col lg:flex-row lg:justify-between w-full">
-                <div className="flex items-center gap-2">
+                <div className="flex flex-wrap items-center gap-2">
                   <DateRangePicker
                     onChange={setDateRange}
                     value={TIME_PERIODS_BILLING[0].key}
@@ -159,46 +251,82 @@ export const Usage = () => {
                     loading={isLoadingSubscription}
                     currentBillingPeriodStart={subscription?.current_period_start}
                     currentBillingPeriodEnd={subscription?.current_period_end}
-                    className="!w-48"
+                    className="w-48!"
                   />
 
-                  <Select_Shadcn_
-                    value={selectedProjectRefInputValue}
-                    onValueChange={(value) => {
-                      if (value === 'all-projects') setSelectedProjectRefInputValue('all-projects')
-                      else setSelectedProjectRefInputValue(value)
+                  <OrganizationProjectSelector
+                    open={openProjectSelector}
+                    setOpen={setOpenProjectSelector}
+                    selectedRef={selectedProjectRef}
+                    onSelect={(project) => {
+                      setUsageFilter({ projectRef: project.ref, branchRef: null })
                     }}
-                  >
-                    <SelectTrigger_Shadcn_ size="tiny" className="w-[180px]">
-                      <SelectValue_Shadcn_ placeholder="Select a project" />
-                    </SelectTrigger_Shadcn_>
-                    <SelectContent_Shadcn_>
-                      <SelectGroup_Shadcn_>
-                        <SelectItem_Shadcn_
-                          key="all-projects"
-                          value="all-projects"
-                          className="text-xs"
+                    renderTrigger={({ listboxId, open }) => {
+                      return (
+                        <Button
+                          block
+                          role="combobox"
+                          size="tiny"
+                          aria-expanded={open}
+                          aria-controls={listboxId}
+                          className="justify-between w-[180px]"
+                          iconRight={
+                            <ChevronDownIcon className="ml-2 h-4 w-4 shrink-0 opacity-50" />
+                          }
+                        >
+                          {selectedProject?.name ?? selectedProjectRef ?? 'All projects'}
+                        </Button>
+                      )
+                    }}
+                    renderRow={(project) => {
+                      const isSelected = selectedProjectRef === project.ref
+                      return (
+                        <div className="w-full flex items-center justify-between">
+                          <span className={cn('truncate', isSelected ? 'max-w-60' : 'max-w-64')}>
+                            {project.name}
+                          </span>
+                          {isSelected && <CheckIcon size={16} />}
+                        </div>
+                      )
+                    }}
+                    renderActions={() => (
+                      <CommandGroup>
+                        <CommandItem
+                          className="cursor-pointer flex items-center justify-between w-full"
+                          onSelect={() => {
+                            setOpenProjectSelector(false)
+                            setUsageFilter({ projectRef: null, branchRef: null })
+                          }}
+                          onClick={() => {
+                            setOpenProjectSelector(false)
+                            setUsageFilter({ projectRef: null, branchRef: null })
+                          }}
                         >
                           All projects
-                        </SelectItem_Shadcn_>
-                        {orgProjects?.map((project) => (
-                          <SelectItem_Shadcn_
-                            key={project.ref}
-                            value={project.ref}
-                            className="text-xs"
-                          >
-                            {project.name}
-                          </SelectItem_Shadcn_>
-                        ))}
-                      </SelectGroup_Shadcn_>
-                    </SelectContent_Shadcn_>
-                  </Select_Shadcn_>
+                          {!selectedProjectRef && <CheckIcon size={16} />}
+                        </CommandItem>
+                      </CommandGroup>
+                    )}
+                  />
+
+                  {isLoadingBranches && <ShimmeringLoader className="w-[180px] py-3.5" />}
+
+                  {!isLoadingBranches && !!selectedProjectRef && (
+                    <UsageBranchFilter
+                      branchOptions={branchOptions}
+                      projectRef={selectedProjectRef}
+                      branchRef={selectedBranch?.project_ref ?? null}
+                      onSelectBranch={(branchRef) =>
+                        setUsageFilter({ projectRef: selectedProjectRef, branchRef })
+                      }
+                    />
+                  )}
                 </div>
 
                 <div className="flex items-center gap-2">
                   <p className={cn('text-sm transition', isLoadingSubscription && 'opacity-50')}>
                     Organization is on the{' '}
-                    <span className="font-medium text-brand">{subscription.plan.name} Plan</span>
+                    <span className="font-medium text-primary">{subscription.plan.name} Plan</span>
                   </p>
                   <span className="text-border-stronger">
                     <svg
@@ -226,81 +354,146 @@ export const Usage = () => {
         </ScaffoldContainer>
       </div>
 
-      {selectedProjectRef ? (
+      {isErrorOrgDailyStats && (
+        <ScaffoldContainer>
+          <ScaffoldSection isFullWidth className="pb-0">
+            <AlertError
+              error={orgDailyStatsError}
+              subject="Failed to retrieve usage statistics for organization"
+            />
+          </ScaffoldSection>
+        </ScaffoldContainer>
+      )}
+
+      {isProjectLookupBlocked && (
+        <ScaffoldContainer className="mt-5">
+          <AlertError subject="Failed to retrieve project" error={selectedProjectError} />
+        </ScaffoldContainer>
+      )}
+
+      {isErrorBranches && (
+        <ScaffoldContainer className="mt-5">
+          <AlertError subject="Failed to retrieve branches" error={branchesError} />
+        </ScaffoldContainer>
+      )}
+
+      {isBranchLookupDenied && (
+        <ScaffoldContainer className="mt-5">
+          <NoPermission resourceText="view this branch's usage" />
+        </ScaffoldContainer>
+      )}
+
+      {isResolvingBranch && (
+        <ScaffoldContainer className="mt-5">
+          <div role="status" aria-label="Loading branch usage">
+            <ShimmeringLoader />
+          </div>
+        </ScaffoldContainer>
+      )}
+
+      {isBranchUnavailable && (
         <ScaffoldContainer className="mt-5">
           <Admonition
-            type="default"
-            title="Usage filtered by project"
-            description={
-              <div>
-                You are currently viewing usage for the{' '}
-                <span className="font-medium text-foreground">
-                  {selectedProject?.name || selectedProjectRef}
-                </span>{' '}
-                project. Supabase uses{' '}
-                <Link
-                  href="/docs/guides/platform/billing-on-supabase#organization-based-billing"
-                  target="_blank"
-                >
-                  organization-level billing
-                </Link>{' '}
-                and quotas. For billing purposes, we sum up usage from all your projects. To view
-                your usage quota, set the project filter above back to "All Projects".
-              </div>
-            }
+            type="warning"
+            title="Branch unavailable"
+            description="The selected branch could not be found for this project. Showing usage for the parent project. Usage from deleted branches still counts toward the organization total."
           />
         </ScaffoldContainer>
-      ) : (
-        <ScaffoldContainer id="restriction" className="mt-5">
-          <Restriction />
-        </ScaffoldContainer>
       )}
 
-      <TotalUsage
-        orgSlug={slug as string}
-        projectRef={selectedProjectRef}
-        subscription={subscription}
-        startDate={startDate}
-        endDate={endDate}
-        currentBillingCycleSelected={currentBillingCycleSelected}
-      />
+      {canShowUsage && (
+        <>
+          {selectedProject ? (
+            <UsageFilterNotice
+              branchName={selectedBranch?.name}
+              hasBranches={branchOptions.length > 0}
+              onViewOrganizationUsage={() => setUsageFilter({ projectRef: null, branchRef: null })}
+            />
+          ) : (
+            <ScaffoldContainer id="restriction" className="mt-5">
+              <Restriction />
+            </ScaffoldContainer>
+          )}
 
-      {subscription?.plan.id !== 'free' && (
-        <Compute
-          orgSlug={slug as string}
-          projectRef={selectedProjectRef}
-          subscription={subscription}
-          startDate={startDate}
-          endDate={endDate}
-        />
+          <TotalUsage
+            orgSlug={slug as string}
+            projectRef={usageProjectRef}
+            subscription={subscription}
+            startDate={startDate}
+            endDate={endDate}
+            currentBillingCycleSelected={currentBillingCycleSelected}
+          />
+
+          {subscription?.plan.id !== 'free' && (
+            <Compute
+              orgDailyStats={orgDailyStats}
+              isLoadingOrgDailyStats={isLoadingOrgDailyStats}
+            />
+          )}
+
+          {subscription?.plan.id === 'platform' && (
+            <ActiveCompute
+              orgDailyStats={orgDailyStats}
+              isLoadingOrgDailyStats={isLoadingOrgDailyStats}
+            />
+          )}
+
+          <Egress
+            orgSlug={slug as string}
+            projectRef={usageProjectRef}
+            subscription={subscription}
+            currentBillingCycleSelected={currentBillingCycleSelected}
+            orgDailyStats={orgDailyStats}
+            isLoadingOrgDailyStats={isLoadingOrgDailyStats}
+            startDate={startDate}
+            endDate={endDate}
+          />
+
+          <SizeAndCounts
+            orgSlug={slug as string}
+            projectRef={usageProjectRef}
+            subscription={subscription}
+            currentBillingCycleSelected={currentBillingCycleSelected}
+            orgDailyStats={orgDailyStats}
+            isLoadingOrgDailyStats={isLoadingOrgDailyStats}
+            startDate={startDate}
+            endDate={endDate}
+          />
+
+          <Activity
+            orgSlug={slug as string}
+            projectRef={usageProjectRef}
+            subscription={subscription}
+            startDate={startDate}
+            endDate={endDate}
+            currentBillingCycleSelected={currentBillingCycleSelected}
+            orgDailyStats={orgDailyStats}
+            isLoadingOrgDailyStats={isLoadingOrgDailyStats}
+          />
+
+          <OrgLogUsage
+            orgSlug={slug as string}
+            projectRef={usageProjectRef}
+            subscription={subscription}
+            startDate={startDate}
+            endDate={endDate}
+            currentBillingCycleSelected={currentBillingCycleSelected}
+            orgDailyStats={orgDailyStats}
+            isLoadingOrgDailyStats={isLoadingOrgDailyStats || isLoadingSubscription}
+          />
+
+          <Pipelines
+            orgSlug={slug as string}
+            projectRef={usageProjectRef}
+            subscription={subscription}
+            startDate={startDate}
+            endDate={endDate}
+            currentBillingCycleSelected={currentBillingCycleSelected}
+            orgDailyStats={orgDailyStats}
+            isLoadingOrgDailyStats={isLoadingOrgDailyStats}
+          />
+        </>
       )}
-
-      <Egress
-        orgSlug={slug as string}
-        projectRef={selectedProjectRef}
-        subscription={subscription}
-        startDate={startDate}
-        endDate={endDate}
-        currentBillingCycleSelected={currentBillingCycleSelected}
-      />
-
-      <SizeAndCounts
-        orgSlug={slug as string}
-        projectRef={selectedProjectRef}
-        subscription={subscription}
-        startDate={startDate}
-        endDate={endDate}
-        currentBillingCycleSelected={currentBillingCycleSelected}
-      />
-
-      <Activity
-        orgSlug={slug as string}
-        projectRef={selectedProjectRef}
-        subscription={subscription}
-        startDate={startDate}
-        endDate={endDate}
-        currentBillingCycleSelected={currentBillingCycleSelected}
-      />
     </>
   )
 }

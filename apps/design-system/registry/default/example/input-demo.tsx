@@ -1,5 +1,5 @@
-import { Input_Shadcn_ } from 'ui'
+import { Input } from 'ui'
 
 export default function InputDemo() {
-  return <Input_Shadcn_ type="email" placeholder="Email" />
+  return <Input type="email" placeholder="Email" />
 }

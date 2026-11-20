@@ -1,12 +1,13 @@
 'use client'
 
-import { useGetBuckets } from '@/registry/default/platform/platform-kit-nextjs/hooks/use-storage'
-import { Skeleton } from '@/registry/default/components/ui/skeleton'
+import { AlertTriangle, Folder } from 'lucide-react'
+
+import { Alert, AlertDescription, AlertTitle } from '@/registry/default/components/ui/alert'
 import { Badge } from '@/registry/default/components/ui/badge'
 import { Button } from '@/registry/default/components/ui/button'
-import { AlertTriangle, Folder } from 'lucide-react'
+import { Skeleton } from '@/registry/default/components/ui/skeleton'
 import { Tooltip, TooltipContent, TooltipTrigger } from '@/registry/default/components/ui/tooltip'
-import { Alert, AlertDescription, AlertTitle } from '@/registry/default/components/ui/alert'
+import { useGetBuckets } from '@/registry/default/platform/platform-kit-nextjs/hooks/use-storage'
 
 export function StorageManager({ projectRef }: { projectRef: string }) {
   const { data: buckets, isLoading, isError } = useGetBuckets(projectRef)

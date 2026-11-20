@@ -10,8 +10,8 @@ tags:
 date: '2025-04-01T00:00:00'
 toc_depth: 3
 author: gregnr
-image: lw14-automatic-embeddings/automatic-embeddings-og.png
-thumb: lw14-automatic-embeddings/automatic-embeddings-thumb.png
+imgSocial: lw14-automatic-embeddings/automatic-embeddings-og.png
+imgThumb: lw14-automatic-embeddings/automatic-embeddings-thumb.png
 launchweek: '14'
 ---
 
@@ -183,7 +183,7 @@ values
   ('Understanding Vector Databases', 'Vector databases are specialized...');
 ```
 
-This will kick off the embedding pipeline within a Supabase Edge Function. If you were to immediately query for the document you just inserted, the `embedding` column will be empty:
+This will kick off the embedding pipeline within a [Supabase Edge Function](/docs/guides/functions). If you were to immediately query for the document you just inserted, the `embedding` column will be empty:
 
 ```sql
 select id, embedding

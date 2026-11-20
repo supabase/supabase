@@ -1,18 +1,18 @@
 import pgMeta from '@supabase/pg-meta'
 import { PGColumn } from '@supabase/pg-meta/src/pg-meta-columns'
-import { useMutation, UseMutationOptions } from '@tanstack/react-query'
+import { useMutation } from '@tanstack/react-query'
 import { toast } from 'sonner'
 
-import type { components } from 'data/api'
-import { executeSql } from 'data/sql/execute-sql-query'
-import type { ResponseError } from 'types'
+import { CreateColumnBody } from './database-column-create-mutation'
+import { unguarded } from '@/data/fetchers'
+import { executeSql } from '@/data/sql/execute-sql-mutation'
+import type { StudioError } from '@/lib/errors/studio-errors'
+import type { UseCustomMutationOptions } from '@/types'
 
-export type UpdateColumnBody = Omit<
-  components['schemas']['UpdateColumnBody'],
-  'check' | 'comment'
+export type UpdateColumnBody = Partial<
+  Omit<CreateColumnBody, 'schema' | 'table' | 'isPrimaryKey'>
 > & {
-  check?: string | null
-  comment?: string | null
+  dropDefault?: boolean
 }
 
 export type DatabaseColumnUpdateVariables = {
@@ -55,8 +55,11 @@ export async function updateDatabaseColumn({
   const { result } = await executeSql({
     projectRef,
     connectionString,
+    sqlOrigin: 'studio',
+    queryName: 'column-update',
     sql,
     queryKey: ['column', 'update', originalColumn.id],
+    grant: unguarded.migrating,
   })
 
   return result
@@ -69,23 +72,21 @@ export const useDatabaseColumnUpdateMutation = ({
   onError,
   ...options
 }: Omit<
-  UseMutationOptions<DatabaseColumnUpdateData, ResponseError, DatabaseColumnUpdateVariables>,
+  UseCustomMutationOptions<DatabaseColumnUpdateData, StudioError, DatabaseColumnUpdateVariables>,
   'mutationFn'
 > = {}) => {
-  return useMutation<DatabaseColumnUpdateData, ResponseError, DatabaseColumnUpdateVariables>(
-    (vars) => updateDatabaseColumn(vars),
-    {
-      async onSuccess(data, variables, context) {
-        await onSuccess?.(data, variables, context)
-      },
-      async onError(data, variables, context) {
-        if (onError === undefined) {
-          toast.error(`Failed to update database column: ${data.message}`)
-        } else {
-          onError(data, variables, context)
-        }
-      },
-      ...options,
-    }
-  )
+  return useMutation<DatabaseColumnUpdateData, StudioError, DatabaseColumnUpdateVariables>({
+    mutationFn: (vars) => updateDatabaseColumn(vars),
+    async onSuccess(data, variables, context) {
+      await onSuccess?.(data, variables, context)
+    },
+    async onError(data, variables, context) {
+      if (onError === undefined) {
+        toast.error(`Failed to update database column: ${data.message}`)
+      } else {
+        onError(data, variables, context)
+      }
+    },
+    ...options,
+  })
 }

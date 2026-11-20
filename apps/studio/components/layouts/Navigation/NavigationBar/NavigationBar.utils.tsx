@@ -1,0 +1,321 @@
+import { useFlag, useParams } from 'common'
+import {
+  Auth,
+  Compute,
+  Database,
+  EdgeFunctions,
+  Inbox,
+  Issues,
+  Realtime,
+  SqlEditor,
+  Storage,
+  TableEditor,
+} from 'icons'
+import { BlocksIcon, LightbulbIcon, ListIcon, SettingsIcon, TelescopeIcon } from 'lucide-react'
+
+import {
+  useIsExplorerEnabled,
+  useUnifiedLogsPreview,
+} from '@/components/interfaces/App/FeaturePreview/FeaturePreviewContext'
+import { ICON_SIZE, ICON_STROKE_WIDTH } from '@/components/interfaces/Sidebar'
+import type { Route } from '@/components/ui/ui.types'
+import { useProjectIssues } from '@/data/issues/useProjectIssues'
+import { EditorIndexPageLink } from '@/data/prefetchers/project.$ref.editor'
+import type { Project } from '@/data/projects/project-detail-query'
+import { useIsFeatureEnabled } from '@/hooks/misc/useIsFeatureEnabled'
+import { useSelectedProjectQuery } from '@/hooks/misc/useSelectedProject'
+import { IS_PLATFORM, PROJECT_STATUS } from '@/lib/constants'
+import { PRODUCT_NAME } from '@/lib/constants/compute'
+import { SHORTCUT_IDS } from '@/state/shortcuts/registry'
+
+interface RouteContext {
+  ref?: string
+  isProjectActive: boolean
+  isProjectBuilding: boolean
+  buildingUrl: string
+}
+
+interface ProductFeatures {
+  auth?: boolean
+  edgeFunctions?: boolean
+  storage?: boolean
+  realtime?: boolean
+  authOverviewPage?: boolean
+  compute?: boolean
+}
+
+interface OtherFeatures {
+  isHealthAdvisorEnabled?: boolean
+  issuesInbox?: boolean
+  hasIssues?: boolean
+  isPlatform?: boolean
+  unifiedLogs?: boolean
+  showReports?: boolean
+  showLogs?: boolean
+}
+
+function getIssuesIcon({
+  isIssuesInboxEnabled,
+  hasIssues,
+}: {
+  isIssuesInboxEnabled: boolean
+  hasIssues: boolean
+}) {
+  if (!isIssuesInboxEnabled)
+    return <LightbulbIcon size={ICON_SIZE} strokeWidth={ICON_STROKE_WIDTH} />
+
+  const Icon = hasIssues ? Issues : Inbox
+  return <Icon size={ICON_SIZE} strokeWidth={ICON_STROKE_WIDTH} />
+}
+
+function getRouteContext(ref?: string, project?: Project): RouteContext {
+  return {
+    ref,
+    isProjectActive: project?.status === PROJECT_STATUS.ACTIVE_HEALTHY,
+    isProjectBuilding: project?.status === PROJECT_STATUS.COMING_UP,
+    buildingUrl: `/project/${ref}`,
+  }
+}
+
+export const useGenerateToolRoutes = (): Route[] => {
+  const { ref } = useParams()
+  const { data: project } = useSelectedProjectQuery()
+
+  const { isProjectActive, isProjectBuilding, buildingUrl } = getRouteContext(ref, project)
+  const isExplorerEnabled = useIsExplorerEnabled()
+
+  return [
+    {
+      key: 'editor',
+      label: 'Table Editor',
+      disabled: !isProjectActive,
+      icon: <TableEditor size={ICON_SIZE} strokeWidth={ICON_STROKE_WIDTH} />,
+      link: ref && (isProjectBuilding ? buildingUrl : `/project/${ref}/editor`),
+      linkElement: <EditorIndexPageLink projectRef={ref} />,
+      shortcutId: SHORTCUT_IDS.NAV_TABLE_EDITOR,
+    },
+    ...(isExplorerEnabled
+      ? [
+          {
+            key: 'explorer',
+            label: 'Explorer',
+            disabled: !isProjectActive,
+            icon: <SqlEditor size={ICON_SIZE} strokeWidth={ICON_STROKE_WIDTH} />,
+            link: ref && (isProjectBuilding ? buildingUrl : `/project/${ref}/explorer`),
+            shortcutId: SHORTCUT_IDS.NAV_SQL_EDITOR,
+          },
+        ]
+      : [
+          {
+            key: 'sql',
+            label: 'SQL Editor',
+            disabled: !isProjectActive,
+            icon: <SqlEditor size={ICON_SIZE} strokeWidth={ICON_STROKE_WIDTH} />,
+            link: ref && (isProjectBuilding ? buildingUrl : `/project/${ref}/sql`),
+            shortcutId: SHORTCUT_IDS.NAV_SQL_EDITOR,
+          },
+        ]),
+  ]
+}
+
+export const generateProductRoutes = (
+  ref?: string,
+  project?: Project,
+  features?: ProductFeatures
+): Route[] => {
+  const { isProjectActive, isProjectBuilding, buildingUrl } = getRouteContext(ref, project)
+
+  const authEnabled = features?.auth ?? true
+  const edgeFunctionsEnabled = features?.edgeFunctions ?? true
+  const storageEnabled = features?.storage ?? true
+  const realtimeEnabled = features?.realtime ?? true
+  const authOverviewPageEnabled = features?.authOverviewPage ?? false
+  const computeEnabled = features?.compute ?? false
+
+  return [
+    {
+      key: 'database',
+      label: 'Database',
+      disabled: !isProjectActive,
+      icon: <Database size={ICON_SIZE} strokeWidth={ICON_STROKE_WIDTH} />,
+      link:
+        ref &&
+        (isProjectBuilding
+          ? buildingUrl
+          : isProjectActive
+            ? `/project/${ref}/database/schemas`
+            : `/project/${ref}/database/backups/scheduled`),
+      shortcutId: SHORTCUT_IDS.NAV_DATABASE,
+    },
+    ...(authEnabled
+      ? [
+          {
+            key: 'auth',
+            label: 'Authentication',
+            disabled: !isProjectActive,
+            icon: <Auth size={ICON_SIZE} strokeWidth={ICON_STROKE_WIDTH} />,
+            link:
+              ref &&
+              (isProjectBuilding
+                ? buildingUrl
+                : authOverviewPageEnabled
+                  ? `/project/${ref}/auth/overview`
+                  : `/project/${ref}/auth/users`),
+            shortcutId: SHORTCUT_IDS.NAV_AUTH,
+          },
+        ]
+      : []),
+    ...(storageEnabled
+      ? [
+          {
+            key: 'storage',
+            label: 'Storage',
+            disabled: !isProjectActive,
+            icon: <Storage size={ICON_SIZE} strokeWidth={ICON_STROKE_WIDTH} />,
+            link: ref && (isProjectBuilding ? buildingUrl : `/project/${ref}/storage/files`),
+            shortcutId: SHORTCUT_IDS.NAV_STORAGE,
+          },
+        ]
+      : []),
+    ...(edgeFunctionsEnabled
+      ? [
+          {
+            key: 'functions',
+            label: 'Edge Functions',
+            disabled: false,
+            icon: <EdgeFunctions size={ICON_SIZE} strokeWidth={ICON_STROKE_WIDTH} />,
+            link: ref && `/project/${ref}/functions`,
+            shortcutId: SHORTCUT_IDS.NAV_FUNCTIONS,
+          },
+        ]
+      : []),
+    ...(computeEnabled
+      ? [
+          {
+            key: 'compute',
+            label: PRODUCT_NAME,
+            disabled: !isProjectActive,
+            icon: <Compute size={ICON_SIZE} strokeWidth={ICON_STROKE_WIDTH} />,
+            link: ref && (isProjectBuilding ? buildingUrl : `/project/${ref}/compute`),
+            isNew: true,
+            shortcutId: SHORTCUT_IDS.NAV_COMPUTE,
+          },
+        ]
+      : []),
+    ...(realtimeEnabled
+      ? [
+          {
+            key: 'realtime',
+            label: 'Realtime',
+            disabled: !isProjectActive,
+            icon: <Realtime size={ICON_SIZE} strokeWidth={ICON_STROKE_WIDTH} />,
+            link: ref && (isProjectBuilding ? buildingUrl : `/project/${ref}/realtime/inspector`),
+            shortcutId: SHORTCUT_IDS.NAV_REALTIME,
+          },
+        ]
+      : []),
+  ]
+}
+
+export const generateOtherRoutes = (
+  ref?: string,
+  project?: Project,
+  features?: OtherFeatures
+): Route[] => {
+  const { isProjectActive, isProjectBuilding, buildingUrl } = getRouteContext(ref, project)
+
+  const isIssuesInboxEnabled = features?.issuesInbox ?? false
+  const hasIssues = features?.hasIssues ?? false
+  const legacyCategory = features?.isHealthAdvisorEnabled ? 'health' : 'security'
+  const advisorDestination = isIssuesInboxEnabled
+    ? `/project/${ref}/issues`
+    : `/project/${ref}/advisors/${legacyCategory}`
+  const unifiedLogsEnabled = features?.unifiedLogs ?? false
+  const reportsEnabled = features?.showReports ?? true
+  const logsEnabled = features?.showLogs ?? true
+
+  return [
+    {
+      key: isIssuesInboxEnabled ? 'issues' : 'advisors',
+      label: isIssuesInboxEnabled ? 'Issues' : 'Advisors',
+      disabled: !isProjectActive,
+      icon: getIssuesIcon({ isIssuesInboxEnabled, hasIssues }),
+      link: ref && (isProjectBuilding ? buildingUrl : advisorDestination),
+      shortcutId: SHORTCUT_IDS.NAV_ADVISORS,
+    },
+    ...(reportsEnabled
+      ? [
+          {
+            key: 'observability',
+            label: 'Observability',
+            disabled: !isProjectActive,
+            icon: <TelescopeIcon size={ICON_SIZE} strokeWidth={ICON_STROKE_WIDTH} />,
+            link:
+              ref &&
+              (isProjectBuilding
+                ? buildingUrl
+                : IS_PLATFORM
+                  ? `/project/${ref}/observability`
+                  : `/project/${ref}/query-performance`),
+            shortcutId: SHORTCUT_IDS.NAV_OBSERVABILITY,
+          },
+        ]
+      : []),
+    ...(logsEnabled
+      ? [
+          {
+            key: 'logs',
+            label: 'Logs',
+            disabled: false,
+            icon: <ListIcon size={ICON_SIZE} strokeWidth={ICON_STROKE_WIDTH} />,
+            link:
+              ref &&
+              (unifiedLogsEnabled ? `/project/${ref}/logs` : `/project/${ref}/logs/explorer`),
+            shortcutId: SHORTCUT_IDS.NAV_LOGS,
+          },
+        ]
+      : []),
+    {
+      key: 'integrations',
+      label: 'Integrations',
+      disabled: !isProjectActive,
+      icon: <BlocksIcon size={ICON_SIZE} strokeWidth={ICON_STROKE_WIDTH} />,
+      link: ref && (isProjectBuilding ? buildingUrl : `/project/${ref}/integrations`),
+      shortcutId: SHORTCUT_IDS.NAV_INTEGRATIONS,
+    },
+  ]
+}
+
+// [Joshen] Main hook to consume as it standardizes the generation of the menu items
+export const useGenerateOtherRoutes = (): Route[] => {
+  const { ref } = useParams()
+  const { data: project } = useSelectedProjectQuery()
+  const { isEnabled: unifiedLogsEnabled } = useUnifiedLogsPreview()
+  const isIssuesInboxEnabled = useFlag('issuesInbox')
+  const isHealthAdvisorEnabled = useFlag('healthAdvisor')
+  const reportsEnabled = useIsFeatureEnabled('reports:all')
+  const logsEnabled = useIsFeatureEnabled('logs:all')
+  const { issues } = useProjectIssues({ projectRef: ref, enabled: isIssuesInboxEnabled })
+
+  return generateOtherRoutes(ref, project, {
+    issuesInbox: isIssuesInboxEnabled,
+    hasIssues: issues.length > 0,
+    isHealthAdvisorEnabled,
+    unifiedLogs: unifiedLogsEnabled,
+    showReports: reportsEnabled,
+    showLogs: logsEnabled,
+  })
+}
+
+export const generateSettingsRoutes = (ref?: string): Route[] => {
+  return [
+    {
+      key: 'settings',
+      label: 'Project Settings',
+      icon: <SettingsIcon size={ICON_SIZE} strokeWidth={ICON_STROKE_WIDTH} />,
+      link: ref && `/project/${ref}/settings/general`,
+      disabled: false,
+      shortcutId: SHORTCUT_IDS.NAV_SETTINGS,
+    },
+  ]
+}

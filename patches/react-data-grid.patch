@@ -1,0 +1,32 @@
+diff --git a/lib/bundle.cjs b/lib/bundle.cjs
+index 810cb878ffb394df9f17296995a838e08a7d6ccf..4ba752efe1b1de392c3254d1b0d12ab9a637362f 100644
+--- a/lib/bundle.cjs
++++ b/lib/bundle.cjs
+@@ -1412,10 +1412,7 @@ function HeaderCell({
+       hasDoubleClicked = true;
+       onColumnResize(column, 'max-content');
+     }
+-    function onLostPointerCapture(event) {
+-      if (!hasDoubleClicked) {
+-        onPointerMove(event);
+-      }
++    function onLostPointerCapture() {
+       currentTarget.removeEventListener('pointermove', onPointerMove);
+       currentTarget.removeEventListener('dblclick', onDoubleClick);
+       currentTarget.removeEventListener('lostpointercapture', onLostPointerCapture);
+diff --git a/lib/bundle.js b/lib/bundle.js
+index ac667d97a43720d1f56995e63ad6556b80d4c4bf..42b6a17f382fffadbb8cdd2d7a6b42235af89ad0 100644
+--- a/lib/bundle.js
++++ b/lib/bundle.js
+@@ -1408,10 +1408,7 @@ function HeaderCell({
+       hasDoubleClicked = true;
+       onColumnResize(column, 'max-content');
+     }
+-    function onLostPointerCapture(event) {
+-      if (!hasDoubleClicked) {
+-        onPointerMove(event);
+-      }
++    function onLostPointerCapture() {
+       currentTarget.removeEventListener('pointermove', onPointerMove);
+       currentTarget.removeEventListener('dblclick', onDoubleClick);
+       currentTarget.removeEventListener('lostpointercapture', onLostPointerCapture);

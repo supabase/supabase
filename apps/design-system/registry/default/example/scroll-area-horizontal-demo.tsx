@@ -1,6 +1,5 @@
-import * as React from 'react'
 import Image from 'next/image'
-
+import * as React from 'react'
 import { ScrollArea, ScrollBar } from 'ui'
 
 export interface Artwork {
@@ -33,7 +32,7 @@ export default function ScrollAreaHorizontalDemo() {
               <Image
                 src={artwork.art}
                 alt={`Photo by ${artwork.artist}`}
-                className="aspect-[3/4] h-fit w-fit object-cover"
+                className="aspect-3/4 h-fit w-fit object-cover"
                 width={300}
                 height={400}
               />

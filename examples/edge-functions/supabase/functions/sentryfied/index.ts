@@ -1,32 +1,31 @@
-import * as Sentry from 'https://deno.land/x/sentry/index.mjs'
+import * as Sentry from 'npm:@sentry/deno@^10'
+import { withSupabase } from 'npm:@supabase/server@^1'
 
 Sentry.init({
-  dsn: SENTRY_DSN,
+  dsn: Deno.env.get('SENTRY_DSN'),
   integrations: [],
   debug: true,
   // Performance Monitoring
   tracesSampleRate: 1.0,
-  // Set sampling rate for profiling - this is relative to tracesSampleRate
-  profilesSampleRate: 1.0,
 })
 
 // Set region and execution_id as custom tags
 Sentry.setTag('region', Deno.env.get('SB_REGION'))
 Sentry.setTag('execution_id', Deno.env.get('SB_EXECUTION_ID'))
 
-Deno.serve(async (req) => {
-  try {
-    const { name } = await req.json()
-    const data = {
-      message: `Hello ${name}!`,
-    }
+// Authenticated endpoint, so deploy with verify_jwt = true.
+export default {
+  fetch: withSupabase({ auth: 'user' }, async (req, ctx) => {
+    try {
+      const { name } = await req.json()
+      const data = {
+        message: `Hello ${name}!`,
+      }
 
-    return new Response(JSON.stringify(data), { headers: { 'Content-Type': 'application/json' } })
-  } catch (e) {
-    Sentry.captureException(e)
-    return new Response(JSON.stringify({ msg: 'error' }), {
-      status: 500,
-      headers: { 'Content-Type': 'application/json' },
-    })
-  }
-})
+      return Response.json(data)
+    } catch (e) {
+      Sentry.captureException(e)
+      return Response.json({ msg: 'error' }, { status: 500 })
+    }
+  }),
+}

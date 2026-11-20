@@ -18,9 +18,9 @@ export const uploadAttachment = async (
       multiTab: false,
       detectSessionInUrl: false,
       localStorage: {
-        getItem: (key: string) => undefined,
-        setItem: (key: string, value: string) => {},
-        removeItem: (key: string) => {},
+        getItem: (_key: string) => undefined,
+        setItem: (_key: string, _value: string) => {},
+        removeItem: (_key: string) => {},
       },
     },
   })

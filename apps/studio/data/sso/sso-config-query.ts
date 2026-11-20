@@ -1,10 +1,10 @@
-import { useQuery, UseQueryOptions } from '@tanstack/react-query'
+import { useQuery } from '@tanstack/react-query'
 
-import { get, handleError } from 'data/fetchers'
-import { useSelectedOrganizationQuery } from 'hooks/misc/useSelectedOrganization'
-import { IS_PLATFORM } from 'lib/constants'
-import type { ResponseError } from 'types'
 import { orgSSOKeys } from './keys'
+import { get, handleError } from '@/data/fetchers'
+import { IS_PLATFORM } from '@/lib/constants'
+import type { StudioError } from '@/lib/errors/studio-errors'
+import type { UseCustomQueryOptions } from '@/types'
 
 export type OrgSSOConfigVariables = {
   orgSlug?: string
@@ -33,22 +33,19 @@ export async function getOrgSSOConfig({ orgSlug }: OrgSSOConfigVariables, signal
 }
 
 export type OrgSSOConfigData = Awaited<ReturnType<typeof getOrgSSOConfig>>
-export type OrgSSOConfigError = ResponseError
+export type OrgSSOConfigError = StudioError
 
 export const useOrgSSOConfigQuery = <TData = OrgSSOConfigData>(
   { orgSlug }: OrgSSOConfigVariables,
-  { enabled = true, ...options }: UseQueryOptions<OrgSSOConfigData, OrgSSOConfigError, TData> = {}
+  {
+    enabled = true,
+    ...options
+  }: UseCustomQueryOptions<OrgSSOConfigData, OrgSSOConfigError, TData> = {}
 ) => {
-  const { data: organization } = useSelectedOrganizationQuery()
-  const plan = organization?.plan.id
-  const canSetupSSOConfig = ['team', 'enterprise'].includes(plan ?? '')
-
-  return useQuery<OrgSSOConfigData, OrgSSOConfigError, TData>(
-    orgSSOKeys.orgSSOConfig(orgSlug),
-    ({ signal }) => getOrgSSOConfig({ orgSlug }, signal),
-    {
-      enabled: enabled && IS_PLATFORM && typeof orgSlug !== 'undefined' && canSetupSSOConfig,
-      ...options,
-    }
-  )
+  return useQuery<OrgSSOConfigData, OrgSSOConfigError, TData>({
+    queryKey: orgSSOKeys.orgSSOConfig(orgSlug),
+    queryFn: ({ signal }) => getOrgSSOConfig({ orgSlug }, signal),
+    enabled: enabled && IS_PLATFORM && typeof orgSlug !== 'undefined',
+    ...options,
+  })
 }

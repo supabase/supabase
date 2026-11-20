@@ -1,26 +1,21 @@
 ---
 title: Platform Kit
 description: The easiest way to build platforms on top of Supabase
+preview: |-
+  <BlockOverview name="platform-kit-nextjs" showFiles>
+    <video width="100%" muted autoPlay controls>
+      <source
+        src="https://xguihxuzqibwxjnimxev.supabase.co/storage/v1/object/public/videos/marketing/blog/platform-kit/platform-kit.mp4"
+        type="video/mp4"
+      />
+      Your browser does not support the video tag.
+    </video>
+  </BlockOverview>
 ---
-
-<video width="100%" muted autoPlay controls>
-  <source
-    src="https://xguihxuzqibwxjnimxev.supabase.co/storage/v1/object/public/videos/marketing/blog/platform-kit/platform-kit.mp4"
-    type="video/mp4"
-  />
-  Your browser does not support the video tag.
-</video>
 
 ## Installation
 
-<BlockItem
-  name="platform-kit-nextjs"
-  description="Embeddable dialog for managing Supabase projects via the Management API."
-/>
-
-## Folder structure
-
-<RegistryBlock itemName="platform-kit-nextjs" />
+<BlockItem name="platform-kit-nextjs" />
 
 ## Introduction
 
@@ -44,9 +39,10 @@ Embed the manager dialog in your app and manage its state:
 
 ```tsx
 import { useState } from 'react'
-import { useMobile } from '@/hooks/use-mobile'
-import { Button } from '@/components/ui/button'
+
 import SupabaseManagerDialog from '@/components/supabase-manager'
+import { Button } from '@/components/ui/button'
+import { useMobile } from '@/hooks/use-mobile'
 
 export default function Example() {
   const [open, setOpen] = useState(false)
@@ -67,7 +63,7 @@ export default function Example() {
 }
 ```
 
-## Quick Start
+## Quickstart
 
 1. **Set up environment variables:** in your `.env.local` file:
 

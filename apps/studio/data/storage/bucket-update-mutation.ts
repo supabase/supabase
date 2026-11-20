@@ -1,10 +1,11 @@
-import { useMutation, UseMutationOptions, useQueryClient } from '@tanstack/react-query'
+import { useMutation, useQueryClient } from '@tanstack/react-query'
+import { components } from 'api-types'
 import { toast } from 'sonner'
 
-import { components } from 'api-types'
-import { patch } from 'data/fetchers'
-import type { ResponseError } from 'types'
 import { storageKeys } from './keys'
+import { patch } from '@/data/fetchers'
+import type { StudioError } from '@/lib/errors/studio-errors'
+import type { UseCustomMutationOptions } from '@/types'
 
 type BucketUpdateVariables = {
   projectRef: string
@@ -12,6 +13,8 @@ type BucketUpdateVariables = {
   isPublic: boolean
   file_size_limit: number | null
   allowed_mime_types: string[] | null
+  /** Omitted when versioning isn't changing. There is no going back to DISABLED. */
+  versioning_status?: components['schemas']['UpdateStorageBucketBody']['versioning_status']
 }
 
 // [Alaister]: API accept null values for allowed_mime_types and file_size_limit to reset
@@ -29,13 +32,15 @@ async function updateBucket({
   isPublic,
   file_size_limit,
   allowed_mime_types,
+  versioning_status,
 }: BucketUpdateVariables): Promise<BucketUpdateResult> {
   if (!projectRef) throw new Error('projectRef is required')
-  if (!id) throw new Error('Bucket name is requried')
+  if (!id) throw new Error('Bucket name is required')
 
   const payload: Partial<UpdateStorageBucketBody> = { public: isPublic }
   if (file_size_limit !== undefined) payload.file_size_limit = file_size_limit
   if (allowed_mime_types !== undefined) payload.allowed_mime_types = allowed_mime_types
+  if (versioning_status !== undefined) payload.versioning_status = versioning_status
 
   const { data, error } = await patch('/platform/storage/{ref}/buckets/{id}', {
     params: { path: { id, ref: projectRef } },
@@ -58,33 +63,35 @@ export const useBucketUpdateMutation = ({
   onError,
   ...options
 }: Omit<
-  UseMutationOptions<BucketUpdateData, ResponseError, BucketUpdateVariables>,
+  UseCustomMutationOptions<BucketUpdateData, StudioError, BucketUpdateVariables>,
   'mutationFn'
 > = {}) => {
   const queryClient = useQueryClient()
 
-  return useMutation<BucketUpdateData, ResponseError, BucketUpdateVariables>(
-    async (vars) => {
+  return useMutation<BucketUpdateData, StudioError, BucketUpdateVariables>({
+    mutationFn: async (vars) => {
       const result = await updateBucket(vars)
       if (result.error) {
         throw result.error
       }
       return result.data
     },
-    {
-      async onSuccess(data, variables, context) {
-        const { projectRef } = variables
-        await queryClient.invalidateQueries(storageKeys.buckets(projectRef))
-        await onSuccess?.(data, variables, context)
-      },
-      async onError(data, variables, context) {
-        if (onError === undefined) {
-          toast.error(`Failed to update bucket: ${data.message}`)
-        } else {
-          onError(data, variables, context)
-        }
-      },
-      ...options,
-    }
-  )
+    async onSuccess(data, variables, context) {
+      const { projectRef } = variables
+      // `refetchType: 'all'` because the list query is inactive on the bucket page.
+      await queryClient.invalidateQueries({
+        queryKey: storageKeys.buckets(projectRef),
+        refetchType: 'all',
+      })
+      await onSuccess?.(data, variables, context)
+    },
+    async onError(data, variables, context) {
+      if (onError === undefined) {
+        toast.error(`Failed to update bucket: ${data.message}`)
+      } else {
+        onError(data, variables, context)
+      }
+    },
+    ...options,
+  })
 }

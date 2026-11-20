@@ -1,150 +1,197 @@
-import { Command, Menu, Search } from 'lucide-react'
-import dynamic from 'next/dynamic'
-import Image from 'next/image'
-import Link from 'next/link'
-import type { FC } from 'react'
-import { memo, useState } from 'react'
 // End of third-party imports
 
 import { useIsLoggedIn, useIsUserLoading, useUser } from 'common'
-import { Button, buttonVariants, cn } from 'ui'
-import { AuthenticatedDropdownMenu, CommandMenuTrigger } from 'ui-patterns'
-import { useCustomContent } from '../../../hooks/custom-content/useCustomContent'
-import GlobalNavigationMenu from './GlobalNavigationMenu'
-import useDropdownMenu from './useDropdownMenu'
+import { isFeatureEnabled } from 'common/enabled-features'
+import { DevToolbarTrigger } from 'dev-tools'
+import dynamic from 'next/dynamic'
+import Image from 'next/image'
+import Link from 'next/link'
+import { useTheme } from 'next-themes'
+import type { Ref } from 'react'
+import { memo } from 'react'
+import { Button, cn } from 'ui'
+import { AuthenticatedDropdownMenu } from 'ui-patterns/AuthenticatedDropdownMenu'
+import { MobileNavThemeButton } from 'ui-patterns/MobileNav/MobileNavThemeButton'
+import { HeadingReel } from 'ui-patterns/Toc/heading-reel'
+import { TopNavMenuToggle } from 'ui-patterns/TopNav/TopNavMenuToggle'
 
-const GlobalMobileMenu = dynamic(() => import('./GlobalMobileMenu'))
+import { getCustomContent } from '../../../lib/custom-content/getCustomContent'
+import { DOCS_SECTIONS_MENU_HEIGHT_STYLE, DocsSectionsMenu } from './DocsSectionsMenu'
+import { HeaderBreadcrumbs } from './HeaderBreadcrumbs'
+import { PageActionButtons } from './PageActionButtons'
+import useDropdownMenu from './useDropdownMenu'
+import { AskAiTrigger } from '@/features/SearchV2'
+import { SearchV2IconTrigger } from '@/features/SearchV2/SearchV2Trigger'
+
+interface DesktopTopNavBarProps {
+  headingSlotRef: Ref<HTMLLIElement>
+  updatedAtSlotRef: Ref<HTMLDivElement>
+}
+
+interface MobileTopNavBarProps {
+  isMenuOpen?: boolean
+  onMenuToggle?: () => void
+  // the page title after it scrolls under the bar, null while the title is in view
+  scrolledTitle?: string | null
+  menuButtonRef?: Ref<HTMLButtonElement>
+}
+
+interface HeaderLogoProps {
+  hasDocsLabel?: boolean
+}
+
 const TopNavDropdown = dynamic(() => import('./TopNavDropdown'))
 
-const TopNavBar: FC = () => {
+const largeLogo = isFeatureEnabled('branding:large_logo')
+
+export const DesktopTopNavBar = ({ headingSlotRef, updatedAtSlotRef }: DesktopTopNavBarProps) => {
   const isLoggedIn = useIsLoggedIn()
   const isUserLoading = useIsUserLoading()
-  const [mobileMenuOpen, setMobileMenuOpen] = useState(false)
   const user = useUser()
   const menu = useDropdownMenu(user)
 
   return (
-    <>
-      <nav
-        aria-label="top bar"
-        className="w-full z-40 flex flex-col border-b backdrop-blur backdrop-filter bg bg-opacity-75"
-      >
-        <div className="w-full px-5 lg:pl-10 flex justify-between h-[var(--header-height)] gap-3">
-          <div className="hidden lg:flex h-full items-center justify-center gap-2">
-            <HeaderLogo />
-            <GlobalNavigationMenu />
-          </div>
-          <div className="w-full grow lg:w-auto flex gap-3 justify-between lg:justify-end items-center h-full">
-            <div className="lg:hidden">
-              <HeaderLogo />
-            </div>
-
-            <div className="flex gap-2 items-center">
-              <CommandMenuTrigger>
-                <button
-                  className={cn(
-                    'group',
-                    'flex-grow md:w-44 xl:w-56 h-[30px] rounded-md',
-                    'pl-1.5 md:pl-2 pr-1',
-                    'flex items-center justify-between',
-                    'bg-surface-100/75 text-foreground-lighter border',
-                    'hover:bg-opacity-100 hover:border-strong',
-                    'focus-visible:!outline-4 focus-visible:outline-offset-1 focus-visible:outline-brand-600',
-                    'transition'
-                  )}
-                >
-                  <div className="flex items-center space-x-2 text-foreground-muted">
-                    <Search size={18} strokeWidth={2} />
-                    <p className="flex text-sm pr-2">
-                      Search
-                      <span className="hidden xl:inline ml-1"> docs...</span>
-                    </p>
-                  </div>
-                  <div className="hidden md:flex items-center space-x-1">
-                    <div
-                      aria-hidden="true"
-                      className="md:flex items-center justify-center h-full px-1 border rounded bg-surface-300 gap-0.5"
-                    >
-                      <Command size={12} strokeWidth={1.5} />
-                      <span className="text-[12px]">K</span>
-                    </div>
-                  </div>
-                </button>
-              </CommandMenuTrigger>
-              <button
-                title="Menu dropdown button"
-                className={cn(
-                  buttonVariants({ type: 'default' }),
-                  'flex lg:hidden border-default bg-surface-100/75 text-foreground-light rounded-md min-w-[30px] w-[30px] h-[30px] data-[state=open]:bg-overlay-hover/30'
-                )}
-                onClick={() => setMobileMenuOpen(!mobileMenuOpen)}
-              >
-                <Menu size={18} strokeWidth={1} />
-              </button>
-            </div>
-          </div>
-          <div className="hidden lg:flex items-center justify-end gap-3">
-            {!isUserLoading && (
-              <Button asChild>
-                <a href="/dashboard" className="h-[30px]" target="_blank" rel="noreferrer noopener">
-                  {isLoggedIn ? 'Dashboard' : 'Sign up'}
-                </a>
-              </Button>
-            )}
-            {process.env.NEXT_PUBLIC_DEV_AUTH_PAGE === 'true' && (
-              <Button asChild>
-                <Link href="/dev-secret-auth">Dev-only secret sign-in</Link>
-              </Button>
-            )}
-            {isLoggedIn ? (
-              <AuthenticatedDropdownMenu menu={menu} user={user} site="docs" />
-            ) : (
-              <TopNavDropdown />
-            )}
+    <nav
+      aria-label="top bar"
+      className="relative w-full z-40 flex flex-col bg-default/75 backdrop-blur-sm backdrop-filter"
+    >
+      <div className="w-full flex h-(--header-height) border-b">
+        <div
+          style={DOCS_SECTIONS_MENU_HEIGHT_STYLE}
+          className="docs-sections-cell relative flex w-(--docs-side-column-width) shrink-0 items-center gap-1.5 pl-5.75 pr-4 border-r"
+        >
+          <a
+            href="https://supabase.com"
+            aria-label="Supabase.com"
+            className="flex shrink-0 items-center rounded-md focus-ring"
+          >
+            <HeaderLogoContent hasDocsLabel={false} />
+          </a>
+          <DocsSectionsMenu />
+        </div>
+        <div className="flex min-w-0 flex-1 items-center gap-4 pl-6 pr-3">
+          <HeaderBreadcrumbs headingSlotRef={headingSlotRef} />
+          <div className="ml-auto flex shrink-0 items-center gap-3">
+            <div ref={updatedAtSlotRef} className="contents" />
+            <PageActionButtons />
           </div>
         </div>
-      </nav>
-      <GlobalMobileMenu open={mobileMenuOpen} setOpen={setMobileMenuOpen} />
+        <div className="flex w-(--docs-side-column-width) shrink-0 items-center justify-end gap-2 px-6 group-has-data-docs-right-rail/docs:border-l">
+          <DevToolbarTrigger />
+          <SearchV2IconTrigger />
+          <AskAiTrigger />
+          {!isUserLoading && !isLoggedIn ? (
+            <Button variant="primary" asChild>
+              <a href="/dashboard" className="h-[30px]" target="_blank" rel="noreferrer noopener">
+                Sign up
+              </a>
+            </Button>
+          ) : null}
+          {process.env.NEXT_PUBLIC_DEV_AUTH_PAGE === 'true' && (
+            <Button asChild>
+              <Link href="/dev-secret-auth">Dev-only secret sign-in</Link>
+            </Button>
+          )}
+          {isLoggedIn ? (
+            <AuthenticatedDropdownMenu menu={menu} user={user} site="docs" />
+          ) : (
+            <TopNavDropdown />
+          )}
+        </div>
+      </div>
+    </nav>
+  )
+}
+
+export const MobileTopNavBar = ({
+  isMenuOpen = false,
+  onMenuToggle,
+  scrolledTitle,
+  menuButtonRef,
+}: MobileTopNavBarProps) => {
+  const { theme, setTheme } = useTheme()
+
+  return (
+    <nav aria-label="top bar" className="relative w-full z-40 flex flex-col bg-default">
+      <div className="w-full flex h-(--header-height) border-b">
+        <div className="flex w-full px-6 gap-3 justify-between items-center">
+          <div className="min-w-0">
+            <MobileHeaderLogo scrolledTitle={scrolledTitle} />
+          </div>
+          <div className="flex gap-3 items-center">
+            <PageActionButtons className="hidden md:flex" />
+            <DevToolbarTrigger />
+            {isMenuOpen ? (
+              <MobileNavThemeButton value={theme} onValueChange={setTheme} />
+            ) : (
+              <>
+                <SearchV2IconTrigger />
+                <AskAiTrigger />
+              </>
+            )}
+            <TopNavMenuToggle ref={menuButtonRef} isOpen={isMenuOpen} onClick={onMenuToggle} />
+          </div>
+        </div>
+      </div>
+    </nav>
+  )
+}
+
+const HeaderLogo = memo(() => (
+  <Link href="/" className="flex shrink-0 items-center gap-1.5 w-fit">
+    <HeaderLogoContent />
+  </Link>
+))
+
+HeaderLogo.displayName = 'HeaderLogo'
+
+const HeaderLogoContent = ({ hasDocsLabel = true }: HeaderLogoProps) => {
+  const { navigationLogo } = getCustomContent(['navigation:logo'])
+
+  return (
+    <>
+      <Image
+        className={cn('hidden dark:block m-0!', largeLogo && 'h-[36px]')}
+        src={navigationLogo?.dark ?? '/docs/supabase-dark.svg'}
+        priority={true}
+        loading="eager"
+        width={navigationLogo?.width ?? 96}
+        height={navigationLogo?.height ?? 18}
+        alt="Supabase wordmark"
+      />
+      <Image
+        className={cn('block dark:hidden m-0!', largeLogo && 'h-[36px]')}
+        src={navigationLogo?.light ?? '/docs/supabase-light.svg'}
+        priority={true}
+        loading="eager"
+        width={navigationLogo?.width ?? 96}
+        height={navigationLogo?.height ?? 18}
+        alt="Supabase wordmark"
+      />
+      {hasDocsLabel ? (
+        <span className="font-mono text-sm font-medium text-primary mb-px">DOCS</span>
+      ) : null}
     </>
   )
 }
 
-const HeaderLogo = memo(() => {
-  const { navigationLogoUrl } = useCustomContent(['navigation:logo_url'])
+const MobileHeaderLogo = ({ scrolledTitle }: { scrolledTitle?: string | null }) => {
+  // the large logo is taller than the reel, so it does not roll
+  if (largeLogo) return <HeaderLogo />
 
   return (
     <Link
       href="/"
-      className={cn(
-        buttonVariants({ type: 'default' }),
-        'flex shrink-0 items-center w-fit !bg-transparent !border-none !shadow-none'
-      )}
+      aria-label={scrolledTitle ? `${scrolledTitle}, Supabase docs` : 'Supabase docs'}
+      className="flex h-11 min-w-0 items-center text-sm font-medium text-foreground"
     >
-      <Image
-        className="hidden dark:block !m-0"
-        src={navigationLogoUrl?.dark ?? '/docs/supabase-dark.svg'}
-        priority={true}
-        loading="eager"
-        width={96}
-        height={18}
-        alt="Supabase wordmark"
-      />
-      <Image
-        className="block dark:hidden !m-0"
-        src={navigationLogoUrl?.light ?? '/docs/supabase-light.svg'}
-        priority={true}
-        loading="eager"
-        width={96}
-        height={18}
-        alt="Supabase wordmark"
-      />
-      <span className="font-mono text-sm font-medium text-brand-link mb-px">DOCS</span>
+      <HeadingReel id={scrolledTitle ?? 'logo'} index={scrolledTitle ? 1 : 0}>
+        {scrolledTitle ?? (
+          <span className="flex items-center gap-1.5">
+            <HeaderLogoContent />
+          </span>
+        )}
+      </HeadingReel>
     </Link>
   )
-})
-
-HeaderLogo.displayName = 'HeaderLogo'
-
-TopNavBar.displayName = 'TopNavBar'
-
-export default TopNavBar
+}

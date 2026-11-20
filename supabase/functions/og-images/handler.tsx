@@ -62,6 +62,7 @@ export async function handler(req: Request) {
 
   switch (site) {
     case 'docs':
+    case 'kb':
       return new ImageResponse(
         (
           <Docs
@@ -69,6 +70,7 @@ export async function handler(req: Request) {
             description={description !== 'undefined' ? description : ''}
             type={type}
             icon={icon}
+            label={site.toUpperCase()}
           />
         ),
         {

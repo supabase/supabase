@@ -1,26 +1,27 @@
-import { useMemo } from 'react'
-
 import { useBreakpoint } from 'common'
-import AlertError from 'components/ui/AlertError'
-import ShimmeringLoader from 'components/ui/ShimmeringLoader'
-import {
-  ComputeUsageMetric,
-  computeUsageMetricLabel,
-  PricingMetric,
-} from 'data/analytics/org-daily-stats-query'
-import type { OrgSubscription } from 'data/subscriptions/types'
-import { useOrgUsageQuery } from 'data/usage/org-usage-query'
-import { useIsFeatureEnabled } from 'hooks/misc/useIsFeatureEnabled'
-import { DOCS_URL } from 'lib/constants'
+import { useMemo } from 'react'
 import { cn } from 'ui'
+import { ShimmeringLoader } from 'ui-patterns/ShimmeringLoader'
+
 import { BILLING_BREAKDOWN_METRICS } from '../BillingSettings/BillingBreakdown/BillingBreakdown.constants'
 import { BillingMetric } from '../BillingSettings/BillingBreakdown/BillingMetric'
 import { ComputeMetric } from '../BillingSettings/BillingBreakdown/ComputeMetric'
 import { SectionContent } from './SectionContent'
+import { AlertError } from '@/components/ui/AlertError'
+import {
+  ComputeUsageMetric,
+  computeUsageMetricLabel,
+  PricingMetric,
+} from '@/data/analytics/org-daily-stats-query'
+import type { OrgSubscription } from '@/data/subscriptions/types'
+import { useOrgUsageQuery } from '@/data/usage/org-usage-query'
+import { useIsFeatureEnabled } from '@/hooks/misc/useIsFeatureEnabled'
+import { useSelectedOrganizationQuery } from '@/hooks/misc/useSelectedOrganization'
+import { DOCS_URL } from '@/lib/constants'
 
 export interface ComputeProps {
   orgSlug: string
-  projectRef?: string
+  projectRef?: string | null
   startDate: string | undefined
   endDate: string | undefined
   subscription: OrgSubscription | undefined
@@ -33,6 +34,11 @@ const METRICS_TO_HIDE_WITH_NO_USAGE: PricingMetric[] = [
   PricingMetric.DISK_SIZE_GB_HOURS_GP3,
   PricingMetric.DISK_SIZE_GB_HOURS_IO2,
   PricingMetric.DISK_THROUGHPUT_GP3,
+  PricingMetric.LOG_STORAGE,
+  PricingMetric.ACTIVE_COMPUTE_HOURS,
+  PricingMetric.PIPELINES_PIPELINE,
+  PricingMetric.PIPELINES_REPLICATED_DATA,
+  PricingMetric.PIPELINES_COPY_BACKFILL_DATA,
 ]
 
 export const TotalUsage = ({
@@ -46,11 +52,13 @@ export const TotalUsage = ({
   const isMobile = useBreakpoint('md')
   const isUsageBillingEnabled = subscription?.usage_billing_enabled
   const { billingAll } = useIsFeatureEnabled(['billing:all'])
+  const { data: org } = useSelectedOrganizationQuery()
+  const hasActiveRestriction = Boolean(org?.restriction_status)
 
   const {
     data: usage,
     error: usageError,
-    isLoading: isLoadingUsage,
+    isPending: isLoadingUsage,
     isError: isErrorUsage,
     isSuccess: isSuccessUsage,
   } = useOrgUsageQuery({
@@ -63,6 +71,8 @@ export const TotalUsage = ({
   // When the user filters by project ref or selects a custom timeframe, we only display usage+project breakdown, but no costs/limits
   const showRelationToSubscription = currentBillingCycleSelected && !projectRef
 
+  const isOnHigherPlan = ['team', 'enterprise', 'platform'].includes(subscription?.plan.id ?? '')
+
   const hasExceededAnyLimits =
     showRelationToSubscription &&
     Boolean(
@@ -70,6 +80,9 @@ export const TotalUsage = ({
         (usageItem) =>
           // Filter out compute as compute has no quota and is always being charged for
           !usageItem.metric.startsWith('COMPUTE_') &&
+          // Log metrics should not trigger the exceeded limits alert for now (soft rollout)
+          usageItem.metric !== PricingMetric.LOG_INGESTION &&
+          usageItem.metric !== PricingMetric.LOG_QUERYING &&
           !usageItem.unlimited &&
           usageItem.usage > (usageItem?.pricing_free_units ?? 0)
       )
@@ -78,15 +91,15 @@ export const TotalUsage = ({
   const sortedBillingMetrics = useMemo(() => {
     if (!usage) return []
 
-    const breakdownMetrics = BILLING_BREAKDOWN_METRICS.filter((metric) =>
-      usage.usages.some((usage) => usage.metric === metric.key)
-    ).filter((metric) => {
-      if (!METRICS_TO_HIDE_WITH_NO_USAGE.includes(metric.key as PricingMetric)) return true
+    const breakdownMetrics = BILLING_BREAKDOWN_METRICS(subscription)
+      .filter((metric) => usage.usages.some((usage) => usage.metric === metric.key))
+      .filter((metric) => {
+        if (!METRICS_TO_HIDE_WITH_NO_USAGE.includes(metric.key as PricingMetric)) return true
 
-      const metricUsage = usage.usages.find((it) => it.metric === metric.key)
+        const metricUsage = usage.usages.find((it) => it.metric === metric.key)
 
-      return metricUsage && metricUsage.usage > 0
-    })
+        return metricUsage && metricUsage.usage > 0
+      })
 
     return breakdownMetrics.slice().sort((a, b) => {
       const usageMetaA = usage.usages.find((x) => x.metric === a.key)
@@ -108,7 +121,7 @@ export const TotalUsage = ({
         usageRatioB - usageRatioA
       )
     })
-  }, [usage])
+  }, [usage, subscription])
 
   const computeMetrics = (usage?.usages || [])
     .filter((it) => it.metric.startsWith('COMPUTE'))
@@ -148,7 +161,7 @@ export const TotalUsage = ({
 
         {isSuccessUsage && subscription && (
           <div>
-            {showRelationToSubscription && (
+            {showRelationToSubscription && !isOnHigherPlan && !hasActiveRestriction && (
               <p className="text-sm">
                 {!hasExceededAnyLimits ? (
                   <span>
@@ -187,12 +200,16 @@ export const TotalUsage = ({
                 )}
               </p>
             )}
-            <div className="grid grid-cols-2 mt-3 gap-[1px] bg-border">
+
+            <div className="grid grid-cols-2 mt-3 gap-px bg-border">
               {sortedBillingMetrics.map((metric, i) => {
                 return (
                   <div
                     key={metric.key}
-                    className={cn('col-span-2 md:col-span-1 bg-sidebar space-y-4 py-4')}
+                    className={cn(
+                      'col-span-2 md:col-span-1 bg-sidebar space-y-4 py-4',
+                      i % 2 === 0 ? 'md:pr-4' : 'md:pl-4'
+                    )}
                   >
                     <BillingMetric
                       idx={i}
@@ -201,7 +218,7 @@ export const TotalUsage = ({
                       usage={usage}
                       subscription={subscription!}
                       relativeToSubscription={showRelationToSubscription}
-                      className={cn(i % 2 === 0 ? 'md:pr-4' : 'md:pl-4')}
+                      projectRef={projectRef}
                     />
                   </div>
                 )
@@ -225,6 +242,7 @@ export const TotalUsage = ({
                       }}
                       relativeToSubscription={showRelationToSubscription}
                       usage={usage}
+                      projectRef={projectRef}
                       className={cn(
                         (i + sortedBillingMetrics.length) % 2 === 0 ? 'md:pr-4' : 'md:pl-4'
                       )}

@@ -1,0 +1,53 @@
+import { useMutation } from '@tanstack/react-query'
+import { toast } from 'sonner'
+
+import { handleError, post } from '@/data/fetchers'
+import type { StudioError } from '@/lib/errors/studio-errors'
+import type { UseCustomMutationOptions } from '@/types'
+
+export type OAuthIntegrationInstallVariables = {
+  projectRef: string
+  listingSlug: string
+}
+
+export async function installOAuthIntegration({
+  projectRef,
+  listingSlug,
+}: OAuthIntegrationInstallVariables) {
+  const { data, error } = await post('/platform/integrations/partners/{ref}/{listing_slug}', {
+    params: { path: { ref: projectRef, listing_slug: listingSlug } },
+  })
+
+  if (error) handleError(error)
+  return data
+}
+
+type OAuthIntegrationInstallData = Awaited<ReturnType<typeof installOAuthIntegration>>
+
+export const useInstallOAuthIntegrationMutation = ({
+  onSuccess,
+  onError,
+  ...options
+}: Omit<
+  UseCustomMutationOptions<
+    OAuthIntegrationInstallData,
+    StudioError,
+    OAuthIntegrationInstallVariables
+  >,
+  'mutationFn'
+> = {}) => {
+  return useMutation<OAuthIntegrationInstallData, StudioError, OAuthIntegrationInstallVariables>({
+    mutationFn: (vars) => installOAuthIntegration(vars),
+    async onSuccess(data, variables, context) {
+      await onSuccess?.(data, variables, context)
+    },
+    async onError(data, variables, context) {
+      if (onError === undefined) {
+        toast.error(`Failed to start OAuth integration installation: ${data.message}`)
+      } else {
+        onError(data, variables, context)
+      }
+    },
+    ...options,
+  })
+}

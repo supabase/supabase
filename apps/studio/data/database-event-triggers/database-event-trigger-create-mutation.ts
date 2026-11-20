@@ -1,0 +1,72 @@
+import { asWriteSql, type SafeSqlFragment } from '@supabase/pg-meta/src/pg-format'
+import { useMutation, useQueryClient } from '@tanstack/react-query'
+import { toast } from 'sonner'
+
+import { databaseEventTriggerKeys } from './keys'
+import { executeSql, type PgMetaWriteGrant } from '@/data/sql/execute-sql-mutation'
+import type { StudioError } from '@/lib/errors/studio-errors'
+import type { UseCustomMutationOptions } from '@/types'
+
+export type DatabaseEventTriggerCreateVariables = {
+  projectRef: string
+  grant: PgMetaWriteGrant
+  connectionString?: string | null
+  sql: SafeSqlFragment
+}
+
+export async function createDatabaseEventTrigger({
+  projectRef,
+  grant,
+  connectionString,
+  sql,
+}: DatabaseEventTriggerCreateVariables) {
+  const { result } = await executeSql({
+    projectRef,
+    connectionString,
+    sqlOrigin: 'studio',
+    queryName: 'event-trigger-create',
+    sql: asWriteSql(sql),
+    queryKey: ['event-trigger', 'create'],
+    grant,
+  })
+
+  return result
+}
+
+type DatabaseEventTriggerCreateData = Awaited<ReturnType<typeof createDatabaseEventTrigger>>
+
+export const useDatabaseEventTriggerCreateMutation = ({
+  onSuccess,
+  onError,
+  ...options
+}: Omit<
+  UseCustomMutationOptions<
+    DatabaseEventTriggerCreateData,
+    StudioError,
+    DatabaseEventTriggerCreateVariables
+  >,
+  'mutationFn'
+> = {}) => {
+  const queryClient = useQueryClient()
+
+  return useMutation<
+    DatabaseEventTriggerCreateData,
+    StudioError,
+    DatabaseEventTriggerCreateVariables
+  >({
+    mutationFn: (vars) => createDatabaseEventTrigger(vars),
+    async onSuccess(data, variables, context) {
+      const { projectRef } = variables
+      await queryClient.invalidateQueries({ queryKey: databaseEventTriggerKeys.list(projectRef) })
+      await onSuccess?.(data, variables, context)
+    },
+    async onError(data, variables, context) {
+      if (onError === undefined) {
+        toast.error(`Failed to create event trigger: ${data.message}`)
+      } else {
+        onError(data, variables, context)
+      }
+    },
+    ...options,
+  })
+}

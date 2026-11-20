@@ -1,11 +1,11 @@
-import dayjs from 'dayjs'
-import { formatBytes } from 'lib/helpers'
+import { useFlag } from 'common'
 import { useTheme } from 'next-themes'
-import { ComponentProps, useEffect, useState } from 'react'
+import { ComponentProps, useEffect, useMemo, useState } from 'react'
 import {
   Area,
   Bar,
   CartesianGrid,
+  Customized,
   Label,
   Line,
   ComposedChart as RechartComposedChart,
@@ -15,31 +15,52 @@ import {
   XAxis,
   YAxis,
 } from 'recharts'
-
 import { CategoricalChartState } from 'recharts/types/chart/types'
 import { cn } from 'ui'
-import { ChartHeader } from './ChartHeader'
-import { ChartHighlightActions, ChartHighlightAction } from './ChartHighlightActions'
+
+import { ChartHeader, type ChartHeaderProps } from './ChartHeader'
+import { ChartHighlightAction, ChartHighlightActions } from './ChartHighlightActions'
 import {
   CHART_COLORS,
   DateTimeFormats,
   STACKED_CHART_COLORS,
+  STACKED_CHART_FILLS,
   updateStackedChartColors,
 } from './Charts.constants'
 import { CommonChartProps, Datum } from './Charts.types'
-import { numberFormatter, useChartSize } from './Charts.utils'
+import {
+  computeYAxisDomain,
+  formatPercentage,
+  normalizeStackedSeriesData,
+  numberFormatter,
+  useChartSize,
+} from './Charts.utils'
 import {
   calculateTotalChartAggregate,
   CustomLabel,
   CustomTooltip,
+  getStackId,
   MultiAttribute,
+  resolveChartColor,
+  ThresholdZone,
 } from './ComposedChart.utils'
-import NoDataPlaceholder from './NoDataPlaceholder'
+import {
+  getThresholdZoneChart,
+  getThresholdZoneXBounds,
+  getThresholdZoneYBounds,
+} from './ComposedChartThresholdZones.utils'
+import { NoDataPlaceholder } from './NoDataPlaceholder'
+import { ThresholdZoneLine } from './ThresholdZoneLine'
 import { ChartHighlight } from './useChartHighlight'
 import { useChartHoverState } from './useChartHoverState'
+import { formatDateTime, useFormatDateTime } from '@/lib/datetime'
+import { formatBytes, formatBytesMinMB } from '@/lib/helpers'
 
 export interface ComposedChartProps<D = Datum> extends CommonChartProps<D> {
+  chartId?: string
   attributes: MultiAttribute[]
+  thresholdZones?: ThresholdZone[]
+  thresholdZoneAttribute?: string
   yAxisKey: string
   xAxisKey: string
   displayDateInUtc?: boolean
@@ -61,15 +82,39 @@ export interface ComposedChartProps<D = Datum> extends CommonChartProps<D> {
   titleTooltip?: string
   hideYAxis?: boolean
   hideHighlightedValue?: boolean
+  hideHighlightedLabel?: boolean
+  hideHighlightArea?: boolean
   syncId?: string
   docsUrl?: string
   sql?: string
   highlightActions?: ChartHighlightAction[]
+  showNewBadge?: boolean
+  getHeaderStats?: ChartHeaderProps['getHeaderStats']
+  normalizeVisibleStackToPercent?: boolean
+}
+
+interface CustomizedDotProps {
+  formattedGraphicalItems?: Array<{
+    props?: {
+      points?: Array<{ x: number; y: number }>
+      dataKey?: string
+    }
+    item?: {
+      props?: {
+        points?: Array<{ x: number; y: number }>
+        dataKey?: string
+      }
+    }
+    points?: Array<{ x: number; y: number }>
+  }>
 }
 
 export function ComposedChart({
+  chartId,
   data,
   attributes,
+  thresholdZones,
+  thresholdZoneAttribute,
   yAxisKey,
   xAxisKey,
   format,
@@ -99,19 +144,25 @@ export function ComposedChart({
   updateDateRange,
   hideYAxis,
   hideHighlightedValue,
+  hideHighlightedLabel = false,
+  hideHighlightArea = false,
   syncId,
   docsUrl,
   sql,
   highlightActions,
+  titleTooltip,
+  showNewBadge,
+  getHeaderStats,
+  normalizeVisibleStackToPercent = false,
 }: ComposedChartProps) {
+  const shouldDefaultToLineCharts = useFlag('defaultToLineCharts')
+  const effectiveChartStyle = shouldDefaultToLineCharts ? 'line' : chartStyle
   const { resolvedTheme } = useTheme()
   const { hoveredIndex, syncTooltip, setHover, clearHover } = useChartHoverState(
     syncId || 'default'
   )
-  const [_activePayload, setActivePayload] = useState<any>(null)
   const [_showMaxValue, setShowMaxValue] = useState(showMaxValue)
   const [focusDataIndex, setFocusDataIndex] = useState<number | null>(null)
-  const [hoveredLabel, setHoveredLabel] = useState<string | null>(null)
   const [isActiveHoveredChart, setIsActiveHoveredChart] = useState(false)
   const [hiddenAttributes, setHiddenAttributes] = useState<Set<string>>(new Set())
   const isDarkMode = resolvedTheme?.includes('dark')
@@ -122,7 +173,13 @@ export function ComposedChart({
 
   const { Container } = useChartSize(size)
 
-  const day = (value: number | string) => (displayDateInUtc ? dayjs(value).utc() : dayjs(value))
+  // When `displayDateInUtc` is set the chart explicitly wants UTC labels.
+  // Otherwise honour the user's selected timezone via the picker.
+  const formatPickerDate = useFormatDateTime()
+  const formatChartDate = (value: number | string) =>
+    displayDateInUtc
+      ? formatDateTime(value, { tz: 'UTC', format: customDateFormat })
+      : formatPickerDate(value, customDateFormat)
 
   const formatTimestamp = (ts: unknown) => {
     if (typeof ts !== 'number' && typeof ts !== 'string') {
@@ -130,10 +187,11 @@ export function ComposedChart({
     }
 
     if (typeof ts === 'number' && ts > 1e14) {
-      return day(ts / 1000).format(customDateFormat)
+      // Microsecond timestamp; convert to milliseconds before formatting.
+      return formatChartDate(ts / 1000)
     }
 
-    return day(ts).format(customDateFormat)
+    return formatChartDate(ts)
   }
 
   const _XAxisProps = XAxisProps || {
@@ -147,6 +205,15 @@ export function ComposedChart({
     tick: false,
     width: 0,
   }
+  const yAxisPadding = useMemo(() => {
+    const needsTopPadding = normalizeVisibleStackToPercent && effectiveChartStyle !== 'bar'
+    if (!needsTopPadding) return _YAxisProps.padding
+
+    return {
+      ..._YAxisProps.padding,
+      top: Math.max(8, _YAxisProps.padding?.top ?? 0),
+    }
+  }, [_YAxisProps.padding, effectiveChartStyle, normalizeVisibleStackToPercent])
 
   function getHeaderLabel() {
     if (!xAxisIsDate) {
@@ -165,8 +232,44 @@ export function ComposedChart({
     )
   }
 
+  function formatHighlightedValue(value: any) {
+    if (typeof value !== 'number') {
+      return value
+    }
+
+    if (typeof format === 'function') {
+      return format(value)
+    }
+
+    if (shouldFormatBytes) {
+      const bytesValue = isNetworkChart ? Math.abs(value) : value
+      const formatted = isMemoryChart
+        ? formatBytesMinMB(bytesValue, valuePrecision)
+        : formatBytes(bytesValue, valuePrecision)
+      return format === 'bytes-per-second' ? `${formatted}/s` : formatted
+    }
+
+    if (format === '%') {
+      return formatPercentage(value, valuePrecision)
+    }
+
+    if (valuePrecision === 0 && value > 0 && value < 1) {
+      return '<1'
+    }
+
+    const formatted = numberFormatter(value, valuePrecision)
+    if (typeof format === 'string' && format) {
+      return `${formatted}${format}`
+    }
+    return formatted
+  }
+
   function computeHighlightedValue() {
-    const maxAttribute = attributes.find((a) => a.isMaxValue)
+    const activePoint = data[focusDataIndex ?? data.length - 1]
+    if (thresholdZoneAttribute && !Number.isFinite(activePoint?.[thresholdZoneAttribute])) {
+      return 'Unavailable'
+    }
+
     const referenceLines = attributes.filter(
       (attribute) => attribute?.provider === 'reference-line'
     )
@@ -195,8 +298,24 @@ export function ComposedChart({
       : undefined
 
     if (focusDataIndex !== null) {
+      const focusedDataPoint = data[focusDataIndex]
+        ? Object.entries(data[focusDataIndex])
+            .map(([key, value]) => ({
+              dataKey: key,
+              value: value as number,
+            }))
+            .filter(
+              (entry) =>
+                entry.dataKey !== 'timestamp' &&
+                entry.dataKey !== 'period_start' &&
+                attributes.some(
+                  (attr) => attr.attribute === entry.dataKey && attr.enabled !== false
+                )
+            )
+        : undefined
+
       return showTotal
-        ? calculateTotalChartAggregate(_activePayload, attributesToIgnoreFromTotal)
+        ? calculateTotalChartAggregate(focusedDataPoint ?? [], attributesToIgnoreFromTotal)
         : data[focusDataIndex]?.[yAxisKey]
     }
 
@@ -207,26 +326,15 @@ export function ComposedChart({
     return highlightedValue
   }
 
-  function formatHighlightedValue(value: any) {
-    if (typeof value !== 'number') {
-      return value
-    }
-
-    if (shouldFormatBytes) {
-      const bytesValue = isNetworkChart ? Math.abs(value) : value
-      return formatBytes(bytesValue, valuePrecision)
-    }
-
-    return numberFormatter(value, valuePrecision)
-  }
-
   const maxAttribute = attributes.find((a) => a.isMaxValue)
   const maxAttributeData = {
     name: maxAttribute?.attribute,
-    color: CHART_COLORS.REFERENCE_LINE,
+    color: resolveChartColor(maxAttribute?.color, isDarkMode) ?? CHART_COLORS.REFERENCE_LINE,
   }
 
-  const referenceLines = attributes.filter((attribute) => attribute?.provider === 'reference-line')
+  const referenceLines = attributes.filter((attribute) => {
+    return attribute?.provider === 'reference-line'
+  })
 
   const resolvedHighlightedLabel = getHeaderLabel()
 
@@ -237,9 +345,16 @@ export function ComposedChart({
     chartHighlight?.coordinates.right &&
     chartHighlight?.coordinates.left !== chartHighlight?.coordinates.right
 
+  const firstChartPoint = { ...data[0] }
+  if (thresholdZoneAttribute && !(thresholdZoneAttribute in firstChartPoint)) {
+    const firstMetricPoint = data.find((point) => thresholdZoneAttribute in point)
+    if (firstMetricPoint)
+      firstChartPoint[thresholdZoneAttribute] = firstMetricPoint[thresholdZoneAttribute]
+  }
+
   const chartData =
     data && !!data[0]
-      ? Object.entries(data[0])
+      ? Object.entries(firstChartPoint)
           ?.map(([key, value]) => ({
             name: key,
             value: value,
@@ -256,11 +371,12 @@ export function ComposedChart({
             const attribute = attributes.find((attr) => attr.attribute === att.name)
             return {
               ...att,
-              color: attribute?.color
-                ? resolvedTheme?.includes('dark')
-                  ? attribute.color.dark
-                  : attribute.color.light
-                : STACKED_CHART_COLORS[index % STACKED_CHART_COLORS.length],
+              color:
+                resolveChartColor(attribute?.color, isDarkMode) ??
+                STACKED_CHART_COLORS[index % STACKED_CHART_COLORS.length],
+              fill:
+                resolveChartColor(attribute?.fill, isDarkMode) ??
+                STACKED_CHART_FILLS[index % STACKED_CHART_FILLS.length],
             }
           })
       : []
@@ -269,11 +385,33 @@ export function ComposedChart({
     const attribute = attributes.find((attr) => attr.attribute === att.name)
     return !attribute?.isMaxValue
   })
-  const visibleAttributes = stackedAttributes.filter((att) => !hiddenAttributes.has(att.name))
+
+  const visibleAttributes = useMemo(
+    () => stackedAttributes.filter((att) => !hiddenAttributes.has(att.name)),
+    [stackedAttributes, hiddenAttributes]
+  )
+  const displayData = useMemo(
+    () =>
+      normalizeVisibleStackToPercent
+        ? normalizeStackedSeriesData({
+            data,
+            attributeNames: visibleAttributes.map((attribute) => attribute.name),
+          })
+        : data,
+    [data, normalizeVisibleStackToPercent, visibleAttributes]
+  )
+
+  const thresholdZoneChart = useMemo(
+    () => getThresholdZoneChart(data, thresholdZones, thresholdZoneAttribute),
+    [data, thresholdZones, thresholdZoneAttribute]
+  )
+
   const isPercentage = format === '%'
   const isRamChart =
     !chartData?.some((att: any) => att.name.toLowerCase() === 'ram_usage') &&
     chartData?.some((att: any) => att.name.toLowerCase().includes('ram_'))
+  const isSwapChart = chartData?.some((att: any) => att.name.toLowerCase().includes('swap_'))
+  const isMemoryChart = isRamChart || isSwapChart
   const isDiskSpaceChart = chartData?.some((att: any) =>
     att.name.toLowerCase().includes('disk_space_')
   )
@@ -281,27 +419,50 @@ export function ComposedChart({
     att.name.toLowerCase().includes('pg_database_size')
   )
   const isNetworkChart = chartData?.some((att: any) => att.name.toLowerCase().includes('network_'))
-  const shouldFormatBytes = isRamChart || isDiskSpaceChart || isDBSizeChart || isNetworkChart
-  //*
-  // Set the y-axis domain
-  // to the highest value in the chart data for percentage charts
-  // to vertically zoom in on the data
-  // */
+  const isBytesFormat = format === 'bytes' || format === 'bytes-per-second'
+  const shouldFormatBytes =
+    isBytesFormat || isMemoryChart || isDiskSpaceChart || isDBSizeChart || isNetworkChart
   const yMaxFromVisible = Math.max(
     0,
     ...visibleAttributes.map((att) => (typeof att.value === 'number' ? att.value : 0))
   )
-  const yDomain = [0, yMaxFromVisible]
+
+  const yAxisDomain = useMemo(
+    () =>
+      computeYAxisDomain({
+        isPercentage,
+        showMaxValue,
+        yMaxFromVisible,
+        thresholdZoneMax: thresholdZoneChart.maxValue,
+        maxAttributeKey: maxAttribute?.attribute,
+        showMaxLine: _showMaxValue,
+        data,
+        visibleAttributeNames: visibleAttributes.map((a) => a.name),
+      }),
+    [
+      isPercentage,
+      showMaxValue,
+      yMaxFromVisible,
+      thresholdZoneChart.maxValue,
+      maxAttribute,
+      _showMaxValue,
+      data,
+      visibleAttributes,
+    ]
+  )
 
   if (data.length === 0) {
     return (
       <NoDataPlaceholder
+        hideTotalPlaceholder={highlightedValue === undefined}
         message={emptyStateMessage}
         description="It may take up to 24 hours for data to refresh"
         size={size}
         className={className}
         attribute={title}
         format={format}
+        docsUrl={docsUrl}
+        titleTooltip={titleTooltip}
       />
     )
   }
@@ -309,15 +470,23 @@ export function ComposedChart({
   return (
     <div className={cn('flex flex-col gap-y-3', className)}>
       <ChartHeader
+        thresholdZoneAttribute={thresholdZoneAttribute}
+        thresholdZoneWarning={thresholdZoneChart.selectedZone}
         hideHighlightedValue={hideHighlightedValue}
         title={title}
+        showNewBadge={showNewBadge}
+        getHeaderStats={getHeaderStats}
+        focusedIndex={focusDataIndex}
         format={format}
+        hideHighlightedLabel={hideHighlightedLabel}
+        hideHighlightArea={hideHighlightArea}
+        titleTooltip={titleTooltip}
         customDateFormat={customDateFormat}
         highlightedValue={formatHighlightedValue(resolvedHighlightedValue)}
         highlightedLabel={resolvedHighlightedLabel}
         minimalHeader={minimalHeader}
-        hideChartType={hideChartType}
-        chartStyle={chartStyle}
+        hideChartType={hideChartType || shouldDefaultToLineCharts}
+        chartStyle={effectiveChartStyle}
         onChartStyleChange={onChartStyleChange}
         showMaxValue={_showMaxValue}
         setShowMaxValue={maxAttribute ? setShowMaxValue : undefined}
@@ -331,41 +500,59 @@ export function ComposedChart({
         valuePrecision={valuePrecision}
         shouldFormatBytes={shouldFormatBytes}
         isNetworkChart={isNetworkChart}
+        isMemoryChart={isMemoryChart}
         attributes={attributes}
         sql={sql}
       />
       <Container className="relative z-10">
         <RechartComposedChart
-          data={data}
+          data={displayData}
           syncId={syncId}
           style={{ cursor: 'crosshair' }}
-          onMouseMove={(e: any) => {
+          onMouseMove={({ activeLabel, activeTooltipIndex }) => {
+            if (activeTooltipIndex === undefined || activeTooltipIndex === null) return
+
             setIsActiveHoveredChart(true)
-            if (e.activeTooltipIndex !== focusDataIndex) {
-              setFocusDataIndex(e.activeTooltipIndex)
-              setActivePayload(e.activePayload)
+            if (activeTooltipIndex !== focusDataIndex) {
+              setFocusDataIndex(activeTooltipIndex)
             }
 
-            setHover(e.activeTooltipIndex)
+            setHover(activeTooltipIndex)
 
-            const activeTimestamp = data[e.activeTooltipIndex]?.timestamp
+            const activeTimestamp =
+              data[activeTooltipIndex]?.[xAxisKey] ?? data[activeTooltipIndex]?.timestamp
             chartHighlight?.handleMouseMove({
               activeLabel: activeTimestamp?.toString(),
-              coordinates: e.activeLabel,
+              coordinates: activeLabel,
             })
           }}
-          onMouseDown={(e: any) => {
-            const activeTimestamp = data[e.activeTooltipIndex]?.timestamp
+          onMouseDown={({ activeLabel, activeTooltipIndex }) => {
+            if (activeTooltipIndex === undefined || activeTooltipIndex === null) return
+
+            const activeTimestamp =
+              data[activeTooltipIndex]?.[xAxisKey] ?? data[activeTooltipIndex]?.timestamp
+
+            const next = data[activeTooltipIndex + 1]
+            const prev = data[activeTooltipIndex - 1]
+            const prevTimestamp = prev?.[xAxisKey] ?? prev?.timestamp
+            const nextTimestamp =
+              next?.[xAxisKey] ??
+              next?.timestamp ??
+              (prevTimestamp != null && activeTimestamp != null
+                ? Number(activeTimestamp) + (Number(activeTimestamp) - Number(prevTimestamp))
+                : undefined)
+
             chartHighlight?.handleMouseDown({
               activeLabel: activeTimestamp?.toString(),
-              coordinates: e.activeLabel,
+              coordinates: activeLabel,
+              nextLabel: nextTimestamp?.toString(),
+              nextCoordinate: nextTimestamp,
             })
           }}
           onMouseUp={chartHighlight?.handleMouseUp}
-          onMouseLeave={(e) => {
+          onMouseLeave={() => {
             setIsActiveHoveredChart(false)
             setFocusDataIndex(null)
-            setActivePayload(null)
 
             clearHover()
           }}
@@ -380,7 +567,8 @@ export function ComposedChart({
             hide={hideYAxis}
             axisLine={{ stroke: CHART_COLORS.AXIS }}
             tickLine={{ stroke: CHART_COLORS.AXIS }}
-            domain={isPercentage && !showMaxValue ? yDomain : ['auto', 'auto']}
+            domain={_YAxisProps.domain ?? yAxisDomain}
+            padding={yAxisPadding}
             key={yAxisKey}
           />
           <XAxis
@@ -391,30 +579,29 @@ export function ComposedChart({
             minTickGap={3}
             key={xAxisKey}
           />
-          <Tooltip
-            content={(props) =>
-              showTooltip && !showHighlightActions ? (
-                <CustomTooltip
-                  {...props}
-                  format={format}
-                  isPercentage={isPercentage}
-                  label={resolvedHighlightedLabel}
-                  attributes={attributes}
-                  valuePrecision={valuePrecision}
-                  showTotal={showTotal}
-                  isActiveHoveredChart={
-                    isActiveHoveredChart || (!!syncId && syncTooltip && hoveredIndex !== null)
-                  }
-                />
-              ) : null
-            }
-          />
-          {chartStyle === 'bar'
+
+          <defs>
+            {visibleAttributes.map((attribute) => (
+              <linearGradient
+                key={`gradient-${attribute.name}`}
+                id={`gradient-${attribute.name}`}
+                x1="0"
+                y1="0"
+                x2="0"
+                y2="1"
+              >
+                <stop offset="5%" stopColor={attribute.color} stopOpacity={0.15} />
+                <stop offset="95%" stopColor={isDarkMode ? '#131313' : '#FFFFFF'} stopOpacity={0} />
+              </linearGradient>
+            ))}
+          </defs>
+
+          {effectiveChartStyle === 'bar'
             ? visibleAttributes.map((attribute) => (
                 <Bar
                   key={attribute.name}
                   dataKey={attribute.name}
-                  stackId={attributes?.find((a) => a.attribute === attribute?.name)?.stackId ?? '1'}
+                  stackId={getStackId(attributes, attribute?.name, '1')}
                   fill={attribute.color}
                   radius={0.75}
                   opacity={1}
@@ -425,36 +612,55 @@ export function ComposedChart({
                   maxBarSize={24}
                 />
               ))
-            : visibleAttributes.map((attribute, i) => (
+            : visibleAttributes.map((attribute) => (
                 <Area
                   key={attribute.name}
-                  type="step"
+                  type="linear"
                   dataKey={attribute.name}
-                  stackId={attributes?.find((a) => a.attribute === attribute.name)?.stackId ?? '1'}
-                  fill={attribute.color}
+                  stackId={getStackId(attributes, attribute.name, attribute.name)}
+                  fill={`url(#gradient-${attribute.name})`}
+                  fillOpacity={1}
                   stroke={attribute.color}
                   radius={20}
                   animationDuration={375}
-                  fillOpacity={
-                    hoveredLabel && hoveredLabel !== attribute.name
-                      ? 0.075
-                      : hoveredLabel === attribute.name
-                        ? 0.3
-                        : 0.25
-                  }
                   name={
                     attributes?.find((a) => a.attribute === attribute.name)?.label || attribute.name
                   }
                   dot={false}
+                  activeDot={false}
                 />
               ))}
+          {thresholdZoneChart.zones.flatMap((zone) =>
+            zone.runs.map((run, index) => {
+              const yBounds = getThresholdZoneYBounds(run, zone.runs[index - 1])
+              const hasVisibleBars = chartStyle === 'bar' && visibleAttributes.length > 0
+              return (
+                <ReferenceArea
+                  key={`${zone.label}-${run.startIndex}`}
+                  {...getThresholdZoneXBounds(run, data, hasVisibleBars, _XAxisProps.dataKey)}
+                  {...yBounds}
+                  fill="none"
+                  stroke={zone.color}
+                  shape={
+                    <ThresholdZoneLine
+                      isRising={yBounds.y1 > yBounds.y2}
+                      label={zone.isAlwaysVisible ? zone.label : undefined}
+                    />
+                  }
+                />
+              )
+            })
+          )}
+
           {/* Max value, if available */}
           {maxAttribute && _showMaxValue && (
             <Line
               key={maxAttribute.attribute}
-              type="stepAfter"
+              type="linear"
               dataKey={maxAttribute.attribute}
-              stroke={CHART_COLORS.REFERENCE_LINE}
+              stroke={
+                resolveChartColor(maxAttribute.color, isDarkMode) ?? CHART_COLORS.REFERENCE_LINE
+              }
               strokeWidth={2}
               strokeDasharray={maxAttribute.strokeDasharray ?? '3 3'}
               dot={false}
@@ -462,14 +668,15 @@ export function ComposedChart({
             />
           )}
           {referenceLines
-            .filter((line) => line.isReferenceLine)
+            .filter((line) => {
+              return line.isReferenceLine
+            })
             .map((line) => (
               <ReferenceLine
                 key={line.attribute}
                 y={line.value}
                 strokeWidth={1}
-                {...line}
-                color={line.color?.dark}
+                stroke={resolveChartColor(line.color, isDarkMode)}
                 strokeDasharray={line.strokeDasharray ?? '3 3'}
                 label={undefined}
               >
@@ -482,6 +689,7 @@ export function ComposedChart({
                 />
               </ReferenceLine>
             ))}
+
           {/* Selection highlight */}
           {showHighlightActions && (
             <ReferenceArea
@@ -493,13 +701,72 @@ export function ComposedChart({
               fillOpacity={0.2}
             />
           )}
+          <Tooltip
+            content={(props) =>
+              showTooltip && !showHighlightActions ? (
+                <CustomTooltip
+                  {...props}
+                  data={data}
+                  thresholdZones={thresholdZoneChart.zones}
+                  format={format}
+                  isPercentage={isPercentage}
+                  label={resolvedHighlightedLabel}
+                  attributes={attributes}
+                  xAxisKey={xAxisKey}
+                  valuePrecision={valuePrecision}
+                  showTotal={showTotal}
+                  isActiveHoveredChart={
+                    isActiveHoveredChart || (!!syncId && syncTooltip && hoveredIndex !== null)
+                  }
+                />
+              ) : null
+            }
+            cursor={{
+              stroke: isDarkMode ? 'rgba(255, 255, 255, 0.5)' : 'rgba(0, 0, 0, 0.5)',
+              strokeWidth: 1,
+            }}
+          />
+          <Customized
+            component={(props: CustomizedDotProps) => {
+              const { formattedGraphicalItems } = props
+              if (!formattedGraphicalItems || focusDataIndex === null) return null
+
+              return (
+                <g>
+                  {formattedGraphicalItems.map((item, index: number) => {
+                    const points = item.props?.points || item.item?.props?.points || item.points
+                    const dataKey = item.props?.dataKey || item.item?.props?.dataKey
+
+                    if (!points || !points[focusDataIndex]) return null
+
+                    const point = points[focusDataIndex]
+                    const attribute = visibleAttributes.find((a) => a.name === dataKey)
+                    if (!attribute) return null
+
+                    return (
+                      <circle
+                        key={`custom-dot-${dataKey}-${index}`}
+                        cx={point.x}
+                        cy={point.y}
+                        r={4}
+                        fill={attribute.fill}
+                        stroke={attribute.color}
+                        strokeWidth={1}
+                      />
+                    )
+                  })}
+                </g>
+              )
+            }}
+          />
         </RechartComposedChart>
-        <ChartHighlightActions
-          chartHighlight={chartHighlight}
-          updateDateRange={updateDateRange}
-          actions={highlightActions}
-        />
       </Container>
+      <ChartHighlightActions
+        chartHighlight={chartHighlight}
+        updateDateRange={updateDateRange}
+        actions={highlightActions}
+        chartId={chartId}
+      />
       {data && (
         <div
           className="text-foreground-lighter -mt-9 flex items-center justify-between text-xs"
@@ -514,34 +781,34 @@ export function ComposedChart({
         </div>
       )}
       {showLegend && (
-        <CustomLabel
-          payload={[maxAttributeData, ...chartData]}
-          attributes={attributes}
-          showMaxValue={_showMaxValue}
-          onLabelHover={setHoveredLabel}
-          onToggleAttribute={(attribute, options) => {
-            setHiddenAttributes((prev) => {
-              if (options?.exclusive) {
-                const next = new Set<string>()
-                // Hide every attribute except the selected one. If all but one are hidden, clicking again will reset to all visible.
-                const allNames = chartData.map((c) => c.name)
-                const allHiddenExcept = allNames.filter((n) => n !== attribute)
-                const isAlreadyExclusive =
-                  allHiddenExcept.every((n) => prev.has(n)) && !prev.has(attribute)
-                return isAlreadyExclusive ? new Set() : new Set(allHiddenExcept)
-              }
+        <div className="relative z-0">
+          <CustomLabel
+            payload={[maxAttributeData, ...chartData]}
+            attributes={attributes}
+            showMaxValue={_showMaxValue}
+            onToggleAttribute={(attribute, options) => {
+              setHiddenAttributes((prev) => {
+                if (options?.exclusive) {
+                  // Hide every attribute except the selected one. If all but one are hidden, clicking again will reset to all visible.
+                  const allNames = chartData.map((c) => c.name)
+                  const allHiddenExcept = allNames.filter((n) => n !== attribute)
+                  const isAlreadyExclusive =
+                    allHiddenExcept.every((n) => prev.has(n)) && !prev.has(attribute)
+                  return isAlreadyExclusive ? new Set() : new Set(allHiddenExcept)
+                }
 
-              const next = new Set(prev)
-              if (next.has(attribute)) {
-                next.delete(attribute)
-              } else {
-                next.add(attribute)
-              }
-              return next
-            })
-          }}
-          hiddenAttributes={hiddenAttributes}
-        />
+                const next = new Set(prev)
+                if (next.has(attribute)) {
+                  next.delete(attribute)
+                } else {
+                  next.add(attribute)
+                }
+                return next
+              })
+            }}
+            hiddenAttributes={hiddenAttributes}
+          />
+        </div>
       )}
     </div>
   )

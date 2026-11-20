@@ -1,6 +1,3 @@
-import { useSendEventMutation } from 'data/telemetry/send-event-mutation'
-import { useSelectedOrganizationQuery } from 'hooks/misc/useSelectedOrganization'
-import { useSelectedProjectQuery } from 'hooks/misc/useSelectedProject'
 import { GitBranchIcon } from 'lucide-react'
 import { useState } from 'react'
 import {
@@ -15,7 +12,11 @@ import {
   AlertDialogTrigger,
   Button,
 } from 'ui'
-import { Admonition } from 'ui-patterns'
+import { Admonition } from 'ui-patterns/Admonition'
+
+import { ButtonTooltip } from '@/components/ui/ButtonTooltip'
+import { useSelectedProjectQuery } from '@/hooks/misc/useSelectedProject'
+import { useTrack } from '@/lib/telemetry/track'
 
 interface OutOfDateNoticeProps {
   isBranchOutOfDateMigrations: boolean
@@ -27,6 +28,7 @@ interface OutOfDateNoticeProps {
   hasEdgeFunctionModifications: boolean
   modifiedFunctionsCount: number
   isPushing: boolean
+  canPush: boolean
   onPush: () => void
 }
 
@@ -34,19 +36,17 @@ export const OutOfDateNotice = ({
   isBranchOutOfDateMigrations,
   missingMigrationsCount,
   hasMissingFunctions,
-  missingFunctionsCount,
   hasOutOfDateFunctions,
-  outOfDateFunctionsCount,
   hasEdgeFunctionModifications,
   modifiedFunctionsCount,
   isPushing,
+  canPush,
   onPush,
 }: OutOfDateNoticeProps) => {
   const [isDialogOpen, setIsDialogOpen] = useState(false)
   const hasOutdatedMigrations = isBranchOutOfDateMigrations && missingMigrationsCount > 0
-  const { data: selectedOrg } = useSelectedOrganizationQuery()
   const { data: project } = useSelectedProjectQuery()
-  const { mutate: sendEvent } = useSendEventMutation()
+  const track = useTrack()
 
   const isBranch = project?.parent_project_ref !== undefined
   const parentProjectRef = isBranch ? project?.parent_project_ref : project?.ref
@@ -71,18 +71,14 @@ export const OutOfDateNotice = ({
       setIsDialogOpen(false)
     }
 
-    // Track branch update
-    sendEvent({
-      action: 'branch_updated',
-      properties: {
+    track(
+      'branch_updated',
+      {
         modifiedEdgeFunctions: hasEdgeFunctionModifications,
         source: 'out_of_date_notice',
       },
-      groups: {
-        project: parentProjectRef ?? 'Unknown',
-        organization: selectedOrg?.slug ?? 'Unknown',
-      },
-    })
+      { project: parentProjectRef }
+    )
 
     onPush()
   }
@@ -95,11 +91,25 @@ export const OutOfDateNotice = ({
           <p className="text-sm text-foreground-light">{getDescription()}</p>
         </div>
 
-        {hasEdgeFunctionModifications ? (
+        {!canPush && (
+          <ButtonTooltip
+            disabled
+            icon={<GitBranchIcon size={16} strokeWidth={1.5} />}
+            className="shrink-0"
+            tooltip={{
+              content: {
+                side: 'bottom',
+                text: 'You need additional permissions to update branches',
+              },
+            }}
+          >
+            Update branch
+          </ButtonTooltip>
+        )}
+        {canPush && hasEdgeFunctionModifications && (
           <AlertDialog open={isDialogOpen} onOpenChange={setIsDialogOpen}>
             <AlertDialogTrigger asChild>
               <Button
-                type="default"
                 loading={isPushing}
                 icon={<GitBranchIcon size={16} strokeWidth={1.5} />}
                 className="shrink-0"
@@ -109,25 +119,27 @@ export const OutOfDateNotice = ({
             </AlertDialogTrigger>
             <AlertDialogContent>
               <AlertDialogHeader>
-                <AlertDialogTitle>Update branch with modified functions?</AlertDialogTitle>
+                <AlertDialogTitle>Update branch with modified functions</AlertDialogTitle>
                 <AlertDialogDescription>
                   This branch has {modifiedFunctionsCount} modified edge function
-                  {modifiedFunctionsCount !== 1 ? 's' : ''} that will be overwritten when updating
-                  with the latest functions from the production branch. This action cannot be
-                  undone.
+                  {modifiedFunctionsCount !== 1 ? <span>s</span> : ''}{' '}
+                  <span>
+                    that will be overwritten when updating with the latest functions from the
+                    production branch. This action cannot be undone.
+                  </span>
                 </AlertDialogDescription>
               </AlertDialogHeader>
               <AlertDialogFooter>
                 <AlertDialogCancel>Cancel</AlertDialogCancel>
-                <AlertDialogAction onClick={() => handleUpdate(true)}>
+                <AlertDialogAction variant="warning" onClick={() => handleUpdate(true)}>
                   Update anyway
                 </AlertDialogAction>
               </AlertDialogFooter>
             </AlertDialogContent>
           </AlertDialog>
-        ) : (
+        )}
+        {canPush && !hasEdgeFunctionModifications && (
           <Button
-            type="default"
             loading={isPushing}
             onClick={() => handleUpdate()}
             icon={<GitBranchIcon size={16} strokeWidth={1.5} />}

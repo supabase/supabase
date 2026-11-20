@@ -1,14 +1,11 @@
-import { useQuery, UseQueryOptions } from '@tanstack/react-query'
-import { executeSql, ExecuteSqlError } from '../sql/execute-sql-query'
+import { getDatabaseSizeSql } from '@supabase/pg-meta'
+import { useQuery } from '@tanstack/react-query'
+
 import { databaseKeys } from './keys'
-
-export const getDatabaseSizeSql = () => {
-  const sql = /* SQL */ `
-select sum(pg_database_size(pg_database.datname))::bigint as db_size from pg_database;
-`.trim()
-
-  return sql
-}
+import { unguarded } from '@/data/fetchers'
+import { executeSql } from '@/data/sql/execute-sql-mutation'
+import type { StudioError } from '@/lib/errors/studio-errors'
+import { UseCustomQueryOptions } from '@/types'
 
 export type DatabaseSizeVariables = {
   projectRef?: string
@@ -25,8 +22,11 @@ export async function getDatabaseSize(
     {
       projectRef,
       connectionString,
+      sqlOrigin: 'studio',
+      queryName: 'database-size',
       sql,
       queryKey: ['database-size'],
+      grant: unguarded.migrating,
     },
     signal
   )
@@ -40,17 +40,18 @@ export async function getDatabaseSize(
 }
 
 export type DatabaseSizeData = Awaited<ReturnType<typeof getDatabaseSize>>
-export type DatabaseSizeError = ExecuteSqlError
+export type DatabaseSizeError = StudioError
 
 export const useDatabaseSizeQuery = <TData = DatabaseSizeData>(
   { projectRef, connectionString }: DatabaseSizeVariables,
-  { enabled = true, ...options }: UseQueryOptions<DatabaseSizeData, DatabaseSizeError, TData> = {}
+  {
+    enabled = true,
+    ...options
+  }: UseCustomQueryOptions<DatabaseSizeData, DatabaseSizeError, TData> = {}
 ) =>
-  useQuery<DatabaseSizeData, DatabaseSizeError, TData>(
-    databaseKeys.databaseSize(projectRef),
-    ({ signal }) => getDatabaseSize({ projectRef, connectionString }, signal),
-    {
-      enabled: enabled && typeof projectRef !== 'undefined',
-      ...options,
-    }
-  )
+  useQuery<DatabaseSizeData, DatabaseSizeError, TData>({
+    queryKey: databaseKeys.databaseSize(projectRef),
+    queryFn: ({ signal }) => getDatabaseSize({ projectRef, connectionString }, signal),
+    enabled: enabled && typeof projectRef !== 'undefined',
+    ...options,
+  })

@@ -1,6 +1,8 @@
-import { QuerySearchParamsType } from 'components/interfaces/UnifiedLogs/UnifiedLogs.types'
+import { QuerySearchParamsType } from '@/components/interfaces/UnifiedLogs/UnifiedLogs.types'
 
 export const logsKeys = {
+  otelLogKeys: (projectRef: string | undefined, source: string | undefined) =>
+    ['projects', projectRef, 'otel-log-keys', source] as const,
   unifiedLogsInfinite: (
     projectRef: string | undefined,
     searchParams: QuerySearchParamsType | undefined
@@ -12,6 +14,11 @@ export const logsKeys = {
       'logs-data',
       ...(searchParams ? [searchParams].filter(Boolean) : []),
     ] as const,
+  unifiedLog: (
+    projectRef: string | undefined,
+    searchParams: QuerySearchParamsType,
+    id: string | undefined
+  ) => ['projects', projectRef, 'unified-logs', 'single-log', searchParams, id] as const,
   unifiedLogsCount: (
     projectRef: string | undefined,
     searchParams: QuerySearchParamsType | undefined
@@ -48,6 +55,34 @@ export const logsKeys = {
       facet,
       facetSearch,
       ...(searchParams ? [searchParams].filter(Boolean) : []),
+    ] as const,
+  logAttributes: (
+    projectRef: string | undefined,
+    logId: string | undefined,
+    source: string | undefined,
+    logTimestampMs: number | null | undefined
+  ) =>
+    [
+      'projects',
+      projectRef,
+      'unified-logs',
+      'log-attributes',
+      logId,
+      { source, logTimestampMs },
+    ] as const,
+  requestTimeline: (
+    projectRef: string | undefined,
+    logId: string | undefined,
+    source: string | undefined,
+    logTimestampMs: number | null | undefined
+  ) =>
+    [
+      'projects',
+      projectRef,
+      'unified-logs',
+      'request-timeline',
+      logId,
+      { source, logTimestampMs },
     ] as const,
   serviceFlow: (
     projectRef: string | undefined,

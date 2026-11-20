@@ -1,12 +1,20 @@
-import { useMutation, UseMutationOptions, useQueryClient } from '@tanstack/react-query'
+import { useMutation, useQueryClient } from '@tanstack/react-query'
 import { toast } from 'sonner'
 
-import { handleError, post } from 'data/fetchers'
-import type { ResponseError } from 'types'
 import { keys } from './keys'
+import { handleError, post } from '@/data/fetchers'
+import type { StudioError } from '@/lib/errors/studio-errors'
+import type { GrantFor } from '@/lib/grants'
+import type { UseCustomMutationOptions } from '@/types'
+
+export type CreateThirdPartyAuthGrant = GrantFor<
+  'post',
+  '/v1/projects/{ref}/config/auth/third-party-auth'
+>
 
 export type CreateThirdPartyAuthVariables = {
   projectRef: string
+  grant: CreateThirdPartyAuthGrant
   customJwks?: Record<string, never>
   jwksUrl?: string
   oidcIssuerUrl?: string
@@ -14,6 +22,7 @@ export type CreateThirdPartyAuthVariables = {
 
 export async function createThirdPartyIntegration({
   projectRef,
+  grant,
   customJwks,
   jwksUrl,
   oidcIssuerUrl,
@@ -29,6 +38,7 @@ export async function createThirdPartyIntegration({
       jwks_url: jwksUrl,
       oidc_issuer_url: oidcIssuerUrl,
     },
+    grant,
   })
   if (error) handleError(error)
 
@@ -42,26 +52,28 @@ export const useCreateThirdPartyAuthIntegrationMutation = ({
   onError,
   ...options
 }: Omit<
-  UseMutationOptions<ThirdPartyIntegrationCreateData, ResponseError, CreateThirdPartyAuthVariables>,
+  UseCustomMutationOptions<
+    ThirdPartyIntegrationCreateData,
+    StudioError,
+    CreateThirdPartyAuthVariables
+  >,
   'mutationFn'
 > = {}) => {
   const queryClient = useQueryClient()
-  return useMutation<ThirdPartyIntegrationCreateData, ResponseError, CreateThirdPartyAuthVariables>(
-    (vars) => createThirdPartyIntegration(vars),
-    {
-      async onSuccess(data, variables, context) {
-        const { projectRef } = variables
-        await queryClient.invalidateQueries(keys.integrations(projectRef))
-        await onSuccess?.(data, variables, context)
-      },
-      async onError(data, variables, context) {
-        if (onError === undefined) {
-          toast.error(`Failed to create third party auth integration: ${data.message}`)
-        } else {
-          onError(data, variables, context)
-        }
-      },
-      ...options,
-    }
-  )
+  return useMutation<ThirdPartyIntegrationCreateData, StudioError, CreateThirdPartyAuthVariables>({
+    mutationFn: (vars) => createThirdPartyIntegration(vars),
+    async onSuccess(data, variables, context) {
+      const { projectRef } = variables
+      await queryClient.invalidateQueries({ queryKey: keys.integrations(projectRef) })
+      await onSuccess?.(data, variables, context)
+    },
+    async onError(data, variables, context) {
+      if (onError === undefined) {
+        toast.error(`Failed to create third party auth integration: ${data.message}`)
+      } else {
+        onError(data, variables, context)
+      }
+    },
+    ...options,
+  })
 }

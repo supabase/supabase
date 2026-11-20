@@ -1,9 +1,9 @@
 import { useParams } from 'common'
 import { toast } from 'sonner'
-
-import { useUserDeleteMutation } from 'data/auth/user-delete-mutation'
-import { User } from 'data/auth/users-infinite-query'
 import ConfirmationModal from 'ui-patterns/Dialogs/ConfirmationModal'
+
+import { useUserDeleteMutation } from '@/data/auth/user-delete-mutation'
+import { User } from '@/data/auth/users-infinite-query'
 
 interface DeleteUserModalProps {
   visible: boolean
@@ -20,7 +20,7 @@ export const DeleteUserModal = ({
 }: DeleteUserModalProps) => {
   const { ref: projectRef } = useParams()
 
-  const { mutate: deleteUser, isLoading: isDeleting } = useUserDeleteMutation({
+  const { mutate: deleteUser, isPending: isDeleting } = useUserDeleteMutation({
     onSuccess: () => {
       toast.success(`Successfully deleted ${selectedUser?.email}`)
       onDeleteSuccess?.()
@@ -52,7 +52,8 @@ export const DeleteUserModal = ({
     >
       <p className="text-sm text-foreground-light">
         This is permanent! Are you sure you want to delete the user{' '}
-        {selectedUser?.email ?? selectedUser?.phone ?? 'this user'}?
+        {selectedUser?.email ?? selectedUser?.phone ?? <span>this user</span>}
+        <span>?</span>
       </p>
     </ConfirmationModal>
   )

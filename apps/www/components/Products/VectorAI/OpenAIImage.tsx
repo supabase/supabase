@@ -1,7 +1,7 @@
+import { domAnimation, LazyMotion, m, useInView } from 'motion/react'
+import { useTheme } from 'next-themes'
 import Image from 'next/image'
 import React from 'react'
-import { useTheme } from 'next-themes'
-import { LazyMotion, domAnimation, m, useInView } from 'framer-motion'
 
 const OpenAIImage = ({ isHovered }: { isHovered: boolean }) => {
   const { resolvedTheme } = useTheme()
@@ -278,7 +278,7 @@ const OpenAIImage = ({ isHovered }: { isHovered: boolean }) => {
 
   return (
     <>
-      <div className="w-[44%] h-[44%] -translate-x-[2px] absolute z-10 inset-0 top-auto bottom-[16%] m-auto">
+      <div className="w-[44%] h-[44%] translate-x-[-2px] absolute z-10 inset-0 top-auto bottom-[16%] m-auto">
         <Image
           src={
             resolvedTheme?.includes('dark')

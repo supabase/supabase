@@ -1,9 +1,12 @@
+import * as Sentry from '@sentry/react'
 import dayjs from 'dayjs'
 import duration from 'dayjs/plugin/duration'
 
+import { getErrorMessage } from '@/lib/get-error-message'
+
 dayjs.extend(duration)
 
-export const formatDuration = (milliseconds: number) => {
+export const formatDuration = (milliseconds: number, precision: number = 2) => {
   const duration = dayjs.duration(milliseconds, 'milliseconds')
 
   const days = Math.floor(duration.asDays())
@@ -13,7 +16,7 @@ export const formatDuration = (milliseconds: number) => {
   const totalSeconds = duration.asSeconds()
 
   if (totalSeconds < 60) {
-    return `${totalSeconds.toFixed(2)}s`
+    return `${totalSeconds.toFixed(precision)}s`
   }
 
   const parts = []
@@ -23,4 +26,46 @@ export const formatDuration = (milliseconds: number) => {
   if (seconds > 0) parts.push(`${seconds}s`)
 
   return parts.length > 0 ? parts.join(' ') : '0s'
+}
+
+export type QueryPerformanceErrorContext = {
+  projectRef?: string
+  databaseIdentifier?: string
+  queryPreset?: string
+  queryType?: 'hitRate' | 'metrics' | 'mainQuery' | 'slowQueriesCount' | 'supamonitor'
+  sql?: string
+  postgresVersion?: string
+  databaseType?: 'primary' | 'read-replica'
+}
+
+export function captureQueryPerformanceError(
+  error: unknown,
+  context: QueryPerformanceErrorContext
+) {
+  Sentry.withScope((scope) => {
+    scope.setTag('query-performance', 'true')
+
+    scope.setContext('query-performance', {
+      projectRef: context.projectRef,
+      databaseIdentifier: context.databaseIdentifier,
+      queryPreset: context.queryPreset,
+      queryType: context.queryType,
+      postgresVersion: context.postgresVersion,
+      databaseType: context.databaseType,
+    })
+
+    if (error instanceof Error) {
+      Sentry.captureException(error)
+      return
+    }
+
+    const errorMessage = getErrorMessage(error)
+    const errorToCapture = new Error(errorMessage || 'Query performance error')
+
+    if (error !== null && error !== undefined) {
+      errorToCapture.cause = error
+    }
+
+    Sentry.captureException(errorToCapture)
+  })
 }

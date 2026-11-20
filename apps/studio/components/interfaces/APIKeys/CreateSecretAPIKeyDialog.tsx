@@ -1,7 +1,14 @@
 import { zodResolver } from '@hookform/resolvers/zod'
-import { useState } from 'react'
-import { SubmitHandler, useForm } from 'react-hook-form'
+import { useParams } from 'common'
+import { PlusIcon, ShieldCheckIcon } from 'lucide-react'
+import { parseAsString, useQueryState } from 'nuqs'
+import { useRef } from 'react'
+import { useForm, type SubmitHandler } from 'react-hook-form'
+import { toast } from 'sonner'
 import {
+  Alert,
+  AlertDescription,
+  AlertTitle,
   Button,
   Dialog,
   DialogContent,
@@ -12,22 +19,19 @@ import {
   DialogSectionSeparator,
   DialogTitle,
   DialogTrigger,
-  FormControl_Shadcn_,
-  FormField_Shadcn_,
-  Form_Shadcn_,
-  Input_Shadcn_,
-  Alert,
-  Alert_Shadcn_,
-  AlertDescription_Shadcn_,
-  AlertTitle_Shadcn_,
+  Form,
+  FormControl,
+  FormField,
+  Input,
 } from 'ui'
 import { FormItemLayout } from 'ui-patterns/form/FormItemLayout/FormItemLayout'
 import * as z from 'zod'
-import { toast } from 'sonner'
 
-import { useParams } from 'common'
-import { useAPIKeyCreateMutation } from 'data/api-keys/api-key-create-mutation'
-import { Plus, ShieldCheck } from 'lucide-react'
+import { ButtonTooltip } from '@/components/ui/ButtonTooltip'
+import { Shortcut } from '@/components/ui/Shortcut'
+import { useAPIKeyCreateMutation } from '@/data/api-keys/api-key-create-mutation'
+import { getWriteGrantToastMessage, getWriteGrantTooltip, useGrant } from '@/lib/grants'
+import { SHORTCUT_IDS } from '@/state/shortcuts/registry'
 
 const NAME_SCHEMA = z
   .string()
@@ -46,28 +50,39 @@ const SCHEMA = z.object({
   description: z.string().max(256, "Description shouldn't be too long").trim(),
 })
 
-const CreateSecretAPIKeyDialog = () => {
-  const [visible, setVisible] = useState(false)
+export const CreateSecretAPIKeyDialog = () => {
   const { ref: projectRef } = useParams()
+  const [visible, setVisible] = useQueryState('new', parseAsString)
+  const formRef = useRef<HTMLFormElement>(null)
 
-  const onClose = (value: boolean) => {
-    setVisible(value)
+  const onOpenChange = (value: boolean) => {
+    if (value) setVisible('secret')
+    else setVisible('')
+  }
+  const openDialog = () => {
+    if (canCreateAPIKeys) setVisible('secret')
   }
 
+  const defaultValues = { name: '', description: '' }
   const form = useForm<z.infer<typeof SCHEMA>>({
     resolver: zodResolver(SCHEMA),
-    defaultValues: {
-      name: '',
-      description: '',
-    },
+    defaultValues,
   })
 
-  const { mutate: createAPIKey, isLoading: isCreatingAPIKey } = useAPIKeyCreateMutation()
+  const createGrant = useGrant('POST /v1/projects/{ref}/api-keys', { projectRef })
+  const canCreateAPIKeys = createGrant.status === 'granted'
+
+  const { mutate: createAPIKey, isPending: isCreatingAPIKey } = useAPIKeyCreateMutation()
 
   const onSubmit: SubmitHandler<z.infer<typeof SCHEMA>> = async (values) => {
+    if (!createGrant.grant) {
+      toast.error(getWriteGrantToastMessage(createGrant.status, 'create', 'API keys'))
+      return
+    }
     createAPIKey(
       {
         projectRef,
+        grant: createGrant.grant,
         type: 'secret',
         name: values.name,
         description: values.description,
@@ -75,38 +90,57 @@ const CreateSecretAPIKeyDialog = () => {
       {
         onSuccess: (data) => {
           toast.success(`Your secret API key ${data.prefix}... is ready.`)
-          onClose(false)
+          form.reset(defaultValues)
+          onOpenChange(false)
         },
       }
     )
   }
 
   return (
-    <Dialog open={visible} onOpenChange={onClose}>
+    <Dialog open={visible === 'secret'} onOpenChange={onOpenChange}>
       <DialogTrigger asChild>
-        <Button type="default" className="mt-2" icon={<Plus />}>
-          Add new secret key
-        </Button>
+        <Shortcut
+          id={SHORTCUT_IDS.API_KEYS_NEW_SECRET}
+          onTrigger={openDialog}
+          side="bottom"
+          // Hide the shortcut hint while blocked so the permission tooltip shows instead
+          tooltipOpen={visible === 'secret' || !canCreateAPIKeys ? false : undefined}
+        >
+          <ButtonTooltip
+            className="mt-2"
+            icon={<PlusIcon />}
+            onClick={openDialog}
+            disabled={!canCreateAPIKeys}
+            tooltip={{
+              content: {
+                side: 'bottom',
+                text: getWriteGrantTooltip(createGrant.status, 'create', 'API keys'),
+              },
+            }}
+          >
+            New secret key
+          </ButtonTooltip>
+        </Shortcut>
       </DialogTrigger>
       <DialogContent>
         <DialogHeader>
           <DialogTitle>Create new secret API key</DialogTitle>
-          <DialogDescription className="grid gap-y-2">
-            <p>
-              Secret API keys allow elevated access to your project's data, bypassing Row-Level
-              security.
-            </p>
+          <DialogDescription>
+            Secret API keys allow elevated access to your project's data, bypassing Row-Level
+            security.
           </DialogDescription>
         </DialogHeader>
         <DialogSectionSeparator />
         <DialogSection className="flex flex-col gap-4">
-          <Form_Shadcn_ {...form}>
+          <Form {...form}>
             <form
+              ref={formRef}
               className="flex flex-col gap-4"
               id={FORM_ID}
               onSubmit={form.handleSubmit(onSubmit)}
             >
-              <FormField_Shadcn_
+              <FormField
                 key="name"
                 name="name"
                 control={form.control}
@@ -115,33 +149,33 @@ const CreateSecretAPIKeyDialog = () => {
                     label="Name"
                     description="A short, unique name of lowercased letters, digits and underscore"
                   >
-                    <FormControl_Shadcn_>
-                      <Input_Shadcn_ {...field} placeholder="Example: my_super_secret_key_123" />
-                    </FormControl_Shadcn_>
+                    <FormControl>
+                      <Input {...field} placeholder="Example: my_super_secret_key_123" />
+                    </FormControl>
                   </FormItemLayout>
                 )}
               />
-              <FormField_Shadcn_
+              <FormField
                 key="description"
                 name="description"
                 control={form.control}
                 render={({ field }) => (
                   <FormItemLayout label="Description" labelOptional="Optional">
-                    <FormControl_Shadcn_>
-                      <Input_Shadcn_
+                    <FormControl>
+                      <Input
                         {...field}
                         placeholder="Short notes on how or where this key will be used"
                       />
-                    </FormControl_Shadcn_>
+                    </FormControl>
                   </FormItemLayout>
                 )}
               />
             </form>
-          </Form_Shadcn_>
-          <Alert_Shadcn_ variant="warning">
-            <ShieldCheck />
-            <AlertTitle_Shadcn_>Securing your API key</AlertTitle_Shadcn_>
-            <AlertDescription_Shadcn_ className="">
+          </Form>
+          <Alert variant="warning">
+            <ShieldCheckIcon />
+            <AlertTitle>Securing your API key</AlertTitle>
+            <AlertDescription className="">
               <ul className="list-disc">
                 <li>Keep this key secret.</li>
                 <li>Do not use on the web, in mobile or desktop apps.</li>
@@ -157,17 +191,28 @@ const CreateSecretAPIKeyDialog = () => {
                   immediately.
                 </li>
               </ul>
-            </AlertDescription_Shadcn_>
-          </Alert_Shadcn_>
+            </AlertDescription>
+          </Alert>
         </DialogSection>
         <DialogFooter>
-          <Button form={FORM_ID} htmlType="submit" loading={isCreatingAPIKey}>
-            Create API key
-          </Button>
+          <Shortcut
+            id={SHORTCUT_IDS.API_KEYS_CREATE_SECRET}
+            onTrigger={() => formRef.current?.requestSubmit()}
+            options={{ enabled: visible === 'secret' && !isCreatingAPIKey }}
+            side="top"
+          >
+            <Button
+              variant="primary"
+              form={FORM_ID}
+              type="submit"
+              loading={isCreatingAPIKey}
+              disabled={!canCreateAPIKeys}
+            >
+              Create API key
+            </Button>
+          </Shortcut>
         </DialogFooter>
       </DialogContent>
     </Dialog>
   )
 }
-
-export default CreateSecretAPIKeyDialog

@@ -1,0 +1,40 @@
+---
+title: Collapsible Card Section
+description: A mono-uppercase collapsible trigger for hiding optional or advanced settings inside a card or panel.
+fragment: true
+---
+
+Use `CollapsibleCardSection` to progressively disclose optional or advanced fields inside a card or panel form. The trigger is styled mono-uppercase to blend with card section headings; content animates in and out on toggle.
+
+<ComponentPreview name="collapsible-card-section-demo" peekCode wide />
+
+## Usage
+
+```tsx
+import { CollapsibleCardSection } from 'ui-patterns/CollapsibleCardSection'
+```
+
+```tsx
+<CollapsibleCardSection title="Advanced settings">{/* form fields */}</CollapsibleCardSection>
+```
+
+### With description
+
+Use `description` to add a short qualifier below the title, only when the content needs context that the title alone doesn't provide.
+
+```tsx
+<CollapsibleCardSection
+  title="Advanced settings"
+  description="These settings cannot be changed after creation"
+>
+  {/* form fields */}
+</CollapsibleCardSection>
+```
+
+### Default open
+
+```tsx
+<CollapsibleCardSection title="Advanced settings" defaultOpen>
+  {/* form fields */}
+</CollapsibleCardSection>
+```

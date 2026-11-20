@@ -1,21 +1,13 @@
-import { MessageSquareMore } from 'lucide-react'
-
 import { InformationCircleIcon } from '@heroicons/react/16/solid'
-
-import {
-  TabsList_Shadcn_,
-  TabsTrigger_Shadcn_,
-  Tabs_Shadcn_,
-  Tooltip,
-  TooltipContent,
-  TooltipTrigger,
-  cn,
-} from 'ui'
-
-import { LINTER_LEVELS, LINT_TABS } from 'components/interfaces/Linter/Linter.constants'
-import ShimmeringLoader from 'components/ui/ShimmeringLoader'
-import { Lint } from 'data/lint/lint-query'
+import { MessageSquareMoreIcon } from 'lucide-react'
 import { useRouter } from 'next/router'
+import { cn, Tabs, TabsList, TabsTrigger, Tooltip, TooltipContent, TooltipTrigger } from 'ui'
+import { ShimmeringLoader } from 'ui-patterns/ShimmeringLoader'
+
+import { LINT_TABS, LINTER_LEVELS } from '@/components/interfaces/Linter/Linter.constants'
+import { parseLinterLevel } from '@/components/interfaces/Linter/Linter.utils'
+import { ShortcutTooltip } from '@/components/ui/ShortcutTooltip'
+import { Lint } from '@/data/lint/lint-query'
 
 interface LintPageTabsProps {
   currentTab: string
@@ -23,99 +15,112 @@ interface LintPageTabsProps {
   isLoading: boolean
   activeLints: Lint[]
 }
-const LintPageTabs = ({ currentTab, setCurrentTab, isLoading, activeLints }: LintPageTabsProps) => {
-  const router = useRouter()
+const LintCountLabel = ({
+  tab,
+  activeLints,
+  isLoading,
+}: {
+  tab: (typeof LINT_TABS)[number]
+  activeLints: Lint[]
+  isLoading: boolean
+}) => {
+  let count = 0
+  let label = ''
+  if (tab.id === LINTER_LEVELS.ERROR) {
+    count = activeLints.filter((lint) => lint.level === 'ERROR').length
+    label = 'errors'
+  }
 
-  const warnLintsCount = activeLints.filter((x) => x.level === 'WARN').length
-  const errorLintsCount = activeLints.filter((x) => x.level === 'ERROR').length
-  const infoLintsCount = activeLints.filter((x) => x.level === 'INFO').length
+  if (tab.id === LINTER_LEVELS.WARN) {
+    count = activeLints.filter((lint) => lint.level === 'WARN').length
+    label = 'warnings'
+  }
 
-  const LintCountLabel = ({ tab }: { tab: (typeof LINT_TABS)[number] }) => {
-    let count = 0
-    let label = ''
-    if (tab.id === LINTER_LEVELS.ERROR) {
-      count = errorLintsCount
-      label = 'errors'
-    }
-
-    if (tab.id === LINTER_LEVELS.WARN) {
-      count = warnLintsCount
-      label = 'warnings'
-    }
-
-    if (tab.id === LINTER_LEVELS.INFO) {
-      count = infoLintsCount
-      label = 'suggestions'
-    }
-
-    return (
-      <span className="text-xs text-foreground-muted group-hover:text-foreground-lighter group-data-[state=active]:text-foreground-lighter transition">
-        {isLoading ? (
-          <ShimmeringLoader className="w-20 pt-1" />
-        ) : (
-          <>
-            {count} {label}
-          </>
-        )}
-      </span>
-    )
+  if (tab.id === LINTER_LEVELS.INFO) {
+    count = activeLints.filter((lint) => lint.level === 'INFO').length
+    label = 'suggestions'
   }
 
   return (
-    <Tabs_Shadcn_
-      defaultValue={currentTab}
+    <span className="text-xs text-foreground-muted group-hover:text-foreground-lighter group-data-[state=active]:text-foreground-lighter transition">
+      {isLoading ? (
+        <ShimmeringLoader className="w-20 pt-1" />
+      ) : (
+        <>
+          {count} {label}
+        </>
+      )}
+    </span>
+  )
+}
+
+const LintPageTabs = ({ currentTab, setCurrentTab, isLoading, activeLints }: LintPageTabsProps) => {
+  const router = useRouter()
+
+  return (
+    <Tabs
+      value={currentTab}
       onValueChange={(value) => {
-        setCurrentTab(value as LINTER_LEVELS)
+        const level = parseLinterLevel(value)
+        if (!level) return
+        setCurrentTab(level)
         const { sort, search, ...rest } = router.query
         router.push({ ...router, query: { ...rest, preset: value, id: null } })
       }}
     >
-      <TabsList_Shadcn_ className={cn('flex gap-0 border-0 items-end z-10 relative')}>
+      <TabsList className={cn('flex gap-0 border-0 items-end z-10 relative')}>
         {LINT_TABS.map((tab) => (
-          <TabsTrigger_Shadcn_
+          <ShortcutTooltip
             key={tab.id}
-            value={tab.id}
-            className={cn(
-              'group relative',
-              'px-6 py-3 border-b-0 flex flex-col items-start !shadow-none border-default border-t',
-              'even:border-x last:border-r even:!border-x-strong last:!border-r-strong',
-              tab.id === currentTab ? '!bg-surface-200' : '!bg-surface-200/[33%]',
-              'hover:!bg-surface-100',
-              'data-[state=active]:!bg-surface-200',
-              'hover:text-foreground-light',
-              'transition'
-            )}
+            shortcutId={tab.shortcutId}
+            label={`Switch to ${tab.label}`}
+            side="top"
+            align="start"
           >
-            {tab.id === currentTab && (
-              <div className="absolute top-0 left-0 w-full h-[1px] bg-foreground" />
-            )}
-            <div className="flex items-center gap-x-2">
-              <span
-                className={
-                  tab.id === LINTER_LEVELS.ERROR
-                    ? 'text-destructive-600'
-                    : tab.id === LINTER_LEVELS.WARN
-                      ? 'text-warning'
-                      : 'text-brand-500'
-                }
-              >
-                <MessageSquareMore size={14} fill="currentColor" strokeWidth={0} />
-              </span>
+            <TabsTrigger
+              value={tab.id}
+              className={cn(
+                'group relative',
+                'px-6 py-3 border-b-0 flex flex-col items-start shadow-none! border-default border-t',
+                'even:border-x last:border-r even:border-x-strong! last:border-r-strong!',
+                tab.id === currentTab ? 'bg-surface-200!' : 'bg-surface-200/33!',
+                'hover:bg-surface-100!',
+                'data-[state=active]:bg-surface-200!',
+                'hover:text-foreground-light',
+                'transition'
+              )}
+            >
+              {tab.id === currentTab && (
+                <div className="absolute top-0 left-0 w-full h-px bg-foreground" />
+              )}
+              <div className="flex items-center gap-x-2">
+                <span
+                  className={
+                    tab.id === LINTER_LEVELS.ERROR
+                      ? 'text-destructive-600'
+                      : tab.id === LINTER_LEVELS.WARN
+                        ? 'text-warning'
+                        : 'text-brand-500'
+                  }
+                >
+                  <MessageSquareMoreIcon size={14} fill="currentColor" strokeWidth={0} />
+                </span>
 
-              <span className="">{tab.label}</span>
-              <Tooltip>
-                <TooltipTrigger asChild>
-                  <InformationCircleIcon className="transition text-foreground-muted w-3 h-3 data-[state=delayed-open]:text-foreground-light" />
-                </TooltipTrigger>
-                <TooltipContent side="top">{tab.description}</TooltipContent>
-              </Tooltip>
-            </div>
-            <LintCountLabel tab={tab} />
-          </TabsTrigger_Shadcn_>
+                <span className="">{tab.label}</span>
+                <Tooltip>
+                  <TooltipTrigger asChild>
+                    <InformationCircleIcon className="transition text-foreground-muted w-3 h-3 data-[state=delayed-open]:text-foreground-light" />
+                  </TooltipTrigger>
+                  <TooltipContent side="top">{tab.description}</TooltipContent>
+                </Tooltip>
+              </div>
+              <LintCountLabel tab={tab} activeLints={activeLints} isLoading={isLoading} />
+            </TabsTrigger>
+          </ShortcutTooltip>
         ))}
-      </TabsList_Shadcn_>
-    </Tabs_Shadcn_>
+      </TabsList>
+    </Tabs>
   )
 }
 
-export default LintPageTabs
+export { LintPageTabs }

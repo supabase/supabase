@@ -1,8 +1,10 @@
-import { useMutation, UseMutationOptions, useQueryClient } from '@tanstack/react-query'
-import { handleError, post } from 'data/fetchers'
+import { useMutation, useQueryClient } from '@tanstack/react-query'
 import { toast } from 'sonner'
-import { ResponseError } from 'types'
+
 import { clientSecretKeys } from './keys'
+import { handleError, post } from '@/data/fetchers'
+import type { StudioError } from '@/lib/errors/studio-errors'
+import type { UseCustomMutationOptions } from '@/types'
 
 export type ClientSecretCreateVariables = {
   slug: string
@@ -23,27 +25,25 @@ export const useClientSecretCreateMutation = ({
   onError,
   ...options
 }: Omit<
-  UseMutationOptions<any, ResponseError, ClientSecretCreateVariables>,
+  UseCustomMutationOptions<any, StudioError, ClientSecretCreateVariables>,
   'mutationFn'
 > = {}) => {
   const queryClient = useQueryClient()
 
-  return useMutation<any, ResponseError, ClientSecretCreateVariables>(
-    (vars) => createClientSecret(vars),
-    {
-      async onSuccess(data, variables, context) {
-        const { slug, appId } = variables
-        await queryClient.invalidateQueries(clientSecretKeys.list(slug, appId))
-        await onSuccess?.(data, variables, context)
-      },
-      async onError(data, variables, context) {
-        if (onError === undefined) {
-          toast.error(`Failed to create client secret: ${data.message}`)
-        } else {
-          onError(data, variables, context)
-        }
-      },
-      ...options,
-    }
-  )
+  return useMutation<any, StudioError, ClientSecretCreateVariables>({
+    mutationFn: (vars) => createClientSecret(vars),
+    async onSuccess(data, variables, context) {
+      const { slug, appId } = variables
+      await queryClient.invalidateQueries({ queryKey: clientSecretKeys.list(slug, appId) })
+      await onSuccess?.(data, variables, context)
+    },
+    async onError(data, variables, context) {
+      if (onError === undefined) {
+        toast.error(`Failed to create client secret: ${data.message}`)
+      } else {
+        onError(data, variables, context)
+      }
+    },
+    ...options,
+  })
 }

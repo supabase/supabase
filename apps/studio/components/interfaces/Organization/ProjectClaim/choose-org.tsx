@@ -1,9 +1,8 @@
-import { OrganizationSelector } from 'components/ui/org-selector'
-import { Organization } from 'types'
 import { ProjectClaimLayout } from './layout'
+import { OrganizationSelector } from '@/components/ui/org-selector'
 
 export interface ProjectClaimChooseOrgProps {
-  onChoose: (org: Organization) => void
+  onChoose: (orgSlug: string) => void
 }
 
 const MAX_ORGS_TO_SHOW = 5
@@ -17,7 +16,11 @@ export function ProjectClaimChooseOrg({ onChoose }: ProjectClaimChooseOrgProps) 
           project will be transferred to Supabase organization.
         </p>
         <p className="text-sm text-foreground-light">Please select an organization to continue.</p>
-        <OrganizationSelector onSelect={onChoose} maxOrgsToShow={MAX_ORGS_TO_SHOW} />
+        <OrganizationSelector
+          onSelect={onChoose}
+          maxOrgsToShow={MAX_ORGS_TO_SHOW}
+          canCreateNewOrg
+        />
       </div>
     </ProjectClaimLayout>
   )

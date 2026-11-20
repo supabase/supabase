@@ -2,8 +2,8 @@
 title: Postgres Roles and Privileges
 description: A guide to Postgres roles and privileges
 author: raminder_singh
-image: 2024-04-11-postgres-roles/pg-roles-og.png
-thumb: 2024-04-11-postgres-roles/pg-roles-og.png
+imgSocial: 2024-04-11-postgres-roles/pg-roles-og.png
+imgThumb: 2024-04-11-postgres-roles/pg-roles-og.png
 categories:
   - engineering
 tags:
@@ -42,7 +42,7 @@ With these basic terms defined, let's take a look at the permissions model in Po
 Create a new Supabase project (or use an existing one) and copy its connection string URI from the [Database Settings page](https://supabase.com/dashboard/project/_/database/settings). The URI looks like the following:
 
 ```bash
-postgres://[USER].[YOUR-PROJECT-REF]:[YOUR-PASSWORD]@[REGION-SUBDOMAIN].pooler.supabase.com:5432/postgres
+postgres://[USER].[YOUR-PROJECT-REF]:[YOUR-DATABASE-PASSWORD]@[REGION-SUBDOMAIN].pooler.supabase.com:5432/postgres
 ```
 
 Where `USER` is the user to connect as. `YOUR-PROJECT-REF` is a string uniquely identifying your project. `YOUR-PASSWORD` is the database password for the `USER` user and `REGION-SUBDOMAIN` is the subdomain where your database is hosted.
@@ -50,7 +50,7 @@ Where `USER` is the user to connect as. `YOUR-PROJECT-REF` is a string uniquely 
 Use the [`psql` command line tool](https://www.postgresql.org/download/) to connect to the database:
 
 ```bash
-➜ psql postgres://postgres.[YOUR-PROJECT-REF]:[YOUR-PASSWORD]@[REGION-SUBDOMAIN].pooler.supabase.com:5432/postgres
+➜ psql postgres://postgres.[YOUR-PROJECT-REF]:[YOUR-DATABASE-PASSWORD]@[REGION-SUBDOMAIN].pooler.supabase.com:5432/postgres
 ```
 
 Once connected, confirm that you are connected as the `postgres` user by running `select current_role` command:
@@ -81,7 +81,7 @@ CREATE ROLE
 You can now confirm that the `junior_dev` and `senior_dev` users can login to the database:
 
 ```bash
-➜ psql postgres://junior_dev.[YOUR-PROJECT-REF]:[YOUR-PASSWORD]@[REGION-SUBDOMAIN].pooler.supabase.com:5432/postgres
+➜ psql postgres://junior_dev.[YOUR-PROJECT-REF]:[YOUR-DATABASE-PASSWORD]@[REGION-SUBDOMAIN].pooler.supabase.com:5432/postgres
 
 postgres=> select current_role;
 ┌──────────────┐
@@ -93,7 +93,7 @@ postgres=> select current_role;
 
 postgres=> exit
 
-➜ psql postgres://senior_dev.[YOUR-PROJECT-REF]:[YOUR-PASSWORD]@[REGION-SUBDOMAIN].pooler.supabase.com:5432/postgres
+➜ psql postgres://senior_dev.[YOUR-PROJECT-REF]:[YOUR-DATABASE-PASSWORD]@[REGION-SUBDOMAIN].pooler.supabase.com:5432/postgres
 
 postgres=> select current_role;
 ┌──────────────┐
@@ -609,7 +609,7 @@ Every role has some attributes associated with it which control the behavior of 
 - `createdb` - controls whether the role will be able to create databases.
 - `createrole` - controls whether the role will be able to create other roles.
 - `replication` - controls whether the role can be used to initiate replication.
-- `bypassrls` - controls whether the role can bypass row level security.
+- `bypassrls` - controls whether the role can bypass [row level security](/docs/guides/database/postgres/row-level-security).
 - `connection limit` - limits the maximum number of connections that the role can make to the database.
 - `inherit` - controls whether the role can inherit permissions from roles it is a member of.
 

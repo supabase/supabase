@@ -1,11 +1,11 @@
-import { AiOptInLevel } from 'hooks/misc/useOrgOptedIntoAi'
-import { filterToolsByOptInLevel } from '../tool-filter'
-import { getFallbackTools } from './fallback-tools'
 import { ToolSet } from 'ai'
 import { IS_PLATFORM } from 'common'
+
+import { filterToolsByOptInLevel } from '../tool-filter'
 import { getMcpTools } from './mcp-tools'
-import { getSchemaTools } from './schema-tools'
-import { getRenderingTools } from './rendering-tools'
+import { buildLocalTools } from './registry.server'
+import type { ToolRequirement } from './types'
+import { AiOptInLevel } from '@/hooks/misc/useOrgOptedIntoAi'
 
 export const getTools = async ({
   projectRef,
@@ -13,48 +13,50 @@ export const getTools = async ({
   authorization,
   aiOptInLevel,
   accessToken,
+  baseUrl,
+  supportMode,
+  isExplorerEnabled,
+  signal,
 }: {
   projectRef: string
   connectionString: string
   authorization?: string
   aiOptInLevel: AiOptInLevel
   accessToken?: string
+  baseUrl?: string
+  supportMode?: boolean
+  // Notebooks haven't shipped yet — they live behind the Explorer feature flag, so the
+  // assistant must not advertise list_notebooks/get_notebook until the caller confirms the
+  // flag is on for this user.
+  isExplorerEnabled?: boolean
+  // Required: tools fetched from the remote MCP server hold an HTTP connection
+  // that is closed when this signal aborts (i.e. when the request ends).
+  signal: AbortSignal
 }) => {
-  // Always include rendering tools
-  let tools: ToolSet = getRenderingTools()
+  const satisfied = new Set<ToolRequirement>()
+  if (isExplorerEnabled) satisfied.add('explorer')
+  if (supportMode) satisfied.add('supportMode')
+  if (baseUrl) satisfied.add('baseUrl')
 
-  // If self-hosted, only add fallback tools
-  if (!IS_PLATFORM) {
-    tools = {
-      ...tools,
-      ...getFallbackTools({
-        projectRef,
-        connectionString,
-        authorization,
-        includeSchemaMetadata: aiOptInLevel !== 'disabled',
-      }),
-    }
-  } else if (accessToken) {
-    // If platform, fetch MCP and other platform specific tools
-    const mcpTools = await getMcpTools({
-      accessToken,
-      projectRef,
-      aiOptInLevel,
-    })
+  const localTools = buildLocalTools(
+    { projectRef, connectionString, authorization, aiOptInLevel, baseUrl },
+    { environment: IS_PLATFORM ? 'platform' : 'self-hosted', satisfied }
+  )
 
-    tools = {
-      ...tools,
-      ...mcpTools,
-      ...getSchemaTools({
+  let tools: ToolSet = {}
+
+  if (IS_PLATFORM && accessToken) {
+    try {
+      tools = await getMcpTools({
+        accessToken,
         projectRef,
-        connectionString,
-        authorization,
-      }),
+        aiOptInLevel,
+        signal,
+      })
+    } catch (error) {
+      console.error('Failed to fetch MCP tools:', error)
     }
   }
 
-  // Filter all tools based on the (potentially modified) AI opt-in level
-  const filteredTools: ToolSet = filterToolsByOptInLevel(tools, aiOptInLevel)
-
-  return filteredTools
+  return filterToolsByOptInLevel({ ...tools, ...localTools }, aiOptInLevel)
 }

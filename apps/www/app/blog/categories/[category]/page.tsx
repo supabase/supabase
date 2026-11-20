@@ -1,22 +1,19 @@
+import { BLOG_VIEW_COOKIE, isBlogView, type BlogView } from 'app/blog/blog-view'
 import type { Metadata } from 'next'
-import Link from 'next/link'
-import DefaultLayout from 'components/Layouts/Default'
-import BlogGridItem from 'components/Blog/BlogGridItem'
+import { cookies } from 'next/headers'
+import { notFound } from 'next/navigation'
 
-import { getAllCMSPosts } from 'lib/get-cms-posts'
-import { capitalize } from 'lib/helpers'
-import { getSortedPosts, getAllCategories } from 'lib/posts'
-import type PostTypes from 'types/post'
+import CategoryClient from './CategoryClient'
+import { canonicalAlternates } from '@/lib/canonical'
+import { decodeRouteParam, startCase } from '@/lib/helpers'
+import { getAllCategories, getSortedPosts } from '@/lib/posts'
+import type PostTypes from '@/types/post'
 
 type Params = { category: string }
 
-export async function generateStaticParams() {
-  const categories = getAllCategories('_blog')
-  return categories.map((category: string) => ({ category }))
-}
-
-export const revalidate = 30
-export const dynamic = 'force-static'
+// Category list is fixed per deploy, so read it once per process instead of per request.
+let knownCategories: string[] | undefined
+const getKnownCategories = (): string[] => (knownCategories ??= getAllCategories('_blog'))
 
 export async function generateMetadata({
   params: paramsPromise,
@@ -24,11 +21,17 @@ export async function generateMetadata({
   params: Promise<Params>
 }): Promise<Metadata> {
   const params = await paramsPromise
+  const category = decodeRouteParam(params.category)
 
-  const capitalizedCategory = capitalize(params?.category.replaceAll('-', ' '))
+  const categoryLabel = startCase(category.replaceAll('-', ' '))
+  // The page calls notFound() for unknown categories, so no canonical for them.
+  const isKnownCategory = getKnownCategories().includes(category)
   return {
-    title: `Blog | ${capitalizedCategory}`,
-    description: 'Latest news from the Supabase team.',
+    title: `Blog | ${categoryLabel}`,
+    description: `Blog posts in ${categoryLabel}.`,
+    alternates: isKnownCategory
+      ? canonicalAlternates(`/blog/categories/${encodeURIComponent(category)}`)
+      : undefined,
   }
 }
 
@@ -38,42 +41,26 @@ export default async function CategoriesPage({
   params: Promise<Params>
 }) {
   const params = await paramsPromise
+  const category = decodeRouteParam(params.category)
+
+  if (!getKnownCategories().includes(category)) {
+    notFound()
+  }
+
+  // Read the list/grid preference from a cookie so the correct view renders on
+  // first paint. Reading a cookie opts this route into dynamic rendering.
+  const cookieStore = await cookies()
+  const cookieView = cookieStore.get(BLOG_VIEW_COOKIE)?.value
+  const initialView: BlogView = isBlogView(cookieView) ? cookieView : 'list'
 
   const staticPosts = getSortedPosts({
     directory: '_blog',
     limit: 0,
-    categories: [params.category],
+    categories: [category],
   })
-  const cmsPosts = await getAllCMSPosts()
-  const blogs = [
-    ...(staticPosts as any[]),
-    ...(cmsPosts as any[]).filter((p) => (p.categories || []).includes(params.category)),
-  ] as unknown as PostTypes[]
-  const capitalizedCategory = capitalize(params?.category.replaceAll('-', ' '))
+  const blogs = [...staticPosts] as PostTypes[]
 
-  return (
-    <>
-      <DefaultLayout>
-        <div className="container mx-auto px-8 py-16 sm:px-16 xl:px-20">
-          <div className="text-foreground-lighter flex space-x-1">
-            <h1 className="cursor-pointer">
-              <Link href="/blog">Blog</Link>
-              <span className="px-2">/</span>
-              <span>{capitalizedCategory}</span>
-            </h1>
-          </div>
-          <ol className="grid grid-cols-12 gap-8 py-16 lg:gap-16">
-            {blogs.map((blog: PostTypes) => (
-              <div
-                className="col-span-12 mb-16 md:col-span-12 lg:col-span-6 xl:col-span-4"
-                key={blog.slug}
-              >
-                <BlogGridItem post={blog} />
-              </div>
-            ))}
-          </ol>
-        </div>
-      </DefaultLayout>
-    </>
-  )
+  // Key by category so state (search term, view) resets when switching between
+  // category pages rather than persisting across the reused page component.
+  return <CategoryClient key={category} posts={blogs} initialView={initialView} />
 }

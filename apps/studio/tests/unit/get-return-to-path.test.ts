@@ -1,5 +1,7 @@
-import { getReturnToPath, DEFAULT_FALLBACK_PATH } from 'lib/gotrue'
-import { describe, it, expect } from 'vitest'
+// @vitest-environment jsdom
+import { describe, expect, it } from 'vitest'
+
+import { DEFAULT_FALLBACK_PATH, getReturnToPath } from '@/lib/gotrue'
 
 describe(`getReturnToPath`, () => {
   it(`returns to ${DEFAULT_FALLBACK_PATH} when no fallback is provided`, () => {
