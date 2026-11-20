@@ -197,7 +197,7 @@ function commonPath(paths: string[]): string {
 
 export const getFallbackImportMapPath = (files: Omit<FileData, 'id' | 'content' | 'state'>[]) => {
   // try to find a deno.json or import_map.json file
-  const regex = /^.*?(deno|import_map).json*$/i
+  const regex = /(?:^|\/)(?:deno\.jsonc?|import_map\.json)$/i
   return files.find(({ name }) => regex.test(name))?.name
 }
 
