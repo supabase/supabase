@@ -1,4 +1,4 @@
-import { isFeatureEnabled } from 'common/enabled-features'
+import { isFeatureEnabled } from 'common/enabled-features';
 
 const {
   sdkCsharp: sdkCsharpEnabled,
@@ -139,9 +139,13 @@ export const REFERENCES = {
     name: 'Kotlin',
     library: 'supabase-kt',
     libPath: 'kotlin',
-    versions: ['v3', 'v2', 'v1'],
+    versions: ['v4', 'v3', 'v2', 'v1'],
     icon: 'reference-kotlin',
     meta: {
+      v4: {
+        libId: 'reference_kotlin_v4',
+        specFile: 'supabase_kt_v4',
+      },
       v3: {
         libId: 'reference_kotlin_v3',
         specFile: 'supabase_kt_v3',

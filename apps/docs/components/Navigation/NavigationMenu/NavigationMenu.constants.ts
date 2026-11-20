@@ -268,7 +268,6 @@ export const GLOBAL_MENU_ITEMS: GlobalMenuItems = [
             icon: 'reference-kotlin',
             href: '/reference/kotlin' as `/${string}`,
             level: 'reference_kotlin',
-            community: true,
             enabled: sdkKotlinEnabled,
           },
         ],
@@ -3635,6 +3634,17 @@ export const reference_kotlin_v3 = {
   },
 }
 
+export const reference_kotlin_v4 = {
+  icon: 'reference-kotlin',
+  title: 'kotlin',
+  url: 'guides/reference/kotlin',
+  parent: '/reference',
+  pkg: {
+    name: '@supabase-community/supabase-kt',
+    repo: 'https://github.com/supabase-community/supabase-kt',
+  },
+}
+
 export const reference_cli = {
   icon: 'reference-cli',
   title: 'Supabase CLI',
@@ -3731,7 +3741,7 @@ export const references = [
       },
       {
         label: 'supabase-kt',
-        versions: ['v3', 'v2', 'v1'],
+        versions: ['v4', 'v3', 'v2', 'v1'],
         description: 'something about the reference',
         icon: '/docs/img/icons/kotlin-icon.svg',
         url: '/reference/kotlin/start',
