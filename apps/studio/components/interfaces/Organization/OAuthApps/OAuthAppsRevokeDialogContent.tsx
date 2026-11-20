@@ -12,17 +12,22 @@ import {
   DialogTitle,
 } from 'ui'
 
+import type { OAuthAppDatabaseAccess } from './OAuthAppsAuthorizedPreview'
 import { AlertError } from '@/components/ui/AlertError'
 import { OAuthApproval } from '@/data/oauth-apps/oauth-apps-approvals-query'
 import { useOAuthAppRevokeMutation } from '@/data/oauth-apps/oauth-apps-revoke-mutation'
 
 export interface OAuthAppsRevokeDialogProps extends ComponentProps<typeof DialogContent> {
   approval?: OAuthApproval
+  databaseAccess?: OAuthAppDatabaseAccess
+  isPreview?: boolean
   onClose: () => void
 }
 
 export const OAuthAppsRevokeDialogContent = ({
   approval,
+  databaseAccess,
+  isPreview = false,
   onClose,
   ...props
 }: OAuthAppsRevokeDialogProps) => {
@@ -76,6 +81,22 @@ export const OAuthAppsRevokeDialogContent = ({
         </ul>
       </DialogSection>
 
+      {databaseAccess && (
+        <>
+          <DialogSectionSeparator />
+          <DialogSection className="flex flex-col gap-2 text-sm text-foreground-light">
+            <h3 className="font-medium text-foreground">Direct database access</h3>
+            <p>
+              New connections will be blocked immediately. Supabase will close open connections.
+            </p>
+            <p>
+              The <span className="break-all font-mono text-xs">{databaseAccess.role}</span> role
+              will stay in the database with login disabled.
+            </p>
+          </DialogSection>
+        </>
+      )}
+
       <DialogFooter>
         <DialogClose asChild>
           <Button variant="default" disabled={isPending} onClick={() => reset()}>
@@ -85,8 +106,9 @@ export const OAuthAppsRevokeDialogContent = ({
         <Button
           variant="danger"
           loading={isPending}
+          disabled={isPreview}
           onClick={() => {
-            if (approval && slug) revokeApp({ slug, appId: approval.id })
+            if (!isPreview && slug) revokeApp({ slug, appId: approval.id })
           }}
         >
           Revoke

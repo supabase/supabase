@@ -111,6 +111,24 @@ const createMockMemberGrants = (
 })
 
 describe('OAuthAppsAuthorizedList', () => {
+  test('previews database access and the effects of revoking without allowing a revoke', async () => {
+    customRender(<OAuthAppsAuthorizedList isPreview />)
+
+    expect(screen.getByRole('columnheader', { name: 'Database access' })).toBeInTheDocument()
+    expect(await rowFor('Example Partner')).toHaveTextContent('Read and write')
+    expect(await rowFor('Example Partner')).toHaveTextContent('northwind-cms, northwind-storefront')
+    expect(await rowFor('Example Analytics')).toHaveTextContent('All current and future projects')
+    expect(await rowFor('Example Deploy')).toHaveTextContent('None')
+
+    await openRowMenu('Example Partner')
+    await userEvent.click(await screen.findByRole('menuitem', { name: 'Revoke grants' }))
+
+    const dialog = await screen.findByRole('dialog')
+    expect(dialog).toHaveTextContent('New connections will be blocked immediately.')
+    expect(dialog).toHaveTextContent('example_partner_user')
+    expect(within(dialog).getByRole('button', { name: 'Revoke', exact: true })).toBeDisabled()
+  })
+
   test('expands a member to show their projects and permission groups', async () => {
     addAPIMock({
       path: '/platform/organizations/:slug/oauth/approvals',

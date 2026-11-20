@@ -16,6 +16,7 @@ import {
   TooltipTrigger,
 } from 'ui'
 
+import type { OAuthAppDatabaseAccess } from './OAuthAppsAuthorizedPreview'
 import { OAuthAppsMemberGrantsDialogContent } from './OAuthAppsMemberGrantsDialogContent'
 import { OAuthAppsRevokeDialogContent } from './OAuthAppsRevokeDialogContent'
 import { OAuthApproval, OAuthApprovalTarget } from '@/data/oauth-apps/oauth-apps-approvals-query'
@@ -24,12 +25,16 @@ export interface OAuthAppsAuthorizedRowProps {
   approval: OAuthApproval
   className?: string
   canRevoke: boolean
+  databaseAccess?: OAuthAppDatabaseAccess
+  isPreview?: boolean
 }
 
 export const OAuthAppsAuthorizedRow = ({
   approval,
   className,
   canRevoke,
+  databaseAccess,
+  isPreview = false,
 }: OAuthAppsAuthorizedRowProps) => {
   const [isDialogOpen, setIsDialogOpen] = useState(false)
   const [dialogContent, setDialogContent] = useState<'grants' | 'revoke' | null>(null)
@@ -58,6 +63,23 @@ export const OAuthAppsAuthorizedRow = ({
         </div>
       </TableCell>
       <TableCell>{getGrantTargetLabel(approval.attributes.target)}</TableCell>
+      {isPreview && (
+        <TableCell className="min-w-40 whitespace-normal align-top">
+          {databaseAccess ? (
+            <div className="space-y-1">
+              <p>{databaseAccess.mode}</p>
+              <p className="break-all font-mono text-xs text-foreground-light">
+                {databaseAccess.role}
+              </p>
+              <p className="text-xs text-foreground-light">
+                {databaseAccess.projects?.join(', ') ?? 'All current and future projects'}
+              </p>
+            </div>
+          ) : (
+            <span className="text-foreground-light">None</span>
+          )}
+        </TableCell>
+      )}
       <TableCell className="text-right">
         <Dialog
           open={isDialogOpen}
@@ -88,13 +110,20 @@ export const OAuthAppsAuthorizedRow = ({
               <TooltipContent side="bottom">Manage app</TooltipContent>
             </Tooltip>
             <DropdownMenuContent align="end" side="bottom" className="w-40">
-              <DialogTrigger asChild>
-                <DropdownMenuItem className="gap-x-2" onClick={() => setDialogContent('grants')}>
-                  <LockIcon size={14} />
-                  View grants
-                </DropdownMenuItem>
-              </DialogTrigger>
-              <DropdownMenuSeparator />
+              {!isPreview && (
+                <>
+                  <DialogTrigger asChild>
+                    <DropdownMenuItem
+                      className="gap-x-2"
+                      onClick={() => setDialogContent('grants')}
+                    >
+                      <LockIcon size={14} />
+                      View grants
+                    </DropdownMenuItem>
+                  </DialogTrigger>
+                  <DropdownMenuSeparator />
+                </>
+              )}
               {canRevoke && (
                 <DialogTrigger asChild>
                   <DropdownMenuItem className="gap-x-2" onClick={() => setDialogContent('revoke')}>
@@ -114,6 +143,8 @@ export const OAuthAppsAuthorizedRow = ({
           {dialogContent === 'revoke' && (
             <OAuthAppsRevokeDialogContent
               approval={approval}
+              databaseAccess={databaseAccess}
+              isPreview={isPreview}
               onClose={() => setDialogContent(null)}
               onCloseAutoFocus={preventDefault}
             />
