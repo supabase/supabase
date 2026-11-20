@@ -11,6 +11,7 @@ import { WarehouseOverviewTab } from './OverviewTab'
 import type { SchemasData } from '@/data/database/schemas-query'
 import type { ProjectDetail } from '@/data/projects/project-detail-query'
 import type { TablesData } from '@/data/tables/tables-query'
+import type { WarehouseMetricsResponse } from '@/data/warehouse/warehouse-metrics-api-types'
 import { customRender } from '@/tests/lib/custom-render'
 import { addAPIMock, type APIErrorBody } from '@/tests/lib/msw'
 
@@ -52,6 +53,14 @@ vi.mock('./WarehouseSchemaTablePicker', () => ({
     </section>
   ),
 }))
+
+beforeEach(() =>
+  addAPIMock({
+    method: 'get',
+    path: '/platform/warehouse/:ref/metrics',
+    response: () => HttpResponse.json<WarehouseMetricsResponse>({ metrics: [] }),
+  })
+)
 
 mockAnimationsApi()
 dayjs.extend(duration)
