@@ -48,7 +48,7 @@ Next, create a new database table to log the transcription results:
 supabase migrations new init
 ```
 
-This will create a new migration file in the `supabase/migrations` directory. Open the file and add the following SQL:
+This will create a new [migration file](/docs/guides/deployment/database-migrations) in the `supabase/migrations` directory. Open the file and add the following SQL:
 
 ```sql supabase/migrations/init.sql
 CREATE TABLE IF NOT EXISTS transcription_logs (
@@ -100,7 +100,7 @@ The project uses a couple of dependencies:
 - The [@supabase/supabase-js](/docs/reference/javascript/introduction) library to interact with the Supabase database.
 - The ElevenLabs [JavaScript SDK](https://github.com/elevenlabs/elevenlabs-js) to interact with the speech-to-text API.
 
-Since Supabase Edge Function uses the [Deno runtime](https://deno.land/), you don't need to install the dependencies, rather you can [import](https://docs.deno.com/examples/npm/) them via the `npm:` prefix.
+Since Supabase Edge Function uses the [Deno runtime](https://deno.com/), you don't need to install the dependencies, rather you can [import](https://docs.deno.com/examples/npm/) them via the `npm:` prefix.
 
 ## Code the Telegram bot
 

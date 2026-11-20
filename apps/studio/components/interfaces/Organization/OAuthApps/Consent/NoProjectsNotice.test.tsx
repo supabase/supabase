@@ -7,7 +7,7 @@ import { customRender } from '@/tests/lib/custom-render'
 describe('NoProjectsNotice', () => {
   test('interpolates the organization into the title', () => {
     customRender(
-      <NoProjectsNotice appName="Vercel" organizationSlug="contoso-labs" onSwitchOrg={vi.fn()} />
+      <NoProjectsNotice appName="Vercel" organizationName="contoso-labs" onSwitchOrg={vi.fn()} />
     )
 
     expect(screen.getByText('No projects in contoso-labs')).toBeInTheDocument()
@@ -15,7 +15,7 @@ describe('NoProjectsNotice', () => {
 
   test('interpolates the app name into the body', () => {
     customRender(
-      <NoProjectsNotice appName="Vercel" organizationSlug="contoso-labs" onSwitchOrg={vi.fn()} />
+      <NoProjectsNotice appName="Vercel" organizationName="contoso-labs" onSwitchOrg={vi.fn()} />
     )
 
     expect(
@@ -30,7 +30,7 @@ describe('NoProjectsNotice', () => {
     customRender(
       <NoProjectsNotice
         appName="Vercel"
-        organizationSlug="contoso-labs"
+        organizationName="contoso-labs"
         onSwitchOrg={onSwitchOrg}
       />
     )
@@ -42,7 +42,7 @@ describe('NoProjectsNotice', () => {
 
   test('interpolates a different app name, so the copy is not hardcoded', () => {
     customRender(
-      <NoProjectsNotice appName="Fabrikam" organizationSlug="contoso-labs" onSwitchOrg={vi.fn()} />
+      <NoProjectsNotice appName="Fabrikam" organizationName="contoso-labs" onSwitchOrg={vi.fn()} />
     )
 
     expect(
@@ -56,7 +56,7 @@ describe('NoProjectsNotice', () => {
     customRender(
       <NoProjectsNotice
         appName="Vercel"
-        organizationSlug="northwind-traders"
+        organizationName="northwind-traders"
         onSwitchOrg={vi.fn()}
       />
     )

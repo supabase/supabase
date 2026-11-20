@@ -220,14 +220,14 @@ function mockProjectConfig(auth: Record<string, unknown>) {
   })
 }
 
-function mockGitHubConfig(config: Record<string, unknown>) {
+function mockGitHubConfig(config: Record<string, unknown>, path = 'supabase/config.toml') {
   addAPIMock({
     method: 'get',
     path: '/platform/integrations/github/connections/:connection_id/config',
     response: () =>
       HttpResponse.json<GetGitHubConnectionConfigResponse>({
         config,
-        path: 'supabase/config.toml',
+        path,
         ref: null,
         sha: 'abc123',
       }),
@@ -251,6 +251,7 @@ describe('ConfigurationDriftPage', () => {
     customRender(<ConfigurationDriftPage />, { profileContext: PROFILE_CONTEXT })
 
     expect(await screen.findByText(/Connect a GitHub repo/)).toBeInTheDocument()
+    expect(screen.getByText(/managed by a\s+config file/)).toBeInTheDocument()
   })
 
   test('shows an error state when a query fails', async () => {
@@ -292,6 +293,38 @@ describe('ConfigurationDriftPage', () => {
 
     expect(await screen.findByText('Could not read config.toml')).toBeInTheDocument()
     expect(screen.getByText(/api\.max_rows/)).toBeInTheDocument()
+  })
+
+  test('names a JSON config file on the decode error', async () => {
+    mockConnectedProject()
+    mockProjectConfig({ disable_signup: false })
+    mockGitHubConfig({ api: { max_rows: 'abc' } }, 'supabase/config.jsonc')
+
+    customRender(<ConfigurationDriftPage />, { profileContext: PROFILE_CONTEXT })
+
+    expect(await screen.findByText('Could not read config.jsonc')).toBeInTheDocument()
+    expect(
+      screen.getByText(/config\.jsonc has an invalid value at api\.max_rows/)
+    ).toBeInTheDocument()
+    expect(screen.queryByText(/config\.toml/)).not.toBeInTheDocument()
+  })
+
+  test('names a JSON config file across the page when settings drift', async () => {
+    mockConnectedProject()
+    mockProjectConfig({ disable_signup: false })
+    mockGitHubConfig(
+      { auth: { enable_signup: false }, api: { max_rows: 1000 } },
+      'supabase/config.jsonc'
+    )
+
+    customRender(<ConfigurationDriftPage />, { profileContext: PROFILE_CONTEXT })
+
+    expect(
+      await screen.findByText('config.jsonc will overwrite these settings on next deploy')
+    ).toBeInTheDocument()
+    expect(screen.getByText('config.jsonc · intended')).toBeInTheDocument()
+    expect(screen.getByText(/differ from config\.jsonc/)).toBeInTheDocument()
+    expect(document.body.textContent).not.toMatch(/config\.toml/i)
   })
 
   test('renders a drift row when the dashboard and config.toml disagree', async () => {

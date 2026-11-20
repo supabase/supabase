@@ -1280,7 +1280,7 @@ We can do this right inside the table editor of Supabase, so go to your tables, 
 
 ![Supabase Realtime](/images/blog/simon-grimm-angular-realtime/supabase-realtime.png)
 
-Now we are able to retrieve those updates if we listen for them, and while the API for this might slightly change with the next Supabase JS update, the general idea can still be applied:
+Now we are able to retrieve those updates if we listen for them, and while the API for this might slightly change with the next [Supabase JS](/docs/reference/javascript/introduction) update, the general idea can still be applied:
 
 We create a new `Subject` and return it as an `Observable`, and then listen to changes of our tables by using `on()`.
 

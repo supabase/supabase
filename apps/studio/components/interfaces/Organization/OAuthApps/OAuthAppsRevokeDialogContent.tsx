@@ -13,11 +13,11 @@ import {
 } from 'ui'
 
 import { AlertError } from '@/components/ui/AlertError'
+import { OAuthApproval } from '@/data/oauth-apps/oauth-apps-approvals-query'
 import { useOAuthAppRevokeMutation } from '@/data/oauth-apps/oauth-apps-revoke-mutation'
-import type { OAuthApprovalItem } from '@/data/oauth-apps/types'
 
 export interface OAuthAppsRevokeDialogProps extends ComponentProps<typeof DialogContent> {
-  approval?: OAuthApprovalItem
+  approval?: OAuthApproval
   onClose: () => void
 }
 
@@ -36,7 +36,7 @@ export const OAuthAppsRevokeDialogContent = ({
     reset,
   } = useOAuthAppRevokeMutation({
     onSuccess: () => {
-      toast.success(`Revoked access for ${approval?.app.name}`)
+      toast.success(`Revoked access for ${approval?.attributes.app.name}`)
       onClose()
     },
     onError: () => {
@@ -46,18 +46,18 @@ export const OAuthAppsRevokeDialogContent = ({
   })
 
   if (!approval) return null
-  const hasOrgGrant = Boolean(approval.org_grant)
+  const hasOrgGrant = Boolean(approval.attributes.org_grant)
 
   return (
     <DialogContent size="medium" {...props}>
       <DialogHeader>
-        <DialogTitle>Revoke access for {approval.app.name}</DialogTitle>
+        <DialogTitle>Revoke access for {approval.attributes.app.name}</DialogTitle>
       </DialogHeader>
       <DialogSectionSeparator />
 
       {isError && (
         <AlertError
-          subject={`An error occurred while revoking this ${approval.app.name} grant`}
+          subject={`An error occurred while revoking this ${approval.attributes.app.name} grant`}
           className="mb-0 rounded-none border-x-0 border-t-0"
           error={error}
         />
@@ -86,7 +86,7 @@ export const OAuthAppsRevokeDialogContent = ({
           variant="danger"
           loading={isPending}
           onClick={() => {
-            if (approval && slug) revokeApp({ slug, appId: approval.app.id })
+            if (approval && slug) revokeApp({ slug, appId: approval.id })
           }}
         >
           Revoke

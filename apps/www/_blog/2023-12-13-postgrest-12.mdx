@@ -87,11 +87,11 @@ $ curl 'http://postgrest/blog_post?select=title,id.count()'
   ...
 ```
 
-This example only scratches the surface. Aggregates are fully-compatible with [resource embedding](https://postgrest.org/en/stable/references/api/resource_embedding.html) which yields an extremely versatile interface. We'll explore this feature more in a deep-dive coming soon.
+This example only scratches the surface. Aggregates are fully-compatible with [resource embedding](https://docs.postgrest.org/en/stable/references/api/resource_embedding.html) which yields an extremely versatile interface. We'll explore this feature more in a deep-dive coming soon.
 
 ## Media Type Handlers
 
-PostgREST now gives you the flexibility to [handle your custom media types and override the built-in ones](https://postgrest.org/en/v12.0/references/api/media_type_handlers.html). Among other things, that enables [serving HTML, javascript, or whatever you can think of, straight from your database](https://postgrest.org/en/latest/how-tos/providing-html-content-using-htmx.html).
+PostgREST now gives you the flexibility to [handle your custom media types and override the built-in ones](https://docs.postgrest.org/en/v12/references/api/media_type_handlers.html). Among other things, that enables [serving HTML, javascript, or whatever you can think of, straight from your database](https://docs.postgrest.org/en/latest/how-tos/providing-html-content-using-htmx.html).
 
 ```sql
 create domain "text/html" as text;

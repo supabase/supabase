@@ -3,6 +3,7 @@ import { IS_PLATFORM } from 'common'
 import dayjs, { Dayjs } from 'dayjs'
 import { get } from 'lodash'
 import uniqBy from 'lodash/uniqBy'
+import type { editor, IPosition, languages } from 'monaco-editor'
 import { useEffect } from 'react'
 import logConstants from 'shared-data/log-constants'
 
@@ -13,7 +14,7 @@ import {
   SQL_FILTER_TEMPLATES,
   type SqlFilterEntry,
 } from './Logs.constants'
-import type { Filters, LogData, LogsEndpointParams, QueryType } from './Logs.types'
+import type { Filters, LogData, LogsEndpointParams, Metadata, QueryType } from './Logs.types'
 import { convertResultsToCSV } from '@/components/interfaces/SQLEditor/UtilityPanel/Results.utils'
 import BackwardIterator from '@/components/ui/CodeEditor/Providers/BackwardIterator'
 import { parseOtelTimestamp } from '@/data/logs/otel-inspection.utils'
@@ -60,8 +61,9 @@ const getDotKeys = (obj: { [k: string]: unknown }, parent?: string): string[] =>
   const keys = Object.keys(obj).filter((k) => obj[k])
   return keys.flatMap((k) => {
     const currKey = parent ? `${parent}.${k}` : k
-    if (typeof obj[k] === 'object') {
-      return getDotKeys(obj[k] as any, currKey)
+    const value = obj[k]
+    if (typeof value === 'object' && value !== null) {
+      return getDotKeys({ ...value }, currKey)
     } else {
       return [currKey]
     }
@@ -351,16 +353,24 @@ export const parseMultigresEventMessage = (
   }
 }
 
+// Presets like "Last 24 hours" compute their start moments before this check runs,
+// so allow a small grace window past the exact cutoff instead of locking them out.
+const ENTITLEMENT_CUTOFF_GRACE_MS = 60 * 1000
+
 /**
  * Determine if we should show the user an upgrade prompt while browsing logs
+ *
+ * [Joshen] Tbh this should be a guard from API, and not UI to ensure that the checks are
+ * consistent. To investigate separately - e.g upgrade prompt should show if API for logs
+ * returns a error regarding the date range
  */
-export const maybeShowUpgradePromptIfNotEntitled = (
+export const isStartOutsideRetention = (
   from: string | null | undefined,
   entitledToDays: number | undefined
 ) => {
   if (!entitledToDays) return false
-  const day = Math.abs(dayjs().diff(dayjs(from), 'day'))
-  return day > entitledToDays
+  const cutoff = dayjs().subtract(entitledToDays, 'day').subtract(ENTITLEMENT_CUTOFF_GRACE_MS, 'ms')
+  return dayjs(from).isBefore(cutoff)
 }
 
 export const genCountQuery = (table: LogsTableName, filters: Filters): SafeLogSqlFragment => {
@@ -388,7 +398,7 @@ const calcChartStart = (
 ): [Dayjs, 'minute' | 'hour' | 'day'] => {
   const ite = resolveLogTimestamp(params.iso_timestamp_end)
   // todo @TzeYiing needs typing
-  const its: any = resolveLogTimestamp(params.iso_timestamp_start)
+  const its = resolveLogTimestamp(params.iso_timestamp_start)
 
   let trunc: 'minute' | 'hour' | 'day' = 'minute'
   let extendValue = 60 * 6
@@ -489,12 +499,23 @@ export const useEditorHints = () => {
 
   useEffect(() => {
     if (monaco) {
-      const competionProvider = {
+      const competionProvider: languages.CompletionItemProvider = {
         triggerCharacters: ['`', ' ', '.'],
-        provideCompletionItems: function (model: any, position: any, context: any) {
+        provideCompletionItems: function (
+          model: editor.ITextModel,
+          position: IPosition,
+          context: languages.CompletionContext
+        ) {
           let iterator = new BackwardIterator(model, position.column - 2, position.lineNumber - 1)
           if (iterator.isNextDQuote()) return { suggestions: [] }
-          let suggestions: { label: string; kind: any; insertText: string }[] = []
+          let suggestions: languages.CompletionItem[] = []
+          const word = model.getWordUntilPosition(position)
+          const range = {
+            startLineNumber: position.lineNumber,
+            endLineNumber: position.lineNumber,
+            startColumn: word.startColumn,
+            endColumn: word.endColumn,
+          }
 
           let schemasInUse = logConstants.schemas.filter((schema) =>
             iterator._text.includes(schema.reference)
@@ -515,6 +536,7 @@ export const useEditorHints = () => {
               label: key,
               kind: monaco.languages.CompletionItemKind.Property,
               insertText: key,
+              range,
             }))
             suggestions = suggestions.concat(trailingToAdd)
           }
@@ -525,6 +547,7 @@ export const useEditorHints = () => {
               label: schema.reference,
               kind: monaco.languages.CompletionItemKind.Class,
               insertText: schema.reference,
+              range,
             }))
 
             const fields = schemasInUse.flatMap((schema) => schema.fields)
@@ -538,6 +561,7 @@ export const useEditorHints = () => {
               label: key,
               kind: monaco.languages.CompletionItemKind.Property,
               insertText: key,
+              range,
             }))
             suggestions = suggestions.concat(leadingToAdd)
             suggestions = suggestions.concat(referencesToAdd)
@@ -546,7 +570,7 @@ export const useEditorHints = () => {
             suggestions: uniqBy(suggestions, 'label'),
           }
         },
-      } as any
+      }
 
       // register completion item provider for pgsql
       const completeProvider = monaco.languages.registerCompletionItemProvider(
@@ -566,8 +590,11 @@ export const useEditorHints = () => {
  *
  * min/max are the datetime strings that extend beyond the given timeseries data.
  */
+const toTimestampInput = (value: unknown): string | number =>
+  typeof value === 'number' ? value : String(value)
+
 export const fillTimeseries = (
-  timeseriesData: any[],
+  timeseriesData: Record<string, unknown>[],
   timestampKey: string,
   valueKey: string | string[],
   defaultValue: number,
@@ -582,7 +609,7 @@ export const fillTimeseries = (
   // If we have more points than minPointsToFill, just normalize timestamps and return
   if (timeseriesData.length > minPointsToFill) {
     return timeseriesData.map((datum) => {
-      const timestamp = datum[timestampKey]
+      const timestamp = toTimestampInput(datum[timestampKey])
       const iso = isUnixMicro(timestamp)
         ? unixMicroToIsoTimestamp(timestamp)
         : dayjs.utc(timestamp).toISOString()
@@ -592,14 +619,14 @@ export const fillTimeseries = (
   }
 
   if (timeseriesData.length === 1 && !(min && max)) {
-    const timestamp = timeseriesData[0][timestampKey]
+    const timestamp = toTimestampInput(timeseriesData[0][timestampKey])
     timeseriesData[0][timestampKey] = isUnixMicro(timestamp)
       ? unixMicroToIsoTimestamp(timestamp)
       : dayjs.utc(timestamp).toISOString()
     return timeseriesData
   }
   const dates = timeseriesData.map((datum) => {
-    const timestamp = datum[timestampKey]
+    const timestamp = toTimestampInput(datum[timestampKey])
     return dayjs.utc(isUnixMicro(timestamp) ? unixMicroToIsoTimestamp(timestamp) : timestamp)
   })
 
@@ -811,8 +838,16 @@ export function getAuthLogSeverity(level?: unknown, status?: unknown): string {
   return normalizedLevel
 }
 
-export function jwtAPIKey(metadata: any) {
-  const apikeyHeader = metadata?.[0]?.request?.[0]?.sb?.[0]?.jwt?.[0]?.apikey?.[0]
+type JwtApiKeyHeader = {
+  invalid?: boolean
+  payload?: { algorithm?: string; issuer?: string; role?: string; subject?: string }[]
+}
+type ApiKeyHeader = { error?: string; prefix?: string }
+type AuthorizationHeader = { invalid?: boolean; payload?: { role?: string }[] }
+
+export function jwtAPIKey(metadata?: Metadata) {
+  const apikeyHeader: JwtApiKeyHeader | undefined =
+    metadata?.[0]?.request?.[0]?.sb?.[0]?.jwt?.[0]?.apikey?.[0]
   if (!apikeyHeader) {
     return undefined
   }
@@ -829,6 +864,7 @@ export function jwtAPIKey(metadata: any) {
   if (
     payload.algorithm === 'HS256' &&
     payload.issuer === 'supabase' &&
+    payload.role !== undefined &&
     ['anon', 'service_role'].includes(payload.role) &&
     !payload.subject
   ) {
@@ -838,8 +874,9 @@ export function jwtAPIKey(metadata: any) {
   return '<unrecognized>'
 }
 
-export function apiKey(metadata: any) {
-  const apikeyHeader = metadata?.[0]?.request?.[0]?.sb?.[0]?.apikey?.[0]?.apikey?.[0]
+export function apiKey(metadata?: Metadata) {
+  const apikeyHeader: ApiKeyHeader | undefined =
+    metadata?.[0]?.request?.[0]?.sb?.[0]?.apikey?.[0]?.apikey?.[0]
   if (!apikeyHeader) {
     return undefined
   }
@@ -851,8 +888,9 @@ export function apiKey(metadata: any) {
   return `${apikeyHeader.prefix}...`
 }
 
-export function role(metadata: any) {
-  const authorizationHeader = metadata?.[0]?.request?.[0]?.sb?.[0]?.jwt?.[0]?.authorization?.[0]
+export function role(metadata?: Metadata) {
+  const authorizationHeader: AuthorizationHeader | undefined =
+    metadata?.[0]?.request?.[0]?.sb?.[0]?.jwt?.[0]?.authorization?.[0]
   if (!authorizationHeader) {
     return undefined
   }
