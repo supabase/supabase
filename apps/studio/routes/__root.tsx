@@ -420,26 +420,8 @@ function RootComponent() {
   )
 }
 
-const DEVTOOLS_TRIGGER_LABEL = 'Open TanStack Devtools'
-
 function RootDocument({ children }: Readonly<{ children: ReactNode }>) {
   const isTestEnv = process.env.NEXT_PUBLIC_NODE_ENV === 'test'
-
-  // Ctrl + Shift + L toggles the TanStack devtools by clicking their (hidden)
-  // trigger. The library's own hotkey is unreliable, and its `config` prop is
-  // overridden by settings it persists to localStorage.
-  useEffect(() => {
-    if (isTestEnv) return
-    const handleKeyDown = (event: KeyboardEvent) => {
-      if (!event.ctrlKey || !event.shiftKey || event.code !== 'KeyL' || event.repeat) return
-      event.preventDefault()
-      document
-        .querySelector<HTMLButtonElement>(`button[aria-label="${DEVTOOLS_TRIGGER_LABEL}"]`)
-        ?.click()
-    }
-    window.addEventListener('keydown', handleKeyDown, { capture: true })
-    return () => window.removeEventListener('keydown', handleKeyDown, { capture: true })
-  }, [isTestEnv])
 
   return (
     // suppressHydrationWarning is for next-themes: it writes data-theme and
@@ -452,11 +434,9 @@ function RootDocument({ children }: Readonly<{ children: ReactNode }>) {
       <body>
         {children}
         {!isTestEnv && (
-          <style>{`button[aria-label="${DEVTOOLS_TRIGGER_LABEL}"] { display: none !important; }`}</style>
-        )}
-        {!isTestEnv && (
           <TanStackDevtools
-            config={{ position: 'bottom-right' }}
+            // Hidden unless the page is loaded with ?tanstack-devtools in the URL.
+            config={{ position: 'bottom-right', requireUrlFlag: true }}
             plugins={[
               {
                 name: 'TanStack Router',
