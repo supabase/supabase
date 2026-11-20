@@ -20,6 +20,7 @@ import {
   hasAnyValues,
   type ReportView,
 } from './WarehouseMetricsReport.utils'
+import { WarehouseWorkersSection } from './WarehouseWorkersSection'
 import { ReportHeader } from '@/components/interfaces/Reports/ReportHeader'
 import { REPORT_DATERANGE_HELPER_LABELS } from '@/components/interfaces/Reports/Reports.constants'
 import ReportStickyNav from '@/components/interfaces/Reports/ReportStickyNav'
@@ -222,6 +223,7 @@ const WarehouseMetricsReportContent = () => {
             <div className="flex flex-col gap-y-8 mt-8">
               <WarehouseLatencySection range={range} />
               <WarehouseCapacitySection range={range} />
+              <WarehouseWorkersSection range={range} />
             </div>
           )}
         </div>
