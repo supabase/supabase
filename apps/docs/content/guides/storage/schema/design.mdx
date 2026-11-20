@@ -10,9 +10,9 @@ Storage uses Postgres to store metadata regarding your buckets and objects. You 
 
 <Admonition type="note">
 
-When you work with SQL, treat all records in Storage tables as read-only. Do all operations, including uploading, copying, moving, and deleting, **through the Storage API**.
+Changing Storage records with SQL can leave objects that you can't access but are still billed for. When you work with SQL, treat all records in Storage tables as read-only. Do all operations, including uploading, copying, moving, and deleting, **through the Storage API**.
 
-This is important because the storage schema only stores the metadata and the actual objects are stored in a provider like S3. Deleting the metadata doesn't remove the object in the underlying storage provider. This results in your object being inaccessible, but you'll still be billed for it.
+The storage schema stores only the metadata. The objects themselves are stored in a provider like S3, so deleting the metadata doesn't remove the object from the underlying storage provider.
 
 </Admonition>
 

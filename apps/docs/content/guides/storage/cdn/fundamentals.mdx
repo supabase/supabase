@@ -5,7 +5,7 @@ description: 'Learn how Supabase Storage caches objects on a CDN, how a cache hi
 sidebar_label: 'CDN'
 ---
 
-All assets uploaded to Supabase Storage are cached on a Content Delivery Network (CDN) to improve the latency for users all around the world. CDNs are a geographically distributed set of servers or **nodes** which cache content from an **origin server**. For Supabase Storage, the origin is the storage server running in the [same region as your project](/dashboard/project/_/settings/general). Aside from performance, CDNs also help with security and availability by mitigating Distributed Denial of Service (DDoS) and other application attacks.
+All assets uploaded to Supabase Storage are cached on a Content Delivery Network (CDN) to improve the latency for users all around the world. CDNs are a geographically distributed set of servers or _nodes_ which cache content from an _origin server_. For Supabase Storage, the origin is the storage server running in the [same region as your project](/dashboard/project/_/settings/general). Aside from performance, CDNs also help with security and availability by mitigating Distributed Denial of Service (DDoS) and other application attacks.
 
 ## Example
 
@@ -31,5 +31,5 @@ The cache status of a particular request is sent in the `cf-cache-status` header
 
 Objects in public buckets don't require authorization to access. This leads to a better cache hit rate compared to private buckets.
 
-For private buckets, Storage checks the permissions for each object per user. For example, if two different users access the same object in a private bucket from the same region, it results in a cache miss for both the users since they might have different security policies attached to them.
+For private buckets, Storage checks the permissions for each object per user. For example, if two different users access the same object in a private bucket from the same region, it results in a cache miss for both users. The users might have different security policies attached to them.
 On the other hand, if two different users access the same object in a public bucket from the same region, it results in a cache hit for the second user.

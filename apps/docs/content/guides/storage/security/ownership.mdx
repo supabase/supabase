@@ -21,7 +21,7 @@ The [Storage schema](/docs/guides/storage/schema/design) has two fields to repre
 
 ## Access control
 
-By itself, the ownership of a resource does not provide any access control. However, you can enforce the ownership by implementing access control against storage resources scoped to their owner.
+Ownership by itself provides no access control. To enforce it, scope access control on Storage resources to their owner.
 
 For example, you can implement a policy where only the owner of an object can delete it. To do this, check the `owner_id` field of the object and compare it with the `sub` claim of the JWT:
 
@@ -35,4 +35,4 @@ using (
 );
 ```
 
-The use of RLS policies is one way to enforce access control. You can also implement access control in your server code by following the same pattern.
+Row Level Security (RLS) policies are one way to enforce access control. You can also implement access control in your server code by following the same pattern.
