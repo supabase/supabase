@@ -19,7 +19,11 @@ export function isFunctionBodyMaxSizeError(error?: { code?: number } | null) {
 
 async function fetchFunctionBody(
   { projectRef, slug }: EdgeFunctionBodyVariables,
-  { multipart = true, signal }: { multipart: boolean; signal?: AbortSignal }
+  {
+    multipart = true,
+    signal,
+    reportImmediately = false,
+  }: { multipart: boolean; signal?: AbortSignal; reportImmediately?: boolean }
 ) {
   if (!projectRef) throw new Error('projectRef is required')
   if (!slug) throw new Error('slug is required')
@@ -34,12 +38,12 @@ async function fetchFunctionBody(
     grant: unguarded.migrating,
   })
 
-  if (error) handleError(error)
+  if (error) handleError(error, { reportImmediately })
   return { data, response }
 }
 
 export async function getEdgeFunctionBodyEszip(variables: EdgeFunctionBodyVariables) {
-  const { data } = await fetchFunctionBody(variables, { multipart: false })
+  const { data } = await fetchFunctionBody(variables, { multipart: false, reportImmediately: true })
   if (!data) throw new Error('Failed to retrieve edge function bundle')
   return new Uint8Array(await new Response(data).arrayBuffer())
 }
