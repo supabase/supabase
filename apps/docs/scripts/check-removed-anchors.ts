@@ -306,13 +306,23 @@ function findInWorkingTree(repoRoot: string): FindFiles {
   }
 }
 
+async function resolveBaseRef(repoRoot: string): Promise<string> {
+  const candidates = ['upstream/master', 'origin/master', 'master', 'HEAD~1']
+  for (const ref of candidates) {
+    try {
+      const base = (await git(['merge-base', ref, 'HEAD'], repoRoot)).trim()
+      if (base) return base
+    } catch {
+      continue
+    }
+  }
+  return 'HEAD~1'
+}
+
 async function main() {
   const baseArgIndex = process.argv.indexOf('--base')
   const repoRoot = (await git(['rev-parse', '--show-toplevel'], import.meta.dirname)).trim()
-  const base =
-    baseArgIndex === -1
-      ? (await git(['merge-base', 'origin/master', 'HEAD'], repoRoot)).trim()
-      : process.argv[baseArgIndex + 1]
+  const base = baseArgIndex === -1 ? await resolveBaseRef(repoRoot) : process.argv[baseArgIndex + 1]
 
   const changedFiles = (
     await git(['diff', '--name-only', '--no-renames', base, '--', CONTENT_PREFIX], repoRoot)
