@@ -430,7 +430,7 @@ export const OAuthAppsAuthorizeScreen = ({
                   <Admonition
                     type="note"
                     title="SSL enforcement will be enabled"
-                    description="Setup will enable SSL enforcement on these projects. Clients without SSL will no longer connect."
+                    description="Any non-SSL connections will close. These clients will need to use SSL to reconnect."
                   >
                     <div
                       role="list"
