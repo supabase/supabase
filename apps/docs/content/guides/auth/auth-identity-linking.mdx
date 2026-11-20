@@ -94,7 +94,7 @@ response = supabase.auth.link_identity({'provider': 'google'})
 <$Show if="sdk:csharp">
 <TabPanel id="csharp" label="C#">
 
-Supabase Auth allows a user to initiate identity linking with a different email address when they are signed in. To link an OAuth identity to the user, call [`LinkIdentity()`](/docs/reference/csharp/link-identity):
+Supabase Auth allows a user to initiate identity linking with a different email address when they are signed in. To link an OAuth identity to the user, call [`LinkIdentity()`](/docs/reference/csharp/auth-linkidentity):
 
 ```c#
 var state = await supabase.Auth.LinkIdentity(Provider.Google, new SignInOptions { FlowType = OAuthFlowType.PKCE });
@@ -275,7 +275,7 @@ if google_identity:
 <$Show if="sdk:csharp">
 <TabPanel id="csharp" label="C#">
 
-Use `CurrentUser.Identities` to get all the identities linked to a user. Then, call [`UnlinkIdentity()`](/docs/reference/csharp/unlink-identity) to unlink the identity. The user needs to be signed in and have at least 2 linked identities in order to unlink an existing identity.
+Use `CurrentUser.Identities` to get all the identities linked to a user. Then, call [`UnlinkIdentity()`](/docs/reference/csharp/auth-unlinkidentity) to unlink the identity. The user needs to be signed in and have at least 2 linked identities in order to unlink an existing identity.
 
 ```c#
 // get all identities linked to the user

@@ -435,6 +435,11 @@ export const gettingstarted: NavMenuConstant = {
           url: '/guides/getting-started/quickstarts/flutter',
         },
         {
+          name: 'Unity',
+          url: '/guides/getting-started/quickstarts/unity',
+          enabled: sdkCsharpEnabled,
+        },
+        {
           name: 'Flask (Python)',
           url: '/guides/getting-started/quickstarts/flask' as `/${string}`,
           enabled: !jsOnly,
@@ -2586,6 +2591,11 @@ export const local_development: NavMenuConstant = {
           url: '/guides/local-development/cli/config',
           enabled: localDevelopmentEnabled,
         },
+        {
+          name: 'Config file formats',
+          url: '/guides/local-development/cli/config-formats',
+          enabled: localDevelopmentEnabled,
+        },
         { name: 'CLI commands', url: '/reference/cli' },
       ],
     },
@@ -3136,6 +3146,10 @@ export const self_hosting: NavMenuConstant = {
         { name: 'Configure Auth Hooks', url: '/guides/self-hosting/self-hosted-auth-hooks' },
         { name: 'Configure Passkeys', url: '/guides/self-hosting/self-hosted-passkeys' },
         { name: 'Configure SAML 2.0 SSO', url: '/guides/self-hosting/self-hosted-saml-sso' },
+        {
+          name: 'Configure OAuth 2.1 Server',
+          url: '/guides/self-hosting/self-hosted-oauth-server',
+        },
         {
           name: 'Restore Project from Platform',
           url: '/guides/self-hosting/restore-from-platform',

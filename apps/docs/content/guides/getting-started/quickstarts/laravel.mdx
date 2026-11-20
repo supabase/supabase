@@ -32,7 +32,7 @@ composer create-project laravel/laravel example-app
 
 ## 4. Install the authentication template
 
-Install [Laravel Breeze](https://github.com/laravel/breeze), a basic implementation of all of Laravel's [authentication features](https://laravel.com/docs/12.x/authentication). It ships the migrations that the next step runs against your Supabase database.
+Install [Laravel Breeze](https://github.com/laravel/breeze), a basic implementation of all of Laravel's [authentication features](https://laravel.com/framework/docs/12.x/authentication). It ships the migrations that the next step runs against your [Supabase database](/docs/guides/database/overview).
 
 ```bash
 composer require laravel/breeze --dev
@@ -47,7 +47,7 @@ Pass a stack name such as `blade`, `react`, or `vue` when prompted. The example 
 
 ```bash name=.env
 DB_CONNECTION=pgsql
-DB_URL=postgres://postgres.[PROJECT-REF]:[YOUR-PASSWORD]@[POOLER-HOST]:5432/postgres
+DB_URL=postgres://postgres.[PROJECT-REF]:[YOUR-DATABASE-PASSWORD]@[POOLER-HOST]:5432/postgres
 ```
 
 Laravel sets `sslmode` as an explicit `config/database.php` option rather than a URL parameter. The next step covers this.

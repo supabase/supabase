@@ -33,7 +33,7 @@ We're operating on a first-signed-up, first-served basis, rolling it out in batc
 
 ## What's Branching?
 
-At some point during development, you will probably need to experiment with your Postgres database. Today that's possible on your local development machine using the Supabase CLI. When you run `supabase start` with the CLI to get the entire Supabase stack running locally. You can play around with ideas and run `supabase db reset` whenever you want to start again. When you want to capture your changes in a database migration, you can run `supabase db diff`.
+At some point during development, you will probably need to experiment with your Postgres database. Today that's possible on your local development machine using the [Supabase CLI](/docs/guides/local-development/cli/getting-started). When you run `supabase start` with the CLI to get the entire Supabase stack running locally. You can play around with ideas and run `supabase db reset` whenever you want to start again. When you want to capture your changes in a database migration, you can run `supabase db diff`.
 
 Branching is a natural extension of this, but instead of experimenting with just a _local_ database you also get _remote_ database. You continue to use the workflow above, and then when you commit your changes to Git we'll run them on a Supabase Preview Branch.
 
@@ -65,7 +65,7 @@ Even in relaxed developer environments, if one of your team accidentally leaks a
 
 ### Support for Vercel Previews
 
-We've designed Supabase Branching to work perfectly with Vercel's [Preview](https://vercel.com/features/previews) deployments. This means that you get an _entire stack_ with Branching.
+We've designed Supabase Branching to work perfectly with Vercel's [Preview](https://vercel.com/products/previews) deployments. This means that you get an _entire stack_ with Branching.
 
 <Img
   alt="Vercel will build your preview deployments, and your preview deployment can connect to the Supabase services on your Preview Branch."

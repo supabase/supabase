@@ -33,6 +33,7 @@ consistency decisions.
 | [`01-voice-and-tone.md`](./01-voice-and-tone.md) | Person, tense, sentence length, brevity            |
 | [`02-elements.md`](./02-elements.md)             | Admonitions, code blocks, procedures, tabs, images |
 | [`03-page-structure.md`](./03-page-structure.md) | Document type, section grouping, chunking          |
+| [`templates/`](./templates/)                     | Page structures for the page types that have one   |
 
 ## Before you open a pull request
 

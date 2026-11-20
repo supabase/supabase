@@ -1,10 +1,17 @@
 import type { Provider } from '@supabase/auth-js'
+import { Link } from '@tanstack/react-router'
 import { useFlag } from 'common'
 import dayjs from 'dayjs'
-import { EditIcon, LockIcon, MailIcon, UnlinkIcon } from 'lucide-react'
-import Link from 'next/link'
+import {
+  BriefcaseIcon,
+  EditIcon,
+  IdCardIcon,
+  KeyRoundIcon,
+  MailIcon,
+  UnlinkIcon,
+} from 'lucide-react'
 import { useRouter } from 'next/router'
-import { useEffect, useMemo, useState } from 'react'
+import { Fragment, useEffect, useMemo, useState } from 'react'
 import { toast } from 'sonner'
 import {
   Badge,
@@ -20,6 +27,7 @@ import {
   TooltipContent,
   TooltipTrigger,
 } from 'ui'
+import { Admonition } from 'ui-patterns/Admonition'
 import ConfirmationModal from 'ui-patterns/Dialogs/ConfirmationModal'
 import {
   PageSection,
@@ -31,7 +39,7 @@ import {
 } from 'ui-patterns/PageSection'
 import { ShimmeringLoader } from 'ui-patterns/ShimmeringLoader'
 
-import { AddPasswordNotice } from './AddPasswordNotice'
+import { AddPasswordRow } from './AddPasswordRow'
 import {
   ChangeEmailAddressForm,
   GitHubChangeEmailAddress,
@@ -105,11 +113,6 @@ export const SignInMethods = ({
   const getProviderName = (provider?: string) =>
     provider ? getProviderDisplay(provider).displayName : undefined
 
-  const getConfiguredExternalProvider = (provider: string) =>
-    connectableExternalProviders.find(
-      ({ id, authProvider }) => provider === id || provider === authProvider
-    )
-
   const onConfirmUnlinkIdentity = async () => {
     if (!selectedProviderUnlink) return
     if (
@@ -162,13 +165,11 @@ export const SignInMethods = ({
       </PageSectionMeta>
       <PageSectionContent className="flex flex-col gap-4">
         {isError && <AlertError error={error} subject="Failed to retrieve sign-in methods" />}
-        {isSuccess && showAddPasswordRow && !!data.email && (
-          <AddPasswordNotice
-            email={data.email}
-            providerName={
-              hasSingleOAuthIdentity ? getProviderName(identities[0]?.provider) : undefined
-            }
-            isPrimary={primaryAction === 'set-password'}
+        {isSuccess && showAddPasswordRow && hasSingleOAuthIdentity && (
+          <Admonition
+            type="warning"
+            title="Add a password for email sign-in"
+            description={`Use ${data?.email} and a password as another way to sign in if you lose access to ${getProviderName(identities[0]?.provider)}.`}
           />
         )}
         <Card>
@@ -179,6 +180,9 @@ export const SignInMethods = ({
           )}
           {isSuccess && (
             <div className="divide-y">
+              {showAddPasswordRow && !!data?.email && (
+                <AddPasswordRow email={data.email} isPrimary={primaryAction === 'set-password'} />
+              )}
               {identities.map((identity) => {
                 const { identity_id, provider } = identity
                 const isSso = provider.startsWith('sso')
@@ -190,78 +194,105 @@ export const SignInMethods = ({
                   .filter(Boolean)
                   .join(' · ')
                 const providerName = getProviderName(provider)
-                const configuredProvider = getConfiguredExternalProvider(provider)
-                const canUpdateEmail = !configuredProvider
 
                 return (
-                  <CardContent
-                    key={identity_id}
-                    className="flex flex-col items-start gap-4 py-4 sm:flex-row sm:items-center sm:justify-between"
-                  >
-                    <div className="flex gap-x-4">
-                      <SignInMethodIcon provider={provider} />
-                      <div>
-                        <div className="flex items-center gap-x-2">
-                          <p className="text-sm capitalize">{providerName}</p>
-                          {provider === 'email' && data.new_email && !isChangeExpired && (
-                            <Tooltip>
-                              <TooltipTrigger className="flex items-center">
-                                <Badge variant="default">Pending change</Badge>
-                              </TooltipTrigger>
-                              <TooltipContent>Changing to {data.new_email}</TooltipContent>
-                            </Tooltip>
+                  <Fragment key={identity_id}>
+                    <CardContent
+                      role="group"
+                      aria-label={provider === 'email' ? 'Email address' : providerName}
+                      className="flex flex-col items-start gap-4 py-4 sm:flex-row sm:items-center sm:justify-between"
+                    >
+                      <div className="flex min-w-0 gap-x-4">
+                        <SignInMethodIcon provider={provider} />
+                        <div className="min-w-0">
+                          <div className="flex flex-wrap items-center gap-x-2">
+                            <p className={cn('text-sm', provider !== 'email' && 'capitalize')}>
+                              {provider === 'email' ? 'Email address' : providerName}
+                            </p>
+                            {provider === 'email' && data?.new_email && !isChangeExpired && (
+                              <Tooltip>
+                                <TooltipTrigger className="flex items-center">
+                                  <Badge variant="default">Pending change</Badge>
+                                </TooltipTrigger>
+                                <TooltipContent>Changing to {data?.new_email}</TooltipContent>
+                              </Tooltip>
+                            )}
+                          </div>
+                          <p className="text-sm text-foreground-lighter [overflow-wrap:anywhere]">
+                            {accountLabel}
+                          </p>
+                          {isSso && (
+                            <p className="text-sm text-foreground-lighter">
+                              Managed by your organization
+                            </p>
                           )}
                         </div>
-                        <p className="text-sm text-foreground-lighter">{accountLabel}</p>
-                        {isSso && (
-                          <p className="text-sm text-foreground-lighter">
-                            Your organization manages how you sign in.
-                          </p>
-                        )}
                       </div>
-                    </div>
-                    <div className="flex items-center gap-x-1">
-                      {provider === 'email' && (
-                        <Button variant="default" asChild>
-                          <Link href="/reset-password?type=change">Change password</Link>
-                        </Button>
-                      )}
-                      {canUpdateEmail && (
+                      <div className="flex shrink-0 items-center gap-x-1">
                         <ButtonTooltip
                           variant="default"
                           size="tiny"
-                          icon={<EditIcon size={14} />}
+                          icon={<EditIcon size={14} strokeWidth={2} />}
                           aria-label="Update email address"
                           onClick={() => setSelectedProviderUpdateEmail(provider)}
                           tooltip={{ content: { side: 'top', text: 'Update email address' } }}
                         />
-                      )}
-                      {identities.length > 1 && (
+                        {identities.length > 1 && provider !== 'email' && (
+                          <ButtonTooltip
+                            variant="default"
+                            size="tiny"
+                            icon={<UnlinkIcon size={14} strokeWidth={2} />}
+                            aria-label={`Unlink ${providerName} identity`}
+                            disabled={
+                              !canUnlinkIdentity({
+                                provider,
+                                identityCount: identities.length,
+                              })
+                            }
+                            onClick={() => setSelectedProviderUnlink(provider)}
+                            tooltip={{
+                              content: {
+                                side: 'bottom',
+                                text: 'Unlink identity',
+                              },
+                            }}
+                          />
+                        )}
+                      </div>
+                    </CardContent>
+                    {provider === 'email' && (
+                      <CardContent
+                        role="group"
+                        aria-label="Password"
+                        className="flex flex-col items-start gap-4 py-4 sm:flex-row sm:items-center sm:justify-between"
+                      >
+                        <div className="flex min-w-0 gap-x-4">
+                          <div className="flex h-9 w-9 shrink-0 items-center justify-center rounded-full bg-selection">
+                            <KeyRoundIcon
+                              size={18}
+                              strokeWidth={2}
+                              className="text-foreground-lighter"
+                            />
+                          </div>
+                          <div>
+                            <p className="text-sm">Password</p>
+                            <p className="text-sm text-foreground-lighter">Configured</p>
+                          </div>
+                        </div>
                         <ButtonTooltip
-                          variant="text"
-                          icon={<UnlinkIcon />}
-                          aria-label={`Unlink ${providerName} identity`}
-                          className="w-7"
-                          disabled={
-                            !canUnlinkIdentity({
-                              provider,
-                              identityCount: identities.length,
-                            })
-                          }
-                          onClick={() => setSelectedProviderUnlink(provider)}
-                          tooltip={{
-                            content: {
-                              side: 'bottom',
-                              text:
-                                provider === 'email'
-                                  ? 'Temporarily unavailable'
-                                  : 'Unlink identity',
-                            },
-                          }}
-                        />
-                      )}
-                    </div>
-                  </CardContent>
+                          variant="default"
+                          size="tiny"
+                          className="hit-area-1 w-6.5"
+                          icon={<EditIcon size={14} strokeWidth={2} />}
+                          aria-label="Change password"
+                          tooltip={{ content: { side: 'top', text: 'Change password' } }}
+                          asChild
+                        >
+                          <Link to="/reset-password" search={{ type: 'change' }} />
+                        </ButtonTooltip>
+                      </CardContent>
+                    )}
+                  </Fragment>
                 )
               })}
 
@@ -269,9 +300,11 @@ export const SignInMethods = ({
                 return (
                   <CardContent
                     key={provider.id}
+                    role="group"
+                    aria-label={provider.displayName}
                     className="flex flex-col items-start gap-4 py-4 sm:flex-row sm:items-center sm:justify-between"
                   >
-                    <div className="flex gap-x-4">
+                    <div className="flex min-w-0 gap-x-4">
                       <SignInMethodIcon provider={provider.authProvider} />
                       <div>
                         <p className="text-sm">{provider.displayName}</p>
@@ -353,7 +386,8 @@ export const SignInMethods = ({
 const SignInMethodIcon = ({ provider }: { provider: string }) => {
   const display = getProviderDisplay(provider)
   const isSso = provider.startsWith('sso')
-  const OutlineIcon = isSso ? LockIcon : MailIcon
+  const ProviderFallbackIcon = isSso ? BriefcaseIcon : IdCardIcon
+  const OutlineIcon = provider === 'email' ? MailIcon : ProviderFallbackIcon
   return (
     <div
       className={cn(
@@ -361,10 +395,10 @@ const SignInMethodIcon = ({ provider }: { provider: string }) => {
         display.displayName === 'GitHub' ? 'bg-transparent' : 'bg-selection'
       )}
     >
-      {isSso || provider === 'email' ? (
-        <OutlineIcon size={18} strokeWidth={2.5} className="text-foreground-lighter" />
+      {!display.hasMonochromeIcon ? (
+        <OutlineIcon size={18} strokeWidth={2} className="text-foreground-lighter" />
       ) : (
-        <IdentityProviderIcon display={display} size={30} />
+        <IdentityProviderIcon display={display} size={display.id === 'github' ? 30 : 22} />
       )}
     </div>
   )

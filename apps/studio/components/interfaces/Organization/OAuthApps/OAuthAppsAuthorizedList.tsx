@@ -50,10 +50,10 @@ export const OAuthAppsAuthorizedList = () => {
   })
 
   useEffect(() => {
-    if (hasNextPage && entry?.isIntersecting) {
+    if (hasNextPage && entry?.isIntersecting && !isFetchingNextPage && !isError) {
       fetchNextPage()
     }
-  }, [hasNextPage, entry?.isIntersecting, fetchNextPage])
+  }, [hasNextPage, entry?.isIntersecting, fetchNextPage, isFetchingNextPage, isError])
 
   const statusText = useMemo(() => {
     if (isFetchingNextPage) return 'Loading more authorized apps...'
@@ -106,7 +106,12 @@ export const OAuthAppsAuthorizedList = () => {
                   >
                     <span className="sr-only">Application icon</span>
                   </TableHead>
-                  <TableHead className={cn('pl-0', !hasAuthorizedApps && 'text-foreground-muted')}>
+                  <TableHead
+                    className={cn(
+                      hasAuthorizedApps && 'pl-0',
+                      !hasAuthorizedApps && 'text-foreground-muted'
+                    )}
+                  >
                     App
                   </TableHead>
                   <TableHead className={cn(!hasAuthorizedApps && 'text-foreground-muted')}>
@@ -118,7 +123,7 @@ export const OAuthAppsAuthorizedList = () => {
                 </TableRow>
               </TableHeader>
               <TableBody>
-                {data.pages.length === 0 ? (
+                {data.pages.length === 0 || data.pages[0].data.length === 0 ? (
                   <TableRow className="[&>td]:hover:bg-inherit">
                     <TableCell colSpan={4}>
                       <p className="text-sm text-foreground">No results found</p>
@@ -133,9 +138,10 @@ export const OAuthAppsAuthorizedList = () => {
                       <Fragment key={pageIndex}>
                         {page.data.map((approval, index) => (
                           <OAuthAppsAuthorizedRow
-                            key={approval.app.id}
+                            key={approval.id}
                             approval={approval}
                             className={cn(
+                              // Avoid a double bottom border when next page isn't loading
                               pageIndex === data.pages.length - 1 &&
                                 index === page.data.length - 1 &&
                                 !isFetchingNextPage &&
@@ -146,12 +152,9 @@ export const OAuthAppsAuthorizedList = () => {
                         ))}
                       </Fragment>
                     ))}
-                    <TableRow
-                      ref={sentinelRef}
-                      className={cn('[&>td]:hover:bg-inherit', !isFetchingNextPage && 'hidden')}
-                    >
-                      <TableCell colSpan={4}>
-                        <p className="text-sm text-foreground-lighter">
+                    <TableRow ref={sentinelRef} className="[&>td]:hover:bg-inherit">
+                      <TableCell colSpan={4} className={isFetchingNextPage ? '' : 'p-0'}>
+                        <p aria-live="polite" className="text-sm text-foreground-lighter">
                           {isFetchingNextPage ? 'Loading...' : ''}
                         </p>
                       </TableCell>
