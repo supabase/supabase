@@ -1,4 +1,4 @@
-import { Badge, cn } from 'ui'
+import { Badge, cn, Skeleton } from 'ui'
 import { Admonition } from 'ui-patterns/Admonition'
 
 import type { Capabilities, Project, Traffic } from '../contract'
@@ -35,27 +35,45 @@ export function ProjectHero({
   )
 }
 
-/** A dot-separated row of labelled values, such as ref · region. Labels are for screen readers. */
+/**
+ * A dot-separated row of labelled values, such as ref · region. Labels are for
+ * screen readers. A detail without a value yet shows a skeleton in its place.
+ *
+ * Every detail starts with a separator of fixed width. The list is pulled back
+ * by one separator and its gap, and clipped by the same amount, so the
+ * separator that starts each line (wrapped ones too) is hidden.
+ */
 export function ProjectDetails({
   details,
   className,
 }: {
-  details: { label: string; value: string }[]
+  details: { label: string; value?: string }[]
   className?: string
 }) {
+  if (details.length === 0) return null
   return (
     <dl
-      className={cn('flex flex-wrap items-center gap-x-2 gap-y-1 text-foreground-light', className)}
+      className={cn(
+        '-ml-[calc(0.5em+0.5rem)] flex flex-wrap items-center gap-x-2 gap-y-1 text-foreground-light [clip-path:inset(0_0_0_calc(0.5em+0.5rem))]',
+        className
+      )}
     >
-      {details.map((detail, index) => (
+      {details.map((detail) => (
         <div key={detail.label} className="flex min-w-0 items-center gap-x-2">
-          {index > 0 && (
-            <span aria-hidden="true" className="text-foreground-muted">
-              ·
-            </span>
-          )}
+          <span
+            aria-hidden="true"
+            className="w-[0.5em] flex-none text-center text-foreground-muted"
+          >
+            ·
+          </span>
           <dt className="sr-only">{detail.label}</dt>
-          <dd className="truncate">{detail.value}</dd>
+          {detail.value === undefined ? (
+            <dd aria-hidden="true" className="flex h-lh items-center">
+              <Skeleton className="h-3.5 w-32" />
+            </dd>
+          ) : (
+            <dd className="truncate">{detail.value}</dd>
+          )}
         </div>
       ))}
     </dl>

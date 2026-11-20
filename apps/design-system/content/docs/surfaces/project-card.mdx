@@ -1,17 +1,22 @@
 ---
 title: Project Card
-description: One project and its current status, condensed for a conversation.
+description: One project or branch and its current status, condensed for a conversation.
 ---
 
 <ComponentPreview name="surfaces-project-card" peekCode wide />
 
 ## Usage
 
-`ProjectCard` shows a project's organization, name, status, ref and region in a compact card, condensed from the [Project Home](project-home) header. The first card above starts as Starting and becomes Active, as a new project does; Refresh starts it again.
+`ProjectCard` shows what a project (or a branch, which is a project too) belongs to, its name, status, ref and region in a compact card, condensed from the [Project Home](project-home) header. The first card above starts before the project exists and follows it until it is Active, as an agent host does.
 
-MCP Apps hosts render it inline when an agent creates a project with `create_project`. The host keeps checking the project while it starts and updates `project`. The status badge is the only status text; screen readers hear each change.
+MCP Apps hosts render it inline when an agent calls `create_project` or `create_branch`, from the moment the tool is called. The card only shows what it is given: the host follows the status and passes the result of `creationStatus`, which turns the request and the latest status into a badge, a note and what screen readers should hear.
 
-- `isFollowing` says the host is following a project that is changing state, such as starting or restoring, and adds a spinner to the badge. Hosts keep the card live by reading the status on a timer and passing the new `project`.
-- `error` is the last failed check. The badge reads Check failed in place of the status, with the error in its tooltip, until a check succeeds. Refresh retries.
-- `organizationName` appears above the name once the host knows it. Organization slugs are not shown.
-- `onRefresh` adds an icon button to check the status now, beside Open in dashboard from `onOpenDashboard`. Omit either when the host can't do it.
+- `isLoading` keeps the layout and shows a skeleton for anything not passed yet: breadcrumbs, `name`, `badge`, a detail's `value` and the action. Pass what is already known, such as the name the agent asked for, and nothing moves when the rest arrives.
+- `breadcrumbs` are the names of what it belongs to, outermost first: the organization, then for a branch its project. Organization slugs are not shown.
+- `badge` is the only status text. While something is being created it names the step (Creating, Checking health, Running migrations, Deploying functions), neutral with a spinner, then Active. `title` adds a tooltip, such as why a check failed.
+- `note` is a line under the details: a problem (`danger`), or why the status won't update (`muted`).
+- `onRetry` adds a small icon beside the badge. Pass it only when checking has stopped without an answer: the checks kept failing, or the host gave up after a while. A host that is still checking, or has a final answer, omits it.
+- `onOpenDashboard` adds an icon button. Omit it when the host can't open links, or there is nothing to open.
+- `children` render edge to edge along the bottom. `ConnectionDetails` goes there once the project is ready: a collapsed section with the project URL and a publishable key to copy. The host loads them when it first opens (`onOpen`) and passes `{ status: 'dashboard' }` when they can't be read, which links to the dashboard instead.
+
+Status changes are announced through `useAnnouncement` from `surfaces/common`, so render an `AnnouncerProvider` once around the card.

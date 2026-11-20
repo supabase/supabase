@@ -147,6 +147,34 @@ export const projectSchema = z
   .passthrough()
 export type Project = z.infer<typeof projectSchema>
 
+/**
+ * A development branch, as create_branch and list_branches return it. A branch is a project
+ * too: `project_ref` is its own, `parent_project_ref` the project it branched from.
+ */
+export const branchSchema = z
+  .object({
+    id: z.string(),
+    name: z.string(),
+    project_ref: z.string(),
+    parent_project_ref: z.string(),
+    /** CREATING_PROJECT, RUNNING_MIGRATIONS, MIGRATIONS_PASSED, FUNCTIONS_DEPLOYED or a failure. */
+    status: z.string(),
+  })
+  .passthrough()
+export type Branch = z.infer<typeof branchSchema>
+
+/** An API key as get_publishable_keys returns it. */
+export const apiKeySchema = z
+  .object({
+    api_key: z.string(),
+    name: z.string(),
+    /** `publishable`, or `legacy` for the anon key. */
+    type: z.string(),
+    disabled: z.boolean().optional(),
+  })
+  .passthrough()
+export type ApiKey = z.infer<typeof apiKeySchema>
+
 export const organizationSchema = z.object({
   id: z.string(),
   name: z.string(),
@@ -489,10 +517,14 @@ export const notebookSummarySchema = z.object({
 export type NotebookSummary = z.infer<typeof notebookSummarySchema>
 
 export const dataOperations = {
-  /** Connection bootstrap. Also the global "Supabase" entrypoint. */
+  /**
+   * Connection bootstrap. Also the global "Supabase" entrypoint: people open it themselves
+   * from the host. It stays visible to the model, because Claude lists an entry point only
+   * for a tool the model can call.
+   */
   bootstrap: operation({
     tool: 'open_projects',
-    visibility: 'app',
+    visibility: 'shared',
     description: 'Open the Supabase project browser.',
     input: z
       .object({
@@ -519,6 +551,30 @@ export const dataOperations = {
     description: 'Gets details for an organization.',
     input: z.object({ id: z.string().min(1) }),
     output: z.object({ id: z.string(), name: z.string() }).passthrough(),
+  }),
+  /** The model's own `list_branches`, for views that follow a branch's status. */
+  listBranches: operation({
+    tool: 'list_branches',
+    visibility: 'shared',
+    description: 'Lists the development branches of a project.',
+    input: projectTarget,
+    output: z.object({ branches: z.array(branchSchema) }),
+  }),
+  /** The model's own `get_project_url`, for a ready project's connection details. */
+  getProjectUrl: operation({
+    tool: 'get_project_url',
+    visibility: 'shared',
+    description: 'Gets the API URL for a project.',
+    input: projectTarget,
+    output: z.object({ url: z.string() }).passthrough(),
+  }),
+  /** The model's own `get_publishable_keys`, for a ready project's connection details. */
+  getPublishableKeys: operation({
+    tool: 'get_publishable_keys',
+    visibility: 'shared',
+    description: 'Gets the publishable API keys for a project.',
+    input: projectTarget,
+    output: z.object({ keys: z.array(apiKeySchema) }),
   }),
   /** The model's own `list_notebooks`; the view keeps only the fields it shows. */
   listNotebooks: operation({
@@ -744,7 +800,7 @@ export const surfaceResources = {
     displayModes: ['inline', 'fullscreen'],
     preferredDisplayMode: 'inline',
   },
-  /** Rendered from `create_project` results: the new project and its live status. */
+  /** Rendered from `create_project` calls: the new project and its live status. */
   'project-card': {
     uri: surfaceUri('project-card'),
     name: 'Supabase Project Card',
@@ -752,10 +808,86 @@ export const surfaceResources = {
     layout: 'inline',
     displayModes: ['inline'],
     preferredDisplayMode: 'inline',
+    // The card lets the user copy connection details.
+    clipboardWrite: true,
+  },
+  /** Rendered from `create_branch` calls: the same card for the new branch. */
+  'branch-card': {
+    uri: surfaceUri('branch-card'),
+    name: 'Supabase Branch Card',
+    description: 'A branch and its current status, shown inline in the conversation.',
+    layout: 'inline',
+    displayModes: ['inline'],
+    preferredDisplayMode: 'inline',
+    clipboardWrite: true,
   },
 } as const
 export type SurfaceName = keyof typeof surfaceResources
 export const SURFACE_NAMES = Object.keys(surfaceResources) as SurfaceName[]
+
+/** Origins hosts serve their fonts from. Surfaces apply the host's font CSS, and Claude's loads Anthropic Sans from here. */
+export const HOST_FONT_ORIGINS = ['https://assets.claude.ai']
+
+type ToolVisibility = ('model' | 'app')[]
+
+/**
+ * The `_meta` that points a tool at a surface, for every host: the MCP Apps key that Claude
+ * and ChatGPT read, the flat key older hosts read (the SDK's `registerAppTool` writes both),
+ * and OpenAI's hint for the mode a model call opens in. A tool the model can't call is listed
+ * by no Claude entry point, so `visibility` includes `model` unless a caller narrows it.
+ */
+export function surfaceToolMeta(
+  surface: SurfaceName,
+  {
+    visibility = ['model', 'app'],
+    entrypoint,
+  }: {
+    visibility?: ToolVisibility
+    /** Lets people open the surface themselves: ChatGPT's sidebar and Claude's Artifacts page. */
+    entrypoint?: 'global' | 'thread'
+  } = {}
+) {
+  const { uri, preferredDisplayMode } = surfaceResources[surface]
+  return {
+    ui: { resourceUri: uri, visibility },
+    'ui/resourceUri': uri,
+    'openai/ui': {
+      ...(entrypoint ? { entrypoints: [{ type: entrypoint }] } : {}),
+      preferredModelDisplayMode: preferredDisplayMode,
+    },
+  }
+}
+
+/**
+ * The `_meta` of a surface's resource, on the content item of `resources/read`, for every
+ * host. `ui` is the MCP Apps standard plus `preferredDisplayMode`, Claude's extension that
+ * opens a fullscreen view in its side panel without a click. `openai/ui` says the same to
+ * ChatGPT. The view declares the same display modes when it connects.
+ */
+export function surfaceResourceMeta(
+  surface: SurfaceName,
+  {
+    assetOrigins = [],
+  }: {
+    /** Where a linked build loads its script and stylesheet from. Inlined builds load neither. */
+    assetOrigins?: string[]
+  } = {}
+) {
+  const resource = surfaceResources[surface]
+  const { preferredDisplayMode, displayModes } = resource
+  return {
+    ui: {
+      // Surfaces never fetch: every read goes through a tool call. They load only a linked
+      // build's own files and the host's fonts.
+      csp: { connectDomains: [], resourceDomains: [...assetOrigins, ...HOST_FONT_ORIGINS] },
+      prefersBorder: false,
+      // Lets the view copy to the clipboard, e.g. a project's connection details.
+      ...('clipboardWrite' in resource ? { permissions: { clipboardWrite: {} } } : {}),
+      preferredDisplayMode,
+    },
+    'openai/ui': { preferredDisplayMode, availableDisplayModes: [...displayModes] },
+  }
+}
 
 /** File names a surface build publishes for each surface. */
 export function surfaceAssetFiles(surface: SurfaceName) {
@@ -795,6 +927,9 @@ export function renderSurfaceDocument({
     '<head>',
     '<meta charset="UTF-8" />',
     '<meta name="viewport" content="width=device-width, initial-scale=1.0" />',
+    // Follows the host's light or dark mode from the first paint. Without it the browser
+    // gives the frame an opaque backdrop until the script applies the host's theme.
+    '<meta name="color-scheme" content="light dark" />',
     '<title>Supabase</title>',
     styleTag,
     '</head>',

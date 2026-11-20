@@ -1,13 +1,17 @@
 import { StrictMode, type ReactNode } from 'react'
 import { createRoot } from 'react-dom/client'
-import type { PanelBootstrap } from 'surfaces/contract'
+import { AnnouncerProvider } from 'surfaces/common'
+import type { PanelBootstrap, SurfaceName } from 'surfaces/contract'
 import { Button, TooltipProvider } from 'ui'
 
 import { AppProvider } from '../host/app-context'
 import {
   connectToHost,
+  connectToolCall,
   connectToolView,
   type HostSession,
+  type ToolCallSession,
+  type ToolCallSnapshot,
   type ToolViewSession,
 } from '../host/connect'
 import type { ToolResult } from '../host/tool-data-port'
@@ -43,7 +47,10 @@ interface MountHandlers<S> {
  * Mounts one surface: connects to the host (or, in development with
  * `?preview=…`, to fixtures), then renders inside the surface and shell providers.
  */
-export function mountSurface(surface: string, render: (props: SurfaceRenderProps) => ReactNode) {
+export function mountSurface(
+  surface: SurfaceName,
+  render: (props: SurfaceRenderProps) => ReactNode
+) {
   mount<HostSession>({
     connect: (handlers) => connectToHost({ surface, ...handlers }),
     // Gated here so production builds drop the fixtures.
@@ -66,7 +73,7 @@ export function mountSurface(surface: string, render: (props: SurfaceRenderProps
  * `create_project`. It gets ports for reads and the agent, not the app's services.
  */
 export function mountToolView<T>(
-  surface: string,
+  surface: SurfaceName,
   {
     decode,
     preview,
@@ -85,6 +92,36 @@ export function mountToolView<T>(
   })
 }
 
+/**
+ * Mounts a view of one model tool's call from before its result, e.g. the
+ * project card on `create_project`. It renders straight away and follows the
+ * call: its arguments, then its result, an error or a cancellation.
+ */
+export function mountToolCallView<T>(
+  surface: SurfaceName,
+  {
+    decode,
+    scopedProjectId,
+    preview,
+    render,
+  }: {
+    decode: (result: ToolResult) => T
+    /** The project a scoped connection is locked to, from what is known of the call so far. */
+    scopedProjectId?: (snapshot: ToolCallSnapshot<T>) => string | null
+    /** Development fixtures for `?preview=…`. Gate on `import.meta.env.DEV` so builds drop them. */
+    preview?: (name: string) => Promise<ToolCallSession<T>>
+    render: (session: ToolCallSession<T>) => ReactNode
+  }
+) {
+  mount<ToolCallSession<T>>({
+    connect: ({ onReady, onTeardown }) =>
+      connectToolCall({ surface, decode, scopedProjectId, onReady, onTeardown }),
+    preview,
+    // The view's status changes while the user reads elsewhere; screen readers hear it.
+    render: (session) => <AnnouncerProvider>{render(session)}</AnnouncerProvider>,
+  })
+}
+
 function mount<S>({
   connect,
   preview: loadPreview,
@@ -95,6 +132,8 @@ function mount<S>({
   render: (session: S, routing: Omit<SurfaceRenderProps, 'initial'>) => ReactNode
 }) {
   const root = createRoot(document.getElementById('root')!)
+  // Not framed by a host: inline surfaces then paint their own page (see styles.css).
+  if (window.parent === window) document.documentElement.dataset.standalone = ''
   let route = '/'
   let notifyRoute: ((path: string) => void) | undefined
   let isDisposed = false

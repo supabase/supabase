@@ -5,7 +5,8 @@
  *   dist/v1/projects.{js,css}     ui://supabase/projects-v1  sidebar + thread workspace
  *   dist/v1/panel.{js,css}        ui://supabase/panel-v1     focused conversation panels
  *   dist/v1/query-block.{js,css}  ui://supabase/query-block-v1 inline query results
- *   dist/v1/project-card.{js,css} ui://supabase/project-card-v1 create_project results, live status
+ *   dist/v1/project-card.{js,css} ui://supabase/project-card-v1 create_project calls, live status
+ *   dist/v1/branch-card.{js,css}  ui://supabase/branch-card-v1  create_branch calls, the same card
  *
  * Each surface is one self-contained script and one stylesheet, with fonts and
  * images inlined, so the server can either link them from where `dist` is

@@ -214,6 +214,15 @@ export function createPreviewDataPort(): DataPort {
       if (!project) throw new Error('Project not found in this preview.')
       return project
     },
+    async listBranches() {
+      return { branches: [] }
+    },
+    async getProjectUrl({ project_id }) {
+      return { url: `https://${project_id}.supabase.co` }
+    },
+    async getPublishableKeys() {
+      return { keys: [] }
+    },
     async bootstrap(input) {
       await wait()
       const data = structuredClone(previewBootstrap)

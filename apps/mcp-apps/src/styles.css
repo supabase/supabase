@@ -20,6 +20,33 @@ html[data-surface='inline'] #root {
   height: auto;
 }
 
+/*
+ * They also sit on the host's own surface, so the page has no fill of its own: hosts frame a
+ * view on a surface that is not always the one they send as background-primary. The padding is
+ * the host's safe area (`applySafeAreaInsets`) plus room for a focus ring at the frame's edge.
+ */
+html[data-surface='inline'] body {
+  background: transparent;
+  padding: calc(var(--host-inset-top, 0px) + 0.25rem) calc(var(--host-inset-right, 0px) + 0.25rem)
+    calc(var(--host-inset-bottom, 0px) + 0.25rem) calc(var(--host-inset-left, 0px) + 0.25rem);
+}
+
+/*
+ * Surfaces that fill their frame keep clear of the host's safe area too: Claude reports an
+ * inset on the side panel's edge beside the conversation, and on mobile the chat input and
+ * navigation bar lie over a fullscreen view.
+ */
+html:not([data-surface='inline']) body {
+  box-sizing: border-box;
+  padding: var(--host-inset-top, 0px) var(--host-inset-right, 0px) var(--host-inset-bottom, 0px)
+    var(--host-inset-left, 0px);
+}
+
+/* Opened on its own, outside a host's frame (a preview in a new tab), there is no surface behind it. */
+html[data-surface='inline'][data-standalone] body {
+  background: var(--background);
+}
+
 body {
   background: var(--background);
   color: var(--foreground);

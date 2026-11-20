@@ -2,9 +2,19 @@ import type { AdvisorIssue, NotebookSummary, Project } from '../contract'
 import type { AdvisorCategory } from '../project/issues-list'
 import type { ProjectCheckId } from '../project/project-overview'
 
+export {
+  Announcer,
+  AnnouncerProvider,
+  useAnnounce,
+  useAnnouncement,
+  type AnnouncerHandle,
+  type Politeness,
+} from './announcer'
+
 /**
  * Types and helpers shared by every surface. Surfaces build their UI from `ui`
- * and `ui-patterns` directly, so nothing here renders.
+ * and `ui-patterns` directly, so nothing here renders, except the screen
+ * reader announcer, which draws nothing.
  */
 
 export function errorMessage(error: unknown): string {

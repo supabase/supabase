@@ -1,109 +1,109 @@
-import { useCallback, useEffect, useRef, useState } from 'react'
-import { errorMessage } from 'surfaces/common'
+import { useEffect } from 'react'
 import type { DataPort, Project } from 'surfaces/contract'
-import { isProjectChanging, ProjectCard } from 'surfaces/project'
+import { PROJECT_CREATION_STEPS, ProjectCard, projectCreationProgress } from 'surfaces/project'
 
-import type { AgentHost } from '../host/app-context'
+import type { ToolCallSession } from '../host/connect'
+import { useCreationStatus, useToolCall } from '../host/use-creation-status'
+import { useLookup } from '../host/use-lookup'
+import { ProjectConnection, studioUrl } from './ProjectConnection'
 
-/** How often the status is read: often while it changes, then slowly to catch later changes. */
-export const CHANGING_POLL_MS = 5_000
-export const SETTLED_POLL_MS = 30_000
+const text = (value: unknown) => (typeof value === 'string' ? value : undefined)
 
-export function dashboardUrl(project: Project) {
-  return `https://supabase.com/dashboard/project/${encodeURIComponent(project.ref ?? project.id)}`
-}
+/** Inline hosts draw the card on their own surface: an outline, with no fill or shadow. */
+export const INLINE_CARD = 'bg-transparent shadow-none'
 
-function useDocumentVisible() {
-  const [isVisible, setIsVisible] = useState(() => document.visibilityState !== 'hidden')
-  useEffect(() => {
-    const update = () => setIsVisible(document.visibilityState !== 'hidden')
-    document.addEventListener('visibilitychange', update)
-    return () => document.removeEventListener('visibilitychange', update)
-  }, [])
-  return isVisible
-}
+export type ProjectCardData = Pick<
+  DataPort,
+  'getProject' | 'getOrganization' | 'getProjectUrl' | 'getPublishableKeys'
+>
 
 /**
- * A project from a tool result, kept live: its status is read again on a timer
- * while the view is visible, so the user never needs to refresh. Each status
- * change is shared with the agent as context, so it knows when the project is
- * ready without calling get_project itself.
+ * The view for `create_project`: the project card, kept live. Before the
+ * tool returns, it shows what was asked for and skeletons for the rest; then
+ * the badge names the step the project is on until it is ready, and
+ * connection details appear. Each status is shared with the agent as context,
+ * so it knows when the project is ready without calling get_project itself.
  */
 export function ProjectCardScreen({
-  initial,
-  data,
-  agent,
-  changingPollMs = CHANGING_POLL_MS,
-  settledPollMs = SETTLED_POLL_MS,
+  session: { toolCall, data, agent, pollIntervalMs },
 }: {
-  initial: Project
-  data: Pick<DataPort, 'getProject' | 'getOrganization'>
-  agent: AgentHost
-  changingPollMs?: number
-  settledPollMs?: number
+  session: Omit<ToolCallSession<Project>, 'data'> & { data: ProjectCardData }
 }) {
-  const [project, setProject] = useState(initial)
-  const [error, setError] = useState<string>()
-  const [isRefreshing, setIsRefreshing] = useState(false)
-  const [organizationName, setOrganizationName] = useState<string>()
-  const inFlight = useRef(false)
-  const isVisible = useDocumentVisible()
-  const isChanging = isProjectChanging(project.status)
-  const organization = initial.organization_slug ?? initial.organization_id
+  const { call, input, canCallTools, canOpenLinks } = useToolCall(toolCall)
+  const openLink = canOpenLinks ? agent.openLink : undefined
 
-  const refresh = useCallback(async () => {
-    if (inFlight.current) return
-    inFlight.current = true
-    setIsRefreshing(true)
-    try {
-      setProject(await data.getProject({ id: initial.id }))
-      setError(undefined)
-    } catch (cause) {
-      setError(errorMessage(cause))
-    } finally {
-      inFlight.current = false
-      setIsRefreshing(false)
-    }
-  }, [data, initial.id])
+  const {
+    data: project,
+    isLoading,
+    isDone,
+    ...status
+  } = useCreationStatus<Project>({
+    noun: 'project',
+    call,
+    canCheck: canCallTools,
+    read: (created) => data.getProject({ id: created.id }),
+    steps: PROJECT_CREATION_STEPS,
+    progress: projectCreationProgress,
+    checkWith: 'get_project',
+    intervalMs: pollIntervalMs,
+  })
+  const projectRef = project && (project.ref ?? project.id)
 
-  // One timer per read, so a slow or failed read never stacks requests. Hidden views wait.
-  useEffect(() => {
-    if (!isVisible || isRefreshing) return
-    const timer = window.setTimeout(
-      () => void refresh(),
-      isChanging ? changingPollMs : settledPollMs
-    )
-    return () => window.clearTimeout(timer)
-  }, [isVisible, isRefreshing, isChanging, changingPollMs, settledPollMs, refresh, project, error])
-
-  // The name is a nicety: on failure the card leaves the organization out.
-  useEffect(() => {
-    if (!organization) return
-    let isCurrent = true
-    data.getOrganization({ id: organization }).then(
-      ({ name }) => isCurrent && setOrganizationName(name),
-      () => {}
-    )
-    return () => {
-      isCurrent = false
-    }
-  }, [data, organization])
+  // The organization's name is a nicety: on failure the card leaves it out.
+  const organization =
+    project?.organization_slug ?? project?.organization_id ?? text(input?.organization_id)
+  const organizationName = useLookup(
+    canCallTools ? organization : undefined,
+    async () => (await data.getOrganization({ id: organization! })).name
+  )
 
   useEffect(() => {
+    if (!project) return
     agent.context?.publish({
       project: { id: project.id, name: project.name, status: project.status },
     })
-  }, [agent, project.id, project.name, project.status])
+  }, [agent, project?.id, project?.name, project?.status])
+
+  // The dashboard has a project that failed to start (to delete it, or for
+  // support), but nothing for one that was never created or was removed.
+  const canOpenDashboard = !!projectRef && !!openLink && project.status !== 'REMOVED'
+
+  const region = text(input?.region)
+  const details = project
+    ? [
+        { label: 'Project ref', value: projectRef },
+        { label: 'Region', value: project.region || 'Region unavailable' },
+      ]
+    : isLoading
+      ? [{ label: 'Project ref' }, { label: 'Region', value: region }]
+      : region
+        ? [{ label: 'Region', value: region }]
+        : []
 
   return (
     <ProjectCard
-      project={project}
-      organizationName={organizationName}
-      isFollowing={isChanging}
-      isRefreshing={isRefreshing}
-      error={error}
-      onRefresh={() => void refresh()}
-      onOpenDashboard={agent.openLink ? () => agent.openLink!(dashboardUrl(project)) : undefined}
-    />
+      {...status}
+      className={INLINE_CARD}
+      isLoading={isLoading}
+      breadcrumbs={organizationName ? [organizationName] : undefined}
+      name={
+        project?.name ??
+        text(input?.name) ??
+        // A call that failed or was cancelled before the host sent its
+        // arguments: nothing more is coming, so no skeleton.
+        (isLoading ? undefined : 'New project')
+      }
+      details={details}
+      onOpenDashboard={canOpenDashboard ? () => openLink(studioUrl(projectRef)) : undefined}
+    >
+      {isDone && projectRef && (
+        <ProjectConnection
+          projectRef={projectRef}
+          data={data}
+          canReachProject={canCallTools}
+          onOpenLink={openLink}
+        />
+      )}
+    </ProjectCard>
   )
 }

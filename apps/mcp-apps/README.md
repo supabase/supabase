@@ -30,12 +30,13 @@ That data lives in `src/preview/catalog.ts`. It matches the reference server, ex
 
 `pnpm build` writes one script and one stylesheet per surface to `dist/v1` (fonts and images inlined, no further chunks) plus a `manifest.json` of hashes:
 
-| Files                   | Resource                        | Opened by                                                                                                                                                                     |
-| ----------------------- | ------------------------------- | ----------------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
-| `projects.{js,css}`     | `ui://supabase/projects-v1`     | `open_projects` (global entrypoint). The reference server also registers `open_workspace` as a thread entrypoint; the north star keeps the workspace in the sidebar app only. |
-| `panel.{js,css}`        | `ui://supabase/panel-v1`        | `open_sql_panel`, `open_logs_panel`, `open_row_panel`, `open_explorer_panel`, `open_project_home_panel`, `open_issues_panel`, `open_notebooks_panel`                          |
-| `query-block.{js,css}`  | `ui://supabase/query-block-v1`  | `show_query_block`                                                                                                                                                            |
-| `project-card.{js,css}` | `ui://supabase/project-card-v1` | `create_project` (its own result)                                                                                                                                             |
+| Files                   | Resource                        | Opened by                                                                                                                                                                                                 |
+| ----------------------- | ------------------------------- | --------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
+| `projects.{js,css}`     | `ui://supabase/projects-v1`     | `open_projects` (global entrypoint, also callable by the model). The reference server also registers `open_workspace` as a thread entrypoint; the north star keeps the workspace in the sidebar app only. |
+| `panel.{js,css}`        | `ui://supabase/panel-v1`        | `open_sql_panel`, `open_logs_panel`, `open_row_panel`, `open_explorer_panel`, `open_project_home_panel`, `open_issues_panel`, `open_notebooks_panel`                                                      |
+| `query-block.{js,css}`  | `ui://supabase/query-block-v1`  | `show_query_block`                                                                                                                                                                                        |
+| `project-card.{js,css}` | `ui://supabase/project-card-v1` | `create_project` (its own call)                                                                                                                                                                           |
+| `branch-card.{js,css}`  | `ui://supabase/branch-card-v1`  | `create_branch` (its own call)                                                                                                                                                                            |
 
 The **projects** surface is the full app: a project list, then a project page that switches between Home, Database (the Explorer) and Logs.
 
@@ -55,7 +56,33 @@ Pick the narrowest panel for the ask: "I want to browse my data" opens the Explo
 
 The **query block** is the same `QueryEditor`, rendered inline in the conversation with collapsible SQL.
 
-The **project card** is a tool-result view: it renders a model tool's normal result rather than a launch payload. `create_project` points at it (`attachToolResultViews` in the reference server, only for clients that render MCP Apps), so "Create a new project" shows the new project inline with its name, ref, region and status. The card is live: `src/shell/ProjectCardScreen.tsx` reads the project again through `get_project` every 5 seconds while its status is changing and every 30 seconds once it settles, pausing while the view is hidden. It shares each status with the agent as model context, so the agent knows when the project is ready without polling. It mounts with `mountToolView`, which gets data and agent ports but not the bootstrap, and bundles only the card, so it is less than half the size of the other surfaces.
+The **project card** is a tool-result view: it renders a model tool's own call rather than a launch payload. `create_project` points at `project-card` and `create_branch` at `branch-card` (`attachToolResultViews` in the reference server, only for clients that render MCP Apps), and both show the same `ProjectCard`: a branch is a project too, shown under its organization and parent project.
+
+The card follows the whole call, so it mounts with `mountToolCallView` rather than `mountToolView`. It renders straight away, before the host has connected, so the host can size the frame:
+
+1. **Waiting on the tool** (or on the user to confirm it): the card shows the call's arguments, such as the name and region, and skeletons for what only the result has.
+2. **Created**: `src/host/use-creation-status.ts` reads the status again every 5 seconds, through `get_project` or `list_branches`, and the badge names the step: Creating, then Checking health for a project, or Running migrations and Deploying functions for a branch. It stops at Active or at a failure, which says which step failed.
+3. **Ready**: a collapsed Connection details section appears, with the project URL and a publishable key to copy, read through `get_project_url` and `get_publishable_keys` the first time it opens. If they can't be read it links to the dashboard's Connect dialog instead.
+
+Nothing closes the view. A tool error or a cancelled call shows in the card, a check that fails three times in a row or runs past 10 minutes stops with a Retry beside the badge, and on a host that can't proxy tool calls or open links (`serverTools`, `openLinks` in its capabilities) the card says the status won't update and offers links to copy. A server scoped to one project takes no `project_id`, so the branch card reads through the data port's scoped connection and leaves connection details to the dashboard. Each status is shared with the agent as model context, so the agent knows when the project is ready without polling. The card's connection has data and agent ports but not the bootstrap, and bundles only the card, so each is less than half the size of the other surfaces.
+
+Inline surfaces sit on the host's own surface: the page has no fill, the card is an outline with no fill or shadow, and the body is padded by the host's safe area. Their resources ask for `clipboardWrite` so values can be copied.
+
+### What Claude needs
+
+The surfaces follow [Claude's MCP Apps guides](https://claude.com/docs/connectors/building/mcp-apps/getting-started). Each of these is easy to undo by accident:
+
+- **Display modes come from the contract.** A surface declares `surfaceResources[name].displayModes` to the host (`src/host/connect.ts`). The cards list only `inline`, so Claude shows no expand button above them. Panels and the projects app list only `fullscreen`, so Claude shows a card in the conversation and opens the view in the side panel; their resources also set `preferredDisplayMode: 'fullscreen'` to open it without a click. The query block lists both, and offers its own expand button only where the host offers fullscreen, requested straight from the click.
+- **The entry point is visible to the model.** `open_projects` carries `openai/ui.entrypoints` for ChatGPT's sidebar and Claude's Artifacts page. Claude lists it only if `_meta.ui.visibility` includes `model`, every argument is optional, and the title is 60 characters or fewer.
+- **The document follows the host's theme from the first paint.** `renderSurfaceDocument` sets `<meta name="color-scheme" content="light dark">`; without it the browser gives the frame an opaque backdrop. Inline surfaces paint no page background.
+- **Fonts need a CSP entry.** The host's font CSS loads Anthropic Sans from `https://assets.claude.ai`, so resources list it in `csp.resourceDomains`.
+- **Safe areas.** `--host-inset-*` pads every surface: Claude reports an inset beside the conversation in the side panel, and on mobile the chat input lies over a fullscreen view.
+- **Messages.** `app.sendMessage` takes text blocks of at most 8,000 characters in all, with no long runs of blank lines or spaces. `src/host/message-limits.ts` tidies them and asks the user to send less rather than cut their selection, and a result with `isError` is reported.
+- **Inline cards.** Skeletons while loading, native `title` hints instead of popovers (a host clips a popover at the frame's edge), 44pt tap targets on touch screens, and no scrolling inside the card.
+- **App tools** are declared only by surfaces that register them, before `connect()`. They rely on `zod/v4` from zod 3.25 with `@modelcontextprotocol/ext-apps` 1.7; ext-apps 2 needs zod 4.2 or later.
+- **Icons.** Claude takes an app icon only as an inline PNG or JPEG of 64 to 128 px under 10 KB, so the server lists a PNG before its SVGs.
+
+Entry points and app tools work only on a remote connector, and entry points only for a custom connector or a Verified directory listing. For a directory listing, add `https://supabase.com` to its allowed link URIs so Open in dashboard skips Claude's confirmation.
 
 ### How a view gets data
 
@@ -95,7 +122,7 @@ Deploying: `vercel.json` builds `dist` and serves `/v1/*` with CORS (views load 
 pnpm --filter mcp-apps dev
 ```
 
-Open http://localhost:5174 for a gallery of every surface on fixture data (no host, agent actions disabled). Each frame also opens on its own, e.g. `/surfaces/panel.html?preview=logs` (`home`, `issues`, `notebooks`, `explorer`, `sql`, `logs`, `row`) or `/surfaces/project-card.html?preview=starting` (`starting`, `active`). Fixtures live in `src/preview/fixtures.ts` and `src/preview/project-card.ts`.
+Open http://localhost:5174 for a gallery of every surface on fixture data (no host, agent actions disabled). Each frame also opens on its own, e.g. `/surfaces/panel.html?preview=logs` (`home`, `issues`, `notebooks`, `explorer`, `sql`, `logs`, `row`) or `/surfaces/project-card.html?preview=starting` (`starting`, `active`, `loading`, `failed`, `tool-error`, `cancelled`, `check-failed`, `no-tools`; `branch-card.html` has `starting`, `active`, `loading` and `failed`). Fixtures live in `src/preview/fixtures.ts` and `src/preview/project-card.ts`.
 
 For a single shared view in isolation, use the design system instead (`pnpm dev:design-system`, then **Surfaces**).
 
@@ -107,10 +134,10 @@ pnpm --filter mcp-apps build          # or build:watch
 
 ### Add a view an agent can open
 
-Prefer a view on an existing tool's result when the user wants to see that result every time the tool runs, like the project card on `create_project`. When the agent should choose whether to show something, use a launch tool (`show_*` or `open_*`) instead: a view on a tool renders on every call, including the agent's own lookups.
+Prefer a view on an existing tool's result when the user wants to see that result every time the tool runs, like the project card on `create_project` and `create_branch`. When the agent should choose whether to show something, use a launch tool (`show_*` or `open_*`) instead: a view on a tool renders on every call, including the agent's own lookups.
 
 1. Build the view in `packages/surfaces` (see its README) and add a design-system demo.
-2. Here: render it (a panel `view` in `src/shell/ConversationPanel.tsx`, or its own entry mounted with `mountToolView`), add any data it needs to `dataOperations` in `surfaces/contract` (prefer an existing model tool, `visibility: 'shared'`), word any new `AgentRequest` in `src/host/project-prompts.ts`, and add fixtures.
+2. Here: render it (a panel `view` in `src/shell/ConversationPanel.tsx`, or its own entry mounted with `mountToolView`, or `mountToolCallView` to follow a call from before its result), add any data it needs to `dataOperations` in `surfaces/contract` (prefer an existing model tool, `visibility: 'shared'`), word any new `AgentRequest` in `src/host/project-prompts.ts`, and add fixtures.
 3. Add it to `src/preview/catalog.ts` with the tool that opens it and its `_meta`, and check it in the gallery.
 4. Server side, when it ships: register the tool and resource on the #551 foundation. New tool names also need entries in the hosted server's tool auth list before they work in production.
 

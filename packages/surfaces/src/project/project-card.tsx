@@ -1,142 +1,208 @@
-import { ExternalLinkIcon, Loader2Icon, RefreshCwIcon } from 'lucide-react'
-import { useEffect, useState } from 'react'
-import { Badge, Button, Card, Tooltip, TooltipContent, TooltipTrigger } from 'ui'
+import { CircleXIcon, ExternalLinkIcon, Loader2Icon, RefreshCwIcon } from 'lucide-react'
+import { Fragment, useId, type ReactNode } from 'react'
+import { Badge, Button, Card, cn, Skeleton } from 'ui'
 
-import type { Project } from '../contract'
-import { ButtonTooltip } from '../explorer/button-tooltip'
 import { ProjectDetails } from './project-identity'
-import { isProjectChanging, projectStatusBadge } from './project-status'
+
+export interface ProjectCardBadge {
+  label: string
+  tone?: 'success' | 'warning' | 'danger'
+  /** Shows a spinner while the host follows a status that is changing. */
+  isSpinning?: boolean
+  /** Extra detail on hover, e.g. why a check failed. */
+  title?: string
+}
+
+/** A line under the details: a problem, or why the status won't update. */
+export interface ProjectCardNote {
+  tone: 'danger' | 'muted'
+  text: string
+}
 
 export interface ProjectCardProps {
-  project: Project
-  /** Shown above the name once known. Slugs are not shown: they rarely read as names. */
-  organizationName?: string
-  /** Whether the host is following a project that is changing state. Shows a spinner on the badge. */
-  isFollowing?: boolean
-  /** Whether a status check is in flight. */
-  isRefreshing?: boolean
-  /** The last status check failed. The badge says so in place of the status until a check succeeds. */
-  error?: string
-  /** Checks the status now, for hosts that also keep it live. Omit to hide Refresh. */
-  onRefresh?: () => void
+  /** Nothing is known yet beyond what is passed. Missing parts show as skeletons, in place. */
+  isLoading?: boolean
+  /**
+   * Names of what it belongs to, outermost first, shown above the name once
+   * known: the organization, then for a branch its project. Slugs are not
+   * shown: they rarely read as names.
+   */
+  breadcrumbs?: string[]
+  name?: string
+  badge?: ProjectCardBadge
+  note?: ProjectCardNote
+  /** Labels are for screen readers; the values are shown, or skeletons while loading. */
+  details: { label: string; value?: string }[]
+  /**
+   * Checks the status again, from a small icon beside the badge. Pass it only
+   * when checking has stopped without an answer.
+   */
+  onRetry?: () => void
+  isRetrying?: boolean
   /** Opens the project in the Supabase dashboard. Omit to hide the action. */
   onOpenDashboard?: () => void
+  /** For hosts that draw the card on their own surface, e.g. `bg-transparent shadow-none`. */
+  className?: string
+  /** Rendered edge to edge along the bottom of the card, e.g. `ConnectionDetails`. */
+  children?: ReactNode
 }
 
-/** Statuses of a new project that is still being set up. */
-const SETTING_UP = new Set(['COMING_UP', 'UNKNOWN'])
+const BADGE_VARIANTS = {
+  neutral: 'default',
+  success: 'success',
+  warning: 'warning',
+  danger: 'destructive',
+} as const
 
-/** `12s`, `1m 12s`, `1h 3m`. */
-export function formatElapsed(ms: number) {
-  const seconds = Math.max(0, Math.floor(ms / 1000))
-  if (seconds < 60) return `${seconds}s`
-  const minutes = Math.floor(seconds / 60)
-  if (minutes < 60) return `${minutes}m ${seconds % 60}s`
-  return `${Math.floor(minutes / 60)}h ${minutes % 60}m`
-}
+/**
+ * A 44pt tap target on touch screens, without changing the size drawn. Hints
+ * are native `title`s, never popovers: a host clips a popover at the edge of
+ * the frame an inline card sits in.
+ */
+const TOUCH_TARGET = 'relative pointer-coarse:after:absolute pointer-coarse:after:content-[""]'
 
-/** The current time, ticking every second while `isTicking`. */
-function useNow(isTicking: boolean) {
-  const [now, setNow] = useState(() => Date.now())
-  useEffect(() => {
-    if (!isTicking) return
-    setNow(Date.now())
-    const timer = window.setInterval(() => setNow(Date.now()), 1000)
-    return () => window.clearInterval(timer)
-  }, [isTicking])
-  return now
+function StatusBadge({ badge }: { badge: ProjectCardBadge }) {
+  return (
+    <Badge variant={BADGE_VARIANTS[badge.tone ?? 'neutral']} title={badge.title}>
+      {badge.isSpinning && (
+        <Loader2Icon
+          size={10}
+          aria-hidden="true"
+          className="animate-spin motion-reduce:[animation-duration:3s]"
+        />
+      )}
+      {badge.label}
+    </Badge>
+  )
 }
 
 /**
- * One project and its current status, condensed from Home's header for a
- * conversation: organization, name, status, ref and region. The host updates
- * `project` as the status changes; the badge shows it and screen readers hear each change.
+ * One project (or branch, which is a project too) and its current status,
+ * condensed from Home's header for a conversation: breadcrumbs, name and
+ * status badge, then a dot-separated row of details (ref, region), with Open
+ * in dashboard beside them. A note and `children` render below, e.g. a
+ * problem or connection details.
+ *
+ * While `isLoading`, the layout stays the same and anything not known yet
+ * (breadcrumbs, name, badge, a detail's value, the action) is a skeleton the
+ * size of what it stands in for, so nothing moves when the data arrives.
+ *
+ * The card only shows what it is given. A host follows the status and says
+ * how to show it; `creationStatus` does that for something being created.
  */
 export function ProjectCard({
-  project,
-  organizationName,
-  isFollowing = false,
-  isRefreshing = false,
-  error,
-  onRefresh,
+  isLoading = false,
+  breadcrumbs = [],
+  name,
+  badge,
+  note,
+  details,
+  onRetry,
+  isRetrying = false,
   onOpenDashboard,
+  className,
+  children,
 }: ProjectCardProps) {
-  const projectStatus = projectStatusBadge(project.status)
-  // A failed check replaces the status: the last one read may no longer be true.
-  const status = error ? { label: 'Check failed', variant: 'destructive' as const } : projectStatus
-  const isChanging = !error && isProjectChanging(project.status)
-  // While a new project sets up, show how long it has been going, from created_at.
-  const createdAt = project.created_at ? Date.parse(project.created_at) : NaN
-  const isSettingUp = SETTING_UP.has(project.status) && Number.isFinite(createdAt)
-  const now = useNow(isSettingUp)
-  const details = [
-    { label: 'Project ref', value: project.ref ?? project.id },
-    { label: 'Region', value: project.region || 'Region unavailable' },
-    ...(isSettingUp
-      ? [{ label: 'Setup time', value: `Started ${formatElapsed(now - createdAt)} ago` }]
-      : []),
-  ]
+  const nameId = useId()
 
   return (
-    <Card className="@container">
-      <section aria-labelledby="project-card-title" aria-busy={isRefreshing}>
-        <div className="flex flex-col gap-3 p-4 @md:flex-row @md:items-center">
-          <div className="flex min-w-0 flex-1 flex-col gap-0.5">
-            {organizationName && (
-              <p className="truncate text-xs text-foreground-light">{organizationName}</p>
-            )}
-            <div className="flex min-w-0 flex-wrap items-center gap-x-2 gap-y-1">
-              <h2 id="project-card-title" className="truncate text-base text-foreground">
-                {project.name}
-              </h2>
-              {error ? (
-                <Tooltip>
-                  <TooltipTrigger asChild>
-                    <Badge variant={status.variant}>{status.label}</Badge>
-                  </TooltipTrigger>
-                  <TooltipContent side="bottom">{`Failed to check status: ${error}`}</TooltipContent>
-                </Tooltip>
+    <Card className={className}>
+      <section
+        aria-labelledby={name === undefined ? undefined : nameId}
+        aria-label={name === undefined ? 'Loading' : undefined}
+        aria-busy={isLoading || isRetrying}
+      >
+        <div className="flex flex-col gap-3 p-4">
+          {/* Identity, then the action; it wraps below when the card is narrow. */}
+          <div className="flex flex-wrap items-center gap-3">
+            <div className="flex min-w-0 flex-[1_1_16rem] flex-col gap-0.5">
+              {breadcrumbs.length > 0 ? (
+                <p className="truncate text-sm text-foreground-light">
+                  {breadcrumbs.map((crumb, index) => (
+                    <Fragment key={index}>
+                      {index > 0 && (
+                        <span aria-hidden="true" className="mx-1 text-foreground-muted">
+                          /
+                        </span>
+                      )}
+                      {crumb}
+                    </Fragment>
+                  ))}
+                </p>
               ) : (
-                <Badge variant={status.variant} className="gap-1">
-                  {isChanging && isFollowing && (
-                    <Loader2Icon size={12} aria-hidden="true" className="animate-spin" />
-                  )}
-                  {status.label}
-                </Badge>
+                isLoading && (
+                  <div aria-hidden="true" className="flex h-lh items-center text-sm">
+                    <Skeleton className="h-3.5 w-20" />
+                  </div>
+                )
               )}
+              <div className="flex min-w-0 flex-wrap items-center gap-x-2 gap-y-1">
+                {name === undefined ? (
+                  <div aria-hidden="true" className="flex h-lh items-center text-base">
+                    <Skeleton className="h-4 w-40" />
+                  </div>
+                ) : (
+                  <h2 id={nameId} className="truncate text-base font-medium text-foreground">
+                    {name}
+                  </h2>
+                )}
+                {badge ? (
+                  <StatusBadge badge={badge} />
+                ) : (
+                  <Skeleton aria-hidden="true" className="h-[17px] w-16 rounded-full" />
+                )}
+                {onRetry && (
+                  <Button
+                    variant="text"
+                    size="tiny"
+                    aria-label="Retry"
+                    title="Check the status again"
+                    className={cn(
+                      TOUCH_TARGET,
+                      'size-5 rounded-full px-0 text-foreground-light hover:text-foreground pointer-coarse:after:-inset-3'
+                    )}
+                    loading={isRetrying}
+                    icon={<RefreshCwIcon size={12} aria-hidden="true" />}
+                    onClick={onRetry}
+                  />
+                )}
+              </div>
+              <ProjectDetails details={details} className="text-sm" />
             </div>
-            <ProjectDetails details={details} className="text-sm" />
+            {(isLoading || onOpenDashboard) && (
+              <div className="flex flex-none">
+                {isLoading ? (
+                  <Skeleton aria-hidden="true" className="size-[26px]" />
+                ) : (
+                  <Button
+                    variant="default"
+                    size="tiny"
+                    aria-label="Open in dashboard"
+                    title="Open in dashboard"
+                    className={cn(TOUCH_TARGET, 'pointer-coarse:after:-inset-[9px]')}
+                    icon={<ExternalLinkIcon size={14} aria-hidden="true" />}
+                    onClick={onOpenDashboard}
+                  />
+                )}
+              </div>
+            )}
           </div>
-          {(onRefresh || onOpenDashboard) && (
-            <div className="flex shrink-0 items-center gap-2">
-              {onRefresh && (
-                <ButtonTooltip
-                  variant="default"
-                  size="tiny"
-                  aria-label="Refresh status"
-                  disabled={isRefreshing}
-                  icon={<RefreshCwIcon size={14} aria-hidden="true" />}
-                  onClick={onRefresh}
-                  tooltip={{ content: { side: 'bottom', text: 'Refresh status' } }}
-                />
+          {note && (
+            <div
+              className={cn(
+                'flex items-center gap-2 text-sm',
+                note.tone === 'danger' ? 'text-destructive' : 'text-foreground-lighter'
               )}
-              {onOpenDashboard && (
-                <Button
-                  variant="default"
-                  size="tiny"
-                  icon={<ExternalLinkIcon size={14} aria-hidden="true" />}
-                  onClick={onOpenDashboard}
-                >
-                  Open in dashboard
-                </Button>
+            >
+              {note.tone === 'danger' && (
+                <CircleXIcon size={16} aria-hidden="true" className="flex-none" />
               )}
+              {/* Wraps inside the card even when the message has a long unbroken word. */}
+              <p className="min-w-0 flex-1 [overflow-wrap:anywhere]">{note.text}</p>
             </div>
           )}
         </div>
-        {/* The badge is not announced when it changes; this is. Always rendered. */}
-        <p role="status" className="sr-only">
-          {error ? `Failed to check status: ${error}` : `Status: ${status.label}`}
-        </p>
+        {children}
       </section>
     </Card>
   )

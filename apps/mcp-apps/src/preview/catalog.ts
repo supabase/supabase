@@ -9,12 +9,20 @@
  * leaves out: the project workspace belongs to the sidebar app. A server that
  * registers these tools and resources serves the surfaces as built here.
  */
-import { dataOperations, surfaceResources, type SurfaceName } from 'surfaces/contract'
+import {
+  dataOperations,
+  surfaceResourceMeta,
+  surfaceResources,
+  surfaceToolMeta,
+  type SurfaceName,
+} from 'surfaces/contract'
 
 /**
  * Where a host shows a component:
- * - `sidebar`: opened by the user from the host, not the agent. ChatGPT lists it in its
- *   sidebar as a global entrypoint; the tool takes no arguments and is hidden from the model.
+ * - `sidebar`: opened by the user from the host, without asking the agent. ChatGPT lists it in
+ *   its sidebar and Claude on its Artifacts page, from the tool's global entrypoint. Every
+ *   argument is optional, and the tool stays visible to the model: Claude lists an entry point
+ *   only for a tool the model can call, so the agent may open it in a conversation too.
  * - `panel`: opened by the agent with a launch tool. Fullscreen in ChatGPT; Claude opens it
  *   in its side panel because the resource prefers fullscreen.
  * - `inline`: rendered in the chat where the tool was called, sized to its content.
@@ -65,25 +73,10 @@ export interface CatalogEntry {
 const uri = (surface: SurfaceName) => surfaceResources[surface].uri
 
 /** The resource `_meta` a server returns from `resources/read` for each surface. */
-export function resourceMeta(surface: SurfaceName) {
-  const { preferredDisplayMode, displayModes } = surfaceResources[surface]
-  return {
-    ui: {
-      // Inlined builds make no requests. A linked build adds its origin to resourceDomains.
-      csp: { connectDomains: [], resourceDomains: [] },
-      prefersBorder: false,
-      // Claude-only: `fullscreen` opens the view in Claude's side panel.
-      preferredDisplayMode,
-    },
-    'openai/ui': { preferredDisplayMode, availableDisplayModes: [...displayModes] },
-  }
-}
+export const resourceMeta = (surface: SurfaceName) => surfaceResourceMeta(surface)
 
-const launchMeta = (surface: SurfaceName) => ({
-  ui: { resourceUri: uri(surface), visibility: ['model', 'app'] },
-  // Unverified key: OpenAI documents display modes on the resource, not the tool.
-  'openai/ui': { preferredModelDisplayMode: surfaceResources[surface].preferredDisplayMode },
-})
+/** The `_meta` of a tool that shows a surface, for Claude and ChatGPT alike. */
+const launchMeta = (surface: SurfaceName) => surfaceToolMeta(surface)
 
 const panelUse = (tool: string): ComponentUse => ({
   presentation: 'panel',
@@ -114,6 +107,13 @@ const panelEntry = (
   frames: [panelFrame(title, preview, height)],
 })
 
+const cardFrame = (title: string, surface: SurfaceName, preview: string): CatalogFrame => ({
+  title,
+  src: `/surfaces/${surface}.html?preview=${preview}`,
+  height: 120,
+  isInline: true,
+})
+
 export const CATALOG: CatalogEntry[] = [
   {
     id: 'projects',
@@ -126,10 +126,8 @@ export const CATALOG: CatalogEntry[] = [
         surface: 'projects',
         tool: dataOperations.bootstrap.tool,
         toolKind: 'entrypoint',
-        toolMeta: {
-          ui: { resourceUri: uri('projects'), visibility: ['app'] },
-          'openai/ui': { entrypoints: [{ type: 'global' }] },
-        },
+        // Visible to the model: Claude lists an entry point only for a tool it can call.
+        toolMeta: surfaceToolMeta('projects', { entrypoint: 'global' }),
       },
     ],
     frames: [
@@ -217,7 +215,8 @@ export const CATALOG: CatalogEntry[] = [
   {
     id: 'project-card',
     title: 'Project card',
-    description: 'A new project and its live status.',
+    description:
+      'A new project or branch, from the moment the agent asks for it: its live setup status, then its connection details.',
     uses: [
       {
         presentation: 'inline',
@@ -226,20 +225,26 @@ export const CATALOG: CatalogEntry[] = [
         toolKind: 'tool-result',
         toolMeta: launchMeta('project-card'),
       },
+      {
+        presentation: 'inline',
+        surface: 'branch-card',
+        tool: 'create_branch',
+        toolKind: 'tool-result',
+        toolMeta: launchMeta('branch-card'),
+      },
     ],
     frames: [
-      {
-        title: 'Starting, becomes Active',
-        src: '/surfaces/project-card.html?preview=starting',
-        height: 120,
-        isInline: true,
-      },
-      {
-        title: 'Active',
-        src: '/surfaces/project-card.html?preview=active',
-        height: 120,
-        isInline: true,
-      },
+      cardFrame('Project: arguments, then each step until Active', 'project-card', 'starting'),
+      cardFrame('Project: Active, with connection details', 'project-card', 'active'),
+      cardFrame('Project: waiting on the tool', 'project-card', 'loading'),
+      cardFrame('Project: setup failed', 'project-card', 'failed'),
+      cardFrame('Project: the tool call failed', 'project-card', 'tool-error'),
+      cardFrame('Project: the call was cancelled', 'project-card', 'cancelled'),
+      cardFrame('Project: status checks failing, with Retry', 'project-card', 'check-failed'),
+      cardFrame('Project: a host that can’t call tools or open links', 'project-card', 'no-tools'),
+      cardFrame('Branch: each step until Active', 'branch-card', 'starting'),
+      cardFrame('Branch: Active', 'branch-card', 'active'),
+      cardFrame('Branch: migrations failed', 'branch-card', 'failed'),
     ],
   },
 ]

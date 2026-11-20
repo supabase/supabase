@@ -1,86 +1,132 @@
-import { act, cleanup, fireEvent, screen } from '@testing-library/react'
+import { cleanup, fireEvent, screen } from '@testing-library/react'
 import { afterEach, describe, expect, it, vi } from 'vitest'
 
-import { renderWithTooltip as render, testProject } from '../test-utils'
-import { formatElapsed, ProjectCard } from './project-card'
+import { renderWithTooltip as render } from '../test-utils'
+import { ProjectCard } from './project-card'
 
 afterEach(cleanup)
 
-const starting = { ...testProject, status: 'COMING_UP' }
+const details = [
+  { label: 'Project ref', value: 'project-ref' },
+  { label: 'Region', value: 'eu-west-1' },
+]
 
 describe('ProjectCard', () => {
-  it('shows where the project is and that it is ready', () => {
-    render(<ProjectCard project={testProject} organizationName="Acme Inc" />)
+  it('shows where the project is and its status', () => {
+    render(
+      <ProjectCard
+        breadcrumbs={['Acme Inc']}
+        name="Customer portal"
+        badge={{ label: 'Active', tone: 'success' }}
+        details={details}
+      />
+    )
+    expect(screen.getByRole('region', { name: 'Customer portal' })).toBeTruthy()
     expect(screen.getByRole('heading', { name: 'Customer portal' })).toBeTruthy()
     expect(screen.getByText('Acme Inc')).toBeTruthy()
     expect(screen.getByText('project-ref')).toBeTruthy()
     expect(screen.getByText('eu-west-1')).toBeTruthy()
     expect(screen.getByText('Active')).toBeTruthy()
-    expect(screen.getByRole('status').textContent).toBe('Status: Active')
   })
 
-  it('announces when a starting project becomes ready, so the user need not refresh', () => {
-    const { rerender } = render(<ProjectCard project={starting} isFollowing />)
-    expect(screen.getByText('Starting')).toBeTruthy()
-    expect(screen.getByRole('status').textContent).toBe('Status: Starting')
-    rerender(<ProjectCard project={testProject} isFollowing />)
-    expect(screen.getByRole('status').textContent).toBe('Status: Active')
-  })
-
-  it('shows a failed check as the status, until a check succeeds', () => {
-    const onRefresh = vi.fn()
-    const { rerender } = render(
-      <ProjectCard project={starting} error="Network error" onRefresh={onRefresh} />
+  it('names a branch under its organization and project', () => {
+    render(
+      <ProjectCard
+        breadcrumbs={['Acme Inc', 'Customer portal']}
+        name="develop"
+        badge={{ label: 'Running migrations', isSpinning: true }}
+        details={[{ label: 'Branch project ref', value: 'branch-ref' }]}
+      />
     )
-    // The last status read may no longer be true, so it is not shown.
-    expect(screen.queryByText('Starting')).toBeNull()
-    expect(screen.getByText('Check failed')).toBeTruthy()
-    expect(screen.getByRole('status').textContent).toBe('Failed to check status: Network error')
-    fireEvent.click(screen.getByRole('button', { name: 'Refresh status' }))
-    expect(onRefresh).toHaveBeenCalled()
-    rerender(<ProjectCard project={testProject} onRefresh={onRefresh} />)
-    expect(screen.getByText('Active')).toBeTruthy()
+    expect(screen.getByText(/Acme Inc/).textContent).toBe('Acme Inc/Customer portal')
+    expect(screen.getByText('Running migrations')).toBeTruthy()
   })
 
-  it('puts Refresh beside Open in dashboard', () => {
-    render(<ProjectCard project={testProject} onRefresh={() => {}} onOpenDashboard={() => {}} />)
-    // Refresh is an icon; its name comes from its label.
-    expect(
-      screen
-        .getAllByRole('button')
-        .map((button) => button.getAttribute('aria-label') ?? button.textContent?.trim())
-    ).toEqual(['Refresh status', 'Open in dashboard'])
-  })
-
-  it('hides actions the host cannot perform', () => {
-    render(<ProjectCard project={testProject} />)
+  it('keeps its layout while loading, with nothing to act on yet', () => {
+    render(<ProjectCard isLoading details={[{ label: 'Project ref' }, { label: 'Region' }]} />)
+    const card = screen.getByRole('region', { name: 'Loading' })
+    expect(card.getAttribute('aria-busy')).toBe('true')
+    expect(screen.queryByRole('heading')).toBeNull()
     expect(screen.queryByRole('button')).toBeNull()
+    // Both details keep their place, read by their labels.
+    expect(screen.getByText('Project ref')).toBeTruthy()
+    expect(screen.getByText('Region')).toBeTruthy()
   })
 
-  it('shows how long a new project has been setting up, and stops once it is ready', () => {
-    vi.useFakeTimers()
-    vi.setSystemTime(new Date('2026-11-13T12:01:12Z'))
-    try {
-      const created = { ...starting, created_at: '2026-11-13T12:00:00Z' }
-      const { rerender } = render(<ProjectCard project={created} isFollowing />)
-      expect(screen.getByText('Started 1m 12s ago')).toBeTruthy()
-      act(() => vi.advanceTimersByTime(3000))
-      expect(screen.getByText('Started 1m 15s ago')).toBeTruthy()
-      rerender(<ProjectCard project={{ ...created, status: 'ACTIVE_HEALTHY' }} isFollowing />)
-      expect(screen.queryByText(/^Started/)).toBeNull()
-    } finally {
-      vi.useRealTimers()
-    }
+  it('shows what is already known while loading', () => {
+    render(
+      <ProjectCard
+        isLoading
+        name="Customer portal"
+        details={[{ label: 'Project ref' }, { label: 'Region', value: 'eu-west-1' }]}
+      />
+    )
+    expect(screen.getByRole('heading', { name: 'Customer portal' })).toBeTruthy()
+    expect(screen.getByText('eu-west-1')).toBeTruthy()
   })
 
-  it('formats elapsed time compactly', () => {
-    expect(formatElapsed(9_000)).toBe('9s')
-    expect(formatElapsed(72_000)).toBe('1m 12s')
-    expect(formatElapsed(3_780_000)).toBe('1h 3m')
+  it('explains a problem under the details', () => {
+    render(
+      <ProjectCard
+        name="Customer portal"
+        badge={{ label: 'Failed', tone: 'danger' }}
+        note={{ tone: 'danger', text: 'Failed while creating (INIT_FAILED).' }}
+        details={details}
+      />
+    )
+    expect(screen.getByText('Failed')).toBeTruthy()
+    expect(screen.getByText('Failed while creating (INIT_FAILED).')).toBeTruthy()
   })
 
-  it('leaves out the organization until its name is known, rather than showing a slug', () => {
-    render(<ProjectCard project={testProject} />)
-    expect(screen.queryByText('acme')).toBeNull()
+  it('offers Retry only when the host passes it, and reports the click', () => {
+    const onRetry = vi.fn()
+    const { rerender } = render(
+      <ProjectCard name="Customer portal" badge={{ label: 'Check failed' }} details={details} />
+    )
+    expect(screen.queryByRole('button', { name: 'Retry' })).toBeNull()
+    rerender(
+      <ProjectCard
+        name="Customer portal"
+        badge={{ label: 'Check failed' }}
+        details={details}
+        onRetry={onRetry}
+      />
+    )
+    fireEvent.click(screen.getByRole('button', { name: 'Retry' }))
+    expect(onRetry).toHaveBeenCalled()
+  })
+
+  it('is busy and cannot be retried again while a retry is in flight', () => {
+    render(
+      <ProjectCard
+        name="Customer portal"
+        badge={{ label: 'Check failed' }}
+        details={details}
+        onRetry={() => {}}
+        isRetrying
+      />
+    )
+    expect(screen.getByRole('region').getAttribute('aria-busy')).toBe('true')
+    expect(screen.getByRole('button', { name: 'Retry' })).toHaveProperty('disabled', true)
+  })
+
+  it('opens the dashboard when the host can', () => {
+    const onOpenDashboard = vi.fn()
+    const { rerender } = render(<ProjectCard name="Customer portal" details={details} />)
+    expect(screen.queryByRole('button', { name: 'Open in dashboard' })).toBeNull()
+    rerender(
+      <ProjectCard name="Customer portal" details={details} onOpenDashboard={onOpenDashboard} />
+    )
+    fireEvent.click(screen.getByRole('button', { name: 'Open in dashboard' }))
+    expect(onOpenDashboard).toHaveBeenCalled()
+  })
+
+  it('renders what the host puts along its bottom edge', () => {
+    render(
+      <ProjectCard name="Customer portal" details={details}>
+        <p>Connection details</p>
+      </ProjectCard>
+    )
+    expect(screen.getByText('Connection details')).toBeTruthy()
   })
 })

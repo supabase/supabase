@@ -254,14 +254,7 @@ function SupportingEntry({ tool }: { tool: SupportingTool }) {
  */
 function Gallery() {
   return (
-    // The header sits as far below the top as the first component sits below the header.
-    <main className="flex flex-col gap-16 px-6 py-16 sm:px-10 lg:px-16 xl:px-24">
-      <header className="flex flex-col gap-2">
-        <h1 className="text-2xl font-medium text-foreground">Supabase surfaces</h1>
-        <p className="text-base text-foreground-light">
-          Every component agent hosts can show, on sample data.
-        </p>
-      </header>
+    <main className="px-6 py-16 sm:px-10 lg:px-16 xl:px-24">
       <div className="flex flex-col gap-24">
         {CATALOG.map((entry) => (
           <Entry key={entry.id} entry={entry} />

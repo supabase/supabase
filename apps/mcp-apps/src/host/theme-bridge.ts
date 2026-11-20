@@ -13,7 +13,11 @@ type HostVariables = Record<string, string | undefined>
 
 const BACKGROUND_KEYS = ['--color-background-primary', '--color-background']
 const TEXT_KEYS = ['--color-text-primary', '--color-foreground']
-const BORDER_KEYS = ['--color-border-primary', '--color-border']
+// Hosts map their themes onto the standard border variables differently: Claude's
+// `border-primary` is a strong line (40% alpha) and its `border-tertiary` the hairline (15%),
+// while in Codex and ChatGPT both are the default border. Tertiary is the hairline in every
+// host that sends it; MCP Inspector sends only primary.
+const BORDER_KEYS = ['--color-border-tertiary', '--color-border-primary', '--color-border']
 const FONT_KEYS = ['--font-sans', '--font-family-sans']
 const MONO_KEYS = ['--font-mono', '--font-family-mono']
 
@@ -91,6 +95,19 @@ export function applyHostVariables(variables: HostVariables | undefined) {
   if (font) root.setProperty('--font-sans', font)
   const mono = first(variables, MONO_KEYS)
   if (mono) root.setProperty('--font-mono', mono)
+}
+
+/**
+ * Mirrors the host's safe area (its own chrome over the frame) into `--host-inset-*`, which
+ * inline surfaces pad by (see styles.css).
+ */
+export function applySafeAreaInsets(
+  insets: Partial<Record<'top' | 'right' | 'bottom' | 'left', number>> | undefined
+) {
+  const root = document.documentElement.style
+  for (const side of ['top', 'right', 'bottom', 'left'] as const) {
+    root.setProperty(`--host-inset-${side}`, `${insets?.[side] ?? 0}px`)
+  }
 }
 
 /** Hosts may supply @font-face rules for their own fonts. */
