@@ -11,7 +11,7 @@ import {
 } from './Charts.constants'
 import type { CommonChartProps } from './Charts.types'
 import { numberFormatter, precisionFormatter, useChartSize, useStacked } from './Charts.utils'
-import NoDataPlaceholder from './NoDataPlaceholder'
+import { NoDataPlaceholder } from './NoDataPlaceholder'
 import { useChartHoverState } from './useChartHoverState'
 import { formatDateTime, useFormatDateTime } from '@/lib/datetime'
 

@@ -84,7 +84,7 @@ The choice also shaped Lingo.dev's approach to compliance. Most startups treat S
 
 ## How Lingo.dev runs on Supabase
 
-Everything business critical at Lingo.dev lives in Supabase, including customers' localization engine configurations, glossaries, brand voices, customer organizations, and the embeddings that power the platform. When a translation request reaches a localization engine, Lingo.dev breaks the source content into phrases, embeds them, and runs a similarity search against the context corpus's vector indices using pgvector on Supabase. That search retrieves the terms, voice, and rules that match, and injects them into the model's context before it generates a translation. This retrieval step is what makes a localization engine stateful, and it runs entirely on Postgres.
+Everything business critical at Lingo.dev lives in Supabase, including customers' localization engine configurations, glossaries, brand voices, customer organizations, and the embeddings that power the platform. When a translation request reaches a localization engine, Lingo.dev breaks the source content into phrases, embeds them, and runs a similarity search against the context corpus's vector indices using [pgvector](https://supabase.com/docs/guides/database/extensions/pgvector) on Supabase. That search retrieves the terms, voice, and rules that match, and injects them into the model's context before it generates a translation. This retrieval step is what makes a localization engine stateful, and it runs entirely on Postgres.
 
 <Quote img="veronica-lingo.jpg" caption="Veronica Prilutskaya, Co-founder and CPO, Lingo.dev">
   pgvector played a real role in the decision, and it keeps earning it. We're happy with the
@@ -106,7 +106,7 @@ That advantage showed up early. While the team was closing its first enterprise 
   with how fast we moved.
 </Quote>
 
-Lingo.dev now uses the Supabase MCP server as part of its development workflow. The team's AI tooling works with the database directly.
+Lingo.dev now uses the [Supabase MCP server](https://supabase.com/features/mcp-server) as part of its development workflow. The team's AI tooling works with the database directly.
 
 ## Zero questions, every security review
 

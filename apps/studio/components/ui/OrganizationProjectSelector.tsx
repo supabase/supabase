@@ -237,7 +237,7 @@ export const OrganizationProjectSelector = ({
         placeholder={searchPlaceholder}
         handleReset={() => setSearch('')}
         wrapperClassName={embedded ? 'shrink-0 border-b' : undefined}
-        className="text-base sm:text-sm"
+        className="text-sm"
       />
       <CommandList
         className={

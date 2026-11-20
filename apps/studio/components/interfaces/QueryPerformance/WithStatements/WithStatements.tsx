@@ -22,7 +22,6 @@ import { unguarded } from '@/data/fetchers'
 import { useReadReplicasQuery } from '@/data/read-replicas/replicas-query'
 import { formatDatabaseID } from '@/data/read-replicas/replicas.utils'
 import { executeSql } from '@/data/sql/execute-sql-mutation'
-import { useInfiniteScroll } from '@/hooks/misc/useInfiniteScroll'
 import { useLocalStorageQuery } from '@/hooks/misc/useLocalStorage'
 import { useSelectedProjectQuery } from '@/hooks/misc/useSelectedProject'
 import { DOCS_URL, IS_PLATFORM } from '@/lib/constants'
@@ -91,13 +90,6 @@ export const WithStatements = ({
   }, [data, indexAdvisor])
 
   const { data: databases } = useReadReplicasQuery({ projectRef: ref })
-
-  const handleScroll = useInfiniteScroll({
-    isLoading,
-    isFetchingNextPage,
-    hasNextPage,
-    fetchNextPage,
-  })
 
   useEffect(() => {
     state.setSelectedDatabaseId(ref)
@@ -249,7 +241,10 @@ export const WithStatements = ({
             : null
         }
         onRetry={handleRefresh}
-        onScroll={handleScroll}
+        hasNextPage={hasNextPage}
+        isFetchingNextPage={isFetchingNextPage}
+        isRefetching={isRefetching}
+        fetchNextPage={fetchNextPage}
       />
       <div
         className={cn('px-6 py-6 flex gap-x-4 border-t relative', {

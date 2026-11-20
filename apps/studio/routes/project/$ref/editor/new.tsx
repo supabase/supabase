@@ -1,11 +1,31 @@
-import { createFileRoute } from '@tanstack/react-router'
+import { createFileRoute, useNavigate } from '@tanstack/react-router'
 
-import EditorNewPage from '@/pages/project/[ref]/editor/new'
+import { DeleteConfirmationDialogs } from '@/components/interfaces/TableGridEditor/DeleteConfirmationDialogs'
+import { SidePanelEditor } from '@/components/interfaces/TableGridEditor/SidePanelEditor/SidePanelEditor'
+import { useCloseDeletedTableTab } from '@/components/interfaces/TableGridEditor/useCloseDeletedTableTab'
+import { NewTab } from '@/components/layouts/Tabs/NewTab'
 
 export const Route = createFileRoute('/project/$ref/editor/new')({
-  component: TableEditorNewRoute,
+  component: EditorNewPage,
 })
 
-function TableEditorNewRoute() {
-  return <EditorNewPage dehydratedState={undefined} />
+function EditorNewPage() {
+  const navigate = useNavigate()
+  const { closeDeletedTableTab } = useCloseDeletedTableTab()
+  const { ref: projectRef } = Route.useParams()
+
+  const onTableCreated = (table: { id: number }) => {
+    void navigate({
+      to: '/project/$ref/editor/$id',
+      params: { ref: projectRef, id: String(table.id) },
+    })
+  }
+
+  return (
+    <>
+      <NewTab />
+      <SidePanelEditor onTableCreated={onTableCreated} />
+      <DeleteConfirmationDialogs onTableDeleted={closeDeletedTableTab} />
+    </>
+  )
 }

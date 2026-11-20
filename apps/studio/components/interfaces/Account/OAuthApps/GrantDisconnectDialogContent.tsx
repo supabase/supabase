@@ -11,11 +11,11 @@ import {
   DialogTitle,
 } from 'ui'
 
+import { OAuthGrant } from '@/data/oauth-apps/oauth-apps-grants-query'
 import { useOAuthGrantRevokeMutation } from '@/data/oauth-apps/oauth-apps-revoke-grant-mutation'
-import { MemberOauthGrantItem } from '@/data/oauth-apps/types'
 
 interface GrantDisconnectDialogContentProps extends ComponentProps<typeof DialogContent> {
-  grant: MemberOauthGrantItem
+  grant: OAuthGrant
   onClose: () => void
 }
 
@@ -26,7 +26,7 @@ export const GrantDisconnectDialogContent = ({
 }: GrantDisconnectDialogContentProps) => {
   const { mutate: revokeGrant, isPending } = useOAuthGrantRevokeMutation({
     onSuccess: () => {
-      toast.success(`Revoked access for ${grant?.app?.name}`)
+      toast.success(`Revoked access for ${grant?.attributes.app?.name}`)
       onClose()
     },
   })
@@ -34,14 +34,14 @@ export const GrantDisconnectDialogContent = ({
   return (
     <DialogContent size="small" {...props}>
       <DialogHeader>
-        <DialogTitle>Revoke access for {grant?.app?.name}</DialogTitle>
+        <DialogTitle>Revoke access for {grant?.attributes.app?.name}</DialogTitle>
       </DialogHeader>
       <DialogSectionSeparator />
       <DialogSection>
         <div className="flex flex-col gap-4 text-sm text-foreground-light">
           <p>
-            {grant?.app.name} will no longer be able to access your projects. To reconnect,
-            authorize {grant?.app.name} again and reselect your projects.
+            {grant?.attributes.app.name} will no longer be able to access your projects. To
+            reconnect, authorize {grant?.attributes.app.name} again and reselect your projects.
           </p>
           <p>Other organization members won't be affected.</p>
         </div>
@@ -57,7 +57,7 @@ export const GrantDisconnectDialogContent = ({
           variant="danger"
           loading={isPending}
           onClick={() => {
-            if (grant) revokeGrant({ slug: grant.organization.slug, grantId: grant.grant_id })
+            if (grant) revokeGrant({ grantId: grant.id })
           }}
         >
           Revoke

@@ -7,7 +7,7 @@
 
 [Supabase](https://supabase.com) 是一个开源的 Firebase 替代品。我们正在使用企业级的开源工具构建 Firebase 的功能。
 
-- [x] Postgres 数据库托管。[文档](https://supabase.com/docs/guides/database)
+- [x] Postgres 数据库托管。[文档](https://supabase.com/docs/guides/database/overview)
 - [x] 身份验证和授权。[文档](https://supabase.com/docs/guides/auth)
 - [x] 自动生成的 API。
   - [x] REST。[文档](https://supabase.com/docs/guides/api)
@@ -46,15 +46,15 @@ Supabase 是一个开源工具的组合。我们正在使用企业级的开源�
 **当前架构**
 
 Supabase 是一个[托管平台](https://supabase.com/dashboard)。你可以注册并开始使用 Supabase，而无需安装任何软件。
-你也可以[自托管](https://supabase.com/docs/guides/hosting/overview)和[本地开发](https://supabase.com/docs/guides/local-development)。
+你也可以[自托管](https://supabase.com/docs/guides/self-hosting)和[本地开发](https://supabase.com/docs/guides/local-development)。
 
 ![架构](https://github.com/supabase/supabase/blob/master/apps/docs/public/img/supabase-architecture.svg)
 
 - [PostgreSQL](https://www.postgresql.org/) 是一个对象关系型数据库系统，经过 30 多年的积极开发，它在可靠性、功能健壮性和性能方面赢得了很好的声誉。
 - [Realtime](https://github.com/supabase/realtime) 是一个 Elixir 服务器，允许你使用 WebSocket 监听 PostgreSQL 的插入、更新和删除。Supabase 监听 Postgres 的内置复制功能，将复制的字节流转换为 JSON，然后通过 WebSocket 广播 JSON。
 - [PostgREST](http://postgrest.org/) 是一个 Web 服务器，可以将你的 PostgreSQL 数据库直接生成 RESTful API
-- [GoTrue](https://github.com/supabase/gotrue) 是一个基于 SWT 的 API，用于管理用户和发布 SWT 令牌。
-- [Storage](https://github.com/supabase/storage-api) 提供了一个 RESTful 接口，用于管理存储在 S3 中的文件，使用 Postgres 来管理权限。
+- [GoTrue](https://github.com/supabase/auth) 是一个基于 SWT 的 API，用于管理用户和发布 SWT 令牌。
+- [Storage](https://github.com/supabase/storage) 提供了一个 RESTful 接口，用于管理存储在 S3 中的文件，使用 Postgres 来管理权限。
 - [pg_graphql](http://github.com/supabase/pg_graphql/) 公开GraphQL API的PostgreSQL扩展
 - [postgres-meta](https://github.com/supabase/postgres-meta) 是一个 RESTful API，用于管理你的 Postgres，允许你获取表、添加角色和运行查询等。
 - [Kong](https://github.com/Kong/kong) 是一个云原生 API 网关。
@@ -74,9 +74,9 @@ Supabase 是一个[托管平台](https://supabase.com/dashboard)。你可以注�
     <th></th>
     <th>Supabase</th>
     <th><a href="https://github.com/postgrest/postgrest" target="_blank" rel="noopener noreferrer">PostgREST</a></th>
-    <th><a href="https://github.com/supabase/gotrue" target="_blank" rel="noopener noreferrer">GoTrue</a></th>
+    <th><a href="https://github.com/supabase/auth" target="_blank" rel="noopener noreferrer">GoTrue</a></th>
     <th><a href="https://github.com/supabase/realtime" target="_blank" rel="noopener noreferrer">Realtime</a></th>
-    <th><a href="https://github.com/supabase/storage-api" target="_blank" rel="noopener noreferrer">Storage</a></th>
+    <th><a href="https://github.com/supabase/storage" target="_blank" rel="noopener noreferrer">Storage</a></th>
     <th>Functions</th>
   </tr>
   <!-- TEMPLATE FOR NEW ROW -->
@@ -122,7 +122,7 @@ Supabase 是一个[托管平台](https://supabase.com/dashboard)。你可以注�
   </tr>
     <tr>
     <td>Python</td>
-    <td><a href="https://github.com/supabase-community/supabase-py" target="_blank" rel="noopener noreferrer">supabase-py</a></td>
+    <td><a href="https://github.com/supabase/supabase-py" target="_blank" rel="noopener noreferrer">supabase-py</a></td>
     <td><a href="https://github.com/supabase-community/postgrest-py" target="_blank" rel="noopener noreferrer">postgrest-py</a></td>
     <td><a href="https://github.com/supabase-community/gotrue-py" target="_blank" rel="noopener noreferrer">gotrue-py</a></td>
     <td><a href="https://github.com/supabase-community/realtime-py" target="_blank" rel="noopener noreferrer">realtime-py</a></td>
@@ -134,7 +134,7 @@ Supabase 是一个[托管平台](https://supabase.com/dashboard)。你可以注�
   <!-- notranslate -->
   <tr>
     <td>C#</td>
-    <td><a href="https://github.com/supabase-community/supabase-csharp" target="_blank" rel="noopener noreferrer">supabase-csharp</a></td>
+    <td><a href="https://github.com/supabase/supabase-csharp" target="_blank" rel="noopener noreferrer">supabase-csharp</a></td>
     <td><a href="https://github.com/supabase-community/postgrest-csharp" target="_blank" rel="noopener noreferrer">postgrest-csharp</a></td>
     <td><a href="https://github.com/supabase-community/gotrue-csharp" target="_blank" rel="noopener noreferrer">gotrue-csharp</a></td>
     <td><a href="https://github.com/supabase-community/realtime-csharp" target="_blank" rel="noopener noreferrer">realtime-csharp</a></td>

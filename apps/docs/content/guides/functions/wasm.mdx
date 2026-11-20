@@ -24,7 +24,7 @@ You can use different languages and SDKs to write Wasm modules. For this tutoria
 
 <Admonition type="note">
 
-Follow this [guide on writing Wasm modules in Rust](https://developer.mozilla.org/en-US/docs/WebAssembly/Rust_to_Wasm) to setup your dev environment.
+Follow this [guide on writing Wasm modules in Rust](https://developer.mozilla.org/en-US/docs/WebAssembly/Guides/Rust_to_Wasm) to setup your dev environment.
 
 </Admonition>
 <StepHikeCompact>
@@ -118,7 +118,7 @@ Supabase Edge Functions currently use Deno 1.46. From [Deno 2.1, importing Wasm 
 
 ## Bundle and deploy
 
-Before deploying, ensure the Wasm module is bundled with your function by defining it in `supabase/config.toml`:
+Before deploying, ensure the Wasm module is bundled with your function by defining it in your config file (`supabase/config.toml` or `supabase/config.jsonc`):
 
 <Admonition type="note">
 
@@ -127,7 +127,7 @@ Before deploying, ensure the Wasm module is bundled with your function by defini
 
 </Admonition>
 
-```toml
+```toml supabase/config.toml
 [functions.wasm-add]
 static_files = [ "./functions/wasm-add/add-wasm/pkg/*"]
 ```

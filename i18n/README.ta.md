@@ -9,7 +9,7 @@
 
 [சுபாபேஸ்](https://supabase.com) என்பது ஒரு திறந்த மூல ஃபயர்பேஸ் மாற்றாகும். நிறுவன-தர திறந்த மூல கருவிகளைப் பயன்படுத்தி ஃபயர்பேஸ் இன் அம்சங்களை நாங்கள் உருவாக்குகிறோம்.
 
-- [x] ஹோஸ்ட் செய்யப்பட்ட பூஸ்ட்ஜீஆர்இஎஸ் தரவுத்தளம். [ஆவணம்](https://supabase.com/docs/guides/database)
+- [x] ஹோஸ்ட் செய்யப்பட்ட பூஸ்ட்ஜீஆர்இஎஸ் தரவுத்தளம். [ஆவணம்](https://supabase.com/docs/guides/database/overview)
 - [x] அங்கீகாரம் மற்றும் அங்கீகாரம்.. [ஆவணம்](https://supabase.com/docs/guides/auth)
 - [x] தானாக உருவாக்கப்பட்ட ஏபிஐ கள்.
   - [x] ராஸ்ட். [ஆவணம்](https://supabase.com/docs/guides/api#rest-api-overview)
@@ -56,14 +56,14 @@
 **கட்டிடக்கலை**
 
 சுபாபேஸ் ஒரு [ஹோஸ்ட் செய்யப்பட்ட தளம்](https://supabase.com/dashboard). எதையும் நிறுவாமல் நீங்கள் பதிவுசெய்து Supabase ஐப் பயன்படுத்தத் தொடங்கலாம்.
-நீங்கள் [சுய ஹோஸ்ட்](https://supabase.com/docs/guides/hosting/overview) மற்றும் [உள்நாட்டில் உருவாக்க](https://supabase.com/docs/guides/local-development) ஆகியவற்றையும் செய்யலாம்.
+நீங்கள் [சுய ஹோஸ்ட்](https://supabase.com/docs/guides/self-hosting) மற்றும் [உள்நாட்டில் உருவாக்க](https://supabase.com/docs/guides/local-development) ஆகியவற்றையும் செய்யலாம்.
 
 ![கட்டிடக்கலை](https://github.com/supabase/supabase/blob/master/apps/docs/public/img/supabase-architecture.svg)
 
 - [பூஸ்ட்ஜீஆர்இஎஸ்கியூஎல்](https://www.postgresql.org/) என்பது 30 ஆண்டுகளுக்கும் மேலான செயலில் உள்ள வளர்ச்சியுடன் கூடிய ஒரு பொருள்-தொடர்புடைய தரவுத்தள அமைப்பாகும், இது நம்பகத்தன்மை, அம்ச உறுதிப்பாடு மற்றும் செயல்திறனுக்கான வலுவான நற்பெயரைப் பெற்றுள்ளது.
 - [நிகழ்நேரம்](https://github.com/supabase/realtime) என்பது ஒரு எலிக்சர் சேவையகமாகும், இது வெப்சாக்கெட்டுகளைப் பயன்படுத்தி பூஸ்ட்ஜீஆர்இஎஸ்கியூஎல் செருகல்கள், புதுப்பிப்புகள் மற்றும் நீக்குதல்களைக் கேட்க உங்களை அனுமதிக்கிறது. நிகழ்நேர கருத்துக் கணிப்புகள் தரவுத்தள மாற்றங்களுக்கான போஸ்ட்கிரஸின் உள்ளமைக்கப்பட்ட பிரதிபலிப்பு செயல்பாடு, ஜே.எஸ்.ஆனுக்கு மாற்றங்களை மாற்றுகிறது, பின்னர் அங்கீகரிக்கப்பட்ட வாடிக்கையாளர்களுக்கு வெப்சாக்கெட்டுகள் மூலம் ஜே.எஸ்.என் ஐ ஒளிபரப்புகிறது.
 - [போஸ்ட்ஜீராஸ்ட்](http://postgrest.org/) என்பது உங்கள் பூஸ்ட்ஜீஆர்இஎஸ்கியூஎல் தரவுத்தளத்தை நேரடியாக ராஸ்ட் ஏபிஐ ஆக மாற்றும் ஒரு வலை சேவையகமாகும்
-- [சேமிப்பகம்](https://github.com/supabase/storage-api) அனுமதிகளை நிர்வகிக்க போஸ்ட்கிரெஸைப் பயன்படுத்தி, S3 இல் சேமிக்கப்பட்ட கோப்புகளை நிர்வகிப்பதற்கான ராஸ்ட் இடைமுகத்தை வழங்குகிறது.
+- [சேமிப்பகம்](https://github.com/supabase/storage) அனுமதிகளை நிர்வகிக்க போஸ்ட்கிரெஸைப் பயன்படுத்தி, S3 இல் சேமிக்கப்பட்ட கோப்புகளை நிர்வகிப்பதற்கான ராஸ்ட் இடைமுகத்தை வழங்குகிறது.
 - [பூஸ்ட்ஜீஆர்இ-மெட்டா](https://github.com/supabase/postgres-meta) என்பது உங்கள் போஸ்ட்கிரேஸை நிர்வகிப்பதற்கான ஒரு ராஸ்ட் ஏபிஐ ஆகும், இது அட்டவணைகளைப் பெறவும், பாத்திரங்களைச் சேர்க்கவும், கேள்விகளை இயக்கவும் உங்களை அனுமதிக்கிறது.
 - [கூட்ரூ](https://github.com/netlify/gotrue) என்பது பயனர்களை நிர்வகிப்பதற்கும் எஸ்டபிள்யூடி டோக்கன்கள் வழங்குவதற்கும் எஸ்டபிள்யூடி அடிப்படையிலான ஏபிஐ ஆகும்.
 - [காங்](https://github.com/Kong/kong) என்பது கிளவுட்-நேட்டிவ் ஏபிஐ நுழைவாயில் ஆகும்.
@@ -83,9 +83,9 @@
     <th></th>
     <th>சுபாபேஸ்</th>
     <th><a href="https://github.com/postgrest/postgrest" target="_blank" rel="noopener noreferrer">போஸ்ட்ஜீராஸ்ட்</a></th>
-    <th><a href="https://github.com/supabase/gotrue" target="_blank" rel="noopener noreferrer">கூட்ரூ</a></th>
+    <th><a href="https://github.com/supabase/auth" target="_blank" rel="noopener noreferrer">கூட்ரூ</a></th>
     <th><a href="https://github.com/supabase/realtime" target="_blank" rel="noopener noreferrer">நிகழ்நேரம்</a></th>
-    <th><a href="https://github.com/supabase/storage-api" target="_blank" rel="noopener noreferrer">சேமிப்பு</a></th>
+    <th><a href="https://github.com/supabase/storage" target="_blank" rel="noopener noreferrer">சேமிப்பு</a></th>
   </tr>
   <!-- TEMPLATE FOR NEW ROW -->
   <!-- START ROW
@@ -110,7 +110,7 @@
   <th colspan="6">💚 பொதுச் சொத்துரிமை 💚</th>
   <tr>
     <td>C#</td>
-    <td><a href="https://github.com/supabase-community/supabase-csharp" target="_blank" rel="noopener noreferrer">சுபாபேஸ்-ஸேசர்ப</a></td>
+    <td><a href="https://github.com/supabase/supabase-csharp" target="_blank" rel="noopener noreferrer">சுபாபேஸ்-ஸேசர்ப</a></td>
     <td><a href="https://github.com/supabase-community/postgrest-csharp" target="_blank" rel="noopener noreferrer">போஸ்ட்ஜீராஸ்ட்-ஸேசர்ப</a></td>
     <td><a href="https://github.com/supabase-community/gotrue-csharp" target="_blank" rel="noopener noreferrer">கூட்ரூ-ஸேசர்ப</a></td>
     <td><a href="https://github.com/supabase-community/realtime-csharp" target="_blank" rel="noopener noreferrer">நிகழ்நேரம்-ஸேசர்ப</a></td>
@@ -150,7 +150,7 @@
   </tr>
   <tr>
     <td>பித்தன்</td>
-    <td><a href="https://github.com/supabase-community/supabase-py" target="_blank" rel="noopener noreferrer">சுபாபேஸ்-பை</a></td>
+    <td><a href="https://github.com/supabase/supabase-py" target="_blank" rel="noopener noreferrer">சுபாபேஸ்-பை</a></td>
     <td><a href="https://github.com/supabase-community/postgrest-py" target="_blank" rel="noopener noreferrer">போஸ்ட்ஜீராஸ்ட்-பை</a></td>
     <td><a href="https://github.com/supabase-community/gotrue-py" target="_blank" rel="noopener noreferrer">கூட்ரூ-பை</a></td>
     <td><a href="https://github.com/supabase-community/realtime-py" target="_blank" rel="noopener noreferrer">நிகழ்நேரம்-பை</a></td>

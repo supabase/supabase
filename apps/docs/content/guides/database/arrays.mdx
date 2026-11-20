@@ -198,8 +198,9 @@ Postgres uses 1-based indexing (e.g., `textarray[1]` is the first item in the ar
 
 To select the first item from the array and get the total length of the array:
 
-```js
-SELECT textarray[1], array_length(textarray, 1) FROM arraytest;
+{/* prettier-ignore */}
+```sql
+select textarray[1], array_length(textarray, 1) from arraytest;
 ```
 
 returns:

@@ -2,8 +2,7 @@ import { createFileRoute, redirect, type AnyRouter } from '@tanstack/react-route
 
 import { IS_PLATFORM } from '@/lib/constants'
 
-// `/` is never rendered — it always redirects. Mirrors the Next.js
-// `redirects()` rules in next.config.ts: platform sends users to `/org`
+// `/` is never rendered — it always redirects: platform sends users to `/org`
 // (or `/new/new-project` when deep-linked with `?next=new-project`),
 // self-hosted sends them straight to `/project/default`.
 export const Route = createFileRoute('/')({
@@ -11,8 +10,8 @@ export const Route = createFileRoute('/')({
     next: typeof search.next === 'string' ? search.next : undefined,
   }),
   beforeLoad: ({ search, location }) => {
-    // Next's redirects() carries the incoming query and hash through to the
-    // destination — deep links like `/?next=new-project&projectName=x` must
+    // Carry the incoming query and hash through to the destination — deep
+    // links like `/?next=new-project&projectName=x` must
     // keep `projectName`. Only the consumed `next` param is dropped (and only
     // when it matched); everything else passes through.
     const carried = (shouldConsumeNext: boolean) => {
