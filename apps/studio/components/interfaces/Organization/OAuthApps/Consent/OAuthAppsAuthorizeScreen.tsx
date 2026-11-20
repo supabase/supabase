@@ -1,5 +1,5 @@
 import { useQuery } from '@tanstack/react-query'
-import { useEffect, useMemo, useRef, useState } from 'react'
+import { useEffect, useMemo, useState } from 'react'
 import { toast } from 'sonner'
 import { Button } from 'ui'
 import { Admonition } from 'ui-patterns/Admonition'
@@ -9,6 +9,7 @@ import { AuthorizeSuccessScreen } from './AuthorizeSuccessScreen'
 import { AuthorizingAsCard } from './AuthorizingAsCard'
 import { NoProjectsNotice } from './NoProjectsNotice'
 import { getFailedProjects, getPreselectedProjectRefs } from './OAuthAppsAuthorizeScreen.utils'
+import { OrganizationSelect } from './OrganizationSelect'
 import { MAX_SELECTED_PROJECTS, ProjectMultiSelect } from './ProjectMultiSelect'
 import { ScopeGroupCard } from './ScopeGroupCard'
 import { ScopeGroupCardWithDiff } from './ScopeGroupCardWithDiff'
@@ -43,7 +44,7 @@ export interface OAuthAppsAuthorizeScreenProps {
 
 export const OAuthAppsAuthorizeScreen = ({
   authId,
-  organizationSlug,
+  organizationSlug: initialOrganizationSlug,
   projectRef,
   navigate,
 }: OAuthAppsAuthorizeScreenProps) => {
@@ -74,6 +75,12 @@ export const OAuthAppsAuthorizeScreen = ({
     isLoading: isPendingIdentity,
     isError: isErrorIdentity,
   } = useProfile()
+
+  const [organizationSlug, setOrganizationSlug] = useState(initialOrganizationSlug)
+  const handleOrganizationChange = (slug: string) => {
+    setOrganizationSlug(slug)
+    setSelectedProjectRefs([])
+  }
 
   const {
     data: memberOrg,
@@ -171,16 +178,13 @@ export const OAuthAppsAuthorizeScreen = ({
     }
   )
 
-  const seeded = useRef(false)
   useEffect(() => {
-    if (seeded.current || !preflightData || !memberOrg) return
+    if (!preflightData || !memberOrg) return
 
     const grant = preflightData.existing_grant
     const hasAllProjectsGrant =
       grant !== null && (grant?.project_refs == null || grant?.project_refs?.length === 0)
     if (!hasAllProjectsGrant && !initialProjectsData) return
-
-    seeded.current = true
 
     if (hasAllProjectsGrant && isProjectScopingModeEnabled) {
       setAllProjectsSelected(true)
@@ -462,19 +466,16 @@ export const OAuthAppsAuthorizeScreen = ({
         <fieldset disabled={isSubmitting} className="contents">
           <AuthorizingAsCard
             email={profile!.primary_email}
-            organizationName={memberOrg.name}
             onSignOut={handleSignOut}
             request={request}
           />
-
+          <OrganizationSelect
+            organization={memberOrg}
+            onOrganizationChange={handleOrganizationChange}
+          />
           {isBlockedOnProjects && (
-            <NoProjectsNotice
-              appName={request.name}
-              organizationName={memberOrg.name}
-              onSwitchOrg={handleSwitchOrg}
-            />
+            <NoProjectsNotice appName={request.name} organizationName={memberOrg.name} />
           )}
-
           {canProceed && isProjectScopingModeEnabled && (
             <div className="flex flex-col gap-2">
               <ProjectMultiSelect

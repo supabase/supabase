@@ -51,7 +51,7 @@ async function toggleProject(projectName: string) {
 }
 
 async function selectProject(projectName: string) {
-  fireEvent.click(await screen.findByRole('combobox'))
+  fireEvent.click(await screen.findByRole('combobox', { name: 'Projects' }))
   await toggleProject(projectName)
 }
 
@@ -370,7 +370,6 @@ describe('OAuthAppsAuthorizeScreen', () => {
     })
     renderScreen()
 
-    await screen.findByRole('combobox')
     await selectProject('northwind-storefront')
     fireEvent.click(await enabledAuthorizeButton(/Authorize Vercel/))
 
@@ -508,7 +507,7 @@ describe('OAuthAppsAuthorizeScreen', () => {
 
     expect(await screen.findByText('All projects, including future ones')).toBeInTheDocument()
     expect(await enabledAuthorizeButton()).toBeEnabled()
-    expect(screen.queryByRole('combobox')).not.toBeInTheDocument()
+    expect(screen.queryByRole('combobox', { name: 'Projects' })).not.toBeInTheDocument()
     expect(
       screen.queryByText('Must select at least one project to authorize.')
     ).not.toBeInTheDocument()
@@ -670,7 +669,7 @@ describe('OAuthAppsAuthorizeScreen', () => {
 
     fireEvent.click(screen.getByRole('checkbox'))
 
-    expect(screen.queryByRole('combobox')).not.toBeInTheDocument()
+    expect(screen.queryByRole('combobox', { name: 'Projects' })).not.toBeInTheDocument()
     const authorizeButton = screen.getByRole('button', { name: /Authorize Vercel/ })
     expect(authorizeButton).toBeEnabled()
     fireEvent.click(authorizeButton)
