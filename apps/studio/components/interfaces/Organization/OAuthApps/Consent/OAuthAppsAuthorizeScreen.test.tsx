@@ -222,6 +222,61 @@ describe('OAuthAppsAuthorizeScreen', () => {
     expect(screen.queryByText('Read-only for your role')).not.toBeInTheDocument()
   })
 
+  test('blocks organization-wide authorization when preflight reports insufficient permissions', async () => {
+    addAPIMock({
+      path: '/platform/oauth/authorizations/:id',
+      method: 'get',
+      response: () =>
+        HttpResponse.json<OAuthAppsAuthorizeRequestData>(
+          createMockRequest({ project_scoping_mode: false })
+        ),
+    })
+    addAPIMock({
+      path: '/platform/organizations',
+      method: 'get',
+      response: () =>
+        HttpResponse.json<Organization[]>([
+          createMockOrganization({ slug: 'northwind-traders', name: 'Northwind Traders' }),
+        ]),
+    })
+    addAPIMock({
+      path: '/platform/organizations/:slug/projects',
+      method: 'get',
+      response: () => HttpResponse.json<OrgProjectsResponse>(createMockOrganizationProjects()),
+    })
+    addAPIMock({
+      path: '/platform/organizations/:slug/oauth/authorizations/:id/preflight',
+      method: 'get',
+      response: () =>
+        HttpResponse.json<OAuthAppsPreflightValidationData>(
+          createMockPreflight({
+            validation_failure: {
+              scope_target: 'all_projects',
+              role: { name: 'read-only' },
+              failed_scopes: ['database:write'],
+            },
+          })
+        ),
+    })
+    const approve = vi.fn(() => HttpResponse.json<OAuthAppsAuthorizeApproveData>({ url: '' }))
+    addAPIMock({
+      path: '/platform/organizations/:slug/oauth/authorizations/:id',
+      method: 'post',
+      response: approve,
+    })
+
+    renderScreen()
+
+    expect(
+      await screen.findByText('You don’t have permission to authorize this application')
+    ).toBeInTheDocument()
+    expect(screen.queryByRole('heading', { name: 'Permissions requested' })).not.toBeInTheDocument()
+    const authorize = screen.getByRole('button', { name: 'Authorize Vercel' })
+    expect(authorize).toBeDisabled()
+    fireEvent.click(authorize)
+    expect(approve).not.toHaveBeenCalled()
+  })
+
   test('renders the empty-org notice, hides permissions, and shows the cancel footer', async () => {
     addAPIMock({
       path: '/platform/oauth/authorizations/:id',
