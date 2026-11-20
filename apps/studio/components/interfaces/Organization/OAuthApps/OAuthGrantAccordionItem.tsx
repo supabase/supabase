@@ -12,7 +12,8 @@ interface OAuthGrantAccordionItemProps {
   icon: ReactNode
   title: string
   description: string
-  sections: { label: string; values: string[] }[]
+  children?: ReactNode
+  sections?: { label: string; values: string[] }[]
 }
 
 export const OAuthGrantAccordionItem = ({
@@ -20,7 +21,8 @@ export const OAuthGrantAccordionItem = ({
   icon,
   title,
   description,
-  sections,
+  sections = [],
+  children,
 }: OAuthGrantAccordionItemProps) => {
   return (
     <AccordionItem value={value} className="border-b-0">
@@ -33,6 +35,7 @@ export const OAuthGrantAccordionItem = ({
       </AccordionTrigger>
       <AccordionContent>
         <div className="flex flex-col gap-y-2 pl-8">
+          {children}
           {sections
             .filter((section) => section.values.length > 0)
             .map((section) => (

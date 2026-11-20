@@ -46,7 +46,7 @@ const rowFor = async (name: string) => {
 
 const openRowMenu = async (name: string) => {
   const row = await rowFor(name)
-  await userEvent.click(within(row).getByRole('button'))
+  await userEvent.click(within(row).getByRole('button', { name: 'Manage app' }))
 }
 
 beforeEach(() => {
@@ -116,22 +116,33 @@ describe('OAuthAppsAuthorizedList', () => {
 
     expect(screen.getByRole('columnheader', { name: 'Permissions' })).toBeInTheDocument()
     const partner = await rowFor('Example Partner')
-    expect(partner).toHaveTextContent('Table data · Read and write')
+    expect(partner).toHaveTextContent('Database access')
     expect(partner).not.toHaveTextContent('preview-app-1')
     expect(partner).not.toHaveTextContent('northwind-cms')
     expect(await rowFor('Example Deploy')).toHaveTextContent('2 permissions')
 
     await openRowMenu('Example Partner')
-    await userEvent.click(await screen.findByRole('menuitem', { name: 'View grants' }))
+    await userEvent.click(await screen.findByRole('menuitem', { name: 'View access' }))
     const grants = await screen.findByRole('dialog')
     expect(grants).toHaveTextContent('preview-app-1')
     expect(grants).toHaveTextContent('example_partner_user')
-    expect(grants).toHaveTextContent('northwind-cms, northwind-storefront')
-    expect(grants).toHaveTextContent('database:write')
-    await userEvent.click(within(grants).getAllByRole('button', { name: 'Close' })[0])
+    expect(grants).toHaveTextContent('wloepwuugddbnlnsakjc')
+    expect(grants).toHaveTextContent('Run SQL on your database')
+    expect(grants).toHaveTextContent(
+      'Read rows that your access rules normally hide'
+    )
+    await userEvent.click(within(grants).getByRole('button', { name: 'Close' }))
+
+    await openRowMenu('Example Deploy')
+    await userEvent.click(await screen.findByRole('menuitem', { name: 'View access' }))
+    const deploy = await screen.findByRole('dialog')
+    expect(deploy).toHaveTextContent('northwind-cms')
+    expect(deploy).toHaveTextContent('Run SQL on your database')
+    expect(deploy).not.toHaveTextContent('Direct database access')
+    await userEvent.click(within(deploy).getByRole('button', { name: 'Close' }))
 
     await openRowMenu('Example Partner')
-    await userEvent.click(await screen.findByRole('menuitem', { name: 'Revoke grants' }))
+    await userEvent.click(await screen.findByRole('menuitem', { name: 'Revoke access' }))
 
     const dialog = await screen.findByRole('dialog')
     expect(dialog).toHaveTextContent('New connections will be blocked immediately.')
@@ -153,15 +164,13 @@ describe('OAuthAppsAuthorizedList', () => {
     customRender(<OAuthAppsAuthorizedList />)
 
     await openRowMenu('Vercel')
-    await userEvent.click(await screen.findByText('View grants'))
+    await userEvent.click(await screen.findByText('View access'))
 
-    expect(await screen.findByText('Member grants for Vercel')).toBeInTheDocument()
+    expect(await screen.findByText('Access for Vercel')).toBeInTheDocument()
     await userEvent.click(await screen.findByText('admin@example.com'))
 
-    expect(await screen.findByText('northwind-storefront, northwind-cms')).toBeInTheDocument()
-    expect(
-      await screen.findByText('database:read, database:write, projects:read')
-    ).toBeInTheDocument()
+    expect(await screen.findByText('northwind-storefront')).toBeInTheDocument()
+    expect(await screen.findByText('Database management')).toBeInTheDocument()
   })
 
   test('labels an organization-bound grant and reports it as covering all projects', async () => {
@@ -198,7 +207,7 @@ describe('OAuthAppsAuthorizedList', () => {
     customRender(<OAuthAppsAuthorizedList />)
 
     await openRowMenu('Vercel')
-    await userEvent.click(await screen.findByText('View grants'))
+    await userEvent.click(await screen.findByText('View access'))
 
     expect(await screen.findByText('Organization-wide')).toBeInTheDocument()
     expect(await screen.findByText(/All projects/)).toBeInTheDocument()
@@ -219,8 +228,8 @@ describe('OAuthAppsAuthorizedList', () => {
     customRender(<OAuthAppsAuthorizedList />)
 
     await openRowMenu('Vercel')
-    expect(await screen.findByText('View grants')).toBeInTheDocument()
-    expect(await screen.findByText('Revoke grants')).toBeInTheDocument()
+    expect(await screen.findByText('View access')).toBeInTheDocument()
+    expect(await screen.findByText('Revoke access')).toBeInTheDocument()
   })
 
   test('does not offer Revoke to non admins on an active row', async () => {
@@ -238,8 +247,8 @@ describe('OAuthAppsAuthorizedList', () => {
     customRender(<OAuthAppsAuthorizedList />)
 
     await openRowMenu('Vercel')
-    expect(await screen.findByText('View grants')).toBeInTheDocument()
-    expect(screen.queryByText('Revoke grants')).not.toBeInTheDocument()
+    expect(await screen.findByText('View access')).toBeInTheDocument()
+    expect(screen.queryByText('Revoke access')).not.toBeInTheDocument()
   })
 
   test('renders the revoke caveats and revokes on confirm', async () => {
@@ -261,7 +270,7 @@ describe('OAuthAppsAuthorizedList', () => {
     customRender(<OAuthAppsAuthorizedList />)
 
     await openRowMenu('Vercel')
-    await userEvent.click(await screen.findByText('Revoke grants'))
+    await userEvent.click(await screen.findByText('Revoke access'))
 
     expect(await screen.findByText('Revoke access for Vercel')).toBeInTheDocument()
     expect(screen.queryByText(/organization-wide grant will be revoked/)).not.toBeInTheDocument()

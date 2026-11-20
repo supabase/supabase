@@ -80,7 +80,6 @@ export const OAuthAppsAuthorizedList = ({ isPreview = false }: { isPreview?: boo
         <p aria-live="polite" className="sr-only">
           {statusText}
         </p>
-        {isPreview && <p className="text-sm text-foreground-light">Preview with sample apps</p>}
         {!isPreview && (isPending || isLoadingPermissions) && !isFetchingNextPage && (
           <div className="space-y-2">
             <ShimmeringLoader />
@@ -120,7 +119,7 @@ export const OAuthAppsAuthorizedList = ({ isPreview = false }: { isPreview?: boo
                     App
                   </TableHead>
                   <TableHead className={cn(!hasAuthorizedApps && 'text-foreground-muted')}>
-                    Access
+                    {isPreview ? 'Scope' : 'Access'}
                   </TableHead>
                   {isPreview && <TableHead>Permissions</TableHead>}
                   <TableHead className="text-right">
@@ -130,12 +129,13 @@ export const OAuthAppsAuthorizedList = ({ isPreview = false }: { isPreview?: boo
               </TableHeader>
               <TableBody>
                 {isPreview ? (
-                  authorizedAppsPreview.map(({ approval, scopes, databaseAccess }) => (
+                  authorizedAppsPreview.map(({ approval, projects, scopes, databaseAccess }) => (
                     <OAuthAppsAuthorizedRow
                       key={approval.id}
                       approval={approval}
                       databaseAccess={databaseAccess}
                       previewScopes={scopes}
+                      previewProjects={projects}
                       canRevoke
                     />
                   ))
