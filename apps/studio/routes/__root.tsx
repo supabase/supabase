@@ -436,8 +436,14 @@ function RootDocument({ children }: Readonly<{ children: ReactNode }>) {
         {!isTestEnv && (
           <TanStackDevtools
             // Hide the trigger by default so it doesn't overlap the dev toolbar.
-            // Open the panel with Ctrl + ~; un-hide the trigger from its settings tab.
-            config={{ position: 'bottom-right', triggerHidden: true }}
+            // Open the panel with Ctrl + Shift + ~; un-hide the trigger from its
+            // settings tab. The library default (Control + ~) never fires on
+            // layouts where ~ needs Shift, because the hotkey match is exact.
+            config={{
+              position: 'bottom-right',
+              triggerHidden: true,
+              openHotkey: ['Control', 'Shift', '~'],
+            }}
             plugins={[
               {
                 name: 'TanStack Router',
