@@ -312,8 +312,13 @@ describe('OAuthAppsAuthorizeScreen', () => {
 
     expect(screen.getByText('Permissions granted')).toBeInTheDocument()
     expect(screen.queryByText('Permissions requested')).not.toBeInTheDocument()
-    expect(screen.getByText('Database, Environment, Analytics')).toBeInTheDocument()
-    expect(screen.getByText('Secrets, Projects, Edge Functions, Storage')).toBeInTheDocument()
+    const databaseManagement = screen.getByRole('button', { name: 'Database management' })
+    expect(databaseManagement.parentElement).toHaveTextContent(
+      'Database management, Environment, Analytics'
+    )
+    expect(screen.getByRole('heading', { name: 'Read only' }).parentElement).toHaveTextContent(
+      'Secrets, Projects, Edge Functions, Storage'
+    )
   })
 
   test('an organization-bound app reaches the success screen with the authorizing identity', async () => {
@@ -915,15 +920,16 @@ describe('OAuthAppsAuthorizeScreen', () => {
     const findSpanWithText = (text: string) =>
       screen.findByText((_, element) => element?.textContent == text, { selector: 'span' })
     await findSpanWithText('Environment (New)')
-    await findSpanWithText('Analytics (Upgraded from Read)')
-    await findSpanWithText('Secrets (Demoted from Read-write)')
+    expect(screen.getByRole('button', { name: 'Environment' })).toBeInTheDocument()
+    await findSpanWithText('Analytics (Upgraded from Read only)')
+    await findSpanWithText('Secrets (Demoted from Read and write)')
     await findSpanWithText('Edge Functions (New)')
     await findSpanWithText('Storage (New)')
-    await findSpanWithText('Rest (Read)')
+    await findSpanWithText('Rest (Read only)')
 
     expect(screen.queryByText('Database')).toBeNull()
     fireEvent.click(screen.getByText('Already granted (2)'))
-    await screen.findByText('Database')
+    await screen.findByText('Database management')
   })
 
   test('flags the projects the role cannot grant after submit', async () => {
