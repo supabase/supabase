@@ -14,6 +14,8 @@ import { BooleanFormatter } from '../components/formatter/BooleanFormatter'
 import { DefaultFormatter } from '../components/formatter/DefaultFormatter'
 import { ForeignKeyFormatter } from '../components/formatter/ForeignKeyFormatter'
 import { JsonFormatter } from '../components/formatter/JsonFormatter'
+import { TimestampFormatter } from '../components/formatter/TimestampFormatter'
+import { isTimestamptzColumnFormat } from '../components/formatter/TimestampFormatter.utils'
 import { AddColumn } from '../components/grid/AddColumn'
 import { ColumnHeader } from '../components/grid/ColumnHeader'
 import { SelectColumn } from '../components/grid/SelectColumn'
@@ -241,7 +243,9 @@ function getCellRenderer(
       break
     }
     default: {
-      formatter = DefaultFormatter
+      formatter = isTimestamptzColumnFormat(columnDef.format)
+        ? TimestampFormatter
+        : DefaultFormatter
     }
   }
 
@@ -285,7 +289,7 @@ export function getColumnDefaultWidth(columnDef: SupaColumn): number {
     isDateColumn(columnDef.format) ||
     isTimeColumn(columnDef.format)
   ) {
-    return 150
+    return isTimestamptzColumnFormat(columnDef.format) ? 220 : 150
   } else if (isBoolColumn(columnDef.dataType)) {
     return 120
   } else if (isEnumColumn(columnDef.dataType)) {
