@@ -686,7 +686,7 @@ export const pricing: Pricing = {
       },
       {
         key: 'security.privateLink',
-        title: 'Supports AWS PrivateLink',
+        title: 'AWS PrivateLink',
         plans: {
           free: false,
           pro: false,
