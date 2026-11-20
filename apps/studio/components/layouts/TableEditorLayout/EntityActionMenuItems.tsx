@@ -19,9 +19,6 @@ import {
   DropdownMenuSub,
   DropdownMenuSubContent,
   DropdownMenuSubTrigger,
-  Tooltip,
-  TooltipContent,
-  TooltipTrigger,
 } from 'ui'
 
 import type { EntityAction, EntityActionGroup, EntityActionId } from './EntityActions.utils'
@@ -96,27 +93,10 @@ export const EntityActionMenuItems = ({
       )
     }
 
-    const item = (
-      <Item
-        key={action.id}
-        className="gap-x-2"
-        disabled={action.disabledReason !== undefined}
-        onClick={(e) => e.stopPropagation()}
-        onSelect={() => onSelectAction(action.id)}
-      >
+    return (
+      <Item key={action.id} className="gap-x-2" onSelect={() => onSelectAction(action.id)}>
         {content}
       </Item>
-    )
-
-    if (action.disabledReason === undefined) return item
-
-    return (
-      <Tooltip key={action.id}>
-        <TooltipTrigger asChild>
-          <div>{item}</div>
-        </TooltipTrigger>
-        <TooltipContent side="right">{action.disabledReason}</TooltipContent>
-      </Tooltip>
     )
   }
 
