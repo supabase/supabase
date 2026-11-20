@@ -1,13 +1,24 @@
 import { useParams } from 'common'
+import Link from 'next/link'
+import { usePathname } from 'next/navigation'
 import { PropsWithChildren } from 'react'
+import { NavMenu, NavMenuItem } from 'ui'
+import {
+  PageHeader,
+  PageHeaderDescription,
+  PageHeaderMeta,
+  PageHeaderNavigationTabs,
+  PageHeaderSummary,
+  PageHeaderTitle,
+} from 'ui-patterns/PageHeader'
 
 import AuthLayout from './AuthLayout'
-import { PageLayout } from '@/components/layouts/PageLayout/PageLayout'
 import { UnknownInterface } from '@/components/ui/UnknownInterface'
 import { useIsFeatureEnabled } from '@/hooks/misc/useIsFeatureEnabled'
 
 export const AuthProvidersLayout = ({ children }: PropsWithChildren<{}>) => {
   const { ref } = useParams()
+  const pathname = usePathname()
   const { authenticationSignInProviders, authenticationThirdPartyAuth } = useIsFeatureEnabled([
     'authentication:sign_in_providers',
     'authentication:third_party_auth',
@@ -31,13 +42,28 @@ export const AuthProvidersLayout = ({ children }: PropsWithChildren<{}>) => {
   return (
     <AuthLayout title="Sign In / Providers">
       {authenticationSignInProviders ? (
-        <PageLayout
-          title="Sign In / Providers"
-          subtitle="Configure authentication providers and login methods for your users"
-          navigationItems={navItems}
-        >
+        <>
+          <PageHeader>
+            <PageHeaderMeta>
+              <PageHeaderSummary>
+                <PageHeaderTitle>Sign In / Providers</PageHeaderTitle>
+                <PageHeaderDescription>
+                  Configure authentication providers and login methods for your users
+                </PageHeaderDescription>
+              </PageHeaderSummary>
+            </PageHeaderMeta>
+            <PageHeaderNavigationTabs>
+              <NavMenu>
+                {navItems.map((item) => (
+                  <NavMenuItem key={item.label} active={pathname === item.href}>
+                    <Link href={item.href}>{item.label}</Link>
+                  </NavMenuItem>
+                ))}
+              </NavMenu>
+            </PageHeaderNavigationTabs>
+          </PageHeader>
           {children}
-        </PageLayout>
+        </>
       ) : (
         <UnknownInterface urlBack={`/project/${ref}/auth/users`} />
       )}
