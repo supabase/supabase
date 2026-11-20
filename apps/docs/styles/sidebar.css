@@ -38,3 +38,34 @@
     filter: blur(1px);
   }
 }
+
+@property --docs-sidebar-fade {
+  syntax: '<length>';
+  inherits: false;
+  initial-value: 0px;
+}
+
+@keyframes docs-sidebar-fade {
+  to {
+    --docs-sidebar-fade: 32px;
+  }
+}
+
+/* the fade grows over the first 48px of scroll, so at the top it covers no focus ring */
+@supports (animation-timeline: scroll()) {
+  .docs-sidebar-scroll {
+    mask-image: linear-gradient(
+      to bottom,
+      transparent 0,
+      rgb(0 0 0 / 0.15) calc(var(--docs-sidebar-fade) * 0.25),
+      rgb(0 0 0 / 0.5) calc(var(--docs-sidebar-fade) * 0.5),
+      rgb(0 0 0 / 0.85) calc(var(--docs-sidebar-fade) * 0.75),
+      #000 var(--docs-sidebar-fade)
+    );
+    animation-name: docs-sidebar-fade;
+    animation-timing-function: linear;
+    animation-fill-mode: both;
+    animation-timeline: scroll(self block);
+    animation-range: 0 48px;
+  }
+}

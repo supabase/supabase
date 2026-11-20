@@ -109,14 +109,14 @@ const NavContainer = memo(function NavContainer({
     >
       {mobileMenuOpen ? <MobileNavLock toggleRef={toggleRef} /> : null}
       <div className="hidden lg:block shrink-0 px-4 bg-background">
-        <DocsSidebarNavTop className="-mx-4 flex border-b px-4 py-2.5" />
+        <DocsSidebarNavTop className="-mx-4 flex px-4 pt-2" />
       </div>
       <ScrollRoot className="flex min-h-0 flex-1 flex-col">
         <ScrollViewport
           // firefox makes a scroll container a tab stop, but the links inside already scroll it
           tabIndex={-1}
           className={cn(
-            'relative',
+            'docs-sidebar-scroll relative scroll-pt-8',
             'overscroll-contain',
             'lg:backdrop-blur-sm lg:backdrop-filter bg-background'
           )}
