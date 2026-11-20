@@ -66,6 +66,9 @@ catalogs:
     cn:
       specifier: ^0.4.0
       version: 0.4.0
+    effect:
+      specifier: 4.0.0-rc.112
+      version: 4.0.0-rc.112
     lucide-react:
       specifier: ^1.55.0
       version: 1.55.0
@@ -686,7 +689,7 @@ importers:
         specifier: ^16.0.3
         version: 16.3.1
       effect:
-        specifier: 4.0.0-rc.112
+        specifier: 'catalog:'
         version: 4.0.0-rc.112
       ejs:
         specifier: ^3.1.10

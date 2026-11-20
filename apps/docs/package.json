@@ -154,7 +154,7 @@
     "cheerio": "^1.0.0-rc.12",
     "config": "workspace:*",
     "dotenv": "^16.0.3",
-    "effect": "4.0.0-rc.112",
+    "effect": "catalog:",
     "ejs": "^3.1.10",
     "fast-glob": "^3.3.3",
     "globby": "^13.2.2",
