@@ -46,13 +46,18 @@ type SuccessResponse<P extends Endpoints, M extends Methods> = RemapPaths[P][M] 
 // hardcode this convention to keep error-state tests strongly typed.
 export type APIErrorBody = { message: string }
 
-// Resolver constrained to the OpenAPI success body (or the error envelope above).
+// Error envelope of the v2 Management API routes (`/v2/...`), which nest the error and have no
+// top-level `message`. Typed loosely rather than as the generated `ErrorResponseBody`, whose `code`
+// union only lists codes that are already in production.
+export type V2APIErrorBody = { error: { code: string; message: string; description?: string } }
+
+// Resolver constrained to the OpenAPI success body (or one of the error envelopes above).
 // Catches drift between mocks and the API contract. `Extract<..., DefaultBodyType>`
 // filters to the JSON-body subset to satisfy `HttpResponseResolver`'s body constraint.
 type TypedResolver<P extends Endpoints, M extends Methods> = HttpResponseResolver<
   PathParams,
   DefaultBodyType,
-  Extract<SuccessResponse<P, M>, DefaultBodyType> | APIErrorBody
+  Extract<SuccessResponse<P, M>, DefaultBodyType> | APIErrorBody | V2APIErrorBody
 >
 
 const isResponseResolver = (val: unknown): val is HttpResponseResolver => typeof val === `function`

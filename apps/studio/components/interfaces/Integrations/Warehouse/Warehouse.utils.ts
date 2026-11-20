@@ -1,14 +1,13 @@
 import type { components } from 'api-types'
 
+import type { WarehouseSetupBody } from '@/data/warehouse/warehouse-setup-mutation'
+import type { WarehouseSetupStatusData } from '@/data/warehouse/warehouse-setup-status-query'
 import { INTERNAL_SCHEMAS } from '@/hooks/useProtectedSchemas'
 import { WAREHOUSE_METADATA_SCHEMA } from '@/lib/warehouse'
 
-export type WarehouseSetupBody = components['schemas']['WarehouseSetupBody']
 export type WarehouseSetupTarget = WarehouseSetupBody['targets'][number]
-export type WarehouseSetupStatus =
-  components['schemas']['WarehouseSetupStatusResponse_Output']['setup_status']
-export type WarehouseSetupTable =
-  components['schemas']['WarehouseSetupStatusResponse_Output']['tables'][number]
+export type WarehouseSetupStatus = WarehouseSetupStatusData['setup_status']
+export type WarehouseSetupTable = WarehouseSetupStatusData['tables'][number]
 
 export function isWarehouseProvisioned(setupStatus?: WarehouseSetupStatus): boolean {
   return setupStatus === 'complete'

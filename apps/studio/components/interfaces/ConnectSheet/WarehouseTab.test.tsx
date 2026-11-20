@@ -7,34 +7,25 @@ import { HttpResponse } from 'msw'
 import { describe, expect, test, vi } from 'vitest'
 
 import { WarehouseTab } from './WarehouseTab'
+import {
+  createMockWarehouseSetupStatusResponse,
+  type WarehouseSetupStatusOverrides,
+} from '@/components/interfaces/Integrations/Warehouse/Warehouse.fixtures'
+import type { V2WarehouseSetupStatusResponse } from '@/data/warehouse/warehouse-setup-api-types'
 import { customRender } from '@/tests/lib/custom-render'
 import { addAPIMock, type APIErrorBody } from '@/tests/lib/msw'
 
-type WarehouseSetupStatusResponse = components['schemas']['WarehouseSetupStatusResponse_Output']
 type WarehouseCatalogResponse = components['schemas']['WarehouseCatalogResponse_Output']
 type UpdateWarehouseCatalogBody = components['schemas']['UpdateWarehouseCatalogBody']
 
-const FDW_STATUS: WarehouseSetupStatusResponse['fdw_status'] = {
-  extension_available: true,
-  extension_installed: true,
-  foreign_schema_imported: true,
-  schema_created: true,
-  server_configured: true,
-  wrapper_installed: true,
-}
-
-const mockSetupStatus = (status: Partial<WarehouseSetupStatusResponse>) =>
+const mockSetupStatus = (status: WarehouseSetupStatusOverrides) =>
   addAPIMock({
     method: 'get',
-    path: '/platform/warehouse/:ref/setup-status',
+    path: '/v2/projects/:ref/warehouse/setups/current',
     response: () =>
-      HttpResponse.json<WarehouseSetupStatusResponse>({
-        fdw_status: FDW_STATUS,
-        setup_status: 'not_started',
-        steps: [],
-        tables: [],
-        ...status,
-      }),
+      HttpResponse.json<V2WarehouseSetupStatusResponse>(
+        createMockWarehouseSetupStatusResponse(status)
+      ),
   })
 
 // Placeholder host and password, matching the fixtures in `lib/warehouse.test.ts`. A realistic
@@ -275,22 +266,21 @@ describe('WarehouseTab', () => {
     let requestCount = 0
     addAPIMock({
       method: 'get',
-      path: '/platform/warehouse/:ref/setup-status',
+      path: '/v2/projects/:ref/warehouse/setups/current',
       response: () => {
         requestCount += 1
         if (requestCount === 1) {
+          // A gateway timeout never reaches the v2 controller, so its body isn't the v2 error
+          // envelope.
           return HttpResponse.json<APIErrorBody>(
             { message: 'Warehouse status request timed out' },
             { status: 544 }
           )
         }
 
-        return HttpResponse.json<WarehouseSetupStatusResponse>({
-          fdw_status: FDW_STATUS,
-          setup_status: 'not_started',
-          steps: [],
-          tables: [],
-        })
+        return HttpResponse.json<V2WarehouseSetupStatusResponse>(
+          createMockWarehouseSetupStatusResponse()
+        )
       },
     })
     // AlertError renders a project-scoped link to the AI assistant.

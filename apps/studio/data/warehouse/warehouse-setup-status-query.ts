@@ -1,12 +1,11 @@
 import { useQuery } from '@tanstack/react-query'
 
 import { warehouseKeys } from './keys'
-import { get, handleError } from '@/data/fetchers'
+import { handleWarehouseV2Error } from './warehouse-v2-error'
+import { get } from '@/data/fetchers'
 import { pipelineIdSchema } from '@/data/replication/pipeline-id'
 import type { StudioError } from '@/lib/errors/studio-errors'
 import type { UseCustomQueryOptions } from '@/types'
-
-export type WarehouseSetupStatusResponse = Awaited<ReturnType<typeof getWarehouseSetupStatus>>
 
 type WarehouseSetupStatusVariables = { projectRef?: string }
 
@@ -16,18 +15,23 @@ async function getWarehouseSetupStatus(
 ) {
   if (!projectRef) throw new Error('projectRef is required')
 
-  const { data, error } = await get('/platform/warehouse/{ref}/setup-status', {
+  // No query parameters: without `selection_id` or `inspect_fdw=false` the read inspects the FDW,
+  // which the FDW setup step reports.
+  const { data, error } = await get('/v2/projects/{ref}/warehouse/setups/current', {
     params: { path: { ref: projectRef } },
     signal,
   })
   if (error) {
-    handleError(error)
+    handleWarehouseV2Error(error)
   }
 
+  const { attributes } = data.data
   return {
-    ...data,
+    ...attributes,
     pipeline_id:
-      data.pipeline_id === undefined ? undefined : pipelineIdSchema.parse(data.pipeline_id),
+      attributes.pipeline_id === undefined
+        ? undefined
+        : pipelineIdSchema.parse(attributes.pipeline_id),
   }
 }
 
