@@ -1,10 +1,9 @@
 import { createFileRoute, Link } from '@tanstack/react-router'
 import { ClockIcon } from 'lucide-react'
-import { Button } from 'ui'
+import { Button, Card, Table, TableBody, TableHead, TableHeader, TableRow } from 'ui'
 
-import RecentQueriesItem from '@/components/interfaces/Settings/Logs/RecentQueriesItem'
+import { RecentQueriesItem } from '@/components/interfaces/Settings/Logs/RecentQueriesItem'
 import { useRecentLogSqlSnippets } from '@/components/interfaces/Settings/Logs/useRecentLogSqlSnippets'
-import Table from '@/components/to-be-cleaned/Table'
 import LogsExplorerHeader from '@/components/ui/Logs/LogsExplorerHeader'
 
 export const Route = createFileRoute('/project/$ref/logs/explorer/recent')({
@@ -22,21 +21,25 @@ function LogsRecentPage() {
     <div className="mx-auto w-full px-5 py-6 h-full">
       <LogsExplorerHeader subtitle="Recent Queries" />
       {recent.length > 0 && (
-        <Table
-          head={
-            <>
-              <Table.th>Snippets</Table.th>
-              <Table.th className="w-24">
-                <Button size="tiny" onClick={() => setRecentLogSnippets([])}>
-                  Clear history
-                </Button>
-              </Table.th>
-            </>
-          }
-          body={recent.map((item) => (
-            <RecentQueriesItem key={item.unchecked_sql} item={item} />
-          ))}
-        />
+        <Card>
+          <Table>
+            <TableHeader>
+              <TableRow>
+                <TableHead>Snippets</TableHead>
+                <TableHead className="w-24">
+                  <Button size="tiny" onClick={() => setRecentLogSnippets([])}>
+                    Clear history
+                  </Button>
+                </TableHead>
+              </TableRow>
+            </TableHeader>
+            <TableBody>
+              {recent.map((item) => (
+                <RecentQueriesItem key={item.unchecked_sql} item={item} />
+              ))}
+            </TableBody>
+          </Table>
+        </Card>
       )}
       {recent.length === 0 && (
         <>

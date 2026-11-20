@@ -1,9 +1,8 @@
 import { createFileRoute, Link } from '@tanstack/react-router'
 import { SaveIcon } from 'lucide-react'
-import { Loading } from 'ui'
+import { Card, Loading, Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from 'ui'
 
 import { SavedQueriesItem } from '@/components/interfaces/Settings/Logs/Logs.SavedQueriesItem'
-import Table from '@/components/to-be-cleaned/Table'
 import LogsExplorerHeader from '@/components/ui/Logs/LogsExplorerHeader'
 import { useContentQuery } from '@/data/content/content-query'
 
@@ -33,25 +32,28 @@ function LogsSavedPage() {
       <LogsExplorerHeader subtitle="Saved Queries" />
       {saved.length > 0 && (
         <div className="flex flex-col gap-3 py-6">
-          <Table
-            headTrClasses="expandable-tr"
-            head={
-              <>
-                <Table.th>Name</Table.th>
-                <Table.th>Description</Table.th>
-                <Table.th>Created</Table.th>
-                <Table.th>Last updated</Table.th>
-                <Table.th></Table.th>
-              </>
-            }
-            body={saved.map((item) => (
-              <Table.tr key={item.id}>
-                <Table.td colSpan={5} className="p-0!">
-                  <SavedQueriesItem item={item} />
-                </Table.td>
-              </Table.tr>
-            ))}
-          />
+          <Card>
+            <Table>
+              <TableHeader>
+                <TableRow>
+                  <TableHead>Name</TableHead>
+                  <TableHead>Description</TableHead>
+                  <TableHead>Created</TableHead>
+                  <TableHead>Last updated</TableHead>
+                  <TableHead></TableHead>
+                </TableRow>
+              </TableHeader>
+              <TableBody>
+                {saved.map((item) => (
+                  <TableRow key={item.id}>
+                    <TableCell colSpan={5} className="p-0">
+                      <SavedQueriesItem item={item} />
+                    </TableCell>
+                  </TableRow>
+                ))}
+              </TableBody>
+            </Table>
+          </Card>
         </div>
       )}
       {saved.length === 0 && (
