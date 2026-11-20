@@ -75,7 +75,9 @@ test('shows latency charts and their timing boundaries', async () => {
   })
   renderSection()
   expect(await screen.findByRole('region', { name: 'Query duration' })).toBeInTheDocument()
-  expect(screen.getByText('Average · p50 · p95 · p99')).toBeInTheDocument()
+  expect(screen.getByRole('list', { name: 'Query duration series' })).toHaveTextContent(
+    'Averagep50p95p99'
+  )
   expect(screen.getByText(/excluding SQL setup such as DuckLake connections/)).toBeInTheDocument()
   expect(screen.getByText(/including result streaming and client backpressure/)).toBeInTheDocument()
 })

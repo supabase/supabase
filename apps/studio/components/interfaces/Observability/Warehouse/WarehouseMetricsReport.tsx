@@ -8,6 +8,7 @@ import { Admonition } from 'ui-patterns/Admonition'
 import { EmptyStatePresentational } from 'ui-patterns/EmptyStatePresentational'
 import { GenericSkeletonLoader } from 'ui-patterns/ShimmeringLoader'
 
+import { WarehouseCapacitySection } from './WarehouseCapacitySection'
 import { WarehouseLatencySection } from './WarehouseLatencySection'
 import { WarehouseMetricChart } from './WarehouseMetricChart'
 import { resolveWarehouseMetricsRange } from './WarehouseMetrics.range'
@@ -218,8 +219,9 @@ const WarehouseMetricsReportContent = () => {
             onResetRange={handleResetRange}
           />
           {view.kind === 'ready' && range.status === 'ok' && (
-            <div className="mt-8">
+            <div className="flex flex-col gap-y-8 mt-8">
               <WarehouseLatencySection range={range} />
+              <WarehouseCapacitySection range={range} />
             </div>
           )}
         </div>
