@@ -50,7 +50,7 @@ export const StoragePoliciesEditPolicyModal = ({
     if (state === 'new') {
       setPolicyFormFields({
         ...policyFormFields,
-        definition: `bucket_id = '${bucketName}'`,
+        definition: applyBucketIdToTemplateDefinition('bucket_id = {bucket_id}', bucketName),
       })
     }
     setView(POLICY_MODAL_VIEWS.EDITOR)
