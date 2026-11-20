@@ -1,7 +1,9 @@
 import fs from 'node:fs/promises'
 import path from 'node:path'
+import { configFormatsRemark } from '~/features/directives/ConfigFormats'
 import { parsePartialVariables, substitutePartialVars } from '~/lib/partials.utils'
 import matter from 'gray-matter'
+import yaml from 'js-yaml'
 import type { Content, Parent, Root } from 'mdast'
 import { fromMarkdown } from 'mdast-util-from-markdown'
 import { gfmFromMarkdown, gfmToMarkdown } from 'mdast-util-gfm'
@@ -13,6 +15,12 @@ import { mdxjs } from 'micromark-extension-mdxjs'
 import { parse as parseToml } from 'smol-toml'
 import { mcpConfigPanelMarkdown as McpConfigPanel } from 'ui-patterns/McpUrlBuilder/McpConfigPanel.md'
 
+import {
+  CONFIG_REFERENCE_SLUG,
+  CONFIG_REFERENCE_SPEC,
+  renderConfigReferenceMarkdown,
+  type ConfigSpec,
+} from './config-reference-markdown'
 import { stripHeadingCustomIds } from './helpers'
 import { addBaseUrlPrefix, getInternalLinkBaseUrl, withDocsBasePath } from './internal-links'
 import { Admonition } from './markdown-schema/Admonition'
@@ -43,11 +51,7 @@ import { StepHike } from './markdown-schema/StepHike'
 import { TabPanel } from './markdown-schema/TabPanel'
 import { TerraformProviderSchema } from './markdown-schema/TerraformProviderSchema'
 import { WrapperDashboardIntegration } from './markdown-schema/WrapperDashboardIntegration'
-import {
-  collectMarkdownSources,
-  type FrontmatterFormat,
-  type MarkdownSource,
-} from './markdown-sources'
+import { collectMarkdownSources, type FrontmatterFormat } from './markdown-sources'
 
 const PARTIALS_DIR = path.join(process.cwd(), 'content', '_partials')
 // The set of guide slugs that have a generated markdown (.md) variant. middleware.ts
@@ -222,6 +226,7 @@ function parseFrontmatter(raw: string, frontmatter: FrontmatterFormat) {
 async function transformBody(content: string, data: Record<string, unknown>): Promise<string> {
   const tree = parseMdx(content)
   await inlinePartials(tree)
+  configFormatsRemark()(tree as Root)
   addBaseUrlPrefix(tree)
   stripHeadingCustomIds(tree)
   applySchema(tree, SCHEMA)
@@ -249,10 +254,26 @@ async function parseSingleSource(
   return transformBody(content, data)
 }
 
-async function renderManifest(sources: MarkdownSource[]): Promise<void> {
+async function generateConfigReference(): Promise<string> {
+  const spec = yaml.load(await fs.readFile(CONFIG_REFERENCE_SPEC, 'utf8')) as ConfigSpec
+  const tree = fromMarkdown(renderConfigReferenceMarkdown(spec), {
+    extensions: [gfm()],
+    mdastExtensions: [gfmFromMarkdown()],
+  })
+  addBaseUrlPrefix(tree)
+  const outPath = `public/markdown/guides/${CONFIG_REFERENCE_SLUG}.md`
+  await fs.mkdir(path.dirname(outPath), { recursive: true })
+  await fs.writeFile(
+    outPath,
+    toMarkdown(tree, { extensions: [gfmToMarkdown()], bullet: '-', listItemIndent: 'one' })
+  )
+  return CONFIG_REFERENCE_SLUG
+}
+
+async function renderManifest(slugs: Array<string>): Promise<void> {
   // Sorted so the output is deterministic: turbo hashes this tracked file as a task input.
-  const slugs = Array.from(new Set(sources.map((s) => s.slug))).sort()
-  const content = `${JSON.stringify(slugs, null, 2)}\n`
+  const sorted = Array.from(new Set(slugs)).sort()
+  const content = `${JSON.stringify(sorted, null, 2)}\n`
 
   await fs.mkdir(path.dirname(MANIFEST_PATH), { recursive: true })
   await fs.writeFile(MANIFEST_PATH, content)
@@ -278,10 +299,11 @@ async function generate() {
     })
   )
 
-  await renderManifest(sources)
+  const configReferenceSlug = await generateConfigReference()
+  await renderManifest([...sources.map((s) => s.slug), configReferenceSlug])
 
   console.log(
-    `Generated ${sources.length} markdown files under public/markdown/guides/ and updated public/markdown/manifest.json`
+    `Generated ${sources.length + 1} markdown files under public/markdown/guides/ and updated public/markdown/manifest.json`
   )
 }
 

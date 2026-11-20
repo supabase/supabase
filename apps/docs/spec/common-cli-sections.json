@@ -520,6 +520,18 @@
         "title": "Diff local config against a remote project",
         "slug": "supabase-config-diff",
         "type": "cli-command"
+      },
+      {
+        "id": "supabase-config-convert",
+        "title": "Convert config.toml to config.jsonc",
+        "slug": "supabase-config-convert",
+        "type": "cli-command"
+      },
+      {
+        "id": "supabase-config-validate",
+        "title": "Validate the project config file",
+        "slug": "supabase-config-validate",
+        "type": "cli-command"
       }
     ]
   },
