@@ -125,7 +125,7 @@ This is possible, but only for apps that use the traditional server-only web app
 
 If your app uses any client side JavaScript to build a rich user experience, using HTTP-Only cookies is not feasible since only your server will be able to read and refresh the session of the user. The browser will not have access to the access and refresh tokens.
 
-Because of this, the Supabase JavaScript libraries provide only limited support. You can override the `storage` option when creating the Supabase client **on the server** to store the values in cookies or your preferred storage choice, for example:
+Because of this, the Supabase JavaScript libraries provide only limited support. You can override the `storage` option when creating the [Supabase client](/docs/reference/javascript/introduction) **on the server** to store the values in cookies or your preferred storage choice, for example:
 
 ```typescript
 import { createClient } from '@supabase/supabase-js'

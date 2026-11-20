@@ -1,9 +1,8 @@
-import { createFileRoute, useLocation, useNavigate } from '@tanstack/react-router'
+import { createFileRoute, useNavigate } from '@tanstack/react-router'
 import { useFlag, useParams } from 'common'
 
 import { ApiAuthorizationScreen } from '@/components/interfaces/ApiAuthorization/ApiAuthorization'
 import { OAuthAppsAuthorizeScreen } from '@/components/interfaces/Organization/OAuthApps/Consent'
-import { OAUTH_APPS_MOCK_SCENARIOS, USE_MOCKS } from '@/data/oauth-apps/mocks'
 import { withAuth } from '@/hooks/misc/withAuth'
 import { buildStudioPageTitle } from '@/lib/page-title'
 
@@ -17,46 +16,21 @@ function Authorize() {
 
 const PAGE_TITLE = buildStudioPageTitle({ section: 'Authorize API Access', brand: 'Supabase' })
 
-const MOCK_SCENARIOS: Record<string, { authId: string; organizationSlug?: string }> = {
-  default: { authId: OAUTH_APPS_MOCK_SCENARIOS.vercelDeveloper },
-  reconsent: { authId: OAUTH_APPS_MOCK_SCENARIOS.vercelReconsent },
-  reconsent_all_projects: { authId: OAUTH_APPS_MOCK_SCENARIOS.vercelReconsentAllProjects },
-  role_validation: { authId: OAUTH_APPS_MOCK_SCENARIOS.vercelRoleValidation },
-  empty_org: {
-    authId: OAUTH_APPS_MOCK_SCENARIOS.vercelDeveloper,
-    organizationSlug: 'contoso-labs',
-  },
-  dynamic_client: { authId: OAUTH_APPS_MOCK_SCENARIOS.dynamicMcpClient },
-  org_bound: { authId: OAUTH_APPS_MOCK_SCENARIOS.kemalBot },
-  org_bound_all: { authId: OAUTH_APPS_MOCK_SCENARIOS.kemalBotOrgWide },
-  user_bound_all: { authId: OAUTH_APPS_MOCK_SCENARIOS.vercelAllProjects },
-}
-
 function APIAuthorizationPage() {
   const navigate = useNavigate()
-  const { searchStr } = useLocation()
-  const { auth_id, organization_slug, mock_scenario } = useParams()
+  const { auth_id, organization_slug, project_ref } = useParams()
   const isScopedOAuthConsentEnabled = useFlag('enableScopedOAuthConsent')
-  const isScopedOAuthFlowEnabled = isScopedOAuthConsentEnabled && USE_MOCKS
 
-  const mockScenario = USE_MOCKS
-    ? (MOCK_SCENARIOS[mock_scenario ?? 'default'] ?? MOCK_SCENARIOS.default)
-    : undefined
-  const authId = mockScenario?.authId ?? auth_id
-  const organizationSlug = organization_slug ?? mockScenario?.organizationSlug
-
-  // first value when the param repeats, like Next's query arrays
-  const projectRef = new URLSearchParams(searchStr).get('project_ref')
-
-  if (isScopedOAuthFlowEnabled) {
+  if (isScopedOAuthConsentEnabled) {
     return (
       <>
         <title>{PAGE_TITLE}</title>
         <OAuthAppsAuthorizeScreen
-          authId={authId}
-          organizationSlug={organizationSlug}
-          projectRef={projectRef}
-          navigate={(destination) => void navigate({ href: destination })}
+          key={auth_id}
+          authId={auth_id}
+          organizationSlug={organization_slug && project_ref ? organization_slug : undefined}
+          projectRef={organization_slug && project_ref ? project_ref : undefined}
+          navigate={(destination) => navigate({ href: destination })}
         />
       </>
     )

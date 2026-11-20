@@ -12,7 +12,7 @@ import {
   useDatabaseSelectionFromUrl,
 } from '@/components/interfaces/Observability/DatabaseReport.hooks'
 import { OBSERVABILITY_DOCS_HREFS } from '@/components/interfaces/Observability/Observability.constants'
-import ReportHeader from '@/components/interfaces/Reports/ReportHeader'
+import { ReportHeader } from '@/components/interfaces/Reports/ReportHeader'
 import { ReportPadding } from '@/components/interfaces/Reports/ReportPadding'
 import { REPORT_DATERANGE_HELPER_LABELS } from '@/components/interfaces/Reports/Reports.constants'
 import ReportStickyNav from '@/components/interfaces/Reports/ReportStickyNav'

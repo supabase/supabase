@@ -16,7 +16,7 @@ async function handler(req: NextApiRequest, res: NextApiResponse) {
     case 'DELETE':
       return handleDelete(req, res)
     default:
-      res.setHeader('Allow', ['PATCH'])
+      res.setHeader('Allow', ['PATCH', 'DELETE'])
       res.status(405).json({ data: null, error: { message: `Method ${method} Not Allowed` } })
   }
 }
@@ -41,5 +41,6 @@ const handleDelete = async (req: NextApiRequest, res: NextApiResponse) => {
 const webHandler = toWebHandler(nextHandler)
 
 export const Route = createFileRoute('/api/platform/auth/$ref/users/$id/')({
-  server: { handlers: { PATCH: webHandler, DELETE: webHandler } },
+  // ANY routes unsupported methods to the handler so they get a 405 with an Allow header
+  server: { handlers: { PATCH: webHandler, DELETE: webHandler, ANY: webHandler } },
 })

@@ -62,7 +62,7 @@ See the [server-side rendering guide](/docs/guides/auth/server-side) for framewo
 
 ## `@supabase/server`
 
-For stateless, header-based auth in backend runtimes — Edge Functions, Workers, and framework APIs. You declare who may call an endpoint and receive a ready-to-use context (a caller-scoped client that respects RLS, plus an admin client). It verifies JWTs and resolves the new API keys (`SUPABASE_PUBLISHABLE_KEYS` / `SUPABASE_SECRET_KEYS`) for you.
+For stateless, header-based auth in backend runtimes — [Edge Functions](/docs/guides/functions), Workers, and framework APIs. You declare who may call an endpoint and receive a ready-to-use context (a caller-scoped client that respects RLS, plus an admin client). It verifies JWTs and resolves the new API keys (`SUPABASE_PUBLISHABLE_KEYS` / `SUPABASE_SECRET_KEYS`) for you.
 
 ```ts
 import { withSupabase } from '@supabase/server'

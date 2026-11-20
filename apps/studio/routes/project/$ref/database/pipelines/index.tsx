@@ -1,5 +1,6 @@
 import { createFileRoute } from '@tanstack/react-router'
 import { useParams } from 'common'
+import { Admonition } from 'ui-patterns/Admonition'
 import { PageContainer } from 'ui-patterns/PageContainer'
 import {
   PageHeader,
@@ -28,9 +29,9 @@ export const Route = createFileRoute('/project/$ref/database/pipelines/')({
 function DatabasePipelinesPage() {
   const { ref: projectRef } = useParams()
   const { isHighAvailability, isPending } = useHighAvailability()
-  const showPgReplicate = useIsFeatureEnabled('database:replication')
+  const showPipelines = useIsFeatureEnabled('database:replication')
 
-  if (!showPgReplicate) {
+  if (!showPipelines) {
     return <UnknownInterface urlBack={`/project/${projectRef}/database/schemas`} />
   }
 
@@ -48,7 +49,11 @@ function DatabasePipelinesPage() {
 
         <PageContainer size="large">
           <PageSection>
-            <PageSectionContent>
+            <PageSectionContent className="space-y-4">
+              <Admonition
+                type="note"
+                title="Pipeline creation is unavailable for High Availability projects"
+              />
               <div className="relative h-[500px] w-full overflow-hidden rounded-md border border-muted">
                 <InstanceConfiguration />
               </div>

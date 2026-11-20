@@ -37,7 +37,7 @@ Supabase green is the main color of the logo symbol. The grays are background co
 ## Downloads
 
 - [Logo kit (ZIP)](https://supabase.com/brand-assets.zip): the SVG and PNG files from the Files table.
-- [Connect Supabase button kit (ZIP)](https://obuldanrptloktxcffvn.supabase.co/storage/v1/object/public/supabase-brand-assets/connect-supabase/connect-supabase.zip): the button that starts the OAuth 2.0 flow in a [Supabase integration](https://supabase.com/docs/guides/platform/oauth-apps/build-a-supabase-integration). Do not use the button as a logo.
+- [Connect Supabase button kit (ZIP)](https://obuldanrptloktxcffvn.supabase.co/storage/v1/object/public/supabase-brand-assets/connect-supabase/connect-supabase.zip): the button that starts the OAuth 2.0 flow in a [Supabase integration](https://supabase.com/docs/guides/integrations/build-a-supabase-oauth-integration). Do not use the button as a logo.
 
 ## Name
 

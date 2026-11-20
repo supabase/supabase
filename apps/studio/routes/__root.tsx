@@ -435,7 +435,8 @@ function RootDocument({ children }: Readonly<{ children: ReactNode }>) {
         {children}
         {!isTestEnv && (
           <TanStackDevtools
-            config={{ position: 'bottom-right' }}
+            // Hidden unless the page is loaded with ?tanstack-devtools in the URL.
+            config={{ position: 'bottom-right', requireUrlFlag: true }}
             plugins={[
               {
                 name: 'TanStack Router',
