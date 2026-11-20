@@ -668,7 +668,8 @@ describe('OAuthAppsAuthorizeScreen', () => {
     expect(await screen.findByText('All current and future projects')).toBeInTheDocument()
     expect(screen.getByRole('button', { name: /Authorize Vercel/ })).toBeDisabled()
 
-    fireEvent.click(screen.getByRole('checkbox'))
+    expect(screen.getByRole('radio', { name: 'Selected projects only' })).toBeChecked()
+    fireEvent.click(screen.getByRole('radio', { name: 'All current and future projects' }))
 
     expect(screen.queryByRole('combobox')).not.toBeInTheDocument()
     const authorizeButton = screen.getByRole('button', { name: /Authorize Vercel/ })
@@ -723,7 +724,7 @@ describe('OAuthAppsAuthorizeScreen', () => {
     renderScreen()
 
     await waitFor(() => {
-      expect(screen.getByRole('checkbox')).toBeChecked()
+      expect(screen.getByRole('radio', { name: 'All current and future projects' })).toBeChecked()
     })
     await enabledAuthorizeButton()
   })
