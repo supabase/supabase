@@ -1,5 +1,6 @@
 'use client'
 
+import { useReducedMotion } from 'common'
 import { BarChart2, ExternalLink } from 'lucide-react'
 import { useEffect, useState } from 'react'
 import {
@@ -17,6 +18,7 @@ import {
 
 export default function ComposedChartBasic() {
   const [isLoading, setIsLoading] = useState(true)
+  const prefersReducedMotion = useReducedMotion()
 
   const actions = [
     {
@@ -121,6 +123,9 @@ export default function ComposedChartBasic() {
           >
             <div className="h-40">
               <ChartLine
+                accessibilityLayer
+                isAnimationActive={!prefersReducedMotion}
+                className="[&_.recharts-surface:focus-visible]:outline-solid [&_.recharts-surface:focus-visible]:outline-2 [&_.recharts-surface:focus-visible]:outline-brand"
                 data={data}
                 dataKey="standard_score"
                 dataKeys={['standard_score', 'performance', 'efficiency']}
