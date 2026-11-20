@@ -316,7 +316,7 @@ describe('OAuthAppsAuthorizeScreen', () => {
     expect(databaseManagement.parentElement).toHaveTextContent(
       'Database management, Environment, Analytics'
     )
-    expect(screen.getByRole('heading', { name: 'READ ONLY' }).parentElement).toHaveTextContent(
+    expect(screen.getByRole('heading', { name: 'Read only' }).parentElement).toHaveTextContent(
       'Secrets, Projects, Edge Functions, Storage'
     )
   })
