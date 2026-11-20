@@ -23,6 +23,8 @@ export async function getDatabaseCronJobsMinimal({
   const { result } = await executeSql({
     projectRef,
     connectionString,
+    sqlOrigin: 'studio',
+    queryName: 'cron-jobs-minimal',
     sql: getCronJobsMinimalSql({ searchTerm, page, limit: CRON_JOBS_PAGE_LIMIT }),
     queryKey: ['cron-jobs-minimal'],
     grant: unguarded.migrating,

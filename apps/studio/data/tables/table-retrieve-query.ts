@@ -26,6 +26,8 @@ export async function getTable(
     {
       projectRef,
       connectionString,
+      sqlOrigin: 'studio',
+      queryName: 'table-retrieve',
       sql,
       queryKey: tableKeys.retrieve(projectRef, name, schema),
       grant: unguarded.migrating,

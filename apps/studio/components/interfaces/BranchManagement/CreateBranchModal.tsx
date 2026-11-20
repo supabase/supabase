@@ -614,8 +614,12 @@ export const CreateBranchModal = () => {
                 <div className="flex flex-col gap-y-1">
                   <p className="text-sm text-foreground">
                     Branch compute is billed at $
-                    {withData ? branchComputeSize.priceHourly : instanceSizeSpecs.micro.priceHourly}{' '}
-                    per hour
+                    {withData ? (
+                      <span>{branchComputeSize.priceHourly}</span>
+                    ) : (
+                      <span>{instanceSizeSpecs.micro.priceHourly}</span>
+                    )}{' '}
+                    <span>per hour</span>
                   </p>
                   <p className="text-sm text-foreground-light">
                     {withData ? (

@@ -146,11 +146,11 @@ export const EdgeFunctionRecentErrors = ({
               <div>
                 {invocationCount !== undefined ? (
                   <>
-                    There {invocationCount === 1 ? 'has' : 'have'} been{' '}
+                    There {invocationCount === 1 ? 'has' : 'have'} <span>been</span>{' '}
                     <span className="text-foreground">
                       {getSinceLastDeployInvocationPhrase(invocationCount)}
                     </span>{' '}
-                    since last deploy and no errors.
+                    <span>since last deploy and no errors.</span>
                   </>
                 ) : (
                   'Runtime errors since the last deploy will appear here when this function returns a 5xx response.'

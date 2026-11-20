@@ -10,7 +10,9 @@ sidebar_label: 'FAQ'
 
 ## Which plans support Pipelines?
 
-Pipelines requires a Pro, Team, or Enterprise plan. During public alpha, availability varies by organization; an eligible plan does not guarantee access. If unavailable, request access from **Database > Pipelines** or contact your account manager.
+Pipelines is in public alpha on Pro, Team, and Enterprise plans. Go to **Database > Pipelines** to see the destinations available for your project and [set up a pipeline](/docs/guides/database/replication/pipelines#setup-overview). If Studio shows **No Pipelines destinations are available for this project**, [contact support](/dashboard/support/new).
+
+Pipeline creation is unavailable for High Availability projects. For those projects, **Database > Pipelines** shows the High Availability cluster topology.
 
 ## What destinations are supported?
 
@@ -46,11 +48,39 @@ The Dashboard validates source access, replication capacity, publication tables,
 
 Support differs by destination. Check the [schema-change guides](/docs/guides/database/replication/pipelines#schema-change-support) before changing column types, defaults, keys, or constraints.
 
-## Can data be processed more than once?
+## Can changes be delivered more than once? [#can-data-be-processed-more-than-once]
 
-Yes. Pipelines provides at-least-once processing: recovery can replay acknowledged data, and consumers of append-only histories must tolerate repeated events. Destination deduplication does not provide an exactly-once processing guarantee.
+Yes. Pipelines provides at-least-once delivery, so retries and recovery can send a change more than once. A destination write can succeed before the pipeline saves its progress. Recovery then sends the change again.
 
-See the data models for [BigQuery](/docs/guides/database/replication/pipelines/bigquery#how-it-works), [ClickHouse](/docs/guides/database/replication/pipelines/clickhouse#choose-a-table-engine), [DuckLake](/docs/guides/database/replication/pipelines/ducklake#how-replication-works), and [Snowflake](/docs/guides/database/replication/pipelines/snowflake#append-only-change-history), and the [billing implications](/docs/guides/platform/manage-your-usage/pipelines#how-data-processed-is-measured).
+Each destination handles repeated changes differently:
+
+| Destination                                                                                                 | Guarantee for ongoing row changes                                                                                                                     |
+| ----------------------------------------------------------------------------------------------------------- | ----------------------------------------------------------------------------------------------------------------------------------------------------- |
+| [BigQuery](/docs/guides/database/replication/pipelines/bigquery#delivery-and-replay)                        | At-least-once ingestion with idempotent updates. Repeating a change leaves current state unchanged, and older replays cannot overwrite newer changes. |
+| [ClickHouse: ReplacingMergeTree](/docs/guides/database/replication/pipelines/clickhouse#replacingmergetree) | At-least-once ingestion with deduplicated current-state results through the generated view. The base table can contain repeated versions.             |
+| [ClickHouse: MergeTree](/docs/guides/database/replication/pipelines/clickhouse#mergetree)                   | At-least-once ingestion. Append-only history can contain repeated events.                                                                             |
+| [DuckLake](/docs/guides/database/replication/pipelines/ducklake#delivery-and-replay)                        | Exactly-once application of row changes to managed tables. Already committed changes are skipped during recovery.                                     |
+| [Snowflake](/docs/guides/database/replication/pipelines/snowflake#delivery-and-replay)                      | Exactly-once ingestion into managed tables through committed-offset recovery.                                                                         |
+
+These guarantees cover the data and views Pipelines maintains. Downstream systems need their own protection against repeated processing. Replayed data can also be [billed again](/docs/guides/platform/manage-your-usage/pipelines#how-data-processed-is-measured).
+
+Delivery covers the data included by your publication and [initial sync selection](/docs/guides/database/replication/pipelines#choosing-which-tables-to-copy). Recovery depends on Postgres retaining required changes; see [lost-slot recovery](#what-does-a-lost-slot-status-mean).
+
+## Are changes applied in order?
+
+Pipelines processes each table's changes in source order. Recovery can replay earlier changes after newer changes have already reached the destination.
+
+Replication is asynchronous, so a successful source write does not mean the change is already available to destination queries. Changes from one source transaction can become visible separately, including across destination tables.
+
+During initial sync, queries can see an incomplete copy. Wait for the relevant tables to finish initial sync and catch up before treating the destination as a complete replica. A **Live** label or [zero replication lag](/docs/guides/database/replication/pipelines-monitoring#replication-lag-metrics) alone does not confirm query visibility or initial-sync completion.
+
+## What happens if I restart during initial sync?
+
+If you restart while a table is copying or catching up after its copy, that table starts its entire initial sync again. Its partial destination data is deleted when it resumes. It does not continue from the last copied row or batch.
+
+Tables that completed initial sync resume from saved replication progress. A pipeline restart does not deliberately rebuild those tables. To rebuild a completed table, use [Reset table](/docs/guides/database/replication/pipelines-monitoring#restarting-tables).
+
+Resetting a table on an active pipeline also restarts the pipeline. Other tables' unfinished initial syncs therefore start over too. Data copied again is [billed again](/docs/guides/platform/manage-your-usage/pipelines#how-data-processed-is-measured).
 
 ## Why is a table not being replicated?
 
@@ -67,7 +97,7 @@ If inserts work but updates or deletes fail, review the source table requirement
 
 ## Why is a table in error state?
 
-An initial sync or ongoing replication operation failed, for example after an unsupported schema change. Some errors retry automatically; others require restarting replication for the affected tables from scratch. See [Table errors](/docs/guides/database/replication/pipelines-monitoring#table-errors) for diagnosis and [Restarting tables](/docs/guides/database/replication/pipelines-monitoring#restarting-tables) for the procedure and its effects.
+An initial sync or ongoing replication operation failed, for example after an unsupported schema change. Some errors retry automatically; others require resetting the affected tables. See [Table errors](/docs/guides/database/replication/pipelines-monitoring#table-errors) for diagnosis and [Resetting tables](/docs/guides/database/replication/pipelines-monitoring#restarting-tables) for the procedure and its effects.
 
 ## Why is a pipeline failed or stopped?
 
@@ -79,7 +109,7 @@ Postgres is producing WAL faster than Pipelines confirms progress. Follow [Inves
 
 ## What does a `Lost` slot status mean?
 
-Required WAL is gone, so replication cannot continue from that slot. Follow [slot recovery](/docs/guides/database/replication/pipelines-monitoring#respond-based-on-the-slot-status); recovery scope depends on whether the main slot or a table-sync slot was lost.
+Required WAL is gone, so replication cannot continue from that slot. Follow [slot recovery](/docs/guides/database/replication/pipelines-monitoring#respond-based-on-the-slot-status); recovery scope depends on whether the main slot or a table-sync slot was lost. A fresh initial sync can restore current source rows, but it cannot restore missing change history.
 
 ## What happens if a table is deleted at the destination?
 

@@ -78,6 +78,7 @@ export const supabaseWayDatabaseBuild: ContentListingGroup = {
 export const supabaseWayAuthBuild: ContentListingGroup = {
   id: 'supabase-way-auth-build',
   heading: 'Build it',
+  headingAnchor: 'build-it-auth',
   headingLevel: 'h3',
   type: 'grid',
   columns: 3,
@@ -103,6 +104,7 @@ export const supabaseWayAuthBuild: ContentListingGroup = {
 export const supabaseWayRlsBuild: ContentListingGroup = {
   id: 'supabase-way-rls-build',
   heading: 'Build it',
+  headingAnchor: 'build-it-rls',
   headingLevel: 'h3',
   type: 'grid',
   columns: 2,
@@ -123,6 +125,7 @@ export const supabaseWayRlsBuild: ContentListingGroup = {
 export const supabaseWayRealtimeBuild: ContentListingGroup = {
   id: 'supabase-way-realtime-build',
   heading: 'Build it',
+  headingAnchor: 'build-it-realtime',
   headingLevel: 'h3',
   type: 'grid',
   columns: 3,
@@ -149,6 +152,7 @@ export const supabaseWayRealtimeBuild: ContentListingGroup = {
 export const supabaseWayStorageBuild: ContentListingGroup = {
   id: 'supabase-way-storage-build',
   heading: 'Build it',
+  headingAnchor: 'build-it-storage',
   headingLevel: 'h3',
   type: 'grid',
   columns: 2,
@@ -169,6 +173,7 @@ export const supabaseWayStorageBuild: ContentListingGroup = {
 export const supabaseWayFunctionsBuild: ContentListingGroup = {
   id: 'supabase-way-functions-build',
   heading: 'Build it',
+  headingAnchor: 'build-it-functions',
   headingLevel: 'h3',
   type: 'grid',
   columns: 3,
@@ -194,6 +199,7 @@ export const supabaseWayFunctionsBuild: ContentListingGroup = {
 export const supabaseWayProductionBuild: ContentListingGroup = {
   id: 'supabase-way-production-build',
   heading: 'Build it',
+  headingAnchor: 'build-it-production',
   headingLevel: 'h3',
   type: 'grid',
   columns: 3,

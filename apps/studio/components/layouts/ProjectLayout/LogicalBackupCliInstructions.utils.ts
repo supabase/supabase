@@ -1,4 +1,4 @@
-export const DB_PASSWORD_PLACEHOLDER = '[YOUR-PASSWORD]'
+export const DB_PASSWORD_PLACEHOLDER = '[YOUR-DATABASE-PASSWORD]'
 
 export function buildDirectPostgresConnectionUri(settings: {
   db_user: string

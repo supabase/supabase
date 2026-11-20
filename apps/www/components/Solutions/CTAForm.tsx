@@ -50,7 +50,7 @@ const OAuthConnectCallout: FC<{ className?: string }> = ({ className }) => (
       Set up a Supabase OAuth app so you can start interacting with your user's Supabase project.
     </p>
     <TextLink
-      url="https://supabase.com/docs/guides/integrations/build-a-supabase-integration"
+      url="https://supabase.com/docs/guides/integrations/build-a-supabase-oauth-integration"
       label="View docs"
     />
   </div>

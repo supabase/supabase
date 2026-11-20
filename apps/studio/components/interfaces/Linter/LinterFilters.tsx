@@ -86,4 +86,4 @@ const LinterFilters = ({
   )
 }
 
-export default LinterFilters
+export { LinterFilters }

@@ -5,7 +5,7 @@ import { join } from 'node:path'
 // CodeSample.test.ts reads fixtures from apps/docs/examples/_internal/fixtures/,
 // which are sourced from the repo-root examples/ directory. Without this,
 // `npx vitest`, `pnpm test:local`, or IDE single-test runs all fail with ENOENT
-// because they bypass the `pretest` npm lifecycle hook.
+// because they bypass the turbo `codegen:examples` dependency of `test`.
 export default function setup() {
   const source = join(import.meta.dirname, '..', '..', 'examples')
   const dest = join(import.meta.dirname, 'examples')

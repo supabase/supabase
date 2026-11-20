@@ -19,13 +19,10 @@ import {
   useIsPipelinesBigQueryEnabled,
   useIsPipelinesClickHouseEnabled,
   useIsPipelinesDuckLakeEnabled,
-  useIsPipelinesIcebergEnabled,
   useIsPipelinesSnowflakeEnabled,
 } from '../../useIsPipelinesEnabled'
 import { type DestinationType, type ExistingDestination } from '../DestinationPanel.types'
 import { AdvancedSettings } from './AdvancedSettings'
-import { getAnalyticsBucketValidationIssues } from './AnalyticsBucket/AnalyticsBucket.utils'
-import { AnalyticsBucketFields } from './AnalyticsBucket/Fields'
 import {
   BIGQUERY_SERVICE_ACCOUNT_JSON_MESSAGE,
   getBigQueryValidationIssues,
@@ -46,7 +43,6 @@ import { DUCKLAKE_MODE_SUPABASE } from './DuckLake/DuckLake.constants'
 import { getDucklakeValidationIssues } from './DuckLake/DuckLake.utils'
 import { DuckLakeFields } from './DuckLake/Fields'
 import { NewPublicationPanel } from './NewPublicationPanel'
-import { NoDestinationsAvailable } from './NoDestinationsAvailable'
 import { PipelineCostDialog } from './PipelineCostDialog'
 import { PipelineRegionField } from './PipelineRegionField'
 import { PublicationSelection } from './PublicationSelection'
@@ -60,16 +56,12 @@ import { useDestinationForm } from './useDestinationForm'
 import { ValidationFailuresSection } from './ValidationFailuresSection'
 import { ValidationWarningsDialog } from './ValidationWarningsDialog'
 import { usePipelineCreationPreview } from '@/components/interfaces/App/FeaturePreview/FeaturePreviewContext'
-import { CreateAnalyticsBucketSheet } from '@/components/interfaces/Storage/AnalyticsBuckets/CreateAnalyticsBucketSheet'
 import { AlertError } from '@/components/ui/AlertError'
-import { useAPIKeys } from '@/data/api-keys/api-keys-query'
-import { useProjectSettingsV2Query } from '@/data/config/project-settings-v2-query'
 import { useReplicationDestinationByIdQuery } from '@/data/replication/destination-by-id-query'
 import { useReplicationPipelineByIdQuery } from '@/data/replication/pipeline-by-id-query'
 import { useReplicationPublicationNamesQuery } from '@/data/replication/publication-names-query'
 import { useReplicationPublicationQuery } from '@/data/replication/publication-query'
 import { useReplicationSourceId } from '@/data/replication/sources-query'
-import { FGA_PERMISSIONS, useAsyncCheckPermissionsV2 } from '@/hooks/misc/useCheckPermissionsV2'
 import { useIsOrioleDb, useSelectedProjectQuery } from '@/hooks/misc/useSelectedProject'
 
 const formId = 'destination-editor'
@@ -107,20 +99,12 @@ export const DestinationForm = ({
     selectedType === 'DuckLake' && (!isProjectSuccess || isOrioleDb !== false)
 
   const isBigQueryEnabled = useIsPipelinesBigQueryEnabled()
-  const isIcebergEnabled = useIsPipelinesIcebergEnabled()
   const isDuckLakeEnabled = useIsPipelinesDuckLakeEnabled()
   const isSnowflakeEnabled = useIsPipelinesSnowflakeEnabled()
   const isClickHouseEnabled = useIsPipelinesClickHouseEnabled()
-  const { can: canReadAPIKeys } = useAsyncCheckPermissionsV2([
-    FGA_PERMISSIONS.PROJECT.API_GATEWAY_KEYS_READ,
-    // api keys reveal = true will require this perms
-    FGA_PERMISSIONS.PROJECT.API_GATEWAY_KEYS_SECRET_READ,
-  ])
-
   const [showValidationWarningsDialog, setShowValidationWarningsDialog] = useState(false)
   const [showCostDialog, setShowCostDialog] = useState(false)
   const [publicationPanelVisible, setPublicationPanelVisible] = useState(false)
-  const [newBucketSheetVisible, setNewBucketSheetVisible] = useState(false)
   const [pendingFormValues, setPendingFormValues] = useState<z.infer<typeof FormSchema> | null>(
     null
   )
@@ -130,25 +114,6 @@ export const DestinationForm = ({
   const editMode = !!existingDestination
   const { isEnabled: isCreationPreviewEnabled } = usePipelineCreationPreview()
   const shouldShowConnectionSection = isCreationPreviewEnabled && !editMode
-
-  // Compute available destinations based on feature flags
-  const availableDestinations = useMemo(() => {
-    const destinations = []
-    if (isBigQueryEnabled) destinations.push({ value: 'BigQuery', label: 'BigQuery' })
-    if (isIcebergEnabled)
-      destinations.push({ value: 'Analytics Bucket', label: 'Analytics Bucket' })
-    if (isDuckLakeEnabled) destinations.push({ value: 'DuckLake', label: 'DuckLake' })
-    if (isSnowflakeEnabled) destinations.push({ value: 'Snowflake', label: 'Snowflake' })
-    if (isClickHouseEnabled) destinations.push({ value: 'ClickHouse', label: 'ClickHouse' })
-    return destinations
-  }, [
-    isBigQueryEnabled,
-    isDuckLakeEnabled,
-    isIcebergEnabled,
-    isSnowflakeEnabled,
-    isClickHouseEnabled,
-  ])
-  const hasNoAvailableDestinations = availableDestinations.length === 0
 
   const sourceId = useReplicationSourceId({ projectRef })
 
@@ -175,18 +140,6 @@ export const DestinationForm = ({
   const isErrorExistingConfig = editMode && (isErrorDestination || isErrorPipeline)
   const isExistingConfigReady = !editMode || (isSuccessDestination && isSuccessPipeline)
 
-  // Revealed API keys are only ever consumed as the default catalog token for
-  // Analytics Bucket (Iceberg) destinations, so don't fetch them for other
-  // destination types.
-  const { data: apiKeysData } = useAPIKeys(
-    { projectRef, reveal: true },
-    { enabled: canReadAPIKeys && selectedType === 'Analytics Bucket' && !editMode }
-  )
-  const { serviceKey } = apiKeysData ?? {}
-  const catalogToken = serviceKey?.api_key ?? ''
-
-  const { data: projectSettings } = useProjectSettingsV2Query({ projectRef })
-
   const {
     isValidating,
     validateConfiguration,
@@ -203,11 +156,9 @@ export const DestinationForm = ({
       generateDefaultValues({
         destinationData,
         pipelineData,
-        catalogToken,
-        region: projectSettings?.region,
         editMode,
       }),
-    [destinationData, pipelineData, catalogToken, projectSettings, editMode]
+    [destinationData, pipelineData, editMode]
   )
   const form = useForm<z.infer<typeof FormSchema>>({
     mode: 'onSubmit',
@@ -234,13 +185,6 @@ export const DestinationForm = ({
           getBigQueryValidationIssues(data, {
             secretsOptional: editMode,
             validateJson: false,
-          }).forEach(({ path, message }) => {
-            addRequiredFieldError(path, message)
-          })
-        } else if (selectedType === 'Analytics Bucket') {
-          getAnalyticsBucketValidationIssues(data, {
-            secretsOptional: editMode,
-            storedS3AccessKeyId: editMode ? defaultValues.s3AccessKeyId : undefined,
           }).forEach(({ path, message }) => {
             addRequiredFieldError(path, message)
           })
@@ -307,8 +251,7 @@ export const DestinationForm = ({
     !isExistingConfigReady ||
     !isSuccessPublicationNames ||
     (!!publicationName && !isSuccessPublication) ||
-    isSelectedPublicationMissing ||
-    (!editMode && hasNoAvailableDestinations)
+    isSelectedPublicationMissing
 
   const getSubmitButtonText = () => {
     if (editMode) {
@@ -490,13 +433,6 @@ export const DestinationForm = ({
       {selectedType === 'BigQuery' && isBigQueryEnabled && (
         <BigQueryFields form={form} editMode={editMode} />
       )}
-      {selectedType === 'Analytics Bucket' && isIcebergEnabled && (
-        <AnalyticsBucketFields
-          form={form}
-          editMode={editMode}
-          onSelectNewBucket={() => setNewBucketSheetVisible(true)}
-        />
-      )}
       {selectedType === 'DuckLake' && isDuckLakeEnabled && (
         <>
           <p role="status" className="px-5 pt-5 text-sm text-foreground-light empty:sr-only">
@@ -540,97 +476,93 @@ export const DestinationForm = ({
     <>
       <SheetSection className="grow overflow-auto px-0 py-0">
         {typeSelection}
-        {hasNoAvailableDestinations && !editMode ? (
-          <NoDestinationsAvailable />
-        ) : (
-          <Form {...form}>
-            <form id={formId} onSubmit={form.handleSubmit(onSubmit)}>
-              <fieldset disabled={!isExistingConfigReady} className="contents">
-                {shouldShowConnectionSection && (
-                  <>
-                    <PipelineConnectionSection type={selectedType} form={form}>
-                      {destinationFields}
-                    </PipelineConnectionSection>
-                    <DialogSectionSeparator />
-                  </>
-                )}
-                {shouldShowConnectionSection ? (
-                  <PipelineDataSection
-                    type={selectedType}
-                    form={form}
-                    onSelectNewPublication={() => setPublicationPanelVisible(true)}
-                  />
-                ) : (
-                  <>
-                    <div className="p-5 flex flex-col gap-y-6">
-                      {isErrorExistingConfig && (
-                        <Admonition type="warning">
-                          <p className="leading-normal!">
-                            The existing destination or pipeline settings could not be loaded.
-                            Refresh before applying changes.
-                          </p>
-                        </Admonition>
-                      )}
-                      <p className="text-sm font-medium text-foreground">Destination details</p>
-
-                      <div className="flex flex-col gap-y-4">
-                        <DestinationNameInput form={form} destinationType={selectedType} />
-                        <PublicationSelection
-                          form={form}
-                          onSelectNewPublication={() => setPublicationPanelVisible(true)}
-                        />
-                        <TableCopySelection form={form} editMode={editMode} />
-                        <PipelineRegionField destinationType={selectedType} />
-                      </div>
-                    </div>
-
-                    <DialogSectionSeparator />
+        <Form {...form}>
+          <form id={formId} onSubmit={form.handleSubmit(onSubmit)}>
+            <fieldset disabled={!isExistingConfigReady} className="contents">
+              {shouldShowConnectionSection && (
+                <>
+                  <PipelineConnectionSection type={selectedType} form={form}>
                     {destinationFields}
+                  </PipelineConnectionSection>
+                  <DialogSectionSeparator />
+                </>
+              )}
+              {shouldShowConnectionSection ? (
+                <PipelineDataSection
+                  type={selectedType}
+                  form={form}
+                  onSelectNewPublication={() => setPublicationPanelVisible(true)}
+                />
+              ) : (
+                <>
+                  <div className="p-5 flex flex-col gap-y-6">
+                    {isErrorExistingConfig && (
+                      <Admonition type="warning">
+                        <p className="leading-normal!">
+                          The existing destination or pipeline settings could not be loaded. Refresh
+                          before applying changes.
+                        </p>
+                      </Admonition>
+                    )}
+                    <p className="text-sm font-medium text-foreground">Destination details</p>
 
-                    <DialogSectionSeparator />
-
-                    <AdvancedSettings type={selectedType} form={form} group="all" />
-                  </>
-                )}
-
-                {shouldShowConnectionSection && (
-                  <>
-                    <DialogSectionSeparator />
-                    <PipelineDestinationReview type={selectedType} control={form.control} />
-                    <DialogSectionSeparator />
-                    <PipelineDataReview
-                      type={selectedType}
-                      control={form.control}
-                      publication={selectedPublication}
-                    />
-                    <DialogSectionSeparator />
-                    <PipelineReviewCosts control={form.control} publication={selectedPublication} />
-                  </>
-                )}
-
-                {!editMode && hasRunValidation && !isValidating && (
-                  <>
-                    <DialogSectionSeparator />
-
-                    <div ref={validationSectionRef}>
-                      {shouldShowConnectionSection ? (
-                        <PipelineValidationAdmonition
-                          failures={allValidationFailures}
-                          hint="Check credentials and Advanced settings above. Some issues may require changes to the project’s database settings."
-                        />
-                      ) : (
-                        <ValidationFailuresSection
-                          destinationFailures={destinationValidationFailures}
-                          pipelineFailures={pipelineValidationFailures}
-                        />
-                      )}
+                    <div className="flex flex-col gap-y-4">
+                      <DestinationNameInput form={form} destinationType={selectedType} />
+                      <PublicationSelection
+                        form={form}
+                        onSelectNewPublication={() => setPublicationPanelVisible(true)}
+                      />
+                      <TableCopySelection form={form} editMode={editMode} />
+                      <PipelineRegionField destinationType={selectedType} />
                     </div>
-                  </>
-                )}
-              </fieldset>
-            </form>
-          </Form>
-        )}
+                  </div>
+
+                  <DialogSectionSeparator />
+                  {destinationFields}
+
+                  <DialogSectionSeparator />
+
+                  <AdvancedSettings type={selectedType} form={form} group="all" />
+                </>
+              )}
+
+              {shouldShowConnectionSection && (
+                <>
+                  <DialogSectionSeparator />
+                  <PipelineDestinationReview type={selectedType} control={form.control} />
+                  <DialogSectionSeparator />
+                  <PipelineDataReview
+                    type={selectedType}
+                    control={form.control}
+                    publication={selectedPublication}
+                  />
+                  <DialogSectionSeparator />
+                  <PipelineReviewCosts control={form.control} publication={selectedPublication} />
+                </>
+              )}
+
+              {!editMode && hasRunValidation && !isValidating && (
+                <>
+                  <DialogSectionSeparator />
+
+                  <div ref={validationSectionRef}>
+                    {shouldShowConnectionSection ? (
+                      <PipelineValidationAdmonition
+                        failures={allValidationFailures}
+                        hint="Check credentials and Advanced settings above. Some issues may require changes to the project’s database settings."
+                      />
+                    ) : (
+                      <ValidationFailuresSection
+                        destinationFailures={destinationValidationFailures}
+                        pipelineFailures={pipelineValidationFailures}
+                      />
+                    )}
+                  </div>
+                </>
+              )}
+            </fieldset>
+          </form>
+        </Form>
       </SheetSection>
 
       <SheetFooter className="justify-between!">
@@ -689,11 +621,6 @@ export const DestinationForm = ({
           }
           setPublicationPanelVisible(false)
         }}
-      />
-
-      <CreateAnalyticsBucketSheet
-        open={newBucketSheetVisible}
-        onOpenChange={setNewBucketSheetVisible}
       />
 
       <ValidationWarningsDialog

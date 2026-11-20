@@ -173,6 +173,19 @@ export function getRegionSelectionType({
   return isGeneral ? 'general' : 'specific'
 }
 
+/**
+ * Sorts Postgres versions newest first. Compares numerically per segment, so `17.11.0.002` sorts
+ * above `17.6.1.164`, which a plain string comparison gets wrong. Returns a new array rather than
+ * sorting in place, since the input is often React Query's cached data.
+ */
+export function sortPostgresVersionsNewestFirst<T extends { version: string }>(
+  versions: readonly T[]
+): T[] {
+  return [...versions].sort((a, b) =>
+    b.version.localeCompare(a.version, undefined, { numeric: true })
+  )
+}
+
 export interface PostgresVersionDetails {
   postgresEngine?: Exclude<PostgresEngine, '13' | '14'>
   releaseChannel?: ReleaseChannel

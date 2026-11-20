@@ -67,7 +67,7 @@ export const RESTRICTION_MESSAGES = {
           <InlineLink href={`/org/${firstOrg.slug}/billing#invoices`}>{firstOrg.name}</InlineLink>
           {remainingOrgs.length > 0 &&
             ` and ${remainingOrgs.length} other${remainingOrgs.length === 1 ? '' : 's'}`}{' '}
-          to avoid service disruption
+          <span>to avoid service disruption</span>
         </>
       )
     },

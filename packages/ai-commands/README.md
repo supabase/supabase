@@ -2,11 +2,10 @@
 
 ## Main purpose
 
-This package contains all features involving AI and LLMs (eg. via OpenAI API).
-Each feature is implemented as a function which can be easily tested for regressions.
+This package contains the docs AI command.
 
-The streaming functions only work on Edge runtime so they can only be imported via a special `edge` subpath like so:
+The streaming command works on Edge runtime and can be imported via the `edge` subpath:
 
 ```ts
-import { chatRlsPolicy } from 'ai-commands/edge'
+import { clippy } from 'ai-commands/edge'
 ```

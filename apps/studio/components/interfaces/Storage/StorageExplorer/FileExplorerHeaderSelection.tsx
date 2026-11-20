@@ -32,7 +32,8 @@ export const FileExplorerHeaderSelection = () => {
   return (
     <div className={bulkActionBarClassName}>
       <span className="font-mono text-xs text-foreground-light">
-        <span className="tabular-nums">{count}</span> item{count !== 1 ? 's' : ''} selected
+        <span className="tabular-nums">{count}</span> item{count !== 1 ? <span>s</span> : ''}{' '}
+        <span>selected</span>
       </span>
 
       <div className="ml-auto flex items-center gap-1">

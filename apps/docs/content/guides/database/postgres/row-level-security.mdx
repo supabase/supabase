@@ -13,6 +13,12 @@ A table in an exposed schema without RLS is readable and writable by any role wi
 
 </Admonition>
 
+<Admonition type="tip">
+
+To control which tables, columns, and schemas the Data API exposes at all, refer to [Securing your API](/docs/guides/api/securing-your-api). To write policies based on roles in JWT claims, refer to [Custom claims and role-based access control (RBAC)](/docs/guides/api/custom-claims-and-role-based-access-control-rbac).
+
+</Admonition>
+
 Use the guide in three parts:
 
 - [Understand Row Level Security](#understand-row-level-security) explains how grants and policies combine to control access.
@@ -458,6 +464,49 @@ Never prove an allowed write with `lives_ok`. It passes when the write matched z
 
 Switch role and identity with `set local role` and `set local request.jwt.claim.sub`.
 
+### Share rows between users
+
+Some rows belong to two users at once, such as an order that both its buyer and its seller can see. Store each user in their own column, and check both columns in the same policy. The following examples use an `orders` table where each row has a `buyer_id` and a `seller_id`:
+
+```sql
+create table orders (
+  id bigint generated always as identity primary key,
+  buyer_id uuid not null references auth.users,
+  seller_id uuid not null references auth.users,
+  total numeric
+);
+
+alter table orders enable row level security;
+
+revoke all on table orders from anon, authenticated;
+grant select, update on table orders to authenticated;
+```
+
+The select policy lets either user read the order:
+
+```sql
+create policy "Buyers and sellers can view their orders."
+on orders for select
+to authenticated
+using ( (select auth.uid()) in (buyer_id, seller_id) );
+```
+
+The update policy uses the same expression in `using` and `with check`, so either user can update the order, but the updated row must still include them as the buyer or the seller:
+
+```sql
+create policy "Buyers and sellers can update their orders."
+on orders for update
+to authenticated
+using ( (select auth.uid()) in (buyer_id, seller_id) )
+with check ( (select auth.uid()) in (buyer_id, seller_id) );
+```
+
+For `insert` and `delete`, check only the user who can create or remove the row, such as `with check ( (select auth.uid()) = buyer_id )` for a buyer placing an order. If either user could delete the row, one user could remove it for both.
+
+This pattern needs no `security definer` function, because a plain policy can check both columns of the row. Use a security definer function when the check reads another table, as in [Use security definer functions](#use-security-definer-functions).
+
+Index `buyer_id` and `seller_id` separately, because a policy that checks both columns needs an index on each. See [Add indexes](#add-indexes).
+
 ### Specify roles in your policies
 
 Always name the role a policy applies to, using the `to` clause. Instead of this:
@@ -608,6 +657,8 @@ Returns the JWT of the user making the request. Anything that you store in the u
 
 - `raw_user_meta_data` - can be updated by the authenticated user using the `supabase.auth.update()` function. It is not a good place to store authorization data.
 - `raw_app_meta_data` - cannot be updated by the user, so it's a good place to store authorization data.
+
+To build role-based policies from custom claims, refer to [Custom claims and role-based access control (RBAC)](/docs/guides/api/custom-claims-and-role-based-access-control-rbac).
 
 The `auth.jwt()` function is extremely versatile. For example, if you store some team data inside `app_metadata`, you can use it to determine whether a particular user belongs to a team. For example, if this was an array of IDs:
 

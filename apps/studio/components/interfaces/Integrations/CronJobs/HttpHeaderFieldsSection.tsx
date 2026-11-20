@@ -1,3 +1,4 @@
+import { useQuery } from '@tanstack/react-query'
 import { useParams } from 'common'
 import { useFormContext } from 'react-hook-form'
 import { FormLabel, SheetSection } from 'ui'
@@ -5,8 +6,9 @@ import { KeyValueFieldArray } from 'ui-patterns/form/KeyValueFieldArray/KeyValue
 
 import { CreateCronJobForm } from './CreateCronJobSheet/CreateCronJobSheet.constants'
 import { buildEdgeFunctionHeaderAddActions } from '@/components/interfaces/Functions/httpHeaderAddActions'
-import { useAPIKeys } from '@/data/api-keys/api-keys-query'
-import { FGA_PERMISSIONS, useAsyncCheckPermissionsV2 } from '@/hooks/misc/useCheckPermissionsV2'
+import { ApiKeysAccessNote } from '@/components/ui/ApiKeysAccessNote'
+import { getKeys, revealedApiKeysQueryOptions } from '@/data/api-keys/api-keys-query'
+import { useGrant } from '@/lib/grants'
 
 interface HTTPHeaderFieldsSectionProps {
   variant: 'edge_function' | 'http_request'
@@ -16,13 +18,13 @@ export const HTTPHeaderFieldsSection = ({ variant }: HTTPHeaderFieldsSectionProp
   const form = useFormContext<CreateCronJobForm>()
 
   const { ref } = useParams()
-  const { can: canReadAPIKeys } = useAsyncCheckPermissionsV2([
-    FGA_PERMISSIONS.PROJECT.API_GATEWAY_KEYS_READ,
-    FGA_PERMISSIONS.PROJECT.API_GATEWAY_KEYS_SECRET_READ,
-  ])
-  const { data: apiKeysData } = useAPIKeys(
-    { projectRef: ref, reveal: true },
-    { enabled: canReadAPIKeys }
+  const apiKeysGrant = useGrant(
+    'GET /v1/projects/{ref}/api-keys',
+    { projectRef: ref },
+    { variant: 'reveal' }
+  )
+  const { data: apiKeysData } = useQuery(
+    revealedApiKeysQueryOptions({ projectRef: ref, grant: apiKeysGrant.grant }, { select: getKeys })
   )
   const { serviceKey, secretKey } = apiKeysData ?? {}
 
@@ -49,6 +51,12 @@ export const HTTPHeaderFieldsSection = ({ variant }: HTTPHeaderFieldsSectionProp
         addLabel="Add header"
         addActions={addActions}
       />
+      {variant === 'edge_function' && (
+        <ApiKeysAccessNote
+          grant={apiKeysGrant}
+          fallback="The Authorization header uses a placeholder you can replace."
+        />
+      )}
     </SheetSection>
   )
 }

@@ -80,6 +80,7 @@ import { Route as ProjectRefEditorRouteImport } from './routes/project/$ref/edit
 import { Route as ProjectRefExplorerRouteImport } from './routes/project/$ref/explorer'
 import { Route as ProjectRefFunctionsRouteImport } from './routes/project/$ref/functions'
 import { Route as ProjectRefIntegrationsRouteImport } from './routes/project/$ref/integrations'
+import { Route as ProjectRefIssuesRouteImport } from './routes/project/$ref/issues'
 import { Route as ProjectRefLogsRouteImport } from './routes/project/$ref/logs'
 import { Route as ProjectRefMergeRouteImport } from './routes/project/$ref/merge'
 import { Route as ProjectRefObservabilityRouteImport } from './routes/project/$ref/observability'
@@ -165,6 +166,8 @@ import { Route as ProjectRefFunctionsFunctionSlugRouteImport } from './routes/pr
 import { Route as ProjectRefFunctionsNewRouteImport } from './routes/project/$ref/functions/new'
 import { Route as ProjectRefFunctionsSecretsRouteImport } from './routes/project/$ref/functions/secrets'
 import { Route as ProjectRefIntegrationsIndexRouteImport } from './routes/project/$ref/integrations/index'
+import { Route as ProjectRefIssuesIndexRouteImport } from './routes/project/$ref/issues/index'
+import { Route as ProjectRefIssuesIdRouteImport } from './routes/project/$ref/issues/$id'
 import { Route as ProjectRefLogsIndexRouteImport } from './routes/project/$ref/logs/index'
 import { Route as ProjectRefLogsAuthLogsRouteImport } from './routes/project/$ref/logs/auth-logs'
 import { Route as ProjectRefLogsCronLogsRouteImport } from './routes/project/$ref/logs/cron-logs'
@@ -193,6 +196,7 @@ import { Route as ProjectRefObservabilityQueryInsightsRouteImport } from './rout
 import { Route as ProjectRefObservabilityQueryPerformanceRouteImport } from './routes/project/$ref/observability/query-performance'
 import { Route as ProjectRefObservabilityRealtimeRouteImport } from './routes/project/$ref/observability/realtime'
 import { Route as ProjectRefObservabilityStorageRouteImport } from './routes/project/$ref/observability/storage'
+import { Route as ProjectRefObservabilityWarehouseRouteImport } from './routes/project/$ref/observability/warehouse'
 import { Route as ProjectRefRealtimeInspectorRouteImport } from './routes/project/$ref/realtime/inspector'
 import { Route as ProjectRefRealtimePoliciesRouteImport } from './routes/project/$ref/realtime/policies'
 import { Route as ProjectRefRealtimeSettingsRouteImport } from './routes/project/$ref/realtime/settings'
@@ -697,6 +701,11 @@ const ProjectRefIntegrationsRoute = ProjectRefIntegrationsRouteImport.update({
   path: '/integrations',
   getParentRoute: () => ProjectRefRoute,
 } as any)
+const ProjectRefIssuesRoute = ProjectRefIssuesRouteImport.update({
+  id: '/issues',
+  path: '/issues',
+  getParentRoute: () => ProjectRefRoute,
+} as any)
 const ProjectRefLogsRoute = ProjectRefLogsRouteImport.update({
   id: '/logs',
   path: '/logs',
@@ -1153,6 +1162,16 @@ const ProjectRefIntegrationsIndexRoute =
     path: '/',
     getParentRoute: () => ProjectRefIntegrationsRoute,
   } as any)
+const ProjectRefIssuesIndexRoute = ProjectRefIssuesIndexRouteImport.update({
+  id: '/',
+  path: '/',
+  getParentRoute: () => ProjectRefIssuesRoute,
+} as any)
+const ProjectRefIssuesIdRoute = ProjectRefIssuesIdRouteImport.update({
+  id: '/$id',
+  path: '/$id',
+  getParentRoute: () => ProjectRefIssuesRoute,
+} as any)
 const ProjectRefLogsIndexRoute = ProjectRefLogsIndexRouteImport.update({
   id: '/',
   path: '/',
@@ -1315,6 +1334,12 @@ const ProjectRefObservabilityStorageRoute =
   ProjectRefObservabilityStorageRouteImport.update({
     id: '/storage',
     path: '/storage',
+    getParentRoute: () => ProjectRefObservabilityRoute,
+  } as any)
+const ProjectRefObservabilityWarehouseRoute =
+  ProjectRefObservabilityWarehouseRouteImport.update({
+    id: '/warehouse',
+    path: '/warehouse',
     getParentRoute: () => ProjectRefObservabilityRoute,
   } as any)
 const ProjectRefRealtimeInspectorRoute =
@@ -2225,6 +2250,7 @@ export interface FileRoutesByFullPath {
   '/project/$ref/explorer': typeof ProjectRefExplorerRouteWithChildren
   '/project/$ref/functions': typeof ProjectRefFunctionsRouteWithChildren
   '/project/$ref/integrations': typeof ProjectRefIntegrationsRouteWithChildren
+  '/project/$ref/issues': typeof ProjectRefIssuesRouteWithChildren
   '/project/$ref/logs': typeof ProjectRefLogsRouteWithChildren
   '/project/$ref/merge': typeof ProjectRefMergeRoute
   '/project/$ref/observability': typeof ProjectRefObservabilityRouteWithChildren
@@ -2303,6 +2329,7 @@ export interface FileRoutesByFullPath {
   '/project/$ref/functions/$functionSlug': typeof ProjectRefFunctionsFunctionSlugRouteWithChildren
   '/project/$ref/functions/new': typeof ProjectRefFunctionsNewRoute
   '/project/$ref/functions/secrets': typeof ProjectRefFunctionsSecretsRoute
+  '/project/$ref/issues/$id': typeof ProjectRefIssuesIdRoute
   '/project/$ref/logs/auth-logs': typeof ProjectRefLogsAuthLogsRoute
   '/project/$ref/logs/cron-logs': typeof ProjectRefLogsCronLogsRoute
   '/project/$ref/logs/dedicated-pooler-logs': typeof ProjectRefLogsDedicatedPoolerLogsRoute
@@ -2329,6 +2356,7 @@ export interface FileRoutesByFullPath {
   '/project/$ref/observability/query-performance': typeof ProjectRefObservabilityQueryPerformanceRoute
   '/project/$ref/observability/realtime': typeof ProjectRefObservabilityRealtimeRoute
   '/project/$ref/observability/storage': typeof ProjectRefObservabilityStorageRoute
+  '/project/$ref/observability/warehouse': typeof ProjectRefObservabilityWarehouseRoute
   '/project/$ref/realtime/inspector': typeof ProjectRefRealtimeInspectorRoute
   '/project/$ref/realtime/policies': typeof ProjectRefRealtimePoliciesRoute
   '/project/$ref/realtime/settings': typeof ProjectRefRealtimeSettingsRoute
@@ -2357,6 +2385,7 @@ export interface FileRoutesByFullPath {
   '/project/$ref/explorer/': typeof ProjectRefExplorerIndexRoute
   '/project/$ref/functions/': typeof ProjectRefFunctionsIndexRoute
   '/project/$ref/integrations/': typeof ProjectRefIntegrationsIndexRoute
+  '/project/$ref/issues/': typeof ProjectRefIssuesIndexRoute
   '/project/$ref/logs/': typeof ProjectRefLogsIndexRoute
   '/project/$ref/observability/': typeof ProjectRefObservabilityIndexRoute
   '/project/$ref/sql/': typeof ProjectRefSqlIndexRoute
@@ -2615,6 +2644,7 @@ export interface FileRoutesByTo {
   '/project/$ref/editor/new': typeof ProjectRefEditorNewRoute
   '/project/$ref/functions/new': typeof ProjectRefFunctionsNewRoute
   '/project/$ref/functions/secrets': typeof ProjectRefFunctionsSecretsRoute
+  '/project/$ref/issues/$id': typeof ProjectRefIssuesIdRoute
   '/project/$ref/logs/auth-logs': typeof ProjectRefLogsAuthLogsRoute
   '/project/$ref/logs/cron-logs': typeof ProjectRefLogsCronLogsRoute
   '/project/$ref/logs/dedicated-pooler-logs': typeof ProjectRefLogsDedicatedPoolerLogsRoute
@@ -2641,6 +2671,7 @@ export interface FileRoutesByTo {
   '/project/$ref/observability/query-performance': typeof ProjectRefObservabilityQueryPerformanceRoute
   '/project/$ref/observability/realtime': typeof ProjectRefObservabilityRealtimeRoute
   '/project/$ref/observability/storage': typeof ProjectRefObservabilityStorageRoute
+  '/project/$ref/observability/warehouse': typeof ProjectRefObservabilityWarehouseRoute
   '/project/$ref/realtime/inspector': typeof ProjectRefRealtimeInspectorRoute
   '/project/$ref/realtime/policies': typeof ProjectRefRealtimePoliciesRoute
   '/project/$ref/realtime/settings': typeof ProjectRefRealtimeSettingsRoute
@@ -2668,6 +2699,7 @@ export interface FileRoutesByTo {
   '/project/$ref/explorer': typeof ProjectRefExplorerIndexRoute
   '/project/$ref/functions': typeof ProjectRefFunctionsIndexRoute
   '/project/$ref/integrations': typeof ProjectRefIntegrationsIndexRoute
+  '/project/$ref/issues': typeof ProjectRefIssuesIndexRoute
   '/project/$ref/logs': typeof ProjectRefLogsIndexRoute
   '/project/$ref/observability': typeof ProjectRefObservabilityIndexRoute
   '/project/$ref/sql': typeof ProjectRefSqlIndexRoute
@@ -2865,6 +2897,7 @@ export interface FileRoutesById {
   '/project/$ref/explorer': typeof ProjectRefExplorerRouteWithChildren
   '/project/$ref/functions': typeof ProjectRefFunctionsRouteWithChildren
   '/project/$ref/integrations': typeof ProjectRefIntegrationsRouteWithChildren
+  '/project/$ref/issues': typeof ProjectRefIssuesRouteWithChildren
   '/project/$ref/logs': typeof ProjectRefLogsRouteWithChildren
   '/project/$ref/merge': typeof ProjectRefMergeRoute
   '/project/$ref/observability': typeof ProjectRefObservabilityRouteWithChildren
@@ -2943,6 +2976,7 @@ export interface FileRoutesById {
   '/project/$ref/functions/$functionSlug': typeof ProjectRefFunctionsFunctionSlugRouteWithChildren
   '/project/$ref/functions/new': typeof ProjectRefFunctionsNewRoute
   '/project/$ref/functions/secrets': typeof ProjectRefFunctionsSecretsRoute
+  '/project/$ref/issues/$id': typeof ProjectRefIssuesIdRoute
   '/project/$ref/logs/auth-logs': typeof ProjectRefLogsAuthLogsRoute
   '/project/$ref/logs/cron-logs': typeof ProjectRefLogsCronLogsRoute
   '/project/$ref/logs/dedicated-pooler-logs': typeof ProjectRefLogsDedicatedPoolerLogsRoute
@@ -2969,6 +3003,7 @@ export interface FileRoutesById {
   '/project/$ref/observability/query-performance': typeof ProjectRefObservabilityQueryPerformanceRoute
   '/project/$ref/observability/realtime': typeof ProjectRefObservabilityRealtimeRoute
   '/project/$ref/observability/storage': typeof ProjectRefObservabilityStorageRoute
+  '/project/$ref/observability/warehouse': typeof ProjectRefObservabilityWarehouseRoute
   '/project/$ref/realtime/inspector': typeof ProjectRefRealtimeInspectorRoute
   '/project/$ref/realtime/policies': typeof ProjectRefRealtimePoliciesRoute
   '/project/$ref/realtime/settings': typeof ProjectRefRealtimeSettingsRoute
@@ -2997,6 +3032,7 @@ export interface FileRoutesById {
   '/project/$ref/explorer/': typeof ProjectRefExplorerIndexRoute
   '/project/$ref/functions/': typeof ProjectRefFunctionsIndexRoute
   '/project/$ref/integrations/': typeof ProjectRefIntegrationsIndexRoute
+  '/project/$ref/issues/': typeof ProjectRefIssuesIndexRoute
   '/project/$ref/logs/': typeof ProjectRefLogsIndexRoute
   '/project/$ref/observability/': typeof ProjectRefObservabilityIndexRoute
   '/project/$ref/sql/': typeof ProjectRefSqlIndexRoute
@@ -3193,6 +3229,7 @@ export interface FileRouteTypes {
     | '/project/$ref/explorer'
     | '/project/$ref/functions'
     | '/project/$ref/integrations'
+    | '/project/$ref/issues'
     | '/project/$ref/logs'
     | '/project/$ref/merge'
     | '/project/$ref/observability'
@@ -3271,6 +3308,7 @@ export interface FileRouteTypes {
     | '/project/$ref/functions/$functionSlug'
     | '/project/$ref/functions/new'
     | '/project/$ref/functions/secrets'
+    | '/project/$ref/issues/$id'
     | '/project/$ref/logs/auth-logs'
     | '/project/$ref/logs/cron-logs'
     | '/project/$ref/logs/dedicated-pooler-logs'
@@ -3297,6 +3335,7 @@ export interface FileRouteTypes {
     | '/project/$ref/observability/query-performance'
     | '/project/$ref/observability/realtime'
     | '/project/$ref/observability/storage'
+    | '/project/$ref/observability/warehouse'
     | '/project/$ref/realtime/inspector'
     | '/project/$ref/realtime/policies'
     | '/project/$ref/realtime/settings'
@@ -3325,6 +3364,7 @@ export interface FileRouteTypes {
     | '/project/$ref/explorer/'
     | '/project/$ref/functions/'
     | '/project/$ref/integrations/'
+    | '/project/$ref/issues/'
     | '/project/$ref/logs/'
     | '/project/$ref/observability/'
     | '/project/$ref/sql/'
@@ -3583,6 +3623,7 @@ export interface FileRouteTypes {
     | '/project/$ref/editor/new'
     | '/project/$ref/functions/new'
     | '/project/$ref/functions/secrets'
+    | '/project/$ref/issues/$id'
     | '/project/$ref/logs/auth-logs'
     | '/project/$ref/logs/cron-logs'
     | '/project/$ref/logs/dedicated-pooler-logs'
@@ -3609,6 +3650,7 @@ export interface FileRouteTypes {
     | '/project/$ref/observability/query-performance'
     | '/project/$ref/observability/realtime'
     | '/project/$ref/observability/storage'
+    | '/project/$ref/observability/warehouse'
     | '/project/$ref/realtime/inspector'
     | '/project/$ref/realtime/policies'
     | '/project/$ref/realtime/settings'
@@ -3636,6 +3678,7 @@ export interface FileRouteTypes {
     | '/project/$ref/explorer'
     | '/project/$ref/functions'
     | '/project/$ref/integrations'
+    | '/project/$ref/issues'
     | '/project/$ref/logs'
     | '/project/$ref/observability'
     | '/project/$ref/sql'
@@ -3832,6 +3875,7 @@ export interface FileRouteTypes {
     | '/project/$ref/explorer'
     | '/project/$ref/functions'
     | '/project/$ref/integrations'
+    | '/project/$ref/issues'
     | '/project/$ref/logs'
     | '/project/$ref/merge'
     | '/project/$ref/observability'
@@ -3910,6 +3954,7 @@ export interface FileRouteTypes {
     | '/project/$ref/functions/$functionSlug'
     | '/project/$ref/functions/new'
     | '/project/$ref/functions/secrets'
+    | '/project/$ref/issues/$id'
     | '/project/$ref/logs/auth-logs'
     | '/project/$ref/logs/cron-logs'
     | '/project/$ref/logs/dedicated-pooler-logs'
@@ -3936,6 +3981,7 @@ export interface FileRouteTypes {
     | '/project/$ref/observability/query-performance'
     | '/project/$ref/observability/realtime'
     | '/project/$ref/observability/storage'
+    | '/project/$ref/observability/warehouse'
     | '/project/$ref/realtime/inspector'
     | '/project/$ref/realtime/policies'
     | '/project/$ref/realtime/settings'
@@ -3964,6 +4010,7 @@ export interface FileRouteTypes {
     | '/project/$ref/explorer/'
     | '/project/$ref/functions/'
     | '/project/$ref/integrations/'
+    | '/project/$ref/issues/'
     | '/project/$ref/logs/'
     | '/project/$ref/observability/'
     | '/project/$ref/sql/'
@@ -4718,6 +4765,13 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof ProjectRefIntegrationsRouteImport
       parentRoute: typeof ProjectRefRoute
     }
+    '/project/$ref/issues': {
+      id: '/project/$ref/issues'
+      path: '/issues'
+      fullPath: '/project/$ref/issues'
+      preLoaderRoute: typeof ProjectRefIssuesRouteImport
+      parentRoute: typeof ProjectRefRoute
+    }
     '/project/$ref/logs': {
       id: '/project/$ref/logs'
       path: '/logs'
@@ -5313,6 +5367,20 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof ProjectRefIntegrationsIndexRouteImport
       parentRoute: typeof ProjectRefIntegrationsRoute
     }
+    '/project/$ref/issues/': {
+      id: '/project/$ref/issues/'
+      path: '/'
+      fullPath: '/project/$ref/issues/'
+      preLoaderRoute: typeof ProjectRefIssuesIndexRouteImport
+      parentRoute: typeof ProjectRefIssuesRoute
+    }
+    '/project/$ref/issues/$id': {
+      id: '/project/$ref/issues/$id'
+      path: '/$id'
+      fullPath: '/project/$ref/issues/$id'
+      preLoaderRoute: typeof ProjectRefIssuesIdRouteImport
+      parentRoute: typeof ProjectRefIssuesRoute
+    }
     '/project/$ref/logs/': {
       id: '/project/$ref/logs/'
       path: '/'
@@ -5507,6 +5575,13 @@ declare module '@tanstack/react-router' {
       path: '/storage'
       fullPath: '/project/$ref/observability/storage'
       preLoaderRoute: typeof ProjectRefObservabilityStorageRouteImport
+      parentRoute: typeof ProjectRefObservabilityRoute
+    }
+    '/project/$ref/observability/warehouse': {
+      id: '/project/$ref/observability/warehouse'
+      path: '/warehouse'
+      fullPath: '/project/$ref/observability/warehouse'
+      preLoaderRoute: typeof ProjectRefObservabilityWarehouseRouteImport
       parentRoute: typeof ProjectRefObservabilityRoute
     }
     '/project/$ref/realtime/inspector': {
@@ -6945,6 +7020,19 @@ const ProjectRefIntegrationsRouteWithChildren =
     ProjectRefIntegrationsRouteChildren,
   )
 
+interface ProjectRefIssuesRouteChildren {
+  ProjectRefIssuesIdRoute: typeof ProjectRefIssuesIdRoute
+  ProjectRefIssuesIndexRoute: typeof ProjectRefIssuesIndexRoute
+}
+
+const ProjectRefIssuesRouteChildren: ProjectRefIssuesRouteChildren = {
+  ProjectRefIssuesIdRoute: ProjectRefIssuesIdRoute,
+  ProjectRefIssuesIndexRoute: ProjectRefIssuesIndexRoute,
+}
+
+const ProjectRefIssuesRouteWithChildren =
+  ProjectRefIssuesRoute._addFileChildren(ProjectRefIssuesRouteChildren)
+
 interface ProjectRefLogsRouteChildren {
   ProjectRefLogsAuthLogsRoute: typeof ProjectRefLogsAuthLogsRoute
   ProjectRefLogsCronLogsRoute: typeof ProjectRefLogsCronLogsRoute
@@ -7008,6 +7096,7 @@ interface ProjectRefObservabilityRouteChildren {
   ProjectRefObservabilityQueryPerformanceRoute: typeof ProjectRefObservabilityQueryPerformanceRoute
   ProjectRefObservabilityRealtimeRoute: typeof ProjectRefObservabilityRealtimeRoute
   ProjectRefObservabilityStorageRoute: typeof ProjectRefObservabilityStorageRoute
+  ProjectRefObservabilityWarehouseRoute: typeof ProjectRefObservabilityWarehouseRoute
   ProjectRefObservabilityIndexRoute: typeof ProjectRefObservabilityIndexRoute
 }
 
@@ -7030,6 +7119,8 @@ const ProjectRefObservabilityRouteChildren: ProjectRefObservabilityRouteChildren
       ProjectRefObservabilityQueryPerformanceRoute,
     ProjectRefObservabilityRealtimeRoute: ProjectRefObservabilityRealtimeRoute,
     ProjectRefObservabilityStorageRoute: ProjectRefObservabilityStorageRoute,
+    ProjectRefObservabilityWarehouseRoute:
+      ProjectRefObservabilityWarehouseRoute,
     ProjectRefObservabilityIndexRoute: ProjectRefObservabilityIndexRoute,
   }
 
@@ -7172,6 +7263,7 @@ interface ProjectRefRouteChildren {
   ProjectRefExplorerRoute: typeof ProjectRefExplorerRouteWithChildren
   ProjectRefFunctionsRoute: typeof ProjectRefFunctionsRouteWithChildren
   ProjectRefIntegrationsRoute: typeof ProjectRefIntegrationsRouteWithChildren
+  ProjectRefIssuesRoute: typeof ProjectRefIssuesRouteWithChildren
   ProjectRefLogsRoute: typeof ProjectRefLogsRouteWithChildren
   ProjectRefMergeRoute: typeof ProjectRefMergeRoute
   ProjectRefObservabilityRoute: typeof ProjectRefObservabilityRouteWithChildren
@@ -7193,6 +7285,7 @@ const ProjectRefRouteChildren: ProjectRefRouteChildren = {
   ProjectRefExplorerRoute: ProjectRefExplorerRouteWithChildren,
   ProjectRefFunctionsRoute: ProjectRefFunctionsRouteWithChildren,
   ProjectRefIntegrationsRoute: ProjectRefIntegrationsRouteWithChildren,
+  ProjectRefIssuesRoute: ProjectRefIssuesRouteWithChildren,
   ProjectRefLogsRoute: ProjectRefLogsRouteWithChildren,
   ProjectRefMergeRoute: ProjectRefMergeRoute,
   ProjectRefObservabilityRoute: ProjectRefObservabilityRouteWithChildren,

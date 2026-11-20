@@ -179,3 +179,21 @@ export const getMenuGroupLabel = (menuId: string, menuItems: GlobalMenuItems): s
       (isMenuLevel(menuId, section.level) ||
         section.menuItems?.some((group) => group.some((item) => isMenuLevel(menuId, item.level))))
   )?.[0].label
+
+// the top bar has no menu id, so it finds the group by its links
+export const getMenuGroupLabelByPath = ({
+  menu,
+  pathname,
+}: {
+  menu: GlobalMenuItems
+  pathname: string
+}): string | undefined =>
+  menu.find(
+    ([section]) =>
+      section.enabled !== false &&
+      [section.href, ...(section.menuItems?.flat().map((item) => item.href) ?? [])].some(
+        (href) =>
+          !!href &&
+          (pathname === href || pathname.startsWith(`${href}/`) || href.startsWith(`${pathname}/`))
+      )
+  )?.[0].label

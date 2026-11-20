@@ -1,7 +1,6 @@
-import { queryOptions, skipToken } from '@tanstack/react-query'
-
 import { branchKeys } from './keys'
 import { get, handleError } from '@/data/fetchers'
+import { grantedQueryOptions, type GrantedQueryCallerOptions } from '@/data/granted-query-options'
 import { IS_PLATFORM } from '@/lib/constants'
 import type { StudioError } from '@/lib/errors/studio-errors'
 import type { GrantForVariants } from '@/lib/grants'
@@ -58,17 +57,22 @@ export async function getBranchDiff({
 export type BranchDiffData = Awaited<ReturnType<typeof getBranchDiff>>
 export type BranchDiffError = StudioError
 
-export const branchDiffQueryOptions = ({
-  branchRef,
-  projectRef,
-  includedSchemas,
-  pgdelta,
-  grant,
-}: BranchDiffVariables) =>
-  queryOptions<BranchDiffData, BranchDiffError>({
-    queryKey: branchKeys.diff(projectRef, branchRef, pgdelta),
-    queryFn:
-      IS_PLATFORM && branchRef && grant
-        ? () => getBranchDiff({ branchRef, includedSchemas, pgdelta, grant })
-        : skipToken,
-  })
+export const branchDiffQueryOptions = <TData = BranchDiffData>(
+  { branchRef, projectRef, includedSchemas, pgdelta, grant }: BranchDiffVariables,
+  options?: GrantedQueryCallerOptions<
+    BranchDiffData,
+    BranchDiffError,
+    TData,
+    ReturnType<typeof branchKeys.diff>
+  >
+) =>
+  grantedQueryOptions(
+    {
+      queryKey: branchKeys.diff(projectRef, branchRef, pgdelta),
+      queryFn:
+        IS_PLATFORM && branchRef && grant
+          ? () => getBranchDiff({ branchRef, includedSchemas, pgdelta, grant })
+          : undefined,
+    },
+    options
+  )

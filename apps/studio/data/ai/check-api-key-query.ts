@@ -1,9 +1,9 @@
 import { useQuery } from '@tanstack/react-query'
 
 import { aiKeys } from './keys'
+import { classifyResponseError } from '@/data/error-classification'
 import { constructHeaders, fetchHandler } from '@/data/fetchers'
 import { BASE_PATH, IS_PLATFORM } from '@/lib/constants'
-import { StudioError } from '@/lib/errors/studio-errors'
 import { UseCustomQueryOptions } from '@/types'
 
 // check to see if the OPENAI_API_KEY env var is set in self-hosted
@@ -26,7 +26,7 @@ export async function checkOpenAIKey(signal?: AbortSignal) {
   } catch {}
 
   if (!response.ok) {
-    throw new StudioError(body?.message, response.status)
+    throw classifyResponseError({ message: body?.message, code: response.status })
   }
 
   return body as { hasKey: boolean }

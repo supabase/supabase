@@ -21,6 +21,8 @@ export async function getSupamonitorEnabled({
   const { result } = await executeSql<{ libraries: string }[]>({
     projectRef,
     connectionString,
+    sqlOrigin: 'studio',
+    queryName: 'supamonitor-enabled',
     sql: safeSql`SELECT current_setting('shared_preload_libraries', true) AS libraries`,
     grant: unguarded.migrating,
   })

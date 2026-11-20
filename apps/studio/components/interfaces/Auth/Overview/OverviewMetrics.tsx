@@ -46,7 +46,6 @@ import {
 import { SIDEBAR_KEYS } from '@/components/layouts/ProjectLayout/LayoutSidebar/LayoutSidebarProvider'
 import { AlertError } from '@/components/ui/AlertError'
 import { ErrorCodeTooltip } from '@/components/ui/ErrorCodeTooltip/ErrorCodeTooltip'
-import { Service } from '@/data/graphql/graphql'
 import { useAiAssistantStateSnapshot } from '@/state/ai-assistant-state'
 import { useSidebarManagerSnapshot } from '@/state/sidebar-manager-state'
 
@@ -387,7 +386,7 @@ export const OverviewMetrics = ({ metrics, isLoading, error }: OverviewMetricsPr
                         header: 'Error code',
                         className: 'w-full',
                         render: (row) => (
-                          <ErrorCodeTooltip errorCode={row.error_code} service={Service.Auth}>
+                          <ErrorCodeTooltip errorCode={row.error_code} service={'AUTH'}>
                             <span className="line-clamp-1 font-mono uppercase text-xs inline-flex text-foreground-light cursor-default">
                               {row.error_code}
                             </span>

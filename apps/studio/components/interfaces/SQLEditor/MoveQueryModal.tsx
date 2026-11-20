@@ -213,11 +213,18 @@ export const MoveQueryModal = ({ visible, snippets = [], onClose }: MoveQueryMod
           <form id="move-snippet" onSubmit={form.handleSubmit(onConfirmMove)}>
             <DialogHeader>
               <DialogTitle>
-                Move {snippets.length === 1 ? `"${snippets[0].name}"` : `${snippets.length}`}{' '}
-                snippet{snippets.length > 1 ? 's' : ''} to a folder
+                Move{' '}
+                {snippets.length === 1 ? (
+                  <span>{`"${snippets[0].name}"`}</span>
+                ) : (
+                  <span>{`${snippets.length}`}</span>
+                )}{' '}
+                <span>snippet</span>
+                {snippets.length > 1 ? <span>s</span> : ''} <span>to a folder</span>
               </DialogTitle>
               <DialogDescription>
-                Select which folder to move your quer{snippets.length > 1 ? 'ies' : 'y'} to
+                Select which folder to move your quer
+                {snippets.length > 1 ? <span>ies</span> : <span>y</span>} <span>to</span>
               </DialogDescription>
             </DialogHeader>
 
@@ -242,7 +249,7 @@ export const MoveQueryModal = ({ visible, snippets = [], onClose }: MoveQueryMod
                     >
                       <div className="flex items-center space-x-2">
                         {selectedFolder}
-                        {isCurrentFolder && ` (Current)`}
+                        {isCurrentFolder && <span>{` (Current)`}</span>}
                       </div>
                     </Button>
                   </PopoverTrigger>
@@ -268,9 +275,9 @@ export const MoveQueryModal = ({ visible, snippets = [], onClose }: MoveQueryMod
                             >
                               <span>
                                 Root of the editor
-                                {snippets.length === 1 &&
-                                  snippets[0].folder_id === null &&
-                                  ` (Current)`}
+                                {snippets.length === 1 && snippets[0].folder_id === null && (
+                                  <span>{` (Current)`}</span>
+                                )}
                               </span>
                               {selectedId === 'root' && <CheckIcon size={14} />}
                             </CommandItem>
@@ -290,9 +297,9 @@ export const MoveQueryModal = ({ visible, snippets = [], onClose }: MoveQueryMod
                               >
                                 <span>
                                   {folder.name}
-                                  {snippets.length === 1 &&
-                                    snippets[0].folder_id === folder.id &&
-                                    ` (Current)`}
+                                  {snippets.length === 1 && snippets[0].folder_id === folder.id && (
+                                    <span>{` (Current)`}</span>
+                                  )}
                                 </span>
                                 {folder.id === selectedId && <CheckIcon size={14} />}
                               </CommandItem>

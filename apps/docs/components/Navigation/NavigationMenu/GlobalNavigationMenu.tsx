@@ -1,8 +1,7 @@
 'use client'
 
 import Link from 'next/link'
-import { usePathname } from 'next/navigation'
-import React, { FC, useEffect, useState } from 'react'
+import React, { FC, type ReactNode } from 'react'
 import { Badge, cn } from 'ui'
 import {
   TopNavMenu,
@@ -15,83 +14,97 @@ import {
 
 import type { DropdownMenuItem, GlobalMenuItems } from '../Navigation.types'
 import MenuIconPicker from './MenuIconPicker'
-import { useIaNavReady, useNavItems } from '@/features/IaNav'
+import { getMenuGroupLabelByPath } from './NavigationMenu.utils'
+import { IA_NAV_PENDING_CLASS, useDocsPathname, useIaNavReady, useNavItems } from '@/features/IaNav'
 
-/**
- * Get TopNav active label based on current pathname
- */
-export const useActiveMenuLabel = (menu: GlobalMenuItems) => {
-  const pathname = usePathname()
-  const [activeLabel, setActiveLabel] = useState('')
-
-  useEffect(() => {
-    // check if homepage
-    if (pathname === '/') {
-      return setActiveLabel('Home')
-    }
-
-    for (let index = 0; index < menu.length; index++) {
-      const section = menu[index]
-      if (section[0].enabled === false) continue
-
-      // check if first level menu items match beginning of url
-      if (section[0].href?.startsWith(pathname)) {
-        return setActiveLabel(section[0].label)
-      }
-      // check if second level menu items match beginning of url
-      if (section[0].menuItems) {
-        section[0].menuItems.map((menuItemGroup) =>
-          menuItemGroup
-            .filter((menuItem) => menuItem.enabled !== false)
-            .map(
-              (menuItem) => menuItem.href?.startsWith(pathname) && setActiveLabel(section[0].label)
-            )
-        )
-      }
-    }
-  }, [pathname, menu])
-
-  return activeLabel
+interface MenuItemLabelProps {
+  title: ReactNode
+  icon?: ReactNode
+  community?: boolean
+  isNew?: boolean
+  experimental?: boolean
 }
 
 const GlobalNavigationMenu: FC = () => {
   const { GLOBAL_MENU_ITEMS } = useNavItems()
   const isNavReady = useIaNavReady()
-  const activeLabel = useActiveMenuLabel(GLOBAL_MENU_ITEMS)
+  const pathname = useDocsPathname()
+  const activeLabel = getMenuGroupLabelByPath({ menu: GLOBAL_MENU_ITEMS, pathname })
+  const itemClassName = cn(!isNavReady && IA_NAV_PENDING_CLASS)
 
   return (
-    <TopNavMenu className={cn('ml-3.5', !isNavReady && 'invisible noscript:visible')}>
-      {GLOBAL_MENU_ITEMS.filter(([section]) => section.enabled !== false).map(([section]) => {
-        const label =
-          section.label === 'Home' ? <MenuIconPicker icon={section.icon || ''} /> : section.label
-        const ariaCurrent = activeLabel === section.label ? 'true' : undefined
+    <>
+      <TopNavMenu data-docs-nav="top-nav" className="ml-3.5">
+        {GLOBAL_MENU_ITEMS.filter(([section]) => section.enabled !== false).map(([section]) => {
+          const label =
+            section.label === 'Home' ? <MenuIconPicker icon={section.icon || ''} /> : section.label
+          const ariaCurrent = activeLabel === section.label ? 'true' : undefined
 
-        return section.menuItems ? (
-          <TopNavMenuItem key={section.label} label={label} aria-current={ariaCurrent}>
-            <TopNavMenuPanel>
-              {section.menuItems.map((group, index) => (
-                <GlobalMenuGroup
-                  key={group[0].label}
-                  items={group}
-                  fallbackLabel={index === 0 ? section.label : undefined}
-                />
-              ))}
-            </TopNavMenuPanel>
-          </TopNavMenuItem>
-        ) : (
-          <TopNavMenuLink
-            key={section.label}
-            linkAs={Link}
-            href={section.href || '#'}
-            aria-current={ariaCurrent}
-          >
-            {label}
-          </TopNavMenuLink>
-        )
-      })}
-    </TopNavMenu>
+          return section.menuItems ? (
+            <TopNavMenuItem
+              key={section.label}
+              label={label}
+              aria-current={ariaCurrent}
+              className={itemClassName}
+            >
+              <TopNavMenuPanel>
+                {section.menuItems.map((group, index) => (
+                  <GlobalMenuGroup
+                    key={group[0].label}
+                    items={group}
+                    fallbackLabel={index === 0 ? section.label : undefined}
+                  />
+                ))}
+              </TopNavMenuPanel>
+            </TopNavMenuItem>
+          ) : (
+            <TopNavMenuLink
+              key={section.label}
+              linkAs={Link}
+              href={section.href || '#'}
+              aria-current={ariaCurrent}
+              className={itemClassName}
+            >
+              {label}
+            </TopNavMenuLink>
+          )
+        })}
+      </TopNavMenu>
+      <GlobalMenuPanelsFallback menuItems={GLOBAL_MENU_ITEMS} />
+    </>
   )
 }
+
+// the menu panels mount on the client, so their links are also rendered for readers without JavaScript
+const GlobalMenuPanelsFallback = ({ menuItems }: { menuItems: GlobalMenuItems }) => (
+  <noscript>
+    <nav aria-label="Docs sections" data-docs-nav="top-nav-subheads" className="sr-only">
+      {menuItems
+        .filter(([section]) => section.enabled !== false && section.menuItems)
+        .map(([section]) => (
+          <section key={section.label}>
+            <h2>{section.label}</h2>
+            {section.menuItems?.map((group) => {
+              const enabledItems = group.filter((item) => item.enabled !== false)
+              const heading = enabledItems.find((item) => !item.href)?.label
+
+              return (
+                <ul key={group[0].label} aria-label={heading}>
+                  {enabledItems.map((item) =>
+                    item.href ? (
+                      <li key={item.href}>
+                        <Link href={item.href}>{item.label}</Link>
+                      </li>
+                    ) : null
+                  )}
+                </ul>
+              )
+            })}
+          </section>
+        ))}
+    </nav>
+  </noscript>
+)
 
 // an item without a link is the heading of its group. the first group falls back to the menu name
 const GlobalMenuGroup = ({
@@ -119,6 +132,26 @@ const GlobalMenuGroup = ({
   )
 }
 
+export const MenuItemLabel = ({
+  title,
+  icon,
+  community,
+  isNew,
+  experimental,
+}: MenuItemLabelProps) => (
+  <>
+    {icon ? (
+      <span aria-hidden className="flex h-5 shrink-0 items-center self-start">
+        {icon}
+      </span>
+    ) : null}
+    <span className="line-clamp-2 flex-1">{title}</span>
+    {community ? <Badge>Community</Badge> : null}
+    {isNew ? <Badge variant="success">New</Badge> : null}
+    {experimental ? <Badge variant="warning">Experimental</Badge> : null}
+  </>
+)
+
 export const MenuItem = React.forwardRef<
   React.ElementRef<'a'>,
   React.ComponentPropsWithoutRef<'a'> & {
@@ -138,19 +171,19 @@ export const MenuItem = React.forwardRef<
         ref={ref}
         className={cn(
           'group/menu-item flex items-center gap-2',
-          'w-full flex h-8 items-center text-foreground-light text-sm hover:text-foreground select-none rounded-md p-2 leading-none no-underline focus-ring focus-visible:text-foreground',
+          'w-full flex min-h-8 items-center text-foreground-light text-sm hover:text-foreground select-none rounded-md px-2 py-1.5 leading-5 no-underline focus-ring focus-visible:text-foreground',
           className
         )}
         {...props}
       >
         {children ?? (
-          <>
-            {icon && <MenuIconPicker icon={icon} className="text-foreground-lighter" />}
-            <span className="flex-1">{title}</span>
-            {community && <Badge>Community</Badge>}
-            {isNew && <Badge variant="success">New</Badge>}
-            {experimental && <Badge variant="warning">Experimental</Badge>}
-          </>
+          <MenuItemLabel
+            title={title}
+            icon={icon ? <MenuIconPicker icon={icon} className="text-foreground-lighter" /> : null}
+            community={community}
+            isNew={isNew}
+            experimental={experimental}
+          />
         )}
       </Link>
     )

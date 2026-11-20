@@ -27,6 +27,7 @@ const {
   mockDismissBanner,
   mockProjectState,
   mockResourceWarningsState,
+  mockOrgPlanState,
   mockBannerDismissedState,
   mockUseLocalStorageQuery,
 } = vi.hoisted(() => ({
@@ -43,6 +44,9 @@ const {
     },
   },
   mockResourceWarningsState: { current: undefined as any[] | undefined },
+  mockOrgPlanState: {
+    current: { id: 'pro', name: 'Pro' } as { id: string; name: string } | undefined,
+  },
   mockBannerDismissedState: { current: false },
   mockUseLocalStorageQuery: vi.fn(),
 }))
@@ -198,7 +202,7 @@ vi.mock('@/data/usage/resource-warnings-query', () => ({
 
 vi.mock('@/hooks/misc/useSelectedOrganization', () => ({
   useSelectedOrganizationQuery: () => ({
-    data: { name: 'Organization 1', slug: 'org-1' },
+    data: { name: 'Organization 1', slug: 'org-1', plan: mockOrgPlanState.current },
   }),
 }))
 
@@ -487,10 +491,11 @@ describe('FREE_MICRO_UPGRADE banner', () => {
       integration_source: null,
     }
     mockResourceWarningsState.current = undefined
+    mockOrgPlanState.current = { id: 'pro', name: 'Pro' }
     mockBannerDismissedState.current = false
   })
 
-  it('calls addBanner when project is nano and compute is near exhaustion', async () => {
+  it('calls addBanner when a paid-plan project is nano and compute is near exhaustion', async () => {
     renderLayout()
 
     await waitFor(() => {
@@ -524,6 +529,18 @@ describe('FREE_MICRO_UPGRADE banner', () => {
       'the project is not nano compute',
       () => {
         mockProjectState.current = { ...mockProjectState.current, infra_compute_size: 'micro' }
+      },
+    ],
+    [
+      'the organization is on the free plan',
+      () => {
+        mockOrgPlanState.current = { id: 'free', name: 'Free' }
+      },
+    ],
+    [
+      'the organization plan is not loaded yet',
+      () => {
+        mockOrgPlanState.current = undefined
       },
     ],
   ])('calls dismissBanner instead of addBanner when %s', async (_, arrange) => {

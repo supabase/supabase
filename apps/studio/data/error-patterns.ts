@@ -1,7 +1,7 @@
 import { ConnectionTimeoutError } from '@/lib/errors/studio-errors'
-import type { ClassifiedError, StudioError } from '@/lib/errors/studio-errors'
+import type { ClassifiedError, StudioErrorInput } from '@/lib/errors/studio-errors'
 
-type ErrorConstructor = new (...args: ConstructorParameters<typeof StudioError>) => ClassifiedError
+type ErrorConstructor = new (input: StudioErrorInput) => ClassifiedError
 
 export interface ErrorPattern {
   pattern: RegExp

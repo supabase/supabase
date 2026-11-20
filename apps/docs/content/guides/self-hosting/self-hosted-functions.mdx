@@ -172,7 +172,7 @@ export default {
 
 This is a key distinction that affects how you build URLs in your functions:
 
-- **`SUPABASE_URL`** contains an internal Docker network hostname. Use it for server-side calls from your functions to other Supabase services (Auth, Storage, database via PostgREST). This is what the Supabase JS client should use inside functions.
+- **`SUPABASE_URL`** contains an internal Docker network hostname. Use it for server-side calls from your functions to other Supabase services (Auth, Storage, database via PostgREST). This is what the [Supabase JS client](/docs/reference/javascript/introduction) should use inside functions.
 
 - **`SUPABASE_PUBLIC_URL`** is the externally-reachable URL of your Supabase instance. Use it if your function needs to build URLs that HTTP clients can reach from the outside.
 
@@ -288,6 +288,18 @@ For more on 401 responses from functions, see [Edge Function 401 errors](/kb/tro
 - Check that `FUNCTIONS_VERIFY_JWT` matches your intent (`true` or `false`) in `.env`
 - If verification is enabled, pass either a valid JWT in `Authorization: Bearer <token>` (a user session token or a legacy API key), or an `sb_publishable_*` or `sb_secret_*` key in the `apikey` header. The API gateway translates `sb_` keys to an internal JWT, which the functions service then verifies.
 - Verifying asymmetric JWTs, including translated `sb_` keys, requires `SUPABASE_JWKS` to be set for the `functions` service in `docker-compose.yml`. See [New API Keys and Asymmetric Authentication](/docs/guides/self-hosting/self-hosted-auth-keys).
+
+### CORS errors in the browser
+
+The API gateway leaves CORS on `/functions/v1/` to your function, as on the platform. It doesn't answer preflight (`OPTIONS`) requests there or add CORS headers to function responses.
+
+When you call a function from a browser, the function must handle preflight requests and return its own CORS headers. `withSupabase` does both. See [CORS support for Edge Functions](/docs/guides/functions/cors).
+
+A missing function, one that fails to start, or an unhandled error in your function also shows up in the browser as a CORS or network error: the preflight fails, or the error response has no CORS headers. Check the function name in the URL and run `docker compose logs functions`.
+
+### Scripts in HTML from a function don't run
+
+The API gateway adds a sandbox `Content-Security-Policy` to function responses, because Studio shares the gateway's origin. A page returned by a function still displays, but its scripts don't run, its forms can't be submitted, and it can't load images or stylesheets. See [Sandboxed responses](/docs/guides/self-hosting/self-hosted-envoy#sandboxed-responses).
 
 ### Changes to function code not reflected after editing
 

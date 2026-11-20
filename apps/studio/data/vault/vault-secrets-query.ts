@@ -29,7 +29,15 @@ export async function getVaultSecrets(
   const sql = getVaultSecretsSql()
 
   const { result } = await executeSql(
-    { projectRef, connectionString, sql, queryKey: ['vault-secrets'], grant: unguarded.migrating },
+    {
+      projectRef,
+      connectionString,
+      sql,
+      sqlOrigin: 'studio',
+      queryName: 'vault-secrets',
+      queryKey: ['vault-secrets'],
+      grant: unguarded.migrating,
+    },
     signal
   )
 

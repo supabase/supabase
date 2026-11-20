@@ -139,7 +139,7 @@ The deciding factor was if the tool could track an owner change for a VIEW.
 ALTER VIEW my_view OWNER TO authenticated;
 ```
 
-This is critical for Row Level Security to work with views. For policies to kick in on views, the owner must not have `superuser` or `bypassrls` privileges. Currently migra doesn't track this change ([issue](https://github.com/djrobstep/migra/issues/160)), while the pgAdmin Schema Diff does.
+This is critical for [Row Level Security](/docs/guides/database/postgres/row-level-security) to work with views. For policies to kick in on views, the owner must not have `superuser` or `bypassrls` privileges. Currently migra doesn't track this change ([issue](https://github.com/djrobstep/migra/issues/160)), while the pgAdmin Schema Diff does.
 
 There was a problem in using the [pgAdmin Schema Diff](https://www.pgadmin.org/docs/pgadmin4/development/schema_diff.html) though, it's a GUI-only tool.
 
@@ -183,7 +183,7 @@ On these [lines](https://gist.github.com/steve-chavez/3f286a233806aeee0bcea4a47f
 Also, similarly to the pgAdmin GUI:
 
 - You can include and exclude database objects from the diff with `--include-objects` or `--exclude-objects`
-- You can choose a single schema to diff with the `--schema` argument or you can pick different schemas to compare with the --source-schema and --target-schema arguments. We recommend you do this for Supabase databases. Diffing the whole database can take a while because of the `extensions` schema (especially if you enable PostGIS, which adds many functions).
+- You can choose a single schema to diff with the `--schema` argument or you can pick different schemas to compare with the --source-schema and --target-schema arguments. We recommend you do this for [Supabase databases](/database). Diffing the whole database can take a while because of the `extensions` schema (especially if you enable [PostGIS](/docs/guides/database/extensions/postgis), which adds many functions).
 
 ### Next steps
 

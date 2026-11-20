@@ -53,6 +53,13 @@
     "author_image_url": "https://github.com/fracek.png"
   },
   {
+    "author_id": "grant_huston",
+    "author": "Grant Huston",
+    "position": "Growth",
+    "author_url": "https://www.linkedin.com/in/grant-huston/",
+    "author_image_url": "/images/blog/avatars/grant-huston.jpg"
+  },
+  {
     "author_id": "gurjeet",
     "author": "Gurjeet Singh",
     "username": "gurjeet",
@@ -1143,5 +1150,33 @@
     "position": "Engineering",
     "author_url": "https://github.com/charislam",
     "author_image_url": "https://github.com/charislam.png"
+  },
+  {
+    "author_id": "kris_talajic",
+    "author": "Kris Talajic",
+    "position": "Sales Lead, East",
+    "author_url": "https://www.linkedin.com/in/ktalajic/",
+    "author_image_url": "/images/blog/avatars/kris-talajic.png"
+  },
+  {
+    "author_id": "nate_asp",
+    "author": "Nate Asp",
+    "position": "VP Sales",
+    "author_url": "https://www.linkedin.com/in/nateasp/",
+    "author_image_url": "/images/blog/avatars/nate-asp.jpg"
+  },
+  {
+    "author_id": "brad_gyger",
+    "author": "Brad Gyger",
+    "position": "VP Success",
+    "author_url": "https://www.linkedin.com/in/bradgyger/",
+    "author_image_url": "/images/blog/avatars/brad-gyger.jpg"
+  },
+  {
+    "author_id": "harold_gimenez",
+    "author": "Harold Gimenez",
+    "position": "VP of Product, Engineering & Design",
+    "author_url": "https://www.linkedin.com/in/hgmnz/",
+    "author_image_url": "/images/blog/avatars/harold-gimenez.jpg"
   }
 ]

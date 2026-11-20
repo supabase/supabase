@@ -55,7 +55,7 @@ export const SaveQueueActionBar = () => {
             >
               <div className="flex items-center gap-x-12 pl-4 pr-2 py-2 bg-surface-100 border rounded-lg shadow-lg">
                 <p className="text-xs text-foreground-light max-w-40 truncate">
-                  {operationCount} pending change{operationCount !== 1 ? 's' : ''}
+                  {operationCount} pending change{operationCount !== 1 ? <span>s</span> : ''}
                 </p>
                 <div className="flex items-center gap-x-2">
                   <Button

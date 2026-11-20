@@ -1,7 +1,7 @@
 import { zodResolver } from '@hookform/resolvers/zod'
 import { keyword } from '@supabase/pg-meta'
 import type { PGTrigger, PGTriggerCreate } from '@supabase/pg-meta'
-import { useQueryClient } from '@tanstack/react-query'
+import { useQuery, useQueryClient } from '@tanstack/react-query'
 import { useParams } from 'common'
 import { parseAsBoolean, parseAsString, useQueryState } from 'nuqs'
 import { useEffect, useRef, useState } from 'react'
@@ -12,19 +12,20 @@ import { Admonition } from 'ui-patterns/Admonition'
 
 import { FormSchema, WebhookFormValues } from './EditHookPanel.constants'
 import { FormContents } from './FormContents'
-import { useIsMarketplaceEnabled } from '@/components/interfaces/App/FeaturePreview/FeaturePreviewContext'
 import { RequiredExtensionsSection } from '@/components/interfaces/Integrations/Integration/RequiredExtensionsSection'
 import { useInstallRequiredExtensions } from '@/components/interfaces/Integrations/Integration/useInstallRequiredExtensions'
 import { DiscardChangesConfirmationDialog } from '@/components/ui-patterns/Dialogs/DiscardChangesConfirmationDialog'
+import { ButtonTooltip } from '@/components/ui/ButtonTooltip'
 import { useDatabaseTriggerCreateMutation } from '@/data/database-triggers/database-trigger-create-mutation'
 import { useDatabaseTriggerUpdateMutation } from '@/data/database-triggers/database-trigger-update-transaction-mutation'
-import { useDatabaseHooksQuery } from '@/data/database-triggers/database-triggers-query'
+import { databaseHooksQueryOptions } from '@/data/database-triggers/database-triggers-query'
 import { useHooksEnableMutation } from '@/data/database/hooks-enable-mutation'
 import { useSchemasQuery } from '@/data/database/schemas-query'
 import { tableEditorQueryOptions } from '@/data/table-editor/table-editor-query'
 import { useSelectedProjectQuery } from '@/hooks/misc/useSelectedProject'
 import { useConfirmOnClose } from '@/hooks/ui/useConfirmOnClose'
 import { isEdgeFunctionUrl } from '@/lib/api/edgeFunctions'
+import { getWriteGrantToastMessage, getWriteGrantTooltip, useGrant } from '@/lib/grants'
 import { uuidv4 } from '@/lib/helpers'
 
 export type HTTPArgument = { id: string; name: string; value: string }
@@ -74,7 +75,6 @@ const parseParameters = (selectedHook?: PGTrigger): HTTPArgument[] => {
 export const EditHookPanel = () => {
   const { ref } = useParams()
   const { data: project } = useSelectedProjectQuery()
-  const isMarketplaceEnabled = useIsMarketplaceEnabled()
 
   const [isLoadingTable, setIsLoadingTable] = useState(false)
 
@@ -92,15 +92,27 @@ export const EditHookPanel = () => {
   const { mutateAsync: enableHooks } = useHooksEnableMutation({ onError: () => {} })
 
   const needsWebhooksEnabled =
-    isMarketplaceEnabled &&
-    isSchemasLoaded &&
-    !schemas.some((schema) => schema.name === 'supabase_functions')
-  const isExtensionDataLoading = isExtensionsLoading || (isMarketplaceEnabled && !isSchemasLoaded)
+    isSchemasLoaded && !schemas.some((schema) => schema.name === 'supabase_functions')
+  const isExtensionDataLoading = isExtensionsLoading || !isSchemasLoaded
 
-  const { data: hooks = [], isSuccess } = useDatabaseHooksQuery({
-    projectRef: project?.ref,
-    connectionString: project?.connectionString,
-  })
+  const readGrant = useGrant(
+    'POST /platform/pg-meta/{ref}/query',
+    { projectRef: project?.ref },
+    { variant: 'read' }
+  )
+  const writeGrant = useGrant(
+    'POST /platform/pg-meta/{ref}/query',
+    { projectRef: project?.ref },
+    { variant: 'write' }
+  )
+
+  const { data: hooks = [], isSuccess } = useQuery(
+    databaseHooksQueryOptions({
+      projectRef: project?.ref,
+      connectionString: project?.connectionString,
+      grant: readGrant.grant,
+    })
+  )
 
   const [showCreateHookForm, setShowCreateHookForm] = useQueryState(
     'new',
@@ -212,6 +224,17 @@ export const EditHookPanel = () => {
       return console.error('Project ref is required')
     }
 
+    if (!writeGrant.grant) {
+      toast.error(
+        getWriteGrantToastMessage(
+          writeGrant.status,
+          selectedHook === undefined ? 'create' : 'update',
+          'webhooks'
+        )
+      )
+      return
+    }
+
     if (isExtensionDataLoading) return
 
     try {
@@ -299,12 +322,14 @@ export const EditHookPanel = () => {
 
       if (selectedHook === undefined) {
         createDatabaseTrigger({
+          grant: writeGrant.grant,
           projectRef: project?.ref,
           connectionString: project?.connectionString,
           payload,
         })
       } else {
         updateDatabaseTrigger({
+          grant: writeGrant.grant,
           projectRef: project?.ref,
           connectionString: project?.connectionString,
           originalTrigger: selectedHook,
@@ -352,22 +377,32 @@ export const EditHookPanel = () => {
             <Button size="tiny" type="button" onClick={confirmOnClose} disabled={isSubmitting}>
               Cancel
             </Button>
-            <Button
+            <ButtonTooltip
               size="tiny"
               variant="primary"
               type="submit"
               form={FORM_ID}
-              disabled={isSubmitting || isExtensionDataLoading}
+              disabled={isSubmitting || isExtensionDataLoading || !writeGrant.grant}
               loading={isSubmitting}
+              tooltip={{
+                content: {
+                  side: 'top',
+                  text: getWriteGrantTooltip(
+                    writeGrant.status,
+                    selectedHook === undefined ? 'create' : 'update',
+                    'webhooks'
+                  ),
+                },
+              }}
             >
               {selectedHook === undefined ? 'Create webhook' : 'Update webhook'}
-            </Button>
+            </ButtonTooltip>
           </div>
         }
       >
         <Form {...form}>
           <form id={FORM_ID} onSubmit={form.handleSubmit(onSubmit)}>
-            {isMarketplaceEnabled && (
+            <fieldset disabled={!writeGrant.grant} className="contents">
               <div className="flex flex-col gap-y-4 border-b px-5 py-5">
                 {(needsExtensions || needsWebhooksEnabled) && (
                   <Admonition
@@ -378,8 +413,8 @@ export const EditHookPanel = () => {
                 )}
                 <RequiredExtensionsSection hideSeparator />
               </div>
-            )}
-            <FormContents form={form} selectedHook={selectedHook} />
+              <FormContents form={form} selectedHook={selectedHook} />
+            </fieldset>
           </form>
         </Form>
       </SidePanel>

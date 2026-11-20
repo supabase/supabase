@@ -1,4 +1,4 @@
-import { useParams } from 'common'
+import { useFlag, useParams } from 'common'
 import { Loader2Icon } from 'lucide-react'
 import { useEffect, useState } from 'react'
 import { toast } from 'sonner'
@@ -22,6 +22,7 @@ import { DOCS_URL } from '@/lib/constants'
 
 export const ComplianceConfig = () => {
   const { ref } = useParams()
+  const isIssuesInboxEnabled = useFlag('issuesInbox')
   const [isSensitive, setIsSensitive] = useState(false)
 
   const { can: canUpdateComplianceConfig } = useAsyncCheckPermissionsV2(
@@ -77,9 +78,19 @@ export const ComplianceConfig = () => {
             <div className="space-y-2 max-w-2xl">
               <p className="text-sm">Apply additional compliance controls to project</p>
               <p className="text-sm text-foreground-light">
-                Enable security warnings in the{' '}
-                <InlineLink href={`/project/${ref}/advisors/security`}>Security Advisor</InlineLink>{' '}
-                to enforce requirements for managing sensitive data.
+                <span>
+                  {isIssuesInboxEnabled ? 'Raise additional ' : 'Enable security warnings in the '}
+                </span>
+                {isIssuesInboxEnabled ? (
+                  <InlineLink href={`/project/${ref}/issues?category=security`}>
+                    security issues
+                  </InlineLink>
+                ) : (
+                  <InlineLink href={`/project/${ref}/advisors/security`}>
+                    Security Advisor
+                  </InlineLink>
+                )}
+                <span> to enforce requirements for managing sensitive data.</span>
               </p>
             </div>
             <div className="flex items-center justify-end space-x-2">

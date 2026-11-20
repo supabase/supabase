@@ -4,7 +4,6 @@ import type jsonLogic from 'json-logic-js'
 import type { OrganizationBase } from '@/data/organizations/organizations-query'
 import type { PlanId } from '@/data/subscriptions/types'
 import type { ManagedBy } from '@/lib/constants/infrastructure'
-import type { StudioError } from '@/lib/errors/studio-errors'
 
 export interface Organization extends OrganizationBase {
   managed_by: ManagedBy
@@ -86,7 +85,7 @@ export interface Permission {
 }
 
 export interface ResponseFailure {
-  error: StudioError
+  error: Error
 }
 
 export type SupaResponse<T> = T | ResponseFailure

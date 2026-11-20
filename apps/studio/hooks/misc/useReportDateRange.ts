@@ -8,7 +8,7 @@ import {
   ReportsDatetimeHelper,
 } from '@/components/interfaces/Reports/Reports.constants'
 import { DatePickerValue } from '@/components/interfaces/Settings/Logs/Logs.DatePickers'
-import { maybeShowUpgradePromptIfNotEntitled } from '@/components/interfaces/Settings/Logs/Logs.utils'
+import { isStartOutsideRetention } from '@/components/interfaces/Settings/Logs/Logs.utils'
 import { AnalyticsInterval } from '@/data/analytics/constants'
 import { useCheckEntitlements } from '@/hooks/misc/useCheckEntitlements'
 import { useCurrentOrgPlan } from '@/hooks/misc/useCurrentOrgPlan'
@@ -168,7 +168,7 @@ export const useReportDateRange = (
         storedFrom.isValid() &&
         storedFrom.isAfter(now.subtract(90, 'day')) &&
         storedFrom.isBefore(now.add(1, 'day')) &&
-        !maybeShowUpgradePromptIfNotEntitled(timestampStartValue, entitledToAuditLogDays)
+        !isStartOutsideRetention(timestampStartValue, entitledToAuditLogDays)
       ) {
         return timestampStartValue
       }
@@ -255,10 +255,7 @@ export const useReportDateRange = (
   )
 
   const handleDatePickerChange = (values: DatePickerValue) => {
-    const shouldShowUpgradePrompt = maybeShowUpgradePromptIfNotEntitled(
-      values.from,
-      entitledToAuditLogDays
-    )
+    const shouldShowUpgradePrompt = isStartOutsideRetention(values.from, entitledToAuditLogDays)
     if (shouldShowUpgradePrompt) {
       setShowUpgradePrompt(true)
       return true

@@ -7,6 +7,7 @@ import { Admonition } from 'ui-patterns/Admonition'
 import { ShimmeringLoader } from 'ui-patterns/ShimmeringLoader'
 
 import { Restriction } from '../Restriction'
+import { useOrgSettingsPanel } from '../useOrgSettingsPanel'
 import { InitiateCancellationFlowButton } from './CancellationFlow'
 import { PlanUpdateSidePanel } from './PlanUpdateSidePanel'
 import { SupportLink } from '@/components/interfaces/Support/SupportLink'
@@ -21,14 +22,13 @@ import { useOrgSubscriptionQuery } from '@/data/subscriptions/org-subscription-q
 import { FGA_PERMISSIONS, useAsyncCheckPermissionsV2 } from '@/hooks/misc/useCheckPermissionsV2'
 import { useSelectedOrganizationQuery } from '@/hooks/misc/useSelectedOrganization'
 import { MANAGED_BY } from '@/lib/constants/infrastructure'
-import { useOrgSettingsPageStateSnapshot } from '@/state/organization-settings'
 
 const COMPARE_PLANS_URL = 'https://supabase.com/pricing#compare-plans'
 const AWS_MARKETPLACE_URL = 'https://supabase.com/aws-marketplace'
 
 const Subscription = () => {
   const { slug } = useParams()
-  const snap = useOrgSettingsPageStateSnapshot()
+  const { setPanel } = useOrgSettingsPanel()
   const projectUpdateDisabled = useFlag('disableProjectCreationAndUpdate')
   const { data: selectedOrganization } = useSelectedOrganizationQuery()
 
@@ -115,14 +115,14 @@ const Subscription = () => {
                 <div className="space-y-6 w-full">
                   <div className="flex justify-between items-center">
                     <p className="text-2xl text-primary leading-none">
-                      {currentPlan?.name ?? 'Unknown'} Plan
+                      {currentPlan?.name ?? <span>Unknown</span>} <span>Plan</span>
                     </p>
 
                     {canChangeTier && (
                       <div className="flex space-x-2">
                         <Button
                           className="pointer-events-auto"
-                          onClick={() => snap.setPanelKey('subscriptionPlan')}
+                          onClick={() => setPanel('subscriptionPlan')}
                         >
                           Change subscription plan
                         </Button>
@@ -177,9 +177,11 @@ const Subscription = () => {
                         Projects may become unresponsive when this organization exceeds its{' '}
                         <Link href={`/org/${slug}/usage`}>included usage quota</Link>. To scale
                         seamlessly,{' '}
-                        {currentPlan?.id === 'free'
-                          ? 'upgrade to a paid plan.'
-                          : 'you can disable Spend Cap under the Cost Control settings.'}
+                        {currentPlan?.id === 'free' ? (
+                          <span>upgrade to a paid plan.</span>
+                        ) : (
+                          <span>you can disable Spend Cap under the Cost Control settings.</span>
+                        )}
                       </div>
                     </Admonition>
                   )}

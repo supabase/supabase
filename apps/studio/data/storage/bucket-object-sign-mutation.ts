@@ -59,7 +59,8 @@ export const signBucketObjects = async (
     signal,
   })
 
-  if (error) handleError(error)
+  // Called directly by the storage explorer state, not through a mutation
+  if (error) handleError(error, { reportImmediately: true })
   return data ?? []
 }
 

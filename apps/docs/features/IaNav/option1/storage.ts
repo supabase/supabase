@@ -23,6 +23,7 @@ export const storage: NavMenuConstant = {
             { name: 'Storage schema design', url: '/guides/storage/schema/design' },
             { name: 'Helper Functions', url: '/guides/storage/schema/helper-functions' },
             { name: 'Custom roles', url: '/guides/storage/schema/custom-roles' },
+            { name: 'URL Signing Keys', url: '/guides/storage/security/signing-keys' },
           ],
         },
         {

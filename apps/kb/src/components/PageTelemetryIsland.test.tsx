@@ -136,6 +136,7 @@ describe('PageTelemetryIsland', () => {
         $referrer: 'https://www.google.com/',
         $utm_source: 'google',
         gclid: 'abc',
+        first_touch_timestamp: expect.stringMatching(/^\d{4}-\d{2}-\d{2}T/),
         first_referrer_cookie_present: true,
         first_referrer_cookie_consumed: true,
       })

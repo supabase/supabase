@@ -89,13 +89,12 @@ export const dynamicRedirects = [
     source: '/docs/guides/getting-started/ai-prompts/:slug',
     destination: '/docs/guides/ai-tools/ai-prompts/:slug',
   },
-  // Remaining troubleshooting guides whose docs slug matches the KB slug exactly.
-  // Hash-suffixed slugs are handled above (KB drops the suffix).
+  // Troubleshooting guides keep their slug on KB, hash suffix included (e.g. `foo-94a76b`,
+  // `foo-KnozmQ`), so this is slug to slug. Guides whose KB slug differs are static entries.
   {
     basePath: false,
     permanent: true,
-    source:
-      '/docs/guides/troubleshooting/:slug((?!_template(?:\\.md)?$)(?![^/]*-[0-9a-f]{6}(?:\\.md)?$)[^/]+)',
+    source: '/docs/guides/troubleshooting/:slug((?!_template(?:\\.md)?$)[^/]+)',
     destination: '/kb/troubleshooting/:slug',
   },
   // Dev and preview only redirects

@@ -187,6 +187,22 @@ Use an admonition when the content needs emphasis, or prose when it doesn't.
 Put the information in the sentence, or in a linked section when it's substantial enough
 to need one.
 
+#### Expandable content
+
+For optional detail
+the reader can skip, such as a long walkthrough or reference table, use an HTML native
+`<details>` element with a `<summary>`. Don't hide content the reader needs to finish
+the task.
+
+```mdx
+<details>
+<summary>Install Postgres and psql</summary>
+
+Content goes here, separated from the tags by blank lines.
+
+</details>
+```
+
 ## Steps and code
 
 ### Procedures
@@ -244,6 +260,17 @@ repository root, or set up automatic formatting in your editor.
 
 Write `select * from table` rather than `SELECT * FROM table`.
 
+#### Write a placeholder in uppercase with a `YOUR_` prefix
+
+Name the value the reader replaces, in `YOUR_UPPER_SNAKE_CASE`: `YOUR_TABLE`,
+`YOUR_PROJECT_REF`. Skip angle and square brackets, which break shell, JSX, and SQL.
+Say what to replace in the step that first uses it. For the project URL and keys, use
+[`ProjectConfigVariables`](#show-the-readers-project-url-and-keys-with-projectconfigvariables)
+instead.
+
+- **Recommended**: `alter table YOUR_TABLE enable row level security;`
+- **Not recommended**: `alter table <your-table> enable row level security;`
+
 Optionally specify a filename after the language specifier:
 
 ````md
@@ -259,6 +286,70 @@ Optionally highlight lines with `mark=${lineNumber}`:
 
 ```
 ````
+
+#### Pull code from a source file with `$CodeSample`
+
+Use `<$CodeSample />` to show code from a real file rather than a copy that can drift.
+Paths are relative to the `examples` directory unless you use an external GitHub source:
+
+```mdx
+<$CodeSample
+path="/relative/path/from/examples/directory.ts"
+lines={[[1, 3], [5, -1]]}
+meta="name=display/path.ts"
+/>
+```
+
+For props (`convertToJs`, external repos, allowlists), see the JSDoc on
+[`CodeSample.ts`](../features/directives/CodeSample.ts).
+
+#### Group related files with `$CodeTabs`
+
+Wrap two or more code blocks in `<$CodeTabs>` to show them as tabs:
+
+````mdx
+<$CodeTabs>
+
+```js name=a.js
+console.log('Hello, world!')
+```
+
+```js name=b.js
+console.log('Goodbye, world!')
+```
+
+</$CodeTabs>
+````
+
+#### Make JavaScript and TypeScript compile so type hints show
+
+JavaScript and TypeScript code blocks show type hints on hover. The whole block must
+compile, so undefined variables or missing imports turn the hints off. Put setup code
+above a `// ---cut---` line. The reader doesn't see it:
+
+````mdx
+```js
+import { createClient } from '@supabase/supabase-js'
+
+const supabase = createClient('https://example.supabase.co', 'publishable-key')
+
+// ---cut---
+const result = supabase.auth.signInWithPassword({
+  email: 'test@example.com',
+  password: 'test1234',
+})
+```
+````
+
+#### Show the reader's project URL and keys with `ProjectConfigVariables`
+
+When a step needs the reader's project URL or API key, use `ProjectConfigVariables`. A
+signed-in reader sees their own values:
+
+```mdx
+<ProjectConfigVariables variable="url" />
+<ProjectConfigVariables variable="publishable" />
+```
 
 ### Tabs
 
@@ -461,7 +552,7 @@ sentence around it.
 
 #### Say when a link leaves Supabase docs
 
-Name the destination in the sentence rather than relying on an icon: `see the Postgres
+Name the destination in the sentence rather than relying on an icon: `refer to the Postgres
 documentation on [row security
 policies](https://www.postgresql.org/docs/current/ddl-rowsecurity.html)`.
 
@@ -481,6 +572,20 @@ renaming a heading breaks every link to it. See [Headings](#headings).
 
 For when to cross-reference a section rather than repeat it, see [Navigation and
 glue](./03-page-structure.md#navigation-and-glue).
+
+### Partials
+
+#### Reuse shared content with `$Partial`
+
+If you copy the same content across files, put it in
+[`apps/docs/content/_partials`](../content/_partials) and include it with `$Partial`:
+
+```mdx
+<$Partial path="path/to/file.mdx" variables={{ "substitute": "this" }} />
+```
+
+In the partial, write `{{ .substitute }}` where the value goes. Only string replacement
+is supported. For anything more complex, make a custom component.
 
 ### Content listings
 

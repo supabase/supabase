@@ -146,7 +146,7 @@ vi.mock('react-data-grid', async () => {
             </RowSelectionContext.Provider>
           )
         })}
-        {rows.length === 0 && renderers?.noRowsFallback}
+        {rows.length === 0 && <span>{renderers?.noRowsFallback}</span>}
       </div>
     )
   }

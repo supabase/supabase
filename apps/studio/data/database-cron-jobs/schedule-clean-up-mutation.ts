@@ -22,6 +22,8 @@ export async function scheduleCronJobRunDetailsCleanup({
   const { result } = await executeSql({
     projectRef,
     connectionString,
+    sqlOrigin: 'studio',
+    queryName: 'schedule-clean-up',
     sql: getScheduleDeleteCronJobRunDetailsSql(interval),
     queryKey: getScheduleDeleteCronJobRunDetailsKey(projectRef, interval),
     grant: unguarded.migrating,

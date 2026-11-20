@@ -42,10 +42,12 @@ export function useSelectedGitHubConfigDrift() {
   })
   const isPermissionDenied = branchesGrant.status === 'denied'
   const shouldLoad = IS_PLATFORM && Boolean(projectRef) && Boolean(project) && !isPermissionDenied
-  const branchesQuery = useQuery({
-    ...branchesQueryOptions({ projectRef: parentProjectRef, grant: branchesGrant.grant }),
-    enabled: shouldLoad,
-  })
+  const branchesQuery = useQuery(
+    branchesQueryOptions(
+      { projectRef: parentProjectRef, grant: branchesGrant.grant },
+      { enabled: shouldLoad }
+    )
+  )
   const connectionQuery = useProjectGitHubConnectionQuery({ ref: parentProjectRef })
   const connection = connectionQuery.data
   const hasConnection = connection !== undefined

@@ -265,7 +265,7 @@ export function StorageSearchResults({ query }: StorageSearchResultsProps) {
         ) : (
           <span>
             Total: {totalBucketsEstimate.toLocaleString()} bucket
-            {totalBucketsEstimate !== 1 ? 's' : ''} (estimate)
+            {totalBucketsEstimate !== 1 ? <span>s</span> : ''} <span>(estimate)</span>
           </span>
         )}
       </div>

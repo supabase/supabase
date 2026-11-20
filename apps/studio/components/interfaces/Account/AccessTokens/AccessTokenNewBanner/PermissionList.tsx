@@ -17,7 +17,7 @@ export const PermissionsList = ({ groupedPermissions }: PermissionsListProps) =>
                 className="text-xs text-foreground capitalize"
               >
                 {resource}
-                {index < resources.length - 1 ? ',' : '.'}
+                {index < resources.length - 1 ? <span>,</span> : <span>.</span>}
               </span>
             ))}
           </div>

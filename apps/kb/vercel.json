@@ -3,6 +3,586 @@
   "trailingSlash": false,
   "redirects": [
     { "source": "/", "destination": "/kb", "permanent": false },
+    {
+      "source": "/kb/troubleshooting/FWD-wrappers-error-component-verification-failed",
+      "destination": "/kb/troubleshooting/FWD-wrappers-error-component-verification-failed-94a76b",
+      "permanent": true
+    },
+    {
+      "source": "/kb/troubleshooting/FWD-wrappers-error-component-verification-failed.md",
+      "destination": "/kb/troubleshooting/FWD-wrappers-error-component-verification-failed-94a76b.md",
+      "permanent": true
+    },
+    {
+      "source": "/kb/troubleshooting/app-store-rejection-tls-error-in-ipv6-only-environments",
+      "destination": "/kb/troubleshooting/app-store-rejection-tls-error-in-ipv6-only-environments-4e9c62",
+      "permanent": true
+    },
+    {
+      "source": "/kb/troubleshooting/app-store-rejection-tls-error-in-ipv6-only-environments.md",
+      "destination": "/kb/troubleshooting/app-store-rejection-tls-error-in-ipv6-only-environments-4e9c62.md",
+      "permanent": true
+    },
+    {
+      "source": "/kb/troubleshooting/auth-error-500-database-error-querying-schema",
+      "destination": "/kb/troubleshooting/auth-error-500-database-error-querying-schema-eb6b44",
+      "permanent": true
+    },
+    {
+      "source": "/kb/troubleshooting/auth-error-500-database-error-querying-schema.md",
+      "destination": "/kb/troubleshooting/auth-error-500-database-error-querying-schema-eb6b44.md",
+      "permanent": true
+    },
+    {
+      "source": "/kb/troubleshooting/auth-error-503-authretryablefetcherror",
+      "destination": "/kb/troubleshooting/auth-error-503-authretryablefetcherror-51b88c",
+      "permanent": true
+    },
+    {
+      "source": "/kb/troubleshooting/auth-error-503-authretryablefetcherror.md",
+      "destination": "/kb/troubleshooting/auth-error-503-authretryablefetcherror-51b88c.md",
+      "permanent": true
+    },
+    {
+      "source": "/kb/troubleshooting/auth-hooks-invalid-payload-when-anonymous-users-attempt-phone-changes",
+      "destination": "/kb/troubleshooting/auth-hooks-invalid-payload-when-anonymous-users-attempt-phone-changes-022c47",
+      "permanent": true
+    },
+    {
+      "source": "/kb/troubleshooting/auth-hooks-invalid-payload-when-anonymous-users-attempt-phone-changes.md",
+      "destination": "/kb/troubleshooting/auth-hooks-invalid-payload-when-anonymous-users-attempt-phone-changes-022c47.md",
+      "permanent": true
+    },
+    {
+      "source": "/kb/troubleshooting/autovacuum-stalled-due-to-inactive-replication-slot",
+      "destination": "/kb/troubleshooting/autovacuum-stalled-due-to-inactive-replication-slot-d55aa2",
+      "permanent": true
+    },
+    {
+      "source": "/kb/troubleshooting/autovacuum-stalled-due-to-inactive-replication-slot.md",
+      "destination": "/kb/troubleshooting/autovacuum-stalled-due-to-inactive-replication-slot-d55aa2.md",
+      "permanent": true
+    },
+    {
+      "source": "/kb/troubleshooting/cant-change-the-default-privileges-of-supabase_admin-in-the-public-schema",
+      "destination": "/kb/troubleshooting/cant-change-the-default-privileges-of-supabase_admin-in-the-public-schema-448af9",
+      "permanent": true
+    },
+    {
+      "source": "/kb/troubleshooting/cant-change-the-default-privileges-of-supabase_admin-in-the-public-schema.md",
+      "destination": "/kb/troubleshooting/cant-change-the-default-privileges-of-supabase_admin-in-the-public-schema-448af9.md",
+      "permanent": true
+    },
+    {
+      "source": "/kb/troubleshooting/cant-revoke-a-role-membership-granted-by-supabase_admin",
+      "destination": "/kb/troubleshooting/cant-revoke-a-role-membership-granted-by-supabase_admin-d08922",
+      "permanent": true
+    },
+    {
+      "source": "/kb/troubleshooting/cant-revoke-a-role-membership-granted-by-supabase_admin.md",
+      "destination": "/kb/troubleshooting/cant-revoke-a-role-membership-granted-by-supabase_admin-d08922.md",
+      "permanent": true
+    },
+    {
+      "source": "/kb/troubleshooting/cloudflare-origin-error-1016-on-custom-domain",
+      "destination": "/kb/troubleshooting/cloudflare-origin-error-1016-on-custom-domain-a57af4",
+      "permanent": true
+    },
+    {
+      "source": "/kb/troubleshooting/cloudflare-origin-error-1016-on-custom-domain.md",
+      "destination": "/kb/troubleshooting/cloudflare-origin-error-1016-on-custom-domain-a57af4.md",
+      "permanent": true
+    },
+    {
+      "source": "/kb/troubleshooting/custom-role-inherits-privileges-that-were-not-explicitly-granted",
+      "destination": "/kb/troubleshooting/custom-role-inherits-privileges-that-were-not-explicitly-granted-ddaa1c",
+      "permanent": true
+    },
+    {
+      "source": "/kb/troubleshooting/custom-role-inherits-privileges-that-were-not-explicitly-granted.md",
+      "destination": "/kb/troubleshooting/custom-role-inherits-privileges-that-were-not-explicitly-granted-ddaa1c.md",
+      "permanent": true
+    },
+    {
+      "source": "/kb/troubleshooting/database-roles-can-read-request-headers-queued-by-pg_net",
+      "destination": "/kb/troubleshooting/database-roles-can-read-request-headers-queued-by-pg_net-ad6357",
+      "permanent": true
+    },
+    {
+      "source": "/kb/troubleshooting/database-roles-can-read-request-headers-queued-by-pg_net.md",
+      "destination": "/kb/troubleshooting/database-roles-can-read-request-headers-queued-by-pg_net-ad6357.md",
+      "permanent": true
+    },
+    {
+      "source": "/kb/troubleshooting/disk-size-not-shrinking-after-deleting-data",
+      "destination": "/kb/troubleshooting/disk-size-not-shrinking-after-deleting-data-135390",
+      "permanent": true
+    },
+    {
+      "source": "/kb/troubleshooting/disk-size-not-shrinking-after-deleting-data.md",
+      "destination": "/kb/troubleshooting/disk-size-not-shrinking-after-deleting-data-135390.md",
+      "permanent": true
+    },
+    {
+      "source": "/kb/troubleshooting/edge-function-error-rate-limit-exceeded-for-trace",
+      "destination": "/kb/troubleshooting/edge-function-error-rate-limit-exceeded-for-trace-1094d3",
+      "permanent": true
+    },
+    {
+      "source": "/kb/troubleshooting/edge-function-error-rate-limit-exceeded-for-trace.md",
+      "destination": "/kb/troubleshooting/edge-function-error-rate-limit-exceeded-for-trace-1094d3.md",
+      "permanent": true
+    },
+    {
+      "source": "/kb/troubleshooting/email-password-login-disabled-supabase-vercel-marketplace",
+      "destination": "/kb/troubleshooting/email-password-login-disabled-supabase-vercel-marketplace-a7dd36",
+      "permanent": true
+    },
+    {
+      "source": "/kb/troubleshooting/email-password-login-disabled-supabase-vercel-marketplace.md",
+      "destination": "/kb/troubleshooting/email-password-login-disabled-supabase-vercel-marketplace-a7dd36.md",
+      "permanent": true
+    },
+    {
+      "source": "/kb/troubleshooting/error-invalid-byte-sequence-for-encoding-utf8-0x00-when-accessing-triggers-or-webhooks",
+      "destination": "/kb/troubleshooting/error-invalid-byte-sequence-for-encoding-utf8-0x00-when-accessing-triggers-or-webhooks-e78cf8",
+      "permanent": true
+    },
+    {
+      "source": "/kb/troubleshooting/error-invalid-byte-sequence-for-encoding-utf8-0x00-when-accessing-triggers-or-webhooks.md",
+      "destination": "/kb/troubleshooting/error-invalid-byte-sequence-for-encoding-utf8-0x00-when-accessing-triggers-or-webhooks-e78cf8.md",
+      "permanent": true
+    },
+    {
+      "source": "/kb/troubleshooting/error-relation-supabase_migrationsschema_migrations-does-not-exist",
+      "destination": "/kb/troubleshooting/error-relation-supabase_migrationsschema_migrations-does-not-exist-a787d6",
+      "permanent": true
+    },
+    {
+      "source": "/kb/troubleshooting/error-relation-supabase_migrationsschema_migrations-does-not-exist.md",
+      "destination": "/kb/troubleshooting/error-relation-supabase_migrationsschema_migrations-does-not-exist-a787d6.md",
+      "permanent": true
+    },
+    {
+      "source": "/kb/troubleshooting/error-target-organization-is-not-managed-by-vercel-marketplace-during-project-transfer",
+      "destination": "/kb/troubleshooting/error-target-organization-is-not-managed-by-vercel-marketplace-during-project-transfer-5262c3",
+      "permanent": true
+    },
+    {
+      "source": "/kb/troubleshooting/error-target-organization-is-not-managed-by-vercel-marketplace-during-project-transfer.md",
+      "destination": "/kb/troubleshooting/error-target-organization-is-not-managed-by-vercel-marketplace-during-project-transfer-5262c3.md",
+      "permanent": true
+    },
+    {
+      "source": "/kb/troubleshooting/formatting-support-requests-for-faster-resolution",
+      "destination": "/kb/troubleshooting/formatting-support-requests-for-faster-resolution-616717",
+      "permanent": true
+    },
+    {
+      "source": "/kb/troubleshooting/formatting-support-requests-for-faster-resolution.md",
+      "destination": "/kb/troubleshooting/formatting-support-requests-for-faster-resolution-616717.md",
+      "permanent": true
+    },
+    {
+      "source": "/kb/troubleshooting/get-detailed-storage-metrics-with-the-aws-cli",
+      "destination": "/kb/troubleshooting/get-detailed-storage-metrics-with-the-aws-cli-587a7d",
+      "permanent": true
+    },
+    {
+      "source": "/kb/troubleshooting/get-detailed-storage-metrics-with-the-aws-cli.md",
+      "destination": "/kb/troubleshooting/get-detailed-storage-metrics-with-the-aws-cli-587a7d.md",
+      "permanent": true
+    },
+    {
+      "source": "/kb/troubleshooting/high-cpu-and-infinite-transaction-retries-when-using-custom-error-codes-in-rpc-functions",
+      "destination": "/kb/troubleshooting/high-cpu-and-infinite-transaction-retries-when-using-custom-error-codes-in-rpc-functions-77326b",
+      "permanent": true
+    },
+    {
+      "source": "/kb/troubleshooting/high-cpu-and-infinite-transaction-retries-when-using-custom-error-codes-in-rpc-functions.md",
+      "destination": "/kb/troubleshooting/high-cpu-and-infinite-transaction-retries-when-using-custom-error-codes-in-rpc-functions-77326b.md",
+      "permanent": true
+    },
+    {
+      "source": "/kb/troubleshooting/how-to-delete-vercel-linked-projects",
+      "destination": "/kb/troubleshooting/how-to-delete-vercel-linked-projects-9d08aa",
+      "permanent": true
+    },
+    {
+      "source": "/kb/troubleshooting/how-to-delete-vercel-linked-projects.md",
+      "destination": "/kb/troubleshooting/how-to-delete-vercel-linked-projects-9d08aa.md",
+      "permanent": true
+    },
+    {
+      "source": "/kb/troubleshooting/issues-with-rotating-pgsodium-and-vault-root-encryption-keys",
+      "destination": "/kb/troubleshooting/issues-with-rotating-pgsodium-and-vault-root-encryption-keys-efeb47",
+      "permanent": true
+    },
+    {
+      "source": "/kb/troubleshooting/issues-with-rotating-pgsodium-and-vault-root-encryption-keys.md",
+      "destination": "/kb/troubleshooting/issues-with-rotating-pgsodium-and-vault-root-encryption-keys-efeb47.md",
+      "permanent": true
+    },
+    {
+      "source": "/kb/troubleshooting/managing-or-disconnecting-github-oauth-connections",
+      "destination": "/kb/troubleshooting/managing-or-disconnecting-github-oauth-connections-e3dc3b",
+      "permanent": true
+    },
+    {
+      "source": "/kb/troubleshooting/managing-or-disconnecting-github-oauth-connections.md",
+      "destination": "/kb/troubleshooting/managing-or-disconnecting-github-oauth-connections-e3dc3b.md",
+      "permanent": true
+    },
+    {
+      "source": "/kb/troubleshooting/manually-created-databases-are-not-visible-in-the-supabase-dashboard",
+      "destination": "/kb/troubleshooting/manually-created-databases-are-not-visible-in-the-supabase-dashboard-4415aa",
+      "permanent": true
+    },
+    {
+      "source": "/kb/troubleshooting/manually-created-databases-are-not-visible-in-the-supabase-dashboard.md",
+      "destination": "/kb/troubleshooting/manually-created-databases-are-not-visible-in-the-supabase-dashboard-4415aa.md",
+      "permanent": true
+    },
+    {
+      "source": "/kb/troubleshooting/otp-verification-failures-token-has-expired-or-otp_expired-errors",
+      "destination": "/kb/troubleshooting/otp-verification-failures-token-has-expired-or-otp_expired-errors-5ee4d0",
+      "permanent": true
+    },
+    {
+      "source": "/kb/troubleshooting/otp-verification-failures-token-has-expired-or-otp_expired-errors.md",
+      "destination": "/kb/troubleshooting/otp-verification-failures-token-has-expired-or-otp_expired-errors-5ee4d0.md",
+      "permanent": true
+    },
+    {
+      "source": "/kb/troubleshooting/partial-migrations-and-schema-inconsistencies-from-embedded-transactions",
+      "destination": "/kb/troubleshooting/partial-migrations-and-schema-inconsistencies-from-embedded-transactions-13ae82",
+      "permanent": true
+    },
+    {
+      "source": "/kb/troubleshooting/partial-migrations-and-schema-inconsistencies-from-embedded-transactions.md",
+      "destination": "/kb/troubleshooting/partial-migrations-and-schema-inconsistencies-from-embedded-transactions-13ae82.md",
+      "permanent": true
+    },
+    {
+      "source": "/kb/troubleshooting/permission-denied-when-deleting-the-cli_login_postgres-role",
+      "destination": "/kb/troubleshooting/permission-denied-when-deleting-the-cli_login_postgres-role-808bae",
+      "permanent": true
+    },
+    {
+      "source": "/kb/troubleshooting/permission-denied-when-deleting-the-cli_login_postgres-role.md",
+      "destination": "/kb/troubleshooting/permission-denied-when-deleting-the-cli_login_postgres-role-808bae.md",
+      "permanent": true
+    },
+    {
+      "source": "/kb/troubleshooting/permission-errors-when-granting-custom-roles-access-to-the-auth-schema",
+      "destination": "/kb/troubleshooting/permission-errors-when-granting-custom-roles-access-to-the-auth-schema-9e32e7",
+      "permanent": true
+    },
+    {
+      "source": "/kb/troubleshooting/permission-errors-when-granting-custom-roles-access-to-the-auth-schema.md",
+      "destination": "/kb/troubleshooting/permission-errors-when-granting-custom-roles-access-to-the-auth-schema-9e32e7.md",
+      "permanent": true
+    },
+    {
+      "source": "/kb/troubleshooting/pg_cron-launcher-crashes-with-duplicate-key-value-violates-unique-constraint",
+      "destination": "/kb/troubleshooting/pg_cron-launcher-crashes-with-duplicate-key-value-violates-unique-constraint-cc6472",
+      "permanent": true
+    },
+    {
+      "source": "/kb/troubleshooting/pg_cron-launcher-crashes-with-duplicate-key-value-violates-unique-constraint.md",
+      "destination": "/kb/troubleshooting/pg_cron-launcher-crashes-with-duplicate-key-value-violates-unique-constraint-cc6472.md",
+      "permanent": true
+    },
+    {
+      "source": "/kb/troubleshooting/pg_dump-fails-with-query-would-be-affected-by-row-level-security-policy",
+      "destination": "/kb/troubleshooting/pg_dump-fails-with-query-would-be-affected-by-row-level-security-policy-1d5783",
+      "permanent": true
+    },
+    {
+      "source": "/kb/troubleshooting/pg_dump-fails-with-query-would-be-affected-by-row-level-security-policy.md",
+      "destination": "/kb/troubleshooting/pg_dump-fails-with-query-would-be-affected-by-row-level-security-policy-1d5783.md",
+      "permanent": true
+    },
+    {
+      "source": "/kb/troubleshooting/pkce-flow-errors-cannot-parse-response-or-zgotmplz-in-magic-link-emails",
+      "destination": "/kb/troubleshooting/pkce-flow-errors-cannot-parse-response-or-zgotmplz-in-magic-link-emails-433665",
+      "permanent": true
+    },
+    {
+      "source": "/kb/troubleshooting/pkce-flow-errors-cannot-parse-response-or-zgotmplz-in-magic-link-emails.md",
+      "destination": "/kb/troubleshooting/pkce-flow-errors-cannot-parse-response-or-zgotmplz-in-magic-link-emails-433665.md",
+      "permanent": true
+    },
+    {
+      "source": "/kb/troubleshooting/postgres-error-could-not-access-status-of-transaction-or-could-not-open-file-pg_xact",
+      "destination": "/kb/troubleshooting/postgres-error-could-not-access-status-of-transaction-or-could-not-open-file-pg_xact-f88389",
+      "permanent": true
+    },
+    {
+      "source": "/kb/troubleshooting/postgres-error-could-not-access-status-of-transaction-or-could-not-open-file-pg_xact.md",
+      "destination": "/kb/troubleshooting/postgres-error-could-not-access-status-of-transaction-or-could-not-open-file-pg_xact-f88389.md",
+      "permanent": true
+    },
+    {
+      "source": "/kb/troubleshooting/postgrest-error-400-column-example_tableexample_column-does-not-exist-when-using-or-operators",
+      "destination": "/kb/troubleshooting/postgrest-error-400-column-example_tableexample_column-does-not-exist-when-using-or-operators-46ff23",
+      "permanent": true
+    },
+    {
+      "source": "/kb/troubleshooting/postgrest-error-400-column-example_tableexample_column-does-not-exist-when-using-or-operators.md",
+      "destination": "/kb/troubleshooting/postgrest-error-400-column-example_tableexample_column-does-not-exist-when-using-or-operators-46ff23.md",
+      "permanent": true
+    },
+    {
+      "source": "/kb/troubleshooting/postgrest-error-pgrst002-could-not-query-the-database-for-the-schema-cache",
+      "destination": "/kb/troubleshooting/postgrest-error-pgrst002-could-not-query-the-database-for-the-schema-cache-c396e9",
+      "permanent": true
+    },
+    {
+      "source": "/kb/troubleshooting/postgrest-error-pgrst002-could-not-query-the-database-for-the-schema-cache.md",
+      "destination": "/kb/troubleshooting/postgrest-error-pgrst002-could-not-query-the-database-for-the-schema-cache-c396e9.md",
+      "permanent": true
+    },
+    {
+      "source": "/kb/troubleshooting/postgrest-not-recognizing-new-columns-or-functions",
+      "destination": "/kb/troubleshooting/postgrest-not-recognizing-new-columns-or-functions-bd75f5",
+      "permanent": true
+    },
+    {
+      "source": "/kb/troubleshooting/postgrest-not-recognizing-new-columns-or-functions.md",
+      "destination": "/kb/troubleshooting/postgrest-not-recognizing-new-columns-or-functions-bd75f5.md",
+      "permanent": true
+    },
+    {
+      "source": "/kb/troubleshooting/powerbi-service-error-the-remote-certificate-is-invalid-according-to-the-validation-procedure",
+      "destination": "/kb/troubleshooting/powerbi-service-error-the-remote-certificate-is-invalid-according-to-the-validation-procedure-640a98",
+      "permanent": true
+    },
+    {
+      "source": "/kb/troubleshooting/powerbi-service-error-the-remote-certificate-is-invalid-according-to-the-validation-procedure.md",
+      "destination": "/kb/troubleshooting/powerbi-service-error-the-remote-certificate-is-invalid-according-to-the-validation-procedure-640a98.md",
+      "permanent": true
+    },
+    {
+      "source": "/kb/troubleshooting/putting-a-project-in-read-only-mode-or-freezing-writes-during-a-migration",
+      "destination": "/kb/troubleshooting/putting-a-project-in-read-only-mode-or-freezing-writes-during-a-migration-b5a2c7",
+      "permanent": true
+    },
+    {
+      "source": "/kb/troubleshooting/putting-a-project-in-read-only-mode-or-freezing-writes-during-a-migration.md",
+      "destination": "/kb/troubleshooting/putting-a-project-in-read-only-mode-or-freezing-writes-during-a-migration-b5a2c7.md",
+      "permanent": true
+    },
+    {
+      "source": "/kb/troubleshooting/rclone-error-s3-protocol-error-received-listing-v1-with-istruncated-set-no-nextmarker-and-no-contents",
+      "destination": "/kb/troubleshooting/rclone-error-s3-protocol-error-received-listing-v1-with-istruncated-set-no-nextmarker-and-no-contents-e64d34",
+      "permanent": true
+    },
+    {
+      "source": "/kb/troubleshooting/rclone-error-s3-protocol-error-received-listing-v1-with-istruncated-set-no-nextmarker-and-no-contents.md",
+      "destination": "/kb/troubleshooting/rclone-error-s3-protocol-error-received-listing-v1-with-istruncated-set-no-nextmarker-and-no-contents-e64d34.md",
+      "permanent": true
+    },
+    {
+      "source": "/kb/troubleshooting/realtime-handling-silent-disconnections-in-backgrounded-applications",
+      "destination": "/kb/troubleshooting/realtime-handling-silent-disconnections-in-backgrounded-applications-592794",
+      "permanent": true
+    },
+    {
+      "source": "/kb/troubleshooting/realtime-handling-silent-disconnections-in-backgrounded-applications.md",
+      "destination": "/kb/troubleshooting/realtime-handling-silent-disconnections-in-backgrounded-applications-592794.md",
+      "permanent": true
+    },
+    {
+      "source": "/kb/troubleshooting/relation-objects-does-not-exist-error-during-storage-uploads",
+      "destination": "/kb/troubleshooting/relation-objects-does-not-exist-error-during-storage-uploads-8f21f0",
+      "permanent": true
+    },
+    {
+      "source": "/kb/troubleshooting/relation-objects-does-not-exist-error-during-storage-uploads.md",
+      "destination": "/kb/troubleshooting/relation-objects-does-not-exist-error-during-storage-uploads-8f21f0.md",
+      "permanent": true
+    },
+    {
+      "source": "/kb/troubleshooting/resolving-cannot-execute-update-in-a-read-only-transaction-on-transaction-pooler-connections",
+      "destination": "/kb/troubleshooting/resolving-cannot-execute-update-in-a-read-only-transaction-on-transaction-pooler-connections-ef582c",
+      "permanent": true
+    },
+    {
+      "source": "/kb/troubleshooting/resolving-cannot-execute-update-in-a-read-only-transaction-on-transaction-pooler-connections.md",
+      "destination": "/kb/troubleshooting/resolving-cannot-execute-update-in-a-read-only-transaction-on-transaction-pooler-connections-ef582c.md",
+      "permanent": true
+    },
+    {
+      "source": "/kb/troubleshooting/resolving-permission-denied-for-database-postgres-during-migrations",
+      "destination": "/kb/troubleshooting/resolving-permission-denied-for-database-postgres-during-migrations-78f33a",
+      "permanent": true
+    },
+    {
+      "source": "/kb/troubleshooting/resolving-permission-denied-for-database-postgres-during-migrations.md",
+      "destination": "/kb/troubleshooting/resolving-permission-denied-for-database-postgres-during-migrations-78f33a.md",
+      "permanent": true
+    },
+    {
+      "source": "/kb/troubleshooting/revoking-access-to-pg_net-objects-has-no-effect",
+      "destination": "/kb/troubleshooting/revoking-access-to-pg_net-objects-has-no-effect-0bbc16",
+      "permanent": true
+    },
+    {
+      "source": "/kb/troubleshooting/revoking-access-to-pg_net-objects-has-no-effect.md",
+      "destination": "/kb/troubleshooting/revoking-access-to-pg_net-objects-has-no-effect-0bbc16.md",
+      "permanent": true
+    },
+    {
+      "source": "/kb/troubleshooting/revoking-privileges-on-storage-pg_cron-vault-and-extension-objects-has-no-effect",
+      "destination": "/kb/troubleshooting/revoking-privileges-on-storage-pg_cron-vault-and-extension-objects-has-no-effect-916576",
+      "permanent": true
+    },
+    {
+      "source": "/kb/troubleshooting/revoking-privileges-on-storage-pg_cron-vault-and-extension-objects-has-no-effect.md",
+      "destination": "/kb/troubleshooting/revoking-privileges-on-storage-pg_cron-vault-and-extension-objects-has-no-effect-916576.md",
+      "permanent": true
+    },
+    {
+      "source": "/kb/troubleshooting/scan-error-on-column-confirmation_token-converting-null-to-string-is-unsupported-during-auth-login",
+      "destination": "/kb/troubleshooting/scan-error-on-column-confirmation_token-converting-null-to-string-is-unsupported-during-auth-login-a0c686",
+      "permanent": true
+    },
+    {
+      "source": "/kb/troubleshooting/scan-error-on-column-confirmation_token-converting-null-to-string-is-unsupported-during-auth-login.md",
+      "destination": "/kb/troubleshooting/scan-error-on-column-confirmation_token-converting-null-to-string-is-unsupported-during-auth-login-a0c686.md",
+      "permanent": true
+    },
+    {
+      "source": "/kb/troubleshooting/security-advisor-flags-spatial_ref_sys-and-other-postgis-objects-in-the-public-schema",
+      "destination": "/kb/troubleshooting/security-advisor-flags-spatial_ref_sys-and-other-postgis-objects-in-the-public-schema-f9d408",
+      "permanent": true
+    },
+    {
+      "source": "/kb/troubleshooting/security-advisor-flags-spatial_ref_sys-and-other-postgis-objects-in-the-public-schema.md",
+      "destination": "/kb/troubleshooting/security-advisor-flags-spatial_ref_sys-and-other-postgis-objects-in-the-public-schema-f9d408.md",
+      "permanent": true
+    },
+    {
+      "source": "/kb/troubleshooting/storage-error-403-forbidden-new-row-violates-row-level-security-policy-on-upload",
+      "destination": "/kb/troubleshooting/storage-error-403-forbidden-new-row-violates-row-level-security-policy-on-upload-a94384",
+      "permanent": true
+    },
+    {
+      "source": "/kb/troubleshooting/storage-error-403-forbidden-new-row-violates-row-level-security-policy-on-upload.md",
+      "destination": "/kb/troubleshooting/storage-error-403-forbidden-new-row-violates-row-level-security-policy-on-upload-a94384.md",
+      "permanent": true
+    },
+    {
+      "source": "/kb/troubleshooting/storage-error-database-schema-is-incompatible-when-uploading-files",
+      "destination": "/kb/troubleshooting/storage-error-database-schema-is-incompatible-when-uploading-files-988baa",
+      "permanent": true
+    },
+    {
+      "source": "/kb/troubleshooting/storage-error-database-schema-is-incompatible-when-uploading-files.md",
+      "destination": "/kb/troubleshooting/storage-error-database-schema-is-incompatible-when-uploading-files-988baa.md",
+      "permanent": true
+    },
+    {
+      "source": "/kb/troubleshooting/storage-unexpectedly-high-usage-or-exceed_storage_size_quota-errors",
+      "destination": "/kb/troubleshooting/storage-unexpectedly-high-usage-or-exceed_storage_size_quota-errors-ae21a5",
+      "permanent": true
+    },
+    {
+      "source": "/kb/troubleshooting/storage-unexpectedly-high-usage-or-exceed_storage_size_quota-errors.md",
+      "destination": "/kb/troubleshooting/storage-unexpectedly-high-usage-or-exceed_storage_size_quota-errors-ae21a5.md",
+      "permanent": true
+    },
+    {
+      "source": "/kb/troubleshooting/supabase-project-provisioned-via-bolt-not-visible-in-dashboard",
+      "destination": "/kb/troubleshooting/supabase-project-provisioned-via-bolt-not-visible-in-dashboard-7188fc",
+      "permanent": true
+    },
+    {
+      "source": "/kb/troubleshooting/supabase-project-provisioned-via-bolt-not-visible-in-dashboard.md",
+      "destination": "/kb/troubleshooting/supabase-project-provisioned-via-bolt-not-visible-in-dashboard-7188fc.md",
+      "permanent": true
+    },
+    {
+      "source": "/kb/troubleshooting/supabase-storage-inefficient-folder-operations-and-hierarchical-rls-challenges",
+      "destination": "/kb/troubleshooting/supabase-storage-inefficient-folder-operations-and-hierarchical-rls-challenges-b05a4d",
+      "permanent": true
+    },
+    {
+      "source": "/kb/troubleshooting/supabase-storage-inefficient-folder-operations-and-hierarchical-rls-challenges.md",
+      "destination": "/kb/troubleshooting/supabase-storage-inefficient-folder-operations-and-hierarchical-rls-challenges-b05a4d.md",
+      "permanent": true
+    },
+    {
+      "source": "/kb/troubleshooting/supavisor-connection-error-fatal-eauthquery-unsupported-or-invalid-secret-format",
+      "destination": "/kb/troubleshooting/supavisor-connection-error-fatal-eauthquery-unsupported-or-invalid-secret-format-d23dd4",
+      "permanent": true
+    },
+    {
+      "source": "/kb/troubleshooting/supavisor-connection-error-fatal-eauthquery-unsupported-or-invalid-secret-format.md",
+      "destination": "/kb/troubleshooting/supavisor-connection-error-fatal-eauthquery-unsupported-or-invalid-secret-format-d23dd4.md",
+      "permanent": true
+    },
+    {
+      "source": "/kb/troubleshooting/supavisor-error-circuit-breaker-open-after-password-rotation",
+      "destination": "/kb/troubleshooting/supavisor-error-circuit-breaker-open-after-password-rotation-0fdb72",
+      "permanent": true
+    },
+    {
+      "source": "/kb/troubleshooting/supavisor-error-circuit-breaker-open-after-password-rotation.md",
+      "destination": "/kb/troubleshooting/supavisor-error-circuit-breaker-open-after-password-rotation-0fdb72.md",
+      "permanent": true
+    },
+    {
+      "source": "/kb/troubleshooting/tracking-postgres-role-activity-to-specific-dashboard-users",
+      "destination": "/kb/troubleshooting/tracking-postgres-role-activity-to-specific-dashboard-users-8d3715",
+      "permanent": true
+    },
+    {
+      "source": "/kb/troubleshooting/tracking-postgres-role-activity-to-specific-dashboard-users.md",
+      "destination": "/kb/troubleshooting/tracking-postgres-role-activity-to-specific-dashboard-users-8d3715.md",
+      "permanent": true
+    },
+    {
+      "source": "/kb/troubleshooting/troubleshooting-connect_timeout-or-hanging-queries-in-vercel-serverless-functions",
+      "destination": "/kb/troubleshooting/troubleshooting-connect_timeout-or-hanging-queries-in-vercel-serverless-functions-775f92",
+      "permanent": true
+    },
+    {
+      "source": "/kb/troubleshooting/troubleshooting-connect_timeout-or-hanging-queries-in-vercel-serverless-functions.md",
+      "destination": "/kb/troubleshooting/troubleshooting-connect_timeout-or-hanging-queries-in-vercel-serverless-functions-775f92.md",
+      "permanent": true
+    },
+    {
+      "source": "/kb/troubleshooting/unexpected-behavior-with-authupdateuser-phone-phone-linked-to-incorrect-user-id",
+      "destination": "/kb/troubleshooting/unexpected-behavior-with-authupdateuser-phone-phone-linked-to-incorrect-user-id-45368f",
+      "permanent": true
+    },
+    {
+      "source": "/kb/troubleshooting/unexpected-behavior-with-authupdateuser-phone-phone-linked-to-incorrect-user-id.md",
+      "destination": "/kb/troubleshooting/unexpected-behavior-with-authupdateuser-phone-phone-linked-to-incorrect-user-id-45368f.md",
+      "permanent": true
+    },
+    {
+      "source": "/kb/troubleshooting/vercel-integration-environment-variables-not-syncing-for-persistent-git-branches",
+      "destination": "/kb/troubleshooting/vercel-integration-environment-variables-not-syncing-for-persistent-git-branches-b9191e",
+      "permanent": true
+    },
+    {
+      "source": "/kb/troubleshooting/vercel-integration-environment-variables-not-syncing-for-persistent-git-branches.md",
+      "destination": "/kb/troubleshooting/vercel-integration-environment-variables-not-syncing-for-persistent-git-branches-b9191e.md",
+      "permanent": true
+    },
+    {
+      "source": "/kb/troubleshooting/why-supabase-edge-functions-cannot-provide-static-egress-ips-for-whitelisting",
+      "destination": "/kb/troubleshooting/why-supabase-edge-functions-cannot-provide-static-egress-ips-for-whitelisting-3d78b0",
+      "permanent": true
+    },
+    {
+      "source": "/kb/troubleshooting/why-supabase-edge-functions-cannot-provide-static-egress-ips-for-whitelisting.md",
+      "destination": "/kb/troubleshooting/why-supabase-edge-functions-cannot-provide-static-egress-ips-for-whitelisting-3d78b0.md",
+      "permanent": true
+    },
     { "source": "/kb/sitemap.md", "destination": "/kb/markdown/sitemap.md", "permanent": true },
     {
       "source": "/kb/guides/:path+.md",

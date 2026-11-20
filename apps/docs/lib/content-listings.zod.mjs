@@ -47,6 +47,7 @@ export const contentListingHeadingLevelSchema = z.enum(['h2', 'h3', 'h4'])
 export const contentListingGroupSchema = z.object({
   id: z.string().min(1),
   heading: z.string().min(1).optional(),
+  headingAnchor: z.string().min(1).optional(),
   /** Id of an existing heading that names this group. Used as aria-labelledby. */
   labelledBy: z.string().min(1).optional(),
   headingLevel: contentListingHeadingLevelSchema.optional(),

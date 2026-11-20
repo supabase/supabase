@@ -1,3 +1,4 @@
+import { useQuery } from '@tanstack/react-query'
 import { useParams } from 'common'
 import { SqlEditor } from 'icons'
 import { ChevronDownIcon, ListPlusIcon } from 'lucide-react'
@@ -26,11 +27,12 @@ import { CodeBlock } from 'ui-patterns/CodeBlock'
 
 import { useS3VectorsWrapperExtension } from '../useS3VectorsWrapper'
 import { useS3VectorsWrapperInstance } from '../useS3VectorsWrapperInstance'
+import { ApiKeysAccessNote } from '@/components/ui/ApiKeysAccessNote'
 import { DocsButton } from '@/components/ui/DocsButton'
-import { useAPIKeys } from '@/data/api-keys/api-keys-query'
+import { apiKeysQueryOptions, getKeys } from '@/data/api-keys/api-keys-query'
 import { VectorBucketIndex } from '@/data/storage/vector-buckets-indexes-query'
-import { FGA_PERMISSIONS, useAsyncCheckPermissionsV2 } from '@/hooks/misc/useCheckPermissionsV2'
 import { DOCS_URL } from '@/lib/constants'
+import { useGrant } from '@/lib/grants'
 import { isGreaterThanOrEqual } from '@/lib/semver'
 
 interface VectorBucketTableExamplesSheetProps {
@@ -137,10 +139,16 @@ function VectorBucketIndexExamples({
 }: VectorBucketIndexExamplesProps) {
   const { ref: projectRef, bucketId } = useParams()
 
-  const { can: canReadAPIKeys } = useAsyncCheckPermissionsV2(
-    FGA_PERMISSIONS.PROJECT.API_GATEWAY_KEYS_READ
+  const apiKeysGrant = useGrant('GET /v1/projects/{ref}/api-keys', { projectRef })
+  const { data: apiKeysData } = useQuery(
+    apiKeysQueryOptions(
+      { projectRef, grant: apiKeysGrant.grant },
+      {
+        // A skipped query still returns cached data, so ignore it unless the grant is granted
+        select: (data) => getKeys(apiKeysGrant.status === 'granted' ? data : []),
+      }
+    )
   )
-  const { data: apiKeysData } = useAPIKeys({ projectRef }, { enabled: canReadAPIKeys })
   const { secretKey } = apiKeysData ?? {}
 
   const { data: wrapperInstance } = useS3VectorsWrapperInstance({ bucketId })
@@ -250,6 +258,12 @@ const result = await index.putVectors({
             href={`${DOCS_URL}/guides/storage/vector/storing-vectors?queryGroups=language&language=${language}#basic-vector-insertion`}
           />
         </div>
+        {language === 'javascript' && (
+          <ApiKeysAccessNote
+            grant={apiKeysGrant}
+            fallback="The example uses SUPABASE_SERVICE_ROLE_KEY. Use your own secret key instead."
+          />
+        )}
         {language === 'javascript' ? (
           <CodeBlock
             hideLineNumbers

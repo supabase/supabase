@@ -503,8 +503,8 @@ export const SubscriptionPlanUpdateDialog = ({
                             .{' '}
                           </>
                         )}
-                        Each additional project costs <span translate="no">$10</span>+/mo,
-                        regardless of compute size.{' '}
+                        <span>Each additional project costs</span> <span translate="no">$10</span>
+                        <span>+/mo, regardless of compute size.</span>{' '}
                         <Link
                           href={`${DOCS_URL}/guides/platform/manage-your-usage/compute`}
                           target="_blank"
@@ -526,7 +526,8 @@ export const SubscriptionPlanUpdateDialog = ({
                   className="flex-1"
                   size="small"
                 >
-                  Confirm {changeType === 'downgrade' ? 'downgrade' : 'upgrade'}
+                  Confirm{' '}
+                  {changeType === 'downgrade' ? <span>downgrade</span> : <span>upgrade</span>}
                 </Button>
               </div>
             </div>
@@ -535,11 +536,15 @@ export const SubscriptionPlanUpdateDialog = ({
           {/* Right Column */}
           <div className="bg-surface-100 p-8 flex flex-col border-l xl:col-span-2">
             <h3 className="mb-8">
-              {changeType === 'downgrade' ? 'Downgrade' : 'Upgrade'}{' '}
-              <span className="font-bold">{selectedOrganization?.name}</span> to{' '}
-              {changeType === 'downgrade'
-                ? DOWNGRADE_PLAN_HEADINGS[(selectedTier as DowngradePlanHeadingKey) || 'default']
-                : PLAN_HEADINGS[(selectedTier as PlanHeadingKey) || 'default']}
+              {changeType === 'downgrade' ? <span>Downgrade</span> : <span>Upgrade</span>}{' '}
+              <span className="font-bold">{selectedOrganization?.name}</span> <span>to</span>{' '}
+              {changeType === 'downgrade' ? (
+                <span>
+                  {DOWNGRADE_PLAN_HEADINGS[(selectedTier as DowngradePlanHeadingKey) || 'default']}
+                </span>
+              ) : (
+                <span>{PLAN_HEADINGS[(selectedTier as PlanHeadingKey) || 'default']}</span>
+              )}
             </h3>
             {changeType === 'downgrade'
               ? featuresToLose.length > 0 && (

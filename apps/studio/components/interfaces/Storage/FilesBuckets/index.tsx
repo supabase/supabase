@@ -145,7 +145,12 @@ export const FilesBuckets = () => {
                         <DropdownMenu>
                           <DropdownMenuTrigger asChild>
                             <Button icon={<ArrowDownNarrowWideIcon />}>
-                              Sorted by {sortBucket === 'alphabetical' ? 'name' : 'created at'}
+                              Sorted by{' '}
+                              {sortBucket === 'alphabetical' ? (
+                                <span>name</span>
+                              ) : (
+                                <span>created at</span>
+                              )}
                             </Button>
                           </DropdownMenuTrigger>
                           <DropdownMenuContent align="start" className="w-40">

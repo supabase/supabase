@@ -16,7 +16,7 @@ export default function TanStackBeta() {
           We&apos;ll do our best to keep up and make integration with Supabase as smooth as
           possible. If you run into issues, have a look at the TanStack docs.
           <a
-            href="https://tanstack.com/start/latest/docs/framework/react/quick-start"
+            href="https://tanstack.com/start/latest/docs/framework/react/getting-started"
             target="_blank"
             rel="noopener noreferrer"
             className="text-foreground underline decoration-1 decoration-foreground-muted underline-offset-4 transition-colors hover:decoration-primary hover:decoration-2"

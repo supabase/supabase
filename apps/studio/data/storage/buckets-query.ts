@@ -14,7 +14,8 @@ import { get, handleError } from '@/data/fetchers'
 import { MAX_RETRY_FAILURE_COUNT } from '@/data/query-client'
 import { useSelectedProjectQuery } from '@/hooks/misc/useSelectedProject'
 import { PROJECT_STATUS } from '@/lib/constants'
-import { StudioError } from '@/lib/errors/studio-errors'
+import type { StudioError } from '@/lib/errors/studio-errors'
+import { isStudioError } from '@/lib/errors/studio-errors'
 import { type UseCustomInfiniteQueryOptions, type UseCustomQueryOptions } from '@/types'
 
 export type BucketsVariables = { projectRef?: string }
@@ -221,10 +222,11 @@ export const useBucketInfoQueryPreferCached = (bucketId?: string, projectRef?: s
   return cachedBucketInfo ?? remoteBucketInfo
 }
 
-const shouldRetryBucketsQuery = (failureCount: number, error: unknown) => {
-  if (error instanceof StudioError) {
-    // If the bucket doesn't exist or was deleted, don't retry — it will never succeed.
-    if (error.code === 404) {
+export const shouldRetryBucketsQuery = (failureCount: number, error: unknown) => {
+  if (isStudioError(error)) {
+    // Client errors (e.g. 402 for a restricted project, 404 for a deleted bucket) will never
+    // succeed on retry. Rate limits (429) are still retried.
+    if (error.code !== undefined && error.code >= 400 && error.code < 500 && error.code !== 429) {
       return false
     }
 

@@ -170,7 +170,7 @@ export const EdgeFunctionBlock = ({
                 ) : (
                   <span className="text-foreground">new function</span>
                 )}{' '}
-                is now live at:
+                <span>is now live at:</span>
               </p>
               <CodeBlock
                 language="bash"

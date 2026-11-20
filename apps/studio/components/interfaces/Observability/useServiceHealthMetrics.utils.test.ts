@@ -10,13 +10,13 @@ import {
 
 describe('calculateDateRange', () => {
   beforeEach(() => {
-    // Mock the current time to ensure consistent test results
     vi.useFakeTimers()
     vi.setSystemTime(new Date('2024-01-15T12:00:00Z'))
   })
 
   afterEach(() => {
     vi.useRealTimers()
+    vi.unstubAllEnvs()
   })
 
   it.each([
@@ -29,6 +29,21 @@ describe('calculateDateRange', () => {
       endDate: '2024-01-15T12:00:00.000Z',
     })
   })
+
+  it.each([
+    ['7day after fall back', '7day', '2026-11-03T17:41:39.274Z', '2026-10-27T17:41:39.274Z'],
+    ['7day after spring forward', '7day', '2026-03-10T16:30:00.000Z', '2026-03-03T16:30:00.000Z'],
+    ['1day across fall back', '1day', '2026-11-01T07:30:00.000Z', '2026-10-31T07:30:00.000Z'],
+    ['1day across spring forward', '1day', '2026-03-08T07:30:00.000Z', '2026-03-07T07:30:00.000Z'],
+  ] as const)(
+    'uses the elapsed duration for %s in America/New_York',
+    (_, interval, now, startDate) => {
+      vi.stubEnv('TZ', 'America/New_York')
+      vi.setSystemTime(new Date(now))
+
+      expect(calculateDateRange(interval)).toEqual({ startDate, endDate: now })
+    }
+  )
 })
 
 describe('transformToBarChartData', () => {

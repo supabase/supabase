@@ -114,6 +114,7 @@ export default function App({ Component, pageProps }: AppProps) {
                     <WwwCommandMenu />
                     <PageTelemetry
                       API_URL={API_URL}
+                      platform="www"
                       hasAcceptedConsent={hasAcceptedConsent}
                       enabled={IS_PLATFORM}
                     />

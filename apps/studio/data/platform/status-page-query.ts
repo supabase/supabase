@@ -1,8 +1,10 @@
 import { queryOptions } from '@tanstack/react-query'
 
 import { platformKeys } from './keys'
+import { classifyResponseError } from '@/data/error-classification'
 import { BASE_PATH, IS_PLATFORM } from '@/lib/constants'
-import { StudioError } from '@/lib/errors/studio-errors'
+import type { StudioError } from '@/lib/errors/studio-errors'
+import { isStudioError } from '@/lib/errors/studio-errors'
 import {
   StatusPageResponseSchema,
   type StatusPageResponse,
@@ -23,12 +25,11 @@ async function getStatusPage(signal?: AbortSignal): Promise<StatusPageResponse> 
       if (Number.isFinite(parsed) && parsed > 0) retryAfter = parsed
     }
 
-    throw new StudioError(
-      `Failed to fetch status page: ${response.statusText}`,
-      response.status,
-      undefined,
-      retryAfter
-    )
+    throw classifyResponseError({
+      message: `Failed to fetch status page: ${response.statusText}`,
+      code: response.status,
+      retryAfter,
+    })
   }
 
   const json = await response.json()
@@ -46,7 +47,7 @@ export const statusPageQueryOptions = () =>
     refetchInterval: 5 * 60_000,
     refetchOnWindowFocus: false,
     retryDelay: (attemptIndex: number, error: StatusPageError) => {
-      if (error instanceof StudioError && error.retryAfter) {
+      if (isStudioError(error) && error.retryAfter) {
         return error.retryAfter * 1000
       }
       return Math.min(1000 * 4 ** attemptIndex, 1000 * 60 * 5)

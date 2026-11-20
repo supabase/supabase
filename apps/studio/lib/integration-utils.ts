@@ -1,24 +1,24 @@
 import { getCreateMigrationsTableSQL, getInsertMigrationSQL } from '@supabase/pg-meta'
 
 import { isResponseOk } from './api/apiWrapper'
+import { classifyError, classifyResponseError } from '@/data/error-classification'
 import { fetchHandler } from '@/data/fetchers'
 import type { Integration } from '@/data/integrations/integrations.types'
 import { BASE_PATH } from '@/lib/constants'
-import { StudioError } from '@/lib/errors/studio-errors'
 import { type SupaResponse } from '@/types'
 
 async function fetchGitHub<T = any>(url: string, responseJson = true): Promise<SupaResponse<T>> {
   const response = await fetchHandler(url)
   if (!response.ok) {
     return {
-      error: new StudioError(response.statusText, response.status),
+      error: classifyResponseError({ message: response.statusText, code: response.status }),
     }
   }
   try {
     return (responseJson ? await response.json() : await response.text()) as T
   } catch (error: any) {
     return {
-      error: new StudioError(error.message, 500),
+      error: classifyError(error),
     }
   }
 }
