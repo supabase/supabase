@@ -77,7 +77,7 @@ const LogsViewRow = ({
         <Layers2Icon size={14} className="shrink-0 text-foreground-light" />
         <span
           className={cn(
-            'min-w-0 flex-1 truncate text-sm',
+            'min-w-0 flex-1 truncate text-sm leading-none',
             isActive ? 'text-foreground' : 'text-foreground-light'
           )}
           title={description ?? view.name}
@@ -85,7 +85,7 @@ const LogsViewRow = ({
           {view.name}
         </span>
         {isModifiedActive && (
-          <span className="shrink-0 text-xs text-foreground-lighter">Modified</span>
+          <span className="shrink-0 text-xs leading-none text-foreground-lighter">Modified</span>
         )}
       </button>
       <DropdownMenu>
