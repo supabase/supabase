@@ -29,10 +29,10 @@ export const selfHostingCommunity: ContentListingGroup = {
   items: [
     {
       title: 'Kubernetes',
-      href: 'https://github.com/supabase-community/supabase-kubernetes',
+      href: '/guides/self-hosting/kubernetes',
       icon: '/docs/img/icons/kubernetes-icon',
       hasLightIcon: false,
-      description: 'Run Supabase on Kubernetes with the Supabase Operator or a Helm chart.',
+      description: 'Deploy and configure Supabase on Kubernetes with the Supabase Operator.',
     },
     {
       title: 'Observability',
