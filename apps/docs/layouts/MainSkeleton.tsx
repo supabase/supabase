@@ -116,6 +116,8 @@ const NavContainer = memo(function NavContainer({
       </div>
       <ScrollRoot className="flex min-h-0 flex-1 flex-col">
         <ScrollViewport
+          // firefox makes a scroll container a tab stop, but the links inside already scroll it
+          tabIndex={-1}
           className={cn(
             'relative',
             'overscroll-contain',

@@ -37,7 +37,7 @@ export const HeaderBreadcrumbs = ({ headingSlotRef, className }: HeaderBreadcrum
 
   return (
     <Breadcrumb aria-label="Breadcrumb" className={cn('min-w-0 flex-1', className)}>
-      <BreadcrumbList className="flex-nowrap gap-2 overflow-hidden whitespace-nowrap no-scrollbar mask-fadeout-right font-medium leading-4.5 sm:gap-2 hover:overflow-x-auto focus-within:overflow-x-auto">
+      <BreadcrumbList className="-m-1.5 flex-nowrap gap-2 overflow-hidden whitespace-nowrap no-scrollbar mask-fadeout-right p-1.5 font-medium leading-4.5 sm:gap-2 hover:overflow-x-auto focus-within:overflow-x-auto">
         {crumbs.map((crumb, index) => (
           <Fragment key={`${crumb.url}-${getCrumbName(crumb)}`}>
             {index > 0 ? (
@@ -83,7 +83,10 @@ const BreadcrumbCrumb = ({ crumb, isCurrent, hasIcon }: BreadcrumbCrumbProps) =>
       {isCurrent ? (
         <BreadcrumbPage className="flex items-center gap-2">{label}</BreadcrumbPage>
       ) : crumb.url ? (
-        <BreadcrumbLink asChild className="flex items-center gap-2 no-underline">
+        <BreadcrumbLink
+          asChild
+          className="-m-1.5 flex items-center gap-2 rounded-md p-1.5 no-underline focus-inset"
+        >
           <Link href={crumb.url}>{label}</Link>
         </BreadcrumbLink>
       ) : (

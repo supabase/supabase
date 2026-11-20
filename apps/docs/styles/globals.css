@@ -51,7 +51,7 @@
 
 @utility docs-active-bar {
   &[aria-current]::before {
-    @apply absolute -left-3.25 top-1/2 h-[1em] w-px -translate-y-1/2 bg-brand;
+    @apply absolute -left-1.25 top-1/2 h-[1em] w-px -translate-y-1/2 bg-brand;
     content: '';
   }
 }
@@ -61,8 +61,8 @@
 }
 
 @utility docs-rail-link {
-  @apply relative block py-1 text-sm text-foreground-lighter wrap-anywhere;
-  @apply transition-colors duration-150 hover:text-foreground-light focus-ring;
+  @apply relative -mx-2 block rounded-md px-2 py-1 text-sm text-foreground-lighter wrap-anywhere;
+  @apply hover:text-foreground-light focus-inset;
   @apply focus-visible:text-foreground-light;
   &[aria-current] {
     @apply text-foreground;

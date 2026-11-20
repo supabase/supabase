@@ -117,8 +117,8 @@ const GuidesRightRail = ({ video, videoTitle, hideToc, editHref }: GuidesRightRa
 
 const GuideToc = ({ toc, activeUrl }: GuideTocProps) => (
   <nav aria-label="On this page" className="flex min-h-0 flex-1 flex-col">
-    <TOCScrollArea className="-me-4 pe-4">
-      <ul className="flex flex-col gap-1 pb-6">
+    <TOCScrollArea className="-ms-2 -me-4 pe-4">
+      <ul className="flex flex-col gap-1 px-2 pb-6">
         {toTocTree(toc).map(({ item, children }) => (
           <li key={item.url} className={cn(children.length > 0 && 'pt-2 first:pt-0')}>
             <GuideTocLink
