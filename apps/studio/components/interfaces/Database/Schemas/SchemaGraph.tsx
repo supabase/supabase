@@ -48,6 +48,7 @@ import {
 import { Admonition } from 'ui-patterns/Admonition'
 
 import { SidePanelEditor } from '../../TableGridEditor/SidePanelEditor/SidePanelEditor'
+import { useTableActions } from '../../TableGridEditor/useTableActions'
 import { DefaultEdge } from './DefaultEdge'
 import { FindTableSelector } from './FindTableSelector'
 import { SchemaGraphContextProvider, SchemaGraphContextType } from './SchemaGraphContext'
@@ -90,6 +91,7 @@ export const SchemaGraph = () => {
   const { selectedSchema, setSelectedSchema } = useQuerySchemaState()
   const [selectedTable, setSelectedTable] = useState<SafePostgresTable | null>(null)
   const snap = useTableEditorStateSnapshot()
+  const { editTable } = useTableActions()
   const { isDownloading, exportSchemaToImage } = useExportSchemaToImage()
 
   const [copied, setCopied] = useState(false)
@@ -373,14 +375,10 @@ export const SchemaGraph = () => {
         snap.onEditColumn(column)
       },
       onEditTable: (tableId) => {
-        const table = tables.find((table) => table.id === tableId)
-        if (!table || table.columns == null) return
-
-        setSelectedTable(table)
-        snap.onEditTable()
+        void editTable(tableId)
       },
     }),
-    [tables, snap, isDownloading, selectedEdge]
+    [tables, snap, editTable, isDownloading, selectedEdge]
   )
 
   return (
