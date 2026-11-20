@@ -37,7 +37,7 @@ const textOf = (node: HastNode): string =>
   node.type === 'text' ? node.value : 'children' in node ? node.children.map(textOf).join('') : ''
 
 describe.each(Object.entries(PROCESSORS))('shared code block through %s', (_, create) => {
-  it('renders the shared frame with exact copy source and no shiki pre', async () => {
+  it('renders the shared frame with comment-free copy source and no shiki pre', async () => {
     const { code } = await (await create()).render(MARKDOWN)
     const tree = fromHtml(code, { fragment: true })
     const [frame, plain] = findAll(tree, hasClass('shiki'))
@@ -46,7 +46,7 @@ describe.each(Object.entries(PROCESSORS))('shared code block through %s', (_, cr
     expect(findAll(tree, hasClass('astro-code'))).toHaveLength(0)
     expect(findAll(tree, (element) => element.tagName === 'pre')).toHaveLength(2)
     expect(findAll(tree, (element) => element.tagName === 'button')).toHaveLength(0)
-    expect(frame.properties.dataCodeSource).toBe(SOURCE)
+    expect(frame.properties.dataCodeSource).toBe(`const html = "<b>it's" + '&amp;'`)
     expect(findAll(frame, hasClass('code-line-content')).map(textOf).join('\n')).toBe(SOURCE)
     expect(label(frame).properties.ariaLabel).toBe('JavaScript, 3 lines')
     expect(textOf(findAll(frame, hasClass('s-k'))[0])).toBe('const')

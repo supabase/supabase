@@ -2,7 +2,7 @@ import { type PropsWithChildren } from 'react'
 import { bundledLanguages, type BundledLanguage } from 'shiki'
 import { createTwoslasher, type ExtraFiles, type NodeHover } from 'twoslash'
 import { highlightCode } from 'ui-patterns/CodeBlock/CodeBlock.highlight'
-import { getTokenClassName } from 'ui-patterns/CodeBlock/CodeBlock.tokens'
+import { getCopyText, getTokenClassName } from 'ui-patterns/CodeBlock/CodeBlock.tokens'
 import {
   CodeBlockFrame,
   CodeBlockTokens,
@@ -68,7 +68,7 @@ export async function CodeBlock({
       controls={
         hideControls ? null : (
           <TrackedCodeBlockControls
-            content={code.trim()}
+            content={getCopyText({ code: code.trim(), lang, tokens })}
             lang={lang ?? undefined}
             copyId={copyId}
           />

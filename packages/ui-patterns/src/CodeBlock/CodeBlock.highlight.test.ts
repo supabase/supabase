@@ -51,6 +51,7 @@ describe('shared code block highlighting', () => {
       expect(highlighter.codeToTokens).toHaveBeenCalledExactlyOnceWith('const value = 42', {
         lang: lang ?? undefined,
         theme: 'Supabase Theme',
+        includeExplanation: 'tokenType',
         tokenizeTimeLimit: 0,
         tokenizeMaxLineLength: 100_000,
       })

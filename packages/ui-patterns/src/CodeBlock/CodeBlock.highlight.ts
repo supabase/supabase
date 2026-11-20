@@ -14,6 +14,8 @@ export async function highlightCode(code: string, lang: BundledLanguage | null) 
   return highlighter.codeToTokens(code, {
     lang: lang || undefined,
     theme: 'Supabase Theme',
+    // each token gets a comment, string or regex type, so docs can copy code without comments
+    includeExplanation: 'tokenType',
     tokenizeTimeLimit: 0,
     tokenizeMaxLineLength: 100_000,
   })
