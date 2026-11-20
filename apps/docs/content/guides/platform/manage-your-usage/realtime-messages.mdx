@@ -13,7 +13,7 @@ Each database change counts as one message per client that listens to the event.
 **Broadcast**
 Each broadcast message counts as one message sent plus one message per subscribed client that receives it. For example, if you broadcast a message and four clients listen to it, it counts as five messages: one sent and four received. The sender isn't counted as a recipient unless it enabled [self-send](/docs/guides/realtime/broadcast#self-send-messages).
 
-Every subscribed client counts as a recipient, including server-side clients such as Edge Function workers. If a server subscribes to a channel only to send messages, it's billed for receiving every message on that channel. To send from a server, use the [Broadcast REST API](/docs/guides/realtime/broadcast#broadcast-using-the-rest-api) instead.
+Every subscribed client counts as a recipient, including server-side clients such as [Edge Function](/docs/guides/functions) workers. If a server subscribes to a channel only to send messages, it's billed for receiving every message on that channel. To send from a server, use the [Broadcast REST API](/docs/guides/realtime/broadcast#broadcast-using-the-rest-api) instead.
 
 ## How charges are calculated
 

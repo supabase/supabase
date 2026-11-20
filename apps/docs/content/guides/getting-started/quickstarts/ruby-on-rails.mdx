@@ -40,7 +40,7 @@ cd blog
 Set the connection string as an environment variable. Rails reads `DATABASE_URL` from the environment and connects with it, so you don't need to edit `config/database.yml`. The export applies to the current shell session, so run it in the same shell as the Rails commands in the following steps.
 
 ```bash
-export DATABASE_URL=postgres://postgres.[PROJECT-REF]:[YOUR-PASSWORD]@[POOLER-HOST]:5432/postgres?sslmode=require
+export DATABASE_URL=postgres://postgres.[PROJECT-REF]:[YOUR-DATABASE-PASSWORD]@[POOLER-HOST]:5432/postgres?sslmode=require
 ```
 
 ## 5. Create and run a database migration

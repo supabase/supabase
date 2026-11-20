@@ -15,11 +15,17 @@ function LogoutPage() {
 
   useEffect(() => {
     const logout = async () => {
-      await signOut()
-      toast('Successfully logged out')
-      await navigate({ to: '/sign-in' })
+      try {
+        await signOut()
+        toast('Successfully logged out')
+      } catch (error) {
+        console.error('Failed to sign out', error)
+        toast.error('Something went wrong while signing out. Please sign in again.')
+      } finally {
+        await navigate({ to: '/sign-in' })
+      }
     }
-    logout()
+    void logout()
   }, [])
 
   return (

@@ -181,7 +181,7 @@ As this is a [server-side rendering](/docs/guides/auth/server-side) (SSR) enviro
 
 The following code snippet performs the following steps:
 
-- Retrieves the `token_hash` sent back from the Supabase Auth server using the `token_hash` query parameter.
+- Retrieves the `token_hash` sent back from the [Supabase Auth](/docs/guides/auth) server using the `token_hash` query parameter.
 - Exchanges this `token_hash` for a session, which you store in storage (in this case, cookies).
 - Finally, redirect the user to the `account` page or the `error` page.
 

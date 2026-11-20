@@ -19,7 +19,6 @@ vi.mock('common', async () => {
       return mockIsPlatform.value
     },
     useIsLoggedIn: () => true,
-    useParams: () => ({ ref: 'default' }),
   }
 })
 

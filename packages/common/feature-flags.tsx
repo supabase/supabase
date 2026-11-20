@@ -16,8 +16,10 @@ import { useAuth, useUser } from './auth'
 import { getFlags as getDefaultConfigCatFlags } from './configcat'
 import { hasConsented } from './consent-state'
 import { get, post } from './fetchWrappers'
+import { gotrueClient } from './gotrue'
 import { ensurePlatformSuffix } from './helpers'
 import { useParams } from './hooks'
+import { setTelemetryFeatureFlags } from './telemetry-event'
 
 type TrackFeatureFlagVariables = components['schemas']['TelemetryFeatureFlagBody']
 export type CallFeatureFlagsResponse =
@@ -262,6 +264,8 @@ export const FeatureFlagProvider = ({
       flagStore.hasLoaded = true
 
       if (mounted) {
+        // Before setStore: a child effect that sends an event on the re-render must already see these flags
+        setTelemetryFeatureFlags(flagStore.posthog)
         setStore(flagStore)
       }
     }
@@ -272,8 +276,14 @@ export const FeatureFlagProvider = ({
     // which subsequently all getValueAsync() calls are served from there
     processFlags()
 
+    // The flags endpoint refuses the pre-MFA token of a user with MFA enabled
+    const { data: auth } = gotrueClient.onAuthStateChange((event) => {
+      if (event === 'MFA_CHALLENGE_VERIFIED') processFlags()
+    })
+
     return () => {
       mounted = false
+      auth.subscription.unsubscribe()
     }
   }, [
     enabled,
