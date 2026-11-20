@@ -312,7 +312,11 @@ describe('OAuthAppsAuthorizeScreen', () => {
 
     expect(screen.getByText('Permissions granted')).toBeInTheDocument()
     expect(screen.queryByText('Permissions requested')).not.toBeInTheDocument()
-    expect(screen.getByText('Database, Environment, Analytics')).toBeInTheDocument()
+    const databaseManagement = screen.getByRole('button', { name: 'Database management' })
+    expect(databaseManagement.parentElement).toHaveTextContent(
+      'Database management, Environment, Analytics'
+    )
+    expect(screen.getByText('Secrets, Projects, Edge Functions, Storage')).toBeInTheDocument()
     expect(screen.getByText('Secrets, Projects, Edge Functions, Storage')).toBeInTheDocument()
   })
 
@@ -923,7 +927,7 @@ describe('OAuthAppsAuthorizeScreen', () => {
 
     expect(screen.queryByText('Database')).toBeNull()
     fireEvent.click(screen.getByText('Already granted (2)'))
-    await screen.findByText('Database')
+    await screen.findByText('Database management')
   })
 
   test('flags the projects the role cannot grant after submit', async () => {
