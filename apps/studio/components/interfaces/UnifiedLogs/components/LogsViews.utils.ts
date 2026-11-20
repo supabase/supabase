@@ -18,3 +18,29 @@ export const getFilterCombinationKey = (filter: string[] | null | undefined): st
   if (!filter || filter.length === 0) return ''
   return JSON.stringify([...filter].sort())
 }
+
+interface GetViewModifiedDescriptionParams {
+  viewName: string
+  isPreset: boolean
+  canCreate: boolean
+  canUpdate: boolean
+}
+
+export const getViewModifiedDescription = ({
+  viewName,
+  isPreset,
+  canCreate,
+  canUpdate,
+}: GetViewModifiedDescriptionParams): string => {
+  if (isPreset) {
+    if (canCreate) {
+      return "Preset views can't be updated. Save these filters as a new view instead."
+    } else {
+      return "Preset views can't be updated. Reset to discard these filters."
+    }
+  } else if (canUpdate) {
+    return `Update "${truncateViewName(viewName)}" for everyone in the project, or save these filters as a new view.`
+  } else {
+    return 'These filters have not been saved.'
+  }
+}

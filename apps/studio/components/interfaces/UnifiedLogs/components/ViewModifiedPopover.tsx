@@ -2,7 +2,7 @@ import { XIcon } from 'lucide-react'
 import { RefObject } from 'react'
 import { Button, Popover, PopoverAnchor, PopoverContent } from 'ui'
 
-import { truncateViewName } from './LogsViews.utils'
+import { getViewModifiedDescription } from './LogsViews.utils'
 
 interface ViewModifiedPopoverProps {
   open: boolean
@@ -34,16 +34,7 @@ export const ViewModifiedPopover = ({
   onDismiss,
 }: ViewModifiedPopoverProps) => {
   const canWrite = canUpdate || canCreate
-
-  const getDescription = () => {
-    if (isPreset)
-      return canCreate
-        ? "Preset views can't be updated. Save these filters as a new view instead."
-        : "Preset views can't be updated. Reset to discard these filters."
-    if (canUpdate)
-      return `Update "${truncateViewName(viewName)}" for everyone in the project, or save these filters as a new view.`
-    return 'These filters have not been saved.'
-  }
+  const description = getViewModifiedDescription({ viewName, isPreset, canCreate, canUpdate })
 
   return (
     <Popover open={open} onOpenChange={onOpenChange} modal={false}>
@@ -68,7 +59,7 @@ export const ViewModifiedPopover = ({
           />
         </div>
 
-        <p className="text-xs text-foreground-light px-4 pt-1">{getDescription()}</p>
+        <p className="text-xs text-foreground-light px-4 pt-1">{description}</p>
 
         {!canWrite && (
           <p className="text-xs text-foreground-lighter px-4 pt-2">
