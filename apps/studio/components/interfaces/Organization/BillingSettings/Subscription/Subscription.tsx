@@ -180,7 +180,7 @@ const Subscription = () => {
                         {currentPlan?.id === 'free' ? (
                           <span>upgrade to a paid plan.</span>
                         ) : (
-                          <span>you can disable Spend Cap under the Cost Control settings.</span>
+                          <span>disable Spend Cap under the Cost Control settings.</span>
                         )}
                       </div>
                     </Admonition>
