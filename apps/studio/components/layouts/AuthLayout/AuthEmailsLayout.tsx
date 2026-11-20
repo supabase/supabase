@@ -7,10 +7,10 @@ import {
   PageHeader,
   PageHeaderDescription,
   PageHeaderMeta,
-  PageHeaderNavigationTabs,
   PageHeaderSummary,
   PageHeaderTitle,
 } from 'ui-patterns/PageHeader'
+import { PageNav } from 'ui-patterns/PageNav'
 
 import AuthLayout from './AuthLayout'
 import { UnknownInterface } from '@/components/ui/UnknownInterface'
@@ -46,16 +46,16 @@ export const AuthEmailsLayout = ({ children }: PropsWithChildren<{}>) => {
                 </PageHeaderDescription>
               </PageHeaderSummary>
             </PageHeaderMeta>
-            <PageHeaderNavigationTabs>
-              <NavMenu>
-                {navItems.map((item) => (
-                  <NavMenuItem key={item.label} active={pathname === item.href}>
-                    <Link href={item.href}>{item.label}</Link>
-                  </NavMenuItem>
-                ))}
-              </NavMenu>
-            </PageHeaderNavigationTabs>
           </PageHeader>
+          <PageNav size="default">
+            <NavMenu>
+              {navItems.map((item) => (
+                <NavMenuItem key={item.label} active={pathname === item.href}>
+                  <Link href={item.href}>{item.label}</Link>
+                </NavMenuItem>
+              ))}
+            </NavMenu>
+          </PageNav>
           {children}
         </>
       ) : (

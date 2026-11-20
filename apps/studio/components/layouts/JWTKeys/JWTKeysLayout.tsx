@@ -8,11 +8,10 @@ import {
   PageHeader,
   PageHeaderDescription,
   PageHeaderMeta,
-  PageHeaderNavigationTabs,
   PageHeaderSummary,
   PageHeaderTitle,
 } from 'ui-patterns/PageHeader'
-
+import { PageNav } from 'ui-patterns/PageNav'
 
 const JWTKeysLayout = ({ children }: PropsWithChildren) => {
   const { ref: projectRef } = useParams()
@@ -42,19 +41,17 @@ const JWTKeysLayout = ({ children }: PropsWithChildren) => {
             </PageHeaderDescription>
           </PageHeaderSummary>
         </PageHeaderMeta>
-        <PageHeaderNavigationTabs>
-          <NavMenu>
-            {navigationItems.map((item) => (
-              <NavMenuItem key={item.id} active={pathname === item.href}>
-                <Link href={item.href}>{item.label}</Link>
-              </NavMenuItem>
-            ))}
-          </NavMenu>
-        </PageHeaderNavigationTabs>
       </PageHeader>
-      <PageContainer className="flex flex-col py-8 pb-16 gap-8">
-        {children}
-      </PageContainer>
+      <PageNav size="default">
+        <NavMenu>
+          {navigationItems.map((item) => (
+            <NavMenuItem key={item.id} active={pathname === item.href}>
+              <Link href={item.href}>{item.label}</Link>
+            </NavMenuItem>
+          ))}
+        </NavMenu>
+      </PageNav>
+      <PageContainer className="flex flex-col py-8 pb-16 gap-8">{children}</PageContainer>
     </>
   )
 }
