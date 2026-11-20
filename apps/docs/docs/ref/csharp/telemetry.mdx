@@ -1,0 +1,272 @@
+---
+id: telemetry
+title: OpenTelemetry
+slug: telemetry
+---
+
+The Auth, Database (Postgrest), Storage, and Edge Functions clients emit traces and metrics through `System.Diagnostics`. Any OpenTelemetry setup can subscribe to them, and so can a plain `ActivityListener` or `MeterListener`.
+
+- The SDK has no dependency on any OpenTelemetry package.
+- Nothing is recorded until something subscribes. Without a listener the instrumentation does no work.
+- Realtime is not instrumented yet. See [Realtime](#realtime).
+
+Diagnostics are available in every 8.x release of the SDK.
+
+## Source names
+
+Each client exposes one `ActivitySource` and one `Meter` that share the same name. Register the name for tracing and for metrics.
+
+| Client    | Constant                          | Name                 |
+| --------- | --------------------------------- | -------------------- |
+| Auth      | `GotrueDiagnostics.SourceName`    | `Supabase.Gotrue`    |
+| Database  | `PostgrestDiagnostics.SourceName` | `Supabase.Postgrest` |
+| Storage   | `StorageDiagnostics.SourceName`   | `Supabase.Storage`   |
+| Functions | `FunctionsDiagnostics.SourceName` | `Supabase.Functions` |
+
+`SupabaseDiagnostics.SourceNames` is an `IReadOnlyList<string>` with all four names. Source names are case-sensitive, so use the constants instead of typing the strings.
+
+The constants live in the namespace of each package: `Supabase.Gotrue`, `Supabase.Postgrest`, `Supabase.Storage`, `Supabase.Functions`. `SupabaseDiagnostics` lives in `Supabase`.
+
+## What is emitted
+
+### Spans
+
+Every HTTP request the SDK sends produces a client span named `{METHOD} {path}`, for example `POST /auth/v1/token`. It carries these tags:
+
+| Tag                         | Value                                                                          |
+| --------------------------- | ------------------------------------------------------------------------------ |
+| `http.request.method`       | The HTTP method                                                                |
+| `server.address`            | The host                                                                       |
+| `server.port`               | The port, only when it is not the default for the scheme                       |
+| `url.full`                  | `scheme://host[:port]/path`, without the query string, fragment, or user info  |
+| `http.response.status_code` | The response status code                                                       |
+| `error.type`                | The status code for a 4xx or 5xx response, or the exception type for a failure |
+
+A 4xx or 5xx response, or an exception, sets the span status to `Error`.
+
+Each client adds its own tags and spans on top of that.
+
+**Database.** The `db.operation` tag holds the logical operation: `select`, `insert`, `update`, `upsert`, `delete`, `count`, or `rpc`. Several operations share an HTTP method, so use this tag to tell them apart.
+
+**Storage.** Upload and download spans also carry `storage.transfer.direction` with the value `upload` or `download`. A resumable (TUS) upload is reported as one span for the whole transfer, not one span per chunk.
+
+**Functions.** The `faas.invoked_name` tag holds the name of the invoked function. A relay error is reported as a failed span even when the HTTP status is a success.
+
+**Auth.** Each public operation produces a span of its own, with the HTTP span as its child. The span names are:
+
+- `gotrue.sign_up`
+- `gotrue.sign_in`, `gotrue.sign_in.otp`, `gotrue.sign_in.id_token`, `gotrue.sign_in.anonymous`, `gotrue.sign_in.passkey`, `gotrue.sign_in.web3`
+- `gotrue.send_magic_link`
+- `gotrue.verify_otp`, `gotrue.verify_token_hash`
+- `gotrue.sign_out`
+- `gotrue.update_user`
+- `gotrue.refresh_session`, `gotrue.refresh_token`, `gotrue.set_session`, `gotrue.retrieve_session`, `gotrue.exchange_code`
+- `gotrue.link_identity.id_token`, `gotrue.get_user_identities`
+- `gotrue.start_passkey_sign_in`, `gotrue.start_passkey_registration`, `gotrue.register_passkey`, `gotrue.list_passkeys`, `gotrue.rename_passkey`, `gotrue.delete_passkey`
+- `gotrue.get_recovery_codes_status`, `gotrue.generate_recovery_codes`, `gotrue.regenerate_recovery_codes`, `gotrue.unenroll_recovery_codes`, `gotrue.verify_recovery_code`
+
+These spans can carry the following tags. The value of each tag is a category such as a provider name or a channel, never a credential or a user identifier.
+
+| Tag                     | Value                             |
+| ----------------------- | --------------------------------- |
+| `gotrue.sign_up.type`   | The sign-up type                  |
+| `gotrue.sign_in.type`   | The sign-in type                  |
+| `gotrue.provider`       | The OAuth or ID token provider    |
+| `gotrue.otp.channel`    | `email` or `phone`                |
+| `gotrue.sign_out.scope` | The sign-out scope                |
+| `gotrue.web3.chain`     | The chain used for a Web3 sign-in |
+
+### Metrics
+
+All metrics are histograms.
+
+| Metric                                     | Unit | Meter                | Measures                                               |
+| ------------------------------------------ | ---- | -------------------- | ------------------------------------------------------ |
+| `supabase.gotrue.http.request.duration`    | `s`  | `Supabase.Gotrue`    | Duration of Auth HTTP requests                         |
+| `supabase.postgrest.http.request.duration` | `s`  | `Supabase.Postgrest` | Duration of Database HTTP requests                     |
+| `supabase.storage.http.request.duration`   | `s`  | `Supabase.Storage`   | Duration of Storage requests other than file transfers |
+| `supabase.storage.transfer.duration`       | `s`  | `Supabase.Storage`   | Duration of file uploads and downloads                 |
+| `supabase.storage.transfer.size`           | `By` | `Supabase.Storage`   | Bytes moved by file uploads and downloads              |
+| `supabase.functions.invoke.duration`       | `s`  | `Supabase.Functions` | Duration of function invocations                       |
+
+Every measurement carries `http.request.method`, `server.address`, and `url.path`. It also carries `http.response.status_code` when the request got a response, and `error.type` when it failed. In addition:
+
+- Database measurements carry `db.operation`.
+- Storage transfer measurements carry `storage.transfer.direction`. The size histogram is recorded only when the number of bytes is known.
+- Functions measurements carry `faas.invoked_name`.
+
+## Use it with OpenTelemetry
+
+Add the OpenTelemetry packages to your app. The SDK does not install them for you.
+
+```sh
+dotnet add package OpenTelemetry.Extensions.Hosting
+dotnet add package OpenTelemetry.Exporter.OpenTelemetryProtocol
+dotnet add package OpenTelemetry.Exporter.Console
+```
+
+### Export with OTLP
+
+In an ASP.NET Core or generic host app, register every Supabase source in one place. The same list works for tracing and for metrics.
+
+```csharp
+using System.Linq;
+using OpenTelemetry.Metrics;
+using OpenTelemetry.Trace;
+using Supabase;
+
+builder.Services.AddOpenTelemetry()
+    .WithTracing(tracing => tracing
+        .AddSource(SupabaseDiagnostics.SourceNames.ToArray())
+        .AddOtlpExporter())
+    .WithMetrics(metrics => metrics
+        .AddMeter(SupabaseDiagnostics.SourceNames.ToArray())
+        .AddOtlpExporter());
+```
+
+The OTLP exporter reads its endpoint and headers from the standard `OTEL_EXPORTER_OTLP_*` environment variables.
+
+To subscribe to a single client, pass its constant instead:
+
+```csharp
+using OpenTelemetry.Trace;
+using Supabase.Postgrest;
+
+builder.Services.AddOpenTelemetry()
+    .WithTracing(tracing => tracing
+        .AddSource(PostgrestDiagnostics.SourceName)
+        .AddOtlpExporter());
+```
+
+### Print to the console
+
+The console exporter is useful while you develop. In a host app, add it next to or in place of the OTLP exporter:
+
+```csharp
+builder.Services.AddOpenTelemetry()
+    .WithTracing(tracing => tracing
+        .AddSource(SupabaseDiagnostics.SourceNames.ToArray())
+        .AddConsoleExporter())
+    .WithMetrics(metrics => metrics
+        .AddMeter(SupabaseDiagnostics.SourceNames.ToArray())
+        .AddConsoleExporter());
+```
+
+In a console app without a host, build the providers directly and keep them alive for the lifetime of the app:
+
+```csharp
+using System.Linq;
+using OpenTelemetry;
+using OpenTelemetry.Metrics;
+using OpenTelemetry.Trace;
+using Supabase;
+
+using var tracerProvider = Sdk.CreateTracerProviderBuilder()
+    .AddSource(SupabaseDiagnostics.SourceNames.ToArray())
+    .AddConsoleExporter()
+    .Build();
+
+using var meterProvider = Sdk.CreateMeterProviderBuilder()
+    .AddMeter(SupabaseDiagnostics.SourceNames.ToArray())
+    .AddConsoleExporter()
+    .Build();
+
+var supabase = new Supabase.Client(url, key);
+await supabase.InitializeAsync();
+
+var response = await supabase.From<Message>().Get();
+```
+
+## Use it without the OpenTelemetry SDK
+
+The same sources work with the listeners in `System.Diagnostics`. No extra package is needed.
+
+### Spans
+
+```csharp
+using System;
+using System.Diagnostics;
+using System.Linq;
+using Supabase;
+
+using var activityListener = new ActivityListener
+{
+    ShouldListenTo = source => SupabaseDiagnostics.SourceNames.Contains(source.Name),
+    Sample = (ref ActivityCreationOptions<ActivityContext> _) => ActivitySamplingResult.AllData,
+    ActivityStopped = activity => Console.WriteLine(
+        $"{activity.OperationName} {activity.Duration.TotalMilliseconds}ms {activity.Status}")
+};
+
+ActivitySource.AddActivityListener(activityListener);
+```
+
+### Metrics
+
+```csharp
+using System;
+using System.Diagnostics.Metrics;
+using System.Linq;
+using Supabase;
+
+using var meterListener = new MeterListener
+{
+    InstrumentPublished = (instrument, listener) =>
+    {
+        if (SupabaseDiagnostics.SourceNames.Contains(instrument.Meter.Name))
+        {
+            listener.EnableMeasurementEvents(instrument);
+        }
+    }
+};
+
+meterListener.SetMeasurementEventCallback<double>((instrument, measurement, tags, state) =>
+    Console.WriteLine($"{instrument.Name} {measurement} {instrument.Unit}"));
+
+meterListener.SetMeasurementEventCallback<long>((instrument, measurement, tags, state) =>
+    Console.WriteLine($"{instrument.Name} {measurement} {instrument.Unit}"));
+
+meterListener.Start();
+```
+
+The duration histograms record `double` values. `supabase.storage.transfer.size` records `long` values, so it needs the second callback.
+
+## Trace context propagation
+
+Since 8.13.0, the SDK adds the current trace context to each request it sends to Auth, Database, Storage, and Edge Functions. It sets the `traceparent`, `tracestate`, and `baggage` headers from `Activity.Current` when there is one, and it never overwrites a header you already set. This links your spans with the spans of your own services.
+
+To stop the SDK from adding these headers, set `SupabaseOptions.TracePropagation`:
+
+```csharp
+var options = new Supabase.SupabaseOptions
+{
+    TracePropagation = Supabase.Core.Http.TracePropagation.Disabled
+};
+
+var supabase = new Supabase.Client(url, key, options);
+```
+
+This option controls only what the SDK injects. The .NET runtime has its own injection for `HttpClient`, which you control through `DistributedContextPropagator.Current`.
+
+## Privacy
+
+- URLs are recorded as `scheme://host[:port]/path`. The query string and fragment are never recorded. Query strings can hold column filters and their values, grant types, API keys, and signed URL tokens.
+- No tag holds an access token, refresh token, API key, request body, response body, row data, or file contents.
+- The Functions client records the name of the invoked function, because it is part of the path. It never records the payload.
+- Storage records object paths, because they are part of the URL path.
+- Telemetry is not sent anywhere by the SDK. It goes only to the listeners and exporters that you register.
+
+## Realtime
+
+The Realtime client is not instrumented yet. It emits no spans or metrics, and `SupabaseDiagnostics.SourceNames` does not include it. It does not propagate trace context either.
+
+To observe a Realtime connection, use the heartbeat handlers, the socket state handler, and the logger option:
+
+```csharp
+supabase.Realtime.AddStateChangedHandler((sender, state) =>
+    Console.WriteLine($"Realtime socket: {state}"));
+
+supabase.Realtime.AddHeartbeatHandler((sender, status, latency) =>
+    Console.WriteLine($"Realtime heartbeat: {status} {latency?.TotalMilliseconds}ms"));
+```
+
+You can also pass an `ILoggerFactory` as `SupabaseOptions.LoggerFactory` (8.13.0). Realtime logs lifecycle events such as connect, disconnect, reconnect, heartbeat timeout, and channel state changes. It never logs credentials, tokens, payloads, or the query string of the endpoint.
