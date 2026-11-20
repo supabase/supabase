@@ -1,6 +1,5 @@
 import { capitalize } from 'lodash'
 
-import { OAuthAppsPreflightValidationData } from '@/data/oauth-apps/oauth-apps-preflight-validation-query'
 import { OAuthScope, OAuthScopeValidationResult } from '@/data/oauth-apps/types'
 import { OrgProject } from '@/data/projects/org-projects-infinite-query'
 
@@ -35,6 +34,8 @@ export function groupScopesByLevel(scopes: string[]) {
 }
 
 export function formatPermissionName(name: string) {
+  if (name === 'database') return 'Database management'
+  if (name === 'table_data') return 'Table data'
   return name
     .split('_')
     .map((part) => capitalize(part))
@@ -67,9 +68,13 @@ type ScopeLevel = OAuthScope extends `${string}:${infer Level}` ? Level : never
 export const getDiffBetweenScopes = ({
   scopes,
   previousScopes,
+  databaseAccess,
+  previousDatabaseAccess,
 }: {
   scopes: string[]
   previousScopes: string[]
+  databaseAccess?: 'read' | 'write'
+  previousDatabaseAccess?: 'read' | 'write'
 }) => {
   const unchanged: ScopeGroup = { 'read-write': [], write: [], read: [] }
   const changed: DiffScopeGroup = { 'read-write': [], write: [], read: [], removed: [] }
@@ -77,7 +82,13 @@ export const getDiffBetweenScopes = ({
   const permissionsWithLevel = getPermissionsWithLevel(scopes)
   const previousPermissionsWithLevel = getPermissionsWithLevel(previousScopes)
 
-  const permissionsKeys = Object.keys(permissionsWithLevel) as ScopePermission[]
+  if (databaseAccess)
+    permissionsWithLevel.table_data = databaseAccess === 'write' ? 'read-write' : 'read'
+  if (previousDatabaseAccess)
+    previousPermissionsWithLevel.table_data =
+      previousDatabaseAccess === 'write' ? 'read-write' : 'read'
+
+  const permissionsKeys = Object.keys(permissionsWithLevel) as (ScopePermission | 'table_data')[]
   for (const permission of permissionsKeys) {
     // New permission
     if (!previousPermissionsWithLevel[permission]) {
@@ -99,7 +110,10 @@ export const getDiffBetweenScopes = ({
   }
 
   // Now detect removed permissions
-  const previousPermissionsKeys = Object.keys(previousPermissionsWithLevel) as ScopePermission[]
+  const previousPermissionsKeys = Object.keys(previousPermissionsWithLevel) as (
+    | ScopePermission
+    | 'table_data'
+  )[]
   for (const permission of previousPermissionsKeys) {
     if (permissionsWithLevel[permission] == null) {
       changed.removed.push({
@@ -113,7 +127,7 @@ export const getDiffBetweenScopes = ({
 }
 
 export const getPermissionsWithLevel = (scopes: string[]) => {
-  const scopesWithLevel: Partial<Record<ScopePermission, ScopeGroupLevel>> = {}
+  const scopesWithLevel: Partial<Record<ScopePermission | 'table_data', ScopeGroupLevel>> = {}
 
   for (const scope of scopes) {
     const [permission, level] = extractPermissionAndLevelFromScope(scope)
@@ -162,9 +176,9 @@ export function getPreselectedProjectRefs({
   projectRef,
   liveProjects,
 }: {
-  existingGrant: OAuthAppsPreflightValidationData['existing_grant']
+  existingGrant: { project_refs?: string[] | null } | null
   projectRef: string | undefined
-  liveProjects: OrgProject[]
+  liveProjects: Pick<OrgProject, 'ref'>[]
 }): string[] {
   const liveRefs = new Set(liveProjects.map((project) => project.ref))
   const candidates = existingGrant?.project_refs?.length

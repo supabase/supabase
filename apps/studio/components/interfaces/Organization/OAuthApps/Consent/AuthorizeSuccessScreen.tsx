@@ -8,7 +8,10 @@ export type AuthorizeSuccessGrant = {
   email: string
   organization_slug: string
   project_refs: string[] | null
-  projects: components['schemas']['OrganizationProjectsResponse_Output']['projects']
+  projects: Pick<
+    components['schemas']['OrganizationProjectsResponse_Output']['projects'][number],
+    'ref' | 'name'
+  >[]
   scopes?: string[]
 }
 
@@ -54,7 +57,7 @@ export const AuthorizeSuccessScreen = ({
       </div>
 
       <section className="flex flex-col gap-3">
-        <p className="text-xs text-foreground">Permissions granted</p>
+        <h2 className="text-xs text-foreground">Permissions granted</h2>
         {grant.scopes == null ? (
           <div className="divide-y rounded-md border bg-surface-75 px-4">
             <p className="font-mono text-xs uppercase text-foreground-light">No scopes</p>

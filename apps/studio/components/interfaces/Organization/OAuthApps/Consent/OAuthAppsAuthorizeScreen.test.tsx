@@ -1,9 +1,11 @@
+import { createFileRoute } from '@tanstack/react-router'
 import { fireEvent, screen, waitFor } from '@testing-library/react'
 import { mockIntersectionObserver } from 'jsdom-testing-mocks'
 import { HttpResponse } from 'msw'
 import { describe, expect, test, vi } from 'vitest'
 
 import { OAuthAppsAuthorizeScreen } from './OAuthAppsAuthorizeScreen'
+import { OAUTH_APPS_MOCK_SCENARIOS } from '@/data/oauth-apps/mocks'
 import { OAuthAppsAuthorizeApproveData } from '@/data/oauth-apps/oauth-apps-authorize-approve-mutation'
 import { OAuthAppsAuthorizeRequestData } from '@/data/oauth-apps/oauth-apps-authorize-request-query'
 import { OAuthAppsPreflightValidationData } from '@/data/oauth-apps/oauth-apps-preflight-validation-query'
@@ -13,19 +15,27 @@ import { createMockOrganization } from '@/tests/helpers'
 import { customRender } from '@/tests/lib/custom-render'
 import { addAPIMock } from '@/tests/lib/msw'
 import { createMockProfileContext } from '@/tests/lib/profile-helpers'
+import { renderRoute } from '@/tests/lib/route-render'
 import { Organization } from '@/types'
 
 type RenderScreenOptions = {
+  isPreview?: boolean
   authId?: string
   request?: OAuthAppsAuthorizeRequestData
   organizationSlug?: string
   projectRef?: string
 }
 
-function renderScreen({ organizationSlug, projectRef }: RenderScreenOptions = {}) {
+function renderScreen({
+  organizationSlug,
+  projectRef,
+  isPreview,
+  authId = 'authId',
+}: RenderScreenOptions = {}) {
   return customRender(
     <OAuthAppsAuthorizeScreen
-      authId="authId"
+      authId={authId}
+      isPreview={isPreview}
       organizationSlug={organizationSlug}
       projectRef={projectRef}
       navigate={vi.fn()}
@@ -44,13 +54,13 @@ async function enabledAuthorizeButton(name = /Authorize Vercel/) {
   return button
 }
 
-async function toggleProject(projectName: string) {
+async function toggleProject(projectName: string | RegExp) {
   // Needed because of a rerender in MultiSelector
   await new Promise((resolve) => setTimeout(resolve, 50))
   fireEvent.click(await screen.findByRole('option', { name: projectName }))
 }
 
-async function selectProject(projectName: string) {
+async function selectProject(projectName: string | RegExp) {
   fireEvent.click(await screen.findByRole('combobox'))
   await toggleProject(projectName)
 }
@@ -312,8 +322,13 @@ describe('OAuthAppsAuthorizeScreen', () => {
 
     expect(screen.getByText('Permissions granted')).toBeInTheDocument()
     expect(screen.queryByText('Permissions requested')).not.toBeInTheDocument()
-    expect(screen.getByText('Database, Environment, Analytics')).toBeInTheDocument()
-    expect(screen.getByText('Secrets, Projects, Edge Functions, Storage')).toBeInTheDocument()
+    const databaseManagement = screen.getByRole('button', { name: 'Database management' })
+    expect(databaseManagement.parentElement).toHaveTextContent(
+      'Database management, Environment, Analytics'
+    )
+    expect(screen.getByRole('heading', { name: 'READ ONLY' }).parentElement).toHaveTextContent(
+      'Secrets, Projects, Edge Functions, Storage'
+    )
   })
 
   test('an organization-bound app reaches the success screen with the authorizing identity', async () => {
@@ -379,7 +394,7 @@ describe('OAuthAppsAuthorizeScreen', () => {
     expect(screen.getByText(/test@example\.com/)).toBeInTheDocument()
   })
 
-  test('tells the member an organization-bound grant is shared, exactly once, without the member-bound copy', async () => {
+  test('keeps organization-bound consent focused on the requested access', async () => {
     addAPIMock({
       path: '/platform/oauth/authorizations/:id',
       method: 'get',
@@ -424,17 +439,13 @@ describe('OAuthAppsAuthorizeScreen', () => {
     })
     renderScreen()
 
-    expect(await screen.findAllByText('Want this scoped to one member?')).toHaveLength(1)
+    await screen.findByText('Permissions requested')
+    expect(screen.queryByText('Want this scoped to one member?')).not.toBeInTheDocument()
     expect(
-      screen.getAllByText(
-        'Have them authorize Vercel from their own account. Authorizing here gives it your Administrator access on every project, including ones created later.'
-      )
-    ).toHaveLength(1)
-    expect(screen.queryByText(/This grant acts as you/)).not.toBeInTheDocument()
+      screen.queryByText(/The app can only use the permissions listed below/)
+    ).not.toBeInTheDocument()
     expect(screen.queryByText(/No admin approval is needed/)).not.toBeInTheDocument()
-    expect(
-      screen.getByText(/This authorization will appear in Authorized apps/)
-    ).toBeInTheDocument()
+    expect(screen.queryByText(/This authorization will appear in Authorized apps/)).toBeNull()
   })
 
   test('shows the member-bound copy for a member-bound grant that picks projects', async () => {
@@ -466,9 +477,9 @@ describe('OAuthAppsAuthorizeScreen', () => {
     renderScreen()
 
     expect(
-      await screen.findByText(/No admin approval is needed if your role permits this access/)
+      await screen.findByText(/The app can only use the permissions listed below/)
     ).toBeInTheDocument()
-    expect(screen.getByText(/This grant acts as you/)).toBeInTheDocument()
+    expect(screen.queryByText(/No admin approval is needed/)).toBeNull()
     expect(screen.queryByText('Want this scoped to one member?')).not.toBeInTheDocument()
     expect(screen.queryByText('This grant covers every project')).not.toBeInTheDocument()
   })
@@ -668,7 +679,7 @@ describe('OAuthAppsAuthorizeScreen', () => {
     expect(await screen.findByText('All current and future projects')).toBeInTheDocument()
     expect(screen.getByRole('button', { name: /Authorize Vercel/ })).toBeDisabled()
 
-    fireEvent.click(screen.getByRole('checkbox'))
+    fireEvent.click(screen.getByRole('radio', { name: 'All current and future projects' }))
 
     expect(screen.queryByRole('combobox')).not.toBeInTheDocument()
     const authorizeButton = screen.getByRole('button', { name: /Authorize Vercel/ })
@@ -723,7 +734,7 @@ describe('OAuthAppsAuthorizeScreen', () => {
     renderScreen()
 
     await waitFor(() => {
-      expect(screen.getByRole('checkbox')).toBeChecked()
+      expect(screen.getByRole('radio', { name: 'All current and future projects' })).toBeChecked()
     })
     await enabledAuthorizeButton()
   })
@@ -865,7 +876,91 @@ describe('OAuthAppsAuthorizeScreen', () => {
     expect(screen.queryByText(/northwind-storefront/)).not.toBeInTheDocument()
   })
 
-  test('reconsent shows the permissions differences, with previous permissions collapsed', async () => {
+  test('resolves the organization that owns the project_ref when none is given', async () => {
+    renderScreen({
+      isPreview: true,
+      authId: OAUTH_APPS_MOCK_SCENARIOS.vercelManyProjects,
+      projectRef: 'northwindcms1',
+    })
+
+    expect(await screen.findByText('northwind-cms')).toBeInTheDocument()
+    expect(screen.getByText('Northwind Traders')).toBeInTheDocument()
+  })
+
+  test('the existing grant wins over the project_ref param', async () => {
+    renderScreen({
+      isPreview: true,
+      authId: OAUTH_APPS_MOCK_SCENARIOS.vercelReconsent,
+      organizationSlug: 'tailspin-toys',
+      projectRef: 'tailspinwarehouse1',
+    })
+
+    expect(await screen.findByText('tailspin-shop')).toBeInTheDocument()
+    expect(screen.getByRole('combobox')).not.toHaveTextContent('tailspin-warehouse')
+  })
+
+  test('blocks a Postgres upgrade but allows consent with an SSL notice', async () => {
+    const route = createFileRoute('/authorize')({
+      component: () => (
+        <OAuthAppsAuthorizeScreen
+          isPreview
+          authId={OAUTH_APPS_MOCK_SCENARIOS.trustedPartnerBlocked}
+          projectRef="northwindcms1"
+          navigate={vi.fn()}
+        />
+      ),
+    })
+    await renderRoute(route, { routeId: '/authorize', url: '/authorize' })
+
+    expect(await screen.findByText('Needs Postgres 17 or later.')).toBeInTheDocument()
+    expect(screen.getByRole('combobox')).toHaveTextContent('Database setup notice: northwind-cms')
+    const remove = await screen.findByRole('button', { name: 'Remove northwind-cms' })
+    const authorize = screen.getByRole('button', { name: 'Authorize Example Partner' })
+    expect(authorize).toHaveAttribute('aria-disabled', 'true')
+    fireEvent.focus(authorize)
+    expect(await screen.findByRole('tooltip')).toHaveTextContent(
+      'Fix or remove the projects listed above.'
+    )
+    fireEvent.click(remove)
+    await selectProject(/fabrikam-api/)
+
+    expect(
+      await screen.findByRole('list', { name: 'Projects that will require SSL' })
+    ).toHaveTextContent('fabrikam-api')
+    expect(authorize).toBeEnabled()
+  })
+
+  test('shows organization-wide project issues without letting the member deselect projects', async () => {
+    renderScreen({
+      isPreview: true,
+      authId: OAUTH_APPS_MOCK_SCENARIOS.trustedPartnerOrgWideBlocked,
+    })
+
+    expect(await screen.findAllByText('Needs Postgres 17 or later.')).toHaveLength(2)
+    expect(screen.getByText('Database is currently unavailable.')).toBeInTheDocument()
+    expect(screen.getByRole('list', { name: 'Projects that will require SSL' })).toHaveTextContent(
+      'northwind-warehouse'
+    )
+    expect(screen.queryByRole('combobox')).not.toBeInTheDocument()
+    expect(screen.queryByRole('button', { name: /^Remove / })).not.toBeInTheDocument()
+    expect(screen.getByRole('button', { name: 'Authorize Example Partner' })).toHaveAttribute(
+      'aria-disabled',
+      'true'
+    )
+  })
+
+  test('shows the change in Table data access for a returning partner', async () => {
+    renderScreen({ isPreview: true, authId: OAUTH_APPS_MOCK_SCENARIOS.trustedPartnerReconsent })
+
+    expect(await screen.findByRole('list', { name: 'Read and write' })).toHaveTextContent(
+      'Table dataAdded'
+    )
+    expect(screen.getByRole('list', { name: 'Read only' })).toHaveTextContent('Table dataRemoved')
+    expect(screen.getByRole('list', { name: 'Read only' })).toHaveTextContent('ProjectsUnchanged')
+    expect(screen.queryByRole('radio', { name: 'All current and future projects' })).toBeNull()
+  })
+
+  test('reconsent groups added, removed, and unchanged permissions by access level', async () => {
     addAPIMock({
       path: '/platform/oauth/authorizations/:id',
       method: 'get',
@@ -911,19 +1006,15 @@ describe('OAuthAppsAuthorizeScreen', () => {
     })
     renderScreen()
 
-    await screen.findByText('Already granted (2)')
-    const findSpanWithText = (text: string) =>
-      screen.findByText((_, element) => element?.textContent == text, { selector: 'span' })
-    await findSpanWithText('Environment (New)')
-    await findSpanWithText('Analytics (Upgraded from Read)')
-    await findSpanWithText('Secrets (Demoted from Read-write)')
-    await findSpanWithText('Edge Functions (New)')
-    await findSpanWithText('Storage (New)')
-    await findSpanWithText('Rest (Read)')
-
-    expect(screen.queryByText('Database')).toBeNull()
-    fireEvent.click(screen.getByText('Already granted (2)'))
-    await screen.findByText('Database')
+    const readWrite = await screen.findByRole('list', { name: 'Read and write' })
+    const read = screen.getByRole('list', { name: 'Read only' })
+    expect(readWrite).toHaveTextContent('EnvironmentAdded')
+    expect(readWrite).toHaveTextContent('AnalyticsAdded')
+    expect(read).toHaveTextContent('AnalyticsRemoved')
+    expect(readWrite).toHaveTextContent('SecretsRemoved')
+    expect(read).toHaveTextContent('SecretsAdded')
+    expect(read).toHaveTextContent('RestRemoved')
+    expect(readWrite).toHaveTextContent('Database managementUnchanged')
   })
 
   test('flags the projects the role cannot grant after submit', async () => {

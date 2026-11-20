@@ -1,7 +1,7 @@
 import { useIntersectionObserver } from '@uidotdev/usehooks'
 import { components } from 'api-types'
 import { useEffect, useId } from 'react'
-import { Checkbox, cn } from 'ui'
+import { cn, RadioGroup, RadioGroupItem } from 'ui'
 import {
   MultiSelector,
   MultiSelectorContent,
@@ -11,17 +11,26 @@ import {
   MultiSelectorTrigger,
 } from 'ui-patterns/multi-select'
 
+import type { OAuthAppsAuthorizeRequest } from '@/data/oauth-apps/types'
+
 export const MAX_SELECTED_PROJECTS = 10
 
 export interface ProjectMultiSelectProps {
-  projects: components['schemas']['OrganizationProjectsResponse_Output']['projects']
+  projects: Pick<
+    components['schemas']['OrganizationProjectsResponse_Output']['projects'][number],
+    'ref' | 'name'
+  >[]
   selectedProjectRefs: string[]
-  selectedProjects: components['schemas']['OrganizationProjectsResponse_Output']['projects']
+  selectedProjects: Pick<
+    components['schemas']['OrganizationProjectsResponse_Output']['projects'][number],
+    'ref' | 'name'
+  >[]
   onChange: (selectedProjects: string[]) => void
   maxSelected?: number
   error?: string
   flaggedRefs?: string[]
   unavailableRefs?: string[]
+  readinessIssues?: NonNullable<OAuthAppsAuthorizeRequest['databaseAccess']>['projectIssues']
   allProjectsSelected?: boolean
   onAllProjectsChange?: (selected: boolean) => void
   onSearchChange: (query: string) => void
@@ -37,6 +46,7 @@ export const ProjectMultiSelect = ({
   error,
   flaggedRefs = [],
   unavailableRefs = [],
+  readinessIssues = {},
   allProjectsSelected = false,
   onAllProjectsChange,
   onSearchChange,
@@ -62,15 +72,35 @@ export const ProjectMultiSelect = ({
     onChange(nextRefs)
   }
 
+  const renderProjectName = (ref: string, name: string) => (
+    <>
+      {readinessIssues[ref] && (
+        <>
+          <span
+            className={cn(
+              'mr-1.5 inline-block size-1.5 rounded-full group-data-[state=open]:hidden',
+              readinessIssues[ref] !== 'ssl_enforcement_required'
+                ? 'bg-warning'
+                : 'bg-foreground-muted/75'
+            )}
+            aria-hidden
+          />
+          <span className="sr-only">Database setup notice: </span>
+        </>
+      )}
+      {name}
+    </>
+  )
+
   return (
     <div className="flex w-full flex-col gap-2">
       <div className="flex items-center justify-between gap-2">
-        <p
+        <h2
           id={labelId}
-          className={cn('text-sm', hasFlagged ? 'text-destructive' : 'text-foreground')}
+          className={cn('text-sm font-medium', hasFlagged ? 'text-destructive' : 'text-foreground')}
         >
           Projects
-        </p>
+        </h2>
         {!allProjectsSelected && showCounter && (
           <p className="text-xs text-foreground-lighter">
             {selectedProjectRefs.length}/{maxSelected}
@@ -78,17 +108,29 @@ export const ProjectMultiSelect = ({
         )}
       </div>
 
-      <label
-        htmlFor="select-all-projects"
-        className="flex cursor-pointer items-center gap-2 py-1 text-sm text-foreground"
-      >
-        <Checkbox
-          id="select-all-projects"
-          checked={allProjectsSelected}
-          onCheckedChange={(checked) => onAllProjectsChange?.(checked === true)}
-        />
-        All current and future projects
-      </label>
+      {onAllProjectsChange && (
+        <RadioGroup
+          aria-labelledby={labelId}
+          value={allProjectsSelected ? 'all' : 'selected'}
+          onValueChange={(value) => onAllProjectsChange(value === 'all')}
+          className="gap-2 py-1"
+        >
+          <label
+            htmlFor={`${labelId}-all`}
+            className="flex cursor-pointer items-center gap-2 text-sm"
+          >
+            <RadioGroupItem id={`${labelId}-all`} value="all" />
+            All current and future projects
+          </label>
+          <label
+            htmlFor={`${labelId}-selected`}
+            className="flex cursor-pointer items-center gap-2 text-sm"
+          >
+            <RadioGroupItem id={`${labelId}-selected`} value="selected" />
+            Selected projects only
+          </label>
+        </RadioGroup>
+      )}
 
       {!allProjectsSelected && (
         <>
@@ -100,12 +142,16 @@ export const ProjectMultiSelect = ({
             <MultiSelectorTrigger
               id="projects"
               aria-labelledby={labelId}
+              className="group"
               aria-describedby="projects-description"
               label="Select projects..."
               badgeLimit={2}
               deletableBadge
               renderValue={(value) =>
-                selectedProjects.find((project) => project.ref === value)?.name ?? value
+                renderProjectName(
+                  value,
+                  selectedProjects.find((project) => project.ref === value)?.name ?? value
+                )
               }
             />
             <MultiSelectorContent>
@@ -119,10 +165,33 @@ export const ProjectMultiSelect = ({
                       value={project.ref}
                       disabled={atCap && !isSelected}
                     >
-                      {project.name}
-                      {unavailableRefs.includes(project.ref) && (
-                        <span className="text-foreground-lighter"> - Unavailable</span>
-                      )}
+                      <span className="flex min-w-0 flex-1 items-center justify-between gap-2">
+                        <span>
+                          {project.name}
+                          {unavailableRefs.includes(project.ref) && (
+                            <span className="text-foreground-lighter"> - Unavailable</span>
+                          )}
+                        </span>
+                        {readinessIssues[project.ref] &&
+                          readinessIssues[project.ref] !== 'ssl_enforcement_required' && (
+                            <>
+                              <span
+                                className="size-1.5 shrink-0 rounded-full bg-warning"
+                                aria-hidden
+                              />
+                              <span className="sr-only">Blocks authorization</span>
+                            </>
+                          )}
+                        {readinessIssues[project.ref] === 'ssl_enforcement_required' && (
+                          <>
+                            <span
+                              className="size-1.5 shrink-0 rounded-full bg-foreground-muted/75"
+                              aria-hidden
+                            />
+                            <span className="sr-only">SSL enforcement will be enabled</span>
+                          </>
+                        )}
+                      </span>
                     </MultiSelectorItem>
                   )
                 })}

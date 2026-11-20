@@ -6,13 +6,14 @@ import { useProjectDetailQuery } from '@/data/projects/project-detail-query'
 import { Organization } from '@/types'
 
 export interface OAuthAppsAuthorizeScreenProps {
-  authId?: string
+  enabled?: boolean
   request?: OAuthAppsAuthorizeRequestData
   organizationSlug?: string
   projectRef?: string
 }
 
 export const useMemberOrganization = ({
+  enabled = true,
   organizationSlug,
   projectRef,
   request,
@@ -25,14 +26,18 @@ export const useMemberOrganization = ({
       error: null
       data: Organization
     } => {
-  const organizationsQuery = useOrganizationsQuery()
+  const organizationsQuery = useOrganizationsQuery({ enabled })
   const projectQuery = useProjectDetailQuery(
     {
       ref: projectRef ?? undefined,
       skipWake: true,
     },
     {
-      enabled: projectRef != null,
+      enabled:
+        enabled &&
+        request?.project_scoping_mode === true &&
+        !organizationSlug &&
+        projectRef != null,
     }
   )
 

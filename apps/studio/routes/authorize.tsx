@@ -1,9 +1,20 @@
 import { createFileRoute, useNavigate } from '@tanstack/react-router'
 import { useFlag, useParams } from 'common'
+import { ChevronDownIcon } from 'lucide-react'
+import {
+  Button,
+  DropdownMenu,
+  DropdownMenuContent,
+  DropdownMenuRadioGroup,
+  DropdownMenuRadioItem,
+  DropdownMenuTrigger,
+} from 'ui'
 
 import { ApiAuthorizationScreen } from '@/components/interfaces/ApiAuthorization/ApiAuthorization'
 import { OAuthAppsAuthorizeScreen } from '@/components/interfaces/Organization/OAuthApps/Consent'
+import { OAUTH_APPS_MOCK_SCENARIOS } from '@/data/oauth-apps/mocks'
 import { withAuth } from '@/hooks/misc/withAuth'
+import { BASE_PATH, IS_STAGING_OR_LOCAL } from '@/lib/constants'
 import { buildStudioPageTitle } from '@/lib/page-title'
 
 export const Route = createFileRoute('/authorize')({
@@ -16,20 +27,115 @@ function Authorize() {
 
 const PAGE_TITLE = buildStudioPageTitle({ section: 'Authorize API Access', brand: 'Supabase' })
 
+const MOCK_SCENARIOS: Record<string, { authId: string; organizationSlug?: string }> = {
+  trusted_partner_write: { authId: OAUTH_APPS_MOCK_SCENARIOS.trustedPartnerWrite },
+  trusted_partner_mixed: { authId: OAUTH_APPS_MOCK_SCENARIOS.trustedPartnerMixed },
+  trusted_partner_reconsent: { authId: OAUTH_APPS_MOCK_SCENARIOS.trustedPartnerReconsent },
+  trusted_partner_read: { authId: OAUTH_APPS_MOCK_SCENARIOS.trustedPartnerRead },
+  trusted_partner_blocked: { authId: OAUTH_APPS_MOCK_SCENARIOS.trustedPartnerBlocked },
+  trusted_partner_multiple_blocked: {
+    authId: OAUTH_APPS_MOCK_SCENARIOS.trustedPartnerMultipleBlocked,
+  },
+  trusted_partner_org_wide_blocked: {
+    authId: OAUTH_APPS_MOCK_SCENARIOS.trustedPartnerOrgWideBlocked,
+  },
+  default: { authId: OAUTH_APPS_MOCK_SCENARIOS.vercelDeveloper },
+  reconsent: { authId: OAUTH_APPS_MOCK_SCENARIOS.vercelReconsent },
+  reconsent_all_projects: { authId: OAUTH_APPS_MOCK_SCENARIOS.vercelReconsentAllProjects },
+  role_validation: { authId: OAUTH_APPS_MOCK_SCENARIOS.vercelRoleValidation },
+  empty_org: {
+    authId: OAUTH_APPS_MOCK_SCENARIOS.vercelDeveloper,
+    organizationSlug: 'contoso-labs',
+  },
+  dynamic_client: { authId: OAUTH_APPS_MOCK_SCENARIOS.dynamicMcpClient },
+  org_bound: { authId: OAUTH_APPS_MOCK_SCENARIOS.kemalBot },
+  org_bound_all: { authId: OAUTH_APPS_MOCK_SCENARIOS.kemalBotOrgWide },
+  user_bound_all: { authId: OAUTH_APPS_MOCK_SCENARIOS.vercelAllProjects },
+}
+
+const CONSENT_PREVIEWS = [
+  { value: 'default', label: 'Standard app', project: 'northwindstorefront1' },
+  { value: 'trusted_partner_read', label: 'Partner · read-only', project: 'northwindstorefront1' },
+  {
+    value: 'trusted_partner_write',
+    label: 'Partner · read-write',
+    project: 'northwindstorefront1',
+  },
+  {
+    value: 'trusted_partner_mixed',
+    label: 'Partner · mixed permissions',
+    project: 'northwindstorefront1',
+  },
+  {
+    value: 'trusted_partner_blocked',
+    label: 'Partner · blocked project',
+    project: 'northwindcms1',
+  },
+  { value: 'trusted_partner_multiple_blocked', label: 'Partner · blocked projects' },
+  { value: 'trusted_partner_org_wide_blocked', label: 'Partner · organization-wide blockers' },
+  { value: 'trusted_partner_reconsent', label: 'Returning partner · Table data upgrade' },
+  { value: 'reconsent', label: 'Returning app · changed permissions' },
+  { value: 'dynamic_client', label: 'Unverified app' },
+  { value: 'org_bound_all', label: 'App · organization-wide' },
+]
+
 function APIAuthorizationPage() {
   const navigate = useNavigate()
-  const { auth_id, organization_slug, project_ref } = useParams()
+  const { auth_id, organization_slug, project_ref, mock_scenario } = useParams()
   const isScopedOAuthConsentEnabled = useFlag('enableScopedOAuthConsent')
+  const consentPreview =
+    !auth_id && IS_STAGING_OR_LOCAL
+      ? CONSENT_PREVIEWS.find(({ value }) => value === mock_scenario)
+      : undefined
+  const mockScenario = consentPreview ? MOCK_SCENARIOS[consentPreview.value] : undefined
 
-  if (isScopedOAuthConsentEnabled) {
+  if (isScopedOAuthConsentEnabled || mockScenario) {
     return (
       <>
         <title>{PAGE_TITLE}</title>
+        {consentPreview && (
+          <div className="fixed bottom-3 right-3 z-50 sm:bottom-auto sm:top-3">
+            <DropdownMenu>
+              <DropdownMenuTrigger asChild>
+                <Button
+                  size="tiny"
+                  variant="default"
+                  iconRight={<ChevronDownIcon />}
+                  aria-label={`Consent preview: ${consentPreview.label}`}
+                >
+                  {consentPreview.label}
+                </Button>
+              </DropdownMenuTrigger>
+              <DropdownMenuContent align="end">
+                <DropdownMenuRadioGroup
+                  value={mock_scenario}
+                  onValueChange={(value) => {
+                    const preview = CONSENT_PREVIEWS.find((option) => option.value === value)
+                    if (!preview) return
+                    const search = new URLSearchParams({ mock_scenario: preview.value })
+                    if (preview.project) search.set('project_ref', preview.project)
+                    void navigate({ href: `${BASE_PATH}/authorize?${search}`, replace: true })
+                  }}
+                >
+                  {CONSENT_PREVIEWS.map(({ value, label }) => (
+                    <DropdownMenuRadioItem key={value} value={value}>
+                      {label}
+                    </DropdownMenuRadioItem>
+                  ))}
+                </DropdownMenuRadioGroup>
+              </DropdownMenuContent>
+            </DropdownMenu>
+          </div>
+        )}
         <OAuthAppsAuthorizeScreen
-          key={auth_id}
-          authId={auth_id}
-          organizationSlug={organization_slug && project_ref ? organization_slug : undefined}
-          projectRef={organization_slug && project_ref ? project_ref : undefined}
+          key={consentPreview?.value ?? auth_id}
+          authId={mockScenario?.authId ?? auth_id}
+          isPreview={mockScenario != null}
+          organizationSlug={
+            mockScenario?.organizationSlug ??
+            (organization_slug && project_ref ? organization_slug : undefined)
+          }
+          projectRef={mockScenario || organization_slug ? project_ref : undefined}
           navigate={(destination) => navigate({ href: destination })}
         />
       </>
