@@ -19,12 +19,6 @@
     "type": "function"
   },
   {
-    "id": "dependency-injection",
-    "title": "ASP.NET Core and Blazor",
-    "slug": "dependency-injection",
-    "type": "function"
-  },
-  {
     "id": "third-party-auth",
     "title": "Third-party auth",
     "slug": "third-party-auth",

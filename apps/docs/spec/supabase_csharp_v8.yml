@@ -27,8 +27,13 @@ functions:
       Leverage `Table`, `PrimaryKey`, and `Column` attributes to specify names of classes/properties that are different from their C# Versions.
 
     notes: |
-      - In ASP.NET Core and Blazor apps, register the client with [`AddSupabase()`](/docs/reference/csharp/dependency-injection) from the `Supabase.Extensions.DependencyInjection` package instead of creating it yourself. It is the recommended setup for web apps.
-      - In other apps (console, desktop, mobile, Unity), create the client once and reuse it. A new client per operation means a new `HttpClient` each time.
+      - Pick the setup that matches your app. For ASP.NET Core and Blazor, use `AddSupabase()` from the `Supabase.Extensions.DependencyInjection` package. For other apps (console, desktop, mobile, Unity), create a `Supabase.Client` yourself, call `InitializeAsync()`, and reuse it. A new client per operation means a new `HttpClient` (and socket) each time.
+      - ASP.NET Core and Blazor: `AddSupabase()` registers a **scoped** `Supabase.Client`, and each sub-client individually: `IGotrueClient<User, Session>`, `IPostgrestClient`, `IStorageClient<Bucket, FileObject>`, `IFunctionsClient`, and `IRealtimeClient<RealtimeSocket, RealtimeChannel>`. Inject only the one a class needs.
+      - ASP.NET Core and Blazor: a scope gets its own `Client`, with its own Auth state. In ASP.NET Core a scope is one request. In Blazor Server it is one circuit, and in Blazor WebAssembly it lasts as long as the app runs.
+      - ASP.NET Core and Blazor: every client's traffic goes through pooled `HttpClient`s from `IHttpClientFactory`. Without the extension, a scoped or transient `Client` builds a new `HttpClient` per resolution, which exhausts the connection pool under load. `AddSupabase()` sets `SupabaseOptions.HttpClient` and the three `StorageClientOptions` HTTP clients (`HttpRequestClient`, `HttpUploadClient`, `HttpDownloadClient`) itself, so values you set for those in `configureOptions` are replaced. Everything else you set stays, including `Proxy`, `StorageClientOptions.Proxy`, the Storage timeouts, and the retry options such as `PostgrestRetry`.
+      - ASP.NET Core and Blazor: `AddSupabase()` does not call `InitializeAsync()` on the client it creates. `AutoConnectRealtime` and restoring a persisted session only happen in `InitializeAsync()`, so call it yourself if you rely on either. `Subscribe()` on a Realtime channel connects the socket on its own.
+      - ASP.NET Core and Blazor: if an `ILoggerFactory` is registered in the service provider and you did not set `SupabaseOptions.LoggerFactory`, the client uses it.
+      - Keep the key out of source control and read it from configuration, such as user secrets or an environment variable. Use a publishable or anon key unless the code runs on the server and needs to bypass Row Level Security.
       - See [OpenTelemetry](/docs/reference/csharp/telemetry) for traces and metrics.
       - `SupabaseOptions.ThirdPartyAccessToken` authenticates the client through a third-party auth provider instead of Supabase Auth.
     examples:
@@ -46,6 +51,107 @@ functions:
 
           var supabase = new Supabase.Client(url, key, options);
           await supabase.InitializeAsync();
+          ```
+      - id: csharp-init-aspnetcore
+        name: 'ASP.NET Core: register the client'
+        description: |
+          Recommended for web apps. Install `Supabase.Extensions.DependencyInjection` (it brings in `Supabase`) and register the client once in `Program.cs`.
+        code: |
+          ```c#
+          using Supabase.Core.Http;
+          using Supabase.Extensions.DependencyInjection;
+
+          var builder = WebApplication.CreateBuilder(args);
+
+          builder.Services.AddSupabase(
+              supabaseUrl: builder.Configuration["Supabase:Url"]!,
+              supabaseKey: builder.Configuration["Supabase:Key"]!,
+              configureOptions: options =>
+              {
+                  options.AutoConnectRealtime = true;
+                  options.PostgrestRetry = new RetryOptions { MaxRetries = 3 };
+              });
+
+          var app = builder.Build();
+          ```
+      - id: csharp-init-aspnetcore-inject
+        name: 'ASP.NET Core: inject the client'
+        description: |
+          Inject `Supabase.Client` in a minimal API endpoint, a controller, or your own service.
+        code: |
+          ```c#
+          app.MapGet("/todos", async (Supabase.Client supabase) =>
+          {
+              var result = await supabase.From<Todo>().Get();
+              return result.Models;
+          });
+
+          public class TodoService
+          {
+              private readonly Supabase.Client _supabase;
+
+              public TodoService(Supabase.Client supabase) => _supabase = supabase;
+
+              public async Task<List<Todo>> GetOpen()
+              {
+                  var result = await _supabase
+                      .From<Todo>()
+                      .Where(t => t.IsComplete == false)
+                      .Get();
+
+                  return result.Models;
+              }
+          }
+          ```
+      - id: csharp-init-aspnetcore-sub-client
+        name: 'ASP.NET Core: inject a single sub-client'
+        description: |
+          A handler that uses one service can depend on that client alone.
+        code: |
+          ```c#
+          app.MapGet("/todos", async (IPostgrestClient postgrest) =>
+              await postgrest.Table<Todo>().Get());
+          ```
+      - id: csharp-init-aspnetcore-initialize
+        name: 'ASP.NET Core: initialize the client'
+        description: |
+          Call `InitializeAsync()` on the injected client when you need `AutoConnectRealtime` or a session restored from your `SessionHandler`.
+        code: |
+          ```c#
+          app.MapGet("/todos", async (Supabase.Client supabase) =>
+          {
+              await supabase.InitializeAsync();
+
+              var result = await supabase.From<Todo>().Get();
+              return result.Models;
+          });
+          ```
+      - id: csharp-init-blazor
+        name: Blazor
+        description: |
+          Register the client in `Program.cs` as shown in the ASP.NET Core example, then inject it in a component. In Blazor Server, the client lives for the circuit.
+        code: |
+          ```c#
+          @page "/todos"
+          @using Supabase
+          @inject Client SupabaseClient
+
+          <ul>
+              @foreach (var todo in _todos)
+              {
+                  <li>@todo.Task</li>
+              }
+          </ul>
+
+          @code {
+              private List<Todo> _todos = new();
+
+              protected override async Task OnInitializedAsync()
+              {
+                  var result = await SupabaseClient.From<Todo>().Get();
+                  _todos = result.Models;
+              }
+          }
           ```
       - id: csharp-init-maui
         name: Dependency Injection (Maui-like)
@@ -3769,121 +3875,4 @@ functions:
           };
 
           var functions = new Supabase.Functions.Client("https://<project>.supabase.co/functions/v1", options: options);
-          ```
-  - id: dependency-injection
-    title: 'AddSupabase()'
-    description: |
-      Registers the Supabase client with ASP.NET Core dependency injection. This is the recommended way to set up the SDK in web apps, including ASP.NET Core minimal APIs, controllers, and Blazor.
-
-      `AddSupabase()` comes from the `Supabase.Extensions.DependencyInjection` package, which targets .NET Standard 2.1 and is versioned together with the other `Supabase.*` packages.
-    notes: |
-      - Install the package with `dotnet add package Supabase.Extensions.DependencyInjection`. It adds the `AddSupabase()` extension method on `IServiceCollection` and depends on the `Supabase` package, so you get both.
-      - `AddSupabase()` registers a **scoped** `Supabase.Client`, and each of its sub-clients individually: `IGotrueClient<User, Session>`, `IPostgrestClient`, `IStorageClient<Bucket, FileObject>`, `IFunctionsClient`, and `IRealtimeClient<RealtimeSocket, RealtimeChannel>`. Inject only the one a class needs.
-      - A scope gets its own `Client`, with its own Auth state. In ASP.NET Core a scope is one request. In Blazor Server it is one circuit, and in Blazor WebAssembly it lasts as long as the app runs.
-      - Without the extension, every new `Client` builds its own `HttpClient` (and socket). A scoped or transient registration then creates one per resolution, and under sustained load this exhausts the connection pool. `AddSupabase()` sends every client's traffic through pooled `HttpClient`s from `IHttpClientFactory` instead.
-      - `AddSupabase()` sets `SupabaseOptions.HttpClient` and the three `StorageClientOptions` HTTP clients (`HttpRequestClient`, `HttpUploadClient`, `HttpDownloadClient`) itself. Values you set for those in `configureOptions` are replaced. Everything else you set stays, including `Proxy`, `StorageClientOptions.Proxy`, the Storage timeouts, and the retry options such as `PostgrestRetry`.
-      - If an `ILoggerFactory` is registered in the service provider and you did not set `SupabaseOptions.LoggerFactory`, the client uses it.
-      - `AddSupabase()` does not call `InitializeAsync()` on the client it creates. `AutoConnectRealtime` and restoring a persisted session only happen in `InitializeAsync()`, so call it yourself if you rely on either. `Subscribe()` on a Realtime channel connects the socket on its own.
-      - Keep the key out of source control. Read it from configuration, such as user secrets or an environment variable. Use a publishable or anon key unless the code runs on the server and needs to bypass Row Level Security.
-      - To set up the SDK outside of dependency injection, for example in a console app, desktop app, mobile app, or Unity, see [Initializing](/docs/reference/csharp/initializing).
-    examples:
-      - id: register-in-aspnet-core
-        name: Register the client in ASP.NET Core
-        isSpotlight: true
-        code: |
-          ```c#
-          using Supabase.Core.Http;
-          using Supabase.Extensions.DependencyInjection;
-
-          var builder = WebApplication.CreateBuilder(args);
-
-          builder.Services.AddSupabase(
-              supabaseUrl: builder.Configuration["Supabase:Url"]!,
-              supabaseKey: builder.Configuration["Supabase:Key"]!,
-              configureOptions: options =>
-              {
-                  options.AutoConnectRealtime = true;
-                  options.PostgrestRetry = new RetryOptions { MaxRetries = 3 };
-              });
-
-          var app = builder.Build();
-          ```
-      - id: inject-the-client
-        name: Inject the client
-        description: |
-          Inject `Supabase.Client` in a minimal API endpoint, a controller, or your own service.
-        code: |
-          ```c#
-          app.MapGet("/todos", async (Supabase.Client supabase) =>
-          {
-              var result = await supabase.From<Todo>().Get();
-              return result.Models;
-          });
-
-          public class TodoService
-          {
-              private readonly Supabase.Client _supabase;
-
-              public TodoService(Supabase.Client supabase) => _supabase = supabase;
-
-              public async Task<List<Todo>> GetOpen()
-              {
-                  var result = await _supabase
-                      .From<Todo>()
-                      .Where(t => t.IsComplete == false)
-                      .Get();
-
-                  return result.Models;
-              }
-          }
-          ```
-      - id: inject-a-sub-client
-        name: Inject a single sub-client
-        description: |
-          A handler that uses one service can depend on that client alone.
-        code: |
-          ```c#
-          app.MapGet("/todos", async (IPostgrestClient postgrest) =>
-              await postgrest.Table<Todo>().Get());
-          ```
-      - id: initialize-the-client
-        name: Initialize the client
-        description: |
-          Call `InitializeAsync()` on the injected client when you need `AutoConnectRealtime` or a session restored from your `SessionHandler`.
-        code: |
-          ```c#
-          app.MapGet("/todos", async (Supabase.Client supabase) =>
-          {
-              await supabase.InitializeAsync();
-
-              var result = await supabase.From<Todo>().Get();
-              return result.Models;
-          });
-          ```
-      - id: use-in-blazor
-        name: Use the client in Blazor
-        description: |
-          Register the client in `Program.cs` as shown above, then inject it in a component. In Blazor Server, the client lives for the circuit.
-        code: |
-          ```c#
-          @page "/todos"
-          @using Supabase
-          @inject Client SupabaseClient
-
-          <ul>
-              @foreach (var todo in _todos)
-              {
-                  <li>@todo.Task</li>
-              }
-          </ul>
-
-          @code {
-              private List<Todo> _todos = new();
-
-              protected override async Task OnInitializedAsync()
-              {
-                  var result = await SupabaseClient.From<Todo>().Get();
-                  _todos = result.Models;
-              }
-          }
           ```
