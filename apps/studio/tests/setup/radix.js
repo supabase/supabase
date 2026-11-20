@@ -1,13 +1,9 @@
 /**
  * Required setup adapted from https://github.com/radix-ui/primitives/issues/856#issuecomment-928704064
  *
- * Implements a custom PointerEvent that can then be used to trigger the radix dropdown.
- * This is required as JSdom has not implemented the PointerEvent (see https://github.com/testing-library/react-testing-library/issues/838#issuecomment-735259406)
- *
- * Furthermore, ResizeObserver and DomRect are both not available in JSdom (see https://github.com/radix-ui/primitives/issues/856)
+ * ResizeObserver and DomRect are both not available in JSdom (see https://github.com/radix-ui/primitives/issues/856)
  *
  * Effects of this setup file:
- * - sets PointerEvent to window
  * - sets ResizeObserver to window
  * - sets DOMRect to window
  *
@@ -16,19 +12,6 @@
 
 // Pure-logic tests run in the node environment, which has no `window` to patch.
 if (typeof window !== 'undefined') {
-  class PointerEvent extends Event {
-    constructor(type, props) {
-      super(type, props)
-      if (props.button != null) {
-        this.button = props.button
-      }
-      if (props.ctrlKey != null) {
-        this.ctrlKey = props.ctrlKey
-      }
-    }
-  }
-
-  window.PointerEvent = PointerEvent
   window.HTMLElement.prototype.scrollIntoView = function () {}
 
   // // https://github.com/radix-ui/primitives/issues/420#issuecomment-771615182

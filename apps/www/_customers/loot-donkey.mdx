@@ -122,6 +122,10 @@ In terms of the backend, I don't lose any sleep ... The thing that keeps me up a
 
 </Quote>
 
+### Under the hood: AWS
+
+Behind all of this, Fool King's Supabase project runs on AWS. Supabase runs the game's Postgres database on Amazon EC2 compute, and that database holds every player's saved army, the ghosts other players fight against, and the win and loss records that drive the decree system, while Supabase Auth and the Steam verification Edge Function run on the same AWS infrastructure. For a programmer who describes the backend as a magical box, that means the servers under the game are infrastructure Loot Donkey never has to host, patch, or scale itself, which is why the weekly maintenance load is close to zero.
+
 ## Getting ready for Early Access
 
 With the backend stable, Loot Donkey is focused on its Early Access launch. Aiming for an Early Access release in 2027, the studio is polishing the game experience for its 20,000+ Steam wishlists, and it is targeting a 1.0 release of Fool King in late 2027.

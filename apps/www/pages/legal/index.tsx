@@ -21,11 +21,6 @@ const sections = [
         type: 'document' as const,
       },
       {
-        label: 'Service Level Agreement',
-        href: '/sla',
-        type: 'document' as const,
-      },
-      {
         label: 'Business Associate Agreement',
         href: '/legal/customer-resources/business-associate-agreement',
         type: 'document' as const,
