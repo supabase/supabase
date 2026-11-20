@@ -16,8 +16,11 @@ import pgMeta, {
   getTableColumnsSql,
   getTableConstraintsSql,
   getUsersCountSQL,
+  isCatalogGap,
   literal,
+  parseTextArray,
   safeSql,
+  withCatalogFallback,
   type CatalogQuery,
 } from '../src'
 import {
@@ -60,9 +63,9 @@ afterAll(async () => {
 })
 
 const POSTGRES_SCHEMA = `
-do $$ begin create role anon; exception when duplicate_object then null; end $$;
-do $$ begin create role authenticated; exception when duplicate_object then null; end $$;
-do $$ begin create role service_role; exception when duplicate_object then null; end $$;
+do $$ begin create role anon; exception when duplicate_object or unique_violation then null; end $$;
+do $$ begin create role authenticated; exception when duplicate_object or unique_violation then null; end $$;
+do $$ begin create role service_role; exception when duplicate_object or unique_violation then null; end $$;
 create schema other;
 comment on schema other is 'other things';
 create type public.mood as enum ('happy', 'sad');
@@ -98,6 +101,9 @@ create foreign table other.remote_items (id int, label text) server remote
 grant select on public.authors to anon;
 grant select, insert, update, delete on public.posts to anon, authenticated, service_role;
 grant execute on function public.add_one(int, int) to anon;
+create table other.parents ("we, ""id""" int, b int, primary key ("we, ""id""", b));
+create table other.kids (id int primary key, "p, ""ref""" int, pb int,
+  foreign key ("p, ""ref""", pb) references other.parents ("we, ""id""", b));
 alter default privileges for role postgres in schema public grant select on tables to anon;
 `
 
@@ -108,6 +114,9 @@ create index posts_author_idx on public.posts (author_id);
 alter table public.posts enable row level security;
 create view public.post_titles as select id, title from public.posts;
 revoke select on table public.authors from anon;
+create schema odd;
+create table odd.parents ("we, ""id""" int, b int, primary key ("we, ""id""", b));
+create table odd.kids (id int primary key, "p, ""ref""" int, pb int, foreign key ("p, ""ref""", pb) references odd.parents ("we, ""id""", b));
 `
 
 const { postgresTest, sparkTest, sparkFallback } = catalogFallbackHarness({
@@ -355,6 +364,12 @@ describe('indexes, constraints, foreign keys and the SQL editor columns', () => 
       sorted(await getForeignKeyConstraintsFallback(query, { schema: 'public' }), 'id')
     ).toEqual(sorted(foreignKeys, 'id'))
 
+    const quoted = await getForeignKeyConstraintsFallback(query, { schema: 'other' })
+    expect(quoted).toEqual(await query(getForeignKeyConstraintsSql({ schema: 'other' })))
+    expect(quoted.map((fk) => parseTextArray(fk.source_columns ?? ''))).toEqual([
+      ['p, "ref"', 'pb'],
+    ])
+
     for (const args of [{ schema: 'public' }, { schema: 'public', table: 'posts' }, {}]) {
       expect(tableColumns(await getTableColumnsFallback(query, args))).toEqual(
         tableColumns(await query(getTableColumnsSql(args)))
@@ -403,6 +418,12 @@ describe('indexes, constraints, foreign keys and the SQL editor columns', () => 
       },
     ])
 
+    const [quoted] = await sparkFallback(getForeignKeyConstraintsSql({ schema: 'odd' }), () =>
+      getForeignKeyConstraintsFallback(query, { schema: 'odd' })
+    )
+    expect(parseTextArray(quoted.source_columns ?? '')).toEqual(['p, "ref"', 'pb'])
+    expect(parseTextArray(quoted.target_columns ?? '')).toEqual(['we, "id"', 'b'])
+
     const columns = await sparkFallback(getTableColumnsSql({ schema: 'public' }), () =>
       getTableColumnsFallback(query, { schema: 'public' })
     )
@@ -428,6 +449,25 @@ describe('Data API privileges', () => {
       })),
       'relation_id'
     )
+
+  postgresTest('a quoted role holding /, = and " reads as itself', async (query) => {
+    await query(safeSql`
+      do $$ begin create role "we""ird/=role"; exception when duplicate_object or unique_violation then null; end $$;
+      create table public.odd_acl (id int);
+      alter table public.odd_acl owner to "we""ird/=role";
+      grant select on public.odd_acl to anon with grant option;
+    `)
+    const options = { includedSchemas: ['public'] }
+    const actual = privileges(await listTablePrivilegesFallback(query, options))
+    expect(actual).toEqual(privileges(await query(pgMeta.tablePrivileges.list(options).sql)))
+    const odd = actual.find((relation: any) => relation.name === 'odd_acl')
+    expect(odd.privileges).toContainEqual({
+      grantor: 'we"ird/=role',
+      grantee: 'anon',
+      privilege_type: 'SELECT',
+      is_grantable: true,
+    })
+  })
 
   postgresTest('the fallbacks return what the pg-meta queries return', async (query) => {
     for (const options of [{ includedSchemas: ['public'] }, { includedSchemas: ['other'] }]) {
@@ -507,6 +547,33 @@ describe('Data API privileges', () => {
 })
 
 describe('auth users count and index worker', () => {
+  postgresTest('a Postgres 0A000 refusal never reaches a fallback', async (query, db) => {
+    await createDatabaseWithAuthSchema(db)
+    await query(safeSql`
+      create function public.refuse_functions() returns event_trigger language plpgsql as $$
+      begin raise exception 'functions are reviewed first' using errcode = '0A000'; end $$;
+      create event trigger refuse_functions on ddl_command_start when tag in ('CREATE FUNCTION')
+        execute function public.refuse_functions();
+    `)
+    try {
+      const refused = await query(getUsersCountSQL({})).catch((error: unknown) => error)
+      expect(refused).toMatchObject({ code: '0A000' })
+      expect(isCatalogGap(refused)).toBe(false)
+
+      let usedFallback = false
+      await withCatalogFallback(
+        () => query(getUsersCountSQL({})),
+        async () => {
+          usedFallback = true
+          return []
+        }
+      ).catch(() => undefined)
+      expect(usedFallback).toBe(false)
+    } finally {
+      await query(safeSql`drop event trigger refuse_functions`)
+    }
+  })
+
   postgresTest('the fallbacks return what the queries return', async (query, db) => {
     await createDatabaseWithAuthSchema(db)
     await query(safeSql`

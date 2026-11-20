@@ -13,27 +13,52 @@ export type CatalogRow = Record<string, unknown>
 /** Runs one SQL statement on the project and returns its rows. */
 export type CatalogQuery = (sql: SafeSqlFragment) => Promise<CatalogRow[]>
 
-const GAP_SQLSTATES = new Set(['0A000', '42P01', '42883', '42703', '42704', '3F000'])
-
-// turso refuses these constructs with a syntax error (42601) or a data exception (22000) instead of
-// 0A000; Postgres never words an error this way.
-const TURSO_REFUSALS =
-  /^(?:unnest currently requires exactly one array|ORDER BY may not be used with non-aggregate|Array slice missing lower index|unnest requires an array$)/i
-
-// turso's wording for a missing object, which Postgres never uses: Postgres's own
-// `relation "x" does not exist` (even for a user table named `pg_x`) reaches the caller unchanged.
-// Spark reports the session schema `pg_temp` missing in Postgres's words.
-const MISSING_CATALOG_OBJECT =
-  /^no such (?:table|function|column): |^schema "pg_temp" does not exist$/i
+// Spark's exact refusals of the pg-meta queries that have a fallback, by SQLSTATE. An error is a
+// gap only when it is one of these: Postgres can raise any SQLSTATE itself (an event trigger can
+// refuse a statement with 0A000), and its wording never matches turso's.
+const TURSO_REFUSALS: Record<string, string[]> = {
+  '0A000': [
+    'SELECT DISTINCT ON is not supported',
+    'DO is not supported',
+    'a column alias list on a function is not supported',
+  ],
+  '42601': [
+    'unnest currently requires exactly one array',
+    'ORDER BY may not be used with non-aggregate jsonb_agg()',
+    'Array slice missing lower index',
+  ],
+  '22000': ['unnest requires an array'],
+  '3F000': ['schema "pg_temp" does not exist'],
+  '42703': ['no such column: a'],
+  '42883': [
+    'no such function: array_ndims',
+    'no such function: array_fill',
+    'no such function: json_build_object',
+    'no such function: left',
+    'no such function: jsonb_agg',
+    'no such function: pg_has_role',
+    'no such function: pg_get_functiondef',
+    'no such function: pg_get_function_identity_arguments',
+    'no such function: to_regclass',
+  ],
+  '42P01': [
+    'no such table: aclexplode',
+    'no such table: pg_available_extensions',
+    'no such table: pg_enum',
+    'no such table: main.pg_enum',
+    'no such table: pg_get_keywords',
+    'no such table: pg_locks',
+    'no such table: pg_partition_tree',
+    'no such table: pg_stat_activity',
+    'no such table: main.pg_stat_activity',
+    'no such table: supabase_migrations.schema_migrations',
+  ],
+}
 
 // Spark's refusals of what the table editor writes with: `json(b)_populate_record(set)`, and the
 // column-less `select` of an all-default row.
 const POPULATE_RECORD_REFUSAL =
   /^(?:no such (?:function|table): jsonb?_populate_record(?:set)?|SELECT requires at least one column or expression)$/i
-
-// For an error that carries no SQLSTATE.
-const GAP_MESSAGE =
-  /^(?:[a-z_ ]+ is not supported|unnest currently requires exactly one array|no such (?:table|function|column): [\w.]+)$/i
 
 const SQLSTATE_IN_TEXT = /\bERROR:\s+([0-9A-Z]{5}):\s*/
 
@@ -63,18 +88,16 @@ function messageOf(error: unknown): string {
 }
 
 /**
- * Whether a query failed because the database lacks a catalog, function or SQL feature the query
- * needs (Spark on turso), as opposed to any other failure. Permission errors are never gaps: a
- * fallback skips pg-meta's privilege filters.
+ * Whether a query failed with one of Spark's (turso's) refusals of a catalog, function or SQL
+ * feature a pg-meta query needs, as opposed to any other failure.
  */
 export function isCatalogGap(error: unknown): boolean {
   const state = sqlStateOf(error)
   const message = messageOf(error)
-  if (state === '42501' || /^permission denied\b/i.test(message)) return false
-  if (state === undefined) return GAP_MESSAGE.test(message)
-  if (state === '0A000') return true
-  if (state === '42601' || state === '22000') return TURSO_REFUSALS.test(message)
-  return GAP_SQLSTATES.has(state) && MISSING_CATALOG_OBJECT.test(message)
+  if (state === undefined) {
+    return Object.values(TURSO_REFUSALS).some((messages) => messages.includes(message))
+  }
+  return TURSO_REFUSALS[state]?.includes(message) ?? false
 }
 
 /**

@@ -3,19 +3,12 @@
  *
  * `tablePrivileges.list` reads `relacl` as text and explodes it in TypeScript; pg-meta's privilege
  * filters are not applied. The grant and revoke statements Studio runs in a `DO` block are written
- * as plain statements.
+ * as plain statements on the table's name.
  */
 import { toInt, type CatalogQuery } from '../catalog-fallback'
 import { DEFAULT_SYSTEM_SCHEMAS } from '../constants'
 import { filterByList } from '../helpers'
-import {
-  ident,
-  joinSqlFragments,
-  keyword,
-  literal,
-  safeSql,
-  type SafeSqlFragment,
-} from '../pg-format'
+import { ident, joinSqlFragments, keyword, safeSql, type SafeSqlFragment } from '../pg-format'
 import {
   granteeSql,
   type TablePrivilegesGrant,
@@ -60,38 +53,31 @@ export async function listTablePrivilegesFallback(
   }))
 }
 
-/** The statements of `tablePrivileges.grant` and `.revoke`, without their `DO` block. */
-export async function getTablePrivilegesStatementsFallback(
-  query: CatalogQuery,
-  { grants, revokes }: { grants: TablePrivilegesGrant[]; revokes: TablePrivilegesRevoke[] }
-): Promise<SafeSqlFragment> {
-  const ids = [...new Set([...grants, ...revokes].map((change) => change.relationId))]
-  if (ids.length === 0) return safeSql``
-  const rows = await query(safeSql`
-    select c.oid::int8 as id, n.nspname as schema, c.relname as name
-    from pg_catalog.pg_class c
-    join pg_catalog.pg_namespace n on n.oid = c.relnamespace
-    where c.oid in (${joinSqlFragments(ids.map(literal), ', ')})`)
-  const relations = new Map(
-    rows.map((row) => [
-      toInt(row.id),
-      safeSql`${ident(String(row.schema))}.${ident(String(row.name))}`,
-    ])
-  )
-  const relation = (id: number) => {
-    const name = relations.get(id)
-    if (!name) throw new Error(`relation ${id} does not exist`)
-    return name
-  }
+/**
+ * The statements of `tablePrivileges.grant` and `.revoke` for one table, without their `DO` block,
+ * on its schema and name: no separate id lookup that a concurrent change could make stale.
+ */
+export function getTablePrivilegesStatementsSql({
+  schema,
+  name,
+  grants,
+  revokes,
+}: {
+  schema: string
+  name: string
+  grants: Array<Omit<TablePrivilegesGrant, 'relationId'>>
+  revokes: Array<Omit<TablePrivilegesRevoke, 'relationId'>>
+}): SafeSqlFragment {
+  const table = safeSql`${ident(schema)}.${ident(name)}`
   const statements = [
     ...revokes.map(
-      ({ privilegeType, relationId, grantee }) =>
-        safeSql`revoke ${keyword(privilegeType)} on table ${relation(relationId)} from ${granteeSql(grantee)}`
+      ({ privilegeType, grantee }) =>
+        safeSql`revoke ${keyword(privilegeType)} on table ${table} from ${granteeSql(grantee)}`
     ),
     ...grants.map(
-      ({ privilegeType, relationId, grantee, isGrantable }) =>
-        safeSql`grant ${keyword(privilegeType)} on table ${relation(relationId)} to ${granteeSql(grantee)}${isGrantable ? safeSql` with grant option` : safeSql``}`
+      ({ privilegeType, grantee, isGrantable }) =>
+        safeSql`grant ${keyword(privilegeType)} on table ${table} to ${granteeSql(grantee)}${isGrantable ? safeSql` with grant option` : safeSql``}`
     ),
   ]
-  return safeSql`${joinSqlFragments(statements, ';\n')};`
+  return statements.length === 0 ? safeSql`` : safeSql`${joinSqlFragments(statements, ';\n')};`
 }

@@ -1,5 +1,5 @@
 import pgMeta, {
-  getTablePrivilegesStatementsFallback,
+  getTablePrivilegesStatementsSql,
   isDoBlockGap,
   withCatalogFallback,
   type TablePrivilegesGrant,
@@ -12,7 +12,6 @@ import { invalidateTablePrivilegesQuery } from './table-privileges-query'
 import type { ConnectionVars } from '@/data/common.types'
 import { unguarded } from '@/data/fetchers'
 import { lintKeys } from '@/data/lint/keys'
-import { catalogFallbackQuery } from '@/data/sql/catalog-fallback-query'
 import { executeSql } from '@/data/sql/execute-sql-mutation'
 import {
   API_ACCESS_ROLES,
@@ -24,6 +23,9 @@ import type { UseCustomMutationOptions } from '@/types'
 
 export type TableApiAccessPrivilegesVariables = ConnectionVars & {
   relationId: number
+  /** The table's schema and name, for databases that cannot run the `DO` block (Spark). */
+  schema: string
+  name: string
   privileges: DeepReadonly<ApiPrivilegesByRole>
 }
 
@@ -31,6 +33,8 @@ export async function updateTableApiAccessPrivileges({
   projectRef,
   connectionString,
   relationId,
+  schema,
+  name,
   privileges,
 }: TableApiAccessPrivilegesVariables) {
   const sqlStatements: Array<SafeSqlFragment> = []
@@ -85,13 +89,7 @@ export async function updateTableApiAccessPrivileges({
 
   return withCatalogFallback(
     () => run(joinSqlFragments(sqlStatements, '\n')),
-    async () =>
-      run(
-        await getTablePrivilegesStatementsFallback(catalogFallbackQuery(variables), {
-          grants,
-          revokes,
-        })
-      ),
+    () => run(getTablePrivilegesStatementsSql({ schema, name, grants, revokes })),
     isDoBlockGap
   )
 }

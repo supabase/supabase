@@ -6,7 +6,7 @@ import {
   getInsertMigrationSQL,
   getMigrationsSql,
   getTableEditorSql,
-  getTablePrivilegesStatementsFallback,
+  getTablePrivilegesStatementsSql,
   getTableRowsCountSql,
   getTablesPaginatedSql,
   isCatalogGap,
@@ -45,8 +45,8 @@ afterAll(async () => {
 })
 
 const POSTGRES_SCHEMA = `
-do $$ begin create role anon; exception when duplicate_object then null; end $$;
-do $$ begin create role authenticated; exception when duplicate_object then null; end $$;
+do $$ begin create role anon; exception when duplicate_object or unique_violation then null; end $$;
+do $$ begin create role authenticated; exception when duplicate_object or unique_violation then null; end $$;
 create schema other;
 create table other.owners (id int primary key, handle text);
 create type public.mood as enum ('happy', 'sad');
@@ -638,13 +638,18 @@ describe('table creation and API access', () => {
   }
 
   postgresTest('plain grant statements change what the DO loop changes', async (query) => {
-    await query(safeSql`create table public.looped (id int); create table public.plain (id int)`)
+    await query(safeSql`create table public.looped (id int)`)
     const looped = apiAccess(await tableIdOf(query, 'looped'))
     await query(pgMeta.tablePrivileges.revoke(looped.revokes).sql)
     await query(pgMeta.tablePrivileges.grant(looped.grants).sql)
-    await query(
-      await getTablePrivilegesStatementsFallback(query, apiAccess(await tableIdOf(query, 'plain')))
-    )
+
+    // The script names the table: it is built without reading the catalog, before the table exists.
+    const plain = getTablePrivilegesStatementsSql({
+      schema: 'public',
+      name: 'plain',
+      ...apiAccess(0),
+    })
+    await query(safeSql`create table public.plain (id int); ${plain}`)
     expect(await aclOf(query, 'plain')).toEqual(await aclOf(query, 'looped'))
   })
 
@@ -726,7 +731,8 @@ describe('table creation and API access', () => {
           ],
           '\n'
         ),
-        async () => query(await getTablePrivilegesStatementsFallback(query, access)),
+        () =>
+          query(getTablePrivilegesStatementsSql({ schema: 'public', name: 'notes', ...access })),
         isDoBlockGap
       )
       const privileges = (await listTablePrivilegesFallback(query, { includedSchemas: ['public'] }))

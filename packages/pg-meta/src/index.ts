@@ -49,7 +49,7 @@ export {
 } from './sql/tables.fallback'
 export { withParsedPolicyRoles } from './sql/policies.fallback'
 export {
-  getTablePrivilegesStatementsFallback,
+  getTablePrivilegesStatementsSql,
   listTablePrivilegesFallback,
 } from './sql/table-privileges.fallback'
 export type { TablePrivilegesGrant, TablePrivilegesRevoke } from './pg-meta-table-privileges'
@@ -88,6 +88,7 @@ export { getUsersCountFallback } from './sql/studio/auth/get-users-count.fallbac
 export { getIndexWorkerStatusFallback } from './sql/studio/auth/get-index-worker-status.fallback'
 export { getKeywordsFallback } from './sql/studio/sql-editor/keywords.fallback'
 
+export { parseTextArray } from './helpers'
 export {
   ident,
   literal,

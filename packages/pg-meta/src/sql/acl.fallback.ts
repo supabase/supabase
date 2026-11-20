@@ -5,6 +5,8 @@
  * fallbacks read `relacl`, `proacl` and `defaclacl` as text, which turso returns.
  */
 
+import { parseTextArray } from '../helpers'
+
 // Privilege letters in `aclexplode`'s output order (the ACL bit order).
 const PRIVILEGES: Array<[string, string]> = [
   ['a', 'INSERT'],
@@ -32,26 +34,7 @@ export type AclPrivilege = {
   is_grantable: boolean
 }
 
-/** The elements of a Postgres array's text form (one level). */
-function arrayElements(text: string): string[] {
-  const body = text.trim().replace(/^\{/, '').replace(/\}$/, '')
-  const elements: string[] = []
-  let current = ''
-  let quoted = false
-  for (let i = 0; i < body.length; i++) {
-    const char = body[i]
-    if (quoted && char === '\\') current += body[++i] ?? ''
-    else if (char === '"') quoted = !quoted
-    else if (char === ',' && !quoted) {
-      elements.push(current)
-      current = ''
-    } else current += char
-  }
-  if (body.length > 0) elements.push(current)
-  return elements
-}
-
-/** A role name in an aclitem: bare, or double-quoted with `""` for a quote. */
+/** A role name in an aclitem from `start`: bare up to `=` or `/`, or double-quoted with `""`. */
 function readRole(text: string, start: number): [string, number] {
   if (text[start] !== '"') {
     let end = start
@@ -70,14 +53,22 @@ function readRole(text: string, start: number): [string, number] {
   return [name, i]
 }
 
+/** `grantee=privileges/grantor`, read left to right so a quoted name may hold `=`, `/` or `"`. */
+function readAclItem(item: string) {
+  const [grantee, afterGrantee] = readRole(item, 0)
+  if (item[afterGrantee] !== '=') throw new Error(`Unexpected aclitem: ${item}`)
+  const slash = item.indexOf('/', afterGrantee + 1)
+  if (slash === -1) throw new Error(`Unexpected aclitem: ${item}`)
+  const [grantor] = readRole(item, slash + 1)
+  return { grantee, letters: item.slice(afterGrantee + 1, slash), grantor }
+}
+
 /** `aclexplode(acl)` for an ACL's text; `null` reads as no privileges. */
 export function explodeAcl(acl: string | null | undefined): AclPrivilege[] {
   if (acl === null || acl === undefined) return []
-  return arrayElements(acl).flatMap((item) => {
-    const [grantee, afterGrantee] = readRole(item, 0)
-    const slash = item.lastIndexOf('/')
-    const letters = item.slice(afterGrantee + 1, slash)
-    const [grantor] = readRole(item, slash + 1)
+  return parseTextArray(acl).flatMap((element) => {
+    if (element === null) return []
+    const { grantee, letters, grantor } = readAclItem(element)
     return PRIVILEGES.flatMap(([letter, privilege_type]) => {
       const index = letters.indexOf(letter)
       if (index === -1) return []

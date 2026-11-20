@@ -1,4 +1,8 @@
-import { getForeignKeyConstraintsFallback, getForeignKeyConstraintsSql } from '@supabase/pg-meta'
+import {
+  getForeignKeyConstraintsFallback,
+  getForeignKeyConstraintsSql,
+  parseTextArray,
+} from '@supabase/pg-meta'
 import { QueryClient, useQuery } from '@tanstack/react-query'
 import { IS_PLATFORM } from 'common'
 
@@ -48,6 +52,10 @@ export type ForeignKeyConstraintsVariables = GetForeignKeyConstraintsVariables &
   connectionString?: string | null
 }
 
+// A quoted column name may hold commas or quotes: `{"a, b",c}`.
+const columnNames = (text: string) =>
+  parseTextArray(text).flatMap((name) => (name === null ? [] : [name]))
+
 export async function getForeignKeyConstraints(
   { projectRef, connectionString, schema }: ForeignKeyConstraintsVariables,
   signal?: AbortSignal
@@ -73,8 +81,8 @@ export async function getForeignKeyConstraints(
   return (result ?? []).map((foreignKey: ForeignKeyConstraintRaw) => {
     return {
       ...foreignKey,
-      source_columns: foreignKey.source_columns.replace('{', '').replace('}', '').split(','),
-      target_columns: foreignKey.target_columns.replace('{', '').replace('}', '').split(','),
+      source_columns: columnNames(foreignKey.source_columns),
+      target_columns: columnNames(foreignKey.target_columns),
     }
   }) as ForeignKeyConstraint[]
 }
