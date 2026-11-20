@@ -88,7 +88,9 @@ export interface ChartLineProps {
   }
   strokeWidth?: number
   referenceLines?: ChartReferenceLine[]
+  /** Enables Recharts keyboard navigation. Defaults to false. */
   accessibilityLayer?: boolean
+  /** Controls area animation. Omit to use the Recharts default. */
   isAnimationActive?: boolean
 }
 
