@@ -126,13 +126,56 @@ transforms:
           .event_message = parsed.msg
           .metadata.level = parsed.level
       }
-  # Function logs are unstructured messages on stderr
+  # Structured requests and runtime events share container output with diagnostics.
   functions_logs:
     type: remap
     inputs:
       - router.functions
     source: |-
       .metadata.project_ref = del(.project)
+      parsed, err = parse_json(.event_message)
+      if err == null && is_object(parsed) {
+        if parsed.schema == "supabase.edge.logs.v1" &&
+           (parsed.stream == "request" || parsed.stream == "runtime") &&
+           is_object(parsed.metadata) && is_string(parsed.msg) {
+          event_timestamp, timestamp_err = parse_timestamp(parsed.timestamp, format: "%+")
+          if timestamp_err == null {
+            .timestamp = event_timestamp
+          }
+          .function_log_stream = parsed.stream
+          .event_message = parsed.msg
+          .metadata.function_id = parsed.metadata.function_id
+          .metadata.execution_id = parsed.metadata.execution_id
+          if parsed.stream == "request" {
+            .metadata.request_id = parsed.metadata.request_id
+            .metadata.request = parsed.metadata.request
+            .metadata.response = parsed.metadata.response
+            .metadata.execution_time_ms = parsed.metadata.execution_time_ms
+          } else {
+            .metadata.event_type = parsed.metadata.event_type
+            .metadata.level = parsed.metadata.level
+            .metadata.boot_time = parsed.metadata.boot_time
+            .metadata.reason = parsed.metadata.reason
+            .metadata.cpu_time_used = parsed.metadata.cpu_time_used
+            .metadata.memory_used = parsed.metadata.memory_used
+            .metadata.dropped_count = parsed.metadata.dropped_count
+            .metadata.synthetic = parsed.metadata.synthetic
+          }
+        }
+      }
+  functions_router:
+    type: route
+    inputs: [functions_logs]
+    route:
+      runtime: '.function_log_stream == "runtime"'
+  functions_requests:
+    type: remap
+    inputs: [functions_router._unmatched]
+    source: 'del(.function_log_stream)'
+  functions_runtime:
+    type: remap
+    inputs: [functions_router.runtime]
+    source: 'del(.function_log_stream)'
   # Storage logs may contain json objects so we parse them for completeness
   storage_logs:
     type: remap
@@ -229,7 +272,7 @@ sinks:
   logflare_functions:
     type: 'http'
     inputs:
-      - functions_logs
+      - functions_requests
     encoding:
       codec: 'json'
     method: 'post'
@@ -239,6 +282,19 @@ sinks:
       headers:
         x-api-key: ${LOGFLARE_PUBLIC_ACCESS_TOKEN?LOGFLARE_PUBLIC_ACCESS_TOKEN is required}
     uri: 'http://analytics:4000/api/logs?source_name=deno-relay-logs'
+  logflare_function_events:
+    type: 'http'
+    inputs:
+      - functions_runtime
+    encoding:
+      codec: 'json'
+    method: 'post'
+    request:
+      retry_max_duration_secs: 30
+      retry_initial_backoff_secs: 1
+      headers:
+        x-api-key: ${LOGFLARE_PUBLIC_ACCESS_TOKEN?LOGFLARE_PUBLIC_ACCESS_TOKEN is required}
+    uri: 'http://analytics:4000/api/logs?source_name=deno-subhosting-events'
   logflare_storage:
     type: 'http'
     inputs:
