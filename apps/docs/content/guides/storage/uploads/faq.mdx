@@ -36,7 +36,7 @@ Yes. For uploads that have an expiry time, an upload can complete after the expi
 
 If an upload fails or stops before completion, for example because of a network failure during a standard upload or an abandoned resumable upload, Supabase is designed to clean up the partial files through automated cleanup tasks. You can't manually trigger a cleanup, and you can't access the backend file service directly to review the raw file system.
 
-If partial files aren't cleaned up in some scenario, you can detect them by comparing your [storage size from object metadata](/docs/guides/platform/manage-your-usage/storage-size#sql-editor) with the average daily storage size on your [organization usage page](/dashboard/org/_/usage#storageSize). The SQL query returns the exact size at the time you run it, while the usage page averages the size over the day, so small differences are expected.
+If partial files aren't cleaned up in some scenario, you can detect them by comparing your [storage size from object metadata](/docs/guides/platform/manage-your-usage/storage-size#sql-editor) with the average daily storage size on your [organization usage page](/dashboard/org/_/usage#storageSize). On the usage page, select the same project that you queried with SQL. The SQL query returns the exact size at the time you run it, while the usage page averages the size over the day, so small differences are expected.
 
 If the difference is significant, [open a support ticket](/dashboard/support/new) so the Supabase team can review your project. If you think partial files weren't cleaned up, share the steps that led to the situation. A storage size mismatch can also happen if you delete file metadata directly with SQL instead of using the standard Storage APIs.
 
@@ -45,7 +45,7 @@ If the difference is significant, [open a support ticket](/dashboard/support/new
 Uploads don't require final confirmation from the client:
 
 - If the client loses connection after sending all the data, the upload can complete without the client receiving the final response.
-- If the client disconnects before the file finishes uploading, Storage treats the upload as failed and removes any partially uploaded data.
+- If a standard upload's client disconnects before the file finishes uploading, Storage treats the upload as failed and removes any partially uploaded data.
 
 To know when an upload has completed, use [triggers](/docs/guides/database/postgres/triggers) on `storage.objects`.
 
