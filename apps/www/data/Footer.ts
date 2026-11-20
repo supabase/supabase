@@ -4,7 +4,6 @@ import {
   skillBasedSolutions,
   useCaseSolutions,
 } from 'data/Solutions'
-import { PrivacySettings } from 'ui-patterns/PrivacySettings'
 
 const footerData = [
   {
@@ -198,10 +197,6 @@ const footerData = [
       {
         text: 'Privacy Policy',
         url: '/privacy',
-      },
-      {
-        text: 'Privacy Settings',
-        component: PrivacySettings,
       },
       {
         text: 'Acceptable Use Policy',

@@ -19,7 +19,6 @@ export type EntityAction = {
   id: EntityActionId
   label: string
   href?: string
-  disabledReason?: string
   children?: EntityAction[]
 }
 
@@ -32,31 +31,22 @@ export function isTableLikeEntity(entity: { type?: string }) {
 type GetEntityActionsParams = {
   entity: Pick<Entity, 'id' | 'schema' | 'type' | 'is_partition'>
   projectRef: string
-  /** Whether the entity is the one currently open in the table editor */
-  isActive: boolean
   isLocked: boolean
 }
 
 /**
- * Edit, duplicate and delete are applied by the side panel / dialogs mounted for the table that is
- * open in the editor, so they can only target the active entity. Everything else works off the
- * entity itself and is available from any row.
- *
- * This is temporary - we'll look into supporting edit, duplicate and delete from context menu in
- * a separate PR, just that it requires a bit more surgery to decouple those actions from the router
+ * Every action works off the entity itself, including edit, duplicate and delete, which act on the
+ * table named in the table editor state. The same list is available from any row.
  */
 export const getEntityActions = ({
   entity,
   projectRef,
-  isActive,
   isLocked,
 }: GetEntityActionsParams): EntityActionGroup[] => {
   const isTableLike = isTableLikeEntity(entity)
   const isViewLike =
     entity.type === ENTITY_TYPE.VIEW || entity.type === ENTITY_TYPE.MATERIALIZED_VIEW
   const noun = isViewLike ? 'view' : 'table'
-  const getDisabledReason = (verb: string) =>
-    isActive ? undefined : `Open this ${noun} to ${verb} it`
 
   const copyGroup: EntityActionGroup = [{ id: 'copy-name', label: 'Copy name' }]
   if (isTableLike) copyGroup.push({ id: 'copy-schema', label: 'Copy table schema' })
@@ -67,12 +57,8 @@ export const getEntityActions = ({
     const canEditTable = !isLocked && entity.type === ENTITY_TYPE.TABLE && !entity.is_partition
     if (canEditTable) {
       manageGroup.push(
-        { id: 'edit-table', label: 'Edit table', disabledReason: getDisabledReason('edit') },
-        {
-          id: 'duplicate-table',
-          label: 'Duplicate table',
-          disabledReason: getDisabledReason('duplicate'),
-        }
+        { id: 'edit-table', label: 'Edit table' },
+        { id: 'duplicate-table', label: 'Duplicate table' }
       )
     }
     manageGroup.push({
@@ -96,9 +82,7 @@ export const getEntityActions = ({
       : []
 
   const deleteGroup: EntityActionGroup =
-    !isLocked && (isTableLike || isViewLike)
-      ? [{ id: 'delete', label: `Delete ${noun}`, disabledReason: getDisabledReason('delete') }]
-      : []
+    !isLocked && (isTableLike || isViewLike) ? [{ id: 'delete', label: `Delete ${noun}` }] : []
 
   return [copyGroup, manageGroup, partitionsGroup, deleteGroup].filter((group) => group.length > 0)
 }
