@@ -1,9 +1,9 @@
-import pgMeta, { type PGTrigger } from '@supabase/pg-meta'
+import pgMeta, { listTriggersFallback, type PGTrigger } from '@supabase/pg-meta'
 
 import { databaseTriggerKeys } from './keys'
 import type { PostgresTrigger } from '@/components/interfaces/Database/Triggers/TriggersList/TriggerList.utils'
 import { grantedQueryOptions, type GrantedQueryCallerOptions } from '@/data/granted-query-options'
-import { executeSql } from '@/data/sql/execute-sql-mutation'
+import { executeSqlWithCatalogFallback } from '@/data/sql/catalog-fallback-query'
 import type { StudioError } from '@/lib/errors/studio-errors'
 import type { GrantFor } from '@/lib/grants'
 
@@ -32,7 +32,7 @@ export async function getDatabaseTriggers(
   if (!projectRef) throw new Error('projectRef is required')
 
   const { sql } = pgMeta.triggers.list({ includedSchemas: schemas })
-  const { result } = await executeSql(
+  const { result } = await executeSqlWithCatalogFallback(
     {
       projectRef,
       connectionString,
@@ -42,6 +42,7 @@ export async function getDatabaseTriggers(
       queryKey: ['triggers'],
       grant,
     },
+    (query) => listTriggersFallback(query, { includedSchemas: schemas }),
     signal
   )
 

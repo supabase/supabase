@@ -1,11 +1,11 @@
-import { getForeignKeyConstraintsSql } from '@supabase/pg-meta'
+import { getForeignKeyConstraintsFallback, getForeignKeyConstraintsSql } from '@supabase/pg-meta'
 import { QueryClient, useQuery } from '@tanstack/react-query'
 import { IS_PLATFORM } from 'common'
 
 import { databaseKeys } from './keys'
 import { unguarded } from '@/data/fetchers'
 import { useConnectionStringForReadOps } from '@/data/read-replicas/replicas-query'
-import { executeSql } from '@/data/sql/execute-sql-mutation'
+import { executeSqlWithCatalogFallback } from '@/data/sql/catalog-fallback-query'
 import type { StudioError } from '@/lib/errors/studio-errors'
 import { UseCustomQueryOptions } from '@/types'
 
@@ -56,7 +56,7 @@ export async function getForeignKeyConstraints(
 
   const sql = getForeignKeyConstraintsSql({ schema })
 
-  const { result } = await executeSql(
+  const { result } = await executeSqlWithCatalogFallback(
     {
       projectRef,
       connectionString,
@@ -66,6 +66,7 @@ export async function getForeignKeyConstraints(
       queryKey: ['foreign-key-constraints', schema],
       grant: unguarded.migrating,
     },
+    (query) => getForeignKeyConstraintsFallback(query, { schema }),
     signal
   )
 

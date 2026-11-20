@@ -1,10 +1,11 @@
+import { getDatabaseExtensionsFallback } from '@supabase/pg-meta'
 import { getDatabaseExtensionsSQL } from '@supabase/pg-meta/src'
 import { useQuery } from '@tanstack/react-query'
 import { components } from 'api-types'
 
 import { databaseExtensionsKeys } from './keys'
 import { unguarded } from '@/data/fetchers'
-import { executeSql } from '@/data/sql/execute-sql-mutation'
+import { executeSqlWithCatalogFallback } from '@/data/sql/catalog-fallback-query'
 import { useSelectedProjectQuery } from '@/hooks/misc/useSelectedProject'
 import { PROJECT_STATUS } from '@/lib/constants'
 import type { StudioError } from '@/lib/errors/studio-errors'
@@ -25,7 +26,7 @@ export async function getDatabaseExtensions(
   signal?: AbortSignal
 ) {
   const sql = getDatabaseExtensionsSQL()
-  const { result } = await executeSql(
+  const { result } = await executeSqlWithCatalogFallback(
     {
       projectRef,
       connectionString,
@@ -35,6 +36,7 @@ export async function getDatabaseExtensions(
       queryKey: ['database-extensions'],
       grant: unguarded.migrating,
     },
+    (query) => getDatabaseExtensionsFallback(query),
     signal
   )
   return (Array.isArray(result) ? result : EMPTY_ARR) as DatabaseExtension[]

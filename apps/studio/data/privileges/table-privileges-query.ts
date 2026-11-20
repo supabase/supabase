@@ -1,10 +1,10 @@
-import pgMeta from '@supabase/pg-meta'
+import pgMeta, { listTablePrivilegesFallback } from '@supabase/pg-meta'
 import { QueryClient, useQuery } from '@tanstack/react-query'
 import { z } from 'zod'
 
 import { privilegeKeys } from './keys'
 import { unguarded } from '@/data/fetchers'
-import { executeSql } from '@/data/sql/execute-sql-mutation'
+import { executeSqlWithCatalogFallback } from '@/data/sql/catalog-fallback-query'
 import type { StudioError } from '@/lib/errors/studio-errors'
 import { UseCustomQueryOptions } from '@/types'
 
@@ -29,7 +29,7 @@ async function getTablePrivileges(
   }).sql
   const queryKey = ['table-privileges', includedSchemas?.join(',')]
 
-  const { result } = await executeSql(
+  const { result } = await executeSqlWithCatalogFallback(
     {
       projectRef,
       connectionString,
@@ -39,6 +39,7 @@ async function getTablePrivileges(
       queryKey,
       grant: unguarded.migrating,
     },
+    (query) => listTablePrivilegesFallback(query, { includedSchemas }),
     signal
   )
 

@@ -1,7 +1,7 @@
-import pgMeta, { type PGPublication } from '@supabase/pg-meta'
+import pgMeta, { listPublicationsFallback, type PGPublication } from '@supabase/pg-meta'
 import { useQuery } from '@tanstack/react-query'
 
-import { executeSql } from '../sql/execute-sql-mutation'
+import { executeSqlWithCatalogFallback } from '../sql/catalog-fallback-query'
 import { databasePublicationsKeys } from './keys'
 import { unguarded } from '@/data/fetchers'
 import { useSelectedProjectQuery } from '@/hooks/misc/useSelectedProject'
@@ -20,7 +20,7 @@ export async function getDatabasePublications(
   if (!projectRef) throw new Error('projectRef is required')
 
   const { sql } = pgMeta.publications.list()
-  const { result } = await executeSql(
+  const { result } = await executeSqlWithCatalogFallback(
     {
       projectRef,
       connectionString,
@@ -30,6 +30,7 @@ export async function getDatabasePublications(
       queryKey: ['publications'].filter(Boolean),
       grant: unguarded.migrating,
     },
+    (query) => listPublicationsFallback(query),
     signal
   )
 

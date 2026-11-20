@@ -1,9 +1,9 @@
-import { getTableColumnsSql } from '@supabase/pg-meta'
+import { getTableColumnsFallback, getTableColumnsSql } from '@supabase/pg-meta'
 import { useQuery } from '@tanstack/react-query'
 
 import { databaseKeys } from './keys'
 import { unguarded } from '@/data/fetchers'
-import { executeSql } from '@/data/sql/execute-sql-mutation'
+import { executeSqlWithCatalogFallback } from '@/data/sql/catalog-fallback-query'
 import type { StudioError } from '@/lib/errors/studio-errors'
 import { UseCustomQueryOptions } from '@/types'
 
@@ -28,7 +28,7 @@ export async function getTableColumns(
 ) {
   const sql = getTableColumnsSql({ table, schema })
 
-  const { result } = await executeSql(
+  const { result } = await executeSqlWithCatalogFallback(
     {
       projectRef,
       connectionString,
@@ -38,6 +38,7 @@ export async function getTableColumns(
       queryKey: ['table-columns', schema, table],
       grant: unguarded.migrating,
     },
+    (query) => getTableColumnsFallback(query, { table, schema }),
     signal
   )
 

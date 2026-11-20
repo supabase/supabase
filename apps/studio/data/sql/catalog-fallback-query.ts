@@ -1,4 +1,4 @@
-import type { CatalogQuery, SafeSqlFragment } from '@supabase/pg-meta'
+import { withCatalogFallback, type CatalogQuery, type SafeSqlFragment } from '@supabase/pg-meta'
 import type { QueryKey } from '@tanstack/react-query'
 
 import { executeSql, type PgMetaReadGrant } from './execute-sql-mutation'
@@ -38,3 +38,20 @@ export const catalogFallbackQuery =
     )
     return result
   }
+
+/**
+ * TEMPORARY, with pg-meta's catalog fallbacks: `executeSql` for a pg-meta builder's SQL, answered by
+ * `fallback` when the database fails it with a catalog gap.
+ */
+// eslint-disable-next-line @typescript-eslint/no-explicit-any -- the same default as `executeSql`
+export async function executeSqlWithCatalogFallback<T = any>(
+  { sql, ...variables }: CatalogFallbackVariables & { sqlOrigin: 'studio'; sql: SafeSqlFragment },
+  fallback: (query: CatalogQuery) => Promise<NoInfer<T>>,
+  signal?: AbortSignal,
+  headersInit?: HeadersInit
+): Promise<{ result: T }> {
+  return withCatalogFallback(
+    () => executeSql<T>({ ...variables, sql }, signal, headersInit),
+    async () => ({ result: await fallback(catalogFallbackQuery(variables, signal)) })
+  )
+}

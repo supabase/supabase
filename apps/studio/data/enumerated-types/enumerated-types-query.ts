@@ -1,7 +1,7 @@
-import pgMeta, { type PGType } from '@supabase/pg-meta'
+import pgMeta, { listTypesFallback, type PGType } from '@supabase/pg-meta'
 import { useQuery } from '@tanstack/react-query'
 
-import { executeSql } from '../sql/execute-sql-mutation'
+import { executeSqlWithCatalogFallback } from '../sql/catalog-fallback-query'
 import { enumeratedTypesKeys } from './keys'
 import type { components } from '@/data/api'
 import { unguarded } from '@/data/fetchers'
@@ -23,7 +23,7 @@ export async function getEnumeratedTypes(
   if (!projectRef) throw new Error('projectRef is required')
 
   const { sql } = pgMeta.types.list({ includedSchemas: schemas })
-  const { result } = await executeSql(
+  const { result } = await executeSqlWithCatalogFallback(
     {
       projectRef,
       connectionString,
@@ -33,6 +33,7 @@ export async function getEnumeratedTypes(
       queryKey: ['types'],
       grant: unguarded.migrating,
     },
+    (query) => listTypesFallback(query, { includedSchemas: schemas }),
     signal
   )
 
