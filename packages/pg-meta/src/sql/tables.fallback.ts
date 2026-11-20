@@ -165,7 +165,7 @@ const checkExpression = (definition: string | null) =>
   definition === null ? null : definition.slice(7, -1)
 
 function buildColumns(
-  tables: Map<number, FallbackTableRow>,
+  tables: Map<number, { schema: string; name: string }>,
   rows: CatalogRow[],
   constraints: CatalogRow[],
   enums: CatalogRow[]
@@ -229,7 +229,7 @@ function buildColumns(
       identity_generation: identity === 'a' ? 'ALWAYS' : identity === 'd' ? 'BY DEFAULT' : null,
       is_generated: toText(row.generated) === 's',
       is_nullable: !(toBool(row.not_null) || (isDomain && toBool(row.type_not_null))),
-      // pg_column_is_updatable is not read: only tables reach this fallback.
+      // turso has no pg_column_is_updatable: view and foreign table columns read as not updatable.
       is_updatable: kind === 'r' || kind === 'p',
       is_unique: unique.has(key),
       check: check.get(key) ?? null,
@@ -242,6 +242,26 @@ function buildColumns(
   return byTable
 }
 
+/** pg-meta's columns of the given relations, in ordinal order per relation id. */
+export async function readColumns(
+  query: CatalogQuery,
+  relations: { id: number; schema: string; name: string }[]
+): Promise<Map<number, PGColumn[]>> {
+  const ids = relations.map((relation) => relation.id)
+  if (ids.length === 0) return new Map()
+  const [columnRows, constraintRows, enumRows] = await Promise.all([
+    query(columnsSql(ids)),
+    query(columnConstraintsSql(ids)),
+    optionalRows(query(ENUMS_SQL)),
+  ])
+  return buildColumns(
+    new Map(relations.map((relation) => [relation.id, relation])),
+    columnRows,
+    constraintRows,
+    enumRows
+  )
+}
+
 /** Keys, foreign keys and (optionally) columns of the given tables. */
 export async function readRelationFacts(
   query: CatalogQuery,
@@ -252,12 +272,10 @@ export async function readRelationFacts(
   if (ids.length === 0) {
     return { primaryKeys: new Map(), uniqueIndexes: new Map(), foreignKeys: [], columns: new Map() }
   }
-  const [fkRows, indexRows, columnRows, constraintRows, enumRows] = await Promise.all([
+  const [fkRows, indexRows, columns] = await Promise.all([
     query(foreignKeysSql(ids)),
     query(indexesSql(ids)),
-    includeColumns ? query(columnsSql(ids)) : Promise.resolve([]),
-    includeColumns ? query(columnConstraintsSql(ids)) : Promise.resolve([]),
-    includeColumns ? optionalRows(query(ENUMS_SQL)) : Promise.resolve([]),
+    includeColumns ? readColumns(query, tables) : new Map<number, PGColumn[]>(),
   ])
 
   const attnameIds = [
@@ -308,10 +326,6 @@ export async function readRelationFacts(
     deletionAction: String(row.deletion_action),
     updateAction: String(row.update_action),
   }))
-
-  const columns = includeColumns
-    ? buildColumns(new Map(tables.map((t) => [t.id, t])), columnRows, constraintRows, enumRows)
-    : new Map<number, PGColumn[]>()
 
   return { primaryKeys, uniqueIndexes, foreignKeys, columns }
 }

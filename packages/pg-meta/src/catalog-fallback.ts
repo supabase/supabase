@@ -13,11 +13,12 @@ export type CatalogRow = Record<string, unknown>
 /** Runs one SQL statement on the project and returns its rows. */
 export type CatalogQuery = (sql: SafeSqlFragment) => Promise<CatalogRow[]>
 
-const GAP_SQLSTATES = new Set(['0A000', '42P01', '42883', '42704', '3F000'])
+const GAP_SQLSTATES = new Set(['0A000', '42P01', '42883', '42703', '42704', '3F000'])
 
-// turso refuses these constructs with a syntax error (42601) instead of 0A000.
-const SYNTAX_REFUSALS =
-  /^(?:unnest currently requires exactly one array|ORDER BY may not be used with non-aggregate)/i
+// turso refuses these constructs with a syntax error (42601) or a data exception (22000) instead of
+// 0A000; Postgres never words an error this way.
+const TURSO_REFUSALS =
+  /^(?:unnest currently requires exactly one array|ORDER BY may not be used with non-aggregate|Array slice missing lower index|unnest requires an array$)/i
 
 // turso's wording for a missing object, which Postgres never uses: Postgres's own
 // `relation "x" does not exist` (even for a user table named `pg_x`) reaches the caller unchanged.
@@ -72,7 +73,7 @@ export function isCatalogGap(error: unknown): boolean {
   if (state === '42501' || /^permission denied\b/i.test(message)) return false
   if (state === undefined) return GAP_MESSAGE.test(message)
   if (state === '0A000') return true
-  if (state === '42601') return SYNTAX_REFUSALS.test(message)
+  if (state === '42601' || state === '22000') return TURSO_REFUSALS.test(message)
   return GAP_SQLSTATES.has(state) && MISSING_CATALOG_OBJECT.test(message)
 }
 

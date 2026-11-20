@@ -59,6 +59,34 @@ export { getMigrationsFallback } from './sql/studio/database/migrations.fallback
 export { getTableRowsCountFallback } from './sql/studio/database/rows.fallback'
 export { getTableRowsFallback } from './query/table-row-query.fallback'
 export { readColumnFormats, type ColumnFormat } from './query/write-values.fallback'
+export { listSchemasFallback } from './sql/schemas.fallback'
+export { listRolesFallback } from './sql/roles.fallback'
+export { listTypesFallback } from './sql/types.fallback'
+export {
+  listForeignTablesFallback,
+  listMaterializedViewsFallback,
+  listViewsFallback,
+} from './sql/views.fallback'
+export { listPublicationsFallback } from './sql/publications.fallback'
+export { getDatabaseExtensionsFallback, listExtensionsFallback } from './sql/extensions.fallback'
+export { listTriggersFallback } from './sql/triggers.fallback'
+export { listFunctionsFallback } from './sql/functions.fallback'
+export { getEventTriggersFallback } from './sql/studio/database/event-triggers.fallback'
+export { getFDWsFallback } from './sql/studio/database/fdw.fallback'
+export { getIndexesFallback } from './sql/studio/database/indexes.fallback'
+export { getTableColumnsFallback } from './sql/studio/database/columns.fallback'
+export {
+  getDefaultPrivilegesStateFallback,
+  getExposedFunctionCountsFallback,
+  getExposedFunctionsFallback,
+  getExposedTableCountsFallback,
+  getExposedTablesFallback,
+} from './sql/studio/database/privileges.fallback'
+export { getTableConstraintsFallback } from './sql/studio/table-editor/constraints.fallback'
+export { getForeignKeyConstraintsFallback } from './sql/studio/table-editor/foreign-keys.fallback'
+export { getUsersCountFallback } from './sql/studio/auth/get-users-count.fallback'
+export { getIndexWorkerStatusFallback } from './sql/studio/auth/get-index-worker-status.fallback'
+export { getKeywordsFallback } from './sql/studio/sql-editor/keywords.fallback'
 
 export {
   ident,
