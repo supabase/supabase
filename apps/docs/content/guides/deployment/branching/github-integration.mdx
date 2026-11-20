@@ -149,6 +149,62 @@ The following changes are deployed:
 
 All other configurations, including API, Auth, and seed files, are ignored by default.
 
+<Admonition type="caution">
+
+If you push to your production branch before the previous deployment finishes, production might end up serving Edge Functions from the earlier commit. Each push starts its own deployment run, and Supabase doesn't queue or cancel runs for earlier commits. Each function keeps the code from the run that deployed it last, and the Supabase checks on both commits pass. To keep production on your most recent commit, see [Deploy one commit at a time](#deploy-one-commit-at-a-time).
+
+</Admonition>
+
+### Deploy one commit at a time
+
+To deploy one commit at a time, deploy your production branch from a GitHub Actions workflow with a `concurrency` group. The group lets only one deployment run at a time. A push that arrives during a deployment waits for it to finish, and replaces any earlier push that's still waiting.
+
+1. In **Project Settings** > [**Integrations**](/dashboard/project/_/settings/integrations), turn off **Deploy to production**. Preview branches keep working.
+2. In your GitHub repository, add your [personal access token](/docs/guides/platform/personal-access-tokens) and database password as repository secrets named `SUPABASE_ACCESS_TOKEN` and `SUPABASE_DB_PASSWORD`.
+3. Add your project ref as a repository variable named `PROJECT_REF`.
+4. Add the following workflow to your repository. If your production branch tracks a Git branch other than `main`, replace `main` with that branch.
+
+```yaml name=.github/workflows/deploy-production.yaml
+name: Deploy to production
+
+on:
+  push:
+    branches:
+      - main
+
+concurrency:
+  group: supabase-production
+  cancel-in-progress: false
+
+jobs:
+  deploy:
+    runs-on: ubuntu-latest
+
+    env:
+      SUPABASE_ACCESS_TOKEN: ${{ secrets.SUPABASE_ACCESS_TOKEN }}
+      SUPABASE_DB_PASSWORD: ${{ secrets.SUPABASE_DB_PASSWORD }}
+      SUPABASE_ENV: production
+
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          ref: ${{ github.ref }}
+
+      - uses: supabase/setup-cli@v3
+
+      - run: supabase db push --remote=${{ vars.PROJECT_REF }} --yes
+      - run: supabase functions deploy --remote=${{ vars.PROJECT_REF }} --yes
+```
+
+- Keep `cancel-in-progress: false`. Setting it to `true` stops a running deployment partway through, which might leave migrations partially applied.
+- The `ref` input checks out the tip of the branch when the job starts. GitHub doesn't guarantee the order of runs in a concurrency group, so the `ref` input keeps the last run on your most recent commit.
+- If the integration's **Working directory** isn't `.`, set `defaults.run.working-directory` on the `deploy` job to the same path.
+- If a `[remotes]` block names your production project, the integration applies its configuration on each push. To keep that behavior, add a `supabase config push --remote=${{ vars.PROJECT_REF }} --yes` step before `supabase db push`. Before you add the step, run `SUPABASE_ENV=production supabase config diff --remote=<project-ref>` to review the values that `config push` sends.
+- `supabase functions deploy` deploys every function directory in `supabase/functions`, including functions that `config.toml` doesn't declare. It doesn't save the secrets under `[edge_runtime.secrets]`, so set those with `supabase secrets set`.
+- If `config.toml` declares Storage buckets, add a `supabase seed buckets --remote=${{ vars.PROJECT_REF }} --yes` step. With `--yes`, the command also uploads the files in each bucket's `objects_path` and overwrites objects already in the bucket.
+
+For more information about the CLI flags in this workflow, see [Running in CI](/docs/guides/local-development/local-and-hosted-projects#ci).
+
 ## Preventing migration failures
 
 We highly recommend turning on a 'required check' for the Supabase integration. You can do this from your GitHub repository settings. This prevents PRs from being merged when migration checks fail, and stops invalid migrations from being merged into your production branch.
