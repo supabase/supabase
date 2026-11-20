@@ -14,7 +14,6 @@ import {
 } from '@tanstack/react-table'
 import { IS_PLATFORM, LOCAL_STORAGE_KEYS, useFeatureFlags, useFlag, useParams } from 'common'
 import {
-  ChevronRightIcon,
   Layers2Icon,
   Loader2Icon,
   PanelLeftCloseIcon,
@@ -53,6 +52,7 @@ import { LogsTable } from './components/LogsTable'
 import { isPresetViewId, PRESET_VIEWS } from './components/LogsViews.presets'
 import { getFilterCombinationKey, MIN_FILTERS_TO_SAVE } from './components/LogsViews.utils'
 import { LogsViewsPanel } from './components/LogsViewsPanel'
+import { SavedViewsEntry } from './components/SavedViewsEntry'
 import { TooltipLabel } from './components/TooltipLabel'
 import { ViewModifiedPopover } from './components/ViewModifiedPopover'
 import { ServiceFlowPanel } from './ServiceFlowPanel'
@@ -682,44 +682,11 @@ export const UnifiedLogs = ({
   }
 
   const savedViewsEntry = showSavedViews ? (
-    <button
-      type="button"
-      tabIndex={0}
-      onClick={handleOpenViewsSection}
-      aria-label={getSavedViewsTooltip()}
-      className="group flex w-full items-center gap-2 rounded-md px-2 py-1.5 text-left hover:bg-surface-200 focus-ring"
-    >
-      <Layers2Icon
-        size={14}
-        className={cn('shrink-0', activeView ? savedViewsIconClassName : 'text-foreground-light')}
-      />
-      <span className="min-w-0 flex-1">
-        <span
-          className={cn(
-            'block truncate text-sm',
-            activeView ? savedViewsIconClassName : 'text-foreground-light'
-          )}
-        >
-          Saved views
-        </span>
-        {activeView ? (
-          <span
-            className={cn(
-              'block truncate text-xs opacity-70',
-              isActiveViewModified ? 'text-warning' : 'text-brand-600'
-            )}
-            title={activeView.name}
-          >
-            {`${activeView.name}${isActiveViewModified ? ' (modified)' : ''}`}
-          </span>
-        ) : (
-          <span className="block truncate text-xs text-foreground-lighter opacity-70">
-            None active
-          </span>
-        )}
-      </span>
-      <ChevronRightIcon size={14} className="shrink-0 text-foreground-muted" />
-    </button>
+    <SavedViewsEntry
+      activeView={activeView}
+      isActiveViewModified={isActiveViewModified}
+      onOpen={handleOpenViewsSection}
+    />
   ) : undefined
 
   const saveViewAction = canCreateView ? (
