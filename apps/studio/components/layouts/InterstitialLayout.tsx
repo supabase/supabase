@@ -48,7 +48,7 @@ export const InterstitialLayout = ({
   const titleElement = title ? (
     <TitleElement
       className={cn(
-        'font-sans tracking-tight text-balance text-lg font-medium normal-case text-foreground',
+        'tracking-tight text-balance text-lg font-medium normal-case text-foreground',
         titleClassName
       )}
     >
