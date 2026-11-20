@@ -69,8 +69,10 @@ import { Tooltip, TooltipContent, TooltipProvider, TooltipTrigger } from '@/comp
 
 ## Inline text
 
-Place a tooltip above its text trigger with `side="top"`. If there is insufficient space, the tooltip can flip to fit the viewport.
+Use a dotted underline and a help cursor (`cursor-help`) for a term with a short definition. Hover over the term or press Tab to focus it.
 
-Use a muted dotted underline to show that the text has an explanation. In Studio, apply `TOOLTIP_UNDERLINE_CLASS_NAME` from `@/components/ui/tooltip-styles` to the trigger. The trigger must also work with keyboard focus.
+<ComponentPreview name="tooltip-inline-demo" peekCode wide />
 
-Keep the explanation short. Put information people need to make a decision in the page itself.
+Set `side="top"` to place the explanation above the term. If it would run off the top edge of the screen, the tooltip opens below the term instead.
+
+In Studio, apply `TOOLTIP_UNDERLINE_CLASS_NAME` from `@/components/ui/tooltip-styles` to the trigger. Keep information people need to make a decision visible on the page.
