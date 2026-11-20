@@ -13,14 +13,14 @@ An explainer covers one concept: the reader leaves able to say what it is, how i
 
 ## Headings, in order
 
-Keep this order for the sections the page has. A short page can be only the required three. Link once per target, and only where it helps, per [Connect contextual sections](../03-page-structure.md#connect-contextual-sections-to-their-procedures).
+Keep this order for the sections the page has. A short page can be only the required three. Link once per target, and only where it helps, per [Connect contextual sections](../03-page-structure.md#connect-contextual-sections-to-their-procedures). A heading that other pages link to keeps its text in whichever slot it fills.
 
-1. **Required**: Value statement, no heading. What the concept is and what the reader can decide once they understand it. If a how-to guide applies the concept, end with `For how to <task>, see [<guide>](link).`
-2. **Required**: `## What <concept> is`: a Concept in a short paragraph. Link the first mention of a related concept to its explainer.
+1. **Required**: Value statement, no heading. What the reader can decide once they understand the concept, such as `Knowing <concept> tells you <decision>`. If a how-to guide applies the concept, end with `For how to <task>, see [<guide>](link).`
+2. **Required**: Concept, no heading: the opening paragraph that says what it is. Don't repeat the value statement. Link the first mention of a related concept to its explainer.
 3. **Optional**: `## How <concept> works`: a Process as stages in order, or a when/then table. Include it if the concept has stages. Link a stage that is a task to its how-to guide.
-4. **Optional**: `## <Parts>`: a Structure as a part and description table, one row per part. Name it for the parts, such as `## Layers`. Link each part to the page that covers it: an explainer for the idea, a reference for the details.
-5. **Optional**: `## Limits` or `## Trade-offs`: Facts a reader needs to decide. Use `Limits` for hard numbers and `Trade-offs` for what the concept costs. Link the reference page that has the full list.
-6. **Required**: `## Related resources`: the how-to guide that applies the concept first, then a tutorial, explainers, and reference pages, each with a reason. Last on the page.
+4. **Optional**: `## <Parts>`: a Structure as a part and description table, one row per part. Name it for the parts, such as `## Layers` or `## Tables`. When a part needs more than a row, follow the table with one H2 per part. Link each part to the page that covers it: an explainer for the idea, a reference for the details.
+5. **Optional**: `## Limits` or `## Trade-offs`: Facts a reader needs to decide. Use `Limits` for hard numbers and `Trade-offs` for what the concept costs. A principle, such as `treat this as read-only`, can go here or ride along as an admonition that leads with its impact. Link the reference page that has the full list.
+6. **Required**: `## Related resources`: the how-to guide that applies the concept first, then a tutorial, explainers, and reference pages, each with a reason. It can repeat the value statement's how-to link. Last on the page.
 
 **Optional**: a Mermaid diagram in the Process or Structure section it supports, per [Diagrams](../02-elements.md#diagrams). Make it accessible:
 
@@ -29,7 +29,7 @@ Keep this order for the sections the page has. A short page can be only the requ
 
 ## Example
 
-Worked from [Auth architecture](/docs/guides/auth/architecture), cut down to show the shape. It has a Process with a diagram and a Structure.
+Worked from [Auth architecture](/docs/guides/auth/architecture), cut down to show every slot. The Process section is illustrative.
 
 ````md
 ---
@@ -37,9 +37,7 @@ title: Auth architecture
 description: Learn how Supabase Auth is built from three layers, how a sign-in request moves through them, and what each layer is responsible for in your project.
 ---
 
-Supabase Auth is three layers between your app and your database. Knowing them tells you where a failed sign-in is happening. For how to sign in a user, see [Sign in a user](/docs/guides/auth/auth-email-passwordless).
-
-## What Supabase Auth is
+Knowing the layers of Supabase Auth tells you where a failed sign-in is happening. For how to sign in a user, see [Sign in a user](/docs/guides/auth/auth-email-passwordless).
 
 Supabase Auth is an API server that issues JWTs and stores users in your Postgres database.
 
@@ -76,5 +74,5 @@ sequenceDiagram
 ## Checklist
 
 - [ ] One concept, no procedure past two steps, and a value statement naming what the reader can decide, ending with the how-to link.
-- [ ] Each section the concept needs is present, in order, with no subsections of its own. Any diagram has `accTitle`, `accDescr`, and a takeaway in the prose beside it.
+- [ ] A value statement and a concept opener with no heading, then each section the concept needs, in order, with no subsections. Any diagram has `accTitle`, `accDescr`, and a takeaway in the prose beside it.
 - [ ] Links go to the page type that serves the reader: how-to for steps, reference for details. Related resources come last, each with a reason.
