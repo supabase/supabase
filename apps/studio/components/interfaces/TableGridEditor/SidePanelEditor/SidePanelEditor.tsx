@@ -552,7 +552,8 @@ export const SidePanelEditor = ({
 
   const updateTableApiAccess = async (
     table: RetrieveTableResult,
-    privileges: DeepReadonly<ApiPrivilegesByRole>
+    privileges: DeepReadonly<ApiPrivilegesByRole>,
+    { isNewTable = false }: { isNewTable?: boolean } = {}
   ) => {
     if (!project) return console.error('Project is required')
 
@@ -562,6 +563,7 @@ export const SidePanelEditor = ({
         connectionString: project.connectionString ?? undefined,
         relationId: table.id,
         privileges,
+        isNewTable,
       })
     } catch (error) {
       const message = error instanceof Error ? error.message : undefined
@@ -673,7 +675,7 @@ export const SidePanelEditor = ({
                     ? apiAccessToggleHandler.data.privileges
                     : undefined
                   if (privilegesToSet) {
-                    await updateTableApiAccess(table, privilegesToSet)
+                    await updateTableApiAccess(table, privilegesToSet, { isNewTable: true })
                   }
                 }
               )
@@ -731,7 +733,7 @@ export const SidePanelEditor = ({
           ? apiAccessToggleHandler.data.privileges
           : undefined
         if (privilegesToSet) {
-          await updateTableApiAccess(table, privilegesToSet)
+          await updateTableApiAccess(table, privilegesToSet, { isNewTable: true })
         }
 
         await Promise.all([

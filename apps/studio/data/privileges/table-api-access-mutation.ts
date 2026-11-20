@@ -1,4 +1,4 @@
-import pgMeta from '@supabase/pg-meta'
+import pgMeta, { isCatalogGap } from '@supabase/pg-meta'
 import { joinSqlFragments, type SafeSqlFragment } from '@supabase/pg-meta/src/pg-format'
 import { useMutation, useQueryClient } from '@tanstack/react-query'
 import { toast } from 'sonner'
@@ -19,6 +19,8 @@ import type { UseCustomMutationOptions } from '@/types'
 export type TableApiAccessPrivilegesVariables = ConnectionVars & {
   relationId: number
   privileges: DeepReadonly<ApiPrivilegesByRole>
+  /** The table was just created, so a database that grants the API roles itself can skip this. */
+  isNewTable?: boolean
 }
 
 export async function updateTableApiAccessPrivileges({
@@ -26,6 +28,7 @@ export async function updateTableApiAccessPrivileges({
   connectionString,
   relationId,
   privileges,
+  isNewTable = false,
 }: TableApiAccessPrivilegesVariables) {
   const sqlStatements: Array<SafeSqlFragment> = []
 
@@ -63,17 +66,23 @@ export async function updateTableApiAccessPrivileges({
     return null
   }
 
-  const { result } = await executeSql<[]>({
-    projectRef,
-    connectionString,
-    sqlOrigin: 'studio',
-    queryName: 'table-api-access-update-privileges',
-    sql: joinSqlFragments(sqlStatements, '\n'),
-    queryKey: ['table-api-access', 'update-privileges'],
-    grant: unguarded.migrating,
-  })
-
-  return result
+  try {
+    const { result } = await executeSql<[]>({
+      projectRef,
+      connectionString,
+      sqlOrigin: 'studio',
+      queryName: 'table-api-access-update-privileges',
+      sql: joinSqlFragments(sqlStatements, '\n'),
+      queryKey: ['table-api-access', 'update-privileges'],
+      grant: unguarded.migrating,
+    })
+    return result
+  } catch (error) {
+    // TEMPORARY: Spark cannot run this DO loop and grants the API roles on a new table itself.
+    // Delete once Spark runs `DO`.
+    if (isNewTable && isCatalogGap(error)) return null
+    throw error
+  }
 }
 
 type UpdateTableApiAccessPrivilegesData = Awaited<ReturnType<typeof updateTableApiAccessPrivileges>>

@@ -1,9 +1,10 @@
-import pgMeta from '@supabase/pg-meta'
+import pgMeta, { retrieveTableFallback, withCatalogFallback } from '@supabase/pg-meta'
 import { useQuery } from '@tanstack/react-query'
 
 import { tableKeys } from './keys'
 import { unguarded } from '@/data/fetchers'
 import { getQueryClient } from '@/data/query-client'
+import { catalogFallbackQuery } from '@/data/sql/catalog-fallback-query'
 import { executeSql } from '@/data/sql/execute-sql-mutation'
 import type { StudioError } from '@/lib/errors/studio-errors'
 import type { SafePostgresTable } from '@/lib/postgres-types'
@@ -21,18 +22,23 @@ export async function getTable(
   signal?: AbortSignal
 ): Promise<SafePostgresTable> {
   const { sql, zod } = pgMeta.tables.retrieve({ name, schema })
+  const variables = {
+    projectRef,
+    connectionString,
+    queryName: 'table-retrieve',
+    queryKey: tableKeys.retrieve(projectRef, name, schema),
+    grant: unguarded.migrating,
+  }
 
-  const { result } = await executeSql(
-    {
-      projectRef,
-      connectionString,
-      sqlOrigin: 'studio',
-      queryName: 'table-retrieve',
-      sql,
-      queryKey: tableKeys.retrieve(projectRef, name, schema),
-      grant: unguarded.migrating,
-    },
-    signal
+  const result = await withCatalogFallback(
+    async () => (await executeSql({ ...variables, sqlOrigin: 'studio', sql }, signal)).result,
+    async () => {
+      const table = await retrieveTableFallback(catalogFallbackQuery(variables, signal), {
+        name,
+        schema,
+      })
+      return table ? [table] : []
+    }
   )
   // pg-meta sources `check` from pg_catalog; treat it as SafeSqlFragment for DDL composition.
   return zod.parse(result[0]) as unknown as SafePostgresTable

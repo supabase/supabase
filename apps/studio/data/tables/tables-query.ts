@@ -1,4 +1,10 @@
-import pgMeta, { getTablesPaginatedSql, type PGTable } from '@supabase/pg-meta'
+import pgMeta, {
+  getTablesPaginatedSql,
+  listTablesFallback,
+  listTablesPaginatedFallback,
+  withCatalogFallback,
+  type PGTable,
+} from '@supabase/pg-meta'
 import { InfiniteData, useInfiniteQuery, useQuery, useQueryClient } from '@tanstack/react-query'
 import { sortBy } from 'lodash'
 import { useCallback } from 'react'
@@ -6,6 +12,7 @@ import { z } from 'zod'
 
 import { tableKeys } from './keys'
 import { unguarded } from '@/data/fetchers'
+import { catalogFallbackQuery } from '@/data/sql/catalog-fallback-query'
 import { executeSql } from '@/data/sql/execute-sql-mutation'
 import type { StudioError } from '@/lib/errors/studio-errors'
 import type { SafePostgresTable } from '@/lib/postgres-types'
@@ -34,23 +41,19 @@ export async function getTables(
   signal?: AbortSignal
 ) {
   if (!projectRef) throw new Error('projectRef is required')
-  const sql = pgMeta.tables.list({
-    includeColumns,
-    includedSchemas: schema ? [schema] : undefined,
-  }).sql
-  const queryKey = ['tables', schema]
+  const options = { includeColumns, includedSchemas: schema ? [schema] : undefined }
+  const sql = pgMeta.tables.list(options).sql
+  const variables = {
+    projectRef,
+    connectionString,
+    queryName: 'tables',
+    queryKey: ['tables', schema],
+    grant: unguarded.migrating,
+  }
 
-  const { result } = await executeSql(
-    {
-      projectRef,
-      connectionString,
-      sql,
-      sqlOrigin: 'studio',
-      queryName: 'tables',
-      queryKey,
-      grant: unguarded.migrating,
-    },
-    signal
+  const result = await withCatalogFallback(
+    async () => (await executeSql({ ...variables, sqlOrigin: 'studio', sql }, signal)).result,
+    () => listTablesFallback(catalogFallbackQuery(variables, signal), options)
   )
   // Sort the data if the sortByName option is true
   if (Array.isArray(result) && sortByProperty) {
@@ -142,27 +145,27 @@ export async function getTablesPage(
     throw new Error('projectRef is required')
   }
 
-  const sql = getTablesPaginatedSql({ schema, includeColumns, limit, afterOid, nameFilter })
+  const options = { schema, includeColumns, limit, afterOid, nameFilter }
+  const sql = getTablesPaginatedSql(options)
+  const variables = {
+    projectRef,
+    connectionString,
+    queryName: 'tables-infinite',
+    queryKey: [
+      `project:${projectRef}`,
+      `schema:${schema}`,
+      `infinite_tables`,
+      includeColumns ? 'with_columns' : null,
+      nameFilter ? `search:${nameFilter}` : null,
+      limit ? `page_size:${limit}` : null,
+      afterOid ? `after:${afterOid}` : null,
+    ],
+    grant: unguarded.migrating,
+  }
 
-  const { result } = await executeSql(
-    {
-      projectRef,
-      connectionString,
-      sqlOrigin: 'studio',
-      queryName: 'tables-infinite',
-      sql,
-      queryKey: [
-        `project:${projectRef}`,
-        `schema:${schema}`,
-        `infinite_tables`,
-        includeColumns ? 'with_columns' : null,
-        nameFilter ? `search:${nameFilter}` : null,
-        limit ? `page_size:${limit}` : null,
-        afterOid ? `after:${afterOid}` : null,
-      ],
-      grant: unguarded.migrating,
-    },
-    signal
+  const result = await withCatalogFallback(
+    async () => (await executeSql({ ...variables, sqlOrigin: 'studio', sql }, signal)).result,
+    () => listTablesPaginatedFallback(catalogFallbackQuery(variables, signal), options)
   )
 
   return result as SafePostgresTable[]

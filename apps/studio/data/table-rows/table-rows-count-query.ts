@@ -1,4 +1,8 @@
-import { getTableRowsCountSql } from '@supabase/pg-meta'
+import {
+  getTableRowsCountFallback,
+  getTableRowsCountSql,
+  withCatalogFallback,
+} from '@supabase/pg-meta'
 import { formatPatternMatchFilterValue } from '@supabase/pg-meta/src/query/table-row-query'
 import { QueryClient, useQuery, useQueryClient } from '@tanstack/react-query'
 import { IS_PLATFORM } from 'common'
@@ -9,6 +13,7 @@ import type { Filter, SupaTable } from '@/components/grid/types'
 import { isUserFaultForValues } from '@/data/error-classification'
 import { unguarded } from '@/data/fetchers'
 import { useConnectionStringForReadOps } from '@/data/read-replicas/replicas-query'
+import { catalogFallbackQuery } from '@/data/sql/catalog-fallback-query'
 import { executeSql } from '@/data/sql/execute-sql-mutation'
 import { prefetchTableEditor } from '@/data/table-editor/table-editor-query'
 import { FGA_PERMISSIONS, useAsyncCheckPermissionsV2 } from '@/hooks/misc/useCheckPermissionsV2'
@@ -76,19 +81,24 @@ export async function getTableRowsCount(
     }),
     roleImpersonationState
   )
-  const { result } = await executeSql(
-    {
-      projectRef,
-      connectionString,
-      sqlOrigin: 'studio',
-      queryName: 'table-rows-count',
-      isUserFaultSqlState: filters?.length ? isUserFaultForValues : undefined,
-      sql,
-      queryKey: ['table-rows-count', table.id],
-      isRoleImpersonationEnabled: isRoleImpersonationEnabled(roleImpersonationState?.role),
-      grant: unguarded.migrating,
-    },
-    signal
+  const variables = {
+    projectRef,
+    connectionString,
+    queryName: 'table-rows-count',
+    isUserFaultSqlState: filters?.length ? isUserFaultForValues : undefined,
+    queryKey: ['table-rows-count', table.id],
+    isRoleImpersonationEnabled: isRoleImpersonationEnabled(roleImpersonationState?.role),
+    grant: unguarded.migrating,
+  }
+  const result = await withCatalogFallback(
+    async () => (await executeSql({ ...variables, sqlOrigin: 'studio', sql }, signal)).result,
+    () =>
+      getTableRowsCountFallback(
+        catalogFallbackQuery(variables, signal, (fallbackSql) =>
+          wrapWithRoleImpersonation(fallbackSql, roleImpersonationState)
+        ),
+        { table, filters: formattedFilters }
+      )
   )
 
   return {
