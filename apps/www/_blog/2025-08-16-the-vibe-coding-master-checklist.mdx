@@ -24,7 +24,7 @@ When you're building with AI tools, you want to focus on your app's unique featu
 
 Unlike piecing together separate services for your [database](https://supabase.com/database), [authentication](https://supabase.com/auth), [storage](https://supabase.com/storage), [edge functions](https://supabase.com/edge-functions), and more, Supabase gives you everything integrated from the start. Your AI tool can request "Supabase Auth for user management" and immediately get secure authentication with social logins, magic links, and proper session handling. No configuration headaches or security gaps.
 
-The same integration applies across the platform. Your database, real-time subscriptions, file storage, and edge functions all work together seamlessly. When your AI-generated code needs to store user files, implement real-time features, or run server-side logic, these components communicate naturally without custom integration work.
+The same integration applies across the platform. Your database, real-time subscriptions, file storage, and [edge functions](/docs/guides/functions) all work together seamlessly. When your AI-generated code needs to store user files, implement real-time features, or run server-side logic, these components communicate naturally without custom integration work.
 
 Tight integration serves the needs of developers of all skill levels and applications of all levels of sophistication, but solo developers and small teams especially benefit from the time and effort saved. Authentication, for example, is notoriously complex to implement securely. With Supabase Auth, you get enterprise-grade security features like [Row Level Security](/docs/guides/database/postgres/row-level-security), proper password hashing, and session management built in. Your AI tool can focus on your app's business logic while Supabase handles the infrastructure.
 
@@ -127,7 +127,7 @@ Also verify that automated backups are enabled. Most managed database services, 
 
 - Review database schema (check tables, relationships, constraints)
 - Optimize queries (add indexes for frequently queried columns)
-- Configure backups (enable automatic database backups)
+- Configure backups (enable automatic [database backups](/docs/guides/platform/backups))
 - Plan for growth (design schema for future changes)
 
 **Database optimization prompt:**

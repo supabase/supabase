@@ -1,4 +1,6 @@
-import { useId } from 'react'
+import { useIntersectionObserver } from '@uidotdev/usehooks'
+import { components } from 'api-types'
+import { useEffect, useId } from 'react'
 import { Checkbox, cn } from 'ui'
 import {
   MultiSelector,
@@ -9,25 +11,27 @@ import {
   MultiSelectorTrigger,
 } from 'ui-patterns/multi-select'
 
-import type { OAuthAppsAuthorizeOrganizationProject } from '@/data/oauth-apps/types'
-
 export const MAX_SELECTED_PROJECTS = 10
 
 export interface ProjectMultiSelectProps {
-  projects: OAuthAppsAuthorizeOrganizationProject[]
-  selectedRefs: string[]
-  onChange: (selectedRefs: string[]) => void
+  projects: components['schemas']['OrganizationProjectsResponse_Output']['projects']
+  selectedProjectRefs: string[]
+  selectedProjects: components['schemas']['OrganizationProjectsResponse_Output']['projects']
+  onChange: (selectedProjects: string[]) => void
   maxSelected?: number
   error?: string
   flaggedRefs?: string[]
   unavailableRefs?: string[]
   allProjectsSelected?: boolean
   onAllProjectsChange?: (selected: boolean) => void
+  onSearchChange: (query: string) => void
+  onLoadMore: () => void
 }
 
 export const ProjectMultiSelect = ({
   projects,
-  selectedRefs,
+  selectedProjects,
+  selectedProjectRefs,
   onChange,
   maxSelected = MAX_SELECTED_PROJECTS,
   error,
@@ -35,11 +39,23 @@ export const ProjectMultiSelect = ({
   unavailableRefs = [],
   allProjectsSelected = false,
   onAllProjectsChange,
+  onSearchChange,
+  onLoadMore,
 }: ProjectMultiSelectProps) => {
   const labelId = useId()
   const hasFlagged = flaggedRefs.length > 0
-  const atCap = selectedRefs.length >= maxSelected
-  const showCounter = selectedRefs.length >= maxSelected - 2
+  const atCap = selectedProjects.length >= maxSelected
+  const showCounter = selectedProjects.length >= maxSelected - 2
+  const [sentinelRef, entry] = useIntersectionObserver({
+    threshold: 0,
+    rootMargin: '0px',
+  })
+
+  useEffect(() => {
+    if (entry?.isIntersecting) {
+      onLoadMore?.()
+    }
+  }, [entry, onLoadMore])
 
   const handleValuesChange = (nextRefs: string[]) => {
     if (nextRefs.length > maxSelected) return
@@ -57,7 +73,7 @@ export const ProjectMultiSelect = ({
         </p>
         {!allProjectsSelected && showCounter && (
           <p className="text-xs text-foreground-lighter">
-            {selectedRefs.length}/{maxSelected}
+            {selectedProjectRefs.length}/{maxSelected}
           </p>
         )}
       </div>
@@ -76,48 +92,60 @@ export const ProjectMultiSelect = ({
 
       {!allProjectsSelected && (
         <>
-          <MultiSelector values={selectedRefs} onValuesChange={handleValuesChange}>
+          <MultiSelector
+            values={selectedProjectRefs}
+            onValuesChange={handleValuesChange}
+            onSearchChange={onSearchChange}
+          >
             <MultiSelectorTrigger
+              id="projects"
               aria-labelledby={labelId}
+              aria-describedby="projects-description"
               label="Select projects..."
               badgeLimit={2}
               deletableBadge
               renderValue={(value) =>
-                projects.find((project) => project.ref === value)?.name ?? value
+                selectedProjects.find((project) => project.ref === value)?.name ?? value
               }
             />
             <MultiSelectorContent>
               <MultiSelectorInput placeholder="Search projects" showResetIcon />
               <MultiSelectorList emptyLabel="No projects found">
-                {projects.map((project) => (
-                  <MultiSelectorItem
-                    key={project.ref}
-                    value={project.ref}
-                    disabled={atCap && !selectedRefs.includes(project.ref)}
-                  >
-                    {project.name}
-                    {unavailableRefs.includes(project.ref) && (
-                      <span className="text-foreground-lighter"> - Unavailable</span>
-                    )}
-                  </MultiSelectorItem>
-                ))}
+                {projects.map((project) => {
+                  const isSelected = selectedProjectRefs.some((ref) => ref === project.ref)
+                  return (
+                    <MultiSelectorItem
+                      key={project.ref}
+                      value={project.ref}
+                      disabled={atCap && !isSelected}
+                    >
+                      {project.name}
+                      {unavailableRefs.includes(project.ref) && (
+                        <span className="text-foreground-lighter"> - Unavailable</span>
+                      )}
+                    </MultiSelectorItem>
+                  )
+                })}
+                <span ref={sentinelRef} />
               </MultiSelectorList>
             </MultiSelectorContent>
           </MultiSelector>
-
-          {hasFlagged && (
-            <p className="text-xs text-destructive">
-              {`${flaggedRefs.length} of ${selectedRefs.length} ${selectedRefs.length === 1 ? 'project' : 'projects'} unavailable`}
-            </p>
-          )}
-          {atCap && (
-            <p className="text-xs text-foreground-lighter">
-              Maximum reached. Deselect a project to choose a different one.
-            </p>
-          )}
-          {error && <p className="text-xs text-foreground-light">{error}</p>}
         </>
       )}
+
+      <div id="projects-description" aria-live="polite">
+        {hasFlagged && (
+          <p className="text-xs text-destructive">
+            {`${flaggedRefs.length} of ${selectedProjectRefs.length} ${selectedProjectRefs.length === 1 ? 'project' : 'projects'} unavailable`}
+          </p>
+        )}
+        {atCap && (
+          <p className="text-xs text-foreground-lighter">
+            Maximum reached. Deselect a project to choose a different one.
+          </p>
+        )}
+        {error && <p className="text-xs text-destructive">{error}</p>}
+      </div>
     </div>
   )
 }

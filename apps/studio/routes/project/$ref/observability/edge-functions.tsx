@@ -8,7 +8,7 @@ import { useMemo, useState } from 'react'
 import { Button } from 'ui'
 
 import { OBSERVABILITY_DOCS_HREFS } from '@/components/interfaces/Observability/Observability.constants'
-import ReportHeader from '@/components/interfaces/Reports/ReportHeader'
+import { ReportHeader } from '@/components/interfaces/Reports/ReportHeader'
 import { ReportPadding } from '@/components/interfaces/Reports/ReportPadding'
 import {
   EDGE_FUNCTION_REGIONS,

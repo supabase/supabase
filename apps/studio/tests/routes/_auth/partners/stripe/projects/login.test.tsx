@@ -30,11 +30,6 @@ vi.mock('@tanstack/react-query', async (importOriginal) => {
   }
 })
 
-vi.mock('common', async (importOriginal) => {
-  const actual = await importOriginal<typeof import('common')>()
-  return { ...actual, useParams: () => ({ ar_id: 'request-id' }) }
-})
-
 vi.mock('sonner', () => ({
   toast: { error: vi.fn() },
 }))

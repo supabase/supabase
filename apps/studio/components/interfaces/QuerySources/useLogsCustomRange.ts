@@ -1,7 +1,7 @@
 import { useState } from 'react'
 
 import { customDateRangeToLogTimeRange } from './LogTimeRange.utils'
-import { maybeShowUpgradePromptIfNotEntitled } from '@/components/interfaces/Settings/Logs/Logs.utils'
+import { isStartOutsideRetention } from '@/components/interfaces/Settings/Logs/Logs.utils'
 import type { TimeRange } from '@/data/content/notebooks/notebook-schema'
 import { useCheckEntitlements } from '@/hooks/misc/useCheckEntitlements'
 
@@ -17,7 +17,7 @@ export function useLogsCustomRange({
 
   const handleApplyCustomRange = ({ from, to }: { from: Date; to: Date }) => {
     const range = customDateRangeToLogTimeRange({ from, to })
-    if (maybeShowUpgradePromptIfNotEntitled(range.start, entitledToLogDays)) {
+    if (isStartOutsideRetention(range.start, entitledToLogDays)) {
       setShowUpgradePrompt(true)
       return
     }
