@@ -6,6 +6,7 @@ export default defineConfig({
   test: {
     projects: [
       {
+        oxc: { jsx: { runtime: 'automatic' } },
         resolve: { tsconfigPaths: true },
         oxc: { jsx: { runtime: 'automatic' } },
         test: {
