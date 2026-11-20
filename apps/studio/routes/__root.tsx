@@ -435,7 +435,9 @@ function RootDocument({ children }: Readonly<{ children: ReactNode }>) {
         {children}
         {!isTestEnv && (
           <TanStackDevtools
-            config={{ position: 'bottom-right' }}
+            // Hide the trigger by default so it doesn't overlap the dev toolbar.
+            // Open the panel with Ctrl + ~; un-hide the trigger from its settings tab.
+            config={{ position: 'bottom-right', triggerHidden: true }}
             plugins={[
               {
                 name: 'TanStack Router',
