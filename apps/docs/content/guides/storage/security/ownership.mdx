@@ -1,22 +1,21 @@
 ---
 id: 'storage-access-control'
 title: 'Ownership'
-description: 'Learn how ownership works in Supabase Storage and how to control access'
+description: 'Learn how Supabase Storage assigns an owner to each bucket and object from the JWT, and how to scope access to that owner with Row Level Security policies.'
 sidebar_label: 'Security'
 ---
 
-When creating new buckets or objects in Supabase Storage, an owner is automatically assigned to the bucket or object. The owner is the user who created the resource and the value is derived from the `sub` claim in the JWT.
-We store the `owner` in the `owner_id` column.
+When you create a bucket or object in Supabase Storage, Storage assigns it an owner automatically. The owner is the user who created the resource, taken from the `sub` claim in the JWT. Storage keeps the owner in the `owner_id` column.
 
 <Admonition type="note">
 
-When using the `service_key` to create a resource, the owner will not be set and the resource will be owned by anyone. This is also the case when you are creating Storage resources via the Dashboard.
+When you create a resource with the `service_key`, Storage doesn't set an owner, and the resource is owned by anyone. The same applies to Storage resources you create in the Dashboard.
 
 </Admonition>
 
 <Admonition type="note">
 
-The [Storage schema](/docs/guides/storage/schema/design) has 2 fields to represent ownership: `owner` and `owner_id`. `owner` is deprecated and will be removed. Use `owner_id` instead.
+The [Storage schema](/docs/guides/storage/schema/design) has two fields to represent ownership: `owner` and `owner_id`. `owner` is deprecated. Use `owner_id` instead.
 
 </Admonition>
 

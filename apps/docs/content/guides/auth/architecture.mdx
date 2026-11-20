@@ -1,6 +1,6 @@
 ---
 title: 'Auth architecture'
-subtitle: 'The architecture behind Supabase Auth.'
+description: 'Learn how Supabase Auth is built from the client layer, the API gateway, the Auth service, and Postgres, and what each of these four layers is responsible for.'
 ---
 
 There are four major layers to Supabase Auth:
@@ -11,7 +11,7 @@ There are four major layers to Supabase Auth:
 1. [Postgres database.](#postgres) This is shared between all Supabase products.
 
 <Image
-  alt="Diagram showing the architecture of Supabase. The Envoy API gateway sits in front of 7 services: GoTrue, PostgREST, Realtime, Storage, pg_meta, Functions, and pg_graphql. All the services talk to a single Postgres instance."
+  alt="Diagram of the Supabase architecture. The Envoy API gateway routes each request by path to one of seven services: /auth to GoTrue, /rest to PostgREST, /realtime to Realtime, /storage to Storage, /pg to pg-meta, /functions to Functions, and /graphql to pg_graphql. All seven services connect to a single Postgres instance."
   src={{
     dark: '/docs/img/supabase-architecture.svg',
     light: '/docs/img/supabase-architecture--light.svg',
@@ -22,7 +22,7 @@ There are four major layers to Supabase Auth:
 
 ## Client layer
 
-The client layer runs in your app. This could be running in many places, including:
+The client layer runs in your app. Your app can run in many places, including:
 
 - Your frontend browser code
 - Your backend server code
@@ -34,7 +34,7 @@ The client layer provides the functions that you use to sign in and manage users
 - Persistence, refresh, and removal of Auth Tokens in your app's storage medium
 - Integration with other Supabase products
 
-But at its core, this layer manages the making of HTTP calls, so you could write your own client layer if you wanted to.
+At its core, this layer makes HTTP calls, so you can write your own client layer.
 
 See the Client SDKs for more information:
 
@@ -65,8 +65,6 @@ You can connect Auth information to your own objects using [database triggers](/
 
 <Admonition type="danger">
 
-Make sure any views you create for Auth data are protected.
-
-Starting in Postgres version 15, views inherit the RLS policies of the underlying tables if created with `security_invoker`. Views in earlier versions, or those created without `security_invoker`, inherit the permissions of the owner, who can bypass RLS policies.
+In Postgres 15 and later, views inherit the RLS policies of the underlying tables if created with `security_invoker`. Views in earlier versions, or those created without `security_invoker`, inherit the permissions of the owner, who can bypass RLS policies.
 
 </Admonition>
