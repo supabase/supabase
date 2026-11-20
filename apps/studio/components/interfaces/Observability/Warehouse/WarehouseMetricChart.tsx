@@ -24,7 +24,7 @@ export const WarehouseMetricChart = ({
   metric?: WarehouseMetric
   title: string
   description: string
-  unit?: string
+  unit?: 'ms' | '/s'
   scale?: number
   emptyMessage?: string
   series?: WarehouseChartSeries[]
@@ -92,7 +92,7 @@ export const WarehouseMetricChart = ({
                 color="var(--chart-1)"
                 DateTimeFormat="MMM D, HH:mm"
                 showHighlightArea={false}
-                tooltipDetails={unit ? (_, __, value) => `${value} ${unit}` : undefined}
+                tooltipDetails={unit ? (_, __, value) => `${value}${unit}` : undefined}
               />
             </>
           ) : (

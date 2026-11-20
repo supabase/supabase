@@ -120,7 +120,7 @@ const WarehouseWorkloadBody = ({
             title="Query duration (p95)"
             description="Includes worker waits and result streaming."
             metric={view.data.metrics.find((item) => item.metric === 'query_duration_p95')}
-            unit=" ms"
+            unit="ms"
             scale={1000}
             emptyMessage="No data in the last 60 minutes"
           />

@@ -19,7 +19,7 @@ const LATENCY_METRICS: WarehouseMetricName[] = [
   'duckdb_duration_mean',
 ]
 
-const MILLISECOND_CHART_PROPS = { unit: 'ms', scale: 1000 }
+const MILLISECOND_CHART_PROPS = { unit: 'ms', scale: 1000 } as const
 
 export const WarehouseLatencySection = ({
   range,
