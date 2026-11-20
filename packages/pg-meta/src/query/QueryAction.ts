@@ -1,6 +1,7 @@
 import type { SafeSqlFragment } from '../pg-format'
 import { IQueryFilter, QueryFilter } from './QueryFilter'
 import type { Dictionary, QueryTable } from './types'
+import type { ColumnFormat } from './write-values.fallback'
 
 export interface IQueryAction {
   count: () => IQueryFilter
@@ -38,7 +39,11 @@ export class QueryAction implements IQueryAction {
    */
   insert(
     values: Array<Dictionary<any>>,
-    options?: { returning: boolean; enumArrayColumns?: Array<string> }
+    options?: {
+      returning: boolean
+      enumArrayColumns?: Array<string>
+      columnFormats?: Array<ColumnFormat>
+    }
   ) {
     return new QueryFilter(this.table, { action: 'insert', actionValue: values }, options)
   }
@@ -60,7 +65,11 @@ export class QueryAction implements IQueryAction {
    */
   update(
     value: Dictionary<any>,
-    options?: { returning: boolean; enumArrayColumns?: Array<string> }
+    options?: {
+      returning: boolean
+      enumArrayColumns?: Array<string>
+      columnFormats?: Array<ColumnFormat>
+    }
   ) {
     return new QueryFilter(this.table, { action: 'update', actionValue: value }, options)
   }

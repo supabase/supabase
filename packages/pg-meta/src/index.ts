@@ -33,6 +33,26 @@ export * from './sql/studio/sql-editor'
 export * from './sql/studio/role-impersonation'
 export * from './sql/studio/integrations'
 
+// TEMPORARY fallbacks for a partial pg_catalog (Spark on turso); see `catalog-fallback.ts`.
+export {
+  isCatalogGap,
+  withCatalogFallback,
+  type CatalogQuery,
+  type CatalogRow,
+} from './catalog-fallback'
+export {
+  listTablesFallback,
+  listTablesPaginatedFallback,
+  retrieveTableFallback,
+} from './sql/tables.fallback'
+export { withParsedPolicyRoles } from './sql/policies.fallback'
+export { getTableEditorFallback } from './sql/studio/table-editor/table.fallback'
+export { getEntityTypesFallback } from './sql/studio/table-editor/entities.fallback'
+export { getMigrationsFallback } from './sql/studio/database/migrations.fallback'
+export { getTableRowsCountFallback } from './sql/studio/database/rows.fallback'
+export { getTableRowsFallback } from './query/table-row-query.fallback'
+export { readColumnFormats, type ColumnFormat } from './query/write-values.fallback'
+
 export {
   ident,
   literal,
