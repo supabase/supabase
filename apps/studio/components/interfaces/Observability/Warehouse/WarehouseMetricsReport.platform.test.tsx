@@ -1,37 +1,29 @@
 import { QueryClient } from '@tanstack/react-query'
 import { screen, waitFor, within } from '@testing-library/react'
 import userEvent from '@testing-library/user-event'
-import type { platformComponents as components } from 'api-types'
 import dayjs from 'dayjs'
 import { HttpResponse } from 'msw'
 import { beforeEach, expect, test, vi } from 'vitest'
 
 import { WarehouseMetricsReport } from './WarehouseMetricsReport'
+import { createMockWarehouseSetupStatusResponse } from '@/components/interfaces/Integrations/Warehouse/Warehouse.fixtures'
+import type { WarehouseSetupStatus } from '@/components/interfaces/Integrations/Warehouse/Warehouse.utils'
 import { organizationKeys } from '@/data/organizations/keys'
 import { projectKeys } from '@/data/projects/keys'
 import type { WarehouseMetricsResponse } from '@/data/warehouse/warehouse-metrics-api-types'
+import type { V2WarehouseSetupStatusResponse } from '@/data/warehouse/warehouse-setup-api-types'
 import { customRender } from '@/tests/lib/custom-render'
 import { addAPIMock, type APIErrorBody } from '@/tests/lib/msw'
 
-type Setup = components['schemas']['WarehouseSetupStatusResponse_Output']
-const setup: Setup = {
-  setup_status: 'complete',
-  steps: [],
-  tables: [],
-  fdw_status: {
-    extension_available: true,
-    extension_installed: true,
-    foreign_schema_imported: true,
-    schema_created: true,
-    server_configured: true,
-    wrapper_installed: true,
-  },
-}
-const mockSetup = (status: Setup['setup_status'] = 'complete') =>
+const setupResponse = (status: WarehouseSetupStatus = 'complete') =>
+  HttpResponse.json<V2WarehouseSetupStatusResponse>(
+    createMockWarehouseSetupStatusResponse({ setup_status: status })
+  )
+const mockSetup = (status?: WarehouseSetupStatus) =>
   addAPIMock({
     method: 'get',
-    path: '/platform/warehouse/:ref/setup-status',
-    response: () => HttpResponse.json<Setup>({ ...setup, setup_status: status }),
+    path: '/v2/projects/:ref/warehouse/setups/current',
+    response: () => setupResponse(status),
   })
 const response = (value: number | null): WarehouseMetricsResponse => ({
   metrics: [
@@ -196,11 +188,11 @@ test('shows the retention upgrade prompt instead of requesting seven days on a f
 })
 
 test('does not request Warehouse data without access', async () => {
-  const setupRequest = vi.fn(() => HttpResponse.json<Setup>(setup))
+  const setupRequest = vi.fn(() => setupResponse())
   const metricsRequest = vi.fn(() => HttpResponse.json<WarehouseMetricsResponse>(response(null)))
   addAPIMock({
     method: 'get',
-    path: '/platform/warehouse/:ref/setup-status',
+    path: '/v2/projects/:ref/warehouse/setups/current',
     response: setupRequest,
   })
   addAPIMock({ method: 'get', path: '/platform/warehouse/:ref/metrics', response: metricsRequest })
@@ -214,7 +206,7 @@ test('does not request Warehouse data without access', async () => {
 test('shows setup status failures when metrics cannot establish activity', async () => {
   addAPIMock({
     method: 'get',
-    path: '/platform/warehouse/:ref/setup-status',
+    path: '/v2/projects/:ref/warehouse/setups/current',
     response: () => HttpResponse.json<APIErrorBody>({ message: 'Failed' }, { status: 400 }),
   })
   mockMetrics(null)
@@ -226,12 +218,12 @@ test('refresh recovers a failed setup status request', async () => {
   let requests = 0
   addAPIMock({
     method: 'get',
-    path: '/platform/warehouse/:ref/setup-status',
+    path: '/v2/projects/:ref/warehouse/setups/current',
     response: () => {
       requests += 1
       return requests === 1
         ? HttpResponse.json<APIErrorBody>({ message: 'Failed' }, { status: 500 })
-        : HttpResponse.json<Setup>(setup)
+        : setupResponse()
     },
   })
   mockMetrics(null)
