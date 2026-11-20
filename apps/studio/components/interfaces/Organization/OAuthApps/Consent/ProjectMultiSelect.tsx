@@ -116,18 +116,18 @@ export const ProjectMultiSelect = ({
           className="gap-2 py-1"
         >
           <label
-            htmlFor={`${labelId}-selected`}
-            className="flex cursor-pointer items-center gap-2 text-sm"
-          >
-            <RadioGroupItem id={`${labelId}-selected`} value="selected" />
-            Selected projects only
-          </label>
-          <label
             htmlFor={`${labelId}-all`}
             className="flex cursor-pointer items-center gap-2 text-sm"
           >
             <RadioGroupItem id={`${labelId}-all`} value="all" />
             All current and future projects
+          </label>
+          <label
+            htmlFor={`${labelId}-selected`}
+            className="flex cursor-pointer items-center gap-2 text-sm"
+          >
+            <RadioGroupItem id={`${labelId}-selected`} value="selected" />
+            Selected projects only
           </label>
         </RadioGroup>
       )}
