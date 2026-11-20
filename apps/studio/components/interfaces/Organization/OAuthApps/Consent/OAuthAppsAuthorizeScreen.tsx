@@ -77,11 +77,6 @@ export const OAuthAppsAuthorizeScreen = ({
   } = useProfile()
 
   const [organizationSlug, setOrganizationSlug] = useState(initialOrganizationSlug)
-  const handleOrganizationChange = (slug: string) => {
-    setOrganizationSlug(slug)
-    setSelectedProjectRefs([])
-    setAllProjectsSelected(false)
-  }
 
   const {
     data: memberOrg,
@@ -93,6 +88,14 @@ export const OAuthAppsAuthorizeScreen = ({
     projectRef,
     request,
   })
+
+  const handleOrganizationChange = (slug: string) => {
+    if (slug === memberOrg?.slug) return
+    setOrganizationSlug(slug)
+    setSelectedProjectRefs([])
+    setAllProjectsSelected(false)
+  }
+
   const [search, setSearch] = useState('')
 
   const {
