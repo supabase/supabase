@@ -19,7 +19,7 @@ services:
       - rustfs-data:/data
 
   rustfs-createbucket:
-    image: rustfs/rc
+    image: rustfs/rc:v0.1.38
     depends_on:
       rustfs:
         condition: service_healthy
