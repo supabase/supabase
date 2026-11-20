@@ -99,8 +99,8 @@ function SelectProject() {
             </PageHeaderSummary>
           </PageHeaderMeta>
         </PageHeader>
-        <PageContainer className="pt-12 grow flex flex-col gap-y-4">
-          <PageSection className="pt-0 last:pb-0">
+        <PageContainer className="grow flex flex-col gap-y-4">
+          <PageSection className="last:pb-0">
             <div className="flex items-center gap-x-2">
               {isLoadingOrganizations ? (
                 <ShimmeringLoader className="w-60 py-0 h-[26px]" />
