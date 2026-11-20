@@ -388,11 +388,15 @@ export const OAuthAppsAuthorizeScreen = ({
   const needsOrganizationRole =
     !usesSelectedProjects &&
     (preflightData?.validation_failure != null || roleFailure?.scope_target === 'all_projects')
-  const preflightRoleError = isOAuthRoleValidationError(preflightError) ? preflightError : null
+  const preflightRoleError =
+    isOAuthRoleValidationError(preflightError) &&
+    (!usesSelectedProjects || preflightError.validation.scope_target !== 'projects')
+      ? preflightError
+      : null
   const cannotGrantRequestedAccess = needsOrganizationRole || preflightRoleError != null
 
   const handleApprove = () => {
-    if (hasNoSelection || cannotGrantRequestedAccess) return
+    if (hasNoSelection || cannotGrantRequestedAccess || hasRoleFailure) return
     const approveBody = usesSelectedProjects ? { project_refs: selectedProjectRefs } : {}
     approveMutation.mutate({ auth_id: authId, slug: memberOrg.slug, body: approveBody })
   }
