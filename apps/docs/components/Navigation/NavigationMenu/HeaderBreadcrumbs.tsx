@@ -31,7 +31,20 @@ interface BreadcrumbCrumbProps {
 
 export const HeaderBreadcrumbs = ({ headingSlotRef, className }: HeaderBreadcrumbsProps) => {
   const pathname = useDocsPathname()
-  const crumbs = resolveBreadcrumbs(pathname, useNavItems())
+  // a group with an overview page links to it, so on that page the group is the current crumb
+  const linkedCrumbs = resolveBreadcrumbs(pathname, useNavItems()).reduce<Crumb[]>(
+    (chain, crumb) => {
+      const firstItem = crumb.items?.[0]
+      const url =
+        crumb.url ??
+        (firstItem && getCrumbName(firstItem) === 'Overview' ? firstItem.url : undefined)
+      if (url && url === chain.at(-1)?.url) return chain
+      return [...chain, url === crumb.url ? crumb : { ...crumb, url }]
+    },
+    []
+  )
+  // the sidebar top row names the section, so the header keeps only the parent and the page
+  const crumbs = (linkedCrumbs.length > 1 ? linkedCrumbs.slice(1) : linkedCrumbs).slice(-2)
 
   if (crumbs.length === 0) return null
 
@@ -48,7 +61,7 @@ export const HeaderBreadcrumbs = ({ headingSlotRef, className }: HeaderBreadcrum
             <BreadcrumbCrumb
               crumb={crumb}
               isCurrent={index === crumbs.length - 1 && crumb.url === pathname}
-              hasIcon={index > 0}
+              hasIcon={crumb !== linkedCrumbs[0]}
             />
             {crumb.version ? (
               <BreadcrumbItem className="shrink-0">
