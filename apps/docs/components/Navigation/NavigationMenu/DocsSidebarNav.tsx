@@ -90,7 +90,7 @@ interface SidebarIconProps {
 
 const SECTIONS_LEVEL: SidebarLevel = { kind: 'sections' }
 
-const MENU_ROW_CLASS_NAME = '-ml-2 w-auto transition-colors hover:bg-surface-200'
+const MENU_ROW_CLASS_NAME = 'group/row -mr-0.5 -ml-2.5 w-auto px-2.5'
 
 const RESOURCES_LABEL = 'Resources'
 
@@ -308,8 +308,8 @@ export const DocsSidebarNavTop = ({ className }: DocsSidebarNavTopProps) => {
         aria-label={`${getLevelLabel(level)}, back to ${parentLabel}`}
         onClick={handleBackClick}
         className={cn(
-          'group flex h-8 w-full min-w-0 cursor-pointer items-center rounded-md pl-0.5',
-          'text-sm font-medium text-foreground transition-colors hover:bg-surface-200 focus-inset'
+          'group -mx-0.5 flex h-8 min-w-0 flex-1 cursor-pointer items-center rounded-md pl-1',
+          'text-sm text-foreground focus-inset'
         )}
       >
         <TopRowIcon>
@@ -390,7 +390,7 @@ export const DocsSidebarResources = ({ className }: DocsSidebarResourcesProps) =
                 aria-current={isActive ? 'page' : undefined}
                 className={cn(
                   MENU_ROW_CLASS_NAME,
-                  item.icon && 'pl-1.5',
+                  item.icon && 'pl-2',
                   isActive && 'text-foreground'
                 )}
               >
@@ -451,9 +451,9 @@ const LevelButton = ({ level, onLevelOpen, children }: LevelButtonProps) => {
       tabIndex={0}
       onClick={handleClick}
       className={cn(
-        'group/level -ml-2 flex min-h-8 cursor-pointer items-center gap-2 rounded-md px-2 py-1.5',
-        'text-left text-sm leading-5 text-foreground-light transition-colors select-none',
-        'focus-ring hover:bg-surface-200 hover:text-foreground focus-visible:text-foreground'
+        'group/row -mr-0.5 -ml-2.5 flex min-h-8 cursor-pointer items-center gap-2 rounded-md py-1.5 pr-2.5 pl-2',
+        'text-left text-sm leading-5 text-foreground-light select-none',
+        'focus-inset hover:text-foreground focus-visible:text-foreground'
       )}
     >
       {children}
@@ -476,12 +476,7 @@ const ProductLink = ({ item, isActive, onLevelOpen, children }: ProductLinkProps
       href={item.href}
       aria-current={getAriaCurrent({ href: item.href, pathname, isActive })}
       onClick={handleClick}
-      className={cn(
-        MENU_ROW_CLASS_NAME,
-        'group/level',
-        item.icon && 'pl-1.5',
-        isActive && 'text-foreground'
-      )}
+      className={cn(MENU_ROW_CLASS_NAME, item.icon && 'pl-2', isActive && 'text-foreground')}
     >
       {children}
       <LevelChevron />
@@ -536,7 +531,7 @@ const SectionLink = ({ item, isActive, onSectionSelect }: SectionLinkProps) => {
       href={item.href}
       aria-current={getAriaCurrent({ href: item.href, pathname, isActive })}
       onClick={handleClick}
-      className={cn(MENU_ROW_CLASS_NAME, item.icon && 'pl-1.5', isActive && 'text-foreground')}
+      className={cn(MENU_ROW_CLASS_NAME, item.icon && 'pl-2', isActive && 'text-foreground')}
     >
       <SectionLabel item={item} />
     </MenuItem>
@@ -556,16 +551,22 @@ const SectionLabel = ({ item }: SectionLabelProps) => (
 const SidebarIcon = ({ icon }: SidebarIconProps) => {
   const Icon = SIDEBAR_ICONS[icon]
   return Icon ? (
-    <Icon aria-hidden className="size-4 shrink-0 text-foreground-lighter" />
+    <Icon
+      aria-hidden
+      className="size-4 shrink-0 text-foreground-lighter group-hover/row:text-foreground group-focus-visible/row:text-foreground"
+    />
   ) : (
-    <MenuIconPicker icon={icon} className="text-foreground-lighter" />
+    <MenuIconPicker
+      icon={icon}
+      className="text-foreground-lighter group-hover/row:text-foreground group-focus-visible/row:text-foreground"
+    />
   )
 }
 
 const LevelChevron = () => (
   <ChevronRight
     aria-hidden
-    className="my-0.5 size-4 shrink-0 self-start text-foreground-muted group-hover/level:text-foreground-lighter group-focus-visible/level:text-foreground-lighter"
+    className="my-0.5 size-4 shrink-0 self-start text-foreground-muted group-hover/row:text-foreground-lighter group-focus-visible/row:text-foreground-lighter"
   />
 )
 

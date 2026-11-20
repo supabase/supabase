@@ -142,7 +142,7 @@ const NavContainer = memo(function NavContainer({
         <ScrollBar />
       </ScrollRoot>
       <GlobalMenuDrawerFooter className="shrink-0 border-t bg-background px-6 py-4 lg:hidden" />
-      <DocsSidebarResources className="hidden lg:flex shrink-0 border-t py-3 pl-6 pr-4" />
+      <DocsSidebarResources className="hidden lg:flex shrink-0 border-t py-2 pl-6 pr-4" />
     </nav>
   )
 })
