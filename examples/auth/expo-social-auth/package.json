@@ -43,7 +43,8 @@
     "react-native-screens": "~4.23.0",
     "react-native-url-polyfill": "^3.0.0",
     "react-native-web": "~0.21.2",
-    "react-native-worklets": "0.7.4"
+    "react-native-worklets": "0.7.4",
+    "uuid": "^11.1.1"
   },
   "devDependencies": {
     "@types/react": "~19.2.14",
