@@ -2,6 +2,7 @@ import { fireEvent, render, screen } from '@testing-library/react'
 import { Children, cloneElement, isValidElement, type ReactElement, type ReactNode } from 'react'
 import { beforeEach, describe, expect, it, vi } from 'vitest'
 
+import { ChartBar } from './chart-bar'
 import { ChartLine } from './chart-line'
 
 const state = vi.hoisted(() => ({
@@ -22,7 +23,7 @@ vi.mock('recharts', async (importOriginal) => {
       Children.forEach(children.props.children, (child) => {
         if (
           isValidElement<{ isAnimationActive?: boolean }>(child) &&
-          child.type === original.Area
+          (child.type === original.Area || child.type === original.Bar)
         ) {
           state.animations.push(child.props.isAnimationActive)
         }
@@ -42,9 +43,12 @@ beforeEach(() => {
   state.animations = []
 })
 
-describe('ChartLine accessibility', () => {
+describe.each([
+  ['ChartLine', ChartLine],
+  ['ChartBar', ChartBar],
+] as const)('%s accessibility', (_, Chart) => {
   it('allows keyboard users to move between measurements', () => {
-    render(<ChartLine data={data} dataKey="value" showHighlightArea={false} />)
+    render(<Chart data={data} dataKey="value" showHighlightArea={false} />)
 
     const chart = screen.getByRole('application')
     expect(chart).toHaveAttribute('tabindex', '0')
@@ -55,14 +59,14 @@ describe('ChartLine accessibility', () => {
 
   it('disables area animation when reduced motion is requested', () => {
     state.reducedMotion = true
-    render(<ChartLine data={data} dataKey="value" />)
+    render(<Chart data={data} dataKey="value" />)
 
     expect(state.animations).not.toHaveLength(0)
     expect(state.animations.every((value) => value === false)).toBe(true)
   })
 
   it('keeps the Recharts animation default otherwise', () => {
-    render(<ChartLine data={data} dataKey="value" />)
+    render(<Chart data={data} dataKey="value" />)
 
     expect(state.animations).not.toHaveLength(0)
     expect(state.animations.every((value) => value === undefined)).toBe(true)

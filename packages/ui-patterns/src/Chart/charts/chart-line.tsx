@@ -206,7 +206,7 @@ export const ChartLine = ({
     >
       <ChartContainer
         className={cn(
-          'w-full! [&_.recharts-surface:focus-visible]:outline-solid [&_.recharts-surface:focus-visible]:outline-2 [&_.recharts-surface:focus-visible]:outline-brand',
+          'w-full! [&_.recharts-surface]:focus-inset',
           hasDateRangeFooter ? 'h-[calc(100%-28px)]' : 'h-full'
         )}
         config={chartConfig}
