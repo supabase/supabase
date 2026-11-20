@@ -1,4 +1,3 @@
-import { useReducedMotion } from 'common'
 import { Card, CardContent } from 'ui'
 import { ChartLine } from 'ui-patterns/Chart'
 
@@ -27,8 +26,6 @@ export const WarehouseMetricChart = ({
   scale?: number
   series?: WarehouseChartSeries[]
 }) => {
-  const prefersReducedMotion = useReducedMotion()
-
   const allSeries = expandWarehouseChartSeries(inputSeries)
   const selectedSeries = [...allSeries]
     .sort((a, b) => getWarehouseSeriesRank(b) - getWarehouseSeriesRank(a))
@@ -78,9 +75,7 @@ export const WarehouseMetricChart = ({
                 </ul>
               )}
               <ChartLine
-                className="h-64 [&_.recharts-surface:focus-visible]:outline-solid [&_.recharts-surface:focus-visible]:outline-2 [&_.recharts-surface:focus-visible]:outline-brand"
-                accessibilityLayer
-                isAnimationActive={!prefersReducedMotion}
+                className="h-64"
                 isFullHeight
                 data={points}
                 xKey="timestamp"
