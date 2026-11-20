@@ -538,21 +538,16 @@ export const OAuthAppsAuthorizeScreen = ({
         </fieldset>
 
         <div className="flex flex-col gap-2">
-          {canProceed ? (
-            <Button
-              block
-              variant={primaryActionVariant}
-              loading={isSubmitting || isPendingPreflight}
-              aria-label={primaryActionLabel}
-              onClick={hasRoleFailure ? handleDeselectFlagged : handleApprove}
-            >
-              {isSubmitting ? 'Authorizing...' : primaryActionLabel}
-            </Button>
-          ) : (
-            <Button block variant="primary" onClick={handleSwitchOrg}>
-              Switch organization
-            </Button>
-          )}
+          <Button
+            block
+            variant={primaryActionVariant}
+            loading={isSubmitting || isPendingPreflight}
+            aria-label={primaryActionLabel}
+            onClick={hasRoleFailure ? handleDeselectFlagged : handleApprove}
+          >
+            {isSubmitting ? 'Authorizing...' : primaryActionLabel}
+          </Button>
+
           {!isSubmitting && (
             <Button variant="text" block onClick={handleDeny}>
               Cancel
