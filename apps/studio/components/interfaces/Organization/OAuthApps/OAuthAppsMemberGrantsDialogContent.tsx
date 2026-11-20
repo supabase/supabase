@@ -9,12 +9,14 @@ import {
   DialogContent,
   DialogFooter,
   DialogHeader,
+  DialogSection,
   DialogSectionSeparator,
   DialogTitle,
   ScrollArea,
 } from 'ui'
 import { ShimmeringLoader } from 'ui-patterns/ShimmeringLoader'
 
+import type { OAuthAppDatabaseAccess } from './OAuthAppsAuthorizedPreview'
 import { OAuthGrantAccordion, OAuthGrantAccordionItem } from './OAuthGrantAccordionItem'
 import { AlertError } from '@/components/ui/AlertError'
 import { OAuthApproval } from '@/data/oauth-apps/oauth-apps-approvals-query'
@@ -26,12 +28,17 @@ import { pluralize } from '@/lib/helpers'
 
 export interface OAuthAppsMemberGrantsDialogProps extends ComponentProps<typeof DialogContent> {
   approval?: OAuthApproval
+  previewScopes?: string[]
+  databaseAccess?: OAuthAppDatabaseAccess
 }
 
 export const OAuthAppsMemberGrantsDialogContent = ({
   approval,
+  previewScopes,
+  databaseAccess,
   ...props
 }: OAuthAppsMemberGrantsDialogProps) => {
+  const isPreview = previewScopes != null
   const { slug } = useParams()
   const {
     data,
@@ -42,7 +49,10 @@ export const OAuthAppsMemberGrantsDialogContent = ({
     hasNextPage,
     fetchNextPage,
     isFetchingNextPage,
-  } = useOAuthAppMemberGrantsQuery({ slug, appId: approval?.id }, { enabled: Boolean(approval) })
+  } = useOAuthAppMemberGrantsQuery(
+    { slug, appId: approval?.id },
+    { enabled: Boolean(approval) && !isPreview }
+  )
 
   const [sentinelRef, entry] = useIntersectionObserver({
     root: null,
@@ -71,23 +81,53 @@ export const OAuthAppsMemberGrantsDialogContent = ({
   return (
     <DialogContent size="medium" {...props}>
       <DialogHeader>
-        <DialogTitle>Member grants for {approval.attributes.app.name}</DialogTitle>
+        <DialogTitle>
+          {isPreview ? 'Grants' : 'Member grants'} for {approval.attributes.app.name}
+        </DialogTitle>
       </DialogHeader>
       <DialogSectionSeparator />
 
+      {isPreview && (
+        <DialogSection className="space-y-4 text-sm">
+          <p>
+            App ID <code>{approval.id}</code>
+          </p>
+          <div className="space-y-1">
+            <h3 className="font-medium">Permissions</h3>
+            <ul className="space-y-1 text-foreground-light">
+              {previewScopes.map((scope) => (
+                <li key={scope}>
+                  <code>{scope}</code>
+                </li>
+              ))}
+              {databaseAccess && <li>Table data · {databaseAccess.mode}</li>}
+            </ul>
+          </div>
+          {databaseAccess && (
+            <div className="space-y-1">
+              <h3 className="font-medium">Database access</h3>
+              <p>
+                Role <code>{databaseAccess.role}</code>
+              </p>
+              <p>{databaseAccess.projects?.join(', ') ?? 'All current and future projects'}</p>
+            </div>
+          )}
+        </DialogSection>
+      )}
+
       <p aria-live="polite" className="sr-only">
-        {statusText}
+        {!isPreview && statusText}
       </p>
 
-      {isPending && (
+      {!isPreview && isPending && (
         <div className="space-y-2">
           <ShimmeringLoader />
         </div>
       )}
 
-      {isError && <AlertError subject="Failed to retrieve grants" error={error} />}
+      {!isPreview && isError && <AlertError subject="Failed to retrieve grants" error={error} />}
 
-      {isSuccess && (
+      {!isPreview && isSuccess && (
         <ScrollArea className="px-4 h-94">
           <p
             className={cn('text-sm text-foreground-lighter', !isEmpty && 'sr-only')}

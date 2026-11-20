@@ -90,8 +90,8 @@ export const OAuthAppsRevokeDialogContent = ({
               New connections will be blocked immediately. Supabase will close open connections.
             </p>
             <p>
-              The <span className="break-all font-mono text-xs">{databaseAccess.role}</span> role
-              will stay in the database with login disabled.
+              The <code className="break-all">{databaseAccess.role}</code> role will stay in the
+              database with login disabled.
             </p>
           </DialogSection>
         </>

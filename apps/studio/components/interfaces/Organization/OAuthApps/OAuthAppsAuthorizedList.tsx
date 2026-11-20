@@ -122,7 +122,7 @@ export const OAuthAppsAuthorizedList = ({ isPreview = false }: { isPreview?: boo
                   <TableHead className={cn(!hasAuthorizedApps && 'text-foreground-muted')}>
                     Access
                   </TableHead>
-                  {isPreview && <TableHead>Database access</TableHead>}
+                  {isPreview && <TableHead>Permissions</TableHead>}
                   <TableHead className="text-right">
                     <span className="sr-only">Actions</span>
                   </TableHead>
@@ -130,12 +130,12 @@ export const OAuthAppsAuthorizedList = ({ isPreview = false }: { isPreview?: boo
               </TableHeader>
               <TableBody>
                 {isPreview ? (
-                  authorizedAppsPreview.map(({ approval, databaseAccess }) => (
+                  authorizedAppsPreview.map(({ approval, scopes, databaseAccess }) => (
                     <OAuthAppsAuthorizedRow
                       key={approval.id}
                       approval={approval}
                       databaseAccess={databaseAccess}
-                      isPreview
+                      previewScopes={scopes}
                       canRevoke
                     />
                   ))

@@ -6,9 +6,14 @@ export type OAuthAppDatabaseAccess = {
   projects: string[] | null
 }
 
-const previewApps: { name: string; databaseAccess?: OAuthAppDatabaseAccess }[] = [
+const previewApps: {
+  name: string
+  scopes: string[]
+  databaseAccess?: OAuthAppDatabaseAccess
+}[] = [
   {
     name: 'Example Partner',
+    scopes: ['database:read', 'database:write', 'projects:read'],
     databaseAccess: {
       mode: 'Read and write',
       role: 'example_partner_user',
@@ -17,15 +22,17 @@ const previewApps: { name: string; databaseAccess?: OAuthAppDatabaseAccess }[] =
   },
   {
     name: 'Example Analytics',
+    scopes: ['analytics:read', 'projects:read'],
     databaseAccess: { mode: 'Read only', role: 'example_analytics_user', projects: null },
   },
-  { name: 'Example Deploy' },
+  { name: 'Example Deploy', scopes: ['projects:read', 'edge_functions:write'] },
 ]
 
 export const authorizedAppsPreview: {
   approval: OAuthApproval
+  scopes: string[]
   databaseAccess?: OAuthAppDatabaseAccess
-}[] = previewApps.map(({ name, databaseAccess }, index) => ({
+}[] = previewApps.map(({ name, scopes, databaseAccess }, index) => ({
   approval: {
     id: `preview-app-${index + 1}`,
     type: 'oauth_app',
@@ -36,5 +43,6 @@ export const authorizedAppsPreview: {
       org_grant: null,
     },
   },
+  scopes,
   databaseAccess,
 }))

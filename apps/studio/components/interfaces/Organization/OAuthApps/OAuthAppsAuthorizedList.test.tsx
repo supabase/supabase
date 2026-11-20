@@ -114,11 +114,21 @@ describe('OAuthAppsAuthorizedList', () => {
   test('previews database access and the effects of revoking without allowing a revoke', async () => {
     customRender(<OAuthAppsAuthorizedList isPreview />)
 
-    expect(screen.getByRole('columnheader', { name: 'Database access' })).toBeInTheDocument()
-    expect(await rowFor('Example Partner')).toHaveTextContent('Read and write')
-    expect(await rowFor('Example Partner')).toHaveTextContent('northwind-cms, northwind-storefront')
-    expect(await rowFor('Example Analytics')).toHaveTextContent('All current and future projects')
-    expect(await rowFor('Example Deploy')).toHaveTextContent('None')
+    expect(screen.getByRole('columnheader', { name: 'Permissions' })).toBeInTheDocument()
+    const partner = await rowFor('Example Partner')
+    expect(partner).toHaveTextContent('Table data · Read and write')
+    expect(partner).not.toHaveTextContent('preview-app-1')
+    expect(partner).not.toHaveTextContent('northwind-cms')
+    expect(await rowFor('Example Deploy')).toHaveTextContent('2 permissions')
+
+    await openRowMenu('Example Partner')
+    await userEvent.click(await screen.findByRole('menuitem', { name: 'View grants' }))
+    const grants = await screen.findByRole('dialog')
+    expect(grants).toHaveTextContent('preview-app-1')
+    expect(grants).toHaveTextContent('example_partner_user')
+    expect(grants).toHaveTextContent('northwind-cms, northwind-storefront')
+    expect(grants).toHaveTextContent('database:write')
+    await userEvent.click(within(grants).getAllByRole('button', { name: 'Close' })[0])
 
     await openRowMenu('Example Partner')
     await userEvent.click(await screen.findByRole('menuitem', { name: 'Revoke grants' }))

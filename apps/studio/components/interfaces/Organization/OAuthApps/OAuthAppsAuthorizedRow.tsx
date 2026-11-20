@@ -11,9 +11,6 @@ import {
   DropdownMenuTrigger,
   TableCell,
   TableRow,
-  Tooltip,
-  TooltipContent,
-  TooltipTrigger,
 } from 'ui'
 
 import type { OAuthAppDatabaseAccess } from './OAuthAppsAuthorizedPreview'
@@ -26,7 +23,7 @@ export interface OAuthAppsAuthorizedRowProps {
   className?: string
   canRevoke: boolean
   databaseAccess?: OAuthAppDatabaseAccess
-  isPreview?: boolean
+  previewScopes?: string[]
 }
 
 export const OAuthAppsAuthorizedRow = ({
@@ -34,8 +31,10 @@ export const OAuthAppsAuthorizedRow = ({
   className,
   canRevoke,
   databaseAccess,
-  isPreview = false,
+  previewScopes,
 }: OAuthAppsAuthorizedRowProps) => {
+  const isPreview = previewScopes != null
+  const permissionCount = (previewScopes?.length ?? 0) + Number(databaseAccess != null)
   const [isDialogOpen, setIsDialogOpen] = useState(false)
   const [dialogContent, setDialogContent] = useState<'grants' | 'revoke' | null>(null)
   const menuTriggerRef = useRef<HTMLButtonElement | null>(null)
@@ -59,24 +58,17 @@ export const OAuthAppsAuthorizedRow = ({
           <p className="min-w-0 truncate" title={approval.attributes.app.name}>
             {approval.attributes.app.name}
           </p>
-          <p className="min-w-0 text-foreground-lighter font-mono">{approval.id}</p>
+          {!isPreview && <p className="min-w-0 text-foreground-lighter font-mono">{approval.id}</p>}
         </div>
       </TableCell>
       <TableCell>{getGrantTargetLabel(approval.attributes.target)}</TableCell>
       {isPreview && (
-        <TableCell className="min-w-40 whitespace-normal align-top">
-          {databaseAccess ? (
-            <div className="space-y-1">
-              <p>{databaseAccess.mode}</p>
-              <p className="break-all font-mono text-xs text-foreground-light">
-                {databaseAccess.role}
-              </p>
-              <p className="text-xs text-foreground-light">
-                {databaseAccess.projects?.join(', ') ?? 'All current and future projects'}
-              </p>
-            </div>
-          ) : (
-            <span className="text-foreground-light">None</span>
+        <TableCell className="min-w-40 whitespace-normal">
+          <p>
+            {permissionCount} {permissionCount === 1 ? 'permission' : 'permissions'}
+          </p>
+          {databaseAccess && (
+            <p className="text-xs text-foreground-light">Table data · {databaseAccess.mode}</p>
           )}
         </TableCell>
       )}
@@ -95,38 +87,31 @@ export const OAuthAppsAuthorizedRow = ({
           }}
         >
           <DropdownMenu>
-            <Tooltip>
-              <TooltipTrigger asChild>
-                <DropdownMenuTrigger asChild>
-                  <Button
-                    ref={menuTriggerRef}
-                    icon={<MoreVerticalIcon />}
-                    className="px-1"
-                    aria-label="Manage app"
-                    aria-describedby={undefined}
-                  />
-                </DropdownMenuTrigger>
-              </TooltipTrigger>
-              <TooltipContent side="bottom">Manage app</TooltipContent>
-            </Tooltip>
+            <DropdownMenuTrigger asChild>
+              <Button
+                ref={menuTriggerRef}
+                icon={<MoreVerticalIcon />}
+                className="px-1"
+                aria-label="Manage app"
+              />
+            </DropdownMenuTrigger>
             <DropdownMenuContent align="end" side="bottom" className="w-40">
-              {!isPreview && (
-                <>
-                  <DialogTrigger asChild>
-                    <DropdownMenuItem
-                      className="gap-x-2"
-                      onClick={() => setDialogContent('grants')}
-                    >
-                      <LockIcon size={14} />
-                      View grants
-                    </DropdownMenuItem>
-                  </DialogTrigger>
-                  <DropdownMenuSeparator />
-                </>
-              )}
+              <DialogTrigger asChild>
+                <DropdownMenuItem
+                  className="gap-x-2 transition-none"
+                  onClick={() => setDialogContent('grants')}
+                >
+                  <LockIcon size={14} />
+                  View grants
+                </DropdownMenuItem>
+              </DialogTrigger>
+              {canRevoke && <DropdownMenuSeparator />}
               {canRevoke && (
                 <DialogTrigger asChild>
-                  <DropdownMenuItem className="gap-x-2" onClick={() => setDialogContent('revoke')}>
+                  <DropdownMenuItem
+                    className="gap-x-2 transition-none"
+                    onClick={() => setDialogContent('revoke')}
+                  >
                     <XIcon size={14} />
                     Revoke grants
                   </DropdownMenuItem>
@@ -137,6 +122,8 @@ export const OAuthAppsAuthorizedRow = ({
           {dialogContent === 'grants' && (
             <OAuthAppsMemberGrantsDialogContent
               approval={approval}
+              previewScopes={previewScopes}
+              databaseAccess={databaseAccess}
               onCloseAutoFocus={preventDefault}
             />
           )}
