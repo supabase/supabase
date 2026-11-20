@@ -183,10 +183,10 @@ const SheetContent = React.forwardRef<
         <SheetPrimitive.Close asChild>
           <Button
             variant="text"
-            size="tiny"
-            className="absolute right-4 top-4 size-7 px-0"
+            size="small"
+            className="absolute right-3.5 top-3.5 size-7 p-0"
             aria-label="Close"
-            icon={<X className="h-4 w-4" />}
+            icon={<X />}
           />
         </SheetPrimitive.Close>
       ) : null}
