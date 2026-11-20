@@ -76,11 +76,28 @@ await supabase.storage.from('avatars').move('public/avatar1.png', 'private/avata
 })
 ```
 
+## Copy or move a version
+
+In a bucket with [object versioning](/docs/guides/storage/buckets/object-versioning) turned on, pass `sourceVersionId` to `copy` or `move` to use a specific version of the source object. The destination gets a new version ID.
+
+```javascript
+import { createClient } from '@supabase/supabase-js'
+
+const supabase = createClient('your_project_url', 'your_supabase_api_key')
+
+// ---cut---
+await supabase.storage.from('avatars').copy('public/avatar1.png', 'private/avatar1-backup.png', {
+  sourceVersionId: 'a1f2e3d4-5b6c-4d7e-8f9a-0b1c2d3e4f5a',
+})
+```
+
+Moving a version copies it and then permanently deletes the source version. To restore a version to its own path, see [Restore a version](/docs/guides/storage/buckets/object-versioning#restore-a-version).
+
 ## Permissions
 
-To **copy** objects, users need `select` permission on the source object and `insert` permission on the destination object. If the user also has `update` permission, the copy can be performed as an upsert, which will overwrite the destination object if it already exists.
+To **copy** objects, users need `select` permission on the source object and `insert` permission on the destination object. To copy over an existing object or delete marker, users also need `update` permission. With [object versioning](/docs/guides/storage/buckets/object-versioning) turned on, the replaced object is kept as a noncurrent version.
 
-To **move** objects, users need `select` and `update` permissions on the object.
+To **move** objects, users need `select` and `update` permissions on the object. If either bucket has versioning turned on, a move copies the object and then deletes the source version, so users need the copy permissions and `delete` permission on the source object.
 
 For example:
 
@@ -90,7 +107,7 @@ on storage.objects
 for select
 to authenticated
 using (
-    owner_id = (select auth.uid())
+    owner_id = (select auth.uid()::text)
 );
 
 create policy "User can insert in their own folders (in any buckets)"
@@ -98,7 +115,7 @@ on storage.objects
 for insert
 to authenticated
 with check (
-    (storage.foldername(name))[1] = (select auth.uid())
+    (storage.foldername(name))[1] = (select auth.uid()::text)
 );
 
 create policy "User can update their own objects (in any buckets)"
@@ -106,6 +123,6 @@ on storage.objects
 for update
 to authenticated
 using (
-    owner_id = (select auth.uid())
+    owner_id = (select auth.uid()::text)
 );
 ```
