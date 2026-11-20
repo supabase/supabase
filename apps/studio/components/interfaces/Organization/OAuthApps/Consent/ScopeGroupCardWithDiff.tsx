@@ -31,14 +31,14 @@ export const ScopeGroupCardWithDiff = ({ scopes, previousScopes }: ScopeGroupCar
     <>
       <div className="divide-y rounded-md border bg-surface-75 px-4">
         <DiffScopeGroupItem
-          label="READ AND WRITE"
+          label="Read and write"
           level="read-write"
           permissions={diff.changed['read-write']}
         />
-        <DiffScopeGroupItem label="WRITE" level="write" permissions={diff.changed['write']} />
-        <DiffScopeGroupItem label="READ ONLY" level="read" permissions={diff.changed['read']} />
+        <DiffScopeGroupItem label="Write" level="write" permissions={diff.changed['write']} />
+        <DiffScopeGroupItem label="Read only" level="read" permissions={diff.changed['read']} />
         <DiffScopeGroupItem
-          label="REMOVED"
+          label="Removed"
           level={undefined}
           permissions={diff.changed['removed']}
         />
@@ -57,9 +57,9 @@ export const ScopeGroupCardWithDiff = ({ scopes, previousScopes }: ScopeGroupCar
         </CollapsibleTrigger>
         <CollapsibleContent>
           <div className="divide-y rounded-md border bg-surface-75 px-4">
-            <ScopeGroupCardItem label="READ AND WRITE" permissions={diff.unchanged['read-write']} />
-            <ScopeGroupCardItem label="WRITE" permissions={diff.unchanged['write']} />
-            <ScopeGroupCardItem label="READ ONLY" permissions={diff.unchanged['read']} />
+            <ScopeGroupCardItem label="Read and write" permissions={diff.unchanged['read-write']} />
+            <ScopeGroupCardItem label="Write" permissions={diff.unchanged['write']} />
+            <ScopeGroupCardItem label="Read only" permissions={diff.unchanged['read']} />
           </div>
         </CollapsibleContent>
       </Collapsible>

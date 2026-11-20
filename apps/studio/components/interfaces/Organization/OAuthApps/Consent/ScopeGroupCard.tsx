@@ -12,9 +12,9 @@ export const ScopeGroupCard = ({ scopes }: ScopeGroupCardProps) => {
 
   return (
     <div className="divide-y rounded-md border bg-surface-75 px-4">
-      <ScopeGroupCardItem label="READ AND WRITE" permissions={scopeGroups['read-write']} />
-      <ScopeGroupCardItem label="WRITE" permissions={scopeGroups['write']} />
-      <ScopeGroupCardItem label="READ ONLY" permissions={scopeGroups['read']} />
+      <ScopeGroupCardItem label="Read and write" permissions={scopeGroups['read-write']} />
+      <ScopeGroupCardItem label="Write" permissions={scopeGroups['write']} />
+      <ScopeGroupCardItem label="Read only" permissions={scopeGroups['read']} />
     </div>
   )
 }
