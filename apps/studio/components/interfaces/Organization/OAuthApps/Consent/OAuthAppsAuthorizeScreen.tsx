@@ -409,12 +409,15 @@ export const OAuthAppsAuthorizeScreen = ({
         preflightData?.existing_grant ? (
           <>
             You authorized {request.name} for this organization on{' '}
-            <TimestampInfo
-              className="text-sm inline-block"
-              utcTimestamp={preflightData.existing_grant.approved_at}
-              labelFormat="D MMM YYYY"
-            />
-            . It's now asking for different access.
+            <span className="inline-block whitespace-nowrap">
+              <TimestampInfo
+                className="text-sm inline-block"
+                utcTimestamp={preflightData.existing_grant.approved_at}
+                labelFormat="D MMM YYYY"
+              />
+              .
+            </span>{' '}
+            It's now asking for different access.
           </>
         ) : (
           'This application wants to access your Supabase Account'
