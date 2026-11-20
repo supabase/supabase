@@ -2755,9 +2755,39 @@ export const platform: NavMenuConstant = {
           ],
         },
         {
-          name: 'Transfer Project',
+          name: 'Project transfers',
           url: '/guides/platform/project-transfer' as `/${string}`,
           enabled: fullPlatformEnabled,
+          items: [
+            {
+              name: 'Transfer a project',
+              url: '/guides/platform/project-transfer' as `/${string}`,
+            },
+            {
+              name: 'Requirements',
+              url: '/guides/platform/project-transfer/requirements' as `/${string}`,
+            },
+            {
+              name: 'Changes after a transfer',
+              url: '/guides/platform/project-transfer/what-changes' as `/${string}`,
+            },
+            {
+              name: 'Transfer project ownership',
+              url: '/guides/platform/project-transfer/transfer-ownership' as `/${string}`,
+            },
+            {
+              name: 'Transfer a Vercel-managed project',
+              url: '/guides/platform/project-transfer/vercel-marketplace' as `/${string}`,
+            },
+            {
+              name: 'Pause a Pro or Team Plan project',
+              url: '/guides/platform/project-transfer/pause-project' as `/${string}`,
+            },
+            {
+              name: 'Troubleshooting',
+              url: '/guides/platform/project-transfer/troubleshooting' as `/${string}`,
+            },
+          ],
         },
         {
           name: 'Restore to a new project',

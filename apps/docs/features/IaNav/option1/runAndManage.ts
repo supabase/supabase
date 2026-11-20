@@ -33,8 +33,34 @@ export const runAndManage: NavMenuConstant = {
           items: [
             {
               name: 'Transfer to another organization',
-              url: '/guides/platform/project-transfer',
               enabled: fullPlatformEnabled,
+              items: [
+                { name: 'Transfer a project', url: '/guides/platform/project-transfer' },
+                {
+                  name: 'Requirements',
+                  url: '/guides/platform/project-transfer/requirements',
+                },
+                {
+                  name: 'Changes after a transfer',
+                  url: '/guides/platform/project-transfer/what-changes',
+                },
+                {
+                  name: 'Transfer project ownership',
+                  url: '/guides/platform/project-transfer/transfer-ownership',
+                },
+                {
+                  name: 'Transfer a Vercel-managed project',
+                  url: '/guides/platform/project-transfer/vercel-marketplace',
+                },
+                {
+                  name: 'Pause a Pro or Team Plan project',
+                  url: '/guides/platform/project-transfer/pause-project',
+                },
+                {
+                  name: 'Troubleshooting',
+                  url: '/guides/platform/project-transfer/troubleshooting',
+                },
+              ],
             },
             { name: 'Project Pausing', url: '/guides/platform/free-project-pausing' },
             { name: 'Delete Project', url: '/guides/platform/delete-project' },
