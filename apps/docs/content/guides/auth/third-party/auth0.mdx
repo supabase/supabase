@@ -11,7 +11,7 @@ Auth0 can be used as a third-party authentication provider alongside Supabase Au
 1. First you need to add an integration to connect your Supabase project with your Auth0 tenant. You will need your tenant ID (and in some cases region ID).
 2. Add a new Third-party Auth integration in your project's [Authentication settings](/dashboard/project/_/auth/third-party).
 3. Assign the `role: 'authenticated'` custom claim to all JWTs by using an Auth0 Action.
-4. Finally setup the Supabase client in your application.
+4. Finally setup the [Supabase client](/docs/reference/javascript/introduction) in your application.
 
 ## Setup the Supabase client library
 
@@ -128,9 +128,9 @@ val supabase = createSupabaseClient(
 
 In the dashboard navigate to your project's [Authentication settings](/dashboard/project/_/auth/third-party) and find the Third-Party Auth section to add a new integration.
 
-In the CLI add the following config to your `supabase/config.toml` file:
+In the CLI add the following config to your config file (`supabase/config.toml` or `supabase/config.jsonc`):
 
-```toml
+```toml supabase/config.toml
 [auth.third_party.auth0]
 enabled = true
 tenant = "<id>"

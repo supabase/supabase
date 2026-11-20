@@ -376,7 +376,6 @@ export const UsersV2 = () => {
     sort_order: sortOrder,
     providers: selectedProviders,
     user_type: filterUserType === 'all' ? undefined : filterUserType,
-    keywords: filterKeywords,
     filter_column: specificFilterColumn === 'freeform' ? undefined : specificFilterColumn,
   }
 

@@ -63,7 +63,7 @@ const org = 'supabase'
 const repo = 'pg_graphql'
 const branch = 'master'
 const docsDir = 'docs'
-const externalSite = 'https://supabase.github.io/pg_graphql'
+const externalSite = 'https://supabase.github.io/pg_graphql/'
 ```
 
 Check the sections for [guide structure](#guide-structure) and [reference structure](#reference-structure) to learn more about the file structures.

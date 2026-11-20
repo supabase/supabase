@@ -4,19 +4,19 @@ import { InlineLinkClassName } from '@/components/ui/InlineLink'
 
 export interface NoProjectsNoticeProps {
   appName: string
-  organizationSlug: string
+  organizationName: string
   onSwitchOrg: () => void
 }
 
 export const NoProjectsNotice = ({
   appName,
-  organizationSlug,
+  organizationName,
   onSwitchOrg,
 }: NoProjectsNoticeProps) => {
   return (
     <Admonition
       type="default"
-      title={`No projects in ${organizationSlug}`}
+      title={`No projects in ${organizationName}`}
       description={
         <>
           <p>

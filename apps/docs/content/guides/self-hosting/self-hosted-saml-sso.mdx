@@ -22,7 +22,7 @@ You need:
 - Open SSL installed (for key generation)
 - Your IdP's SAML metadata URL or metadata XML
 - Your project's secret key, `SUPABASE_SECRET_KEY`, from your `.env` file (needed for admin API calls)
-- `API_EXTERNAL_URL` set to the publicly-accessible URL of your Supabase Auth service (e.g., `https://<your-domain>/auth/v1`). Used as the base for constructing the SAML Service Provider entity ID and ACS endpoint URL
+- `API_EXTERNAL_URL` set to the publicly-accessible URL of your [Supabase Auth](/docs/guides/auth) service (e.g., `https://<your-domain>/auth/v1`). Used as the base for constructing the SAML Service Provider entity ID and ACS endpoint URL
 
 ## How SAML SSO works in Supabase
 
@@ -571,4 +571,4 @@ The user took too long between initiating SSO and completing authentication at t
 
 - [SSO with SAML 2.0](/docs/guides/auth/enterprise-sso/auth-sso-saml) - Client-side SAML integration guide
 - [Auth server configuration reference](/docs/guides/self-hosting/auth/config) - Full list of Auth environment variables
-- [SAML 2.0 specification](http://docs.oasis-open.org/security/saml/v2.0/) - The underlying standard
+- [SAML 2.0 specification](https://docs.oasis-open.org/security/saml/v2.0/) - The underlying standard

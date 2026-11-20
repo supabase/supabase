@@ -10,11 +10,6 @@ import { Route } from '@/routes/_auth/sign-in-mfa'
 import { addAPIMock, mswServer } from '@/tests/lib/msw'
 import { renderRoute } from '@/tests/lib/route-render'
 
-vi.mock('common', async (importOriginal) => {
-  const actual = await importOriginal<typeof import('common')>()
-  return { ...actual, useParams: () => ({}) }
-})
-
 const CALLBACK_ERROR = new AuthError('Test')
 const SESSION: Session = {
   access_token: 'access-token',

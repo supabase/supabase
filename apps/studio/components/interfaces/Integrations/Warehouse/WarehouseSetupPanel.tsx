@@ -12,6 +12,7 @@ import {
   WarehouseEnablingProgress,
   WarehouseReplicatedTablesSection,
 } from './WarehouseTableStatusList'
+import { WarehouseWorkloadSection } from './WarehouseWorkloadSection'
 import { AlertError } from '@/components/ui/AlertError'
 import { useReplicationDestinationsQuery } from '@/data/replication/destinations-query'
 import { checkLocalPipelinesNotSetUp } from '@/data/replication/utils'
@@ -290,6 +291,7 @@ const WarehouseSetupPanelContent = ({
         isSubmitting={setupMutation.isPending}
         error={setupMutation.error}
       />
+      <WarehouseWorkloadSection />
       <WarehouseConnectSection />
       <WarehouseDisableCard />
     </>

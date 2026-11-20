@@ -5,6 +5,7 @@ import { cn, Tooltip, TooltipContent, TooltipTrigger } from 'ui'
 
 import { billingMetricUnit, formatUsage } from '../helpers'
 import { Metric, USAGE_APPROACHING_THRESHOLD } from './BillingBreakdown.constants'
+import { UsageProjectName } from '@/components/interfaces/Organization/Usage/UsageProjectName'
 import { InlineLink } from '@/components/ui/InlineLink'
 import { UpgradePlanButton } from '@/components/ui/UpgradePlanButton'
 import { PricingMetric } from '@/data/analytics/org-daily-stats-query'
@@ -19,6 +20,7 @@ export interface BillingMetricProps {
   usage: OrgUsageResponse
   subscription: OrgSubscription
   relativeToSubscription: boolean
+  projectRef?: string | null
 }
 
 export const BillingMetric = ({
@@ -27,6 +29,7 @@ export const BillingMetric = ({
   usage,
   subscription,
   relativeToSubscription,
+  projectRef,
 }: BillingMetricProps) => {
   const usageMeta = usage.usages.find((x) => x.metric === metric.key)
 
@@ -241,7 +244,13 @@ export const BillingMetric = ({
                 <tbody className="[&>tr:last-child>td]:pb-1">
                   {sortedProjectAllocations.map((allocation) => (
                     <tr key={`${usageMeta.metric}_${allocation.ref}`}>
-                      <td className="text-foreground-light">{allocation.name}</td>
+                      <td className="text-foreground-light">
+                        <UsageProjectName
+                          name={allocation.name}
+                          projectRef={allocation.ref}
+                          selectedProjectRef={projectRef}
+                        />
+                      </td>
                       <td className="text-foreground-light text-right">
                         {formatUsage(usageMeta.metric as PricingMetric, allocation)}
                       </td>

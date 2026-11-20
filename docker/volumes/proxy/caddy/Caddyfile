@@ -7,8 +7,8 @@
 
     handle {
         basic_auth {
-            # PROXY_AUTH_PASSWORD is overwritten with the bcrypt on startup
-            {$PROXY_AUTH_USERNAME} {$PROXY_AUTH_PASSWORD}
+            # Written on startup by the caddy service in docker-compose.caddy.yml
+            import /config/dashboard-auth
         }
 
         reverse_proxy studio:3000

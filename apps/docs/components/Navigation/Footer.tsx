@@ -1,6 +1,7 @@
+import { linkCells, secondaryLinks } from '~/data/footer'
 import Link from 'next/link'
 import { IconDiscord, IconGitHubSolid, IconTwitterX, IconYoutubeSolid } from 'ui'
-import { linkCells, secondaryLinks } from '~/data/footer'
+import { PrivacySettings, PrivacySettingsLabel } from 'ui-patterns/PrivacySettings'
 
 interface FooterProps {
   className?: string
@@ -42,34 +43,29 @@ export const Footer = ({ className }: FooterProps) => {
 }
 
 export const FooterBottomRow = () => (
-  <div className="flex gap-4 items-center justify-between">
-    <div className="flex flex-col lg:flex-row gap-3 ">
+  <div className="flex flex-wrap items-center justify-between gap-x-4 gap-y-3">
+    <div className="flex min-w-0 flex-wrap items-center gap-x-4 gap-y-3">
       <Link href="https://supabase.com/" className="text-xs text-foreground-lighter">
         &copy; Supabase Inc
       </Link>
       <span className="text-xs text-foreground-lighter">—</span>
-      {secondaryLinks.map(({ component: Component, ...item }) =>
-        item.url ? (
-          <Link
-            href={item.url}
-            key={item.url}
-            className="text-xs text-foreground-lighter hover:underline"
-          >
-            {item.title}
-          </Link>
-        ) : (
-          Component && (
-            <Component key={item.title} className="text-xs text-foreground-lighter hover:underline">
-              {item.title}
-            </Component>
-          )
-        )
-      )}
+      <PrivacySettings className="text-left text-xs text-foreground-lighter hover:underline">
+        <PrivacySettingsLabel />
+      </PrivacySettings>
+      {secondaryLinks.map((item) => (
+        <Link
+          href={item.url}
+          key={item.url}
+          className="text-xs text-foreground-lighter hover:underline"
+        >
+          {item.title}
+        </Link>
+      ))}
     </div>
     <div className="flex items-center gap-4">
       <a
         href="https://twitter.com/supabase"
-        className="text-foreground-muted hover:text-foreground transition"
+        className="text-foreground-muted transition hover:text-foreground"
       >
         <span className="sr-only">Twitter</span>
         <IconTwitterX size={14} />
@@ -77,7 +73,7 @@ export const FooterBottomRow = () => (
 
       <a
         href="https://github.com/supabase"
-        className="text-foreground-muted hover:text-foreground transition"
+        className="text-foreground-muted transition hover:text-foreground"
       >
         <span className="sr-only">GitHub</span>
         <IconGitHubSolid size={14} />
@@ -85,7 +81,7 @@ export const FooterBottomRow = () => (
 
       <a
         href="https://discord.supabase.com/"
-        className="text-foreground-muted hover:text-foreground transition"
+        className="text-foreground-muted transition hover:text-foreground"
       >
         <span className="sr-only">Discord</span>
         <IconDiscord size={14} />
@@ -93,7 +89,7 @@ export const FooterBottomRow = () => (
 
       <a
         href="https://youtube.com/c/supabase"
-        className="text-foreground-muted hover:text-foreground transition"
+        className="text-foreground-muted transition hover:text-foreground"
       >
         <span className="sr-only">Youtube</span>
         <IconYoutubeSolid size={14} />
