@@ -153,7 +153,7 @@ const EdgeFunctionDetailsLayout = ({
     if (isExceedMaxSize) {
       try {
         const eszip = await getEdgeFunctionBodyEszip({ projectRef: ref, slug: functionSlug })
-        const files = await extractFunctionSourcesFromEszip(eszip)
+        const files = extractFunctionSourcesFromEszip(eszip)
         zipEntries = getFunctionZipEntries({ files, slug: functionSlug ?? '', source: 'eszip' })
       } catch (error) {
         return toast.error(

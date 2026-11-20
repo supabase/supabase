@@ -326,7 +326,7 @@ export const getDefaultSelectedFileId = (
   return (entrypointFile ?? files.find((file) => file.name === 'index.ts') ?? files[0])?.id
 }
 
-type FunctionZipFile = { name: string; content: string }
+type FunctionZipFile = { name: string; content: string | Uint8Array<ArrayBuffer> }
 
 // Resolves `.`, empty (e.g. from a leading `/`) and inner `..` segments, so the only `..` left are
 // leading ones that reach above the base, e.g. `a/../../b` becomes `../b`.
@@ -353,7 +353,7 @@ export const getFunctionZipEntries = ({
   files: FunctionZipFile[]
   slug: string
   source: 'multipart' | 'eszip'
-}): { path: string; content: string }[] => {
+}): { path: string; content: string | Uint8Array<ArrayBuffer> }[] => {
   const relativeNames = files.map(({ name }) => {
     if (source === 'eszip') return normalizePathSegments(name)
     const nameSections = name.split('/')

@@ -244,28 +244,6 @@ function ssrLodashEs(): Plugin {
   }
 }
 
-// `@deno/eszip` (lazy-loaded when downloading oversized edge functions) imports Node-only
-// `@deno/shim-deno` and `undici`. The shim calls `os.platform()` at module scope, which throws in
-// the browser ("os.platform is not a function"), so swap both for browser stand-ins. Scoped to
-// `@deno/eszip`'s own imports in the client build; other importers and server builds get the
-// real packages.
-const denoEszipShims = new Map([
-  ['@deno/shim-deno', path.resolve(rootDir, 'compat/deno-shim.ts')],
-  ['undici', path.resolve(rootDir, 'compat/undici.ts')],
-])
-
-function denoEszipBrowserShims(): Plugin {
-  return {
-    name: 'studio-deno-eszip-browser-shims',
-    enforce: 'pre',
-    applyToEnvironment: (environment) => environment.name === 'client',
-    resolveId(source, importer) {
-      const shim = denoEszipShims.get(source)
-      if (shim && importer?.includes('/node_modules/@deno/eszip/')) return shim
-    },
-  }
-}
-
 function ssrStubGraphiql(): Plugin {
   return {
     name: 'studio-ssr-stub-graphiql',
@@ -626,15 +604,10 @@ export default defineConfig(({ command, mode }) => {
       // pre-bundling; the modules then go through the normal transform
       // pipeline where Vite's built-in worker plugin turns each `?worker`
       // import into a spawnable Worker constructor.
-      //
-      // `@deno/eszip` loads its WASM with `new URL('eszip_wasm_bg.wasm', import.meta.url)`, which
-      // points at a file that doesn't exist once pre-bundled into `.vite/deps`. Excluding it also
-      // lets `denoEszipBrowserShims` resolve its imports, as plugins don't run in the optimizer.
       exclude: [
         'graphiql/setup-workers/webpack',
         'graphiql/setup-workers/vite',
         '@graphiql/react/setup-workers/vite',
-        '@deno/eszip',
       ],
     },
     define: {
@@ -786,7 +759,6 @@ export default defineConfig(({ command, mode }) => {
       nextCompat(),
       rawTextLoader(),
       graphiqlViteWorkers(),
-      denoEszipBrowserShims(),
       ssrStubGraphiql(),
       ssrLodashEs(),
       umdAmdShortCircuit(),
