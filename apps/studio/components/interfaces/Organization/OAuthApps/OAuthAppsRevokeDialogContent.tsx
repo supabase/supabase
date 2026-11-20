@@ -2,14 +2,13 @@ import { useParams } from 'common'
 import { ComponentProps } from 'react'
 import { toast } from 'sonner'
 import {
+  AlertDialogCancel,
+  AlertDialogContent,
+  AlertDialogDescription,
+  AlertDialogFooter,
+  AlertDialogHeader,
+  AlertDialogTitle,
   Button,
-  DialogClose,
-  DialogContent,
-  DialogFooter,
-  DialogHeader,
-  DialogSection,
-  DialogSectionSeparator,
-  DialogTitle,
 } from 'ui'
 
 import type { OAuthAppDatabaseAccess } from './OAuthAppsAuthorizedPreview'
@@ -17,7 +16,8 @@ import { AlertError } from '@/components/ui/AlertError'
 import { OAuthApproval } from '@/data/oauth-apps/oauth-apps-approvals-query'
 import { useOAuthAppRevokeMutation } from '@/data/oauth-apps/oauth-apps-revoke-mutation'
 
-export interface OAuthAppsRevokeDialogProps extends ComponentProps<typeof DialogContent> {
+export interface OAuthAppsRevokeDialogProps extends ComponentProps<typeof AlertDialogContent> {
+  projects?: { name: string; ref: string }[]
   approval?: OAuthApproval
   databaseAccess?: OAuthAppDatabaseAccess
   isPreview?: boolean
@@ -26,6 +26,7 @@ export interface OAuthAppsRevokeDialogProps extends ComponentProps<typeof Dialog
 
 export const OAuthAppsRevokeDialogContent = ({
   approval,
+  projects,
   databaseAccess,
   isPreview = false,
   onClose,
@@ -51,58 +52,37 @@ export const OAuthAppsRevokeDialogContent = ({
   })
 
   if (!approval) return null
-  const hasOrgGrant = Boolean(approval.attributes.org_grant)
+  const coverage =
+    isPreview && projects
+      ? `${projects.length} ${projects.length === 1 ? 'project' : 'projects'} in this organization`
+      : 'the entire organization'
+
+  const databaseLocation =
+    projects?.length === 1 ? 'this project’s database' : 'each project’s database'
 
   return (
-    <DialogContent size="medium" {...props}>
-      <DialogHeader>
-        <DialogTitle>Revoke access for {approval.attributes.app.name}</DialogTitle>
-      </DialogHeader>
-      <DialogSectionSeparator />
-
-      {isError && (
-        <AlertError
-          subject={`An error occurred while revoking this ${approval.attributes.app.name} grant`}
-          className="mb-0 rounded-none border-x-0 border-t-0"
-          error={error}
-        />
-      )}
-
-      <DialogSection className="flex flex-col gap-y-2 text-sm text-foreground-light">
-        <p>
-          Revoking access removes app for the{' '}
-          <span className="font-medium text-foreground">entire organization</span>:
-        </p>
-
-        <ul className="flex flex-col gap-y-1 list-disc pl-6">
-          {hasOrgGrant && <li>The organization-wide grant is removed</li>}
-          <li>All members lose access on the app's next request</li>
-          <li>Members must authorize the app again to reconnect</li>
-        </ul>
-      </DialogSection>
-
+    <AlertDialogContent size="small" {...props}>
+      <AlertDialogHeader>
+        <AlertDialogTitle>Revoke access</AlertDialogTitle>
+        <AlertDialogDescription>
+          Revoking access for “{approval.attributes.app.name}” will remove it from {coverage}. The
+          app will stop working on its next request.
+        </AlertDialogDescription>
+      </AlertDialogHeader>
       {databaseAccess && (
-        <>
-          <DialogSectionSeparator />
-          <DialogSection className="flex flex-col gap-2 text-sm text-foreground-light">
-            <h3 className="font-medium text-foreground">Direct database access</h3>
-            <p>
-              New connections will be blocked immediately. Supabase will close open connections.
-            </p>
-            <p>
-              The <code className="break-all">{databaseAccess.role}</code> role will stay in the
-              database with login disabled.
-            </p>
-          </DialogSection>
-        </>
+        <p className="px-5 pb-4 text-sm text-foreground-light">
+          Database connections using <code>{databaseAccess.role}</code> will close, and new ones
+          will be blocked. The role will remain in {databaseLocation} with login disabled. Database
+          objects the app created will keep running.
+        </p>
       )}
-
-      <DialogFooter>
-        <DialogClose asChild>
+      {isError && <AlertError subject="Failed to revoke access" error={error} />}
+      <AlertDialogFooter>
+        <AlertDialogCancel asChild>
           <Button variant="default" disabled={isPending} onClick={() => reset()}>
             Cancel
           </Button>
-        </DialogClose>
+        </AlertDialogCancel>
         <Button
           variant="danger"
           loading={isPending}
@@ -113,7 +93,7 @@ export const OAuthAppsRevokeDialogContent = ({
         >
           Revoke
         </Button>
-      </DialogFooter>
-    </DialogContent>
+      </AlertDialogFooter>
+    </AlertDialogContent>
   )
 }

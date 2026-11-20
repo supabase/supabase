@@ -1,9 +1,9 @@
 import { EyeIcon, MoreVerticalIcon, XIcon } from 'lucide-react'
 import { useRef, useState } from 'react'
 import {
+  AlertDialog,
   Button,
   Dialog,
-  DialogTrigger,
   DropdownMenu,
   DropdownMenuContent,
   DropdownMenuItem,
@@ -43,6 +43,7 @@ export const OAuthAppsAuthorizedRow = ({
   const [dialogContent, setDialogContent] = useState<'grants' | 'revoke' | null>(null)
   const menuTriggerRef = useRef<HTMLButtonElement | null>(null)
 
+  const AccessRoot = dialogContent === 'revoke' ? AlertDialog : Dialog
   const openAccess = () => {
     setDialogContent('grants')
     setIsDialogOpen(true)
@@ -103,7 +104,7 @@ export const OAuthAppsAuthorizedRow = ({
         </TableCell>
       )}
       <TableCell className="text-right">
-        <Dialog
+        <AccessRoot
           open={isDialogOpen}
           onOpenChange={(open) => {
             setIsDialogOpen(open)
@@ -126,20 +127,23 @@ export const OAuthAppsAuthorizedRow = ({
               />
             </DropdownMenuTrigger>
             <DropdownMenuContent align="end" side="bottom" className="w-40">
-              <DialogTrigger asChild>
-                <DropdownMenuItem className="gap-x-2" onClick={() => setDialogContent('grants')}>
-                  <EyeIcon size={14} />
-                  View access
-                </DropdownMenuItem>
-              </DialogTrigger>
+              <DropdownMenuItem className="gap-x-2" onSelect={openAccess}>
+                <EyeIcon size={14} />
+                View access
+              </DropdownMenuItem>
+
               {canRevoke && <DropdownMenuSeparator />}
               {canRevoke && (
-                <DialogTrigger asChild>
-                  <DropdownMenuItem className="gap-x-2" onClick={() => setDialogContent('revoke')}>
-                    <XIcon size={14} />
-                    Revoke access
-                  </DropdownMenuItem>
-                </DialogTrigger>
+                <DropdownMenuItem
+                  className="gap-x-2"
+                  onSelect={() => {
+                    setDialogContent('revoke')
+                    setIsDialogOpen(true)
+                  }}
+                >
+                  <XIcon size={14} />
+                  Revoke access
+                </DropdownMenuItem>
               )}
             </DropdownMenuContent>
           </DropdownMenu>
@@ -165,11 +169,12 @@ export const OAuthAppsAuthorizedRow = ({
               approval={approval}
               databaseAccess={databaseAccess}
               isPreview={isPreview}
+              projects={previewProjects}
               onClose={() => setDialogContent(null)}
               onCloseAutoFocus={preventDefault}
             />
           )}
-        </Dialog>
+        </AccessRoot>
       </TableCell>
     </TableRow>
   )

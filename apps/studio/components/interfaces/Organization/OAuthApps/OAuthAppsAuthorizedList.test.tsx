@@ -128,9 +128,7 @@ describe('OAuthAppsAuthorizedList', () => {
     expect(grants).toHaveTextContent('example_partner_user')
     expect(grants).toHaveTextContent('wloepwuugddbnlnsakjc')
     expect(grants).toHaveTextContent('Run SQL on your database')
-    expect(grants).toHaveTextContent(
-      'Read rows that your access rules normally hide'
-    )
+    expect(grants).toHaveTextContent('Read rows that your access rules normally hide')
     await userEvent.click(within(grants).getByRole('button', { name: 'Close' }))
 
     await openRowMenu('Example Deploy')
@@ -144,8 +142,8 @@ describe('OAuthAppsAuthorizedList', () => {
     await openRowMenu('Example Partner')
     await userEvent.click(await screen.findByRole('menuitem', { name: 'Revoke access' }))
 
-    const dialog = await screen.findByRole('dialog')
-    expect(dialog).toHaveTextContent('New connections will be blocked immediately.')
+    const dialog = await screen.findByRole('alertdialog')
+    expect(dialog).toHaveTextContent('Database connections using')
     expect(dialog).toHaveTextContent('example_partner_user')
     expect(within(dialog).getByRole('button', { name: 'Revoke' })).toBeDisabled()
   })
@@ -272,13 +270,13 @@ describe('OAuthAppsAuthorizedList', () => {
     await openRowMenu('Vercel')
     await userEvent.click(await screen.findByText('Revoke access'))
 
-    expect(await screen.findByText('Revoke access for Vercel')).toBeInTheDocument()
+    expect(await screen.findByRole('heading', { name: 'Revoke access' })).toBeInTheDocument()
     expect(screen.queryByText(/organization-wide grant will be revoked/)).not.toBeInTheDocument()
     expect(
-      await screen.findByText("All members lose access on the app's next request")
+      await screen.findByText(/The app will stop working on its next request/)
     ).toBeInTheDocument()
     expect(
-      await screen.findByText('Members must authorize the app again to reconnect')
+      await screen.findByText(/will remove it from the entire organization/)
     ).toBeInTheDocument()
 
     await userEvent.click(screen.getByRole('button', { name: 'Revoke' }))
