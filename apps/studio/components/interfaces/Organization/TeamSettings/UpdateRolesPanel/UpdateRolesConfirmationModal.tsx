@@ -153,7 +153,7 @@ export const UpdateRolesConfirmationModal = ({
             <div>
               <p className="text-sm">
                 Removing {changesToRoles.removed.length} role
-                {changesToRoles.removed.length > 1 ? 's' : ''} for user:
+                {changesToRoles.removed.length > 1 ? <span>s</span> : ''} <span>for user:</span>
               </p>
               <ul className="list-disc pl-6">
                 {changesToRoles.removed.map((x, i) => {
@@ -176,7 +176,7 @@ export const UpdateRolesConfirmationModal = ({
             <div>
               <p className="text-sm">
                 Adding {changesToRoles.added.length} role
-                {changesToRoles.added.length > 1 ? 's' : ''} for user:
+                {changesToRoles.added.length > 1 ? <span>s</span> : ''} <span>for user:</span>
               </p>
               <ul className="list-disc pl-6">
                 {changesToRoles.added.map((x, i) => {
@@ -195,7 +195,7 @@ export const UpdateRolesConfirmationModal = ({
             <div>
               <p className="text-sm">
                 Updating {changesToRoles.updated.length} role
-                {changesToRoles.updated.length > 1 ? 's' : ''} for user:
+                {changesToRoles.updated.length > 1 ? <span>s</span> : ''} <span>for user:</span>
               </p>
               <ul className="list-disc pl-6">
                 {changesToRoles.updated.map((x, i) => {

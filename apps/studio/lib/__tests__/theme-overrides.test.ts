@@ -1,3 +1,4 @@
+// @vitest-environment jsdom
 import { describe, expect, it } from 'vitest'
 
 import {
@@ -24,31 +25,28 @@ const knob = (key: string) => {
 }
 
 describe.each<ThemeOverrideMode>(['dark', 'light'])('%s theme slider mappings', (mode) => {
-  it.each(THEME_OVERRIDE_KNOBS)('maps $label endpoints to its safe range', (setting) => {
-    const range = getThemeOverrideRange(setting, mode)
+  it.each(THEME_OVERRIDE_KNOBS)(
+    'maps $label endpoints to its safe range and clamps outside it',
+    (setting) => {
+      const range = getThemeOverrideRange(setting, mode)
 
-    expect(sliderValueToThemeOverride(setting, mode, 0)).toBe(range.min)
-    expect(sliderValueToThemeOverride(setting, mode, 100)).toBe(range.max)
-    expect(themeOverrideToSliderValue(setting, mode, range.min)).toBe(0)
-    expect(themeOverrideToSliderValue(setting, mode, range.max)).toBe(100)
-  })
+      expect(sliderValueToThemeOverride(setting, mode, 0)).toBe(range.min)
+      expect(sliderValueToThemeOverride(setting, mode, 100)).toBe(range.max)
+      expect(themeOverrideToSliderValue(setting, mode, range.min)).toBe(0)
+      expect(themeOverrideToSliderValue(setting, mode, range.max)).toBe(100)
+
+      expect(themeOverrideToSliderValue(setting, mode, Number.NEGATIVE_INFINITY)).toBe(0)
+      expect(themeOverrideToSliderValue(setting, mode, Number.POSITIVE_INFINITY)).toBe(100)
+      expect(sliderValueToThemeOverride(setting, mode, -1)).toBe(range.min)
+      expect(sliderValueToThemeOverride(setting, mode, 101)).toBe(range.max)
+    }
+  )
 
   it.each(THEME_OVERRIDE_KNOBS)('round trips $label positions', (setting) => {
     for (const sliderValue of [0, 17, 50, 83, 100]) {
       const rawValue = sliderValueToThemeOverride(setting, mode, sliderValue)
       expect(themeOverrideToSliderValue(setting, mode, rawValue)).toBe(sliderValue)
     }
-  })
-
-  it.each(THEME_OVERRIDE_KNOBS)('clamps $label outside the safe range', (setting) => {
-    expect(themeOverrideToSliderValue(setting, mode, Number.NEGATIVE_INFINITY)).toBe(0)
-    expect(themeOverrideToSliderValue(setting, mode, Number.POSITIVE_INFINITY)).toBe(100)
-    expect(sliderValueToThemeOverride(setting, mode, -1)).toBe(
-      getThemeOverrideRange(setting, mode).min
-    )
-    expect(sliderValueToThemeOverride(setting, mode, 101)).toBe(
-      getThemeOverrideRange(setting, mode).max
-    )
   })
 })
 

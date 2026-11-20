@@ -4,7 +4,7 @@ import type { OptInDecision } from './scorer'
 import type { Transcript } from './transcript'
 import { USER_SKIPPED_TOOL_REASON } from '@/components/ui/AIAssistantPanel/Confirm.utils'
 import type { AiOptInLevel } from '@/hooks/misc/useOrgOptedIntoAi'
-import { storedUpdateOptInLevelInputSchema } from '@/lib/ai/tool-filter'
+import { contract as updateOptInLevelContract } from '@/lib/ai/tools/update-opt-in-level'
 
 const TOOL_PART_TYPE = 'tool-update_opt_in_level'
 
@@ -36,7 +36,7 @@ export function applyOptInDecision(
     }
 
     isResolved = true
-    const requestedLevel = storedUpdateOptInLevelInputSchema.safeParse(part.input).data
+    const requestedLevel = updateOptInLevelContract.inputSchema.safeParse(part.input).data
       ?.requiredLevel
     const isApproved = decision !== 'skip'
     if (!isApproved) deniedToolCalls.push({ toolName: 'update_opt_in_level', input: part.input })

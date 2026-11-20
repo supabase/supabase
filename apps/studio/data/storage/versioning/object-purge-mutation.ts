@@ -4,7 +4,7 @@ import { toast } from 'sonner'
 import { storageKeys } from '../keys'
 import { objectVersionsQueryOptions } from './object-versions-query'
 import { del, handleError } from '@/data/fetchers'
-import type { ResponseError } from '@/types'
+import type { StudioError } from '@/lib/errors/studio-errors'
 
 export type ObjectPurgeVariables = {
   projectRef: string
@@ -21,7 +21,7 @@ export const useObjectPurgeMutation = ({
   onSuccess,
   onError,
   ...options
-}: Omit<UseMutationOptions<void, ResponseError, ObjectPurgeVariables>, 'mutationFn'> = {}) => {
+}: Omit<UseMutationOptions<void, StudioError, ObjectPurgeVariables>, 'mutationFn'> = {}) => {
   const queryClient = useQueryClient()
 
   const purgeObject = async ({ projectRef, bucketId, path }: ObjectPurgeVariables) => {
@@ -67,7 +67,7 @@ export const useObjectPurgeMutation = ({
     }
   }
 
-  return useMutation<void, ResponseError, ObjectPurgeVariables>({
+  return useMutation<void, StudioError, ObjectPurgeVariables>({
     mutationFn: purgeObject,
     async onSuccess(data, variables, context, mutationContext) {
       // The object list lives in the explorer's state, not React Query.

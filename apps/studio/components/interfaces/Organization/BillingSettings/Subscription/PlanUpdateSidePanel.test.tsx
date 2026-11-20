@@ -3,10 +3,10 @@ import { beforeEach, describe, expect, it, vi } from 'vitest'
 
 import { PlanUpdateSidePanel } from './PlanUpdateSidePanel'
 import { MANAGED_BY } from '@/lib/constants/infrastructure'
-import { createMockOrganization, render } from '@/tests/helpers'
+import { createMockOrganization } from '@/tests/helpers'
+import { customRender } from '@/tests/lib/custom-render'
 
 const mockSelectedOrganization = vi.hoisted(() => vi.fn())
-const mockPush = vi.hoisted(() => vi.fn())
 const mockPartnerManagedResource = vi.hoisted(() => vi.fn())
 
 vi.mock('common', async (importOriginal) => {
@@ -21,9 +21,11 @@ vi.mock('next/router', () => ({
   useRouter: () => ({
     pathname: '/org/[slug]/billing',
     query: {},
-    push: mockPush,
   }),
 }))
+
+const render = (ui: React.ReactElement) =>
+  customRender(ui, { nuqs: { searchParams: '?panel=subscriptionPlan' } })
 
 vi.mock('shared-data/plans', () => ({
   plans: [
@@ -58,15 +60,9 @@ vi.mock('@/lib/telemetry/track', () => ({
   useTrack: () => vi.fn(),
 }))
 
-vi.mock('@/hooks/misc/useCheckPermissions', () => ({
-  useAsyncCheckPermissions: () => ({ can: true }),
-}))
-
-vi.mock('@/state/organization-settings', () => ({
-  useOrgSettingsPageStateSnapshot: () => ({
-    panelKey: 'subscriptionPlan',
-    setPanelKey: vi.fn(),
-  }),
+vi.mock('@/hooks/misc/useCheckPermissionsV2', async (importOriginal) => ({
+  ...(await importOriginal<typeof import('@/hooks/misc/useCheckPermissionsV2')>()),
+  useAsyncCheckPermissionsV2: () => ({ can: true }),
 }))
 
 vi.mock('@/data/projects/org-projects-infinite-query', () => ({
@@ -83,7 +79,7 @@ vi.mock('@/data/organizations/organization-query', () => ({
 
 vi.mock('@/data/subscriptions/org-subscription-query', () => ({
   useOrgSubscriptionQuery: () => ({
-    data: { plan: { id: 'free', name: 'Free' } },
+    data: { plan: { id: 'free', name: 'Free' }, billing_via_partner: false },
     isSuccess: true,
   }),
 }))
@@ -128,7 +124,7 @@ vi.mock('./UpgradeModal', () => ({
 }))
 
 vi.mock('./MembersExceedLimitModal', () => ({
-  default: () => null,
+  MembersExceedLimitModal: () => null,
 }))
 
 vi.mock('./SubscriptionPlanUpdateDialog', () => ({
@@ -211,7 +207,7 @@ describe('PlanUpdateSidePanel', () => {
     it('renders the full-screen shell', () => {
       render(<PlanUpdateSidePanel />)
 
-      expect(screen.getByRole('button', { name: /Go back to Studio/ })).toBeInTheDocument()
+      expect(screen.getByRole('button', { name: /Back/ })).toBeInTheDocument()
       expect(screen.getByRole('link', { name: /Compare plans/ })).toBeInTheDocument()
     })
 
@@ -222,6 +218,32 @@ describe('PlanUpdateSidePanel', () => {
         screen.getByText('Perfect for passion projects & simple websites.')
       ).toBeInTheDocument()
       expect(screen.getByText('Everything in the Free Plan, plus:')).toBeInTheDocument()
+    })
+
+    it('offers AWS Marketplace as a separate purchasing route', () => {
+      render(<PlanUpdateSidePanel />)
+
+      expect(screen.getByText('Prefer purchasing through AWS Marketplace?')).toBeInTheDocument()
+      expect(screen.getByRole('link', { name: 'View options' })).toHaveAttribute(
+        'href',
+        'https://supabase.com/aws-marketplace'
+      )
+    })
+
+    it('does not offer AWS Marketplace for partner-billed organizations', () => {
+      mockSelectedOrganization.mockReturnValue(
+        createMockOrganization({
+          slug: 'aws-org',
+          billing_partner: 'aws_marketplace',
+          managed_by: MANAGED_BY.AWS_MARKETPLACE,
+        })
+      )
+
+      render(<PlanUpdateSidePanel />)
+
+      expect(
+        screen.queryByText('Prefer purchasing through AWS Marketplace?')
+      ).not.toBeInTheDocument()
     })
 
     it('does not render gap rows', () => {

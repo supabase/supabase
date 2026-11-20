@@ -1,4 +1,4 @@
-import * as Sentry from '@sentry/nextjs'
+import * as Sentry from '@sentry/react'
 import type { PGColumn } from '@supabase/pg-meta'
 import { useConstant } from 'common'
 import { createContext, PropsWithChildren, useContext } from 'react'
@@ -33,9 +33,10 @@ type ForeignKeyState = {
 
 export type SidePanel =
   | { type: 'cell'; value?: { column: string; row: Dictionary<any> } }
-  | { type: 'row'; row?: Dictionary<any> }
+  | { type: 'row'; row?: Dictionary<any>; duplicateFrom?: Dictionary<any> }
   | { type: 'column'; column?: SafePostgresColumn }
-  | { type: 'table'; mode: 'new' | 'edit' | 'duplicate'; templateData?: Partial<TableField> }
+  | { type: 'table'; mode: 'new'; templateData?: Partial<TableField> }
+  | { type: 'table'; mode: 'edit' | 'duplicate'; tableId: number }
   | { type: 'schema'; mode: 'new' | 'edit' }
   | { type: 'json'; jsonValue: EditValue }
   | {
@@ -46,9 +47,9 @@ export type SidePanel =
   | { type: 'operation-queue' }
 
 export type ConfirmationDialog =
-  | { type: 'table'; isDeleteWithCascade: boolean }
-  | { type: 'view'; isDeleteWithCascade: boolean }
-  | { type: 'materialized-view'; isDeleteWithCascade: boolean }
+  | { type: 'table'; tableId: number; isDeleteWithCascade: boolean }
+  | { type: 'view'; tableId: number; isDeleteWithCascade: boolean }
+  | { type: 'materialized-view'; tableId: number; isDeleteWithCascade: boolean }
   | { type: 'column'; column: SafePostgresColumn; isDeleteWithCascade: boolean }
   // [Joshen] Just FYI callback, numRows, allRowsSelected is a temp workaround so that
   // DeleteConfirmationDialog can trigger dispatch methods after the successful deletion of rows.
@@ -119,34 +120,34 @@ export const createTableEditorState = () => {
         sidePanel: { type: 'table', mode: 'new', templateData },
       }
     },
-    onEditTable: () => {
+    onEditTable: (tableId: number) => {
       state.ui = {
         open: 'side-panel',
-        sidePanel: { type: 'table', mode: 'edit' },
+        sidePanel: { type: 'table', mode: 'edit', tableId },
       }
     },
-    onDuplicateTable: () => {
+    onDuplicateTable: (tableId: number) => {
       state.ui = {
         open: 'side-panel',
-        sidePanel: { type: 'table', mode: 'duplicate' },
+        sidePanel: { type: 'table', mode: 'duplicate', tableId },
       }
     },
-    onDeleteTable: () => {
+    onDeleteTable: (tableId: number) => {
       state.ui = {
         open: 'confirmation-dialog',
-        confirmationDialog: { type: 'table', isDeleteWithCascade: false },
+        confirmationDialog: { type: 'table', tableId, isDeleteWithCascade: false },
       }
     },
-    onDeleteView: () => {
+    onDeleteView: (tableId: number) => {
       state.ui = {
         open: 'confirmation-dialog',
-        confirmationDialog: { type: 'view', isDeleteWithCascade: false },
+        confirmationDialog: { type: 'view', tableId, isDeleteWithCascade: false },
       }
     },
-    onDeleteMaterializedView: () => {
+    onDeleteMaterializedView: (tableId: number) => {
       state.ui = {
         open: 'confirmation-dialog',
-        confirmationDialog: { type: 'materialized-view', isDeleteWithCascade: false },
+        confirmationDialog: { type: 'materialized-view', tableId, isDeleteWithCascade: false },
       }
     },
 
@@ -181,6 +182,12 @@ export const createTableEditorState = () => {
       state.ui = {
         open: 'side-panel',
         sidePanel: { type: 'row', row },
+      }
+    },
+    onDuplicateRow: (row: Dictionary<any>) => {
+      state.ui = {
+        open: 'side-panel',
+        sidePanel: { type: 'row', duplicateFrom: row },
       }
     },
     onDeleteRows: (

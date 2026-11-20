@@ -3,7 +3,8 @@ import { toast } from 'sonner'
 
 import { handleError, post } from '@/data/fetchers'
 import { captureCriticalError } from '@/lib/error-reporting'
-import type { ResponseError, UseCustomMutationOptions } from '@/types'
+import type { StudioError } from '@/lib/errors/studio-errors'
+import type { UseCustomMutationOptions } from '@/types'
 
 export type SignUpVariables = {
   email: string
@@ -28,11 +29,8 @@ export const useSignUpMutation = ({
   onSuccess,
   onError,
   ...options
-}: Omit<
-  UseCustomMutationOptions<SignUpData, ResponseError, SignUpVariables>,
-  'mutationFn'
-> = {}) => {
-  return useMutation<SignUpData, ResponseError, SignUpVariables>({
+}: Omit<UseCustomMutationOptions<SignUpData, StudioError, SignUpVariables>, 'mutationFn'> = {}) => {
+  return useMutation<SignUpData, StudioError, SignUpVariables>({
     mutationFn: (vars) => signup(vars),
     async onSuccess(data, variables, context) {
       await onSuccess?.(data, variables, context)

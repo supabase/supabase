@@ -10,7 +10,7 @@ import { ReportBlockContainer } from './ReportBlockContainer'
 import { ChartConfig } from '@/components/interfaces/SQLEditor/UtilityPanel/ChartConfig'
 import { ButtonTooltip } from '@/components/ui/ButtonTooltip'
 import { timestampFormatter } from '@/components/ui/Charts/Charts.utils'
-import NoDataPlaceholder from '@/components/ui/Charts/NoDataPlaceholder'
+import { NoDataPlaceholder } from '@/components/ui/Charts/NoDataPlaceholder'
 import { PortalChartTooltip } from '@/components/ui/Charts/PortalChartTooltip'
 import {
   checkHasNonPositiveValues,

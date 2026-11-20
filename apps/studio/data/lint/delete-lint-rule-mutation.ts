@@ -3,7 +3,8 @@ import { toast } from 'sonner'
 
 import { lintKeys } from './keys'
 import { del, handleError } from '@/data/fetchers'
-import type { ResponseError, UseCustomMutationOptions } from '@/types'
+import type { StudioError } from '@/lib/errors/studio-errors'
+import type { UseCustomMutationOptions } from '@/types'
 
 export type LintRuleDeleteVariables = {
   projectRef: string
@@ -26,11 +27,11 @@ export const useLintRuleDeleteMutation = ({
   onError,
   ...options
 }: Omit<
-  UseCustomMutationOptions<LintRuleDeleteData, ResponseError, LintRuleDeleteVariables>,
+  UseCustomMutationOptions<LintRuleDeleteData, StudioError, LintRuleDeleteVariables>,
   'mutationFn'
 > = {}) => {
   const queryClient = useQueryClient()
-  return useMutation<LintRuleDeleteData, ResponseError, LintRuleDeleteVariables>({
+  return useMutation<LintRuleDeleteData, StudioError, LintRuleDeleteVariables>({
     mutationFn: (vars) => deleteLintRule(vars),
     async onSuccess(data, variables, context) {
       const { projectRef } = variables

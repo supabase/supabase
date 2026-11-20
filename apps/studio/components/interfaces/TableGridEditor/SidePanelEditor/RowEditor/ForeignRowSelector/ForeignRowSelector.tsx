@@ -164,7 +164,7 @@ export const ForeignRowSelector = ({
         <div className="flex items-center justify-between">
           <p>
             Select a record to reference from{' '}
-            <code className="text-code-inline text-sm!">
+            <code className="text-sm!">
               {schemaName}.{tableName}
             </code>
           </p>

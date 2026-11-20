@@ -1,3 +1,4 @@
+// @vitest-environment jsdom
 import { act, renderHook } from '@testing-library/react'
 import mockRouter from 'next-router-mock'
 import { useRouter } from 'next/router'
@@ -9,25 +10,7 @@ import { useTableEditorFiltersSort } from '../useTableEditorFiltersSort'
 vi.mock('next/router', () => import('next-router-mock'))
 
 describe('useTableEditorFilters', () => {
-  it('should support old syntax', async () => {
-    const url =
-      '/test?filter=id:eq:123&filter=created_at:eq:2021-01-01&filter=id:eq:456&sort=id:asc'
-
-    const expected = ['id:eq:123', 'created_at:eq:2021-01-01', 'id:eq:456']
-
-    const router = renderHook(() => useRouter()).result.current
-    router.push(url)
-
-    const { result } = renderHook(() => useTableEditorFiltersSort(), {
-      wrapper: withNuqsTestingAdapter(),
-    })
-
-    expect(result.current.filters).toEqual(expected)
-
-    expect(result.current.sorts).toEqual(['id:asc'])
-  })
-
-  it('should support new syntax', async () => {
+  it('reads repeated filter and sort params from the URL', async () => {
     const router = renderHook(() => useRouter()).result.current
     router.push(
       '/test?filter=id:eq:123&filter=created_at:eq:2021-01-01&filter=id:eq:456&sort=id:asc'
@@ -41,7 +24,7 @@ describe('useTableEditorFilters', () => {
     expect(result.current.sorts).toEqual(['id:asc'])
   })
 
-  it('should return empty array if no filters are present', async () => {
+  it('returns empty arrays when filters or sorts are absent', async () => {
     const router = renderHook(() => useRouter()).result.current
     router.push('/test')
 
@@ -50,16 +33,6 @@ describe('useTableEditorFilters', () => {
     })
 
     expect(result.current.filters).toEqual([])
-  })
-
-  it('should return empty array if no sorts are present', async () => {
-    const router = renderHook(() => useRouter()).result.current
-    router.push('/test?filter=id:eq:123&filter=created_at:eq:2021-01-01&filter=id:eq:456')
-
-    const { result } = renderHook(() => useTableEditorFiltersSort(), {
-      wrapper: withNuqsTestingAdapter(),
-    })
-
     expect(result.current.sorts).toEqual([])
   })
 

@@ -11,68 +11,46 @@ const steps = [
 ]
 
 describe('SteppedFlow', () => {
-  test('does not show Back on the first step', () => {
-    customRender(
-      <SteppedFlow steps={steps} currentStep="destination" onStepChange={vi.fn()}>
-        Step body
-      </SteppedFlow>
-    )
-
-    expect(screen.queryByRole('button', { name: 'Back' })).not.toBeInTheDocument()
-  })
-
-  test('shows Cancel on the first step when onCancel is provided', () => {
+  test('offers Cancel instead of Back on the first step, and advances when onNext is omitted', () => {
     const onCancel = vi.fn()
+    const onStepChange = vi.fn()
 
     customRender(
       <SteppedFlow
         steps={steps}
         currentStep="destination"
-        onStepChange={vi.fn()}
+        onStepChange={onStepChange}
         onCancel={onCancel}
       >
         Step body
       </SteppedFlow>
     )
 
+    expect(screen.queryByRole('button', { name: 'Back' })).not.toBeInTheDocument()
     fireEvent.click(screen.getByRole('button', { name: 'Cancel' }))
     expect(onCancel).toHaveBeenCalledOnce()
+
+    fireEvent.click(screen.getByRole('button', { name: 'Next' }))
+    expect(onStepChange).toHaveBeenCalledWith('connection')
   })
 
-  test('does not show Cancel after the first step', () => {
+  test('offers Back instead of Cancel after the first step', () => {
+    const onStepChange = vi.fn()
+
     customRender(
-      <SteppedFlow steps={steps} currentStep="connection" onStepChange={vi.fn()} onCancel={vi.fn()}>
+      <SteppedFlow
+        steps={steps}
+        currentStep="connection"
+        onStepChange={onStepChange}
+        onCancel={vi.fn()}
+      >
         Step body
       </SteppedFlow>
     )
 
     expect(screen.queryByRole('button', { name: 'Cancel' })).not.toBeInTheDocument()
-  })
-
-  test('shows Back after the first step', () => {
-    const onStepChange = vi.fn()
-
-    customRender(
-      <SteppedFlow steps={steps} currentStep="connection" onStepChange={onStepChange}>
-        Step body
-      </SteppedFlow>
-    )
-
     fireEvent.click(screen.getByRole('button', { name: 'Back' }))
     expect(onStepChange).toHaveBeenCalledWith('destination')
-  })
-
-  test('advances to the next step when onNext is omitted', () => {
-    const onStepChange = vi.fn()
-
-    customRender(
-      <SteppedFlow steps={steps} currentStep="destination" onStepChange={onStepChange}>
-        Step body
-      </SteppedFlow>
-    )
-
-    fireEvent.click(screen.getByRole('button', { name: 'Next' }))
-    expect(onStepChange).toHaveBeenCalledWith('connection')
   })
 
   test('shows the final action on the last step instead of Next', () => {
@@ -95,23 +73,12 @@ describe('SteppedFlow', () => {
     expect(onFinal).toHaveBeenCalledOnce()
   })
 
-  test('renders a step header heading', () => {
+  test('renders a step header with its heading, description and optional actions', () => {
     customRender(
       <SteppedFlow steps={steps} currentStep="destination" onStepChange={vi.fn()}>
-        <SteppedFlowHeader title="Choose a destination" description="Where should data go?" />
-      </SteppedFlow>
-    )
-
-    expect(screen.getByRole('heading', { name: 'Choose a destination' })).toBeInTheDocument()
-    expect(screen.getByText('Where should data go?')).toBeInTheDocument()
-  })
-
-  test('renders optional header actions', () => {
-    customRender(
-      <SteppedFlow steps={steps} currentStep="connection" onStepChange={vi.fn()}>
         <SteppedFlowHeader
-          title="Authorize the destination"
-          description="Name this pipeline."
+          title="Choose a destination"
+          description="Where should data go?"
           actions={
             <button type="button" tabIndex={0}>
               Docs
@@ -121,23 +88,26 @@ describe('SteppedFlow', () => {
       </SteppedFlow>
     )
 
+    expect(screen.getByRole('heading', { name: 'Choose a destination' })).toBeInTheDocument()
+    expect(screen.getByText('Where should data go?')).toBeInTheDocument()
     expect(screen.getByRole('button', { name: 'Docs' })).toBeInTheDocument()
   })
 
-  test('disables Back while navigation is locked', () => {
+  test('disables Back and the final action while navigation is locked', () => {
     customRender(
       <SteppedFlow
         steps={steps}
         currentStep="review"
         onStepChange={vi.fn()}
         navigationDisabled
-        finalAction={{ label: 'Create and start pipeline', loading: true }}
+        finalAction={{ label: 'Create and start pipeline' }}
       >
         Step body
       </SteppedFlow>
     )
 
     expect(screen.getByRole('button', { name: 'Back' })).toBeDisabled()
+    expect(screen.getByRole('button', { name: 'Create and start pipeline' })).toBeDisabled()
   })
 
   test('disables Next while navigation is locked', () => {
@@ -153,21 +123,5 @@ describe('SteppedFlow', () => {
     )
 
     expect(screen.getByRole('button', { name: 'Next' })).toBeDisabled()
-  })
-
-  test('disables the final action while navigation is locked', () => {
-    customRender(
-      <SteppedFlow
-        steps={steps}
-        currentStep="review"
-        onStepChange={vi.fn()}
-        navigationDisabled
-        finalAction={{ label: 'Create and start pipeline' }}
-      >
-        Step body
-      </SteppedFlow>
-    )
-
-    expect(screen.getByRole('button', { name: 'Create and start pipeline' })).toBeDisabled()
   })
 })

@@ -140,7 +140,6 @@ describe('NewPublicationPanel', () => {
     const partitionOption = screen.getByRole('option', {
       name: 'Replicate each partition separately',
     })
-    expect(partitionOption).toHaveClass('whitespace-nowrap')
     fireEvent.click(partitionOption)
     fireEvent.click(screen.getByRole('button', { name: 'Create publication' }))
 

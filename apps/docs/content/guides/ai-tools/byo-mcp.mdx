@@ -16,8 +16,8 @@ This is the MCP server your app exposes to its users. The [Supabase MCP server](
 
 ## Prerequisites
 
-- [Docker](https://docs.docker.com/get-docker/) or a compatible runtime, running (for local development)
-- [Deno](https://deno.land/)
+- [Docker](https://docs.docker.com/get-started/get-docker/) or a compatible runtime, running (for local development)
+- [Deno](https://deno.com/)
 - [Supabase CLI](/docs/guides/local-development) 2.117.0 or later, installed and authenticated
 - [Node.js 20 or later](https://nodejs.org/) (required by the Supabase CLI)
 
@@ -113,7 +113,7 @@ Your MCP server is at `https://<your-project-ref>.supabase.co/functions/v1/mcp`.
 
 ## Add authentication
 
-Most servers act on user data, and then the question is who the caller is. With Supabase Auth as the OAuth 2.1 authorization server, users sign in with their existing accounts, approve the MCP client once, and every tool call runs as that user. Your RLS policies decide what each client can see, with no per-tool authorization code.
+Most servers act on user data, and then the question is who the caller is. With [Supabase Auth](/docs/guides/auth) as the OAuth 2.1 authorization server, users sign in with their existing accounts, approve the MCP client once, and every tool call runs as that user. Your RLS policies decide what each client can see, with no per-tool authorization code.
 
 ### How it works
 
@@ -126,7 +126,7 @@ pipeline([...], handler)
   handler                         MCP transport and your tools
 ```
 
-`withOAuthProtectedResource()` runs before the auth gate. It serves the OAuth Protected Resource Metadata document so clients can find your authorization server, and it adds the `WWW-Authenticate` challenge to unauthenticated responses. `withSupabase({ auth: 'user' })` rejects requests without a valid user token and gives your handler a Supabase client scoped to that user. Anything the tools read or write goes through RLS.
+`withOAuthProtectedResource()` runs before the auth gate. It serves the OAuth Protected Resource Metadata document so clients can find your authorization server, and it adds the `WWW-Authenticate` challenge to unauthenticated responses. `withSupabase({ auth: 'user' })` rejects requests without a valid user token and gives your handler a [Supabase client](/docs/reference/javascript/introduction) scoped to that user. Anything the tools read or write goes through RLS.
 
 Two things must be in place beyond the prerequisites above:
 
@@ -186,7 +186,7 @@ The function imports a `Database` type so the Supabase client inside the tools k
 
 ```bash
 supabase start
-supabase gen types typescript --local > supabase/functions/mcp/database.types.ts
+supabase gen types typescript > supabase/functions/mcp/database.types.ts
 ```
 
 Replace the contents of `supabase/functions/mcp/index.ts`. Compared with the public server, the handler moves inside a `pipeline` so it receives the caller's Supabase client, and the tools query a table instead of adding numbers:
@@ -295,7 +295,7 @@ curl -s 'http://127.0.0.1:54321/functions/v1/mcp/oauth-protected-resource'
 }
 ```
 
-Both URLs use the public origin of your local stack, taken from the headers the gateway forwards, not the Docker-internal `http://kong:8000` that `SUPABASE_URL` holds inside the function. Supabase CLI 2.117.0 and later also injects the function slug, so the `resource` path stays canonical whatever sub-path a request arrives on.
+Both URLs use the public origin of your local stack, taken from the headers the gateway forwards, not the Docker-internal `http://kong:8000` that `SUPABASE_URL` holds inside the function. [Supabase CLI](/docs/guides/local-development/cli/getting-started) 2.117.0 and later also injects the function slug, so the `resource` path stays canonical whatever sub-path a request arrives on.
 
 #### Test with MCP Inspector
 
@@ -309,7 +309,7 @@ In the Inspector, choose the Streamable HTTP transport, enter `http://127.0.0.1:
 
 #### Test with Claude Code
 
-Add the server to [Claude Code](https://docs.anthropic.com/en/docs/claude-code/mcp):
+Add the server to [Claude Code](https://code.claude.com/docs/en/mcp):
 
 ```bash
 claude mcp add --transport http todos http://127.0.0.1:54321/functions/v1/mcp

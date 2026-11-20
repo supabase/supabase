@@ -109,7 +109,11 @@ export function buildPropertyItems(params: {
   items.push(
     ...availableProperties
       .filter((prop) => prop.label.toLowerCase().includes(inputValue.toLowerCase()))
-      .map((prop) => ({ value: prop.name, label: prop.label }))
+      .map((prop) => ({
+        value: prop.name,
+        label: prop.label,
+        propertyGroupLabel: prop.propertyGroupLabel,
+      }))
   )
 
   if (supportsOperators) {
@@ -150,7 +154,11 @@ export function buildPropertyChangeItems(params: {
     .filter((property) => !(isNested && property.topLevelOnly))
     .filter((prop) => prop.name !== currentPropertyName)
     .filter((prop) => prop.label.toLowerCase().includes(inputValue.toLowerCase()))
-    .map((prop) => ({ value: prop.name, label: prop.label }))
+    .map((prop) => ({
+      value: prop.name,
+      label: prop.label,
+      propertyGroupLabel: prop.propertyGroupLabel,
+    }))
 }
 
 export function buildValueItems(

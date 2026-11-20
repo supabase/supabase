@@ -11,7 +11,7 @@ import { createContext, ReactNode, useContext, useMemo } from 'react'
 
 import { DataTableFilterField } from '../DataTable.types'
 import { RowSelectionModifiers } from '../rowSelection.utils'
-import { ResponseError } from '@/types'
+import type { StudioError } from '@/lib/errors/studio-errors'
 
 // REMINDER: read about how to move controlled state out of the useReactTable hook
 // https://github.com/TanStack/table/discussions/4005#discussioncomment-7303569
@@ -33,7 +33,7 @@ interface DataTableStateContextType<TSearchParams = unknown> {
 
 interface DataTableBaseContextType<TData = unknown, TValue = unknown> {
   table: Table<TData>
-  error: ResponseError | null
+  error: StudioError | null
   filterFields: DataTableFilterField<TData>[]
   columns: ColumnDef<TData, TValue>[]
   isFetching: boolean

@@ -2,9 +2,10 @@
 title: 'Migrate from Neon to Supabase'
 description: 'Migrate your existing Neon database to Supabase.'
 topics: ['Migration', 'Database']
+lastEdited: 2026-09-24
 ---
 
-This guide demonstrates how to migrate your Neon database to Supabase to get the most out of Postgres while gaining access to all the features you need to build a project.
+Supabase is one of the best [free alternatives to Neon](/solutions/switch-from-neon). This guide demonstrates how to migrate your Neon database to Supabase to get the most out of Postgres while gaining access to all the features you need to build a project.
 
 ## Retrieve your Neon database credentials
 
@@ -39,12 +40,12 @@ export OLD_DB_URL="postgresql://neondb_owner:xxxxxxxxxxxxxxx-random-word-yyyyyyy
 
 ## Set your `NEW_DB_URL` environment variable
 
-Set the **NEW_DB_URL** environment variable at the command line using your Supabase connection string. You will need to replace `[YOUR-PASSWORD]` with your actual database password.
+Set the **NEW_DB_URL** environment variable at the command line using your Supabase connection string. You will need to replace `[YOUR-DATABASE-PASSWORD]` with your actual database password.
 
 Example:
 
 ```bash
-export NEW_DB_URL="postgresql://postgres.xxxxxxxxxxxxxxxxxxxx:[YOUR-PASSWORD]@aws-0-us-west-1.pooler.supabase.com:5432/postgres"
+export NEW_DB_URL="postgresql://postgres.xxxxxxxxxxxxxxxxxxxx:[YOUR-DATABASE-PASSWORD]@aws-0-us-west-1.pooler.supabase.com:5432/postgres"
 ```
 
 ## Migrate the database

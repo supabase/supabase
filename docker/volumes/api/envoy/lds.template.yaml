@@ -319,6 +319,50 @@ resources:
                                     principals:
                                       - any: true
 
+                      # OAuth 2.1 server endpoints that third-party clients call
+                      # without an API key. The consent endpoints
+                      # (/oauth/authorizations/...) stay on the protected route.
+                      # The Lua filters are off so the request reaches Auth as
+                      # sent: a client's `Authorization: Basic` credentials must
+                      # not be replaced with the apikey.
+                      - name: auth-v1-open-oauth
+                        match:
+                          safe_regex:
+                            regex: /auth/v1/oauth/(authorize|clients/register|token|userinfo)
+                        route:
+                          cluster: auth
+                          regex_rewrite:
+                            pattern:
+                              regex: ^/auth/v1/
+                            substitution: /
+                          timeout: 30s
+                        request_headers_to_add:
+                          - header:
+                              key: X-Forwarded-Prefix
+                              value: /auth/v1/
+                            append_action: ADD_IF_ABSENT
+                        typed_per_filter_config:
+                          envoy.filters.http.basic_auth:
+                            '@type': >-
+                              type.googleapis.com/envoy.config.route.v3.FilterConfig
+                            disabled: true
+                          envoy.filters.http.lua:
+                            '@type': >-
+                              type.googleapis.com/envoy.extensions.filters.http.lua.v3.LuaPerRoute
+                            disabled: true
+                          envoy.filters.http.rbac:
+                            '@type': >-
+                              type.googleapis.com/envoy.extensions.filters.http.rbac.v3.RBACPerRoute
+                            rbac:
+                              rules:
+                                action: ALLOW
+                                policies:
+                                  allow_all:
+                                    permissions:
+                                      - any: true
+                                    principals:
+                                      - any: true
+
                       - name: functions-v1-all
                         match:
                           prefix: /functions/v1/
@@ -335,6 +379,12 @@ resources:
                               value: /functions/v1/
                             append_action: ADD_IF_ABSENT
                         typed_per_filter_config:
+                          # Functions handle CORS themselves, as on the platform:
+                          # preflights reach the function, responses pass unchanged.
+                          envoy.filters.http.cors:
+                            '@type': >-
+                              type.googleapis.com/envoy.config.route.v3.FilterConfig
+                            disabled: true
                           envoy.filters.http.basic_auth:
                             '@type': >-
                               type.googleapis.com/envoy.config.route.v3.FilterConfig
@@ -610,6 +660,10 @@ resources:
                               value: /api/mcp
                             append_action: ADD_IF_ABSENT
                         typed_per_filter_config:
+                          envoy.filters.http.cors:
+                            '@type': >-
+                              type.googleapis.com/envoy.config.route.v3.FilterConfig
+                            disabled: true
                           envoy.filters.http.basic_auth:
                             '@type': >-
                               type.googleapis.com/envoy.config.route.v3.FilterConfig
@@ -639,6 +693,10 @@ resources:
                               value: /mcp
                             append_action: ADD_IF_ABSENT
                         typed_per_filter_config:
+                          envoy.filters.http.cors:
+                            '@type': >-
+                              type.googleapis.com/envoy.config.route.v3.FilterConfig
+                            disabled: true
                           envoy.filters.http.basic_auth:
                             '@type': >-
                               type.googleapis.com/envoy.config.route.v3.FilterConfig
@@ -688,6 +746,13 @@ resources:
                               value: /
                             append_action: ADD_IF_ABSENT
                         typed_per_filter_config:
+                          # Studio's routes (here and on /mcp, /api/mcp) are called only by
+                          # Studio's own pages (same origin) and by MCP clients (not browsers),
+                          # so they don't answer CORS.
+                          envoy.filters.http.cors:
+                            '@type': >-
+                              type.googleapis.com/envoy.config.route.v3.FilterConfig
+                            disabled: true
                           envoy.filters.http.rbac:
                             '@type': >-
                               type.googleapis.com/envoy.extensions.filters.http.rbac.v3.RBACPerRoute
@@ -1147,9 +1212,15 @@ resources:
                         return string.match(auth, "^[Bb]earer%s+(.+)$")
                       end
 
+                      -- Gateway CORS is off on this route, so this error carries
+                      -- its own CORS header and stays readable by browsers.
                       local function unauthorized(request_handle, message)
                         request_handle:respond(
-                          { [":status"] = "401", ["content-type"] = "text/plain" },
+                          {
+                            [":status"] = "401",
+                            ["content-type"] = "text/plain",
+                            ["access-control-allow-origin"] = "*",
+                          },
                           message
                         )
                       end
@@ -1203,6 +1274,43 @@ resources:
                         else
                           unauthorized(request_handle, "Invalid API key")
                         end
+                      end
+
+                # Sandboxes responses on Storage, REST and Functions, since Studio
+                # shares this origin: a document opened from these routes can't run script
+                # or submit forms. Subresources (<img>, fetch, downloads) ignore the policy.
+                # media-src 'self' lets the browser's player load audio and video opened
+                # directly, and style-src 'unsafe-inline' keeps inline styles in SVG files.
+                - name: envoy.filters.http.lua
+                  typed_config:
+                    '@type': >-
+                      type.googleapis.com/envoy.extensions.filters.http.lua.v3.Lua
+                    inline_code: |
+                      local NAMESPACE = "supabase.sandbox"
+
+                      local function in_scope(path)
+                        return path:sub(1, 12) == "/storage/v1/"
+                          or path:sub(1, 9) == "/rest/v1/"
+                          or path:sub(1, 14) == "/functions/v1/"
+                      end
+
+                      function envoy_on_request(request_handle)
+                        local headers = request_handle:headers()
+                        local path = (headers:get(":path") or ""):match("^[^?#]*")
+                        if in_scope(path) then
+                          request_handle:streamInfo():dynamicMetadata():set(NAMESPACE, "in_scope", true)
+                        end
+                      end
+
+                      function envoy_on_response(response_handle)
+                        if response_handle:streamInfo():dynamicMetadata():get(NAMESPACE) == nil then
+                          return
+                        end
+
+                        response_handle:headers():replace(
+                          "content-security-policy",
+                          "default-src 'none'; media-src 'self'; style-src 'unsafe-inline'; sandbox"
+                        )
                       end
 
                 - name: envoy.filters.http.rbac

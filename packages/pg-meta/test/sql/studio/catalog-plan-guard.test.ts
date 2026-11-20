@@ -6,19 +6,28 @@ import {
   getEntityTypesSQL,
   getForeignKeyConstraintsSql,
   getIndexesSQL,
+  getSearchEntitiesSql,
   getTableColumnsSql,
   getTableConstraintsSql,
   getTableDefinitionSql,
   getTableEditorSql,
+  getTableReferencingFunctionsSql,
+  getTableRelatedResourcesSql,
   getTablesPaginatedSql,
   getViewDefinitionSql,
+  TABLE_RELATED_FUNCTION_CANDIDATE_LIMIT,
 } from '../../../src'
 import columnPrivileges from '../../../src/pg-meta-column-privileges'
 import tablePrivileges from '../../../src/pg-meta-table-privileges'
 import * as tables from '../../../src/pg-meta-tables'
 import * as types from '../../../src/pg-meta-types'
 import { assertPlanWithinBudget, explainAnalyze } from '../../db/plan-guard'
-import { buildStressCatalog, STRESS_TABLE_COUNT } from '../../db/stress-catalog'
+import {
+  buildStressCatalog,
+  buildStressFunctions,
+  buildStressTriggers,
+  STRESS_TABLE_COUNT,
+} from '../../db/stress-catalog'
 import { cleanupRoot, createTestDatabase } from '../../db/utils'
 
 /**
@@ -31,17 +40,8 @@ import { cleanupRoot, createTestDatabase } from '../../db/utils'
  * unavoidable scans carrying a written justification (see test/db/plan-guard.ts
  * for THE RULE).
  *
- * Context: a real production catalog had ~267K pg_class rows. Before
- * https://github.com/supabase/supabase/pull/47894, unscoped CTEs in the Table
- * Editor query full-scanned pg_index/pg_constraint on every open -- O(catalog)
- * work regardless of which table was opened, taking 30-58s at incident scale.
- *
- * NOTE: the scoped introspection behavior from PR #47894 defaults to OFF and is
- * gated behind a `scoped` flag so Studio can enable it progressively via a
- * feature flag. The legacy (scoped:false) path is intentionally NOT exercised
- * here -- this guard tests the SCOPED path, so every builder below is called
- * with `scoped: true`. Once the rollout completes, drop the legacy path and the
- * flag, and this guard becomes the only shape.
+ * Unscoped CTEs here once full-scanned pg_index/pg_constraint on every Table
+ * Editor open, so cost grew with the whole catalog instead of the opened table.
  */
 
 let db: Awaited<ReturnType<typeof createTestDatabase>>
@@ -67,8 +67,22 @@ beforeAll(async () => {
   viewId = vId
 }, 120_000)
 
+// Function and trigger search get their own catalog: growing pg_proc/pg_depend/
+// pg_trigger in the shared one shifts the plans of unrelated queries above.
+let searchDb: Awaited<ReturnType<typeof createTestDatabase>> | undefined
+const getSearchDb = async () => {
+  if (!searchDb) {
+    searchDb = await createTestDatabase()
+    await buildStressCatalog(searchDb, STRESS_TABLE_COUNT)
+    await buildStressFunctions(searchDb)
+    await buildStressTriggers(searchDb)
+  }
+  return searchDb
+}
+
 afterAll(async () => {
   await db.cleanup()
+  await searchDb?.cleanup()
   await cleanupRoot()
 })
 
@@ -86,18 +100,18 @@ const TABLE_EDITOR_BUDGET = {
 }
 
 test('getTableEditorSql: plan stays scoped for a mid-chain table (stress.t_1000)', async () => {
-  const result = await explainAnalyze(db, getTableEditorSql({ id: midChainTableId, scoped: true }))
+  const result = await explainAnalyze(db, getTableEditorSql({ id: midChainTableId }))
   assertPlanWithinBudget(result, TABLE_EDITOR_BUDGET)
 }, 60_000)
 
 test('getTableEditorSql: plan stays scoped for the hub table with many incoming FKs (stress.t_0)', async () => {
-  const result = await explainAnalyze(db, getTableEditorSql({ id: hubTableId, scoped: true }))
+  const result = await explainAnalyze(db, getTableEditorSql({ id: hubTableId }))
   assertPlanWithinBudget(result, TABLE_EDITOR_BUDGET)
 }, 60_000)
 
 test('getTableEditorSql: real (non-EXPLAIN) query returns a well-formed entity for t_1000', async () => {
   const [{ entity }] = await db.executeQuery<Array<{ entity: any }>>(
-    getTableEditorSql({ id: midChainTableId, scoped: true })
+    getTableEditorSql({ id: midChainTableId })
   )
 
   expect(entity.schema).toBe('stress')
@@ -253,7 +267,7 @@ test('getIndexesSQL: plan stays scoped for a schema', async () => {
 // setup on the (single, pooled) connection first, then EXPLAIN only the tail
 // SELECT -- which is the part whose plan we actually care about.
 async function explainDefinitionQuery(fullSql: string) {
-  const setup = createPgGetTabledefSql({ scoped: true }) as unknown as string
+  const setup = createPgGetTabledefSql() as unknown as string
   const tail = fullSql.slice(fullSql.indexOf(setup) + setup.length)
   await db.executeQuery(setup)
   return explainAnalyze(db, tail)
@@ -263,9 +277,7 @@ async function explainDefinitionQuery(fullSql: string) {
 // Only the outer table_info lookup is planned (pg_get_tabledef is an opaque
 // plpgsql function); it resolves the table by oid, so no scaling seq scans.
 test('getTableDefinitionSql: plan stays scoped for a single table', async () => {
-  const result = await explainDefinitionQuery(
-    getTableDefinitionSql({ id: midChainTableId, scoped: true })
-  )
+  const result = await explainDefinitionQuery(getTableDefinitionSql({ id: midChainTableId }))
   assertPlanWithinBudget(result, {})
 }, 60_000)
 
@@ -284,7 +296,7 @@ test('getTableDefinitionSql: plan stays scoped for a single table', async () => 
 // on a 12K-table catalog measured ~0.9s post-fix.
 test('getEntityDefinitionsSql: plan stays scoped for a schema', async () => {
   const result = await explainDefinitionQuery(
-    getEntityDefinitionsSql({ schemas: ['stress'], limit: 100, scoped: true })
+    getEntityDefinitionsSql({ schemas: ['stress'], limit: 100 })
   )
   assertPlanWithinBudget(result, {
     // ~0.3s measured at 2000 tables post-fix for a 100-entity page; loose
@@ -320,15 +332,12 @@ const TYPES_LIST_BUDGET = {
   },
 }
 test('types.list: scoped plan stays scoped for a schema', async () => {
-  const result = await explainAnalyze(
-    db,
-    types.list({ includedSchemas: ['stress'], scoped: true }).sql
-  )
+  const result = await explainAnalyze(db, types.list({ includedSchemas: ['stress'] }).sql)
   assertPlanWithinBudget(result, TYPES_LIST_BUDGET)
 }, 60_000)
 
 test('types.list: scoped real query returns the schema’s enums and composites', async () => {
-  const { sql, zod } = types.list({ includedSchemas: ['stress'], scoped: true })
+  const { sql, zod } = types.list({ includedSchemas: ['stress'] })
   const rows = zod.parse(await db.executeQuery(sql))
   // stress has enums (mood/priority/e_*) and composites (addr/pair/ct_*).
   const mood = rows.find((t) => t.name === 'mood')
@@ -357,10 +366,7 @@ const TABLE_PRIVILEGES_BUDGET = {
 // Scoped pushes the schema filter into the base WHERE (before the aclexplode
 // lateral / GROUP BY) so pg_class is pruned before privileges are exploded.
 test('tablePrivileges.list: scoped plan stays scoped for a schema', async () => {
-  const result = await explainAnalyze(
-    db,
-    tablePrivileges.list({ includedSchemas: ['stress'], scoped: true }).sql
-  )
+  const result = await explainAnalyze(db, tablePrivileges.list({ includedSchemas: ['stress'] }).sql)
   assertPlanWithinBudget(result, TABLE_PRIVILEGES_BUDGET)
 }, 60_000)
 
@@ -370,7 +376,7 @@ test('tablePrivileges.list: scoped plan stays scoped for a schema', async () => 
 test('tablePrivileges.retrieve: scoped plan stays scoped for a single relation', async () => {
   const result = await explainAnalyze(
     db,
-    tablePrivileges.retrieve({ name: 't_1000', schema: 'stress', scoped: true }).sql
+    tablePrivileges.retrieve({ name: 't_1000', schema: 'stress' }).sql
   )
   assertPlanWithinBudget(result, TABLE_PRIVILEGES_BUDGET)
 }, 60_000)
@@ -402,7 +408,6 @@ test('columnPrivileges.list: scoped plan stays scoped for a single table', async
     columnPrivileges.list({
       includedSchemas: ['stress'],
       relationName: 't_1000',
-      scoped: true,
     }).sql
   )
   assertPlanWithinBudget(result, COLUMN_PRIVILEGES_TABLE_SCOPED_BUDGET)
@@ -426,7 +431,7 @@ const COLUMN_PRIVILEGES_SCHEMA_SCOPED_BUDGET = {
 test('columnPrivileges.list: scoped plan stays scoped for a schema', async () => {
   const result = await explainAnalyze(
     db,
-    columnPrivileges.list({ includedSchemas: ['stress'], scoped: true }).sql
+    columnPrivileges.list({ includedSchemas: ['stress'] }).sql
   )
   assertPlanWithinBudget(result, COLUMN_PRIVILEGES_SCHEMA_SCOPED_BUDGET)
 }, 60_000)
@@ -456,28 +461,22 @@ const TABLES_RETRIEVE_BUDGET = {
 }
 
 test('tables.retrieve: scoped plan stays scoped for a single table by id', async () => {
-  const result = await explainAnalyze(
-    db,
-    tables.retrieve({ id: midChainTableId, scoped: true }).sql
-  )
+  const result = await explainAnalyze(db, tables.retrieve({ id: midChainTableId }).sql)
   assertPlanWithinBudget(result, TABLES_RETRIEVE_BUDGET)
 }, 60_000)
 
 test('tables.retrieve: scoped plan stays scoped for a single table by name+schema', async () => {
-  const result = await explainAnalyze(
-    db,
-    tables.retrieve({ name: 't_1000', schema: 'stress', scoped: true }).sql
-  )
+  const result = await explainAnalyze(db, tables.retrieve({ name: 't_1000', schema: 'stress' }).sql)
   assertPlanWithinBudget(result, TABLES_RETRIEVE_BUDGET)
 }, 60_000)
 
 test('tables.retrieve: scoped plan stays scoped for a composite-FK hub', async () => {
-  const result = await explainAnalyze(db, tables.retrieve({ id: hubTableId, scoped: true }).sql)
+  const result = await explainAnalyze(db, tables.retrieve({ id: hubTableId }).sql)
   assertPlanWithinBudget(result, TABLES_RETRIEVE_BUDGET)
 }, 60_000)
 
 test('tables.retrieve: composite FKs stay ordinally paired at stress scale', async () => {
-  const { sql, zod } = tables.retrieve({ id: midChainTableId, scoped: true })
+  const { sql, zod } = tables.retrieve({ id: midChainTableId })
   const row = zod.parse((await db.executeQuery(sql))[0])
   const chainRelationships = row.relationships.filter(
     ({ source_table_name, target_table_name }) =>
@@ -494,3 +493,142 @@ test('tables.retrieve: composite FKs stay ordinally paired at stress scale', asy
     ['fk_tenant_id', 'tenant_id'],
   ])
 }, 60_000)
+
+// ── getSearchEntitiesSql (database/search-entities.ts) — command menu search ─
+// Runs on debounced keystrokes, so every case below must stay cheap at scale.
+// A substring (leading-wildcard) ILIKE cannot use pg_class_relname_nsp_index,
+// so one filtered seq scan of pg_class is structurally unavoidable. Everything
+// downstream (privilege checks, policy counts) is capped by the materialized
+// candidate CTE, so no other scaling catalog may be scanned. Policy name search
+// adds one more: pg_policy has no index usable for a leading-wildcard ILIKE.
+const SEARCH_ENTITIES_BUDGET = {
+  allowedSeqScans: {
+    pg_class: {
+      max: 1,
+      reason:
+        'substring name search: a leading-wildcard ILIKE cannot use pg_class_relname_nsp_index, so one filtered pass of pg_class is unavoidable',
+    },
+    pg_policy: {
+      max: 1,
+      reason:
+        'policy name search: a leading-wildcard ILIKE cannot use the (polrelid, polname) index, so one filtered pass of pg_policy is unavoidable',
+    },
+    pg_trigger: {
+      max: 1,
+      reason:
+        'trigger name search: a leading-wildcard ILIKE cannot use the (tgrelid, tgname) index, so one filtered pass of pg_trigger is unavoidable',
+    },
+    pg_proc: {
+      max: 1,
+      reason:
+        'function name search: a leading-wildcard ILIKE cannot use pg_proc_proname_args_nsp_index, so one filtered pass of pg_proc is unavoidable. pg_depend must NOT be scanned: extension functions are excluded through the pg_depend reference index.',
+    },
+  },
+  maxExecutionTimeMs: 500,
+}
+
+test('getSearchEntitiesSql: broad search (thousands of matches) stays within budget', async () => {
+  // `t_1` matches t_1, t_10..t_19, t_100..t_199, ... -- a large share of the catalog
+  const result = await explainAnalyze(db, getSearchEntitiesSql({ query: 't_1' }))
+  assertPlanWithinBudget(result, SEARCH_ENTITIES_BUDGET)
+}, 60_000)
+
+test('getSearchEntitiesSql: broad policy name search stays within budget', async () => {
+  // Stress policies are named p_<n>, so `p_1` matches a large share of pg_policy
+  const result = await explainAnalyze(db, getSearchEntitiesSql({ query: 'p_1' }))
+  assertPlanWithinBudget(result, SEARCH_ENTITIES_BUDGET)
+}, 60_000)
+
+test('getSearchEntitiesSql: broad function name search stays within budget', async () => {
+  // `fn_1` matches a large share of both the user's functions and the (same-named)
+  // extension-owned ones, which must be excluded without scanning pg_depend
+  const result = await explainAnalyze(await getSearchDb(), getSearchEntitiesSql({ query: 'fn_1' }))
+  assertPlanWithinBudget(result, SEARCH_ENTITIES_BUDGET)
+}, 300_000)
+
+test('getSearchEntitiesSql: broad trigger name search stays within budget', async () => {
+  // `trg_1` matches a large share of the user triggers, in a catalog where the
+  // foreign keys have added many internal triggers that must be skipped
+  const result = await explainAnalyze(await getSearchDb(), getSearchEntitiesSql({ query: 'trg_1' }))
+  assertPlanWithinBudget(result, SEARCH_ENTITIES_BUDGET)
+}, 300_000)
+
+test('getSearchEntitiesSql: triggers found through a function stay within budget', async () => {
+  // Matches the `audit_row_fn` function; the triggers that run it (aud_*) only match
+  // through the function, which must share the one pg_trigger pass
+  const result = await explainAnalyze(
+    await getSearchDb(),
+    getSearchEntitiesSql({ query: 'audit_row_fn' })
+  )
+  assertPlanWithinBudget(result, SEARCH_ENTITIES_BUDGET)
+}, 300_000)
+
+test('getSearchEntitiesSql: schema-qualified search stays within budget', async () => {
+  const result = await explainAnalyze(db, getSearchEntitiesSql({ query: 'stress.t_1' }))
+  assertPlanWithinBudget(result, SEARCH_ENTITIES_BUDGET)
+}, 60_000)
+
+// Nothing here is matched by name: the table is given, so every lookup should be
+// an index probe. A seq scan over any of these means the query stopped being
+// scoped to the one table.
+const TABLE_RELATED_RESOURCES_BUDGET = {
+  allowedSeqScans: {},
+  maxExecutionTimeMs: 100,
+}
+
+test('getTableRelatedResourcesSql: policies, triggers and indexes stay index-scoped', async () => {
+  // t_0 is the hub table: many incoming foreign keys, so many internal triggers
+  // to skip, plus a primary key and unique constraint backing indexes of their own
+  const result = await explainAnalyze(
+    await getSearchDb(),
+    getTableRelatedResourcesSql({ schema: 'stress', name: 't_0' })
+  )
+  assertPlanWithinBudget(result, TABLE_RELATED_RESOURCES_BUDGET)
+}, 300_000)
+
+/** Rows returned by the first seq scan over `relation`, for checking a scan stopped early. */
+const seqScanRows = (node: unknown, relation: string): number | undefined => {
+  if (Array.isArray(node)) {
+    for (const item of node) {
+      const found = seqScanRows(item, relation)
+      if (found !== undefined) return found
+    }
+  } else if (node !== null && typeof node === 'object') {
+    const obj = node as Record<string, unknown>
+    if (obj['Node Type'] === 'Seq Scan' && obj['Relation Name'] === relation) {
+      return obj['Actual Rows'] as number
+    }
+    for (const key of Object.keys(obj)) {
+      const found = seqScanRows(obj[key], relation)
+      if (found !== undefined) return found
+    }
+  }
+  return undefined
+}
+
+const TABLE_REFERENCING_FUNCTIONS_BUDGET = {
+  allowedSeqScans: {
+    pg_proc: {
+      max: 1,
+      reason:
+        'function source search: no index can answer a substring match on prosrc, so one filtered pass of pg_proc is unavoidable. pg_depend must NOT be scanned: extension functions are excluded through the pg_depend reference index.',
+    },
+  },
+  maxExecutionTimeMs: 500,
+}
+
+test('getTableReferencingFunctionsSql: source search stays within budget', async () => {
+  // Every stress function body mentions stress.t_0, so this matches all of pg_proc
+  const result = await explainAnalyze(
+    await getSearchDb(),
+    getTableReferencingFunctionsSql({ schema: 'stress', name: 't_0' })
+  )
+  assertPlanWithinBudget(result, TABLE_REFERENCING_FUNCTIONS_BUDGET)
+
+  // The scan has to stop at the candidate cap. Ranking before the cap would
+  // make Postgres read every matching function body instead, which on a real
+  // catalog is the difference between milliseconds and about a second.
+  expect(seqScanRows(result.plan.Plan, 'pg_proc')).toBeLessThanOrEqual(
+    TABLE_RELATED_FUNCTION_CANDIDATE_LIMIT
+  )
+}, 300_000)

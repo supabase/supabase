@@ -1,6 +1,6 @@
 # Supabase Database
 
-> Every Supabase project is a dedicated Postgres database, trusted by millions of developers. Use it on its own, or with the rest of the Supabase platform.
+> Every Supabase project is a dedicated Postgres database, trusted by millions of developers. Start for free. Use it on its own, or with the rest of the Supabase platform.
 
 Supabase Database gives you a full Postgres database with no compromises. It is not a Postgres-compatible alternative or a shared cluster: every project gets its own dedicated Postgres instance that you can connect to directly with any Postgres client.
 
@@ -38,7 +38,7 @@ You do not need any other Supabase product to use the database. Auth, Storage, R
 
 ## Links
 
-- Documentation: https://supabase.com/docs/guides/database
+- Documentation: https://supabase.com/docs/guides/database/overview
 - Connect to your database: https://supabase.com/docs/guides/database/connecting-to-postgres
 - Pricing: https://supabase.com/pricing.md
 - API Reference: https://supabase.com/docs/reference/javascript/select

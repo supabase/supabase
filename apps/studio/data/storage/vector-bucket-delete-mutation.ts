@@ -3,7 +3,7 @@ import { toast } from 'sonner'
 
 import { storageKeys } from './keys'
 import { del, handleError } from '@/data/fetchers'
-import type { ResponseError } from '@/types'
+import type { StudioError } from '@/lib/errors/studio-errors'
 
 type VectorBucketDeleteVariables = {
   projectRef: string
@@ -31,12 +31,12 @@ export const useVectorBucketDeleteMutation = ({
   onError,
   ...options
 }: Omit<
-  UseMutationOptions<VectorBucketDeleteData, ResponseError, VectorBucketDeleteVariables>,
+  UseMutationOptions<VectorBucketDeleteData, StudioError, VectorBucketDeleteVariables>,
   'mutationFn'
 > = {}) => {
   const queryClient = useQueryClient()
 
-  return useMutation<VectorBucketDeleteData, ResponseError, VectorBucketDeleteVariables>({
+  return useMutation<VectorBucketDeleteData, StudioError, VectorBucketDeleteVariables>({
     mutationFn: (vars) => deleteVectorBucket(vars),
     async onSuccess(data, variables, context, mutationContext) {
       const { projectRef } = variables

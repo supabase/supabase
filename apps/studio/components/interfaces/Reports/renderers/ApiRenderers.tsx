@@ -43,7 +43,7 @@ import { DataTableColumnStatusCode } from '@/components/ui/DataTable/DataTableCo
 import { useFillTimeseriesSorted } from '@/hooks/analytics/useFillTimeseriesSorted'
 import { useSelectedOrganizationQuery } from '@/hooks/misc/useSelectedOrganization'
 import { BASE_PATH, IS_PLATFORM } from '@/lib/constants'
-import type { ResponseError } from '@/types'
+import type { StudioError } from '@/lib/errors/studio-errors'
 
 export const NetworkTrafficRenderer = (
   props: ReportWidgetProps<{
@@ -71,7 +71,7 @@ export const NetworkTrafficRenderer = (
   if (!!props.error) {
     const error = (
       typeof props.error === 'string' ? { message: props.error } : props.error
-    ) as ResponseError
+    ) as StudioError
     return <AlertError subject="Failed to retrieve network traffic" error={error} />
   } else if (isError) {
     return (
@@ -138,7 +138,7 @@ export const TotalRequestsChartRenderer = (
   if (!!props.error) {
     const error = (
       typeof props.error === 'string' ? { message: props.error } : props.error
-    ) as ResponseError
+    ) as StudioError
     return <AlertError subject="Failed to retrieve total requests" error={error} />
   } else if (isError) {
     return (
@@ -270,7 +270,7 @@ export const ErrorCountsChartRenderer = (
   if (!!props.error) {
     const error = (
       typeof props.error === 'string' ? { message: props.error } : props.error
-    ) as ResponseError
+    ) as StudioError
     return <AlertError subject="Failed to retrieve request errors" error={error} />
   } else if (isError) {
     return (
@@ -323,7 +323,7 @@ export const ResponseSpeedChartRenderer = (
   if (!!props.error) {
     const error = (
       typeof props.error === 'string' ? { message: props.error } : props.error
-    ) as ResponseError
+    ) as StudioError
     return <AlertError subject="Failed to retrieve response speeds" error={error} />
   } else if (isError) {
     return (

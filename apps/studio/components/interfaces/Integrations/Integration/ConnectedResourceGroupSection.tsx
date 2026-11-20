@@ -5,13 +5,17 @@ import { Admonition } from 'ui-patterns/Admonition'
 
 import { type ResourceGroup } from './MarketplaceIntegrationSettingsTab.types'
 import { type ConnectedResource } from '@/components/interfaces/Integrations/Landing/Landing.utils'
+import { ButtonTooltip } from '@/components/ui/ButtonTooltip'
 
 export const ResourceGroupSection = ({
   group,
   onRemove,
+  getRemoveDisabledReason,
 }: {
   group: ResourceGroup
   onRemove: (resource: ConnectedResource) => void
+  /** Returns why a resource can't be removed, which disables its Remove button. */
+  getRemoveDisabledReason?: (resource: ConnectedResource) => string | undefined
 }) => {
   return (
     <section className="flex flex-col gap-y-4 border-b py-8 first:pt-0 last:border-b-0">
@@ -60,6 +64,7 @@ export const ResourceGroupSection = ({
             >
               <div className="flex min-w-0 flex-col">
                 <code
+                  data-code-style="plain"
                   className="truncate font-mono text-sm text-foreground"
                   title={item.identifier}
                 >
@@ -73,12 +78,10 @@ export const ResourceGroupSection = ({
                     <Link href={group.manageAction.href}>{group.manageAction.label}</Link>
                   </Button>
                 )}
-                <Button
-                  icon={<Trash2Icon className="text-foreground-light" />}
+                <RemoveResourceButton
+                  disabledReason={getRemoveDisabledReason?.(item.resource)}
                   onClick={() => onRemove(item.resource)}
-                >
-                  Remove
-                </Button>
+                />
               </div>
             </div>
           ))}
@@ -87,3 +90,20 @@ export const ResourceGroupSection = ({
     </section>
   )
 }
+
+const RemoveResourceButton = ({
+  disabledReason,
+  onClick,
+}: {
+  disabledReason?: string
+  onClick: () => void
+}) => (
+  <ButtonTooltip
+    icon={<Trash2Icon className="text-foreground-light" />}
+    onClick={onClick}
+    disabled={disabledReason !== undefined}
+    tooltip={{ content: { side: 'bottom', text: disabledReason } }}
+  >
+    Remove
+  </ButtonTooltip>
+)

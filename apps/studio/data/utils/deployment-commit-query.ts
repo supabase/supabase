@@ -2,7 +2,8 @@ import { useQuery } from '@tanstack/react-query'
 
 import { fetchHandler } from '@/data/fetchers'
 import { BASE_PATH } from '@/lib/constants'
-import type { ResponseError, UseCustomQueryOptions } from '@/types'
+import type { StudioError } from '@/lib/errors/studio-errors'
+import type { UseCustomQueryOptions } from '@/types'
 
 export async function getDeploymentCommit() {
   // Deliberately unpinned: TanStack only adds x-deployment-id to server-function
@@ -18,8 +19,8 @@ export type DeploymentCommitData = Awaited<ReturnType<typeof getDeploymentCommit
 export const useDeploymentCommitQuery = <TData = DeploymentCommitData>({
   enabled = true,
   ...options
-}: UseCustomQueryOptions<DeploymentCommitData, ResponseError, TData> = {}) =>
-  useQuery<DeploymentCommitData, ResponseError, TData>({
+}: UseCustomQueryOptions<DeploymentCommitData, StudioError, TData> = {}) =>
+  useQuery<DeploymentCommitData, StudioError, TData>({
     queryKey: ['deployment-commit'],
     queryFn: () => getDeploymentCommit(),
     ...options,

@@ -9,7 +9,7 @@ import { useInstalledIntegrations } from '@/components/interfaces/Integrations/L
 import { DOCS_URL } from '@/lib/constants'
 
 const sectionLabelCls =
-  'px-2 pt-4 pb-1.5 font-mono text-xs uppercase tracking-wider text-foreground-lighter'
+  'px-3 pt-4 pb-1.5 font-mono text-xs uppercase tracking-wider text-foreground-lighter'
 
 interface SidebarLinkProps {
   href: string
@@ -24,7 +24,7 @@ const SidebarLink = ({ href, active, icon, label, count, className }: SidebarLin
   <Link
     href={href}
     className={cn(
-      'flex items-center justify-between rounded px-2 py-1 text-sm',
+      'flex items-center justify-between rounded px-3 py-1 text-sm',
       'text-foreground-light hover:bg-surface-200 hover:text-foreground',
       active && 'bg-surface-200 text-foreground',
       className
@@ -53,7 +53,7 @@ const HELP_LINKS: Array<{ icon: React.ReactNode; label: string; href: string }> 
   },
 ]
 
-export const MarketplaceSidebar = () => {
+export const MarketplaceProductMenu = () => {
   const router = useRouter()
   const { ref } = useParams()
 
@@ -65,7 +65,7 @@ export const MarketplaceSidebar = () => {
   const activeIntegrationId = typeof router.query.id === 'string' ? router.query.id : undefined
 
   return (
-    <aside className="grow flex h-full w-full flex-col gap-y-0.5 overflow-y-auto p-4 text-sm">
+    <div className="flex flex-col gap-y-0.5 overflow-y-auto my-4 md:px-3 w-full">
       <SidebarLink
         href={baseHref}
         active={isDiscoverActive}
@@ -93,12 +93,12 @@ export const MarketplaceSidebar = () => {
                 href={`${baseHref}/${integration.id}/overview`}
                 aria-current={isActive ? 'page' : undefined}
                 className={cn(
-                  'flex items-center gap-2 rounded px-2 py-1 text-sm',
+                  'flex items-center gap-2 rounded px-3 py-1 text-sm',
                   'text-foreground-light hover:bg-surface-200 hover:text-foreground',
                   isActive && 'bg-surface-200 text-foreground'
                 )}
               >
-                <span className="relative flex h-[18px] w-[18px] shrink-0 items-center justify-center overflow-hidden rounded-[4px] border bg-white">
+                <span className="relative flex h-[18px] w-[18px] shrink-0 items-center justify-center overflow-hidden rounded-xs border bg-white">
                   {integration.icon({ className: 'p-0.5' })}
                 </span>
                 <span className="truncate">{integration.name}</span>
@@ -115,7 +115,7 @@ export const MarketplaceSidebar = () => {
           href={href}
           target="_blank"
           rel="noreferrer"
-          className="flex items-center justify-between rounded px-2 py-1 text-sm text-foreground-light hover:bg-surface-200 hover:text-foreground"
+          className="flex items-center justify-between rounded px-3 py-1 text-sm text-foreground-light hover:bg-surface-200 hover:text-foreground"
         >
           <span className="flex items-center gap-2">
             {icon}
@@ -124,6 +124,6 @@ export const MarketplaceSidebar = () => {
           <ArrowUpRightIcon size={11} className="opacity-50" />
         </a>
       ))}
-    </aside>
+    </div>
   )
 }

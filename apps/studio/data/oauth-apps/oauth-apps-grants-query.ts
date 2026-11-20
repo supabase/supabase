@@ -1,33 +1,30 @@
 import { InfiniteData, useInfiniteQuery } from '@tanstack/react-query'
 
+import { get, handleError } from '../fetchers'
 import { oauthAppsKeys } from './keys'
-import { getMockOAuthOwnGrants, USE_MOCKS } from './mocks'
-import type { ListOwnGrantsResponse } from './types'
-import type { ResponseError, UseCustomInfiniteQueryOptions } from '@/types'
+import type { StudioError } from '@/lib/errors/studio-errors'
+import type { UseCustomInfiniteQueryOptions } from '@/types'
 
 export type OAuthGrantsVariables = {
   cursor?: string
 }
 
-export type { ListOwnGrantsResponse, MemberOauthGrantItem, OAuthGrantProject } from './types'
+export async function getOAuthGrants({ cursor }: OAuthGrantsVariables = {}) {
+  const { data, error } = await get('/platform/profile/oauth/grants', {
+    params: { query: { page: { after: cursor } } },
+  })
 
-export async function getOAuthGrants({
-  cursor,
-}: OAuthGrantsVariables = {}): Promise<ListOwnGrantsResponse> {
-  if (!USE_MOCKS) throw new Error('OAuth grants are not yet implemented')
-
-  return getMockOAuthOwnGrants(cursor)
+  if (error) handleError(error)
+  return data
 }
 
 export type OAuthGrantsData = Awaited<ReturnType<typeof getOAuthGrants>>
-export type OAuthGrantsError = ResponseError
+export type OAuthGrant = OAuthGrantsData['data'][number]
+export type OAuthGrantsError = StudioError
 
 export const useOAuthGrantsQuery = <TData = OAuthGrantsData>(
   { cursor }: OAuthGrantsVariables = {},
-  {
-    enabled = true,
-    ...options
-  }: UseCustomInfiniteQueryOptions<
+  options: UseCustomInfiniteQueryOptions<
     OAuthGrantsData,
     OAuthGrantsError,
     InfiniteData<TData>,
@@ -39,7 +36,10 @@ export const useOAuthGrantsQuery = <TData = OAuthGrantsData>(
     queryKey: oauthAppsKeys.grants(cursor),
     queryFn: ({ pageParam }) => getOAuthGrants({ cursor: pageParam }),
     initialPageParam: cursor,
-    getNextPageParam: (lastPage) => lastPage.pagination.next_cursor,
-    enabled: enabled && USE_MOCKS,
+    getNextPageParam: (lastPage) =>
+      lastPage.links.next
+        ? // The URL second paramater does not matter as we only want to extract the search params
+          new URL(lastPage.links.next, 'http://localhost').searchParams.get('page[after]')
+        : null,
     ...options,
   })

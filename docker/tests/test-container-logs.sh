@@ -127,7 +127,7 @@ check_logs rest \
 
 check_logs realtime \
     'Starting Realtime' \
-    'Connected to Postgres database' \
+    'Tenant set-up successfully' \
     'Janitor started' \
     'Starting MetricsCleaner'
 
@@ -141,7 +141,8 @@ check_logs meta \
     'Server listening at http'
 
 check_logs functions \
-    'main function started'
+    'main function started' \
+    'Memory pressure monitor active'
 
 check_logs_if_running analytics \
     'Access LogflareWeb.Endpoint at http://localhost:4000' \

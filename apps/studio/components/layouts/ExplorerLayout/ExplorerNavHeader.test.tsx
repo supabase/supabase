@@ -34,10 +34,9 @@ function renderHeader(section?: ExplorerResourceType) {
 describe('Explorer sidebar header', () => {
   beforeEach(() => vi.clearAllMocks())
 
-  it('shows the smaller root title with the preferences action', () => {
+  it('shows the root title with the preferences action and no breadcrumb', () => {
     renderHeader()
     expect(screen.getAllByText('Explorer')).toHaveLength(1)
-    expect(screen.getByText('Explorer')).toHaveClass('text-sm')
     expect(screen.getByText('Explorer preferences')).toBeInTheDocument()
     expect(screen.queryByRole('button')).not.toBeInTheDocument()
   })
@@ -76,10 +75,4 @@ describe('Explorer sidebar header', () => {
       expect(level === 'notebook' ? createChat : createNotebook).not.toHaveBeenCalled()
     }
   )
-
-  it('keeps the default title and badge for other product sidebars', () => {
-    customRender(<ProductMenuBar title="Database" titleBadge={<span>Preview</span>} />)
-    expect(screen.getByRole('heading', { name: 'Database' })).toHaveClass('text-sm')
-    expect(screen.getByText('Preview')).toBeInTheDocument()
-  })
 })

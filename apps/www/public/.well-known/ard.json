@@ -20,6 +20,18 @@
       ]
     },
     {
+      "identifier": "urn:air:supabase.com:mcp:server-card",
+      "displayName": "Supabase MCP server card",
+      "type": "application/mcp-server-card+json",
+      "url": "https://supabase.com/.well-known/mcp/server-card.json",
+      "description": "MCP Server Card for the hosted Supabase MCP server: its registry name and streamable HTTP remote.",
+      "tags": ["mcp", "server-card", "agents"],
+      "representativeQueries": [
+        "find the Supabase MCP server URL and transport",
+        "discover the Supabase MCP server before connecting an MCP client"
+      ]
+    },
+    {
       "identifier": "urn:air:supabase.com:metadata:mcp-oauth",
       "displayName": "Supabase MCP OAuth metadata",
       "type": "application/json",

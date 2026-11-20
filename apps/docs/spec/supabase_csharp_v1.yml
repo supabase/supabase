@@ -355,7 +355,7 @@ functions:
       Creates a new anonymous user.
     notes: |
       - Returns an anonymous user with a session. The user's `IsAnonymous` claim is set to `true`.
-      - You can later convert an anonymous user into a permanent one by calling [`UpdateUser()`](/docs/reference/csharp/update-user) with an email or phone number, or by linking an OAuth identity with [`LinkIdentity()`](/docs/reference/csharp/link-identity).
+      - You can later convert an anonymous user into a permanent one by calling [`UpdateUser()`](/docs/reference/csharp/auth-updateuser) with an email or phone number, or by linking an OAuth identity with [`LinkIdentity()`](/docs/reference/csharp/auth-linkidentity).
       - Enable anonymous sign-ins in [your project's auth settings](https://supabase.com/dashboard/project/_/settings/auth).
     examples:
       - id: create-an-anonymous-user
@@ -503,7 +503,7 @@ functions:
       Sends a reauthentication nonce to the signed-in user's email or phone number.
     notes: |
       - Requires a signed-in user.
-      - Use this before updating a password when [secure password change](https://supabase.com/docs/guides/auth/passwords#secure-password-change) is enabled. Pass the nonce the user receives to [`UpdateUser()`](/docs/reference/csharp/update-user).
+      - Use this before updating a password when [secure password change](https://supabase.com/docs/guides/auth/passwords#secure-password-change) is enabled. Pass the nonce the user receives to [`UpdateUser()`](/docs/reference/csharp/auth-updateuser).
     examples:
       - id: send-a-reauthentication-nonce
         name: Send a reauthentication nonce
@@ -518,7 +518,7 @@ functions:
     description: |
       Starts the enrollment process for a new multi-factor authentication (MFA) factor.
     notes: |
-      - Creates a new `unverified` factor. Present the returned QR code or secret to the user, then verify it with [`Verify()`](/docs/reference/csharp/mfa-verify) or [`ChallengeAndVerify()`](/docs/reference/csharp/mfa-challenge-and-verify).
+      - Creates a new `unverified` factor. Present the returned QR code or secret to the user, then verify it with [`Verify()`](/docs/reference/csharp/auth-mfa-verify) or [`ChallengeAndVerify()`](/docs/reference/csharp/auth-mfa-challengeandverify).
       - Only Time-based One-Time Password (TOTP) factors are supported. Set `FactorType` to `"totp"`.
     examples:
       - id: enroll-a-factor
@@ -541,8 +541,8 @@ functions:
     description: |
       Creates a challenge for an enrolled MFA factor.
     notes: |
-      - Pair the returned challenge with [`Verify()`](/docs/reference/csharp/mfa-verify) to complete verification.
-      - Use [`ChallengeAndVerify()`](/docs/reference/csharp/mfa-challenge-and-verify) to create and verify a challenge in a single call.
+      - Pair the returned challenge with [`Verify()`](/docs/reference/csharp/auth-mfa-verify) to complete verification.
+      - Use [`ChallengeAndVerify()`](/docs/reference/csharp/auth-mfa-challengeandverify) to create and verify a challenge in a single call.
     examples:
       - id: create-a-challenge
         name: Create a challenge
@@ -581,7 +581,7 @@ functions:
     description: |
       Creates a challenge and immediately verifies it with the given code.
     notes: |
-      - A convenience method that combines [`Challenge()`](/docs/reference/csharp/mfa-challenge) and [`Verify()`](/docs/reference/csharp/mfa-verify).
+      - A convenience method that combines [`Challenge()`](/docs/reference/csharp/auth-mfa-challenge) and [`Verify()`](/docs/reference/csharp/auth-mfa-verify).
       - The code is the one the user reads from their authenticator app.
     examples:
       - id: create-and-verify-a-challenge
@@ -619,7 +619,7 @@ functions:
     description: |
       Returns the Authenticator Assurance Level (AAL) for the active session.
     notes: |
-      - `aal1` (or `null`) means the user signed in with a single factor (password, OTP, magic link, or social login).
+      - `aal1` (or `null`) means the user signed in with a single factor (password, OTP, magic link, or social sign-in).
       - `aal2` means the user also verified an MFA factor.
       - Use this to decide whether to prompt the user to complete an MFA challenge.
     examples:
@@ -677,7 +677,7 @@ functions:
       Creates a user.
     notes: |
       - This is an admin method. Call it with your service role key, and only from a trusted server environment—never from a client app.
-      - To send an invite link instead of setting a password directly, use [`InviteUserByEmail()`](/docs/reference/csharp/invite-user-by-email).
+      - To send an invite link instead of setting a password directly, use [`InviteUserByEmail()`](/docs/reference/csharp/auth-admin-inviteuserbyemail).
     examples:
       - id: create-a-user
         name: Create a user
@@ -1565,7 +1565,7 @@ functions:
       - Policy permissions required:
         - `buckets` permissions: none
         - `objects` permissions: `insert`
-      - Pair this with [`UploadToSignedUrl()`](/docs/reference/csharp/from-upload-to-signed-url) to perform the upload.
+      - Pair this with [`UploadToSignedUrl()`](/docs/reference/csharp/storage-from-uploadtosignedurl) to perform the upload.
     examples:
       - id: create-signed-upload-url
         name: Create Signed Upload URL
@@ -1577,7 +1577,7 @@ functions:
 
   - id: from-upload-to-signed-url
     description: |
-      Uploads a file to a signed URL created with [`CreateUploadSignedUrl()`](/docs/reference/csharp/from-create-signed-upload-url).
+      Uploads a file to a signed URL created with [`CreateUploadSignedUrl()`](/docs/reference/csharp/storage-from-createsigneduploadurl).
     title: 'From().UploadToSignedUrl()'
     notes: |
       - Policy permissions required:

@@ -28,8 +28,8 @@ import {
   useDatabaseExtensionsQuery,
 } from '@/data/database-extensions/database-extensions-query'
 import { useSelectedProjectQuery } from '@/hooks/misc/useSelectedProject'
+import type { StudioError } from '@/lib/errors/studio-errors'
 import { useTrack } from '@/lib/telemetry/track'
-import { ResponseError } from '@/types'
 
 export interface InstallIntegrationSheetProps {
   integration: IntegrationDefinition
@@ -156,7 +156,7 @@ export const InstallIntegrationSheet = ({ integration }: InstallIntegrationSheet
               setTimeout(() => pollInstallationStatus(), 5000)
             }
           } catch (error) {
-            toast.error(`Failed to install ${name}: ${(error as ResponseError).message}`, {
+            toast.error(`Failed to install ${name}: ${(error as StudioError).message}`, {
               id: toastId,
             })
             setIsInstalling(false)
@@ -169,7 +169,7 @@ export const InstallIntegrationSheet = ({ integration }: InstallIntegrationSheet
         setIsInstalling(false)
       }
     } catch (error) {
-      toast.error(`Failed to install ${name}: ${(error as ResponseError).message}`, {
+      toast.error(`Failed to install ${name}: ${(error as StudioError).message}`, {
         id: toastId,
       })
       setIsInstalling(false)

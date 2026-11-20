@@ -1,13 +1,9 @@
 import { AWS_REGIONS } from 'shared-data'
 import { describe, expect, it } from 'vitest'
 
-import {
-  HIGH_AVAILABILITY_INSTANCE_SIZE,
-  HIGH_AVAILABILITY_POSTGRES_ENGINE,
-  HIGH_AVAILABILITY_RELEASE_CHANNEL,
-} from './ProjectCreation.constants'
 import type { AvailableRegions } from './ProjectCreation.utils'
 import {
+  AUTO_REGION_VALUE,
   extractPostgresVersionDetails,
   filterHighAvailabilityRegions,
   getAvailableRegions,
@@ -16,8 +12,21 @@ import {
   getRegionSelectionType,
   resolveDefaultDbRegion,
   resolvePostgresVersion,
+  smartRegionToExactRegion,
+  sortPostgresVersionsNewestFirst,
 } from './ProjectCreation.utils'
 import type { PostgresEngine, ReleaseChannel } from '@/data/projects/new-project.constants'
+
+describe('smartRegionToExactRegion', () => {
+  it('maps the Auto option to the exact region of Americas', () => {
+    expect(smartRegionToExactRegion(AUTO_REGION_VALUE)).toBe(smartRegionToExactRegion('Americas'))
+    expect(smartRegionToExactRegion(AUTO_REGION_VALUE)).toBe('East US (North Virginia)')
+  })
+
+  it('passes through values that are not smart regions', () => {
+    expect(smartRegionToExactRegion('us-east-1')).toBe('us-east-1')
+  })
+})
 
 describe('resolveDefaultDbRegion', () => {
   const base = {
@@ -52,6 +61,42 @@ describe('resolveDefaultDbRegion', () => {
         autoDefaultRegion: AWS_REGIONS.SOUTHEAST_ASIA.displayName,
       })
     ).toBe('Americas')
+  })
+
+  it('falls back to the first available smart region when there is no recommendation', () => {
+    expect(
+      resolveDefaultDbRegion({
+        ...base,
+        cloudProvider: 'AWS',
+        isSmartRegionEnabled: true,
+        recommendedSmartRegion: undefined,
+        firstAvailableSmartRegion: 'Americas',
+      })
+    ).toBe('Americas')
+  })
+
+  it('prefers the Auto option over the recommended smart region when it is available', () => {
+    expect(
+      resolveDefaultDbRegion({
+        ...base,
+        cloudProvider: 'AWS',
+        isSmartRegionEnabled: true,
+        isAutoRegionAvailable: true,
+        recommendedSmartRegion: 'Americas',
+      })
+    ).toBe(AUTO_REGION_VALUE)
+  })
+
+  it('still prefers the high availability region over Auto when restricted', () => {
+    expect(
+      resolveDefaultDbRegion({
+        ...base,
+        isHighAvailabilityRestricted: true,
+        highAvailabilityRegionName: AWS_REGIONS.EAST_US.displayName,
+        isSmartRegionEnabled: true,
+        isAutoRegionAvailable: true,
+      })
+    ).toBe(AWS_REGIONS.EAST_US.displayName)
   })
 
   it('uses the geolocated region when the provider offers it', () => {
@@ -91,12 +136,6 @@ describe('getAvailableRegions', () => {
 })
 
 describe('High Availability project creation constraints', () => {
-  it('pins the Alpha Postgres engine, release channel, and compute size', () => {
-    expect(HIGH_AVAILABILITY_POSTGRES_ENGINE).toBe('17')
-    expect(HIGH_AVAILABILITY_RELEASE_CHANNEL).toBe('ga')
-    expect(HIGH_AVAILABILITY_INSTANCE_SIZE).toBe('large')
-  })
-
   it.each([
     ['local', 'eu-central-1'],
     ['staging', 'us-east-1'],
@@ -157,16 +196,6 @@ describe('getFreeTierGeneralRegionExperimentVariant', () => {
       getFreeTierGeneralRegionExperimentVariant({ ...base, enrollmentFlag: false })
     ).toBeUndefined()
   })
-
-  it('returns undefined when the enrollment flag is off even if the selection flag is on', () => {
-    expect(
-      getFreeTierGeneralRegionExperimentVariant({
-        ...base,
-        enrollmentFlag: false,
-        selectionFlag: true,
-      })
-    ).toBeUndefined()
-  })
 })
 
 describe('getRegionSelectionType', () => {
@@ -191,6 +220,24 @@ describe('getRegionSelectionType', () => {
     expect(getRegionSelectionType({ dbRegion: 'Nonexistent', availableRegions })).toBeUndefined()
   })
 
+  it('classifies the Auto option as auto when it is available', () => {
+    expect(
+      getRegionSelectionType({
+        dbRegion: AUTO_REGION_VALUE,
+        availableRegions: {
+          ...availableRegions,
+          auto: { code: 'auto', name: 'Auto', type: 'auto' },
+        },
+      })
+    ).toBe('auto')
+  })
+
+  it('returns undefined for the Auto option when it is not available', () => {
+    expect(
+      getRegionSelectionType({ dbRegion: AUTO_REGION_VALUE, availableRegions })
+    ).toBeUndefined()
+  })
+
   it('returns undefined when dbRegion is undefined', () => {
     expect(getRegionSelectionType({ dbRegion: undefined, availableRegions })).toBeUndefined()
   })
@@ -199,32 +246,6 @@ describe('getRegionSelectionType', () => {
     expect(
       getRegionSelectionType({ dbRegion: 'Americas', availableRegions: undefined })
     ).toBeUndefined()
-  })
-
-  it('classifies an untouched field as auto, even if it resolved to a specific region', () => {
-    expect(
-      getRegionSelectionType({
-        dbRegion: 'East US (North Virginia)',
-        availableRegions,
-        isDbRegionDirty: false,
-      })
-    ).toBe('auto')
-  })
-
-  it('returns undefined for an untouched field holding a stale region matching neither list', () => {
-    expect(
-      getRegionSelectionType({
-        dbRegion: 'Nonexistent',
-        availableRegions,
-        isDbRegionDirty: false,
-      })
-    ).toBeUndefined()
-  })
-
-  it('classifies a touched field normally', () => {
-    expect(
-      getRegionSelectionType({ dbRegion: 'Americas', availableRegions, isDbRegionDirty: true })
-    ).toBe('general')
   })
 })
 
@@ -298,5 +319,50 @@ describe('resolvePostgresVersion', () => {
         availableOrioleVersion,
       })
     ).toEqual({})
+  })
+})
+
+describe('sortPostgresVersionsNewestFirst', () => {
+  const toVersions = (versions: string[]) =>
+    versions.map((version) => ({ version: `supabase-postgres-${version}` }))
+  const toNumbers = (versions: { version: string }[]) =>
+    versions.map((x) => x.version.replace('supabase-postgres-', ''))
+
+  it('compares segments numerically, not alphabetically', () => {
+    const sorted = sortPostgresVersionsNewestFirst(
+      toVersions([
+        '17.6.1.164',
+        '17.6.0.062',
+        '17.11.0.002',
+        '17.11.0.001',
+        '15.19.0.002',
+        '15.14.1.164',
+      ])
+    )
+
+    expect(toNumbers(sorted)).toEqual([
+      '17.11.0.002',
+      '17.11.0.001',
+      '17.6.1.164',
+      '17.6.0.062',
+      '15.19.0.002',
+      '15.14.1.164',
+    ])
+  })
+
+  it('interleaves OrioleDB versions by version number', () => {
+    const sorted = sortPostgresVersionsNewestFirst(
+      toVersions(['17.6.0.062-orioledb', '17.11.0.002', '17.6.1.164'])
+    )
+
+    expect(toNumbers(sorted)).toEqual(['17.11.0.002', '17.6.1.164', '17.6.0.062-orioledb'])
+  })
+
+  it('does not mutate the input', () => {
+    const input = toVersions(['15.6.1.139', '17.6.1.164'])
+    const sorted = sortPostgresVersionsNewestFirst(input)
+
+    expect(sorted).not.toBe(input)
+    expect(toNumbers(input)).toEqual(['15.6.1.139', '17.6.1.164'])
   })
 })

@@ -22,7 +22,8 @@ export const IndexImprovementText = ({
     <p className={cn('text-sm text-foreground-light mb-3', className)} {...props}>
       Query's performance can be improved by{' '}
       <span className="text-primary">{improvement.toFixed(2)}%</span> by creating this{' '}
-      {indexStatements.length > 1 ? 'indexes' : 'index'}:
+      {indexStatements.length > 1 ? <span>indexes</span> : <span>index</span>}
+      <span>:</span>
     </p>
   )
 }

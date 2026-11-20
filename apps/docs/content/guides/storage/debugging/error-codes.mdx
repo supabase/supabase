@@ -1,6 +1,6 @@
 ---
 id: 'storage-errors-codes'
-title: 'Error Codes'
+title: 'Storage error codes'
 description: 'Supabase Error Codes'
 subtitle: 'Learn about the Storage error codes and how to resolve them'
 sidebar_label: 'Debugging'
@@ -104,7 +104,7 @@ Here is the full list of error codes and their descriptions:
 | `ResourceAlreadyExists`     | The specified resource already exists.                          | 409          | Use a different name or identifier for the resource to avoid conflicts. Use `x-upsert:true` header to overwrite the resource.                                                               |
 | `InvalidBucketName`         | The specified bucket name is invalid.                           | 400          | Ensure the bucket name follows the naming conventions and does not contain invalid characters.                                                                                              |
 | `InvalidKey`                | The specified key is invalid.                                   | 400          | Verify the key name and ensure it follows the naming conventions.                                                                                                                           |
-| `InvalidRange`              | The specified range is not valid.                               | 416          | Make sure that range provided is within the file size boundary and follow the [HTTP Range spec](https://developer.mozilla.org/en-US/docs/Web/HTTP/Headers/Range)                            |
+| `InvalidRange`              | The specified range is not valid.                               | 416          | Make sure that range provided is within the file size boundary and follow the [HTTP Range spec](https://developer.mozilla.org/en-US/docs/Web/HTTP/Reference/Headers/Range)                  |
 | `InvalidMimeType`           | The specified MIME type is not valid.                           | 400          | Provide a valid MIME type, ensure using the standard MIME type format                                                                                                                       |
 | `InvalidUploadId`           | The specified upload ID is invalid.                             | 400          | The upload ID provided is invalid or missing. Make sure to provide a active upload ID                                                                                                       |
 | `KeyAlreadyExists`          | The specified key already exists.                               | 409          | Use a different key name to avoid conflicts with existing keys. Use `x-upsert:true` header to overwrite the resource.                                                                       |
@@ -163,6 +163,7 @@ You don't have permission to action this request
 
 - Add RLS policy to grant permission. See our [Access Control docs](/docs/guides/storage/security/access-control) for more information.
 - Ensure you include the user `Authorization` header
+- If the error is `new row violates row-level security policy`, see [Fix RLS upload errors](/kb/troubleshooting/storage-error-403-forbidden-new-row-violates-row-level-security-policy-on-upload-a94384)
 
 ### 429 `too many requests`
 

@@ -6,7 +6,7 @@ subtitle: 'Identify the celebrities who look most similar to you using Supabase 
 
 This guide will walk you through a ["Face Similarity Search"](https://github.com/supabase/supabase/blob/master/examples/ai/face_similarity.ipynb) example using Colab and Supabase Vecs. You will be able to identify the celebrities who look most similar to you (or any other person). You will:
 
-1. Launch a Postgres database that uses pgvector to store embeddings
+1. Launch a Postgres database that uses [pgvector](/docs/guides/database/extensions/pgvector) to store embeddings
 1. Launch a notebook that connects to your database
 1. Load the "`ashraq/tmdb-people-image`" celebrity dataset
 1. Use the `face_recognition` model to create an embedding for every celebrity photo.
@@ -50,7 +50,7 @@ SQLAlchemy requires the connection string to start with `postgresql://` (instead
 
 <Admonition type='note'>
 
-You must use the "connection pooling" string (domain ending in `*.pooler.supabase.com`) with Google Colab since Colab does not support IPv6.
+You must use the "connection pooling" string (domain ending in `*.pooler.supabase.com`) with Google Colab since [Colab does not support IPv6](/kb/troubleshooting/supabase--your-network-ipv4-and-ipv6-compatibility-cHe3BP).
 
 </Admonition>
 

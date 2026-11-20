@@ -3,46 +3,15 @@ import { describe, expect, it } from 'vitest'
 import { csatSurveyParamsSchema } from './CsatSurvey.schema'
 
 describe('parseCsatSurveyParams', () => {
-  it('returns a valid result with the yes answer preselected', () => {
-    expect(
-      csatSurveyParamsSchema.safeParse({ conversation_id: 'cnv_1abc2', helpful: 'yes' })
-    ).toEqual({
+  it.each([
+    { helpful: 'yes', expected: true },
+    { helpful: 'no', expected: false },
+    { helpful: undefined, expected: true },
+    { helpful: 'maybe', expected: true },
+  ])('parses helpful=$helpful as $expected (defaults to yes)', ({ helpful, expected }) => {
+    expect(csatSurveyParamsSchema.safeParse({ conversation_id: 'cnv_1abc2', helpful })).toEqual({
       success: true,
-      data: {
-        conversation_id: 'cnv_1abc2',
-        helpful: true,
-      },
-    })
-  })
-
-  it('returns a valid result with the no answer preselected', () => {
-    expect(
-      csatSurveyParamsSchema.safeParse({ conversation_id: 'cnv_1abc2', helpful: 'no' })
-    ).toEqual({
-      success: true,
-      data: {
-        conversation_id: 'cnv_1abc2',
-        helpful: false,
-      },
-    })
-  })
-
-  it('preselects yes when helpful is missing or unknown', () => {
-    expect(csatSurveyParamsSchema.safeParse({ conversation_id: 'cnv_1abc2' })).toEqual({
-      success: true,
-      data: {
-        conversation_id: 'cnv_1abc2',
-        helpful: true,
-      },
-    })
-    expect(
-      csatSurveyParamsSchema.safeParse({ conversation_id: 'cnv_1abc2', helpful: 'maybe' })
-    ).toEqual({
-      success: true,
-      data: {
-        conversation_id: 'cnv_1abc2',
-        helpful: true,
-      },
+      data: { conversation_id: 'cnv_1abc2', helpful: expected },
     })
   })
 

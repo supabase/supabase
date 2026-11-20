@@ -23,7 +23,7 @@ Supabase branches create separate environments that spin off from your base proj
 Whether you create a branch from a pull request or from the Supabase Dashboard, Supabase creates a project with default settings then copies these settings from your base project:
 
 - Postgres settings
-- Connection pooler settings
+- Connection [pooler](/docs/guides/database/connecting-to-postgres/pooling-and-limits) settings
 - Auth, Data API, Realtime, and Storage settings
 - SSL enforcement
 - Network restrictions, when your base project has them
@@ -31,7 +31,7 @@ Whether you create a branch from a pull request or from the Supabase Dashboard, 
 
 Auth secrets, such as OAuth provider secrets and SMTP passwords, get placeholder values instead. Set the real values with [branch secrets](/docs/guides/deployment/branching/configuration#managing-secrets-for-branches). Supabase also turns on Database Webhooks for every branch.
 
-The database schema isn't cloned. A GitHub-connected branch builds it from the [migrations in your repository](/docs/guides/deployment/branching/github-integration#migrations). A dashboard branch builds it from your [base project's migration history](/docs/guides/deployment/branching/dashboard#where-a-dashboard-branch-gets-its-schema). The branch is ready when the settings, the schema, and the Edge Functions are all in place.
+The database schema isn't cloned. A GitHub-connected branch builds it from the [migrations in your repository](/docs/guides/deployment/branching/github-integration#migrations). A dashboard branch builds it from your [base project's migration history](/docs/guides/deployment/branching/dashboard#where-a-dashboard-branch-gets-its-schema). The branch is ready when the settings, the schema, and the [Edge Functions](/docs/guides/functions) are all in place.
 
 ## Deploying to production
 

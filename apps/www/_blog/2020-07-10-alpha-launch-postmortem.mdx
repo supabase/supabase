@@ -50,7 +50,7 @@ We have since migrated our middleware to multiple ECS clusters, globally load-ba
 
 ### Frontend: Netlify, Vercel, Auth0
 
-We serve our marketing site ([supabase.io](/)) from Netlify. It's a static-build [Docusaurus (v2)](https://v2.docusaurus.io/) site, so it had no problems (apart from one developer in Russia who couldn't access the site - it looks like some of Netlify's IP addresses are blocked there).
+We serve our marketing site ([supabase.io](/)) from Netlify. It's a static-build [Docusaurus (v2)](https://docusaurus.io/) site, so it had no problems (apart from one developer in Russia who couldn't access the site - it looks like some of Netlify's IP addresses are blocked there).
 
 We serve our app ([supabase.com/dashboard](https://supabase.com/dashboard)) using Vercel, and the login system uses Auth0. These were both rock-solid. Before the launch we noticed that Vercel was extremely slow on their Free Plan, and once we upgraded to their Pro Plan for multi-region deploys it solved performance issues. It looks like they are changing their plans again so buyer beware.
 
@@ -64,7 +64,7 @@ Digital Ocean were very responsive when we asked for increases, each time respon
 
 ### Cloudflare cloud limits
 
-Each Supabase project gets a unique URL for their API and database. This is set up using Cloudflare's API. This was a seamless process until we hit the 1000-subdomain limit, at 4am in the morning. My cofounder was awake, managed to identify the problem early, and reached out to the support to increase the limit.
+Each Supabase project gets a unique URL for their API and [database](/database). This is set up using Cloudflare's API. This was a seamless process until we hit the 1000-subdomain limit, at 4am in the morning. My cofounder was awake, managed to identify the problem early, and reached out to the support to increase the limit.
 
 Cloudflare support advised him to upgrade the account to increase the limit, but the upgrade could only be done by the owner (me). Unfortunately my phone was on silent, so for 3 hours our systems were down. Ideally any one of our team could have upgraded our account, but I imagine that Cloudflare have their reasons for this restriction.
 

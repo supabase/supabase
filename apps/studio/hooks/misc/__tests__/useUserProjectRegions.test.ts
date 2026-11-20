@@ -1,3 +1,4 @@
+// @vitest-environment jsdom
 import { waitFor } from '@testing-library/react'
 import { platformComponents as components } from 'api-types'
 import { HttpResponse } from 'msw'

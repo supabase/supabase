@@ -1,4 +1,3 @@
-import { PermissionAction } from '@supabase/shared-types/out/constants'
 import { useParams } from 'common'
 import { useTheme } from 'next-themes'
 import { useEffect, useState } from 'react'
@@ -27,7 +26,7 @@ import { useProjectAddonUpdateMutation } from '@/data/subscriptions/project-addo
 import { useProjectAddonsQuery } from '@/data/subscriptions/project-addons-query'
 import type { AddonVariantId } from '@/data/subscriptions/types'
 import { useCheckEntitlements } from '@/hooks/misc/useCheckEntitlements'
-import { useAsyncCheckPermissions } from '@/hooks/misc/useCheckPermissions'
+import { FGA_PERMISSIONS, useAsyncCheckPermissionsV2 } from '@/hooks/misc/useCheckPermissionsV2'
 import { useSelectedOrganizationQuery } from '@/hooks/misc/useSelectedOrganization'
 import { useSelectedProjectQuery } from '@/hooks/misc/useSelectedProject'
 import { BASE_PATH, DOCS_URL } from '@/lib/constants'
@@ -64,9 +63,8 @@ const PITRSidePanel = () => {
   const [selectedCategory, setSelectedCategory] = useState<'on' | 'off'>('off')
   const [selectedOption, setSelectedOption] = useState<string>('pitr_0')
 
-  const { can: canUpdatePitr } = useAsyncCheckPermissions(
-    PermissionAction.BILLING_WRITE,
-    'stripe.subscriptions'
+  const { can: canUpdatePitr } = useAsyncCheckPermissionsV2(
+    FGA_PERMISSIONS.PROJECT.INFRA_ADDONS_WRITE
   )
   const isBranchingEnabled =
     project?.is_branch_enabled === true || project?.parent_project_ref !== undefined

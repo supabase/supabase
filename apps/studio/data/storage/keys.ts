@@ -32,6 +32,8 @@ export const storageKeys = {
   vectorBucketsIndexes: (projectRef: string | undefined, vectorBucketName: string | undefined) =>
     ['projects', projectRef, 'vector-buckets', vectorBucketName, 'indexes'] as const,
   archive: (projectRef: string | undefined) => ['projects', projectRef, 'archive'] as const,
+  urlSigningKeys: (projectRef: string | undefined) =>
+    ['projects', projectRef, 'storage-url-signing-keys'] as const,
   publicBucketsWithSelectPolicies: (projectRef: string | undefined, bucketId: string | undefined) =>
     ['projects', projectRef, 'public-buckets-with-select-policies', bucketId] as const,
   objects: (

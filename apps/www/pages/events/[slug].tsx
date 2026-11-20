@@ -21,10 +21,10 @@ import Link from 'next/link'
 import { Button } from 'ui'
 import { Image } from 'ui-patterns/Image'
 
+import { AiTools } from '@/components/AiTools'
 import ShareArticleActions from '@/components/Blog/ShareArticleActions'
 import DefaultLayout from '@/components/Layouts/Default'
 import SectionContainer from '@/components/Layouts/SectionContainer'
-import { MarkdownActions } from '@/components/MarkdownActions'
 import authors from '@/lib/authors.json'
 import { breadcrumbs } from '@/lib/breadcrumbs'
 import { capitalize, isNotNullOrUndefined } from '@/lib/helpers'
@@ -325,9 +325,10 @@ const EventPage = ({ event }: InferGetStaticPropsType<typeof getStaticProps>) =>
                     </Link>
                   </Button>
                 </div>
-                <MarkdownActions
+                <AiTools
                   pagePath={`/events/${event.slug}`}
                   pageType="events"
+                  titleClassName="sr-only"
                   className="mb-4"
                 />
                 <div className="flex flex-col text-sm">

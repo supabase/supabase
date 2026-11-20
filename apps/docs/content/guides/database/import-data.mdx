@@ -59,7 +59,7 @@ You can use it in conjunction with Supabase by following these steps:
    - `work_mem`: It is set to '2GB', allocating 2 GB of memory for query operations. This enhances the performance of complex queries by allowing larger in-memory datasets.
 
 3. Run pgloader with the configuration file.
-   ```jsx
+   ```bash
    pgloader config.load
    ```
 
@@ -91,7 +91,7 @@ Backups help you restore your data if something goes wrong. Databases on Pro, Te
 
 ### 2. Increase statement timeouts
 
-By default, Supabase enforces query statement timeouts to ensure fair resource allocation and prevent long-running queries from affecting the overall system. When importing large datasets, you may encounter timeouts. To address this:
+By default, Supabase enforces [query statement timeouts](/kb/troubleshooting/canceling-statement-due-to-statement-timeout-581wFv) to ensure fair resource allocation and prevent long-running queries from affecting the overall system. When importing large datasets, you may encounter timeouts. To address this:
 
 - **Increase the Statement Timeout**: You can adjust the statement timeout for your session or connection to accommodate longer-running queries. Be cautious when doing this, as excessively long queries can negatively impact system performance. Read more about [Statement Timeouts](/docs/guides/database/postgres/configuration).
 
@@ -99,7 +99,7 @@ By default, Supabase enforces query statement timeouts to ensure fair resource a
 
 Large datasets consume disk space. Ensure your Supabase project has sufficient disk capacity to accommodate the imported data. If you know how big your database is going to be, you can manually increase the size in your [projects database settings](/dashboard/project/_/database/settings).
 
-Read more about [disk management](/docs/guides/platform/database-size#disk-management).
+Read more about [disk management](/docs/guides/platform/database-size#disk-size).
 
 ### 4. Disable triggers
 

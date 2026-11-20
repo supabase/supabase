@@ -29,6 +29,7 @@ const DUCKLAKE_INPUT_FIELD_PATHS = [
 const DUCKLAKE_SUPABASE_FIELD_PATHS = ['ducklakeStorageBucket'] as const
 
 type DucklakeFieldPath =
+  | 'ducklakeMode'
   | (typeof DUCKLAKE_INPUT_FIELD_PATHS)[number]
   | (typeof DUCKLAKE_SUPABASE_FIELD_PATHS)[number]
 
@@ -83,10 +84,18 @@ const getMissingRequiredFieldIssues = (
 
 export const getDucklakeValidationIssues = (
   data: DucklakeValidationData,
-  options: { secretsOptional?: boolean } = {}
+  options: { secretsOptional?: boolean; isOrioleDb?: boolean } = {}
 ): DucklakeValidationIssue[] => {
   if (data.ducklakeMode === DUCKLAKE_MODE_SUPABASE) {
     const issues = getMissingRequiredFieldIssues(data, DUCKLAKE_SUPABASE_REQUIRED_FIELDS)
+
+    if (options.isOrioleDb) {
+      issues.push({
+        path: 'ducklakeMode',
+        message:
+          'OrioleDB cannot host a DuckLake metadata catalog. Enter connection details for a catalog using standard Postgres.',
+      })
+    }
 
     if (data.ducklakeMetadataSchema && !METADATA_SCHEMA_PATTERN.test(data.ducklakeMetadataSchema)) {
       issues.push(METADATA_SCHEMA_ISSUE)

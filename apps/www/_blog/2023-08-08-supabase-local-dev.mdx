@@ -35,11 +35,11 @@ We received feedback recently about our local development experience, encouragin
 
 One of the unique features of Supabase is the ability to access your Postgres database directly from a browser or mobile app through our [Serverless APIs](https://supabase.com/docs/guides/api). This means that developers are writing more [PL/pgSQL](https://www.postgresql.org/docs/current/plpgsql.html).
 
-While code editors have great support for most programming languages, SQL support is underwhelming. We want to make Postgres as simple as Python. Our recently announced [Postgres Language Server](https://github.com/supabase/postgres_lsp) takes us a step in that direction - eventually it will provide first-class support for Postgres in your favorite code editor including Linting, Syntax Highlighting, Migrations Parsing, SQL Auto-complete, and Intellisense.
+While code editors have great support for most programming languages, SQL support is underwhelming. We want to make Postgres as simple as Python. Our recently announced [Postgres Language Server](https://github.com/supabase-community/postgres-language-server) takes us a step in that direction - eventually it will provide first-class support for Postgres in your favorite code editor including Linting, Syntax Highlighting, Migrations Parsing, SQL Auto-complete, and Intellisense.
 
-The Postgres Language Server is not ready for Production just yet. The majority of work is still ahead, but we've verified that the technical approach works and we're making it public now so that we can develop it in the open with input from the community. We’re already receiving amazing [feedback](https://github.com/supabase/postgres_lsp/discussions) and [support](https://news.ycombinator.com/item?id=37020610).
+The Postgres Language Server is not ready for Production just yet. The majority of work is still ahead, but we've verified that the technical approach works and we're making it public now so that we can develop it in the open with input from the community. We’re already receiving amazing [feedback](https://github.com/supabase-community/postgres-language-server/discussions) and [support](https://news.ycombinator.com/item?id=37020610).
 
-Follow the progress of the [Postgres Language Server on GitHub](https://github.com/supabase/postgres_lsp).
+Follow the progress of the [Postgres Language Server on GitHub](https://github.com/supabase-community/postgres-language-server).
 
 ## Observability tools for Postgres
 
@@ -236,7 +236,7 @@ npx snaplet generate --sql > supabase/seed.sql
 
 Type generators introspect a PostgreSQL schema and automatically generate TypeScript definitions. This gives you [end-to-end type safety](https://www.youtube.com/watch?v=VSNgAIObBdw) from the database to the browser.
 
-In the past month, we've added relationship detection in supabase-js. Foreign keys are now included in the generated types so that supabase-js can detect whether a referenced table should be an array (one-to-many) or an object (many-to-one). We've also added Helper Types to improve the developer experience for common scenarios, like short-hand accessors:
+In the past month, we've added relationship detection in [supabase-js](/docs/reference/javascript/introduction). Foreign keys are now included in the generated types so that supabase-js can detect whether a referenced table should be an array (one-to-many) or an object (many-to-one). We've also added Helper Types to improve the developer experience for common scenarios, like short-hand accessors:
 
 ```tsx
 // Before
@@ -315,7 +315,7 @@ We’re starting with seed data. Any SQL with `./supabase/seed.sql` will populat
 
 Importantly, we _aren’t_ cloning production data until we find something appropriate for data security. We know that copy-on-write is an available option, and with the appropriate anonymization techniques it seems like a promising way to provide a “production-like” test environment.
 
-We’ll also need to figure out what this means for large files in Supabase Storage. Do you need to anonymize your photos and videos? This is a work in progress and we’re open to feedback.
+We’ll also need to figure out what this means for large files in [Supabase Storage](/docs/guides/storage). Do you need to anonymize your photos and videos? This is a work in progress and we’re open to feedback.
 
 Either way, we want to support _both_ seed data and anonymized production data, so that teams can choose their preference based on their risk profile. It makes sense to start with a seed.
 
@@ -339,4 +339,4 @@ If you’re an existing user simply [update your CLI](https://supabase.com/docs/
 - [Launch Week 8](https://supabase.com/launch-week)
 - [Coding the stars - an interactive constellation with Three.js and React Three Fiber](https://supabase.com/blog/interactive-constellation-threejs-react-three-fiber)
 - [Why we'll stay remote](https://supabase.com/blog/why-supabase-remote)
-- [Postgres Language Server](https://github.com/supabase/postgres_lsp)
+- [Postgres Language Server](https://github.com/supabase-community/postgres-language-server)

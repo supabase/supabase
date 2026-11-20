@@ -1,36 +1,36 @@
 import { useMutation, useQueryClient } from '@tanstack/react-query'
 import { toast } from 'sonner'
 
+import { del, handleError } from '../fetchers'
 import { oauthAppsKeys } from './keys'
-import { USE_MOCKS } from './mocks'
-import type { ResponseError, UseCustomMutationOptions } from '@/types'
+import type { StudioError } from '@/lib/errors/studio-errors'
+import type { UseCustomMutationOptions } from '@/types'
 
 export type OAuthGrantRevokeVariables = {
-  slug: string
-  grantId: string
+  grantId?: string
 }
 
-export async function revokeOAuthGrant({ slug, grantId }: OAuthGrantRevokeVariables) {
-  if (!slug) throw new Error('Organization slug is required')
+export async function revokeOAuthGrant({ grantId }: OAuthGrantRevokeVariables) {
   if (!grantId) throw new Error('Grant id is required')
-  if (!USE_MOCKS) throw new Error('OAuth grant revocation is not yet implemented')
-
-  // 204 on success — no response body.
+  const { error } = await del('/platform/profile/oauth/grants/{grant_id}', {
+    params: { path: { grant_id: grantId } },
+  })
+  if (error) handleError(error)
 }
 
-type OAuthGrantRevokeData = Awaited<ReturnType<typeof revokeOAuthGrant>>
+export type OAuthGrantRevokeData = Awaited<ReturnType<typeof revokeOAuthGrant>>
 
 export const useOAuthGrantRevokeMutation = ({
   onError,
   onSuccess,
   ...options
 }: Omit<
-  UseCustomMutationOptions<OAuthGrantRevokeData, ResponseError, OAuthGrantRevokeVariables>,
+  UseCustomMutationOptions<OAuthGrantRevokeData, StudioError, OAuthGrantRevokeVariables>,
   'mutationFn'
 > = {}) => {
   const queryClient = useQueryClient()
 
-  return useMutation<OAuthGrantRevokeData, ResponseError, OAuthGrantRevokeVariables>({
+  return useMutation<OAuthGrantRevokeData, StudioError, OAuthGrantRevokeVariables>({
     mutationFn: (vars) => revokeOAuthGrant(vars),
     async onSuccess(data, variables, context) {
       await queryClient.invalidateQueries({ queryKey: oauthAppsKeys.grants() })

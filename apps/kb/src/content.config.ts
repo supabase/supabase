@@ -1,21 +1,14 @@
 import { defineCollection } from 'astro:content'
-import { glob } from 'astro/loaders'
+import { file, glob } from 'astro/loaders'
 import { z } from 'astro/zod'
 
 import { TOPIC_NAMES } from './lib/topics'
 
-// Format date as "26 SEPTEMBER 2026"
-const formatDate = (date: Date): string => {
-  // Adjust for timezone offset to preserve the intended date
-  const adjusted = new Date(date.getTime() + date.getTimezoneOffset() * 60000)
-  return new Intl.DateTimeFormat('en-US', {
-    year: 'numeric',
-    month: 'long',
-    day: 'numeric',
-  })
-    .format(adjusted)
-    .toUpperCase()
-}
+// Astro's default id is a lowercased slug of the file path, but the markdown
+// export (scripts/generate-markdown.ts) keeps the filename's case and Vercel
+// serves static files case-sensitively. Keeping the case here makes the page
+// URL and the `.md` export path line up.
+const generateId = ({ entry }: { entry: string }) => entry.replace(/\.mdx?$/, '')
 
 // Every entry here is rendered through GuideLayout by
 // Shared by every article-like collection (guides, troubleshooting) so their
@@ -27,13 +20,17 @@ const articleFields = {
   // Surfaces the guide in the homepage's "Featured Guides" section.
   pinned: z.boolean().default(false),
   github_url: z.string().optional(),
+  lastEdited: z
+    .date()
+    .nullish()
+    .transform((value) => value ?? undefined),
 }
 
 // Every entry here is rendered through ArticleLayout by
 // src/pages/guides/[...slug].astro — dropping a new file in
 // src/content/guides doesn't need any per-file layout wiring.
 const guides = defineCollection({
-  loader: glob({ pattern: '**/*.{md,mdx}', base: './src/content/guides' }),
+  loader: glob({ pattern: '**/*.{md,mdx}', base: './src/content/guides', generateId }),
   schema: z.object({
     ...articleFields,
     description: z.string(),
@@ -43,19 +40,15 @@ const guides = defineCollection({
     // Surfaces the guide in the homepage's "Featured Guides" section.
     pinned: z.boolean().default(false),
     github_url: z.string().optional(),
-    date: z
-      .date()
-      .optional()
-      .transform((date) => (date ? formatDate(date) : undefined)),
   }),
 })
 
 // Fetched from the private supabase/troubleshooting repo by
-// scripts/federated-content/fetch-federated-content.ts (a prebuild step) —
+// scripts/federated-content/fetch-federated-content.ts (the `fetch:federated-content` turbo task) —
 // entirely generated, never hand-authored, see .gitignore. Rendered through
 // ArticleLayout by src/pages/troubleshooting/[...slug].astro.
 const troubleshooting = defineCollection({
-  loader: glob({ pattern: '**/*.{md,mdx}', base: './src/content/troubleshooting' }),
+  loader: glob({ pattern: '**/*.{md,mdx}', base: './src/content/troubleshooting', generateId }),
   schema: z.object({
     ...articleFields,
     // The source has no description field, and ArticleLayout already
@@ -69,4 +62,48 @@ const troubleshooting = defineCollection({
   }),
 })
 
-export const collections = { guides, troubleshooting }
+// Question-and-answer entries in src/content/faqs. `title` holds the question,
+// and the body holds the answer. Rendered by src/pages/faqs/[...slug].astro.
+const faqs = defineCollection({
+  loader: glob({ pattern: '**/*.{md,mdx}', base: './src/content/faqs', generateId }),
+  // Every entry is tagged with the FAQs topic in addition to any topics its
+  // frontmatter lists, so it appears on /topics/faqs and its product topic pages.
+  schema: z
+    .object({
+      title: z.string(),
+      topics: z.array(z.string()).default([]),
+      lastEdited: z
+        .date()
+        .nullish()
+        .transform((value) => value ?? undefined),
+    })
+    .transform((data) => ({ ...data, topics: [...new Set(['FAQs', ...data.topics])] })),
+})
+
+// Community-written guides listed in src/data/community-guides.json — a plain
+// array of entries with no `id` field, so the parser uses each entry's `url`
+// as its id. Every entry is tagged with the Community topic in addition to any
+// topics it lists, the same way `faqs` adds FAQs.
+const communityGuides = defineCollection({
+  loader: file('src/data/community-guides.json', {
+    parser: (text) =>
+      (JSON.parse(text) as { url: string }[]).map((entry) => ({ ...entry, id: entry.url })),
+  }),
+  schema: z
+    .object({
+      title: z.string(),
+      description: z.string().optional(),
+      // Where the guide lives, usually off-site, since there is no body to render here
+      url: z.url(),
+      author: z.string().optional(),
+      topics: z.array(z.string()).default([]),
+      // JSON has no date type, so `lastEdited` arrives as an ISO string
+      lastEdited: z.coerce
+        .date()
+        .nullish()
+        .transform((value) => value ?? undefined),
+    })
+    .transform((data) => ({ ...data, topics: [...new Set(['Community', ...data.topics])] })),
+})
+
+export const collections = { guides, troubleshooting, faqs, communityGuides }

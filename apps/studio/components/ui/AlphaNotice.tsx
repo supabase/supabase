@@ -57,9 +57,11 @@ export const AlphaNotice = ({
             <p className="text-sm font-medium">Introducing {entity.toLocaleLowerCase()}</p>
           </div>
           <p className="text-sm text-foreground-lighter text-balance">
-            {entity} {entity.endsWith('s') ? 'are' : 'is'} now in private alpha. Expect rapid
-            changes, limited features, and possible breaking updates. Please share feedback as we
-            refine the experience and expand access.
+            {entity} {entity.endsWith('s') ? <span>are</span> : <span>is</span>}{' '}
+            <span>
+              now in private alpha. Expect rapid changes, limited features, and possible breaking
+              updates. Please share feedback as we refine the experience and expand access.
+            </span>
           </p>
           {children}
         </div>

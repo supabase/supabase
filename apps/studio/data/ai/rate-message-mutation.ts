@@ -2,9 +2,11 @@ import { UIMessage } from '@ai-sdk/react'
 import { useMutation } from '@tanstack/react-query'
 
 import type { RateMessageResponse } from '@/components/ui/AIAssistantPanel/Message.utils'
+import { classifyResponseError } from '@/data/error-classification'
 import { constructHeaders, fetchHandler } from '@/data/fetchers'
 import { BASE_PATH } from '@/lib/constants'
-import { ResponseError, UseCustomMutationOptions } from '@/types'
+import type { StudioError } from '@/lib/errors/studio-errors'
+import { UseCustomMutationOptions } from '@/types'
 
 export type RateMessageVariables = {
   rating: 'positive' | 'negative'
@@ -41,7 +43,7 @@ export async function rateMessage({
   } catch {}
 
   if (!response.ok) {
-    throw new ResponseError(body?.message, response.status)
+    throw classifyResponseError({ message: body?.message, code: response.status })
   }
 
   return body as RateMessageResponse
@@ -54,10 +56,10 @@ export const useRateMessageMutation = ({
   onError,
   ...options
 }: Omit<
-  UseCustomMutationOptions<RateMessageData, ResponseError, RateMessageVariables>,
+  UseCustomMutationOptions<RateMessageData, StudioError, RateMessageVariables>,
   'mutationFn'
 > = {}) => {
-  return useMutation<RateMessageData, ResponseError, RateMessageVariables>({
+  return useMutation<RateMessageData, StudioError, RateMessageVariables>({
     mutationFn: (vars) => rateMessage(vars),
     async onSuccess(data, variables, context) {
       await onSuccess?.(data, variables, context)

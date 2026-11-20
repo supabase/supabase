@@ -3,7 +3,8 @@ import { toast } from 'sonner'
 
 import { integrationKeys } from './keys'
 import { del, handleError } from '@/data/fetchers'
-import type { ResponseError, UseCustomMutationOptions } from '@/types'
+import type { StudioError } from '@/lib/errors/studio-errors'
+import type { UseCustomMutationOptions } from '@/types'
 
 type DeleteVariables = {
   id: string
@@ -33,11 +34,11 @@ export const useIntegrationsVercelInstalledConnectionDeleteMutation = ({
   onError,
   ...options
 }: Omit<
-  UseCustomMutationOptions<DeleteContentData, ResponseError, DeleteVariables>,
+  UseCustomMutationOptions<DeleteContentData, StudioError, DeleteVariables>,
   'mutationFn'
 > = {}) => {
   const queryClient = useQueryClient()
-  return useMutation<DeleteContentData, ResponseError, DeleteVariables>({
+  return useMutation<DeleteContentData, StudioError, DeleteVariables>({
     mutationFn: (args) => deleteConnection(args),
     async onSuccess(data, variables, context) {
       await Promise.all([

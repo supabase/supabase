@@ -2,7 +2,8 @@ import { useQuery } from '@tanstack/react-query'
 
 import { configKeys } from './keys'
 import { get, handleError } from '@/data/fetchers'
-import type { ResponseError, UseCustomQueryOptions } from '@/types'
+import type { StudioError } from '@/lib/errors/studio-errors'
+import type { UseCustomQueryOptions } from '@/types'
 
 export type ProjectUnpausePostgresVersionsVariables = {
   projectRef?: string
@@ -26,7 +27,7 @@ export async function getPostgresUnpauseVersions(
 export type ProjectUnpausePostgresVersionData = Awaited<
   ReturnType<typeof getPostgresUnpauseVersions>
 >
-export type ProjectUnpausePostgresVersionError = ResponseError
+export type ProjectUnpausePostgresVersionError = StudioError
 
 export const useProjectUnpausePostgresVersionsQuery = <TData = ProjectUnpausePostgresVersionData>(
   { projectRef }: ProjectUnpausePostgresVersionsVariables,

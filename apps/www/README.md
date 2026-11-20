@@ -11,19 +11,21 @@ To get started copy the example env file using `cp .env.local.example .env.local
 Run `pnpm build` from `apps/www`, or `pnpm build --filter=www` from the repository
 root. Vercel uses the app's `build` script by default.
 
-`prebuild` refreshes remote content before Turbo hashes it. Turbo caches
-`build:next` (Next.js, sitemaps, and the customer RSS feed), then `postbuild`
-uploads assets even on cache hits. The outer `build` task stays uncached so
-neither preparation nor upload can be skipped. Uploads run after caching because
-the upload script removes `.next/static`.
+`build` is a Turbo task (`maybe-turbo` makes `pnpm build` run it through Turbo), and
+`turbo.jsonc` declares what runs before it: `docs#build:guides-markdown` (which
+fetches the federated docs guides) and `content:build` (which refreshes the
+changelog, GitHub stars, RSS feeds and agent-skills index). The remote fetches
+aren't cached, so content is refreshed on every build. Turbo hashes the files they
+write after they finish and caches the `build` output (Next.js, sitemaps, and the
+customer RSS feed).
 
-Production cache reuse requires the same commit and inputs: CDN URLs include
-`VERCEL_GIT_COMMIT_SHA`. Set `FORCE_ASSET_CDN=-1` to disable local uploads.
-Running `build:next` directly skips content preparation and uploads.
+Production cache reuse requires the same commit and inputs, including
+`VERCEL_GIT_COMMIT_SHA`. `pnpm typecheck` and `pnpm dev` run `content:build:core`
+first in the same way.
 
 Run `pnpm exec vitest run turbo-build.test.ts` to check cache invalidation and
-asset restoration using real pnpm, Turbo, and the upload script with fixture
-generators, a stub compiler, and a fake AWS CLI.
+artifact restoration using real pnpm and Turbo with fixture generators and a
+stub compiler.
 
 ## Best practices
 
@@ -172,6 +174,10 @@ content.
 
 See [`e2e/www/README.md`](https://github.com/supabase/supabase/blob/master/e2e/www/README.md)
 for coverage and limits.
+
+## Redirects
+
+Redirects for non-docs URLs live in [`lib/redirects.js`](lib/redirects.js). Redirects for `/docs` URLs moved to the docs app, so add new `/docs` redirects in [`apps/docs/lib/redirects/`](../docs/lib/redirects/README.md) instead.
 
 ## Go pages (`/go/*`)
 

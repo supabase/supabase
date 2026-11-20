@@ -176,7 +176,7 @@ export const QueueTab = () => {
                     passHref
                     href={`/project/${ref}/database/policies?search=${queueTable?.id}&schema=pgmq`}
                   >
-                    Auth {queuePolicies.length > 1 ? 'policies' : 'policy'}
+                    Auth {queuePolicies.length > 1 ? <span>policies</span> : <span>policy</span>}
                   </Link>
                 </Button>
               )}

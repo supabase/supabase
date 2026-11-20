@@ -71,8 +71,10 @@ export function ExplainNodeRow({ node, depth, maxDuration }: ExplainNodeRowProps
                 {node.operation}
               </span>
               <span className="text-foreground-muted whitespace-nowrap">
-                (cost {node.cost?.end?.toFixed(1) ?? '-'}, estimated{' '}
-                {node.rows?.toLocaleString() ?? '?'} {node.rows === 1 ? 'row' : 'rows'})
+                (cost {node.cost?.end?.toFixed(1) ?? <span>-</span>}
+                <span>, estimated</span> {node.rows?.toLocaleString() ?? <span>?</span>}{' '}
+                {node.rows === 1 ? <span>row</span> : <span>rows</span>}
+                <span>)</span>
               </span>
             </div>
           </div>

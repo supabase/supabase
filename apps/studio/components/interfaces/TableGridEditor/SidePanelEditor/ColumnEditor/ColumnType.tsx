@@ -309,14 +309,12 @@ const ColumnType = ({
           <CriticalIcon />
           <AlertTitle>
             {' '}
-            It is recommended to use{' '}
-            <code className="text-code-inline">{recommendation.alternative}</code> instead
+            It is recommended to use <code>{recommendation.alternative}</code> instead
           </AlertTitle>
           <AlertDescription>
             <p>
-              Postgres recommends against using the data type{' '}
-              <code className="text-code-inline">{displayValue}</code> unless you have a very
-              specific use case.
+              Postgres recommends against using the data type <code>{displayValue}</code> unless you
+              have a very specific use case.
             </p>
             <div className="flex items-center space-x-2 mt-3">
               <Button asChild icon={<ExternalLinkIcon />}>

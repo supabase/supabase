@@ -14,7 +14,7 @@ const ORG_SAMEAS = [
   'https://www.instagram.com/supabasecom',
 ]
 
-const ORG_LOGO_URL = `${CANONICAL_ORIGIN}/images/og/supabase-og.png`
+const ORG_LOGO_URL = `${CANONICAL_ORIGIN}/brand-assets/supabase-logo-green-black-transparent.png`
 
 type JsonLdSchema = Record<string, unknown> | Record<string, unknown>[]
 
@@ -142,6 +142,34 @@ export function breadcrumbListSchema(items: BreadcrumbItem[]) {
       position: index + 1,
       name: item.name,
       item: item.url,
+    })),
+  }
+}
+
+const MARKDOWN_LINK = /\[([^\]]+)\]\(([^)\s"]+)\)/g
+
+/**
+ * Converts markdown links to `<a>` tags (relative URLs become absolute), since
+ * schema.org answer text is plain text with a small HTML subset, not markdown.
+ */
+export function markdownLinksToHtml(text: string): string {
+  return text.replace(MARKDOWN_LINK, (_, label: string, href: string) => {
+    const url = href.startsWith('/') ? `${CANONICAL_ORIGIN}${href}` : href
+    return `<a href="${url}">${label}</a>`
+  })
+}
+
+export function faqPageSchema(items: Array<{ question: string; answer: string }>) {
+  return {
+    '@context': 'https://schema.org',
+    '@type': 'FAQPage',
+    mainEntity: items.map((item) => ({
+      '@type': 'Question',
+      name: item.question,
+      acceptedAnswer: {
+        '@type': 'Answer',
+        text: markdownLinksToHtml(item.answer),
+      },
     })),
   }
 }

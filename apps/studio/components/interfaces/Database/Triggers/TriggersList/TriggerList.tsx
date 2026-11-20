@@ -1,4 +1,4 @@
-import { PermissionAction } from '@supabase/shared-types/out/constants'
+import { useQuery } from '@tanstack/react-query'
 import { useParams } from 'common'
 import { includes, sortBy } from 'lodash'
 import {
@@ -36,11 +36,11 @@ import { selectFilterSchema } from '@/components/interfaces/Reports/v2/ReportsSe
 import { SIDEBAR_KEYS } from '@/components/layouts/ProjectLayout/LayoutSidebar/LayoutSidebarProvider'
 import { ButtonTooltip } from '@/components/ui/ButtonTooltip'
 import { TableRowNoResults } from '@/components/ui/TableRowNoResults'
-import { useDatabaseTriggersQuery } from '@/data/database-triggers/database-triggers-query'
-import { useAsyncCheckPermissions } from '@/hooks/misc/useCheckPermissions'
+import { databaseTriggersQueryOptions } from '@/data/database-triggers/database-triggers-query'
 import { useQuerySchemaState } from '@/hooks/misc/useSchemaQueryState'
 import { useSelectedProjectQuery } from '@/hooks/misc/useSelectedProject'
 import { useIsProtectedSchema } from '@/hooks/useProtectedSchemas'
+import { useGrant } from '@/lib/grants'
 import { useAiAssistantStateSnapshot } from '@/state/ai-assistant-state'
 import { useSidebarManagerSnapshot } from '@/state/sidebar-manager-state'
 
@@ -56,10 +56,17 @@ export const TriggerList = ({ editTrigger, duplicateTrigger, deleteTrigger }: Tr
   const aiSnap = useAiAssistantStateSnapshot()
   const { openSidebar } = useSidebarManagerSnapshot()
 
-  const { can: canUpdateTriggers } = useAsyncCheckPermissions(
-    PermissionAction.TENANT_SQL_ADMIN_WRITE,
-    'triggers'
+  const readGrant = useGrant(
+    'POST /platform/pg-meta/{ref}/query',
+    { projectRef: project?.ref },
+    { variant: 'read' }
   )
+  const writeGrant = useGrant(
+    'POST /platform/pg-meta/{ref}/query',
+    { projectRef: project?.ref },
+    { variant: 'write' }
+  )
+  const canUpdateTriggers = writeGrant.status === 'granted'
 
   const { selectedSchema: schema } = useQuerySchemaState()
   const { isSchemaLocked: isLocked } = useIsProtectedSchema({ schema })
@@ -69,10 +76,13 @@ export const TriggerList = ({ editTrigger, duplicateTrigger, deleteTrigger }: Tr
     parseAsJson(selectFilterSchema.parse).withDefault([])
   )
 
-  const { data: triggers } = useDatabaseTriggersQuery({
-    projectRef: project?.ref,
-    connectionString: project?.connectionString,
-  })
+  const { data: triggers } = useQuery(
+    databaseTriggersQueryOptions({
+      projectRef: project?.ref,
+      connectionString: project?.connectionString,
+      grant: readGrant.grant,
+    })
+  )
   const filteredTriggers = (triggers ?? []).filter((x) => {
     const search = filterString?.toLowerCase()
     const matchesSearch =

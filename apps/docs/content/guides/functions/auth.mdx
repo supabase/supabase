@@ -5,7 +5,7 @@ description: 'Authentication patterns for Supabase Edge Functions.'
 subtitle: 'Authentication patterns for Edge Functions'
 ---
 
-Secure an Edge Function by declaring which credentials it accepts. The `withSupabase` wrapper from the [`@supabase/server` package](https://github.com/supabase/server) on GitHub checks each caller against the `auth` mode you set. Your handler receives a preconfigured Supabase client on `ctx`.
+Secure an Edge Function by declaring which credentials it accepts. The `withSupabase` wrapper from the [`@supabase/server` package](https://github.com/supabase/server) on GitHub checks each caller against the `auth` mode you set. Your handler receives a preconfigured [Supabase client](/docs/reference/javascript/introduction) on `ctx`.
 
 - [Choose an auth mode](#choose-an-auth-mode) compares the four modes. Start here if you aren't sure which one your function needs.
 - [Secure your function](#secure-your-function) has an example for each mode, plus how to combine modes and shape your own error response.
@@ -30,7 +30,7 @@ Each of the following sections covers one mode, then how to combine modes and sh
 
 ### Authenticated user calls
 
-When a signed-in user calls a function, the request carries the user's session JWT on the `Authorization` header. Your app usually makes that call through `supabase.functions.invoke`. Use `auth: 'user'` to get a `ctx.supabase` scoped to the caller's Row Level Security (RLS) policies.
+When a signed-in user calls a function, the request carries the user's session JWT on the `Authorization` header. Your app usually makes that call through `supabase.functions.invoke`. Use `auth: 'user'` to get a `ctx.supabase` scoped to the caller's [Row Level Security](/docs/guides/database/postgres/row-level-security) (RLS) policies.
 
 The default is `verify_jwt = true`, so the platform validates the JWT before your handler runs. Leave it on for user-facing functions. Turning it off to clear a 401 during development removes the platform's check, leaving `withSupabase` as the only thing that verifies the caller.
 
@@ -62,18 +62,29 @@ A handler that queries a shared table through `ctx.supabaseAdmin` without filter
 
 ### Service-to-service calls
 
-Cron jobs, workers, `pg_net`, and other Edge Functions make calls with a secret key on the `apikey` header rather than a user JWT. Disable `verify_jwt` and use `auth: 'secret'`. The wrapper validates the key against the secret key named `default` in your [project's API keys](/dashboard/project/_/settings/api-keys), and gives your handler `ctx.supabaseAdmin` for privileged work.
+Cron jobs, workers, `pg_net`, and other Edge Functions make calls with a secret key on the `apikey` header rather than a user JWT. To accept the key:
 
-```ts
-import { withSupabase } from 'npm:@supabase/server@1'
+1. In `supabase/config.toml`, disable the [`verify_jwt` check](/docs/guides/functions/auth-headers) for the function:
 
-export default {
-  fetch: withSupabase({ auth: 'secret' }, async (_req, ctx) => {
-    // your business logic. ctx.supabaseAdmin bypasses RLS
-    return Response.json({ ok: true })
-  }),
-}
-```
+   ```toml
+   [functions.your-function]
+   verify_jwt = false
+   ```
+
+1. In the function, use `auth: 'secret'`. The wrapper validates the key against the secret key named `default` in your [project's API keys](/dashboard/project/_/settings/api-keys), and gives your handler `ctx.supabaseAdmin` for privileged work:
+
+   ```ts
+   import { withSupabase } from 'npm:@supabase/server@1'
+
+   export default {
+     fetch: withSupabase({ auth: 'secret' }, async (_req, ctx) => {
+       // your business logic. ctx.supabaseAdmin bypasses RLS
+       return Response.json({ ok: true })
+     }),
+   }
+   ```
+
+To call a function from Postgres with the secret key, see [Call an Edge Function](/docs/guides/database/webhooks#call-an-edge-function) for Database Webhooks and [Scheduling Edge Functions](/docs/guides/functions/schedule-functions) for `pg_cron`.
 
 <Admonition type="note">
 
@@ -191,7 +202,7 @@ export default {
 
 ## Environment variables
 
-`@supabase/server` reads its configuration from a standard set of environment variables, which the Supabase Platform and the Supabase CLI provision for you.
+`@supabase/server` reads its configuration from a standard set of environment variables, which the Supabase Platform and the [Supabase CLI](/docs/guides/local-development/cli/getting-started) provision for you.
 
 | Variable                    | What it is                                |
 | --------------------------- | ----------------------------------------- |

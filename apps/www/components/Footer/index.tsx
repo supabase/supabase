@@ -20,6 +20,7 @@ import {
   IconYoutubeSolid,
   Input,
 } from 'ui'
+import { PrivacySettings, PrivacySettingsLabel } from 'ui-patterns/PrivacySettings'
 import { ThemeToggle } from 'ui-patterns/ThemeToggle'
 
 import useDarkLaunchWeeks from '../../hooks/useDarkLaunchWeeks'
@@ -119,6 +120,8 @@ const Footer = (props: Props) => {
             </Link>
             <div className="flex space-x-5">
               <a
+                target="_blank"
+                rel="noopener noreferrer"
                 href="https://twitter.com/supabase"
                 className="text-foreground-lighter hover:text-foreground transition"
               >
@@ -127,6 +130,8 @@ const Footer = (props: Props) => {
               </a>
 
               <a
+                target="_blank"
+                rel="noopener noreferrer"
                 href="https://github.com/supabase"
                 className="text-foreground-lighter hover:text-foreground transition"
               >
@@ -135,6 +140,8 @@ const Footer = (props: Props) => {
               </a>
 
               <a
+                target="_blank"
+                rel="noopener noreferrer"
                 href="https://discord.supabase.com/"
                 className="text-foreground-lighter hover:text-foreground transition"
               >
@@ -143,6 +150,8 @@ const Footer = (props: Props) => {
               </a>
 
               <a
+                target="_blank"
+                rel="noopener noreferrer"
                 href="https://youtube.com/c/supabase"
                 className="text-foreground-lighter hover:text-foreground transition"
               >
@@ -151,6 +160,8 @@ const Footer = (props: Props) => {
               </a>
 
               <a
+                target="_blank"
+                rel="noopener noreferrer"
                 href="https://www.tiktok.com/@supabase.com"
                 className="text-foreground-lighter hover:text-foreground transition"
               >
@@ -159,6 +170,8 @@ const Footer = (props: Props) => {
               </a>
 
               <a
+                target="_blank"
+                rel="noopener noreferrer"
                 href="https://www.instagram.com/supabasecom"
                 className="text-foreground-lighter hover:text-foreground transition"
               >
@@ -211,17 +224,17 @@ const Footer = (props: Props) => {
                   <div key={`footer_${segment.title}`}>
                     <h6 className="text-foreground overwrite text-base">{segment.title}</h6>
                     <ul className="mt-4 space-y-2">
-                      {segment.links.map(({ component: Component, ...link }, idx) => {
+                      {segment.links.map((link, idx) => {
                         const children = (
                           <div
                             className={`text-sm transition-colors ${
-                              link.url || Component
+                              link.url
                                 ? 'text-foreground-lighter hover:text-foreground'
                                 : 'text-muted hover:text-foreground-lighter'
                             } `}
                           >
                             {link.text}
-                            {!link.url && !Component && (
+                            {!link.url && (
                               <div className="ml-2 inline text-xs xl:ml-0 xl:block 2xl:ml-2 2xl:inline">
                                 <Badge>Coming soon</Badge>
                               </div>
@@ -238,7 +251,7 @@ const Footer = (props: Props) => {
                                 <Link href={link.url}>{children}</Link>
                               )
                             ) : (
-                              Component && <Component>{children}</Component>
+                              children
                             )}
                           </li>
                         )
@@ -251,7 +264,13 @@ const Footer = (props: Props) => {
           </div>
         </div>
         <div className="border-default mt-32 flex justify-between border-t pt-8">
-          <small className="small">&copy; Supabase Inc</small>
+          <div className="flex flex-col gap-1.5 sm:flex-row sm:items-center sm:gap-3">
+            <small className="small">&copy; Supabase Inc</small>
+            <span className="small hidden sm:inline">—</span>
+            <PrivacySettings className="small text-left hover:underline">
+              <PrivacySettingsLabel />
+            </PrivacySettings>
+          </div>
           <div className={cn(forceDark && 'hidden')}>
             <ThemeToggle forceDark={forceDark} />
           </div>

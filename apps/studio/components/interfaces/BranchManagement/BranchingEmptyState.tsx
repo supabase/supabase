@@ -42,7 +42,7 @@ export const BranchingEmptyState = ({
                 <DocsButton
                   label="Learn more"
                   topic="Branching via the dashboard"
-                  href={`${DOCS_URL}/deployment/branching/dashboard`}
+                  href={`${DOCS_URL}/guides/deployment/branching/dashboard`}
                 />
               </div>
             </div>
@@ -78,7 +78,7 @@ export const BranchingEmptyState = ({
                 <DocsButton
                   label="Learn more"
                   topic="Branching GitHub integration"
-                  href={`${DOCS_URL}/deployment/branching/github-integration`}
+                  href={`${DOCS_URL}/guides/deployment/branching/github-integration`}
                 />
               </div>
             </div>

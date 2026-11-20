@@ -16,8 +16,11 @@ vi.mock('sonner', () => ({
   },
 }))
 
-vi.mock('@/hooks/misc/useCheckPermissions', () => ({
-  useAsyncCheckPermissions: () => ({ can: true, isSuccess: true }),
+vi.mock('@/hooks/misc/useCheckPermissionsV2', () => ({
+  useAsyncCheckPermissionsV2: () => ({ can: true, isLoading: false, isSuccess: true }),
+  FGA_PERMISSIONS: {
+    PROJECT: { AUTH_CONFIG_WRITE: 'auth_config_write' },
+  },
 }))
 
 vi.mock('@/lib/constants', async () => {
@@ -99,5 +102,39 @@ describe('SiteUrl', () => {
     expect(await screen.findByText('Must have a Site URL')).toBeInTheDocument()
     await waitFor(() => expect(requests).toHaveLength(0))
     expect(toast.success).not.toHaveBeenCalled()
+  })
+
+  it.each([
+    ['https://my app.example.com', "Site URL can't contain spaces"],
+    ['http://localhost:3000\\', "Site URL can't contain backslashes"],
+    ['https://*.example.com', "Site URL can't contain wildcards"],
+    ['example.com', 'Please provide a valid URL, such as https://example.com'],
+  ])('rejects %s without saving', async (siteUrl, message) => {
+    const user = userEvent.setup()
+
+    const requests: Array<{ body: unknown }> = []
+    addAPIMock({
+      method: 'patch',
+      path: '/platform/auth/:ref/config',
+      response: async ({ request }) => {
+        requests.push({ body: await request.json() })
+        return HttpResponse.json<AuthConfigResponse>({
+          SITE_URL: siteUrl,
+        } as unknown as AuthConfigResponse)
+      },
+    })
+
+    renderSiteUrl()
+
+    const input = await screen.findByDisplayValue(CURRENT_SITE_URL)
+
+    await user.clear(input)
+    await user.click(input)
+    await user.paste(siteUrl)
+
+    fireEvent.click(await screen.findByRole('button', { name: 'Save changes' }))
+
+    expect(await screen.findByText(message)).toBeInTheDocument()
+    expect(requests).toHaveLength(0)
   })
 })

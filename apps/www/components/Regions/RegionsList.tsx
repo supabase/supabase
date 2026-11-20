@@ -61,7 +61,10 @@ export const RegionsList = ({
                     {region.displayName}
                   </span>
                   {region.jurisdiction && <Badge>{region.jurisdiction}</Badge>}
-                  <code className="ml-auto shrink-0 font-mono text-xs text-foreground-lighter">
+                  <code
+                    data-code-style="plain"
+                    className="ml-auto shrink-0 font-mono text-xs text-foreground-lighter"
+                  >
                     {region.code}
                   </code>
                 </button>

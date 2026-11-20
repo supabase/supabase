@@ -117,13 +117,6 @@ module.exports = {
             'tbody tr:not(:last-child) td': {
               borderBottom: '1px solid var(--background-surface-200)',
             },
-            code: {
-              fontWeight: '400',
-              padding: '0.2rem 0.4rem',
-              backgroundColor: 'var(--background-surface-200)',
-              border: '1px solid var(--background-surface-300)',
-              borderRadius: 'var(--radius-lg)',
-            },
             a: {
               position: 'relative',
               transition: 'all 0.18s ease',

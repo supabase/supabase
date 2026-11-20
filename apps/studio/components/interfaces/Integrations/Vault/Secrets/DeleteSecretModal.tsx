@@ -68,7 +68,7 @@ export const DeleteSecretModal = () => {
             <div className="space-y-1">
               <p className="text-sm">{selectedSecret?.description}</p>
               <p className="text-sm text-foreground-light">
-                ID: <code className="text-code-inline">{selectedSecret?.id}</code>
+                ID: <code>{selectedSecret?.id}</code>
               </p>
             </div>
           </AlertDialogDescription>

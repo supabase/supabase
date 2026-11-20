@@ -2,8 +2,10 @@ import { getQueuesExposePostgrestStatusSQL } from '@supabase/pg-meta'
 import { useQuery } from '@tanstack/react-query'
 
 import { databaseQueuesKeys } from './keys'
+import { unguarded } from '@/data/fetchers'
 import { executeSql } from '@/data/sql/execute-sql-mutation'
-import type { ResponseError, UseCustomQueryOptions } from '@/types'
+import type { StudioError } from '@/lib/errors/studio-errors'
+import type { UseCustomQueryOptions } from '@/types'
 
 export type DatabaseQueuesVariables = {
   projectRef?: string
@@ -20,13 +22,17 @@ export async function getDatabaseQueuesExposePostgrestStatus({
   const { result } = await executeSql({
     projectRef,
     connectionString,
+    sqlOrigin: 'studio',
+    queryName: 'queues-postgrest-expose',
     sql,
+    queryKey: ['queues-postgrest-expose'],
+    grant: unguarded.migrating,
   })
   return result[0].exists as boolean
 }
 
 export type DatabaseQueueData = boolean
-export type DatabaseQueueError = ResponseError
+export type DatabaseQueueError = StudioError
 
 export const useQueuesExposePostgrestStatusQuery = <TData = DatabaseQueueData>(
   { projectRef, connectionString }: DatabaseQueuesVariables,

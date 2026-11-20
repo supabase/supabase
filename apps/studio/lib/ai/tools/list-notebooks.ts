@@ -42,6 +42,11 @@ export const contract = {
   inputSchema,
   outputSchema,
   minOptInLevel: 'schema',
+  availability: {
+    environments: new Set(['platform']),
+    requires: new Set(['explorer']),
+  },
   needsApproval: false,
+  promptGuidance: `- Resolve a notebook referenced by name with \`list_notebooks\` yourself before calling \`get_notebook\` or \`update_notebook\` — never ask the user for a notebook id when a name is enough to look it up. Only ask the user to disambiguate if more than one notebook matches that name.`,
   toModelOutput: (output: z.infer<typeof outputSchema>) => output,
 } as const satisfies ToolContract

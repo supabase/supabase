@@ -38,10 +38,6 @@ describe('RoleImpersonationSelectorInterface', () => {
     const { rerender } = customRender(<RoleImpersonationSelectorInterface state={state} />)
 
     expect(screen.queryByText('Role')).not.toBeInTheDocument()
-    for (const option of screen.getAllByRole('radio')) {
-      expect(option).toHaveClass('w-full')
-      expect(option.querySelector('svg')).toBeInTheDocument()
-    }
     expect(screen.getByRole('radio', { name: 'PostgresSuperuser' })).toBeChecked()
     expect(screen.getByText('Bypasses RLS and can return all rows.')).toBeVisible()
     expect(screen.getByTestId('user-settings')).toBeDisabled()

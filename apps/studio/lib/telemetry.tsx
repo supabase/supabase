@@ -1,4 +1,4 @@
-import * as Sentry from '@sentry/nextjs'
+import * as Sentry from '@sentry/react'
 import { PageTelemetry, posthogClient, useParams, useUser } from 'common'
 import { useEffect, useRef } from 'react'
 import { useConsentToast } from 'ui-patterns/consent'
@@ -68,6 +68,7 @@ export function Telemetry() {
   return (
     <PageTelemetry
       API_URL={API_URL}
+      platform="studio"
       hasAcceptedConsent={hasAcceptedConsent}
       enabled={IS_PLATFORM}
       organizationSlug={organization?.slug}

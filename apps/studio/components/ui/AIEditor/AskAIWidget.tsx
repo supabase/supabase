@@ -93,7 +93,7 @@ export const AskAIWidget = ({
             className="text-xs h-auto py-1 rounded-none px-3 border-r-border"
             disabled={isLoading}
           >
-            {isLoading ? 'Generating...' : 'Generate'}{' '}
+            {isLoading ? <span>Generating...</span> : <span>Generate</span>}{' '}
             {!isLoading && <span className="text-xs text-foreground-light">Enter</span>}
           </Button>
           <Button

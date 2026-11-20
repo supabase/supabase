@@ -1,5 +1,4 @@
 import { zodResolver } from '@hookform/resolvers/zod'
-import { PermissionAction } from '@supabase/shared-types/out/constants'
 import { useParams } from 'common'
 import { useEffect, useState } from 'react'
 import { useForm } from 'react-hook-form'
@@ -16,13 +15,28 @@ import {
 import { GenericSkeletonLoader } from 'ui-patterns/ShimmeringLoader'
 import * as z from 'zod'
 
+import { getSiteUrlError } from '../Auth.constants'
 import { AlertError } from '@/components/ui/AlertError'
 import { useAuthConfigQuery } from '@/data/auth/auth-config-query'
 import { useAuthConfigUpdateMutation } from '@/data/auth/auth-config-update-mutation'
-import { useAsyncCheckPermissions } from '@/hooks/misc/useCheckPermissions'
+import { FGA_PERMISSIONS, useAsyncCheckPermissionsV2 } from '@/hooks/misc/useCheckPermissionsV2'
 
 const schema = z.object({
-  SITE_URL: z.string().trim().min(1, 'Must have a Site URL'),
+  SITE_URL: z
+    .string()
+    .trim()
+    .min(1, 'Must have a Site URL')
+    .superRefine((value, ctx) => {
+      const isEmpty = value.length === 0
+      if (isEmpty) {
+        return
+      }
+
+      const siteUrlError = getSiteUrlError(value)
+      if (siteUrlError) {
+        ctx.addIssue({ code: z.ZodIssueCode.custom, message: siteUrlError })
+      }
+    }),
 })
 
 const SiteUrl = () => {
@@ -36,9 +50,8 @@ const SiteUrl = () => {
   const { mutate: updateAuthConfig } = useAuthConfigUpdateMutation()
   const [isUpdatingSiteUrl, setIsUpdatingSiteUrl] = useState(false)
 
-  const { can: canUpdateConfig } = useAsyncCheckPermissions(
-    PermissionAction.UPDATE,
-    'custom_config_gotrue'
+  const { can: canUpdateConfig } = useAsyncCheckPermissionsV2(
+    FGA_PERMISSIONS.PROJECT.AUTH_CONFIG_WRITE
   )
 
   const siteUrlForm = useForm({
@@ -57,7 +70,7 @@ const SiteUrl = () => {
     }
   }, [authConfig, isUpdatingSiteUrl])
 
-  const onSubmitSiteUrl = (values: any) => {
+  const onSubmitSiteUrl = (values: z.infer<typeof schema>) => {
     setIsUpdatingSiteUrl(true)
 
     updateAuthConfig(

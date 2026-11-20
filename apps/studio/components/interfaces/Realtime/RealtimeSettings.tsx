@@ -1,5 +1,4 @@
 import { zodResolver } from '@hookform/resolvers/zod'
-import { PermissionAction } from '@supabase/shared-types/out/constants'
 import { useParams } from 'common'
 import Link from 'next/link'
 import { useState } from 'react'
@@ -38,7 +37,7 @@ import {
   useRealtimeConfigurationQuery,
 } from '@/data/realtime/realtime-config-query'
 import { useCheckEntitlements } from '@/hooks/misc/useCheckEntitlements'
-import { useAsyncCheckPermissions } from '@/hooks/misc/useCheckPermissions'
+import { FGA_PERMISSIONS, useAsyncCheckPermissionsV2 } from '@/hooks/misc/useCheckPermissionsV2'
 import { useSelectedOrganizationQuery } from '@/hooks/misc/useSelectedOrganization'
 import { useSelectedProjectQuery } from '@/hooks/misc/useSelectedProject'
 
@@ -57,9 +56,8 @@ export const RealtimeSettings = () => {
   const { ref: projectRef } = useParams()
   const { data: project } = useSelectedProjectQuery()
   const { data: organization, isSuccess: isSuccessOrganization } = useSelectedOrganizationQuery()
-  const { can: canUpdateConfig, isSuccess: isPermissionsLoaded } = useAsyncCheckPermissions(
-    PermissionAction.REALTIME_ADMIN_READ,
-    '*'
+  const { can: canUpdateConfig, isSuccess: isPermissionsLoaded } = useAsyncCheckPermissionsV2(
+    FGA_PERMISSIONS.PROJECT.REALTIME_CONFIG_WRITE
   )
 
   const [isConfirmNextModalOpen, setIsConfirmNextModalOpen] = useState(false)
@@ -421,10 +419,11 @@ export const RealtimeSettings = () => {
                                 title="No Realtime RLS policies found"
                                 description={
                                   <p className="prose max-w-full text-sm">
-                                    Private mode is {isSettingToPrivate ? 'being ' : ''}
-                                    enabled, but no RLS policies exist on the{' '}
-                                    <code className="text-code-inline">realtime.messages</code>{' '}
-                                    table. No messages will be received by users.
+                                    Private mode is{' '}
+                                    {isSettingToPrivate ? <span>{'being '}</span> : ''}
+                                    <span>enabled, but no RLS policies exist on the</span>{' '}
+                                    <code>realtime.messages</code>{' '}
+                                    <span>table. No messages will be received by users.</span>
                                   </p>
                                 }
                                 actions={

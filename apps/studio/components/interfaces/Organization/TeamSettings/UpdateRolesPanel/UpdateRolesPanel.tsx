@@ -27,7 +27,7 @@ import {
 import { Admonition } from 'ui-patterns/Admonition'
 
 import { ROLE_DESCRIPTIONS } from '../Roles.constants'
-import { useGetRolesManagementPermissions } from '../TeamSettings.utils'
+import { canManageRole, getAssignableRoleIds, getOrgRole } from '../TeamSettings.utils'
 import { UpdateRolesConfirmationModal } from './UpdateRolesConfirmationModal'
 import {
   formatMemberRoleToProjectRoleConfiguration,
@@ -39,7 +39,7 @@ import { DocsButton } from '@/components/ui/DocsButton'
 import { OrganizationProjectsMultiSelect } from '@/components/ui/OrganizationProjectsMultiSelect'
 import { useOrganizationRolesV2Query } from '@/data/organization-members/organization-roles-query'
 import { OrganizationMember } from '@/data/organizations/organization-members-query'
-import { usePermissionsQuery } from '@/data/permissions/permissions-query'
+import { usePermissionsQueryV2 } from '@/data/permissions/permissions-query-v2'
 import { useOrgProjectsInfiniteQuery } from '@/data/projects/org-projects-infinite-query'
 import { useHasAccessToProjectLevelPermissions } from '@/data/subscriptions/org-subscription-query'
 import { useSelectedOrganizationQuery } from '@/hooks/misc/useSelectedOrganization'
@@ -57,7 +57,7 @@ export const UpdateRolesPanel = ({ visible, member, onClose }: UpdateRolesPanelP
   const { data: organization } = useSelectedOrganizationQuery()
   const isOptedIntoProjectLevelPermissions = useHasAccessToProjectLevelPermissions(slug as string)
 
-  const { data: permissions } = usePermissionsQuery()
+  const { data: permissionsV2 } = usePermissionsQueryV2()
   const { data: allRoles, isSuccess: isSuccessRoles } = useOrganizationRolesV2Query({ slug })
 
   const { data: projectsData } = useOrgProjectsInfiniteQuery({ slug })
@@ -65,14 +65,12 @@ export const UpdateRolesPanel = ({ visible, member, onClose }: UpdateRolesPanelP
 
   // [Joshen] We use the org scoped roles as the source for available roles
   const orgScopedRoles = allRoles?.org_scoped_roles ?? []
-  const projectScopedRoles = allRoles?.project_scoped_roles ?? []
 
-  const { rolesAddable, rolesRemovable } = useGetRolesManagementPermissions(
-    organization?.slug,
-    orgScopedRoles.concat(projectScopedRoles),
-    permissions ?? []
-  )
-  const cannotAddAnyRoles = orgScopedRoles.every((r) => !rolesAddable.includes(r.id))
+  // Role management requires an org-level role; the Owner role is only
+  // assignable/removable by another owner. Server enforces the same rule.
+  const orgRole = getOrgRole(permissionsV2, organization?.slug)
+  const rolesAddable = getAssignableRoleIds(orgRole, orgScopedRoles)
+  const cannotAddAnyRoles = rolesAddable.length === 0
   const isStripeProjectsOrg = organization?.managed_by === MANAGED_BY.STRIPE_PROJECTS
 
   const [showConfirmation, setShowConfirmation] = useState(false)
@@ -111,7 +109,7 @@ export const UpdateRolesPanel = ({ visible, member, onClose }: UpdateRolesPanelP
   const selectedRefs = projectsWithRef.map((p) => p.ref)
   const knownProjects = projectsWithRef.map((p) => ({ ref: p.ref, name: p.name ?? p.ref }))
   const disabledRefs = projectsWithRef
-    .filter((p) => !rolesRemovable.includes(getRoleForProject(p)?.id ?? 0))
+    .filter((p) => !canManageRole(orgRole, getRoleForProject(p)?.name))
     .map((p) => p.ref)
 
   const onRemoveProject = (ref?: string) => {
@@ -209,7 +207,7 @@ export const UpdateRolesPanel = ({ visible, member, onClose }: UpdateRolesPanelP
                       disabledTooltip="Additional permission required to remove role from member"
                       renderTrigger={() => (
                         <Button type="button" variant="primary" icon={<PlusIcon size={14} />}>
-                          Add new
+                          Add project
                         </Button>
                       )}
                     />
@@ -230,7 +228,7 @@ export const UpdateRolesPanel = ({ visible, member, onClose }: UpdateRolesPanelP
               {!isApplyingRoleToAllProjects &&
                 projectsRoleConfiguration.length > 0 &&
                 projectsRoleConfiguration.length < totalNumOrgProjects && (
-                  <Admonition>
+                  <Admonition className="shrink-0">
                     <span className="text-sm">
                       {hasNoChanges
                         ? `This member only has access to ${numberOfProjectsWithAccess} project${numberOfProjectsWithAccess > 1 ? 's' : ''} out of ${totalNumOrgProjects} total project${totalNumOrgProjects > 1 ? 's' : ''}.`
@@ -239,111 +237,121 @@ export const UpdateRolesPanel = ({ visible, member, onClose }: UpdateRolesPanelP
                   </Admonition>
                 )}
 
-              <Card className="overflow-hidden">
-                <div className="flex flex-col divide-y divide-border">
-                  {projectsRoleConfiguration.map((project) => {
-                    const name = project.ref === undefined ? 'All projects' : project.name
-                    const role = getRoleForProject(project)
-                    const canRemoveRole = rolesRemovable.includes(role?.id ?? 0)
+              {projectsRoleConfiguration.length > 0 && (
+                <Card className="overflow-y-auto">
+                  <div className="flex flex-col divide-y divide-border">
+                    {projectsRoleConfiguration.map((project) => {
+                      const name = project.ref === undefined ? 'All projects' : project.name
+                      const role = getRoleForProject(project)
+                      const canRemoveRole = canManageRole(orgRole, role?.name)
 
-                    return (
-                      <div
-                        key={`${project.ref}-${project.roleId}`}
-                        className="flex items-center justify-between px-4 py-3"
-                      >
-                        <p className="text-sm">{name}</p>
+                      return (
+                        <div
+                          key={`${project.ref}-${project.roleId}`}
+                          className="flex items-center justify-between px-4 py-3"
+                        >
+                          <p className="text-sm">{name}</p>
 
-                        <div className="flex items-center gap-x-2">
-                          {cannotAddAnyRoles ? (
-                            <Tooltip>
-                              <TooltipTrigger asChild>
-                                <div className="flex items-center justify-between rounded-md border border-button bg-button px-3 py-2 text-sm h-10 w-56 text-foreground-light">
-                                  {role?.name ?? 'Unknown'}
-                                </div>
-                              </TooltipTrigger>
-                              <TooltipContent side="bottom">
-                                Additional permissions required to update role
-                              </TooltipContent>
-                            </Tooltip>
-                          ) : (
-                            <Select
-                              value={(project?.baseRoleId ?? project.roleId).toString()}
-                              onValueChange={(value) => onSelectRole(value, project)}
-                            >
-                              <SelectTrigger
-                                className={cn(
-                                  ' w-40',
-                                  role?.name === undefined && 'text-foreground-light'
-                                )}
+                          <div className="flex items-center gap-x-2">
+                            {cannotAddAnyRoles ? (
+                              <Tooltip>
+                                <TooltipTrigger asChild>
+                                  <div className="flex items-center justify-between rounded-md border border-button bg-button px-3 py-2 text-sm h-10 w-56 text-foreground-light">
+                                    {role?.name ?? 'Unknown'}
+                                  </div>
+                                </TooltipTrigger>
+                                <TooltipContent side="bottom">
+                                  Additional permissions required to update role
+                                </TooltipContent>
+                              </Tooltip>
+                            ) : (
+                              <Select
+                                value={(project?.baseRoleId ?? project.roleId).toString()}
+                                onValueChange={(value) => onSelectRole(value, project)}
                               >
-                                {role?.name ?? 'Please select a role'}
-                              </SelectTrigger>
-                              <SelectContent align="end" className="max-h-[32rem]">
-                                <SelectGroup>
-                                  {(orgScopedRoles ?? []).map((role) => {
-                                    const canAssignRole = rolesAddable.includes(role.id)
-                                    const isOwnerRole = role.name === 'Owner'
-                                    const disabledForStripe = isStripeProjectsOrg && isOwnerRole
+                                <SelectTrigger
+                                  className={cn(
+                                    ' w-40',
+                                    role?.name === undefined && 'text-foreground-light'
+                                  )}
+                                >
+                                  {role?.name ?? 'Please select a role'}
+                                </SelectTrigger>
+                                <SelectContent align="end" className="max-h-[32rem]">
+                                  <SelectGroup>
+                                    {(orgScopedRoles ?? []).map((role) => {
+                                      const canAssignRole = rolesAddable.includes(role.id)
+                                      const isOwnerRole = role.name === 'Owner'
+                                      const disabledForStripe = isStripeProjectsOrg && isOwnerRole
 
-                                    const isNoAccessRole = role.name === 'No-access'
-                                    const disabledForProjectRole =
-                                      !isApplyingRoleToAllProjects && isNoAccessRole
-                                    const disabled =
-                                      !canAssignRole || disabledForStripe || disabledForProjectRole
-                                    const disabledReason = disabledForStripe
-                                      ? 'Cannot be assigned in Stripe Projects organizations'
-                                      : disabledForProjectRole
-                                        ? 'Cannot assign No-access role to project-scoped members'
-                                        : !canAssignRole
-                                          ? 'Additional permissions required to assign role'
-                                          : undefined
+                                      const isNoAccessRole = role.name === 'No-access'
+                                      const disabledForProjectRole =
+                                        !isApplyingRoleToAllProjects && isNoAccessRole
+                                      const disabled =
+                                        !canAssignRole ||
+                                        disabledForStripe ||
+                                        disabledForProjectRole
+                                      const disabledReason = disabledForStripe
+                                        ? 'Cannot be assigned in Stripe Projects organizations'
+                                        : disabledForProjectRole
+                                          ? 'Cannot assign No-access role to project-scoped members'
+                                          : !canAssignRole
+                                            ? 'Additional permissions required to assign role'
+                                            : undefined
 
-                                    return (
-                                      <SelectItem
-                                        key={role.id}
-                                        value={role.id.toString()}
-                                        className="text-sm hover:bg-selection cursor-pointer"
-                                        disabled={disabled}
-                                      >
-                                        <div className="flex flex-col gap-0.5 max-w-xs">
-                                          <span>{role.name}</span>
-                                          <span className="text-xs text-foreground-lighter">
-                                            {ROLE_DESCRIPTIONS[role.name] ??
-                                              'Permissions are based on the configured organization role.'}
-                                            {disabledReason && ` ${disabledReason}`}
-                                          </span>
-                                        </div>
-                                      </SelectItem>
-                                    )
-                                  })}
-                                </SelectGroup>
-                              </SelectContent>
-                            </Select>
-                          )}
+                                      return (
+                                        <SelectItem
+                                          key={role.id}
+                                          value={role.id.toString()}
+                                          className="text-sm hover:bg-selection cursor-pointer"
+                                          disabled={disabled}
+                                        >
+                                          <div className="flex flex-col gap-0.5 max-w-xs">
+                                            <span>{role.name}</span>
+                                            <span className="text-xs text-foreground-lighter">
+                                              {ROLE_DESCRIPTIONS[role.name] ?? (
+                                                <span>
+                                                  Permissions are based on the configured
+                                                  organization role.
+                                                </span>
+                                              )}
+                                              {disabledReason && (
+                                                <span>{` ${disabledReason}`}</span>
+                                              )}
+                                            </span>
+                                          </div>
+                                        </SelectItem>
+                                      )
+                                    })}
+                                  </SelectGroup>
+                                </SelectContent>
+                              </Select>
+                            )}
 
-                          {!isApplyingRoleToAllProjects && (
-                            <ButtonTooltip
-                              variant="text"
-                              disabled={!canRemoveRole}
-                              className="px-1"
-                              icon={<XIcon />}
-                              onClick={() => onRemoveProject(project?.ref)}
-                              tooltip={{
-                                content: {
-                                  side: 'bottom',
-                                  text: !canRemoveRole
-                                    ? 'Additional permission required to remove role from member'
-                                    : 'Remove access to project',
-                                },
-                              }}
-                            />
-                          )}
+                            {!isApplyingRoleToAllProjects && (
+                              <ButtonTooltip
+                                variant="text"
+                                disabled={!canRemoveRole}
+                                className="px-1"
+                                icon={<XIcon />}
+                                onClick={() => onRemoveProject(project?.ref)}
+                                tooltip={{
+                                  content: {
+                                    side: 'bottom',
+                                    text: !canRemoveRole
+                                      ? 'Additional permission required to remove role from member'
+                                      : 'Remove access to project',
+                                  },
+                                }}
+                              />
+                            )}
+                          </div>
                         </div>
-                      </div>
-                    )
-                  })}
-                </div>
-              </Card>
+                      )
+                    })}
+                  </div>
+                </Card>
+              )}
             </SheetSection>
 
             <SheetFooter className="flex items-center justify-end! px-5 py-4 w-full border-t">

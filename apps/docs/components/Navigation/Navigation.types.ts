@@ -15,6 +15,7 @@ export interface NavMenuSection {
   hasLightIcon?: boolean
   isDarkMode?: boolean
   enabled?: boolean
+  shortName?: string
 }
 
 type MenuItem = {
@@ -25,6 +26,7 @@ type MenuItem = {
   hasLightIcon?: boolean
   community?: boolean
   new?: boolean
+  experimental?: boolean
   enabled?: boolean
 }
 

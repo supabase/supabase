@@ -23,13 +23,15 @@ export const OrgNotFound = ({ slug }: { slug?: string }) => {
             <>
               {slug ? (
                 <>
-                  The organization <code className="text-code-inline">{slug}</code>{' '}
+                  The organization <code>{slug}</code>{' '}
                 </>
               ) : (
                 <>This organization </>
               )}
-              does not exist or you do not have permission to access to it. Contact the the owner if
-              you believe this is a mistake.
+              <span>
+                does not exist or you do not have permission to access it. Contact the owner if you
+                believe this is a mistake.
+              </span>
             </>
           }
         />
@@ -52,10 +54,13 @@ export const OrgNotFound = ({ slug }: { slug?: string }) => {
             description={organizationsError?.message}
           />
         )}
-        {isOrganizationsSuccess &&
-          organizations?.map((org) => (
-            <OrganizationCard key={org.slug} organization={org} href={`/new/${org.slug}`} />
-          ))}
+        {isOrganizationsSuccess && (
+          <>
+            {organizations?.map((org) => (
+              <OrganizationCard key={org.slug} organization={org} href={`/new/${org.slug}`} />
+            ))}
+          </>
+        )}
       </div>
     </>
   )

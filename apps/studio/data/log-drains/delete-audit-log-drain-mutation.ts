@@ -3,7 +3,8 @@ import { toast } from 'sonner'
 
 import { logDrainsKeys } from './keys'
 import { del, handleError } from '@/data/fetchers'
-import type { ResponseError, UseCustomMutationOptions } from '@/types'
+import type { StudioError } from '@/lib/errors/studio-errors'
+import type { UseCustomMutationOptions } from '@/types'
 
 export type AuditLogDrainDeleteVariables = {
   slug: string
@@ -29,12 +30,12 @@ export const useDeleteAuditLogDrainMutation = ({
   onError,
   ...options
 }: Omit<
-  UseCustomMutationOptions<AuditLogDrainDeleteData, ResponseError, AuditLogDrainDeleteVariables>,
+  UseCustomMutationOptions<AuditLogDrainDeleteData, StudioError, AuditLogDrainDeleteVariables>,
   'mutationFn'
 > = {}) => {
   const queryClient = useQueryClient()
 
-  return useMutation<AuditLogDrainDeleteData, ResponseError, AuditLogDrainDeleteVariables>({
+  return useMutation<AuditLogDrainDeleteData, StudioError, AuditLogDrainDeleteVariables>({
     mutationFn: (vars) => deleteAuditLogDrain(vars),
     async onSuccess(data, variables, context) {
       const { slug } = variables

@@ -62,7 +62,7 @@ const data = {
       },
       {
         label: 'Start your migration',
-        href: 'https://supabase.com/docs/guides/platform/migrating-to-supabase/firestore-data',
+        href: 'https://supabase.com/kb/guides/migrate-from-firestore-data',
         type: 'primary' as any,
         icon: <ArrowUpRight className="w-4 h-4 text-current" />,
       },
@@ -695,7 +695,7 @@ const data = {
     ),
     primaryCta: {
       label: 'Open migration guide',
-      url: 'https://supabase.com/docs/guides/platform/migrating-to-supabase/firestore-data',
+      url: 'https://supabase.com/kb/guides/migrate-from-firestore-data',
       target: '_blank',
       icon: <ArrowUpRight className="w-4 h-4 text-current" />,
     },

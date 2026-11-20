@@ -8,7 +8,8 @@ import type {
   UpsertWebhookEndpointInput,
   WebhookEndpoint,
 } from '@/components/interfaces/Platform/Webhooks/PlatformWebhooks.types'
-import type { ResponseError, UseCustomMutationOptions } from '@/types'
+import type { StudioError } from '@/lib/errors/studio-errors'
+import type { UseCustomMutationOptions } from '@/types'
 
 export type WebhookEndpointUpdateVariables = {
   scope: WebhookScopeParams
@@ -39,16 +40,12 @@ export const useWebhookEndpointUpdateMutation = ({
   onError,
   ...options
 }: Omit<
-  UseCustomMutationOptions<
-    WebhookEndpointUpdateData,
-    ResponseError,
-    WebhookEndpointUpdateVariables
-  >,
+  UseCustomMutationOptions<WebhookEndpointUpdateData, StudioError, WebhookEndpointUpdateVariables>,
   'mutationFn'
 > = {}) => {
   const queryClient = useQueryClient()
 
-  return useMutation<WebhookEndpointUpdateData, ResponseError, WebhookEndpointUpdateVariables>({
+  return useMutation<WebhookEndpointUpdateData, StudioError, WebhookEndpointUpdateVariables>({
     mutationFn: updateEndpoint,
     async onSuccess(data, variables, context) {
       await Promise.all([

@@ -19,7 +19,7 @@ export const DetailSectionHeader = ({
   summary,
   className,
 }: DetailSectionHeaderProps) => (
-  <div className={cn('relative flex h-9 items-center justify-between gap-3 px-4', className)}>
+  <div className={cn('relative flex h-10 items-center justify-between gap-3 px-4', className)}>
     <div className="flex min-w-0 items-center gap-2">
       {Icon ? (
         <Icon size={14} strokeWidth={1.5} className="shrink-0 text-foreground-lighter" />

@@ -4,7 +4,8 @@ import { toast } from 'sonner'
 import { EnvironmentTargets } from './integrations.types'
 import { integrationKeys } from './keys'
 import { handleError, patch } from '@/data/fetchers'
-import type { ResponseError, UseCustomMutationOptions } from '@/types'
+import type { StudioError } from '@/lib/errors/studio-errors'
+import type { UseCustomMutationOptions } from '@/types'
 
 type UpdateConnectionPayload = {
   id: string
@@ -40,11 +41,11 @@ export const useVercelConnectionUpdateMutation = ({
   onError,
   ...options
 }: Omit<
-  UseCustomMutationOptions<UpdateVercelConnectionData, ResponseError, UpdateConnectionPayload>,
+  UseCustomMutationOptions<UpdateVercelConnectionData, StudioError, UpdateConnectionPayload>,
   'mutationFn'
 > = {}) => {
   const queryClient = useQueryClient()
-  return useMutation<UpdateVercelConnectionData, ResponseError, UpdateConnectionPayload>({
+  return useMutation<UpdateVercelConnectionData, StudioError, UpdateConnectionPayload>({
     mutationFn: (vars) => updateVercelConnection(vars),
     async onSuccess(data, variables, context) {
       await queryClient.invalidateQueries({

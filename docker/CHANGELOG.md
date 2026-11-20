@@ -22,6 +22,62 @@ If you depend on any of these overrides, plan to migrate before they are removed
 
 ---
 
+## [0.8.4](https://github.com/supabase/supabase/releases/tag/self-hosted/v0.8.4) - 2026-11-05
+
+⚠️ **Note:** This update includes **important changes**. Please check the details below:
+- Includes **security fixes** for Storage - updating is **strongly recommended**
+- The API gateway no longer adds CORS headers to Edge Functions responses: functions called from a browser must handle CORS themselves. See the **API gateway** section below
+- The functions container now has a default memory limit of 2 GiB. If your functions need more, set `FUNCTIONS_MEMORY_LIMIT` in `.env` before updating. See the **Edge Runtime** section below
+- The Realtime known issue from 0.8.3 is fixed, and the `REGION: us-east-1` workaround is no longer needed. See the **Realtime** section below
+
+### Documentation
+- Added a **Memory management** section to the [Edge Functions](https://supabase.com/docs/guides/self-hosting/self-hosted-functions) guide, covering the shared container memory budget, the per-worker limit and idle-worker cleanup - PR [#51958](https://github.com/supabase/supabase/pull/51958) (via [@luizfelmach](https://github.com/luizfelmach))
+- Explained how to trace a main worker `BOOT_ERROR` that includes a `(ref: <uuid>)` in the Edge Functions troubleshooting guide - PR [#51811](https://github.com/supabase/supabase/pull/51811) (via [@luizfelmach](https://github.com/luizfelmach))
+
+### API gateway
+- ⚠️ Changed the `/functions/v1/` route to leave CORS to the function, as on the platform. The gateway no longer answers preflight requests or adds CORS headers to function responses, so the function's own CORS policy applies. Functions called from a browser must handle CORS themselves, see [CORS support for Edge Functions](https://supabase.com/docs/guides/functions/cors) (requires `volumes/api/envoy/lds.template.yaml` and `volumes/api/kong.yml` update) - PR [#52709](https://github.com/supabase/supabase/pull/52709)
+- Fixed requests failing with a 503 for up to about 30 seconds after `docker compose up -d` recreates a service that gets a new IP address: Envoy now drops removed hosts at the next DNS refresh (requires `volumes/api/envoy/cds.yaml` update) - PR [#52968](https://github.com/supabase/supabase/pull/52968)
+- Updated Envoy to `v1.39.6` - [Release](https://github.com/envoyproxy/envoy/releases/tag/v1.39.6)
+  - Fixed **security** issues in Envoy filters and its TLS library; the bundled configuration doesn't use the affected filters (OAuth2, API key authentication, Brotli decompression) - [GHSA-3wvj-j6qm-62mr](https://github.com/envoyproxy/envoy/security/advisories/GHSA-3wvj-j6qm-62mr), [GHSA-8vc2-jrm4-835w](https://github.com/envoyproxy/envoy/security/advisories/GHSA-8vc2-jrm4-835w), [GHSA-47vj-9r25-wv5j](https://github.com/envoyproxy/envoy/security/advisories/GHSA-47vj-9r25-wv5j)
+- Updated [nginx-certbot](https://github.com/JonasAlfredsson/docker-nginx-certbot) to `6.2.0-nginx1.31.8` (requires `docker-compose.nginx.yml` update)
+  - Fixed **security** issues in nginx, including a buffer overflow when evaluating variables (CVE-2026-93479) - [nginx changes](https://nginx.org/en/CHANGES)
+
+### Studio
+- Updated to `2026.11.02-sha-a05e7ec`
+
+### Realtime
+- Updated to `v2.148.3` - [Release](https://github.com/supabase/realtime/releases/tag/v2.148.3)
+  - Fixed a **security** issue: crafted tenant IDs could give access to another tenant's private channels; the default setup, with a single tenant, isn't affected - [GHSA-2rcv-vpjw-5g6c](https://github.com/supabase/realtime/security/advisories/GHSA-2rcv-vpjw-5g6c)
+  - Fixed Realtime restarting its database connection and Postgres Changes replication every 10 minutes (the 0.8.3 known issue). If you added `REGION: us-east-1` as a workaround, you can remove it - [realtime#2290](https://github.com/supabase/realtime/pull/2290)
+  - Changed: Postgres Changes subscriptions now match schema and table names exactly; before, `_` and `%` in a name could also match other tables - [realtime#2285](https://github.com/supabase/realtime/pull/2285)
+  - Fixed **security** issues in dependencies: jose, used for JWT verification - [realtime#2438](https://github.com/supabase/realtime/pull/2438)
+
+### Storage
+- Updated to `v1.89.12` - [Release](https://github.com/supabase/storage/releases/tag/v1.89.12)
+  - ⚠️ Fixed **security** issues in dependencies: a denial of service in multipart upload parsing (`@fastify/busboy`), reachable in the default setup - [storage#1659](https://github.com/supabase/storage/pull/1659)
+  - Fixed a **security** issue: signed S3 protocol requests and presigned URLs could be replayed after their intended lifetime by someone who captured them - [GHSA-2p28-q2vx-mw6w](https://github.com/supabase/storage/security/advisories/GHSA-2p28-q2vx-mw6w), [storage#1578](https://github.com/supabase/storage/pull/1578)
+  - Changed: uploads, copies, moves and deletes blocked by a trigger on `storage.objects` now fail with `AccessDenied` instead of a 500, 409 or 404 - [storage#1600](https://github.com/supabase/storage/pull/1600)
+  - Changed: resumable (TUS) uploads that receive no data for 60 seconds are now aborted, releasing their lock (`TUS_BODY_IDLE_TIMEOUT_MS`) - [storage#1478](https://github.com/supabase/storage/pull/1478)
+- Updated RustFS to `1.0.4` (requires `docker-compose.rustfs.yml` update)
+
+### imgproxy
+- Updated to `v4.0.21` - [Changelog](https://github.com/imgproxy/imgproxy/blob/master/CHANGELOG.md) | [Release](https://github.com/imgproxy/imgproxy/releases/tag/v4.0.21)
+  - Fixed **security** issues in the BMP and ICO image loaders and the SVG sanitizer; imgproxy 3.x no longer receives these fixes
+  - Changed: the environment variables removed in imgproxy 4, such as `IMGPROXY_CONCURRENCY`, `IMGPROXY_READ_TIMEOUT` and `IMGPROXY_WRITE_TIMEOUT`, are now ignored without a warning. If you set any of them, check the imgproxy changelog for their replacements
+  - Changed: grayscale images now stay grayscale, and SVGs sized in physical units (such as `pt`) are rasterized at 96 DPI instead of 72 when no width or height is given
+  - Fixed image transformations of corrupt or truncated images returning a 500 instead of a 400
+
+### Edge Runtime
+- Updated to `v1.77.9` - [Release](https://github.com/supabase/edge-runtime/releases/tag/v1.77.9)
+  - Fixed requests failing with "worker did not respond in time" when they arrive while a function is still starting - [edge-runtime#763](https://github.com/supabase/edge-runtime/pull/763)
+  - Fixed **security** issues in dependencies: the bundled TLS root certificates trusted distrusted intermediates - [edge-runtime#756](https://github.com/supabase/edge-runtime/pull/756), [edge-runtime#758](https://github.com/supabase/edge-runtime/pull/758)
+  - Changed: legacy root certificates such as DigiCert Global Root CA, GlobalSign Root CA and Baltimore CyberTrust Root were removed from the bundled store, so `fetch()` to a server whose certificate chains only to one of them now fails. To also trust the system store, add `DENO_TLS_CA_STORE: mozilla,system` to the `functions` service's `environment` in `docker-compose.yml`
+- ⚠️ Changed: the functions container now has a default memory limit of 2 GiB, shared by all workers, and each worker can use up to 256 MiB. When memory runs low, idle workers are reclaimed. This also applies to existing deployments when updating `docker-compose.yml`. Set `FUNCTIONS_MEMORY_LIMIT` in `.env` to a suitable value before recreating the container. If memory exhaustion terminates the runtime, all functions are interrupted until the container restarts (requires `docker-compose.yml`, `.env`, `volumes/functions/main/index.ts`, and `volumes/functions/main/memory-pressure.ts` update) - PR [#51957](https://github.com/supabase/supabase/pull/51957) (via [@luizfelmach](https://github.com/luizfelmach))
+- Fixed an unhandled promise rejection in the main worker terminating the runtime, which made every function unavailable until a restart. Errors that escape the request handler now return a `503 BOOT_ERROR` with a reference to look up in the logs. If you customized `volumes/functions/main/index.ts`, reconcile your changes (requires `volumes/functions/main/index.ts` update) - PR [#51353](https://github.com/supabase/supabase/pull/51353) (via [@luizfelmach](https://github.com/luizfelmach))
+- Added CORS headers to the main worker's own error responses, such as `404 NOT_FOUND` and the `401` from JWT verification, so browsers can read them (requires `volumes/functions/main/index.ts` update) - PR [#52710](https://github.com/supabase/supabase/pull/52710)
+
+---
+
 ## [0.8.3](https://github.com/supabase/supabase/releases/tag/self-hosted/v0.8.3) - 2026-10-16
 
 ⚠️ **Note:** This update includes **important changes**. Please check the details below:
