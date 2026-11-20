@@ -1,6 +1,5 @@
 import { safeLocalStorage, useParams } from 'common'
 import { partition } from 'lodash'
-import { type NextRouter } from 'next/router'
 import {
   createContext,
   PropsWithChildren,
@@ -15,6 +14,11 @@ import { buildTableEditorUrl } from '@/components/grid/SupabaseGrid.utils'
 import type { SqlSnippetSource } from '@/components/interfaces/SQLEditor/querySource'
 import type { EditorType } from '@/components/layouts/editors/EditorsLayout.hooks'
 import type { ENTITY_TYPE } from '@/data/entity-types/entity-type-constants'
+
+export type TabRouter = {
+  push: (url: string) => unknown
+  query: { ref?: string | string[]; schema?: string | string[] }
+}
 
 export const editorEntityTypes = {
   table: ['r', 'v', 'm', 'f', 'p'],
@@ -424,7 +428,7 @@ export function createTabsState(projectRef: string) {
 
     // TABS HANDLERS
 
-    handleTabNavigation: (id: string, router: NextRouter) => {
+    handleTabNavigation: (id: string, router: TabRouter) => {
       const tab = store.tabsMap[id]
       if (!tab) return
 
@@ -536,7 +540,7 @@ export function createTabsState(projectRef: string) {
       onClearDashboardHistory,
     }: {
       id: string
-      router: NextRouter
+      router: TabRouter
       editor?: EditorType
       onClose?: (id: string) => void
       onClearDashboardHistory: () => void
@@ -617,7 +621,7 @@ export function createTabsState(projectRef: string) {
       onClearDashboardHistory,
     }: {
       editor: 'sql' | 'table' | 'explorer'
-      router: NextRouter
+      router: TabRouter
       onClearDashboardHistory: () => void
     }) => {
       const tabsToClose = store.openTabs.filter((id) => {
@@ -629,7 +633,7 @@ export function createTabsState(projectRef: string) {
       const editorPath = editor === 'table' ? 'editor' : editor
       router.push(`/project/${router.query.ref}/${editorPath}`)
     },
-    handleTabDragEnd: (oldIndex: number, newIndex: number, tabId: string, router: NextRouter) => {
+    handleTabDragEnd: (oldIndex: number, newIndex: number, tabId: string, router: TabRouter) => {
       // Make permanent if needed
       const draggedTab = store.tabsMap[tabId]
       if (draggedTab?.isPreview) {

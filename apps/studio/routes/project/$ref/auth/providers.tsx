@@ -1,7 +1,11 @@
 import { createFileRoute } from '@tanstack/react-router'
+import { PageContainer } from 'ui-patterns/PageContainer'
 
+import { AuthProvidersForm } from '@/components/interfaces/Auth/AuthProvidersForm'
+import { BasicAuthSettingsForm } from '@/components/interfaces/Auth/BasicAuthSettingsForm'
+import { CustomAuthProviders } from '@/components/interfaces/Auth/CustomAuthProviders'
 import { AuthProvidersLayout } from '@/components/layouts/AuthLayout/AuthProvidersLayout'
-import ProvidersPage from '@/pages/project/[ref]/auth/providers'
+import { useIsFeatureEnabled } from '@/hooks/misc/useIsFeatureEnabled'
 
 export const Route = createFileRoute('/project/$ref/auth/providers')({
   component: AuthProvidersRoute,
@@ -16,7 +20,20 @@ export const Route = createFileRoute('/project/$ref/auth/providers')({
 function AuthProvidersRoute() {
   return (
     <AuthProvidersLayout>
-      <ProvidersPage dehydratedState={undefined} />
+      <ProvidersPage />
     </AuthProvidersLayout>
+  )
+}
+
+function ProvidersPage() {
+  const showProviders = useIsFeatureEnabled('authentication:show_providers')
+  const showCustomProviders = useIsFeatureEnabled('authentication:show_custom_providers')
+
+  return (
+    <PageContainer size="default">
+      <BasicAuthSettingsForm />
+      {showProviders && <AuthProvidersForm />}
+      {showCustomProviders && <CustomAuthProviders />}
+    </PageContainer>
   )
 }

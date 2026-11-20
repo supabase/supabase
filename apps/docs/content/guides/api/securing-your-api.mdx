@@ -47,6 +47,14 @@ To revoke these privileges as well, see [Revoke default privileges](#revoke-defa
 
 Supabase is changing the platform default to revoke these automatic grants so that exposure becomes opt-in. See [the platform defaults discussion](https://github.com/orgs/supabase/discussions/45329) in the Supabase GitHub discussions.
 
+Changes to default privileges, including the platform default change, apply only to new objects. Existing tables keep their grants and stay reachable through the Data API. To remove Data API access from an existing table, revoke its grants:
+
+```sql
+revoke all on table public.your_table from anon, authenticated, service_role;
+```
+
+Leave out `service_role` to keep server-side access with a secret key.
+
 The default privileges are part of the standard Supabase permission model and don't bypass RLS. The internal `supabase_admin` role grants them to `anon`, `authenticated`, and `service_role`, but it can't authenticate through the Data API. See [`pg_default_acl`](https://www.postgresql.org/docs/current/catalog-pg-default-acl.html) in the Postgres documentation and [`supabase_admin`](/docs/guides/database/postgres/roles#supabaseadmin) in the Supabase documentation.
 
 To see which privileges your project grants on new objects, see [Check your default privileges](#check-your-default-privileges). To prevent automatic grants on new objects, see [Revoke default privileges](#revoke-default-privileges).
@@ -105,7 +113,7 @@ select split_part(
   ',', 1); -- takes the client IP before the first comma
 ```
 
-See [Pre-request](https://postgrest.org/en/stable/references/transactions.html#pre-request) in the PostgREST documentation and [X-Forwarded-For](https://developer.mozilla.org/en-US/docs/Web/HTTP/Headers/X-Forwarded-For) in the MDN documentation.
+See [Pre-request](https://postgrest.org/en/stable/references/transactions.html#pre-request) in the PostgREST documentation and [X-Forwarded-For](https://developer.mozilla.org/en-US/docs/Web/HTTP/Reference/Headers/X-Forwarded-For) in the MDN documentation.
 
 For complete implementations that use this request information, see [Pre-request examples](#pre-request-examples).
 
@@ -228,7 +236,7 @@ Revoke automatic grants when you want new objects in `public` to remain inaccess
      revoke execute on functions from public;
    ```
 
-New tables, sequences, and functions then require explicit grants before Data API roles can access them.
+New tables, sequences, and functions then require explicit grants before Data API roles can access them. Existing tables, sequences, and functions keep their current grants, so [revoke grants on each existing table](#default-privileges) that you want to remove from the Data API.
 
 <Admonition type="caution">
 
@@ -238,7 +246,7 @@ The last statement also restricts functions that `postgres` creates in other sch
 
 ### Disable the Data API
 
-If your app never uses Supabase client libraries, REST, or GraphQL data endpoints, turn the Data API off:
+If your app never uses [Supabase client](/docs/reference/javascript/introduction) libraries, REST, or GraphQL data endpoints, turn the Data API off:
 
 1. Open the [Data API integration overview](/dashboard/project/_/integrations/data_api/overview) in the Dashboard.
 2. Turn **Enable Data API** off.

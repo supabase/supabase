@@ -205,7 +205,7 @@ EXECUTE PROCEDURE handle_times();
 
 The `created_at`, `updated_at`, and `deleted` columns are used by Legend-State to track changes and sync efficiently. The `handle_times` function is used to automatically set the `created_at` and `updated_at` columns when a new row is inserted or an existing row is updated. This allows to efficiently sync only the changes since the last sync.
 
-Next, run `supabase link` to link your local project to your Supabase project and run `supabase db push` to apply the init migration to your Supabase database.
+Next, run `supabase link` to link your local project to your Supabase project and run `supabase db push` to apply the init migration to your [Supabase database](/docs/guides/database/overview).
 
 ## Generating TypeScript Types
 
@@ -216,7 +216,7 @@ supabase start
 supabase gen types --lang=typescript --local > utils/database.types.ts
 ```
 
-Next, in your `utils/SupaLegend.ts` file, import the generated types inject them into the Supabase client.
+Next, in your `utils/SupaLegend.ts` file, import the generated types inject them into the [Supabase client](/docs/reference/javascript/introduction).
 
 ```ts utils/SupaLegend.ts
 import { createClient } from '@supabase/supabase-js'

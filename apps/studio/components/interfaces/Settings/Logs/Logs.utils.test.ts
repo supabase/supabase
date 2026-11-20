@@ -1,3 +1,4 @@
+import dayjs from 'dayjs'
 import { describe, expect, test, vi } from 'vitest'
 
 import { LogsTableName } from './Logs.constants'
@@ -14,6 +15,7 @@ import {
   genCountQuery,
   genDefaultQuery,
   getAuthLogSeverity,
+  isStartOutsideRetention,
   parseMultigresEventMessage,
 } from './Logs.utils'
 
@@ -25,6 +27,24 @@ const createLog = (overrides: Partial<LogData> = {}): LogData => ({
 })
 
 describe('Logs.utils', () => {
+  describe('isStartOutsideRetention', () => {
+    const hoursAgo = (hours: number) => dayjs().subtract(hours, 'hour').toISOString()
+
+    test('prompts for a start 36 hours ago with a one-day entitlement', () => {
+      expect(isStartOutsideRetention(hoursAgo(36), 1)).toBe(true)
+    })
+
+    test('does not prompt within the entitlement, including presets computed just before the check', () => {
+      expect(isStartOutsideRetention(hoursAgo(12), 1)).toBe(false)
+      expect(isStartOutsideRetention(hoursAgo(24), 1)).toBe(false)
+      expect(isStartOutsideRetention(hoursAgo(24 * 7), 7)).toBe(false)
+    })
+
+    test('does not prompt without an entitlement value', () => {
+      expect(isStartOutsideRetention(hoursAgo(24 * 30), undefined)).toBe(false)
+    })
+  })
+
   describe('formatLogsAsJson', () => {
     test('formats single log as JSON', () => {
       const rows: LogData[] = [createLog({ id: '1', event_message: 'test message' })]

@@ -8,7 +8,7 @@ import { mdAlternates } from '@/lib/md-alternates'
 export const metadata: Metadata = {
   title: 'Realtime | Supabase',
   description:
-    'Sync client state globally over WebSockets. Listen to database changes, store user presence, and broadcast messages in real time.',
+    'Use Realtime to sync client state globally over WebSockets. Listen to database changes, store user presence, and broadcast messages in real time.',
   alternates: {
     ...canonicalAlternates('/realtime'),
     ...mdAlternates('realtime'),

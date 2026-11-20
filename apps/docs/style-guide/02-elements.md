@@ -260,6 +260,17 @@ repository root, or set up automatic formatting in your editor.
 
 Write `select * from table` rather than `SELECT * FROM table`.
 
+#### Write a placeholder in uppercase with a `YOUR_` prefix
+
+Name the value the reader replaces, in `YOUR_UPPER_SNAKE_CASE`: `YOUR_TABLE`,
+`YOUR_PROJECT_REF`. Skip angle and square brackets, which break shell, JSX, and SQL.
+Say what to replace in the step that first uses it. For the project URL and keys, use
+[`ProjectConfigVariables`](#show-the-readers-project-url-and-keys-with-projectconfigvariables)
+instead.
+
+- **Recommended**: `alter table YOUR_TABLE enable row level security;`
+- **Not recommended**: `alter table <your-table> enable row level security;`
+
 Optionally specify a filename after the language specifier:
 
 ````md

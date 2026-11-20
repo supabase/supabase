@@ -83,13 +83,17 @@ Add the IP address you discovered to the Envoy configuration by editing the `/mc
   route:
     cluster: studio
     prefix_rewrite: /api/mcp
-    timeout: 30s
+    timeout: 0s
   request_headers_to_add:
     - header:
         key: X-Forwarded-Prefix
         value: /mcp
       append_action: ADD_IF_ABSENT
   typed_per_filter_config:
+    envoy.filters.http.cors:
+      '@type': >-
+        type.googleapis.com/envoy.config.route.v3.FilterConfig
+      disabled: true
     envoy.filters.http.basic_auth:
       '@type': >-
         type.googleapis.com/envoy.config.route.v3.FilterConfig
@@ -138,7 +142,7 @@ Add the IP address you discovered to the Envoy configuration by editing the `/mc
 Add the IP address you discovered to the Kong configuration by editing the following section in `./volumes/api/kong.yml`:
 
 1. Comment out the request-termination section
-2. Remove the # symbols from the entire section starting with `- name: cors`, including `deny: []`
+2. Remove the # symbols from the entire section starting with `- name: ip-restriction`, including `deny: []`
 3. Add your local IP to the 'allow' list
 4. **Preserve the existing indentation** - YAML is whitespace-sensitive and the config will fail to load if it changes
 5. Your edited configuration should look like the example below:
@@ -163,7 +167,6 @@ Add the IP address you discovered to the Kong configuration by editing the follo
     # 1. Comment out the 'request-termination' section above
     # 2. Uncomment the entire section below, including 'deny'
     # 3. Add your local IPs to the 'allow' list
-    - name: cors
     - name: ip-restriction
       config:
         allow:

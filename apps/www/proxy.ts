@@ -1,5 +1,6 @@
 import { stampFirstReferrerCookie } from 'common/first-referrer-cookie'
 import { negotiateMarkdown } from 'common/markdown-negotiation'
+import { stampVisitorCountryCookie } from 'common/visitor-country'
 import { NextResponse, type NextRequest } from 'next/server'
 
 import { CHANGELOG_PAGES, MD_PAGES } from './app/api-v2/md/content.generated'
@@ -40,6 +41,7 @@ export function proxy(request: NextRequest) {
 
   const response = NextResponse.next()
   stampFirstReferrerCookie(request, response)
+  stampVisitorCountryCookie(request, response)
   return response
 }
 
