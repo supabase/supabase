@@ -684,6 +684,7 @@ export const UnifiedLogs = ({
   const savedViewsEntry = showSavedViews ? (
     <button
       type="button"
+      tabIndex={0}
       onClick={handleOpenViewsSection}
       aria-label={getSavedViewsTooltip()}
       className="group flex w-full items-center gap-2 rounded-md px-2 py-1.5 text-left hover:bg-surface-200 focus-ring"
@@ -709,8 +710,7 @@ export const UnifiedLogs = ({
             )}
             title={activeView.name}
           >
-            {activeView.name}
-            {isActiveViewModified ? ' (modified)' : ''}
+            {`${activeView.name}${isActiveViewModified ? ' (modified)' : ''}`}
           </span>
         ) : (
           <span className="block truncate text-xs text-foreground-lighter opacity-70">
