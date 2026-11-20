@@ -7,6 +7,7 @@ import * as React from 'react'
 
 import { cn } from '../../../lib/utils/cn'
 import { getExplicitTabIndex } from '../../../lib/utils/getExplicitTabIndex'
+import { Button } from '../../Button/Button'
 
 const Sheet = SheetPrimitive.Root
 
@@ -179,14 +180,14 @@ const SheetContent = React.forwardRef<
     >
       {children}
       {showClose ? (
-        <SheetPrimitive.Close
-          className={cn(
-            'absolute right-4 top-4 rounded-xs opacity-70 transition-opacity hover:opacity-100 focus-ring disabled:pointer-events-none data-[state=open]:bg-secondary',
-            'hit-area-6'
-          )}
-        >
-          <X className="h-4 w-4" />
-          <span className="sr-only">Close</span>
+        <SheetPrimitive.Close asChild>
+          <Button
+            variant="text"
+            size="tiny"
+            className="absolute right-4 top-4 size-7 px-0"
+            aria-label="Close"
+            icon={<X className="h-4 w-4" />}
+          />
         </SheetPrimitive.Close>
       ) : null}
     </SheetPrimitive.Content>
