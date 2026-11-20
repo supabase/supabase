@@ -1,7 +1,9 @@
 import dayjs from 'dayjs'
-import { ALL_TIMEZONES } from './PITR.constants'
+
 import type { Time } from './PITR.types'
-import type { ProjectSelectedAddon } from 'data/subscriptions/types'
+import type { ProjectSelectedAddon } from '@/data/subscriptions/types'
+import { findTimezoneByIana, TIMEZONES_BY_IANA } from '@/lib/constants/timezones'
+import { guessLocalTimezone } from '@/lib/dayjs'
 
 export const getPITRRetentionDuration = (addons: ProjectSelectedAddon[]) => {
   const pitrAddon = addons.find((addon) => addon.type === 'pitr')
@@ -17,13 +19,8 @@ export const getDatesBetweenRange = (startDate: dayjs.Dayjs, endDate: dayjs.Dayj
 }
 
 export const getClientTimezone = () => {
-  const defaultTz = dayjs.tz.guess()
-  const utcTz = ALL_TIMEZONES.find((option) => option.value === 'UTC')
-  const timezone = ALL_TIMEZONES.find((option) => {
-    if (option.utc.includes(defaultTz)) return option
-    else return undefined
-  })
-  return timezone ?? (utcTz || ALL_TIMEZONES[0])
+  const utcTimezone = TIMEZONES_BY_IANA.find((option) => option.value === 'UTC')
+  return findTimezoneByIana(guessLocalTimezone()) ?? utcTimezone ?? TIMEZONES_BY_IANA[0]
 }
 
 export const formatNumberToTwoDigits = (number: Number) => {
@@ -48,4 +45,36 @@ export function constrainDateToRange(current: dayjs.Dayjs, lower: dayjs.Dayjs, u
     return upper
   }
   return current
+}
+
+export function getRestoreDate(unix: number, timezone: string) {
+  const instant = dayjs.unix(unix).utc()
+  const offset = new Intl.DateTimeFormat('en-US', {
+    timeZone: timezone,
+    timeZoneName: 'longOffset',
+  })
+    .formatToParts(instant.toDate())
+    .find((part) => part.type === 'timeZoneName')?.value
+  const match = offset?.match(/^GMT([+-])(\d{2}):(\d{2})$/)
+  if (!match) return instant
+
+  const minutes = Number(match[2]) * 60 + Number(match[3])
+  return instant.utcOffset(match[1] === '-' ? -minutes : minutes)
+}
+
+export function updateRestoreDate(
+  current: dayjs.Dayjs,
+  date: string,
+  time: Time,
+  timezone: string
+) {
+  const wallTime = dayjs.utc(date).hour(time.h).minute(time.m).second(time.s)
+  const candidate = getRestoreDate(
+    wallTime.subtract(current.utcOffset(), 'minute').unix(),
+    timezone
+  )
+  const format = 'YYYY-MM-DD HH:mm:ss'
+  if (candidate.format(format) === wallTime.format(format)) return candidate
+
+  return getRestoreDate(dayjs.tz(wallTime.format(format), timezone).unix(), timezone)
 }

@@ -1,0 +1,266 @@
+import { QueryClient } from '@tanstack/react-query'
+import { renderHook } from '@testing-library/react'
+import { FeatureFlagContext } from 'common'
+import { Inbox, Issues } from 'icons'
+import { isValidElement } from 'react'
+import { beforeEach, describe, expect, it, vi } from 'vitest'
+
+import {
+  generateOtherRoutes,
+  generateProductRoutes,
+  generateSettingsRoutes,
+  useGenerateOtherRoutes,
+  useGenerateToolRoutes,
+} from './NavigationBar.utils'
+import type { Route } from '@/components/ui/ui.types'
+import { lintKeys } from '@/data/lint/keys'
+import { miscKeys } from '@/data/misc/keys'
+import type { Project } from '@/data/projects/project-detail-query'
+import { CustomWrapper } from '@/tests/lib/custom-render'
+
+const REF = 'test-project-ref'
+
+const activeProject = { status: 'ACTIVE_HEALTHY' } as Project
+const buildingProject = { status: 'COMING_UP' } as Project
+const inactiveProject = { status: 'INACTIVE' } as Project
+
+const keys = (routes: { key: string }[]) => routes.map((r) => r.key)
+
+const iconOf = (route?: Route) => (isValidElement(route?.icon) ? route.icon.type : undefined)
+
+const mockUseParams = vi.fn()
+const mockUseSelectedProjectQuery = vi.fn()
+const mockUseIsExplorerEnabled = vi.fn()
+
+vi.mock('common', async (importOriginal) => ({
+  ...(await importOriginal<typeof import('common')>()),
+  useParams: () => mockUseParams(),
+}))
+
+vi.mock('@/hooks/misc/useSelectedProject', () => ({
+  useSelectedProjectQuery: () => mockUseSelectedProjectQuery(),
+}))
+
+vi.mock('@/components/interfaces/App/FeaturePreview/FeaturePreviewContext', () => ({
+  useIsExplorerEnabled: () => mockUseIsExplorerEnabled(),
+  useUnifiedLogsPreview: () => ({ isEnabled: false }),
+}))
+
+describe('useGenerateToolRoutes', () => {
+  beforeEach(() => {
+    mockUseParams.mockReturnValue({ ref: REF })
+    mockUseSelectedProjectQuery.mockReturnValue({ data: activeProject })
+    mockUseIsExplorerEnabled.mockReturnValue(false)
+  })
+
+  it('always returns Table Editor and SQL Editor', () => {
+    const { result } = renderHook(() => useGenerateToolRoutes())
+    expect(keys(result.current)).toEqual(['editor', 'sql'])
+  })
+
+  it('marks routes as disabled when project is not active', () => {
+    mockUseSelectedProjectQuery.mockReturnValue({ data: inactiveProject })
+
+    const { result } = renderHook(() => useGenerateToolRoutes())
+    expect(result.current.every((r) => r.disabled)).toBe(true)
+  })
+
+  it('points links to the building URL when project is building', () => {
+    mockUseSelectedProjectQuery.mockReturnValue({ data: buildingProject })
+
+    const { result } = renderHook(() => useGenerateToolRoutes())
+    expect(result.current.every((r) => r.link === `/project/${REF}`)).toBe(true)
+  })
+
+  it('returns links as false when ref is undefined', () => {
+    mockUseParams.mockReturnValue({ ref: undefined })
+
+    const { result } = renderHook(() => useGenerateToolRoutes())
+    expect(result.current.every((r) => r.link === undefined)).toBe(true)
+  })
+})
+
+describe('generateProductRoutes', () => {
+  it('includes all product routes by default (features default to true)', () => {
+    const routes = generateProductRoutes(REF, activeProject)
+    expect(keys(routes)).toEqual(['database', 'auth', 'storage', 'functions', 'realtime'])
+  })
+
+  it('includes compute only when the compute flag is enabled', () => {
+    expect(keys(generateProductRoutes(REF, activeProject))).not.toContain('compute')
+    expect(keys(generateProductRoutes(REF, activeProject, { compute: true }))).toContain('compute')
+  })
+
+  it('gives every product route a navigation shortcut', () => {
+    const routes = generateProductRoutes(REF, activeProject, { compute: true })
+    expect(routes.filter((r) => !r.shortcutId)).toEqual([])
+  })
+
+  it.each([
+    ['auth', 'auth'],
+    ['storage', 'storage'],
+    ['edgeFunctions', 'functions'],
+    ['realtime', 'realtime'],
+  ] as const)('excludes %s when its feature is disabled', (feature, key) => {
+    const routes = generateProductRoutes(REF, activeProject, { [feature]: false })
+    expect(keys(routes)).not.toContain(key)
+    expect(keys(routes)).toContain('database')
+  })
+
+  it('links auth to overview page when authOverviewPage is enabled', () => {
+    const routes = generateProductRoutes(REF, activeProject, { authOverviewPage: true })
+    const authRoute = routes.find((r) => r.key === 'auth')
+    expect(authRoute?.link).toBe(`/project/${REF}/auth/overview`)
+  })
+
+  it('links auth to users page by default', () => {
+    const routes = generateProductRoutes(REF, activeProject)
+    const authRoute = routes.find((r) => r.key === 'auth')
+    expect(authRoute?.link).toBe(`/project/${REF}/auth/users`)
+  })
+
+  it('always includes database even when all optional features are disabled', () => {
+    const routes = generateProductRoutes(REF, activeProject, {
+      auth: false,
+      storage: false,
+      edgeFunctions: false,
+      realtime: false,
+    })
+    expect(keys(routes)).toEqual(['database'])
+  })
+})
+
+describe('generateOtherRoutes', () => {
+  it('includes logs and integrations with Issues hidden by default', () => {
+    const routes = generateOtherRoutes(REF, activeProject)
+    expect(keys(routes)).not.toContain('issues')
+    expect(keys(routes)).toContain('logs')
+    expect(keys(routes)).toContain('integrations')
+  })
+
+  it.each([false, undefined])('restores Advisors when Issues is %s', (issuesInbox) => {
+    const route = generateOtherRoutes(REF, activeProject, { issuesInbox }).find(
+      (route) => route.key === 'advisors'
+    )
+    expect(route?.label).toBe('Advisors')
+    expect(route?.link).toBe(`/project/${REF}/advisors/security`)
+
+    expect(keys(generateOtherRoutes(REF, activeProject, { issuesInbox: false }))).not.toContain(
+      'issues'
+    )
+  })
+
+  it('opens the Health Advisor when health checks are enabled and Issues is off', () => {
+    const route = generateOtherRoutes(REF, activeProject, {
+      issuesInbox: false,
+      isHealthAdvisorEnabled: true,
+    }).find((route) => route.key === 'advisors')
+    expect(route?.link).toBe(`/project/${REF}/advisors/health`)
+  })
+
+  it('uses the empty inbox icon when the project has no issues', () => {
+    const route = generateOtherRoutes(REF, activeProject, { issuesInbox: true }).find(
+      (route) => route.key === 'issues'
+    )
+    expect(iconOf(route)).toBe(Inbox)
+  })
+
+  it('swaps in the issues icon when the project has issues', () => {
+    const route = generateOtherRoutes(REF, activeProject, {
+      issuesInbox: true,
+      hasIssues: true,
+    }).find((route) => route.key === 'issues')
+    expect(iconOf(route)).toBe(Issues)
+  })
+
+  it('keeps the issues icon off the legacy Advisors route', () => {
+    const route = generateOtherRoutes(REF, activeProject, { hasIssues: true }).find(
+      (route) => route.key === 'advisors'
+    )
+    expect(iconOf(route)).not.toBe(Issues)
+    expect(iconOf(route)).not.toBe(Inbox)
+  })
+
+  it.each([false, true])('wires the Issues flag into generated navigation: %s', (issuesInbox) => {
+    mockUseParams.mockReturnValue({ ref: REF })
+    mockUseSelectedProjectQuery.mockReturnValue({ data: activeProject })
+    const queryClient = new QueryClient({ defaultOptions: { queries: { staleTime: Infinity } } })
+    queryClient.setQueryData(miscKeys.enabledFeaturesOverride(), { disabled_features: [] })
+    queryClient.setQueryData(lintKeys.lint(REF), [])
+    const { result } = renderHook(() => useGenerateOtherRoutes(), {
+      wrapper: ({ children }) => (
+        <FeatureFlagContext.Provider value={{ configcat: { issuesInbox }, posthog: {} }}>
+          <CustomWrapper queryClient={queryClient}>{children}</CustomWrapper>
+        </FeatureFlagContext.Provider>
+      ),
+    })
+    expect(keys(result.current).includes('issues')).toBe(issuesInbox)
+    expect(keys(result.current).includes('advisors')).toBe(!issuesInbox)
+  })
+
+  it('includes observability when reports are enabled', () => {
+    const routes = generateOtherRoutes(REF, activeProject, { showReports: true })
+    expect(keys(routes)).toContain('observability')
+  })
+
+  it('excludes observability when reports are disabled', () => {
+    const routes = generateOtherRoutes(REF, activeProject, { showReports: false })
+    expect(keys(routes)).not.toContain('observability')
+  })
+
+  it('links observability to the query performance page in self-hosted mode', () => {
+    // NEXT_PUBLIC_IS_PLATFORM is false in .env.test, so IS_PLATFORM is false here
+    const routes = generateOtherRoutes(REF, activeProject, { showReports: true })
+    const observabilityRoute = routes.find((r) => r.key === 'observability')
+    expect(observabilityRoute?.link).toBe(`/project/${REF}/query-performance`)
+  })
+
+  it('does not include API Docs nav item', () => {
+    const routes = generateOtherRoutes(REF, activeProject)
+    expect(keys(routes)).not.toContain('api')
+  })
+
+  it('links logs to unified logs page when unifiedLogs is enabled', () => {
+    const routes = generateOtherRoutes(REF, activeProject, { unifiedLogs: true })
+    const logsRoute = routes.find((r) => r.key === 'logs')
+    expect(logsRoute?.link).toBe(`/project/${REF}/logs`)
+  })
+
+  it('links logs to explorer page by default', () => {
+    const routes = generateOtherRoutes(REF, activeProject)
+    const logsRoute = routes.find((r) => r.key === 'logs')
+    expect(logsRoute?.link).toBe(`/project/${REF}/logs/explorer`)
+  })
+
+  it('points links to building URL when project is building', () => {
+    const routes = generateOtherRoutes(REF, buildingProject, { showReports: true })
+    const observabilityRoute = routes.find((r) => r.key === 'observability')
+    expect(observabilityRoute?.link).toBe(`/project/${REF}`)
+  })
+
+  it('marks routes as disabled when project is not active', () => {
+    const routes = generateOtherRoutes(REF, inactiveProject, { issuesInbox: true })
+    const issuesRoute = routes.find((r) => r.key === 'issues')
+    expect(issuesRoute?.disabled).toBe(true)
+  })
+
+  it('links enabled Issues to the project issues page', () => {
+    const routes = generateOtherRoutes(REF, activeProject, { issuesInbox: true })
+    const issuesRoute = routes.find((r) => r.key === 'issues')
+    expect(issuesRoute?.link).toBe(`/project/${REF}/issues`)
+  })
+})
+
+describe('generateSettingsRoutes', () => {
+  it('links to general settings', () => {
+    const routes = generateSettingsRoutes(REF)
+    const settingsRoute = routes.find((r) => r.key === 'settings')
+    expect(settingsRoute?.link).toBe(`/project/${REF}/settings/general`)
+  })
+
+  it('returns a link as false when ref is undefined', () => {
+    const routes = generateSettingsRoutes(undefined)
+    const settingsRoute = routes.find((r) => r.key === 'settings')
+    expect(settingsRoute?.link).toBe(undefined)
+  })
+})

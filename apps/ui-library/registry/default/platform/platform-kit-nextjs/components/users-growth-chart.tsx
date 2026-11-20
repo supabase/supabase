@@ -1,17 +1,18 @@
 'use client'
 
+import { AlertTriangle } from 'lucide-react'
 import * as React from 'react'
 import { Bar, BarChart, CartesianGrid, XAxis, YAxis } from 'recharts'
+
+import { Alert, AlertDescription, AlertTitle } from '@/registry/default/components/ui/alert'
 import {
   ChartConfig,
   ChartContainer,
   ChartTooltip,
   ChartTooltipContent,
 } from '@/registry/default/components/ui/chart'
-import { useGetUserCountsByDay } from '@/registry/default/platform/platform-kit-nextjs/hooks/use-user-counts'
 import { Skeleton } from '@/registry/default/components/ui/skeleton'
-import { AlertTriangle } from 'lucide-react'
-import { Alert, AlertDescription, AlertTitle } from '@/registry/default/components/ui/alert'
+import { useGetUserCountsByDay } from '@/registry/default/platform/platform-kit-nextjs/hooks/use-user-counts'
 
 const chartConfig = {
   users: {

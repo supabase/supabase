@@ -2,7 +2,7 @@
 
 import { useRouter as useLegacyRouter } from 'next/compat/router'
 import { useRouter as useNextRouter } from 'next/navigation'
-import { createContext, useContext, useEffect, useMemo, useRef, useTransition } from 'react'
+import { createContext, useContext, useMemo, useRef, useTransition } from 'react'
 
 type Handler = (...evts: any[]) => void
 

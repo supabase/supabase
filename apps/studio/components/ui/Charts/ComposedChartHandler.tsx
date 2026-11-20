@@ -1,35 +1,40 @@
-import { Loader2 } from 'lucide-react'
+import dayjs from 'dayjs'
+import { ListIcon, Loader2Icon } from 'lucide-react'
 import { useRouter } from 'next/router'
 import React, { PropsWithChildren, useEffect, useMemo, useRef, useState } from 'react'
-import { cn, WarningIcon } from 'ui'
+import { Card, cn, WarningIcon } from 'ui'
 
-import Panel from 'components/ui/Panel'
-import { ComposedChart } from './ComposedChart'
-
-import { AnalyticsInterval, DataPoint } from 'data/analytics/constants'
-import { useInfraMonitoringQueries } from 'data/analytics/infra-monitoring-queries'
-import { InfraMonitoringAttribute } from 'data/analytics/infra-monitoring-query'
-import { useProjectDailyStatsQueries } from 'data/analytics/project-daily-stats-queries'
-import { ProjectDailyStatsAttribute } from 'data/analytics/project-daily-stats-query'
-import { useDatabaseSelectorStateSnapshot } from 'state/database-selector'
-import { useChartHighlight } from './useChartHighlight'
-
-import dayjs from 'dayjs'
-import type { UpdateDateRange } from 'pages/project/[ref]/reports/database'
+import type { ChartHighlightAction, UpdateDateRange } from './ChartHighlightActions'
 import type { ChartData } from './Charts.types'
-import { MultiAttribute } from './ComposedChart.utils'
+import { ComposedChart } from './ComposedChart'
+import { MultiAttribute, ThresholdZone } from './ComposedChart.utils'
+import { useChartHighlight } from './useChartHighlight'
+import Panel from '@/components/ui/Panel'
+import { AnalyticsInterval, DataPoint } from '@/data/analytics/constants'
+import { useInfraMonitoringQueries } from '@/data/analytics/infra-monitoring-queries'
+import { InfraMonitoringAttribute } from '@/data/analytics/infra-monitoring-query'
+import { useProjectDailyStatsQueries } from '@/data/analytics/project-daily-stats-queries'
+import { ProjectDailyStatsAttribute } from '@/data/analytics/project-daily-stats-query'
+import { useDatabaseSelectorStateSnapshot } from '@/state/database-selector'
+
+const parseChartTimestamp = (value: string) => {
+  const asNumber = Number(value)
+  return value !== '' && Number.isFinite(asNumber) ? dayjs(asNumber) : dayjs(value)
+}
 
 export interface ComposedChartHandlerProps {
   id?: string
   label: string
   attributes: MultiAttribute[]
+  thresholdZones?: ThresholdZone[]
+  thresholdZoneAttribute?: string
   startDate: string
   endDate: string
-  interval: string
+  interval?: string
   customDateFormat?: string
   defaultChartStyle?: 'bar' | 'line' | 'stackedAreaLine'
   hideChartType?: boolean
-  data?: ChartData
+  data?: ChartData | DataPoint[]
   isLoading?: boolean
   format?: string
   highlightedValue?: string | number
@@ -38,18 +43,25 @@ export interface ComposedChartHandlerProps {
   showLegend?: boolean
   showTotal?: boolean
   showMaxValue?: boolean
+  normalizeVisibleStackToPercent?: boolean
   updateDateRange?: UpdateDateRange
   valuePrecision?: number
   isVisible?: boolean
   docsUrl?: string
   hide?: boolean
   syncId?: string
+  YAxisProps?: {
+    width?: number
+    tickFormatter?: (value: number) => string
+    domain?: [number | string, number | string]
+    allowDataOverflow?: boolean
+  }
 }
 
 /**
  * Wrapper component that handles intersection observer logic for lazy loading
  */
-const LazyChartWrapper = ({ children }: PropsWithChildren) => {
+const LazyChartWrapper = ({ id, children }: PropsWithChildren<{ id: string }>) => {
   const [isVisible, setIsVisible] = useState(false)
   const ref = useRef<HTMLDivElement>(null)
 
@@ -79,7 +91,11 @@ const LazyChartWrapper = ({ children }: PropsWithChildren) => {
     }
   }, [])
 
-  return <div ref={ref}>{React.cloneElement(children as React.ReactElement, { isVisible })}</div>
+  return (
+    <div ref={ref} id={id} className="scroll-mt-16">
+      {React.cloneElement(children as React.ReactElement<{ isVisible: boolean }>, { isVisible })}
+    </div>
+  )
 }
 
 /**
@@ -94,6 +110,7 @@ const LazyChartWrapper = ({ children }: PropsWithChildren) => {
 const ComposedChartHandler = ({
   label,
   attributes,
+  thresholdZoneAttribute,
   startDate,
   endDate,
   interval,
@@ -133,12 +150,13 @@ const ComposedChartHandler = ({
     endDate,
     interval as AnalyticsInterval,
     databaseIdentifier,
-    data,
-    isVisible
+    Array.isArray(data) ? undefined : data,
+    isVisible,
+    thresholdZoneAttribute
   )
 
   const combinedData = useMemo(() => {
-    if (data) return data
+    if (data) return Array.isArray(data) ? data : data.data
 
     const isLoading = attributeQueries.some((query: any) => query.isLoading)
     if (isLoading) return undefined
@@ -176,6 +194,8 @@ const ComposedChartHandler = ({
 
           const queryData = attributeQueries[index]?.data?.data
           const matchingPoint = queryData?.find((p: any) => p.period_start === timestamp)
+          if (attr.attribute === thresholdZoneAttribute && matchingPoint?.[attr.attribute] == null)
+            return
           let value = matchingPoint?.[attr.attribute] ?? 0
 
           if (attr.manipulateValue && typeof attr.manipulateValue === 'function') {
@@ -201,9 +221,12 @@ const ComposedChartHandler = ({
       })
 
     return combined as DataPoint[]
-  }, [data, attributeQueries, attributes])
+  }, [data, attributeQueries, attributes, thresholdZoneAttribute])
 
-  const loading = isLoading || attributeQueries.some((query: any) => query.isLoading)
+  const loading =
+    data !== undefined
+      ? isLoading
+      : isLoading || attributeQueries.some((query: any) => query.isLoading)
 
   const _highlightedValue = useMemo(() => {
     if (highlightedValue !== undefined) return highlightedValue
@@ -231,26 +254,41 @@ const ComposedChartHandler = ({
           : (firstData.data[firstData.data.length - 1] as any)?.[firstAttr.attribute]
   }, [highlightedValue, attributes, attributeQueries])
 
+  const highlightActions: ChartHighlightAction[] = useMemo(() => {
+    return [
+      {
+        id: 'open-logs',
+        label: 'Open in Postgres Logs',
+        icon: <ListIcon size={12} />,
+        onSelect: ({ start, end }) => {
+          const projectRef = ref as string
+          if (!projectRef) return
+          const its = parseChartTimestamp(start).toISOString()
+          const ite = parseChartTimestamp(end).toISOString()
+          const url = `/project/${projectRef}/logs/postgres-logs?its=${its}&ite=${ite}`
+          router.push(url)
+        },
+      },
+    ]
+  }, [ref])
+
   if (loading) {
     return (
-      <Panel
+      <Card
         className={cn(
           'flex min-h-[280px] w-full flex-col items-center justify-center gap-y-2',
           className
         )}
-        wrapWithLoading={false}
-        noMargin
-        noHideOverflow
       >
-        <Loader2 size={18} className="animate-spin text-border-strong" />
+        <Loader2Icon size={18} className="animate-spin text-border-strong" />
         <p className="text-xs text-foreground-lighter">Loading data for {label}</p>
-      </Panel>
+      </Card>
     )
   }
 
   if (!combinedData) {
     return (
-      <div className="flex h-52 w-full flex-col items-center justify-center gap-y-2">
+      <div className="flex h-64 w-full flex-col items-center justify-center gap-y-2 border border-dashed rounded-md">
         <WarningIcon />
         <p className="text-xs text-foreground-lighter">Unable to load data for {label}</p>
       </div>
@@ -261,14 +299,14 @@ const ComposedChartHandler = ({
     <Panel
       noMargin
       noHideOverflow
-      className={cn('relative w-full scroll-mt-16', className)}
+      className={cn('relative w-full', className)}
       wrapWithLoading={false}
-      id={id ?? label.toLowerCase().replaceAll(' ', '-')}
     >
       <Panel.Content className="flex flex-col gap-4">
         <div className="absolute right-6 z-50 flex justify-between scroll-mt-16">{children}</div>
         <ComposedChart
           attributes={attributes}
+          thresholdZoneAttribute={thresholdZoneAttribute}
           data={combinedData as DataPoint[]}
           format={format}
           // [Joshen] This is where it's messing up
@@ -288,6 +326,7 @@ const ComposedChartHandler = ({
           valuePrecision={valuePrecision}
           hideChartType={hideChartType}
           syncId={syncId}
+          highlightActions={highlightActions}
           {...otherProps}
         />
       </Panel.Content>
@@ -303,7 +342,8 @@ const useAttributeQueries = (
   interval: AnalyticsInterval,
   databaseIdentifier: string | undefined,
   data: ChartData | undefined,
-  isVisible: boolean
+  isVisible: boolean,
+  thresholdZoneAttribute?: string
 ) => {
   const infraAttributes = attributes
     .filter((attr) => attr?.provider === 'infra-monitoring')
@@ -321,21 +361,20 @@ const useAttributeQueries = (
     interval,
     databaseIdentifier,
     data,
-    isVisible
+    isVisible,
+    thresholdZoneAttribute
   )
   const dailyStatsQueries = useProjectDailyStatsQueries(
     dailyStatsAttributes,
     ref,
     startDate,
     endDate,
-    interval,
-    databaseIdentifier,
     data,
     isVisible
   )
 
   const referenceLineQueries = referenceLines.map((line) => {
-    let value = line.value || 0
+    let value = line.value ?? line.customValue ?? 0
 
     return {
       data: {
@@ -356,8 +395,9 @@ const useAttributeQueries = (
 export function LazyComposedChartHandler(props: ComposedChartHandlerProps) {
   if (props.hide) return null
 
+  const anchorId = props.id ?? props.label.toLowerCase().replaceAll(' ', '-')
   return (
-    <LazyChartWrapper>
+    <LazyChartWrapper id={anchorId}>
       <ComposedChartHandler {...props} />
     </LazyChartWrapper>
   )

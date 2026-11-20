@@ -1,20 +1,26 @@
 'use client'
 
-import dayjs from 'dayjs'
 import { useState } from 'react'
-import { cn, Tooltip, TooltipContent, TooltipTrigger } from 'ui'
+import { cn, Tooltip, TooltipContent, TooltipProvider, TooltipTrigger } from 'ui'
+
 import { CHART_COLORS, DateTimeFormats } from './Charts.constants'
-import { numberFormatter } from './Charts.utils'
-import { formatBytes } from 'lib/helpers'
+import type { Datum } from './Charts.types'
+import { formatPercentage, numberFormatter } from './Charts.utils'
+import { getThresholdZoneValues } from './ComposedChartThresholdZones.utils'
+import { useFormatDateTime, useTimezone } from '@/lib/datetime'
+import { formatBytes, formatBytesMinMB } from '@/lib/helpers'
 
 export interface ReportAttributes {
   id?: string
   titleTooltip?: string
   label: string
   attributes?: (MultiAttribute | false)[]
+  thresholdZones?: ThresholdZone[]
+  thresholdZoneAttribute?: string
   defaultChartStyle?: 'bar' | 'line' | 'stackedAreaLine'
   hide?: boolean
-  availableIn?: string[]
+  entitlement?: string
+  requiredPlan?: string
   hideChartType?: boolean
   format?: string
   className?: string
@@ -29,20 +35,45 @@ export interface ReportAttributes {
   YAxisProps?: {
     width?: number
     tickFormatter?: (value: any) => string
+    domain?: [number | string, number | string]
+    allowDataOverflow?: boolean
   }
+  normalizeVisibleStackToPercent?: boolean
   hideHighlightedValue?: boolean
 }
 
+export type ThresholdZone = {
+  label: string
+  color: string
+  textColor?: string
+  badgeLabel?: string
+  tooltipLabel?: string
+  isAlwaysVisible?: boolean
+  tooltip: string
+  getRanges: (data: Datum[]) => ([number, number] | null)[]
+}
+
 export type Provider = 'infra-monitoring' | 'daily-stats' | 'mock' | 'reference-line' | 'logs'
+
+export type ThemedColor = {
+  light?: string
+  dark?: string
+}
+
+export const resolveChartColor = (
+  color: string | ThemedColor | undefined,
+  isDarkMode: boolean | undefined
+) => {
+  if (typeof color === 'string') return color
+  return isDarkMode ? color?.dark : color?.light
+}
 
 export type MultiAttribute = {
   attribute: string
   provider?: Provider
   label?: string
-  color?: {
-    light: string
-    dark: string
-  }
+  color?: string | { light: string; dark: string }
+  fill?: string | ThemedColor
   statusCode?: string
   grantType?: string
   providerType?: string
@@ -106,6 +137,9 @@ interface TooltipProps {
   payload?: any[]
   label?: string | number
   attributes?: MultiAttribute[]
+  data?: Datum[]
+  thresholdZones?: ThresholdZone[]
+  xAxisKey?: string
   isPercentage?: boolean
   format?: string | ((value: unknown) => string)
   valuePrecision?: number
@@ -115,6 +149,26 @@ interface TooltipProps {
 }
 
 const isMaxAttribute = (attributes?: MultiAttribute[]) => attributes?.find((a) => a.isMaxValue)
+
+/**
+ * Resolve the recharts `stackId` for a series.
+ *
+ * Series that share a `stackId` are stacked additively, so overlaid series
+ * (e.g. min/max/avg of the same metric) must each get a distinct id. Bar
+ * charts pass `'1'` as the fallback to stack together; area charts pass the
+ * attribute name so each series overlays independently. An explicit per-
+ * attribute `stackId` always wins.
+ */
+export const getStackId = (
+  attributes: (MultiAttribute | false | null | undefined)[] | null | undefined,
+  name: string | null | undefined,
+  fallback: string
+): string => {
+  const configured = Array.isArray(attributes)
+    ? attributes.find((a): a is MultiAttribute => !!a && a.attribute === name)?.stackId
+    : undefined
+  return configured ?? fallback
+}
 
 /**
  * Calculate the total aggregate of the chart values
@@ -129,17 +183,22 @@ export const calculateTotalChartAggregate = (
     ?.filter((p) => !ignoreAttributes?.includes(p.dataKey))
     .reduce((acc, curr) => acc + curr.value, 0)
 
-const CustomTooltip = ({
+export const CustomTooltip = ({
   active,
   payload,
-  label,
+  label: _label,
   attributes,
+  data,
+  thresholdZones,
+  xAxisKey = 'period_start',
   isPercentage,
   format,
   valuePrecision,
   showTotal,
   isActiveHoveredChart,
 }: TooltipProps) => {
+  const formatDateTime = useFormatDateTime()
+  const { timezone } = useTimezone()
   if (active && payload && payload.length) {
     /**
      * Depending on the data source, the timestamp key could be 'timestamp' or 'period_start'
@@ -147,18 +206,28 @@ const CustomTooltip = ({
     const firstItem = payload[0].payload
     const timestampKey = firstItem?.hasOwnProperty('timestamp') ? 'timestamp' : 'period_start'
     const timestamp = payload[0].payload[timestampKey]
+    const rawDataPoint = data?.find(
+      (point) => point[xAxisKey] === timestamp || point[timestampKey] === timestamp
+    )
+    const thresholdValues = getThresholdZoneValues(rawDataPoint, thresholdZones)
     const maxValueAttribute = isMaxAttribute(attributes)
-    const maxValueData =
-      maxValueAttribute && payload?.find((p: any) => p.dataKey === maxValueAttribute.attribute)
-    const maxValue = maxValueData?.value
+    const maxValue =
+      maxValueAttribute && rawDataPoint
+        ? Number(rawDataPoint[maxValueAttribute.attribute])
+        : undefined
+    const hasFiniteMaxValue = typeof maxValue === 'number' && Number.isFinite(maxValue)
     const isRamChart =
       !payload?.some((p: any) => p.dataKey.toLowerCase() === 'ram_usage') &&
       payload?.some((p: any) => p.dataKey.toLowerCase().includes('ram_'))
+    const isSwapChart = payload?.some((p: any) => p.dataKey.toLowerCase().includes('swap_'))
+    const isMemoryChart = isRamChart || isSwapChart
     const isDBSizeChart =
       payload?.some((p: any) => p.dataKey.toLowerCase().includes('disk_fs_')) ||
       payload?.some((p: any) => p.dataKey.toLowerCase().includes('pg_database_size'))
     const isNetworkChart = payload?.some((p: any) => p.dataKey.toLowerCase().includes('network_'))
-    const shouldFormatBytes = isRamChart || isDBSizeChart || isNetworkChart
+    const isBytesFormat = format === 'bytes' || format === 'bytes-per-second'
+    const shouldFormatBytes = isBytesFormat || isMemoryChart || isDBSizeChart || isNetworkChart
+    const byteUnitSuffix = format === 'bytes-per-second' ? '/s' : ''
 
     const attributesToIgnore =
       attributes?.filter((a) => a.omitFromTotal)?.map((a) => a.attribute) ?? []
@@ -173,31 +242,66 @@ const CustomTooltip = ({
       ...(maxValueAttribute?.attribute ? [maxValueAttribute.attribute] : []),
     ]
 
-    const total = showTotal && calculateTotalChartAggregate(payload, attributesToIgnoreFromTotal)
+    const localTimeZone = timezone
+
+    const rawPayload = payload.map((entry: any) => ({
+      ...entry,
+      value:
+        rawDataPoint && typeof rawDataPoint[entry.dataKey] === 'number'
+          ? Number(rawDataPoint[entry.dataKey])
+          : entry.value,
+    }))
+
+    const total = showTotal && calculateTotalChartAggregate(rawPayload, attributesToIgnoreFromTotal)
 
     const getIcon = (color: string, isMax: boolean) =>
       isMax ? <MaxConnectionsIcon /> : <CustomIcon color={color} />
 
+    const formatNumeric = (value: number) => {
+      if (!shouldFormatBytes && valuePrecision === 0 && value > 0 && value < 1) return '<1'
+      if (shouldFormatBytes) {
+        const val = isNetworkChart ? Math.abs(value) : value
+        if (isMemoryChart) return formatBytesMinMB(val, valuePrecision)
+        return formatBytes(val, valuePrecision)
+      }
+      const formatted = numberFormatter(value, valuePrecision)
+      if (
+        !isBytesFormat &&
+        format !== '%' &&
+        format !== 'ms' &&
+        typeof format === 'string' &&
+        format
+      ) {
+        return `${formatted}${format}`
+      }
+      return formatted
+    }
+
     const LabelItem = ({ entry }: { entry: any }) => {
       const attribute = attributes?.find((a: MultiAttribute) => a?.attribute === entry.name)
-      const percentage = ((entry.value / maxValue) * 100).toFixed(valuePrecision)
+      const rawValue =
+        rawDataPoint && typeof rawDataPoint[entry.dataKey] === 'number'
+          ? Number(rawDataPoint[entry.dataKey])
+          : entry.value
+      const percentage =
+        hasFiniteMaxValue && maxValue > 0
+          ? ((rawValue / maxValue) * 100).toFixed(valuePrecision)
+          : null
       const isMax = entry.dataKey === maxValueAttribute?.attribute
 
       return (
         <div key={entry.name} className="flex items-center w-full">
           {getIcon(entry.color, isMax)}
-          <span className="text-foreground-lighter ml-1 flex-grow cursor-default select-none">
+          <span className="text-foreground-lighter ml-1 grow cursor-default select-none">
             {attribute?.label || entry.name}
           </span>
           <span className="ml-3.5 flex items-end gap-1">
-            {shouldFormatBytes
-              ? formatBytes(isNetworkChart ? Math.abs(entry.value) : entry.value, valuePrecision)
-              : numberFormatter(entry.value, valuePrecision)}
-            {isPercentage ? '%' : ''}
-            {format === 'ms' ? 'ms' : ''}
+            {formatNumeric(rawValue) + (!isPercentage && format !== 'ms' ? byteUnitSuffix : '')}
+            {isPercentage ? <span>%</span> : ''}
+            {format === 'ms' ? <span>ms</span> : ''}
 
             {/* Show percentage if max value is set */}
-            {!!maxValueData && !isMax && !isPercentage && (
+            {percentage !== null && !isMax && !isPercentage && (
               <span className="text-[11px] text-foreground-light mb-0.5">({percentage}%)</span>
             )}
           </span>
@@ -208,35 +312,43 @@ const CustomTooltip = ({
     return (
       <div
         className={cn(
-          'grid min-w-[8rem] items-start gap-1.5 rounded-lg border border-border/50 bg px-2.5 py-1.5 text-xs shadow-xl transition-opacity opacity-100',
+          'grid min-w-32 items-start gap-1.5 rounded-lg border border-border/50 bg-default px-2.5 py-1.5 text-xs shadow-xl transition-opacity opacity-100',
           !isActiveHoveredChart && 'opacity-0'
         )}
       >
-        <p className="font-medium">{dayjs(timestamp).format(DateTimeFormats.FULL_SECONDS)}</p>
+        <p className="text-foreground-light text-xs">{localTimeZone}</p>
+        <p className="font-medium">{formatDateTime(timestamp, DateTimeFormats.FULL_SECONDS)}</p>
         <div className="grid gap-0">
-          {payload
-            .reverse()
-            .filter((entry: any) => entry.value !== 0)
-            .map((entry: any, index: number) => (
-              <LabelItem key={`${entry.name}-${index}`} entry={entry} />
-            ))}
+          {[...payload].reverse().map((entry: any, index: number) => (
+            <LabelItem key={`${entry.name}-${index}`} entry={entry} />
+          ))}
+          {thresholdValues?.map((threshold) => (
+            <div key={threshold.label} className="flex items-center w-full">
+              <MaxConnectionsIcon color={threshold.color} />
+              <span className="text-foreground-lighter ml-1 grow cursor-default select-none">
+                {threshold.label}
+              </span>
+              <span className="ml-3.5">{formatNumeric(threshold.value)}</span>
+            </div>
+          ))}
           {active && showTotal && (
             <div className="flex md:flex-col gap-1 md:gap-0 text-foreground mt-1">
-              <span className="flex-grow text-foreground-lighter">Total</span>
+              <span className="grow text-foreground-lighter">Total</span>
               <div className="flex items-end gap-1">
                 <span className="text-base">
-                  {shouldFormatBytes
-                    ? formatBytes(total as number, valuePrecision)
-                    : numberFormatter(total as number, valuePrecision)}
-                  {isPercentage ? '%' : ''}
-                  {format === 'ms' ? 'ms' : ''}
+                  {isPercentage
+                    ? formatPercentage(total as number, valuePrecision)
+                    : formatNumeric(total as number) +
+                      (!isPercentage && format !== 'ms' ? byteUnitSuffix : '')}
+                  {format === 'ms' ? <span>ms</span> : ''}
                 </span>
                 {maxValueAttribute &&
+                  hasFiniteMaxValue &&
                   !isPercentage &&
-                  !isNaN((total as number) / maxValueData?.value) &&
-                  isFinite((total as number) / maxValueData?.value) && (
+                  !isNaN((total as number) / maxValue) &&
+                  isFinite((total as number) / maxValue) && (
                     <span className="text-[11px] text-foreground-light mb-0.5">
-                      ({(((total as number) / maxValueData?.value) * 100).toFixed(1)}%)
+                      ({(((total as number) / maxValue) * 100).toFixed(1)}%)
                     </span>
                   )}
               </div>
@@ -259,7 +371,7 @@ interface CustomLabelProps {
   hiddenAttributes?: Set<string>
 }
 
-const CustomLabel = ({
+export const CustomLabel = ({
   payload,
   attributes,
   showMaxValue,
@@ -269,7 +381,7 @@ const CustomLabel = ({
 }: CustomLabelProps) => {
   const items = payload ?? []
   const maxValueAttribute = isMaxAttribute(attributes)
-  const [hoveredLabel, setHoveredLabel] = useState<string | null>(null)
+  const [, setHoveredLabel] = useState<string | null>(null)
 
   const handleMouseEnter = (label: string) => {
     setHoveredLabel(label)
@@ -293,12 +405,12 @@ const CustomLabel = ({
   const LabelItem = ({ entry }: { entry: any }) => {
     const attribute = attributes?.find((a) => a.attribute === entry.name)
     const isMax = entry.name === maxValueAttribute?.attribute
-    const isHovered = hoveredLabel === entry.name
     const isHidden = hiddenAttributes?.has(entry.name)
+    const color = isHidden ? 'gray' : entry.color
 
     const Label = () => (
       <div className="flex items-center gap-1">
-        {getIcon(entry.name, entry.color)}
+        {getIcon(entry.name, color)}
         <span className={cn('text-nowrap text-foreground-lighter', isHidden && 'opacity-50')}>
           {attribute?.label || entry.name}
         </span>
@@ -310,17 +422,18 @@ const CustomLabel = ({
     return (
       <button
         key={entry.name}
-        className="flex md:flex-col gap-1 md:gap-0 w-fit text-foreground rounded-lg p-1.5 hover:bg-background-overlay-hover"
+        tabIndex={0}
+        className="flex md:flex-col gap-1 md:gap-0 w-fit text-foreground rounded-lg  hover:bg-background-overlay-hover"
         onMouseOver={() => handleMouseEnter(entry.name)}
         onMouseOutCapture={handleMouseLeave}
         onClick={(e) => onToggleAttribute?.(entry.name, { exclusive: e.metaKey || e.ctrlKey })}
       >
         {!!attribute?.tooltip ? (
           <Tooltip>
-            <TooltipTrigger>
+            <TooltipTrigger className="p-1.5">
               <Label />
             </TooltipTrigger>
-            <TooltipContent side="bottom" align="center" className="max-w-[250px]">
+            <TooltipContent sideOffset={6} side="bottom" align="center" className="max-w-[250px]">
               {attribute.tooltip}
             </TooltipContent>
           </Tooltip>
@@ -334,10 +447,12 @@ const CustomLabel = ({
   return (
     <div className="relative z-10 mx-auto flex flex-col items-center gap-1 text-xs w-full">
       <div className="flex flex-wrap items-center justify-center gap-2">
-        {items?.map((entry, index) => <LabelItem key={`${entry.name}-${index}`} entry={entry} />)}
+        <TooltipProvider delayDuration={800}>
+          {items?.map((entry, index) => (
+            <LabelItem key={`${entry.name}-${index}`} entry={entry} />
+          ))}
+        </TooltipProvider>
       </div>
     </div>
   )
 }
-
-export { CustomLabel, CustomTooltip }

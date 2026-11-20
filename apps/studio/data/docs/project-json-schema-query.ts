@@ -1,8 +1,9 @@
-import { useQuery, UseQueryOptions } from '@tanstack/react-query'
+import { useQuery } from '@tanstack/react-query'
 
-import { get, handleError } from 'data/fetchers'
-import { ResponseError } from 'types'
 import { docsKeys } from './keys'
+import { get, handleError } from '@/data/fetchers'
+import type { StudioError } from '@/lib/errors/studio-errors'
+import type { UseCustomQueryOptions } from '@/types'
 
 export type ProjectJsonSchemaVariables = {
   projectRef?: string
@@ -86,20 +87,18 @@ export async function getProjectJsonSchema(
 }
 
 export type ProjectJsonSchemaData = Awaited<ReturnType<typeof getProjectJsonSchema>>
-export type ProjectJsonSchemaError = ResponseError
+export type ProjectJsonSchemaError = StudioError
 
 export const useProjectJsonSchemaQuery = <TData = ProjectJsonSchemaData>(
   { projectRef }: ProjectJsonSchemaVariables,
   {
     enabled = true,
     ...options
-  }: UseQueryOptions<ProjectJsonSchemaData, ProjectJsonSchemaError, TData> = {}
+  }: UseCustomQueryOptions<ProjectJsonSchemaData, ProjectJsonSchemaError, TData> = {}
 ) =>
-  useQuery<ProjectJsonSchemaData, ProjectJsonSchemaError, TData>(
-    docsKeys.jsonSchema(projectRef),
-    ({ signal }) => getProjectJsonSchema({ projectRef }, signal),
-    {
-      enabled: enabled && typeof projectRef !== 'undefined',
-      ...options,
-    }
-  )
+  useQuery<ProjectJsonSchemaData, ProjectJsonSchemaError, TData>({
+    queryKey: docsKeys.jsonSchema(projectRef),
+    queryFn: ({ signal }) => getProjectJsonSchema({ projectRef }, signal),
+    enabled: enabled && typeof projectRef !== 'undefined',
+    ...options,
+  })

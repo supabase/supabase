@@ -1,10 +1,11 @@
-import { useMutation, UseMutationOptions } from '@tanstack/react-query'
+import { useMutation } from '@tanstack/react-query'
 import { toast } from 'sonner'
 
-import { ResponseData } from 'components/interfaces/Functions/EdgeFunctionDetails/EdgeFunctionDetails.types'
-import { constructHeaders, fetchHandler } from 'data/fetchers'
-import { BASE_PATH } from 'lib/constants'
-import { ResponseError } from 'types'
+import { ResponseData } from '@/components/interfaces/Functions/EdgeFunctionDetails/EdgeFunctionDetails.types'
+import { constructHeaders, fetchHandler } from '@/data/fetchers'
+import { BASE_PATH } from '@/lib/constants'
+import type { StudioError } from '@/lib/errors/studio-errors'
+import type { UseCustomMutationOptions } from '@/types'
 
 export type EdgeFunctionTestResponse = {
   title: string
@@ -49,23 +50,21 @@ export const useEdgeFunctionTestMutation = ({
   onError,
   ...options
 }: Omit<
-  UseMutationOptions<EdgeFunctionTestData, ResponseError, EdgeFunctionTestVariables>,
+  UseCustomMutationOptions<EdgeFunctionTestData, StudioError, EdgeFunctionTestVariables>,
   'mutationFn'
 > = {}) => {
-  return useMutation<EdgeFunctionTestData, ResponseError, EdgeFunctionTestVariables>(
-    (vars) => testEdgeFunction(vars),
-    {
-      async onSuccess(data, variables, context) {
-        await onSuccess?.(data, variables, context)
-      },
-      async onError(data, variables, context) {
-        if (onError === undefined) {
-          toast.error(`Failed to test edge function: ${data.message}`)
-        } else {
-          onError(data, variables, context)
-        }
-      },
-      ...options,
-    }
-  )
+  return useMutation<EdgeFunctionTestData, StudioError, EdgeFunctionTestVariables>({
+    mutationFn: (vars) => testEdgeFunction(vars),
+    async onSuccess(data, variables, context) {
+      await onSuccess?.(data, variables, context)
+    },
+    async onError(data, variables, context) {
+      if (onError === undefined) {
+        toast.error(`Failed to test edge function: ${data.message}`)
+      } else {
+        onError(data, variables, context)
+      }
+    },
+    ...options,
+  })
 }

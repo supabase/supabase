@@ -1,13 +1,14 @@
-import { useQuery, UseQueryOptions } from '@tanstack/react-query'
-
-import { get, handleError } from 'data/fetchers'
-import type { ResponseError } from 'types'
-import { organizationKeys } from './keys'
+import { useQuery } from '@tanstack/react-query'
 import { components } from 'api-types'
+
+import { organizationKeys } from './keys'
+import { get, handleError } from '@/data/fetchers'
+import type { StudioError } from '@/lib/errors/studio-errors'
+import type { UseCustomQueryOptions } from '@/types'
 
 export type OrganizationInviteTokenVariables = { slug?: string; token?: string }
 
-export type OrganizationInviteByToken = components['schemas']['InvitationByTokenResponse']
+export type OrganizationInviteByToken = components['schemas']['InvitationByTokenResponse_Output']
 
 export async function getOrganizationInviteByToken(
   { slug, token }: OrganizationInviteTokenVariables,
@@ -26,21 +27,19 @@ export async function getOrganizationInviteByToken(
 }
 
 export type OrganizationInviteTokenData = Awaited<ReturnType<typeof getOrganizationInviteByToken>>
-export type OrganizationInviteTokenError = ResponseError
+export type OrganizationInviteTokenError = StudioError
 
 export const useOrganizationInvitationTokenQuery = <TData = OrganizationInviteTokenData>(
   { slug, token }: OrganizationInviteTokenVariables,
   {
     enabled = true,
     ...options
-  }: UseQueryOptions<OrganizationInviteTokenData, OrganizationInviteTokenError, TData> = {}
+  }: UseCustomQueryOptions<OrganizationInviteTokenData, OrganizationInviteTokenError, TData> = {}
 ) => {
-  return useQuery<OrganizationInviteTokenData, OrganizationInviteTokenError, TData>(
-    organizationKeys.token(slug, token),
-    ({ signal }) => getOrganizationInviteByToken({ slug, token }, signal),
-    {
-      enabled: enabled && typeof slug !== 'undefined' && typeof token !== 'undefined',
-      ...options,
-    }
-  )
+  return useQuery<OrganizationInviteTokenData, OrganizationInviteTokenError, TData>({
+    queryKey: organizationKeys.token(slug, token),
+    queryFn: ({ signal }) => getOrganizationInviteByToken({ slug, token }, signal),
+    enabled: enabled && typeof slug !== 'undefined' && typeof token !== 'undefined',
+    ...options,
+  })
 }

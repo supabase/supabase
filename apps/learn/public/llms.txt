@@ -1,0 +1,87 @@
+# Supabase UI Library
+Last updated: 2025-10-15T07:54:48.550Z
+
+## Overview
+Library of components for your project. The components integrate with Supabase and are shadcn compatible.
+
+## Docs
+- [Prompts](https://supabase.com/ui/docs/ai-editors-rules/prompts)
+    - Rules for AI Code Editors for Supabase
+- [FAQ](https://supabase.com/ui/docs/getting-started/faq)
+    - Frequently asked questions
+- [Introduction](https://supabase.com/ui/docs/getting-started/introduction)
+    - A flexible, open-source, React-based UI component library built on shadcn/ui, designed to simplify Supabase-powered projects with pre-built Auth, Storage, and Realtime features.
+- [Quick Start](https://supabase.com/ui/docs/getting-started/quickstart)
+    - Install shadcn/ui and use the components in your project
+- [Infinite Query Hook](https://supabase.com/ui/docs/infinite-query-hook)
+    - React hook for infinite lists, fetching data from Supabase.
+- [Supabase Client Libraries](https://supabase.com/ui/docs/nextjs/client)
+    - Supabase client for Next.js
+- [Current User Avatar](https://supabase.com/ui/docs/nextjs/current-user-avatar)
+    - Supabase Auth-aware avatar
+- [Dropzone (File Upload)](https://supabase.com/ui/docs/nextjs/dropzone)
+    - Displays a control for easier uploading of files directly to Supabase Storage
+- [Password-based Authentication](https://supabase.com/ui/docs/nextjs/password-based-auth)
+    - Password-based authentication block for Next.js
+- [Realtime Avatar Stack](https://supabase.com/ui/docs/nextjs/realtime-avatar-stack)
+    - Avatar stack in realtime
+- [Realtime Chat](https://supabase.com/ui/docs/nextjs/realtime-chat)
+    - Real-time chat component for collaborative applications
+- [Realtime Cursor](https://supabase.com/ui/docs/nextjs/realtime-cursor)
+    - Real-time cursor sharing for collaborative applications
+- [Social Authentication](https://supabase.com/ui/docs/nextjs/social-auth)
+    - Social authentication block for Next.js
+- [Supabase Client Libraries](https://supabase.com/ui/docs/nuxtjs/client)
+    - Supabase client for Nuxt.js
+- [Platform Kit](https://supabase.com/ui/docs/platform/platform-kit)
+    - The easiest way to build platforms on top of Supabase
+- [Supabase Client Libraries](https://supabase.com/ui/docs/react-router/client)
+    - Supabase client for React Router
+- [Current User Avatar](https://supabase.com/ui/docs/react-router/current-user-avatar)
+    - Supabase Auth-aware avatar
+- [Dropzone (File Upload)](https://supabase.com/ui/docs/react-router/dropzone)
+    - Displays a control for easier uploading of files directly to Supabase Storage
+- [Password-based Authentication](https://supabase.com/ui/docs/react-router/password-based-auth)
+    - Password-based authentication block for React Router
+- [Realtime Avatar Stack](https://supabase.com/ui/docs/react-router/realtime-avatar-stack)
+    - Avatar stack in realtime
+- [Realtime Chat](https://supabase.com/ui/docs/react-router/realtime-chat)
+    - Real-time chat component for collaborative applications
+- [Realtime Cursor](https://supabase.com/ui/docs/react-router/realtime-cursor)
+    - Real-time cursor sharing for collaborative applications
+- [Social Authentication](https://supabase.com/ui/docs/react-router/social-auth)
+    - Social authentication block for React Router
+- [Supabase Client Libraries](https://supabase.com/ui/docs/react/client)
+    - Supabase client for React Single Page Applications
+- [Current User Avatar](https://supabase.com/ui/docs/react/current-user-avatar)
+    - Supabase Auth-aware avatar
+- [Dropzone (File Upload)](https://supabase.com/ui/docs/react/dropzone)
+    - Displays a control for easier uploading of files directly to Supabase Storage
+- [Password-based Authentication](https://supabase.com/ui/docs/react/password-based-auth)
+    - Password-based authentication block for React Single Page Applications
+- [Realtime Avatar Stack](https://supabase.com/ui/docs/react/realtime-avatar-stack)
+    - Avatar stack in realtime
+- [Realtime Chat](https://supabase.com/ui/docs/react/realtime-chat)
+    - Real-time chat component for collaborative applications
+- [Realtime Cursor](https://supabase.com/ui/docs/react/realtime-cursor)
+    - Real-time cursor sharing for collaborative applications
+- [Social Authentication](https://supabase.com/ui/docs/react/social-auth)
+    - Social authentication block for React Single Page Applications
+- [Supabase Client Libraries](https://supabase.com/ui/docs/tanstack/client)
+    - Supabase client for TanStack Start
+- [Current User Avatar](https://supabase.com/ui/docs/tanstack/current-user-avatar)
+    - Supabase Auth-aware avatar
+- [Dropzone (File Upload)](https://supabase.com/ui/docs/tanstack/dropzone)
+    - Displays a control for easier uploading of files directly to Supabase Storage
+- [Password-based Authentication](https://supabase.com/ui/docs/tanstack/password-based-auth)
+    - Password-based authentication block for TanStack Start
+- [Realtime Avatar Stack](https://supabase.com/ui/docs/tanstack/realtime-avatar-stack)
+    - Avatar stack in realtime
+- [Realtime Chat](https://supabase.com/ui/docs/tanstack/realtime-chat)
+    - Real-time chat component for collaborative applications
+- [Realtime Cursor](https://supabase.com/ui/docs/tanstack/realtime-cursor)
+    - Real-time cursor sharing for collaborative applications
+- [Social Authentication](https://supabase.com/ui/docs/tanstack/social-auth)
+    - Social authentication block for Tanstack Start
+- [Supabase Client Libraries](https://supabase.com/ui/docs/vue/client)
+    - Supabase client for Vue Single Page Applications

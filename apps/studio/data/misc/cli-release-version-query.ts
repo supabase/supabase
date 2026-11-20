@@ -1,9 +1,10 @@
-import { useQuery, UseQueryOptions } from '@tanstack/react-query'
+import { useQuery } from '@tanstack/react-query'
 
-import { fetchHandler } from 'data/fetchers'
-import { BASE_PATH, IS_PLATFORM } from 'lib/constants'
-import type { ResponseError } from 'types'
 import { miscKeys } from './keys'
+import { fetchHandler } from '@/data/fetchers'
+import { BASE_PATH, IS_PLATFORM } from '@/lib/constants'
+import type { StudioError } from '@/lib/errors/studio-errors'
+import type { UseCustomQueryOptions } from '@/types'
 
 export async function getCLIReleaseVersion() {
   try {
@@ -17,14 +18,15 @@ export async function getCLIReleaseVersion() {
 }
 
 export type CLIReleaseVersionData = Awaited<ReturnType<typeof getCLIReleaseVersion>>
-export type CLIReleaseVersionError = ResponseError
+export type CLIReleaseVersionError = StudioError
 
 export const useCLIReleaseVersionQuery = <TData = CLIReleaseVersionData>({
   enabled = true,
   ...options
-}: UseQueryOptions<CLIReleaseVersionData, CLIReleaseVersionError, TData> = {}) =>
-  useQuery<CLIReleaseVersionData, CLIReleaseVersionError, TData>(
-    miscKeys.cliReleaseVersion(),
-    () => getCLIReleaseVersion(),
-    { enabled: enabled && !IS_PLATFORM, ...options }
-  )
+}: UseCustomQueryOptions<CLIReleaseVersionData, CLIReleaseVersionError, TData> = {}) =>
+  useQuery<CLIReleaseVersionData, CLIReleaseVersionError, TData>({
+    queryKey: miscKeys.cliReleaseVersion(),
+    queryFn: () => getCLIReleaseVersion(),
+    enabled: enabled && !IS_PLATFORM,
+    ...options,
+  })

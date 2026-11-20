@@ -1,14 +1,14 @@
 import dayjs from 'dayjs'
-import { Github } from 'lucide-react'
+import Link from 'next/link'
 import { useRouter } from 'next/router'
 import { PropsWithChildren, ReactNode } from 'react'
+import { GithubIcon, Tooltip, TooltipContent, TooltipTrigger } from 'ui'
+import { ShimmeringLoader } from 'ui-patterns/ShimmeringLoader'
+import { TimestampInfo } from 'ui-patterns/TimestampInfo'
 
-import { ButtonTooltip } from 'components/ui/ButtonTooltip'
-import ShimmeringLoader from 'components/ui/ShimmeringLoader'
-import type { Branch } from 'data/branches/branches-query'
-import { BASE_PATH } from 'lib/constants'
-import { Tooltip, TooltipContent, TooltipTrigger } from 'ui'
 import { WorkflowLogs } from './WorkflowLogs'
+import { ButtonTooltip } from '@/components/ui/ButtonTooltip'
+import type { Branch } from '@/data/branches/branches-query'
 
 interface BranchManagementSectionProps {
   header: string | ReactNode
@@ -22,12 +22,10 @@ export const BranchManagementSection = ({
 }: PropsWithChildren<BranchManagementSectionProps>) => {
   return (
     <div className="border rounded-lg overflow-hidden">
-      <div className="bg-surface-100 shadow-sm flex justify-between items-center px-4 py-3 rounded-t-lg text-xs font-mono uppercase">
+      <div className="bg-surface-100 shadow-xs flex justify-between items-center px-4 py-3 rounded-t-lg text-xs font-mono uppercase">
         {typeof header === 'string' ? <span>{header}</span> : header}
       </div>
-      <div className="bg-surface border-t shadow-sm rounded-b-lg text-sm divide-y px-4">
-        {children}
-      </div>
+      <div className="bg-surface border-t shadow-xs rounded-b-lg text-sm divide-y">{children}</div>
       {footer !== undefined && <div className="bg-surface-100 px-6 py-1 border-t">{footer}</div>}
     </div>
   )
@@ -64,6 +62,7 @@ interface BranchRowProps {
   repo: string
   label?: string | ReactNode
   branch: Branch
+  isGithubConnected: boolean
   rowLink?: string
   external?: boolean
   rowActions?: ReactNode
@@ -71,6 +70,7 @@ interface BranchRowProps {
 
 export const BranchRow = ({
   branch,
+  isGithubConnected,
   label,
   repo,
   rowLink,
@@ -81,26 +81,20 @@ export const BranchRow = ({
   const page = router.pathname.split('/').pop()
 
   const daysFromNow = dayjs().diff(dayjs(branch.updated_at), 'day')
+  const willBeDeletedIn = branch.deletion_scheduled_at
+    ? dayjs(branch.deletion_scheduled_at).diff(dayjs(), 'minutes')
+    : null
+  const isDeletionPending = willBeDeletedIn !== null && willBeDeletedIn < 0
   const formattedTimeFromNow = dayjs(branch.updated_at).fromNow()
-  const formattedUpdatedAt = dayjs(branch.updated_at).format('DD MMM YYYY, HH:mm:ss (ZZ)')
 
   const navigateUrl = rowLink ?? `/project/${branch.project_ref}`
-
-  const handleRowClick = () => {
-    if (external) {
-      window.open(`${BASE_PATH}/${navigateUrl}`, '_blank', 'noopener noreferrer')
-    } else {
-      router.push(navigateUrl)
-    }
-  }
 
   return (
     <div className="w-full flex items-center justify-between px-4 py-2.5 hover:bg-surface-100">
       <div className="flex items-center gap-x-3">
-        {branch.git_branch && (
+        {branch.git_branch && isGithubConnected && (
           <ButtonTooltip
             asChild
-            type="default"
             className="px-1.5"
             tooltip={{ content: { side: 'bottom', text: 'View branch on GitHub' } }}
           >
@@ -109,29 +103,46 @@ export const BranchRow = ({
               rel="noreferrer noopener"
               href={`https://github.com/${repo}/tree/${branch.git_branch}`}
             >
-              <Github size={14} className="text-foreground-light" />
+              <GithubIcon size={14} className="text-foreground-light" />
             </a>
           </ButtonTooltip>
         )}
         <Tooltip>
-          <TooltipTrigger asChild>
-            <div className="flex items-center cursor-pointer" onClick={handleRowClick}>
+          <TooltipTrigger>
+            <Link
+              target={external ? '_blank' : '_self'}
+              rel={external ? 'noopener noreferrer' : undefined}
+              href={navigateUrl}
+              className="flex items-center"
+            >
               {label || branch.name}
-            </div>
+            </Link>
           </TooltipTrigger>
           {((page === 'branches' && !branch.is_default) || page === 'merge-requests') && (
             <TooltipContent side="bottom">
-              {page === 'branches' && !branch.is_default && 'Switch to branch'}
-              {page === 'merge-requests' && 'View merge request'}
+              {page === 'branches' && !branch.is_default && <span>Switch to branch</span>}
+              {page === 'merge-requests' && <span>View merge request</span>}
             </TooltipContent>
           )}
         </Tooltip>
       </div>
       <div className="flex items-center gap-x-4">
-        <p className="text-xs text-foreground-lighter">
-          {daysFromNow > 1 ? `Updated on ${formattedUpdatedAt}` : `Updated ${formattedTimeFromNow}`}
-        </p>
-        <WorkflowLogs projectRef={branch.project_ref} status={branch.status} />
+        {branch.deletion_scheduled_at ? (
+          <p className="text-xs text-foreground-lighter">
+            {isDeletionPending
+              ? 'Deletion pending...'
+              : `Will be deleted in ${willBeDeletedIn} minutes`}
+          </p>
+        ) : (
+          <p className="text-xs text-foreground-lighter">
+            {daysFromNow > 1 ? <span>Updated on</span> : <span>Updated</span>}{' '}
+            <TimestampInfo
+              utcTimestamp={branch.updated_at}
+              label={daysFromNow <= 1 ? formattedTimeFromNow : undefined}
+            />
+          </p>
+        )}
+        <WorkflowLogs branch={branch} />
         {rowActions}
       </div>
     </div>

@@ -1,8 +1,10 @@
 'use client'
 
+import { MobileTocSlotPortal } from '~/layouts/MobileHeaderSlots'
 import { useEffect, useState, type PropsWithChildren } from 'react'
-import { AnchorProvider } from 'ui-patterns'
-import { TocAnchorsContext, useSubscribeTocRerender } from './GuidesMdx.state'
+import { AnchorProvider, TocMenu } from 'ui-patterns/Toc'
+
+import { TocAnchorsContext, useSubscribeTocRerender, useTocAnchors } from './GuidesMdx.state'
 
 interface TOCHeader {
   id?: string
@@ -33,11 +35,13 @@ const TocAnchorsProvider = ({ children }: PropsWithChildren) => {
       )
 
       const newHeadings = headings
-        .filter((heading) => heading.id)
+        // inactive tab panels stay mounted (hidden), so their headings aren't navigable
+        .filter(
+          (heading) => heading.id && !heading.closest('[role="tabpanel"][data-state="inactive"]')
+        )
         .map((heading) => {
-          const text = heading.textContent?.replace('#', '') || ''
-          const link = heading.querySelector('a')?.getAttribute('href')
-          if (!link) return null
+          const text = heading.textContent || ''
+          const link = heading.id ? `#${heading.id}` : null
 
           const level = heading.tagName === 'H2' ? 2 : 3
 
@@ -64,4 +68,14 @@ const TocAnchorsProvider = ({ children }: PropsWithChildren) => {
   )
 }
 
-export { TocAnchorsProvider }
+// the guide template is a server component, so the headings collected in the browser reach it through here
+const GuideTocMenu = () => {
+  const { toc } = useTocAnchors()
+  return (
+    <MobileTocSlotPortal>
+      <TocMenu items={toc} className="pl-6 pr-8" />
+    </MobileTocSlotPortal>
+  )
+}
+
+export { GuideTocMenu, TocAnchorsProvider }

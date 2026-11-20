@@ -1,0 +1,220 @@
+import { useFeatureFlags, useParams } from 'common'
+import { parseAsInteger, parseAsStringEnum, useQueryState } from 'nuqs'
+import { useEffect, useRef } from 'react'
+import { toast } from 'sonner'
+import {
+  DialogSectionSeparator,
+  Sheet,
+  SheetContent,
+  SheetDescription,
+  SheetHeader,
+  SheetSection,
+  SheetTitle,
+} from 'ui'
+import { Admonition } from 'ui-patterns/Admonition'
+import { GenericSkeletonLoader } from 'ui-patterns/ShimmeringLoader'
+
+import { EnablePipelinesCallout } from '../EnablePipelinesCallout'
+import { PipelineStatusName } from '../Replication.constants'
+import { canModifyDestination } from '../ReplicationDiagram/Nodes.utils'
+import { UnknownDestinationNotice } from '../UnknownDestinationNotice'
+import { useDestinationInformation } from '../useDestinationInformation'
+import { useIsPipelinesEnabled } from '../useIsPipelinesEnabled'
+import { DestinationForm } from './DestinationForm'
+import { NoDestinationsAvailable } from './DestinationForm/NoDestinationsAvailable'
+import { DESTINATION_DOCS_PATHS } from './DestinationPanel.constants'
+import { DestinationType } from './DestinationPanel.types'
+import { DestinationTypeSelection } from './DestinationTypeSelection'
+import { DiscardChangesConfirmationDialog } from '@/components/ui-patterns/Dialogs/DiscardChangesConfirmationDialog'
+import { AlertError } from '@/components/ui/AlertError'
+import { DocsButton } from '@/components/ui/DocsButton'
+import { useReplicationDestinationsQuery } from '@/data/replication/destinations-query'
+import { checkLocalPipelinesNotSetUp } from '@/data/replication/utils'
+import { useSelectedOrganizationQuery } from '@/hooks/misc/useSelectedOrganization'
+import { useConfirmOnClose } from '@/hooks/ui/useConfirmOnClose'
+import { DOCS_URL, IS_PLATFORM } from '@/lib/constants'
+
+export const DestinationPanel = () => {
+  const { ref: projectRef } = useParams()
+  const { hasLoaded: flagsLoaded } = useFeatureFlags()
+  const { isPending: isOrganizationPending } = useSelectedOrganizationQuery()
+  const hasPipelinesDestinationAccess = useIsPipelinesEnabled()
+  const isAccessLoading = IS_PLATFORM && (!flagsLoaded || isOrganizationPending)
+  const { error: destinationsError } = useReplicationDestinationsQuery({ projectRef })
+  const isLocalPipelinesNotSetUp = checkLocalPipelinesNotSetUp(destinationsError)
+
+  const [urlDestinationType, setDestinationType] = useQueryState(
+    'destinationType',
+    parseAsStringEnum<DestinationType>([
+      'BigQuery',
+      'DuckLake',
+      'Snowflake',
+      'ClickHouse',
+    ]).withOptions({
+      history: 'push',
+      clearOnDefault: true,
+    })
+  )
+
+  const [edit, setEdit] = useQueryState(
+    'edit',
+    parseAsInteger.withOptions({
+      history: 'push',
+      clearOnDefault: true,
+    })
+  )
+
+  const visible = urlDestinationType !== null || edit !== null
+  const editMode = edit !== null
+
+  const {
+    sourceId,
+    pipeline,
+    statusName,
+    replicationNotEnabled,
+    type: existingDestinationType,
+    destinationFetcher,
+  } = useDestinationInformation({ id: edit })
+  const isUnknownDestination = editMode && existingDestinationType === 'Unknown'
+  const destinationType =
+    existingDestinationType === 'Unknown' ? null : (existingDestinationType ?? urlDestinationType)
+  const invalidExistingDestination = destinationFetcher.error?.code === 404
+  const hasDestinationError = editMode && destinationFetcher.isError && !invalidExistingDestination
+  const showNoDestinations = !isAccessLoading && !hasPipelinesDestinationAccess
+  const showEnablement = !isAccessLoading && hasPipelinesDestinationAccess && replicationNotEnabled
+  const isEditLoading = editMode && destinationFetcher.isPending
+  const canEditDestination = !editMode || canModifyDestination(existingDestinationType)
+  const showDestinationForm =
+    !isAccessLoading &&
+    hasPipelinesDestinationAccess &&
+    !replicationNotEnabled &&
+    canEditDestination
+
+  const existingDestination = editMode
+    ? {
+        sourceId,
+        destinationId: edit,
+        pipelineId: pipeline?.id,
+        statusName,
+        enabled:
+          statusName === PipelineStatusName.STARTED || statusName === PipelineStatusName.FAILED,
+      }
+    : undefined
+
+  const checkIsDirtyRef = useRef<() => boolean>(() => false)
+
+  const onClose = () => {
+    checkIsDirtyRef.current = () => false
+    setDestinationType(null)
+    setEdit(null)
+  }
+
+  const { confirmOnClose, handleOpenChange, modalProps } = useConfirmOnClose({
+    checkIsDirty: () => checkIsDirtyRef.current(),
+    onClose,
+  })
+
+  const destinationDocsPath = destinationType ? DESTINATION_DOCS_PATHS[destinationType] : undefined
+  const docsUrl = `${DOCS_URL}${
+    destinationDocsPath ?? '/guides/database/replication/pipelines#step-3-configure-a-destination'
+  }`
+
+  useEffect(() => {
+    if (edit !== null && invalidExistingDestination) {
+      toast(`Unable to find destination ID ${edit}`)
+      setEdit(null)
+    }
+  }, [edit, invalidExistingDestination, setEdit])
+
+  const typeSelection = (
+    <>
+      <DestinationTypeSelection />
+      <DialogSectionSeparator />
+    </>
+  )
+
+  const pipelinesTypeSelection = (
+    <>
+      {typeSelection}
+      {destinationType != null && isLocalPipelinesNotSetUp && (
+        <SheetSection className="pb-0!">
+          <Admonition
+            type="warning"
+            title="Replication unavailable locally"
+            description="Configure the replication API to manage pipelines in local development."
+          />
+        </SheetSection>
+      )}
+    </>
+  )
+
+  return (
+    <>
+      <Sheet open={visible} onOpenChange={handleOpenChange}>
+        <SheetContent size="lg" showClose={false} className="max-w-3xl">
+          <div className="flex flex-col h-full min-h-0" tabIndex={-1}>
+            <SheetHeader className="flex items-center justify-between">
+              <div>
+                <SheetTitle>{editMode ? 'Edit pipeline' : 'Add pipeline'}</SheetTitle>
+                <SheetDescription>
+                  {editMode
+                    ? 'Update how this pipeline sends data to its destination.'
+                    : 'Send tables to an external destination for analytics workloads.'}
+                </SheetDescription>
+              </div>
+              <DocsButton
+                href={docsUrl}
+                topic={`${destinationType ?? 'destination'} pipeline settings`}
+              />
+            </SheetHeader>
+
+            {(isAccessLoading || isEditLoading) && (
+              <SheetSection>
+                <GenericSkeletonLoader />
+              </SheetSection>
+            )}
+            {isUnknownDestination && (
+              <SheetSection>
+                <UnknownDestinationNotice />
+              </SheetSection>
+            )}
+            {hasDestinationError && (
+              <SheetSection>
+                <AlertError
+                  error={destinationFetcher.error}
+                  subject="Failed to retrieve destination information"
+                  projectRef={projectRef}
+                />
+              </SheetSection>
+            )}
+            {showNoDestinations && (
+              <div className="grow overflow-auto min-h-0">
+                <NoDestinationsAvailable />
+              </div>
+            )}
+            {showEnablement && (
+              <div className="grow overflow-auto min-h-0">
+                {pipelinesTypeSelection}
+                <SheetSection>
+                  <EnablePipelinesCallout type={destinationType} />
+                </SheetSection>
+              </div>
+            )}
+            {showDestinationForm && (
+              <DestinationForm
+                visible={visible}
+                selectedType={destinationType ?? 'BigQuery'}
+                existingDestination={existingDestination}
+                typeSelection={pipelinesTypeSelection}
+                checkIsDirtyRef={checkIsDirtyRef}
+                onClose={onClose}
+                onCancel={confirmOnClose}
+              />
+            )}
+          </div>
+        </SheetContent>
+      </Sheet>
+      <DiscardChangesConfirmationDialog {...modalProps} />
+    </>
+  )
+}

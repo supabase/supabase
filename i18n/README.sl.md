@@ -9,7 +9,7 @@
 
 [Supabase](https://supabase.com) je odprtokodna alternativa Firebase. Funkcije Firebase gradimo z odprtokodnimi orodji za podjetja.
 
-- [x] Gostovana podatkovna baza Postgres. [Dokumenti](https://supabase.com/docs/guides/database)
+- [x] Gostovana podatkovna baza Postgres. [Dokumenti](https://supabase.com/docs/guides/database/overview)
 - [x] Avtentikacija in avtorizacija. [Dokumenti](https://supabase.com/docs/guides/auth)
 - [x] Samodejno generirani API-ji.
   - [x] REST. [Dokumenti](https://supabase.com/docs/guides/api#rest-api-overview)
@@ -56,7 +56,7 @@ Supabaza je kombinacija odprtokodnih orodij. Funkcije Firebase gradimo z odprtok
 **Arhitektura**
 
 Supabase je [gostovana platforma](https://supabase.com/dashboard). Prijavite se lahko in začnete uporabljati bazo Supabase, ne da bi kar koli namestili.
-Lahko tudi [gostujete sami](https://supabase.com/docs/guides/hosting/overview) in [razvijate lokalno](https://supabase.com/docs/guides/local-development).
+Lahko tudi [gostujete sami](https://supabase.com/docs/guides/self-hosting) in [razvijate lokalno](https://supabase.com/docs/guides/local-development).
 
 ![Arhitektura](https://github.com/supabase/supabase/blob/master/apps/docs/public/img/supabase-architecture.svg)
 
@@ -64,7 +64,7 @@ Lahko tudi [gostujete sami](https://supabase.com/docs/guides/hosting/overview) i
 - [Realtime](https://github.com/supabase/realtime) je strežnik Elixir, ki omogoča poslušanje vstavljanja, posodabljanja in brisanja podatkov PostgreSQL z uporabo spletnih vtičnic. Realtime poizveduje o spremembah v podatkovni zbirki Postgres, pretvori spremembe v JSON in jih nato prek spletnih vtičnikov posreduje pooblaščenim odjemalcem.
 - [PostgREST](http://postgrest.org/) je spletni strežnik, ki vašo podatkovno zbirko PostgreSQL spremeni neposredno v API REST
 - [pg_graphql](http://github.com/supabase/pg_graphql/) je razširitev PostgreSQL, ki izpostavlja API GraphQL
-- [Storage](https://github.com/supabase/storage-api) zagotavlja vmesnik RESTful za upravljanje datotek, shranjenih v S3, z uporabo Postgresa za upravljanje dovoljenj.
+- [Storage](https://github.com/supabase/storage) zagotavlja vmesnik RESTful za upravljanje datotek, shranjenih v S3, z uporabo Postgresa za upravljanje dovoljenj.
 - [postgres-meta](https://github.com/supabase/postgres-meta) je vmesnik RESTful API za upravljanje vašega Postgresa, ki omogoča pridobivanje tabel, dodajanje vlog, izvajanje poizvedb itd.
 - [GoTrue](https://github.com/netlify/gotrue) je API, ki temelji na SWT, za upravljanje uporabnikov in izdajanje žetonov SWT.
 - [Kong](https://github.com/Kong/kong) je prehod API v oblaku.
@@ -84,9 +84,9 @@ Naš pristop k odjemalskim knjižnicam je modularen. Vsaka pod-knjižnica je sam
     <th></th>
     <th>Supabase</th>
     <th><a href="https://github.com/postgrest/postgrest" target="_blank" rel="noopener noreferrer">PostgREST</a></th>
-    <th><a href="https://github.com/supabase/gotrue" target="_blank" rel="noopener noreferrer">GoTrue</a></th>
+    <th><a href="https://github.com/supabase/auth" target="_blank" rel="noopener noreferrer">GoTrue</a></th>
     <th><a href="https://github.com/supabase/realtime" target="_blank" rel="noopener noreferrer">Realtime</a></th>
-    <th><a href="https://github.com/supabase/storage-api" target="_blank" rel="noopener noreferrer">Storage</a></th>
+    <th><a href="https://github.com/supabase/storage" target="_blank" rel="noopener noreferrer">Storage</a></th>
     <th>Functions</th>
   </tr>
   <!-- TEMPLATE FOR NEW ROW -->
@@ -106,11 +106,11 @@ Naš pristop k odjemalskim knjižnicam je modularen. Vsaka pod-knjižnica je sam
   <tr>
     <td>JavaScript (TypeScript)</td>
     <td><a href="https://github.com/supabase/supabase-js" target="_blank" rel="noopener noreferrer">supabase-js</a></td>
-    <td><a href="https://github.com/supabase/postgrest-js" target="_blank" rel="noopener noreferrer">postgrest-js</a></td>
-    <td><a href="https://github.com/supabase/gotrue-js" target="_blank" rel="noopener noreferrer">gotrue-js</a></td>
-    <td><a href="https://github.com/supabase/realtime-js" target="_blank" rel="noopener noreferrer">realtime-js</a></td>
-    <td><a href="https://github.com/supabase/storage-js" target="_blank" rel="noopener noreferrer">storage-js</a></td>
-    <td><a href="https://github.com/supabase/functions-js" target="_blank" rel="noopener noreferrer">functions-js</a></td>
+    <td><a href="https://github.com/supabase/supabase-js/tree/master/packages/core/postgrest-js" target="_blank" rel="noopener noreferrer">postgrest-js</a></td>
+    <td><a href="https://github.com/supabase/supabase-js/tree/master/packages/core/auth-js" target="_blank" rel="noopener noreferrer">auth-js</a></td>
+    <td><a href="https://github.com/supabase/supabase-js/tree/master/packages/core/realtime-js" target="_blank" rel="noopener noreferrer">realtime-js</a></td>
+    <td><a href="https://github.com/supabase/supabase-js/tree/master/packages/core/storage-js" target="_blank" rel="noopener noreferrer">storage-js</a></td>
+    <td><a href="https://github.com/supabase/supabase-js/tree/master/packages/core/functions-js" target="_blank" rel="noopener noreferrer">functions-js</a></td>
   </tr>
     <tr>
     <td>Flutter</td>
@@ -126,7 +126,7 @@ Naš pristop k odjemalskim knjižnicam je modularen. Vsaka pod-knjižnica je sam
   
   <tr>
     <td>C#</td>
-    <td><a href="https://github.com/supabase-community/supabase-csharp" target="_blank" rel="noopener noreferrer">supabase-csharp</a></td>
+    <td><a href="https://github.com/supabase/supabase-csharp" target="_blank" rel="noopener noreferrer">supabase-csharp</a></td>
     <td><a href="https://github.com/supabase-community/postgrest-csharp" target="_blank" rel="noopener noreferrer">postgrest-csharp</a></td>
     <td><a href="https://github.com/supabase-community/gotrue-csharp" target="_blank" rel="noopener noreferrer">gotrue-csharp</a></td>
     <td><a href="https://github.com/supabase-community/realtime-csharp" target="_blank" rel="noopener noreferrer">realtime-csharp</a></td>
@@ -162,7 +162,7 @@ Naš pristop k odjemalskim knjižnicam je modularen. Vsaka pod-knjižnica je sam
   </tr>
   <tr>
     <td>Python</td>
-    <td><a href="https://github.com/supabase-community/supabase-py" target="_blank" rel="noopener noreferrer">supabase-py</a></td>
+    <td><a href="https://github.com/supabase/supabase-py" target="_blank" rel="noopener noreferrer">supabase-py</a></td>
     <td><a href="https://github.com/supabase-community/postgrest-py" target="_blank" rel="noopener noreferrer">postgrest-py</a></td>
     <td><a href="https://github.com/supabase-community/gotrue-py" target="_blank" rel="noopener noreferrer">gotrue-py</a></td>
     <td><a href="https://github.com/supabase-community/realtime-py" target="_blank" rel="noopener noreferrer">realtime-py</a></td>

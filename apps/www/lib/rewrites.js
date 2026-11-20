@@ -1,4 +1,19 @@
-module.exports = [
+const LIBRARY_URL = process.env.NEXT_PUBLIC_LIBRARY_URL ?? process.env.NEXT_PUBLIC_UI_LIBRARY_URL
+
+const zoneRewrites = (basePath, url) => [
+  // vercel keeps the segment prefetch header on .segments paths. the zone then adds the suffix again
+  {
+    source: `${basePath}/:path(.*)\\.segments/:segment(.*)\\.segment\\.rsc`,
+    destination: `${url}/:path`,
+  },
+  { source: `${basePath}\\.segments/:segment(.*)\\.segment\\.rsc`, destination: `${url}` },
+  // a zone serves its root as index.rsc
+  { source: `${basePath}\\.rsc`, destination: `${url}` },
+  { source: basePath, destination: `${url}` },
+  { source: `${basePath}/:path*`, destination: `${url}/:path*` },
+]
+
+const rewrites = [
   {
     source: '/:path*',
     destination: `/:path*`,
@@ -11,28 +26,40 @@ module.exports = [
     source: '/dashboard/:path*',
     destination: `${process.env.NEXT_PUBLIC_STUDIO_URL}/:path*`,
   },
+  ...(process.env.NEXT_PUBLIC_VERCEL_ENV === 'production'
+    ? [
+        {
+          source: '/docs/',
+          destination: `${process.env.NEXT_PUBLIC_DOCS_URL}`,
+        },
+        ...zoneRewrites('/docs', process.env.NEXT_PUBLIC_DOCS_URL),
+      ]
+    : []),
+  ...zoneRewrites('/library', LIBRARY_URL),
+  ...zoneRewrites('/design-system', process.env.NEXT_PUBLIC_DESIGN_SYSTEM_URL),
   {
-    source: '/docs',
-    destination: `${process.env.NEXT_PUBLIC_DOCS_URL}`,
+    source: '/kb',
+    destination: `${process.env.NEXT_PUBLIC_KB_URL}`,
   },
   {
-    // redirect /docs/
-    // trailing slash caused by docusaurus issue with multizone
-    source: '/docs/',
-    destination: `${process.env.NEXT_PUBLIC_DOCS_URL}`,
+    source: '/kb/:path*',
+    destination: `${process.env.NEXT_PUBLIC_KB_URL}/:path*`,
   },
   {
-    source: '/docs/:path*',
-    destination: `${process.env.NEXT_PUBLIC_DOCS_URL}/:path*`,
-  },
-
-  {
-    source: '/ui',
-    destination: `${process.env.NEXT_PUBLIC_UI_LIBRARY_URL}`,
+    source: '/evals',
+    destination: 'https://supabase-evals.vercel.app',
   },
   {
-    source: '/ui/:path*',
-    destination: `${process.env.NEXT_PUBLIC_UI_LIBRARY_URL}/:path*`,
+    source: '/evals/:path*',
+    destination: 'https://supabase-evals.vercel.app/:path*',
+  },
+  {
+    source: '/migrate/instantdb',
+    destination: 'https://instantdb-to-supabase.vercel.app/migrate/instantdb',
+  },
+  {
+    source: '/migrate/instantdb/:path*',
+    destination: 'https://instantdb-to-supabase.vercel.app/migrate/instantdb/:path*',
   },
 
   {
@@ -63,15 +90,15 @@ module.exports = [
     destination: `${process.env.NEXT_PUBLIC_DOCS_URL}/.well-known/security.txt`,
   },
   {
-    source: '/llms.txt',
-    destination: `${process.env.NEXT_PUBLIC_DOCS_URL}/llms.txt`,
+    // legacy AI Catalog path; /.well-known/ard.json is the canonical source
+    source: '/.well-known/ai-catalog.json',
+    destination: '/.well-known/ard.json',
   },
   {
-    source: '/llms/:path(.*\\.txt$)',
-    destination: `${process.env.NEXT_PUBLIC_DOCS_URL}/llms/:path`,
+    source: '/openapi.json',
+    destination: 'https://api.supabase.com/api/v1-json',
   },
-  {
-    source: '/feed.xml',
-    destination: `/rss.xml`,
-  },
+  { source: '/feed.xml', destination: `/rss.xml` },
 ]
+
+module.exports = rewrites

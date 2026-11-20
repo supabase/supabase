@@ -1,6 +1,7 @@
-import { expect, test, beforeAll, afterAll } from 'vitest'
+import { afterAll, beforeAll, expect, test } from 'vitest'
+
 import pgMeta from '../src/index'
-import { createTestDatabase, cleanupRoot } from './db/utils'
+import { cleanupRoot, createTestDatabase } from './db/utils'
 
 beforeAll(async () => {
   // Any global setup if needed
@@ -40,6 +41,7 @@ withTestDatabase('list foreign tables', async ({ executeQuery }) => {
           "default_value": null,
           "enums": [],
           "format": "int8",
+          "format_schema": "pg_catalog",
           "id": "16451.1",
           "identity_generation": null,
           "is_generated": false,
@@ -60,6 +62,7 @@ withTestDatabase('list foreign tables', async ({ executeQuery }) => {
           "default_value": null,
           "enums": [],
           "format": "text",
+          "format_schema": "pg_catalog",
           "id": "16451.2",
           "identity_generation": null,
           "is_generated": false,
@@ -83,6 +86,7 @@ withTestDatabase('list foreign tables', async ({ executeQuery }) => {
             "INACTIVE",
           ],
           "format": "user_status",
+          "format_schema": "public",
           "id": "16451.3",
           "identity_generation": null,
           "is_generated": false,
@@ -98,6 +102,9 @@ withTestDatabase('list foreign tables', async ({ executeQuery }) => {
         },
       ],
       "comment": null,
+      "foreign_data_wrapper_handler": "postgres_fdw_handler",
+      "foreign_data_wrapper_name": "postgres_fdw",
+      "foreign_server_name": "foreign_server",
       "id": Any<Number>,
       "name": "foreign_table",
       "schema": "public",
@@ -115,6 +122,9 @@ withTestDatabase('list foreign tables without columns', async ({ executeQuery })
     `
     {
       "comment": null,
+      "foreign_data_wrapper_handler": "postgres_fdw_handler",
+      "foreign_data_wrapper_name": "postgres_fdw",
+      "foreign_server_name": "foreign_server",
       "id": Any<Number>,
       "name": "foreign_table",
       "schema": "public",
@@ -141,6 +151,7 @@ withTestDatabase('retrieve foreign table by name', async ({ executeQuery }) => {
           "default_value": null,
           "enums": [],
           "format": "int8",
+          "format_schema": "pg_catalog",
           "id": "16451.1",
           "identity_generation": null,
           "is_generated": false,
@@ -161,6 +172,7 @@ withTestDatabase('retrieve foreign table by name', async ({ executeQuery }) => {
           "default_value": null,
           "enums": [],
           "format": "text",
+          "format_schema": "pg_catalog",
           "id": "16451.2",
           "identity_generation": null,
           "is_generated": false,
@@ -184,6 +196,7 @@ withTestDatabase('retrieve foreign table by name', async ({ executeQuery }) => {
             "INACTIVE",
           ],
           "format": "user_status",
+          "format_schema": "public",
           "id": "16451.3",
           "identity_generation": null,
           "is_generated": false,
@@ -199,6 +212,9 @@ withTestDatabase('retrieve foreign table by name', async ({ executeQuery }) => {
         },
       ],
       "comment": null,
+      "foreign_data_wrapper_handler": "postgres_fdw_handler",
+      "foreign_data_wrapper_name": "postgres_fdw",
+      "foreign_server_name": "foreign_server",
       "id": Any<Number>,
       "name": "foreign_table",
       "schema": "public",
@@ -224,6 +240,7 @@ withTestDatabase('retrieve foreign table by id', async ({ executeQuery }) => {
           "default_value": null,
           "enums": [],
           "format": "int8",
+          "format_schema": "pg_catalog",
           "id": "16451.1",
           "identity_generation": null,
           "is_generated": false,
@@ -244,6 +261,7 @@ withTestDatabase('retrieve foreign table by id', async ({ executeQuery }) => {
           "default_value": null,
           "enums": [],
           "format": "text",
+          "format_schema": "pg_catalog",
           "id": "16451.2",
           "identity_generation": null,
           "is_generated": false,
@@ -267,6 +285,7 @@ withTestDatabase('retrieve foreign table by id', async ({ executeQuery }) => {
             "INACTIVE",
           ],
           "format": "user_status",
+          "format_schema": "public",
           "id": "16451.3",
           "identity_generation": null,
           "is_generated": false,
@@ -282,6 +301,9 @@ withTestDatabase('retrieve foreign table by id', async ({ executeQuery }) => {
         },
       ],
       "comment": null,
+      "foreign_data_wrapper_handler": "postgres_fdw_handler",
+      "foreign_data_wrapper_name": "postgres_fdw",
+      "foreign_server_name": "foreign_server",
       "id": Any<Number>,
       "name": "foreign_table",
       "schema": "public",

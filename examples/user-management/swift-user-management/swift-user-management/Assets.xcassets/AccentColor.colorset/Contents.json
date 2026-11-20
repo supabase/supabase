@@ -1,11 +1,11 @@
 {
-  "colors" : [
+  "colors": [
     {
-      "idiom" : "universal"
+      "idiom": "universal"
     }
   ],
-  "info" : {
-    "author" : "xcode",
-    "version" : 1
+  "info": {
+    "author": "xcode",
+    "version": 1
   }
 }

@@ -4,13 +4,14 @@ import { useRouter } from 'next/router'
 import { useRef, useState } from 'react'
 import { SubmitHandler, useForm } from 'react-hook-form'
 import { toast } from 'sonner'
+import { Button, Form, FormControl, FormField, Input } from 'ui'
+import { Admonition } from 'ui-patterns/Admonition'
+import { FormItemLayout } from 'ui-patterns/form/FormItemLayout/FormItemLayout'
 import * as z from 'zod'
 
-import { useResetPasswordMutation } from 'data/misc/reset-password-mutation'
-import { BASE_PATH } from 'lib/constants'
-import { auth } from 'lib/gotrue'
-import { Button, Form_Shadcn_, FormControl_Shadcn_, FormField_Shadcn_, Input_Shadcn_ } from 'ui'
-import { FormItemLayout } from 'ui-patterns/form/FormItemLayout/FormItemLayout'
+import { useResetPasswordMutation } from '@/data/misc/reset-password-mutation'
+import { BASE_PATH } from '@/lib/constants'
+import { auth } from '@/lib/gotrue'
 
 const forgotPasswordSchema = z.object({
   email: z.string().min(1, 'Please provide an email address').email('Must be a valid email'),
@@ -72,36 +73,44 @@ const ConfirmResetCodeForm = ({ email }: { email: string }) => {
   }
 
   return (
-    <Form_Shadcn_ {...codeForm}>
+    <Form {...codeForm}>
       <form
         id="code-input-form"
+        method="POST"
         className="flex flex-col pt-4 space-y-4"
         onSubmit={codeForm.handleSubmit(onCodeEntered)}
       >
-        <FormField_Shadcn_
+        <Admonition
+          type="default"
+          title="Check your email for a reset code"
+          description="You'll receive an email if an account associated with the email address exists"
+        />
+        <FormField
           control={codeForm.control}
           name="code"
           render={({ field }) => (
             <FormItemLayout label="Code">
-              <FormControl_Shadcn_>
-                <Input_Shadcn_
-                  {...field}
-                  placeholder="123456"
-                  autoComplete="off"
-                  disabled={isLoading}
-                />
-              </FormControl_Shadcn_>
+              <FormControl>
+                <Input {...field} placeholder="123456" autoComplete="off" disabled={isLoading} />
+              </FormControl>
             </FormItemLayout>
           )}
         />
 
         <div className="border-t border-overlay-border" />
 
-        <Button block form="code-input-form" htmlType="submit" size="medium" loading={isLoading}>
+        <Button
+          variant="primary"
+          block
+          form="code-input-form"
+          type="submit"
+          size="medium"
+          loading={isLoading}
+        >
           Confirm reset code
         </Button>
       </form>
-    </Form_Shadcn_>
+    </Form>
   )
 }
 
@@ -114,7 +123,7 @@ const ForgotPasswordForm = ({ onSuccess }: { onSuccess: (email: string) => void 
     defaultValues: { email: '' },
   })
 
-  const { mutate: resetPassword, isLoading } = useResetPasswordMutation({
+  const { mutate: resetPassword, isPending } = useResetPasswordMutation({
     onSuccess: () => {
       onSuccess(forgotPasswordForm.getValues('email'))
     },
@@ -144,26 +153,27 @@ const ForgotPasswordForm = ({ onSuccess }: { onSuccess: (email: string) => void 
   }
 
   return (
-    <Form_Shadcn_ {...forgotPasswordForm}>
+    <Form {...forgotPasswordForm}>
       <form
         id="forgot-password-form"
+        method="POST"
         className="flex flex-col pt-4 space-y-4"
         onSubmit={forgotPasswordForm.handleSubmit(onForgotPassword)}
       >
-        <FormField_Shadcn_
+        <FormField
           control={forgotPasswordForm.control}
           name="email"
           render={({ field }) => (
             <FormItemLayout label="Email">
-              <FormControl_Shadcn_>
-                <Input_Shadcn_
+              <FormControl>
+                <Input
                   {...field}
                   type="email"
                   placeholder="you@example.com"
-                  disabled={isLoading}
+                  disabled={isPending}
                   autoComplete="email"
                 />
-              </FormControl_Shadcn_>
+              </FormControl>
             </FormItemLayout>
           )}
         />
@@ -185,16 +195,17 @@ const ForgotPasswordForm = ({ onSuccess }: { onSuccess: (email: string) => void 
         <div className="border-t border-overlay-border" />
 
         <Button
+          variant="primary"
           block
           form="forgot-password-form"
-          htmlType="submit"
+          type="submit"
           size="medium"
-          disabled={isLoading}
-          loading={isLoading}
+          disabled={isPending}
+          loading={isPending}
         >
           Send reset code
         </Button>
       </form>
-    </Form_Shadcn_>
+    </Form>
   )
 }

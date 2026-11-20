@@ -1,21 +1,28 @@
 'use client'
 
-import * as Accordion from '@radix-ui/react-accordion'
-import { ChevronUp } from 'lucide-react'
-import Image from 'next/legacy/image'
-import { Fragment, memo } from 'react'
-import { cn } from 'ui'
-import RevVersionDropdown from '~/components/RefVersionDropdown'
 import type { ICommonItem, ICommonSection } from '~/components/reference/Reference.types'
+import RevVersionDropdown from '~/components/RefVersionDropdown'
 import { menuState, useMenuActiveRefId } from '~/hooks/useMenuState'
 import { BASE_PATH } from '~/lib/constants'
+import { ChevronUp } from 'lucide-react'
+import Image from 'next/legacy/image'
+import { Accordion } from 'radix-ui'
+import { Fragment, memo } from 'react'
+import { cn } from 'ui'
+
 import MenuIconPicker from './MenuIconPicker'
 import * as NavItems from './NavigationMenu.constants'
 import { deepFilterSections } from './NavigationMenu.utils'
+import { SidebarGroupLabel } from './SidebarGroupLabel'
 
 const HeaderLink = memo(function HeaderLink(props: any) {
   return (
-    <span className={['text-base text-brand-600 ', !props.title && 'capitalize'].join(' ')}>
+    <span
+      className={[
+        'text-base text-brand-600 layout-v2:text-foreground ',
+        !props.title && 'capitalize',
+      ].join(' ')}
+    >
       {props.title ?? props.id}
     </span>
   )
@@ -52,12 +59,14 @@ const FunctionLink = memo(function FunctionLink({
     <li className="function-link-item leading-5">
       <a
         href={url}
+        aria-current={active ? 'page' : undefined}
         /**
          * We don't actually want to navigate or re-render anything
          * since ref links are all sub-sections on the same page
          */
         onClick={(e) => {
           e.preventDefault()
+          menuState.setMenuActiveRefId(id)
           history.pushState({}, '', url)
           const reduceMotion = window.matchMedia('(prefers-reduced-motion: reduce)').matches
           document.getElementById(slug)?.scrollIntoView({
@@ -68,7 +77,7 @@ const FunctionLink = memo(function FunctionLink({
         className={cn(
           'cursor-pointer transition text-sm hover:text-foreground gap-3 relative',
           isParent ? 'flex justify-between' : 'leading-3',
-          active ? 'text-brand' : 'text-foreground-lighter'
+          active ? 'text-primary layout-v2:text-foreground' : 'text-foreground-lighter'
         )}
       >
         {icon && <Image width={16} height={16} alt={icon} src={`${BASE_PATH}${icon}`} />}
@@ -76,7 +85,7 @@ const FunctionLink = memo(function FunctionLink({
         {active && !isSubItem && (
           <div
             aria-hidden="true"
-            className="absolute -left-[13px] top-0 bottom-0 w-[1px] bg-brand-600"
+            className="absolute left-[-13px] top-0 bottom-0 w-px bg-brand-600"
           ></div>
         )}
         {isParent && (
@@ -150,14 +159,17 @@ const RenderLink = memo(function RenderLink({ section, basePath }: RenderLinkPro
 
 const SideMenuTitle = ({ title }: { title: string }) => {
   return (
-    <span className="font-mono text-xs uppercase text-foreground font-medium tracking-wider">
-      {title}
-    </span>
+    <>
+      <span className="font-mono text-xs uppercase text-foreground font-medium tracking-wider layout-v2:hidden">
+        {title}
+      </span>
+      <SidebarGroupLabel className="hidden mt-1 layout-v2:flex pb-1.5">{title}</SidebarGroupLabel>
+    </>
   )
 }
 
 const Divider = () => {
-  return <div className="h-px w-full bg-control my-3"></div>
+  return <div className="h-px w-full bg-control my-3 layout-v2:hidden"></div>
 }
 
 interface NavigationMenuRefListItemsProps {
@@ -182,7 +194,7 @@ const NavigationMenuRefListItems = ({
 
   return (
     <div className={'w-full flex flex-col gap-0 sticky top-8'}>
-      <div className="flex items-center gap-3 my-3">
+      <div className="flex items-center gap-3 my-3 layout-v2:lg:hidden">
         <MenuIconPicker icon={menu.icon} width={21} height={21} />
         <HeaderLink title={menu.title} url={menu.url} id={id} />
       </div>

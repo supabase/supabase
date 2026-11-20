@@ -5,6 +5,7 @@ export const SUPABASE_ROLES = [
   'authenticator',
   'dashboard_user',
   'supabase_admin',
+  'supabase_privileged_role',
   'supabase_auth_admin',
   'supabase_functions_admin',
   'supabase_read_only_user',
@@ -16,7 +17,12 @@ export const SUPABASE_ROLES = [
   'pgsodium_keyiduser',
   'pgsodium_keymaker',
   'pgtle_admin',
+  'cli_login_postgres',
+  'supabase_etl_admin',
 ] as const
+
+// Roles managed by Supabase whose names carry a variable suffix, e.g. support_ro_<id>
+export const SUPABASE_ROLE_PREFIXES = ['support_ro_'] as const
 
 // [Joshen] This was originally in the Roles mobx store
 // Just keeping it for now in case we need to differ it from ^ SUPABASE_ROLES

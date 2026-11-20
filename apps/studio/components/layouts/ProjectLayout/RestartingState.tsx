@@ -1,8 +1,8 @@
 import { useParams } from 'common'
-import { Loader2 } from 'lucide-react'
+import { Loader2Icon } from 'lucide-react'
 
-import { useProjectDetailQuery } from 'data/projects/project-detail-query'
-import { PROJECT_STATUS } from 'lib/constants'
+import { useProjectDetailQuery } from '@/data/projects/project-detail-query'
+import { PROJECT_STATUS } from '@/lib/constants'
 
 const RestartingState = () => {
   const { ref } = useParams()
@@ -12,7 +12,8 @@ const RestartingState = () => {
       // setting a refetch interval here will cause the `useSelectedProject()` in `ProjectLayout.tsx` to
       // rerender every 4 seconds while the project is restarting. Once restarting is complete, it will
       // no longer show this state.
-      refetchInterval(data) {
+      refetchInterval: (query) => {
+        const data = query.state.data
         return data?.status !== PROJECT_STATUS.ACTIVE_HEALTHY ? 4000 : false
       },
     }
@@ -24,7 +25,7 @@ const RestartingState = () => {
         <div className="space-y-6 py-6">
           <div className="flex px-8 space-x-8">
             <div className="mt-1">
-              <Loader2 className="animate-spin" size={18} />
+              <Loader2Icon className="animate-spin" size={18} />
             </div>
             <div className="space-y-1">
               <p>Restarting...</p>

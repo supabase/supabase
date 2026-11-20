@@ -1,12 +1,15 @@
-import { useMutation, UseMutationOptions, useQueryClient } from '@tanstack/react-query'
+import { Query } from '@supabase/pg-meta/src/query'
+import { useMutation, useQueryClient } from '@tanstack/react-query'
 import { toast } from 'sonner'
 
-import { Query } from '@supabase/pg-meta/src/query'
-import { executeSql } from 'data/sql/execute-sql-query'
-import { RoleImpersonationState, wrapWithRoleImpersonation } from 'lib/role-impersonation'
-import { isRoleImpersonationEnabled } from 'state/role-impersonation-state'
-import type { ResponseError } from 'types'
 import { tableRowKeys } from './keys'
+import { isUserFaultForValues } from '@/data/error-classification'
+import { unguarded } from '@/data/fetchers'
+import { executeSql } from '@/data/sql/execute-sql-mutation'
+import type { StudioError } from '@/lib/errors/studio-errors'
+import { RoleImpersonationState, wrapWithRoleImpersonation } from '@/lib/role-impersonation'
+import { isRoleImpersonationEnabled } from '@/state/role-impersonation-state'
+import type { UseCustomMutationOptions } from '@/types'
 
 export type TableRowUpdateVariables = {
   projectRef: string
@@ -54,9 +57,13 @@ export async function updateTableRow({
   const { result } = await executeSql({
     projectRef,
     connectionString,
+    sqlOrigin: 'studio',
+    queryName: 'table-row-update',
+    isUserFaultSqlState: isUserFaultForValues,
     sql,
     isRoleImpersonationEnabled: isRoleImpersonationEnabled(roleImpersonationState?.role),
     queryKey: ['table-row-update', table.id],
+    grant: unguarded.migrating,
   })
 
   return result
@@ -69,29 +76,27 @@ export const useTableRowUpdateMutation = ({
   onError,
   ...options
 }: Omit<
-  UseMutationOptions<TableRowUpdateData, ResponseError, TableRowUpdateVariables>,
+  UseCustomMutationOptions<TableRowUpdateData, StudioError, TableRowUpdateVariables>,
   'mutationFn'
 > = {}) => {
   const queryClient = useQueryClient()
 
-  return useMutation<TableRowUpdateData, ResponseError, TableRowUpdateVariables>(
-    (vars) => updateTableRow(vars),
-    {
-      async onSuccess(data, variables, context) {
-        const { projectRef, table } = variables
-        await queryClient.invalidateQueries(
-          tableRowKeys.tableRows(projectRef, { table: { id: table.id } })
-        )
-        await onSuccess?.(data, variables, context)
-      },
-      async onError(data, variables, context) {
-        if (onError === undefined) {
-          toast.error(`Failed to update table row: ${data.message}`)
-        } else {
-          onError(data, variables, context)
-        }
-      },
-      ...options,
-    }
-  )
+  return useMutation<TableRowUpdateData, StudioError, TableRowUpdateVariables>({
+    mutationFn: (vars) => updateTableRow(vars),
+    async onSuccess(data, variables, context) {
+      const { projectRef, table } = variables
+      await queryClient.invalidateQueries({
+        queryKey: tableRowKeys.tableRows(projectRef, { table: { id: table.id } }),
+      })
+      await onSuccess?.(data, variables, context)
+    },
+    async onError(data, variables, context) {
+      if (onError === undefined) {
+        toast.error(`Failed to update table row: ${data.message}`)
+      } else {
+        onError(data, variables, context)
+      }
+    },
+    ...options,
+  })
 }

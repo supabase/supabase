@@ -1,10 +1,15 @@
+import { useQuery } from '@tanstack/react-query'
 import { useMemo } from 'react'
-import { useBranchDiffQuery } from 'data/branches/branch-diff-query'
-import { useMigrationsQuery } from 'data/database/migrations-query'
+
+import { useBranchGrant } from './useBranchGrant'
 import { useEdgeFunctionsDiff, type EdgeFunctionsDiffResult } from './useEdgeFunctionsDiff'
+import { useIsPgDeltaDiffEnabled } from '@/components/interfaces/App/FeaturePreview/FeaturePreviewContext'
+import { branchDiffQueryOptions } from '@/data/branches/branch-diff-query'
+import { useMigrationsQuery } from '@/data/database/migrations-query'
 
 interface UseBranchMergeDiffProps {
   currentBranchRef?: string
+  isCurrentBranchDefault?: boolean
   parentProjectRef?: string
   currentBranchConnectionString?: string
   parentBranchConnectionString?: string
@@ -46,30 +51,51 @@ export interface BranchMergeDiffResult {
 
 export const useBranchMergeDiff = ({
   currentBranchRef,
+  isCurrentBranchDefault,
   parentProjectRef,
   currentBranchConnectionString,
   parentBranchConnectionString,
   currentBranchCreatedAt,
 }: UseBranchMergeDiffProps): BranchMergeDiffResult => {
+  const pgDeltaDiffEnabled = useIsPgDeltaDiffEnabled()
+
+  const diffGrant = useBranchGrant('GET /v1/branches/{branch_id_or_ref}/diff', {
+    projectRef: parentProjectRef,
+    isDefault: isCurrentBranchDefault,
+  })
+
   // Get database diff
   const {
     data: diffContent,
-    isLoading: isDatabaseDiffLoading,
+    isPending: isDiffQueryPending,
     isRefetching: isDatabaseDiffRefetching,
-    error: databaseDiffError,
+    error: diffQueryError,
     refetch: refetchDatabaseDiff,
-  } = useBranchDiffQuery(
-    {
-      branchRef: currentBranchRef || '',
-      projectRef: parentProjectRef || '',
-    },
-    {
-      enabled: !!currentBranchRef && !!parentProjectRef,
-      refetchOnMount: 'always',
-      refetchOnWindowFocus: false,
-      staleTime: 0,
-    }
+  } = useQuery(
+    branchDiffQueryOptions(
+      {
+        branchRef: currentBranchRef,
+        projectRef: parentProjectRef,
+        pgdelta: pgDeltaDiffEnabled,
+        grant: diffGrant.grant,
+      },
+      {
+        enabled: !!currentBranchRef && !!parentProjectRef,
+        refetchOnMount: 'always',
+        refetchOnWindowFocus: false,
+        staleTime: 0,
+      }
+    )
   )
+
+  const isDatabaseDiffLoading =
+    diffGrant.status === 'loading' || (diffGrant.status === 'granted' && isDiffQueryPending)
+  let databaseDiffError: unknown = diffQueryError
+  if (diffGrant.status === 'denied') {
+    databaseDiffError = new Error('You need additional permissions to view branch diffs')
+  } else if (diffGrant.status === 'error') {
+    databaseDiffError = diffGrant.error
+  }
 
   // Get migrations for both current branch and main branch
   const { data: currentBranchMigrations, refetch: refetchCurrentBranchMigrations } =

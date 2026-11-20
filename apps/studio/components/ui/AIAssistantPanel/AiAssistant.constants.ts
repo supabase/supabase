@@ -1,4 +1,15 @@
 import { SupportedAssistantEntities } from './AIAssistant.types'
+import type { AiOptInLevel } from '@/hooks/misc/useOrgOptedIntoAi'
+
+export const ASSISTANT_ERRORS = {
+  'context-exceeded': {
+    message:
+      'This conversation has become too long for the Assistant to process. Please start a new chat to continue.',
+  },
+  default: {
+    message: 'If the error persists while retrying, you may try creating a new chat and try again.',
+  },
+}
 
 export const ASSISTANT_SUPPORT_ENTITIES: {
   id: SupportedAssistantEntities
@@ -34,3 +45,10 @@ export const SAFE_FUNCTIONS = [
   'now(',
   'left(',
 ]
+
+export const AI_OPT_IN_LEVEL_LABELS: Record<AiOptInLevel, string> = {
+  disabled: 'Disabled',
+  schema: 'Schema Only',
+  schema_and_log: 'Schema & Logs',
+  schema_and_log_and_data: 'Schema, Logs & Database Data',
+}

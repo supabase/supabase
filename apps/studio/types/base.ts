@@ -1,8 +1,9 @@
-import { PermissionAction } from '@supabase/shared-types/out/constants'
-import { OrganizationBase } from 'data/organizations/organizations-query'
-import { PlanId } from 'data/subscriptions/types'
-import jsonLogic from 'json-logic-js'
-import { ManagedBy } from 'lib/constants/infrastructure'
+import type { PermissionAction } from '@supabase/shared-types/out/constants'
+import type jsonLogic from 'json-logic-js'
+
+import type { OrganizationBase } from '@/data/organizations/organizations-query'
+import type { PlanId } from '@/data/subscriptions/types'
+import type { ManagedBy } from '@/lib/constants/infrastructure'
 
 export interface Organization extends OrganizationBase {
   managed_by: ManagedBy
@@ -76,27 +77,27 @@ export interface Permission {
   organization_slug: string
   resources: string[]
   restrictive?: boolean
-  project_refs: string[]
+  /**
+   * Projects the row is limited to. Organization-wide rows arrive as [] or null — the API
+   * contract is nullable and some view-synthesized rows serialize as null.
+   */
+  project_refs: string[] | null
 }
 
 export interface ResponseFailure {
-  error: ResponseError
+  error: Error
 }
 
 export type SupaResponse<T> = T | ResponseFailure
 
-export class ResponseError extends Error {
-  code?: number
-  requestId?: string
-  retryAfter?: number
-
-  constructor(message: string | undefined, code?: number, requestId?: string, retryAfter?: number) {
-    super(message || 'API error happened while trying to communicate with the server.')
-    this.code = code
-    this.requestId = requestId
-    this.retryAfter = retryAfter
-  }
+// [Joshen] Trialing returning metadata for the error object. It's meant to be generic
+// but typed properly here, and we can create more types if needed with the | operator
+type CostMetadata = {
+  cost: number
+  sql: string
 }
+
+export type ErrorMetadata = CostMetadata
 
 export interface Dictionary<T> {
   [Key: string]: T

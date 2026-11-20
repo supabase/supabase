@@ -2,8 +2,8 @@
 title: 'Introducing Supabase Enterprise'
 description: 'Today we are releasing Supabase Enterprise, a suite of features to scale your project.'
 author: rory_wilding,paul_copplestone
-image: launch-week-4/enterprise-day/enterprise-thumb.png
-thumb: launch-week-4/enterprise-day/enterprise-thumb.png
+imgSocial: launch-week-4/enterprise-day/enterprise-thumb.png
+imgThumb: launch-week-4/enterprise-day/enterprise-thumb.png
 categories:
   - company
 tags:
@@ -133,7 +133,7 @@ Some features are too good to limit to large customers, so today we're introduci
 </video>
 
 To simplify pricing, we've merged the “Pro” and “Pay as you go” plans and introduced monthly spend caps to avoid nasty billing surprises.
-These changes are to keep Supabase pricing [predictable, transparent, and developer friendly](/blog/pricing).
+These changes are to keep Supabase pricing [predictable, transparent, and developer friendly](/pricing).
 
 When you upgrade to the Pro Plan, spend caps are turned on by default, limiting your per-project costs to $25 per month.
 We're also retaining our soft limits while we manage the transition to granular spend-caps, so your service will continue to run even if your usage exceeds $25 (we'll contact you directly when you go over the limit). Right now there is a global project spend-cap, and in the future you'll have full control with configurable spend-caps on a “per-feature” basis.
@@ -163,7 +163,7 @@ Today, Database Add-ons are available for a small set of customers. We will prog
   />
 </video>
 
-Today we're releasing a brand new [Log Explorer](/docs/guides/platform/logs) in the Supabase Dashboard.
+Today we're releasing a brand new [Log Explorer](/docs/guides/observability/logs) in the Supabase Dashboard.
 As big advocates of SQL, we've done what any good Postgres fanatics would do - we're giving you the ability to query your logs using SQL.
 And if you're new to SQL, we have plenty of templates included.
 This is just one of the exciting features we are releasing through our [Logflare acquisition](/blog/supabase-acquires-logflare).
@@ -224,21 +224,21 @@ Supabase PITR is powered by [WAL-G](https://github.com/wal-g/wal-g), an open sou
 If you run critical infrastructure you likely use Prometheus to monitor your metrics. We've now exposed a Prometheus compatible endpoint for our Enterprise customers.
 This allows them to scrape Supabase metrics into their own metrics infrastructure for real-time monitoring and alerting. This makes monitoring Supabase as easy as building with Supabase.
 
-If you want access to the Prometheus Endpoint, [contact the Supabase Enterprise team](/contact/enterprise) today and we'll get you setup.
+If you want access to the Prometheus Endpoint, [contact the Supabase Enterprise team](https://forms.supabase.com/enterprise) today and we'll get you setup.
 
 ### SLAs & Enterprise Support
 
 For our enterprise customers we know that service level agreements and support response times are also critical features. We continue to treat support as an
 important priority for all plans, though enterprise users require confidence that our response times meet their business needs. We now offer faster response times for Enterprise customers,
 alongside Priority and Priority Plus support packages for those who need more comprehensive support. You can find further details around our SLAs & support
-[in our documentation](/docs/company/sla).
+[in our documentation](/sla).
 
 ### Enterprise Pricing
 
 ![enterprise-pricing](/images/blog/launch-week-4/enterprise-day/enterprise-pricing.png)
 
 If you need more information on our Enterprise plan, Pricing, SLAs, Support packages, or want to learn more about how Supabase can meet your scaling needs just
-[contact us](/contact/enterprise).
+[contact us](https://forms.supabase.com/enterprise).
 
 ## Coming soon
 
@@ -260,13 +260,13 @@ Or how many gigabytes of video a user streamed from [Supabase Storage](/storage)
 
 ### Materialized Views
 
-Querying huge datasets can be time-consuming, especially when you are aggregating billions of rows of historical logs. Supabase will make this simple with auto-updating views,
+Querying huge datasets can be time-consuming, especially when you are aggregating billions of rows of historical logs. Supabase will make this simple with [auto-updating views](/docs/guides/database/views#materialized-views),
 saved to disk for increased performance. These views update periodically at a cadence that you decide. You'll even be able to fetch these views with your
-[Supabase API](/docs/guides/database/api)!
+Supabase API!
 
 ## Next steps
 
-Get started today with all of our Enterprise Features on [supabase.com/dashboard](https://supabase.com/dashboard), or [contact the Supabase Enterprise team](/contact/enterprise)
+Get started today with all of our Enterprise Features on [supabase.com/dashboard](https://supabase.com/dashboard), or [contact the Supabase Enterprise team](https://forms.supabase.com/enterprise)
 if you want to access our Enterprise features.
 
 [^1]: Updated on May 31 2022 for accuracy: Changed to accurately reflect the log periods we advertise on our [pricing page](/pricing).

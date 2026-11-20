@@ -1,8 +1,8 @@
-import { useMutation, UseMutationOptions } from '@tanstack/react-query'
-import { toast } from 'sonner'
+import { useMutation } from '@tanstack/react-query'
 
-import { handleError, post } from 'data/fetchers'
-import type { ResponseError } from 'types'
+import { handleError, post } from '@/data/fetchers'
+import type { StudioError } from '@/lib/errors/studio-errors'
+import type { UseCustomMutationOptions } from '@/types'
 
 export type ApiAuthorizationApproveVariables = {
   id: string
@@ -29,24 +29,18 @@ export async function approveApiAuthorization({ id, slug }: ApiAuthorizationAppr
 
 type ApiAuthorizationApproveData = Awaited<ReturnType<typeof approveApiAuthorization>>
 
-export const useApiAuthorizationApproveMutation = ({
-  onError,
-  ...options
-}: Omit<
-  UseMutationOptions<ApiAuthorizationApproveData, ResponseError, ApiAuthorizationApproveVariables>,
-  'mutationFn'
-> = {}) => {
-  return useMutation<ApiAuthorizationApproveData, ResponseError, ApiAuthorizationApproveVariables>(
-    (vars) => approveApiAuthorization(vars),
-    {
-      async onError(data, variables, context) {
-        if (onError === undefined) {
-          toast.error(`Failed to approve authorization request: ${data.message}`)
-        } else {
-          onError(data, variables, context)
-        }
-      },
-      ...options,
-    }
-  )
+export const useApiAuthorizationApproveMutation = (
+  options: Omit<
+    UseCustomMutationOptions<
+      ApiAuthorizationApproveData,
+      StudioError,
+      ApiAuthorizationApproveVariables
+    >,
+    'mutationFn'
+  > = {}
+) => {
+  return useMutation<ApiAuthorizationApproveData, StudioError, ApiAuthorizationApproveVariables>({
+    mutationFn: (vars) => approveApiAuthorization(vars),
+    ...options,
+  })
 }

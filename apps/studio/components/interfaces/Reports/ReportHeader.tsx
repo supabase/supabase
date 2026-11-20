@@ -1,14 +1,14 @@
+import { useParams } from 'common'
 import { useRouter } from 'next/router'
 
-import { useParams } from 'common'
-import DatabaseSelector from 'components/ui/DatabaseSelector'
+import { DatabaseSelector } from '@/components/ui/DatabaseSelector'
 
 interface ReportHeaderProps {
   title: string
   showDatabaseSelector?: boolean
 }
 
-const ReportHeader = ({ title, showDatabaseSelector }: ReportHeaderProps) => {
+export const ReportHeader = ({ title, showDatabaseSelector }: ReportHeaderProps) => {
   const router = useRouter()
   const { ref } = useParams()
   const { db, chart, ...params } = router.query
@@ -29,4 +29,3 @@ const ReportHeader = ({ title, showDatabaseSelector }: ReportHeaderProps) => {
     </div>
   )
 }
-export default ReportHeader

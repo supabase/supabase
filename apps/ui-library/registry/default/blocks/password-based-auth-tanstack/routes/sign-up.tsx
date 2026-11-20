@@ -1,5 +1,6 @@
-import { SignUpForm } from '@/registry/default/blocks/password-based-auth-tanstack/components/sign-up-form'
 import { createFileRoute } from '@tanstack/react-router'
+
+import { SignUpForm } from '@/registry/default/blocks/password-based-auth-tanstack/components/sign-up-form'
 
 export const Route = createFileRoute('/sign-up')({
   component: SignUp,

@@ -1,0 +1,20 @@
+---
+id: 'advisors'
+title: 'Advisors'
+description: 'Health, security, and performance checks you or an agent can run against a project.'
+---
+
+Advisors are deterministic checks that ship with the platform. They flag health, security, and performance issues in your project, such as elevated error rates, misconfigured RLS policies, or missing indexes.
+
+You or an agent can run them from:
+
+- Studio: [Health Advisor](/dashboard/project/_/advisors/health), [Security Advisor](/dashboard/project/_/advisors/security), and [Performance Advisor](/dashboard/project/_/advisors/performance)
+- MCP: `get_advisors` with `type` set to `security` or `performance`
+- CLI: [`supabase db advisors`](/docs/reference/cli/supabase-db-advisors)
+- Management API: [security](/docs/reference/api/v1-get-security-advisors), [performance](/docs/reference/api/v1-get-performance-advisors), and [health](/docs/reference/api/v2-run-project-advisors) advisors
+
+Some findings may be intentional, so check them against your intended schema and access model before you change anything. Health findings can take a while to clear after a fix, since the check measures error rates over a period of time.
+
+## Available checks
+
+<DatabaseAdvisorsIndex />

@@ -17,7 +17,7 @@ Smart CDN caching is automatically enabled for [Pro Plan and above](/pricing).
 
 ## Cache duration
 
-When Smart CDN is enabled, the asset is cached on the CDN for as long as possible. You can still control how long assets are stored in the browser using the [`cacheControl`](/docs/reference/javascript/storage-from-upload) option when uploading a file. Smart CDN caching works with all types of storage operations including signed URLs.
+When Smart CDN is enabled, the asset is cached on the CDN for as long as possible. You can still control how long assets are stored in the browser using the [`cacheControl`](/docs/reference/javascript/file-buckets-upload) option when uploading a file. Smart CDN caching works with all types of storage operations including signed URLs.
 
 When a file is updated or deleted, the CDN cache is automatically invalidated to reflect the change (including transformed images). It can take **up to 60 seconds** for the CDN cache to be invalidated as the asset metadata has to propagate across all the data-centers around the globe.
 
@@ -33,6 +33,48 @@ If you anticipate that your asset might be deleted, it's advisable to set a shor
 
 ## Bypassing cache
 
-If you need to ensure assets refresh directly from the origin server and bypass the cache, you can achieve this by adding a unique query string to the URL.
+If you need to ensure assets refresh directly from the origin server and bypass the cache, you can achieve this by adding a unique query string such as `cacheNonce` to the URL.
 
-For instance, you can use a URL like `/storage/v1/object/sign/profile-pictures/cat.jpg?version=1` with a long browser cache (e.g., 1 year). To update the picture, increment the version query parameter in the URL, like `/storage/v1/object/sign/profile-pictures/cat.jpg?version=2`. The CDN will recognize it as a new object and fetch the updated version from the origin.
+For instance, you can use a URL like `/storage/v1/object/sign/profile-pictures/cat.jpg?cacheNonce=1` with a long browser cache (e.g., 1 year). To update the picture, increment the `cacheNonce` query parameter in the URL, like `/storage/v1/object/sign/profile-pictures/cat.jpg?cacheNonce=2`. The CDN will recognize it as a new object and fetch the updated version from the origin.
+
+## Signed URLs and CDN caching
+
+Signed URLs are the primary way to serve assets from private buckets to end users. With Smart CDN enabled, signed URL responses are cached at the CDN edge, like any other storage request.
+
+Unlike public bucket URLs, each signed URL contains a unique token query parameter (`?token=...`). Smart CDN treats each unique token as a separate cache key, meaning the first request with any given signed URL results in a cache miss, and only subsequent requests using that exact same URL will receive a cache hit. Two different signed URLs for the same object, even if generated seconds apart, each maintain their own independent cache entry.
+
+This affects how you should think about serving private assets:
+
+- If you generate a new signed URL on every request, the cache will never be warm and every request hits the origin.
+- If you re-use the same signed URL across multiple requests, subsequent requests are served from cache. If the asset has no meaningful per-user access restriction, prefer a public bucket. It results in higher cache hit rates and removes the need to manage signed URL generation entirely.
+- Revoking or expiring a token does not purge its CDN cache entry. The cached response persists at the edge until the cache duration expires.
+- Deleting the object invalidates all cached entries for that object across all tokens. This can take up to a minute to propagate.
+
+Token expiry (`expiresIn`) and the object's response cache TTL (`cacheControl`) are independent. Once a response is cached at the edge, that cached response can continue to be served for the same signed URL until the CDN cache duration expires, even if the token in that URL has already expired. If you need to cut off access to an asset, delete the object from the bucket rather than relying on token expiry alone.
+
+For more information about revoking signed URLs, see [URL Signing Keys](/docs/guides/storage/security/signing-keys).
+
+## Authenticated URLs and CDN caching
+
+When you request a private asset through the authenticated endpoint (`/storage/v1/object/authenticated/[bucket]/[asset-name]`), access is allowed until the user's access token (JWT) expires. The CDN caches the response based on the user's access at the time of the request, and keeps serving it until the JWT expires.
+
+For the authenticated endpoint:
+
+- If you change a user's access, for example, by updating a Row Level Security (RLS) policy, [purge the CDN cache](/docs/guides/storage/cdn/purge-cdn-cache) so the next request that reaches the server is re-evaluated against your current access rules.
+  - The purge can take up to 60 seconds to propagate.
+  - A CDN purge doesn't update permissions stored in JWT claims. An unexpired JWT can still grant access after you change those permissions.
+  - A CDN purge doesn't clear browser caches. A browser can reuse a cached asset without sending a request to Storage until its `cacheControl` TTL expires.
+- If a user signs out and a request reuses their old JWT, the user can still access files.
+  - Signing out ends the Auth session but doesn't invalidate access tokens that were already issued.
+  - To shorten this window, lower the access token expiry in your project's [Sessions settings](/dashboard/project/_/auth/sessions). Changes only affect newly issued JWTs. Existing tokens keep their original expiry. See the [recommended values](/docs/guides/auth/sessions#what-are-recommended-values-for-access-token-jwt-expiration) before choosing a duration.
+
+To revoke access immediately, check the user's session and permissions in your own server code, for example, in an [Edge Function](/docs/guides/functions). Your code then handles authorization, so it can call the Storage API with a secret API key and still benefit from CDN caching between Storage and your server. Projects that use legacy API keys can use the `service_role` key.
+
+To check for sign-out in that code:
+
+1. Verify the JWT's signature and expiry with [`getClaims()`](/docs/reference/javascript/auth-getclaims). Reject the request if verification fails.
+2. Check that the `session_id` claim matches a row in `auth.sessions`. If no row exists, the user has signed out.
+
+For more detail, see [how to ensure an access token can't be used after sign-out](/docs/guides/auth/sessions#how-to-ensure-an-access-token-jwt-cannot-be-used-after-a-user-signs-out).
+
+[Serving assets through the S3 API](/docs/guides/storage/s3/authentication) doesn't cache responses, but requests that use a session token still succeed after sign-out until the JWT expires.

@@ -1,0 +1,72 @@
+import { components } from 'api-types'
+import type { ReactNode } from 'react'
+import { Button } from 'ui'
+
+import { ScopeGroupCard } from './ScopeGroupCard'
+
+export type AuthorizeSuccessGrant = {
+  email: string
+  organization_slug: string
+  project_refs: string[] | null
+  projects: components['schemas']['OrganizationProjectsResponse_Output']['projects']
+  scopes?: string[]
+}
+
+export interface AuthorizeSuccessScreenProps {
+  appName: string
+  grant: AuthorizeSuccessGrant
+  onReturn: () => void
+}
+
+const DetailRow = ({ label, children }: { label: string; children: ReactNode }) => (
+  <div className="flex items-start justify-between gap-4 py-2.5 text-xs">
+    <span className="shrink-0 text-foreground-light">{label}</span>
+    <span className="min-w-0 text-right text-foreground">{children}</span>
+  </div>
+)
+
+export const AuthorizeSuccessScreen = ({
+  appName,
+  grant,
+  onReturn,
+}: AuthorizeSuccessScreenProps) => {
+  const hasAllProjects = grant.project_refs === null
+
+  return (
+    <div className="flex flex-col gap-6 px-6 pb-6">
+      <div className="divide-y rounded-md border bg-surface-75 px-4">
+        <DetailRow label="Authorized by">{grant.email}</DetailRow>
+        <DetailRow label="Organization">{grant.organization_slug}</DetailRow>
+        <DetailRow label="Projects">
+          {hasAllProjects ? (
+            'All projects, including ones created later'
+          ) : (
+            <span className="flex flex-wrap justify-end gap-x-1">
+              {grant.projects.map((project, index) => (
+                <span key={project.ref}>
+                  {project.name}
+                  {index < grant.projects.length - 1 ? <span>,</span> : ''}
+                </span>
+              ))}
+            </span>
+          )}
+        </DetailRow>
+      </div>
+
+      <section className="flex flex-col gap-3">
+        <p className="text-xs text-foreground">Permissions granted</p>
+        {grant.scopes == null ? (
+          <div className="divide-y rounded-md border bg-surface-75 px-4">
+            <p className="font-mono text-xs uppercase text-foreground-light">No scopes</p>
+          </div>
+        ) : (
+          <ScopeGroupCard scopes={grant.scopes} />
+        )}
+      </section>
+
+      <Button variant="text" block onClick={onReturn}>
+        Return to {appName}
+      </Button>
+    </div>
+  )
+}

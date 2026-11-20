@@ -1,14 +1,16 @@
-import { useMutation, UseMutationOptions, useQueryClient } from '@tanstack/react-query'
+import { useMutation, useQueryClient } from '@tanstack/react-query'
 import { toast } from 'sonner'
 
-import { handleError, post } from 'data/fetchers'
-import type { ResponseError } from 'types'
 import { replicationKeys } from './keys'
+import { handleError, post } from '@/data/fetchers'
+import type { StudioError } from '@/lib/errors/studio-errors'
+import type { UseCustomMutationOptions } from '@/types'
 
 type UpdatePipelineVersionParams = {
   projectRef: string
-  pipelineId: number
+  pipelineId: string
   versionId: number
+  skipStatusInvalidation?: boolean
 }
 
 async function updatePipelineVersion(
@@ -39,36 +41,43 @@ export const useUpdatePipelineVersionMutation = ({
   onError,
   ...options
 }: Omit<
-  UseMutationOptions<UpdatePipelineVersionData, ResponseError, UpdatePipelineVersionParams>,
+  UseCustomMutationOptions<UpdatePipelineVersionData, StudioError, UpdatePipelineVersionParams>,
   'mutationFn'
 > = {}) => {
   const queryClient = useQueryClient()
 
-  return useMutation<UpdatePipelineVersionData, ResponseError, UpdatePipelineVersionParams>(
-    (vars) => updatePipelineVersion(vars),
-    {
-      async onSuccess(data, variables, context) {
-        const { projectRef, pipelineId } = variables
-        // Ensure the version dot updates promptly
-        await queryClient.invalidateQueries(
-          replicationKeys.pipelinesVersion(projectRef, pipelineId)
-        )
-        await onSuccess?.(data, variables, context)
-      },
-      async onError(error, variables, context) {
-        const { projectRef, pipelineId } = variables
-        if (error?.code === 404) {
-          // Default image changed meanwhile. Refresh version info so UI reflects latest state.
-          await queryClient.invalidateQueries(
-            replicationKeys.pipelinesVersion(projectRef, pipelineId)
-          )
-        } else if (onError === undefined) {
-          toast.error(`Failed to update pipeline version: ${error.message}`)
-        } else {
-          onError(error, variables, context)
-        }
-      },
-      ...options,
-    }
-  )
+  return useMutation<UpdatePipelineVersionData, StudioError, UpdatePipelineVersionParams>({
+    mutationFn: (vars) => updatePipelineVersion(vars),
+    async onSuccess(data, variables, context) {
+      const { projectRef, pipelineId, skipStatusInvalidation = true } = variables
+      await Promise.all([
+        queryClient.invalidateQueries({
+          queryKey: replicationKeys.pipelinesVersion(projectRef, pipelineId),
+        }),
+        ...(skipStatusInvalidation
+          ? []
+          : [
+              queryClient.invalidateQueries(
+                { queryKey: replicationKeys.pipelinesStatus(projectRef, pipelineId) },
+                { cancelRefetch: false }
+              ),
+            ]),
+      ])
+      await onSuccess?.(data, variables, context)
+    },
+    async onError(error, variables, context) {
+      const { projectRef, pipelineId } = variables
+      if (error?.code === 404) {
+        // Default image changed meanwhile. Refresh version info so UI reflects latest state.
+        await queryClient.invalidateQueries({
+          queryKey: replicationKeys.pipelinesVersion(projectRef, pipelineId),
+        })
+      } else if (onError === undefined) {
+        toast.error(`Failed to update pipeline version: ${error.message}`)
+      } else {
+        onError(error, variables, context)
+      }
+    },
+    ...options,
+  })
 }

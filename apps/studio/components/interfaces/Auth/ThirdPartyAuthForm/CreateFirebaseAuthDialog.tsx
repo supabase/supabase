@@ -1,12 +1,9 @@
 import { zodResolver } from '@hookform/resolvers/zod'
-import { Trash } from 'lucide-react'
+import { useParams } from 'common'
+import { TrashIcon } from 'lucide-react'
 import { useEffect } from 'react'
 import { SubmitHandler, useForm } from 'react-hook-form'
 import { toast } from 'sonner'
-import * as z from 'zod'
-
-import { useParams } from 'common'
-import { useCreateThirdPartyAuthIntegrationMutation } from 'data/third-party-auth/integration-create-mutation'
 import {
   Button,
   Dialog,
@@ -15,13 +12,18 @@ import {
   DialogHeader,
   DialogSection,
   DialogTitle,
-  FormControl_Shadcn_,
-  FormField_Shadcn_,
-  Form_Shadcn_,
-  Input_Shadcn_,
+  Form,
+  FormControl,
+  FormField,
+  Input,
   Separator,
 } from 'ui'
 import { FormItemLayout } from 'ui-patterns/form/FormItemLayout/FormItemLayout'
+import * as z from 'zod'
+
+import { ButtonTooltip } from '@/components/ui/ButtonTooltip'
+import { useCreateThirdPartyAuthIntegrationMutation } from '@/data/third-party-auth/integration-create-mutation'
+import { getWriteGrantToastMessage, getWriteGrantTooltip, useGrant } from '@/lib/grants'
 
 interface CreateFirebaseAuthIntegrationProps {
   visible: boolean
@@ -50,7 +52,10 @@ export const CreateFirebaseAuthIntegrationDialog = ({
   const isCreating = true
 
   const { ref: projectRef } = useParams()
-  const { mutate: createAuthIntegration, isLoading } = useCreateThirdPartyAuthIntegrationMutation({
+  const createGrant = useGrant('POST /v1/projects/{ref}/config/auth/third-party-auth', {
+    projectRef,
+  })
+  const { mutate: createAuthIntegration, isPending } = useCreateThirdPartyAuthIntegrationMutation({
     onSuccess: () => {
       toast.success(`Successfully created a new Firebase Auth integration.`)
       onClose()
@@ -79,8 +84,15 @@ export const CreateFirebaseAuthIntegrationDialog = ({
   }, [visible])
 
   const onSubmit: SubmitHandler<z.infer<typeof FormSchema>> = async (values) => {
+    if (!createGrant.grant) {
+      toast.error(
+        getWriteGrantToastMessage(createGrant.status, 'add', 'third-party auth integrations')
+      )
+      return
+    }
     createAuthIntegration({
       projectRef: projectRef!,
+      grant: createGrant.grant,
       oidcIssuerUrl: `https://securetoken.google.com/${values.firebaseProjectId}`,
     })
   }
@@ -98,10 +110,10 @@ export const CreateFirebaseAuthIntegrationDialog = ({
 
         <Separator />
         <DialogSection>
-          <Form_Shadcn_ {...form}>
+          <Form {...form}>
             <form id={FORM_ID} onSubmit={form.handleSubmit(onSubmit)} className="space-y-4">
               {/* Enabled flag can't be changed for now because there's no update API call for integrations */}
-              {/* <FormField_Shadcn_
+              {/* <FormField
               key="enabled"
               control={form.control}
               name="enabled"
@@ -111,13 +123,13 @@ export const CreateFirebaseAuthIntegrationDialog = ({
                   label={`Enable Firebase Auth Connection`}
                   layout="flex"
                 >
-                  <FormControl_Shadcn_>
+                  <FormControl>
                     <Switch
                       checked={field.value}
                       onCheckedChange={field.onChange}
                       disabled={field.disabled}
                     />
-                  </FormControl_Shadcn_>
+                  </FormControl>
                 </FormItemLayout>
               )}
             />
@@ -127,36 +139,52 @@ export const CreateFirebaseAuthIntegrationDialog = ({
                 This will enable a JWT token from a specific Firebase project to access data from
                 this Supabase project.
               </p>
-              <FormField_Shadcn_
+              <FormField
                 key="firebaseProjectId"
                 control={form.control}
                 name="firebaseProjectId"
                 render={({ field }) => (
                   <FormItemLayout label="Firebase Auth Project ID">
-                    <FormControl_Shadcn_>
-                      <Input_Shadcn_ {...field} />
-                    </FormControl_Shadcn_>
+                    <FormControl>
+                      <Input {...field} />
+                    </FormControl>
                   </FormItemLayout>
                 )}
               />
             </form>
-          </Form_Shadcn_>
+          </Form>
         </DialogSection>
         <DialogFooter>
           {!isCreating && (
             <div className="flex-1">
-              <Button type="danger" onClick={() => onDelete()} icon={<Trash />}>
+              <Button variant="danger" onClick={() => onDelete()} icon={<TrashIcon />}>
                 Remove connection
               </Button>
             </div>
           )}
 
-          <Button disabled={isLoading} type="default" onClick={() => onClose()}>
+          <Button disabled={isPending} onClick={() => onClose()}>
             Cancel
           </Button>
-          <Button form={FORM_ID} htmlType="submit" disabled={isLoading} loading={isLoading}>
+          <ButtonTooltip
+            variant="primary"
+            form={FORM_ID}
+            type="submit"
+            disabled={isPending || !createGrant.grant}
+            loading={isPending}
+            tooltip={{
+              content: {
+                side: 'top',
+                text: getWriteGrantTooltip(
+                  createGrant.status,
+                  'add',
+                  'third-party auth integrations'
+                ),
+              },
+            }}
+          >
             {isCreating ? 'Create connection' : 'Update connection'}
-          </Button>
+          </ButtonTooltip>
         </DialogFooter>
       </DialogContent>
     </Dialog>

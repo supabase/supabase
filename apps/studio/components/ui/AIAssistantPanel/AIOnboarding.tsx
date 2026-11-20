@@ -1,11 +1,12 @@
-import { motion } from 'framer-motion'
-import { FileText } from 'lucide-react'
+import { MessageSquarePlusIcon } from 'lucide-react'
+import type { ReactNode } from 'react'
 
-import { Button } from 'ui'
-import { type SqlSnippet } from './AIAssistant.types'
-import { codeSnippetPrompts, defaultPrompts } from './AIAssistant.prompts'
+import { CHAT_TEMPLATES, codeSnippetPrompts } from './AIAssistant.prompts'
+import { ActionCard } from '@/components/layouts/Tabs/ActionCard'
+import type { SqlSnippet } from '@/state/ai-assistant-state'
 
 interface AIOnboardingProps {
+  children: ReactNode
   sqlSnippets?: SqlSnippet[]
   suggestions?: {
     title?: string
@@ -16,52 +17,64 @@ interface AIOnboardingProps {
 }
 
 export const AIOnboarding = ({
+  children,
   sqlSnippets,
   suggestions,
   onValueChange,
   onFocusInput,
 }: AIOnboardingProps) => {
-  const prompts = suggestions?.prompts
-    ? suggestions.prompts.map((suggestion) => ({
-        title: suggestion.label,
-        prompt: suggestion.description,
-        icon: <FileText strokeWidth={1.25} size={14} className="!w-4 !h-4" />,
-      }))
-    : sqlSnippets && sqlSnippets.length > 0
-      ? codeSnippetPrompts
-      : defaultPrompts
+  const suggestionPrompts = suggestions?.prompts ?? []
+  const hasSuggestions = suggestionPrompts.length > 0
+  let templates = CHAT_TEMPLATES
+
+  if (hasSuggestions) {
+    templates = suggestionPrompts.map((suggestion) => ({
+      title: suggestion.label,
+      icon: MessageSquarePlusIcon,
+      initialMessage: suggestion.description,
+    }))
+  } else if (sqlSnippets && sqlSnippets.length > 0) {
+    templates = codeSnippetPrompts.map((prompt) => ({
+      title: prompt.title,
+      icon: prompt.icon,
+      initialMessage: prompt.prompt,
+    }))
+  }
 
   return (
-    <div className="w-full mb-6">
-      <div className="px-4 mb-4">
-        <h2 className="heading-section text-foreground mb-1">How can I assist you?</h2>
-        <p className="text-foreground-light text-sm">
-          Generate SQL, RLS policies and edge functions, debug issues or check on your project
-          health.
-        </p>
-      </div>
-      <div>
-        {prompts.map((item, index) => (
-          <motion.div
-            key={index}
-            initial={{ y: 5, opacity: 0 }}
-            animate={{ y: 0, opacity: 1 }}
-            transition={{ duration: 0.3, delay: index * 0.05 }}
-          >
-            <Button
-              size="small"
-              type="text"
-              className="w-full justify-start"
-              icon={<FileText strokeWidth={1.5} size={14} className="text-foreground-light" />}
-              onClick={() => {
-                onValueChange(item.prompt)
-                onFocusInput?.()
-              }}
-            >
-              {item.title}
-            </Button>
-          </motion.div>
-        ))}
+    <div className="@container flex min-h-0 flex-1 flex-col overflow-y-auto px-6 py-8">
+      <div className="m-auto w-full max-w-2xl">
+        <div className="mb-6 text-center">
+          <h2 className="heading-section">Chat with your project</h2>
+        </div>
+
+        {children}
+
+        <section className="mt-8 flex flex-col gap-y-3">
+          {hasSuggestions && suggestions?.title && (
+            <h3 className="text-sm font-medium text-foreground">{suggestions.title}</h3>
+          )}
+          <div className="grid grid-cols-1 gap-3 @2xl:grid-cols-3">
+            {templates.map((template) => (
+              <button
+                key={template.title}
+                type="button"
+                tabIndex={0}
+                className="rounded-md text-left focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring"
+                onClick={() => {
+                  onValueChange(template.initialMessage)
+                  onFocusInput?.()
+                }}
+              >
+                <ActionCard
+                  icon={<template.icon className="h-4 w-4 text-foreground" strokeWidth={1.5} />}
+                  title={template.title}
+                  bgColor="bg-brand-400"
+                />
+              </button>
+            ))}
+          </div>
+        </section>
       </div>
     </div>
   )

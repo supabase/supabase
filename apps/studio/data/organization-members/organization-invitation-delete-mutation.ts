@@ -1,10 +1,11 @@
-import { useMutation, UseMutationOptions, useQueryClient } from '@tanstack/react-query'
+import { useMutation, useQueryClient } from '@tanstack/react-query'
 import { toast } from 'sonner'
 
-import { del, handleError } from 'data/fetchers'
-import type { ResponseError } from 'types'
-import { organizationKeys as organizationKeysV1 } from '../organizations/keys'
 import { organizationKeys } from './keys'
+import { del, handleError, unguarded } from '@/data/fetchers'
+import { organizationKeys as organizationKeysV1 } from '@/data/organizations/keys'
+import type { StudioError } from '@/lib/errors/studio-errors'
+import type { UseCustomMutationOptions } from '@/types'
 
 export type OrganizationDeleteInvitationVariables = {
   slug: string
@@ -18,6 +19,7 @@ export async function deleteOrganizationInvitation({
 }: OrganizationDeleteInvitationVariables) {
   const { error } = await del('/platform/organizations/{slug}/members/invitations/{id}', {
     params: { path: { slug, id } },
+    grant: unguarded.migrating,
   })
 
   if (error) handleError(error)
@@ -31,9 +33,9 @@ export const useOrganizationDeleteInvitationMutation = ({
   onError,
   ...options
 }: Omit<
-  UseMutationOptions<
+  UseCustomMutationOptions<
     OrganizationDeleteInvitationData,
-    ResponseError,
+    StudioError,
     OrganizationDeleteInvitationVariables
   >,
   'mutationFn'
@@ -42,16 +44,17 @@ export const useOrganizationDeleteInvitationMutation = ({
 
   return useMutation<
     OrganizationDeleteInvitationData,
-    ResponseError,
+    StudioError,
     OrganizationDeleteInvitationVariables
-  >((vars) => deleteOrganizationInvitation(vars), {
+  >({
+    mutationFn: (vars) => deleteOrganizationInvitation(vars),
     async onSuccess(data, variables, context) {
       const { slug, skipInvalidation } = variables
 
       if (!skipInvalidation) {
         await Promise.all([
-          queryClient.invalidateQueries(organizationKeys.rolesV2(slug)),
-          queryClient.invalidateQueries(organizationKeysV1.members(slug)),
+          queryClient.invalidateQueries({ queryKey: organizationKeys.rolesV2(slug) }),
+          queryClient.invalidateQueries({ queryKey: organizationKeysV1.members(slug) }),
         ])
       }
 

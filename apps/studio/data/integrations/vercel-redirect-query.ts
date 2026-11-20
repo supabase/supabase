@@ -1,8 +1,9 @@
-import { useQuery, UseQueryOptions } from '@tanstack/react-query'
+import { useQuery } from '@tanstack/react-query'
 
-import { get, handleError } from 'data/fetchers'
-import type { ResponseError } from 'types'
 import { integrationKeys } from './keys'
+import { get, handleError } from '@/data/fetchers'
+import type { StudioError } from '@/lib/errors/studio-errors'
+import type { UseCustomQueryOptions } from '@/types'
 
 export type VercelRedirectVariables = {
   installationId?: string
@@ -23,20 +24,18 @@ export async function getVercelRedirect(
 }
 
 export type VercelRedirectData = Awaited<ReturnType<typeof getVercelRedirect>>
-export type VercelRedirectError = ResponseError
+export type VercelRedirectError = StudioError
 
 export const useVercelRedirectQuery = <TData = VercelRedirectData>(
   { installationId }: VercelRedirectVariables,
   {
     enabled = true,
     ...options
-  }: UseQueryOptions<VercelRedirectData, VercelRedirectError, TData> = {}
+  }: UseCustomQueryOptions<VercelRedirectData, VercelRedirectError, TData> = {}
 ) =>
-  useQuery<VercelRedirectData, VercelRedirectError, TData>(
-    integrationKeys.vercelRedirect(installationId),
-    ({ signal }) => getVercelRedirect({ installationId }, signal),
-    {
-      enabled: enabled && typeof installationId !== 'undefined',
-      ...options,
-    }
-  )
+  useQuery<VercelRedirectData, VercelRedirectError, TData>({
+    queryKey: integrationKeys.vercelRedirect(installationId),
+    queryFn: ({ signal }) => getVercelRedirect({ installationId }, signal),
+    enabled: enabled && typeof installationId !== 'undefined',
+    ...options,
+  })

@@ -1,10 +1,10 @@
-import { X } from 'lucide-react'
-import { ReactNode } from 'react'
-import { motion, HTMLMotionProps } from 'framer-motion'
-
 import { useParams } from 'common/hooks'
-import { useLocalStorageQuery } from 'hooks/misc/useLocalStorage'
+import { XIcon } from 'lucide-react'
+import { HTMLMotionProps, motion } from 'motion/react'
+import { ReactNode } from 'react'
 import { Button, cn } from 'ui'
+
+import { useLocalStorageQuery } from '@/hooks/misc/useLocalStorage'
 
 // Base props common to all feature banners
 interface BaseFeatureBannerProps extends HTMLMotionProps<'div'> {
@@ -74,9 +74,9 @@ export const FeatureBanner = ({
       {dismissable && storageKey && (
         <div className={cn('absolute top-3 right-3', dismissClassName)}>
           <Button
-            type="text"
+            variant="text"
             size="tiny"
-            icon={<X size={16} strokeWidth={1.5} />}
+            icon={<XIcon size={16} strokeWidth={1.5} />}
             onClick={() => setIsDismissed(true)}
             className="opacity-75 px-1"
             aria-label="Dismiss notification"

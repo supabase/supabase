@@ -1,6 +1,15 @@
-import { PermissionAction } from '@supabase/shared-types/out/constants'
 import { useParams } from 'common'
 import dayjs from 'dayjs'
+import {
+  Edit3Icon,
+  EyeIcon,
+  EyeOffIcon,
+  KeyIcon,
+  LoaderIcon,
+  MoreVerticalIcon,
+  TrashIcon,
+} from 'lucide-react'
+import { parseAsString, useQueryState } from 'nuqs'
 import { useState } from 'react'
 import {
   Button,
@@ -8,34 +17,35 @@ import {
   DropdownMenuContent,
   DropdownMenuSeparator,
   DropdownMenuTrigger,
+  Tooltip,
+  TooltipContent,
+  TooltipTrigger,
 } from 'ui'
-
-import { DropdownMenuItemTooltip } from 'components/ui/DropdownMenuItemTooltip'
-import { useVaultSecretDecryptedValueQuery } from 'data/vault/vault-secret-decrypted-value-query'
-import { useAsyncCheckPermissions } from 'hooks/misc/useCheckPermissions'
-import { useSelectedProjectQuery } from 'hooks/misc/useSelectedProject'
-import { Edit3, Eye, EyeOff, Key, Loader, MoreVertical, Trash } from 'lucide-react'
-import type { VaultSecret } from 'types'
 import { Input } from 'ui-patterns/DataInputs/Input'
-import EditSecretModal from './EditSecretModal'
-import type { SecretTableColumn } from './Secrets.utils'
+
+import { SecretTableColumn } from './Secrets.types'
+import { DropdownMenuItemTooltip } from '@/components/ui/DropdownMenuItemTooltip'
+import { useVaultSecretDecryptedValueQuery } from '@/data/vault/vault-secret-decrypted-value-query'
+import { FGA_PERMISSIONS, useAsyncCheckPermissionsV2 } from '@/hooks/misc/useCheckPermissionsV2'
+import { useSelectedProjectQuery } from '@/hooks/misc/useSelectedProject'
+import type { VaultSecret } from '@/types'
 
 interface SecretRowProps {
   row: VaultSecret
   col: SecretTableColumn
-  onSelectRemove: (secret: VaultSecret) => void
 }
 
-const SecretRow = ({ row, col, onSelectRemove }: SecretRowProps) => {
+export const SecretRow = ({ row, col }: SecretRowProps) => {
   const { ref } = useParams()
   const { data: project } = useSelectedProjectQuery()
-  const [modal, setModal] = useState<string | null>(null)
   const [revealSecret, setRevealSecret] = useState(false)
   const name = row?.name ?? 'No name provided'
 
-  const { can: canManageSecrets } = useAsyncCheckPermissions(
-    PermissionAction.TENANT_SQL_ADMIN_WRITE,
-    'tables'
+  const [, setSelectedSecretToEdit] = useQueryState('edit', parseAsString)
+  const [, setSelectedSecretToDelete] = useQueryState('delete', parseAsString)
+
+  const { can: canManageSecrets } = useAsyncCheckPermissionsV2(
+    FGA_PERMISSIONS.PROJECT.DATABASE_WRITE
   )
 
   const { data: revealedValue, isFetching } = useVaultSecretDecryptedValueQuery(
@@ -49,25 +59,36 @@ const SecretRow = ({ row, col, onSelectRemove }: SecretRowProps) => {
     }
   )
 
-  const onCloseModal = () => setModal(null)
-
   if (col.id === 'actions') {
     return (
       <div className="flex items-center justify-end w-full" onClick={(e) => e.stopPropagation()}>
         <DropdownMenu>
-          <DropdownMenuTrigger asChild>
-            <Button title="Manage Secret" type="text" className="px-1" icon={<MoreVertical />} />
-          </DropdownMenuTrigger>
+          <Tooltip>
+            <TooltipTrigger asChild>
+              <DropdownMenuTrigger asChild>
+                <Button
+                  title="Manage Secret"
+                  variant="text"
+                  className="px-1"
+                  icon={<MoreVerticalIcon />}
+                  aria-label="Manage secret"
+                  // Tooltip repeats the label; screen readers would read it twice
+                  aria-describedby={undefined}
+                />
+              </DropdownMenuTrigger>
+            </TooltipTrigger>
+            <TooltipContent side="bottom">Manage secret</TooltipContent>
+          </Tooltip>
           <DropdownMenuContent side="bottom" align="end" className="w-40">
             <DropdownMenuItemTooltip
               className="gap-x-2"
               disabled={!canManageSecrets}
-              onClick={() => setModal(`edit`)}
+              onClick={() => setSelectedSecretToEdit(row.id)}
               tooltip={{
                 content: { side: 'left', text: 'You need additional permissions to edit secrets' },
               }}
             >
-              <Edit3 size={12} />
+              <Edit3Icon size={12} />
               <p>Edit</p>
             </DropdownMenuItemTooltip>
 
@@ -76,7 +97,7 @@ const SecretRow = ({ row, col, onSelectRemove }: SecretRowProps) => {
             <DropdownMenuItemTooltip
               className="gap-x-2"
               disabled={!canManageSecrets}
-              onClick={() => onSelectRemove(row)}
+              onClick={() => setSelectedSecretToDelete(row.id)}
               tooltip={{
                 content: {
                   side: 'left',
@@ -84,13 +105,11 @@ const SecretRow = ({ row, col, onSelectRemove }: SecretRowProps) => {
                 },
               }}
             >
-              <Trash size={12} />
+              <TrashIcon size={12} />
               <p className="text-foreground-light">Delete</p>
             </DropdownMenuItemTooltip>
           </DropdownMenuContent>
         </DropdownMenu>
-
-        <EditSecretModal visible={modal === `edit`} secret={row} onClose={onCloseModal} />
       </div>
     )
   }
@@ -98,21 +117,31 @@ const SecretRow = ({ row, col, onSelectRemove }: SecretRowProps) => {
   if (col.id === 'secret_value') {
     return (
       <div className="flex items-center gap-2 w-full" onClick={(e) => e.stopPropagation()}>
-        <Button
-          type="text"
-          className="px-1.5"
-          icon={
-            isFetching && revealedValue === undefined ? (
-              <Loader className="animate-spin" size={16} strokeWidth={1.5} />
-            ) : !revealSecret ? (
-              <Eye size={16} strokeWidth={1.5} />
-            ) : (
-              <EyeOff size={16} strokeWidth={1.5} />
-            )
-          }
-          onClick={() => setRevealSecret(!revealSecret)}
-        />
-        <div className="flex-grow min-w-0">
+        <Tooltip>
+          <TooltipTrigger asChild>
+            <Button
+              variant="text"
+              className="px-1.5"
+              icon={
+                isFetching && revealedValue === undefined ? (
+                  <LoaderIcon className="animate-spin" size={16} strokeWidth={1.5} />
+                ) : !revealSecret ? (
+                  <EyeIcon size={16} strokeWidth={1.5} />
+                ) : (
+                  <EyeOffIcon size={16} strokeWidth={1.5} />
+                )
+              }
+              onClick={() => setRevealSecret(!revealSecret)}
+              aria-label={revealSecret ? 'Hide secret value' : 'Show secret value'}
+              // Tooltip repeats the label; screen readers would read it twice
+              aria-describedby={undefined}
+            />
+          </TooltipTrigger>
+          <TooltipContent side="bottom">
+            {revealSecret ? 'Hide secret value' : 'Show secret value'}
+          </TooltipContent>
+        </Tooltip>
+        <div className="grow min-w-0">
           {revealSecret && revealedValue !== undefined ? (
             <Input copy readOnly size="tiny" className="font-mono" value={revealedValue} />
           ) : (
@@ -127,8 +156,8 @@ const SecretRow = ({ row, col, onSelectRemove }: SecretRowProps) => {
     return (
       <div className="w-full flex items-center justify-start">
         <p className="text-xs text-foreground-light">
-          {row.updated_at === row.created_at ? 'Added' : 'Updated'} on{' '}
-          {dayjs(row.updated_at).format('MMM D, YYYY')}
+          {row.updated_at === row.created_at ? <span>Added</span> : <span>Updated</span>}{' '}
+          <span>on</span> {dayjs(row.updated_at).format('MMM D, YYYY')}
         </p>
       </div>
     )
@@ -137,7 +166,7 @@ const SecretRow = ({ row, col, onSelectRemove }: SecretRowProps) => {
   if (col.id === 'id') {
     return (
       <div className="w-full flex items-center">
-        <Key size={12} strokeWidth={2} className="text-foreground-light mr-2" />
+        <KeyIcon size={12} strokeWidth={2} className="text-foreground-light mr-2" />
         <p className="text-foreground-light text-xs font-mono truncate" title={row.id}>
           {row.id}
         </p>
@@ -147,16 +176,16 @@ const SecretRow = ({ row, col, onSelectRemove }: SecretRowProps) => {
 
   return (
     <div className="w-full flex flex-col justify-center">
-      <p className="text-xs text-foreground truncate" title={name}>
+      <p className="text-xs text-foreground truncate select-text" title={name}>
         {name}
       </p>
       {row.description !== undefined && row.description !== '' && (
         <div>
-          <p className="text-xs text-foreground-lighter w-full truncate">{row.description}</p>
+          <p className="text-xs text-foreground-lighter w-full truncate select-text">
+            {row.description}
+          </p>
         </div>
       )}
     </div>
   )
 }
-
-export default SecretRow

@@ -1,18 +1,19 @@
-import { useQuery, UseQueryOptions } from '@tanstack/react-query'
+import { useQuery } from '@tanstack/react-query'
 import dayjs from 'dayjs'
 import { useMemo } from 'react'
 
-import type { components } from 'data/api'
-import { get, handleError } from 'data/fetchers'
-import type { ResponseError } from 'types'
 import { COOLDOWN_DURATION } from './disk-attributes-update-mutation'
 import { configKeys } from './keys'
+import type { components } from '@/data/api'
+import { get, handleError } from '@/data/fetchers'
+import type { StudioError } from '@/lib/errors/studio-errors'
+import type { UseCustomQueryOptions } from '@/types'
 
 export type DiskAttributesVariables = {
   projectRef?: string
 }
 
-export type DiskAttribute = components['schemas']['DiskResponse']
+export type DiskAttribute = components['schemas']['DiskResponse_Output']
 
 export async function getDiskAttributes(
   { projectRef }: DiskAttributesVariables,
@@ -30,20 +31,21 @@ export async function getDiskAttributes(
 }
 
 export type DiskAttributesData = Awaited<ReturnType<typeof getDiskAttributes>>
-export type DiskAttributesError = ResponseError
+export type DiskAttributesError = StudioError
 
 export const useDiskAttributesQuery = <TData = DiskAttributesData>(
   { projectRef }: DiskAttributesVariables,
   {
     enabled = true,
     ...options
-  }: UseQueryOptions<DiskAttributesData, DiskAttributesError, TData> = {}
+  }: UseCustomQueryOptions<DiskAttributesData, DiskAttributesError, TData> = {}
 ) =>
-  useQuery<DiskAttributesData, DiskAttributesError, TData>(
-    configKeys.diskAttributes(projectRef),
-    ({ signal }) => getDiskAttributes({ projectRef }, signal),
-    { enabled: enabled && typeof projectRef !== 'undefined', ...options }
-  )
+  useQuery<DiskAttributesData, DiskAttributesError, TData>({
+    queryKey: configKeys.diskAttributes(projectRef),
+    queryFn: ({ signal }) => getDiskAttributes({ projectRef }, signal),
+    enabled: enabled && typeof projectRef !== 'undefined',
+    ...options,
+  })
 
 export const useRemainingDurationForDiskAttributeUpdate = ({
   projectRef,
@@ -52,10 +54,13 @@ export const useRemainingDurationForDiskAttributeUpdate = ({
   projectRef?: string
   enabled?: boolean
 }) => {
-  const { data, isLoading, isError, isSuccess, error } = useDiskAttributesQuery(
-    { projectRef },
-    { enabled }
-  )
+  const {
+    data,
+    isPending: isLoading,
+    isError,
+    isSuccess,
+    error,
+  } = useDiskAttributesQuery({ projectRef }, { enabled })
 
   const lastModifiedAtString = dayjs(data?.last_modified_at ?? '').utc()
   const secondsFromNow = Math.max(

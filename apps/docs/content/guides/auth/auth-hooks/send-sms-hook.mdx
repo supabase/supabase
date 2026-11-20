@@ -1,13 +1,14 @@
 ---
 id: 'send-sms-hook'
 title: 'Send SMS Hook'
-subtitle: 'Use a custom SMS provider to send authentication messages'
+subtitle: 'Use your own SMS service to send authentication messages.'
 ---
 
-Runs before a message is sent. Use the hook to:
+The Send SMS Hook replaces Supabase's built-in SMS sending. You can use this hook to:
 
 - Use a regional SMS Provider
 - Use alternate messaging channels such as WhatsApp
+- Fall back to another provider if your primary one fails
 - Adjust the message body to include platform specific fields such as the [`AppHash`](https://developers.google.com/identity/sms-retriever/overview)
 
 **Inputs**

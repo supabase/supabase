@@ -1,16 +1,28 @@
-import { useQuery, UseQueryOptions } from '@tanstack/react-query'
+import { useQuery } from '@tanstack/react-query'
+import type { operations } from 'api-types'
 
-import { get, handleError } from 'data/fetchers'
-import type { ResponseError } from 'types'
 import { organizationKeys } from './keys'
+import { get, handleError } from '@/data/fetchers'
+import type { StudioError } from '@/lib/errors/studio-errors'
+import type { UseCustomQueryOptions } from '@/types'
+
+export type DesiredInstanceSizeForAvailableRegions =
+  operations['ProjectsController_getRegions']['parameters']['query']['desired_instance_size']
 
 export type OrganizationAvailableRegionsVariables = {
   slug?: string
-  cloudProvider: 'AWS' | 'FLY' | 'AWS_K8S' | 'AWS_NIMBUS'
+  cloudProvider: 'AWS' | 'AWS_K8S' | 'AWS_NIMBUS'
+  desiredInstanceSize?: DesiredInstanceSizeForAvailableRegions
+  highAvailability?: boolean
 }
 
 export async function getOrganizationAvailableRegions(
-  { slug, cloudProvider }: OrganizationAvailableRegionsVariables,
+  {
+    slug,
+    cloudProvider,
+    desiredInstanceSize,
+    highAvailability,
+  }: OrganizationAvailableRegionsVariables,
   signal?: AbortSignal
 ) {
   if (!slug) throw new Error('slug is required')
@@ -20,6 +32,8 @@ export async function getOrganizationAvailableRegions(
       query: {
         cloud_provider: cloudProvider,
         organization_slug: slug,
+        desired_instance_size: desiredInstanceSize,
+        high_availability: highAvailability?.toString(),
       },
     },
     signal,
@@ -31,21 +45,36 @@ export async function getOrganizationAvailableRegions(
 export type OrganizationAvailableRegionsData = Awaited<
   ReturnType<typeof getOrganizationAvailableRegions>
 >
-export type OrganizationAvailableRegionsError = ResponseError
+export type OrganizationAvailableRegionsError = StudioError
 
 export const useOrganizationAvailableRegionsQuery = <TData = OrganizationAvailableRegionsData>(
-  { slug, cloudProvider }: OrganizationAvailableRegionsVariables,
+  {
+    slug,
+    cloudProvider,
+    desiredInstanceSize,
+    highAvailability,
+  }: OrganizationAvailableRegionsVariables,
   {
     enabled = true,
     ...options
-  }: UseQueryOptions<
+  }: UseCustomQueryOptions<
     OrganizationAvailableRegionsData,
     OrganizationAvailableRegionsError,
     TData
   > = {}
 ) =>
-  useQuery<OrganizationAvailableRegionsData, OrganizationAvailableRegionsError, TData>(
-    organizationKeys.availableRegions(slug, cloudProvider),
-    ({ signal }) => getOrganizationAvailableRegions({ slug, cloudProvider }, signal),
-    { enabled: enabled && typeof slug !== 'undefined', ...options }
-  )
+  useQuery<OrganizationAvailableRegionsData, OrganizationAvailableRegionsError, TData>({
+    queryKey: organizationKeys.availableRegions(
+      slug,
+      cloudProvider,
+      desiredInstanceSize,
+      highAvailability
+    ),
+    queryFn: ({ signal }) =>
+      getOrganizationAvailableRegions(
+        { slug, cloudProvider, desiredInstanceSize, highAvailability },
+        signal
+      ),
+    enabled: enabled && typeof slug !== 'undefined',
+    ...options,
+  })

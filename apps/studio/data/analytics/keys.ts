@@ -77,42 +77,15 @@ export const analyticsKeys = {
       },
     ] as const,
 
-  orgDailyComputeStats: (
-    orgSlug: string | undefined,
-    {
-      startDate,
-      endDate,
-      projectRef,
-    }: {
-      startDate?: string
-      endDate?: string
-      projectRef?: string
-    }
-  ) =>
-    [
-      'organizations',
-      orgSlug,
-      'daily-stats-compute',
-      {
-        startDate: isoDateStringToDate(startDate),
-        endDate: isoDateStringToDate(endDate),
-        projectRef,
-      },
-    ] as const,
-
   orgDailyStats: (
     orgSlug: string | undefined,
     {
-      metric,
       startDate,
       endDate,
-      interval,
       projectRef,
     }: {
-      metric?: string
       startDate?: string
       endDate?: string
-      interval?: string
       projectRef?: string
     }
   ) =>
@@ -121,10 +94,8 @@ export const analyticsKeys = {
       orgSlug,
       'daily-stats',
       {
-        metric,
         startDate: isoDateStringToDate(startDate),
         endDate: isoDateStringToDate(endDate),
-        interval,
         projectRef,
       },
     ] as const,
@@ -150,11 +121,61 @@ export const analyticsKeys = {
       'infra-monitoring',
       { attribute, startDate, endDate, interval, databaseIdentifier },
     ] as const,
+  infraMonitoringGroup: (
+    projectRef: string | undefined,
+    {
+      attributes,
+      startDate,
+      endDate,
+      interval,
+      databaseIdentifier,
+    }: {
+      attributes?: string[]
+      startDate?: string
+      endDate?: string
+      interval?: string
+      databaseIdentifier?: string
+    }
+  ) =>
+    [
+      'projects',
+      projectRef,
+      'infra-monitoring',
+      'group',
+      {
+        attributes: attributes ? [...attributes].sort() : undefined,
+        startDate,
+        endDate,
+        interval,
+        databaseIdentifier,
+      },
+    ] as const,
+  apiKeysLastUsed: (
+    projectRef: string | undefined,
+    {
+      isoTimestampStart,
+      isoTimestampEnd,
+    }: {
+      isoTimestampStart?: string
+      isoTimestampEnd?: string
+    }
+  ) =>
+    ['projects', projectRef, 'api-keys-last-used', { isoTimestampStart, isoTimestampEnd }] as const,
   usageApiCounts: (projectRef: string | undefined, interval: string | undefined) =>
     ['projects', projectRef, 'usage.api-counts', interval] as const,
 
-  usageApiRequestsCount: (projectRef: string | undefined) =>
-    ['projects', projectRef, 'usage.api-requests-count'] as const,
+  serviceHealth: (
+    projectRef: string | undefined,
+    {
+      startDate,
+      endDate,
+      granularity,
+    }: {
+      startDate?: string
+      endDate?: string
+      granularity?: string
+    }
+  ) => ['projects', projectRef, 'service-health', { startDate, endDate, granularity }] as const,
 }
 
 function isoDateStringToDate(isoDateString: string | undefined): string | undefined {

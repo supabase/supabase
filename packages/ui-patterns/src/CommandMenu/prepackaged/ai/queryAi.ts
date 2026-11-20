@@ -1,8 +1,8 @@
 import type OpenAI from 'openai'
 import { SSE } from 'sse.js'
 
-import { type Message } from './utils'
 import { BASE_PATH } from '../shared/constants'
+import { type Message } from './utils'
 
 /**
  * Perform a one-off query to AI based on a snapshot of messages

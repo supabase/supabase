@@ -1,20 +1,29 @@
-import { PermissionAction } from '@supabase/shared-types/out/constants'
-import { AlertTriangle, Book, Github, Loader2 } from 'lucide-react'
+import { BookIcon, Loader2Icon } from 'lucide-react'
 import Link from 'next/link'
 import { useState } from 'react'
-import { toast } from 'sonner'
-
-import { ButtonTooltip } from 'components/ui/ButtonTooltip'
-import { useDatabaseExtensionDisableMutation } from 'data/database-extensions/database-extension-disable-mutation'
-import { DatabaseExtension } from 'data/database-extensions/database-extensions-query'
-import { useAsyncCheckPermissions } from 'hooks/misc/useCheckPermissions'
-import { useIsOrioleDb, useSelectedProjectQuery } from 'hooks/misc/useSelectedProject'
 import { extensions } from 'shared-data'
-import { Button, Switch, TableCell, TableRow, Tooltip, TooltipContent, TooltipTrigger } from 'ui'
-import { Admonition } from 'ui-patterns'
-import ConfirmationModal from 'ui-patterns/Dialogs/ConfirmationModal'
-import EnableExtensionModal from './EnableExtensionModal'
+import { toast } from 'sonner'
+import {
+  Badge,
+  Button,
+  GithubIcon,
+  Switch,
+  TableCell,
+  TableRow,
+  Tooltip,
+  TooltipContent,
+  TooltipTrigger,
+} from 'ui'
+import { Admonition } from 'ui-patterns/Admonition'
+import { ConfirmationModal } from 'ui-patterns/Dialogs/ConfirmationModal'
+
+import { EnableExtensionModal } from './EnableExtensionModal'
 import { EXTENSION_DISABLE_WARNINGS } from './Extensions.constants'
+import { useDatabaseExtensionDisableMutation } from '@/data/database-extensions/database-extension-disable-mutation'
+import { DatabaseExtension } from '@/data/database-extensions/database-extensions-query'
+import { FGA_PERMISSIONS, useAsyncCheckPermissionsV2 } from '@/hooks/misc/useCheckPermissionsV2'
+import { useIsOrioleDb, useSelectedProjectQuery } from '@/hooks/misc/useSelectedProject'
+import { DOCS_URL } from '@/lib/constants'
 
 interface ExtensionRowProps {
   extension: DatabaseExtension
@@ -28,19 +37,18 @@ export const ExtensionRow = ({ extension }: ExtensionRowProps) => {
   const [isDisableModalOpen, setIsDisableModalOpen] = useState(false)
   const [showConfirmEnableModal, setShowConfirmEnableModal] = useState(false)
 
-  const { can: canUpdateExtensions } = useAsyncCheckPermissions(
-    PermissionAction.TENANT_SQL_ADMIN_WRITE,
-    'extensions'
+  const { can: canUpdateExtensions } = useAsyncCheckPermissionsV2(
+    FGA_PERMISSIONS.PROJECT.DATABASE_WRITE
   )
   const orioleDbCheck = isOrioleDb && extension.name === 'orioledb'
   const disabled = !canUpdateExtensions || orioleDbCheck
 
   const extensionMeta = extensions.find((item) => item.name === extension.name)
   const docsUrl = extensionMeta?.link.startsWith('/guides')
-    ? `https://supabase.com/docs${extensionMeta?.link}`
-    : extensionMeta?.link ?? undefined
+    ? `${DOCS_URL}${extensionMeta?.link}`
+    : (extensionMeta?.link ?? undefined)
 
-  const { mutate: disableExtension, isLoading: isDisabling } = useDatabaseExtensionDisableMutation({
+  const { mutate: disableExtension, isPending: isDisabling } = useDatabaseExtensionDisableMutation({
     onSuccess: () => {
       toast.success(`${extension.name} is off.`)
       setIsDisableModalOpen(false)
@@ -66,30 +74,29 @@ export const ExtensionRow = ({ extension }: ExtensionRowProps) => {
               {extension.name}
             </span>
             {extensionMeta?.deprecated && extensionMeta?.deprecated.length > 0 && (
-              <ButtonTooltip
-                type="warning"
-                icon={<AlertTriangle />}
-                className="rounded-full"
-                tooltip={{
-                  content: {
-                    text: `The extension is deprecated and will be removed in ${extensionMeta.deprecated.join(', ')}.`,
-                  },
-                }}
-              >
-                Deprecated
-              </ButtonTooltip>
+              <Tooltip>
+                <TooltipTrigger asChild>
+                  <Badge variant="warning" className="cursor-default" tabIndex={0}>
+                    Deprecated
+                  </Badge>
+                </TooltipTrigger>
+                <TooltipContent side="bottom">
+                  The extension is deprecated and will be removed in{' '}
+                  {extensionMeta.deprecated.join(', ')}
+                </TooltipContent>
+              </Tooltip>
             )}
           </div>
         </TableCell>
 
-        <TableCell className="font-mono tracking-tighter">
+        <TableCell className="w-28 font-mono tracking-tighter">
           {extension?.installed_version ?? extension.default_version}
         </TableCell>
 
         <TableCell className="truncate">{isOn ? extension.schema : '-'}</TableCell>
 
         <TableCell className="text-foreground-light">
-          <p className="block max-w-96" title={extension.comment ?? undefined}>
+          <p className="block" title={extension.comment ?? undefined}>
             {extension.comment}
           </p>
         </TableCell>
@@ -121,7 +128,7 @@ export const ExtensionRow = ({ extension }: ExtensionRowProps) => {
         <TableCell>
           <div className="flex gap-2 items-center">
             {extensionMeta?.github_url && (
-              <Button asChild type="default" icon={<Github />} className="rounded-full">
+              <Button asChild icon={<GithubIcon />} className="rounded-full">
                 <a
                   target="_blank"
                   rel="noreferrer"
@@ -133,7 +140,7 @@ export const ExtensionRow = ({ extension }: ExtensionRowProps) => {
               </Button>
             )}
             {docsUrl !== undefined && (
-              <Button asChild type="default" icon={<Book />} className="rounded-full">
+              <Button asChild icon={<BookIcon />} className="rounded-full">
                 <a
                   target="_blank"
                   rel="noreferrer"
@@ -147,24 +154,27 @@ export const ExtensionRow = ({ extension }: ExtensionRowProps) => {
           </div>
         </TableCell>
 
-        {/* 
-          [Joshen] The div child here and all these classes is to properly add a left border
-          to make the sticky column more distinct 
+        {/*
+          Left border on the absolute child makes the sticky column more distinct.
+          Sticky positioning/background come from ShadowScrollArea's stickyLastColumn.
         */}
-        <TableCell className="w-20 sticky bg-surface-100 right-0 relative">
+        <TableCell className="w-20 relative">
           <div className="absolute top-0 right-0 left-0 bottom-0 flex items-center justify-center border-l">
             {isDisabling ? (
-              <Loader2 className="animate-spin" size={16} />
+              <Loader2Icon className="animate-spin" size={16} />
             ) : (
               <Tooltip>
-                <TooltipTrigger>
-                  <Switch
-                    disabled={disabled}
-                    checked={isOn}
-                    onCheckedChange={() =>
-                      isOn ? setIsDisableModalOpen(true) : setShowConfirmEnableModal(true)
-                    }
-                  />
+                <TooltipTrigger asChild>
+                  <div>
+                    <Switch
+                      aria-label="Toggle extension"
+                      disabled={disabled}
+                      checked={isOn}
+                      onCheckedChange={() =>
+                        isOn ? setIsDisableModalOpen(true) : setShowConfirmEnableModal(true)
+                      }
+                    />
+                  </div>
                 </TooltipTrigger>
                 {disabled && (
                   <TooltipContent side="bottom">
@@ -202,9 +212,7 @@ export const ExtensionRow = ({ extension }: ExtensionRowProps) => {
             Are you sure you want to turn OFF the "{extension.name}" extension?
           </p>
           {EXTENSION_DISABLE_WARNINGS[extension.name] && (
-            <Admonition type="warning" className="m-0">
-              {EXTENSION_DISABLE_WARNINGS[extension.name]}
-            </Admonition>
+            <Admonition type="warning">{EXTENSION_DISABLE_WARNINGS[extension.name]}</Admonition>
           )}
         </div>
       </ConfirmationModal>

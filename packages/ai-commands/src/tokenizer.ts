@@ -1,10 +1,20 @@
-import { getEncoding } from 'js-tiktoken'
 import type OpenAI from 'openai'
 
-export const tokenizer = getEncoding('cl100k_base')
+// Average number of characters per token for English text with OpenAI's tokenizers.
+// We estimate instead of tokenizing exactly, because bundling a tokenizer (js-tiktoken) adds
+// ~3 MB to the edge function that serves the docs chat, which exceeds the Vercel Edge Function
+// size limit.
+const CHARS_PER_TOKEN = 4
 
 /**
- * Count the tokens for multi-message chat completion requests
+ * Estimate the number of tokens in a string.
+ */
+export function estimateTokenCount(text: string): number {
+  return Math.ceil(text.length / CHARS_PER_TOKEN)
+}
+
+/**
+ * Estimate the tokens for multi-message chat completion requests
  */
 export function getChatRequestTokenCount(
   messages: OpenAI.Chat.Completions.ChatCompletionMessageParam[],
@@ -17,7 +27,7 @@ export function getChatRequestTokenCount(
 }
 
 /**
- * Count the tokens for a single message within a chat completion request
+ * Estimate the tokens for a single message within a chat completion request
  *
  * See "Counting tokens for chat API calls"
  * from https://github.com/openai/openai-cookbook/blob/834181d5739740eb8380096dac7056c925578d9a/examples/How_to_count_tokens_with_tiktoken.ipynb
@@ -42,6 +52,7 @@ export function getMessageTokenCount(
       tokensPerMessage = 4 // every message follows <|start|>{role/name}\n{content}<|end|>\n
       tokensPerName = -1 // if there's a name, the role is omitted
       break
+    case 'gpt-6-luna':
     case 'gpt-4o-mini-2024-07-18':
       tokensPerMessage = 3
       tokensPerName = 1
@@ -57,7 +68,7 @@ export function getMessageTokenCount(
   }
 
   return Object.entries(message).reduce((acc, [key, value]) => {
-    acc += tokenizer.encode(value).length
+    acc += estimateTokenCount(typeof value === 'string' ? value : (JSON.stringify(value) ?? ''))
     if (key === 'name') {
       acc += tokensPerName
     }
@@ -86,6 +97,9 @@ export function getMaxTokenCount(model: string): number {
       return 4097
     case 'gpt-4-0314':
       return 4097
+    case 'gpt-6-luna':
+      // Preserve the previous input allowance with the larger completion budget.
+      return 5120
     case 'gpt-4o-mini-2024-07-18':
       return 4097
     default:

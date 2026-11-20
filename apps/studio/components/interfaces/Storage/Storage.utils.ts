@@ -1,6 +1,15 @@
-import { groupBy, difference } from 'lodash'
+import { difference } from 'lodash'
+import { useRouter } from 'next/router'
+
 import { STORAGE_CLIENT_LIBRARY_MAPPINGS } from './Storage.constants'
 import type { StoragePolicyFormField } from './Storage.types'
+import type { Policy } from '@/components/interfaces/Database/Policies/PolicyTableRow/PolicyTableRow.utils'
+import { WrapperMeta } from '@/components/interfaces/Integrations/Wrappers/Wrappers.types'
+import { convertKVStringArrayToJson } from '@/components/interfaces/Integrations/Wrappers/Wrappers.utils'
+import { FDW } from '@/data/fdw/fdws-query'
+import { Bucket } from '@/data/storage/buckets-query'
+import { getDecryptedValues } from '@/data/vault/vault-secret-decrypted-value-query'
+import { createWrappedSymbol } from '@/lib/helpers'
 
 const shortHash = (str: string) => {
   let hash = 0
@@ -12,14 +21,19 @@ const shortHash = (str: string) => {
   return new Uint32Array([hash])[0].toString(36)
 }
 
+export type PoliciesByBucket = { name: string | Symbol; policies: Policy[] }[]
+
 /**
  * Formats the policies from the objects table in the storage schema
  * to be consumable for the storage policies dashboard.
- * Output: [{ bucket: <string>, policies: <Policy[]> }]
- * @param {Array} policies: All policies from a table in a schema
+ *
+ * @param policies All policies from a table in a schema
  */
-export const formatPoliciesForStorage = (buckets: any[], policies: any[]) => {
-  if (policies.length === 0) return policies
+export const formatPoliciesForStorage = (
+  buckets: Bucket[],
+  policies: Policy[]
+): PoliciesByBucket => {
+  if (policies.length === 0) return []
 
   /**
    * Format policies from storage objects to:
@@ -30,57 +44,168 @@ export const formatPoliciesForStorage = (buckets: any[], policies: any[]) => {
    */
   const formattedPolicies = formatStoragePolicies(buckets, policies)
 
-  /**
-   * Package policies by grouping them by bucket:
-   * [{ name: <string>, policies: <Policy[]> }]
-   */
   const policiesByBucket = groupPoliciesByBucket(formattedPolicies)
-
   return policiesByBucket
 }
 
-/* Start: Internal methods to support formatPoliciesForStorage but exported for tests to cover */
-const formatStoragePolicies = (buckets: any[], policies: any[]) => {
+/**
+ * Policy that belongs to a bucket which is not loaded yet (might not have been
+ * paginated to yet, or might have been deleted)
+ */
+export const UNKNOWN_BUCKET_SYMBOL = createWrappedSymbol('unknown-bucket', 'Unknown')
+/**
+ * Policy that is not associated with a specific bucket
+ */
+export const UNGROUPED_POLICY_SYMBOL = createWrappedSymbol('ungrouped-policy', 'Ungrouped')
+
+const formatStoragePolicies = (buckets: Bucket[], policies: Policy[]) => {
   const availableBuckets = buckets.map((bucket) => bucket.name)
-  const formattedPolicies = policies.map((policy) => {
-    const { definition: policyDefinition, check: policyCheck } = policy
 
-    const bucketName =
-      policyDefinition !== null
-        ? extractBucketNameFromDefinition(policyDefinition)
-        : extractBucketNameFromDefinition(policyCheck)
+  return policies.flatMap((policy) => {
+    const bucketNames = getPolicyBucketNames(policy)
 
-    if (bucketName && availableBuckets.includes(bucketName)) {
-      // [JOSHEN TODO] We cannot override definition here anymore cause we're gonna be using the auth editor
-      // const definition = policyDefinition !== null ? policyDefinition : policyCheck
-      return {
-        ...policy,
-        bucket: bucketName,
-      }
+    if (bucketNames.length === 0) return [{ ...policy, bucket: UNGROUPED_POLICY_SYMBOL }]
+
+    // A policy can cover several buckets, so it is listed once under each of them
+    const groups = bucketNames.map((bucketName) =>
+      availableBuckets.includes(bucketName) ? bucketName : UNKNOWN_BUCKET_SYMBOL
+    )
+    return Array.from(new Set(groups)).map((bucket) => ({ ...policy, bucket }))
+  })
+}
+
+const STRING_LITERAL = "'((?:[^']|'')*)'"
+const EQUALS_BUCKET_REGEX = new RegExp(`\\bbucket_id\\s*=\\s*${STRING_LITERAL}`, 'g')
+const ANY_ARRAY_BUCKET_REGEX = /\bbucket_id\s*=\s*ANY\s*\(\s*(?:ARRAY\s*)?\[([^\]]*)\]/g
+const NEGATED_BUCKET_REGEX = /\bbucket_id\s*(?:<>|!=)|\bNOT\s*\(*\s*bucket_id\b/i
+
+/** Splits on a boolean keyword at parenthesis depth 0, ignoring string literals */
+const splitTopLevel = (expression: string, keyword: 'AND' | 'OR') => {
+  const parts: string[] = []
+  const keywordRegex = new RegExp(`^\\s+${keyword}\\s+`, 'i')
+  let depth = 0
+  let isInString = false
+  let start = 0
+
+  for (let i = 0; i < expression.length; i++) {
+    const char = expression[i]
+    if (char === "'") isInString = !isInString
+    if (isInString) continue
+    if (char === '(') depth++
+    if (char === ')') depth--
+    if (depth !== 0) continue
+
+    const match = expression.slice(i).match(keywordRegex)
+    if (match) {
+      parts.push(expression.slice(start, i))
+      i += match[0].length - 1
+      start = i + 1
     }
+  }
+  parts.push(expression.slice(start))
+  return parts
+}
 
-    return { ...policy, bucket: 'Ungrouped' }
+const stripOuterParentheses = (expression: string): string => {
+  const trimmed = expression.trim()
+  if (!trimmed.startsWith('(') || !trimmed.endsWith(')')) return trimmed
+
+  // Only strip when the opening paren closes at the very end, i.e. `(a) OR (b)` is untouched
+  let depth = 0
+  let isInString = false
+  for (let i = 0; i < trimmed.length; i++) {
+    if (trimmed[i] === "'") isInString = !isInString
+    if (isInString) continue
+    if (trimmed[i] === '(') depth++
+    if (trimmed[i] === ')') depth--
+    if (depth === 0 && i < trimmed.length - 1) return trimmed
+  }
+  return stripOuterParentheses(trimmed.slice(1, -1))
+}
+
+const unquoteLiteral = (literal: string) => literal.replace(/''/g, "'")
+
+const extractBucketNamesFromExpression = (expression: string): string[] => {
+  const unwrapped = stripOuterParentheses(expression)
+
+  // Every OR branch has to be limited to specific buckets, otherwise the policy also
+  // applies to rows in other buckets (e.g. `bucket_id = 'a' OR auth.uid() IS NOT NULL`)
+  const orBranches = splitTopLevel(unwrapped, 'OR')
+  if (orBranches.length > 1) {
+    const branchNames = orBranches.map(extractBucketNamesFromExpression)
+    if (branchNames.some((names) => names.length === 0)) return []
+    return Array.from(new Set(branchNames.flat()))
+  }
+
+  // AND only narrows access, so one bucket-limited condition is enough
+  const andBranches = splitTopLevel(unwrapped, 'AND')
+  if (andBranches.length > 1) {
+    return Array.from(new Set(andBranches.flatMap(extractBucketNamesFromExpression)))
+  }
+
+  const names = new Set<string>()
+  for (const [, name] of unwrapped.matchAll(EQUALS_BUCKET_REGEX)) names.add(unquoteLiteral(name))
+  for (const [, list] of unwrapped.matchAll(ANY_ARRAY_BUCKET_REGEX)) {
+    for (const [, name] of list.matchAll(new RegExp(STRING_LITERAL, 'g'))) {
+      names.add(unquoteLiteral(name))
+    }
+  }
+  return Array.from(names)
+}
+
+/**
+ * Returns the names of the buckets a policy expression restricts access to, e.g. from
+ * `bucket_id = 'a'` or `bucket_id = ANY (ARRAY['a', 'b'])` (how Postgres renders `IN`).
+ *
+ * Returns no buckets when the expression negates the bucket condition (`<>`, `NOT IN`,
+ * `NOT (...)`) or has an `OR` branch that isn't limited to specific buckets, because such a
+ * policy also applies to other buckets. Callers treat that as "not tied to a specific
+ * bucket", which is the safe default for both listing and deleting.
+ */
+export const extractBucketNamesFromDefinition = (definition: string | null): string[] => {
+  if (!definition || NEGATED_BUCKET_REGEX.test(definition)) return []
+  return extractBucketNamesFromExpression(definition)
+}
+
+/**
+ * All buckets a storage.objects policy targets. Shared by the policies page, per-bucket
+ * counts, and bucket deletion so they agree on which buckets a policy belongs to.
+ *
+ * Every expression the policy's command evaluates (`using` for SELECT/DELETE, `with check`
+ * for INSERT, both for UPDATE/ALL) has to be limited to specific buckets. Otherwise the
+ * policy also reaches other buckets (negated, an unrestricted `OR` branch, or no `bucket_id`
+ * condition at all), so it isn't tied to any bucket, even when another expression names one.
+ */
+export const getPolicyBucketNames = (
+  policy: Pick<Policy, 'definition' | 'check' | 'command'>
+): string[] => {
+  const { definition, check, command } = policy
+
+  const getAppliedExpressions = () => {
+    if (command === 'INSERT') return [check]
+    if (command === 'SELECT' || command === 'DELETE') return [definition]
+    // For UPDATE/ALL a missing `with check` falls back to the `using` expression
+    return [definition, check ?? definition]
+  }
+
+  const expressionNames = getAppliedExpressions().map(extractBucketNamesFromDefinition)
+  if (expressionNames.some((names) => names.length === 0)) return []
+  return Array.from(new Set(expressionNames.flat()))
+}
+
+const groupPoliciesByBucket = (policies: (Policy & { bucket: string | Symbol })[]) => {
+  const policiesByBucket = new Map<string | Symbol, Policy[]>()
+  policies.forEach((policy) => {
+    if (!policiesByBucket.has(policy.bucket)) {
+      policiesByBucket.set(policy.bucket, [])
+    }
+    policiesByBucket.get(policy.bucket)?.push(policy)
   })
-
-  return formattedPolicies
+  return Array.from(policiesByBucket).map(([bucketName, policies]) => ({
+    name: bucketName,
+    policies,
+  }))
 }
-
-const extractBucketNameFromDefinition = (definition: string) => {
-  const definitionSegments = definition?.split(' AND ') ?? []
-  const [bucketDefinition] = definitionSegments.filter((segment: string) =>
-    segment.includes('bucket_id')
-  )
-  return bucketDefinition ? bucketDefinition.split("'")[1] : null
-}
-
-const groupPoliciesByBucket = (policies: any[]) => {
-  const policiesByBucket = groupBy(policies, 'bucket')
-  return Object.keys(policiesByBucket).map((bucketName) => {
-    return { name: bucketName, policies: policiesByBucket[bucketName] }
-  })
-}
-
-/* End: Internal methods to support formatPoliciesForStorage but exported for tests to cover */
 
 export const createPayloadsForAddPolicy = (
   bucketName = '',
@@ -188,3 +313,74 @@ export const createSQLPolicies = (
 export const applyBucketIdToTemplateDefinition = (definition: string, bucketId: any) => {
   return definition.replace('{bucket_id}', `'${bucketId}'`)
 }
+
+export const useStorageV2Page = () => {
+  const router = useRouter()
+  return router.pathname.split('/')[4] as
+    | undefined
+    | 'files'
+    | 'analytics'
+    | 'vectors'
+    | 's3'
+    | 'signing-keys'
+}
+
+export const getDecryptedParameters = async ({
+  ref,
+  connectionString,
+  wrapper,
+  wrapperMeta,
+}: {
+  ref?: string
+  connectionString?: string
+  wrapper: FDW
+  wrapperMeta: WrapperMeta
+}) => {
+  const wrapperServerOptions = wrapperMeta.server.options
+
+  const serverOptions = convertKVStringArrayToJson(wrapper?.server_options ?? [])
+
+  const paramsToBeDecrypted = Object.fromEntries(
+    new Map(
+      Object.entries(serverOptions).filter(([key, _value]) => {
+        return wrapperServerOptions.find((option) => option.name === key)?.encrypted
+      })
+    )
+  )
+
+  const decryptedValues = await getDecryptedValues({
+    projectRef: ref,
+    connectionString: connectionString,
+    ids: Object.values(paramsToBeDecrypted),
+  })
+
+  const paramsWithDecryptedValues = Object.fromEntries(
+    new Map(
+      Object.entries(paramsToBeDecrypted).map(([name, id]) => {
+        const decryptedValue = decryptedValues[id]
+        return [name, decryptedValue]
+      })
+    )
+  )
+
+  return {
+    ...serverOptions,
+    ...paramsWithDecryptedValues,
+  }
+}
+
+// [Joshen] These are referenced from the storage API directly here
+// https://github.com/supabase/storage/blob/69e4a40799a9d10be0a63a37cbb46d7d9bea0e17/src/storage/limits.ts#L59
+
+// only allow s3 safe characters and characters which require special handling for now
+// the slash restriction come from bucket naming rules
+// and the rest of the validation rules are based on S3 object key validation.
+// https://docs.aws.amazon.com/AmazonS3/latest/userguide/object-keys.html
+// https://docs.aws.amazon.com/AmazonS3/latest/userguide/bucketnamingrules.html
+export const validBucketNameRegex = /^(\w|!|-|\.|\*|'|\(|\)| |&|\$|@|=|;|:|\+|,|\?)*$/
+export const inverseValidBucketNameRegex = /[^A-Za-z0-9_!\-.*'() &$@=;:+,?]/
+
+// only allow s3 safe characters and characters which require special handling for now
+// https://docs.aws.amazon.com/AmazonS3/latest/userguide/object-keys.html
+export const validObjectKeyRegex = /^(\w|\/|!|-|\.|\*|'|\(|\)| |&|\$|@|=|;|:|\+|,|\?)*$/
+export const inverseValidObjectKeyRegex = /[^A-Za-z0-9_\/!\-.*'() &$@=;:+,?]/

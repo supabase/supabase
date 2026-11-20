@@ -1,20 +1,24 @@
-import { Lightbulb } from 'lucide-react'
-import { useEffect, useState } from 'react'
+import { ChevronsUpDownIcon, LightbulbIcon } from 'lucide-react'
 import dynamic from 'next/dynamic'
-import dayjs from 'dayjs'
+import { useEffect, useState } from 'react'
+import { Alert, AlertDescription, AlertTitle, Button, cn, FloatingPlate } from 'ui'
 
-import { formatSql } from 'lib/formatSql'
-import { AlertDescription_Shadcn_, AlertTitle_Shadcn_, Alert_Shadcn_, Button, cn } from 'ui'
 import { QueryPanelContainer, QueryPanelSection } from './QueryPanel'
-import {
-  QUERY_PERFORMANCE_COLUMNS,
-  QUERY_PERFORMANCE_REPORT_TYPES,
-} from './QueryPerformance.constants'
+import { buildQueryExplanationPrompt } from './QueryPerformance.ai'
+import { QUERY_PERFORMANCE_COLUMNS } from './QueryPerformance.constants'
+import { QueryPerformanceRow } from './QueryPerformance.types'
+import { formatDuration } from './QueryPerformance.utils'
+import { SIDEBAR_KEYS } from '@/components/layouts/ProjectLayout/LayoutSidebar/LayoutSidebarProvider'
+import { AiAssistantDropdown } from '@/components/ui/AiAssistantDropdown'
+import { formatSql } from '@/lib/formatSql'
+import { useTrack } from '@/lib/telemetry/track'
+import { useAiAssistantStateSnapshot } from '@/state/ai-assistant-state'
+import { useSidebarManagerSnapshot } from '@/state/sidebar-manager-state'
 
 interface QueryDetailProps {
-  reportType: QUERY_PERFORMANCE_REPORT_TYPES
-  selectedRow: any
+  selectedRow?: QueryPerformanceRow
   onClickViewSuggestion: () => void
+  onClose?: () => void
 }
 
 // Load SqlMonacoBlock (monaco editor) client-side only (does not behave well server-side)
@@ -25,11 +29,15 @@ const SqlMonacoBlock = dynamic(
   }
 )
 
-export const QueryDetail = ({ selectedRow, onClickViewSuggestion }: QueryDetailProps) => {
+export const QueryDetail = ({ selectedRow, onClickViewSuggestion, onClose }: QueryDetailProps) => {
   // [Joshen] TODO implement this logic once the linter rules are in
   const isLinterWarning = false
   const report = QUERY_PERFORMANCE_COLUMNS
   const [query, setQuery] = useState(selectedRow?.['query'])
+
+  const { openSidebar } = useSidebarManagerSnapshot()
+  const aiSnap = useAiAssistantStateSnapshot()
+  const track = useTrack()
 
   useEffect(() => {
     if (selectedRow !== undefined) {
@@ -38,48 +46,103 @@ export const QueryDetail = ({ selectedRow, onClickViewSuggestion }: QueryDetailP
     }
   }, [selectedRow])
 
-  const formatDuration = (seconds: number) => {
-    const dur = dayjs.duration(seconds, 'seconds')
+  const [isExpanded, setIsExpanded] = useState(false)
 
-    const minutes = Math.floor(dur.asMinutes())
-    const remainingSeconds = dur.seconds() + dur.milliseconds() / 1000
+  const handleExplainQuery = () => {
+    if (!selectedRow?.query) return
 
-    const parts = []
-    if (minutes > 0) parts.push(`${minutes}m`)
-    if (remainingSeconds > 0) {
-      const formattedSeconds = remainingSeconds.toFixed(2)
-      parts.push(`${formattedSeconds}s`)
-    }
+    const { query, prompt } = buildQueryExplanationPrompt(selectedRow)
 
-    return parts.join(' ')
+    openSidebar(SIDEBAR_KEYS.AI_ASSISTANT)
+    aiSnap.newChat({
+      sqlSnippets: [
+        {
+          label: 'Query',
+          content: query,
+        },
+      ],
+      initialMessage: prompt,
+    })
+
+    track('query_performance_explain_with_ai_button_clicked')
+
+    // Close the query detail panel since we need to see the AI assistant panel
+    onClose?.()
+  }
+
+  const buildPromptForCopy = () => {
+    if (!selectedRow?.query) return ''
+
+    const { query, prompt } = buildQueryExplanationPrompt(selectedRow)
+    return `${prompt}\n\nSQL Query:\n\`\`\`sql\n${query}\n\`\`\``
   }
 
   return (
     <QueryPanelContainer>
-      <QueryPanelSection>
-        <h4 className="mb-2">Query pattern</h4>
-        <SqlMonacoBlock value={query} height={310} lineNumbers="off" wrapperClassName="pl-3" />
-        {isLinterWarning && (
-          <Alert_Shadcn_
+      <QueryPanelSection className="pt-2 border-b relative">
+        <div className="flex items-center justify-between mb-4">
+          <h4>Query pattern</h4>
+          <AiAssistantDropdown
+            label="Explain with AI"
+            buildPrompt={buildPromptForCopy}
+            onOpenAssistant={handleExplainQuery}
+            telemetrySource="query_performance"
+            size="tiny"
             variant="default"
-            className="mt-2 border-brand-400 bg-alternative [&>svg]:p-0.5 [&>svg]:bg-transparent [&>svg]:text-brand"
-          >
-            <Lightbulb />
-            <AlertTitle_Shadcn_>Suggested optimization: Add an index</AlertTitle_Shadcn_>
-            <AlertDescription_Shadcn_>
-              Adding an index will help this query execute faster
-            </AlertDescription_Shadcn_>
-            <AlertDescription_Shadcn_>
-              <Button className="mt-3" onClick={() => onClickViewSuggestion()}>
-                View suggestion
-              </Button>
-            </AlertDescription_Shadcn_>
-          </Alert_Shadcn_>
-        )}
+          />
+        </div>
+        <div
+          id="query-detail-sql-panel"
+          className={cn(
+            'overflow-hidden pb-0 z-0 relative transition-all duration-300',
+            isExpanded ? 'h-[348px]' : 'h-[120px]'
+          )}
+        >
+          <SqlMonacoBlock
+            value={query}
+            wrapperClassName={cn('bg-surface-100', !isExpanded && 'pointer-events-none')}
+          />
+          {isLinterWarning && (
+            <Alert
+              variant="default"
+              className="mt-2 border-brand-400 bg-alternative [&>svg]:p-0.5 [&>svg]:bg-transparent [&>svg]:text-primary"
+            >
+              <LightbulbIcon />
+              <AlertTitle>Suggested optimization: Add an index</AlertTitle>
+              <AlertDescription>
+                Adding an index will help this query execute faster
+              </AlertDescription>
+              <AlertDescription>
+                <Button variant="primary" className="mt-3" onClick={() => onClickViewSuggestion()}>
+                  View suggestion
+                </Button>
+              </AlertDescription>
+            </Alert>
+          )}
+        </div>
+        <div
+          className={cn(
+            'absolute left-0 bottom-0 w-full bg-linear-to-t from-black/30 to-transparent h-24 transition-opacity duration-300',
+            isExpanded && 'opacity-0 pointer-events-none'
+          )}
+        />
+        <div className="absolute bottom-[-13px] left-0 right-0 w-full flex items-center justify-center z-10">
+          <FloatingPlate rounded="full">
+            <Button
+              type="button"
+              className="rounded-full"
+              icon={<ChevronsUpDownIcon />}
+              aria-expanded={isExpanded}
+              aria-controls="query-detail-sql-panel"
+              onClick={() => setIsExpanded(!isExpanded)}
+            >
+              {isExpanded ? 'Collapse' : 'Expand'}
+            </Button>
+          </FloatingPlate>
+        </div>
       </QueryPanelSection>
-      <div className="border-t" />
-      <QueryPanelSection className="pb-3">
-        <h4 className="mb-2">Metadata</h4>
+      <QueryPanelSection className="pb-3 pt-6">
+        <h4 className="mb-4">Metadata</h4>
         <ul className="flex flex-col gap-y-3 divide-y divide-dashed">
           {report
             .filter((x) => x.id !== 'query')
@@ -100,7 +163,7 @@ export const QueryDetail = ({ selectedRow, onClickViewSuggestion }: QueryDetailP
                 const totalTime = selectedRow?.total_time || 0
 
                 return (
-                  <li key={x.id} className="flex justify-between pt-3 text-sm">
+                  <li key={x.id} className="flex justify-between pb-3 text-sm">
                     <p className="text-foreground-light">{x.name}</p>
                     {percentage && totalTime ? (
                       <p className="flex items-center gap-x-1.5">
@@ -116,10 +179,10 @@ export const QueryDetail = ({ selectedRow, onClickViewSuggestion }: QueryDetailP
                         <span
                           className={cn(
                             'tabular-nums',
-                            formatDuration(rawValue / 1000) === '0.00s' && 'text-foreground-lighter'
+                            formatDuration(totalTime) === '0.00s' && 'text-foreground-lighter'
                           )}
                         >
-                          {formatDuration(totalTime / 1000)}
+                          {formatDuration(totalTime)}
                         </span>
                       </p>
                     ) : (
@@ -131,7 +194,7 @@ export const QueryDetail = ({ selectedRow, onClickViewSuggestion }: QueryDetailP
 
               if (x.id == 'rows_read') {
                 return (
-                  <li key={x.id} className="flex justify-between pt-3 text-sm">
+                  <li key={x.id} className="flex justify-between pb-3 text-sm">
                     <p className="text-foreground-light">{x.name}</p>
                     {typeof rawValue === 'number' && !isNaN(rawValue) && isFinite(rawValue) ? (
                       <p
@@ -153,9 +216,9 @@ export const QueryDetail = ({ selectedRow, onClickViewSuggestion }: QueryDetailP
 
               if (x.id === 'cache_hit_rate') {
                 return (
-                  <li key={x.id} className="flex justify-between pt-3 text-sm">
+                  <li key={x.id} className="flex justify-between pb-3 text-sm">
                     <p className="text-foreground-light">{x.name}</p>
-                    {typeof rawValue === 'string' ? (
+                    {typeof rawValue === 'string' || typeof rawValue === 'number' ? (
                       <p
                         className={cn(
                           cacheHitRateToNumber(rawValue).toFixed(2) === '0.00' &&
@@ -176,7 +239,7 @@ export const QueryDetail = ({ selectedRow, onClickViewSuggestion }: QueryDetailP
               }
 
               return (
-                <li key={x.id} className="flex justify-between pt-3 text-sm">
+                <li key={x.id} className="flex justify-between pb-3 text-sm">
                   <p className="text-foreground-light">{x.name}</p>
                   <p className={cn('tabular-nums', x.id === 'rolname' && 'font-mono')}>
                     {formattedValue}

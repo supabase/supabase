@@ -39,11 +39,9 @@ Note: when testing locally, the select dropdown doesn't have any effect, and inv
 - Link your project
   - Within your project root run `supabase link --project-ref your-project-ref`
 - Set up your secrets
-
   - Run `supabase secrets set --env-file ./supabase/.env.local` to set the environment variables.
 
   (This is assuming your local and production secrets are the same. The recommended way is to create a separate `.env` file for storing production secrets, and then use it to set the environment variables while deploying.)
-
   - You can run `supabase secrets list` to check that it worked and also to see what other env vars are set by default.
 
 - Deploy the function

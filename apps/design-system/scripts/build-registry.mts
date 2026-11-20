@@ -1,5 +1,5 @@
 // @sts-nocheck
-import { existsSync, promises as fs } from 'fs'
+import { promises as fs } from 'fs'
 import { tmpdir } from 'os'
 import path from 'path'
 import { cwd } from 'process'
@@ -191,13 +191,10 @@ export const Index: Record<string, any> = {
           })
         )
 
-        // // Write the source file for blocks only.
+        // Write the source file for blocks only.
         sourceFilename = `__registry__/${style.name}/${type}/${item.name}.tsx`
         const sourcePath = path.join(process.cwd(), sourceFilename)
-        if (!existsSync(sourcePath)) {
-          await fs.mkdir(sourcePath, { recursive: true })
-        }
-
+        await fs.mkdir(path.dirname(sourcePath), { recursive: true })
         rimraf.sync(sourcePath)
         await fs.writeFile(sourcePath, sourceFile.getText())
       }
@@ -207,17 +204,29 @@ export const Index: Record<string, any> = {
       // console.log('item', item)
 
       let packagePath = ''
+      let componentImportPath = ''
       if (type === 'ui') {
         packagePath = `../../packages/ui/src/components/shadcn/ui`
+        componentImportPath = `@/${packagePath}/${item.name}`
       }
       if (type === 'fragment') {
         packagePath = `../../packages/ui-patterns/src${item.optionalPath}`
+        // Check if the file is index.tsx - if so, don't append the item name
+        const isIndexFile = item.files.some((file) => {
+          const basename = path.basename(file)
+          return basename === 'index.tsx' || basename === 'index.ts'
+        })
+        componentImportPath = isIndexFile
+          ? `@/${packagePath}`
+          : `@/${packagePath}/${item.name}`
       }
       if (type === 'example') {
         packagePath = `registry/${style.name}/${type}`
+        componentImportPath = `@/${packagePath}/${item.name}`
       }
       if (type === 'block') {
         packagePath = `registry/${style.name}/${type}`
+        componentImportPath = `@/${packagePath}/${item.name}`
       }
 
       index += `
@@ -225,7 +234,7 @@ export const Index: Record<string, any> = {
       name: "${item.name}",
       type: "${item.type}",
       registryDependencies: ${JSON.stringify(item.registryDependencies)},
-      component: React.lazy(() => import("@/${packagePath}/${item.name}")),
+      component: React.lazy(() => import("${componentImportPath}")),
       source: "${sourceFilename}",
       files: [${resolveFiles.map((file) => `"${file}"`)}],
       category: "${item.category}",
@@ -261,8 +270,10 @@ export const Index: Record<string, any> = {
   // await fs.writeFile(path.join(REGISTRY_PATH, 'index.json'), registryJson, 'utf8')
 
   // Write style index.
-  rimraf.sync(path.join(process.cwd(), '__registry__/index.tsx'))
-  await fs.writeFile(path.join(process.cwd(), '__registry__/index.tsx'), index)
+  const indexPath = path.join(process.cwd(), '__registry__/index.tsx')
+  await fs.mkdir(path.dirname(indexPath), { recursive: true })
+  rimraf.sync(indexPath)
+  await fs.writeFile(indexPath, index)
 }
 
 // ----------------------------------------------------------------------------

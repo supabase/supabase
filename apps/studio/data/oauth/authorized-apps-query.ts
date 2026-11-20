@@ -1,8 +1,9 @@
-import { useQuery, UseQueryOptions } from '@tanstack/react-query'
+import { useQuery } from '@tanstack/react-query'
 
-import { get, handleError } from 'data/fetchers'
-import type { ResponseError } from 'types'
 import { oauthAppKeys } from './keys'
+import { get, handleError } from '@/data/fetchers'
+import type { StudioError } from '@/lib/errors/studio-errors'
+import type { UseCustomQueryOptions } from '@/types'
 
 export type AuthorizedAppsVariables = {
   slug?: string
@@ -18,7 +19,7 @@ export type AuthorizedApp = {
   authorized_at: string
 }
 
-export async function getAuthorizedApps({ slug }: AuthorizedAppsVariables, signal?: AbortSignal) {
+export async function getAuthorizedApps({ slug }: AuthorizedAppsVariables) {
   if (!slug) throw new Error('Organization slug is required')
 
   const { data, error } = await get('/platform/organizations/{slug}/oauth/apps', {
@@ -30,20 +31,18 @@ export async function getAuthorizedApps({ slug }: AuthorizedAppsVariables, signa
 }
 
 export type AuthorizedAppsData = Awaited<ReturnType<typeof getAuthorizedApps>>
-export type AuthorizedAppsError = ResponseError
+export type AuthorizedAppsError = StudioError
 
 export const useAuthorizedAppsQuery = <TData = AuthorizedAppsData>(
   { slug }: AuthorizedAppsVariables,
   {
     enabled = true,
     ...options
-  }: UseQueryOptions<AuthorizedAppsData, AuthorizedAppsError, TData> = {}
+  }: UseCustomQueryOptions<AuthorizedAppsData, AuthorizedAppsError, TData> = {}
 ) =>
-  useQuery<AuthorizedAppsData, AuthorizedAppsError, TData>(
-    oauthAppKeys.authorizedApps(slug),
-    ({ signal }) => getAuthorizedApps({ slug }, signal),
-    {
-      enabled: enabled && typeof slug !== 'undefined',
-      ...options,
-    }
-  )
+  useQuery<AuthorizedAppsData, AuthorizedAppsError, TData>({
+    queryKey: oauthAppKeys.authorizedApps(slug),
+    queryFn: () => getAuthorizedApps({ slug }),
+    enabled: enabled && typeof slug !== 'undefined',
+    ...options,
+  })

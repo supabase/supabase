@@ -1,52 +1,115 @@
-import { ArrowDown, ArrowUp, ChevronDown, TextSearch } from 'lucide-react'
+import { useParams } from 'common'
+import {
+  ArrowDownIcon,
+  ArrowRightIcon,
+  ArrowUpIcon,
+  ChevronDownIcon,
+  TextSearchIcon,
+} from 'lucide-react'
+import { parseAsArrayOf, parseAsJson, parseAsString, useQueryStates } from 'nuqs'
 import { useCallback, useEffect, useMemo, useRef, useState } from 'react'
 import DataGrid, { Column, DataGridHandle, Row } from 'react-data-grid'
-
-import { useParams } from 'common'
-import { DbQueryHook } from 'hooks/analytics/useDbQuery'
 import {
   Button,
+  cn,
   DropdownMenu,
   DropdownMenuContent,
   DropdownMenuItem,
   DropdownMenuTrigger,
   Sheet,
   SheetContent,
-  TabsContent_Shadcn_,
-  TabsList_Shadcn_,
-  TabsTrigger_Shadcn_,
-  Tabs_Shadcn_,
-  cn,
-  CodeBlock,
+  SheetDescription,
   SheetTitle,
+  Tabs,
+  TabsContent,
+  TabsList,
+  TabsTrigger,
 } from 'ui'
+import { Admonition } from 'ui-patterns/Admonition'
+import { CodeBlock } from 'ui-patterns/CodeBlock'
 import { InfoTooltip } from 'ui-patterns/info-tooltip'
 import { GenericSkeletonLoader } from 'ui-patterns/ShimmeringLoader'
-import { hasIndexRecommendations } from './index-advisor.utils'
-import { IndexSuggestionIcon } from './IndexSuggestionIcon'
+
+import { useQueryPerformanceSort } from './hooks/useQueryPerformanceSort'
+import {
+  hasIndexRecommendations,
+  queryInvolvesProtectedSchemas,
+} from './IndexAdvisor/index-advisor.utils'
+import { IndexSuggestionIcon } from './IndexAdvisor/IndexSuggestionIcon'
 import { QueryDetail } from './QueryDetail'
 import { QueryIndexes } from './QueryIndexes'
 import {
   QUERY_PERFORMANCE_COLUMNS,
-  QUERY_PERFORMANCE_REPORT_TYPES,
   QUERY_PERFORMANCE_ROLE_DESCRIPTION,
 } from './QueryPerformance.constants'
-import { useQueryPerformanceSort } from './hooks/useQueryPerformanceSort'
+import { QueryPerformanceRow } from './QueryPerformance.types'
+import { formatDuration } from './QueryPerformance.utils'
+import { NumericFilter } from '@/components/interfaces/Reports/v2/ReportsNumericFilter'
+import { ButtonTooltip } from '@/components/ui/ButtonTooltip'
+import { useInfiniteScroll } from '@/hooks/misc/useInfiniteScroll'
 
 interface QueryPerformanceGridProps {
-  queryPerformanceQuery: DbQueryHook<any>
+  aggregatedData: QueryPerformanceRow[]
+  isLoading: boolean
+  error?: string | null
+  currentSelectedQuery?: string | null
+  onCurrentSelectQuery?: (query: string) => void
+  onRetry?: () => void
+  hasNextPage: boolean
+  isFetchingNextPage: boolean
+  isRefetching: boolean
+  fetchNextPage: (options?: { cancelRefetch?: boolean }) => void
 }
 
-export const QueryPerformanceGrid = ({ queryPerformanceQuery }: QueryPerformanceGridProps) => {
+const calculateTimeConsumedWidth = (data: QueryPerformanceRow[]) => {
+  if (!data || data.length === 0) return 150
+
+  let maxWidth = 150
+
+  data.forEach((row) => {
+    const percentage = row.prop_total_time || 0
+    const totalTime = row.total_time || 0
+
+    if (percentage && totalTime) {
+      const percentageText = `${percentage.toFixed(1)}%`
+      const durationText = formatDuration(totalTime)
+      const fullText = `${percentageText} / ${durationText}`
+      const estimatedWidth = fullText.length * 8 + 40
+
+      maxWidth = Math.max(maxWidth, estimatedWidth)
+    }
+  })
+
+  return Math.min(maxWidth, 300)
+}
+
+export const QueryPerformanceGrid = ({
+  aggregatedData,
+  isLoading,
+  error,
+  currentSelectedQuery,
+  onCurrentSelectQuery,
+  onRetry,
+  hasNextPage,
+  isFetchingNextPage,
+  isRefetching,
+  fetchNextPage,
+}: QueryPerformanceGridProps) => {
   const { sort, setSortConfig } = useQueryPerformanceSort()
   const gridRef = useRef<DataGridHandle>(null)
-  const { sort: urlSort, order, roles, search } = useParams()
-  const { isLoading, data } = queryPerformanceQuery
+  const { sort: urlSort, order } = useParams()
+  // Filtering happens in SQL. These are read only to reset the selected row when they change.
+  const [{ search, roles, sources, callsFilter, totalTimeFilter }] = useQueryStates({
+    search: parseAsString.withDefault(''),
+    roles: parseAsArrayOf(parseAsString).withDefault([]),
+    sources: parseAsArrayOf(parseAsString).withDefault([]),
+    callsFilter: parseAsJson<NumericFilter | null>((value) => value as NumericFilter | null),
+    totalTimeFilter: parseAsJson<NumericFilter | null>((value) => value as NumericFilter | null),
+  })
   const dataGridContainerRef = useRef<HTMLDivElement>(null)
 
   const [view, setView] = useState<'details' | 'suggestion'>('details')
   const [selectedRow, setSelectedRow] = useState<number>()
-  const reportType = QUERY_PERFORMANCE_REPORT_TYPES.UNIFIED
 
   const columns = QUERY_PERFORMANCE_COLUMNS.map((col) => {
     const nonSortableColumns = ['query']
@@ -56,7 +119,10 @@ export const QueryPerformanceGrid = ({ queryPerformanceQuery }: QueryPerformance
       name: col.name,
       cellClass: `column-${col.id}`,
       resizable: true,
-      minWidth: col.minWidth ?? 120,
+      minWidth:
+        col.id === 'prop_total_time'
+          ? calculateTimeConsumedWidth((aggregatedData as any) ?? [])
+          : (col.minWidth ?? 120),
       sortable: !nonSortableColumns.includes(col.id),
       headerCellClass: 'first:pl-6 cursor-pointer',
       renderHeaderCell: () => {
@@ -65,7 +131,7 @@ export const QueryPerformanceGrid = ({ queryPerformanceQuery }: QueryPerformance
         return (
           <div className="flex items-center justify-between text-xs w-full">
             <div className="flex items-center gap-x-2">
-              <p className="!text-foreground font-medium">{col.name}</p>
+              <p className="text-foreground! font-medium">{col.name}</p>
               {col.description && (
                 <p className="text-foreground-lighter font-normal">{col.description}</p>
               )}
@@ -75,10 +141,10 @@ export const QueryPerformanceGrid = ({ queryPerformanceQuery }: QueryPerformance
               <DropdownMenu>
                 <DropdownMenuTrigger asChild>
                   <Button
-                    type="text"
+                    variant="text"
                     size="tiny"
-                    className="p-1 h-5 w-5 flex-shrink-0"
-                    icon={<ChevronDown size={14} className="text-foreground-muted" />}
+                    className="p-1 h-5 w-5 shrink-0"
+                    icon={<ChevronDownIcon size={14} className="text-foreground-muted" />}
                     onClick={(e) => e.stopPropagation()}
                   />
                 </DropdownMenuTrigger>
@@ -92,7 +158,7 @@ export const QueryPerformanceGrid = ({ queryPerformanceQuery }: QueryPerformance
                       sort?.column === col.id && sort?.order === 'asc' && 'text-foreground'
                     )}
                   >
-                    <ArrowUp size={14} />
+                    <ArrowUpIcon size={14} />
                     Sort Ascending
                   </DropdownMenuItem>
                   <DropdownMenuItem
@@ -104,7 +170,7 @@ export const QueryPerformanceGrid = ({ queryPerformanceQuery }: QueryPerformance
                       sort?.column === col.id && sort?.order === 'desc' && 'text-foreground'
                     )}
                   >
-                    <ArrowDown size={14} />
+                    <ArrowDownIcon size={14} />
                     Sort Descending
                   </DropdownMenuItem>
                 </DropdownMenuContent>
@@ -117,26 +183,42 @@ export const QueryPerformanceGrid = ({ queryPerformanceQuery }: QueryPerformance
         const value = props.row?.[col.id]
         if (col.id === 'query') {
           return (
-            <div className="w-full flex items-center gap-x-3 ml-4">
-              {hasIndexRecommendations(props.row.index_advisor_result, true) && (
-                <IndexSuggestionIcon
-                  indexAdvisorResult={props.row.index_advisor_result}
-                  onClickIcon={() => {
-                    setSelectedRow(props.rowIdx)
-                    setView('suggestion')
-                    gridRef.current?.scrollToCell({ idx: 0, rowIdx: props.rowIdx })
-                  }}
-                />
-              )}
+            <div className="w-full flex items-center gap-x-3 group">
+              <div className="shrink-0 w-4">
+                {hasIndexRecommendations(props.row.index_advisor_result, true) && (
+                  <IndexSuggestionIcon
+                    indexAdvisorResult={props.row.index_advisor_result}
+                    onClickIcon={() => {
+                      setSelectedRow(props.rowIdx)
+                      setView('suggestion')
+                      gridRef.current?.scrollToCell({ idx: 0, rowIdx: props.rowIdx })
+                    }}
+                  />
+                )}
+              </div>
               <CodeBlock
                 language="pgsql"
-                className="!bg-transparent !p-0 !m-0 !border-none !whitespace-nowrap [&>code]:!whitespace-nowrap [&>code]:break-words !overflow-visible !truncate !w-full !pr-8 flex-grow pointer-events-none"
-                wrapperClassName="!max-w-full"
+                className="bg-transparent! p-0! m-0! border-none! truncate! whitespace-nowrap! w-full! pr-20! pointer-events-none"
+                wrapperClassName="flex-1 min-w-0 max-w-full overflow-hidden!"
                 hideLineNumbers
                 hideCopy
-                value={value.replace(/\s+/g, ' ').trim() as string}
+                value={typeof value === 'string' ? value.replace(/\s+/g, ' ').trim() : ''}
                 wrapLines={false}
               />
+              {onCurrentSelectQuery && (
+                <ButtonTooltip
+                  tooltip={{ content: { text: 'Query details' } }}
+                  icon={<ArrowRightIcon size={14} />}
+                  size="tiny"
+                  onClick={(e) => {
+                    e.stopPropagation()
+                    setSelectedRow(props.rowIdx)
+                    setView('details')
+                    gridRef.current?.scrollToCell({ idx: 0, rowIdx: props.rowIdx })
+                  }}
+                  className="p-1 shrink-0 -translate-x-2 group-hover:flex hidden"
+                />
+              )}
             </div>
           )
         }
@@ -173,14 +255,10 @@ export const QueryPerformanceGrid = ({ queryPerformanceQuery }: QueryPerformance
                   <span className="text-muted">/</span>
                   <span
                     className={cn(
-                      (totalTime / 1000).toFixed(2) === '0.00' && 'text-foreground-lighter'
+                      formatDuration(totalTime) === '0.00s' && 'text-foreground-lighter'
                     )}
                   >
-                    {(totalTime / 1000).toLocaleString(undefined, {
-                      minimumFractionDigits: 2,
-                      maximumFractionDigits: 2,
-                    })}
-                    s
+                    {formatDuration(totalTime)}
                   </span>
                 </span>
               ) : (
@@ -232,21 +310,15 @@ export const QueryPerformanceGrid = ({ queryPerformanceQuery }: QueryPerformance
           )
         }
 
-        const cacheHitRateToNumber = (value: number | string) => {
-          if (typeof value === 'number') return value
-          return parseFloat(value.toString().replace('%', '')) || 0
-        }
-
         if (col.id === 'cache_hit_rate') {
+          const numericValue = typeof value === 'number' ? value : parseFloat(value)
           return (
             <div className="w-full flex flex-col justify-center text-xs text-right tabular-nums font-mono">
-              {typeof value === 'string' ? (
-                <p
-                  className={cn(
-                    cacheHitRateToNumber(value).toFixed(2) === '0.00' && 'text-foreground-lighter'
-                  )}
-                >
-                  {cacheHitRateToNumber(value).toLocaleString(undefined, {
+              {typeof numericValue === 'number' &&
+              !isNaN(numericValue) &&
+              isFinite(numericValue) ? (
+                <p className={cn(numericValue.toFixed(2) === '0.00' && 'text-foreground-lighter')}>
+                  {numericValue.toLocaleString(undefined, {
                     minimumFractionDigits: 2,
                     maximumFractionDigits: 2,
                   })}
@@ -279,6 +351,18 @@ export const QueryPerformanceGrid = ({ queryPerformanceQuery }: QueryPerformance
           )
         }
 
+        if (col.id === 'application_name') {
+          return (
+            <div className="w-full flex flex-col justify-center">
+              {value ? (
+                <p className="font-mono text-xs">{value}</p>
+              ) : (
+                <p className="text-muted">&ndash;</p>
+              )}
+            </div>
+          )
+        }
+
         return (
           <div className="w-full flex flex-col gap-y-0.5 justify-center text-xs">
             <p>{formattedValue}</p>
@@ -290,40 +374,43 @@ export const QueryPerformanceGrid = ({ queryPerformanceQuery }: QueryPerformance
   })
 
   const reportData = useMemo(() => {
-    const rawData = data ?? []
+    let data = [...aggregatedData]
 
     if (sort?.column === 'prop_total_time') {
-      const sortedData = [...rawData].sort((a, b) => {
-        const getNumericValue = (value: number | string) => {
-          if (!value || value === 'n/a') return 0
-          if (typeof value === 'number') return value
-          return parseFloat(value.toString().replace('%', '')) || 0
-        }
-
-        const aValue = getNumericValue(a.prop_total_time)
-        const bValue = getNumericValue(b.prop_total_time)
-
+      data.sort((a, b) => {
+        const aValue = a.prop_total_time || 0
+        const bValue = b.prop_total_time || 0
         return sort.order === 'asc' ? aValue - bValue : bValue - aValue
       })
+    } else if (sort?.column && sort.column !== 'query') {
+      data.sort((a, b) => {
+        const aValue = a[sort.column as keyof QueryPerformanceRow] || 0
+        const bValue = b[sort.column as keyof QueryPerformanceRow] || 0
 
-      return sortedData
+        if (typeof aValue === 'number' && typeof bValue === 'number') {
+          return sort.order === 'asc' ? aValue - bValue : bValue - aValue
+        }
+        return 0
+      })
     }
 
-    return rawData
-  }, [data, sort])
+    return data
+  }, [aggregatedData, sort])
 
-  const selectedQuery = selectedRow !== undefined ? reportData[selectedRow]?.query : undefined
-  const query = (selectedQuery ?? '').trim().toLowerCase()
-  const showIndexSuggestions =
-    (query.startsWith('select') ||
-      query.startsWith('with pgrst_source') ||
-      query.startsWith('with pgrst_payload')) &&
-    hasIndexRecommendations(reportData[selectedRow!]?.index_advisor_result, true)
+  const handleScroll = useInfiniteScroll({
+    isLoading,
+    isFetchingNextPage,
+    isRefetching,
+    isError: !!error,
+    hasNextPage,
+    fetchNextPage,
+    containerRef: gridRef,
+    rowCount: reportData.length,
+  })
 
   useEffect(() => {
     setSelectedRow(undefined)
-    // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, [search, roles, urlSort, order])
+  }, [search, roles, urlSort, order, callsFilter, totalTimeFilter, sources])
 
   const handleKeyDown = useCallback(
     (event: KeyboardEvent) => {
@@ -331,7 +418,6 @@ export const QueryPerformanceGrid = ({ queryPerformanceQuery }: QueryPerformance
 
       if (event.key !== 'ArrowUp' && event.key !== 'ArrowDown') return
 
-      // stop default RDG behavior (which moves focus to header when selectedRow is 0)
       event.stopPropagation()
 
       let nextIndex = selectedRow
@@ -362,23 +448,76 @@ export const QueryPerformanceGrid = ({ queryPerformanceQuery }: QueryPerformance
     }
   }, [handleKeyDown])
 
+  const isSelectQuery = (query: string | undefined): boolean => {
+    if (!query) return false
+    const formattedQuery = query.trim().toLowerCase()
+    return (
+      formattedQuery.startsWith('select') ||
+      formattedQuery.startsWith('with pgrst_source') ||
+      formattedQuery.startsWith('with pgrst_payload')
+    )
+  }
+
+  useEffect(() => {
+    if (selectedRow !== undefined && view === 'suggestion') {
+      const query = reportData[selectedRow]?.query
+      if (!isSelectQuery(query)) {
+        setView('details')
+      }
+    }
+  }, [selectedRow, view, reportData])
+
+  if (error) {
+    return (
+      <div className="relative flex grow bg-alternative min-h-0">
+        <div className="flex-1 min-w-0 p-6">
+          <Admonition
+            type="destructive"
+            title="Failed to load query performance data"
+            description={error}
+          >
+            {onRetry && (
+              <div className="mt-4">
+                <Button onClick={onRetry}>Try again</Button>
+              </div>
+            )}
+          </Admonition>
+        </div>
+      </div>
+    )
+  }
+
+  const selectedQuery = selectedRow !== undefined ? reportData[selectedRow]?.query : undefined
+  const isProtectedSchemaQuery = queryInvolvesProtectedSchemas(selectedQuery)
+  const canShowIndexesTab = isSelectQuery(selectedQuery) && !isProtectedSchemaQuery
+
   return (
-    <div className="relative flex flex-grow bg-alternative min-h-0">
+    <div className="relative flex grow bg-alternative min-h-0">
       <div ref={dataGridContainerRef} className="flex-1 min-w-0 overflow-x-auto">
         <DataGrid
           ref={gridRef}
           style={{ height: '100%' }}
-          className={cn('flex-1 flex-grow h-full')}
+          className={cn('flex-1 grow h-full border-t-0! border-b-0!')}
           rowHeight={44}
           headerRowHeight={36}
           columns={columns}
           rows={reportData}
+          onScroll={handleScroll}
           rowClass={(_, idx) => {
             const isSelected = idx === selectedRow
+            const query = reportData[idx]?.query
+            const isCharted = currentSelectedQuery ? currentSelectedQuery === query : false
+            const hasRecommendations = hasIndexRecommendations(
+              reportData[idx]?.index_advisor_result,
+              true
+            )
+
             return [
-              `${isSelected ? 'bg-surface-300 dark:bg-surface-300' : 'bg-200'} cursor-pointer`,
-              `${isSelected ? '[&>div:first-child]:border-l-4 border-l-secondary [&>div]:border-l-foreground' : ''}`,
-              '[&>.rdg-cell]:box-border [&>.rdg-cell]:outline-none [&>.rdg-cell]:shadow-none',
+              `${isSelected ? (hasRecommendations ? 'bg-warning/10 hover:bg-warning/20' : 'bg-surface-300 dark:bg-surface-300') : hasRecommendations ? 'bg-warning/10 hover:bg-warning/20' : 'bg-200 hover:bg-surface-200'} cursor-pointer`,
+              `${isSelected ? (hasRecommendations ? '[&>div:first-child]:border-l-4 border-l-warning [&>div]:border-l-warning' : '[&>div:first-child]:border-l-4 border-l-secondary [&>div]:border-l-foreground!') : ''}`,
+              `${isCharted ? 'bg-surface-200 dark:bg-surface-200' : ''}`,
+              `${isCharted ? '[&>div:first-child]:border-l-4 border-l-secondary [&>div]:border-l-brand' : ''}`,
+              '[&>.rdg-cell]:box-border [&>.rdg-cell]:outline-hidden [&>.rdg-cell]:shadow-none',
               '[&>.rdg-cell.column-prop_total_time]:relative',
             ].join(' ')
           }}
@@ -392,12 +531,19 @@ export const QueryPerformanceGrid = ({ queryPerformanceQuery }: QueryPerformance
                     event.stopPropagation()
 
                     if (typeof idx === 'number' && idx >= 0) {
-                      setSelectedRow(idx)
-                      gridRef.current?.scrollToCell({ idx: 0, rowIdx: idx })
-
-                      const rowQuery = reportData[idx]?.query ?? ''
-                      if (!rowQuery.trim().toLowerCase().startsWith('select')) {
-                        setView('details')
+                      if (onCurrentSelectQuery) {
+                        const query = reportData[idx]?.query
+                        if (query) {
+                          onCurrentSelectQuery(query)
+                        }
+                      } else {
+                        setSelectedRow(idx)
+                        const hasRecommendations = hasIndexRecommendations(
+                          reportData[idx]?.index_advisor_result,
+                          true
+                        )
+                        setView(hasRecommendations ? 'suggestion' : 'details')
+                        gridRef.current?.scrollToCell({ idx: 0, rowIdx: idx })
                       }
                     }
                   }}
@@ -410,7 +556,7 @@ export const QueryPerformanceGrid = ({ queryPerformanceQuery }: QueryPerformance
               </div>
             ) : (
               <div className="absolute top-20 px-6 flex flex-col items-center justify-center w-full gap-y-2">
-                <TextSearch className="text-foreground-muted" strokeWidth={1} />
+                <TextSearchIcon className="text-foreground-muted" strokeWidth={1} />
                 <div className="text-center">
                   <p className="text-foreground">No queries detected</p>
                   <p className="text-foreground-light">
@@ -433,9 +579,12 @@ export const QueryPerformanceGrid = ({ queryPerformanceQuery }: QueryPerformance
         modal={false}
       >
         <SheetTitle className="sr-only">Query details</SheetTitle>
+        <SheetDescription className="sr-only">
+          Query Performance Details &amp; Indexes
+        </SheetDescription>
         <SheetContent
           side="right"
-          className="flex flex-col h-full bg-studio border-l lg:!w-[calc(100vw-802px)] max-w-[700px] w-full"
+          className="flex flex-col h-full bg-studio border-l lg:w-[calc(100vw-802px)]! max-w-[700px] w-full"
           hasOverlay={false}
           onInteractOutside={(event) => {
             if (dataGridContainerRef.current?.contains(event.target as Node)) {
@@ -443,46 +592,45 @@ export const QueryPerformanceGrid = ({ queryPerformanceQuery }: QueryPerformance
             }
           }}
         >
-          <Tabs_Shadcn_
+          <Tabs
             value={view}
             className="flex flex-col h-full"
             onValueChange={(value: any) => setView(value)}
           >
             <div className="px-5 border-b">
-              <TabsList_Shadcn_ className="px-0 flex gap-x-4 min-h-[46px] border-b-0 [&>button]:h-[47px]">
-                <TabsTrigger_Shadcn_
+              <TabsList className="px-0 flex gap-x-4 min-h-[46px] border-b-0 [&>button]:h-[47px]">
+                <TabsTrigger
                   value="details"
-                  className="px-0 pb-0 data-[state=active]:bg-transparent !shadow-none"
+                  className="px-0 pb-0 data-[state=active]:bg-transparent shadow-none!"
                 >
                   Query details
-                </TabsTrigger_Shadcn_>
-                {showIndexSuggestions && (
-                  <TabsTrigger_Shadcn_
+                </TabsTrigger>
+                {selectedRow !== undefined && canShowIndexesTab && (
+                  <TabsTrigger
                     value="suggestion"
-                    className="px-0 pb-0 data-[state=active]:bg-transparent !shadow-none"
+                    className="px-0 pb-0 data-[state=active]:bg-transparent shadow-none!"
                   >
                     Indexes
-                  </TabsTrigger_Shadcn_>
+                  </TabsTrigger>
                 )}
-              </TabsList_Shadcn_>
+              </TabsList>
             </div>
 
-            <TabsContent_Shadcn_ value="details" className="mt-0 flex-grow min-h-0 overflow-y-auto">
+            <TabsContent value="details" className="mt-0 grow min-h-0 overflow-y-auto">
               {selectedRow !== undefined && (
                 <QueryDetail
-                  reportType={reportType}
                   selectedRow={reportData[selectedRow]}
                   onClickViewSuggestion={() => setView('suggestion')}
+                  onClose={() => setSelectedRow(undefined)}
                 />
               )}
-            </TabsContent_Shadcn_>
-            <TabsContent_Shadcn_
-              value="suggestion"
-              className="mt-0 flex-grow min-h-0 overflow-y-auto"
-            >
-              {selectedRow !== undefined && <QueryIndexes selectedRow={reportData[selectedRow]} />}
-            </TabsContent_Shadcn_>
-          </Tabs_Shadcn_>
+            </TabsContent>
+            {selectedRow !== undefined && canShowIndexesTab && (
+              <TabsContent value="suggestion" className="mt-0 grow min-h-0 overflow-y-auto">
+                <QueryIndexes selectedRow={reportData[selectedRow]} />
+              </TabsContent>
+            )}
+          </Tabs>
         </SheetContent>
       </Sheet>
     </div>

@@ -1,6 +1,6 @@
-import { describe, it, expect, vi, beforeEach } from 'vitest'
-
 import { createClient } from '@supabase/supabase-js'
+import { beforeEach, describe, expect, it, vi } from 'vitest'
+
 import { uploadAttachment } from './upload'
 
 vi.mock('@supabase/supabase-js', () => ({
@@ -25,7 +25,6 @@ describe('uploadAttachment', () => {
   const mockFile = new File(['test'], 'test.png', { type: 'image/png' })
 
   beforeEach(() => {
-    vi.clearAllMocks()
     ;(createClient as any).mockReturnValue(mockSupabaseClient)
   })
 

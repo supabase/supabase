@@ -9,7 +9,7 @@
 
 [Supabase](https://supabase.com) - это альтернатива Firebase с открытым исходным кодом. Мы создаем функции Firebase, используя инструменты корпоративного уровня с открытым исходным кодом.
 
-- [x] Хостируемая база данных Postgres. [Docs](https://supabase.com/docs/guides/database)
+- [x] Хостируемая база данных Postgres. [Docs](https://supabase.com/docs/guides/database/overview)
 - [x] Аутентификация и авторизация. [Docs](https://supabase.com/docs/guides/auth)
 - [x] Автоматически генерируемые API.
   - [x] REST. [Docs](https://supabase.com/docs/guides/api#rest-api-overview)
@@ -56,7 +56,7 @@ Supabase - это комбинация инструментов с открыт�
 \*\*Архитектура
 
 Supabase - это [размещенная платформа](https://supabase.com/dashboard). Вы можете зарегистрироваться и начать использовать Supabase, ничего не устанавливая.
-Вы также можете [самостоятельно размещать](https://supabase.com/docs/guides/hosting/overview) и [разрабатывать локально](https://supabase.com/docs/guides/local-development).
+Вы также можете [самостоятельно размещать](https://supabase.com/docs/guides/self-hosting) и [разрабатывать локально](https://supabase.com/docs/guides/local-development).
 
 ![Архитектура](https://github.com/supabase/supabase/blob/master/apps/docs/public/img/supabase-architecture.svg)
 
@@ -64,7 +64,7 @@ Supabase - это [размещенная платформа](https://supabase.c
 - [Realtime](https://github.com/supabase/realtime) - это сервер Elixir, который позволяет прослушивать вставки, обновления и удаления PostgreSQL с помощью веб-сокета. Realtime опрашивает встроенную функцию репликации Postgres на предмет изменений в базе данных, преобразует изменения в JSON, а затем передает JSON через веб-сокеты авторизованным клиентам.
 - [PostgREST](http://postgrest.org/) - это веб-сервер, который превращает вашу базу данных PostgreSQL непосредственно в RESTful API
 - [pg_graphql](http://github.com/supabase/pg_graphql/) расширение PostgreSQL, открывающее API GraphQL
-- [Storage](https://github.com/supabase/storage-api) предоставляет RESTful интерфейс для управления файлами, хранящимися в S3, используя Postgres для управления разрешениями.
+- [Storage](https://github.com/supabase/storage) предоставляет RESTful интерфейс для управления файлами, хранящимися в S3, используя Postgres для управления разрешениями.
 - [postgres-meta](https://github.com/supabase/postgres-meta) представляет собой RESTful API для управления Postgres, позволяющий получать таблицы, добавлять роли, запускать запросы и т.д.
 - [GoTrue](https://github.com/netlify/gotrue) - это SWT API для управления пользователями и выпуска SWT-токенов.
 - [Kong](https://github.com/Kong/kong) - облачный API-шлюз.
@@ -84,9 +84,9 @@ Supabase - это [размещенная платформа](https://supabase.c
     <th></th>
     <th>Supabase</th>
     <th><a href="https://github.com/postgrest/postgrest" target="_blank" rel="noopener noreferrer">PostgREST</a></th>
-    <th><a href="https://github.com/supabase/gotrue" target="_blank" rel="noopener noreferrer">GoTrue</a></th>
+    <th><a href="https://github.com/supabase/auth" target="_blank" rel="noopener noreferrer">GoTrue</a></th>
     <th><a href="https://github.com/supabase/realtime" target="_blank" rel="noopener noreferrer">Realtime</a></th>
-    <th><a href="https://github.com/supabase/storage-api" target="_blank" rel="noopener noreferrer">Storage</a></th>
+    <th><a href="https://github.com/supabase/storage" target="_blank" rel="noopener noreferrer">Storage</a></th>
     <th>Functions</th>
   </tr>
   <!-- TEMPLATE FOR NEW ROW -->
@@ -106,11 +106,11 @@ Supabase - это [размещенная платформа](https://supabase.c
   <tr>
     <td>JavaScript (TypeScript)</td>
     <td><a href="https://github.com/supabase/supabase-js" target="_blank" rel="noopener noreferrer">supabase-js</a></td>
-    <td><a href="https://github.com/supabase/postgrest-js" target="_blank" rel="noopener noreferrer">postgrest-js</a></td>
-    <td><a href="https://github.com/supabase/gotrue-js" target="_blank" rel="noopener noreferrer">gotrue-js</a></td>
-    <td><a href="https://github.com/supabase/realtime-js" target="_blank" rel="noopener noreferrer">realtime-js</a></td>
-    <td><a href="https://github.com/supabase/storage-js" target="_blank" rel="noopener noreferrer">storage-js</a></td>
-    <td><a href="https://github.com/supabase/functions-js" target="_blank" rel="noopener noreferrer">functions-js</a></td>
+    <td><a href="https://github.com/supabase/supabase-js/tree/master/packages/core/postgrest-js" target="_blank" rel="noopener noreferrer">postgrest-js</a></td>
+    <td><a href="https://github.com/supabase/supabase-js/tree/master/packages/core/auth-js" target="_blank" rel="noopener noreferrer">auth-js</a></td>
+    <td><a href="https://github.com/supabase/supabase-js/tree/master/packages/core/realtime-js" target="_blank" rel="noopener noreferrer">realtime-js</a></td>
+    <td><a href="https://github.com/supabase/supabase-js/tree/master/packages/core/storage-js" target="_blank" rel="noopener noreferrer">storage-js</a></td>
+    <td><a href="https://github.com/supabase/supabase-js/tree/master/packages/core/functions-js" target="_blank" rel="noopener noreferrer">functions-js</a></td>
   </tr>
     <tr>
     <td>Flutter</td>
@@ -126,7 +126,7 @@ Supabase - это [размещенная платформа](https://supabase.c
   
   <tr>
     <td>C#</td>
-    <td><a href="https://github.com/supabase-community/supabase-csharp" target="_blank" rel="noopener noreferrer">supabase-csharp</a></td>
+    <td><a href="https://github.com/supabase/supabase-csharp" target="_blank" rel="noopener noreferrer">supabase-csharp</a></td>
     <td><a href="https://github.com/supabase-community/postgrest-csharp" target="_blank" rel="noopener noreferrer">postgrest-csharp</a></td>
     <td><a href="https://github.com/supabase-community/gotrue-csharp" target="_blank" rel="noopener noreferrer">gotrue-csharp</a></td>
     <td><a href="https://github.com/supabase-community/realtime-csharp" target="_blank" rel="noopener noreferrer">realtime-csharp</a></td>
@@ -162,7 +162,7 @@ Supabase - это [размещенная платформа](https://supabase.c
   </tr>
   <tr>
     <td>Python</td>
-    <td><a href="https://github.com/supabase-community/supabase-py" target="_blank" rel="noopener noreferrer">supabase-py</a></td>
+    <td><a href="https://github.com/supabase/supabase-py" target="_blank" rel="noopener noreferrer">supabase-py</a></td>
     <td><a href="https://github.com/supabase-community/postgrest-py" target="_blank" rel="noopener noreferrer">postgrest-py</a></td>
     <td><a href="https://github.com/supabase-community/gotrue-py" target="_blank" rel="noopener noreferrer">gotrue-py</a></td>
     <td><a href="https://github.com/supabase-community/realtime-py" target="_blank" rel="noopener noreferrer">realtime-py</a></td>

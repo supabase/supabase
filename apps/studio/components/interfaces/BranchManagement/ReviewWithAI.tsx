@@ -1,12 +1,14 @@
-import { ButtonTooltip } from 'components/ui/ButtonTooltip'
-import { Branch } from 'data/branches/branches-query'
-import { useTablesQuery } from 'data/tables/tables-query'
-import { useSendEventMutation } from 'data/telemetry/send-event-mutation'
-import { useSelectedOrganizationQuery } from 'hooks/misc/useSelectedOrganization'
-import { useProjectByRefQuery } from 'hooks/misc/useSelectedProject'
-import { tablesToSQL } from 'lib/helpers'
-import { useAiAssistantStateSnapshot } from 'state/ai-assistant-state'
 import { AiIconAnimation } from 'ui'
+
+import { SIDEBAR_KEYS } from '@/components/layouts/ProjectLayout/LayoutSidebar/LayoutSidebarProvider'
+import { ButtonTooltip } from '@/components/ui/ButtonTooltip'
+import { Branch } from '@/data/branches/branches-query'
+import { useProjectDetailQuery } from '@/data/projects/project-detail-query'
+import { useTablesQuery } from '@/data/tables/tables-query'
+import { tablesToSQL } from '@/lib/helpers'
+import { useTrack } from '@/lib/telemetry/track'
+import { useAiAssistantStateSnapshot } from '@/state/ai-assistant-state'
+import { useSidebarManagerSnapshot } from '@/state/sidebar-manager-state'
 
 interface ReviewWithAIProps {
   currentBranch?: Branch
@@ -24,11 +26,13 @@ export const ReviewWithAI = ({
   disabled = false,
 }: ReviewWithAIProps) => {
   const aiSnap = useAiAssistantStateSnapshot()
-  const { data: selectedOrg } = useSelectedOrganizationQuery()
-  const { mutate: sendEvent } = useSendEventMutation()
+  const { openSidebar } = useSidebarManagerSnapshot()
+  const track = useTrack()
 
   // Get parent project for production schema
-  const { data: parentProject } = useProjectByRefQuery(parentProjectRef)
+  const { data: parentProject } = useProjectDetailQuery({
+    ref: parentProjectRef,
+  })
 
   // Fetch production schema tables
   const { data: productionTables } = useTablesQuery(
@@ -44,13 +48,8 @@ export const ReviewWithAI = ({
   const handleReviewWithAssistant = () => {
     if (!currentBranch || !mainBranch) return
 
-    // Track review with assistant button pressed
-    sendEvent({
-      action: 'branch_review_with_assistant_clicked',
-      groups: {
-        project: parentProjectRef ?? 'Unknown',
-        organization: selectedOrg?.slug ?? 'Unknown',
-      },
+    track('branch_review_with_assistant_clicked', undefined, {
+      project: parentProjectRef,
     })
 
     // Prepare diff content for the assistant
@@ -75,11 +74,15 @@ export const ReviewWithAI = ({
       })
     }
 
+    openSidebar(SIDEBAR_KEYS.AI_ASSISTANT)
     aiSnap.newChat({
       name: `Review merge: ${currentBranch.name} → ${mainBranch.name}`,
-      open: true,
       sqlSnippets: sqlSnippets.length > 0 ? sqlSnippets : undefined,
-      initialInput: `I want to run the attached database changes on my production database branch as part of a branch merge from "${currentBranch.name}" into "${mainBranch.name || 'main'}". I've included the current production database schema as extra context. Please analyze the proposed schema changes and provide concise feedback on their impact on the production schema including any migration concerns and potential conflicts.`,
+      initialInput: `I want to run the attached database changes on my production database branch as part of a branch merge from "${
+        currentBranch.name
+      }" into "${
+        mainBranch.name || 'main'
+      }". I've included the current production database schema as extra context. Please analyze the proposed schema changes and provide concise feedback on their impact on the production schema including any migration concerns and potential conflicts.`,
       suggestions: {
         title: `I can help you review the database schema changes from "${currentBranch.name}" to "${mainBranch.name}", here are some specific areas I can focus on:`,
         prompts: [
@@ -107,7 +110,6 @@ export const ReviewWithAI = ({
 
   return (
     <ButtonTooltip
-      type="default"
       disabled={disabled || !currentBranch || !mainBranch}
       className="px-1"
       onClick={handleReviewWithAssistant}

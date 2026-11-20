@@ -1,3 +1,5 @@
+import type { FeatureKey } from '@/data/entitlements/entitlements-query'
+
 export interface Enum {
   label: string
   value: string
@@ -12,7 +14,7 @@ export interface Provider {
   properties: {
     [x: string]: {
       title: string
-      type: 'boolean' | 'string' | 'select' | 'number'
+      type: 'boolean' | 'string' | 'select' | 'number' | 'comma-separated-list'
       enum: Enum[]
       show: {
         key: string
@@ -22,11 +24,14 @@ export interface Provider {
       descriptionOptional?: string
       units?: string
       isSecret?: boolean
+      entitlementKey?: FeatureKey
+      link?: string
     }
   }
   validationSchema: any // todo: use Yup type
   misc: {
     iconKey: 'gitlab-icon'
+    hasLightIcon: boolean
     requiresRedirect: true
     helper: string
     alert: {

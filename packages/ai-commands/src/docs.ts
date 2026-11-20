@@ -1,8 +1,9 @@
 import type { SupabaseClient } from '@supabase/supabase-js'
 import { codeBlock, oneLine } from 'common-tags'
 import type OpenAI from 'openai'
+
 import { ApplicationError, UserError } from './errors'
-import { getChatRequestTokenCount, getMaxTokenCount, tokenizer } from './tokenizer'
+import { estimateTokenCount, getChatRequestTokenCount, getMaxTokenCount } from './tokenizer'
 import type { Message } from './types'
 
 interface PageSection {
@@ -13,10 +14,20 @@ interface PageSection {
   rag_ignore?: boolean
 }
 
-type MatchPageSectionsFunction = 'match_page_sections_v2' | 'match_page_sections_v2_nimbus'
+interface ClippyOpenAI {
+  apiKey: string
+  moderations: {
+    create(body: {
+      input: string
+    }): Promise<{ results: { flagged: boolean; categories: object }[] }>
+  }
+  embeddings: {
+    create(body: { model: string; input: string }): Promise<{ data: { embedding: number[] }[] }>
+  }
+}
 
 export async function clippy(
-  openai: OpenAI,
+  openai: ClippyOpenAI,
   supabaseClient: SupabaseClient<any, 'public', any>,
   messages: Message[],
   options?: { useAltSearchIndex?: boolean }
@@ -93,14 +104,16 @@ export async function clippy(
   for (let i = 0; i < pageSections.length; i++) {
     const pageSection = pageSections[i]
     const content = pageSection.content
-    const encoded = tokenizer.encode(content)
-    tokenCount += encoded.length
+    tokenCount += estimateTokenCount(content)
 
     if (tokenCount >= 1500) {
       break
     }
 
-    const pagePath = pageSection.page.path
+    const pagePath = options?.useAltSearchIndex
+      ? // @ts-ignore
+        pageSection.page_nimbus.path
+      : pageSection.page.path
 
     // Include source reference with each section
     contextText += `[Source ${sourceIndex}: ${pagePath}]\n${content.trim()}\n---\n`
@@ -181,8 +194,9 @@ export async function clippy(
     },
   ]
 
-  const model = 'gpt-4o-mini-2024-07-18'
-  const maxCompletionTokenCount = 1024
+  const model = 'gpt-6-luna'
+  // Allow room for reasoning and code examples while limiting cost on the public endpoint.
+  const maxCompletionTokenCount = 2048
 
   const completionMessages: OpenAI.Chat.Completions.ChatCompletionMessageParam[] = capMessages(
     initMessages,
@@ -194,8 +208,8 @@ export async function clippy(
   const completionOptions = {
     model,
     messages: completionMessages,
-    max_tokens: 1024,
-    temperature: 0,
+    max_completion_tokens: maxCompletionTokenCount,
+    reasoning_effort: 'low',
     stream: true,
   }
 

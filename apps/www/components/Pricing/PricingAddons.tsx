@@ -1,11 +1,14 @@
+'use client'
+
 import { ArrowUpRight } from 'lucide-react'
 import { useTheme } from 'next-themes'
 import Image from 'next/image'
 import Link from 'next/link'
-import { useRouter } from 'next/router'
 import { FC } from 'react'
 import { Button, cn } from 'ui'
+
 import CostControlAnimation from './CostControlAnimation'
+import { isCrossZoneHref } from '@/lib/cross-zone'
 
 const addons = [
   {
@@ -63,8 +66,8 @@ const PricingAddons: FC = () => {
 }
 
 const AddonCard = ({ addon }: any) => {
-  const { basePath } = useRouter()
   const { resolvedTheme } = useTheme()
+  const basePath = '' // basePath is empty string in next.config.mjs
 
   const isHighlightCard = addon.id === 'addon-cost-control'
 
@@ -77,7 +80,7 @@ const AddonCard = ({ addon }: any) => {
 
   const HighlightCard = () => (
     <>
-      <div className="relative order-last lg:order-first w-full max-w-full lg:w-auto lg:h-full aspect-[2/1] lg:aspect-[3/2] p-4 pt-0 lg:pt-4 lg:pr-0">
+      <div className="relative order-last lg:order-first w-full max-w-full lg:w-auto lg:h-full aspect-2/1 lg:aspect-3/2 p-4 pt-0 lg:pt-4 lg:pr-0">
         {addon.heroImg}
       </div>
 
@@ -94,15 +97,16 @@ const AddonCard = ({ addon }: any) => {
           </p>
         </div>
         <div className="flex items-center gap-4 mt-4">
-          <Button
-            asChild
-            size="tiny"
-            type="default"
-            iconRight={<ArrowUpRight className="w-4 h-4" />}
-          >
-            <Link href={addon.ctaLink} target={addon.ctaTarget}>
-              {addon.ctaText}
-            </Link>
+          <Button asChild size="tiny" iconRight={<ArrowUpRight className="w-4 h-4" />}>
+            {isCrossZoneHref(addon.ctaLink) ? (
+              <a href={addon.ctaLink} target={addon.ctaTarget}>
+                {addon.ctaText}
+              </a>
+            ) : (
+              <Link href={addon.ctaLink} target={addon.ctaTarget}>
+                {addon.ctaText}
+              </Link>
+            )}
           </Button>
         </div>
       </div>
@@ -155,6 +159,10 @@ const AddonCard = ({ addon }: any) => {
     <div className={containerClasses}>
       <HighlightCard />
     </div>
+  ) : isCrossZoneHref(addon.ctaLink) ? (
+    <a href={addon.ctaLink} className={containerClasses} target={addon.ctaTarget}>
+      <SmallCard />
+    </a>
   ) : (
     <Link href={addon.ctaLink} className={containerClasses} target={addon.ctaTarget}>
       <SmallCard />

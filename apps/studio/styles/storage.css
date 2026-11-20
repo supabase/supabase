@@ -1,0 +1,18 @@
+@reference "./globals.css";
+
+/* May need to just comment this out, the smooth scrolling looks weird */
+/* .file-explorer { */
+/* scroll-behavior: smooth; */
+/* } */
+
+.storage-row:hover,
+button[aria-haspopup='menu'][data-state='open'],
+button[aria-haspopup='menu']:focus-visible {
+  .storage-row-menu {
+    @apply opacity-100;
+  }
+}
+
+.sql-editor-container {
+  @apply p-0;
+}

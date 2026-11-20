@@ -1,0 +1,22 @@
+{
+  "name": "Supabase",
+  "short_name": "Supabase",
+  "description": "The Postgres development platform.",
+  "display": "standalone",
+  "theme_color": "#1C1C1C",
+  "background_color": "#1C1C1C",
+  "icons": [
+    {
+      "src": "android-icon-192x192.png",
+      "sizes": "192x192",
+      "type": "image/png",
+      "purpose": "any"
+    },
+    {
+      "src": "android-icon-512x512.png",
+      "sizes": "512x512",
+      "type": "image/png",
+      "purpose": "any"
+    }
+  ]
+}

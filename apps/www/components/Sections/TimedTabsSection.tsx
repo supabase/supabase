@@ -1,14 +1,14 @@
 import 'swiper/css'
 
-import { AnimatePresence, motion, useAnimation } from 'framer-motion'
-import Image from 'next/image'
-import Link from 'next/link'
-import { ReactNode, useEffect, useState } from 'react'
-import { Swiper, SwiperSlide } from 'swiper/react'
-import { Button } from 'ui'
 import CodeBlock from '~/components/CodeBlock/CodeBlock'
 import SectionContainer from '~/components/Layouts/SectionContainer'
 import { ArrowUpRight } from 'lucide-react'
+import { AnimatePresence, motion, useAnimation } from 'motion/react'
+import Image from 'next/image'
+import Link from 'next/link'
+import { useEffect, useState, type ReactNode } from 'react'
+import { Swiper, SwiperSlide } from 'swiper/react'
+import { Button } from 'ui'
 
 interface TabProps {
   label: string
@@ -21,9 +21,10 @@ interface TabProps {
 
 const Tab = ({ isActive, label, paragraph, onClick, progress, intervalDuration }: TabProps) => (
   <button
+    tabIndex={0}
     onClick={onClick}
     className={`text-left text-lg flex flex-col group gap-1 transition-all ${
-      isActive ? 'flex-[2] text-foreground' : 'flex-[1] text-foreground-light'
+      isActive ? 'flex-2 text-foreground' : 'flex-1 text-foreground-light'
     }`}
     aria-selected={isActive}
     role="tab"
@@ -32,7 +33,7 @@ const Tab = ({ isActive, label, paragraph, onClick, progress, intervalDuration }
       {isActive && (
         <motion.div
           className={[
-            'absolute inset-0 w-full right-full bg-brand h-full transition-opacity',
+            'absolute inset-0 w-full right-full bg-brand-default h-full transition-opacity',
             progress! > 99.7 ? 'opacity-0' : 'opacity-100',
           ].join(' ')}
           style={{ x: `${progress! - 100}%` }}
@@ -58,13 +59,13 @@ const Tab = ({ isActive, label, paragraph, onClick, progress, intervalDuration }
 interface Tab {
   label: string
   paragraph?: string
-  panel?: JSX.Element
+  panel?: ReactNode
   colabUrl: string
   code?: string
 }
 
 interface Props {
-  title: string | ReactNode
+  title: ReactNode
   paragraph: string
   cta?: {
     label?: string
@@ -138,7 +139,7 @@ const TimedTabsSection = ({
           </h2>
           <p className="text-foreground-lighter mb-4 max-w-sm">{paragraph}</p>
           {cta && (
-            <Button asChild type="default" size="small" icon={<ArrowUpRight />}>
+            <Button asChild size="small" icon={<ArrowUpRight />}>
               <Link href={cta.link}>{cta.label ?? 'Explore more'}</Link>
             </Button>
           )}
@@ -170,7 +171,7 @@ const TimedTabsSection = ({
           </Swiper>
           <OpenInColab
             colabUrl={tabs[activeTab]?.colabUrl}
-            className="flex md:hidden !relative !top-0 !right-0 mt-8 w-full justify-center"
+            className="flex md:hidden relative! top-0! right-0! mt-8 w-full justify-center"
           />
         </div>
       </div>

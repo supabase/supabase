@@ -1,0 +1,46 @@
+<ion-header>
+  <ion-toolbar>
+    <ion-title>Account</ion-title>
+  </ion-toolbar>
+</ion-header>
+
+<ion-content>
+  <app-avatar
+    [avatarUrl]="this.profile?.avatar_url"
+    (upload)="updateProfile($event)"
+  >
+  </app-avatar>
+  <form>
+    <ion-item>
+      <ion-label position="stacked">Email</ion-label>
+      <ion-input type="email" name="email" [(ngModel)]="email" readonly></ion-input>
+    </ion-item>
+
+    <ion-item>
+      <ion-label position="stacked">Name</ion-label>
+      <ion-input
+        type="text"
+        name="username"
+        [(ngModel)]="profile.username"
+      ></ion-input>
+    </ion-item>
+
+    <ion-item>
+      <ion-label position="stacked">Website</ion-label>
+      <ion-input
+        type="url"
+        name="website"
+        [(ngModel)]="profile.website"
+      ></ion-input>
+    </ion-item>
+    <div class="ion-text-center">
+      <ion-button fill="clear" (click)="updateProfile()"
+        >Update Profile</ion-button
+      >
+    </div>
+  </form>
+
+  <div class="ion-text-center">
+    <ion-button fill="clear" (click)="signOut()">Log Out</ion-button>
+  </div>
+</ion-content>

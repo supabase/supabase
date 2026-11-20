@@ -11,17 +11,17 @@ function ProductIcon({ icon, color }: ProductIcon) {
       case 'green':
         return {
           container: 'bg-brand-600 text-brand-100',
-          svg: 'stroke-brand',
+          svg: 'stroke-brand-default',
         }
       case 'alt':
         return {
-          container: 'bg-brand-200 text-brand',
-          svg: 'stroke-brand',
+          container: 'bg-brand-200 text-primary',
+          svg: 'stroke-brand-default',
         }
       case 'gray':
         return {
-          container: 'bg- text-brand',
-          svg: 'stroke-brand',
+          container: 'bg- text-primary',
+          svg: 'stroke-brand-default',
         }
       case 'black':
       default:
@@ -35,21 +35,22 @@ function ProductIcon({ icon, color }: ProductIcon) {
   return (
     <div
       className={[
-        'inline-flex h-8 w-8 flex-shrink-0 items-center justify-center rounded-md',
+        'inline-flex shrink-0 items-center justify-center',
+        color === 'green' ? 'size-6 rounded-sm' : 'h-8 w-8 rounded-md',
         !color || color === 'black' ? 'bg-foreground text-background-alternative' : '',
         color && color === 'gray' ? 'bg-border-strong text-foreground-light' : '',
-        color && color === 'green' ? 'bg-brand text-brand-100' : '',
-        color && color === 'alt' ? 'bg-alternative text-brand' : '',
-        // color && color === 'alt' ? 'bg-surface-300 text-brand' : '',
+        color && color === 'green' ? 'bg-primary/10 text-primary' : '',
+        color && color === 'alt' ? 'bg-alternative text-primary' : '',
+        // color && color === 'alt' ? 'bg-surface-300 text-primary' : '',
       ].join(' ')}
     >
       <svg
         className={[
-          'h-5 w-5',
+          color === 'green' ? 'size-4' : 'h-5 w-5',
           !color || color === 'black' ? 'stroke-background' : '',
           color && color === 'gray' ? 'stroke-foreground-light' : '',
-          color && color === 'green' ? 'stroke-brand-200' : '',
-          color && color === 'alt' ? 'stroke-brand' : '',
+          color && color === 'green' ? 'stroke-primary' : '',
+          color && color === 'alt' ? 'stroke-brand-default' : '',
         ].join(' ')}
         xmlns="http://www.w3.org/2000/svg"
         fill="none"

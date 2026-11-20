@@ -1,10 +1,12 @@
 import pgMeta from '@supabase/pg-meta'
-import { useMutation, UseMutationOptions, useQueryClient } from '@tanstack/react-query'
+import { useMutation, useQueryClient } from '@tanstack/react-query'
 import { toast } from 'sonner'
 
-import { executeSql } from 'data/sql/execute-sql-query'
-import type { ResponseError } from 'types'
 import { databasePublicationsKeys } from './keys'
+import { unguarded } from '@/data/fetchers'
+import { executeSql } from '@/data/sql/execute-sql-mutation'
+import type { StudioError } from '@/lib/errors/studio-errors'
+import type { UseCustomMutationOptions } from '@/types'
 
 export type DatabasePublicationCreateVariables = {
   projectRef: string
@@ -39,8 +41,11 @@ export async function createDatabasePublication({
   const { result } = await executeSql({
     projectRef,
     connectionString,
+    sqlOrigin: 'studio',
+    queryName: 'publication-create',
     sql,
     queryKey: ['publication', 'create'],
+    grant: unguarded.migrating,
   })
 
   return result
@@ -53,9 +58,9 @@ export const useDatabasePublicationCreateMutation = ({
   onError,
   ...options
 }: Omit<
-  UseMutationOptions<
+  UseCustomMutationOptions<
     DatabasePublicationCreateData,
-    ResponseError,
+    StudioError,
     DatabasePublicationCreateVariables
   >,
   'mutationFn'
@@ -64,12 +69,13 @@ export const useDatabasePublicationCreateMutation = ({
 
   return useMutation<
     DatabasePublicationCreateData,
-    ResponseError,
+    StudioError,
     DatabasePublicationCreateVariables
-  >((vars) => createDatabasePublication(vars), {
+  >({
+    mutationFn: (vars) => createDatabasePublication(vars),
     async onSuccess(data, variables, context) {
       const { projectRef } = variables
-      await queryClient.invalidateQueries(databasePublicationsKeys.list(projectRef))
+      await queryClient.invalidateQueries({ queryKey: databasePublicationsKeys.list(projectRef) })
       await onSuccess?.(data, variables, context)
     },
     async onError(data, variables, context) {

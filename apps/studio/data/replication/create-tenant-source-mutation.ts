@@ -1,9 +1,10 @@
-import { useMutation, UseMutationOptions, useQueryClient } from '@tanstack/react-query'
+import { useMutation, useQueryClient } from '@tanstack/react-query'
 import { toast } from 'sonner'
 
-import type { ResponseError } from 'types'
 import { replicationKeys } from './keys'
-import { handleError, post } from 'data/fetchers'
+import { handleError, post } from '@/data/fetchers'
+import type { StudioError } from '@/lib/errors/studio-errors'
+import type { UseCustomMutationOptions } from '@/types'
 
 export type CreateTenantSourceParams = {
   projectRef: string
@@ -30,27 +31,25 @@ export const useCreateTenantSourceMutation = ({
   onError,
   ...options
 }: Omit<
-  UseMutationOptions<CreateTenantSourceData, ResponseError, CreateTenantSourceParams>,
+  UseCustomMutationOptions<CreateTenantSourceData, StudioError, CreateTenantSourceParams>,
   'mutationFn'
 > = {}) => {
   const queryClient = useQueryClient()
 
-  return useMutation<CreateTenantSourceData, ResponseError, CreateTenantSourceParams>(
-    (vars) => createTenantSource(vars),
-    {
-      async onSuccess(data, variables, context) {
-        const { projectRef } = variables
-        await queryClient.invalidateQueries(replicationKeys.sources(projectRef))
-        await onSuccess?.(data, variables, context)
-      },
-      async onError(data, variables, context) {
-        if (onError === undefined) {
-          toast.error(`Failed to create tenant or source: ${data.message}`)
-        } else {
-          onError(data, variables, context)
-        }
-      },
-      ...options,
-    }
-  )
+  return useMutation<CreateTenantSourceData, StudioError, CreateTenantSourceParams>({
+    mutationFn: (vars) => createTenantSource(vars),
+    async onSuccess(data, variables, context) {
+      const { projectRef } = variables
+      await queryClient.invalidateQueries({ queryKey: replicationKeys.sources(projectRef) })
+      await onSuccess?.(data, variables, context)
+    },
+    async onError(data, variables, context) {
+      if (onError === undefined) {
+        toast.error(`Failed to create tenant or source: ${data.message}`)
+      } else {
+        onError(data, variables, context)
+      }
+    },
+    ...options,
+  })
 }

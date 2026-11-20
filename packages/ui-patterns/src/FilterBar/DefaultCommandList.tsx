@@ -1,18 +1,19 @@
-import React from 'react'
-import {
-  Command_Shadcn_,
-  CommandEmpty_Shadcn_,
-  CommandGroup_Shadcn_,
-  CommandItem_Shadcn_,
-  CommandList_Shadcn_,
-} from 'ui'
-import { MenuItem } from './menuItems'
+'use client'
 
-type DefaultCommandListProps = {
+import { Fragment, useEffect, useMemo, useRef } from 'react'
+
+import { CommandListItem } from './CommandListItem'
+import { EmptyState, GroupHeader, GroupSeparator } from './DefaultCommandList.helpers'
+import { MenuItem, MenuItemGroup, OPERATOR_GROUP_LABELS } from './types'
+import { groupMenuItemsByOperator } from './utils'
+
+export type DefaultCommandListProps = {
   items: MenuItem[]
   highlightedIndex: number
   onSelect: (item: MenuItem) => void
   includeIcon?: boolean
+  showSelection?: boolean
+  grouped?: boolean
 }
 
 export function DefaultCommandList({
@@ -20,25 +21,80 @@ export function DefaultCommandList({
   highlightedIndex,
   onSelect,
   includeIcon = true,
+  showSelection = false,
+  grouped = false,
 }: DefaultCommandListProps) {
+  const listRef = useRef<HTMLDivElement>(null)
+  const itemRefs = useRef<Map<number, HTMLDivElement>>(new Map())
+
+  const groups: MenuItemGroup[] = useMemo(() => {
+    if (grouped) {
+      return groupMenuItemsByOperator(items)
+    }
+    // Non-grouped items are treated as a single uncategorized group
+    return [
+      {
+        group: 'uncategorized',
+        items: items.map((item, index) => ({ item, index })),
+      },
+    ]
+  }, [grouped, items])
+
+  const showGroupHeaders = groups.length > 1
+
+  useEffect(() => {
+    const itemEl = itemRefs.current.get(highlightedIndex)
+    if (itemEl && listRef.current) {
+      itemEl.scrollIntoView({ block: 'center', behavior: 'smooth' })
+    }
+  }, [highlightedIndex])
+
+  const setItemRef = (index: number) => (el: HTMLDivElement | null) => {
+    if (el) {
+      itemRefs.current.set(index, el)
+    } else {
+      itemRefs.current.delete(index)
+    }
+  }
+
+  if (items.length === 0) {
+    return (
+      <div ref={listRef} className="max-h-[300px] overflow-y-auto p-1">
+        <EmptyState />
+      </div>
+    )
+  }
+
   return (
-    <Command_Shadcn_>
-      <CommandList_Shadcn_>
-        <CommandEmpty_Shadcn_>No results found.</CommandEmpty_Shadcn_>
-        <CommandGroup_Shadcn_>
-          {items.map((item, idx) => (
-            <CommandItem_Shadcn_
-              key={`${item.value}-${item.label}`}
-              value={item.value}
-              onSelect={() => onSelect(item)}
-              className={`text-xs ${idx === highlightedIndex ? 'bg-surface-400' : ''}`}
-            >
-              {includeIcon && item.icon}
-              {item.label}
-            </CommandItem_Shadcn_>
+    <div ref={listRef} className="max-h-[300px] overflow-y-auto p-1">
+      {groups.map((groupData, groupIndex) => (
+        <div key={groupData.group}>
+          {groupIndex > 0 && showGroupHeaders && <GroupSeparator />}
+          {showGroupHeaders && groupData.group && (
+            <GroupHeader label={OPERATOR_GROUP_LABELS[groupData.group]} />
+          )}
+          {groupData.items.map(({ item, index }, itemIndex) => (
+            <Fragment key={`${item.value}-${item.label}`}>
+              {item.propertyGroupLabel &&
+                item.propertyGroupLabel !== items[index - 1]?.propertyGroupLabel && (
+                  <>
+                    {index > 0 && <GroupSeparator />}
+                    <GroupHeader label={item.propertyGroupLabel} />
+                  </>
+                )}
+              {item.value === '__new_group__' && itemIndex > 0 && <GroupSeparator />}
+              <CommandListItem
+                showSelection={showSelection}
+                item={item}
+                isHighlighted={index === highlightedIndex}
+                includeIcon={includeIcon}
+                onSelect={onSelect}
+                setRef={setItemRef(index)}
+              />
+            </Fragment>
           ))}
-        </CommandGroup_Shadcn_>
-      </CommandList_Shadcn_>
-    </Command_Shadcn_>
+        </div>
+      ))}
+    </div>
   )
 }

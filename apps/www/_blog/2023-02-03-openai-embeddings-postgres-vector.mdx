@@ -2,8 +2,8 @@
 title: Storing OpenAI embeddings in Postgres with pgvector
 description: An example of how to build an AI-powered search engine using OpenAI's embeddings and PostgreSQL.
 author: gregnr
-image: embeddings/og_pgvector.png
-thumb: embeddings/og_pgvector.png
+imgSocial: embeddings/og_pgvector.png
+imgThumb: embeddings/og_pgvector.png
 categories:
   - engineering
 tags:
@@ -64,7 +64,7 @@ In this example we only have 2 dimensions: the X and Y axis. In reality, we woul
 
 ## OpenAI embeddings
 
-OpenAI offers an [API](https://platform.openai.com/docs/guides/embeddings) to generate embeddings for a string of text using its language model. You feed it any text information (blog articles, documentation, your company's knowledge base), and it will output a vector of floating point numbers that represents the “meaning” of that text.
+OpenAI offers an [API](https://developers.openai.com/api/docs/guides/embeddings) to generate embeddings for a string of text using its language model. You feed it any text information (blog articles, documentation, your company's knowledge base), and it will output a vector of floating point numbers that represents the “meaning” of that text.
 
 Compared to our 2-dimensional example above, their latest embedding model `text-embedding-ada-002` will output 1536 dimensions.
 

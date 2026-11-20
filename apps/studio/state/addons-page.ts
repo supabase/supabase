@@ -1,4 +1,4 @@
-import { useUrlState } from 'hooks/ui/useUrlState'
+import { useUrlState } from '@/hooks/ui/useUrlState'
 
 export const ADDONS_PANEL_KEYS_ARRAY = ['pitr', 'customDomain', 'ipv4'] as const
 

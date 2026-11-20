@@ -1,0 +1,30 @@
+/*
+ * Custom Tailwind v4 variants migrated from:
+ *  - packages/config/ui.config.js addVariant calls
+ *  - packages/config/tailwind.config.js addVariant + darkMode setting
+ */
+
+/*
+ * `darkMode: ['class', '[data-theme*="dark"]']` from the v3 config is replaced
+ * by this @custom-variant. The :where() wrapper keeps specificity at 0 so
+ * the dark utilities don't override unrelated rules.
+ */
+@custom-variant dark (&:where([data-theme*='dark'] *, [data-theme*='dark']));
+
+@custom-variant data-open-parent ([data-state='open'] &);
+@custom-variant data-closed-parent ([data-state='closed'] &);
+@custom-variant data-open (&[data-state='open']);
+@custom-variant data-closed (&[data-state='closed']);
+
+/* may be unused — verify before pruning */
+@custom-variant data-show (&[data-state='show']);
+/* may be unused — verify before pruning */
+@custom-variant data-hide (&[data-state='hide']);
+
+@custom-variant data-checked (&[data-state='checked']);
+/* may be unused — verify before pruning */
+@custom-variant data-unchecked (&[data-state='unchecked']);
+
+@custom-variant aria-expanded (&[aria-expanded='true']);
+
+@custom-variant not-disabled (&:not(:disabled));

@@ -1,0 +1,112 @@
+---
+title: Security
+description: Learn how Supabase uses Row Level Security (RLS) to control which data each user can access.
+chapterNumber: 4
+explore:
+  - title: Supabase Docs
+    link: https://supabase.com/docs/guides/database/postgres/row-level-security
+    itemType: doc
+  - title: RLS and Policies
+    link: https://www.youtube.com/watch?v=WAa3a-HxLVs
+    itemType: video
+---
+
+Authentication tells us who the user is. But we still need to decide what data
+each user is allowed to see or change. Supabase handles this using a Postgres
+feature called Row Level Security (RLS).
+
+RLS lets the database check each row before returning it. For every request, the
+database asks: _should this user be allowed to access this row?_
+
+Here is an example of a table with some notes:
+
+```text
++--------------------------------------------------------------------------+
+| user_id | content          | created_at |
++---------+------------------+---------------------------------------------+
+| 1       | Buy groceries    | 2025-01-10 14:22:11 | ← belongs to user Alice
+| 2       | Call the dentist | 2025-01-10 15:08:54 | ← belongs to user Bob
++--------------------------------------------------------------------------+
+```
+
+Because this check happens in the database, the rules can be applied to every request:
+REST, GraphQL, Realtime, and Edge Functions all follow the same security
+behavior. There is no separate code path to maintain.
+
+---
+
+## Enabling RLS
+
+RLS is turned off by default so you can design your tables first. Once you are
+ready to secure a table, you turn it on via the Dashboard or via SQL:
+
+```text
+ALTER TABLE users ENABLE ROW LEVEL SECURITY;
+```
+
+Enabling RLS does not allow any access. It simply tells Postgres that row access
+must now follow policies.
+
+At this point, your table becomes locked down. No one can read or write data
+until you add policies.
+
+---
+
+## Policies
+
+A policy is a rule that describes who can do what. Policies are written in SQL,
+but we will use very small, readable examples.
+
+Example: Allow a signed-in user to see only their own rows.
+
+```text
+create policy "Users can view their own notes"
+on notes
+for select
+using (user_id = auth.uid());
+```
+
+Explanation:
+
+- `for select` means the policy applies to reading rows
+- `auth.uid()` is the id of the signed-in user
+- The user is only allowed to read rows where the `user_id` matches theirs
+
+This gives us personal data isolation without writing any backend code.
+
+---
+
+## A mental model for policies
+
+Think of policies as sentences:
+`Allow X to do Y when Z is true.`
+
+For example:
+
+```text
+Allow a user to read a note when they created it.
+Allow a user to update a note when they created it.
+Allow a user to delete an item when they own the project it belongs to.
+Allow an admin to do everything.
+```
+
+Policies describe access in plain language.
+SQL just expresses the rule.
+
+In a typical app, a table may have one policy or several. Each policy represents
+a small piece of business logic — who can do what and under what conditions.
+Together, they form the full access rules for that table.
+
+---
+
+## What we learned
+
+- Authentication identifies the user.
+- RLS decides what data that user can access.
+- RLS is a Postgres feature that checks every row before returning it.
+- When RLS is enabled, access is blocked until policies are added.
+- Policies describe who can read or write data and under what conditions.
+- `auth.uid()` gives you the id of the signed-in user, which is used in policy
+  conditions.
+
+Understanding RLS is the foundation of secure Supabase applications.

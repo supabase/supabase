@@ -10,17 +10,13 @@
   },
   "scripts": {
     "preinstall": "npx only-allow pnpm",
-    "clean": "rimraf node_modules"
-  },
-  "engines": {
-    "node": ">= 16"
+    "clean": "rimraf .turbo tsconfig.tsbuildinfo"
   },
   "keywords": [],
   "author": "",
   "license": "ISC",
   "devDependencies": {
     "minimist": "^1.2.7",
-    "prettier": "3.2.4",
     "svgson": "^5.2.1"
   }
 }

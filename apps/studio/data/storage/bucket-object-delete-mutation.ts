@@ -1,8 +1,9 @@
-import { UseMutationOptions, useMutation, useQueryClient } from '@tanstack/react-query'
-
-import { del, handleError } from 'data/fetchers'
+import { useMutation } from '@tanstack/react-query'
 import { toast } from 'sonner'
-import { ResponseError } from 'types'
+
+import { del, handleError } from '@/data/fetchers'
+import type { StudioError } from '@/lib/errors/studio-errors'
+import type { UseCustomMutationOptions } from '@/types'
 
 type DeleteBucketObjectParams = {
   projectRef: string
@@ -39,25 +40,22 @@ export const useBucketObjectDeleteMutation = ({
   onError,
   ...options
 }: Omit<
-  UseMutationOptions<BucketObjectDeleteData, ResponseError, DeleteBucketObjectParams>,
+  UseCustomMutationOptions<BucketObjectDeleteData, StudioError, DeleteBucketObjectParams>,
   'mutationFn'
 > = {}) => {
-  const queryClient = useQueryClient()
-  return useMutation<BucketObjectDeleteData, ResponseError, DeleteBucketObjectParams>(
-    (vars) => deleteBucketObject(vars),
-    {
-      async onSuccess(data, variables, context) {
-        // [Joshen] TODO figure out what queries to invalidate
-        await onSuccess?.(data, variables, context)
-      },
-      async onError(data, variables, context) {
-        if (onError === undefined) {
-          toast.error(`Failed to delete bucket object: ${data.message}`)
-        } else {
-          onError(data, variables, context)
-        }
-      },
-      ...options,
-    }
-  )
+  return useMutation<BucketObjectDeleteData, StudioError, DeleteBucketObjectParams>({
+    mutationFn: (vars) => deleteBucketObject(vars),
+    async onSuccess(data, variables, context) {
+      // [Joshen] TODO figure out what queries to invalidate
+      await onSuccess?.(data, variables, context)
+    },
+    async onError(data, variables, context) {
+      if (onError === undefined) {
+        toast.error(`Failed to delete bucket object: ${data.message}`)
+      } else {
+        onError(data, variables, context)
+      }
+    },
+    ...options,
+  })
 }

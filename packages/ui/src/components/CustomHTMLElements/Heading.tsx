@@ -2,12 +2,14 @@
 
 import { forwardRef, useCallback, type HTMLAttributes } from 'react'
 import { useInView } from 'react-intersection-observer'
+
 import {
   getAnchor,
-  removeAnchor,
   highlightSelectedTocItem,
+  removeAnchor,
   unHighlightSelectedTocItems,
 } from './CustomHTMLElements.utils'
+import { CopyHeadingLinkButton } from './CopyHeadingLinkButton'
 
 interface Props extends HTMLAttributes<HTMLHeadingElement> {
   tag?: string
@@ -28,7 +30,6 @@ const Heading = forwardRef(
   ({ tag, customAnchor, children, ...props }: React.PropsWithChildren<Props>, forwardedRef) => {
     const HeadingTag = `${tag}` as any
     const anchor = customAnchor ? customAnchor : getAnchor(children, props)
-    const link = `#${anchor}`
 
     const { ref: viewRef } = useInView({
       threshold: 1,
@@ -54,15 +55,7 @@ const Heading = forwardRef(
     return (
       <HeadingTag id={anchor} ref={combinedRef} className="group scroll-mt-24" {...props}>
         {removeAnchor(children)}
-        {anchor && (
-          <a
-            href={link}
-            aria-hidden="true"
-            className="ml-2 opacity-0 group-hover:opacity-100 transition"
-          >
-            <span aria-hidden="true">#</span>
-          </a>
-        )}
+        {anchor && <CopyHeadingLinkButton id={anchor} className="ml-2 align-middle" />}
       </HeadingTag>
     )
   }

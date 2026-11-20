@@ -1,8 +1,10 @@
-import { useMutation, UseMutationOptions, useQueryClient } from '@tanstack/react-query'
-import { handleError, put } from 'data/fetchers'
+import { useMutation, useQueryClient } from '@tanstack/react-query'
 import { toast } from 'sonner'
-import type { ResponseError } from 'types'
+
 import { organizationKeys } from './keys'
+import { handleError, put } from '@/data/fetchers'
+import type { StudioError } from '@/lib/errors/studio-errors'
+import type { UseCustomMutationOptions } from '@/types'
 
 export type OrganizationPaymentMethodDefaultVariables = {
   slug: string
@@ -34,9 +36,9 @@ export const useOrganizationPaymentMethodMarkAsDefaultMutation = ({
   onError,
   ...options
 }: Omit<
-  UseMutationOptions<
+  UseCustomMutationOptions<
     OrganizationPaymentMethodDefaultData,
-    ResponseError,
+    StudioError,
     OrganizationPaymentMethodDefaultVariables
   >,
   'mutationFn'
@@ -45,20 +47,24 @@ export const useOrganizationPaymentMethodMarkAsDefaultMutation = ({
 
   return useMutation<
     OrganizationPaymentMethodDefaultData,
-    ResponseError,
+    StudioError,
     OrganizationPaymentMethodDefaultVariables
-  >((vars) => markPaymentMethodAsDefault(vars), {
+  >({
+    mutationFn: (vars) => markPaymentMethodAsDefault(vars),
     async onSuccess(data, variables, context) {
       const { slug, paymentMethodId } = variables
       // We do not invalidate payment methods here as endpoint data is stale for 1-2 seconds, so we handle state manually
-      queryClient.setQueriesData(organizationKeys.paymentMethods(slug), (prev: any) => {
-        if (!prev) return prev
-        return {
-          ...prev,
-          defaultPaymentMethodId: paymentMethodId,
-          data: prev.data.map((pm: any) => ({ ...pm, is_default: pm.id === paymentMethodId })),
+      queryClient.setQueriesData(
+        { queryKey: organizationKeys.paymentMethods(slug) },
+        (prev: any) => {
+          if (!prev) return prev
+          return {
+            ...prev,
+            defaultPaymentMethodId: paymentMethodId,
+            data: prev.data.map((pm: any) => ({ ...pm, is_default: pm.id === paymentMethodId })),
+          }
         }
-      })
+      )
 
       await onSuccess?.(data, variables, context)
     },

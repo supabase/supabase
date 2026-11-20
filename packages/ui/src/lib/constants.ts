@@ -64,6 +64,13 @@ export const SIZE = {
     large: 'h-[42px]',
     xlarge: 'h-[50px]',
   },
+  minHeight: {
+    tiny: 'min-h-[26px]',
+    small: 'min-h-[34px]',
+    medium: 'min-h-[38px]',
+    large: 'min-h-[42px]',
+    xlarge: 'min-h-[50px]',
+  },
 }
 
 // used for internal badges/buttons

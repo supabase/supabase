@@ -1,5 +1,5 @@
-import type { Filter, FilterOperator, QueryTable, Sort, Dictionary } from './types'
 import { IQueryModifier, QueryModifier } from './QueryModifier'
+import type { ActionConfig, Dictionary, Filter, FilterOperator, QueryTable, Sort } from './types'
 
 export interface IQueryFilter {
   filter: (column: string, operator: FilterOperator, value: string) => IQueryFilter
@@ -8,17 +8,16 @@ export interface IQueryFilter {
 }
 
 export class QueryFilter implements IQueryFilter, IQueryModifier {
-  protected filters: Filter[] = []
-  protected sorts: Sort[] = []
+  protected filters: Array<Filter> = []
+  protected sorts: Array<Sort> = []
 
   constructor(
     protected table: QueryTable,
-    protected action: 'count' | 'delete' | 'insert' | 'select' | 'update' | 'truncate',
-    protected actionValue?: string | string[] | Dictionary<any> | Dictionary<any>[],
-    protected actionOptions?: { returning: boolean; enumArrayColumns?: string[] }
+    protected actionConfig: ActionConfig,
+    protected actionOptions?: { returning: boolean; enumArrayColumns?: Array<string> }
   ) {}
 
-  filter(column: string, operator: FilterOperator, value: any) {
+  filter(column: string | string[], operator: FilterOperator, value: any) {
     this.filters.push({ column, operator, value })
     return this
   }
@@ -44,13 +43,33 @@ export class QueryFilter implements IQueryFilter, IQueryModifier {
     return this._getQueryModifier().range(from, to)
   }
 
+  clone(): QueryFilter {
+    const clonedData = structuredClone({
+      table: this.table,
+      actionConfig: this.actionConfig,
+      actionOptions: this.actionOptions,
+      filters: this.filters,
+      sorts: this.sorts,
+    })
+
+    const cloned = new QueryFilter(
+      clonedData.table,
+      clonedData.actionConfig,
+      clonedData.actionOptions
+    )
+
+    cloned.filters = clonedData.filters
+    cloned.sorts = clonedData.sorts
+
+    return cloned
+  }
+
   toSql(options?: { isCTE: boolean; isFinal: boolean }) {
     return this._getQueryModifier().toSql(options)
   }
 
   _getQueryModifier() {
-    return new QueryModifier(this.table, this.action, {
-      actionValue: this.actionValue,
+    return new QueryModifier(this.table, this.actionConfig, {
       actionOptions: this.actionOptions,
       filters: this.filters,
       sorts: this.sorts,

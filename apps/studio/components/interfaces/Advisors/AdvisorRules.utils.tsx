@@ -1,6 +1,6 @@
-import { LintException } from 'data/lint/lint-rules-query'
-import { Member } from 'data/organizations/organization-members-query'
 import { lintInfoMap } from '../Linter/Linter.utils'
+import { LintException } from '@/data/lint/lint-rules-query'
+import { Member } from '@/data/organizations/organization-members-query'
 
 export const generateRuleText = (e: LintException, member?: Member) => {
   const lintName = lintInfoMap.find((x) => x.name === e.lint_name)?.title
@@ -25,25 +25,28 @@ export const generateRuleDescription = ({
   return (
     <>
       <p className="font-mono uppercase text-xs text-foreground-lighter">What this rule means:</p>
-      <p className="!mb-0">
+      <p className="mb-0!">
         The "{lint?.title}" lint will be{' '}
-        {disabled
-          ? `ignored for ${!!member ? `this user only` : 'this project'}`
-          : `visible to ${!!member ? `this user only` : ''}`}
+        {disabled ? (
+          <span>{`ignored for ${!!member ? `this user only` : 'this project'}`}</span>
+        ) : (
+          <span>{`visible to ${!!member ? `this user only` : ''}`}</span>
+        )}
       </p>
       <p className="text-foreground-light">
         {!!member ? (
           disabled ? (
             <>
-              Only {member.username ?? member.primary_email} will no longer see this lint in the{' '}
-              <span className="capitalize">{lint?.category}</span> Advisor, the lint will still be
-              visible to all other project members
+              Only {member.username ?? member.primary_email}{' '}
+              <span>will no longer see this lint in the</span>{' '}
+              <span className="capitalize">{lint?.category}</span>{' '}
+              <span>Advisor, the lint will still be visible to all other project members</span>
             </>
           ) : (
             <>
-              Only {member.username ?? member.primary_email} will see this lint in the{' '}
-              <span className="capitalize">{lint?.category}</span> Advisor, the lint will no longer
-              be visible to all other project members
+              Only {member.username ?? member.primary_email} <span>will see this lint in the</span>{' '}
+              <span className="capitalize">{lint?.category}</span>{' '}
+              <span>Advisor, the lint will no longer be visible to all other project members</span>
             </>
           )
         ) : (

@@ -1,9 +1,10 @@
-import { useMutation, UseMutationOptions, useQueryClient } from '@tanstack/react-query'
+import { useMutation, useQueryClient } from '@tanstack/react-query'
 import { toast } from 'sonner'
 
-import { handleError, patch } from 'data/fetchers'
-import type { ResponseError } from 'types'
 import { resourceKeys } from './keys'
+import { handleError, patch } from '@/data/fetchers'
+import type { StudioError } from '@/lib/errors/studio-errors'
+import type { UseCustomMutationOptions } from '@/types'
 
 export type ResourceUpdateVariables = {
   projectRef: string
@@ -29,32 +30,30 @@ export const useResourceUpdateMutation = ({
   onError,
   ...options
 }: Omit<
-  UseMutationOptions<ResourceUpdateData, ResponseError, ResourceUpdateVariables>,
+  UseCustomMutationOptions<ResourceUpdateData, StudioError, ResourceUpdateVariables>,
   'mutationFn'
 > = {}) => {
   const queryClient = useQueryClient()
 
-  return useMutation<ResourceUpdateData, ResponseError, ResourceUpdateVariables>(
-    (vars) => updateResource(vars),
-    {
-      async onSuccess(data, variables, context) {
-        const { projectRef, id } = variables
+  return useMutation<ResourceUpdateData, StudioError, ResourceUpdateVariables>({
+    mutationFn: (vars) => updateResource(vars),
+    async onSuccess(data, variables, context) {
+      const { projectRef, id } = variables
 
-        await Promise.all([
-          queryClient.invalidateQueries(resourceKeys.list(projectRef)),
-          queryClient.invalidateQueries(resourceKeys.resource(projectRef, id)),
-        ])
+      await Promise.all([
+        queryClient.invalidateQueries({ queryKey: resourceKeys.list(projectRef) }),
+        queryClient.invalidateQueries({ queryKey: resourceKeys.resource(projectRef, id) }),
+      ])
 
-        await onSuccess?.(data, variables, context)
-      },
-      async onError(data, variables, context) {
-        if (onError === undefined) {
-          toast.error(`Failed to mutate: ${data.message}`)
-        } else {
-          onError(data, variables, context)
-        }
-      },
-      ...options,
-    }
-  )
+      await onSuccess?.(data, variables, context)
+    },
+    async onError(data, variables, context) {
+      if (onError === undefined) {
+        toast.error(`Failed to mutate: ${data.message}`)
+      } else {
+        onError(data, variables, context)
+      }
+    },
+    ...options,
+  })
 }

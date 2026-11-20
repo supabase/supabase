@@ -1,8 +1,10 @@
 'use client'
 
 import { zodResolver } from '@hookform/resolvers/zod'
+import { useEffect, useRef } from 'react'
 import { useForm } from 'react-hook-form'
 import type { z, ZodTypeAny } from 'zod'
+
 import { Button } from '@/registry/default/components/ui/button'
 import {
   Form,
@@ -14,7 +16,6 @@ import {
   FormMessage,
 } from '@/registry/default/components/ui/form'
 import { Input } from '@/registry/default/components/ui/input'
-import { Switch } from '@/registry/default/components/ui/switch'
 import {
   Select,
   SelectContent,
@@ -22,7 +23,7 @@ import {
   SelectTrigger,
   SelectValue,
 } from '@/registry/default/components/ui/select'
-import { useEffect, useRef } from 'react'
+import { Switch } from '@/registry/default/components/ui/switch'
 
 interface DynamicFormProps<T extends z.ZodRawShape = z.ZodRawShape> {
   schema: z.ZodObject<T>

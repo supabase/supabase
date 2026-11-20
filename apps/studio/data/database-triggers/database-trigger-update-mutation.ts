@@ -1,10 +1,12 @@
-import { useMutation, UseMutationOptions, useQueryClient } from '@tanstack/react-query'
-import { toast } from 'sonner'
-import pgMeta from '@supabase/pg-meta'
-import type { ResponseError } from 'types'
-import { databaseTriggerKeys } from './keys'
-import { executeSql } from 'data/sql/execute-sql-query'
+import pgMeta, { asWriteSql } from '@supabase/pg-meta'
 import { PGTriggerUpdate } from '@supabase/pg-meta/src/pg-meta-triggers'
+import { useMutation, useQueryClient } from '@tanstack/react-query'
+import { toast } from 'sonner'
+
+import { databaseTriggerKeys } from './keys'
+import { executeSql, type PgMetaWriteGrant } from '@/data/sql/execute-sql-mutation'
+import type { StudioError } from '@/lib/errors/studio-errors'
+import type { UseCustomMutationOptions } from '@/types'
 
 export type DatabaseTriggerUpdateVariables = {
   originalTrigger: {
@@ -14,6 +16,7 @@ export type DatabaseTriggerUpdateVariables = {
     table: string
   }
   projectRef: string
+  grant: PgMetaWriteGrant
   connectionString?: string | null
   payload: PGTriggerUpdate
 }
@@ -21,6 +24,7 @@ export type DatabaseTriggerUpdateVariables = {
 export async function updateDatabaseTrigger({
   originalTrigger,
   projectRef,
+  grant,
   connectionString,
   payload,
 }: DatabaseTriggerUpdateVariables) {
@@ -29,8 +33,11 @@ export async function updateDatabaseTrigger({
   const { result } = await executeSql({
     projectRef,
     connectionString,
-    sql,
+    sqlOrigin: 'studio',
+    queryName: 'trigger-update',
+    sql: asWriteSql(sql),
     queryKey: ['trigger', 'update', originalTrigger.id],
+    grant,
   })
 
   return result
@@ -43,27 +50,25 @@ export const useDatabaseTriggerUpdateMutation = ({
   onError,
   ...options
 }: Omit<
-  UseMutationOptions<DatabaseTriggerUpdateData, ResponseError, DatabaseTriggerUpdateVariables>,
+  UseCustomMutationOptions<DatabaseTriggerUpdateData, StudioError, DatabaseTriggerUpdateVariables>,
   'mutationFn'
 > = {}) => {
   const queryClient = useQueryClient()
 
-  return useMutation<DatabaseTriggerUpdateData, ResponseError, DatabaseTriggerUpdateVariables>(
-    (vars) => updateDatabaseTrigger(vars),
-    {
-      async onSuccess(data, variables, context) {
-        const { projectRef } = variables
-        await queryClient.invalidateQueries(databaseTriggerKeys.list(projectRef))
-        await onSuccess?.(data, variables, context)
-      },
-      async onError(data, variables, context) {
-        if (onError === undefined) {
-          toast.error(`Failed to update database trigger: ${data.message}`)
-        } else {
-          onError(data, variables, context)
-        }
-      },
-      ...options,
-    }
-  )
+  return useMutation<DatabaseTriggerUpdateData, StudioError, DatabaseTriggerUpdateVariables>({
+    mutationFn: (vars) => updateDatabaseTrigger(vars),
+    async onSuccess(data, variables, context) {
+      const { projectRef } = variables
+      await queryClient.invalidateQueries({ queryKey: databaseTriggerKeys.list(projectRef) })
+      await onSuccess?.(data, variables, context)
+    },
+    async onError(data, variables, context) {
+      if (onError === undefined) {
+        toast.error(`Failed to update database trigger: ${data.message}`)
+      } else {
+        onError(data, variables, context)
+      }
+    },
+    ...options,
+  })
 }

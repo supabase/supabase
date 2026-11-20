@@ -1,0 +1,39 @@
+import type { UseFormReturn } from 'react-hook-form'
+import { FormControl, FormField, Input } from 'ui'
+import { CollapsibleCardSection } from 'ui-patterns/CollapsibleCardSection'
+import { FormItemLayout } from 'ui-patterns/form/FormItemLayout/FormItemLayout'
+
+import type { SSOConfigFormSchema } from './SSOConfig'
+import { InlineLink } from '@/components/ui/InlineLink'
+import { DOCS_URL } from '@/lib/constants'
+
+export const SSOAdvancedSettings = ({ form }: { form: UseFormReturn<SSOConfigFormSchema> }) => (
+  <CollapsibleCardSection
+    title="Advanced settings"
+    description={
+      <>
+        Required for enterprise-managed MCP authorization.{' '}
+        <InlineLink href={`${DOCS_URL}/guides/platform/sso/enterprise-mcp-authorization`}>
+          Learn more
+        </InlineLink>
+        .
+      </>
+    }
+  >
+    <FormField
+      control={form.control}
+      name="idjagIssuerUrl"
+      render={({ field }) => (
+        <FormItemLayout
+          layout="flex-row-reverse"
+          label="ID-JAG Issuer"
+          description="Enter the issuer URL of your identity provider or Claude so that Supabase can verify your members' ID-JAGs."
+        >
+          <FormControl>
+            <Input placeholder="https://your-org.okta.com" {...field} />
+          </FormControl>
+        </FormItemLayout>
+      )}
+    />
+  </CollapsibleCardSection>
+)

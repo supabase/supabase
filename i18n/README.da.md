@@ -9,7 +9,7 @@
 
 [Supabase](https://supabase.com) er et Open Source Firebase-alternativ. Vi opbygger Firebase-funktionerne ved hjælp af open source-værktøjer i virksomhedskvalitet.
 
-- [x] Hosted Postgres Database. [Docs](https://supabase.com/docs/guides/database)
+- [x] Hosted Postgres Database. [Docs](https://supabase.com/docs/guides/database/overview)
 - [x] Autentifikation og autorisering. [Docs](https://supabase.com/docs/guides/auth)
 - [x] Automatisk genererede API'er.
   - [x] REST. [Docs](https://supabase.com/docs/guides/api#rest-api-overview)
@@ -56,7 +56,7 @@ Supabase er en kombination af open source-værktøjer. Vi opbygger funktionerne 
 **Arkitektur**
 
 Supabase er en [hosted platform](https://supabase.com/dashboard). Du kan tilmelde dig og begynde at bruge Supabase uden at installere noget.
-Du kan også [selv hoste](https://supabase.com/docs/guides/hosting/overview) og [udvikle lokalt](https://supabase.com/docs/guides/local-development).
+Du kan også [selv hoste](https://supabase.com/docs/guides/self-hosting) og [udvikle lokalt](https://supabase.com/docs/guides/local-development).
 
 ![Arkitektur](https://github.com/supabase/supabase/blob/master/apps/docs/public/img/supabase-architecture.svg)
 
@@ -64,7 +64,7 @@ Du kan også [selv hoste](https://supabase.com/docs/guides/hosting/overview) og 
 - [Realtime](https://github.com/supabase/realtime) er en Elixir-server, der giver dig mulighed for at lytte til PostgreSQL-indsættelser, -opdateringer og -slettelser ved hjælp af websockets. Realtime spørger Postgres' indbyggede replikationsfunktionalitet efter databaseændringer, konverterer ændringer til JSON og sender derefter JSON'en over websockets til autoriserede klienter.
 - [PostgREST](http://postgrest.org/) er en webserver, der forvandler din PostgreSQL-database direkte til et RESTful API
 - [pg_graphql](http://github.com/supabase/pg_graphql/) er en PostgreSQL-udvidelse, der eksponerer et GraphQL API
-- [Storage](https://github.com/supabase/storage-api) giver en RESTful grænseflade til administration af filer gemt i S3, der bruger Postgres til at administrere tilladelser.
+- [Storage](https://github.com/supabase/storage) giver en RESTful grænseflade til administration af filer gemt i S3, der bruger Postgres til at administrere tilladelser.
 - [postgres-meta](https://github.com/supabase/postgres-meta) er et RESTful API til administration af din Postgres, så du kan hente tabeller, tilføje roller og køre forespørgsler osv.
 - [GoTrue](https://github.com/netlify/gotrue) er et SWT-baseret API til administration af brugere og udstedelse af SWT-tokens.
 - [Kong](https://github.com/Kong/kong) er en cloud-nativ API-gateway.
@@ -84,9 +84,9 @@ Vores tilgang til klientbiblioteker er modulær. Hvert delbibliotek er en selvst
     <th></th>
     <th>Supabase</th>
     <th><a href="https://github.com/postgrest/postgrest" target="_blank" rel="noopener noreferrer">PostgREST</a></th>
-    <th><a href="https://github.com/supabase/gotrue" target="_blank" rel="noopener noreferrer">GoTrue</a></th>
+    <th><a href="https://github.com/supabase/auth" target="_blank" rel="noopener noreferrer">GoTrue</a></th>
     <th><a href="https://github.com/supabase/realtime" target="_blank" rel="noopener noreferrer">Realtime</a></th>
-    <th><a href="https://github.com/supabase/storage-api" target="_blank" rel="noopener noreferrer">Storage</a></th>
+    <th><a href="https://github.com/supabase/storage" target="_blank" rel="noopener noreferrer">Storage</a></th>
     <th>Functions</th>
   </tr>
   <!-- TEMPLATE FOR NEW ROW -->
@@ -106,11 +106,11 @@ Vores tilgang til klientbiblioteker er modulær. Hvert delbibliotek er en selvst
   <tr>
     <td>JavaScript (TypeScript)</td>
     <td><a href="https://github.com/supabase/supabase-js" target="_blank" rel="noopener noreferrer">supabase-js</a></td>
-    <td><a href="https://github.com/supabase/postgrest-js" target="_blank" rel="noopener noreferrer">postgrest-js</a></td>
-    <td><a href="https://github.com/supabase/gotrue-js" target="_blank" rel="noopener noreferrer">gotrue-js</a></td>
-    <td><a href="https://github.com/supabase/realtime-js" target="_blank" rel="noopener noreferrer">realtime-js</a></td>
-    <td><a href="https://github.com/supabase/storage-js" target="_blank" rel="noopener noreferrer">storage-js</a></td>
-    <td><a href="https://github.com/supabase/functions-js" target="_blank" rel="noopener noreferrer">functions-js</a></td>
+    <td><a href="https://github.com/supabase/supabase-js/tree/master/packages/core/postgrest-js" target="_blank" rel="noopener noreferrer">postgrest-js</a></td>
+    <td><a href="https://github.com/supabase/supabase-js/tree/master/packages/core/auth-js" target="_blank" rel="noopener noreferrer">auth-js</a></td>
+    <td><a href="https://github.com/supabase/supabase-js/tree/master/packages/core/realtime-js" target="_blank" rel="noopener noreferrer">realtime-js</a></td>
+    <td><a href="https://github.com/supabase/supabase-js/tree/master/packages/core/storage-js" target="_blank" rel="noopener noreferrer">storage-js</a></td>
+    <td><a href="https://github.com/supabase/supabase-js/tree/master/packages/core/functions-js" target="_blank" rel="noopener noreferrer">functions-js</a></td>
   </tr>
     <tr>
     <td>Flutter</td>
@@ -126,7 +126,7 @@ Vores tilgang til klientbiblioteker er modulær. Hvert delbibliotek er en selvst
   
   <tr>
     <td>C#</td>
-    <td><a href="https://github.com/supabase-community/supabase-csharp" target="_blank" rel="noopener noreferrer">supabase-csharp</a></td>
+    <td><a href="https://github.com/supabase/supabase-csharp" target="_blank" rel="noopener noreferrer">supabase-csharp</a></td>
     <td><a href="https://github.com/supabase-community/postgrest-csharp" target="_blank" rel="noopener noreferrer">postgrest-csharp</a></td>
     <td><a href="https://github.com/supabase-community/gotrue-csharp" target="_blank" rel="noopener noreferrer">gotrue-csharp</a></td>
     <td><a href="https://github.com/supabase-community/realtime-csharp" target="_blank" rel="noopener noreferrer">realtime-csharp</a></td>
@@ -162,7 +162,7 @@ Vores tilgang til klientbiblioteker er modulær. Hvert delbibliotek er en selvst
   </tr>
   <tr>
     <td>Python</td>
-    <td><a href="https://github.com/supabase-community/supabase-py" target="_blank" rel="noopener noreferrer">supabase-py</a></td>
+    <td><a href="https://github.com/supabase/supabase-py" target="_blank" rel="noopener noreferrer">supabase-py</a></td>
     <td><a href="https://github.com/supabase-community/postgrest-py" target="_blank" rel="noopener noreferrer">postgrest-py</a></td>
     <td><a href="https://github.com/supabase-community/gotrue-py" target="_blank" rel="noopener noreferrer">gotrue-py</a></td>
     <td><a href="https://github.com/supabase-community/realtime-py" target="_blank" rel="noopener noreferrer">realtime-py</a></td>

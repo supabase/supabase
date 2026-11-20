@@ -8,6 +8,12 @@ type PressItem = {
 const data: PressItem[] = [
   {
     type: 'article',
+    href: 'https://supabase.com/blog/supabase-series-f',
+    title: 'Supabase Series F',
+    publisher: 'Supabase',
+  },
+  {
+    type: 'article',
     href: 'https://techcrunch.com/2022/05/10/supabase-raises-80m-series-b-for-its-open-source-firebase-alternative/',
     title: 'Supabase raises $80M Series B for its open source Firebase alternative',
     publisher: 'TechCrunch',
@@ -62,7 +68,7 @@ const data: PressItem[] = [
   },
   {
     type: 'podcast',
-    href: 'https://www.heavybit.com/library/podcasts/jamstack-radio/ep-71-open-source-firebase-alternative-with-paul-copplestone-of-supabase/',
+    href: 'https://www.heavybit.com/library/podcasts/jamstack-radio/ep-71-open-source-firebase-alternative-with-paul-copplestone-of-supabase',
     title: 'Open Source Firebase Alternative with Paul Copplestone of Supabase',
     publisher: 'Jamstack',
   },

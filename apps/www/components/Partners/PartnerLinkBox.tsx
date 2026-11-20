@@ -17,7 +17,7 @@ const PartnerLinkBox = ({
   const colors = {
     amber: 'bg-amber-300 text-amber-900',
     blue: 'bg-blue-300 text-blue-900',
-    brand: 'bg-brand-300 text-brand',
+    brand: 'bg-brand-300 text-primary',
   }
 
   const content = (
@@ -25,7 +25,7 @@ const PartnerLinkBox = ({
       className="
         hover:border-foreground-lighter
         bg-surface-100
-        group cursor-pointer rounded 
+        group cursor-pointer rounded-sm 
         border px-5 py-4 
         "
     >
