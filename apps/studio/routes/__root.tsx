@@ -436,13 +436,15 @@ function RootDocument({ children }: Readonly<{ children: ReactNode }>) {
         {!isTestEnv && (
           <TanStackDevtools
             // Hide the trigger by default so it doesn't overlap the dev toolbar.
-            // Open the panel with Ctrl + Shift + ~; un-hide the trigger from its
-            // settings tab. The library default (Control + ~) never fires on
-            // layouts where ~ needs Shift, because the hotkey match is exact.
+            // Open the panel with Ctrl + Shift + L; un-hide the trigger from its
+            // settings tab. Use a letter key: the library's default (Control + ~)
+            // needs Shift on most layouts, and a shifted symbol can stay stuck
+            // in its pressed-keys list (keyup reports ` instead of ~), which
+            // blocks the hotkey until a reload.
             config={{
               position: 'bottom-right',
               triggerHidden: true,
-              openHotkey: ['Control', 'Shift', '~'],
+              openHotkey: ['Control', 'Shift', 'L'],
             }}
             plugins={[
               {
