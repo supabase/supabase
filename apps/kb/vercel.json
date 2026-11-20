@@ -583,6 +583,7 @@
       "destination": "/kb/troubleshooting/why-supabase-edge-functions-cannot-provide-static-egress-ips-for-whitelisting-3d78b0.md",
       "permanent": true
     },
+    { "source": "/kb/sitemap.xml", "destination": "/kb/sitemap-index.xml", "permanent": true },
     { "source": "/kb/sitemap.md", "destination": "/kb/markdown/sitemap.md", "permanent": true },
     {
       "source": "/kb/guides/:path+.md",
