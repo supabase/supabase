@@ -40,9 +40,7 @@ export function ScopePermissionLabel({ permission }: { permission: string }) {
   return (
     <Tooltip>
       <TooltipTrigger className={TOOLTIP_UNDERLINE_CLASS_NAME}>{label}</TooltipTrigger>
-      <TooltipContent className="max-w-60">
-        {description}
-      </TooltipContent>
+      <TooltipContent className="max-w-60">{description}</TooltipContent>
     </Tooltip>
   )
 }
