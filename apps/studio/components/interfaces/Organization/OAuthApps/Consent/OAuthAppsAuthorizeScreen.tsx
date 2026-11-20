@@ -80,6 +80,7 @@ export const OAuthAppsAuthorizeScreen = ({
   const handleOrganizationChange = (slug: string) => {
     setOrganizationSlug(slug)
     setSelectedProjectRefs([])
+    setAllProjectsSelected(false)
   }
 
   const {

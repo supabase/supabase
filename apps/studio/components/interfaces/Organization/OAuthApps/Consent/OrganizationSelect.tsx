@@ -59,6 +59,7 @@ export const OrganizationSelect = ({
                   <CommandItem
                     key={organization.id}
                     value={organization.slug}
+                    keywords={[organization.name]}
                     onSelect={() => {
                       onOrganizationChange(organization.slug)
                       setOpen(false)
