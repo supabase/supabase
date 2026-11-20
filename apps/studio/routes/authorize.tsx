@@ -1,4 +1,4 @@
-import { createFileRoute, useLocation, useNavigate } from '@tanstack/react-router'
+import { createFileRoute, useNavigate } from '@tanstack/react-router'
 import { useFlag, useParams } from 'common'
 import { ChevronDownIcon } from 'lucide-react'
 import {
@@ -12,7 +12,7 @@ import {
 
 import { ApiAuthorizationScreen } from '@/components/interfaces/ApiAuthorization/ApiAuthorization'
 import { OAuthAppsAuthorizeScreen } from '@/components/interfaces/Organization/OAuthApps/Consent'
-import { OAUTH_APPS_MOCK_SCENARIOS, USE_MOCKS } from '@/data/oauth-apps/mocks'
+import { OAUTH_APPS_MOCK_SCENARIOS } from '@/data/oauth-apps/mocks'
 import { withAuth } from '@/hooks/misc/withAuth'
 import { BASE_PATH, IS_STAGING_OR_LOCAL } from '@/lib/constants'
 import { buildStudioPageTitle } from '@/lib/page-title'
@@ -81,26 +81,15 @@ const CONSENT_PREVIEWS = [
 
 function APIAuthorizationPage() {
   const navigate = useNavigate()
-  const { searchStr } = useLocation()
-  const { auth_id, organization_slug, mock_scenario } = useParams()
+  const { auth_id, organization_slug, project_ref, mock_scenario } = useParams()
   const isScopedOAuthConsentEnabled = useFlag('enableScopedOAuthConsent')
   const consentPreview =
     !auth_id && (import.meta.env.DEV || IS_STAGING_OR_LOCAL)
       ? CONSENT_PREVIEWS.find(({ value }) => value === mock_scenario)
       : undefined
-  const isScopedOAuthFlowEnabled =
-    USE_MOCKS && (isScopedOAuthConsentEnabled || Boolean(consentPreview))
+  const mockScenario = consentPreview ? MOCK_SCENARIOS[consentPreview.value] : undefined
 
-  const mockScenario = USE_MOCKS
-    ? (MOCK_SCENARIOS[mock_scenario ?? 'default'] ?? MOCK_SCENARIOS.default)
-    : undefined
-  const authId = mockScenario?.authId ?? auth_id
-  const organizationSlug = organization_slug ?? mockScenario?.organizationSlug
-
-  // first value when the param repeats, like Next's query arrays
-  const projectRef = new URLSearchParams(searchStr).get('project_ref')
-
-  if (isScopedOAuthFlowEnabled) {
+  if (isScopedOAuthConsentEnabled || mockScenario) {
     return (
       <>
         <title>{PAGE_TITLE}</title>
@@ -139,11 +128,15 @@ function APIAuthorizationPage() {
           </div>
         )}
         <OAuthAppsAuthorizeScreen
-          key={consentPreview?.value}
-          authId={authId}
-          organizationSlug={organizationSlug}
-          projectRef={projectRef}
-          navigate={(destination) => void navigate({ href: destination })}
+          key={consentPreview?.value ?? auth_id}
+          authId={mockScenario?.authId ?? auth_id}
+          isPreview={mockScenario != null}
+          organizationSlug={
+            mockScenario?.organizationSlug ??
+            (organization_slug && project_ref ? organization_slug : undefined)
+          }
+          projectRef={mockScenario || organization_slug ? project_ref : undefined}
+          navigate={(destination) => navigate({ href: destination })}
         />
       </>
     )

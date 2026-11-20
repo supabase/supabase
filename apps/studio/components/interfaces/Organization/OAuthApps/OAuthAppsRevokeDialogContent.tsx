@@ -13,11 +13,11 @@ import {
 } from 'ui'
 
 import { AlertError } from '@/components/ui/AlertError'
+import { OAuthApproval } from '@/data/oauth-apps/oauth-apps-approvals-query'
 import { useOAuthAppRevokeMutation } from '@/data/oauth-apps/oauth-apps-revoke-mutation'
-import type { OAuthApprovalItem } from '@/data/oauth-apps/types'
 
 export interface OAuthAppsRevokeDialogProps extends ComponentProps<typeof DialogContent> {
-  approval?: OAuthApprovalItem
+  approval?: OAuthApproval
   onClose: () => void
 }
 

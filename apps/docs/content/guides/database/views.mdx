@@ -78,6 +78,10 @@ create view <view name> with(security_invoker=true) as (
 );
 ```
 
+When you query a `security_invoker` view through the Data API, Postgres checks the role from the request's API key or JWT: `anon`, `authenticated`, or `service_role`. That role needs privileges, such as `select`, on every table the view reads, not only on the view. Postgres logs show `authenticator`, but that's the role the Data API connects as, not the role the view checks.
+
+By default, API roles have no privileges on tables in the `auth` schema. A `security_invoker` view that reads `auth.users` fails with `permission denied for table users`, even with a secret key. To expose user data through the Data API, store it in a table in the `public` schema. See [User management](/docs/guides/auth/managing-user-data).
+
 ## When to use views
 
 Views provide several benefits.

@@ -1,14 +1,17 @@
+import { components } from 'api-types'
 import type { ReactNode } from 'react'
 import { Button } from 'ui'
 
 import { ScopeGroupCard } from './ScopeGroupCard'
-import type { OAuthAppsAuthorizeOrganizationProject } from '@/data/oauth-apps/types'
 
 export type AuthorizeSuccessGrant = {
   email: string
   organization_slug: string
   project_refs: string[] | null
-  projects: OAuthAppsAuthorizeOrganizationProject[]
+  projects: Pick<
+    components['schemas']['OrganizationProjectsResponse_Output']['projects'][number],
+    'ref' | 'name'
+  >[]
   scopes?: string[]
 }
 

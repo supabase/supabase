@@ -8,7 +8,6 @@ import { cn } from 'ui'
 import { useMobileSheet } from '../Navigation/NavigationBar/MobileSheetContext'
 import { AccountMenuContent } from './AccountMenuContent'
 import { WithSidebar } from './WithSidebar'
-import { USE_MOCKS } from '@/data/oauth-apps/mocks'
 import { useCustomContent } from '@/hooks/custom-content/useCustomContent'
 import { useLastVisitedOrganization } from '@/hooks/misc/useLastVisitedOrganization'
 import { withAuth } from '@/hooks/misc/withAuth'
@@ -27,7 +26,7 @@ const AccountLayout = ({ children, title }: PropsWithChildren<AccountLayoutProps
   const { setContent: setMobileSheetContent, registerOpenMenu } = useMobileSheet()
   const currentPath = router.pathname
 
-  const showOAuthApps = useFlag('enableScopedOAuthManage') && USE_MOCKS
+  const showOAuthApps = useFlag('enableScopedOAuthManage')
   const { appTitle } = useCustomContent(['app:title'])
   const brandTitle = appTitle || 'Supabase'
   const surfaceLabel = IS_PLATFORM ? 'Account' : 'Preferences'

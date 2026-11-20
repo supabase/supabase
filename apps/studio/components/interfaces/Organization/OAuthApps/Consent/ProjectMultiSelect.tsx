@@ -1,4 +1,5 @@
 import { useIntersectionObserver } from '@uidotdev/usehooks'
+import { components } from 'api-types'
 import { useEffect, useId } from 'react'
 import { cn, RadioGroup, RadioGroupItem } from 'ui'
 import {
@@ -10,16 +11,20 @@ import {
   MultiSelectorTrigger,
 } from 'ui-patterns/multi-select'
 
-import type {
-  OAuthAppsAuthorizeOrganizationProject,
-  OAuthAppsAuthorizeRequest,
-} from '@/data/oauth-apps/types'
+import type { OAuthAppsAuthorizeRequest } from '@/data/oauth-apps/types'
 
 export const MAX_SELECTED_PROJECTS = 10
 
 export interface ProjectMultiSelectProps {
-  projects: OAuthAppsAuthorizeOrganizationProject[]
-  selectedProjects: OAuthAppsAuthorizeOrganizationProject[]
+  projects: Pick<
+    components['schemas']['OrganizationProjectsResponse_Output']['projects'][number],
+    'ref' | 'name'
+  >[]
+  selectedProjectRefs: string[]
+  selectedProjects: Pick<
+    components['schemas']['OrganizationProjectsResponse_Output']['projects'][number],
+    'ref' | 'name'
+  >[]
   onChange: (selectedProjects: string[]) => void
   maxSelected?: number
   error?: string
@@ -35,6 +40,7 @@ export interface ProjectMultiSelectProps {
 export const ProjectMultiSelect = ({
   projects,
   selectedProjects,
+  selectedProjectRefs,
   onChange,
   maxSelected = MAX_SELECTED_PROJECTS,
   error,
@@ -97,7 +103,7 @@ export const ProjectMultiSelect = ({
         </h2>
         {!allProjectsSelected && showCounter && (
           <p className="text-xs text-foreground-lighter">
-            {selectedProjects.length}/{maxSelected}
+            {selectedProjectRefs.length}/{maxSelected}
           </p>
         )}
       </div>
@@ -129,13 +135,15 @@ export const ProjectMultiSelect = ({
       {!allProjectsSelected && (
         <>
           <MultiSelector
-            values={selectedProjects.map((p) => p.ref)}
+            values={selectedProjectRefs}
             onValuesChange={handleValuesChange}
             onSearchChange={onSearchChange}
           >
             <MultiSelectorTrigger
+              id="projects"
               aria-labelledby={labelId}
               className="group"
+              aria-describedby="projects-description"
               label="Select projects..."
               badgeLimit={2}
               deletableBadge
@@ -150,7 +158,7 @@ export const ProjectMultiSelect = ({
               <MultiSelectorInput placeholder="Search projects" showResetIcon />
               <MultiSelectorList emptyLabel="No projects found">
                 {projects.map((project) => {
-                  const isSelected = selectedProjects.some((p) => p.ref === project.ref)
+                  const isSelected = selectedProjectRefs.some((ref) => ref === project.ref)
                   return (
                     <MultiSelectorItem
                       key={project.ref}
@@ -191,20 +199,22 @@ export const ProjectMultiSelect = ({
               </MultiSelectorList>
             </MultiSelectorContent>
           </MultiSelector>
-
-          {hasFlagged && (
-            <p className="text-xs text-destructive">
-              {`${flaggedRefs.length} of ${selectedProjects.length} ${selectedProjects.length === 1 ? 'project' : 'projects'} unavailable`}
-            </p>
-          )}
-          {atCap && (
-            <p className="text-xs text-foreground-lighter">
-              Maximum reached. Deselect a project to choose a different one.
-            </p>
-          )}
-          {error && <p className="text-xs text-foreground-light">{error}</p>}
         </>
       )}
+
+      <div id="projects-description" aria-live="polite">
+        {hasFlagged && (
+          <p className="text-xs text-destructive">
+            {`${flaggedRefs.length} of ${selectedProjectRefs.length} ${selectedProjectRefs.length === 1 ? 'project' : 'projects'} unavailable`}
+          </p>
+        )}
+        {atCap && (
+          <p className="text-xs text-foreground-lighter">
+            Maximum reached. Deselect a project to choose a different one.
+          </p>
+        )}
+        {error && <p className="text-xs text-destructive">{error}</p>}
+      </div>
     </div>
   )
 }

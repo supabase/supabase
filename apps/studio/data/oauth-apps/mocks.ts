@@ -1,10 +1,6 @@
 import dayjs from 'dayjs'
 
-import type { OAuthAppsAuthorizeIdentity } from './oauth-apps-authorize-organizations-query'
 import type {
-  ListOAuthApprovalsResponse,
-  ListOrgAppGrantsResponse,
-  ListOwnGrantsResponse,
   OAuthAppsAuthorizeApproveResult,
   OAuthAppsAuthorizeOrganizationProject,
   OAuthAppsAuthorizePreflightResult,
@@ -18,8 +14,7 @@ import type {
 import { isWriteScope } from './types'
 import type { OrganizationRole } from '@/data/organization-members/organization-roles-query'
 
-const ENABLE_MOCKS = true
-export const USE_MOCKS = ENABLE_MOCKS && process.env.NEXT_PUBLIC_ENVIRONMENT !== 'prod'
+type OAuthAppsAuthorizeIdentity = { email: string; organizations: OAuthOrganizationRole[] }
 
 export const OAUTH_APPS_MOCK_SCENARIOS = {
   vercelDeveloper: 'mock-vercel-developer',
@@ -436,169 +431,6 @@ const MOCK_ORGANIZATIONS_BY_SLUG: Record<string, OAuthOrganizationRole> = {
   'litware-inc': LITWARE_DEVELOPER,
 }
 
-const MOCK_APPROVALS: ListOAuthApprovalsResponse = {
-  data: [
-    {
-      id: 'vercel',
-      type: 'oauth_app',
-      attributes: {
-        app: {
-          name: 'Vercel',
-          icon: null,
-          created_by: '',
-        },
-        target: 'organization_and_members',
-        org_grant: null,
-        last_approved_at: '',
-      },
-    },
-    {
-      id: 'dynamic-mcp-client',
-      type: 'oauth_app',
-      attributes: {
-        app: {
-          name: 'Northwind MCP',
-          icon: null,
-          created_by: '',
-        },
-        target: 'members',
-        org_grant: null,
-        last_approved_at: '',
-      },
-    },
-    {
-      id: 'contoso-analytics',
-      type: 'oauth_app',
-      attributes: {
-        app: {
-          name: 'Contoso Analytics',
-          icon: null,
-          created_by: '',
-        },
-        target: 'organization',
-        org_grant: {
-          grant_id: 'grant-contoso-analytics-org',
-          approved_scopes: ['analytics:read', 'projects:read'],
-          approved_at: '2025-11-03T14:20:00.000Z',
-        },
-        last_approved_at: '',
-      },
-    },
-  ],
-  links: { next: null },
-}
-
-const MOCK_APP_GRANTS: Record<string, ListOrgAppGrantsResponse> = {
-  vercel: {
-    data: [
-      {
-        grant_id: 'grant-vercel-admin',
-        kind: 'member_bound',
-        user: {
-          gotrue_id: 'b1d3e2f4-0000-4000-8000-000000000001',
-          email: 'admin@example.com',
-        },
-        projects: [
-          { ref: 'northwindstorefront1', name: 'northwind-storefront' },
-          { ref: 'northwindcms1', name: 'northwind-cms' },
-        ],
-        approved_scopes: ['database:read', 'database:write', 'projects:read'],
-        approved_at: '2026-08-18T09:12:00.000Z',
-      },
-      ...Array.from({ length: 50 }, (_, index) => ({
-        grant_id: `grant-vercel-developer-${index}`,
-        kind: 'member_bound' as const,
-        user: {
-          gotrue_id: `b1d3e2f4-0000-4000-8000-0000000000${index.toString().padStart(2, '0')}`,
-          email: `developer${index}@example.com`,
-          avatar_url: 'https://avatars.example/developer.png',
-        },
-        projects: [{ ref: 'northwindcms1', name: 'northwind-cms' }],
-        approved_scopes: ['projects:read'],
-        approved_at: '2026-08-16T11:30:00.000Z',
-      })),
-    ],
-    pagination: { next_cursor: null },
-  },
-  'dynamic-mcp-client': {
-    data: [
-      {
-        grant_id: 'grant-northwind-mcp-ops',
-        kind: 'member_bound',
-        user: {
-          gotrue_id: 'b1d3e2f4-0000-4000-8000-000000000003',
-          email: 'ops@example.com',
-        },
-        projects: [{ ref: 'northwindstorefront1', name: 'northwind-storefront' }],
-        approved_scopes: ['database:read', 'database:write'],
-        approved_at: '2026-09-01T08:45:00.000Z',
-      },
-    ],
-    pagination: { next_cursor: null },
-  },
-  'contoso-analytics': {
-    data: [
-      {
-        grant_id: 'grant-contoso-analytics-org',
-        kind: 'organization_bound',
-        user: null,
-        projects: null,
-        approved_scopes: ['analytics:read', 'projects:read'],
-        approved_at: '2025-11-03T14:20:00.000Z',
-      },
-    ],
-    pagination: { next_cursor: null },
-  },
-}
-
-const MOCK_OWN_GRANTS: ListOwnGrantsResponse = {
-  data: [
-    {
-      grant_id: 'grant-vercel-admin',
-      app: { id: 'vercel', name: 'Vercel', icon: null },
-      organization: { slug: 'northwind-traders', name: 'Northwind Traders' },
-      projects: [
-        { ref: 'northwindstorefront1', name: 'northwind-storefront' },
-        { ref: 'northwindcms1', name: 'northwind-cms' },
-      ],
-      approved_scopes: ['database:read', 'database:write', 'projects:read'],
-      approved_at: '2026-08-18T09:12:00.000Z',
-    },
-    {
-      grant_id: 'grant-northwind-mcp-ops',
-      app: { id: 'dynamic-mcp-client', name: 'Northwind MCP', icon: null },
-      organization: { slug: 'northwind-traders', name: 'Northwind Traders' },
-      projects: [{ ref: 'northwindstorefront1', name: 'northwind-storefront' }],
-      approved_scopes: ['database:read', 'database:write'],
-      approved_at: '2026-09-01T08:45:00.000Z',
-    },
-    {
-      grant_id: 'kemal-bot-all-projects',
-      app: { id: 'kemal-bot', name: 'kemal-bot', icon: null },
-      organization: { slug: 'northwind-traders', name: 'Northwind Traders' },
-      // Targets all projects
-      projects: null,
-      approved_scopes: ['database:read', 'database:write'],
-      approved_at: '2026-09-20T14:30:00.000Z',
-    },
-  ],
-  pagination: { next_cursor: null },
-}
-
-// Fixture lists are small and static — cursor is accepted for real-endpoint parity but not
-// used to actually paginate the mock data.
-export function getMockOAuthApprovals(_cursor?: string): ListOAuthApprovalsResponse {
-  return MOCK_APPROVALS
-}
-
-export function getMockOAuthAppGrants(appId: string, _cursor?: string): ListOrgAppGrantsResponse {
-  return MOCK_APP_GRANTS[appId] ?? { data: [], pagination: { next_cursor: null } }
-}
-
-export function getMockOAuthOwnGrants(_cursor?: string): ListOwnGrantsResponse {
-  return MOCK_OWN_GRANTS
-}
-
 export function getMockOAuthAppsAuthorizeRequest(authId: string): OAuthAppsAuthorizeRequest {
   const request = MOCK_AUTHORIZE_REQUESTS[authId]
   if (!request) throw new Error(`No mock authorize request for id "${authId}"`)
@@ -615,10 +447,6 @@ export function getMockOAuthAppsAuthorizeOrganizationProjects(
   slug: string
 ): OAuthAppsAuthorizeOrganizationProject[] {
   return MOCK_ORGANIZATION_PROJECTS[slug] ?? []
-}
-
-export function getMockOAuthOrgAppDetails(slug: string, appId: string): OAuthOrgAppDetails {
-  return MOCK_ORG_APP_DETAILS[slug]?.[appId] ?? DEFAULT_ORG_APP_DETAILS
 }
 
 function findMockOrganization(authId: string, slug: string): OAuthOrganizationRole | undefined {

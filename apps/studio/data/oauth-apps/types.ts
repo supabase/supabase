@@ -58,30 +58,6 @@ export type OAuthOrgAppDetails = {
   existing_grant: OAuthExistingGrant | null
 }
 
-export function getPreselectedProjectRefs({
-  existingGrant,
-  projectRef,
-  liveProjects,
-}: {
-  existingGrant: OAuthExistingGrant | null
-  projectRef: string | null
-  liveProjects: OAuthAppsAuthorizeOrganizationProject[]
-}): string[] {
-  const liveRefs = new Set(liveProjects.map((project) => project.ref))
-  const candidates = existingGrant?.project_refs?.length
-    ? existingGrant.project_refs
-    : projectRef
-      ? [projectRef]
-      : []
-  return candidates.filter((ref) => liveRefs.has(ref))
-}
-
-export type OAuthAuthorizeApproveRequest = {
-  // not allowed when project_scoping_mode is false.
-  // when project_scoping_mode is true, if omitted, this means all projects
-  project_refs?: string[]
-}
-
 export type OAuthAppsAuthorizeRedirect =
   components['schemas']['ApproveAuthorizationResponse_Output']
 
@@ -108,11 +84,6 @@ export type OAuthScopeValidationResult =
       }>
     }
 
-export type OAuthScopeValidationProjectFailure = Extract<
-  OAuthScopeValidationResult,
-  { scope_target: 'projects' }
->['failures'][number]
-
 export type OAuthAppsAuthorizeRoleValidationFailure = {
   status: 'error'
   error_code: 'role_validation_failed'
@@ -121,15 +92,6 @@ export type OAuthAppsAuthorizeRoleValidationFailure = {
 }
 
 export type OAuthAppsAuthorizeApproveResult = OAuthAppsAuthorizeRedirect
-
-export function getFailedProjects(
-  failure: OAuthScopeValidationResult | null | undefined
-): OAuthScopeValidationProjectFailure[] {
-  if (!failure) return []
-  return failure.scope_target === 'projects' ? failure.failures : []
-}
-
-export type OAuthAppsAuthorizePreflightSuccess = { status: 'success' }
 
 export type OAuthAppsAuthorizePreflightResult = {
   existing_grant: OAuthExistingGrant | null
@@ -142,61 +104,13 @@ export type OAuthAppsAuthorizePreflightResult = {
   } | null
 }
 
-export type OAuthApprovalTarget = 'organization' | 'members' | 'organization_and_members'
-
-export type OAuthApprovalItem = {
-  id: string
-  type: 'oauth_app'
-  attributes: {
-    app: {
-      name: string
-      created_by: string | null
-      icon: string | null
-    }
-    last_approved_at: string
-    target: OAuthApprovalTarget
-    org_grant: {
-      grant_id: string
-      approved_scopes: string[]
-      approved_at: string
-    } | null
-  }
-}
-
-export type ListOAuthApprovalsResponse = {
-  data: OAuthApprovalItem[]
-  links: { next: string | null }
-}
-
-export type OAuthGrantProject = {
-  ref: string
-  name: string
-}
-
-export type OAuthGrantItem = {
-  grant_id: string
-  kind: OAuthGrantKind
-  user: { gotrue_id: string; email: string; avatar_url?: string } | null
-  projects: OAuthGrantProject[] | null
-  approved_scopes: string[]
-  approved_at: string
-}
-
-export type ListOrgAppGrantsResponse = {
-  data: OAuthGrantItem[]
-  pagination: { next_cursor: string | null }
-}
-
-export type MemberOauthGrantItem = {
-  grant_id: string
-  app: { id: string; name: string; icon: string | null }
-  organization: { slug: string; name: string }
-  projects: OAuthGrantProject[] | null
-  approved_scopes: string[]
-  approved_at: string
-}
-
-export type ListOwnGrantsResponse = {
-  data: MemberOauthGrantItem[]
-  pagination: { next_cursor: string | null }
+export function isOAuthRoleValidationError(
+  err: unknown
+): err is OAuthAppsAuthorizeRoleValidationFailure {
+  return (
+    typeof err === 'object' &&
+    err !== null &&
+    'error_code' in err &&
+    err.error_code === 'role_validation_failed'
+  )
 }
