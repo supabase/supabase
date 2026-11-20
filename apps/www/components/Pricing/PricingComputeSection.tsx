@@ -1,8 +1,7 @@
 'use client'
 
 import { ChevronDownIcon } from '@heroicons/react/outline'
-import React, { useEffect, useRef, useState } from 'react'
-import { useWindowSize } from 'react-use'
+import React, { useState } from 'react'
 import { plans as allPlans } from 'shared-data/plans'
 import { Button, cn, ToggleGroup, ToggleGroupItem } from 'ui'
 
@@ -10,6 +9,7 @@ import Panel from '../Panel'
 import ComputePricingCalculator from './ComputePricingCalculator'
 import ComputePricingTable from './ComputePricingTable'
 import PricingComputeAnimation from './PricingComputeAnimation'
+import { Check } from './PricingIcons'
 
 const plans = allPlans
   .filter((plan) => plan.planId === 'pro' || plan.planId === 'team')
@@ -18,48 +18,62 @@ const plans = allPlans
     price: plan.priceMonthly as number,
   }))
 
+const PLAN_HIGHLIGHTS: Record<string, { preface: string; features: string[] }> = {
+  Pro: {
+    preface: 'Everything in the Free Plan, plus:',
+    features: [
+      '100K monthly active users',
+      '8 GB disk size per project',
+      '250 GB bandwidth',
+      'Daily backups (7 day retention)',
+      'Email support',
+    ],
+  },
+  Team: {
+    preface: 'Everything in the Pro Plan, plus:',
+    features: [
+      'SOC2 & ISO 27001',
+      'Project-scoped and read-only access',
+      'HIPAA available as paid add-on',
+      'SSO for Supabase Dashboard',
+      'Priority email support & SLAs',
+      'Daily backups (14 day retention)',
+    ],
+  },
+}
+
 const PricingComputeSection = () => {
-  const ref = useRef<HTMLDivElement>(null)
   const [showTable, setShowTable] = useState(false)
-  const { width } = useWindowSize()
-  const [height, setHeight] = useState(ref?.current?.clientHeight)
   const [activePlan, setActivePlan] = useState(plans[0])
 
-  useEffect(() => {
-    setHeight(ref?.current?.clientHeight)
-  }, [width])
+  const handleTableToggle = () => setShowTable((isShown) => !isShown)
 
   return (
     <Panel outerClassName="w-full mx-auto max-w-6xl" innerClassName="flex flex-col">
       <div className="flex flex-col xl:grid xl:grid-cols-3 xl:gap-4">
         <div className="p-4 pb-0 lg:p-8 gap-4 flex flex-col">
-          <div className="mb-4 grid gap-1">
+          <div className="mb-2 flex flex-wrap items-center gap-3">
             <h3 className="text-foreground-light text-lg">1. Choose your plan</h3>
+            <ToggleGroup
+              type="single"
+              variant="segmented"
+              size="tiny"
+              allowDeselect={false}
+              aria-label="Plan"
+              value={activePlan.name}
+              onValueChange={(value) => {
+                const selectedPlan = plans.find((p) => p.name === value)
+                if (selectedPlan) setActivePlan(selectedPlan)
+              }}
+              className="bg-surface-200"
+            >
+              {plans.map((plan) => (
+                <ToggleGroupItem key={plan.name} value={plan.name}>
+                  {plan.name}
+                </ToggleGroupItem>
+              ))}
+            </ToggleGroup>
           </div>
-          <ToggleGroup
-            type="single"
-            value={activePlan.name}
-            onValueChange={(value) => {
-              const selectedPlan = plans.find((p) => p.name === value)
-              if (selectedPlan) setActivePlan(selectedPlan)
-            }}
-            className="grid grid-cols-2 gap-2 w-full bg-surface-200 rounded-md"
-          >
-            {plans.map((plan) => (
-              <ToggleGroupItem
-                key={plan.name}
-                value={plan.name}
-                className={cn(
-                  'w-full h-6 ',
-                  activePlan.name === plan.name
-                    ? 'bg-surface-200 text-foreground data-[state=on]:bg-surface-400 data-[state=on]:text-foreground'
-                    : 'hover:bg-surface-200'
-                )}
-              >
-                {plan.name}
-              </ToggleGroupItem>
-            ))}
-          </ToggleGroup>
 
           <div className="grid gap-3">
             <h3 className="text-foreground text-2xl font-medium">{activePlan.name}</h3>
@@ -70,31 +84,23 @@ const PricingComputeSection = () => {
               </p>
             </div>
             <div className="grid gap-2 text-sm">
-              {activePlan.name === 'Pro' && (
+              {PLAN_HIGHLIGHTS[activePlan.name] ? (
                 <>
                   <p className="text-foreground-light font-medium">
-                    Everything in the Free Plan, plus:
+                    {PLAN_HIGHLIGHTS[activePlan.name].preface}
                   </p>
-                  <p className="text-foreground-light">100K monthly active users</p>
-                  <p className="text-foreground-light">8 GB disk size per project</p>
-                  <p className="text-foreground-light">250 GB bandwidth</p>
-                  <p className="text-foreground-light">Daily backups (7 day retention)</p>
-                  <p className="text-foreground-light">Email support</p>
+                  <ul className="grid gap-2">
+                    {PLAN_HIGHLIGHTS[activePlan.name].features.map((feature) => (
+                      <li key={feature} className="flex items-start gap-2 text-foreground-light">
+                        <span className="flex h-lh shrink-0 items-center">
+                          <Check className="size-5 -ml-0.5" />
+                        </span>
+                        {feature}
+                      </li>
+                    ))}
+                  </ul>
                 </>
-              )}
-              {activePlan.name === 'Team' && (
-                <>
-                  <p className="text-foreground-light font-medium">
-                    Everything in the Pro Plan, plus:
-                  </p>
-                  <p className="text-foreground-light">SOC2 & ISO 27001</p>
-                  <p className="text-foreground-light">Project-scoped and read-only access</p>
-                  <p className="text-foreground-light">HIPAA available as paid add-on</p>
-                  <p className="text-foreground-light">SSO for Supabase Dashboard</p>
-                  <p className="text-foreground-light">Priority email support & SLAs</p>
-                  <p className="text-foreground-light">Daily backups (14 day retention)</p>
-                </>
-              )}
+              ) : null}
               <p className="text-foreground-lighter text-xs mt-2">
                 Paid plans include $10/mo in compute credits, enough to cover one Micro instance.
               </p>
@@ -112,14 +118,12 @@ const PricingComputeSection = () => {
           <ComputePricingCalculator activePlan={activePlan} />
         </div>
       </div>
-      <hr className="border-0 border-t" />
+      <div aria-hidden="true" className="h-0.5 groove" />
       <div className="flex flex-col">
-        <div className="flex flex-col items-start md:flex-row gap-2 p-6 justify-between md:items-center mt-2">
+        <div className="flex flex-col items-start md:flex-row gap-2 p-6 justify-between md:items-end mt-2">
           <div className="grid gap-2">
-            <p>
-              <span className="border bg-alternative px-3 py-0.5 text-foreground text-sm rounded-full text-nowrap">
-                Starts from <span translate="no">$10</span>/month
-              </span>
+            <p className="text-foreground-light text-sm">
+              Starts from <span translate="no">$10</span>/month
             </p>
             <h3 className="text-foreground text-2xl ml-0.5 md:ml-0 mb-2 md:mb-0">
               Scale compute up to
@@ -133,22 +137,29 @@ const PricingComputeSection = () => {
             </a>
           </Button>
         </div>
-        <div
-          className="relative w-full overflow-hidden transition-all ease-[cubic-bezier(.76,0,.23,1)]! duration-300"
-          style={{ height: showTable ? `${height}px` : '200px' }}
-        >
+        <div className="relative">
           <div
+            inert={!showTable}
             className={cn(
-              'absolute inset-0 top-auto w-full h-40 bg-linear-to-t from-background-surface-100 z-20 to-transparent transition-opacity pointer-events-none not-sr-only',
-              showTable ? 'opacity-0 delay-200' : 'opacity-100'
+              'relative w-full overflow-hidden [interpolate-size:allow-keywords]',
+              'transition-[max-height] duration-300 ease-out motion-reduce:transition-none',
+              showTable ? 'max-h-max' : 'max-h-50'
             )}
-          />
-          <div ref={ref}>
+          >
+            <div
+              className={cn(
+                'pointer-events-none absolute inset-x-0 bottom-0 z-20 h-40',
+                'bg-linear-to-t from-background-surface-100 to-transparent',
+                'transition-opacity duration-300 ease-out motion-reduce:transition-none',
+                showTable && 'opacity-0'
+              )}
+            />
             <ComputePricingTable />
 
-            <div className="grid lg:grid-cols-2 gap-4 md:gap-8 mt-4 md:mt-0 border-t">
-              <div className="max-w-4xl prose p-4 md:p-8 relative z-10">
-                <h4 className="text-lg">Choose the best compute size for you</h4>
+            <div aria-hidden="true" className="h-0.5 groove" />
+            <div className="grid lg:grid-cols-2 gap-4 md:gap-8 mt-4 md:mt-0">
+              <div className="max-w-4xl prose p-4 pb-16 md:p-8 md:pb-20 relative z-10">
+                <h4 className="text-lg font-medium">Choose the best compute size for you</h4>
                 <p className="text-[13px] text-foreground-lighter">
                   Every project on the Supabase Platform comes with its own dedicated Postgres
                   instance. Select the compute size that fits your needs.
@@ -183,23 +194,27 @@ const PricingComputeSection = () => {
               </div>
             </div>
           </div>
-        </div>
-        <button
-          tabIndex={0}
-          onClick={() => setShowTable(!showTable)}
-          className="group w-full p-2 border-t border-muted text-foreground outline-hidden rounded-b-xl text-sm bg-alternative flex items-center justify-center"
-        >
-          {/* Label-scoped ring: full-bleed focus-ring clips under Panel overflow-hidden */}
-          <span className="inline-flex items-center gap-2 rounded-md px-2 py-0.5 group-focus-visible:ring-2 group-focus-visible:ring-ring">
-            <ChevronDownIcon
+          <div className="absolute inset-x-0 bottom-4 z-30 flex justify-center">
+            <button
+              type="button"
+              tabIndex={0}
+              onClick={handleTableToggle}
+              aria-expanded={showTable}
               className={cn(
-                'w-4 transition-transform transform origin-center',
-                showTable ? 'rotate-180' : 'rotate-0'
+                'inline-flex cursor-pointer items-center gap-1.5 rounded-full pl-2.5 pr-3 py-1 text-xs text-foreground',
+                'bg-surface-200/90 shadow-sm ring-1 ring-foreground/10 backdrop-blur-sm',
+                'transition-[background-color,scale] duration-200 ease-out',
+                'hover:bg-surface-300 active:scale-96 focus-ring'
               )}
-            />
-            {!showTable ? 'Expand' : 'Hide'} Pricing breakdown
-          </span>
-        </button>
+            >
+              <ChevronDownIcon
+                aria-hidden="true"
+                className={cn('size-3.5', showTable && 'rotate-180')}
+              />
+              {showTable ? 'Hide pricing breakdown' : 'Show pricing breakdown'}
+            </button>
+          </div>
+        </div>
       </div>
     </Panel>
   )
