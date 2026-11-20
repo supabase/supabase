@@ -27,6 +27,7 @@ create extension pgmq;
 Create a new queue.
 
 {/* prettier-ignore */}
+
 ```sql
 pgmq.create(queue_name text)
 returns void
@@ -34,13 +35,14 @@ returns void
 
 **Parameters:**
 
-| Parameter  | Type | Description           |
-| :--------- | :--- | :-------------------- |
+| Parameter | Type | Description |
+| --- | --- | --- |
 | queue_name | text | The name of the queue |
 
 Example:
 
 {/* prettier-ignore */}
+
 ```sql
 select from pgmq.create('my_queue');
  create
@@ -53,6 +55,7 @@ Creates an unlogged table. This is useful when write throughput is more importan
 See Postgres documentation for [unlogged tables](https://www.postgresql.org/docs/current/sql-createtable.html#SQL-CREATETABLE-UNLOGGED) for more information.
 
 {/* prettier-ignore */}
+
 ```sql
 pgmq.create_unlogged(queue_name text)
 returns void
@@ -60,13 +63,14 @@ returns void
 
 **Parameters:**
 
-| Parameter  | Type | Description           |
-| :--------- | :--- | :-------------------- |
+| Parameter | Type | Description |
+| --- | --- | --- |
 | queue_name | text | The name of the queue |
 
 Example:
 
 {/* prettier-ignore */}
+
 ```sql
 select pgmq.create_unlogged('my_unlogged');
  create_unlogged
@@ -81,19 +85,21 @@ Drop the queue's archive table as a member of the PGMQ extension. Useful for pre
 This does not prevent the further archives() from appending to the archive table.
 
 {/* prettier-ignore */}
+
 ```sql
 pgmq.detach_archive(queue_name text)
 ```
 
 **Parameters:**
 
-| Parameter  | Type | Description           |
-| :--------- | :--- | :-------------------- |
+| Parameter | Type | Description |
+| --- | --- | --- |
 | queue_name | text | The name of the queue |
 
 Example:
 
 {/* prettier-ignore */}
+
 ```sql
 select * from pgmq.detach_archive('my_queue');
  detach_archive
@@ -107,6 +113,7 @@ select * from pgmq.detach_archive('my_queue');
 Deletes a queue and its archive table.
 
 {/* prettier-ignore */}
+
 ```sql
 pgmq.drop_queue(queue_name text)
 returns boolean
@@ -114,13 +121,14 @@ returns boolean
 
 **Parameters:**
 
-| Parameter  | Type | Description           |
-| :--------- | :--- | :-------------------- |
+| Parameter | Type | Description |
+| --- | --- | --- |
 | queue_name | text | The name of the queue |
 
 Example:
 
 {/* prettier-ignore */}
+
 ```sql
 select * from pgmq.drop_queue('my_unlogged');
  drop_queue
@@ -135,6 +143,7 @@ select * from pgmq.drop_queue('my_unlogged');
 Send a single message to a queue.
 
 {/* prettier-ignore */}
+
 ```sql
 pgmq.send(
     queue_name text,
@@ -146,15 +155,16 @@ returns setof bigint
 
 **Parameters:**
 
-| Parameter    | Type      | Description                                                        |
-| :----------- | :-------- | :----------------------------------------------------------------- |
-| `queue_name` | `text`    | The name of the queue                                              |
-| `msg`        | `jsonb`   | The message to send to the queue                                   |
-| `delay`      | `integer` | Time in seconds before the message becomes visible. Defaults to 0. |
+| Parameter | Type | Description |
+| --- | --- | --- |
+| `queue_name` | `text` | The name of the queue |
+| `msg` | `jsonb` | The message to send to the queue |
+| `delay` | `integer` | Time in seconds before the message becomes visible. Defaults to 0. |
 
 Example:
 
 {/* prettier-ignore */}
+
 ```sql
 select * from pgmq.send('my_queue', '{"hello": "world"}');
  send
@@ -169,6 +179,7 @@ select * from pgmq.send('my_queue', '{"hello": "world"}');
 Send 1 or more messages to a queue.
 
 {/* prettier-ignore */}
+
 ```sql
 pgmq.send_batch(
     queue_name text,
@@ -180,13 +191,14 @@ returns setof bigint
 
 **Parameters:**
 
-| Parameter    | Type      | Description                                                         |
-| :----------- | :-------- | :------------------------------------------------------------------ |
-| `queue_name` | `text`    | The name of the queue                                               |
-| `msgs`       | `jsonb[]` | Array of messages to send to the queue                              |
-| `delay`      | `integer` | Time in seconds before the messages becomes visible. Defaults to 0. |
+| Parameter | Type | Description |
+| --- | --- | --- |
+| `queue_name` | `text` | The name of the queue |
+| `msgs` | `jsonb[]` | Array of messages to send to the queue |
+| `delay` | `integer` | Time in seconds before the messages becomes visible. Defaults to 0. |
 
 {/* prettier-ignore */}
+
 ```sql
 select * from pgmq.send_batch(
     'my_queue',
@@ -210,6 +222,7 @@ select * from pgmq.send_batch(
 Read 1 or more messages from a queue. The VT specifies the duration of time in seconds that the message is invisible to other consumers. At the end of that duration, the message is visible again and could be read by other consumers.
 
 {/* prettier-ignore */}
+
 ```sql
 pgmq.read(
     queue_name text,
@@ -222,15 +235,16 @@ returns setof pgmq.message_record
 
 **Parameters:**
 
-| Parameter    | Type      | Description                                                     |
-| :----------- | :-------- | :-------------------------------------------------------------- |
-| `queue_name` | `text`    | The name of the queue                                           |
-| `vt`         | `integer` | Time in seconds that the message become invisible after reading |
-| `qty`        | `integer` | The number of messages to read from the queue. Defaults to 1    |
+| Parameter | Type | Description |
+| --- | --- | --- |
+| `queue_name` | `text` | The name of the queue |
+| `vt` | `integer` | Time in seconds that the message become invisible after reading |
+| `qty` | `integer` | The number of messages to read from the queue. Defaults to 1 |
 
 Example:
 
 {/* prettier-ignore */}
+
 ```sql
 select * from pgmq.read('my_queue', 10, 2);
  msg_id | read_ct |          enqueued_at          |              vt               |       message
@@ -249,6 +263,7 @@ When there are no messages in the queue, the function call will wait for `max_po
 If messages reach the queue during that duration, they will be read and returned immediately.
 
 {/* prettier-ignore */}
+
 ```sql
  pgmq.read_with_poll(
     queue_name text,
@@ -262,17 +277,18 @@ returns setof pgmq.message_record
 
 **Parameters:**
 
-| Parameter          | Type      | Description                                                                 |
-| :----------------- | :-------- | :-------------------------------------------------------------------------- |
-| `queue_name`       | `text`    | The name of the queue                                                       |
-| `vt`               | `integer` | Time in seconds that the message become invisible after reading.            |
-| `qty`              | `integer` | The number of messages to read from the queue. Defaults to 1.               |
+| Parameter | Type | Description |
+| --- | --- | --- |
+| `queue_name` | `text` | The name of the queue |
+| `vt` | `integer` | Time in seconds that the message become invisible after reading. |
+| `qty` | `integer` | The number of messages to read from the queue. Defaults to 1. |
 | `max_poll_seconds` | `integer` | Time in seconds to wait for new messages to reach the queue. Defaults to 5. |
-| `poll_interval_ms` | `integer` | Milliseconds between the internal poll operations. Defaults to 100.         |
+| `poll_interval_ms` | `integer` | Milliseconds between the internal poll operations. Defaults to 100. |
 
 Example:
 
 {/* prettier-ignore */}
+
 ```sql
 select * from pgmq.read_with_poll('my_queue', 1, 1, 5, 100);
  msg_id | read_ct |          enqueued_at          |              vt               |      message
@@ -289,6 +305,7 @@ Reads a single message from a queue and deletes it upon read.
 Note: utilization of pop() results in at-most-once delivery semantics if the consuming application does not guarantee processing of the message.
 
 {/* prettier-ignore */}
+
 ```sql
 pgmq.pop(queue_name text)
 returns setof pgmq.message_record
@@ -296,13 +313,14 @@ returns setof pgmq.message_record
 
 **Parameters:**
 
-| Parameter  | Type | Description           |
-| :--------- | :--- | :-------------------- |
+| Parameter | Type | Description |
+| --- | --- | --- |
 | queue_name | text | The name of the queue |
 
 Example:
 
 {/* prettier-ignore */}
+
 ```sql
 pgmq=# select * from pgmq.pop('my_queue');
  msg_id | read_ct |          enqueued_at          |              vt               |      message
@@ -319,6 +337,7 @@ pgmq=# select * from pgmq.pop('my_queue');
 Deletes a single message from a queue.
 
 {/* prettier-ignore */}
+
 ```sql
 pgmq.delete (queue_name text, msg_id: bigint)
 returns boolean
@@ -326,14 +345,15 @@ returns boolean
 
 **Parameters:**
 
-| Parameter    | Type     | Description                         |
-| :----------- | :------- | :---------------------------------- |
-| `queue_name` | `text`   | The name of the queue               |
-| `msg_id`     | `bigint` | Message ID of the message to delete |
+| Parameter | Type | Description |
+| --- | --- | --- |
+| `queue_name` | `text` | The name of the queue |
+| `msg_id` | `bigint` | Message ID of the message to delete |
 
 Example:
 
 {/* prettier-ignore */}
+
 ```sql
 select pgmq.delete('my_queue', 5);
  delete
@@ -348,6 +368,7 @@ select pgmq.delete('my_queue', 5);
 Delete one or many messages from a queue.
 
 {/* prettier-ignore */}
+
 ```sql
 pgmq.delete (queue_name text, msg_ids: bigint[])
 returns setof bigint
@@ -355,16 +376,17 @@ returns setof bigint
 
 **Parameters:**
 
-| Parameter    | Type       | Description                    |
-| :----------- | :--------- | :----------------------------- |
-| `queue_name` | `text`     | The name of the queue          |
-| `msg_ids`    | `bigint[]` | Array of message IDs to delete |
+| Parameter | Type | Description |
+| --- | --- | --- |
+| `queue_name` | `text` | The name of the queue |
+| `msg_ids` | `bigint[]` | Array of message IDs to delete |
 
 Examples:
 
 Delete two messages that exist.
 
 {/* prettier-ignore */}
+
 ```sql
 select * from pgmq.delete('my_queue', array[2, 3]);
  delete
@@ -395,8 +417,8 @@ returns bigint
 
 **Parameters:**
 
-| Parameter  | Type | Description           |
-| :--------- | :--- | :-------------------- |
+| Parameter | Type | Description |
+| --- | --- | --- |
 | queue_name | text | The name of the queue |
 
 Example:
@@ -404,6 +426,7 @@ Example:
 Purge the queue when it contains 8 messages;
 
 {/* prettier-ignore */}
+
 ```sql
 select * from pgmq.purge_queue('my_queue');
  purge_queue
@@ -418,6 +441,7 @@ select * from pgmq.purge_queue('my_queue');
 Removes a single requested message from the specified queue and inserts it into the queue's archive.
 
 {/* prettier-ignore */}
+
 ```sql
 pgmq.archive(queue_name text, msg_id bigint)
 returns boolean
@@ -425,10 +449,10 @@ returns boolean
 
 **Parameters:**
 
-| Parameter    | Type     | Description                          |
-| :----------- | :------- | :----------------------------------- |
-| `queue_name` | `text`   | The name of the queue                |
-| `msg_id`     | `bigint` | Message ID of the message to archive |
+| Parameter | Type | Description |
+| --- | --- | --- |
+| `queue_name` | `text` | The name of the queue |
+| `msg_id` | `bigint` | Message ID of the message to archive |
 
 Returns
 Boolean value indicating success or failure of the operation.
@@ -436,6 +460,7 @@ Boolean value indicating success or failure of the operation.
 Example; remove message with ID 1 from queue `my_queue` and archive it:
 
 {/* prettier-ignore */}
+
 ```sql
 select * from pgmq.archive('my_queue', 1);
  archive
@@ -457,16 +482,17 @@ RETURNS SETOF bigint
 
 **Parameters:**
 
-| Parameter    | Type       | Description                     |
-| :----------- | :--------- | :------------------------------ |
-| `queue_name` | `text`     | The name of the queue           |
-| `msg_ids`    | `bigint[]` | Array of message IDs to archive |
+| Parameter | Type | Description |
+| --- | --- | --- |
+| `queue_name` | `text` | The name of the queue |
+| `msg_ids` | `bigint[]` | Array of message IDs to archive |
 
 Examples:
 
 Delete messages with ID 1 and 2 from queue `my_queue` and move to the archive.
 
 {/* prettier-ignore */}
+
 ```sql
 select * from pgmq.archive('my_queue', array[1, 2]);
  archive
@@ -478,6 +504,7 @@ select * from pgmq.archive('my_queue', array[1, 2]);
 Delete messages 4, which exists and 999, which does not exist.
 
 {/* prettier-ignore */}
+
 ```sql
 select * from pgmq.archive('my_queue', array[4, 999]);
  archive
@@ -494,6 +521,7 @@ select * from pgmq.archive('my_queue', array[4, 999]);
 Sets the visibility timeout of a message to a specified time duration in the future. Returns the record of the message that was updated.
 
 {/* prettier-ignore */}
+
 ```sql
 pgmq.set_vt(
     queue_name text,
@@ -505,11 +533,11 @@ returns pgmq.message_record
 
 **Parameters:**
 
-| Parameter    | Type      | Description                                                           |
-| :----------- | :-------- | :-------------------------------------------------------------------- |
-| `queue_name` | `text`    | The name of the queue                                                 |
-| `msg_id`     | `bigint`  | ID of the message to set visibility time                              |
-| `vt_offset`  | `integer` | Duration from now, in seconds, that the message's VT should be set to |
+| Parameter | Type | Description |
+| --- | --- | --- |
+| `queue_name` | `text` | The name of the queue |
+| `msg_id` | `bigint` | ID of the message to set visibility time |
+| `vt_offset` | `integer` | Duration from now, in seconds, that the message's VT should be set to |
 
 Example:
 
@@ -529,6 +557,7 @@ select * from pgmq.set_vt('my_queue', 11, 30);
 List all the queues that currently exist.
 
 {/* prettier-ignore */}
+
 ```sql
 list_queues()
 RETURNS TABLE(
@@ -542,6 +571,7 @@ RETURNS TABLE(
 Example:
 
 {/* prettier-ignore */}
+
 ```sql
 select * from pgmq.list_queues();
       queue_name      |          created_at           | is_partitioned | is_unlogged
@@ -558,6 +588,7 @@ select * from pgmq.list_queues();
 Get metrics for a specific queue.
 
 {/* prettier-ignore */}
+
 ```sql
 pgmq.metrics(queue_name: text)
 returns table(
@@ -572,24 +603,25 @@ returns table(
 
 **Parameters:**
 
-| Parameter  | Type | Description           |
-| :--------- | :--- | :-------------------- |
+| Parameter | Type | Description |
+| --- | --- | --- |
 | queue_name | text | The name of the queue |
 
 **Returns:**
 
 | Attribute            | Type                       | Description                                                               |
-| :------------------- | :------------------------- | :------------------------------------------------------------------------ | -------------------------------------------------- |
+| :------------------- | :------------------------- | :------------------------------------------------------------------------ | 
 | `queue_name`         | `text`                     | The name of the queue                                                     |
 | `queue_length`       | `bigint`                   | Number of messages currently in the queue                                 |
-| `newest_msg_age_sec` | `integer                   | null`                                                                     | Age of the newest message in the queue, in seconds |
-| `oldest_msg_age_sec` | `integer                   | null`                                                                     | Age of the oldest message in the queue, in seconds |
+| `newest_msg_age_sec` | `integer` or `null`            | Age of the newest message in the queue, in seconds | 
+| `oldest_msg_age_sec` | `integer` or `null`            | Age of the oldest message in the queue, in seconds | 
 | `total_messages`     | `bigint`                   | Total number of messages that have passed through the queue over all time |
 | `scrape_time`        | `timestamp with time zone` | The current timestamp                                                     |
 
 Example:
 
 {/* prettier-ignore */}
+
 ```sql
 select * from pgmq.metrics('my_queue');
  queue_name | queue_length | newest_msg_age_sec | oldest_msg_age_sec | total_messages |          scrape_time
@@ -618,15 +650,16 @@ RETURNS TABLE(
 **Returns:**
 
 | Attribute            | Type                       | Description                                                               |
-| :------------------- | :------------------------- | :------------------------------------------------------------------------ | -------------------------------------------------- |
+| :------------------- | :------------------------- | :------------------------------------------------------------------------ |
 | `queue_name`         | `text`                     | The name of the queue                                                     |
 | `queue_length`       | `bigint`                   | Number of messages currently in the queue                                 |
-| `newest_msg_age_sec` | `integer                   | null`                                                                     | Age of the newest message in the queue, in seconds |
-| `oldest_msg_age_sec` | `integer                   | null`                                                                     | Age of the oldest message in the queue, in seconds |
+| `newest_msg_age_sec` | `integer` or `null`        | Age of the newest message in the queue, in seconds |
+| `oldest_msg_age_sec` | `integer` or `null`        | Age of the oldest message in the queue, in seconds |
 | `total_messages`     | `bigint`                   | Total number of messages that have passed through the queue over all time |
 | `scrape_time`        | `timestamp with time zone` | The current timestamp                                                     |
 
 {/* prettier-ignore */}
+
 ```sql
 select * from pgmq.metrics_all();
       queue_name      | queue_length | newest_msg_age_sec | oldest_msg_age_sec | total_messages |          scrape_time
@@ -642,17 +675,18 @@ select * from pgmq.metrics_all();
 
 The complete representation of a message in a queue.
 
-| Attribute Name | Type                       | Description                                                            |
-| :------------- | :------------------------- | :--------------------------------------------------------------------- |
-| `msg_id`       | `bigint`                   | Unique ID of the message                                               |
-| `read_ct`      | `bigint`                   | Number of times the message has been read. Increments on read().       |
-| `enqueued_at`  | `timestamp with time zone` | time that the message was inserted into the queue                      |
-| `vt`           | `timestamp with time zone` | Timestamp when the message will become available for consumers to read |
-| `message`      | `jsonb`                    | The message payload                                                    |
+| Attribute Name | Type | Description |
+| --- | --- | --- |
+| `msg_id` | `bigint` | Unique ID of the message |
+| `read_ct` | `bigint` | Number of times the message has been read. Increments on read(). |
+| `enqueued_at` | `timestamp with time zone` | time that the message was inserted into the queue |
+| `vt` | `timestamp with time zone` | Timestamp when the message will become available for consumers to read |
+| `message` | `jsonb` | The message payload |
 
 Example:
 
 {/* prettier-ignore */}
+
 ```sql
  msg_id | read_ct |          enqueued_at          |              vt               |      message
 --------+---------+-------------------------------+-------------------------------+--------------------
