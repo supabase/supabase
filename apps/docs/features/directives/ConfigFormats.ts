@@ -8,7 +8,7 @@
  *   across the page through the `config-format` query group
  */
 
-import { convertCliConfigTomlToJsonc } from '@supabase/config/internal'
+import { CliConfigConvertError, convertCliConfigTomlToJsonc } from '@supabase/config/internal'
 import { Effect } from 'effect'
 import { type Code, type Parent, type Root } from 'mdast'
 import type { MdxJsxFlowElement } from 'mdast-util-mdx-jsx'
@@ -21,10 +21,12 @@ export const CONFIG_FORMAT_QUERY_GROUP = 'config-format'
 const SCHEMA_MEMBER = /^\{\n {2}"\$schema": "[^"]*",\n\n?/
 
 export async function convertConfigTomlToJsonc(source: string): Promise<string> {
-  const result = await Effect.runPromise(Effect.result(convertCliConfigTomlToJsonc(source)))
-
-  if (result._tag === 'Failure') {
-    const { reason, detail, sourceLine } = result.failure
+  try {
+    const { text, schemaSource } = await Effect.runPromise(convertCliConfigTomlToJsonc(source))
+    return (schemaSource === 'default' ? text.replace(SCHEMA_MEMBER, '{\n') : text).trimEnd()
+  } catch (error) {
+    if (!(error instanceof CliConfigConvertError)) throw error
+    const { reason, detail, sourceLine } = error
     const firstLine = source.split('\n').find((line) => line.trim() !== '') ?? ''
     throw new Error(
       `Could not convert config.toml snippet to JSONC (${reason}: ${detail}` +
@@ -32,9 +34,6 @@ export async function convertConfigTomlToJsonc(source: string): Promise<string> 
         `Snippet starts with: ${firstLine}`
     )
   }
-
-  const { text, schemaSource } = result.success
-  return (schemaSource === 'default' ? text.replace(SCHEMA_MEMBER, '{\n') : text).trimEnd()
 }
 
 export function configFormatsRemark() {
