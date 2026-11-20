@@ -1,10 +1,13 @@
 import { Table } from '@tanstack/react-table'
 
+import type { LogsFilterOperator } from '../UnifiedLogs.filters'
 import { DataTableFilterField } from '@/components/ui/DataTable/DataTable.types'
 
 /**
  * Service Flow Type Definitions
  */
+
+export type AddAttributeFilter = (key: string, value: string, operator: LogsFilterOperator) => void
 
 /**
  * Props for individual service flow blocks (Network, PostgREST, Auth, etc.)

@@ -446,7 +446,7 @@ export const isValueTruncated = (value: string | null | undefined, format?: stri
 export const convertByteaToHex = (value: { type: 'Buffer'; data: number[] }) => {
   // [Alaister] this is just a safeguard to catch sneaky null values
   try {
-    return `\\x${Buffer.from(value.data).toString('hex')}`
+    return `\\x${Array.from(Uint8Array.from(value.data), (byte) => byte.toString(16).padStart(2, '0')).join('')}`
   } catch {
     return value
   }

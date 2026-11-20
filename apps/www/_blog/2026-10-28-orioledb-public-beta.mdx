@@ -14,7 +14,7 @@ imgThumb: '2026-10-28-orioledb-public-beta/thumb.png'
 toc_depth: 2
 ---
 
-OrioleDB, an [open-source](https://github.com/orioledb/orioledb) storage engine for Postgres, is now in public beta on every Supabase plan. We announced the public beta at [Supabase Select](https://supabase.com/blog/select-2026-scale-without-limits), alongside Multigres and DBArena. Pick OrioleDB when you create a project. It's billed the same as standard Postgres. Compute and disk resizing, read replicas, Postgres upgrades, and scheduled backups work. It's not ready for production yet.
+OrioleDB, an [open-source](https://github.com/orioledb/orioledb) storage engine for Postgres, is now in public beta on every Supabase plan. We announced the public beta at [Supabase Select](https://supabase.com/blog/select-2026-scale-without-limits), alongside Multigres and DBArena. Pick OrioleDB when you create a project. It's billed the same as standard Postgres. Compute and disk resizing, [read replicas](/docs/guides/platform/read-replicas), Postgres upgrades, and scheduled backups work. It's not ready for production yet.
 
 <div className="video-container">
   <iframe
@@ -36,7 +36,7 @@ Heap storage also has limits at high concurrency. A lookup by primary key has to
 
 ## How OrioleDB works
 
-OrioleDB replaces the heap through the Table Access Method, Postgres's plug-in interface for storage engines. Your connection strings, Auth, Row Level Security policies, and client libraries stay the same.
+OrioleDB replaces the heap through the Table Access Method, Postgres's plug-in interface for storage engines. Your connection strings, Auth, [Row Level Security](/docs/guides/database/postgres/row-level-security) policies, and client libraries stay the same.
 
 - **Undo log instead of dead tuples.** When a row is updated or deleted, OrioleDB writes the previous version to an undo log, which is reclaimed automatically. In most cases, tables don't accumulate dead tuples, so there's nothing for VACUUM to clean up.
 - **64-bit transaction IDs.** Postgres’s 32-bit transaction IDs wrap around, and if VACUUM falls behind, Postgres stops accepting writes. OrioleDB tables use 64-bit IDs, so they don’t wrap around. System catalogs and any heap tables still use 32-bit IDs.
@@ -52,7 +52,7 @@ We benchmark OrioleDB on [DBArena](https://dbarena.com/), our open benchmarking 
 
 When the data doesn’t fit in memory, OrioleDB had the highest throughput per dollar of any product at every compute size we tested. On an 8XL instance (32 vCPU, 128 GiB of RAM), it completed about 1.8x more transactions per minute than Supabase Postgres on heap storage, reaching 113,850 transactions per minute. At the Small size, at the same price, it delivered about 46% more throughput per dollar than heap. When the data fits in memory, the gap is smaller. OrioleDB was about 13% ahead of heap at Large and about 29% ahead at 8XL. At Small, heap came out ahead. You can [compare the results](https://dbarena.com/compare?bound=cache-exceeding&cols=supabase:8xlarge,orioledb:8xlarge) for any size and scenario.
 
-The performance benefits of OrioleDB depend on your workload. OrioleDB helps most with tables that are updated or deleted often, such as order status, inventory counts, job queues, and session data, since those are the tables where heap storage builds up the most bloat. It also helps when your data set is larger than memory, when many connections are reading and writing at once on a large instance, and when most queries look up rows by primary key. Read-mostly workloads that fit comfortably in memory will see a smaller difference. Workloads that depend on non-B-tree indexes, like pgvector HNSW, may not see gains yet, since those indexes run through an experimental bridge. We recommend benchmarking your own workload before drawing conclusions.
+The performance benefits of OrioleDB depend on your workload. [OrioleDB](/features/orioledb) helps most with tables that are updated or deleted often, such as order status, inventory counts, job queues, and session data, since those are the tables where heap storage builds up the most bloat. It also helps when your data set is larger than memory, when many connections are reading and writing at once on a large instance, and when most queries look up rows by primary key. Read-mostly workloads that fit comfortably in memory will see a smaller difference. Workloads that depend on non-B-tree indexes, like [pgvector](/docs/guides/database/extensions/pgvector) HNSW, may not see gains yet, since those indexes run through an experimental bridge. We recommend benchmarking your own workload before drawing conclusions.
 
 <Img
   alt="Benchmark derived from TPC-C: OrioleDB completed up to 1.8x more transactions per minute than the standard Postgres heap on an 8XL instance (32 vCPU, 128 GiB RAM) with data larger than memory and 128 clients. Results on dbarena.com."
@@ -77,7 +77,7 @@ create table orders (
 );
 ```
 
-To develop locally, initialize your project with the Supabase CLI (v2.119.0 or later):
+To develop locally, initialize your project with the [Supabase CLI](/features/cli) (v2.119.0 or later):
 
 ```bash
 supabase init --use-orioledb

@@ -23,7 +23,6 @@ export type PipelineConfig = {
 
 export type DestinationConfig =
   | { bigQuery: BigQueryDestinationConfig }
-  | { iceberg: IcebergDestinationConfig }
   | { ducklake: DucklakeDestinationConfig }
   | { snowflake: SnowflakeDestinationConfig }
   | { clickHouse: ClickHouseDestinationConfig }
@@ -101,16 +100,6 @@ export type BigQueryTableOption = {
   tableId: number
   partitionBy?: BigQueryPartitionBy
   clusterBy?: string[]
-}
-
-export type IcebergDestinationConfig = {
-  projectRef: string
-  warehouseName: string
-  namespace?: string
-  catalogToken: string
-  s3AccessKeyId: string
-  s3SecretAccessKey: string
-  s3Region: string
 }
 
 export type SnowflakeDestinationConfig = {

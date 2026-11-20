@@ -4,7 +4,6 @@ import {
   skillBasedSolutions,
   useCaseSolutions,
 } from 'data/Solutions'
-import { PrivacySettings } from 'ui-patterns/PrivacySettings'
 
 const footerData = [
   {
@@ -174,10 +173,6 @@ const footerData = [
         text: 'Open Source',
         url: '/open-source',
       },
-      {
-        text: 'DevTo',
-        url: 'https://dev.to/supabase',
-      },
     ],
   },
   {
@@ -202,10 +197,6 @@ const footerData = [
       {
         text: 'Privacy Policy',
         url: '/privacy',
-      },
-      {
-        text: 'Privacy Settings',
-        component: PrivacySettings,
       },
       {
         text: 'Acceptable Use Policy',

@@ -1,11 +1,12 @@
 import { zodResolver } from '@hookform/resolvers/zod'
-import { EyeIcon, EyeOffIcon } from 'lucide-react'
+import { EyeIcon, EyeOffIcon, KeyRoundIcon } from 'lucide-react'
 import { parseAsString, useQueryState } from 'nuqs'
 import { useState } from 'react'
 import { useForm, useWatch } from 'react-hook-form'
 import { toast } from 'sonner'
 import {
   Button,
+  CardContent,
   Dialog,
   DialogContent,
   DialogFooter,
@@ -17,7 +18,6 @@ import {
   FormField,
   Input,
 } from 'ui'
-import { Admonition } from 'ui-patterns/Admonition'
 import { Input as InputWithActions } from 'ui-patterns/DataInputs/Input'
 import { FormItemLayout } from 'ui-patterns/form/FormItemLayout/FormItemLayout'
 import { z } from 'zod'
@@ -43,11 +43,9 @@ const defaultValues: FormValues = { password: '' }
  */
 export const AddPasswordRow = ({
   email,
-  providerName,
   isPrimary = false,
 }: {
   email: string
-  providerName?: string
   isPrimary?: boolean
 }) => {
   const [isDialogOpen, setIsDialogOpen] = useState(false)
@@ -60,24 +58,30 @@ export const AddPasswordRow = ({
 
   return (
     <>
-      <Admonition
-        type={providerName ? 'warning' : 'default'}
-        layout="responsive"
-        title="Add a password for email sign-in"
-        description={
-          providerName
-            ? `Use ${email} and a password as another way to sign in if you lose access to ${providerName}.`
-            : `Add a password to sign in with ${email}.`
-        }
-        actions={
-          <Button
-            variant={isPrimary ? 'primary' : 'default'}
-            onClick={() => handleOpenChange(true)}
-          >
-            Add password
-          </Button>
-        }
-      />
+      <CardContent
+        role="group"
+        aria-label="Password"
+        className="flex flex-col items-start gap-4 py-4 sm:flex-row sm:items-center sm:justify-between"
+      >
+        <div className="flex min-w-0 gap-x-4">
+          <div className="flex h-9 w-9 shrink-0 items-center justify-center rounded-full bg-selection">
+            <KeyRoundIcon size={18} strokeWidth={2} className="text-foreground-lighter" />
+          </div>
+          <div className="min-w-0">
+            <p className="text-sm">Password</p>
+            <p className="text-sm text-foreground-lighter [overflow-wrap:anywhere]">
+              Add a password to sign in with {email}
+            </p>
+          </div>
+        </div>
+        <Button
+          variant={isPrimary ? 'primary' : 'default'}
+          aria-label="Add password"
+          onClick={() => handleOpenChange(true)}
+        >
+          Add
+        </Button>
+      </CardContent>
 
       <Dialog open={isOpen} onOpenChange={handleOpenChange}>
         <DialogContent>

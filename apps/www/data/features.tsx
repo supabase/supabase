@@ -49,6 +49,12 @@ enum ADDITIONAL_PRODUCTS {
   STUDIO = 'studio',
 }
 
+/**
+ * Placeholder in a feature description where the CTA button is rendered.
+ * Renders as nothing in markdown; FeatureDescription splits on it.
+ */
+export const FEATURE_CTA_MARKER = '<!-- feature-cta -->'
+
 export type FeatureProductType = PRODUCT | PRODUCT_MODULE | ADDITIONAL_PRODUCTS
 
 export enum PRODUCT_STAGES {
@@ -108,6 +114,11 @@ export type FeatureType = {
    */
   blogUrl?: string
   /**
+   * label for the CTA button rendered at the `FEATURE_CTA_MARKER` position in the description.
+   * Defaults to "Start your project".
+   */
+  ctaLabel?: string
+  /**
    * feature metadata on its status
    */
   status?: {
@@ -126,9 +137,9 @@ export const features: FeatureType[] = [
     title: 'Postgres database',
     subtitle: 'Every project is a full Postgres database.',
     description: `
-Every Supabase project is a dedicated [Postgres database](https://www.postgresql.org/) - _"a powerful, open source object-relational database system with over 35 years of active development that has earned it a strong reputation for reliability, feature robustness, and performance"_.
+Every Supabase project is a dedicated [Postgres database](https://www.postgresql.org/), which is a powerful, open source object-relational database. Start building for free.
 
-It's 100% portable, which means you can easily migrate your data to and from other Postgres databases, ensuring that your data is never locked into a proprietary system.
+${FEATURE_CTA_MARKER}
 
 ## Key benefits
 1. Advanced data types: Utilize JSON, arrays, and custom types to store complex data structures efficiently.
@@ -154,7 +165,9 @@ It's 100% portable, which means you can easily migrate your data to and from oth
     title: 'Vector database',
     subtitle: 'Store vector embeddings right next to the rest of your data.',
     description: `
-Supabase provides an open source toolkit for developing AI applications using Postgres and pgvector. Use the Supabase client libraries to store, index, and query your vector embeddings at scale.
+Use the Supabase client libraries to store, index, and query your vector embeddings at scale.
+
+${FEATURE_CTA_MARKER}
 
 ## Key benefits
 1. Unified data storage: Keep vector embeddings and relational data in one place, simplifying your data architecture.
@@ -169,6 +182,7 @@ Supabase provides an open source toolkit for developing AI applications using Po
     products: [PRODUCT_SHORTNAMES.DATABASE],
     heroImage: 'https://www.youtube-nocookie.com/embed/6xchFWcHkaI',
     docsUrl: 'https://supabase.com/docs/guides/ai',
+    blogUrl: 'https://supabase.com/blog/openai-embeddings-postgres-vector',
     slug: 'vector-database',
     status: {
       stage: PRODUCT_STAGES.GA,
@@ -228,6 +242,7 @@ Supabase offers lightning-fast GraphQL APIs through its custom-built Postgres Gr
     heroImage: '/images/features/auto-generated-graphql-api.png',
     heroImageLight: '/images/features/auto-generated-graphql-api-light.png',
     docsUrl: 'https://supabase.com/docs/guides/graphql/api',
+    blogUrl: 'https://supabase.com/blog/pg-graphql',
     slug: 'auto-generated-graphql-api',
     status: {
       stage: PRODUCT_STAGES.GA,
@@ -267,6 +282,7 @@ Supabase's backup solutions provide a balance of security, flexibility, and ease
     heroImage: '/images/features/backups.png',
     heroImageLight: '/images/features/backups-light.png',
     docsUrl: 'https://supabase.com/docs/guides/platform/backups',
+    blogUrl: 'https://supabase.com/blog/postgres-point-in-time-recovery',
     slug: 'database-backups',
     status: {
       stage: PRODUCT_STAGES.GA,
@@ -300,6 +316,7 @@ By using custom domains, you create a more cohesive brand experience and gain fl
     heroImage: '/images/features/custom-domains.png',
     heroImageLight: '/images/features/custom-domains-light.png',
     docsUrl: 'https://supabase.com/docs/guides/platform/custom-domains',
+    blogUrl: 'https://supabase.com/blog/custom-domain-names',
     slug: 'custom-domains',
     status: {
       stage: PRODUCT_STAGES.GA,
@@ -340,6 +357,7 @@ Once configured, your users sign in with \`signInWithOAuth({ provider: 'custom:m
     products: [PRODUCT_SHORTNAMES.AUTHENTICATION],
     heroImage: 'https://www.youtube-nocookie.com/embed/WrX3FfKj6I8',
     docsUrl: 'https://supabase.com/docs/guides/auth/custom-oauth-providers',
+    blogUrl: 'https://supabase.com/blog/custom-oauth-oidc-providers',
     slug: 'custom-oidc-providers',
     status: {
       stage: PRODUCT_STAGES.GA,
@@ -457,6 +475,7 @@ Connect a GitHub repo to your project. Migrations live in version control, and b
     heroImage: '/images/features/branching.png',
     heroImageLight: '/images/features/branching-light.png',
     docsUrl: 'https://supabase.com/docs/guides/deployment/branching',
+    blogUrl: 'https://supabase.com/blog/branching-2-0',
     slug: 'branching',
     status: {
       stage: PRODUCT_STAGES.GA,
@@ -533,6 +552,7 @@ Deploy your first Read Replica in minutes from Project Settings > Infrastructure
     products: [PRODUCT_SHORTNAMES.DATABASE],
     heroImage: 'https://www.youtube-nocookie.com/embed/PX3R1fXjJ2M',
     docsUrl: 'https://supabase.com/docs/guides/platform/read-replicas',
+    blogUrl: 'https://supabase.com/blog/introducing-read-replicas',
     slug: 'read-replicas',
     status: {
       stage: PRODUCT_STAGES.GA,
@@ -607,6 +627,7 @@ Dedicated Poolers provide an alternative to Supavisor for specific use cases, gi
     heroImage: '',
     docsUrl:
       'https://supabase.com/docs/guides/database/connecting-to-postgres/pooling-and-limits#shared-pooler',
+    blogUrl: 'https://supabase.com/blog/dedicated-poolers',
     slug: 'dedicated-poolers',
     status: {
       stage: PRODUCT_STAGES.GA,
@@ -641,6 +662,7 @@ Foreign Data Wrappers simplify data integration by bringing external data into y
     products: [PRODUCT_SHORTNAMES.DATABASE],
     heroImage: '',
     docsUrl: 'https://supabase.com/docs/guides/database/extensions/wrappers/overview',
+    blogUrl: 'https://supabase.com/blog/postgres-foreign-data-wrappers-rust',
     slug: 'foreign-data-wrappers',
     status: {
       stage: PRODUCT_STAGES.GA,
@@ -649,37 +671,29 @@ Foreign Data Wrappers simplify data integration by bringing external data into y
   },
   {
     title: 'Supabase Pipelines',
-    subtitle: 'Replicate Postgres data to analytical destinations.',
-    description: `Supabase Pipelines is a managed change data capture (CDC) product that uses Postgres logical replication to deliver published data to analytical destinations in near real time.
+    subtitle: 'Bring your Postgres data into your analytics stack.',
+    description: `Supabase Pipelines sends data from Supabase Postgres to BigQuery, ClickHouse, DuckLake, or Snowflake in near real time. Build reports on recent application data in the tools your team already uses.
 
 ## Key benefits
-1. Initial sync: Copy existing rows from published tables.
-2. Ongoing replication: Capture and deliver subsequent INSERT, UPDATE, DELETE, and TRUNCATE operations selected by the publication.
-3. Managed operation: Monitor pipeline status, lag, table state, and errors in the Dashboard.
-4. Workload isolation: Keep analytical queries away from the primary database.
 
-## Destinations
-BigQuery, ClickHouse, DuckLake, and Snowflake are available in public alpha. See the [destination guides](/docs/guides/database/replication#supported-destinations) to get started.
+- **Start with the data you already have.** Choose which tables to replicate and which ones to include in the first copy.
+- **Keep reporting queries off your production database.** Run large reports and dashboards at your destination, leaving Postgres to serve your app.
+- **See how current your data is.** Supabase runs the pipeline. In the Dashboard, see which tables are live, check how far behind replication is, and review errors.
 
-## Setup
-Create a Postgres publication for the tables to replicate. In Database > Pipelines, add a Pipelines destination, configure its settings, and monitor the pipeline from the Dashboard.
+## When to use Pipelines
 
-## Requirements
-Requirements depend on the destination. BigQuery and ClickHouse ReplacingMergeTree require source tables to have primary keys and require the publication to include those columns. ClickHouse updates require REPLICA IDENTITY FULL. ClickHouse deletes require primary-key or full identity. DuckLake updates and deletes require a primary-key identity, replica-identity index, or full identity. With a primary-key identity or replica-identity index, include every identity column in the publication. Snowflake updates require REPLICA IDENTITY FULL. Snowflake deletes require a published row identity.
+- **Business reporting.** Bring orders, customer accounts, and billing records together to track revenue and retention.
+- **Product analytics.** Combine signup and activity data to find where users get stuck during onboarding.
+- **Customer dashboards.** Give customers a view of how they use your product over time.
 
-## Pipelines is valuable for:
-- Near real-time analytics data movement
-- Analytics separation from production
-- Managed replication to supported destination systems
+## Get started
 
-## Limitations
-Schema change support is destination-specific and limited. Destination-specific constraints apply.
-
-BigQuery and DuckLake keep current-state tables synchronized. ClickHouse supports current-state ReplacingMergeTree tables or append-only MergeTree CDC history. Snowflake stores append-only CDC history. Source \`TRUNCATE\` operations and table resets erase accumulated destination data. Schema changes can alter retained history in append-only ClickHouse and Snowflake tables.`,
+Pipelines is available on Pro, Team, and Enterprise plans. In the Supabase Dashboard, go to **Database > Pipelines** and click **Add pipeline**. The [destination guides](/docs/guides/database/replication#supported-destinations) cover the requirements and walk you through setup.`,
     icon: CloudCog,
     products: [PRODUCT_SHORTNAMES.DATABASE],
     heroImage: 'https://www.youtube-nocookie.com/embed/8o3duiYqppA',
     docsUrl: 'https://supabase.com/docs/guides/database/replication/pipelines',
+    blogUrl: 'https://supabase.com/blog/introducing-supabase-pipelines',
     slug: 'supabase-pipelines',
     status: {
       stage: PRODUCT_STAGES.PUBLIC_ALPHA,
@@ -731,6 +745,7 @@ This feature is particularly useful for teams looking to enhance their security 
     products: [ADDITIONAL_PRODUCTS.PLATFORM],
     heroImage: 'https://supabase.com/docs/img/guides/database/vault-hello-compressed.mp4',
     docsUrl: 'https://supabase.com/docs/guides/database/vault',
+    blogUrl: 'https://supabase.com/blog/supabase-vault',
     slug: 'vault',
     status: {
       stage: PRODUCT_STAGES.PUBLIC_ALPHA,
@@ -755,7 +770,8 @@ This feature is particularly valuable for teams looking to optimize their databa
     icon: Zap,
     products: [ADDITIONAL_PRODUCTS.PLATFORM],
     heroImage: 'https://www.youtube-nocookie.com/embed/ogYNmJOFEpk',
-    docsUrl: 'https://supabase.com/blog/supavisor-postgres-connection-pooler',
+    docsUrl: 'https://supabase.com/docs/guides/database/connecting-to-postgres/pooling-and-limits',
+    blogUrl: 'https://supabase.com/blog/supavisor-postgres-connection-pooler',
     slug: 'supavisor',
     status: {
       stage: PRODUCT_STAGES.PUBLIC_BETA,
@@ -794,6 +810,7 @@ Supabase's Realtime Postgres Changes feature allows you to listen to database ch
     products: [PRODUCT_SHORTNAMES.REALTIME],
     heroImage: 'https://www.youtube-nocookie.com/embed/_-y_Lnujq64',
     docsUrl: 'https://supabase.com/docs/guides/realtime/postgres-changes',
+    blogUrl: 'https://supabase.com/blog/postgres-changes-filters-and-column-selection',
     slug: 'realtime-postgres-changes',
     status: {
       stage: PRODUCT_STAGES.GA,
@@ -835,6 +852,7 @@ Supabase's Realtime Broadcast feature provides a powerful tool for creating resp
     products: [PRODUCT_SHORTNAMES.REALTIME],
     heroImage: 'https://www.youtube-nocookie.com/embed/_-y_Lnujq64',
     docsUrl: 'https://supabase.com/docs/guides/realtime/broadcast',
+    blogUrl: 'https://supabase.com/blog/supabase-realtime-multiplayer-general-availability',
     slug: 'realtime-broadcast',
     status: {
       stage: PRODUCT_STAGES.GA,
@@ -900,6 +918,7 @@ This feature is particularly valuable for applications that require controlled a
     products: [PRODUCT_SHORTNAMES.REALTIME, PRODUCT_SHORTNAMES.AUTHENTICATION],
     heroImage: 'https://www.youtube-nocookie.com/embed/IXRrU9MpA8Q',
     docsUrl: 'https://supabase.com/docs/guides/realtime/authorization#broadcast',
+    blogUrl: 'https://supabase.com/blog/supabase-realtime-broadcast-and-presence-authorization',
     slug: 'realtime-broadcast-authorization',
     status: {
       stage: PRODUCT_STAGES.PUBLIC_BETA,
@@ -924,6 +943,7 @@ This feature is particularly useful for collaborative applications where knowing
     products: [PRODUCT_SHORTNAMES.REALTIME, PRODUCT_SHORTNAMES.AUTHENTICATION],
     heroImage: 'https://www.youtube-nocookie.com/embed/IXRrU9MpA8Q',
     docsUrl: 'https://supabase.com/docs/guides/realtime/authorization#presence',
+    blogUrl: 'https://supabase.com/blog/supabase-realtime-broadcast-and-presence-authorization',
     slug: 'realtime-presence-authorization',
     status: {
       stage: PRODUCT_STAGES.PUBLIC_BETA,
@@ -959,6 +979,7 @@ Broadcast from Database provides a powerful way to trigger real-time events dire
     products: [PRODUCT_SHORTNAMES.REALTIME],
     heroImage: '',
     docsUrl: 'https://supabase.com/docs/guides/realtime/broadcast#broadcast-from-database',
+    blogUrl: 'https://supabase.com/blog/realtime-broadcast-from-database',
     slug: 'realtime-broadcast-from-database',
     status: {
       stage: PRODUCT_STAGES.PUBLIC_BETA,
@@ -993,6 +1014,7 @@ Broadcast Replay ensures users never miss important real-time updates, even when
     products: [PRODUCT_SHORTNAMES.REALTIME],
     heroImage: '',
     docsUrl: 'https://supabase.com/docs/guides/realtime/broadcast#broadcast-replay',
+    blogUrl: 'https://supabase.com/blog/realtime-broadcast-replay',
     slug: 'realtime-broadcast-replay',
     status: {
       stage: PRODUCT_STAGES.PUBLIC_ALPHA,
@@ -1110,6 +1132,7 @@ Supabase's Phone Login feature enables a seamless authentication experience, par
     heroImage: '/images/features/phone-login.png',
     heroImageLight: '/images/features/phone-login-light.png',
     docsUrl: 'https://supabase.com/docs/guides/auth/phone-login',
+    blogUrl: 'https://supabase.com/blog/supabase-auth-passwordless-sms-login',
     slug: 'phone-logins',
     status: {
       stage: PRODUCT_STAGES.GA,
@@ -1177,7 +1200,7 @@ SSO with SAML provides the enterprise-grade authentication capabilities required
     icon: Lock,
     products: [PRODUCT_SHORTNAMES.AUTHENTICATION],
     heroImage: '',
-    docsUrl: 'https://supabase.com/docs/guides/auth/sso/auth-sso-saml',
+    docsUrl: 'https://supabase.com/docs/guides/auth/enterprise-sso/auth-sso-saml',
     slug: 'sso-with-saml',
     status: {
       stage: PRODUCT_STAGES.GA,
@@ -1213,6 +1236,7 @@ Third-Party Authentication bridges your existing auth system with Supabase's bac
     products: [PRODUCT_SHORTNAMES.AUTHENTICATION],
     heroImage: '',
     docsUrl: 'https://supabase.com/docs/guides/auth/third-party/overview',
+    blogUrl: 'https://supabase.com/blog/third-party-auth-mfa-phone-send-hooks',
     slug: 'third-party-authentication',
     status: {
       stage: PRODUCT_STAGES.GA,
@@ -1246,6 +1270,7 @@ Auth Hooks provide the flexibility to customize authentication while leveraging 
     products: [PRODUCT_SHORTNAMES.AUTHENTICATION],
     heroImage: '',
     docsUrl: 'https://supabase.com/docs/guides/auth/auth-hooks',
+    blogUrl: 'https://supabase.com/blog/supabase-auth-identity-linking-hooks',
     slug: 'auth-hooks',
     status: {
       stage: PRODUCT_STAGES.BETA,
@@ -1282,6 +1307,7 @@ JWT Signing Keys provide modern, secure JWT management with the flexibility requ
     products: [PRODUCT_SHORTNAMES.AUTHENTICATION],
     heroImage: '',
     docsUrl: 'https://supabase.com/docs/guides/auth/signing-keys',
+    blogUrl: 'https://supabase.com/blog/jwt-signing-keys',
     slug: 'jwt-signing-keys',
     status: {
       stage: PRODUCT_STAGES.GA,
@@ -1319,6 +1345,7 @@ OAuth 2.1 Server provides enterprise-grade identity provider capabilities built 
     products: [PRODUCT_SHORTNAMES.AUTHENTICATION],
     heroImage: '',
     docsUrl: 'https://supabase.com/docs/guides/auth/oauth-server',
+    blogUrl: 'https://supabase.com/blog/oauth2-provider',
     slug: 'oauth2-1-server',
     status: {
       stage: PRODUCT_STAGES.PUBLIC_BETA,
@@ -1358,6 +1385,7 @@ Web3 Authentication provides the wallet-based identity infrastructure required f
     products: [PRODUCT_SHORTNAMES.AUTHENTICATION],
     heroImage: '',
     docsUrl: 'https://supabase.com/docs/guides/auth/auth-web3',
+    blogUrl: 'https://supabase.com/blog/login-with-solana-ethereum',
     slug: 'web3-authentication',
     status: {
       stage: PRODUCT_STAGES.GA,
@@ -1398,6 +1426,7 @@ Email Templates provide complete control over your authentication email experien
     products: [PRODUCT_SHORTNAMES.AUTHENTICATION],
     heroImage: '',
     docsUrl: 'https://supabase.com/docs/guides/auth/auth-email-templates',
+    blogUrl: 'https://supabase.com/blog/introducing-seven-new-email-templates-for-auth',
     slug: 'email-templates',
     status: {
       stage: PRODUCT_STAGES.GA,
@@ -1437,6 +1466,7 @@ Supabase's MFA feature provides a robust tool for enhancing application security
     products: [PRODUCT_SHORTNAMES.AUTHENTICATION],
     heroImage: '',
     docsUrl: 'https://supabase.com/docs/guides/auth/auth-mfa',
+    blogUrl: 'https://supabase.com/blog/mfa-auth-via-rls',
     slug: 'multi-factor-authentication',
     status: {
       stage: PRODUCT_STAGES.GA,
@@ -1475,7 +1505,7 @@ Supabase's RLS feature provides a powerful tool for implementing sophisticated a
     icon: Lock,
     products: [PRODUCT_SHORTNAMES.DATABASE, PRODUCT_SHORTNAMES.AUTHENTICATION],
     heroImage: `https://xguihxuzqibwxjnimxev.supabase.co/storage/v1/object/public/videos/marketing/website/supabase-rls.mp4`,
-    docsUrl: 'https://supabase.com/docs/guides/auth/row-level-security',
+    docsUrl: 'https://supabase.com/docs/guides/database/postgres/row-level-security',
     slug: 'row-level-security',
     status: {
       stage: PRODUCT_STAGES.GA,
@@ -1601,6 +1631,7 @@ Supabase Storage simplifies adding robust file management to your applications, 
     heroImage: '/images/features/file-storage.png',
     heroImageLight: '/images/features/file-storage-light.png',
     docsUrl: 'https://supabase.com/docs/guides/storage',
+    blogUrl: 'https://supabase.com/blog/supabase-storage',
     slug: 'file-storage',
     status: {
       stage: PRODUCT_STAGES.GA,
@@ -1638,6 +1669,7 @@ Analytics Buckets provide the scalable, cost-effective storage layer required fo
     products: [PRODUCT_SHORTNAMES.STORAGE],
     heroImage: '',
     docsUrl: 'https://supabase.com/docs/guides/storage/analytics/introduction',
+    blogUrl: 'https://supabase.com/blog/introducing-analytics-buckets',
     slug: 'analytics-buckets-with-iceberg',
     status: {
       stage: PRODUCT_STAGES.PUBLIC_ALPHA,
@@ -1675,6 +1707,7 @@ Vector Buckets provide the scalable vector storage required for AI-powered appli
     products: [PRODUCT_SHORTNAMES.STORAGE],
     heroImage: '',
     docsUrl: 'https://supabase.com/docs/guides/storage/vector/introduction',
+    blogUrl: 'https://supabase.com/blog/vector-buckets',
     slug: 'vector-buckets',
     status: {
       stage: PRODUCT_STAGES.PUBLIC_ALPHA,
@@ -1713,7 +1746,7 @@ Supabase's CDN significantly improves the performance and user experience of you
     icon: Cloud,
     products: [PRODUCT_SHORTNAMES.STORAGE],
     heroImage: '',
-    docsUrl: 'https://supabase.com/docs/guides/storage/cdn',
+    docsUrl: 'https://supabase.com/docs/guides/storage/cdn/fundamentals',
     slug: 'cdn',
     status: {
       stage: PRODUCT_STAGES.GA,
@@ -1837,7 +1870,7 @@ Automatic format optimization detects the capabilities of the user’s browser a
     icon: Image,
     products: [PRODUCT_SHORTNAMES.STORAGE],
     heroImage: 'https://www.youtube-nocookie.com/embed/dLqSmxX3r7I',
-    docsUrl: 'https://supabase.com/docs/guides/storage/image-transformations',
+    docsUrl: 'https://supabase.com/docs/guides/storage/serving/image-transformations',
     slug: 'image-transformations',
     status: {
       stage: PRODUCT_STAGES.GA,
@@ -1878,6 +1911,7 @@ Supabase's Resumable Uploads feature significantly improves the reliability and 
     products: [PRODUCT_SHORTNAMES.STORAGE],
     heroImage: 'https://www.youtube-nocookie.com/embed/pT2PcZFq_M0',
     docsUrl: 'https://supabase.com/docs/guides/storage/uploads/resumable-uploads',
+    blogUrl: 'https://supabase.com/blog/storage-v3-resumable-uploads',
     slug: 'resumable-uploads',
     status: {
       stage: PRODUCT_STAGES.GA,
@@ -1919,6 +1953,7 @@ Supabase's S3 compatibility allows seamless integration with existing workflows 
     heroImage: '/images/features/s3-compatibility.png',
     heroImageLight: '/images/features/s3-compatibility-light.png',
     docsUrl: 'https://supabase.com/docs/guides/storage/s3/compatibility',
+    blogUrl: 'https://supabase.com/blog/s3-compatible-storage',
     slug: 's3-compatibility',
     status: {
       stage: PRODUCT_STAGES.GA,
@@ -1964,6 +1999,7 @@ Supabase's Deno Edge Functions enable you to build responsive, globally distribu
     products: [PRODUCT_SHORTNAMES.FUNCTIONS],
     heroImage: 'https://www.youtube-nocookie.com/embed/EQ5h3NSWMbk',
     docsUrl: 'https://supabase.com/docs/guides/functions',
+    blogUrl: 'https://supabase.com/blog/supabase-edge-functions',
     slug: 'deno-edge-functions',
     status: {
       stage: PRODUCT_STAGES.GA,
@@ -1996,6 +2032,7 @@ Supabase's Deno Edge Functions enable you to build responsive, globally distribu
     products: [PRODUCT_SHORTNAMES.FUNCTIONS],
     heroImage: 'https://www.youtube-nocookie.com/embed/kL4M0auf4UU',
     docsUrl: 'https://supabase.com/docs/reference/middleware/introduction',
+    blogUrl: 'https://supabase.com/blog/supabase-middleware',
     slug: 'supabase-middleware',
     status: {
       stage: PRODUCT_STAGES.GA,
@@ -2036,6 +2073,7 @@ Turn on the OAuth 2.1 server and dynamic client registration under Authenticatio
     products: [PRODUCT_SHORTNAMES.AUTHENTICATION, PRODUCT_SHORTNAMES.FUNCTIONS],
     heroImage: 'https://www.youtube-nocookie.com/embed/vEv87D-eJK4',
     docsUrl: 'https://supabase.com/docs/reference/server/introduction',
+    blogUrl: 'https://supabase.com/blog/introducing-supabase-server',
     slug: 'server-sdk',
     status: {
       stage: PRODUCT_STAGES.PUBLIC_BETA,
@@ -2075,6 +2113,7 @@ Persistent Storage transforms Edge Functions into stateful, high-performance com
     products: [PRODUCT_SHORTNAMES.FUNCTIONS],
     heroImage: '',
     docsUrl: 'https://supabase.com/docs/guides/functions/ephemeral-storage',
+    blogUrl: 'https://supabase.com/blog/persistent-storage-for-faster-edge-functions',
     slug: 'persistent-storage',
     status: {
       stage: PRODUCT_STAGES.GA,
@@ -2189,6 +2228,7 @@ Automatic Embeddings eliminate the manual work of generating and maintaining vec
     products: [PRODUCT_MODULES_SHORTNAMES.VECTOR],
     heroImage: '',
     docsUrl: 'https://supabase.com/docs/guides/ai/automatic-embeddings',
+    blogUrl: 'https://supabase.com/blog/automatic-embeddings',
     slug: 'automatic-embeddings',
     status: {
       stage: PRODUCT_STAGES.GA,
@@ -2221,6 +2261,7 @@ Update to CLI v2.119.0 or later, then turn it on with \`SUPABASE_EXPERIMENTAL_ST
     heroImage: '/images/features/local-development.png',
     heroImageLight: '/images/features/local-development-light.png',
     docsUrl: 'https://supabase.com/docs/guides/local-development/running-multiple-local-projects',
+    blogUrl: 'https://supabase.com/blog/supabase-local-dev',
     slug: 'local-development',
     status: {
       stage: PRODUCT_STAGES.PUBLIC_ALPHA,
@@ -2252,6 +2293,7 @@ The Supabase CLI runs the full Supabase stack on your machine or in CI, captures
     products: [ADDITIONAL_PRODUCTS.PLATFORM],
     heroImage: 'https://www.youtube-nocookie.com/embed/vyHyYpvjaks',
     docsUrl: 'https://supabase.com/docs/guides/local-development',
+    blogUrl: 'https://supabase.com/blog/supabase-cli',
     slug: 'cli',
     status: {
       stage: PRODUCT_STAGES.GA,
@@ -2286,6 +2328,7 @@ Running several local projects is experimental and needs CLI v2.119.0 or later. 
     heroImage: '',
     hideHero: true,
     docsUrl: 'https://supabase.com/docs/guides/local-development/running-multiple-local-projects',
+    blogUrl: 'https://supabase.com/blog/local-supabase-project-per-agent-with-or-without-docker',
     slug: 'parallel-local-projects',
     status: {
       stage: PRODUCT_STAGES.PUBLIC_ALPHA,
@@ -2352,6 +2395,7 @@ By utilizing the Supabase Management API, you can create more efficient, scalabl
     heroImage: '/images/features/management-api.png',
     heroImageLight: '/images/features/management-api-light.png',
     docsUrl: 'https://supabase.com/docs/reference/api/introduction',
+    blogUrl: 'https://supabase.com/blog/supabase-cli-v1-and-admin-api-beta',
     slug: 'management-api',
     status: {
       stage: PRODUCT_STAGES.GA,
@@ -2437,7 +2481,7 @@ By leveraging Role-Based Access Control, you can create a secure, scalable, and 
     products: [ADDITIONAL_PRODUCTS.PLATFORM],
     heroImage: 'https://www.youtube-nocookie.com/embed/168PHFnxkok',
     docsUrl:
-      'https://supabase.com/docs/guides/database/postgres/custom-claims-and-role-based-access-control-rbac',
+      'https://supabase.com/docs/guides/api/custom-claims-and-role-based-access-control-rbac',
     slug: 'role-based-access-control',
     status: {
       stage: PRODUCT_STAGES.GA,
@@ -2474,7 +2518,8 @@ By leveraging Supabase Reports, you gain a understanding of your project's perfo
     products: [ADDITIONAL_PRODUCTS.PLATFORM],
     heroImage: '/images/features/reports-and-metrics.png',
     heroImageLight: '/images/features/reports-and-metrics-light.png',
-    docsUrl: 'https://supabase.com/blog/supabase-reports-and-metrics',
+    docsUrl: 'https://supabase.com/docs/guides/observability/reports',
+    blogUrl: 'https://supabase.com/blog/supabase-reports-and-metrics',
     slug: 'reports-and-metrics',
     status: {
       stage: PRODUCT_STAGES.GA,
@@ -2555,6 +2600,7 @@ By building on Supabase's SOC 2 compliant platform, you gain a significant advan
     products: [ADDITIONAL_PRODUCTS.PLATFORM],
     heroImage: '',
     docsUrl: 'https://supabase.com/docs/guides/security/soc-2-compliance',
+    blogUrl: 'https://supabase.com/blog/supabase-soc2',
     slug: 'soc-2-compliance',
     status: {
       stage: PRODUCT_STAGES.GA,
@@ -2583,7 +2629,7 @@ With Supabase AI Assistant, you gain a powerful ally in your development process
     icon: Brain,
     products: [ADDITIONAL_PRODUCTS.PLATFORM],
     heroImage: 'https://www.youtube-nocookie.com/embed/_fdP-aaTHgw',
-    docsUrl: '/blog/supabase-ai-assistant-v2',
+    blogUrl: '/blog/supabase-ai-assistant-v2',
     slug: 'ai-assistant',
     status: {
       stage: PRODUCT_STAGES.PUBLIC_ALPHA,
@@ -2621,7 +2667,8 @@ This feature is particularly valuable for teams looking to enhance their applica
     products: [ADDITIONAL_PRODUCTS.PLATFORM],
     heroImage: '/images/features/logs-analytics.png',
     heroImageLight: '/images/features/logs-analytics-light.png',
-    docsUrl: 'https://supabase.com/docs/guides/monitoring-troubleshooting/logs',
+    docsUrl: 'https://supabase.com/docs/guides/observability/logs',
+    blogUrl: 'https://supabase.com/blog/new-observability-features-in-supabase',
     slug: 'logs-analytics',
     status: {
       stage: PRODUCT_STAGES.GA,
@@ -2693,7 +2740,7 @@ Multiple users can collaborate on schema design in real-time, enhancing teamwork
     products: [ADDITIONAL_PRODUCTS.STUDIO],
     heroImage: '/images/features/visual-schema-designer.png',
     heroImageLight: '/images/features/visual-schema-designer-light.png',
-    docsUrl: 'https://supabase.com/blog/supabase-studio-3-0#schema-visualizer',
+    blogUrl: 'https://supabase.com/blog/supabase-studio-3-0#schema-visualizer',
     slug: 'visual-schema-designer',
     status: {
       stage: PRODUCT_STAGES.GA,
@@ -2719,7 +2766,6 @@ This feature is essential for organizations looking to maintain robust security 
     products: [ADDITIONAL_PRODUCTS.STUDIO],
     heroImage: '/images/features/policy-templates.png',
     heroImageLight: '/images/features/policy-templates-light.png',
-    docsUrl: '',
     slug: 'policy-templates',
     status: {
       stage: PRODUCT_STAGES.GA,
@@ -2730,7 +2776,9 @@ This feature is essential for organizations looking to maintain robust security 
     title: 'SQL Editor',
     subtitle: 'A powerful interface for writing and executing SQL queries.',
     description: `
-The SQL Editor in [Supabase Studio](/features?products=studio) provides users with a robust platform for writing, executing, and managing SQL queries directly within their browser. This feature is designed to enhance productivity by offering syntax highlighting, auto-completion, and error detection, making it easier for developers to interact with their databases efficiently.
+The SQL Editor in [Supabase Studio](/features?products=studio) provides users with a robust platform for writing, executing, and managing SQL queries directly within their browser. 
+
+${FEATURE_CTA_MARKER}
 
 ## Key benefits
 1. User-friendly interface: Intuitive design that simplifies the process of writing SQL queries.
@@ -2795,7 +2843,7 @@ Yes, the editor is available locally through [Supabase CLI](/features/cli).
     products: [ADDITIONAL_PRODUCTS.STUDIO],
     heroImage: '/images/features/sql-editor.png',
     heroImageLight: '/images/features/sql-editor-light.png',
-    docsUrl: '',
+    blogUrl: 'https://supabase.com/blog/supabase-studio-3-0',
     slug: 'sql-editor',
     status: {
       stage: PRODUCT_STAGES.GA,
@@ -2822,7 +2870,8 @@ This feature is essential for organizations aiming to maintain high security sta
     products: [ADDITIONAL_PRODUCTS.STUDIO],
     heroImage: '/images/features/security-and-performance-advisor.png',
     heroImageLight: '/images/features/security-and-performance-advisor-light.png',
-    docsUrl: 'https://supabase.com/blog/security-performance-advisor',
+    docsUrl: 'https://supabase.com/docs/guides/observability/advisors',
+    blogUrl: 'https://supabase.com/blog/security-performance-advisor',
     slug: 'security-and-performance-advisor',
     status: {
       stage: PRODUCT_STAGES.GA,
@@ -2887,6 +2936,7 @@ This feature is particularly valuable for teams looking to implement robust secu
     heroImage: '/images/features/postgres-roles.png',
     heroImageLight: '/images/features/postgres-roles-light.png',
     docsUrl: 'https://supabase.com/docs/guides/database/postgres/roles',
+    blogUrl: 'https://supabase.com/blog/postgres-roles-and-privileges',
     slug: 'postgres-roles',
     status: {
       stage: PRODUCT_STAGES.GA,
@@ -2918,7 +2968,7 @@ By leveraging User Impersonation, you can ensure that your application delivers 
     products: [PRODUCT_SHORTNAMES.AUTHENTICATION, ADDITIONAL_PRODUCTS.STUDIO],
     heroImage: '/images/blog/launch-week-x/day-1/3.png',
     heroImageLight: '/images/blog/launch-week-x/day-1/3.png',
-    docsUrl: '/blog/studio-introducing-assistant#user-impersonation',
+    blogUrl: '/blog/studio-introducing-assistant#user-impersonation',
     slug: 'user-impersonation',
     status: {
       stage: PRODUCT_STAGES.PUBLIC_BETA,
@@ -2944,7 +2994,7 @@ This feature is particularly beneficial for developers working with complex data
     products: [ADDITIONAL_PRODUCTS.STUDIO],
     heroImage:
       'https://xguihxuzqibwxjnimxev.supabase.co/storage/v1/object/public/videos/docs/fk-lookup.mp4',
-    docsUrl: 'https://supabase.com/blog/supabase-studio-2.0#foreign-key-selector',
+    blogUrl: 'https://supabase.com/blog/supabase-studio-2.0#foreign-key-selector',
     slug: 'foreign-key-selector',
     status: {
       stage: PRODUCT_STAGES.GA,
@@ -2974,6 +3024,7 @@ $60 per drain per project, plus $0.20 per million events and $0.09 per GB egress
     products: [ADDITIONAL_PRODUCTS.STUDIO],
     heroImage: 'https://www.youtube-nocookie.com/embed/A4GFmvgxS-E',
     docsUrl: 'https://supabase.com/docs/guides/observability/log-drains',
+    blogUrl: 'https://supabase.com/blog/log-drains',
     slug: 'log-drains',
     status: {
       stage: PRODUCT_STAGES.GA,
@@ -2999,6 +3050,7 @@ This feature is particularly valuable for developers looking to build dynamic we
     products: [ADDITIONAL_PRODUCTS.PLATFORM],
     heroImage: '',
     docsUrl: 'https://supabase.com/docs/reference/javascript/introduction',
+    blogUrl: 'https://supabase.com/blog/supabase-js-v2',
     slug: 'client-library-javascript',
     status: {
       stage: PRODUCT_STAGES.GA,
@@ -3024,6 +3076,7 @@ This feature is particularly useful for Flutter developers aiming to create resp
     products: [ADDITIONAL_PRODUCTS.PLATFORM],
     heroImage: '',
     docsUrl: 'https://supabase.com/docs/reference/dart/introduction',
+    blogUrl: 'https://supabase.com/blog/supabase-flutter-sdk-v1-released',
     slug: 'client-library-flutter',
     status: {
       stage: PRODUCT_STAGES.GA,
@@ -3049,6 +3102,7 @@ This feature is particularly valuable for iOS developers looking to leverage the
     products: [ADDITIONAL_PRODUCTS.PLATFORM],
     heroImage: '',
     docsUrl: 'https://supabase.com/docs/reference/swift/start',
+    blogUrl: 'https://supabase.com/blog/supabase-swift',
     slug: 'client-library-swift',
     status: {
       stage: PRODUCT_STAGES.GA,
@@ -3074,6 +3128,7 @@ This feature is especially beneficial for Python developers looking to build rob
     products: [ADDITIONAL_PRODUCTS.PLATFORM],
     heroImage: '',
     docsUrl: 'https://supabase.com/docs/reference/python/start',
+    blogUrl: 'https://supabase.com/blog/python-support',
     slug: 'client-library-python',
     status: {
       stage: PRODUCT_STAGES.BETA,
@@ -3099,6 +3154,7 @@ Supabase Cron is a Postgres module designed to schedule recurring Jobs with cron
     products: [PRODUCT_SHORTNAMES.DATABASE, ADDITIONAL_PRODUCTS.PLATFORM],
     heroImage: 'https://www.youtube-nocookie.com/embed/miRQPbIJOuQ',
     docsUrl: 'https://supabase.com/docs/guides/cron',
+    blogUrl: 'https://supabase.com/blog/supabase-cron',
     slug: 'supabase-cron',
     status: {
       stage: PRODUCT_STAGES.BETA,
@@ -3130,6 +3186,7 @@ OrioleDB is a PostgreSQL storage extension built on its pluggable storage framew
     heroImage: '/images/features/orioledb.png',
     heroImageLight: '/images/features/orioledb-light.png',
     docsUrl: 'https://supabase.com/docs/guides/database/orioledb',
+    blogUrl: 'https://supabase.com/blog/orioledb-launch',
     slug: 'orioledb',
     status: {
       stage: PRODUCT_STAGES.PUBLIC_BETA,
@@ -3155,6 +3212,7 @@ Supabase Queues provides the reliability of Postgres with the simplicity of Supa
     products: [PRODUCT_SHORTNAMES.DATABASE, ADDITIONAL_PRODUCTS.PLATFORM],
     heroImage: 'https://www.youtube-nocookie.com/embed/UEwfaElBnZk',
     docsUrl: 'https://supabase.com/docs/guides/queues',
+    blogUrl: 'https://supabase.com/blog/supabase-queues',
     slug: 'queues',
     status: {
       stage: PRODUCT_STAGES.PUBLIC_ALPHA,
@@ -3270,7 +3328,8 @@ Yes, the MCP Server can perform actions like creating tables, running queries, a
     icon: CloudCog,
     products: [PRODUCT_SHORTNAMES.DATABASE, ADDITIONAL_PRODUCTS.PLATFORM],
     heroImage: 'https://www.youtube-nocookie.com/embed/1SMldLoOhbg',
-    docsUrl: 'https://supabase.com/docs/guides/getting-started/mcp',
+    docsUrl: 'https://supabase.com/docs/guides/ai-tools/mcp',
+    blogUrl: 'https://supabase.com/blog/mcp-server',
     slug: 'mcp-server',
     status: {
       stage: PRODUCT_STAGES.GA,
@@ -3391,6 +3450,7 @@ Get started with the [Declarative Schemas documentation](https://supabase.com/do
     products: [PRODUCT_SHORTNAMES.DATABASE],
     heroImage: 'https://www.youtube-nocookie.com/embed/EALkUlOKvAs',
     docsUrl: 'https://supabase.com/docs/guides/local-development/declarative-database-schemas',
+    blogUrl: 'https://supabase.com/blog/declarative-schemas',
     slug: 'declarative-schemas',
     status: {
       stage: PRODUCT_STAGES.GA,
@@ -3443,6 +3503,7 @@ By leveraging PrivateLink, you can satisfy stringent compliance requirements, re
     products: [ADDITIONAL_PRODUCTS.PLATFORM],
     heroImage: '/images/blog/2026/security-retro/privatelink.png',
     docsUrl: 'https://supabase.com/docs/guides/platform/privatelink',
+    blogUrl: 'https://supabase.com/blog/supabase-privatelink-available',
     slug: 'privatelink',
     status: {
       stage: PRODUCT_STAGES.BETA,

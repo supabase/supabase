@@ -3,11 +3,14 @@ import { getAccessToken, IS_PLATFORM } from 'common'
 import createClient from 'openapi-fetch'
 
 import type { paths } from './api'
-import { refetchWithoutCache, reportEmptyBodyResponse } from './empty-body-diagnostics'
+import { emptyBodyErrorContext, refetchWithoutCache } from './empty-body-diagnostics'
 import {
   classifyError,
   classifyResponseError,
+  parseJsonObject,
   parseResponseErrorBody,
+  parseRetryAfterSeconds,
+  readResponseError,
 } from './error-classification'
 import { guardMethod, type GuardedClientMethod } from './guarded-fetch'
 import { API_URL } from '@/lib/constants'
@@ -16,22 +19,26 @@ import {
   reportStudioError,
   type StudioSentryContext,
 } from '@/lib/errors/report-studio-error'
-import type { StudioError } from '@/lib/errors/studio-errors'
+import { MalformedResponseError, type StudioError } from '@/lib/errors/studio-errors'
 import { uuidv4 } from '@/lib/helpers'
 
 // generated from openapi-typescript
 
 const DEFAULT_HEADERS = { Accept: 'application/json' }
 
+// The OpenAPI path pattern of each in-flight request, recorded by `onRequest` (which receives
+// `schemaPath`) and read by `fetchHandler`, which only sees the `Request`.
+const requestEndpoints = new WeakMap<Request, string>()
+
 export const fetchHandler: typeof fetch = async (input, init) => {
   try {
     return await fetch(input, init)
-  } catch (err: any) {
-    if (err instanceof TypeError && err.message === 'Failed to fetch') {
-      console.error(err)
-      throw new Error('Unable to reach the server. Please check your network or try again later.')
-    }
-    throw err
+  } catch (err) {
+    const request = typeof Request !== 'undefined' && input instanceof Request ? input : undefined
+    throw classifyError(err, {
+      endpoint: request ? requestEndpoints.get(request) : undefined,
+      method: request?.method ?? init?.method,
+    })
   }
 }
 
@@ -84,7 +91,8 @@ export async function constructHeaders(headersInit?: HeadersInit | undefined) {
  * Some browsers (mostly Firefox) also return a 200 with an empty body for GETs that have
  * data, which would otherwise surface as `{}` and crash components. Before giving up we try
  * to recover the body: first from the original response (when only the clone was empty),
- * then by re-fetching JSON GETs once with the HTTP cache bypassed.
+ * then by re-fetching JSON GETs once with the HTTP cache bypassed. If a JSON GET is still empty
+ * it throws `MalformedResponseError` rather than hand callers an empty object they'd crash on.
  */
 export async function normalizeEmptyBodyResponse(
   response: Response,
@@ -105,8 +113,6 @@ export async function normalizeEmptyBodyResponse(
     // The clone came back empty, check whether the original still has the body
     const originalBody = await response.text()
     if (originalBody.length > 0) {
-      if (source)
-        void reportEmptyBodyResponse({ ...source, response, recoveredBy: 'original_body' })
       return new Response(originalBody, {
         status: response.status,
         statusText: response.statusText,
@@ -122,21 +128,33 @@ export async function normalizeEmptyBodyResponse(
   if (source && canRefetch) {
     const { summary, response: retried, body } = await refetchWithoutCache(source.request)
     if (retried?.ok && body) {
-      void reportEmptyBodyResponse({
-        ...source,
-        response,
-        recoveredBy: 'refetch',
-        refetch: summary,
-      })
       return new Response(body, {
         status: retried.status,
         statusText: retried.statusText,
         headers: retried.headers,
       })
     }
-    void reportEmptyBodyResponse({ ...source, response, recoveredBy: 'none', refetch: summary })
-  } else if (source) {
-    void reportEmptyBodyResponse({ ...source, response, recoveredBy: 'none' })
+
+    // A refetch cut short by the caller's abort isn't evidence of a malformed response.
+    if (source.request.signal?.aborted) {
+      throw classifyError(new DOMException('The operation was aborted.', 'AbortError'), {
+        endpoint: source.schemaPath,
+        method: source.request.method,
+      })
+    }
+
+    const error = new MalformedResponseError({
+      message: 'The server returned an empty response.',
+      code: response.status,
+      requestId: source.request.headers.get('X-Request-Id') ?? undefined,
+      endpoint: source.schemaPath,
+      method: source.request.method,
+    })
+    // The query cache reports this error once, after the last retry, with the refetch diagnostics
+    deferStudioErrorReport(error, {
+      context: emptyBodyErrorContext({ request: source.request, response, refetch: summary }),
+    })
+    throw error
   }
 
   if (response.headers.has('Content-Length')) return response
@@ -150,7 +168,7 @@ export async function normalizeEmptyBodyResponse(
   })
 }
 
-function pgMetaGuard(request: Request) {
+function pgMetaGuard(request: Request, schemaPath: string) {
   // Only check for /platform/pg-meta/ endpoints
   if (request.url.includes('/platform/pg-meta/')) {
     // If there is no valid `x-connection-encrypted`, pg-meta will necesseraly fail to connect to the target database
@@ -161,7 +179,9 @@ function pgMetaGuard(request: Request) {
         message: 'API Error: happened while trying to acquire connection to the database',
         code: 400,
         requestId: request.headers.get('X-Request-Id') ?? undefined,
-        retryAfter: retryAfterHeader ? parseInt(retryAfterHeader) : undefined,
+        retryAfter: parseRetryAfterSeconds(retryAfterHeader),
+        endpoint: schemaPath,
+        method: request.method,
       })
     }
     if (!request.headers.get('x-pg-application-name')) {
@@ -171,14 +191,59 @@ function pgMetaGuard(request: Request) {
   return request
 }
 
+async function readBodyText(response: Response): Promise<string> {
+  try {
+    return await response.text()
+  } catch {
+    // unreadable body: classify by status alone
+    return ''
+  }
+}
+
+/**
+ * Turns every non-OK response into a JSON object body that `parseResponseErrorBody` can read.
+ * openapi-fetch builds `error` only from the returned body, so the fields extracted by
+ * `readResponseError` are serialized over the original JSON object body (some callers read
+ * other fields from it directly).
+ */
+async function buildErrorResponse(
+  response: Response,
+  { request, schemaPath }: { request: Request; schemaPath: string }
+): Promise<Response> {
+  const text = await readBodyText(response.clone())
+  const raw = readResponseError({
+    status: response.status,
+    headers: response.headers,
+    text,
+    requestId: request.headers.get('X-Request-Id') ?? undefined,
+    endpoint: schemaPath,
+    method: request.method,
+  })
+
+  // Keep the original body's other fields: some callers read the openapi-fetch `error` directly
+  const original = parseJsonObject(text)
+
+  const headers = new Headers(response.headers)
+  // The old length no longer matches, and `Content-Length: 0` makes openapi-fetch skip the body
+  headers.delete('Content-Length')
+  headers.set('Content-Type', 'application/json')
+
+  return new Response(JSON.stringify({ ...original, ...raw }), {
+    status: response.status,
+    statusText: response.statusText,
+    headers,
+  })
+}
+
 // Middleware
 client.use(
   {
     // Middleware to add authorization headers to the request
-    async onRequest({ request }) {
+    async onRequest({ request, schemaPath }) {
+      requestEndpoints.set(request, schemaPath)
       const headers = await constructHeaders()
       headers.forEach((value, key) => request.headers.set(key, value))
-      return pgMetaGuard(request)
+      return pgMetaGuard(request, schemaPath)
     },
   },
   {
@@ -188,33 +253,7 @@ client.use(
         return normalizeEmptyBodyResponse(response, { request, schemaPath })
       }
 
-      // handle errors
-      try {
-        // attempt to parse the response body as JSON
-        let body = await response.clone().json()
-
-        // add code field to body
-        body.code = response.status
-
-        body.requestId = request.headers.get('X-Request-Id')
-
-        const retryAfterHeader =
-          response.headers.get('Retry-After') ?? response.headers.get('X-RateLimit-Reset')
-        body.retryAfter = retryAfterHeader ? parseInt(retryAfterHeader) : undefined
-
-        const requestUrl = new URL(request.url)
-        body.requestPathname = requestUrl.pathname
-
-        return new Response(JSON.stringify(body), {
-          headers: response.headers,
-          status: response.status,
-          statusText: response.statusText,
-        })
-      } catch {
-        // noop
-      }
-
-      return response
+      return buildErrorResponse(response, { request, schemaPath })
     },
   }
 )
@@ -312,16 +351,15 @@ async function handleFetchError(response: unknown): Promise<StudioError> {
 }
 
 async function classifyFetchResponse(response: Response): Promise<StudioError> {
-  const resJson: any = await response.json()
-  const status = response.status
-
-  const message =
-    resJson.message ?? resJson.msg ?? resJson.error ?? `An error has occurred: ${status}`
-  const retryAfterHeader =
-    response.headers.get('Retry-After') ?? response.headers.get('X-RateLimit-Reset')
-  const retryAfter = retryAfterHeader ? parseInt(retryAfterHeader) : undefined
-
-  return classifyResponseError({ message, code: status, retryAfter })
+  const raw = readResponseError({
+    status: response.status,
+    headers: response.headers,
+    text: await readBodyText(response),
+  })
+  return classifyResponseError({
+    ...raw,
+    message: raw.message ?? `An error has occurred: ${response.status}`,
+  })
 }
 
 /**
@@ -345,7 +383,7 @@ export async function fetchGet<T = any>(
       ...otherOptions,
       signal: abortSignal,
     })
-    if (!response.ok) return handleFetchError(response)
+    if (!response.ok) return await handleFetchError(response)
     return handleFetchResponse(response)
   } catch (error) {
     return handleFetchError(error)
@@ -377,7 +415,7 @@ export async function fetchPost<T = any>(
       ...otherOptions,
       signal: abortSignal,
     })
-    if (!response.ok) return handleFetchError(response)
+    if (!response.ok) return await handleFetchError(response)
     return handleFetchResponse(response)
   } catch (error) {
     return handleFetchError(error)
@@ -410,7 +448,7 @@ export async function fetchHeadWithTimeout<T = any>(
       signal: AbortSignal.timeout(timeout),
     })
 
-    if (!response.ok) return handleFetchError(response)
+    if (!response.ok) return await handleFetchError(response)
     return handleFetchHeadResponse(response, headersToRetrieve)
   } catch (error) {
     return handleFetchError(error)

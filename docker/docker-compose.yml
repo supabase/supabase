@@ -224,6 +224,12 @@ services:
       # Optional, defaults to API_EXTERNAL_URL if not set
       # GOTRUE_SAML_EXTERNAL_URL: ${SAML_EXTERNAL_URL}
 
+      # OAuth 2.1 server
+      # See: https://supabase.com/docs/guides/self-hosting/self-hosted-oauth-server
+      # GOTRUE_OAUTH_SERVER_ENABLED: ${OAUTH_SERVER_ENABLED:-false}
+      # GOTRUE_OAUTH_SERVER_AUTHORIZATION_PATH: ${OAUTH_SERVER_AUTHORIZATION_PATH}
+      # GOTRUE_OAUTH_SERVER_ALLOW_DYNAMIC_REGISTRATION: ${OAUTH_SERVER_ALLOW_DYNAMIC_REGISTRATION:-false}
+
       # Uncomment to enable custom access token hook.
       # See: https://supabase.com/docs/guides/auth/auth-hooks for
       # full list of hooks and additional details about custom_access_token_hook
@@ -319,13 +325,28 @@ services:
 
       SECRET_KEY_BASE: ${SECRET_KEY_BASE}
       METRICS_JWT_SECRET: ${JWT_SECRET}
+      # Erlang distribution cookie. Leave unset for single-node: the entrypoint
+      # generates a random one on start. Set it (same value on every node) only
+      # when running multiple Realtime nodes that must cluster together.
+      RELEASE_COOKIE: ${RELEASE_COOKIE:-}
       ERL_AFLAGS: -proto_dist inet_tcp
-      DNS_NODES: "''"
+      # Bind the internal gen_rpc listener to loopback only. This single-node
+      # deployment has no cluster peers, so nothing else on the Docker network
+      # needs to reach it.
+      GEN_RPC_SOCKET_IP: 127.0.0.1
+      # Disable cluster peer discovery: it only benefits multi-node Realtime and
+      # does nothing on a single node.
+      CLUSTER_STRATEGIES: ""
       RLIMIT_NOFILE: "10000"
       APP_NAME: realtime
       SEED_SELF_HOST: "true"
       RUN_JANITOR: "true"
       DISABLE_HEALTHCHECK_LOGGING: "true"
+    volumes:
+      - ./volumes/realtime/docker-entrypoint.sh:/docker-entrypoint.sh:ro,z
+    # Overriding entrypoint clears the image's default command, so restore it.
+    entrypoint: ["/bin/sh", "/docker-entrypoint.sh"]
+    command: ["/app/bin/server"]
 
   # To use S3 backed storage: docker compose -f docker-compose.yml -f docker-compose.s3.yml up
   storage:

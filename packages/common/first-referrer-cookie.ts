@@ -145,7 +145,7 @@ export function isOAuthRedirectReferrer(referrer: string): boolean {
 
 const UTM_KEYS = ['utm_source', 'utm_medium', 'utm_campaign', 'utm_content', 'utm_term'] as const
 
-const CLICK_ID_KEYS = [
+export const CLICK_ID_KEYS = [
   'gclid', // Google Ads
   'gbraid', // Google Ads (iOS)
   'wbraid', // Google Ads (iOS)

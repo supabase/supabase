@@ -7,20 +7,20 @@ import {
   DialogDescription,
   DialogFooter,
   DialogHeader,
-  DialogSection,
   DialogSectionSeparator,
   DialogTitle,
+  ScrollArea,
 } from 'ui'
 
 import {
   OAuthGrantAccordion,
   OAuthGrantAccordionItem,
 } from '@/components/interfaces/Organization/OAuthApps/OAuthGrantAccordionItem'
-import { MemberOauthGrantItem } from '@/data/oauth-apps/types'
+import { OAuthGrant } from '@/data/oauth-apps/oauth-apps-grants-query'
 import { pluralize } from '@/lib/helpers'
 
 interface GrantProjectsDialogContentProps extends ComponentProps<typeof DialogContent> {
-  grant: MemberOauthGrantItem
+  grant: OAuthGrant
 }
 
 export const GrantProjectsDialogContent = ({
@@ -30,32 +30,30 @@ export const GrantProjectsDialogContent = ({
   return (
     <DialogContent size="medium" {...props}>
       <DialogHeader>
-        <DialogTitle>Projects using {grant?.app.name}</DialogTitle>
+        <DialogTitle>Projects using {grant?.attributes.app.name}</DialogTitle>
         <DialogDescription className="sr-only">
-          My authorized projects using {grant?.app.name}
+          My authorized projects using {grant?.attributes.app.name}
         </DialogDescription>
       </DialogHeader>
       <DialogSectionSeparator />
-      <DialogSection className="p-0">
-        <div className="max-h-94 overflow-y-auto">
-          <OAuthGrantAccordion>
-            {grant?.projects?.map((project) => {
-              const permissionCount = grant.approved_scopes.length
+      <ScrollArea className="px-4 h-94">
+        <OAuthGrantAccordion>
+          {grant?.attributes.projects?.map((project) => {
+            const permissionCount = grant.attributes.approved_scopes.length
 
-              return (
-                <OAuthGrantAccordionItem
-                  key={project.ref}
-                  value={project.ref}
-                  icon={<BoxIcon size={16} />}
-                  title={project.name}
-                  description={`${permissionCount} ${pluralize(permissionCount, 'permission')}`}
-                  sections={[{ label: 'Permissions', values: grant.approved_scopes }]}
-                />
-              )
-            })}
-          </OAuthGrantAccordion>
-        </div>
-      </DialogSection>
+            return (
+              <OAuthGrantAccordionItem
+                key={project.ref}
+                value={project.ref}
+                icon={<BoxIcon size={16} />}
+                title={project.name}
+                description={`${permissionCount} ${pluralize(permissionCount, 'permission')}`}
+                sections={[{ label: 'Permissions', values: grant.attributes.approved_scopes }]}
+              />
+            )
+          })}
+        </OAuthGrantAccordion>
+      </ScrollArea>
       <DialogFooter>
         <DialogClose asChild>
           <Button variant="default">Close</Button>

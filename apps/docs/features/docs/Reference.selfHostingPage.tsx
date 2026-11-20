@@ -8,11 +8,8 @@ import {
 } from '~/components/Navigation/NavigationMenu/NavigationMenu.constants'
 import { REFERENCES } from '~/content/navigation.references'
 import { ClientLibIntroduction } from '~/features/docs/Reference.introduction'
-import { ReferenceNavigation } from '~/features/docs/Reference.navigation'
-import { ReferenceContentScrollHandler } from '~/features/docs/Reference.navigation.client'
 import { RefSections } from '~/features/docs/Reference.sections'
-import { LayoutMainContent } from '~/layouts/DefaultLayout'
-import { SidebarSkeleton } from '~/layouts/MainSkeleton'
+import { ReferencePageShell } from '~/features/docs/Reference.shell'
 
 export async function SelfHostingReferencePage({
   service,
@@ -47,33 +44,26 @@ export async function SelfHostingReferencePage({
 
   const name = REFERENCES[servicePath.replaceAll('-', '_')].name
 
+  const navigationProps = {
+    libraryId: servicePath,
+    name,
+    menuData,
+    libPath: servicePath,
+    version: 'latest',
+    isLatestVersion: true,
+  }
+
   return (
-    <ReferenceContentScrollHandler libPath={servicePath} version="latest" isLatestVersion={true}>
-      <SidebarSkeleton
-        menuId={menuId}
-        NavigationMenu={
-          <ReferenceNavigation
-            libraryId={servicePath}
-            name={name}
-            menuData={menuData}
-            libPath={servicePath}
-            version="latest"
-            isLatestVersion={true}
-          />
-        }
-      >
-        <LayoutMainContent>
-          <article className="@container/article">
-            <ClientLibIntroduction
-              libPath={servicePath}
-              version="latest"
-              isLatestVersion={true}
-              className="max-w-[unset]"
-            />
-            <RefSections libraryId={servicePath} version="latest" />
-          </article>
-        </LayoutMainContent>
-      </SidebarSkeleton>
-    </ReferenceContentScrollHandler>
+    <ReferencePageShell menuId={menuId} navigation={navigationProps}>
+      <article className="@container/article">
+        <ClientLibIntroduction
+          libPath={servicePath}
+          version="latest"
+          isLatestVersion={true}
+          className="max-w-[unset]"
+        />
+        <RefSections libraryId={servicePath} version="latest" />
+      </article>
+    </ReferencePageShell>
   )
 }

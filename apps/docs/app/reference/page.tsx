@@ -11,8 +11,8 @@ export const metadata: Metadata = {
 export default function ReferenceIndexPage() {
   return (
     <SidebarSkeleton>
-      <LayoutMainContent>
-        <article className="prose">
+      <LayoutMainContent className="layout-v2:lg:px-20">
+        <article className="prose layout-v2:mx-auto layout-v2:max-w-docs-content">
           <h1>API References</h1>
           <p>
             The Supabase client libraries help you interact with Supabase products, such as the
