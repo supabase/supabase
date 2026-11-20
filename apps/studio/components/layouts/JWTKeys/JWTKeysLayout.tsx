@@ -3,6 +3,7 @@ import Link from 'next/link'
 import { usePathname } from 'next/navigation'
 import { PropsWithChildren } from 'react'
 import { NavMenu, NavMenuItem } from 'ui'
+import { PageContainer } from 'ui-patterns/PageContainer'
 import {
   PageHeader,
   PageHeaderDescription,
@@ -12,7 +13,6 @@ import {
   PageHeaderTitle,
 } from 'ui-patterns/PageHeader'
 
-import { ScaffoldContainer } from '@/components/layouts/Scaffold'
 
 const JWTKeysLayout = ({ children }: PropsWithChildren) => {
   const { ref: projectRef } = useParams()
@@ -52,9 +52,9 @@ const JWTKeysLayout = ({ children }: PropsWithChildren) => {
           </NavMenu>
         </PageHeaderNavigationTabs>
       </PageHeader>
-      <ScaffoldContainer className="flex flex-col py-8 gap-8" bottomPadding>
+      <PageContainer className="flex flex-col py-8 pb-16 gap-8">
         {children}
-      </ScaffoldContainer>
+      </PageContainer>
     </>
   )
 }
