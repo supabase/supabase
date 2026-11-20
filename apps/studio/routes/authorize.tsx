@@ -84,7 +84,7 @@ function APIAuthorizationPage() {
   const { auth_id, organization_slug, project_ref, mock_scenario } = useParams()
   const isScopedOAuthConsentEnabled = useFlag('enableScopedOAuthConsent')
   const consentPreview =
-    !auth_id && (import.meta.env.DEV || IS_STAGING_OR_LOCAL)
+    !auth_id && IS_STAGING_OR_LOCAL
       ? CONSENT_PREVIEWS.find(({ value }) => value === mock_scenario)
       : undefined
   const mockScenario = consentPreview ? MOCK_SCENARIOS[consentPreview.value] : undefined

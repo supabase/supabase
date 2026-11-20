@@ -326,7 +326,9 @@ describe('OAuthAppsAuthorizeScreen', () => {
     expect(databaseManagement.parentElement).toHaveTextContent(
       'Database management, Environment, Analytics'
     )
-    expect(screen.getByText('Secrets, Projects, Edge Functions, Storage')).toBeInTheDocument()
+    expect(screen.getByRole('heading', { name: 'READ ONLY' }).parentElement).toHaveTextContent(
+      'Secrets, Projects, Edge Functions, Storage'
+    )
   })
 
   test('an organization-bound app reaches the success screen with the authorizing identity', async () => {
