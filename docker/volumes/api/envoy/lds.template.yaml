@@ -19,8 +19,10 @@ resources:
               merge_slashes: true
               path_with_escaped_slashes_action: REJECT_REQUEST
               use_remote_address: true
-              # Limit inactivity, matching Kong's default read_timeout.
-              stream_idle_timeout: 60s
+              # Close a stream after 5 minutes without data in either direction.
+              # Routes have no total timeout, so services apply their own limits
+              # first (Realtime closes idle sockets after 60s).
+              stream_idle_timeout: 300s
               common_http_protocol_options:
                 headers_with_underscores_action: REJECT_REQUEST
               upgrade_configs:
@@ -335,7 +337,7 @@ resources:
                             pattern:
                               regex: ^/auth/v1/
                             substitution: /
-                          timeout: 30s
+                          timeout: 0s
                         request_headers_to_add:
                           - header:
                               key: X-Forwarded-Prefix
@@ -371,7 +373,7 @@ resources:
                           prefix_rewrite: /
                           # Allow the runtime's 400s wall clock to expire first.
                           timeout: 410s
-                          # Limit inactivity, matching Kong's read_timeout.
+                          # Outlast the runtime's 150s request idle timeout.
                           idle_timeout: 160s
                         request_headers_to_add:
                           - header:
