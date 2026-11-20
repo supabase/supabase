@@ -27,7 +27,7 @@ export interface PrivilegesTableProps extends Pick<
   isApplyingChanges?: boolean
 }
 
-const PrivilegesTable = ({
+export const PrivilegesTable = ({
   columnPrivileges,
   tableCheckedStates,
   columnCheckedStates,
@@ -101,7 +101,7 @@ const PrivilegesTable = ({
 
                 return (
                   <TableCell key={privilege}>
-                    {COLUMN_PRIVILEGE_TYPES.includes(privilege as any) && (
+                    {COLUMN_PRIVILEGE_TYPES.includes(privilege) && (
                       <div className="ml-5 inline-flex">
                         <Switch
                           aria-label={`${privilege} privilege for ${column.column_name}`}
@@ -130,5 +130,3 @@ const PrivilegesTable = ({
     </Card>
   )
 }
-
-export default PrivilegesTable
