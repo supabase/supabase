@@ -79,9 +79,14 @@ export const LegacyTopNavBar: FC<TopNavBarProps> = ({
           </div>
         </div>
         <div className="hidden lg:flex items-center justify-end gap-3">
-          {!isUserLoading && !isLoggedIn ? (
+          {!isLoggedIn ? (
             <Button variant="primary" asChild>
-              <a href="/dashboard" className="h-[30px]" target="_blank" rel="noreferrer noopener">
+              <a
+                href="/dashboard"
+                className={cn('h-[30px]', isUserLoading && 'invisible')}
+                target="_blank"
+                rel="noreferrer noopener"
+              >
                 Sign up
               </a>
             </Button>
@@ -103,7 +108,7 @@ export const LegacyTopNavBar: FC<TopNavBarProps> = ({
 }
 
 const HeaderLogo = memo(() => (
-  <Link href="/" className="flex shrink-0 items-center gap-1.5 w-fit">
+  <Link href="/" className="flex shrink-0 items-center gap-1.5 w-fit lg:w-(--nav-logo-width)">
     <HeaderLogoContent />
   </Link>
 ))

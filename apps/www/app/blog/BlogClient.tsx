@@ -156,7 +156,7 @@ export default function BlogClient({ initialBlogs, totalPosts, initialView }: Bl
   return (
     <div>
       {/* Filters row */}
-      <div className="sticky top-[65px] z-10 bg-background/80 backdrop-blur-sm border-b border-border">
+      <div className="sticky top-(--header-height) z-10 bg-background/80 backdrop-blur-sm border-b border-border">
         <SectionContainer className="py-0!">
           <div className="py-3">
             <Suspense fallback={null}>

@@ -1,20 +1,55 @@
+import Image from 'next/image'
+import { cn } from 'ui'
+
+import { migrationSolutions, Solutions } from './Solutions'
+
+interface ComparisonIconProps {
+  className?: string
+}
+
 export const data = {
-  label: 'Compare Supabase',
+  label: 'Compare',
   comparisons: [
     {
-      text: 'Supabase vs Firebase',
-      description: '',
+      name: 'Firebase',
       url: '/alternatives/supabase-vs-firebase',
+      icon: migrationSolutions.solutions.find((solution) => solution.id === Solutions.firebase)
+        ?.icon,
     },
     {
-      text: 'Supabase vs Heroku Postgres',
-      description: '',
+      name: 'Heroku Postgres',
       url: '/alternatives/supabase-vs-heroku-postgres',
+      icon: ({ className }: ComparisonIconProps) => (
+        <Image
+          src="/images/logos/heroku-icon.svg"
+          alt=""
+          width={16}
+          height={16}
+          className={className}
+        />
+      ),
     },
     {
-      text: 'Supabase vs Auth0',
-      description: '',
+      name: 'Auth0',
       url: '/alternatives/supabase-vs-auth0',
+      icon: ({ className }: ComparisonIconProps) => (
+        <>
+          <Image
+            src="/images/logos/auth0-icon-light.svg"
+            alt=""
+            width={16}
+            height={16}
+            className={cn(className, 'dark:hidden')}
+          />
+          <Image
+            src="/images/logos/auth0-icon.svg"
+            alt=""
+            width={16}
+            height={16}
+            className={cn(className, 'hidden dark:block')}
+          />
+        </>
+      ),
     },
   ],
 }
