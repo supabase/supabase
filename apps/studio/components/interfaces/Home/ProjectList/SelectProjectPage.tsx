@@ -12,6 +12,14 @@ import {
   SelectTrigger,
   SelectValue,
 } from 'ui'
+import { PageContainer } from 'ui-patterns/PageContainer'
+import {
+  PageHeader,
+  PageHeaderMeta,
+  PageHeaderSummary,
+  PageHeaderTitle,
+} from 'ui-patterns/PageHeader'
+import { PageSection } from 'ui-patterns/PageSection'
 import { ShimmeringLoader } from 'ui-patterns/ShimmeringLoader'
 
 import {
@@ -21,8 +29,6 @@ import {
 } from '@/components/interfaces/Home/ProjectList/EmptyStates'
 import { ProjectList } from '@/components/interfaces/Home/ProjectList/ProjectList'
 import { HomePageActions } from '@/components/interfaces/HomePageActions'
-import { PageLayout } from '@/components/layouts/PageLayout/PageLayout'
-import { ScaffoldContainer, ScaffoldSection } from '@/components/layouts/Scaffold'
 import { useOrganizationsQuery } from '@/data/organizations/organizations-query'
 import { useLastVisitedOrganization } from '@/hooks/misc/useLastVisitedOrganization'
 import { withAuth } from '@/hooks/misc/withAuth'
@@ -85,9 +91,16 @@ function SelectProject() {
   return (
     <div className="h-screen flex flex-col">
       <Header />
-      <PageLayout className="grow min-h-0" title="Select a project to continue">
-        <ScaffoldContainer className="grow flex flex-col gap-y-4">
-          <ScaffoldSection isFullWidth className="py-0">
+      <div className="flex w-full min-h-0 grow flex-col items-stretch">
+        <PageHeader>
+          <PageHeaderMeta>
+            <PageHeaderSummary>
+              <PageHeaderTitle>Select a project to continue</PageHeaderTitle>
+            </PageHeaderSummary>
+          </PageHeaderMeta>
+        </PageHeader>
+        <PageContainer className="pt-12 grow flex flex-col gap-y-4">
+          <PageSection className="pt-0 last:pb-0">
             <div className="flex items-center gap-x-2">
               {isLoadingOrganizations ? (
                 <ShimmeringLoader className="w-60 py-0 h-[26px]" />
@@ -110,8 +123,8 @@ function SelectProject() {
               )}
               <HomePageActions hideNewProject />
             </div>
-          </ScaffoldSection>
-          <ScaffoldSection isFullWidth className="py-0">
+          </PageSection>
+          <PageSection className="pt-0 last:pb-0">
             {isLoadingOrganizations ? (
               <LoadingCardView />
             ) : isErrorOrganizations ? (
@@ -128,9 +141,9 @@ function SelectProject() {
                 rewriteHref={urlRewriterFactory(routeSlug)}
               />
             ) : null}
-          </ScaffoldSection>
-        </ScaffoldContainer>
-      </PageLayout>
+          </PageSection>
+        </PageContainer>
+      </div>
     </div>
   )
 }
