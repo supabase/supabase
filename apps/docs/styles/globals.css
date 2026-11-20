@@ -10,7 +10,6 @@
 @import './curved-scroll-area.css';
 @import './details.css';
 @import 'docs-search/styles.css';
-@import './header.css';
 
 @source '../app/**/*.{ts,tsx,mdx}';
 @source '../components/**/*.tsx';

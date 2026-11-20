@@ -4,12 +4,10 @@ import {
   ChevronLeft,
   ChevronRight,
   CircleChevronRight,
-  House,
   Lock,
   MousePointerClick,
   type LucideIcon,
 } from 'lucide-react'
-import Link from 'next/link'
 import { useRef, useState, type MouseEvent, type PropsWithChildren } from 'react'
 import { cn } from 'ui'
 
@@ -59,11 +57,6 @@ interface AriaCurrentOptions {
 
 interface LevelViewProps {
   level: SidebarLevel
-}
-
-interface HomeLinkProps {
-  isCurrent: boolean
-  onSectionSelect: (href: string) => void
 }
 
 interface LevelButtonProps extends PropsWithChildren {
@@ -144,8 +137,8 @@ const getPageStack = ({
   activeGroup,
   referenceSection,
 }: PageStackOptions): SidebarLevel[] => {
-  // reference pages have a nav of their own, so the reference list is their root
-  if (referenceSection) return [{ kind: 'section', section: referenceSection }]
+  // reference pages have a nav of their own, so the reference list is their deepest level
+  if (referenceSection) return [SECTIONS_LEVEL, { kind: 'section', section: referenceSection }]
   if (!activeItem) return [SECTIONS_LEVEL]
   const productLevel: SidebarLevel = { kind: 'product', item: activeItem }
   // a single page section, like start, has no section list of its own
@@ -167,12 +160,17 @@ const useSidebarSections = () => {
       section.menuItems ? getGroupItems(section) : [section]
     ),
     listSections,
-    // the footer keeps a fixed subset of the resources menu, so status stays in the top bar only
+    // the footer keeps a fixed subset of the resources menu, because the page footer already links the changelog
     resourceItems: [
-      '/guides/resources/glossary',
-      'https://supabase.com/changelog',
-      '/contributing',
-    ].flatMap((href) => resources.filter((item) => item.href === href)),
+      {
+        label: 'Knowledge base',
+        icon: 'support',
+        href: 'https://supabase.com/kb',
+      } satisfies DropdownMenuItem,
+      ...['/guides/resources/glossary', '/contributing'].flatMap((href) =>
+        resources.filter((item) => item.href === href)
+      ),
+    ],
   }
 }
 
@@ -288,22 +286,15 @@ export const DocsSidebarNavProvider = ({
 )
 
 export const DocsSidebarNavTop = ({ className }: DocsSidebarNavTopProps) => {
-  const { pathname, stack, level, onLevelJump, onSectionSelect } = useDocsSidebarNav()
+  const { stack, level, onLevelJump } = useDocsSidebarNav()
   const isNavReady = useIaNavReady()
   const navClassName = cn(
     'min-w-0 items-center pl-1',
     !isNavReady && IA_NAV_PENDING_CLASS,
     className
   )
-  // the reference list is its own root, and the top bar already names it
-  if (stack.length < 2 && level.kind !== 'sections') return null
-  if (stack.length < 2) {
-    return (
-      <nav aria-label="Sidebar levels" className={navClassName}>
-        <HomeLink isCurrent={pathname === '/'} onSectionSelect={onSectionSelect} />
-      </nav>
-    )
-  }
+  // the section list is the root, and the logo already links the docs home
+  if (stack.length < 2) return null
 
   const parentIndex = stack.length - 2
   const parentLabel = getLevelLabel(stack[parentIndex])
@@ -413,24 +404,6 @@ export const DocsSidebarResources = ({ className }: DocsSidebarResourcesProps) =
   )
 }
 
-const HomeLink = ({ isCurrent, onSectionSelect }: HomeLinkProps) => {
-  const handleClick = () => onSectionSelect('/')
-
-  return (
-    <Link
-      href="/"
-      aria-current={isCurrent ? 'page' : undefined}
-      onClick={handleClick}
-      className="group flex h-8 min-w-0 items-center rounded-md pl-0.5 text-sm font-medium text-foreground focus-inset"
-    >
-      <TopRowIcon>
-        <House aria-hidden className="size-4" />
-      </TopRowIcon>
-      <span className="min-w-0 truncate px-1">Home</span>
-    </Link>
-  )
-}
-
 const LevelView = ({ level }: LevelViewProps) => {
   const { additionalNavItems } = useDocsSidebarNav()
   if (level.kind === 'sections') return <SectionsView />
@@ -447,25 +420,23 @@ const SectionsView = () => {
   return (
     <nav aria-label="Docs sections">
       <ul className="flex flex-col">
-        {listSections
-          .filter((section) => section.label !== REFERENCE_LABEL)
-          .map((section) => (
-            <li key={section.label} className="flex flex-col">
-              {section.menuItems ? (
-                <LevelButton level={{ kind: 'section', section }} onLevelOpen={onLevelOpen}>
-                  <SectionLabel item={section} />
-                </LevelButton>
-              ) : (
-                <ProductLink
-                  item={section}
-                  isActive={isActiveHref(section.href, pathname)}
-                  onLevelOpen={onLevelOpen}
-                >
-                  <SectionLabel item={section} />
-                </ProductLink>
-              )}
-            </li>
-          ))}
+        {listSections.map((section) => (
+          <li key={section.label} className="flex flex-col">
+            {section.menuItems ? (
+              <LevelButton level={{ kind: 'section', section }} onLevelOpen={onLevelOpen}>
+                <SectionLabel item={section} />
+              </LevelButton>
+            ) : (
+              <ProductLink
+                item={section}
+                isActive={isActiveHref(section.href, pathname)}
+                onLevelOpen={onLevelOpen}
+              >
+                <SectionLabel item={section} />
+              </ProductLink>
+            )}
+          </li>
+        ))}
       </ul>
     </nav>
   )

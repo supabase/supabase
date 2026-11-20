@@ -24,7 +24,6 @@ import { menuState, useMenuMobileOpen } from '~/hooks/useMenuState'
 import { HeadingSlotProvider } from '~/layouts/HeadingSlot'
 import { MobileHeaderSlotsContext } from '~/layouts/MobileHeaderSlots'
 import { RightRailProvider } from '~/layouts/RightRail'
-import { SidebarTopSlotProvider, useSidebarTopSlot } from '~/layouts/SidebarTopSlot'
 import { UpdatedAtSlotProvider } from '~/layouts/UpdatedAtSlot'
 // End of third-party imports
 
@@ -90,7 +89,6 @@ const NavContainer = memo(function NavContainer({
   className,
 }: NavContainerProps) {
   const mobileMenuOpen = useMenuMobileOpen()
-  const { setTarget: setTopSlot } = useSidebarTopSlot()
 
   return (
     <nav
@@ -110,7 +108,6 @@ const NavContainer = memo(function NavContainer({
       )}
     >
       {mobileMenuOpen ? <MobileNavLock toggleRef={toggleRef} /> : null}
-      <div ref={setTopSlot} className="hidden lg:block shrink-0" />
       <div className="hidden lg:block shrink-0 px-4 bg-background">
         <DocsSidebarNavTop className="-mx-4 flex border-b px-4 py-2.5" />
       </div>
@@ -280,21 +277,19 @@ function TopNavSkeleton({ children }: PropsWithChildren) {
   return (
     <HeadingSlotProvider value={headingSlot}>
       <UpdatedAtSlotProvider value={updatedAtSlot}>
-        <SidebarTopSlotProvider>
-          <div className="group/docs flex flex-col h-full w-full">
-            <div className="hidden lg:sticky w-full lg:flex top-0 left-0 right-0 z-50">
-              {isLayoutV2 ? (
-                <DesktopTopNavBar
-                  headingSlotRef={setHeadingSlot}
-                  updatedAtSlotRef={setUpdatedAtSlot}
-                />
-              ) : (
-                <LegacyTopNavBar />
-              )}
-            </div>
-            {children}
+        <div className="group/docs flex flex-col h-full w-full">
+          <div className="hidden lg:sticky w-full lg:flex top-0 left-0 right-0 z-50">
+            {isLayoutV2 ? (
+              <DesktopTopNavBar
+                headingSlotRef={setHeadingSlot}
+                updatedAtSlotRef={setUpdatedAtSlot}
+              />
+            ) : (
+              <LegacyTopNavBar />
+            )}
           </div>
-        </SidebarTopSlotProvider>
+          {children}
+        </div>
       </UpdatedAtSlotProvider>
     </HeadingSlotProvider>
   )
