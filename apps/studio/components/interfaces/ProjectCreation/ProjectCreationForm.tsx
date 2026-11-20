@@ -26,7 +26,7 @@ import {
   HIGH_AVAILABILITY_RELEASE_CHANNEL,
   sizes,
 } from './ProjectCreation.constants'
-import { FormSchema } from './ProjectCreation.schema'
+import { FormSchema, ORIOLE_NOT_SUPPORTED_ON_V3_MESSAGE } from './ProjectCreation.schema'
 import {
   AUTO_REGION_VALUE,
   getAvailableRegions,
@@ -209,11 +209,8 @@ export const ProjectCreationForm = ({
     highAvailability,
     kubernetesClusterId: watchedKubernetesClusterId,
     kubernetesClusterForce: watchedKubernetesClusterForce,
-    useOrioleDb: watchedUseOrioleDb,
   } = useWatch({ control: form.control })
   const { dirtyFields } = useFormState(form)
-  const isCloudProviderDirty = dirtyFields.cloudProvider
-  const hasDroppedV3Default = useRef(false)
   const isDbRegionDirty = dirtyFields.dbRegion
   const smartRegionEnabled = cloudProvider !== 'AWS_NIMBUS'
   const highAvailabilityRegionCode = getHighAvailabilityRegionCode()
@@ -730,26 +727,6 @@ export const ProjectCreationForm = ({
     }
   }, [cloudProvider, watchedKubernetesClusterId, watchedKubernetesClusterForce, setValue])
 
-  // OrioleDB does not support v3 (AWS_K8S). If the user picks OrioleDB while the provider is
-  // still the randomly rolled v3 default, fall back to the standard provider once. A provider
-  // the user picked by hand is left as is.
-  useEffect(() => {
-    if (hasDroppedV3Default.current) return
-    if (!watchedUseOrioleDb || highAvailability || isCloudProviderDirty) return
-    if (defaultProvider !== 'AWS_K8S' || cloudProvider !== 'AWS_K8S') return
-
-    hasDroppedV3Default.current = true
-    setValue('cloudProvider', PROVIDERS[defaultProviderFromHook].id, { shouldDirty: false })
-  }, [
-    watchedUseOrioleDb,
-    highAvailability,
-    isCloudProviderDirty,
-    defaultProvider,
-    cloudProvider,
-    defaultProviderFromHook,
-    setValue,
-  ])
-
   useEffect(() => {
     if (!githubRepositoryName) return
     if ((watchedProjectName ?? '').trim().length > 0) return
@@ -786,13 +763,18 @@ export const ProjectCreationForm = ({
   return (
     <Form {...form}>
       <form
-        onSubmit={form.handleSubmit(onSubmitWithComputeCostsConfirmation, (errors) =>
+        onSubmit={form.handleSubmit(onSubmitWithComputeCostsConfirmation, (errors) => {
+          // The OrioleDB field can sit in a collapsed section, where its inline error is not
+          // rendered, so surface this error as a toast as well.
+          if (errors.useOrioleDb?.message === ORIOLE_NOT_SUPPORTED_ON_V3_MESSAGE) {
+            toast.error(ORIOLE_NOT_SUPPORTED_ON_V3_MESSAGE)
+          }
           trackFunnelError(
             'project_creation',
             classifyValidationError('project_creation', errors),
             'form'
           )
-        )}
+        })}
       >
         <Panel
           loading={!isOrganizationsSuccess}

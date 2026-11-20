@@ -2,6 +2,9 @@ import { z } from 'zod'
 
 import { DEFAULT_MINIMUM_PASSWORD_STRENGTH } from '@/lib/constants'
 
+export const ORIOLE_NOT_SUPPORTED_ON_V3_MESSAGE =
+  'OrioleDB is not supported on AWS (Revamped). Choose Postgres or another cloud provider.'
+
 export const FormSchema = z
   .object({
     organization: z.string({
@@ -89,6 +92,14 @@ export const FormSchema = z
           code: z.ZodIssueCode.custom,
           path: ['useOrioleDb'],
           message: 'High availability is not supported with OrioleDB images',
+        })
+      }
+
+      if (useOrioleDb && cloudProvider === 'AWS_K8S') {
+        ctx.addIssue({
+          code: z.ZodIssueCode.custom,
+          path: ['useOrioleDb'],
+          message: ORIOLE_NOT_SUPPORTED_ON_V3_MESSAGE,
         })
       }
 
