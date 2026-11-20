@@ -880,6 +880,61 @@ withTestDatabase('dropping column checks', async ({ executeQuery }) => {
   expect(updatedColumn!.check).toMatchInlineSnapshot(`null`)
 })
 
+withTestDatabase(
+  'adding a column check when a table in another schema has a check with the same name',
+  async ({ executeQuery }) => {
+    // `archive.orders` already has a check constraint named `orders_amount_check`,
+    // which is the name the update below generates for `public.orders`.
+    await executeQuery(`
+      create schema archive;
+      create table archive.orders(amount int8 constraint orders_amount_check check (amount > 0));
+      create table public.orders(id int8, amount int8);
+    `)
+
+    const { sql: retrieveSql, zod: retrieveZod } = await pgMeta.columns.retrieve({
+      schema: 'public',
+      table: 'orders',
+      name: 'amount',
+    })
+    const column = retrieveZod.parse((await executeQuery(retrieveSql))[0])
+
+    const { sql: updateSql } = await pgMeta.columns.update(column!, {
+      check: rawSql('amount > 0'),
+    })
+    await executeQuery(updateSql)
+
+    const updatedColumn = retrieveZod.parse((await executeQuery(retrieveSql))[0])
+    expect(updatedColumn!.check).toBe('amount > 0')
+  }
+)
+
+withTestDatabase(
+  'rejecting a multi-column check when a table in another schema has a check with the same name',
+  async ({ executeQuery }) => {
+    // `staging.invoices` has a single-column check named `invoices_total_check` on the same
+    // column position, so validating against it would wrongly accept the multi-column check.
+    await executeQuery(`
+      create schema staging;
+      create table staging.invoices(id int8, total int8 constraint invoices_total_check check (total > 0));
+      create table public.invoices(id int8, total int8, discount int8);
+    `)
+
+    const { sql: retrieveSql, zod: retrieveZod } = await pgMeta.columns.retrieve({
+      schema: 'public',
+      table: 'invoices',
+      name: 'total',
+    })
+    const column = retrieveZod.parse((await executeQuery(retrieveSql))[0])
+
+    const { sql: updateSql } = await pgMeta.columns.update(column!, {
+      check: rawSql('total > discount'),
+    })
+    await expect(executeQuery(updateSql)).rejects.toThrow(
+      'check condition cannot refer to multiple columns'
+    )
+  }
+)
+
 withTestDatabase('column with fully-qualified type', async ({ executeQuery }) => {
   // Setup: Create table and type in separate schema
   await executeQuery(`
