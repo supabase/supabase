@@ -408,7 +408,7 @@ export const OAuthAppsAuthorizeScreen = ({
       description={
         preflightData?.existing_grant ? (
           <>
-            You already authorized this app for {memberOrg.name} on{' '}
+            You authorized this app on{' '}
             <span className="inline-block whitespace-nowrap">
               <TimestampInfo
                 className="text-sm inline-block"
