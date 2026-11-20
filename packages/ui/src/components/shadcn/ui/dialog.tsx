@@ -7,6 +7,7 @@ import * as React from 'react'
 
 import { cn } from '../../../lib/utils/cn'
 import { getExplicitTabIndex } from '../../../lib/utils/getExplicitTabIndex'
+import { Button } from '../../Button/Button'
 
 export const DIALOG_PADDING_Y_SMALL = 'py-4'
 export const DIALOG_PADDING_X_SMALL = 'px-4 md:px-5'
@@ -112,14 +113,14 @@ const DialogContent = React.forwardRef<
         >
           {children}
           {!hideClose && (
-            <DialogPrimitive.Close
-              className={cn(
-                'absolute p-0.5 right-3.5 top-3.5 rounded-xs opacity-20 transition-opacity hover:opacity-100 focus-ring disabled:pointer-events-none data-[state=open]:bg-accent data-[state=open]:text-foreground-muted',
-                'hit-area-6'
-              )}
-            >
-              <X size={16} />
-              <span className="sr-only">Close</span>
+            <DialogPrimitive.Close asChild>
+              <Button
+                variant="text"
+                size="small"
+                className="absolute right-2.5 top-2.5 size-7 p-0"
+                aria-label="Close"
+                icon={<X />}
+              />
             </DialogPrimitive.Close>
           )}
         </DialogPrimitive.Content>
