@@ -3,6 +3,7 @@
 // legacy layout for the docs-ia-mvp-v1 control variant. delete it when option-1 ships
 import { AiTools } from '~/components/AiTools'
 import { Feedback } from '~/components/Feedback'
+import { LayoutSwitchButton } from '~/features/DocsLayout/LayoutSwitchButton'
 import { isFeatureEnabled } from 'common'
 import { usePathname } from 'next/navigation'
 import { cn } from 'ui'
@@ -52,6 +53,7 @@ const GuidesSidebar = ({
         {!hideToc && toc.length !== 0 && (
           <TocSection items={toc} scrollAreaClassName="-me-8.75 pe-8.75" />
         )}
+        <LayoutSwitchButton className="ml-5 shrink-0" />
       </div>
     </div>
   )

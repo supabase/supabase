@@ -1342,6 +1342,23 @@ export interface DocsGettingStartedOptionClickedEvent {
 }
 
 /**
+ * User switched the docs layout with the layout switch button in the guide right column. A switch
+ * keeps the layout over the docs-ia-mvp-v1 flag assignment.
+ *
+ * @group Events
+ * @source docs
+ */
+export interface DocsLayoutUpdatedEvent {
+  action: 'docs_layout_updated'
+  properties: {
+    /**
+     * Layout the user switched to. option-1 is the new layout, control is the previous layout.
+     */
+    layoutVariant: 'control' | 'option-1'
+  }
+}
+
+/**
  * User opened the Search V2 dialog.
  *
  * @group Events
@@ -4862,6 +4879,7 @@ export type TelemetryEvent =
   | ExampleLinkClickedEvent
   | DocsCodeCopiedEvent
   | DocsGettingStartedOptionClickedEvent
+  | DocsLayoutUpdatedEvent
   | DocsSearchV2OpenedEvent
   | DocsSearchV2SearchSubmittedEvent
   | DocsSearchV2ResultClickedEvent
