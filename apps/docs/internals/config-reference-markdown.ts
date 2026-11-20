@@ -14,20 +14,20 @@ export interface ConfigSpec {
 }
 
 /** Renders the config reference page, which is built from the spec rather than MDX. */
-export async function renderConfigReferenceMarkdown(spec: ConfigSpec): Promise<string> {
+export function renderConfigReferenceMarkdown(spec: ConfigSpec): string {
   const parts = ['# Supabase CLI config', spec.info.description.trim()]
 
   for (const tag of spec.info.tags) {
     parts.push(`## ${tag.title} Config`)
     for (const parameter of spec.parameters.filter((p) => p.tags?.[0] === tag.id)) {
-      parts.push(await renderParameter(parameter))
+      parts.push(renderParameter(parameter))
     }
   }
 
   return parts.join('\n\n') + '\n'
 }
 
-async function renderParameter(parameter: Parameter): Promise<string> {
+function renderParameter(parameter: Parameter): string {
   const block = [
     `### \`${parameter.title}\``,
     [
@@ -40,7 +40,7 @@ async function renderParameter(parameter: Parameter): Promise<string> {
 
   if (parameter.usage) {
     const toml = parameter.usage.trim()
-    const jsonc = await convertConfigTomlToJsonc(parameter.usage)
+    const jsonc = convertConfigTomlToJsonc(parameter.usage)
     block.push(`**${CONFIG_TOML_NAME}**`, '```toml\n' + toml + '\n```')
     block.push(`**${CONFIG_JSONC_NAME}**`, '```jsonc\n' + jsonc + '\n```')
   }

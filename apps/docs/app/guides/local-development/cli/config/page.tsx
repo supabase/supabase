@@ -52,8 +52,8 @@ const Config = () => {
   )
 }
 
-async function Info({ parameter }: { parameter: Parameter }) {
-  const jsonc = parameter.usage ? await convertConfigTomlToJsonc(parameter.usage) : undefined
+function Info({ parameter }: { parameter: Parameter }) {
+  const jsonc = parameter.usage ? convertConfigTomlToJsonc(parameter.usage) : undefined
 
   return (
     <div className="mt-8">

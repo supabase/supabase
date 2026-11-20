@@ -36,7 +36,6 @@ catalog:
   '@vitest/coverage-v8': ^5.0.0
   '@vitest/ui': ^5.0.0
   cn: ^0.4.0
-  effect: 4.0.0-rc.112
   lodash: ^4.18.1
   lodash-es: ^4.18.1
   # Latest v1.x that satisfies minimumReleaseAge (72h). Newer patch releases

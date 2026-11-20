@@ -41,7 +41,7 @@ const spec: ConfigSpec = {
 
 describe('renderConfigReferenceMarkdown', () => {
   it('should render parameters grouped by tag with both config formats', async () => {
-    expect(await renderConfigReferenceMarkdown(spec)).toMatchInlineSnapshot(`
+    expect(renderConfigReferenceMarkdown(spec)).toMatchInlineSnapshot(`
       "# Supabase CLI config
 
       Intro with a [link](/docs/guides/x).
@@ -92,7 +92,7 @@ describe('renderConfigReferenceMarkdown', () => {
 
   it('should render every parameter in the config spec', async () => {
     const real = yaml.load(readFileSync(CONFIG_REFERENCE_SPEC, 'utf8')) as ConfigSpec
-    const output = await renderConfigReferenceMarkdown(real)
+    const output = renderConfigReferenceMarkdown(real)
 
     for (const parameter of real.parameters) {
       expect(output).toContain(`### \`${parameter.title}\``)

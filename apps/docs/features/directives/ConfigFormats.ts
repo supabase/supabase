@@ -8,8 +8,7 @@
  *   across the page through the `config-format` query group
  */
 
-import { CliConfigConvertError, convertCliConfigTomlToJsonc } from '@supabase/config/internal'
-import { Effect } from 'effect'
+import { CliConfigConvertError, convertCliConfigTomlToJsonc } from '@supabase/config/convert'
 import { type Code, type Parent, type Root } from 'mdast'
 import type { MdxJsxFlowElement } from 'mdast-util-mdx-jsx'
 import { visitParents } from 'unist-util-visit-parents'
@@ -20,9 +19,9 @@ export const CONFIG_FORMAT_QUERY_GROUP = 'config-format'
 
 const SCHEMA_MEMBER = /^\{\n {2}"\$schema": "[^"]*",\n\n?/
 
-export async function convertConfigTomlToJsonc(source: string): Promise<string> {
+export function convertConfigTomlToJsonc(source: string): string {
   try {
-    const { text, schemaSource } = await Effect.runPromise(convertCliConfigTomlToJsonc(source))
+    const { text, schemaSource } = convertCliConfigTomlToJsonc(source)
     return (schemaSource === 'default' ? text.replace(SCHEMA_MEMBER, '{\n') : text).trimEnd()
   } catch (error) {
     if (!(error instanceof CliConfigConvertError)) throw error
@@ -37,7 +36,7 @@ export async function convertConfigTomlToJsonc(source: string): Promise<string> 
 }
 
 export function configFormatsRemark() {
-  return async function transform(tree: Root) {
+  return function transform(tree: Root) {
     const targets: Array<{ node: Code; parent: Parent }> = []
     visitParents(tree, 'code', (node: Code, ancestors: Array<Parent>) => {
       if (isConfigToml(node)) {
@@ -46,7 +45,7 @@ export function configFormatsRemark() {
     })
 
     for (const { node, parent } of targets) {
-      const jsonc = await convertConfigTomlToJsonc(node.value)
+      const jsonc = convertConfigTomlToJsonc(node.value)
       const index = parent.children.indexOf(node)
 
       if (isCodeTabs(parent)) {

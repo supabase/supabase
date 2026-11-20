@@ -11,7 +11,7 @@ import { fromDocsMarkdown } from './utils.server'
 
 async function render(mdx: string, { withCodeTabs = false } = {}) {
   let mdast = fromDocsMarkdown(mdx.trim())
-  mdast = await configFormatsRemark()(mdast)
+  mdast = configFormatsRemark()(mdast)
   if (withCodeTabs) mdast = codeTabsRemark()(mdast)
   return toMarkdown(mdast, { extensions: [mdxToMarkdown()] })
 }
@@ -142,19 +142,19 @@ y = 1
   })
 
   it('should drop the generated $schema for snippets', async () => {
-    const jsonc = await convertConfigTomlToJsonc('[auth]\nenabled = true\n')
+    const jsonc = convertConfigTomlToJsonc('[auth]\nenabled = true\n')
     expect(jsonc).not.toContain('$schema')
   })
 
   it('should keep $schema when the source declares one', async () => {
-    const jsonc = await convertConfigTomlToJsonc(
+    const jsonc = convertConfigTomlToJsonc(
       '#:schema https://supabase.com/schemas/config/v1.json\n\n[auth]\nenabled = true\n'
     )
     expect(jsonc).toContain('"$schema"')
   })
 
   it('should carry comments, including commented-out keys', async () => {
-    const jsonc = await convertConfigTomlToJsonc(
+    const jsonc = convertConfigTomlToJsonc(
       '# Auth settings\n[auth]\nenabled = true\n# site_url = "http://localhost:3000"\n'
     )
     expect(jsonc).toContain('// Auth settings')
@@ -162,7 +162,7 @@ y = 1
   })
 
   it('should throw a useful error for an unconvertible snippet', async () => {
-    await expect(convertConfigTomlToJsonc('\n[auth\nenabled = true\n')).rejects.toThrowError(
+    expect(() => convertConfigTomlToJsonc('\n[auth\nenabled = true\n')).toThrowError(
       /parse_error.*\[auth/s
     )
   })
@@ -178,7 +178,7 @@ y = 1
       const fences = source.match(/^\s*```toml (name=)?supabase\/config\.toml\b/gm) ?? []
       if (fences.length === 0) continue
       try {
-        await configFormatsRemark()(fromDocsMarkdown(source))
+        configFormatsRemark()(fromDocsMarkdown(source))
         converted += fences.length
       } catch (err) {
         failures.push(`${file}: ${(err as Error).message}`)

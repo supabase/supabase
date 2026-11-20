@@ -226,7 +226,7 @@ function parseFrontmatter(raw: string, frontmatter: FrontmatterFormat) {
 async function transformBody(content: string, data: Record<string, unknown>): Promise<string> {
   const tree = parseMdx(content)
   await inlinePartials(tree)
-  await configFormatsRemark()(tree as Root)
+  configFormatsRemark()(tree as Root)
   addBaseUrlPrefix(tree)
   stripHeadingCustomIds(tree)
   applySchema(tree, SCHEMA)
@@ -256,7 +256,7 @@ async function parseSingleSource(
 
 async function generateConfigReference(): Promise<string> {
   const spec = yaml.load(await fs.readFile(CONFIG_REFERENCE_SPEC, 'utf8')) as ConfigSpec
-  const tree = fromMarkdown(await renderConfigReferenceMarkdown(spec), {
+  const tree = fromMarkdown(renderConfigReferenceMarkdown(spec), {
     extensions: [gfm()],
     mdastExtensions: [gfmFromMarkdown()],
   })
