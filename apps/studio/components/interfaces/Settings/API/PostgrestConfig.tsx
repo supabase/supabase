@@ -60,7 +60,8 @@ import { IS_PLATFORM } from '@/lib/constants'
 import type { StudioError } from '@/lib/errors/studio-errors'
 import { noop } from '@/lib/void'
 
-const resetAuthenticatorDbSchemasSql = safeSql`alter role authenticator reset pgrst.db_schemas`
+const resetAuthenticatorDbSchemasSql = safeSql`alter role authenticator reset pgrst.db_schemas;
+notify pgrst, 'reload config';`
 
 const formSchema = z.object({
   // Fields for updatePostgrestConfig
@@ -711,9 +712,10 @@ export const PostgrestConfig = () => {
       >
         <p className="text-sm text-foreground-light">
           This clears the <code>pgrst.db_schemas</code> setting on the <code>authenticator</code>{' '}
-          role, so the Data API falls back to the schemas selected in the Dashboard above.
+          role and reloads the Data API config, so the Data API falls back to the schemas selected
+          in the Dashboard above.
         </p>
-        <p className="text-sm text-foreground-light mt-4">The following statement will be run:</p>
+        <p className="text-sm text-foreground-light mt-4">The following statements will be run:</p>
         <div className="relative mt-2">
           <pre className="px-3 py-2 pr-10 rounded bg-surface-200 text-xs font-mono whitespace-pre-wrap break-words">
             {resetAuthenticatorDbSchemasSql}
