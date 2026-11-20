@@ -420,6 +420,51 @@ function RootComponent() {
   )
 }
 
+const DEVTOOLS_TRIGGER_ATTR = 'data-studio-tanstack-devtools-trigger'
+
+const isDevtoolsHotkey = (event: KeyboardEvent) =>
+  event.ctrlKey && event.shiftKey && !event.metaKey && !event.altKey && event.code === 'KeyL'
+
+/**
+ * TanStack devtools (Router and Query panels) with the floating trigger hidden
+ * so it doesn't cover the dev toolbar. Ctrl + Shift + L toggles the panel.
+ *
+ * The library's own hotkey tracks held keys from keydown/keyup pairs, which
+ * breaks when a keyup never arrives (macOS drops a letter's keyup while Cmd is
+ * held, and a shifted symbol's keyup reports a different key). Instead, this
+ * reads the modifier flags of each keydown event and clicks the library's
+ * trigger, which stays in the DOM but is hidden with CSS.
+ */
+function TanStackDevtoolsWithHiddenTrigger() {
+  useEffect(() => {
+    const onKeyDown = (event: KeyboardEvent) => {
+      if (event.repeat || !isDevtoolsHotkey(event)) return
+      event.preventDefault()
+      document.querySelector(`[${DEVTOOLS_TRIGGER_ATTR}]`)?.closest('button')?.click()
+    }
+    window.addEventListener('keydown', onKeyDown, { capture: true })
+    return () => window.removeEventListener('keydown', onKeyDown, { capture: true })
+  }, [])
+
+  return (
+    <>
+      <style>{`button:has([${DEVTOOLS_TRIGGER_ATTR}]) { display: none !important; }`}</style>
+      <TanStackDevtools
+        // An empty hotkey registers no library shortcut; the listener above handles it.
+        config={{
+          position: 'bottom-right',
+          openHotkey: [],
+          customTrigger: <span {...{ [DEVTOOLS_TRIGGER_ATTR]: '' }} />,
+        }}
+        plugins={[
+          { name: 'TanStack Router', render: <TanStackRouterDevtoolsPanel /> },
+          { name: 'TanStack Query', render: <ReactQueryDevtoolsPanel /> },
+        ]}
+      />
+    </>
+  )
+}
+
 function RootDocument({ children }: Readonly<{ children: ReactNode }>) {
   const isTestEnv = process.env.NEXT_PUBLIC_NODE_ENV === 'test'
 
@@ -433,31 +478,7 @@ function RootDocument({ children }: Readonly<{ children: ReactNode }>) {
       </head>
       <body>
         {children}
-        {!isTestEnv && (
-          <TanStackDevtools
-            // Hide the trigger by default so it doesn't overlap the dev toolbar.
-            // Open the panel with Ctrl + Shift + L; un-hide the trigger from its
-            // settings tab. Use a letter key: the library's default (Control + ~)
-            // needs Shift on most layouts, and a shifted symbol can stay stuck
-            // in its pressed-keys list (keyup reports ` instead of ~), which
-            // blocks the hotkey until a reload.
-            config={{
-              position: 'bottom-right',
-              triggerHidden: true,
-              openHotkey: ['Control', 'Shift', 'L'],
-            }}
-            plugins={[
-              {
-                name: 'TanStack Router',
-                render: <TanStackRouterDevtoolsPanel />,
-              },
-              {
-                name: 'TanStack Query',
-                render: <ReactQueryDevtoolsPanel />,
-              },
-            ]}
-          />
-        )}
+        {!isTestEnv && <TanStackDevtoolsWithHiddenTrigger />}
         <Scripts />
       </body>
     </html>
