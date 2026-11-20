@@ -1,0 +1,69 @@
+---
+id: 'faq'
+title: 'Upload FAQ'
+description: 'Answers to common questions about how Supabase Storage handles uploads, including expiry, access checks, and failed uploads.'
+subtitle: 'Answers to common questions about how Storage handles uploads.'
+sidebar_label: 'Upload FAQ'
+---
+
+Find out how Storage checks policies, expires uploads, and handles failures.
+
+## When are uploads checked against policies, and when do they expire?
+
+Policy checks depend on the authorization mode of the request:
+
+- [Secret key (or legacy service role key)](/docs/guides/getting-started/api-keys): Bypasses Row Level Security (RLS) policies.
+- [User access token (JWT)](/docs/guides/auth/jwts): Requests are checked against the [RLS policies set up on the corresponding buckets](/docs/guides/storage/security/access-control).
+
+This table shows when Storage checks policies and when uploads expire, for requests that use a user access token.
+
+| Upload type                 | Policy checks (user access token)                          | Expiry   |
+| --------------------------- | ---------------------------------------------------------- | -------- |
+| Standard                    | At the start and at completion                             | None     |
+| Resumable                   | On each POST, PATCH, and DELETE request, and at completion | 24 hours |
+| Signed                      | When the signed upload URL is created                      | 2 hours  |
+| Resumable with a signed URL | When the signed upload URL is created                      | 2 hours  |
+
+For non-signed uploads, a policy change in the middle of an upload causes the upload to fail if the user is no longer authorized. For signed uploads, policy changes after the signed URL is created don't affect the upload.
+
+You can't revoke a single signed URL. To invalidate one, delete or move the original file. To revoke all signed URLs (upload and download), rotate and revoke the [Storage signing key](/docs/guides/storage/security/signing-keys) used to sign them. After revocation, requests to signed URLs fail, but signed uploads already in progress can continue to completion.
+
+## Can an upload complete after expiry?
+
+Yes. For uploads that have an expiry time, an upload can complete after the expiry if the final request was initiated and verified before the expiry time.
+
+## What happens to partial files from failed or abandoned uploads?
+
+If an upload fails or stops before completion, for example because of a network failure during a standard upload or an abandoned resumable upload, Supabase is designed to clean up the partial files through automated cleanup tasks. You can't manually trigger a cleanup, and you can't access the backend file service directly to review the raw file system.
+
+If partial files aren't cleaned up in some scenario, you can detect them by comparing your [storage size from object metadata](/docs/guides/platform/manage-your-usage/storage-size#sql-editor) with the average daily storage size on your [organization usage page](/dashboard/org/_/usage#storageSize). The SQL query returns the exact size at the time you run it, while the usage page averages the size over the day, so small differences are expected.
+
+If the difference is significant, [open a support ticket](/dashboard/support/new) so the Supabase team can review your project. If you think partial files weren't cleaned up, share the steps that led to the situation. A storage size mismatch can also happen if you delete file metadata directly with SQL instead of using the standard Storage APIs.
+
+## Does an upload complete if the client loses connection?
+
+Uploads don't require final confirmation from the client:
+
+- If the client loses connection after sending all the data, the upload can complete without the client receiving the final response.
+- If the client disconnects before the file finishes uploading, Storage treats the upload as failed and removes any partially uploaded data.
+
+To know when an upload has completed, use [triggers](/docs/guides/database/postgres/triggers) on `storage.objects`.
+
+## How are simultaneous uploads and deletion to the same file handled?
+
+The request that finalizes last determines the outcome:
+
+- If the delete finalizes after the upload, the file is deleted and no longer exists at the path.
+- If the upload finalizes after the delete, the newly uploaded file is available at the path.
+
+## How do I view in-progress uploads?
+
+Storage doesn't store a record of in-progress uploads that you can query. To track them, build a custom upload system between your end users and Storage that records each upload and marks it as completed when it finishes.
+
+## Is there a maintenance mode that blocks uploads?
+
+No. To prevent writes, add a database trigger on `storage.objects` that raises an error. You can use similar triggers to prevent updates and deletions.
+
+## How do I enforce custom upload requirements?
+
+If Storage doesn't natively support a requirement, build your own server code, for example with an [Edge Function](/docs/guides/functions), that sits between your end users and Storage and enforces the extra requirements.
