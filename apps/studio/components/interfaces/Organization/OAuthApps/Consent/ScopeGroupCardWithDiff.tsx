@@ -9,7 +9,7 @@ import {
   getDiffBetweenScopes,
   ScopeGroupLevel,
 } from './OAuthAppsAuthorizeScreen.utils'
-import { ScopeGroupCardItem } from './ScopeGroupCardItem'
+import { ScopeGroupCardItem, ScopePermissionLabel } from './ScopeGroupCardItem'
 
 export interface ScopeGroupCardProps {
   scopes: string[]
@@ -84,7 +84,11 @@ const DiffScopeGroupItem = ({
         {permissions.map((permission, index) => (
           <Fragment key={permission.permission}>
             <span className="inline-block">
-              {formatPermissionName(permission.permission)}{' '}
+              {level === undefined ? (
+                formatPermissionName(permission.permission)
+              ) : (
+                <ScopePermissionLabel permission={permission.permission} />
+              )}{' '}
               <span className="text-foreground-lighter">
                 (<DiffDescription level={level} previousLevel={permission.previousLevel} />)
               </span>
