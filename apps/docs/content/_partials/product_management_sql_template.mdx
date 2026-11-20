@@ -19,17 +19,17 @@ insert into storage.buckets (id, name)
 CREATE POLICY "Enable read access for all users" ON "storage"."objects"
 AS PERMISSIVE FOR SELECT
 TO public
-USING (true)
+USING (true);
 
 CREATE POLICY "Enable insert for all users" ON "storage"."objects"
 AS PERMISSIVE FOR INSERT
 TO authenticated, anon
-WITH CHECK (true)
+WITH CHECK (true);
 
 CREATE POLICY "Enable update for all users" ON "storage"."objects"
 AS PERMISSIVE FOR UPDATE
 TO public
 USING (true)
-WITH CHECK (true)
+WITH CHECK (true);
 
 ```
