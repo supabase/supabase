@@ -65,12 +65,12 @@ export const ProjectMultiSelect = ({
   return (
     <div className="flex w-full flex-col gap-2">
       <div className="flex items-center justify-between gap-2">
-        <p
+        <h2
           id={labelId}
-          className={cn('text-sm', hasFlagged ? 'text-destructive' : 'text-foreground')}
+          className={cn('text-sm font-medium', hasFlagged ? 'text-destructive' : 'text-foreground')}
         >
           Projects
-        </p>
+        </h2>
         {!allProjectsSelected && showCounter && (
           <p className="text-xs text-foreground-lighter">
             {selectedProjectRefs.length}/{maxSelected}
