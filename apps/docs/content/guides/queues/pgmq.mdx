@@ -226,7 +226,7 @@ returns setof pgmq.message_record
 | :----------- | :-------- | :-------------------------------------------------------------- |
 | `queue_name` | `text`    | The name of the queue                                           |
 | `vt`         | `integer` | Time in seconds that the message become invisible after reading |
-| `qty`        | `integer` | The number of messages to read from the queue. Defaults to 1    |
+| `qty`        | `integer` | The number of messages to read from the queue                   |
 
 Example:
 
@@ -266,7 +266,7 @@ returns setof pgmq.message_record
 | :----------------- | :-------- | :-------------------------------------------------------------------------- |
 | `queue_name`       | `text`    | The name of the queue                                                       |
 | `vt`               | `integer` | Time in seconds that the message become invisible after reading.            |
-| `qty`              | `integer` | The number of messages to read from the queue. Defaults to 1.               |
+| `qty`              | `integer` | The number of messages to read from the queue.                              |
 | `max_poll_seconds` | `integer` | Time in seconds to wait for new messages to reach the queue. Defaults to 5. |
 | `poll_interval_ms` | `integer` | Milliseconds between the internal poll operations. Defaults to 100.         |
 
@@ -498,9 +498,9 @@ Sets the visibility timeout of a message to a specified time duration in the fut
 pgmq.set_vt(
     queue_name text,
     msg_id bigint,
-    vt_offset integer
+    vt integer
 )
-returns pgmq.message_record
+returns setof pgmq.message_record
 ```
 
 **Parameters:**
@@ -509,7 +509,7 @@ returns pgmq.message_record
 | :----------- | :-------- | :-------------------------------------------------------------------- |
 | `queue_name` | `text`    | The name of the queue                                                 |
 | `msg_id`     | `bigint`  | ID of the message to set visibility time                              |
-| `vt_offset`  | `integer` | Duration from now, in seconds, that the message's VT should be set to |
+| `vt`         | `integer` | Duration from now, in seconds, that the message's VT should be set to |
 
 Example:
 
