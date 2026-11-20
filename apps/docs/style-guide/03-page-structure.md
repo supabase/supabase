@@ -41,9 +41,10 @@ Reference content is generated from spec files rather than hand-authored. See
 Pick the one template that matches the page, and follow only that one. Each template
 answers a reader question and names its Information Type.
 
-| Page purpose            | Reader question       | Information type | Template                                         |
-| ----------------------- | --------------------- | ---------------- | ------------------------------------------------ |
-| Finish one task (guide) | How do I do one task? | Procedure        | [`how-to-guide.md`](./templates/how-to-guide.md) |
+| Page purpose              | Reader question                   | Information type | Template                                         |
+| ------------------------- | --------------------------------- | ---------------- | ------------------------------------------------ |
+| Learn a topic (explainer) | What is it, and when do I use it? | Concept          | [`explainer.md`](./templates/explainer.md)       |
+| Finish one task (guide)   | How do I do one task?             | Procedure        | [`how-to-guide.md`](./templates/how-to-guide.md) |
 
 If no row fits the page, say so and ask the requester. Don't invent a structure.
 
