@@ -18,7 +18,7 @@ export const ScopeGroupCardItem = ({
       <p className="text-xs font-medium text-foreground">
         {permissions.map((permission, index) => (
           <Fragment key={permission}>
-            {index > 0 && ', '}
+            {index > 0 && <span>, </span>}
             <ScopePermissionLabel permission={permission} />
           </Fragment>
         ))}
