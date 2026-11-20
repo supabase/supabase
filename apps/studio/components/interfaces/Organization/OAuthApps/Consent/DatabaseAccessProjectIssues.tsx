@@ -23,12 +23,12 @@ export function DatabaseAccessProjectIssues({
       <div className="mt-1 divide-y text-xs">
         {projects.map(({ ref, name, issue }) => (
           <div key={ref} className="flex items-center justify-between gap-2 py-2">
-            <div className="min-w-0 leading-snug">
+            <div className="min-w-0 leading-normal">
               <div className="font-medium text-foreground">{name}</div>
               <div>
                 {issue === 'postgres_upgrade_required'
                   ? 'Needs Postgres 17 or later.'
-                  : 'The database is currently unavailable.'}
+                  : 'Database is currently unavailable.'}
               </div>
             </div>
             {onRemove && (

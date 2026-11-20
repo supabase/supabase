@@ -935,7 +935,7 @@ describe('OAuthAppsAuthorizeScreen', () => {
     })
 
     expect(await screen.findAllByText('Needs Postgres 17 or later.')).toHaveLength(2)
-    expect(screen.getByText('The database is currently unavailable.')).toBeInTheDocument()
+    expect(screen.getByText('Database is currently unavailable.')).toBeInTheDocument()
     expect(screen.getByRole('list', { name: 'Projects that will require SSL' })).toHaveTextContent(
       'northwind-warehouse'
     )
