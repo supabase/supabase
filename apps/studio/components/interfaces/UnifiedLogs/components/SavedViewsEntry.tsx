@@ -14,17 +14,19 @@ export const SavedViewsEntry = ({
   isActiveViewModified,
   onOpen,
 }: SavedViewsEntryProps) => {
-  const stateClassName = !activeView
-    ? 'text-foreground-light'
-    : isActiveViewModified
-      ? 'text-warning'
-      : 'text-brand-600'
+  const getStateClassName = () => {
+    if (!activeView) return 'text-foreground-light'
+    if (isActiveViewModified) return 'text-warning'
+    return 'text-brand-600'
+  }
+  const stateClassName = getStateClassName()
 
-  const ariaLabel = !activeView
-    ? 'Saved views'
-    : isActiveViewModified
-      ? `Saved views · ${activeView.name} (modified)`
-      : `Saved views · ${activeView.name}`
+  const getAriaLabel = () => {
+    if (!activeView) return 'Saved views'
+    if (isActiveViewModified) return `Saved views · ${activeView.name} (modified)`
+    return `Saved views · ${activeView.name}`
+  }
+  const ariaLabel = getAriaLabel()
 
   return (
     <button
