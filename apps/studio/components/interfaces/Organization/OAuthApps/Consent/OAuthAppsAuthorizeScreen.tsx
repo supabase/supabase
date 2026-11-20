@@ -89,14 +89,15 @@ export const OAuthAppsAuthorizeScreen = ({
     request,
   })
 
+  const [search, setSearch] = useState('')
+
   const handleOrganizationChange = (slug: string) => {
     if (slug === memberOrg?.slug) return
     setOrganizationSlug(slug)
     setSelectedProjectRefs([])
     setAllProjectsSelected(false)
+    setSearch('')
   }
-
-  const [search, setSearch] = useState('')
 
   const {
     data: projectsData,
