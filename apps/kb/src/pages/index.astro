@@ -5,13 +5,20 @@ import { FeaturedSection } from '../components/FeaturedSection'
 import { GuideBrowser } from '../components/GuideBrowser'
 import { HomeHero } from '../components/Hero'
 import Layout from '../layouts/Layout.astro'
-import { padFeatured, toSummary, toTroubleshootingSummary, type FeaturedItem } from '../lib/guides'
+import {
+	padFeatured,
+	toCommunityGuideSummary,
+	toSummary,
+	toTroubleshootingSummary,
+	type FeaturedItem,
+} from '../lib/guides'
 import { getListedTopics, topicToSlug } from '../lib/topics'
 
 const guides = await getCollection('guides')
 const summaries = guides.map(toSummary)
 const troubleshooting = (await getCollection('troubleshooting')).map(toTroubleshootingSummary)
-const listedTopics = getListedTopics({ guides: summaries, troubleshooting })
+const communityGuides = (await getCollection('communityGuides')).map(toCommunityGuideSummary)
+const listedTopics = getListedTopics({ guides: summaries, troubleshooting, communityGuides })
 const pinnedTopics = listedTopics.filter((topic) => topic.pinned)
 const featuredTopics: FeaturedItem[] = (pinnedTopics.length > 0 ? pinnedTopics : listedTopics.slice(0, 3)).map(
 	(topic) => ({

@@ -4,6 +4,7 @@ import { ExternalLinkIcon, Maximize2Icon, Minimize2Icon, TerminalIcon } from 'lu
 import { useRouter } from 'next/router'
 import { ComponentPropsWithoutRef, ElementRef, forwardRef, useState } from 'react'
 import { Button, Collapsible, CollapsibleContent, CollapsibleTrigger } from 'ui'
+import { ShimmeringLoader } from 'ui-patterns/ShimmeringLoader'
 
 import type { Commands } from './Functions.types'
 import CommandRender from '@/components/interfaces/Functions/CommandRender'
@@ -30,15 +31,20 @@ export const TerminalInstructions = forwardRef<
 
   const { data: tokens } = useAccessTokensQuery()
   const apiKeysGrant = useGrant('GET /v1/projects/{ref}/api-keys', { projectRef })
-  const { data: apiKeyData } = useQuery({
-    ...apiKeysQueryOptions({ projectRef, grant: apiKeysGrant.grant }),
-    // A skipped query still returns cached data, so ignore it unless the grant is granted
-    select: (data) => getKeys(apiKeysGrant.status === 'granted' ? data : []),
-  })
+  const { data: apiKeyData } = useQuery(
+    apiKeysQueryOptions(
+      { projectRef, grant: apiKeysGrant.grant },
+      {
+        // A skipped query still returns cached data, so ignore it unless the grant is granted
+        select: (data) => getKeys(apiKeysGrant.status === 'granted' ? data : []),
+      }
+    )
+  )
   const { anonKey, publishableKey } = apiKeyData ?? {}
 
-  const { data: endpoint } = useProjectApiUrl({ projectRef })
-  const functionsEndpoint = `${endpoint}/functions/v1`
+  const { data: endpoint, isPending: isEndpointPending } = useProjectApiUrl({ projectRef })
+  const functionsEndpoint = endpoint ? `${endpoint}/functions/v1` : undefined
+  const isFunctionsEndpointLoading = !functionsEndpoint && isEndpointPending
 
   const apiKey = publishableKey?.api_key ?? anonKey?.api_key ?? '[YOUR ANON KEY]'
 
@@ -68,7 +74,9 @@ export const TerminalInstructions = forwardRef<
       },
       comment: 'Deploy your function',
     },
-    {
+  ]
+  if (functionsEndpoint) {
+    commands.push({
       command: `curl -L -X POST '${functionsEndpoint}/hello-world' -H 'Authorization: Bearer ${apiKey}'${anonKey?.type === 'publishable' ? ` -H 'apikey: ${apiKey}'` : ''} --data '{"name":"Functions"}'`,
       description: 'Invokes the hello-world function',
       jsx: () => {
@@ -82,8 +90,8 @@ export const TerminalInstructions = forwardRef<
         )
       },
       comment: 'Invoke your function',
-    },
-  ]
+    })
+  }
 
   return (
     <Collapsible
@@ -111,7 +119,10 @@ export const TerminalInstructions = forwardRef<
         )}
       </CollapsibleTrigger>
       <CollapsibleContent className="w-full transition-all data-closed:animate-collapsible-up data-open:animate-collapsible-down">
-        <CommandRender commands={commands} className="my-4" />
+        <div className="my-4 space-y-4">
+          <CommandRender commands={commands} />
+          {isFunctionsEndpointLoading && <ShimmeringLoader className="w-3/4" />}
+        </div>
         <ApiKeysAccessNote
           grant={apiKeysGrant}
           fallback="Replace the placeholder with your own key."

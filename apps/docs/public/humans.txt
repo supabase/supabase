@@ -18,6 +18,7 @@ Aleksi Immonen
 Alex Hall
 Alex Hsu
 Alex Ives
+Alex Venter
 Alexander Alexandrov
 Alexander Korotkov
 Alexis Aguilar
@@ -51,6 +52,7 @@ Beng Eu
 Benjamin Coenen
 Benoit Ammermann
 Beth Long
+Bob Van Landuyt
 Bobbie Soedirgo
 Brad Deam
 Brad Gyger
@@ -128,6 +130,7 @@ Etienne Stalmans
 Evan Cummack
 Fabrizio Fenoglio
 Fady A
+Fallon Petty
 Farley Thomas
 Fatuma Abdullahi
 Felipe Stival
@@ -161,10 +164,12 @@ Hieu Pham
 Hunter Luckow
 Ignacio Dobronich
 Illia Basalaiev
+Ilya Kobets
 Inian P
 Iryna Deans
 Isaac Dawson
 Ivan Vasilov
+Jagpreet Singh
 Jamie Boyd
 Jake Ng
 Jared Patterson
@@ -196,6 +201,7 @@ Joel Martin
 Johan Bergström
 John Pena
 Jon M
+Jonathan Eng
 Jonathan Smock
 Jonny Summers-Muir
 Jordan McQueen
@@ -232,7 +238,6 @@ Laurence Isla
 Leandro Pereira
 Leigh Anne Applewhite
 Lenny Urbanowski
-Leonardo Santiago
 Levon Galstyan
 Liam Cloud Hogan
 Lindsay Moss
@@ -272,10 +277,13 @@ Mike Podobnik
 Miranda Limonczenko
 Monica Khoury
 Mrinal Paliwal
+Musa Jundi
 Mykhailo Mischa Lieibenson
 Nara Kasbergen Kwon
 Natalie Roberge
+Neil Brookes
 Nick B
+Nick Clark
 Nick Littman
 Nick Nowlan
 Nicola Ferraro
@@ -288,6 +296,7 @@ Oli R
 Pamela Chia
 Patricia Szasz
 Patrick Crane
+Patrick Knight
 Paul Bauer
 Paul Copplestone
 Paul Ibeabuchi
@@ -315,6 +324,7 @@ Robert Vojta
 Rodrigo Esteves
 Rodrigo Mansueli
 Román Cuellar
+Roman Gruhn
 Roman Hernandez
 Ronan Lehane
 Rory Hunter
@@ -350,6 +360,7 @@ Sreyas Udayavarman
 Stephanie Jackson (stejacks)
 Stephen Denham
 Stephen Morgan
+Steve Abrams
 Steve Chavez
 Steven Eubank
 Stojan Dimitrovski

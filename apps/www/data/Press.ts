@@ -68,7 +68,7 @@ const data: PressItem[] = [
   },
   {
     type: 'podcast',
-    href: 'https://www.heavybit.com/library/podcasts/jamstack-radio/ep-71-open-source-firebase-alternative-with-paul-copplestone-of-supabase/',
+    href: 'https://www.heavybit.com/library/podcasts/jamstack-radio/ep-71-open-source-firebase-alternative-with-paul-copplestone-of-supabase',
     title: 'Open Source Firebase Alternative with Paul Copplestone of Supabase',
     publisher: 'Jamstack',
   },

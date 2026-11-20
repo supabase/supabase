@@ -1,7 +1,7 @@
 import * as Sentry from '@sentry/nextjs'
 import { hasConsented } from 'common/consent-state'
 import { IS_PLATFORM } from 'common/constants/environment'
-import { filterSentryEvent } from 'common/sentry'
+import { BROWSER_NOISE_IGNORE_ERRORS, filterSentryEvent } from 'common/sentry'
 
 Sentry.init({
   dsn: process.env.NEXT_PUBLIC_SENTRY_DSN,
@@ -13,6 +13,7 @@ Sentry.init({
       behaviour: 'apply-tag-if-exclusively-contains-third-party-frames',
     }),
   ],
+  ignoreErrors: BROWSER_NOISE_IGNORE_ERRORS,
   beforeSend(event) {
     return filterSentryEvent(event, { isPlatform: IS_PLATFORM, hasConsent: hasConsented() })
   },

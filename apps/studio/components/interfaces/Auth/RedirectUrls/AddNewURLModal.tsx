@@ -22,7 +22,12 @@ import { FormItemLayout } from 'ui-patterns/form/FormItemLayout/FormItemLayout'
 import { SingleValueFieldArray } from 'ui-patterns/form/SingleValueFieldArray/SingleValueFieldArray'
 import * as z from 'zod'
 
-import { normalizeRedirectUrl, parseRedirectUrls, urlRegex } from '../Auth.constants'
+import {
+  getUrlCharacterError,
+  normalizeRedirectUrl,
+  parseRedirectUrls,
+  urlRegex,
+} from '../Auth.constants'
 import { useAuthConfigUpdateMutation } from '@/data/auth/auth-config-update-mutation'
 
 const MAX_URLS_LENGTH = 2 * 1024
@@ -51,11 +56,14 @@ const createRedirectUrlsSchema = (normalizedAllowList: string[]) => {
       const seenUrls = new Set<string>()
 
       data.urls.forEach((url, index) => {
-        if (!redirectUrlRegex.test(url.value)) {
+        const characterError = getUrlCharacterError(url.value)
+        const isValidUrl = redirectUrlRegex.test(url.value)
+
+        if (characterError || !isValidUrl) {
           ctx.addIssue({
             code: z.ZodIssueCode.custom,
             path: ['urls', index, 'value'],
-            message: 'Please provide a valid URL',
+            message: characterError ?? 'Please provide a valid URL',
           })
         }
 
@@ -142,15 +150,16 @@ export const AddNewURLModal = ({ visible, allowList, onClose }: AddNewURLModalPr
         <DialogSectionSeparator />
         <Form {...form}>
           <form onSubmit={form.handleSubmit(onSubmit)}>
-            <DialogSection className="flex flex-col gap-y-2 px-0">
+            <DialogSection className="flex flex-col gap-y-2">
               <div className="flex flex-col gap-y-1">
                 <Label>URL</Label>
                 <p className="text-sm text-foreground-light">
                   Paste multiple URLs at once — one per line
                 </p>
               </div>
-              <ScrollArea className={cn(urls.length > 4 ? 'h-[220px]' : '')}>
-                <div className="px-5 py-1">
+              {/* offsets align rows with the label and leave room for the focus ring and scrollbar */}
+              <ScrollArea className={cn('-ml-1 -mr-4', urls.length > 4 ? 'h-[220px]' : '')}>
+                <div className="py-1 pl-1 pr-4">
                   <FormItemLayout className="[&>div>div]:mt-0">
                     <SingleValueFieldArray
                       control={form.control}

@@ -5,7 +5,6 @@ import type { LogData } from '../Logs.types'
 import { ResponseCodeFormatter, RowLayout, TextFormatter } from '../LogsFormatters'
 import { defaultRenderCell } from './DefaultPreviewColumnRenderer'
 import { ErrorCodeTooltip } from '@/components/ui/ErrorCodeTooltip/ErrorCodeTooltip'
-import { Service } from '@/data/graphql/graphql'
 
 const columns: Column<LogData>[] = [
   {
@@ -19,7 +18,7 @@ const columns: Column<LogData>[] = [
       const error_code = props.row.metadata?.[0]?.response?.[0]?.headers?.[0]?.x_sb_error_code
       const service =
         typeof props.row.path === 'string' && props.row.path.startsWith('/auth/')
-          ? Service.Auth
+          ? 'AUTH'
           : undefined
       return (
         <RowLayout>

@@ -3,6 +3,7 @@ import '../styles/globals.css'
 import '../styles/prism-okaidia.css'
 
 import { GlobalProviders } from '~/features/app.providers'
+import { IaNavRouteProvider } from '~/features/IaNav'
 import { IA_NAV_CACHE_SCRIPT } from '~/features/IaNav/constants'
 import { DOCS_CONTENT_CONTAINER_ID } from '~/features/ui/helpers.constants'
 import { TopNavSkeleton } from '~/layouts/MainSkeleton'
@@ -69,7 +70,9 @@ const RootLayout = ({ children }: { children: React.ReactNode }) => {
         <SkipToContent href={`#${DOCS_CONTENT_CONTAINER_ID}`} />
         <TelemetryTagManager />
         <GlobalProviders>
-          <TopNavSkeleton>{children}</TopNavSkeleton>
+          <IaNavRouteProvider>
+            <TopNavSkeleton>{children}</TopNavSkeleton>
+          </IaNavRouteProvider>
         </GlobalProviders>
       </body>
     </html>

@@ -1,12 +1,15 @@
 import { createFileRoute } from '@tanstack/react-router'
+import { useParams } from 'common'
 
-import PipelinesLogsPage from '@/pages/project/[ref]/logs/pipelines-logs'
+import { LogsPreviewer } from '@/components/interfaces/Settings/Logs/LogsPreviewer'
 
 export const Route = createFileRoute('/project/$ref/logs/pipelines-logs')({
-  component: PipelinesLogsRoute,
+  component: LogPage,
   staticData: { logsLayoutTitle: 'Pipelines Logs' },
 })
 
-function PipelinesLogsRoute() {
-  return <PipelinesLogsPage dehydratedState={undefined} />
+function LogPage() {
+  const { ref } = useParams()
+
+  return <LogsPreviewer condensedLayout queryType="pipelines" projectRef={ref!} />
 }

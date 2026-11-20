@@ -32,9 +32,6 @@ export const computeSuccessAndNonSuccessRates = (
   return { successRate, nonSuccessRate }
 }
 
-export const sortServicesByTraffic = <T extends { total: number }>(services: T[]): T[] =>
-  [...services].sort((a, b) => b.total - a.total)
-
 export const isServiceDisabled = (total: number, isLoading: boolean): boolean =>
   !isLoading && total <= 0
 
@@ -52,28 +49,26 @@ export type ServiceCard<Entry> = Entry & {
   err: number
 }
 
-/** Maps enabled services to card data and orders them by traffic. */
-export const buildSortedServiceCards = <
-  Key extends string,
-  Entry extends { key: Key; enabled: boolean },
->(
+/**
+ * Maps enabled services to card data. Keeps the order of `services`, so the
+ * cards do not move when the totals change (for example on a new interval).
+ */
+export const buildServiceCards = <Key extends string, Entry extends { key: Key; enabled: boolean }>(
   services: Entry[],
   statsByKey: Record<Key, ServiceCardStats>
 ): ServiceCard<Entry>[] =>
-  sortServicesByTraffic(
-    services
-      .filter((service) => service.enabled)
-      .map((service) => {
-        const stats = statsByKey[service.key]
-        return {
-          ...service,
-          data: stats.eventChartData,
-          total: stats.total,
-          warn: stats.warningCount,
-          err: stats.errorCount,
-        }
-      })
-  )
+  services
+    .filter((service) => service.enabled)
+    .map((service) => {
+      const stats = statsByKey[service.key]
+      return {
+        ...service,
+        data: stats.eventChartData,
+        total: stats.total,
+        warn: stats.warningCount,
+        err: stats.errorCount,
+      }
+    })
 
 /** One-bucket-wide window for a clicked chart bar; the timestamp is the UTC bucket start. */
 export const getBucketLogRange = (

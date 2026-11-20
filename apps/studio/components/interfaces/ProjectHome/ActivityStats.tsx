@@ -93,10 +93,12 @@ export const ActivityStats = () => {
     data: branchesData,
     isPending: isPendingBranches,
     isError: isBranchesQueryError,
-  } = useQuery({
-    ...branchesQueryOptions({ projectRef: parentProjectRef, grant: branchesGrant.grant }),
-    enabled: !isHighAvailability,
-  })
+  } = useQuery(
+    branchesQueryOptions(
+      { projectRef: parentProjectRef, grant: branchesGrant.grant },
+      { enabled: !isHighAvailability }
+    )
+  )
   const isLoadingBranches =
     branchesGrant.status === 'loading' || (branchesGrant.status === 'granted' && isPendingBranches)
   const isBranchesError = isBranchesQueryError || branchesGrant.status === 'error'

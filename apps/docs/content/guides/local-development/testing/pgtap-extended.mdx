@@ -4,7 +4,7 @@ title: 'Advanced pgTAP Testing'
 description: 'Learn how to leverage dbdev and test helpers for advanced database testing.'
 ---
 
-While basic pgTAP provides excellent testing capabilities, you can enhance the testing workflow using database development tools and helper packages. This guide covers advanced testing techniques using database.dev and community-maintained test helpers.
+While basic [pgTAP](/docs/guides/database/extensions/pgtap) provides excellent testing capabilities, you can enhance the testing workflow using database development tools and helper packages. This guide covers advanced testing techniques using database.dev and community-maintained test helpers.
 
 ## Using database.dev
 
@@ -83,7 +83,7 @@ The test helpers package provides several advantages over writing raw pgTAP test
 
 ## Schema-wide Row Level Security testing
 
-When working with Row Level Security, it's crucial to ensure that RLS is enabled on all tables that need it. Create a basic test to verify RLS is enabled across an entire schema:
+When working with [Row Level Security](/docs/guides/database/postgres/row-level-security), it's crucial to ensure that RLS is enabled on all tables that need it. Create a basic test to verify RLS is enabled across an entire schema:
 
 ```sql
 begin;

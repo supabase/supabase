@@ -26,10 +26,12 @@ export const RealtimeTokensPopover = ({ config, onChangeConfig }: RealtimeTokens
   const apiKeysGrant = useGrant('GET /v1/projects/{ref}/api-keys', {
     projectRef: config.projectRef,
   })
-  const { data: apiKeysData } = useQuery({
-    ...apiKeysQueryOptions({ projectRef: config.projectRef, grant: apiKeysGrant.grant }),
-    select: getKeys,
-  })
+  const { data: apiKeysData } = useQuery(
+    apiKeysQueryOptions(
+      { projectRef: config.projectRef, grant: apiKeysGrant.grant },
+      { select: getKeys }
+    )
+  )
   const { data: postgrestConfig } = useProjectPostgrestConfigQuery(
     { projectRef: config.projectRef },
     { enabled: IS_PLATFORM }

@@ -86,6 +86,14 @@ export const FeaturePreviewModal = () => {
   const selectedFeatureRoute = selectedFeature?.getRoute?.(ref)
   const hasRoute = selectedFeatureRoute !== undefined && ref !== undefined
 
+  const currentPath = router.asPath.split(/[?#]/)[0].replace(/\/$/, '')
+  const isAlreadyOnFeatureRoute =
+    hasRoute &&
+    (currentPath === selectedFeatureRoute ||
+      (selectedFeature.matchesSubroutes === true &&
+        currentPath.startsWith(`${selectedFeatureRoute}/`)))
+  const shouldRedirect = hasRoute && !isAlreadyOnFeatureRoute
+
   const toggleFeature = () => {
     if (!selectedFeature) return
 
@@ -101,7 +109,7 @@ export const FeaturePreviewModal = () => {
       return
     }
 
-    if (hasRoute) {
+    if (shouldRedirect) {
       // Navigating away drops the `featurePreviewModal` query param, which is
       // what closes the modal. Don't also close it via
       // toggleFeaturePreviewModal — its queued nuqs URL update races the push

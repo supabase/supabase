@@ -1,17 +1,29 @@
 ---
-title: Consuming Supabase Queue Messages with Edge Functions
+title: Consume queue messages
 subtitle: 'Learn how to consume Supabase Queue messages server-side with a Supabase Edge Function'
+description: 'Read Supabase Queue messages in an Edge Function, process each one, and delete it when done, so failed messages stay on the queue and run again next time.'
 ---
 
-This guide helps you read & process queue messages server-side with a Supabase Edge Function. Read [Queues API Reference](/docs/guides/queues/api) for more details on our API.
+Read and process queue messages server-side with a Supabase Edge Function. For more details on the API, see the [Queues API reference](/docs/guides/queues/api).
 
-## Concepts
+## Overview
 
-Supabase Queues is a pull-based Message Queue consisting of three main components: Queues, Messages, and Queue Types. You should already be familiar with the [Queues Quickstart](/docs/guides/queues/quickstart).
+Supabase Queues is a pull-based Message Queue consisting of three main components: Queues, Messages, and Queue Types.
 
-### Consuming messages in an Edge Function
+Every time the Edge Function below is run it:
 
-This is a Supabase Edge Function that reads 5 messages off the queue, processes each of them, and deletes each message when it is done.
+1. Read 5 messages off the queue
+2. Call the `processMessage` function
+3. At the end of `processMessage`, the message is deleted from the queue
+4. If `processMessage` throws an error, the error is logged. In this case, the message is still in the queue, so the next time this Edge Function runs it reads the message again.
+
+## Prerequisites
+
+You need to be familiar with the [Queues Quickstart](/docs/guides/queues/quickstart).
+
+## Consuming messages in an Edge Function
+
+This is a [Supabase Edge Function](/docs/guides/functions) that reads 5 messages off the queue, processes each of them, and deletes each message when it is done.
 
 ```tsx
 import 'jsr:@supabase/functions-js/edge-runtime.d.ts'
@@ -98,13 +110,16 @@ Deno.serve(async (req) => {
 })
 ```
 
-Every time this Edge Function is run it:
+## Next steps
 
-1. Read 5 messages off the queue
-2. Call the `processMessage` function
-3. At the end of `processMessage`, the message is deleted from the queue
-4. If `processMessage` throws an error, the error is logged. In this case, the message is still in the queue, so the next time this Edge Function runs it reads the message again.
+To run this Edge Function, use one of these:
 
-You might find this kind of setup handy to run with [Supabase Cron](/docs/guides/cron). You can set up Cron so that every N number of minutes or seconds, the Edge Function will run and process a number of messages off the queue.
+- [Supabase Cron](/docs/guides/cron): set up Cron so that every N number of minutes or seconds, the Edge Function runs and processes a number of messages off the queue.
+- [`supabase.functions.invoke`](/docs/guides/functions/quickstart-dashboard#usage): invoke the Edge Function on command at any given time.
 
-Similarly, you can invoke the Edge Function on command at any given time with [`supabase.functions.invoke`](/docs/guides/functions/quickstart-dashboard#usage).
+## Related resources
+
+To read more about Queues, see these pages:
+
+- [Queues API reference](/docs/guides/queues/api): look up every function for sending, reading, and deleting messages.
+- [Queues Quickstart](/docs/guides/queues/quickstart): create a queue and send your first message.

@@ -1,5 +1,6 @@
 import { QueryClient, QueryClientProvider } from '@tanstack/react-query'
 import { render, renderHook, type RenderOptions } from '@testing-library/react'
+import { AuthContext, AuthContext as AuthContextType } from 'common'
 import { NuqsTestingAdapter } from 'nuqs/adapters/testing'
 import { TooltipProvider } from 'ui'
 import { CommandProvider } from 'ui-patterns/CommandMenu'
@@ -15,11 +16,13 @@ export const CustomWrapper = ({
   queryClient,
   nuqs,
   profileContext,
+  authContext,
 }: {
   children: React.ReactNode
   queryClient?: QueryClient
   nuqs?: AdapterProps
   profileContext?: ProfileContextType
+  authContext?: AuthContext
 }) => {
   const _queryClient =
     queryClient ??
@@ -30,7 +33,7 @@ export const CustomWrapper = ({
       },
     })
 
-  const content = (
+  let content = (
     <QueryClientProvider client={_queryClient}>
       <NuqsTestingAdapter {...nuqs}>
         <TooltipProvider>
@@ -40,17 +43,22 @@ export const CustomWrapper = ({
     </QueryClientProvider>
   )
 
-  return profileContext ? (
-    <ProfileContext.Provider value={profileContext}>{content}</ProfileContext.Provider>
-  ) : (
-    content
-  )
+  if (profileContext) {
+    content = <ProfileContext.Provider value={profileContext}>{content}</ProfileContext.Provider>
+  }
+
+  if (authContext) {
+    content = <AuthContext.Provider value={authContext}>{content}</AuthContext.Provider>
+  }
+
+  return content
 }
 
 type CustomRenderOpts = RenderOptions & {
   queryClient?: QueryClient
   nuqs?: AdapterProps
   profileContext?: ProfileContextType
+  authContext?: AuthContextType
 }
 
 export const customRender = (component: React.ReactElement, renderOptions?: CustomRenderOpts) => {
@@ -60,6 +68,7 @@ export const customRender = (component: React.ReactElement, renderOptions?: Cust
         queryClient: renderOptions?.queryClient,
         nuqs: renderOptions?.nuqs,
         profileContext: renderOptions?.profileContext,
+        authContext: renderOptions?.authContext,
         children,
       }),
     ...renderOptions,
@@ -74,6 +83,7 @@ export const customRenderHook = <T,>(hook: () => T, renderOptions?: CustomRender
         queryClient: renderOptions?.queryClient,
         nuqs: renderOptions?.nuqs,
         profileContext: renderOptions?.profileContext,
+        authContext: renderOptions?.authContext,
       }),
     ...renderOptions,
   })

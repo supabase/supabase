@@ -26,6 +26,8 @@ async function cancelQuery({
   const { result } = await executeSql({
     projectRef,
     connectionString,
+    sqlOrigin: 'studio',
+    queryName: 'cancel-query',
     sql,
     queryKey: ['cancel-query'],
     grant: unguarded.migrating,

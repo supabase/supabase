@@ -5,7 +5,7 @@ This repo is a quick sample of how you can get started building apps using Vue 3
 This repo will demonstrate how to:
 
 - sign users in with Supabase Auth using [magic link](https://supabase.com/docs/reference/dart/auth-signinwithotp)
-- store and retrieve data with [Supabase database](https://supabase.com/docs/guides/database)
+- store and retrieve data with [Supabase database](https://supabase.com/docs/guides/database/overview)
 - store image files in [Supabase storage](https://supabase.com/docs/guides/storage)
 
 ## Getting Started

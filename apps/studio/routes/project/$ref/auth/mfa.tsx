@@ -1,14 +1,68 @@
 import { createFileRoute } from '@tanstack/react-router'
+import { useParams } from 'common'
+import { PageContainer } from 'ui-patterns/PageContainer'
+import {
+  PageHeader,
+  PageHeaderDescription,
+  PageHeaderMeta,
+  PageHeaderSummary,
+  PageHeaderTitle,
+} from 'ui-patterns/PageHeader'
+import { PageSection, PageSectionContent } from 'ui-patterns/PageSection'
+import { GenericSkeletonLoader } from 'ui-patterns/ShimmeringLoader'
 
-import MfaPage from '@/pages/project/[ref]/auth/mfa'
+import { MfaAuthSettingsForm } from '@/components/interfaces/Auth/MfaAuthSettingsForm/MfaAuthSettingsForm'
+import { NoPermission } from '@/components/ui/NoPermission'
+import { UnknownInterface } from '@/components/ui/UnknownInterface'
+import { FGA_PERMISSIONS, useAsyncCheckPermissionsV2 } from '@/hooks/misc/useCheckPermissionsV2'
+import { useIsFeatureEnabled } from '@/hooks/misc/useIsFeatureEnabled'
 
 export const Route = createFileRoute('/project/$ref/auth/mfa')({
-  component: AuthMfaRoute,
+  component: MfaPage,
   staticData: {
     authLayoutTitle: 'Multi-Factor',
   },
 })
 
-function AuthMfaRoute() {
-  return <MfaPage dehydratedState={undefined} />
+function MfaPage() {
+  const { ref } = useParams()
+  const showMFA = useIsFeatureEnabled('authentication:multi_factor')
+
+  const { can: canReadAuthSettings, isSuccess: isPermissionsLoaded } = useAsyncCheckPermissionsV2(
+    FGA_PERMISSIONS.PROJECT.AUTH_CONFIG_READ
+  )
+
+  if (!showMFA) {
+    return <UnknownInterface urlBack={`/project/${ref}/auth/users`} />
+  }
+
+  if (isPermissionsLoaded && !canReadAuthSettings) {
+    return <NoPermission isFullPage resourceText="access your project's authentication settings" />
+  }
+
+  return (
+    <>
+      <PageHeader size="default">
+        <PageHeaderMeta>
+          <PageHeaderSummary>
+            <PageHeaderTitle>Multi-Factor Authentication (MFA)</PageHeaderTitle>
+            <PageHeaderDescription>
+              Requires users to provide additional verification factors to authenticate
+            </PageHeaderDescription>
+          </PageHeaderSummary>
+        </PageHeaderMeta>
+      </PageHeader>
+      <PageContainer size="default">
+        {!isPermissionsLoaded ? (
+          <PageSection>
+            <PageSectionContent>
+              <GenericSkeletonLoader />
+            </PageSectionContent>
+          </PageSection>
+        ) : (
+          <MfaAuthSettingsForm />
+        )}
+      </PageContainer>
+    </>
+  )
 }

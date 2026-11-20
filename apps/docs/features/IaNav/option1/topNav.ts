@@ -39,6 +39,7 @@ export const GLOBAL_MENU_ITEMS: GlobalMenuItems = [
   [
     {
       label: 'Build',
+      icon: 'products',
       menuItems: [
         [
           {
@@ -70,6 +71,7 @@ export const GLOBAL_MENU_ITEMS: GlobalMenuItems = [
   [
     {
       label: 'Develop and deploy',
+      icon: 'develop',
       menuItems: [
         [
           { label: 'AI tools', icon: 'ai-tools', href: '/guides/ai-tools', level: 'ai_tools' },
@@ -106,10 +108,11 @@ export const GLOBAL_MENU_ITEMS: GlobalMenuItems = [
   [
     {
       label: 'Run and manage',
+      icon: 'manage',
       menuItems: [
         [
           {
-            label: 'Projects, compute and scaling',
+            label: 'Projects, organizations and compute',
             icon: 'platform',
             href: '/guides/platform/performance',
             level: 'platform',

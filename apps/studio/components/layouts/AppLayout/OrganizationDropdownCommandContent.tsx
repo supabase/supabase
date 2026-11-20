@@ -80,7 +80,7 @@ export function OrganizationDropdownCommandContent({
         <CommandInput
           placeholder="Find organization..."
           wrapperClassName="shrink-0"
-          className="text-base sm:text-sm"
+          className="text-sm"
         />
         <CommandList className="flex flex-col flex-1 min-h-0 overflow-y-auto p-1 max-h-none!">
           <CommandEmpty>No organizations found</CommandEmpty>

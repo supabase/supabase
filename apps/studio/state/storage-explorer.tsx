@@ -59,6 +59,7 @@ import { getOrRefreshTemporaryApiKey } from '@/data/api-keys/temp-api-keys-utils
 import { configKeys } from '@/data/config/keys'
 import { useProjectApiUrl } from '@/data/config/project-endpoint-query'
 import type { ProjectStorageConfigResponse } from '@/data/config/project-storage-config-query'
+import { isRequestAborted } from '@/data/error-classification'
 import { getQueryClient } from '@/data/query-client'
 import { deleteBucketObject } from '@/data/storage/bucket-object-delete-mutation'
 import { signBucketObjects } from '@/data/storage/bucket-object-sign-mutation'
@@ -381,7 +382,7 @@ export function createStorageExplorerState({
           index
         )
       } catch (error: any) {
-        if (error.name === 'AbortError') {
+        if (isRequestAborted(error)) {
           state.updateRowStatus({
             name: folderName,
             status: STORAGE_ROW_STATUS.READY,
@@ -441,7 +442,7 @@ export function createStorageExplorerState({
           return col
         })
       } catch (error: any) {
-        if (!error.message.includes('aborted')) {
+        if (!isRequestAborted(error)) {
           toast.error(`Failed to retrieve more folder contents: ${error.message}`)
         }
       }
@@ -1530,11 +1531,12 @@ export function createStorageExplorerState({
               state.abortUploadCallbacks[toastId] = []
             }
             state.abortUploadCallbacks[toastId].push(() => {
-              try {
-                upload.abort(true)
-              } catch (error) {
-                // Ignore error
-              }
+              // abort(true) returns a promise that rejects if the terminate request fails
+              // (e.g. network unreachable). The upload is already stopped locally, so the
+              // failure is safe to ignore, but it must be caught to avoid an unhandled rejection.
+              upload.abort(true).catch((error) => {
+                console.warn('Failed to terminate upload on the server', error)
+              })
               reject(new Error('Upload aborted by user'))
             })
 
