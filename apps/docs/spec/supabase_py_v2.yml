@@ -2910,6 +2910,11 @@ functions:
             type: string
             description: Space-separated list of scope values.
     examples:
+      notes: |
+        The `CreateOAuthClientParams` type does not include `client_type` as a typed field.
+        To create a public client, pass `client_type: "public"` in the request dictionary.
+        If both `client_type` and `token_endpoint_auth_method` are omitted, the client
+        defaults to a confidential client.
       - id: create-oauth-client
         name: Create OAuth client
         code: |
@@ -2921,6 +2926,18 @@ functions:
               }
           )
           ```
+        - id: create-oauth-client-public
+          name: Create public OAuth client
+          code: |
+            ```python
+            response = supabase.auth.admin.oauth.create_client(
+                {
+                    "client_name": "My Public Client",
+                    "redirect_uris": ["https://example.com/callback"],
+                    "client_type": "public"
+                }
+            )
+            ```
 
   - id: auth-js-gotrueadminoauthapi-updateclient
     title: 'admin.oauth.update_client()'
@@ -2964,10 +2981,6 @@ functions:
             isOptional: true
             type: list[string]
             description: List of allowed response types.
-          - name: scope
-            isOptional: true
-            type: string
-            description: Space-separated list of scope values.
     examples:
       - id: update-oauth-client
         name: Update OAuth client
@@ -9025,7 +9038,7 @@ functions:
           ```python
           supabase.storage.vectors().from_("vectors-bucket").create_index(
               index_name="my-index",
-              dimension=128,
+              dimension=3,
               distance_metric="cosine",
               data_type="float32"
           )
