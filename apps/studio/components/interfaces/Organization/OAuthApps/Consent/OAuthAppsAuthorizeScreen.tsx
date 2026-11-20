@@ -391,7 +391,7 @@ export const OAuthAppsAuthorizeScreen = ({
     setSelectedProjectRefs((refs) => refs.filter((ref) => !flaggedRefs.includes(ref)))
 
   const handleApprove = () => {
-    if (hasNoSelection) return
+    if (hasNoSelection || isBlockedOnProjects) return
     const approveBody = usesSelectedProjects ? { project_refs: selectedProjectRefs } : {}
     approveMutation.mutate({ auth_id: authId, slug: memberOrg.slug, body: approveBody })
   }
