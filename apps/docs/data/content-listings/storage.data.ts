@@ -59,7 +59,7 @@ export const storageResources: ContentListingGroup = {
   items: [
     {
       title: 'Supabase Storage API',
-      href: 'https://github.com/supabase/storage-api',
+      href: 'https://github.com/supabase/storage',
       description: 'Amazon S3-compatible object storage service that stores metadata in Postgres.',
     },
     {

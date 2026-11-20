@@ -15,7 +15,7 @@ function PluginInstructions({ client }: { client: PluginClient }) {
         <p className="text-sm text-foreground-light">
           Install the Supabase plugin from the{' '}
           <a
-            href="https://claude.com/plugins/supabase"
+            href="https://claude.com/marketplace/plugins/supabase"
             target="_blank"
             rel="noopener noreferrer"
             className="text-primary hover:underline"

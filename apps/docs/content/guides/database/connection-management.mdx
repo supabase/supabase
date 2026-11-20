@@ -7,7 +7,7 @@ subtitle: 'Using your connections resourcefully'
 
 ## Connections
 
-Every [Compute Add-On](/docs/guides/platform/compute-and-disk) has a pre-configured direct connection count and pool size. The pool size applies to both the shared pooler (Supavisor) and the dedicated pooler (PgBouncer). This guide discusses ways to observe and manage them resourcefully.
+Every [Compute Add-On](/docs/guides/platform/compute-and-disk) has a pre-configured direct connection count and pool size. The pool size applies to both the shared pooler ([Supavisor](https://supabase.github.io/supavisor/)) and the dedicated pooler (PgBouncer). This guide discusses ways to observe and manage them resourcefully.
 
 ### Configuring pool size [#configuring-supavisors-pool-size]
 
@@ -19,7 +19,7 @@ The general rule is that if you are heavily using the PostgREST database API, yo
 
 These numbers are generalizations and depends on other Supabase products that you use and the extent of their usage. The actual values depend on your concurrent peak connection usage. For instance, if you were only using 80 connections in a week period and your database max connections is set to 500, then realistically you could allocate the difference of 420 (minus a reasonable buffer) to service more demand.
 
-This pool size applies per database user (role), not as a single total for the whole project. Each distinct role that connects through a pooler gets its own pool of up to this many direct Postgres connections, so the total connections poolers can open scale with the number of roles in use.
+This pool size applies per database user (role), not as a single total for the whole project. Each distinct role that connects through a [pooler](/docs/guides/database/connecting-to-postgres/pooling-and-limits) gets its own pool of up to this many direct Postgres connections, so the total connections poolers can open scale with the number of roles in use.
 
 The value defaults to a size based on your project's [Compute add-on](/docs/guides/platform/compute-and-disk#limits-and-constraints).
 
@@ -45,8 +45,8 @@ For Teams and Enterprise plans, Supabase provides Advanced Telemetry charts dire
 - **Postgres**: Direct connections from your application
 - **PostgREST**: Connections from the PostgREST API layer
 - **Reserved**: Administrative connections for Supabase services
-- **Auth**: Connections from Supabase Auth service
-- **Storage**: Connections from Supabase Storage service
+- **Auth**: Connections from [Supabase Auth](/docs/guides/auth) service
+- **Storage**: Connections from [Supabase Storage](/docs/guides/storage) service
 - **Other roles**: Miscellaneous database connections
 
 This chart helps you monitor connection pool usage, identify connection leaks, and plan capacity. It also shows a reference line for your compute size's maximum connection limit.

@@ -4,7 +4,7 @@ import { useRouter } from 'next/router'
 import React, { PropsWithChildren, useEffect, useMemo, useRef, useState } from 'react'
 import { Card, cn, WarningIcon } from 'ui'
 
-import type { ChartHighlightAction } from './ChartHighlightActions'
+import type { ChartHighlightAction, UpdateDateRange } from './ChartHighlightActions'
 import type { ChartData } from './Charts.types'
 import { ComposedChart } from './ComposedChart'
 import { MultiAttribute, ThresholdZone } from './ComposedChart.utils'
@@ -15,7 +15,6 @@ import { useInfraMonitoringQueries } from '@/data/analytics/infra-monitoring-que
 import { InfraMonitoringAttribute } from '@/data/analytics/infra-monitoring-query'
 import { useProjectDailyStatsQueries } from '@/data/analytics/project-daily-stats-queries'
 import { ProjectDailyStatsAttribute } from '@/data/analytics/project-daily-stats-query'
-import type { UpdateDateRange } from '@/pages/project/[ref]/observability/database'
 import { useDatabaseSelectorStateSnapshot } from '@/state/database-selector'
 
 const parseChartTimestamp = (value: string) => {

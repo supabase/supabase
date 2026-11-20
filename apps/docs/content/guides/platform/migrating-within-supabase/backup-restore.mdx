@@ -33,12 +33,12 @@ breadcrumb: 'Migrations'
 
       Session pooler connection string:
       ```bash
-        postgresql://postgres.[PROJECT-REF]:[YOUR-PASSWORD]@aws-0-us-east-1.pooler.supabase.com:5432/postgres
+        postgresql://postgres.[PROJECT-REF]:[YOUR-DATABASE-PASSWORD]@aws-0-us-east-1.pooler.supabase.com:5432/postgres
       ```
 
       Direct connection string:
       ```bash
-        postgresql://postgres:[YOUR-PASSWORD]@db.[PROJECT-REF].supabase.co:5432/postgres
+        postgresql://postgres:[YOUR-DATABASE-PASSWORD]@db.[PROJECT-REF].supabase.co:5432/postgres
       ```
     </StepHikeCompact.Details>
 
@@ -48,7 +48,7 @@ breadcrumb: 'Migrations'
     <StepHikeCompact.Details title="Get the database password" fullWidth>
       Reset the password in the [Database Settings](/dashboard/project/_/database/settings).
 
-      Replace ```[YOUR-PASSWORD]``` in the connection string with the database password.
+      Replace ```[YOUR-DATABASE-PASSWORD]``` in the connection string with the database password.
 
     </StepHikeCompact.Details>
 
@@ -120,12 +120,12 @@ These steps cover a manual logical restore (`pg_dump` / `psql`) into a project y
 
         Session pooler connection string:
         ```bash
-          postgresql://postgres.[PROJECT-REF]:[YOUR-PASSWORD]@aws-0-us-east-1.pooler.supabase.com:5432/postgres
+          postgresql://postgres.[PROJECT-REF]:[YOUR-DATABASE-PASSWORD]@aws-0-us-east-1.pooler.supabase.com:5432/postgres
         ```
 
         Direct connection string:
         ```bash
-          postgresql://postgres:[YOUR-PASSWORD]@db.[PROJECT-REF].supabase.co:5432/postgres
+          postgresql://postgres:[YOUR-DATABASE-PASSWORD]@db.[PROJECT-REF].supabase.co:5432/postgres
         ```
       </StepHikeCompact.Details>
 
@@ -135,7 +135,7 @@ These steps cover a manual logical restore (`pg_dump` / `psql`) into a project y
 
     <StepHikeCompact.Details title="Get the database password" fullWidth>
 
-      Replace ```[YOUR-PASSWORD]``` in the connection string with the database password. If you do not remember your password, you can reset it on [the **Database >  Settings**](/dashboard/project/_/database/settings) page of the Dashboard.
+      Replace ```[YOUR-DATABASE-PASSWORD]``` in the connection string with the database password. If you do not remember your password, you can reset it on [the **Database >  Settings**](/dashboard/project/_/database/settings) page of the Dashboard.
 
     </StepHikeCompact.Details>
     </StepHikeCompact.Step>

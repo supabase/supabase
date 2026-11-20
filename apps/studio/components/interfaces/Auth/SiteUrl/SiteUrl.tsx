@@ -15,13 +15,28 @@ import {
 import { GenericSkeletonLoader } from 'ui-patterns/ShimmeringLoader'
 import * as z from 'zod'
 
+import { getSiteUrlError } from '../Auth.constants'
 import { AlertError } from '@/components/ui/AlertError'
 import { useAuthConfigQuery } from '@/data/auth/auth-config-query'
 import { useAuthConfigUpdateMutation } from '@/data/auth/auth-config-update-mutation'
 import { FGA_PERMISSIONS, useAsyncCheckPermissionsV2 } from '@/hooks/misc/useCheckPermissionsV2'
 
 const schema = z.object({
-  SITE_URL: z.string().trim().min(1, 'Must have a Site URL'),
+  SITE_URL: z
+    .string()
+    .trim()
+    .min(1, 'Must have a Site URL')
+    .superRefine((value, ctx) => {
+      const isEmpty = value.length === 0
+      if (isEmpty) {
+        return
+      }
+
+      const siteUrlError = getSiteUrlError(value)
+      if (siteUrlError) {
+        ctx.addIssue({ code: z.ZodIssueCode.custom, message: siteUrlError })
+      }
+    }),
 })
 
 const SiteUrl = () => {
@@ -55,7 +70,7 @@ const SiteUrl = () => {
     }
   }, [authConfig, isUpdatingSiteUrl])
 
-  const onSubmitSiteUrl = (values: any) => {
+  const onSubmitSiteUrl = (values: z.infer<typeof schema>) => {
     setIsUpdatingSiteUrl(true)
 
     updateAuthConfig(

@@ -17,6 +17,7 @@ import type { WarehouseSetupStatus } from './Warehouse.utils'
 import type { SchemasData } from '@/data/database/schemas-query'
 import type { ProjectDetail } from '@/data/projects/project-detail-query'
 import type { TablesData } from '@/data/tables/tables-query'
+import type { WarehouseMetricsResponse } from '@/data/warehouse/warehouse-metrics-api-types'
 import type {
   V2WarehouseSetupAcceptedResponse,
   V2WarehouseSetupStatusResponse,
@@ -60,6 +61,14 @@ vi.mock('./WarehouseSchemaTablePicker', () => ({
     </section>
   ),
 }))
+
+beforeEach(() =>
+  addAPIMock({
+    method: 'get',
+    path: '/platform/warehouse/:ref/metrics',
+    response: () => HttpResponse.json<WarehouseMetricsResponse>({ metrics: [] }),
+  })
+)
 
 mockAnimationsApi()
 dayjs.extend(duration)
