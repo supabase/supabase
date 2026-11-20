@@ -1,4 +1,3 @@
-import { capitalize } from 'lodash'
 import { ChevronsUpDownIcon } from 'lucide-react'
 import { Fragment, useMemo, type ReactNode } from 'react'
 import { Button, Collapsible, CollapsibleContent, CollapsibleTrigger } from 'ui'
@@ -10,6 +9,12 @@ import {
   ScopeGroupLevel,
 } from './OAuthAppsAuthorizeScreen.utils'
 import { ScopeGroupCardItem, ScopePermissionLabel } from './ScopeGroupCardItem'
+
+const scopeLabels: Record<ScopeGroupLevel, string> = {
+  'read-write': 'Read and write',
+  write: 'Write',
+  read: 'Read only',
+}
 
 export interface ScopeGroupCardProps {
   scopes: string[]
@@ -31,12 +36,20 @@ export const ScopeGroupCardWithDiff = ({ scopes, previousScopes }: ScopeGroupCar
     <>
       <div className="divide-y rounded-md border bg-surface-75 px-4">
         <DiffScopeGroupItem
-          label="Read and write"
+          label={scopeLabels['read-write']}
           level="read-write"
           permissions={diff.changed['read-write']}
         />
-        <DiffScopeGroupItem label="Write" level="write" permissions={diff.changed['write']} />
-        <DiffScopeGroupItem label="Read only" level="read" permissions={diff.changed['read']} />
+        <DiffScopeGroupItem
+          label={scopeLabels['write']}
+          level="write"
+          permissions={diff.changed['write']}
+        />
+        <DiffScopeGroupItem
+          label={scopeLabels['read']}
+          level="read"
+          permissions={diff.changed['read']}
+        />
         <DiffScopeGroupItem
           label="Removed"
           level={undefined}
@@ -57,9 +70,15 @@ export const ScopeGroupCardWithDiff = ({ scopes, previousScopes }: ScopeGroupCar
         </CollapsibleTrigger>
         <CollapsibleContent>
           <div className="divide-y rounded-md border bg-surface-75 px-4">
-            <ScopeGroupCardItem label="Read and write" permissions={diff.unchanged['read-write']} />
-            <ScopeGroupCardItem label="Write" permissions={diff.unchanged['write']} />
-            <ScopeGroupCardItem label="Read only" permissions={diff.unchanged['read']} />
+            <ScopeGroupCardItem
+              label={scopeLabels['read-write']}
+              permissions={diff.unchanged['read-write']}
+            />
+            <ScopeGroupCardItem
+              label={scopeLabels['write']}
+              permissions={diff.unchanged['write']}
+            />
+            <ScopeGroupCardItem label={scopeLabels['read']} permissions={diff.unchanged['read']} />
           </div>
         </CollapsibleContent>
       </Collapsible>
@@ -109,18 +128,18 @@ const DiffDescription = ({
   previousLevel: ScopeGroupLevel | undefined
 }) => {
   // Removed
-  if (level == null) return capitalize(previousLevel!)
+  if (level == null) return scopeLabels[previousLevel!]
 
   // New
   if (previousLevel == null) return 'New'
 
   // Upgraded
-  if (level === 'read-write') return `Upgraded from ${capitalize(previousLevel)}`
+  if (level === 'read-write') return `Upgraded from ${scopeLabels[previousLevel]}`
 
   // Modified
   if (['read', 'write'].includes(level!) && ['read', 'write'].includes(previousLevel))
-    return `Changed from ${capitalize(previousLevel)}`
+    return `Changed from ${scopeLabels[previousLevel]}`
 
   // Downgraded
-  return `Demoted from ${capitalize(previousLevel)}`
+  return `Demoted from ${scopeLabels[previousLevel]}`
 }
