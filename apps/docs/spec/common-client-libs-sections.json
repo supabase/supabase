@@ -1773,14 +1773,6 @@
     ],
     "items": [
       {
-        "title": "OpenTelemetry",
-        "id": "telemetry",
-        "slug": "telemetry",
-        "isFunc": false,
-        "type": "markdown",
-        "excludes": ["reference_csharp_v0", "reference_csharp_v1"]
-      },
-      {
         "title": "Release Notes",
         "id": "release-notes",
         "slug": "release-notes",

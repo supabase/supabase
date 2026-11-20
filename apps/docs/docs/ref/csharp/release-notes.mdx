@@ -12,7 +12,7 @@ title: Release Notes
 - Realtime: reconnect as soon as the network comes back, controlled by `ClientOptions.MonitorsNetworkPath` ([#799](https://github.com/supabase/supabase-csharp/issues/799)).
 - Realtime: log channel state changes to the supplied logger ([#797](https://github.com/supabase/supabase-csharp/issues/797)).
 - Add `SupabaseOptions.LoggerFactory` to log request outcomes, retries, and background work such as token refresh and Realtime reconnects. Credentials, bodies, and query strings are never logged ([#766](https://github.com/supabase/supabase-csharp/issues/766)).
-- Send the current trace context (`traceparent`, `tracestate`, `baggage`) with every Auth, Database, Storage, and Functions request. Turn it off with `SupabaseOptions.TracePropagation = TracePropagation.Disabled`. See [OpenTelemetry](/docs/reference/csharp/telemetry) ([#762](https://github.com/supabase/supabase-csharp/issues/762)).
+- Send the current trace context (`traceparent`, `tracestate`, `baggage`) with every Auth, Database, Storage, and Functions request. Turn it off with `SupabaseOptions.TracePropagation = TracePropagation.Disabled`. See [Client-side tracing](/docs/guides/observability/client-side-tracing?language=csharp) ([#762](https://github.com/supabase/supabase-csharp/issues/762)).
 - Send Storage requests, uploads, and downloads through the client set in `SupabaseOptions.HttpClient` ([#758](https://github.com/supabase/supabase-csharp/issues/758)).
 - Auth: disable session persistence with `SessionPersistence.Disabled` ([#761](https://github.com/supabase/supabase-csharp/issues/761)).
 - Auth: manage OAuth clients as an admin: list, read, register, update, delete, and regenerate the secret ([#789](https://github.com/supabase/supabase-csharp/issues/789), [#791](https://github.com/supabase/supabase-csharp/issues/791), [#786](https://github.com/supabase/supabase-csharp/issues/786), [#792](https://github.com/supabase/supabase-csharp/issues/792), [#784](https://github.com/supabase/supabase-csharp/issues/784), [#788](https://github.com/supabase/supabase-csharp/issues/788)).
@@ -395,4 +395,4 @@ This is the observability release: every child library now emits diagnostics thr
     name `supabase-core`
     to `Supabase.Core`
 - Adds comments to the remaining undocumented code.
-- Emit OpenTelemetry-compatible traces and metrics through `System.Diagnostics` from the Auth, Database, Storage, and Functions clients. See [OpenTelemetry](/docs/reference/csharp/telemetry).
+- Emit OpenTelemetry-compatible traces and metrics through `System.Diagnostics` from the Auth, Database, Storage, and Functions clients. See [Client-side tracing](/docs/guides/observability/client-side-tracing?language=csharp).
