@@ -3,12 +3,18 @@ title: 'Auth architecture'
 description: 'Learn how Supabase Auth is built from the client layer, the API gateway, the Auth service, and Postgres, and what each of these four layers is responsible for.'
 ---
 
+Supabase Auth sits between your app and your database. Knowing which layer does what tells you where to look when you sign in users, issue tokens, or store user data. For how to sign users in, see [Password-based Auth](/docs/guides/auth/passwords).
+
+## Layers
+
 There are four major layers to Supabase Auth:
 
-1. [Client layer.](#client-layer) This can be one of the Supabase client SDKs, or manually made HTTP requests using the HTTP client of your choice.
-1. Envoy API gateway. This is shared between all Supabase products.
-1. [Auth service](#auth-service) (formerly known as GoTrue).
-1. [Postgres database.](#postgres) This is shared between all Supabase products.
+| Layer                          | Description                                                                                           |
+| ------------------------------ | ----------------------------------------------------------------------------------------------------- |
+| [Client layer](#client-layer)  | One of the Supabase client SDKs, or manually made HTTP requests using the HTTP client of your choice. |
+| Envoy API gateway              | Shared between all Supabase products.                                                                 |
+| [Auth service](#auth-service)  | Formerly known as GoTrue.                                                                             |
+| [Postgres database](#postgres) | Shared between all Supabase products.                                                                 |
 
 <Image
   alt="Diagram of the Supabase architecture. The Envoy API gateway routes each request by path to one of seven services: /auth to GoTrue, /rest to PostgREST, /realtime to Realtime, /storage to Storage, /pg to pg-meta, /functions to Functions, and /graphql to pg_graphql. All seven services connect to a single Postgres instance."
@@ -68,3 +74,9 @@ You can connect Auth information to your own objects using [database triggers](/
 Views you create for Auth data can bypass RLS. In Postgres 15 and later, views inherit the RLS policies of the underlying tables if created with `security_invoker`. Views in earlier versions, or those created without `security_invoker`, inherit the permissions of the owner, who can bypass RLS policies.
 
 </Admonition>
+
+## Related resources
+
+- [Password-based Auth](/docs/guides/auth/passwords): sign users in through the client layer.
+- [JWTs](/docs/guides/auth/jwts): the tokens the Auth service issues and refreshes.
+- [Users](/docs/guides/auth/users): the user records that Auth stores in the `auth` schema.

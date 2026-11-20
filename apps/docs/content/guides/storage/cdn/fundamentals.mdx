@@ -5,9 +5,11 @@ description: 'Learn how Supabase Storage caches objects on a CDN, how a cache hi
 sidebar_label: 'CDN'
 ---
 
+Knowing how the Storage cache works tells you why a first request is slower than the next one, and why public buckets cache better than private buckets. For how to remove an object from the cache, see [Purge CDN cache](/docs/guides/storage/cdn/purge-cdn-cache).
+
 All assets uploaded to Supabase Storage are cached on a Content Delivery Network (CDN) to improve the latency for users all around the world. CDNs are a geographically distributed set of servers or _nodes_ which cache content from an _origin server_. For Supabase Storage, the origin is the storage server running in the [same region as your project](/dashboard/project/_/settings/general). Aside from performance, CDNs also help with security and availability by mitigating Distributed Denial of Service (DDoS) and other application attacks.
 
-## Example
+## How caching works
 
 The following example shows how a CDN helps with performance.
 
@@ -33,3 +35,9 @@ Objects in public buckets don't require authorization to access. This leads to a
 
 For private buckets, Storage checks the permissions for each object per user. For example, if two different users access the same object in a private bucket from the same region, it results in a cache miss for both users. The users might have different security policies attached to them.
 On the other hand, if two different users access the same object in a public bucket from the same region, it results in a cache hit for the second user.
+
+## Related resources
+
+- [Purge CDN cache](/docs/guides/storage/cdn/purge-cdn-cache): remove a stale object from the cache.
+- [Smart CDN](/docs/guides/storage/cdn/smart-cdn): how Storage invalidates cached objects when they change.
+- [Storage buckets](/docs/guides/storage/buckets/fundamentals): choose between public and private buckets.

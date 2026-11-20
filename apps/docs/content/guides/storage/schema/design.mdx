@@ -1,10 +1,12 @@
 ---
 id: 'storage-schema-design'
-title: 'The Storage Schema'
+title: 'Storage schema'
 description: 'Learn how Supabase Storage keeps bucket and object metadata in the storage schema in Postgres, which tables it holds, and why you treat them as read-only.'
 sidebar_label: 'Schema'
 tocVideo: ch2UGHMreB0
 ---
+
+Storage keeps the metadata for your buckets and objects in Postgres. Knowing the schema tells you what you can query directly and what you change only through the Storage API. For how to write policies on these tables, see [Storage access control](/docs/guides/storage/security/access-control).
 
 Storage uses Postgres to store metadata regarding your buckets and objects. You can use [Row Level Security](/docs/guides/database/postgres/row-level-security) (RLS) policies for access control. This data is stored in a dedicated schema within your project called `storage`.
 
@@ -15,6 +17,8 @@ Changing Storage records with SQL can leave objects that you can't access but ar
 The storage schema stores only the metadata. The objects themselves are stored in a provider like S3, so deleting the metadata doesn't remove the object from the underlying storage provider.
 
 </Admonition>
+
+## Tables
 
 The following diagram shows the schema. You can query these tables directly to retrieve information about your files without going through the Storage API.
 
@@ -59,3 +63,9 @@ The schema centers on three tables. Each `buckets` row can own many `objects` ro
 Supabase strongly recommends treating the `storage` schema as read-only. Your changes to the schema can conflict with Supabase updates to it and cause downtime.
 
 Supabase does encourage custom indexes, because they can significantly improve the performance of the RLS policies that enforce access control.
+
+## Related resources
+
+- [Storage access control](/docs/guides/storage/security/access-control): write RLS policies on the `storage.objects` table.
+- [Ownership](/docs/guides/storage/security/ownership): how the `owner_id` column is set.
+- [Row Level Security](/docs/guides/database/postgres/row-level-security): how policies work in Postgres.

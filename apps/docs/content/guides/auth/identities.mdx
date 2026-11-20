@@ -3,6 +3,8 @@ title: 'Identities'
 description: 'Learn what an identity is in Supabase Auth, which identity types a user can have, and which attributes the user identity object holds for each linked identity.'
 ---
 
+Each way a user signs in, such as email or an OAuth provider, is a separate identity on the same user. Knowing a user's identities tells you which sign-in methods they can use. For how to add or remove identities, see [Identity linking](/docs/guides/auth/auth-identity-linking).
+
 An identity is an authentication method associated with a user. Supabase Auth supports the following types of identity:
 
 - Email
@@ -27,3 +29,9 @@ The user identity object contains the following attributes:
 | `created_at`      | `string` | The timestamp that the identity was created.                                                                                                                                                                                             |
 | `last_sign_in_at` | `string` | The timestamp that the identity was last used to sign in.                                                                                                                                                                                |
 | `updated_at`      | `string` | The timestamp that the identity was last updated.                                                                                                                                                                                        |
+
+## Related resources
+
+- [Identity linking](/docs/guides/auth/auth-identity-linking): link or unlink an identity.
+- [Users](/docs/guides/auth/users): the user object that identities belong to.
+- [Anonymous sign-ins](/docs/guides/auth/auth-anonymous): users with no identity until they link one.

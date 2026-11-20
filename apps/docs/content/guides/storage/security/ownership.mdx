@@ -1,9 +1,11 @@
 ---
 id: 'storage-access-control'
-title: 'Ownership'
+title: 'Storage ownership'
 description: 'Learn how Supabase Storage assigns an owner to each bucket and object from the JWT, and how to scope access to that owner with Row Level Security policies.'
 sidebar_label: 'Security'
 ---
+
+Storage records an owner for every bucket and object. Knowing the owner lets you write access rules scoped to that user. For how to write those rules, see [Storage access control](/docs/guides/storage/security/access-control).
 
 When you create a bucket or object in Supabase Storage, Storage assigns it an owner automatically. The owner is the user who created the resource, taken from the `sub` claim in the JWT. Storage keeps the owner in the `owner_id` column.
 
@@ -36,3 +38,8 @@ using (
 ```
 
 Row Level Security (RLS) policies are one way to enforce access control. You can also implement access control in your server code by following the same pattern.
+
+## Related resources
+
+- [Storage access control](/docs/guides/storage/security/access-control): write RLS policies for Storage.
+- [Storage schema](/docs/guides/storage/schema/design): the tables that hold the `owner_id` column.
