@@ -126,7 +126,7 @@ describe('OAuthAppsAuthorizedList', () => {
     const dialog = await screen.findByRole('dialog')
     expect(dialog).toHaveTextContent('New connections will be blocked immediately.')
     expect(dialog).toHaveTextContent('example_partner_user')
-    expect(within(dialog).getByRole('button', { name: 'Revoke', exact: true })).toBeDisabled()
+    expect(within(dialog).getByRole('button', { name: 'Revoke' })).toBeDisabled()
   })
 
   test('expands a member to show their projects and permission groups', async () => {
