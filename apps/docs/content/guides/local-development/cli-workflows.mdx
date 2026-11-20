@@ -42,15 +42,15 @@ If you want a working project to explore rather than an empty one, `supabase boo
 
 After `supabase init`, your project contains a `./supabase` directory. Here's what goes in it and what to commit:
 
-| Path                   | Purpose                                                           | Commit? |
-| ---------------------- | ----------------------------------------------------------------- | ------- |
-| `config.toml`          | Local stack configuration (ports, auth settings, etc.)            | Yes     |
-| `migrations/`          | Timestamped SQL migration files, applied in order                 | Yes     |
-| `seed.sql`             | Dev/test data, applied after migrations on `start` and `db reset` | Yes     |
-| `schemas/`             | Declarative schema files (if using that approach)                 | Yes     |
-| `.temp/`, `.branches/` | CLI internal state                                                | No      |
+| Path                            | Purpose                                                           | Commit? |
+| ------------------------------- | ----------------------------------------------------------------- | ------- |
+| `config.toml` or `config.jsonc` | Local stack configuration (ports, auth settings, etc.)            | Yes     |
+| `migrations/`                   | Timestamped SQL migration files, applied in order                 | Yes     |
+| `seed.sql`                      | Dev/test data, applied after migrations on `start` and `db reset` | Yes     |
+| `schemas/`                      | Declarative schema files (if using that approach)                 | Yes     |
+| `.temp/`, `.branches/`          | CLI internal state                                                | No      |
 
-The `config.toml` is safe to commit. It contains no secrets by default. If you add sensitive values (OAuth credentials, API keys), use the `env()` function to reference environment variables instead of hardcoding them. See [Managing config and secrets](/docs/guides/local-development/managing-config).
+The config file is safe to commit. It contains no secrets by default. If you add sensitive values (OAuth credentials, API keys), use the `env()` function to reference environment variables instead of hardcoding them. See [Managing config and secrets](/docs/guides/local-development/managing-config).
 
 <Admonition type="note" title="Local vs. remote targets">
 
@@ -307,7 +307,7 @@ These steps assume the `pg-delta` engine. On the legacy `migra` engine, generate
 
 `db schema declarative sync` compares your `supabase/schemas/` files against your existing migrations. It does not read the live local database. Changes you make directly in Studio or via SQL are invisible to it, so it reports "No schema changes found" and silently drops them. Always edit the schema files, then sync.
 
-Don't use `db diff` to generate migrations from declarative files. Under `pg-delta`, `db diff` never uses `supabase/schemas/` as its baseline. The old `[db.migrations].schema_paths` setting no longer changes that, and the CLI warns when the setting lists any paths. Remove it from `config.toml`.
+Don't use `db diff` to generate migrations from declarative files. Under `pg-delta`, `db diff` never uses `supabase/schemas/` as its baseline. The old `db.migrations.schema_paths` setting no longer changes that, and the CLI warns when the setting lists any paths. Remove it from your config file.
 
 </Admonition>
 
@@ -442,7 +442,7 @@ When `supabase db diff` or `db schema declarative sync` generates a migration, r
 
 ### What `pg-delta` output looks like
 
-Generated SQL uses uppercase keywords, wrapped at a maximum width of 180 characters. You can override this with `[experimental.pgdelta] format_options` in `config.toml`, or set `format_options = "null"` to emit raw statements with no formatting applied.
+Generated SQL uses uppercase keywords, wrapped at a maximum width of 180 characters. You can override this with `experimental.pgdelta.format_options` in your config file, or set it to the string `"null"` to emit raw statements with no formatting applied.
 
 Most changes produce a single migration file. When a change crosses a transaction boundary (for example `alter type ... add value` followed by a check constraint that uses the new enum value, which can't run in the same transaction), the CLI may write one ordered migration file per unit instead. The extra files carry a numeric segment suffix, such as `<timestamp>_add-status_1.sql` and `<timestamp+1s>_add-status_2.sql`. Commit all of them.
 
@@ -521,4 +521,4 @@ If problems persist, `supabase stop --no-backup` for a clean restart (this remov
 
 **`supabase start` fails because a port is already allocated**
 
-Another local Supabase project is using the default ports. Stop it with `supabase stop` from its directory. To run both projects at the same time, turn on the experimental `supabase stack` commands and remove the fixed ports from each project's `config.toml`. See [Running multiple local projects](/docs/guides/local-development/running-multiple-local-projects).
+Another local Supabase project is using the default ports. Stop it with `supabase stop` from its directory. To run both projects at the same time, turn on the experimental `supabase stack` commands and remove the fixed ports from each project's config file. See [Running multiple local projects](/docs/guides/local-development/running-multiple-local-projects).

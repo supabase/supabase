@@ -2591,6 +2591,11 @@ export const local_development: NavMenuConstant = {
           url: '/guides/local-development/cli/config',
           enabled: localDevelopmentEnabled,
         },
+        {
+          name: 'Config file formats',
+          url: '/guides/local-development/cli/config-formats',
+          enabled: localDevelopmentEnabled,
+        },
         { name: 'CLI commands', url: '/reference/cli' },
       ],
     },

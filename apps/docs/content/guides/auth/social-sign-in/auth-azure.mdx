@@ -37,9 +37,9 @@ Azure does not allow `127.0.0.1` as a redirect URI hostname and requires
 the use of `localhost`.
 
 To enable Azure OAuth during local Supabase development, configure the
-Supabase API external URL in your `config.toml`:
+Supabase API external URL in your config file (`supabase/config.toml` or `supabase/config.jsonc`):
 
-```toml
+```toml supabase/config.toml
 [api]
 external_url = "http://localhost:54321"
 ```

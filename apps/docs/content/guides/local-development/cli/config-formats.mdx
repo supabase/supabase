@@ -1,0 +1,128 @@
+---
+id: 'config-formats'
+title: 'Config file formats'
+description: 'Configure your Supabase project in TOML or JSONC, convert between formats, and validate the file.'
+subtitle: 'Choose a format, convert, and validate.'
+---
+
+The Supabase CLI reads project configuration from one of three files in the `supabase` directory.
+
+| File                    | Format                                   |
+| ----------------------- | ---------------------------------------- |
+| `supabase/config.toml`  | TOML. `supabase init` creates this file. |
+| `supabase/config.jsonc` | JSON with comments and trailing commas.  |
+| `supabase/config.json`  | JSON without comments.                   |
+
+Every format uses the same keys. Config examples in the docs show only the keys they change. In JSON or JSONC, merge them into the matching objects in your file instead of adding a second copy of a parent key. See the [CLI configuration reference](/docs/guides/local-development/cli/config) for the full list.
+
+A `config.json` or `config.jsonc` file takes precedence over `config.toml`. Having both `config.json` and `config.jsonc` is an error.
+
+## Minimum CLI version
+
+Supabase CLI 3.1.0 is the first release that reads `config.json` and `config.jsonc`. Older versions ignore these files and run with default settings. Everyone who works on the project, and any CI step that pins a CLI version such as [`supabase/setup-cli`](https://github.com/supabase/setup-cli), needs 3.1.0 or later.
+
+The `supabase config convert` and `supabase config validate` commands need CLI 3.2.0 or later.
+
+## Convert TOML to JSONC
+
+To convert `supabase/config.toml` to `supabase/config.jsonc`, run:
+
+```bash
+supabase config convert
+```
+
+The command carries comments over, adds a `$schema` entry, and moves the original file to `supabase/config.toml.bak`. If `.vscode/settings.json` exists, it also adds the schema domain to the trusted domains. It refuses to write anything if the converted file doesn't match the original.
+
+To preview the result without writing any file, use `--dry-run`:
+
+```bash
+supabase config convert --dry-run
+```
+
+To undo the conversion, run the undo command that `supabase config convert` prints. It moves the backup back and removes the JSONC file. Undoing discards any edits you made to `config.jsonc` after converting, so copy those edits into the backup file first.
+
+If a backup from an earlier conversion exists, the command names the backup `config.toml.2.bak` or the next free number, and the printed undo command uses that name.
+
+After you convert:
+
+- Delete the backup so it isn't committed.
+- Search your repository, CI workflows, and Dockerfiles for `config.toml` references.
+- Update pinned CLI versions to 3.1.0 or later.
+
+For all options, see the [`supabase config convert` reference](/docs/reference/cli/supabase-config-convert).
+
+## Validate your config
+
+To check the config file without starting any services, run:
+
+```bash
+supabase config validate
+```
+
+The command reports every problem in one pass, each with its key path and `file:line:column`. It exits with `0` when the file is valid and `1` when it has errors. It doesn't contact the Supabase API or modify any file.
+
+Values written as `env()` references aren't checked unless you pass `--resolve-env`, which reads your shell and `.env` files.
+
+To catch problems before they merge, add the command to a CI workflow:
+
+```yaml
+- uses: supabase/setup-cli@v1
+  with:
+    version: latest
+- run: supabase config validate
+```
+
+For all options and a pre-commit hook example, see the [`supabase config validate` reference](/docs/reference/cli/supabase-config-validate).
+
+## Schema declaration and versions
+
+The config schema is hosted at `https://supabase.com/schemas/config/v1.json`. Editors use it for validation and autocomplete.
+
+In a JSON or JSONC file, declare the schema with a `$schema` key:
+
+```jsonc
+{
+  "$schema": "https://supabase.com/schemas/config/v1.json",
+  "project_id": "my-project",
+}
+```
+
+In `config.toml`, add a `#:schema` comment. Only comments and blank lines can come before it:
+
+```toml
+#:schema https://supabase.com/schemas/config/v1.json
+
+project_id = "my-project"
+```
+
+`supabase init` writes this line for you in CLI 3.1.0 and later. For a project created earlier, add it as the first line of `config.toml`.
+
+A file without a declaration is read as version 1. The CLI also reads the legacy references `https://supabase.com/docs/cli/config.schema.json` and `./node_modules/@supabase/config/schema.json` as version 1, and warns about any other URL.
+
+A new schema version is published only when existing config would change meaning, such as when a default value changes. New keys are added to the current version. If a file declares a newer version than your CLI reads, the CLI fails and asks you to upgrade.
+
+## Editor setup
+
+### VS Code
+
+VS Code downloads a `$schema` URL only from trusted domains. Without this setting, JSON and JSONC configs get no validation or autocomplete. `supabase init` and `supabase config convert` add it to `.vscode/settings.json`. To add it yourself:
+
+```jsonc
+{
+  "json.schemaDownload.trustedDomains": {
+    "https://supabase.com/schemas/": true,
+  },
+}
+```
+
+VS Code's built-in JSON support relies on the `$schema` key in the file.
+
+### TOML editors
+
+The Even Better TOML extension needs the `#:schema` line at the top of `config.toml`. Its released version can't load the SchemaStore catalog.
+
+Tombi reads the `#:schema` line, and also matches `supabase/config.toml` through the SchemaStore catalog.
+
+### Editors that use SchemaStore
+
+The [SchemaStore](https://www.schemastore.org) catalog has an entry for `**/supabase/config.{toml,json,jsonc}`. Editors that use the catalog for JSON, such as JetBrains IDEs and Neovim with SchemaStore.nvim, apply the schema automatically. Zed relies on the `$schema` key.
