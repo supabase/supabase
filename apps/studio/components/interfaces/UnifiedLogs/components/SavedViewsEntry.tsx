@@ -37,21 +37,7 @@ export const SavedViewsEntry = ({
       className="group flex w-full items-center gap-2 rounded-md px-2 py-1.5 text-left hover:bg-surface-200 focus-ring"
     >
       <Layers2Icon size={14} className={cn('shrink-0', stateClassName)} />
-      <span className="min-w-0 flex-1">
-        <span className={cn('block truncate text-sm', stateClassName)}>Saved views</span>
-        {activeView ? (
-          <span
-            className={cn('block truncate text-xs opacity-70', stateClassName)}
-            title={activeView.name}
-          >
-            {`${activeView.name}${isActiveViewModified ? ' (modified)' : ''}`}
-          </span>
-        ) : (
-          <span className="block truncate text-xs text-foreground-lighter opacity-70">
-            None active
-          </span>
-        )}
-      </span>
+      <span className={cn('min-w-0 flex-1 truncate text-sm', stateClassName)}>Saved views</span>
       <ChevronRightIcon size={14} className="shrink-0 text-foreground-muted" />
     </button>
   )

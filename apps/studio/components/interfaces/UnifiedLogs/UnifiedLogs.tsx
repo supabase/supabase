@@ -52,6 +52,7 @@ import { LogsTable } from './components/LogsTable'
 import { isPresetViewId, PRESET_VIEWS } from './components/LogsViews.presets'
 import { getFilterCombinationKey, MIN_FILTERS_TO_SAVE } from './components/LogsViews.utils'
 import { LogsViewsPanel } from './components/LogsViewsPanel'
+import { NewViewEntry } from './components/NewViewEntry'
 import { SavedViewsEntry } from './components/SavedViewsEntry'
 import { TooltipLabel } from './components/TooltipLabel'
 import { ViewModifiedPopover } from './components/ViewModifiedPopover'
@@ -553,6 +554,7 @@ export const UnifiedLogs = ({
   }
 
   const handleStartSaveView = () => {
+    handleOpenViewsSection()
     setSaveViewProjectRef(projectRef ?? null)
   }
 
@@ -682,11 +684,19 @@ export const UnifiedLogs = ({
   }
 
   const savedViewsEntry = showSavedViews ? (
-    <SavedViewsEntry
-      activeView={activeView}
-      isActiveViewModified={isActiveViewModified}
-      onOpen={handleOpenViewsSection}
-    />
+    <div className="flex flex-col gap-0.5">
+      <SavedViewsEntry
+        activeView={activeView}
+        isActiveViewModified={isActiveViewModified}
+        onOpen={handleOpenViewsSection}
+      />
+      {canCreateView && (
+        <NewViewEntry
+          disabled={isSavingNewView || activeFilterCount < MIN_FILTERS_TO_SAVE}
+          onClick={handleStartSaveView}
+        />
+      )}
+    </div>
   ) : undefined
 
   const saveViewAction = canCreateView ? (
