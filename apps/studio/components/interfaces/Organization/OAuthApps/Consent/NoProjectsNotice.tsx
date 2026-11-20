@@ -1,18 +1,11 @@
 import { Admonition } from 'ui-patterns/Admonition'
 
-import { InlineLinkClassName } from '@/components/ui/InlineLink'
-
 export interface NoProjectsNoticeProps {
   appName: string
   organizationName: string
-  onSwitchOrg: () => void
 }
 
-export const NoProjectsNotice = ({
-  appName,
-  organizationName,
-  onSwitchOrg,
-}: NoProjectsNoticeProps) => {
+export const NoProjectsNotice = ({ appName, organizationName }: NoProjectsNoticeProps) => {
   return (
     <Admonition
       type="default"
@@ -22,17 +15,6 @@ export const NoProjectsNotice = ({
           <p>
             {appName} needs access to at least one project, and this organization doesn't have any
             yet.
-          </p>
-          <p>
-            Expecting to see your projects?
-            <button
-              type="button"
-              tabIndex={0}
-              className={InlineLinkClassName}
-              onClick={onSwitchOrg}
-            >
-              Switch organization
-            </button>
           </p>
         </>
       }

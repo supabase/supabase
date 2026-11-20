@@ -2510,6 +2510,11 @@
     "permanent": true
   },
   {
+    "source": "/docs/reference/cli/supabase-inspect-db-role-connections",
+    "destination": "/docs/reference/cli/supabase-inspect-db-role-stats",
+    "permanent": true
+  },
+  {
     "source": "/docs/reference/csharp",
     "destination": "/docs/reference/csharp/introduction",
     "permanent": true
