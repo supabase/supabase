@@ -65,6 +65,7 @@ export const AddRowOperationItem = ({
           aria-label="Discard change"
           className="w-7"
           icon={<Undo2Icon />}
+          disabled={snap.operationQueue.status === 'saving'}
           onClick={handleDelete}
           tooltip={{
             content: {

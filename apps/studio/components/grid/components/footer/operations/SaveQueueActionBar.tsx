@@ -93,7 +93,7 @@ export const SaveQueueActionBar = () => {
                         <KeyboardShortcut keys={['Meta', '.']} />
                       </DropdownMenuItem>
                       <DropdownMenuSeparator />
-                      <DropdownMenuItem onClick={confirmOnClose}>
+                      <DropdownMenuItem onClick={confirmOnClose} disabled={isSaving}>
                         <div className="flex items-center gap-x-2">
                           <TrashIcon size={14} />
                           <span>Discard</span>

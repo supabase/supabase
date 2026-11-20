@@ -24,7 +24,6 @@ export const OperationQueueSidePanel = () => {
   const operations = snap.operationQueue.operations as readonly QueuedOperation[]
 
   const { handleSave, handleCancel, isSaving } = useOperationQueueActions({
-    onSaveSuccess: snap.closeSidePanel,
     onCancelSuccess: snap.closeSidePanel,
   })
 
