@@ -40,9 +40,6 @@ export const UserLogFilterControl = () => {
     [data?.pages]
   )
 
-  // Only one user can be filtered on at a time — keep the current selection visible (and
-  // checked) even if it falls outside the current search results, e.g. right after loading
-  // from a deep link.
   const options: UserOption[] =
     user && !results.some((u) => u.id === user) ? [{ id: user, email: null }, ...results] : results
 
@@ -50,8 +47,8 @@ export const UserLogFilterControl = () => {
 
   return (
     <AccordionItem value="user" className="border-none">
-      <div className="flex items-center gap-2 pr-2">
-        <AccordionTrigger className="flex-1 px-2 py-0 hover:no-underline data-[state=closed]:text-muted-foreground data-open:text-foreground focus-within:data-closed:text-foreground hover:data-closed:text-foreground">
+      <div className="flex items-center gap-2 px-2">
+        <AccordionTrigger className="flex-1 px-0 py-0 hover:no-underline data-[state=closed]:text-muted-foreground data-open:text-foreground focus-within:data-closed:text-foreground hover:data-closed:text-foreground">
           <div className="flex items-center gap-2 truncate py-2">
             <p className="text-sm">User</p>
           </div>
@@ -73,7 +70,7 @@ export const UserLogFilterControl = () => {
         ) : null}
       </div>
       <AccordionContent>
-        <div className="p-1 grid gap-2">
+        <div className="py-1 px-2 grid gap-2">
           <InputWithAddons
             placeholder="Search by email or id"
             leading={<SearchIcon size={14} className="text-foreground-lighter" />}
