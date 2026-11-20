@@ -157,6 +157,20 @@ describe('code block serialization and rendering', () => {
     expect($('.code-content button[tabindex="0"]')).toHaveLength(2)
   })
 
+  it('copies the code without comments', async () => {
+    highlight.mockResolvedValueOnce({
+      tokens: [
+        [
+          { content: 'const a = 1', offset: 0, type: 0 },
+          { content: ' // note', offset: 11, type: 1 },
+        ],
+      ],
+    })
+    const block = await CodeBlock({ contents: 'const a = 1 // note', lang: 'ts' })
+
+    expect(block.props.controls.props.content).toBe('const a = 1')
+  })
+
   it('retains unnumbered layout, source text, hidden controls, and the accessible label', async () => {
     const code = 'echo "hello"\necho "reader"'
     const block = await CodeBlock({
