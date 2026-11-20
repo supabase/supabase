@@ -21,13 +21,15 @@ To move the project to the recipient's organization and then leave that organiza
 1. Ask the recipient to create an organization and invite you with a role for the whole organization. The Developer role is enough. On the Team Plan or Enterprise Plan, the recipient can also send the invitation with the [create organization invitations](/docs/reference/api/v2-create-organization-invitations) endpoint.
 2. Accept the invitation from the invitation email. The Management API has no endpoint for accepting an invitation.
 3. Transfer the project to their organization, with the Supabase Dashboard or the Management API steps in [Transfer a project](/docs/guides/platform/project-transfer).
-4. In their organization's [team settings](/dashboard/org/_/team), click **Leave team**. The recipient can also remove you, from the same page or with the [remove organization members](/docs/reference/api/v2-remove-organization-members) endpoint.
+4. Leave their organization.
 
    <Admonition type="danger">
 
    Leaving an organization permanently deletes the content you saved in its projects, such as SQL snippets, including shared ones, custom reports, and Log Explorer queries. Copy anything that you or the recipient need before you leave.
 
    </Admonition>
+
+   In their organization's [team settings](/dashboard/org/_/team), click **Leave team**. The recipient can also remove you, from the same page or with the [remove organization members](/docs/reference/api/v2-remove-organization-members) endpoint.
 
 ## Hand over the whole organization
 
@@ -42,13 +44,15 @@ To hand over the organization in the Supabase Dashboard, follow these steps:
 
 1. In the organization's [team settings](/dashboard/org/_/team), invite the recipient as an **Owner**, or promote a member to **Owner**.
 2. After the recipient accepts, ask them to add their payment method in the organization's [billing settings](/dashboard/org/_/billing) and to select **Use this card**. Then delete your card. On a paid plan, you can't delete the card that's active. A payment method that stays with the organization can still be charged after you leave.
-3. In the organization's [team settings](/dashboard/org/_/team), click **Leave team**.
+3. Leave the organization.
 
    <Admonition type="danger">
 
    Leaving an organization permanently deletes the content you saved in its projects, such as SQL snippets, including shared ones, custom reports, and Log Explorer queries. Copy anything that you or the recipient need before you leave.
 
    </Admonition>
+
+   In the organization's [team settings](/dashboard/org/_/team), click **Leave team**.
 
 </TabPanel>
 <TabPanel id="api" label="Management API">
