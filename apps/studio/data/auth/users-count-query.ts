@@ -4,7 +4,9 @@ import { useQuery } from '@tanstack/react-query'
 
 import { authKeys } from './keys'
 import { type Filter } from './users-infinite-query'
-import { executeSql, type ExecuteSqlError } from '@/data/sql/execute-sql-query'
+import { unguarded } from '@/data/fetchers'
+import { executeSql } from '@/data/sql/execute-sql-mutation'
+import type { StudioError } from '@/lib/errors/studio-errors'
 import { UseCustomQueryOptions } from '@/types'
 
 type UsersCountVariables = {
@@ -37,8 +39,11 @@ export async function getUsersCount(
     {
       projectRef,
       connectionString,
+      sqlOrigin: 'studio',
+      queryName: 'users-count',
       sql,
       queryKey: ['users-count'],
+      grant: unguarded.migrating,
     },
     signal
   )
@@ -57,7 +62,7 @@ export async function getUsersCount(
 }
 
 export type UsersCountData = Awaited<ReturnType<typeof getUsersCount>>
-export type UsersCountError = ExecuteSqlError
+export type UsersCountError = StudioError
 
 /** [Joshen] Be wary of using this as it could potentially cause a huge load on the user's DB */
 export const useUsersCountQuery = <TData = UsersCountData>(

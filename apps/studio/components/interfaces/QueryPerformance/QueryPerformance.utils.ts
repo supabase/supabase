@@ -1,4 +1,4 @@
-import * as Sentry from '@sentry/nextjs'
+import * as Sentry from '@sentry/react'
 import dayjs from 'dayjs'
 import duration from 'dayjs/plugin/duration'
 
@@ -6,7 +6,7 @@ import { getErrorMessage } from '@/lib/get-error-message'
 
 dayjs.extend(duration)
 
-export const formatDuration = (milliseconds: number) => {
+export const formatDuration = (milliseconds: number, precision: number = 2) => {
   const duration = dayjs.duration(milliseconds, 'milliseconds')
 
   const days = Math.floor(duration.asDays())
@@ -16,7 +16,7 @@ export const formatDuration = (milliseconds: number) => {
   const totalSeconds = duration.asSeconds()
 
   if (totalSeconds < 60) {
-    return `${totalSeconds.toFixed(2)}s`
+    return `${totalSeconds.toFixed(precision)}s`
   }
 
   const parts = []
@@ -34,7 +34,6 @@ export type QueryPerformanceErrorContext = {
   queryPreset?: string
   queryType?: 'hitRate' | 'metrics' | 'mainQuery' | 'slowQueriesCount' | 'supamonitor'
   sql?: string
-  errorMessage?: string
   postgresVersion?: string
   databaseType?: 'primary' | 'read-replica'
 }
@@ -53,7 +52,6 @@ export function captureQueryPerformanceError(
       queryType: context.queryType,
       postgresVersion: context.postgresVersion,
       databaseType: context.databaseType,
-      errorMessage: context.errorMessage,
     })
 
     if (error instanceof Error) {

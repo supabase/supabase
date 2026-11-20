@@ -238,7 +238,7 @@ Right click this and “Send to Intruder”. In the Intruder panel. Find the pas
 
 If you are a dinosaur like me, you would load a password file like “Rockyou.txt”.
 
-Supabase Auth has a rate limit for sign in requests based on certain heuristics so we need to throttle our requests to about one request per 2000 milliseconds. You can do this in the “Resource Pool” section, create a new resource pool with maximum concurrent requests of 1 and delay between requests of 2000 milliseconds. From here on it is just a waiting game for Intruder to return us a valid result.
+[Supabase Auth](/auth) has a rate limit for sign in requests based on certain heuristics so we need to throttle our requests to about one request per 2000 milliseconds. You can do this in the “Resource Pool” section, create a new resource pool with maximum concurrent requests of 1 and delay between requests of 2000 milliseconds. From here on it is just a waiting game for Intruder to return us a valid result.
 
 Should I have included a password higher up on most wordlists? Yes, yes I should have.
 
@@ -309,7 +309,7 @@ Viewing this directly in our browser reveals some information its clear we shoul
   }}
 />
 
-Lets try to connect to this database. We will need to translate the information in the README into a connection string. Looking at an example connection string in our example Supabase project we can see a pooler connection string has the pattern:
+Lets try to connect to this database. We will need to translate the information in the README into a connection string. Looking at an example connection string in our example Supabase project we can see a [pooler](/docs/guides/database/connecting-to-postgres/pooling-and-limits) connection string has the pattern:
 
 `postgresql://[USER].[PROJECT_ID]:[PASSWORD]@[REGION].pooler.supabase.com:6543/postgres`
 

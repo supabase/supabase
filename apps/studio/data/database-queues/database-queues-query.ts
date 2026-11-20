@@ -1,8 +1,11 @@
+import { safeSql } from '@supabase/pg-meta/src/pg-format'
 import { useQuery } from '@tanstack/react-query'
 
 import { databaseQueuesKeys } from './keys'
-import { executeSql } from '@/data/sql/execute-sql-query'
-import type { ResponseError, UseCustomQueryOptions } from '@/types'
+import { unguarded } from '@/data/fetchers'
+import { executeSql } from '@/data/sql/execute-sql-mutation'
+import type { StudioError } from '@/lib/errors/studio-errors'
+import type { UseCustomQueryOptions } from '@/types'
 
 export type DatabaseQueuesVariables = {
   projectRef?: string
@@ -16,7 +19,7 @@ export type PostgresQueue = {
   created_at: string
 }
 
-const queueSqlQuery = `select * from pgmq.list_queues();`
+const queueSqlQuery = safeSql`select * from pgmq.list_queues();`
 
 export async function getDatabaseQueues({ projectRef, connectionString }: DatabaseQueuesVariables) {
   if (!projectRef) throw new Error('Project ref is required')
@@ -24,13 +27,17 @@ export async function getDatabaseQueues({ projectRef, connectionString }: Databa
   const { result } = await executeSql({
     projectRef,
     connectionString,
+    sqlOrigin: 'studio',
+    queryName: 'list-queues',
     sql: queueSqlQuery,
+    queryKey: ['list-queues'],
+    grant: unguarded.migrating,
   })
   return result
 }
 
 export type DatabaseQueueData = PostgresQueue[]
-export type DatabaseQueueError = ResponseError
+export type DatabaseQueueError = StudioError
 
 export const useQueuesQuery = <TData = DatabaseQueueData>(
   { projectRef, connectionString }: DatabaseQueuesVariables,

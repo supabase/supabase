@@ -12,7 +12,7 @@ import {
 } from '@/state/table-editor-table'
 
 type ShortcutsProps = {
-  gridRef: RefObject<DataGridHandle>
+  gridRef: RefObject<DataGridHandle | null>
   rows: SupaRow[]
 }
 

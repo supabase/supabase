@@ -6,13 +6,15 @@ description: 'Organizing tables into partitions in Postgres.'
 
 Table partitioning is a technique that allows you to divide a large table into smaller, more manageable parts called “partitions”.
 
+The diagram below shows a single large table split into several smaller partitions, each holding a subset of its rows.
+
 <Image
-  alt="multi database"
+  alt="Diagram showing a single large table divided into several smaller partitions, each holding a subset of the table's rows."
   src={{
     light: '/docs/img/database/partitions-light.png',
     dark: '/docs/img/database/partitions-dark.png',
   }}
-  className="max-h-[400px] !mx-auto"
+  className="max-h-[400px] mx-auto!"
   width={1600}
   height={1075}
 />
@@ -36,7 +38,7 @@ Postgres supports various partitioning methods based on how you want to partitio
 
 ## Creating partitioned tables
 
-Let's consider an example of range partitioning for a sales table based on the order date. We'll create monthly partitions to store data for each month:
+The following example uses range partitioning for a sales table based on the order date. We'll create monthly partitions to store data for each month:
 
 ```sql
 create table sales (
@@ -105,11 +107,11 @@ There is no real threshold to determine when you should use partitions. Partitio
 
 ## Examples
 
-Here are simple examples for each of the partitioning types in Postgres.
+Here are basic examples for each of the partitioning types in Postgres.
 
 ### Range partitioning
 
-Let's consider a range partitioning example for a table that stores sales data based on the order date. We'll create monthly partitions to store data for each month.
+The following range partitioning example stores sales data based on the order date. We'll create monthly partitions to store data for each month.
 
 In this example, the **`sales`** table is partitioned into two partitions: **`sales_january`** and **`sales_february`**. The data in these partitions is based on the specified range of order dates:
 
@@ -137,7 +139,7 @@ create table sales_2000_02
 
 ### List partitioning
 
-Let's consider a list partitioning example for a table that stores customer data based on their region. We'll create partitions to store customers from different regions.
+The following list partitioning example stores customer data based on their region. We'll create partitions to store customers from different regions.
 
 In this example, the **`customers`** table is partitioned into two partitions: `customers_americas` and `customers_asia`. The data in these partitions is based on the specified list of regions:
 

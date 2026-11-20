@@ -1,21 +1,27 @@
 import { useParams } from 'common'
-import dayjs from 'dayjs'
 import {
-  Activity,
+  ActivityIcon,
   BarChartIcon,
   GitCommitHorizontalIcon,
   InfoIcon,
-  SquareTerminal,
+  SquareTerminalIcon,
 } from 'lucide-react'
 import Link from 'next/link'
 import { useEffect, useState } from 'react'
-import { Badge, cn } from 'ui'
-import { InfoTooltip } from 'ui-patterns/info-tooltip'
+import { Badge, cn, Tooltip, TooltipContent, TooltipTrigger } from 'ui'
 
 import { formatPercentage, numberFormatter } from './Charts.utils'
 import { useChartHoverState } from './useChartHoverState'
 import { ButtonTooltip } from '@/components/ui/ButtonTooltip'
-import { formatBytes } from '@/lib/helpers'
+import { formatDateTime, useFormatDateTime } from '@/lib/datetime'
+import { formatBytes, formatBytesMinMB } from '@/lib/helpers'
+
+export interface ChartHeaderStat {
+  label: string
+  value: number
+  /** Colors the dot next to the label */
+  tone: 'warning' | 'destructive'
+}
 
 export interface ChartHeaderProps {
   title?: string
@@ -38,14 +44,33 @@ export interface ChartHeaderProps {
   data?: any[]
   xAxisKey?: string
   yAxisKey?: string
+  thresholdZoneAttribute?: string
+  thresholdZoneWarning?: {
+    label: string
+    color: string
+    textColor?: string
+    badgeLabel?: string
+    tooltip: string
+  }
   xAxisIsDate?: boolean
   valuePrecision?: number
   shouldFormatBytes?: boolean
   isNetworkChart?: boolean
+  isMemoryChart?: boolean
   attributes?: any[]
   sql?: string
   titleTooltip?: string
   showNewBadge?: boolean
+  /**
+   * Extra stats shown on the right of the header. Receives all chart rows, or only the hovered
+   * row while a point is hovered.
+   */
+  getHeaderStats?: (rows: Record<string, unknown>[]) => ChartHeaderStat[]
+  /**
+   * Index of the point hovered on this chart. Used for `getHeaderStats` when hover isn't synced
+   * across charts, in which case the shared hover state doesn't reach the header.
+   */
+  focusedIndex?: number | null
 }
 
 export const ChartHeader = ({
@@ -67,6 +92,8 @@ export const ChartHeader = ({
   data,
   xAxisKey,
   yAxisKey,
+  thresholdZoneAttribute,
+  thresholdZoneWarning,
   xAxisIsDate = true,
   displayDateInUtc,
   customDateFormat,
@@ -77,11 +104,18 @@ export const ChartHeader = ({
   sql,
   titleTooltip,
   showNewBadge,
+  isMemoryChart,
+  getHeaderStats,
+  focusedIndex,
 }: ChartHeaderProps) => {
   const { ref } = useParams()
   const { hoveredIndex, isHovered } = useChartHoverState(syncId || 'default')
   const [localHighlightedValue, setLocalHighlightedValue] = useState(highlightedValue)
   const [localHighlightedLabel, setLocalHighlightedLabel] = useState(highlightedLabel)
+
+  // When `displayDateInUtc` is set the chart explicitly wants UTC labels.
+  // Otherwise honour the user's selected timezone via the picker.
+  const formatPickerDate = useFormatDateTime()
 
   const formatHighlightedValue = (value: any) => {
     if (typeof value !== 'number') {
@@ -94,7 +128,9 @@ export const ChartHeader = ({
 
     if (shouldFormatBytes) {
       const bytesValue = isNetworkChart ? Math.abs(value) : value
-      return formatBytes(bytesValue, valuePrecision)
+      return isMemoryChart
+        ? formatBytesMinMB(bytesValue, valuePrecision)
+        : formatBytes(bytesValue, valuePrecision)
     }
 
     if (format === '%') {
@@ -116,10 +152,13 @@ export const ChartHeader = ({
       if (activeDataPoint) {
         // For stacked charts, we need to calculate the total of all attributes
         // that should be included in the total (excluding reference lines, max values, etc.)
-        let newValue = activeDataPoint[yAxisKey]
+        const isThresholdValueMissing =
+          thresholdZoneAttribute !== undefined &&
+          !Number.isFinite(activeDataPoint[thresholdZoneAttribute])
+        let newValue = isThresholdValueMissing ? 'Unavailable' : activeDataPoint[yAxisKey]
 
         // If this is a stacked chart with multiple attributes, calculate the total
-        if (attributes && attributes.length > 1) {
+        if (!isThresholdValueMissing && attributes && attributes.length > 1) {
           const attributesToIgnore =
             attributes
               ?.filter((a) => a.omitFromTotal || a.isMaxValue || a.provider === 'reference-line')
@@ -146,11 +185,11 @@ export const ChartHeader = ({
         // Update highlighted label based on sync state
         let newLabel = highlightedLabel
         if (xAxisIsDate && activeDataPoint[xAxisKey]) {
-          const day = (value: number | string) =>
-            displayDateInUtc ? dayjs(value).utc() : dayjs(value)
-          newLabel = day(activeDataPoint[xAxisKey]).format(
-            customDateFormat || 'YYYY-MM-DD HH:mm:ss'
-          )
+          const value = activeDataPoint[xAxisKey] as number | string
+          const fmt = customDateFormat || 'YYYY-MM-DD HH:mm:ss'
+          newLabel = displayDateInUtc
+            ? formatDateTime(value, { tz: 'UTC', format: fmt })
+            : formatPickerDate(value, fmt)
         } else if (activeDataPoint[xAxisKey]) {
           newLabel = activeDataPoint[xAxisKey]
         }
@@ -168,12 +207,14 @@ export const ChartHeader = ({
     data,
     xAxisKey,
     yAxisKey,
+    thresholdZoneAttribute,
     xAxisIsDate,
     displayDateInUtc,
     customDateFormat,
     highlightedValue,
     highlightedLabel,
     attributes,
+    formatPickerDate,
   ])
 
   const chartTitle = (
@@ -182,11 +223,32 @@ export const ChartHeader = ({
         <h3 className={'text-foreground-lighter ' + (minimalHeader ? 'text-xs' : 'text-sm')}>
           {title}
         </h3>
-        {titleTooltip && <InfoTooltip>{titleTooltip}</InfoTooltip>}
+        {titleTooltip && (
+          <Tooltip>
+            <TooltipTrigger asChild>
+              <InfoIcon className="w-4 h-4 text-foreground-lighter" />
+            </TooltipTrigger>
+            <TooltipContent side="bottom" className="max-w-xs">
+              {titleTooltip}
+              {docsUrl && (
+                <>
+                  {' '}
+                  <Link
+                    href={docsUrl}
+                    target="_blank"
+                    className="underline text-foreground hover:text-foreground-light"
+                  >
+                    Read docs
+                  </Link>
+                </>
+              )}
+            </TooltipContent>
+          </Tooltip>
+        )}
       </div>
-      {docsUrl && (
+      {!titleTooltip && docsUrl && (
         <ButtonTooltip
-          type="text"
+          variant="text"
           className="px-1"
           asChild
           tooltip={{
@@ -203,6 +265,11 @@ export const ChartHeader = ({
       )}
     </div>
   )
+
+  const syncedIndex = syncId && isHovered ? hoveredIndex : null
+  const statsIndex = syncedIndex ?? focusedIndex ?? null
+  const hoveredRow = statsIndex !== null ? data?.[statsIndex] : undefined
+  const headerStats = getHeaderStats?.(hoveredRow ? [hoveredRow] : (data ?? []))
 
   const highlighted = (
     <h4
@@ -248,9 +315,26 @@ export const ChartHeader = ({
         </div>
       </div>
       <div className="flex items-center gap-2">
+        {headerStats && headerStats.length > 0 && (
+          <div className="flex items-end gap-4 mr-2 text-foreground-light">
+            {headerStats.map((stat) => (
+              <div key={stat.label} className="flex flex-col items-end">
+                <div className="flex items-center gap-2">
+                  <div
+                    className={cn(
+                      'w-1.5 h-1.5 rounded-full',
+                      stat.tone === 'warning' ? 'bg-warning' : 'bg-destructive'
+                    )}
+                  />
+                  <span className="heading-meta">{stat.label}</span>
+                </div>
+                <span className="text-foreground text-base">{stat.value.toLocaleString()}</span>
+              </div>
+            ))}
+          </div>
+        )}
         {sql ? (
           <ButtonTooltip
-            type="default"
             className="px-1.5"
             asChild
             tooltip={{
@@ -261,16 +345,39 @@ export const ChartHeader = ({
             }}
           >
             <Link href={`/project/${ref}/logs/explorer?q=${encodeURIComponent(sql)}`}>
-              <SquareTerminal className="w-4 h-4 text-foreground-lighter" />
+              <SquareTerminalIcon className="w-4 h-4 text-foreground-lighter" />
             </Link>
           </ButtonTooltip>
         ) : null}
 
+        {thresholdZoneWarning && (
+          <Tooltip>
+            <TooltipTrigger asChild>
+              <Badge
+                tabIndex={0}
+                className="cursor-default focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring"
+                aria-label={`Warning: ${thresholdZoneWarning.label}`}
+                style={{
+                  color: thresholdZoneWarning.textColor ?? thresholdZoneWarning.color,
+                  borderColor: thresholdZoneWarning.color,
+                  backgroundColor: `color-mix(in srgb, ${thresholdZoneWarning.color} 10%, transparent)`,
+                }}
+              >
+                {thresholdZoneWarning.badgeLabel ?? 'Warning'}
+              </Badge>
+            </TooltipTrigger>
+            <TooltipContent className="max-w-xs" side="top">
+              <p className="font-medium">
+                {thresholdZoneWarning.label} threshold crossed in this time range.
+              </p>
+              <p>{thresholdZoneWarning.tooltip}</p>
+            </TooltipContent>
+          </Tooltip>
+        )}
         {!hideChartType && onChartStyleChange && (
           <ButtonTooltip
-            type="default"
             className="px-1.5"
-            icon={chartStyle === 'bar' ? <Activity /> : <BarChartIcon />}
+            icon={chartStyle === 'bar' ? <ActivityIcon /> : <BarChartIcon />}
             onClick={() => onChartStyleChange(chartStyle === 'bar' ? 'line' : 'bar')}
             tooltip={{
               content: {
@@ -282,7 +389,7 @@ export const ChartHeader = ({
         )}
         {setShowMaxValue && (
           <ButtonTooltip
-            type={showMaxValue ? 'default' : 'dashed'}
+            variant={showMaxValue ? 'default' : 'dashed'}
             className="px-1.5"
             icon={
               <GitCommitHorizontalIcon

@@ -1,0 +1,319 @@
+// Sentry client-side configuration. `sentry.tanstack.ts` calls `Sentry.init`
+// with these options from `getRouter()` (router.tsx).
+import * as Sentry from '@sentry/react'
+import { thirdPartyErrorFilterIntegration } from '@sentry/react'
+import { hasConsented } from 'common'
+import { IS_PLATFORM } from 'common/constants/environment'
+import {
+  BROWSER_NOISE_IGNORE_ERRORS,
+  BROWSER_TRANSLATION_SAMPLE_RATE,
+  filterSentryEvent,
+  isBrowserTranslationDomError,
+  isPageTranslated,
+  isSentryErrorBoundaryCrash,
+} from 'common/sentry'
+
+import { MIRRORED_BREADCRUMBS } from '@/lib/breadcrumbs'
+import { applyStudioErrorPolicy } from '@/lib/errors/sentry-event-policy'
+import { sanitizeArrayOfObjects, sanitizeUrlHashParams } from '@/lib/sanitize'
+
+type Integration = Parameters<typeof Sentry.addIntegration>[0]
+
+// This is a workaround to ignore hCaptcha related errors.
+function isHCaptchaRelatedError(event: Sentry.Event): boolean {
+  const errors = event.exception?.values ?? []
+  for (const error of errors) {
+    if (
+      error.value?.includes('is not a function') &&
+      error.stacktrace?.frames?.some((f) => f.filename === 'api.js')
+    ) {
+      return true
+    }
+  }
+  return false
+}
+
+// Filter browser wallet extension errors (e.g., Gate.io wallet)
+// These errors come from injected wallet scripts and are not actionable
+// Examples: SUPABASE-APP-AFC, SUPABASE-APP-92A
+export function isBrowserWalletExtensionError(event: Sentry.Event): boolean {
+  const frames = event.exception?.values?.flatMap((e) => e.stacktrace?.frames || []) || []
+  return frames.some((frame) => {
+    const filename = frame.filename || frame.abs_path || ''
+    return filename.includes('gt-window-provider') || filename.includes('wallet-provider')
+  })
+}
+
+// Filter user-aborted operations (intentional cancellations)
+// These are expected when users cancel requests or navigate away
+// Examples: SUPABASE-APP-BG6, SUPABASE-APP-BG7
+export function isUserAbortedOperation(error: unknown, event: Sentry.Event): boolean {
+  const errorMessage = error instanceof Error ? error.message : ''
+  const eventMessage = event.message || ''
+  const message = errorMessage || eventMessage
+
+  return (
+    message.includes('operation was aborted') ||
+    message.includes('signal is aborted') ||
+    message.includes('manually canceled') ||
+    message.includes('AbortError')
+  )
+}
+
+// Filter cancellation promise rejections (e.g., from query cancellation)
+// These occur when operations are intentionally cancelled by the user
+// Example: SUPABASE-APP-353 (~466k events)
+export function isCancellationRejection(event: Sentry.Event): boolean {
+  const serialized = event.extra?.__serialized__ as Record<string, unknown> | undefined
+  return serialized?.type === 'cancelation'
+}
+
+// Filter challenge/captcha expired errors (user timeout)
+// These happen when users don't complete captcha in time - expected behavior
+// Example: SUPABASE-APP-ACC
+export function isChallengeExpiredError(error: unknown, event: Sentry.Event): boolean {
+  const errorMessage = error instanceof Error ? error.message : ''
+  const eventMessage = event.message || ''
+  const message = errorMessage || eventMessage
+
+  return message.includes('challenge-expired')
+}
+
+// Tag errors whose stack trace only contains third-party frames (browser extensions,
+// injected scripts, etc.). This relies on build-time code annotation via the
+// `supabase-studio` applicationKey to reliably distinguish our code from third-party code.
+// We use 'apply-tag' instead of 'drop' so that beforeSend can exempt error boundary
+// crashes — these may originate in third-party code but are caused by first-party bugs.
+function buildThirdPartyErrorFilterIntegration(): Integration {
+  return thirdPartyErrorFilterIntegration({
+    filterKeys: ['supabase-studio'],
+    behaviour: 'apply-tag-if-exclusively-contains-third-party-frames',
+  })
+}
+
+export interface SentryClientOptionsParams {
+  /**
+   * Whether to include `thirdPartyErrorFilterIntegration`.
+   *
+   * Only enable this on builds whose bundler annotates stack frames with the
+   * `supabase-studio` applicationKey. On a build WITHOUT the annotation
+   * no frame carries first-party metadata, so the integration tags EVERY
+   * event `third_party_code: true` and `beforeSend` would then drop all
+   * non-error-boundary events.
+   */
+  includeThirdPartyErrorFilter: boolean
+  /** Build-specific integrations (e.g. TanStack Router browser tracing). */
+  extraIntegrations?: Integration[]
+  /**
+   * Release identifier for the client.
+   *
+   * The SDK SILENTLY DROPS session envelopes when the client has no release
+   * (`Client.sendSession` early-returns), so a build without a release sends
+   * no Release Health traffic at all — errors and traces still flow.
+   *
+   * The build runs no Sentry bundler plugin to inject one, so
+   * sentry.tanstack.ts passes the commit SHA.
+   */
+  release?: string
+}
+
+/**
+ * Applies the `sample_rate` tag set by `reportStudioError`: events tagged with a rate below 1 are
+ * dropped with probability `1 - rate`. Events without the tag are never dropped.
+ */
+export function shouldDropForSampleRate(
+  event: Pick<Sentry.Event, 'tags'>,
+  random: () => number = Math.random
+): boolean {
+  const rate = Number(event.tags?.sample_rate)
+  if (event.tags?.sample_rate === undefined || !Number.isFinite(rate) || rate >= 1) return false
+  return random() >= rate
+}
+
+/**
+ * Tags browser-translation DOM errors (insert/remove node crashes) so they are sampled at
+ * `BROWSER_TRANSLATION_SAMPLE_RATE` by `shouldDropForSampleRate` and easy to filter in Sentry.
+ * `page_translated` is best-effort and only looked up for matching events. Keeps a `sample_rate`
+ * that is already set, such as an explicit `1`.
+ */
+export function tagBrowserTranslationError(event: Sentry.Event, pageTranslated?: boolean): void {
+  if (!isBrowserTranslationDomError(event)) return
+  event.tags = {
+    ...event.tags,
+    // After the spread: an explicit `sample_rate: undefined` must not replace the default
+    sample_rate: event.tags?.sample_rate ?? BROWSER_TRANSLATION_SAMPLE_RATE,
+    browser_translation: true,
+    page_translated: pageTranslated ?? isPageTranslated(),
+  }
+}
+
+export function buildSentryClientOptions({
+  includeThirdPartyErrorFilter,
+  extraIntegrations = [],
+  release,
+}: SentryClientOptionsParams): Sentry.BrowserOptions {
+  return {
+    dsn: process.env.NEXT_PUBLIC_SENTRY_DSN,
+    ...(process.env.NEXT_PUBLIC_SENTRY_ENVIRONMENT && {
+      environment: process.env.NEXT_PUBLIC_SENTRY_ENVIRONMENT,
+    }),
+    ...(release && { release }),
+    // Setting this option to true will print useful information to the console while you're setting up Sentry.
+    debug: false,
+
+    // Enable performance monitoring
+    tracesSampleRate: 0.02,
+
+    // Leave the error `sampleRate` unset (1.0). Error sampling is per tag and fault in `ERROR_ROUTING` and
+    // applied in `beforeSend`; a global rate would multiply with it and also drop `alwaysCapture`.
+
+    // Function form so Sentry's default integrations (browserSession,
+    // globalHandlers, breadcrumbs, dedupe, …) are explicitly preserved — this
+    // is the documented way to extend the defaults, and it can never be
+    // misread as replacing them.
+    integrations: (defaultIntegrations) => [
+      ...defaultIntegrations,
+      ...(includeThirdPartyErrorFilter ? [buildThirdPartyErrorFilterIntegration()] : []),
+      ...extraIntegrations,
+    ],
+
+    // Only capture errors originating from our own code.
+    // This is a whitelist on the source URL in stack frames — it drops errors from
+    // browser extensions, injected scripts, third-party widgets, etc. (FE-2094)
+    allowUrls: [
+      /https?:\/\/(.*\.)?supabase\.(com|co|green|io)/,
+      /app:\/\//, // Next.js rewrites source URLs to app:// with source maps
+    ],
+    beforeBreadcrumb(breadcrumb, _hint) {
+      const cleanedBreadcrumb = { ...breadcrumb }
+
+      if (cleanedBreadcrumb.category === 'navigation') {
+        if (typeof cleanedBreadcrumb.data?.from === 'string') {
+          cleanedBreadcrumb.data.from = sanitizeUrlHashParams(cleanedBreadcrumb.data.from)
+        }
+        if (typeof cleanedBreadcrumb.data?.to === 'string') {
+          cleanedBreadcrumb.data.to = sanitizeUrlHashParams(cleanedBreadcrumb.data.to)
+        }
+      }
+
+      MIRRORED_BREADCRUMBS.pushBack(cleanedBreadcrumb)
+      return cleanedBreadcrumb
+    },
+    beforeSend(rawEvent, hint) {
+      const event = applyStudioErrorPolicy(rawEvent, hint.originalException)
+      if (!event) return null
+
+      // Must run before `filterSentryEvent`, which skips its 1% sampling for tagged events.
+      tagBrowserTranslationError(event)
+
+      if (!filterSentryEvent(event, { isPlatform: IS_PLATFORM, hasConsent: hasConsented() })) {
+        return null
+      }
+
+      const isErrorBoundaryCrash = isSentryErrorBoundaryCrash(event)
+
+      if (isHCaptchaRelatedError(event)) {
+        return null
+      }
+
+      // Drop events where every exception has no stack trace — these are not debuggable.
+      // Exempt error boundary crashes: even without stack frames, a page crash is always worth reporting.
+      // Also exempt browser-translation errors: they only need counting, and dropping them here
+      // would skip the sample.
+      const exceptions = event.exception?.values ?? []
+      if (
+        !isErrorBoundaryCrash &&
+        event.tags?.browser_translation !== true &&
+        exceptions.length > 0 &&
+        exceptions.every((ex) => !ex.stacktrace?.frames?.length)
+      ) {
+        return null
+      }
+
+      // Filter out errors like 'e._5BLbSXV[t] is not a function' or anything matching '[t] is not a function'
+      if (
+        hint.originalException instanceof Error &&
+        hint.originalException.message.includes('[t] is not a function')
+      ) {
+        return null
+      }
+
+      if (isBrowserWalletExtensionError(event)) {
+        return null
+      }
+      if (isUserAbortedOperation(hint.originalException, event)) {
+        return null
+      }
+      if (isCancellationRejection(event)) {
+        return null
+      }
+      if (isChallengeExpiredError(hint.originalException, event)) {
+        return null
+      }
+
+      if (shouldDropForSampleRate(event)) {
+        return null
+      }
+
+      if (event.breadcrumbs) {
+        event.breadcrumbs = sanitizeArrayOfObjects(event.breadcrumbs) as Sentry.Breadcrumb[]
+      }
+      return event
+    },
+    ignoreErrors: [
+      // === Monaco Editor ===
+      'ResizeObserver',
+      's.getModifierState is not a function',
+      /^Uncaught NetworkError: Failed to execute 'importScripts' on 'WorkerGlobalScope'/,
+
+      // === Browser extension errors ===
+      // Gate.io wallet
+      'shouldSetTallyForCurrentProvider is not a function',
+      // SAP browser extensions (SAP GUI, SAP Companion)
+      'sap is not defined',
+      // Non-Error objects thrown as exceptions (e.g., Event objects)
+      '[object Event]',
+
+      // === Third-party SDK errors ===
+      // stripe-js: https://github.com/stripe/stripe-js/issues/26
+      'Failed to load Stripe.js',
+      // hCaptcha
+      "undefined is not an object (evaluating 'n.chat.setReady')",
+      "undefined is not an object (evaluating 'i.chat.setReady')",
+
+      // === Next.js internals ===
+      // Ref: https://github.com/supabase/supabase/pull/9729
+      /The provided `href` \(\/org\/\[slug\]\/.*\) value is missing query values/,
+      // Next.js throws these during navigation, not actual errors
+      'NEXT_NOT_FOUND',
+      'NEXT_REDIRECT',
+
+      // === User input errors (not bugs) ===
+      // sql-formatter lexer on invalid SQL input
+      /^Parse error: Unexpected ".+" at line \d+ column \d+$/,
+
+      ...BROWSER_NOISE_IGNORE_ERRORS,
+
+      // === React hydration mismatches caused by extensions modifying DOM ===
+      // Note: we only suppress the generic browser messages, NOT "Hydration failed because..."
+      // which can indicate real SSR/client mismatches in our own code.
+      /text content does not match/i,
+      /There was an error while hydrating/i,
+
+      // === Web crawler / bot errors ===
+      'instantSearchSDKJSBridgeClearHighlight',
+
+      // === Third-party library race conditions ===
+      // cmdk: useSyncExternalStore subscribe called before store context is available
+      "Cannot read properties of undefined (reading 'subscribe')",
+      "undefined is not an object (evaluating 't.subscribe')",
+
+      // === Misc known noise ===
+      'r.default.setDefaultLevel is not a function',
+      // Clipboard permission denied
+      'The request is not allowed by the user agent or the platform in the current context, possibly because the user denied permission.',
+      // Facebook pixel
+      'fb_xd_fragment',
+    ],
+  }
+}

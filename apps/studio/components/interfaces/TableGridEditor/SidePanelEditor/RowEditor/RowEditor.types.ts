@@ -1,4 +1,4 @@
-import type { PostgresRelationship } from '@supabase/postgres-meta'
+import type { PGTableRelationship } from '@supabase/pg-meta'
 
 export interface EditValue {
   row?: any
@@ -14,8 +14,15 @@ export interface RowField {
   enums: string[]
   value: string | null | undefined
   defaultValue: string | null
-  foreignKey?: PostgresRelationship
+  foreignKey?: PGTableRelationship
   isNullable: boolean
   isIdentity: boolean
+  isGenerated: boolean
   isPrimaryKey: boolean
 }
+
+/**
+ * Why a field copied from another row has no value yet: its full value is still loading, or it
+ * couldn't be copied.
+ */
+export type LargeValueStatus = 'loading' | 'too-large' | 'no-primary-key' | 'failed'

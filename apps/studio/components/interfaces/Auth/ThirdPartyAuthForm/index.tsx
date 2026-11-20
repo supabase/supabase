@@ -1,7 +1,6 @@
-import { PermissionAction } from '@supabase/shared-types/out/constants'
 import { useQuery } from '@tanstack/react-query'
 import { useParams } from 'common'
-import { Loader2 } from 'lucide-react'
+import { Loader2Icon } from 'lucide-react'
 import { useState } from 'react'
 import { toast } from 'sonner'
 import { cn } from 'ui'
@@ -21,6 +20,7 @@ import { AddIntegrationDropdown } from './AddIntegrationDropdown'
 import { CreateAuth0IntegrationDialog } from './CreateAuth0Dialog'
 import { CreateAwsCognitoAuthIntegrationDialog } from './CreateAwsCognitoAuthDialog'
 import { CreateClerkAuthIntegrationDialog } from './CreateClerkAuthDialog'
+import { CreateCustomOidcIntegrationDialog } from './CreateCustomOidcDialog'
 import { CreateFirebaseAuthIntegrationDialog } from './CreateFirebaseAuthDialog'
 import { CreateWorkOSIntegrationDialog } from './CreateWorkOSDialog'
 import { IntegrationCard } from './IntegrationCard'
@@ -29,37 +29,64 @@ import {
   getIntegrationTypeLabel,
   INTEGRATION_TYPES,
 } from './ThirdPartyAuthForm.utils'
-import AlertError from '@/components/ui/AlertError'
+import { AlertError } from '@/components/ui/AlertError'
 import { DocsButton } from '@/components/ui/DocsButton'
 import { InlineLink } from '@/components/ui/InlineLink'
+import { NoPermission } from '@/components/ui/NoPermission'
 import { useDeleteThirdPartyAuthIntegrationMutation } from '@/data/third-party-auth/integration-delete-mutation'
 import {
   ThirdPartyAuthIntegration,
   thirdPartyAuthIntegrationsQueryOptions,
 } from '@/data/third-party-auth/integrations-query'
-import { useAsyncCheckPermissions } from '@/hooks/misc/useCheckPermissions'
 import { DOCS_URL } from '@/lib/constants'
+import { getWriteGrantToastMessage, getWriteGrantTooltip, useGrant } from '@/lib/grants'
+import { SHORTCUT_IDS } from '@/state/shortcuts/registry'
+import { useShortcut } from '@/state/shortcuts/useShortcut'
 
 export const ThirdPartyAuthForm = () => {
   const { ref: projectRef } = useParams()
+  const integrationsGrant = useGrant('GET /v1/projects/{ref}/config/auth/third-party-auth', {
+    projectRef,
+  })
+  const deleteGrant = useGrant('DELETE /v1/projects/{ref}/config/auth/third-party-auth/{tpa_id}', {
+    projectRef,
+  })
   const {
     data: integrationsData,
-    isPending: isLoading,
+    isPending: isLoadingIntegrations,
     isError,
     isSuccess,
     error,
-  } = useQuery(thirdPartyAuthIntegrationsQueryOptions({ projectRef }))
+  } = useQuery(
+    thirdPartyAuthIntegrationsQueryOptions({ projectRef, grant: integrationsGrant.grant })
+  )
+  const isLoading = integrationsGrant.status === 'loading' || isLoadingIntegrations
   const integrations = integrationsData || []
 
   const [selectedIntegration, setSelectedIntegration] = useState<INTEGRATION_TYPES>()
   const [selectedIntegrationForDeletion, setSelectedIntegrationForDeletion] =
     useState<ThirdPartyAuthIntegration>()
+  const [addIntegrationOpen, setAddIntegrationOpen] = useState(false)
+
+  useShortcut(SHORTCUT_IDS.LIST_PAGE_NEW_ITEM, () => setAddIntegrationOpen(true), {
+    label: 'Add provider',
+  })
 
   const { mutateAsync: deleteIntegration } = useDeleteThirdPartyAuthIntegrationMutation()
-  const { can: canUpdateConfig } = useAsyncCheckPermissions(
-    PermissionAction.UPDATE,
-    'custom_config_gotrue'
-  )
+  const canUpdateConfig = deleteGrant.status === 'granted'
+
+  if (integrationsGrant.status === 'denied') {
+    return <NoPermission resourceText="view auth provider settings" />
+  }
+
+  if (integrationsGrant.status === 'error') {
+    return (
+      <AlertError
+        error={integrationsGrant.error}
+        subject="Failed to check auth provider settings permissions"
+      />
+    )
+  }
 
   if (isError) {
     return (
@@ -87,17 +114,21 @@ export const ThirdPartyAuthForm = () => {
         </PageSectionSummary>
         <PageSectionAside>
           <DocsButton href={`${DOCS_URL}/guides/auth/third-party/overview`} />
-          <AddIntegrationDropdown onSelectIntegrationType={setSelectedIntegration} />
+          <AddIntegrationDropdown
+            open={addIntegrationOpen}
+            onOpenChange={setAddIntegrationOpen}
+            onSelectIntegrationType={setSelectedIntegration}
+          />
         </PageSectionAside>
       </PageSectionMeta>
       <PageSectionContent>
         {isLoading && (
           <div
             className={cn(
-              'border rounded border-default px-20 py-16 flex flex-col items-center justify-center space-y-4'
+              'border rounded-sm border-default px-20 py-16 flex flex-col items-center justify-center space-y-4'
             )}
           >
-            <Loader2 size={24} className="animate-spin" />
+            <Loader2Icon size={24} className="animate-spin" />
           </div>
         )}
 
@@ -109,7 +140,7 @@ export const ThirdPartyAuthForm = () => {
             >
               <AddIntegrationDropdown
                 align="center"
-                type="default"
+                variant="default"
                 onSelectIntegrationType={setSelectedIntegration}
               />
             </EmptyStatePresentational>
@@ -121,6 +152,11 @@ export const ThirdPartyAuthForm = () => {
                     key={integration.id}
                     integration={integration}
                     canUpdateConfig={canUpdateConfig}
+                    deleteTooltip={getWriteGrantTooltip(
+                      deleteGrant.status,
+                      'delete',
+                      'third-party auth integrations'
+                    )}
                     onDelete={() => {
                       setSelectedIntegrationForDeletion(integration)
                     }}
@@ -161,6 +197,11 @@ export const ThirdPartyAuthForm = () => {
           onClose={() => setSelectedIntegration(undefined)}
         />
 
+        <CreateCustomOidcIntegrationDialog
+          visible={selectedIntegration === 'custom'}
+          onClose={() => setSelectedIntegration(undefined)}
+        />
+
         <ConfirmationModal
           size="medium"
           visible={!!selectedIntegrationForDeletion}
@@ -170,7 +211,15 @@ export const ThirdPartyAuthForm = () => {
           confirmLabelLoading="Deleting"
           onCancel={() => setSelectedIntegrationForDeletion(undefined)}
           onConfirm={async () => {
-            if (!selectedIntegrationForDeletion) {
+            if (!selectedIntegrationForDeletion) return
+            if (!deleteGrant.grant) {
+              toast.error(
+                getWriteGrantToastMessage(
+                  deleteGrant.status,
+                  'delete',
+                  'third-party auth integrations'
+                )
+              )
               return
             }
             const type = getIntegrationType(selectedIntegrationForDeletion)
@@ -178,6 +227,7 @@ export const ThirdPartyAuthForm = () => {
               await deleteIntegration({
                 projectRef: projectRef!,
                 tpaId: selectedIntegrationForDeletion.id,
+                grant: deleteGrant.grant,
               })
               toast.success(`Successfully deleted ${getIntegrationTypeLabel(type)}.`)
               setSelectedIntegrationForDeletion(undefined)

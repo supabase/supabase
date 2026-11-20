@@ -3,7 +3,7 @@ title: 'OAuth 2.1 Server'
 description: 'Turn your Supabase project into an OAuth 2.1 and OpenID Connect identity provider'
 ---
 
-Supabase Auth can act as an OAuth 2.1 and OpenID Connect (OIDC) identity provider. This allows other applications and services to use your Supabase project as their authentication provider, just like "Sign in with Google" or "Sign in with GitHub".
+Supabase Auth can act as an OAuth 2.1 and OpenID Connect (OIDC) identity provider. This allows other applications and services to use your Supabase project as their authentication provider, like "Sign in with Google" or "Sign in with GitHub".
 
 You can use this to build "Sign in with [Your App]" experiences, authenticate AI agents through the Model Context Protocol (MCP), power developer platforms with third-party integrations, or implement standards-compliant enterprise SSO.
 
@@ -19,6 +19,10 @@ There are several reasons why you might want to enable OAuth 2.1 Server in your 
 
 - **Enterprise SSO**: Provide OpenID Connect (OIDC) authentication for enterprise customers who need standards-compliant identity federation across multiple services.
 
+## Pricing
+
+There is no separate charge for OAuth 2.1 Server. Users who sign in through your OAuth server count toward your project's [Monthly Active Users (MAUs)](/docs/guides/platform/manage-your-usage/monthly-active-users). See the [pricing page](/pricing) for the MAU quota on each plan.
+
 ## Overview
 
 Supabase Auth implements the OAuth 2.1 authorization code flow with PKCE (Proof Key for Code Exchange). When a third-party application wants to access user data:
@@ -30,7 +34,7 @@ Supabase Auth implements the OAuth 2.1 authorization code flow with PKCE (Proof 
 5. The application exchanges the code for access and refresh tokens
 6. The application uses the access token to make authenticated API requests
 
-Access tokens are standard Supabase JWTs that include `user_id`, `role`, and `client_id` claims. Your existing Row Level Security policies automatically apply to OAuth tokens, giving you fine-grained control over what each client can access.
+Access tokens are standard Supabase JWTs that include `user_id`, `role`, and `client_id` claims. Your existing [Row Level Security](/docs/guides/database/postgres/row-level-security) policies automatically apply to OAuth tokens, giving you fine-grained control over what each client can access.
 
 ### Supported standards
 
@@ -54,35 +58,34 @@ OAuth 2.1 Server works seamlessly with your existing Supabase Auth configuration
 To enable OAuth 2.1 Server in your project, follow these guides:
 
 <div className="grid md:grid-cols-12 gap-4 not-prose">
-  {[
-    {
-      name: 'Getting Started',
-      description:
-        'Enable OAuth 2.1, configure your authorization endpoint, and register your first client.',
-      href: '/guides/auth/oauth-server/getting-started',
-    },
-    {
-      name: 'OAuth Flows',
-      description: 'Detailed walkthrough of authorization code and refresh token flows.',
-      href: '/guides/auth/oauth-server/oauth-flows',
-    },
-    {
-      name: 'MCP Authentication',
-      description: 'Authenticate AI agents and LLM tools using Model Context Protocol.',
-      href: '/guides/auth/oauth-server/mcp-authentication',
-    },
-    {
-      name: 'Token Security & RLS',
-      description: 'Control data access with Row Level Security policies for OAuth clients.',
-      href: '/guides/auth/oauth-server/token-security',
-    },
-  ].map((x) => (
-    <div className="col-span-6" key={x.href}>
-      <Link href={x.href} passHref>
-        <GlassPanel title={x.name}>{x.description}</GlassPanel>
-      </Link>
-    </div>
-  ))}
+  <div className="col-span-6">
+    <Link href="/guides/auth/oauth-server/getting-started" passHref>
+      <GlassPanel title="Getting Started">
+        Enable OAuth 2.1, configure your authorization endpoint, and register your first client.
+      </GlassPanel>
+    </Link>
+  </div>
+  <div className="col-span-6">
+    <Link href="/guides/auth/oauth-server/oauth-flows" passHref>
+      <GlassPanel title="OAuth Flows">
+        Detailed walkthrough of authorization code and refresh token flows.
+      </GlassPanel>
+    </Link>
+  </div>
+  <div className="col-span-6">
+    <Link href="/guides/auth/oauth-server/mcp-authentication" passHref>
+      <GlassPanel title="MCP Authentication">
+        Authenticate AI agents and LLM tools using Model Context Protocol.
+      </GlassPanel>
+    </Link>
+  </div>
+  <div className="col-span-6">
+    <Link href="/guides/auth/oauth-server/token-security" passHref>
+      <GlassPanel title="Token Security & RLS">
+        Control data access with Row Level Security policies for OAuth clients.
+      </GlassPanel>
+    </Link>
+  </div>
 </div>
 
 ## Resources

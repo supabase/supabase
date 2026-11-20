@@ -1,5 +1,7 @@
 import { ReactNode } from 'react'
 
+import type { ShortcutId } from '@/state/shortcuts/registry'
+
 export interface ProductMenuGroup {
   title?: string
   /** Set to "main" if page is on a '/' route */
@@ -8,6 +10,8 @@ export interface ProductMenuGroup {
   name?: string
   items: ProductMenuGroupItem[]
   link?: string
+  /** Optional node rendered after the group's items (e.g. a footer note) */
+  footer?: ReactNode
 }
 
 export interface ProductMenuGroupItem {
@@ -25,6 +29,8 @@ export interface ProductMenuGroupItem {
   childIcon?: ReactNode
   childItems?: ProductMenuGroupItem[]
   pages?: string[]
+  shortcutId?: ShortcutId
+  isLoading?: boolean
 }
 
 /**
@@ -33,7 +39,7 @@ export interface ProductMenuGroupItem {
 export interface SubMenuSection {
   key: string
   heading?: string
-  links: Array<{ key: string; label: string; href?: string }>
+  links: Array<{ key: string; label: string; href?: string; shortcutId?: ShortcutId }>
 }
 
 export interface SubMenuProps {

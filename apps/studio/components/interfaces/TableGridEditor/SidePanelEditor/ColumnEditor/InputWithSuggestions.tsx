@@ -6,7 +6,7 @@
 // the component over to the UI library
 
 import { noop } from 'lodash'
-import { List } from 'lucide-react'
+import { ChevronDownIcon } from 'lucide-react'
 import { useEffect, useRef, useState } from 'react'
 import {
   DropdownMenu,
@@ -15,8 +15,11 @@ import {
   DropdownMenuLabel,
   DropdownMenuSeparator,
   DropdownMenuTrigger,
-  Input,
+  InputGroup,
+  InputGroupAddon,
+  InputGroupInput,
 } from 'ui'
+import { FormItemLayout } from 'ui-patterns/form/FormItemLayout/FormItemLayout'
 
 import type { Suggestion } from './ColumnEditor.types'
 import { ButtonTooltip } from '@/components/ui/ButtonTooltip'
@@ -42,13 +45,13 @@ interface InputWithSuggestionsProps {
 }
 
 const InputWithSuggestions = ({
+  className,
   label,
   description,
   placeholder,
   size,
   layout,
   disabled = false,
-  className = '',
   value = '',
   suggestions = [],
   suggestionsTooltip,
@@ -83,54 +86,59 @@ const InputWithSuggestions = ({
 
   return (
     <div ref={ref} className="relative">
-      <Input
-        label={label}
-        aria-label={ariaLabel}
-        descriptionText={description}
-        placeholder={placeholder}
-        size={size}
-        layout={layout}
-        disabled={disabled}
-        className={className}
-        inputClassName="pr-10"
-        type="text"
-        value={value}
-        title={value}
-        onChange={onInputChange}
-        data-testid={dataTestId}
-        actions={
-          showSuggestions && (
-            <DropdownMenu>
-              <DropdownMenuTrigger asChild>
-                <ButtonTooltip
-                  type="default"
-                  className="!px-1 mr-0.5"
-                  tooltip={{
-                    content: { text: suggestionsTooltip || 'Suggestions', side: 'bottom' },
-                  }}
-                >
-                  <List strokeWidth={1.5} size={14} />
-                </ButtonTooltip>
-              </DropdownMenuTrigger>
-
-              <DropdownMenuContent align="end" side="bottom">
-                <DropdownMenuLabel>{suggestionsHeader || 'Suggestions'}</DropdownMenuLabel>
-                <DropdownMenuSeparator />
-                {filteredSuggestions.map((suggestion: Suggestion) => (
-                  <DropdownMenuItem
-                    className="space-x-2"
-                    key={suggestion.name}
-                    onClick={() => onSelectSuggestion(suggestion)}
+      <FormItemLayout layout={layout} label={label} description={description} isReactForm={false}>
+        <InputGroup>
+          <InputGroupInput
+            className={className}
+            aria-label={ariaLabel}
+            data-testid={dataTestId}
+            disabled={disabled}
+            size={size}
+            value={value}
+            title={value}
+            onChange={onInputChange}
+            placeholder={placeholder}
+          />
+          {showSuggestions && (
+            <InputGroupAddon align="inline-end">
+              <DropdownMenu>
+                <DropdownMenuTrigger asChild>
+                  <ButtonTooltip
+                    variant="text"
+                    size="tiny"
+                    className="w-6.5 px-0 mr-0.5"
+                    aria-label={suggestionsTooltip || 'Show suggestions'}
+                    tooltip={{
+                      content: { text: 'Choose a suggested value for this column', side: 'bottom' },
+                    }}
                   >
-                    <div>{suggestion.name}</div>
-                    <div className="text-foreground-lighter">{suggestion.description}</div>
-                  </DropdownMenuItem>
-                ))}
-              </DropdownMenuContent>
-            </DropdownMenu>
-          )
-        }
-      />
+                    <ChevronDownIcon
+                      className="text-foreground-lighter"
+                      strokeWidth={1.5}
+                      size={16}
+                    />
+                  </ButtonTooltip>
+                </DropdownMenuTrigger>
+
+                <DropdownMenuContent align="end" side="bottom">
+                  <DropdownMenuLabel>{suggestionsHeader || 'Suggestions'}</DropdownMenuLabel>
+                  <DropdownMenuSeparator />
+                  {filteredSuggestions.map((suggestion: Suggestion) => (
+                    <DropdownMenuItem
+                      className="flex flex-col items-start"
+                      key={suggestion.name}
+                      onClick={() => onSelectSuggestion(suggestion)}
+                    >
+                      <p>{suggestion.name}</p>
+                      <p className="text-foreground-lighter">{suggestion.description}</p>
+                    </DropdownMenuItem>
+                  ))}
+                </DropdownMenuContent>
+              </DropdownMenu>
+            </InputGroupAddon>
+          )}
+        </InputGroup>
+      </FormItemLayout>
     </div>
   )
 }

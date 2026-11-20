@@ -1,8 +1,8 @@
 import { useDebounce } from '@uidotdev/usehooks'
 import { LOCAL_STORAGE_KEYS, useParams } from 'common'
-import { AnimatePresence, motion } from 'framer-motion'
 import { toPng } from 'html-to-image'
-import { Camera, CircleCheck, Image as ImageIcon, Upload, X } from 'lucide-react'
+import { CameraIcon, CircleCheckIcon, ImageIcon, UploadIcon, XIcon } from 'lucide-react'
+import { AnimatePresence, motion } from 'motion/react'
 import { useRouter } from 'next/router'
 import { ChangeEvent, useEffect, useRef, useState } from 'react'
 import { toast } from 'sonner'
@@ -14,10 +14,10 @@ import {
   DropdownMenuItem,
   DropdownMenuSeparator,
   DropdownMenuTrigger,
-  PopoverSeparator_Shadcn_,
-  TextArea_Shadcn_,
+  PopoverSeparator,
+  TextArea,
 } from 'ui'
-import { Admonition } from 'ui-patterns'
+import { Admonition } from 'ui-patterns/Admonition'
 
 import {
   convertB64toBlob,
@@ -25,27 +25,54 @@ import {
   uploadAttachment,
 } from './FeedbackDropdown.utils'
 import { SupportLink } from '@/components/interfaces/Support/SupportLink'
+import { ButtonTooltip } from '@/components/ui/ButtonTooltip'
 import { InlineLinkClassName } from '@/components/ui/InlineLink'
 import { useFeedbackCategoryQuery } from '@/data/feedback/feedback-category'
 import { useSendFeedbackMutation } from '@/data/feedback/feedback-send'
-import { useSendEventMutation } from '@/data/telemetry/send-event-mutation'
 import { useLocalStorageQuery } from '@/hooks/misc/useLocalStorage'
-import { useSelectedOrganizationQuery } from '@/hooks/misc/useSelectedOrganization'
 import { timeout } from '@/lib/helpers'
 import { useProfile } from '@/lib/profile'
+import { useTrack } from '@/lib/telemetry/track'
 
 interface FeedbackWidgetProps {
   onClose: () => void
   onSwitchToIssueOptions: () => void
 }
 
+const ThanksMessageView = ({
+  onClose,
+  onSwitchToIssueOptions,
+}: Pick<FeedbackWidgetProps, 'onClose' | 'onSwitchToIssueOptions'>) => (
+  <>
+    <div className="py-6 px-4 grid gap-4 text-center text-foreground-light">
+      <CircleCheckIcon className="mx-auto text-brand-500" size={24} />
+      <div className="flex flex-col gap-1">
+        <p className="text-foreground text-sm">Your feedback has been sent. Thanks!</p>
+        <p className="text-xs text-balance">
+          We don’t always respond to feedback. If you need help with your project, use the button
+          below.
+        </p>
+      </div>
+    </div>
+    <PopoverSeparator />
+    <div className="px-4 pt-4 pb-4 flex flex-row items-center justify-between">
+      <Button size="tiny" onClick={onSwitchToIssueOptions}>
+        Get help
+      </Button>
+      <Button size="tiny" onClick={onClose}>
+        Close
+      </Button>
+    </div>
+  </>
+)
+
 export const FeedbackWidget = ({ onClose, onSwitchToIssueOptions }: FeedbackWidgetProps) => {
   const router = useRouter()
   const { profile } = useProfile()
   const { ref, slug } = useParams()
-  const { data: org } = useSelectedOrganizationQuery()
+  const track = useTrack()
 
-  const uploadButtonRef = useRef(null)
+  const uploadButtonRef = useRef<HTMLInputElement>(null)
   const [feedback, setFeedback] = useState('')
   const [isSending, setSending] = useState(false)
   const [isSavingScreenshot, setIsSavingScreenshot] = useState(false)
@@ -68,7 +95,6 @@ export const FeedbackWidget = ({ onClose, onSwitchToIssueOptions }: FeedbackWidg
   const isLikelySupport = isLikelySupportRequest(feedback)
   const effectiveCategory = category ?? (isLikelySupport ? 'support' : null)
 
-  const { mutate: sendEvent } = useSendEventMutation()
   const { mutate: submitFeedback } = useSendFeedbackMutation({
     onSuccess: () => {
       setIsFeedbackSent(true)
@@ -95,15 +121,24 @@ export const FeedbackWidget = ({ onClose, onSwitchToIssueOptions }: FeedbackWidg
 
     // Give time for dropdown to close
     await timeout(100)
-    toPng(document.body, { filter })
-      .then((dataUrl: any) => setScreenshot(dataUrl))
-      .catch(() => toast.error('Failed to capture screenshot'))
+    toPng(document.body, {
+      filter,
+      // the csp blocks fetches to avatar hosts, so a transparent pixel replaces images it cannot read
+      imagePlaceholder:
+        'data:image/gif;base64,R0lGODlhAQABAIAAAAAAAP///yH5BAEAAAAALAAAAAABAAEAAAIBRAA7',
+    })
+      .then((dataUrl) => setScreenshot(dataUrl))
+      .catch((error) => {
+        console.error('Failed to capture screenshot:', error)
+        toast.error('Failed to capture screenshot')
+      })
       .finally(() => setIsSavingScreenshot(false))
   }
 
   const onFilesUpload = async (event: ChangeEvent<HTMLInputElement>) => {
     event.persist()
-    const [file] = event.target.files || (event as any).dataTransfer.items
+    const file = event.target.files?.[0]
+    if (file === undefined) return
 
     const reader = new FileReader()
     reader.onload = function (event) {
@@ -168,36 +203,12 @@ export const FeedbackWidget = ({ onClose, onSwitchToIssueOptions }: FeedbackWidg
     // eslint-disable-next-line react-hooks/exhaustive-deps -- setStoredFeedback is stable; only sync on debounced value
   }, [debouncedFeedback])
 
-  const ThanksMessageView = () => (
-    <>
-      <div className="py-6 px-4 grid gap-4 text-center text-foreground-light">
-        <CircleCheck className="mx-auto text-brand-500" size={24} />
-        <div className="flex flex-col gap-1">
-          <p className="text-foreground text-base">Your feedback has been sent. Thanks!</p>
-          <p className="text-sm text-balance">
-            We don’t always respond to feedback. If you need help with your project, use the button
-            below.
-          </p>
-        </div>
-      </div>
-      <PopoverSeparator_Shadcn_ />
-      <div className="px-4 pt-4 pb-4 flex flex-row items-center justify-between">
-        <Button type="default" size="tiny" onClick={onSwitchToIssueOptions}>
-          Get help
-        </Button>
-        <Button type="default" size="tiny" onClick={onClose}>
-          Close
-        </Button>
-      </div>
-    </>
-  )
-
   return isFeedbackSent ? (
-    <ThanksMessageView />
+    <ThanksMessageView onClose={onClose} onSwitchToIssueOptions={onSwitchToIssueOptions} />
   ) : (
     <>
       <div className="p-4">
-        <TextArea_Shadcn_
+        <TextArea
           placeholder="My idea for improving Supabase is..."
           rows={6}
           value={feedback}
@@ -236,10 +247,10 @@ export const FeedbackWidget = ({ onClose, onSwitchToIssueOptions }: FeedbackWidg
         )}
       </AnimatePresence>
 
-      <PopoverSeparator_Shadcn_ />
+      <PopoverSeparator />
 
       <div className="px-4 pt-4 pb-4 flex flex-row items-center justify-between">
-        <Button type="default" size="tiny" onClick={onSwitchToIssueOptions}>
+        <Button size="tiny" onClick={onSwitchToIssueOptions}>
           Get help instead
         </Button>
         <div className="flex items-center gap-2 flex-row">
@@ -251,9 +262,12 @@ export const FeedbackWidget = ({ onClose, onSwitchToIssueOptions }: FeedbackWidg
                 const blobUrl = URL.createObjectURL(blob)
                 window.open(blobUrl, '_blank')
               }}
-              className="cursor-pointer rounded h-[26px] w-[26px] border border-control relative bg-cover bg-center bg-no-repeat"
+              className="cursor-pointer rounded-sm h-[26px] w-[26px] border border-control relative bg-cover bg-center bg-no-repeat"
             >
               <button
+                type="button"
+                tabIndex={0}
+                aria-label="Remove screenshot"
                 className={[
                   'cursor-pointer rounded-full bg-red-900 h-3 w-3',
                   'flex items-center justify-center absolute -top-1 -right-1',
@@ -263,18 +277,18 @@ export const FeedbackWidget = ({ onClose, onSwitchToIssueOptions }: FeedbackWidg
                   setScreenshot(null)
                 }}
               >
-                <X size={8} strokeWidth={3} />
+                <XIcon size={8} strokeWidth={3} />
               </button>
             </div>
           ) : (
             <DropdownMenu>
               <DropdownMenuTrigger asChild>
-                <Button
-                  type="default"
+                <ButtonTooltip
                   disabled={isSavingScreenshot}
                   loading={isSavingScreenshot}
                   className="w-7"
                   icon={<ImageIcon size={14} />}
+                  tooltip={{ content: { side: 'bottom', text: 'Attach screenshot' } }}
                 />
               </DropdownMenuTrigger>
               <DropdownMenuContent side="bottom" align="end" className="w-fit">
@@ -282,10 +296,10 @@ export const FeedbackWidget = ({ onClose, onSwitchToIssueOptions }: FeedbackWidg
                   className="flex gap-2"
                   key="upload-screenshot"
                   onSelect={() => {
-                    if (uploadButtonRef.current) (uploadButtonRef.current as any).click()
+                    if (uploadButtonRef.current) uploadButtonRef.current.click()
                   }}
                 >
-                  <Upload size={14} />
+                  <UploadIcon size={14} />
                   Upload screenshot
                 </DropdownMenuItem>
                 <DropdownMenuSeparator />
@@ -294,7 +308,7 @@ export const FeedbackWidget = ({ onClose, onSwitchToIssueOptions }: FeedbackWidg
                   key="capture-screenshot"
                   onSelect={() => captureScreenshot()}
                 >
-                  <Camera size={14} />
+                  <CameraIcon size={14} />
                   Capture screenshot
                 </DropdownMenuItem>
               </DropdownMenuContent>
@@ -303,19 +317,18 @@ export const FeedbackWidget = ({ onClose, onSwitchToIssueOptions }: FeedbackWidg
           <input
             type="file"
             ref={uploadButtonRef}
+            aria-label="Upload screenshot"
             className="hidden"
             accept="image/png"
             onChange={onFilesUpload}
           />
           <Button
+            variant="primary"
             disabled={feedback.length === 0 || isSending}
             loading={isSending}
             onClick={() => {
               sendFeedback()
-              sendEvent({
-                action: 'send_feedback_button_clicked',
-                groups: { project: ref, organization: org?.slug },
-              })
+              track('send_feedback_button_clicked')
             }}
           >
             Send

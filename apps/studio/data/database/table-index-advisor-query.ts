@@ -1,10 +1,12 @@
-import { getTableIndexAdvisorSql } from '@supabase/pg-meta'
+import { getTableIndexAdvisorSql, type SafeSqlFragment } from '@supabase/pg-meta'
 import { useQuery } from '@tanstack/react-query'
 
 import { databaseKeys } from './keys'
 import { filterProtectedSchemaIndexStatements } from '@/components/interfaces/QueryPerformance/IndexAdvisor/index-advisor.utils'
-import { executeSql } from '@/data/sql/execute-sql-query'
-import type { ResponseError, UseCustomQueryOptions } from '@/types'
+import { unguarded } from '@/data/fetchers'
+import { executeSql } from '@/data/sql/execute-sql-mutation'
+import type { StudioError } from '@/lib/errors/studio-errors'
+import type { UseCustomQueryOptions } from '@/types'
 
 export type TableIndexAdvisorVariables = {
   projectRef?: string
@@ -14,11 +16,11 @@ export type TableIndexAdvisorVariables = {
 }
 
 export type IndexAdvisorSuggestion = {
-  query: string
+  query: SafeSqlFragment
   calls: number
   total_time: number
   mean_time: number
-  index_statements: string[]
+  index_statements: SafeSqlFragment[]
   startup_cost_before: number
   startup_cost_after: number
   total_cost_before: number
@@ -66,6 +68,18 @@ function extractColumnsFromIndexStatements(indexStatements: string[]): string[] 
   return Array.from(columns)
 }
 
+interface GetTableIndexAdvisorSuggestionsResponse {
+  query: SafeSqlFragment
+  calls: number
+  total_time: number
+  mean_time: number
+  index_statements: SafeSqlFragment[]
+  startup_cost_before: number
+  startup_cost_after: number
+  total_cost_before: number
+  total_cost_after: number
+}
+
 export async function getTableIndexAdvisorSuggestions({
   projectRef,
   connectionString,
@@ -78,22 +92,13 @@ export async function getTableIndexAdvisorSuggestions({
 
   const sql = getTableIndexAdvisorSql(schema, table)
 
-  const { result } = await executeSql<
-    Array<{
-      query: string
-      calls: number
-      total_time: number
-      mean_time: number
-      index_statements: string[]
-      startup_cost_before: number
-      startup_cost_after: number
-      total_cost_before: number
-      total_cost_after: number
-    }>
-  >({
+  const { result } = await executeSql<Array<GetTableIndexAdvisorSuggestionsResponse>>({
     projectRef,
     connectionString,
+    sqlOrigin: 'studio',
+    queryName: 'table-index-advisor',
     sql,
+    grant: unguarded.migrating,
   })
 
   const suggestions: IndexAdvisorSuggestion[] = (result || [])
@@ -138,7 +143,7 @@ export async function getTableIndexAdvisorSuggestions({
 }
 
 export type TableIndexAdvisorData = Awaited<ReturnType<typeof getTableIndexAdvisorSuggestions>>
-export type TableIndexAdvisorError = ResponseError
+export type TableIndexAdvisorError = StudioError
 
 export function useTableIndexAdvisorQuery<TData = TableIndexAdvisorData>(
   { projectRef, connectionString, schema, table }: TableIndexAdvisorVariables,

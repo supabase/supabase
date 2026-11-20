@@ -1,11 +1,13 @@
-import { literal } from '@supabase/pg-meta/src/pg-format'
+import { literal, safeSql } from '@supabase/pg-meta/src/pg-format'
 import { useMutation, useQueryClient } from '@tanstack/react-query'
 import { toast } from 'sonner'
 
 import { databaseQueuesKeys } from './keys'
 import { isQueueNameValid } from '@/components/interfaces/Integrations/Queues/Queues.utils'
-import { executeSql } from '@/data/sql/execute-sql-query'
-import type { ResponseError, UseCustomMutationOptions } from '@/types'
+import { unguarded } from '@/data/fetchers'
+import { executeSql } from '@/data/sql/execute-sql-mutation'
+import type { StudioError } from '@/lib/errors/studio-errors'
+import type { UseCustomMutationOptions } from '@/types'
 
 export type DatabaseQueueMessageArchiveVariables = {
   projectRef: string
@@ -28,8 +30,11 @@ export async function archiveDatabaseQueueMessage({
   const { result } = await executeSql({
     projectRef,
     connectionString,
-    sql: `SELECT * FROM pgmq.archive(${literal(queueName)}, ${literal(messageId)})`,
+    sqlOrigin: 'studio',
+    queryName: 'database-queue-messages-archive',
+    sql: safeSql`SELECT * FROM pgmq.archive(${literal(queueName)}, ${literal(messageId)})`,
     queryKey: databaseQueuesKeys.create(),
+    grant: unguarded.migrating,
   })
 
   return result
@@ -44,7 +49,7 @@ export const useDatabaseQueueMessageArchiveMutation = ({
 }: Omit<
   UseCustomMutationOptions<
     DatabaseQueueMessageArchiveData,
-    ResponseError,
+    StudioError,
     DatabaseQueueMessageArchiveVariables
   >,
   'mutationFn'
@@ -53,7 +58,7 @@ export const useDatabaseQueueMessageArchiveMutation = ({
 
   return useMutation<
     DatabaseQueueMessageArchiveData,
-    ResponseError,
+    StudioError,
     DatabaseQueueMessageArchiveVariables
   >({
     mutationFn: (vars) => archiveDatabaseQueueMessage(vars),

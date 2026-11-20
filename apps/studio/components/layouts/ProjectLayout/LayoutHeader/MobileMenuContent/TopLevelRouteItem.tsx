@@ -40,6 +40,7 @@ export function TopLevelRouteItem({
       {hasItems ? (
         <button
           type="button"
+          tabIndex={route.disabled ? -1 : 0}
           data-active={isActive}
           onClick={() => onTopLevelClick(route)}
           disabled={route.disabled}
@@ -48,14 +49,20 @@ export function TopLevelRouteItem({
           {content}
         </button>
       ) : route.link ? (
-        <Link
-          href={route.link}
-          onClick={onCloseSheet}
-          data-active={isActive}
-          className={menuButtonClass}
-        >
-          {content}
-        </Link>
+        route.disabled ? (
+          <span aria-disabled="true" data-active={isActive} className={menuButtonClass}>
+            {content}
+          </span>
+        ) : (
+          <Link
+            href={route.link}
+            onClick={onCloseSheet}
+            data-active={isActive}
+            className={menuButtonClass}
+          >
+            {content}
+          </Link>
+        )
       ) : (
         <span data-active={false} className={cn(menuButtonClass, 'cursor-default')}>
           {content}

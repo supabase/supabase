@@ -5,7 +5,7 @@
   import type { PageData } from './$types'
 
   let { data } = $props()
-  let { notes, supabase, user } = $derived(data)
+  let { notes, supabase, claims } = $derived(data)
 
   const handleSubmit: EventHandler<SubmitEvent, HTMLFormElement> = async (evt) => {
     evt.preventDefault()
@@ -24,7 +24,7 @@
   }
 </script>
 
-<h1>Private page for user: {user?.email}</h1>
+<h1>Private page for user: {claims?.email}</h1>
 <h2>Notes</h2>
 <ul>
   {#each notes as note}

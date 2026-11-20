@@ -1,4 +1,4 @@
-import { Loader2 } from 'lucide-react'
+import { Loader2Icon } from 'lucide-react'
 import { MouseEvent, useState } from 'react'
 import {
   Button,
@@ -80,7 +80,7 @@ export const IndexSuggestionIcon = ({
           className="cursor-pointer"
         >
           {isCreatingIndex ? (
-            <Loader2 size={16} className="animate-spin text-foreground-light" />
+            <Loader2Icon size={16} className="animate-spin text-foreground-light" />
           ) : (
             <WarningIcon />
           )}
@@ -104,7 +104,7 @@ export const IndexSuggestionIcon = ({
             className={cn(
               'border-none rounded-none',
               'max-w-full',
-              '!py-0.5 !px-3.5 prose dark:prose-dark transition',
+              'py-0.5! px-3.5! prose dark:prose-dark transition',
               '[&>code]:m-0 [&>code>span]:flex [&>code>span]:flex-wrap'
             )}
           />
@@ -126,7 +126,7 @@ export const IndexSuggestionIcon = ({
         />
         <div className="p-3 flex gap-2 items-center border-t justify-end">
           <Button
-            type="text"
+            variant="text"
             onClick={(e) => {
               e.stopPropagation()
               if (onClickIcon && !isCreatingIndex) onClickIcon()
@@ -136,7 +136,12 @@ export const IndexSuggestionIcon = ({
           >
             View details
           </Button>
-          <Button onClick={handleCreateIndex} loading={isCreatingIndex} disabled={isCreatingIndex}>
+          <Button
+            variant="primary"
+            onClick={handleCreateIndex}
+            loading={isCreatingIndex}
+            disabled={isCreatingIndex}
+          >
             Create index
           </Button>
         </div>

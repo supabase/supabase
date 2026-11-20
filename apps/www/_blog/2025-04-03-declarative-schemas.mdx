@@ -14,7 +14,7 @@ toc_depth: 3
 launchweek: '14'
 ---
 
-Today we’re releasing declarative schemas to simplify managing and maintaining complex database schemas. With declarative schemas, you can define your database structure in a clear, centralized, and version-controlled manner.
+Today we’re releasing [declarative schemas](/features/declarative-schemas) to simplify managing and maintaining complex database schemas. With declarative schemas, you can define your database structure in a clear, centralized, and version-controlled manner.
 
 <div className="video-container mb-8">
   <iframe
@@ -129,7 +129,7 @@ This complexity slows down development velocity, as changes to the table might b
 2. Write the `alter table` statement in a new migration file.
 3. Copy and update the `projects` view definition to include the new column.
 4. Copy and update the trigger function definition to include the new column.
-5. Add new pgTAP tests and verify that existing tests pass.
+5. Add new [pgTAP](/docs/guides/database/extensions/pgtap) tests and verify that existing tests pass.
 6. Submit the new migration file for review, which would be at least a few hundred lines.
 
 This process is tedious and it's frustrating to have multiple engineers working on the `projects` table concurrently. Merging PRs would result in a merge conflict that must be resolved by repeating steps 1-5.

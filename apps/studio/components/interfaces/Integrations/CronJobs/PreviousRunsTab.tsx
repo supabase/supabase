@@ -1,12 +1,12 @@
 import { useParams } from 'common'
 import dayjs from 'dayjs'
-import { CircleCheck, CircleX, Loader } from 'lucide-react'
-import { useMemo } from 'react'
-import DataGrid, { Column, Row } from 'react-data-grid'
+import { CircleCheckIcon, CircleXIcon, LoaderIcon } from 'lucide-react'
+import { useMemo, useRef } from 'react'
+import DataGrid, { Column, DataGridHandle, Row } from 'react-data-grid'
 import { cn, LoadingLine, Tooltip, TooltipContent, TooltipTrigger } from 'ui'
-import { TimestampInfo } from 'ui-patterns'
 import { CodeBlock } from 'ui-patterns/CodeBlock'
 import { GenericSkeletonLoader } from 'ui-patterns/ShimmeringLoader'
+import { TimestampInfo } from 'ui-patterns/TimestampInfo'
 
 import { calculateDuration, formatDate } from './CronJobs.utils'
 import CronJobsEmptyState from './CronJobsEmptyState'
@@ -47,7 +47,7 @@ const cronJobColumns = [
               align="start"
               className="min-w-[200px] max-w-[300px] text-wrap p-0"
             >
-              <p className="text-xs font-mono px-2 py-1 border-b bg-surface-100">Message</p>
+              <p className="text-xs font-mono px-2 py-1 border-b bg-muted">Message</p>
               <CodeBlock
                 hideLineNumbers
                 language="sql"
@@ -119,7 +119,7 @@ const columns = cronJobColumns.map((col) => {
             col.id === 'runid' && 'ml-8'
           )}
         >
-          <p className="!text-foreground">{col.name}</p>
+          <p className="text-foreground!">{col.name}</p>
         </div>
       )
     },
@@ -159,6 +159,8 @@ export const PreviousRunsTab = () => {
     isPending: isLoadingCronJobRuns,
     isFetching,
     isFetchingNextPage,
+    isRefetching,
+    isError,
     hasNextPage,
     fetchNextPage,
   } = useCronJobRunsInfiniteQuery(
@@ -172,18 +174,24 @@ export const PreviousRunsTab = () => {
 
   const cronJobRuns = useMemo(() => data?.pages.flatMap((p) => p) || [], [data?.pages])
 
+  const gridRef = useRef<DataGridHandle>(null)
   const handleScroll = useInfiniteScroll({
     isLoading: isLoadingCronJobRuns,
     isFetchingNextPage,
+    isRefetching,
+    isError,
     hasNextPage,
     fetchNextPage,
+    containerRef: gridRef,
+    rowCount: cronJobRuns.length,
   })
 
   return (
     <div className="h-full flex flex-col">
       <LoadingLine loading={isFetching} />
       <DataGrid
-        className="grow border-t-0"
+        ref={gridRef}
+        className="grow border-t-0! border-b-0!"
         rowHeight={44}
         headerRowHeight={36}
         onScroll={handleScroll}
@@ -192,7 +200,7 @@ export const PreviousRunsTab = () => {
         rowClass={() => {
           return cn(
             'cursor-pointer',
-            '[&>.rdg-cell]:border-box [&>.rdg-cell]:outline-none [&>.rdg-cell]:shadow-none',
+            '[&>.rdg-cell]:border-box [&>.rdg-cell]:outline-hidden [&>.rdg-cell]:shadow-none',
             '[&>.rdg-cell:first-child>div]:ml-8'
           )
         }}
@@ -223,7 +231,7 @@ function StatusBadge({ status }: StatusBadgeProps) {
   if (status === 'succeeded') {
     return (
       <span className="text-brand-600 flex items-center gap-1 text-xs">
-        <CircleCheck size={14} /> Succeeded
+        <CircleCheckIcon size={14} /> Succeeded
       </span>
     )
   }
@@ -231,7 +239,7 @@ function StatusBadge({ status }: StatusBadgeProps) {
   if (status === 'failed') {
     return (
       <span className="text-destructive flex items-center gap-1 text-xs">
-        <CircleX size={14} /> Failed
+        <CircleXIcon size={14} /> Failed
       </span>
     )
   }
@@ -239,7 +247,7 @@ function StatusBadge({ status }: StatusBadgeProps) {
   if (['running', 'starting', 'sending', 'connecting'].includes(status)) {
     return (
       <span className="text-_secondary flex items-center gap-1 text-xs">
-        <Loader size={14} className="animate-spin" /> Running
+        <LoaderIcon size={14} className="animate-spin" /> Running
       </span>
     )
   }

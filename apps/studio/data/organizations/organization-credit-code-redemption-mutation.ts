@@ -3,7 +3,8 @@ import { useMutation, useQueryClient } from '@tanstack/react-query'
 import { organizationKeys } from './keys'
 import { handleError, post } from '@/data/fetchers'
 import { subscriptionKeys } from '@/data/subscriptions/keys'
-import type { ResponseError, UseCustomMutationOptions } from '@/types'
+import type { StudioError } from '@/lib/errors/studio-errors'
+import type { UseCustomMutationOptions } from '@/types'
 
 export type OrganizationCreditCodeRedemptionVariables = {
   code: string
@@ -48,16 +49,12 @@ export const useOrganizationCreditCodeRedemptionMutation = ({
   onError,
   ...options
 }: Omit<
-  UseCustomMutationOptions<
-    RedeemCodeData,
-    ResponseError,
-    OrganizationCreditCodeRedemptionVariables
-  >,
+  UseCustomMutationOptions<RedeemCodeData, StudioError, OrganizationCreditCodeRedemptionVariables>,
   'mutationFn'
 > = {}) => {
   const queryClient = useQueryClient()
 
-  return useMutation<RedeemCodeData, ResponseError, OrganizationCreditCodeRedemptionVariables>({
+  return useMutation<RedeemCodeData, StudioError, OrganizationCreditCodeRedemptionVariables>({
     mutationFn: (vars) => redeemCode(vars),
     async onSuccess(data, variables, context) {
       const { slug } = variables
@@ -65,6 +62,7 @@ export const useOrganizationCreditCodeRedemptionMutation = ({
       await Promise.all([
         queryClient.invalidateQueries({ queryKey: organizationKeys.customerProfile(slug) }),
         queryClient.invalidateQueries({ queryKey: subscriptionKeys.orgSubscription(slug) }),
+        queryClient.invalidateQueries({ queryKey: subscriptionKeys.orgBalance(slug) }),
       ])
 
       await onSuccess?.(data, variables, context)

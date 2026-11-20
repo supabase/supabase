@@ -2,8 +2,9 @@ import { useQuery, useQueryClient } from '@tanstack/react-query'
 import { useEffect } from 'react'
 
 import { customDomainKeys } from './keys'
-import { handleError, post } from '@/data/fetchers'
-import type { ResponseError, UseCustomQueryOptions } from '@/types'
+import { handleError, post, unguarded } from '@/data/fetchers'
+import type { StudioError } from '@/lib/errors/studio-errors'
+import type { UseCustomQueryOptions } from '@/types'
 
 export type CustomDomainReverifyVariables = {
   projectRef?: string
@@ -14,6 +15,7 @@ export async function reverifyCustomDomain({ projectRef }: CustomDomainReverifyV
 
   const { data, error } = await post(`/v1/projects/{ref}/custom-hostname/reverify`, {
     params: { path: { ref: projectRef } },
+    grant: unguarded.migrating,
   })
 
   if (error) handleError(error)
@@ -21,7 +23,7 @@ export async function reverifyCustomDomain({ projectRef }: CustomDomainReverifyV
 }
 
 export type CustomDomainReverifyData = Awaited<ReturnType<typeof reverifyCustomDomain>>
-export type CustomDomainReverifyError = ResponseError
+export type CustomDomainReverifyError = StudioError
 
 export const useCustomDomainReverifyQuery = (
   { projectRef }: CustomDomainReverifyVariables,

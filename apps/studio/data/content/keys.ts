@@ -1,4 +1,6 @@
 export const contentKeys = {
+  logsViews: (projectRef: string | undefined) =>
+    ['projects', projectRef, 'content', 'logs-views'] as const,
   allContentLists: (projectRef: string | undefined) => ['projects', projectRef, 'content'] as const,
   infiniteList: (
     projectRef: string | undefined,
@@ -16,6 +18,7 @@ export const contentKeys = {
   sqlSnippets: (
     projectRef: string | undefined,
     options?: {
+      type?: 'sql' | 'log_sql'
       sort?: 'inserted_at' | 'name'
       name?: string
       visibility?: string

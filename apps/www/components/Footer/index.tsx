@@ -18,12 +18,14 @@ import {
   IconTikTok,
   IconTwitterX,
   IconYoutubeSolid,
-  Input_Shadcn_,
+  Input,
 } from 'ui'
+import { PrivacySettings, PrivacySettingsLabel } from 'ui-patterns/PrivacySettings'
 import { ThemeToggle } from 'ui-patterns/ThemeToggle'
 
 import useDarkLaunchWeeks from '../../hooks/useDarkLaunchWeeks'
 import SectionContainer from '../Layouts/SectionContainer'
+import { isCrossZoneHref } from '@/lib/cross-zone'
 
 interface Props {
   className?: string
@@ -85,11 +87,11 @@ const Footer = (props: Props) => {
       <h2 id="footerHeading" className="sr-only">
         Footer
       </h2>
-      <div className="w-full !py-0">
-        <SectionContainer className="grid grid-cols-2 md:flex items-center justify-between text-foreground md:justify-center gap-8 md:gap-16 xl:gap-28 !py-6 md:!py-10 text-sm">
+      <div className="w-full py-0!">
+        <SectionContainer className="grid grid-cols-2 md:flex items-center justify-between text-foreground md:justify-center gap-8 md:gap-16 xl:gap-28 py-6! md:py-10! text-sm">
           <div className="flex flex-col md:flex-row gap-2 md:items-center">
             We protect your data.
-            <Link href="/security" className="text-brand-link hover:underline">
+            <Link href="/security" className="text-primary hover:underline">
               More on Security
             </Link>
           </div>
@@ -108,16 +110,18 @@ const Footer = (props: Props) => {
             </li>
           </ul>
         </SectionContainer>
-        <div className="w-full h-px bg-gradient-to-r from-transparent via-border to-transparent" />
+        <div className="w-full h-px bg-linear-to-r from-transparent via-border to-transparent" />
       </div>
       <SectionContainer className="py-8">
         <div className="xl:grid xl:grid-cols-7 xl:gap-4">
-          <div className="space-y-8 xl:col-span-2">
+          <div className="xl:col-span-2 flex flex-col gap-8">
             <Link href="#" as="/" className="w-40">
               <SupabaseWordmark className="w-40 h-[30px]" />
             </Link>
             <div className="flex space-x-5">
               <a
+                target="_blank"
+                rel="noopener noreferrer"
                 href="https://twitter.com/supabase"
                 className="text-foreground-lighter hover:text-foreground transition"
               >
@@ -126,6 +130,8 @@ const Footer = (props: Props) => {
               </a>
 
               <a
+                target="_blank"
+                rel="noopener noreferrer"
                 href="https://github.com/supabase"
                 className="text-foreground-lighter hover:text-foreground transition"
               >
@@ -134,6 +140,8 @@ const Footer = (props: Props) => {
               </a>
 
               <a
+                target="_blank"
+                rel="noopener noreferrer"
                 href="https://discord.supabase.com/"
                 className="text-foreground-lighter hover:text-foreground transition"
               >
@@ -142,6 +150,8 @@ const Footer = (props: Props) => {
               </a>
 
               <a
+                target="_blank"
+                rel="noopener noreferrer"
                 href="https://youtube.com/c/supabase"
                 className="text-foreground-lighter hover:text-foreground transition"
               >
@@ -150,6 +160,8 @@ const Footer = (props: Props) => {
               </a>
 
               <a
+                target="_blank"
+                rel="noopener noreferrer"
                 href="https://www.tiktok.com/@supabase.com"
                 className="text-foreground-lighter hover:text-foreground transition"
               >
@@ -158,6 +170,8 @@ const Footer = (props: Props) => {
               </a>
 
               <a
+                target="_blank"
+                rel="noopener noreferrer"
                 href="https://www.instagram.com/supabasecom"
                 className="text-foreground-lighter hover:text-foreground transition"
               >
@@ -165,10 +179,10 @@ const Footer = (props: Props) => {
                 <IconInstagram size={22} />
               </a>
             </div>
-            <div className="mt-8">
+            <div>
               {newsletterStatus === 'success' ? (
                 <div className="flex flex-col gap-1">
-                  <p className="text-brand-link text-sm">Thanks for subscribing!</p>
+                  <p className="text-primary text-sm">Thanks for subscribing!</p>
                   <p className="text-foreground-lighter text-xs">
                     You'll hear from us when we publish our next newsletter issue.
                   </p>
@@ -178,19 +192,19 @@ const Footer = (props: Props) => {
                   <p className="text-foreground-lighter text-sm">
                     Get product updates and news from Supabase.
                   </p>
-                  <Input_Shadcn_
+                  <Input
                     type="email"
                     placeholder="Your email"
                     aria-label="Email for newsletter"
                     value={newsletterEmail}
                     onChange={(e) => setNewsletterEmail(e.target.value)}
                     required
-                    className="flex-1 md:max-w-72 xl:max-w-[80%] !h-6 text-xs px-2"
+                    className="flex-1 md:max-w-72 xl:max-w-[80%] h-6! text-xs px-2"
                   />
                   <Button
-                    type="primary"
+                    variant="primary"
                     size="tiny"
-                    htmlType="submit"
+                    type="submit"
                     loading={newsletterStatus === 'loading'}
                     className="w-fit"
                   >
@@ -210,17 +224,17 @@ const Footer = (props: Props) => {
                   <div key={`footer_${segment.title}`}>
                     <h6 className="text-foreground overwrite text-base">{segment.title}</h6>
                     <ul className="mt-4 space-y-2">
-                      {segment.links.map(({ component: Component, ...link }, idx) => {
+                      {segment.links.map((link, idx) => {
                         const children = (
                           <div
                             className={`text-sm transition-colors ${
-                              link.url || Component
+                              link.url
                                 ? 'text-foreground-lighter hover:text-foreground'
                                 : 'text-muted hover:text-foreground-lighter'
                             } `}
                           >
                             {link.text}
-                            {!link.url && !Component && (
+                            {!link.url && (
                               <div className="ml-2 inline text-xs xl:ml-0 xl:block 2xl:ml-2 2xl:inline">
                                 <Badge>Coming soon</Badge>
                               </div>
@@ -231,13 +245,13 @@ const Footer = (props: Props) => {
                         return (
                           <li key={`${segment.title}_link_${idx}`}>
                             {link.url ? (
-                              link.url.startsWith('https') ? (
+                              link.url.startsWith('https') || isCrossZoneHref(link.url) ? (
                                 <a href={link.url}>{children}</a>
                               ) : (
                                 <Link href={link.url}>{children}</Link>
                               )
                             ) : (
-                              Component && <Component>{children}</Component>
+                              children
                             )}
                           </li>
                         )
@@ -250,7 +264,13 @@ const Footer = (props: Props) => {
           </div>
         </div>
         <div className="border-default mt-32 flex justify-between border-t pt-8">
-          <small className="small">&copy; Supabase Inc</small>
+          <div className="flex flex-col gap-1.5 sm:flex-row sm:items-center sm:gap-3">
+            <small className="small">&copy; Supabase Inc</small>
+            <span className="small hidden sm:inline">—</span>
+            <PrivacySettings className="small text-left hover:underline">
+              <PrivacySettingsLabel />
+            </PrivacySettings>
+          </div>
           <div className={cn(forceDark && 'hidden')}>
             <ThemeToggle forceDark={forceDark} />
           </div>

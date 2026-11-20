@@ -4,62 +4,111 @@ import { toast } from 'sonner'
 import {
   AlertDialog,
   AlertDialogAction,
+  AlertDialogBody,
   AlertDialogCancel,
   AlertDialogContent,
   AlertDialogDescription,
   AlertDialogFooter,
   AlertDialogHeader,
   AlertDialogTitle,
-  Button,
 } from 'ui'
+import { Admonition } from 'ui-patterns/Admonition'
 
+import { ButtonTooltip } from '@/components/ui/ButtonTooltip'
 import { useAPIKeyCreateMutation } from '@/data/api-keys/api-key-create-mutation'
+import { getWriteGrantToastMessage, getWriteGrantTooltip, useGrant } from '@/lib/grants'
 
 export const CreateNewAPIKeysButton = () => {
   const { ref: projectRef } = useParams()
 
-  const [isCreatingKeys, setIsCreatingKeys] = useState(false)
   const [createKeysDialogOpen, setCreateKeysDialogOpen] = useState(false)
+  const [error, setError] = useState<string | null>(null)
 
-  const { mutateAsync: createAPIKey } = useAPIKeyCreateMutation()
+  const createGrant = useGrant('POST /v1/projects/{ref}/api-keys', { projectRef })
+
+  const { mutateAsync: createAPIKey } = useAPIKeyCreateMutation({ onError: () => {} })
 
   const handleCreateNewApiKeys = async () => {
     if (!projectRef) return
-    setIsCreatingKeys(true)
+    if (!createGrant.grant) {
+      toast.error(getWriteGrantToastMessage(createGrant.status, 'create', 'API keys'))
+      return
+    }
 
     try {
+      setError(null)
+
       // Create publishable key
-      await createAPIKey({ projectRef, type: 'publishable', name: 'default' })
+      try {
+        await createAPIKey({
+          projectRef,
+          grant: createGrant.grant,
+          type: 'publishable',
+          name: 'default',
+        })
+      } catch (error: any) {
+        setError(`Failed to create the default publishable key: ${error.message}`)
+        throw error
+      }
 
       // Create secret key
-      await createAPIKey({ projectRef, type: 'secret', name: 'default' })
+      try {
+        await createAPIKey({
+          projectRef,
+          grant: createGrant.grant,
+          type: 'secret',
+          name: 'default',
+        })
+      } catch (error: any) {
+        setError(
+          `The default publishable key was created, but the default secret key failed: ${error.message}`
+        )
+        throw error
+      }
 
       setCreateKeysDialogOpen(false)
       toast.success('Successfully created a new set of API keys!')
     } catch (error) {
       console.error('Failed to create API keys:', error)
-    } finally {
-      setIsCreatingKeys(false)
+      throw error
     }
   }
 
   return (
     <AlertDialog open={createKeysDialogOpen} onOpenChange={setCreateKeysDialogOpen}>
-      <Button onClick={() => setCreateKeysDialogOpen(true)}>Create new API keys</Button>
+      <ButtonTooltip
+        variant="primary"
+        onClick={() => setCreateKeysDialogOpen(true)}
+        disabled={createGrant.status !== 'granted'}
+        tooltip={{
+          content: {
+            side: 'bottom',
+            text: getWriteGrantTooltip(createGrant.status, 'create', 'API keys'),
+          },
+        }}
+      >
+        Create new API keys
+      </ButtonTooltip>
       <AlertDialogContent>
         <AlertDialogHeader>
           <AlertDialogTitle>Create new API keys</AlertDialogTitle>
           <AlertDialogDescription>
             This will create a default publishable key and a default secret key both named{' '}
-            <code className="!break-keep text-code-inline">default</code>. These keys are required
-            to connect your application to your Supabase project.
+            <code className="break-keep!">default</code>. These keys are required to connect your
+            application to your Supabase project. Your existing legacy API keys (
+            <code className="break-keep!">anon</code> and{' '}
+            <code className="break-keep!">service_role</code>) are not affected and remain valid
+            until you disable them in a separate step.
           </AlertDialogDescription>
         </AlertDialogHeader>
+        {error && (
+          <AlertDialogBody>
+            <Admonition type="destructive" title="Unable to create API keys" description={error} />
+          </AlertDialogBody>
+        )}
         <AlertDialogFooter>
           <AlertDialogCancel>Cancel</AlertDialogCancel>
-          <AlertDialogAction onClick={handleCreateNewApiKeys} disabled={isCreatingKeys}>
-            {isCreatingKeys ? 'Creating...' : 'Create keys'}
-          </AlertDialogAction>
+          <AlertDialogAction onClick={handleCreateNewApiKeys}>Create keys</AlertDialogAction>
         </AlertDialogFooter>
       </AlertDialogContent>
     </AlertDialog>

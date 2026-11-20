@@ -48,7 +48,7 @@ const DaySection = ({ day }: { day: WeekDayProps }) => {
             href={day.blog!}
             className={cn(
               `
-              bg-[#111415] hover:bg-[#121516] sm:!bg-transparent
+              bg-[#111415] hover:bg-[#121516] sm:bg-transparent!
               min-h-[210px] group sm:aspect-[3.67/1] relative overflow-hidden flex-1 flex flex-col justify-between
               hover:border-strong transition-colors border border-muted
               rounded-xl text-2xl bg-contain shadow-lg`,
@@ -56,7 +56,7 @@ const DaySection = ({ day }: { day: WeekDayProps }) => {
             )}
           >
             <div className="relative p-4 sm:p-6 md:p-8 z-20 grow flex flex-col items-start justify-between gap-2 w-full lg:w-3/5 text-left">
-              <div className="relative w-full flex items-center gap-2 text-sm translate-x-0 !ease-[.24,0,.22,.99] duration-200 group-hover:-translate-x-6 transition-transform">
+              <div className="relative w-full flex items-center gap-2 text-sm translate-x-0 ease-[.24,0,.22,.99]! duration-200 group-hover:-translate-x-6 transition-transform">
                 <Edit2 className="w-4 min-w-4 group-hover:opacity-0 transition-opacity" />
                 <span>Blog post</span>
                 <ArrowRightIcon className="w-4 opacity-0 group-hover:opacity-100 transition-opacity" />
@@ -65,7 +65,7 @@ const DaySection = ({ day }: { day: WeekDayProps }) => {
                 {day.description}
               </h2>
             </div>
-            <div className="relative z-10 border-b border-muted/40 sm:border-none w-full order-first aspect-[2/1] sm:aspect-auto sm:absolute sm:inset-0">
+            <div className="relative z-10 border-b border-muted/40 sm:border-none w-full order-first aspect-2/1 sm:aspect-auto sm:absolute sm:inset-0">
               {day.steps[0]?.bg_layers &&
                 day.steps[0]?.bg_layers?.map(
                   (layer, i) =>

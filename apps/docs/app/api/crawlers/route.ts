@@ -1,11 +1,3 @@
-import { toHtml } from 'hast-util-to-html'
-import { fromMarkdown } from 'mdast-util-from-markdown'
-import { mdxFromMarkdown } from 'mdast-util-mdx'
-import { toHast } from 'mdast-util-to-hast'
-import { mdxjs } from 'micromark-extension-mdxjs'
-import { notFound } from 'next/navigation'
-import { visit } from 'unist-util-visit'
-
 import { REFERENCES } from '~/content/navigation.references'
 import {
   getFlattenedSections,
@@ -15,7 +7,14 @@ import {
 import { getRefMarkdown } from '~/features/docs/Reference.mdx'
 import type { MethodTypes, VariableTypes } from '~/features/docs/Reference.typeSpec'
 import type { AbbrevApiReferenceSection } from '~/features/docs/Reference.utils'
-import { BASE_PATH } from '~/lib/constants'
+import { PROD_URL } from '~/lib/constants'
+import { toHtml } from 'hast-util-to-html'
+import { fromMarkdown } from 'mdast-util-from-markdown'
+import { mdxFromMarkdown } from 'mdast-util-mdx'
+import { toHast } from 'mdast-util-to-hast'
+import { mdxjs } from 'micromark-extension-mdxjs'
+import { notFound } from 'next/navigation'
+import { visit } from 'unist-util-visit'
 
 export async function GET(request: Request) {
   const url = new URL(request.url)
@@ -34,20 +33,34 @@ export async function GET(request: Request) {
   try {
     const flattenedSections = (await getFlattenedSections(lib, version)) ?? []
     sectionsWithUrl = flattenedSections.map((section) => {
-      const url = new URL(request.url)
-      url.pathname = [BASE_PATH, 'reference', lib, isVersion ? version : null, section.slug]
-        .filter(Boolean)
-        .join('/')
+      const url = new URL(
+        [PROD_URL, 'reference', lib, isVersion ? version : null, section.slug]
+          .filter(Boolean)
+          .join('/')
+      )
 
       return {
         ...section,
         url,
       }
     })
-    section = flattenedSections.find(
-      (section) =>
-        (section.type === 'markdown' || section.type === 'function') && section.slug === slug
+    const contentSections = flattenedSections.filter(
+      (section) => section.type === 'markdown' || section.type === 'function'
     )
+    section = contentSections.find((section) => section.slug === slug)
+    if (!section) {
+      const legacySlug = slug?.toLowerCase()
+      const replacement = legacyReferenceSlug(lib, version, legacySlug)
+
+      if (replacement) {
+        section = contentSections.find((section) => section.slug?.toLowerCase() === replacement)
+      } else if (legacySlug && version === 'v2' && (lib === 'javascript' || lib === 'dart')) {
+        const matches = contentSections.filter((section) =>
+          section.slug?.toLowerCase().endsWith(`-${legacySlug}`)
+        )
+        if (matches.length === 1) section = matches[0]
+      }
+    }
   } catch {}
 
   if (!section) {
@@ -57,7 +70,7 @@ export async function GET(request: Request) {
   const html = htmlShell(
     lib,
     isVersion ? version : null,
-    slug,
+    section.slug ?? slug,
     section,
     libraryNav(sectionsWithUrl) + (await sectionDetails(lib, isVersion ? version : null, section))
   )
@@ -65,6 +78,17 @@ export async function GET(request: Request) {
   response.headers.set('Content-Type', 'text/html; charset=utf-8')
 
   return response
+}
+
+function legacyReferenceSlug(lib: string, version: string, slug?: string) {
+  if (!slug || slug === 'start') return 'introduction'
+  if (lib === 'swift' && version === 'v2' && slug === 'get-user') return 'auth-getuser'
+  if (version !== 'v2' || (lib !== 'javascript' && lib !== 'dart')) return undefined
+  if (slug === 'admin-api') return 'auth-admin'
+  if (slug === 'get-user') return lib === 'dart' ? 'auth-currentuser' : 'auth-getuser'
+  if (slug.startsWith('storage-from-')) return `file-buckets-${slug.slice('storage-from-'.length)}`
+  if (slug.startsWith('storage-')) return `file-buckets-${slug.slice('storage-'.length)}`
+  return undefined
 }
 
 function htmlShell(
@@ -75,6 +99,7 @@ function htmlShell(
   body: string
 ) {
   const libraryName = REFERENCES[lib].name
+  const versionPath = version && version !== REFERENCES[lib].versions[0] ? '/' + version : ''
   let title = libraryName + ': ' + (section.title ?? '')
 
   return (
@@ -85,6 +110,7 @@ function htmlShell(
     `<meta name="og:image" content="https://supabase.com/docs/img/supabase-og-image.png">` +
     `<meta name="twitter:image" content="https://supabase.com/docs/img/supabase-og-image.png">` +
     `<link rel="canonical" href="https://supabase.com/docs/reference/${lib}` +
+    versionPath +
     (slug ? '/' + slug : '') +
     `">` +
     '</head>' +
@@ -138,7 +164,7 @@ async function functionDetails(
 
   let types: MethodTypes | VariableTypes | undefined
   if (libraryMeta.typeSpec && '$ref' in fn) {
-    types = await getTypeSpec(fn['$ref'] as string)
+    types = await getTypeSpec(lib, version ?? libraryMeta.versions[0], fn['$ref'] as string)
   }
 
   const fullDescription = [
@@ -151,7 +177,7 @@ async function functionDetails(
     .join('')
 
   const parameters = parametersToHtml(fn, types)
-  const examples = examplesToHtml(fn)
+  const examples = examplesToHtml(fn, types)
 
   return fullDescription + parameters + examples
 }
@@ -219,13 +245,24 @@ function parametersToHtml(fn: any, types: MethodTypes | VariableTypes | undefine
   return result
 }
 
-function examplesToHtml(fn: any) {
-  if (!fn.examples || fn.examples.length === 0) return ''
+function examplesToHtml(fn: any, types?: MethodTypes | VariableTypes) {
+  // Prefer hand-authored YAML/JSON examples on the section entry; fall back to
+  // TSDoc-extracted `@example` blocks on the method's normalised comment. The
+  // page renderer in `Reference.sections.tsx` does the same merge, so the
+  // crawler stays consistent with what a browser sees.
+  const examples =
+    Array.isArray(fn.examples) && fn.examples.length > 0
+      ? fn.examples
+      : (types?.comment?.examples ?? [])
+  if (examples.length === 0) return ''
 
   let result = '<h2 id="examples">Examples</h2>'
 
-  result += fn.examples
-    .map((example) => `<h3>${example.name ?? ''}</h3>` + mdxToHtml(example.code ?? ''))
+  result += examples
+    .map(
+      (example: { name?: string; code?: string }) =>
+        `<h3>${example.name ?? ''}</h3>` + mdxToHtml(example.code ?? '')
+    )
     .join('')
 
   return result

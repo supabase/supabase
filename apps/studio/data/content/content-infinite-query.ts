@@ -1,7 +1,9 @@
 import { InfiniteData, useInfiniteQuery } from '@tanstack/react-query'
 
 import { Content, ContentType } from './content-query'
+import { remapSqlContentFields } from './content-remap'
 import { contentKeys } from './keys'
+import { getLogSqlSnippetPage } from './logs-view-content'
 import { get, handleError } from '@/data/fetchers'
 import { UseCustomInfiniteQueryOptions } from '@/types'
 
@@ -16,10 +18,20 @@ interface GetContentVariables {
 
 export async function getContent(
   { projectRef, type, name, limit = 10, sort, cursor }: GetContentVariables,
-  signal?: AbortSignal
+  signal?: AbortSignal,
+  headers?: HeadersInit
 ) {
   if (typeof projectRef === 'undefined') {
     throw new Error('projectRef is required for getContent')
+  }
+
+  if (type === 'log_sql') {
+    const { rows, cursor: nextCursor } = await getLogSqlSnippetPage(
+      { projectRef, name, limit, sort, cursor },
+      signal,
+      headers
+    )
+    return { cursor: nextCursor, content: rows }
   }
 
   const { data, error } = await get('/platform/projects/{ref}/content', {
@@ -33,6 +45,7 @@ export async function getContent(
         cursor,
       },
     },
+    headers,
     signal,
   })
 
@@ -40,7 +53,7 @@ export async function getContent(
 
   return {
     cursor: data.cursor,
-    content: data.data as unknown as Content[],
+    content: remapSqlContentFields(data.data as unknown as Content[]),
   }
 }
 

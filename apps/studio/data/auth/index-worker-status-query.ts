@@ -2,7 +2,9 @@ import { getIndexWorkerStatusSQL } from '@supabase/pg-meta'
 import { useQuery } from '@tanstack/react-query'
 
 import { authKeys } from './keys'
-import { executeSql, type ExecuteSqlError } from '@/data/sql/execute-sql-query'
+import { unguarded } from '@/data/fetchers'
+import { executeSql } from '@/data/sql/execute-sql-mutation'
+import type { StudioError } from '@/lib/errors/studio-errors'
 import { UseCustomQueryOptions } from '@/types'
 
 type IndexWorkerStatusVariables = {
@@ -12,7 +14,7 @@ type IndexWorkerStatusVariables = {
 type IndexWorkerStatusData = {
   is_in_progress: boolean
 }
-export type IndexWorkerStatusError = ExecuteSqlError
+export type IndexWorkerStatusError = StudioError
 
 export async function getIndexWorkerStatus(
   { projectRef, connectionString }: IndexWorkerStatusVariables,
@@ -24,8 +26,11 @@ export async function getIndexWorkerStatus(
     {
       projectRef,
       connectionString,
+      sqlOrigin: 'studio',
+      queryName: 'index-worker-status',
       sql,
       queryKey: ['index-worker-status'],
+      grant: unguarded.migrating,
     },
     signal
   )

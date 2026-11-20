@@ -4,8 +4,15 @@ import { toast } from 'sonner'
 // End of third-party imports
 
 import type { ExtendedSupportCategories } from '@/components/interfaces/Support/Support.constants'
-import { handleError, post } from '@/data/fetchers'
-import type { ResponseError, UseCustomMutationOptions } from '@/types'
+import { NO_ORG_MARKER, NO_PROJECT_MARKER } from '@/components/interfaces/Support/SupportForm.utils'
+import {
+  classifyResponseError,
+  parseRateLimitResetSeconds,
+  parseRetryAfterSeconds,
+} from '@/data/error-classification'
+import { handleError, post, unguarded } from '@/data/fetchers'
+import type { StudioError } from '@/lib/errors/studio-errors'
+import type { UseCustomMutationOptions } from '@/types'
 
 export type sendSupportTicketVariables = {
   subject: string
@@ -23,7 +30,12 @@ export type sendSupportTicketVariables = {
   dashboardSentryIssueId?: string
   dashboardLogs?: string
   dashboardStudioVersion?: string
+  // Stable Front thread_ref so the AI support chat can later be appended to the
+  // same Front conversation that this submission creates.
+  threadRef?: string
 }
+
+const RATE_LIMIT_FALLBACK_SECONDS = 60
 
 export async function sendSupportTicket({
   subject,
@@ -41,15 +53,17 @@ export async function sendSupportTicket({
   dashboardSentryIssueId,
   dashboardLogs,
   dashboardStudioVersion,
+  threadRef,
 }: sendSupportTicketVariables) {
-  const { data, error } = await post('/platform/feedback/send', {
+  const { data, error, response } = await post('/platform/feedback/send', {
     body: {
       subject,
       message,
       category,
       severity,
-      projectRef,
-      organizationSlug,
+      // Skip `NO_PROJECT_MARKER` values so we don't need to have special handling for it's value in API validation.
+      projectRef: projectRef === NO_PROJECT_MARKER ? undefined : projectRef,
+      organizationSlug: organizationSlug === NO_ORG_MARKER ? undefined : organizationSlug,
       library,
       verified: true,
       tags: ['dashboard-support-form'],
@@ -61,10 +75,25 @@ export async function sendSupportTicket({
       dashboardSentryIssueId,
       dashboardLogs,
       dashboardStudioVersion,
+      threadRef,
     },
+    grant: unguarded.migrating,
   })
 
   if (error) {
+    const httpResponse: unknown = response
+    if (httpResponse instanceof Response && httpResponse.status === 429) {
+      const waitSeconds =
+        parseRetryAfterSeconds(httpResponse.headers.get('Retry-After')) ??
+        parseRateLimitResetSeconds(httpResponse.headers.get('X-RateLimit-Reset')) ??
+        RATE_LIMIT_FALLBACK_SECONDS
+      throw classifyResponseError({
+        message: `You have submitted too many support requests. Please try again in ${waitSeconds} second${waitSeconds === 1 ? '' : 's'}.`,
+        code: 429,
+        retryAfter: waitSeconds,
+      })
+    }
+
     handleError(error, {
       alwaysCapture: true,
       sentryContext: {
@@ -84,10 +113,10 @@ export const useSendSupportTicketMutation = ({
   onError,
   ...options
 }: Omit<
-  UseCustomMutationOptions<sendSupportTicketData, ResponseError, sendSupportTicketVariables>,
+  UseCustomMutationOptions<sendSupportTicketData, StudioError, sendSupportTicketVariables>,
   'mutationFn'
 > = {}) => {
-  return useMutation<sendSupportTicketData, ResponseError, sendSupportTicketVariables>({
+  return useMutation<sendSupportTicketData, StudioError, sendSupportTicketVariables>({
     mutationFn: (vars) => sendSupportTicket(vars),
     async onSuccess(data, variables, context) {
       await onSuccess?.(data, variables, context)

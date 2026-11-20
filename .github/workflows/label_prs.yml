@@ -1,6 +1,5 @@
 name: 'Pull Request Labeler'
 
-# only docs uses the labeler at the moment
 on:
   pull_request_target:
     paths:
@@ -13,4 +12,4 @@ jobs:
       pull-requests: write
     runs-on: ubuntu-latest
     steps:
-      - uses: actions/labeler@634933edcd8ababfe52f92936142cc22ac488b1b # v6.0.1
+      - uses: actions/labeler@b8dd2d9be0f68b860e7dae5dae7d772984eacd6d # v6.2.0

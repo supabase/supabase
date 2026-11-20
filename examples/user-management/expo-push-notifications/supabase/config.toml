@@ -15,6 +15,10 @@ extra_search_path = ["public", "extensions"]
 # for accidental or malicious requests.
 max_rows = 1000
 
+# Triggered by a Database Webhook with a secret key, so skip the platform JWT check.
+[functions.push]
+verify_jwt = false
+
 [db]
 # Port to use for the local database URL.
 port = 54322

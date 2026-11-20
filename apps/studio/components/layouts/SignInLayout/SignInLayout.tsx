@@ -1,34 +1,85 @@
 import { useQueryClient } from '@tanstack/react-query'
-import { getAccessToken, useFlag } from 'common'
-import { useTheme } from 'next-themes'
+import { getAccessToken } from 'common'
 import Link from 'next/link'
 import { useRouter } from 'next/router'
 import { PropsWithChildren, useEffect, useState } from 'react'
 import { tweets } from 'shared-data'
+import { cn } from 'ui'
 
+import { useStatusBanner } from '@/components/layouts/AppLayout/useStatusBanner'
+import {
+  DestinationLogo,
+  InterstitialLayout,
+  LogoPair,
+  SupabaseLogo,
+} from '@/components/layouts/InterstitialLayout'
+import { DisabledUntilHydrated } from '@/components/ui/DisabledUntilHydrated'
 import { DocsButton } from '@/components/ui/DocsButton'
+import { InlineLink } from '@/components/ui/InlineLink'
+import { IdentityProviderIcon } from '@/components/ui/ProviderIcon'
+import { useCustomContent } from '@/hooks/custom-content/useCustomContent'
+import { useInboundBranding } from '@/hooks/misc/useInboundBranding'
 import { useIsFeatureEnabled } from '@/hooks/misc/useIsFeatureEnabled'
 import { BASE_PATH, DOCS_URL } from '@/lib/constants'
+import { getProviderDisplay } from '@/lib/external-identity-providers'
 import { auth, buildPathWithParams, getReturnToPath } from '@/lib/gotrue'
+
+type Quote = {
+  text: string
+  url: string
+  handle: string
+  img_url: string
+}
 
 type SignInLayoutProps = {
   heading: string
   subheading: string
   showDisclaimer?: boolean
   logoLinkToMarketingSite?: boolean
+  /**
+   * When set, the layout can show a focused-provider interstitial or swap its default heading for
+   * a destination-branded header (see {@link useInboundBranding}). The flow controls the verb
+   * ("Sign in" vs "Sign up").
+   */
+  inboundFlow?: 'sign-in' | 'sign-up'
+  /**
+   * Set only on pages wrapped in `AuthenticationLayout`, which is the only place that actually
+   * mounts the status banner above this layout. Elsewhere there's nothing rendered to reserve
+   * space for, so the nav shouldn't shift down even if an incident is ongoing.
+   */
+  hasStatusBanner?: boolean
 }
 
-const SignInLayout = ({
+const TermsText = () => (
+  <>
+    By continuing, you agree to Supabase’s{' '}
+    <InlineLink href="https://supabase.com/terms">Terms of Service</InlineLink> and{' '}
+    <InlineLink href="https://supabase.com/privacy">Privacy Policy</InlineLink>, and to receive
+    periodic emails with updates.
+  </>
+)
+
+export const SignInLayout = ({
   heading,
   subheading,
   showDisclaimer = true,
   logoLinkToMarketingSite = false,
+  inboundFlow,
+  hasStatusBanner = false,
   children,
 }: PropsWithChildren<SignInLayoutProps>) => {
   const router = useRouter()
   const queryClient = useQueryClient()
-  const { resolvedTheme } = useTheme()
-  const ongoingIncident = useFlag('ongoingIncident')
+  const statusBanner = useStatusBanner({ signedOut: true })
+  const showIncidentBanner = hasStatusBanner && statusBanner.type !== 'hidden'
+
+  const { destination, focusProvider } = useInboundBranding(inboundFlow)
+  const { dashboardAuthLogoLinkUrl } = useCustomContent(['dashboard_auth:logo_link_url'])
+  const marketingSiteUrl = dashboardAuthLogoLinkUrl ?? 'https://supabase.com'
+
+  const [quote, setQuote] = useState<Quote | null>(null)
+
+  const verb = inboundFlow === 'sign-up' ? 'Sign up' : 'Sign in'
 
   const {
     dashboardAuthShowTestimonial: showTestimonial,
@@ -42,6 +93,8 @@ const SignInLayout = ({
 
   // This useEffect redirects the user to MFA if they're already halfway signed in
   useEffect(() => {
+    let isUnmounted = false
+
     auth
       .initialize()
       .then(async ({ error }) => {
@@ -58,8 +111,13 @@ const SignInLayout = ({
             // if there was a problem signing in via the url, don't redirect
             return
           }
+          if (isUnmounted) return
 
           if (data) {
+            // we're already where we need to be
+            if (router.pathname === '/sign-in-recovery-code') {
+              return
+            }
             // we're already where we need to be
             if (router.pathname === '/sign-in-mfa') {
               return
@@ -72,18 +130,15 @@ const SignInLayout = ({
           }
 
           await queryClient.resetQueries()
-          router.push(getReturnToPath())
+          if (!isUnmounted) router.push(getReturnToPath())
         }
       })
       .catch(() => {}) // catch all errors thrown by auth methods
-  }, [])
 
-  const [quote, setQuote] = useState<{
-    text: string
-    url: string
-    handle: string
-    img_url: string
-  } | null>(null)
+    return () => {
+      isUnmounted = true
+    }
+  }, [])
 
   useEffect(() => {
     // Weighted random selection
@@ -106,26 +161,79 @@ const SignInLayout = ({
     }
   }, [])
 
+  // Focused provider: render a dedicated single-provider interstitial (same card layout as the
+  // external-identity flows). When we also know the destination the inbound link is returning the
+  // user to, frame the screen around it.
+  if (inboundFlow && focusProvider) {
+    return (
+      <InterstitialLayout
+        logo={
+          <LogoPair
+            left={
+              <DestinationLogo
+                icon={
+                  destination?.icon ?? (
+                    <IdentityProviderIcon
+                      display={getProviderDisplay(focusProvider.id)}
+                      size={28}
+                    />
+                  )
+                }
+                name={destination?.displayName ?? focusProvider.displayName}
+              />
+            }
+            right={<SupabaseLogo />}
+          />
+        }
+        title={destination ? `Continue to ${destination.displayName}` : `${verb} to Supabase`}
+        description={
+          destination
+            ? `${verb} to Supabase using your ${focusProvider.displayName} account`
+            : `Use your ${focusProvider.displayName} account to continue`
+        }
+        footer={
+          showDisclaimer && showTos ? (
+            <p className="text-xs text-foreground-lighter">
+              <TermsText />
+            </p>
+          ) : undefined
+        }
+      >
+        <div className="px-6 pb-6">
+          <DisabledUntilHydrated>{children}</DisabledUntilHydrated>
+        </div>
+      </InterstitialLayout>
+    )
+  }
+
+  // Destination known but no focused provider: keep the regular screen but brand its heading.
+  const brandedDestination = inboundFlow ? destination : undefined
+  const brandedHeading = brandedDestination
+    ? `${verb} to continue to ${brandedDestination.displayName}`
+    : undefined
+
   return (
     <>
       <div className="relative flex flex-col bg-alternative min-h-screen">
         <div
-          className={`absolute top-0 w-full px-8 mx-auto sm:px-6 lg:px-8 ${
-            ongoingIncident ? 'mt-14' : 'mt-6'
-          }`}
+          className={cn(
+            'absolute top-0 w-full px-8 mx-auto sm:px-6 lg:px-8',
+            showIncidentBanner ? 'mt-14' : 'mt-6'
+          )}
         >
           <nav className="relative flex items-center justify-between sm:h-10">
             <div className="flex items-center grow shrink-0 lg:grow-0">
               <div className="flex items-center justify-between w-full md:w-auto">
-                <Link href={logoLinkToMarketingSite ? 'https://supabase.com' : '/organizations'}>
+                <Link href={logoLinkToMarketingSite ? marketingSiteUrl : '/organizations'}>
                   <img
-                    src={
-                      resolvedTheme?.includes('dark')
-                        ? `${BASE_PATH}/img/supabase-dark.svg`
-                        : `${BASE_PATH}/img/supabase-light.svg`
-                    }
+                    src={`${BASE_PATH}/img/supabase-light.svg`}
                     alt="Supabase Logo"
-                    className={largeLogo ? 'h-[48px]' : 'h-[24px]'}
+                    className={cn('dark:hidden', largeLogo ? 'h-[48px]' : 'h-[24px]')}
+                  />
+                  <img
+                    src={`${BASE_PATH}/img/supabase-dark.svg`}
+                    alt="Supabase Logo"
+                    className={cn('hidden dark:block', largeLogo ? 'h-[48px]' : 'h-[24px]')}
                   />
                 </Link>
               </div>
@@ -140,32 +248,33 @@ const SignInLayout = ({
         <div className="flex flex-1 h-full">
           <main className="flex flex-col items-center flex-1 shrink-0 px-5 pt-16 pb-8 border-r shadow-lg bg-studio border-default">
             <div className="flex-1 flex flex-col justify-center w-[330px] sm:w-[384px]">
-              <div className="mb-10">
-                <h1 className="mt-8 mb-2 lg:text-3xl">{heading}</h1>
-                <h2 className="text-sm text-foreground-light">{subheading}</h2>
-              </div>
+              {brandedDestination ? (
+                <div className="mb-10 flex flex-col items-center gap-5 text-center">
+                  <LogoPair
+                    left={
+                      <DestinationLogo
+                        icon={brandedDestination.icon}
+                        name={brandedDestination.displayName}
+                      />
+                    }
+                    right={<SupabaseLogo />}
+                  />
+                  <h1 className="text-balance lg:text-2xl">{brandedHeading}</h1>
+                </div>
+              ) : (
+                <div className="mb-10">
+                  <h1 className="mt-8 mb-2 lg:text-3xl">{heading}</h1>
+                  <h2 className="text-sm text-foreground-light">{subheading}</h2>
+                </div>
+              )}
 
-              {children}
+              <DisabledUntilHydrated>{children}</DisabledUntilHydrated>
             </div>
 
             {showDisclaimer && showTos && (
               <div className="text-center text-balance">
                 <p className="text-xs text-foreground-lighter sm:mx-auto sm:max-w-sm">
-                  By continuing, you agree to Supabase’s{' '}
-                  <Link
-                    href="https://supabase.com/terms"
-                    className="underline hover:text-foreground-light"
-                  >
-                    Terms of Service
-                  </Link>{' '}
-                  and{' '}
-                  <Link
-                    href="https://supabase.com/privacy"
-                    className="underline hover:text-foreground-light"
-                  >
-                    Privacy Policy
-                  </Link>
-                  , and to receive periodic emails with updates.
+                  <TermsText />
                 </p>
               </div>
             )}
@@ -206,5 +315,3 @@ const SignInLayout = ({
     </>
   )
 }
-
-export default SignInLayout

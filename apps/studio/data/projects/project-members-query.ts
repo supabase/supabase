@@ -2,7 +2,8 @@ import { useQuery } from '@tanstack/react-query'
 
 import { projectKeys } from './keys'
 import { get, handleError } from '@/data/fetchers'
-import type { ResponseError, UseCustomQueryOptions } from '@/types'
+import type { StudioError } from '@/lib/errors/studio-errors'
+import type { UseCustomQueryOptions } from '@/types'
 
 export type ProjectMembersVariables = {
   projectRef?: string
@@ -24,7 +25,7 @@ export async function getProjectMembers(
 }
 
 export type ProjectMembersData = Awaited<ReturnType<typeof getProjectMembers>>
-export type ProjectMembersError = ResponseError
+export type ProjectMembersError = StudioError
 
 export const useProjectMembersQuery = <TData = ProjectMembersData>(
   { projectRef }: ProjectMembersVariables,

@@ -74,6 +74,24 @@ export const compactNumberFormatter = (num: number): string => {
 }
 
 /**
+ * Formats a duration in milliseconds with thousands separators and a unit suffix.
+ *
+ * @example
+ * millisecondFormatter(123)          // "123ms"
+ * millisecondFormatter(90000)        // "90,000ms"
+ * millisecondFormatter(1234.56)      // "1,235ms"
+ * millisecondFormatter(1234.56, 2)   // "1,234.56ms"
+ */
+export const millisecondFormatter = (value: number, precision = 0) => {
+  if (!Number.isFinite(value)) return '0ms'
+
+  return `${value.toLocaleString('en-US', {
+    minimumFractionDigits: precision,
+    maximumFractionDigits: precision,
+  })}ms`
+}
+
+/**
  * Formats a percentage, trimming decimals at 100.
  *
  * @example
@@ -140,6 +158,7 @@ export function computeYAxisDomain({
   isPercentage,
   showMaxValue,
   yMaxFromVisible,
+  thresholdZoneMax = 0,
   maxAttributeKey,
   showMaxLine,
   data,
@@ -148,20 +167,22 @@ export function computeYAxisDomain({
   isPercentage: boolean
   showMaxValue: boolean
   yMaxFromVisible: number
+  thresholdZoneMax?: number
   maxAttributeKey: string | undefined
   showMaxLine: boolean
   data: Record<string, unknown>[]
   visibleAttributeNames: string[]
 }): [number, number] | ['auto', 'auto'] {
   if (isPercentage && !showMaxValue) return [0, yMaxFromVisible]
-  if (!maxAttributeKey || !showMaxLine) return ['auto', 'auto']
+  const hasThresholdZones = Number.isFinite(thresholdZoneMax) && thresholdZoneMax > 0
+  if (!hasThresholdZones && (!maxAttributeKey || !showMaxLine)) return ['auto', 'auto']
 
   const maxRefValue = data.reduce((max, point) => {
-    const val = point[maxAttributeKey]
+    const val = maxAttributeKey && showMaxLine ? point[maxAttributeKey] : undefined
     return typeof val === 'number' ? Math.max(max, val) : max
   }, 0)
 
-  if (maxRefValue <= 0) return ['auto', 'auto']
+  if (!hasThresholdZones && maxRefValue <= 0) return ['auto', 'auto']
 
   const maxStackedTotal = data.reduce((max, point) => {
     const total = visibleAttributeNames.reduce((sum, name) => {
@@ -171,7 +192,7 @@ export function computeYAxisDomain({
     return Math.max(max, total)
   }, 0)
 
-  return [0, Math.max(maxRefValue, maxStackedTotal)]
+  return [0, Math.max(maxRefValue, maxStackedTotal, hasThresholdZones ? thresholdZoneMax : 0)]
 }
 
 export function normalizeStackedSeriesData<T extends Record<string, unknown>>({

@@ -1,12 +1,12 @@
 import { IS_PLATFORM } from 'common'
-import { Edit, File, Trash } from 'lucide-react'
+import { EditIcon, FileIcon, TrashIcon } from 'lucide-react'
 import {
   cn,
-  ContextMenu_Shadcn_,
-  ContextMenuContent_Shadcn_,
-  ContextMenuItem_Shadcn_,
-  ContextMenuSeparator_Shadcn_,
-  ContextMenuTrigger_Shadcn_,
+  ContextMenu,
+  ContextMenuContent,
+  ContextMenuItem,
+  ContextMenuSeparator,
+  ContextMenuTrigger,
   Tooltip,
   TooltipContent,
   TooltipTrigger,
@@ -45,8 +45,8 @@ export const FileExplorerAndEditorRow = ({
   const isEditing = Boolean(element.metadata?.isEditing)
 
   return (
-    <ContextMenu_Shadcn_ modal={false}>
-      <ContextMenuTrigger_Shadcn_ asChild>
+    <ContextMenu modal={false}>
+      <ContextMenuTrigger asChild>
         <div>
           <TreeViewItem
             {...nodeProps}
@@ -65,7 +65,7 @@ export const FileExplorerAndEditorRow = ({
                     ? 'text-code_block-2'
                     : ''
             )}
-            icon={<File size={14} className="text-foreground-light shrink-0" />}
+            icon={<FileIcon size={14} className="text-foreground-light shrink-0" />}
             isEditing={isEditing}
             onEditSubmit={(value) => {
               if (IS_PLATFORM && originalId !== null) {
@@ -98,24 +98,24 @@ export const FileExplorerAndEditorRow = ({
             }
           />
         </div>
-      </ContextMenuTrigger_Shadcn_>
+      </ContextMenuTrigger>
       {IS_PLATFORM && (
-        <ContextMenuContent_Shadcn_ onCloseAutoFocus={(e) => e.stopPropagation()}>
-          <ContextMenuItem_Shadcn_
+        <ContextMenuContent onCloseAutoFocus={(e) => e.stopPropagation()}>
+          <ContextMenuItem
             className="gap-x-2"
             onSelect={() => {
               if (originalId !== null) handleStartRename(originalId)
             }}
             onFocusCapture={(e) => e.stopPropagation()}
           >
-            <Edit size={14} />
+            <EditIcon size={14} />
             Rename file
-          </ContextMenuItem_Shadcn_>
+          </ContextMenuItem>
 
           {files.length > 1 && (
             <>
-              <ContextMenuSeparator_Shadcn_ />
-              <ContextMenuItem_Shadcn_
+              <ContextMenuSeparator />
+              <ContextMenuItem
                 className="gap-x-2"
                 onSelect={() => {
                   if (originalId !== null) {
@@ -124,13 +124,13 @@ export const FileExplorerAndEditorRow = ({
                 }}
                 onFocusCapture={(e) => e.stopPropagation()}
               >
-                <Trash size={14} />
+                <TrashIcon size={14} />
                 Delete file
-              </ContextMenuItem_Shadcn_>
+              </ContextMenuItem>
             </>
           )}
-        </ContextMenuContent_Shadcn_>
+        </ContextMenuContent>
       )}
-    </ContextMenu_Shadcn_>
+    </ContextMenu>
   )
 }

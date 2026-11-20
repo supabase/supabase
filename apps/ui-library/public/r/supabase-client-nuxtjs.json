@@ -1,7 +1,6 @@
 {
   "$schema": "https://ui.shadcn.com/schema/registry-item.json",
   "name": "supabase-client-nuxtjs",
-  "type": "registry:lib",
   "title": "Supabase Client for Nuxt.js",
   "description": "",
   "dependencies": [
@@ -11,13 +10,13 @@
   "registryDependencies": [],
   "files": [
     {
-      "path": "registry/default/clients/nuxtjs/lib/supabase/client.ts",
+      "path": "lib/supabase/client.ts",
       "content": "import { createBrowserClient } from '@supabase/ssr'\n\nexport function createClient() {\n  return createBrowserClient(\n    process.env.NUXT_PUBLIC_SUPABASE_URL!,\n    process.env.NUXT_PUBLIC_SUPABASE_PUBLISHABLE_KEY!\n  )\n}\n",
       "type": "registry:lib"
     },
     {
       "path": "registry/default/clients/nuxtjs/server/middleware/is-authenticated.ts",
-      "content": "import { defineNuxtRouteMiddleware, navigateTo, useRequestEvent } from 'nuxt/app'\n\nimport { createSupabaseServerClient } from '../supabase/client'\n\nexport default defineNuxtRouteMiddleware(async (to) => {\n  const event = useRequestEvent()\n\n  // create Supabase SSR client directly here\n  const supabase = createSupabaseServerClient(event)\n\n  // check current user\n  const {\n    data: { user },\n  } = await supabase.auth.getUser()\n\n  if (!user && to.path !== '/login') {\n    return navigateTo('/login')\n  }\n})\n",
+      "content": "import type { H3Event } from 'h3'\nimport { defineNuxtRouteMiddleware, navigateTo, useRequestEvent } from 'nuxt/app'\n\nimport { createSupabaseServerClient } from '../supabase/client'\n\nexport default defineNuxtRouteMiddleware(async (to) => {\n  // Nuxt's Nitro server provides an h3 `H3Event` here\n  const event = useRequestEvent() as H3Event | undefined\n\n  // create Supabase SSR client directly here\n  const supabase = createSupabaseServerClient(event)\n\n  // check current user\n  const {\n    data: { user },\n  } = await supabase.auth.getUser()\n\n  if (!user && to.path !== '/login') {\n    return navigateTo('/login')\n  }\n})\n",
       "type": "registry:file",
       "target": "server/middleware/is-authenticated.ts"
     },
@@ -38,5 +37,6 @@
     "NUXT_PUBLIC_SUPABASE_URL": "",
     "NUXT_PUBLIC_SUPABASE_PUBLISHABLE_KEY": ""
   },
-  "docs": "You'll need to set the following environment variables in your project: `NUXT_PUBLIC_SUPABASE_URL` and `NUXT_PUBLIC_SUPABASE_PUBLISHABLE_KEY`."
+  "docs": "You'll need to set the following environment variables in your project: `NUXT_PUBLIC_SUPABASE_URL` and `NUXT_PUBLIC_SUPABASE_PUBLISHABLE_KEY`.",
+  "type": "registry:lib"
 }

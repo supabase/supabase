@@ -1,7 +1,7 @@
 import { KeyIcon, RewindIcon, ShieldCheckIcon, UserGroupIcon } from '@heroicons/react/outline'
+import { companyStats } from 'data/company-stats'
 import { Activity } from 'lucide-react'
 import { IconDiscord, IconGitHubSolid, IconTwitterX, IconYoutubeSolid } from 'ui'
-import { companyStats } from 'data/company-stats'
 
 export const data = (isDark: boolean) => ({
   hero: {
@@ -152,7 +152,7 @@ We're committed to our Free Plan - we know the importance of this for testing ho
                   strokeLinecap: 'butt',
                   strokeLinejoin: 'miter',
                   strokeMiterlimit: 10,
-                  fill: 'hsl(var(--background-default) / 1)',
+                  fill: 'oklch(from var(--background-default) l c h / 1)',
                   fillRule: 'nonzero',
                   opacity: 1,
                 }}
@@ -258,11 +258,11 @@ We've [teamed up with Fly](/blog/postgres-on-fly-by-supabase) to bring Postgres 
 
 Vercel users can use the [Supabase integration](https://vercel.com/integrations/supabase) to connect Supabase to their Next.js projects, and we have deep integrations with [Flutterflow](https://docs.flutterflow.io/data-and-backend/supabase), [Resend](https://resend.com/blog/how-to-configure-supabase-to-send-emails-from-your-domain), and [Twilio](https://www.twilio.com/en-us/blog/send-sms-notifications-supabase-users-node-js-twilio-messaging).
 
-Cloudflare recently announced the Supabase integration for [Workers](https://developers.cloudflare.com/workers/databases/native-integrations/supabase/) and [Hyperdrive](https://developers.cloudflare.com/hyperdrive/examples/supabase/).
+Cloudflare recently announced the Supabase integration for [Workers](https://developers.cloudflare.com/workers/databases/native-integrations/supabase/) and [Hyperdrive](https://developers.cloudflare.com/hyperdrive/examples/connect-to-postgres/postgres-database-providers/supabase/).
 
 Developers have different preferences on how to connect to their database, and Supabase is ["just Postgres"](https://itsjustpostgres.com/) you can connect natively with [Prisma](https://www.prisma.io/docs/orm/overview/databases/supabase), [Drizzle](https://orm.drizzle.team/docs/get-started-postgresql#supabase), or [Kysely](https://github.com/kysely-org/kysely-supabase).
 
-You can find the [full list of partners and integrations](https://supabase.com/partners/integrations) on our Partners page. If you're interested in partnering with Supabase head over to the [Partner Portal](https://supabase.com/partners).
+You can find the [full list of partners and integrations](https://supabase.com/partners/catalog) on our Partners page. If you're interested in partnering with Supabase head over to the [Partner Portal](https://supabase.com/partners).
 `,
     partners: [
       {

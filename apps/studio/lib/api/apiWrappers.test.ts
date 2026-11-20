@@ -1,10 +1,11 @@
+import * as Sentry from '@sentry/react'
 import type { JwtPayload } from '@supabase/supabase-js'
 import type { NextApiRequest, NextApiResponse } from 'next'
-import { beforeEach, describe, expect, it, vi } from 'vitest'
+import { describe, expect, it, vi } from 'vitest'
 
 import { apiAuthenticate } from './apiAuthenticate'
-import apiWrapper from './apiWrapper'
-import { ResponseError } from '@/types'
+import { apiWrapper } from './apiWrapper'
+import { classifyResponseError } from '@/data/error-classification'
 
 vi.mock('@/lib/constants', () => ({
   IS_PLATFORM: true,
@@ -15,6 +16,10 @@ vi.mock('./apiAuthenticate', () => ({
   apiAuthenticate: vi.fn(),
 }))
 
+vi.mock('@sentry/react', () => ({
+  captureException: vi.fn(),
+}))
+
 describe('apiWrapper', () => {
   const mockReq = {} as NextApiRequest
   const mockRes = {
@@ -22,10 +27,6 @@ describe('apiWrapper', () => {
     json: vi.fn().mockReturnThis(),
   } as unknown as NextApiResponse
   const mockHandler = vi.fn()
-
-  beforeEach(() => {
-    vi.clearAllMocks()
-  })
 
   it('should call handler directly when withAuth is false', async () => {
     await apiWrapper(mockReq, mockRes, mockHandler, { withAuth: false })
@@ -52,11 +53,21 @@ describe('apiWrapper', () => {
   })
 
   it('should return 401 when authentication fails', async () => {
-    const mockError = { error: new ResponseError('Invalid token') }
+    const mockError = { error: classifyResponseError({ message: 'Invalid token' }) }
     vi.mocked(apiAuthenticate).mockResolvedValue(mockError)
 
     await apiWrapper(mockReq, mockRes, mockHandler, { withAuth: true })
     expect(mockRes.status).toHaveBeenCalledWith(401)
     expect(mockHandler).not.toHaveBeenCalled()
+  })
+
+  it('should report to Sentry and return 500 when the handler throws', async () => {
+    const mockError = new Error('boom')
+    mockHandler.mockRejectedValue(mockError)
+
+    await apiWrapper(mockReq, mockRes, mockHandler, { withAuth: false })
+    expect(Sentry.captureException).toHaveBeenCalledWith(mockError)
+    expect(mockRes.status).toHaveBeenCalledWith(500)
+    expect(mockRes.json).toHaveBeenCalledWith({ error: mockError })
   })
 })

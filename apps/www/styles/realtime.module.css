@@ -104,7 +104,7 @@
   88.1%,
   100% {
     opacity: 1;
-    font-family: 'custom-font';
+    font-family: var(--font-sans);
     background-color: transparent;
   }
 }

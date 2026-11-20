@@ -2,7 +2,6 @@ import type { JwtPayload } from '@supabase/supabase-js'
 import type { NextApiRequest, NextApiResponse } from 'next'
 
 import { getUserClaims } from '@/lib/gotrue'
-import type { ResponseError } from '@/types'
 
 /**
  * Use this method on api routes to check if user is authenticated and having required permissions.
@@ -17,7 +16,7 @@ import type { ResponseError } from '@/types'
 export async function apiAuthenticate(
   req: NextApiRequest,
   _res: NextApiResponse
-): Promise<JwtPayload | { error: ResponseError }> {
+): Promise<JwtPayload | { error: Error }> {
   try {
     const claims = await fetchUserClaims(req)
     if (!claims) {
@@ -26,7 +25,7 @@ export async function apiAuthenticate(
 
     return claims
   } catch (error) {
-    return { error: error as ResponseError }
+    return { error: error as Error }
   }
 }
 

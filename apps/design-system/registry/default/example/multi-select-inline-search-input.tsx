@@ -18,7 +18,6 @@ export default function MultiSelectDemo() {
         label="Select fruits"
         deletableBadge
         badgeLimit="wrap"
-        showIcon={false}
       />
       <MultiSelectorContent>
         <MultiSelectorList>

@@ -4,7 +4,7 @@ import { HelpCircle } from 'lucide-react'
 import { forwardRef, useEffect, useRef } from 'react'
 import { Card, CardHeader, cn } from 'ui'
 
-import { WarningIcon } from '../admonition'
+import { WarningIcon } from '../Admonition'
 import type { ErrorDisplayProps, SupportFormParams } from './ErrorDisplay.types'
 
 export type { SupportFormParams } from './ErrorDisplay.types'
@@ -60,7 +60,7 @@ export const ErrorDisplay = forwardRef<HTMLDivElement, ErrorDisplayProps>(
         </CardHeader>
 
         <div className="px-4 py-3 bg-warning-200 border-y border-warning-500">
-          <pre className="text-xs font-mono text-warning-600 whitespace-pre-wrap break-words overflow-auto max-h-32">
+          <pre className="text-xs font-mono text-warning-600 whitespace-pre-wrap wrap-break-word overflow-auto max-h-32">
             {errorMessage}
           </pre>
         </div>

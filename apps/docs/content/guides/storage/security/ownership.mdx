@@ -16,7 +16,7 @@ When using the `service_key` to create a resource, the owner will not be set and
 
 <Admonition type="note">
 
-The Storage schema has 2 fields to represent ownership: `owner` and `owner_id`. `owner` is deprecated and will be removed. Use `owner_id` instead.
+The [Storage schema](/docs/guides/storage/schema/design) has 2 fields to represent ownership: `owner` and `owner_id`. `owner` is deprecated and will be removed. Use `owner_id` instead.
 
 </Admonition>
 
@@ -36,4 +36,4 @@ using (
 );
 ```
 
-The use of RLS policies is just one way to enforce access control. You can also implement access control in your server code by following the same pattern.
+The use of RLS policies is one way to enforce access control. You can also implement access control in your server code by following the same pattern.

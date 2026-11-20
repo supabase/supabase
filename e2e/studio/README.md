@@ -142,7 +142,7 @@ pnpm run e2e -- --ui
 Example:
 
 ```ts
-await expect(page.getByRole('heading', { name: 'Logs & Analytics' }), {
+await expect(page.getByRole('heading', { name: 'Logs', exact: true }), {
   message: 'Logs heading should be visible',
 }).toBeVisible()
 ```

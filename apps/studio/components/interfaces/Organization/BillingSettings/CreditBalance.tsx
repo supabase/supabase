@@ -1,48 +1,45 @@
-import { PermissionAction } from '@supabase/shared-types/out/constants'
 import { useParams } from 'common'
+import { useInView } from 'react-intersection-observer'
 
 import { CreditCodeRedemption } from './CreditCodeRedemption'
 import { CreditTopUp } from './CreditTopUp'
-import { getTotalCreditBalanceCents } from './helpers'
 import {
   ScaffoldSection,
   ScaffoldSectionContent,
   ScaffoldSectionDetail,
 } from '@/components/layouts/Scaffold'
-import AlertError from '@/components/ui/AlertError'
+import { AlertError } from '@/components/ui/AlertError'
 import { FormPanel } from '@/components/ui/Forms/FormPanel'
 import { FormSection, FormSectionContent } from '@/components/ui/Forms/FormSection'
-import NoPermission from '@/components/ui/NoPermission'
-import { useOrgSubscriptionQuery } from '@/data/subscriptions/org-subscription-query'
-import { useAsyncCheckPermissions } from '@/hooks/misc/useCheckPermissions'
+import { NoPermission } from '@/components/ui/NoPermission'
+import { useOrgBalanceQuery } from '@/data/subscriptions/org-balance-query'
+import { FGA_PERMISSIONS, useAsyncCheckPermissionsV2 } from '@/hooks/misc/useCheckPermissionsV2'
 
 const CreditBalance = () => {
   const { slug } = useParams()
 
-  const { isSuccess: isPermissionsLoaded, can: canReadSubscriptions } = useAsyncCheckPermissions(
-    PermissionAction.BILLING_READ,
-    'stripe.subscriptions'
+  const { isSuccess: isPermissionsLoaded, can: canReadSubscriptions } = useAsyncCheckPermissionsV2(
+    FGA_PERMISSIONS.ORGANIZATION.BILLING_READ
   )
+  const { ref, inView } = useInView({ triggerOnce: true })
 
+  // Endpoint is expensive, so we only load it if it's in view
   const {
-    data: subscription,
-    error,
-    isPending: isLoading,
-    isError,
-    isSuccess,
-  } = useOrgSubscriptionQuery({ orgSlug: slug }, { enabled: canReadSubscriptions })
+    data: balanceData,
+    error: balanceError,
+    isPending: isBalanceLoading,
+    isError: isBalanceError,
+    isSuccess: isBalanceSuccess,
+  } = useOrgBalanceQuery({ orgSlug: slug }, { enabled: canReadSubscriptions && inView })
 
-  const combinedCreditBalanceCents = getTotalCreditBalanceCents({
-    customerBalance: subscription?.customer_balance,
-    prepaidCreditsBalance: subscription?.prepaid_credits_balance,
-  })
+  const combinedCreditBalanceCents = balanceData?.total_balance_cents ?? 0
   const combinedCreditBalance = combinedCreditBalanceCents / 100
   const hasCredits = combinedCreditBalanceCents > 0
   const hasDebt = combinedCreditBalanceCents < 0
   const balance = Math.abs(combinedCreditBalance).toFixed(2)
 
   return (
-    <ScaffoldSection>
+    <ScaffoldSection ref={ref}>
       <ScaffoldSectionDetail>
         <div className="sticky space-y-2 top-12 pr-3">
           <div className="flex items-center space-x-2">
@@ -63,7 +60,7 @@ const CreditBalance = () => {
         ) : (
           <FormPanel
             footer={
-              subscription?.billing_via_partner ? undefined : (
+              balanceData?.billing_via_partner ? undefined : (
                 <div className="flex justify-end items-center py-4 px-8 gap-x-2">
                   <CreditCodeRedemption slug={slug} />
                   <CreditTopUp slug={slug} />
@@ -72,15 +69,15 @@ const CreditBalance = () => {
             }
           >
             <FormSection>
-              <FormSectionContent fullWidth loading={isLoading}>
-                {isError && (
+              <FormSectionContent fullWidth loading={isBalanceLoading}>
+                {isBalanceError && (
                   <AlertError
                     subject="Failed to retrieve organization customer profile"
-                    error={error}
+                    error={balanceError}
                   />
                 )}
 
-                {isSuccess && (
+                {isBalanceSuccess && (
                   <div className="flex w-full justify-between items-center">
                     <span>Balance</span>
                     <div className="flex items-center space-x-1">

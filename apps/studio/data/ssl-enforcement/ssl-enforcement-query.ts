@@ -1,7 +1,7 @@
 import { useQuery } from '@tanstack/react-query'
 
 import { sslEnforcementKeys } from './keys'
-import { get, handleError } from '@/data/fetchers'
+import { get, handleError, unguarded } from '@/data/fetchers'
 import { UseCustomQueryOptions } from '@/types'
 
 export type SSLEnforcementVariables = { projectRef?: string }
@@ -15,6 +15,7 @@ export async function getSSLEnforcementConfiguration(
   const { data, error } = await get(`/v1/projects/{ref}/ssl-enforcement`, {
     params: { path: { ref: projectRef } },
     signal,
+    grant: unguarded.migrating,
   })
 
   // Not allowed error is a valid response to denote if a project

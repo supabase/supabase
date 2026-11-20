@@ -1,3 +1,5 @@
+declare module 'swiper/css'
+
 declare module 'config/tailwind.config' {
   import type { Config } from 'tailwindcss'
   const wrapper: (tailwindConfig: Partial<Config>) => Config

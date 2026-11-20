@@ -3,7 +3,7 @@ import { useEffect, useRef, useState, type CSSProperties } from 'react'
 
 import { STORAGE_ROW_STATUS, STORAGE_ROW_TYPES, STORAGE_VIEWS } from '../Storage.constants'
 import { StorageItem } from '../Storage.types'
-import { RowIcon } from './FileExplorerRow'
+import { StorageRowIcon } from '../StorageRowIcon'
 import { useStorageExplorerStateSnapshot } from '@/state/storage-explorer'
 
 export interface FileExplorerRowEditingProps {
@@ -67,10 +67,11 @@ export const FileExplorerRowEditing = ({
   }
 
   useEffect(() => {
-    // select just the name of the file without the extension
+    // Select the full folder name or the file name without the extension
     if (inputRef.current) {
       const dotIndex = item.name.lastIndexOf('.')
-      const selectionEnd = dotIndex !== -1 ? dotIndex : item.name.length
+      const selectionEnd =
+        dotIndex !== -1 && item.type === STORAGE_ROW_TYPES.FILE ? dotIndex : item.name.length
       inputRef.current.setSelectionRange(0, selectionEnd)
       inputRef.current.focus()
     }
@@ -90,11 +91,11 @@ export const FileExplorerRowEditing = ({
   return (
     <div
       style={style}
-      className="storage-row flex items-center justify-between rounded bg-gray-500"
+      className="storage-row flex items-center justify-between rounded-sm bg-gray-500"
     >
       <div className="flex h-full grow items-center px-2.5">
         <div>
-          <RowIcon
+          <StorageRowIcon
             view={view}
             status={item.status}
             fileType={item.type}
@@ -115,6 +116,7 @@ export const FileExplorerRowEditing = ({
             onBlur={(event) => onSaveItemName(itemName.trim() || item.name, event)}
           />
           <button
+            tabIndex={-1}
             className="hidden"
             type="submit"
             onClick={(event) => onSaveItemName(itemName.trim() || item.name, event)}

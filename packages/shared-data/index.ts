@@ -10,13 +10,19 @@ import config from './config'
 import { ERROR_CODE_DOCS_URLS, ERROR_CODES, HTTP_ERROR_CODES } from './error-codes'
 import type { ErrorCodeDefinition, ErrorCodeService } from './error-codes'
 import extensions from './extensions.json'
+import {
+  getInstanceDiskLimits,
+  hasBurstableDiskIO,
+  INSTANCE_DISK_LIMITS,
+} from './instance-disk-limits'
+import type { InstanceDiskLimits } from './instance-disk-limits'
 import logConstants from './log-constants'
 import { plans, PricingInformation } from './plans'
 import { pricing } from './pricing'
 import { PRODUCT_MODULES, products } from './products'
 import questions from './questions'
 import type { AWS_REGIONS_KEYS, CloudProvider, Region } from './regions'
-import { AWS_REGIONS, FLY_REGIONS } from './regions'
+import { AWS_REGIONS } from './regions'
 import tweets, { topTweets } from './tweets'
 
 export {
@@ -32,7 +38,9 @@ export {
   ERROR_CODES,
   HTTP_ERROR_CODES,
   extensions,
-  FLY_REGIONS,
+  getInstanceDiskLimits,
+  hasBurstableDiskIO,
+  INSTANCE_DISK_LIMITS,
   logConstants,
   plans,
   pricing,
@@ -47,6 +55,7 @@ export type {
   CloudProvider,
   ErrorCodeDefinition,
   ErrorCodeService,
+  InstanceDiskLimits,
   PricingInformation,
   Region,
 }

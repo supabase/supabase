@@ -3,7 +3,10 @@ import { QueryClient, useQuery } from '@tanstack/react-query'
 import { z } from 'zod'
 
 import { databaseKeys } from './keys'
-import { executeSql, ExecuteSqlError } from '@/data/sql/execute-sql-query'
+import { unguarded } from '@/data/fetchers'
+import { executeSql } from '@/data/sql/execute-sql-mutation'
+import type { StudioError } from '@/lib/errors/studio-errors'
+import { EMPTY_ARR } from '@/lib/void'
 import { UseCustomQueryOptions } from '@/types'
 
 export type SchemasVariables = {
@@ -16,7 +19,7 @@ export type Schema = z.infer<typeof pgMeta.schemas.zod>
 const pgMetaSchemasList = pgMeta.schemas.list()
 
 export type SchemasData = z.infer<typeof pgMetaSchemasList.zod>
-export type SchemasError = ExecuteSqlError
+export type SchemasError = StudioError
 
 export async function getSchemas(
   { projectRef, connectionString }: SchemasVariables,
@@ -26,13 +29,16 @@ export async function getSchemas(
     {
       projectRef,
       connectionString,
+      sqlOrigin: 'studio',
+      queryName: 'schemas',
       sql: pgMetaSchemasList.sql,
       queryKey: ['schemas'],
+      grant: unguarded.migrating,
     },
     signal
   )
 
-  return result
+  return Array.isArray(result) ? result : EMPTY_ARR
 }
 
 export const useSchemasQuery = <TData = SchemasData>(

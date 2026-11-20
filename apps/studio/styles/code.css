@@ -1,3 +1,5 @@
+@reference "./globals.css";
+
 .Code {
   width: 100%;
 
@@ -46,7 +48,7 @@
 
   .token.string {
     font-style: normal !important;
-    @apply !text-brand;
+    @apply !text-primary;
   }
 
   .token.constant {
@@ -60,12 +62,12 @@
   }
 
   .token.number {
-    @apply !text-brand;
+    @apply !text-primary;
   }
 
   .token.boolean,
   .token.doc-comment.class-name {
-    @apply text-brand;
+    @apply text-primary;
   }
 
   .codeBlock {
@@ -96,7 +98,7 @@
       bottom 200ms ease-in-out;
 
     button {
-      @apply rounded text-xs;
+      @apply rounded-sm text-xs;
       background: rgb(1, 22, 39);
       border: 1px solid rgb(214, 222, 235);
       color: rgb(214, 222, 235);
@@ -105,20 +107,6 @@
       outline: none;
       padding: 4px 8px;
     }
-  }
-
-  &.codeBlockWrapper .sbui-btn-container {
-    position: absolute;
-    top: 2px;
-    right: 3px;
-
-    visibility: hidden;
-    opacity: 0;
-  }
-
-  &.codeBlockWrapper:hover .sbui-btn-container {
-    visibility: visible;
-    opacity: 1;
   }
 }
 

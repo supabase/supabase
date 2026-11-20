@@ -144,7 +144,7 @@ In the future, we would also like to support a “seeds” section that outputs 
 
 ElectricSQL has been working hard to support real Postgres extensions in PGlite (compiled to WASM). One extension that was high on the priority list was [pgvector](https://github.com/pgvector/pgvector) which enables in-browser vector search.
 
-pgvector is enabled by default in database.build, meaning you can create and query vector columns on any table immediately. Of course, this is only useful if you have real embeddings to work with - so we gave AI access to [Transformers.js](https://github.com/xenova/transformers.js) which allows you to generate text embeddings directly in the browser, then store/query them in PGlite.
+[pgvector](https://supabase.com/docs/guides/database/extensions/pgvector) is enabled by default in database.build, meaning you can create and query vector columns on any table immediately. Of course, this is only useful if you have real embeddings to work with - so we gave AI access to [Transformers.js](https://github.com/huggingface/transformers.js) which allows you to generate text embeddings directly in the browser, then store/query them in PGlite.
 
 <div>
   <Img
@@ -162,7 +162,7 @@ We're excited to see what people do with this tool. We've found it has provided 
 
 ### Deployments
 
-With database.build we expect to have read-only deployments by the end of the week. This is important for one main reason: it's incredibly cheap to host a PGLite database in S3. While running a full Postgres database isn't _that_ expensive, there are use-cases where developers would love **most** of the features of Postgres but without the cost of running a full database. PGLite, served via S3, will open the floodgates to many use-cases: a replicated database per user; read-only [materialized](https://github.com/supabase/pg_replicate) databases for faster reads; search features hosted on the edge; maybe even a trimmed-down version of Supabase.
+With database.build we expect to have read-only deployments by the end of the week. This is important for one main reason: it's incredibly cheap to host a PGLite database in S3. While running a full Postgres database isn't _that_ expensive, there are use-cases where developers would love **most** of the features of Postgres but without the cost of running a full database. PGLite, served via S3, will open the floodgates to many use-cases: a replicated database per user; read-only [materialized](https://github.com/supabase/etl) databases for faster reads; search features hosted on the edge; maybe even a trimmed-down version of Supabase.
 
 By itself PGlite is an embedded database which means you can't connect to it like a normal Postgres database via TCP connection. To support PGlite-backed deployments, we needed a way to recreate the TCP server component of Postgres and also parse real wire protocol messages so that people could connect to their database via any regular Postgres client.
 
@@ -227,7 +227,7 @@ Fortunately, Postgres has a relatively unknown built-in [“single user mode”]
 
 PGlite builds on the single user mode by adding Postgres wire protocol support, as standard Postgres only supports a minimal basic cancel REPL in single user mode, this enables parametrised queries and converting between Postgres types and the host languages types.
 
-There are a number of of other things in Postgres that PGlite modifies to enable its use with WASM. These include:
+There are a number of other things in Postgres that PGlite modifies to enable its use with WASM. These include:
 
 - Support for [specifying a user](https://pglite.dev/docs/api#options) for the connection when starting under single-user mode, allowing permissions and RLS to be applied.
 - Support for `COPY`, for loading CSVs or Postgres binary copy formats into the database. This was achieved by creating a virtual device on the VFS, [`/dev/blob`](https://pglite.dev/docs/api#dev-blob), which you can read and write to with the `COPY` command, and representing a JavaScript Blob object on the query.
@@ -252,4 +252,4 @@ As always, the work that we've done is open source and permissively licensed (as
 - [PGlite](https://github.com/electric-sql/pglite) (Apache 2.0): A WASM build of Postgres.
 - [pg-gateway](https://github.com/supabase-community/pg-gateway) (MIT): Postgres wire protocol for the server-side.
 - [database-build](https://github.com/supabase-community/database-build) (Apache 2.0): The frontend for [database.build](https://database.build).
-- [transformers.js](https://github.com/xenova/transformers.js): Run Transformers directly in your browser
+- [transformers.js](https://github.com/huggingface/transformers.js): Run Transformers directly in your browser

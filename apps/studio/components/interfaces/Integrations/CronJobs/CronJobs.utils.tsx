@@ -1,3 +1,4 @@
+import { keyword, literal, safeSql, type SafeSqlFragment } from '@supabase/pg-meta/src/pg-format'
 import { toString as CronToString } from 'cronstrue'
 import { Column } from 'react-data-grid'
 import { cn } from 'ui'
@@ -6,13 +7,142 @@ import { CronJobType } from './CreateCronJobSheet/CreateCronJobSheet.constants'
 import { CRON_TABLE_COLUMNS, HTTPHeader, secondsPattern } from './CronJobs.constants'
 import { CronJobTableCell } from './CronJobTableCell'
 import { CronJob } from '@/data/database-cron-jobs/database-cron-jobs-infinite-query'
+import { isEdgeFunctionUrl } from '@/lib/api/edgeFunctions'
+import { IS_PLATFORM } from '@/lib/constants'
 
-const escapeSqlLiteral = (value = '') => value.replaceAll("'", "''")
-const unescapeSqlLiteral = (value = '') => value.replaceAll("''", "'")
+const unescapeSqlLiteral = (value = '', isEscapeString = false) => {
+  const unescaped = value.replaceAll("''", "'")
+  return isEscapeString ? unescaped.replaceAll('\\\\', '\\') : unescaped
+}
 
-export function buildCronQuery(name: string, schedule: string, command: string) {
-  const escapedName = escapeSqlLiteral(name)
-  return `select cron.schedule('${escapedName}', '${schedule}', ${command});`
+/**
+ * Strips the surrounding quotes from a single SQL string literal and unescapes its
+ * contents, handling the optional `E''` escape-string prefix.
+ */
+const unwrapSqlLiteral = (token: string) => {
+  const trimmed = token.trim()
+  const isEscapeString = /^e'/i.test(trimmed)
+  const withoutPrefix = isEscapeString ? trimmed.slice(1) : trimmed
+  const withoutQuotes = withoutPrefix.replace(/^'|'$/g, '')
+  return unescapeSqlLiteral(withoutQuotes, isEscapeString)
+}
+
+/**
+ * Splits a SQL argument list starting after its `(`, respecting quotes and nested parentheses.
+ * Returns the raw arguments and the index of the closing `)`, or undefined if unbalanced.
+ */
+const splitSqlArgs = (sql: string, start: number) => {
+  const args: string[] = []
+  let current = ''
+  let depth = 1
+  let inQuote = false
+  let hasContent = false
+  let i = start
+
+  for (; i < sql.length; i++) {
+    const char = sql[i]
+
+    if (inQuote) {
+      if (char === "'" && sql[i + 1] === "'") {
+        current += "''"
+        i++
+        continue
+      }
+      if (char === "'") inQuote = false
+      current += char
+      continue
+    }
+
+    if (char === "'") {
+      inQuote = true
+      current += char
+      hasContent = true
+    } else if (char === '(') {
+      depth++
+      current += char
+    } else if (char === ')') {
+      depth--
+      if (depth === 0) break
+      current += char
+    } else if (char === ',' && depth === 1) {
+      args.push(current)
+      current = ''
+    } else {
+      current += char
+      if (char.trim().length > 0) hasContent = true
+    }
+  }
+
+  if (depth !== 0) return undefined
+
+  if (hasContent || args.length > 0) args.push(current)
+
+  return { args, end: i }
+}
+
+const parseJsonBuildObjectArgs = (command: string) => {
+  const match = command.match(/headers:=jsonb_build_object\s*\(/i)
+  if (!match || match.index === undefined) return []
+
+  const result = splitSqlArgs(command, match.index + match[0].length)
+  return result ? result.args.map(unwrapSqlLiteral) : []
+}
+
+const SQL_STRING_LITERAL = /^e?'(?:''|[^'])*'$/i
+const SQL_STRING_LITERAL_WITH_CAST = /^e?'(?:''|[^'])*'(?:\s*::\s*(?:jsonb|json|text))?$/i
+
+const isJsonBuildObjectOfLiterals = (value: string) => {
+  const match = value.match(/^jsonb_build_object\s*\(/i)
+  if (!match) return false
+  const result = splitSqlArgs(value, match[0].length)
+  if (!result || value.slice(result.end + 1).trim().length > 0) return false
+  return result.args.every((arg) => SQL_STRING_LITERAL.test(arg.trim()))
+}
+
+// The HTTP form rebuilds the command from its fields, so anything else is edited as a SQL snippet
+const isFormRepresentableHttpCommand = (command: string) => {
+  const match = command.match(/^select\s+net\.(http_get|http_post)\s*\(/i)
+  if (!match) return false
+
+  const result = splitSqlArgs(command, match[0].length)
+  if (!result) return false
+  if (!/^\s*;?\s*$/.test(command.slice(result.end + 1))) return false
+
+  return result.args.every((arg) => {
+    const namedArg = arg.trim().match(/^([a-z_]+)\s*:=\s*([\s\S]*)$/i)
+    if (!namedArg) return false
+    const name = namedArg[1].toLowerCase()
+    const value = namedArg[2].trim()
+
+    switch (name) {
+      case 'url':
+        return SQL_STRING_LITERAL.test(value)
+      case 'body':
+        return SQL_STRING_LITERAL_WITH_CAST.test(value)
+      case 'headers':
+        return SQL_STRING_LITERAL_WITH_CAST.test(value) || isJsonBuildObjectOfLiterals(value)
+      case 'timeout_milliseconds':
+        return /^\d+$/.test(value)
+      default:
+        return false
+    }
+  })
+}
+
+export function buildCronCreateQuery(
+  name: string,
+  schedule: string,
+  command: string
+): SafeSqlFragment {
+  return safeSql`select cron.schedule(${literal(name)}, ${literal(schedule)}, ${literal(command)});`
+}
+
+export function buildCronUpdateQuery(
+  jobId: number,
+  schedule: string,
+  command: string
+): SafeSqlFragment {
+  return safeSql`select cron.alter_job(job_id := ${literal(jobId)}, schedule := ${literal(schedule)}, command := ${literal(command)});`
 }
 
 export const buildHttpRequestCommand = (
@@ -21,20 +151,23 @@ export const buildHttpRequestCommand = (
   headers: HTTPHeader[] = [],
   body: string | undefined,
   timeout: number
-) => {
-  return `
+): SafeSqlFragment => {
+  const funcName = keyword(method === 'GET' ? 'http_get' : 'http_post')
+  const headersJson = JSON.stringify(
+    Object.fromEntries(headers.filter((v) => v.name && v.value).map((v) => [v.name, v.value]))
+  )
+  const bodyPart = method === 'POST' && body ? safeSql`\n      body:=${literal(body)},` : safeSql``
+  return safeSql`
 select
-  net.${method === 'GET' ? 'http_get' : 'http_post'}(
-      url:='${escapeSqlLiteral(url)}',
-      headers:=jsonb_build_object(${headers
-        .filter((v) => v.name && v.value)
-        .map((v) => `'${escapeSqlLiteral(v.name)}', '${escapeSqlLiteral(v.value)}'`)
-        .join(
-          ', '
-        )}), ${method === 'POST' && body ? `\n      body:='${escapeSqlLiteral(body)}',` : ''}
-      timeout_milliseconds:=${timeout}
+  net.${funcName}(
+      url:=${literal(url)},
+      headers:=${literal(headersJson)}::jsonb, ${bodyPart}
+      timeout_milliseconds:=${literal(timeout)}
   );`
 }
+
+// Default of pg_net's `timeout_milliseconds` argument, used when a command omits it
+const PG_NET_DEFAULT_TIMEOUT_MS = 5000
 
 const DEFAULT_CRONJOB_COMMAND = {
   type: 'sql_snippet',
@@ -45,39 +178,44 @@ const DEFAULT_CRONJOB_COMMAND = {
   httpBody: '',
 } as const
 
-export const parseCronJobCommand = (originalCommand: string, projectRef: string): CronJobType => {
+export const parseCronJobCommand = (
+  originalCommand: string,
+  projectRef: string,
+  restUrl?: string,
+  isPlatform = IS_PLATFORM
+): CronJobType => {
   const command = originalCommand.replaceAll('$$', ' ').replaceAll(/\n/g, ' ').trim()
 
-  if (command.toLocaleLowerCase().match(/^select\s+net\./)) {
+  if (
+    command.toLocaleLowerCase().match(/^select\s+net\./) &&
+    isFormRepresentableHttpCommand(command)
+  ) {
     const methodMatch = command.match(/select\s+net\.([^']+)\(\s*url:=/i)
     const method = methodMatch?.[1] || ''
 
-    const urlMatch = command.match(/url:='((?:''|[^'])*)'/i)
-    const url = unescapeSqlLiteral(urlMatch?.[1])
+    const urlMatch = command.match(/url:=(E)?'((?:''|[^'])*)'/i)
+    const url = unescapeSqlLiteral(urlMatch?.[2], Boolean(urlMatch?.[1]))
 
-    const bodyMatch = command.match(/body:='((?:''|[^'])*)'/i)
-    const body = unescapeSqlLiteral(bodyMatch?.[1])
+    const bodyMatch = command.match(/body:=(E)?'((?:''|[^'])*)'/i)
+    const body = unescapeSqlLiteral(bodyMatch?.[2], Boolean(bodyMatch?.[1]))
 
     const timeoutMatch = command.match(/timeout_milliseconds:=(\d+)/i)
-    const timeout = timeoutMatch?.[1] || ''
-
-    const headersJsonBuildObjectMatch = command.match(/headers:=jsonb_build_object\(([^)]*)/i)
-    const headersJsonBuildObject = headersJsonBuildObjectMatch?.[1] || ''
+    const timeoutMs = timeoutMatch ? Number(timeoutMatch[1]) : PG_NET_DEFAULT_TIMEOUT_MS
 
     let headersObjs: { name: string; value: string }[] = []
-    if (headersJsonBuildObject) {
-      const headers = headersJsonBuildObject
-        .split(',')
-        .map((s) => unescapeSqlLiteral(s.trim().replace(/^'|'$/g, '')))
+    if (/headers:=jsonb_build_object\s*\(/i.test(command)) {
+      const args = parseJsonBuildObjectArgs(command)
 
-      for (let i = 0; i < headers.length; i += 2) {
-        if (headers[i] && headers[i].length > 0) {
-          headersObjs.push({ name: headers[i], value: headers[i + 1] })
+      for (let i = 0; i < args.length; i += 2) {
+        const name = args[i]
+        if (name && name.length > 0) {
+          headersObjs.push({ name, value: args[i + 1] ?? '' })
         }
       }
     } else {
-      const headersStringMatch = command.match(/headers:='((?:''|[^'])*)'/i)
-      const headersString = unescapeSqlLiteral(headersStringMatch?.[1]) || '{}'
+      const headersStringMatch = command.match(/headers:=(E)?'((?:''|[^'])*)'/i)
+      const headersString =
+        unescapeSqlLiteral(headersStringMatch?.[2], Boolean(headersStringMatch?.[1])) || '{}'
       try {
         const parsedHeaders = JSON.parse(headersString)
         headersObjs = Object.entries(parsedHeaders).map(([name, value]) => ({
@@ -100,8 +238,7 @@ export const parseCronJobCommand = (originalCommand: string, projectRef: string)
     } catch {}
 
     if (
-      url.includes(`${projectRef}.supabase.`) &&
-      url.includes('/functions/v1/') &&
+      isEdgeFunctionUrl(url, projectRef, restUrl, isPlatform) &&
       searchParams.length === 0 &&
       urlHash.length === 0
     ) {
@@ -111,7 +248,7 @@ export const parseCronJobCommand = (originalCommand: string, projectRef: string)
         edgeFunctionName: url,
         httpHeaders: headersObjs,
         httpBody: body,
-        timeoutMs: Number(timeout ?? 1000),
+        timeoutMs,
         snippet: originalCommand,
       }
     }
@@ -123,7 +260,7 @@ export const parseCronJobCommand = (originalCommand: string, projectRef: string)
         endpoint: url,
         httpHeaders: headersObjs,
         httpBody: body,
-        timeoutMs: Number(timeout ?? 1000),
+        timeoutMs,
         snippet: originalCommand,
       }
     }
@@ -132,7 +269,7 @@ export const parseCronJobCommand = (originalCommand: string, projectRef: string)
   const regexDBFunction = /select\s+[a-zA-Z0-9_]+\.[a-zA-Z0-9_]+\s*\(\)/g
   if (command.toLocaleLowerCase().match(regexDBFunction)) {
     const [schemaName, functionName] = command
-      .replace('SELECT ', '')
+      .replace(/^select\s+/i, '')
       .replace(/\(.*\);*/, '')
 
       .trim()
@@ -250,7 +387,7 @@ export const formatCronJobColumns = ({
               col.id === 'jobname' && 'ml-8'
             )}
           >
-            <p className="!text-foreground">{col.name}</p>
+            <p className="text-foreground!">{col.name}</p>
           </div>
         )
       },

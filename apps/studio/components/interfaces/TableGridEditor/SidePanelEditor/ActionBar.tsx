@@ -58,12 +58,7 @@ export const ActionBar = ({
       {children}
 
       <div className="flex items-center gap-3 ml-auto">
-        <Button
-          type="default"
-          htmlType="button"
-          onClick={closePanel}
-          disabled={isRunning || loading}
-        >
+        <Button type="button" onClick={closePanel} disabled={isRunning || loading}>
           {backButtonLabel}
         </Button>
 
@@ -88,7 +83,7 @@ export const ActionBar = ({
             disabled={loading || disableApply}
             loading={loading}
             data-testid="action-bar-save-row"
-            htmlType="submit"
+            type="submit"
             form={formId}
             iconRight={
               loading ? undefined : <KeyboardShortcut keys={['Meta', 'Enter']} variant="inline" />

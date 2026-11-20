@@ -3,7 +3,8 @@ import { toast } from 'sonner'
 
 import { organizationKeys } from './keys'
 import { handleError, patch } from '@/data/fetchers'
-import type { ResponseError, UseCustomMutationOptions } from '@/types'
+import type { StudioError } from '@/lib/errors/studio-errors'
+import type { UseCustomMutationOptions } from '@/types'
 
 export type OrganizationMfaToggleVariables = {
   slug: string
@@ -29,16 +30,12 @@ export const useOrganizationMfaToggleMutation = ({
   onError,
   ...options
 }: Omit<
-  UseCustomMutationOptions<
-    OrganizationMfaToggleData,
-    ResponseError,
-    OrganizationMfaToggleVariables
-  >,
+  UseCustomMutationOptions<OrganizationMfaToggleData, StudioError, OrganizationMfaToggleVariables>,
   'mutationFn'
 > = {}) => {
   const queryClient = useQueryClient()
 
-  return useMutation<OrganizationMfaToggleData, ResponseError, OrganizationMfaToggleVariables>({
+  return useMutation<OrganizationMfaToggleData, StudioError, OrganizationMfaToggleVariables>({
     mutationFn: (vars) => toggleOrganizationMfa(vars),
     async onSuccess(data, variables, context) {
       const { slug } = variables

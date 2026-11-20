@@ -1,29 +1,30 @@
-import puppeteer from 'https://deno.land/x/puppeteer@16.2.0/mod.ts'
+import puppeteer from 'npm:puppeteer@^25'
+import { withSupabase } from 'npm:@supabase/server@^1'
 
-Deno.serve(async (req) => {
-  try {
-    console.log(`wss://chrome.browserless.io?token=${Deno.env.get('PUPPETEER_BROWSERLESS_IO_KEY')}`)
-    // Visit browserless.io to get your free API token
-    const browser = await puppeteer.connect({
-      browserWSEndpoint: `wss://chrome.browserless.io?token=${Deno.env.get(
+// Authenticated endpoint, so deploy with verify_jwt = true.
+export default {
+  fetch: withSupabase({ auth: 'user' }, async (req) => {
+    try {
+      const browserWSEndpoint = `wss://chrome.browserless.io?token=${Deno.env.get(
         'PUPPETEER_BROWSERLESS_IO_KEY'
-      )}`,
-    })
-    const page = await browser.newPage()
+      )}`
+      // Visit browserless.io to get your free API token
+      const browser = await puppeteer.connect({
+        browserWSEndpoint,
+      })
+      const page = await browser.newPage()
 
-    const url = new URL(req.url).searchParams.get('url') || 'http://www.example.com'
+      const url = new URL(req.url).searchParams.get('url') || 'http://www.example.com'
 
-    await page.goto(url)
-    const screenshot = await page.screenshot()
+      await page.goto(url)
+      const screenshot = await page.screenshot()
 
-    return new Response(screenshot, {
-      headers: { 'Content-Type': 'image/png' },
-    })
-  } catch (e) {
-    console.error(e)
-    return new Response(JSON.stringify({ error: e.message }), {
-      headers: { 'Content-Type': 'application/json' },
-      status: 500,
-    })
-  }
-})
+      return new Response(screenshot as BodyInit, {
+        headers: { 'Content-Type': 'image/png' },
+      })
+    } catch (e) {
+      console.error(e)
+      return Response.json({ error: e.message }, { status: 500 })
+    }
+  }),
+}

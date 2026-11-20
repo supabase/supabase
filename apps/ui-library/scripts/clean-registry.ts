@@ -1,11 +1,18 @@
 import * as fs from 'fs'
 import * as path from 'path'
 
+import { normalizeVueRegistryFiles } from '../lib/registry-resolution'
+
 function processJsonFile(filePath: string) {
   try {
     // Read the file
     const content = fs.readFileSync(filePath, 'utf8')
     const json = JSON.parse(content)
+
+    // Normalize only after shadcn build has read the original package source files.
+    for (const item of Array.isArray(json.items) ? json.items : [json]) {
+      if (Array.isArray(item.files)) item.files = normalizeVueRegistryFiles(item.files)
+    }
 
     // Convert to string to do replacement
     let stringified = JSON.stringify(json, null, 2)
@@ -21,11 +28,37 @@ function processJsonFile(filePath: string) {
       // Replace the file origin path to exclude the monorepo structure
       .replaceAll('node_modules/@supabase/vue-blocks/', '')
 
+    // Blocks that combine() across all client variants hard-code the nextjs
+    // client path in their source. Rewrite that import per-variant so each
+    // generated artifact points at the client file it actually bundles.
+    const variantClientMap: Record<string, string> = {
+      react: 'react',
+      'react-router': 'react-router',
+      tanstack: 'tanstack',
+    }
+    const baseName = path.basename(filePath, '.json')
+    for (const [suffix, clientDir] of Object.entries(variantClientMap)) {
+      if (baseName.endsWith(`-${suffix}`)) {
+        stringified = stringified.replaceAll(
+          '@/registry/default/clients/nextjs/lib/supabase/client',
+          `@/registry/default/clients/${clientDir}/lib/supabase/client`
+        )
+        break
+      }
+    }
+
+    // Registry source routes are absent from this app's generated TanStack tree.
+    // Consumers generate their own tree, where this suppression would be unused.
+    stringified = stringified.replaceAll(
+      '// @ts-expect-error The local generated route tree does not include this block route.\\n',
+      ''
+    )
+
     // Write back to file
     fs.writeFileSync(filePath, stringified)
     console.log(`✓ Updated ${filePath}`)
   } catch (error) {
-    console.error(`Error processing ${filePath}:`, error)
+    throw new Error(`Unable to prepare registry artifact "${filePath}"`, { cause: error })
   }
 }
 

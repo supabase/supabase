@@ -175,15 +175,15 @@ Several team members now fit the “Design Engineer” description and it has en
 
 Just today we saw this tweet:
 
-<a href="https://x.com/soleio/status/1732082949670023373?s=20" target="_black" className="!m-0">
-  <figure className="max-w-md mx-auto !my-0">
+<a href="https://x.com/soleio/status/1732082949670023373?s=20" target="_black" className="m-0!">
+  <figure className="max-w-md mx-auto my-0!">
     ![something](/images/blog/lwx-how-design-works-at-supabase/soleio-tweet.png)
   </figure>
 </a>
 
 Today, this statement is true. But does it need to be? Can we update production from Figma? The answer is, yes; partly.
 
-At Supabase, we have a pipeline that exports [Figma variables](https://help.figma.com/hc/en-us/articles/15339657135383-Guide-to-variables-in-Figma) into [CSS custom properties](https://developer.mozilla.org/en-US/docs/Web/CSS/Using_CSS_custom_properties), used with TailwindCSS. What does this mean? Developing apps with TailwindCSS in the main monorepo uses the same color palette as our files in Figma.
+At Supabase, we have a pipeline that exports [Figma variables](https://help.figma.com/hc/en-us/articles/15339657135383-Guide-to-variables-in-Figma) into [CSS custom properties](https://developer.mozilla.org/en-US/docs/Web/CSS/Guides/Cascading_variables/Using_custom_properties), used with TailwindCSS. What does this mean? Developing apps with TailwindCSS in the main monorepo uses the same color palette as our files in Figma.
 
 Our Tailwind can now be used like this:
 

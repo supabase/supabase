@@ -1,16 +1,26 @@
-import type { PostgresTrigger } from '@supabase/postgres-meta'
-import { PermissionAction } from '@supabase/shared-types/out/constants'
-import { DatabaseZap, Search } from 'lucide-react'
+import { safeSql } from '@supabase/pg-meta'
+import { useQuery } from '@tanstack/react-query'
+import { DatabaseZapIcon, SearchIcon } from 'lucide-react'
 import { parseAsBoolean, parseAsJson, parseAsString, useQueryState } from 'nuqs'
-import { useEffect } from 'react'
+import { useEffect, useRef, useState } from 'react'
 import { toast } from 'sonner'
-import { Card, Input, Table, TableBody, TableHead, TableHeader, TableRow } from 'ui'
-import { EmptyStatePresentational } from 'ui-patterns'
+import {
+  Card,
+  InputGroup,
+  InputGroupAddon,
+  InputGroupInput,
+  Table,
+  TableBody,
+  TableHead,
+  TableHeader,
+  TableRow,
+} from 'ui'
+import { EmptyStatePresentational } from 'ui-patterns/EmptyStatePresentational'
 import { GenericSkeletonLoader } from 'ui-patterns/ShimmeringLoader'
 
 import { CreateTriggerButtons } from './CreateTriggerButtons'
 import { TriggerList } from './TriggerList'
-import { generateTriggerCreateSQL } from './TriggerList.utils'
+import { generateTriggerCreateSQL, type PostgresTrigger } from './TriggerList.utils'
 import { useIsInlineEditorEnabled } from '@/components/interfaces/Account/Preferences/useDashboardSettings'
 import { ProtectedSchemaWarning } from '@/components/interfaces/Database/ProtectedSchemaWarning'
 import { TriggerSheet } from '@/components/interfaces/Database/Triggers/TriggerSheet'
@@ -19,19 +29,24 @@ import {
   selectFilterSchema,
 } from '@/components/interfaces/Reports/v2/ReportsSelectFilter'
 import { SIDEBAR_KEYS } from '@/components/layouts/ProjectLayout/LayoutSidebar/LayoutSidebarProvider'
-import AlertError from '@/components/ui/AlertError'
+import { AlertError } from '@/components/ui/AlertError'
 import { DocsButton } from '@/components/ui/DocsButton'
-import SchemaSelector from '@/components/ui/SchemaSelector'
+import { NoPermission } from '@/components/ui/NoPermission'
+import { SchemaSelector } from '@/components/ui/SchemaSelector'
+import { Shortcut } from '@/components/ui/Shortcut'
 import { TextConfirmModal } from '@/components/ui/TextConfirmModalWrapper'
 import { useDatabaseTriggerDeleteMutation } from '@/data/database-triggers/database-trigger-delete-mutation'
-import { useDatabaseTriggersQuery } from '@/data/database-triggers/database-triggers-query'
+import { databaseTriggersQueryOptions } from '@/data/database-triggers/database-triggers-query'
 import { useTablesQuery } from '@/data/tables/tables-query'
-import { useAsyncCheckPermissions } from '@/hooks/misc/useCheckPermissions'
 import { useQuerySchemaState } from '@/hooks/misc/useSchemaQueryState'
 import { useSelectedProjectQuery } from '@/hooks/misc/useSelectedProject'
 import { useIsProtectedSchema, useProtectedSchemas } from '@/hooks/useProtectedSchemas'
 import { DOCS_URL } from '@/lib/constants'
+import { getWriteGrantToastMessage, useGrant } from '@/lib/grants'
+import { onSearchInputEscape } from '@/lib/keyboard'
 import { useEditorPanelStateSnapshot } from '@/state/editor-panel-state'
+import { SHORTCUT_IDS } from '@/state/shortcuts/registry'
+import { useShortcut } from '@/state/shortcuts/useShortcut'
 import { useSidebarManagerSnapshot } from '@/state/sidebar-manager-state'
 
 export const TriggersList = () => {
@@ -45,6 +60,9 @@ export const TriggersList = () => {
     parseAsJson(selectFilterSchema.parse).withDefault([])
   )
 
+  const [schemaSelectorOpen, setSchemaSelectorOpen] = useState(false)
+  const searchInputRef = useRef<HTMLInputElement>(null)
+
   const isInlineEditorEnabled = useIsInlineEditorEnabled()
   const {
     templates: editorPanelTemplates,
@@ -56,9 +74,21 @@ export const TriggersList = () => {
   const { data: protectedSchemas } = useProtectedSchemas()
   const { isSchemaLocked } = useIsProtectedSchema({ schema: selectedSchema })
 
+  const readGrant = useGrant(
+    'POST /platform/pg-meta/{ref}/query',
+    { projectRef: project?.ref },
+    { variant: 'read' }
+  )
+  const writeGrant = useGrant(
+    'POST /platform/pg-meta/{ref}/query',
+    { projectRef: project?.ref },
+    { variant: 'write' }
+  )
+
   const { data = [] } = useTablesQuery({
     projectRef: project?.ref,
     connectionString: project?.connectionString,
+    schema: selectedSchema,
   })
   const hasTables =
     data.filter((a) => !protectedSchemas.find((s) => s.name === a.schema)).length > 0
@@ -66,18 +96,20 @@ export const TriggersList = () => {
   const {
     data: triggers = [],
     error,
-    isPending,
+    isPending: isLoadingTriggers,
     isSuccess,
     isError,
-  } = useDatabaseTriggersQuery({
-    projectRef: project?.ref,
-    connectionString: project?.connectionString,
-  })
-
-  const { can: canCreateTriggers } = useAsyncCheckPermissions(
-    PermissionAction.TENANT_SQL_ADMIN_WRITE,
-    'triggers'
+  } = useQuery(
+    databaseTriggersQueryOptions({
+      projectRef: project?.ref,
+      connectionString: project?.connectionString,
+      grant: readGrant.grant,
+    })
   )
+  const isPending =
+    readGrant.status === 'loading' || (readGrant.status === 'granted' && isLoadingTriggers)
+
+  const canCreateTriggers = writeGrant.status === 'granted'
 
   const [showCreateTriggerForm, setShowCreateTriggerForm] = useQueryState(
     'new',
@@ -108,10 +140,12 @@ export const TriggersList = () => {
     setTriggerToDuplicate(null)
     if (isInlineEditorEnabled) {
       setEditorPanelInitialPrompt('Create a new database trigger that...')
-      setEditorPanelValue(`create trigger trigger_name
+      setEditorPanelValue(
+        safeSql`create trigger trigger_name
 after insert or update or delete on table_name
 for each row
-execute function function_name();`)
+execute function function_name();`
+      )
       if (editorPanelTemplates.length > 0) {
         setEditorPanelTemplates([])
       }
@@ -149,8 +183,12 @@ execute function function_name();`)
   const onDeleteTrigger = () => {
     if (!project) return console.error('Project is required')
     if (!triggerToDelete) return console.error('Trigger ID is required')
+    if (!writeGrant.grant) {
+      return toast.error(getWriteGrantToastMessage(writeGrant.status, 'delete', 'triggers'))
+    }
 
     deleteDatabaseTrigger({
+      grant: writeGrant.grant,
       projectRef: project.ref,
       connectionString: project.connectionString,
       trigger: triggerToDelete,
@@ -159,6 +197,30 @@ execute function function_name();`)
 
   const schemaTriggers = triggers.filter((x) => x.schema === selectedSchema)
   const tables = Array.from(new Set(schemaTriggers.map((x) => x.table))).sort()
+
+  const canAddTriggers = canCreateTriggers && !isSchemaLocked && hasTables
+
+  useShortcut(
+    SHORTCUT_IDS.LIST_PAGE_FOCUS_SEARCH,
+    () => {
+      searchInputRef.current?.focus()
+      searchInputRef.current?.select()
+    },
+    { label: 'Search triggers' }
+  )
+
+  useShortcut(
+    SHORTCUT_IDS.LIST_PAGE_NEW_ITEM,
+    () => {
+      createTrigger()
+    },
+    { enabled: canAddTriggers, label: 'Create new trigger' }
+  )
+
+  useShortcut(SHORTCUT_IDS.LIST_PAGE_RESET_FILTERS, () => {
+    setFilterString('')
+    setTablesFilter([])
+  })
 
   useEffect(() => {
     if (isSuccess && !!triggerIdToEdit && !triggerToEdit) {
@@ -181,6 +243,16 @@ execute function function_name();`)
     }
   }, [isSuccess, triggerIdToDelete, triggerToDelete, isSuccessDelete, setTriggerToDelete])
 
+  if (readGrant.status === 'denied') {
+    return <NoPermission resourceText="view database triggers" />
+  }
+
+  if (readGrant.status === 'error') {
+    return (
+      <AlertError error={readGrant.error} subject="Failed to check database triggers permissions" />
+    )
+  }
+
   if (isPending) {
     return <GenericSkeletonLoader />
   }
@@ -194,21 +266,35 @@ execute function function_name();`)
       <div className="space-y-4">
         <div className="flex flex-col lg:flex-row lg:items-center justify-between gap-2 flex-wrap">
           <div className="flex flex-col lg:flex-row lg:items-center gap-2 flex-wrap">
-            <SchemaSelector
-              className="w-full lg:w-[180px]"
-              size="tiny"
-              showError={false}
-              selectedSchemaName={selectedSchema}
-              onSelectSchema={setSelectedSchema}
-            />
-            <Input
-              placeholder="Search for a trigger"
-              size="tiny"
-              icon={<Search />}
-              value={filterString}
-              className="w-full lg:w-52"
-              onChange={(e) => setFilterString(e.target.value)}
-            />
+            <Shortcut
+              id={SHORTCUT_IDS.LIST_PAGE_FOCUS_SCHEMA}
+              onTrigger={() => setSchemaSelectorOpen(true)}
+              side="bottom"
+              tooltipOpen={schemaSelectorOpen ? false : undefined}
+            >
+              <SchemaSelector
+                className="w-full lg:w-[180px]"
+                size="tiny"
+                showError={false}
+                selectedSchemaName={selectedSchema}
+                onSelectSchema={setSelectedSchema}
+                open={schemaSelectorOpen}
+                onOpenChange={setSchemaSelectorOpen}
+              />
+            </Shortcut>
+            <InputGroup className="w-full lg:w-52">
+              <InputGroupInput
+                ref={searchInputRef}
+                size="tiny"
+                placeholder="Search for a trigger"
+                value={filterString}
+                onChange={(e) => setFilterString(e.target.value)}
+                onKeyDown={onSearchInputEscape(filterString, setFilterString)}
+              />
+              <InputGroupAddon>
+                <SearchIcon />
+              </InputGroupAddon>
+            </InputGroup>
             <ReportsSelectFilter
               label="Table"
               options={tables.map((type) => ({ label: type, value: type }))}
@@ -235,7 +321,7 @@ execute function function_name();`)
 
         {!isSchemaLocked && (schemaTriggers ?? []).length === 0 ? (
           <EmptyStatePresentational
-            icon={DatabaseZap}
+            icon={DatabaseZapIcon}
             title="Add your first trigger"
             description="Make your database reactive. Send updates in realtime, call edge functions, or validate data as it comes in."
           >

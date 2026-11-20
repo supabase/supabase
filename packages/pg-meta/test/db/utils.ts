@@ -1,5 +1,5 @@
 import { randomUUID } from 'crypto'
-import pg, { Pool } from 'pg'
+import pg, { Pool, type QueryResult } from 'pg'
 import { parse as parseArray } from 'postgres-array'
 
 // Those types override are in sync with `postgres-meta` since the queries
@@ -50,8 +50,15 @@ export async function createTestDatabase() {
       client: 'pg' as const,
       executeQuery: async <T = any>(query: string): Promise<T> => {
         try {
-          const res = await pool.query(query)
-          return res.rows as T
+          const res: QueryResult | QueryResult[] = await pool.query(query)
+          // node-pg resolves multi-statement queries with one result per
+          // statement. Mirror `postgres-meta`, which returns the rows of the
+          // last statement that produced any:
+          // https://github.com/supabase/postgres-meta/blob/master/src/lib/db.ts
+          const rows = Array.isArray(res)
+            ? (res.reverse().find((x) => x.rows.length !== 0)?.rows ?? [])
+            : res.rows
+          return rows as T
         } catch (error) {
           if (error instanceof Error) {
             throw new Error(`Failed to execute query: ${error.message}`)

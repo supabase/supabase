@@ -1,5 +1,4 @@
-import { PermissionAction } from '@supabase/shared-types/out/constants'
-import { Download } from 'lucide-react'
+import { DownloadIcon } from 'lucide-react'
 import { useState } from 'react'
 import { toast } from 'sonner'
 import { Button } from 'ui'
@@ -11,22 +10,21 @@ import {
   ScaffoldSectionContent,
   ScaffoldSectionDetail,
 } from '@/components/layouts/Scaffold'
-import NoPermission from '@/components/ui/NoPermission'
+import { NoPermission } from '@/components/ui/NoPermission'
 import { UpgradePlanButton } from '@/components/ui/UpgradePlanButton'
 import { getDocument } from '@/data/documents/document-query'
-import { useSendEventMutation } from '@/data/telemetry/send-event-mutation'
 import { useCheckEntitlements } from '@/hooks/misc/useCheckEntitlements'
-import { useAsyncCheckPermissions } from '@/hooks/misc/useCheckPermissions'
+import { FGA_PERMISSIONS, useAsyncCheckPermissionsV2 } from '@/hooks/misc/useCheckPermissionsV2'
 import { useSelectedOrganizationQuery } from '@/hooks/misc/useSelectedOrganization'
+import { useTrack } from '@/lib/telemetry/track'
 
 export const ISO27001 = () => {
   const { data: organization } = useSelectedOrganizationQuery()
   const slug = organization?.slug
 
-  const { mutate: sendEvent } = useSendEventMutation()
-  const { can: canReadSubscriptions, isLoading: isLoadingPermissions } = useAsyncCheckPermissions(
-    PermissionAction.BILLING_READ,
-    'stripe.subscriptions'
+  const track = useTrack()
+  const { can: canReadSubscriptions, isLoading: isLoadingPermissions } = useAsyncCheckPermissionsV2(
+    FGA_PERMISSIONS.ORGANIZATION.BILLING_READ
   )
   const { hasAccess: hasAccessToISO27001, isLoading: isLoadingEntitlement } = useCheckEntitlements(
     'security.iso27001_certificate'
@@ -48,11 +46,7 @@ export const ISO27001 = () => {
   const handleDownloadClick = () => {
     if (!slug) return
 
-    sendEvent({
-      action: 'document_view_button_clicked',
-      properties: { documentName: 'ISO27001' },
-      groups: { organization: slug },
-    })
+    track('document_view_button_clicked', { documentName: 'ISO27001' })
     setIsOpen(true)
   }
 
@@ -85,12 +79,7 @@ export const ISO27001 = () => {
           </div>
         ) : (
           <div className="@lg:flex items-center justify-center h-full">
-            <Button
-              type="default"
-              icon={<Download />}
-              onClick={handleDownloadClick}
-              disabled={!slug}
-            >
+            <Button icon={<DownloadIcon />} onClick={handleDownloadClick} disabled={!slug}>
               Download ISO 27001 Certificate
             </Button>
           </div>

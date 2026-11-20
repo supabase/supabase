@@ -36,7 +36,7 @@ Supabase has organizations and projects. An organization may contain multiple pr
 
 Many of you have expressed your confusion with per-project pricing, the number of invoices and the different ways to manage the subscription.
 
-With this change, we're moving subscriptions to the organization level. Each organization has a single subscription with a single plan (Free, Pro, Team or Enterprise). Project addons such as [compute upgrades](/docs/guides/platform/compute-add-ons), [custom domains](/docs/guides/platform/custom-domains) and [PITR](/docs/guides/platform/backups#point-in-time-recovery) are still configured per project and are added to your organization subscription.
+With this change, we're moving subscriptions to the organization level. Each organization has a single subscription with a single plan (Free, Pro, Team or Enterprise). Project addons such as [compute upgrades](/docs/guides/platform/compute-and-disk), [custom domains](/docs/guides/platform/custom-domains) and [PITR](/docs/guides/platform/backups#point-in-time-recovery) are still configured per project and are added to your organization subscription.
 
 ![org_billing_after.png](/images/blog/2023-08-31-org-billing/org-billing-after.png)
 
@@ -68,7 +68,7 @@ Most importantly, there is only one change that affects the Free Plan: you recei
 | Realtime Peak Connections | 200                              | 200                                          |
 |                           | 2 free projects                  | 2 "free orgs"<br />(1 free database per org) |
 
-We're giving you an extra 1GB of egress for free and, as an added benefit, it's unified across your org. This means that if you aren't using Supabase Storage, you get even more Database Egress.
+We're giving you an extra 1GB of egress for free and, as an added benefit, it's unified across your org. This means that if you aren't using [Supabase Storage](/docs/guides/storage), you get even more Database Egress.
 
 If you are currently running 2 free projects however, **this does require some work from you**. Because we are now working on an Org-level, instead of Projects, you will need to:
 
@@ -79,7 +79,7 @@ This should be done before the end of October, but don't worry - we'll give you 
 
 ## No more upfront payments for databases
 
-Currently, plans include one Micro Compute instance. When you upgrade the [Compute Add-On](https://supabase.com/docs/guides/platform/compute-add-ons), you immediately prepay the prorated amount (days remaining in your current billing cycle), and then pay upfront for the entire month when your billing cycle resets. When you downgrade, you get the appropriate credits for unused time.
+Currently, plans include one Micro Compute instance. When you upgrade the [Compute Add-On](https://supabase.com/docs/guides/platform/compute-and-disk), you immediately prepay the prorated amount (days remaining in your current billing cycle), and then pay upfront for the entire month when your billing cycle resets. When you downgrade, you get the appropriate credits for unused time.
 
 Full-month upfront payments are annoying, especially when you just want to do a temporary upgrade. We've heard your feedback and are moving billing for compute to hourly usage.
 

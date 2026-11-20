@@ -1,0 +1,11 @@
+{
+  "excludeCategories": ["Initializing"],
+  "excludeDefinitions": ["constructor"],
+  "categoryOrder": ["Database", "Auth", "Edge Functions", "Realtime", "Storage"],
+  "partialsOrder": ["introduction", "installing", "initializing", "typescript-support"],
+  "navigationPrefixes": {
+    "Database": false,
+    "Realtime": false,
+    "Edge Functions": "functions"
+  }
+}

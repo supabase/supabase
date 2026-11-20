@@ -1,14 +1,16 @@
+import { safeSql } from '@supabase/pg-meta'
 import { Query } from '@supabase/pg-meta/src/query'
 import { useQuery } from '@tanstack/react-query'
 
 import { vaultSecretsKeys } from './keys'
-import { executeSql } from '@/data/sql/execute-sql-query'
+import { unguarded } from '@/data/fetchers'
+import { executeSql } from '@/data/sql/execute-sql-mutation'
 import { UseCustomQueryOptions } from '@/types'
 
 const vaultSecretDecryptedValueQuery = (id: string) => {
   const sql = new Query()
     .from('decrypted_secrets', 'vault')
-    .select('decrypted_secret')
+    .select(safeSql`decrypted_secret`)
     .match({ id })
     .toSql()
 
@@ -18,7 +20,7 @@ const vaultSecretDecryptedValueQuery = (id: string) => {
 const vaultSecretDecryptedValuesQuery = (ids: string[]) => {
   const sql = new Query()
     .from('decrypted_secrets', 'vault')
-    .select('id,decrypted_secret')
+    .select(safeSql`id,decrypted_secret`)
     .filter('id', 'in', ids)
     .toSql()
 
@@ -42,8 +44,11 @@ export const getDecryptedValue = async (
     {
       projectRef,
       connectionString,
+      sqlOrigin: 'studio',
+      queryName: 'vault-secret-decrypted-value',
       sql,
       queryKey: vaultSecretsKeys.getDecryptedValue(projectRef, id),
+      grant: unguarded.migrating,
     },
     signal
   )
@@ -72,8 +77,6 @@ export const useVaultSecretDecryptedValueQuery = <TData = string>(
   })
 
 // [Joshen] Considering to consolidate fetching single and multiple decrypted values by just passing in a string array
-// This is currently used in ImportForeignSchemaDialog, but reckon EditWrapperSheet can use this too to replace the useEffect on L153
-// which fetches all the decrypted secrets
 export const getDecryptedValues = async (
   {
     projectRef,
@@ -88,7 +91,15 @@ export const getDecryptedValues = async (
 ) => {
   const sql = vaultSecretDecryptedValuesQuery(ids)
   const { result } = await executeSql<{ id: string; decrypted_secret: string }[]>(
-    { projectRef, connectionString, sql },
+    {
+      projectRef,
+      connectionString,
+      sql,
+      sqlOrigin: 'studio',
+      queryName: 'decrypt-secret',
+      queryKey: ['decrypt-secret'],
+      grant: unguarded.migrating,
+    },
     signal
   )
   return result.reduce(

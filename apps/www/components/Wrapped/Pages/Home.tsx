@@ -1,9 +1,10 @@
 'use client'
 
-import { AnimatePresence, motion } from 'framer-motion'
+import { useBreakpoint } from 'common'
+import { AnimatePresence, motion } from 'motion/react'
 import { useEffect, useRef, useState } from 'react'
 import { cn } from 'ui'
-import { useBreakpoint } from 'common'
+
 import { AnimatedGridBackground } from '../AnimatedGridBackground'
 
 const stats = [
@@ -175,7 +176,7 @@ function FloatingStatBubbles() {
         <motion.div
           key={bubble.id}
           className={cn(
-            'absolute pointer-events-none px-3 py-2 bg-surface-100 border rounded-lg shadow-sm'
+            'absolute pointer-events-none px-3 py-2 bg-surface-100 border rounded-lg shadow-xs'
           )}
           style={{
             top: `${bubble.top}%`,
@@ -193,7 +194,7 @@ function FloatingStatBubbles() {
             },
           }}
         >
-          <p className="text-sm font-mono font-medium text-brand-link dark:text-brand whitespace-nowrap">
+          <p className="text-sm font-mono font-medium text-primary whitespace-nowrap">
             {bubble.stat.value}
           </p>
           <p className="text-xs text-foreground-light whitespace-nowrap">{bubble.stat.label}</p>
@@ -205,7 +206,7 @@ function FloatingStatBubbles() {
 
 export function Home() {
   return (
-    <div className="h-[calc(100dvh-64px)] flex flex-col max-w-[60rem] mx-auto w-[95%] md:w-full">
+    <div className="h-[calc(100dvh-64px)] flex flex-col max-w-240 mx-auto w-[95%] md:w-full">
       <section className="relative border-x border-b h-full">
         {/* Grid background */}
         <AnimatedGridBackground

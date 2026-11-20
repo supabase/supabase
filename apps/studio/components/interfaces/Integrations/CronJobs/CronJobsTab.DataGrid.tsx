@@ -1,23 +1,25 @@
-import { type MouseEvent, type UIEvent } from 'react'
-import DataGrid, { Row, type Column } from 'react-data-grid'
+import { type MouseEvent, type RefObject, type UIEvent } from 'react'
+import DataGrid, { Row, type Column, type DataGridHandle } from 'react-data-grid'
 import { cn } from 'ui'
 import { GenericSkeletonLoader } from 'ui-patterns/ShimmeringLoader'
 
-import AlertError from '@/components/ui/AlertError'
+import { AlertError } from '@/components/ui/AlertError'
 import type { CronJob } from '@/data/database-cron-jobs/database-cron-jobs-infinite-query'
-import type { ResponseError } from '@/types'
+import type { StudioError } from '@/lib/errors/studio-errors'
 
 interface CronJobsTabDataGridProps {
+  gridRef: RefObject<DataGridHandle | null>
   columns: readonly Column<CronJob>[]
   rows: CronJob[]
   isLoading: boolean
-  error: ResponseError | Error | null
+  error: StudioError | Error | null
   searchQuery?: string | null
   onScroll: (event: UIEvent<HTMLDivElement>) => void
   onRowClick: (row: CronJob, event: MouseEvent<HTMLDivElement>) => void
 }
 
 export const CronJobsTabDataGrid = ({
+  gridRef,
   columns,
   rows,
   isLoading,
@@ -51,7 +53,8 @@ export const CronJobsTabDataGrid = ({
 
   return (
     <DataGrid
-      className="grow border-t-0"
+      ref={gridRef}
+      className="grow border-t-0! border-b-0!"
       rowHeight={44}
       headerRowHeight={36}
       columns={columns}
@@ -61,7 +64,7 @@ export const CronJobsTabDataGrid = ({
       rowClass={() => {
         return cn(
           'cursor-pointer',
-          '[&>.rdg-cell]:border-box [&>.rdg-cell]:outline-none [&>.rdg-cell]:shadow-none',
+          '[&>.rdg-cell]:border-box [&>.rdg-cell]:outline-hidden [&>.rdg-cell]:shadow-none',
           '[&>.rdg-cell:first-child>div]:ml-8'
         )
       }}

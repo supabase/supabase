@@ -2,8 +2,7 @@
 
 import { cva, type VariantProps } from 'class-variance-authority'
 import React, { createContext, useContext } from 'react'
-import { cn } from 'ui'
-import { Breadcrumb } from 'ui/src/components/shadcn/ui/breadcrumb'
+import { Breadcrumb, cn } from 'ui'
 
 import { PageContainer } from '../PageContainer'
 
@@ -76,6 +75,9 @@ export type PageHeaderBreadcrumbProps = React.ComponentProps<typeof Breadcrumb>
  * Breadcrumb component for page header.
  * A wrapper around Breadcrumb with page header styling.
  * Should be placed as the first child of PageHeader.
+ *
+ * @deprecated Prefer PageBreadcrumbs as a sibling above PageHeader.
+ * See /design-system/docs/fragments/page-breadcrumbs
  */
 const PageHeaderBreadcrumb = ({ className, children, ...props }: PageHeaderBreadcrumbProps) => {
   const { size } = usePageHeaderContext()
@@ -187,7 +189,8 @@ export type PageHeaderMetaProps = React.ComponentProps<'div'>
 /**
  * Meta wrapper for page header.
  * Contains icon, summary, and aside components with proper layout.
- * Should be placed after PageHeaderBreadcrumb (if present) and before PageHeaderNavigationTabs.
+ * Place as a child of PageHeader. Prefer PageBreadcrumbs and PageNav as siblings for
+ * breadcrumbs and sub-navigation rather than the deprecated in-header slots.
  * Uses CSS to style children based on their data-slot attributes.
  */
 const PageHeaderMeta = ({ className, children, ...props }: PageHeaderMetaProps) => {
@@ -198,8 +201,8 @@ const PageHeaderMeta = ({ className, children, ...props }: PageHeaderMetaProps) 
         data-slot="page-header-meta"
         className={cn(
           'flex flex-col @xl:flex-row @xl:justify-between @xl:items-center gap-4',
-          '[&>[data-slot="page-header-icon"]]:shrink-0',
-          '[&>[data-slot="page-header-summary"]]:flex-1',
+          '*:data-[slot="page-header-icon"]:shrink-0',
+          '*:data-[slot="page-header-summary"]:flex-1',
           className
         )}
         {...props}
@@ -243,6 +246,9 @@ export type PageHeaderNavigationTabsProps = React.ComponentProps<'div'>
  * Navigation component for page header.
  * Container for tab navigation (NavMenu).
  * Should be placed as the last child of PageHeader.
+ *
+ * @deprecated Prefer PageNav wrapping NavMenu as a sibling outside PageHeader.
+ * See /design-system/docs/fragments/page-nav
  */
 const PageHeaderNavigationTabs = ({ className, ...props }: PageHeaderNavigationTabsProps) => {
   const { size } = usePageHeaderContext()
@@ -266,7 +272,10 @@ export type PageHeaderProps = PageHeaderRootProps
 
 /**
  * Page header root component.
- * Use PageHeader, PageHeaderBreadcrumb, PageHeaderMeta, PageHeaderIcon, etc.
+ * Use PageHeader with PageHeaderMeta, PageHeaderIcon, PageHeaderSummary, PageHeaderTitle,
+ * PageHeaderDescription, and PageHeaderAside. Prefer PageBreadcrumbs and PageNav as siblings
+ * for breadcrumbs and sub-navigation.
+ * See /design-system/docs/ui-patterns/layout
  */
 export {
   PageHeaderRoot as PageHeader,

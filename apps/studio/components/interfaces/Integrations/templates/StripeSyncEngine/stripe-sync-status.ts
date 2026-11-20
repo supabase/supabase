@@ -1,4 +1,4 @@
-import { SchemaInstallationStatus, StripeSchemaComment } from 'stripe-experiment-sync/supabase'
+import { SchemaInstallationStatus, StripeSchemaComment } from '@stripe/sync-engine/supabase'
 
 import type {
   StripeSyncState,
@@ -46,10 +46,6 @@ export function hasUninstallError(status: SchemaInstallationStatus): boolean {
   return status === 'uninstall error'
 }
 
-export function hasError(status: SchemaInstallationStatus): boolean {
-  return hasInstallError(status) || hasUninstallError(status)
-}
-
 export function isInstalling(status: SchemaInstallationStatus): boolean {
   return status === 'installing'
 }
@@ -68,10 +64,6 @@ export function isInstallDone(status: SchemaInstallationStatus): boolean {
 
 export function isUninstallDone(status: SchemaInstallationStatus): boolean {
   return isUninstalled(status) || hasUninstallError(status)
-}
-
-export function canInstall(status: SchemaInstallationStatus): boolean {
-  return isUninstalled(status) || hasError(status)
 }
 
 export function isSyncRunning(syncState: StripeSyncStateData | undefined): boolean {

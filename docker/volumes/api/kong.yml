@@ -77,6 +77,26 @@ services:
           - /auth/v1/.well-known/jwks.json
     plugins:
       - name: cors
+  - name: auth-v1-open-well-known-oauth
+    _comment: 'Auth: /auth/v1/.well-known/oauth-authorization-server -> http://auth:9999/.well-known/oauth-authorization-server'
+    url: http://auth:9999/.well-known/oauth-authorization-server
+    routes:
+      - name: auth-v1-open-well-known-oauth
+        strip_path: true
+        paths:
+          - /auth/v1/.well-known/oauth-authorization-server
+    plugins:
+      - name: cors
+  - name: auth-v1-open-well-known-openid
+    _comment: 'Auth: /auth/v1/.well-known/openid-configuration -> http://auth:9999/.well-known/openid-configuration'
+    url: http://auth:9999/.well-known/openid-configuration
+    routes:
+      - name: auth-v1-open-well-known-openid
+        strip_path: true
+        paths:
+          - /auth/v1/.well-known/openid-configuration
+    plugins:
+      - name: cors
 
   - name: auth-v1-open-sso-acs
     url: "http://auth:9999/sso/saml/acs"
@@ -84,19 +104,37 @@ services:
       - name: auth-v1-open-sso-acs
         strip_path: true
         paths:
-        - /sso/saml/acs
+        - /auth/v1/sso/saml/acs
     plugins:
       - name: cors
-      
+
   - name: auth-v1-open-sso-metadata
     url: "http://auth:9999/sso/saml/metadata"
     routes:
       - name: auth-v1-open-sso-metadata
         strip_path: true
         paths:
-        - /sso/saml/metadata
+        - /auth/v1/sso/saml/metadata
     plugins:
       - name: cors
+
+  ## OAuth 2.1 server endpoints that third-party clients call without an
+  ## API key. The consent endpoints (/oauth/authorizations/...) stay on the
+  ## secure auth-v1 route.
+  - name: auth-v1-open-oauth
+    _comment: 'Auth: /auth/v1/oauth/{authorize,clients/register,token,userinfo} -> http://auth:9999/oauth/*'
+    url: http://auth:9999/
+    routes:
+      - name: auth-v1-open-oauth
+        strip_path: false
+        paths:
+          - /auth/v1/oauth/(?<endpoint>authorize|clients/register|token|userinfo)$
+    plugins:
+      - name: cors
+      - name: request-transformer
+        config:
+          replace:
+            uri: /oauth/$(uri_captures.endpoint)
 
   ## Secure Auth routes
   - name: auth-v1
@@ -127,6 +165,33 @@ services:
             - admin
             - anon
 
+  ## OpenAPI root - admin only
+  - name: rest-v1-openapi
+    _comment: 'PostgREST OpenAPI root: /rest/v1/ -> <http://rest:3000/> (admin only). See <https://github.com/orgs/supabase/discussions/42949>'
+    url: http://rest:3000/
+    routes:
+      - name: rest-v1-openapi-root
+        strip_path: true
+        expression: 'http.path == "/rest/v1/"'
+    plugins:
+      - name: cors
+      - name: key-auth
+        config:
+          hide_credentials: false
+      - name: request-transformer
+        config:
+          add:
+            headers:
+              - "Authorization: $LUA_AUTH_EXPR"
+          replace:
+            headers:
+              - "Authorization: $LUA_AUTH_EXPR"
+      - name: acl
+        config:
+          hide_groups_header: true
+          allow:
+            - admin
+
   ## Secure PostgREST routes
   - name: rest-v1
     _comment: 'PostgREST: /rest/v1/* -> http://rest:3000/*'
@@ -155,6 +220,21 @@ services:
           allow:
             - admin
             - anon
+      # Sandboxes responses, since Studio shares this origin: a document opened
+      # from these routes can't run script or submit forms. Subresources (<img>,
+      # fetch, downloads) ignore the policy. media-src 'self' lets the browser's player
+      # load audio and video opened directly, and style-src 'unsafe-inline' keeps
+      # inline styles in SVG files. `&sandbox_response` is a YAML anchor:
+      # the storage-v1 and functions-v1 services below reuse this same Lua code
+      # through the `*sandbox_response` alias, which YAML expands into a copy.
+      - name: post-function
+        config:
+          header_filter:
+            - &sandbox_response |
+              kong.response.set_header(
+                "Content-Security-Policy",
+                "default-src 'none'; media-src 'self'; style-src 'unsafe-inline'; sandbox"
+              )
 
   ## Secure GraphQL routes
   - name: graphql-v1
@@ -216,6 +296,38 @@ services:
             - admin
             - anon
 
+  # Block access to /realtime/v1/api/openapi
+  - name: realtime-v1-rest-openapi
+    _comment: 'Realtime: /realtime/v1/api/openapi/* -> http://realtime:4000/api/openapi/* (blocked)'
+    url: http://realtime-dev.supabase-realtime:4000/api/openapi
+    protocol: http
+    routes:
+      - name: realtime-v1-rest-openapi
+        strip_path: true
+        paths:
+          - /realtime/v1/api/openapi
+    plugins:
+      - name: request-termination
+        config:
+          status_code: 403
+          message: "Access is forbidden."
+
+  # Block access to /realtime/v1/api/tenants
+  - name: realtime-v1-rest-tenants
+    _comment: 'Realtime: /realtime/v1/api/tenants/* -> http://realtime:4000/api/tenants/* (blocked)'
+    url: http://realtime-dev.supabase-realtime:4000/api/tenants
+    protocol: http
+    routes:
+      - name: realtime-v1-rest-tenants
+        strip_path: true
+        paths:
+          - /realtime/v1/api/tenants
+    plugins:
+      - name: request-termination
+        config:
+          status_code: 403
+          message: "Access is forbidden."
+
   - name: realtime-v1-rest
     _comment: 'Realtime: /realtime/v1/api/* -> http://realtime:4000/api/*'
     url: http://realtime-dev.supabase-realtime:4000/api
@@ -246,7 +358,7 @@ services:
             - anon
 
   ## Storage API endpoint (with Authorization header transformation).
-  ## No key-auth — S3 protocol requests don't carry an apikey header.
+  ## No key-auth - S3 protocol requests don't carry an apikey header.
   ##
   ## The request-transformer translates opaque API keys to asymmetric JWTs
   ## and passes through existing Authorization headers (user JWTs, AWS SigV4).
@@ -280,29 +392,69 @@ services:
               if auth == nil or auth == "" or auth:find("^%s*$") then
                 kong.service.request.clear_header("authorization")
               end
+          header_filter:
+            # Same Lua code as the rest-v1 service (YAML alias of `&sandbox_response`)
+            - *sandbox_response
 
   ## Edge Functions routes
+  ##
+  ## Functions header handling: opaque sb_ keys are translated to the pre-signed
+  ## internal asymmetric JWT and injected as a raw `sb-api-key` header (no
+  ## `Bearer` prefix), while `Authorization` is left untouched so user-session
+  ## JWTs and legacy bearers flow through to the runtime.
+  ##
+  ## No `key-auth`: Functions is a passthrough that does NOT validate keys. Kong
+  ## cannot reject an invalid key while still letting unauthenticated requests
+  ## through (key-auth's `anonymous` fallback accepts missing AND invalid keys
+  ## alike), so unknown/invalid keys simply pass to the runtime, which handles
+  ## verify_jwt itself.
+  ##
+  ## The request-transformer strips any client-supplied `sb-api-key` (anti-spoof)
+  ## and re-adds the translated value; on no match the Lua expression yields nil
+  ## (an empty header) which the post-function then removes.
+  ##
+  ## No `cors`: functions handle CORS themselves, as on the platform. Preflights
+  ## reach the function and its responses pass through unchanged.
   - name: functions-v1
     _comment: 'Edge Functions: /functions/v1/* -> http://functions:9000/*'
     url: http://functions:9000/
-    read_timeout: 150000
+    # Limit inactivity between reads, leaving 10s for the runtime's 150s idle timeout.
+    read_timeout: 160000
     routes:
       - name: functions-v1-all
         strip_path: true
         paths:
           - /functions/v1/
     plugins:
-      - name: cors
+      - name: request-transformer
+        config:
+          remove:
+            headers:
+              - "sb-api-key"
+          add:
+            headers:
+              - "sb-api-key:$LUA_FUNCTIONS_EXPR"
+      - name: post-function
+        config:
+          access:
+            - |
+              local v = kong.request.get_header("sb-api-key")
+              if v == nil or v == "" or v:find("^%s*$") then
+                kong.service.request.clear_header("sb-api-key")
+              end
+          header_filter:
+            # Same Lua code as the rest-v1 service (YAML alias of `&sandbox_response`)
+            - *sandbox_response
 
   ## OAuth 2.0 Authorization Server Metadata (RFC 8414)
   - name: well-known-oauth
-    _comment: 'Auth: /.well-known/oauth-authorization-server -> http://auth:9999/.well-known/oauth-authorization-server'
+    _comment: 'Auth: /.well-known/oauth-authorization-server/auth/v1 -> http://auth:9999/.well-known/oauth-authorization-server'
     url: http://auth:9999/.well-known/oauth-authorization-server
     routes:
       - name: well-known-oauth
         strip_path: true
         paths:
-          - /.well-known/oauth-authorization-server
+          - /.well-known/oauth-authorization-server/auth/v1
     plugins:
       - name: cors
 
@@ -384,7 +536,6 @@ services:
       # 1. Comment out the 'request-termination' section above
       # 2. Uncomment the entire section below, including 'deny'
       # 3. Add your local IPs to the 'allow' list
-      #- name: cors
       #- name: ip-restriction
       #  config:
       #    allow:
@@ -393,6 +544,7 @@ services:
       #    deny: []
 
   ## Protected Dashboard - catch all remaining routes
+  ## No cors plugin: only Studio's own pages call these routes, from the same origin.
   - name: dashboard
     _comment: 'Studio: /* -> http://studio:3000/*'
     url: http://studio:3000/
@@ -402,7 +554,6 @@ services:
         paths:
           - /
     plugins:
-      - name: cors
       - name: basic-auth
         config:
           hide_credentials: true

@@ -128,7 +128,7 @@ export function TableIndexAdvisorProvider({
     <TableIndexAdvisorContext.Provider value={value}>
       {children}
       <Sheet open={isSheetOpen} onOpenChange={(open) => !open && closeSheet()}>
-        <SheetContent className="flex flex-col gap-0 p-0 lg:!w-[calc(100vw-802px)] max-w-[700px]">
+        <SheetContent className="flex flex-col gap-0 p-0 lg:w-[calc(100vw-802px)]! max-w-[700px]">
           <SheetHeader className="border-b px-5 py-3">
             <SheetTitle>Index Recommendation</SheetTitle>
           </SheetHeader>

@@ -1,13 +1,19 @@
 import dayjs from 'dayjs'
 
-import { type BaseQueries, type PresetConfig, type ReportQuery } from './Reports.types'
+import {
+  type BaseQueries,
+  type PresetConfig,
+  type ReportFilterItem,
+  type ReportQuery,
+} from './Reports.types'
 import {
   isUnixMicro,
   unixMicroToIsoTimestamp,
 } from '@/components/interfaces/Settings/Logs/Logs.utils'
-import { REPORT_STATUS_CODE_COLORS } from '@/data/reports/report.utils'
+import type { SafeLogSqlFragment } from '@/data/logs/safe-analytics-sql'
+import { REPORT_STATUS_CODE_COLORS, type Granularity } from '@/data/reports/report.utils'
 import useDbQuery, { DbQueryHook } from '@/hooks/analytics/useDbQuery'
-import useLogsQuery, { LogsQueryHook } from '@/hooks/analytics/useLogsQuery'
+import { useLogsQuery, type LogsQueryHook } from '@/hooks/analytics/useLogsQuery'
 import { getHttpStatusCodeInfo } from '@/lib/http-status-codes'
 
 /**
@@ -15,6 +21,21 @@ import { getHttpStatusCodeInfo } from '@/lib/http-status-codes'
  */
 export const queryParamsToObject = (params: string) => {
   return Object.fromEntries(new URLSearchParams(params))
+}
+
+/**
+ * Decodes a URI component, returning the original string if it is malformed.
+ *
+ * `decodeURIComponent` throws a `URIError` on invalid percent-encoding (e.g. a
+ * literal `%` such as `?discount=100%`). Request paths are user-controlled, so
+ * decoding inline during render can crash the page.
+ */
+export const safeDecodeURIComponent = (value: string) => {
+  try {
+    return decodeURIComponent(value)
+  } catch {
+    return value
+  }
 }
 
 export type PresetHookResult = LogsQueryHook | DbQueryHook
@@ -26,25 +47,43 @@ type PresetHooks = Record<keyof PresetConfig['queries'], () => PresetHookResult>
  */
 export const queriesFactory = <T extends string>(
   queries: BaseQueries<T>,
-  projectRef: string
+  projectRef?: string,
+  useOtel = false,
+  enabled = true
 ): PresetHooks => {
-  const hooks: PresetHooks = Object.entries<ReportQuery>(queries).reduce(
-    (acc, [k, { sql, queryType }]) => {
-      if (queryType === 'db') {
-        return {
-          ...acc,
-          [k]: () => useDbQuery({ sql }),
-        }
-      } else {
-        return {
-          ...acc,
-          [k]: () => useLogsQuery(projectRef),
-        }
+  const hooks: PresetHooks = Object.entries<ReportQuery>(queries).reduce((acc, [k, query]) => {
+    if (query.queryType === 'db') {
+      return {
+        ...acc,
+        [k]: () =>
+          useDbQuery({ sql: query.safeSql, sqlOrigin: 'studio', queryName: 'report-db-query' }),
       }
-    },
-    {}
-  )
+    } else {
+      return {
+        ...acc,
+        [k]: () => useLogsQuery({ projectRef, enabled, options: { useOtel } }),
+      }
+    }
+  }, {})
   return hooks
+}
+
+export function getLogsSql(
+  query: ReportQuery,
+  filters: ReportFilterItem[],
+  useOtel = false,
+  granularity?: Granularity
+): SafeLogSqlFragment {
+  if (query.queryType !== 'logs') {
+    throw new Error(`Expected logs query, got ${query.queryType}`)
+  }
+  if (useOtel) {
+    if (query.safeSqlOtel === undefined) {
+      throw new Error('Expected an OTEL logs query')
+    }
+    return query.safeSqlOtel(filters, granularity)
+  }
+  return query.safeSql(filters)
 }
 
 /**
@@ -129,6 +168,26 @@ export function transformStatusCodeData(data: any[], statusCodes: string[]) {
   }, {})
 
   return Object.values(pivotedData)
+}
+
+/**
+ * Sums pivoted status code rows ({ timestamp, [status_code]: count }) into the
+ * warning (4xx) and error (5xx) counts shown in chart headers. Other codes only
+ * count towards the chart's total.
+ */
+export function getStatusClassCounts(rows: Record<string, unknown>[]) {
+  let warnings = 0
+  let errors = 0
+
+  for (const row of rows) {
+    for (const [key, value] of Object.entries(row)) {
+      if (typeof value !== 'number' || !/^\d{3}$/.test(key)) continue
+      if (key.startsWith('4')) warnings += value
+      else if (key.startsWith('5')) errors += value
+    }
+  }
+
+  return { warnings, errors }
 }
 
 /**

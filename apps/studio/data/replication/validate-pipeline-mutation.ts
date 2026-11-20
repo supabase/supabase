@@ -1,8 +1,11 @@
 import { useMutation } from '@tanstack/react-query'
 import { components } from 'api-types'
 
+import { type TableSyncCopyConfig } from './types'
+import { buildPipelineApiConfig } from './utils'
 import { handleError, post } from '@/data/fetchers'
-import type { ResponseError, UseCustomMutationOptions } from '@/types'
+import type { StudioError } from '@/lib/errors/studio-errors'
+import type { UseCustomMutationOptions } from '@/types'
 
 type ValidatePipelineParams = {
   projectRef: string
@@ -12,8 +15,9 @@ type ValidatePipelineParams = {
   maxTableSyncWorkers?: number
   maxCopyConnectionsPerTable?: number
   invalidatedSlotBehavior?: 'error' | 'recreate'
+  tableSyncCopy: TableSyncCopyConfig
 }
-type ValidatePipelineResponse = components['schemas']['ValidatePipelineResponse']
+type ValidatePipelineResponse = components['schemas']['ValidatePipelineResponse_Output']
 
 async function validatePipeline(
   {
@@ -24,44 +28,42 @@ async function validatePipeline(
     maxTableSyncWorkers,
     maxCopyConnectionsPerTable,
     invalidatedSlotBehavior,
+    tableSyncCopy,
   }: ValidatePipelineParams,
   signal?: AbortSignal
 ): Promise<ValidatePipelineResponse> {
   if (!projectRef) throw new Error('projectRef is required')
   if (!sourceId) throw new Error('sourceId is required')
 
-  const batchConfig = maxFillMs !== undefined ? { max_fill_ms: maxFillMs } : undefined
-
-  const config = {
-    publication_name: publicationName,
-    max_table_sync_workers: maxTableSyncWorkers,
-    max_copy_connections_per_table: maxCopyConnectionsPerTable,
-    invalidated_slot_behavior: invalidatedSlotBehavior,
-    batch: batchConfig,
-  }
-
   const { data, error } = await post('/platform/replication/{ref}/pipelines/validate', {
     params: { path: { ref: projectRef } },
     body: {
       source_id: sourceId,
-      config: config as components['schemas']['ValidateReplicationPipelineBody']['config'],
+      config: buildPipelineApiConfig({
+        publicationName,
+        maxTableSyncWorkers,
+        maxCopyConnectionsPerTable,
+        invalidatedSlotBehavior,
+        tableSyncCopy,
+        batch: maxFillMs === undefined ? undefined : { maxFillMs },
+      }),
     },
     signal,
   })
 
   if (error) handleError(error)
-  return data as ValidatePipelineResponse
+  return data
 }
 
 type ValidatePipelineData = Awaited<ReturnType<typeof validatePipeline>>
 
 export const useValidatePipelineMutation = (
   options?: Omit<
-    UseCustomMutationOptions<ValidatePipelineData, ResponseError, ValidatePipelineParams>,
+    UseCustomMutationOptions<ValidatePipelineData, StudioError, ValidatePipelineParams>,
     'mutationFn'
   >
 ) => {
-  return useMutation<ValidatePipelineData, ResponseError, ValidatePipelineParams>({
+  return useMutation<ValidatePipelineData, StudioError, ValidatePipelineParams>({
     mutationFn: (vars) => validatePipeline(vars),
     ...options,
   })

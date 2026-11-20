@@ -16,7 +16,7 @@ Some of the components have the `_Shadcn_` suffix. These components should be pr
 
 ```tsx
 // deep object merge (used for themes)
-import { clipboard, cn, mergeDeep } from 'ui' // clsx + tailwind-merge
+import { clipboard, cn, mergeDeep } from 'ui' // Tailwind class merging (shadcn-ui/cn)
 
 // copy-to-clipboard helper
 ```
@@ -24,5 +24,15 @@ import { clipboard, cn, mergeDeep } from 'ui' // clsx + tailwind-merge
 ## Styling conventions
 
 - Tailwind only — no inline styles or CSS modules.
-- Use semantic tokens (`bg-muted`, `text-foreground-light`, `border-default`) rather than hardcoded colors.
+- Prefer shadcn semantic pairs (`bg-card text-card-foreground`, `bg-muted text-muted-foreground`,
+  `bg-tertiary text-tertiary-foreground`) over hardcoded colors. Legacy utilities such as
+  `text-foreground-light` and `border-default` are compatibility aliases only.
+- Control surface roles (`bg-field`, `bg-control-raised`, `border-control-hover`; CSS
+  `--control` aliases raised) live in [`build/css/source/semantic.css`](./build/css/source/semantic.css).
+  Prefer those over inventing fills. Legacy `bg-control` is still the accent wash alias.
+- Themes set the core `--hue` (or the split `--surface-hue` / `--primary-hue`), `--chroma`,
+  `--surface`, `--foreground-lightness`, and `--contrast` inputs, plus their
+  `--muted-foreground-level` and `--tertiary-foreground-level` hierarchy.
+  Semantic colors are derived from them in OKLCH; `--contrast: 1` is the baseline and the supported
+  adjustment range is `0.75` to `1.25`.
 - The workspace root owns the actual `tailwind.config.js`. The file in this package is a stub for IntelliSense only.

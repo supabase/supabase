@@ -1,4 +1,4 @@
-import { Admonition } from 'ui-patterns'
+import { Admonition } from 'ui-patterns/Admonition'
 
 import { DeleteOrganizationButton } from './DeleteOrganizationButton'
 import PartnerManagedResource from '@/components/ui/PartnerManagedResource'
@@ -10,12 +10,12 @@ export const OrganizationDeletePanel = () => {
 
   return selectedOrganization?.managed_by !== 'vercel-marketplace' ? (
     <Admonition
-      type="destructive"
+      type="danger"
       title="Deleting this organization will also remove its projects"
-      description="Make sure you have made a backup of your projects if you want to keep your data"
-    >
-      <DeleteOrganizationButton />
-    </Admonition>
+      description="Make sure you have made a backup of your projects if you want to keep your data."
+      actions={<DeleteOrganizationButton />}
+      layout="responsive"
+    />
   ) : (
     <PartnerManagedResource
       managedBy={MANAGED_BY.VERCEL_MARKETPLACE}

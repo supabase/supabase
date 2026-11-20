@@ -1,10 +1,12 @@
-import { ident } from '@supabase/pg-meta/src/pg-format'
+import { ident, safeSql } from '@supabase/pg-meta/src/pg-format'
 import { useMutation, useQueryClient } from '@tanstack/react-query'
 import { toast } from 'sonner'
 
 import { databaseIndexesKeys } from './keys'
-import { executeSql } from '@/data/sql/execute-sql-query'
-import type { ResponseError, UseCustomMutationOptions } from '@/types'
+import { unguarded } from '@/data/fetchers'
+import { executeSql } from '@/data/sql/execute-sql-mutation'
+import type { StudioError } from '@/lib/errors/studio-errors'
+import type { UseCustomMutationOptions } from '@/types'
 
 export type DatabaseIndexDeleteVariables = {
   projectRef: string
@@ -19,13 +21,16 @@ export async function deleteDatabaseIndex({
   name,
   schema,
 }: DatabaseIndexDeleteVariables) {
-  const sql = `drop index if exists ${ident(schema)}.${ident(name)}`
+  const sql = safeSql`drop index if exists ${ident(schema)}.${ident(name)}`
 
   const { result } = await executeSql({
     projectRef,
     connectionString,
+    sqlOrigin: 'studio',
+    queryName: 'index-delete',
     sql,
     queryKey: ['indexes'],
+    grant: unguarded.migrating,
   })
 
   return result
@@ -38,12 +43,12 @@ export const useDatabaseIndexDeleteMutation = ({
   onError,
   ...options
 }: Omit<
-  UseCustomMutationOptions<DatabaseIndexDeleteData, ResponseError, DatabaseIndexDeleteVariables>,
+  UseCustomMutationOptions<DatabaseIndexDeleteData, StudioError, DatabaseIndexDeleteVariables>,
   'mutationFn'
 > = {}) => {
   const queryClient = useQueryClient()
 
-  return useMutation<DatabaseIndexDeleteData, ResponseError, DatabaseIndexDeleteVariables>({
+  return useMutation<DatabaseIndexDeleteData, StudioError, DatabaseIndexDeleteVariables>({
     mutationFn: (vars) => deleteDatabaseIndex(vars),
     async onSuccess(data, variables, context) {
       const { projectRef } = variables

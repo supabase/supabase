@@ -1,9 +1,9 @@
 import { zodResolver } from '@hookform/resolvers/zod'
+import { useQuery } from '@tanstack/react-query'
 import { useDebounce } from '@uidotdev/usehooks'
 import { useParams } from 'common'
-import { Check, Github, Loader2 } from 'lucide-react'
+import { CheckIcon, Loader2Icon } from 'lucide-react'
 import Image from 'next/image'
-import { useRouter } from 'next/router'
 import { useCallback, useEffect, useState } from 'react'
 import { useForm, useWatch } from 'react-hook-form'
 import { toast } from 'sonner'
@@ -20,22 +20,28 @@ import {
   Form,
   FormControl,
   FormField,
-  Input_Shadcn_,
-  Label_Shadcn_ as Label,
+  Input,
 } from 'ui'
 import { FormItemLayout } from 'ui-patterns/form/FormItemLayout/FormItemLayout'
 import { ShimmeringLoader } from 'ui-patterns/ShimmeringLoader'
 import * as z from 'zod'
 
+import { ConnectToGitHub } from './ConnectToGitHub'
 import { AlertError } from '@/components/ui/AlertError'
 import { InlineLink } from '@/components/ui/InlineLink'
-import { useBranchUpdateMutation } from '@/data/branches/branch-update-mutation'
-import { Branch, useBranchesQuery } from '@/data/branches/branches-query'
+import {
+  useBranchUpdateMutation,
+  type BranchUpdateGrant,
+} from '@/data/branches/branch-update-mutation'
+import { branchesQueryOptions, type Branch } from '@/data/branches/branches-query'
+import { useGitHubAuthorizationQuery } from '@/data/integrations/github-authorization-query'
 import { useCheckGithubBranchValidity } from '@/data/integrations/github-branch-check-query'
 import { useGitHubConnectionsQuery } from '@/data/integrations/github-connections-query'
+import { useBranchGrant } from '@/hooks/branches/useBranchGrant'
 import { useSelectedOrganizationQuery } from '@/hooks/misc/useSelectedOrganization'
 import { useSelectedProjectQuery } from '@/hooks/misc/useSelectedProject'
 import { BASE_PATH } from '@/lib/constants'
+import { useGrant } from '@/lib/grants'
 
 interface EditBranchModalProps {
   branch?: Branch
@@ -45,7 +51,6 @@ interface EditBranchModalProps {
 
 export const EditBranchModal = ({ branch, visible, onClose }: EditBranchModalProps) => {
   const { ref } = useParams()
-  const router = useRouter()
   const { data: projectDetails } = useSelectedProjectQuery()
   const { data: selectedOrg } = useSelectedOrganizationQuery()
 
@@ -54,6 +59,14 @@ export const EditBranchModal = ({ branch, visible, onClose }: EditBranchModalPro
   const isBranch = projectDetails?.parent_project_ref !== undefined
   const projectRef =
     projectDetails !== undefined ? (isBranch ? projectDetails.parent_project_ref : ref) : undefined
+
+  const {
+    data: githubAuthorization,
+    error: authorizationError,
+    isPending: isLoadingAuthorization,
+    isSuccess: isSuccessAuthorization,
+    isError: isErrorAuthorization,
+  } = useGitHubAuthorizationQuery()
 
   const {
     data: connections,
@@ -65,7 +78,19 @@ export const EditBranchModal = ({ branch, visible, onClose }: EditBranchModalPro
     organizationId: selectedOrg?.id,
   })
 
-  const { data: branches } = useBranchesQuery({ projectRef })
+  const isLoading = isLoadingAuthorization || isLoadingConnections
+  const isSuccess = isSuccessAuthorization && isSuccessConnections
+  const isError = isErrorAuthorization || isErrorConnections
+  const error = authorizationError || connectionsError
+
+  const branchesGrant = useGrant('GET /v1/projects/{ref}/branches', { projectRef })
+  const updateBranchGrant = useBranchGrant('PATCH /v1/branches/{branch_id_or_ref}', {
+    projectRef,
+    isDefault: branch?.is_default,
+  })
+  const { data: branches } = useQuery(
+    branchesQueryOptions({ projectRef, grant: branchesGrant.grant })
+  )
   const { mutate: checkGithubBranchValidity, isPending: isChecking } = useCheckGithubBranchValidity(
     { onError: () => {} }
   )
@@ -111,26 +136,22 @@ export const EditBranchModal = ({ branch, visible, onClose }: EditBranchModalPro
   const debouncedGitBranchName = useDebounce(gitBranchName, 500)
 
   const isFormValid = form.formState.isValid && (!gitBranchName || isGitBranchValid)
-  const canSubmit = isFormValid && !isUpdating && !isChecking
-
-  const openLinkerPanel = () => {
-    onClose()
-
-    if (projectRef) {
-      router.push(`/project/${projectRef}/settings/integrations`)
-    }
-  }
+  const canSubmit =
+    isFormValid && !isUpdating && !isChecking && updateBranchGrant.status === 'granted'
 
   const onSubmit = (data: z.infer<typeof FormSchema>) => {
     if (!projectRef) return console.error('Project ref is required')
     if (!branch?.project_ref) return console.error('Branch ref is required')
+    if (updateBranchGrant.status !== 'granted') return
 
     const payload: {
+      grant: BranchUpdateGrant
       branchRef: string
       projectRef: string
       branchName: string
       gitBranch?: string
     } = {
+      grant: updateBranchGrant.grant,
       branchRef: branch.project_ref,
       projectRef,
       branchName: data.branchName,
@@ -179,8 +200,9 @@ export const EditBranchModal = ({ branch, visible, onClose }: EditBranchModalPro
             if (form.getValues('gitBranchName') !== requested) return
             setIsGitBranchValid(false)
             form.setError('gitBranchName', {
-              ...error,
-              message: `Unable to find branch "${branchName}" in ${repoOwner}/${repoName}`,
+              message:
+                error?.message ??
+                `Unable to find branch "${branchName}" in ${repoOwner}/${repoName}`,
             })
           },
         }
@@ -224,7 +246,7 @@ export const EditBranchModal = ({ branch, visible, onClose }: EditBranchModalPro
                 render={({ field }) => (
                   <FormItemLayout label="Preview branch name">
                     <FormControl>
-                      <Input_Shadcn_
+                      <Input
                         {...field}
                         placeholder="e.g. staging, dev-feature-x"
                         autoComplete="off"
@@ -234,22 +256,24 @@ export const EditBranchModal = ({ branch, visible, onClose }: EditBranchModalPro
                 )}
               />
 
-              {isLoadingConnections && (
+              {isLoading && (
                 <div className="flex flex-col gap-y-2">
                   <ShimmeringLoader />
                   <ShimmeringLoader className="w-1/2" />
                 </div>
               )}
 
-              {isErrorConnections && (
+              {isError && (
                 <AlertError
-                  error={connectionsError}
+                  error={error}
                   subject="Failed to retrieve GitHub connection information"
                 />
               )}
 
-              {isSuccessConnections &&
-                (githubConnection ? (
+              {isSuccess &&
+                (!githubAuthorization || !githubConnection ? (
+                  <ConnectToGitHub />
+                ) : (
                   <FormField
                     control={form.control}
                     name="gitBranchName"
@@ -277,7 +301,7 @@ export const EditBranchModal = ({ branch, visible, onClose }: EditBranchModalPro
                       >
                         <div className="relative">
                           <FormControl>
-                            <Input_Shadcn_
+                            <Input
                               {...field}
                               placeholder="e.g. main, feat/some-feature"
                               autoComplete="off"
@@ -290,9 +314,9 @@ export const EditBranchModal = ({ branch, visible, onClose }: EditBranchModalPro
                           <div className="absolute top-2.5 right-3 flex items-center gap-2">
                             {field.value ? (
                               isChecking ? (
-                                <Loader2 size={14} className="animate-spin" />
+                                <Loader2Icon size={14} className="animate-spin" />
                               ) : isGitBranchValid ? (
-                                <Check size={14} className="text-brand" strokeWidth={2} />
+                                <CheckIcon size={14} className="text-primary" strokeWidth={2} />
                               ) : null
                             ) : null}
                           </div>
@@ -300,39 +324,25 @@ export const EditBranchModal = ({ branch, visible, onClose }: EditBranchModalPro
                       </FormItemLayout>
                     )}
                   />
-                ) : (
-                  <div className="flex items-center gap-2 justify-between">
-                    <div className="flex flex-col gap-1">
-                      <div className="flex items-center gap-2">
-                        <Label>Sync with a GitHub branch</Label>
-                      </div>
-                      <p className="text-sm text-foreground-light">
-                        Optionally connect to a GitHub repository to manage migrations automatically
-                        for this branch.
-                      </p>
-                    </div>
-                    <Button type="default" icon={<Github />} onClick={openLinkerPanel}>
-                      Connect to GitHub
-                    </Button>
-                  </div>
                 ))}
             </DialogSection>
 
             <DialogFooter padding="medium">
-              <Button disabled={isUpdating} type="default" onClick={onClose}>
+              <Button disabled={isUpdating} onClick={onClose}>
                 Cancel
               </Button>
               <Button
                 form={formId}
                 disabled={
+                  updateBranchGrant.status !== 'granted' ||
                   (!!gitBranchName && !isSuccessConnections) ||
                   isUpdating ||
                   !canSubmit ||
                   isChecking
                 }
                 loading={isUpdating}
-                type="primary"
-                htmlType="submit"
+                variant="primary"
+                type="submit"
               >
                 Update branch
               </Button>

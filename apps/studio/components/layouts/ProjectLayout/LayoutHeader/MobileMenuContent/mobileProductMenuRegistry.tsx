@@ -47,9 +47,14 @@ export const MOBILE_PRODUCT_MENU_REGISTRY: Record<string, ComponentType | null> 
       default: m.AdvisorsSidebarMenu,
     }))
   ),
+  issues: React.lazy(() =>
+    import('@/components/layouts/IssuesLayout/IssuesSidebar').then((m) => ({
+      default: m.IssuesSidebar,
+    }))
+  ),
   observability: React.lazy(() =>
     import('@/components/layouts/ObservabilityLayout/ObservabilityMenu').then((m) => ({
-      default: m.default,
+      default: m.ObservabilityMenu,
     }))
   ),
   logs: React.lazy(() =>
@@ -59,8 +64,8 @@ export const MOBILE_PRODUCT_MENU_REGISTRY: Record<string, ComponentType | null> 
   ),
   api: null,
   integrations: React.lazy(() =>
-    import('@/components/layouts/Integrations/IntegrationsProductMenu').then((m) => ({
-      default: m.IntegrationsProductMenu,
+    import('@/components/interfaces/Integrations/Marketplace/MarketplaceSidebar').then((m) => ({
+      default: m.MarketplaceProductMenu,
     }))
   ),
   settings: React.lazy(() =>

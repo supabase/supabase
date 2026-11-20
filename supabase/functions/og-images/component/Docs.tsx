@@ -5,10 +5,11 @@ type Props = {
   title: string
   description: string
   icon?: string | null
+  label: string
 }
 
 const Docs = (props: Props) => {
-  const { type, title, description, icon } = props
+  const { type, title, description, icon, label } = props
 
   let typeName: string | undefined = type
     ?.replace(/-/g, ' ')
@@ -67,7 +68,7 @@ const Docs = (props: Props) => {
             height={34}
           />
           <span tw="text-2xl font-normal text-[#3ecf8e] ml-4" style={{ fontFamily: 'SourceCode' }}>
-            DOCS
+            {label}
           </span>
         </div>
       </div>

@@ -4,6 +4,7 @@ title: 'Getting Started with Realtime'
 description: 'Learn how to build real-time applications with Supabase Realtime'
 subtitle: 'Learn how to build real-time applications with Supabase Realtime'
 sidebar_label: 'Getting Started'
+tocVideo: _-y_Lnujq64
 ---
 
 ## Quick start
@@ -70,10 +71,19 @@ pip install supabase
 ```
 
 </TabPanel>
-<TabPanel id="python" label="Python - Conda">
+<TabPanel id="python-conda" label="Python - Conda">
 
 ```bash
 conda install -c conda-forge supabase
+```
+
+</TabPanel>
+</$Show>
+<$Show if="sdk:csharp">
+<TabPanel id="csharp" label="C#">
+
+```bash
+dotnet add package Supabase
 ```
 
 </TabPanel>
@@ -147,6 +157,21 @@ supabase: Client = create_client(url, key)
 
 </TabPanel>
 </$Show>
+<$Show if="sdk:csharp">
+<TabPanel id="csharp" label="C#">
+
+```c#
+using Supabase;
+
+var supabase = new Client(
+  "https://<project>.supabase.co",
+  "<sb_publishable_key>"
+);
+await supabase.InitializeAsync();
+```
+
+</TabPanel>
+</$Show>
 </Tabs>
 
 ### 3. Create your first Channel
@@ -202,11 +227,23 @@ channel = supabase.channel('room:lobby:messages', params={'config': {'private': 
 
 </TabPanel>
 </$Show>
+<$Show if="sdk:csharp">
+<TabPanel id="csharp" label="C#">
+
+```c#
+// Create a channel with a descriptive topic name.
+// Note: The C# SDK does not yet support private channel configuration,
+// so this connects to a public channel.
+var channel = supabase.Realtime.Channel("room:lobby:messages");
+```
+
+</TabPanel>
+</$Show>
 </Tabs>
 
 ### 4. Set up authorization
 
-Since we're using a private channel, you need to create a basic RLS policy on the `realtime.messages` table to allow authenticated users to connect. Row Level Security (RLS) policies control who can access your Realtime channels based on user authentication and custom rules:
+Since we're using a private channel, you need to create a basic RLS policy on the `realtime.messages` table to allow authenticated users to connect. [Row Level Security](/docs/guides/database/postgres/row-level-security) (RLS) policies control who can access your Realtime channels based on user authentication and custom rules:
 
 ```sql
 -- Allow authenticated users to receive broadcasts
@@ -324,6 +361,42 @@ channel.send_broadcast_message(
         "timestamp": datetime.now().isoformat()
     }
 )
+```
+
+</TabPanel>
+</$Show>
+<$Show if="sdk:csharp">
+<TabPanel id="csharp" label="C#">
+
+```c#
+class MessageBroadcast : BaseBroadcast
+{
+    [JsonProperty("text")]
+    public string Text { get; set; }
+
+    [JsonProperty("user")]
+    public string User { get; set; }
+
+    [JsonProperty("timestamp")]
+    public string Timestamp { get; set; }
+}
+
+// Listen for messages
+var broadcast = channel.Register<MessageBroadcast>();
+broadcast.AddBroadcastEventHandler((sender, _) =>
+{
+    Console.WriteLine($"New message: {broadcast.Current()}");
+});
+
+await channel.Subscribe();
+
+// Send a message
+await broadcast.Send("message_sent", new MessageBroadcast
+{
+    Text = "Hello, world!",
+    User = "john_doe",
+    Timestamp = DateTime.UtcNow.ToString("o")
+});
 ```
 
 </TabPanel>
@@ -642,6 +715,16 @@ with RealtimeManager() as channel:
 
 </TabPanel>
 </$Show>
+<$Show if="sdk:csharp">
+<TabPanel id="csharp" label="C#">
+
+```c#
+// Remove the channel when you are done with it to free up resources
+supabase.Realtime.Remove(channel);
+```
+
+</TabPanel>
+</$Show>
 </Tabs>
 
 ## Choose the right feature
@@ -691,6 +774,11 @@ Now that you understand the basics, dive deeper into each feature:
 - **[Realtime with Next.js](/docs/guides/realtime/realtime-with-nextjs)** - Build real-time Next.js applications
 - **[User Presence](/docs/guides/realtime/realtime-user-presence)** - Implement user presence features
 - **[Database Changes](/docs/guides/realtime/subscribing-to-database-changes)** - Listen to database changes
+
+### UI components
+
+- **[Realtime components](/library?category=Realtime)** - Install live cursors, avatar stacks, and collaborative editors from the Supabase Library
+- **[Messaging components](/library?category=Messaging)** - Install a realtime chat from the Supabase Library
 
 ### Framework examples
 

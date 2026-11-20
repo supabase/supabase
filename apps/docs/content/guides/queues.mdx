@@ -1,11 +1,12 @@
 ---
 title: Supabase Queues
 subtitle: 'Durable Message Queues with Guaranteed Delivery in Postgres'
+tocVideo: UEwfaElBnZk
 ---
 
-Supabase Queues is a Postgres-native durable Message Queue system with guaranteed delivery built on the [pgmq database extension](https://github.com/tembo-io/pgmq). It offers developers a seamless way to persist and process Messages in the background while improving the resiliency and scalability of their applications and services.
+Supabase Queues is a Postgres-native durable Message Queue system with guaranteed delivery built on the [pgmq database extension](https://github.com/pgmq/pgmq). It offers developers a seamless way to persist and process Messages in the background while improving the resiliency and scalability of their applications and services.
 
-Queues couples the reliability of Postgres with the simplicity Supabase's platform and developer experience, enabling developers to manage Background Tasks with zero configuration.
+Queues couples the reliability of Postgres with the simplicity Supabase's platform and developer experience, enabling developers to manage [Background Tasks](/docs/guides/functions/background-tasks) with zero configuration.
 
 ## Features
 
@@ -23,8 +24,8 @@ Queues couples the reliability of Postgres with the simplicity Supabase's platfo
   purposes.
 - **Granular Authorization**
   <br />
-  Control client-side consumer access to Queues with API permissions and Row Level Security (RLS)
-  policies.
+  Control client-side consumer access to Queues with API permissions and [Row Level
+  Security](/docs/guides/database/postgres/row-level-security) (RLS) policies.
 - **Queue Management and Monitoring**
   <br />
   Create, manage, and monitor Queues and Messages in the Supabase Dashboard.
@@ -33,4 +34,4 @@ Queues couples the reliability of Postgres with the simplicity Supabase's platfo
 
 - [Quickstart](/docs/guides/queues/quickstart)
 - [API Reference](/docs/guides/queues/api)
-- [`pgmq` GitHub Repository](https://github.com/tembo-io/pgmq)
+- [`pgmq` GitHub Repository](https://github.com/pgmq/pgmq)

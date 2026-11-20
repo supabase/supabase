@@ -1,4 +1,4 @@
-import { Maximize2 } from 'lucide-react'
+import { Maximize2Icon } from 'lucide-react'
 import { ChangeEvent, InputHTMLAttributes, SyntheticEvent, useEffect, useRef } from 'react'
 import {
   CalculatedColumn,
@@ -147,10 +147,10 @@ function SelectCellFormatter({
       </ShortcutTooltip>
       {row && (
         <ButtonTooltip
-          type="text"
+          variant="text"
           size="tiny"
           className="px-1 rdg-row__select-column__edit-action"
-          icon={<Maximize2 />}
+          icon={<Maximize2Icon />}
           onClick={onEditClick}
           tooltip={{
             content: {

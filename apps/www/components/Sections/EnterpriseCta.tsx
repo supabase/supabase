@@ -1,7 +1,7 @@
+import SectionContainer from '~/components/Layouts/SectionContainer'
 import Link from 'next/link'
 import React from 'react'
 import { Button } from 'ui'
-import SectionContainer from '~/components/Layouts/SectionContainer'
 
 const EnterpriseCta = () => {
   return (
@@ -16,7 +16,7 @@ const EnterpriseCta = () => {
           and managing embeddings at scale.
         </p>
         <div className="w-full mt-4 flex items-center justify-center text-center gap-4">
-          <Button asChild size="medium">
+          <Button variant="primary" asChild size="medium">
             <Link href="https://forms.supabase.com/enterprise">Fill out Enterprise Form</Link>
           </Button>
         </div>

@@ -1,4 +1,5 @@
 import { useBreakpoint } from 'common'
+import { DASHBOARD_SIGN_UP_URL } from '@/lib/dashboard-links'
 import { Check, CheckCircle, Sparkles, Timer, Zap } from 'lucide-react'
 import dynamic from 'next/dynamic'
 import { PRODUCT_SHORTNAMES } from 'shared-data/products'
@@ -49,7 +50,7 @@ const useVibeCodersContent: () => {
       h1: (
         <>
           <span className="block text-foreground">Your weekend prototype</span>
-          <span className="text-brand block md:ml-0">deserves production</span>
+          <span className="text-primary block md:ml-0">deserves production</span>
         </>
       ),
       subheader: [
@@ -62,7 +63,7 @@ const useVibeCodersContent: () => {
       ctas: [
         {
           label: 'Start Your Project',
-          href: 'https://supabase.com/dashboard',
+          href: DASHBOARD_SIGN_UP_URL,
           type: 'primary' as any,
         },
       ],
@@ -217,7 +218,7 @@ const useVibeCodersContent: () => {
                 absolute pointer-events-none
                 w-full h-full
                 inset-0 top-auto
-                bg-[linear-gradient(to_bottom,transparent_0%,hsl(var(--background-default))_100%)]
+                bg-[linear-gradient(to_bottom,transparent_0%,var(--background-default)_100%)]
               "
               />
             </div>
@@ -249,8 +250,8 @@ const useVibeCodersContent: () => {
               . Secure and trusted.
             </>
           ),
-          className: '!border-l-0 sm:!border-l sm:!border-t-0',
-          image: <AuthVisual className="2xl:!-bottom-20" />,
+          className: 'border-l-0! sm:border-l! sm:border-t-0!',
+          image: <AuthVisual className="2xl:-bottom-20!" />,
         },
         {
           id: 'realtime',
@@ -262,9 +263,9 @@ const useVibeCodersContent: () => {
               <span className="text-foreground">multi-player, collaborative experiences</span>.
             </>
           ),
-          className: '!border-l-0',
+          className: 'border-l-0!',
           image: (
-            <RealtimeVisual className="[&_.visual-overlay]:bg-[linear-gradient(to_top,transparent_0%,transparent_50%,hsl(var(--background-default))_75%)]" />
+            <RealtimeVisual className="[&_.visual-overlay]:bg-[linear-gradient(to_top,transparent_0%,transparent_50%,var(--background-default)_75%)]" />
           ),
         },
         {
@@ -272,7 +273,7 @@ const useVibeCodersContent: () => {
           title: 'Edge Functions',
           icon: MainProducts[PRODUCT_SHORTNAMES.FUNCTIONS].icon,
           subheading: <>Custom backend logic when you want to dive into code.</>,
-          className: '!border-l-0 sm:!border-l',
+          className: 'border-l-0! sm:border-l!',
           image: <FunctionsVisual className="" />,
         },
         {
@@ -285,7 +286,7 @@ const useVibeCodersContent: () => {
               images you need in your app.
             </>
           ),
-          className: '!border-l-0 lg:!border-l',
+          className: 'border-l-0! lg:border-l!',
           image: (
             <Image
               draggable={false}
@@ -316,7 +317,7 @@ const useVibeCodersContent: () => {
               industry-standard tools to guide you.
             </>
           ),
-          className: '!border-l lg:!border-l-0',
+          className: 'border-l! lg:border-l-0!',
           image: (
             <Image
               draggable={false}
@@ -395,7 +396,7 @@ const useVibeCodersContent: () => {
           <Sparkles size={24} className="inline text-foreground" />
         </>
       ),
-      docsUrl: 'https://supabase.com/docs/guides/getting-started/ai-prompts',
+      docsUrl: 'https://supabase.com/docs/guides/ai-tools/ai-prompts',
       leftFooter: (
         <div className="grid grid-cols-5 divide-x divide-y rounded-lg overflow-hidden border">
           {frameworks.map((framework) => (
@@ -413,8 +414,7 @@ const useVibeCodersContent: () => {
 4. Hook up middleware to refresh auth tokens
 `,
           language: 'markdown',
-          docsUrl:
-            'https://supabase.com/docs/guides/getting-started/ai-prompts/nextjs-supabase-auth',
+          docsUrl: 'https://supabase.com/docs/guides/ai-tools/ai-prompts/nextjs-supabase-auth',
         },
         {
           id: 'edge-functions',
@@ -426,7 +426,7 @@ const useVibeCodersContent: () => {
 5. For external dependencies, importing via 'npm:' and 'jsr:' is preferred. Minimize the use of imports from @'deno.land/x' , 'esm.sh' and @'unpkg.com' . If you have a package from one of those CDNs, you can replace the CDN hostname with 'npm:' specifier.
 `,
           language: 'markdown',
-          docsUrl: 'https://supabase.com/docs/guides/getting-started/ai-prompts/edge-functions',
+          docsUrl: 'https://supabase.com/docs/guides/ai-tools/ai-prompts/edge-functions',
         },
         {
           id: 'declarative-db-schema',
@@ -436,7 +436,7 @@ const useVibeCodersContent: () => {
 -**All database schema modifications must be defined within '.sql' files located in the 'supabase/schemas/' directory.`,
           language: 'markdown',
           docsUrl:
-            'https://supabase.com/docs/guides/getting-started/ai-prompts/declarative-database-schema',
+            'https://supabase.com/docs/guides/ai-tools/ai-prompts/declarative-database-schema',
         },
         {
           id: 'rls-policies',
@@ -446,8 +446,7 @@ The output should use the following instructions:
 
 - The generated SQL must be valid SQL.`,
           language: 'markdown',
-          docsUrl:
-            'https://supabase.com/docs/guides/getting-started/ai-prompts/database-rls-policies',
+          docsUrl: 'https://supabase.com/docs/guides/ai-tools/ai-prompts/database-rls-policies',
         },
       ],
     },

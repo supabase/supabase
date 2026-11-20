@@ -3,13 +3,16 @@ import { useMutation, useQueryClient } from '@tanstack/react-query'
 import { toast } from 'sonner'
 
 import { vaultSecretsKeys } from './keys'
-import { executeSql } from '@/data/sql/execute-sql-query'
-import type { ResponseError, UseCustomMutationOptions, VaultSecret } from '@/types'
+import { unguarded } from '@/data/fetchers'
+import { executeSql } from '@/data/sql/execute-sql-mutation'
+import type { StudioError } from '@/lib/errors/studio-errors'
+import type { UseCustomMutationOptions, VaultSecret } from '@/types'
 
 export type VaultSecretUpdateVariables = {
   projectRef: string
   connectionString?: string | null
   id: string
+  skipClearCache?: boolean
 } & Partial<VaultSecret>
 
 export async function updateVaultSecret({
@@ -21,7 +24,14 @@ export async function updateVaultSecret({
   const { name, description, secret } = payload
   const sql = getUpdateVaultSecretSQL({ id, secret, name, description })
 
-  const { result } = await executeSql({ projectRef, connectionString, sql })
+  const { result } = await executeSql({
+    projectRef,
+    connectionString,
+    sqlOrigin: 'studio',
+    queryName: 'vault-secret-update',
+    sql,
+    grant: unguarded.migrating,
+  })
   return result
 }
 
@@ -32,17 +42,23 @@ export const useVaultSecretUpdateMutation = ({
   onSuccess,
   ...options
 }: Omit<
-  UseCustomMutationOptions<VaultSecretUpdateData, ResponseError, VaultSecretUpdateVariables>,
+  UseCustomMutationOptions<VaultSecretUpdateData, StudioError, VaultSecretUpdateVariables>,
   'mutationFn'
 > = {}) => {
   const queryClient = useQueryClient()
 
-  return useMutation<VaultSecretUpdateData, ResponseError, VaultSecretUpdateVariables>({
+  return useMutation<VaultSecretUpdateData, StudioError, VaultSecretUpdateVariables>({
     mutationFn: (vars) => updateVaultSecret(vars),
     async onSuccess(data, variables, context) {
-      const { id, projectRef } = variables
+      const { id, projectRef, skipClearCache = false } = variables
       await Promise.all([
-        queryClient.removeQueries({ queryKey: vaultSecretsKeys.getDecryptedValue(projectRef, id) }),
+        !skipClearCache
+          ? queryClient.removeQueries({
+              queryKey: vaultSecretsKeys.getDecryptedValue(projectRef, id),
+            })
+          : queryClient.invalidateQueries({
+              queryKey: vaultSecretsKeys.getDecryptedValue(projectRef, id),
+            }),
         queryClient.invalidateQueries({ queryKey: vaultSecretsKeys.list(projectRef) }),
       ])
       await onSuccess?.(data, variables, context)

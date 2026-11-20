@@ -1,6 +1,6 @@
-import { PermissionAction, SupportCategories } from '@supabase/shared-types/out/constants'
+import { SupportCategories } from '@supabase/shared-types/out/constants'
 import { useParams } from 'common'
-import { Download, MoreVertical, Trash } from 'lucide-react'
+import { DownloadIcon, MoreVerticalIcon, TrashIcon } from 'lucide-react'
 import { useState } from 'react'
 import {
   Button,
@@ -9,6 +9,7 @@ import {
   DialogContent,
   DialogHeader,
   DialogSection,
+  DialogSectionSeparator,
   DialogTitle,
   DropdownMenu,
   DropdownMenuContent,
@@ -23,7 +24,7 @@ import { DropdownMenuItemTooltip } from '@/components/ui/DropdownMenuItemTooltip
 import { InlineLink } from '@/components/ui/InlineLink'
 import { useBackupDownloadMutation } from '@/data/database/backup-download-mutation'
 import { useDownloadableBackupQuery } from '@/data/database/backup-query'
-import { useAsyncCheckPermissions } from '@/hooks/misc/useCheckPermissions'
+import { FGA_PERMISSIONS, useAsyncCheckPermissionsV2 } from '@/hooks/misc/useCheckPermissionsV2'
 import { useSelectedProjectQuery } from '@/hooks/misc/useSelectedProject'
 
 export const RestoreFailedState = () => {
@@ -32,9 +33,7 @@ export const RestoreFailedState = () => {
   const [visible, setVisible] = useState(false)
   const [showCliBackup, setShowCliBackup] = useState(false)
 
-  const { can: canDeleteProject } = useAsyncCheckPermissions(PermissionAction.UPDATE, 'projects', {
-    resource: { project_id: project?.id },
-  })
+  const { can: canDeleteProject } = useAsyncCheckPermissionsV2(FGA_PERMISSIONS.PROJECT.ADMIN_WRITE)
 
   const { data, isPending: isLoadingBackups } = useDownloadableBackupQuery({ projectRef: ref })
   const backups = data?.backups ?? []
@@ -56,7 +55,7 @@ export const RestoreFailedState = () => {
     if (!ref) return console.error('Project ref is required')
     if (backups.length === 0 || data?.status === 'physical-backups-enabled')
       return setShowCliBackup(true)
-    downloadBackup({ ref, backup: backups[0] })
+    downloadBackup({ ref, backupId: backups[0].id })
   }
 
   const downloadBackupTooltipText = isLoadingBackups
@@ -90,7 +89,7 @@ export const RestoreFailedState = () => {
             </div>
 
             <div className="border-t border-overlay flex items-center justify-end py-4 px-8 gap-x-2">
-              <Button asChild type="default">
+              <Button asChild>
                 <SupportLink
                   queryParams={{
                     category: SupportCategories.DATABASE_UNRESPONSIVE,
@@ -103,8 +102,7 @@ export const RestoreFailedState = () => {
               </Button>
 
               <ButtonTooltip
-                type="default"
-                icon={<Download />}
+                icon={<DownloadIcon />}
                 disabled={isLoadingBackups}
                 loading={isDownloading || isLoadingBackups}
                 tooltip={{
@@ -119,8 +117,8 @@ export const RestoreFailedState = () => {
               </ButtonTooltip>
 
               <DropdownMenu>
-                <DropdownMenuTrigger>
-                  <Button type="default" className="w-7" icon={<MoreVertical />} />
+                <DropdownMenuTrigger asChild>
+                  <Button className="w-7" icon={<MoreVerticalIcon />} />
                 </DropdownMenuTrigger>
                 <DropdownMenuContent className="w-72" align="end">
                   <DropdownMenuItemTooltip
@@ -137,7 +135,7 @@ export const RestoreFailedState = () => {
                     }}
                   >
                     <div className="translate-y-0.5">
-                      <Trash size={14} />
+                      <TrashIcon size={14} />
                     </div>
                     <div className="">
                       <p>Delete project</p>
@@ -154,10 +152,13 @@ export const RestoreFailedState = () => {
       </div>
 
       <Dialog open={showCliBackup} onOpenChange={setShowCliBackup}>
-        <DialogContent size="medium">
+        <DialogContent size="medium" onOpenAutoFocus={(e) => e.preventDefault()}>
           <DialogHeader>
-            <DialogTitle>Back up your database</DialogTitle>
+            <DialogTitle>Back up your database with the Supabase CLI</DialogTitle>
           </DialogHeader>
+
+          <DialogSectionSeparator />
+
           <DialogSection>
             <LogicalBackupCliInstructions showResetPassword={false} />
           </DialogSection>

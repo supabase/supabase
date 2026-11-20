@@ -2,7 +2,7 @@ import { format } from 'date-fns'
 import { useState } from 'react'
 import { DateRange } from 'react-day-picker'
 import { Button, Calendar } from 'ui'
-import { CustomOptionProps, FilterBar, FilterGroup } from 'ui-patterns'
+import { CustomOptionProps, FilterBar, FilterGroup } from 'ui-patterns/FilterBar'
 
 function CustomDatePicker({ onChange, onCancel, search }: CustomOptionProps) {
   const [date, setDate] = useState<DateRange | undefined>(
@@ -25,11 +25,9 @@ function CustomDatePicker({ onChange, onCancel, search }: CustomOptionProps) {
         className="w-full"
       />
       <div className="flex justify-end gap-2 py-3 px-4 border-t">
-        <Button type="default" onClick={onCancel}>
-          Cancel
-        </Button>
+        <Button onClick={onCancel}>Cancel</Button>
         <Button
-          type="primary"
+          variant="primary"
           onClick={() =>
             onChange(
               date?.from
@@ -120,19 +118,28 @@ const initialFilters: FilterGroup = {
   conditions: [],
 }
 
-export default function FilterBarDemo() {
+function FilterBarExample({ variant }: { variant: 'default' | 'pill' }) {
   const [filters, setFilters] = useState<FilterGroup>(initialFilters)
   const [freeformText, setFreeformText] = useState('')
 
   return (
-    <div className="w-full">
-      <FilterBar
-        filterProperties={filterProperties}
-        freeformText={freeformText}
-        onFreeformTextChange={setFreeformText}
-        filters={filters}
-        onFilterChange={setFilters}
-      />
+    <FilterBar
+      variant={variant}
+      className={variant === 'pill' ? 'border-0 bg-transparent overflow-visible' : undefined}
+      filterProperties={filterProperties}
+      freeformText={freeformText}
+      onFreeformTextChange={setFreeformText}
+      filters={filters}
+      onFilterChange={setFilters}
+    />
+  )
+}
+
+export default function FilterBarDemo() {
+  return (
+    <div className="w-full space-y-6">
+      <FilterBarExample variant="default" />
+      <FilterBarExample variant="pill" />
     </div>
   )
 }

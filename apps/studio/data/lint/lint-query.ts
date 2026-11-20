@@ -5,12 +5,14 @@ import { lintKeys } from './keys'
 import { get, handleError } from '@/data/fetchers'
 import { useSelectedProjectQuery } from '@/hooks/misc/useSelectedProject'
 import { PROJECT_STATUS } from '@/lib/constants'
-import type { ResponseError, UseCustomQueryOptions } from '@/types'
+import type { StudioError } from '@/lib/errors/studio-errors'
+import { EMPTY_ARR } from '@/lib/void'
+import type { UseCustomQueryOptions } from '@/types'
 
 type ProjectLintsVariables = {
   projectRef?: string
 }
-type ProjectLintResponse = components['schemas']['GetProjectLintsResponse']
+type ProjectLintResponse = components['schemas']['GetProjectLintsResponse_Output']
 export type Lint = ProjectLintResponse[0]
 export type LINT_TYPES = ProjectLintResponse[0]['name']
 
@@ -24,11 +26,11 @@ export async function getProjectLints({ projectRef }: ProjectLintsVariables, sig
 
   if (error) handleError(error)
 
-  return data
+  return Array.isArray(data) ? data : EMPTY_ARR
 }
 
 export type ProjectLintsData = Awaited<ReturnType<typeof getProjectLints>>
-export type ProjectLintsError = ResponseError
+export type ProjectLintsError = StudioError
 
 export const useProjectLintsQuery = <TData = ProjectLintsData>(
   { projectRef }: ProjectLintsVariables,
@@ -37,7 +39,7 @@ export const useProjectLintsQuery = <TData = ProjectLintsData>(
     ...options
   }: UseCustomQueryOptions<ProjectLintsData, ProjectLintsError, TData> = {}
 ) => {
-  const { data: project } = useSelectedProjectQuery()
+  const { data: project } = useSelectedProjectQuery({ enabled: enabled !== false })
   const isActive = project?.status === PROJECT_STATUS.ACTIVE_HEALTHY
 
   return useQuery<ProjectLintsData, ProjectLintsError, TData>({

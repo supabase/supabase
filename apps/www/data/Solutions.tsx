@@ -2,6 +2,7 @@ import {
   BotIcon,
   Building2Icon,
   Code2Icon,
+  Database,
   HammerIcon,
   Heart,
   LightbulbIcon,
@@ -33,6 +34,7 @@ export enum Solutions {
   finserv = 'finserv',
   healthcare = 'healthcare',
   agents = 'agents',
+  hostedPostgres = 'hosted-postgres',
 }
 
 export const skillBasedSolutions = {
@@ -154,6 +156,13 @@ export const useCaseSolutions = {
 export const appTypeSolutions = {
   label: 'Solutions',
   solutions: [
+    {
+      id: Solutions.hostedPostgres,
+      text: 'Hosted Postgres',
+      description: '',
+      url: '/solutions/hosted-postgres',
+      icon: Database,
+    },
     {
       id: Solutions.b2bSaaS,
       text: 'B2B SaaS',

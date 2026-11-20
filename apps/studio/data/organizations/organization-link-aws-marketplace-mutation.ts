@@ -1,8 +1,8 @@
 import { useMutation } from '@tanstack/react-query'
-import { toast } from 'sonner'
 
 import { handleError, put } from '@/data/fetchers'
-import type { ResponseError, UseCustomMutationOptions } from '@/types'
+import type { StudioError } from '@/lib/errors/studio-errors'
+import type { UseCustomMutationOptions } from '@/types'
 
 export type OrganizationLinkAwsMarketplaceVariables = {
   buyerId: string
@@ -26,27 +26,19 @@ type LinkOrganizationData = Awaited<ReturnType<typeof linkOrganization>>
 
 export const useOrganizationLinkAwsMarketplaceMutation = ({
   onSuccess,
-  onError,
   ...options
 }: Omit<
   UseCustomMutationOptions<
     LinkOrganizationData,
-    ResponseError,
+    StudioError,
     OrganizationLinkAwsMarketplaceVariables
   >,
   'mutationFn'
 > = {}) => {
-  return useMutation<LinkOrganizationData, ResponseError, OrganizationLinkAwsMarketplaceVariables>({
+  return useMutation<LinkOrganizationData, StudioError, OrganizationLinkAwsMarketplaceVariables>({
     mutationFn: (vars) => linkOrganization(vars),
     async onSuccess(data, variables, context) {
       await onSuccess?.(data, variables, context)
-    },
-    async onError(data, variables, context) {
-      if (onError === undefined) {
-        toast.error(`Failed to link organization to AWS Marketplace: ${data.message}`)
-      } else {
-        onError(data, variables, context)
-      }
     },
     ...options,
   })

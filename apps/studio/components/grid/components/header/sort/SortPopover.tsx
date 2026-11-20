@@ -13,12 +13,11 @@ export const SortPopover = ({ tableQueriesEnabled }: SortPopoverProps) => {
   const { urlSorts, onApplySorts } = useTableSort()
 
   const snap = useTableEditorTableStateSnapshot()
-  const tableName = snap.table?.name || ''
 
   // Convert string[] to Sort[]
   const sorts = useMemo(() => {
-    return tableName && urlSorts ? formatSortURLParams(tableName, urlSorts) : []
-  }, [tableName, urlSorts])
+    return snap.originalTable && urlSorts ? formatSortURLParams(snap.originalTable, urlSorts) : []
+  }, [snap.originalTable, urlSorts])
 
   return (
     <SortPopoverPrimitive

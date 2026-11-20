@@ -1,15 +1,28 @@
-import { ident, literal } from '@supabase/pg-meta/src/pg-format'
+import {
+  ident,
+  joinSqlFragments,
+  keyword,
+  literal,
+  safeSql,
+  type SafeSqlFragment,
+} from '@supabase/pg-meta'
 import { useInfiniteQuery, useQueryClient } from '@tanstack/react-query'
 
 import { PRESET_CONFIG } from '../Reports/Reports.constants'
 import { Presets } from '../Reports/Reports.types'
 import {
+  numericFilterSchema,
+  type ComparisonOperator,
+  type NumericFilter,
+} from '../Reports/v2/ReportsNumericFilter'
+import {
   QueryPerformanceRow,
   QueryPerformanceSort,
   QueryPerformanceSQLParams,
 } from './QueryPerformance.types'
+import { unguarded } from '@/data/fetchers'
 import { useReadReplicasQuery } from '@/data/read-replicas/replicas-query'
-import { executeSql } from '@/data/sql/execute-sql-query'
+import { executeSql } from '@/data/sql/execute-sql-mutation'
 import useDbQuery from '@/hooks/analytics/useDbQuery'
 import { useSelectedProjectQuery } from '@/hooks/misc/useSelectedProject'
 import { IS_PLATFORM } from '@/lib/constants'
@@ -27,14 +40,35 @@ const VALID_SORT_COLUMNS: ReadonlySet<string> = new Set<QueryPerformanceSort['co
   'min_time',
 ])
 
+// Operators are resolved against this allowlist, never interpolated from the filter itself
+const COMPARISON_OPERATOR_SQL: Record<ComparisonOperator, SafeSqlFragment> = {
+  '=': safeSql`=`,
+  '>=': safeSql`>=`,
+  '<=': safeSql`<=`,
+  '>': safeSql`>`,
+  '<': safeSql`<`,
+  '!=': safeSql`<>`,
+}
+
+function numericFilterToSql(
+  column: SafeSqlFragment,
+  filter: NumericFilter | undefined
+): SafeSqlFragment | undefined {
+  // Filters come from URL params, so validate the shape before building SQL. The schema's
+  // operator enum also rules out inherited property names like `constructor`.
+  const parsed = numericFilterSchema.safeParse(filter)
+  if (!parsed.success || !Number.isFinite(parsed.data.value)) return undefined
+  return safeSql`${column} ${COMPARISON_OPERATOR_SQL[parsed.data.operator]} ${literal(parsed.data.value)}`
+}
+
 export function generateQueryPerformanceSql({
   preset,
   orderBy,
   searchQuery = '',
   roles = [],
   sources = [],
-  minCalls = 0,
-  minTotalTime = 0,
+  callsFilter,
+  totalTimeFilter,
   runIndexAdvisor = false,
   filterIndexAdvisor = false,
   page = 1,
@@ -54,36 +88,50 @@ export function generateQueryPerformanceSql({
     (orderBy.order === 'asc' || orderBy.order === 'desc')
 
   const orderBySql = isValidOrderBy
-    ? `ORDER BY ${ident(orderBy!.column)} ${orderBy!.order}`
+    ? safeSql`ORDER BY ${ident(orderBy!.column)} ${keyword(orderBy!.order)}`
     : undefined
 
-  const whereConditions = []
+  const whereConditions: SafeSqlFragment[] = []
   if (roles.length > 0) {
-    whereConditions.push(`auth.rolname in (${roles.map((r) => `${literal(r)}`).join(', ')})`)
+    whereConditions.push(
+      safeSql`auth.rolname in (${joinSqlFragments(
+        roles.map((r) => literal(r)),
+        ', '
+      )})`
+    )
   }
   if (searchQuery.length > 0) {
-    whereConditions.push(`statements.query ~* ${literal(searchQuery)}`)
+    // Literal, case-insensitive substring match. A regex (~*) would make characters like `[`
+    // or `(` a SQL error while the user is still typing.
+    whereConditions.push(
+      safeSql`strpos(lower(statements.query), lower(${literal(searchQuery)})) > 0`
+    )
   }
   if (sources.includes('dashboard') && !sources.includes('non-dashboard')) {
-    whereConditions.push(`statements.query ~* 'source: dashboard'`)
+    whereConditions.push(safeSql`statements.query ~* 'source: dashboard'`)
   }
   if (sources.includes('non-dashboard') && !sources.includes('dashboard')) {
-    whereConditions.push(`statements.query !~* 'source: dashboard'`)
+    whereConditions.push(safeSql`statements.query !~* 'source: dashboard'`)
   }
-  if (Number.isFinite(minCalls) && minCalls > 0) {
-    whereConditions.push(`statements.calls >= ${minCalls}`)
-  }
-  if (Number.isFinite(minTotalTime) && minTotalTime > 0) {
-    whereConditions.push(
-      `(statements.total_exec_time + statements.total_plan_time) >= ${minTotalTime}`
+  const callsSql = numericFilterToSql(safeSql`statements.calls`, callsFilter)
+  if (callsSql) whereConditions.push(callsSql)
+  const totalTimeSql = numericFilterToSql(
+    safeSql`(statements.total_exec_time + statements.total_plan_time)`,
+    totalTimeFilter
+  )
+  if (totalTimeSql) whereConditions.push(totalTimeSql)
+
+  const whereSql = joinSqlFragments(whereConditions, ' AND ')
+
+  if (baseSQL.queryType !== 'db') {
+    throw new Error(
+      `Query performance presets must be db queries; got ${baseSQL.queryType} for preset ${preset}`
     )
   }
 
-  const whereSql = whereConditions.join(' AND ')
-
-  const sql = baseSQL.sql(
+  const sql = baseSQL.safeSql(
     [],
-    whereSql.length > 0 ? `WHERE ${whereSql}` : undefined,
+    whereSql.length > 0 ? safeSql`WHERE ${whereSql}` : undefined,
     orderBySql,
     runIndexAdvisor,
     filterIndexAdvisor,
@@ -96,7 +144,14 @@ export function generateQueryPerformanceSql({
 
 export const useQueryPerformanceQuery = (props: QueryPerformanceSQLParams) => {
   const { sql, whereSql, orderBySql } = generateQueryPerformanceSql(props)
-  return useDbQuery({ sql, params: undefined, where: whereSql, orderBy: orderBySql })
+  return useDbQuery({
+    sql,
+    sqlOrigin: 'studio',
+    queryName: 'query-performance',
+    params: undefined,
+    where: whereSql,
+    orderBy: orderBySql,
+  })
 }
 
 export interface QueryPerformanceInfiniteHook {
@@ -120,7 +175,7 @@ export const useQueryPerformanceInfiniteQuery = (
   const { data: databases } = useReadReplicasQuery({ projectRef: project?.ref })
   const connectionString = (databases || []).find(
     (db) => db.identifier === state.selectedDatabaseId
-  )?.connectionString
+  )?.connection_string_read_only // default to read_only connection string
 
   // Clamp pageSize the same way generateQueryPerformanceSql does so getNextPageParam
   // and the queryKey are always consistent with the SQL actually executed.
@@ -165,7 +220,10 @@ export const useQueryPerformanceInfiniteQuery = (
           {
             projectRef: project?.ref,
             connectionString: effectiveConnectionString,
+            sqlOrigin: 'studio',
+            queryName: 'query-performance-infinite',
             sql,
+            grant: unguarded.migrating,
           },
           signal
         ).then((res) => res.result)

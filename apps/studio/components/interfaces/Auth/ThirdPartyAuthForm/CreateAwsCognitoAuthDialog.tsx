@@ -1,8 +1,8 @@
 import { zodResolver } from '@hookform/resolvers/zod'
 import { useParams } from 'common'
-import { Trash } from 'lucide-react'
+import { TrashIcon } from 'lucide-react'
 import { useEffect } from 'react'
-import { SubmitHandler, useForm } from 'react-hook-form'
+import { SubmitHandler, useForm, useWatch } from 'react-hook-form'
 import { toast } from 'sonner'
 import {
   Button,
@@ -16,14 +16,16 @@ import {
   Form,
   FormControl,
   FormField,
-  Input_Shadcn_,
+  Input,
   Separator,
 } from 'ui'
 import { FormItemLayout } from 'ui-patterns/form/FormItemLayout/FormItemLayout'
 import * as z from 'zod'
 
 import { AwsRegionSelector } from './AwsRegionSelector'
+import { ButtonTooltip } from '@/components/ui/ButtonTooltip'
 import { useCreateThirdPartyAuthIntegrationMutation } from '@/data/third-party-auth/integration-create-mutation'
+import { getWriteGrantToastMessage, getWriteGrantTooltip, useGrant } from '@/lib/grants'
 
 interface CreateAwsCognitoAuthIntegrationProps {
   visible: boolean
@@ -53,6 +55,9 @@ export const CreateAwsCognitoAuthIntegrationDialog = ({
   const isCreating = true
 
   const { ref: projectRef } = useParams()
+  const createGrant = useGrant('POST /v1/projects/{ref}/config/auth/third-party-auth', {
+    projectRef,
+  })
   const { mutate: createAuthIntegration, isPending } = useCreateThirdPartyAuthIntegrationMutation({
     onSuccess: () => {
       toast.success(`Successfully created a new Amazon Cognito Auth integration.`)
@@ -84,13 +89,20 @@ export const CreateAwsCognitoAuthIntegrationDialog = ({
   }, [visible])
 
   const onSubmit: SubmitHandler<z.infer<typeof FormSchema>> = async (values) => {
+    if (!createGrant.grant) {
+      toast.error(
+        getWriteGrantToastMessage(createGrant.status, 'add', 'third-party auth integrations')
+      )
+      return
+    }
     createAuthIntegration({
       projectRef: projectRef!,
+      grant: createGrant.grant,
       oidcIssuerUrl: `https://cognito-idp.${values.awsRegion}.amazonaws.com/${values.awsCognitoUserPoolId}`,
     })
   }
 
-  const awsRegion = form.watch('awsRegion')
+  const awsRegion = useWatch({ control: form.control, name: 'awsRegion' })
 
   return (
     <Dialog open={visible} onOpenChange={() => onClose()}>
@@ -144,7 +156,6 @@ export const CreateAwsCognitoAuthIntegrationDialog = ({
                   <FormItemLayout label="Amazon Cognito User Pool ID">
                     <div className="flex flex-row">
                       <Button
-                        type="default"
                         size="small"
                         className="px-2 text-foreground-light rounded-r-none"
                         onClick={() => form.setFocus('awsCognitoUserPoolId')}
@@ -152,7 +163,7 @@ export const CreateAwsCognitoAuthIntegrationDialog = ({
                         https://cognito-idp.{awsRegion}.amazonaws.com/
                       </Button>
                       <FormControl>
-                        <Input_Shadcn_ className="rounded-l-none border-l-0 z-50" {...field} />
+                        <Input className="rounded-l-none border-l-0 z-50" {...field} />
                       </FormControl>
                     </div>
                   </FormItemLayout>
@@ -173,18 +184,34 @@ export const CreateAwsCognitoAuthIntegrationDialog = ({
         <DialogFooter>
           {!isCreating && (
             <div className="flex-1">
-              <Button type="danger" onClick={() => onDelete()} icon={<Trash />}>
+              <Button variant="danger" onClick={() => onDelete()} icon={<TrashIcon />}>
                 Remove connection
               </Button>
             </div>
           )}
 
-          <Button disabled={isPending} type="default" onClick={() => onClose()}>
+          <Button disabled={isPending} onClick={() => onClose()}>
             Cancel
           </Button>
-          <Button form={FORM_ID} htmlType="submit" disabled={isPending} loading={isPending}>
+          <ButtonTooltip
+            variant="primary"
+            form={FORM_ID}
+            type="submit"
+            disabled={isPending || !createGrant.grant}
+            loading={isPending}
+            tooltip={{
+              content: {
+                side: 'top',
+                text: getWriteGrantTooltip(
+                  createGrant.status,
+                  'add',
+                  'third-party auth integrations'
+                ),
+              },
+            }}
+          >
             {isCreating ? 'Create connection' : 'Update connection'}
-          </Button>
+          </ButtonTooltip>
         </DialogFooter>
       </DialogContent>
     </Dialog>

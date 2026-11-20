@@ -1,12 +1,12 @@
 import { useParams } from 'common'
-import { Eye, Unlock } from 'lucide-react'
+import { EyeIcon, UnlockIcon } from 'lucide-react'
 import { toast } from 'sonner'
 import ConfirmationModal from 'ui-patterns/Dialogs/ConfirmationModal'
 
 import { getContentById } from '@/data/content/content-id-query'
 import { useContentUpsertMutation } from '@/data/content/content-upsert-mutation'
 import { Snippet } from '@/data/content/sql-folders-query'
-import { useSqlEditorV2StateSnapshot } from '@/state/sql-editor-v2'
+import { useSqlEditorV2StateSnapshot } from '@/state/sql-editor/sql-editor-state'
 import type { SqlSnippets } from '@/types'
 
 export const ShareSnippetModal = ({
@@ -49,6 +49,7 @@ export const ShareSnippetModal = ({
         projectRef,
         payload: {
           ...snippet,
+          description: snippet.description ?? undefined,
           visibility: 'project',
           folder_id: null,
           content: snippetContent,
@@ -86,11 +87,11 @@ export const ShareSnippetModal = ({
     >
       <ul className="text-sm text-foreground-light space-y-5">
         <li className="flex gap-3 items-center">
-          <Eye size={16} />
+          <EyeIcon size={16} />
           <span>Project members will have read-only access to this query.</span>
         </li>
         <li className="flex gap-3 items-center">
-          <Unlock size={16} />
+          <UnlockIcon size={16} />
           <span>Anyone will be able to duplicate it to their personal snippets.</span>
         </li>
       </ul>

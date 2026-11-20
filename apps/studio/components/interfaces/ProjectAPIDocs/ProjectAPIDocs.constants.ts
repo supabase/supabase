@@ -121,7 +121,7 @@ curl -X POST '${endpoint}/auth/v1/token?grant_type=password' \\
   magicLinkLogin: {
     key: 'magic-link-login',
     category: API_DOCS_CATEGORIES.USER_MANAGEMENT,
-    title: `Log in with Magic Link via Email`,
+    title: `Sign in with magic link`,
     description: `
 Send a user a passwordless link which they can use to redeem an access_token.
 

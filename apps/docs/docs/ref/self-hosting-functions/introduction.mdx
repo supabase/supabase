@@ -5,7 +5,7 @@ hideTitle: true
 ---
 
 <div className="flex items-start gap-6 not-prose" id="introduction">
-  <img src="/docs/img/icons/menu/reference-analytics.svg" className="w-8 h-8 rounded" />
+  <img src="/docs/img/icons/menu/reference-analytics.svg" className="w-8 h-8 rounded-sm" />
   <div className="flex flex-col gap-2">
     <h1 className="text-3xl text-foreground m-0">Self-Hosting Functions</h1>
   </div>
@@ -21,7 +21,7 @@ You can use it to:
 - Locally test and self-host Supabase's Edge Functions (or any Deno Edge Function)
 - As a programmable HTTP Proxy: You can intercept / route HTTP requests
 
-<Admonition type="note" label="Beta Version">
+<Admonition type="note" title="Beta Version">
 
 Self hosted Edge functions are in beta. There will be breaking changes to APIs / Configuration Options.
 
@@ -51,7 +51,7 @@ We have put together a demo on how to self-host edge functions on [Fly.io](http:
 
 To try it yourself,
 
-1. Sign up for an [Fly.io](http://Fly.io) account and install [flyctl](https://fly.io/docs/hands-on/install-flyctl/)
+1. Sign up for an [Fly.io](http://Fly.io) account and install [flyctl](https://docs.fly.io/flyctl/install)
 2. Clone the demo repository to your machine - https://github.com/supabase/self-hosted-edge-functions-demo
 3. Copy your Edge Function into the `./functions` directory in the demo repo.
 4. Update the Dockerfile to pull the latest edge-runtime image (check [releases](https://github.com/supabase/edge-runtime/pkgs/container/edge-runtime))

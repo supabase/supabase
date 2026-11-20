@@ -1,0 +1,56 @@
+import { createFileRoute } from '@tanstack/react-router'
+import { LogoLoader } from 'ui'
+import {
+  PageHeader,
+  PageHeaderDescription,
+  PageHeaderMeta,
+  PageHeaderSummary,
+  PageHeaderTitle,
+} from 'ui-patterns/PageHeader'
+
+import { AuditLogs } from '@/components/interfaces/Organization/AuditLogs/AuditLogs'
+import { OrganizationSettingsLayout } from '@/components/layouts/ProjectLayout/OrganizationSettingsLayout'
+import { usePermissionsQuery } from '@/data/permissions/permissions-query'
+import { useSelectedOrganizationQuery } from '@/hooks/misc/useSelectedOrganization'
+
+export const Route = createFileRoute('/_app/org/$slug/audit')({
+  component: OrgAudit,
+  staticData: {
+    orgLayoutTitle: 'Audit Logs',
+  },
+})
+
+function OrgAudit() {
+  return (
+    <OrganizationSettingsLayout>
+      <OrgAuditLogsPage />
+    </OrganizationSettingsLayout>
+  )
+}
+
+function OrgAuditLogsPage() {
+  const { isPending: isLoadingPermissions } = usePermissionsQuery()
+  const { data: selectedOrganization } = useSelectedOrganizationQuery()
+
+  return (
+    <div className="flex flex-col h-full">
+      <PageHeader size="full">
+        <PageHeaderMeta>
+          <PageHeaderSummary>
+            <PageHeaderTitle>Audit Logs</PageHeaderTitle>
+            <PageHeaderDescription>
+              Organization-level activity history and security event records
+            </PageHeaderDescription>
+          </PageHeaderSummary>
+        </PageHeaderMeta>
+      </PageHeader>
+      <div className="flex-1 min-h-0">
+        {selectedOrganization === undefined && isLoadingPermissions ? (
+          <LogoLoader />
+        ) : (
+          <AuditLogs />
+        )}
+      </div>
+    </div>
+  )
+}

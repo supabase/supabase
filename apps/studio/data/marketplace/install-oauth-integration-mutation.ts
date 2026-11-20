@@ -2,19 +2,20 @@ import { useMutation } from '@tanstack/react-query'
 import { toast } from 'sonner'
 
 import { handleError, post } from '@/data/fetchers'
-import type { ResponseError, UseCustomMutationOptions } from '@/types'
+import type { StudioError } from '@/lib/errors/studio-errors'
+import type { UseCustomMutationOptions } from '@/types'
 
 export type OAuthIntegrationInstallVariables = {
   projectRef: string
-  id: string
+  listingSlug: string
 }
 
 export async function installOAuthIntegration({
   projectRef,
-  id,
+  listingSlug,
 }: OAuthIntegrationInstallVariables) {
-  const { data, error } = await post('/platform/integrations/partners/{ref}/{listing_id}', {
-    params: { path: { ref: projectRef, listing_id: id } },
+  const { data, error } = await post('/platform/integrations/partners/{ref}/{listing_slug}', {
+    params: { path: { ref: projectRef, listing_slug: listingSlug } },
   })
 
   if (error) handleError(error)
@@ -30,12 +31,12 @@ export const useInstallOAuthIntegrationMutation = ({
 }: Omit<
   UseCustomMutationOptions<
     OAuthIntegrationInstallData,
-    ResponseError,
+    StudioError,
     OAuthIntegrationInstallVariables
   >,
   'mutationFn'
 > = {}) => {
-  return useMutation<OAuthIntegrationInstallData, ResponseError, OAuthIntegrationInstallVariables>({
+  return useMutation<OAuthIntegrationInstallData, StudioError, OAuthIntegrationInstallVariables>({
     mutationFn: (vars) => installOAuthIntegration(vars),
     async onSuccess(data, variables, context) {
       await onSuccess?.(data, variables, context)

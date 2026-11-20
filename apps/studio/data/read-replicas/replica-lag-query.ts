@@ -2,7 +2,9 @@ import { replicationLagSql } from '@supabase/pg-meta'
 import { useQuery } from '@tanstack/react-query'
 
 import { replicaKeys } from './keys'
-import { executeSql, ExecuteSqlError } from '@/data/sql/execute-sql-query'
+import { unguarded } from '@/data/fetchers'
+import { executeSql } from '@/data/sql/execute-sql-mutation'
+import type { StudioError } from '@/lib/errors/studio-errors'
 import { UseCustomQueryOptions } from '@/types'
 
 export type ReplicationLagVariables = {
@@ -18,7 +20,15 @@ export async function getReplicationLag(
   const sql = replicationLagSql()
 
   const { result } = await executeSql(
-    { projectRef, connectionString, sql, queryKey: ['replica-lag', id] },
+    {
+      projectRef,
+      connectionString,
+      sqlOrigin: 'studio',
+      queryName: 'replica-lag',
+      sql,
+      queryKey: ['replica-lag', id],
+      grant: unguarded.migrating,
+    },
     signal
   )
 
@@ -26,7 +36,7 @@ export async function getReplicationLag(
 }
 
 export type ReplicationLagData = Awaited<ReturnType<typeof getReplicationLag>>
-export type ReplicationLagError = ExecuteSqlError
+export type ReplicationLagError = StudioError
 
 export const useReplicationLagQuery = <TData = ReplicationLagData>(
   { projectRef, connectionString, id }: ReplicationLagVariables,

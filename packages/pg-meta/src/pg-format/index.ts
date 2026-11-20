@@ -26,6 +26,35 @@ export interface PgFormatConfig {
  */
 export type SafeSqlFragment = string & { readonly __safeSqlFragmentBrand: never }
 
+/**
+ * SQL that writes (DDL/DML). Needs a `write` grant to run through executeSql.
+ * Composing it via safeSql`...${w}...` or joinSqlFragments keeps the brand; only SQL written from
+ * scratch needs asWriteSql.
+ */
+export type WriteSqlFragment = SafeSqlFragment & { readonly __sqlIntent: 'write' }
+
+/** `WriteSqlFragment` if any input fragment writes, otherwise `SafeSqlFragment`. */
+type ComposedSql<F extends SafeSqlFragment> = [Extract<F, WriteSqlFragment>] extends [never]
+  ? SafeSqlFragment
+  : WriteSqlFragment
+
+/** Marks SQL as writing. Only for SQL that has already been built safely. */
+export function asWriteSql(sql: SafeSqlFragment): WriteSqlFragment {
+  return sql as WriteSqlFragment
+}
+
+/**
+ * A branded string type representing SQL that may have been influenced by a
+ * third party (URL params, AI output, external content). Safe to display;
+ * must never be auto-executed or persisted as user-authored content.
+ * Promote to SafeSqlFragment via acceptUntrustedSql() — only inside an
+ * explicit user-action event handler.
+ */
+export type UntrustedSqlFragment = string & { readonly __untrustedSqlFragmentBrand: never }
+
+/** Either brand — for read-only display surfaces that accept both. */
+export type DisplayableSqlFragment = SafeSqlFragment | UntrustedSqlFragment
+
 export type SqlFragmentSeparator =
   | ','
   | ', '
@@ -49,8 +78,8 @@ const FMT_PATTERN_CONFIG: PgFormatConfigPattern = {
 }
 
 // convert to Postgres default ISO 8601 format
-function formatDate(date: string): string {
-  return date.replace('T', ' ').replace('Z', '+00')
+function formatDate(date: SafeSqlFragment): SafeSqlFragment {
+  return date.replace('T', ' ').replace('Z', '+00') as SafeSqlFragment
 }
 
 function isReserved(value: string): boolean {
@@ -60,14 +89,18 @@ function isReserved(value: string): boolean {
   return false
 }
 
-function arrayToList(useSpace: boolean, array: unknown[], formatter: (value: unknown) => string) {
-  let sql = ''
+function arrayToList<ElementType = unknown>(
+  useSpace: boolean,
+  array: ElementType[],
+  formatter: (value: ElementType) => SafeSqlFragment
+): SafeSqlFragment {
+  let sql = safeSql``
 
-  sql += useSpace ? ' (' : '('
+  sql = useSpace ? safeSql`${sql} (` : safeSql`${sql} (`
   for (const [index, element] of array.entries()) {
-    sql += (index === 0 ? '' : ', ') + formatter(element)
+    sql = safeSql`${sql}${index === 0 ? safeSql`` : safeSql`, `}${formatter(element)}`
   }
-  sql += ')'
+  sql = safeSql`${sql})`
 
   return sql
 }
@@ -82,7 +115,7 @@ export function ident(value?: unknown): SafeSqlFragment {
   } else if (value === true) {
     return '"t"' as SafeSqlFragment
   } else if (value instanceof Date) {
-    return `"${formatDate(value.toISOString())}"` as SafeSqlFragment
+    return safeSql`"${formatDate(value.toISOString() as SafeSqlFragment)}"`
   } else if (Array.isArray(value)) {
     const temporary: string[] = []
     for (const element of value) {
@@ -149,7 +182,7 @@ export function literal(value?: unknown): SafeSqlFragment {
     return "'t'" as SafeSqlFragment
   }
   if (value instanceof Date) {
-    return `'${formatDate(value.toISOString())}'` as SafeSqlFragment
+    return safeSql`'${formatDate(value.toISOString() as SafeSqlFragment)}'`
   }
   if (Array.isArray(value)) {
     const temporary: string[] = []
@@ -196,36 +229,56 @@ export function literal(value?: unknown): SafeSqlFragment {
   return quoted as SafeSqlFragment
 }
 
+// Multi-word SQL keyword phrases callers are allowed to pass to `keyword()`.
+// Compared case-insensitively. Any phrase not listed here must be expressed as
+// separate single-word `keyword()` calls composed via `safeSql`, so that
+// arbitrary control phrases (e.g. "DROP TABLE") can't slip through.
+const ALLOWED_MULTI_WORD_KEYWORDS = new Set(['INSTEAD OF', 'BY DEFAULT'])
+
 /**
- * Marks SQL keywords (e.g., 'BEFORE', 'instead of') as safe for interpolation.
- * Only letters, numbers, underscores, and spaces are allowed, to prevent
- * injection.
+ * Marks SQL keywords (e.g., 'BEFORE', 'INSTEAD OF') as safe for interpolation.
+ * Accepts either a single word matching [A-Za-z][A-Za-z0-9_]*, or a
+ * multi-word phrase from `ALLOWED_MULTI_WORD_KEYWORDS`. Any other input —
+ * including arbitrary space-separated tokens like "DROP TABLE" — is rejected.
  */
 export function keyword(value: string): SafeSqlFragment {
-  if (!/^[A-Za-z][A-Za-z0-9_ ]*$/.test(value)) {
-    throw new Error(
-      `Not a valid keyword: "${value}". Only letters, numbers, underscores, and spaces are permitted.`
-    )
+  if (/^[A-Za-z][A-Za-z0-9_]*$/.test(value)) {
+    return value as SafeSqlFragment
   }
-  return value as SafeSqlFragment
+  if (ALLOWED_MULTI_WORD_KEYWORDS.has(value.toUpperCase())) {
+    return value as SafeSqlFragment
+  }
+  throw new Error(
+    `Not a valid keyword: "${value}". Must be a single word matching [A-Za-z][A-Za-z0-9_]*, or one of: ${[...ALLOWED_MULTI_WORD_KEYWORDS].join(', ')}.`
+  )
 }
 
+type Stringifyable =
+  | SafeSqlFragment
+  | number
+  | boolean
+  | Date
+  | null
+  | undefined
+  | Record<string | number | symbol, unknown>
+  | Stringifyable[]
+
 // eslint-disable-next-line radar/cognitive-complexity
-export function string(value?: unknown): string {
+export function string(value?: Stringifyable): SafeSqlFragment {
   if (value === undefined || value === null) {
-    return ''
+    return safeSql``
   }
   if (value === false) {
-    return 'f'
+    return safeSql`f`
   }
   if (value === true) {
-    return 't'
+    return safeSql`t`
   }
   if (value instanceof Date) {
-    return formatDate(value.toISOString())
+    return formatDate(value.toISOString() as SafeSqlFragment)
   }
   if (Array.isArray(value)) {
-    const temporary: string[] = []
+    const temporary: SafeSqlFragment[] = []
     for (const [index, element] of value.entries()) {
       if (element !== null && element !== undefined) {
         if (Array.isArray(element) === true) {
@@ -235,13 +288,14 @@ export function string(value?: unknown): string {
         }
       }
     }
-    return temporary.toString()
+    return temporary.toString() as SafeSqlFragment
   }
-  if (value === Object(value)) {
-    return JSON.stringify(value)
+  if (!!value && typeof value === 'object') {
+    return JSON.stringify(value) as SafeSqlFragment
   }
 
-  return String(value).toString().slice(0) // return copy
+  // value is number or SafeSqlFragment
+  return String(value).toString().slice(0) as SafeSqlFragment // return copy
 }
 
 export function config(cfg: PgFormatConfig): void {
@@ -263,7 +317,7 @@ export function config(cfg: PgFormatConfig): void {
   }
 }
 
-export function withArray(fmt: string, parameters: unknown[]): string {
+export function withArray(fmt: SafeSqlFragment, parameters: SafeSqlFragment[]): SafeSqlFragment {
   let index = 0
 
   let reText = '%(%|(\\d+\\$)?['
@@ -274,10 +328,9 @@ export function withArray(fmt: string, parameters: unknown[]): string {
   const re = new RegExp(reText, 'g')
 
   // eslint-disable-next-line @typescript-eslint/ban-ts-comment
-  // @ts-ignore
-  return fmt.replace(re, (_, type: string): string => {
+  return fmt.replace(re, (_, type: string): SafeSqlFragment => {
     if (type === '%') {
-      return '%'
+      return safeSql`%`
     }
 
     let position = index
@@ -306,10 +359,12 @@ export function withArray(fmt: string, parameters: unknown[]): string {
     if (type === FMT_PATTERN_CONFIG.string) {
       return string(parameters[position])
     }
-  })
+
+    throw new Error(`unsupported format type: ${type}`)
+  }) as SafeSqlFragment
 }
 
-export function format(fmt: string, ...arguments_: unknown[]): string {
+export function format(fmt: SafeSqlFragment, ...arguments_: SafeSqlFragment[]): SafeSqlFragment {
   return withArray(fmt, arguments_)
 }
 
@@ -318,23 +373,54 @@ export function format(fmt: string, ...arguments_: unknown[]): string {
  * Only accepts SafeSqlFragment interpolations — plain strings are rejected at
  * compile time.
  */
-export function safeSql(
+export function safeSql<const F extends ReadonlyArray<SafeSqlFragment>>(
   strings: TemplateStringsArray,
-  ...interpolated: Array<SafeSqlFragment>
-): SafeSqlFragment {
+  ...interpolated: F
+): ComposedSql<F[number]> {
   return strings.reduce(
     (result, string, i) => result + string + (interpolated[i] ?? ''),
     ''
-  ) as SafeSqlFragment
+  ) as ComposedSql<F[number]>
+}
+
+/**
+ * Marks a user-provided SQL string as a SafeSqlFragment for execution.
+ * Only use this when the user has explicitly typed or authored the SQL
+ * (e.g. a SQL editor, RLS tester). Never use for arbitrary data.
+ */
+export function rawSql(sql: string): SafeSqlFragment {
+  return sql as SafeSqlFragment
+}
+
+/**
+ * Marks SQL that may have been influenced by a third party (URL params, AI
+ * output, external content) as UntrustedSqlFragment. Safe to display; must
+ * never be auto-executed or persisted as user-authored.
+ */
+export function untrustedSql(sql: string): UntrustedSqlFragment {
+  return sql as UntrustedSqlFragment
+}
+
+/**
+ * Promote SQL to executable after explicit user acknowledgment.
+ * Accepts DisplayableSqlFragment (SafeSqlFragment | UntrustedSqlFragment) because
+ * a Run action approves whatever is currently in the editor, whether the user typed
+ * it themselves or loaded it from an external source.
+ * ONLY call from an event handler tied to a deliberate user action (onClick,
+ * keydown on Run shortcut). Never call from useEffect, render, or any path
+ * that runs without a user gesture.
+ */
+export function acceptUntrustedSql(sql: DisplayableSqlFragment): SafeSqlFragment {
+  return sql as unknown as SafeSqlFragment
 }
 
 /**
  * Joins an array of already-safe SQL fragments with a fixed structural
  * separator.
  */
-export function joinSqlFragments(
-  fragments: Array<SafeSqlFragment>,
+export function joinSqlFragments<const F extends ReadonlyArray<SafeSqlFragment>>(
+  fragments: F,
   separator: SqlFragmentSeparator
-): SafeSqlFragment {
-  return fragments.join(separator) as SafeSqlFragment
+): ComposedSql<F[number]> {
+  return fragments.join(separator) as ComposedSql<F[number]>
 }

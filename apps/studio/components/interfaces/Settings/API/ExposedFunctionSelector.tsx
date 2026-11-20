@@ -1,18 +1,18 @@
 import { keepPreviousData, useInfiniteQuery, useQuery } from '@tanstack/react-query'
 import { useDebounce, useIntersectionObserver } from '@uidotdev/usehooks'
-import { Check, ChevronsUpDown, CircleAlert, Info } from 'lucide-react'
+import { CheckIcon, ChevronsUpDownIcon, CircleAlertIcon, InfoIcon } from 'lucide-react'
 import { useEffect, useMemo, useRef, useState } from 'react'
 import {
   Button,
   cn,
-  Command_Shadcn_,
-  CommandGroup_Shadcn_,
-  CommandInput_Shadcn_,
-  CommandItem_Shadcn_,
-  CommandList_Shadcn_,
-  Popover_Shadcn_,
-  PopoverContent_Shadcn_,
-  PopoverTrigger_Shadcn_,
+  Command,
+  CommandGroup,
+  CommandInput,
+  CommandItem,
+  CommandList,
+  Popover,
+  PopoverContent,
+  PopoverTrigger,
   ScrollArea,
   Tooltip,
   TooltipContent,
@@ -95,46 +95,61 @@ export const ExposedFunctionSelector = ({
     }
   }, [entry?.isIntersecting, hasNextPage, isFetching, isFetchingNextPage, isPending, fetchNextPage])
 
+  let functionsSummary: string
+
+  if (isCountsPending) {
+    functionsSummary = 'Loading functions...'
+  } else if (totalCount === 0) {
+    functionsSummary = 'No functions available'
+  } else {
+    functionsSummary = `${grantsCount} of ${totalCount} functions exposed${
+      pendingCount > 0 ? `, ${pendingCount} pending ${pluralize(pendingCount, 'change')}` : ''
+    }`
+  }
+
   return (
-    <Popover_Shadcn_ open={open} onOpenChange={setOpen} modal={false}>
-      <PopoverTrigger_Shadcn_ asChild>
-        <Button
-          size="small"
-          disabled={disabled}
-          type="default"
-          className="w-full [&>span]:w-full !pr-1 space-x-1"
-          iconRight={<ChevronsUpDown className="text-foreground-muted" strokeWidth={2} size={14} />}
-        >
-          <div className="w-full flex gap-1">
-            <p className="text-foreground-lighter">
-              {isCountsPending
-                ? 'Loading functions...'
-                : totalCount === 0
-                  ? 'No functions available'
-                  : `${grantsCount} of ${totalCount} functions exposed${
-                      pendingCount > 0
-                        ? `, ${pendingCount} pending ${pluralize(pendingCount, 'change')}`
-                        : ''
-                    }`}
-            </p>
-          </div>
-        </Button>
-      </PopoverTrigger_Shadcn_>
-      <PopoverContent_Shadcn_
+    <Popover open={open} onOpenChange={setOpen} modal={false}>
+      <Tooltip>
+        <TooltipTrigger asChild>
+          <PopoverTrigger asChild>
+            <Button
+              size="small"
+              disabled={disabled}
+              className="w-full [&>span]:w-full pr-1! space-x-1"
+              iconRight={
+                <ChevronsUpDownIcon className="text-foreground-muted" strokeWidth={2} size={14} />
+              }
+              aria-label="Select functions"
+              // Tooltip repeats the label; the description would read the name twice
+              aria-describedby={undefined}
+            >
+              <div className="w-full flex gap-1">
+                <p className="text-foreground-lighter" aria-live="polite">
+                  {functionsSummary}
+                </p>
+              </div>
+            </Button>
+          </PopoverTrigger>
+        </TooltipTrigger>
+        <TooltipContent side="bottom" align="end">
+          Select functions
+        </TooltipContent>
+      </Tooltip>
+      <PopoverContent
         className="p-0 min-w-[200px] pointer-events-auto"
         side="bottom"
         align="start"
         sameWidthAsTrigger
       >
-        <Command_Shadcn_ shouldFilter={false}>
-          <CommandInput_Shadcn_
+        <Command shouldFilter={false}>
+          <CommandInput
             className="text-xs"
             placeholder="Find function..."
             value={search}
             onValueChange={setSearch}
           />
-          <CommandList_Shadcn_>
-            <CommandGroup_Shadcn_>
+          <CommandList>
+            <CommandGroup>
               {isPending ? (
                 <>
                   <div className="px-2 py-1">
@@ -179,12 +194,12 @@ export const ExposedFunctionSelector = ({
                       })
 
                       return (
-                        <CommandItem_Shadcn_
+                        <CommandItem
                           key={key}
                           value={key}
                           className={cn(
                             'w-full',
-                            isSchemaExposed ? 'cursor-pointer' : 'opacity-50 !cursor-not-allowed'
+                            isSchemaExposed ? 'cursor-pointer' : 'opacity-50 cursor-not-allowed!'
                           )}
                           onSelect={() => {
                             if (!isSchemaExposed) return
@@ -211,7 +226,9 @@ export const ExposedFunctionSelector = ({
                         >
                           <div className="w-full flex items-center gap-x-2">
                             <div className="w-4 shrink-0 flex items-center justify-center">
-                              {isExposed && <Check size={16} className="text-brand shrink-0" />}
+                              {isExposed && (
+                                <CheckIcon size={16} className="text-primary shrink-0" />
+                              )}
                               {!isSchemaExposed && (
                                 <Tooltip>
                                   <TooltipTrigger asChild>
@@ -221,7 +238,7 @@ export const ExposedFunctionSelector = ({
                                       aria-label="Schema not exposed"
                                       className="inline-flex items-center text-foreground-muted hover:text-foreground-light"
                                     >
-                                      <Info size={14} />
+                                      <InfoIcon size={14} />
                                     </button>
                                   </TooltipTrigger>
                                   <TooltipContent side="left" className="max-w-[320px] text-xs">
@@ -253,7 +270,7 @@ export const ExposedFunctionSelector = ({
                                           : 'text-foreground-muted'
                                       )}
                                     >
-                                      <CircleAlert size={14} />
+                                      <CircleAlertIcon size={14} />
                                     </div>
                                   </TooltipTrigger>
                                   <TooltipContent
@@ -266,7 +283,7 @@ export const ExposedFunctionSelector = ({
                               )}
                             </div>
                           </div>
-                        </CommandItem_Shadcn_>
+                        </CommandItem>
                       )
                     })}
                     <div ref={sentinelRef} className="h-1 -mt-1" />
@@ -278,11 +295,11 @@ export const ExposedFunctionSelector = ({
                   </ScrollArea>
                 </>
               )}
-            </CommandGroup_Shadcn_>
-          </CommandList_Shadcn_>
-        </Command_Shadcn_>
-      </PopoverContent_Shadcn_>
-    </Popover_Shadcn_>
+            </CommandGroup>
+          </CommandList>
+        </Command>
+      </PopoverContent>
+    </Popover>
   )
 }
 

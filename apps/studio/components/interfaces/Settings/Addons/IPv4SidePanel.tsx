@@ -1,9 +1,8 @@
-import { PermissionAction } from '@supabase/shared-types/out/constants'
 import { useParams } from 'common'
 import { useEffect, useState } from 'react'
 import { toast } from 'sonner'
 import { cn, RadioGroup, RadioGroupLargeItem, SidePanel } from 'ui'
-import { Admonition } from 'ui-patterns'
+import { Admonition } from 'ui-patterns/Admonition'
 
 import { TaxDisclaimer } from '@/components/interfaces/Billing/TaxDisclaimer'
 import { DocsButton } from '@/components/ui/DocsButton'
@@ -14,7 +13,7 @@ import { useProjectAddonUpdateMutation } from '@/data/subscriptions/project-addo
 import { useProjectAddonsQuery } from '@/data/subscriptions/project-addons-query'
 import type { AddonVariantId } from '@/data/subscriptions/types'
 import { useCheckEntitlements } from '@/hooks/misc/useCheckEntitlements'
-import { useAsyncCheckPermissions } from '@/hooks/misc/useCheckPermissions'
+import { FGA_PERMISSIONS, useAsyncCheckPermissionsV2 } from '@/hooks/misc/useCheckPermissionsV2'
 import { useIsAwsCloudProvider } from '@/hooks/misc/useSelectedProject'
 import { DOCS_URL } from '@/lib/constants'
 import { formatCurrency } from '@/lib/helpers'
@@ -26,9 +25,8 @@ const IPv4SidePanel = () => {
 
   const [selectedOption, setSelectedOption] = useState<string>('ipv4_none')
 
-  const { can: canUpdateIPv4 } = useAsyncCheckPermissions(
-    PermissionAction.BILLING_WRITE,
-    'stripe.subscriptions'
+  const { can: canUpdateIPv4 } = useAsyncCheckPermissionsV2(
+    FGA_PERMISSIONS.PROJECT.INFRA_ADDONS_WRITE
   )
 
   const { panel, closePanel } = useAddonsPagePanel()
@@ -75,7 +73,7 @@ const IPv4SidePanel = () => {
       priceContent: (
         <>
           <p className="text-foreground text-sm">$0</p>
-          <p className="text-foreground-light translate-y-[1px] text-sm">/ month</p>
+          <p className="text-foreground-light translate-y-px text-sm">/ month</p>
         </>
       ),
       priceRowClassName: 'mt-2',
@@ -161,12 +159,12 @@ const IPv4SidePanel = () => {
           {!isAws && (
             <Admonition
               type="default"
-              title="Dedicated IPv4 address is only available for AWS projects"
+              description="Dedicated IPv4 address is only available for AWS projects."
             />
           )}
 
           {isAws && (
-            <div className={cn('!mt-8 pb-4', !hasAccessToIPv4 && 'opacity-75')}>
+            <div className={cn('mt-8! pb-4', !hasAccessToIPv4 && 'opacity-75')}>
               <RadioGroup
                 name="ipv4"
                 value={selectedOption}

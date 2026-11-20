@@ -1,4 +1,4 @@
-import { X } from 'lucide-react'
+import { XIcon } from 'lucide-react'
 import { useState } from 'react'
 import { toast } from 'sonner'
 import { Button, cn, ScrollArea, Sheet, SheetContent, SheetHeader } from 'ui'
@@ -62,13 +62,13 @@ export function ViewAppSheet({ app, visible, onClose, onDeleted }: ViewAppSheetP
         <SheetContent
           showClose={false}
           size="default"
-          className="!min-w-[600px] flex flex-col h-full gap-0"
+          className="min-w-[600px]! flex flex-col h-full gap-0"
         >
           <SheetHeader
             className={cn('flex flex-row justify-between gap-x-4 items-center border-b')}
           >
             <p className="truncate font-medium">{app?.name}</p>
-            <Button type="text" icon={<X size={16} />} className="px-1" onClick={onClose} />
+            <Button variant="text" icon={<XIcon size={16} />} className="px-1" onClick={onClose} />
           </SheetHeader>
 
           <ScrollArea className="flex-1 max-h-[calc(100vh-60px)]">

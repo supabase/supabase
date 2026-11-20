@@ -1,10 +1,11 @@
-import { keepPreviousData, useQuery } from '@tanstack/react-query'
+import { keepPreviousData, useQuery, UseQueryResult } from '@tanstack/react-query'
 
 import { organizationKeys } from './keys'
 import type { CustomerAddress, CustomerTaxId } from './types'
 import { handleError, post } from '@/data/fetchers'
 import type { SubscriptionTier } from '@/data/subscriptions/types'
-import type { ResponseError, UseCustomQueryOptions } from '@/types'
+import type { StudioError } from '@/lib/errors/studio-errors'
+import type { UseCustomQueryOptions } from '@/types'
 
 export type OrganizationBillingSubscriptionPreviewVariables = {
   organizationSlug?: string
@@ -46,6 +47,11 @@ export type OrganizationBillingSubscriptionPreviewData = Awaited<
   ReturnType<typeof previewOrganizationBillingSubscription>
 >
 
+export type OrganizationBillingSubscriptionPreviewQueryResult = UseQueryResult<
+  OrganizationBillingSubscriptionPreviewData,
+  StudioError
+>
+
 export const useOrganizationBillingSubscriptionPreview = <
   TData = OrganizationBillingSubscriptionPreviewData,
 >(
@@ -53,9 +59,9 @@ export const useOrganizationBillingSubscriptionPreview = <
   {
     enabled = true,
     ...options
-  }: UseCustomQueryOptions<OrganizationBillingSubscriptionPreviewData, ResponseError, TData> = {}
+  }: UseCustomQueryOptions<OrganizationBillingSubscriptionPreviewData, StudioError, TData> = {}
 ) =>
-  useQuery<OrganizationBillingSubscriptionPreviewData, ResponseError, TData>({
+  useQuery<OrganizationBillingSubscriptionPreviewData, StudioError, TData>({
     queryKey: organizationKeys.subscriptionPreview(organizationSlug, tier, {
       address: address as Record<string, unknown> | undefined,
       taxId: taxId as Record<string, unknown> | undefined,

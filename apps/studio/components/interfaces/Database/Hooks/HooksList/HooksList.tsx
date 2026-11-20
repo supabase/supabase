@@ -1,37 +1,56 @@
-import { PermissionAction } from '@supabase/shared-types/out/constants'
+import { useQuery } from '@tanstack/react-query'
 import { includes, map as lodashMap, uniqBy } from 'lodash'
-import { Search } from 'lucide-react'
+import { SearchIcon } from 'lucide-react'
 import { parseAsBoolean, useQueryState } from 'nuqs'
-import { useState } from 'react'
-import { Input } from 'ui'
+import { useRef, useState } from 'react'
+import { InputGroup, InputGroupAddon, InputGroupInput } from 'ui'
 import { GenericSkeletonLoader } from 'ui-patterns/ShimmeringLoader'
 
 import { HooksListEmpty } from './HooksListEmpty'
 import { SchemaTable } from './SchemaTable'
-import AlertError from '@/components/ui/AlertError'
+import { AlertError } from '@/components/ui/AlertError'
 import { ButtonTooltip } from '@/components/ui/ButtonTooltip'
 import { DocsButton } from '@/components/ui/DocsButton'
+import { NoPermission } from '@/components/ui/NoPermission'
 import { NoSearchResults } from '@/components/ui/NoSearchResults'
-import { useDatabaseHooksQuery } from '@/data/database-triggers/database-triggers-query'
-import { useAsyncCheckPermissions } from '@/hooks/misc/useCheckPermissions'
+import { databaseHooksQueryOptions } from '@/data/database-triggers/database-triggers-query'
 import { useSelectedProjectQuery } from '@/hooks/misc/useSelectedProject'
 import { DOCS_URL } from '@/lib/constants'
+import { getWriteGrantTooltip, useGrant } from '@/lib/grants'
+import { onSearchInputEscape } from '@/lib/keyboard'
+import { SHORTCUT_IDS } from '@/state/shortcuts/registry'
+import { useShortcut } from '@/state/shortcuts/useShortcut'
 
 export const HooksList = () => {
   const { data: project } = useSelectedProjectQuery()
 
   const [, setShowCreateHookForm] = useQueryState('new', parseAsBoolean.withDefault(false))
 
+  const readGrant = useGrant(
+    'POST /platform/pg-meta/{ref}/query',
+    { projectRef: project?.ref },
+    { variant: 'read' }
+  )
+  const writeGrant = useGrant(
+    'POST /platform/pg-meta/{ref}/query',
+    { projectRef: project?.ref },
+    { variant: 'write' }
+  )
   const {
     data: hooks = [],
-    isPending: isLoading,
+    isPending: isLoadingHooks,
     isSuccess,
     isError,
     error,
-  } = useDatabaseHooksQuery({
-    projectRef: project?.ref,
-    connectionString: project?.connectionString,
-  })
+  } = useQuery(
+    databaseHooksQueryOptions({
+      projectRef: project?.ref,
+      connectionString: project?.connectionString,
+      grant: readGrant.grant,
+    })
+  )
+  const isLoading =
+    readGrant.status === 'loading' || (readGrant.status === 'granted' && isLoadingHooks)
   const [filterString, setFilterString] = useState<string>('')
 
   const filteredHooks = hooks.filter((x) =>
@@ -39,38 +58,54 @@ export const HooksList = () => {
   )
   const filteredHookSchemas = lodashMap(uniqBy(filteredHooks, 'schema'), 'schema')
 
-  const { can: canCreateWebhooks, isSuccess: isPermissionsLoaded } = useAsyncCheckPermissions(
-    PermissionAction.TENANT_SQL_ADMIN_WRITE,
-    'triggers'
+  const canCreateWebhooks = writeGrant.status === 'granted'
+
+  const searchInputRef = useRef<HTMLInputElement>(null)
+
+  useShortcut(
+    SHORTCUT_IDS.LIST_PAGE_FOCUS_SEARCH,
+    () => {
+      searchInputRef.current?.focus()
+      searchInputRef.current?.select()
+    },
+    { label: 'Search webhooks' }
   )
+  useShortcut(SHORTCUT_IDS.LIST_PAGE_RESET_FILTERS, () => setFilterString(''))
+  useShortcut(SHORTCUT_IDS.LIST_PAGE_NEW_ITEM, () => setShowCreateHookForm(true), {
+    label: 'Create webhook',
+    enabled: canCreateWebhooks,
+  })
 
   return (
     <div className="w-full space-y-4">
       <div className="flex items-center justify-between">
-        <Input
-          placeholder="Search for a webhook"
-          size="tiny"
-          icon={<Search />}
-          value={filterString}
-          className="w-52"
-          onChange={(e) => setFilterString(e.target.value)}
-        />
+        <InputGroup className="w-52">
+          <InputGroupInput
+            ref={searchInputRef}
+            size="tiny"
+            placeholder="Search for a webhook"
+            value={filterString}
+            onChange={(e) => setFilterString(e.target.value)}
+            onKeyDown={onSearchInputEscape(filterString, setFilterString)}
+          />
+          <InputGroupAddon>
+            <SearchIcon />
+          </InputGroupAddon>
+        </InputGroup>
         <div className="flex items-center gap-x-2">
           <DocsButton href={`${DOCS_URL}/guides/database/webhooks`} />
           <ButtonTooltip
+            variant="primary"
             onClick={() => setShowCreateHookForm(true)}
-            disabled={!isPermissionsLoaded || !canCreateWebhooks}
+            disabled={!canCreateWebhooks}
             tooltip={{
               content: {
                 side: 'bottom',
-                text:
-                  isPermissionsLoaded && !canCreateWebhooks
-                    ? 'You need additional permissions to create webhooks'
-                    : undefined,
+                text: getWriteGrantTooltip(writeGrant.status, 'create', 'webhooks'),
               },
             }}
           >
-            Create a new hook
+            Create webhook
           </ButtonTooltip>
         </div>
       </div>
@@ -79,6 +114,15 @@ export const HooksList = () => {
         <div className="py-4">
           <GenericSkeletonLoader />
         </div>
+      )}
+
+      {readGrant.status === 'denied' && <NoPermission resourceText="view database webhooks" />}
+
+      {readGrant.status === 'error' && (
+        <AlertError
+          error={readGrant.error}
+          subject="Failed to check database webhooks permissions"
+        />
       )}
 
       {isError && <AlertError error={error} subject="Failed to retrieve database webhooks" />}

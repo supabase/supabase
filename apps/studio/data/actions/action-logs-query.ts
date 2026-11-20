@@ -1,8 +1,9 @@
 import { useQuery } from '@tanstack/react-query'
 
 import { actionKeys } from './keys'
-import { get, handleError } from '@/data/fetchers'
-import type { ResponseError, UseCustomQueryOptions } from '@/types'
+import { get, handleError, unguarded } from '@/data/fetchers'
+import type { StudioError } from '@/lib/errors/studio-errors'
+import type { UseCustomQueryOptions } from '@/types'
 
 type ActionLogsVariables = {
   projectRef?: string
@@ -21,6 +22,7 @@ export async function getActionRunLogs(
     parseAs: 'text',
     headers: { Accept: 'text/plain' },
     signal,
+    grant: unguarded.migrating,
   })
   if (error) handleError(error)
 
@@ -32,7 +34,7 @@ export async function getActionRunLogs(
 }
 
 export type ActionLogsData = Awaited<ReturnType<typeof getActionRunLogs>>
-export type WorkflowRunLogsError = ResponseError
+export type WorkflowRunLogsError = StudioError
 
 export const useActionRunLogsQuery = <TData = ActionLogsData>(
   { projectRef, runId }: ActionLogsVariables,

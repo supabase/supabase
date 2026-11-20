@@ -1,30 +1,21 @@
-import { zodResolver } from '@hookform/resolvers/zod'
 import { SupportCategories } from '@supabase/shared-types/out/constants'
-import { LOCAL_STORAGE_KEYS } from 'common'
-import { useEffect, useState } from 'react'
-import { useForm } from 'react-hook-form'
+import { LOCAL_STORAGE_KEYS, safeLocalStorage } from 'common'
+import { useState } from 'react'
 import { toast } from 'sonner'
 import {
   Button,
   Dialog,
+  DialogClose,
   DialogContent,
   DialogDescription,
   DialogFooter,
   DialogHeader,
   DialogSection,
   DialogTitle,
-  DialogTrigger,
-  Form,
-  FormControl,
-  FormField,
-  FormItem,
-  FormLabel,
-  Input_Shadcn_,
-  Separator,
 } from 'ui'
-import * as z from 'zod'
 
 import { NO_PROJECT_MARKER } from '@/components/interfaces/Support/SupportForm.utils'
+import { TextConfirmModal } from '@/components/ui/TextConfirmModalWrapper'
 import { useSendSupportTicketMutation } from '@/data/feedback/support-ticket-send'
 import { useOrganizationsQuery } from '@/data/organizations/organizations-query'
 import { useProfile } from '@/lib/profile'
@@ -32,18 +23,18 @@ import { useProfile } from '@/lib/profile'
 const setDeletionRequestFlag = () => {
   const expiryDate = new Date()
   expiryDate.setDate(expiryDate.getDate() + 30)
-  localStorage.setItem(LOCAL_STORAGE_KEYS.ACCOUNT_DELETION_REQUEST, expiryDate.toString())
+  safeLocalStorage.setItem(LOCAL_STORAGE_KEYS.ACCOUNT_DELETION_REQUEST, expiryDate.toString())
 }
 
 const hasActiveDeletionRequest = () => {
-  const expiryDateStr = localStorage.getItem(LOCAL_STORAGE_KEYS.ACCOUNT_DELETION_REQUEST)
+  const expiryDateStr = safeLocalStorage.getItem(LOCAL_STORAGE_KEYS.ACCOUNT_DELETION_REQUEST)
   if (!expiryDateStr) return false
 
   const expiryDate = new Date(expiryDateStr)
   const now = new Date()
 
   if (now > expiryDate) {
-    localStorage.removeItem(LOCAL_STORAGE_KEYS.ACCOUNT_DELETION_REQUEST)
+    safeLocalStorage.removeItem(LOCAL_STORAGE_KEYS.ACCOUNT_DELETION_REQUEST)
     return false
   }
 
@@ -53,17 +44,22 @@ const hasActiveDeletionRequest = () => {
 export const DeleteAccountButton = () => {
   const { profile } = useProfile()
   const [isOpen, setIsOpen] = useState(false)
-  const { data: organizations, isSuccess } = useOrganizationsQuery()
+  const {
+    data: organizations,
+    isSuccess,
+    isPending: isCheckingOrganizations,
+    isError: hasOrganizationCheckFailed,
+    isFetching: isFetchingOrganizations,
+    refetch: refetchOrganizations,
+  } = useOrganizationsQuery()
+  const belongsToOrganizations = isSuccess && organizations.length > 0
+  const canRequestDeletion = isSuccess && organizations.length === 0
+
+  const organizationCheckDescription = isCheckingOrganizations
+    ? 'Checking your organization memberships…'
+    : 'Could not check your organization memberships.'
 
   const accountEmail = profile?.primary_email
-  const FormSchema = z.object({ account: z.string() })
-  const form = useForm<z.infer<typeof FormSchema>>({
-    mode: 'onBlur',
-    reValidateMode: 'onBlur',
-    resolver: zodResolver(FormSchema),
-    defaultValues: { account: '' },
-  })
-  const { account } = form.watch()
 
   const { mutate: submitSupportTicket, isPending } = useSendSupportTicketMutation({
     onSuccess: () => {
@@ -79,8 +75,8 @@ export const DeleteAccountButton = () => {
     },
   })
 
-  const onConfirmDelete = async () => {
-    if (!accountEmail) return console.error('Account information is required')
+  const handleSubmitDeletionRequest = () => {
+    if (!canRequestDeletion || !accountEmail || isPending) return
 
     if (hasActiveDeletionRequest()) {
       return toast.error('You have already submitted a deletion request within the last 30 days.')
@@ -99,105 +95,77 @@ export const DeleteAccountButton = () => {
     submitSupportTicket(payload)
   }
 
-  useEffect(() => {
-    if (isOpen && form !== undefined) form.reset({ account: '' })
-  }, [form, isOpen])
-
   return (
-    <Dialog open={isOpen} onOpenChange={setIsOpen}>
-      <DialogTrigger asChild>
-        <Button type="danger" loading={!accountEmail}>
-          Request to delete account
-        </Button>
-      </DialogTrigger>
-      <DialogContent className="!w-[500px]">
-        <DialogHeader>
-          {(organizations ?? []).length > 0 ? (
-            <>
-              <DialogTitle>Leave all organizations before requesting account deletion</DialogTitle>
-              <DialogDescription>
-                This will allow us to process your account deletion request faster
-              </DialogDescription>
-            </>
-          ) : (
-            <>
-              <DialogTitle>Are you sure you want to delete your account?</DialogTitle>
-              <DialogDescription>
-                Deleting your account is permanent and{' '}
-                <span className="text-foreground">cannot</span> be undone
-              </DialogDescription>
-            </>
-          )}
-        </DialogHeader>
+    <>
+      <Button
+        variant="danger"
+        loading={!accountEmail}
+        aria-haspopup="dialog"
+        onClick={() => setIsOpen(true)}
+      >
+        Request deletion
+      </Button>
 
-        <Separator />
+      {canRequestDeletion && accountEmail ? (
+        <TextConfirmModal
+          visible={isOpen}
+          size="small"
+          variant="destructive"
+          title="Request account deletion"
+          confirmString={accountEmail}
+          confirmPlaceholder="Type your email address in here"
+          confirmLabel="Submit deletion request"
+          errorMessage="Enter the email address shown above"
+          input={{ autoFocus: true, disabled: isPending }}
+          loading={isPending}
+          onConfirm={handleSubmitDeletionRequest}
+          onCancel={() => setIsOpen(false)}
+        >
+          <DialogDescription className="text-foreground">
+            Deleting your account is permanent and cannot be undone.
+          </DialogDescription>
+        </TextConfirmModal>
+      ) : (
+        <Dialog open={isOpen} onOpenChange={setIsOpen}>
+          <DialogContent size="small" hideClose={belongsToOrganizations}>
+            <DialogHeader>
+              <DialogTitle>
+                {belongsToOrganizations
+                  ? 'Leave all organizations first'
+                  : 'Request account deletion'}
+              </DialogTitle>
+            </DialogHeader>
 
-        {isSuccess && (
-          <>
-            {organizations.length > 0 ? (
-              <>
-                <DialogSection>
-                  <span className="text-sm text-foreground flex flex-col gap-y-2">
-                    Before submitting an account deletion request, please ensure that your account
-                    is not part of any organization. This can be done by leaving or deleting the
-                    organizations that you are a part of.
-                  </span>
-                </DialogSection>
-                <DialogFooter>
-                  <Button block type="primary" size="medium" onClick={() => setIsOpen(false)}>
-                    Understood
-                  </Button>
-                </DialogFooter>
-              </>
-            ) : (
-              <Form {...form}>
-                <form
-                  id="account-deletion-request"
-                  onSubmit={form.handleSubmit(() => onConfirmDelete())}
+            <DialogSection className="border-t">
+              <DialogDescription className="text-foreground">
+                {belongsToOrganizations
+                  ? 'Leave or delete every organization you belong to before requesting account deletion.'
+                  : organizationCheckDescription}
+              </DialogDescription>
+            </DialogSection>
+
+            {hasOrganizationCheckFailed && (
+              <DialogFooter>
+                <Button
+                  variant="primary"
+                  loading={isFetchingOrganizations}
+                  onClick={() => refetchOrganizations()}
                 >
-                  <DialogSection>
-                    <FormField
-                      name="account"
-                      control={form.control}
-                      render={({ field }) => (
-                        <FormItem>
-                          <FormLabel>
-                            Please type{' '}
-                            <span className="font-bold">{profile?.primary_email ?? ''}</span> to
-                            confirm
-                          </FormLabel>
-                          <FormControl>
-                            <Input_Shadcn_
-                              autoFocus
-                              {...field}
-                              autoComplete="off"
-                              disabled={isPending}
-                              placeholder="Enter the account above"
-                            />
-                          </FormControl>
-                        </FormItem>
-                      )}
-                    />
-                  </DialogSection>
-
-                  <DialogFooter>
-                    <Button
-                      block
-                      size="small"
-                      type="danger"
-                      htmlType="submit"
-                      loading={isPending}
-                      disabled={account !== accountEmail || isPending}
-                    >
-                      Submit request for account deletion
-                    </Button>
-                  </DialogFooter>
-                </form>
-              </Form>
+                  Retry
+                </Button>
+              </DialogFooter>
             )}
-          </>
-        )}
-      </DialogContent>
-    </Dialog>
+
+            {belongsToOrganizations && (
+              <DialogFooter>
+                <DialogClose asChild>
+                  <Button variant="default">Close</Button>
+                </DialogClose>
+              </DialogFooter>
+            )}
+          </DialogContent>
+        </Dialog>
+      )}
+    </>
   )
 }

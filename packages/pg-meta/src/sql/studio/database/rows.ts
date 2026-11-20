@@ -1,24 +1,27 @@
+import { literal, safeSql, type SafeSqlFragment } from '../../../pg-format'
 import { Filter, Query } from '../../../query'
-import { COUNT_ESTIMATE_SQL, THRESHOLD_COUNT } from './get-count-estimate'
+import { COUNT_ESTIMATE_SQL, THRESHOLD_COUNT, THRESHOLD_ESTIMATE_BYTES } from './get-count-estimate'
 
 /**
- * [Joshen] Initially check reltuples from pg_class for an estimate of row count on the table
- * - If reltuples = -1, table never been analyzed, assume small table -> return exact count
- * - If reltuples exceeds threshold, return estimate count
- * - Else return exact count
+ * Row-count for a table. reltuples = -1 (never analyzed) covers both an
+ * empty/small new table and a freshly bulk-loaded huge one, so we gate on
+ * real heap size (pg_relation_size, + pg_partition_tree for partitioned
+ * parents whose own size is 0): large -> EXPLAIN estimate, small/empty ->
+ * exact count.
  */
 export const getTableRowsCountSql = ({
   table,
   filters = [],
   enforceExactCount = false,
-  isUsingReadReplica = false,
+  isReadOnlyContext = false,
 }: {
   table: any
   filters?: Filter[]
   enforceExactCount?: boolean
-  isUsingReadReplica?: boolean
-}) => {
-  if (!table) return ``
+  /** Skip creating pg_temp.count_estimate; fall back to pg_class.reltuples. */
+  isReadOnlyContext?: boolean
+}): SafeSqlFragment => {
+  if (!table) return safeSql``
 
   if (enforceExactCount) {
     const query = new Query()
@@ -28,16 +31,23 @@ export const getTableRowsCountSql = ({
       .forEach((x) => {
         queryChains = queryChains.filter(x.column, x.operator, x.value)
       })
-    return `select (${queryChains.toSql().slice(0, -1)}), false as is_estimate;`
+    const queryChainsSql = queryChains.toSql()
+    const queryChainsSqlWithoutSemicolon = queryChainsSql.endsWith(';')
+      ? (queryChainsSql.slice(0, -1) as SafeSqlFragment)
+      : queryChainsSql
+    return safeSql`select (${queryChainsSqlWithoutSemicolon}), false as is_estimate;`
   } else {
     const selectQuery = new Query()
-    let selectQueryChains = selectQuery.from(table.name, table.schema ?? undefined).select('*')
+    let selectQueryChains = selectQuery.from(table.name, table.schema ?? undefined).select()
     filters
       .filter((x) => x.value && x.value != '')
       .forEach((x) => {
         selectQueryChains = selectQueryChains.filter(x.column, x.operator, x.value)
       })
     const selectBaseSql = selectQueryChains.toSql()
+    const selectBaseSqlWithoutSemicolon = selectBaseSql.endsWith(';')
+      ? (selectBaseSql.slice(0, -1) as SafeSqlFragment)
+      : selectBaseSql
 
     const countQuery = new Query()
     let countQueryChains = countQuery.from(table.name, table.schema ?? undefined).count()
@@ -46,42 +56,73 @@ export const getTableRowsCountSql = ({
       .forEach((x) => {
         countQueryChains = countQueryChains.filter(x.column, x.operator, x.value)
       })
-    const countBaseSql = countQueryChains.toSql().slice(0, -1)
+    const countBaseSql = countQueryChains.toSql()
+    const countBaseSqlWithoutSemicolon = countBaseSql.endsWith(';')
+      ? (countBaseSql.slice(0, -1) as SafeSqlFragment)
+      : countBaseSql
 
-    if (isUsingReadReplica) {
-      const sql = `
+    if (isReadOnlyContext) {
+      // Readonly can't create the pg_temp function: an over-threshold or
+      // physically-large never-analyzed table reports -1 (is_estimate=true);
+      // a small/empty one still gets an exact count.
+      const sql = safeSql`
 with approximation as (
-    select reltuples as estimate
+    select
+      reltuples as estimate,
+      -- Whole-tree heap size. A partitioned PARENT (relkind 'p') has no storage
+      -- of its own, so its size is the sum over pg_partition_tree; every other
+      -- relkind uses its own heap directly (pg_partition_tree returns NO rows
+      -- for a plain non-partitioned table, so it cannot be used unconditionally).
+      -- Views/foreign tables yield 0 (-> exact count, unchanged behavior).
+      case when relkind = 'p'
+        then (select coalesce(sum(pg_relation_size(relid)), 0) from pg_partition_tree(oid))
+        else pg_relation_size(oid)
+      end as bytes
     from pg_class
-    where oid = ${table.id}
+    where oid = ${literal(table.id)}
 )
-select 
-  case 
-    when estimate > ${THRESHOLD_COUNT} then (select -1)
-    else (${countBaseSql})
+select
+  case
+    when estimate > ${literal(THRESHOLD_COUNT)} or (estimate = -1 and bytes > ${literal(THRESHOLD_ESTIMATE_BYTES)}) then -1
+    else (${countBaseSqlWithoutSemicolon})
   end as count,
-  estimate > ${THRESHOLD_COUNT} as is_estimate
+  (estimate > ${literal(THRESHOLD_COUNT)} or (estimate = -1 and bytes > ${literal(THRESHOLD_ESTIMATE_BYTES)})) as is_estimate
 from approximation;
-`.trim()
+`
 
       return sql
     } else {
-      const sql = `
+      // estimate = -1 gated on heap size: large -> EXPLAIN estimate,
+      // small/empty -> exact count. literal() quotes the embedded select so
+      // backslash identifiers survive under any standard_conforming_strings.
+      const estimateExpr = safeSql`pg_temp.count_estimate(${literal(selectBaseSqlWithoutSemicolon)})`
+      const sql = safeSql`
 ${COUNT_ESTIMATE_SQL}
 
 with approximation as (
-    select reltuples as estimate
+    select
+      reltuples as estimate,
+      -- Whole-tree heap size. A partitioned PARENT (relkind 'p') has no storage
+      -- of its own, so its size is the sum over pg_partition_tree; every other
+      -- relkind uses its own heap directly (pg_partition_tree returns NO rows
+      -- for a plain non-partitioned table, so it cannot be used unconditionally).
+      -- Views/foreign tables yield 0 (-> exact count, unchanged behavior).
+      case when relkind = 'p'
+        then (select coalesce(sum(pg_relation_size(relid)), 0) from pg_partition_tree(oid))
+        else pg_relation_size(oid)
+      end as bytes
     from pg_class
-    where oid = ${table.id}
+    where oid = ${literal(table.id)}
 )
-select 
-  case 
-    when estimate > ${THRESHOLD_COUNT} then ${filters.length > 0 ? `pg_temp.count_estimate('${selectBaseSql.replaceAll("'", "''")}')` : 'estimate'}
-    else (${countBaseSql})
+select
+  case
+    when estimate = -1 and bytes > ${literal(THRESHOLD_ESTIMATE_BYTES)} then ${estimateExpr}
+    when estimate > ${literal(THRESHOLD_COUNT)} then ${filters.length > 0 ? estimateExpr : safeSql`estimate`}
+    else (${countBaseSqlWithoutSemicolon})
   end as count,
-  estimate > ${THRESHOLD_COUNT} as is_estimate
+  (estimate > ${literal(THRESHOLD_COUNT)} or (estimate = -1 and bytes > ${literal(THRESHOLD_ESTIMATE_BYTES)})) as is_estimate
 from approximation;
-`.trim()
+`
 
       return sql
     }

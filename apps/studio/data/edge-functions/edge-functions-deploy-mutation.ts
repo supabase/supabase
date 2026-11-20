@@ -8,8 +8,9 @@ import {
   getFallbackImportMapPath,
   getStaticPatterns,
 } from '@/components/interfaces/EdgeFunctions/EdgeFunctions.utils'
-import { handleError, post } from '@/data/fetchers'
-import type { ResponseError, UseCustomMutationOptions } from '@/types'
+import { handleError, post, unguarded } from '@/data/fetchers'
+import type { StudioError } from '@/lib/errors/studio-errors'
+import type { UseCustomMutationOptions } from '@/types'
 
 type EdgeFunctionsDeployBodyMetadata = components['schemas']['FunctionDeployBody']['metadata']
 type EdgeFunctionsDeployVariables = {
@@ -17,6 +18,7 @@ type EdgeFunctionsDeployVariables = {
   slug: string
   metadata: Partial<EdgeFunctionsDeployBodyMetadata>
   files: { name: string; content: string }[]
+  authorization?: string
 }
 
 export async function deployEdgeFunction({
@@ -24,6 +26,7 @@ export async function deployEdgeFunction({
   slug,
   metadata: _metadata,
   files,
+  authorization,
 }: EdgeFunctionsDeployVariables) {
   if (!projectRef) throw new Error('projectRef is required')
 
@@ -36,6 +39,7 @@ export async function deployEdgeFunction({
 
   const { data, error } = await post(`/v1/projects/{ref}/functions/deploy`, {
     params: { path: { ref: projectRef }, query: { slug: slug } },
+    ...(authorization && { headers: { Authorization: authorization } }),
     body: {
       file: files as any,
       metadata: metadata as EdgeFunctionsDeployBodyMetadata,
@@ -53,6 +57,7 @@ export async function deployEdgeFunction({
 
       return formData
     },
+    grant: unguarded.migrating,
   })
 
   if (error) handleError(error)
@@ -66,12 +71,12 @@ export const useEdgeFunctionDeployMutation = ({
   onError,
   ...options
 }: Omit<
-  UseCustomMutationOptions<EdgeFunctionsDeployData, ResponseError, EdgeFunctionsDeployVariables>,
+  UseCustomMutationOptions<EdgeFunctionsDeployData, StudioError, EdgeFunctionsDeployVariables>,
   'mutationFn'
 > = {}) => {
   const queryClient = useQueryClient()
 
-  return useMutation<EdgeFunctionsDeployData, ResponseError, EdgeFunctionsDeployVariables>({
+  return useMutation<EdgeFunctionsDeployData, StudioError, EdgeFunctionsDeployVariables>({
     mutationFn: (vars) => deployEdgeFunction(vars),
     async onSuccess(data, variables, context) {
       const { projectRef, slug } = variables

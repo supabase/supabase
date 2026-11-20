@@ -8,8 +8,8 @@ import { invoicesKeys } from '@/data/invoices/keys'
 import { organizationKeys } from '@/data/organizations/keys'
 import type { CustomerAddress, CustomerTaxId } from '@/data/organizations/types'
 import { usageKeys } from '@/data/usage/keys'
+import type { StudioError } from '@/lib/errors/studio-errors'
 import { UseCustomMutationOptions } from '@/types'
-import type { ResponseError } from '@/types/base'
 
 export type OrgSubscriptionUpdateVariables = {
   slug: string
@@ -56,16 +56,12 @@ export const useOrgSubscriptionUpdateMutation = ({
   onError,
   ...options
 }: Omit<
-  UseCustomMutationOptions<
-    OrgSubscriptionUpdateData,
-    ResponseError,
-    OrgSubscriptionUpdateVariables
-  >,
+  UseCustomMutationOptions<OrgSubscriptionUpdateData, StudioError, OrgSubscriptionUpdateVariables>,
   'mutationFn'
 > = {}) => {
   const queryClient = useQueryClient()
 
-  return useMutation<OrgSubscriptionUpdateData, ResponseError, OrgSubscriptionUpdateVariables>({
+  return useMutation<OrgSubscriptionUpdateData, StudioError, OrgSubscriptionUpdateVariables>({
     mutationFn: (vars) => updateOrgSubscription(vars),
     async onSuccess(data, variables, context) {
       const { slug } = variables
@@ -78,6 +74,7 @@ export const useOrgSubscriptionUpdateMutation = ({
         await Promise.all([
           queryClient.invalidateQueries({ queryKey: subscriptionKeys.orgSubscription(slug) }),
           queryClient.invalidateQueries({ queryKey: subscriptionKeys.orgPlans(slug) }),
+          queryClient.invalidateQueries({ queryKey: subscriptionKeys.orgBalance(slug) }),
           queryClient.invalidateQueries({ queryKey: usageKeys.orgUsage(slug) }),
           queryClient.invalidateQueries({ queryKey: invoicesKeys.orgUpcomingPreview(slug) }),
           queryClient.invalidateQueries({ queryKey: organizationKeys.detail(slug) }),

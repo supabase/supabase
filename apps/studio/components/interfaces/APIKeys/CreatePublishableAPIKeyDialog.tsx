@@ -1,8 +1,10 @@
 import { zodResolver } from '@hookform/resolvers/zod'
-import { Plus } from 'lucide-react'
+import { PlusIcon } from 'lucide-react'
 import { useParams } from 'next/navigation'
 import { parseAsString, useQueryState } from 'nuqs'
+import { useRef } from 'react'
 import { SubmitHandler, useForm } from 'react-hook-form'
+import { toast } from 'sonner'
 import {
   Button,
   Dialog,
@@ -13,16 +15,19 @@ import {
   DialogSection,
   DialogSectionSeparator,
   DialogTitle,
-  DialogTrigger,
   Form,
   FormControl,
   FormField,
-  Input_Shadcn_,
+  Input,
 } from 'ui'
 import { FormItemLayout } from 'ui-patterns/form/FormItemLayout/FormItemLayout'
 import * as z from 'zod'
 
+import { ButtonTooltip } from '@/components/ui/ButtonTooltip'
+import { Shortcut } from '@/components/ui/Shortcut'
 import { useAPIKeyCreateMutation } from '@/data/api-keys/api-key-create-mutation'
+import { getWriteGrantToastMessage, getWriteGrantTooltip, useGrant } from '@/lib/grants'
+import { SHORTCUT_IDS } from '@/state/shortcuts/registry'
 
 const FORM_ID = 'create-publishable-api-key'
 const SCHEMA = z.object({
@@ -37,12 +42,16 @@ export interface CreatePublishableAPIKeyDialogProps {
 export const CreatePublishableAPIKeyDialog = () => {
   const params = useParams()
   const projectRef = params?.ref as string
+  const formRef = useRef<HTMLFormElement>(null)
 
   const [visible, setVisible] = useQueryState('new', parseAsString.withDefault(''))
 
   const onOpenChange = (value: boolean) => {
     if (value) setVisible('publishable')
     else setVisible('')
+  }
+  const openDialog = () => {
+    if (canCreateAPIKeys) setVisible('publishable')
   }
 
   const defaultValues = { name: '', description: '' }
@@ -55,12 +64,20 @@ export const CreatePublishableAPIKeyDialog = () => {
     },
   })
 
+  const createGrant = useGrant('POST /v1/projects/{ref}/api-keys', { projectRef })
+  const canCreateAPIKeys = createGrant.status === 'granted'
+
   const { mutate: createAPIKey, isPending: isCreatingAPIKey } = useAPIKeyCreateMutation()
 
   const onSubmit: SubmitHandler<z.infer<typeof SCHEMA>> = async (values) => {
+    if (!createGrant.grant) {
+      toast.error(getWriteGrantToastMessage(createGrant.status, 'create', 'API keys'))
+      return
+    }
     createAPIKey(
       {
         projectRef,
+        grant: createGrant.grant,
         type: 'publishable',
         name: values.name,
         description: values.description,
@@ -76,11 +93,27 @@ export const CreatePublishableAPIKeyDialog = () => {
 
   return (
     <Dialog open={visible === 'publishable'} onOpenChange={onOpenChange}>
-      <DialogTrigger asChild>
-        <Button type="default" icon={<Plus />}>
+      <Shortcut
+        id={SHORTCUT_IDS.API_KEYS_NEW_PUBLISHABLE}
+        onTrigger={openDialog}
+        side="bottom"
+        // Hide the shortcut hint while blocked so the permission tooltip shows instead
+        tooltipOpen={visible === 'publishable' || !canCreateAPIKeys ? false : undefined}
+      >
+        <ButtonTooltip
+          icon={<PlusIcon />}
+          onClick={openDialog}
+          disabled={!canCreateAPIKeys}
+          tooltip={{
+            content: {
+              side: 'bottom',
+              text: getWriteGrantTooltip(createGrant.status, 'create', 'API keys'),
+            },
+          }}
+        >
           New publishable key
-        </Button>
-      </DialogTrigger>
+        </ButtonTooltip>
+      </Shortcut>
       <DialogContent>
         <DialogHeader>
           <DialogTitle>Create new publishable API key</DialogTitle>
@@ -94,6 +127,7 @@ export const CreatePublishableAPIKeyDialog = () => {
         <DialogSection className="flex flex-col gap-4">
           <Form {...form}>
             <form
+              ref={formRef}
               className="flex flex-col gap-4"
               id={FORM_ID}
               onSubmit={form.handleSubmit(onSubmit)}
@@ -108,7 +142,7 @@ export const CreatePublishableAPIKeyDialog = () => {
                     description="A short name of lowercase alphanumeric characters and underscore, must start with letter or underscore."
                   >
                     <FormControl>
-                      <Input_Shadcn_ {...field} />
+                      <Input {...field} />
                     </FormControl>
                   </FormItemLayout>
                 )}
@@ -123,7 +157,7 @@ export const CreatePublishableAPIKeyDialog = () => {
                     description="Provide a description about what this key is used for."
                   >
                     <FormControl>
-                      <Input_Shadcn_ {...field} placeholder="(Optional)" />
+                      <Input {...field} placeholder="(Optional)" />
                     </FormControl>
                   </FormItemLayout>
                 )}
@@ -132,9 +166,22 @@ export const CreatePublishableAPIKeyDialog = () => {
           </Form>
         </DialogSection>
         <DialogFooter>
-          <Button form={FORM_ID} htmlType="submit" loading={isCreatingAPIKey}>
-            Create Publishable API key
-          </Button>
+          <Shortcut
+            id={SHORTCUT_IDS.API_KEYS_CREATE_PUBLISHABLE}
+            onTrigger={() => formRef.current?.requestSubmit()}
+            options={{ enabled: visible === 'publishable' && !isCreatingAPIKey }}
+            side="top"
+          >
+            <Button
+              variant="primary"
+              form={FORM_ID}
+              type="submit"
+              loading={isCreatingAPIKey}
+              disabled={!canCreateAPIKeys}
+            >
+              Create Publishable API key
+            </Button>
+          </Shortcut>
         </DialogFooter>
       </DialogContent>
     </Dialog>

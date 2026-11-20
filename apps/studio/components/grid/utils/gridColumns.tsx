@@ -228,7 +228,6 @@ function getCellRenderer(
       if (!columnDef.isUpdatable) {
         formatter = DefaultFormatter
       } else {
-        // eslint-disable-next-line react/display-name
         formatter = (p: any) => <ForeignKeyFormatter {...p} tableId={metadata.tableId} />
       }
       break

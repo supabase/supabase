@@ -226,7 +226,7 @@ services:
 
 Edge Runtime will serve requests on port `9000`, so we’re creating a mapping from `[localhost:8000](http://localhost:8000)` where we want to serve our requests locally (of course you can adapt this to your needs) to port `9000` of our Docker container.
 
-Furthermore, we’re using [bind mounts](https://docs.docker.com/storage/bind-mounts/) to mount our functions directory into the container. This allows us to make modifications to our functions without needing to rebuild the container after, making for a great local developer experience.
+Furthermore, we’re using [bind mounts](https://docs.docker.com/engine/storage/bind-mounts/) to mount our functions directory into the container. This allows us to make modifications to our functions without needing to rebuild the container after, making for a great local developer experience.
 
 That’s it, now we can build and spin up our container from the terminal:
 
@@ -243,7 +243,7 @@ Go ahead and try it out by visiting:
 
 ## Installing and testing the plugin locally
 
-You can conveniently test your plugin while running it on [localhost](http://localhost) using the [ChatGPT UI](https://chat.openai.com/):
+You can conveniently test your plugin while running it on [localhost](http://localhost) using the [ChatGPT UI](https://chatgpt.com/):
 
 1. Select the plugin model from the top drop down, then select “Plugins”, “Plugin Store”, and finally “Develop your own plugin”.
 2. Enter `localhost:8000` and click "Find manifest file".
@@ -257,7 +257,7 @@ There you are, now go ahead and build your own plugin as it says on your todo li
 
 ## Deploying to Fly.io
 
-Once you’re happy with the functionality of your plugin, go ahead and deploy it to [Fly.io](http://Fly.io). After installing the [flyctl cli](https://fly.io/docs/hands-on/install-flyctl/), it only takes a couple of steps:
+Once you’re happy with the functionality of your plugin, go ahead and deploy it to [Fly.io](http://Fly.io). After installing the [flyctl cli](https://docs.fly.io/flyctl/install), it only takes a couple of steps:
 
 - Change `http://localhost:8000` to your Fly domain in the `/main/ai-plugins.json` file
 - Open `fly.toml` and update the app name and optionally the region etc.
@@ -275,6 +275,6 @@ In a next step you can add authentication to your plugin, let us know on [Twitte
 ## More AI resources
 
 - [Hugging Face is now supported in Supabase](https://supabase.com/blog/hugging-face-supabase)
-- [pgvector v0.5.0: Faster semantic search with HNSW indexes](https://supabase.com/blog/pgvector-v0-5-0-hnsw)
+- [pgvector v0.5.0: Faster semantic search with HNSW indexes](https://supabase.com/blog/increase-performance-pgvector-hnsw)
 - [OpenAI ChatGPT Plugin docs](https://platform.openai.com/docs/plugins/introduction)
 - [Docs pgvector: Embeddings and vector similarity](https://supabase.com/docs/guides/database/extensions/pgvector)

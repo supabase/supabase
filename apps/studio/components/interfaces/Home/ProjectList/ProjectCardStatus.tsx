@@ -1,4 +1,4 @@
-import { AlertTriangle, Info, PauseCircle, RefreshCcw } from 'lucide-react'
+import { AlertTriangleIcon, InfoIcon, PauseCircleIcon, RefreshCcwIcon } from 'lucide-react'
 import { Badge, cn, Tooltip, TooltipContent, TooltipTrigger } from 'ui'
 
 import { InferredProjectStatus } from './ProjectCard.utils'
@@ -163,7 +163,7 @@ export const ProjectCardStatus = ({
   if (!alertTitle) return null
 
   return (
-    <div role="alert" className={cn('w-full p-5 pb-[1.25rem] flex flex-row gap-x-2 items-center')}>
+    <div role="alert" className={cn('w-full p-5 pb-5 flex flex-row gap-x-2 items-center')}>
       {/* Icon */}
       <div
         className={cn(
@@ -174,13 +174,13 @@ export const ProjectCardStatus = ({
         )}
       >
         {['isPaused', 'isPausing'].includes(projectStatus ?? '') ? (
-          <PauseCircle strokeWidth={1.5} size={14} />
+          <PauseCircleIcon strokeWidth={1.5} size={14} />
         ) : ['isRestoring', 'isComingUp', 'isRestarting', 'isResizing'].includes(
             projectStatus ?? ''
           ) ? (
-          <RefreshCcw strokeWidth={1.5} size={14} />
+          <RefreshCcwIcon strokeWidth={1.5} size={14} />
         ) : (
-          <AlertTriangle strokeWidth={1.5} size={14} />
+          <AlertTriangleIcon strokeWidth={1.5} size={14} />
         )}
       </div>
       {/* Text and tooltip icon */}
@@ -188,7 +188,7 @@ export const ProjectCardStatus = ({
         <p className="text-xs">{alertTitle}</p>
         <Tooltip>
           <TooltipTrigger>
-            <Info
+            <InfoIcon
               size={12}
               className="text-foreground-lighter hover:text-foreground transition-colors"
             />

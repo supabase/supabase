@@ -1,16 +1,18 @@
+import * as Sentry from '@sentry/react'
 import type { JwtPayload } from '@supabase/supabase-js'
 import type { NextApiRequest, NextApiResponse } from 'next'
 
 import { IS_PLATFORM } from '../constants'
 import { apiAuthenticate } from './apiAuthenticate'
-import { ResponseError, ResponseFailure } from '@/types'
+import { isStudioError } from '@/lib/errors/studio-errors'
+import type { ResponseFailure } from '@/types'
 
 export function isResponseOk<T>(response: T | ResponseFailure | undefined): response is T {
   if (response === undefined || response === null) {
     return false
   }
 
-  if (response instanceof ResponseError) {
+  if (isStudioError(response)) {
     return false
   }
 
@@ -24,7 +26,7 @@ export function isResponseOk<T>(response: T | ResponseFailure | undefined): resp
 // Purpose of this apiWrapper is to function like a global catchall for ANY errors
 // It's a safety net as the API service should never drop, nor fail
 
-async function apiWrapper(
+export async function apiWrapper(
   req: NextApiRequest,
   res: NextApiResponse,
   handler: (
@@ -50,11 +52,9 @@ async function apiWrapper(
       claims = response
     }
 
-    return handler(req, res, claims)
+    return await handler(req, res, claims)
   } catch (error) {
+    Sentry.captureException(error)
     return res.status(500).json({ error })
   }
 }
-
-export { apiWrapper }
-export default apiWrapper

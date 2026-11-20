@@ -35,14 +35,14 @@ type Highlight = {
 
 const UseCases: FC<Props> = (props) => (
   <section id={props.id}>
-    <SectionContainer className="flex flex-col gap-4 md:gap-8 !pb-0">
+    <SectionContainer className="flex flex-col gap-4 md:gap-8 pb-0!">
       <div className="flex flex-col gap-2">
         <span className="label">{props.label}</span>
         <h2 className="h2">{props.heading}</h2>
       </div>
     </SectionContainer>
     <div className="overflow-hidden">
-      <SectionContainer className="!py-4">
+      <SectionContainer className="py-4!">
         <ul className="hidden xl:flex flex-col gap-4 md:flex-row items-stretch w-full h-auto min-h-[300px]">
           {props.stories?.map((story) => (
             <li key={story.heading} className="w-full">
@@ -60,7 +60,7 @@ const UseCases: FC<Props> = (props) => (
             watchOverflow
             threshold={2}
             updateOnWindowResize
-            className="h-[300px] w-full !overflow-visible"
+            className="h-[300px] w-full overflow-visible!"
             breakpoints={{
               320: {
                 slidesPerView: 1.2,
@@ -82,7 +82,7 @@ const UseCases: FC<Props> = (props) => (
         </div>
       </SectionContainer>
     </div>
-    <SectionContainer className="!pt-0">
+    <SectionContainer className="pt-0!">
       <ul className="grid grid-cols-2 gap-4 sm:gap-10 gap-y-10 lg:grid-cols-4 md:gap-12 lg:gap-x-8 mt-8">
         {props.highlights?.map((highlight) => (
           <HighlightCard highlight={highlight} key={highlight.heading} />
@@ -110,7 +110,7 @@ const StoryCard: FC<StoryCardProps> = ({ story }) => (
             alt={story.heading ?? ''}
             width={150}
             height={30}
-            className="max-h-[23px] max-w-[150px] w-auto object-contain object-left-bottom filter invert dark:invert-0 opacity-60"
+            className="max-h-[23px] max-w-[150px] w-auto object-contain object-bottom-left filter invert dark:invert-0 opacity-60"
           />
         )}
         <h3 className="text-foreground">{story.heading}</h3>

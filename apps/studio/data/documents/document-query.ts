@@ -2,7 +2,8 @@ import { useQuery } from '@tanstack/react-query'
 
 import { documentKeys } from './keys'
 import { get, handleError } from '@/data/fetchers'
-import type { ResponseError, UseCustomQueryOptions } from '@/types'
+import type { StudioError } from '@/lib/errors/studio-errors'
+import type { UseCustomQueryOptions } from '@/types'
 
 export type DocType =
   | 'standard-security-questionnaire'
@@ -58,7 +59,7 @@ export async function getDocument({ orgSlug, docType }: DocumentVariables, signa
 }
 
 export type DocumentData = Awaited<ReturnType<typeof getDocument>>
-export type DocumentError = ResponseError
+export type DocumentError = StudioError
 
 export const useDocumentQuery = <TData = DocumentData>(
   { orgSlug, docType }: DocumentVariables,

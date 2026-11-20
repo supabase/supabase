@@ -1,5 +1,5 @@
+import { getCurrentVersion, parseSchemaComment } from '@stripe/sync-engine/supabase'
 import { useEffect } from 'react'
-import { getCurrentVersion, parseSchemaComment } from 'stripe-experiment-sync/supabase'
 
 import {
   findStripeSchema,

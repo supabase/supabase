@@ -1,5 +1,5 @@
 import { IQueryModifier, QueryModifier } from './QueryModifier'
-import type { Dictionary, Filter, FilterOperator, QueryTable, Sort } from './types'
+import type { ActionConfig, Dictionary, Filter, FilterOperator, QueryTable, Sort } from './types'
 
 export interface IQueryFilter {
   filter: (column: string, operator: FilterOperator, value: string) => IQueryFilter
@@ -8,14 +8,13 @@ export interface IQueryFilter {
 }
 
 export class QueryFilter implements IQueryFilter, IQueryModifier {
-  protected filters: Filter[] = []
-  protected sorts: Sort[] = []
+  protected filters: Array<Filter> = []
+  protected sorts: Array<Sort> = []
 
   constructor(
     protected table: QueryTable,
-    protected action: 'count' | 'delete' | 'insert' | 'select' | 'update' | 'truncate',
-    protected actionValue?: string | string[] | Dictionary<any> | Dictionary<any>[],
-    protected actionOptions?: { returning: boolean; enumArrayColumns?: string[] }
+    protected actionConfig: ActionConfig,
+    protected actionOptions?: { returning: boolean; enumArrayColumns?: Array<string> }
   ) {}
 
   filter(column: string | string[], operator: FilterOperator, value: any) {
@@ -47,8 +46,7 @@ export class QueryFilter implements IQueryFilter, IQueryModifier {
   clone(): QueryFilter {
     const clonedData = structuredClone({
       table: this.table,
-      action: this.action,
-      actionValue: this.actionValue,
+      actionConfig: this.actionConfig,
       actionOptions: this.actionOptions,
       filters: this.filters,
       sorts: this.sorts,
@@ -56,8 +54,7 @@ export class QueryFilter implements IQueryFilter, IQueryModifier {
 
     const cloned = new QueryFilter(
       clonedData.table,
-      clonedData.action,
-      clonedData.actionValue,
+      clonedData.actionConfig,
       clonedData.actionOptions
     )
 
@@ -72,8 +69,7 @@ export class QueryFilter implements IQueryFilter, IQueryModifier {
   }
 
   _getQueryModifier() {
-    return new QueryModifier(this.table, this.action, {
-      actionValue: this.actionValue,
+    return new QueryModifier(this.table, this.actionConfig, {
       actionOptions: this.actionOptions,
       filters: this.filters,
       sorts: this.sorts,

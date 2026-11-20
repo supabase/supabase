@@ -37,8 +37,8 @@ const ImageLeftSection: FC<Props> = (props) => {
         )}
       >
         <span className="label">{props.label}</span>
-        <h2 className="h2 !m-0">{props.heading}</h2>
-        <p className="p !text-foreground-lighter">{props.subheading}</p>
+        <h2 className="h2 m-0!">{props.heading}</h2>
+        <p className="p text-foreground-lighter!">{props.subheading}</p>
         {props.cta && (
           <TextLink hasChevron label={props.cta.label} url={props.cta.url} className="mt-2" />
         )}

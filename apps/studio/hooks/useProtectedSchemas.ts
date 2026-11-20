@@ -29,6 +29,9 @@ export const INTERNAL_SCHEMAS = [
   'pgtle',
   'pgmq',
   'realtime',
+  // Self-hosted Realtime's own internal bookkeeping schema (docker/volumes/db/realtime.sql)
+  // is created as `_realtime`, distinct from the `realtime` schema name above.
+  '_realtime',
   'storage',
   'supabase_functions',
   'supabase_migrations',

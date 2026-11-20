@@ -16,10 +16,10 @@ You only need to expose the `pgmq_public` schema manually when running Supabase 
 
 ## Expose Queues with Supabase CLI
 
-When running Supabase locally with Supabase CLI, update your project's `config.toml` file.
-Locate the `[api]` section and add `pgmq_public` to the list of schemas.
+When running Supabase locally with Supabase CLI, update your project's config file (`supabase/config.toml` or `supabase/config.jsonc`).
+Locate the `api` section and add `pgmq_public` to the list of schemas.
 
-```toml
+```toml supabase/config.toml
 [api]
 enabled = true
 port = 54321
@@ -47,11 +47,13 @@ docker compose down
 docker compose up -d
 ```
 
+If queue functions still return a schema error after you expose `pgmq_public`, see [PGRST106 schema must be one of the following](/kb/troubleshooting/pgrst106-the-schema-must-be-one-of-the-following-error-when-querying-an-exposed-schema).
+
 ## Stop exposing queues
 
 If you no longer want to expose the `pgmq_public` schema, you can remove it from your configuration.
 
-- For Supabase CLI, remove `pgmq_public` from the `[api]` schemas list in your `config.toml` file.
+- For Supabase CLI, remove `pgmq_public` from the `api.schemas` list in your config file.
 - For Docker Compose, remove `pgmq_public` from the `PGRST_DB_SCHEMAS` variable in your `.env` file.
 
 After updating your configuration, restart your containers for the changes to take effect.

@@ -1,9 +1,9 @@
 import { useMutation, useQueryClient } from '@tanstack/react-query'
-import { toast } from 'sonner'
 
 import { integrationKeys } from './keys'
 import { handleError, post } from '@/data/fetchers'
-import type { ResponseError, UseCustomMutationOptions } from '@/types'
+import type { StudioError } from '@/lib/errors/studio-errors'
+import type { UseCustomMutationOptions } from '@/types'
 
 export type VercelIntegrationCreateVariables = {
   code: string
@@ -50,13 +50,13 @@ export const useVercelIntegrationCreateMutation = ({
 }: Omit<
   UseCustomMutationOptions<
     VercelIntegrationCreateData,
-    ResponseError,
+    StudioError,
     VercelIntegrationCreateVariables
   >,
   'mutationFn'
 > = {}) => {
   const queryClient = useQueryClient()
-  return useMutation<VercelIntegrationCreateData, ResponseError, VercelIntegrationCreateVariables>({
+  return useMutation<VercelIntegrationCreateData, StudioError, VercelIntegrationCreateVariables>({
     mutationFn: (vars) => createVercelIntegration(vars),
     async onSuccess(data, variables, context) {
       await Promise.all([
@@ -69,11 +69,7 @@ export const useVercelIntegrationCreateMutation = ({
       await onSuccess?.(data, variables, context)
     },
     async onError(data, variables, context) {
-      if (onError === undefined) {
-        toast.error(`Failed to create Vercel integration: ${data.message}`)
-      } else {
-        onError(data, variables, context)
-      }
+      await onError?.(data, variables, context)
     },
     ...options,
   })

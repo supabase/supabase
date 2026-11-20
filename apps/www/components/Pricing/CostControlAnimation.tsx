@@ -1,8 +1,8 @@
 'use client'
 
+import { AnimatePresence, motion, useInView } from 'motion/react'
 import React, { FC, useRef, useState } from 'react'
-import { AnimatePresence, motion, useInView } from 'framer-motion'
-import { Switch, cn } from 'ui'
+import { cn, Switch } from 'ui'
 
 interface Props {
   className?: string
@@ -61,7 +61,7 @@ const CostControlAnimation: FC<Props> = ({ className }) => {
         className
       )}
     >
-      <div className="absolute z-30 border left-2 top-2 rounded-full pointer-events-auto bg-alternative p-1 shadow flex items-center gap-1">
+      <div className="absolute z-30 border left-2 top-2 rounded-full pointer-events-auto bg-alternative p-1 shadow-sm flex items-center gap-1">
         <Switch checked={hasSpendCap} onCheckedChange={toggleSpendCap} />
         <span className="text-sm text-foreground-light mr-1">
           Spend Cap {hasSpendCap ? 'On' : 'Off'}
@@ -69,9 +69,10 @@ const CostControlAnimation: FC<Props> = ({ className }) => {
       </div>
       <div className="absolute inset-0 z-20 w-full h-full flex items-center justify-center">
         <span
+          aria-hidden="true"
           className={cn(
-            'w-full h-px border border-b border-dashed transition-all opacity-90 border-strong',
-            hasSpendCap && 'opacity-100 border-warning'
+            'h-0.5 w-full transition-shadow',
+            hasSpendCap ? 'groove-primary' : 'groove-page'
           )}
         />
       </div>
@@ -95,9 +96,7 @@ const CostControlAnimation: FC<Props> = ({ className }) => {
                   <motion.span
                     custom={index}
                     variants={barVariant}
-                    className={cn(
-                      'w-full bg-surface-200 border-stronger border-2 rounded h-0 transform transition-all'
-                    )}
+                    className={cn('w-full bg-surface-200 border-stronger border-2 rounded-sm h-0')}
                   />
                 </div>
               ))}
@@ -121,9 +120,7 @@ const CostControlAnimation: FC<Props> = ({ className }) => {
                   <motion.span
                     custom={index}
                     variants={barVariant}
-                    className={cn(
-                      'w-full bg-surface-200 border-stronger border-2 rounded h-0 transform transition-all'
-                    )}
+                    className={cn('w-full bg-surface-200 border-stronger border-2 rounded-sm h-0')}
                   />
                 </div>
               ))}
@@ -139,7 +136,7 @@ const CostControlAnimation: FC<Props> = ({ className }) => {
                         custom={index}
                         variants={barVariant}
                         className={cn(
-                          'relative w-full bg-warning-400 border-warning border-2 rounded h-0 transform transition-all'
+                          'relative w-full bg-warning-400 border-warning border-2 rounded-sm h-0'
                         )}
                       >
                         {bar.y > 50 && (

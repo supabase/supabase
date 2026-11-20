@@ -2,19 +2,26 @@ import { useMutation, useQueryClient } from '@tanstack/react-query'
 import { toast } from 'sonner'
 
 import { customDomainKeys } from './keys'
-import { del, handleError } from '@/data/fetchers'
+import { del, handleError, unguarded } from '@/data/fetchers'
 import { subscriptionKeys } from '@/data/subscriptions/keys'
-import type { ResponseError, UseCustomMutationOptions } from '@/types'
+import type { StudioError } from '@/lib/errors/studio-errors'
+import type { UseCustomMutationOptions } from '@/types'
 
 export type CustomDomainDeleteVariables = {
   projectRef: string
+  removeAddon?: boolean
 }
 
-export async function deleteCustomDomain({ projectRef }: CustomDomainDeleteVariables) {
+export async function deleteCustomDomain({
+  projectRef,
+  removeAddon = false,
+}: CustomDomainDeleteVariables) {
   const { data, error } = await del(`/v1/projects/{ref}/custom-hostname`, {
     params: {
       path: { ref: projectRef },
+      query: { remove_addon: removeAddon ? 'true' : 'false' },
     },
+    grant: unguarded.migrating,
   })
 
   if (error) handleError(error)
@@ -28,15 +35,15 @@ export const useCustomDomainDeleteMutation = ({
   onError,
   ...options
 }: Omit<
-  UseCustomMutationOptions<CustomDomainDeleteData, ResponseError, CustomDomainDeleteVariables>,
+  UseCustomMutationOptions<CustomDomainDeleteData, StudioError, CustomDomainDeleteVariables>,
   'mutationFn'
 > = {}) => {
   const queryClient = useQueryClient()
 
-  return useMutation<CustomDomainDeleteData, ResponseError, CustomDomainDeleteVariables>({
+  return useMutation<CustomDomainDeleteData, StudioError, CustomDomainDeleteVariables>({
     mutationFn: (vars) => deleteCustomDomain(vars),
     async onSuccess(data, variables, context) {
-      const { projectRef } = variables
+      const { projectRef, removeAddon } = variables
 
       // we manually setQueriesData here instead of using
       // the standard invalidateQueries is the custom domains
@@ -48,8 +55,10 @@ export const useCustomDomainDeleteMutation = ({
         }
       })
 
-      // Invalidate addons cache since the backend removes the addon when deleting the domain
-      await queryClient.invalidateQueries({ queryKey: subscriptionKeys.addons(projectRef) })
+      if (removeAddon) {
+        // Invalidate addons cache since if removing addon too when deleting the domain
+        await queryClient.invalidateQueries({ queryKey: subscriptionKeys.addons(projectRef) })
+      }
 
       await onSuccess?.(data, variables, context)
     },

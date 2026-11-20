@@ -9,6 +9,7 @@ import remarkGfm from 'remark-gfm'
 import redirects from './lib/redirects.js'
 import remotePatterns from './lib/remotePatterns.js'
 import rewrites from './lib/rewrites.js'
+import securityHeaders from './lib/security-headers.js'
 
 const withMDX = nextMdx({
   extension: /\.mdx?$/,
@@ -30,6 +31,8 @@ const withMDX = nextMdx({
   },
 })
 
+const { getSecurityHeaderRules } = securityHeaders
+
 const withBundleAnalyzer = bundleAnalyzer({
   enabled: process.env.ANALYZE === 'true',
 })
@@ -39,7 +42,6 @@ const withBundleAnalyzer = bundleAnalyzer({
  */
 const nextConfig = {
   basePath: '',
-  assetPrefix: getAssetPrefix(),
   pageExtensions: ['js', 'jsx', 'ts', 'tsx', 'md', 'mdx'],
   trailingSlash: false,
   transpilePackages: [
@@ -67,23 +69,77 @@ const nextConfig = {
       // Next.js build artifacts
       '.next/cache/**/*',
       '.next/static/**/*',
+      // Next 16 creates `.next/lock` during `next build` and deletes it on exit. Routes that read
+      // `process.cwd()` get the whole app dir traced, so Vercel would try to deploy the missing file.
+      '.next/lock',
       // Static assets
       'public/**/*',
     ],
   },
+  /**
+   * /llms.txt enumerates top-level guide directories at runtime via fs.readdir
+   * on apps/docs/content/guides and reads each <dir>.mdx for its frontmatter
+   * title. /llms-full.txt recursively reads the generated .md files under
+   * apps/docs/public/markdown/. Both directories live in a sibling app, so
+   * they have to be explicitly traced into this lambda's bundle.
+   */
+  outputFileTracingIncludes: {
+    '/llms.txt': ['../docs/content/guides/*'],
+    '/llms-full.txt': ['../docs/public/markdown/guides/**/*.md'],
+  },
   reactStrictMode: true,
   images: {
     dangerouslyAllowSVG: false,
+    // Next 16 rejects local images with a query string (e.g. `/images/blog/foo/thumb.png?v=3`,
+    // used for cache busting) unless `localPatterns` allows it. Omitting `search` allows any.
+    localPatterns: [{ pathname: '/**' }],
+    // Next 16 only allows `quality` values listed here (default is [75]); the app uses 75, 80 and 100.
+    qualities: [75, 80, 100],
     remotePatterns,
   },
   async headers() {
     return [
       {
+        source: '/changelog-rss.xml',
+        headers: [
+          { key: 'Content-Type', value: 'application/rss+xml; charset=utf-8' },
+          { key: 'X-Content-Type-Options', value: 'nosniff' },
+          { key: 'Cache-Control', value: 'public, s-maxage=900, stale-while-revalidate=900' },
+        ],
+      },
+      {
+        source: '/changelog-rss/:slug.xml',
+        headers: [
+          { key: 'Content-Type', value: 'application/rss+xml; charset=utf-8' },
+          { key: 'X-Content-Type-Options', value: 'nosniff' },
+          { key: 'Cache-Control', value: 'public, s-maxage=900, stale-while-revalidate=900' },
+        ],
+      },
+      {
+        source: '/changelog/:slug.md',
+        headers: [
+          { key: 'Content-Type', value: 'text/markdown; charset=utf-8' },
+          { key: 'X-Content-Type-Options', value: 'nosniff' },
+          { key: 'Cache-Control', value: 'public, s-maxage=900, stale-while-revalidate=900' },
+          { key: 'Vary', value: 'Accept' },
+        ],
+      },
+      {
+        source: '/changelog.md',
+        headers: [
+          { key: 'Content-Type', value: 'text/markdown; charset=utf-8' },
+          { key: 'X-Content-Type-Options', value: 'nosniff' },
+          { key: 'Cache-Control', value: 'public, s-maxage=900, stale-while-revalidate=900' },
+          { key: 'Vary', value: 'Accept' },
+        ],
+      },
+      {
         source: '/',
         headers: [
           {
             key: 'Link',
-            value: '</.well-known/api-catalog>; rel="api-catalog"',
+            value:
+              '</.well-known/api-catalog>; rel="api-catalog", </.well-known/ai-catalog.json>; rel="ai-catalog"',
           },
         ],
       },
@@ -104,6 +160,13 @@ const nextConfig = {
         ],
       },
       {
+        source: '/schemas/:path*',
+        headers: [
+          { key: 'access-control-allow-origin', value: '*' },
+          { key: 'cache-control', value: 'public, max-age=3600' },
+        ],
+      },
+      {
         source: '/favicon/:slug*',
         headers: [{ key: 'cache-control', value: 'public, max-age=86400' }],
       },
@@ -119,8 +182,9 @@ const nextConfig = {
           },
         ],
       },
+      ...getSecurityHeaderRules(rewrites),
       {
-        source: '/(docs|blog)/:path*',
+        source: '/(docs|blog|kb|library)/:path*',
         headers: [
           {
             key: 'X-Robots-Tag',
@@ -129,7 +193,8 @@ const nextConfig = {
         ],
       },
       {
-        source: '/dashboard/:path*',
+        // Public auth pages are indexable; every other dashboard path stays noindex
+        source: '/dashboard/:path((?!sign-in$|sign-up$).*)',
         headers: [
           {
             key: 'X-Robots-Tag',
@@ -146,10 +211,32 @@ const nextConfig = {
           },
         ],
       },
+      {
+        source: '/sla',
+        headers: [
+          {
+            key: 'X-Robots-Tag',
+            value: 'noindex, nofollow',
+          },
+        ],
+      },
     ]
   },
   async rewrites() {
-    return rewrites
+    return {
+      afterFiles: rewrites,
+      fallback: [
+        {
+          source: '/:path(.*\\.md)',
+          destination: '/api-v2/md-404/:path',
+        },
+        {
+          source: '/:path*',
+          has: [{ type: 'header', key: 'accept', value: '.*text/(markdown|\\*).*' }],
+          destination: '/api-v2/md-404/:path*',
+        },
+      ],
+    }
   },
   async redirects() {
     return redirects
@@ -159,10 +246,6 @@ const nextConfig = {
     // On production, we turn it on to prevent errors from conflicting PRs getting into
     // prod
     ignoreBuildErrors: process.env.NEXT_PUBLIC_VERCEL_ENV === 'production' ? false : true,
-  },
-  eslint: {
-    // We are already running linting via GH action, this will skip linting during production build on Vercel.
-    ignoreDuringBuilds: true,
   },
 }
 
@@ -178,6 +261,13 @@ export default withSentryConfig(configExport, {
 
   org: 'supabase',
   project: 'www',
+  applicationKey: 'supabase-www',
+  webpack: {
+    treeshake: {
+      // Automatically tree-shake Sentry logger statements to reduce bundle size
+      removeDebugLogging: true,
+    },
+  },
 
   // Only print logs for uploading source maps in CI
   silent: !process.env.CI,
@@ -193,21 +283,4 @@ export default withSentryConfig(configExport, {
   // Note: Check that the configured route will not match with your Next.js middleware, otherwise reporting of client-
   // side errors will fail.
   // tunnelRoute: "/monitoring",
-
-  // Automatically tree-shake Sentry logger statements to reduce bundle size
-  disableLogger: true,
 })
-
-function getAssetPrefix() {
-  // If not force enabled, but not production env, disable CDN
-  if (process.env.FORCE_ASSET_CDN !== '1' && process.env.VERCEL_ENV !== 'production') {
-    return undefined
-  }
-
-  // Force disable CDN
-  if (process.env.FORCE_ASSET_CDN === '-1') {
-    return undefined
-  }
-
-  return `https://frontend-assets.supabase.com/${process.env.SITE_NAME}/${process.env.VERCEL_GIT_COMMIT_SHA.substring(0, 12)}`
-}

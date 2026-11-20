@@ -1,10 +1,11 @@
 import { useMutation, useQueryClient } from '@tanstack/react-query'
-import { LOCAL_STORAGE_KEYS } from 'common'
+import { LOCAL_STORAGE_KEYS, safeLocalStorage } from 'common'
 import { toast } from 'sonner'
 
 import { integrationKeys } from './keys'
 import { handleError, post } from '@/data/fetchers'
-import type { ResponseError, UseCustomMutationOptions } from '@/types'
+import type { StudioError } from '@/lib/errors/studio-errors'
+import type { UseCustomMutationOptions } from '@/types'
 
 export type GitHubAuthorizationCreateVariables = {
   code: string
@@ -15,12 +16,12 @@ export async function createGitHubAuthorization({
   code,
   state,
 }: GitHubAuthorizationCreateVariables) {
-  const localState = localStorage.getItem(LOCAL_STORAGE_KEYS.GITHUB_AUTHORIZATION_STATE)
+  const localState = safeLocalStorage.getItem(LOCAL_STORAGE_KEYS.GITHUB_AUTHORIZATION_STATE)
 
   if (state !== localState) {
     throw new Error('GitHub authorization state mismatch')
   } else {
-    localStorage.removeItem(LOCAL_STORAGE_KEYS.GITHUB_AUTHORIZATION_STATE)
+    safeLocalStorage.removeItem(LOCAL_STORAGE_KEYS.GITHUB_AUTHORIZATION_STATE)
   }
 
   const { data, error } = await post('/platform/integrations/github/authorization', {
@@ -40,7 +41,7 @@ export const useGitHubAuthorizationCreateMutation = ({
 }: Omit<
   UseCustomMutationOptions<
     GitHubAuthorizationCreateData,
-    ResponseError,
+    StudioError,
     GitHubAuthorizationCreateVariables
   >,
   'mutationFn'
@@ -48,7 +49,7 @@ export const useGitHubAuthorizationCreateMutation = ({
   const queryClient = useQueryClient()
   return useMutation<
     GitHubAuthorizationCreateData,
-    ResponseError,
+    StudioError,
     GitHubAuthorizationCreateVariables
   >({
     mutationFn: (vars) => createGitHubAuthorization(vars),

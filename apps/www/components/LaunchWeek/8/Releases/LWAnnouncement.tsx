@@ -15,7 +15,7 @@ const LWAnnouncement = () => {
           <span className="text-foreground-light">Explore all the announcements</span>
         </div>
       </div>
-      <div className="relative flex items-center justify-center !aspect-video h-[80px] md:h-[80px] gap-2 z-10 rounded overflow-hidden">
+      <div className="relative flex items-center justify-center aspect-video! h-[80px] md:h-[80px] gap-2 z-10 rounded-sm overflow-hidden">
         <Image
           src="/images/launchweek/8/lw8-og.jpg"
           alt="Launch Week 8"
@@ -27,7 +27,7 @@ const LWAnnouncement = () => {
   )
 
   return (
-    <div className="w-full max-w-xl opacity-0 !animate-[fadeIn_0.5s_cubic-bezier(0.25,0.25,0,1)_0.5s_both]">
+    <div className="w-full max-w-xl opacity-0 animate-[fadeIn_0.5s_cubic-bezier(0.25,0.25,0,1)_0.5s_both]!">
       <SmallCard
         className="border hover:border-stronger transition-colors"
         innerClassName="opacity-70 items-stretch"

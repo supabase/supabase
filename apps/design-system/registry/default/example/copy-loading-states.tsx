@@ -4,17 +4,17 @@ import { Button } from 'ui'
 
 export default function CopyLoadingStates() {
   return (
-    <div className="flex flex-row gap-16">
+    <div className="flex flex-row flex-wrap gap-8 sm:gap-16">
       <div className="flex flex-col gap-4">
         <span className="text-xs text-foreground-muted">Bad Example</span>
         <div className="flex flex-col gap-4">
-          <Button type="primary" loading>
+          <Button variant="primary" loading>
             Please wait...
           </Button>
-          <Button type="primary" loading>
+          <Button variant="primary" loading>
             Loading...
           </Button>
-          <Button type="danger" loading>
+          <Button variant="danger" loading>
             Processing...
           </Button>
         </div>
@@ -22,13 +22,13 @@ export default function CopyLoadingStates() {
       <div className="flex flex-col gap-4">
         <span className="text-xs text-foreground-muted">Good Example</span>
         <div className="flex flex-col gap-4">
-          <Button type="primary" loading>
+          <Button variant="primary" loading>
             Creating table...
           </Button>
-          <Button type="primary" loading>
+          <Button variant="primary" loading>
             Loading schema...
           </Button>
-          <Button type="danger" loading>
+          <Button variant="danger" loading>
             Deleting project...
           </Button>
         </div>

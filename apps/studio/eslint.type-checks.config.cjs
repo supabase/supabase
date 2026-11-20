@@ -1,36 +1,32 @@
 /**
- * Separate ESLint config for rules that require TypeScript type information.
+ * Separate ESLint config for rules that need TypeScript type information.
  *
- * Run via: pnpm lint:type-checks
+ * Run via: pnpm lint:type-checks (also part of `pnpm lint`). The script passes
+ * `--no-inline-config` because source files carry disable comments for rules that only exist in
+ * eslint.config.cjs, which would otherwise be reported as unknown rules.
  *
- * Kept separate from eslint.config.cjs because loading a full TypeScript program
- * (project: true) is memory-intensive and would slow down or OOM the main lint run.
+ * Kept apart from eslint.config.cjs on purpose. Enabling `projectService` there would give every
+ * other plugin type information too, which silently changes what they report (e.g.
+ * react-google-translate and @tanstack/query rules find more issues), and loading the TypeScript
+ * program slows the whole run. Only add rules here that cannot work without types.
  */
 
 const { defineConfig } = require('eslint/config')
 const tsparser = require('@typescript-eslint/parser')
-const requireSafeSqlFragment = require('./eslint-rules/require-safe-sql-fragment.cjs')
-
-const studioPlugin = {
-  rules: {
-    'require-safe-sql-fragment': requireSafeSqlFragment,
-  },
-}
+const fga = require('./scripts/eslint-rules/fga.cjs')
 
 module.exports = defineConfig([
+  { ignores: ['.next', 'dist', 'public', '.contentlayer', '**/*.mts', '**/*.cts', '**/*.d.ts'] },
   {
     files: ['**/*.ts', '**/*.tsx'],
+    // Tests and scripts don't build query options for components, and the test fixtures live in
+    // their own tsconfig.
+    ignores: ['**/*.test.ts', '**/*.test.tsx', 'scripts/**', 'tests/**'],
     languageOptions: {
       parser: tsparser,
-      parserOptions: {
-        project: true,
-      },
+      parserOptions: { projectService: true, tsconfigRootDir: __dirname },
     },
-    plugins: {
-      studio: studioPlugin,
-    },
-    rules: {
-      'studio/require-safe-sql-fragment': 'warn',
-    },
+    plugins: { fga },
+    rules: { 'fga/no-spread-granted-query-options': 'error' },
   },
 ])

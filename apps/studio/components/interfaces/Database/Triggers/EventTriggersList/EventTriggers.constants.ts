@@ -1,4 +1,6 @@
-export const DEFAULT_EVENT_TRIGGER_SQL = `CREATE OR REPLACE FUNCTION event_trigger_fn()
+import { safeSql } from '@supabase/pg-meta'
+
+export const DEFAULT_EVENT_TRIGGER_SQL = safeSql`CREATE OR REPLACE FUNCTION event_trigger_fn()
 RETURNS event_trigger
 LANGUAGE plpgsql
 AS $$
@@ -13,7 +15,8 @@ ON ddl_command_end
 EXECUTE FUNCTION event_trigger_fn();
 `
 
-export const AUTO_ENABLE_RLS_EVENT_TRIGGER_SQL = `
+export const AUTO_ENABLE_RLS_EVENT_TRIGGER_SQL = safeSql`
+-- Event trigger: ensure_rls
 CREATE OR REPLACE FUNCTION rls_auto_enable()
 RETURNS EVENT_TRIGGER
 LANGUAGE plpgsql
@@ -22,6 +25,7 @@ SET search_path = pg_catalog
 AS $$
 DECLARE
   cmd record;
+  tbl name;
 BEGIN
   FOR cmd IN
     SELECT *
@@ -31,7 +35,8 @@ BEGIN
   LOOP
      IF cmd.schema_name IS NOT NULL AND cmd.schema_name IN ('public') AND cmd.schema_name NOT IN ('pg_catalog','information_schema') AND cmd.schema_name NOT LIKE 'pg_toast%' AND cmd.schema_name NOT LIKE 'pg_temp%' THEN
       BEGIN
-        EXECUTE format('alter table if exists %s enable row level security', cmd.object_identity);
+        SELECT c.relname INTO tbl FROM pg_catalog.pg_class c WHERE c.oid = cmd.objid;
+        EXECUTE format('alter table if exists %I.%I enable row level security', cmd.schema_name, tbl);
         RAISE LOG 'rls_auto_enable: enabled RLS on %', cmd.object_identity;
       EXCEPTION
         WHEN OTHERS THEN
@@ -48,7 +53,8 @@ DROP EVENT TRIGGER IF EXISTS ensure_rls;
 CREATE EVENT TRIGGER ensure_rls
 ON ddl_command_end
 WHEN TAG IN ('CREATE TABLE', 'CREATE TABLE AS', 'SELECT INTO')
-EXECUTE FUNCTION rls_auto_enable();`
+EXECUTE FUNCTION rls_auto_enable();
+`
 
 export const EVENT_TRIGGER_TEMPLATES = [
   {
@@ -59,7 +65,7 @@ export const EVENT_TRIGGER_TEMPLATES = [
   {
     name: 'Prevent table drops',
     description: 'Block dropping tables using the sql_drop event trigger.',
-    content: `-- Function
+    content: safeSql`-- Function
 CREATE OR REPLACE FUNCTION dont_drop_function()
   RETURNS event_trigger LANGUAGE plpgsql AS $$
 DECLARE

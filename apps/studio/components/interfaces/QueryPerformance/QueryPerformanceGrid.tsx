@@ -1,7 +1,13 @@
 import { useParams } from 'common'
-import { ArrowDown, ArrowRight, ArrowUp, ChevronDown, TextSearch } from 'lucide-react'
+import {
+  ArrowDownIcon,
+  ArrowRightIcon,
+  ArrowUpIcon,
+  ChevronDownIcon,
+  TextSearchIcon,
+} from 'lucide-react'
 import { parseAsArrayOf, parseAsJson, parseAsString, useQueryStates } from 'nuqs'
-import { UIEvent, useCallback, useEffect, useMemo, useRef, useState } from 'react'
+import { useCallback, useEffect, useMemo, useRef, useState } from 'react'
 import DataGrid, { Column, DataGridHandle, Row } from 'react-data-grid'
 import {
   Button,
@@ -14,12 +20,12 @@ import {
   SheetContent,
   SheetDescription,
   SheetTitle,
-  Tabs_Shadcn_,
-  TabsContent_Shadcn_,
-  TabsList_Shadcn_,
-  TabsTrigger_Shadcn_,
+  Tabs,
+  TabsContent,
+  TabsList,
+  TabsTrigger,
 } from 'ui'
-import { Admonition } from 'ui-patterns'
+import { Admonition } from 'ui-patterns/Admonition'
 import { CodeBlock } from 'ui-patterns/CodeBlock'
 import { InfoTooltip } from 'ui-patterns/info-tooltip'
 import { GenericSkeletonLoader } from 'ui-patterns/ShimmeringLoader'
@@ -40,6 +46,7 @@ import { QueryPerformanceRow } from './QueryPerformance.types'
 import { formatDuration } from './QueryPerformance.utils'
 import { NumericFilter } from '@/components/interfaces/Reports/v2/ReportsNumericFilter'
 import { ButtonTooltip } from '@/components/ui/ButtonTooltip'
+import { useInfiniteScroll } from '@/hooks/misc/useInfiniteScroll'
 
 interface QueryPerformanceGridProps {
   aggregatedData: QueryPerformanceRow[]
@@ -48,7 +55,10 @@ interface QueryPerformanceGridProps {
   currentSelectedQuery?: string | null
   onCurrentSelectQuery?: (query: string) => void
   onRetry?: () => void
-  onScroll?: (event: UIEvent<HTMLDivElement>) => void
+  hasNextPage: boolean
+  isFetchingNextPage: boolean
+  isRefetching: boolean
+  fetchNextPage: (options?: { cancelRefetch?: boolean }) => void
 }
 
 const calculateTimeConsumedWidth = (data: QueryPerformanceRow[]) => {
@@ -80,20 +90,21 @@ export const QueryPerformanceGrid = ({
   currentSelectedQuery,
   onCurrentSelectQuery,
   onRetry,
-  onScroll,
+  hasNextPage,
+  isFetchingNextPage,
+  isRefetching,
+  fetchNextPage,
 }: QueryPerformanceGridProps) => {
   const { sort, setSortConfig } = useQueryPerformanceSort()
   const gridRef = useRef<DataGridHandle>(null)
   const { sort: urlSort, order } = useParams()
-  const [{ search, roles, callsFilter }] = useQueryStates({
+  // Filtering happens in SQL. These are read only to reset the selected row when they change.
+  const [{ search, roles, sources, callsFilter, totalTimeFilter }] = useQueryStates({
     search: parseAsString.withDefault(''),
     roles: parseAsArrayOf(parseAsString).withDefault([]),
-    callsFilter: parseAsJson<NumericFilter | null>(
-      (value) => value as NumericFilter | null
-    ).withDefault({
-      operator: '>=',
-      value: 0,
-    } as NumericFilter),
+    sources: parseAsArrayOf(parseAsString).withDefault([]),
+    callsFilter: parseAsJson<NumericFilter | null>((value) => value as NumericFilter | null),
+    totalTimeFilter: parseAsJson<NumericFilter | null>((value) => value as NumericFilter | null),
   })
   const dataGridContainerRef = useRef<HTMLDivElement>(null)
 
@@ -120,7 +131,7 @@ export const QueryPerformanceGrid = ({
         return (
           <div className="flex items-center justify-between text-xs w-full">
             <div className="flex items-center gap-x-2">
-              <p className="!text-foreground font-medium">{col.name}</p>
+              <p className="text-foreground! font-medium">{col.name}</p>
               {col.description && (
                 <p className="text-foreground-lighter font-normal">{col.description}</p>
               )}
@@ -130,10 +141,10 @@ export const QueryPerformanceGrid = ({
               <DropdownMenu>
                 <DropdownMenuTrigger asChild>
                   <Button
-                    type="text"
+                    variant="text"
                     size="tiny"
                     className="p-1 h-5 w-5 shrink-0"
-                    icon={<ChevronDown size={14} className="text-foreground-muted" />}
+                    icon={<ChevronDownIcon size={14} className="text-foreground-muted" />}
                     onClick={(e) => e.stopPropagation()}
                   />
                 </DropdownMenuTrigger>
@@ -147,7 +158,7 @@ export const QueryPerformanceGrid = ({
                       sort?.column === col.id && sort?.order === 'asc' && 'text-foreground'
                     )}
                   >
-                    <ArrowUp size={14} />
+                    <ArrowUpIcon size={14} />
                     Sort Ascending
                   </DropdownMenuItem>
                   <DropdownMenuItem
@@ -159,7 +170,7 @@ export const QueryPerformanceGrid = ({
                       sort?.column === col.id && sort?.order === 'desc' && 'text-foreground'
                     )}
                   >
-                    <ArrowDown size={14} />
+                    <ArrowDownIcon size={14} />
                     Sort Descending
                   </DropdownMenuItem>
                 </DropdownMenuContent>
@@ -187,19 +198,18 @@ export const QueryPerformanceGrid = ({
               </div>
               <CodeBlock
                 language="pgsql"
-                className="!bg-transparent !p-0 !m-0 !border-none !whitespace-nowrap [&>code]:!whitespace-nowrap [&>code]:break-words !overflow-visible !truncate !w-full !pr-20 pointer-events-none"
-                wrapperClassName="!max-w-full flex-1"
+                className="bg-transparent! p-0! m-0! border-none! truncate! whitespace-nowrap! w-full! pr-20! pointer-events-none"
+                wrapperClassName="flex-1 min-w-0 max-w-full overflow-hidden!"
                 hideLineNumbers
                 hideCopy
-                value={value.replace(/\s+/g, ' ').trim() as string}
+                value={typeof value === 'string' ? value.replace(/\s+/g, ' ').trim() : ''}
                 wrapLines={false}
               />
               {onCurrentSelectQuery && (
                 <ButtonTooltip
                   tooltip={{ content: { text: 'Query details' } }}
-                  icon={<ArrowRight size={14} />}
+                  icon={<ArrowRightIcon size={14} />}
                   size="tiny"
-                  type="default"
                   onClick={(e) => {
                     e.stopPropagation()
                     setSelectedRow(props.rowIdx)
@@ -366,37 +376,6 @@ export const QueryPerformanceGrid = ({
   const reportData = useMemo(() => {
     let data = [...aggregatedData]
 
-    if (search && typeof search === 'string' && search.length > 0) {
-      data = data.filter((row) => row.query.toLowerCase().includes(search.toLowerCase()))
-    }
-
-    if (roles && Array.isArray(roles) && roles.length > 0) {
-      data = data.filter((row) => row.rolname && roles.includes(row.rolname))
-    }
-
-    if (callsFilter) {
-      const { operator, value } = callsFilter
-      data = data.filter((row) => {
-        const calls = row.calls || 0
-        switch (operator) {
-          case '=':
-            return calls === value
-          case '>=':
-            return calls >= value
-          case '<=':
-            return calls <= value
-          case '>':
-            return calls > value
-          case '<':
-            return calls < value
-          case '!=':
-            return calls !== value
-          default:
-            return true
-        }
-      })
-    }
-
     if (sort?.column === 'prop_total_time') {
       data.sort((a, b) => {
         const aValue = a.prop_total_time || 0
@@ -416,11 +395,22 @@ export const QueryPerformanceGrid = ({
     }
 
     return data
-  }, [aggregatedData, sort, search, roles, callsFilter])
+  }, [aggregatedData, sort])
+
+  const handleScroll = useInfiniteScroll({
+    isLoading,
+    isFetchingNextPage,
+    isRefetching,
+    isError: !!error,
+    hasNextPage,
+    fetchNextPage,
+    containerRef: gridRef,
+    rowCount: reportData.length,
+  })
 
   useEffect(() => {
     setSelectedRow(undefined)
-  }, [search, roles, urlSort, order, callsFilter])
+  }, [search, roles, urlSort, order, callsFilter, totalTimeFilter, sources])
 
   const handleKeyDown = useCallback(
     (event: KeyboardEvent) => {
@@ -488,9 +478,7 @@ export const QueryPerformanceGrid = ({
           >
             {onRetry && (
               <div className="mt-4">
-                <Button type="default" onClick={onRetry}>
-                  Try again
-                </Button>
+                <Button onClick={onRetry}>Try again</Button>
               </div>
             )}
           </Admonition>
@@ -509,12 +497,12 @@ export const QueryPerformanceGrid = ({
         <DataGrid
           ref={gridRef}
           style={{ height: '100%' }}
-          className={cn('flex-1 grow h-full')}
+          className={cn('flex-1 grow h-full border-t-0! border-b-0!')}
           rowHeight={44}
           headerRowHeight={36}
           columns={columns}
           rows={reportData}
-          onScroll={onScroll}
+          onScroll={handleScroll}
           rowClass={(_, idx) => {
             const isSelected = idx === selectedRow
             const query = reportData[idx]?.query
@@ -526,10 +514,10 @@ export const QueryPerformanceGrid = ({
 
             return [
               `${isSelected ? (hasRecommendations ? 'bg-warning/10 hover:bg-warning/20' : 'bg-surface-300 dark:bg-surface-300') : hasRecommendations ? 'bg-warning/10 hover:bg-warning/20' : 'bg-200 hover:bg-surface-200'} cursor-pointer`,
-              `${isSelected ? (hasRecommendations ? '[&>div:first-child]:border-l-4 border-l-warning [&>div]:border-l-warning' : '[&>div:first-child]:border-l-4 border-l-secondary [&>div]:!border-l-foreground') : ''}`,
+              `${isSelected ? (hasRecommendations ? '[&>div:first-child]:border-l-4 border-l-warning [&>div]:border-l-warning' : '[&>div:first-child]:border-l-4 border-l-secondary [&>div]:border-l-foreground!') : ''}`,
               `${isCharted ? 'bg-surface-200 dark:bg-surface-200' : ''}`,
               `${isCharted ? '[&>div:first-child]:border-l-4 border-l-secondary [&>div]:border-l-brand' : ''}`,
-              '[&>.rdg-cell]:box-border [&>.rdg-cell]:outline-none [&>.rdg-cell]:shadow-none',
+              '[&>.rdg-cell]:box-border [&>.rdg-cell]:outline-hidden [&>.rdg-cell]:shadow-none',
               '[&>.rdg-cell.column-prop_total_time]:relative',
             ].join(' ')
           }}
@@ -568,7 +556,7 @@ export const QueryPerformanceGrid = ({
               </div>
             ) : (
               <div className="absolute top-20 px-6 flex flex-col items-center justify-center w-full gap-y-2">
-                <TextSearch className="text-foreground-muted" strokeWidth={1} />
+                <TextSearchIcon className="text-foreground-muted" strokeWidth={1} />
                 <div className="text-center">
                   <p className="text-foreground">No queries detected</p>
                   <p className="text-foreground-light">
@@ -596,7 +584,7 @@ export const QueryPerformanceGrid = ({
         </SheetDescription>
         <SheetContent
           side="right"
-          className="flex flex-col h-full bg-studio border-l lg:!w-[calc(100vw-802px)] max-w-[700px] w-full"
+          className="flex flex-col h-full bg-studio border-l lg:w-[calc(100vw-802px)]! max-w-[700px] w-full"
           hasOverlay={false}
           onInteractOutside={(event) => {
             if (dataGridContainerRef.current?.contains(event.target as Node)) {
@@ -604,31 +592,31 @@ export const QueryPerformanceGrid = ({
             }
           }}
         >
-          <Tabs_Shadcn_
+          <Tabs
             value={view}
             className="flex flex-col h-full"
             onValueChange={(value: any) => setView(value)}
           >
             <div className="px-5 border-b">
-              <TabsList_Shadcn_ className="px-0 flex gap-x-4 min-h-[46px] border-b-0 [&>button]:h-[47px]">
-                <TabsTrigger_Shadcn_
+              <TabsList className="px-0 flex gap-x-4 min-h-[46px] border-b-0 [&>button]:h-[47px]">
+                <TabsTrigger
                   value="details"
-                  className="px-0 pb-0 data-[state=active]:bg-transparent !shadow-none"
+                  className="px-0 pb-0 data-[state=active]:bg-transparent shadow-none!"
                 >
                   Query details
-                </TabsTrigger_Shadcn_>
+                </TabsTrigger>
                 {selectedRow !== undefined && canShowIndexesTab && (
-                  <TabsTrigger_Shadcn_
+                  <TabsTrigger
                     value="suggestion"
-                    className="px-0 pb-0 data-[state=active]:bg-transparent !shadow-none"
+                    className="px-0 pb-0 data-[state=active]:bg-transparent shadow-none!"
                   >
                     Indexes
-                  </TabsTrigger_Shadcn_>
+                  </TabsTrigger>
                 )}
-              </TabsList_Shadcn_>
+              </TabsList>
             </div>
 
-            <TabsContent_Shadcn_ value="details" className="mt-0 grow min-h-0 overflow-y-auto">
+            <TabsContent value="details" className="mt-0 grow min-h-0 overflow-y-auto">
               {selectedRow !== undefined && (
                 <QueryDetail
                   selectedRow={reportData[selectedRow]}
@@ -636,13 +624,13 @@ export const QueryPerformanceGrid = ({
                   onClose={() => setSelectedRow(undefined)}
                 />
               )}
-            </TabsContent_Shadcn_>
+            </TabsContent>
             {selectedRow !== undefined && canShowIndexesTab && (
-              <TabsContent_Shadcn_ value="suggestion" className="mt-0 grow min-h-0 overflow-y-auto">
+              <TabsContent value="suggestion" className="mt-0 grow min-h-0 overflow-y-auto">
                 <QueryIndexes selectedRow={reportData[selectedRow]} />
-              </TabsContent_Shadcn_>
+              </TabsContent>
             )}
-          </Tabs_Shadcn_>
+          </Tabs>
         </SheetContent>
       </Sheet>
     </div>

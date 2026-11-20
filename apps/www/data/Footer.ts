@@ -1,5 +1,9 @@
-import { skillBasedSolutions, useCaseSolutions } from 'data/Solutions'
-import { PrivacySettings } from 'ui-patterns/PrivacySettings'
+import {
+  appTypeSolutions,
+  migrationSolutions,
+  skillBasedSolutions,
+  useCaseSolutions,
+} from 'data/Solutions'
 
 const footerData = [
   {
@@ -20,6 +24,10 @@ const footerData = [
       {
         text: 'Functions',
         url: '/edge-functions',
+      },
+      {
+        text: 'Compute',
+        url: '/compute',
       },
       {
         text: 'Realtime',
@@ -58,6 +66,14 @@ const footerData = [
         text: solution.text,
         url: solution.url,
       })),
+      ...appTypeSolutions.solutions.map((solution) => ({
+        text: solution.text,
+        url: solution.url,
+      })),
+      ...migrationSolutions.solutions.map((solution) => ({
+        text: solution.text,
+        url: solution.url,
+      })),
     ],
   },
   {
@@ -80,20 +96,32 @@ const footerData = [
         url: '/partners',
       },
       {
-        text: 'Integrations',
-        url: '/partners/integrations',
+        text: 'Partner Catalog',
+        url: '/partners/catalog',
       },
       {
-        text: 'Brand Assets',
-        url: '/brand-assets',
+        text: 'Knowledge Base',
+        url: '/kb',
+      },
+      {
+        text: 'FAQs',
+        url: '/kb/topics/faqs',
+      },
+      {
+        text: 'Brand Guidelines',
+        url: '/brand',
       },
       {
         text: 'Security & Compliance',
         url: '/security',
       },
       {
-        text: 'DPA',
-        url: '/legal/dpa',
+        text: 'Regions',
+        url: '/regions',
+      },
+      {
+        text: 'dbarena',
+        url: 'https://dbarena.com',
       },
       {
         text: 'SOC2',
@@ -113,8 +141,8 @@ const footerData = [
         url: '/docs',
       },
       {
-        text: 'Supabase UI',
-        url: 'https://supabase.com/ui',
+        text: 'Supabase Library',
+        url: 'https://supabase.com/library',
       },
       {
         text: 'Changelog',
@@ -145,10 +173,6 @@ const footerData = [
         text: 'Open Source',
         url: '/open-source',
       },
-      {
-        text: 'DevTo',
-        url: 'https://dev.to/supabase',
-      },
     ],
   },
   {
@@ -167,28 +191,16 @@ const footerData = [
         url: '/ga',
       },
       {
-        text: 'Terms of Service',
-        url: '/terms',
+        text: 'Legal Hub',
+        url: '/legal',
       },
       {
         text: 'Privacy Policy',
         url: '/privacy',
       },
       {
-        text: 'Privacy Settings',
-        component: PrivacySettings,
-      },
-      {
         text: 'Acceptable Use Policy',
         url: '/aup',
-      },
-      {
-        text: 'Support Policy',
-        url: '/support-policy',
-      },
-      {
-        text: 'Service Level Agreement',
-        url: '/sla',
       },
       {
         text: 'Humans.txt',

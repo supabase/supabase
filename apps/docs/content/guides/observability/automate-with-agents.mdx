@@ -1,0 +1,38 @@
+---
+id: 'automate-with-agents'
+title: 'Agent prompts'
+subtitle: 'Give an agent a prompt to check your project and report issues to fix.'
+description: 'Run a Health, Security, Performance, or Resource prompt in Claude, Codex, or Cursor.'
+---
+
+Each prompt tells an agent to check one area of your project — health, security, performance, or resources — and report issues worth fixing. It reads project data read-only and changes nothing. Run it on demand, or put it on a schedule.
+
+## Choose a prompt
+
+Start with one prompt. Add another only when you need a different source or cadence.
+
+| Prompt                                                                     | What it checks                                                                | Suggested cadence | Use it when                                                    |
+| -------------------------------------------------------------------------- | ----------------------------------------------------------------------------- | ----------------- | -------------------------------------------------------------- |
+| [Health](/docs/guides/observability/automate-with-agents/health)           | API and Auth server errors, error-rate spikes, connection pressure            | Hourly            | You need incident detection and regular feedback loops         |
+| [Security](/docs/guides/observability/automate-with-agents/security)       | Security Advisor findings, authentication and authorization failures          | Daily             | You need a regular access-control and configuration review     |
+| [Performance](/docs/guides/observability/automate-with-agents/performance) | Slow queries, lock waits, long-running sessions, Performance Advisor findings | Hourly            | You need query and database performance checks                 |
+| [Resources](/docs/guides/observability/automate-with-agents/usage)         | Request, error, storage, table, and connection growth                         | Daily             | You need to identify growth before it reaches a resource limit |
+
+For a small project, run the most relevant prompt daily or weekly and fold the other categories into it. Split into separate prompts only when you need different owners, schedules, or alert thresholds.
+
+## Run a prompt
+
+1. Connect the [Supabase MCP server](/docs/guides/ai-tools/mcp) with `project_ref` and `read_only=true`.
+2. Open the prompt that matches the job from the table above.
+3. Set it up in Claude, Codex, Cursor, or copy the prompt into another harness.
+4. Run it on demand first. Then put the same prompt on a schedule.
+
+Each prompt page describes what it will output. Send those findings through the connections your harness already has, such as Linear in Codex.
+
+Scheduled tasks start a fresh context on every run, so the prompt is self-contained. Review the first runs before you rely on the schedule.
+
+<Admonition type="caution">
+
+Logs and query results can contain secrets or personal information. Keep the agent read-only, aggregate evidence, and redact sensitive values.
+
+</Admonition>

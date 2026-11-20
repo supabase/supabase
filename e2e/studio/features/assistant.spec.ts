@@ -1,4 +1,5 @@
 import { expect } from '@playwright/test'
+
 import { test } from '../utils/test.js'
 import { toUrl } from '../utils/to-url.js'
 
@@ -16,10 +17,12 @@ test.describe('AI Assistant', async () => {
     await page.locator('#assistant-trigger').click()
 
     // Wait for the assistant panel to be visible
-    await expect(page.getByRole('heading', { name: 'How can I assist you?' })).toBeVisible()
+    await expect(page.getByRole('heading', { name: 'Chat with your project' })).toBeVisible()
 
     // Type "hello" in the chat input
-    const chatInput = page.getByRole('textbox', { name: 'Chat to Postgres...' })
+    const chatInput = page.getByRole('textbox', {
+      name: 'Ask about your data, troubleshoot an issue, or explore your project...',
+    })
     await chatInput.fill('hello')
 
     const responsePromise = page.waitForResponse(

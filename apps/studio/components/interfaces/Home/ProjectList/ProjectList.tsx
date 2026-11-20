@@ -1,4 +1,3 @@
-import { keepPreviousData } from '@tanstack/react-query'
 import { useDebounce } from '@uidotdev/usehooks'
 import { LOCAL_STORAGE_KEYS, useParams } from 'common'
 import { parseAsArrayOf, parseAsString, parseAsStringLiteral, useQueryState } from 'nuqs'
@@ -25,7 +24,7 @@ import {
   toTableHeadSortValue,
 } from './ProjectListSort.utils'
 import { ProjectTableRow } from './ProjectTableRow'
-import AlertError from '@/components/ui/AlertError'
+import { AlertError } from '@/components/ui/AlertError'
 import { NoSearchResults } from '@/components/ui/NoSearchResults'
 import { useGitHubConnectionsQuery } from '@/data/integrations/github-connections-query'
 import { useOrgIntegrationsQuery } from '@/data/integrations/integrations-query-org-only'
@@ -71,17 +70,12 @@ export const ProjectList = ({ organization: organization_, rewriteHref }: Projec
     isFetchingNextPage,
     hasNextPage,
     fetchNextPage,
-  } = useOrgProjectsInfiniteQuery(
-    {
-      slug,
-      sort,
-      search: search.length === 0 ? search : debouncedSearch,
-      statuses: filterStatus,
-    },
-    {
-      placeholderData: keepPreviousData,
-    }
-  )
+  } = useOrgProjectsInfiniteQuery({
+    slug,
+    sort,
+    search: search.length === 0 ? search : debouncedSearch,
+    statuses: filterStatus,
+  })
   const orgProjects =
     useMemo(() => data?.pages.flatMap((page) => page.projects), [data?.pages]) || []
 
@@ -159,7 +153,7 @@ export const ProjectList = ({ organization: organization_, rewriteHref }: Projec
 
   if (viewMode === 'table') {
     return (
-      <Card className="flex-1 min-h-0 overflow-y-auto mb-8">
+      <Card className="flex-1 min-h-0 overflow-y-auto">
         <Table>
           {/* [Joshen] Ideally we can figure out sticky table headers here */}
           <TableHeader>
@@ -277,7 +271,7 @@ export const ProjectList = ({ organization: organization_, rewriteHref }: Projec
       ) : noResultsFromSearch ? (
         <NoSearchResults searchString={search} />
       ) : (
-        <div className="flex flex-col gap-y-2 md:gap-y-4 pb-6">
+        <div className="flex flex-col gap-y-2 md:gap-y-4">
           <ul
             className={cn(
               'min-h-0 w-full mx-auto',

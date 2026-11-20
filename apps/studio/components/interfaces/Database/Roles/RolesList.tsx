@@ -1,8 +1,7 @@
-import { PermissionAction } from '@supabase/shared-types/out/constants'
 import { partition, sortBy } from 'lodash'
-import { Plus, Search, X } from 'lucide-react'
+import { PlusIcon, SearchIcon, XIcon } from 'lucide-react'
 import { parseAsBoolean, parseAsString, useQueryState } from 'nuqs'
-import { useEffect, useState } from 'react'
+import { useEffect, useRef, useState } from 'react'
 import { toast } from 'sonner'
 import { Badge, Button, cn, Tooltip, TooltipContent, TooltipTrigger } from 'ui'
 import { Input } from 'ui-patterns/DataInputs/Input'
@@ -11,28 +10,42 @@ import { ConfirmationModal } from 'ui-patterns/Dialogs/ConfirmationModal'
 import { CreateRolePanel } from './CreateRolePanel'
 import { RoleRow } from './RoleRow'
 import { RoleRowSkeleton } from './RoleRowSkeleton'
-import { SUPABASE_ROLES } from './Roles.constants'
+import { isSupabaseRole } from './Roles.utils'
 import { ButtonTooltip } from '@/components/ui/ButtonTooltip'
 import { NoSearchResults } from '@/components/ui/NoSearchResults'
+import { Shortcut } from '@/components/ui/Shortcut'
 import { SparkBar } from '@/components/ui/SparkBar'
 import { useDatabaseRoleDeleteMutation } from '@/data/database-roles/database-role-delete-mutation'
 import { useDatabaseRolesQuery } from '@/data/database-roles/database-roles-query'
 import { useMaxConnectionsQuery } from '@/data/database/max-connections-query'
-import { useAsyncCheckPermissions } from '@/hooks/misc/useCheckPermissions'
+import { FGA_PERMISSIONS, useAsyncCheckPermissionsV2 } from '@/hooks/misc/useCheckPermissionsV2'
 import { useSelectedProjectQuery } from '@/hooks/misc/useSelectedProject'
-
-type SUPABASE_ROLE = (typeof SUPABASE_ROLES)[number]
+import { onSearchInputEscape } from '@/lib/keyboard'
+import { SHORTCUT_IDS } from '@/state/shortcuts/registry'
+import { useShortcut } from '@/state/shortcuts/useShortcut'
 
 export const RolesList = () => {
   const { data: project } = useSelectedProjectQuery()
 
   const [filterString, setFilterString] = useState('')
   const [filterType, setFilterType] = useState<'all' | 'active'>('all')
+  const searchInputRef = useRef<HTMLInputElement>(null)
 
-  const { can: canUpdateRoles } = useAsyncCheckPermissions(
-    PermissionAction.TENANT_SQL_ADMIN_WRITE,
-    'roles'
+  const { can: canUpdateRoles } = useAsyncCheckPermissionsV2(FGA_PERMISSIONS.PROJECT.DATABASE_WRITE)
+
+  useShortcut(
+    SHORTCUT_IDS.LIST_PAGE_FOCUS_SEARCH,
+    () => {
+      searchInputRef.current?.focus()
+      searchInputRef.current?.select()
+    },
+    { label: 'Search roles' }
   )
+
+  useShortcut(SHORTCUT_IDS.LIST_PAGE_RESET_FILTERS, () => {
+    setFilterString('')
+    setFilterType('all')
+  })
 
   const { data: maxConnData } = useMaxConnectionsQuery({
     projectRef: project?.ref,
@@ -72,9 +85,7 @@ export const RolesList = () => {
   const filteredRoles = (
     filterType === 'active' ? roles.filter((role) => role.activeConnections > 0) : roles
   ).filter((role) => role.name.includes(filterString))
-  const [supabaseRoles, otherRoles] = partition(filteredRoles, (role) =>
-    SUPABASE_ROLES.includes(role.name as SUPABASE_ROLE)
-  )
+  const [supabaseRoles, otherRoles] = partition(filteredRoles, (role) => isSupabaseRole(role.name))
 
   const totalActiveConnections = roles
     .map((role) => role.activeConnections)
@@ -107,27 +118,30 @@ export const RolesList = () => {
       <div className="mb-4 flex items-center justify-between gap-2 flex-wrap">
         <div className="flex items-center space-x-4">
           <Input
+            ref={searchInputRef}
             size="tiny"
             className="w-52"
             placeholder="Search for a role"
-            icon={<Search />}
+            icon={<SearchIcon />}
             value={filterString}
             onChange={(event) => setFilterString(event.target.value)}
+            onKeyDown={onSearchInputEscape(filterString, setFilterString)}
             actions={
               filterString && (
                 <Button
                   size="tiny"
-                  type="text"
+                  variant="text"
                   onClick={() => setFilterString('')}
                   className="px-1 mr-1"
                 >
-                  <X size={12} strokeWidth={2} />
+                  <XIcon size={12} strokeWidth={2} />
                 </Button>
               )
             }
           />
           <div className="flex items-center border border-strong rounded-full w-min h-[26px]">
             <button
+              tabIndex={0}
               className={cn(
                 'text-xs w-[80px] h-full text-center rounded-l-full flex items-center justify-center transition',
                 filterType === 'all'
@@ -138,8 +152,9 @@ export const RolesList = () => {
             >
               All roles
             </button>
-            <div className="h-full w-[1px] border-r border-strong"></div>
+            <div className="h-full w-px border-r border-strong"></div>
             <button
+              tabIndex={0}
               className={cn(
                 'text-xs w-[80px] h-full text-center rounded-r-full flex items-center justify-center transition',
                 filterType === 'active'
@@ -155,7 +170,7 @@ export const RolesList = () => {
         <div className="flex items-center space-x-6">
           <Tooltip>
             <TooltipTrigger>
-              <div className="w-42">
+              <div className="w-44">
                 <SparkBar
                   type="horizontal"
                   // if the maxConnectionLimit is undefined, set totalActiveConnections so that
@@ -191,29 +206,45 @@ export const RolesList = () => {
               ))}
             </TooltipContent>
           </Tooltip>
-          <ButtonTooltip
-            type="primary"
-            disabled={!canUpdateRoles}
-            icon={<Plus size={12} />}
-            onClick={() => setIsCreatingRole(true)}
-            tooltip={{
-              content: {
-                side: 'bottom',
-                text: !canUpdateRoles
-                  ? 'You need additional permissions to add a new role'
-                  : undefined,
-              },
-            }}
-          >
-            Add role
-          </ButtonTooltip>
+          {canUpdateRoles ? (
+            <Shortcut
+              id={SHORTCUT_IDS.LIST_PAGE_NEW_ITEM}
+              label="Add new role"
+              onTrigger={() => setIsCreatingRole(true)}
+              side="bottom"
+            >
+              <Button
+                variant="primary"
+                icon={<PlusIcon size={12} />}
+                onClick={() => setIsCreatingRole(true)}
+              >
+                Add role
+              </Button>
+            </Shortcut>
+          ) : (
+            <ButtonTooltip
+              variant="primary"
+              disabled
+              icon={<PlusIcon size={12} />}
+              tooltip={{
+                content: {
+                  side: 'bottom',
+                  text: 'You need additional permissions to add a new role',
+                },
+              }}
+            >
+              Add role
+            </ButtonTooltip>
+          )}
         </div>
       </div>
 
       <div className="space-y-4">
-        <div>
+        <section aria-labelledby="supabase-service-roles">
           <div className="bg-surface-100 border border-default px-card py-3 rounded-t flex items-center space-x-4">
-            <p className="text-sm text-foreground-light">Roles managed by Supabase</p>
+            <h2 id="supabase-service-roles" className="text-sm text-foreground-light">
+              Supabase service roles
+            </h2>
             <Badge variant="success">Protected</Badge>
           </div>
 
@@ -227,11 +258,18 @@ export const RolesList = () => {
                   onSelectDelete={setSelectedRoleIdToDelete}
                 />
               ))}
-        </div>
+        </section>
 
-        <div>
+        <section aria-labelledby="project-database-roles">
           <div className="bg-surface-100 border border-default px-card py-3 rounded-t">
-            <p className="text-sm text-foreground-light">Other database roles</p>
+            <div className="space-y-1">
+              <h2 id="project-database-roles" className="text-sm text-foreground-light">
+                Project database roles
+              </h2>
+              <p className="text-xs text-foreground-lighter">
+                Includes the <code>postgres</code> administrator role and custom roles.
+              </p>
+            </div>
           </div>
 
           {isLoading
@@ -244,7 +282,7 @@ export const RolesList = () => {
                   onSelectDelete={setSelectedRoleIdToDelete}
                 />
               ))}
-        </div>
+        </section>
       </div>
 
       {filterString.length > 0 && filteredRoles.length === 0 && (

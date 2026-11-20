@@ -1,10 +1,11 @@
+import { EASE_IN, EASE_OUT } from '~/lib/animations'
+import { useSendTelemetryEvent } from '~/lib/telemetry'
 import { useBreakpoint } from 'common'
-import { AnimatePresence, motion } from 'framer-motion'
+import { AnimatePresence, motion } from 'motion/react'
 import Link from 'next/link'
 import { useState } from 'react'
 import { cn } from 'ui'
-import { EASE_IN, EASE_OUT } from '~/lib/animations'
-import { useSendTelemetryEvent } from '~/lib/telemetry'
+
 import SectionContainer from '../Layouts/SectionContainer'
 
 type Framework = {
@@ -101,7 +102,7 @@ const HeroFrameworks = ({ className }: { className?: string }) => {
   return (
     <SectionContainer className={cn(className)} id="frameworks">
       <div className="relative z-20 w-full max-w-6xl mx-auto h-full flex flex-col xl:flex-row gap-4 items-center justify-between">
-        <div className="!leading-tight text-center xl:text-left text-2xl md:text-4xl text-foreground-lighter whitespace-nowrap">
+        <div className="leading-tight! text-center xl:text-left text-2xl md:text-4xl text-foreground-lighter whitespace-nowrap">
           Use Supabase with{' '}
           <div className="block">
             <AnimatePresence mode="wait">
@@ -135,7 +136,7 @@ const HeroFrameworks = ({ className }: { className?: string }) => {
             >
               <div
                 className={cn(
-                  'm-1 bg-[var(--color-bg-darkest)] h-16 w-16 flex items-center justify-center rounded-md group-hover:border transition-all text-foreground-light border-foreground-light hover:shadow',
+                  'm-1 bg-(--color-bg-darkest) h-16 w-16 flex items-center justify-center rounded-md group-hover:border transition-all text-foreground-light border-foreground-light hover:shadow-sm',
                   !!activeFramework &&
                     activeFramework.name !== framework.name &&
                     'text-foreground-muted',

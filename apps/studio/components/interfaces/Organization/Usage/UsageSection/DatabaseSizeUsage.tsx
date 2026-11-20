@@ -1,16 +1,11 @@
 import Link from 'next/link'
 import { useMemo } from 'react'
-import {
-  Alert_Shadcn_,
-  AlertDescription_Shadcn_,
-  AlertTitle_Shadcn_,
-  Button,
-  CriticalIcon,
-} from 'ui'
+import { Alert, AlertDescription, AlertTitle, Button, CriticalIcon } from 'ui'
 import { InfoTooltip } from 'ui-patterns/info-tooltip'
 
 import { SectionContent } from '../SectionContent'
 import { CategoryAttribute } from '../Usage.constants'
+import { UsageProjectName } from '../UsageProjectName'
 import Panel from '@/components/ui/Panel'
 import { PricingMetric } from '@/data/analytics/org-daily-stats-query'
 import type { OrgSubscription } from '@/data/subscriptions/types'
@@ -28,6 +23,7 @@ export interface DatabaseSizeUsageProps {
 }
 
 const DatabaseSizeUsage = ({
+  projectRef,
   attribute,
   subscription,
   usage,
@@ -47,14 +43,14 @@ const DatabaseSizeUsage = ({
       <SectionContent section={attribute}>
         <div className="space-y-4">
           {currentBillingCycleSelected && hasProjectsExceedingDatabaseSize && (
-            <Alert_Shadcn_ variant="warning">
+            <Alert variant="warning">
               <CriticalIcon />
-              <AlertTitle_Shadcn_>Projects exceeding quota</AlertTitle_Shadcn_>
-              <AlertDescription_Shadcn_>
+              <AlertTitle>Projects exceeding quota</AlertTitle>
+              <AlertDescription>
                 You have projects that are exceeding 0.5 GB of database size. Reduce the database
                 size or upgrade to a paid plan.
-              </AlertDescription_Shadcn_>
-            </Alert_Shadcn_>
+              </AlertDescription>
+            </Alert>
           )}
 
           <div>
@@ -116,9 +112,13 @@ const DatabaseSizeUsage = ({
                   >
                     <div className="flex justify-between">
                       <span className="text-foreground-light flex items-center gap-2">
-                        {project.name}
+                        <UsageProjectName
+                          name={project.name}
+                          projectRef={project.ref}
+                          selectedProjectRef={projectRef}
+                        />
                       </span>
-                      <Button asChild type="default" size={'tiny'}>
+                      <Button asChild size={'tiny'}>
                         <Link
                           href={`/project/${project.ref}/observability/database#database-size-report`}
                         >
@@ -129,7 +129,7 @@ const DatabaseSizeUsage = ({
                     <div className="flex flex-col gap-2">
                       <div className="flex items-center h-6 gap-3">
                         <span className="text-foreground-light text-sm font-mono flex items-center gap-2">
-                          <span className="text-foreground font-semibold font-mono -mt-[2px]">
+                          <span className="text-foreground font-semibold font-mono mt-[-2px]">
                             {formatBytes(project.usage)}
                           </span>{' '}
                           Database Size

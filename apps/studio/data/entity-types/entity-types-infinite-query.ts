@@ -3,18 +3,23 @@ import { InfiniteData, QueryClient, useInfiniteQuery } from '@tanstack/react-que
 
 import { ENTITY_TYPE } from './entity-type-constants'
 import { entityTypeKeys } from './keys'
-import { executeSql, ExecuteSqlVariables } from '@/data/sql/execute-sql-query'
-import type { ResponseError, UseCustomInfiniteQueryOptions } from '@/types'
+import { unguarded } from '@/data/fetchers'
+import { executeSql } from '@/data/sql/execute-sql-mutation'
+import type { StudioError } from '@/lib/errors/studio-errors'
+import type { UseCustomInfiniteQueryOptions } from '@/types'
 
 export type EntityTypesVariables = {
   projectRef?: string
+  connectionString?: string | null
   schemas?: string[]
   search?: string
   limit?: number
   page?: number
   sort?: 'alphabetical' | 'grouped-alphabetical'
   filterTypes?: string[]
-} & Pick<ExecuteSqlVariables, 'connectionString'>
+  excludePartitions?: boolean
+  parentId?: number
+}
 
 export interface Entity {
   id: number
@@ -23,6 +28,7 @@ export interface Entity {
   type: ENTITY_TYPE
   comment: string | null
   rls_enabled: boolean
+  is_partition: boolean
 }
 
 export type EntityTypesResponse = {
@@ -42,17 +48,31 @@ export async function getEntityTypes(
     page = 0,
     sort = 'alphabetical',
     filterTypes = Object.values(ENTITY_TYPE),
+    excludePartitions,
+    parentId,
   }: EntityTypesVariables,
   signal?: AbortSignal
 ) {
-  const sql = getEntityTypesSQL({ schemas, sort, filterTypes, search, limit, page })
+  const sql = getEntityTypesSQL({
+    schemas,
+    sort,
+    filterTypes,
+    excludePartitions,
+    parentId,
+    search,
+    limit,
+    page,
+  })
 
   const { result } = await executeSql(
     {
       projectRef,
       connectionString,
+      sqlOrigin: 'studio',
+      queryName: 'entity-types',
       sql,
       queryKey: ['entity-types', ...schemas, page],
+      grant: unguarded.migrating,
     },
     signal
   )
@@ -61,7 +81,7 @@ export async function getEntityTypes(
 }
 
 export type EntityTypesData = Awaited<ReturnType<typeof getEntityTypes>>
-export type EntityTypesError = ResponseError
+export type EntityTypesError = StudioError
 
 export const useEntityTypesQuery = <TData = EntityTypesData>(
   {
@@ -72,6 +92,8 @@ export const useEntityTypesQuery = <TData = EntityTypesData>(
     limit = 100,
     sort,
     filterTypes,
+    excludePartitions,
+    parentId,
   }: Omit<EntityTypesVariables, 'page'>,
   {
     enabled = true,
@@ -85,7 +107,15 @@ export const useEntityTypesQuery = <TData = EntityTypesData>(
   > = {}
 ) => {
   return useInfiniteQuery({
-    queryKey: entityTypeKeys.list(projectRef, { schemas, search, sort, limit, filterTypes }),
+    queryKey: entityTypeKeys.list(projectRef, {
+      schemas,
+      search,
+      sort,
+      limit,
+      filterTypes,
+      excludePartitions,
+      parentId,
+    }),
     queryFn: ({ signal, pageParam }) =>
       getEntityTypes(
         {
@@ -97,6 +127,8 @@ export const useEntityTypesQuery = <TData = EntityTypesData>(
           page: pageParam,
           sort,
           filterTypes,
+          excludePartitions,
+          parentId,
         },
         signal
       ),
@@ -127,10 +159,18 @@ export function prefetchEntityTypes(
     limit = 100,
     sort,
     filterTypes,
+    excludePartitions,
   }: Omit<EntityTypesVariables, 'page'>
 ) {
   return client.prefetchInfiniteQuery({
-    queryKey: entityTypeKeys.list(projectRef, { schemas, search, sort, limit, filterTypes }),
+    queryKey: entityTypeKeys.list(projectRef, {
+      schemas,
+      search,
+      sort,
+      limit,
+      filterTypes,
+      excludePartitions,
+    }),
     initialPageParam: 0,
     queryFn: ({ signal, pageParam }) =>
       getEntityTypes(
@@ -143,6 +183,7 @@ export function prefetchEntityTypes(
           page: pageParam,
           sort,
           filterTypes,
+          excludePartitions,
         },
         signal
       ),

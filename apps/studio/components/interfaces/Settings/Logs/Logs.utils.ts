@@ -3,12 +3,28 @@ import { IS_PLATFORM } from 'common'
 import dayjs, { Dayjs } from 'dayjs'
 import { get } from 'lodash'
 import uniqBy from 'lodash/uniqBy'
+import type { editor, IPosition, languages } from 'monaco-editor'
 import { useEffect } from 'react'
 import logConstants from 'shared-data/log-constants'
 
-import { LogsTableName, SQL_FILTER_TEMPLATES } from './Logs.constants'
-import type { Filters, LogData, LogsEndpointParams, QueryType } from './Logs.types'
+import {
+  AUTH_LOG_ERROR_CONDITION,
+  AUTH_LOG_WARNING_CONDITION,
+  LogsTableName,
+  SQL_FILTER_TEMPLATES,
+  type SqlFilterEntry,
+} from './Logs.constants'
+import type { Filters, LogData, LogsEndpointParams, Metadata, QueryType } from './Logs.types'
+import { convertResultsToCSV } from '@/components/interfaces/SQLEditor/UtilityPanel/Results.utils'
 import BackwardIterator from '@/components/ui/CodeEditor/Providers/BackwardIterator'
+import { parseOtelTimestamp } from '@/data/logs/otel-inspection.utils'
+import {
+  analyticsLiteral,
+  joinSqlFragments,
+  quotedIdent,
+  safeSql,
+  type SafeLogSqlFragment,
+} from '@/data/logs/safe-analytics-sql'
 
 /**
  * Convert a micro timestamp from number/string to iso timestamp
@@ -45,63 +61,65 @@ const getDotKeys = (obj: { [k: string]: unknown }, parent?: string): string[] =>
   const keys = Object.keys(obj).filter((k) => obj[k])
   return keys.flatMap((k) => {
     const currKey = parent ? `${parent}.${k}` : k
-    if (typeof obj[k] === 'object') {
-      return getDotKeys(obj[k] as any, currKey)
+    const value = obj[k]
+    if (typeof value === 'object' && value !== null) {
+      return getDotKeys({ ...value }, currKey)
     } else {
       return [currKey]
     }
   })
 }
 
-/**
- * Root keys in the filter object are considered to be AND filters.
- * Nested keys under a root key are considered to be OR filters.
- *
- * For example:
- * ```
- * {my_value: 'something', nested: {id: 123, test: 123 }}
- * ```
- * This would be converted into `WHERE (my_value = 'something') and (id = 123 or test = 123)
- *
- * The template of the filter determines the actual filter statement. If no template is provided, a generic equality statement will be used.
- * This only applies for root keys of the filter.
- * For example:
- * ```
- * {'my.nested.value': 123}
- * ```
- * with no template, it will be converted into `WHERE (my.nested.value = 123)
- *
- * @returns a where statement with WHERE clause.
- */
-const genWhereStatement = (table: LogsTableName, filters: Filters) => {
-  const keys = Object.keys(filters)
-  const filterTemplates = SQL_FILTER_TEMPLATES[table]
+// Fallback for filter keys with no template: a plain `key = value`.
+// Drops the clause on non-scalar or un-encodable input.
+const defaultResolveUnknownClause = (dotKey: string, value: unknown): SafeLogSqlFragment | null => {
+  if (typeof value !== 'string' && typeof value !== 'number' && typeof value !== 'boolean') {
+    return null
+  }
+  try {
+    return safeSql`${quotedIdent(dotKey)} = ${analyticsLiteral(value)}`
+  } catch {
+    return null
+  }
+}
 
-  const _resolveTemplateToStatement = (dotKey: string): string | null => {
+/**
+ * Builds the AND-joined WHERE clauses for a table's filters. Top-level keys are
+ * ANDed, nested keys under one key are ORed.
+ *
+ * `filterTemplates` and `resolveUnknownClause` can be passed in so the OTEL
+ * builders reuse this with their own ClickHouse conditions. Defaults keep the
+ * BigQuery behavior.
+ */
+export const buildWhereClauses = (
+  table: LogsTableName,
+  filters: Filters,
+  filterTemplates: Record<string, SqlFilterEntry> = SQL_FILTER_TEMPLATES[table],
+  resolveUnknownClause: (
+    dotKey: string,
+    value: unknown
+  ) => SafeLogSqlFragment | null = defaultResolveUnknownClause
+): SafeLogSqlFragment[] => {
+  const keys = Object.keys(filters)
+  const _resolveTemplateToStatement = (dotKey: string): SafeLogSqlFragment | null => {
     const template = filterTemplates[dotKey]
     const value = get(filters, dotKey)
-    if (value !== undefined && typeof template === 'function') {
-      return template(value)
-    } else if (template === undefined) {
-      // resolve unknown filters (possibly from filter overrides)
-      // no template, set a default
-      if (typeof value === 'string') {
-        return `${dotKey} = '${value}'`
-      } else {
-        return `${dotKey} = ${value}`
-      }
-    } else if (value === undefined && typeof template === 'function') {
-      return null
-    } else if (template && value === false) {
-      // template present, but value is false
-      return null
-    } else {
-      return template
+
+    if (template === undefined) {
+      return resolveUnknownClause(dotKey, value)
     }
+
+    if (typeof template === 'function') {
+      return value !== undefined ? template(value) : null
+    }
+
+    // template is SafeLogSqlFragment — emit unless the filter is explicitly disabled
+    if (!template || value === false) return null
+    return template
   }
 
-  const statement = keys
-    .map((rootKey) => {
+  return keys
+    .map((rootKey): SafeLogSqlFragment | null => {
       if (
         filters[rootKey] === undefined ||
         (typeof filters[rootKey] === 'string' && (filters[rootKey] as string).length === 0)
@@ -111,128 +129,147 @@ const genWhereStatement = (table: LogsTableName, filters: Filters) => {
         // join all statements with an OR
         const nestedStatements = getDotKeys(filters[rootKey] as Filters, rootKey)
           .map(_resolveTemplateToStatement)
-          .filter(Boolean)
+          .filter((s) => s !== null)
 
         if (nestedStatements.length > 0) {
-          return `(${nestedStatements.join(' or ')})`
+          return safeSql`(${joinSqlFragments(nestedStatements, ' or ')})`
         } else {
           return null
         }
       } else {
         const nestedStatement = _resolveTemplateToStatement(rootKey)
         if (nestedStatement === null) return null
-        return `(${nestedStatement})`
+        return safeSql`(${nestedStatement})`
       }
     })
-    .filter(Boolean)
-    // join all root statements with AND
-    .join(' and ')
-
-  if (statement) {
-    return 'where ' + statement
-  } else {
-    return ''
-  }
+    .filter((s) => s !== null)
 }
 
-export const genDefaultQuery = (table: LogsTableName, filters: Filters, limit: number = 100) => {
+export const genWhereStatement = (
+  table: LogsTableName,
+  filters: Filters,
+  filterTemplates?: Record<string, SqlFilterEntry>,
+  resolveUnknownClause?: (dotKey: string, value: unknown) => SafeLogSqlFragment | null
+): SafeLogSqlFragment => {
+  const clauses = buildWhereClauses(table, filters, filterTemplates, resolveUnknownClause)
+  return clauses.length > 0 ? safeSql`where ${joinSqlFragments(clauses, ' and ')}` : safeSql``
+}
+
+export const genDefaultQuery = (
+  table: LogsTableName,
+  filters: Filters,
+  limit: number = 100
+): SafeLogSqlFragment => {
   const where = genWhereStatement(table, filters)
   const joins = genCrossJoinUnnests(table)
-  const orderBy = 'order by timestamp desc'
+  const orderBy = safeSql`order by timestamp desc`
+  const limitLit = analyticsLiteral(limit)
 
   switch (table) {
     case 'edge_logs':
       if (!IS_PLATFORM) {
-        return `
+        return safeSql`
 -- local dev edge_logs query
 select id, edge_logs.timestamp, event_message, request.method, request.path, request.search, response.status_code
 from edge_logs
 ${joins}
 ${where}
 ${orderBy}
-limit ${limit};
+limit ${limitLit};
 `
       }
-      return `select id, identifier, timestamp, event_message, request.method, request.path, request.search, response.status_code
-  from ${table}
+      return safeSql`select id, identifier, timestamp, event_message, request.method, request.path, request.search, response.status_code
+  from ${LOG_TABLE_SQL[table]}
   ${joins}
   ${where}
   ${orderBy}
-  limit ${limit}
+  limit ${limitLit}
   `
 
     case 'postgres_logs':
       if (!IS_PLATFORM) {
-        return `
+        return safeSql`
 select postgres_logs.timestamp, id, event_message, parsed.error_severity, parsed.detail, parsed.hint
 from postgres_logs
 ${joins}
 ${where}
 ${orderBy}
-limit ${limit}
+limit ${limitLit}
   `
       }
-      return `select identifier, postgres_logs.timestamp, id, event_message, parsed.error_severity, parsed.detail, parsed.hint from ${table}
+      return safeSql`select identifier, postgres_logs.timestamp, id, event_message, parsed.error_severity, parsed.detail, parsed.hint from ${LOG_TABLE_SQL[table]}
   ${joins}
   ${where}
   ${orderBy}
-  limit ${limit}
+  limit ${limitLit}
   `
 
     case 'function_logs':
-      return `select id, ${table}.timestamp, event_message, metadata.event_type, metadata.function_id, metadata.execution_id, metadata.level from ${table}
+      return safeSql`select id, ${LOG_TABLE_SQL[table]}.timestamp, event_message, metadata.event_type, metadata.function_id, metadata.execution_id, metadata.level from ${LOG_TABLE_SQL[table]}
   ${joins}
   ${where}
   ${orderBy}
-  limit ${limit}
+  limit ${limitLit}
     `
 
     case 'auth_logs':
-      return `select id, ${table}.timestamp, event_message, metadata.level, metadata.status, metadata.path, metadata.msg as msg, metadata.error from ${table}
+      return safeSql`select id, ${LOG_TABLE_SQL[table]}.timestamp, event_message, metadata.level, metadata.status, metadata.path, metadata.msg as msg, metadata.error from ${LOG_TABLE_SQL[table]}
   ${joins}
   ${where}
   ${orderBy}
-  limit ${limit}
+  limit ${limitLit}
     `
 
     case 'function_edge_logs':
       if (!IS_PLATFORM) {
-        return `
+        return safeSql`
 select id, function_edge_logs.timestamp, event_message
 from function_edge_logs
 ${orderBy}
-limit ${limit}
+limit ${limitLit}
 `
       }
-      return `select id, ${table}.timestamp, event_message, response.status_code, request.method, request.pathname, m.function_id, m.execution_id, m.execution_time_ms, m.deployment_id, m.version from ${table}
+      return safeSql`select id, ${LOG_TABLE_SQL[table]}.timestamp, event_message, response.status_code, request.method, request.pathname, m.function_id, m.execution_id, m.execution_time_ms, m.deployment_id, m.version from ${LOG_TABLE_SQL[table]}
   ${joins}
   ${where}
   ${orderBy}
-  limit ${limit}
+  limit ${limitLit}
   `
+
     case 'supavisor_logs':
-      return `select id, ${table}.timestamp, event_message from ${table} ${joins} ${where} ${orderBy} limit ${limit}`
+      return safeSql`select id, ${LOG_TABLE_SQL[table]}.timestamp, event_message from ${LOG_TABLE_SQL[table]} ${joins} ${where} ${orderBy} limit ${limitLit}`
 
     case 'pg_upgrade_logs':
-      return `select id, ${table}.timestamp, event_message from ${table} ${joins} ${where} ${orderBy} limit 100`
+      return safeSql`select id, ${LOG_TABLE_SQL[table]}.timestamp, event_message from ${LOG_TABLE_SQL[table]} ${joins} ${where} ${orderBy} limit ${analyticsLiteral(100)}`
 
-    default:
-      return `select id, ${table}.timestamp, event_message from ${table}
+    case 'etl_replication_logs':
+      return safeSql`select id, t.timestamp, event_message from ${LOG_TABLE_SQL[table]} t
   ${where}
   ${orderBy}
-  limit ${limit}
+  limit ${limitLit}
   `
 
-    case 'pg_cron_logs':
-      const pgCronWhere = where ? `${basePgCronWhere} AND ${where.substring(6)}` : basePgCronWhere
-
-      return `select id, postgres_logs.timestamp, event_message, parsed.error_severity, parsed.query
+    case 'pg_cron_logs': {
+      const userClauses = buildWhereClauses(table, filters)
+      const pgCronWhere =
+        userClauses.length > 0
+          ? safeSql`where ${basePgCronConditions} AND ${joinSqlFragments(userClauses, ' and ')}`
+          : basePgCronWhere
+      return safeSql`select id, postgres_logs.timestamp, event_message, parsed.error_severity, parsed.query
 from postgres_logs
 ${joins}
 ${pgCronWhere}
 ${orderBy}
-limit ${limit}
+limit ${limitLit}
 `
+    }
+
+    default:
+      return safeSql`select id, ${LOG_TABLE_SQL[table]}.timestamp, event_message from ${LOG_TABLE_SQL[table]}
+  ${where}
+  ${orderBy}
+  limit ${limitLit}
+  `
   }
 }
 
@@ -240,74 +277,128 @@ limit ${limit}
  * Hardcoded cross join unnests and aliases for each table.
  * Should be used together with the getWhereStatements to allow for filtering on aliases
  */
-const genCrossJoinUnnests = (table: LogsTableName) => {
+const genCrossJoinUnnests = (table: LogsTableName): SafeLogSqlFragment => {
   switch (table) {
     case 'edge_logs':
-      return `cross join unnest(metadata) as m
+      return safeSql`cross join unnest(metadata) as m
   cross join unnest(m.request) as request
   cross join unnest(m.response) as response`
 
     case 'pg_cron_logs':
     case 'postgres_logs':
-      return `cross join unnest(metadata) as m
+      return safeSql`cross join unnest(metadata) as m
   cross join unnest(m.parsed) as parsed`
 
     case 'function_logs':
-      return `cross join unnest(metadata) as metadata`
+      return safeSql`cross join unnest(metadata) as metadata`
 
     case 'auth_logs':
-      return `cross join unnest(metadata) as metadata`
+      return safeSql`cross join unnest(metadata) as metadata`
 
     case 'function_edge_logs':
-      return `cross join unnest(metadata) as m
+      return safeSql`cross join unnest(metadata) as m
   cross join unnest(m.response) as response
   cross join unnest(m.request) as request`
 
     case 'supavisor_logs':
-      return `cross join unnest(metadata) as m`
+      return safeSql`cross join unnest(metadata) as m`
 
     default:
-      return ''
+      return safeSql``
   }
+}
+
+/** Brand-safe table name literals for analytics SQL. */
+export const LOG_TABLE_SQL: Record<LogsTableName, SafeLogSqlFragment> = {
+  [LogsTableName.EDGE]: safeSql`edge_logs`,
+  [LogsTableName.POSTGRES]: safeSql`postgres_logs`,
+  [LogsTableName.FUNCTIONS]: safeSql`function_logs`,
+  [LogsTableName.FN_EDGE]: safeSql`function_edge_logs`,
+  [LogsTableName.AUTH]: safeSql`auth_logs`,
+  [LogsTableName.AUTH_AUDIT]: safeSql`auth_audit_logs`,
+  [LogsTableName.REALTIME]: safeSql`realtime_logs`,
+  [LogsTableName.STORAGE]: safeSql`storage_logs`,
+  [LogsTableName.POSTGREST]: safeSql`postgrest_logs`,
+  [LogsTableName.SUPAVISOR]: safeSql`supavisor_logs`,
+  [LogsTableName.PGBOUNCER]: safeSql`pgbouncer_logs`,
+  [LogsTableName.PG_UPGRADE]: safeSql`pg_upgrade_logs`,
+  [LogsTableName.PG_CRON]: safeSql`pg_cron_logs`,
+  [LogsTableName.PIPELINES]: safeSql`etl_replication_logs`,
+  [LogsTableName.MULTIGRES]: safeSql`multigres_logs`,
 }
 
 /**
  * SQL query to retrieve only one log
  */
-export const genSingleLogQuery = (table: LogsTableName, id: string) =>
-  `select id, timestamp, event_message, metadata from ${table} where id = '${id}' limit 1`
+export const genSingleLogQuery = (table: LogsTableName, id: string): SafeLogSqlFragment => {
+  // multigres logs have no metadata column
+  const metadataColumn = table === LogsTableName.MULTIGRES ? safeSql`` : safeSql`, metadata`
+  return safeSql`select id, timestamp, event_message${metadataColumn} from ${LOG_TABLE_SQL[table]} where id = ${analyticsLiteral(id)} limit 1`
+}
+
+/**
+ * Multigres logs store their structured payload as a JSON string in
+ * `event_message`. Parse it into a plain object, returning `null` when the
+ * value is missing, not valid JSON, or not a plain object (e.g. an array).
+ */
+export const parseMultigresEventMessage = (
+  eventMessage: unknown
+): Record<string, unknown> | null => {
+  if (typeof eventMessage !== 'string') return null
+  try {
+    const parsed = JSON.parse(eventMessage)
+    return parsed && typeof parsed === 'object' && !Array.isArray(parsed) ? parsed : null
+  } catch {
+    return null
+  }
+}
+
+// Presets like "Last 24 hours" compute their start moments before this check runs,
+// so allow a small grace window past the exact cutoff instead of locking them out.
+const ENTITLEMENT_CUTOFF_GRACE_MS = 60 * 1000
 
 /**
  * Determine if we should show the user an upgrade prompt while browsing logs
+ *
+ * [Joshen] Tbh this should be a guard from API, and not UI to ensure that the checks are
+ * consistent. To investigate separately - e.g upgrade prompt should show if API for logs
+ * returns a error regarding the date range
  */
-export const maybeShowUpgradePromptIfNotEntitled = (
+export const isStartOutsideRetention = (
   from: string | null | undefined,
   entitledToDays: number | undefined
 ) => {
   if (!entitledToDays) return false
-  const day = Math.abs(dayjs().diff(dayjs(from), 'day'))
-  return day > entitledToDays
+  const cutoff = dayjs().subtract(entitledToDays, 'day').subtract(ENTITLEMENT_CUTOFF_GRACE_MS, 'ms')
+  return dayjs(from).isBefore(cutoff)
 }
 
-export const genCountQuery = (table: LogsTableName, filters: Filters): string => {
+export const genCountQuery = (table: LogsTableName, filters: Filters): SafeLogSqlFragment => {
   let where = genWhereStatement(table, filters)
-  // pg_cron logs are a subset of postgres logs
-  // to calculate the chart, we need to query postgres logs
   if (table === LogsTableName.PG_CRON) {
     table = LogsTableName.POSTGRES
     where = basePgCronWhere
   }
   const joins = genCrossJoinUnnests(table)
-  return `SELECT count(*) as count FROM ${table} ${joins} ${where}`
+  // Pipelines filters read the row through the `t` alias.
+  const alias = table === LogsTableName.PIPELINES ? safeSql` t` : safeSql``
+  return safeSql`SELECT count(*) as count FROM ${LOG_TABLE_SQL[table]}${alias} ${joins} ${where}`
+}
+
+// Falls back to now for missing or unparseable params so an Invalid Date can't
+// reach .toISOString() downstream and throw RangeError (Sentry 7580074952).
+export const resolveLogTimestamp = (value?: string): Dayjs => {
+  const parsed = dayjs(value)
+  return value && parsed.isValid() ? parsed : dayjs()
 }
 
 /** calculates how much the chart start datetime should be offset given the current datetime filter params */
 const calcChartStart = (
   params: Partial<LogsEndpointParams>
 ): [Dayjs, 'minute' | 'hour' | 'day'] => {
-  const ite = params.iso_timestamp_end ? dayjs(params.iso_timestamp_end) : dayjs()
+  const ite = resolveLogTimestamp(params.iso_timestamp_end)
   // todo @TzeYiing needs typing
-  const its: any = params.iso_timestamp_start ? dayjs(params.iso_timestamp_start) : dayjs()
+  const its = resolveLogTimestamp(params.iso_timestamp_start)
 
   let trunc: 'minute' | 'hour' | 'day' = 'minute'
   let extendValue = 60 * 6
@@ -324,9 +415,16 @@ const calcChartStart = (
 }
 
 // TODO(qiao): workaround for self-hosted cron logs error until logflare is fixed
-const basePgCronWhere = IS_PLATFORM
-  ? `where ( parsed.application_name = 'pg_cron' or regexp_contains(event_message, 'cron job') )`
-  : `where ( parsed.application_name = 'pg_cron' or event_message::text LIKE '%cron job%' )`
+const basePgCronConditions: SafeLogSqlFragment = IS_PLATFORM
+  ? safeSql`( parsed.application_name = 'pg_cron' or regexp_contains(event_message, 'cron job') )`
+  : safeSql`( parsed.application_name = 'pg_cron' or event_message::text LIKE '%cron job%' )`
+const basePgCronWhere: SafeLogSqlFragment = safeSql`where ${basePgCronConditions}`
+
+const TRUNC_SQL: Record<'minute' | 'hour' | 'day', SafeLogSqlFragment> = {
+  minute: safeSql`minute`,
+  hour: safeSql`hour`,
+  day: safeSql`day`,
+}
 /**
  *
  * generates log event chart query
@@ -335,7 +433,7 @@ export const genChartQuery = (
   table: LogsTableName,
   params: LogsEndpointParams,
   filters: Filters
-) => {
+): SafeLogSqlFragment => {
   const [startOffset, trunc] = calcChartStart(params)
   let where = genWhereStatement(table, filters)
   const errorCondition = getErrorCondition(table)
@@ -348,29 +446,28 @@ export const genChartQuery = (
     where = basePgCronWhere
   }
 
-  let joins = genCrossJoinUnnests(table)
+  const joins = genCrossJoinUnnests(table)
+  const tsLit = analyticsLiteral(startOffset.toISOString())
+  const whereFragment: SafeLogSqlFragment = where
+    ? safeSql`${where} and t.timestamp > ${tsLit}`
+    : safeSql`where t.timestamp > ${tsLit}`
 
-  const q = `
+  return safeSql`
 SELECT
 -- log-event-chart
-  timestamp_trunc(t.timestamp, ${trunc}) as timestamp,
+  timestamp_trunc(t.timestamp, ${TRUNC_SQL[trunc]}) as timestamp,
   count(CASE WHEN NOT (${errorCondition} OR ${warningCondition}) THEN 1 END) as ok_count,
   count(CASE WHEN ${errorCondition} THEN 1 END) as error_count,
   count(CASE WHEN ${warningCondition} THEN 1 END) as warning_count,
 FROM
-  ${table} t
+  ${LOG_TABLE_SQL[table]} t
   ${joins}
-  ${
-    where
-      ? where + ` and t.timestamp > '${startOffset.toISOString()}'`
-      : `where t.timestamp > '${startOffset.toISOString()}'`
-  }
+  ${whereFragment}
 GROUP BY
 timestamp
 ORDER BY
   timestamp ASC
   `
-  return q
 }
 
 type TsPair = [string | '', string | '']
@@ -379,14 +476,12 @@ export const ensureNoTimestampConflict = (
   [nextStart, nextEnd]: TsPair
 ): TsPair => {
   if (initialStart && initialEnd && nextEnd && !nextStart) {
-    const resolvedDiff = dayjs(nextEnd).diff(dayjs(initialStart))
-    let start = dayjs(initialStart)
+    const end = resolveLogTimestamp(nextEnd)
+    let start = resolveLogTimestamp(initialStart)
 
-    if (resolvedDiff <= 0) {
-      // start ts is definitely before end ts
-      const currDiff = Math.abs(dayjs(initialEnd).diff(start, 'minute'))
-      // shift start ts backwards by the current ts difference
-      start = dayjs(nextEnd).subtract(currDiff, 'minute')
+    if (end.diff(start) <= 0) {
+      const currDiff = Math.abs(resolveLogTimestamp(initialEnd).diff(start, 'minute'))
+      start = end.subtract(currDiff, 'minute')
     }
     return [start.toISOString(), nextEnd]
   } else if (!nextEnd && nextStart) {
@@ -404,12 +499,23 @@ export const useEditorHints = () => {
 
   useEffect(() => {
     if (monaco) {
-      const competionProvider = {
+      const competionProvider: languages.CompletionItemProvider = {
         triggerCharacters: ['`', ' ', '.'],
-        provideCompletionItems: function (model: any, position: any, context: any) {
+        provideCompletionItems: function (
+          model: editor.ITextModel,
+          position: IPosition,
+          context: languages.CompletionContext
+        ) {
           let iterator = new BackwardIterator(model, position.column - 2, position.lineNumber - 1)
           if (iterator.isNextDQuote()) return { suggestions: [] }
-          let suggestions: { label: string; kind: any; insertText: string }[] = []
+          let suggestions: languages.CompletionItem[] = []
+          const word = model.getWordUntilPosition(position)
+          const range = {
+            startLineNumber: position.lineNumber,
+            endLineNumber: position.lineNumber,
+            startColumn: word.startColumn,
+            endColumn: word.endColumn,
+          }
 
           let schemasInUse = logConstants.schemas.filter((schema) =>
             iterator._text.includes(schema.reference)
@@ -430,6 +536,7 @@ export const useEditorHints = () => {
               label: key,
               kind: monaco.languages.CompletionItemKind.Property,
               insertText: key,
+              range,
             }))
             suggestions = suggestions.concat(trailingToAdd)
           }
@@ -440,6 +547,7 @@ export const useEditorHints = () => {
               label: schema.reference,
               kind: monaco.languages.CompletionItemKind.Class,
               insertText: schema.reference,
+              range,
             }))
 
             const fields = schemasInUse.flatMap((schema) => schema.fields)
@@ -453,6 +561,7 @@ export const useEditorHints = () => {
               label: key,
               kind: monaco.languages.CompletionItemKind.Property,
               insertText: key,
+              range,
             }))
             suggestions = suggestions.concat(leadingToAdd)
             suggestions = suggestions.concat(referencesToAdd)
@@ -461,7 +570,7 @@ export const useEditorHints = () => {
             suggestions: uniqBy(suggestions, 'label'),
           }
         },
-      } as any
+      }
 
       // register completion item provider for pgsql
       const completeProvider = monaco.languages.registerCompletionItemProvider(
@@ -481,8 +590,11 @@ export const useEditorHints = () => {
  *
  * min/max are the datetime strings that extend beyond the given timeseries data.
  */
+const toTimestampInput = (value: unknown): string | number =>
+  typeof value === 'number' ? value : String(value)
+
 export const fillTimeseries = (
-  timeseriesData: any[],
+  timeseriesData: Record<string, unknown>[],
   timestampKey: string,
   valueKey: string | string[],
   defaultValue: number,
@@ -497,7 +609,7 @@ export const fillTimeseries = (
   // If we have more points than minPointsToFill, just normalize timestamps and return
   if (timeseriesData.length > minPointsToFill) {
     return timeseriesData.map((datum) => {
-      const timestamp = datum[timestampKey]
+      const timestamp = toTimestampInput(datum[timestampKey])
       const iso = isUnixMicro(timestamp)
         ? unixMicroToIsoTimestamp(timestamp)
         : dayjs.utc(timestamp).toISOString()
@@ -506,11 +618,20 @@ export const fillTimeseries = (
     })
   }
 
-  if (timeseriesData.length <= 1 && !(min && max)) return timeseriesData
-  const dates: unknown[] = timeseriesData.map((datum) => dayjs.utc(datum[timestampKey]))
+  if (timeseriesData.length === 1 && !(min && max)) {
+    const timestamp = toTimestampInput(timeseriesData[0][timestampKey])
+    timeseriesData[0][timestampKey] = isUnixMicro(timestamp)
+      ? unixMicroToIsoTimestamp(timestamp)
+      : dayjs.utc(timestamp).toISOString()
+    return timeseriesData
+  }
+  const dates = timeseriesData.map((datum) => {
+    const timestamp = toTimestampInput(datum[timestampKey])
+    return dayjs.utc(isUnixMicro(timestamp) ? unixMicroToIsoTimestamp(timestamp) : timestamp)
+  })
 
-  const maxDate = max ? dayjs.utc(max) : dayjs.utc(Math.max.apply(null, dates as number[]))
-  const minDate = min ? dayjs.utc(min) : dayjs.utc(Math.min.apply(null, dates as number[]))
+  const maxDate = max ? dayjs.utc(max) : dayjs.utc(Math.max(...dates.map((date) => date.valueOf())))
+  const minDate = min ? dayjs.utc(min) : dayjs.utc(Math.min(...dates.map((date) => date.valueOf())))
 
   // When no data exists but min/max are provided, we need to determine truncation from the time range
   const truncationSamples = timeseriesData.length > 0 ? dates : [minDate, maxDate]
@@ -526,10 +647,10 @@ export const fillTimeseries = (
       truncation = unitMap[unitChar]
     } else {
       // Fallback for invalid format
-      truncation = getTimestampTruncation(truncationSamples as Dayjs[])
+      truncation = getTimestampTruncation(truncationSamples)
     }
   } else {
-    truncation = getTimestampTruncation(truncationSamples as Dayjs[])
+    truncation = getTimestampTruncation(truncationSamples)
   }
 
   // If no data exists and no interval specified, default to minute precision
@@ -537,11 +658,8 @@ export const fillTimeseries = (
     truncation = 'minute'
   }
 
-  const newData = timeseriesData.map((datum) => {
-    const timestamp = datum[timestampKey]
-    const iso = isUnixMicro(timestamp)
-      ? unixMicroToIsoTimestamp(timestamp)
-      : dayjs.utc(timestamp).toISOString()
+  const newData = timeseriesData.map((datum, index) => {
+    const iso = dates[index].toISOString()
 
     if (Array.isArray(valueKey) && valueKey.length === 0) {
       return { [timestampKey]: iso }
@@ -553,8 +671,7 @@ export const fillTimeseries = (
 
   let currentDate = minDate
   while (currentDate.isBefore(maxDate) || currentDate.isSame(maxDate)) {
-    const found = dates.find((d) => {
-      const d_date = d as Dayjs
+    const found = dates.find((d_date) => {
       return (
         d_date.year() === currentDate.year() &&
         d_date.month() === currentDate.month() &&
@@ -638,6 +755,13 @@ export function checkForILIKEClause(query: string) {
   return ilikeClauseRegex.test(queryWithoutComments)
 }
 
+export function checkForLimitClause(query: string) {
+  const queryWithoutComments = query.replace(/--.*$/gm, '').replace(/\/\*[\s\S]*?\*\//gm, '')
+
+  const limitClauseRegex = /\b(LIMIT)\b\s+\d+(?=(?:[^']*'[^']*')*[^']*$)/i
+  return limitClauseRegex.test(queryWithoutComments)
+}
+
 export function checkForWildcard(query: string) {
   const queryWithoutComments = query.replace(/--.*$/gm, '').replace(/\/\*[\s\S]*?\*\//gm, '')
 
@@ -647,44 +771,83 @@ export function checkForWildcard(query: string) {
   return wildcardRegex.test(queryWithoutCount)
 }
 
-function getErrorCondition(table: LogsTableName): string {
+function getErrorCondition(table: LogsTableName): SafeLogSqlFragment {
   switch (table) {
     case 'edge_logs':
-      return 'response.status_code >= 500'
+      return safeSql`response.status_code >= 500`
     case 'postgres_logs':
-      return "parsed.error_severity IN ('ERROR', 'FATAL', 'PANIC')"
+      return safeSql`parsed.error_severity IN ('ERROR', 'FATAL', 'PANIC')`
     case 'auth_logs':
-      return "metadata.level = 'error' OR SAFE_CAST(metadata.status AS INT64) >= 400"
+      return AUTH_LOG_ERROR_CONDITION
     case 'function_edge_logs':
-      return 'response.status_code >= 500'
+      return safeSql`response.status_code >= 500`
     case 'function_logs':
-      return "metadata.level IN ('error', 'fatal')"
+      return safeSql`metadata.level IN ('error', 'fatal')`
     case 'pg_cron_logs':
-      return "parsed.error_severity IN ('ERROR', 'FATAL', 'PANIC')"
+      return safeSql`parsed.error_severity IN ('ERROR', 'FATAL', 'PANIC')`
+    case 'multigres_logs':
+      return safeSql`JSON_VALUE(event_message, '$.level') IN ('ERROR', 'FATAL', 'PANIC')`
     default:
-      return 'false'
+      return safeSql`false`
   }
 }
 
-function getWarningCondition(table: LogsTableName): string {
+function getWarningCondition(table: LogsTableName): SafeLogSqlFragment {
   switch (table) {
     case 'edge_logs':
-      return 'response.status_code >= 400 AND response.status_code < 500'
+      return safeSql`response.status_code >= 400 AND response.status_code < 500`
     case 'postgres_logs':
-      return "parsed.error_severity IN ('WARNING')"
+      return safeSql`parsed.error_severity IN ('WARNING')`
     case 'auth_logs':
-      return "metadata.level = 'warning'"
+      return AUTH_LOG_WARNING_CONDITION
     case 'function_edge_logs':
-      return 'response.status_code >= 400 AND response.status_code < 500'
+      return safeSql`response.status_code >= 400 AND response.status_code < 500`
     case 'function_logs':
-      return "metadata.level IN ('warning')"
+      return safeSql`metadata.level IN ('warning')`
+    case 'multigres_logs':
+      return safeSql`JSON_VALUE(event_message, '$.level') IN ('WARN', 'WARNING')`
     default:
-      return 'false'
+      return safeSql`false`
   }
 }
 
-export function jwtAPIKey(metadata: any) {
-  const apikeyHeader = metadata?.[0]?.request?.[0]?.sb?.[0]?.jwt?.[0]?.apikey?.[0]
+export const HTTP_SERVER_ERROR_STATUS = 500
+export const HTTP_CLIENT_ERROR_STATUS = 400
+
+/**
+ * Derives the severity badge shown in the auth log table from the log level and
+ * HTTP status, matching the chart: 5xx → error, 4xx → warning, otherwise the
+ * log level. See the AUTH_LOG_*_CONDITION constants in Logs.constants.ts for the
+ * matching SQL and the reason auth logs need this.
+ */
+export function getAuthLogSeverity(level?: unknown, status?: unknown): string {
+  const normalizedLevel = typeof level === 'string' ? level : ''
+
+  // Preserve explicit error-class levels so we never downgrade them and so the
+  // original label (e.g. "fatal") is kept.
+  if (normalizedLevel === 'error' || normalizedLevel === 'fatal') return normalizedLevel
+
+  const statusCode =
+    typeof status === 'number' ? status : typeof status === 'string' ? Number(status) : NaN
+  const hasStatus = Number.isFinite(statusCode)
+
+  if (hasStatus && statusCode >= HTTP_SERVER_ERROR_STATUS) return 'error'
+  if (normalizedLevel === 'warning') return 'warning'
+  if (hasStatus && statusCode >= HTTP_CLIENT_ERROR_STATUS) return 'warning'
+
+  return normalizedLevel
+}
+
+type JwtApiKeyHeader = {
+  invalid?: boolean
+  payload?: { algorithm?: string; issuer?: string; role?: string; subject?: string }[]
+}
+type ApiKeyHeader = { error?: string; prefix?: string }
+type AuthorizationHeader = { invalid?: boolean; payload?: { role?: string }[] }
+
+export function jwtAPIKey(metadata?: Metadata) {
+  const apikeyHeader: JwtApiKeyHeader | undefined =
+    metadata?.[0]?.request?.[0]?.sb?.[0]?.jwt?.[0]?.apikey?.[0]
   if (!apikeyHeader) {
     return undefined
   }
@@ -701,6 +864,7 @@ export function jwtAPIKey(metadata: any) {
   if (
     payload.algorithm === 'HS256' &&
     payload.issuer === 'supabase' &&
+    payload.role !== undefined &&
     ['anon', 'service_role'].includes(payload.role) &&
     !payload.subject
   ) {
@@ -710,8 +874,9 @@ export function jwtAPIKey(metadata: any) {
   return '<unrecognized>'
 }
 
-export function apiKey(metadata: any) {
-  const apikeyHeader = metadata?.[0]?.request?.[0]?.sb?.[0]?.apikey?.[0]?.apikey?.[0]
+export function apiKey(metadata?: Metadata) {
+  const apikeyHeader: ApiKeyHeader | undefined =
+    metadata?.[0]?.request?.[0]?.sb?.[0]?.apikey?.[0]?.apikey?.[0]
   if (!apikeyHeader) {
     return undefined
   }
@@ -723,8 +888,9 @@ export function apiKey(metadata: any) {
   return `${apikeyHeader.prefix}...`
 }
 
-export function role(metadata: any) {
-  const authorizationHeader = metadata?.[0]?.request?.[0]?.sb?.[0]?.jwt?.[0]?.authorization?.[0]
+export function role(metadata?: Metadata) {
+  const authorizationHeader: AuthorizationHeader | undefined =
+    metadata?.[0]?.request?.[0]?.sb?.[0]?.jwt?.[0]?.authorization?.[0]
   if (!authorizationHeader) {
     return undefined
   }
@@ -741,11 +907,19 @@ export function role(metadata: any) {
   return payload.role
 }
 
-export function formatLogsAsJson(rows: LogData[]): string {
+type LogExportData = Pick<LogData, 'id' | 'event_message'> & {
+  timestamp: string | number
+} & Record<string, unknown>
+
+export function formatLogsAsJson(rows: LogExportData[]): string {
   return JSON.stringify(rows, null, 2)
 }
 
-export function formatLogsAsMarkdown(rows: LogData[]): string {
+export function formatLogsAsCsv(rows: LogData[]): string {
+  return convertResultsToCSV(rows as unknown as Record<string, unknown>[]) ?? ''
+}
+
+export function formatLogsAsMarkdown(rows: LogExportData[]): string {
   return rows
     .map((row, i) => {
       const lines: string[] = [`## Log ${i + 1}`]
@@ -755,7 +929,7 @@ export function formatLogsAsMarkdown(rows: LogData[]): string {
         if (isFinite(numTs)) {
           tsString = new Date(numTs / 1000).toISOString()
         } else if (typeof row.timestamp === 'string') {
-          const d = new Date(row.timestamp)
+          const d = parseOtelTimestamp(row.timestamp)
           tsString = isNaN(d.getTime()) ? row.timestamp : d.toISOString()
         } else {
           tsString = String(row.timestamp)
@@ -765,7 +939,7 @@ export function formatLogsAsMarkdown(rows: LogData[]): string {
       if (row.event_message) {
         lines.push(`**Message:** ${row.event_message}`)
       }
-      const { id: _id, timestamp: _ts, event_message: _msg, ...rest } = row as any
+      const { id: _id, timestamp: _ts, event_message: _msg, ...rest } = row
       if (Object.keys(rest).length > 0) {
         lines.push('', '**Details:**', '```json', JSON.stringify(rest, null, 2), '```')
       }
@@ -787,7 +961,8 @@ const QUERY_TYPE_LABELS: Record<QueryType, string> = {
   pg_upgrade: 'Postgres upgrade',
   pg_cron: 'pg_cron',
   pgbouncer: 'PgBouncer',
-  etl: 'ETL',
+  pipelines: 'Pipelines',
+  multigres: 'Multigres',
 }
 
 const LOG_TABLE_TO_SERVICE_LABEL: Record<LogsTableName, string> = {
@@ -804,7 +979,8 @@ const LOG_TABLE_TO_SERVICE_LABEL: Record<LogsTableName, string> = {
   pgbouncer_logs: 'PgBouncer',
   pg_upgrade_logs: 'Postgres upgrade',
   pg_cron_logs: 'pg_cron',
-  etl_replication_logs: 'ETL',
+  etl_replication_logs: 'Pipelines',
+  multigres_logs: 'Multigres',
 }
 
 const isLogsTableName = (value: string): value is LogsTableName =>
@@ -823,7 +999,18 @@ function extractServiceLabelFromSql(sql: string): string | null {
   return tableName && isLogsTableName(tableName) ? LOG_TABLE_TO_SERVICE_LABEL[tableName] : null
 }
 
-export function buildLogsPrompt(rows: LogData[], queryType?: string, sqlQuery?: string): string {
+export function buildLogsPrompt(
+  rows: LogExportData[],
+  {
+    queryType,
+    sqlQuery,
+    omittedCount = 0,
+  }: {
+    queryType?: string
+    sqlQuery?: string
+    omittedCount?: number
+  } = {}
+): string {
   const serviceLabel =
     (queryType && isQueryType(queryType) ? QUERY_TYPE_LABELS[queryType] : null) ??
     (sqlQuery ? extractServiceLabelFromSql(sqlQuery) : null)
@@ -831,9 +1018,14 @@ export function buildLogsPrompt(rows: LogData[], queryType?: string, sqlQuery?: 
   const sqlContext = sqlQuery ? `\n\n**Query used:**\n\`\`\`sql\n${sqlQuery.trim()}\n\`\`\`` : ''
   const header = `I have ${rows.length} Supabase log entr${rows.length === 1 ? 'y' : 'ies'}${serviceContext} I'd like help debugging:\n\n`
   const body = formatLogsAsMarkdown(rows)
+  const omittedContext =
+    omittedCount > 0
+      ? `\n\n+${omittedCount.toLocaleString('en-US')} more matching log entr${omittedCount === 1 ? 'y' : 'ies'} not included.`
+      : ''
   return (
     header +
     body +
+    omittedContext +
     sqlContext +
     '\n\nWhat do these logs indicate? What steps can I take to resolve it? Keep your answer very concise and actionable. Max 2 or 3 bullet points.'
   )

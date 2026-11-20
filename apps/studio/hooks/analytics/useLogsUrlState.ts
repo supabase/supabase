@@ -1,4 +1,5 @@
 import { createParser, useQueryState } from 'nuqs'
+import { useCallback } from 'react'
 
 import { Filters } from '@/components/interfaces/Settings/Logs/Logs.types'
 
@@ -67,34 +68,55 @@ export function useLogsUrlState() {
   const selectedLogId = selectedLogIdValue || null
   const filters = filtersValue || defaultState.filters
 
-  const setSearch = (value: string) => {
-    setSearchValue(value || defaultState.search)
-  }
+  const setSearch = useCallback(
+    (value: string) => {
+      setSearchValue(value || defaultState.search)
+    },
+    [setSearchValue]
+  )
 
-  const setTimeRange = (start: string, end: string) => {
-    setTimestampStartValue(start || defaultState.timestampStart)
-    setTimestampEndValue(end || defaultState.timestampEnd)
-  }
+  const setTimeRange = useCallback(
+    (start: string, end: string) => {
+      setTimestampStartValue(start || defaultState.timestampStart)
+      setTimestampEndValue(end || defaultState.timestampEnd)
+    },
+    [setTimestampStartValue, setTimestampEndValue]
+  )
 
-  const setSelectedLogId = (value: string | null) => {
-    setSelectedLogIdValue(value || '')
-  }
+  const setSelectedLogId = useCallback(
+    (value: string | null) => {
+      setSelectedLogIdValue(value || '')
+    },
+    [setSelectedLogIdValue]
+  )
 
-  const setFilters = (value: Filters) => {
-    setFiltersValue(value || defaultState.filters)
-  }
+  const setFilters = useCallback(
+    (value: Filters) => {
+      setFiltersValue(value || defaultState.filters)
+    },
+    [setFiltersValue]
+  )
 
-  const updateFilter = (key: string, value: any) => {
-    setFilters({ ...filters, [key]: value })
-  }
+  const updateFilter = useCallback(
+    (key: string, value: any) => {
+      setFilters({ ...filters, [key]: value })
+    },
+    [filters, setFilters]
+  )
 
-  const reset = () => {
+  const reset = useCallback(() => {
     setSearch(defaultState.search)
     setTimestampStartValue(defaultState.timestampStart)
     setTimestampEndValue(defaultState.timestampEnd)
     setSelectedLogIdValue('')
     setFiltersValue(defaultState.filters)
-  }
+  }, [
+    setSearch,
+    setTimestampStartValue,
+    setTimestampEndValue,
+    setSelectedLogIdValue,
+    setFiltersValue,
+  ])
 
   return {
     // State

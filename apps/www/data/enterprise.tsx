@@ -59,7 +59,7 @@ export default {
     heading: <>Stay on the forefront</>,
     stories: [
       {
-        icon: '/images/customers/logos/light/mozilla.png',
+        icon: '/images/customers/logos/on-dark/mozilla.png',
         url: 'https://developer.mozilla.org/en-US/blog/introducing-ai-help/',
         target: '_blank',
         heading: 'Mozilla use Supabase for GenAI and RAG',
@@ -74,7 +74,7 @@ export default {
         ),
       },
       {
-        icon: '/images/customers/logos/light/epsilon3.png',
+        icon: '/images/customers/logos/on-dark/epsilon3.png',
         url: '/customers/epsilon3',
         heading: 'Epsilon3 use Supabase to build software for NASA',
         subheading: (
@@ -88,7 +88,7 @@ export default {
         ),
       },
       {
-        icon: '/images/customers/logos/light/pebblely.png',
+        icon: '/images/customers/logos/on-dark/pebblely.png',
         url: '/customers/pebblely',
         heading: 'Pebblely use Supabase to scale to millions of users.',
         subheading: (

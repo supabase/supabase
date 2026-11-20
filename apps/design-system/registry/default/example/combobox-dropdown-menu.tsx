@@ -4,12 +4,12 @@ import { Calendar, MoreHorizontal, Tags, Trash, User } from 'lucide-react'
 import * as React from 'react'
 import {
   Button,
-  Command_Shadcn_,
-  CommandEmpty_Shadcn_,
-  CommandGroup_Shadcn_,
-  CommandInput_Shadcn_,
-  CommandItem_Shadcn_,
-  CommandList_Shadcn_,
+  Command,
+  CommandEmpty,
+  CommandGroup,
+  CommandInput,
+  CommandItem,
+  CommandList,
   DropdownMenu,
   DropdownMenuContent,
   DropdownMenuGroup,
@@ -49,7 +49,7 @@ export default function ComboboxDropdownMenu() {
       <DropdownMenu open={open} onOpenChange={setOpen}>
         <DropdownMenuTrigger asChild>
           <Button
-            type="text"
+            variant="text"
             size="tiny"
             icon={<MoreHorizontal className="text-foreground-muted" />}
           ></Button>
@@ -72,14 +72,14 @@ export default function ComboboxDropdownMenu() {
                 Apply label
               </DropdownMenuSubTrigger>
               <DropdownMenuSubContent className="p-0">
-                <Command_Shadcn_>
-                  <CommandInput_Shadcn_ placeholder="Filter label..." autoFocus={true} />
+                <Command>
+                  <CommandInput placeholder="Filter label..." autoFocus={true} />
                   <ScrollArea className="h-20">
-                    <CommandList_Shadcn_>
-                      <CommandEmpty_Shadcn_>No label found.</CommandEmpty_Shadcn_>
-                      <CommandGroup_Shadcn_>
+                    <CommandList>
+                      <CommandEmpty>No label found.</CommandEmpty>
+                      <CommandGroup>
                         {labels.map((label) => (
-                          <CommandItem_Shadcn_
+                          <CommandItem
                             key={label}
                             value={label}
                             onSelect={(value) => {
@@ -88,12 +88,12 @@ export default function ComboboxDropdownMenu() {
                             }}
                           >
                             {label}
-                          </CommandItem_Shadcn_>
+                          </CommandItem>
                         ))}
-                      </CommandGroup_Shadcn_>
-                    </CommandList_Shadcn_>
+                      </CommandGroup>
+                    </CommandList>
                   </ScrollArea>
-                </Command_Shadcn_>
+                </Command>
               </DropdownMenuSubContent>
             </DropdownMenuSub>
             <DropdownMenuSeparator />

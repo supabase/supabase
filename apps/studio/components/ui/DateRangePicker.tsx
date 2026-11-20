@@ -1,5 +1,5 @@
 import dayjs from 'dayjs'
-import { ChevronDown } from 'lucide-react'
+import { ChevronDownIcon } from 'lucide-react'
 import { ReactNode, useEffect, useState } from 'react'
 import {
   Button,
@@ -227,7 +227,7 @@ export const DateRangePicker = ({
   return (
     <DropdownMenu>
       <DropdownMenuTrigger asChild>
-        <Button type="default" iconRight={<ChevronDown />}>
+        <Button iconRight={<ChevronDownIcon />}>
           <span>{timePeriod && options.find((x) => x.key === timePeriod)?.label}</span>
         </Button>
       </DropdownMenuTrigger>
@@ -251,5 +251,3 @@ export const DateRangePicker = ({
     </DropdownMenu>
   )
 }
-
-export default DateRangePicker

@@ -19,7 +19,7 @@ export function AnimatedCounter({
   const countRef = useRef(value)
   const lastUpdateRef = useRef(0)
   const isVisibleRef = useRef(false)
-  const rafIdRef = useRef<number>()
+  const rafIdRef = useRef<number | undefined>(undefined)
 
   const formatNumber = useCallback(
     (num: number) => {

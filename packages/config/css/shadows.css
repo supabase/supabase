@@ -1,0 +1,40 @@
+:root {
+  --floating-shadow-strength: 1;
+  --floating-ring-strength: calc(var(--contrast-border, 0.275625) / 0.275625);
+  --floating-ring-color: hsl(var(--colors-black) / calc(0.05 * var(--floating-ring-strength)));
+}
+
+[data-theme*='dark'] {
+  --floating-shadow-strength: 5;
+  --floating-ring-color: hsl(var(--colors-white) / calc(0.18 * var(--floating-ring-strength)));
+}
+
+@utility floating-surface-shadow-sm {
+  box-shadow:
+    0 18px 47px 0 hsl(var(--colors-black) / calc(0.03 * var(--floating-shadow-strength))),
+    0 7.5px 19px 0 hsl(var(--colors-black) / calc(0.02 * var(--floating-shadow-strength))),
+    0 4px 10.5px 0 hsl(var(--colors-black) / calc(0.03 * var(--floating-shadow-strength))),
+    0 2.3px 5.8px 0 hsl(var(--colors-black) / calc(0.03 * var(--floating-shadow-strength))),
+    0 1.2px 3.1px 0 hsl(var(--colors-black) / calc(0.03 * var(--floating-shadow-strength))),
+    0 0.5px 1.3px 0 hsl(var(--colors-black) / calc(0.02 * var(--floating-shadow-strength))),
+    0 0 0 1px var(--floating-ring-color);
+
+  /* forced colors mode removes box shadows */
+  @media (forced-colors: active) {
+    outline: 1px solid CanvasText;
+  }
+}
+
+@utility floating-surface-shadow-md {
+  box-shadow:
+    0 17.54px 23.39px 0 hsl(var(--colors-black) / calc(0.04 * var(--floating-shadow-strength))),
+    0 9.4px 12.5px 0 hsl(var(--colors-black) / calc(0.03 * var(--floating-shadow-strength))),
+    0 5.25px 7px 0 hsl(var(--colors-black) / calc(0.02 * var(--floating-shadow-strength))),
+    0 2.79px 3.72px -2px hsl(var(--colors-black) / calc(0.01 * var(--floating-shadow-strength))),
+    0 1.16px 1.5px 0 hsl(var(--colors-black) / calc(0.01 * var(--floating-shadow-strength))),
+    0 0 0 1px var(--floating-ring-color);
+
+  @media (forced-colors: active) {
+    outline: 1px solid CanvasText;
+  }
+}

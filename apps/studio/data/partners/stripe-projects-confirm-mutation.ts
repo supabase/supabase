@@ -1,8 +1,8 @@
 import { useMutation } from '@tanstack/react-query'
-import { toast } from 'sonner'
 
 import { handleError, post } from '@/data/fetchers'
-import type { ResponseError, UseCustomMutationOptions } from '@/types'
+import type { StudioError } from '@/lib/errors/studio-errors'
+import type { UseCustomMutationOptions } from '@/types'
 
 type ConfirmAccountRequestVariables = {
   arId: string
@@ -24,27 +24,15 @@ type ConfirmAccountRequestData = Awaited<ReturnType<typeof confirmAccountRequest
 
 export const useConfirmAccountRequestMutation = ({
   onSuccess,
-  onError,
   ...options
 }: Omit<
-  UseCustomMutationOptions<
-    ConfirmAccountRequestData,
-    ResponseError,
-    ConfirmAccountRequestVariables
-  >,
+  UseCustomMutationOptions<ConfirmAccountRequestData, StudioError, ConfirmAccountRequestVariables>,
   'mutationFn'
 > = {}) => {
   return useMutation({
     mutationFn: (vars) => confirmAccountRequest(vars),
     async onSuccess(data, variables, context) {
       await onSuccess?.(data, variables, context)
-    },
-    async onError(data, variables, context) {
-      if (onError === undefined) {
-        toast.error(`Failed to confirm account request: ${data.message}`)
-      } else {
-        onError(data, variables, context)
-      }
     },
     ...options,
   })

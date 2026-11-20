@@ -3,8 +3,9 @@ import { toast } from 'sonner'
 
 import { oAuthCustomProvidersKeys } from './keys'
 import { handleError } from '@/data/fetchers'
+import type { StudioError } from '@/lib/errors/studio-errors'
 import { createProjectSupabaseClient } from '@/lib/project-supabase-client'
-import type { ResponseError, UseCustomMutationOptions } from '@/types'
+import type { UseCustomMutationOptions } from '@/types'
 
 export type OAuthCustomProviderDeleteVariables = {
   identifier: string | undefined
@@ -37,7 +38,7 @@ export const useOAuthCustomProviderDeleteMutation = ({
 }: Omit<
   UseCustomMutationOptions<
     OAuthCustomProviderDeleteData,
-    ResponseError,
+    StudioError,
     OAuthCustomProviderDeleteVariables
   >,
   'mutationFn'
@@ -46,7 +47,7 @@ export const useOAuthCustomProviderDeleteMutation = ({
 
   return useMutation<
     OAuthCustomProviderDeleteData,
-    ResponseError,
+    StudioError,
     OAuthCustomProviderDeleteVariables
   >({
     mutationFn: (vars) => deleteOAuthCustomProvider(vars),

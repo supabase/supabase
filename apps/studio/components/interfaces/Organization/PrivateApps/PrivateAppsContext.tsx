@@ -15,7 +15,7 @@ interface PrivateAppsContextValue {
   isLoadingInstallations: boolean
   installations: Installation[]
   addInstallation: (
-    data: components['schemas']['InstallPlatformAppResponse'],
+    data: components['schemas']['InstallPlatformAppResponse_Output'],
     projectScope: 'all' | string[]
   ) => void
   removeInstallation: (id: string) => void
@@ -41,7 +41,7 @@ export function PrivateAppsProvider({ children }: PropsWithChildren) {
   const installations = useMemo<Installation[]>(() => {
     if (!installationsError && installationsData?.installations) {
       return installationsData.installations.map((inst) => ({
-        ...(inst as components['schemas']['InstallPlatformAppResponse']),
+        ...(inst as components['schemas']['InstallPlatformAppResponse_Output']),
         projectScope: 'all' as const,
       }))
     }
@@ -49,7 +49,7 @@ export function PrivateAppsProvider({ children }: PropsWithChildren) {
   }, [installationsData, installationsError, localInstallations])
 
   function addInstallation(
-    data: components['schemas']['InstallPlatformAppResponse'],
+    data: components['schemas']['InstallPlatformAppResponse_Output'],
     projectScope: 'all' | string[]
   ) {
     setLocalInstallations((prev) => [...prev, { ...data, projectScope }])

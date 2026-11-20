@@ -1,30 +1,74 @@
 import { MultipleCodeBlock } from 'ui-patterns/MultipleCodeBlock'
 
-import type { StepContentProps } from '@/components/interfaces/ConnectSheet/Connect.types'
+import type {
+  ConnectionStringPooler,
+  DeploymentMode,
+  StepContentProps,
+} from '@/components/interfaces/ConnectSheet/Connect.types'
+import { resolveOrmConnectionScenario } from '@/components/interfaces/ConnectSheet/OrmConnection.utils'
+import { useIsHighAvailability } from '@/hooks/misc/useSelectedProject'
 
-const ContentFile = ({ connectionStringPooler }: StepContentProps) => {
+function getEnvCode({
+  connectionStringPooler,
+  deploymentMode,
+  isHighAvailability,
+}: {
+  connectionStringPooler: ConnectionStringPooler
+  deploymentMode: DeploymentMode
+  isHighAvailability: boolean
+}): string {
+  const scenario = resolveOrmConnectionScenario({
+    connectionStringPooler,
+    deploymentMode,
+    isHighAvailability,
+  })
+
+  switch (scenario) {
+    case 'cli':
+      return `
+# Connect to Postgres via the direct connection
+DATABASE_URL="${connectionStringPooler.direct}"
+`
+    case 'self-hosted':
+      return `
+# Connect to Postgres via the self-hosted transaction-mode pooler
+DATABASE_URL="${connectionStringPooler.transactionShared}"
+`
+    case 'high-availability':
+      return `
+# Multigres does not support connection pooling — connect to Postgres directly
+DATABASE_URL="${connectionStringPooler.direct}"
+`
+    case 'dedicated-pooler':
+      return `
+# Connect to Postgres via the dedicated transaction-mode pooler (IPv4-only)
+DATABASE_URL="${connectionStringPooler.transactionDedicated}"
+        `
+    case 'shared-pooler-with-dedicated-alternative':
+      return `
+# Connect to Postgres via the shared transaction-mode pooler (IPv4-only)
+DATABASE_URL="${connectionStringPooler.transactionShared}"
+
+# For paid projects, if your network supports IPv6, or you purchased the IPv4 add-on, use the dedicated transaction-mode pooler as an alternative
+# DATABASE_URL="${connectionStringPooler.transactionDedicated}"
+        `
+    case 'shared-pooler':
+      return `
+# Connect to Postgres via the shared transaction-mode pooler (IPv4-only)
+DATABASE_URL="${connectionStringPooler.transactionShared}"
+`
+  }
+}
+
+const ContentFile = ({ connectionStringPooler, deploymentMode }: StepContentProps) => {
+  const isHighAvailability = useIsHighAvailability()
+  const envCode = getEnvCode({ connectionStringPooler, deploymentMode, isHighAvailability })
+
   const files = [
     {
       name: '.env',
       language: 'bash',
-      code:
-        connectionStringPooler.ipv4SupportedForDedicatedPooler &&
-        connectionStringPooler.transactionDedicated
-          ? `
-DATABASE_URL="${connectionStringPooler.transactionDedicated}"
-        `
-          : connectionStringPooler.transactionDedicated &&
-              !connectionStringPooler.ipv4SupportedForDedicatedPooler
-            ? `
-# Use Shared connection pooler (supports both IPv4/IPv6)
-DATABASE_URL="${connectionStringPooler.transactionShared}"
-
-# If your network supports IPv6 or you purchased IPv4 addon, use dedicated pooler
-# DATABASE_URL="${connectionStringPooler.transactionDedicated}"
-        `
-            : `
-DATABASE_URL="${connectionStringPooler.transactionShared}"
-`,
+      code: envCode,
     },
     {
       name: 'drizzle/schema.ts',

@@ -11,19 +11,35 @@ const {
   mockUseStorageExplorerStateSnapshot,
   mockUseAsyncCheckPermissions,
   mockUseStoragePreference,
+  mockGoUpOneLevel,
+  mockNavigateToPath,
 } = vi.hoisted(() => ({
   mockTrack: vi.fn(),
   mockUseStorageExplorerStateSnapshot: vi.fn(),
   mockUseAsyncCheckPermissions: vi.fn(),
   mockUseStoragePreference: vi.fn(),
+  mockGoUpOneLevel: vi.fn(),
+  mockNavigateToPath: vi.fn(),
 }))
 
 vi.mock('@/lib/telemetry/track', () => ({ useTrack: () => mockTrack }))
 vi.mock('@/state/storage-explorer', () => ({
   useStorageExplorerStateSnapshot: () => mockUseStorageExplorerStateSnapshot(),
 }))
-vi.mock('@/hooks/misc/useCheckPermissions', () => ({
-  useAsyncCheckPermissions: () => mockUseAsyncCheckPermissions(),
+vi.mock('@/hooks/misc/useCheckPermissionsV2', () => ({
+  useAsyncCheckPermissionsV2: () => mockUseAsyncCheckPermissions(),
+  FGA_PERMISSIONS: {
+    PROJECT: {
+      STORAGE_WRITE: 'storage_write',
+    },
+  },
+}))
+
+vi.mock('./StorageExplorerNavigation', () => ({
+  useStorageExplorerNavigation: () => ({
+    goUpOneLevel: mockGoUpOneLevel,
+    navigateToPath: mockNavigateToPath,
+  }),
 }))
 
 vi.mock('./useStoragePreference', () => ({
@@ -71,38 +87,32 @@ function createPreference(view: STORAGE_VIEWS = STORAGE_VIEWS.COLUMNS) {
   }
 }
 
+const renderHeader = () =>
+  render(
+    <FileExplorerHeader itemSearchString="" setItemSearchString={vi.fn()} onFilesUpload={vi.fn()} />
+  )
+
 describe('FileExplorerHeader', () => {
   beforeEach(() => {
     mockTrack.mockReset()
     mockUseStorageExplorerStateSnapshot.mockReset()
     mockUseAsyncCheckPermissions.mockReset()
     mockUseStoragePreference.mockReset()
+    mockGoUpOneLevel.mockReset()
+    mockNavigateToPath.mockReset()
 
     mockUseStorageExplorerStateSnapshot.mockReturnValue(createSnapshot())
     mockUseStoragePreference.mockReturnValue(createPreference())
     mockUseAsyncCheckPermissions.mockReturnValue({ can: true })
   })
 
-  it('renders full breadcrumbs in column view and places Navigate before Reload', () => {
-    render(
-      <FileExplorerHeader
-        itemSearchString=""
-        setItemSearchString={vi.fn()}
-        onFilesUpload={vi.fn()}
-      />
-    )
+  it('in column view, shows Navigate before Reload with no breadcrumbs or go-up button', () => {
+    renderHeader()
 
-    const rootBreadcrumb = screen.getByRole('button', { name: 'my-bucket' })
-    const inactiveBreadcrumb = screen.getByRole('button', { name: 'images' })
-    const activeBreadcrumb = screen.getByText('2024')
-
-    expect(rootBreadcrumb).toBeInTheDocument()
-    expect(inactiveBreadcrumb).toBeInTheDocument()
-    expect(activeBreadcrumb).toBeInTheDocument()
-    expect(inactiveBreadcrumb).toHaveClass('text-foreground-lighter')
-    expect(activeBreadcrumb).toHaveClass('text-foreground')
-    expect(activeBreadcrumb).not.toHaveClass('text-foreground-lighter')
-    expect(screen.queryByRole('button', { name: '2024' })).not.toBeInTheDocument()
+    expect(screen.queryByRole('button', { name: 'my-bucket' })).not.toBeInTheDocument()
+    expect(screen.queryByRole('button', { name: 'images' })).not.toBeInTheDocument()
+    expect(screen.queryByText('2024')).not.toBeInTheDocument()
+    expect(screen.queryByRole('button', { name: 'Go up one level' })).not.toBeInTheDocument()
 
     const navigateButton = screen.getByRole('button', { name: 'Navigate' })
     const reloadButton = screen.getByRole('button', { name: 'Reload' })
@@ -112,57 +122,40 @@ describe('FileExplorerHeader', () => {
     ).toBeTruthy()
   })
 
-  it('uses breadcrumb buttons to navigate back to a previous folder level with keyboard input', async () => {
-    const snapshot = createSnapshot()
-    mockUseStorageExplorerStateSnapshot.mockReturnValue(snapshot)
+  it('in list view below the bucket root, replaces Navigate with a go-up button that goes up a level', async () => {
+    mockUseStoragePreference.mockReturnValue(createPreference(STORAGE_VIEWS.LIST))
 
-    render(
-      <FileExplorerHeader
-        itemSearchString=""
-        setItemSearchString={vi.fn()}
-        onFilesUpload={vi.fn()}
-      />
-    )
+    renderHeader()
 
-    const breadcrumbButton = screen.getByRole('button', { name: 'images' })
-    breadcrumbButton.focus()
-    await userEvent.keyboard('{Enter}')
+    expect(screen.queryByRole('button', { name: 'Navigate' })).not.toBeInTheDocument()
+    expect(screen.queryByRole('button', { name: 'my-bucket' })).not.toBeInTheDocument()
+    expect(screen.queryByRole('button', { name: 'images' })).not.toBeInTheDocument()
+    expect(screen.getByPlaceholderText('Search in 2024...')).toBeInTheDocument()
 
-    expect(snapshot.popColumnAtIndex).toHaveBeenCalledWith(1)
-    expect(snapshot.popOpenedFoldersAtIndex).toHaveBeenCalledWith(0)
+    await userEvent.click(screen.getByRole('button', { name: 'Go up one level' }))
+
+    expect(mockGoUpOneLevel).toHaveBeenCalled()
   })
 
-  it('opens path edit mode from Navigate and tracks the click', async () => {
-    render(
-      <FileExplorerHeader
-        itemSearchString=""
-        setItemSearchString={vi.fn()}
-        onFilesUpload={vi.fn()}
-      />
-    )
+  it('does not render the go-up button at bucket root', () => {
+    const snapshot = createSnapshot()
+    snapshot.columns = [makeColumn('my-bucket')]
+    mockUseStorageExplorerStateSnapshot.mockReturnValue(snapshot)
+    mockUseStoragePreference.mockReturnValue(createPreference(STORAGE_VIEWS.LIST))
+
+    renderHeader()
+
+    expect(screen.queryByRole('button', { name: 'Go up one level' })).not.toBeInTheDocument()
+    expect(screen.getByPlaceholderText('Search in root directory...')).toBeInTheDocument()
+  })
+
+  it('opens path edit mode prefilled with the current path, then navigates to a submitted path', async () => {
+    renderHeader()
 
     await userEvent.click(screen.getByRole('button', { name: 'Navigate' }))
 
     expect(mockTrack).toHaveBeenCalledWith('storage_explorer_navigate_clicked')
-    expect(screen.getByRole('dialog')).toBeInTheDocument()
     expect(screen.getByText('Navigate to folder')).toBeInTheDocument()
-    expect(screen.getByDisplayValue('images/2024')).toBeInTheDocument()
-    expect(screen.getByRole('button', { name: 'Navigate' })).toBeInTheDocument()
-  })
-
-  it('submits a path, tracks the submission, and calls the existing path navigation flow', async () => {
-    const snapshot = createSnapshot()
-    mockUseStorageExplorerStateSnapshot.mockReturnValue(snapshot)
-
-    render(
-      <FileExplorerHeader
-        itemSearchString=""
-        setItemSearchString={vi.fn()}
-        onFilesUpload={vi.fn()}
-      />
-    )
-
-    await userEvent.click(screen.getByRole('button', { name: 'Navigate' }))
 
     const input = screen.getByDisplayValue('images/2024')
     await userEvent.clear(input)
@@ -170,54 +163,24 @@ describe('FileExplorerHeader', () => {
     await userEvent.click(screen.getByRole('button', { name: 'Navigate' }))
 
     await waitFor(() => {
-      expect(snapshot.fetchFoldersByPath).toHaveBeenCalledWith({ paths: ['archive', '2025'] })
+      expect(mockNavigateToPath).toHaveBeenCalledWith(['archive', '2025'])
     })
     await waitFor(() => {
       expect(mockTrack).toHaveBeenCalledWith('storage_explorer_navigate_submitted')
     })
-
-    expect(mockTrack).toHaveBeenCalledWith('storage_explorer_navigate_clicked')
   })
 
   it('navigates to bucket root without tracking a folder-path submission', async () => {
-    const snapshot = createSnapshot()
-    mockUseStorageExplorerStateSnapshot.mockReturnValue(snapshot)
-
-    render(
-      <FileExplorerHeader
-        itemSearchString=""
-        setItemSearchString={vi.fn()}
-        onFilesUpload={vi.fn()}
-      />
-    )
+    renderHeader()
 
     await userEvent.click(screen.getByRole('button', { name: 'Navigate' }))
 
-    const input = screen.getByDisplayValue('images/2024')
-    await userEvent.clear(input)
+    await userEvent.clear(screen.getByDisplayValue('images/2024'))
     await userEvent.click(screen.getByRole('button', { name: 'Navigate' }))
 
     await waitFor(() => {
-      expect(snapshot.popColumnAtIndex).toHaveBeenCalledWith(0)
+      expect(mockNavigateToPath).toHaveBeenCalledWith([])
     })
-
-    expect(snapshot.clearOpenedFolders).toHaveBeenCalled()
-    expect(snapshot.setSelectedFilePreview).toHaveBeenCalledWith(undefined)
-    expect(mockTrack).toHaveBeenCalledWith('storage_explorer_navigate_clicked')
     expect(mockTrack).not.toHaveBeenCalledWith('storage_explorer_navigate_submitted')
-  })
-
-  it('does not render Navigate in list view', () => {
-    mockUseStoragePreference.mockReturnValue(createPreference(STORAGE_VIEWS.LIST))
-
-    render(
-      <FileExplorerHeader
-        itemSearchString=""
-        setItemSearchString={vi.fn()}
-        onFilesUpload={vi.fn()}
-      />
-    )
-
-    expect(screen.queryByRole('button', { name: 'Navigate' })).not.toBeInTheDocument()
   })
 })

@@ -8,7 +8,7 @@
 #    docker builder prune
 #    docker build . -f apps/studio/Dockerfile --target production -t studio:latest --no-cache
 
-FROM node:22-slim AS base
+FROM node:24-slim AS base
 ENV PNPM_HOME="/pnpm"
 ENV PATH="$PNPM_HOME:$PATH"
 
@@ -23,7 +23,7 @@ RUN apt-get update -qq && \
   rm -rf /var/lib/apt/lists/* && \
   update-ca-certificates
 
-RUN npm install -g pnpm@10.24.0
+RUN npm install -g pnpm@11.13.1
 
 WORKDIR /app
 
@@ -31,7 +31,7 @@ WORKDIR /app
 FROM base AS turbo
 COPY . .
 
-RUN pnpm dlx turbo@2.9.3 prune studio --docker
+RUN pnpm dlx turbo@2.11.10 prune studio --docker
 
 # Install dev dependencies (only if needed)
 FROM base AS deps
@@ -39,7 +39,8 @@ COPY --from=turbo /app/out/json ./
 COPY --from=turbo /app/out/pnpm-lock.yaml ./
 COPY ./patches/ ./patches
 
-# No need to clean cache because production uses standalone build
+# The production stage copies only the self-contained build output, so the
+# install cache never reaches the final image.
 RUN pnpm install --frozen-lockfile
 
 # dev contains dependencies and source code not compiled
@@ -49,16 +50,26 @@ ENTRYPOINT ["docker-entrypoint.sh"]
 EXPOSE 8082
 CMD ["pnpm", "dev:studio"]
 
-# Compile Next.js
-FROM dev AS builder
+# Compile TanStack Start (Vite + Nitro)
+FROM dev AS build
+RUN NODE_OPTIONS=--max-old-space-size=4096 pnpm --filter studio run build
 
-RUN pnpm --filter studio exec next build
+# Assemble the runtime tree at /srv. Nitro's node-server output is
+# self-contained (`.output/server` bundles the app with its traced
+# dependencies, `.output/public` holds the client assets), so no node_modules
+# install is needed. The server.js shim loads `.env` (container env vars win);
+# package.json is copied so the shim runs as ESM.
+RUN mkdir -p /srv/apps/studio && \
+  cp -a apps/studio/.output /srv/apps/studio/.output && \
+  cp apps/studio/package.json apps/studio/.env /srv/apps/studio/ && \
+  printf "process.loadEnvFile(new URL('.env', import.meta.url))\nawait import('./.output/server/index.mjs')\n" > /srv/apps/studio/server.js
 
 # Copy only compiled code and dependencies
 FROM base AS production
-COPY --from=builder /app/apps/studio/public ./apps/studio/public
-COPY --from=builder /app/apps/studio/.next/standalone ./
-COPY --from=builder /app/apps/studio/.next/static ./apps/studio/.next/static
+COPY --from=build /srv ./
+# The server reads PORT (the `start` script defaults it to 8082); pin it to
+# the port the healthcheck and compose files expect.
+ENV PORT=3000
 EXPOSE 3000
 ENTRYPOINT ["docker-entrypoint.sh"]
 HEALTHCHECK --interval=5s --timeout=5s --retries=3 CMD node -e "fetch('http://localhost:3000/api/platform/profile').then((r) => {if (r.status !== 200) throw new Error(r.status)})"

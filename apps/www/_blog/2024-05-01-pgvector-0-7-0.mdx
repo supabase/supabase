@@ -13,7 +13,7 @@ date: '2024-05-02'
 toc_depth: 3
 ---
 
-Real-world embedding datasets often contain redundancy buried within the vector space. For example, when vectors cluster around certain central points in a multidimensional space, it reveals an exploitable structure. By reducing this redundancy, we can achieve memory and performance savings with a minimal impact on precision. Several approaches to leverage this idea have been introduced in pgvector since version 0.7.0:
+Real-world embedding datasets often contain redundancy buried within the vector space. For example, when vectors cluster around certain central points in a multidimensional space, it reveals an exploitable structure. By reducing this redundancy, we can achieve memory and performance savings with a minimal impact on precision. Several approaches to leverage this idea have been introduced in [pgvector](https://supabase.com/docs/guides/database/extensions/pgvector) since version 0.7.0:
 
 - float16 vector representation
 - sparse vectors
@@ -80,7 +80,7 @@ Both heap and HNSW relations for float16 occupy only half of the space compared 
 
 There is a proposal to speed it up even more in the future by using SVE intrinsics on ARM architecture (see: https://github.com/pgvector/pgvector/pull/536).
 
-Jonathan Katz [made his measurements](https://jkatz05.com/post/postgres/pgvector-performance-150x-speedup) on HNSW performance using `r7gd.16xlarge` (64 vCPU, 512GiB RAM), and his results are even better. For float16, HNSW build times are up to 3x faster. For select’s performance, ANN benchmark results show that precision is not changed with decreasing bitness, and queries per second (QPS) is similar to in-memory cases. But when real machine queries are using I/O or some HNSW pages are evicted from memory due to concurrent connections, there would be a meaningful difference. With only half of memory needed to accommodate the same HNSW index, cost for the same performance and precision is also significantly less.
+Jonathan Katz [made his measurements](https://jkatz05.com/post/postgres/pgvector-performance-150x-speedup/) on HNSW performance using `r7gd.16xlarge` (64 vCPU, 512GiB RAM), and his results are even better. For float16, HNSW build times are up to 3x faster. For select’s performance, ANN benchmark results show that precision is not changed with decreasing bitness, and queries per second (QPS) is similar to in-memory cases. But when real machine queries are using I/O or some HNSW pages are evicted from memory due to concurrent connections, there would be a meaningful difference. With only half of memory needed to accommodate the same HNSW index, cost for the same performance and precision is also significantly less.
 
 |                            | Vector / Vector | Vector / HalfVec |
 | -------------------------- | --------------- | ---------------- |

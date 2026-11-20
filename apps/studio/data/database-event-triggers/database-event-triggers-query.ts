@@ -1,11 +1,17 @@
-import { useQuery } from '@tanstack/react-query'
+import { safeSql } from '@supabase/pg-meta/src/pg-format'
 
 import { databaseEventTriggerKeys } from './keys'
-import { executeSql } from '@/data/sql/execute-sql-query'
-import type { ResponseError, UseCustomQueryOptions } from '@/types'
+import type { EventTrigger } from '@/components/interfaces/Database/Triggers/EventTriggersList/EventTriggerList.utils'
+import { grantedQueryOptions, type GrantedQueryCallerOptions } from '@/data/granted-query-options'
+import { executeSql } from '@/data/sql/execute-sql-mutation'
+import type { StudioError } from '@/lib/errors/studio-errors'
+import type { GrantFor } from '@/lib/grants'
+
+export type DatabaseEventTriggersGrant = GrantFor<'post', '/platform/pg-meta/{ref}/query', 'read'>
 
 export type DatabaseEventTriggersVariables = {
   projectRef?: string
+  grant?: DatabaseEventTriggersGrant
   connectionString?: string | null
 }
 
@@ -21,7 +27,7 @@ export type DatabaseEventTrigger = {
   function_definition: string | null
 }
 
-const EVENT_TRIGGERS_SQL = `
+const EVENT_TRIGGERS_SQL = safeSql`
 select
   evt.oid,
   evt.evtname as name,
@@ -48,15 +54,22 @@ order by evt.evtname;
 `
 
 export async function getDatabaseEventTriggers(
-  { projectRef, connectionString }: DatabaseEventTriggersVariables,
+  {
+    projectRef,
+    connectionString,
+    grant,
+  }: Omit<DatabaseEventTriggersVariables, 'grant'> & { grant: DatabaseEventTriggersGrant },
   signal?: AbortSignal
 ) {
   const { result } = await executeSql<DatabaseEventTrigger[]>(
     {
       projectRef,
       connectionString,
+      sqlOrigin: 'studio',
+      queryName: 'database-event-triggers',
       sql: EVENT_TRIGGERS_SQL,
       queryKey: databaseEventTriggerKeys.list(projectRef),
+      grant,
     },
     signal
   )
@@ -65,18 +78,31 @@ export async function getDatabaseEventTriggers(
 }
 
 export type DatabaseEventTriggersData = Awaited<ReturnType<typeof getDatabaseEventTriggers>>
-export type DatabaseEventTriggersError = ResponseError
+export type DatabaseEventTriggersError = StudioError
 
-export const useDatabaseEventTriggersQuery = <TData = DatabaseEventTriggersData>(
-  { projectRef, connectionString }: DatabaseEventTriggersVariables,
-  {
-    enabled = true,
-    ...options
-  }: UseCustomQueryOptions<DatabaseEventTriggersData, DatabaseEventTriggersError, TData> = {}
+function markSavedEventTriggerSafe(trigger: DatabaseEventTrigger): EventTrigger {
+  return trigger as EventTrigger
+}
+
+export const databaseEventTriggersQueryOptions = <TData = EventTrigger[]>(
+  { projectRef, connectionString, grant }: DatabaseEventTriggersVariables,
+  options?: GrantedQueryCallerOptions<
+    EventTrigger[],
+    DatabaseEventTriggersError,
+    TData,
+    ReturnType<typeof databaseEventTriggerKeys.list>
+  >
 ) =>
-  useQuery<DatabaseEventTriggersData, DatabaseEventTriggersError, TData>({
-    queryKey: databaseEventTriggerKeys.list(projectRef),
-    queryFn: ({ signal }) => getDatabaseEventTriggers({ projectRef, connectionString }, signal),
-    enabled: enabled && typeof projectRef !== 'undefined',
-    ...options,
-  })
+  grantedQueryOptions(
+    {
+      queryKey: databaseEventTriggerKeys.list(projectRef),
+      queryFn:
+        projectRef && grant
+          ? ({ signal }) =>
+              getDatabaseEventTriggers({ projectRef, connectionString, grant }, signal).then(
+                (data) => data.map(markSavedEventTriggerSafe)
+              )
+          : undefined,
+    },
+    options
+  )

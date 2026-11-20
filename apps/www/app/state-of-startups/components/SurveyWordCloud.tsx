@@ -1,6 +1,7 @@
 'use client'
 
 import { useEffect, useState } from 'react'
+
 import { useAccent } from './accent-context'
 
 const TIMER_DURATION = 3000
@@ -17,7 +18,7 @@ export function SurveyWordCloud({
   const [scramblingTexts, setScramblingTexts] = useState<string[]>([])
   const accent = useAccent()
 
-  const accentBg = 'bg-brand'
+  const accentBg = 'bg-brand-default'
 
   // Calculate the range within the current context
   const counts = answers.map((answer) => answer.count)

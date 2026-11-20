@@ -15,9 +15,16 @@ export const COLUMN_TYPES = [
   'binary',
   'decimal',
   'fixed',
-]
+] as const
 
-export const COLUMN_TYPE_FIELDS = {
+export type ColumnType = (typeof COLUMN_TYPES)[number]
+
+interface AdditionalColumnField {
+  name: 'precision' | 'scale' | 'length'
+  type: 'number'
+}
+
+export const COLUMN_TYPE_FIELDS: Partial<Record<ColumnType, AdditionalColumnField[]>> = {
   decimal: [
     { name: 'precision', type: 'number' },
     { name: 'scale', type: 'number' },

@@ -118,6 +118,29 @@ supabase.from_('arraytest').insert(
 
 </TabPanel>
 </$Show>
+<$Show if="sdk:csharp">
+<TabPanel id="csharp" label="C#">
+
+Insert a record from the C# client:
+
+```c#
+[Table("arraytest")]
+class ArrayTest : BaseModel
+{
+    [PrimaryKey("id", false)]
+    public int Id { get; set; }
+
+    [Column("textarray")]
+    public List<string> Textarray { get; set; }
+}
+
+await supabase
+  .From<ArrayTest>()
+  .Insert(new ArrayTest { Id = 2, Textarray = new List<string> { "one", "two", "three", "four" } });
+```
+
+</TabPanel>
+</$Show>
 </Tabs>
 
 ## View the results
@@ -175,8 +198,9 @@ Postgres uses 1-based indexing (e.g., `textarray[1]` is the first item in the ar
 
 To select the first item from the array and get the total length of the array:
 
-```js
-SELECT textarray[1], array_length(textarray, 1) FROM arraytest;
+{/* prettier-ignore */}
+```sql
+select textarray[1], array_length(textarray, 1) from arraytest;
 ```
 
 returns:
@@ -230,6 +254,20 @@ returns:
     textarray: ["Harry", "Larry", "Moe"],
   )
 ]
+```
+
+</TabPanel>
+</$Show>
+<$Show if="sdk:csharp">
+<TabPanel id="csharp" label="C#">
+
+This returns the entire array field:
+
+```c#
+var result = await supabase
+  .From<ArrayTest>()
+  .Select(x => new object[] { x.Textarray })
+  .Get();
 ```
 
 </TabPanel>

@@ -1,17 +1,19 @@
 import { NewspaperIcon } from '@heroicons/react/outline'
+
 import { Article } from '../../types'
 
 const ArticleButton = (props: Article) => {
   return (
     <div className="mr-2 mb-2 inline-block">
       <button
+        tabIndex={0}
         className="
             bg-background text-foreground 
             hover:bg-background-overlay 
             border-default 
             flex items-start gap-3 rounded-md 
             border p-3 
-            px-6 drop-shadow-sm transition"
+            px-6 drop-shadow-xs transition"
       >
         <div className="w-6">
           <NewspaperIcon strokeWidth={1} />

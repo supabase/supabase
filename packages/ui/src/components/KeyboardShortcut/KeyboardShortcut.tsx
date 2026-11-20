@@ -18,6 +18,10 @@ const KEY_SYMBOLS: Record<string, string | ((isMac: boolean) => string)> = {
   Alt: (isMac) => (isMac ? '⌥' : 'Alt'),
   Shift: '⇧',
   Enter: '↵',
+  ArrowUp: '↑',
+  ArrowDown: '↓',
+  ArrowLeft: '←',
+  ArrowRight: '→',
   Esc: 'Esc', // ⎋ symbol not recognisable enough
   Escape: 'Esc', // Match above
   Tab: 'Tab', // ⇥ symbol not recognisable enough
@@ -25,7 +29,7 @@ const KEY_SYMBOLS: Record<string, string | ((isMac: boolean) => string)> = {
 
 type KeyboardShortcutProps = {
   keys: string[]
-  variant?: 'pill' | 'inline'
+  variant?: 'pill' | 'inline' | 'keycaps'
   className?: string
 }
 
@@ -36,18 +40,39 @@ const resolveKeyLabel = (key: string, isMac: boolean) => {
   return resolvedKey.length === 1 ? resolvedKey.toUpperCase() : resolvedKey
 }
 
+const formatShortcutLabel = (keys: string[]) => {
+  if (keys.length <= 1) return keys.join('')
+
+  return keys.every((key) => key.length === 1) ? keys.join('') : keys.join(' ')
+}
+
 export const KeyboardShortcut = ({ keys, variant = 'pill', className }: KeyboardShortcutProps) => {
   const isMac = getIsMac()
   const resolvedKeys = keys.map((key) => resolveKeyLabel(key, isMac))
-  const shortcutLabel = resolvedKeys.join(' ')
+  const shortcutLabel = formatShortcutLabel(resolvedKeys)
+
+  if (variant === 'keycaps') {
+    return (
+      <span className={cn('inline-flex shrink-0 items-center gap-0.5', className)}>
+        {resolvedKeys.map((key) => (
+          <kbd
+            key={key}
+            className="inline-flex h-4 min-w-4 items-center justify-center rounded border border-border-muted bg-surface-300 px-0.5 font-sans text-[11px] leading-none text-foreground-light"
+          >
+            {key}
+          </kbd>
+        ))}
+      </span>
+    )
+  }
 
   return (
     <span
       className={cn(
         'inline-flex whitespace-nowrap shrink-0',
         variant === 'pill'
-          ? 'items-center text-[11px] leading-none -tracking-[0.05em] text-foreground-light bg-surface-200 dark:bg-surface-100 rounded px-[5px] py-[3px]'
-          : 'items-baseline text-[11px] leading-[inherit] text-foreground/40',
+          ? 'items-center text-[11px] leading-none tracking-[-0.025em] text-foreground-light bg-surface-200/50 dark:bg-surface-100/50 rounded px-[5px] py-[3px] border border-border-muted'
+          : 'items-baseline text-[11px] leading-[inherit]',
         className
       )}
     >

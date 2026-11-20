@@ -1,6 +1,6 @@
 import { useParams } from 'common/hooks'
-import { HTMLMotionProps, motion } from 'framer-motion'
-import { X } from 'lucide-react'
+import { XIcon } from 'lucide-react'
+import { HTMLMotionProps, motion } from 'motion/react'
 import { ReactNode } from 'react'
 import { Button, cn } from 'ui'
 
@@ -74,9 +74,9 @@ export const FeatureBanner = ({
       {dismissable && storageKey && (
         <div className={cn('absolute top-3 right-3', dismissClassName)}>
           <Button
-            type="text"
+            variant="text"
             size="tiny"
-            icon={<X size={16} strokeWidth={1.5} />}
+            icon={<XIcon size={16} strokeWidth={1.5} />}
             onClick={() => setIsDismissed(true)}
             className="opacity-75 px-1"
             aria-label="Dismiss notification"

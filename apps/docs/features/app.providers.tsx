@@ -6,7 +6,7 @@ import type { PropsWithChildren } from 'react'
 import { TooltipProvider } from 'ui'
 
 import { AuthContainer } from './auth/auth.client'
-import { DocsCommandMenu, DocsCommandProvider } from './command'
+import { SearchV2Provider } from './SearchV2/SearchV2Provider'
 import { QueryClientProvider } from './data/queryClient.client'
 import { PageTelemetry } from './telemetry/telemetry.client'
 import { Toaster } from './toaster'
@@ -24,17 +24,14 @@ function GlobalProviders({ children }: PropsWithChildren) {
           <DevToolbarProvider apiUrl={API_URL}>
             <PageTelemetry />
             <ScrollRestoration />
-            <ThemeProvider defaultTheme="system" enableSystem disableTransitionOnChange>
+            <ThemeProvider>
               <TooltipProvider delayDuration={0}>
-                <DocsCommandProvider>
+                <SearchV2Provider>
                   <div className="flex flex-col">
-                    <SiteLayout>
-                      {children}
-                      <DocsCommandMenu />
-                    </SiteLayout>
+                    <SiteLayout>{children}</SiteLayout>
                     <ThemeSandbox />
                   </div>
-                </DocsCommandProvider>
+                </SearchV2Provider>
                 <Toaster />
                 <DevToolbar />
               </TooltipProvider>

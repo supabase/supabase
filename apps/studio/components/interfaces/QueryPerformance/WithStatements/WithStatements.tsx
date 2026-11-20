@@ -1,10 +1,11 @@
+import { safeSql } from '@supabase/pg-meta/src/pg-format'
 import { LOCAL_STORAGE_KEYS, useParams } from 'common'
-import { RefreshCw, RotateCcw, X } from 'lucide-react'
+import { RefreshCwIcon, RotateCcwIcon, XIcon } from 'lucide-react'
 import { parseAsString, useQueryStates } from 'nuqs'
 import { useEffect, useMemo, useState } from 'react'
 import { toast } from 'sonner'
 import { Button, cn, LoadingLine } from 'ui'
-import { Admonition } from 'ui-patterns'
+import { Admonition } from 'ui-patterns/Admonition'
 import ConfirmationModal from 'ui-patterns/Dialogs/ConfirmationModal'
 
 import { Markdown } from '../../Markdown'
@@ -15,17 +16,19 @@ import { QueryPerformanceMetrics } from '../QueryPerformanceMetrics'
 import { QueryPerformanceInfiniteHook } from '../useQueryPerformanceQuery'
 import { transformStatementDataToRows } from './WithStatements.utils'
 import { PresetHookResult } from '@/components/interfaces/Reports/Reports.utils'
-import { ButtonTooltip } from '@/components/ui/ButtonTooltip'
 import { DownloadResultsButton } from '@/components/ui/DownloadResultsButton'
+import { ShortcutTooltip } from '@/components/ui/ShortcutTooltip'
+import { unguarded } from '@/data/fetchers'
 import { useReadReplicasQuery } from '@/data/read-replicas/replicas-query'
 import { formatDatabaseID } from '@/data/read-replicas/replicas.utils'
-import { executeSql } from '@/data/sql/execute-sql-query'
-import { useInfiniteScroll } from '@/hooks/misc/useInfiniteScroll'
+import { executeSql } from '@/data/sql/execute-sql-mutation'
 import { useLocalStorageQuery } from '@/hooks/misc/useLocalStorage'
 import { useSelectedProjectQuery } from '@/hooks/misc/useSelectedProject'
 import { DOCS_URL, IS_PLATFORM } from '@/lib/constants'
 import { getErrorMessage } from '@/lib/get-error-message'
 import { useDatabaseSelectorStateSnapshot } from '@/state/database-selector'
+import { SHORTCUT_IDS } from '@/state/shortcuts/registry'
+import { useShortcut } from '@/state/shortcuts/useShortcut'
 
 interface WithStatementsProps {
   queryHitRate: PresetHookResult
@@ -75,18 +78,18 @@ export const WithStatements = ({
     queryMetrics.runQuery()
   }
 
+  useShortcut(SHORTCUT_IDS.OBSERVABILITY_REFRESH, handleRefresh, {
+    enabled: !isRefetching,
+  })
+  useShortcut(SHORTCUT_IDS.OBSERVABILITY_RESET_REPORT, () => {
+    setShowResetgPgStatStatements(true)
+  })
+
   const processedData = useMemo(() => {
     return transformStatementDataToRows(data || [], indexAdvisor === 'true')
   }, [data, indexAdvisor])
 
   const { data: databases } = useReadReplicasQuery({ projectRef: ref })
-
-  const handleScroll = useInfiniteScroll({
-    isLoading,
-    isFetchingNextPage,
-    hasNextPage,
-    fetchNextPage,
-  })
 
   useEffect(() => {
     state.setSelectedDatabaseId(ref)
@@ -109,7 +112,6 @@ export const WithStatements = ({
           postgresVersion: project?.dbVersion,
           databaseType: isPrimaryDatabase ? 'primary' : 'read-replica',
           sql: queryPerformanceQuery.resolvedSql,
-          errorMessage: errorMessage || undefined,
         })
       }
     }
@@ -124,7 +126,6 @@ export const WithStatements = ({
 
   useEffect(() => {
     if (hitRateError) {
-      const errorMessage = getErrorMessage(hitRateError)
       captureQueryPerformanceError(hitRateError, {
         projectRef: ref,
         databaseIdentifier: state.selectedDatabaseId,
@@ -132,14 +133,12 @@ export const WithStatements = ({
         queryType: 'hitRate',
         postgresVersion: project?.dbVersion,
         databaseType: isPrimaryDatabase ? 'primary' : 'read-replica',
-        errorMessage: errorMessage || undefined,
       })
     }
   }, [hitRateError, ref, state.selectedDatabaseId, project?.dbVersion, isPrimaryDatabase])
 
   useEffect(() => {
     if (metricsError) {
-      const errorMessage = getErrorMessage(metricsError)
       captureQueryPerformanceError(metricsError, {
         projectRef: ref,
         databaseIdentifier: state.selectedDatabaseId,
@@ -147,7 +146,6 @@ export const WithStatements = ({
         queryType: 'metrics',
         postgresVersion: project?.dbVersion,
         databaseType: isPrimaryDatabase ? 'primary' : 'read-replica',
-        errorMessage: errorMessage || undefined,
       })
     }
   }, [metricsError, ref, state.selectedDatabaseId, project?.dbVersion, isPrimaryDatabase])
@@ -194,22 +192,32 @@ export const WithStatements = ({
         showSourceFilter
         actions={
           <>
-            <ButtonTooltip
-              type="default"
-              size="tiny"
-              icon={<RefreshCw />}
-              onClick={handleRefresh}
-              tooltip={{ content: { side: 'top', text: 'Refresh' } }}
-              className="w-[26px]"
-            />
-            <ButtonTooltip
-              type="default"
-              size="tiny"
-              icon={<RotateCcw />}
-              onClick={() => setShowResetgPgStatStatements(true)}
-              tooltip={{ content: { side: 'top', text: 'Reset report' } }}
-              className="w-[26px]"
-            />
+            <ShortcutTooltip
+              shortcutId={SHORTCUT_IDS.OBSERVABILITY_REFRESH}
+              label="Refresh"
+              side="top"
+            >
+              <Button
+                aria-label="Refresh"
+                size="tiny"
+                icon={<RefreshCwIcon />}
+                onClick={handleRefresh}
+                className="w-[26px]"
+              />
+            </ShortcutTooltip>
+            <ShortcutTooltip
+              shortcutId={SHORTCUT_IDS.OBSERVABILITY_RESET_REPORT}
+              label="Reset report"
+              side="top"
+            >
+              <Button
+                aria-label="Reset report"
+                size="tiny"
+                icon={<RotateCcwIcon />}
+                onClick={() => setShowResetgPgStatStatements(true)}
+                className="w-[26px]"
+              />
+            </ShortcutTooltip>
 
             <DownloadResultsButton
               results={processedData}
@@ -219,7 +227,11 @@ export const WithStatements = ({
           </>
         }
       />
-      <LoadingLine loading={isLoading || isRefetching || isFetchingNextPage} />
+
+      <div>
+        <LoadingLine loading={isLoading || isRefetching || isFetchingNextPage} />
+      </div>
+
       <QueryPerformanceGrid
         aggregatedData={processedData}
         isLoading={isLoading}
@@ -229,7 +241,10 @@ export const WithStatements = ({
             : null
         }
         onRetry={handleRefresh}
-        onScroll={handleScroll}
+        hasNextPage={hasNextPage}
+        isFetchingNextPage={isFetchingNextPage}
+        isRefetching={isRefetching}
+        fetchNextPage={fetchNextPage}
       />
       <div
         className={cn('px-6 py-6 flex gap-x-4 border-t relative', {
@@ -238,22 +253,18 @@ export const WithStatements = ({
       >
         <Button
           className="absolute top-1.5 right-3 px-1.5"
-          type="text"
+          variant="text"
           size="tiny"
           onClick={() => setShowBottomSection(false)}
         >
-          <X size="14" />
+          <XIcon size="14" />
         </Button>
         <div className="w-[33%] flex flex-col gap-y-1 text-sm">
           <p>Reset report</p>
           <p className="text-xs text-foreground-light">
             Consider resetting the analysis after optimizing any queries
           </p>
-          <Button
-            type="default"
-            className="!mt-3 w-min"
-            onClick={() => setShowResetgPgStatStatements(true)}
-          >
+          <Button className="mt-3! w-min" onClick={() => setShowResetgPgStatStatements(true)}>
             Reset report
           </Button>
         </div>
@@ -271,7 +282,7 @@ export const WithStatements = ({
           <Markdown
             className="text-xs"
             content={`The Supabase CLI comes with a range of tools to help inspect your Postgres instances for
-            potential issues. [Learn more here](${DOCS_URL}/guides/database/inspect).`}
+            potential issues. [Learn more here](${DOCS_URL}/guides/observability/inspect).`}
           />
         </div>
       </div>
@@ -297,7 +308,10 @@ export const WithStatements = ({
             await executeSql({
               projectRef: project?.ref,
               connectionString,
-              sql: `SELECT pg_stat_statements_reset();`,
+              sqlOrigin: 'studio',
+              queryName: 'pg-stat-statements-reset',
+              sql: safeSql`SELECT pg_stat_statements_reset();`,
+              grant: unguarded.migrating,
             })
             handleRefresh()
             setShowResetgPgStatStatements(false)

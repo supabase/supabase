@@ -1,26 +1,37 @@
-import { queryOptions } from '@tanstack/react-query'
-import { createMarketplaceClient } from 'common/marketplace-client'
+import { useQuery } from '@tanstack/react-query'
+import { IS_PLATFORM } from 'common'
+import { createMarketplaceClient, type MarketplaceListing } from 'common/marketplace-client'
 
 import { marketplaceIntegrationsKeys } from './keys'
 import { handleError } from '@/data/fetchers'
+import type { StudioError } from '@/lib/errors/studio-errors'
+import type { UseCustomQueryOptions } from '@/types'
 
-async function getMarketplaceIntegrations() {
+export type MarketplaceIntegration = MarketplaceListing
+
+export async function getMarketplaceIntegrations(signal?: AbortSignal) {
   const marketplaceClient = createMarketplaceClient()
-  const { data, error } = await marketplaceClient
-    .from('listings')
+  let query = marketplaceClient
+    .from('marketplace_listings')
     .select('*')
-    .or('publish_location.eq.dashboard,publish_location.eq.both')
+    .not('published_in_marketplace_at', 'is', null)
+  if (signal) query = query.abortSignal(signal)
+  const { data, error } = await query
 
   if (error) handleError(error)
   return data ?? []
 }
 
-export const marketplaceIntegrationsQueryOptions = ({
+export type MarketplaceIntegrationsData = Awaited<ReturnType<typeof getMarketplaceIntegrations>>
+export type MarketplaceIntegrationsError = StudioError
+
+export const useMarketplaceIntegrationsQuery = <TData = MarketplaceIntegrationsData>({
   enabled = true,
-}: { enabled?: boolean } = {}) => {
-  return queryOptions({
+  ...options
+}: UseCustomQueryOptions<MarketplaceIntegrationsData, MarketplaceIntegrationsError, TData> = {}) =>
+  useQuery<MarketplaceIntegrationsData, MarketplaceIntegrationsError, TData>({
     queryKey: marketplaceIntegrationsKeys.list(),
-    queryFn: () => getMarketplaceIntegrations(),
-    enabled,
+    queryFn: ({ signal }) => getMarketplaceIntegrations(signal),
+    enabled: enabled && IS_PLATFORM,
+    ...options,
   })
-}

@@ -1,6 +1,7 @@
 import { useInfiniteQuery, UseInfiniteQueryOptions } from '@tanstack/react-query'
-import { components } from 'api-types'
 import type { ResponseError } from '~/types/fetch'
+import { components } from 'api-types'
+
 import { get } from './fetchWrappers'
 
 const DEFAULT_LIMIT = 10
@@ -20,7 +21,7 @@ interface GetProjectsInfiniteVariables {
 }
 
 export type ProjectInfoInfinite =
-  components['schemas']['ListProjectsPaginatedResponse']['projects'][number]
+  components['schemas']['ListProjectsPaginatedResponse_Output']['projects'][number]
 
 async function getProjects(
   {
@@ -43,7 +44,7 @@ async function getProjects(
   })
 
   if (error) throw error
-  return data as unknown as components['schemas']['ListProjectsPaginatedResponse']
+  return data as unknown as components['schemas']['ListProjectsPaginatedResponse_Output']
 }
 
 export type ProjectsInfiniteData = Awaited<ReturnType<typeof getProjects>>

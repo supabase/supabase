@@ -58,6 +58,7 @@ const STRIPE_NETWORK_URL = 'https://*.stripe.network'
 const CLOUDFLARE_URL = 'https://www.cloudflare.com'
 const VERCEL_URL = 'https://vercel.com'
 const VERCEL_INSIGHTS_URL = 'https://*.vercel-insights.com'
+const GITHUB_URL = 'https://github.com'
 const GITHUB_API_URL = 'https://api.github.com'
 const GITHUB_USER_CONTENT_URL = 'https://raw.githubusercontent.com'
 const GITHUB_USER_AVATAR_URL = 'https://avatars.githubusercontent.com'
@@ -69,10 +70,6 @@ const STAPE_URL = 'https://ss.supabase.com'
 const VERCEL_LIVE_URL = 'https://vercel.live'
 const SENTRY_URL =
   'https://*.ingest.sentry.io https://*.ingest.us.sentry.io https://*.ingest.de.sentry.io'
-const SUPABASE_ASSETS_URL =
-  process.env.NEXT_PUBLIC_ENVIRONMENT === 'staging'
-    ? 'https://frontend-assets.supabase.green'
-    : 'https://frontend-assets.supabase.com'
 const POSTHOG_URL = isDevOrStaging ? 'https://ph.supabase.green' : 'https://ph.supabase.com'
 
 const USERCENTRICS_URLS = 'https://*.usercentrics.eu'
@@ -102,7 +99,6 @@ export function getCSP() {
     VERCEL_INSIGHTS_URL,
     GITHUB_API_URL,
     GITHUB_USER_CONTENT_URL,
-    SUPABASE_ASSETS_URL,
     USERCENTRICS_URLS,
     STAPE_URL,
     GOOGLE_MAPS_API_URL,
@@ -114,7 +110,6 @@ export function getCSP() {
     CLOUDFLARE_CDN_URL,
     HCAPTCHA_JS_URL,
     STRIPE_JS_URL,
-    SUPABASE_ASSETS_URL,
     STAPE_URL,
     POSTHOG_URL,
     USERCENTRICS_URLS,
@@ -125,21 +120,28 @@ export function getCSP() {
     STAPE_URL,
     ...(isDevOrStaging ? [POSTHOG_URL] : []),
   ]
+  // The TanStack build renders remote images as plain <img> tags (no image
+  // optimizer proxy), so every remote image origin must be listed here
+  // explicitly — unlike the Next.js build, where the optimizer serves them
+  // from same-origin /_next/image URLs covered by 'self'.
   const IMG_SRC_URLS = [
     SUPABASE_URL,
     SUPABASE_COM_URL,
     SUPABASE_PROJECTS_URL,
+    // GitHub profile avatars, e.g. https://github.com/<username>.png
+    GITHUB_URL,
     GITHUB_USER_AVATAR_URL,
     GOOGLE_USER_AVATAR_URL,
-    SUPABASE_ASSETS_URL,
+    // Vercel integration account avatars (https://vercel.com/api/www/avatar/...)
+    VERCEL_URL,
     USERCENTRICS_APP_URL,
     STAPE_URL,
     USERCENTRICS_URLS,
     MARKETPLACE_API_URL,
     ...(!!NIMBUS_PROD_PROJECTS_URL ? [NIMBUS_PROD_PROJECTS_URL, NIMBUS_PROD_PROJECTS_URL_WS] : []),
   ]
-  const STYLE_SRC_URLS = [CLOUDFLARE_CDN_URL, SUPABASE_ASSETS_URL]
-  const FONT_SRC_URLS = [CLOUDFLARE_CDN_URL, SUPABASE_ASSETS_URL]
+  const STYLE_SRC_URLS = [CLOUDFLARE_CDN_URL]
+  const FONT_SRC_URLS = [CLOUDFLARE_CDN_URL]
 
   const defaultSrcDirective = [
     `default-src 'self'`,
@@ -164,9 +166,7 @@ export function getCSP() {
     `blob:`,
     `data:`,
     ...IMG_SRC_URLS,
-    ...(isDevOrStaging
-      ? [SUPABASE_STAGING_PROJECTS_URL, NIMBUS_STAGING_PROJECTS_URL, VERCEL_URL]
-      : []),
+    ...(isDevOrStaging ? [SUPABASE_STAGING_PROJECTS_URL, NIMBUS_STAGING_PROJECTS_URL] : []),
   ].join(' ')
 
   const scriptSrcDirective = [
@@ -188,11 +188,34 @@ export function getCSP() {
     VERCEL_LIVE_URL,
   ].join(' ')
 
-  const fontSrcDirective = [`font-src 'self'`, ...FONT_SRC_URLS, VERCEL_LIVE_URL].join(' ')
+  // `data:` is required — GraphiQL's bundled Monaco ships the codicon icon font
+  // as a data: URI, and Stripe's payment element inlines its fonts the same way.
+  const fontSrcDirective = [`font-src 'self'`, `data:`, ...FONT_SRC_URLS, VERCEL_LIVE_URL].join(' ')
 
   const workerSrcDirective = [`worker-src 'self'`, `blob:`, `data:`].join(' ')
 
+  const connectSrcDirective = [
+    `connect-src 'self'`,
+    `data:`,
+    `blob:`,
+    ...DEFAULT_SRC_URLS,
+    ...(isDevOrStaging
+      ? [
+          SUPABASE_STAGING_PROJECTS_URL,
+          SUPABASE_STAGING_PROJECTS_URL_WS,
+          NIMBUS_STAGING_PROJECTS_URL,
+          NIMBUS_STAGING_PROJECTS_URL_WS,
+          VERCEL_LIVE_URL,
+          SUPABASE_DOCS_PROJECT_URL,
+          SUPABASE_CONTENT_API_URL,
+        ]
+      : []),
+    PUSHER_URL_WS,
+    SENTRY_URL,
+  ].join(' ')
+
   const cspDirectives = [
+    connectSrcDirective,
     defaultSrcDirective,
     imgSrcDirective,
     scriptSrcDirective,

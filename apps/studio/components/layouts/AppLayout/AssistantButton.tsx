@@ -2,6 +2,7 @@ import { AiIconAnimation, cn, KeyboardShortcut } from 'ui'
 
 import { SIDEBAR_KEYS } from '@/components/layouts/ProjectLayout/LayoutSidebar/LayoutSidebarProvider'
 import { ButtonTooltip } from '@/components/ui/ButtonTooltip'
+import { useTrack } from '@/lib/telemetry/track'
 import { SHORTCUT_IDS } from '@/state/shortcuts/registry'
 import { useIsShortcutEnabled } from '@/state/shortcuts/useIsShortcutEnabled'
 import { useSidebarManagerSnapshot } from '@/state/sidebar-manager-state'
@@ -9,12 +10,13 @@ import { useSidebarManagerSnapshot } from '@/state/sidebar-manager-state'
 export const AssistantButton = () => {
   const { activeSidebar, toggleSidebar } = useSidebarManagerSnapshot()
   const isAIAssistantHotkeyEnabled = useIsShortcutEnabled(SHORTCUT_IDS.AI_ASSISTANT_TOGGLE)
+  const track = useTrack()
 
   const isOpen = activeSidebar?.id === SIDEBAR_KEYS.AI_ASSISTANT
 
   return (
     <ButtonTooltip
-      type="outline"
+      variant="outline"
       size="tiny"
       id="assistant-trigger"
       className={cn(
@@ -22,6 +24,7 @@ export const AssistantButton = () => {
         isOpen && 'bg-foreground text-background'
       )}
       onClick={() => {
+        track('header_assistant_button_clicked')
         toggleSidebar(SIDEBAR_KEYS.AI_ASSISTANT)
       }}
       tooltip={{
@@ -41,6 +44,7 @@ export const AssistantButton = () => {
         size={16}
         className={cn(isOpen && 'text-background')}
       />
+      <span className="sr-only">AI Assistant</span>
     </ButtonTooltip>
   )
 }

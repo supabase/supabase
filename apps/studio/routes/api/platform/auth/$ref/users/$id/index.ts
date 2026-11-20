@@ -1,0 +1,46 @@
+import { createFileRoute } from '@tanstack/react-router'
+import { NextApiRequest, NextApiResponse } from 'next'
+
+import { toWebHandler } from '@/compat/next/api'
+import { apiWrapper } from '@/lib/api/apiWrapper'
+import { selfHostedSupabaseAdmin as supabase } from '@/lib/api/self-hosted-admin'
+
+const nextHandler = (req: NextApiRequest, res: NextApiResponse) => apiWrapper(req, res, handler)
+
+async function handler(req: NextApiRequest, res: NextApiResponse) {
+  const { method } = req
+
+  switch (method) {
+    case 'PATCH':
+      return handlePatch(req, res)
+    case 'DELETE':
+      return handleDelete(req, res)
+    default:
+      res.setHeader('Allow', ['PATCH', 'DELETE'])
+      res.status(405).json({ data: null, error: { message: `Method ${method} Not Allowed` } })
+  }
+}
+
+const handlePatch = async (req: NextApiRequest, res: NextApiResponse) => {
+  const { id } = req.query
+  const { ban_duration } = req.body
+  const { data, error } = await supabase.auth.admin.updateUserById(id as string, { ban_duration })
+
+  if (error) return res.status(400).json({ error: { message: error.message } })
+  return res.status(200).json(data.user)
+}
+
+const handleDelete = async (req: NextApiRequest, res: NextApiResponse) => {
+  const { id } = req.query
+  const { data, error } = await supabase.auth.admin.deleteUser(id as string)
+
+  if (error) return res.status(400).json({ error: { message: error.message } })
+  return res.status(200).json(data)
+}
+
+const webHandler = toWebHandler(nextHandler)
+
+export const Route = createFileRoute('/api/platform/auth/$ref/users/$id/')({
+  // ANY routes unsupported methods to the handler so they get a 405 with an Allow header
+  server: { handlers: { PATCH: webHandler, DELETE: webHandler, ANY: webHandler } },
+})

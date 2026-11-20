@@ -1,9 +1,8 @@
 import { zodResolver } from '@hookform/resolvers/zod'
-import { PermissionAction } from '@supabase/shared-types/out/constants'
 import { useParams } from 'common'
 import Link from 'next/link'
 import { useEffect } from 'react'
-import { useForm } from 'react-hook-form'
+import { useForm, useWatch } from 'react-hook-form'
 import { toast } from 'sonner'
 import {
   Button,
@@ -35,23 +34,21 @@ import { GenericSkeletonLoader } from 'ui-patterns/ShimmeringLoader'
 import * as z from 'zod'
 
 import { isSmtpEnabled } from '../SmtpForm/SmtpForm.utils'
-import AlertError from '@/components/ui/AlertError'
+import { AlertError } from '@/components/ui/AlertError'
 import { InlineLink } from '@/components/ui/InlineLink'
-import NoPermission from '@/components/ui/NoPermission'
+import { NoPermission } from '@/components/ui/NoPermission'
 import { useAuthConfigQuery } from '@/data/auth/auth-config-query'
 import { useAuthConfigUpdateMutation } from '@/data/auth/auth-config-update-mutation'
-import { useAsyncCheckPermissions } from '@/hooks/misc/useCheckPermissions'
+import { FGA_PERMISSIONS, useAsyncCheckPermissionsV2 } from '@/hooks/misc/useCheckPermissionsV2'
 import { DOCS_URL } from '@/lib/constants'
 
 export const RateLimits = () => {
   const { ref: projectRef } = useParams()
-  const { can: canUpdateConfig } = useAsyncCheckPermissions(
-    PermissionAction.UPDATE,
-    'custom_config_gotrue'
+  const { can: canUpdateConfig } = useAsyncCheckPermissionsV2(
+    FGA_PERMISSIONS.PROJECT.AUTH_CONFIG_WRITE
   )
-  const { can: canReadConfig } = useAsyncCheckPermissions(
-    PermissionAction.READ,
-    'custom_config_gotrue'
+  const { can: canReadConfig } = useAsyncCheckPermissionsV2(
+    FGA_PERMISSIONS.PROJECT.AUTH_CONFIG_READ
   )
 
   const {
@@ -70,7 +67,9 @@ export const RateLimits = () => {
     },
   })
 
-  const canUpdateEmailLimit = authConfig?.EXTERNAL_EMAIL_ENABLED && isSmtpEnabled(authConfig)
+  const canUpdateEmailLimit =
+    authConfig?.EXTERNAL_EMAIL_ENABLED &&
+    (isSmtpEnabled(authConfig) || authConfig?.HOOK_SEND_EMAIL_ENABLED)
   const canUpdateSMSRateLimit = authConfig?.EXTERNAL_PHONE_ENABLED
   const canUpdateAnonymousUsersRateLimit = authConfig?.EXTERNAL_ANONYMOUS_USERS_ENABLED
   const canUpdateWeb3RateLimit = authConfig?.EXTERNAL_WEB3_SOLANA_ENABLED
@@ -105,31 +104,35 @@ export const RateLimits = () => {
     RATE_LIMIT_TOKEN_REFRESH: z.coerce
       .number()
       .min(0, 'Must be not be lower than 0')
-      .max(32767, 'Must not be more than 32,767 an 5 minutes'),
+      .max(2147483647, 'Must not be more than 2,147,483,647 in 5 minutes'),
     RATE_LIMIT_VERIFY: z.coerce
       .number()
       .min(0, 'Must be not be lower than 0')
-      .max(32767, 'Must not be more than 32,767 an 5 minutes'),
+      .max(2147483647, 'Must not be more than 2,147,483,647 in 5 minutes'),
     RATE_LIMIT_EMAIL_SENT: z.coerce
       .number()
       .min(0, 'Must be not be lower than 0')
-      .max(32767, 'Must not be more than 32,767 an hour'),
+      .max(2147483647, 'Must not be more than 2,147,483,647 per hour'),
     RATE_LIMIT_SMS_SENT: z.coerce
       .number()
       .min(0, 'Must be not be lower than 0')
-      .max(32767, 'Must not be more than 32,767 an hour'),
+      .max(2147483647, 'Must not be more than 2,147,483,647 per hour'),
     RATE_LIMIT_ANONYMOUS_USERS: z.coerce
       .number()
       .min(0, 'Must be not be lower than 0')
-      .max(32767, 'Must not be more than 32,767 an hour'),
+      .max(2147483647, 'Must not be more than 2,147,483,647 per hour'),
     RATE_LIMIT_OTP: z.coerce
       .number()
       .min(0, 'Must be not be lower than 0')
-      .max(32767, 'Must not be more than 32,767 an hour'),
+      .max(2147483647, 'Must not be more than 2,147,483,647 per hour'),
     RATE_LIMIT_WEB3: z.coerce
       .number()
       .min(0, 'Must be not be lower than 0')
-      .max(32767, 'Must not be more than 32,767 an hour'),
+      .max(2147483647, 'Must not be more than 2,147,483,647 per hour'),
+    SMTP_MAX_FREQUENCY: z.coerce
+      .number()
+      .min(0, 'Must be not be lower than 0')
+      .max(32767, 'Must not be more than 32,767 seconds'),
   })
 
   const rateLimitForm = useForm<z.infer<typeof RateLimitFormSchema>>({
@@ -142,11 +145,25 @@ export const RateLimits = () => {
       RATE_LIMIT_ANONYMOUS_USERS: 0,
       RATE_LIMIT_OTP: 0,
       RATE_LIMIT_WEB3: 0,
+      SMTP_MAX_FREQUENCY: 60,
     },
   })
 
+  const rateLimitTokenRefresh = useWatch({
+    control: rateLimitForm.control,
+    name: 'RATE_LIMIT_TOKEN_REFRESH',
+  })
+  const rateLimitVerify = useWatch({ control: rateLimitForm.control, name: 'RATE_LIMIT_VERIFY' })
+  const rateLimitOtp = useWatch({ control: rateLimitForm.control, name: 'RATE_LIMIT_OTP' })
+  const { dirtyFields: rateLimitDirtyFields } = rateLimitForm.formState
+
   const onSubmitRateLimitForm = (data: z.infer<typeof RateLimitFormSchema>) => {
     if (!projectRef) return console.error('Project ref is required')
+
+    if (rateLimitDirtyFields.SMTP_MAX_FREQUENCY && data.SMTP_MAX_FREQUENCY < 1) {
+      rateLimitForm.setError('SMTP_MAX_FREQUENCY', { message: 'Must be more than 0' })
+      return
+    }
 
     const payload: Partial<z.infer<typeof RateLimitFormSchema>> = {}
     const params = [
@@ -157,6 +174,7 @@ export const RateLimits = () => {
       'RATE_LIMIT_ANONYMOUS_USERS',
       'RATE_LIMIT_OTP',
       'RATE_LIMIT_WEB3',
+      'SMTP_MAX_FREQUENCY',
     ] as (keyof typeof payload)[]
     params.forEach((param) => {
       if (data[param] !== authConfig?.[param]) payload[param] = data[param]
@@ -178,6 +196,7 @@ export const RateLimits = () => {
         RATE_LIMIT_ANONYMOUS_USERS: authConfig.RATE_LIMIT_ANONYMOUS_USERS,
         RATE_LIMIT_OTP: authConfig.RATE_LIMIT_OTP,
         RATE_LIMIT_WEB3: authConfig.RATE_LIMIT_WEB3 ?? 0,
+        SMTP_MAX_FREQUENCY: authConfig.SMTP_MAX_FREQUENCY,
       })
 
       ipForwardingForm.reset({
@@ -261,7 +280,7 @@ export const RateLimits = () => {
                                     Enable email-based logins to update this rate limit
                                   </p>
                                   <div className="mt-3">
-                                    <Button asChild type="default" size="tiny">
+                                    <Button asChild size="tiny">
                                       <Link href={`/project/${projectRef}/auth/providers`}>
                                         View auth providers
                                       </Link>
@@ -271,17 +290,23 @@ export const RateLimits = () => {
                               ) : (
                                 <>
                                   <p className="font-medium">
-                                    Custom SMTP provider is required to update this configuration
+                                    Custom SMTP or Send Email hook is required to update this
+                                    configuration
                                   </p>
                                   <p className="mt-1">
-                                    The built-in email service has a fixed rate limit. You will need
-                                    to set up your own custom SMTP provider to update your email
-                                    rate limit
+                                    The built-in email service has a fixed rate limit. Set up a
+                                    custom SMTP provider or enable the Send Email hook to update
+                                    your email rate limit
                                   </p>
-                                  <div className="mt-3">
-                                    <Button asChild type="default" size="tiny">
+                                  <div className="mt-3 flex gap-2">
+                                    <Button asChild size="tiny">
                                       <Link href={`/project/${projectRef}/auth/smtp`}>
                                         View SMTP settings
+                                      </Link>
+                                    </Button>
+                                    <Button asChild size="tiny">
+                                      <Link href={`/project/${projectRef}/auth/hooks`}>
+                                        View hooks
                                       </Link>
                                     </Button>
                                   </div>
@@ -330,7 +355,7 @@ export const RateLimits = () => {
                                 Enable phone-based logins to update this rate limit
                               </p>
                               <div className="mt-3">
-                                <Button asChild type="default" size="tiny">
+                                <Button asChild size="tiny">
                                   <Link href={`/project/${projectRef}/auth/providers`}>
                                     View auth providers
                                   </Link>
@@ -382,9 +407,9 @@ export const RateLimits = () => {
                             </TooltipContent>
                           )}
                         </Tooltip>
-                        {rateLimitForm.watch('RATE_LIMIT_TOKEN_REFRESH') > 0 && (
+                        {rateLimitTokenRefresh > 0 && (
                           <p className="text-foreground-lighter text-sm mt-2">
-                            {rateLimitForm.watch('RATE_LIMIT_TOKEN_REFRESH') * 12} requests per hour
+                            {rateLimitTokenRefresh * 12} requests per hour
                           </p>
                         )}
                       </FormItemLayout>
@@ -400,7 +425,7 @@ export const RateLimits = () => {
                       <FormItemLayout
                         layout="flex-row-reverse"
                         label="Rate limit for token verifications"
-                        description="Number of OTP/Magic link verifications that can be made in a 5 minute interval per IP address"
+                        description="Number of OTP and magic link verifications that can be made in a 5 minute interval per IP address"
                       >
                         <Tooltip>
                           <TooltipTrigger asChild>
@@ -430,9 +455,9 @@ export const RateLimits = () => {
                             </TooltipContent>
                           )}
                         </Tooltip>
-                        {rateLimitForm.watch('RATE_LIMIT_VERIFY') > 0 && (
+                        {rateLimitVerify > 0 && (
                           <p className="text-foreground-lighter text-sm mt-2">
-                            {rateLimitForm.watch('RATE_LIMIT_VERIFY') * 12} requests per hour
+                            {rateLimitVerify * 12} requests per hour
                           </p>
                         )}
                       </FormItemLayout>
@@ -473,7 +498,7 @@ export const RateLimits = () => {
                                 control this rate limit.
                               </p>
                               <div className="mt-3">
-                                <Button asChild type="default" size="tiny">
+                                <Button asChild size="tiny">
                                   <Link href={`/project/${projectRef}/auth/providers`}>
                                     View auth settings
                                   </Link>
@@ -525,9 +550,9 @@ export const RateLimits = () => {
                             </TooltipContent>
                           )}
                         </Tooltip>
-                        {rateLimitForm.watch('RATE_LIMIT_OTP') > 0 && (
+                        {rateLimitOtp > 0 && (
                           <p className="text-foreground-lighter text-sm mt-2">
-                            {rateLimitForm.watch('RATE_LIMIT_OTP') * 12} requests per hour
+                            {rateLimitOtp * 12} requests per hour
                           </p>
                         )}
                       </FormItemLayout>
@@ -568,7 +593,7 @@ export const RateLimits = () => {
                                 control this rate limit.
                               </p>
                               <div className="mt-3">
-                                <Button asChild type="default" size="tiny">
+                                <Button asChild size="tiny">
                                   <Link href={`/project/${projectRef}/auth/providers`}>
                                     View Auth provider settings
                                   </Link>
@@ -582,15 +607,77 @@ export const RateLimits = () => {
                   />
                 </CardContent>
 
+                <CardContent>
+                  <FormField
+                    control={rateLimitForm.control}
+                    name="SMTP_MAX_FREQUENCY"
+                    render={({ field }) => (
+                      <FormItemLayout
+                        layout="flex-row-reverse"
+                        label="Minimum interval per user"
+                        description="Minimum time between emails sent to the same user. Only applies when Custom SMTP is configured."
+                      >
+                        <Tooltip>
+                          <TooltipTrigger asChild>
+                            <FormControl>
+                              <InputGroup>
+                                <FormInputGroupInput
+                                  type="number"
+                                  min={0}
+                                  {...field}
+                                  disabled={!canUpdateConfig || !isSmtpEnabled(authConfig)}
+                                />
+                                <InputGroupAddon align="inline-end">
+                                  <InputGroupText>seconds</InputGroupText>
+                                </InputGroupAddon>
+                              </InputGroup>
+                            </FormControl>
+                          </TooltipTrigger>
+                          {!canUpdateConfig || !isSmtpEnabled(authConfig) ? (
+                            <TooltipContent side="left" className="w-80 p-4">
+                              {!canUpdateConfig ? (
+                                <>
+                                  <p className="font-medium">
+                                    You don't have permission to update this setting
+                                  </p>
+                                  <p className="mt-1">
+                                    You need additional permissions to update auth configuration
+                                    settings
+                                  </p>
+                                </>
+                              ) : (
+                                <>
+                                  <p className="font-medium">
+                                    Custom SMTP is required to update this setting
+                                  </p>
+                                  <p className="mt-1">
+                                    This setting only applies when a custom SMTP provider is
+                                    configured
+                                  </p>
+                                  <div className="mt-3">
+                                    <Button asChild size="tiny">
+                                      <Link href={`/project/${projectRef}/auth/smtp`}>
+                                        View SMTP settings
+                                      </Link>
+                                    </Button>
+                                  </div>
+                                </>
+                              )}
+                            </TooltipContent>
+                          ) : null}
+                        </Tooltip>
+                      </FormItemLayout>
+                    )}
+                  />
+                </CardContent>
+
                 <CardFooter className="justify-end space-x-2">
                   {rateLimitForm.formState.isDirty && (
-                    <Button type="default" onClick={() => rateLimitForm.reset()}>
-                      Cancel
-                    </Button>
+                    <Button onClick={() => rateLimitForm.reset()}>Cancel</Button>
                   )}
                   <Button
-                    type="primary"
-                    htmlType="submit"
+                    variant="primary"
+                    type="submit"
                     disabled={
                       !canUpdateConfig || isUpdatingConfig || !rateLimitForm.formState.isDirty
                     }
@@ -649,13 +736,11 @@ export const RateLimits = () => {
                 </CardContent>
                 <CardFooter className="justify-end space-x-2">
                   {ipForwardingForm.formState.isDirty && (
-                    <Button type="default" onClick={() => ipForwardingForm.reset()}>
-                      Cancel
-                    </Button>
+                    <Button onClick={() => ipForwardingForm.reset()}>Cancel</Button>
                   )}
                   <Button
-                    type="primary"
-                    htmlType="submit"
+                    variant="primary"
+                    type="submit"
                     disabled={
                       !canUpdateConfig || isUpdatingConfig || !ipForwardingForm.formState.isDirty
                     }

@@ -5,7 +5,7 @@ import { Button, Tooltip, TooltipContent, TooltipProvider, TooltipTrigger } from
 
 export default function CopyTooltips() {
   return (
-    <div className="flex flex-row gap-20">
+    <div className="flex flex-row flex-wrap gap-8 sm:gap-20">
       <div className="flex flex-col gap-4">
         <span className="text-xs text-foreground-muted">Bad Example</span>
         <div className="flex flex-row gap-8 items-center">
@@ -13,7 +13,7 @@ export default function CopyTooltips() {
             <Tooltip>
               <TooltipTrigger asChild>
                 <Button
-                  type="text"
+                  variant="text"
                   className="flex items-center px-1.5"
                   icon={<Info size={20} strokeWidth={1.5} />}
                   aria-label="More info"
@@ -33,7 +33,7 @@ export default function CopyTooltips() {
             <Tooltip>
               <TooltipTrigger asChild>
                 <Button
-                  type="text"
+                  variant="text"
                   className="flex items-center px-1.5"
                   icon={<Info size={20} strokeWidth={1.5} />}
                   aria-label="More info"

@@ -1,5 +1,5 @@
 import { EdgeFunctions, RESTApi, SqlEditor } from 'icons'
-import { ScrollText } from 'lucide-react'
+import { ScrollTextIcon } from 'lucide-react'
 
 const cronField = /(\*|(\d+|\*\/\d+)|\d+\/\d+|\d+-\d+|\d+(,\d+)*)/
 const cronDayOfMonth = /(\*|\$|(\d+|\*\/\d+)|\d+\/\d+|\d+-\d+|\d+(,\d+)*)/
@@ -26,7 +26,7 @@ export const CRONJOB_DEFINITIONS = [
   },
   {
     value: 'sql_function',
-    icon: <ScrollText strokeWidth={1} />,
+    icon: <ScrollTextIcon strokeWidth={1} />,
     label: 'Database function',
     description: 'Choose a database function to run.',
   },
@@ -49,7 +49,7 @@ export type HTTPHeader = { name: string; value: string }
 
 export type HTTPParameter = { name: string; value: string }
 
-type CronTableColumn = {
+export type CronTableColumn = {
   id: string
   name: string
   width?: number

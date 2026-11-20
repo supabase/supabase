@@ -1,9 +1,12 @@
+import { literal, safeSql } from '@supabase/pg-meta/src/pg-format'
 import { InfiniteData, useInfiniteQuery } from '@tanstack/react-query'
 import { last } from 'lodash'
 
 import { databaseCronJobsKeys } from './keys'
-import { executeSql } from '@/data/sql/execute-sql-query'
-import type { ResponseError, UseCustomInfiniteQueryOptions } from '@/types'
+import { unguarded } from '@/data/fetchers'
+import { executeSql } from '@/data/sql/execute-sql-mutation'
+import type { StudioError } from '@/lib/errors/studio-errors'
+import type { UseCustomInfiniteQueryOptions } from '@/types'
 
 export type DatabaseCronJobRunsVariables = {
   projectRef?: string
@@ -37,24 +40,29 @@ export async function getDatabaseCronJobRuns({
 
   // Use runid for ordering and pagination since it's the primary key (indexed)
   // and preserves chronological order (auto-incrementing)
-  let query = `
+  const afterRunIdClause =
+    typeof afterRunId === 'number' ? safeSql`AND runid < ${literal(afterRunId)}` : safeSql``
+  const query = safeSql`
     SELECT * FROM cron.job_run_details
     WHERE
-      jobid = '${jobId}'
-      ${typeof afterRunId === 'number' ? `AND runid < '${afterRunId}'` : ''}
+      jobid = ${literal(jobId)}
+      ${afterRunIdClause}
     ORDER BY runid DESC
-    LIMIT ${CRON_JOB_RUNS_PAGE_SIZE}`
+    LIMIT ${literal(CRON_JOB_RUNS_PAGE_SIZE)}`
 
   const { result } = await executeSql({
     projectRef,
     connectionString,
+    sqlOrigin: 'studio',
+    queryName: 'database-cron-jobs-runs-infinite',
     sql: query,
+    grant: unguarded.migrating,
   })
   return result
 }
 
 type DatabaseCronJobRunData = CronJobRun[]
-type DatabaseCronJobError = ResponseError
+type DatabaseCronJobError = StudioError
 
 export const useCronJobRunsInfiniteQuery = <TData = DatabaseCronJobRunData>(
   { projectRef, connectionString, jobId }: DatabaseCronJobRunsVariables,

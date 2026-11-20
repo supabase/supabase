@@ -1,4 +1,4 @@
-import type { PostgresColumn } from '@supabase/postgres-meta'
+import type { PGColumn } from '@supabase/pg-meta'
 
 import { ProjectLogStatsVariables } from '@/data/analytics/project-log-stats-query'
 
@@ -27,6 +27,7 @@ export interface ChartIntervals {
 
 export interface VaultSecret {
   id: string
+  key_id: string | null
   name: string
   description: string
   secret: string
@@ -41,5 +42,5 @@ export interface SchemaView {
   schema: string
   is_updatable: boolean
   comment?: string
-  columns: PostgresColumn[]
+  columns: PGColumn[]
 }

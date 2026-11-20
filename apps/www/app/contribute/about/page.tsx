@@ -1,3 +1,7 @@
+import { GithubAvatar } from '~/components/Contribute/GithubAvatar'
+import DefaultLayout from '~/components/Layouts/Default'
+import SectionContainer from '~/components/Layouts/SectionContainer'
+import { Feature, FeaturesSection as FeaturesSectionType } from '~/data/solutions/solutions.utils'
 import { Realtime } from 'icons'
 import {
   ArrowLeft,
@@ -14,13 +18,12 @@ import {
   TrendingUp,
   Zap,
 } from 'lucide-react'
+import type { Metadata } from 'next'
 import Image from 'next/image'
 import Link from 'next/link'
-import { Badge, Button, Separator, cn } from 'ui'
-import { GithubAvatar } from '~/components/Contribute/GithubAvatar'
-import DefaultLayout from '~/components/Layouts/Default'
-import SectionContainer from '~/components/Layouts/SectionContainer'
-import { Feature, FeaturesSection as FeaturesSectionType } from '~/data/solutions/solutions.utils'
+import { Badge, Button, cn, Separator } from 'ui'
+
+import { canonicalAlternates } from '@/lib/canonical'
 
 const githubUsers = [
   'aantti',
@@ -140,6 +143,10 @@ const especially = [
   },
 ]
 
+export const metadata: Metadata = {
+  alternates: canonicalAlternates('/contribute/about'),
+}
+
 // eslint-disable-next-line no-restricted-exports
 export default function AboutPage() {
   return (
@@ -233,7 +240,7 @@ export default function AboutPage() {
               Ready to start contributing?
             </h2>
 
-            <Button asChild type="primary" size="small">
+            <Button asChild variant="primary" size="small">
               <Link
                 href="https://supabase.notion.site/2ce5004b775f80a38acdc3ca5df7b9d3"
                 target="_blank"

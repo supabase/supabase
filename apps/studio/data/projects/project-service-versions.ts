@@ -2,7 +2,8 @@ import { useQuery } from '@tanstack/react-query'
 
 import { projectKeys } from './keys'
 import { get, handleError } from '@/data/fetchers'
-import type { ResponseError, UseCustomQueryOptions } from '@/types'
+import type { StudioError } from '@/lib/errors/studio-errors'
+import type { UseCustomQueryOptions } from '@/types'
 
 export type ProjectServiceVersionsVariables = {
   projectRef?: string
@@ -23,7 +24,7 @@ export async function getProjectServiceVersions(
 }
 
 export type ProjectServiceVersionsData = Awaited<ReturnType<typeof getProjectServiceVersions>>
-export type ProjectServiceVersionsError = ResponseError
+export type ProjectServiceVersionsError = StudioError
 
 export const useProjectServiceVersionsQuery = <TData = ProjectServiceVersionsData>(
   { projectRef }: ProjectServiceVersionsVariables,

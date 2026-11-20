@@ -1,7 +1,8 @@
 'use client'
 
-import { motion, useInView } from 'framer-motion'
-import { useState, useEffect, useCallback, useMemo, useRef } from 'react'
+import { motion, useInView } from 'motion/react'
+import { useCallback, useEffect, useMemo, useRef, useState } from 'react'
+
 import { Dots, Stripes } from './Visuals'
 
 const STAGGER_DELAY = 0.05
@@ -170,7 +171,7 @@ export function AnimatedGridBackground({
   return (
     <div
       ref={containerRef}
-      className={`absolute inset-0 grid h-full [&>*]:border-muted [&>*]:border-r [&>*]:border-b overflow-hidden`}
+      className={`absolute inset-0 grid h-full *:border-muted *:border-r *:border-b overflow-hidden`}
       style={{
         gridTemplateColumns: `repeat(${cols}, 1fr)`,
         gridTemplateRows: `repeat(${actualRows}, 1fr)`,
@@ -192,7 +193,7 @@ export function AnimatedGridBackground({
         return (
           <div
             key={cellIndex}
-            className={`relative ${isLastCol ? '!border-r-0' : ''} ${isLastRow ? '!border-b-0' : ''}`}
+            className={`relative ${isLastCol ? 'border-r-0!' : ''} ${isLastRow ? 'border-b-0!' : ''}`}
           >
             {tile && (
               <motion.div

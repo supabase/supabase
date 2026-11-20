@@ -2,7 +2,9 @@ import { getViewDefinitionSql } from '@supabase/pg-meta'
 import { useQuery } from '@tanstack/react-query'
 
 import { databaseKeys } from './keys'
-import { executeSql, ExecuteSqlError } from '@/data/sql/execute-sql-query'
+import { unguarded } from '@/data/fetchers'
+import { executeSql } from '@/data/sql/execute-sql-mutation'
+import type { StudioError } from '@/lib/errors/studio-errors'
 import { UseCustomQueryOptions } from '@/types'
 
 type GetViewDefinitionArgs = {
@@ -26,8 +28,11 @@ export async function getViewDefinition(
     {
       projectRef,
       connectionString,
+      sqlOrigin: 'studio',
+      queryName: 'view-definition',
       sql,
       queryKey: ['view-definition', id, includeCreateStatement ?? false],
+      grant: unguarded.migrating,
     },
     signal
   )
@@ -36,7 +41,7 @@ export async function getViewDefinition(
 }
 
 export type ViewDefinitionData = string
-export type ViewDefinitionError = ExecuteSqlError
+export type ViewDefinitionError = StudioError
 
 export const useViewDefinitionQuery = <TData = ViewDefinitionData>(
   { projectRef, connectionString, id, includeCreateStatement }: ViewDefinitionVariables,

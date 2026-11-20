@@ -1,13 +1,11 @@
-import { PermissionAction } from '@supabase/shared-types/out/constants'
 import { useFlag, useParams } from 'common'
-import { AlertCircle } from 'lucide-react'
-import Link from 'next/link'
+import { AlertCircleIcon } from 'lucide-react'
 import { useEffect, useState } from 'react'
 import { toast } from 'sonner'
 import {
-  Alert_Shadcn_,
-  AlertDescription_Shadcn_,
-  AlertTitle_Shadcn_,
+  Alert,
+  AlertDescription,
+  AlertTitle,
   cn,
   RadioGroupCard,
   RadioGroupCardItem,
@@ -16,13 +14,14 @@ import {
 
 import { TaxDisclaimer } from '@/components/interfaces/Billing/TaxDisclaimer'
 import { DocsButton } from '@/components/ui/DocsButton'
+import { InlineLink } from '@/components/ui/InlineLink'
 import { UpgradeToPro } from '@/components/ui/UpgradeToPro'
 import { useProjectAddonRemoveMutation } from '@/data/subscriptions/project-addon-remove-mutation'
 import { useProjectAddonUpdateMutation } from '@/data/subscriptions/project-addon-update-mutation'
 import { useProjectAddonsQuery } from '@/data/subscriptions/project-addons-query'
 import type { AddonVariantId } from '@/data/subscriptions/types'
 import { useCheckEntitlements } from '@/hooks/misc/useCheckEntitlements'
-import { useAsyncCheckPermissions } from '@/hooks/misc/useCheckPermissions'
+import { FGA_PERMISSIONS, useAsyncCheckPermissionsV2 } from '@/hooks/misc/useCheckPermissionsV2'
 import { DOCS_URL } from '@/lib/constants'
 import { formatCurrency } from '@/lib/helpers'
 import { useAddonsPagePanel } from '@/state/addons-page'
@@ -33,9 +32,8 @@ const CustomDomainSidePanel = () => {
 
   const [selectedOption, setSelectedOption] = useState<string>('cd_none')
 
-  const { can: canUpdateCustomDomain } = useAsyncCheckPermissions(
-    PermissionAction.BILLING_WRITE,
-    'stripe.subscriptions'
+  const { can: canUpdateCustomDomain } = useAsyncCheckPermissionsV2(
+    FGA_PERMISSIONS.PROJECT.INFRA_ADDONS_WRITE
   )
 
   const { panel, closePanel } = useAddonsPagePanel()
@@ -130,27 +128,25 @@ const CustomDomainSidePanel = () => {
           {subscriptionCDOption === undefined &&
             selectedCustomDomain !== undefined &&
             customDomainsDisabledDueToQuota && (
-              <Alert_Shadcn_ variant="default" className="mb-2">
-                <AlertCircle className="h-4 w-4" />
-                <AlertTitle_Shadcn_>
-                  Adding new custom domains temporarily disabled
-                </AlertTitle_Shadcn_>
-                <AlertDescription_Shadcn_ className="flex flex-col gap-3">
+              <Alert variant="default" className="mb-2">
+                <AlertCircleIcon className="h-4 w-4" />
+                <AlertTitle>Adding new custom domains temporarily disabled</AlertTitle>
+                <AlertDescription className="flex flex-col gap-3">
                   We are working with our upstream DNS provider before we are able to sign up new
                   custom domains. Please check back in a few hours.
-                </AlertDescription_Shadcn_>
-              </Alert_Shadcn_>
+                </AlertDescription>
+              </Alert>
             )}
           <p className="text-sm">
             Custom domains allow you to present a branded experience to your users. You may set up
             your custom domain in the{' '}
-            <Link href={`/project/${projectRef}/settings/general`} className="text-brand">
+            <InlineLink href={`/project/${projectRef}/settings/general#custom-domains`}>
               General Settings
-            </Link>{' '}
+            </InlineLink>{' '}
             page after enabling the add-on.
           </p>
 
-          <div className={cn('!mt-8 pb-4', !hasAccessToCustomDomain && 'opacity-75')}>
+          <div className={cn('mt-8! pb-4', !hasAccessToCustomDomain && 'opacity-75')}>
             <RadioGroupCard
               id="custom-domain"
               className="flex flex-wrap gap-3"
@@ -173,7 +169,7 @@ const CustomDomainSidePanel = () => {
                         <p className="text-foreground text-sm" translate="no">
                           $0
                         </p>
-                        <p className="text-foreground-light translate-y-[1px]"> / month</p>
+                        <p className="text-foreground-light translate-y-px"> / month</p>
                       </div>
                     </div>
                   </div>
@@ -198,7 +194,7 @@ const CustomDomainSidePanel = () => {
                           <p className="text-foreground text-sm" translate="no">
                             {formatCurrency(option.price)}
                           </p>
-                          <p className="text-foreground-light translate-y-[1px]"> / month</p>
+                          <p className="text-foreground-light translate-y-px"> / month</p>
                         </div>
                       </div>
                     </div>

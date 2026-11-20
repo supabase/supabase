@@ -7,6 +7,15 @@ import { AlertCircle } from 'lucide-react'
 import { FC, memo, useEffect, useState } from 'react'
 import { useForm } from 'react-hook-form'
 import {
+  Alert,
+  AlertDescription,
+  AlertDialog,
+  AlertDialogAction,
+  AlertDialogContent,
+  AlertDialogDescription,
+  AlertDialogFooter,
+  AlertDialogHeader,
+  AlertDialogTitle,
   Button,
   Form,
   FormControl,
@@ -15,9 +24,9 @@ import {
   FormItem,
   FormLabel,
   FormMessage,
-  Input_Shadcn_,
+  Input,
   Separator,
-  TextArea_Shadcn_,
+  TextArea,
 } from 'ui'
 import {
   MultiSelector,
@@ -26,16 +35,6 @@ import {
   MultiSelectorList,
   MultiSelectorTrigger,
 } from 'ui-patterns/multi-select'
-import { Alert, AlertDescription } from 'ui/src/components/shadcn/ui/alert'
-import {
-  AlertDialog,
-  AlertDialogAction,
-  AlertDialogContent,
-  AlertDialogDescription,
-  AlertDialogFooter,
-  AlertDialogHeader,
-  AlertDialogTitle,
-} from 'ui/src/components/shadcn/ui/alert-dialog'
 
 import { CountrySelector } from '../Supasquad/CountrySelector'
 
@@ -45,7 +44,7 @@ interface FormItem {
   placeholder: string
   required: boolean
   className?: string
-  component: typeof TextArea_Shadcn_ | typeof Input_Shadcn_
+  component: typeof TextArea | typeof Input
 }
 
 interface Track {
@@ -155,11 +154,7 @@ const FormContent = memo(function FormContent({
                 <FormItem className="w-full md:flex-1">
                   <FormLabel className="text-foreground">First Name *</FormLabel>
                   <FormControl>
-                    <Input_Shadcn_
-                      placeholder="Your first name"
-                      autoComplete="given-name"
-                      {...field}
-                    />
+                    <Input placeholder="Your first name" autoComplete="given-name" {...field} />
                   </FormControl>
 
                   <FormMessage />
@@ -175,11 +170,7 @@ const FormContent = memo(function FormContent({
                   <FormLabel className="text-foreground">Last Name *</FormLabel>
                   <FormControl>
                     <div className="relative ">
-                      <Input_Shadcn_
-                        placeholder="Your last name"
-                        autoComplete="family-name"
-                        {...field}
-                      />
+                      <Input placeholder="Your last name" autoComplete="family-name" {...field} />
                     </div>
                   </FormControl>
 
@@ -197,7 +188,7 @@ const FormContent = memo(function FormContent({
                 <FormLabel className="text-foreground">Email Address *</FormLabel>
                 <FormControl>
                   <div className="relative">
-                    <Input_Shadcn_
+                    <Input
                       type="email"
                       placeholder="Your personal or work email"
                       autoComplete="email"
@@ -282,7 +273,7 @@ const FormContent = memo(function FormContent({
                   </FormDescription>
                   <FormControl>
                     <div className="relative">
-                      <TextArea_Shadcn_
+                      <TextArea
                         autoComplete="off"
                         rows={3}
                         className="bg-foreground/[.026]"
@@ -315,7 +306,7 @@ const FormContent = memo(function FormContent({
                   </FormDescription>
                   <FormControl>
                     <div className="relative">
-                      <TextArea_Shadcn_
+                      <TextArea
                         autoComplete="off"
                         rows={3}
                         className="bg-foreground/[.026]"
@@ -384,7 +375,7 @@ const FormContent = memo(function FormContent({
                   </FormDescription>
                   <FormControl>
                     <div className="relative mt-1">
-                      <Input_Shadcn_ type="text" {...field} />
+                      <Input type="text" {...field} />
                     </div>
                   </FormControl>
                   <FormMessage />
@@ -423,7 +414,7 @@ const FormContent = memo(function FormContent({
                     <FormLabel className="text-foreground">City *</FormLabel>
                     <FormControl>
                       <div className="relative mt-1">
-                        <Input_Shadcn_ type="text" placeholder="City" {...field} />
+                        <Input type="text" placeholder="City" {...field} />
                       </div>
                     </FormControl>
                     <FormMessage />
@@ -443,7 +434,7 @@ const FormContent = memo(function FormContent({
                   </FormDescription>
                   <FormControl>
                     <div className="relative mt-1">
-                      <Input_Shadcn_ {...field} />
+                      <Input {...field} />
                     </div>
                   </FormControl>
                   <FormMessage />
@@ -506,7 +497,7 @@ const FormContent = memo(function FormContent({
                     <FormLabel className="text-foreground">Discord</FormLabel>
                     <FormControl>
                       <div className="relative mt-1">
-                        <Input_Shadcn_ type="text" placeholder="#username" {...field} />
+                        <Input type="text" placeholder="#username" {...field} />
                       </div>
                     </FormControl>
                     <FormMessage />
@@ -522,7 +513,7 @@ const FormContent = memo(function FormContent({
                     <FormLabel className="text-foreground">GitHub</FormLabel>
                     <FormControl>
                       <div className="relative mt-1">
-                        <Input_Shadcn_ type="text" placeholder="@yourusername" {...field} />
+                        <Input type="text" placeholder="@yourusername" {...field} />
                       </div>
                     </FormControl>
                     <FormMessage />
@@ -538,7 +529,7 @@ const FormContent = memo(function FormContent({
                     <FormLabel className="text-foreground">Twitter</FormLabel>
                     <FormControl>
                       <div className="relative mt-1">
-                        <Input_Shadcn_ type="text" placeholder="@yourhandle" {...field} />
+                        <Input type="text" placeholder="@yourhandle" {...field} />
                       </div>
                     </FormControl>
                     <FormMessage />
@@ -552,15 +543,21 @@ const FormContent = memo(function FormContent({
             <div className="flex flex-row gap-3">
               <Button
                 size="small"
-                htmlType="button"
-                type="outline"
+                type="button"
+                variant="outline"
                 onClick={handleCancel}
                 disabled={isSubmitting}
                 className="border-border text-foreground hover:bg-muted flex-1"
               >
                 Cancel
               </Button>
-              <Button size="small" htmlType="submit" disabled={isSubmitting} className="flex-1">
+              <Button
+                variant="primary"
+                size="small"
+                type="submit"
+                disabled={isSubmitting}
+                className="flex-1"
+              >
                 {isSubmitting ? <>Submitting...</> : <>Submit Application</>}
               </Button>
             </div>

@@ -24,10 +24,10 @@ export const calculateDateRange = (
       start = now.subtract(1, 'hour').toISOString()
       break
     case '1day':
-      start = now.subtract(1, 'day').toISOString()
+      start = now.subtract(24, 'hour').toISOString()
       break
     case '7day':
-      start = now.subtract(7, 'day').toISOString()
+      start = now.subtract(168, 'hour').toISOString()
       break
     default:
       start = now.subtract(1, 'hour').toISOString()

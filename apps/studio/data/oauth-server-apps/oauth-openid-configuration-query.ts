@@ -4,7 +4,8 @@ import { useAuthConfigQuery } from '../auth/auth-config-query'
 import { oauthServerAppKeys } from './keys'
 import { useProjectApiUrl } from '@/data/config/project-endpoint-query'
 import { handleError } from '@/data/fetchers'
-import type { ResponseError, UseCustomQueryOptions } from '@/types'
+import type { StudioError } from '@/lib/errors/studio-errors'
+import type { UseCustomQueryOptions } from '@/types'
 
 export type OpenIDConfigurationVariables = {
   projectRef: string | undefined
@@ -31,13 +32,13 @@ export type OpenIDConfiguration = {
 }
 
 export async function getOpenIDConfiguration({
-  clientEndpoint,
+  endpoint,
 }: {
-  clientEndpoint: string | undefined
+  endpoint: string | undefined
 }): Promise<OpenIDConfiguration> {
-  if (!clientEndpoint) throw new Error('Client endpoint is required')
+  if (!endpoint) throw new Error('Client endpoint is required')
 
-  const response = await fetch(`${clientEndpoint}/auth/v1/.well-known/openid-configuration`)
+  const response = await fetch(`${endpoint}/auth/v1/.well-known/openid-configuration`)
 
   if (!response.ok) {
     handleError({ message: `Failed to fetch OpenID configuration: ${response.statusText}` })
@@ -47,7 +48,7 @@ export async function getOpenIDConfiguration({
 }
 
 export type OpenIDConfigurationData = Awaited<ReturnType<typeof getOpenIDConfiguration>>
-export type OpenIDConfigurationError = ResponseError
+export type OpenIDConfigurationError = StudioError
 
 export const useOpenIDConfigurationQuery = <TData = OpenIDConfigurationData>(
   { projectRef }: OpenIDConfigurationVariables,
@@ -56,7 +57,7 @@ export const useOpenIDConfigurationQuery = <TData = OpenIDConfigurationData>(
     ...options
   }: UseCustomQueryOptions<OpenIDConfigurationData, OpenIDConfigurationError, TData> = {}
 ) => {
-  const { data: clientEndpoint, isPending: isEndpointLoading } = useProjectApiUrl({
+  const { hostEndpoint, isPending: isEndpointLoading } = useProjectApiUrl({
     projectRef,
   })
 
@@ -70,13 +71,13 @@ export const useOpenIDConfigurationQuery = <TData = OpenIDConfigurationData>(
   const isQueryEnabled =
     enabled &&
     typeof projectRef !== 'undefined' &&
-    !!clientEndpoint &&
+    !!hostEndpoint &&
     isSuccessConfig &&
     isOAuthServerEnabled
 
   const query = useQuery<OpenIDConfigurationData, OpenIDConfigurationError, TData>({
     queryKey: oauthServerAppKeys.openidConfiguration(projectRef),
-    queryFn: () => getOpenIDConfiguration({ clientEndpoint }),
+    queryFn: () => getOpenIDConfiguration({ endpoint: hostEndpoint }),
     enabled: isQueryEnabled,
     ...options,
   })

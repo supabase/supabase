@@ -1,10 +1,11 @@
-import { useQuery } from '@tanstack/react-query'
+import { useQuery, type QueryClient } from '@tanstack/react-query'
 import { useIsLoggedIn } from 'common'
 
 import { permissionKeys } from './keys'
 import { get, handleError } from '@/data/fetchers'
 import { IS_PLATFORM } from '@/lib/constants'
-import type { Permission, ResponseError, UseCustomQueryOptions } from '@/types'
+import type { StudioError } from '@/lib/errors/studio-errors'
+import type { Permission, UseCustomQueryOptions } from '@/types'
 
 export type PermissionsResponse = Permission[]
 
@@ -28,7 +29,7 @@ export async function getPermissions(signal?: AbortSignal) {
 }
 
 export type PermissionsData = Awaited<ReturnType<typeof getPermissions>>
-export type PermissionsError = ResponseError
+export type PermissionsError = StudioError
 
 export const usePermissionsQuery = <TData = PermissionsData>({
   enabled = true,
@@ -43,4 +44,8 @@ export const usePermissionsQuery = <TData = PermissionsData>({
     enabled: IS_PLATFORM && enabled && isLoggedIn,
     staleTime: 5 * 60 * 1000,
   })
+}
+
+export function invalidatePermissionsQuery(client: QueryClient) {
+  return client.invalidateQueries({ queryKey: permissionKeys.list() })
 }

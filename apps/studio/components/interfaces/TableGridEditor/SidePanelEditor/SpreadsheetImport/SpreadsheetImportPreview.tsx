@@ -1,13 +1,15 @@
-import { AlertCircle, ArrowRight, ChevronDown, ChevronRight } from 'lucide-react'
+import { AlertCircleIcon, ArrowRightIcon, ChevronDownIcon, ChevronRightIcon } from 'lucide-react'
 import { useEffect, useState } from 'react'
 import {
-  Alert_Shadcn_,
-  AlertDescription_Shadcn_,
-  AlertTitle_Shadcn_,
+  Alert,
+  AlertDescription,
+  AlertTitle,
   Badge,
   Button,
   cn,
   Collapsible,
+  CollapsibleContent,
+  CollapsibleTrigger,
   SidePanel,
   WarningIcon,
 } from 'ui'
@@ -69,7 +71,7 @@ export const SpreadsheetImportPreview = ({
 
   return (
     <Collapsible open={expandPreview} onOpenChange={setExpandPreview} className={''}>
-      <Collapsible.Trigger asChild>
+      <CollapsibleTrigger asChild>
         <SidePanel.Content>
           <div className="py-1 flex items-center justify-between">
             <div className="flex items-center space-x-2">
@@ -77,14 +79,16 @@ export const SpreadsheetImportPreview = ({
               {!isCompatible && <Badge variant="destructive">Data incompatible</Badge>}
               {dedupedErrors.length > 0 && (
                 <Badge variant="warning">
-                  {dedupedErrors.length} {dedupedErrors.length === 1 ? 'issue' : 'issues'} found
+                  {dedupedErrors.length}{' '}
+                  {dedupedErrors.length === 1 ? <span>issue</span> : <span>issues</span>}{' '}
+                  <span>found</span>
                 </Badge>
               )}
             </div>
             <Button
-              type="text"
+              variant="text"
               icon={
-                <ChevronDown
+                <ChevronDownIcon
                   size={18}
                   strokeWidth={2}
                   className={cn('text-foreground-light', expandPreview && 'rotate-180')}
@@ -95,8 +99,8 @@ export const SpreadsheetImportPreview = ({
             />
           </div>
         </SidePanel.Content>
-      </Collapsible.Trigger>
-      <Collapsible.Content>
+      </CollapsibleTrigger>
+      <CollapsibleContent>
         <SidePanel.Content>
           <div className="mb-4">
             <p className="text-sm text-foreground-light">
@@ -122,7 +126,7 @@ export const SpreadsheetImportPreview = ({
               />
             ) : (
               <div className="flex items-center justify-center py-4 border border-control rounded-md space-x-2">
-                <AlertCircle size={16} strokeWidth={1.5} className="text-foreground-light" />
+                <AlertCircleIcon size={16} strokeWidth={1.5} className="text-foreground-light" />
                 <p className="text-sm text-foreground-light">
                   {previewHeaders.length === 0
                     ? 'No headers have been selected'
@@ -134,10 +138,10 @@ export const SpreadsheetImportPreview = ({
             )}
           </div>
           {(!isCompatible || dedupedErrors.length > 0) && (
-            <Alert_Shadcn_ variant="warning" className="my-4">
+            <Alert variant="warning" className="my-4">
               <WarningIcon />
-              <AlertTitle_Shadcn_>Issues found in spreadsheet</AlertTitle_Shadcn_>
-              <AlertDescription_Shadcn_>
+              <AlertTitle>Issues found in spreadsheet</AlertTitle>
+              <AlertDescription>
                 <div className="space-y-2">
                   {isCompatible ? (
                     <p className="text-sm">
@@ -158,9 +162,10 @@ export const SpreadsheetImportPreview = ({
                           <div className="size-[6px] rounded-full bg-foreground-lighter" />
                         </div>
                         <p className="text-sm">
-                          The column{incompatibleHeaders.length > 1 ? 's' : ''}{' '}
+                          The column{incompatibleHeaders.length > 1 ? <span>s</span> : ''}{' '}
                           {incompatibleHeaders.map((x) => `"${x}"`).join(', ')}{' '}
-                          {incompatibleHeaders.length > 1 ? 'are' : 'is'} not present in your table
+                          {incompatibleHeaders.length > 1 ? <span>are</span> : <span>is</span>}{' '}
+                          <span>not present in your table</span>
                         </p>
                       </div>
                     </div>
@@ -176,13 +181,14 @@ export const SpreadsheetImportPreview = ({
                           {errorData !== undefined ? (
                             <button
                               type="button"
-                              className="flex items-center space-x-2 cursor-pointer focus:outline-none focus-visible:ring-2 focus-visible:ring-primary"
+                              tabIndex={0}
+                              className="flex cursor-pointer items-center space-x-2 focus-ring"
                               onClick={() => onSelectExpandError(key)}
                               aria-expanded={isExpanded}
                               aria-controls={`${key}-panel`}
                               aria-labelledby={`${key}-summary`}
                             >
-                              <ChevronRight
+                              <ChevronRightIcon
                                 size={14}
                                 className={cn('transform transition-transform', {
                                   'rotate-90': isExpanded,
@@ -197,12 +203,12 @@ export const SpreadsheetImportPreview = ({
                               <p className="text-sm">{error.message}</p>
                               {errorData?.__parsed_extra && (
                                 <>
-                                  <ArrowRight size={14} aria-hidden="true" />
+                                  <ArrowRightIcon size={14} aria-hidden="true" />
                                   <p className="text-sm">Extra field(s):</p>
                                   <ul className="ml-2 list-disc">
                                     {errorData.__parsed_extra.map((value: string, i: number) => (
                                       <li key={i}>
-                                        <code className="text-code-inline">{value}</code>
+                                        <code>{value}</code>
                                       </li>
                                     ))}
                                   </ul>
@@ -233,11 +239,11 @@ export const SpreadsheetImportPreview = ({
                     })}
                   </ul>
                 </div>
-              </AlertDescription_Shadcn_>
-            </Alert_Shadcn_>
+              </AlertDescription>
+            </Alert>
           )}
         </SidePanel.Content>
-      </Collapsible.Content>
+      </CollapsibleContent>
     </Collapsible>
   )
 }

@@ -3,25 +3,41 @@ import { toast } from 'sonner'
 
 import { awsAccountKeys } from './keys'
 import { del, handleError } from '@/data/fetchers'
-import type { ResponseError } from '@/types'
+import type { StudioError } from '@/lib/errors/studio-errors'
 
 export type AWSAccountDeleteVariables = {
   projectRef: string
   awsAccountId: string
+  databaseIdentifier?: string
 }
 
-export async function deleteAWSAccount({ projectRef, awsAccountId }: AWSAccountDeleteVariables) {
-  const { data, error } = await del(
-    '/platform/projects/{ref}/privatelink/associations/aws-account/{aws_account_id}',
-    {
+export async function deleteAWSAccount({
+  projectRef,
+  awsAccountId,
+  databaseIdentifier,
+}: AWSAccountDeleteVariables) {
+  const deleteRequest = del as unknown as (
+    path: string,
+    init: {
       params: {
-        path: {
-          ref: projectRef,
-          aws_account_id: awsAccountId,
-        },
-      },
+        path: Record<string, string>
+      }
     }
-  )
+  ) => Promise<{ data: unknown; error: unknown }>
+
+  const path = databaseIdentifier
+    ? '/platform/projects/{ref}/privatelink/associations/aws-account/{aws_account_id}/database/{database_identifier}'
+    : '/platform/projects/{ref}/privatelink/associations/aws-account/{aws_account_id}'
+
+  const { data, error } = await deleteRequest(path, {
+    params: {
+      path: {
+        ref: projectRef,
+        aws_account_id: awsAccountId,
+        ...(databaseIdentifier ? { database_identifier: databaseIdentifier } : {}),
+      },
+    },
+  })
 
   if (error) handleError(error)
   return data
@@ -34,22 +50,22 @@ export const useAWSAccountDeleteMutation = ({
   onError,
   ...options
 }: Omit<
-  UseMutationOptions<AWSAccountDeleteData, ResponseError, AWSAccountDeleteVariables>,
+  UseMutationOptions<AWSAccountDeleteData, StudioError, AWSAccountDeleteVariables>,
   'mutationFn'
 > = {}) => {
   const queryClient = useQueryClient()
-  return useMutation<AWSAccountDeleteData, ResponseError, AWSAccountDeleteVariables>({
+  return useMutation<AWSAccountDeleteData, StudioError, AWSAccountDeleteVariables>({
     mutationFn: (vars) => deleteAWSAccount(vars),
-    async onSuccess(data, variables, context) {
+    async onSuccess(data, variables, context, mutationContext) {
       const { projectRef } = variables
       await queryClient.invalidateQueries({ queryKey: awsAccountKeys.list(projectRef) })
-      await onSuccess?.(data, variables, context)
+      await onSuccess?.(data, variables, context, mutationContext)
     },
-    async onError(data, variables, context) {
+    async onError(data, variables, context, mutationContext) {
       if (onError === undefined) {
-        toast.error(`Failed to delete AWS account: ${data.message}`)
+        toast.error(`Failed to delete connection: ${data.message}`)
       } else {
-        onError(data, variables, context)
+        onError(data, variables, context, mutationContext)
       }
     },
     ...options,

@@ -3,7 +3,9 @@ import { QueryClient, queryOptions, useQuery } from '@tanstack/react-query'
 
 import { tableEditorKeys } from './keys'
 import { Entity } from './table-editor-types'
-import { executeSql, ExecuteSqlError } from '@/data/sql/execute-sql-query'
+import { unguarded } from '@/data/fetchers'
+import { executeSql } from '@/data/sql/execute-sql-mutation'
+import type { StudioError } from '@/lib/errors/studio-errors'
 import { UseCustomQueryOptions } from '@/types'
 
 type TableEditorArgs = {
@@ -28,8 +30,11 @@ export async function getTableEditor(
     {
       projectRef,
       connectionString,
+      sqlOrigin: 'studio',
+      queryName: 'table-editor',
       sql,
       queryKey: ['table-editor', id],
+      grant: unguarded.migrating,
     },
     signal
   )
@@ -38,7 +43,7 @@ export async function getTableEditor(
 }
 
 export type TableEditorData = Awaited<ReturnType<typeof getTableEditor>>
-export type TableEditorError = ExecuteSqlError
+export type TableEditorError = StudioError
 
 export const useTableEditorQuery = <TData = TableEditorData>(
   { projectRef, connectionString, id }: TableEditorVariables,
@@ -46,8 +51,8 @@ export const useTableEditorQuery = <TData = TableEditorData>(
     enabled = true,
     ...options
   }: UseCustomQueryOptions<TableEditorData, TableEditorError, TData> = {}
-) =>
-  useQuery<TableEditorData, TableEditorError, TData>({
+) => {
+  return useQuery<TableEditorData, TableEditorError, TData>({
     ...tableEditorQueryOptions({ projectRef, connectionString, id }),
     enabled:
       enabled && typeof projectRef !== 'undefined' && typeof id !== 'undefined' && !isNaN(id),
@@ -56,6 +61,7 @@ export const useTableEditorQuery = <TData = TableEditorData>(
     staleTime: 5 * 60 * 1000,
     ...options,
   })
+}
 
 export function prefetchTableEditor(
   client: QueryClient,

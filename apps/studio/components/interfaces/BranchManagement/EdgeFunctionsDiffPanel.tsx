@@ -1,16 +1,16 @@
-import { basename } from 'path'
 import { IS_PLATFORM } from 'common'
-import { Circle, Code, Minus, Plus, Wind } from 'lucide-react'
+import { CircleIcon, CodeIcon, MinusIcon, PlusIcon, WindIcon } from 'lucide-react'
 import Link from 'next/link'
 import { useEffect, useMemo, useState } from 'react'
 import { Card, CardContent, CardHeader, CardTitle, cn, Skeleton } from 'ui'
 
 import { DiffEditor } from '@/components/ui/DiffEditor'
 import type { EdgeFunctionBodyData } from '@/data/edge-functions/edge-function-body-query'
-import type {
-  EdgeFunctionsDiffResult,
-  FileInfo,
-  FileStatus,
+import {
+  fileKey,
+  type EdgeFunctionsDiffResult,
+  type FileInfo,
+  type FileStatus,
 } from '@/hooks/branches/useEdgeFunctionsDiff'
 import { EMPTY_ARR } from '@/lib/void'
 
@@ -31,14 +31,11 @@ interface FunctionDiffProps {
   fileInfos: FileInfo[]
 }
 
-// Helper to canonicalize file identifiers to prevent mismatch due to differing root paths
-const fileKey = (fullPath: string) => basename(fullPath)
-
 // Helper to get the status color for file indicators
 const getStatusColor = (status: FileStatus): string => {
   switch (status) {
     case 'added':
-      return 'text-brand'
+      return 'text-primary'
     case 'removed':
       return 'text-destructive'
     case 'modified':
@@ -54,15 +51,15 @@ const getStatusColor = (status: FileStatus): string => {
 const getStatusIcon = (status: FileStatus) => {
   switch (status) {
     case 'added':
-      return Plus
+      return PlusIcon
     case 'removed':
-      return Minus
+      return MinusIcon
     case 'modified':
-      return Circle
+      return CircleIcon
     case 'unchanged':
-      return Circle
+      return CircleIcon
     default:
-      return Circle
+      return CircleIcon
   }
 }
 
@@ -115,7 +112,7 @@ const FunctionDiff = ({
             href={`/project/${currentBranchRef}/functions/${functionSlug}${IS_PLATFORM ? '' : '/details'}`}
             className="flex items-center gap-2"
           >
-            <Code strokeWidth={1.5} size={16} className="text-foreground-muted" />
+            <CodeIcon strokeWidth={1.5} size={16} className="text-foreground-muted" />
             {functionSlug}
           </Link>
         </CardTitle>
@@ -131,6 +128,7 @@ const FunctionDiff = ({
                   <li key={fileInfo.key} className="flex">
                     <button
                       type="button"
+                      tabIndex={0}
                       onClick={() => setActiveFileKey(fileInfo.key)}
                       className={cn(
                         'flex-1 text-left text-xs px-4 py-2 flex items-center gap-2',
@@ -178,7 +176,7 @@ export const EdgeFunctionsDiffPanel = ({
   if (noChanges) {
     return (
       <div className="p-6 text-center">
-        <Wind size={32} strokeWidth={1.5} className="text-foreground-muted mx-auto mb-8" />
+        <WindIcon size={32} strokeWidth={1.5} className="text-foreground-muted mx-auto mb-8" />
         <h3 className="mb-1">No changes detected between branches</h3>
         <p className="text-sm text-foreground-light">
           Any changes to your edge functions will be shown here for review

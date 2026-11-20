@@ -1,22 +1,27 @@
-import pgMeta from '@supabase/pg-meta'
+import pgMeta, { asWriteSql } from '@supabase/pg-meta'
+import type { PGFunctionUpdate } from '@supabase/pg-meta/src/pg-meta-functions'
 import { useMutation, useQueryClient } from '@tanstack/react-query'
 import { toast } from 'sonner'
 import { z } from 'zod'
 
-import type { DatabaseFunction } from './database-functions-query'
+import type { SavedDatabaseFunction } from './database-functions-query'
 import { databaseKeys } from '@/data/database/keys'
-import { executeSql } from '@/data/sql/execute-sql-query'
-import type { ResponseError, UseCustomMutationOptions } from '@/types'
+import { isUserFaultForSql } from '@/data/error-classification'
+import { executeSql, type PgMetaWriteGrant } from '@/data/sql/execute-sql-mutation'
+import type { StudioError } from '@/lib/errors/studio-errors'
+import type { UseCustomMutationOptions } from '@/types'
 
 export type DatabaseFunctionUpdateVariables = {
   projectRef: string
+  grant: PgMetaWriteGrant
   connectionString?: string | null
-  func: DatabaseFunction
-  payload: z.infer<typeof pgMeta.functions.pgFunctionCreateZod>
+  func: SavedDatabaseFunction
+  payload: PGFunctionUpdate
 }
 
 export async function updateDatabaseFunction({
   projectRef,
+  grant,
   connectionString,
   func,
   payload,
@@ -26,8 +31,13 @@ export async function updateDatabaseFunction({
   const { result } = await executeSql({
     projectRef,
     connectionString,
-    sql,
+    sql: asWriteSql(sql),
+    // Studio composes the statement, but the user wrote the expressions and bodies Postgres parses
+    sqlOrigin: 'studio',
+    queryName: 'database-function-update',
+    isUserFaultSqlState: isUserFaultForSql,
     queryKey: ['functions', 'update', func.id.toString()],
+    grant,
   })
 
   return result as z.infer<typeof zod>
@@ -42,14 +52,14 @@ export const useDatabaseFunctionUpdateMutation = ({
 }: Omit<
   UseCustomMutationOptions<
     DatabaseFunctionUpdateData,
-    ResponseError,
+    StudioError,
     DatabaseFunctionUpdateVariables
   >,
   'mutationFn'
 > = {}) => {
   const queryClient = useQueryClient()
 
-  return useMutation<DatabaseFunctionUpdateData, ResponseError, DatabaseFunctionUpdateVariables>({
+  return useMutation<DatabaseFunctionUpdateData, StudioError, DatabaseFunctionUpdateVariables>({
     mutationFn: (vars) => updateDatabaseFunction(vars),
     async onSuccess(data, variables, context) {
       const { projectRef } = variables

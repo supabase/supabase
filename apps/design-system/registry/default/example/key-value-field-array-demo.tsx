@@ -64,7 +64,7 @@ export default function KeyValueFieldArrayDemo() {
         </FormItemLayout>
 
         <div className="mt-4">
-          <Button size="tiny" type="primary" htmlType="submit">
+          <Button size="tiny" variant="primary" type="submit">
             Submit
           </Button>
         </div>

@@ -21,6 +21,7 @@ const pgTypeZod = z.object({
 })
 
 const pgTypeArrayZod = z.array(pgTypeZod)
+export type PGType = z.infer<typeof pgTypeZod>
 
 function list({
   includeArrayTypes = false,
@@ -56,6 +57,7 @@ function list({
   if (filter) {
     sql = safeSql`${sql} and n.nspname ${filter}`
   }
+  sql = safeSql`${sql} order by t.oid`
   if (limit) {
     sql = safeSql`${sql} limit ${literal(limit)}`
   }
@@ -68,7 +70,4 @@ function list({
   }
 }
 
-export default {
-  list,
-  zod: pgTypeZod,
-}
+export { list }

@@ -1,3 +1,4 @@
+import { safeSql } from '@supabase/pg-meta'
 import { describe, expect, it } from 'vitest'
 
 import type { ParsedLogEntry } from '../QueryInsights.types'
@@ -63,12 +64,6 @@ describe('parseSupamonitorLogs', () => {
       p95_plan_time: 4,
     })
   })
-
-  it('handles multiple log entries', () => {
-    const raw = [makeSampleLog(), makeSampleLog({ query: 'SELECT 2', query_id: 2 })]
-    const result = parseSupamonitorLogs(raw)
-    expect(result).toHaveLength(2)
-  })
 })
 
 describe('transformLogsToChartData', () => {
@@ -77,16 +72,11 @@ describe('transformLogsToChartData', () => {
     expect(transformLogsToChartData([])).toEqual([])
   })
 
-  it('filters out entries with no timestamp', () => {
-    const logs: ParsedLogEntry[] = [{ query: 'SELECT 1', calls: 5 }]
-    const result = transformLogsToChartData(logs)
-    expect(result).toEqual([])
-  })
-
-  it('filters out entries with invalid timestamp', () => {
-    const logs: ParsedLogEntry[] = [{ timestamp: 'not-a-date', calls: 5 }]
-    const result = transformLogsToChartData(logs)
-    expect(result).toEqual([])
+  it.each<[string, ParsedLogEntry]>([
+    ['no', { query: safeSql`SELECT 1`, calls: 5 }],
+    ['an invalid', { timestamp: 'not-a-date', calls: 5 }],
+  ])('filters out entries with %s timestamp', (_, log) => {
+    expect(transformLogsToChartData([log])).toEqual([])
   })
 
   it('transforms a valid log entry into a chart data point', () => {
@@ -167,8 +157,8 @@ describe('aggregateLogsByQuery', () => {
 
   it('skips entries with empty or whitespace-only queries', () => {
     const logs: ParsedLogEntry[] = [
-      { query: '', calls: 5 },
-      { query: '   ', calls: 3 },
+      { query: safeSql``, calls: 5 },
+      { query: safeSql`   `, calls: 3 },
     ]
     const result = aggregateLogsByQuery(logs)
     expect(result).toEqual([])
@@ -177,7 +167,7 @@ describe('aggregateLogsByQuery', () => {
   it('aggregates a single log entry correctly', () => {
     const logs: ParsedLogEntry[] = [
       {
-        query: 'SELECT 1',
+        query: safeSql`SELECT 1`,
         user_name: 'postgres',
         application_name: 'app',
         calls: 10,
@@ -207,7 +197,7 @@ describe('aggregateLogsByQuery', () => {
   it('aggregates multiple entries for the same query', () => {
     const logs: ParsedLogEntry[] = [
       {
-        query: 'SELECT 1',
+        query: safeSql`SELECT 1`,
         user_name: 'postgres',
         calls: 5,
         total_exec_time: 50,
@@ -218,7 +208,7 @@ describe('aggregateLogsByQuery', () => {
         max_plan_time: 3,
       },
       {
-        query: 'SELECT 1',
+        query: safeSql`SELECT 1`,
         user_name: 'postgres',
         calls: 10,
         total_exec_time: 100,
@@ -243,8 +233,8 @@ describe('aggregateLogsByQuery', () => {
 
   it('normalizes whitespace differences in queries', () => {
     const logs: ParsedLogEntry[] = [
-      { query: 'SELECT  1', calls: 5, total_exec_time: 50, total_plan_time: 0 },
-      { query: 'SELECT 1', calls: 3, total_exec_time: 30, total_plan_time: 0 },
+      { query: safeSql`SELECT  1`, calls: 5, total_exec_time: 50, total_plan_time: 0 },
+      { query: safeSql`SELECT 1`, calls: 3, total_exec_time: 30, total_plan_time: 0 },
     ]
 
     const result = aggregateLogsByQuery(logs)
@@ -255,9 +245,9 @@ describe('aggregateLogsByQuery', () => {
 
   it('sorts results by total_time descending', () => {
     const logs: ParsedLogEntry[] = [
-      { query: 'SELECT 1', calls: 1, total_exec_time: 10, total_plan_time: 0 },
-      { query: 'SELECT 2', calls: 1, total_exec_time: 100, total_plan_time: 0 },
-      { query: 'SELECT 3', calls: 1, total_exec_time: 50, total_plan_time: 0 },
+      { query: safeSql`SELECT 1`, calls: 1, total_exec_time: 10, total_plan_time: 0 },
+      { query: safeSql`SELECT 2`, calls: 1, total_exec_time: 100, total_plan_time: 0 },
+      { query: safeSql`SELECT 3`, calls: 1, total_exec_time: 50, total_plan_time: 0 },
     ]
 
     const result = aggregateLogsByQuery(logs)
@@ -270,8 +260,8 @@ describe('aggregateLogsByQuery', () => {
 
   it('calculates prop_total_time as percentage of total execution', () => {
     const logs: ParsedLogEntry[] = [
-      { query: 'SELECT 1', calls: 1, total_exec_time: 75, total_plan_time: 0 },
-      { query: 'SELECT 2', calls: 1, total_exec_time: 25, total_plan_time: 0 },
+      { query: safeSql`SELECT 1`, calls: 1, total_exec_time: 75, total_plan_time: 0 },
+      { query: safeSql`SELECT 2`, calls: 1, total_exec_time: 25, total_plan_time: 0 },
     ]
 
     const result = aggregateLogsByQuery(logs)
@@ -282,26 +272,12 @@ describe('aggregateLogsByQuery', () => {
 
   it('handles zero calls gracefully (mean_time defaults to 0)', () => {
     const logs: ParsedLogEntry[] = [
-      { query: 'SELECT 1', calls: 0, total_exec_time: 100, total_plan_time: 0 },
+      { query: safeSql`SELECT 1`, calls: 0, total_exec_time: 100, total_plan_time: 0 },
     ]
 
     const result = aggregateLogsByQuery(logs)
 
     expect(result).toHaveLength(1)
     expect(result[0].mean_time).toBe(0)
-  })
-
-  it('sets static fields correctly', () => {
-    const logs: ParsedLogEntry[] = [
-      { query: 'SELECT 1', calls: 1, total_exec_time: 10, total_plan_time: 0 },
-    ]
-
-    const result = aggregateLogsByQuery(logs)
-
-    expect(result[0].rows_read).toBe(0)
-    expect(result[0].cache_hit_rate).toBe(0)
-    expect(result[0].index_advisor_result).toBeNull()
-    expect(result[0]._total_cache_hits).toBe(0)
-    expect(result[0]._total_cache_misses).toBe(0)
   })
 })

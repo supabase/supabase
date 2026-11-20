@@ -1,10 +1,12 @@
-import { getScheduleDeleteCronJobRunDetailsSql } from '@supabase/pg-meta'
-import { useMutation } from '@tanstack/react-query'
+import { CRON_CLEANUP_JOB_NAME, getScheduleDeleteCronJobRunDetailsSql } from '@supabase/pg-meta'
+import { useMutation, useQueryClient } from '@tanstack/react-query'
 import { toast } from 'sonner'
 
-import { getScheduleDeleteCronJobRunDetailsKey } from './keys'
-import { executeSql } from '@/data/sql/execute-sql-query'
-import type { ResponseError, UseCustomMutationOptions } from '@/types'
+import { databaseCronJobsKeys, getScheduleDeleteCronJobRunDetailsKey } from './keys'
+import { unguarded } from '@/data/fetchers'
+import { executeSql } from '@/data/sql/execute-sql-mutation'
+import type { StudioError } from '@/lib/errors/studio-errors'
+import type { UseCustomMutationOptions } from '@/types'
 
 export type ScheduleCronJobRunDetailsCleanupVariables = {
   projectRef: string
@@ -20,8 +22,11 @@ export async function scheduleCronJobRunDetailsCleanup({
   const { result } = await executeSql({
     projectRef,
     connectionString,
+    sqlOrigin: 'studio',
+    queryName: 'schedule-clean-up',
     sql: getScheduleDeleteCronJobRunDetailsSql(interval),
     queryKey: getScheduleDeleteCronJobRunDetailsKey(projectRef, interval),
+    grant: unguarded.migrating,
   })
 
   return result
@@ -38,18 +43,32 @@ export const useScheduleCronJobRunDetailsCleanupMutation = ({
 }: Omit<
   UseCustomMutationOptions<
     ScheduleCronJobRunDetailsCleanupData,
-    ResponseError,
+    StudioError,
     ScheduleCronJobRunDetailsCleanupVariables
   >,
   'mutationFn'
 > = {}) => {
+  const queryClient = useQueryClient()
+
   return useMutation<
     ScheduleCronJobRunDetailsCleanupData,
-    ResponseError,
+    StudioError,
     ScheduleCronJobRunDetailsCleanupVariables
   >({
     mutationFn: (vars) => scheduleCronJobRunDetailsCleanup(vars),
     async onSuccess(data, variables, context) {
+      // Deliberately narrower than the jobs() prefix: invalidating the jobs list here would
+      // refetch it while it sits in the cost-threshold error state, which briefly resets it
+      // to pending and unmounts the overflow notice (closing its dialog mid-flow). Both
+      // callers refetch their own grid via callbacks instead.
+      await Promise.all([
+        queryClient.invalidateQueries({
+          queryKey: databaseCronJobsKeys.job(variables.projectRef, CRON_CLEANUP_JOB_NAME),
+        }),
+        queryClient.invalidateQueries({
+          queryKey: databaseCronJobsKeys.count(variables.projectRef),
+        }),
+      ])
       await onSuccess?.(data, variables, context)
     },
     async onError(data, variables, context) {
