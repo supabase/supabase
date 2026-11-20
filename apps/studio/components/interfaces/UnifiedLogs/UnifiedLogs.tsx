@@ -14,6 +14,7 @@ import {
 } from '@tanstack/react-table'
 import { IS_PLATFORM, LOCAL_STORAGE_KEYS, useFeatureFlags, useFlag, useParams } from 'common'
 import {
+  ChevronRightIcon,
   Layers2Icon,
   Loader2Icon,
   PanelLeftCloseIcon,
@@ -680,6 +681,47 @@ export const UnifiedLogs = ({
     return `Saved views · ${activeView.name}`
   }
 
+  const savedViewsEntry = showSavedViews ? (
+    <button
+      type="button"
+      onClick={handleOpenViewsSection}
+      aria-label={getSavedViewsTooltip()}
+      className="group flex w-full items-center gap-2 rounded-md px-2 py-1.5 text-left hover:bg-surface-200 focus-ring"
+    >
+      <Layers2Icon
+        size={14}
+        className={cn('shrink-0', activeView ? savedViewsIconClassName : 'text-foreground-light')}
+      />
+      <span className="min-w-0 flex-1">
+        <span
+          className={cn(
+            'block truncate text-sm',
+            activeView ? savedViewsIconClassName : 'text-foreground-light'
+          )}
+        >
+          Saved views
+        </span>
+        {activeView ? (
+          <span
+            className={cn(
+              'block truncate text-xs opacity-70',
+              isActiveViewModified ? 'text-warning' : 'text-brand-600'
+            )}
+            title={activeView.name}
+          >
+            {activeView.name}
+            {isActiveViewModified ? ' (modified)' : ''}
+          </span>
+        ) : (
+          <span className="block truncate text-xs text-foreground-lighter opacity-70">
+            None active
+          </span>
+        )}
+      </span>
+      <ChevronRightIcon size={14} className="shrink-0 text-foreground-muted" />
+    </button>
+  ) : undefined
+
   const saveViewAction = canCreateView ? (
     <ButtonTooltip
       size="tiny"
@@ -767,24 +809,7 @@ export const UnifiedLogs = ({
                   dateRangeDisabled={{ after: new Date() }}
                   onReset={handleClearActiveView}
                   onExitSection={() => setIsViewsSectionOpen(false)}
-                  headerAction={
-                    showSavedViews ? (
-                      <ButtonTooltip
-                        size="tiny"
-                        variant="outline"
-                        className="size-7 shrink-0 px-0"
-                        icon={<Layers2Icon className={savedViewsIconClassName} />}
-                        aria-label="Saved views"
-                        tooltip={{
-                          content: {
-                            side: 'bottom',
-                            text: getSavedViewsTooltip(),
-                          },
-                        }}
-                        onClick={handleOpenViewsSection}
-                      />
-                    ) : undefined
-                  }
+                  savedViewsEntry={savedViewsEntry}
                   section={
                     showSavedViews && isViewsSectionOpen
                       ? { label: 'Views', action: saveViewAction, content: sidebarViewsPanel }

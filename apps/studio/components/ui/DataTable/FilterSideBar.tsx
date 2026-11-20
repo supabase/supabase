@@ -30,8 +30,8 @@ interface FilterSideBarProps {
   dateRangeDisabled?: DateRangeDisabled
   /** When set, the panel swaps the filters out for this section's content. */
   section?: FilterSideBarSection
-  /** Header action at the top level, e.g. an entry into `section`. */
-  headerAction?: ReactNode
+  /** Rendered above the filter controls, e.g. an entry into `section`. */
+  savedViewsEntry?: ReactNode
   /** Called alongside the built-in filter reset, for filter state the caller owns. */
   onReset?: () => void
   onExitSection?: () => void
@@ -42,7 +42,7 @@ export function FilterSideBar({
   setIsFilterBarOpen,
   dateRangeDisabled,
   section,
-  headerAction,
+  savedViewsEntry,
   onReset,
   onExitSection,
 }: FilterSideBarProps) {
@@ -107,7 +107,6 @@ export function FilterSideBar({
                     }}
                   />
                 ) : null}
-                {headerAction}
               </div>
             </>
           )}
@@ -139,6 +138,7 @@ export function FilterSideBar({
               <UnifiedLogsBanner />
 
               <div className="flex min-h-0 flex-1 flex-col gap-3 overflow-y-auto p-3">
+                {savedViewsEntry}
                 <DataTableFilterControls
                   dateRangeDisabled={dateRangeDisabled}
                   itemsAfter={{ level: <UserLogFilterControl /> }}
