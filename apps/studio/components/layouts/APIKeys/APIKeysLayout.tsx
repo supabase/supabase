@@ -28,9 +28,7 @@ const ApiKeysLayout = ({ children }: PropsWithChildren) => {
           </PageHeaderAside>
         </PageHeaderMeta>
       </PageHeader>
-      <PageContainer className="flex flex-col py-8 pb-16 gap-8">
-        {children}
-      </PageContainer>
+      <PageContainer className="flex flex-col py-8 pb-16 gap-8">{children}</PageContainer>
     </>
   )
 }
