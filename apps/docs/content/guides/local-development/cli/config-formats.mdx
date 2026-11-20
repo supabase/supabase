@@ -65,7 +65,7 @@ If `supabase/config.toml` exists next to the JSON file, the command refuses, bec
 
 `--dry-run` and the printed undo command work the same way as for the conversion to JSONC. After you check the result, delete the backup so it isn't committed.
 
-In an interactive terminal, the command asks what made you switch back to TOML. Answering is optional, and the answer is sent as [telemetry](/docs/guides/local-development/cli/getting-started#telemetry) unless you've opted out. To answer from a script, pass `--reason`, such as `--reason editor`.
+In an interactive terminal, the command asks what made you switch back to TOML, unless you've opted out of [telemetry](/docs/guides/local-development/cli/getting-started#telemetry). Answering is optional, and the answer is sent as telemetry. To answer from a script, pass `--reason`, such as `--reason editor`.
 
 ## Validate your config
 
