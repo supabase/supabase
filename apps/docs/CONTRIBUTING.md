@@ -102,7 +102,7 @@ Add an entry with the `name`, `url`, and optional `icon` for your page.
 Reference docs are produced from the reference specs and library source code. A common spec file contains shared function and endpoint definitions, and library-specific spec files contain further details.
 
 JavaScript v2 reference docs use the TypeDoc pipeline described in the [reference pipeline README](./spec/reference/README.md).
-To update JavaScript v2 reference content, edit source comments in the relevant SDK repository when changing function parameters or return values, or edit the tracked `config.json` and partials under `apps/docs/spec/reference/javascript/v2/` when changing docs-specific content.
+To change function parameters or return values in the JavaScript v2 reference, edit the source comments in the relevant SDK repository. To change docs-specific content, edit the tracked `config.json` and partials under `apps/docs/spec/reference/javascript/v2/`.
 The TypeDoc JSON files and generated `content/reference/` output are build artifacts, so do not edit them directly.
 
 ### Common spec file
