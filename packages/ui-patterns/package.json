@@ -567,6 +567,10 @@
       "import": "./src/MetricCard/index.tsx",
       "types": "./src/MetricCard/index.tsx"
     },
+    "./MobileNav/MobileNavAccountActions": {
+      "import": "./src/MobileNav/MobileNavAccountActions.tsx",
+      "types": "./src/MobileNav/MobileNavAccountActions.tsx"
+    },
     "./MobileNav/MobileNavDrawer": {
       "import": "./src/MobileNav/MobileNavDrawer.tsx",
       "types": "./src/MobileNav/MobileNavDrawer.tsx"
@@ -677,6 +681,10 @@
     "./ShimmeringLoader": {
       "import": "./src/ShimmeringLoader/index.tsx",
       "types": "./src/ShimmeringLoader/index.tsx"
+    },
+    "./SignedInSwitch/SignedInSwitch": {
+      "import": "./src/SignedInSwitch/SignedInSwitch.tsx",
+      "types": "./src/SignedInSwitch/SignedInSwitch.tsx"
     },
     "./SimpleCodeBlock/SimpleCodeBlock": {
       "import": "./src/SimpleCodeBlock/SimpleCodeBlock.tsx",
