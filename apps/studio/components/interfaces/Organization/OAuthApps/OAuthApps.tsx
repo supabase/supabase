@@ -1,9 +1,10 @@
-import { useFeatureFlags, useFlag } from 'common'
+import { useFeatureFlags, useFlag, useParams } from 'common'
 import { PageContainer } from 'ui-patterns/PageContainer'
 
 import { AuthorizedApps } from './AuthorizedApps'
 import { OAuthAppsAuthorizedList } from './OAuthAppsAuthorizedList'
 import { PublishableApps } from './PublishableApps'
+import { IS_STAGING_OR_LOCAL } from '@/lib/constants'
 
 // [Joshen] Note on nav UX
 // Kang Ming mentioned that it might be better to split Published Apps and Authorized Apps into 2 separate tabs
@@ -13,11 +14,17 @@ import { PublishableApps } from './PublishableApps'
 export const OAuthApps = () => {
   const isScopedOAuthManageEnabled = useFlag('enableScopedOAuthManage')
   const { hasLoaded } = useFeatureFlags()
+  const { mock_scenario } = useParams()
+  const showsDatabaseAccessPreview =
+    (import.meta.env.DEV || IS_STAGING_OR_LOCAL) &&
+    mock_scenario === 'trusted_partner_authorized_apps'
   return (
     <>
       <PageContainer size="default" className="pb-16">
         <PublishableApps />
-        {hasLoaded ? (
+        {showsDatabaseAccessPreview ? (
+          <OAuthAppsAuthorizedList isPreview />
+        ) : hasLoaded ? (
           isScopedOAuthManageEnabled ? (
             <OAuthAppsAuthorizedList />
           ) : (
