@@ -9,6 +9,7 @@ import { Suspense, useCallback, useState } from 'react'
 import type PostTypes from 'types/post'
 
 import SectionContainerWithCn from '../../components/Layouts/SectionContainerWithCn'
+import { buildBlogPostsParams } from './blog-params'
 import SectionContainer from '@/components/Layouts/SectionContainer'
 
 const POSTS_PER_PAGE = 25
@@ -76,14 +77,12 @@ export default function BlogClient({ initialBlogs, totalPosts, initialView }: Bl
     async (offset: number, limit: number) => {
       // The hero posts stay in the loaded array (just rendered in the layout
       // hero, sliced off at render), so `offset` already counts them — no skip.
-      const params = new URLSearchParams({
-        offset: offset.toString(),
-        limit: limit.toString(),
+      const params = buildBlogPostsParams({
+        offset,
+        limit,
+        category: filterParams.category,
+        search: filterParams.search,
       })
-
-      if (filterParams.search) {
-        params.set('q', filterParams.search)
-      }
 
       const response = await fetch(`/api-v2/blog-posts?${params}`)
       const data = await response.json()
@@ -122,17 +121,12 @@ export default function BlogClient({ initialBlogs, totalPosts, initialView }: Bl
     setFilterParams({ category, search })
 
     try {
-      const params = new URLSearchParams({
-        offset: '0',
-        limit: POSTS_PER_PAGE.toString(),
+      const params = buildBlogPostsParams({
+        offset: 0,
+        limit: POSTS_PER_PAGE,
+        category,
+        search,
       })
-
-      if (category && category !== 'all') {
-        params.set('category', category)
-      }
-      if (search) {
-        params.set('q', search)
-      }
 
       const response = await fetch(`/api-v2/blog-posts?${params}`)
       const data = await response.json()
