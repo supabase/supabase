@@ -15,7 +15,7 @@ Supabase Storage uses the same role-based access control system as any other Sup
 Create a custom role `manager` to provide full read access to a specific bucket. For a more advanced setup, see the [RBAC Guide](/docs/guides/api/custom-claims-and-role-based-access-control-rbac#create-auth-hook-to-apply-user-role).
 
 ```sql
-create role 'manager';
+create role manager;
 
 -- Important to grant the role to the authenticator and anon role
 grant manager to authenticator;
