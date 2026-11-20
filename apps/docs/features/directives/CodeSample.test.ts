@@ -1,10 +1,15 @@
+import { readFileSync } from 'node:fs'
+import { join } from 'node:path'
 import { afterAll, beforeAll, describe, expect, it, vi } from 'vitest'
 
 import { stripIndent } from 'common-tags'
+import type { Code } from 'mdast'
 import { fromMarkdown } from 'mdast-util-from-markdown'
 import { mdxFromMarkdown, mdxToMarkdown } from 'mdast-util-mdx'
 import { toMarkdown } from 'mdast-util-to-markdown'
 import { mdxjs } from 'micromark-extension-mdxjs'
+import ts from 'typescript'
+import { visit } from 'unist-util-visit'
 
 import { _createElidedLine, codeSampleRemark } from './CodeSample'
 
@@ -732,6 +737,69 @@ Some more text.
 
       expect(containsStringIgnoringLeadingWhitespace(output, expected)).toBe(true)
     })
+  })
+
+  it('should throw on out-of-bounds line ranges', async () => {
+    const cases = [
+      '<$CodeSample path="/_internal/fixtures/javascript.js" lines={[[1, 999]]} />',
+      '<$CodeSample path="/_internal/fixtures/javascript.js" lines={[[0, 2]]} />',
+      '<$CodeSample path="/_internal/fixtures/javascript.js" lines={[[5, 3]]} />',
+      '<$CodeSample path="/_internal/fixtures/javascript.js" lines={[[999, -1]]} />',
+    ]
+
+    for (const markdown of cases) {
+      const mdast = fromMarkdown(markdown, {
+        mdastExtensions: [mdxFromMarkdown()],
+        extensions: [mdxjs()],
+      })
+      await expect(transformWithMock(mdast)).rejects.toThrow(/Invalid \$CodeSample line range/)
+    }
+  })
+
+  it('should produce syntactically valid TypeScript snippets for with-nextjs tutorial', async () => {
+    const raw = readFileSync(
+      join(process.cwd(), 'content/guides/getting-started/tutorials/with-nextjs.mdx'),
+      'utf8'
+    )
+    const markdown = raw.replace(/^---[\s\S]*?---\n/, '')
+    const mdast = fromMarkdown(markdown, {
+      mdastExtensions: [mdxFromMarkdown()],
+      extensions: [mdxjs()],
+    })
+    const transformed = await transformWithMock(mdast)
+
+    const tsCodeNodes: Code[] = []
+    visit(transformed, 'code', (node) => {
+      if (node.lang === 'typescript' || node.lang === 'tsx') {
+        tsCodeNodes.push(node)
+      }
+    })
+
+    expect(tsCodeNodes.length).toBeGreaterThanOrEqual(10)
+
+    for (const node of tsCodeNodes) {
+      const result = ts.transpileModule(node.value, {
+        fileName: node.lang === 'tsx' ? 'sample.tsx' : 'sample.ts',
+        reportDiagnostics: true,
+        compilerOptions: {
+          jsx: ts.JsxEmit.ReactJSX,
+          target: ts.ScriptTarget.ESNext,
+          module: ts.ModuleKind.ESNext,
+        },
+      })
+      expect(result.diagnostics ?? [], `Snippet ${node.meta ?? '(no meta)'}`).toEqual([])
+    }
+
+    const firstAccountForm = tsCodeNodes.find(
+      (node) => node.meta === 'name=app/account/account-form.tsx'
+    )
+    expect(firstAccountForm).toBeDefined()
+    expect(firstAccountForm!.value).toContain(
+      "import { type JwtPayload } from '@supabase/supabase-js'"
+    )
+    expect(firstAccountForm!.value).toContain('claims: JwtPayload | null')
+    expect(firstAccountForm!.value).not.toContain("from './avatar'")
+    expect(firstAccountForm!.value).toContain("alert('Profile updated!')")
   })
 })
 
