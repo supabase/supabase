@@ -185,7 +185,7 @@ export const ChartBar = ({
     >
       <ChartContainer
         className={cn(
-          'w-full! [&_.recharts-surface]:focus-inset',
+          'w-full! [&_.recharts-surface:focus-visible]:focus-inset',
           hasDateRangeFooter ? 'h-[calc(100%-28px)]' : 'h-full'
         )}
         config={chartConfig}
