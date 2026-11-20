@@ -408,7 +408,7 @@ export const OAuthAppsAuthorizeScreen = ({
       description={
         preflightData?.existing_grant ? (
           <>
-            You already authorized this app for this organization on{' '}
+            You authorized this app on{' '}
             <span className="inline-block whitespace-nowrap">
               <TimestampInfo
                 className="text-sm inline-block"
@@ -417,7 +417,7 @@ export const OAuthAppsAuthorizeScreen = ({
               />
               .
             </span>{' '}
-            It's now asking for different access.
+            It’s now requesting different permissions.
           </>
         ) : (
           'This application wants to access your Supabase Account'
