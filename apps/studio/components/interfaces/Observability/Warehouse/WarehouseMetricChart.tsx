@@ -17,13 +17,15 @@ export const WarehouseMetricChart = ({
   description,
   unit,
   scale = 1,
+  emptyMessage,
   series: inputSeries = [{ metric, label: title }],
 }: {
   metric?: WarehouseMetric
   title: string
   description: string
-  unit?: string
+  unit?: 'ms' | '/s'
   scale?: number
+  emptyMessage?: string
   series?: WarehouseChartSeries[]
 }) => {
   const allSeries = expandWarehouseChartSeries(inputSeries)
@@ -93,7 +95,11 @@ export const WarehouseMetricChart = ({
               attribute={title}
               size="normal"
               hideTotalPlaceholder
-              message={getEmptyMessage(metric)}
+              message={
+                metric?.availability === 'no_data' && emptyMessage
+                  ? emptyMessage
+                  : getEmptyMessage(metric)
+              }
             />
           )}
           {allSeries.length > series.length && (

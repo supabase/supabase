@@ -18,7 +18,7 @@ const WORKER_METRICS: WarehouseMetricName[] = [
   'rpc_duration_p95',
 ]
 
-const MILLISECOND_CHART_PROPS = { unit: 'ms', scale: 1000 }
+const MILLISECOND_CHART_PROPS = { unit: 'ms', scale: 1000 } as const
 
 const getWorkerStatus = (status: 'pending' | 'error' | 'success') => {
   switch (status) {

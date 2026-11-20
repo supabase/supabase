@@ -43,7 +43,7 @@ import { useShortcut } from '@/state/shortcuts/useShortcut'
 const WAREHOUSE_METRICS: {
   metric: WarehouseMetricName
   title: string
-  unit: string
+  unit?: '/s' | 'ms'
   description: string
 }[] = [
   {
@@ -55,7 +55,7 @@ const WAREHOUSE_METRICS: {
   {
     metric: 'query_in_flight',
     title: 'Queries in progress',
-    unit: '',
+    unit: undefined,
     description: 'Queries awaiting completion, including worker waits and result streaming.',
   },
   {
