@@ -66,6 +66,8 @@ Alternatively, visit this page to initiate a download: `https://alt.supabase.io/
 
 Click on the _Upload metadata file_ option in the toolbar and select the file you downloaded.
 
+Note: The metadata file is the same for every Supabase organization, so each organization currently gets the same SP Entity ID. Microsoft Entra requires a unique Entity ID for each Enterprise Application, so you can’t register a second Supabase organization as another Enterprise Application in the same Entra tenant. Support for unique SP Entity IDs per organization is not yet available.
+
 ![Azure AD console: Supabase application, SAML-based Sign-on screen, selected Upload metadata file button](/docs/img/sso-azure-step-06-1.png)
 
 All of the correct information should automatically populate the _Basic SAML Configuration_ screen as shown.
@@ -113,6 +115,8 @@ We do not permit use of public domains like `gmail.com`, `yahoo.com`.
 <Admonition type="note">
 
 You can configure each SSO provider with different email domains. For multi-environment setups (Dev/Staging/Prod), we recommend using IdP-initiated flow with multiple SAML apps under the same domain rather than domain-based routing. For more details, see the [Multiple SSO Providers guide](/docs/guides/platform/sso/multiple-providers).
+
+This applies to identity providers that allow the same Entity ID across apps. With Microsoft Entra, multiple Supabase Enterprise Applications in the same tenant are currently not supported, because all organizations share one SP Entity ID.
 
 </Admonition>
 
