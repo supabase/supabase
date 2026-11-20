@@ -3372,6 +3372,22 @@ export const integrations: NavMenuConstant = {
               name: 'OAuth scopes',
               url: '/guides/integrations/build-a-supabase-oauth-integration/oauth-scopes',
             },
+            {
+              name: 'Scoped access',
+              url: '/guides/integrations/build-a-supabase-oauth-integration/scoped-access',
+            },
+            {
+              name: 'Update your app',
+              url: '/guides/integrations/build-a-supabase-oauth-integration/update-for-scoped-access',
+            },
+            {
+              name: 'Test on staging',
+              url: '/guides/integrations/build-a-supabase-oauth-integration/test-scoped-access',
+            },
+            {
+              name: 'Manage app access',
+              url: '/guides/integrations/build-a-supabase-oauth-integration/manage-oauth-app-access',
+            },
           ],
         },
         {

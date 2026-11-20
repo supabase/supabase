@@ -1,0 +1,81 @@
+---
+title: 'Scoped access for OAuth apps'
+subtitle: 'Limit an OAuth app to the people and projects that need it'
+description: 'Learn how member permissions and project selection limit what an OAuth app can access, and what changes for the people who authorize your app.'
+---
+
+Two settings on an OAuth app control how much access its tokens carry. You turn them on in your app's settings, and they apply to every person who authorizes the app. They build on the scopes you choose for your app, which limit the Management API endpoints its tokens can call. For how to build an OAuth app, see [Build a Supabase OAuth integration](/docs/guides/integrations/build-a-supabase-oauth-integration).
+
+Without either setting, an Owner or Administrator authorizes your app for the whole organization. The token can reach every project in the organization, including projects created later.
+
+<Admonition type="note">
+
+Scoped access is in private beta. If the settings don't appear on your app, [open a support ticket](/dashboard/support/new) and include your app's client ID to request access.
+
+</Admonition>
+
+## Settings
+
+| Setting                                            | What it changes                                                                                                         |
+| -------------------------------------------------- | ----------------------------------------------------------------------------------------------------------------------- |
+| **Use the permissions of the person who connects** | Any organization member can authorize the app. The token acts as that member and has only the access their role allows. |
+| **Ask for specific projects**                      | The person who authorizes the app chooses all current and future projects, or selects up to 10 specific projects.       |
+
+You can turn on one setting or both.
+
+<Admonition type="caution">
+
+You can't turn off a setting after you save it. Test each setting on a separate staging app before you turn it on for your production app. For the steps, see [Test scoped access on a staging app](/docs/guides/integrations/build-a-supabase-oauth-integration/test-scoped-access).
+
+</Admonition>
+
+## Member permissions
+
+With **Use the permissions of the person who connects** turned on, any organization member can authorize your app. Each member who authorizes it gets their own grant, so one organization can hold several grants for your app.
+
+The token acts as the member who authorized it:
+
+- The token has the access of the member's role at the time of each request. If an administrator changes the member's role, the token's access changes with it.
+- If the member leaves the organization, their grant ends.
+- If the member's role doesn't cover every scope your app requests, the consent screen shows a warning and the member can't approve your app, unless you turn on [partial grants](#partial-grants). Your app doesn't receive a redirect.
+- Organization Owners and Administrators receive an email each time a member authorizes your app.
+
+To see which roles can authorize each scope, see [Request only the scopes you need](/docs/guides/integrations/build-a-supabase-oauth-integration/update-for-scoped-access#request-only-the-scopes-you-need).
+
+Use this setting when the people who use your app day to day aren't organization administrators. Leave it off when your integration must keep working after the person who installed it leaves the organization, such as an integration that runs unattended.
+
+### Partial grants
+
+By default, a member can't approve your app if their role can never grant one of the scopes it requests. For example, a Developer can't grant `projects:write`. With partial grants turned on, the member can approve your app, and the grant leaves out the scopes their role can't grant. The token response lists the scopes the grant includes, so your app can detect what's missing.
+
+Partial grants apply only to apps that use member permissions. Turn them on only if your app handles missing scopes, for example by hiding features the person can't use. You can't turn them on in the dashboard. For how to turn them on, see [Handle scopes missing from the grant](/docs/guides/integrations/build-a-supabase-oauth-integration/update-for-scoped-access#handle-scopes-missing-from-the-grant).
+
+## Project selection
+
+With **Ask for specific projects** turned on, the consent screen asks the person how much project access to give your app. They choose one of two options:
+
+| Option                              | What the grant covers                                                                                                          |
+| ----------------------------------- | ------------------------------------------------------------------------------------------------------------------------------ |
+| **All current and future projects** | Every project in the organization, including projects created later. This matches the access your app has without the setting. |
+| **Specific projects**               | Up to 10 projects the person selects. The grant covers only those projects.                                                    |
+
+The consent screen lists only the projects the person can access. If your app also uses member permissions, the consent screen checks the person's role on each selected project. When their role on a project doesn't cover your app's scopes, the consent screen flags that project, and the person deselects it to continue.
+
+When the person selects specific projects:
+
+- `GET /v1/projects` returns only the selected projects.
+- Requests for any other project return `403 Forbidden`.
+- Requests for a branch use the grant of the branch's parent project.
+- Projects created after the person authorizes your app aren't included. To add one, the person authorizes your app again and selects it.
+
+Turning on this setting means your app can receive either kind of grant, and the person decides which. Your app needs to work with both. If your app creates projects or works across every project in an organization, it keeps working for people who choose **All current and future projects**. For people who choose specific projects, it needs to handle projects outside the grant.
+
+## Grants created before you change a setting
+
+Grants and tokens created before you turn on a setting keep working. The setting applies the next time a person authorizes your app.
+
+## Next steps
+
+- To change your app's code for each setting, see [Update your app for scoped access](/docs/guides/integrations/build-a-supabase-oauth-integration/update-for-scoped-access).
+- To try the settings without affecting production users, see [Test scoped access on a staging app](/docs/guides/integrations/build-a-supabase-oauth-integration/test-scoped-access).
+- To review and revoke the apps authorized in your organization, see [Manage OAuth app access](/docs/guides/integrations/build-a-supabase-oauth-integration/manage-oauth-app-access).
