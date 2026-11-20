@@ -2931,13 +2931,13 @@ functions:
         code: |
           ```python
           response = supabase.auth.admin.oauth.create_client(
-          {
-          "client_name": "My Public Client",
-          "redirect_uris": ["https://example.com/callback"],
-          "client_type": "public"
-          }
-            )
-            ```
+              {
+                  "client_name": "My Public Client",
+                  "redirect_uris": ["https://example.com/callback"],
+                  "client_type": "public"
+              }
+          )
+          ```
 
   - id: auth-js-gotrueadminoauthapi-updateclient
     title: 'admin.oauth.update_client()'
