@@ -35,7 +35,7 @@ export const Footer = ({ className }: FooterProps) => {
           </li>
         ))}
       </ul>
-      <div className="p-6">
+      <div className="px-6 py-5">
         <FooterBottomRow />
       </div>
     </footer>
@@ -48,7 +48,7 @@ export const FooterBottomRow = () => (
       <Link href="https://supabase.com/" className="text-xs text-foreground-lighter">
         &copy; Supabase Inc
       </Link>
-      <span className="text-xs text-foreground-lighter">—</span>
+      <span aria-hidden className="size-1 shrink-0 bg-foreground-muted" />
       <PrivacySettings className="text-left text-xs text-foreground-lighter hover:underline">
         <PrivacySettingsLabel />
       </PrivacySettings>
