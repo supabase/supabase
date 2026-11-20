@@ -31,11 +31,7 @@ export function UnifiedLogsBanner({ className = 'mx-4 mt-4' }: UnifiedLogsBanner
   // Keep the "Go back" banner visible even after dismissal so manually opted-in users can switch back
   if (isDismissed && !(isEnabled && !isDefaultOptIn)) return null
 
-  const cardClassName = cn(
-    'rounded-lg border p-4 space-y-3 text-left',
-    'bg-muted/10 border-border/50',
-    className
-  )
+  const cardClassName = cn('rounded-lg border p-4 space-y-3 text-left', className)
 
   const onSwitchBack = () => {
     disable()
@@ -49,7 +45,7 @@ export function UnifiedLogsBanner({ className = 'mx-4 mt-4' }: UnifiedLogsBanner
 
   if (isEnabled && !isDefaultOptIn) {
     return (
-      <div className={cn('rounded-lg border px-4 py-3', 'bg-muted/10 border-border/50', className)}>
+      <div className={cn('rounded-lg border px-4 py-3', className)}>
         <div className="flex items-center justify-between gap-3">
           <p className="min-w-0 flex-1 truncate text-sm font-medium text-foreground">
             Go back to old logs

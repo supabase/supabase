@@ -78,6 +78,7 @@ export const GLOBAL_MENU_ITEMS: GlobalMenuItems = [
   [
     {
       label: 'Products',
+      icon: 'products',
       menuItems: [
         [
           { label: 'Features' },
@@ -151,6 +152,7 @@ export const GLOBAL_MENU_ITEMS: GlobalMenuItems = [
   [
     {
       label: 'Build',
+      icon: 'build',
       menuItems: [
         [
           {
@@ -194,6 +196,7 @@ export const GLOBAL_MENU_ITEMS: GlobalMenuItems = [
   [
     {
       label: 'Manage',
+      icon: 'manage',
       menuItems: [
         [
           {
@@ -430,6 +433,11 @@ export const gettingstarted: NavMenuConstant = {
         {
           name: 'Flutter',
           url: '/guides/getting-started/quickstarts/flutter',
+        },
+        {
+          name: 'Unity',
+          url: '/guides/getting-started/quickstarts/unity',
+          enabled: sdkCsharpEnabled,
         },
         {
           name: 'Flask (Python)',
@@ -1048,6 +1056,7 @@ export const database: NavMenuConstant = {
     },
     {
       name: 'Working with your database (basics)',
+      shortName: 'Basics',
       url: undefined,
       items: [
         {
@@ -1072,6 +1081,7 @@ export const database: NavMenuConstant = {
     },
     {
       name: 'Working with your database (intermediate)',
+      shortName: 'Intermediate',
       url: undefined,
       items: [
         {
@@ -2489,6 +2499,12 @@ export const ai_tools: NavMenuConstant = {
       url: '/guides/ai-tools/ai-skills' as `/${string}`,
       enabled: agentSkillsEnabled,
     },
+    // agent-only instructions: the html page returns 404, and the .md stays available
+    {
+      name: 'Report documentation problems: instructions for agents',
+      url: '/guides/ai-tools/agent-feedback',
+      enabled: false,
+    },
     {
       name: 'Prompts',
       url: '/guides/ai-tools/ai-prompts' as `/${string}`,
@@ -3125,6 +3141,10 @@ export const self_hosting: NavMenuConstant = {
         { name: 'Configure Auth Hooks', url: '/guides/self-hosting/self-hosted-auth-hooks' },
         { name: 'Configure Passkeys', url: '/guides/self-hosting/self-hosted-passkeys' },
         { name: 'Configure SAML 2.0 SSO', url: '/guides/self-hosting/self-hosted-saml-sso' },
+        {
+          name: 'Configure OAuth 2.1 Server',
+          url: '/guides/self-hosting/self-hosted-oauth-server',
+        },
         {
           name: 'Restore Project from Platform',
           url: '/guides/self-hosting/restore-from-platform',

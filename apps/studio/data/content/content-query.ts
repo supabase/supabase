@@ -3,6 +3,7 @@ import { components } from 'api-types'
 
 import { remapSqlContentFields } from './content-remap'
 import { contentKeys } from './keys'
+import { getLogSqlSnippetPage } from './logs-view-content'
 import { get, handleError } from '@/data/fetchers'
 import type {
   Dashboards,
@@ -55,6 +56,15 @@ export async function getContent(
 ) {
   if (typeof projectRef === 'undefined') {
     throw new Error('projectRef is required for getContent')
+  }
+
+  if (type === 'log_sql') {
+    const { rows, cursor: nextCursor } = await getLogSqlSnippetPage(
+      { projectRef, name, limit },
+      signal,
+      headers
+    )
+    return { cursor: nextCursor, content: rows }
   }
 
   const { data, error } = await get('/platform/projects/{ref}/content', {

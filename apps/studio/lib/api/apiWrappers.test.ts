@@ -1,4 +1,4 @@
-import * as Sentry from '@sentry/nextjs'
+import * as Sentry from '@sentry/react'
 import type { JwtPayload } from '@supabase/supabase-js'
 import type { NextApiRequest, NextApiResponse } from 'next'
 import { describe, expect, it, vi } from 'vitest'
@@ -16,7 +16,7 @@ vi.mock('./apiAuthenticate', () => ({
   apiAuthenticate: vi.fn(),
 }))
 
-vi.mock('@sentry/nextjs', () => ({
+vi.mock('@sentry/react', () => ({
   captureException: vi.fn(),
 }))
 

@@ -1,7 +1,7 @@
 import { createFileRoute } from '@tanstack/react-router'
 
+import { PlatformWebhooksPage } from '@/components/interfaces/Platform/Webhooks'
 import { OrganizationSettingsLayout } from '@/components/layouts/ProjectLayout/OrganizationSettingsLayout'
-import OrgWebhookEndpointSettingsPage from '@/pages/org/[slug]/webhooks/[endpointId]'
 
 export const Route = createFileRoute('/_app/org/$slug/webhooks/$endpointId')({
   component: OrgWebhookEndpoint,
@@ -13,7 +13,14 @@ export const Route = createFileRoute('/_app/org/$slug/webhooks/$endpointId')({
 function OrgWebhookEndpoint() {
   return (
     <OrganizationSettingsLayout>
-      <OrgWebhookEndpointSettingsPage dehydratedState={undefined} />
+      <OrgWebhookEndpointSettingsPage />
     </OrganizationSettingsLayout>
   )
+}
+
+function OrgWebhookEndpointSettingsPage() {
+  const { endpointId } = Route.useParams()
+
+  // The key resets the page state (such as delivery page cursors) when the endpoint changes
+  return <PlatformWebhooksPage key={endpointId} scope="organization" endpointId={endpointId} />
 }
