@@ -21,7 +21,7 @@ A `config.json` or `config.jsonc` file takes precedence over `config.toml`. Havi
 
 Supabase CLI 3.1.0 is the first release that reads `config.json` and `config.jsonc`. Older versions ignore these files and run with default settings. Everyone who works on the project, and any CI step that pins a CLI version such as [`supabase/setup-cli`](https://github.com/supabase/setup-cli), needs 3.1.0 or later.
 
-The `supabase config convert` and `supabase config validate` commands need CLI 3.2.0 or later.
+The `supabase config convert` and `supabase config validate` commands need CLI 3.2.0 or later. Converting back to TOML with `--to toml` needs CLI 3.3.0 or later.
 
 ## Convert TOML to JSONC
 
@@ -50,6 +50,22 @@ After you convert:
 - Update pinned CLI versions to 3.1.0 or later.
 
 For all options, see the [`supabase config convert` reference](/docs/reference/cli/supabase-config-convert).
+
+## Convert back to TOML
+
+To convert `supabase/config.jsonc` or `supabase/config.json` to `supabase/config.toml`, run:
+
+```bash
+supabase config convert --to toml
+```
+
+This works for any project, including one that started on JSONC. The command carries comments over, turns commented-out keys into commented-out TOML, writes a `#:schema` line, and moves the JSON file to a backup such as `supabase/config.jsonc.bak`. TOML has no place for some comments, such as one inside an array. The command moves each of those to a nearby line and lists them. It refuses to write anything if the converted file doesn't match the original.
+
+If `supabase/config.toml` exists next to the JSON file, the command refuses, because converting would overwrite it. Move or delete `config.toml`, then rerun the command.
+
+`--dry-run` and the printed undo command work the same way as for the conversion to JSONC. After you check the result, delete the backup so it isn't committed.
+
+In an interactive terminal, the command asks what made you switch back to TOML. Answering is optional, and the answer is sent as [telemetry](/docs/guides/local-development/cli/getting-started#telemetry) unless you've opted out. To answer from a script, pass `--reason`, such as `--reason editor`.
 
 ## Validate your config
 
