@@ -123,7 +123,7 @@ If you use asymmetric signing keys and your backend can't reach the discovery en
 - Request the discovery endpoint from a machine that can reach it. The response is one JSON Web Key Set with every trusted public key.
 - In the Supabase Dashboard, go to the [JWT signing keys](/dashboard/project/_/settings/jwt) page. Open the **More options** (⋮) menu next to a key, select **View key details**, and copy the **Public key set (JSON Web Key Set format)**. Each key's dialog contains only that key, so repeat this for each of those keys and combine their `keys` arrays into one key set.
 
-Copied keys act as a cache that never expires, so neither problem in the preceding list resolves on its own. Your app no longer learns about rotation or revocation. Before you rotate to a standby key, add it to your app and deploy. After you revoke a key, remove it from your app yourself, or your app keeps trusting JWTs signed with it.
+Copied keys never refresh, so your app doesn't learn about a rotation or a revocation. Before you rotate to a standby key, add it to your app and deploy. After you revoke a key, remove it from your app yourself, or your app keeps trusting JWTs signed with it.
 
 ## Choosing the right signing algorithm
 
