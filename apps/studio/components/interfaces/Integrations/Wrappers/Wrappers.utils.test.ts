@@ -3,6 +3,8 @@ import { describe, expect, it } from 'vitest'
 import { SUPABASE_TARGET_SCHEMA_OPTION, WRAPPER_HANDLERS } from './Wrappers.constants'
 import { Table } from './Wrappers.types'
 import {
+  convertKVStringArrayToJson,
+  formatWrapperTables,
   getEditionFormSchema,
   getRequiredExtensionsToInstall,
   getTableFormSchema,
@@ -267,5 +269,49 @@ describe('hasForeignSchemaSupport', () => {
     ['1.0.0', true],
   ])('installed_version %s returns %s', (installed_version, expected) => {
     expect(hasForeignSchemaSupport({ installed_version })).toBe(expected)
+  })
+})
+
+describe('convertKVStringArrayToJson', () => {
+  it('converts key=value strings into an object', () => {
+    expect(
+      convertKVStringArrayToJson(['api_url=https://api.stripe.com/v1', 'object=customers'])
+    ).toEqual({ api_url: 'https://api.stripe.com/v1', object: 'customers' })
+  })
+
+  it('only splits on the first equals sign', () => {
+    expect(
+      convertKVStringArrayToJson([
+        'api_url=https://example.com/v1?region=eu&format=json',
+        'table=(select * from people where age = 18)',
+      ])
+    ).toEqual({
+      api_url: 'https://example.com/v1?region=eu&format=json',
+      table: '(select * from people where age = 18)',
+    })
+  })
+
+  it('keeps empty values and options without a value', () => {
+    expect(convertKVStringArrayToJson(['empty=', 'flag'])).toEqual({ empty: '', flag: '' })
+  })
+})
+
+describe('formatWrapperTables', () => {
+  it('keeps table option values that contain an equals sign', () => {
+    const [table] = formatWrapperTables({
+      handler: WRAPPER_HANDLERS.BIG_QUERY,
+      tables: [
+        {
+          id: '1',
+          name: 'adults',
+          schema: 'public',
+          columns: [],
+          options: ['table=(select * from people where age = 18)', 'rowid_column=id'],
+        },
+      ],
+    })
+
+    expect(table.table).toBe('(select * from people where age = 18)')
+    expect(table.rowid_column).toBe('id')
   })
 })
