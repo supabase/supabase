@@ -435,6 +435,11 @@ export const gettingstarted: NavMenuConstant = {
           url: '/guides/getting-started/quickstarts/flutter',
         },
         {
+          name: 'Unity',
+          url: '/guides/getting-started/quickstarts/unity',
+          enabled: sdkCsharpEnabled,
+        },
+        {
           name: 'Flask (Python)',
           url: '/guides/getting-started/quickstarts/flask' as `/${string}`,
           enabled: !jsOnly,
@@ -2586,6 +2591,11 @@ export const local_development: NavMenuConstant = {
           url: '/guides/local-development/cli/config',
           enabled: localDevelopmentEnabled,
         },
+        {
+          name: 'Config file formats',
+          url: '/guides/local-development/cli/config-formats',
+          enabled: localDevelopmentEnabled,
+        },
         { name: 'CLI commands', url: '/reference/cli' },
       ],
     },
@@ -2755,9 +2765,39 @@ export const platform: NavMenuConstant = {
           ],
         },
         {
-          name: 'Transfer Project',
+          name: 'Project transfers',
           url: '/guides/platform/project-transfer' as `/${string}`,
           enabled: fullPlatformEnabled,
+          items: [
+            {
+              name: 'Transfer a project',
+              url: '/guides/platform/project-transfer' as `/${string}`,
+            },
+            {
+              name: 'Requirements',
+              url: '/guides/platform/project-transfer/requirements' as `/${string}`,
+            },
+            {
+              name: 'Changes after a transfer',
+              url: '/guides/platform/project-transfer/what-changes' as `/${string}`,
+            },
+            {
+              name: 'Transfer project ownership',
+              url: '/guides/platform/project-transfer/transfer-ownership' as `/${string}`,
+            },
+            {
+              name: 'Transfer a Vercel-managed project',
+              url: '/guides/platform/project-transfer/vercel-marketplace' as `/${string}`,
+            },
+            {
+              name: 'Pause a Pro or Team Plan project',
+              url: '/guides/platform/project-transfer/pause-project' as `/${string}`,
+            },
+            {
+              name: 'Troubleshooting',
+              url: '/guides/platform/project-transfer/troubleshooting' as `/${string}`,
+            },
+          ],
         },
         {
           name: 'Restore to a new project',
