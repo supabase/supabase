@@ -93,6 +93,7 @@ describe('/account/me', () => {
     expect(screen.getByText('ProfileInformation')).toBeInTheDocument()
     expect(screen.getByText('AccountConnections')).toBeInTheDocument()
     expect(screen.getByText('ThemeSettings')).toBeInTheDocument()
+    expect(screen.getByRole('combobox', { name: 'Display language' })).toHaveAttribute('lang', 'en')
     expect(screen.getByText('TimezoneSettings')).toBeInTheDocument()
     expect(screen.getByText('HotkeySettings')).toBeInTheDocument()
     expect(screen.getByText('DashboardSettings')).toBeInTheDocument()
@@ -116,6 +117,7 @@ describe('/account/me', () => {
     await renderPreferences()
 
     expect(screen.getByText('ThemeSettings')).toBeInTheDocument()
+    expect(screen.getByRole('combobox', { name: 'Display language' })).toHaveAttribute('lang', 'en')
     expect(screen.getByText('TimezoneSettings')).toBeInTheDocument()
     expect(screen.getByText('HotkeySettings')).toBeInTheDocument()
     expect(screen.getByText('DashboardSettings')).toBeInTheDocument()
