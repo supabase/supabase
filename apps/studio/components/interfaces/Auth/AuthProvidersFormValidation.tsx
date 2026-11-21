@@ -165,10 +165,21 @@ const smsProviderBaseSchema = z.object({
 })
 
 export const normalizeSmsTemplate = (value: unknown) => {
-  if (typeof value === 'string') {
-    return value.replace(/\\r\\n/g, '\n').replace(/\\n/g, '\n')
+  if (typeof value !== 'string') {
+    return value
   }
+
+  // Convert literal \r\n and \n escape sequences only outside Go template {{ ... }} actions.
+  // Inside {{ ... }}, \n is a Go string escape sequence and a physical newline inside a quoted string is invalid syntax.
   return value
+    .split(/(\{\{[\s\S]*?\}\})/g)
+    .map((segment, index) => {
+      if (index % 2 === 1) {
+        return segment
+      }
+      return segment.replace(/\\r\\n/g, '\n').replace(/\\n/g, '\n')
+    })
+    .join('')
 }
 
 const getSmsOtpPhoneProviderSchema = (optional = false) =>
