@@ -25,6 +25,16 @@
   }
 }
 
+@utility floating-surface-shadow-xs {
+  --floating-shadow-strength: 0.6;
+  --floating-ring-color: var(--border);
+  @apply floating-surface-shadow-sm;
+
+  @variant dark {
+    --floating-shadow-strength: 3;
+  }
+}
+
 @utility floating-surface-shadow-md {
   box-shadow:
     0 17.54px 23.39px 0 hsl(var(--colors-black) / calc(0.04 * var(--floating-shadow-strength))),
