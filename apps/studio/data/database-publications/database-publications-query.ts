@@ -2,6 +2,7 @@ import pgMeta, { type PGPublication } from '@supabase/pg-meta'
 import { useQuery } from '@tanstack/react-query'
 
 import { executeSql } from '../sql/execute-sql-mutation'
+import { isTableInPublication } from './database-publications.utils'
 import { databasePublicationsKeys } from './keys'
 import { unguarded } from '@/data/fetchers'
 import { useSelectedProjectQuery } from '@/hooks/misc/useSelectedProject'
@@ -62,7 +63,5 @@ export const useIsTableRealtimeEnabled = ({ id }: { id: number }) => {
   const realtimePublication = (publications ?? []).find(
     (publication) => publication.name === 'supabase_realtime'
   )
-  const realtimeEnabledTables = realtimePublication?.tables ?? []
-  const isRealtimeEnabled = realtimeEnabledTables.some((t) => t.id === id)
-  return isRealtimeEnabled
+  return isTableInPublication(realtimePublication, id)
 }
