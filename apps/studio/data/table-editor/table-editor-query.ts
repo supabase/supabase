@@ -1,10 +1,10 @@
-import { getTableEditorFallback, getTableEditorSql, withCatalogFallback } from '@supabase/pg-meta'
+import { getTableEditorFallback, getTableEditorSql } from '@supabase/pg-meta'
 import { QueryClient, queryOptions, useQuery } from '@tanstack/react-query'
 
 import { tableEditorKeys } from './keys'
 import { Entity } from './table-editor-types'
 import { unguarded } from '@/data/fetchers'
-import { catalogFallbackQuery } from '@/data/sql/catalog-fallback-query'
+import { catalogFallbackQuery, withSparkFallback } from '@/data/sql/catalog-fallback-query'
 import { executeSql } from '@/data/sql/execute-sql-mutation'
 import type { StudioError } from '@/lib/errors/studio-errors'
 import { UseCustomQueryOptions } from '@/types'
@@ -34,7 +34,8 @@ export async function getTableEditor(
     queryKey: ['table-editor', id],
     grant: unguarded.migrating,
   }
-  const result = await withCatalogFallback(
+  const result = await withSparkFallback(
+    projectRef,
     async () => (await executeSql({ ...variables, sqlOrigin: 'studio', sql }, signal)).result,
     () => getTableEditorFallback(catalogFallbackQuery(variables, signal), { id })
   )

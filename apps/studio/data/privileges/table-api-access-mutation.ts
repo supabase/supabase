@@ -1,7 +1,5 @@
 import pgMeta, {
   getTablePrivilegesStatementsSql,
-  isDoBlockGap,
-  withCatalogFallback,
   type TablePrivilegesGrant,
 } from '@supabase/pg-meta'
 import { joinSqlFragments, type SafeSqlFragment } from '@supabase/pg-meta/src/pg-format'
@@ -12,6 +10,7 @@ import { invalidateTablePrivilegesQuery } from './table-privileges-query'
 import type { ConnectionVars } from '@/data/common.types'
 import { unguarded } from '@/data/fetchers'
 import { lintKeys } from '@/data/lint/keys'
+import { withSparkFallback } from '@/data/sql/catalog-fallback-query'
 import { executeSql } from '@/data/sql/execute-sql-mutation'
 import {
   API_ACCESS_ROLES,
@@ -87,10 +86,10 @@ export async function updateTableApiAccessPrivileges({
   const run = async (sql: SafeSqlFragment) =>
     (await executeSql<[]>({ ...variables, sqlOrigin: 'studio', sql })).result
 
-  return withCatalogFallback(
+  return withSparkFallback(
+    projectRef,
     () => run(joinSqlFragments(sqlStatements, '\n')),
-    () => run(getTablePrivilegesStatementsSql({ schema, name, grants, revokes })),
-    isDoBlockGap
+    () => run(getTablePrivilegesStatementsSql({ schema, name, grants, revokes }))
   )
 }
 

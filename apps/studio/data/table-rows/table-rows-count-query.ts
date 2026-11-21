@@ -1,8 +1,4 @@
-import {
-  getTableRowsCountFallback,
-  getTableRowsCountSql,
-  withCatalogFallback,
-} from '@supabase/pg-meta'
+import { getTableRowsCountFallback, getTableRowsCountSql } from '@supabase/pg-meta'
 import { formatPatternMatchFilterValue } from '@supabase/pg-meta/src/query/table-row-query'
 import { QueryClient, useQuery, useQueryClient } from '@tanstack/react-query'
 import { IS_PLATFORM } from 'common'
@@ -13,7 +9,7 @@ import type { Filter, SupaTable } from '@/components/grid/types'
 import { isUserFaultForValues } from '@/data/error-classification'
 import { unguarded } from '@/data/fetchers'
 import { useConnectionStringForReadOps } from '@/data/read-replicas/replicas-query'
-import { catalogFallbackQuery } from '@/data/sql/catalog-fallback-query'
+import { catalogFallbackQuery, withSparkFallback } from '@/data/sql/catalog-fallback-query'
 import { executeSql } from '@/data/sql/execute-sql-mutation'
 import { prefetchTableEditor } from '@/data/table-editor/table-editor-query'
 import { FGA_PERMISSIONS, useAsyncCheckPermissionsV2 } from '@/hooks/misc/useCheckPermissionsV2'
@@ -90,7 +86,8 @@ export async function getTableRowsCount(
     isRoleImpersonationEnabled: isRoleImpersonationEnabled(roleImpersonationState?.role),
     grant: unguarded.migrating,
   }
-  const result = await withCatalogFallback(
+  const result = await withSparkFallback(
+    projectRef,
     async () => (await executeSql({ ...variables, sqlOrigin: 'studio', sql }, signal)).result,
     () =>
       getTableRowsCountFallback(

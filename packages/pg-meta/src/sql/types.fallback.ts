@@ -1,9 +1,9 @@
 /**
  * TEMPORARY. Delete once Spark (turso) has `pg_enum` and runs `types.list`.
  *
- * Enum labels read as empty without `pg_enum`.
+ * Enum labels read as empty (Spark has no `pg_enum`).
  */
-import { optionalRows, toInt, toText, type CatalogQuery } from '../catalog-fallback'
+import { toInt, toText, type CatalogQuery } from '../catalog-fallback'
 import { DEFAULT_SYSTEM_SCHEMAS } from '../constants'
 import { filterByList } from '../helpers'
 import { joinSqlFragments, literal, safeSql } from '../pg-format'
@@ -52,33 +52,23 @@ export async function listTypesFallback(
     .filter((row) => includeArrayTypes || arrayOf.get(toInt(row.elem)) !== toInt(row.id))
     .slice(offset, limit ? offset + limit : undefined)
 
-  const ids = types.map((row) => toInt(row.id))
   const relids = types.map((row) => toInt(row.relid)).filter((id) => id !== 0)
-  const [enums, attributes] = await Promise.all([
-    ids.length === 0
-      ? []
-      : optionalRows(
-          query(safeSql`
-            select e.enumtypid::int8 as type_id, e.enumlabel as label
-            from pg_catalog.pg_enum e
-            where e.enumtypid in (${joinSqlFragments(ids.map(literal), ', ')})
-            order by e.enumsortorder`)
-        ),
+  const attributes =
     relids.length === 0
       ? []
-      : query(safeSql`
+      : await query(safeSql`
           select a.attrelid::int8 as relid, a.attname as name, a.atttypid::int8 as type_id
           from pg_catalog.pg_attribute a
           where a.attrelid in (${joinSqlFragments(relids.map(literal), ', ')}) and not a.attisdropped
-          order by a.attnum`),
-  ])
+          order by a.attnum`)
 
   return types.map((row) => ({
     id: toInt(row.id),
     name: String(row.name),
     schema: String(row.schema),
     format: String(row.format),
-    enums: enums.filter((e) => toInt(e.type_id) === toInt(row.id)).map((e) => String(e.label)),
+    // TEMPORARY: Spark has no pg_enum, so no enum labels; read them again once it has the catalog.
+    enums: [],
     attributes: attributes
       .filter((a) => toInt(a.relid) === toInt(row.relid))
       .map((a) => ({ name: String(a.name), type_id: toInt(a.type_id) })),

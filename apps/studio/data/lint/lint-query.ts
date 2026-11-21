@@ -41,11 +41,13 @@ export const useProjectLintsQuery = <TData = ProjectLintsData>(
 ) => {
   const { data: project } = useSelectedProjectQuery({ enabled: enabled !== false })
   const isActive = project?.status === PROJECT_STATUS.ACTIVE_HEALTHY
+  // TEMPORARY: the lints need session settings and catalogs Spark lacks, and have no Spark fallback.
+  const isSpark = project?.postgres_engine === 'spark'
 
   return useQuery<ProjectLintsData, ProjectLintsError, TData>({
     queryKey: lintKeys.lint(projectRef),
     queryFn: ({ signal }) => getProjectLints({ projectRef }, signal),
-    enabled: enabled && typeof projectRef !== 'undefined' && isActive,
+    enabled: enabled && typeof projectRef !== 'undefined' && isActive && !isSpark,
     ...options,
   })
 }

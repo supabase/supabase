@@ -1,9 +1,4 @@
-import {
-  isPopulateRecordGap,
-  readColumnFormats,
-  withCatalogFallback,
-  type ColumnFormat,
-} from '@supabase/pg-meta'
+import { readColumnFormats, type ColumnFormat } from '@supabase/pg-meta'
 import { Query } from '@supabase/pg-meta/src/query'
 import { useMutation, useQueryClient } from '@tanstack/react-query'
 import { toast } from 'sonner'
@@ -11,7 +6,7 @@ import { toast } from 'sonner'
 import { tableRowKeys } from './keys'
 import { isUserFaultForValues } from '@/data/error-classification'
 import { unguarded } from '@/data/fetchers'
-import { catalogFallbackQuery } from '@/data/sql/catalog-fallback-query'
+import { catalogFallbackQuery, withSparkFallback } from '@/data/sql/catalog-fallback-query'
 import { executeSql } from '@/data/sql/execute-sql-mutation'
 import type { StudioError } from '@/lib/errors/studio-errors'
 import { RoleImpersonationState, wrapWithRoleImpersonation } from '@/lib/role-impersonation'
@@ -87,7 +82,8 @@ export async function updateTableRow({
     return result
   }
 
-  return withCatalogFallback(
+  return withSparkFallback(
+    projectRef,
     () => write(),
     async () =>
       write(
@@ -100,8 +96,7 @@ export async function updateTableRow({
           }),
           table.id
         )
-      ),
-    isPopulateRecordGap
+      )
   )
 }
 

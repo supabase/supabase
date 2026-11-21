@@ -1,9 +1,9 @@
 /**
  * TEMPORARY. Delete once Spark (turso) runs `getMigrationsSql`, which fails there on its `DO` block.
  *
- * The same rows from a plain select; no rows when the migrations table does not exist.
+ * The same rows from a plain select. Spark keeps its own migration history in this table.
  */
-import { isCatalogGap, toText, type CatalogQuery } from '../../../catalog-fallback'
+import { toText, type CatalogQuery } from '../../../catalog-fallback'
 import { safeSql } from '../../../pg-format'
 
 const MIGRATIONS_SQL = safeSql`
@@ -13,10 +13,7 @@ order by version desc`
 
 /** Fallback for `getMigrationsSql`. */
 export async function getMigrationsFallback(query: CatalogQuery) {
-  const rows = await query(MIGRATIONS_SQL).catch((error) => {
-    if (isCatalogGap(error)) return []
-    throw error
-  })
+  const rows = await query(MIGRATIONS_SQL)
   return rows.map((row) => ({
     version: String(row.version),
     name: toText(row.name),

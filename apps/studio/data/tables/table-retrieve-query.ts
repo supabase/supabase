@@ -1,10 +1,10 @@
-import pgMeta, { retrieveTableFallback, withCatalogFallback } from '@supabase/pg-meta'
+import pgMeta, { retrieveTableFallback } from '@supabase/pg-meta'
 import { useQuery } from '@tanstack/react-query'
 
 import { tableKeys } from './keys'
 import { unguarded } from '@/data/fetchers'
 import { getQueryClient } from '@/data/query-client'
-import { catalogFallbackQuery } from '@/data/sql/catalog-fallback-query'
+import { catalogFallbackQuery, withSparkFallback } from '@/data/sql/catalog-fallback-query'
 import { executeSql } from '@/data/sql/execute-sql-mutation'
 import type { StudioError } from '@/lib/errors/studio-errors'
 import type { SafePostgresTable } from '@/lib/postgres-types'
@@ -30,7 +30,8 @@ export async function getTable(
     grant: unguarded.migrating,
   }
 
-  const result = await withCatalogFallback(
+  const result = await withSparkFallback(
+    projectRef,
     async () => (await executeSql({ ...variables, sqlOrigin: 'studio', sql }, signal)).result,
     async () => {
       const table = await retrieveTableFallback(catalogFallbackQuery(variables, signal), {

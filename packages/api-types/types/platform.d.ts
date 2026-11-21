@@ -12630,6 +12630,8 @@ export interface components {
       name: string
       organization_id: number
       parent_project_ref?: string
+      /** @description The database engine of the project's app version, e.g. '17' or 'spark' */
+      postgres_engine?: string
       ref: string
       region: string
       restUrl: string
@@ -13696,7 +13698,7 @@ export interface components {
     UnpauseProjectAvailableVersionsResponse_Output: {
       available_versions: {
         /** @enum {string} */
-        postgres_engine: '13' | '14' | '15' | '17' | '17-oriole'
+        postgres_engine: '13' | '14' | '15' | '17' | '17-oriole' | 'spark'
         /** @enum {string} */
         release_channel: 'internal' | 'alpha' | 'beta' | 'ga' | 'withdrawn' | 'preview'
         version: string

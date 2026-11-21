@@ -16,11 +16,9 @@ import pgMeta, {
   getTableColumnsSql,
   getTableConstraintsSql,
   getUsersCountSQL,
-  isCatalogGap,
   literal,
   parseTextArray,
   safeSql,
-  withCatalogFallback,
   type CatalogQuery,
 } from '../src'
 import {
@@ -160,7 +158,9 @@ describe('schemas, roles and types', () => {
     ]) {
       const expected = await query(pgMeta.types.list(options).sql)
       expect(expected.map((type) => type.name)).toEqual(expect.arrayContaining(['mood', 'pair']))
-      expect(await listTypesFallback(query, options)).toEqual(expected)
+      // The fallback reads no enum labels: Spark has no pg_enum.
+      const withoutEnums = (types: any[]) => types.map(({ enums, ...type }) => type)
+      expect(withoutEnums(await listTypesFallback(query, options))).toEqual(withoutEnums(expected))
     }
   })
 
@@ -185,14 +185,14 @@ describe('schemas, roles and types', () => {
 })
 
 describe('views, materialized views, foreign tables and publications', () => {
-  // turso has no pg_relation_is_updatable or pg_column_is_updatable.
+  // turso has no pg_relation_is_updatable or pg_column_is_updatable, and no pg_enum.
   const withoutUpdatable = (rows: any[]) =>
     sorted(
       rows.map(({ is_updatable, columns, ...row }) => ({
         ...row,
         ...(columns && {
           columns: sorted(
-            columns.map(({ is_updatable, ...column }: any) => column),
+            columns.map(({ is_updatable, enums, ...column }: any) => column),
             'ordinal_position'
           ),
         }),
@@ -286,9 +286,15 @@ describe('extensions, functions, triggers, event triggers and foreign data wrapp
     expect(functions.map((f) => f.name)).toEqual(
       expect.arrayContaining(['add_one', 'touch', 'noop', 'on_ddl'])
     )
+    // The fallback reads no definitions: Spark has no pg_get_functiondef.
+    const withoutDefinitions = (rows: any[]) =>
+      sorted(
+        rows.map(({ complete_statement, identity_argument_types, ...row }) => row),
+        'id'
+      )
     expect(
-      sorted(await listFunctionsFallback(query, { includedSchemas: ['public'] }), 'id')
-    ).toEqual(sorted(functions, 'id'))
+      withoutDefinitions(await listFunctionsFallback(query, { includedSchemas: ['public'] }))
+    ).toEqual(withoutDefinitions(functions))
 
     const expectedTriggers = triggers(await query(pgMeta.triggers.list().sql))
     expect(expectedTriggers).toHaveLength(2)
@@ -296,7 +302,10 @@ describe('extensions, functions, triggers, event triggers and foreign data wrapp
 
     const eventTriggers = await query(getEventTriggersSql())
     expect(eventTriggers).toHaveLength(1)
-    expect(await getEventTriggersFallback(query)).toEqual(eventTriggers)
+    const withoutDefinition = (rows: any[]) => rows.map(({ function_definition, ...row }) => row)
+    expect(withoutDefinition(await getEventTriggersFallback(query))).toEqual(
+      withoutDefinition(eventTriggers)
+    )
 
     const expectedFdws = fdws(await query(getFDWsSql()))
     expect(expectedFdws.map((fdw) => fdw.server_name)).toContain('remote')
@@ -547,33 +556,6 @@ describe('Data API privileges', () => {
 })
 
 describe('auth users count and index worker', () => {
-  postgresTest('a Postgres 0A000 refusal never reaches a fallback', async (query, db) => {
-    await createDatabaseWithAuthSchema(db)
-    await query(safeSql`
-      create function public.refuse_functions() returns event_trigger language plpgsql as $$
-      begin raise exception 'functions are reviewed first' using errcode = '0A000'; end $$;
-      create event trigger refuse_functions on ddl_command_start when tag in ('CREATE FUNCTION')
-        execute function public.refuse_functions();
-    `)
-    try {
-      const refused = await query(getUsersCountSQL({})).catch((error: unknown) => error)
-      expect(refused).toMatchObject({ code: '0A000' })
-      expect(isCatalogGap(refused)).toBe(false)
-
-      let usedFallback = false
-      await withCatalogFallback(
-        () => query(getUsersCountSQL({})),
-        async () => {
-          usedFallback = true
-          return []
-        }
-      ).catch(() => undefined)
-      expect(usedFallback).toBe(false)
-    } finally {
-      await query(safeSql`drop event trigger refuse_functions`)
-    }
-  })
-
   postgresTest('the fallbacks return what the queries return', async (query, db) => {
     await createDatabaseWithAuthSchema(db)
     await query(safeSql`

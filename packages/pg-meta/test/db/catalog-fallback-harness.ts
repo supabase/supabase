@@ -1,12 +1,7 @@
 import { afterAll, beforeAll, expect, test } from 'vitest'
 
-import {
-  isCatalogGap,
-  withCatalogFallback,
-  type CatalogQuery,
-  type SafeSqlFragment,
-} from '../../src'
-import { SPARK_BIN, startSpark } from './spark'
+import { type CatalogQuery, type SafeSqlFragment } from '../../src'
+import { SPARK_BIN, SparkQueryError, startSpark } from './spark'
 import { createTestDatabase } from './utils'
 
 type TestDb = Awaited<ReturnType<typeof createTestDatabase>>
@@ -55,19 +50,17 @@ export function catalogFallbackHarness({
   const sparkTest = (name: string, fn: (query: CatalogQuery) => Promise<void>) =>
     test.skipIf(!SPARK_BIN)(`on Spark, ${name}`, () => fn(sparkQuery), 30_000)
 
-  /** Runs pg-meta's SQL on Spark, expects a gap, and returns the fallback's answer. */
-  async function sparkFallback<T>(
-    sql: SafeSqlFragment,
-    fallback: () => Promise<T>,
-    isGap: (error: unknown) => boolean = isCatalogGap
-  ): Promise<T> {
+  /** Runs pg-meta's SQL on Spark, expects it to fail, and returns the fallback's answer. */
+  async function sparkFallback<T>(sql: SafeSqlFragment, fallback: () => Promise<T>): Promise<T> {
     const failure = await sparkQuery(sql).then(
       () => undefined,
       (error: unknown) => error
     )
     expect(failure, 'pg-meta SQL now runs on Spark: delete its fallback').toBeDefined()
-    expect(isGap(failure)).toBe(true)
-    return withCatalogFallback(() => sparkQuery(sql) as Promise<T>, fallback, isGap)
+    // A transport failure is not Spark refusing the SQL.
+    expect(failure).toBeInstanceOf(SparkQueryError)
+    expect((failure as SparkQueryError).code).toMatch(/^[0-9A-Z]{5}$/)
+    return fallback()
   }
 
   return { postgresTest, sparkTest, sparkFallback, sparkQuery }

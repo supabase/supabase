@@ -2,7 +2,6 @@ import pgMeta, {
   getTablesPaginatedSql,
   listTablesFallback,
   listTablesPaginatedFallback,
-  withCatalogFallback,
   type PGTable,
 } from '@supabase/pg-meta'
 import { InfiniteData, useInfiniteQuery, useQuery, useQueryClient } from '@tanstack/react-query'
@@ -12,7 +11,7 @@ import { z } from 'zod'
 
 import { tableKeys } from './keys'
 import { unguarded } from '@/data/fetchers'
-import { catalogFallbackQuery } from '@/data/sql/catalog-fallback-query'
+import { catalogFallbackQuery, withSparkFallback } from '@/data/sql/catalog-fallback-query'
 import { executeSql } from '@/data/sql/execute-sql-mutation'
 import type { StudioError } from '@/lib/errors/studio-errors'
 import type { SafePostgresTable } from '@/lib/postgres-types'
@@ -51,7 +50,8 @@ export async function getTables(
     grant: unguarded.migrating,
   }
 
-  const result = await withCatalogFallback(
+  const result = await withSparkFallback(
+    projectRef,
     async () => (await executeSql({ ...variables, sqlOrigin: 'studio', sql }, signal)).result,
     () => listTablesFallback(catalogFallbackQuery(variables, signal), options)
   )
@@ -163,7 +163,8 @@ export async function getTablesPage(
     grant: unguarded.migrating,
   }
 
-  const result = await withCatalogFallback(
+  const result = await withSparkFallback(
+    projectRef,
     async () => (await executeSql({ ...variables, sqlOrigin: 'studio', sql }, signal)).result,
     () => listTablesPaginatedFallback(catalogFallbackQuery(variables, signal), options)
   )

@@ -1,4 +1,4 @@
-import { afterAll, beforeAll, describe, expect, test } from 'vitest'
+import { afterAll, describe, expect } from 'vitest'
 
 import {
   getCreateMigrationsTableSQL,
@@ -9,17 +9,12 @@ import {
   getTablePrivilegesStatementsSql,
   getTableRowsCountSql,
   getTablesPaginatedSql,
-  isCatalogGap,
-  isDoBlockGap,
-  isPopulateRecordGap,
   joinSqlFragments,
   listTablePrivilegesFallback,
   literal,
   rawSql,
   safeSql,
-  withCatalogFallback,
   type CatalogQuery,
-  type SafeSqlFragment,
 } from '../src'
 import pgMeta from '../src/index'
 import { Query } from '../src/query'
@@ -37,8 +32,8 @@ import {
   listTablesPaginatedFallback,
   retrieveTableFallback,
 } from '../src/sql/tables.fallback'
-import { SPARK_BIN, SparkQueryError, startSpark } from './db/spark'
-import { cleanupRoot, createTestDatabase } from './db/utils'
+import { catalogFallbackHarness } from './db/catalog-fallback-harness'
+import { cleanupRoot } from './db/utils'
 
 afterAll(async () => {
   await cleanupRoot()
@@ -104,55 +99,10 @@ insert into public.authors (name, tags, meta) values ('ada', '{a,b}', '{"k": 1}'
 insert into public.posts (author_id, title) values (1, 'hello');
 `
 
-type TestDb = Awaited<ReturnType<typeof createTestDatabase>>
-
-const postgresTest = (name: string, fn: (query: CatalogQuery, db: TestDb) => Promise<void>) =>
-  test(`on Postgres, ${name}`, async () => {
-    const db = await createTestDatabase()
-    try {
-      await db.executeQuery(POSTGRES_SCHEMA)
-      await fn((sql) => db.executeQuery(sql), db)
-    } finally {
-      await db.cleanup()
-    }
-  }, 30_000)
-
-let spark: Awaited<ReturnType<typeof startSpark>> | undefined
-
-const sparkQuery: CatalogQuery = (sql) => {
-  if (!spark) throw new Error('Spark is not running')
-  return spark.query(sql)
-}
-
-if (!SPARK_BIN) {
-  console.warn('SPARK_BIN is not set: the Spark runs of the catalog fallbacks are skipped.')
-}
-
-const sparkTest = (name: string, fn: (query: CatalogQuery) => Promise<void>) =>
-  test.skipIf(!SPARK_BIN)(`on Spark, ${name}`, () => fn(sparkQuery), 30_000)
-
-beforeAll(async () => {
-  if (SPARK_BIN) spark = await startSpark(SPARK_SCHEMA)
-}, 60_000)
-
-afterAll(async () => {
-  await spark?.stop()
+const { postgresTest, sparkTest, sparkFallback } = catalogFallbackHarness({
+  postgresSchema: POSTGRES_SCHEMA,
+  sparkSchema: SPARK_SCHEMA,
 })
-
-/** Runs pg-meta's SQL on Spark, expects a catalog gap, and returns the fallback's answer. */
-async function sparkFallback<T>(
-  sql: SafeSqlFragment,
-  fallback: () => Promise<T>,
-  isGap: (error: unknown) => boolean = isCatalogGap
-): Promise<T> {
-  const failure = await sparkQuery(sql).then(
-    () => undefined,
-    (error: unknown) => error
-  )
-  expect(failure, 'pg-meta SQL now runs on Spark: delete its fallback').toBeDefined()
-  expect(isGap(failure)).toBe(true)
-  return withCatalogFallback(() => sparkQuery(sql) as Promise<T>, fallback, isGap)
-}
 
 const byText = (key: string) => (a: any, b: any) =>
   String(a[key]) < String(b[key]) ? -1 : String(a[key]) > String(b[key]) ? 1 : 0
@@ -162,7 +112,8 @@ const sortRelationships = (relationships: any[]) =>
       a.id - b.id || byText('source_column_name')(a, b) || byText('target_column_name')(a, b)
   )
 
-// What a partial catalog cannot know, as `catalog-fallback.ts` lists.
+// What a partial catalog cannot know, as `catalog-fallback.ts` lists, and the enum labels the
+// fallbacks do not read (Spark has no pg_enum).
 const comparableTable = ({
   bytes,
   size,
@@ -175,7 +126,9 @@ const comparableTable = ({
   ...table,
   relationships: sortRelationships(relationships),
   ...(columns && {
-    columns: [...columns].sort((a: any, b: any) => a.ordinal_position - b.ordinal_position),
+    columns: [...columns]
+      .sort((a: any, b: any) => a.ordinal_position - b.ordinal_position)
+      .map(({ enums, ...column }: any) => column),
   }),
 })
 const comparableTables = (tables: any[]) => tables.map(comparableTable).sort((a, b) => a.id - b.id)
@@ -306,6 +259,8 @@ describe('table editor entity', () => {
         name: 'posts',
         rls_enabled: true,
         primary_keys: [{ name: 'id' }],
+        // Spark has no pg_enum: the field is present and empty.
+        columns: expect.arrayContaining([expect.objectContaining({ name: 'title', enums: [] })]),
         unique_indexes: [{ columns: ['title'] }],
         relationships: [
           {
@@ -555,33 +510,6 @@ describe('table editor writes', () => {
     )
   })
 
-  postgresTest('a write is not retried after a trigger refuses it', async (query) => {
-    await query(writeTable('guarded'))
-    await query(safeSql`
-      create sequence public.guard_calls;
-      create function public.refuse() returns trigger language plpgsql as $$
-      begin
-        perform nextval('public.guard_calls');
-        raise exception 'refused' using errcode = '0A000';
-      end $$;
-      create trigger refuse before insert on public.guarded for each row execute function public.refuse();
-    `)
-    const failure = await query(insertSql('guarded', rows)).catch((error: unknown) => error)
-    expect(failure).toMatchObject({ code: '0A000' })
-    expect(isPopulateRecordGap(failure)).toBe(false)
-
-    let retried = false
-    await withCatalogFallback(
-      () => query(insertSql('guarded', rows)),
-      async () => {
-        retried = true
-        return []
-      },
-      isPopulateRecordGap
-    ).catch(() => undefined)
-    expect(retried).toBe(false)
-  })
-
   sparkTest(
     'literal values insert and update when json_populate_record is missing',
     async (query) => {
@@ -589,22 +517,16 @@ describe('table editor writes', () => {
       const formats = () => tableId(query, 'writes').then((id) => readColumnFormats(query, id))
       const sparkRows = rows.map(({ docs, ...row }) => row)
 
-      const inserted = await sparkFallback(
-        insertSql('writes', sparkRows),
-        async () => query(insertSql('writes', sparkRows, await formats())),
-        isPopulateRecordGap
+      const inserted = await sparkFallback(insertSql('writes', sparkRows), async () =>
+        query(insertSql('writes', sparkRows, await formats()))
       )
       expect(inserted).toEqual(sparkRows)
-      const updated = await sparkFallback(
-        updateSql('writes'),
-        async () => query(updateSql('writes', await formats())),
-        isPopulateRecordGap
+      const updated = await sparkFallback(updateSql('writes'), async () =>
+        query(updateSql('writes', await formats()))
       )
       expect(updated).toMatchObject([{ id: 101, ...update }])
-      const defaults = await sparkFallback(
-        insertSql('writes', [{}]),
-        async () => query(insertSql('writes', [{}], await formats())),
-        isPopulateRecordGap
+      const defaults = await sparkFallback(insertSql('writes', [{}]), async () =>
+        query(insertSql('writes', [{}], await formats()))
       )
       expect(defaults).toMatchObject([{ label: 'none', active: null }])
     }
@@ -651,31 +573,6 @@ describe('table creation and API access', () => {
     })
     await query(safeSql`create table public.plain (id int); ${plain}`)
     expect(await aclOf(query, 'plain')).toEqual(await aclOf(query, 'looped'))
-  })
-
-  postgresTest('Postgres refusals are neither catalog gaps nor DO gaps', async (query) => {
-    await query(safeSql`create table public.pg_events (id int); drop table public.pg_events`)
-    const missing = await query(safeSql`select * from public.pg_events`).catch((e) => e)
-    expect(missing).toMatchObject({ code: '42P01' })
-    expect(isCatalogGap(missing)).toBe(false)
-    expect(isPopulateRecordGap(missing)).toBe(false)
-
-    await query(safeSql`
-      create function public.refuse_grants() returns event_trigger language plpgsql as $$
-      begin raise exception 'grants are managed elsewhere' using errcode = '0A000'; end $$;
-      create event trigger refuse_grants on ddl_command_start when tag in ('GRANT', 'REVOKE')
-        execute function public.refuse_grants();
-    `)
-    try {
-      const id = await tableIdOf(query, 'nodes')
-      const refused = await query(pgMeta.tablePrivileges.grant(apiAccess(id).grants).sql).catch(
-        (e) => e
-      )
-      expect(refused).toMatchObject({ code: '0A000' })
-      expect(isDoBlockGap(refused)).toBe(false)
-    } finally {
-      await query(safeSql`drop event trigger refuse_grants`)
-    }
   })
 
   sparkTest(
@@ -731,9 +628,7 @@ describe('table creation and API access', () => {
           ],
           '\n'
         ),
-        () =>
-          query(getTablePrivilegesStatementsSql({ schema: 'public', name: 'notes', ...access })),
-        isDoBlockGap
+        () => query(getTablePrivilegesStatementsSql({ schema: 'public', name: 'notes', ...access }))
       )
       const privileges = (await listTablePrivilegesFallback(query, { includedSchemas: ['public'] }))
         .find((relation) => relation.name === 'notes')
@@ -742,9 +637,6 @@ describe('table creation and API access', () => {
       expect(privileges).not.toContain('anon:SELECT')
       expect(privileges).toEqual(
         expect.arrayContaining(['authenticated:SELECT', 'authenticated:INSERT'])
-      )
-      expect(isDoBlockGap(new SparkQueryError('permission denied for table notes', '42501'))).toBe(
-        false
       )
     }
   )

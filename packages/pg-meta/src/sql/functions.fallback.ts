@@ -5,10 +5,10 @@
  * `pg_get_function_identity_arguments` and `pg_get_functiondef`: identity arguments and complete
  * statements read as empty there. Spark refuses `CREATE FUNCTION`, so it lists none.
  */
-import { optionalRows, toBool, toInt, toText, type CatalogQuery } from '../catalog-fallback'
+import { toBool, toInt, toText, type CatalogQuery } from '../catalog-fallback'
 import { DEFAULT_SYSTEM_SCHEMAS } from '../constants'
 import { filterByList } from '../helpers'
-import { joinSqlFragments, literal, safeSql } from '../pg-format'
+import { literal, safeSql } from '../pg-format'
 
 const MODES: Record<string, string> = { i: 'in', o: 'out', b: 'inout', v: 'variadic' }
 const KINDS: Record<string, string> = {
@@ -59,20 +59,6 @@ export async function listFunctionsFallback(
     where p.prokind in ('f', 'p') ${filter ? safeSql`and n.nspname ${filter}` : safeSql``}
     ${limit ? safeSql`limit ${literal(limit)}` : safeSql``}
     ${offset ? safeSql`offset ${literal(offset)}` : safeSql``}`)
-  const ids = rows.map((row) => toInt(row.id))
-  const definitions =
-    ids.length === 0
-      ? []
-      : await optionalRows(
-          query(safeSql`
-            select p.oid::int8 as id, pg_get_function_identity_arguments(p.oid) as identity,
-              case when l.lanname = 'internal' then null else pg_get_functiondef(p.oid) end as statement
-            from pg_catalog.pg_proc p
-            left join pg_catalog.pg_language l on l.oid = p.prolang
-            where p.oid in (${joinSqlFragments(ids.map(literal), ', ')})`)
-        )
-  const definitionOf = new Map(definitions.map((row) => [toInt(row.id), row]))
-
   return rows.map((row) => {
     const id = toInt(row.id)
     const internal = row.language === 'internal'
@@ -93,9 +79,9 @@ export async function listFunctionsFallback(
       language: String(row.language),
       type: KINDS[String(row.kind)] ?? 'unknown',
       definition: internal ? '' : String(row.source ?? ''),
-      complete_statement: internal
-        ? String(row.source ?? '')
-        : String(definitionOf.get(id)?.statement ?? ''),
+      // TEMPORARY: Spark has no pg_get_functiondef or pg_get_function_identity_arguments, so a
+      // complete statement and the identity arguments read as empty; read them again once it has them.
+      complete_statement: internal ? String(row.source ?? '') : '',
       args: types.map((type, index) => ({
         mode: MODES[modes[index]] ?? 'table',
         name: names[index] ?? '',
@@ -103,7 +89,7 @@ export async function listFunctionsFallback(
         has_default: index < nargs && index >= firstDefault,
       })),
       argument_types: toText(row.argument_types),
-      identity_argument_types: String(definitionOf.get(id)?.identity ?? ''),
+      identity_argument_types: '',
       return_type_id: toInt(row.return_type_id),
       return_type: toText(row.return_type),
       return_type_relation_id: toInt(row.return_relid) === 0 ? null : toInt(row.return_relid),

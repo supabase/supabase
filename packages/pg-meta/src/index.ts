@@ -34,14 +34,7 @@ export * from './sql/studio/role-impersonation'
 export * from './sql/studio/integrations'
 
 // TEMPORARY fallbacks for a partial pg_catalog (Spark on turso); see `catalog-fallback.ts`.
-export {
-  isCatalogGap,
-  isDoBlockGap,
-  isPopulateRecordGap,
-  withCatalogFallback,
-  type CatalogQuery,
-  type CatalogRow,
-} from './catalog-fallback'
+export { type CatalogQuery, type CatalogRow } from './catalog-fallback'
 export {
   listTablesFallback,
   listTablesPaginatedFallback,

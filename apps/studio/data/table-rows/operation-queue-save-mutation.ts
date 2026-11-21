@@ -1,9 +1,7 @@
 import {
-  isPopulateRecordGap,
   joinSqlFragments,
   readColumnFormats,
   safeSql,
-  withCatalogFallback,
   type ColumnFormat,
   type SafeSqlFragment,
 } from '@supabase/pg-meta'
@@ -18,7 +16,7 @@ import { getTableRowUpdateSql } from './table-row-update-mutation'
 import type { PendingAddRow } from '@/components/grid/types'
 import { isUserFaultForValues } from '@/data/error-classification'
 import { unguarded } from '@/data/fetchers'
-import { catalogFallbackQuery } from '@/data/sql/catalog-fallback-query'
+import { catalogFallbackQuery, withSparkFallback } from '@/data/sql/catalog-fallback-query'
 import { executeSql } from '@/data/sql/execute-sql-mutation'
 import type { StudioError } from '@/lib/errors/studio-errors'
 import { RoleImpersonationState, wrapWithRoleImpersonation } from '@/lib/role-impersonation'
@@ -197,7 +195,8 @@ export async function saveOperationQueue({
     return result
   }
 
-  const result = await withCatalogFallback(
+  const result = await withSparkFallback(
+    projectRef,
     () => save(),
     async () => {
       const query = catalogFallbackQuery({
@@ -209,8 +208,7 @@ export async function saveOperationQueue({
       const tableIds = [...new Set(operations.map((operation) => operation.tableId))]
       const formats = await Promise.all(tableIds.map((id) => readColumnFormats(query, id)))
       return save(new Map(tableIds.map((id, index) => [id, formats[index]])))
-    },
-    isPopulateRecordGap
+    }
   )
 
   return { result }

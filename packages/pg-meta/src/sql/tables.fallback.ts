@@ -8,7 +8,6 @@
  * `pg_enum`, and pg-meta's privilege and temp-schema filters are not applied.
  */
 import {
-  optionalRows,
   toAttnums,
   toBool,
   toInt,
@@ -83,11 +82,6 @@ left join pg_catalog.pg_type bt on t.typtype = 'd' and bt.oid = t.typbasetype
 left join pg_catalog.pg_namespace bn on bn.oid = bt.typnamespace
 left join pg_catalog.pg_attrdef d on d.adrelid = a.attrelid and d.adnum = a.attnum
 where a.attrelid in (${idList(ids)}) and a.attnum > 0 and not a.attisdropped`
-
-const ENUMS_SQL = safeSql`
-select e.enumtypid::int8 as type_id, e.enumlabel as label
-from pg_catalog.pg_enum e
-order by e.enumsortorder`
 
 const REPLICA_IDENTITY: Record<string, PGTable['replica_identity']> = {
   d: 'DEFAULT',
@@ -167,8 +161,7 @@ const checkExpression = (definition: string | null) =>
 function buildColumns(
   tables: Map<number, { schema: string; name: string }>,
   rows: CatalogRow[],
-  constraints: CatalogRow[],
-  enums: CatalogRow[]
+  constraints: CatalogRow[]
 ): Map<number, PGColumn[]> {
   const unique = new Set<string>()
   const check = new Map<string, string | null>()
@@ -179,11 +172,6 @@ function buildColumns(
     if (row.type === 'u') unique.add(key)
     // pg-meta keeps the check with the lowest oid per column.
     if (row.type === 'c' && !check.has(key)) check.set(key, checkExpression(toText(row.definition)))
-  }
-  const labels = new Map<number, string[]>()
-  for (const row of enums) {
-    const id = toInt(row.type_id)
-    labels.set(id, [...(labels.get(id) ?? []), String(row.label)])
   }
 
   const byTable = new Map<number, PGColumn[]>()
@@ -196,10 +184,6 @@ function buildColumns(
     const isDomain = row.type_type === 'd'
     const identity = toText(row.identity)
     const kind = String(row.kind)
-    const enumIds = [
-      row.base_id ?? row.type_id,
-      row.base_id !== null && row.base_id !== undefined ? row.base_elem : row.type_elem,
-    ].map(toInt)
     const column: PGColumn = {
       table_id: tableId,
       schema: table.schema,
@@ -233,7 +217,8 @@ function buildColumns(
       is_updatable: kind === 'r' || kind === 'p',
       is_unique: unique.has(key),
       check: check.get(key) ?? null,
-      enums: enumIds.flatMap((id) => labels.get(id) ?? []),
+      // TEMPORARY: Spark has no pg_enum, so no enum labels; read them again once it has the catalog.
+      enums: [],
       comment: toText(row.comment),
     }
     byTable.set(tableId, [...(byTable.get(tableId) ?? []), column])
@@ -249,16 +234,15 @@ export async function readColumns(
 ): Promise<Map<number, PGColumn[]>> {
   const ids = relations.map((relation) => relation.id)
   if (ids.length === 0) return new Map()
-  const [columnRows, constraintRows, enumRows] = await Promise.all([
+  const [columnRows, constraintRows] = await Promise.all([
     query(columnsSql(ids)),
     query(columnConstraintsSql(ids)),
-    optionalRows(query(ENUMS_SQL)),
   ])
+
   return buildColumns(
     new Map(relations.map((relation) => [relation.id, relation])),
     columnRows,
-    constraintRows,
-    enumRows
+    constraintRows
   )
 }
 
