@@ -13,11 +13,11 @@ import {
   DialogSection,
   DialogSectionSeparator,
   DialogTitle,
+  ExpandingTextArea,
   Form,
   FormControl,
   FormField,
   Input,
-  Textarea,
 } from 'ui'
 import { FormItemLayout } from 'ui-patterns/form/FormItemLayout/FormItemLayout'
 import { GenericSkeletonLoader } from 'ui-patterns/ShimmeringLoader'
@@ -171,32 +171,23 @@ export const EditSecretModal = () => {
                       <FormItemLayout label="Secret value">
                         <div className="relative">
                           <FormControl>
-                            <Textarea
+                            <ExpandingTextArea
                               {...field}
-                              rows={1}
-                              ref={(el) => {
-                                field.ref(el)
-                                if (el) {
-                                  el.style.height = 'auto'
-                                  el.style.height = Math.max(40, el.scrollHeight) + 'px'
-                                }
-                              }}
+                              value={field.value ?? ''}
+                              data-1p-ignore
                               data-lpignore="true"
-                              className="min-h-0 resize-none"
+                              data-form-type="other"
+                              data-bwignore
+                              className="max-h-[320px] overflow-y-auto"
                               style={
                                 {
                                   WebkitTextSecurity: showSecretValue ? undefined : 'disc',
                                 } as React.CSSProperties
                               }
-                              onChange={(e) => {
-                                field.onChange(e)
-                                e.currentTarget.style.height = 'auto'
-                                e.currentTarget.style.height =
-                                  Math.max(40, e.currentTarget.scrollHeight) + 'px'
-                              }}
                             />
                           </FormControl>
                           <Button
+                            variant="text"
                             title={showSecretValue ? `Hide secret value` : `Show secret value`}
                             aria-label={showSecretValue ? `Hide secret value` : `Show secret value`}
                             className="absolute right-1 top-1 w-7"
