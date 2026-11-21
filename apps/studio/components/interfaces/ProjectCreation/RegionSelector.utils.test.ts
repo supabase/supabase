@@ -4,6 +4,7 @@ import {
   getItemsAffectingProjectCreation,
   getRegionRestrictionCopy,
   getRegionRestrictionMessage,
+  getShowLockedSpecificRegions,
   parseRestrictedRegions,
   REGION_RESTRICTION_COPY,
   regionMatches,
@@ -204,5 +205,32 @@ describe('getItemsAffectingProjectCreation', () => {
   it('includes a region-scoped item matching the selected region via a smart group', () => {
     const item = buildItem({ projectCreationScope: { type: 'regions', regions: ['us-east-1'] } })
     expect(getItemsAffectingProjectCreation([item], 'americas')).toEqual([item])
+  })
+})
+
+describe('getShowLockedSpecificRegions', () => {
+  const base = {
+    isFreePlan: true,
+    regionLockedOverlayVariant: true,
+    hasGeneralRegions: true,
+  }
+
+  it('shows the locked overlay when the org is free, flagged, and has general regions', () => {
+    expect(getShowLockedSpecificRegions(base)).toBe(true)
+  })
+
+  it('does not show the overlay for a paid plan', () => {
+    expect(getShowLockedSpecificRegions({ ...base, isFreePlan: false })).toBe(false)
+  })
+
+  it.each([
+    ['false', false],
+    ['undefined (loading or unresolved)', undefined],
+  ])('does not show the overlay when the flag is %s', (_label, regionLockedOverlayVariant) => {
+    expect(getShowLockedSpecificRegions({ ...base, regionLockedOverlayVariant })).toBe(false)
+  })
+
+  it('does not show the overlay without general regions (e.g. AWS_NIMBUS or high availability)', () => {
+    expect(getShowLockedSpecificRegions({ ...base, hasGeneralRegions: false })).toBe(false)
   })
 })

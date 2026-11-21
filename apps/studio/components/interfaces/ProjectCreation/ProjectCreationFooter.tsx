@@ -18,6 +18,7 @@ import { InfoTooltip } from 'ui-patterns/info-tooltip'
 
 import { CreateProjectForm } from './ProjectCreation.schema'
 import { instanceLabel, monthlyInstancePrice } from './ProjectCreation.utils'
+import { ButtonTooltip } from '@/components/ui/ButtonTooltip'
 import { InlineLink } from '@/components/ui/InlineLink'
 import { OrgProject } from '@/data/projects/org-projects-infinite-query'
 import { useLastVisitedOrganization } from '@/hooks/misc/useLastVisitedOrganization'
@@ -30,6 +31,7 @@ export type ProjectCreationCancelAction = 'studio' | 'close' | 'hidden'
 interface ProjectCreationFooterProps {
   form: UseFormReturn<CreateProjectForm>
   canCreateProject: boolean
+  isSelectedRegionLocked?: boolean
   instanceSize?: string
   highAvailability?: boolean
   organizationProjects: OrgProject[]
@@ -42,6 +44,7 @@ interface ProjectCreationFooterProps {
 export const ProjectCreationFooter = ({
   form,
   canCreateProject,
+  isSelectedRegionLocked = false,
   instanceSize,
   highAvailability = false,
   organizationProjects,
@@ -228,14 +231,22 @@ export const ProjectCreationFooter = ({
           </Button>
         )}
 
-        <Button
+        <ButtonTooltip
           variant="primary"
           type="submit"
           loading={isCreatingNewProject || isSuccessNewProject}
           disabled={!canCreateProject || isLoadingAvailableRegions}
+          tooltip={{
+            content: {
+              side: 'top',
+              text: isSelectedRegionLocked
+                ? 'Upgrade to Pro or select a different region to continue'
+                : undefined,
+            },
+          }}
         >
           Create new project
-        </Button>
+        </ButtonTooltip>
       </div>
     </div>
   )
