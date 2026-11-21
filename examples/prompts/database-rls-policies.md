@@ -136,7 +136,11 @@ The `auth.jwt()` function is extremely versatile. For example, if you store some
 create policy "User is in team"
 on my_table
 to authenticated
-using ( team_id in (select auth.jwt() -> 'app_metadata' -> 'teams'));
+using (
+  team_id::text in (
+    select jsonb_array_elements_text((select auth.jwt()) -> 'app_metadata' -> 'teams')
+  )
+);
 ```
 
 ### MFA
