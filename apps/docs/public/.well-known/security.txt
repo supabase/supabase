@@ -14,7 +14,7 @@ Here is a brief list of some common out of scope vulnerabilities:
 - Unauthenticated/logout/login CSRF.
 - Attacks requiring MITM or physical access to a user's device.
 - Attacks requiring social engineering.
-- Any activity that could lead to the disruption of our service (DoS).
+- Any activity that could lead to the disruption of our service (DoS). This means volumetric attacks, load testing and flooding. A vulnerability in our code that lets an unprivileged attacker crash a service or exhaust resources for other users or tenants is in scope. Denial of service that only affects the attacker's own project, or that needs admin or owner privileges, is not.
 - Content spoofing and text injection issues without showing an attack vector/without being able to modify HTML/CSS.
 - Email spoofing
 - Missing DNSSEC, CAA, CSP headers
