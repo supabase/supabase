@@ -8647,7 +8647,60 @@ functions:
           )
           ```
 
-  - id: from-list-v2
+  - id: storagefile-exists
+    title: 'from_.exists()'
+    description: |
+      Checks the existence of a file. Returns `True` if the file exists, `False` otherwise.
+    notes: |
+      - RLS policy permissions required:
+        - `buckets` table permissions: none
+        - `objects` table permissions: `select`
+      - Refer to the [Storage guide](/docs/guides/storage/security/access-control) on how access control works
+    params:
+      - name: path
+        isOptional: false
+        type: string
+        description: The file path, including the filename. For example `folder/image.png`.
+    examples:
+      - id: check-file-existence
+        name: Check file existence
+        code: |
+          ```python
+          response = (
+              supabase.storage
+              .from_("avatars")
+              .exists("folder/avatar1.png")
+          )
+          ```
+
+  - id: storagefile-info
+    title: 'from_.info()'
+    description: |
+      Retrieves the details of an existing file, such as its size, content type, and timestamps.
+    notes: |
+      - RLS policy permissions required:
+        - `buckets` table permissions: none
+        - `objects` table permissions: `select`
+      - Refer to the [Storage guide](/docs/guides/storage/security/access-control) on how access control works
+    params:
+      - name: path
+        isOptional: false
+        type: string
+        description: The file path, including the filename. For example `folder/image.png`.
+    examples:
+      - id: get-file-info
+        name: Get file info
+        code: |
+          ```python
+          response = (
+              supabase.storage
+              .from_("avatars")
+              .info("folder/avatar1.png")
+          )
+          print(response["content_type"])
+          ```
+
+  - id: storagefile-list-v2
     title: 'from_.list_v2()'
     description: |
       Lists files within a bucket using cursor-based pagination. Returns separate lists for folders and objects along with pagination metadata.
