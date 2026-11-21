@@ -4836,7 +4836,7 @@ functions:
   - id: gt
     title: gt()
     description: |
-      Match only rows where `column` is greather than `value`.
+      Match only rows where `column` is greater than `value`.
     params:
       - name: column
         isOptional: false

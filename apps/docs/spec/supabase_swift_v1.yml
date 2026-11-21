@@ -3328,7 +3328,7 @@ functions:
             )
           ```
         note: |
-          You can also sepcify a `String` in the `download` parameter to define the file name for the downloaded asset.
+          You can also specify a `String` in the `download` parameter to define the file name for the downloaded asset.
 
   - id: from-get-public-url
     title: from.getPublicUrl()
@@ -3376,7 +3376,7 @@ functions:
             )
           ```
         note: |
-          You can also sepcify a `String` in the `download` parameter to define the file name for the downloaded asset.
+          You can also specify a `String` in the `download` parameter to define the file name for the downloaded asset.
 
   - id: from-download
     title: from.download()
