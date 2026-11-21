@@ -74,8 +74,12 @@ export const ScaffoldHeader = forwardRef<HTMLDivElement, HTMLAttributes<HTMLDivE
  * See /design-system/docs/fragments/page-header
  */
 export const ScaffoldTitle = forwardRef<HTMLHeadingElement, HTMLAttributes<HTMLHeadingElement>>(
-  ({ className, ...props }, ref) => {
-    return <h1 ref={ref} {...props} className={cn(className)} />
+  ({ className, children, ...props }, ref) => {
+    return (
+      <h1 ref={ref} {...props} className={cn(className)}>
+        {children}
+      </h1>
+    )
   }
 )
 
@@ -134,8 +138,12 @@ export const ScaffoldDivider = forwardRef<HTMLDivElement, HTMLAttributes<HTMLDiv
 export const ScaffoldSectionTitle = forwardRef<
   HTMLHeadingElement,
   HTMLAttributes<HTMLHeadingElement>
->(({ className, ...props }, ref) => {
-  return <h3 ref={ref} {...props} className={cn('text-foreground text-xl', className)} />
+>(({ className, children, ...props }, ref) => {
+  return (
+    <h3 ref={ref} {...props} className={cn('text-foreground text-xl', className)}>
+      {children}
+    </h3>
+  )
 })
 
 /**
