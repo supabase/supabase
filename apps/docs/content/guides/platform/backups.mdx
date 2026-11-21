@@ -142,6 +142,14 @@ When you disable PITR, we still take all new backups as physical backups only. Y
 
 To download a logical backup, see [Download logical backups](/kb/troubleshooting/download-logical-backups).
 
+### Troubleshooting stale WAL archiving [#troubleshooting-stale-wal-archiving]
+
+PITR depends on continuous WAL archiving to advance its recovery window. If archiving stops, the latest available recovery point stops advancing, and changes made after that point aren't protected by PITR until archiving resumes. The Security Advisor's "PITR archiving may be broken" finding flags this condition.
+
+To check whether it affects your project, open the [Point in Time](/dashboard/project/_/database/backups/pitr) settings and compare the latest restore point against your project's recent write activity. A restore point that's behind because the database has had no recent writes is expected, as described in [Backup process](#backup-process). A restore point that stays behind despite ongoing writes points to broken archiving.
+
+WAL archiving is managed by the platform, so you can't restart or reconfigure it yourself. If the restore point stays stale despite recent activity, or the Advisor finding persists, [contact support](/dashboard/support/new) and mention the "PITR archiving may be broken" finding. Verification runs periodically, so the finding can remain for a while after archiving recovers, and clears after the next successful check.
+
 ## Restore to a new project
 
 See the [Duplicate Project docs](/docs/guides/platform/clone-project).
