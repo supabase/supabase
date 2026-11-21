@@ -1,3 +1,4 @@
+import { EgressDebugButton } from './EgressDebugButton'
 import { dailyUsageToDataPoints } from './Usage.utils'
 import UsageSection from './UsageSection/UsageSection'
 import { DataPoint } from '@/data/analytics/constants'
@@ -53,6 +54,7 @@ const Egress = ({
       currentBillingCycleSelected={currentBillingCycleSelected}
       startDate={startDate}
       endDate={endDate}
+      headerActions={<EgressDebugButton projectRef={projectRef} orgSlug={orgSlug} />}
     />
   )
 }
