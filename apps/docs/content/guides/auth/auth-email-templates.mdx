@@ -1,5 +1,5 @@
 ---
-title: 'Email Templates'
+title: 'Email templates'
 description: 'Customize the authentication and security notification emails Supabase Auth sends.'
 subtitle: 'Customize the authentication and security notification emails Supabase Auth sends.'
 ---
@@ -29,7 +29,7 @@ Supabase Auth sends a security notification only when that notification is turne
 
 The confirmation email is sent only when email confirmations are on. In a hosted project, turn on **Confirm email** on the [Auth Providers page](/dashboard/project/_/auth/providers). In local development, set [`auth.email.enable_confirmations`](/docs/guides/local-development/cli/config#auth.email.enable_confirmations) to `true` in your config file. With confirmations off, users are confirmed on sign-up and no email is sent, so a customized confirmation template never reaches them.
 
-## Terminology
+## Template variables
 
 Templates can use the following variables:
 
@@ -55,25 +55,7 @@ Where you edit templates depends on how you run Supabase.
 
 ### Hosted projects
 
-Edit templates on the [Email Templates](/dashboard/project/_/auth/templates) page in the dashboard. The template builder uses the variables in the [terminology](#terminology) table.
-
-### Local development and self-hosted
-
-The dashboard template builder doesn't apply to [local development with the CLI](/docs/guides/local-development) or [self-hosted Supabase](/docs/guides/self-hosting). Customize templates in your config file (`supabase/config.toml` or `supabase/config.jsonc`) and in local HTML files.
-
-For local development with the CLI, [open the emails your templates produce in Mailpit](/docs/guides/auth/testing-auth-flows#test-email-flows-locally).
-
-<Admonition type="note" title="Customizing templates locally">
-
-See [Customizing email templates](/docs/guides/local-development/customizing-email-templates) for:
-
-- [Config file keys and HTML file paths](/docs/guides/local-development/customizing-email-templates#configuring-templates)
-- [Template variables](/docs/guides/local-development/customizing-email-templates#template-variables), which match the [terminology](#terminology) table
-- Default subjects and behavior for each [authentication](/docs/guides/local-development/customizing-email-templates#available-authentication-email-templates) and [security notification](/docs/guides/local-development/customizing-email-templates#available-security-notification-email-templates) template
-
-For self-hosted deployments, see [Custom email templates](/docs/guides/self-hosting/custom-email-templates).
-
-</Admonition>
+Edit templates on the [Email Templates](/dashboard/project/_/auth/templates) page in the dashboard. The template builder uses the same [template variables](#template-variables).
 
 You can also manage email templates using the Management API:
 
@@ -128,9 +110,48 @@ curl -X PATCH "https://api.supabase.com/v1/projects/$PROJECT_REF/config/auth" \
   }'
 ```
 
-## Mobile deep linking
+### Local development and self-hosted
 
-To send users from an email link to a specific page in a mobile app, see [Native mobile deep linking](/docs/guides/auth/native-mobile-deep-linking).
+The dashboard template builder doesn't apply to [local development with the CLI](/docs/guides/local-development) or [self-hosted Supabase](/docs/guides/self-hosting). Customize templates in your config file (`supabase/config.toml` or `supabase/config.jsonc`) and in local HTML files.
+
+For local development with the CLI, [open the emails your templates produce in Mailpit](/docs/guides/auth/testing-auth-flows#test-email-flows-locally).
+
+<Admonition type="note" title="Customizing templates locally">
+
+See [Customizing email templates](/docs/guides/local-development/customizing-email-templates) for:
+
+- [Config file keys and HTML file paths](/docs/guides/local-development/customizing-email-templates#configuring-templates)
+- [Template variables](/docs/guides/local-development/customizing-email-templates#template-variables), which match the [template variables](#template-variables) on this page
+- Default subjects and behavior for each [authentication](/docs/guides/local-development/customizing-email-templates#available-authentication-email-templates) and [security notification](/docs/guides/local-development/customizing-email-templates#available-security-notification-email-templates) template
+
+For self-hosted deployments, see [Custom email templates](/docs/guides/self-hosting/custom-email-templates).
+
+</Admonition>
+
+## Customization
+
+Supabase Auth uses [Go templates](https://pkg.go.dev/text/template), so you can render content conditionally based on template variables.
+
+### Send different email to early access users
+
+Send a different email to users who signed up through an early access domain (`https://www.earlyaccess.trial.com`).
+
+```
+{{ if eq .Data.Domain "https://www.example.com" }}
+<h1>Welcome to Our Database Service!</h1>
+  <p>Dear Developer,</p>
+  <p>Welcome to Billy, the scalable developer platform!</p>
+  <p>Best Regards,<br>
+Billy Team</p>
+{{ else if eq .Data.Domain "https://www.earlyaccess.trial.com" }}
+<h1>Welcome to Our Database Service!</h1>
+  <p>Dear Developer,</p>
+  <p>Welcome Billy, the scalable developer platform!</p>
+  <p> As an early access member, you have access to select features like Point To Space Restoration.</p>
+  <p>Best Regards,<br>
+Billy Team</p>
+{{ end }}
+```
 
 ## Limitations
 
@@ -203,27 +224,6 @@ const {
 // ...
 ```
 
-## Customization
+## Mobile deep linking
 
-Supabase Auth uses [Go templates](https://pkg.go.dev/text/template), so you can render content conditionally based on template variables.
-
-### Send different email to early access users
-
-Send a different email to users who signed up through an early access domain (`https://www.earlyaccess.trial.com`).
-
-```
-{{ if eq .Data.Domain "https://www.example.com" }}
-<h1>Welcome to Our Database Service!</h1>
-  <p>Dear Developer,</p>
-  <p>Welcome to Billy, the scalable developer platform!</p>
-  <p>Best Regards,<br>
-Billy Team</p>
-{{ else if eq .Data.Domain "https://www.earlyaccess.trial.com" }}
-<h1>Welcome to Our Database Service!</h1>
-  <p>Dear Developer,</p>
-  <p>Welcome Billy, the scalable developer platform!</p>
-  <p> As an early access member, you have access to select features like Point To Space Restoration.</p>
-  <p>Best Regards,<br>
-Billy Team</p>
-{{ end }}
-```
+To send users from an email link to a specific page in a mobile app, see [Native mobile deep linking](/docs/guides/auth/native-mobile-deep-linking).
