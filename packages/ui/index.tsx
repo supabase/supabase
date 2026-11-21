@@ -35,6 +35,8 @@ export { controlRadiusBySize } from './src/lib/raised-control-surface'
 // DATA ENTRY
 export * from './src/components/ExpandingTextArea'
 
+export * from './src/components/PrePostTab'
+
 // layout
 export * from './src/components/LoadingLine'
 
