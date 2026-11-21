@@ -27,6 +27,8 @@ Security notification emails:
 
 Security emails are only sent to users if the respective security notifications have been enabled at a project-level.
 
+The confirmation email is sent only when email confirmations are on. In a hosted project, turn on **Confirm email** on the [Auth Providers page](/dashboard/project/_/auth/providers). In local development, set [`auth.email.enable_confirmations`](/docs/guides/local-development/cli/config#auth.email.enable_confirmations) to `true` in your config file. With confirmations off, users are confirmed on sign-up and no email is sent, so a customized confirmation template never reaches them.
+
 ## Terminology
 
 The templating system provides the following variables for use:
