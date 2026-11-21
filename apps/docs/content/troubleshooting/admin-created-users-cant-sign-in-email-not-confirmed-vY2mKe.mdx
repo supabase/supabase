@@ -1,0 +1,37 @@
+---
+title = "Admin-created users can't sign in: 'email_not_confirmed'"
+topics = [ "auth" ]
+keywords = [ "email_not_confirmed", "createUser", "confirm email", "autoconfirm", "admin" ]
+
+[api]
+sdk = [ "auth-admin-createuser", "auth-admin-updateuserbyid", "auth-signinwithpassword" ]
+
+[[errors]]
+http_status_code = 400
+code = "email_not_confirmed"
+message = "Email not confirmed"
+---
+
+Password sign-in fails with `email_not_confirmed` for users created through `supabase.auth.admin.createUser()`, even when **Confirm email** is turned off for the email provider (or `enable_confirmations = false` in `config.toml` for local development).
+
+## Why this happens
+
+Password sign-in requires the user's email to be confirmed, whatever the **Confirm email** setting is. That setting only controls the sign-up flow: with it turned off, `signUp()` confirms new users immediately. The Admin API doesn't apply it. `createUser()` leaves the user unconfirmed unless you request confirmation explicitly, so the user is rejected at sign-in.
+
+## How to fix it
+
+Pass `email_confirm: true` when creating users with the Admin API:
+
+```js
+await supabase.auth.admin.createUser({
+  email: 'user@example.com',
+  password: 'example-password',
+  email_confirm: true,
+})
+```
+
+To repair users that were already created unconfirmed, confirm them with `updateUserById()`:
+
+```js
+await supabase.auth.admin.updateUserById(userId, { email_confirm: true })
+```
