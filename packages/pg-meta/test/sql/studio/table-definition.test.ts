@@ -65,3 +65,37 @@ test('getTableDefinitionSql: quotes the parent schema for an inherited table', a
     await db.cleanup()
   }
 })
+
+test('getTableDefinitionSql: preserves expressions and predicates when recreating indexes', async () => {
+  const db = await createTestDatabase()
+  try {
+    await db.executeQuery(`
+      create table public.events (message text, active boolean);
+      create index events_message_idx on public.events (message);
+      create index events_where_idx on public.events ((message || ' WHERE marker'))
+        where active and message <> 'another WHERE marker';
+      create unique index events_unique_idx on public.events ((message || 'CREATE INDEX'))
+        where active;
+    `)
+
+    const [{ id }] = await db.executeQuery<{ id: number }[]>(
+      `select 'public.events'::regclass::oid::int8 as id;`
+    )
+    const indexDefinitionsSql = `
+      select indexdef from pg_indexes
+      where schemaname = 'public' and tablename = 'events'
+      order by indexname;
+    `
+    const originalIndexes = await db.executeQuery(indexDefinitionsSql)
+    const [{ definition }] = await db.executeQuery<{ definition: string }[]>(
+      getTableDefinitionSql({ id })
+    )
+
+    await db.executeQuery('drop table public.events;')
+    await db.executeQuery(definition)
+
+    expect(await db.executeQuery(indexDefinitionsSql)).toEqual(originalIndexes)
+  } finally {
+    await db.cleanup()
+  }
+})
