@@ -27,7 +27,7 @@ Security notification emails:
 
 Supabase Auth sends a security notification only when that notification is turned on for the project.
 
-The confirmation email is sent only when email confirmations are on. In a hosted project, turn on **Confirm email** on the [Auth Providers page](/dashboard/project/_/auth/providers). In local development, set [`auth.email.enable_confirmations`](/docs/guides/local-development/cli/config#auth.email.enable_confirmations) to `true` in your config file. With confirmations off, users are confirmed on sign-up and no email is sent, so a customized confirmation template never reaches them.
+The confirmation email is sent only when email confirmations are on. In a hosted project, turn on **Confirm email** on the [Auth Providers page](/dashboard/project/_/auth/providers), or set `mailer_autoconfirm` to `false` with the [Management API](/docs/reference/api/v1-update-auth-service-config). In local development, set [`auth.email.enable_confirmations`](/docs/guides/local-development/cli/config#auth.email.enable_confirmations) to `true` in your config file, then restart the local stack. With confirmations off, users are confirmed on sign-up and no email is sent, so a customized confirmation template never reaches them.
 
 ## Template variables [#terminology]
 
@@ -112,7 +112,7 @@ curl -X PATCH "https://api.supabase.com/v1/projects/$PROJECT_REF/config/auth" \
 
 ### Local development and self-hosted
 
-The dashboard template builder doesn't apply to [local development with the CLI](/docs/guides/local-development) or [self-hosted Supabase](/docs/guides/self-hosting). Customize templates in your config file (`supabase/config.toml` or `supabase/config.jsonc`) and in local HTML files.
+The dashboard template builder doesn't apply to [local development with the CLI](/docs/guides/local-development) or [self-hosted Supabase](/docs/guides/self-hosting). With the CLI, customize templates in your config file (`supabase/config.toml` or `supabase/config.jsonc`) and in local HTML files. Self-hosted Supabase uses environment variables instead.
 
 For local development with the CLI, [open the emails your templates produce in Mailpit](/docs/guides/auth/testing-auth-flows#test-email-flows-locally).
 
@@ -173,6 +173,13 @@ To avoid this, use one of the following approaches.
 3. Sign the user in by verifying the OTP with [`supabase.auth.verifyOtp`](/docs/reference/javascript/auth-verifyotp):
 
    ```ts
+   import { createClient } from '@supabase/supabase-js'
+
+   const supabase = createClient('https://your-project-id.supabase.co', 'sb_publishable_...')
+   declare const email: string
+   declare const token: string
+
+   // ---cut---
    const { data, error } = await supabase.auth.verifyOtp({ email, token, type: 'email' })
    ```
 
@@ -212,9 +219,10 @@ When the user clicks the link, the request goes to `https://api.example.com/v1/a
 import { createClient, type EmailOtpType } from '@supabase/supabase-js'
 
 const supabase = createClient('https://your-project-id.supabase.co', 'sb_publishable_...')
+declare const request: Request
 
 // ---cut---
-const { token_hash, type } = Object.fromEntries(new URLSearchParams(window.location.search))
+const { token_hash, type } = Object.fromEntries(new URL(request.url).searchParams)
 const {
   data: { session },
   error,
