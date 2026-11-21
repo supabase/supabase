@@ -14,14 +14,12 @@ const BlogCollapsible = ({ title, containerClassName, ...props }: BlogCollapsibl
     <Collapsible className={containerClassName}>
       <CollapsibleTrigger
         className="
-        data-[state=open]:text
         hover:text-foreground-light
         flex items-center gap-3
         [&>svg]:fill-current
         [&>svg]:rotate-90
         [&>svg]:transition-transform
-        [&>svg]:data-[state='open']:rotate-180
-        [&>svg]:data-[state='open']:text
+        data-[state=open]:[&>svg]:rotate-180
         "
       >
         <Triangle size={10} />
