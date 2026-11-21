@@ -34,6 +34,8 @@ import {
   Input,
   SidePanel,
 } from 'ui'
+import { Admonition } from 'ui-patterns/Admonition'
+import { FormItemLayout } from 'ui-patterns/form/FormItemLayout/FormItemLayout'
 import * as z from 'zod'
 
 import EnumeratedTypeValueRow from './EnumeratedTypeValueRow'
@@ -185,30 +187,26 @@ const EditEnumeratedTypeSidePanel = ({
               control={form.control}
               name="name"
               render={({ field }) => (
-                <FormItem>
-                  <FormLabel>Name</FormLabel>
+                <FormItemLayout layout="vertical" label="Name">
                   <FormControl>
                     <Input {...field} />
                   </FormControl>
-                  <FormMessage />
-                </FormItem>
+                </FormItemLayout>
               )}
             />
             <FormField
               control={form.control}
               name="description"
               render={({ field }) => (
-                <FormItem>
-                  <FormLabel>Description</FormLabel>
+                <FormItemLayout layout="vertical" label="Description" description="Optional">
                   <FormControl>
                     <Input {...field} />
                   </FormControl>
-                  <FormDescription>Optional</FormDescription>
-                </FormItem>
+                </FormItemLayout>
               )}
             />
 
-            <div>
+            <div className="space-y-4">
               <span
                 className={cn(
                   'text-foreground-light text-sm',
@@ -218,44 +216,42 @@ const EditEnumeratedTypeSidePanel = ({
               >
                 Values
               </span>
-              <Alert>
-                <AlertCircleIcon strokeWidth={1.5} />
-                <AlertTitle>Existing values cannot be deleted or sorted</AlertTitle>
-                <AlertDescription>
-                  <p className="leading-normal! track">
-                    You will need to delete and recreate the enumerated type with the updated values
-                    instead.
-                  </p>
-                  <Button asChild icon={<ExternalLinkIcon strokeWidth={1.5} />} className="mt-2">
-                    <Link
-                      href="https://www.postgresql.org/message-id/21012.1459434338%40sss.pgh.pa.us"
-                      target="_blank"
-                      rel="noreferrer"
-                    >
-                      Learn more
-                    </Link>
-                  </Button>
-                </AlertDescription>
-              </Alert>
-              <DndContext
-                sensors={sensors}
-                collisionDetection={closestCenter}
-                onDragEnd={handleDragEnd}
-              >
-                <SortableContext items={fields} strategy={verticalListSortingStrategy}>
-                  {fields.map((field, index) => (
-                    <EnumeratedTypeValueRow
-                      key={field.id}
-                      id={field.id}
-                      name={`values.${index}.updatedValue`}
-                      index={index}
-                      control={form.control}
-                      isDisabled={!field.isNew}
-                      onRemoveValue={() => remove(index)}
-                    />
-                  ))}
-                </SortableContext>
-              </DndContext>
+              <Admonition type="default" title="Existing values cannot be deleted or sorted">
+                <p className="leading-normal! track">
+                  You will need to delete and recreate the enumerated type with the updated values
+                  instead.
+                </p>
+                <Button asChild icon={<ExternalLinkIcon strokeWidth={1.5} />} className="mt-2">
+                  <Link
+                    href="https://www.postgresql.org/message-id/21012.1459434338%40sss.pgh.pa.us"
+                    target="_blank"
+                    rel="noreferrer"
+                  >
+                    Learn more
+                  </Link>
+                </Button>
+              </Admonition>
+              <div>
+                <DndContext
+                  sensors={sensors}
+                  collisionDetection={closestCenter}
+                  onDragEnd={handleDragEnd}
+                >
+                  <SortableContext items={fields} strategy={verticalListSortingStrategy}>
+                    {fields.map((field, index) => (
+                      <EnumeratedTypeValueRow
+                        key={field.id}
+                        id={field.id}
+                        name={`values.${index}.updatedValue`}
+                        index={index}
+                        control={form.control}
+                        isDisabled={!field.isNew}
+                        onRemoveValue={() => remove(index)}
+                      />
+                    ))}
+                  </SortableContext>
+                </DndContext>
+              </div>
             </div>
 
             <Button
