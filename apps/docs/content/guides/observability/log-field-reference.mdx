@@ -26,6 +26,7 @@ Each event is a row in the ClickHouse `logs` table. Filter the `source` column t
 | `pg_upgrade_logs`    | Database version upgrade                                          |
 
 For `postgres_logs`, statement text and error details can appear in `event_message`. A missing structured field does not mean the event has no detail.
+For `auth_logs` events, the `duration` field records the request duration in nanoseconds.
 
 ## Captured HTTP headers
 
