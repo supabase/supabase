@@ -22,7 +22,7 @@
     "codegen:references:new": "maybe-turbo tsx scripts/build-reference-content.ts",
     "codegen:references:legacy": "tsx features/docs/Reference.generated.script.ts",
     "codegen:references": "maybe-turbo",
-    "dev": "maybe-turbo next dev --webpack --port 3001",
+    "dev": "maybe-turbo next dev --port 3001",
     "dev:secrets:pull": "AWS_PROFILE=supa-dev node ../../scripts/getSecrets.js -n local/docs",
     "embeddings": "maybe-turbo tsx --conditions=react-server scripts/search/generate-embeddings.ts",
     "embeddings:nimbus": "ENABLED_FEATURES_OVERRIDE_DISABLE_ALL=true pnpm run embeddings",
