@@ -4422,6 +4422,19 @@ export interface UpgradeCtaClickedEvent {
 }
 
 /**
+ * User clicked the Free plan badge next to the organization name (in the org dropdown) to
+ * start the upgrade flow.
+ *
+ * @group Events
+ * @page Any authenticated dashboard route — the org dropdown is in the global header
+ * @source studio
+ */
+export interface PlanBadgeUpgradeClickedEvent {
+  action: 'plan_badge_upgrade_clicked'
+  groups: Omit<TelemetryGroups, 'project'>
+}
+
+/**
  * User clicked the primary CTA on a resource exhaustion warning banner.
  *
  * @group Events
@@ -5018,6 +5031,7 @@ export type TelemetryEvent =
   | FreeMicroUpgradeBannerDismissedEvent
   | FreeMicroUpgradeBannerCtaClickedEvent
   | UpgradeCtaClickedEvent
+  | PlanBadgeUpgradeClickedEvent
   | AccessTokenCreatedEvent
   | AccessTokenCreationSheetDismissedEvent
   | AccessTokenRemovedEvent

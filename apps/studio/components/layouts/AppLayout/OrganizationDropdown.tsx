@@ -1,5 +1,6 @@
 import { useParams } from 'common'
 import { BoxesIcon } from 'lucide-react'
+import Link from 'next/link'
 import { useRouter } from 'next/router'
 import { useState } from 'react'
 import { Badge, cn } from 'ui'
@@ -16,6 +17,7 @@ import PartnerIcon from '@/components/ui/PartnerIcon'
 import { useOrganizationsQuery } from '@/data/organizations/organizations-query'
 import { useIsFeatureEnabled } from '@/hooks/misc/useIsFeatureEnabled'
 import { useSelectedOrganizationQuery } from '@/hooks/misc/useSelectedOrganization'
+import { MANAGED_BY } from '@/lib/constants/infrastructure'
 import { useTrack } from '@/lib/telemetry/track'
 
 interface OrganizationDropdownProps {
@@ -42,6 +44,14 @@ export const OrganizationDropdown = ({
 
   const slug = selectedOrganization?.slug
   const orgName = selectedOrganization?.name
+
+  // The Free plan badge links into the upgrade funnel. Partner-managed orgs are excluded: they
+  // change plans at the partner, and PlanUpdateSidePanel disables every paid tier for them.
+  const showPlanBadgeUpgrade =
+    !!slug &&
+    selectedOrganization?.plan.id === 'free' &&
+    selectedOrganization.managed_by === MANAGED_BY.SUPABASE &&
+    !selectedOrganization.billing_partner
 
   const [open, setOpen] = useState(false)
   const close = useEmbeddedCloseHandler(embedded, onClose, setOpen)
@@ -88,10 +98,29 @@ export const OrganizationDropdown = ({
             {orgName ?? 'Select an organization'}
           </span>
           {!!selectedOrganization && <PartnerIcon organization={selectedOrganization} />}
-          {!!selectedOrganization && (
+          {/* When upgradable, the badge is rendered as a clickable sibling (via `trailingContent`)
+              instead, to avoid nesting an `<a>` inside the org link. */}
+          {!!selectedOrganization && !showPlanBadgeUpgrade && (
             <Badge variant="default">{selectedOrganization?.plan.name}</Badge>
           )}
         </>
+      }
+      trailingContent={
+        showPlanBadgeUpgrade ? (
+          <Link
+            href={`/org/${slug}/billing?panel=subscriptionPlan&source=org_plan_badge`}
+            className="ml-2 shrink-0"
+            aria-label={`Upgrade from the ${selectedOrganization?.plan.name} plan`}
+            onClick={() => track('plan_badge_upgrade_clicked')}
+          >
+            <Badge
+              variant="default"
+              className="cursor-pointer transition-colors hover:border-foreground-muted hover:text-foreground"
+            >
+              {selectedOrganization?.plan.name}
+            </Badge>
+          </Link>
+        ) : undefined
       }
       commandContent={commandContent}
       open={open}
