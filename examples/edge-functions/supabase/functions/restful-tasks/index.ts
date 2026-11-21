@@ -12,35 +12,35 @@ interface Task {
 
 async function getTask(supabaseClient: SupabaseClient, id: string) {
   const { data: task, error } = await supabaseClient.from('tasks').select('*').eq('id', id)
-  if (error) throw error
+  if (error) throw new Error(error.message)
 
   return Response.json({ task })
 }
 
 async function getAllTasks(supabaseClient: SupabaseClient) {
   const { data: tasks, error } = await supabaseClient.from('tasks').select('*')
-  if (error) throw error
+  if (error) throw new Error(error.message)
 
   return Response.json({ tasks })
 }
 
 async function deleteTask(supabaseClient: SupabaseClient, id: string) {
   const { error } = await supabaseClient.from('tasks').delete().eq('id', id)
-  if (error) throw error
+  if (error) throw new Error(error.message)
 
   return Response.json({})
 }
 
 async function updateTask(supabaseClient: SupabaseClient, id: string, task: Task) {
   const { error } = await supabaseClient.from('tasks').update(task).eq('id', id)
-  if (error) throw error
+  if (error) throw new Error(error.message)
 
   return Response.json({ task })
 }
 
 async function createTask(supabaseClient: SupabaseClient, task: Task) {
   const { error } = await supabaseClient.from('tasks').insert(task)
-  if (error) throw error
+  if (error) throw new Error(error.message)
 
   return Response.json({ task })
 }
@@ -68,22 +68,25 @@ export default {
       // call relevant method based on method and id
       switch (true) {
         case id && method === 'GET':
-          return getTask(supabaseClient, id as string)
+          return await getTask(supabaseClient, id as string)
         case id && method === 'PUT':
-          return updateTask(supabaseClient, id as string, task)
+          return await updateTask(supabaseClient, id as string, task)
         case id && method === 'DELETE':
-          return deleteTask(supabaseClient, id as string)
+          return await deleteTask(supabaseClient, id as string)
         case method === 'POST':
-          return createTask(supabaseClient, task)
+          return await createTask(supabaseClient, task)
         case method === 'GET':
-          return getAllTasks(supabaseClient)
+          return await getAllTasks(supabaseClient)
         default:
-          return getAllTasks(supabaseClient)
+          return await getAllTasks(supabaseClient)
       }
     } catch (error) {
       console.error(error)
 
-      return Response.json({ error: error.message }, { status: 400 })
+      return Response.json(
+        { error: error instanceof Error ? error.message : String(error) },
+        { status: 400 }
+      )
     }
   }),
 }
