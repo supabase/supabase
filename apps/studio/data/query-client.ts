@@ -2,8 +2,15 @@ import { MutationCache, onlineManager, QueryCache, QueryClient } from '@tanstack
 import { useState } from 'react'
 
 import { IS_PLATFORM } from '@/lib/constants'
-import { reportQueryError } from '@/lib/errors/report-studio-error'
+import { reportQueryError, type StudioQueryMeta } from '@/lib/errors/report-studio-error'
 import { isStudioError } from '@/lib/errors/studio-errors'
+
+declare module '@tanstack/react-query' {
+  interface Register {
+    queryMeta: StudioQueryMeta
+    mutationMeta: StudioQueryMeta
+  }
+}
 
 // When running locally we don't need the internet
 // so we can pretend we're online all the time
@@ -37,8 +44,13 @@ export function getQueryClient() {
     queryClient ??
     new QueryClient({
       // Report once per failed fetch, after retries are exhausted
-      queryCache: new QueryCache({ onError: (error) => reportQueryError(error) }),
-      mutationCache: new MutationCache({ onError: (error) => reportQueryError(error) }),
+      queryCache: new QueryCache({
+        onError: (error, query) => reportQueryError(error, query.meta),
+      }),
+      mutationCache: new MutationCache({
+        onError: (error, _variables, _onMutateResult, mutation) =>
+          reportQueryError(error, mutation.meta),
+      }),
       defaultOptions: {
         queries: {
           staleTime: 60 * 1000, // 1 minute
