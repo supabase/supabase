@@ -1,8 +1,11 @@
 ---
 name: studio-ui-patterns
-description: Design system UI patterns for Supabase Studio. Use when building or updating
-  pages, forms, tables, charts, empty states, navigation, cards, alerts, or side panels
-  (sheets). Covers layout selection, component choice, and placement conventions.
+description: Design system UI patterns for the Supabase Studio dashboard codebase
+  (apps/studio). Use when building or updating UI inside apps/studio — including
+  pages, forms, tables, charts, empty states, navigation, cards, alerts, or side
+  panels (sheets) — that should follow the Studio design system. Do not use for
+  external Supabase consumer apps, marketing site work, or unrelated frontend
+  projects.
 ---
 
 # Studio UI Patterns
