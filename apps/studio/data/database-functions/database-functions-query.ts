@@ -1,9 +1,9 @@
-import pgMeta, { type SafeSqlFragment } from '@supabase/pg-meta'
+import pgMeta, { listFunctionsFallback, type SafeSqlFragment } from '@supabase/pg-meta'
 import { z } from 'zod'
 
 import { databaseKeys } from '@/data/database/keys'
 import { grantedQueryOptions, type GrantedQueryCallerOptions } from '@/data/granted-query-options'
-import { executeSql } from '@/data/sql/execute-sql-mutation'
+import { executeSqlWithCatalogFallback } from '@/data/sql/catalog-fallback-query'
 import type { StudioError } from '@/lib/errors/studio-errors'
 import type { GrantFor } from '@/lib/grants'
 
@@ -48,7 +48,7 @@ export async function getDatabaseFunctions(
   const pgMetaFunctionsList = pgMeta.functions.list({
     includedSchemas: schema ? [schema] : undefined,
   })
-  const { result } = await executeSql(
+  const { result } = await executeSqlWithCatalogFallback(
     {
       projectRef,
       connectionString,
@@ -58,6 +58,7 @@ export async function getDatabaseFunctions(
       queryKey: ['database-functions'],
       grant,
     },
+    (query) => listFunctionsFallback(query, { includedSchemas: schema ? [schema] : undefined }),
     signal,
     headers
   )

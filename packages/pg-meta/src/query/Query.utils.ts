@@ -7,6 +7,7 @@ import {
   type SafeSqlFragment,
 } from '../pg-format'
 import type { Dictionary, Filter, QueryPagination, QueryTable, Sort } from './types'
+import { columnValueLiteral, type ColumnFormat } from './write-values.fallback'
 
 export function countQuery(
   table: QueryTable,
@@ -72,18 +73,22 @@ export function insertQuery(
   options?: {
     returning?: boolean
     enumArrayColumns?: string[]
+    /** Writes literal values instead of `jsonb_populate_recordset` (see `write-values.fallback.ts`). */
+    columnFormats?: ColumnFormat[]
   }
 ) {
   if (!values || values.length === 0) {
     throw new Error('no value to insert')
   }
-  const { returning, enumArrayColumns } = options ?? {}
+  const { returning, enumArrayColumns, columnFormats } = options ?? {}
   const queryColumns = joinSqlFragments(
     Object.keys(values[0]).map((x) => ident(x)),
     ','
   )
   let query = safeSql``
-  if (queryColumns.length == 0) {
+  if (columnFormats) {
+    query = insertValuesQuery(table, values, columnFormats)
+  } else if (queryColumns.length == 0) {
     query = format(
       safeSql`insert into %1$s select from jsonb_populate_recordset(null::%1$s, %2$s)`,
       queryTable(table),
@@ -108,6 +113,37 @@ export function insertQuery(
     query = safeSql`${query}${returningStatement}`
   }
   return safeSql`${query};`
+}
+
+const formatOf = (columnFormats: ColumnFormat[], column: string) =>
+  columnFormats.find((x) => x.name === column)?.format
+
+function insertValuesQuery(
+  table: QueryTable,
+  values: Dictionary<any>[],
+  columnFormats: ColumnFormat[]
+): SafeSqlFragment {
+  const columns = Object.keys(values[0])
+  if (columns.length === 0) {
+    // One column set to its default inserts the same all-default row, without `default values`.
+    const first = columnFormats[0]
+    if (!first) throw new Error('no column to insert a default row into')
+    return safeSql`insert into ${queryTable(table)} (${ident(first.name)}) values ${joinSqlFragments(
+      values.map(() => safeSql`(default)`),
+      ', '
+    )}`
+  }
+  const rows = values.map(
+    (row) =>
+      safeSql`(${joinSqlFragments(
+        columns.map((column) => columnValueLiteral(row[column], formatOf(columnFormats, column))),
+        ', '
+      )})`
+  )
+  return safeSql`insert into ${queryTable(table)} (${joinSqlFragments(
+    columns.map((column) => ident(column)),
+    ','
+  )}) values ${joinSqlFragments(rows, ', ')}`
 }
 
 export function selectQuery(
@@ -146,9 +182,11 @@ export function updateQuery(
     filters?: Filter[]
     returning?: boolean
     enumArrayColumns?: string[]
+    /** Writes literal values instead of `json_populate_record` (see `write-values.fallback.ts`). */
+    columnFormats?: ColumnFormat[]
   }
 ) {
-  const { filters, returning, enumArrayColumns } = options ?? {}
+  const { filters, returning, enumArrayColumns, columnFormats } = options ?? {}
   if (!filters || filters.length === 0) {
     throw new Error('no filters for this update query')
   }
@@ -156,12 +194,20 @@ export function updateQuery(
     Object.keys(value).map((x) => ident(x)),
     ','
   )
-  let query = format(
-    safeSql`update %1$s set (%2$s) = (select %2$s from json_populate_record(null::%1$s, %3$s))`,
-    queryTable(table),
-    queryColumns,
-    literal(JSON.stringify(value))
-  )
+  let query = columnFormats
+    ? safeSql`update ${queryTable(table)} set ${joinSqlFragments(
+        Object.entries(value).map(
+          ([column, columnValue]) =>
+            safeSql`${ident(column)} = ${columnValueLiteral(columnValue, formatOf(columnFormats, column))}`
+        ),
+        ', '
+      )}`
+    : format(
+        safeSql`update %1$s set (%2$s) = (select %2$s from json_populate_record(null::%1$s, %3$s))`,
+        queryTable(table),
+        queryColumns,
+        literal(JSON.stringify(value))
+      )
   if (filters) {
     query = applyFilters(query, filters)
   }

@@ -575,6 +575,8 @@ export const SidePanelEditor = ({
         projectRef: project.ref,
         connectionString: project.connectionString ?? undefined,
         relationId: table.id,
+        schema: table.schema,
+        name: table.name,
         privileges,
       })
     } catch (error) {

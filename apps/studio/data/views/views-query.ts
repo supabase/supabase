@@ -1,7 +1,7 @@
-import pgMeta, { type PGView } from '@supabase/pg-meta'
+import pgMeta, { listViewsFallback, type PGView } from '@supabase/pg-meta'
 import { useQuery } from '@tanstack/react-query'
 
-import { executeSql } from '../sql/execute-sql-mutation'
+import { executeSqlWithCatalogFallback } from '../sql/catalog-fallback-query'
 import { viewKeys } from './keys'
 import { unguarded } from '@/data/fetchers'
 import type { StudioError } from '@/lib/errors/studio-errors'
@@ -20,7 +20,7 @@ export async function getViews(
   if (!projectRef) throw new Error('projectRef is required')
 
   const { sql } = pgMeta.views.list({ includedSchemas: schemas })
-  const { result } = await executeSql(
+  const { result } = await executeSqlWithCatalogFallback(
     {
       projectRef,
       connectionString,
@@ -30,6 +30,7 @@ export async function getViews(
       queryKey: ['views', schemas].filter(Boolean),
       grant: unguarded.migrating,
     },
+    (query) => listViewsFallback(query, { includedSchemas: schemas }),
     signal
   )
 

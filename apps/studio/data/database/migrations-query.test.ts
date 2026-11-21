@@ -1,8 +1,9 @@
-import { HttpResponse } from 'msw'
+import { http, HttpResponse } from 'msw'
 import { describe, expect, it } from 'vitest'
 
 import { getMigrations } from './migrations-query'
-import { addAPIMock } from '@/tests/lib/msw'
+import { API_URL } from '@/lib/constants'
+import { addAPIMock, mswServer } from '@/tests/lib/msw'
 
 describe('getMigrations', () => {
   it('returns the list of migrations', async () => {
@@ -59,5 +60,40 @@ describe('getMigrations', () => {
     })
 
     await expect(getMigrations({ projectRef: 'default' })).rejects.toThrowError('permission denied')
+  })
+
+  it('reads the migrations with the fallback, not the pg-meta SQL, on a Spark project', async () => {
+    // Project details are cached per ref for the whole file, so the Spark project has its own ref.
+    mswServer.use(
+      http.get(`${API_URL}/platform/projects/:ref`, ({ params }) =>
+        HttpResponse.json({
+          ref: String(params.ref),
+          status: 'ACTIVE_HEALTHY',
+          postgres_engine: 'spark',
+        })
+      )
+    )
+    const sqls: string[] = []
+    addAPIMock({
+      method: 'post',
+      path: '/platform/pg-meta/:ref/query',
+      response: async ({ request }) => {
+        const body = await request.json()
+        if (typeof body === 'object' && body !== null && 'query' in body) {
+          sqls.push(String(body.query))
+        }
+        return HttpResponse.json([
+          { version: '20260101000000', name: 'init', statements: ['create table t (id int)'] },
+        ])
+      },
+    })
+
+    const result = await getMigrations({ projectRef: 'spark-project' })
+
+    expect(result).toEqual([
+      { version: '20260101000000', name: 'init', statements: ['create table t (id int)'] },
+    ])
+    expect(sqls).toHaveLength(1)
+    expect(sqls[0]).not.toMatch(/do \$\$/i)
   })
 })

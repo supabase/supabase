@@ -10,10 +10,12 @@ import { LinterDataGrid } from '@/components/interfaces/Linter/LinterDataGrid'
 import { LinterFilters } from '@/components/interfaces/Linter/LinterFilters'
 import { LinterPageFooter } from '@/components/interfaces/Linter/LinterPageFooter'
 import { LintPageTabs } from '@/components/interfaces/Linter/LintPageTabs'
+import { SparkLintsUnavailable } from '@/components/interfaces/Linter/SparkLintsUnavailable'
 import { useAdvisorPageShortcuts } from '@/components/interfaces/Linter/useAdvisorPageShortcuts'
 import { LegacyAdvisorsLayout } from '@/components/layouts/AdvisorsLayout/LegacyAdvisorsLayout'
 import { FormHeader } from '@/components/ui/Forms/FormHeader'
 import { Lint, useProjectLintsQuery } from '@/data/lint/lint-query'
+import { useIsSparkProject } from '@/data/sql/catalog-fallback-query'
 import { useSelectedProjectQuery } from '@/hooks/misc/useSelectedProject'
 import { DOCS_URL } from '@/lib/constants'
 
@@ -118,5 +120,7 @@ const ProjectLints = () => {
 
 function AdvisorsSecurityPage() {
   const isIssuesInboxEnabled = useFlag('issuesInbox')
+  const isSpark = useIsSparkProject()
+  if (isSpark) return <SparkLintsUnavailable title="Security Advisor" />
   return isIssuesInboxEnabled ? <IssuesCategoryRedirect category="security" /> : <ProjectLints />
 }

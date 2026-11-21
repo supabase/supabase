@@ -1,9 +1,9 @@
-import { getExposedTablesSql } from '@supabase/pg-meta'
+import { getExposedTablesFallback, getExposedTablesSql } from '@supabase/pg-meta'
 import { infiniteQueryOptions } from '@tanstack/react-query'
 
 import { privilegeKeys } from './keys'
 import { unguarded } from '@/data/fetchers'
-import { executeSql } from '@/data/sql/execute-sql-mutation'
+import { executeSqlWithCatalogFallback } from '@/data/sql/catalog-fallback-query'
 import { INTERNAL_SCHEMAS } from '@/hooks/useProtectedSchemas'
 import type { StudioError } from '@/lib/errors/studio-errors'
 
@@ -44,7 +44,7 @@ export async function getExposedTables(
 
   const sql = getExposedTablesSql({ search, offset, limit, ignoredSchemas: IGNORED_SCHEMAS })
 
-  const { result } = await executeSql(
+  const { result } = await executeSqlWithCatalogFallback(
     {
       projectRef,
       connectionString,
@@ -54,6 +54,8 @@ export async function getExposedTables(
       queryKey: ['exposed-tables', page],
       grant: unguarded.migrating,
     },
+    (query) =>
+      getExposedTablesFallback(query, { search, offset, limit, ignoredSchemas: IGNORED_SCHEMAS }),
     signal
   )
 

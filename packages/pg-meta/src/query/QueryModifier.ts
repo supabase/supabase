@@ -8,6 +8,7 @@ import {
   updateQuery,
 } from './Query.utils'
 import type { ActionConfig, Filter, QueryPagination, QueryTable, Sort } from './types'
+import type { ColumnFormat } from './write-values.fallback'
 
 export interface IQueryModifier {
   range: (from: number, to: number) => QueryModifier
@@ -21,7 +22,12 @@ export class QueryModifier implements IQueryModifier {
     protected table: QueryTable,
     protected actionConfig: ActionConfig,
     protected options?: {
-      actionOptions?: { returning?: boolean; cascade?: boolean; enumArrayColumns?: Array<string> }
+      actionOptions?: {
+        returning?: boolean
+        cascade?: boolean
+        enumArrayColumns?: Array<string>
+        columnFormats?: Array<ColumnFormat>
+      }
       filters?: Array<Filter>
       sorts?: Array<Sort>
     }
@@ -60,6 +66,7 @@ export class QueryModifier implements IQueryModifier {
           return insertQuery(this.table, this.actionConfig.actionValue, {
             returning: actionOptions?.returning,
             enumArrayColumns: actionOptions?.enumArrayColumns,
+            columnFormats: actionOptions?.columnFormats,
           })
         }
         case 'select': {
@@ -80,6 +87,7 @@ export class QueryModifier implements IQueryModifier {
             filters,
             returning: actionOptions?.returning,
             enumArrayColumns: actionOptions?.enumArrayColumns,
+            columnFormats: actionOptions?.columnFormats,
           })
         }
         case 'truncate': {

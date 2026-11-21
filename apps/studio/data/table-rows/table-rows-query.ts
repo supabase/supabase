@@ -1,4 +1,10 @@
-import { ident, joinSqlFragments, ROLE_IMPERSONATION_NO_RESULTS, safeSql } from '@supabase/pg-meta'
+import {
+  getTableRowsFallback,
+  ident,
+  joinSqlFragments,
+  ROLE_IMPERSONATION_NO_RESULTS,
+  safeSql,
+} from '@supabase/pg-meta'
 import { Query, type QueryFilter } from '@supabase/pg-meta/src/query'
 import {
   formatPatternMatchFilterValue,
@@ -14,6 +20,7 @@ import { ENTITY_TYPE } from '@/data/entity-types/entity-type-constants'
 import { isUserFaultForValues } from '@/data/error-classification'
 import { handleError, unguarded } from '@/data/fetchers'
 import { useConnectionStringForReadOps } from '@/data/read-replicas/replicas-query'
+import { catalogFallbackQuery, withSparkFallback } from '@/data/sql/catalog-fallback-query'
 import { executeSql } from '@/data/sql/execute-sql-mutation'
 import { prefetchTableEditor } from '@/data/table-editor/table-editor-query'
 import { isMsSqlForeignTable } from '@/data/table-editor/table-editor-types'
@@ -395,33 +402,38 @@ async function getTableRows(
     ? Array.from(new Set(equalityFilterColumns))
     : undefined
 
-  const sql = wrapWithRoleImpersonation(
-    getTableRowsSql({
-      table: entity,
-      filters,
-      sorts,
-      limit,
-      page,
-      sortExcludedColumns: excludedColumns,
-    }),
-    roleImpersonationState
-  )
+  const rowsArgs = {
+    table: entity,
+    filters,
+    sorts,
+    limit,
+    page,
+    sortExcludedColumns: excludedColumns,
+  }
+  const sql = wrapWithRoleImpersonation(getTableRowsSql(rowsArgs), roleImpersonationState)
+  const variables = {
+    projectRef,
+    connectionString,
+    queryName: 'table-rows',
+    isUserFaultSqlState: filters?.length ? isUserFaultForValues : undefined,
+    queryKey: ['table-rows', table?.id],
+    isRoleImpersonationEnabled: isRoleImpersonationEnabled(roleImpersonationState?.role),
+    grant: unguarded.migrating,
+  }
 
   try {
-    const { result } = await executeSql(
-      {
-        projectRef,
-        connectionString,
-        sqlOrigin: 'studio',
-        queryName: 'table-rows',
-        isUserFaultSqlState: filters?.length ? isUserFaultForValues : undefined,
-        sql,
-        queryKey: ['table-rows', table?.id],
-        isRoleImpersonationEnabled: isRoleImpersonationEnabled(roleImpersonationState?.role),
-        preflightCheck,
-        grant: unguarded.migrating,
-      },
-      signal
+    const result = await withSparkFallback(
+      projectRef,
+      async () =>
+        (await executeSql({ ...variables, sqlOrigin: 'studio', sql, preflightCheck }, signal))
+          .result,
+      () =>
+        getTableRowsFallback(
+          catalogFallbackQuery(variables, signal, (fallbackSql) =>
+            wrapWithRoleImpersonation(fallbackSql, roleImpersonationState)
+          ),
+          rowsArgs
+        )
     )
 
     const rows = result.map((x: any, index: number) => {

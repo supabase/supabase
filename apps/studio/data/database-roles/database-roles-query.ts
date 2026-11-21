@@ -1,10 +1,10 @@
-import pgMeta from '@supabase/pg-meta'
+import pgMeta, { listRolesFallback } from '@supabase/pg-meta'
 import { QueryClient, useQuery } from '@tanstack/react-query'
 import { z } from 'zod'
 
 import { databaseRoleKeys } from './keys'
 import { unguarded } from '@/data/fetchers'
-import { executeSql } from '@/data/sql/execute-sql-mutation'
+import { executeSqlWithCatalogFallback } from '@/data/sql/catalog-fallback-query'
 import type { StudioError } from '@/lib/errors/studio-errors'
 import { UseCustomQueryOptions } from '@/types'
 
@@ -21,7 +21,7 @@ export async function getDatabaseRoles(
   { projectRef, connectionString }: DatabaseRolesVariables,
   signal?: AbortSignal
 ) {
-  const { result } = await executeSql(
+  const { result } = await executeSqlWithCatalogFallback(
     {
       projectRef,
       connectionString,
@@ -31,6 +31,7 @@ export async function getDatabaseRoles(
       queryKey: ['database-roles'],
       grant: unguarded.migrating,
     },
+    (query) => listRolesFallback(query),
     signal
   )
 

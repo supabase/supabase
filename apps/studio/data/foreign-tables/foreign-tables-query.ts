@@ -1,10 +1,10 @@
-import pgMeta from '@supabase/pg-meta'
+import pgMeta, { listForeignTablesFallback } from '@supabase/pg-meta'
 import type { PGForeignTable } from '@supabase/pg-meta'
 import { useQuery } from '@tanstack/react-query'
 
 import { foreignTableKeys } from './keys'
 import { unguarded } from '@/data/fetchers'
-import { executeSql } from '@/data/sql/execute-sql-mutation'
+import { executeSqlWithCatalogFallback } from '@/data/sql/catalog-fallback-query'
 import type { StudioError } from '@/lib/errors/studio-errors'
 import type { UseCustomQueryOptions } from '@/types'
 
@@ -18,7 +18,7 @@ export async function getForeignTables(
   { projectRef, connectionString, schemas }: ForeignTablesVariables,
   signal?: AbortSignal
 ) {
-  const { result } = await executeSql(
+  const { result } = await executeSqlWithCatalogFallback(
     {
       projectRef,
       connectionString,
@@ -28,6 +28,7 @@ export async function getForeignTables(
       queryKey: ['foreign-tables', schemas].filter(Boolean),
       grant: unguarded.migrating,
     },
+    (query) => listForeignTablesFallback(query, { includedSchemas: schemas }),
     signal
   )
 

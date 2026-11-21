@@ -1,3 +1,4 @@
+import { readColumnFormats, type ColumnFormat } from '@supabase/pg-meta'
 import { Query } from '@supabase/pg-meta/src/query'
 import { useMutation, useQueryClient } from '@tanstack/react-query'
 import { toast } from 'sonner'
@@ -5,6 +6,7 @@ import { toast } from 'sonner'
 import { tableRowKeys } from './keys'
 import { isUserFaultForValues } from '@/data/error-classification'
 import { unguarded } from '@/data/fetchers'
+import { catalogFallbackQuery, withSparkFallback } from '@/data/sql/catalog-fallback-query'
 import { executeSql } from '@/data/sql/execute-sql-mutation'
 import type { StudioError } from '@/lib/errors/studio-errors'
 import { RoleImpersonationState, wrapWithRoleImpersonation } from '@/lib/role-impersonation'
@@ -28,13 +30,17 @@ export function getTableRowUpdateSql({
   payload,
   returning = false,
   enumArrayColumns,
+  columnFormats,
 }: Pick<
   TableRowUpdateVariables,
   'table' | 'payload' | 'configuration' | 'enumArrayColumns' | 'returning'
->) {
+> & {
+  /** TEMPORARY: writes literal values where `json_populate_record` is missing (Spark). */
+  columnFormats?: ColumnFormat[]
+}) {
   return new Query()
     .from(table.name, table.schema ?? undefined)
-    .update(payload, { returning, enumArrayColumns })
+    .update(payload, { returning, enumArrayColumns, columnFormats })
     .match(configuration.identifiers)
     .toSql()
 }
@@ -49,24 +55,49 @@ export async function updateTableRow({
   returning,
   roleImpersonationState,
 }: TableRowUpdateVariables) {
-  const sql = wrapWithRoleImpersonation(
-    getTableRowUpdateSql({ table, configuration, payload, enumArrayColumns, returning }),
-    roleImpersonationState
-  )
+  const grant = unguarded.migrating
+  const write = async (columnFormats?: ColumnFormat[]) => {
+    const sql = wrapWithRoleImpersonation(
+      getTableRowUpdateSql({
+        table,
+        configuration,
+        payload,
+        enumArrayColumns,
+        returning,
+        columnFormats,
+      }),
+      roleImpersonationState
+    )
+    const { result } = await executeSql({
+      projectRef,
+      connectionString,
+      sqlOrigin: 'studio',
+      queryName: 'table-row-update',
+      isUserFaultSqlState: isUserFaultForValues,
+      sql,
+      isRoleImpersonationEnabled: isRoleImpersonationEnabled(roleImpersonationState?.role),
+      queryKey: ['table-row-update', table.id],
+      grant,
+    })
+    return result
+  }
 
-  const { result } = await executeSql({
+  return withSparkFallback(
     projectRef,
-    connectionString,
-    sqlOrigin: 'studio',
-    queryName: 'table-row-update',
-    isUserFaultSqlState: isUserFaultForValues,
-    sql,
-    isRoleImpersonationEnabled: isRoleImpersonationEnabled(roleImpersonationState?.role),
-    queryKey: ['table-row-update', table.id],
-    grant: unguarded.migrating,
-  })
-
-  return result
+    () => write(),
+    async () =>
+      write(
+        await readColumnFormats(
+          catalogFallbackQuery({
+            projectRef,
+            connectionString,
+            queryName: 'table-row-update',
+            grant,
+          }),
+          table.id
+        )
+      )
+  )
 }
 
 type TableRowUpdateData = Awaited<ReturnType<typeof updateTableRow>>

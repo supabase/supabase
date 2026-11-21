@@ -3,6 +3,7 @@ import { useQuery } from '@tanstack/react-query'
 
 import { databaseKeys } from './keys'
 import { unguarded } from '@/data/fetchers'
+import { useIsSparkProject } from '@/data/sql/catalog-fallback-query'
 import { executeSql } from '@/data/sql/execute-sql-mutation'
 import type { StudioError } from '@/lib/errors/studio-errors'
 import { UseCustomQueryOptions } from '@/types'
@@ -47,10 +48,13 @@ export const useMaxConnectionsQuery = <TData = MaxConnectionsData>(
     enabled = true,
     ...options
   }: UseCustomQueryOptions<MaxConnectionsData, MaxConnectionsError, TData> = {}
-) =>
-  useQuery<MaxConnectionsData, MaxConnectionsError, TData>({
+) => {
+  // TEMPORARY: Spark refuses `SHOW max_connections` and has no connection limit to report.
+  const isSpark = useIsSparkProject()
+  return useQuery<MaxConnectionsData, MaxConnectionsError, TData>({
     queryKey: databaseKeys.maxConnections(projectRef),
     queryFn: ({ signal }) => getMaxConnections({ projectRef, connectionString }, signal),
-    enabled: enabled && typeof projectRef !== 'undefined',
+    enabled: enabled && typeof projectRef !== 'undefined' && !isSpark,
     ...options,
   })
+}
