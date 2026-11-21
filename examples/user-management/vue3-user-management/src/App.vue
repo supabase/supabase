@@ -8,12 +8,12 @@ const claims = ref()
 
 onMounted(() => {
   supabase.auth.getClaims().then(({ data }) => {
-    claims.value = data.claims
+    claims.value = data?.claims
   })
 
   supabase.auth.onAuthStateChange(async () => {
     const { data } = await supabase.auth.getClaims()
-    claims.value = data.claims
+    claims.value = data?.claims
   })
 })
 </script>
