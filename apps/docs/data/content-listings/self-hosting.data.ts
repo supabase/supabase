@@ -61,6 +61,14 @@ export const selfHostingThirdPartyGuides: ContentListingGroup = {
       description:
         'Keep Studio and Postgres off the public internet with NetBird network access controls.',
     },
+    {
+      title: 'Run self-hosted Supabase in production',
+      href: 'https://pulore.com/blog/self-hosted-supabase-production-guide',
+      icon: { kind: 'server', color: '#64748B', bg: 'rgba(100,116,139,0.1)' },
+      subtitle: 'By Pulore',
+      description:
+        'What each service in the stack needs in production: upgrades, backups, auth email, storage, and a checklist.',
+    },
   ],
 }
 
