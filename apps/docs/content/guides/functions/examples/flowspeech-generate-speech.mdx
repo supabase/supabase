@@ -1,0 +1,777 @@
+---
+title: Generate speech with FlowSpeech
+subtitle: Submit speech jobs, check their status, and download audio through a Supabase Edge Function.
+---
+
+Use the [FlowSpeech public API](https://flowspeech.io/docs/public-api) from a Supabase Edge Function to generate speech. The function runs one operation per request. Your caller submits a job, polls its status, and downloads the completed WAV file.
+
+Use [Set up the function](#set-up-the-function) to create a server-to-server gateway, then [Run the caller](#run-the-caller) to generate audio. Read [Recovery and limits](#recovery-and-limits) before deploying.
+
+## Requirements
+
+- An active paid FlowSpeech Basic, Pro, or Scale subscription and a developer [API key](https://flowspeech.io/settings/apikeys). Trials do not include API generation.
+- A [Supabase project](/dashboard) and the [Supabase CLI](/docs/guides/local-development).
+- Node.js 20 or later for the caller example.
+
+<Admonition type="caution">
+
+Generation uses your FlowSpeech account credits. This example is for trusted server-side callers. It requires a separate gateway token as well as the Supabase project key. Keep both the gateway token and FlowSpeech key out of browser code. Before exposing this to application users, add user authentication, per-user job ownership, and rate limits.
+
+</Admonition>
+
+## Set up the function
+
+1. Initialize your project and create the function:
+
+   ```bash
+   supabase init
+   supabase functions new flowspeech-tts
+   ```
+
+2. Create `supabase/functions/.env` with these secrets. Generate a gateway token with at least 32 random characters and use the same token in your trusted caller.
+
+   ```env supabase/functions/.env
+   FLOWSPEECH_API_KEY=YOUR_FLOWSPEECH_API_KEY
+   FLOWSPEECH_GATEWAY_TOKEN=YOUR_RANDOM_GATEWAY_TOKEN_AT_LEAST_32_CHARACTERS
+   ```
+
+   Do not commit this file. Check that your project ignores it.
+
+3. Replace `supabase/functions/flowspeech-tts/index.ts` with this code:
+
+```ts supabase/functions/flowspeech-tts/index.ts
+import 'jsr:@supabase/functions-js/edge-runtime.d.ts'
+
+type ObjectValue = Record<string, unknown>
+const API = 'https://flowspeech.io/api/v1'
+const UUID = /^[0-9a-f]{8}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{12}$/i
+const pending = ['queued', 'running', 'merging', 'settling']
+const publicErrorCodes = new Set([
+  'invalid_request',
+  'invalid_api_key',
+  'insufficient_scope',
+  'insufficient_credits',
+  'subscription_required',
+  'rate_limited',
+  'service_unavailable',
+  'job_not_found',
+  'job_already_completed',
+  'idempotency_conflict',
+])
+const encoder = new TextEncoder()
+
+function safeError(value: unknown, secrets: string[], retryable: boolean) {
+  const details =
+    value && typeof value === 'object' && !Array.isArray(value)
+      ? (value as Record<string, unknown>)
+      : {}
+  const code = details.code
+  return {
+    code:
+      typeof code === 'string' &&
+      publicErrorCodes.has(code) &&
+      !secrets.some((secret) => code.includes(secret))
+        ? code
+        : 'upstream_error',
+    message: 'FlowSpeech request did not succeed',
+    retryable,
+  }
+}
+
+function safeTrace(value: unknown, secrets: string[]) {
+  return typeof value === 'string' &&
+    UUID.test(value) &&
+    !secrets.some((secret) => value.toLowerCase().includes(secret.toLowerCase()))
+    ? value.toLowerCase()
+    : undefined
+}
+
+class Problem extends Error {
+  constructor(
+    public code: string,
+    message: string,
+    public status = 400
+  ) {
+    super(message)
+  }
+}
+
+function object(value: unknown): ObjectValue {
+  if (!value || typeof value !== 'object' || Array.isArray(value)) {
+    throw new Problem('invalid_request', 'Expected a JSON object')
+  }
+  return value as ObjectValue
+}
+
+function validateWav(bytes: Uint8Array) {
+  const invalid = () => {
+    throw new Problem('invalid_audio', 'Expected complete 24 kHz mono 16-bit PCM WAV', 502)
+  }
+  const view = new DataView(bytes.buffer, bytes.byteOffset, bytes.byteLength)
+  const tag = (offset: number) => new TextDecoder().decode(bytes.subarray(offset, offset + 4))
+  if (
+    bytes.length < 44 ||
+    tag(0) !== 'RIFF' ||
+    tag(8) !== 'WAVE' ||
+    view.getUint32(4, true) !== bytes.length - 8
+  )
+    invalid()
+  let format = false
+  let data = false
+  let offset = 12
+  while (offset < bytes.length) {
+    if (bytes.length - offset < 8) invalid()
+    const size = view.getUint32(offset + 4, true)
+    const start = offset + 8
+    const end = start + size
+    const paddedEnd = end + (size % 2)
+    if (paddedEnd > bytes.length) invalid()
+    if (tag(offset) === 'fmt ') {
+      if (
+        format ||
+        data ||
+        (size !== 16 && size !== 18) ||
+        (size === 18 && view.getUint16(start + 16, true) !== 0) ||
+        view.getUint16(start, true) !== 1 ||
+        view.getUint16(start + 2, true) !== 1 ||
+        view.getUint32(start + 4, true) !== 24000 ||
+        view.getUint32(start + 8, true) !== 48000 ||
+        view.getUint16(start + 12, true) !== 2 ||
+        view.getUint16(start + 14, true) !== 16
+      )
+        invalid()
+      format = true
+    } else if (tag(offset) === 'data') {
+      if (!format || data || size === 0 || size % 2 !== 0) invalid()
+      data = true
+    }
+    offset = paddedEnd
+  }
+  if (!format || !data) invalid()
+}
+
+function fields(value: ObjectValue, allowed: string[]) {
+  if (Object.keys(value).some((key) => !allowed.includes(key))) {
+    throw new Problem('invalid_request', 'Unsupported field')
+  }
+}
+
+function text(value: unknown, maximum: number): string {
+  if (typeof value !== 'string' || !value.trim() || value.length > maximum) {
+    throw new Problem('invalid_request', 'Missing or invalid text field')
+  }
+  return value
+}
+
+function uuid(value: unknown): string {
+  if (typeof value !== 'string' || !UUID.test(value)) {
+    throw new Problem('invalid_request', 'Expected a UUID')
+  }
+  return value.toLowerCase()
+}
+
+function input(value: unknown) {
+  const script = object(value)
+  if (script.mode === 'single') {
+    fields(script, ['mode', 'text', 'voiceName'])
+    return { mode: 'single', text: text(script.text, 5000), voiceName: text(script.voiceName, 100) }
+  }
+  if (
+    script.mode !== 'multi' ||
+    !Array.isArray(script.segments) ||
+    !script.segments.length ||
+    script.segments.length > 1000
+  ) {
+    throw new Problem('invalid_request', 'Expected single or multi input')
+  }
+  fields(script, ['mode', 'segments'])
+  const segments = script.segments.map((value) => {
+    const segment = object(value)
+    fields(segment, ['speaker', 'text', 'voiceName'])
+    return {
+      speaker: text(segment.speaker, 100),
+      text: text(segment.text, 5000),
+      voiceName: text(segment.voiceName, 100),
+    }
+  })
+  if (segments.reduce((total, segment) => total + segment.text.length, 0) > 5000) {
+    throw new Problem('invalid_request', 'This example limits text to 5000 UTF-16 code units')
+  }
+  return { mode: 'multi', segments }
+}
+
+async function readBytes(response: Response, limit: number, signal: AbortSignal) {
+  const reader = response.body?.getReader()
+  if (!reader) throw new Problem('empty_response', 'Response body is missing', 502)
+  const cancel = () => {
+    void reader.cancel().catch(() => {})
+  }
+  signal.addEventListener('abort', cancel, { once: true })
+  let total = 0
+  const chunks: Uint8Array[] = []
+  try {
+    signal.throwIfAborted()
+    while (true) {
+      const { done, value } = await reader.read()
+      signal.throwIfAborted()
+      if (done) break
+      total += value.byteLength
+      if (total > limit) throw new Problem('response_too_large', 'Body exceeds the byte limit', 413)
+      chunks.push(value)
+    }
+    const bytes = new Uint8Array(total)
+    let offset = 0
+    for (const chunk of chunks) {
+      bytes.set(chunk, offset)
+      offset += chunk.byteLength
+    }
+    return bytes
+  } finally {
+    signal.removeEventListener('abort', cancel)
+    await reader.cancel().catch(() => {})
+    reader.releaseLock()
+  }
+}
+
+function job(
+  value: unknown,
+  expectedId?: string,
+  expectedRequestId?: string,
+  secrets: string[] = []
+): ObjectValue & { id: string; requestId: string; status: string } {
+  const result = object(value)
+  const id = uuid(result.id)
+  const requestId = uuid(result.requestId)
+  if (
+    (expectedId && id !== expectedId) ||
+    (expectedRequestId && requestId !== expectedRequestId) ||
+    typeof result.status !== 'string' ||
+    ![...pending, 'success', 'failed', 'cancelled'].includes(result.status)
+  ) {
+    throw new Problem('invalid_job', 'Malformed or mismatched job', 502)
+  }
+  const usage = object(result.usage)
+  if (
+    ['billableCharacters', 'reservedCredits', 'chargedCredits'].some(
+      (key) => !Number.isSafeInteger(usage[key]) || Number(usage[key]) < 0
+    )
+  ) {
+    throw new Problem('invalid_job', 'Invalid usage', 502)
+  }
+  if (result.status === 'success' && !result.resultDeleted) {
+    const audio = object(result.result)
+    if (
+      audio.mimeType !== 'audio/wav' ||
+      audio.sampleRate !== 24000 ||
+      audio.channels !== 1 ||
+      audio.bitsPerSample !== 16
+    ) {
+      throw new Problem('invalid_result', 'Invalid WAV result metadata', 502)
+    }
+    const url = new URL(text(audio.url, 8192))
+    if (url.protocol !== 'https:' || url.username || url.password || url.hash) {
+      throw new Problem('invalid_result', 'Unsafe result URL', 502)
+    }
+  }
+  return {
+    ...result,
+    id,
+    requestId,
+    status: result.status,
+    ...(result.error != null ? { error: safeError(result.error, secrets, false) } : {}),
+    ...(Object.hasOwn(result, 'traceId') ? { traceId: safeTrace(result.traceId, secrets) } : {}),
+  }
+}
+
+function reply(value: unknown, status = 200, retryAfter?: string | null) {
+  return Response.json(value, {
+    status,
+    headers: { 'Cache-Control': 'no-store', ...(retryAfter ? { 'Retry-After': retryAfter } : {}) },
+  })
+}
+
+Deno.serve(async (request) => {
+  if (request.method !== 'POST') return reply({ error: { code: 'method_not_allowed' } }, 405)
+  const apiKey = Deno.env.get('FLOWSPEECH_API_KEY')
+  const gatewayToken = Deno.env.get('FLOWSPEECH_GATEWAY_TOKEN')
+  if (
+    !apiKey ||
+    /\s/.test(apiKey) ||
+    !gatewayToken ||
+    gatewayToken.length < 32 ||
+    /\s/.test(gatewayToken)
+  ) {
+    return reply({ error: { code: 'configuration_error' } }, 500)
+  }
+  // This server-to-server example does not grant paid access to anonymous project users.
+  const supplied = request.headers.get('X-FlowSpeech-Gateway-Token') ?? ''
+  const [actual, expected] = await Promise.all(
+    [supplied, gatewayToken].map(
+      async (value) => new Uint8Array(await crypto.subtle.digest('SHA-256', encoder.encode(value)))
+    )
+  )
+  if (actual.reduce((difference, byte, index) => difference | (byte ^ expected[index]), 0) !== 0) {
+    return reply({ error: { code: 'unauthorized' } }, 401)
+  }
+
+  const controller = new AbortController()
+  const timer = setTimeout(() => controller.abort(), 30000)
+  let requestId: string | undefined
+  let id: string | undefined
+  try {
+    let body: ObjectValue
+    try {
+      body = object(
+        JSON.parse(
+          new TextDecoder().decode(
+            await readBytes(new Response(request.body), 65536, controller.signal)
+          )
+        )
+      )
+    } catch (error) {
+      if (controller.signal.aborted) throw error
+      if (error instanceof Problem) throw error
+      throw new Problem('invalid_request', 'Expected JSON input')
+    }
+    const action = body.action
+    if (
+      !['create', 'get', 'recover', 'cancel', 'download', 'quota', 'voices'].includes(
+        String(action)
+      )
+    ) {
+      throw new Problem('invalid_request', 'Unknown action')
+    }
+    fields(
+      body,
+      action === 'create'
+        ? ['action', 'requestId', 'input']
+        : action === 'recover'
+          ? ['action', 'requestId']
+          : ['get', 'cancel', 'download'].includes(String(action))
+            ? ['action', 'id']
+            : ['action']
+    )
+    if (['create', 'recover'].includes(String(action))) requestId = uuid(body.requestId)
+    if (['get', 'cancel', 'download'].includes(String(action))) id = uuid(body.id)
+    const path =
+      action === 'quota'
+        ? '/quota'
+        : action === 'voices'
+          ? '/voices'
+          : action === 'recover'
+            ? '/tts/jobs?requestId=' + requestId
+            : '/tts/jobs' + (id ? '/' + id : '') + (action === 'cancel' ? '/cancel' : '')
+    const createBody =
+      action === 'create' ? JSON.stringify({ input: input(body.input) }) : undefined
+    const response = await fetch(API + path, {
+      method: ['create', 'cancel'].includes(String(action)) ? 'POST' : 'GET',
+      redirect: 'error',
+      credentials: 'omit',
+      signal: controller.signal,
+      headers: {
+        Authorization: 'Bearer ' + apiKey,
+        Accept: 'application/json',
+        ...(createBody
+          ? { 'Content-Type': 'application/json', 'Idempotency-Key': requestId! }
+          : {}),
+      },
+      body: createBody,
+    })
+    if (response.status >= 300 && response.status < 400)
+      throw new Problem('unexpected_redirect', 'API redirect rejected', 502)
+    const upstreamError = () =>
+      reply(
+        {
+          error: {
+            code: 'upstream_error',
+            message: 'Upstream error response could not be read or validated',
+            retryable: response.status === 429 || response.status >= 500,
+          },
+          requestId,
+          id,
+        },
+        response.status,
+        response.headers.get('Retry-After')
+      )
+    let responseBytes: Uint8Array
+    try {
+      responseBytes = await readBytes(response, 1048576, controller.signal)
+    } catch (error) {
+      if (!response.ok) return upstreamError()
+      throw error
+    }
+    let payload: ObjectValue
+    try {
+      payload = object(JSON.parse(new TextDecoder().decode(responseBytes)))
+    } catch {
+      if (response.ok)
+        throw new Problem('invalid_response', 'Malformed successful API response', 502)
+      return upstreamError()
+    }
+    if (!response.ok) {
+      let error: ObjectValue
+      try {
+        error = object(payload.error)
+      } catch {
+        return upstreamError()
+      }
+      if (
+        typeof error.code !== 'string' ||
+        typeof error.message !== 'string' ||
+        typeof error.retryable !== 'boolean' ||
+        typeof payload.traceId !== 'string'
+      ) {
+        return upstreamError()
+      }
+      return reply(
+        {
+          error: safeError(
+            error,
+            [apiKey, gatewayToken],
+            (response.status === 429 || response.status >= 500) && error.retryable
+          ),
+          traceId: safeTrace(payload.traceId, [apiKey, gatewayToken]),
+          requestId,
+          id,
+        },
+        response.status,
+        response.headers.get('Retry-After')
+      )
+    }
+    if (action === 'quota' || action === 'voices') {
+      if (
+        action === 'voices'
+          ? !Array.isArray(payload.voices)
+          : !payload.quota ||
+            !('subscription' in payload || 'entitlement' in payload) ||
+            !payload.limits
+      ) {
+        throw new Problem('invalid_response', 'Malformed API response', 502)
+      }
+      return reply(payload)
+    }
+    let current: ReturnType<typeof job>
+    try {
+      current = job(payload, id, requestId, [apiKey, gatewayToken])
+    } catch {
+      throw new Problem('invalid_job', 'Malformed or mismatched job response', 502)
+    }
+    id = current.id
+    requestId = current.requestId
+    if (action !== 'download')
+      return reply(current, response.status, response.headers.get('Retry-After'))
+    if (current.status !== 'success')
+      throw new Problem('job_not_successful', 'Job is ' + current.status, 409)
+    if (current.resultDeleted) throw new Problem('result_deleted', 'Recording was deleted', 410)
+
+    // Never copy API, gateway or caller headers to storage. Do not follow redirects.
+    const audio = await fetch(String(object(current.result).url), {
+      credentials: 'omit',
+      redirect: 'error',
+      signal: controller.signal,
+    })
+    if (audio.status !== 200) {
+      await audio.body?.cancel().catch(() => {})
+      if (audio.status >= 400) {
+        return reply(
+          {
+            error: {
+              code: 'download_failed',
+              message: 'Download failed; retry this job, not creation',
+              retryable: audio.status === 429 || audio.status >= 500,
+            },
+            requestId,
+            id,
+          },
+          audio.status,
+          audio.headers.get('Retry-After')
+        )
+      }
+      throw new Problem('download_failed', 'Retry download for this job, not creation', 502)
+    }
+    const bytes = await readBytes(audio, 50 * 1024 * 1024, controller.signal)
+    validateWav(bytes)
+    return new Response(bytes, {
+      headers: {
+        'Content-Type': 'audio/wav',
+        'Cache-Control': 'no-store',
+        'X-FlowSpeech-Request-Id': requestId,
+        'X-FlowSpeech-Job-Id': id,
+      },
+    })
+  } catch (error) {
+    const problem =
+      error instanceof Problem
+        ? error
+        : new Problem(
+            controller.signal.aborted ? 'deadline_exceeded' : 'upstream_error',
+            'Request did not complete; recover with the original requestId or job ID',
+            controller.signal.aborted ? 504 : 502
+          )
+    return reply(
+      {
+        error: {
+          code: problem.code,
+          message: problem.message,
+          retryable: ['upstream_error', 'deadline_exceeded'].includes(problem.code),
+        },
+        requestId,
+        id,
+      },
+      problem.status
+    )
+  } finally {
+    clearTimeout(timer)
+  }
+})
+```
+
+The function sends your API key only to `https://flowspeech.io/api/v1`. Audio downloads use a separate request with no API key, gateway token, cookies, or caller headers. Both requests reject redirects. Downloads validate the complete RIFF structure, chunk bounds, PCM format, and nonempty aligned audio data before returning a WAV file.
+
+API errors with unreadable bodies, malformed JSON error objects, or non-JSON content retain their HTTP status and `Retry-After` header through the gateway. Storage HTTP errors retain those fields too. Error messages are local, fixed text; only recognized error codes and canonical trace UUIDs are returned, excluding configured credentials. Terminal job errors are filtered in the same way. The caller respects upstream cooldowns even after interrupted response bodies, without retrying known 401/403 responses.
+
+The gateway accepts these actions:
+
+| Action     | Additional fields    | Purpose                                              |
+| ---------- | -------------------- | ---------------------------------------------------- |
+| `quota`    | None                 | Read top-level `quota`, `subscription`, and `limits` |
+| `voices`   | None                 | Read the top-level `voices` array                    |
+| `create`   | `requestId`, `input` | Submit a new job or replay an identical request      |
+| `get`      | `id`                 | Read a job                                           |
+| `recover`  | `requestId`          | Find a job after a lost response                     |
+| `cancel`   | `id`                 | Cancel unfinished work                               |
+| `download` | `id`                 | Retrieve an existing successful recording            |
+
+Unknown fields, including legacy speaker scripts, model, speed, and format options, are rejected. The function returns job objects directly. Use the `download` action to retrieve audio as WAV bytes.
+
+## Run the caller
+
+1. Start Supabase and serve the function:
+
+   ```bash
+   supabase start
+   supabase functions serve flowspeech-tts --env-file supabase/functions/.env
+   ```
+
+2. In a separate terminal, set your trusted caller's environment. Get the local anon key from `supabase status`. This key alone does not authorize paid generation through the example.
+
+   ```bash
+   export FLOWSPEECH_FUNCTION_URL='http://127.0.0.1:54321/functions/v1/flowspeech-tts'
+   export SUPABASE_ANON_KEY='YOUR_LOCAL_ANON_KEY'
+   export FLOWSPEECH_GATEWAY_TOKEN='YOUR_RANDOM_GATEWAY_TOKEN_AT_LEAST_32_CHARACTERS'
+   ```
+
+3. Create `generate.mjs` with this code:
+
+```js generate.mjs
+import { writeFile } from 'node:fs/promises'
+import { randomUUID } from 'node:crypto'
+
+const functionUrl = process.env.FLOWSPEECH_FUNCTION_URL
+const supabaseKey = process.env.SUPABASE_ANON_KEY
+const gatewayToken = process.env.FLOWSPEECH_GATEWAY_TOKEN
+const requestId = process.env.FLOWSPEECH_REQUEST_ID || randomUUID()
+const input = { mode: 'single', text: 'Hello from a Supabase Edge Function.', voiceName: 'Kore' }
+const deadline = Date.now() + 600000
+const pending = ['queued', 'running', 'merging', 'settling']
+if (!functionUrl || !supabaseKey || !gatewayToken)
+  throw new Error('Missing server-side environment variables')
+const endpoint = new URL(functionUrl)
+if (
+  endpoint.username ||
+  endpoint.password ||
+  endpoint.hash ||
+  (endpoint.protocol !== 'https:' &&
+    !(endpoint.protocol === 'http:' && endpoint.hostname === '127.0.0.1'))
+) {
+  throw new Error('Use HTTPS, or loopback HTTP for local development, without embedded credentials')
+}
+if (!/^[0-9a-f]{8}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{12}$/i.test(requestId))
+  throw new Error('requestId must be a UUID')
+console.log('Save requestId for recovery:', requestId)
+
+function remaining() {
+  const ms = deadline - Date.now()
+  if (ms <= 0) throw new Error('Total deadline exceeded; recover requestId=' + requestId)
+  return ms
+}
+function retryDelay(header) {
+  const seconds = /^\d+$/.test(header || '')
+    ? Number(header)
+    : (Date.parse(header) - Date.now()) / 1000
+  return Math.max(5000, Number.isFinite(seconds) ? seconds * 1000 : 5000)
+}
+function errorCode(value) {
+  return typeof value === 'string' &&
+    /^[A-Za-z0-9_-]{1,128}$/.test(value) &&
+    ![supabaseKey, gatewayToken].some((secret) => value.includes(secret))
+    ? value
+    : 'request_failed'
+}
+async function wait(ms) {
+  if (ms >= remaining())
+    throw new Error('Retry delay exceeds total deadline; requestId=' + requestId)
+  await new Promise((resolve) => setTimeout(resolve, ms))
+}
+async function bytes(response, limit) {
+  const reader = response.body.getReader()
+  let length = 0
+  const chunks = []
+  try {
+    for (;;) {
+      const { done, value } = await reader.read()
+      remaining()
+      if (done) break
+      length += value.byteLength
+      if (length > limit) throw new Error('Response exceeds byte limit')
+      chunks.push(value)
+    }
+    return Buffer.concat(chunks)
+  } finally {
+    await reader.cancel().catch(() => {})
+    reader.releaseLock()
+  }
+}
+async function call(action, arguments_ = {}) {
+  const body = JSON.stringify({ action, ...arguments_ })
+  for (let attempt = 0; ; attempt++) {
+    let response, raw
+    try {
+      response = await fetch(functionUrl, {
+        method: 'POST',
+        redirect: 'error',
+        credentials: 'omit',
+        signal: AbortSignal.timeout(Math.min(30000, remaining())),
+        headers: {
+          Authorization: 'Bearer ' + supabaseKey,
+          'Content-Type': 'application/json',
+          'X-FlowSpeech-Gateway-Token': gatewayToken,
+        },
+        body,
+      })
+      raw = await bytes(response, action === 'download' && response.ok ? 50 * 1024 * 1024 : 1048576)
+    } catch (error) {
+      const transient = ['TypeError', 'AbortError', 'TimeoutError'].includes(error.name)
+      const retryable =
+        transient && (!response || response.ok || response.status === 429 || response.status >= 500)
+      if (attempt < 2 && retryable) {
+        await wait(retryDelay(response?.headers.get('Retry-After')))
+        continue
+      }
+      const failure = new Error('Gateway request did not complete; requestId=' + requestId)
+      failure.status = response?.status
+      throw failure
+    }
+    const delay = retryDelay(response.headers.get('Retry-After'))
+    if (response.ok && action === 'download') return raw
+    let payload
+    try {
+      payload = JSON.parse(raw.toString('utf8'))
+    } catch {
+      if (response.ok) throw new Error('invalid_response; requestId=' + requestId)
+      payload = { error: { code: 'invalid_response', retryable: response.status >= 500 } }
+    }
+    if (response.ok) return { job: payload, delay }
+    if (
+      attempt < 2 &&
+      (response.status === 429 || (response.status >= 500 && payload.error?.retryable))
+    ) {
+      await wait(delay)
+      continue
+    }
+    const error = new Error(errorCode(payload.error?.code) + '; requestId=' + requestId)
+    error.status = response.status
+    throw error
+  }
+}
+
+let response
+try {
+  response = await call('recover', { requestId })
+} catch (error) {
+  if (error.status !== 404) throw error
+  response = await call('create', { requestId, input })
+}
+while (pending.includes(response.job.status)) {
+  await wait(response.delay)
+  response = await call('get', { id: response.job.id })
+}
+if (response.job.status !== 'success')
+  throw new Error(
+    'Job did not succeed: ' + errorCode(response.job.error?.code) + '; requestId=' + requestId
+  )
+if (response.job.resultDeleted || !response.job.result)
+  throw new Error('Recording result is unavailable; requestId=' + requestId)
+const audio = await call('download', { id: response.job.id })
+await writeFile('speech.wav', audio)
+console.log('Saved speech.wav; jobId=' + response.job.id)
+```
+
+4. Intentionally run the caller to create a billable recording:
+
+   ```bash
+   node generate.mjs
+   ```
+
+The caller prints a request ID before submission. Save it so you can recover after an interruption. The output is `speech.wav`: mono, 16-bit WAV audio at 24,000 samples per second.
+
+For multiple speakers, replace the caller's `input` value with this object and use a new request ID:
+
+```js
+const input = {
+  mode: 'multi',
+  segments: [
+    { speaker: 'Alice', text: 'Welcome!', voiceName: 'Kore' },
+    { speaker: 'Bob', text: 'Thank you.', voiceName: 'Puck' },
+  ],
+}
+```
+
+Use the `voices` action to select a supported, case-sensitive voice name. Use `quota.available` from the `quota` action to check available credits.
+
+## Recovery and limits
+
+Keep the same UUID and input when retrying an interrupted create request. The gateway forwards that UUID as `Idempotency-Key`. A new UUID represents a new recording. To retry a download, use the existing job ID.
+
+To resume, set the printed request ID and rerun the unchanged caller:
+
+```bash
+export FLOWSPEECH_REQUEST_ID='PASTE_PREVIOUS_REQUEST_ID_HERE'
+node generate.mjs
+```
+
+The caller tries recovery first. Only a 404 leads to resubmission with the same ID and input. It retries temporary transport failures and retryable HTTP errors at most twice, without changing the serialized request. HTML or plain-text error responses still follow the HTTP status and `Retry-After`: 429 and 5xx responses use the same retry budget. Invalid JSON in a successful job response fails immediately. Errors retain the request ID for recovery. A failed or cancelled job remains terminal when its request ID is reused.
+
+Pending states are `queued`, `running`, `merging`, and `settling`. Poll at least five seconds apart, or longer when `Retry-After` requires it. HTTP 200 only means a status query succeeded. Generation succeeds only when the job's `status` is `success`.
+
+A deleted recording can report `success` with `result: null` and `resultDeleted: true`. The gateway reports this explicitly. Downloads retry the existing job; they never create another recording. Audio URLs are link-accessible, so treat them as private recording data.
+
+The caller has a 10-minute total deadline. Each gateway request has a 30-second deadline covering upstream fetches and response bodies, with a 50 MiB streaming download limit. Input is limited to 5,000 UTF-16 code units. Longer jobs can be resumed with the same request ID. There is no long-running polling loop inside the Edge Function.
+
+Stopping the caller does not cancel a server job. Send `{"action":"cancel","id":"YOUR_JOB_ID"}` through the authenticated gateway to cancel unfinished work. A `job_already_completed` conflict means the job finished first. Save `error.code`, `traceId`, request ID, and job ID when troubleshooting.
+
+## Deploy
+
+1. Link your local project:
+
+   ```bash
+   supabase link
+   ```
+
+2. Set secrets from the ignored file:
+
+   ```bash
+   supabase secrets set --env-file supabase/functions/.env
+   ```
+
+3. Deploy the function without disabling JWT verification:
+
+   ```bash
+   supabase functions deploy flowspeech-tts
+   ```
+
+4. Set `FLOWSPEECH_FUNCTION_URL` to `https://YOUR_PROJECT_REF.supabase.co/functions/v1/flowspeech-tts` and use your project's key in the trusted caller. Keep the same gateway token on both sides.
+
+Do not use `--no-verify-jwt` as a substitute for authentication. This example keeps its own server-only gateway token check in addition to Supabase's gateway checks. Add application-specific authorization and limits before allowing untrusted callers.
+
+Validate with mocked HTTP responses before connecting production credentials. The examples are not a request to run paid generation as part of a test or documentation build.
