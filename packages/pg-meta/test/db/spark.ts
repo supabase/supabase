@@ -76,7 +76,7 @@ export async function startSpark(migration: string) {
   }
 
   const query: CatalogQuery = async (sql) => {
-    const response = await fetch(`${url}/_spark/v1/query`, {
+    const response = await fetch(`${url}/database/query`, {
       method: 'POST',
       headers: {
         apikey: SERVICE_ROLE_KEY,
