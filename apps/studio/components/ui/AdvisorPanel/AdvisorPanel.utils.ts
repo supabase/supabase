@@ -92,8 +92,11 @@ export const createAdvisorNotificationItems = (
 ): AdvisorNotificationItem[] => {
   if (!notifications) return []
 
-  return notifications.map((notification) => {
-    const data = notification.data as NotificationData
+  return notifications.flatMap((notification) => {
+    const data = notification.data as NotificationData | null | undefined
+
+    // Skip notifications without a usable payload, since the panel and detail view need a title
+    if (!data || typeof data.title !== 'string') return []
 
     return {
       id: notification.id,
