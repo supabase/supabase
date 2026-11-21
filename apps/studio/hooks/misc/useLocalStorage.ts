@@ -50,28 +50,27 @@ export function useLocalStorageQuery<T>(key: string, initialValue: T) {
   const queryClient = useQueryClient()
   const queryKey = useMemo(() => getLocalStorageQueryKey(key), [key])
 
-  const {
-    error,
-    data: storedValue = initialValue,
-    isSuccess,
-    isLoading,
-    isError,
-  } = useQuery({
+  const { error, data, isSuccess, isLoading, isError } = useQuery<T | null>({
     queryKey,
     queryFn: () => {
       const item = safeLocalStorage.getItem(key)
 
       if (!item) {
-        return initialValue
+        // react-query rejects `undefined` as query data, so cache `null` instead
+        // when the caller's initial value is `undefined`.
+        return initialValue === undefined ? null : initialValue
       }
 
       return JSON.parse(item) as T
     },
   })
 
+  const storedValue: T =
+    data === undefined || (data === null && initialValue === undefined) ? initialValue : (data as T)
+
   const setValue: Dispatch<SetStateAction<T>> = useCallback(
     (value) => {
-      const currentValue = queryClient.getQueryData<T>(queryKey) ?? initialValue
+      const currentValue = (queryClient.getQueryData<T | null>(queryKey) ?? initialValue) as T
       const valueToStore = value instanceof Function ? value(currentValue) : value
 
       // Bail out when the value is unchanged (matches useState semantics).
@@ -82,9 +81,15 @@ export function useLocalStorageQuery<T>(key: string, initialValue: T) {
       // of the same key are mounted together.
       if (Object.is(valueToStore, currentValue)) return
 
-      safeLocalStorage.setItem(key, JSON.stringify(valueToStore))
-
-      queryClient.setQueryData(queryKey, valueToStore)
+      if (valueToStore === undefined) {
+        // JSON.stringify(undefined) is not valid JSON, and react-query ignores
+        // `undefined` in setQueryData, so clear the entry and cache `null`.
+        safeLocalStorage.removeItem(key)
+        queryClient.setQueryData(queryKey, null)
+      } else {
+        safeLocalStorage.setItem(key, JSON.stringify(valueToStore))
+        queryClient.setQueryData(queryKey, valueToStore)
+      }
       queryClient.invalidateQueries({ queryKey })
     },
     // initialValue is intentionally excluded: the function body reads the

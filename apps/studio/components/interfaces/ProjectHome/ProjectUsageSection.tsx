@@ -63,9 +63,10 @@ export const ProjectUsageSection = () => {
   const retentionDays = getEntitlementMax()
   const { isEnabled: isUnifiedLogsEnabled } = useUnifiedLogsPreview()
 
-  const [storedInterval, setStoredInterval] = useLocalStorageQuery<string | undefined>(
+  // react-query rejects `undefined` query data, so the "no stored value" default must be `null`
+  const [storedInterval, setStoredInterval] = useLocalStorageQuery<string | null>(
     LOCAL_STORAGE_KEYS.HOME_CHART_INTERVAL(projectRef ?? ''),
-    undefined
+    null
   )
   const interval = resolveChartInterval(storedInterval, retentionDays)
 
