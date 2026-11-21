@@ -1,3 +1,48 @@
+import * as z from 'zod'
+
+import { HTTP_METHODS } from './EdgeFunctionDetails.constants'
+
+export const edgeFunctionTestFormSchema = z
+  .object({
+    method: z.enum(HTTP_METHODS),
+    body: z
+      .string()
+      .optional()
+      .transform((str) => str || '{}'),
+    headers: z.array(
+      z.object({
+        key: z.string(),
+        value: z.string(),
+      })
+    ),
+    queryParams: z.array(
+      z.object({
+        key: z.string(),
+        value: z.string(),
+      })
+    ),
+  })
+  .superRefine(({ method, body, headers }, ctx) => {
+    if (method === 'GET' || method === 'HEAD') return
+
+    const requestHeaders = buildEdgeFunctionTestHeaders({ customHeaders: headers })
+    const contentType = Object.entries(requestHeaders).find(
+      ([name]) => name.toLowerCase() === 'content-type'
+    )?.[1]
+    const mediaType = contentType?.split(';')[0].trim().toLowerCase()
+    if (mediaType !== 'application/json' && !mediaType?.endsWith('+json')) return
+
+    try {
+      JSON.parse(body)
+    } catch {
+      ctx.addIssue({
+        code: z.ZodIssueCode.custom,
+        path: ['body'],
+        message: 'Enter a valid JSON body',
+      })
+    }
+  })
+
 export interface EdgeFunctionTestHeaderRow {
   key: string
   value: string
