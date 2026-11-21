@@ -1,8 +1,10 @@
 import { type NextRequest } from 'next/server'
 
-import { updateSession } from '@/registry/default/clients/nextjs/lib/supabase/middleware'
+import { updateSession } from '@/registry/default/clients/nextjs/lib/supabase/proxy'
 
-export async function middleware(request: NextRequest) {
+// On Next.js 16 and later, the shadcn CLI installs this file as proxy.ts. The default
+// export works under either name, so the same file also runs as middleware on Next.js 15.
+export default async function proxy(request: NextRequest) {
   return await updateSession(request)
 }
 
