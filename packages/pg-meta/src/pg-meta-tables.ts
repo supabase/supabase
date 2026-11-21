@@ -250,7 +250,7 @@ function update(
     // skip
   } else {
     primaryKeysSql = safeSql`${primaryKeysSql}
-DO $$
+DO $pgmeta$
 DECLARE
   r record;
 BEGIN
@@ -262,7 +262,7 @@ BEGIN
     EXECUTE ${literal(`${alter} DROP CONSTRAINT `)} || quote_ident(r.conname);
   END IF;
 END
-$$;
+$pgmeta$;
 `
 
     if (primary_keys.length === 0) {
