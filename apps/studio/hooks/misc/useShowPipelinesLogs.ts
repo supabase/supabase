@@ -4,6 +4,7 @@ import { useIsPipelinesEnabled } from '@/components/interfaces/Database/Replicat
 import { useProjectDetailQuery } from '@/data/projects/project-detail-query'
 import { useReplicationSourcesQuery } from '@/data/replication/sources-query'
 import { useSelectedOrganizationQuery } from '@/hooks/misc/useSelectedOrganization'
+import { IS_PLATFORM } from '@/lib/constants'
 
 /**
  * Whether to surface Pipelines logs (legacy logs sidebar and the unified logs filter). Only
@@ -17,7 +18,8 @@ export const useShowPipelinesLogs = () => {
 
   const isPipelinesEnabled = useIsPipelinesEnabled()
   const isLoadingAccess =
-    !hasLoadedFlags || !!isConfigCatStale || isLoadingProject || isLoadingOrganization
+    IS_PLATFORM &&
+    (!hasLoadedFlags || !!isConfigCatStale || isLoadingProject || isLoadingOrganization)
 
   const { data, isLoading: isLoadingSources } = useReplicationSourcesQuery(
     { projectRef },

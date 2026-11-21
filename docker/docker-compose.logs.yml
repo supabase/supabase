@@ -1,5 +1,6 @@
 # This override adds the following to the self-hosted Supabase configuration:
 #   - Logflare: Log management and event analytics platform
+#   - ClickHouse: Storage for Unified Logs
 #   - Vector: High-performance observability data pipeline for logs
 #
 # Usage:
@@ -9,8 +10,8 @@ services:
 
   studio:
     depends_on:
-      analytics:
-        condition: service_healthy
+      analytics-setup:
+        condition: service_completed_successfully
     environment:
       LOGFLARE_PRIVATE_ACCESS_TOKEN: ${LOGFLARE_PRIVATE_ACCESS_TOKEN}
       LOGFLARE_URL: http://analytics:4000
@@ -38,6 +39,8 @@ services:
         condition: service_healthy
     environment:
       LOGFLARE_NODE_HOST: 127.0.0.1
+      # Required by the source management API, including with local backends.
+      GOOGLE_PROJECT_ID: ${GOOGLE_PROJECT_ID:-supabase-local}
 
       DB_USERNAME: supabase_admin
       DB_DATABASE: _supabase
@@ -62,12 +65,46 @@ services:
       POSTGRES_BACKEND_SCHEMA: _analytics
 
       # Uncomment to use the BigQuery backend for logs
-      #GOOGLE_PROJECT_ID: ${GOOGLE_PROJECT_ID}
       #GOOGLE_PROJECT_NUMBER: ${GOOGLE_PROJECT_NUMBER}
     # Uncomment to use the BigQuery backend for logs (requires gcloud.json
     # service account key from Google Cloud Console)
     #volumes:
     #  - ./gcloud.json:/opt/app/rel/logflare/bin/gcloud.json:ro,z
+
+  clickhouse:
+    container_name: supabase-clickhouse
+    image: clickhouse/clickhouse-server:26.2
+    restart: unless-stopped
+    environment:
+      CLICKHOUSE_DB: logs
+      CLICKHOUSE_USER: logflare
+      CLICKHOUSE_PASSWORD: ${CLICKHOUSE_PASSWORD:-${POSTGRES_PASSWORD}}
+    volumes:
+      - clickhouse-data:/var/lib/clickhouse
+    healthcheck:
+      test: ["CMD", "wget", "--spider", "-q", "http://localhost:8123/ping"]
+      interval: 5s
+      timeout: 5s
+      retries: 10
+      start_period: 30s
+
+  analytics-setup:
+    image: node:24-alpine
+    restart: "no"
+    depends_on:
+      analytics:
+        condition: service_healthy
+      clickhouse:
+        condition: service_healthy
+    environment:
+      LOGFLARE_URL: http://analytics:4000
+      LOGFLARE_PRIVATE_ACCESS_TOKEN: ${LOGFLARE_PRIVATE_ACCESS_TOKEN}
+      CLICKHOUSE_DB: logs
+      CLICKHOUSE_USER: logflare
+      CLICKHOUSE_PASSWORD: ${CLICKHOUSE_PASSWORD:-${POSTGRES_PASSWORD}}
+    volumes:
+      - ./volumes/logs/setup.mjs:/setup.mjs:ro,z
+    command: ["node", "/setup.mjs"]
 
   vector:
     container_name: supabase-vector
@@ -86,8 +123,8 @@ services:
       interval: 5s
       retries: 3
     depends_on:
-      analytics:
-        condition: service_healthy
+      analytics-setup:
+        condition: service_completed_successfully
     environment:
       LOGFLARE_PUBLIC_ACCESS_TOKEN: ${LOGFLARE_PUBLIC_ACCESS_TOKEN}
     command:
@@ -97,3 +134,6 @@ services:
       ]
     security_opt:
       - "label=disable"
+
+volumes:
+  clickhouse-data:

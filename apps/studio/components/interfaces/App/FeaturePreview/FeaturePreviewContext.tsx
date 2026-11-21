@@ -20,6 +20,8 @@ import {
 
 import { useFeaturePreviews } from './useFeaturePreviews'
 import { useProjectStorageConfigQuery } from '@/data/config/project-storage-config-query'
+import { useEnabledFeaturesOverrideQuery } from '@/data/misc/enabled-features-override-query'
+import { useIsFeatureEnabled } from '@/hooks/misc/useIsFeatureEnabled'
 import { IS_PLATFORM } from '@/lib/constants'
 import { EMPTY_OBJ } from '@/lib/void'
 
@@ -116,9 +118,13 @@ export const useIsColumnLevelPrivilegesEnabled = () => {
 
 export const useUnifiedLogsPreview = () => {
   const { flags, isInitialized, onUpdateFlag } = useFeaturePreviewContext()
+  const logsEnabled = useIsFeatureEnabled('logs:all')
+  const { isPending, isSuccess } = useEnabledFeaturesOverrideQuery()
 
-  const isLoading = !isInitialized
-  const isEnabled = IS_PLATFORM && flags[LOCAL_STORAGE_KEYS.UI_PREVIEW_UNIFIED_LOGS]
+  const isLoading = IS_PLATFORM ? !isInitialized : isPending
+  const isEnabled = IS_PLATFORM
+    ? flags[LOCAL_STORAGE_KEYS.UI_PREVIEW_UNIFIED_LOGS]
+    : isSuccess && logsEnabled
 
   const hasToggledPreview = !!safeLocalStorage.getItem(LOCAL_STORAGE_KEYS.UI_PREVIEW_UNIFIED_LOGS)
   const isDefaultOptIn = IS_PLATFORM && !hasToggledPreview
