@@ -354,7 +354,12 @@ export const updateColumn = async ({
   }
 }
 
-/** TODO: Refactor to do in a single transaction */
+/**
+ * Duplicates a table's structure and optionally its rows, foreign keys, RLS
+ * state, and comment.
+ *
+ * TODO: Refactor to do in a single transaction.
+ */
 export const duplicateTable = async (
   projectRef: string,
   connectionString: string | undefined | null,
@@ -400,6 +405,11 @@ export const duplicateTable = async (
 
   // Duplicate rows if needed
   if (isDuplicateRows) {
+    const columns = duplicateTable.columns ?? []
+    const copyableColumns = columns
+      .filter((column) => !column.is_generated)
+      .map((column) => column.name)
+
     await executeSql({
       projectRef,
       connectionString,
@@ -409,28 +419,30 @@ export const duplicateTable = async (
         sourceTableName,
         sourceTableSchema,
         duplicatedTableName,
+        columns: copyableColumns,
       }),
       grant: unguarded.migrating,
     })
 
     // Insert into does not copy over auto increment sequences, so we manually do it next if any
-    const columns = duplicateTable.columns ?? []
     const identityColumns = columns.filter((column) => column.identity_generation !== null)
-    identityColumns.map(async (column) => {
-      await executeSql({
-        projectRef,
-        connectionString,
-        sqlOrigin: 'studio',
-        queryName: 'table-duplicate-identity-sequence',
-        sql: getDuplicateIdentitySequenceSQL({
-          sourceTableName,
-          sourceTableSchema,
-          duplicatedTableName,
-          columnName: column.name,
-        }),
-        grant: unguarded.migrating,
-      })
-    })
+    await Promise.all(
+      identityColumns.map((column) =>
+        executeSql({
+          projectRef,
+          connectionString,
+          sqlOrigin: 'studio',
+          queryName: 'table-duplicate-identity-sequence',
+          sql: getDuplicateIdentitySequenceSQL({
+            sourceTableName,
+            sourceTableSchema,
+            duplicatedTableName,
+            columnName: column.name,
+          }),
+          grant: unguarded.migrating,
+        })
+      )
+    )
   }
 
   const tables = await queryClient.fetchQuery({
