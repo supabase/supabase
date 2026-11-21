@@ -8,9 +8,8 @@ import {
   isExternalContentListingHref,
 } from '~/lib/content-listings.utils'
 import { useSendTelemetryEvent } from '~/lib/telemetry'
-import { ChevronDown, ChevronRight } from 'lucide-react'
 import Link from 'next/link'
-import { useCallback, useMemo } from 'react'
+import { useCallback, useMemo, useState } from 'react'
 import ReactMarkdown from 'react-markdown'
 import { Badge, cn, Heading } from 'ui'
 import { GlassPanel } from 'ui-patterns/GlassPanel'
@@ -48,89 +47,101 @@ function useContentListingClickHandler(group: ContentListingGroup) {
   return { trackClick }
 }
 
-const PROGRESSION_COLUMNS = 2
-
-type FlowDirection = 'right' | 'wrap' | 'none'
-
-function progressionDirection(index: number, count: number): FlowDirection {
-  if (index >= count - 1) return 'none'
-  if (index % PROGRESSION_COLUMNS === PROGRESSION_COLUMNS - 1) return 'wrap'
-  return 'right'
-}
-
-function FlowArrow({ icon: Icon }: { icon: typeof ChevronDown }) {
-  return (
-    <span className="relative flex size-4 items-center justify-center rounded-full bg-background text-brand-600">
-      <Icon size={14} strokeWidth={2.5} />
-    </span>
-  )
-}
-
-function ProgressionConnector({ direction }: { direction: Exclude<FlowDirection, 'none'> }) {
-  return (
-    <span aria-hidden className="pointer-events-none absolute inset-0 z-10">
-      <span className="absolute top-full left-1/2 flex h-(--flow-gap) -translate-x-1/2 items-center justify-center @md:hidden">
-        <span className="absolute inset-y-0 w-px bg-brand-500/15 dark:bg-brand-500/40" />
-        <FlowArrow icon={ChevronDown} />
-      </span>
-      {direction === 'right' && (
-        <span className="absolute top-1/2 left-full hidden h-px w-(--flow-gap) -translate-y-1/2 items-center justify-center @md:flex">
-          <span className="absolute inset-x-0 h-px bg-brand-500/15 dark:bg-brand-500/40" />
-          <FlowArrow icon={ChevronRight} />
-        </span>
-      )}
-      {direction === 'wrap' && (
-        <span className="absolute top-full right-0 hidden h-(--flow-gap) w-[calc(200%+var(--flow-gap))] [--elbow:50%] @md:block">
-          <span className="absolute top-0 right-[calc(25%-var(--flow-gap)/4)] h-(--elbow) w-px bg-brand-500/15 dark:bg-brand-500/40" />
-          <span className="absolute top-(--elbow) right-[calc(25%-var(--flow-gap)/4)] left-[calc(25%-var(--flow-gap)/4)] h-px bg-brand-500/15 dark:bg-brand-500/40" />
-          <span className="absolute top-(--elbow) bottom-0 left-[calc(25%-var(--flow-gap)/4)] w-px bg-brand-500/15 dark:bg-brand-500/40" />
-          <span className="absolute bottom-0 left-[calc(25%-var(--flow-gap)/4)] -translate-x-1/2">
-            <FlowArrow icon={ChevronDown} />
-          </span>
-        </span>
-      )}
-    </span>
-  )
-}
-
 function ContentListingProgression({ group }: { group: ContentListingGroup }) {
   const { trackClick } = useContentListingClickHandler(group)
   const items = filterContentListingItems(group.items).filter(
     (item): item is ContentListingItem & { href: string } => Boolean(item.href)
   )
+  const [activeIndex, setActiveIndex] = useState<number | null>(null)
+
+  const handleStepDeactivate = () => setActiveIndex(null)
 
   return (
-    <div className="@container [--flow-gap:calc(2rem*4/3)]">
-      <ol
-        aria-labelledby={group.labelledBy}
-        aria-label={group.labelledBy ? undefined : (group.heading ?? 'Progression')}
-        className="m-0 grid list-none grid-cols-1 gap-(--flow-gap) p-0 @md:grid-cols-2"
-      >
-        {items.map((item, index) => {
-          const direction = progressionDirection(index, items.length)
-          const panel = (
-            <GlassPanel title={item.title} icon={resolveContentListingIcon(item.icon)} showIconBg>
-              {item.subtitle && (
-                <span className="-mt-1 ml-11 block text-xs text-foreground">{item.subtitle}</span>
-              )}
-            </GlassPanel>
-          )
+    <ol
+      aria-labelledby={group.labelledBy}
+      aria-label={group.labelledBy ? undefined : (group.heading ?? 'Progression')}
+      className="m-0 flex list-none flex-col items-center p-0"
+    >
+      {items.map((item, index) => (
+        <ContentListingProgressionStep
+          key={`${group.id}-${item.href}`}
+          item={item}
+          index={index}
+          isOnActivePath={activeIndex !== null && index <= activeIndex}
+          onItemClick={trackClick}
+          onStepActivate={setActiveIndex}
+          onStepDeactivate={handleStepDeactivate}
+        />
+      ))}
+    </ol>
+  )
+}
 
-          return (
-            <li key={`${group.id}-${item.href}`} className="relative">
-              <a
-                href={item.href}
-                className="focus-ring block h-full rounded-lg no-underline"
-                onClick={() => trackClick(item)}
-              >
-                {panel}
-              </a>
-              {direction !== 'none' && <ProgressionConnector direction={direction} />}
-            </li>
-          )
-        })}
-      </ol>
-    </div>
+function ContentListingProgressionStep({
+  item,
+  index,
+  isOnActivePath,
+  onItemClick,
+  onStepActivate,
+  onStepDeactivate,
+}: {
+  item: ContentListingItem & { href: string }
+  index: number
+  isOnActivePath: boolean
+  onItemClick: (item: ContentListingItem) => void
+  onStepActivate: (index: number) => void
+  onStepDeactivate: () => void
+}) {
+  const handleActivate = () => onStepActivate(index)
+
+  return (
+    <li className="flex w-full flex-col items-center">
+      {index > 0 ? (
+        <span
+          aria-hidden
+          className={cn(
+            'mt-3 h-6 border-l border-strong',
+            isOnActivePath ? 'border-solid' : 'border-dashed'
+          )}
+        />
+      ) : null}
+      <a
+        href={item.href}
+        className={cn(
+          'group focus-ring relative mt-3 flex w-full max-w-md',
+          'border-t border-l border-strong px-8 py-7 font-mono text-sm no-underline'
+        )}
+        onClick={() => onItemClick(item)}
+        onPointerEnter={handleActivate}
+        onPointerLeave={onStepDeactivate}
+        onFocus={handleActivate}
+        onBlur={onStepDeactivate}
+      >
+        <span className="absolute top-0 left-6 max-w-[calc(100%-3rem)] -translate-y-1/2 truncate bg-background px-2 text-foreground-light group-hover:text-foreground group-focus-visible:text-foreground">
+          <span className="text-foreground-lighter group-hover:text-foreground-light group-focus-visible:text-foreground-light">
+            {index + 1}
+          </span>{' '}
+          {item.subtitle ?? item.title}
+        </span>
+        <span className="text-foreground">{item.title}</span>
+        <span
+          aria-hidden
+          className="absolute right-2 bottom-0 left-0 h-px bg-border-strong group-hover:right-4.5 group-focus-visible:right-4.5"
+        />
+        <span
+          aria-hidden
+          className="absolute right-0 bottom-0 size-2 border-r border-b border-strong group-hover:border-foreground-light group-focus-visible:border-foreground-light"
+        />
+        <span
+          aria-hidden
+          className="absolute top-0 right-0 bottom-2 w-px bg-border-strong group-hover:bottom-4.5 group-focus-visible:bottom-4.5"
+        />
+        <span
+          aria-hidden
+          className="absolute right-px bottom-px hidden h-px w-3 origin-right rotate-45 bg-foreground-light group-hover:block group-focus-visible:block"
+        />
+      </a>
+    </li>
   )
 }
 
