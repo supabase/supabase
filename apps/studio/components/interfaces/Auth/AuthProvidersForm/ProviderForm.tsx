@@ -141,6 +141,10 @@ export const ProviderForm = ({ config, provider, isActive }: ProviderFormProps) 
       payload.PASSWORD_REQUIRED_CHARACTERS = ''
     }
 
+    if (typeof payload.SMS_TEMPLATE === 'string') {
+      payload.SMS_TEMPLATE = payload.SMS_TEMPLATE.replace(/\\r\\n/g, '\n').replace(/\\n/g, '\n')
+    }
+
     updateAuthConfig(
       { projectRef: projectRef!, config: payload },
       {
