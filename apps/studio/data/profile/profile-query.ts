@@ -2,10 +2,18 @@ import { useQuery } from '@tanstack/react-query'
 
 import { profileKeys } from './keys'
 import type { Profile } from './types'
+import { parseResponseErrorBody } from '@/data/error-classification'
 import { get, handleError } from '@/data/fetchers'
 import { IS_PLATFORM } from '@/lib/constants'
 import type { StudioError } from '@/lib/errors/studio-errors'
 import type { UseCustomQueryOptions } from '@/types'
+
+/**
+ * Profile responses the app handles as expected states, so they are not reported to Sentry:
+ * 401 signs the user out, 403 is returned until MFA is completed, and 404 means the profile
+ * doesn't exist yet and `ProfileProvider` creates it.
+ */
+const EXPECTED_PROFILE_ERROR_CODES = [401, 403, 404]
 
 export async function getProfile(signal?: AbortSignal) {
   const { data, error } = await get('/platform/profile', {
@@ -13,7 +21,11 @@ export async function getProfile(signal?: AbortSignal) {
     headers: { Version: '2' },
   })
 
-  if (error) handleError(error)
+  if (error) {
+    const code = parseResponseErrorBody(error)?.code
+    const isExpected = code !== undefined && EXPECTED_PROFILE_ERROR_CODES.includes(code)
+    handleError(error, { skipReport: isExpected })
+  }
 
   if (!IS_PLATFORM) {
     return {
