@@ -1,6 +1,7 @@
 import { ReactNode } from 'react'
 import { Admonition } from 'ui-patterns/Admonition'
 
+import { EgressBreakdownPanel } from './EgressBreakdownPanel'
 import { USAGE_APPROACHING_THRESHOLD } from '@/components/interfaces/Billing/Billing.constants'
 import { EgressType, PricingMetric } from '@/data/analytics/org-daily-stats-query'
 import type { OrgSubscription } from '@/data/subscriptions/types'
@@ -95,6 +96,7 @@ export const USAGE_CATEGORIES: (subscription?: OrgSubscription) => CategoryMeta[
         'Contains any outgoing traffic including Database, Storage, Realtime, Auth, API, Edge Functions, Pooler and Log Drains.\nBilling is based on the total sum of uncached egress in GB throughout your billing period.\nEgress via cache hits is billed separately.',
       chartDescription:
         'The breakdown of different egress types is inclusive of cached egress, even though it is billed separately. The data refreshes every hour.',
+      additionalInfo: () => <EgressBreakdownPanel />,
       links: [
         {
           name: 'Documentation',
