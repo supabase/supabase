@@ -84,7 +84,7 @@ export const RolesList = () => {
 
   const filteredRoles = (
     filterType === 'active' ? roles.filter((role) => role.activeConnections > 0) : roles
-  ).filter((role) => role.name.includes(filterString))
+  ).filter((role) => role.name.toLowerCase().includes(filterString.toLowerCase()))
   const [supabaseRoles, otherRoles] = partition(filteredRoles, (role) => isSupabaseRole(role.name))
 
   const totalActiveConnections = roles

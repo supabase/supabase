@@ -108,9 +108,14 @@ export const Indexes = () => {
   })
 
   const sortedIndexes = sortBy(allIndexes ?? [], (index) => index.name.toLocaleLowerCase())
+  const lowerCaseSearch = search.toLowerCase()
   const indexes =
     search.length > 0
-      ? sortedIndexes.filter((index) => index.name.includes(search) || index.table.includes(search))
+      ? sortedIndexes.filter(
+          (index) =>
+            index.name.toLowerCase().includes(lowerCaseSearch) ||
+            index.table.toLowerCase().includes(lowerCaseSearch)
+        )
       : sortedIndexes
 
   const onConfirmDeleteIndex = (index: DatabaseIndex) => {
