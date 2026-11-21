@@ -14,6 +14,11 @@ import { customRender } from '@/tests/lib/custom-render'
 mockAnimationsApi()
 
 vi.mock('@/lib/telemetry/track', () => ({ useTrack: () => vi.fn() }))
+vi.mock('common', async (importOriginal) => ({
+  ...(await importOriginal<typeof import('common')>()),
+  useParams: () => ({ ref: 'default' }),
+  useSession: () => ({ access_token: 'test-token' }),
+}))
 
 const authenticator: Factor<'totp', 'verified'> = {
   id: 'other_id',

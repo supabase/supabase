@@ -9,6 +9,7 @@ import { useRecoveryCodesStatusQuery } from '@/data/recovery-codes/recovery-code
 
 const mock = vi.hoisted(() => ({
   userId: 'user-a',
+  hasSession: true,
   recoveryCodesEnabled: true,
   passwordEnabled: true,
   listFactors: vi.fn(),
@@ -20,6 +21,7 @@ vi.mock('common', () => ({
   useFlag: (name: string) =>
     name === 'enableAuthRecoveryCodes' ? mock.recoveryCodesEnabled : mock.passwordEnabled,
   useUser: () => (mock.userId ? { id: mock.userId } : null),
+  useSession: () => (mock.hasSession ? { user: { id: mock.userId } } : null),
 }))
 
 vi.mock('@/lib/gotrue', () => ({
@@ -46,6 +48,7 @@ describe('useAccountRecovery', () => {
   beforeEach(() => {
     vi.clearAllMocks()
     mock.userId = 'user-a'
+    mock.hasSession = true
     mock.recoveryCodesEnabled = true
     mock.passwordEnabled = true
     mock.listFactors.mockResolvedValue({
@@ -104,6 +107,35 @@ describe('useAccountRecovery', () => {
     await waitFor(() => expect(mock.getStatus).toHaveBeenCalledTimes(2))
     await waitFor(() => expect(mock.listFactors).toHaveBeenCalledTimes(2))
     await waitFor(() => expect(mock.getUser).toHaveBeenCalledTimes(2))
+  })
+
+  it('does not call auth while signed out', async () => {
+    mock.hasSession = false
+    const client = new QueryClient({ defaultOptions: { queries: { retry: false } } })
+    const { result, rerender } = renderHook(
+      () => ({
+        factors: useMfaListFactorsQuery(),
+        identities: useProfileIdentitiesQuery(),
+        codes: useRecoveryCodesStatusQuery(),
+      }),
+      {
+        wrapper: ({ children }) => (
+          <QueryClientProvider client={client}>{children}</QueryClientProvider>
+        ),
+      }
+    )
+    expect(result.current.factors.fetchStatus).toBe('idle')
+    expect(result.current.identities.fetchStatus).toBe('idle')
+    expect(result.current.codes.fetchStatus).toBe('idle')
+    expect(mock.listFactors).not.toHaveBeenCalled()
+    expect(mock.getUser).not.toHaveBeenCalled()
+    expect(mock.getStatus).not.toHaveBeenCalled()
+
+    mock.hasSession = true
+    rerender()
+    await waitFor(() => expect(result.current.identities.isSuccess).toBe(true))
+    await waitFor(() => expect(result.current.factors.isSuccess).toBe(true))
+    await waitFor(() => expect(result.current.codes.isSuccess).toBe(true))
   })
 
   it('does not reuse findings after the signed-in user changes', async () => {
