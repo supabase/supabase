@@ -1,11 +1,11 @@
 import { describe, expect, it } from 'vitest'
 
-import type { ProjectAuthConfigData } from '@/data/auth/auth-config-query'
 import {
   getPhoneProviderValidationSchema,
   normalizeSmsTemplate,
   PROVIDERS_SCHEMAS,
 } from './AuthProvidersFormValidation'
+import type { ProjectAuthConfigData } from '@/data/auth/auth-config-query'
 
 const URL_FIELDS = [
   {
