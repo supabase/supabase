@@ -275,6 +275,12 @@ type HandleErrorOptions = {
    * error after the last retry, so leave this unset there.
    */
   reportImmediately?: boolean
+  /**
+   * Return false for errors the caller expects and handles, such as an auth failure on a query
+   * that runs while the session is signed out or waiting for MFA. Those errors are still thrown,
+   * but never sent to Sentry, even with `alwaysCapture`.
+   */
+  shouldReport?: (error: StudioError) => boolean
 }
 
 /**
@@ -286,7 +292,9 @@ type HandleErrorOptions = {
 export const handleError = (error: unknown, options: HandleErrorOptions = {}): never => {
   const raw = parseResponseErrorBody(error)
   const classified = raw ? classifyResponseError(raw) : classifyError(error)
-  if (options.reportImmediately) {
+  if (options.shouldReport && !options.shouldReport(classified)) {
+    deferStudioErrorReport(classified, { skip: true })
+  } else if (options.reportImmediately) {
     reportStudioError(classified, options.sentryContext, { force: options.alwaysCapture })
   } else {
     deferStudioErrorReport(classified, {

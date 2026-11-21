@@ -44,6 +44,17 @@ export function classifyResponseError(raw: RawResponseError): StudioError {
   return new UnexpectedError(raw)
 }
 
+/**
+ * True for a 401 or 403 from the API: the session has no valid token, or has not met the
+ * requirements of the endpoint (for example, MFA not completed yet).
+ */
+export function isAuthFailure(error: StudioError): boolean {
+  return (
+    error._tag === 'UnclassifiedApiError' &&
+    (error.reason === 'unauthorized' || error.reason === 'forbidden')
+  )
+}
+
 // pg-meta formats Postgres errors as `Failed to run sql query: ERROR:  42702: <message>`
 const SQLSTATE_IN_MESSAGE = /\bERROR:\s+([0-9A-Z]{5}):/
 
