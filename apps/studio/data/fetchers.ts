@@ -275,6 +275,12 @@ type HandleErrorOptions = {
    * error after the last retry, so leave this unset there.
    */
   reportImmediately?: boolean
+  /**
+   * Response statuses that are an expected outcome for this request, such as 404 for a deleted
+   * resource or 403 for a resource the user can't access. The error is still thrown, but never
+   * reported to Sentry, even with `alwaysCapture`.
+   */
+  expectedStatuses?: readonly number[]
 }
 
 /**
@@ -286,7 +292,11 @@ type HandleErrorOptions = {
 export const handleError = (error: unknown, options: HandleErrorOptions = {}): never => {
   const raw = parseResponseErrorBody(error)
   const classified = raw ? classifyResponseError(raw) : classifyError(error)
-  if (options.reportImmediately) {
+  const isExpected =
+    classified.code !== undefined && !!options.expectedStatuses?.includes(classified.code)
+  if (isExpected) {
+    deferStudioErrorReport(classified, { skip: true })
+  } else if (options.reportImmediately) {
     reportStudioError(classified, options.sentryContext, { force: options.alwaysCapture })
   } else {
     deferStudioErrorReport(classified, {

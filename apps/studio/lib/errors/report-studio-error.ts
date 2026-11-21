@@ -45,7 +45,12 @@ export function reportStudioError(
   err.errorEventId = eventId
 }
 
-type DeferredReportOptions = { context?: StudioSentryContext; force?: boolean }
+type DeferredReportOptions = {
+  context?: StudioSentryContext
+  force?: boolean
+  /** The caller expects this error (see `expectedStatuses` in `handleError`): never report it. */
+  skip?: boolean
+}
 
 // Kept off the error so its fields describe only the error, not how the caller wants it reported.
 const deferredReportOptions = new WeakMap<StudioError, DeferredReportOptions>()
@@ -66,5 +71,6 @@ export function deferStudioErrorReport(err: StudioError, options: DeferredReport
 export function reportQueryError(error: unknown) {
   const classified = classifyError(error)
   const options = deferredReportOptions.get(classified)
+  if (options?.skip) return
   reportStudioError(classified, options?.context, { force: options?.force })
 }
