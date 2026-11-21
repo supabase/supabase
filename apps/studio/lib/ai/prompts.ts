@@ -490,9 +490,9 @@ export const REALTIME_PROMPT = `
 ### Using realtime.broadcast_changes (Recommended for database changes)
 \`\`\`sql
 CREATE OR REPLACE FUNCTION room_messages_broadcast_trigger()
-RETURNS TRIGGER AS $$
-SECURITY DEFINER
+RETURNS TRIGGER
 LANGUAGE plpgsql
+SECURITY DEFINER
 AS $$
 BEGIN
   PERFORM realtime.broadcast_changes(
@@ -504,7 +504,7 @@ BEGIN
     NEW,
     OLD
   );
-  RETURN COALESCE(NEW, OLD);
+  RETURN NULL;
 END;
 $$;
 
@@ -518,16 +518,16 @@ CREATE TRIGGER messages_broadcast_trigger
 ### Using realtime.send (For custom messages)
 \`\`\`sql
 CREATE OR REPLACE FUNCTION notify_custom_event()
-RETURNS TRIGGER AS $$
-SECURITY DEFINER
+RETURNS TRIGGER
 LANGUAGE plpgsql
+SECURITY DEFINER
 AS $$
 BEGIN
   PERFORM realtime.send(
-    'room:' || NEW.room_id::text,
-    'status_changed',
-    jsonb_build_object('id', NEW.id, 'status', NEW.status),
-    false  -- set to true for private channels
+    payload => jsonb_build_object('id', NEW.id, 'status', NEW.status),
+    event => 'status_changed',
+    topic => 'room:' || NEW.room_id::text,
+    private => true -- Must match config: { private: true } on the client
   );
   RETURN NEW;
 END;
@@ -621,25 +621,40 @@ myChannel.subscribe((status) => {
 const channelRef = useRef(null)
 
 useEffect(() => {
-  // Check if already subscribed to prevent multiple subscriptions
-  if (channelRef.current?.state === 'subscribed') return
-  
-  const channel = supabase.channel('room:123:messages', {
-    config: { private: true }
+  let cancelled = false
+  let channel = null
+
+  async function setupChannel() {
+    // Refresh auth before subscribing to a private channel.
+    await supabase.realtime.setAuth()
+    if (cancelled) return
+
+    // Avoid creating duplicate subscriptions for this room.
+    if (channelRef.current?.state === 'subscribed') return
+
+    channel = supabase.channel('room:123:messages', {
+      config: { private: true },
+    })
+    channelRef.current = channel
+
+    channel
+      .on('broadcast', { event: 'message_created' }, handleMessage)
+      .subscribe((status, error) => {
+        if (status === 'CHANNEL_ERROR' || status === 'TIMED_OUT') {
+          console.error('Realtime subscription failed:', status, error)
+        }
+      })
+  }
+
+  void setupChannel().catch((error) => {
+    console.error('Failed to set up Realtime channel:', error)
   })
-  channelRef.current = channel
-
-  // Set auth before subscribing
-  await supabase.realtime.setAuth()
-
-  channel
-    .on('broadcast', { event: 'message_created' }, handleMessage)
-    .subscribe()
 
   return () => {
-    if (channelRef.current) {
-      supabase.removeChannel(channelRef.current)
-      channelRef.current = null
+    cancelled = true
+    if (channel) {
+      void supabase.removeChannel(channel)
+      if (channelRef.current === channel) channelRef.current = null
     }
   }
 }, [roomId])
