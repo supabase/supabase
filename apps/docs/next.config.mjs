@@ -3,12 +3,13 @@ import configureBundleAnalyzer from '@next/bundle-analyzer'
 import nextMdx from '@next/mdx'
 import { withSentryConfig } from '@sentry/nextjs'
 import withYaml from 'next-plugin-yaml'
-import rehypeSlug from 'rehype-slug'
-import remarkGfm from 'remark-gfm'
+import { createRequire } from 'node:module'
 import { parse as parseToml } from 'smol-toml'
 
 import { dynamicRedirects } from './lib/redirects/dynamic-redirects.js'
 import remotePatterns from './lib/remotePatterns.js'
+
+const require = createRequire(import.meta.url)
 
 const withBundleAnalyzer = configureBundleAnalyzer({
   enabled: process.env.ANALYZE === 'true',
@@ -17,8 +18,9 @@ const withBundleAnalyzer = configureBundleAnalyzer({
 const withMDX = nextMdx({
   extension: /\.mdx?$/,
   options: {
-    remarkPlugins: [remarkGfm],
-    rehypePlugins: [rehypeSlug],
+    // turbopack needs serializable loader options, so plugins are module names
+    remarkPlugins: ['remark-gfm'],
+    rehypePlugins: ['rehype-slug'],
     providerImportSource: '@mdx-js/react',
   },
 })
@@ -51,6 +53,18 @@ const nextConfig = {
       },
     })
     return config
+  },
+  turbopack: {
+    rules: {
+      '*.include': { type: 'raw' },
+      // next-plugin-yaml only patches webpack, so use its loader here to parse yaml the same way
+      '*.{yml,yaml}': {
+        loaders: [
+          require.resolve('js-yaml-loader', { paths: [require.resolve('next-plugin-yaml')] }),
+        ],
+        as: '*.cjs',
+      },
+    },
   },
   transpilePackages: [
     'ui',
