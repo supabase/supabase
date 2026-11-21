@@ -109,10 +109,38 @@ withTestDatabase(
     })
     const res = zod.parse(await executeQuery(sql))
 
-    expect(res.length).toBeGreaterThan(0)
-    res.forEach((func) => {
-      expect(func.schema).not.toBe('public')
+  expect(res.length).toBeGreaterThan(0)
+  res.forEach((func) => {
+    expect(func.schema).not.toBe('public')
+  })
+})
+
+withTestDatabase(
+  'procedure round-trip: create then list/retrieve parse',
+  async ({ executeQuery }) => {
+    const { sql: createSql } = pgMeta.functions.create({
+      name: 'p1',
+      schema: 'public',
+      type: 'procedure',
+      definition: 'BEGIN NULL; END',
+      language: 'plpgsql',
+      behavior: 'VOLATILE',
+      security_definer: false,
     })
+    await executeQuery(createSql)
+
+    const { sql: listSql, zod } = pgMeta.functions.list()
+    const res = zod.parse(await executeQuery(listSql))
+    const proc = res.find((f) => f.name === 'p1' && f.type === 'procedure')
+    expect.assert.isDefined(proc)
+    expect(proc.return_type).toBeNull()
+
+    const { sql: rSql, zod: rZod } = pgMeta.functions.retrieve({
+      name: 'p1',
+      schema: 'public',
+      args: [],
+    })
+    expect(rZod.parse((await executeQuery(rSql))[0]).return_type).toBeNull()
   }
 )
 
