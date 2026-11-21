@@ -1,7 +1,7 @@
 import { useParams } from 'common'
 import { sortBy } from 'lodash'
 import { AlertCircleIcon, SearchIcon, TrashIcon } from 'lucide-react'
-import { parseAsBoolean, parseAsString, useQueryState } from 'nuqs'
+import { parseAsBoolean, parseAsJson, parseAsString, useQueryState } from 'nuqs'
 import { useEffect, useRef, useState } from 'react'
 import { toast } from 'sonner'
 import {
@@ -24,6 +24,10 @@ import { GenericSkeletonLoader, ShimmeringLoader } from 'ui-patterns/ShimmeringL
 
 import { ProtectedSchemaWarning } from '../ProtectedSchemaWarning'
 import { CreateIndexSidePanel } from './CreateIndexSidePanel'
+import {
+  ReportsSelectFilter,
+  selectFilterSchema,
+} from '@/components/interfaces/Reports/v2/ReportsSelectFilter'
 import { AlertError } from '@/components/ui/AlertError'
 import { CodeEditor } from '@/components/ui/CodeEditor/CodeEditor'
 import { SchemaSelector } from '@/components/ui/SchemaSelector'
@@ -44,6 +48,10 @@ export const Indexes = () => {
   const { schema: urlSchema, table } = useParams()
 
   const [search, setSearch] = useQueryState('search', parseAsString.withDefault(''))
+  const [tablesFilter, setTablesFilter] = useQueryState(
+    'tables',
+    parseAsJson(selectFilterSchema.parse).withDefault([])
+  )
   const [schemaSelectorOpen, setSchemaSelectorOpen] = useState(false)
   const searchInputRef = useRef<HTMLInputElement>(null)
   const { selectedSchema, setSelectedSchema } = useQuerySchemaState()
@@ -105,13 +113,18 @@ export const Indexes = () => {
 
   useShortcut(SHORTCUT_IDS.LIST_PAGE_RESET_FILTERS, () => {
     setSearch('')
+    setTablesFilter([])
   })
 
+  const tables = Array.from(new Set((allIndexes || []).map((x) => x.table))).sort()
+  const hasFilters = search.length > 0 || tablesFilter.length > 0
+
   const sortedIndexes = sortBy(allIndexes ?? [], (index) => index.name.toLocaleLowerCase())
-  const indexes =
-    search.length > 0
-      ? sortedIndexes.filter((index) => index.name.includes(search) || index.table.includes(search))
-      : sortedIndexes
+  const indexes = sortedIndexes.filter((index) => {
+    const matchesSearch = !search || index.name.includes(search) || index.table.includes(search)
+    const matchesTables = !tablesFilter.length || tablesFilter.includes(index.table)
+    return matchesSearch && matchesTables
+  })
 
   const onConfirmDeleteIndex = (index: DatabaseIndex) => {
     if (!project) return console.error('Project is required')
@@ -189,6 +202,20 @@ export const Indexes = () => {
               icon={<SearchIcon />}
             />
 
+            <ReportsSelectFilter
+              label="Table"
+              options={tables.map((type) => ({ label: type, value: type }))}
+              value={tablesFilter ?? []}
+              onChange={setTablesFilter}
+              showSearch
+            />
+            <div role="status" aria-live="polite" aria-atomic="true" className="sr-only">
+              {isSuccessIndexes &&
+                `Showing ${indexes.length} of ${sortedIndexes.length} indexes${
+                  tablesFilter.length > 0 ? ` for selected tables: ${tablesFilter.join(', ')}` : ''
+                }`}
+            </div>
+
             {!isSchemaLocked && (
               <Shortcut
                 id={SHORTCUT_IDS.LIST_PAGE_NEW_ITEM}
@@ -230,7 +257,7 @@ export const Indexes = () => {
                     </TableRow>
                   </TableHeader>
                   <TableBody>
-                    {indexes.length === 0 && search.length === 0 && (
+                    {indexes.length === 0 && !hasFilters && (
                       <TableRow>
                         <TableCell colSpan={4}>
                           <p className="text-sm text-foreground">No indexes created yet</p>
@@ -240,8 +267,17 @@ export const Indexes = () => {
                         </TableCell>
                       </TableRow>
                     )}
-                    {indexes.length === 0 && search.length > 0 && (
-                      <TableRowNoResults colSpan={4} search={search} />
+                    {indexes.length === 0 && hasFilters && (
+                      <TableRowNoResults colSpan={4} search={search}>
+                        {search.length === 0 ? (
+                          <>
+                            <p className="text-sm text-foreground">No results found</p>
+                            <p className="text-sm text-foreground-light">
+                              No indexes match the selected tables
+                            </p>
+                          </>
+                        ) : undefined}
+                      </TableRowNoResults>
                     )}
                     {indexes.length > 0 &&
                       indexes.map((index) => (
