@@ -170,16 +170,67 @@ export const normalizeSmsTemplate = (value: unknown) => {
   }
 
   // Convert literal \r\n and \n escape sequences only outside Go template {{ ... }} actions.
-  // Inside {{ ... }}, \n is a Go string escape sequence and a physical newline inside a quoted string is invalid syntax.
-  return value
-    .split(/(\{\{[\s\S]*?\}\})/g)
-    .map((segment, index) => {
-      if (index % 2 === 1) {
-        return segment
+  // Scans actions while respecting quoted strings, escaped characters, raw strings, and comments,
+  // so delimiters like }} inside printf format strings do not prematurely terminate the action.
+  let result = ''
+  let i = 0
+  const len = value.length
+
+  while (i < len) {
+    if (value.startsWith('{{', i)) {
+      const actionStart = i
+      i += 2
+      while (i < len && !value.startsWith('}}', i)) {
+        const ch = value[i]
+        if (ch === '"') {
+          i++
+          while (i < len && value[i] !== '"') {
+            if (value[i] === '\\') {
+              i++
+            }
+            i++
+          }
+          if (i < len) i++
+        } else if (ch === '`') {
+          i++
+          while (i < len && value[i] !== '`') {
+            i++
+          }
+          if (i < len) i++
+        } else if (ch === "'") {
+          i++
+          while (i < len && value[i] !== "'") {
+            if (value[i] === '\\') {
+              i++
+            }
+            i++
+          }
+          if (i < len) i++
+        } else if (value.startsWith('/*', i)) {
+          i += 2
+          while (i < len && !value.startsWith('*/', i)) {
+            i++
+          }
+          if (i < len) i += 2
+        } else {
+          i++
+        }
       }
-      return segment.replace(/\\r\\n/g, '\n').replace(/\\n/g, '\n')
-    })
-    .join('')
+
+      if (value.startsWith('}}', i)) {
+        i += 2
+      }
+      result += value.slice(actionStart, i)
+    } else {
+      const nextAction = value.indexOf('{{', i)
+      const plainEnd = nextAction === -1 ? len : nextAction
+      const plainSegment = value.slice(i, plainEnd)
+      result += plainSegment.replace(/\\r\\n/g, '\n').replace(/\\n/g, '\n')
+      i = plainEnd
+    }
+  }
+
+  return result
 }
 
 const getSmsOtpPhoneProviderSchema = (optional = false) =>

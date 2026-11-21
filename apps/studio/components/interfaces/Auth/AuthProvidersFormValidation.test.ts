@@ -106,6 +106,12 @@ describe('AuthProvidersFormValidation: normalizeSmsTemplate', () => {
     ).toBe('Your code is {{ printf "%s\\n" .Code }}\n@example.com #123456')
   })
 
+  it('preserves \\n escape sequences inside Go template {{ ... }} actions even when delimiters appear in quotes', () => {
+    expect(
+      normalizeSmsTemplate('Your code is {{ printf "}}\\n%s" .Code }}\\n@example.com #123456')
+    ).toBe('Your code is {{ printf "}}\\n%s" .Code }}\n@example.com #123456')
+  })
+
   it('passes through non-string values safely', () => {
     expect(normalizeSmsTemplate(undefined)).toBeUndefined()
     expect(normalizeSmsTemplate(null)).toBeNull()
@@ -180,6 +186,20 @@ describe('AuthProvidersFormValidation: Phone provider SMS_TEMPLATE', () => {
     if (result.success) {
       expect((result.data as Record<string, unknown>).SMS_TEMPLATE).toBe(
         'Your code is {{ printf "%s\\n" .Code }}\n@example.com #123456'
+      )
+    }
+  })
+
+  it('preserves \\n escape sequences inside Go template actions with quoted delimiters in parsed form data', () => {
+    const result = phoneSchema.safeParse({
+      ...basePhoneValues,
+      SMS_TEMPLATE: 'Your code is {{ printf "}}\\n%s" .Code }}\\n@example.com #123456',
+    })
+
+    expect(result.success).toBe(true)
+    if (result.success) {
+      expect((result.data as Record<string, unknown>).SMS_TEMPLATE).toBe(
+        'Your code is {{ printf "}}\\n%s" .Code }}\n@example.com #123456'
       )
     }
   })
