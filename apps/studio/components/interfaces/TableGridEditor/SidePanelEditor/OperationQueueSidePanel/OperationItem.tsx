@@ -62,6 +62,7 @@ export const OperationItem = ({ operationId, tableId, content }: OperationItemPr
           aria-label="Discard change"
           className="px-1.5"
           icon={<Undo2Icon />}
+          disabled={snap.operationQueue.status === 'saving'}
           onClick={handleDelete}
           tooltip={{
             content: {

@@ -10,7 +10,6 @@ import { useTableEditorStateSnapshot } from '@/state/table-editor'
 import { QueuedOperation } from '@/state/table-editor-operation-queue.types'
 
 interface UseOperationQueueActionsOptions {
-  onSaveSuccess?: () => void
   onCancelSuccess?: () => void
 }
 
@@ -19,7 +18,7 @@ interface UseOperationQueueActionsOptions {
  * Consolidates the logic used by both the useSaveQueueToast hook and OperationQueueSidePanel.
  */
 export function useOperationQueueActions(options: UseOperationQueueActionsOptions = {}) {
-  const { onSaveSuccess, onCancelSuccess } = options
+  const { onCancelSuccess } = options
 
   const queryClient = useQueryClient()
   const { data: project } = useSelectedProjectQuery()
@@ -29,24 +28,24 @@ export function useOperationQueueActions(options: UseOperationQueueActionsOption
   const { mutate: saveOperationQueue, isPending: isMutationPending } =
     useOperationQueueSaveMutation({
       onSuccess: () => {
-        snap.clearQueue()
-        snap.closeSidePanel()
-        toast.success('Changes saved successfully')
-        onSaveSuccess?.()
+        const hasPendingOperations = snap.finishQueueSave(true)
+        toast.success(
+          hasPendingOperations
+            ? 'Batch saved. More changes are pending.'
+            : 'Changes saved successfully'
+        )
       },
       onError: (error) => {
-        snap.setQueueStatus('idle')
+        snap.finishQueueSave(false)
         toast.error(`Failed to save changes: ${error.message}`)
       },
     })
 
   const isSaving = snap.operationQueue.status === 'saving' || isMutationPending
-  const operations = snap.operationQueue.operations as readonly QueuedOperation[]
-
   const handleSave = useCallback(() => {
-    if (!project || operations.length === 0) return
-
-    snap.setQueueStatus('saving')
+    if (!project) return
+    const operations = snap.startQueueSave()
+    if (!operations) return
 
     saveOperationQueue({
       projectRef: project.ref,
@@ -54,7 +53,7 @@ export function useOperationQueueActions(options: UseOperationQueueActionsOption
       operations,
       roleImpersonationState: getImpersonatedRoleState(),
     })
-  }, [snap, project, operations, saveOperationQueue, getImpersonatedRoleState])
+  }, [snap, project, saveOperationQueue, getImpersonatedRoleState])
 
   const handleCancel = useCallback(() => {
     // Get unique table IDs from the queue before clearing
@@ -62,7 +61,7 @@ export function useOperationQueueActions(options: UseOperationQueueActionsOption
     const tableIds = [...new Set(operations.map((op) => op.tableId))]
 
     // Clear the queue and invalidate queries to revert optimistic updates
-    snap.clearQueue()
+    if (!snap.clearQueue()) return
     if (project) {
       // Invalidate queries for each table that had pending operations
       tableIds.forEach((tableId) => {
