@@ -52,22 +52,22 @@ function exposedNotebookErrorPart(
 /** Trims history to the last 7 messages and strips tool parts the model shouldn't see. */
 export function prepareMessagesForModel(rawMessages: UIMessage[], aiOptInLevel: AiOptInLevel) {
   return (rawMessages || []).slice(-7).map((msg) => {
-    if (msg && msg.role === 'assistant' && 'results' in msg) {
-      const cleanedMsg = { ...msg }
+    if (!msg || msg.role !== 'assistant') return msg
+
+    const cleanedMsg = { ...msg }
+    if ('results' in cleanedMsg) {
       delete cleanedMsg.results
-      return cleanedMsg
     }
-    if (msg && msg.role === 'assistant' && msg.parts) {
-      const cleanedParts = msg.parts.flatMap((part) => {
+    if (cleanedMsg.parts) {
+      cleanedMsg.parts = cleanedMsg.parts.flatMap((part) => {
         if (!isToolUIPart(part)) return [part]
         if (!INVALID_TOOL_STATES.includes(part.state))
           return [sanitizeMessagePart(part, aiOptInLevel)]
         const exposed = exposedNotebookErrorPart(part)
         return exposed ? [sanitizeMessagePart(exposed, aiOptInLevel)] : []
       })
-      return { ...msg, parts: cleanedParts }
     }
-    return msg
+    return cleanedMsg
   })
 }
 

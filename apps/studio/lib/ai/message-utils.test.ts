@@ -188,4 +188,19 @@ describe('prepareMessagesForAPI', () => {
     // Assistant message has results removed
     expect(result[1]).not.toHaveProperty('results')
   })
+
+  it('removes falsy results properties from assistant messages', () => {
+    const messages = [
+      {
+        id: 'msg-1',
+        role: 'assistant',
+        parts: [{ type: 'text', text: 'Answer' }],
+        results: null,
+      },
+    ] as Array<UIMessage & { results?: unknown }>
+
+    const [cleaned] = prepareMessagesForAPI(messages)
+
+    expect(cleaned).not.toHaveProperty('results')
+  })
 })

@@ -185,6 +185,36 @@ describe('prepareMessagesForModel', () => {
 
     expect(result[0].parts).toEqual([{ type: 'text', text: 'hello' }])
   })
+
+  it('still sanitizes and filters tool parts when an assistant message also carries results', () => {
+    const messageWithResults = {
+      ...assistantMessage([
+        toolPart({
+          type: 'tool-execute_sql',
+          state: 'output-available',
+          output: {
+            rows: [{ email: 'secret@example.com' }],
+            optInLevel: 'schema_and_log_and_data',
+          },
+        }),
+        toolPart({
+          type: 'tool-execute_sql',
+          toolCallId: 'call-err',
+          state: 'output-error',
+          errorText: 'duplicate key (email)=(secret@example.com)',
+        }),
+      ]),
+      results: [{ email: 'secret@example.com' }],
+    } as UIMessage
+
+    const [prepared] = prepareMessagesForModel([messageWithResults], 'schema')
+
+    expect(prepared).not.toHaveProperty('results')
+    expect(prepared.parts).toHaveLength(1)
+    expect((prepared.parts[0] as ToolUIPart).output).toEqual(
+      expect.stringContaining('permission levels')
+    )
+  })
 })
 
 describe('hideToolErrorsFromModel', () => {
