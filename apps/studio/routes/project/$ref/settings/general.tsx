@@ -1,5 +1,5 @@
 import { createFileRoute } from '@tanstack/react-router'
-import { IS_PLATFORM } from 'common'
+import { IS_PLATFORM, useFlag } from 'common'
 import { PageContainer } from 'ui-patterns/PageContainer'
 import {
   PageHeader,
@@ -15,6 +15,7 @@ import { CustomDomainConfig } from '@/components/interfaces/Settings/General/Cus
 import { DeleteBranchPanel } from '@/components/interfaces/Settings/General/DeleteBranchPanel'
 import { DeleteProjectPanel } from '@/components/interfaces/Settings/General/DeleteProjectPanel/DeleteProjectPanel'
 import { General } from '@/components/interfaces/Settings/General/General'
+import { LogVolumeControlSettings } from '@/components/interfaces/Settings/General/LogVolumeControlSettings'
 import { Project } from '@/components/interfaces/Settings/General/Project'
 import { ServiceVersionsSection } from '@/components/interfaces/Settings/General/ServiceVersions/ServiceVersionsSection'
 import { TransferProjectPanel } from '@/components/interfaces/Settings/General/TransferProjectPanel/TransferProjectPanel'
@@ -41,6 +42,7 @@ function ProjectSettings() {
     { enabled: IS_PLATFORM }
   )
   const hasHipaaAddon = subscriptionHasHipaaAddon(subscription)
+  const isLogVolumeControlsEnabled = useFlag('enableLogVolumeControls')
 
   return (
     <>
@@ -60,6 +62,7 @@ function ProjectSettings() {
           <>
             <Project />
             <ServiceVersionsSection />
+            {isLogVolumeControlsEnabled && <LogVolumeControlSettings />}
             {/* this is only settable on compliance orgs, currently that means HIPAA orgs */}
             {!isBranch && hasHipaaAddon && <ComplianceConfig />}
             {projectSettingsCustomDomains && <CustomDomainConfig />}
