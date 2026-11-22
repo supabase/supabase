@@ -50,11 +50,12 @@ const RevVersionDropdown = ({
           hover:border-control
           hover:bg-overlay-hover
           border-control px-2 h-[32px] rounded-sm
+          layout-v2:h-6 layout-v2:px-1.5 layout-v2:rounded-md
           font-mono
           flex items-center gap-1 text-foreground-muted text-xs group-hover:text-foreground transition
           "
         >
-          <span className="text-foreground text-sm group-hover:text-foreground transition">
+          <span className="text-foreground text-sm layout-v2:text-xs group-hover:text-foreground transition">
             {currentVersion}.0
           </span>
           <ChevronDown size={14} strokeWidth={2} />

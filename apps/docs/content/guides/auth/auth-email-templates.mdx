@@ -57,7 +57,7 @@ Edit templates on the [Email Templates](/dashboard/project/_/auth/templates) pag
 
 ### Local development and self-hosted
 
-The dashboard template builder **does not apply** when running [local development with CLI](/docs/guides/local-development) or [self-hosted Supabase](/docs/guides/self-hosting). Customize templates in `supabase/config.toml` and local HTML files instead.
+The dashboard template builder **does not apply** when running [local development with CLI](/docs/guides/local-development) or [self-hosted Supabase](/docs/guides/self-hosting). Customize templates in your config file (`supabase/config.toml` or `supabase/config.jsonc`) and local HTML files instead.
 
 For local development with the CLI, [open the emails your templates produce in Mailpit](/docs/guides/auth/testing-auth-flows#test-email-flows-locally).
 
@@ -65,7 +65,7 @@ For local development with the CLI, [open the emails your templates produce in M
 
 See [Customizing email templates](/docs/guides/local-development/customizing-email-templates) for:
 
-- [`config.toml` keys and HTML file paths](/docs/guides/local-development/customizing-email-templates#configuring-templates)
+- [Config file keys and HTML file paths](/docs/guides/local-development/customizing-email-templates#configuring-templates)
 - [Template variables](/docs/guides/local-development/customizing-email-templates#template-variables) — the same placeholders as the [terminology](#terminology) table above
 - Default subjects and behavior for each [authentication](/docs/guides/local-development/customizing-email-templates#available-authentication-email-templates) and [security notification](/docs/guides/local-development/customizing-email-templates#available-security-notification-email-templates) template
 
@@ -134,8 +134,8 @@ For mobile applications, you might need to link or redirect to a specific page w
 
 ### Email prefetching
 
-Certain email providers may have spam detection or other security features that prefetch URL links from incoming emails (e.g. [Safe Links in Microsoft Defender for Office 365](https://learn.microsoft.com/en-us/microsoft-365/security/office-365-security/safe-links-about?view=o365-worldwide)).
-In this scenario, the `{{ .ConfirmationURL }}` sent will be consumed instantly which leads to a "[Token has expired or is invalid](/kb/troubleshooting/otp-verification-failures-token-has-expired-or-otp_expired-errors)" error.
+Certain email providers may have spam detection or other security features that prefetch URL links from incoming emails (e.g. [Safe Links in Microsoft Defender for Office 365](https://learn.microsoft.com/en-us/defender-office-365/safe-links-about?view=o365-worldwide)).
+In this scenario, the `{{ .ConfirmationURL }}` sent will be consumed instantly which leads to a "[Token has expired or is invalid](/kb/troubleshooting/otp-verification-failures-token-has-expired-or-otp_expired-errors-5ee4d0)" error.
 To guard against this there are the options below:
 
 **Option 1**

@@ -10,7 +10,7 @@ import {
 
 import { datePickerValueToLogTimeRange, logTimeRangesEqual } from './LogTimeRange.utils'
 import { EXPLORER_DATEPICKER_HELPERS } from '@/components/interfaces/Settings/Logs/Logs.constants'
-import { maybeShowUpgradePromptIfNotEntitled } from '@/components/interfaces/Settings/Logs/Logs.utils'
+import { isStartOutsideRetention } from '@/components/interfaces/Settings/Logs/Logs.utils'
 import type { TimeRange } from '@/data/content/notebooks/notebook-schema'
 import { useCheckEntitlements } from '@/hooks/misc/useCheckEntitlements'
 
@@ -55,7 +55,7 @@ export const LogsTimeRangeSubMenu = ({
       <DropdownMenuSubContent className="w-52">
         {presets.map(({ helper, range: presetRange }) => {
           const isSelected = !isCustomRange && logTimeRangesEqual(range, presetRange)
-          const isLocked = maybeShowUpgradePromptIfNotEntitled(helper.calcFrom(), entitledToLogDays)
+          const isLocked = isStartOutsideRetention(helper.calcFrom(), entitledToLogDays)
 
           return (
             <DropdownMenuItem

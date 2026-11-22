@@ -150,6 +150,7 @@ describe('generate-sitemap lastmod', () => {
       'https://supabase.com/events/webinar',
       'https://supabase.com/company',
       'https://supabase.com/evals',
+      'https://supabase.com/migrate/instantdb',
       'https://supabase.com/dashboard/sign-in',
       'https://supabase.com/dashboard/sign-up',
     ]) {
@@ -226,6 +227,7 @@ describe('generate-sitemap App Router pages', () => {
           '/events/example',
           '/example',
           '/guides/start',
+          '/migrate/instantdb',
           '/reference/index',
         ].map((route) => ({ loc: `https://supabase.com${route}`, lastmod: undefined }))
       )
@@ -262,6 +264,7 @@ describe('generate-sitemap prerendered feature pages', () => {
         'https://supabase.com/features/auth-hooks',
         'https://supabase.com/features/social-sign-in',
         'https://supabase.com/evals',
+        'https://supabase.com/migrate/instantdb',
         'https://supabase.com/dashboard/sign-in',
         'https://supabase.com/dashboard/sign-up',
       ])

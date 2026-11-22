@@ -1,10 +1,11 @@
 import { getCoreRowModel, useReactTable } from '@tanstack/react-table'
-import { render, screen } from '@testing-library/react'
+import { screen } from '@testing-library/react'
 import userEvent from '@testing-library/user-event'
 import { describe, expect, it, vi } from 'vitest'
 
 import { columnSchema } from '../UnifiedLogs.schema'
 import { LogOverview } from './LogOverview'
+import { customRender as render } from '@/tests/lib/custom-render'
 
 const row = columnSchema.parse({
   id: 'postgres-log',
@@ -58,7 +59,7 @@ describe('specialized log attribute actions', () => {
     await user.click(screen.getByRole('button', { name: section }))
     const label = attribute.replace(/^request\./, '')
     await user.click(screen.getByRole('button', { name: `${label} ${value}` }))
-    await user.click(screen.getByRole('menuitem', { name: 'Add filter' }))
-    expect(onAddAttributeFilter).toHaveBeenCalledExactlyOnceWith(attribute, String(value))
+    await user.click(screen.getByRole('menuitem', { name: 'Filter: equals' }))
+    expect(onAddAttributeFilter).toHaveBeenCalledExactlyOnceWith(attribute, String(value), '=')
   })
 })

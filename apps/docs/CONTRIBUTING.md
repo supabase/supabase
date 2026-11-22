@@ -63,7 +63,7 @@ const org = 'supabase'
 const repo = 'pg_graphql'
 const branch = 'master'
 const docsDir = 'docs'
-const externalSite = 'https://supabase.github.io/pg_graphql'
+const externalSite = 'https://supabase.github.io/pg_graphql/'
 ```
 
 Check the sections for [guide structure](#guide-structure) and [reference structure](#reference-structure) to learn more about the file structures.
@@ -106,6 +106,10 @@ To merge anyway:
 
 Reference docs are produced from the reference specs and library source code. A common spec file contains shared function and endpoint definitions, and library-specific spec files contain further details.
 
+JavaScript v2 reference docs use the TypeDoc pipeline described in the [reference pipeline README](./spec/reference/README.md).
+To change function parameters or return values in the JavaScript v2 reference, edit the source comments in the relevant SDK repository. To change docs-specific content, edit the tracked `config.json` and partials under `apps/docs/spec/reference/javascript/v2/`.
+The TypeDoc JSON files and generated `content/reference/` output are build artifacts, so do not edit them directly.
+
 ### Common spec file
 
 Each type of library, such as a language SDK or CLI, has a common spec file. For example, see the [spec file for the language SDKs](https://github.com/supabase/supabase/blob/master/apps/docs/spec/common-client-libs-sections.json). This file contains definitions for the common SDK functions:
@@ -120,11 +124,12 @@ To add a new function, manually add an entry to this common file.
 
 ### Specific spec file
 
-Each library also has its own spec file containing library-specific details. For example, see the [JavaScript SDK spec file](https://github.com/supabase/supabase/blob/master/apps/docs/spec/supabase_js_v2.yml).
+Libraries that still use the legacy pipeline have a specific YAML spec file containing library-specific details.
+For example, see the [Python SDK spec file](https://github.com/supabase/supabase/blob/master/apps/docs/spec/supabase_py_v2.yml).
 
 The functions listed in this file match the ones defined in the common spec file.
 
-Each function contains a description, code examples, and optional notes. The parameters are pulled from the source code via the `$ref` property, which references a function definition in the source code repo. These references are pulled down and transformed using commands in the spec [Makefile](https://github.com/supabase/supabase/blob/master/apps/docs/spec/Makefile). Unless you're a library maintainer, you don't need to worry about this.
+Each function contains a description, code examples, and optional notes. The parameters are pulled from the source code via the `$ref` property, which references a function definition in the source code repo. The legacy pipeline pulls these references down and transforms them using commands in the spec [Makefile](https://github.com/supabase/supabase/blob/master/apps/docs/spec/Makefile). Unless you're a library maintainer, you don't need to worry about this.
 
 If you're a library maintainer, follow these steps when updating function parameters or return values:
 
@@ -156,10 +161,20 @@ Run `pnpm test:local lib/content-listings.test.ts` from apps/docs.
 **Manually add content listings:**
 
 1. Add or update a `ContentListingGroup` export in [`data/content-listings/[topic].data.ts`](data/content-listings/). The `id` field must be globally unique across all listing groups. For example, use `storage-get-started` rather than `get-started`. The ID is both the lookup key and the telemetry `listingId`.
-2. Place the component inline in guide MDX, for example `<ContentListings id="storage-get-started" />`. Use a partial only when the block is reused or gated with `$Show` at the partial level. For individual items that depend on a feature flag (for example `sdk:dart`), set `feature` on the item instead of wrapping the whole listing.
+2. Place the component inline in guide MDX, for example `<ContentListings id="storage-get-started" />`. Use a partial only when the block is reused or gated with `$Show` at the partial level. For individual items that depend on a feature flag (for example `sdk:dart`), set `feature` on the item instead of wrapping the whole listing. The `feature` field removes only the listing item. The linked page stays live.
 3. Run `pnpm test:local lib/content-listings.test.ts` from `apps/docs`.
 
 Code snippets for manually adding content listings are available in [`.vscode/content-listing.code-snippets`](../../.vscode/content-listing.code-snippets). Use `cl-data` for a data export with a namespaced ID. Use `cl-inline` for an MDX component.
+
+## Feature flags and experiments
+
+Docs can hide or show content at build time with `enabled-features` flags. Use the `$Show` directive in MDX, or the `feature` field on a content listing item. To add or change a flag, see the [enabled-features README](../../packages/common/enabled-features/README.md).
+
+Docs also supports A/B tests behind PostHog feature flags. PostHog flags resolve in the browser, not at build time.
+
+Supabase staff: to run an experiment, contact the Docs PM or Docs Engineering. Read [Feature flag a docs change](https://app.notion.com/p/4105004b775f81bf810ddd5682284d23) (internal, staff only) first.
+
+Other contributors: if your change may need an A/B test, say so in your PR description or issue. The Docs team decides and sets up the flag. To preview a variant of a live experiment locally, add `?<flag>=<variant>` to the URL.
 
 ## Search
 

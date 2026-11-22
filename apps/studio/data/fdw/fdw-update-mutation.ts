@@ -38,6 +38,8 @@ export async function updateFDW({
   const { result } = await executeSql({
     projectRef,
     connectionString,
+    sqlOrigin: 'studio',
+    queryName: 'update-fdw',
     sql,
     queryKey: ['update-fdw'],
     grant: unguarded.migrating,

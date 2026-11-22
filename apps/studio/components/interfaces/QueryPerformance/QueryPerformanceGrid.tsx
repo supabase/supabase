@@ -7,7 +7,7 @@ import {
   TextSearchIcon,
 } from 'lucide-react'
 import { parseAsArrayOf, parseAsJson, parseAsString, useQueryStates } from 'nuqs'
-import { UIEvent, useCallback, useEffect, useMemo, useRef, useState } from 'react'
+import { useCallback, useEffect, useMemo, useRef, useState } from 'react'
 import DataGrid, { Column, DataGridHandle, Row } from 'react-data-grid'
 import {
   Button,
@@ -46,6 +46,7 @@ import { QueryPerformanceRow } from './QueryPerformance.types'
 import { formatDuration } from './QueryPerformance.utils'
 import { NumericFilter } from '@/components/interfaces/Reports/v2/ReportsNumericFilter'
 import { ButtonTooltip } from '@/components/ui/ButtonTooltip'
+import { useInfiniteScroll } from '@/hooks/misc/useInfiniteScroll'
 
 interface QueryPerformanceGridProps {
   aggregatedData: QueryPerformanceRow[]
@@ -54,7 +55,10 @@ interface QueryPerformanceGridProps {
   currentSelectedQuery?: string | null
   onCurrentSelectQuery?: (query: string) => void
   onRetry?: () => void
-  onScroll?: (event: UIEvent<HTMLDivElement>) => void
+  hasNextPage: boolean
+  isFetchingNextPage: boolean
+  isRefetching: boolean
+  fetchNextPage: (options?: { cancelRefetch?: boolean }) => void
 }
 
 const calculateTimeConsumedWidth = (data: QueryPerformanceRow[]) => {
@@ -86,20 +90,21 @@ export const QueryPerformanceGrid = ({
   currentSelectedQuery,
   onCurrentSelectQuery,
   onRetry,
-  onScroll,
+  hasNextPage,
+  isFetchingNextPage,
+  isRefetching,
+  fetchNextPage,
 }: QueryPerformanceGridProps) => {
   const { sort, setSortConfig } = useQueryPerformanceSort()
   const gridRef = useRef<DataGridHandle>(null)
   const { sort: urlSort, order } = useParams()
-  const [{ search, roles, callsFilter }] = useQueryStates({
+  // Filtering happens in SQL. These are read only to reset the selected row when they change.
+  const [{ search, roles, sources, callsFilter, totalTimeFilter }] = useQueryStates({
     search: parseAsString.withDefault(''),
     roles: parseAsArrayOf(parseAsString).withDefault([]),
-    callsFilter: parseAsJson<NumericFilter | null>(
-      (value) => value as NumericFilter | null
-    ).withDefault({
-      operator: '>=',
-      value: 0,
-    } as NumericFilter),
+    sources: parseAsArrayOf(parseAsString).withDefault([]),
+    callsFilter: parseAsJson<NumericFilter | null>((value) => value as NumericFilter | null),
+    totalTimeFilter: parseAsJson<NumericFilter | null>((value) => value as NumericFilter | null),
   })
   const dataGridContainerRef = useRef<HTMLDivElement>(null)
 
@@ -371,37 +376,6 @@ export const QueryPerformanceGrid = ({
   const reportData = useMemo(() => {
     let data = [...aggregatedData]
 
-    if (search && typeof search === 'string' && search.length > 0) {
-      data = data.filter((row) => row.query.toLowerCase().includes(search.toLowerCase()))
-    }
-
-    if (roles && Array.isArray(roles) && roles.length > 0) {
-      data = data.filter((row) => row.rolname && roles.includes(row.rolname))
-    }
-
-    if (callsFilter) {
-      const { operator, value } = callsFilter
-      data = data.filter((row) => {
-        const calls = row.calls || 0
-        switch (operator) {
-          case '=':
-            return calls === value
-          case '>=':
-            return calls >= value
-          case '<=':
-            return calls <= value
-          case '>':
-            return calls > value
-          case '<':
-            return calls < value
-          case '!=':
-            return calls !== value
-          default:
-            return true
-        }
-      })
-    }
-
     if (sort?.column === 'prop_total_time') {
       data.sort((a, b) => {
         const aValue = a.prop_total_time || 0
@@ -421,11 +395,22 @@ export const QueryPerformanceGrid = ({
     }
 
     return data
-  }, [aggregatedData, sort, search, roles, callsFilter])
+  }, [aggregatedData, sort])
+
+  const handleScroll = useInfiniteScroll({
+    isLoading,
+    isFetchingNextPage,
+    isRefetching,
+    isError: !!error,
+    hasNextPage,
+    fetchNextPage,
+    containerRef: gridRef,
+    rowCount: reportData.length,
+  })
 
   useEffect(() => {
     setSelectedRow(undefined)
-  }, [search, roles, urlSort, order, callsFilter])
+  }, [search, roles, urlSort, order, callsFilter, totalTimeFilter, sources])
 
   const handleKeyDown = useCallback(
     (event: KeyboardEvent) => {
@@ -517,7 +502,7 @@ export const QueryPerformanceGrid = ({
           headerRowHeight={36}
           columns={columns}
           rows={reportData}
-          onScroll={onScroll}
+          onScroll={handleScroll}
           rowClass={(_, idx) => {
             const isSelected = idx === selectedRow
             const query = reportData[idx]?.query

@@ -119,6 +119,7 @@ export const createTool: ApprovalGatedToolFactory<typeof contract> = (ctx) => {
               projectRef,
               connectionString: selectedConnectionString,
               sql: limitedSql.sql,
+              sqlOrigin: 'user',
               isStatementTimeoutDisabled: true,
               grant: unguarded.migrating,
             },

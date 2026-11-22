@@ -1,0 +1,193 @@
+---
+title: 'Configure the OAuth 2.1 server'
+description: 'Turn Supabase Auth in your self-hosted Docker deployment into an OAuth 2.1 and OpenID Connect provider, so that third-party apps can sign in your users.'
+subtitle: 'Turn your self-hosted Supabase Auth into an OAuth 2.1 and OpenID Connect (OIDC) provider.'
+---
+
+With the OAuth 2.1 server enabled, third-party apps can sign in your users and call your APIs on their behalf. To learn how the OAuth 2.1 server works, see [OAuth 2.1 server](/docs/guides/auth/oauth-server).
+
+This guide covers the server configuration for a Docker deployment. Your consent page and your clients use the same APIs and flows as on the Supabase platform.
+
+- [Set up the OAuth 2.1 server](#set-up-the-oauth-21-server) has the steps, from enabling the server to testing a sign-in.
+- [Use OAuth access tokens](#use-oauth-access-tokens) explains what clients send to your APIs.
+- [Reference](#reference) lists the API gateway routes and the environment variables.
+- [Troubleshooting](#troubleshooting) covers the common errors.
+
+## Before you begin
+
+You need:
+
+- A running self-hosted Supabase instance. See [Self-hosting with Docker](/docs/guides/self-hosting/docker).
+- An asymmetric JWT signing key in `JWT_KEYS`. Auth signs OIDC ID tokens only with an asymmetric key. The setup script creates the key pair. Otherwise, add it with `utils/add-new-auth-keys.sh`, which also replaces your `sb_` API keys. See [New API keys and asymmetric authentication](/docs/guides/self-hosting/self-hosted-auth-keys).
+- `API_EXTERNAL_URL` set to the public URL of Auth, for example `https://<your-domain>/auth/v1`. Auth uses it as the issuer and in the endpoint URLs it publishes to clients.
+- `SITE_URL` set to the URL of the app that hosts your consent page.
+- Your secret key, `SUPABASE_SECRET_KEY`, from your `.env` file. You need it to register clients.
+- An API gateway configuration that passes the OAuth 2.1 server endpoints to Auth without an API key. If you customized it, see [API gateway routes](#api-gateway-routes).
+
+## Set up the OAuth 2.1 server
+
+Enable the server, build a consent page in your app, register a client, and then test a sign-in.
+
+### Enable the OAuth 2.1 server
+
+1. In your `.env` file, set the following variables. `.env.example` has them commented out in its `OAuth 2.1 server` section:
+
+   ```sh name=.env
+   OAUTH_SERVER_ENABLED=true
+   # Path of your consent page on SITE_URL
+   OAUTH_SERVER_AUTHORIZATION_PATH=/oauth/consent
+
+   # Optional: let clients register themselves without an API key (default: false)
+   # OAUTH_SERVER_ALLOW_DYNAMIC_REGISTRATION=false
+   ```
+
+2. In `docker-compose.yml`, pass the variables to the `auth` service. Uncomment the `OAuth 2.1 server` lines. If your file doesn't have them, add them. Auth expects the `GOTRUE_` prefix on its configuration variables:
+
+   ```yaml name=docker-compose.yml
+   auth:
+     environment:
+       # ... existing variables ...
+
+       # OAuth 2.1 server
+       GOTRUE_OAUTH_SERVER_ENABLED: ${OAUTH_SERVER_ENABLED:-false}
+       GOTRUE_OAUTH_SERVER_AUTHORIZATION_PATH: ${OAUTH_SERVER_AUTHORIZATION_PATH}
+       GOTRUE_OAUTH_SERVER_ALLOW_DYNAMIC_REGISTRATION: ${OAUTH_SERVER_ALLOW_DYNAMIC_REGISTRATION:-false}
+   ```
+
+3. Recreate the Auth container:
+
+   ```sh
+   sh run.sh recreate auth
+   ```
+
+4. Check that Auth publishes the OAuth endpoints in its discovery document:
+
+   ```sh
+   curl 'https://<your-domain>/.well-known/oauth-authorization-server/auth/v1'
+   ```
+
+   The response lists `authorization_endpoint`, `token_endpoint`, and the other endpoints, all under `API_EXTERNAL_URL`.
+
+### Build your consent page
+
+When a client starts a sign-in, Auth redirects the user's browser to your consent page with an `authorization_id`. The page signs in the user if needed, shows which app is asking for access, and approves or denies the request. Build it with the `supabase.auth.oauth` methods in `supabase-js`. For a complete example, see [Build your authorization UI](/docs/guides/auth/oauth-server/getting-started#build-your-authorization-ui).
+
+Auth always redirects the browser to `SITE_URL` plus `OAUTH_SERVER_AUTHORIZATION_PATH`, with the `authorization_id` in the query string, so host the consent page there. To get the authorization details and to approve or deny the request, the page calls Auth's consent endpoints from that origin.
+
+The page calls Auth with your publishable key and the user's session, like the rest of your app.
+
+### Register an OAuth client
+
+Register each third-party app with the Auth admin API, using your secret key. A public client, such as a single-page or mobile app, has no secret and uses Proof Key for Code Exchange (PKCE) instead:
+
+```sh
+curl -X POST 'https://<your-domain>/auth/v1/admin/oauth/clients' \
+  -H 'apikey: your-supabase-secret-key' \
+  -H 'Content-Type: application/json' \
+  -d '{
+    "client_name": "My third-party app",
+    "redirect_uris": ["https://app.example.com/auth/callback"],
+    "client_type": "public"
+  }'
+```
+
+The response includes the `client_id`, which the third-party app needs to start a sign-in.
+
+For a server-side app, set `client_type` to `confidential`. The response then includes a `client_secret`. Store it securely, because Auth doesn't show it again.
+
+Clients can also register themselves at `/auth/v1/oauth/clients/register` without an API key, which the API gateway allows like the other OAuth 2.1 server endpoints. To allow it in Auth, set `OAUTH_SERVER_ALLOW_DYNAMIC_REGISTRATION=true` in your `.env` file, and then recreate the Auth container with `sh run.sh recreate auth`.
+
+<Admonition type="caution">
+
+With dynamic registration enabled, anyone who can reach your instance can register a client. Enable it only when your clients need it, such as Model Context Protocol (MCP) clients.
+
+</Admonition>
+
+### Test the flow
+
+1. In a browser, open the authorization URL for your client. The following URL is split across lines for readability. Join it into one line, with your client's ID, redirect URI, and PKCE code challenge:
+
+   ```text
+   https://<your-domain>/auth/v1/oauth/authorize
+     ?response_type=code
+     &client_id=<client-id>
+     &redirect_uri=https://app.example.com/auth/callback
+     &scope=openid%20email
+     &code_challenge=<code-challenge>
+     &code_challenge_method=S256
+   ```
+
+   Auth redirects you to your consent page with an `authorization_id`.
+
+2. Approve the request. Auth redirects you to the client's redirect URI with a `code`.
+3. Exchange the code for tokens. See [Authorization code flow with PKCE](/docs/guides/auth/oauth-server/oauth-flows#authorization-code-flow-with-pkce).
+
+The token response includes an access token and a refresh token. With the `openid` scope, it also includes an ID token.
+
+## Use OAuth access tokens
+
+To call your Data API, Storage, or other Auth endpoints with an OAuth access token, the client also sends your publishable key. The key goes in the `apikey` header.
+
+Access tokens carry a `client_id` claim. To control what each client can access, use the claim in Row Level Security policies. See [Token security and Row Level Security](/docs/guides/auth/oauth-server/token-security).
+
+## Reference
+
+### API gateway routes
+
+The API gateway passes the following endpoints to Auth without an API key:
+
+| Path                              | Used for                                     |
+| --------------------------------- | -------------------------------------------- |
+| `/auth/v1/oauth/authorize`        | Starting a sign-in from the browser          |
+| `/auth/v1/oauth/token`            | Exchanging a code and refreshing tokens      |
+| `/auth/v1/oauth/userinfo`         | Returning the user's profile to OIDC clients |
+| `/auth/v1/oauth/clients/register` | Registering clients dynamically              |
+
+The consent endpoints under `/auth/v1/oauth/authorizations/` need your API key, like other Auth endpoints. If you customized `volumes/api/envoy/lds.template.yaml` or `volumes/api/kong.yml`, compare them with the files in the release you run. See [Routes](/docs/guides/self-hosting/self-hosted-envoy#routes).
+
+### Environment variables
+
+Auth reads the following OAuth 2.1 server variables:
+
+| Variable                                  | Default | Description                                                                                        |
+| ----------------------------------------- | ------- | -------------------------------------------------------------------------------------------------- |
+| `OAUTH_SERVER_ENABLED`                    | `false` | Enables the OAuth 2.1 server                                                                       |
+| `OAUTH_SERVER_AUTHORIZATION_PATH`         | -       | Sets the path of your consent page on `SITE_URL`. Required.                                        |
+| `OAUTH_SERVER_ALLOW_DYNAMIC_REGISTRATION` | `false` | Lets clients register themselves without an API key                                                |
+| `OAUTH_SERVER_AUTHORIZATION_TTL`          | `10m`   | Sets how long an authorization request stays valid, from the redirect until the client gets tokens |
+| `OAUTH_SERVER_DEFAULT_SCOPE`              | `email` | Sets the scope used when a client doesn't request one                                              |
+
+To set `OAUTH_SERVER_AUTHORIZATION_TTL` or `OAUTH_SERVER_DEFAULT_SCOPE`, pass them to the `auth` service as `GOTRUE_OAUTH_SERVER_AUTHORIZATION_TTL` and `GOTRUE_OAUTH_SERVER_DEFAULT_SCOPE`. For every Auth variable, see the [Auth server configuration reference](/docs/guides/self-hosting/auth/config).
+
+## Troubleshooting
+
+### Auth responds with `OAuth server is disabled`
+
+Auth didn't get `GOTRUE_OAUTH_SERVER_ENABLED=true`. Check that `docker-compose.yml` passes the variable to the `auth` service, then recreate the container with `sh run.sh recreate auth`.
+
+### The client gets a 401 from the authorize or token endpoint
+
+The API gateway is asking for an API key on an endpoint that clients call without one. Check that your gateway configuration has the routes listed in [API gateway routes](#api-gateway-routes).
+
+### The redirect to the client has `error=server_error`
+
+If the `error_description` is `oauth authorization path not configured`, set `OAUTH_SERVER_AUTHORIZATION_PATH` and pass it to the `auth` service.
+
+### Consent requests fail with `unauthorized request origin`
+
+The consent endpoints were called from an origin that Auth doesn't accept. Auth accepts these calls when the browser's origin is one of the following:
+
+- The `SITE_URL` origin. When `SITE_URL` uses a local hostname, such as `localhost`, any port on that hostname.
+- An origin in `ADDITIONAL_REDIRECT_URLS`, listed as it is, for example `https://consent.example.com`. Auth compares the origin, which has no path, so a path wildcard such as `https://consent.example.com/**`, which matches any path on that site, doesn't match it.
+- A loopback IP address, such as `http://127.0.0.1:3000`.
+
+Requests without an `Origin` header, such as those from servers, also pass.
+
+### The token request fails with `Error generating ID token`
+
+The client requested the `openid` scope, and Auth signs tokens with a symmetric key.
+
+- If `JWT_KEYS` in your `.env` file already has an EC or RSA private key with `sign` in its `key_ops`, `docker-compose.yml` may not pass it on. The key script enables `GOTRUE_JWT_KEYS` for Auth and `JWT_JWKS` for the services that verify tokens. Check these lines against [Adding the new keys](/docs/guides/self-hosting/self-hosted-auth-keys#adding-the-new-keys), and then recreate the services you changed.
+- Otherwise, add a key pair with that script. It also replaces your `sb_` API keys, so update your clients with the new ones. Restarting all services afterwards briefly stops the whole stack, including the database.
+
+Then start the sign-in again: the failed request already used up its authorization code, so retrying it returns `invalid_grant`.

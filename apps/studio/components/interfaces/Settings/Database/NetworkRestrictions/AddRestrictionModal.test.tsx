@@ -22,7 +22,7 @@ type NetworkRestrictionsResponse = components['schemas']['NetworkRestrictionsRes
 
 type ApplyRequest = { ref: string | undefined; body: unknown }
 
-const mockExistingRestrictions = (dbAllowedCidrs: string[]) => {
+const mockExistingRestrictions = (dbAllowedCidrs: string[], dbAllowedCidrsV6: string[] = []) => {
   addAPIMock({
     method: 'get',
     path: '/v1/projects/:ref/network-restrictions',
@@ -30,7 +30,7 @@ const mockExistingRestrictions = (dbAllowedCidrs: string[]) => {
       HttpResponse.json<NetworkRestrictionsResponse>({
         entitlement: 'allowed',
         status: 'applied',
-        config: { dbAllowedCidrs, dbAllowedCidrsV6: [] },
+        config: { dbAllowedCidrs, dbAllowedCidrsV6 },
       }),
   })
 }
@@ -57,7 +57,7 @@ const mockApply = () => {
 
 const renderModal = (
   props: Partial<React.ComponentProps<typeof AddRestrictionModal>> = {},
-  { cachedCidrs }: { cachedCidrs?: string[] } = {}
+  { cachedCidrs, cachedCidrsV6 = [] }: { cachedCidrs?: string[]; cachedCidrsV6?: string[] } = {}
 ) => {
   const onClose = props.onClose ?? vi.fn()
 
@@ -68,7 +68,7 @@ const renderModal = (
   })
   if (cachedCidrs) {
     queryClient.setQueryData(networkRestrictionKeys.list('default'), {
-      config: { dbAllowedCidrs: cachedCidrs, dbAllowedCidrsV6: [] },
+      config: { dbAllowedCidrs: cachedCidrs, dbAllowedCidrsV6: cachedCidrsV6 },
     })
   }
 
@@ -217,6 +217,33 @@ describe('AddRestrictionModal', () => {
       await screen.findByText('The address 203.0.113.7/32 is already in the list')
     ).toBeInTheDocument()
     expect(screen.getByText('1 range to add')).toBeInTheDocument()
+  })
+
+  test('rejects a range already restricted in another spelling', async () => {
+    mockExistingRestrictions([], ['2001:DB8::/32'])
+    renderModal({ type: 'IPv6' }, { cachedCidrs: [], cachedCidrsV6: ['2001:DB8::/32'] })
+
+    await enterValue(await screen.findByPlaceholderText('::0'), '2001:db8::')
+    await enterValue(screen.getByPlaceholderText('128'), '32')
+    fireEvent.click(screen.getByRole('button', { name: 'Add to list' }))
+
+    expect(
+      await screen.findByText('The address 2001:db8::/32 is already restricted')
+    ).toBeInTheDocument()
+  })
+
+  test('rejects an IPv4-mapped IPv6 address', async () => {
+    mockExistingRestrictions([])
+    renderModal({ type: 'IPv6' })
+
+    await enterValue(await screen.findByPlaceholderText('::0'), '::ffff:102:304')
+    fireEvent.click(screen.getByRole('button', { name: 'Add to list' }))
+
+    expect(
+      await screen.findByText(
+        "IPv4-mapped IPv6 addresses aren't supported. Add the address as an IPv4 restriction instead."
+      )
+    ).toBeInTheDocument()
   })
 
   test('rejects private addresses', async () => {

@@ -1,4 +1,4 @@
-import { LOCAL_STORAGE_KEYS, useFlag, useIsMFAEnabled, useParams } from 'common'
+import { LOCAL_STORAGE_KEYS, useFlag, useIsMFAEnabled, useMountEffect, useParams } from 'common'
 import { Home } from 'icons'
 import { isUndefined } from 'lodash'
 import {
@@ -44,11 +44,12 @@ import {
   useGenerateOtherRoutes,
   useGenerateToolRoutes,
 } from '@/components/layouts/Navigation/NavigationBar/NavigationBar.utils'
+import { ORG_SETTINGS_ROUTES } from '@/components/layouts/OrganizationLayout/OrganizationLayout.utils'
 import { ProjectIndexPageLink } from '@/data/prefetchers/project.$ref'
 import { useHideSidebar } from '@/hooks/misc/useHideSidebar'
 import { useIsFeatureEnabled } from '@/hooks/misc/useIsFeatureEnabled'
 import { useLints } from '@/hooks/misc/useLints'
-import { useLocalStorageQuery } from '@/hooks/misc/useLocalStorage'
+import { useLocalStorage, useLocalStorageQuery } from '@/hooks/misc/useLocalStorage'
 import { useSelectedOrganizationQuery } from '@/hooks/misc/useSelectedOrganization'
 import { useSelectedProjectQuery } from '@/hooks/misc/useSelectedProject'
 import { useTrack } from '@/lib/telemetry/track'
@@ -71,10 +72,20 @@ export const Sidebar = ({ className, ...props }: SidebarProps) => {
   const { setOpen } = useSidebar()
   const hideSideBar = useHideSidebar()
 
-  const [sidebarBehaviour, setSidebarBehaviour] = useLocalStorageQuery(
+  // useLocalStorageQuery returns data after the first render, so seed it with the stored value
+  const [storedBehavior] = useLocalStorage(
     LOCAL_STORAGE_KEYS.SIDEBAR_BEHAVIOR,
     DEFAULT_SIDEBAR_BEHAVIOR
   )
+  const [sidebarBehaviour, setSidebarBehaviour] = useLocalStorageQuery(
+    LOCAL_STORAGE_KEYS.SIDEBAR_BEHAVIOR,
+    storedBehavior
+  )
+
+  // account pages keep the provider but not this component, so a hover-expand choice made there must close it here
+  useMountEffect(() => {
+    if (sidebarBehaviour === 'expandable') setOpen(false)
+  })
 
   useEffect(() => {
     // logic to toggle sidebar open based on sidebarBehaviour state
@@ -105,7 +116,7 @@ export const Sidebar = ({ className, ...props }: SidebarProps) => {
                 <DropdownMenuTrigger asChild>
                   <Button
                     variant="text"
-                    className={`w-min px-1.5 mx-0.5 ${sidebarBehaviour === 'open' ? 'px-2!' : ''}`}
+                    className="w-min px-1.5 mx-0.5"
                     icon={<PanelLeftDashedIcon size={ICON_SIZE} strokeWidth={ICON_STROKE_WIDTH} />}
                     aria-label="Sidebar control"
                   />
@@ -178,11 +189,6 @@ export function SideBarNavLink({
   const router = useRouter()
   const { state: sidebarState } = useSidebar()
 
-  const [sidebarBehaviour] = useLocalStorageQuery(
-    LOCAL_STORAGE_KEYS.SIDEBAR_BEHAVIOR,
-    DEFAULT_SIDEBAR_BEHAVIOR
-  )
-
   const isActiveLink = !!(route.link && !route.disabled)
   const hasShortcut = !!(route.shortcutId && isActiveLink)
 
@@ -195,7 +201,7 @@ export function SideBarNavLink({
     disabled: route.disabled,
     isActive: active,
     isLoading,
-    className: cn('text-sm', sidebarBehaviour === 'open' ? 'px-2!' : ''),
+    className: 'text-sm',
     size: 'default' as const,
     onClick: onClick,
   }
@@ -229,11 +235,15 @@ export function SideBarNavLink({
     <SidebarMenuItem>
       {hasShortcut ? (
         <Shortcut
+          label={
+            route.shortcutId === SHORTCUT_IDS.NAV_ADVISORS || route.key === 'explorer'
+              ? `Go to ${route.label}`
+              : undefined
+          }
           id={route.shortcutId!}
           onTrigger={() => router.push(route.link!)}
           side="right"
           delayDuration={shortcutPopoverDelay}
-          label={route.key === 'explorer' ? 'Go to Explorer' : undefined}
         >
           {button}
         </Shortcut>
@@ -245,21 +255,10 @@ export function SideBarNavLink({
 }
 
 const ActiveDot = ({ hasErrors, hasWarnings }: { hasErrors: boolean; hasWarnings: boolean }) => {
-  const [sidebarBehaviour] = useLocalStorageQuery(
-    LOCAL_STORAGE_KEYS.SIDEBAR_BEHAVIOR,
-    DEFAULT_SIDEBAR_BEHAVIOR
-  )
-
-  // The nav icon only shifts right (pl-1.5 -> pl-2) when the sidebar is
-  // persistently open — not on hover-expand. Tie the dot to the same
-  // condition so it stays put while skimming the nav.
-  const isPersistentlyOpen = sidebarBehaviour === 'open'
-
   return (
     <div
       className={cn(
-        'absolute pointer-events-none flex h-2 w-2 top-2 z-10 rounded-full',
-        isPersistentlyOpen ? 'left-[20px]' : 'left-[18px]',
+        'absolute pointer-events-none flex h-2 w-2 top-2 left-4.5 z-10 rounded-full',
         hasErrors ? 'bg-destructive-600' : hasWarnings ? 'bg-warning-600' : 'bg-transparent'
       )}
     />
@@ -350,12 +349,15 @@ const ProjectLinks = () => {
       <SidebarGroup className="gap-0.5">
         <SidebarMenu>
           {otherRoutes.map((route) => {
-            if (route.key === 'advisors') {
+            if (route.key === 'issues' || route.key === 'advisors') {
               return (
                 <SideBarNavLink
                   key={route.key}
                   route={route}
-                  active={activeRoute === route.key}
+                  active={
+                    activeRoute === route.key ||
+                    (route.key === 'issues' && activeRoute === 'advisors')
+                  }
                   isLoading={isProjectPending}
                 >
                   {route.icon}
@@ -412,15 +414,6 @@ const OrganizationLinks = () => {
   const showBilling = useIsFeatureEnabled('billing:all')
 
   const activeRoute = router.pathname.split('/')[3]
-  const organizationSettingsRoutes = new Set([
-    'general',
-    'security',
-    'sso',
-    'apps',
-    'audit',
-    'documents',
-  ])
-
   const navMenuItems = [
     {
       label: 'Projects',
@@ -482,7 +475,7 @@ const OrganizationLinks = () => {
               i === 0
                 ? activeRoute === undefined
                 : item.key === 'settings'
-                  ? organizationSettingsRoutes.has(activeRoute ?? '')
+                  ? ORG_SETTINGS_ROUTES.includes(activeRoute ?? '')
                   : activeRoute === item.key
             }
             route={{

@@ -26,7 +26,7 @@ const EMPTY_SUMMARY: GitHubConfigDriftSummary = {
 
 type ConfigDriftMemoResult =
   | { status: 'success'; summary: GitHubConfigDriftSummary }
-  | { status: 'error'; source: 'project-config' | 'config-toml'; error: Error }
+  | { status: 'error'; source: 'project-config' | 'config-file'; error: Error }
 
 export function getGitBranchName(branch?: Branch): string | undefined {
   return branch?.git_branch?.trim() || (branch?.is_default ? undefined : branch?.name?.trim())
@@ -42,10 +42,12 @@ export function useSelectedGitHubConfigDrift() {
   })
   const isPermissionDenied = branchesGrant.status === 'denied'
   const shouldLoad = IS_PLATFORM && Boolean(projectRef) && Boolean(project) && !isPermissionDenied
-  const branchesQuery = useQuery({
-    ...branchesQueryOptions({ projectRef: parentProjectRef, grant: branchesGrant.grant }),
-    enabled: shouldLoad,
-  })
+  const branchesQuery = useQuery(
+    branchesQueryOptions(
+      { projectRef: parentProjectRef, grant: branchesGrant.grant },
+      { enabled: shouldLoad }
+    )
+  )
   const connectionQuery = useProjectGitHubConnectionQuery({ ref: parentProjectRef })
   const connection = connectionQuery.data
   const hasConnection = connection !== undefined
@@ -89,6 +91,8 @@ export function useSelectedGitHubConfigDrift() {
     githubConfigRefetch,
   ])
 
+  const configFileName = githubConfigQuery.data?.path?.split('/').pop()
+
   const driftResult = useMemo((): ConfigDriftMemoResult => {
     let dashboardConfig
     try {
@@ -109,13 +113,13 @@ export function useSelectedGitHubConfigDrift() {
     if (result.status === 'invalid-config') {
       return {
         status: 'error',
-        source: 'config-toml',
-        error: new Error(formatGitHubConfigDecodeMessage(result.issues)),
+        source: 'config-file',
+        error: new Error(formatGitHubConfigDecodeMessage(result.issues, configFileName)),
       }
     }
 
     return { status: 'success', summary: result.summary }
-  }, [projectConfigQuery.data?.attributes, githubConfigQuery.data?.config])
+  }, [projectConfigQuery.data?.attributes, githubConfigQuery.data?.config, configFileName])
 
   const summary = driftResult.status === 'success' ? driftResult.summary : EMPTY_SUMMARY
   const conversionError = driftResult.status === 'error' ? driftResult.error : undefined
@@ -139,7 +143,7 @@ export function useSelectedGitHubConfigDrift() {
     shouldLoad && hasConnection && projectConfigQuery.isSuccess && githubConfigQuery.isSuccess
   const issueCount = summary.driftedFields.length
   const queryError = activeQueries.find((query) => query.error)?.error
-  let errorSource: 'query' | 'project-config' | 'config-toml' | undefined = undefined
+  let errorSource: 'query' | 'project-config' | 'config-file' | undefined = undefined
   if (queryError) {
     errorSource = 'query'
   } else if (driftResult.status === 'error') {
@@ -155,6 +159,7 @@ export function useSelectedGitHubConfigDrift() {
     isError: activeQueries.some((query) => query.isError) || conversionError !== undefined,
     error: queryError ?? conversionError,
     errorSource,
+    configFileName,
     hasConfigurationIssues: isReady && issueCount > 0,
     summary,
     refetch,

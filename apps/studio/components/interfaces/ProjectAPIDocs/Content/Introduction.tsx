@@ -17,10 +17,9 @@ import { useTrack } from '@/lib/telemetry/track'
 export const Introduction = ({ showKeys, language, apikey, endpoint }: ContentProps) => {
   const { ref } = useParams()
   const apiKeysGrant = useGrant('GET /v1/projects/{ref}/api-keys', { projectRef: ref })
-  const { data: apiKeysData } = useQuery({
-    ...apiKeysQueryOptions({ projectRef: ref, grant: apiKeysGrant.grant }),
-    select: getKeys,
-  })
+  const { data: apiKeysData } = useQuery(
+    apiKeysQueryOptions({ projectRef: ref, grant: apiKeysGrant.grant }, { select: getKeys })
+  )
   useProjectSettingsV2Query({ projectRef: ref })
   const { anonKey, serviceKey } = apiKeysData ?? {}
 

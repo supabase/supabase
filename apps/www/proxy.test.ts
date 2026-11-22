@@ -1,4 +1,5 @@
 import { FIRST_REFERRER_COOKIE_NAME } from 'common/first-referrer-cookie'
+import { VISITOR_COUNTRY_COOKIE_NAME } from 'common/visitor-country'
 import { unstable_doesMiddlewareMatch } from 'next/experimental/testing/server'
 import { NextRequest } from 'next/server'
 import { describe, expect, it, vi } from 'vitest'
@@ -22,12 +23,20 @@ function makeRequest(
     hasCookie,
     accept,
     userAgent,
-  }: { referer?: string; hasCookie?: boolean; accept?: string; userAgent?: string } = {}
+    country,
+  }: {
+    referer?: string
+    hasCookie?: boolean
+    accept?: string
+    userAgent?: string
+    country?: string
+  } = {}
 ): NextRequest {
   const headers: Record<string, string> = {}
   if (referer) headers.referer = referer
   if (accept) headers.accept = accept
   if (userAgent) headers['user-agent'] = userAgent
+  if (country) headers['x-vercel-ip-country'] = country
   const req = new NextRequest(new URL(url, 'https://supabase.com'), { headers })
   if (hasCookie) {
     req.cookies.set(FIRST_REFERRER_COOKIE_NAME, 'existing')
@@ -420,5 +429,19 @@ describe('www proxy matcher', () => {
     '/pricing',
   ])('runs on documents: %s', (url) => {
     expect(matches(url)).toBe(true)
+  })
+})
+
+describe('visitor country cookie', () => {
+  it('stamps the Vercel country on page requests', () => {
+    const res = proxy(makeRequest('/pricing', { country: 'DE' }))
+    expect(res.cookies.get(VISITOR_COUNTRY_COOKIE_NAME)?.value).toBe('DE')
+  })
+
+  it('stamps the country on docs and kb requests rewritten through www', () => {
+    for (const path of ['/docs/guides/auth', '/kb']) {
+      const res = proxy(makeRequest(path, { country: 'US' }))
+      expect(res.cookies.get(VISITOR_COUNTRY_COOKIE_NAME)?.value).toBe('US')
+    }
   })
 })

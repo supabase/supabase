@@ -24,6 +24,8 @@ export async function getMaxConnections(
     {
       projectRef,
       connectionString,
+      sqlOrigin: 'studio',
+      queryName: 'max-connections',
       sql,
       queryKey: ['max-connections'],
       grant: unguarded.migrating,

@@ -4,6 +4,8 @@ import {
   Compute,
   Database,
   EdgeFunctions,
+  Inbox,
+  Issues,
   Realtime,
   SqlEditor,
   Storage,
@@ -17,6 +19,7 @@ import {
 } from '@/components/interfaces/App/FeaturePreview/FeaturePreviewContext'
 import { ICON_SIZE, ICON_STROKE_WIDTH } from '@/components/interfaces/Sidebar'
 import type { Route } from '@/components/ui/ui.types'
+import { useProjectIssues } from '@/data/issues/useProjectIssues'
 import { EditorIndexPageLink } from '@/data/prefetchers/project.$ref.editor'
 import type { Project } from '@/data/projects/project-detail-query'
 import { useIsFeatureEnabled } from '@/hooks/misc/useIsFeatureEnabled'
@@ -42,11 +45,27 @@ interface ProductFeatures {
 }
 
 interface OtherFeatures {
+  isHealthAdvisorEnabled?: boolean
+  issuesInbox?: boolean
+  hasIssues?: boolean
   isPlatform?: boolean
   unifiedLogs?: boolean
   showReports?: boolean
   showLogs?: boolean
-  isHealthAdvisorEnabled?: boolean
+}
+
+function getIssuesIcon({
+  isIssuesInboxEnabled,
+  hasIssues,
+}: {
+  isIssuesInboxEnabled: boolean
+  hasIssues: boolean
+}) {
+  if (!isIssuesInboxEnabled)
+    return <LightbulbIcon size={ICON_SIZE} strokeWidth={ICON_STROKE_WIDTH} />
+
+  const Icon = hasIssues ? Issues : Inbox
+  return <Icon size={ICON_SIZE} strokeWidth={ICON_STROKE_WIDTH} />
 }
 
 function getRouteContext(ref?: string, project?: Project): RouteContext {
@@ -205,22 +224,23 @@ export const generateOtherRoutes = (
 ): Route[] => {
   const { isProjectActive, isProjectBuilding, buildingUrl } = getRouteContext(ref, project)
 
+  const isIssuesInboxEnabled = features?.issuesInbox ?? false
+  const hasIssues = features?.hasIssues ?? false
+  const legacyCategory = features?.isHealthAdvisorEnabled ? 'health' : 'security'
+  const advisorDestination = isIssuesInboxEnabled
+    ? `/project/${ref}/issues`
+    : `/project/${ref}/advisors/${legacyCategory}`
   const unifiedLogsEnabled = features?.unifiedLogs ?? false
   const reportsEnabled = features?.showReports ?? true
   const logsEnabled = features?.showLogs ?? true
-  const isHealthAdvisorEnabled = features?.isHealthAdvisorEnabled ?? false
 
   return [
     {
-      key: 'advisors',
-      label: 'Advisors',
+      key: isIssuesInboxEnabled ? 'issues' : 'advisors',
+      label: isIssuesInboxEnabled ? 'Issues' : 'Advisors',
       disabled: !isProjectActive,
-      icon: <LightbulbIcon size={ICON_SIZE} strokeWidth={ICON_STROKE_WIDTH} />,
-      link:
-        ref &&
-        (isProjectBuilding
-          ? buildingUrl
-          : `/project/${ref}/advisors/${isHealthAdvisorEnabled ? 'health' : 'security'}`),
+      icon: getIssuesIcon({ isIssuesInboxEnabled, hasIssues }),
+      link: ref && (isProjectBuilding ? buildingUrl : advisorDestination),
       shortcutId: SHORTCUT_IDS.NAV_ADVISORS,
     },
     ...(reportsEnabled
@@ -271,15 +291,19 @@ export const useGenerateOtherRoutes = (): Route[] => {
   const { ref } = useParams()
   const { data: project } = useSelectedProjectQuery()
   const { isEnabled: unifiedLogsEnabled } = useUnifiedLogsPreview()
+  const isIssuesInboxEnabled = useFlag('issuesInbox')
+  const isHealthAdvisorEnabled = useFlag('healthAdvisor')
   const reportsEnabled = useIsFeatureEnabled('reports:all')
   const logsEnabled = useIsFeatureEnabled('logs:all')
-  const isHealthAdvisorEnabled = useFlag('healthAdvisor')
+  const { issues } = useProjectIssues({ projectRef: ref, enabled: isIssuesInboxEnabled })
 
   return generateOtherRoutes(ref, project, {
+    issuesInbox: isIssuesInboxEnabled,
+    hasIssues: issues.length > 0,
+    isHealthAdvisorEnabled,
     unifiedLogs: unifiedLogsEnabled,
     showReports: reportsEnabled,
     showLogs: logsEnabled,
-    isHealthAdvisorEnabled,
   })
 }
 

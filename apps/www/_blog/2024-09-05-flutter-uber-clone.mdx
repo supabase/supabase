@@ -21,7 +21,7 @@ toc_depth: 3
 
 </Admonition>
 
-Postgres can handle geography data efficiently thanks to the PostGIS extension. Combining it with Supabase realtime and you can create a real-time location tracking app.
+Postgres can handle geography data efficiently thanks to the [PostGIS](/docs/guides/database/extensions/postgis) extension. Combining it with Supabase realtime and you can create a real-time location tracking app.
 
 In this tutorial, we will guide you through the process of creating an Uber-like application using Flutter and Supabase. This project demonstrates the capabilities of Supabase for building complex, real-time applications with minimal backend code.
 
@@ -29,7 +29,7 @@ In this tutorial, we will guide you through the process of creating an Uber-like
 
 An actual Uber app has two apps, the consumer facing app and the driver facing app. This article only covers the consumer facing app. The app works by first choosing a destination, and then waiting for the driver to come pick them up. Once they are picked up, they head to the destination and the journey is complete once they arrive at the destination. Throughout the lifecycle of the app, the driver’s position is shared on screen in real-time.
 
-The focus of the app is to showcase how to use Supabase realtime with geographical data, so handling payments will not be covered in this article.
+The focus of the app is to showcase how to use [Supabase realtime](/docs/guides/realtime) with geographical data, so handling payments will not be covered in this article.
 
 <video width="99%" loop muted playsInline controls={true}>
   <source
@@ -520,7 +520,7 @@ Future<void> _confirmLocation() async {
 
 Let’s also create the `route` edge functions. This function calls the [routes API from Google](https://developers.google.com/maps/documentation/routes), which provides us the array of lines on the map to take us from the customer’s current location to the destination.
 
-Run the following commands to create the edge functions.
+Run the following commands to create the [edge functions](/docs/guides/functions).
 
 ```bash
 # initialize Supabase
@@ -777,5 +777,5 @@ Want to learn more about Maps and PostGIS? Make sure to follow our [Twitter](ht
 ## More Supabase Resources
 
 - [Flutter Tutorial: building a Flutter chat app](https://supabase.com/blog/flutter-tutorial-building-a-chat-app)
-- [Generate Flame template using Very Good CLI](https://verygood.ventures/blog/generate-a-game-with-our-new-template)
+- [Generate Flame template using Very Good CLI](https://verygood.ventures/blog/generate-a-game-with-our-new-template/)
 - [Supabase Flutter SDK docs](https://supabase.com/docs/reference/dart/introduction)

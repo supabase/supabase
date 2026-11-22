@@ -2,7 +2,7 @@ import { useQuery } from '@tanstack/react-query'
 import { useParams } from 'common'
 import dayjs from 'dayjs'
 import { ChartAreaIcon, CheckIcon, ChevronDownIcon } from 'lucide-react'
-import { parseAsString, useQueryStates } from 'nuqs'
+import { useQueryStates } from 'nuqs'
 import { useMemo, useState } from 'react'
 import { Button, cn, CommandGroup, CommandItem } from 'ui'
 import { Admonition } from 'ui-patterns/Admonition'
@@ -17,7 +17,7 @@ import OrgLogUsage from './OrgLogUsage'
 import { Pipelines } from './Pipelines'
 import SizeAndCounts from './SizeAndCounts'
 import { TotalUsage } from './TotalUsage'
-import { getUsageBranchOptions, resolveUsageProjectRef } from './Usage.utils'
+import { getUsageBranchOptions, resolveUsageProjectRef, usageFilterParsers } from './Usage.utils'
 import { UsageBranchFilter } from './UsageBranchFilter'
 import { UsageFilterNotice } from './UsageFilterNotice'
 import {
@@ -45,10 +45,7 @@ export const Usage = () => {
 
   const [dateRange, setDateRange] = useState<any>()
 
-  const [{ projectRef, branchRef }, setUsageFilter] = useQueryStates({
-    projectRef: parseAsString,
-    branchRef: parseAsString,
-  })
+  const [{ projectRef, branchRef }, setUsageFilter] = useQueryStates(usageFilterParsers)
   const [openProjectSelector, setOpenProjectSelector] = useState(false)
 
   const {
@@ -89,13 +86,15 @@ export const Usage = () => {
     isError: isErrorBranchesQuery,
     isSuccess: isSuccessBranches,
     error: branchesQueryError,
-  } = useQuery({
-    ...branchesQueryOptions({
-      projectRef: selectedProjectRef ?? undefined,
-      grant: branchesGrant.grant,
-    }),
-    enabled: isBranchesQueryEnabled,
-  })
+  } = useQuery(
+    branchesQueryOptions(
+      {
+        projectRef: selectedProjectRef ?? undefined,
+        grant: branchesGrant.grant,
+      },
+      { enabled: isBranchesQueryEnabled }
+    )
+  )
   const isPendingBranches =
     isBranchesQueryEnabled &&
     (branchesGrant.status === 'loading' ||

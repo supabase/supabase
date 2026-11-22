@@ -27,10 +27,9 @@ export const HTTPHeaders = ({ form }: HTTPHeadersProps) => {
     { projectRef: ref },
     { variant: 'reveal' }
   )
-  const { data: apiKeyData } = useQuery({
-    ...revealedApiKeysQueryOptions({ projectRef: ref, grant: apiKeysGrant.grant }),
-    select: getKeys,
-  })
+  const { data: apiKeyData } = useQuery(
+    revealedApiKeysQueryOptions({ projectRef: ref, grant: apiKeysGrant.grant }, { select: getKeys })
+  )
   const { serviceKey, secretKey } = apiKeyData ?? {}
   const apiKey = secretKey?.api_key ?? serviceKey?.api_key ?? '[YOUR API KEY]'
 

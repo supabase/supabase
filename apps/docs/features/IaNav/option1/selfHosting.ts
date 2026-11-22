@@ -42,6 +42,10 @@ export const selfHosting: NavMenuConstant = {
         { name: 'Configure Auth Hooks', url: '/guides/self-hosting/self-hosted-auth-hooks' },
         { name: 'Configure Passkeys', url: '/guides/self-hosting/self-hosted-passkeys' },
         { name: 'Configure SAML 2.0 SSO', url: '/guides/self-hosting/self-hosted-saml-sso' },
+        {
+          name: 'Configure OAuth 2.1 Server',
+          url: '/guides/self-hosting/self-hosted-oauth-server',
+        },
       ],
     },
     {

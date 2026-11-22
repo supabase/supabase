@@ -31,7 +31,6 @@ vi.mock('common', async (importOriginal) => ({
     isLoading: mock.isAuthLoading,
   }),
 }))
-vi.mock('@/hooks/misc/useIsFeatureEnabled', () => ({ useIsFeatureEnabled: () => true }))
 vi.mock('@/lib/gotrue', () => ({
   auth: {
     mfa: {
