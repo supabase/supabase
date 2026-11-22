@@ -14,11 +14,12 @@ import type {
 import { FileExplorerRow } from '@/components/interfaces/Storage/StorageExplorer/FileExplorerRow'
 import { customRender as render } from '@/tests/lib/custom-render'
 
-const { versioningEnabled, selectedBucket } = vi.hoisted(() => ({
+const { versioningEnabled, selectedBucket, openedFolders } = vi.hoisted(() => ({
   versioningEnabled: { current: false },
   selectedBucket: {
     current: { id: 'my-bucket', name: 'my-bucket', public: false } as Record<string, unknown>,
   },
+  openedFolders: { current: [] as StorageItem[] },
 }))
 
 vi.mock(
@@ -34,7 +35,7 @@ vi.mock('@/state/storage-explorer', () => ({
     projectRef: 'abcdef',
     selectedBucket: selectedBucket.current,
     selectedFilePreview: undefined,
-    openedFolders: [],
+    openedFolders: openedFolders.current,
     setSelectedFileCustomExpiry: vi.fn(),
     setSelectedItems: vi.fn(),
     setSelectedItemsToDelete: vi.fn(),
@@ -93,6 +94,7 @@ const item = (overrides: Partial<StorageItem>): StorageItem => ({
 beforeEach(() => {
   versioningEnabled.current = false
   selectedBucket.current = { id: 'my-bucket', name: 'my-bucket', public: false }
+  openedFolders.current = []
 })
 
 describe('FileExplorerRow', () => {
@@ -294,5 +296,22 @@ describe('FileExplorerRow', () => {
     )
 
     expect(screen.getByRole('checkbox', { name: 'Select live.png' })).toBeInTheDocument()
+  })
+
+  it('names a nested file checkbox after its folder path so same-named files stay distinct', () => {
+    openedFolders.current = [
+      item({ name: 'images', type: STORAGE_ROW_TYPES.FOLDER, metadata: null }),
+    ]
+    render(
+      <FileExplorerRow
+        item={item({ id: 'f5', name: 'live.png' })}
+        index={0}
+        view={STORAGE_VIEWS.COLUMNS}
+        columnIndex={1}
+        selectedItems={[]}
+      />
+    )
+
+    expect(screen.getByRole('checkbox', { name: 'Select images/live.png' })).toBeInTheDocument()
   })
 })
