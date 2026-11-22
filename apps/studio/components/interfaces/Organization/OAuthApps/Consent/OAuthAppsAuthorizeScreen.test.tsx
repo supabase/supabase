@@ -1,7 +1,7 @@
 import { fireEvent, screen, waitFor } from '@testing-library/react'
 import { mockIntersectionObserver } from 'jsdom-testing-mocks'
 import { HttpResponse } from 'msw'
-import { describe, expect, test } from 'vitest'
+import { describe, expect, test, vi } from 'vitest'
 
 import { OAuthAppsAuthorizeScreen } from './OAuthAppsAuthorizeScreen'
 import { OAuthAppsAuthorizeApproveData } from '@/data/oauth-apps/oauth-apps-authorize-approve-mutation'
