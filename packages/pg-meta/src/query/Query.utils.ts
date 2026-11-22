@@ -229,7 +229,7 @@ function inFilterSql(filter: Filter) {
     values = filter.value.map((x) => filterLiteral(x))
   } else {
     const filterValueTxt = String(filter.value)
-    values = filterValueTxt.split(',').map((x) => filterLiteral(x))
+    values = filterValueTxt.split(',').map((x) => filterLiteral(x.trim()))
   }
   return safeSql`${ident(filter.column)} ${filter.operator as SafeSqlFragment} (${joinSqlFragments(values, ',')})`
 }

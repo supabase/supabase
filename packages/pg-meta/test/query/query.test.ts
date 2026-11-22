@@ -426,6 +426,16 @@ describe('Query.utils', () => {
         expect(result).toBe("select * from public.users where id in ('1','2','3');")
       })
 
+      test('should trim spaces around "in" operator comma-separated values', () => {
+        const filters: Filter[] = [
+          { column: 'city', operator: 'in', value: 'London, New York ,Boston' },
+        ]
+        const result = QueryUtils.selectQuery(table, safeSql`*`, { filters: filters })
+        expect(result).toBe(
+          "select * from public.users where city in ('London','New York','Boston');"
+        )
+      })
+
       test('should correctly handle "is" operator with null value', () => {
         const filters: Filter[] = [{ column: 'email', operator: 'is', value: 'null' }]
         const result = QueryUtils.selectQuery(table, safeSql`*`, { filters: filters })
