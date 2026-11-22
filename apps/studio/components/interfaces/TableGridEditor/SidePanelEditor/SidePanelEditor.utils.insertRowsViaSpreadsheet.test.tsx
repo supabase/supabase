@@ -1,18 +1,9 @@
-// @vitest-environment jsdom
+import { HttpResponse } from 'msw'
 import { beforeEach, describe, expect, it, vi } from 'vitest'
 
 import { insertRowsViaSpreadsheet } from './SidePanelEditor.utils'
 import type { RetrieveTableResult } from '@/data/tables/table-retrieve-query'
-
-const mockExecuteSql = vi.fn()
-
-vi.mock('@/data/sql/execute-sql-mutation', () => ({
-  executeSql: (...args: unknown[]) => mockExecuteSql(...args),
-}))
-
-vi.mock('@/components/ui/SparkBar', () => ({
-  default: () => null,
-}))
+import { addAPIMock } from '@/tests/lib/msw'
 
 const table = {
   id: 1,
@@ -35,12 +26,23 @@ const importCsv = (csv: string) =>
   })
 
 describe('insertRowsViaSpreadsheet', () => {
+  let queries: string[]
+
   beforeEach(() => {
-    mockExecuteSql.mockReset()
-    mockExecuteSql.mockResolvedValue({ result: [] })
+    queries = []
   })
 
   it('imports rows that are larger than a single parse chunk', async () => {
+    addAPIMock({
+      method: 'post',
+      path: '/platform/pg-meta/:ref/query',
+      response: async ({ request }) => {
+        const { query } = (await request.json()) as { query: string }
+        queries.push(query)
+        return HttpResponse.json<any>([])
+      },
+    })
+
     // Larger than the 0.1MB chunk the file is read in, like a long LineString
     const largeValue = 'x'.repeat(300 * 1024)
     const csv = `id,path\n1,small\n2,${largeValue}\n3,small\n`
@@ -48,17 +50,21 @@ describe('insertRowsViaSpreadsheet', () => {
     const { error } = await importCsv(csv)
 
     expect(error).toBeUndefined()
-    const insertedSql = mockExecuteSql.mock.calls.map(([args]) => args.sql).join('\n')
+    const insertedSql = queries.join('\n')
     expect(insertedSql).toContain('"id":"1"')
     expect(insertedSql).toContain(largeValue)
     expect(insertedSql).toContain('"id":"3"')
   })
 
   it('returns the error when an insert fails', async () => {
-    mockExecuteSql.mockRejectedValue(new Error('insert failed'))
+    addAPIMock({
+      method: 'post',
+      path: '/platform/pg-meta/:ref/query',
+      response: () => HttpResponse.json<any>({ message: 'insert failed' }, { status: 400 }),
+    })
 
     const { error } = await importCsv('id,path\n1,small\n')
 
-    expect(error).toEqual(new Error('insert failed'))
+    expect(error).toMatchObject({ message: 'insert failed' })
   })
 })
