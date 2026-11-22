@@ -47,10 +47,7 @@ export const InterstitialLayout = ({
 
   const titleElement = title ? (
     <TitleElement
-      className={cn(
-        'tracking-tight text-balance text-lg font-medium text-foreground',
-        titleClassName
-      )}
+      className={cn('tracking-tight text-balance text-lg text-foreground', titleClassName)}
     >
       {title}
     </TitleElement>
@@ -170,7 +167,7 @@ export const PartnerLogo = ({
  */
 export const DestinationLogo = ({ icon, name }: { icon?: ReactNode; name: string }) => (
   <LogoBox>
-    {icon ?? <span className="text-lg font-medium text-foreground-light">{name.slice(0, 1)}</span>}
+    {icon ?? <span className="text-lg text-foreground-light">{name.slice(0, 1)}</span>}
   </LogoBox>
 )
 
