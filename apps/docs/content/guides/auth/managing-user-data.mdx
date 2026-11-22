@@ -60,6 +60,12 @@ create trigger on_auth_user_created
   for each row execute procedure public.handle_new_user();
 ```
 
+<Admonition type="caution">
+
+Put the schema in front of every table, function, and type in this function that isn't built in, such as `public.profiles`. The function sets `search_path = ''`, so Postgres can't find a name like `profiles` without its schema. The trigger then fails, and every sign-up fails with `Database error saving new user`. To learn why the search path stays empty, see [Security `definer` vs `invoker`](/docs/guides/database/functions#security-definer-vs-invoker).
+
+</Admonition>
+
 ## Adding and retrieving user metadata
 
 You can assign metadata to users on sign up:

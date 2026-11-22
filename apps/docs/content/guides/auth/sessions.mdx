@@ -16,6 +16,25 @@ Access tokens are designed to be short lived, usually between 5 minutes and 1 ho
 
 This process is called **refreshing the session.**
 
+The `supabase-js` client library refreshes the session for you, because its `autoRefreshToken` option defaults to `true`. The client library checks the session at a short interval and exchanges the refresh token shortly before the access token expires. A browser app doesn't need its own refresh code. In the browser, auto refresh pauses while the tab is hidden, and resumes with a check of the session when the tab is visible again.
+
+To react to a new access token, listen for the `TOKEN_REFRESHED` event with [`onAuthStateChange`](/docs/reference/javascript/auth-onauthstatechange):
+
+```ts
+import { createClient } from '@supabase/supabase-js'
+
+const supabase = createClient('https://your-project-id.supabase.co', 'sb_publishable_...')
+
+// ---cut---
+supabase.auth.onAuthStateChange((event, session) => {
+  if (event === 'TOKEN_REFRESHED') {
+    // use session.access_token
+  }
+})
+```
+
+To force a refresh, for example to pick up changed custom claims, call [`refreshSession()`](/docs/reference/javascript/auth-refreshsession).
+
 A session terminates, depending on configuration, when:
 
 - The user clicks sign out.
