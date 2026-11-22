@@ -222,7 +222,7 @@ function CaseStudyPage(props: any) {
                           <div>
                             <Button asChild iconRight={<ChevronRight />}>
                               <Link
-                                href="https://supabase.com/contact/enterprise"
+                                href="https://forms.supabase.com/enterprise"
                                 className="no-underline"
                               >
                                 Contact sales

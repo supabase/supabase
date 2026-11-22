@@ -53,9 +53,9 @@ Passkeys are cryptographically bound to the Relying Party (RP) ID they were regi
 
 ### CLI
 
-Add the following to `supabase/config.toml`:
+Add the following to your config file (`supabase/config.toml` or `supabase/config.jsonc`):
 
-```toml
+```toml supabase/config.toml
 [auth.passkey]
 enabled = true
 
@@ -65,7 +65,7 @@ rp_id = "example.com"
 rp_origins = ["https://example.com", "https://app.example.com"]
 ```
 
-The `[auth.webauthn]` section is required when `auth.passkey.enabled` is `true`.
+The `auth.webauthn` section is required when `auth.passkey.enabled` is `true`.
 
 ### Management API
 

@@ -1,4 +1,5 @@
 import ApiSchema from '~/components/ApiSchema'
+import { CliFlagDefault } from '~/components/reference/enrichments/cli/CliFlagDefault'
 import { clientSdkIds, REFERENCES } from '~/content/navigation.references'
 import {
   getApiEndpointById,
@@ -232,6 +233,7 @@ async function CliCommandSection({ link, section }: CliCommandSectionProps) {
                       <ReactMarkdown>{flag.description}</ReactMarkdown>
                     </div>
                   )}
+                  <CliFlagDefault flag={flag} />
                 </li>
               ))}
             </ul>
@@ -267,8 +269,6 @@ async function CliCommandSection({ link, section }: CliCommandSectionProps) {
                   <CodeBlock lang="bash" className="mb-6">
                     {example.code}
                   </CodeBlock>
-                  <h3 className="text-foreground-lighter text-sm mb-2">Response</h3>
-                  <CodeBlock lang="txt">{example.response}</CodeBlock>
                 </TabsContent>
               ))}
             </Tabs>

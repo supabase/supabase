@@ -1,0 +1,159 @@
+---
+title: 'Transfer project ownership'
+description: 'Transfer ownership of a Supabase project to another person or a client: move the project to their organization, or hand over your whole organization to them.'
+---
+
+Transfer ownership of a project to another person or a client, or to a new account of your own. Projects belong to organizations, not to user accounts, so you either move the project to the recipient's organization or hand over your whole organization.
+
+## Prerequisites
+
+Before you start, check that you meet the following requirements:
+
+- To move the project, you're an **Owner** of the organization that the project belongs to. For the other checks a transfer runs, see [Project transfer requirements](/docs/guides/platform/project-transfer/requirements).
+- To hand over the organization, you're an **Owner** of it.
+- To hand over the organization with the Management API, you have an [access token](/dashboard/account/tokens). For a scoped token, under **Resource access**, select **Organization**, choose the organization, and grant **Organization Members** with **Read-write** access and **Organization Settings** with **Read-write** access.
+- To make the recipient an Owner with the Management API, your organization is on the Team Plan or Enterprise Plan. On other plans, use the Dashboard for that step.
+
+## Move the project to their organization
+
+To move the project to the recipient's organization and then leave that organization, follow these steps:
+
+1. Ask the recipient to create an organization and invite you with a role for the whole organization. The Developer role is enough. On the Team Plan or Enterprise Plan, the recipient can also send the invitation with the [create organization invitations](/docs/reference/api/v2-create-organization-invitations) endpoint.
+2. Accept the invitation from the invitation email. The Management API has no endpoint for accepting an invitation.
+3. Transfer the project to their organization, with the Supabase Dashboard or the Management API steps in [Transfer a project](/docs/guides/platform/project-transfer).
+4. Leave their organization.
+
+   <Admonition type="danger">
+
+   Leaving an organization permanently deletes the content you saved in its projects, such as SQL snippets, including shared ones, custom reports, and Log Explorer queries. Copy anything that you or the recipient need before you leave.
+
+   </Admonition>
+
+   In their organization's [team settings](/dashboard/org/_/team), click **Leave team**. The recipient can also remove you, from the same page or with the [remove organization members](/docs/reference/api/v2-remove-organization-members) endpoint.
+
+## Hand over the whole organization
+
+To hand over the organization with every project in it, make the recipient an Owner, have them replace your payment method, and leave.
+
+You can't add an Owner from Supabase to an organization managed through the [Vercel Marketplace](/docs/guides/integrations/vercel-marketplace). Give the person the `owner` role on your Vercel team instead.
+
+<Tabs scrollable size="small" type="underlined" defaultActiveId="dashboard" queryGroup="method">
+<TabPanel id="dashboard" label="Dashboard">
+
+To hand over the organization in the Supabase Dashboard, follow these steps:
+
+1. In the organization's [team settings](/dashboard/org/_/team), invite the recipient as an **Owner**, or promote a member to **Owner**.
+2. After the recipient accepts, ask them to add their payment method in the organization's [billing settings](/dashboard/org/_/billing) and to select **Use this card**. Then delete your card. On a paid plan, you can't delete the card that's active. A payment method that stays with the organization can still be charged after you leave.
+3. Leave the organization.
+
+   <Admonition type="danger">
+
+   Leaving an organization permanently deletes the content you saved in its projects, such as SQL snippets, including shared ones, custom reports, and Log Explorer queries. Copy anything that you or the recipient need before you leave.
+
+   </Admonition>
+
+   In the organization's [team settings](/dashboard/org/_/team), click **Leave team**.
+
+</TabPanel>
+<TabPanel id="api" label="Management API">
+
+To hand over the organization with the Management API, follow these steps:
+
+1. Set the token, the organization's slug, and the recipient's email address. Replace `YOUR_ACCESS_TOKEN`, `YOUR_ORG_SLUG`, and `YOUR_RECIPIENT_EMAIL` with your values:
+
+   ```bash
+   export SUPABASE_ACCESS_TOKEN="YOUR_ACCESS_TOKEN"
+   export ORG_SLUG="YOUR_ORG_SLUG"
+   export RECIPIENT_EMAIL="YOUR_RECIPIENT_EMAIL"
+   ```
+
+2. Make the recipient an Owner. Both of the following requests need the Team Plan or Enterprise Plan. On other plans, use the Dashboard for this step.
+
+   If the recipient isn't a member of the organization, invite them with the [create organization invitations](/docs/reference/api/v2-create-organization-invitations) endpoint:
+
+   ```bash
+   curl -X POST "https://api.supabase.com/v2/organizations/$ORG_SLUG/members/invitations" \
+     -H "Authorization: Bearer $SUPABASE_ACCESS_TOKEN" \
+     -H "Content-Type: application/json" \
+     -d @- <<EOF
+   {
+     "data": [
+       {
+         "type": "organization_invitation",
+         "attributes": { "email": "$RECIPIENT_EMAIL", "role": "owner" }
+       }
+     ]
+   }
+   EOF
+   ```
+
+   If the recipient is already a member, find their `id` with the [list organization members](/docs/reference/api/v2-list-organization-members) endpoint. Filter by their email address, because the endpoint returns one page of members at a time:
+
+   ```bash
+   curl -G "https://api.supabase.com/v2/organizations/$ORG_SLUG/members" \
+     --data-urlencode "filter[primary_email]=$RECIPIENT_EMAIL" \
+     -H "Authorization: Bearer $SUPABASE_ACCESS_TOKEN"
+   ```
+
+   Copy the `id` from the response, and replace `YOUR_RECIPIENT_MEMBER_ID` with it. Then change their role with the [assign organization member role](/docs/reference/api/v2-assign-organization-member-role) endpoint:
+
+   ```bash
+   export MEMBER_ID="YOUR_RECIPIENT_MEMBER_ID"
+
+   curl -X PATCH "https://api.supabase.com/v2/organizations/$ORG_SLUG/members/$MEMBER_ID/roles" \
+     -H "Authorization: Bearer $SUPABASE_ACCESS_TOKEN" \
+     -H "Content-Type: application/json" \
+     -d @- <<EOF
+   {
+     "data": {
+       "type": "organization_member_role",
+       "attributes": { "role": "owner" }
+     }
+   }
+   EOF
+   ```
+
+3. After the recipient is an Owner, ask them to add their payment method in the organization's [billing settings](/dashboard/org/_/billing) and to select **Use this card**. Then delete your card. The Management API has no endpoint for payment methods. A payment method that stays with the organization can still be charged after you leave.
+4. Remove yourself with the [remove organization members](/docs/reference/api/v2-remove-organization-members) endpoint. The request fails while you're the only Owner.
+
+   Find your own `id` in the list of members. Replace `YOUR_EMAIL` with the email address of your account:
+
+   ```bash
+   curl -G "https://api.supabase.com/v2/organizations/$ORG_SLUG/members" \
+     --data-urlencode "filter[primary_email]=YOUR_EMAIL" \
+     -H "Authorization: Bearer $SUPABASE_ACCESS_TOKEN"
+   ```
+
+   <Admonition type="danger">
+
+   Leaving an organization permanently deletes the content you saved in its projects, such as SQL snippets, including shared ones, custom reports, and Log Explorer queries. Copy anything that you or the recipient need before you leave.
+
+   </Admonition>
+
+   Copy the `id` from the response, and replace `YOUR_MEMBER_ID` with it. Then remove yourself:
+
+   ```bash
+   export MY_MEMBER_ID="YOUR_MEMBER_ID"
+
+   curl -X DELETE "https://api.supabase.com/v2/organizations/$ORG_SLUG/members/$MY_MEMBER_ID" \
+     -H "Authorization: Bearer $SUPABASE_ACCESS_TOKEN"
+   ```
+
+</TabPanel>
+</Tabs>
+
+If the organization's billing email is your address, it changes to a remaining Owner's address when you leave, unless the organization is billed through a partner, such as Vercel or the AWS Marketplace. A billing email set to any other address stays the same.
+
+## Next steps
+
+After the handover, use these pages:
+
+- [Changes after a project transfer](/docs/guides/platform/project-transfer/what-changes): if you moved the project, check which organization pays for it, and who keeps access to it.
+- [Troubleshoot a project transfer](/docs/guides/platform/project-transfer/troubleshooting): if a message blocks the transfer, find its cause and its fix.
+
+## Related resources
+
+To read more about ownership and roles, see these pages:
+
+- [Transferring ownership of an organization](/docs/guides/platform/access-control#transferring-ownership-of-an-organization): the rule that every organization keeps at least one Owner.
+- [Recover access to the Owner account](/docs/guides/platform/project-transfer/requirements#recover-access-to-the-owner-account): what to do when you can't sign in to the Owner account.

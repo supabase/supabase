@@ -729,6 +729,7 @@ const EXTERNAL_PROVIDER_AZURE = {
       EXTERNAL_AZURE_SECRET: z.string().min(1, 'Secret Value is required'),
       EXTERNAL_AZURE_URL: z
         .string()
+        .trim()
         .refine((value) => !value || urlRegex().test(value), 'Must be a valid URL'),
       EXTERNAL_AZURE_EMAIL_OPTIONAL: z.boolean().optional(),
     }),
@@ -1023,6 +1024,7 @@ const EXTERNAL_PROVIDER_GITLAB = {
       EXTERNAL_GITLAB_SECRET: z.string().min(1, 'Client Secret is required'),
       EXTERNAL_GITLAB_URL: z
         .string()
+        .trim()
         .refine((value) => !value || urlRegex().test(value), 'Must be a valid URL')
         .optional(),
       EXTERNAL_GITLAB_EMAIL_OPTIONAL: z.boolean().optional(),
@@ -1050,7 +1052,7 @@ const EXTERNAL_PROVIDER_GOOGLE = {
       title: 'Client IDs',
       description:
         'Comma-separated list of client IDs for Web, OAuth, Android apps, One Tap, and Chrome extensions.',
-      type: 'string',
+      type: 'comma-separated-list',
     },
     EXTERNAL_GOOGLE_SECRET: {
       title: 'Client Secret (for OAuth)',
@@ -1196,6 +1198,7 @@ const EXTERNAL_PROVIDER_KEYCLOAK = {
       EXTERNAL_KEYCLOAK_SECRET: z.string().min(1, 'Client secret is required'),
       EXTERNAL_KEYCLOAK_URL: z
         .string()
+        .trim()
         .min(1, 'Realm URL is required')
         .regex(urlRegex(), 'Must be a valid URL'),
       EXTERNAL_KEYCLOAK_EMAIL_OPTIONAL: z.boolean().optional(),
@@ -1613,6 +1616,7 @@ const EXTERNAL_PROVIDER_WORKOS = {
       EXTERNAL_WORKOS_ENABLED: z.literal(true),
       EXTERNAL_WORKOS_URL: z
         .string()
+        .trim()
         .min(1, 'WorkOS URL is required')
         .regex(urlRegex(), 'Must be a valid URL'),
       EXTERNAL_WORKOS_CLIENT_ID: z.string().min(1, 'Client ID is required'),
@@ -1705,11 +1709,14 @@ const PROVIDER_SAML = {
     }),
     z.object({
       SAML_ENABLED: z.literal(true),
-      SAML_EXTERNAL_URL: z.string().refine((value) => {
-        // Allow empty values
-        if (value == '') return true
-        return urlRegex().test(value)
-      }, 'Must be a valid URL'),
+      SAML_EXTERNAL_URL: z
+        .string()
+        .trim()
+        .refine((value) => {
+          // Allow empty values
+          if (value == '') return true
+          return urlRegex().test(value)
+        }, 'Must be a valid URL'),
       SAML_ALLOW_ENCRYPTED_ASSERTIONS: z.boolean().optional(),
     }),
   ]),

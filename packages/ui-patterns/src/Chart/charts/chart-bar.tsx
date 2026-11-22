@@ -1,5 +1,6 @@
 'use client'
 
+import { useReducedMotion } from 'common'
 import dayjs from 'dayjs'
 import { useTheme } from 'next-themes'
 import { ReactNode, useState } from 'react'
@@ -111,6 +112,7 @@ export const ChartBar = ({
   XAxisProps,
   YAxisProps,
 }: ChartBarProps) => {
+  const prefersReducedMotion = useReducedMotion()
   const [focusDataIndex, setFocusDataIndex] = useState<number | null>(null)
   const { resolvedTheme } = useTheme()
   const isDarkMode = resolvedTheme?.includes('dark')
@@ -182,10 +184,14 @@ export const ChartBar = ({
       className={cn('flex flex-col gap-y-3 w-full', isFullHeight ? 'h-full' : 'h-24', className)}
     >
       <ChartContainer
-        className={cn('w-full!', hasDateRangeFooter ? 'h-[calc(100%-28px)]' : 'h-full')}
+        className={cn(
+          'w-full! [&_.recharts-surface:focus-visible]:focus-inset',
+          hasDateRangeFooter ? 'h-[calc(100%-28px)]' : 'h-full'
+        )}
         config={chartConfig}
       >
         <RechartBarChart
+          accessibilityLayer
           data={data}
           syncId={syncId}
           margin={margin}
@@ -267,6 +273,7 @@ export const ChartBar = ({
               return (
                 <Bar
                   key={key}
+                  isAnimationActive={prefersReducedMotion ? false : undefined}
                   dataKey={key}
                   fill={barColor}
                   maxBarSize={24}
@@ -288,7 +295,12 @@ export const ChartBar = ({
               )
             })
           ) : (
-            <Bar dataKey={dataKey} fill={color} maxBarSize={24}>
+            <Bar
+              dataKey={dataKey}
+              fill={color}
+              maxBarSize={24}
+              isAnimationActive={prefersReducedMotion ? false : undefined}
+            >
               {data?.map((_entry: ChartBarTick, index: number) => (
                 <Cell
                   className="cursor-pointer transition-colors"

@@ -471,6 +471,8 @@ const goPageBaseSchema = z.object({
   hero: heroSectionSchema,
   sections: z.array(goSectionSchema).optional(),
   publishedAt: z.string().optional(),
+  /** Set to 'light' to render the whole page with a white background and light theme tokens. */
+  theme: z.literal('light').optional(),
 })
 
 export const leadGenPageSchema = goPageBaseSchema.extend({

@@ -29,6 +29,12 @@ interface PageHeaderProps {
   isCompact?: boolean
 }
 
+/**
+ * Studio-only page header used by deprecated PageLayout.
+ *
+ * @deprecated Prefer PageBreadcrumbs, PageNav, and PageHeader from ui-patterns.
+ * See /design-system/docs/ui-patterns/layout
+ */
 export const PageHeader = ({
   title,
   subtitle,

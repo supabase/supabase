@@ -1,8 +1,8 @@
 import { useParams } from 'common'
-import { CircleAlertIcon, ExternalLinkIcon } from 'lucide-react'
+import { Issues } from 'icons'
+import { ExternalLinkIcon } from 'lucide-react'
 import Link from 'next/link'
 import type { ComponentProps, ReactNode } from 'react'
-import { cn } from 'ui'
 import { Admonition } from 'ui-patterns/Admonition'
 import { ShimmeringLoader } from 'ui-patterns/ShimmeringLoader'
 
@@ -10,12 +10,8 @@ import { asGraphqlExposureLint, GraphqlExposureCallout } from '../Linter/Graphql
 import { Markdown } from '../Markdown'
 import { IssueAffectedResources } from './IssueAffectedResources'
 import { IssueDetailToolbar } from './IssueDetailToolbar'
-import {
-  CATEGORY_ICONS,
-  CATEGORY_LABELS,
-  SEVERITY_DOT_CLASSES,
-  SEVERITY_LABELS,
-} from './Issues.constants'
+import { CATEGORY_ICONS, CATEGORY_LABELS, SEVERITY_LABELS } from './Issues.constants'
+import { SeverityIndicator } from './SeverityIndicator'
 import {
   ExplorerToolbar,
   ExplorerToolbarIcon,
@@ -51,10 +47,7 @@ const IssueMeta = ({ issue }: { issue: Issue }) => {
   return (
     <p className="flex flex-wrap items-center gap-x-2 gap-y-1 text-sm text-foreground-light">
       <span className="flex items-center gap-1.5">
-        <span
-          aria-hidden
-          className={cn('size-1.5 rounded-full', SEVERITY_DOT_CLASSES[issue.severity])}
-        />
+        <SeverityIndicator severity={issue.severity} aria-hidden />
         {SEVERITY_LABELS[issue.severity]}
       </span>
       <span aria-hidden className="text-foreground-muted">
@@ -89,7 +82,7 @@ const IssueDetailSkeleton = () => (
     toolbar={
       <ExplorerToolbar aria-hidden className="md:h-(--header-height)">
         <ExplorerToolbarIcon>
-          <CircleAlertIcon size={16} strokeWidth={2} />
+          <Issues size={16} strokeWidth={2} />
         </ExplorerToolbarIcon>
         <ShimmeringLoader className="h-3 w-48 py-0" />
       </ExplorerToolbar>

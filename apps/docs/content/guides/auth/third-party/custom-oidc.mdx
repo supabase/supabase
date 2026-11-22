@@ -11,7 +11,7 @@ Any identity provider that supports OpenID Connect (OIDC) can be used as a third
 1. Check that your provider meets the [requirements](#requirements).
 2. Add a Third-Party Auth integration with your provider's issuer URL in the [Dashboard](#add-the-integration-in-the-dashboard) or with the [Management API](#add-the-integration-with-the-management-api).
 3. Add the `role` claim to the JWTs your provider issues.
-4. Set up the Supabase client in your application.
+4. Set up the [Supabase client](/docs/reference/javascript/introduction) in your application.
 
 ## Requirements
 
@@ -38,11 +38,11 @@ Create a [personal access token](/docs/guides/platform/personal-access-tokens), 
 
 ## Supabase CLI
 
-Custom OIDC providers are not available in the Supabase CLI. There is no `supabase/config.toml` option for them.
+Custom OIDC providers are not available in the [Supabase CLI](/docs/guides/local-development/cli/getting-started). There is no config file option for them.
 
 ## Assign the role claim
 
-Your Supabase project inspects the `role` claim in every JWT sent to it, to assign the correct Postgres role when using the Data API, Storage or Realtime authorization. Without a `role` claim, requests run as the `anon` role.
+Your Supabase project inspects the `role` claim in every JWT sent to it, to assign the correct [Postgres role](/docs/guides/database/postgres/roles) when using the Data API, Storage or Realtime authorization. Without a `role` claim, requests run as the `anon` role.
 
 Set `role` to `authenticated` for signed-in users. Use your provider's custom claims or token template feature to add it. See your provider's documentation for the steps.
 

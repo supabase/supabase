@@ -18,7 +18,7 @@ const Param = ({ name, isOptional, type, description, children, isPrimitive }: I
         ) : (
           <Badge variant="warning">Required</Badge>
         )}
-        <span className="text-foreground-muted text-xs">{type ?? 'no type'}</span>
+        {type && <span className="text-foreground-muted text-xs">{type}</span>}
       </div>
       {description && (
         <div className="text-sm text-foreground-lighter m-0">

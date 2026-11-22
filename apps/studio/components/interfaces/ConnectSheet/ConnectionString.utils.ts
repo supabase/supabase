@@ -2,7 +2,7 @@ import type { ConnectionStringMethod } from './Connect.constants'
 import type { ConnectionStringPooler } from './Connect.types'
 
 export const DEFAULT_PORT = '5432'
-export const PASSWORD_PLACEHOLDER = '[YOUR-PASSWORD]'
+export const PASSWORD_PLACEHOLDER = '[YOUR-DATABASE-PASSWORD]'
 
 /** Appends query params to a connection string, joining with `?` or `&` as needed */
 export const appendConnectionStringParams = (uri: string, params: string) =>
