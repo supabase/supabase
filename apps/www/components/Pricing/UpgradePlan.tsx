@@ -44,7 +44,12 @@ const UpgradePlan = ({ organizations = [], onClick, size = 'large', planId }: Up
   return (
     <Dialog>
       <DialogTrigger asChild>
-        <Button block size={size} variant="primary" onClick={onClick}>
+        <Button
+          block
+          size={size}
+          variant={planId === 'pro' ? 'primary' : 'default'}
+          onClick={onClick}
+        >
           Upgrade now
         </Button>
       </DialogTrigger>

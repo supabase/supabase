@@ -56,32 +56,37 @@ export const ScopeGroupCardWithDiff = ({ scopes, previousScopes }: ScopeGroupCar
           permissions={diff.changed['removed']}
         />
       </div>
-      <Collapsible className="flex flex-col gap-2">
-        <CollapsibleTrigger asChild>
-          <Button
-            block
-            iconRight={<ChevronsUpDownIcon className="h-4 w-4" />}
-            variant="text"
-            size="tiny"
-            className="p-0 flex justify-center text-foreground-lighter"
-          >
-            <span>Already granted ({unchangedPermissionsCount})</span>
-          </Button>
-        </CollapsibleTrigger>
-        <CollapsibleContent>
-          <div className="divide-y rounded-md border bg-surface-75 px-4">
-            <ScopeGroupCardItem
-              label={scopeLabels['read-write']}
-              permissions={diff.unchanged['read-write']}
-            />
-            <ScopeGroupCardItem
-              label={scopeLabels['write']}
-              permissions={diff.unchanged['write']}
-            />
-            <ScopeGroupCardItem label={scopeLabels['read']} permissions={diff.unchanged['read']} />
-          </div>
-        </CollapsibleContent>
-      </Collapsible>
+      {unchangedPermissionsCount > 0 ? (
+        <Collapsible className="flex flex-col gap-2">
+          <CollapsibleTrigger asChild>
+            <Button
+              block
+              iconRight={<ChevronsUpDownIcon className="h-4 w-4" />}
+              variant="text"
+              size="tiny"
+              className="p-0 flex justify-center text-foreground-lighter"
+            >
+              <span>Already granted ({unchangedPermissionsCount})</span>
+            </Button>
+          </CollapsibleTrigger>
+          <CollapsibleContent>
+            <div className="divide-y rounded-md border bg-surface-75 px-4">
+              <ScopeGroupCardItem
+                label={scopeLabels['read-write']}
+                permissions={diff.unchanged['read-write']}
+              />
+              <ScopeGroupCardItem
+                label={scopeLabels['write']}
+                permissions={diff.unchanged['write']}
+              />
+              <ScopeGroupCardItem
+                label={scopeLabels['read']}
+                permissions={diff.unchanged['read']}
+              />
+            </div>
+          </CollapsibleContent>
+        </Collapsible>
+      ) : null}
     </>
   )
 }

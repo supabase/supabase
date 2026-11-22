@@ -101,7 +101,13 @@ export function ConfigurationDriftPageSkeleton() {
   )
 }
 
-function ConfigurationDriftItem({ row }: { row: ConfigurationDriftRow }) {
+function ConfigurationDriftItem({
+  row,
+  configFileName,
+}: {
+  row: ConfigurationDriftRow
+  configFileName: string
+}) {
   const valueDiff = row.valueDiff
 
   return (
@@ -134,7 +140,9 @@ function ConfigurationDriftItem({ row }: { row: ConfigurationDriftRow }) {
           </pre>
         </div>
         <div className="min-w-0 rounded-md border border-border bg-surface-100 p-3">
-          <p className="mb-2 text-xs font-medium text-foreground-light">config.toml · intended</p>
+          <p className="mb-2 text-xs font-medium text-foreground-light">
+            {configFileName} · intended
+          </p>
           <pre className="whitespace-pre-wrap break-all font-mono text-xs leading-5 text-foreground">
             {valueDiff.configValue}
           </pre>
@@ -144,7 +152,13 @@ function ConfigurationDriftItem({ row }: { row: ConfigurationDriftRow }) {
   )
 }
 
-export function ConfigurationDriftResults({ rows }: { rows: ConfigurationDriftRow[] }) {
+export function ConfigurationDriftResults({
+  rows,
+  configFileName,
+}: {
+  rows: ConfigurationDriftRow[]
+  configFileName: string
+}) {
   const driftCount = rows.length
   const issueSummary = `${driftCount} ${driftCount === 1 ? 'setting differs' : 'settings differ'}`
 
@@ -156,7 +170,8 @@ export function ConfigurationDriftResults({ rows }: { rows: ConfigurationDriftRo
           <div className="min-w-0">
             <h2 className="text-sm font-medium">{issueSummary}</h2>
             <p className="mt-1 text-sm text-foreground-light">
-              Current environment values differ from config.toml. Update the setting to resolve.
+              Current environment values differ from {configFileName}. Update the setting to
+              resolve.
             </p>
           </div>
         </div>
@@ -164,7 +179,7 @@ export function ConfigurationDriftResults({ rows }: { rows: ConfigurationDriftRo
 
       <div>
         {rows.map((row) => (
-          <ConfigurationDriftItem key={row.configPath} row={row} />
+          <ConfigurationDriftItem key={row.configPath} row={row} configFileName={configFileName} />
         ))}
       </div>
     </Card>
@@ -228,6 +243,7 @@ export function ConfigurationDriftPage() {
     isError,
     error,
     errorSource,
+    configFileName,
     refetch,
   } = useSelectedGitHubConfigDrift()
   const driftRows = createConfigurationDriftRows(summary.driftedFields, projectRef)
@@ -244,11 +260,13 @@ export function ConfigurationDriftPage() {
   }
 
   if (isError) {
-    const isConfigTomlError = errorSource === 'config-toml'
-    const subject = isConfigTomlError
-      ? 'Could not read config.toml'
+    const isConfigFileError = errorSource === 'config-file'
+    const subject = isConfigFileError
+      ? configFileName
+        ? `Could not read ${configFileName}`
+        : 'Could not read the config file'
       : 'Could not check configuration drift'
-    const description = isConfigTomlError
+    const description = isConfigFileError
       ? 'Fix the listed values on the selected GitHub branch, then refresh.'
       : 'Refresh to compare the supported settings with the selected GitHub branch again.'
 
@@ -275,7 +293,7 @@ export function ConfigurationDriftPage() {
         description={
           <p className="mt-1 text-sm text-foreground-light">
             This feature requires a GitHub integration to enable the project to be managed by a
-            config.toml file.
+            config file.
           </p>
         }
       >
@@ -288,15 +306,17 @@ export function ConfigurationDriftPage() {
     )
   }
 
+  const configFile = configFileName ?? 'config file'
+
   return (
     <main className="space-y-6">
       <Admonition
         type="warning"
-        title="Config.toml will overwrite these settings on next deploy"
+        title={`${configFileName ?? 'The config file'} will overwrite these settings on next deploy`}
         description={
           <>
             This project is connected to GitHub. The next commit redeploys{' '}
-            <code className="text-xs">config.toml</code> and overwrite changes made here. To keep
+            <code className="text-xs">{configFile}</code> and overwrites changes made here. To keep
             these changes, run <code className="text-xs">supabase config pull</code> locally.
           </>
         }
@@ -325,18 +345,18 @@ export function ConfigurationDriftPage() {
           </div>
         </Card>
       ) : (
-        <ConfigurationDriftResults rows={driftRows} />
+        <ConfigurationDriftResults rows={driftRows} configFileName={configFile} />
       )}
 
       <ConfigFieldSection
-        title="Matching config.toml"
-        description="These settings already match between the current environment and config.toml."
+        title={`Matching ${configFile}`}
+        description={`These settings already match between the current environment and ${configFile}.`}
         groups={matchedGroups}
       />
 
       <ConfigFieldSection
-        title="Not tracked in config.toml"
-        description="These settings aren't declared in config.toml, so they can't drift — shown here for visibility only."
+        title={`Not tracked in ${configFile}`}
+        description={`These settings aren't declared in ${configFile}, so they can't drift — shown here for visibility only.`}
         groups={unmanagedGroups}
       />
     </main>
