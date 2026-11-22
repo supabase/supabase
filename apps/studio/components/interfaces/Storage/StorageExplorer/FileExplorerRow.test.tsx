@@ -281,4 +281,18 @@ describe('FileExplorerRow', () => {
     expect(screen.getByRole('checkbox')).toBeInTheDocument()
     expect(container.querySelector('.absolute')?.className).toContain('group-hover:hidden')
   })
+
+  it('names the row checkbox after the file so each row is distinguishable', () => {
+    render(
+      <FileExplorerRow
+        item={item({ id: 'f4', name: 'live.png' })}
+        index={0}
+        view={STORAGE_VIEWS.COLUMNS}
+        columnIndex={0}
+        selectedItems={[]}
+      />
+    )
+
+    expect(screen.getByRole('checkbox', { name: 'Select live.png' })).toBeInTheDocument()
+  })
 })
