@@ -986,29 +986,35 @@ export async function insertRowsViaSpreadsheet({
       chunk: async (results, parser) => {
         parser.pause()
 
-        const formattedData = formatRowsForInsert({
-          rows: results.data,
-          headers: selectedHeaders,
-          columns: table.columns,
-          emptyStringAsNullHeaders,
-        })
-
-        const insertQuery = wrapWithRoleImpersonation(
-          new Query().from(table.name, table.schema).insert(formattedData).toSql(),
-          roleImpersonationState
-        )
         try {
-          await executeWithRetry(() =>
-            executeSql({
-              projectRef,
-              connectionString,
-              sqlOrigin: 'studio',
-              queryName: 'table-rows-spreadsheet-import',
-              sql: insertQuery,
-              isRoleImpersonationEnabled: isRoleImpersonationEnabled(roleImpersonationState?.role),
-              grant: unguarded.migrating,
-            })
-          )
+          const formattedData = formatRowsForInsert({
+            rows: results.data,
+            headers: selectedHeaders,
+            columns: table.columns,
+            emptyStringAsNullHeaders,
+          })
+
+          // A row larger than CHUNK_SIZE spans several chunks, so some chunks contain no
+          // complete rows. Skip those, as an insert with no values throws.
+          if (formattedData.length > 0) {
+            const insertQuery = wrapWithRoleImpersonation(
+              new Query().from(table.name, table.schema).insert(formattedData).toSql(),
+              roleImpersonationState
+            )
+            await executeWithRetry(() =>
+              executeSql({
+                projectRef,
+                connectionString,
+                sqlOrigin: 'studio',
+                queryName: 'table-rows-spreadsheet-import',
+                sql: insertQuery,
+                isRoleImpersonationEnabled: isRoleImpersonationEnabled(
+                  roleImpersonationState?.role
+                ),
+                grant: unguarded.migrating,
+              })
+            )
+          }
         } catch (error) {
           console.warn(error)
           insertError = error
