@@ -880,6 +880,62 @@ withTestDatabase('dropping column checks', async ({ executeQuery }) => {
   expect(updatedColumn!.check).toMatchInlineSnapshot(`null`)
 })
 
+withTestDatabase(
+  'adding column check when same-named table in another schema has identical check constraint name',
+  async ({ executeQuery }) => {
+    await executeQuery(`
+      create schema archive;
+      create table public.orders (amount int8 constraint orders_amount_check check (amount > 0));
+      create table archive.orders (id int8, amount int8);
+    `)
+
+    const { sql: retrieveSql, zod: retrieveZod } = await pgMeta.columns.retrieve({
+      schema: 'archive',
+      table: 'orders',
+      name: 'amount',
+    })
+    const column = retrieveZod.parse((await executeQuery(retrieveSql))[0])
+
+    // Adding valid check condition to archive.orders.amount
+    const { sql: updateSql } = await pgMeta.columns.update(column!, { check: rawSql('amount > 0') })
+    await executeQuery(updateSql)
+
+    const { sql: verifySql, zod: verifyZod } = await pgMeta.columns.retrieve({
+      schema: 'archive',
+      table: 'orders',
+      name: 'amount',
+    })
+    const updatedColumn = verifyZod.parse((await executeQuery(verifySql))[0])
+    expect(updatedColumn!.check).toBe('amount > 0')
+  }
+)
+
+withTestDatabase(
+  'rejecting multi-column check constraint when same-named table in another schema exists',
+  async ({ executeQuery }) => {
+    await executeQuery(`
+      create schema archive;
+      create table public.orders (amount int8 constraint orders_amount_check check (amount > 0));
+      create table archive.orders (id int8, amount int8);
+    `)
+
+    const { sql: retrieveSql, zod: retrieveZod } = await pgMeta.columns.retrieve({
+      schema: 'archive',
+      table: 'orders',
+      name: 'amount',
+    })
+    const column = retrieveZod.parse((await executeQuery(retrieveSql))[0])
+
+    // Attempting invalid multi-column check condition
+    const { sql: updateSql } = await pgMeta.columns.update(column!, {
+      check: rawSql('amount > 0 and id > 0'),
+    })
+    await expect(executeQuery(updateSql)).rejects.toThrow(
+      'error creating column constraint: check condition cannot refer to multiple columns'
+    )
+  }
+)
+
 withTestDatabase('column with fully-qualified type', async ({ executeQuery }) => {
   // Setup: Create table and type in separate schema
   await executeQuery(`
