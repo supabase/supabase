@@ -1056,6 +1056,11 @@ module.exports = [
     source: '/downloads/docs/Supabase\\+DPA\\+:version.pdf',
     destination: '/legal/customer-resources/data-processing-addendum',
   },
+  {
+    permanent: true,
+    source: '/downloads/docs/Supabase\\+TIA\\+250314.pdf',
+    destination: 'https://trust.supabase.io',
+  },
   // Legacy product .txt URLs → new .md routes
   { permanent: true, source: '/llms/homepage.txt', destination: '/index.md' },
   { permanent: true, source: '/llms/auth.txt', destination: '/auth.md' },

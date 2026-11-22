@@ -1,0 +1,127 @@
+---
+title: 'Project transfer requirements'
+description: 'The checks a Supabase project transfer runs on your account, the project, and both organizations, and what to do when one of the checks blocks the transfer.'
+---
+
+A project transfer runs checks on your account, the project, and both organizations. This page lists each requirement and what to do when one blocks a transfer. For the steps, see [Transfer a project](/docs/guides/platform/project-transfer).
+
+The _source organization_ is the organization the project belongs to before the transfer. The _target organization_ is the organization you move the project to.
+
+The Supabase Dashboard checks every requirement when you select a target organization. **Transfer Project** stays disabled until all of them pass.
+
+## Account requirements
+
+Your account must meet the following requirements:
+
+- You're an **Owner** of the source organization. An Administrator can't transfer projects.
+- You're a member of the target organization with a role for the whole organization: Owner, Administrator, or Developer. On the Team Plan and Enterprise Plan, the Read-only role also qualifies. The **No-access** role and project-scoped roles don't qualify. For more information about roles, see [Access control](/docs/guides/platform/access-control).
+- You use the same account in both organizations. An account that signs in with single sign-on (SSO) and a non-SSO account with the same email address are separate accounts, so a role held by one doesn't count for the other. If your SSO account isn't a member of both organizations, use a non-SSO account that is. For more information, see [Enable SSO for your organization](/docs/guides/platform/sso).
+
+### Recover access to the Owner account
+
+In the Dashboard and with the Management API's transfer endpoint, only an Owner of the source organization can transfer a project. Supabase support can't transfer a project for you and doesn't decide ownership disputes.
+
+If you can't sign in to the Owner account, [contact support](https://supabase.help). Support must verify that you own the account before it restores access, and it usually relies on billing records to do so. An organization on the Free Plan has no billing records, so support might not be able to restore access.
+
+## Project and organization requirements
+
+The project and the two organizations must meet the following requirements:
+
+- The project has no GitHub connection. Disconnect the [GitHub integration](/docs/guides/deployment/branching/github-integration), then reconnect it after the transfer.
+- No member and no pending invitation has a project-scoped role on the project. Remove those roles and cancel those invitations before the transfer. To assign the roles again afterwards, the target organization must be on the Team Plan or Enterprise Plan.
+- If both organizations are on the Free Plan, the source organization has no usage restriction. See the [Usage restrictions on Free Plan organizations](#usage-restrictions-on-free-plan-organizations) section.
+- If the source organization is on the Free Plan or Pro Plan, you have no overdue invoices. See the [Overdue invoices](#overdue-invoices) section.
+- If the target organization is on the Free Plan, the transfer doesn't put an Owner or Administrator of the target organization over the free project limit. See the [Free project limit](#free-project-limit) section.
+- The project doesn't use a feature that the target organization lacks. See the [Features that block a transfer](#features-that-block-a-transfer) section.
+
+### Usage restrictions on Free Plan organizations
+
+A Free Plan organization that exceeded its quota can't transfer projects to another Free Plan organization. The Dashboard shows the following message:
+
+```text
+This project can't be transferred to a Free organization while the source organization is in an active grace period or under service restrictions. Resolve the restriction or upgrade the source organization before transferring.
+```
+
+The block applies only when both organizations are on the Free Plan. It stays in place in all of the following cases:
+
+- Your usage drops back under the quota.
+- The grace period ends.
+- The restriction on the organization is lifted.
+
+The block ends when the restriction notice clears from the source organization. The notice clears automatically if you continue to stay under plan limits for multiple billing cycles. For more information, see [What is a grace period and does it reset after usage drops?](/docs/guides/platform/billing-faq#what-is-a-grace-period-and-does-it-reset-after-usage-drops).
+
+To transfer without waiting, use either of these options:
+
+- Upgrade the source organization to the Pro Plan. The upgrade lifts the restriction, and the block applies only between two Free Plan organizations. The plan fee applies to the whole organization. For the cost, see [Pricing](/pricing).
+- Transfer the project to an organization on the Pro Plan and above.
+
+Supabase support can't lift a restriction to allow a transfer.
+
+If you upgrade the source organization only to transfer a project, transfer the project before you downgrade. An organization that returns to the Free Plan can be restricted again.
+
+### Overdue invoices
+
+Overdue invoices block a transfer to any target organization when the source organization is on the Free Plan or the Pro Plan. The check covers the source organization and every other Free Plan or Pro Plan organization where you're an Owner or Administrator. The Dashboard names the organizations in the following message:
+
+```text
+There are overdue invoices in the organization(s) <organization names>. Head to the organization's invoices page to settle the invoices before transferring the project.
+```
+
+Pay the overdue invoices on each organization's [invoices page](/dashboard/org/_/billing#invoices). The check also passes when an organization's credit balance covers its overdue amount.
+
+### Free project limit
+
+The free project limit is counted for each member, not for each organization. Every Owner and Administrator of the target organization can have a limited number of active Free Plan projects, two by default, counted across all Free Plan organizations they own or administer. Paused projects don't count. When the source organization is also on the Free Plan, the check skips Owners and Administrators of the target organization who are also members of the source organization.
+
+When the transfer would put a member over the limit, the Dashboard lists the affected members. To continue, use one of these options:
+
+- Ask each listed member to pause or delete one of their Free Plan projects, or to upgrade one of their Free Plan organizations.
+- Change the member's role to Developer in the target organization's [team settings](/dashboard/org/_/team). The limit counts only Owners and Administrators.
+- Transfer the project to an organization on the Pro Plan and above.
+
+### Features that block a transfer
+
+Some features block a transfer until you remove them or choose a different target organization. The following table lists each feature, when it blocks a transfer, and what to do.
+
+| Feature                                                                                               | Blocks the transfer when                                                    | What to do                                                            |
+| ----------------------------------------------------------------------------------------------------- | --------------------------------------------------------------------------- | --------------------------------------------------------------------- |
+| [Preview and persistent branches](/docs/guides/deployment/branching)                                  | The target organization is on the Free Plan                                 | Save the data you need from the branches, then delete them            |
+| [Log drains](/docs/guides/observability/log-drains)                                                   | The target organization is on the Free Plan                                 | Remove the log drains                                                 |
+| [Advanced multi-factor authentication (MFA)](/docs/guides/auth/auth-mfa/phone) with phone or WebAuthn | The target organization is on the Free Plan                                 | Turn off phone and WebAuthn MFA                                       |
+| [Pipelines](/docs/guides/database/replication/pipelines)                                              | The target organization is on the Free Plan                                 | Delete all pipelines                                                  |
+| High availability                                                                                     | The target organization has no high availability access or capacity         | Choose a target organization with high availability access            |
+| [AWS PrivateLink](/docs/guides/platform/privatelink)                                                  | The project has a PrivateLink association                                   | Remove the PrivateLink associations                                   |
+| [Vector buckets](/docs/guides/storage/vector/creating-vector-buckets)                                 | The source organization has access to vector buckets and the target doesn't | Contact support to turn on vector buckets for the target organization |
+| [Stripe Projects](/docs/guides/integrations/stripe-projects)                                          | The project was provisioned through Stripe                                  | See the [Stripe Projects](#stripe-projects) section                   |
+| A restore in progress                                                                                 | The project is restoring                                                    | Wait until the restore finishes                                       |
+
+Compliance settings don't block a transfer. If your project is a HIPAA project, transfer it only to an organization that also has the HIPAA add-on. See the [shared responsibility model](/docs/guides/deployment/shared-responsibility-model).
+
+## Partner-managed projects
+
+For a project that you manage through a partner, start with the following:
+
+- **Vercel Marketplace.** You can transfer a project out of an organization managed through the Vercel Marketplace, or into one. See [Transfer a Vercel-managed project](/docs/guides/platform/project-transfer/vercel-marketplace).
+- **Stripe Projects.** See the [Stripe Projects](#stripe-projects) section.
+- **Lovable.** An app built with Lovable uses either Lovable Cloud or your own Supabase project as its backend. To tell the two apart, see [Identifying Lovable backend: Lovable Cloud or Supabase](/kb/troubleshooting/identify-lovable-cloud-or-supabase-backend).
+- **AWS Marketplace.** AWS billing is linked to an organization, and you can link an organization you already have. You don't need to transfer projects. See [AWS Marketplace account setup](/docs/guides/platform/aws-marketplace/account-setup).
+
+### Stripe Projects
+
+A project provisioned through Stripe Projects can't be transferred while it's linked to Stripe. The Dashboard message asks you to deprovision the project through Stripe before you transfer it.
+
+<Admonition type="danger">
+
+Removing the project's resource in Stripe deletes the Supabase project and its data. Back up your data before you remove anything in Stripe.
+
+</Admonition>
+
+To move the data to another organization, create a project in that organization and copy the data to it. See [Migrating within Supabase](/docs/guides/platform/migrating-within-supabase).
+
+## Related resources
+
+To read more about project transfers, see these pages:
+
+- [Transfer a project](/docs/guides/platform/project-transfer): the steps for the Supabase Dashboard and the Management API.
+- [Changes after a project transfer](/docs/guides/platform/project-transfer/what-changes): what a transfer keeps, and what it changes for downtime, billing, and access.
+- [Troubleshoot a project transfer](/docs/guides/platform/project-transfer/troubleshooting): the cause and the fix for each message that blocks a transfer.
