@@ -209,6 +209,8 @@ This endpoint is served directly from the Auth server, but is also additionally 
 
 Make sure that you do not cache this data for longer in your application, as it might make revocation difficult. If you do, make sure to provide a way to purge this cache when rotating signing keys to avoid unintentionally rejecting valid user access tokens.
 
+If your backend can't reach this endpoint, see [Public key discovery and caching](/docs/guides/auth/signing-keys#public-key-discovery-and-caching) to copy the public keys into your app.
+
 Below is an example of how to use the [jose TypeScript JWT verification library](https://github.com/panva/jose) with Supabase JWTs:
 
 ```typescript

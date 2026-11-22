@@ -1,5 +1,5 @@
 import { useQuery } from '@tanstack/react-query'
-import { useEffect, useMemo, useRef, useState } from 'react'
+import { useEffect, useMemo, useState } from 'react'
 import { toast } from 'sonner'
 import { Button } from 'ui'
 import { Admonition } from 'ui-patterns/Admonition'
@@ -9,6 +9,7 @@ import { AuthorizeSuccessScreen } from './AuthorizeSuccessScreen'
 import { AuthorizingAsCard } from './AuthorizingAsCard'
 import { NoProjectsNotice } from './NoProjectsNotice'
 import { getFailedProjects, getPreselectedProjectRefs } from './OAuthAppsAuthorizeScreen.utils'
+import { OrganizationSelect } from './OrganizationSelect'
 import { MAX_SELECTED_PROJECTS, ProjectMultiSelect } from './ProjectMultiSelect'
 import { ScopeGroupCard } from './ScopeGroupCard'
 import { ScopeGroupCardWithDiff } from './ScopeGroupCardWithDiff'
@@ -38,14 +39,12 @@ export interface OAuthAppsAuthorizeScreenProps {
   authId?: string
   organizationSlug?: string
   projectRef?: string
-  navigate: (destination: string) => void
 }
 
 export const OAuthAppsAuthorizeScreen = ({
   authId,
-  organizationSlug,
+  organizationSlug: initialOrganizationSlug,
   projectRef,
-  navigate,
 }: OAuthAppsAuthorizeScreenProps) => {
   const signOut = useSignOut()
 
@@ -75,6 +74,8 @@ export const OAuthAppsAuthorizeScreen = ({
     isError: isErrorIdentity,
   } = useProfile()
 
+  const [organizationSlug, setOrganizationSlug] = useState(initialOrganizationSlug)
+
   const {
     data: memberOrg,
     error: memberOrgError,
@@ -85,7 +86,16 @@ export const OAuthAppsAuthorizeScreen = ({
     projectRef,
     request,
   })
+
   const [search, setSearch] = useState('')
+
+  const handleOrganizationChange = (slug: string) => {
+    if (slug === memberOrg?.slug) return
+    setOrganizationSlug(slug)
+    setSelectedProjectRefs([])
+    setAllProjectsSelected(false)
+    setSearch('')
+  }
 
   const {
     data: projectsData,
@@ -171,16 +181,13 @@ export const OAuthAppsAuthorizeScreen = ({
     }
   )
 
-  const seeded = useRef(false)
   useEffect(() => {
-    if (seeded.current || !preflightData || !memberOrg) return
+    if (!preflightData || !memberOrg) return
 
     const grant = preflightData.existing_grant
     const hasAllProjectsGrant =
       grant !== null && (grant?.project_refs == null || grant?.project_refs?.length === 0)
     if (!hasAllProjectsGrant && !initialProjectsData) return
-
-    seeded.current = true
 
     if (hasAllProjectsGrant && isProjectScopingModeEnabled) {
       setAllProjectsSelected(true)
@@ -380,13 +387,11 @@ export const OAuthAppsAuthorizeScreen = ({
     window.location.reload()
   }
 
-  const handleSwitchOrg = () => navigate('/organizations')
-
   const handleDeselectFlagged = () =>
     setSelectedProjectRefs((refs) => refs.filter((ref) => !flaggedRefs.includes(ref)))
 
   const handleApprove = () => {
-    if (hasNoSelection) return
+    if (hasNoSelection || isBlockedOnProjects) return
     const approveBody = usesSelectedProjects ? { project_refs: selectedProjectRefs } : {}
     approveMutation.mutate({ auth_id: authId, slug: memberOrg.slug, body: approveBody })
   }
@@ -465,19 +470,16 @@ export const OAuthAppsAuthorizeScreen = ({
         <fieldset disabled={isSubmitting} className="contents">
           <AuthorizingAsCard
             email={profile!.primary_email}
-            organizationName={memberOrg.name}
             onSignOut={handleSignOut}
             request={request}
           />
-
+          <OrganizationSelect
+            organization={memberOrg}
+            onOrganizationChange={handleOrganizationChange}
+          />
           {isBlockedOnProjects && (
-            <NoProjectsNotice
-              appName={request.name}
-              organizationName={memberOrg.name}
-              onSwitchOrg={handleSwitchOrg}
-            />
+            <NoProjectsNotice appName={request.name} organizationName={memberOrg.name} />
           )}
-
           {canProceed && isProjectScopingModeEnabled && (
             <div className="flex flex-col gap-2">
               <ProjectMultiSelect
@@ -535,21 +537,16 @@ export const OAuthAppsAuthorizeScreen = ({
         </fieldset>
 
         <div className="flex flex-col gap-2">
-          {canProceed ? (
-            <Button
-              block
-              variant={primaryActionVariant}
-              loading={isSubmitting || isPendingPreflight}
-              aria-label={primaryActionLabel}
-              onClick={hasRoleFailure ? handleDeselectFlagged : handleApprove}
-            >
-              {isSubmitting ? 'Authorizing...' : primaryActionLabel}
-            </Button>
-          ) : (
-            <Button block variant="primary" onClick={handleSwitchOrg}>
-              Switch organization
-            </Button>
-          )}
+          <Button
+            block
+            variant={primaryActionVariant}
+            loading={isSubmitting || isPendingPreflight}
+            aria-label={primaryActionLabel}
+            onClick={hasRoleFailure ? handleDeselectFlagged : handleApprove}
+          >
+            {isSubmitting ? 'Authorizing...' : primaryActionLabel}
+          </Button>
+
           {!isSubmitting && (
             <Button variant="text" block onClick={handleDeny}>
               Cancel
