@@ -492,6 +492,25 @@ describe('regions', () => {
     expect(statusRequests.every((request) => request.endsWith(':omitted'))).toBe(true)
   })
 
+  test('sorts pipelines by region in both directions', async () => {
+    mockRegions()
+    mockRegionResources()
+    renderRegions()
+
+    const singapore = (await screen.findByText('Singapore sync')).closest('tr')
+    const frankfurt = (await screen.findByText('Frankfurt sync')).closest('tr')
+    const header = screen.getByRole('columnheader', { name: 'Region' })
+    const sortButton = within(header).getByRole('button')
+
+    fireEvent.click(sortButton)
+    expect(header).toHaveAttribute('aria-sort', 'ascending')
+    expect(screen.getAllByRole('row').slice(1)).toEqual([frankfurt, singapore])
+
+    fireEvent.click(sortButton)
+    expect(header).toHaveAttribute('aria-sort', 'descending')
+    expect(screen.getAllByRole('row').slice(1)).toEqual([singapore, frankfurt])
+  })
+
   test('shows each pipeline region and routes each pipeline to its cluster', async () => {
     mockRegions()
     const { statusRequests } = mockRegionResources()

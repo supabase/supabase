@@ -15,6 +15,7 @@ export type OverviewEdge = Edge<{
   hasStatusChip?: boolean
   isConverging?: boolean
   isFinalConnection?: boolean
+  shouldAnimate?: boolean
 }>
 
 export function OverviewFlowEdge(props: EdgeProps<OverviewEdge>) {
@@ -60,8 +61,11 @@ export function OverviewFlowEdge(props: EdgeProps<OverviewEdge>) {
         stroke: 'var(--pipeline-line-color)',
         strokeWidth: 1.5,
         opacity: isStopped ? 0.35 : 1,
-        strokeDasharray: isRunning ? '5 5' : undefined,
-        animation: isRunning && !prefersReducedMotion ? 'dashdraw 0.5s linear infinite' : undefined,
+        strokeDasharray: isRunning && props.data?.shouldAnimate !== false ? '5 5' : undefined,
+        animation:
+          isRunning && props.data?.shouldAnimate !== false && !prefersReducedMotion
+            ? 'dashdraw 0.5s linear infinite'
+            : undefined,
       }}
     />
   )

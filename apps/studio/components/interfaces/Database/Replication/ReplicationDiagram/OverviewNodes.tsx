@@ -5,6 +5,7 @@ import { useParams } from 'common'
 import { ArrowRightIcon } from 'lucide-react'
 import { useTheme } from 'next-themes'
 import type { ReactNode } from 'react'
+import { AWS_REGIONS } from 'shared-data'
 import { cn } from 'ui'
 
 import { DestinationLogo } from '../DestinationLogo'
@@ -84,10 +85,11 @@ export function OverviewCard({ data }: NodeProps<OverviewNode>) {
 }
 
 export function OverviewRegion({ name, code }: { name?: string; code?: string }) {
+  const displayName = Object.values(AWS_REGIONS).find((region) => region.code === code)?.displayName
   return (
     <div className="flex items-center gap-2">
       {code && <RegionFlag className="w-4 shrink-0" region={code} />}
-      <span title={code}>{name ?? 'Region unavailable'}</span>
+      <span title={code}>{displayName ?? name ?? 'Region unavailable'}</span>
     </div>
   )
 }

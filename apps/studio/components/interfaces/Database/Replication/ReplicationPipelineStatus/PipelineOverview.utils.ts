@@ -124,3 +124,39 @@ export const getPipelineStateNotice = ({
     showLogsLink: false,
   }
 }
+
+export const getPipelineHealthNotice = ({
+  statusName,
+  metrics,
+  isError,
+}: {
+  statusName?: string
+  metrics?: { active?: boolean | null; wal_status?: string | null } | null
+  isError: boolean
+}): PipelineStateNotice | undefined => {
+  if (isError || statusName !== PipelineStatusName.STARTED) return undefined
+  if (metrics?.wal_status === 'lost')
+    return {
+      type: 'warning',
+      title: 'Replication cannot continue',
+      description:
+        'Postgres has removed changes this pipeline still needs. Review pipeline health before choosing recovery.',
+      showLogsLink: true,
+    }
+  if (metrics?.wal_status === 'unreserved')
+    return {
+      type: 'warning',
+      title: 'Replication changes at risk',
+      description:
+        'Postgres may remove changes this pipeline still needs. Check pipeline health and logs.',
+      showLogsLink: true,
+    }
+  if (metrics?.active === false)
+    return {
+      type: 'warning',
+      title: 'Pipeline disconnected',
+      description:
+        'The pipeline is running but isn’t connected to your database right now. It reconnects on its own; if this persists, check the logs.',
+      showLogsLink: true,
+    }
+}

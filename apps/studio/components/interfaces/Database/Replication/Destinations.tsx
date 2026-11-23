@@ -55,7 +55,7 @@ import { ReplicationClusterProvider } from '@/state/replication-cluster'
 import { SHORTCUT_IDS } from '@/state/shortcuts/registry'
 import { useShortcut } from '@/state/shortcuts/useShortcut'
 
-type DestinationSortColumn = 'name' | 'status'
+type DestinationSortColumn = 'name' | 'status' | 'region'
 type DestinationSort = `${DestinationSortColumn}:${'asc' | 'desc'}`
 
 export const Destinations = () => {
@@ -151,6 +151,7 @@ export const Destinations = () => {
   const failedRegions = clusterResults.filter(({ error }) => error !== null)
   const pendingRegions = clusterResults.filter(({ isPending, error }) => isPending && !error)
   const loadingStatus = isDestinationsLoading ? 'Loading pipelines' : ''
+
 
   const {
     isSuccess: isSourcesSuccess,
@@ -456,7 +457,15 @@ export const Destinations = () => {
                         Status
                       </TableHeadSort>
                     </TableHead>
-                    <TableHead key="region">Region</TableHead>
+                    <TableHead key="region" aria-sort={getAriaSort('region')}>
+                      <TableHeadSort
+                        column="region"
+                        currentSort={sort}
+                        onSortChange={handleSortChange}
+                      >
+                        Region
+                      </TableHeadSort>
+                    </TableHead>
                     <TableHead key="lag" className="w-[150px]">
                       Lag
                     </TableHead>

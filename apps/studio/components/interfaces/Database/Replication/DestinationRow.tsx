@@ -3,7 +3,7 @@ import { ChevronRightIcon, MinusIcon } from 'lucide-react'
 import { useRouter } from 'next/router'
 import { useState } from 'react'
 import { toast } from 'sonner'
-import { cn, TableCell, TableRow, Tooltip, TooltipContent, TooltipTrigger } from 'ui'
+import { cn, TableCell, TableRow } from 'ui'
 import { ShimmeringLoader } from 'ui-patterns/ShimmeringLoader'
 
 import { DeleteDestination } from './DeleteDestination'
@@ -155,6 +155,16 @@ export const DestinationRow = ({
   // Five distinct states, so early returns rather than a ternary chain.
   const renderLag = () => {
     if (isReplicationStatusLoading) return <ShimmeringLoader />
+    if (
+      (statusName !== PipelineStatusName.STARTED || isReplicationStatusError) &&
+      lagBytes !== undefined
+    )
+      return (
+        <span className="flex flex-col gap-0.5">
+          <span className="text-foreground-light">{lag.display}</span>
+          <span className="text-xs text-foreground-lighter">Last reported</span>
+        </span>
+      )
     if (isInitialSyncRunning)
       return <span className="text-foreground-light whitespace-nowrap">Initial sync</span>
     if (isReplicationStatusError || !applyLag)
@@ -188,14 +198,9 @@ export const DestinationRow = ({
         >
           <TableCell className="!pr-1">
             {type && (
-              <Tooltip>
-                <TooltipTrigger asChild>
-                  <span role="img" aria-label={type} tabIndex={0} className="inline-flex">
-                    <DestinationLogo type={type} hasErrors={hasTableErrors} />
-                  </span>
-                </TooltipTrigger>
-                <TooltipContent side="top">{type}</TooltipContent>
-              </Tooltip>
+              <span role="img" aria-label={type} className="inline-flex">
+                <DestinationLogo type={type} hasErrors={hasTableErrors} />
+              </span>
             )}
           </TableCell>
 
@@ -211,9 +216,15 @@ export const DestinationRow = ({
                   <DetailSubtext className="flex min-w-0 flex-wrap items-center gap-x-1.5 gap-y-0.5">
                     <span
                       className="block max-w-full truncate"
-                      title={destinationIdentity.datasetId ? destinationIdentity.label : undefined}
+                      title={
+                        type === 'BigQuery' || type === 'ClickHouse'
+                          ? destinationIdentity.label
+                          : undefined
+                      }
                     >
-                      {destinationIdentity.datasetId ? destinationIdentity.label : type}
+                      {type === 'BigQuery' || type === 'ClickHouse'
+                        ? destinationIdentity.label
+                        : type}
                     </span>
                     {hasTableErrors && (
                       <>

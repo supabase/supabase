@@ -40,3 +40,24 @@ test('does not merge destinations when their external identity is unavailable', 
   const frankfurt = getOverviewDestination({ destinationId: 7, clusterId: '2' })
   expect(singapore.id).not.toBe(frankfurt.id)
 })
+
+test('shows ClickHouse host and database without credentials or URL query parameters', () => {
+  const result = getOverviewDestination({
+    destinationId: 7,
+    destination: {
+      id: 7,
+      tenant_id: 'default',
+      name: 'Analytics',
+      config: {
+        clickhouse: {
+          url: 'https://user:secret@preview.example:8443/?token=secret',
+          user: 'default',
+          engine: 'merge_tree',
+          database: 'events',
+        },
+      },
+    },
+  })
+  expect(result.label).toBe('preview.example:8443 / events')
+  expect(result.id).not.toContain('secret')
+})

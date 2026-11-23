@@ -490,6 +490,20 @@ describe('DestinationRow', () => {
     expect(lag.closest('[aria-live="polite"]')).toHaveAttribute('aria-atomic', 'true')
   })
 
+  test('labels a stopped pipeline lag as last reported instead of caught up', async () => {
+    addSourcesMock()
+    addDestinationMock()
+    addPipelinesMock()
+    addPipelineStatusMock('stopped')
+    addReplicationStatusMock(0)
+    addVersionMock()
+
+    customRender(<DestinationRow destinationId={DESTINATION_ID} />)
+
+    expect(await screen.findByText('Last reported')).toBeInTheDocument()
+    expect(screen.queryByText('Caught up')).not.toBeInTheDocument()
+  })
+
   test('shows formatted lag value when confirmed_flush_lsn_bytes is non-zero', async () => {
     addSourcesMock()
     addDestinationMock()

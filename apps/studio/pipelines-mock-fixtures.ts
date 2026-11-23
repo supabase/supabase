@@ -35,24 +35,33 @@ const statuses = [
   'stopped',
   'started',
 ]
-const getDestination = (pipeline: (typeof allPipelines)[number]) => ({
+const getDestination = (pipeline: (typeof allPipelines)[number], scenario: string) => ({
   id: pipeline.destination_id,
   name: pipeline.destination_name,
   tenant_id: projectRef,
-  config: {
-    big_query: {
-      connection_pool_size: 8,
-      dataset_id: 'analytics',
-      project_id: 'preview-warehouse',
-    },
-  },
+  config:
+    scenario === 'busy' && pipeline.destination_id >= 7
+      ? {
+          clickhouse: {
+            url: 'https://preview.clickhouse.example',
+            user: 'default',
+            database: 'operations',
+          },
+        }
+      : {
+          big_query: {
+            connection_pool_size: 8,
+            dataset_id: 'analytics',
+            project_id: 'preview-warehouse',
+          },
+        },
 })
 
 export function getPipelinesMockResponse(
   request: Request,
   scenario = 'busy'
 ): Response | undefined {
-  const counts: Record<string, number> = { one: 1, two: 2, small: 3, busy: 8 }
+  const counts: Record<string, number> = { one: 1, two: 2, small: 3, uneven: 5, busy: 8 }
   const pipelines = allPipelines.slice(0, counts[scenario] ?? counts.busy)
   const url = new URL(request.url)
   const path = url.pathname.replace(/^\/api\/platform\//, '/')
@@ -106,7 +115,7 @@ export function getPipelinesMockResponse(
     })
   }
   if (resource === 'destinations') {
-    const destinations = selection.map(getDestination)
+    const destinations = selection.map((pipeline) => getDestination(pipeline, scenario))
     if (!id) return Response.json({ destinations })
     const destination = destinations.find((entry) => entry.id === Number(id))
     if (destination) return Response.json(destination)

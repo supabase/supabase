@@ -28,6 +28,18 @@ export function getOverviewDestination({
       label: `${project_id}.${dataset_id}`,
     }
   }
+  const clickhouse = z
+    .object({ clickhouse: z.object({ url: z.string().url(), database: z.string().min(1) }) })
+    .safeParse(destination?.config)
+  if (clickhouse.success) {
+    const { url, database } = clickhouse.data.clickhouse
+    const endpoint = new URL(url)
+    return {
+      id: JSON.stringify(['ClickHouse', endpoint.origin, database]),
+      type,
+      label: `${endpoint.host} / ${database}`,
+    }
+  }
   return {
     id: JSON.stringify(['destination', clusterId ?? 'default', destinationId]),
     type,

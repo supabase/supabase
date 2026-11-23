@@ -272,7 +272,7 @@ describe('ReplicationPipelineLayout', () => {
 
       renderLayout(<ReplicationPipelineStatus />)
 
-      expect(await screen.findByRole('img', { name: 'Unknown destination' })).toBeVisible()
+      expect((await screen.findAllByRole('img', { name: 'Unknown destination' }))[0]).toBeVisible()
       expect(
         screen.queryByRole('button', { name: /^(Start|Restart|Update available)$/ })
       ).not.toBeInTheDocument()
@@ -288,10 +288,10 @@ describe('ReplicationPipelineLayout', () => {
             return HttpResponse.json<Record<string, never>>({}, { status: 202 })
           },
         })
-        await screen.findByText(status === 'started' ? 'Running' : 'Failed')
+        await screen.findAllByText(status === 'started' ? 'Running' : 'Failed')
         expect(screen.getByRole('button', { name: 'Stop' })).toBeEnabled()
         await userEvent.click(screen.getByRole('button', { name: 'Stop' }))
-        expect(await screen.findByText('Stopped')).toBeVisible()
+        expect((await screen.findAllByText('Stopped'))[0]).toBeVisible()
         expect(screen.queryByRole('button', { name: 'Start' })).not.toBeInTheDocument()
       }
       await userEvent.click(screen.getByRole('button', { name: 'Pipeline options' }))
@@ -357,7 +357,7 @@ describe('ReplicationPipelineLayout', () => {
     await waitFor(() => expect(screen.queryByRole('dialog')).not.toBeInTheDocument())
     expect(screen.getByRole('button', { name: 'Stop' })).toBeEnabled()
     await userEvent.click(screen.getByRole('button', { name: 'Stop' }))
-    expect(await screen.findByText('Stopped')).toBeVisible()
+    expect((await screen.findAllByText('Stopped'))[0]).toBeVisible()
   })
 
   test('deletes an unknown pipeline and returns to its cluster', async () => {
@@ -388,7 +388,7 @@ describe('ReplicationPipelineLayout', () => {
     const clusterId = 'eu-west-1'
     const { router } = renderLayout(undefined, queryClient, clusterId)
     const listHref = '/project/default/database/pipelines'
-    await screen.findByRole('img', { name: 'Unknown destination' })
+    await screen.findAllByRole('img', { name: 'Unknown destination' })
     expect(requestedClusters).toEqual([clusterId])
     expect(screen.getByRole('link', { name: 'Pipelines' })).toHaveAttribute('href', listHref)
     await userEvent.click(screen.getByRole('button', { name: 'Pipeline options' }))
@@ -400,7 +400,7 @@ describe('ReplicationPipelineLayout', () => {
       expect(within(dialog).getByRole('button', { name: 'Delete pipeline' })).toBeEnabled()
     )
     fireEvent.submit(dialog.querySelector('form')!)
-    await screen.findByText('Stopping')
+    await screen.findAllByText('Stopping')
     await act(() =>
       queryClient.invalidateQueries({
         queryKey: replicationKeys.pipelinesStatus('default', '42', clusterId),
@@ -481,7 +481,7 @@ describe('ReplicationPipelineLayout', () => {
     renderLayout(<ReplicationPipelineStatus />)
 
     expect(await screen.findByRole('heading', { name: 'Analytics warehouse' })).toBeVisible()
-    expect(screen.getAllByRole('link', { name: 'View logs' })).toHaveLength(1)
+    expect(screen.getAllByRole('link', { name: 'Logs' })).toHaveLength(1)
     expect(await screen.findByRole('heading', { name: 'Pipeline stopped' })).toBeVisible()
   })
 

@@ -33,7 +33,7 @@ export const PipelineHealthSection = ({ metrics, children }: PipelineHealthSecti
     <PageSection>
       <PageSectionMeta>
         <PageSectionSummary>
-          <PageSectionTitle>Pipeline health</PageSectionTitle>
+          <PageSectionTitle id="pipeline-health">Pipeline health</PageSectionTitle>
         </PageSectionSummary>
       </PageSectionMeta>
 

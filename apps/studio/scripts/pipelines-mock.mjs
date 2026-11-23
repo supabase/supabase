@@ -6,10 +6,10 @@ import { tmpdir } from 'node:os'
 import { dirname, join } from 'node:path'
 import { fileURLToPath } from 'node:url'
 
-const scenarios = { one: 1, two: 2, small: 3, busy: 8 }
+const scenarios = { one: 1, two: 2, small: 3, uneven: 5, busy: 8 }
 const scenario = process.argv[2]
 if (!Object.hasOwn(scenarios, scenario)) {
-  console.error('Usage: node apps/studio/scripts/pipelines-mock.mjs <one|two|small|busy>')
+  console.error('Usage: node apps/studio/scripts/pipelines-mock.mjs <one|two|small|uneven|busy>')
   process.exit(1)
 }
 

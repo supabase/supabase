@@ -2,6 +2,7 @@ import { describe, expect, test } from 'vitest'
 
 import {
   getInitialSyncSummary,
+  getPipelineHealthNotice,
   getPipelineStateNotice,
   getTableStatusEmptyState,
 } from './PipelineOverview.utils'
@@ -91,4 +92,27 @@ describe('getInitialSyncSummary', () => {
       })
     ).toBe(expected)
   })
+})
+
+test.each(['lost', 'unreserved'])(
+  'surfaces confirmed WAL problem %s above the overview',
+  (wal_status) => {
+    expect(
+      getPipelineHealthNotice({ statusName: 'started', metrics: { wal_status }, isError: false })
+        ?.type
+    ).toBe('warning')
+  }
+)
+
+test('does not treat cached or stopped slot state as a live disconnection', () => {
+  expect(
+    getPipelineHealthNotice({ statusName: 'started', metrics: { active: false }, isError: true })
+  ).toBeUndefined()
+  expect(
+    getPipelineHealthNotice({ statusName: 'stopped', metrics: { active: false }, isError: false })
+  ).toBeUndefined()
+  expect(
+    getPipelineHealthNotice({ statusName: 'started', metrics: { active: false }, isError: false })
+      ?.title
+  ).toBe('Pipeline disconnected')
 })
