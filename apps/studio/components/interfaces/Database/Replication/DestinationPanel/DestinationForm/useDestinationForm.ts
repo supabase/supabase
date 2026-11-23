@@ -226,6 +226,7 @@ export const useDestinationForm = ({ selectedType }: { selectedType: Destination
               destinationId: existingDestination.destinationId,
               pipelineId,
               projectRef,
+              clusterId,
               destinationName: data.name,
               destinationConfig,
               pipelineConfig,
@@ -251,6 +252,7 @@ export const useDestinationForm = ({ selectedType }: { selectedType: Destination
         const { pipeline_id: pipelineId } = await createDestinationPipeline(
           {
             projectRef,
+            clusterId,
             destinationName: data.name,
             destinationConfig,
             pipelineConfig,

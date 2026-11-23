@@ -1,9 +1,10 @@
-import { useMutation, useQueryClient } from '@tanstack/react-query'
+import { useQueryClient } from '@tanstack/react-query'
 import { toast } from 'sonner'
 
 import { invalidateReplicationPipelineQueries } from './invalidate-pipeline-queries'
 import { replicationKeys } from './keys'
 import { pipelineIdSchema } from './pipeline-id'
+import { useReplicationMutation } from './use-cluster-mutation'
 import { del, handleError } from '@/data/fetchers'
 import type { StudioError } from '@/lib/errors/studio-errors'
 import type { UseCustomMutationOptions } from '@/types'
@@ -12,10 +13,11 @@ export type DeleteDestinationPipelineParams = {
   projectRef?: string
   destinationId: number
   pipelineId: string
+  clusterId?: string
 }
 
 async function deleteDestinationPipeline(
-  { projectRef, destinationId, pipelineId }: DeleteDestinationPipelineParams,
+  { projectRef, destinationId, pipelineId, clusterId }: DeleteDestinationPipelineParams,
   signal?: AbortSignal
 ) {
   if (!projectRef) throw new Error('projectRef is required')
@@ -23,7 +25,10 @@ async function deleteDestinationPipeline(
   const { data, error } = await del(
     '/platform/replication/{ref}/destinations-pipelines/{destination_id}/{pipeline_id}',
     {
-      params: { path: { ref: projectRef, destination_id: destinationId, pipeline_id: pipelineId } },
+      params: {
+        path: { ref: projectRef, destination_id: destinationId, pipeline_id: pipelineId },
+        query: { cluster_id: clusterId },
+      },
       signal,
     }
   )
@@ -50,13 +55,19 @@ export const useDeleteDestinationPipelineMutation = ({
 > = {}) => {
   const queryClient = useQueryClient()
 
-  return useMutation<DeleteDestinationPipelineData, StudioError, DeleteDestinationPipelineParams>({
+  return useReplicationMutation<
+    DeleteDestinationPipelineData,
+    StudioError,
+    DeleteDestinationPipelineParams
+  >({
     mutationFn: (vars) => deleteDestinationPipeline(vars),
     async onSuccess(data, variables, context) {
       const { projectRef } = variables
       await Promise.all([
-        queryClient.invalidateQueries({ queryKey: replicationKeys.destinations(projectRef) }),
-        invalidateReplicationPipelineQueries(queryClient, projectRef),
+        queryClient.invalidateQueries({
+          queryKey: replicationKeys.destinations(projectRef, variables.clusterId),
+        }),
+        invalidateReplicationPipelineQueries(queryClient, projectRef, variables.clusterId),
       ])
 
       await onSuccess?.(data, variables, context)

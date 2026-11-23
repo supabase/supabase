@@ -20,6 +20,7 @@ import { RowMenu } from './RowMenu'
 import { UpdateVersionModal } from './UpdateVersionModal'
 import { useDestinationInformation } from './useDestinationInformation'
 import { AlertError } from '@/components/ui/AlertError'
+import { withReplicationCluster } from '@/data/replication/cluster-path'
 import { useDeleteDestinationPipelineMutation } from '@/data/replication/delete-destination-pipeline-mutation'
 import { useReplicationPipelineReplicationStatusQuery } from '@/data/replication/pipeline-replication-status-query'
 import { useReplicationPipelineStatusQuery } from '@/data/replication/pipeline-status-query'
@@ -38,9 +39,9 @@ interface DestinationRowProps {
 }
 
 export const DestinationRow = ({ destinationId }: DestinationRowProps) => {
+  const clusterId = useReplicationClusterId()
   const router = useRouter()
   const { ref: projectRef } = useParams()
-  const clusterId = useReplicationClusterId()
   const [showDeleteDestinationForm, setShowDeleteDestinationForm] = useState(false)
   const [isDeleting, setIsDeleting] = useState(false)
   const [showUpdateVersionModal, setShowUpdateVersionModal] = useState(false)
@@ -110,7 +111,13 @@ export const DestinationRow = ({ destinationId }: DestinationRowProps) => {
   const hasUpdate = Boolean(versionData?.new_version)
 
   const handleNavigation = pipeline
-    ? createNavigationHandler(`/project/${projectRef}/database/pipelines/${pipeline.id}`, router)
+    ? createNavigationHandler(
+        withReplicationCluster(
+          `/project/${projectRef}/database/pipelines/${pipeline.id}`,
+          clusterId
+        ),
+        router
+      )
     : undefined
 
   const onDeleteClick = async () => {
@@ -121,13 +128,14 @@ export const DestinationRow = ({ destinationId }: DestinationRowProps) => {
       return toast.error('No pipeline found')
     }
 
+    const pipelineTarget = { projectRef, pipelineId: pipeline.id, clusterId }
+
     try {
       setIsDeleting(true)
-      await stopPipeline({ projectRef, pipelineId: pipeline.id, clusterId, waitUntilStopped: true })
+      await stopPipeline({ ...pipelineTarget, waitUntilStopped: true })
       await deleteDestinationPipeline({
-        projectRef,
-        destinationId: destinationId,
-        pipelineId: pipeline.id,
+        ...pipelineTarget,
+        destinationId,
       })
       // Close dialog after successful deletion
       setShowDeleteDestinationForm(false)
