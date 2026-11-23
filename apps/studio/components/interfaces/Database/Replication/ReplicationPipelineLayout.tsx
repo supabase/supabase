@@ -60,6 +60,11 @@ import { UpdateVersionModal } from './UpdateVersionModal'
 import { useUnifiedLogsPreview } from '@/components/interfaces/App/FeaturePreview/FeaturePreviewContext'
 import { AlertError } from '@/components/ui/AlertError'
 import { DocsButton } from '@/components/ui/DocsButton'
+import { RegionFlag } from '@/components/ui/RegionFlag'
+import {
+  getReplicationRegionLabel,
+  useReplicationClusterGroups,
+} from '@/data/replication/clusters-query'
 import { useDeleteDestinationPipelineMutation } from '@/data/replication/delete-destination-pipeline-mutation'
 import { useReplicationDestinationByIdQuery } from '@/data/replication/destination-by-id-query'
 import { useReplicationPipelineByIdQuery } from '@/data/replication/pipeline-by-id-query'
@@ -90,6 +95,8 @@ const LIFECYCLE_BY_STATUS: Partial<
 export const ReplicationPipelineLayout = ({ children }: PropsWithChildren) => {
   const { ref: projectRef, pipelineId } = useParams()
   const clusterId = useReplicationClusterId()
+  const { groups, hasMultipleRegions } = useReplicationClusterGroups()
+  const region = groups.find((group) => group.clusterId === clusterId)?.region
   const { isEnabled: isUnifiedLogsEnabled } = useUnifiedLogsPreview()
   const navigate = useNavigate()
   const [showUpdateVersionModal, setShowUpdateVersionModal] = useState(false)
@@ -326,6 +333,20 @@ export const ReplicationPipelineLayout = ({ children }: PropsWithChildren) => {
                     <span>{destinationType ?? pipeline?.destination_name ?? 'Unknown'}</span>
                   )}
                 </span>
+                {hasMultipleRegions && region && (
+                  <>
+                    <span aria-hidden className="text-foreground-lighter">
+                      &middot;
+                    </span>
+                    <span className="inline-flex items-center gap-1 text-foreground-light">
+                      <span>Pipeline region:</span>
+                      {region.region_code && (
+                        <RegionFlag className="w-4" region={region.region_code} />
+                      )}
+                      <span>{getReplicationRegionLabel(region)}</span>
+                    </span>
+                  </>
+                )}
               </PageHeaderDescription>
             </PageHeaderSummary>
 

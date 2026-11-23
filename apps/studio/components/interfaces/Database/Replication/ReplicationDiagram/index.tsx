@@ -1,18 +1,21 @@
+import { useQueries, type UseQueryResult } from '@tanstack/react-query'
 import { Background, ColorMode, ReactFlow, ReactFlowProvider, useReactFlow } from '@xyflow/react'
 import { useParams } from 'common'
 import { useTheme } from 'next-themes'
-import { useEffect, useMemo } from 'react'
-
-import { PrimaryDatabaseNode, ReplicationNode } from './Nodes'
-import { getDagreGraphLayout } from './ReplicationDiagram.utils'
-import { useReplicationDestinationsQuery } from '@/data/replication/destinations-query'
-import { timeout } from '@/lib/helpers'
-
-import '@xyflow/react/dist/style.css'
+import { useCallback, useEffect, useMemo } from 'react'
 
 import { SmoothstepEdge } from './Edges'
+import { PrimaryDatabaseNode, ReplicationNode } from './Nodes'
+import { getDagreGraphLayout } from './ReplicationDiagram.utils'
+import { useReplicationClusterGroups } from '@/data/replication/clusters-query'
+import {
+  replicationDestinationsQueryOptions,
+  type ReplicationDestinationsData,
+} from '@/data/replication/destinations-query'
 import { checkLocalPipelinesNotSetUp } from '@/data/replication/utils'
-import { useReplicationClusterId } from '@/state/replication-cluster'
+import type { StudioError } from '@/lib/errors/studio-errors'
+
+import '@xyflow/react/dist/style.css'
 
 export const ReplicationDiagram = () => {
   return (
@@ -33,28 +36,44 @@ const ReplicationDiagramContent = () => {
   const reactFlow = useReactFlow()
   const { resolvedTheme } = useTheme()
   const { ref: projectRef = 'default' } = useParams()
-  const clusterId = useReplicationClusterId()
 
-  const {
-    data,
-    error: destinationsError,
-    isSuccess: isSuccessDestinations,
-    isError: isErrorDestinations,
-  } = useReplicationDestinationsQuery({
-    projectRef,
-    clusterId,
+  const { groups } = useReplicationClusterGroups()
+  const combineDestinations = useCallback(
+    (results: UseQueryResult<ReplicationDestinationsData, StudioError>[]) => ({
+      destinations: results.flatMap((result, index) => {
+        const { clusterId, region } = groups[index]
+        return (result.data?.destinations ?? []).map((destination) => ({
+          nodeId: JSON.stringify([clusterId ?? null, destination.id]),
+          destination,
+          clusterId,
+          region,
+        }))
+      }),
+      canRenderGraph: results.some(
+        (result) => result.data !== undefined || checkLocalPipelinesNotSetUp(result.error)
+      ),
+    }),
+    [groups]
+  )
+  const { destinations, canRenderGraph } = useQueries({
+    queries: groups.map(({ clusterId }) =>
+      replicationDestinationsQueryOptions({ projectRef, clusterId })
+    ),
+    combine: combineDestinations,
   })
-  const destinations = useMemo(() => data?.destinations ?? [], [data])
-  const isLocalPipelinesNotSetUp = checkLocalPipelinesNotSetUp(destinationsError)
-  const skipRenderingDestinations = isErrorDestinations && isLocalPipelinesNotSetUp
 
   const nodes = useMemo(() => {
     return [
-      { id: projectRef, type: 'primary', data: {}, position: { x: 0, y: 5 } },
-      ...destinations.map((x) => ({
-        id: x.id.toString(),
+      {
+        id: projectRef,
+        type: 'primary',
+        data: { hasDestinations: destinations.length > 0 },
+        position: { x: 0, y: 5 },
+      },
+      ...destinations.map(({ nodeId, destination, clusterId }) => ({
+        id: nodeId,
         type: 'replication',
-        data: {},
+        data: { destination, clusterId },
         position: { x: 0, y: 0 },
       })),
     ]
@@ -63,34 +82,30 @@ const ReplicationDiagramContent = () => {
   const edges = useMemo(() => {
     const shiftEdgeEnd = destinations.length > 1
 
-    return destinations.map((x) => ({
-      id: `${projectRef}-${x.id}`,
+    return destinations.map(({ nodeId, destination, clusterId, region }) => ({
+      id: `${projectRef}-${nodeId}`,
       source: projectRef,
-      target: x.id.toString(),
+      target: nodeId,
       type: 'smoothstep',
       className: 'cursor-default!',
-      data: { identifier: x.id.toString(), shiftEdgeEnd },
+      data: { destinationId: destination.id, clusterId, region, shiftEdgeEnd },
     }))
   }, [destinations, projectRef])
 
   const backgroundPatternColor =
     resolvedTheme === 'dark' ? 'rgba(255, 255, 255, 0.3)' : 'rgba(0, 0, 0, 0.4)'
 
-  const setReactFlow = async () => {
+  useEffect(() => {
+    if (!canRenderGraph) return
+
     const graph = getDagreGraphLayout(nodes, edges)
     reactFlow.setNodes(graph.nodes)
     reactFlow.setEdges(graph.edges)
 
-    // [Joshen] Odd fix to ensure that react flow snaps back to center when adding nodes
-    await timeout(1)
-    reactFlow.fitView({ minZoom: 0.8, maxZoom: 0.9 })
-  }
-
-  useEffect(() => {
-    if (nodes.length > 0 && (isSuccessDestinations || skipRenderingDestinations)) {
-      setReactFlow()
-    }
-  }, [nodes, isSuccessDestinations, skipRenderingDestinations])
+    // Fit the graph after React Flow has added the new nodes.
+    const timer = setTimeout(() => reactFlow.fitView({ minZoom: 0.8, maxZoom: 0.9 }), 1)
+    return () => clearTimeout(timer)
+  }, [canRenderGraph, edges, nodes, reactFlow])
 
   return (
     <div className="nowheel relative h-[350px] w-full border border-muted rounded-md overflow-hidden">
