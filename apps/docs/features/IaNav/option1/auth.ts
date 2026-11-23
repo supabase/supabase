@@ -46,8 +46,8 @@ export const auth: NavMenuConstant = {
           url: '/guides/auth/choosing-a-server-package',
           enabled: authFlowsEnabled,
         },
-        { name: 'Server SDK', url: '/reference/server' },
-        { name: 'Middleware SDK', url: '/reference/middleware' },
+        { name: 'Server SDK reference', url: '/reference/server' },
+        { name: 'Middleware SDK reference', url: '/reference/middleware' },
         {
           name: 'Server-side rendering',
           enabled: authFlowsEnabled,
