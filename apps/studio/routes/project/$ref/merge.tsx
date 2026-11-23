@@ -56,6 +56,8 @@ import { useSelectedProjectQuery } from '@/hooks/misc/useSelectedProject'
 import { useGrant } from '@/lib/grants'
 import { useTrack } from '@/lib/telemetry/track'
 
+const LAYOUT_SIZE = 'default'
+
 export const Route = createFileRoute('/project/$ref/merge')({
   component: ProjectMergeRoute,
 })
@@ -367,7 +369,7 @@ function MergePage() {
 
   if (branchesGrant.status === 'denied') {
     return (
-      <PageContainer size="full">
+      <PageContainer size={LAYOUT_SIZE}>
         <NoPermission resourceText="view this project's branches" />
       </PageContainer>
     )
@@ -375,7 +377,7 @@ function MergePage() {
 
   if (branchesGrant.status === 'error') {
     return (
-      <PageContainer size="full">
+      <PageContainer size={LAYOUT_SIZE}>
         <AlertError
           error={branchesGrant.error}
           subject="Failed to check your permissions to view branches"
@@ -387,7 +389,7 @@ function MergePage() {
   // If not on a preview branch or branch info unavailable, show notice
   if (!isBranch || !currentBranch) {
     return (
-      <PageContainer size="full">
+      <PageContainer size={LAYOUT_SIZE}>
         <div className="flex items-center flex-col justify-center w-full py-16">
           <ProductEmptyState title="Merge Request">
             <p className="text-sm text-foreground-light">
@@ -415,7 +417,7 @@ function MergePage() {
         </BreadcrumbList>
       </PageBreadcrumbs>
 
-      <PageHeader size="full">
+      <PageHeader size={LAYOUT_SIZE} className="pt-6">
         <PageHeaderMeta>
           <PageHeaderSummary>
             <PageHeaderTitle>
@@ -436,7 +438,7 @@ function MergePage() {
         </PageHeaderMeta>
       </PageHeader>
 
-      <PageContainer size="full">
+      <PageContainer size={LAYOUT_SIZE}>
         {hasGHProductionDeployEnabled ? (
           <Admonition
             type="default"
@@ -517,7 +519,7 @@ function MergePage() {
         ) : null}
       </PageContainer>
 
-      <PageNav size="full">
+      <PageNav size={LAYOUT_SIZE}>
         <NavMenu>
           {navigationItems.map((item) => (
             <NavMenuItem key={item.label} active={item.active}>
@@ -534,7 +536,7 @@ function MergePage() {
         </NavMenu>
       </PageNav>
 
-      <PageContainer size="full" className="flex min-h-0 flex-1 flex-col pt-6 pb-12">
+      <PageContainer size={LAYOUT_SIZE} className="flex min-h-0 flex-1 flex-col pt-6 pb-12">
         <div className="flex min-h-0 flex-1 flex-col">
           {currentTab === 'database' ? (
             <DatabaseDiffPanel
