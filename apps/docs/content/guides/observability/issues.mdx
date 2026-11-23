@@ -59,8 +59,8 @@ The `get_advisors` tool is planned for deprecation in a future release. It remai
 CLI structured output and `get_issues` return `issues` and `checks`:
 
 - `issues` groups findings by check. Each issue includes its `id`, `title`, `description`, `severity`, `category`, `source`, `docs_url`, and `affected` resources.
-- Each `affected` entry preserves its resource, detail, severity, documentation URL, and finding ID. Filtering by severity retains all findings within a matching issue.
-- `checks` reports each requested category as `complete` or `unavailable`, with a reason when unavailable.
+- Each `affected` entry preserves its resource, detail, severity, documentation URL, and finding ID. Severity filtering selects issues by their highest finding severity. The CLI retains all findings within a matching issue. MCP returns up to 20 `affected` entries per issue, with the full total in `affected_count`. Issue severity reflects all findings, including entries beyond that limit.
+- `checks` reports each requested category as `complete` or `unavailable`, with a reason when unavailable. MCP retains available findings when another source in the same category is unavailable.
 
 Check IDs identify checks within a project, rather than persistent incidents. These interfaces inspect current findings; they do not dismiss issues or track their resolution.
 
