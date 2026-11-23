@@ -128,7 +128,7 @@ describe('UnifiedLogs.queries (OTEL flat)', () => {
       // literal(); a raw single quote from user input never closes its
       // string literal early.
       expect(sql).toContain(`'G''ET'`)
-      expect(sql).toContain(`%/customers''; DROP TABLE logs --%`)
+      expect(sql).toContain(`'/customers''; DROP TABLE logs --'`)
     })
 
     it('translates method/status/pathname filters to log_attributes predicates', () => {
@@ -145,7 +145,7 @@ describe('UnifiedLogs.queries (OTEL flat)', () => {
       expect(sql).toContain(`log_attributes['parsed.sql_state_code']`)
       expect(sql).toMatch(/END\) IN \('401'\)/)
       expect(sql).toContain(
-        `(multiIf(source = 'storage_logs', log_attributes['req.url'], source = 'function_edge_logs' AND log_attributes['request.pathname'] != '', log_attributes['request.pathname'], log_attributes['request.path'])) LIKE '%/customers%'`
+        `(multiIf(source = 'storage_logs', log_attributes['req.url'], source = 'function_edge_logs' AND log_attributes['request.pathname'] != '', log_attributes['request.pathname'], log_attributes['request.path'])) IN ('/customers')`
       )
     })
 
@@ -168,15 +168,27 @@ describe('UnifiedLogs.queries (OTEL flat)', () => {
       expect(sql).toContain(expected)
     })
 
-    it('flips LIKE to NOT LIKE when the pathname/host operator is `<>`', () => {
+    it('uses NOT IN for pathname and retains NOT LIKE for host with `<>`', () => {
       const sql = getUnifiedLogsQuery(withFilters('pathname:neq:/health', 'host:neq:cdn.foo'))
       expect(sql).toContain(
-        `(multiIf(source = 'storage_logs', log_attributes['req.url'], source = 'function_edge_logs' AND log_attributes['request.pathname'] != '', log_attributes['request.pathname'], log_attributes['request.path'])) NOT LIKE '%/health%'`
+        `(multiIf(source = 'storage_logs', log_attributes['req.url'], source = 'function_edge_logs' AND log_attributes['request.pathname'] != '', log_attributes['request.pathname'], log_attributes['request.path'])) NOT IN ('/health')`
       )
       expect(sql).toContain(`log_attributes['request.url'] NOT LIKE '%cdn.foo%'`)
     })
 
     const pathExpr = `(multiIf(source = 'storage_logs', log_attributes['req.url'], source = 'function_edge_logs' AND log_attributes['request.pathname'] != '', log_attributes['request.pathname'], log_attributes['request.path']))`
+
+    it.each([
+      ['eq', 'IN'],
+      ['neq', 'NOT IN'],
+    ])('matches complete pathname values for %s', (operator, expected) => {
+      const sql = getUnifiedLogsQuery(
+        withFilters(`pathname:${operator}:/auth/v1/token`, `pathname:${operator}:/auth/v1/user_%`)
+      )
+      expect(sql).toContain(`${pathExpr} ${expected} ('/auth/v1/token','/auth/v1/user_%')`)
+      expect(sql).not.toContain(`${pathExpr} LIKE`)
+      expect(sql).not.toContain(`${pathExpr} NOT LIKE`)
+    })
 
     it.each([
       ['pathname:ilike:Customers', `${pathExpr} ILIKE '%Customers%'`, null],
@@ -431,6 +443,18 @@ describe('UnifiedLogs.queries (OTEL flat)', () => {
 })
 
 describe('UnifiedLogs.queries.bq', () => {
+  it.each([
+    ['eq', 'IN'],
+    ['neq', 'NOT IN'],
+  ])('matches complete pathname values for %s', (operator, expected) => {
+    const sql = getUnifiedLogsQueryBQ(
+      withFilters(`pathname:${operator}:/auth/v1/token`, `pathname:${operator}:/auth/v1/user_%`)
+    )
+    expect(sql).toContain('`pathname` ' + expected + " ('/auth/v1/token','/auth/v1/user_%')")
+    expect(sql).not.toContain('`pathname` LIKE')
+    expect(sql).not.toContain('`pathname` NOT LIKE')
+  })
+
   it('backtick-quotes column identifiers (BigQuery syntax)', () => {
     const sql = getUnifiedLogsQueryBQ(withFilters('method:eq:GET'))
     expect(sql).toContain("`method` IN ('GET')")
