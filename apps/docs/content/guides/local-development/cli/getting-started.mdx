@@ -24,7 +24,7 @@ With two commands, you can set up and start a new local project:
 
 How you run a CLI command depends on how you install it. Homebrew, Scoop, and the Linux packages give you a global `supabase` command. Installing with npm, pnpm, yarn, or bun adds the CLI to one project instead, so you run it through your package runner as `npx supabase <command>`. This page writes every example as `supabase <command>`.
 
-The CLI is project-scoped either way. Most commands, including `start`, expect a directory that `supabase init` has already set up with a `supabase` directory and a `config.toml` file. Run `init` first, then the rest from the same directory.
+The CLI is project-scoped either way. Most commands, including `start`, expect a directory that `supabase init` has already set up with a `supabase` directory and a `config.jsonc` file. Run `init` first, then the rest from the same directory.
 
 </Admonition>
 
@@ -134,7 +134,7 @@ To bring the stack up:
    supabase init
    ```
 
-   The command creates a `supabase` directory, which is safe to commit to version control. `init` creates local files only: it doesn't sign you in or connect the directory to a project on the Supabase Platform. To connect one, see [Connect to a hosted project](#connect-to-a-hosted-project).
+   The command creates a `supabase` directory with a `config.jsonc` file, which is safe to commit to version control. `init` creates local files only: it doesn't sign you in or connect the directory to a project on the Supabase Platform. To connect one, see [Connect to a hosted project](#connect-to-a-hosted-project). If you prefer TOML, run `supabase config convert --to toml` to switch to `config.toml`. See [Config file formats](/docs/guides/local-development/cli/config-formats).
 
 4. Start the Supabase services from the same directory:
 
