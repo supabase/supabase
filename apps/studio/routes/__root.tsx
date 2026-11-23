@@ -42,7 +42,6 @@ import {
 } from 'common'
 import { genFaviconLinks } from 'common/MetaFavicons/icons'
 import dayjs from 'dayjs'
-import advancedFormat from 'dayjs/plugin/advancedFormat'
 import customParseFormat from 'dayjs/plugin/customParseFormat'
 import duration from 'dayjs/plugin/duration'
 import relativeTime from 'dayjs/plugin/relativeTime'
@@ -101,7 +100,6 @@ import { Toaster } from '@/lib/toaster'
 import { matchRedirect } from '@/redirects.shared'
 import { AiAssistantStateContextProvider } from '@/state/ai-assistant-state'
 
-dayjs.extend(advancedFormat)
 dayjs.extend(customParseFormat)
 dayjs.extend(utc)
 dayjs.extend(timezone)

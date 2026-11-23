@@ -191,7 +191,7 @@ function UpcomingInvoiceBreakdown({
 
       {/* Format in UTC so the due date matches the date on the invoice PDF */}
       <InvoiceTotalRow
-        title={`Projected Total (due on ${dayjs.utc(invoice.billing_cycle_end).format('MMMM Do')})`}
+        title={`Projected Total (due on ${dayjs.utc(invoice.billing_cycle_end).format('MMMM D')})`}
         tooltip="The estimated amount we expect to charge at the end of the billing cycle. The final amount depends on your usage."
         amount={invoice.total.net.expectedAtEndOfCycle}
         isEmphasized
