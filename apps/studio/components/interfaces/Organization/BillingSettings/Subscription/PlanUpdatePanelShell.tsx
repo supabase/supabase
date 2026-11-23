@@ -1,4 +1,4 @@
-import { ArrowLeftIcon, ExternalLinkIcon } from 'lucide-react'
+import { ArrowLeftIcon, ArrowUpRightIcon } from 'lucide-react'
 import { motion } from 'motion/react'
 import type { ReactNode } from 'react'
 import { Button, cn } from 'ui'
@@ -8,8 +8,6 @@ interface FullScreenPanelProps {
   skipOverlayFade?: boolean
   /** Seconds to delay the content entrance animation by. */
   contentDelay?: number
-  /** Rendered in the top right corner, next to nothing by default. */
-  headerActions?: ReactNode
   backDisabled?: boolean
   onBack: () => void
   contentClassName?: string
@@ -23,7 +21,6 @@ interface FullScreenPanelProps {
 export function FullScreenPanel({
   skipOverlayFade = false,
   contentDelay = 0,
-  headerActions,
   backDisabled = false,
   onBack,
   contentClassName,
@@ -45,9 +42,6 @@ export function FullScreenPanel({
       >
         Back
       </Button>
-      {headerActions && (
-        <div className="fixed top-4 right-4 z-10 flex items-center gap-2">{headerActions}</div>
-      )}
       <motion.div
         className={cn(
           'mx-auto flex w-full flex-col gap-4 px-6 py-16 items-center',
@@ -87,31 +81,24 @@ export function PlanUpdateFullScreenShell({
       contentDelay={contentDelay}
       onBack={onClose}
       contentClassName="max-w-7xl"
-      headerActions={
-        <>
-          <Button
-            asChild
-            variant="text"
-            iconRight={<ExternalLinkIcon />}
-            className="hidden sm:inline-flex"
-          >
-            <a href="https://supabase.com/pricing#faq" target="_blank" rel="noreferrer">
-              Pricing FAQ
-            </a>
-          </Button>
-          <Button asChild iconRight={<ExternalLinkIcon />}>
-            <a href="https://supabase.com/pricing#compare-plans" target="_blank" rel="noreferrer">
-              Compare plans
-            </a>
-          </Button>
-        </>
-      }
     >
       <h1 className="text-2xl text-center text-balance max-w-2/3">
         Change subscription plan for {organizationName}
       </h1>
       {notice}
       {children}
+      <div className="flex justify-center gap-2">
+        <Button asChild variant="secondary" iconRight={<ArrowUpRightIcon />}>
+          <a href="https://supabase.com/pricing#compare-plans" target="_blank" rel="noreferrer">
+            Compare plans
+          </a>
+        </Button>
+        <Button asChild iconRight={<ArrowUpRightIcon />}>
+          <a href="https://supabase.com/pricing#faq" target="_blank" rel="noreferrer">
+            Pricing FAQ
+          </a>
+        </Button>
+      </div>
     </FullScreenPanel>
   )
 }
