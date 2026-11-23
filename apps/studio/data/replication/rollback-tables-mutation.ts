@@ -1,9 +1,10 @@
-import { useMutation, useQueryClient } from '@tanstack/react-query'
+import { useQueryClient } from '@tanstack/react-query'
 import type { components } from 'api-types'
 import { toast } from 'sonner'
 
 import { replicationKeys } from './keys'
 import { pipelineIdSchema } from './pipeline-id'
+import { useReplicationMutation } from './use-cluster-mutation'
 import { handleError, post } from '@/data/fetchers'
 import type { StudioError } from '@/lib/errors/studio-errors'
 import type { UseCustomMutationOptions } from '@/types'
@@ -14,10 +15,11 @@ type RollbackTablesParams = {
   projectRef: string
   pipelineId: string
   target: RollbackTablesTarget
+  clusterId?: string
 }
 
 async function rollbackTables(
-  { projectRef, pipelineId, target }: RollbackTablesParams,
+  { projectRef, pipelineId, target, clusterId }: RollbackTablesParams,
   signal?: AbortSignal
 ) {
   if (!projectRef) throw new Error('Project reference is required')
@@ -26,7 +28,10 @@ async function rollbackTables(
   const { data, error } = await post(
     '/platform/replication/{ref}/pipelines/{pipeline_id}/rollback-tables',
     {
-      params: { path: { ref: projectRef, pipeline_id: pipelineId } },
+      params: {
+        path: { ref: projectRef, pipeline_id: pipelineId },
+        query: { cluster_id: clusterId },
+      },
       // Production OpenAPI still includes the retired rollback_type field.
       body: { target } as components['schemas']['RollbackTablesBody'],
       signal,
@@ -49,20 +54,24 @@ export const useRollbackTablesMutation = ({
 > = {}) => {
   const queryClient = useQueryClient()
 
-  return useMutation<RollbackTablesData, StudioError, RollbackTablesParams>({
+  return useReplicationMutation<RollbackTablesData, StudioError, RollbackTablesParams>({
     mutationFn: (vars) => rollbackTables(vars),
     async onSuccess(data, variables, context) {
       const { projectRef, pipelineId } = variables
       await Promise.all([
         queryClient.invalidateQueries(
           {
-            queryKey: replicationKeys.pipelinesStatus(projectRef, pipelineId),
+            queryKey: replicationKeys.pipelinesStatus(projectRef, pipelineId, variables.clusterId),
           },
           { cancelRefetch: false }
         ),
         queryClient.invalidateQueries(
           {
-            queryKey: replicationKeys.pipelinesReplicationStatus(projectRef, pipelineId),
+            queryKey: replicationKeys.pipelinesReplicationStatus(
+              projectRef,
+              pipelineId,
+              variables.clusterId
+            ),
           },
           { cancelRefetch: false }
         ),
@@ -74,7 +83,11 @@ export const useRollbackTablesMutation = ({
       await Promise.all([
         queryClient.invalidateQueries(
           {
-            queryKey: replicationKeys.pipelinesStatus(variables.projectRef, variables.pipelineId),
+            queryKey: replicationKeys.pipelinesStatus(
+              variables.projectRef,
+              variables.pipelineId,
+              variables.clusterId
+            ),
           },
           { cancelRefetch: false }
         ),
@@ -82,7 +95,8 @@ export const useRollbackTablesMutation = ({
           {
             queryKey: replicationKeys.pipelinesReplicationStatus(
               variables.projectRef,
-              variables.pipelineId
+              variables.pipelineId,
+              variables.clusterId
             ),
           },
           { cancelRefetch: false }
