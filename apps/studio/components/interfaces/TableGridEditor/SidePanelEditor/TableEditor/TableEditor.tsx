@@ -1,4 +1,5 @@
 import { isEmpty, noop } from 'lodash'
+import { parseAsString, useQueryState } from 'nuqs'
 import { useContext, useEffect, useMemo, useRef, useState } from 'react'
 import { toast } from 'sonner'
 import { Badge, Checkbox, Input, SidePanel } from 'ui'
@@ -35,7 +36,6 @@ import { useChanged } from '@/hooks/misc/useChanged'
 import { useIsFeatureEnabled } from '@/hooks/misc/useIsFeatureEnabled'
 import { useQuerySchemaState } from '@/hooks/misc/useSchemaQueryState'
 import { useSelectedProjectQuery } from '@/hooks/misc/useSelectedProject'
-import { useUrlState } from '@/hooks/ui/useUrlState'
 import { useVisibleKey } from '@/hooks/ui/useVisibleKey'
 import { useProtectedSchemas } from '@/hooks/useProtectedSchemas'
 import { DOCS_URL } from '@/lib/constants'
@@ -103,7 +103,10 @@ export const TableEditor = ({
   const { realtimeAll: realtimeEnabled } = useIsFeatureEnabled(['realtime:all'])
   const { docsRowLevelSecurityGuidePath } = useCustomContent(['docs:row_level_security_guide_path'])
 
-  const [params, setParams] = useUrlState()
+  const [createParam, setCreateParam] = useQueryState(
+    'create',
+    parseAsString.withOptions({ history: 'replace' })
+  )
   const { data: project } = useSelectedProjectQuery()
   const { selectedSchema } = useQuerySchemaState()
 
@@ -302,11 +305,11 @@ export const TableEditor = ({
   }
 
   useEffect(() => {
-    if (params.create === 'table' && snap.ui.open === 'none') {
+    if (createParam === 'table' && snap.ui.open === 'none') {
       tableEditorApi.onAddTable()
-      setParams({ ...params, create: undefined })
+      setCreateParam(null)
     }
-  }, [tableEditorApi, setParams, snap.ui.open, params])
+  }, [tableEditorApi, setCreateParam, snap.ui.open, createParam])
 
   useEffect(() => {
     if (visibleChanged && visible) {
