@@ -1,6 +1,10 @@
 import { describe, expect, it } from 'vitest'
 
-import { convertArgumentTypes } from '@/components/interfaces/Database/Functions/Functions.utils'
+import {
+  convertArgumentTypes,
+  formatArgumentDeclarations,
+  stripInArgModePrefixes,
+} from '@/components/interfaces/Database/Functions/Functions.utils'
 
 describe('convertArgumentTypes', () => {
   it('parses simple argument types', () => {
@@ -54,7 +58,62 @@ describe('convertArgumentTypes', () => {
     })
   })
 
+  it('keeps commas inside quoted procedure argument names and defaults', () => {
+    expect(
+      convertArgumentTypes({ type: 'procedure', value: 'IN "first, IN second" text' })
+    ).toEqual({
+      value: [{ name: '"first, IN second"', type: 'text', defaultValue: undefined }],
+    })
+    expect(
+      convertArgumentTypes({ type: 'procedure', value: "IN a text DEFAULT 'x, IN y'::text" })
+    ).toEqual({
+      value: [{ name: 'a', type: 'text', defaultValue: "'x, IN y'::text" }],
+    })
+  })
+
   it.each(['', '   '])('returns no arguments for an empty value: %s', (value) => {
     expect(convertArgumentTypes({ type: 'function', value })).toEqual({ value: [] })
+  })
+})
+
+describe('stripInArgModePrefixes', () => {
+  it('only strips an IN token at the start of each top-level argument', () => {
+    expect(stripInArgModePrefixes('IN a integer, IN b text')).toBe('a integer, b text')
+    expect(stripInArgModePrefixes('IN "first, IN second" text')).toBe('"first, IN second" text')
+    expect(stripInArgModePrefixes("IN a text DEFAULT 'x, IN y'::text")).toBe(
+      "a text DEFAULT 'x, IN y'::text"
+    )
+  })
+})
+
+describe('formatArgumentDeclarations', () => {
+  it('serializes a comma default exactly as parsed', () => {
+    const { value } = convertArgumentTypes({
+      type: 'function',
+      value: "f text DEFAULT 'x, y'::text, g integer DEFAULT 1",
+    })
+
+    expect(formatArgumentDeclarations(value)).toEqual([
+      "f text DEFAULT 'x, y'::text",
+      'g integer DEFAULT 1',
+    ])
+  })
+
+  it('does not append DEFAULT for arguments without one', () => {
+    expect(formatArgumentDeclarations([{ name: 'a', type: 'integer' }])).toEqual(['a integer'])
+  })
+
+  it('keeps a timestamp default expression unchanged', () => {
+    const { value } = convertArgumentTypes({
+      type: 'function',
+      value: 'a timestamp without time zone DEFAULT now()',
+    })
+
+    expect(value).toEqual([
+      { name: 'a', type: 'timestamp without time zone', defaultValue: 'now()' },
+    ])
+    expect(formatArgumentDeclarations(value)).toEqual([
+      'a timestamp without time zone DEFAULT now()',
+    ])
   })
 })

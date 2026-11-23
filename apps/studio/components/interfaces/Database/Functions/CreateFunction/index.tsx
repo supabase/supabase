@@ -37,7 +37,11 @@ import {
 import { FormItemLayout } from 'ui-patterns/form/FormItemLayout/FormItemLayout'
 import z from 'zod'
 
-import { convertArgumentTypes, convertConfigParams } from '../Functions.utils'
+import {
+  convertArgumentTypes,
+  convertConfigParams,
+  formatArgumentDeclarations,
+} from '../Functions.utils'
 import { CreateFunctionConfigParamsSection } from './CreateFunctionConfigParamsSection'
 import { CreateFunctionHeader } from './CreateFunctionHeader'
 import { FunctionEditor } from './FunctionEditor'
@@ -68,7 +72,13 @@ const FormSchema = z.object({
   name: z.string().trim().min(1),
   type: z.enum(['function', 'procedure']),
   schema: z.string().trim().min(1),
-  args: z.array(z.object({ name: z.string().trim().min(1), type: z.string().trim() })),
+  args: z.array(
+    z.object({
+      name: z.string().trim().min(1),
+      type: z.string().trim(),
+      defaultValue: z.string().optional(),
+    })
+  ),
   behavior: z.enum(['IMMUTABLE', 'STABLE', 'VOLATILE']),
   definition: z.string().trim().min(1),
   language: z.string().trim(),
@@ -124,7 +134,9 @@ export const CreateFunction = ({
     // (`args` items, `return_type`, and each `config_params` value) to executable.
     const payload = {
       ...data,
-      args: data.args.map((x) => acceptUntrustedSql(untrustedSql(`${x.name} ${x.type}`))),
+      args: formatArgumentDeclarations(data.args).map((arg) =>
+        acceptUntrustedSql(untrustedSql(arg))
+      ),
       return_type: acceptUntrustedSql(untrustedSql(data.return_type)),
       config_params: mapValues(keyBy(data.config_params, 'name'), (item) =>
         acceptUntrustedSql(untrustedSql(item.value))

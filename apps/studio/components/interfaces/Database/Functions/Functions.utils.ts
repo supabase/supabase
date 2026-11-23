@@ -1,14 +1,5 @@
 import { isEmpty } from 'lodash'
 
-/**
- * Procedures expose their arguments with explicit `IN` mode prefixes
- * (e.g. "IN a integer, IN b integer"); strip them so they read like functions.
- * `INOUT`/`VARIADIC` are left intact since `IN\s+` requires whitespace after `IN`.
- */
-export function stripInArgModePrefixes(value: string) {
-  return value?.replace(/(^|,)\s*IN\s+/gi, '$1')
-}
-
 // Index of the first match outside parentheses/brackets and quoted strings.
 function findTopLevelIndex(
   value: string,
@@ -64,6 +55,20 @@ function splitTopLevel(value: string, separator: string): string[] {
   }
 }
 
+function stripArgModePrefix(value: string) {
+  return value.replace(/^\s*IN\s+/i, '')
+}
+
+/**
+ * Procedures expose their arguments with explicit `IN` mode prefixes
+ * (e.g. "IN a integer, IN b integer"); strip them so they read like functions.
+ * `INOUT`/`VARIADIC` are left intact since `IN\s+` requires whitespace after `IN`.
+ */
+export function stripInArgModePrefixes(value: string) {
+  if (!value) return value
+  return splitTopLevel(value, ',').map(stripArgModePrefix).join(', ')
+}
+
 // Splits an argument into its declaration and optional default clause. The
 // default can be introduced by `DEFAULT` or `=`, and may itself contain commas.
 function splitArgumentDefault(value: string) {
@@ -97,15 +102,17 @@ function parseArgument(value: string) {
   const parsed = splitArgumentNameAndType(declaration)
   if (!parsed) return null
 
-  let parsedDefaultValue = defaultValue
-  if (
-    ['timestamp', 'time', 'timetz', 'timestamptz'].includes(parsed.type.toLowerCase()) &&
-    parsedDefaultValue
-  ) {
-    parsedDefaultValue = `'${parsedDefaultValue}'`
-  }
+  return { ...parsed, defaultValue }
+}
 
-  return { ...parsed, defaultValue: parsedDefaultValue }
+export type FunctionArgument = { name: string; type: string; defaultValue?: string }
+
+export function formatArgumentDeclarations(args: FunctionArgument[]) {
+  return args.map((arg) =>
+    arg.defaultValue
+      ? `${arg.name} ${arg.type} DEFAULT ${arg.defaultValue}`
+      : `${arg.name} ${arg.type}`
+  )
 }
 
 /**
@@ -121,14 +128,16 @@ export function convertArgumentTypes({
 }) {
   if (isEmpty(value) || !value.trim()) return { value: [] }
 
-  const normalizedValue = type === 'procedure' ? stripInArgModePrefixes(value) : value
-  const temp = splitTopLevel(normalizedValue, ',')
+  const temp = splitTopLevel(value, ',')
     .map((item) => {
-      const parsed = parseArgument(item)
-      if (!parsed) console.error('Error while trying to parse function arguments', item.trim())
+      const normalized = type === 'procedure' ? stripArgModePrefix(item) : item
+      const parsed = parseArgument(normalized)
+      if (!parsed) {
+        console.error('Error while trying to parse function arguments', normalized.trim())
+      }
       return parsed
     })
-    .filter(Boolean) as { name: string; type: string; defaultValue?: string }[]
+    .filter(Boolean) as FunctionArgument[]
 
   return { value: temp }
 }
