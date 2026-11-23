@@ -17,12 +17,15 @@ import { ShimmeringLoader } from 'ui-patterns/ShimmeringLoader'
 
 import { OAuthGrantAccordion, OAuthGrantAccordionItem } from './OAuthGrantAccordionItem'
 import { AlertError } from '@/components/ui/AlertError'
-import { useOAuthAppMemberGrantsQuery } from '@/data/oauth-apps/oauth-apps-member-grants-query'
-import type { OAuthApprovalItem, OAuthGrantItem } from '@/data/oauth-apps/types'
+import { OAuthApproval } from '@/data/oauth-apps/oauth-apps-approvals-query'
+import {
+  OAuthAppMemberGrant,
+  useOAuthAppMemberGrantsQuery,
+} from '@/data/oauth-apps/oauth-apps-member-grants-query'
 import { pluralize } from '@/lib/helpers'
 
 export interface OAuthAppsMemberGrantsDialogProps extends ComponentProps<typeof DialogContent> {
-  approval?: OAuthApprovalItem
+  approval?: OAuthApproval
 }
 
 export const OAuthAppsMemberGrantsDialogContent = ({
@@ -95,7 +98,7 @@ export const OAuthAppsMemberGrantsDialogContent = ({
 
           <OAuthGrantAccordion>
             {memberGrants.map((grant) => (
-              <GrantAccordionItem key={grant.grant_id} grant={grant} />
+              <GrantAccordionItem key={grant.id} grant={grant} />
             ))}
           </OAuthGrantAccordion>
           <p ref={sentinelRef} className="text-sm text-foreground-lighter">
@@ -113,31 +116,34 @@ export const OAuthAppsMemberGrantsDialogContent = ({
   )
 }
 
-const GrantAccordionItem = ({ grant }: { grant: OAuthGrantItem }) => {
-  const isOrganizationBound = grant.kind === 'organization_bound'
-  const permissionCount = grant.approved_scopes.length
+const GrantAccordionItem = ({ grant }: { grant: OAuthAppMemberGrant }) => {
+  const isOrganizationBound = grant.attributes.kind === 'organization_bound'
+  const permissionCount = grant.attributes.approved_scopes.length
   const Icon = isOrganizationBound ? BuildingIcon : UserIcon
 
   const projectsSummary =
-    grant.projects == null
+    grant.attributes.projects == null
       ? 'All projects'
-      : `${grant.projects.length} ${pluralize(grant.projects.length, 'project')}`
+      : `${grant.attributes.projects.length} ${pluralize(grant.attributes.projects.length, 'project')}`
 
   return (
     <OAuthGrantAccordionItem
-      value={grant.grant_id}
+      value={grant.id}
       icon={<Icon size={16} />}
       title={getGrantLabel(grant)}
       description={`${projectsSummary} · ${permissionCount} ${pluralize(permissionCount, 'permission')}`}
       sections={[
-        { label: 'Projects', values: grant.projects?.map((project) => project.name) ?? [] },
-        { label: 'Permissions', values: grant.approved_scopes },
+        {
+          label: 'Projects',
+          values: grant.attributes.projects?.map((project) => project.name) ?? [],
+        },
+        { label: 'Permissions', values: grant.attributes.approved_scopes },
       ]}
     />
   )
 }
 
-const getGrantLabel = (grant: OAuthGrantItem) => {
-  if (grant.user) return grant.user.email
+const getGrantLabel = (grant: OAuthAppMemberGrant) => {
+  if (grant.attributes.user) return grant.attributes.user.email ?? grant.attributes.user.username
   return 'Organization-wide'
 }

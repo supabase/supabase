@@ -98,7 +98,6 @@ vi.mock('common', async (importOriginal) => {
     ...actual,
     IS_PLATFORM: true,
     useIsLoggedIn: () => true,
-    useParams: () => ({ ref: PROJECT_REF }),
   }
 })
 

@@ -49,7 +49,7 @@ export function buildSignUpReturnPath(returnTo: string | string[] | undefined): 
     return queryString ? `${pathOnly}?${queryString}` : pathOnly
   }
 
-  const mergedParams = new URLSearchParams(location.search)
+  const mergedParams = stripTransientAuthParams(new URLSearchParams(location.search))
   mergedParams.delete('returnTo')
   for (const [key, val] of pathnameSearchParams.entries()) {
     mergedParams.set(key, val)
@@ -105,6 +105,13 @@ export const getIdentity = (gotrueUser: User) => {
   }
 }
 
+const TRANSIENT_AUTH_PARAMS = ['error', 'error_code', 'error_description']
+
+const stripTransientAuthParams = (params: URLSearchParams) => {
+  TRANSIENT_AUTH_PARAMS.forEach((key) => params.delete(key))
+  return params
+}
+
 /**
  * Transfers the search params from the current location path to a newly built path
  */
@@ -115,7 +122,7 @@ export const buildPathWithParams = (pathname: string) => {
 
   // Merge the parameters, with pathname parameters taking precedence
   // over the current location's search parameters
-  const mergedParams = new URLSearchParams(location.search)
+  const mergedParams = stripTransientAuthParams(new URLSearchParams(location.search))
   for (const [key, value] of pathnameSearchParams.entries()) {
     mergedParams.set(key, value)
   }
@@ -130,7 +137,7 @@ export const getReturnToPath = (fallback = DEFAULT_FALLBACK_PATH) => {
     return fallback
   }
 
-  const searchParams = new URLSearchParams(location.search)
+  const searchParams = stripTransientAuthParams(new URLSearchParams(location.search))
 
   let returnTo = searchParams.get('returnTo') ?? fallback
 

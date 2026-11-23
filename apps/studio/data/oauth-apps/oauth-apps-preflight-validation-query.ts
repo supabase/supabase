@@ -1,27 +1,36 @@
-import { useQuery } from '@tanstack/react-query'
+import { useQuery, useQueryClient } from '@tanstack/react-query'
 
+import { MAX_RETRY_FAILURE_COUNT } from '../query-client'
 import { oauthAppsKeys } from './keys'
-import { getMockOAuthAppsPreflightValidation, USE_MOCKS } from './mocks'
-import type { OAuthAppsAuthorizePreflightResult } from './types'
+import { isOAuthRoleValidationError } from './types'
+import { get, handleError } from '@/data/fetchers'
 import type { StudioError } from '@/lib/errors/studio-errors'
 import type { UseCustomQueryOptions } from '@/types'
 
 export type OAuthAppsPreflightValidationVariables = {
   slug?: string
-  appId?: string
+  auth_id?: string
 }
 
-export type { OAuthAppsAuthorizePreflightResult } from './types'
-
-export async function getOAuthAppsPreflightValidation({
-  slug,
-  appId,
-}: OAuthAppsPreflightValidationVariables): Promise<OAuthAppsAuthorizePreflightResult> {
+export async function getOAuthAppsPreflightValidation(
+  { slug, auth_id }: OAuthAppsPreflightValidationVariables,
+  signal?: AbortSignal
+) {
   if (!slug) throw new Error('Organization slug is required')
-  if (!appId) throw new Error('App id is required')
-  if (!USE_MOCKS) throw new Error('OAuth app preflight validation is not yet implemented')
+  if (!auth_id) throw new Error('Authorization request id is required')
+  const { data, error } = await get(
+    '/platform/organizations/{slug}/oauth/authorizations/{id}/preflight',
+    {
+      params: { path: { slug, id: auth_id } },
+      signal,
+    }
+  )
 
-  return getMockOAuthAppsPreflightValidation(slug, appId)
+  if (error && isOAuthRoleValidationError(error)) {
+    throw error
+  }
+  if (error) handleError(error)
+  return data
 }
 
 export type OAuthAppsPreflightValidationData = Awaited<
@@ -30,7 +39,7 @@ export type OAuthAppsPreflightValidationData = Awaited<
 export type OAuthAppsPreflightValidationError = StudioError
 
 export const useOAuthAppsPreflightValidationQuery = <TData = OAuthAppsPreflightValidationData>(
-  { slug, appId }: OAuthAppsPreflightValidationVariables,
+  { slug, auth_id }: OAuthAppsPreflightValidationVariables,
   {
     enabled = true,
     ...options
@@ -39,10 +48,26 @@ export const useOAuthAppsPreflightValidationQuery = <TData = OAuthAppsPreflightV
     OAuthAppsPreflightValidationError,
     TData
   > = {}
-) =>
-  useQuery<OAuthAppsPreflightValidationData, OAuthAppsPreflightValidationError, TData>({
-    queryKey: oauthAppsKeys.preflightValidation(slug, appId),
-    queryFn: () => getOAuthAppsPreflightValidation({ slug, appId }),
-    enabled: enabled && USE_MOCKS && Boolean(slug) && Boolean(appId),
+) => {
+  const queryClient = useQueryClient()
+  return useQuery<OAuthAppsPreflightValidationData, OAuthAppsPreflightValidationError, TData>({
+    queryKey: oauthAppsKeys.preflightValidation(slug, auth_id),
+    queryFn: ({ signal }) => getOAuthAppsPreflightValidation({ slug, auth_id }, signal),
+    enabled: enabled && Boolean(slug) && Boolean(auth_id),
+    retry: (failureCount, error) => {
+      if (isOAuthRoleValidationError(error)) return false
+      const defaultOptions = queryClient.getDefaultOptions()
+      if (defaultOptions.queries?.retry != null) {
+        if (typeof defaultOptions.queries.retry === 'function') {
+          return defaultOptions.queries.retry(failureCount, error)
+        }
+        if (typeof defaultOptions.queries.retry === 'number') {
+          return failureCount < defaultOptions.queries.retry
+        }
+        return defaultOptions.queries.retry
+      }
+      return failureCount < MAX_RETRY_FAILURE_COUNT
+    },
     ...options,
   })
+}

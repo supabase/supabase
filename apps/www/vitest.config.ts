@@ -7,6 +7,7 @@ export default defineConfig({
     projects: [
       {
         resolve: { tsconfigPaths: true },
+        oxc: { jsx: { runtime: 'automatic' } },
         test: {
           name: 'unit',
           include: [...configDefaults.include, '../../packages/common/sentry.test.ts'],

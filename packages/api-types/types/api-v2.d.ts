@@ -535,6 +535,23 @@ export interface paths {
     patch?: never
     trace?: never
   }
+  '/v2/projects/{ref}/functions': {
+    parameters: {
+      query?: never
+      header?: never
+      path?: never
+      cookie?: never
+    }
+    get?: never
+    put?: never
+    post?: never
+    /** Deletes all Edge Functions from a project */
+    delete: operations['v2-delete-project-function']
+    options?: never
+    head?: never
+    patch?: never
+    trace?: never
+  }
   '/v2/projects/{ref}/notebooks': {
     parameters: {
       query?: never
@@ -670,6 +687,276 @@ export interface paths {
     put?: never
     /** Previews transferring a project to a different organizations, shows eligibility and impact */
     post: operations['v2-preview-a-project-transfer']
+    delete?: never
+    options?: never
+    head?: never
+    patch?: never
+    trace?: never
+  }
+  '/v2/projects/{ref}/warehouse': {
+    parameters: {
+      query?: never
+      header?: never
+      path?: never
+      cookie?: never
+    }
+    get?: never
+    put?: never
+    post?: never
+    /**
+     * Disable Warehouse replication and access
+     * @description Stops replication and removes the Warehouse publication, FDW and dependent foreign tables, reader group, catalog access and query routing asynchronously. Stored Warehouse data is retained by default. Set delete_data=true to permanently delete the managed catalog schema and dedicated Storage bucket; destination SQL and Storage write permissions are also required. Legacy shared buckets and source Postgres tables are preserved. Reader memberships are not restored on re-enablement. Safe retries return the existing cleanup identity; changing an in-progress data policy returns a conflict. Poll the linked teardown for completion or partial cleanup failures.
+     *
+     *     This endpoint is currently in its **Alpha** stage.
+     */
+    delete: operations['v2-disable-warehouse']
+    options?: never
+    head?: never
+    patch?: never
+    trace?: never
+  }
+  '/v2/projects/{ref}/warehouse/capacity': {
+    parameters: {
+      query?: never
+      header?: never
+      path?: never
+      cookie?: never
+    }
+    /**
+     * Inspect Warehouse capacity diagnostics
+     * @description Returns capacity, admission, assignment-wait, and activation measurements over a bounded time range, using the project’s stored Warehouse placement. Use since or both from and to; the default is the last 30 minutes. Each measurement includes its definition, unit, aggregation, requested and effective ranges, rate_window_seconds, source-sample freshness, availability, coverage, and full series with dimension labels such as reason, kind, and result. Executor invocations in flight are distinct from worker admission grants. Occupied admission includes active plus pending grants. The configured admission limit does not imply an open gate or spare capacity. Missing, stale, and insufficient observations remain unavailable or null; they do not establish healthy or idle capacity. Point timestamps are evaluation times; last_sample_at is the original source-sample time. Rates and latency quantiles describe the effective rate window at each point, not the entire requested range. Each request returns up to eight measurements, and a failure of one measurement does not discard the other results. No raw queries or backend selectors are accepted.
+     *
+     *     This endpoint is currently in its **Alpha** stage.
+     */
+    get: operations['v2-get-warehouse-capacity']
+    put?: never
+    post?: never
+    delete?: never
+    options?: never
+    head?: never
+    patch?: never
+    trace?: never
+  }
+  '/v2/projects/{ref}/warehouse/connection': {
+    parameters: {
+      query?: never
+      header?: never
+      path?: never
+      cookie?: never
+    }
+    /**
+     * Get Warehouse Flight SQL connection details
+     * @description Returns the public Arrow Flight SQL endpoint resolved from the project's Warehouse routing, with TLS required on port 443. Status is configured availability and query connectivity is not checked, so DNS readiness does not prove a query will succeed. Login uses a role in the source project database with that role's existing password (postgres uses the project database password), including when the catalog and storage are in another project. The role needs supabase_warehouse_reader membership, which is separate from Management API authorization. No passwords, tokens, catalog credentials or private endpoints are returned, and endpoint, host and port are null unless status is available or pending. Example client: usql -W 'flightsql://postgres@<host>:443?tls=enabled'.
+     *
+     *     This endpoint is currently in its **Alpha** stage.
+     */
+    get: operations['v2-get-warehouse-connection']
+    put?: never
+    post?: never
+    delete?: never
+    options?: never
+    head?: never
+    patch?: never
+    trace?: never
+  }
+  '/v2/projects/{ref}/warehouse/enable': {
+    parameters: {
+      query?: never
+      header?: never
+      path?: never
+      cookie?: never
+    }
+    get?: never
+    put?: never
+    /**
+     * Enable Warehouse replication
+     * @description Enables replication for the currently eligible tables in a schema, or the named tables in that schema. Resolves source identities under the mutation lock without a preview or revision. Repeating the same selection is safe; a different existing selection is rejected. Schema selection excludes future tables; selected partition roots include future partitions. Acceptance does not imply completed synchronization.
+     *
+     *     This endpoint is currently in its **Alpha** stage.
+     */
+    post: operations['v2-enable-warehouse']
+    delete?: never
+    options?: never
+    head?: never
+    patch?: never
+    trace?: never
+  }
+  '/v2/projects/{ref}/warehouse/query-stats': {
+    parameters: {
+      query?: never
+      header?: never
+      path?: never
+      cookie?: never
+    }
+    /**
+     * Inspect Warehouse workload query statistics
+     * @description Returns aggregate workload measurements over a bounded time range, using the project’s stored Warehouse placement. Use since or both from and to; the default is the last 30 minutes. Each measurement includes its definition, unit, aggregation, requested and effective ranges, rate_window_seconds, source-sample freshness, availability, and full series with dimension labels. Point timestamps are evaluation times; last_sample_at is the original source-sample time. Rates and latency quantiles describe the effective rate window at each point, not the entire requested range. Do not average interval percentiles into a whole-range percentile. Executor invocations include metadata/schema work and are not counts of user SQL statements. Timeouts are included in errors; cancellation is separate. Missing and unavailable values remain null. No query history, individual-query attribution, raw queries, or backend selectors are exposed. Each request returns up to eight measurements. A failure of one measurement does not discard the other results.
+     *
+     *     This endpoint is currently in its **Alpha** stage.
+     */
+    get: operations['v2-get-warehouse-query-stats']
+    put?: never
+    post?: never
+    delete?: never
+    options?: never
+    head?: never
+    patch?: never
+    trace?: never
+  }
+  '/v2/projects/{ref}/warehouse/setups': {
+    parameters: {
+      query?: never
+      header?: never
+      path?: never
+      cookie?: never
+    }
+    get?: never
+    put?: never
+    /**
+     * Set up Warehouse or replace its replication selection
+     * @description Replaces the full selection, preserving existing placement and destination settings. Resolves source identities under the mutation lock. Empty selections asynchronously disable Warehouse while retaining data. FDW installation is opt-in. Acceptance does not imply completed synchronization.
+     *
+     *     This endpoint is currently in its **Alpha** stage.
+     */
+    post: operations['v2-create-warehouse-setup']
+    delete?: never
+    options?: never
+    head?: never
+    patch?: never
+    trace?: never
+  }
+  '/v2/projects/{ref}/warehouse/setups/current': {
+    parameters: {
+      query?: never
+      header?: never
+      path?: never
+      cookie?: never
+    }
+    /**
+     * Get Warehouse initial synchronization status
+     * @description Returns setup phases, linked tables, pipeline and routing state, cleanup errors, and optional FDW inspection. Set inspect_fdw=false to skip database FDW inspection. A null table replication_state means no observation is available. Status succeeded requires initial copy, a running pipeline and ready routing; it does not verify query connectivity. Pass the selection_id returned by enable to reject a changed selection while waiting.
+     *
+     *     This endpoint is currently in its **Alpha** stage.
+     */
+    get: operations['v2-get-warehouse-setup']
+    put?: never
+    post?: never
+    delete?: never
+    options?: never
+    head?: never
+    patch?: never
+    trace?: never
+  }
+  '/v2/projects/{ref}/warehouse/status': {
+    parameters: {
+      query?: never
+      header?: never
+      path?: never
+      cookie?: never
+    }
+    /**
+     * Get consolidated Warehouse status and capabilities
+     * @description Returns provisioning, configured compute, replication, cleanup lifecycle and supported capabilities, including when individual dependencies are unavailable. Enabled Warehouse state is independent of the selected table count. Readiness is inferred from configuration and replication; query connectivity is not checked. Does not inspect the FDW. Observation timestamps are retrieval times, separate from table sync lag, pipeline apply lag and feedback age. Read access remains available without a replication entitlement; mutation endpoints enforce their own entitlements and permissions.
+     *
+     *     This endpoint is currently in its **Alpha** stage.
+     */
+    get: operations['v2-get-warehouse-status']
+    put?: never
+    post?: never
+    delete?: never
+    options?: never
+    head?: never
+    patch?: never
+    trace?: never
+  }
+  '/v2/projects/{ref}/warehouse/tables': {
+    parameters: {
+      query?: never
+      header?: never
+      path?: never
+      cookie?: never
+    }
+    /**
+     * List tables replicated to Warehouse
+     * @description Lists the source tables selected for Warehouse replication with their replication status and freshness, from the same observations as the Warehouse status. Freshness comes from the replication slot that carries each table: its own sync slot until it follows changes, then the pipeline apply slot; one slot never stands in for the other. lag_ms is that slot's flush lag. Postgres reports no lag time for a caught-up slot without new WAL, so lag_ms can be null while replication_feedback.flush_lag_bytes is 0; neither is ever filled with zero when unknown. observed_at is when the API read the replication state, not when data last synchronized. A stopped, failed or unreadable pipeline reports its tables as stopped or unknown rather than live, and keeps each table's last recorded state. Returns an empty list when Warehouse is not set up, its publication is missing, or it is being disabled or failed to clean up.
+     *
+     *     This endpoint is currently in its **Alpha** stage.
+     */
+    get: operations['v2-list-warehouse-tables']
+    put?: never
+    post?: never
+    delete?: never
+    options?: never
+    head?: never
+    patch?: never
+    trace?: never
+  }
+  '/v2/projects/{ref}/warehouse/tables/{table_id}': {
+    parameters: {
+      query?: never
+      header?: never
+      path?: never
+      cookie?: never
+    }
+    /**
+     * Get a table replicated to Warehouse
+     * @description Returns one source table selected for Warehouse replication by its source OID, from the same observations and with the same status and freshness attributes as the Warehouse tables list. Returns 404 when the table is not selected for replication, including when Warehouse is not set up, its publication is missing, or it is being disabled.
+     *
+     *     This endpoint is currently in its **Alpha** stage.
+     */
+    get: operations['v2-get-warehouse-table']
+    put?: never
+    post?: never
+    delete?: never
+    options?: never
+    head?: never
+    patch?: never
+    trace?: never
+  }
+  '/v2/projects/{ref}/warehouse/tables/{table_id}/layout': {
+    parameters: {
+      query?: never
+      header?: never
+      path?: never
+      cookie?: never
+    }
+    /**
+     * Get the layout of a table replicated to Warehouse
+     * @description Returns the sorting and partitioning rules saved for one replicated table, by source OID, beside the layout the DuckLake catalog records for it. The two are reported separately and can differ: the replicator applies saved rules when it starts and then hourly, and a stopped pipeline applies them on its next start. observation_status reports whether the catalog was read; desired rules are returned even when it was not. A catalog layout governs files written after it changes and does not establish that existing files are sorted or partitioned. Returns 404 when the table is not replicated, including when Warehouse is not set up, is being disabled or failed to clean up.
+     *
+     *     This endpoint is currently in its **Alpha** stage.
+     */
+    get: operations['v2-get-warehouse-table-layout']
+    put?: never
+    post?: never
+    delete?: never
+    options?: never
+    head?: never
+    /**
+     * Update the layout of a table replicated to Warehouse
+     * @description Updates saved sorting and partitioning rules for one source table object identifier (OID). Provide sort_by or partition_by; empty and reset-only patches are rejected. Omitted settings are preserved. Null makes a setting unmanaged. An empty partition list clears partitioning, and the none sort selector clears sorting. The backend validates the source schema and preserves other tables. When the layout changes, an active pipeline is restarted. A stopped pipeline stays stopped. reset_table defaults to false, preserving historical files and replication progress. When the layout changes, --reset-table resets the table and copies it again. This requires initial sync to be enabled. Reads are disrupted during the copy. An unchanged layout never restarts the pipeline or resets the table. Acceptance and application_status report orchestration. Run warehouse tables layout get to compare the desired and observed rules. Run warehouse tables get to check table replication status. These reads do not establish completion of this specific update. There is no revision, idempotency, resolved preview, or durable operation contract. A failed update can leave partial effects, including a completed reset. Inspect the saved layout, pipeline, and table state before retrying.
+     *
+     *     This endpoint is currently in its **Alpha** stage.
+     */
+    patch: operations['v2-update-warehouse-table-layout']
+    trace?: never
+  }
+  '/v2/projects/{ref}/warehouse/teardowns/current': {
+    parameters: {
+      query?: never
+      header?: never
+      path?: never
+      cookie?: never
+    }
+    /**
+     * Get Warehouse cleanup status
+     * @description Reads the current durable cleanup state without contacting ETL or inspecting the FDW. Disabling means cleanup is in progress; disabled means cleanup completed; deletion_failed means cleanup may be partial. The original data policy and failure reason remain available. Optionally supply operation_id to observe a specific disable attempt. Returns a conflict if no cleanup state is available or the supplied identity does not match the current operation.
+     *
+     *     This endpoint is currently in its **Alpha** stage.
+     */
+    get: operations['v2-get-warehouse-teardown']
+    put?: never
+    post?: never
     delete?: never
     options?: never
     head?: never
@@ -846,6 +1133,14 @@ export interface components {
         | 'request_too_large'
         | 'unauthorized'
         | 'validation_failed'
+        | 'warehouse_selection_empty'
+        | 'warehouse_selection_conflict'
+        | 'warehouse_selection_changed'
+        | 'warehouse_lifecycle_conflict'
+        | 'warehouse_setup_invalid'
+        | 'warehouse_not_found'
+        | 'warehouse_metrics_unavailable'
+        | 'warehouse_setup_unavailable'
         | 'agentic_credential_not_found'
         | 'backup_unsupported'
         | 'branch_admin_required'
@@ -1595,6 +1890,14 @@ export interface components {
           | 'request_too_large'
           | 'unauthorized'
           | 'validation_failed'
+          | 'warehouse_selection_empty'
+          | 'warehouse_selection_conflict'
+          | 'warehouse_selection_changed'
+          | 'warehouse_lifecycle_conflict'
+          | 'warehouse_setup_invalid'
+          | 'warehouse_not_found'
+          | 'warehouse_metrics_unavailable'
+          | 'warehouse_setup_unavailable'
           | 'agentic_credential_not_found'
           | 'backup_unsupported'
           | 'branch_admin_required'
@@ -2291,6 +2594,7 @@ export interface components {
             | 'PAUSE_FAILED'
             | 'RESIZING'
             | 'PROMOTING'
+            | 'RIGHTSIZING'
         }
         /**
          * @description Project ref
@@ -2979,6 +3283,1214 @@ export interface components {
          * @enum {string}
          */
         type: 'notebook'
+      }
+    }
+    V2WarehouseCapacityResponse_Output: {
+      data: {
+        attributes: {
+          /** @enum {string} */
+          aggregation: 'rate' | 'sum' | 'mean' | 'p50' | 'p95' | 'p99' | 'occupied'
+          /** @enum {string} */
+          availability:
+            | 'ok'
+            | 'partial'
+            | 'stale'
+            | 'no_data'
+            | 'insufficient_data'
+            | 'not_provisioned'
+            | 'disabled'
+            | 'unavailable'
+          definition: string
+          effective: {
+            end: number
+            rate_window_seconds: number
+            start: number
+            step: number
+          }
+          /** @description Latest observed source sample timestamp in Unix seconds; not the query evaluation timestamp. */
+          last_sample_at: number | null
+          /** @enum {string} */
+          metric:
+            | 'query_rate'
+            | 'query_error_rate'
+            | 'query_timeout_rate'
+            | 'query_canceled_rate'
+            | 'query_duration_mean'
+            | 'query_duration_p50'
+            | 'query_duration_p95'
+            | 'query_duration_p99'
+            | 'duckdb_duration_mean'
+            | 'assignment_wait_mean'
+            | 'assignment_wait_p95'
+            | 'query_in_flight'
+            | 'admission_rejection_rate'
+            | 'worker_admission_limit'
+            | 'worker_admission_active'
+            | 'worker_admission_pending'
+            | 'worker_admission_occupied'
+            | 'activation_rate'
+            | 'activation_duration_mean'
+            | 'activation_duration_p95'
+            | 'rpc_rate'
+            | 'rpc_duration_mean'
+            | 'rpc_duration_p95'
+          project_ref: string
+          requested: {
+            end: number
+            /** @enum {string} */
+            metric:
+              | 'query_rate'
+              | 'query_error_rate'
+              | 'query_timeout_rate'
+              | 'query_canceled_rate'
+              | 'query_duration_mean'
+              | 'query_duration_p50'
+              | 'query_duration_p95'
+              | 'query_duration_p99'
+              | 'duckdb_duration_mean'
+              | 'assignment_wait_mean'
+              | 'assignment_wait_p95'
+              | 'query_in_flight'
+              | 'admission_rejection_rate'
+              | 'worker_admission_limit'
+              | 'worker_admission_active'
+              | 'worker_admission_pending'
+              | 'worker_admission_occupied'
+              | 'activation_rate'
+              | 'activation_duration_mean'
+              | 'activation_duration_p95'
+              | 'rpc_rate'
+              | 'rpc_duration_mean'
+              | 'rpc_duration_p95'
+            start: number
+            step?: number
+          }
+          scrape_interval_seconds: number
+          series: {
+            /** @description Grid point coverage, not proof that every worker was scraped. */
+            coverage: {
+              expected_points: number
+              returned_points: number
+            }
+            labels: {
+              [key: string]: string
+            }
+            points: {
+              timestamp: number
+              value: number | null
+            }[]
+          }[]
+          /** @enum {string} */
+          unit: 'per_second' | 'seconds' | 'queries' | 'grants'
+        }
+        /** @enum {string} */
+        id:
+          | 'query_rate'
+          | 'query_error_rate'
+          | 'query_timeout_rate'
+          | 'query_canceled_rate'
+          | 'query_duration_mean'
+          | 'query_duration_p50'
+          | 'query_duration_p95'
+          | 'query_duration_p99'
+          | 'duckdb_duration_mean'
+          | 'assignment_wait_mean'
+          | 'assignment_wait_p95'
+          | 'query_in_flight'
+          | 'admission_rejection_rate'
+          | 'worker_admission_limit'
+          | 'worker_admission_active'
+          | 'worker_admission_pending'
+          | 'worker_admission_occupied'
+          | 'activation_rate'
+          | 'activation_duration_mean'
+          | 'activation_duration_p95'
+          | 'rpc_rate'
+          | 'rpc_duration_mean'
+          | 'rpc_duration_p95'
+        /**
+         * @description Resource type.
+         * @enum {string}
+         */
+        type: 'warehouse_metric'
+      }[]
+    }
+    V2WarehouseConnectionResponse_Output: {
+      data: {
+        attributes: {
+          /** @enum {string} */
+          access_mode: 'read_only'
+          /** @description How to authenticate. No credentials are returned; the password is never exposed by this API. */
+          authentication: {
+            /** @enum {string} */
+            credential_source: 'source_project_database'
+            /** @enum {string} */
+            default_username: 'postgres'
+            membership_guidance: string
+            /** @enum {string} */
+            method: 'database_username_password'
+            password_guidance: string
+            /** @enum {string} */
+            required_membership: 'supabase_warehouse_reader'
+          }
+          /** @description Arrow Flight SQL URI, grpc+tls://<host>:443. Null unless status is available or pending. */
+          endpoint: string | null
+          /** @description Public hostname of the Flight SQL endpoint. Null unless status is available or pending. */
+          host: string | null
+          /**
+           * Format: date-time
+           * @description Time the API retrieved this information. This timestamp does not indicate when connectivity was last verified.
+           */
+          observed_at: string
+          /** @description Public TLS port of the Flight SQL endpoint. Null unless status is available or pending. */
+          port: number | null
+          /**
+           * @description Project ref
+           * @example abcdefghijklmnopqrst
+           */
+          project_ref: string
+          /** @enum {string} */
+          protocol: 'arrow_flight_sql'
+          /** @enum {string} */
+          query_connectivity: 'not_checked'
+          /** @description Assigned Warehouse compute region, which may differ from the source database region. Null when the project has no project-specific route. */
+          region: string | null
+          /**
+           * @description DNS delivery status of the project route. Null when the project uses the shared legacy route.
+           * @enum {string|null}
+           */
+          routing_status: 'pending' | 'ready' | 'error' | 'removed' | null
+          /**
+           * @description Configured availability of the Warehouse endpoint, derived from routing and lifecycle state. It is not a connectivity probe: a ready route does not prove a query will succeed.
+           * @enum {string}
+           */
+          status:
+            | 'available'
+            | 'pending'
+            | 'not_configured'
+            | 'disabling'
+            | 'disabled'
+            | 'unavailable'
+          /** @enum {boolean} */
+          tls_required: true
+          /**
+           * @description Why the endpoint is unavailable. Null unless status is unavailable.
+           * @enum {string|null}
+           */
+          unavailable_reason:
+            | 'assignment_unavailable'
+            | 'routing_failed'
+            | 'observation_unavailable'
+            | 'cleanup_failed'
+            | null
+        }
+        /**
+         * @description Project ref
+         * @example abcdefghijklmnopqrst
+         */
+        id: string
+        /**
+         * @description Resource type.
+         * @enum {string}
+         */
+        type: 'warehouse_connection'
+      }
+    }
+    V2WarehouseContextResponse_Output: {
+      data: {
+        attributes: {
+          /** @description Complete operations supported by this API, not caller authorization. Each operation still requires its feature, entitlement and project permission checks. */
+          capabilities: {
+            context: boolean
+            query_explain: boolean
+            replication_add: boolean
+            replication_remove: boolean
+            table_layout_read: boolean
+            table_layout_update: boolean
+            table_resync: boolean
+            workload_metrics: boolean
+          }
+          /** @description Configured Warehouse compute and region, which may differ from the source database region. Live availability and capacity are not reported. */
+          compute: {
+            /**
+             * Format: date-time
+             * @description Time the API retrieved this information. This timestamp does not indicate when data was measured or last synchronized.
+             */
+            observed_at: string | null
+            region: string | null
+            /** @enum {string|null} */
+            routing_status: 'pending' | 'ready' | 'error' | 'removed' | null
+            /** @enum {string} */
+            status: 'available' | 'unavailable' | 'not_provisioned'
+            /** @enum {string|null} */
+            unavailable_reason:
+              | 'assignment_unavailable'
+              | 'observation_unavailable'
+              | 'identity_mismatch'
+              | 'cleanup_in_progress'
+              | 'cleanup_failed'
+              | null
+          }
+          /**
+           * @description Readiness inferred from configuration and replication observations; no query is executed.
+           * @enum {string}
+           */
+          configured_readiness: 'ready' | 'not_ready' | 'unavailable'
+          /** @description Whether Warehouse is enabled, independently of selected table count. Null means provisioning could not be determined. */
+          enabled: boolean | null
+          lifecycle: {
+            delete_data: boolean
+            /** @enum {string} */
+            status: 'disabling' | 'disabled' | 'deletion_failed'
+            /** Format: date-time */
+            updated_at: string
+          } | null
+          /** Format: date-time */
+          observed_at: string
+          pipeline: {
+            id: string
+            /**
+             * Format: date-time
+             * @description Time the API retrieved this information. This timestamp does not indicate when data was measured or last synchronized.
+             */
+            observed_at: string | null
+            /** @enum {string} */
+            status:
+              | 'stopped'
+              | 'starting'
+              | 'started'
+              | 'stopping'
+              | 'unknown'
+              | 'failed'
+              | 'unavailable'
+            /** @enum {string|null} */
+            unavailable_reason:
+              | 'assignment_unavailable'
+              | 'observation_unavailable'
+              | 'identity_mismatch'
+              | 'cleanup_in_progress'
+              | 'cleanup_failed'
+              | null
+          } | null
+          /**
+           * @description Project ref
+           * @example abcdefghijklmnopqrst
+           */
+          project_ref: string
+          /** @enum {string} */
+          query_connectivity: 'not_checked'
+          replication: {
+            /** @description Postgres replication feedback. Null means Postgres reported no value; lag times also become null shortly after a caught-up slot sees no new WAL, while flush_lag_bytes, the WAL not yet confirmed flushed, reads 0. Feedback age measures time since the last response and does not establish how current query results are. */
+            apply_lag: {
+              active: boolean
+              feedback_age_ms: number | null
+              flush_lag_bytes: number | null
+              flush_lag_ms: number | null
+              /** @enum {string|null} */
+              wal_status: 'reserved' | 'extended' | 'unreserved' | 'lost' | 'unknown' | null
+              write_lag_ms: number | null
+            } | null
+            /**
+             * Format: date-time
+             * @description Time the API retrieved this information. This timestamp does not indicate when data was measured or last synchronized.
+             */
+            observed_at: string | null
+            /** @enum {string} */
+            status: 'available' | 'unavailable' | 'not_provisioned' | 'not_started' | 'stopped'
+            /** @enum {string|null} */
+            unavailable_reason:
+              | 'assignment_unavailable'
+              | 'observation_unavailable'
+              | 'identity_mismatch'
+              | 'cleanup_in_progress'
+              | 'cleanup_failed'
+              | null
+          }
+          /**
+           * @description Warehouse setup and replication status. Ready means the Warehouse connection is configured and tables are replicating ongoing changes. It does not guarantee that a query will succeed.
+           * @enum {string}
+           */
+          status:
+            | 'not_provisioned'
+            | 'disabled'
+            | 'disabling'
+            | 'starting'
+            | 'ready'
+            | 'stopped'
+            | 'stopping'
+            | 'degraded'
+            | 'unavailable'
+          tables: {
+            items: {
+              id: number
+              name: string
+              /** @enum {string|null} */
+              replication_state:
+                | 'queued'
+                | 'copying_table'
+                | 'copied_table'
+                | 'following_wal'
+                | 'error'
+                | null
+              schema: string
+              /** @description Postgres replication feedback. Null means Postgres reported no value; lag times also become null shortly after a caught-up slot sees no new WAL, while flush_lag_bytes, the WAL not yet confirmed flushed, reads 0. Feedback age measures time since the last response and does not establish how current query results are. */
+              sync_lag: {
+                active: boolean
+                feedback_age_ms: number | null
+                flush_lag_bytes: number | null
+                flush_lag_ms: number | null
+                /** @enum {string|null} */
+                wal_status: 'reserved' | 'extended' | 'unreserved' | 'lost' | 'unknown' | null
+                write_lag_ms: number | null
+              } | null
+            }[]
+            /**
+             * Format: date-time
+             * @description Time the API retrieved this information. This timestamp does not indicate when data was measured or last synchronized.
+             */
+            observed_at: string | null
+            /** @enum {string} */
+            status: 'available' | 'unavailable' | 'not_provisioned'
+            /** @enum {string|null} */
+            unavailable_reason:
+              | 'assignment_unavailable'
+              | 'observation_unavailable'
+              | 'identity_mismatch'
+              | 'cleanup_in_progress'
+              | 'cleanup_failed'
+              | null
+          }
+        }
+        /**
+         * @description Project ref
+         * @example abcdefghijklmnopqrst
+         */
+        id: string
+        /**
+         * @description Resource type.
+         * @enum {string}
+         */
+        type: 'warehouse_context'
+      }
+    }
+    V2WarehouseEnableAcceptedResponse_Output: {
+      data: {
+        attributes: {
+          /** @enum {boolean} */
+          accepted: true
+          /**
+           * @description Warehouse replication pipeline ID, or null when Warehouse disable has been requested
+           * @example 03dg2o5teb2eucxr9ggh3uie6
+           */
+          pipeline_id: string | null
+          selected_tables: {
+            id: number
+            name: string
+            schema: string
+          }[]
+          /** @description Identity of the accepted selection. Pass to the current setup read to reject a changed selection while waiting. */
+          selection_id: string
+          /** @description Tables with Warehouse copies */
+          tables: {
+            /**
+             * @description DuckLake table path with individually quoted identifiers, including the configured project namespace when present
+             * @example "abcjuqabhgwjjutfvtpa"."public"."orders"
+             */
+            copy_name: string
+            /**
+             * @description Replication lag in milliseconds, when available
+             * @example 12000
+             */
+            lag_ms?: number
+            /**
+             * Format: date-time
+             * @description Last sync timestamp, when available
+             * @example 2026-06-23T17:48:00Z
+             */
+            last_synced_at?: string
+            /**
+             * @description Postgres table name
+             * @example orders
+             */
+            name: string
+            /**
+             * @description Postgres schema name
+             * @example public
+             */
+            schema: string
+            /**
+             * @description Warehouse copy sync state derived from replication status
+             * @example live
+             * @enum {string}
+             */
+            state: 'syncing' | 'live' | 'error'
+            /**
+             * @description Warehouse table size in bytes, when available
+             * @example 197912092672
+             */
+            warehouse_size_bytes?: number
+          }[]
+        }
+        id: string
+        /**
+         * @description Resource type.
+         * @enum {string}
+         */
+        type: 'warehouse_setup'
+      }
+    }
+    V2WarehouseEnableRequest: {
+      data: {
+        attributes: {
+          /**
+           * @description Supabase project to use for both the DuckLake PostgreSQL catalog and Supabase Storage. Defaults to this project on first setup and to the configured destination on later requests. The destination must be active and healthy, and another project requires SQL and Storage admin write permissions. An existing destination cannot be changed through setup. Ignored when targets is empty.
+           * @example zyxwvutsrqponmlkjihg
+           */
+          destination_project_ref?: string
+          /**
+           * @description Whether to configure and install the Warehouse FDW in the project database. Defaults to false. Ignored when targets is empty.
+           * @example false
+           */
+          install_fdw?: boolean
+          /**
+           * @description Source PostgreSQL schema. Without tables, selects its currently eligible tables only.
+           * @example public
+           */
+          schema: string
+          /** @description Table names in schema. Omit to select the currently eligible tables in that schema. */
+          tables?: string[]
+          /**
+           * @description Optional Warehouse compute region, independent of the source and catalog regions. Defaults to the existing assignment, or ap-southeast-1 in staging and eu-west-1 in production for a new assignment. DNS routing requires a registered cluster in that environment. Unsupported regions and changes to an existing assignment are rejected. Ignored when targets is empty.
+           * @example ap-southeast-1
+           */
+          warehouse_region?: string
+        }
+        /**
+         * @description Resource type.
+         * @enum {string}
+         */
+        type: 'warehouse_setup'
+      }
+    }
+    V2WarehouseQueryStatsResponse_Output: {
+      data: {
+        attributes: {
+          /** @enum {string} */
+          aggregation: 'rate' | 'sum' | 'mean' | 'p50' | 'p95' | 'p99' | 'occupied'
+          /** @enum {string} */
+          availability:
+            | 'ok'
+            | 'partial'
+            | 'stale'
+            | 'no_data'
+            | 'insufficient_data'
+            | 'not_provisioned'
+            | 'disabled'
+            | 'unavailable'
+          definition: string
+          effective: {
+            end: number
+            rate_window_seconds: number
+            start: number
+            step: number
+          }
+          /** @description Latest observed source sample timestamp in Unix seconds; not the query evaluation timestamp. */
+          last_sample_at: number | null
+          /** @enum {string} */
+          metric:
+            | 'query_rate'
+            | 'query_error_rate'
+            | 'query_timeout_rate'
+            | 'query_canceled_rate'
+            | 'query_duration_mean'
+            | 'query_duration_p50'
+            | 'query_duration_p95'
+            | 'query_duration_p99'
+            | 'duckdb_duration_mean'
+            | 'assignment_wait_mean'
+            | 'assignment_wait_p95'
+            | 'query_in_flight'
+            | 'admission_rejection_rate'
+            | 'worker_admission_limit'
+            | 'worker_admission_active'
+            | 'worker_admission_pending'
+            | 'worker_admission_occupied'
+            | 'activation_rate'
+            | 'activation_duration_mean'
+            | 'activation_duration_p95'
+            | 'rpc_rate'
+            | 'rpc_duration_mean'
+            | 'rpc_duration_p95'
+          project_ref: string
+          requested: {
+            end: number
+            /** @enum {string} */
+            metric:
+              | 'query_rate'
+              | 'query_error_rate'
+              | 'query_timeout_rate'
+              | 'query_canceled_rate'
+              | 'query_duration_mean'
+              | 'query_duration_p50'
+              | 'query_duration_p95'
+              | 'query_duration_p99'
+              | 'duckdb_duration_mean'
+              | 'assignment_wait_mean'
+              | 'assignment_wait_p95'
+              | 'query_in_flight'
+              | 'admission_rejection_rate'
+              | 'worker_admission_limit'
+              | 'worker_admission_active'
+              | 'worker_admission_pending'
+              | 'worker_admission_occupied'
+              | 'activation_rate'
+              | 'activation_duration_mean'
+              | 'activation_duration_p95'
+              | 'rpc_rate'
+              | 'rpc_duration_mean'
+              | 'rpc_duration_p95'
+            start: number
+            step?: number
+          }
+          scrape_interval_seconds: number
+          series: {
+            /** @description Grid point coverage, not proof that every worker was scraped. */
+            coverage: {
+              expected_points: number
+              returned_points: number
+            }
+            labels: {
+              [key: string]: string
+            }
+            points: {
+              timestamp: number
+              value: number | null
+            }[]
+          }[]
+          /** @enum {string} */
+          unit: 'per_second' | 'seconds' | 'queries' | 'grants'
+        }
+        /** @enum {string} */
+        id:
+          | 'query_rate'
+          | 'query_error_rate'
+          | 'query_timeout_rate'
+          | 'query_canceled_rate'
+          | 'query_duration_mean'
+          | 'query_duration_p50'
+          | 'query_duration_p95'
+          | 'query_duration_p99'
+          | 'duckdb_duration_mean'
+          | 'assignment_wait_mean'
+          | 'assignment_wait_p95'
+          | 'query_in_flight'
+          | 'admission_rejection_rate'
+          | 'worker_admission_limit'
+          | 'worker_admission_active'
+          | 'worker_admission_pending'
+          | 'worker_admission_occupied'
+          | 'activation_rate'
+          | 'activation_duration_mean'
+          | 'activation_duration_p95'
+          | 'rpc_rate'
+          | 'rpc_duration_mean'
+          | 'rpc_duration_p95'
+        /**
+         * @description Resource type.
+         * @enum {string}
+         */
+        type: 'warehouse_metric'
+      }[]
+    }
+    V2WarehouseSetupAcceptedResponse_Output: {
+      data: {
+        attributes: {
+          /** @enum {boolean} */
+          accepted: true
+          /**
+           * @description Warehouse replication pipeline ID, or null when Warehouse disable has been requested
+           * @example 03dg2o5teb2eucxr9ggh3uie6
+           */
+          pipeline_id: string | null
+          selected_tables: {
+            id: number
+            name: string
+            schema: string
+          }[]
+          /** @description Tables with Warehouse copies */
+          tables: {
+            /**
+             * @description DuckLake table path with individually quoted identifiers, including the configured project namespace when present
+             * @example "abcjuqabhgwjjutfvtpa"."public"."orders"
+             */
+            copy_name: string
+            /**
+             * @description Replication lag in milliseconds, when available
+             * @example 12000
+             */
+            lag_ms?: number
+            /**
+             * Format: date-time
+             * @description Last sync timestamp, when available
+             * @example 2026-06-23T17:48:00Z
+             */
+            last_synced_at?: string
+            /**
+             * @description Postgres table name
+             * @example orders
+             */
+            name: string
+            /**
+             * @description Postgres schema name
+             * @example public
+             */
+            schema: string
+            /**
+             * @description Warehouse copy sync state derived from replication status
+             * @example live
+             * @enum {string}
+             */
+            state: 'syncing' | 'live' | 'error'
+            /**
+             * @description Warehouse table size in bytes, when available
+             * @example 197912092672
+             */
+            warehouse_size_bytes?: number
+          }[]
+        }
+        id: string
+        /**
+         * @description Resource type.
+         * @enum {string}
+         */
+        type: 'warehouse_setup'
+      }
+    }
+    V2WarehouseSetupRequest: {
+      data: {
+        attributes: {
+          /**
+           * @description Supabase project to use for both the DuckLake PostgreSQL catalog and Supabase Storage. Defaults to this project on first setup and to the configured destination on later requests. The destination must be active and healthy, and another project requires SQL and Storage admin write permissions. An existing destination cannot be changed through setup. Ignored when targets is empty.
+           * @example zyxwvutsrqponmlkjihg
+           */
+          destination_project_ref?: string
+          /**
+           * @description Whether to configure and install the Warehouse FDW in the project database. Defaults to false. Ignored when targets is empty.
+           * @example false
+           */
+          install_fdw?: boolean
+          /** @description Complete selection of schemas and individual tables to copy, replacing the previous selection. Schema targets expand to the eligible tables present when the request is processed. An empty array asynchronously disables Warehouse while retaining its data. Prefer DELETE to disable Warehouse; poll setup-status for completion. */
+          targets: (
+            | {
+                /**
+                 * @description Postgres schema whose currently eligible tables should be copied
+                 * @example public
+                 */
+                schema: string
+                /** @enum {string} */
+                type: 'schema'
+              }
+            | {
+                /**
+                 * @description Postgres table name
+                 * @example orders
+                 */
+                name: string
+                /**
+                 * @description Postgres schema name
+                 * @example public
+                 */
+                schema: string
+                /** @enum {string} */
+                type: 'table'
+              }
+          )[]
+          /**
+           * @description Optional Warehouse compute region, independent of the source and catalog regions. Defaults to the existing assignment, or ap-southeast-1 in staging and eu-west-1 in production for a new assignment. DNS routing requires a registered cluster in that environment. Unsupported regions and changes to an existing assignment are rejected. Ignored when targets is empty.
+           * @example ap-southeast-1
+           */
+          warehouse_region?: string
+        }
+        /**
+         * @description Resource type.
+         * @enum {string}
+         */
+        type: 'warehouse_setup'
+      }
+    }
+    V2WarehouseSetupStatusResponse_Output: {
+      data: {
+        attributes: {
+          /** @description Whether the current disable request deletes DuckLake data. */
+          delete_data?: boolean
+          /** @description Warehouse DNS delivery status. Ready means the DNS API accepted the route; client DNS caches may still be updating. */
+          dns?: {
+            hostname: string
+            region: string
+            /** @enum {string} */
+            status: 'pending' | 'ready' | 'error' | 'removed'
+          }
+          /** @description Warehouse cleanup failure, when present. */
+          error?: string
+          /** @description Project database FDW setup markers; null during or after teardown, when setup inspection is inapplicable. */
+          fdw_status: {
+            /**
+             * @description Whether fdw_warehouse is available to install on the project database instance
+             * @example true
+             */
+            extension_available: boolean
+            /**
+             * @description Whether the fdw_warehouse extension exists in the project database
+             * @example true
+             */
+            extension_installed: boolean
+            /**
+             * @description Whether the Warehouse foreign schema import has exposed the Warehouse snapshots table
+             * @example true
+             */
+            foreign_schema_imported: boolean
+            /**
+             * @description Whether the local Warehouse schema exists in the project database
+             * @example true
+             */
+            schema_created: boolean
+            /**
+             * @description Whether the Warehouse foreign server exists in the project database
+             * @example true
+             */
+            server_configured: boolean
+            /**
+             * @description Whether the Warehouse foreign data wrapper exists in the project database
+             * @example true
+             */
+            wrapper_installed: boolean
+          } | null
+          /**
+           * @description Warehouse replication pipeline ID when it exists
+           * @example 03dg2o5teb2eucxr9ggh3uie6
+           */
+          pipeline_id?: string
+          replication_state: string
+          /**
+           * @description Overall Warehouse lifecycle status, using persisted state during teardown and replication state during setup
+           * @example copying
+           * @enum {string}
+           */
+          setup_status:
+            | 'not_started'
+            | 'setting_up'
+            | 'copying'
+            | 'complete'
+            | 'error'
+            | 'disabling'
+            | 'disabled'
+            | 'deletion_failed'
+          /**
+           * @description Current enablement readiness. Success requires initial copy, a running pipeline and ready routing; this is not a historical operation result or a query connectivity check.
+           * @enum {string}
+           */
+          status: 'running' | 'succeeded' | 'failed'
+          /** @description Reason current enablement readiness failed. Separate from Studio setup or cleanup errors. */
+          status_error?: string
+          /** @description Warehouse setup phases in execution order */
+          steps: {
+            /**
+             * @description Best-effort progress or error message derived from Warehouse state
+             * @example Pending initial copy: public.orders:copying_table
+             */
+            message?: string
+            /**
+             * @description Observable Warehouse setup phase
+             * @example warehouse_copy
+             * @enum {string}
+             */
+            name: 'warehouse_pipeline' | 'warehouse_copy' | 'warehouse_fdw'
+            /**
+             * @description Derived Warehouse setup step status
+             * @example running
+             * @enum {string}
+             */
+            status: 'waiting' | 'running' | 'completed' | 'skipped' | 'error'
+          }[]
+          tables: {
+            /**
+             * @description DuckLake table path with individually quoted identifiers, including the configured project namespace when present
+             * @example "abcjuqabhgwjjutfvtpa"."public"."orders"
+             */
+            copy_name: string
+            id: number
+            /**
+             * @description Replication lag in milliseconds, when available
+             * @example 12000
+             */
+            lag_ms?: number
+            /**
+             * Format: date-time
+             * @description Last sync timestamp, when available
+             * @example 2026-06-23T17:48:00Z
+             */
+            last_synced_at?: string
+            /**
+             * @description Postgres table name
+             * @example orders
+             */
+            name: string
+            replication_state: string | null
+            /**
+             * @description Postgres schema name
+             * @example public
+             */
+            schema: string
+            /**
+             * @description Warehouse copy sync state derived from replication status
+             * @example live
+             * @enum {string}
+             */
+            state: 'syncing' | 'live' | 'error'
+            /**
+             * @description Warehouse table size in bytes, when available
+             * @example 197912092672
+             */
+            warehouse_size_bytes?: number
+          }[]
+        }
+        id: string
+        /**
+         * @description Resource type.
+         * @enum {string}
+         */
+        type: 'warehouse_setup'
+      }
+    }
+    V2WarehouseTableLayoutResponse_Output: {
+      data: {
+        attributes: {
+          /** @description Backend orchestration state. Runtime acceptance does not establish that the desired layout has been observed in the catalog. */
+          application_status: string
+          /** @description Saved layout rules. The replicator applies them on start and hourly, so they can differ from the observed layout. */
+          desired: {
+            /** @description Configured partition keys in order. An empty list explicitly clears partitioning; null leaves it unmanaged. */
+            partition_by:
+              | {
+                  /** @description Source column name. */
+                  column: string
+                  transform:
+                    | {
+                        /** @enum {string} */
+                        kind: 'identity'
+                      }
+                    | {
+                        /** @enum {string} */
+                        kind: 'year'
+                      }
+                    | {
+                        /** @enum {string} */
+                        kind: 'month'
+                      }
+                    | {
+                        /** @enum {string} */
+                        kind: 'day'
+                      }
+                    | {
+                        /** @enum {string} */
+                        kind: 'hour'
+                      }
+                    | {
+                        /** @description Number of hash buckets. */
+                        count: number
+                        /** @enum {string} */
+                        kind: 'bucket'
+                      }
+                }[]
+              | null
+            /** @description Configured sort order. none explicitly clears sorting, primary_key sorts by the source primary-key columns in key order, and columns lists them. Null leaves sorting unmanaged. */
+            sort_by:
+              | (
+                  | {
+                      /** @enum {string} */
+                      kind: 'none'
+                    }
+                  | {
+                      /** @enum {string} */
+                      kind: 'primary_key'
+                    }
+                  | {
+                      columns: {
+                        /** @enum {string} */
+                        direction: 'asc' | 'desc'
+                        /** @description Source column name. */
+                        name: string
+                        /**
+                         * @description Null placement. Null uses DuckLake's default placement.
+                         * @enum {string|null}
+                         */
+                        nulls: 'first' | 'last' | null
+                      }[]
+                      /** @enum {string} */
+                      kind: 'columns'
+                    }
+                )
+              | (never | null)
+          }
+          /** @description Source PostgreSQL table name. */
+          name: string
+          /**
+           * @description observed when the DuckLake catalog was read, table_missing when the catalog has no table for it yet, unavailable when the catalog could not be read, and not_requested when an update returned without reading the catalog.
+           * @enum {string}
+           */
+          observation_status: 'observed' | 'table_missing' | 'unavailable' | 'not_requested'
+          /** @description Layout recorded in the DuckLake catalog, null unless observation_status is observed. Catalog metadata governs files written after it changes and does not establish that existing files are sorted or partitioned. */
+          observed: {
+            /**
+             * Format: date-time
+             * @description Time the catalog metadata was read.
+             */
+            observed_at: string
+            /** @description Active partition keys in key order, with transforms as the catalog reports them, for example bucket(16). */
+            partition_by: {
+              column: string
+              transform: string
+            }[]
+            /** @description Active sort expressions in key order, as the catalog reports them. */
+            sort_by: {
+              direction: string
+              expression: string
+              nulls: string
+            }[]
+          } | null
+          /** @description Warehouse replication pipeline identity. */
+          pipeline_id: string
+          /** @description Whether this update reset source replication state. False for unchanged layouts and reads; reads do not retain reset history. True does not establish completion of recopy. */
+          reset_table: boolean
+          /** @description Source PostgreSQL schema of the table. */
+          schema: string
+        }
+        /**
+         * @description Source PostgreSQL table OID, as returned by the Warehouse tables list.
+         * @example 16385
+         */
+        id: string
+        /**
+         * @description Resource type.
+         * @enum {string}
+         */
+        type: 'warehouse_table_layout'
+      }
+    }
+    V2WarehouseTableLayoutUpdateRequest: {
+      data: {
+        attributes: {
+          /** @description Omit to preserve the saved partitioning. Null makes partitioning unmanaged. An empty list explicitly clears partitioning. Otherwise, supply all ordered partition keys. */
+          partition_by?:
+            | {
+                /** @description Source column name. */
+                column: string
+                transform:
+                  | {
+                      /** @enum {string} */
+                      kind: 'identity'
+                    }
+                  | {
+                      /** @enum {string} */
+                      kind: 'year'
+                    }
+                  | {
+                      /** @enum {string} */
+                      kind: 'month'
+                    }
+                  | {
+                      /** @enum {string} */
+                      kind: 'day'
+                    }
+                  | {
+                      /** @enum {string} */
+                      kind: 'hour'
+                    }
+                  | {
+                      /** @description Number of hash buckets. */
+                      count: number
+                      /** @enum {string} */
+                      kind: 'bucket'
+                    }
+              }[]
+            | null
+          /** @description Defaults to false, preserving historical files and replication progress. When the layout changes, true resets the table and copies it again. This requires initial sync to be enabled. Reads are disrupted during the copy. An unchanged layout never resets the table. */
+          reset_table?: boolean
+          /** @description Omit to preserve the saved sorting. Null makes sorting unmanaged. The none selector explicitly clears sorting. Otherwise, supply the complete sort selector. */
+          sort_by?:
+            | (
+                | {
+                    /** @enum {string} */
+                    kind: 'none'
+                  }
+                | {
+                    /** @enum {string} */
+                    kind: 'primary_key'
+                  }
+                | {
+                    columns: {
+                      /** @enum {string} */
+                      direction: 'asc' | 'desc'
+                      /** @description Source column name. */
+                      name: string
+                      /**
+                       * @description Null placement. Null uses DuckLake's default placement.
+                       * @enum {string|null}
+                       */
+                      nulls?: 'first' | 'last' | null
+                    }[]
+                    /** @enum {string} */
+                    kind: 'columns'
+                  }
+              )
+            | (never | null)
+        }
+        /**
+         * @description Resource type.
+         * @enum {string}
+         */
+        type: 'warehouse_table_layout'
+      }
+    }
+    V2WarehouseTableResponse_Output: {
+      data: {
+        attributes: {
+          /** @description Flush lag in milliseconds that Postgres reports for the slot in replication_feedback. Null when there is no feedback or Postgres reports no recent measurement, which includes a caught-up slot without new WAL; replication_feedback.flush_lag_bytes reads 0 in that case. */
+          lag_ms: number | null
+          /** @description Source PostgreSQL table name. */
+          name: string
+          /**
+           * Format: date-time
+           * @description Time the API retrieved the replication state of the table. It does not indicate when data was last synchronized.
+           */
+          observed_at: string | null
+          /** @description Postgres feedback from the replication slot named in source. Null when no feedback is available, including while the pipeline is stopped. Feedback age measures time since the slot last responded and does not establish how current query results are. */
+          replication_feedback: {
+            active: boolean
+            feedback_age_ms: number | null
+            flush_lag_bytes: number | null
+            flush_lag_ms: number | null
+            /**
+             * @description Replication slot that reported the feedback: the table's own sync slot until it follows changes, or the pipeline apply slot once it does.
+             * @enum {string}
+             */
+            source: 'table_sync' | 'pipeline_apply'
+            /** @enum {string|null} */
+            wal_status: 'reserved' | 'extended' | 'unreserved' | 'lost' | 'unknown' | null
+            write_lag_ms: number | null
+          } | null
+          /**
+           * @description Last replication state the pipeline recorded for the table, also while the pipeline is stopped. Null when none was observed.
+           * @enum {string|null}
+           */
+          replication_state:
+            | 'queued'
+            | 'copying_table'
+            | 'copied_table'
+            | 'following_wal'
+            | 'error'
+            | null
+          /** @description Source PostgreSQL schema of the table. */
+          schema: string
+          /**
+           * @description Replication status. error means the table failed to replicate; stopped means the pipeline is stopped, stopping or failed, so the table receives no changes; live means the table follows changes; syncing means it is queued, copying or catching up; unknown means the pipeline status or the table state was not observed, for example before replication starts.
+           * @enum {string}
+           */
+          status: 'syncing' | 'live' | 'error' | 'stopped' | 'unknown'
+          /** @description Quoted, fully qualified name of the replicated table in the Warehouse. */
+          warehouse_name: string
+        }
+        /**
+         * @description Source PostgreSQL table OID, as returned by the Warehouse tables list.
+         * @example 16385
+         */
+        id: string
+        /**
+         * @description Resource type.
+         * @enum {string}
+         */
+        type: 'warehouse_table'
+      }
+    }
+    V2WarehouseTablesResponse_Output: {
+      data: {
+        attributes: {
+          /** @description Flush lag in milliseconds that Postgres reports for the slot in replication_feedback. Null when there is no feedback or Postgres reports no recent measurement, which includes a caught-up slot without new WAL; replication_feedback.flush_lag_bytes reads 0 in that case. */
+          lag_ms: number | null
+          /** @description Source PostgreSQL table name. */
+          name: string
+          /**
+           * Format: date-time
+           * @description Time the API retrieved the replication state of the table. It does not indicate when data was last synchronized.
+           */
+          observed_at: string | null
+          /** @description Postgres feedback from the replication slot named in source. Null when no feedback is available, including while the pipeline is stopped. Feedback age measures time since the slot last responded and does not establish how current query results are. */
+          replication_feedback: {
+            active: boolean
+            feedback_age_ms: number | null
+            flush_lag_bytes: number | null
+            flush_lag_ms: number | null
+            /**
+             * @description Replication slot that reported the feedback: the table's own sync slot until it follows changes, or the pipeline apply slot once it does.
+             * @enum {string}
+             */
+            source: 'table_sync' | 'pipeline_apply'
+            /** @enum {string|null} */
+            wal_status: 'reserved' | 'extended' | 'unreserved' | 'lost' | 'unknown' | null
+            write_lag_ms: number | null
+          } | null
+          /**
+           * @description Last replication state the pipeline recorded for the table, also while the pipeline is stopped. Null when none was observed.
+           * @enum {string|null}
+           */
+          replication_state:
+            | 'queued'
+            | 'copying_table'
+            | 'copied_table'
+            | 'following_wal'
+            | 'error'
+            | null
+          /** @description Source PostgreSQL schema of the table. */
+          schema: string
+          /**
+           * @description Replication status. error means the table failed to replicate; stopped means the pipeline is stopped, stopping or failed, so the table receives no changes; live means the table follows changes; syncing means it is queued, copying or catching up; unknown means the pipeline status or the table state was not observed, for example before replication starts.
+           * @enum {string}
+           */
+          status: 'syncing' | 'live' | 'error' | 'stopped' | 'unknown'
+          /** @description Quoted, fully qualified name of the replicated table in the Warehouse. */
+          warehouse_name: string
+        }
+        /**
+         * @description Source PostgreSQL table OID, as returned by the Warehouse tables list.
+         * @example 16385
+         */
+        id: string
+        /**
+         * @description Resource type.
+         * @enum {string}
+         */
+        type: 'warehouse_table'
+      }[]
+    }
+    V2WarehouseTeardownResponse_Output: {
+      data: {
+        attributes: {
+          /** @description Last cleanup failure, or null when none was recorded. Failed cleanup can leave partially removed resources; retry disable with the same data policy. */
+          cleanup_error: string | null
+          /** @description Whether this cleanup permanently deletes managed Warehouse data. Source Postgres tables are preserved in both modes. */
+          delete_data: boolean
+          /** @enum {string} */
+          lifecycle_status: 'disabling' | 'disabled' | 'deletion_failed'
+          /** Format: date-time */
+          updated_at: string
+        }
+        /** Format: uuid */
+        id: string
+        /**
+         * @description Resource type.
+         * @enum {string}
+         */
+        type: 'warehouse_teardown'
       }
     }
   }
@@ -7946,6 +9458,71 @@ export interface operations {
       }
     }
   }
+  'v2-delete-project-function': {
+    parameters: {
+      query?: never
+      header?: never
+      path: {
+        /** @description Project ref */
+        ref: string
+      }
+      cookie?: never
+    }
+    requestBody?: never
+    responses: {
+      204: {
+        headers: {
+          [name: string]: unknown
+        }
+        content?: never
+      }
+      /** @description Unauthorized */
+      401: {
+        headers: {
+          [name: string]: unknown
+        }
+        content: {
+          'application/json': components['schemas']['ErrorResponseBody']
+        }
+      }
+      /** @description Forbidden action */
+      403: {
+        headers: {
+          [name: string]: unknown
+        }
+        content: {
+          'application/json': components['schemas']['ErrorResponseBody']
+        }
+      }
+      /** @description Project not found */
+      404: {
+        headers: {
+          [name: string]: unknown
+        }
+        content: {
+          'application/json': components['schemas']['ErrorResponseBody']
+        }
+      }
+      /** @description Rate limit exceeded */
+      429: {
+        headers: {
+          [name: string]: unknown
+        }
+        content: {
+          'application/json': components['schemas']['ErrorResponseBody']
+        }
+      }
+      /** @description Failed to delete project functions */
+      500: {
+        headers: {
+          [name: string]: unknown
+        }
+        content: {
+          'application/json': components['schemas']['ErrorResponseBody']
+        }
+      }
+    }
+  }
   'v2-list-notebooks': {
     parameters: {
       query?: {
@@ -8642,6 +10219,1027 @@ export interface operations {
       }
       /** @description Rate limit exceeded */
       429: {
+        headers: {
+          [name: string]: unknown
+        }
+        content: {
+          'application/json': components['schemas']['ErrorResponseBody']
+        }
+      }
+    }
+  }
+  'v2-disable-warehouse': {
+    parameters: {
+      query?: {
+        /** @description Permanently delete managed Warehouse data. Defaults to false (retain data). Source Postgres tables and legacy shared buckets are preserved. */
+        delete_data?: boolean
+      }
+      header?: never
+      path: {
+        /** @description Project ref */
+        ref: string
+      }
+      cookie?: never
+    }
+    requestBody?: never
+    responses: {
+      202: {
+        headers: {
+          [name: string]: unknown
+        }
+        content: {
+          'application/json': components['schemas']['V2WarehouseTeardownResponse_Output']
+        }
+      }
+      /** @description Invalid deletion option or unmanaged destination */
+      400: {
+        headers: {
+          [name: string]: unknown
+        }
+        content: {
+          'application/json': components['schemas']['ErrorResponseBody']
+        }
+      }
+      /** @description Unauthorized */
+      401: {
+        headers: {
+          [name: string]: unknown
+        }
+        content: {
+          'application/json': components['schemas']['ErrorResponseBody']
+        }
+      }
+      /** @description This feature requires the Pro, Team, or Enterprise organization plan. */
+      402: {
+        headers: {
+          [name: string]: unknown
+        }
+        content: {
+          'application/json': components['schemas']['ErrorResponseBody']
+        }
+      }
+      /** @description Forbidden action */
+      403: {
+        headers: {
+          [name: string]: unknown
+        }
+        content: {
+          'application/json': components['schemas']['ErrorResponseBody']
+        }
+      }
+      /** @description Warehouse mutation or cleanup policy conflict */
+      409: {
+        headers: {
+          [name: string]: unknown
+        }
+        content: {
+          'application/json': components['schemas']['ErrorResponseBody']
+        }
+      }
+      /** @description Rate limit exceeded */
+      429: {
+        headers: {
+          [name: string]: unknown
+        }
+        content: {
+          'application/json': components['schemas']['ErrorResponseBody']
+        }
+      }
+      /** @description Warehouse cleanup unavailable */
+      503: {
+        headers: {
+          [name: string]: unknown
+        }
+        content: {
+          'application/json': components['schemas']['ErrorResponseBody']
+        }
+      }
+    }
+  }
+  'v2-get-warehouse-capacity': {
+    parameters: {
+      query?: {
+        /** @description Up to eight distinct measurements. Defaults to query_in_flight, worker_admission_limit, worker_admission_active, worker_admission_pending, worker_admission_occupied, admission_rejection_rate, assignment_wait_p95, activation_duration_p95. Supply a comma-separated list. Allowed measurements: query_in_flight, worker_admission_limit, worker_admission_active, worker_admission_pending, worker_admission_occupied, admission_rejection_rate, assignment_wait_mean, assignment_wait_p95, activation_rate, activation_duration_mean, activation_duration_p95. */
+        attributes?: string
+        /** @description Range start as an ISO timestamp, within the last 30 days. Requires to; cannot be combined with since. */
+        from?: string
+        /** @description Defaults to 1m. The effective step increases to stay within 1441 points per series. Rate and latency windows are at least 5m. */
+        interval?: '1m' | '5m' | '10m' | '30m' | '1h' | '1d'
+        /** @description Look back from server time, for example 30m, 2h, or 1d. Defaults to 30m when from/to are omitted. Maximum 30d. Cannot be combined with from/to. */
+        since?: string
+        /** @description Range end as an ISO timestamp, no later than server time. Requires from; cannot be combined with since. The service tolerates up to 60 seconds of request delay or clock skew. */
+        to?: string
+      }
+      header?: never
+      path: {
+        /** @description Project ref */
+        ref: string
+      }
+      cookie?: never
+    }
+    requestBody?: never
+    responses: {
+      200: {
+        headers: {
+          [name: string]: unknown
+        }
+        content: {
+          'application/json': components['schemas']['V2WarehouseCapacityResponse_Output']
+        }
+      }
+      /** @description validation_failed: Invalid measurement selection, range, interval, or query parameter */
+      400: {
+        headers: {
+          [name: string]: unknown
+        }
+        content: {
+          'application/json': components['schemas']['ErrorResponseBody']
+        }
+      }
+      /** @description Unauthorized */
+      401: {
+        headers: {
+          [name: string]: unknown
+        }
+        content: {
+          'application/json': components['schemas']['ErrorResponseBody']
+        }
+      }
+      /** @description This feature requires the Pro, Team, or Enterprise organization plan. */
+      402: {
+        headers: {
+          [name: string]: unknown
+        }
+        content: {
+          'application/json': components['schemas']['ErrorResponseBody']
+        }
+      }
+      /** @description Forbidden action */
+      403: {
+        headers: {
+          [name: string]: unknown
+        }
+        content: {
+          'application/json': components['schemas']['ErrorResponseBody']
+        }
+      }
+      /** @description Project not found */
+      404: {
+        headers: {
+          [name: string]: unknown
+        }
+        content: {
+          'application/json': components['schemas']['ErrorResponseBody']
+        }
+      }
+      /** @description Rate limit exceeded */
+      429: {
+        headers: {
+          [name: string]: unknown
+        }
+        content: {
+          'application/json': components['schemas']['ErrorResponseBody']
+        }
+      }
+      /** @description warehouse_metrics_unavailable: Metrics query capacity is temporarily unavailable; retry after a short delay. warehouse_setup_unavailable: Warehouse feature or project metadata unavailable. */
+      503: {
+        headers: {
+          [name: string]: unknown
+        }
+        content: {
+          'application/json': components['schemas']['ErrorResponseBody']
+        }
+      }
+    }
+  }
+  'v2-get-warehouse-connection': {
+    parameters: {
+      query?: never
+      header?: never
+      path: {
+        /** @description Project ref */
+        ref: string
+      }
+      cookie?: never
+    }
+    requestBody?: never
+    responses: {
+      200: {
+        headers: {
+          [name: string]: unknown
+        }
+        content: {
+          'application/json': components['schemas']['V2WarehouseConnectionResponse_Output']
+        }
+      }
+      /** @description Unauthorized */
+      401: {
+        headers: {
+          [name: string]: unknown
+        }
+        content: {
+          'application/json': components['schemas']['ErrorResponseBody']
+        }
+      }
+      /** @description Forbidden action */
+      403: {
+        headers: {
+          [name: string]: unknown
+        }
+        content: {
+          'application/json': components['schemas']['ErrorResponseBody']
+        }
+      }
+      /** @description Rate limit exceeded */
+      429: {
+        headers: {
+          [name: string]: unknown
+        }
+        content: {
+          'application/json': components['schemas']['ErrorResponseBody']
+        }
+      }
+      /** @description Warehouse feature or project metadata unavailable */
+      503: {
+        headers: {
+          [name: string]: unknown
+        }
+        content: {
+          'application/json': components['schemas']['ErrorResponseBody']
+        }
+      }
+    }
+  }
+  'v2-enable-warehouse': {
+    parameters: {
+      query?: never
+      header?: never
+      path: {
+        /** @description Project ref */
+        ref: string
+      }
+      cookie?: never
+    }
+    requestBody: {
+      content: {
+        'application/json': components['schemas']['V2WarehouseEnableRequest']
+      }
+    }
+    responses: {
+      202: {
+        headers: {
+          [name: string]: unknown
+        }
+        content: {
+          'application/json': components['schemas']['V2WarehouseEnableAcceptedResponse_Output']
+        }
+      }
+      /** @description Empty or unsupported selection */
+      400: {
+        headers: {
+          [name: string]: unknown
+        }
+        content: {
+          'application/json': components['schemas']['ErrorResponseBody']
+        }
+      }
+      /** @description Unauthorized */
+      401: {
+        headers: {
+          [name: string]: unknown
+        }
+        content: {
+          'application/json': components['schemas']['ErrorResponseBody']
+        }
+      }
+      /** @description This feature requires the Pro, Team, or Enterprise organization plan. */
+      402: {
+        headers: {
+          [name: string]: unknown
+        }
+        content: {
+          'application/json': components['schemas']['ErrorResponseBody']
+        }
+      }
+      /** @description Forbidden action */
+      403: {
+        headers: {
+          [name: string]: unknown
+        }
+        content: {
+          'application/json': components['schemas']['ErrorResponseBody']
+        }
+      }
+      /** @description Existing selection or lifecycle conflict */
+      409: {
+        headers: {
+          [name: string]: unknown
+        }
+        content: {
+          'application/json': components['schemas']['ErrorResponseBody']
+        }
+      }
+      /** @description Rate limit exceeded */
+      429: {
+        headers: {
+          [name: string]: unknown
+        }
+        content: {
+          'application/json': components['schemas']['ErrorResponseBody']
+        }
+      }
+      /** @description Warehouse setup unavailable */
+      503: {
+        headers: {
+          [name: string]: unknown
+        }
+        content: {
+          'application/json': components['schemas']['ErrorResponseBody']
+        }
+      }
+    }
+  }
+  'v2-get-warehouse-query-stats': {
+    parameters: {
+      query?: {
+        /** @description Up to eight distinct measurements. Defaults to query_rate, query_duration_p50, query_duration_p95, query_duration_p99, query_error_rate, query_timeout_rate. Supply a comma-separated list. Allowed measurements: query_rate, query_error_rate, query_timeout_rate, query_canceled_rate, query_duration_mean, query_duration_p50, query_duration_p95, query_duration_p99, duckdb_duration_mean, rpc_rate, rpc_duration_mean, rpc_duration_p95. */
+        attributes?: string
+        /** @description Range start as an ISO timestamp, within the last 30 days. Requires to; cannot be combined with since. */
+        from?: string
+        /** @description Defaults to 1m. The effective step increases to stay within 1441 points per series. Rate and latency windows are at least 5m. */
+        interval?: '1m' | '5m' | '10m' | '30m' | '1h' | '1d'
+        /** @description Look back from server time, for example 30m, 2h, or 1d. Defaults to 30m when from/to are omitted. Maximum 30d. Cannot be combined with from/to. */
+        since?: string
+        /** @description Range end as an ISO timestamp, no later than server time. Requires from; cannot be combined with since. The service tolerates up to 60 seconds of request delay or clock skew. */
+        to?: string
+      }
+      header?: never
+      path: {
+        /** @description Project ref */
+        ref: string
+      }
+      cookie?: never
+    }
+    requestBody?: never
+    responses: {
+      200: {
+        headers: {
+          [name: string]: unknown
+        }
+        content: {
+          'application/json': components['schemas']['V2WarehouseQueryStatsResponse_Output']
+        }
+      }
+      /** @description validation_failed: Invalid measurement selection, range, interval, or query parameter */
+      400: {
+        headers: {
+          [name: string]: unknown
+        }
+        content: {
+          'application/json': components['schemas']['ErrorResponseBody']
+        }
+      }
+      /** @description Unauthorized */
+      401: {
+        headers: {
+          [name: string]: unknown
+        }
+        content: {
+          'application/json': components['schemas']['ErrorResponseBody']
+        }
+      }
+      /** @description This feature requires the Pro, Team, or Enterprise organization plan. */
+      402: {
+        headers: {
+          [name: string]: unknown
+        }
+        content: {
+          'application/json': components['schemas']['ErrorResponseBody']
+        }
+      }
+      /** @description Forbidden action */
+      403: {
+        headers: {
+          [name: string]: unknown
+        }
+        content: {
+          'application/json': components['schemas']['ErrorResponseBody']
+        }
+      }
+      /** @description Project not found */
+      404: {
+        headers: {
+          [name: string]: unknown
+        }
+        content: {
+          'application/json': components['schemas']['ErrorResponseBody']
+        }
+      }
+      /** @description Rate limit exceeded */
+      429: {
+        headers: {
+          [name: string]: unknown
+        }
+        content: {
+          'application/json': components['schemas']['ErrorResponseBody']
+        }
+      }
+      /** @description warehouse_metrics_unavailable: Metrics query capacity is temporarily unavailable; retry after a short delay. warehouse_setup_unavailable: Warehouse feature or project metadata unavailable. */
+      503: {
+        headers: {
+          [name: string]: unknown
+        }
+        content: {
+          'application/json': components['schemas']['ErrorResponseBody']
+        }
+      }
+    }
+  }
+  'v2-create-warehouse-setup': {
+    parameters: {
+      query?: never
+      header?: never
+      path: {
+        /** @description Project ref */
+        ref: string
+      }
+      cookie?: never
+    }
+    requestBody: {
+      content: {
+        'application/json': components['schemas']['V2WarehouseSetupRequest']
+      }
+    }
+    responses: {
+      202: {
+        headers: {
+          [name: string]: unknown
+        }
+        content: {
+          'application/json': components['schemas']['V2WarehouseSetupAcceptedResponse_Output']
+        }
+      }
+      /** @description Empty or unsupported selection */
+      400: {
+        headers: {
+          [name: string]: unknown
+        }
+        content: {
+          'application/json': components['schemas']['ErrorResponseBody']
+        }
+      }
+      /** @description Unauthorized */
+      401: {
+        headers: {
+          [name: string]: unknown
+        }
+        content: {
+          'application/json': components['schemas']['ErrorResponseBody']
+        }
+      }
+      /** @description This feature requires the Pro, Team, or Enterprise organization plan. */
+      402: {
+        headers: {
+          [name: string]: unknown
+        }
+        content: {
+          'application/json': components['schemas']['ErrorResponseBody']
+        }
+      }
+      /** @description Forbidden action */
+      403: {
+        headers: {
+          [name: string]: unknown
+        }
+        content: {
+          'application/json': components['schemas']['ErrorResponseBody']
+        }
+      }
+      /** @description Source identity or lifecycle conflict */
+      409: {
+        headers: {
+          [name: string]: unknown
+        }
+        content: {
+          'application/json': components['schemas']['ErrorResponseBody']
+        }
+      }
+      /** @description Rate limit exceeded */
+      429: {
+        headers: {
+          [name: string]: unknown
+        }
+        content: {
+          'application/json': components['schemas']['ErrorResponseBody']
+        }
+      }
+      /** @description Warehouse setup unavailable */
+      503: {
+        headers: {
+          [name: string]: unknown
+        }
+        content: {
+          'application/json': components['schemas']['ErrorResponseBody']
+        }
+      }
+    }
+  }
+  'v2-get-warehouse-setup': {
+    parameters: {
+      query?: {
+        /** @description Inspect database FDW state. Defaults to true for current-status reads and false when selection_id is supplied. */
+        inspect_fdw?: 'true' | 'false'
+        /** @description Accepted selection identity returned by enable. A different current nonempty selection returns a conflict. */
+        selection_id?: string
+      }
+      header?: never
+      path: {
+        /** @description Project ref */
+        ref: string
+      }
+      cookie?: never
+    }
+    requestBody?: never
+    responses: {
+      200: {
+        headers: {
+          [name: string]: unknown
+        }
+        content: {
+          'application/json': components['schemas']['V2WarehouseSetupStatusResponse_Output']
+        }
+      }
+      /** @description Unauthorized */
+      401: {
+        headers: {
+          [name: string]: unknown
+        }
+        content: {
+          'application/json': components['schemas']['ErrorResponseBody']
+        }
+      }
+      /** @description Forbidden action */
+      403: {
+        headers: {
+          [name: string]: unknown
+        }
+        content: {
+          'application/json': components['schemas']['ErrorResponseBody']
+        }
+      }
+      /** @description The accepted selection changed */
+      409: {
+        headers: {
+          [name: string]: unknown
+        }
+        content: {
+          'application/json': components['schemas']['ErrorResponseBody']
+        }
+      }
+      /** @description Rate limit exceeded */
+      429: {
+        headers: {
+          [name: string]: unknown
+        }
+        content: {
+          'application/json': components['schemas']['ErrorResponseBody']
+        }
+      }
+      /** @description Warehouse status unavailable */
+      503: {
+        headers: {
+          [name: string]: unknown
+        }
+        content: {
+          'application/json': components['schemas']['ErrorResponseBody']
+        }
+      }
+    }
+  }
+  'v2-get-warehouse-status': {
+    parameters: {
+      query?: never
+      header?: never
+      path: {
+        /** @description Project ref */
+        ref: string
+      }
+      cookie?: never
+    }
+    requestBody?: never
+    responses: {
+      200: {
+        headers: {
+          [name: string]: unknown
+        }
+        content: {
+          'application/json': components['schemas']['V2WarehouseContextResponse_Output']
+        }
+      }
+      /** @description Unauthorized */
+      401: {
+        headers: {
+          [name: string]: unknown
+        }
+        content: {
+          'application/json': components['schemas']['ErrorResponseBody']
+        }
+      }
+      /** @description Forbidden action */
+      403: {
+        headers: {
+          [name: string]: unknown
+        }
+        content: {
+          'application/json': components['schemas']['ErrorResponseBody']
+        }
+      }
+      /** @description Rate limit exceeded */
+      429: {
+        headers: {
+          [name: string]: unknown
+        }
+        content: {
+          'application/json': components['schemas']['ErrorResponseBody']
+        }
+      }
+      /** @description Warehouse feature or project metadata unavailable */
+      503: {
+        headers: {
+          [name: string]: unknown
+        }
+        content: {
+          'application/json': components['schemas']['ErrorResponseBody']
+        }
+      }
+    }
+  }
+  'v2-list-warehouse-tables': {
+    parameters: {
+      query?: never
+      header?: never
+      path: {
+        /** @description Project ref */
+        ref: string
+      }
+      cookie?: never
+    }
+    requestBody?: never
+    responses: {
+      200: {
+        headers: {
+          [name: string]: unknown
+        }
+        content: {
+          'application/json': components['schemas']['V2WarehouseTablesResponse_Output']
+        }
+      }
+      /** @description Unauthorized */
+      401: {
+        headers: {
+          [name: string]: unknown
+        }
+        content: {
+          'application/json': components['schemas']['ErrorResponseBody']
+        }
+      }
+      /** @description Forbidden action */
+      403: {
+        headers: {
+          [name: string]: unknown
+        }
+        content: {
+          'application/json': components['schemas']['ErrorResponseBody']
+        }
+      }
+      /** @description Warehouse DuckLake destination not found */
+      404: {
+        headers: {
+          [name: string]: unknown
+        }
+        content: {
+          'application/json': components['schemas']['ErrorResponseBody']
+        }
+      }
+      /** @description Rate limit exceeded */
+      429: {
+        headers: {
+          [name: string]: unknown
+        }
+        content: {
+          'application/json': components['schemas']['ErrorResponseBody']
+        }
+      }
+      /** @description Warehouse feature, project metadata or table selection unavailable */
+      503: {
+        headers: {
+          [name: string]: unknown
+        }
+        content: {
+          'application/json': components['schemas']['ErrorResponseBody']
+        }
+      }
+    }
+  }
+  'v2-get-warehouse-table': {
+    parameters: {
+      query?: never
+      header?: never
+      path: {
+        /** @description Project ref */
+        ref: string
+        /** @description Source PostgreSQL table OID, as returned by the Warehouse tables list. */
+        table_id: string
+      }
+      cookie?: never
+    }
+    requestBody?: never
+    responses: {
+      200: {
+        headers: {
+          [name: string]: unknown
+        }
+        content: {
+          'application/json': components['schemas']['V2WarehouseTableResponse_Output']
+        }
+      }
+      /** @description Unauthorized */
+      401: {
+        headers: {
+          [name: string]: unknown
+        }
+        content: {
+          'application/json': components['schemas']['ErrorResponseBody']
+        }
+      }
+      /** @description Forbidden action */
+      403: {
+        headers: {
+          [name: string]: unknown
+        }
+        content: {
+          'application/json': components['schemas']['ErrorResponseBody']
+        }
+      }
+      /** @description Table not replicated to Warehouse, or Warehouse DuckLake destination not found */
+      404: {
+        headers: {
+          [name: string]: unknown
+        }
+        content: {
+          'application/json': components['schemas']['ErrorResponseBody']
+        }
+      }
+      /** @description Rate limit exceeded */
+      429: {
+        headers: {
+          [name: string]: unknown
+        }
+        content: {
+          'application/json': components['schemas']['ErrorResponseBody']
+        }
+      }
+      /** @description Warehouse feature, project metadata or table selection unavailable */
+      503: {
+        headers: {
+          [name: string]: unknown
+        }
+        content: {
+          'application/json': components['schemas']['ErrorResponseBody']
+        }
+      }
+    }
+  }
+  'v2-get-warehouse-table-layout': {
+    parameters: {
+      query?: never
+      header?: never
+      path: {
+        /** @description Project ref */
+        ref: string
+        /** @description Source PostgreSQL table OID, as returned by the Warehouse tables list. */
+        table_id: string
+      }
+      cookie?: never
+    }
+    requestBody?: never
+    responses: {
+      200: {
+        headers: {
+          [name: string]: unknown
+        }
+        content: {
+          'application/json': components['schemas']['V2WarehouseTableLayoutResponse_Output']
+        }
+      }
+      /** @description Unauthorized */
+      401: {
+        headers: {
+          [name: string]: unknown
+        }
+        content: {
+          'application/json': components['schemas']['ErrorResponseBody']
+        }
+      }
+      /** @description Forbidden action */
+      403: {
+        headers: {
+          [name: string]: unknown
+        }
+        content: {
+          'application/json': components['schemas']['ErrorResponseBody']
+        }
+      }
+      /** @description Table not replicated to Warehouse */
+      404: {
+        headers: {
+          [name: string]: unknown
+        }
+        content: {
+          'application/json': components['schemas']['ErrorResponseBody']
+        }
+      }
+      /** @description Rate limit exceeded */
+      429: {
+        headers: {
+          [name: string]: unknown
+        }
+        content: {
+          'application/json': components['schemas']['ErrorResponseBody']
+        }
+      }
+      /** @description Warehouse feature, project metadata or table layout unavailable */
+      503: {
+        headers: {
+          [name: string]: unknown
+        }
+        content: {
+          'application/json': components['schemas']['ErrorResponseBody']
+        }
+      }
+    }
+  }
+  'v2-update-warehouse-table-layout': {
+    parameters: {
+      query?: never
+      header?: never
+      path: {
+        /** @description Project ref */
+        ref: string
+        /** @description Source PostgreSQL table OID, as returned by the Warehouse tables list. */
+        table_id: string
+      }
+      cookie?: never
+    }
+    requestBody: {
+      content: {
+        'application/json': components['schemas']['V2WarehouseTableLayoutUpdateRequest']
+      }
+    }
+    responses: {
+      202: {
+        headers: {
+          [name: string]: unknown
+        }
+        content: {
+          'application/json': components['schemas']['V2WarehouseTableLayoutResponse_Output']
+        }
+      }
+      /** @description Invalid layout or source schema */
+      400: {
+        headers: {
+          [name: string]: unknown
+        }
+        content: {
+          'application/json': components['schemas']['ErrorResponseBody']
+        }
+      }
+      /** @description Unauthorized */
+      401: {
+        headers: {
+          [name: string]: unknown
+        }
+        content: {
+          'application/json': components['schemas']['ErrorResponseBody']
+        }
+      }
+      /** @description This feature requires the Pro, Team, or Enterprise organization plan. */
+      402: {
+        headers: {
+          [name: string]: unknown
+        }
+        content: {
+          'application/json': components['schemas']['ErrorResponseBody']
+        }
+      }
+      /** @description Forbidden action */
+      403: {
+        headers: {
+          [name: string]: unknown
+        }
+        content: {
+          'application/json': components['schemas']['ErrorResponseBody']
+        }
+      }
+      /** @description Warehouse pipeline or replicated table not found */
+      404: {
+        headers: {
+          [name: string]: unknown
+        }
+        content: {
+          'application/json': components['schemas']['ErrorResponseBody']
+        }
+      }
+      /** @description Warehouse or pipeline mutation conflict, or reset requested without initial sync */
+      409: {
+        headers: {
+          [name: string]: unknown
+        }
+        content: {
+          'application/json': components['schemas']['ErrorResponseBody']
+        }
+      }
+      /** @description Rate limit exceeded */
+      429: {
+        headers: {
+          [name: string]: unknown
+        }
+        content: {
+          'application/json': components['schemas']['ErrorResponseBody']
+        }
+      }
+      /** @description Layout update unavailable or outcome uncertain; inspect the saved layout, pipeline, and table state before retrying */
+      503: {
+        headers: {
+          [name: string]: unknown
+        }
+        content: {
+          'application/json': components['schemas']['ErrorResponseBody']
+        }
+      }
+    }
+  }
+  'v2-get-warehouse-teardown': {
+    parameters: {
+      query?: {
+        /** @description Optional cleanup operation identity returned by disable. Omit to read the current cleanup; when supplied, a different current operation returns a conflict. */
+        operation_id?: string
+      }
+      header?: never
+      path: {
+        /** @description Project ref */
+        ref: string
+      }
+      cookie?: never
+    }
+    requestBody?: never
+    responses: {
+      200: {
+        headers: {
+          [name: string]: unknown
+        }
+        content: {
+          'application/json': components['schemas']['V2WarehouseTeardownResponse_Output']
+        }
+      }
+      /** @description Unauthorized */
+      401: {
+        headers: {
+          [name: string]: unknown
+        }
+        content: {
+          'application/json': components['schemas']['ErrorResponseBody']
+        }
+      }
+      /** @description Forbidden action */
+      403: {
+        headers: {
+          [name: string]: unknown
+        }
+        content: {
+          'application/json': components['schemas']['ErrorResponseBody']
+        }
+      }
+      /** @description Cleanup state is unavailable or the supplied operation identity is no longer current */
+      409: {
+        headers: {
+          [name: string]: unknown
+        }
+        content: {
+          'application/json': components['schemas']['ErrorResponseBody']
+        }
+      }
+      /** @description Rate limit exceeded */
+      429: {
+        headers: {
+          [name: string]: unknown
+        }
+        content: {
+          'application/json': components['schemas']['ErrorResponseBody']
+        }
+      }
+      /** @description Warehouse cleanup state unavailable */
+      503: {
         headers: {
           [name: string]: unknown
         }

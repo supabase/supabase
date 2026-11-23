@@ -1,4 +1,7 @@
-import { Children, isValidElement, type PropsWithChildren, type ReactNode } from 'react'
+'use client'
+
+import { useTabsWithQueryParams } from '~/features/ui/useTabsWithQueryParams'
+import { Children, isValidElement, useState, type PropsWithChildren, type ReactNode } from 'react'
 import { cn, TabsIndicator, TabsList, Tabs as TabsRoot, TabsTrigger } from 'ui'
 
 interface CodeTabPanelProps {
@@ -10,6 +13,7 @@ interface CodeTabPanelProps {
 interface CodeTabsProps {
   value?: string
   onValueChange?: (value: string) => void
+  queryGroup?: string
 }
 
 export function NamedCodeBlock({ name, children }: PropsWithChildren<{ name: string }>) {
@@ -37,14 +41,29 @@ export function NamedCodeBlock({ name, children }: PropsWithChildren<{ name: str
   )
 }
 
-export function CodeTabs({ children, value, onValueChange }: PropsWithChildren<CodeTabsProps>) {
+export function CodeTabs({
+  children,
+  value,
+  onValueChange,
+  queryGroup,
+}: PropsWithChildren<CodeTabsProps>) {
   const tabs = Children.toArray(children).filter(isValidElement<CodeTabPanelProps>)
+  const { queryTab, onTabSelected } = useTabsWithQueryParams({
+    tabIds: tabs.map((tab) => tab.props.id),
+    queryGroup,
+  })
+  const [selected, setSelected] = useState(tabs[0]?.props.id)
+
+  const handleValueChange = (next: string) => {
+    setSelected(next)
+    onTabSelected(next)
+    onValueChange?.(next)
+  }
 
   return (
     <TabsRoot
-      defaultValue={tabs[0]?.props.id}
-      value={value}
-      onValueChange={onValueChange}
+      value={value ?? queryTab ?? selected}
+      onValueChange={handleValueChange}
       className="group/code-tabs shiki-wrapper w-full isolate [&_.shiki]:my-0!"
     >
       <TabsList

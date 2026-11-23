@@ -16,7 +16,6 @@ import { addAPIMock, type APIErrorBody } from '@/tests/lib/msw'
 import { mockPermissions } from '@/tests/lib/msw-permissions'
 import type { PermissionsV2Response } from '@/tests/lib/permissions-fixtures'
 import { createMockProfileContext } from '@/tests/lib/profile-helpers'
-import { routerMock } from '@/tests/lib/route-mock'
 import { renderRoute } from '@/tests/lib/route-render'
 
 type OrganizationResponse = components['schemas']['OrganizationResponse_Output']
@@ -84,7 +83,6 @@ vi.mock(import('common'), async (importOriginal) => {
   const actual = await importOriginal()
   return {
     ...actual,
-    useParams: () => ({ slug: 'default-org' }),
     useIsLoggedIn: () => true,
   }
 })
@@ -433,7 +431,6 @@ const generateAndWaitForStrongPassword = async () => {
 describe('project creation wizard', () => {
   beforeEach(() => {
     user = userEvent.setup({ delay: null })
-    routerMock.setCurrentUrl(`/new/${ORG_SLUG}`)
   })
 
   test('creates a project on the happy path for a paid-plan organization', async () => {
@@ -441,7 +438,7 @@ describe('project creation wizard', () => {
     const onRequest = vi.fn()
     mockCreateProject(onRequest)
 
-    await renderWizard()
+    const { router } = await renderWizard()
 
     await fillProjectName('My New Project')
     await generateAndWaitForStrongPassword()
@@ -459,7 +456,7 @@ describe('project creation wizard', () => {
     expect(body.desired_instance_size).toBe('micro')
     expect(body.region_selection).toMatchObject({ name: 'Americas' })
 
-    await waitFor(() => expect(routerMock.asPath).toBe('/project/new-project-ref'))
+    await waitFor(() => expect(router.state.location.pathname).toBe('/project/new-project-ref'))
   })
 
   test('omits the desired instance size for a free-plan organization', async () => {

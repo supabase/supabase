@@ -144,9 +144,9 @@ suspend fun getAccessToken(): String? {
 
 In the dashboard navigate to your project's [Authentication settings](/dashboard/project/_/auth/third-party) and find the Third-Party Auth section to add a new integration.
 
-In the CLI add the following config to your `supabase/config.toml` file:
+In the CLI add the following config to your config file (`supabase/config.toml` or `supabase/config.jsonc`):
 
-```toml
+```toml supabase/config.toml
 [auth.third_party.aws_cognito]
 enabled = true
 user_pool_id = "<id>"

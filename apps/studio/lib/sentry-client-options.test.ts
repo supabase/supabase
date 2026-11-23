@@ -8,6 +8,7 @@ import {
   isChallengeExpiredError,
   isUserAbortedOperation,
   shouldDropForSampleRate,
+  tagBrowserTranslationError,
 } from './sentry-client-options'
 
 describe('Sentry beforeSend filtering functions', () => {
@@ -364,6 +365,76 @@ describe('shouldDropForSampleRate', () => {
   })
 })
 
+describe('tagBrowserTranslationError', () => {
+  const domError = (): SentryEvent => ({
+    exception: {
+      values: [
+        {
+          type: 'NotFoundError',
+          value: "Failed to execute 'removeChild' on 'Node': The node is not a child of this node.",
+        },
+      ],
+    },
+  })
+
+  it('tags the error and sets the sample rate', () => {
+    const event = domError()
+    tagBrowserTranslationError(event, true)
+    expect(event.tags).toEqual({
+      sample_rate: 0.05,
+      browser_translation: true,
+      page_translated: true,
+    })
+  })
+
+  it('records when the page was not translated', () => {
+    const event = domError()
+    tagBrowserTranslationError(event, false)
+    expect(event.tags?.page_translated).toBe(false)
+  })
+
+  it('looks the page up itself when no answer is passed in', () => {
+    // Node test environment: there is no document, so the page counts as untranslated
+    const event = domError()
+    tagBrowserTranslationError(event)
+    expect(event.tags?.page_translated).toBe(false)
+  })
+
+  it('detects a translated page when no answer is passed in', () => {
+    vi.stubGlobal('document', {
+      documentElement: { classList: { contains: (cls: string) => cls === 'translated-ltr' } },
+      querySelector: () => null,
+    })
+    try {
+      const event = domError()
+      tagBrowserTranslationError(event)
+      expect(event.tags?.page_translated).toBe(true)
+    } finally {
+      vi.unstubAllGlobals()
+    }
+  })
+
+  it('uses the default rate when sample_rate is explicitly undefined', () => {
+    const event = { ...domError(), tags: { sample_rate: undefined } }
+    tagBrowserTranslationError(event, false)
+    expect(event.tags.sample_rate).toBe(0.05)
+  })
+
+  it('keeps tags that are already set', () => {
+    const event = { ...domError(), tags: { globalErrorBoundary: true, sample_rate: 1 } }
+    tagBrowserTranslationError(event, false)
+    expect(event.tags).toMatchObject({ globalErrorBoundary: true, sample_rate: 1 })
+  })
+
+  it('leaves other errors alone', () => {
+    const event: SentryEvent = {
+      exception: { values: [{ type: 'Error', value: 'Application error' }] },
+    }
+    tagBrowserTranslationError(event, true)
+    expect(event.tags).toBeUndefined()
+  })
+})
+
 describe('buildSentryClientOptions', () => {
   // Representative subset of Sentry's default integrations. `integrations`
   // is the function form: Sentry.init calls it with the defaults and installs
@@ -422,6 +493,13 @@ describe('buildSentryClientOptions', () => {
     })
 
     expect(getIntegrationNames(options)).toContain('FakeRouterTracing')
+  })
+
+  it('no longer ignores insert/remove node errors, so beforeSend can sample them', () => {
+    const { ignoreErrors = [] } = buildSentryClientOptions({ includeThirdPartyErrorFilter: true })
+    expect(ignoreErrors).not.toContain("NotFoundError: Failed to execute 'removeChild' on 'Node'")
+    expect(ignoreErrors).not.toContain('NotFoundError: The object can not be found here.')
+    expect(ignoreErrors).toContain("Cannot read properties of null (reading 'parentNode')")
   })
 
   it('builds the same shared options for both builds (parity)', () => {
@@ -535,5 +613,55 @@ describe('which errors Studio sends to Sentry', () => {
     expect(
       await beforeSend({ type: undefined, exception: { values: [{ value: 'No stack' }] } }, {})
     ).toBeNull()
+  })
+
+  describe('browser-translation DOM errors', () => {
+    const domErrorEvent = (): Parameters<typeof beforeSend>[0] => ({
+      type: undefined,
+      exception: {
+        values: [
+          {
+            type: 'NotFoundError',
+            value:
+              "Failed to execute 'removeChild' on 'Node': The node is not a child of this node.",
+            stacktrace: { frames: [{ filename: 'app.js' }] },
+          },
+        ],
+      },
+    })
+
+    it('sends the sampled share, tagged, without the extra 1% sampling', async () => {
+      vi.mocked(Math.random).mockReturnValueOnce(0.04)
+      const event = domErrorEvent()
+
+      expect(await beforeSend(event, {})).toBe(event)
+      expect(Math.random).toHaveBeenCalledOnce()
+      expect(event.tags).toMatchObject({
+        browser_translation: true,
+        sample_rate: 0.05,
+        codeSampleRate: '1',
+      })
+    })
+
+    it('samples them even when the event has no stack frames', async () => {
+      vi.mocked(Math.random).mockReturnValueOnce(0.04)
+      const event = domErrorEvent()
+      event.exception!.values![0].stacktrace = undefined
+
+      expect(await beforeSend(event, {})).toBe(event)
+    })
+
+    it('still drops other errors that have no stack frames', async () => {
+      const event: Parameters<typeof beforeSend>[0] = {
+        type: undefined,
+        exception: { values: [{ type: 'Error', value: 'Application error' }] },
+      }
+      expect(await beforeSend(event, {})).toBeNull()
+    })
+
+    it('drops the rest of them', async () => {
+      vi.mocked(Math.random).mockReturnValueOnce(0.5)
+      expect(await beforeSend(domErrorEvent(), {})).toBeNull()
+    })
   })
 })

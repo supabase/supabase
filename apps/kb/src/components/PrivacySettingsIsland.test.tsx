@@ -24,6 +24,7 @@ describe('PrivacySettingsIsland', () => {
     act(() => root?.unmount())
     root = undefined
     document.body.innerHTML = ''
+    document.cookie = '_sb_country=; max-age=0'
   })
 
   it('opens the privacy settings dialog from the footer link', async () => {
@@ -33,10 +34,21 @@ describe('PrivacySettingsIsland', () => {
     act(() => root!.render(<PrivacySettingsIsland />))
 
     const link = container.querySelector('button')
-    expect(link?.textContent).toBe('Privacy Settings')
+    expect(link?.textContent).toBe('Do Not Sell or Share My Personal Information')
+    expect(link?.querySelector('span')?.classList.contains('invisible')).toBe(false)
 
     await act(async () => link!.click())
 
     expect(document.querySelector('[role="dialog"]')?.textContent).toContain('Privacy Settings')
+  })
+
+  it('keeps the Privacy Settings label for non-US visitors', () => {
+    document.cookie = '_sb_country=DE'
+    const container = document.createElement('div')
+    document.body.append(container)
+    root = createRoot(container)
+    act(() => root!.render(<PrivacySettingsIsland />))
+
+    expect(container.querySelector('button')?.textContent).toBe('Privacy Settings')
   })
 })

@@ -32,7 +32,7 @@ it('loads the overview before feature flags and updates metrics with the selecte
   })
   queryClient.setQueryData(subscriptionKeys.addons('default'), { selected_addons: [] })
   queryClient.setQueryData(customDomainKeys.list('default'), {})
-  queryClient.setQueryData<EdgeFunction>(edgeFunctionsKeys.detail('default', undefined), {
+  queryClient.setQueryData<EdgeFunction>(edgeFunctionsKeys.detail('default', 'send-email'), {
     id: 'function-id',
     name: 'Send email',
     slug: 'send-email',

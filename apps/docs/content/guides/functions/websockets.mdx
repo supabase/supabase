@@ -294,9 +294,9 @@ When testing Edge Functions locally with [Supabase CLI](/docs/guides/local-devel
 automatically after a request is completed. This will prevent keeping WebSocket
 connections open.
 
-To prevent that, you can update the `supabase/config.toml` with the following settings:
+To prevent that, you can update your config file (`supabase/config.toml` or `supabase/config.jsonc`) with the following settings:
 
-```toml
+```toml supabase/config.toml
 [edge_runtime]
 policy = "per_worker"
 ```

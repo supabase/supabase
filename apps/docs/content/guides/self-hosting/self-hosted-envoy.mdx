@@ -143,6 +143,8 @@ MCP routes are denied at the gateway by default. Allowing local access requires 
 
 The `/functions/v1/` route sets `idle_timeout` to `160s` and `timeout` to `410s` in `volumes/api/envoy/lds.template.yaml`. These allow the runtime's 150-second request idle timeout and 400-second worker lifetime limit to expire first. See [Timeout errors](/docs/guides/self-hosting/self-hosted-functions#timeout-errors) for the runtime settings.
 
+Other routes have no total timeout. Envoy closes a request after 5 minutes without data in either direction, set by `stream_idle_timeout` in `volumes/api/envoy/lds.template.yaml`.
+
 ## Authentication
 
 The gateway handles three authentication-related steps: dashboard basic auth on the catch-all route, API key enforcement on protected routes, and an opaque-to-internal key translation step that runs before enforcement.

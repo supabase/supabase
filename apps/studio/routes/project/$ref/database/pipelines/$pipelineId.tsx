@@ -14,21 +14,21 @@ function DatabasePipelinesPage() {
   const navigate = useNavigate()
   const { ref: projectRef } = Route.useParams()
   const { hasLoaded } = useContext(FeatureFlagContext)
-  const enablePgReplicate = useIsPipelinesEnabled()
+  const hasPipelinesDestinationAccess = useIsPipelinesEnabled()
 
   useEffect(() => {
-    if (hasLoaded && !enablePgReplicate) {
+    if (hasLoaded && !hasPipelinesDestinationAccess) {
       void navigate({
         to: '/project/$ref/database/pipelines',
         params: { ref: projectRef },
         replace: true,
       })
     }
-  }, [navigate, hasLoaded, projectRef, enablePgReplicate])
+  }, [navigate, hasLoaded, projectRef, hasPipelinesDestinationAccess])
 
   return (
     <>
-      {enablePgReplicate && (
+      {hasPipelinesDestinationAccess && (
         <ReplicationPipelineLayout>
           <ReplicationPipelineStatus />
         </ReplicationPipelineLayout>

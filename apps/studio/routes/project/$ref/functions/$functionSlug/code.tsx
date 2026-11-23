@@ -5,6 +5,7 @@ import { CornerDownLeftIcon, Loader2Icon } from 'lucide-react'
 import { useEffect, useMemo, useState } from 'react'
 import { toast } from 'sonner'
 import { LogoLoader } from 'ui'
+import { Admonition } from 'ui-patterns/Admonition'
 
 import { DeployEdgeFunctionWarningModal } from '@/components/interfaces/EdgeFunctions/DeployEdgeFunctionWarningModal'
 import {
@@ -178,24 +179,39 @@ function CodePage() {
 
       {isErrorLoadingFiles && (
         <div className="flex flex-col items-center justify-center h-full bg-surface-200">
-          <AlertError
-            hideContactSupport
-            className="max-w-xl"
-            subject="Failed to load function code"
-            description={
-              filesError?.message ?? 'The format may be invalid or the function may be corrupted'
-            }
-          >
-            <p className="mb-0!">To resolve this issue:</p>
-            <ol className="mt-0!">
-              <li>Update to the latest Supabase CLI version</li>
-              {isExceedMaxSize ? (
+          {isExceedMaxSize ? (
+            <Admonition
+              type="note"
+              className="max-w-xl"
+              title="Function source code exceeds the maximum size of 5MB"
+            >
+              <p className="mb-0!">To resolve this issue:</p>
+              <ol className="mt-0!">
+                <li>Update to the latest Supabase CLI version</li>
                 <li>
-                  Download your function via the CLI with:
-                  <br />
-                  <code>supabase functions download {functionSlug}</code>
+                  Download your function using either:
+                  <ul className="list-disc! mt-0!">
+                    <li>
+                      The CLI via: <code>supabase functions download {functionSlug}</code>{' '}
+                      (Recommended)
+                    </li>
+                    <li>Or try the "Download" button above</li>
+                  </ul>
                 </li>
-              ) : (
+              </ol>
+            </Admonition>
+          ) : (
+            <AlertError
+              hideContactSupport
+              className="max-w-xl"
+              subject="Failed to load function code"
+              description={
+                filesError?.message ?? 'The format may be invalid or the function may be corrupted'
+              }
+            >
+              <p className="mb-0!">To resolve this issue:</p>
+              <ol className="mt-0!">
+                <li>Update to the latest Supabase CLI version</li>
                 <li>
                   Redeploy your function using either:
                   <ul className="list-disc! mt-0!">
@@ -210,9 +226,9 @@ function CodePage() {
                     </li>
                   </ul>
                 </li>
-              )}
-            </ol>
-          </AlertError>
+              </ol>
+            </AlertError>
+          )}
         </div>
       )}
 
