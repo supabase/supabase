@@ -45,6 +45,8 @@ catalog:
   motion: ^11.18.2
   next: ^16.4.3
   next-themes: ^0.4.6
+  # Pin exact version while oxfmt is 0.x so patch releases don't cause surprise CI diffs.
+  oxfmt: 0.79.0
   postcss: ^8.5.18
   radix-ui: ^1.4.3
   react: ^19.2.6
