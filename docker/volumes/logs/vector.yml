@@ -136,7 +136,7 @@ transforms:
       parsed, err = parse_json(.event_message)
       if err == null && is_object(parsed) {
         if parsed.schema == "supabase.edge.logs.v1" &&
-           (parsed.stream == "request" || parsed.stream == "runtime") &&
+           (parsed.stream == "request" || parsed.stream == "runtime" || parsed.stream == "internal") &&
            is_object(parsed.metadata) && is_string(parsed.msg) {
           event_timestamp, timestamp_err = parse_timestamp(parsed.timestamp, format: "%+")
           if timestamp_err == null {
@@ -144,22 +144,30 @@ transforms:
           }
           .function_log_stream = parsed.stream
           .event_message = parsed.msg
-          .metadata.function_id = parsed.metadata.function_id
-          .metadata.execution_id = parsed.metadata.execution_id
-          if parsed.stream == "request" {
-            .metadata.request_id = parsed.metadata.request_id
-            .metadata.request = parsed.metadata.request
-            .metadata.response = parsed.metadata.response
-            .metadata.execution_time_ms = parsed.metadata.execution_time_ms
-          } else {
-            .metadata.event_type = parsed.metadata.event_type
+          if parsed.stream == "internal" {
             .metadata.level = parsed.metadata.level
-            .metadata.boot_time = parsed.metadata.boot_time
-            .metadata.reason = parsed.metadata.reason
-            .metadata.cpu_time_used = parsed.metadata.cpu_time_used
-            .metadata.memory_used = parsed.metadata.memory_used
-            .metadata.dropped_count = parsed.metadata.dropped_count
-            .metadata.synthetic = parsed.metadata.synthetic
+            .metadata.component = parsed.metadata.component
+            if exists(parsed.metadata.error) {
+              .metadata.error = parsed.metadata.error
+            }
+          } else {
+            .metadata.function_id = parsed.metadata.function_id
+            .metadata.execution_id = parsed.metadata.execution_id
+            if parsed.stream == "request" {
+              .metadata.request_id = parsed.metadata.request_id
+              .metadata.request = parsed.metadata.request
+              .metadata.response = parsed.metadata.response
+              .metadata.execution_time_ms = parsed.metadata.execution_time_ms
+            } else {
+              .metadata.event_type = parsed.metadata.event_type
+              .metadata.level = parsed.metadata.level
+              .metadata.boot_time = parsed.metadata.boot_time
+              .metadata.reason = parsed.metadata.reason
+              .metadata.cpu_time_used = parsed.metadata.cpu_time_used
+              .metadata.memory_used = parsed.metadata.memory_used
+              .metadata.dropped_count = parsed.metadata.dropped_count
+              .metadata.synthetic = parsed.metadata.synthetic
+            }
           }
         }
       }
