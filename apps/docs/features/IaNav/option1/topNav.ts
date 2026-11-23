@@ -38,7 +38,7 @@ export const GLOBAL_MENU_ITEMS: GlobalMenuItems = [
   ],
   [
     {
-      label: 'Build',
+      label: 'Products',
       icon: 'products',
       menuItems: [
         [

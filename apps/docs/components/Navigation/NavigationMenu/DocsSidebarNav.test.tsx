@@ -100,7 +100,7 @@ describe('DocsSidebarNav', () => {
   })
 
   it.each([
-    ['/guides/realtime/broadcast', 'REST, GraphQL and Realtime, back to Build'],
+    ['/guides/realtime/broadcast', 'REST, GraphQL and Realtime, back to Products'],
     ['/guides/deployment/terraform/tutorial', 'Terraform, back to Develop and deploy'],
   ])('opens the option-1 product whose tree holds %s', (pathname, backButtonName) => {
     navigation.pathname = pathname
