@@ -3,11 +3,17 @@ import { PlusIcon, SearchIcon } from 'lucide-react'
 import { useState } from 'react'
 import { Button, Skeleton } from 'ui'
 import { Input } from 'ui-patterns/DataInputs/Input'
+import { PageContainer } from 'ui-patterns/PageContainer'
+import {
+  PageHeader,
+  PageHeaderMeta,
+  PageHeaderSummary,
+  PageHeaderTitle,
+} from 'ui-patterns/PageHeader'
+import { PageSection } from 'ui-patterns/PageSection'
 
 import { NoOrganizationsState } from '@/components/interfaces/Home/ProjectList/EmptyStates'
 import { OrganizationCard } from '@/components/interfaces/Organization/OrganizationCard'
-import { PageLayout } from '@/components/layouts/PageLayout/PageLayout'
-import { ScaffoldContainer, ScaffoldSection } from '@/components/layouts/Scaffold'
 import { AlertError } from '@/components/ui/AlertError'
 import { NoSearchResults } from '@/components/ui/NoSearchResults'
 import { useOrganizationsQuery } from '@/data/organizations/organizations-query'
@@ -26,9 +32,16 @@ export const Route = createFileRoute('/_app/organizations')({
 
 function Organizations() {
   return (
-    <PageLayout title="Your organizations" className="max-w-[1200px] lg:px-6 mx-auto">
+    <>
+      <PageHeader>
+        <PageHeaderMeta>
+          <PageHeaderSummary>
+            <PageHeaderTitle>Your organizations</PageHeaderTitle>
+          </PageHeaderSummary>
+        </PageHeaderMeta>
+      </PageHeader>
       <OrganizationsPageWithAuth />
-    </PageLayout>
+    </>
   )
 }
 
@@ -62,8 +75,8 @@ function OrganizationsPage() {
     <>
       <title>{pageTitle}</title>
       <meta name="description" content="Supabase Studio" />
-      <ScaffoldContainer>
-        <ScaffoldSection isFullWidth className="flex flex-col gap-y-4">
+      <PageContainer>
+        <PageSection className="gap-y-4 last:pb-6">
           {organizations.length > 0 && (
             <div className="flex items-center justify-between gap-x-2 md:gap-x-3">
               <Input
@@ -103,8 +116,8 @@ function OrganizationsPage() {
                 <OrganizationCard key={org.id} organization={org} />
               ))}
           </div>
-        </ScaffoldSection>
-      </ScaffoldContainer>
+        </PageSection>
+      </PageContainer>
     </>
   )
 }
