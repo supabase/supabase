@@ -614,7 +614,7 @@ export const UnifiedLogs = ({
   const handleDismissUpdateSuggestion = () => {
     setDismissedUpdateKey(updateSuggestionKey)
     setIsReviewingChanges(false)
-    track('unified_logs_view_update_prompt_closed')
+    track('unified_logs_view_modified_popover_closed')
   }
 
   const applyFilterSearch = () => {

@@ -4581,8 +4581,8 @@ export interface UnifiedLogsViewRemovedEvent {
  * @source studio
  * @page /project/[ref]/logs
  */
-export interface UnifiedLogsViewUpdatePromptClosedEvent {
-  action: 'unified_logs_view_update_prompt_closed'
+export interface UnifiedLogsViewModifiedPopoverClosedEvent {
+  action: 'unified_logs_view_modified_popover_closed'
   groups: TelemetryGroups
 }
 
@@ -5120,7 +5120,7 @@ export type TelemetryEvent =
   | UnifiedLogsViewCreatedEvent
   | UnifiedLogsViewUpdatedEvent
   | UnifiedLogsViewRemovedEvent
-  | UnifiedLogsViewUpdatePromptClosedEvent
+  | UnifiedLogsViewModifiedPopoverClosedEvent
   | HeaderHomeLogoClickedEvent
   | HeaderBackToDashboardClickedEvent
   | HeaderExceedingUsageBadgeClickedEvent
