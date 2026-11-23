@@ -64,7 +64,7 @@ const PaymentMethods = () => {
     selectedOrganization?.managed_by === MANAGED_BY.STRIPE_PROJECTS
   return (
     <>
-      <PageSection ref={ref} orientation="horizontal">
+      <PageSection ref={ref} orientation="horizontal" className="pb-12">
         <PageSectionMeta>
           <PageSectionSummary>
             <PageSectionTitle>Payment Methods</PageSectionTitle>
