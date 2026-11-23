@@ -1,7 +1,6 @@
 import { Link, useNavigate } from '@tanstack/react-router'
 import { useParams } from 'common'
 import {
-  ArrowRightIcon,
   ArrowUpCircleIcon,
   CircleStopIcon,
   EditIcon,
@@ -20,6 +19,8 @@ import {
   BreadcrumbPage,
   BreadcrumbSeparator,
   Button,
+  Card,
+  CardContent,
   DropdownMenu,
   DropdownMenuContent,
   DropdownMenuItem,
@@ -37,10 +38,18 @@ import {
   PageHeaderSummary,
   PageHeaderTitle,
 } from 'ui-patterns/PageHeader'
+import {
+  PageSection,
+  PageSectionContent,
+  PageSectionMeta,
+  PageSectionSummary,
+  PageSectionTitle,
+} from 'ui-patterns/PageSection'
 import { GenericSkeletonLoader, ShimmeringLoader } from 'ui-patterns/ShimmeringLoader'
 
 import { DeleteDestination } from './DeleteDestination'
 import { DestinationLogo } from './DestinationLogo'
+import { PIPELINE_REGION } from './DestinationPanel/DestinationForm/PipelineRegionField'
 import { DestinationPanel } from './DestinationPanel/DestinationPanel'
 import {
   getPipelineDisplayState,
@@ -49,19 +58,24 @@ import {
   getRestartRequestStatus,
   getStatusName,
 } from './Pipeline.utils'
+import { PipelineFlow } from './PipelineFlow'
 import { PipelineStatePill } from './PipelineStatePill'
 import { PipelineStatusName } from './Replication.constants'
 import {
   canModifyDestination,
   getReplicationDestinationType,
 } from './ReplicationDiagram/Nodes.utils'
+import { getOverviewDestination } from './ReplicationDiagram/Overview.utils'
+import {
+  PIPELINE_DETAIL_GRID_CLASS_NAME,
+  PipelineDetailItem,
+} from './ReplicationPipelineStatus/PipelineDetailItem'
 import { UnknownDestinationNotice } from './UnknownDestinationNotice'
 import { UpdateVersionModal } from './UpdateVersionModal'
 import { useReplicationClusters } from './useReplicationClusters'
 import { useUnifiedLogsPreview } from '@/components/interfaces/App/FeaturePreview/FeaturePreviewContext'
 import { AlertError } from '@/components/ui/AlertError'
 import { DocsButton } from '@/components/ui/DocsButton'
-import { RegionFlag } from '@/components/ui/RegionFlag'
 import { useDeleteDestinationPipelineMutation } from '@/data/replication/delete-destination-pipeline-mutation'
 import { useReplicationDestinationByIdQuery } from '@/data/replication/destination-by-id-query'
 import { useReplicationPipelineByIdQuery } from '@/data/replication/pipeline-by-id-query'
@@ -92,7 +106,7 @@ const LIFECYCLE_BY_STATUS: Partial<
 export const ReplicationPipelineLayout = ({ children }: PropsWithChildren) => {
   const { ref: projectRef, pipelineId } = useParams()
   const clusterId = useReplicationClusterId()
-  const { clusters, hasMultipleRegions } = useReplicationClusters()
+  const { clusters } = useReplicationClusters()
   const region = clusters.find(
     (cluster) => (cluster.isDefault ? undefined : cluster.clusterId) === clusterId
   )
@@ -157,6 +171,11 @@ export const ReplicationPipelineLayout = ({ children }: PropsWithChildren) => {
   const statusName = getStatusName(pipelineStatusData?.status)
   const displayState = getPipelineDisplayState(requestStatus, statusName)
   const destinationType = getReplicationDestinationType(destination?.config)
+  const destinationIdentity = getOverviewDestination({
+    destination,
+    destinationId: pipeline?.destination_id ?? 0,
+    clusterId,
+  })
   const isUnknownDestination = destinationType === 'Unknown'
   const canModify = canModifyDestination(destinationType)
   const isPipelineIdentityLoading =
@@ -306,7 +325,7 @@ export const ReplicationPipelineLayout = ({ children }: PropsWithChildren) => {
                   (pipeline?.destination_name ?? 'Pipeline')
                 )}
               </PageHeaderTitle>
-              <PageHeaderDescription className="flex flex-row flex-wrap items-center gap-x-1.5 gap-y-1 text-sm!">
+              <PageHeaderDescription className="flex flex-wrap items-center gap-x-2 gap-y-1 text-sm!">
                 <PipelineStatePill
                   pipelineStatus={pipelineStatusData?.status}
                   error={pipelineStatusError}
@@ -317,39 +336,6 @@ export const ReplicationPipelineLayout = ({ children }: PropsWithChildren) => {
                   projectRef={projectRef}
                   pipelineId={pipelineId}
                 />
-                <span aria-hidden className="text-foreground-lighter">
-                  &middot;
-                </span>
-                <span className="flex items-center gap-x-1.5 text-foreground-light">
-                  <span>Primary database</span>
-                  <ArrowRightIcon size={14} strokeWidth={1.5} className="text-foreground-lighter" />
-                  {isPipelineIdentityLoading ? (
-                    <span className="inline-flex items-center">
-                      <span className="sr-only">Loading destination</span>
-                      <ShimmeringLoader className="h-5 w-20 py-0" />
-                    </span>
-                  ) : (
-                    <span>{destinationType ?? pipeline?.destination_name ?? 'Unknown'}</span>
-                  )}
-                </span>
-                {hasMultipleRegions && region && (
-                  <>
-                    <span aria-hidden className="text-foreground-lighter">
-                      &middot;
-                    </span>
-                    <span className="inline-flex items-center gap-1 text-foreground-light">
-                      <span>Pipeline region:</span>
-                      {region.regionCode && (
-                        <RegionFlag className="w-4" region={region.regionCode} />
-                      )}
-                      <span>
-                        {region.regionCode
-                          ? `${region.regionName} (${region.regionCode})`
-                          : region.regionName}
-                      </span>
-                    </span>
-                  </>
-                )}
               </PageHeaderDescription>
             </PageHeaderSummary>
 
@@ -460,6 +446,7 @@ export const ReplicationPipelineLayout = ({ children }: PropsWithChildren) => {
 
       {isPipelineIdentityLoading && !pipelineError && (
         <PageContainer size="large">
+          <span className="sr-only">Loading pipeline details</span>
           <GenericSkeletonLoader />
         </PageContainer>
       )}
@@ -476,6 +463,59 @@ export const ReplicationPipelineLayout = ({ children }: PropsWithChildren) => {
             error={destinationError}
             subject="Failed to retrieve destination information"
             projectRef={projectRef}
+          />
+        </PageContainer>
+      )}
+
+      {pipeline && !isPipelineIdentityLoading && (
+        <PageContainer size="large" className="flex flex-col gap-y-6">
+          <PageSection>
+            <PageSectionMeta>
+              <PageSectionSummary>
+                <PageSectionTitle>Overview</PageSectionTitle>
+              </PageSectionSummary>
+            </PageSectionMeta>
+            <PageSectionContent>
+              <Card>
+                <CardContent className="pb-5">
+                  <dl className={PIPELINE_DETAIL_GRID_CLASS_NAME}>
+                    <PipelineDetailItem label="Pipeline ID">
+                      <code className="break-all">{pipeline.id}</code>
+                    </PipelineDetailItem>
+                    <PipelineDetailItem label="Source">Primary database</PipelineDetailItem>
+                    <PipelineDetailItem label="Publication">
+                      {pipeline.config.publication_name}
+                    </PipelineDetailItem>
+                    <PipelineDetailItem label="Destination">
+                      {destinationType ?? 'Destination'}
+                    </PipelineDetailItem>
+                    {destinationIdentity.projectId && (
+                      <PipelineDetailItem label="Project">
+                        {destinationIdentity.projectId}
+                      </PipelineDetailItem>
+                    )}
+                    {destinationIdentity.datasetId && (
+                      <PipelineDetailItem label="Dataset">
+                        {destinationIdentity.datasetId}
+                      </PipelineDetailItem>
+                    )}
+                    <PipelineDetailItem label="Region">
+                      {(region?.regionCode ? `${region.regionName} (${region.regionCode})` : region?.regionName) ??
+                        (clusterId === undefined ? PIPELINE_REGION.displayName : 'Unknown')}
+                    </PipelineDetailItem>
+                  </dl>
+                </CardContent>
+              </Card>
+            </PageSectionContent>
+          </PageSection>
+          <PipelineFlow
+            pipelineRegion={
+              (region?.regionCode ? `${region.regionName} (${region.regionCode})` : region?.regionName) ??
+              (clusterId === undefined ? PIPELINE_REGION.displayName : undefined)
+            }
+            isRunning={statusName === PipelineStatusName.STARTED && !isTransitioning}
+            destination={destination?.name ?? pipeline.destination_name}
+            destinationType={destinationType}
           />
         </PageContainer>
       )}

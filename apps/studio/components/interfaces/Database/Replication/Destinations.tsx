@@ -428,7 +428,7 @@ export const Destinations = () => {
         )}
 
         {isDestinationsLoading && !shouldShowTable && (
-          <GenericTableLoader headers={[null, 'Name', 'Status', 'Region', 'Lag', null]} />
+          <GenericTableLoader headers={[null, 'Pipeline', 'Status', 'Region', 'Lag', null]} />
         )}
 
         {shouldShowTable && (
@@ -444,7 +444,7 @@ export const Destinations = () => {
                         currentSort={sort}
                         onSortChange={handleSortChange}
                       >
-                        Name
+                        Pipeline
                       </TableHeadSort>
                     </TableHead>
                     <TableHead key="status" className="w-[150px]" aria-sort={getAriaSort('status')}>
@@ -472,6 +472,7 @@ export const Destinations = () => {
                       <DestinationRow
                         destinationId={destination.id}
                         pipelineRegion={cluster.regionName}
+                        pipelineRegionCode={cluster.regionCode ?? undefined}
                       />
                     </ReplicationClusterProvider>
                   ))}

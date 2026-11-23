@@ -18,6 +18,8 @@ const VARIANT_BY_TYPE: Record<PipelineDisplayType, StateDotVariant> = {
 }
 
 interface PipelineStatePillProps {
+  withTooltip?: boolean
+  shouldPulseRunning?: boolean
   pipelineStatus: ReplicationPipelineStatusData['status'] | undefined
   error: StudioError | null
   isLoading: boolean
@@ -34,6 +36,8 @@ interface PipelineStatePillProps {
  */
 export const PipelineStatePill = ({
   pipelineStatus,
+  withTooltip = true,
+  shouldPulseRunning = false,
   error,
   isLoading,
   isError,
@@ -68,6 +72,20 @@ export const PipelineStatePill = ({
     tooltipMessage = `${message}. Check the logs for more information.`
   }
 
+  if (!withTooltip) {
+    return (
+      <StateDot
+        variant={shouldShowError ? 'default' : VARIANT_BY_TYPE[type]}
+        isPulsing={
+          !shouldShowError && (type === 'loading' || (shouldPulseRunning && type === 'success'))
+        }
+        labelClassName="text-xs text-foreground-light"
+      >
+        {shouldShowError ? 'Unknown' : label}
+      </StateDot>
+    )
+  }
+
   return (
     <span className="inline-flex" aria-live="polite" aria-atomic="true">
       <Tooltip>
@@ -75,7 +93,9 @@ export const PipelineStatePill = ({
           <StateDot
             tabIndex={0}
             variant={shouldShowError ? 'default' : VARIANT_BY_TYPE[type]}
-            isPulsing={!shouldShowError && type === 'loading'}
+            isPulsing={
+              !shouldShowError && (type === 'loading' || (shouldPulseRunning && type === 'success'))
+            }
             labelClassName={cn('text-foreground-light', TOOLTIP_UNDERLINE_CLASS_NAME)}
           >
             {shouldShowError ? 'Unknown' : label}

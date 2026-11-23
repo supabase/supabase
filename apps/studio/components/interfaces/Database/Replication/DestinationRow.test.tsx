@@ -170,6 +170,7 @@ describe('DestinationRow', () => {
       await userEvent.click(await screen.findByRole('button', { name: 'Pipeline options' }))
       expect(screen.getAllByRole('menuitem').map((item) => item.textContent)).toEqual([
         'View details',
+        'View logs',
         ...(status === 'stopped' ? [] : ['Stop pipeline']),
         'Delete pipeline',
       ])

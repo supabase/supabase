@@ -17,6 +17,7 @@ const useIsCurrentOrgInFlagList = (flag: string) => {
       : []
 
   // [Joshen] Override to enable for all organizations by setting the flag value as `all`
+  if (import.meta.env.DEV && import.meta.env.STUDIO_PIPELINES_MOCK === true) return true
   if (allowedOrgSlugs.includes('all')) return true
 
   // [Joshen] Otherwise fallback to checking against org slug
