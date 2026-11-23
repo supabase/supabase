@@ -562,23 +562,28 @@ const FormFieldArgs = ({ readonly }: FormFieldConfigParamsProps) => {
                 />
                 <FormField
                   name={`args.${index}.type`}
-                  render={({ field }) => (
+                  render={({ field: typeField }) => (
                     <FormItem className="flex-1">
                       <FormControl>
                         {readonly ? (
-                          <Input value={field.value} disabled readOnly className="h-auto" />
+                          <Input value={typeField.value} disabled readOnly className="h-auto" />
                         ) : (
                           <Select
                             disabled={readonly}
-                            onValueChange={field.onChange}
-                            defaultValue={field.value}
+                            onValueChange={typeField.onChange}
+                            defaultValue={typeField.value}
                           >
                             <SelectTrigger className="h-[34px]">
                               <SelectValue />
                             </SelectTrigger>
                             <SelectContent>
                               <ScrollArea className="h-52">
-                                {uniq(['integer', ...POSTGRES_DATA_TYPES, field.value])
+                                {uniq([
+                                  'integer',
+                                  ...POSTGRES_DATA_TYPES,
+                                  field.type,
+                                  typeField.value,
+                                ])
                                   .filter(Boolean)
                                   .map((option) => (
                                     <SelectItem value={option} key={option}>
