@@ -128,7 +128,12 @@ CREATE POLICY "View organization settings."
   ON organization_settings
   AS RESTRICTIVE
   USING (
-    sso_provider_id = (select (auth.jwt()#>>'{amr,0,provider}')::uuid)
+    sso_provider_id = (
+      select (entry->>'provider')::uuid
+      from jsonb_array_elements(coalesce(auth.jwt()->'amr', '[]'::jsonb)) as entry
+      where entry->>'method' = 'sso/saml'
+      limit 1
+    )
   );
 ```
 
