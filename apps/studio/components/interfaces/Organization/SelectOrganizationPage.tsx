@@ -1,5 +1,13 @@
 import { useLocation } from '@tanstack/react-router'
 import { cn } from 'ui'
+import { PageContainer } from 'ui-patterns/PageContainer'
+import {
+  PageHeader,
+  PageHeaderMeta,
+  PageHeaderSummary,
+  PageHeaderTitle,
+} from 'ui-patterns/PageHeader'
+import { PageSection } from 'ui-patterns/PageSection'
 
 import {
   Header,
@@ -8,8 +16,6 @@ import {
 } from '@/components/interfaces/Home/ProjectList/EmptyStates'
 import { buildOrgUrl } from '@/components/interfaces/Organization/Organization.utils'
 import { OrganizationCard } from '@/components/interfaces/Organization/OrganizationCard'
-import { PageLayout } from '@/components/layouts/PageLayout/PageLayout'
-import { ScaffoldContainer, ScaffoldSection } from '@/components/layouts/Scaffold'
 import { useOrganizationsQuery } from '@/data/organizations/organizations-query'
 import { useCustomContent } from '@/hooks/custom-content/useCustomContent'
 import { withAuth } from '@/hooks/misc/withAuth'
@@ -39,9 +45,16 @@ function SelectOrganization() {
       <title>{pageTitle}</title>
       <meta name="description" content="Supabase Studio" />
       <Header />
-      <PageLayout className="grow min-h-0" title="Select an organization to continue">
-        <ScaffoldContainer>
-          <ScaffoldSection isFullWidth>
+      <div className="flex w-full min-h-0 grow flex-col items-stretch">
+        <PageHeader>
+          <PageHeaderMeta>
+            <PageHeaderSummary>
+              <PageHeaderTitle>Select an organization to continue</PageHeaderTitle>
+            </PageHeaderSummary>
+          </PageHeaderMeta>
+        </PageHeader>
+        <PageContainer>
+          <PageSection className="last:pb-6">
             <div
               className="grow overflow-y-auto"
               style={{ maxHeight: 'calc(100vh - 49px - 64px)' }}
@@ -69,9 +82,9 @@ function SelectOrganization() {
                 )}
               </div>
             </div>
-          </ScaffoldSection>
-        </ScaffoldContainer>
-      </PageLayout>
+          </PageSection>
+        </PageContainer>
+      </div>
     </>
   )
 }

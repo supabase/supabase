@@ -1,6 +1,15 @@
-import { screen, waitFor } from '@testing-library/react'
+import { QueryClient } from '@tanstack/react-query'
+import {
+  createMemoryHistory,
+  createRootRoute,
+  createRouter,
+  RouterContextProvider,
+} from '@tanstack/react-router'
+import { act, screen, waitFor } from '@testing-library/react'
 import type { platformComponents } from 'api-types'
+import { LOCAL_STORAGE_KEYS } from 'common'
 import { HttpResponse } from 'msw'
+import type { ReactElement } from 'react'
 import { beforeEach, describe, expect, it, vi } from 'vitest'
 
 import {
@@ -12,6 +21,9 @@ import {
 import { OverviewMetrics } from './OverviewMetrics'
 import type { AuthMetricsResponse } from './OverviewUsage.constants'
 import type { RawAuthMetricsRow } from './OverviewUsage.schema'
+import { SEARCH_PARAMS_PARSER } from '@/components/interfaces/UnifiedLogs/UnifiedLogs.constants'
+import { parseLogsFilterUrlParams } from '@/components/interfaces/UnifiedLogs/UnifiedLogs.filters'
+import { parseSearch, stringifySearch } from '@/lib/router-search-params'
 import { customRender } from '@/tests/lib/custom-render'
 import { addAPIMock, type APIErrorBody } from '@/tests/lib/msw'
 
@@ -66,7 +78,26 @@ const mockEmptyLogs = () => {
   })
 }
 
+const renderMetrics = (component: ReactElement, queryClient?: QueryClient) => {
+  const router = createRouter({
+    routeTree: createRootRoute(),
+    history: createMemoryHistory({ initialEntries: ['/project/default/auth'] }),
+    parseSearch,
+    stringifySearch,
+  })
+  const result = customRender(
+    <RouterContextProvider router={router}>{component}</RouterContextProvider>,
+    { queryClient }
+  )
+  return {
+    ...result,
+    rerender: (next: ReactElement) =>
+      result.rerender(<RouterContextProvider router={router}>{next}</RouterContextProvider>),
+  }
+}
+
 beforeEach(() => {
+  localStorage.removeItem(LOCAL_STORAGE_KEYS.UI_PREVIEW_UNIFIED_LOGS)
   flags.otelLegacyLogs = false
 })
 
@@ -94,13 +125,51 @@ describe('Auth overview logs requests', () => {
       },
     })
 
-    customRender(<OverviewMetrics isLoading={false} error={null} />)
+    const queryClient = new QueryClient({ defaultOptions: { queries: { retry: false } } })
+    const { rerender } = renderMetrics(
+      <OverviewMetrics isLoading={false} error={null} />,
+      queryClient
+    )
 
     expect(await screen.findByText('/auth/v1/token')).toBeVisible()
     expect(await screen.findByText('invalid_credentials')).toBeVisible()
     expect(screen.getByText('7')).toBeVisible()
     expect(screen.getByText('3')).toBeVisible()
+    const assertLogsLink = (request: URL) => {
+      const link = screen.getAllByRole('link', { name: 'Go to Logs' })[0]
+      const url = new URL(link.getAttribute('href') ?? '', 'http://localhost')
+      expect(url.pathname).toBe('/project/default/logs')
+      const filters = SEARCH_PARAMS_PARSER.filter.parse(url.searchParams.get('filter') ?? '')
+      expect(parseLogsFilterUrlParams(filters)).toEqual([
+        { column: 'log_type', operator: '=', value: 'edge' },
+        { column: 'method', operator: '=', value: 'POST' },
+        { column: 'pathname', operator: '=', value: '/auth/v1/token' },
+        { column: 'status', operator: '=', value: '401' },
+      ])
+      const date = SEARCH_PARAMS_PARSER.date.parse(url.searchParams.get('date') ?? '')
+      expect(date?.map((value) => value.toISOString())).toEqual([
+        request.searchParams.get('iso_timestamp_start'),
+        request.searchParams.get('iso_timestamp_end'),
+      ])
+    }
+    const responseRequest = () => {
+      const request = requests
+        .filter((url) => url.searchParams.get('sql') === query.responseSql)
+        .at(-1)
+      if (!request) throw new Error('Expected a response errors request')
+      return request
+    }
+    assertLogsLink(responseRequest())
+    rerender(<OverviewMetrics isLoading={false} error={null} />)
+    assertLogsLink(responseRequest())
     expect(requests).toHaveLength(2)
+    await act(async () => {
+      await queryClient.invalidateQueries({
+        queryKey: ['auth-overview', 'default', 'top-response-errors'],
+      })
+    })
+    expect(requests).toHaveLength(3)
+    await waitFor(() => assertLogsLink(responseRequest()))
     for (const request of requests) {
       expect(request.pathname).toContain('/projects/default/analytics/endpoints/')
       const start = Date.parse(request.searchParams.get('iso_timestamp_start') ?? '')
@@ -109,8 +178,26 @@ describe('Auth overview logs requests', () => {
     }
   })
 
-  // Error parsing is shared by both endpoints (the success test above covers endpoint
-  // selection), so the failure shapes only need checking against one of them
+  it('respects an explicit legacy logs preference', async () => {
+    localStorage.setItem(LOCAL_STORAGE_KEYS.UI_PREVIEW_UNIFIED_LOGS, 'false')
+    addAPIMock({
+      method: 'get',
+      path: logQueries[0].endpoint,
+      response: ({ request }) =>
+        HttpResponse.json<AnalyticsResponse>({
+          result:
+            new URL(request.url).searchParams.get('sql') === logQueries[0].responseSql
+              ? [{ method: 'POST', path: '/auth/v1/token', status_code: 401, count: 7 }]
+              : [],
+        }),
+    })
+    renderMetrics(<OverviewMetrics isLoading={false} error={null} />)
+    expect(await screen.findByRole('link', { name: 'Go to Logs' })).toHaveAttribute(
+      'href',
+      '/project/default/logs/edge-logs?s=%2Fauth%2Fv1%2Ftoken'
+    )
+  })
+
   it.each(['http', 'string', 'object'] as const)(
     'shows %s errors instead of empty log tables',
     async (failure) => {
@@ -134,7 +221,7 @@ describe('Auth overview logs requests', () => {
         },
       })
 
-      customRender(<OverviewMetrics isLoading={false} error={null} />)
+      renderMetrics(<OverviewMetrics isLoading={false} error={null} />)
 
       expect(await screen.findByText('Failed to retrieve Auth API errors')).toBeVisible()
       expect(await screen.findByText('Failed to retrieve Auth server errors')).toBeVisible()
@@ -154,7 +241,7 @@ describe('Auth success rate presentation', () => {
       result: [metricRow('previous', 500, 500), ...(current ? [current] : [])],
       error: null,
     }
-    customRender(<OverviewMetrics metrics={metrics} isLoading={false} error={null} />)
+    renderMetrics(<OverviewMetrics metrics={metrics} isLoading={false} error={null} />)
 
     expect(screen.getAllByText('No data')).toHaveLength(2)
     expect(screen.queryByText('0.0%')).not.toBeInTheDocument()
@@ -168,7 +255,7 @@ describe('Auth success rate presentation', () => {
       result: [metricRow('current', 500, 500), metricRow('previous', 500, 500)],
       error: null,
     }
-    const { rerender } = customRender(
+    const { rerender } = renderMetrics(
       <OverviewMetrics metrics={metrics} isLoading={false} error={null} />
     )
     expect(screen.getAllByText('0.0%')).toHaveLength(2)
@@ -190,7 +277,7 @@ describe('Auth success rate presentation', () => {
 
   it('shows a populated current rate without comparison when the previous period has no requests', async () => {
     mockEmptyLogs()
-    customRender(
+    renderMetrics(
       <OverviewMetrics
         metrics={{
           result: [metricRow('current', 500, 499), metricRow('previous', 0, 0)],

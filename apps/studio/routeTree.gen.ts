@@ -272,8 +272,6 @@ import { Route as ProjectRefFunctionsFunctionSlugInvocationsRouteImport } from '
 import { Route as ProjectRefFunctionsFunctionSlugLogsRouteImport } from './routes/project/$ref/functions/$functionSlug/logs'
 import { Route as ProjectRefIntegrationsIdIndexRouteImport } from './routes/project/$ref/integrations/$id/index'
 import { Route as ProjectRefLogsExplorerIndexRouteImport } from './routes/project/$ref/logs/explorer/index'
-import { Route as ProjectRefLogsExplorerRecentRouteImport } from './routes/project/$ref/logs/explorer/recent'
-import { Route as ProjectRefLogsExplorerSavedRouteImport } from './routes/project/$ref/logs/explorer/saved'
 import { Route as ProjectRefLogsExplorerTemplatesRouteImport } from './routes/project/$ref/logs/explorer/templates'
 import { Route as ProjectRefSettingsApiKeysIndexRouteImport } from './routes/project/$ref/settings/api-keys/index'
 import { Route as ProjectRefSettingsApiKeysLegacyRouteImport } from './routes/project/$ref/settings/api-keys/legacy'
@@ -1782,18 +1780,6 @@ const ProjectRefLogsExplorerIndexRoute =
     path: '/explorer/',
     getParentRoute: () => ProjectRefLogsRoute,
   } as any)
-const ProjectRefLogsExplorerRecentRoute =
-  ProjectRefLogsExplorerRecentRouteImport.update({
-    id: '/explorer/recent',
-    path: '/explorer/recent',
-    getParentRoute: () => ProjectRefLogsRoute,
-  } as any)
-const ProjectRefLogsExplorerSavedRoute =
-  ProjectRefLogsExplorerSavedRouteImport.update({
-    id: '/explorer/saved',
-    path: '/explorer/saved',
-    getParentRoute: () => ProjectRefLogsRoute,
-  } as any)
 const ProjectRefLogsExplorerTemplatesRoute =
   ProjectRefLogsExplorerTemplatesRouteImport.update({
     id: '/explorer/templates',
@@ -2436,8 +2422,6 @@ export interface FileRoutesByFullPath {
   '/project/$ref/functions/$functionSlug/details': typeof ProjectRefFunctionsFunctionSlugDetailsRoute
   '/project/$ref/functions/$functionSlug/invocations': typeof ProjectRefFunctionsFunctionSlugInvocationsRoute
   '/project/$ref/functions/$functionSlug/logs': typeof ProjectRefFunctionsFunctionSlugLogsRoute
-  '/project/$ref/logs/explorer/recent': typeof ProjectRefLogsExplorerRecentRoute
-  '/project/$ref/logs/explorer/saved': typeof ProjectRefLogsExplorerSavedRoute
   '/project/$ref/logs/explorer/templates': typeof ProjectRefLogsExplorerTemplatesRoute
   '/project/$ref/settings/api-keys/legacy': typeof ProjectRefSettingsApiKeysLegacyRoute
   '/project/$ref/settings/billing/usage': typeof ProjectRefSettingsBillingUsageRoute
@@ -2750,8 +2734,6 @@ export interface FileRoutesByTo {
   '/project/$ref/functions/$functionSlug/details': typeof ProjectRefFunctionsFunctionSlugDetailsRoute
   '/project/$ref/functions/$functionSlug/invocations': typeof ProjectRefFunctionsFunctionSlugInvocationsRoute
   '/project/$ref/functions/$functionSlug/logs': typeof ProjectRefFunctionsFunctionSlugLogsRoute
-  '/project/$ref/logs/explorer/recent': typeof ProjectRefLogsExplorerRecentRoute
-  '/project/$ref/logs/explorer/saved': typeof ProjectRefLogsExplorerSavedRoute
   '/project/$ref/logs/explorer/templates': typeof ProjectRefLogsExplorerTemplatesRoute
   '/project/$ref/settings/api-keys/legacy': typeof ProjectRefSettingsApiKeysLegacyRoute
   '/project/$ref/settings/billing/usage': typeof ProjectRefSettingsBillingUsageRoute
@@ -3083,8 +3065,6 @@ export interface FileRoutesById {
   '/project/$ref/functions/$functionSlug/details': typeof ProjectRefFunctionsFunctionSlugDetailsRoute
   '/project/$ref/functions/$functionSlug/invocations': typeof ProjectRefFunctionsFunctionSlugInvocationsRoute
   '/project/$ref/functions/$functionSlug/logs': typeof ProjectRefFunctionsFunctionSlugLogsRoute
-  '/project/$ref/logs/explorer/recent': typeof ProjectRefLogsExplorerRecentRoute
-  '/project/$ref/logs/explorer/saved': typeof ProjectRefLogsExplorerSavedRoute
   '/project/$ref/logs/explorer/templates': typeof ProjectRefLogsExplorerTemplatesRoute
   '/project/$ref/settings/api-keys/legacy': typeof ProjectRefSettingsApiKeysLegacyRoute
   '/project/$ref/settings/billing/usage': typeof ProjectRefSettingsBillingUsageRoute
@@ -3415,8 +3395,6 @@ export interface FileRouteTypes {
     | '/project/$ref/functions/$functionSlug/details'
     | '/project/$ref/functions/$functionSlug/invocations'
     | '/project/$ref/functions/$functionSlug/logs'
-    | '/project/$ref/logs/explorer/recent'
-    | '/project/$ref/logs/explorer/saved'
     | '/project/$ref/logs/explorer/templates'
     | '/project/$ref/settings/api-keys/legacy'
     | '/project/$ref/settings/billing/usage'
@@ -3729,8 +3707,6 @@ export interface FileRouteTypes {
     | '/project/$ref/functions/$functionSlug/details'
     | '/project/$ref/functions/$functionSlug/invocations'
     | '/project/$ref/functions/$functionSlug/logs'
-    | '/project/$ref/logs/explorer/recent'
-    | '/project/$ref/logs/explorer/saved'
     | '/project/$ref/logs/explorer/templates'
     | '/project/$ref/settings/api-keys/legacy'
     | '/project/$ref/settings/billing/usage'
@@ -4061,8 +4037,6 @@ export interface FileRouteTypes {
     | '/project/$ref/functions/$functionSlug/details'
     | '/project/$ref/functions/$functionSlug/invocations'
     | '/project/$ref/functions/$functionSlug/logs'
-    | '/project/$ref/logs/explorer/recent'
-    | '/project/$ref/logs/explorer/saved'
     | '/project/$ref/logs/explorer/templates'
     | '/project/$ref/settings/api-keys/legacy'
     | '/project/$ref/settings/billing/usage'
@@ -6109,20 +6083,6 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof ProjectRefLogsExplorerIndexRouteImport
       parentRoute: typeof ProjectRefLogsRoute
     }
-    '/project/$ref/logs/explorer/recent': {
-      id: '/project/$ref/logs/explorer/recent'
-      path: '/explorer/recent'
-      fullPath: '/project/$ref/logs/explorer/recent'
-      preLoaderRoute: typeof ProjectRefLogsExplorerRecentRouteImport
-      parentRoute: typeof ProjectRefLogsRoute
-    }
-    '/project/$ref/logs/explorer/saved': {
-      id: '/project/$ref/logs/explorer/saved'
-      path: '/explorer/saved'
-      fullPath: '/project/$ref/logs/explorer/saved'
-      preLoaderRoute: typeof ProjectRefLogsExplorerSavedRouteImport
-      parentRoute: typeof ProjectRefLogsRoute
-    }
     '/project/$ref/logs/explorer/templates': {
       id: '/project/$ref/logs/explorer/templates'
       path: '/explorer/templates'
@@ -7050,8 +7010,6 @@ interface ProjectRefLogsRouteChildren {
   ProjectRefLogsReplicationLogsRoute: typeof ProjectRefLogsReplicationLogsRoute
   ProjectRefLogsStorageLogsRoute: typeof ProjectRefLogsStorageLogsRoute
   ProjectRefLogsIndexRoute: typeof ProjectRefLogsIndexRoute
-  ProjectRefLogsExplorerRecentRoute: typeof ProjectRefLogsExplorerRecentRoute
-  ProjectRefLogsExplorerSavedRoute: typeof ProjectRefLogsExplorerSavedRoute
   ProjectRefLogsExplorerTemplatesRoute: typeof ProjectRefLogsExplorerTemplatesRoute
   ProjectRefLogsExplorerIndexRoute: typeof ProjectRefLogsExplorerIndexRoute
 }
@@ -7074,8 +7032,6 @@ const ProjectRefLogsRouteChildren: ProjectRefLogsRouteChildren = {
   ProjectRefLogsReplicationLogsRoute: ProjectRefLogsReplicationLogsRoute,
   ProjectRefLogsStorageLogsRoute: ProjectRefLogsStorageLogsRoute,
   ProjectRefLogsIndexRoute: ProjectRefLogsIndexRoute,
-  ProjectRefLogsExplorerRecentRoute: ProjectRefLogsExplorerRecentRoute,
-  ProjectRefLogsExplorerSavedRoute: ProjectRefLogsExplorerSavedRoute,
   ProjectRefLogsExplorerTemplatesRoute: ProjectRefLogsExplorerTemplatesRoute,
   ProjectRefLogsExplorerIndexRoute: ProjectRefLogsExplorerIndexRoute,
 }
