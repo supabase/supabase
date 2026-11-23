@@ -106,6 +106,7 @@ import { useUnifiedLogsChartQuery } from '@/data/logs/unified-logs-chart-query'
 import { useUnifiedLogsCountQuery } from '@/data/logs/unified-logs-count-query'
 import { useUnifiedLogsInfiniteQuery } from '@/data/logs/unified-logs-infinite-query'
 import { useLocalStorageQuery } from '@/hooks/misc/useLocalStorage'
+import { useSelectedOrganizationQuery } from '@/hooks/misc/useSelectedOrganization'
 import { useShowMultigresLogs } from '@/hooks/misc/useShowMultigresLogs'
 import { useShowPipelinesLogs } from '@/hooks/misc/useShowPipelinesLogs'
 import { useTrack } from '@/lib/telemetry/track'
@@ -145,6 +146,8 @@ export const UnifiedLogs = ({
   useResetFocus()
 
   const { ref: projectRef } = useParams()
+  const { data: selectedOrganization } = useSelectedOrganizationQuery()
+  const orgSlug = selectedOrganization?.slug
   const track = useTrack()
   const [search, setSearch] = useQueryStates(SEARCH_PARAMS_PARSER)
   const showMultigresLogs = useShowMultigresLogs()
@@ -173,6 +176,7 @@ export const UnifiedLogs = ({
   const [isViewsSectionOpen, setIsViewsSectionOpen] = useState(false)
   const [isMobileViewsDrawerOpen, setIsMobileViewsDrawerOpen] = useState(false)
   const [saveViewProjectRef, setSaveViewProjectRef] = useState<string | null>(null)
+  const [saveViewSource, setSaveViewSource] = useState<'new' | 'save_as_new'>('new')
   const isSavingNewView = saveViewProjectRef !== null && saveViewProjectRef === projectRef
   const currentProjectRef = useRef(projectRef)
   currentProjectRef.current = projectRef
@@ -519,7 +523,12 @@ export const UnifiedLogs = ({
     isActiveViewRowMounted &&
     (isViewModifiedUnacknowledged || (isReviewingChanges && canReviewChanges))
 
-  const handleApplyView = (view: LogsView) => {
+  const getTrackGroupOverrides = (ref: string | undefined, slug: string | undefined) => ({
+    ...(ref && { project: ref }),
+    ...(slug && { organization: slug }),
+  })
+
+  const applyViewState = (view: LogsView) => {
     const { params, dropped } = applyView(view, { filterableNames })
     if (dropped.length > 0) {
       console.warn(`Saved view "${view.name}" dropped unknown filters/options:`, dropped)
@@ -530,6 +539,14 @@ export const UnifiedLogs = ({
     setIsReviewingChanges(false)
   }
 
+  const handleApplyView = (view: LogsView, trigger: 'select' | 'reset' = 'select') => {
+    applyViewState(view)
+    track('unified_logs_view_applied', {
+      viewType: isPresetViewId(view.id) ? 'preset' : 'saved',
+      trigger,
+    })
+  }
+
   const handleOpenViewsSection = () => {
     setIsViewsSectionOpen(true)
     setIsFilterBarOpen(true)
@@ -538,6 +555,8 @@ export const UnifiedLogs = ({
 
   const handleUpdateActiveView = async () => {
     if (!activeView) return
+    const savedProjectRef = projectRef
+    const savedOrgSlug = orgSlug
     const { filters, viewOptions } = serializeView({
       name: activeView.name,
       logSource: activeView.logSource,
@@ -548,19 +567,25 @@ export const UnifiedLogs = ({
       setIsReviewingChanges(false)
       setDismissedUpdateKey(null)
       toast.success('View updated')
+      track(
+        'unified_logs_view_updated',
+        { updateType: 'content' },
+        getTrackGroupOverrides(savedProjectRef, savedOrgSlug)
+      )
     } catch {
       return
     }
   }
 
-  const handleStartSaveView = () => {
+  const handleStartSaveView = (source: 'new' | 'save_as_new' = 'new') => {
     handleOpenViewsSection()
     setSaveViewProjectRef(projectRef ?? null)
+    setSaveViewSource(source)
   }
 
   const handleResetToActiveView = () => {
     if (!activeView) return
-    handleApplyView(activeView)
+    handleApplyView(activeView, 'reset')
   }
 
   const handleReviewChanges = () => {
@@ -576,18 +601,25 @@ export const UnifiedLogs = ({
 
   const handleDuplicateView = async (view: LogsView, name: string) => {
     const savedProjectRef = projectRef
+    const savedOrgSlug = orgSlug
     const id = await createSavedView({
       name,
       logSource: view.logSource,
       filters: view.filters,
       viewOptions: view.viewOptions,
     })
-    if (currentProjectRef.current === savedProjectRef) handleApplyView({ ...view, id, name })
+    if (currentProjectRef.current === savedProjectRef) applyViewState({ ...view, id, name })
     toast.success('View saved')
+    track(
+      'unified_logs_view_created',
+      { source: 'duplicate' },
+      getTrackGroupOverrides(savedProjectRef, savedOrgSlug)
+    )
   }
 
   const handleCreateView = async (name: string) => {
     const savedProjectRef = projectRef
+    const savedOrgSlug = orgSlug
     const input = serializeView({ name, logSource, search })
     const id = await createSavedView(input)
     if (currentProjectRef.current === savedProjectRef) {
@@ -596,11 +628,17 @@ export const UnifiedLogs = ({
       setIsReviewingChanges(false)
     }
     toast.success('View saved')
+    track(
+      'unified_logs_view_created',
+      { source: saveViewSource },
+      getTrackGroupOverrides(savedProjectRef, savedOrgSlug)
+    )
   }
 
   const handleDismissUpdateSuggestion = () => {
     setDismissedUpdateKey(updateSuggestionKey)
     setIsReviewingChanges(false)
+    track('unified_logs_view_modified_popover_closed')
   }
 
   const applyFilterSearch = () => {
@@ -688,12 +726,15 @@ export const UnifiedLogs = ({
       <SavedViewsEntry
         activeView={activeView}
         isActiveViewModified={isActiveViewModified}
-        onOpen={handleOpenViewsSection}
+        onOpen={() => {
+          track('unified_logs_views_panel_opened', { surface: 'sidebar' })
+          handleOpenViewsSection()
+        }}
       />
       {canCreateView && (
         <NewViewEntry
           disabled={isSavingNewView || activeFilterCount < MIN_FILTERS_TO_SAVE}
-          onClick={handleStartSaveView}
+          onClick={() => handleStartSaveView('new')}
         />
       )}
     </div>
@@ -716,7 +757,7 @@ export const UnifiedLogs = ({
               : 'Save current filters as a view',
         },
       }}
-      onClick={handleStartSaveView}
+      onClick={() => handleStartSaveView('new')}
     />
   ) : undefined
 
@@ -737,8 +778,26 @@ export const UnifiedLogs = ({
       onApply={handleApplyView}
       onReviewChanges={handleReviewChanges}
       canCreate={canCreateView}
-      onRename={(id, name) => updateSavedView(id, { name })}
-      onDelete={deleteSavedView}
+      onRename={async (id, name) => {
+        const savedProjectRef = projectRef
+        const savedOrgSlug = orgSlug
+        await updateSavedView(id, { name })
+        track(
+          'unified_logs_view_updated',
+          { updateType: 'name' },
+          getTrackGroupOverrides(savedProjectRef, savedOrgSlug)
+        )
+      }}
+      onDelete={async (id) => {
+        const savedProjectRef = projectRef
+        const savedOrgSlug = orgSlug
+        await deleteSavedView(id)
+        track(
+          'unified_logs_view_removed',
+          undefined,
+          getTrackGroupOverrides(savedProjectRef, savedOrgSlug)
+        )
+      }}
       onDuplicate={handleDuplicateView}
       onCancelSave={() => setSaveViewProjectRef(null)}
       onSubmitSave={handleCreateView}
@@ -840,7 +899,13 @@ export const UnifiedLogs = ({
                         {showSavedViews && (
                           <Drawer
                             open={isMobileViewsDrawerOpen}
-                            onOpenChange={setIsMobileViewsDrawerOpen}
+                            onOpenChange={(open) => {
+                              if (open)
+                                track('unified_logs_views_panel_opened', {
+                                  surface: 'mobile_drawer',
+                                })
+                              setIsMobileViewsDrawerOpen(open)
+                            }}
                           >
                             <DrawerTrigger asChild>
                               <Button
@@ -977,7 +1042,7 @@ export const UnifiedLogs = ({
           isPreset={isActiveViewPreset}
           isPending={isSavingView}
           onUpdate={handleUpdateActiveView}
-          onSaveAsNew={handleStartSaveView}
+          onSaveAsNew={() => handleStartSaveView('save_as_new')}
           onReset={handleResetToActiveView}
           onDismiss={handleDismissUpdateSuggestion}
         />
