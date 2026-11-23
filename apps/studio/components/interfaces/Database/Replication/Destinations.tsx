@@ -127,7 +127,14 @@ export const Destinations = () => {
   )
 
   const { groups, hasMultipleRegions } = useReplicationClusterGroups()
-  const { isLoading: isDiscoveringRegions } = useQuery(replicationClustersQueryOptions())
+  const {
+    isLoading: isDiscoveringRegions,
+    isSuccess: isRegionsSuccess,
+    isError: isRegionsError,
+    isFetching: isRetryingDiscovery,
+    error: regionsError,
+    refetch: refetchRegions,
+  } = useQuery(replicationClustersQueryOptions())
   const destinationResults = useQueries({
     queries: groups.map(({ clusterId }) =>
       replicationDestinationsQueryOptions({ projectRef, clusterId })
@@ -147,6 +154,7 @@ export const Destinations = () => {
   const clusterResults = groups.map((group, index) => {
     const destinationsResult = destinationResults[index]
     const pipelinesResult = pipelineResults[index]
+    const sourcesResult = sourceResults[index]
     const destinations = destinationsResult.data?.destinations ?? []
     const pipelines = pipelinesResult.data?.pipelines ?? []
     const pipelinesByDestination = new Map(
@@ -155,11 +163,14 @@ export const Destinations = () => {
     const visibleDestinations = pipelinesResult.isPending
       ? destinations
       : destinations.filter((destination) => pipelinesByDestination.has(destination.id))
-    const error = destinationsResult.error ?? pipelinesResult.error
+    const listError = destinationsResult.error ?? pipelinesResult.error
+    const sourceError = group.clusterId === undefined ? null : sourcesResult.error
+    const error = listError ?? sourceError
     return {
       group,
       destinationsResult,
       pipelinesResult,
+      sourcesResult,
       destinations,
       pipelines,
       pipelinesByDestination,
@@ -181,14 +192,18 @@ export const Destinations = () => {
   const retryRegion = ({
     destinationsResult,
     pipelinesResult,
+    sourcesResult,
   }: (typeof clusterResults)[number]) => {
     if (destinationsResult.isError) void destinationsResult.refetch()
     if (pipelinesResult.isError) void pipelinesResult.refetch()
+    if (sourcesResult.isError) void sourcesResult.refetch()
   }
   const isRetryingRegion = ({
     destinationsResult,
     pipelinesResult,
-  }: (typeof clusterResults)[number]) => destinationsResult.isFetching || pipelinesResult.isFetching
+    sourcesResult,
+  }: (typeof clusterResults)[number]) =>
+    destinationsResult.isFetching || pipelinesResult.isFetching || sourcesResult.isFetching
 
   const pipelineEntries = clusterResults.flatMap(({ group, pipelines }) =>
     pipelines.map((pipeline) => ({ pipeline, clusterId: group.clusterId }))
@@ -243,22 +258,25 @@ export const Destinations = () => {
     error: sourcesError,
     refetch: refetchSources,
   } = sourceResults[0]
-  const hasExternalReplicationSource = sourceResults.some(
-    ({ data }) => data?.sources.some((source) => source.name === projectRef) === true
-  )
+  const clustersWithProjectSource = groups
+    .filter((_, index) =>
+      sourceResults[index].data?.sources.some(({ name }) => name === projectRef)
+    )
+    .map(({ clusterId }) => clusterId)
+  const hasExternalReplicationSource = clustersWithProjectSource.length > 0
   const replicationNotEnabled = isSourcesSuccess && !hasExternalReplicationSource
 
-  const canDisablePipelines =
-    !isDiscoveringRegions &&
-    sourceResults.every(({ isSuccess }) => isSuccess) &&
-    hasExternalReplicationSource &&
+  const hasRegionalPipelines = clusterResults.some(
+    ({ destinations, pipelines }) => destinations.length > 0 || pipelines.length > 0
+  )
+  const canConfirmDisable =
+    (!IS_PLATFORM || isRegionsSuccess) &&
+    !hasRegionalPipelines &&
     clusterResults.every(
-      ({ destinationsResult, pipelinesResult, destinations, pipelines }) =>
-        destinationsResult.isSuccess &&
-        pipelinesResult.isSuccess &&
-        destinations.length === 0 &&
-        pipelines.length === 0
+      ({ destinationsResult, pipelinesResult, sourcesResult }) =>
+        destinationsResult.isSuccess && pipelinesResult.isSuccess && sourcesResult.isSuccess
     )
+  const canDisablePipelines = canConfirmDisable && hasExternalReplicationSource
 
   const canCreate = isSourcesSuccess && !isCreationGateLoading
   const isCheckingPipelineStatus = isCreationGateLoading || (!isSourcesSuccess && !isSourcesError)
@@ -408,7 +426,11 @@ export const Destinations = () => {
                   <div className="flex flex-col gap-y-0.5">
                     <p>Disable Pipelines</p>
                     {!canDisablePipelines && (
-                      <p className="text-foreground-lighter">Delete all pipelines first</p>
+                      <p className="text-foreground-lighter">
+                        {hasRegionalPipelines
+                          ? 'Delete all pipelines first'
+                          : 'Check every region first'}
+                      </p>
                     )}
                   </div>
                 </DropdownMenuItem>
@@ -446,6 +468,19 @@ export const Destinations = () => {
         <p role="status" aria-live="polite" className="sr-only">
           {isDestinationsLoading ? 'Loading pipelines' : ''}
         </p>
+
+        {isRegionsError && (
+          <AlertError
+            error={regionsError}
+            projectRef={projectRef}
+            subject="Failed to retrieve pipeline regions"
+            additionalActions={
+              <Button loading={isRetryingDiscovery} onClick={() => void refetchRegions()}>
+                Retry
+              </Button>
+            }
+          />
+        )}
 
         {isSourcesError && (
           <AlertError
@@ -529,7 +564,7 @@ export const Destinations = () => {
                   ))}
                   {hasMultipleRegions &&
                     clusterResults.map((result) => {
-                      const { group, error, isPending } = result
+                      const { group, error, isPending, sourcesResult } = result
                       const regionName = group.region?.region_name
                       if (!isPending && !error) return null
 
@@ -540,7 +575,11 @@ export const Destinations = () => {
                               <AlertError
                                 error={error}
                                 projectRef={projectRef}
-                                subject={`Failed to retrieve pipelines in ${regionName}`}
+                                subject={
+                                  error === sourcesResult.error
+                                    ? `Failed to retrieve pipeline enablement status in ${regionName}`
+                                    : `Failed to retrieve pipelines in ${regionName}`
+                                }
                                 additionalActions={
                                   <Button
                                     loading={isRetryingRegion(result)}
@@ -607,6 +646,8 @@ export const Destinations = () => {
       />
 
       <DisablePipelinesDialog
+        canConfirm={canConfirmDisable}
+        clusterIds={clustersWithProjectSource}
         open={showDisablePipelinesDialog}
         setOpen={setShowDisablePipelinesDialog}
       />
