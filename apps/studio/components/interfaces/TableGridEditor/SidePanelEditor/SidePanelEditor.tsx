@@ -3,6 +3,7 @@ import type { PGTable } from '@supabase/pg-meta'
 import { useQueryClient } from '@tanstack/react-query'
 import { useParams } from 'common'
 import { isEmpty, isUndefined, noop } from 'lodash'
+import { parseAsNativeArrayOf, parseAsString, useQueryStates } from 'nuqs'
 import { useState } from 'react'
 import { toast } from 'sonner'
 import { SonnerProgress, StatusIcon } from 'ui'
@@ -56,7 +57,6 @@ import { RetrieveTableResult } from '@/data/tables/table-retrieve-query'
 import { getTables } from '@/data/tables/tables-query'
 import { useSelectedProjectQuery } from '@/hooks/misc/useSelectedProject'
 import { useConfirmOnClose } from '@/hooks/ui/useConfirmOnClose'
-import { useUrlState } from '@/hooks/ui/useUrlState'
 import { useVisibleKey } from '@/hooks/ui/useVisibleKey'
 import { type ApiPrivilegesByRole } from '@/lib/data-api-types'
 import { isObjectContainingKeys } from '@/lib/helpers'
@@ -185,7 +185,13 @@ export const SidePanelEditor = ({
   const { ref } = useParams()
   const snap = useTableEditorStateSnapshot()
   const tabsSnap = useTabsStateSnapshot()
-  const [_, setParams] = useUrlState({ arrayKeys: ['filter', 'sort'] })
+  const [, setFilterAndSortParams] = useQueryStates(
+    {
+      filter: parseAsNativeArrayOf(parseAsString),
+      sort: parseAsNativeArrayOf(parseAsString),
+    },
+    { history: 'replace' }
+  )
 
   const track = useTrack()
   const queryClient = useQueryClient()
@@ -457,22 +463,15 @@ export const SidePanelEditor = ({
    * Adds the renamed column's filter and/or sort rules.
    */
   const reAddRenamedColumnSortAndFilter = (oldColumnName: string, newColumnName: string) => {
-    setParams((prevParams) => {
-      const existingFilters = (prevParams?.filter ?? []) as string[]
-      const existingSorts = (prevParams?.sort ?? []) as string[]
+    const renameColumnRule = (rule: string) => {
+      const [column] = rule.split(':')
+      return column === oldColumnName ? rule.replace(column, newColumnName) : rule
+    }
 
-      return {
-        ...prevParams,
-        filter: existingFilters.map((filter: string) => {
-          const [column] = filter.split(':')
-          return column === oldColumnName ? filter.replace(column, newColumnName) : filter
-        }),
-        sort: existingSorts.map((sort: string) => {
-          const [column] = sort.split(':')
-          return column === oldColumnName ? sort.replace(column, newColumnName) : sort
-        }),
-      }
-    })
+    setFilterAndSortParams((prev) => ({
+      filter: prev.filter?.map(renameColumnRule) ?? null,
+      sort: prev.sort?.map(renameColumnRule) ?? null,
+    }))
   }
 
   const updateTableRealtime = async (table: RetrieveTableResult, enabled: boolean) => {
