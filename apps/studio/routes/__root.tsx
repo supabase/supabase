@@ -16,7 +16,6 @@ import '@/styles/storage.css'
 import '@/styles/stripe.css'
 import '@/styles/ui.css'
 import 'ui-patterns/ShimmeringLoader/index.css'
-
 import * as Sentry from '@sentry/react'
 import { TanStackDevtools } from '@tanstack/react-devtools'
 import type { QueryClient } from '@tanstack/react-query'

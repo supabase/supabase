@@ -1,7 +1,6 @@
 'use client'
 
 import 'swiper/css'
-
 import { Swiper, SwiperSlide } from 'swiper/react'
 import { Image } from 'ui-patterns/Image'
 

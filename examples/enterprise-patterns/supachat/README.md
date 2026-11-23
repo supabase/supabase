@@ -1,6 +1,6 @@
 # Supachat Dynamic Table Partitioning Example
 
-This is example code for the [Supachat Dynamic Table Partitioning blog post]().
+This is example code for the [Supachat Dynamic Table Partitioning blog post](<>).
 
 Postgres has many powerful partitioning features ranging from simple
 declarative partitioning to fine-grained control over how child tables

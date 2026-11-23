@@ -1,9 +1,9 @@
-import RGL, { WidthProvider } from 'react-grid-layout'
+import { useParams } from 'common'
 
 import 'react-grid-layout/css/styles.css'
 import 'react-resizable/css/styles.css'
 
-import { useParams } from 'common'
+import RGL, { WidthProvider } from 'react-grid-layout'
 import { toast } from 'sonner'
 
 import { createSqlSnippetSkeletonV2 } from '../SQLEditor/SQLEditor.utils'
