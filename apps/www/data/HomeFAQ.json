@@ -25,7 +25,7 @@
   },
   {
     "question": "How does Supabase compare to other serverless function providers?",
-    "answer": "[Supabase Edge Functions](https://supabase.com/edge-functions) are TypeScript functions built on Deno and deployed globally, close to your users. Deno is open source, and your functions run locally and on any Deno-compatible platform, including self-hosted infrastructure.\n\nUse them for webhook receivers, authenticated or public HTTP endpoints, transactional emails, and calls to external APIs such as LLM providers.\n\nEdge Functions validate the caller's JWT from [Auth](https://supabase.com/auth) and give you a Supabase client scoped to that user's Row Level Security policies. They can also reach Postgres and [Storage](https://supabase.com/storage).\n\nPricing is based on invocations, with a free tier included."
+    "answer": "[Supabase Edge Functions](https://supabase.com/edge-functions) are TypeScript functions built on Deno and deployed globally, close to your users. Deno is open source, and your functions run locally and on any Deno-compatible platform, including self-hosted infrastructure.\n\nUse them for webhook receivers, authenticated or public HTTP endpoints, transactional emails, and calls to external APIs such as LLM providers.\n\nEdge Functions can work together with [Supabase Auth](https://supabase.com/auth) so actions are limited to a specific user's Row Level Security policies. They can also work with [Postgres database](https://supabase.com/database) and [Storage](https://supabase.com/storage).\n\nPricing is based on invocations, with a free tier included."
   },
   {
     "question": "How does Supabase compare to other storage providers?",
