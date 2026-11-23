@@ -18,10 +18,10 @@ import {
 
 import { OAuthAppsMemberGrantsDialogContent } from './OAuthAppsMemberGrantsDialogContent'
 import { OAuthAppsRevokeDialogContent } from './OAuthAppsRevokeDialogContent'
-import type { OAuthApprovalItem, OAuthApprovalTarget } from '@/data/oauth-apps/types'
+import { OAuthApproval, OAuthApprovalTarget } from '@/data/oauth-apps/oauth-apps-approvals-query'
 
 export interface OAuthAppsAuthorizedRowProps {
-  approval: OAuthApprovalItem
+  approval: OAuthApproval
   className?: string
   canRevoke: boolean
 }

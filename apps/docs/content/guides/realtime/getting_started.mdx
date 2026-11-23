@@ -542,7 +542,7 @@ RETURNS TRIGGER AS $$
 BEGIN
   -- Broadcast to room-specific channel
   PERFORM realtime.broadcast_changes(
-    'room:' || NEW.room_id::text || ':messages',
+    'room:' || coalesce(NEW.room_id, OLD.room_id)::text || ':messages',
     TG_OP,
     TG_OP,
     TG_TABLE_NAME,

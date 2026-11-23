@@ -1,21 +1,15 @@
 import { LogOutIcon } from 'lucide-react'
 
 import { ButtonTooltip } from '@/components/ui/ButtonTooltip'
-import { OAuthAppsAuthorizeRequest } from '@/data/oauth-apps/types'
+import { OAuthAppsAuthorizeRequestData } from '@/data/oauth-apps/oauth-apps-authorize-request-query'
 
 export interface AuthorizingAsCardProps {
   email: string
-  request: OAuthAppsAuthorizeRequest
-  organizationSlug: string
+  request: OAuthAppsAuthorizeRequestData
   onSignOut: () => void
 }
 
-export const AuthorizingAsCard = ({
-  email,
-  request,
-  organizationSlug,
-  onSignOut,
-}: AuthorizingAsCardProps) => {
+export const AuthorizingAsCard = ({ email, request, onSignOut }: AuthorizingAsCardProps) => {
   return (
     <section className="flex flex-col gap-2">
       <div className="divide-y rounded-md border bg-surface-75 px-4">
@@ -34,10 +28,6 @@ export const AuthorizingAsCard = ({
               tooltip={{ content: { side: 'bottom', text: 'Sign out' } }}
             />
           </span>
-        </div>
-        <div className="flex items-center justify-between gap-4 py-2.5 text-xs">
-          <span className="shrink-0 text-foreground-light">Organization</span>
-          <span className="min-w-0 truncate text-right text-foreground">{organizationSlug}</span>
         </div>
         {!request.project_scoping_mode && (
           <div className="flex items-center justify-between gap-4 py-2.5 text-xs">

@@ -1,4 +1,4 @@
-import { useQuery, useQueryClient } from '@tanstack/react-query'
+import { useIsFetching, useQuery, useQueryClient } from '@tanstack/react-query'
 import { useParams } from 'common'
 import dayjs from 'dayjs'
 import { RefreshCwIcon, WarehouseIcon } from 'lucide-react'
@@ -8,6 +8,8 @@ import { Admonition } from 'ui-patterns/Admonition'
 import { EmptyStatePresentational } from 'ui-patterns/EmptyStatePresentational'
 import { GenericSkeletonLoader } from 'ui-patterns/ShimmeringLoader'
 
+import { WarehouseCapacitySection } from './WarehouseCapacitySection'
+import { WarehouseLatencySection } from './WarehouseLatencySection'
 import { WarehouseMetricChart } from './WarehouseMetricChart'
 import { resolveWarehouseMetricsRange } from './WarehouseMetrics.range'
 import {
@@ -18,6 +20,7 @@ import {
   hasAnyValues,
   type ReportView,
 } from './WarehouseMetricsReport.utils'
+import { WarehouseWorkersSection } from './WarehouseWorkersSection'
 import { ReportHeader } from '@/components/interfaces/Reports/ReportHeader'
 import { REPORT_DATERANGE_HELPER_LABELS } from '@/components/interfaces/Reports/Reports.constants'
 import ReportStickyNav from '@/components/interfaces/Reports/ReportStickyNav'
@@ -40,7 +43,7 @@ import { useShortcut } from '@/state/shortcuts/useShortcut'
 const WAREHOUSE_METRICS: {
   metric: WarehouseMetricName
   title: string
-  unit: string
+  unit?: '/s' | 'ms'
   description: string
 }[] = [
   {
@@ -52,7 +55,7 @@ const WAREHOUSE_METRICS: {
   {
     metric: 'query_in_flight',
     title: 'Queries in progress',
-    unit: '',
+    unit: undefined,
     description: 'Queries awaiting completion, including worker waits and result streaming.',
   },
   {
@@ -119,18 +122,20 @@ const WarehouseMetricsReportContent = () => {
       enabled: isRangeOk,
     })
   )
+  const isFetching = useIsFetching({ queryKey: warehouseKeys.metrics(ref) }) > 0
+
   const handleRefresh = useRefreshHandler(
     datePickerValue,
     datePickerHelpers,
     handleDatePickerChange,
     async () => {
       await Promise.all([
-        queryClient.invalidateQueries({ queryKey: warehouseKeys.metricsAll(ref) }),
+        queryClient.invalidateQueries({ queryKey: warehouseKeys.metrics(ref) }),
         queryClient.invalidateQueries({ queryKey: warehouseKeys.setupStatus(ref) }),
       ])
     }
   )
-  useShortcut(SHORTCUT_IDS.OBSERVABILITY_REFRESH, handleRefresh, { enabled: !query.isFetching })
+  useShortcut(SHORTCUT_IDS.OBSERVABILITY_REFRESH, handleRefresh, { enabled: !isFetching })
   useShortcut(SHORTCUT_IDS.OBSERVABILITY_TOGGLE_DATE_PICKER, () => {
     setShowDatePicker((open) => !open)
   })
@@ -177,10 +182,8 @@ const WarehouseMetricsReportContent = () => {
               <Button
                 type="button"
                 aria-label="Refresh report"
-                disabled={query.isFetching}
-                icon={
-                  <RefreshCwIcon className={query.isFetching ? 'motion-safe:animate-spin' : ''} />
-                }
+                disabled={isFetching}
+                icon={<RefreshCwIcon className={isFetching ? 'motion-safe:animate-spin' : ''} />}
                 onClick={handleRefresh}
               />
             </ShortcutTooltip>
@@ -216,6 +219,13 @@ const WarehouseMetricsReportContent = () => {
             data={query.data}
             onResetRange={handleResetRange}
           />
+          {view.kind === 'ready' && range.status === 'ok' && (
+            <div className="flex flex-col gap-y-8 mt-8">
+              <WarehouseLatencySection range={range} />
+              <WarehouseCapacitySection range={range} />
+              <WarehouseWorkersSection range={range} />
+            </div>
+          )}
         </div>
       </ReportStickyNav>
       <UpgradePrompt

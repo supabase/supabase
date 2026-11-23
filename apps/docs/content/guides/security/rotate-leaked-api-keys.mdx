@@ -1,19 +1,25 @@
 ---
 id: 'rotate-leaked-api-keys'
-title: 'Rotate a leaked or compromised API key'
-description: 'Stop a leaked API key from granting access to your project without breaking the components that use it.'
+title: 'Rotate a leaked API key'
+description: 'Stop a leaked or compromised API key from granting access to your project without breaking the components that use it: create a new key, retire the old one.'
 ---
 
 Replace a leaked secret key or `service_role` key with a new secret key, then retire the compromised key so it stops granting access to your project. To learn what each key type can access, see [API keys](/docs/guides/getting-started/api-keys).
 
 ## Prerequisites
 
-Fix the root cause of the leak before you rotate anything. Otherwise the new key can leak the same way. The [OWASP Risk Rating Methodology](https://community.owasp.org/OWASP_Risk_Rating_Methodology) helps you judge the severity of the incident and plan your next steps. If someone is actively using the leaked key, retire it right away with the steps in [Retire the compromised key](#retire-the-compromised-key), even though components that still use it stop working until you replace it.
+Fix the root cause of the leak before you rotate anything. Otherwise the new key can leak the same way. The [OWASP Risk Rating Methodology](https://community.owasp.org/OWASP_Risk_Rating_Methodology) helps you judge the severity of the incident and plan your next steps.
 
 To follow the Management API path, you also need:
 
 - A [personal access token](/dashboard/account/tokens). If you use a [scoped personal access token](/docs/guides/platform/personal-access-tokens), it needs the **API Keys** permission with **Read-write** access. An OAuth application needs the `secrets:read` and `secrets:write` scopes.
 - [`jq`](https://jqlang.org/), to filter the responses.
+
+## Procedure
+
+To rotate the key, create a new secret key, replace the compromised key with it, then retire the compromised key.
+
+If someone is actively using the leaked key, retire it right away with the steps in [Retire the compromised key](#retire-the-compromised-key), even though components that still use it stop working until you replace it.
 
 If you use the Management API, set your project reference and access token in your terminal:
 
@@ -22,7 +28,9 @@ export PROJECT_REF="your-project-ref"
 export SUPABASE_ACCESS_TOKEN="your-personal-access-token"
 ```
 
-## Create a new secret key
+### 1. Create a new secret key [#create-a-new-secret-key]
+
+To create the key, use the Dashboard or the Management API:
 
 <Tabs
   scrollable
@@ -51,7 +59,7 @@ curl --fail-with-body -X POST "https://api.supabase.com/v1/projects/$PROJECT_REF
 </TabPanel>
 </Tabs>
 
-## Replace the compromised key
+### 2. Replace the compromised key [#replace-the-compromised-key]
 
 To move your application to the new key:
 
@@ -59,7 +67,7 @@ To move your application to the new key:
 2. If the compromised key is a legacy `service_role` key, also replace the legacy `anon` key with a [publishable key](/docs/guides/getting-started/migrating-to-new-api-keys) in your browser and mobile clients. Retiring the compromised key deactivates both legacy keys.
 3. Confirm that every component now uses the new key.
 
-## Retire the compromised key
+### 3. Retire the compromised key [#retire-the-compromised-key]
 
 Unless someone is actively using the leaked key, wait until every component uses the new key before you start. Deleting a secret key can't be undone. If you find a client you missed after you deactivate the legacy keys, move it to a new key rather than re-enabling them, because re-enabling restores the compromised key.
 
@@ -124,3 +132,18 @@ For a legacy `anon` or `service_role` key:
 If the compromised key is a legacy `service_role` key, also revoke the legacy JWT secret. The legacy keys are JWTs signed by that secret, so anything that still trusts the secret can accept the leaked key. To move to JWT signing keys and revoke the legacy secret, see [Getting started](/docs/guides/auth/signing-keys#getting-started) in the JWT signing keys guide.
 
 The compromised key no longer grants access to your project.
+
+## Next steps
+
+To finish the move off the old keys, see these pages:
+
+- [API keys](/docs/guides/getting-started/api-keys): check what each key type can access.
+- [Migrating to new API keys](/docs/guides/getting-started/migrating-to-new-api-keys): move your clients to publishable and secret keys.
+- [JWT signing keys](/docs/guides/auth/signing-keys#getting-started): revoke the legacy JWT secret.
+
+## Related resources
+
+To read more about how keys reach your services, see these pages:
+
+- [Service-to-service calls](/docs/guides/functions/auth#service-to-service-calls): name the secret key an Edge Function accepts.
+- [Personal access tokens](/docs/guides/platform/personal-access-tokens): scope the token you use to manage keys.

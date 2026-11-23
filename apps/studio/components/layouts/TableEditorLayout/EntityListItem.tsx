@@ -78,8 +78,8 @@ export const EntityListItem = ({
 
   const isActive = Number(id) === entity.id
   const isChildPartition = entity.is_partition && entity.type !== ENTITY_TYPE.PARTITIONED_TABLE
-  const canEdit = isActive && !isLocked
-  const canViewPartitions = isActive && entity.type === ENTITY_TYPE.PARTITIONED_TABLE
+  const canEdit = !isLocked
+  const canViewPartitions = entity.type === ENTITY_TYPE.PARTITIONED_TABLE
   const canShowOptionsDropdown = canEdit || canViewPartitions
 
   const filters = useUrlTableFilters(entity.id)
@@ -166,7 +166,7 @@ export const EntityListItem = ({
     return text.charAt(0).toUpperCase() + text.slice(1)
   }
 
-  const actionGroups = getEntityActions({ entity, projectRef, isActive, isLocked })
+  const actionGroups = getEntityActions({ entity, projectRef, isLocked })
   const { onSelectAction, modals } = useEntityActionHandlers({
     entity,
     projectRef,
@@ -192,7 +192,7 @@ export const EntityListItem = ({
                 isSelected: isActive && !isPreview,
                 isPreview,
               }),
-              'pl-4 pr-1'
+              'pl-4 pr-1 group'
             )}
             onDoubleClick={(e) => {
               e.preventDefault()
@@ -273,7 +273,11 @@ export const EntityListItem = ({
                     <TooltipTrigger asChild>
                       <DropdownMenuTrigger
                         asChild
-                        className="text-foreground-lighter transition-all text-transparent group-hover:text-foreground data-open:text-foreground"
+                        className={cn(
+                          isActive ? 'opacity-100' : 'opacity-0 group-hover:opacity-100',
+                          'transition-all text-foreground-lighter text-transparent',
+                          'group-hover:text-foreground data-open:text-foreground'
+                        )}
                       >
                         <Button
                           variant="text"
@@ -286,7 +290,13 @@ export const EntityListItem = ({
                     </TooltipTrigger>
                     <TooltipContent side="bottom">More options</TooltipContent>
                   </Tooltip>
-                  <DropdownMenuContent side="bottom" align="start" className="w-52">
+
+                  <DropdownMenuContent
+                    side="bottom"
+                    align="start"
+                    className="w-52"
+                    onClick={(e) => e.stopPropagation()}
+                  >
                     <EntityActionMenuItems
                       variant="dropdown"
                       groups={actionGroups}

@@ -10,7 +10,13 @@ interface ComputeBadgeProps extends HTMLAttributes<HTMLDivElement> {
   icon?: ReactNode
 }
 
-export function ComputeBadge({ infraComputeSize, className, icon, ...props }: ComputeBadgeProps) {
+export function ComputeBadge({
+  infraComputeSize,
+  className,
+  icon,
+  children,
+  ...props
+}: ComputeBadgeProps) {
   const smallCompute =
     infraComputeSize?.toLocaleLowerCase() === 'micro' ||
     infraComputeSize?.toLocaleLowerCase() === 'nano'
@@ -39,7 +45,7 @@ export function ComputeBadge({ infraComputeSize, className, icon, ...props }: Co
       )}
       {...props}
     >
-      {infraComputeSize}
+      {children ?? infraComputeSize}
       {icon && <span className="flex items-center">{icon}</span>}
     </div>
   )
