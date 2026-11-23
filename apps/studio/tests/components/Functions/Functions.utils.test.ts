@@ -160,6 +160,12 @@ describe('formatArgumentDeclarations', () => {
       'integer DEFAULT 1',
     ])
   })
+
+  it('serializes an edited default after a type change', () => {
+    expect(formatArgumentDeclarations([{ name: 'a', type: 'bool', defaultValue: 'TRUE' }])).toEqual(
+      ['a bool DEFAULT TRUE']
+    )
+  })
 })
 
 describe('getNewArgumentIndex', () => {

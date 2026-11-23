@@ -592,6 +592,25 @@ const FormFieldArgs = ({ readonly }: FormFieldConfigParamsProps) => {
                 )}
               />
 
+              {(!readonly || field.defaultValue) && (
+                <FormField
+                  name={`args.${index}.defaultValue`}
+                  render={({ field: defaultField }) => (
+                    <FormItem className="flex-1">
+                      <FormControl>
+                        <Input
+                          {...defaultField}
+                          value={defaultField.value ?? ''}
+                          disabled={readonly}
+                          placeholder="default expression"
+                        />
+                      </FormControl>
+                      <FormMessage />
+                    </FormItem>
+                  )}
+                />
+              )}
+
               {!readonly && (
                 <Tooltip>
                   <TooltipTrigger asChild>
