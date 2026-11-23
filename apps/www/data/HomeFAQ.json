@@ -1,0 +1,42 @@
+[
+  {
+    "question": "What is Supabase?",
+    "answer": "Supabase is an open source Postgres development platform. Every project includes a full Postgres database, and you can add the other products together or separately. You can start for free.\n\n- [Database](https://supabase.com/docs/guides/database/overview): A dedicated Postgres database with auto-generated REST and GraphQL APIs.\n- [Auth](https://supabase.com/docs/guides/auth): Passwords, magic links, one-time passwords, social sign-in, and SSO.\n- [Edge Functions](https://supabase.com/docs/guides/functions): Serverless functions deployed globally, close to your users.\n- [Storage](https://supabase.com/docs/guides/storage): Store and serve large files, from videos to images.\n- [Realtime](https://supabase.com/docs/guides/realtime): Send messages between connected clients for chat, collaboration, live dashboards, and multiplayer games.\n- [Vector](https://supabase.com/docs/guides/ai): Store, index, and search vector embeddings.\n- [Queues](https://supabase.com/docs/guides/queues): Create and manage queues with any Postgres tooling.\n- [Cron](https://supabase.com/docs/guides/cron): Schedule recurring jobs with cron syntax and monitor runs inside Postgres."
+  },
+  {
+    "question": "How does Supabase's pricing work?",
+    "answer": "Supabase offers predictable pricing that lets you start building for free, collaborate with your team, scale to millions of users, and pay only for what you use.\n\nSupabase uses organization-based billing. You choose a plan (Pro, Team, or Enterprise) for your organization, then each project within it runs on its own compute instance. The plan subscription covers platform features and usage quotas. Compute is billed separately per project.\n\nPro and Team plans include $10/month in compute credits, which covers one Micro instance. Additional projects each add their own compute cost. For example, a Pro org with 2 projects on Micro compute costs: $25 (plan) + $10 (project 1) + $10 (project 2) - $10 (credits) = $35/month.\n\nFor current pricing, visit [https://supabase.com/pricing](https://supabase.com/pricing).\n\nA Supabase project can be used as a standalone Postgres database. Connect with psql, Prisma, Drizzle, or any Postgres client or ORM using the project's connection string. Auth, Storage, Realtime, and Edge Functions are included in every project but optional. Unused products cost nothing.\n\n- Free: $0/month, including 500 MB database size. Free projects are paused after 1 week of inactivity, with a limit of 2 active projects.\n- Pro: from $25/month, including 8 GB disk size per project and $10/month in compute credits that cover one project on Micro compute. A single database-only project on Micro compute costs $25/month before usage beyond the included quotas.\n- Projects on paid plans are not paused for inactivity."
+  },
+  {
+    "question": "Why should I build with Supabase?",
+    "answer": "Placeholder answer. Replace this with the final copy."
+  },
+  {
+    "question": "How does Supabase compare to other database providers?",
+    "answer": "Placeholder answer. Replace this with the final copy."
+  },
+  {
+    "question": "How does Supabase compare to other authentication providers?",
+    "answer": "Placeholder answer. Replace this with the final copy."
+  },
+  {
+    "question": "How does Supabase compare to other vector database providers?",
+    "answer": "Placeholder answer. Replace this with the final copy."
+  },
+  {
+    "question": "How does Supabase compare to other realtime providers?",
+    "answer": "Placeholder answer. Replace this with the final copy."
+  },
+  {
+    "question": "How does Supabase compare to other serverless function providers?",
+    "answer": "Placeholder answer. Replace this with the final copy."
+  },
+  {
+    "question": "How does Supabase compare to other storage providers?",
+    "answer": "Placeholder answer. Replace this with the final copy."
+  },
+  {
+    "question": "How does Supabase compare to other queue providers?",
+    "answer": "Placeholder answer. Replace this with the final copy."
+  }
+]

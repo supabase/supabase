@@ -155,10 +155,22 @@ if (staticSlugs.length === 0) {
   process.exit(1)
 }
 
+// The homepage FAQ lives in data/HomeFAQ.json so the page and /index.md share one source.
+// content/md/index.md holds the marker where the rendered section goes.
+const HOME_FAQ_MARKER = '<!-- HOME_FAQ -->'
+const homeFaq = JSON.parse(await fs.readFile(path.join(wwwDir, 'data/HomeFAQ.json'), 'utf-8'))
+const homeFaqMarkdown = [
+  '## Frequently asked questions',
+  ...homeFaq.flatMap(({ question, answer }) => ['', `### ${question}`, '', answer]),
+].join('\n')
+
 const staticEntries = await Promise.all(
   staticSlugs.map(async (slug) => ({
     slug,
-    content: await fs.readFile(path.join(contentDir, `${slug}.md`), 'utf-8'),
+    content: (await fs.readFile(path.join(contentDir, `${slug}.md`), 'utf-8')).replace(
+      HOME_FAQ_MARKER,
+      () => homeFaqMarkdown
+    ),
   }))
 )
 
@@ -201,6 +213,11 @@ if (excludedSlugs.length > 0) {
 
 if (!liveEntries.some((entry) => entry.slug === 'index')) {
   console.error('❌ Missing content/md/index.md — middleware maps / to the index slug.')
+  process.exit(1)
+}
+
+if (!liveEntries.find((entry) => entry.slug === 'index').content.includes(homeFaqMarkdown)) {
+  console.error('❌ content/md/index.md is missing the <!-- HOME_FAQ --> marker.')
   process.exit(1)
 }
 
