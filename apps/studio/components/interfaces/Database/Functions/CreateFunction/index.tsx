@@ -3,7 +3,7 @@ import { acceptUntrustedSql, untrustedSql } from '@supabase/pg-meta/src/pg-forma
 import { isEmpty, isNull, keyBy, mapValues, partition, uniq } from 'lodash'
 import { PlusIcon, TrashIcon } from 'lucide-react'
 import { useEffect, useMemo, useState } from 'react'
-import { SubmitHandler, useFieldArray, useForm, useWatch } from 'react-hook-form'
+import { SubmitHandler, useFieldArray, useForm, useFormContext, useWatch } from 'react-hook-form'
 import { toast } from 'sonner'
 import {
   Button,
@@ -527,6 +527,8 @@ interface FormFieldConfigParamsProps {
 }
 
 const FormFieldArgs = ({ readonly }: FormFieldConfigParamsProps) => {
+  const { control } = useFormContext<z.infer<typeof FormSchema>>()
+  const args = useWatch({ control, name: 'args' })
   const { fields, insert, remove } = useFieldArray<z.infer<typeof FormSchema>, 'args'>({
     name: 'args',
   })
@@ -545,86 +547,87 @@ const FormFieldArgs = ({ readonly }: FormFieldConfigParamsProps) => {
         )}
         {fields.map((field, index) => {
           return (
-            <div className="flex flex-row space-x-1" key={field.id}>
-              <FormField
-                name={`args.${index}.name`}
-                render={({ field }) => (
-                  <FormItem className="flex-1">
-                    <FormControl>
-                      <Input {...field} disabled={readonly} placeholder="argument_name" />
-                    </FormControl>
-                    <FormMessage />
-                  </FormItem>
-                )}
-              />
-              <FormField
-                name={`args.${index}.type`}
-                render={({ field }) => (
-                  <FormItem className="flex-1">
-                    <FormControl>
-                      {readonly ? (
-                        <Input value={field.value} disabled readOnly className="h-auto" />
-                      ) : (
-                        <Select
-                          disabled={readonly}
-                          onValueChange={field.onChange}
-                          defaultValue={field.value}
-                        >
-                          <SelectTrigger className="h-[34px]">
-                            <SelectValue />
-                          </SelectTrigger>
-                          <SelectContent>
-                            <ScrollArea className="h-52">
-                              {uniq(['integer', ...POSTGRES_DATA_TYPES, field.value])
-                                .filter(Boolean)
-                                .map((option) => (
-                                  <SelectItem value={option} key={option}>
-                                    {option}
-                                  </SelectItem>
-                                ))}
-                            </ScrollArea>
-                          </SelectContent>
-                        </Select>
-                      )}
-                    </FormControl>
-                    <FormMessage />
-                  </FormItem>
-                )}
-              />
-
-              {(!readonly || field.defaultValue) && (
+            <div className="flex flex-col space-y-1" key={field.id}>
+              <div className="flex flex-row space-x-1">
                 <FormField
-                  name={`args.${index}.defaultValue`}
-                  render={({ field: defaultField }) => (
+                  name={`args.${index}.name`}
+                  render={({ field }) => (
                     <FormItem className="flex-1">
                       <FormControl>
-                        <Input
-                          {...defaultField}
-                          value={defaultField.value ?? ''}
-                          disabled={readonly}
-                          placeholder="default expression"
-                        />
+                        <Input {...field} disabled={readonly} placeholder="argument_name" />
                       </FormControl>
                       <FormMessage />
                     </FormItem>
                   )}
                 />
-              )}
+                <FormField
+                  name={`args.${index}.type`}
+                  render={({ field }) => (
+                    <FormItem className="flex-1">
+                      <FormControl>
+                        {readonly ? (
+                          <Input value={field.value} disabled readOnly className="h-auto" />
+                        ) : (
+                          <Select
+                            disabled={readonly}
+                            onValueChange={field.onChange}
+                            defaultValue={field.value}
+                          >
+                            <SelectTrigger className="h-[34px]">
+                              <SelectValue />
+                            </SelectTrigger>
+                            <SelectContent>
+                              <ScrollArea className="h-52">
+                                {uniq(['integer', ...POSTGRES_DATA_TYPES, field.value])
+                                  .filter(Boolean)
+                                  .map((option) => (
+                                    <SelectItem value={option} key={option}>
+                                      {option}
+                                    </SelectItem>
+                                  ))}
+                              </ScrollArea>
+                            </SelectContent>
+                          </Select>
+                        )}
+                      </FormControl>
+                      <FormMessage />
+                    </FormItem>
+                  )}
+                />
 
-              {!readonly && (
-                <Tooltip>
-                  <TooltipTrigger asChild>
-                    <Button
-                      icon={<TrashIcon size={12} />}
-                      onClick={() => remove(index)}
-                      className="h-[34px] w-[34px]"
-                      aria-label="Remove argument"
-                      // Tooltip repeats the label; screen readers would read it twice
-                      aria-describedby={undefined}
-                    />
-                  </TooltipTrigger>
-                  <TooltipContent side="bottom">Remove </TooltipContent>
-                </Tooltip>
+                {!readonly && (
+                  <Tooltip>
+                    <TooltipTrigger asChild>
+                      <Button
+                        icon={<TrashIcon size={12} />}
+                        onClick={() => remove(index)}
+                        className="h-[34px] w-[34px]"
+                        aria-label="Remove argument"
+                        // Tooltip repeats the label; screen readers would read it twice
+                        aria-describedby={undefined}
+                      />
+                    </TooltipTrigger>
+                    <TooltipContent side="bottom">Remove </TooltipContent>
+                  </Tooltip>
+                )}
+              </div>
+
+              {(!readonly || field.defaultValue) && (
+                <FormField
+                  name={`args.${index}.defaultValue`}
+                  render={({ field: defaultField }) => (
+                    <FormItemLayout label="Default expression">
+                      <FormControl>
+                        <Input
+                          {...defaultField}
+                          value={defaultField.value ?? ''}
+                          disabled={readonly}
+                          placeholder="e.g. 1, TRUE, now()"
+                        />
+                      </FormControl>
+                    </FormItemLayout>
+                  )}
+                />
               )}
             </div>
           )
@@ -633,7 +636,7 @@ const FormFieldArgs = ({ readonly }: FormFieldConfigParamsProps) => {
         {!readonly && (
           <Button
             icon={<PlusIcon size={12} />}
-            onClick={() => insert(getNewArgumentIndex(fields), { name: '', type: 'integer' })}
+            onClick={() => insert(getNewArgumentIndex(args ?? []), { name: '', type: 'integer' })}
             disabled={readonly}
           >
             Add a new argument
