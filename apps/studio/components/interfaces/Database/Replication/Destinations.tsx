@@ -253,6 +253,7 @@ export const Destinations = () => {
     })
 
   const {
+    data: defaultSources,
     isSuccess: isSourcesSuccess,
     isError: isSourcesError,
     error: sourcesError,
@@ -278,6 +279,7 @@ export const Destinations = () => {
     )
   const canDisablePipelines = canConfirmDisable && hasExternalReplicationSource
 
+  const isDefaultRegionEnabled = defaultSources?.sources.some(({ name }) => name === projectRef)
   const canCreate = isSourcesSuccess && !isCreationGateLoading
   const isCheckingPipelineStatus = isCreationGateLoading || (!isSourcesSuccess && !isSourcesError)
   const sourceErrorTitle = checkLocalPipelinesNotSetUp(sourcesError)
@@ -285,7 +287,7 @@ export const Destinations = () => {
     : 'Failed to retrieve pipeline enablement status'
 
   const canLinkToWizard =
-    isWizardEnabled && hasWizardDestination && !!projectRef && !replicationNotEnabled && canCreate
+    isWizardEnabled && hasWizardDestination && !!projectRef && isDefaultRegionEnabled && canCreate
   const wizardLink = linkOptions({
     to: '/project/$ref/database/pipelines/new',
     params: { ref: projectRef ?? '_' },
@@ -301,7 +303,7 @@ export const Destinations = () => {
 
   const handleAddPipeline = () => {
     if (!canCreate) return
-    if (replicationNotEnabled) {
+    if (!isDefaultRegionEnabled) {
       pendingCreationTypeRef.current = 'BigQuery'
       setShowEnablePipelinesDialog(true)
       return

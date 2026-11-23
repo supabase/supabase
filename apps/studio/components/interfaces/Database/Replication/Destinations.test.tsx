@@ -478,7 +478,7 @@ describe('regions', () => {
       parseSearch,
       stringifySearch,
     })
-    return customRender(<Destinations />, {
+    const view = customRender(<Destinations />, {
       wrapper: ({ children }) => (
         <CustomWrapper queryClient={queryClient} nuqs={{ hasMemory: true }}>
           <RouterContextProvider router={router}>
@@ -487,6 +487,7 @@ describe('regions', () => {
         </CustomWrapper>
       ),
     })
+    return { ...view, router }
   }
 
   test('shows the pipeline region for a single region without cluster_id', async () => {
@@ -627,9 +628,8 @@ describe('regions', () => {
     expect(screen.queryByRole('heading', { name: 'Add a pipeline' })).not.toBeInTheDocument()
   })
 
-  const mockRegionalDisable = () => {
+  const mockRegionalDisable = (enabledClusters = new Set(['omitted', '2'])) => {
     const requests: string[] = []
-    const enabledClusters = new Set(['omitted', '2'])
     const failingClusters = new Set<string>()
     addAPIMock({
       method: 'get',
@@ -679,6 +679,40 @@ describe('regions', () => {
 
     return await screen.findByRole('alertdialog', { name: 'Disable Pipelines' })
   }
+
+  test('enables the default region before opening the wizard when only another region is enabled', async () => {
+    options.wizard = true
+    const enabledClusters = new Set(['2'])
+    mockRegions()
+    mockRegionalDisable(enabledClusters)
+    addAPIMock({
+      method: 'post',
+      path: '/platform/replication/:ref/tenants-sources',
+      response: ({ request }) => {
+        enabledClusters.add(clusterOf(request))
+        return HttpResponse.json<components['schemas']['CreateTenantSourceResponse_Output']>({
+          source_id: 42,
+          tenant_id: 'tenant',
+        })
+      },
+    })
+    const { router } = renderRegions()
+
+    const disableDialog = await openDisableDialog()
+    fireEvent.click(within(disableDialog).getByRole('button', { name: 'Cancel' }))
+    await waitFor(() => expect(disableDialog).not.toBeInTheDocument())
+
+    expect(screen.queryByRole('link', { name: 'Add pipeline' })).not.toBeInTheDocument()
+    addPipeline()
+    expect(router.history.location.href).toBe(listPath)
+    const enableDialog = await screen.findByRole('dialog', { name: 'Enable Pipelines' })
+    fireEvent.click(within(enableDialog).getByRole('button', { name: 'Enable' }))
+
+    await waitFor(() =>
+      expect(router.history.location.href).toBe(`${listPath}/new`)
+    )
+    expect(enabledClusters).toEqual(new Set(['2', 'omitted']))
+  })
 
   test('disables Pipelines in each region with a project source', async () => {
     mockRegions([
