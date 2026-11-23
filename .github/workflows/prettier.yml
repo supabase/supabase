@@ -24,7 +24,6 @@ jobs:
           sparse-checkout: |
             apps
             blocks
-            examples
             i18n
             packages
             patches

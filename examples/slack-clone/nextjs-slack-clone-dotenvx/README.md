@@ -60,14 +60,16 @@ However, if you choose to commit `.env` to git, remember to encrypt secret value
 > [auth.external.github]
 > enabled = true
 > client_id = "encrypted:<value>" # Won't decrypt the value since client_id isn't a secret value
-> secret = "encrypted:<encrypted-value>" # Works: 'secret' is a designated secret field
+> secret = "encrypted:<encrypted-value>"  # Works: 'secret' is a designated secret field
 > ```
 
 Using `env()` in `config.toml` simplifies environment-specific values:
 
 ```toml
 site_url = "env(SUPABASE_AUTH_SITE_URL)"
-additional_redirect_urls = ["env(SUPABASE_AUTH_ADDITIONAL_REDIRECT_URLS)"]
+additional_redirect_urls = [
+    "env(SUPABASE_AUTH_ADDITIONAL_REDIRECT_URLS)"
+]
 
 [auth.external.github]
 enabled = true
