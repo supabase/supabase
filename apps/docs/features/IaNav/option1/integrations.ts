@@ -12,8 +12,8 @@ export const integrations: NavMenuConstant = {
   items: [
     { name: 'Partner catalog', url: '/guides/integrations/partner-catalog' },
     { name: 'Vercel Marketplace', url: '/guides/integrations/vercel-marketplace' },
+    { name: 'Vercel preview branches', url: '/guides/integrations/vercel-preview-branches' },
     { name: 'Stripe Projects', url: '/guides/integrations/stripe-projects' },
-    { name: 'Preview branches on Vercel', url: '/guides/integrations/vercel-preview-branches' },
     {
       name: 'Build your own integration',
       items: [
