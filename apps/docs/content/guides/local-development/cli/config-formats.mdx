@@ -113,7 +113,7 @@ In `config.toml`, add a `#:schema` comment. Only comments and blank lines can co
 project_id = "my-project"
 ```
 
-`supabase init` declares the schema for you. For a `config.toml` created before CLI 3.1.0, add the `#:schema` line as the first line of the file.
+`supabase init` writes the `$schema` key into `config.jsonc` for you. For a `config.toml` created before CLI 3.1.0, add the `#:schema` line as the first line of the file.
 
 A file without a declaration is read as version 1. The CLI also reads the legacy references `https://supabase.com/docs/cli/config.schema.json` and `./node_modules/@supabase/config/schema.json` as version 1, and warns about any other URL.
 
