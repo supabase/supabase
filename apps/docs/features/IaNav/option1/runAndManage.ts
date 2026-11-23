@@ -53,16 +53,16 @@ export const runAndManage: NavMenuConstant = {
                   url: '/guides/platform/project-transfer/vercel-marketplace',
                 },
                 {
-                  name: 'Pause a paid-plan project',
-                  url: '/guides/platform/project-transfer/pause-project',
-                },
-                {
                   name: 'Troubleshooting',
                   url: '/guides/platform/project-transfer/troubleshooting',
                 },
               ],
             },
             { name: 'Free project pausing', url: '/guides/platform/free-project-pausing' },
+            {
+              name: 'Pause a paid-plan project',
+              url: '/guides/platform/project-transfer/pause-project',
+            },
             { name: 'Delete a project', url: '/guides/platform/delete-project' },
           ],
         },
