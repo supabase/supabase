@@ -23,9 +23,9 @@ export const ai: NavMenuConstant = {
         },
         { name: 'Automatic embeddings', url: '/guides/ai/automatic-embeddings' },
         { name: 'Engineering for scale', url: '/guides/ai/engineering-for-scale' },
-        { name: 'Choosing Compute Add-on', url: '/guides/ai/choosing-compute-addon' },
-        { name: 'Going to Production', url: '/guides/ai/going-to-prod' },
-        { name: 'RAG with Permissions', url: '/guides/ai/rag-with-permissions' },
+        { name: 'Choosing a compute add-on', url: '/guides/ai/choosing-compute-addon' },
+        { name: 'Going to production', url: '/guides/ai/going-to-prod' },
+        { name: 'RAG with permissions', url: '/guides/ai/rag-with-permissions' },
       ],
     },
     {
@@ -37,15 +37,15 @@ export const ai: NavMenuConstant = {
       ],
     },
     {
-      name: 'JavaScript Examples',
+      name: 'JavaScript examples',
       items: [
         { name: 'OpenAI completions', url: '/guides/ai/examples/openai' },
         {
-          name: 'Image captions with Hugging Face',
+          name: 'Hugging Face image captions',
           url: '/guides/ai/examples/huggingface-image-captioning',
         },
         {
-          name: 'Generate Embeddings',
+          name: 'Generate embeddings',
           url: '/guides/ai/quickstarts/generate-text-embeddings',
         },
         {
@@ -59,9 +59,9 @@ export const ai: NavMenuConstant = {
       ],
     },
     {
-      name: 'Python Client',
+      name: 'Python client',
       items: [
-        { name: 'Choosing a Client', url: '/guides/ai/python-clients' },
+        { name: 'Choosing a client', url: '/guides/ai/python-clients' },
         { name: 'API', url: '/guides/ai/python/api' },
         { name: 'Collections', url: '/guides/ai/python/collections' },
         { name: 'Indexes', url: '/guides/ai/python/indexes' },
@@ -69,28 +69,28 @@ export const ai: NavMenuConstant = {
       ],
     },
     {
-      name: 'Python Examples',
+      name: 'Python examples',
       items: [
         { name: 'Developing locally with Vecs', url: '/guides/ai/vecs-python-client' },
-        { name: 'Creating and managing collections', url: '/guides/ai/quickstarts/hello-world' },
-        { name: 'Text Deduplication', url: '/guides/ai/quickstarts/text-deduplication' },
+        { name: 'Manage collections', url: '/guides/ai/quickstarts/hello-world' },
+        { name: 'Text deduplication', url: '/guides/ai/quickstarts/text-deduplication' },
         { name: 'Face similarity search', url: '/guides/ai/quickstarts/face-similarity' },
         {
-          name: 'Image search with OpenAI CLIP',
+          name: 'OpenAI CLIP image search',
           url: '/guides/ai/examples/image-search-openai-clip',
         },
         {
-          name: 'Semantic search with Amazon Titan',
+          name: 'Amazon Titan semantic search',
           url: '/guides/ai/examples/semantic-image-search-amazon-titan',
         },
         {
-          name: 'Building ChatGPT Plugins',
+          name: 'Building ChatGPT plugins',
           url: '/guides/ai/examples/building-chatgpt-plugins',
         },
       ],
     },
     {
-      name: 'Third-Party Tools',
+      name: 'Third-party tools',
       items: [
         { name: 'LangChain', url: '/guides/ai/langchain' },
         { name: 'Hugging Face', url: '/guides/ai/hugging-face' },

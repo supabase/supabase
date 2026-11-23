@@ -10,7 +10,7 @@ export const integrations: NavMenuConstant = {
   url: '/guides/integrations',
   enabled: integrationsEnabled,
   items: [
-    { name: 'Partner Catalog', url: '/guides/integrations/partner-catalog' },
+    { name: 'Partner catalog', url: '/guides/integrations/partner-catalog' },
     { name: 'Vercel Marketplace', url: '/guides/integrations/vercel-marketplace' },
     { name: 'Stripe Projects', url: '/guides/integrations/stripe-projects' },
     { name: 'Preview branches on Vercel', url: '/guides/integrations/vercel-preview-branches' },
@@ -18,7 +18,7 @@ export const integrations: NavMenuConstant = {
       name: 'Build your own integration',
       items: [
         {
-          name: 'Supabase OAuth Integration',
+          name: 'Supabase OAuth integration',
           items: [
             { name: 'Overview', url: '/guides/integrations/build-a-supabase-oauth-integration' },
             {
@@ -29,7 +29,7 @@ export const integrations: NavMenuConstant = {
         },
         { name: 'Supabase for Platforms', url: '/guides/integrations/supabase-for-platforms' },
         {
-          name: 'Supabase partner integration guide',
+          name: 'Build a partner integration',
           url: '/guides/integrations/partner-integration-guide',
         },
       ],

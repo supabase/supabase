@@ -78,11 +78,11 @@ const ALLOWLIST = [
   'Storage > File Buckets',
 ]
 const OPTION_1_ALLOWLIST = [
-  'Auth > Social Sign-in (OAuth)',
-  'Database > Foreign Data Wrappers > Apps and APIs',
-  'Database > Foreign Data Wrappers > Databases and warehouses',
-  'Start > Framework Quickstarts > JavaScript and TypeScript',
-  'Start > Web app demos',
+  'Auth > Social sign-in (OAuth)',
+  'Database > Foreign data wrappers > Apps and APIs',
+  'Database > Foreign data wrappers > Databases and warehouses',
+  'Start > Framework quickstarts > JavaScript and TypeScript',
+  'Start > Web app tutorials',
 ]
 
 describe('navigation level size', () => {

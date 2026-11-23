@@ -57,7 +57,7 @@ export const GLOBAL_MENU_ITEMS: GlobalMenuItems = [
             level: 'functions',
           },
           {
-            label: 'REST, GraphQL and Realtime APIs',
+            label: 'REST, GraphQL and Realtime',
             icon: 'rest',
             href: '/guides/api',
             level: 'api',
@@ -76,7 +76,7 @@ export const GLOBAL_MENU_ITEMS: GlobalMenuItems = [
         [
           { label: 'AI tools', icon: 'ai-tools', href: '/guides/ai-tools', level: 'ai_tools' },
           {
-            label: 'Local Development and CLI',
+            label: 'Local development and CLI',
             icon: 'dev-cli',
             href: '/guides/local-development',
             level: 'local_development',
@@ -112,7 +112,7 @@ export const GLOBAL_MENU_ITEMS: GlobalMenuItems = [
       menuItems: [
         [
           {
-            label: 'Projects, organizations and compute',
+            label: 'Projects and compute',
             icon: 'platform',
             href: '/guides/platform/performance',
             level: 'platform',
@@ -136,7 +136,7 @@ export const GLOBAL_MENU_ITEMS: GlobalMenuItems = [
             level: 'security',
           },
           {
-            label: 'Backups, restore and upgrades',
+            label: 'Backups and upgrades',
             icon: 'database',
             href: '/guides/platform/backups',
             level: 'platform',
@@ -218,7 +218,7 @@ export const GLOBAL_MENU_ITEMS: GlobalMenuItems = [
         ],
         [
           {
-            label: 'CLI Commands',
+            label: 'CLI commands',
             icon: 'reference-cli',
             href: '/reference/cli/introduction',
             level: 'reference_javascript',

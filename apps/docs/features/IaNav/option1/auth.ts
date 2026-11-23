@@ -25,7 +25,7 @@ export const auth: NavMenuConstant = {
   url: '/guides/auth',
   items: [
     {
-      name: 'Getting started and server-side',
+      name: 'Get started and server-side',
       items: [
         {
           name: 'Quickstarts',
@@ -36,7 +36,7 @@ export const auth: NavMenuConstant = {
             { name: 'React', url: '/guides/auth/quickstarts/react' },
             { name: 'React Native', url: '/guides/auth/quickstarts/react-native' },
             {
-              name: 'React Native Expo social sign-in',
+              name: 'Expo social sign-in',
               url: '/guides/auth/quickstarts/with-expo-react-native-social-sign-in',
             },
           ],
@@ -49,7 +49,7 @@ export const auth: NavMenuConstant = {
         { name: 'Server SDK', url: '/reference/server' },
         { name: 'Middleware SDK', url: '/reference/middleware' },
         {
-          name: 'Server-Side Rendering',
+          name: 'Server-side rendering',
           enabled: authFlowsEnabled,
           items: [
             { name: 'Overview', url: '/guides/auth/server-side' },
@@ -64,7 +64,7 @@ export const auth: NavMenuConstant = {
       ],
     },
     {
-      name: 'Architecture, users and sessions',
+      name: 'Users and sessions',
       items: [
         {
           name: 'Architecture',
@@ -73,13 +73,13 @@ export const auth: NavMenuConstant = {
         },
         { name: 'Users', url: '/guides/auth/users' },
         {
-          name: 'User Management',
+          name: 'User management',
           url: '/guides/auth/managing-user-data',
           enabled: authConfigurationEnabled,
         },
         { name: 'Identities', url: '/guides/auth/identities' },
         {
-          name: 'Identity Linking',
+          name: 'Identity linking',
           url: '/guides/auth/auth-identity-linking',
           enabled: authFlowsEnabled,
         },
@@ -95,12 +95,12 @@ export const auth: NavMenuConstant = {
       ],
     },
     {
-      name: 'Social Sign-in (OAuth)',
+      name: 'Social sign-in (OAuth)',
       enabled: allAuthProvidersEnabled && authFlowsEnabled,
       items: [
         { name: 'Overview', url: '/guides/auth/social-sign-in' },
         ...[...SocialSignInItems].sort((a, b) => (a.name ?? '').localeCompare(b.name ?? '')),
-        { name: 'Custom OAuth/OIDC Providers', url: '/guides/auth/custom-oauth-providers' },
+        { name: 'Custom OAuth/OIDC providers', url: '/guides/auth/custom-oauth-providers' },
       ],
     },
     {
@@ -108,7 +108,7 @@ export const auth: NavMenuConstant = {
       enabled: allAuthProvidersEnabled && authFlowsEnabled,
       items: [
         { name: 'Password-based', url: '/guides/auth/passwords' },
-        { name: 'Email (Magic link or OTP)', url: '/guides/auth/auth-email-passwordless' },
+        { name: 'Email (magic link or OTP)', url: '/guides/auth/auth-email-passwordless' },
         { name: 'Phone sign-in', url: '/guides/auth/phone-login' },
         { name: 'Passkey', url: '/guides/auth/passkeys' },
         {
@@ -121,32 +121,32 @@ export const auth: NavMenuConstant = {
             },
           ],
         },
-        { name: 'Anonymous Sign-Ins', url: '/guides/auth/auth-anonymous' },
+        { name: 'Anonymous sign-ins', url: '/guides/auth/auth-anonymous' },
         { name: 'Web3 (Ethereum or Solana)', url: '/guides/auth/auth-web3' },
       ],
     },
     {
-      name: 'Settings, hooks and troubleshooting',
+      name: 'Settings and troubleshooting',
       items: [
         {
-          name: 'General Configuration',
+          name: 'General configuration',
           url: '/guides/auth/general-configuration',
           enabled: authConfigurationEnabled,
         },
         {
-          name: 'Email Templates',
+          name: 'Email templates',
           url: '/guides/auth/auth-email-templates',
           enabled: authConfigurationEnabled,
         },
         { name: 'Custom SMTP', url: '/guides/auth/auth-smtp', enabled: authConfigurationEnabled },
-        { name: 'Test Auth Flows', url: '/guides/auth/testing-auth-flows' },
+        { name: 'Test Auth flows', url: '/guides/auth/testing-auth-flows' },
         {
           name: 'Redirect URLs',
           url: '/guides/auth/redirect-urls',
           enabled: authConfigurationEnabled,
         },
         {
-          name: 'Mobile Deep Linking',
+          name: 'Mobile deep linking',
           url: '/guides/auth/native-mobile-deep-linking',
           enabled: authFlowsEnabled,
         },
@@ -177,7 +177,7 @@ export const auth: NavMenuConstant = {
         },
         {
           name: 'Debugging',
-          items: [{ name: 'Error Codes', url: '/guides/auth/debugging/error-codes' }],
+          items: [{ name: 'Error codes', url: '/guides/auth/debugging/error-codes' }],
         },
       ],
     },
@@ -185,43 +185,43 @@ export const auth: NavMenuConstant = {
       name: 'Security and MFA',
       items: [
         {
-          name: 'Multi-Factor Authentication (MFA)',
+          name: 'Multi-factor auth (MFA)',
           enabled: authFlowsEnabled,
           items: [
             { name: 'Overview', url: '/guides/auth/auth-mfa' },
-            { name: 'App Authenticator (TOTP)', url: '/guides/auth/auth-mfa/totp' },
+            { name: 'App authenticator (TOTP)', url: '/guides/auth/auth-mfa/totp' },
             { name: 'Phone', url: '/guides/auth/auth-mfa/phone' },
           ],
         },
         {
-          name: 'Password Security',
+          name: 'Password security',
           url: '/guides/auth/password-security',
           enabled: authFullSecurityEnabled,
         },
-        { name: 'Rate Limits', url: '/guides/auth/rate-limits', enabled: authFullSecurityEnabled },
+        { name: 'Rate limits', url: '/guides/auth/rate-limits', enabled: authFullSecurityEnabled },
         {
-          name: 'Bot Detection (CAPTCHA)',
+          name: 'Bot detection (CAPTCHA)',
           url: '/guides/auth/auth-captcha',
           enabled: authFullSecurityEnabled,
         },
-        { name: 'Audit Logs', url: '/guides/auth/audit-logs', enabled: authFullSecurityEnabled },
+        { name: 'Audit logs', url: '/guides/auth/audit-logs', enabled: authFullSecurityEnabled },
         {
           name: 'JSON Web Tokens (JWT)',
           enabled: authFullSecurityEnabled,
           items: [
             { name: 'Overview', url: '/guides/auth/jwts' },
-            { name: 'Claims Reference', url: '/guides/auth/jwt-fields' },
+            { name: 'Claims reference', url: '/guides/auth/jwt-fields' },
           ],
         },
         {
-          name: 'JWT Signing Keys',
+          name: 'JWT signing keys',
           url: '/guides/auth/signing-keys',
           enabled: authFullSecurityEnabled,
         },
       ],
     },
     {
-      name: 'Third-party auth and migration',
+      name: 'Third-party auth, migration',
       items: [
         {
           name: 'Third-party auth',
@@ -240,14 +240,14 @@ export const auth: NavMenuConstant = {
           name: 'OAuth 2.1 Server',
           items: [
             { name: 'Overview', url: '/guides/auth/oauth-server' },
-            { name: 'Getting Started', url: '/guides/auth/oauth-server/getting-started' },
-            { name: 'OAuth Flows', url: '/guides/auth/oauth-server/oauth-flows' },
-            { name: 'MCP Authentication', url: '/guides/auth/oauth-server/mcp-authentication' },
-            { name: 'Token Security and RLS', url: '/guides/auth/oauth-server/token-security' },
+            { name: 'Getting started', url: '/guides/auth/oauth-server/getting-started' },
+            { name: 'OAuth flows', url: '/guides/auth/oauth-server/oauth-flows' },
+            { name: 'MCP authentication', url: '/guides/auth/oauth-server/mcp-authentication' },
+            { name: 'Token security and RLS', url: '/guides/auth/oauth-server/token-security' },
           ],
         },
         {
-          name: 'Migrate users from another provider',
+          name: 'Migrate users',
           items: [
             {
               name: 'From Firebase Auth',

@@ -29,7 +29,7 @@ export const deployment: NavMenuConstant = {
       items: [
         { name: 'Overview', url: '/guides/deployment/branching' },
         { name: 'Branching via GitHub', url: '/guides/deployment/branching/github-integration' },
-        { name: 'Branching via Supabase Dashboard', url: '/guides/deployment/branching/dashboard' },
+        { name: 'Branching in the dashboard', url: '/guides/deployment/branching/dashboard' },
         {
           name: 'Working with branches',
           url: '/guides/deployment/branching/working-with-branches',
@@ -46,7 +46,7 @@ export const deployment: NavMenuConstant = {
       name: 'CI/CD',
       items: [
         {
-          name: 'Generate types from your database',
+          name: 'Generate database types',
           url: '/guides/deployment/ci/generating-types',
         },
         { name: 'Automated testing', url: '/guides/deployment/ci/testing' },
