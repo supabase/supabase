@@ -1,4 +1,4 @@
-import { useQueryClient } from '@tanstack/react-query'
+import { useMutation, useQueryClient } from '@tanstack/react-query'
 import { components } from 'api-types'
 import { toast } from 'sonner'
 
@@ -12,7 +12,6 @@ import type {
   DucklakeDestinationConfig,
   PipelineConfig,
 } from './types'
-import { useReplicationMutation } from './use-cluster-mutation'
 import {
   buildBigQueryTableOptionApiConfig,
   buildPipelineApiConfig,
@@ -206,11 +205,7 @@ export const useUpdateDestinationPipelineMutation = ({
 > = {}) => {
   const queryClient = useQueryClient()
 
-  return useReplicationMutation<
-    UpdateDestinationPipelineData,
-    StudioError,
-    UpdateDestinationPipelineParams
-  >({
+  return useMutation<UpdateDestinationPipelineData, StudioError, UpdateDestinationPipelineParams>({
     mutationFn: (vars) => updateDestinationPipeline(vars),
     async onSuccess(data, variables, context) {
       const { projectRef } = variables

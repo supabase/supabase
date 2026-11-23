@@ -1,10 +1,9 @@
-import { useQueryClient } from '@tanstack/react-query'
+import { useMutation, useQueryClient } from '@tanstack/react-query'
 import { toast } from 'sonner'
 
 import { invalidateReplicationPipelineQueries } from './invalidate-pipeline-queries'
 import { replicationKeys } from './keys'
 import { pipelineIdSchema } from './pipeline-id'
-import { useReplicationMutation } from './use-cluster-mutation'
 import { del, handleError } from '@/data/fetchers'
 import type { StudioError } from '@/lib/errors/studio-errors'
 import type { UseCustomMutationOptions } from '@/types'
@@ -55,11 +54,7 @@ export const useDeleteDestinationPipelineMutation = ({
 > = {}) => {
   const queryClient = useQueryClient()
 
-  return useReplicationMutation<
-    DeleteDestinationPipelineData,
-    StudioError,
-    DeleteDestinationPipelineParams
-  >({
+  return useMutation<DeleteDestinationPipelineData, StudioError, DeleteDestinationPipelineParams>({
     mutationFn: (vars) => deleteDestinationPipeline(vars),
     async onSuccess(data, variables, context) {
       const { projectRef } = variables

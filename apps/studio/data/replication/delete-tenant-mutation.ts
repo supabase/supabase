@@ -1,8 +1,7 @@
-import { useQueryClient } from '@tanstack/react-query'
+import { useMutation, useQueryClient } from '@tanstack/react-query'
 import { toast } from 'sonner'
 
 import { replicationKeys } from './keys'
-import { useReplicationMutation } from './use-cluster-mutation'
 import { del, handleError } from '@/data/fetchers'
 import type { StudioError } from '@/lib/errors/studio-errors'
 import type { UseCustomMutationOptions } from '@/types'
@@ -39,11 +38,7 @@ export const useDeleteReplicationTenantMutation = ({
 > = {}) => {
   const queryClient = useQueryClient()
 
-  return useReplicationMutation<
-    DeleteReplicationTenantData,
-    StudioError,
-    DeleteReplicationTenantParams
-  >({
+  return useMutation<DeleteReplicationTenantData, StudioError, DeleteReplicationTenantParams>({
     mutationFn: (vars) => deleteReplicationTenant(vars),
     async onSuccess(data, variables, context) {
       const { projectRef } = variables

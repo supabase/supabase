@@ -1,8 +1,7 @@
-import { useQueryClient } from '@tanstack/react-query'
+import { useMutation, useQueryClient } from '@tanstack/react-query'
 import { toast } from 'sonner'
 
 import { replicationKeys } from './keys'
-import { useReplicationMutation } from './use-cluster-mutation'
 import { handleError, put } from '@/data/fetchers'
 import type { StudioError } from '@/lib/errors/studio-errors'
 import type { UseCustomMutationOptions } from '@/types'
@@ -64,7 +63,7 @@ export const useCreatePublicationMutation = ({
 > = {}) => {
   const queryClient = useQueryClient()
 
-  return useReplicationMutation<CreatePublicationData, StudioError, CreatePublicationParams>({
+  return useMutation<CreatePublicationData, StudioError, CreatePublicationParams>({
     mutationFn: (vars) => createPublication(vars),
     async onSuccess(data, variables, context) {
       const { projectRef, sourceId, name, clusterId } = variables
