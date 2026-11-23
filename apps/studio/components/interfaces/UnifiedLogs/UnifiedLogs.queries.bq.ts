@@ -318,14 +318,14 @@ const getEdgeFunctionLogsQuery = (): SafeLogSqlFragment => safeSql`
     cross join unnest(fel_metadata.request) as fel_request
     left join (
     SELECT
-        fl_metadata.request_id,
+        json_value(to_json_string(fl_metadata), '$.request_id') as request_id,
         COUNT(fl.id) as function_log_count,
         ANY_VALUE(fl.event_message) as last_event_message
     FROM function_logs as fl
     CROSS JOIN UNNEST(fl.metadata) as fl_metadata
-    WHERE fl_metadata.request_id IS NOT NULL
-    GROUP BY fl_metadata.request_id
-    ) as function_logs_agg on fel_metadata.request_id = function_logs_agg.request_id
+    WHERE json_value(to_json_string(fl_metadata), '$.request_id') IS NOT NULL
+    GROUP BY json_value(to_json_string(fl_metadata), '$.request_id')
+    ) as function_logs_agg on json_value(to_json_string(fel_metadata), '$.request_id') = function_logs_agg.request_id
   `
 
 /**

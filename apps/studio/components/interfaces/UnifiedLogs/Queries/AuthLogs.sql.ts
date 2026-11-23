@@ -29,5 +29,5 @@ LEFT JOIN (
   CROSS JOIN UNNEST(edge_logs_metadata.response) AS edge_logs_response
   LEFT JOIN UNNEST(edge_logs_response.headers) AS edge_logs_response_headers
   CROSS JOIN UNNEST(edge_logs_metadata.request) AS edge_logs_request
-) ON al_metadata.request_id = edge_logs_response_headers.cf_ray
+) ON coalesce(json_value(to_json_string(al_metadata), '$.request_id'), json_value(al.event_message, '$.request_id')) = edge_logs_response_headers.cf_ray
 `

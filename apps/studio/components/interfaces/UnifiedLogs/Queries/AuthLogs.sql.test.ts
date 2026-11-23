@@ -33,6 +33,9 @@ describe('legacy Auth request metadata', () => {
       if (index > 0)
         expect(status.indexOf(fields[index])).toBeGreaterThan(status.indexOf(fields[index - 1]))
     }
+    expect(sql).toContain("json_value(to_json_string(al_metadata), '$.request_id')")
+    expect(sql).toContain("json_value(al.event_message, '$.request_id')")
+    expect(sql).not.toContain('al_metadata.request_id')
     expect(sql).toContain(
       "json_value(al.event_message, '$.path'), json_value(to_json_string(al_metadata), '$.path'), edge_logs_request.path"
     )

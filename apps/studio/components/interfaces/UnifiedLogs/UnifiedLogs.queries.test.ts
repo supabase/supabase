@@ -816,6 +816,13 @@ describe('unified logs without a log type filter', () => {
       const sql = buildQuery(withFilters('level:eq:error', 'status:eq:500'))
       expect(sql).toContain('from function_edge_logs as fel')
       expect(sql).toContain("WHEN fel_response.status_code >= 500 THEN 'error'")
+      expect(sql).toContain("json_value(to_json_string(fl_metadata), '$.request_id') as request_id")
+      expect(sql).toContain(
+        "json_value(to_json_string(fel_metadata), '$.request_id') = function_logs_agg.request_id"
+      )
+      expect(sql).not.toContain('fl_metadata.request_id')
+      expect(sql).not.toContain('fel_metadata.request_id')
+
       expect(sql).toContain("`level` IN ('error')")
       expect(sql).toContain("`status` IN ('500')")
     })
