@@ -84,8 +84,10 @@ export function getPipelinesMockResponse(
   request: Request,
   scenario = 'busy'
 ): Response | undefined {
-  const counts: Record<string, number> = { one: 1, two: 2, small: 3, uneven: 5, busy: 8 }
-  const pipelines = allPipelines.slice(0, counts[scenario] ?? counts.busy)
+  const counts: Record<string, number> = { one: 1, two: 2, small: 3, four: 4, uneven: 5, busy: 8 }
+  const pipelines = allPipelines
+    .slice(0, counts[scenario] ?? counts.busy)
+    .map((pipeline) => (scenario === 'four' ? { ...pipeline, cluster_id: '1' } : pipeline))
   const url = new URL(request.url)
   const path = url.pathname.replace(/^\/api\/platform\//, '/')
   if (

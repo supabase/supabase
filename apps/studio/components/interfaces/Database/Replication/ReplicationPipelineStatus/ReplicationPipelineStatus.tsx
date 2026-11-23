@@ -3,7 +3,6 @@ import { ActivityIcon, ChevronDownIcon, RotateCcwIcon, SearchIcon, XIcon } from 
 import Link from 'next/link'
 import { parseAsString, useQueryState } from 'nuqs'
 import { useContext, useMemo, useState } from 'react'
-import { createPortal } from 'react-dom'
 import {
   Button,
   Card,
@@ -40,7 +39,7 @@ import {
   getPipelineUnifiedLogsUrl,
   getStatusName,
 } from '../Pipeline.utils'
-import { PipelineNoticeContext, PipelineTableNoticeContext } from '../PipelineNoticeContext'
+import { PipelineNoticeContext } from '../PipelineNoticeContext'
 import { PipelineStatusName } from '../Replication.constants'
 import { RestartTableDialog } from '../RestartTableDialog'
 import { PipelineHealthSection } from './PipelineHealthSection'
@@ -232,7 +231,6 @@ export const ReplicationPipelineStatus = () => {
   const showDisabledState = isPipelineBusy || !isPipelineActionable
   const canResetErroredTables = hasErroredTables && !showDisabledState
   const isNoticeAboveOverview = useContext(PipelineNoticeContext)
-  const tableNoticeTarget = useContext(PipelineTableNoticeContext)
   const stateNotice = getPipelineStateNotice({ requestStatus, statusName, tableStatuses })
   const isSlotDisconnected =
     !isStatusError && statusName === PipelineStatusName.STARTED && applyLagMetrics?.active === false
@@ -277,9 +275,6 @@ export const ReplicationPipelineStatus = () => {
 
   return (
     <>
-      {isNoticeAboveOverview &&
-        tableNoticeTarget &&
-        createPortal(tableErrorNotice, tableNoticeTarget)}
       <PageContainer size="large">
         <p className="sr-only" role="status" aria-live="polite">
           {isLoading ? 'Loading pipeline details' : ''}
@@ -313,8 +308,6 @@ export const ReplicationPipelineStatus = () => {
               />
             )}
 
-            {!isNoticeAboveOverview && tableErrorNotice}
-
             {!isNoticeAboveOverview && isSlotDisconnected && (
               <Admonition
                 type="warning"
@@ -341,6 +334,7 @@ export const ReplicationPipelineStatus = () => {
               </PageSectionSummary>
             </PageSectionMeta>
             <PageSectionContent className="flex flex-col gap-y-4">
+              {tableErrorNotice}
               {hasTableData && (
                 <div className="flex flex-col gap-y-3">
                   <div className="flex items-center justify-between">

@@ -107,7 +107,7 @@ export const ReplicationDiagram = ({
       )
     ).values(),
   ]
-  const regionHeights = regions.map(({ entries }) => (isCompact ? 88 : 60 + entries.length * 56))
+  const regionHeights = regions.map(({ entries }) => (isCompact ? 88 : 48 + entries.length * 64))
   const regionsHeight = regionHeights.reduce((total, height) => total + height + 32, -32)
   const destinationsHeight = (destinations.length - 1) * 112 + 64
   const contentHeight = Math.max(regionsHeight, destinationsHeight)
@@ -150,7 +150,7 @@ export const ReplicationDiagram = ({
           ? undefined
           : entries.map(({ pipeline }, index) => ({
               id: pipeline.id,
-              top: pipelineId ? 32 : 77 + index * 56,
+              top: pipelineId ? 32 : 77 + index * 64,
             })),
         content: (
           <>
@@ -158,11 +158,11 @@ export const ReplicationDiagram = ({
             {isCompact ? (
               <p className="border-t border-muted px-1 pt-3 pb-1 text-foreground-light">{`${entries.length} ${entries.length === 1 ? 'pipeline' : 'pipelines'}`}</p>
             ) : (
-              <div className="border-t border-muted pt-1">
+              <div className="border-t border-muted">
                 {entries.map(({ pipeline }) => (
                   <div
                     key={pipeline.id}
-                    className="flex h-14 flex-col justify-center border-b border-muted last:border-b-0"
+                    className="flex h-16 flex-col justify-center border-b border-muted border-dotted last:h-14 last:justify-end last:border-b-0"
                   >
                     {pipelineId ? (
                       <div className="flex h-12 flex-col justify-center gap-0.25 px-2">
