@@ -27,17 +27,24 @@ import { PageNav } from 'ui-patterns/PageNav'
 import { ProjectLayout } from '../ProjectLayout'
 import EdgeFunctionsLayout from './EdgeFunctionsLayout'
 import { useUnifiedLogsPreview } from '@/components/interfaces/App/FeaturePreview/FeaturePreviewContext'
+import { extractFunctionSourcesFromEszip } from '@/components/interfaces/EdgeFunctions/EdgeFunctions.eszip'
+import { getFunctionZipEntries } from '@/components/interfaces/EdgeFunctions/EdgeFunctions.utils'
 import { EdgeFunctionTesterSheet } from '@/components/interfaces/Functions/EdgeFunctionDetails/EdgeFunctionTesterSheet'
 import { useFunctionsDetailShortcuts } from '@/components/interfaces/Functions/useFunctionsDetailShortcuts'
 import { DocsButton } from '@/components/ui/DocsButton'
 import { NoPermission } from '@/components/ui/NoPermission'
 import { ShortcutTooltip } from '@/components/ui/ShortcutTooltip'
 import { useProjectApiUrl } from '@/data/config/project-endpoint-query'
-import { useEdgeFunctionBodyQuery } from '@/data/edge-functions/edge-function-body-query'
+import {
+  getEdgeFunctionBodyEszip,
+  isFunctionBodyMaxSizeError,
+  useEdgeFunctionBodyQuery,
+} from '@/data/edge-functions/edge-function-body-query'
 import { useEdgeFunctionQuery } from '@/data/edge-functions/edge-function-query'
 import { FGA_PERMISSIONS, useAsyncCheckPermissionsV2 } from '@/hooks/misc/useCheckPermissionsV2'
 import { withAuth } from '@/hooks/misc/withAuth'
 import { DOCS_URL } from '@/lib/constants'
+import { getErrorMessage } from '@/lib/get-error-message'
 import { useTrack } from '@/lib/telemetry/track'
 import { SHORTCUT_IDS } from '@/state/shortcuts/registry'
 
@@ -61,6 +68,7 @@ const EdgeFunctionDetailsLayout = ({
 
   const [isOpen, setIsOpen] = useState(false)
   const [isDownloadOpen, setIsDownloadOpen] = useState(false)
+  const [isDownloading, setIsDownloading] = useState(false)
 
   const {
     data: selectedFunction,
@@ -128,63 +136,37 @@ const EdgeFunctionDetailsLayout = ({
       ]
     : []
 
-  const downloadFunction = async () => {
-    if (filesError) return toast.error('Failed to retrieve edge function files')
+  const downloadFunctionZip = async () => {
+    const isExceedMaxSize = isFunctionBodyMaxSizeError(filesError)
+    if (filesError && !isExceedMaxSize) {
+      return toast.error('Failed to retrieve edge function files')
+    }
+
+    // The multipart response is capped in size, so for large functions we fall back to the raw
+    // eszip bundle and extract the original sources from it
+    let zipEntries = getFunctionZipEntries({
+      files: functionBody.files,
+      slug: functionSlug ?? '',
+      source: 'multipart',
+    })
+
+    if (isExceedMaxSize) {
+      try {
+        const eszip = await getEdgeFunctionBodyEszip({ projectRef: ref, slug: functionSlug })
+        const files = extractFunctionSourcesFromEszip(eszip)
+        zipEntries = getFunctionZipEntries({ files, slug: functionSlug ?? '', source: 'eszip' })
+      } catch (error) {
+        return toast.error(
+          `Failed to download edge function: ${getErrorMessage(error, 'Unknown error')}`
+        )
+      }
+    }
 
     const zipFileWriter = new BlobWriter('application/zip')
     const zipWriter = new ZipWriter(zipFileWriter, { bufferedWrite: true })
 
-    // Extract file paths relative to function slug
-    const filePaths = functionBody.files.map((file) => {
-      const nameSections = file.name.split('/')
-      const slugIndex = nameSections.indexOf(functionSlug ?? '')
-      return nameSections.slice(slugIndex + 1).join('/')
-    })
-
-    // Find the deepest relative path (count leading ../ segments)
-    let maxDepth = 0
-    filePaths.forEach((path) => {
-      const segments = path.split('/')
-      let depth = 0
-      for (const segment of segments) {
-        if (segment === '..') {
-          depth++
-        } else {
-          break
-        }
-      }
-      maxDepth = Math.max(maxDepth, depth)
-    })
-
-    // Add files to zip with normalized paths
-    functionBody.files.forEach((file) => {
-      const nameSections = file.name.split('/')
-      const slugIndex = nameSections.indexOf(functionSlug ?? '')
-      const fileName = nameSections.slice(slugIndex + 1).join('/')
-
-      // Count and remove leading ../ segments
-      const segments = fileName.split('/')
-      let parentDirCount = 0
-      while (segments.length > 0 && segments[0] === '..') {
-        segments.shift()
-        parentDirCount++
-      }
-
-      // Calculate safe path:
-      // - Files without ../ go into the full base path
-      // - Files with ../ go into a shallower path based on how many levels up they go
-      const depthFromBase = maxDepth - parentDirCount
-      const safePath =
-        depthFromBase > 0
-          ? Array.from({ length: depthFromBase }, (_, i) => (i === 0 ? 'src' : `src${i}`)).join(
-              '/'
-            ) +
-            '/' +
-            segments.join('/')
-          : segments.join('/')
-
-      const fileBlob = new Blob([file.content])
-      zipWriter.add(safePath, new BlobReader(fileBlob))
+    zipEntries.forEach(({ path, content }) => {
+      zipWriter.add(path, new BlobReader(new Blob([content])))
     })
 
     const blobURL = URL.createObjectURL(await zipWriter.close())
@@ -194,6 +176,18 @@ const EdgeFunctionDetailsLayout = ({
     document.body.appendChild(link)
     link.click()
     link.parentNode?.removeChild(link)
+    // Deferred so the browser has started the download before the URL is released
+    setTimeout(() => URL.revokeObjectURL(blobURL), 0)
+  }
+
+  const handleDownloadZip = async () => {
+    if (isDownloading) return
+    setIsDownloading(true)
+    try {
+      await downloadFunctionZip()
+    } finally {
+      setIsDownloading(false)
+    }
   }
 
   useEffect(() => {
@@ -289,7 +283,8 @@ const EdgeFunctionDetailsLayout = ({
                         variant="text"
                         className="w-min hover:bg-transparent"
                         icon={<FileArchiveIcon />}
-                        onClick={downloadFunction}
+                        loading={isDownloading}
+                        onClick={handleDownloadZip}
                       >
                         Download as ZIP
                       </Button>

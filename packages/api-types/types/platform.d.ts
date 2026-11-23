@@ -9141,6 +9141,7 @@ export interface components {
       app_id: string
       approved_at?: string
       approved_organization_slug?: string
+      approved_project_refs?: string[]
       domain: string
       expires_at: string
       /** @enum {string} */
@@ -9151,7 +9152,7 @@ export interface components {
       redirect_uri: string
       /** @enum {string} */
       registration_type: 'manual' | 'dynamic'
-      scopes?: (
+      scopes: (
         | 'analytics:read'
         | 'analytics:write'
         | 'analytics_config:read'
@@ -9561,7 +9562,6 @@ export interface components {
         id: 'free' | 'pro' | 'team' | 'enterprise' | 'platform'
         name: string
       }
-      prepaid_credits_balance?: number
       project_addons: {
         addons: {
           /** @enum {string} */
@@ -10988,6 +10988,7 @@ export interface components {
           | 'PAUSE_FAILED'
           | 'RESIZING'
           | 'PROMOTING'
+          | 'RIGHTSIZING'
       }[]
     }
     OrganizationResponse_Output: {
@@ -12356,6 +12357,7 @@ export interface components {
           | 'PAUSE_FAILED'
           | 'RESIZING'
           | 'PROMOTING'
+          | 'RIGHTSIZING'
       }[]
       billed_via_partner: boolean
       breakdown: {
@@ -12403,6 +12405,7 @@ export interface components {
             | 'PAUSE_FAILED'
             | 'RESIZING'
             | 'PROMOTING'
+            | 'RIGHTSIZING'
           usage: number
         }[]
         description: string
@@ -12651,6 +12654,7 @@ export interface components {
         | 'PAUSE_FAILED'
         | 'RESIZING'
         | 'PROMOTING'
+        | 'RIGHTSIZING'
       subscription_id: string
       updated_at: string
       volumeSizeGb?: number | null
@@ -13661,6 +13665,8 @@ export interface components {
         viewport_height: number
         viewport_width: number
       }
+      /** Format: uuid */
+      session_id?: string | null
     }
     TelemetryFeatureFlagBody: {
       feature_flag_name: string
@@ -13780,6 +13786,7 @@ export interface components {
             | 'PAUSE_FAILED'
             | 'RESIZING'
             | 'PROMOTING'
+            | 'RIGHTSIZING'
           usage: number
         }[]
         description: string
@@ -13930,6 +13937,7 @@ export interface components {
                       | 'PAUSE_FAILED'
                       | 'RESIZING'
                       | 'PROMOTING'
+                      | 'RIGHTSIZING'
                     total_pre_tax_amount?: number
                     total_usage: number
                     variants: {
@@ -14054,6 +14062,7 @@ export interface components {
                       | 'PAUSE_FAILED'
                       | 'RESIZING'
                       | 'PROMOTING'
+                      | 'RIGHTSIZING'
                     total_pre_tax_amount?: number
                     total_usage: number
                     variants: {
@@ -14262,6 +14271,7 @@ export interface components {
                       | 'PAUSE_FAILED'
                       | 'RESIZING'
                       | 'PROMOTING'
+                      | 'RIGHTSIZING'
                     total_pre_tax_amount?: number
                     total_usage: number
                     variants: {
@@ -14386,6 +14396,7 @@ export interface components {
                       | 'PAUSE_FAILED'
                       | 'RESIZING'
                       | 'PROMOTING'
+                      | 'RIGHTSIZING'
                     total_pre_tax_amount?: number
                     total_usage: number
                     variants: {

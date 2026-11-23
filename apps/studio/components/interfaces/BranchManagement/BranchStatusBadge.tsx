@@ -38,6 +38,7 @@ const STATUS_TO_LABEL: Record<Status, string> = {
   RESTORING: 'Restoring',
   UPGRADING: 'Upgrading',
   RESIZING: 'Resizing',
+  RIGHTSIZING: 'Rightsizing',
   PROMOTING: 'Promoting',
   CREATING_PROJECT: 'Creating project',
   RUNNING_MIGRATIONS: 'Running migrations',

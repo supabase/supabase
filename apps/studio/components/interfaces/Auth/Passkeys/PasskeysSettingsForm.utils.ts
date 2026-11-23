@@ -42,8 +42,8 @@ export function validateWebAuthnOrigins(
     return { valid: false, message: 'At least one origin is required' }
   }
 
-  if (origins.length > 5) {
-    return { valid: false, message: 'A maximum of 5 origins is allowed' }
+  if (origins.length > 10) {
+    return { valid: false, message: 'A maximum of 10 origins is allowed' }
   }
 
   for (const origin of origins) {
