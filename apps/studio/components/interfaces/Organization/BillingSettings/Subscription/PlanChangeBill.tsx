@@ -19,7 +19,6 @@ import {
 } from './PlanChangeSummary.utils'
 import type { OrgProject } from '@/data/projects/org-projects-infinite-query'
 import { DOCS_URL } from '@/lib/constants'
-import { formatCurrency } from '@/lib/helpers'
 
 /**
  * An illustrative day of traffic: idle overnight, busy in the afternoon. Each entry is
@@ -27,6 +26,9 @@ import { formatCurrency } from '@/lib/helpers'
  * the label says — the server is billed the same whether that hour is busy or idle.
  */
 const HOURLY_ACTIVITY = [0, 0, 0, 0, 0, 1, 2, 3, 3, 4, 2, 4, 4, 3, 0, 3, 4, 2, 1, 0, 0, 1, 0, 0]
+
+/** Illustrative hourly compute rate used by the chart and its copy. */
+const ILLUSTRATIVE_HOURLY_RATE = 0.0137
 
 /** How long one hour of the illustrative day takes to play while the section is open. */
 const HOUR_TICK_MS = 400
@@ -170,10 +172,8 @@ const PausedProjectsRow = ({
  * visually: the idle hours are drawn as empty outlines that still occupy an hour slot.
  */
 const HourlyBillingPanel = ({
-  perProjectHourlyRate,
   perProjectMonthlyPrice,
 }: {
-  perProjectHourlyRate: number
   perProjectMonthlyPrice: number | null
 }) => {
   const [isOpen, setIsOpen] = useState(false)
@@ -219,8 +219,8 @@ const HourlyBillingPanel = ({
       <CollapsibleContent className="px-3 pb-3">
         <p className="text-sm text-foreground-light">
           Each project is a dedicated server. It bills{' '}
-          <span translate="no">{formatHourlyRate(perProjectHourlyRate)}/hr</span> for every hour it
-          exists, busy or idle
+          <span translate="no">{formatHourlyRate(ILLUSTRATIVE_HOURLY_RATE)}/hr</span> for every hour
+          it is provisioned, busy or idle
           {perProjectMonthlyPrice !== null && (
             <span>
               , which adds up to about{' '}
@@ -258,7 +258,7 @@ const HourlyBillingPanel = ({
                 className={cn(
                   'flex-1 rounded-xs transition-colors duration-150',
                   ACTIVITY_HEIGHT[activity],
-                  isCurrentHour ? 'bg-foreground-light' : 'bg-foreground-muted'
+                  isCurrentHour ? 'bg-foreground' : 'bg-foreground-muted/60'
                 )}
               />
             )
@@ -269,7 +269,7 @@ const HourlyBillingPanel = ({
           className="mt-1.5 text-right text-xs text-foreground-lighter tabular-nums"
           translate="no"
         >
-          {`${String(readoutHour).padStart(2, '0')}:00 · ${formatCurrency(perProjectHourlyRate * elapsedHours)} billed`}
+          {`${String(readoutHour).padStart(2, '0')}:00 · ${formatHourlyRate(ILLUSTRATIVE_HOURLY_RATE * elapsedHours)} billed`}
         </p>
       </CollapsibleContent>
     </Collapsible>
@@ -349,15 +349,9 @@ export const PlanChangeBill = ({
   currentPlan,
   isCondensed,
 }: PlanChangeBillProps) => {
-  const {
-    computeProjects,
-    computeTotal,
-    perProjectMonthlyPrice,
-    perProjectHourlyRate,
-    projectCount,
-  } = summary
+  const { computeProjects, computeTotal, perProjectMonthlyPrice, projectCount } = summary
   const hasActiveProjects = computeProjects.length > 0
-  const canShowHourlyPanel = !isCondensed && hasActiveProjects && perProjectHourlyRate !== null
+  const canShowHourlyPanel = !isCondensed
 
   return (
     <div className="divide-y rounded-md border bg-surface-200">
@@ -403,10 +397,7 @@ export const PlanChangeBill = ({
 
           {canShowHourlyPanel && (
             <div className="mt-3">
-              <HourlyBillingPanel
-                perProjectHourlyRate={perProjectHourlyRate}
-                perProjectMonthlyPrice={perProjectMonthlyPrice}
-              />
+              <HourlyBillingPanel perProjectMonthlyPrice={perProjectMonthlyPrice} />
             </div>
           )}
 
