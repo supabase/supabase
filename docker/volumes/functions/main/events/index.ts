@@ -30,9 +30,10 @@ const THROTTLE_WINDOW_MS = 1_000
 const ANSI_PATTERN = /(?:\x1b\](?:[^\x07\x1b]|\x1b(?!\\))*(?:\x07|\x1b\\))|(?:(?:\x1b\[|\x9b)[0-?]*[ -/]*[@-~])/g
 
 function sanitize(msg: string): string {
-  const message = msg.replace(ANSI_PATTERN, '').slice(0, MAX_MESSAGE_LENGTH)
+  const message = msg.replace(ANSI_PATTERN, '')
   // Do not emit an unmatched surrogate when truncating an astral character.
-  return message.replace(/[\uD800-\uDBFF]$/, '')
+  const truncated = message.slice(0, MAX_MESSAGE_LENGTH).replace(/[\uD800-\uDBFF]$/, '')
+  return message.length > MAX_MESSAGE_LENGTH ? `${truncated} ....[truncated]` : truncated
 }
 
 function emit(msg: string, metadata: object, timestamp = new Date().toISOString()): void {
