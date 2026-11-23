@@ -174,9 +174,7 @@ const renderList = async (waitForSources = true, clusterId?: string) => {
   await screen.findByRole('heading', { name: 'Add a pipeline' })
   if (waitForSources)
     await waitFor(() =>
-      expect(queryClient.getQueryState(replicationKeys.sources('default'))?.status).toBe(
-        'success'
-      )
+      expect(queryClient.getQueryState(replicationKeys.sources('default'))?.status).toBe('success')
     )
   return { ...view, router }
 }
