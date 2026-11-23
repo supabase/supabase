@@ -196,7 +196,5 @@ export const getLogAttributeSources = (search: QuerySearchParamsType): string[] 
   }
   types = types.filter((type) => !excludedScopeTypes.some(({ value }) => value === type))
   if (hasUser) types = types.filter((type) => type === 'edge' || type === 'auth')
-  return Object.entries(LOG_TYPE_TO_SOURCE)
-    .filter(([type]) => types.includes(type))
-    .map(([, source]) => source)
+  return types.map((type) => LOG_TYPE_TO_SOURCE[type])
 }
