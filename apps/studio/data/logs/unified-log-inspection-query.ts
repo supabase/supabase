@@ -18,7 +18,6 @@ import {
   getEdgeFunctionServiceFlowQuery,
   getPostgresServiceFlowQuery,
   getPostgrestServiceFlowQuery,
-  getStandaloneAuthLogQuery,
   getStorageServiceFlowQuery,
 } from '@/components/interfaces/UnifiedLogs/Queries/ServiceFlowQueries/ServiceFlow.sql'
 import { LOG_TYPE_TO_SOURCE } from '@/components/interfaces/UnifiedLogs/UnifiedLogs.constants'
@@ -213,7 +212,7 @@ export async function getUnifiedLogInspection(
         throw new Error('Invalid type')
     }
 
-    let data = await executeAnalyticsSql({
+    const data = await executeAnalyticsSql({
       projectRef,
       endpoint: '/platform/projects/{ref}/analytics/endpoints/logs.all',
       sql,
@@ -222,16 +221,6 @@ export async function getUnifiedLogInspection(
       signal,
     })
 
-    if (type === 'auth' && !data.result?.length) {
-      data = await executeAnalyticsSql({
-        projectRef,
-        endpoint: '/platform/projects/{ref}/analytics/endpoints/logs.all',
-        sql: getStandaloneAuthLogQuery(logId),
-        iso_timestamp_start: isoTimestampStart,
-        iso_timestamp_end: isoTimestampEnd,
-        signal,
-      })
-    }
     return data as unknown as UnifiedLogInspectionResponse
   }
 

@@ -7,6 +7,13 @@
 import dayjs from 'dayjs'
 
 import {
+  AUTH_LEVEL_SQL,
+  AUTH_LOGS_FROM_SQL,
+  AUTH_METHOD_SQL,
+  AUTH_PATH_SQL,
+  AUTH_STATUS_SQL,
+} from './Queries/AuthLogs.sql'
+import {
   getLogAttributeKey,
   groupLogsFiltersByColumn,
   parseLogsFilterUrlParams,
@@ -324,40 +331,22 @@ const getEdgeFunctionLogsQuery = (): SafeLogSqlFragment => safeSql`
 /**
  * Auth logs query fragment
  */
-const AUTH_STATUS_EXPR = safeSql`COALESCE(el_in_al_response.status_code, SAFE_CAST(json_value(to_json_string(al_metadata), '$.status') AS INT64), SAFE_CAST(json_value(al.event_message, '$.status') AS INT64))`
-const AUTH_LEVEL_EXPR = safeSql`lower(coalesce(json_value(to_json_string(al_metadata), '$.level'), json_value(al.event_message, '$.level'), ''))`
-
 const getAuthLogsQuery = (): SafeLogSqlFragment => safeSql`
     select
       al.id as id,
-      el_in_al.id as source_id,
+      el.id as source_id,
       al.timestamp as timestamp,
       'auth' as log_type,
-      CAST(${AUTH_STATUS_EXPR} AS STRING) as status,
-      CASE
-          WHEN ${AUTH_STATUS_EXPR} >= 500 THEN 'error'
-          WHEN ${AUTH_STATUS_EXPR} BETWEEN 400 AND 499 THEN 'warning'
-          WHEN ${AUTH_LEVEL_EXPR} IN ('error', 'fatal', 'panic') THEN 'error'
-          WHEN ${AUTH_LEVEL_EXPR} IN ('warn', 'warning') THEN 'warning'
-          ELSE 'success'
-      END as level,
-      coalesce(el_in_al_request.path, json_value(to_json_string(al_metadata), '$.path'), json_value(al.event_message, '$.path')) as pathname,
+      CAST(${AUTH_STATUS_SQL} AS STRING) as status,
+      ${AUTH_LEVEL_SQL} as level,
+      ${AUTH_PATH_SQL} as pathname,
       al.event_message as event_message,
-      coalesce(el_in_al_request.method, json_value(to_json_string(al_metadata), '$.method'), json_value(al.event_message, '$.method')) as method,
+      ${AUTH_METHOD_SQL} as method,
       null as log_count,
       null as logs,
       cast(null as string) as pipeline_id,
       cast(null as string) as pipeline_metadata
-    from auth_logs as al
-    left join unnest(metadata) as al_metadata
-    left join (
-    edge_logs as el_in_al
-        cross join unnest (metadata) as el_in_al_metadata
-        cross join unnest (el_in_al_metadata.response) as el_in_al_response
-        cross join unnest (el_in_al_response.headers) as el_in_al_response_headers
-        cross join unnest (el_in_al_metadata.request) as el_in_al_request
-    )
-    on al_metadata.request_id = el_in_al_response_headers.cf_ray
+    ${AUTH_LOGS_FROM_SQL}
   `
 
 /**

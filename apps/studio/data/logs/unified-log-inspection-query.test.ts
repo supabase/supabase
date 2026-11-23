@@ -119,37 +119,45 @@ describe('Postgres inspection hints', () => {
 })
 
 describe('legacy Auth inspection', () => {
-  it.each([false, true])('preserves Auth details when standalone is %s', async (isStandalone) => {
-    const queries: string[] = []
-    const result = {
-      id: 'auth-123',
-      event_message: 'Auth failure',
-      raw_log_data: { id: 'auth-123' },
-    }
-    addAPIMock({
-      method: 'post',
-      path: '/platform/projects/:ref/analytics/endpoints/logs.all',
-      response: async ({ request }) => {
-        queries.push(requestSchema.parse(await request.json()).sql)
-        return HttpResponse.json<AnalyticsResponse>({
-          result: isStandalone && queries.length === 1 ? [] : [result],
-        })
-      },
-    })
-    await expect(
-      getUnifiedLogInspection({
-        projectRef: 'default',
-        logId: 'auth-123',
-        type: 'auth',
-        search: createUnifiedLogsSearch({}),
+  it.each([false, true])(
+    'anchors the selected Auth event when gateway enrichment is %s',
+    async (hasGateway) => {
+      const queries: string[] = []
+      const authLog = {
+        id: 'auth-123',
+        timestamp: 1793142000000000,
+        event_message: 'Auth failure',
+      }
+      const result = {
+        ...authLog,
+        raw_log_data: authLog,
+        request_host: hasGateway ? 'project.supabase.co' : null,
+      }
+      addAPIMock({
+        method: 'post',
+        path: '/platform/projects/:ref/analytics/endpoints/logs.all',
+        response: async ({ request }) => {
+          queries.push(requestSchema.parse(await request.json()).sql)
+          return HttpResponse.json<AnalyticsResponse>({ result: [result] })
+        },
       })
-    ).resolves.toMatchObject({ result: [result] })
-    expect(queries).toHaveLength(isStandalone ? 2 : 1)
-    expect(queries[0]).toContain("el.id = 'auth-123'")
-    expect(queries[0]).toContain("WHERE a.id = 'auth-123'")
-    if (isStandalone) {
-      expect(queries[1]).toContain("WHERE al.id = 'auth-123'")
-      expect(queries[1]).toContain('al AS raw_log_data')
+      await expect(
+        getUnifiedLogInspection({
+          projectRef: 'default',
+          logId: 'auth-123',
+          type: 'auth',
+          search: createUnifiedLogsSearch({}),
+        })
+      ).resolves.toMatchObject({ result: [result] })
+      expect(queries).toHaveLength(1)
+      expect(queries[0]).toContain('al.id AS id')
+      expect(queries[0]).toContain('al.timestamp as timestamp')
+      expect(queries[0]).toContain('al.event_message,')
+      expect(queries[0]).toContain('al as raw_log_data')
+      expect(queries[0]).toContain('FROM auth_logs AS al')
+      expect(queries[0]).toContain('LEFT JOIN UNNEST(al.metadata) AS al_metadata')
+      expect(queries[0]).toMatch(/LEFT JOIN \(\s*edge_logs AS el/)
+      expect(queries[0]).toContain("al.id = 'auth-123' OR el.id = 'auth-123'")
     }
-  })
+  )
 })
