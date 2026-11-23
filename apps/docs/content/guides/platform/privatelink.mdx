@@ -24,7 +24,9 @@ Supabase PrivateLink is an organisation level configuration. It works by sharing
 
 The connection architecture changes from public internet routing to a dedicated private path through AWS's secure network backbone.
 
-Supabase PrivateLink supports direct database connections on port `5432` and dedicated pooler (PgBouncer) connections on port `6543`. It does not support other Supabase services like API, Storage, Auth, or Realtime. These services will continue to operate over public internet connections.
+Supabase PrivateLink carries only Postgres connections: direct database connections on port `5432` and dedicated pooler (PgBouncer) connections on port `6543`. It doesn't carry the [Data API](/docs/guides/api) (REST and GraphQL), Auth, Storage, or Realtime.
+
+The Supabase client libraries, such as `supabase-js`, call these services at the project URL, `https://<project_ref>.supabase.co`, over the public internet, not PrivateLink. If your backend's database traffic must stay private, connect it to Postgres directly or through the dedicated pooler over PrivateLink, instead of through the Data API.
 
 ## Requirements
 
@@ -189,7 +191,7 @@ For maximum security, you can restrict public database access in your project se
 
 ## Limitations
 
-- **Service Scope**: PrivateLink only supports database connections (Postgres and the dedicated [pooler](/docs/guides/database/connecting-to-postgres/pooling-and-limits)). Other Supabase services (API, Storage, Auth, Realtime) will continue to operate over public internet connections.
+- **Service Scope**: PrivateLink only supports Postgres connections, direct or through the dedicated [pooler](/docs/guides/database/connecting-to-postgres/pooling-and-limits). The [Data API](/docs/guides/api), Auth, Storage, and Realtime use the public internet, and so do the Supabase client libraries that call them.
 - **Feature Evolution**: The setup process and capabilities may evolve as we refine the offering
 
 ## Compatibility

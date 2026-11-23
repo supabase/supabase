@@ -544,18 +544,31 @@ export interface paths {
      * Gets all project's logs in a single log stream
      * @description Executes an SQL or LQL query on the project's unified logs stream.
      *
-     *     Either the `iso_timestamp_start` and `iso_timestamp_end` parameters must be provided.
-     *     If both are not provided, only the last 1 minute of logs will be queried.
-     *     The timestamp range must be no more than 24 hours and is rounded to the nearest minute. If the range is more than 24 hours, a validation error will be thrown.
+     *       Either the `iso_timestamp_start` and `iso_timestamp_end` parameters must be provided.
+     *       If both are not provided, only the last 1 minute of logs will be queried.
+     *       The timestamp range must be no more than 24 hours and is rounded to the nearest minute. If the range is more than 24 hours, a validation error will be thrown.
      *
-     *     Filter by the `source` column to specify specific log sources, such as edge_logs, postgres_logs, etc.
+     *       Filter by the `source` column to specify specific log sources, such as edge_logs, postgres_logs, etc.
      *
-     *     Note: SQL must be written in **ClickHouse SQL dialect**.
+     *       Note: SQL must be written in **ClickHouse SQL dialect**.
      *
      */
     get: operations['v1-get-project-logs']
     put?: never
-    post?: never
+    /**
+     * Gets all project's logs in a single log stream
+     * @description Executes an SQL or LQL query on the project's unified logs stream.
+     *
+     *       Either the `iso_timestamp_start` and `iso_timestamp_end` parameters must be provided.
+     *       If both are not provided, only the last 1 minute of logs will be queried.
+     *       The timestamp range must be no more than 24 hours and is rounded to the nearest minute. If the range is more than 24 hours, a validation error will be thrown.
+     *
+     *       Filter by the `source` column to specify specific log sources, such as edge_logs, postgres_logs, etc.
+     *
+     *       Note: SQL must be written in **ClickHouse SQL dialect**.
+     *
+     */
+    post: operations['v1-post-project-logs']
     delete?: never
     options?: never
     head?: never
@@ -1649,7 +1662,8 @@ export interface paths {
      * @description This endpoint is deprecated - use the deploy endpoint. Creates a function and adds it to the specified project.
      */
     post: operations['v1-create-a-function']
-    delete?: never
+    /** Deletes all Edge Functions from a project */
+    delete: operations['v1-delete-all-functions']
     options?: never
     head?: never
     patch?: never
@@ -2791,6 +2805,7 @@ export interface components {
         | 'PAUSE_FAILED'
         | 'RESIZING'
         | 'PROMOTING'
+        | 'RIGHTSIZING'
     }
     BranchResponse_Output: {
       /** Format: date-time */
@@ -2831,6 +2846,7 @@ export interface components {
         | 'PAUSE_FAILED'
         | 'RESIZING'
         | 'PROMOTING'
+        | 'RIGHTSIZING'
       project_ref: string
       /** Format: date-time */
       review_requested_at?: string
@@ -3018,6 +3034,8 @@ export interface components {
           }
         }
       }
+      /** @description When `true`, the provider's SAML ACS URL and entity ID are scoped to its own provider ID instead of the ones shared by all SAML providers in the project. The same signing key is still used. This cannot be changed once the provider is created. */
+      dedicated_scope?: boolean
       domains?: string[]
       metadata_url?: string
       metadata_xml?: string
@@ -3052,6 +3070,7 @@ export interface components {
             }
           }
         }
+        dedicated_scope?: boolean | null
         entity_id: string
         metadata_url?: string
         metadata_xml?: string
@@ -3233,6 +3252,7 @@ export interface components {
             }
           }
         }
+        dedicated_scope?: boolean | null
         entity_id: string
         metadata_url?: string
         metadata_xml?: string
@@ -3417,6 +3437,7 @@ export interface components {
             }
           }
         }
+        dedicated_scope?: boolean | null
         entity_id: string
         metadata_url?: string
         metadata_xml?: string
@@ -3734,6 +3755,7 @@ export interface components {
               }
             }
           }
+          dedicated_scope?: boolean | null
           entity_id: string
           metadata_url?: string
           metadata_xml?: string
@@ -4065,6 +4087,7 @@ export interface components {
           | 'PAUSE_FAILED'
           | 'RESIZING'
           | 'PROMOTING'
+          | 'RIGHTSIZING'
       }[]
     }
     OrganizationResponseV1_Output: {
@@ -5335,8 +5358,21 @@ export interface components {
      *       "region": "us-east-1"
      *     } */
     V1CreateProjectBody: {
+      /**
+       * Format: uri
+       * @description URL of the authentication site.
+       */
+      auth_site_url?: string
+      /** @description Schemas exposed by the data API. */
+      data_api_exposed_schemas?: string[]
+      /** @description Force revoke default privileges for the data API. This flag will be ignored if the organization enforces `true` by default, and cannot be overridden. */
+      data_api_revoke_default_privileges?: boolean
+      /** @description Whether to use the API schema for the data API. */
+      data_api_use_api_schema?: boolean
       /** @description Database password */
       db_pass: string
+      /** @description Initial SQL to run on the database. Limited to 1024 characters (1 KiB). For complex database changes, please use migrations https://supabase.com/docs/guides/deployment/database-migrations */
+      db_sql?: string
       /**
        * @description Desired instance size. Omit this field to always default to the smallest possible size.
        * @enum {string}
@@ -5361,6 +5397,10 @@ export interface components {
         | '48xlarge_optimized_memory'
         | '48xlarge_optimized_cpu'
         | '48xlarge_high_memory'
+      /** @description GitHub installation ID for linkage. Must first grant access to the repository on the Dashboard. */
+      github_installation_id?: number
+      /** @description GitHub repository ID for linkage. Must first grant access to the repository on the Dashboard. */
+      github_repository_id?: number
       /** @description [Experimental] Whether to enable high availability for the project. */
       high_availability?: boolean
       /**
@@ -5656,6 +5696,36 @@ export interface components {
       db_schema: string
       max_rows: number
     }
+    /**
+     * @description Request body for searching project logs with POST body
+     * @example {
+     *       "sql": "select event_message from edge_logs limit 10",
+     *       "iso_timestamp_start": "2025-03-01T00:00:00Z",
+     *       "iso_timestamp_end": "2025-03-01T23:59:59Z"
+     *     }
+     */
+    V1PostProjectLogsBody: {
+      /**
+       * Format: date-time
+       * @example 2025-03-01T23:59:59Z
+       */
+      iso_timestamp_end?: string
+      /**
+       * Format: date-time
+       * @example 2025-03-01T00:00:00Z
+       */
+      iso_timestamp_start?: string
+      /**
+       * @description Custom LQL query to execute on the logs. See [querying logs](https://supabase.com/docs/guides/monitoring-and-debugging/logs#querying-with-the-logs-explorer) for more details.
+       * @example s:event_message
+       */
+      lql?: string
+      /**
+       * @description Custom SQL query to execute on the logs. See [querying logs](https://supabase.com/docs/guides/monitoring-and-debugging/logs#querying-with-the-logs-explorer) for more details.
+       * @example select event_message from edge_logs limit 10
+       */
+      sql?: string
+    }
     V1ProfileResponse_Output: {
       gotrue_id: string
       primary_email: string
@@ -5792,6 +5862,7 @@ export interface components {
         | 'PAUSE_FAILED'
         | 'RESIZING'
         | 'PROMOTING'
+        | 'RIGHTSIZING'
     }
     V1ProjectWithDatabaseResponse_Output: {
       /** @description Creation timestamp */
@@ -5848,11 +5919,19 @@ export interface components {
         | 'PAUSE_FAILED'
         | 'RESIZING'
         | 'PROMOTING'
+        | 'RIGHTSIZING'
     }
     /** @example {
-     *       "query": "select * from pg_stat_activity limit 1;"
+     *       "query": "select * from pg_stat_activity limit 1;",
+     *       "disable_statement_timeout": false
      *     } */
     V1ReadOnlyQueryBody: {
+      /**
+       * @description Disable statement timeout for the query. Role-based or global timeout
+       *             still apply https://supabase.com/docs/guides/database/postgres/timeouts
+       * @default true
+       */
+      disable_statement_timeout?: boolean
       parameters?: unknown[]
       query: string
     }
@@ -5884,9 +5963,16 @@ export interface components {
     }
     /** @example {
      *       "query": "select * from pg_stat_activity limit 1;",
-     *       "read_only": true
+     *       "read_only": true,
+     *       "disable_statement_timeout": false
      *     } */
     V1RunQueryBody: {
+      /**
+       * @description Disable statement timeout for the query. Role-based or global timeout
+       *             still apply https://supabase.com/docs/guides/database/postgres/timeouts
+       * @default true
+       */
+      disable_statement_timeout?: boolean
       parameters?: unknown[]
       query: string
       read_only?: boolean
@@ -7732,6 +7818,8 @@ export interface operations {
       query?: {
         iso_timestamp_end?: string
         iso_timestamp_start?: string
+        /** @description Custom LQL query to execute on the logs. See [querying logs](https://supabase.com/docs/guides/monitoring-and-debugging/logs#querying-with-the-logs-explorer) for more details. */
+        lql?: string
         /** @description Custom SQL query to execute on the logs. See [querying logs](https://supabase.com/docs/guides/monitoring-and-debugging/logs#querying-with-the-logs-explorer) for more details. */
         sql?: string
       }
@@ -7743,6 +7831,60 @@ export interface operations {
       cookie?: never
     }
     requestBody?: never
+    responses: {
+      200: {
+        headers: {
+          [name: string]: unknown
+        }
+        content: {
+          'application/json': components['schemas']['AnalyticsResponse_Output']
+        }
+      }
+      /** @description Unauthorized */
+      401: {
+        headers: {
+          [name: string]: unknown
+        }
+        content?: never
+      }
+      /** @description Usage exceeded. Enable additional usage to continue querying */
+      402: {
+        headers: {
+          [name: string]: unknown
+        }
+        content?: never
+      }
+      /** @description Forbidden action */
+      403: {
+        headers: {
+          [name: string]: unknown
+        }
+        content?: never
+      }
+      /** @description Rate limit exceeded */
+      429: {
+        headers: {
+          [name: string]: unknown
+        }
+        content?: never
+      }
+    }
+  }
+  'v1-post-project-logs': {
+    parameters: {
+      query?: never
+      header?: never
+      path: {
+        /** @description Project ref */
+        ref: string
+      }
+      cookie?: never
+    }
+    requestBody: {
+      content: {
+        'application/json': components['schemas']['V1PostProjectLogsBody']
+      }
+    }
     responses: {
       200: {
         headers: {
@@ -9500,6 +9642,15 @@ export interface operations {
         }
         content?: never
       }
+      /** @description This feature requires the Pro, Team, or Enterprise organization plan. */
+      402: {
+        headers: {
+          [name: string]: unknown
+        }
+        content: {
+          'application/json': components['schemas']['PlanGateErrorBody']
+        }
+      }
       /** @description Forbidden action */
       403: {
         headers: {
@@ -9605,6 +9756,15 @@ export interface operations {
           [name: string]: unknown
         }
         content?: never
+      }
+      /** @description This feature requires the Pro, Team, or Enterprise organization plan. */
+      402: {
+        headers: {
+          [name: string]: unknown
+        }
+        content: {
+          'application/json': components['schemas']['PlanGateErrorBody']
+        }
       }
       /** @description Forbidden action */
       403: {
@@ -12499,6 +12659,54 @@ export interface operations {
         content?: never
       }
       /** @description Failed to create project's function */
+      500: {
+        headers: {
+          [name: string]: unknown
+        }
+        content?: never
+      }
+    }
+  }
+  'v1-delete-all-functions': {
+    parameters: {
+      query?: never
+      header?: never
+      path: {
+        /** @description Project ref */
+        ref: string
+      }
+      cookie?: never
+    }
+    requestBody?: never
+    responses: {
+      204: {
+        headers: {
+          [name: string]: unknown
+        }
+        content?: never
+      }
+      /** @description Unauthorized */
+      401: {
+        headers: {
+          [name: string]: unknown
+        }
+        content?: never
+      }
+      /** @description Forbidden action */
+      403: {
+        headers: {
+          [name: string]: unknown
+        }
+        content?: never
+      }
+      /** @description Rate limit exceeded */
+      429: {
+        headers: {
+          [name: string]: unknown
+        }
+        content?: never
+      }
+      /** @description Failed to delete project's functions */
       500: {
         headers: {
           [name: string]: unknown

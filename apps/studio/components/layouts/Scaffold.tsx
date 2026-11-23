@@ -50,8 +50,7 @@ export const ScaffoldContainer = forwardRef<
 /**
  * Top most header for a page
  *
- * Note: In most cases, we won't use this directly in pages. Header title and description can be controlled via
- * the PageLayout component, which uses the PageHeader component, and in turn uses this ScaffoldHeader component
+ * Note: In most cases, we won't use this directly in pages. Prefer the PageHeader components from ui-patterns.
  *
  * @deprecated Prefer PageHeader from ui-patterns.
  * See /design-system/docs/fragments/page-header
@@ -67,8 +66,7 @@ export const ScaffoldHeader = forwardRef<HTMLDivElement, HTMLAttributes<HTMLDivE
 /**
  * Title for the top most header for a page
  *
- * Note: In most cases, we won't use this directly in pages. Header title and description can be controlled via
- * the PageLayout component, which uses the PageHeader component, and in turn uses this ScaffoldTitle component
+ * Note: In most cases, we won't use this directly in pages. Prefer the PageHeader components from ui-patterns.
  *
  * @deprecated Prefer PageHeaderTitle from ui-patterns.
  * See /design-system/docs/fragments/page-header
@@ -82,8 +80,7 @@ export const ScaffoldTitle = forwardRef<HTMLHeadingElement, HTMLAttributes<HTMLH
 /**
  * Description for the top most header for a page
  *
- * Note: In most cases, we won't use this directly in pages. Header title and description can be controlled via
- * the PageLayout component, which uses the PageHeader component, and in turn uses this ScaffoldDescription component
+ * Note: In most cases, we won't use this directly in pages. Prefer the PageHeader components from ui-patterns.
  *
  * @deprecated Prefer PageHeaderDescription from ui-patterns.
  * See /design-system/docs/fragments/page-header
