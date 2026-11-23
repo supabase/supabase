@@ -1,3 +1,5 @@
+import '@xyflow/react/dist/style.css'
+
 import type { PGSchema } from '@supabase/pg-meta'
 import {
   Background,
@@ -23,9 +25,6 @@ import {
 import { useTheme } from 'next-themes'
 import Link from 'next/link'
 import { useCallback, useEffect, useMemo, useRef, useState } from 'react'
-
-import '@xyflow/react/dist/style.css'
-
 import { toast } from 'sonner'
 import {
   AlertDialog,

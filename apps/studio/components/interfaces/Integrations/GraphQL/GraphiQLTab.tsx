@@ -1,5 +1,6 @@
 import 'graphiql/setup-workers/webpack'
 import './graphiql-styles.css'
+
 import { useMonaco, type GraphiQLPlugin } from '@graphiql/react'
 import { createGraphiQLFetcher, Fetcher } from '@graphiql/toolkit'
 import { useParams } from 'common'

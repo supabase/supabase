@@ -19,6 +19,7 @@
           "sortSideEffects": false,
           "partitionByComment": true,
           "groups": [
+            ["side_effect", "side_effect_style"],
             "builtin",
             { "newlinesBetween": false },
             ["external", "subpath", "unknown"],
