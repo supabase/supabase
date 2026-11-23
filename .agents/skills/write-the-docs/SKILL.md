@@ -31,6 +31,8 @@ Four inputs, read in this sequence (sequence, not priority; Linear remains the p
 3. **Code.** Read the actual implementation before writing a single behavior claim — the PRD describes intent, the code describes what shipped. Check the Linear issue/project first for a linked `supabase/supabase` PR — its diff and description are the most precise "what actually shipped" source, more precise than a general codebase read. If no PR is linked, locate the feature directly in `supabase/supabase` (or the product's own repo), and apply [`ask-the-docs`](../ask-the-docs/SKILL.md)'s reuse/minimalism lens: understand what exists before describing it. When behavior spans services (CLI, Auth, migrations, platform, …), follow [`pm-the-docs`](../pm-the-docs/SKILL.md) → [universe-lookup](../pm-the-docs/reference/universe-lookup.md) **capability gate** (universe when accessible, else OSS public search / linked repos — not `ask-the-docs`). If code and PRD disagree, the code wins for behavior claims — flag the mismatch rather than silently picking one.
 4. **Whatever else the author supplies.** Screenshots, example projects, related pages, Slack threads, a specific voice sample. Screenshots are for more than general context — use them to verify the _exact_ button/menu/field labels before writing instructional steps that reference them; a mismatched UI label is one of the easiest, most avoidable errors in a draft. Ask for these when the feature's user-facing shape is still unclear after 1–3, rather than guessing.
 
+When the draft adds to or rewrites an existing page, also read the whole page, each page it links to, and other pages under `apps/docs/content/` on the same topic. Note facts the draft must not repeat, and nearby text that the draft would make untrue, such as "the steps above".
+
 Summarize all four back to the requester before drafting: what's confirmed, what's product intent vs. shipped behavior, what's still a gap. Stop and ask if a real gap would change the draft's structure or scope.
 
 ## Phase 1.5 — Content-type gate
@@ -42,6 +44,15 @@ Before drafting, classify what's actually being asked for against `apps/docs`'s 
 - **Reference** — generated from `spec/` (OpenAPI, SDK YAML, CLI config) → `features/docs/generated/**`. **Not hand-authored via the standard MDX path.** If the ask is actually reference-type content (a new API endpoint, config option, or SDK method that needs a reference entry), stop drafting MDX — it would diverge from or get silently overwritten by the generator. Instead point to the spec/codegen pipeline (`apps/docs/spec/`, `apps/docs/generator/`; see `ask-the-docs`'s `management-api-reference.md` for the OpenAPI-specific flow) and say so explicitly rather than producing a page that looks done but isn't the real fix.
 
 When in doubt, ask `ask-the-docs` rather than guessing — this classification is the one call in this skill most likely to be wrong if made from outside knowledge of the app.
+
+## Phase 1.6 — Template gate
+
+Before drafting, pick the page's template and confirm it with the requester.
+
+1. Match the page's purpose, reader question, and Information Type to a row in [Choose a template](../../../apps/docs/style-guide/03-page-structure.md#choose-a-template). Load only that template file.
+2. Tell the requester which template you chose, why, and the headings it requires. Wait for a yes or a different choice. If the requester is unavailable, go ahead with the template you recommend and record the choice in the handoff. If the page spans two templates, say so and propose a split.
+3. If no row fits, say so and ask. Don't invent a structure.
+4. Draft from the template's headings, and run its checklist in Phase 2.5.
 
 ## Phase 2 — Draft
 
@@ -81,6 +92,7 @@ Before handoff, run both passes from [Use with an AI agent](../../../apps/docs/s
 - [ ] Terminology matches [`WORD_LIST.md`](../../../apps/docs/style-guide/WORD_LIST.md) (including any terms flagged as imprecise, not just spelling/capitalization)
 - [ ] Voice, tense, and brevity follow [`01-voice-and-tone.md`](../../../apps/docs/style-guide/01-voice-and-tone.md)
 - [ ] Document type, section grouping, and chunking follow [`03-page-structure.md`](../../../apps/docs/style-guide/03-page-structure.md)
+- [ ] The page follows the template named in [Choose a template](../../../apps/docs/style-guide/03-page-structure.md#choose-a-template)
 - [ ] Admonitions, headings, links, and other components follow [`02-elements.md`](../../../apps/docs/style-guide/02-elements.md)
 
 ### Accuracy pass
@@ -112,7 +124,7 @@ Only apply this phase when the draft renames, moves, or deletes an existing page
 This skill stops at a reviewable draft. It does not open worktrees or PRs itself:
 
 - **Offer** [`test-the-docs`](../test-the-docs/SKILL.md) when the draft includes runnable procedural snippets. Ask before starting verification. Gate prerequisites **per artifact class** (Docker Compose stack profile for DB/API artifacts; examples profile / Node in-runner for `example-app`). If declined, or a required prerequisite for that class is missing, record `deferred` for those artifacts only and continue. When accepted, attach the verification report to the PR body / self-review note.
-- Then run [`review-the-docs`](../review-the-docs/SKILL.md) local self-review (build/classify).
+- Then run [`review-the-docs`](../review-the-docs/SKILL.md) local self-review (build, classify, and read the change as a reader).
 - Hand off to [`create-pull-request`](https://github.com/supabase/docs-agent-skills/blob/main/.claude/skills/create-pull-request/SKILL.md) (and [`work-linear-issue`](https://github.com/supabase/docs-agent-skills/blob/main/.claude/skills/work-linear-issue/SKILL.md) if the ticket needs a full worktree+PR flow) for the actual PR mechanics. Carry the Phase 1/2 flagged-assumptions list forward explicitly into that handoff — it belongs in the PR description (e.g. a "needs review" section) so a reviewer sees it, not just as an inline comment buried in the draft.
 - If the feature is UI-driven and the PR will need screenshots/GIFs, flag [`proof-it-works`](https://github.com/supabase/docs-agent-skills/blob/main/.claude/skills/proof-it-works/SKILL.md) as the next step rather than capturing evidence here.
 - Before opening the PR, run [`review-the-docs`](../review-the-docs/SKILL.md) local self-review: `pnpm build:guides-markdown` where applicable, and anchor checks per [reference/drafting-mechanics.md](reference/drafting-mechanics.md).

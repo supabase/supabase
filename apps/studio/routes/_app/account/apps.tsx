@@ -11,7 +11,6 @@ import {
 } from 'ui-patterns/PageHeader'
 
 import { OAuthApps } from '@/components/interfaces/Account/OAuthApps/OAuthApps'
-import { USE_MOCKS } from '@/data/oauth-apps/mocks'
 
 export const Route = createFileRoute('/_app/account/apps')({
   component: AccountOAuthAppsPage,
@@ -22,7 +21,7 @@ export const Route = createFileRoute('/_app/account/apps')({
 })
 
 function AccountOAuthAppsPage() {
-  const isScopedOAuthManageEnabled = useFlag('enableScopedOAuthManage') && USE_MOCKS
+  const isScopedOAuthManageEnabled = useFlag('enableScopedOAuthManage')
   const { hasLoaded } = useFeatureFlags()
   const navigate = useNavigate()
   useEffect(() => {

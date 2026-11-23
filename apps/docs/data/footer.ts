@@ -1,5 +1,4 @@
 import { CheckCircle, FlaskConical, LifeBuoy, MessagesSquare, ScrollText } from 'lucide-react'
-import { PrivacySettings } from 'ui-patterns/PrivacySettings'
 
 export const primaryLinks = [
   {
@@ -39,5 +38,4 @@ export const secondaryLinks = [
   },
   { title: 'Open Source', url: 'https://supabase.com/open-source' },
   { title: 'SupaSquad', url: 'https://supabase.com/open-source/contributing/supasquad' },
-  { title: 'Privacy Settings', component: PrivacySettings },
 ]

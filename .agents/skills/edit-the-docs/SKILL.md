@@ -28,18 +28,19 @@ Improves **existing** Supabase docs pages: structure, order, connective text, an
 
 ## Phase 0: Size and split
 
-1. Identify the document type per [`03-page-structure.md`](../../../apps/docs/style-guide/03-page-structure.md#document-types). The types are explainer, tutorial, guide, reference, and troubleshooting.
+1. Identify the document type per [`03-page-structure.md`](../../../apps/docs/style-guide/03-page-structure.md#document-types). The types are explainer, tutorial, guide, reference, and troubleshooting. Then pick its template per [Choose a template](../../../apps/docs/style-guide/03-page-structure.md#choose-a-template).
 2. State the reader's goal and prerequisites in one or two lines.
-3. Note structural problems: mixed information types interrupting a procedure, missing intro navigation on a long page, weak transitions, redundancy, or over-explained mechanics.
-4. Sort the diagnosis into the buckets below. **Drop any bucket that comes back empty, and say so.** Style, structure, and technical revision take one commit or branch each. Additions take as many as the content needs, so the edit has no fixed size. A style edit plus a structural edit is the common shape, because most pages that need restructuring are already correct. Two buckets is a complete result, not a truncated one.
-5. Know where the edit ends. **The edit is only the buckets that have content.** Any bucket you drop is beyond the edit, and a later request for that change type is a new request. That includes one you raise yourself. Name it, keep the work in progress clean, and ask whether it belongs in this edit, in a separate ticket, or nowhere. Absorbing it into a bucket that's already open is what turns an edit into a rewrite.
-6. Size the edit. **When it comes out large, offer a stack. Don't choose one.** One PR with each bucket as its own commit is the output unless the requester approves a split. Raise the question when both hold:
+3. Compare the page to its template and list every section that doesn't fit it: a second task, a second audience, background, or lookup content. **When a section is clearly a second task or audience, or the requester asked for template alignment, recommend a topic split-out and a content migration for it.** Name the page it should move to, an existing page or a new one under its own template, and say that the original anchor stays as a pointer. Otherwise note the misfit and carry on, so a small edit stays small. Don't squeeze misfit content into the template, and don't delete it. If no template fits the page at all, say so and ask.
+4. Note structural problems: mixed information types interrupting a procedure, missing intro navigation on a long page, weak transitions, redundancy, or over-explained mechanics.
+5. Sort the diagnosis into the buckets below. **Drop any bucket that comes back empty, and say so.** Style, structure, and technical revision take one commit or branch each. Additions take as many as the content needs, so the edit has no fixed size. A style edit plus a structural edit is the common shape, because most pages that need restructuring are already correct. Two buckets is a complete result, not a truncated one.
+6. Know where the edit ends. **The edit is only the buckets that have content.** Any bucket you drop is beyond the edit, and a later request for that change type is a new request. That includes one you raise yourself. Name it, keep the work in progress clean, and ask whether it belongs in this edit, in a separate ticket, or nowhere. Absorbing it into a bucket that's already open is what turns an edit into a rewrite.
+7. Size the edit. **When it comes out large, offer a stack. Don't choose one.** One PR with each bucket as its own commit is the output unless the requester approves a split. Raise the question when both hold:
    - The edit rewrites prose and moves sections, or it corrects a technical claim.
    - It runs over roughly 150 changed lines.
 
    Say how large the diff is and propose the branches. Name the trade in the ask: a stack gives a reviewer clean per-change-type diffs, and it also means no PR page shows the whole edit, so reading it end to end costs them an extra command. Their reviewers pay that cost, so it's their call. **No answer means one PR.**
 
-7. Summarize the diagnosis and the proposed split to the requester, and **wait for confirmation before creating any branch.** Name which buckets are empty and why. When nobody is available to confirm, record the diagnosis in the PR body and ship one PR.
+8. Summarize the diagnosis and the proposed split to the requester, and **wait for confirmation before creating any branch.** Name which buckets are empty and why. When nobody is available to confirm, record the diagnosis in the PR body and ship one PR.
 
 **When the diff outgrows the estimate mid-edit, stop and offer the split then.** A size call made at diagnosis can be wrong by the time the style pass lands. Say how large it got and ask. Splitting unasked is the failure here, and so is carrying on quietly because you already have an answer.
 
@@ -103,7 +104,7 @@ Then:
 
 ### 5. When the page itself should split
 
-When a topic outgrows the page, give it its own page rather than its own group. Navigation that overflows the sidebar is one signal. A section carrying its own subsections several levels deep, sharing nothing with the rest of the page but a single word, is another.
+When a topic outgrows the page, or a section doesn't fit the page's template (Phase 0, step 3), give it its own page rather than its own group, and migrate the content there. Navigation that overflows the sidebar is one signal. A section carrying its own subsections several levels deep, sharing nothing with the rest of the page but a single word, is another.
 
 Update every navigation entry, repoint every inbound anchor, and cross-reference the new page. Confirm the nav-registration mechanism through [`ask-the-docs`](../ask-the-docs/SKILL.md) rather than assuming it.
 

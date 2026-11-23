@@ -78,8 +78,7 @@ export const CliLoginScreen = ({
   const { profile } = useProfile()
   const [status, setStatus] = useState<CliLoginStatus>({ _tag: 'loading' })
   const startedForSessionIdRef = useRef<string | undefined>(undefined)
-  // Keep navigate in a ref so changing the prop never re-triggers the effect
-  // or cancels an in-flight POST via the isActive cleanup.
+  // Keep navigate out of the effect deps so changing the prop never re-triggers it.
   const navigate = useEffectEvent(navigateProp)
   const displayName = profile?.primary_email ?? profile?.username
 
@@ -107,14 +106,14 @@ export const CliLoginScreen = ({
     if (startedForSessionIdRef.current === sessionId) return
     startedForSessionIdRef.current = sessionId
 
-    let isActive = true
     setStatus({ _tag: 'loading' })
 
     async function createSession() {
       try {
         const { nonce } = await createCliLoginSession(sessionId!, publicKey!, tokenName)
 
-        if (!isActive) return
+        // Ignore the response only if a different session has since started.
+        if (startedForSessionIdRef.current !== sessionId) return
 
         if (nonce) {
           navigate(`/cli/login?device_code=${nonce.substring(0, 8)}`)
@@ -122,16 +121,12 @@ export const CliLoginScreen = ({
           setStatus({ _tag: 'error', message: 'The CLI sign-in session did not return a code.' })
         }
       } catch (error: unknown) {
-        if (!isActive) return
+        if (startedForSessionIdRef.current !== sessionId) return
         setStatus({ _tag: 'error', message: getErrorMessage(error) })
       }
     }
 
     createSession()
-
-    return () => {
-      isActive = false
-    }
   }, [deviceCode, isLoggedIn, publicKey, sessionId, tokenName])
 
   if (status._tag === 'loading') {

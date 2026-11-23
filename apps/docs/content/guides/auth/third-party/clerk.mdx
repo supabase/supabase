@@ -14,9 +14,9 @@ Finally add a [new Third-Party Auth integration with Clerk](/dashboard/project/_
 
 ### Configure for local development or self-hosting
 
-When developing locally or self-hosting with the [Supabase CLI](/docs/guides/local-development/cli/getting-started), add the following config to your `supabase/config.toml` file:
+When developing locally or self-hosting with the [Supabase CLI](/docs/guides/local-development/cli/getting-started), add the following config to your config file (`supabase/config.toml` or `supabase/config.jsonc`):
 
-```toml
+```toml supabase/config.toml
 [auth.third_party.clerk]
 enabled = true
 domain = "example.clerk.accounts.dev"

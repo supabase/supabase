@@ -1,4 +1,14 @@
-import { Label, Switch } from 'ui'
+import {
+  Card,
+  Label,
+  Switch,
+  Table,
+  TableBody,
+  TableCell,
+  TableHead,
+  TableHeader,
+  TableRow,
+} from 'ui'
 
 import {
   ALL_PRIVILEGE_TYPES,
@@ -6,7 +16,6 @@ import {
   TABLE_PRIVILEGE_TYPES,
 } from './Privileges.constants'
 import { usePrivilegesState } from './Privileges.utils'
-import Table from '@/components/to-be-cleaned/Table'
 import type { ColumnPrivilege } from '@/data/privileges/column-privileges-query'
 
 export interface PrivilegesTableProps extends Pick<
@@ -18,7 +27,7 @@ export interface PrivilegesTableProps extends Pick<
   isApplyingChanges?: boolean
 }
 
-const PrivilegesTable = ({
+export const PrivilegesTable = ({
   columnPrivileges,
   tableCheckedStates,
   columnCheckedStates,
@@ -43,78 +52,81 @@ const PrivilegesTable = ({
   }
 
   return (
-    <Table
-      className="table-fixed mb-4"
-      head={[
-        <Table.th key="header-column">
-          <span>Column</span>
-        </Table.th>,
-        ...ALL_PRIVILEGE_TYPES.map((privilege) => {
-          const checked = tableCheckedStates[privilege]
-          const switchThId = `privilege-th-${privilege}`
+    <Card className="mb-4">
+      <Table className="table-fixed">
+        <TableHeader>
+          <TableRow>
+            <TableHead key="header-column">
+              <span>Column</span>
+            </TableHead>
+            {ALL_PRIVILEGE_TYPES.map((privilege) => {
+              const checked = tableCheckedStates[privilege]
+              const switchThId = `privilege-th-${privilege}`
 
-          return (
-            <Table.th key={`header-${privilege}`}>
-              <div className="inline-flex items-center gap-2">
-                <Label htmlFor={switchThId}>
-                  {privilege.charAt(0) + privilege.slice(1).toLowerCase()}
-                </Label>
+              return (
+                <TableHead key={`header-${privilege}`}>
+                  <div className="inline-flex items-center gap-2">
+                    <Label htmlFor={switchThId} className="text-xs">
+                      {privilege.charAt(0) + privilege.slice(1).toLowerCase()}
+                    </Label>
 
-                <Switch
-                  id={switchThId}
-                  checked={checked}
-                  onCheckedChange={() => {
-                    toggleTablePrivilege(privilege)
-                  }}
-                  disabled={disabled || isApplyingChanges}
-                />
-              </div>
-            </Table.th>
-          )
-        }),
-      ]}
-      body={columnPrivileges.map((column) => (
-        <Table.tr key={column.column_id}>
-          <Table.td>
-            <button
-              tabIndex={0}
-              onClick={() => handleClickColumnName(column.column_id)}
-              className="block w-full truncate text-left text-foreground"
-            >
-              {column.column_name}
-            </button>
-          </Table.td>
-          {COLUMN_PRIVILEGE_TYPES.map((privilege) => {
-            const checked = columnCheckedStates[column.column_id][privilege]
-
-            return (
-              <Table.td key={privilege}>
-                {COLUMN_PRIVILEGE_TYPES.includes(privilege as any) && (
-                  <div className="ml-5 inline-flex">
                     <Switch
-                      aria-label={`${privilege} privilege for ${column.column_name}`}
+                      id={switchThId}
                       checked={checked}
                       onCheckedChange={() => {
-                        toggleColumnPrivilege(column.column_id, privilege)
+                        toggleTablePrivilege(privilege)
                       }}
                       disabled={disabled || isApplyingChanges}
                     />
                   </div>
-                )}
-              </Table.td>
-            )
-          })}
-          {TABLE_PRIVILEGE_TYPES.map((privilege) => {
-            return (
-              <Table.td key={privilege}>
-                <span className="ml-5 text-xs text-foreground-lighter">N/A</span>
-              </Table.td>
-            )
-          })}
-        </Table.tr>
-      ))}
-    />
+                </TableHead>
+              )
+            })}
+          </TableRow>
+        </TableHeader>
+        <TableBody>
+          {columnPrivileges.map((column) => (
+            <TableRow key={column.column_id}>
+              <TableCell>
+                <button
+                  tabIndex={0}
+                  onClick={() => handleClickColumnName(column.column_id)}
+                  className="block w-full truncate text-left text-foreground"
+                >
+                  {column.column_name}
+                </button>
+              </TableCell>
+              {COLUMN_PRIVILEGE_TYPES.map((privilege) => {
+                const checked = columnCheckedStates[column.column_id][privilege]
+
+                return (
+                  <TableCell key={privilege}>
+                    {COLUMN_PRIVILEGE_TYPES.includes(privilege) && (
+                      <div className="ml-5 inline-flex">
+                        <Switch
+                          aria-label={`${privilege} privilege for ${column.column_name}`}
+                          checked={checked}
+                          onCheckedChange={() => {
+                            toggleColumnPrivilege(column.column_id, privilege)
+                          }}
+                          disabled={disabled || isApplyingChanges}
+                        />
+                      </div>
+                    )}
+                  </TableCell>
+                )
+              })}
+              {TABLE_PRIVILEGE_TYPES.map((privilege) => {
+                return (
+                  <TableCell key={privilege}>
+                    <span className="ml-5 text-xs text-foreground-lighter">N/A</span>
+                  </TableCell>
+                )
+              })}
+            </TableRow>
+          ))}
+        </TableBody>
+      </Table>
+    </Card>
   )
 }
-
-export default PrivilegesTable

@@ -12,6 +12,7 @@ import { WarehouseSetupPanel } from './WarehouseSetupPanel'
 import type { DestinationPanelSchemaType } from '@/components/interfaces/Database/Replication/DestinationPanel/DestinationForm/DestinationForm.schema'
 import { DuckLakeFields } from '@/components/interfaces/Database/Replication/DestinationPanel/DestinationForm/DuckLake/Fields'
 import type { ProjectDetail } from '@/data/projects/project-detail-query'
+import type { WarehouseMetricsResponse } from '@/data/warehouse/warehouse-metrics-api-types'
 import { customRender } from '@/tests/lib/custom-render'
 import { addAPIMock, type APIErrorBody } from '@/tests/lib/msw'
 
@@ -98,6 +99,11 @@ function mockWarehouse(
     method: 'get',
     path: '/platform/replication/:ref/destinations',
     response: () => HttpResponse.json<Destinations>({ destinations }),
+  })
+  addAPIMock({
+    method: 'get',
+    path: '/platform/warehouse/:ref/metrics',
+    response: () => HttpResponse.json<WarehouseMetricsResponse>({ metrics: [] }),
   })
 }
 

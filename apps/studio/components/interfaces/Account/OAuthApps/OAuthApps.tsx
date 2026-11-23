@@ -1,3 +1,4 @@
+import { cn } from '@graphiql/react'
 import { useIntersectionObserver } from '@uidotdev/usehooks'
 import { Fragment, useEffect } from 'react'
 import { Card, Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from 'ui'
@@ -34,10 +35,10 @@ export const OAuthApps = () => {
   })
 
   useEffect(() => {
-    if (hasNextPage && entry?.isIntersecting) {
+    if (hasNextPage && entry?.isIntersecting && !isFetchingNextPage && !isError) {
       fetchNextPage()
     }
-  }, [hasNextPage, entry?.isIntersecting, fetchNextPage])
+  }, [hasNextPage, entry?.isIntersecting, fetchNextPage, isFetchingNextPage, isError])
 
   return (
     <PageSection id="authorized-apps">
@@ -78,8 +79,9 @@ export const OAuthApps = () => {
                 {data.pages.length === 0 || data.pages[0].data.length === 0 ? (
                   <TableRow className="[&>td]:hover:bg-inherit">
                     <TableCell colSpan={4}>
+                      <p className="text-sm text-foreground">No results found</p>
                       <p className="text-sm text-foreground-lighter">
-                        No apps have been authorized in this organization yet.
+                        No apps have been authorized for your account yet.
                       </p>
                     </TableCell>
                   </TableRow>
@@ -87,13 +89,23 @@ export const OAuthApps = () => {
                   <>
                     {data.pages.map((page, pageIndex) => (
                       <Fragment key={pageIndex}>
-                        {page.data.map((grant) => (
-                          <GrantRow key={grant.grant_id} grant={grant} />
+                        {page.data.map((grant, index) => (
+                          <GrantRow
+                            key={grant.id}
+                            grant={grant}
+                            className={cn(
+                              // Avoid a double bottom border when next page isn't loading
+                              pageIndex === data.pages.length - 1 &&
+                                index === page.data.length - 1 &&
+                                !isFetchingNextPage &&
+                                'border-none'
+                            )}
+                          />
                         ))}
                       </Fragment>
                     ))}
                     <TableRow ref={sentinelRef} className="[&>td]:hover:bg-inherit">
-                      <TableCell colSpan={4} className={isFetchingNextPage ? '' : 'p-0 hidden'}>
+                      <TableCell colSpan={4} className={isFetchingNextPage ? '' : 'p-0'}>
                         <p aria-live="polite" className="text-sm text-foreground-lighter">
                           {isFetchingNextPage ? 'Loading...' : ''}
                         </p>

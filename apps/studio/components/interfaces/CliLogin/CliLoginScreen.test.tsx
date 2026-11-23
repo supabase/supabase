@@ -165,4 +165,73 @@ describe('CliLoginScreen', () => {
     expect(initialNavigate).not.toHaveBeenCalled()
     expect(createCliLoginSessionMock).toHaveBeenCalledTimes(1)
   })
+
+  test('still navigates when an effect dependency changes during an in-flight POST', async () => {
+    let resolveSession: (value: { nonce: string }) => void = () => {}
+    createCliLoginSessionMock.mockImplementation(
+      () =>
+        new Promise<{ nonce: string }>((resolve) => {
+          resolveSession = resolve
+        })
+    )
+    const { rerender, navigate } = renderScreen()
+
+    await waitFor(() => {
+      expect(createCliLoginSessionMock).toHaveBeenCalledTimes(1)
+    })
+
+    rerender(
+      <CliLoginScreen
+        isLoggedIn
+        sessionId="session-test"
+        publicKey="public-key-test"
+        tokenName="renamed-token"
+        navigate={navigate}
+      />
+    )
+
+    resolveSession({ nonce: 'ABCDEFGH12345678' })
+
+    await waitFor(() => {
+      expect(navigate).toHaveBeenCalledWith('/cli/login?device_code=ABCDEFGH')
+    })
+    expect(createCliLoginSessionMock).toHaveBeenCalledTimes(1)
+  })
+
+  test('ignores a stale response after the session id changes', async () => {
+    const resolvers: Array<(value: { nonce: string }) => void> = []
+    createCliLoginSessionMock.mockImplementation(
+      () =>
+        new Promise<{ nonce: string }>((resolve) => {
+          resolvers.push(resolve)
+        })
+    )
+    const { rerender, navigate } = renderScreen()
+
+    await waitFor(() => {
+      expect(createCliLoginSessionMock).toHaveBeenCalledTimes(1)
+    })
+
+    rerender(
+      <CliLoginScreen
+        isLoggedIn
+        sessionId="session-other"
+        publicKey="public-key-test"
+        tokenName="local-dev"
+        navigate={navigate}
+      />
+    )
+
+    await waitFor(() => {
+      expect(createCliLoginSessionMock).toHaveBeenCalledTimes(2)
+    })
+
+    resolvers[0]({ nonce: 'STALE0001234' })
+    resolvers[1]({ nonce: 'FRESH0001234' })
+
+    await waitFor(() => {
+      expect(navigate).toHaveBeenCalledWith('/cli/login?device_code=FRESH000')
+    })
+    expect(navigate).not.toHaveBeenCalledWith('/cli/login?device_code=STALE000')
+  })
 })
