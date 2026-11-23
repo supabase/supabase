@@ -15,15 +15,15 @@ export const BannerFreeMicroUpgrade = () => {
   const { ref } = useParams()
   const track = useTrack()
   const { dismissBanner } = useBannerStack()
-  const [, setIsDismissed] = useLocalStorageQuery(
-    LOCAL_STORAGE_KEYS.FREE_MICRO_UPGRADE_BANNER_DISMISSED(ref ?? ''),
-    false
+  const [, setDismissedAt] = useLocalStorageQuery<string | null>(
+    LOCAL_STORAGE_KEYS.FREE_MICRO_UPGRADE_BANNER_DISMISSED_AT(ref ?? ''),
+    null
   )
 
   return (
     <BannerCard
       onDismiss={() => {
-        setIsDismissed(true)
+        setDismissedAt(new Date().toISOString())
         dismissBanner(BANNER_ID.FREE_MICRO_UPGRADE)
         track('free_micro_upgrade_banner_dismissed')
       }}
@@ -42,10 +42,9 @@ export const BannerFreeMicroUpgrade = () => {
           </div>
         </div>
         <div className="flex flex-col gap-y-1 mb-2">
-          <p className="text-sm font-medium">Project low on resources</p>
+          <p className="text-sm font-medium">Compute Upgrade available</p>
           <p className="text-xs text-foreground-lighter text-balance">
-            Your Nano compute is approaching its limits. Your Pro plan includes a free upgrade to
-            Micro — double the memory at no extra cost.
+            Your Pro plan includes a free upgrade to Micro — double the memory at no extra cost.
           </p>
         </div>
         <div className="flex gap-2">
@@ -54,7 +53,7 @@ export const BannerFreeMicroUpgrade = () => {
             size="tiny"
             asChild
             onClick={() => {
-              setIsDismissed(true)
+              setDismissedAt(new Date().toISOString())
               dismissBanner(BANNER_ID.FREE_MICRO_UPGRADE)
               track('free_micro_upgrade_banner_cta_clicked')
             }}
