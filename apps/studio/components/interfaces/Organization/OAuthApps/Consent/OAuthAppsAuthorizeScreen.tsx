@@ -419,7 +419,7 @@ export const OAuthAppsAuthorizeScreen = ({
               utcTimestamp={preflightData.existing_grant.approved_at}
               labelFormat="D MMM YYYY"
             />
-            . It's now asking for different access.
+            . It’s now asking for different access.
           </>
         ) : (
           'This application wants to access your Supabase Account'
