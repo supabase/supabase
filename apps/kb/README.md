@@ -13,6 +13,20 @@ At build time, every page is also exported as a plain `.md` file, so the content
 
 Search is served by an API route in `api/search/`, backed by content indexed with `pnpm search:ingest`.
 
+## What belongs in `/kb` versus `/docs`
+
+- **`/kb` owns applied decisions and applied experience.** If the answer depends on factors outside the product (scale, budget, the existing stack, or the alternatives), it belongs in `/kb`.
+- **`/docs` owns product truth.** If Supabase alone determines the answer, it belongs in `/docs`. This includes API and SDK reference, configuration, product concepts, quickstarts, supported behavior and limits, and setup for a single integration.
+
+| Content type       | Include                                                                                                                                          | Exclude                                                                                                   |
+| :----------------- | :----------------------------------------------------------------------------------------------------------------------------------------------- | :-------------------------------------------------------------------------------------------------------- |
+| `guides`           | Comparisons, migrations from other platforms, decision guides, and tutorials where the cross-stack choice is the point                           | Single-product setup or reference that `/docs` already covers. Link to `/docs` for that material instead. |
+| `faqs`             | Short answers to "Can I use Supabase for X?" or "Can I use X with Supabase?" questions, where the answer depends on the user's stack or workload | Yes/no product facts (supported SDKs, limits, pricing). Answer these in `/docs`.                          |
+| `community-guides` | Useful external write-ups from the community that we only link to.                                                                               | Any content that we host ourselves.                                                                       |
+| `troubleshooting`  | Fixes for problems, for example in response to Support tickets                                                                                   | N/A                                                                                                       |
+
+**Tip:** Before you add a page, search `/docs`, `/kb`, and `/blog` for an existing answer. If one exists, improve it and then decide if it should move or you should link to it. Avoid duplicating content.
+
 ## Development
 
 Run the dev server from the repository root or from `apps/kb`. It starts at http://localhost:3008/kb.
