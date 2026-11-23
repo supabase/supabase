@@ -111,7 +111,12 @@ for await (const ev of new EventManager()) {
         const { reason, cpu_time_used, memory_used } = ev.event
         const level = reason === 'CPUTime' || reason === 'Memory' ? 'error' : 'info'
         emit(`shutdown (${reason})`, {
-          ...base, level, reason, cpu_time_used, memory_used,
+          ...base, level, reason, cpu_time_used,
+          memory_used: {
+            total: memory_used.total,
+            heap: memory_used.heap,
+            external: memory_used.external,
+          },
         }, ev.timestamp)
         break
       }
