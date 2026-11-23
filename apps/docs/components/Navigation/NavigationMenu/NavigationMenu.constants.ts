@@ -1212,7 +1212,7 @@ export const database: NavMenuConstant = {
           url: '/guides/database/postgres/postgres-log-config' as `/${string}`,
         },
         {
-          name: 'Log slow and failing queries',
+          name: 'Find slow queries',
           url: '/guides/observability/log-slow-queries' as `/${string}`,
         },
       ],
@@ -3124,7 +3124,7 @@ export const telemetry: NavMenuConstant = {
       name: 'Configure and export',
       items: [
         { name: 'Configure logging', url: '/guides/observability/configure-logging' },
-        { name: 'Log slow and failing queries', url: '/guides/observability/log-slow-queries' },
+        { name: 'Find slow queries', url: '/guides/observability/log-slow-queries' },
         { name: 'Log drains', url: '/guides/observability/log-drains' },
         { name: 'Client-side tracing', url: '/guides/observability/client-side-tracing' },
         { name: 'Sentry integration', url: '/guides/observability/sentry-monitoring' },

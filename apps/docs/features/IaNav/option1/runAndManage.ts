@@ -349,7 +349,7 @@ export const runAndManage: NavMenuConstant = {
               url: '/guides/platform/postgres-connection-logging',
             },
             {
-              name: 'Log slow and failing queries',
+              name: 'Find slow queries',
               url: '/guides/observability/log-slow-queries',
             },
           ],

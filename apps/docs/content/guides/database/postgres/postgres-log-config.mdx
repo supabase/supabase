@@ -450,7 +450,7 @@ postgres-config update --config cron.log_statement=false --no-restart \
 
 ### `auto_explain.*`
 
-Logs the query plan of each statement that runs longer than a threshold. To set it up, see [Log slow and failing queries](/docs/guides/observability/log-slow-queries).
+Logs the query plan of each statement that runs longer than a threshold. To set it up, see [Find slow and failing queries](/docs/guides/observability/log-slow-queries).
 
 ### `log_duration`
 
@@ -484,11 +484,11 @@ alter role "postgres" set "log_duration" to true;
 
 ### `log_min_duration_statement`
 
-Logs each statement that runs longer than a threshold. To set it up, see [Log slow and failing queries](/docs/guides/observability/log-slow-queries).
+Logs each statement that runs longer than a threshold. To set it up, see [Find slow and failing queries](/docs/guides/observability/log-slow-queries).
 
 ### `log_min_error_statement`
 
-Records the statement behind each error, and is on by default. To find that statement in your logs, see [Log slow and failing queries](/docs/guides/observability/log-slow-queries).
+Records the statement behind each error, and is on by default. To find that statement in your logs, see [Find slow and failing queries](/docs/guides/observability/log-slow-queries).
 
 ### `log_min_messages`
 
