@@ -4500,6 +4500,93 @@ export interface UnifiedLogsRowClickedEvent {
 }
 
 /**
+ * User opened the Unified Logs saved views panel from the sidebar entry or the mobile drawer.
+ *
+ * @group Events
+ * @source studio
+ * @page /project/[ref]/logs
+ */
+export interface UnifiedLogsViewsPanelOpenedEvent {
+  action: 'unified_logs_views_panel_opened'
+  properties: {
+    surface: 'sidebar' | 'mobile_drawer'
+  }
+  groups: TelemetryGroups
+}
+
+/**
+ * User applied a preset or saved view to the Unified Logs filters.
+ *
+ * @group Events
+ * @source studio
+ * @page /project/[ref]/logs
+ */
+export interface UnifiedLogsViewAppliedEvent {
+  action: 'unified_logs_view_applied'
+  properties: {
+    viewType: 'preset' | 'saved'
+    /** 'select' is a direct row click; 'reset' discards local edits by re-applying the active view. */
+    trigger: 'select' | 'reset'
+  }
+  groups: TelemetryGroups
+}
+
+/**
+ * User created a new saved view in Unified Logs.
+ *
+ * @group Events
+ * @source studio
+ * @page /project/[ref]/logs
+ */
+export interface UnifiedLogsViewCreatedEvent {
+  action: 'unified_logs_view_created'
+  properties: {
+    source: 'new' | 'duplicate' | 'save_as_new'
+  }
+  groups: TelemetryGroups
+}
+
+/**
+ * User updated an existing saved view's name or filters in Unified Logs.
+ *
+ * @group Events
+ * @source studio
+ * @page /project/[ref]/logs
+ */
+export interface UnifiedLogsViewUpdatedEvent {
+  action: 'unified_logs_view_updated'
+  properties: {
+    updateType: 'name' | 'filters'
+  }
+  groups: TelemetryGroups
+}
+
+/**
+ * User deleted a saved view in Unified Logs.
+ *
+ * @group Events
+ * @source studio
+ * @page /project/[ref]/logs
+ */
+export interface UnifiedLogsViewRemovedEvent {
+  action: 'unified_logs_view_removed'
+  groups: TelemetryGroups
+}
+
+/**
+ * User dismissed the "this view has been modified" popover without updating, saving, or
+ * resetting.
+ *
+ * @group Events
+ * @source studio
+ * @page /project/[ref]/logs
+ */
+export interface UnifiedLogsViewUpdatePromptClosedEvent {
+  action: 'unified_logs_view_update_prompt_closed'
+  groups: TelemetryGroups
+}
+
+/**
  * User clicked the Supabase logo in the top-left corner of the page header.
  *
  * @group Events
@@ -5028,6 +5115,12 @@ export type TelemetryEvent =
   | ResourceExhaustionBannerAiAssistantClickedEvent
   | ResourceExhaustionBannerTroubleshootClickedEvent
   | UnifiedLogsRowClickedEvent
+  | UnifiedLogsViewsPanelOpenedEvent
+  | UnifiedLogsViewAppliedEvent
+  | UnifiedLogsViewCreatedEvent
+  | UnifiedLogsViewUpdatedEvent
+  | UnifiedLogsViewRemovedEvent
+  | UnifiedLogsViewUpdatePromptClosedEvent
   | HeaderHomeLogoClickedEvent
   | HeaderBackToDashboardClickedEvent
   | HeaderExceedingUsageBadgeClickedEvent
