@@ -61,9 +61,9 @@ supabase config convert --to toml
 
 This works for any project, including one that started on JSONC. The command carries comments over, turns commented-out keys into commented-out TOML, writes a `#:schema` line, and moves the JSON file to a backup such as `supabase/config.jsonc.bak`. TOML has no place for some comments, such as one inside an array. The command moves each of those to a nearby line and lists them. It refuses to write anything if the converted file doesn't match the original.
 
-If `supabase/config.toml` exists next to the JSON file, the command refuses, because converting would overwrite it. Move or delete `config.toml`, then rerun the command.
+If `supabase/config.toml` exists next to the JSON file, the command refuses, because converting would overwrite it. The CLI ignores that `config.toml` while a JSON file exists, but it can still hold edits the JSON file doesn't have. Copy any edits you want to keep into the JSON file, then move or delete `config.toml` and rerun the command.
 
-`--dry-run` and the printed undo command work the same way as for the conversion to JSONC. After you check the result, delete the backup so it isn't committed.
+`--dry-run` works the same way as for the conversion to JSONC. To undo the conversion, run the undo command that `supabase config convert` prints. It moves the backup back and removes `config.toml`. Undoing discards any edits you made to `config.toml` after converting, so copy those edits into the backup file first. After you check the result, delete the backup so it isn't committed.
 
 In an interactive terminal, the command asks what made you switch back to TOML, unless you've opted out of [telemetry](/docs/guides/local-development/cli/getting-started#telemetry). Answering is optional, and the answer is sent as telemetry. To answer from a script, pass `--reason`, such as `--reason editor`.
 

@@ -149,15 +149,20 @@ Branching reads one config file from your `supabase` directory: `config.json` or
 
 To go back to `config.toml` after converting, run `supabase config convert --to toml` with CLI 3.3.0 or later. It converts the JSON file to `config.toml`, keeps your edits, and moves the JSON file to a `.bak` backup that you delete before committing. See [Convert back to TOML](/docs/guides/local-development/cli/config-formats#convert-back-to-toml).
 
-With a CLI earlier than 3.3.0, restore `config.toml` from the commit before the conversion and delete the JSON file:
+With a CLI earlier than 3.3.0, restore `config.toml` from the commit before the conversion:
 
 ```bash
 git log --diff-filter=D -n 1 --format=%h -- supabase/config.toml
 git checkout <commit>^ -- supabase/config.toml
+```
+
+Replace `<commit>` with the hash the first command prints. Edits you made to the JSON file after converting aren't carried over, so copy them into `config.toml`. Then delete the JSON file:
+
+```bash
 git rm supabase/config.jsonc
 ```
 
-Replace `<commit>` with the hash the first command prints. Edits you made to the JSON file after converting aren't carried over, so copy them into `config.toml`.
+If your project uses `config.json`, run `git rm supabase/config.json` instead.
 
 Either way, commit and push the change to update your branches.
 
