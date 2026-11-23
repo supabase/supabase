@@ -3,6 +3,7 @@ import { NextApiRequest, NextApiResponse } from 'next'
 
 import { toWebHandler } from '@/compat/next/api'
 import { apiWrapper } from '@/lib/api/apiWrapper'
+import { isSparkProject } from '@/lib/api/self-hosted/util'
 import { DEFAULT_PROJECT, PROJECT_REST_URL } from '@/lib/constants/api'
 
 const nextHandler = (req: NextApiRequest, res: NextApiResponse) => apiWrapper(req, res, handler)
@@ -25,8 +26,7 @@ const handleGet = async (_req: NextApiRequest, res: NextApiResponse) => {
     ...DEFAULT_PROJECT,
     connectionString: '',
     restUrl: PROJECT_REST_URL,
-    // Read per request: the same built image runs with or without it.
-    ...(process.env.POSTGRES_ENGINE === 'spark' && { postgres_engine: 'spark' }),
+    ...(isSparkProject() && { postgres_engine: 'spark' }),
   }
 
   return res.status(200).json(response)

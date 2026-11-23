@@ -1,6 +1,11 @@
 import { afterEach, beforeEach, describe, expect, it, vi } from 'vitest'
 
-import { getDebuggingOperations, getDevelopmentOperations, getFeedbackOperations } from './mcp'
+import {
+  getDebuggingOperations,
+  getDevelopmentOperations,
+  getFeedbackOperations,
+  getSelfHostedPlatform,
+} from './mcp'
 
 vi.mock('./settings', () => ({
   getProjectSettings: vi.fn(),
@@ -19,6 +24,29 @@ vi.mock('./lints', () => ({
 }))
 
 describe('api/self-hosted/mcp', () => {
+  describe('getSelfHostedPlatform', () => {
+    afterEach(() => {
+      vi.unstubAllEnvs()
+    })
+
+    it('reports the Spark engine on the project detail the MCP server reads', async () => {
+      vi.stubEnv('POSTGRES_ENGINE', 'spark')
+
+      const { account } = getSelfHostedPlatform({})
+
+      expect(await account?.getProject('default')).toMatchObject({
+        ref: 'default',
+        database: { postgres_engine: 'spark' },
+      })
+    })
+
+    it('has no account operations on a Postgres project', () => {
+      vi.stubEnv('POSTGRES_ENGINE', undefined)
+
+      expect(getSelfHostedPlatform({})).not.toHaveProperty('account')
+    })
+  })
+
   describe('getDevelopmentOperations.getPublishableKeys', () => {
     let getProjectSettingsMock: ReturnType<typeof vi.fn>
 
