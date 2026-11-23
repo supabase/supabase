@@ -3,6 +3,7 @@ import { describe, expect, it } from 'vitest'
 import {
   convertArgumentTypes,
   formatArgumentDeclarations,
+  getNewArgumentIndex,
   stripInArgModePrefixes,
 } from '@/components/interfaces/Database/Functions/Functions.utils'
 
@@ -71,6 +72,43 @@ describe('convertArgumentTypes', () => {
     })
   })
 
+  it('preserves unnamed arguments when pg-meta provides their names', () => {
+    expect(
+      convertArgumentTypes({
+        type: 'function',
+        value: 'integer DEFAULT 1, b text',
+        argumentNames: ['', 'b'],
+      })
+    ).toEqual({
+      value: [
+        { name: '', type: 'integer', defaultValue: '1' },
+        { name: 'b', type: 'text', defaultValue: undefined },
+      ],
+    })
+  })
+
+  it('preserves unnamed multi-word types and procedure modes', () => {
+    expect(
+      convertArgumentTypes({
+        type: 'function',
+        value: 'double precision DEFAULT 1.5',
+        argumentNames: [''],
+      })
+    ).toEqual({
+      value: [{ name: '', type: 'double precision', defaultValue: '1.5' }],
+    })
+
+    expect(
+      convertArgumentTypes({
+        type: 'procedure',
+        value: 'IN integer DEFAULT 1',
+        argumentNames: [''],
+      })
+    ).toEqual({
+      value: [{ name: '', type: 'integer', defaultValue: '1' }],
+    })
+  })
+
   it.each(['', '   '])('returns no arguments for an empty value: %s', (value) => {
     expect(convertArgumentTypes({ type: 'function', value })).toEqual({ value: [] })
   })
@@ -115,5 +153,32 @@ describe('formatArgumentDeclarations', () => {
     expect(formatArgumentDeclarations(value)).toEqual([
       'a timestamp without time zone DEFAULT now()',
     ])
+  })
+
+  it('serializes unnamed arguments without a leading name', () => {
+    expect(formatArgumentDeclarations([{ name: '', type: 'integer', defaultValue: '1' }])).toEqual([
+      'integer DEFAULT 1',
+    ])
+  })
+})
+
+describe('getNewArgumentIndex', () => {
+  it('appends when no argument has a default', () => {
+    expect(getNewArgumentIndex([{ name: 'a', type: 'integer', defaultValue: undefined }])).toBe(1)
+  })
+
+  it('inserts before the first defaulted argument', () => {
+    expect(
+      getNewArgumentIndex([
+        { name: 'a', type: 'integer', defaultValue: undefined },
+        { name: 'b', type: 'text', defaultValue: 'x' },
+      ])
+    ).toBe(1)
+    expect(
+      getNewArgumentIndex([
+        { name: 'a', type: 'integer', defaultValue: '1' },
+        { name: 'b', type: 'text', defaultValue: 'x' },
+      ])
+    ).toBe(0)
   })
 })

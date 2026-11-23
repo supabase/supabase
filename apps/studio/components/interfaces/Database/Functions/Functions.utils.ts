@@ -97,8 +97,13 @@ function splitArgumentNameAndType(value: string) {
   return name && type ? { name, type } : null
 }
 
-function parseArgument(value: string) {
+function parseArgument(value: string, isUnnamed: boolean) {
   const { declaration, defaultValue } = splitArgumentDefault(value.trim())
+  if (isUnnamed) {
+    const type = declaration.trim()
+    return type ? { name: '', type, defaultValue } : null
+  }
+
   const parsed = splitArgumentNameAndType(declaration)
   if (!parsed) return null
 
@@ -108,11 +113,20 @@ function parseArgument(value: string) {
 type FunctionArgument = { name: string; type: string; defaultValue?: string }
 
 export function formatArgumentDeclarations(args: FunctionArgument[]) {
-  return args.map((arg) =>
-    arg.defaultValue
-      ? `${arg.name} ${arg.type} DEFAULT ${arg.defaultValue}`
-      : `${arg.name} ${arg.type}`
-  )
+  return args.map((arg) => {
+    const declaration = arg.name ? `${arg.name} ${arg.type}` : arg.type
+    return arg.defaultValue ? `${declaration} DEFAULT ${arg.defaultValue}` : declaration
+  })
+}
+
+/**
+ * PostgreSQL requires arguments after a defaulted argument to have defaults too.
+ * Newly added arguments have no default, so insert them before the first one
+ * that does.
+ */
+export function getNewArgumentIndex<T extends { defaultValue?: string }>(args: ReadonlyArray<T>) {
+  const firstDefaultedIndex = args.findIndex((arg) => Boolean(arg.defaultValue))
+  return firstDefaultedIndex === -1 ? args.length : firstDefaultedIndex
 }
 
 /**
@@ -122,16 +136,18 @@ export function formatArgumentDeclarations(args: FunctionArgument[]) {
 export function convertArgumentTypes({
   type,
   value,
+  argumentNames,
 }: {
   type: 'function' | 'procedure'
   value: string
+  argumentNames?: string[]
 }) {
   if (isEmpty(value) || !value.trim()) return { value: [] }
 
   const temp = splitTopLevel(value, ',')
-    .map((item) => {
+    .map((item, index) => {
       const normalized = type === 'procedure' ? stripArgModePrefix(item) : item
-      const parsed = parseArgument(normalized)
+      const parsed = parseArgument(normalized, argumentNames?.[index] === '')
       if (!parsed) {
         console.error('Error while trying to parse function arguments', normalized.trim())
       }

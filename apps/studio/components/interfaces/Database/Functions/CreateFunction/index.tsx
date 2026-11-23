@@ -41,6 +41,7 @@ import {
   convertArgumentTypes,
   convertConfigParams,
   formatArgumentDeclarations,
+  getNewArgumentIndex,
 } from '../Functions.utils'
 import { CreateFunctionConfigParamsSection } from './CreateFunctionConfigParamsSection'
 import { CreateFunctionHeader } from './CreateFunctionHeader'
@@ -74,7 +75,8 @@ const FormSchema = z.object({
   schema: z.string().trim().min(1),
   args: z.array(
     z.object({
-      name: z.string().trim().min(1),
+      // Empty for PostgreSQL arguments declared without a name
+      name: z.string().trim(),
       type: z.string().trim(),
       defaultValue: z.string().optional(),
     })
@@ -185,7 +187,11 @@ export const CreateFunction = ({
         type,
         name: func?.name ?? '',
         schema: func?.schema ?? selectedSchema,
-        args: convertArgumentTypes({ type, value: func?.argument_types || '' }).value,
+        args: convertArgumentTypes({
+          type,
+          value: func?.argument_types || '',
+          argumentNames: func?.args.map((arg) => arg.name),
+        }).value,
         behavior: func?.behavior ?? 'VOLATILE',
         definition: func?.definition ?? '',
         language: func?.language ?? 'plpgsql',
@@ -521,7 +527,7 @@ interface FormFieldConfigParamsProps {
 }
 
 const FormFieldArgs = ({ readonly }: FormFieldConfigParamsProps) => {
-  const { fields, append, remove } = useFieldArray<z.infer<typeof FormSchema>>({
+  const { fields, insert, remove } = useFieldArray<z.infer<typeof FormSchema>, 'args'>({
     name: 'args',
   })
 
@@ -608,7 +614,7 @@ const FormFieldArgs = ({ readonly }: FormFieldConfigParamsProps) => {
         {!readonly && (
           <Button
             icon={<PlusIcon size={12} />}
-            onClick={() => append({ name: '', type: 'integer' })}
+            onClick={() => insert(getNewArgumentIndex(fields), { name: '', type: 'integer' })}
             disabled={readonly}
           >
             Add a new argument
