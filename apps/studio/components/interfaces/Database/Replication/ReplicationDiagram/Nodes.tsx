@@ -72,7 +72,6 @@ export const ReplicationNode = ({
     projectRef,
     clusterId,
     pipelineId: pipeline?.id,
-    clusterId,
   })
   const statusName = getStatusName(pipelineStatusData?.status)
 
