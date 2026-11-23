@@ -66,7 +66,7 @@ Put the schema in front of every table, function, and type in this function that
 
 </Admonition>
 
-Your app doesn't insert the profile from the client after `signUp`, because the trigger already created it. The function is `security definer`, so it runs as its owner. A function created in the Dashboard or by a migration is owned by `postgres`, which bypasses Row Level Security, so the trigger inserts the row without an insert policy. The table has no insert policy, so an insert from the client fails with `new row violates row-level security policy for table "profiles"`.
+Don't insert the profile from the client after `signUp`. The trigger already creates it, and the table has no insert policy, so a client insert fails with `new row violates row-level security policy for table "profiles"`. The trigger can insert the row because the function is `security definer`: it runs as its owner, `postgres`, which bypasses Row Level Security.
 
 With RLS enabled and no policies, the `anon` and `authenticated` roles can't read or change any row of `public.profiles`. These policies let each signed-in user read and update only their own profile:
 
