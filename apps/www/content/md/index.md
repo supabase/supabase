@@ -68,8 +68,6 @@ npx supabase login
 | Understand Free plan pausing                     | https://supabase.com/docs/guides/platform/free-project-pausing.md   |
 | Pricing and plans                                | https://supabase.com/pricing.md                                     |
 
-<!-- HOME_FAQ -->
-
 ## Machine interfaces
 
 - MCP: https://mcp.supabase.com/mcp
@@ -86,3 +84,5 @@ npx supabase login
 - GitHub: https://github.com/supabase/supabase
 - Pricing: https://supabase.com/pricing
 - Pricing (markdown): https://supabase.com/pricing.md
+
+<!-- HOME_FAQ -->
