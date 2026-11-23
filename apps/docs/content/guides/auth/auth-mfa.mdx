@@ -284,7 +284,7 @@ We thus recommend you redirect users to a page where they can authenticate using
 
 ### APIs
 
-If your application uses the Supabase Database, Storage or Edge Functions, Row Level Security policies provide sufficient protection. In the event that you have other APIs that you wish to protect, follow these general guidelines:
+If your application uses the Supabase Database, [Storage](/docs/guides/storage) or [Edge Functions](/docs/guides/functions), Row Level Security policies provide sufficient protection. In the event that you have other APIs that you wish to protect, follow these general guidelines:
 
 1. **Use a good JWT verification and parsing library for your language.**
    This will let you securely parse JWTs and extract their claims.
@@ -298,18 +298,8 @@ If your application uses the Supabase Database, Storage or Edge Functions, Row L
 
 ## Frequently asked questions
 
-<Accordion
-  type="default"
-  chevronAlign="right"
-  justified
-  size="medium"
-  className="text-foreground-light mt-8 mb-6 [&>div]:space-y-4"
->
-
-<AccordionItem
-header="How do I check when a user went through MFA?"
-id="how-do-i-check-when-a-user-went-through-mfa"
->
+<details>
+<summary>How do I check when a user went through MFA?</summary>
 
 Access tokens issued by Supabase Auth contain an `amr` (Authentication Methods Reference) claim. It is an array of objects that indicate what authentication methods the user has used so far.
 
@@ -366,6 +356,4 @@ The following additional claims are available when using PKCE flow:
 
 More authentication methods will be added over time as we increase the number of authentication methods supported by Supabase.
 
-</AccordionItem>
-
-</Accordion>
+</details>

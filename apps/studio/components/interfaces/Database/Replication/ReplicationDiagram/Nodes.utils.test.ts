@@ -12,12 +12,12 @@ describe('getReplicationDestinationType', () => {
     expect(getReplicationDestinationType({ [key]: {} })).toBe(expected)
   })
 
-  it('does not recognize retired iceberg configs', () => {
-    expect(getReplicationDestinationType({ iceberg: {} })).toBeUndefined()
+  it('renders unrecognized configurations anonymously', () => {
+    expect(getReplicationDestinationType({ iceberg: {} })).toBe('Unknown')
+    expect(getReplicationDestinationType({})).toBe('Unknown')
   })
 
-  it('returns undefined for unknown or missing configs', () => {
-    expect(getReplicationDestinationType({})).toBeUndefined()
+  it('returns undefined while the configuration is missing', () => {
     expect(getReplicationDestinationType(undefined)).toBeUndefined()
   })
 })

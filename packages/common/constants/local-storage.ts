@@ -82,7 +82,6 @@ export const LOCAL_STORAGE_KEYS = {
   EXPAND_NAVIGATION_PANEL: 'supabase-expand-navigation-panel',
   GITHUB_AUTHORIZATION_STATE: 'supabase-github-authorization-state',
   // Notice banner keys
-  TERMS_OF_SERVICE_UPDATE: 'terms-of-service-update-v4-dismissed',
   API_KEYS_FEEDBACK_DISMISSED: (ref: string) => `supabase-api-keys-feedback-dismissed-${ref}`,
   SUPAVISOR_MAINTENANCE: (ref: string) => `supavisor-maintenance-2026-06-09-${ref}`,
   REPORT_DATERANGE: 'supabase-report-daterange',
@@ -122,8 +121,8 @@ export const LOCAL_STORAGE_KEYS = {
 
   TABLE_EDITOR_QUEUE_OPERATIONS_BANNER_DISMISSED: (ref: string) =>
     `table-editor-queue-operations-banner-dismissed-${ref}`,
-  FREE_MICRO_UPGRADE_BANNER_DISMISSED: (ref: string) =>
-    `free-micro-upgrade-banner-dismissed-${ref}`,
+  FREE_MICRO_UPGRADE_BANNER_DISMISSED_AT: (ref: string) =>
+    `free-micro-upgrade-banner-dismissed-at-${ref}`,
   PROJECT_UPGRADE_FAILED_BANNER_DISMISSED_AT: (ref: string) =>
     `project-upgrade-failed-banner-dismissed-at-${ref}`,
   UNIFIED_LOGS_SIDEBAR_BANNER_DISMISSED: 'unified-logs-sidebar-banner-dismissed',
@@ -192,10 +191,17 @@ export function clearLocalStorage() {
     const isRecoveryReminder = key.startsWith('account-recovery-reminder:')
     // Per-profile, and holds the new org's type and size until the follow-up saves them
     const isOnboardingSurveyFollowUp = key.startsWith(ONBOARDING_SURVEY_FOLLOW_UP_PREFIX)
+    // Consent belongs to the browser, so an opt-out has to survive sign-out
+    const isConsentRecord =
+      key.startsWith('uc_') ||
+      key === 'ucData' ||
+      key === 'ucString' ||
+      key.startsWith('__ph_opt_in_out_')
     if (
       !LOCAL_STORAGE_KEYS_ALLOWLIST.includes(key) &&
       !isRecoveryReminder &&
-      !isOnboardingSurveyFollowUp
+      !isOnboardingSurveyFollowUp &&
+      !isConsentRecord
     ) {
       safeLocalStorage.removeItem(key)
     }

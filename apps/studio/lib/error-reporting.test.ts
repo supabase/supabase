@@ -1,10 +1,10 @@
-import * as Sentry from '@sentry/nextjs'
+import * as Sentry from '@sentry/react'
 import { describe, expect, it, vi } from 'vitest'
 
 import { captureCriticalError } from './error-reporting'
 import { classifyResponseError } from '@/data/error-classification'
 
-vi.mock('@sentry/nextjs', () => ({
+vi.mock('@sentry/react', () => ({
   captureException: vi.fn(),
   withScope: vi.fn((cb: (scope: any) => void) => {
     const scope = { setTag: vi.fn() }

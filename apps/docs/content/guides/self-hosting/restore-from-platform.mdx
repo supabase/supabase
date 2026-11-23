@@ -3,7 +3,7 @@ title: 'Restore a Platform Project to Self-Hosted'
 description: 'Restore your database from the Supabase platform to a self-hosted instance.'
 ---
 
-This guide walks you through restoring your database from a Supabase platform project to a [self-hosted Docker instance](/docs/guides/self-hosting/docker). Transferring storage objects or redeploying edge functions is not covered here.
+This guide walks you through restoring your database from a Supabase platform project to a [self-hosted Docker instance](/docs/guides/self-hosting/docker). Transferring storage objects or redeploying [edge functions](/docs/guides/functions) is not covered here.
 
 ## Before you begin
 
@@ -97,7 +97,7 @@ SELECT * FROM pg_extension;
 
 ## What's included in the restore and what's not
 
-The database dump includes your schema, data, roles, RLS policies, database functions, triggers, and `auth.users`. However, several things require separate configuration on your self-hosted instance:
+The database dump includes your schema, data, roles, RLS policies, [database functions](/docs/guides/database/functions), triggers, and `auth.users`. However, several things require separate configuration on your self-hosted instance:
 
 | Requires manual setup                       | How to configure                                  |
 | ------------------------------------------- | ------------------------------------------------- |

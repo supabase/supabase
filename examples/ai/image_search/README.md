@@ -77,7 +77,7 @@ This example uses the CLIP (Contrastive Language-Image Pre-training) model to:
 
 ### Models
 
-[clip-ViT-B-32](https://www.sbert.net/examples/applications/image-search/README.html) via [Hugging Face](https://huggingface.co/sentence-transformers/clip-ViT-B-32)
+[clip-ViT-B-32](https://www.sbert.net/examples/sentence_transformer/applications/image-search/README.html) via [Hugging Face](https://huggingface.co/sentence-transformers/clip-ViT-B-32)
 
 ### Images
 

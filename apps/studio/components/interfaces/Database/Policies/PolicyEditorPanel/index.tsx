@@ -48,6 +48,7 @@ import { DiscardChangesConfirmationDialog } from '@/components/ui-patterns/Dialo
 import { ButtonTooltip } from '@/components/ui/ButtonTooltip'
 import { useDatabasePolicyUpdateMutation } from '@/data/database-policies/database-policy-update-mutation'
 import { databasePoliciesKeys } from '@/data/database-policies/keys'
+import { isUserFaultForSql } from '@/data/error-classification'
 import { unguarded } from '@/data/fetchers'
 import { QueryResponseError, useExecuteSqlMutation } from '@/data/sql/execute-sql-mutation'
 import { FGA_PERMISSIONS, useAsyncCheckPermissionsV2 } from '@/hooks/misc/useCheckPermissionsV2'
@@ -219,7 +220,10 @@ export const PolicyEditorPanel = memo(function ({
       setError(undefined)
       executeMutation({
         sql,
-        sqlOrigin: 'user',
+        // Studio composes the statement, but the user wrote the expressions Postgres parses
+        sqlOrigin: 'studio',
+        queryName: 'database-policy-create',
+        isUserFaultSqlState: isUserFaultForSql,
         projectRef: selectedProject?.ref,
         connectionString: selectedProject?.connectionString,
         handleError: (error) => {
@@ -266,7 +270,6 @@ export const PolicyEditorPanel = memo(function ({
         projectRef: selectedProject.ref,
         connectionString: selectedProject?.connectionString,
         originalPolicy: selectedPolicy,
-        sqlOrigin: 'user',
         // The Save click is the explicit user gesture that promotes editor content
         // to executable SQL.
         payload: {

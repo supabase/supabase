@@ -671,33 +671,24 @@ Foreign Data Wrappers simplify data integration by bringing external data into y
   },
   {
     title: 'Supabase Pipelines',
-    subtitle: 'Replicate Postgres data to analytical destinations.',
-    description: `Supabase Pipelines is a managed change data capture (CDC) product that uses Postgres logical replication to deliver published data to analytical destinations in near real time.
+    subtitle: 'Bring your Postgres data into your analytics stack.',
+    description: `Supabase Pipelines sends data from Supabase Postgres to BigQuery, ClickHouse, DuckLake, or Snowflake in near real time. Build reports on recent application data in the tools your team already uses.
 
 ## Key benefits
-1. Initial sync: Copy existing rows from published tables.
-2. Ongoing replication: Capture and deliver subsequent INSERT, UPDATE, DELETE, and TRUNCATE operations selected by the publication.
-3. Managed operation: Monitor pipeline status, lag, table state, and errors in the Dashboard.
-4. Workload isolation: Keep analytical queries away from the primary database.
 
-## Destinations
-BigQuery, ClickHouse, DuckLake, and Snowflake are available in public alpha. See the [destination guides](/docs/guides/database/replication#supported-destinations) to get started.
+- **Start with the data you already have.** Choose which tables to replicate and which ones to include in the first copy.
+- **Keep reporting queries off your production database.** Run large reports and dashboards at your destination, leaving Postgres to serve your app.
+- **See how current your data is.** Supabase runs the pipeline. In the Dashboard, see which tables are live, check how far behind replication is, and review errors.
 
-## Setup
-Create a Postgres publication for the tables to replicate. In Database > Pipelines, add a Pipelines destination, configure its settings, and monitor the pipeline from the Dashboard.
+## When to use Pipelines
 
-## Requirements
-Requirements depend on the destination. BigQuery and ClickHouse ReplacingMergeTree require source tables to have primary keys and require the publication to include those columns. ClickHouse updates require REPLICA IDENTITY FULL. ClickHouse deletes require primary-key or full identity. DuckLake updates and deletes require a primary-key identity, replica-identity index, or full identity. With a primary-key identity or replica-identity index, include every identity column in the publication. Snowflake updates require REPLICA IDENTITY FULL. Snowflake deletes require a published row identity.
+- **Business reporting.** Bring orders, customer accounts, and billing records together to track revenue and retention.
+- **Product analytics.** Combine signup and activity data to find where users get stuck during onboarding.
+- **Customer dashboards.** Give customers a view of how they use your product over time.
 
-## Pipelines is valuable for:
-- Near real-time analytics data movement
-- Analytics separation from production
-- Managed replication to supported destination systems
+## Get started
 
-## Limitations
-Schema change support is destination-specific and limited. Destination-specific constraints apply.
-
-BigQuery and DuckLake keep current-state tables synchronized. ClickHouse supports current-state ReplacingMergeTree tables or append-only MergeTree CDC history. Snowflake stores append-only CDC history. Source \`TRUNCATE\` operations and table resets erase accumulated destination data. Schema changes can alter retained history in append-only ClickHouse and Snowflake tables.`,
+Pipelines is available on Pro, Team, and Enterprise plans. In the Supabase Dashboard, go to **Database > Pipelines** and click **Add pipeline**. The [destination guides](/docs/guides/database/replication#supported-destinations) cover the requirements and walk you through setup.`,
     icon: CloudCog,
     products: [PRODUCT_SHORTNAMES.DATABASE],
     heroImage: 'https://www.youtube-nocookie.com/embed/8o3duiYqppA',
@@ -1209,7 +1200,7 @@ SSO with SAML provides the enterprise-grade authentication capabilities required
     icon: Lock,
     products: [PRODUCT_SHORTNAMES.AUTHENTICATION],
     heroImage: '',
-    docsUrl: 'https://supabase.com/docs/guides/auth/sso/auth-sso-saml',
+    docsUrl: 'https://supabase.com/docs/guides/auth/enterprise-sso/auth-sso-saml',
     slug: 'sso-with-saml',
     status: {
       stage: PRODUCT_STAGES.GA,
@@ -1514,7 +1505,7 @@ Supabase's RLS feature provides a powerful tool for implementing sophisticated a
     icon: Lock,
     products: [PRODUCT_SHORTNAMES.DATABASE, PRODUCT_SHORTNAMES.AUTHENTICATION],
     heroImage: `https://xguihxuzqibwxjnimxev.supabase.co/storage/v1/object/public/videos/marketing/website/supabase-rls.mp4`,
-    docsUrl: 'https://supabase.com/docs/guides/auth/row-level-security',
+    docsUrl: 'https://supabase.com/docs/guides/database/postgres/row-level-security',
     slug: 'row-level-security',
     status: {
       stage: PRODUCT_STAGES.GA,
@@ -1755,7 +1746,7 @@ Supabase's CDN significantly improves the performance and user experience of you
     icon: Cloud,
     products: [PRODUCT_SHORTNAMES.STORAGE],
     heroImage: '',
-    docsUrl: 'https://supabase.com/docs/guides/storage/cdn',
+    docsUrl: 'https://supabase.com/docs/guides/storage/cdn/fundamentals',
     slug: 'cdn',
     status: {
       stage: PRODUCT_STAGES.GA,
@@ -1879,7 +1870,7 @@ Automatic format optimization detects the capabilities of the user’s browser a
     icon: Image,
     products: [PRODUCT_SHORTNAMES.STORAGE],
     heroImage: 'https://www.youtube-nocookie.com/embed/dLqSmxX3r7I',
-    docsUrl: 'https://supabase.com/docs/guides/storage/image-transformations',
+    docsUrl: 'https://supabase.com/docs/guides/storage/serving/image-transformations',
     slug: 'image-transformations',
     status: {
       stage: PRODUCT_STAGES.GA,
@@ -2490,7 +2481,7 @@ By leveraging Role-Based Access Control, you can create a secure, scalable, and 
     products: [ADDITIONAL_PRODUCTS.PLATFORM],
     heroImage: 'https://www.youtube-nocookie.com/embed/168PHFnxkok',
     docsUrl:
-      'https://supabase.com/docs/guides/database/postgres/custom-claims-and-role-based-access-control-rbac',
+      'https://supabase.com/docs/guides/api/custom-claims-and-role-based-access-control-rbac',
     slug: 'role-based-access-control',
     status: {
       stage: PRODUCT_STAGES.GA,
@@ -2676,7 +2667,7 @@ This feature is particularly valuable for teams looking to enhance their applica
     products: [ADDITIONAL_PRODUCTS.PLATFORM],
     heroImage: '/images/features/logs-analytics.png',
     heroImageLight: '/images/features/logs-analytics-light.png',
-    docsUrl: 'https://supabase.com/docs/guides/monitoring-troubleshooting/logs',
+    docsUrl: 'https://supabase.com/docs/guides/observability/logs',
     blogUrl: 'https://supabase.com/blog/new-observability-features-in-supabase',
     slug: 'logs-analytics',
     status: {
@@ -3337,7 +3328,7 @@ Yes, the MCP Server can perform actions like creating tables, running queries, a
     icon: CloudCog,
     products: [PRODUCT_SHORTNAMES.DATABASE, ADDITIONAL_PRODUCTS.PLATFORM],
     heroImage: 'https://www.youtube-nocookie.com/embed/1SMldLoOhbg',
-    docsUrl: 'https://supabase.com/docs/guides/getting-started/mcp',
+    docsUrl: 'https://supabase.com/docs/guides/ai-tools/mcp',
     blogUrl: 'https://supabase.com/blog/mcp-server',
     slug: 'mcp-server',
     status: {

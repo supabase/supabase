@@ -29,18 +29,16 @@ export function Rows({
   ...props
 }: ComponentProps<typeof ScrollRoot>) {
   const index = useTrace()
-  const { selectedId, collapsed, select, setCollapsed } = useView()
+  const { selectedId, collapsed, select, setCollapsed, treeRef, scrollRef } = useView()
   const rows = useMemo(() => flattenTree(index, collapsed), [index, collapsed])
   const rowIndexById = useMemo(() => new Map(rows.map((row, i) => [row.span.id, i])), [rows])
 
-  const viewportRef = useRef<HTMLDivElement>(null)
-  const treeRef = useRef<HTMLDivElement>(null)
   const pendingFocus = useRef(false)
   const [focusedId, setFocusedId] = useState<string | null>(null)
 
   const virtualizer = useVirtualizer({
     count: rows.length,
-    getScrollElement: () => viewportRef.current,
+    getScrollElement: () => scrollRef.current,
     estimateSize: () => ROW_HEIGHT,
     overscan: OVERSCAN,
     getItemKey: (i) => rows[i].span.id,
@@ -68,6 +66,11 @@ export function Rows({
     focusRow(0)
     return () => cancelAnimationFrame(frame)
   }, [focusedId])
+
+  useEffect(() => {
+    const selectedIndex = selectedId === null ? undefined : rowIndexById.get(selectedId)
+    if (selectedIndex !== undefined) virtualizer.scrollToIndex(selectedIndex)
+  }, [selectedId])
 
   const handleKeyDown = (event: KeyboardEvent<HTMLDivElement>) => {
     if (event.altKey || event.ctrlKey || event.metaKey) return
@@ -109,7 +112,7 @@ export function Rows({
 
   return (
     <ScrollRoot data-trace-rows className={cn('relative min-h-0 flex-1', className)} {...props}>
-      <ScrollViewport ref={viewportRef} className="h-full w-full">
+      <ScrollViewport ref={scrollRef} className="h-full w-full">
         <div
           ref={treeRef}
           role="tree"

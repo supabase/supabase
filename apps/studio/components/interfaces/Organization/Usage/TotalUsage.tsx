@@ -218,6 +218,7 @@ export const TotalUsage = ({
                       usage={usage}
                       subscription={subscription!}
                       relativeToSubscription={showRelationToSubscription}
+                      projectRef={projectRef}
                     />
                   </div>
                 )
@@ -241,6 +242,7 @@ export const TotalUsage = ({
                       }}
                       relativeToSubscription={showRelationToSubscription}
                       usage={usage}
+                      projectRef={projectRef}
                       className={cn(
                         (i + sortedBillingMetrics.length) % 2 === 0 ? 'md:pr-4' : 'md:pl-4'
                       )}

@@ -32,8 +32,17 @@ describe('generateQueryPerformanceSql', () => {
       preset: 'mostFrequentlyInvoked',
       searchQuery: 'SELECT',
     })
-    expect(result.whereSql).toContain("statements.query ~* 'SELECT'")
+    expect(result.whereSql).toBe("strpos(lower(statements.query), lower('SELECT')) > 0")
   })
+
+  it.each(['[', 'pg_sleep(', '(unclosed', 'a\\b', "it's", '100%', 'under_score'])(
+    'treats %s in the search query as literal text',
+    (searchQuery) => {
+      const result = generateQueryPerformanceSql({ preset: 'mostFrequentlyInvoked', searchQuery })
+      expect(result.whereSql).not.toContain('~*')
+      expect(result.whereSql).toMatch(/^strpos\(lower\(statements\.query\), lower\(.+\)\) > 0$/)
+    }
+  )
 
   it('filters by dashboard source only', () => {
     const result = generateQueryPerformanceSql({
@@ -59,41 +68,75 @@ describe('generateQueryPerformanceSql', () => {
     expect(result.whereSql).not.toContain('source: dashboard')
   })
 
-  it('filters by minimum calls', () => {
+  it.each([
+    ['=', '='],
+    ['>=', '>='],
+    ['<=', '<='],
+    ['>', '>'],
+    ['<', '<'],
+    ['!=', '<>'],
+  ] as const)('filters calls with the %s operator', (operator, sqlOperator) => {
     const result = generateQueryPerformanceSql({
       preset: 'mostFrequentlyInvoked',
-      minCalls: 10,
+      callsFilter: { operator, value: 200 },
     })
-    expect(result.whereSql).toContain('statements.calls >= 10')
+    expect(result.whereSql).toBe(`statements.calls ${sqlOperator} 200`)
   })
 
-  it('does not filter by minCalls when 0', () => {
+  it.each([
+    ['=', '='],
+    ['>=', '>='],
+    ['<=', '<='],
+    ['>', '>'],
+    ['<', '<'],
+    ['!=', '<>'],
+  ] as const)('filters total time with the %s operator', (operator, sqlOperator) => {
     const result = generateQueryPerformanceSql({
       preset: 'mostFrequentlyInvoked',
-      minCalls: 0,
+      totalTimeFilter: { operator, value: 500 },
     })
-    expect(result.whereSql).not.toContain('statements.calls')
-  })
-
-  it('filters by minimum total time', () => {
-    const result = generateQueryPerformanceSql({
-      preset: 'mostFrequentlyInvoked',
-      minTotalTime: 500,
-    })
-    expect(result.whereSql).toContain(
-      '(statements.total_exec_time + statements.total_plan_time) >= 500'
+    expect(result.whereSql).toBe(
+      `(statements.total_exec_time + statements.total_plan_time) ${sqlOperator} 500`
     )
   })
+
+  it('keeps a filter value of 0', () => {
+    const result = generateQueryPerformanceSql({
+      preset: 'mostFrequentlyInvoked',
+      callsFilter: { operator: '<=', value: 0 },
+    })
+    expect(result.whereSql).toBe('statements.calls <= 0')
+  })
+
+  it('ignores a filter with a non-finite value', () => {
+    const result = generateQueryPerformanceSql({
+      preset: 'mostFrequentlyInvoked',
+      callsFilter: { operator: '>=', value: Number.NaN },
+    })
+    expect(result.whereSql).toBe('')
+  })
+
+  it.each(['>= 0 OR 1=1 --', 'constructor', '__proto__', 'toString'])(
+    'ignores a filter with the unknown operator %s',
+    (operator) => {
+      const result = generateQueryPerformanceSql({
+        preset: 'mostFrequentlyInvoked',
+        // URL params are not validated at runtime, so an injected operator must be dropped
+        callsFilter: { operator: operator as never, value: 1 },
+      })
+      expect(result.whereSql).toBe('')
+    }
+  )
 
   it('combines multiple WHERE conditions with AND', () => {
     const result = generateQueryPerformanceSql({
       preset: 'mostFrequentlyInvoked',
       roles: ['postgres'],
       searchQuery: 'SELECT',
-      minCalls: 5,
+      callsFilter: { operator: '>=', value: 5 },
     })
     expect(result.whereSql).toContain("auth.rolname in ('postgres')")
-    expect(result.whereSql).toContain("statements.query ~* 'SELECT'")
+    expect(result.whereSql).toContain("lower('SELECT')")
     expect(result.whereSql).toContain('statements.calls >= 5')
     expect(result.whereSql.split(' AND ').length).toBe(3)
   })

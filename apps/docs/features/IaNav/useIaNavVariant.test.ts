@@ -4,7 +4,7 @@ import { posthogClient, useFeatureFlags, useSearchParamsShallow } from 'common'
 import { LOCAL_STORAGE_KEYS } from 'common/constants/local-storage'
 import { afterEach, beforeEach, describe, expect, it, vi } from 'vitest'
 
-import { IA_NAV_FLAG } from './constants'
+import { IA_NAV_FLAG, IA_NAV_OVERRIDE_KEY } from './constants'
 import { IaNavRouteProvider } from './IaNavRouteProvider'
 import { useIaNavVariant } from './useIaNavVariant'
 
@@ -57,6 +57,25 @@ describe('useIaNavVariant', () => {
 
   afterEach(() => {
     localStorage.clear()
+    sessionStorage.clear()
+  })
+
+  it('keeps a forced option-1 on later pages without the query param, with no exposure', () => {
+    renderVariant({ flagValue: 'control', override: 'option-1' })
+
+    const { result } = renderVariant({ flagValue: 'control' })
+
+    expect(result.current).toBe('option-1')
+    expect(captureExposure).not.toHaveBeenCalled()
+  })
+
+  it('lets a forced control replace a forced option-1 on later pages', () => {
+    renderVariant({ flagValue: 'option-1', override: 'option-1' })
+    renderVariant({ flagValue: 'option-1', override: 'control' })
+
+    const { result } = renderVariant({ flagValue: 'option-1' })
+
+    expect(result.current).toBe('control')
   })
 
   it('returns option-1 and records its exposure', () => {
@@ -100,6 +119,19 @@ describe('useIaNavVariant', () => {
     expect(captureExposure).toHaveBeenCalledWith(IA_NAV_FLAG, { variant: 'option-1' }, true)
   })
 
+  it.each([
+    ['option-1', 'control'],
+    ['control', 'option-1'],
+  ])('keeps the session override %s when the URL value is invalid', (sessionVariant, flagValue) => {
+    sessionStorage.setItem(IA_NAV_OVERRIDE_KEY, sessionVariant)
+
+    const { result } = renderVariant({ flagValue, override: 'nope' })
+
+    expect(result.current).toBe(sessionVariant)
+    expect(sessionStorage.getItem(IA_NAV_OVERRIDE_KEY)).toBe(sessionVariant)
+    expect(captureExposure).not.toHaveBeenCalled()
+  })
+
   it('uses the cached flag while the flags load, without recording exposure', () => {
     localStorage.setItem(LOCAL_STORAGE_KEYS.IA_NAV_FLAG, 'option-1')
 
@@ -138,6 +170,17 @@ describe('useIaNavVariant', () => {
 describe('useIaNavVariant on the option-1 route', () => {
   beforeEach(() => {
     captureExposure.mockClear()
+  })
+
+  it('prioritizes the route over conflicting URL and session overrides', () => {
+    sessionStorage.setItem(IA_NAV_OVERRIDE_KEY, 'control')
+    renderVariant({ flagValue: 'control', override: 'control' })
+
+    const { result } = renderHook(() => useIaNavVariant(), { wrapper: IaNavRouteProvider })
+
+    expect(result.current).toBe('option-1')
+    expect(captureExposure).not.toHaveBeenCalled()
+    sessionStorage.clear()
   })
 
   it('returns option-1 before the URL is read and records no exposure', () => {

@@ -73,10 +73,30 @@ describe('getAIDetails', () => {
       orgId: 1,
       orgSlug: ORG_SLUG,
       planId: 'pro',
-      region: 'us-east-1',
+      projectRegion: 'us-east-1',
       isHighComplianceProject: false,
     })
   })
+
+  it.each(['eu-west-1', undefined])(
+    'validates the project/org pair with region %s',
+    async (region) => {
+      mockGetProjectDetail.mockResolvedValue({
+        ref: PROJECT_REF,
+        region,
+        organization_id: 1,
+      })
+
+      const result = await getAIDetails({
+        orgSlug: ORG_SLUG,
+        projectRef: PROJECT_REF,
+        authorization: AUTH,
+      })
+
+      expect(result.orgId).toBe(1)
+      expect(result.projectRegion).toBe(region)
+    }
+  )
 
   it('flags a High Compliance project', async () => {
     mockGetProjectSettings.mockResolvedValue({ is_sensitive: true })
@@ -178,21 +198,12 @@ describe('getAIDetails', () => {
         authorization: AUTH,
       })
 
+      expect(result.orgId).toBeUndefined()
+      expect(result.projectRegion).toBeUndefined()
       expect(result.aiOptInLevel).toBe('disabled')
       expect(result.hasAccessToAdvanceModel).toBe(false)
-      expect(result.orgId).toBeUndefined()
       expect(result.orgSlug).toBeUndefined()
       expect(result.planId).toBeUndefined()
-    })
-
-    it('leaves the region undefined so tracing checks fail closed', async () => {
-      const result = await getAIDetails({
-        orgSlug: ORG_SLUG,
-        projectRef: PROJECT_REF,
-        authorization: AUTH,
-      })
-
-      expect(result.region).toBeUndefined()
     })
   })
 
@@ -220,6 +231,6 @@ describe('getAIDetails', () => {
     })
 
     expect(result.aiOptInLevel).toBe('disabled')
-    expect(result.region).toBeUndefined()
+    expect(result.orgId).toBeUndefined()
   })
 })

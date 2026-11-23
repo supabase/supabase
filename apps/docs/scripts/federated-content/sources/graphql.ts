@@ -7,7 +7,7 @@ const graphql: FederatedContentSource = {
   repo: 'pg_graphql',
   branch: 'master',
   docsDir: 'docs',
-  externalSite: 'https://supabase.github.io/pg_graphql',
+  externalSite: 'https://supabase.github.io/pg_graphql/',
   pageMap: [
     {
       meta: {
