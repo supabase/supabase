@@ -27,7 +27,7 @@ async function fetchReplicationDestinations(
 
 export type ReplicationDestinationsData = Awaited<ReturnType<typeof fetchReplicationDestinations>>
 
-const replicationDestinationsQueryOptions = <TData = ReplicationDestinationsData>({
+export const replicationDestinationsQueryOptions = <TData = ReplicationDestinationsData>({
   projectRef,
   clusterId,
 }: ReplicationDestinationsParams) =>

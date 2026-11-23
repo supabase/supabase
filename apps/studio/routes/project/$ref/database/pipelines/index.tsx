@@ -21,6 +21,7 @@ import { UnknownInterface } from '@/components/ui/UnknownInterface'
 import { useHighAvailability } from '@/hooks/misc/useHighAvailability'
 import { useIsFeatureEnabled } from '@/hooks/misc/useIsFeatureEnabled'
 import { DOCS_URL } from '@/lib/constants'
+import { ReplicationClusterProvider } from '@/state/replication-cluster'
 
 export const Route = createFileRoute('/project/$ref/database/pipelines/')({
   component: DatabasePipelinesPage,
@@ -108,10 +109,10 @@ function DatabasePipelinesPage() {
                 </div>
               </>
             ) : (
-              <>
+              <ReplicationClusterProvider clusterId={undefined}>
                 <ReplicationDiagram />
                 <Destinations />
-              </>
+              </ReplicationClusterProvider>
             )}
           </PageSectionContent>
         </PageSection>
