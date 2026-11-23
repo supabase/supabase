@@ -26,7 +26,6 @@ const {
   mockAddBanner,
   mockDismissBanner,
   mockProjectState,
-  mockResourceWarningsState,
   mockOrgPlanState,
   mockBannerDismissedState,
   mockUseLocalStorageQuery,
@@ -43,7 +42,6 @@ const {
       integration_source: null as string | null,
     },
   },
-  mockResourceWarningsState: { current: undefined as any[] | undefined },
   mockOrgPlanState: {
     current: { id: 'pro', name: 'Pro' } as { id: string; name: string } | undefined,
   },
@@ -197,7 +195,6 @@ vi.mock('@/components/ui/BannerStack/Banners/BannerFreeMicroUpgrade', () => ({
 }))
 
 vi.mock('@/data/usage/resource-warnings-query', () => ({
-  useResourceWarningsQuery: () => ({ data: mockResourceWarningsState.current }),
 }))
 
 vi.mock('@/hooks/misc/useSelectedOrganization', () => ({
@@ -468,14 +465,6 @@ describe('FREE_MICRO_UPGRADE banner', () => {
       infra_compute_size: 'nano',
       integration_source: null,
     }
-    mockResourceWarningsState.current = [
-      {
-        project: 'default',
-        cpu_exhaustion: true,
-        memory_and_swap_exhaustion: false,
-        disk_space_exhaustion: false,
-      },
-    ]
     mockBannerDismissedState.current = false
   })
 
@@ -490,12 +479,11 @@ describe('FREE_MICRO_UPGRADE banner', () => {
       infra_compute_size: undefined,
       integration_source: null,
     }
-    mockResourceWarningsState.current = undefined
     mockOrgPlanState.current = { id: 'pro', name: 'Pro' }
     mockBannerDismissedState.current = false
   })
 
-  it('calls addBanner when a paid-plan project is nano and compute is near exhaustion', async () => {
+  it('calls addBanner when a paid-plan project is nano', async () => {
     renderLayout()
 
     await waitFor(() => {
@@ -510,19 +498,6 @@ describe('FREE_MICRO_UPGRADE banner', () => {
       'the banner was previously dismissed',
       () => {
         mockBannerDismissedState.current = true
-      },
-    ],
-    [
-      'compute warnings are cleared',
-      () => {
-        mockResourceWarningsState.current = [
-          {
-            project: 'default',
-            cpu_exhaustion: false,
-            memory_and_swap_exhaustion: false,
-            disk_space_exhaustion: false,
-          },
-        ]
       },
     ],
     [
