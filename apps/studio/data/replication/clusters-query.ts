@@ -16,6 +16,8 @@ export type ReplicationClustersData = Awaited<ReturnType<typeof getReplicationCl
 
 export type ReplicationClustersError = StudioError
 
+export type ReplicationRegion = ReplicationClustersData['regions'][number]
+
 export const replicationClustersQueryOptions = () =>
   queryOptions<ReplicationClustersData, ReplicationClustersError>({
     queryKey: replicationKeys.clusters(),
@@ -27,13 +29,26 @@ export const replicationClustersQueryOptions = () =>
     retryOnMount: false,
   })
 
-// Default-cluster requests retain the API's omission semantics.
+// The default cluster maps to undefined so its requests omit cluster_id and share cache keys with
+// replication callers that never pass a cluster.
 export const toRequestClusterId = (
   clusterId: string | null | undefined,
   defaultClusterId: string | undefined
 ) => (clusterId === null || clusterId === defaultClusterId ? undefined : clusterId)
 
-export type ReplicationRegion = ReplicationClustersData['regions'][number]
+/**
+ * The cluster a new pipeline starts in: the one in the project's database region, otherwise the
+ * environment default. Returned as a request cluster ID, so the default maps to `undefined`.
+ */
+export const getPreferredClusterId = (
+  data: ReplicationClustersData | undefined,
+  projectRegion: string | undefined
+) => {
+  const match = projectRegion
+    ? data?.regions.find((region) => region.region_code === projectRegion)
+    : undefined
+  return toRequestClusterId(match?.cluster_id ?? data?.default_cluster_id, data?.default_cluster_id)
+}
 
 export type ReplicationClusterGroup = {
   clusterId: string | undefined
@@ -41,8 +56,9 @@ export type ReplicationClusterGroup = {
 }
 
 /** Every cluster to query, default first. Only the default cluster when regions are unavailable. */
-export const useReplicationClusterGroups = () => {
-  const { data } = useQuery(replicationClustersQueryOptions())
+export const useReplicationClusterGroups = ({ enabled = true } = {}) => {
+  const options = replicationClustersQueryOptions()
+  const { data, isPending } = useQuery({ ...options, enabled: enabled && options.enabled })
   const groups = useMemo<ReplicationClusterGroup[]>(() => {
     const regions = data?.regions ?? []
     if (regions.length === 0) return [{ clusterId: undefined }]
@@ -55,7 +71,11 @@ export const useReplicationClusterGroups = () => {
     )
   }, [data])
 
-  return { groups, hasMultipleRegions: groups.length > 1 }
+  return {
+    groups,
+    hasMultipleRegions: groups.length > 1,
+    isDiscovering: enabled && IS_PLATFORM && isPending,
+  }
 }
 
 export const getReplicationRegionLabel = (region: ReplicationRegion | undefined) => {

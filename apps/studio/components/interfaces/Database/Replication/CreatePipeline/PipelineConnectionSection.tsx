@@ -12,18 +12,20 @@ export const PipelineConnectionSection = ({
   type,
   form,
   children,
+  regionField,
   revealInvalidSettings = false,
 }: {
   type: DestinationType
   form: UseFormReturn<DestinationPanelSchemaType>
   children: ReactNode
+  regionField?: ReactNode
   revealInvalidSettings?: boolean
 }) => (
   <section aria-label="Destination connection">
     <div className="flex flex-col gap-y-4 p-5">
       <h3 className="text-sm font-medium text-foreground">Destination connection</h3>
       <DestinationNameInput form={form} destinationType={type} />
-      <PipelineRegionField destinationType={type} />
+      {regionField ?? <PipelineRegionField destinationType={type} />}
     </div>
     <DialogSectionSeparator />
     {children}
