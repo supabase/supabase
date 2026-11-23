@@ -93,8 +93,8 @@ Here are some commonly used statements to extract SSO related information from t
 
 - `auth.jwt()#>>'{amr,0,method}'`
   Returns the name of the last method used to verify the identity of this user. With SAML SSO this is `sso/saml`.
-- `auth.jwt()#>>'{amr,0,provider}'`
-  Returns the UUID of the SSO identity provider used by the user to sign in.
+- `auth.jwt()->'amr'`
+  Returns the authentication methods for the session. Find the entry whose `method` is `sso/saml` and read its `provider` to get the UUID of the SSO identity provider used to sign in. The policy example below shows the full lookup.
 - `auth.jwt()#>>'{user_metadata,iss}'`
   Returns the identity provider's SAML 2.0 `EntityID`
 
