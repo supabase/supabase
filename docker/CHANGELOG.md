@@ -90,7 +90,6 @@ If you depend on any of these overrides, plan to migrate before they are removed
 ### Analytics (Logflare)
 - Updated Vector to `0.62.0-alpine` (requires `docker-compose.logs.yml` update) - [Release](https://github.com/vectordotdev/vector/releases/tag/v0.62.0)
   - ⚠️ Changed: Vector 0.57+ expands `${VAR}` in its config only with `VECTOR_DANGEROUSLY_ALLOW_ENV_VAR_INTERPOLATION: "true"`, now set in `docker-compose.logs.yml`. Without it, logs stop arriving - [vector#25699](https://github.com/vectordotdev/vector/pull/25699)
-- Skipped Logflare 1.52.0 and later for now: every release up to 1.54.8 breaks Studio log queries - [Logflare/logflare#4158](https://github.com/Logflare/logflare/issues/4158)
 
 ---
 
