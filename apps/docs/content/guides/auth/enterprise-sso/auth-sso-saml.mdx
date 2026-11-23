@@ -121,9 +121,15 @@ create table organization_settings (
 );
 ```
 
-You can use the information present in the user's JWT to scope down which rows from this table the user can see, without doing any additional user management:
+You can use the information present in the user's JWT to scope down which rows from this table the user can see, without doing any additional user management. Restrictive policies only filter rows that a permissive policy allows, so the example also adds a permissive `SELECT` policy:
 
 ```sql
+CREATE POLICY "Authenticated can view organization settings."
+  ON organization_settings
+  FOR SELECT
+  TO authenticated
+  USING (true);
+
 CREATE POLICY "View organization settings."
   ON organization_settings
   AS RESTRICTIVE
