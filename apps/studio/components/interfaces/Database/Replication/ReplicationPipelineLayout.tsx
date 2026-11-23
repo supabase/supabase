@@ -71,6 +71,7 @@ import { useStopPipelineMutation } from '@/data/replication/stop-pipeline-mutati
 import { DOCS_URL } from '@/lib/constants'
 import type { StudioError } from '@/lib/errors/studio-errors'
 import { splitInternalUrl } from '@/lib/internal-url'
+import { useReplicationClusterId } from '@/state/replication-cluster'
 import {
   PipelineStatusRequestStatus,
   usePipelineRequestStatus,
@@ -88,6 +89,7 @@ const LIFECYCLE_BY_STATUS: Partial<
 
 export const ReplicationPipelineLayout = ({ children }: PropsWithChildren) => {
   const { ref: projectRef, pipelineId } = useParams()
+  const clusterId = useReplicationClusterId()
   const { isEnabled: isUnifiedLogsEnabled } = useUnifiedLogsPreview()
   const navigate = useNavigate()
   const [showUpdateVersionModal, setShowUpdateVersionModal] = useState(false)

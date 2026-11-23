@@ -105,7 +105,6 @@ vi.mock('./PipelineCreationFlow', () => ({
 const pipelinesList = {
   to: '/project/$ref/database/pipelines',
   params: { ref: 'default' },
-  search: { cluster_id: undefined },
 }
 const renderPage = ({
   queryClient,
@@ -192,22 +191,20 @@ it('returns through the shared router without reloading the toast host', async (
   expect(state.navigate).toHaveBeenCalledWith(pipelinesList)
 })
 
-it('returns to the selected cluster when closing the wizard', async () => {
+it('returns to the combined list when closing a regional wizard', async () => {
   await renderPage({ clusterId: 'eu-west-1' })
   fireEvent.click(await screen.findByRole('button', { name: 'Wizard form' }))
   expect(state.navigate).toHaveBeenCalledWith({
     ...pipelinesList,
-    search: { cluster_id: 'eu-west-1' },
   })
 })
 
-it('returns to the selected cluster when direct entry is unavailable', async () => {
+it('returns to the combined list when regional direct entry is unavailable', async () => {
   mockSources([])
   await renderPage({ clusterId: 'eu-west-1' })
   expect(await screen.findByText('Returning to Pipelines…')).toBeInTheDocument()
   expect(state.navigate).toHaveBeenCalledWith({
     ...pipelinesList,
-    search: { cluster_id: 'eu-west-1' },
     replace: true,
   })
 })
