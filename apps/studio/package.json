@@ -72,6 +72,7 @@
     "@supabase/realtime-js": "catalog:",
     "@supabase/shared-types": "0.1.98",
     "@supabase/supabase-js": "catalog:",
+    "@supabase/typegen": "github:supabase/sdk#5a5db05b23a12f1cdea0406e082d465eacc1d6a7&path:/packages/typegen",
     "@tanstack/react-devtools": "^0.10.3",
     "@tanstack/react-hotkeys": "^0.10.0",
     "@tanstack/react-query": "~5.104.3",
