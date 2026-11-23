@@ -3,7 +3,7 @@ import { beforeEach, describe, expect, it, vi } from 'vitest'
 
 import { insertRowsViaSpreadsheet } from './SidePanelEditor.utils'
 import type { RetrieveTableResult } from '@/data/tables/table-retrieve-query'
-import { addAPIMock } from '@/tests/lib/msw'
+import { addAPIMock, type APIErrorBody } from '@/tests/lib/msw'
 
 const table = {
   id: 1,
@@ -39,7 +39,7 @@ describe('insertRowsViaSpreadsheet', () => {
       response: async ({ request }) => {
         const { query } = (await request.json()) as { query: string }
         queries.push(query)
-        return HttpResponse.json<any>([])
+        return HttpResponse.json([])
       },
     })
 
@@ -60,7 +60,8 @@ describe('insertRowsViaSpreadsheet', () => {
     addAPIMock({
       method: 'post',
       path: '/platform/pg-meta/:ref/query',
-      response: () => HttpResponse.json<any>({ message: 'insert failed' }, { status: 400 }),
+      response: () =>
+        HttpResponse.json<APIErrorBody>({ message: 'insert failed' }, { status: 400 }),
     })
 
     const { error } = await importCsv('id,path\n1,small\n')
