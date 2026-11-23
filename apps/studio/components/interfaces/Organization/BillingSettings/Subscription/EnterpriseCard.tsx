@@ -1,4 +1,3 @@
-import { type Variants } from 'motion/react'
 import { PricingInformation } from 'shared-data'
 import { Button } from 'ui'
 
@@ -10,15 +9,9 @@ export interface EnterpriseCardProps {
   plan: PricingInformation
   isCurrentPlan: boolean
   liftedSide?: 'left' | 'right'
-  variants?: Variants
 }
 
-export const EnterpriseCard = ({
-  plan,
-  isCurrentPlan,
-  liftedSide,
-  variants,
-}: EnterpriseCardProps) => {
+export const EnterpriseCard = ({ plan, isCurrentPlan, liftedSide }: EnterpriseCardProps) => {
   const { data: selectedOrganization } = useSelectedOrganizationQuery()
   const track = useTrack()
 
@@ -33,7 +26,6 @@ export const EnterpriseCard = ({
       plan={plan}
       isCurrentPlan={isCurrentPlan}
       liftedSide={liftedSide}
-      variants={variants}
       price={
         <p className="text-foreground text-5xl font-mono" translate="no">
           <span className="text-4xl">{plan.priceMonthly}</span>

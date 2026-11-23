@@ -1,4 +1,3 @@
-import { type Variants } from 'motion/react'
 import type { PricingInformation } from 'shared-data'
 import { Button, cn } from 'ui'
 import { ShimmeringLoader } from 'ui-patterns/ShimmeringLoader'
@@ -22,7 +21,6 @@ export interface PlanCardProps {
   currentSubscriptionPlanId: string | undefined
   managedBy: string | undefined
   shouldHighlight: boolean
-  variants?: Variants
   onSelectTier: () => void
   onTrackCtaClick: () => void
 }
@@ -40,7 +38,6 @@ export function PlanCard({
   currentSubscriptionPlanId,
   managedBy,
   shouldHighlight,
-  variants,
   onSelectTier,
   onTrackCtaClick,
 }: PlanCardProps) {
@@ -104,7 +101,6 @@ export function PlanCard({
       plan={plan}
       isCurrentPlan={isCurrentPlan}
       liftedSide={liftedSide}
-      variants={variants}
       className={cn(
         shouldHighlight &&
           'ring-4 ring-primary-bright animate-[pulse_1.5s_ease-in-out_1] motion-reduce:animate-none shadow-md shadow-primary-bright/40'

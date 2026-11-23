@@ -1,5 +1,4 @@
 import { isArray } from 'lodash'
-import { motion, type Variants } from 'motion/react'
 import type { ReactNode } from 'react'
 import type { PricingInformation } from 'shared-data'
 import { cn } from 'ui'
@@ -12,7 +11,6 @@ export interface PlanColumnProps {
   cta: ReactNode
   isCurrentPlan: boolean
   liftedSide?: 'left' | 'right'
-  variants?: Variants
   className?: string
 }
 
@@ -32,14 +30,12 @@ export const PlanColumn = ({
   cta,
   isCurrentPlan,
   liftedSide,
-  variants,
   className,
 }: PlanColumnProps) => {
   const hasPopularBadge = !isCurrentPlan && !!plan.nameBadge
 
   return (
-    <motion.div
-      variants={variants}
+    <div
       className={cn(
         'flex flex-col md:row-span-2 md:grid md:grid-rows-subgrid md:gap-y-0',
         'border rounded-xl col-span-12 md:col-span-6 xl:col-span-3',
@@ -135,6 +131,6 @@ export const PlanColumn = ({
           ))}
         </ul>
       </div>
-    </motion.div>
+    </div>
   )
 }
