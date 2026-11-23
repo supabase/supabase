@@ -63,7 +63,7 @@ Deno.serve(async (req: Request) => {
 
 ## Row Level Security
 
-After initializing a Supabase client with the Auth context, all queries will be executed with the context of the user. For database queries, this means [Row Level Security](/docs/guides/database/postgres/row-level-security) will be enforced.
+After initializing a [Supabase client](/docs/reference/javascript/introduction) with the Auth context, all queries will be executed with the context of the user. For database queries, this means [Row Level Security](/docs/guides/database/postgres/row-level-security) will be enforced.
 
 ```js
 import { createClient } from 'npm:@supabase/supabase-js@2'

@@ -43,7 +43,6 @@ import { DUCKLAKE_MODE_SUPABASE } from './DuckLake/DuckLake.constants'
 import { getDucklakeValidationIssues } from './DuckLake/DuckLake.utils'
 import { DuckLakeFields } from './DuckLake/Fields'
 import { NewPublicationPanel } from './NewPublicationPanel'
-import { NoDestinationsAvailable } from './NoDestinationsAvailable'
 import { PipelineCostDialog } from './PipelineCostDialog'
 import { PipelineRegionField } from './PipelineRegionField'
 import { PublicationSelection } from './PublicationSelection'
@@ -115,17 +114,6 @@ export const DestinationForm = ({
   const editMode = !!existingDestination
   const { isEnabled: isCreationPreviewEnabled } = usePipelineCreationPreview()
   const shouldShowConnectionSection = isCreationPreviewEnabled && !editMode
-
-  // Compute available destinations based on feature flags
-  const availableDestinations = useMemo(() => {
-    const destinations = []
-    if (isBigQueryEnabled) destinations.push({ value: 'BigQuery', label: 'BigQuery' })
-    if (isDuckLakeEnabled) destinations.push({ value: 'DuckLake', label: 'DuckLake' })
-    if (isSnowflakeEnabled) destinations.push({ value: 'Snowflake', label: 'Snowflake' })
-    if (isClickHouseEnabled) destinations.push({ value: 'ClickHouse', label: 'ClickHouse' })
-    return destinations
-  }, [isBigQueryEnabled, isDuckLakeEnabled, isSnowflakeEnabled, isClickHouseEnabled])
-  const hasNoAvailableDestinations = availableDestinations.length === 0
 
   const sourceId = useReplicationSourceId({ projectRef })
 
@@ -263,8 +251,7 @@ export const DestinationForm = ({
     !isExistingConfigReady ||
     !isSuccessPublicationNames ||
     (!!publicationName && !isSuccessPublication) ||
-    isSelectedPublicationMissing ||
-    (!editMode && hasNoAvailableDestinations)
+    isSelectedPublicationMissing
 
   const getSubmitButtonText = () => {
     if (editMode) {
@@ -489,97 +476,93 @@ export const DestinationForm = ({
     <>
       <SheetSection className="grow overflow-auto px-0 py-0">
         {typeSelection}
-        {hasNoAvailableDestinations && !editMode ? (
-          <NoDestinationsAvailable />
-        ) : (
-          <Form {...form}>
-            <form id={formId} onSubmit={form.handleSubmit(onSubmit)}>
-              <fieldset disabled={!isExistingConfigReady} className="contents">
-                {shouldShowConnectionSection && (
-                  <>
-                    <PipelineConnectionSection type={selectedType} form={form}>
-                      {destinationFields}
-                    </PipelineConnectionSection>
-                    <DialogSectionSeparator />
-                  </>
-                )}
-                {shouldShowConnectionSection ? (
-                  <PipelineDataSection
-                    type={selectedType}
-                    form={form}
-                    onSelectNewPublication={() => setPublicationPanelVisible(true)}
-                  />
-                ) : (
-                  <>
-                    <div className="p-5 flex flex-col gap-y-6">
-                      {isErrorExistingConfig && (
-                        <Admonition type="warning">
-                          <p className="leading-normal!">
-                            The existing destination or pipeline settings could not be loaded.
-                            Refresh before applying changes.
-                          </p>
-                        </Admonition>
-                      )}
-                      <p className="text-sm font-medium text-foreground">Destination details</p>
-
-                      <div className="flex flex-col gap-y-4">
-                        <DestinationNameInput form={form} destinationType={selectedType} />
-                        <PublicationSelection
-                          form={form}
-                          onSelectNewPublication={() => setPublicationPanelVisible(true)}
-                        />
-                        <TableCopySelection form={form} editMode={editMode} />
-                        <PipelineRegionField destinationType={selectedType} />
-                      </div>
-                    </div>
-
-                    <DialogSectionSeparator />
+        <Form {...form}>
+          <form id={formId} onSubmit={form.handleSubmit(onSubmit)}>
+            <fieldset disabled={!isExistingConfigReady} className="contents">
+              {shouldShowConnectionSection && (
+                <>
+                  <PipelineConnectionSection type={selectedType} form={form}>
                     {destinationFields}
+                  </PipelineConnectionSection>
+                  <DialogSectionSeparator />
+                </>
+              )}
+              {shouldShowConnectionSection ? (
+                <PipelineDataSection
+                  type={selectedType}
+                  form={form}
+                  onSelectNewPublication={() => setPublicationPanelVisible(true)}
+                />
+              ) : (
+                <>
+                  <div className="p-5 flex flex-col gap-y-6">
+                    {isErrorExistingConfig && (
+                      <Admonition type="warning">
+                        <p className="leading-normal!">
+                          The existing destination or pipeline settings could not be loaded. Refresh
+                          before applying changes.
+                        </p>
+                      </Admonition>
+                    )}
+                    <p className="text-sm font-medium text-foreground">Destination details</p>
 
-                    <DialogSectionSeparator />
-
-                    <AdvancedSettings type={selectedType} form={form} group="all" />
-                  </>
-                )}
-
-                {shouldShowConnectionSection && (
-                  <>
-                    <DialogSectionSeparator />
-                    <PipelineDestinationReview type={selectedType} control={form.control} />
-                    <DialogSectionSeparator />
-                    <PipelineDataReview
-                      type={selectedType}
-                      control={form.control}
-                      publication={selectedPublication}
-                    />
-                    <DialogSectionSeparator />
-                    <PipelineReviewCosts control={form.control} publication={selectedPublication} />
-                  </>
-                )}
-
-                {!editMode && hasRunValidation && !isValidating && (
-                  <>
-                    <DialogSectionSeparator />
-
-                    <div ref={validationSectionRef}>
-                      {shouldShowConnectionSection ? (
-                        <PipelineValidationAdmonition
-                          failures={allValidationFailures}
-                          hint="Check credentials and Advanced settings above. Some issues may require changes to the project’s database settings."
-                        />
-                      ) : (
-                        <ValidationFailuresSection
-                          destinationFailures={destinationValidationFailures}
-                          pipelineFailures={pipelineValidationFailures}
-                        />
-                      )}
+                    <div className="flex flex-col gap-y-4">
+                      <DestinationNameInput form={form} destinationType={selectedType} />
+                      <PublicationSelection
+                        form={form}
+                        onSelectNewPublication={() => setPublicationPanelVisible(true)}
+                      />
+                      <TableCopySelection form={form} editMode={editMode} />
+                      <PipelineRegionField destinationType={selectedType} />
                     </div>
-                  </>
-                )}
-              </fieldset>
-            </form>
-          </Form>
-        )}
+                  </div>
+
+                  <DialogSectionSeparator />
+                  {destinationFields}
+
+                  <DialogSectionSeparator />
+
+                  <AdvancedSettings type={selectedType} form={form} group="all" />
+                </>
+              )}
+
+              {shouldShowConnectionSection && (
+                <>
+                  <DialogSectionSeparator />
+                  <PipelineDestinationReview type={selectedType} control={form.control} />
+                  <DialogSectionSeparator />
+                  <PipelineDataReview
+                    type={selectedType}
+                    control={form.control}
+                    publication={selectedPublication}
+                  />
+                  <DialogSectionSeparator />
+                  <PipelineReviewCosts control={form.control} publication={selectedPublication} />
+                </>
+              )}
+
+              {!editMode && hasRunValidation && !isValidating && (
+                <>
+                  <DialogSectionSeparator />
+
+                  <div ref={validationSectionRef}>
+                    {shouldShowConnectionSection ? (
+                      <PipelineValidationAdmonition
+                        failures={allValidationFailures}
+                        hint="Check credentials and Advanced settings above. Some issues may require changes to the project’s database settings."
+                      />
+                    ) : (
+                      <ValidationFailuresSection
+                        destinationFailures={destinationValidationFailures}
+                        pipelineFailures={pipelineValidationFailures}
+                      />
+                    )}
+                  </div>
+                </>
+              )}
+            </fieldset>
+          </form>
+        </Form>
       </SheetSection>
 
       <SheetFooter className="justify-between!">

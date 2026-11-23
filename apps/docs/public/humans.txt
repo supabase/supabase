@@ -18,6 +18,7 @@ Aleksi Immonen
 Alex Hall
 Alex Hsu
 Alex Ives
+Alex Venter
 Alexander Alexandrov
 Alexander Korotkov
 Alexis Aguilar
@@ -129,6 +130,7 @@ Etienne Stalmans
 Evan Cummack
 Fabrizio Fenoglio
 Fady A
+Fallon Petty
 Farley Thomas
 Fatuma Abdullahi
 Felipe Stival
@@ -169,6 +171,7 @@ Isaac Dawson
 Ivan Vasilov
 Jagpreet Singh
 Jamie Boyd
+Jack Secord
 Jake Ng
 Jared Patterson
 Jason Farber
@@ -275,6 +278,7 @@ Mike Podobnik
 Miranda Limonczenko
 Monica Khoury
 Mrinal Paliwal
+Musa Jundi
 Mykhailo Mischa Lieibenson
 Nara Kasbergen Kwon
 Natalie Roberge

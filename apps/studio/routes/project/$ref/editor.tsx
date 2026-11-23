@@ -9,8 +9,7 @@ export const Route = createFileRoute('/project/$ref/editor')({
 })
 
 // All three editor leaves (index, $id, new) share identical layout
-// wrapping in the Next pages router (DefaultLayout > EditorBaseLayout >
-// TableEditorLayout). DefaultLayout is provided by the parent
+// wrapping (DefaultLayout > EditorBaseLayout > TableEditorLayout). DefaultLayout is provided by the parent
 // `routes/project/$ref.tsx` shell, so this file only adds the
 // editor-specific layers.
 //

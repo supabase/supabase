@@ -282,7 +282,6 @@ vi.mock('./DuckLake/Fields', () => ({
 vi.mock('./Snowflake/Fields', () => ({ SnowflakeFields: () => null }))
 vi.mock('./ClickHouse/Fields', () => ({ ClickHouseFields: () => null }))
 vi.mock('./NewPublicationPanel', () => ({ NewPublicationPanel: () => null }))
-vi.mock('./NoDestinationsAvailable', () => ({ NoDestinationsAvailable: () => null }))
 vi.mock('./PipelineCostDialog', () => ({
   PipelineCostDialog: ({ open, onConfirm }: { open: boolean; onConfirm: () => void }) =>
     open ? (

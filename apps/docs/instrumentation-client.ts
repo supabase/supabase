@@ -4,7 +4,11 @@
 
 import * as Sentry from '@sentry/nextjs'
 import { hasConsented, IS_PLATFORM } from 'common'
-import { BROWSER_NOISE_IGNORE_ERRORS, filterSentryEvent } from 'common/sentry'
+import {
+  BROWSER_NOISE_IGNORE_ERRORS,
+  BROWSER_TRANSLATION_DOM_ERRORS,
+  filterSentryEvent,
+} from 'common/sentry'
 
 import { IS_DEV } from './lib/constants'
 
@@ -25,6 +29,7 @@ if (!IS_DEV) {
 
     ignoreErrors: [
       ...BROWSER_NOISE_IGNORE_ERRORS,
+      ...BROWSER_TRANSLATION_DOM_ERRORS,
 
       // [Charis 2025-05-05]
       // We should fix hydration problems but let's not make this a blocker for

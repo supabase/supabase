@@ -1,8 +1,8 @@
 import { useParams } from 'common'
 import dayjs from 'dayjs'
 import { CircleCheckIcon, CircleXIcon, LoaderIcon } from 'lucide-react'
-import { useMemo } from 'react'
-import DataGrid, { Column, Row } from 'react-data-grid'
+import { useMemo, useRef } from 'react'
+import DataGrid, { Column, DataGridHandle, Row } from 'react-data-grid'
 import { cn, LoadingLine, Tooltip, TooltipContent, TooltipTrigger } from 'ui'
 import { CodeBlock } from 'ui-patterns/CodeBlock'
 import { GenericSkeletonLoader } from 'ui-patterns/ShimmeringLoader'
@@ -159,6 +159,8 @@ export const PreviousRunsTab = () => {
     isPending: isLoadingCronJobRuns,
     isFetching,
     isFetchingNextPage,
+    isRefetching,
+    isError,
     hasNextPage,
     fetchNextPage,
   } = useCronJobRunsInfiniteQuery(
@@ -172,17 +174,23 @@ export const PreviousRunsTab = () => {
 
   const cronJobRuns = useMemo(() => data?.pages.flatMap((p) => p) || [], [data?.pages])
 
+  const gridRef = useRef<DataGridHandle>(null)
   const handleScroll = useInfiniteScroll({
     isLoading: isLoadingCronJobRuns,
     isFetchingNextPage,
+    isRefetching,
+    isError,
     hasNextPage,
     fetchNextPage,
+    containerRef: gridRef,
+    rowCount: cronJobRuns.length,
   })
 
   return (
     <div className="h-full flex flex-col">
       <LoadingLine loading={isFetching} />
       <DataGrid
+        ref={gridRef}
         className="grow border-t-0! border-b-0!"
         rowHeight={44}
         headerRowHeight={36}

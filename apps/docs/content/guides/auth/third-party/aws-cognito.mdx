@@ -11,7 +11,7 @@ Amazon Cognito User Pools (via AWS Amplify or on its own) can be used as a third
 1. First you need to add an integration to connect your Supabase project with your Amazon Cognito User Pool. You will need the pool's ID and region.
 2. Add a new Third-party Auth integration in your project's [Authentication settings](/dashboard/project/_/auth/third-party) or configure it in the CLI.
 3. Assign the `role: 'authenticated'` custom claim to all JWTs by using a Pre-Token Generation Trigger.
-4. Finally setup the Supabase client in your application.
+4. Finally setup the [Supabase client](/docs/reference/javascript/introduction) in your application.
 
 ## Setup the Supabase client library
 
@@ -144,9 +144,9 @@ suspend fun getAccessToken(): String? {
 
 In the dashboard navigate to your project's [Authentication settings](/dashboard/project/_/auth/third-party) and find the Third-Party Auth section to add a new integration.
 
-In the CLI add the following config to your `supabase/config.toml` file:
+In the CLI add the following config to your config file (`supabase/config.toml` or `supabase/config.jsonc`):
 
-```toml
+```toml supabase/config.toml
 [auth.third_party.aws_cognito]
 enabled = true
 user_pool_id = "<id>"
@@ -155,7 +155,7 @@ user_pool_region = "<region>"
 
 ## Use a pre-token generation trigger to assign the authenticated role
 
-Your Supabase project inspects the `role` claim present in all JWTs sent to it, to assign the correct Postgres role when using the Data API, Storage or Realtime authorization.
+Your Supabase project inspects the `role` claim present in all JWTs sent to it, to assign the correct [Postgres role](/docs/guides/database/postgres/roles) when using the Data API, Storage or Realtime authorization.
 
 By default, Amazon Cognito JWTs (both ID token and access tokens) do not contain a `role` claim in them. If you were to send such a JWT to your Supabase project, the `anon` role would be assigned when executing the Postgres query. Most of your app's logic will be accessible by the `authenticated` role.
 
