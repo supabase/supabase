@@ -74,6 +74,8 @@ async function applySparkMigration<T>({
         apikey: `${process.env.SUPABASE_SERVICE_KEY}`,
       },
       body: JSON.stringify({ sql: query, name }),
+      // fetch would carry the service key to wherever a redirect points.
+      redirect: 'error',
     })
     const result = await response.json()
 

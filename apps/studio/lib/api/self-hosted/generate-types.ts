@@ -34,6 +34,8 @@ const unformatted: Host = { cwd: '.', env: {}, format: (code) => Promise.resolve
 async function generateSparkTypescriptTypes(): Promise<GenerateTypescriptTypesResult> {
   const response = await fetch(`${process.env.SUPABASE_URL}/_spark/v1/schema`, {
     headers: { apikey: `${process.env.SUPABASE_SERVICE_KEY}` },
+    // fetch would carry the service key to wherever a redirect points.
+    redirect: 'error',
   })
   if (!response.ok) {
     throw new Error(`Spark's schema description answered HTTP ${response.status}`)

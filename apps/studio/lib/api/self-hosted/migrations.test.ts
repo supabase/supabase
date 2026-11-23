@@ -49,6 +49,7 @@ describe('api/self-hosted/migrations', () => {
       expect(url).toBe('http://localhost:54321/system/v1/migrations')
       expect(init.method).toBe('POST')
       expect(init.headers).toEqual({ 'Content-Type': 'application/json', apikey: 'service-key' })
+      expect(init.redirect).toBe('error')
       expect(JSON.parse(String(init.body))).toEqual({ sql: migration.query, name: 'labels' })
     })
 

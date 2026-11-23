@@ -175,6 +175,7 @@ describe('api/self-hosted/generate-types', () => {
       const [url, init] = fetchMock.mock.calls[0]
       expect(url).toBe('http://localhost:54321/_spark/v1/schema')
       expect(init.headers).toEqual({ apikey: 'service-key' })
+      expect(init.redirect).toBe('error')
       expect(mockFetchGet).not.toHaveBeenCalled()
       expect(result).toEqual({ types: expect.stringContaining('export type Database = {') })
       expect(result).toEqual({
