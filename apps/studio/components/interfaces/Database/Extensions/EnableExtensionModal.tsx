@@ -111,13 +111,11 @@ export const EnableExtensionModal = ({
             <CardContent className="divide-y text-sm p-0">
               <div className="flex items-center justify-between px-3 py-2.5">
                 <p className="text-foreground-lighter">Extension</p>
-                <code className="text-code-inline">{extension.name}</code>
+                <code>{extension.name}</code>
               </div>
               <div className="flex items-center justify-between px-3 py-2.5">
                 <p className="text-foreground-lighter">Schema</p>
-                <code data-testid="enable-extension-schema" className="text-code-inline">
-                  {defaultSchema ?? 'extensions'}
-                </code>
+                <code data-testid="enable-extension-schema">{defaultSchema ?? 'extensions'}</code>
               </div>
             </CardContent>
           </Card>
@@ -134,13 +132,12 @@ export const EnableExtensionModal = ({
                 <DialogSection className="pt-1 min-w-0 flex flex-col gap-y-3">
                   <div className="text-sm text-foreground-light flex flex-col gap-y-3">
                     <p>
-                      We recommend using the <code className="text-code-inline">extensions</code>{' '}
-                      schema to keep extension objects separate from your own tables.
+                      We recommend using the <code>extensions</code> schema to keep extension
+                      objects separate from your own tables.
                     </p>
                     <p>
                       To use another schema, run the following in the SQL Editor. Replace{' '}
-                      <code className="text-code-inline">target_schema</code> with an existing
-                      schema name.
+                      <code>target_schema</code> with an existing schema name.
                     </p>
                   </div>
                   <CodeBlock

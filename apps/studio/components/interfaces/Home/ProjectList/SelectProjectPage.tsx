@@ -1,0 +1,151 @@
+import { useLocation } from '@tanstack/react-router'
+import { IS_PLATFORM, useParams } from 'common'
+import { AlertTriangleIcon } from 'lucide-react'
+import { useEffect, useState } from 'react'
+import {
+  Alert,
+  AlertDescription,
+  AlertTitle,
+  Select,
+  SelectContent,
+  SelectItem,
+  SelectTrigger,
+  SelectValue,
+} from 'ui'
+import { PageContainer } from 'ui-patterns/PageContainer'
+import {
+  PageHeader,
+  PageHeaderMeta,
+  PageHeaderSummary,
+  PageHeaderTitle,
+} from 'ui-patterns/PageHeader'
+import { PageSection } from 'ui-patterns/PageSection'
+import { ShimmeringLoader } from 'ui-patterns/ShimmeringLoader'
+
+import {
+  Header,
+  LoadingCardView,
+  NoOrganizationsState,
+} from '@/components/interfaces/Home/ProjectList/EmptyStates'
+import { ProjectList } from '@/components/interfaces/Home/ProjectList/ProjectList'
+import { HomePageActions } from '@/components/interfaces/HomePageActions'
+import { useOrganizationsQuery } from '@/data/organizations/organizations-query'
+import { useLastVisitedOrganization } from '@/hooks/misc/useLastVisitedOrganization'
+import { withAuth } from '@/hooks/misc/withAuth'
+
+// [Joshen] I'd say we don't do route validation here, this page will act more
+// like a proxy to the project specific pages, and we let those pages handle
+// any route validation logic instead
+
+function SelectProject() {
+  const { pathname, searchStr } = useLocation()
+  // `/project/_/billing` → ['billing']; the splat route nests under the `/project/_` route,
+  // which renders this page, so the trailing path is read from the location
+  const trailingSegments = pathname
+    .replace(/^\/project\/_\/?/, '')
+    .split('/')
+    .filter(Boolean)
+  const routeSlug = trailingSegments.length > 0 ? trailingSegments : undefined
+  const { slug } = useParams()
+
+  const { lastVisitedOrganization } = useLastVisitedOrganization()
+
+  const {
+    data: organizations = [],
+    isSuccess: isSuccessOrganizations,
+    isPending: isLoadingOrganizations,
+    isError: isErrorOrganizations,
+  } = useOrganizationsQuery({
+    enabled: IS_PLATFORM,
+  })
+
+  const [selectedSlug, setSlug] = useState<string>(
+    slug || lastVisitedOrganization || organizations[0]?.slug
+  )
+  const selectedOrganization = organizations.find((x) => x.slug === selectedSlug)
+
+  const query = searchStr || undefined
+
+  const urlRewriterFactory = (slug: string | string[] | undefined) => {
+    return (projectRef: string) => {
+      const hash = location.hash
+
+      if (!Array.isArray(slug)) {
+        return [`/project/${projectRef}`, query, hash].filter(Boolean).join('')
+      }
+
+      const slugPath = slug.join('/')
+      return [`/project/${projectRef}/${slugPath}`, query, hash].filter(Boolean).join('')
+    }
+  }
+
+  useEffect(() => {
+    if (!!lastVisitedOrganization) {
+      setSlug(lastVisitedOrganization)
+    } else if (isSuccessOrganizations) {
+      setSlug(organizations[0]?.slug)
+    }
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [lastVisitedOrganization, isSuccessOrganizations])
+
+  return (
+    <div className="h-screen flex flex-col">
+      <Header />
+      <div className="flex w-full min-h-0 grow flex-col items-stretch">
+        <PageHeader>
+          <PageHeaderMeta>
+            <PageHeaderSummary>
+              <PageHeaderTitle>Select a project to continue</PageHeaderTitle>
+            </PageHeaderSummary>
+          </PageHeaderMeta>
+        </PageHeader>
+        <PageContainer className="grow flex flex-col gap-y-4">
+          <PageSection className="last:pb-0">
+            <div className="flex items-center gap-x-2">
+              {isLoadingOrganizations ? (
+                <ShimmeringLoader className="w-60 py-0 h-[26px]" />
+              ) : (
+                <Select value={selectedSlug} onValueChange={setSlug}>
+                  <SelectTrigger size="tiny" className="w-60 truncate">
+                    <div className="flex items-center gap-x-2">
+                      <p className="text-xs text-foreground-light">Organization:</p>
+                      <SelectValue placeholder="Select an organization" />
+                    </div>
+                  </SelectTrigger>
+                  <SelectContent className="col-span-8">
+                    {organizations.map((org) => (
+                      <SelectItem key={org.slug} value={org.slug} className="text-xs">
+                        {org.name}
+                      </SelectItem>
+                    ))}
+                  </SelectContent>
+                </Select>
+              )}
+              <HomePageActions hideNewProject />
+            </div>
+          </PageSection>
+          <PageSection className="pt-0 last:pb-0">
+            {isLoadingOrganizations ? (
+              <LoadingCardView />
+            ) : isErrorOrganizations ? (
+              <Alert variant="warning">
+                <AlertTriangleIcon />
+                <AlertTitle>Failed to load your Supabase organizations</AlertTitle>
+                <AlertDescription>Try refreshing the page</AlertDescription>
+              </Alert>
+            ) : organizations.length === 0 ? (
+              <NoOrganizationsState />
+            ) : !!selectedOrganization ? (
+              <ProjectList
+                organization={selectedOrganization}
+                rewriteHref={urlRewriterFactory(routeSlug)}
+              />
+            ) : null}
+          </PageSection>
+        </PageContainer>
+      </div>
+    </div>
+  )
+}
+
+export const SelectProjectPage = withAuth(SelectProject)

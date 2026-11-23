@@ -26,18 +26,18 @@ export const Pipelines = ({
   const chartMeta: {
     [key: string]: { data: DataPoint[]; margin: number; isLoading: boolean }
   } = {
-    [PricingMetric.ETL_COPY_BACKFILL_DATA]: {
+    [PricingMetric.PIPELINES_COPY_BACKFILL_DATA]: {
       data: dailyUsageToDataPoints(
         orgDailyStats,
-        (metric) => metric === PricingMetric.ETL_COPY_BACKFILL_DATA
+        (metric) => metric === PricingMetric.PIPELINES_COPY_BACKFILL_DATA
       ),
       margin: 18,
       isLoading: isLoadingOrgDailyStats,
     },
-    [PricingMetric.ETL_REPLICATED_DATA]: {
+    [PricingMetric.PIPELINES_REPLICATED_DATA]: {
       data: dailyUsageToDataPoints(
         orgDailyStats,
-        (metric) => metric === PricingMetric.ETL_REPLICATED_DATA
+        (metric) => metric === PricingMetric.PIPELINES_REPLICATED_DATA
       ),
       margin: 20,
       isLoading: isLoadingOrgDailyStats,

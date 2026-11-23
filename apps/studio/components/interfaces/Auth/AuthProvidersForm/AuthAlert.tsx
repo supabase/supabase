@@ -26,7 +26,7 @@ export const AuthAlert = ({
             below. Developers using this provider should move over to the new provider. Please refer
             to our{' '}
             <a
-              href={`${DOCS_URL}/guides/auth/social-login/auth-slack`}
+              href={`${DOCS_URL}/guides/auth/social-sign-in/auth-slack`}
               className="underline"
               target="_blank"
             >

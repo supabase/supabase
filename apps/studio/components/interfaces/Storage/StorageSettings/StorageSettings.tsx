@@ -1,5 +1,4 @@
 import { zodResolver } from '@hookform/resolvers/zod'
-import { PermissionAction } from '@supabase/shared-types/out/constants'
 import { IS_PLATFORM, useParams } from 'common'
 import { useEffect, useMemo, useState } from 'react'
 import { SubmitHandler, useForm } from 'react-hook-form'
@@ -38,6 +37,7 @@ import {
   convertFromBytes,
   convertToBytes,
   encodeBucketLimitErrorMessage,
+  isFileSizeReducedBySpendCap,
 } from './StorageSettings.utils'
 import { ValidateSizeLimit } from './StorageSettings.ValidateSizeLimit'
 import { AlertError } from '@/components/ui/AlertError'
@@ -48,7 +48,7 @@ import { useProjectStorageConfigQuery } from '@/data/config/project-storage-conf
 import { useProjectStorageConfigUpdateUpdateMutation } from '@/data/config/project-storage-config-update-mutation'
 import { useLargestBucketSizeLimitsCheck } from '@/data/storage/buckets-max-size-limit-query'
 import { useCheckEntitlements } from '@/hooks/misc/useCheckEntitlements'
-import { useAsyncCheckPermissions } from '@/hooks/misc/useCheckPermissions'
+import { FGA_PERMISSIONS, useAsyncCheckPermissionsV2 } from '@/hooks/misc/useCheckPermissionsV2'
 import { useSelectedOrganizationQuery } from '@/hooks/misc/useSelectedOrganization'
 import { useSelectedProjectQuery } from '@/hooks/misc/useSelectedProject'
 import { DOCS_URL } from '@/lib/constants'
@@ -60,13 +60,10 @@ export const StorageSettings = () => {
   const { ref: projectRef } = useParams()
   const { data: project } = useSelectedProjectQuery()
 
-  const { can: canReadStorageSettings, isLoading: isLoadingPermissions } = useAsyncCheckPermissions(
-    PermissionAction.STORAGE_ADMIN_READ,
-    '*'
-  )
-  const { can: canUpdateStorageSettings } = useAsyncCheckPermissions(
-    PermissionAction.STORAGE_ADMIN_WRITE,
-    '*'
+  const { can: canReadStorageSettings, isLoading: isLoadingPermissions } =
+    useAsyncCheckPermissionsV2(FGA_PERMISSIONS.PROJECT.STORAGE_CONFIG_READ)
+  const { can: canUpdateStorageSettings } = useAsyncCheckPermissionsV2(
+    FGA_PERMISSIONS.PROJECT.STORAGE_CONFIG_WRITE
   )
 
   const {
@@ -100,8 +97,6 @@ export const StorageSettings = () => {
     isLoading: isLoadingImageTransformationEntitlement,
   } = useCheckEntitlements('storage.image_transformations')
 
-  const isSpendCapOn =
-    organization?.plan.id === 'pro' && organization?.usage_billing_enabled === false
   const hasLimitedStorageAccess =
     !hasAccessToImageTransformations && !hasAccessToFileSizeConfiguration
 
@@ -114,6 +109,13 @@ export const StorageSettings = () => {
       return getEntitlementNumericValue() ?? STORAGE_FILE_SIZE_LIMIT_MAX_BYTES_CAPPED
     }
   }, [organization, isEntitlementUnlimited, getEntitlementNumericValue])
+
+  const showSpendCapBanner = isFileSizeReducedBySpendCap({
+    planId: organization?.plan.id,
+    isUsageBillingEnabled: organization?.usage_billing_enabled,
+    entitledMaxBytes: getEntitlementNumericValue(),
+    isEntitlementUnlimited: isEntitlementUnlimited(),
+  })
 
   const isLoading =
     isLoadingProjectStorageConfig ||
@@ -309,7 +311,7 @@ export const StorageSettings = () => {
                                     Learn more
                                   </InlineLink>
                                   .
-                                  {!shouldAutoValidateBucketLimits && (
+                                  {!isBucketEstimatePending && !shouldAutoValidateBucketLimits && (
                                     <p>
                                       Ensure that the global limit is greater than that of
                                       individual buckets
@@ -398,7 +400,7 @@ export const StorageSettings = () => {
                           )} and unlock image transformations.`}
                         />
                       )}
-                      {isSpendCapOn && (
+                      {showSpendCapBanner && (
                         <UpgradeToPro
                           fullWidth
                           addon="spendCap"
@@ -406,7 +408,7 @@ export const StorageSettings = () => {
                           source="storageSizeLimit"
                           featureProposition="increase the file upload size limits in Storage"
                           buttonText="Disable spend cap"
-                          primaryText="Reduced max upload file size limit due to spend cap"
+                          primaryText={`Max upload file size limit reduced to ${formatBytes(maxBytes)} due to spend cap`}
                           secondaryText={`Disable your spend cap to allow file uploads of up to ${formatBytes(
                             STORAGE_FILE_SIZE_LIMIT_MAX_BYTES_UNCAPPED
                           )}.`}

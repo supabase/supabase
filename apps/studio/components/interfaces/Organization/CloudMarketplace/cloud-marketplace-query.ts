@@ -2,8 +2,9 @@ import { useQuery } from '@tanstack/react-query'
 
 import { cloudMarketplaceKeys } from './keys'
 import { get, handleError } from '@/data/fetchers'
+import type { StudioError } from '@/lib/errors/studio-errors'
 import { useProfile } from '@/lib/profile'
-import type { ResponseError, UseCustomQueryOptions } from '@/types'
+import type { UseCustomQueryOptions } from '@/types'
 
 export type CloudMarketplaceOnboardingInfoVariables = {
   buyerId: string
@@ -29,7 +30,7 @@ export async function getCloudMarketplaceOnboardingInfo(
 export type CloudMarketplaceOnboardingInfo = Awaited<
   ReturnType<typeof getCloudMarketplaceOnboardingInfo>
 >
-export type CloudMarketplaceOnboardingInfoError = ResponseError
+export type CloudMarketplaceOnboardingInfoError = StudioError
 
 export const useCloudMarketplaceOnboardingInfoQuery = <TData = CloudMarketplaceOnboardingInfo>(
   { buyerId }: CloudMarketplaceOnboardingInfoVariables,
@@ -79,7 +80,7 @@ export type CloudMarketplaceContractLinkingEligibility = Awaited<
 export type CloudMarketplaceContractLinkingIneligibilityReason =
   CloudMarketplaceContractLinkingEligibility['eligibility']['reasons'][0]
 
-export type CloudMarketplaceContractEligibilityError = ResponseError
+export type CloudMarketplaceContractEligibilityError = StudioError
 
 export const useCloudMarketplaceContractLinkingEligibilityQuery = <
   TData = CloudMarketplaceContractLinkingEligibility,

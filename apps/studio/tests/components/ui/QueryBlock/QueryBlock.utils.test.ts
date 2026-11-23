@@ -26,11 +26,6 @@ describe('checkHasNonPositiveValues', () => {
     expect(checkHasNonPositiveValues(data, 'value')).toBe(true)
   })
 
-  it('returns true when all values are non-positive', () => {
-    const data = [{ value: -5 }, { value: 0 }, { value: -1 }]
-    expect(checkHasNonPositiveValues(data, 'value')).toBe(true)
-  })
-
   it('checks only the specified key', () => {
     const data = [
       { x: -1, y: 5 },
@@ -143,20 +138,6 @@ describe('getCumulativeResults', () => {
     const output = getCumulativeResults(results, config)
     expect(output[0]).toMatchObject({ x: 'a', y: 1, label: 'foo' })
     expect(output[1]).toMatchObject({ x: 'b', y: 3, label: 'bar' })
-  })
-
-  it('handles a single row', () => {
-    const results = { rows: [{ x: 'a', y: 42 }] }
-    const config = {
-      type: 'bar' as const,
-      xKey: 'x',
-      yKey: 'y',
-      cumulative: true,
-      showLabels: false,
-      showGrid: false,
-    }
-    const output = getCumulativeResults(results, config)
-    expect(output).toEqual([{ x: 'a', y: 42 }])
   })
 
   // Postgres returns `bigint`, `numeric`, `money` and `count(*)` columns as

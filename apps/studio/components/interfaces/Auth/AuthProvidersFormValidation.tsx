@@ -77,6 +77,12 @@ const PROVIDER_EMAIL = {
         },
       ],
     },
+    EXTERNAL_EMAIL_MAGIC_LINK_DISABLED: {
+      title: 'Enable magic links and email OTP',
+      description:
+        'Allow users to sign in with a magic link or a one-time password sent to their email. Passwords and other methods are not affected.',
+      type: 'boolean',
+    },
     MAILER_OTP_EXP: {
       title: 'Email OTP expiration',
       type: 'number',
@@ -97,6 +103,7 @@ const PROVIDER_EMAIL = {
       SECURITY_UPDATE_PASSWORD_REQUIRE_REAUTHENTICATION: z.boolean(),
       SECURITY_UPDATE_PASSWORD_REQUIRE_CURRENT_PASSWORD: z.boolean(),
       PASSWORD_HIBP_ENABLED: z.boolean(),
+      EXTERNAL_EMAIL_MAGIC_LINK_DISABLED: z.boolean(),
       MAILER_OTP_EXP: preprocessEmptyNumberInput(
         z.coerce
           .number({ required_error: 'This is required', invalid_type_error: 'This is required' })
@@ -122,6 +129,7 @@ const PROVIDER_EMAIL = {
       SECURITY_UPDATE_PASSWORD_REQUIRE_REAUTHENTICATION: z.boolean().optional(),
       PASSWORD_HIBP_ENABLED: z.boolean().optional(),
       SECURITY_UPDATE_PASSWORD_REQUIRE_CURRENT_PASSWORD: z.boolean().optional(),
+      EXTERNAL_EMAIL_MAGIC_LINK_DISABLED: z.boolean().optional(),
       MAILER_OTP_EXP: preprocessEmptyNumberInput(z.coerce.number().optional()),
       MAILER_OTP_LENGTH: preprocessEmptyNumberInput(z.coerce.number().optional()),
       PASSWORD_MIN_LENGTH: preprocessEmptyNumberInput(z.coerce.number().optional()),
@@ -131,7 +139,7 @@ const PROVIDER_EMAIL = {
   misc: {
     iconKey: 'email-icon2',
     helper: `To complete setup, add this authorisation callback URL to your app's configuration in the Apple Developer Console.
-[Learn more](${DOCS_URL}/guides/auth/social-login/auth-apple#configure-your-services-id)`,
+[Learn more](${DOCS_URL}/guides/auth/social-sign-in/auth-apple#configure-your-services-id)`,
   },
 }
 
@@ -576,7 +584,7 @@ export const PROVIDER_PHONE = {
   misc: {
     iconKey: 'phone-icon4',
     helper: `To complete setup, add this authorisation callback URL to your app's configuration in the Apple Developer Console.
-[Learn more](${DOCS_URL}/guides/auth/social-login/auth-apple#configure-your-services-id)`,
+[Learn more](${DOCS_URL}/guides/auth/social-sign-in/auth-apple#configure-your-services-id)`,
   },
 }
 
@@ -584,7 +592,7 @@ const EXTERNAL_PROVIDER_APPLE = {
   $schema: JSON_SCHEMA_VERSION,
   type: 'object',
   title: 'Apple',
-  link: `${DOCS_URL}/guides/auth/social-login/auth-apple`,
+  link: `${DOCS_URL}/guides/auth/social-sign-in/auth-apple`,
   properties: {
     EXTERNAL_APPLE_ENABLED: {
       title: 'Enable Sign in with Apple',
@@ -599,7 +607,7 @@ const EXTERNAL_PROVIDER_APPLE = {
     },
     EXTERNAL_APPLE_SECRET: {
       title: 'Secret Key (for OAuth)',
-      description: `Secret key used in the OAuth flow. [Learn more](${DOCS_URL}/guides/auth/social-login/auth-apple#generate-a-client_secret)`,
+      description: `Secret key used in the OAuth flow. [Learn more](${DOCS_URL}/guides/auth/social-sign-in/auth-apple#generate-a-client_secret)`,
       type: 'string',
       isSecret: true,
     },
@@ -671,7 +679,7 @@ const EXTERNAL_PROVIDER_APPLE = {
     iconKey: 'apple-icon',
     requiresRedirect: true,
     helper: `Register this callback URL when using Sign in with Apple on the web in the Apple Developer Center.
-[Learn more](${DOCS_URL}/guides/auth/social-login/auth-apple#configure-your-services-id)`,
+[Learn more](${DOCS_URL}/guides/auth/social-sign-in/auth-apple#configure-your-services-id)`,
     alert: {
       title: `Apple OAuth secret keys expire every 6 months`,
       description: `A new secret should be generated every 6 months, otherwise users on the web will not be able to sign in.`,
@@ -683,7 +691,7 @@ const EXTERNAL_PROVIDER_AZURE = {
   $schema: JSON_SCHEMA_VERSION,
   type: 'object',
   title: 'Azure',
-  link: `${DOCS_URL}/guides/auth/social-login/auth-azure`,
+  link: `${DOCS_URL}/guides/auth/social-sign-in/auth-azure`,
   properties: {
     EXTERNAL_AZURE_ENABLED: {
       title: 'Azure enabled',
@@ -697,7 +705,7 @@ const EXTERNAL_PROVIDER_AZURE = {
     EXTERNAL_AZURE_SECRET: {
       // [TODO] Change docs
       title: 'Secret Value',
-      description: `Enter the data from Value, not the Secret ID. [Learn more](${DOCS_URL}/guides/auth/social-login/auth-azure#obtain-a-secret-id)`,
+      description: `Enter the data from Value, not the Secret ID. [Learn more](${DOCS_URL}/guides/auth/social-sign-in/auth-azure#obtain-a-secret-id)`,
       type: 'string',
       isSecret: true,
     },
@@ -721,6 +729,7 @@ const EXTERNAL_PROVIDER_AZURE = {
       EXTERNAL_AZURE_SECRET: z.string().min(1, 'Secret Value is required'),
       EXTERNAL_AZURE_URL: z
         .string()
+        .trim()
         .refine((value) => !value || urlRegex().test(value), 'Must be a valid URL'),
       EXTERNAL_AZURE_EMAIL_OPTIONAL: z.boolean().optional(),
     }),
@@ -742,7 +751,7 @@ const EXTERNAL_PROVIDER_BITBUCKET = {
   $schema: JSON_SCHEMA_VERSION,
   type: 'object',
   title: 'Bitbucket',
-  link: `${DOCS_URL}/guides/auth/social-login/auth-bitbucket`,
+  link: `${DOCS_URL}/guides/auth/social-sign-in/auth-bitbucket`,
   properties: {
     EXTERNAL_BITBUCKET_ENABLED: {
       title: 'Bitbucket enabled',
@@ -788,7 +797,7 @@ const EXTERNAL_PROVIDER_DISCORD = {
   $schema: JSON_SCHEMA_VERSION,
   type: 'object',
   title: 'Discord',
-  link: `${DOCS_URL}/guides/auth/social-login/auth-discord?`,
+  link: `${DOCS_URL}/guides/auth/social-sign-in/auth-discord?`,
   properties: {
     EXTERNAL_DISCORD_ENABLED: {
       title: 'Discord enabled',
@@ -834,7 +843,7 @@ const EXTERNAL_PROVIDER_FACEBOOK = {
   $schema: JSON_SCHEMA_VERSION,
   type: 'object',
   title: 'Facebook',
-  link: `${DOCS_URL}/guides/auth/social-login/auth-facebook`,
+  link: `${DOCS_URL}/guides/auth/social-sign-in/auth-facebook`,
   properties: {
     EXTERNAL_FACEBOOK_ENABLED: {
       title: 'Facebook enabled',
@@ -880,7 +889,7 @@ const EXTERNAL_PROVIDER_FIGMA = {
   $schema: JSON_SCHEMA_VERSION,
   type: 'object',
   title: 'Figma',
-  link: `${DOCS_URL}/guides/auth/social-login/auth-figma`,
+  link: `${DOCS_URL}/guides/auth/social-sign-in/auth-figma`,
   properties: {
     EXTERNAL_FIGMA_ENABLED: {
       title: 'Figma enabled',
@@ -926,7 +935,7 @@ const EXTERNAL_PROVIDER_GITHUB = {
   $schema: JSON_SCHEMA_VERSION,
   type: 'object',
   title: 'GitHub',
-  link: `${DOCS_URL}/guides/auth/social-login/auth-github`,
+  link: `${DOCS_URL}/guides/auth/social-sign-in/auth-github`,
   properties: {
     EXTERNAL_GITHUB_ENABLED: {
       title: 'GitHub enabled',
@@ -972,7 +981,7 @@ const EXTERNAL_PROVIDER_GITLAB = {
   $schema: JSON_SCHEMA_VERSION,
   type: 'object',
   title: 'GitLab',
-  link: `${DOCS_URL}/guides/auth/social-login/auth-gitlab`,
+  link: `${DOCS_URL}/guides/auth/social-sign-in/auth-gitlab`,
   properties: {
     EXTERNAL_GITLAB_ENABLED: {
       title: 'GitLab enabled',
@@ -1015,6 +1024,7 @@ const EXTERNAL_PROVIDER_GITLAB = {
       EXTERNAL_GITLAB_SECRET: z.string().min(1, 'Client Secret is required'),
       EXTERNAL_GITLAB_URL: z
         .string()
+        .trim()
         .refine((value) => !value || urlRegex().test(value), 'Must be a valid URL')
         .optional(),
       EXTERNAL_GITLAB_EMAIL_OPTIONAL: z.boolean().optional(),
@@ -1030,7 +1040,7 @@ const EXTERNAL_PROVIDER_GOOGLE = {
   $schema: JSON_SCHEMA_VERSION,
   type: 'object',
   title: 'Google',
-  link: `${DOCS_URL}/guides/auth/social-login/auth-google`,
+  link: `${DOCS_URL}/guides/auth/social-sign-in/auth-google`,
   properties: {
     EXTERNAL_GOOGLE_ENABLED: {
       title: 'Enable Sign in with Google',
@@ -1042,7 +1052,7 @@ const EXTERNAL_PROVIDER_GOOGLE = {
       title: 'Client IDs',
       description:
         'Comma-separated list of client IDs for Web, OAuth, Android apps, One Tap, and Chrome extensions.',
-      type: 'string',
+      type: 'comma-separated-list',
     },
     EXTERNAL_GOOGLE_SECRET: {
       title: 'Client Secret (for OAuth)',
@@ -1090,7 +1100,7 @@ const EXTERNAL_PROVIDER_GOOGLE = {
     iconKey: 'google-icon',
     requiresRedirect: true,
     helper: `Register this callback URL when using Sign-in with Google on the web using OAuth.
-[Learn more](${DOCS_URL}/guides/auth/social-login/auth-google#configure-your-services-id)`,
+[Learn more](${DOCS_URL}/guides/auth/social-sign-in/auth-google#configure-your-services-id)`,
   },
 }
 
@@ -1098,7 +1108,7 @@ const EXTERNAL_PROVIDER_KAKAO = {
   $schema: JSON_SCHEMA_VERSION,
   type: 'object',
   title: 'Kakao',
-  link: `${DOCS_URL}/guides/auth/social-login/auth-kakao`,
+  link: `${DOCS_URL}/guides/auth/social-sign-in/auth-kakao`,
   properties: {
     EXTERNAL_KAKAO_ENABLED: {
       title: 'Kakao enabled',
@@ -1147,7 +1157,7 @@ const EXTERNAL_PROVIDER_KEYCLOAK = {
   $schema: JSON_SCHEMA_VERSION,
   type: 'object',
   title: 'KeyCloak',
-  link: `${DOCS_URL}/guides/auth/social-login/auth-keycloak`,
+  link: `${DOCS_URL}/guides/auth/social-sign-in/auth-keycloak`,
   properties: {
     EXTERNAL_KEYCLOAK_ENABLED: {
       title: 'Keycloak enabled',
@@ -1188,6 +1198,7 @@ const EXTERNAL_PROVIDER_KEYCLOAK = {
       EXTERNAL_KEYCLOAK_SECRET: z.string().min(1, 'Client secret is required'),
       EXTERNAL_KEYCLOAK_URL: z
         .string()
+        .trim()
         .min(1, 'Realm URL is required')
         .regex(urlRegex(), 'Must be a valid URL'),
       EXTERNAL_KEYCLOAK_EMAIL_OPTIONAL: z.boolean().optional(),
@@ -1204,7 +1215,7 @@ const EXTERNAL_PROVIDER_LINKEDIN_OIDC = {
   type: 'object',
   key: 'linkedin_oidc',
   title: 'LinkedIn (OIDC)',
-  link: `${DOCS_URL}/guides/auth/social-login/auth-linkedin`,
+  link: `${DOCS_URL}/guides/auth/social-sign-in/auth-linkedin`,
   properties: {
     EXTERNAL_LINKEDIN_OIDC_ENABLED: {
       title: 'LinkedIn enabled',
@@ -1250,7 +1261,7 @@ const EXTERNAL_PROVIDER_NOTION = {
   $schema: JSON_SCHEMA_VERSION,
   type: 'object',
   title: 'Notion',
-  link: `${DOCS_URL}/guides/auth/social-login/auth-notion`,
+  link: `${DOCS_URL}/guides/auth/social-sign-in/auth-notion`,
   properties: {
     EXTERNAL_NOTION_ENABLED: {
       title: 'Notion enabled',
@@ -1296,7 +1307,7 @@ const EXTERNAL_PROVIDER_TWITCH = {
   $schema: JSON_SCHEMA_VERSION,
   type: 'object',
   title: 'Twitch',
-  link: `${DOCS_URL}/guides/auth/social-login/auth-twitch`,
+  link: `${DOCS_URL}/guides/auth/social-sign-in/auth-twitch`,
   properties: {
     EXTERNAL_TWITCH_ENABLED: {
       title: 'Twitch enabled',
@@ -1342,7 +1353,7 @@ const EXTERNAL_PROVIDER_TWITTER = {
   $schema: JSON_SCHEMA_VERSION,
   type: 'object',
   title: 'Twitter (Deprecated)',
-  link: `${DOCS_URL}/guides/auth/social-login/auth-twitter`,
+  link: `${DOCS_URL}/guides/auth/social-sign-in/auth-twitter`,
   properties: {
     EXTERNAL_TWITTER_ENABLED: {
       title: 'Twitter enabled',
@@ -1388,7 +1399,7 @@ const EXTERNAL_PROVIDER_X = {
   $schema: JSON_SCHEMA_VERSION,
   type: 'object',
   title: 'X / Twitter (OAuth 2.0)',
-  link: `${DOCS_URL}/guides/auth/social-login/auth-twitter`,
+  link: `${DOCS_URL}/guides/auth/social-sign-in/auth-twitter`,
   properties: {
     EXTERNAL_X_ENABLED: {
       title: 'X / Twitter enabled',
@@ -1435,7 +1446,7 @@ const EXTERNAL_PROVIDER_SLACK = {
   $schema: JSON_SCHEMA_VERSION,
   type: 'object',
   title: 'Slack (Deprecated)',
-  link: `${DOCS_URL}/guides/auth/social-login/auth-slack`,
+  link: `${DOCS_URL}/guides/auth/social-sign-in/auth-slack`,
   properties: {
     EXTERNAL_SLACK_ENABLED: {
       title: 'Slack enabled',
@@ -1482,7 +1493,7 @@ const EXTERNAL_PROVIDER_SLACK_OIDC = {
   type: 'object',
   title: 'Slack (OIDC)',
   key: 'slack_oidc',
-  link: `${DOCS_URL}/guides/auth/social-login/auth-slack`,
+  link: `${DOCS_URL}/guides/auth/social-sign-in/auth-slack`,
   properties: {
     EXTERNAL_SLACK_OIDC_ENABLED: {
       title: 'Slack enabled',
@@ -1528,7 +1539,7 @@ const EXTERNAL_PROVIDER_SPOTIFY = {
   $schema: JSON_SCHEMA_VERSION,
   type: 'object',
   title: 'Spotify',
-  link: `${DOCS_URL}/guides/auth/social-login/auth-spotify`,
+  link: `${DOCS_URL}/guides/auth/social-sign-in/auth-spotify`,
   properties: {
     EXTERNAL_SPOTIFY_ENABLED: {
       title: 'Spotify enabled',
@@ -1574,7 +1585,7 @@ const EXTERNAL_PROVIDER_WORKOS = {
   $schema: JSON_SCHEMA_VERSION,
   type: 'object',
   title: 'WorkOS',
-  link: `${DOCS_URL}/guides/auth/social-login/auth-workos`,
+  link: `${DOCS_URL}/guides/auth/social-sign-in/auth-workos`,
   properties: {
     EXTERNAL_WORKOS_ENABLED: {
       title: 'WorkOS enabled',
@@ -1605,6 +1616,7 @@ const EXTERNAL_PROVIDER_WORKOS = {
       EXTERNAL_WORKOS_ENABLED: z.literal(true),
       EXTERNAL_WORKOS_URL: z
         .string()
+        .trim()
         .min(1, 'WorkOS URL is required')
         .regex(urlRegex(), 'Must be a valid URL'),
       EXTERNAL_WORKOS_CLIENT_ID: z.string().min(1, 'Client ID is required'),
@@ -1621,7 +1633,7 @@ const EXTERNAL_PROVIDER_ZOOM = {
   $schema: JSON_SCHEMA_VERSION,
   type: 'object',
   title: 'Zoom',
-  link: `${DOCS_URL}/guides/auth/social-login/auth-zoom`,
+  link: `${DOCS_URL}/guides/auth/social-sign-in/auth-zoom`,
   properties: {
     EXTERNAL_ZOOM_ENABLED: {
       title: 'Zoom enabled',
@@ -1697,11 +1709,14 @@ const PROVIDER_SAML = {
     }),
     z.object({
       SAML_ENABLED: z.literal(true),
-      SAML_EXTERNAL_URL: z.string().refine((value) => {
-        // Allow empty values
-        if (value == '') return true
-        return urlRegex().test(value)
-      }, 'Must be a valid URL'),
+      SAML_EXTERNAL_URL: z
+        .string()
+        .trim()
+        .refine((value) => {
+          // Allow empty values
+          if (value == '') return true
+          return urlRegex().test(value)
+        }, 'Must be a valid URL'),
       SAML_ALLOW_ENCRYPTED_ASSERTIONS: z.boolean().optional(),
     }),
   ]),

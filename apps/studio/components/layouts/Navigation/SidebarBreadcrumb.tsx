@@ -27,7 +27,7 @@ export const SidebarBreadcrumb = ({
         <BreadcrumbList className="flex-nowrap text-sm sm:gap-x-1">
           {parent && (
             <>
-              <BreadcrumbItem className="min-w-0 leading-none">
+              <BreadcrumbItem className="min-w-0">
                 <BreadcrumbLink
                   role="button"
                   tabIndex={0}

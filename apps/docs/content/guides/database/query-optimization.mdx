@@ -74,13 +74,15 @@ Here are some concepts and tools to keep in mind to help you identify the best i
 
 ### Analyze the query plan
 
-Use the `explain` command to understand the query's execution. Look for slow parts, such as Sequential Scans or high cost numbers. If creating an index does not reduce the cost of the query plan, remove it.
+Use the `explain` command to [understand the query's execution](/kb/troubleshooting/understanding-postgresql-explain-output-Un9dqX). Look for slow parts, such as Sequential Scans or high cost numbers. If creating an index does not reduce the cost of the query plan, remove it.
 
 For example:
 
 ```sql
 explain select * from customers where sign_up_date > 25;
 ```
+
+To get the plan of a Data API request from a client, see [Query plans with explain()](/docs/guides/api/query-plans).
 
 ### Use appropriate index types
 

@@ -54,7 +54,9 @@ export function OrganizationSelector({ form, orgSlug }: OrganizationSelectorProp
                       {orgSlug === NO_ORG_MARKER ? (
                         <span>No specific organization</span>
                       ) : (
-                        (organizations ?? []).find((o) => o.slug === field.value)?.name
+                        <span>
+                          {(organizations ?? []).find((o) => o.slug === field.value)?.name}
+                        </span>
                       )}
                       {subscriptionPlanId && <Badge variant="default">{subscriptionPlanId}</Badge>}
                     </div>

@@ -230,7 +230,7 @@ export const WarehouseSchemaTablePicker = ({
               label="Tables to replicate"
               description={
                 <span aria-live="polite">
-                  {selectedCount} table{selectedCount === 1 ? '' : 's'} selected
+                  {`${selectedCount} ${selectedCount === 1 ? 'table' : 'tables'} selected`}
                 </span>
               }
             >

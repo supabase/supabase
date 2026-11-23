@@ -1,11 +1,14 @@
 import { type PropsWithChildren } from 'react'
 import { bundledLanguages, type BundledLanguage } from 'shiki'
 import { createTwoslasher, type ExtraFiles, type NodeHover } from 'twoslash'
-import { cn } from 'ui'
-
-import { CodeBlockControls, CodeBlockTokens, type CodeToken } from './CodeBlock.client'
-import { highlightCode } from './CodeBlock.highlight'
-import { getCodeBlockLabel, getTokenClassName } from './CodeBlock.utils'
+import { highlightCode } from 'ui-patterns/CodeBlock/CodeBlock.highlight'
+import { getTokenClassName } from 'ui-patterns/CodeBlock/CodeBlock.tokens'
+import {
+  CodeBlockFrame,
+  CodeBlockTokens,
+  type CodeToken,
+} from 'ui-patterns/CodeBlock/CodeBlockFrame'
+import { TrackedCodeBlockControls } from './CodeBlockControls.client'
 import denoTypes from './types/lib.deno.d.ts.include'
 
 const extraFiles: ExtraFiles = { 'deno.d.ts': denoTypes }
@@ -28,6 +31,7 @@ export async function CodeBlock({
   skipTypeGeneration,
   hideControls = false,
   compact = false,
+  copyId,
 }: PropsWithChildren<{
   className?: string
   lang?: string
@@ -36,6 +40,7 @@ export async function CodeBlock({
   skipTypeGeneration?: boolean
   hideControls?: boolean
   compact?: boolean
+  copyId?: string
 }>) {
   let code = (contents || extractCode(children)).trim()
   const lang = tryToBundledLanguage(langSetting || '') || extractLang(children)
@@ -55,52 +60,38 @@ export async function CodeBlock({
   const { tokens } = await highlightCode(code, lang)
 
   return (
-    <div
-      className={cn(
-        'shiki',
-        'group',
-        'relative has-[.code-scroll:focus-visible]:z-1',
-        'has-[.code-scroll:focus-visible]:outline-2 has-[.code-scroll:focus-visible]:outline-ring',
-        'not-prose',
-        'w-full',
-        compact ? 'border-0 my-0!' : 'border border-default rounded-lg shadow-codeblock',
-        'bg-200',
-        'text-sm',
-        className
-      )}
+    <CodeBlockFrame
+      className={className}
+      lang={lang}
+      lineCount={tokens.length}
+      compact={compact}
+      controls={
+        hideControls ? null : (
+          <TrackedCodeBlockControls
+            content={code.trim()}
+            lang={lang ?? undefined}
+            copyId={copyId}
+          />
+        )
+      }
     >
-      <div
-        className={cn(
-          'code-scroll',
-          'w-full overflow-x-auto overscroll-x-none',
-          !compact && 'rounded-lg',
-          'focus-visible:outline-hidden'
-        )}
-        role="group"
-        aria-roledescription="code block"
-        aria-label={getCodeBlockLabel(lang, tokens.length)}
-        tabIndex={0}
-      >
-        <CodeBlockTokens
-          lineNumbers={lineNumbers}
-          lines={tokens.map((line, lineIndex) => {
-            let offset = 0
-            return line.map(({ content, color, fontStyle }): CodeToken => {
-              const annotations = twoslashed
-                ?.get(lineIndex)
-                ?.get(offset)
-                ?.map(({ text, docs, tags }) => ({ text, docs, tags }))
-              offset += content.length
-              const className = getTokenClassName(color, fontStyle)
+      <CodeBlockTokens
+        lineNumbers={lineNumbers}
+        lines={tokens.map((line, lineIndex) => {
+          let offset = 0
+          return line.map(({ content, color, fontStyle }): CodeToken => {
+            const annotations = twoslashed
+              ?.get(lineIndex)
+              ?.get(offset)
+              ?.map(({ text, docs, tags }) => ({ text, docs, tags }))
+            offset += content.length
+            const className = getTokenClassName(color, fontStyle)
 
-              return annotations ? [content, className, annotations] : [content, className]
-            })
-          })}
-        />
-      </div>
-      {/* After the code so the block is named before its controls, and outside the scroller so they stay pinned */}
-      {!hideControls && <CodeBlockControls content={code.trim()} />}
-    </div>
+            return annotations ? [content, className, annotations] : [content, className]
+          })
+        })}
+      />
+    </CodeBlockFrame>
   )
 }
 

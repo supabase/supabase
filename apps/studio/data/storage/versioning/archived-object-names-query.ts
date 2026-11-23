@@ -6,7 +6,7 @@ import { storageKeys } from '../keys'
 import { dropPartialTrailingPath, toArchivedObjects } from './archived-objects-query'
 import { EMPTY_FOLDER_PLACEHOLDER_FILE_NAME } from '@/components/interfaces/Storage/StorageExplorer/StorageExplorer.utils'
 import { IS_PLATFORM } from '@/lib/constants'
-import type { ResponseError } from '@/types'
+import type { StudioError } from '@/lib/errors/studio-errors'
 
 type StorageObjectV2 = components['schemas']['StorageListResponseV2_Output']['objects'][number]
 
@@ -17,7 +17,7 @@ export type ArchivedObjectNamesVariables = {
   path: string
 }
 
-export type ArchivedObjectNamesError = ResponseError
+export type ArchivedObjectNamesError = StudioError
 
 /**
  * One page only. A folder holding more versioned rows than this just goes unchecked, which

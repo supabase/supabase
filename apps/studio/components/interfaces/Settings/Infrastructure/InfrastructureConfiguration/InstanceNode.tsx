@@ -153,11 +153,11 @@ export const PrimaryNode = ({ data }: NodeProps<Node<PrimaryNodeData>>) => {
           <div className="border-t p-3 py-2">
             <p className="text-sm text-foreground-light">
               <span className="text-foreground">
-                {numReplicas} replica{numReplicas > 1 ? 's' : ''}
+                {numReplicas} replica{numReplicas > 1 ? <span>s</span> : ''}
               </span>{' '}
               deployed across{' '}
               <span className="text-foreground">
-                {numRegions} region{numRegions > 1 ? 's' : ''}
+                {numRegions} region{numRegions > 1 ? <span>s</span> : ''}
               </span>
             </p>
           </div>
@@ -246,7 +246,7 @@ export const ReplicaNode = ({ data }: NodeProps<Node<ReplicaNodeData>>) => {
           <div className="flex flex-col gap-y-0.5">
             <div className="flex items-center gap-x-2">
               <p className="text-sm truncate">
-                Replica {id.length > 0 && `(ID: ${formatDatabaseID(id)})`}
+                Replica {id.length > 0 && <span>{`(ID: ${formatDatabaseID(id)})`}</span>}
               </p>
               {initStatus === ReplicaInitializationStatus.InProgress ||
               status === REPLICA_STATUS.COMING_UP ||

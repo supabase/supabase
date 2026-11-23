@@ -1,14 +1,18 @@
 import { fireEvent, screen, waitFor } from '@testing-library/react'
 import userEvent from '@testing-library/user-event'
+import { HttpResponse } from 'msw'
 import { toast } from 'sonner'
 import { beforeEach, describe, expect, it, vi } from 'vitest'
 
 import { urlRegex } from '../Auth.constants'
 import { AddNewURLModal } from './AddNewURLModal'
-import { render } from '@/tests/helpers'
+import type { AuthConfigResponse } from '@/data/auth/auth-config-query'
+import { customRender } from '@/tests/lib/custom-render'
+import { addAPIMock } from '@/tests/lib/msw'
 
 // One entry per URL shape urlRegex() accepts. None may be split by the paste separator,
-// otherwise pasting a valid URL would produce invalid rows.
+// otherwise pasting a valid URL would produce invalid rows. Pasting them all at once must
+// round-trip to exactly this list, which also proves no single entry gets split.
 const SUPPORTED_URL_FORMS = [
   'https://example.com',
   'https://example.com/auth/callback',
@@ -28,24 +32,6 @@ const SUPPORTED_URL_FORMS = [
   'myapp:/callback',
 ]
 
-const { mutateMock, useAuthConfigUpdateMutationMock } = vi.hoisted(() => ({
-  mutateMock: vi.fn(),
-  useAuthConfigUpdateMutationMock: vi.fn(),
-}))
-
-vi.mock(import('common'), async (importOriginal) => {
-  const actual = await importOriginal()
-
-  return {
-    ...actual,
-    useParams: vi.fn().mockReturnValue({ ref: 'project-ref' }),
-  }
-})
-
-vi.mock('@/data/auth/auth-config-update-mutation', () => ({
-  useAuthConfigUpdateMutation: useAuthConfigUpdateMutationMock,
-}))
-
 vi.mock('sonner', () => ({
   toast: {
     success: vi.fn(),
@@ -53,19 +39,34 @@ vi.mock('sonner', () => ({
   },
 }))
 
+const mockAuthConfigUpdate = () => {
+  const requests: Array<{ ref: string | undefined; body: unknown }> = []
+
+  addAPIMock({
+    method: 'patch',
+    path: '/platform/auth/:ref/config',
+    response: async ({ request, params }) => {
+      requests.push({ ref: params.ref as string | undefined, body: await request.json() })
+      return HttpResponse.json<AuthConfigResponse>({} as AuthConfigResponse)
+    },
+  })
+
+  return requests
+}
+
+const submitForm = () =>
+  fireEvent.submit(screen.getByRole('dialog').querySelector('form') as HTMLFormElement)
+
 describe('AddNewURLModal', () => {
   beforeEach(() => {
-    useAuthConfigUpdateMutationMock.mockReturnValue({
-      mutate: mutateMock,
-      isPending: false,
-    })
+    vi.clearAllMocks()
   })
 
   it('adds and removes URL rows before submitting the current values', async () => {
     const user = userEvent.setup()
-    mutateMock.mockImplementation((_vars, callbacks) => callbacks?.onSuccess?.())
+    const requests = mockAuthConfigUpdate()
 
-    render(
+    customRender(
       <AddNewURLModal visible allowList={['https://existing.example.com']} onClose={vi.fn()} />
     )
 
@@ -73,66 +74,54 @@ describe('AddNewURLModal', () => {
 
     expect(screen.getAllByPlaceholderText('https://mydomain.com')).toHaveLength(1)
 
-    await user.type(screen.getByPlaceholderText('https://mydomain.com'), 'https://app.example.com')
+    fireEvent.change(screen.getByPlaceholderText('https://mydomain.com'), {
+      target: { value: 'https://app.example.com' },
+    })
     await user.click(screen.getByRole('button', { name: 'Add URL' }))
 
     const urlInputs = screen.getAllByPlaceholderText('https://mydomain.com')
     expect(urlInputs).toHaveLength(2)
 
-    await user.type(urlInputs[1], 'https://dashboard.example.com')
+    fireEvent.change(urlInputs[1], { target: { value: 'https://dashboard.example.com' } })
     await user.click(screen.getAllByRole('button', { name: 'Remove URL' })[1])
 
     expect(screen.getAllByPlaceholderText('https://mydomain.com')).toHaveLength(1)
 
-    fireEvent.submit(screen.getByRole('dialog').querySelector('form') as HTMLFormElement)
+    submitForm()
 
-    await waitFor(() =>
-      expect(mutateMock).toHaveBeenCalledWith(
-        {
-          projectRef: 'project-ref',
-          config: {
-            URI_ALLOW_LIST: 'https://existing.example.com,https://app.example.com',
-          },
-        },
-        expect.any(Object)
-      )
-    )
-
-    expect(toast.success).toHaveBeenCalledWith('Successfully added 1 URL')
+    await waitFor(() => expect(toast.success).toHaveBeenCalledWith('Successfully added 1 URL'))
+    expect(requests).toEqual([
+      {
+        ref: 'default',
+        body: { URI_ALLOW_LIST: 'https://existing.example.com,https://app.example.com' },
+      },
+    ])
   })
 
   it('normalizes a trailing-comma URL before submitting', async () => {
-    const user = userEvent.setup()
-    mutateMock.mockImplementation((_vars, callbacks) => callbacks?.onSuccess?.())
+    const requests = mockAuthConfigUpdate()
 
-    render(<AddNewURLModal visible allowList={[]} onClose={vi.fn()} />)
+    customRender(<AddNewURLModal visible allowList={[]} onClose={vi.fn()} />)
 
     await screen.findByRole('dialog')
 
-    await user.type(screen.getByPlaceholderText('https://mydomain.com'), 'https://app.example.com,')
+    fireEvent.change(screen.getByPlaceholderText('https://mydomain.com'), {
+      target: { value: 'https://app.example.com,' },
+    })
 
-    fireEvent.submit(screen.getByRole('dialog').querySelector('form') as HTMLFormElement)
+    submitForm()
 
-    await waitFor(() =>
-      expect(mutateMock).toHaveBeenCalledWith(
-        {
-          projectRef: 'project-ref',
-          config: {
-            URI_ALLOW_LIST: 'https://app.example.com',
-          },
-        },
-        expect.any(Object)
-      )
-    )
-
-    expect(toast.success).toHaveBeenCalledWith('Successfully added 1 URL')
+    await waitFor(() => expect(toast.success).toHaveBeenCalledWith('Successfully added 1 URL'))
+    expect(requests).toEqual([
+      { ref: 'default', body: { URI_ALLOW_LIST: 'https://app.example.com' } },
+    ])
   })
 
   it('splits a pasted list on commas, spaces and line breaks', async () => {
     const user = userEvent.setup()
-    mutateMock.mockImplementation((_vars, callbacks) => callbacks?.onSuccess?.())
+    const requests = mockAuthConfigUpdate()
 
-    render(
+    customRender(
       <AddNewURLModal visible allowList={['https://existing.example.com']} onClose={vi.fn()} />
     )
 
@@ -145,28 +134,25 @@ describe('AddNewURLModal', () => {
 
     expect(screen.getAllByPlaceholderText('https://mydomain.com')).toHaveLength(4)
 
-    fireEvent.submit(screen.getByRole('dialog').querySelector('form') as HTMLFormElement)
+    submitForm()
 
-    await waitFor(() =>
-      expect(mutateMock).toHaveBeenCalledWith(
-        {
-          projectRef: 'project-ref',
-          config: {
-            URI_ALLOW_LIST:
-              'https://existing.example.com,https://a.example.com,https://b.example.com,https://c.example.com,https://d.example.com',
-          },
+    await waitFor(() => expect(toast.success).toHaveBeenCalledWith('Successfully added 4 URLs'))
+    expect(requests).toEqual([
+      {
+        ref: 'default',
+        body: {
+          URI_ALLOW_LIST:
+            'https://existing.example.com,https://a.example.com,https://b.example.com,https://c.example.com,https://d.example.com',
         },
-        expect.any(Object)
-      )
-    )
-
-    expect(toast.success).toHaveBeenCalledWith('Successfully added 4 URLs')
+      },
+    ])
   })
 
   it('flags a duplicate within a pasted list instead of collapsing it', async () => {
     const user = userEvent.setup()
+    const requests = mockAuthConfigUpdate()
 
-    render(<AddNewURLModal visible allowList={[]} onClose={vi.fn()} />)
+    customRender(<AddNewURLModal visible allowList={[]} onClose={vi.fn()} />)
 
     await screen.findByRole('dialog')
 
@@ -175,33 +161,17 @@ describe('AddNewURLModal', () => {
 
     expect(screen.getAllByPlaceholderText('https://mydomain.com')).toHaveLength(2)
 
-    fireEvent.submit(screen.getByRole('dialog').querySelector('form') as HTMLFormElement)
+    submitForm()
 
     expect(await screen.findByText('URL already exists in this list')).toBeInTheDocument()
-    expect(mutateMock).not.toHaveBeenCalled()
+    expect(requests).toHaveLength(0)
   })
 
-  it.each(SUPPORTED_URL_FORMS)('leaves the supported URL form %s on one row', async (url) => {
+  it('splits a list of every supported URL form back into that list and saves it', async () => {
     const user = userEvent.setup()
+    const requests = mockAuthConfigUpdate()
 
-    expect(urlRegex().test(url)).toBe(true)
-
-    render(<AddNewURLModal visible allowList={[]} onClose={vi.fn()} />)
-
-    await screen.findByRole('dialog')
-
-    await user.click(screen.getByPlaceholderText('https://mydomain.com'))
-    await user.paste(url)
-
-    const inputs = screen.getAllByPlaceholderText('https://mydomain.com') as HTMLInputElement[]
-    expect(inputs).toHaveLength(1)
-    expect(inputs[0].value).toBe(url)
-  })
-
-  it('splits a list of every supported URL form back into that list', async () => {
-    const user = userEvent.setup()
-
-    render(<AddNewURLModal visible allowList={[]} onClose={vi.fn()} />)
+    customRender(<AddNewURLModal visible allowList={[]} onClose={vi.fn()} />)
 
     await screen.findByRole('dialog')
 
@@ -214,12 +184,46 @@ describe('AddNewURLModal', () => {
 
     expect(values).toEqual(SUPPORTED_URL_FORMS)
     values.forEach((value) => expect(urlRegex().test(value)).toBe(true))
+
+    submitForm()
+
+    await waitFor(() =>
+      expect(toast.success).toHaveBeenCalledWith(
+        `Successfully added ${SUPPORTED_URL_FORMS.length} URLs`
+      )
+    )
+    expect(requests).toEqual([
+      { ref: 'default', body: { URI_ALLOW_LIST: SUPPORTED_URL_FORMS.join(',') } },
+    ])
+  })
+
+  it.each([
+    ['https://my app.example.com', "URL can't contain spaces"],
+    ['https://example.com/auth callback', "URL can't contain spaces"],
+    ['http://localhost:3000\\', "URL can't contain backslashes"],
+    ['myapp://callback\\', "URL can't contain backslashes"],
+  ])('rejects %s without saving', async (url, message) => {
+    const requests = mockAuthConfigUpdate()
+
+    customRender(<AddNewURLModal visible allowList={[]} onClose={vi.fn()} />)
+
+    await screen.findByRole('dialog')
+
+    fireEvent.change(screen.getByPlaceholderText('https://mydomain.com'), {
+      target: { value: url },
+    })
+
+    submitForm()
+
+    expect(await screen.findByText(message)).toBeInTheDocument()
+    expect(requests).toHaveLength(0)
   })
 
   it('validates each pasted URL on its own row', async () => {
     const user = userEvent.setup()
+    const requests = mockAuthConfigUpdate()
 
-    render(
+    customRender(
       <AddNewURLModal visible allowList={['https://existing.example.com']} onClose={vi.fn()} />
     )
 
@@ -230,49 +234,47 @@ describe('AddNewURLModal', () => {
 
     expect(screen.getAllByPlaceholderText('https://mydomain.com')).toHaveLength(2)
 
-    fireEvent.submit(screen.getByRole('dialog').querySelector('form') as HTMLFormElement)
+    submitForm()
 
     expect(await screen.findByText('URL already exists in the allow list')).toBeInTheDocument()
-    expect(mutateMock).not.toHaveBeenCalled()
+    expect(requests).toHaveLength(0)
   })
 
   it('rejects a trailing-comma URL when it already exists in the allow list', async () => {
-    const user = userEvent.setup()
+    const requests = mockAuthConfigUpdate()
 
-    render(
+    customRender(
       <AddNewURLModal visible allowList={['https://existing.example.com']} onClose={vi.fn()} />
     )
 
     await screen.findByRole('dialog')
 
-    await user.type(
-      screen.getByPlaceholderText('https://mydomain.com'),
-      'https://existing.example.com,'
-    )
+    fireEvent.change(screen.getByPlaceholderText('https://mydomain.com'), {
+      target: { value: 'https://existing.example.com,' },
+    })
 
-    fireEvent.submit(screen.getByRole('dialog').querySelector('form') as HTMLFormElement)
+    submitForm()
 
     expect(await screen.findByText('URL already exists in the allow list')).toBeInTheDocument()
-    expect(mutateMock).not.toHaveBeenCalled()
+    expect(requests).toHaveLength(0)
   })
 
   it('rejects a whitespace-padded URL when it already exists in the allow list', async () => {
-    const user = userEvent.setup()
+    const requests = mockAuthConfigUpdate()
 
-    render(
+    customRender(
       <AddNewURLModal visible allowList={['https://existing.example.com']} onClose={vi.fn()} />
     )
 
     await screen.findByRole('dialog')
 
-    await user.type(
-      screen.getByPlaceholderText('https://mydomain.com'),
-      ' https://existing.example.com '
-    )
+    fireEvent.change(screen.getByPlaceholderText('https://mydomain.com'), {
+      target: { value: ' https://existing.example.com ' },
+    })
 
-    fireEvent.submit(screen.getByRole('dialog').querySelector('form') as HTMLFormElement)
+    submitForm()
 
     expect(await screen.findByText('URL already exists in the allow list')).toBeInTheDocument()
-    expect(mutateMock).not.toHaveBeenCalled()
+    expect(requests).toHaveLength(0)
   })
 })

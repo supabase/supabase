@@ -89,7 +89,8 @@ export const usePipelineCreationSubmission = ({
   return {
     handleSubmit,
     isSubmitting,
-    failures,
+    destinationValidationFailures,
+    pipelineValidationFailures,
     submitLabel:
       failures.length > 0 && failures.every(({ failure_type }) => failure_type === 'warning')
         ? 'Start pipeline anyway'

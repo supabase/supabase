@@ -19,7 +19,8 @@ type PipelineReplicationStatusResponse =
   components['schemas']['PipelineReplicationStatusResponse_Output']
 
 const pipeline: PipelineResponse = {
-  id: 42,
+  id: '42',
+  cluster_id: 'cluster',
   config: { publication_name: 'analytics_publication' },
   destination_id: 7,
   destination_name: 'Analytics warehouse',
@@ -44,7 +45,7 @@ const mockPipelineQueries = ({
     path: '/platform/replication/:ref/pipelines/:pipeline_id/status',
     response: () =>
       HttpResponse.json<PipelineStatusResponse>({
-        pipeline_id: 42,
+        pipeline_id: '42',
         status: { name: 'started' },
       }),
   })
@@ -53,7 +54,7 @@ const mockPipelineQueries = ({
     path: '/platform/replication/:ref/pipelines/:pipeline_id/replication-status',
     response: () =>
       HttpResponse.json<PipelineReplicationStatusResponse>({
-        pipeline_id: 42,
+        pipeline_id: '42',
         apply_lag: {
           active: true,
           wal_status: 'reserved',
@@ -92,7 +93,7 @@ describe('ReplicationPipelineStatus', () => {
       path: '/platform/replication/:ref/pipelines/:pipeline_id/replication-status',
       response: () =>
         HttpResponse.json<PipelineReplicationStatusResponse>({
-          pipeline_id: 42,
+          pipeline_id: '42',
           apply_lag: {
             active: true,
             wal_status: 'reserved',
@@ -122,7 +123,7 @@ describe('ReplicationPipelineStatus', () => {
     expect(screen.getByRole('status')).toHaveTextContent('Loading pipeline details')
 
     resolvePipelineStatus({
-      pipeline_id: 42,
+      pipeline_id: '42',
       status: { name: 'started' },
     })
 

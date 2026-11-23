@@ -14,10 +14,8 @@ export const FEDERATED_SECTIONS = [
 export const MAX_SCOPED_PAGES = 20
 
 const GUIDES_PREFIX = 'apps/docs/content/guides/'
-const TROUBLESHOOTING_PREFIX = 'apps/docs/content/troubleshooting/'
 const PARTIALS_PREFIX = 'apps/docs/content/_partials/'
 const DOCS_GUIDES_URL_PREFIX = '/docs/guides/'
-const DOCS_TROUBLESHOOTING_URL_PREFIX = '/docs/guides/troubleshooting/'
 const FEDERATED_CONTENT_SOURCES_DIR = 'apps/docs/scripts/federated-content/sources'
 export const GUIDE_LIST_COMPONENT =
   'apps/docs/components/Navigation/NavigationMenu/NavigationMenuGuideListItems.tsx'
@@ -27,6 +25,9 @@ export const GUIDE_LIST_COMPONENT_PAGES = [
   '/docs/guides/getting-started/quickstarts/nextjs',
   '/docs/guides/integrations/build-a-supabase-oauth-integration/oauth-scopes',
 ]
+
+// the nav disables these guides, so the docs app returns 404 for their html page
+const NAV_DISABLED_PAGES = new Set(['/docs/guides/ai-tools/agent-feedback'])
 
 const PARTIAL_PATH_RE = /<\$Partial\b[\s\S]*?\bpath\s*=\s*"([^"]+)"[\s\S]*?\/?>/g
 const SOURCE_SECTION_RE = /\bsection:\s*'([^']+)'/g
@@ -97,12 +98,6 @@ export function changedFileToPagePath(filePath: string): string | null {
     return `${DOCS_GUIDES_URL_PREFIX}${slug}`
   }
 
-  if (normalized.startsWith(TROUBLESHOOTING_PREFIX) && normalized.endsWith('.mdx')) {
-    if (isHiddenMdx(normalized)) return null
-    const slug = basename(normalized, '.mdx')
-    return `${DOCS_TROUBLESHOOTING_URL_PREFIX}${slug}`
-  }
-
   return null
 }
 
@@ -169,12 +164,10 @@ async function buildPartialIndex(repoRoot: string): Promise<PartialIndex> {
 
   const partialsDir = join(repoRoot, 'apps/docs/content/_partials')
   const guidesDir = join(repoRoot, 'apps/docs/content/guides')
-  const troubleshootingDir = join(repoRoot, 'apps/docs/content/troubleshooting')
 
-  const [partialFiles, guideFiles, troubleshootingFiles] = await Promise.all([
+  const [partialFiles, guideFiles] = await Promise.all([
     walkMdxFiles(partialsDir).catch(() => [] as string[]),
     walkMdxFiles(guidesDir).catch(() => [] as string[]),
-    walkMdxFiles(troubleshootingDir).catch(() => [] as string[]),
   ])
 
   for (const file of partialFiles) {
@@ -194,14 +187,6 @@ async function buildPartialIndex(repoRoot: string): Promise<PartialIndex> {
     const relFromGuides = normalizeRepoPath(relative(guidesDir, file)).replace(/\.mdx$/, '')
     if (isFederatedGuideSlug(relFromGuides)) continue
     const pagePath = `${DOCS_GUIDES_URL_PREFIX}${relFromGuides}`
-    const source = await readFile(file, 'utf8')
-    const refs = extractPartialRefs(source)
-    if (refs.length > 0) pagePartials.set(pagePath, new Set(refs))
-  }
-
-  for (const file of troubleshootingFiles) {
-    const slug = basename(file, '.mdx')
-    const pagePath = `${DOCS_TROUBLESHOOTING_URL_PREFIX}${slug}`
     const source = await readFile(file, 'utf8')
     const refs = extractPartialRefs(source)
     if (refs.length > 0) pagePartials.set(pagePath, new Set(refs))
@@ -288,7 +273,7 @@ export async function resolveDocsScope(
   const selectedRequiredPages = [...requiredPages].sort().slice(0, maxPages)
   const remainingSlots = Math.max(0, maxPages - selectedRequiredPages.length)
   const selectedPages = [...pages]
-    .filter((page) => !requiredPages.has(page))
+    .filter((page) => !requiredPages.has(page) && !NAV_DISABLED_PAGES.has(page))
     .sort()
     .slice(0, remainingSlots)
   const sorted = [...selectedRequiredPages, ...selectedPages].sort()
@@ -303,24 +288,15 @@ export async function resolveAllDocsPages(repoRoot: string): Promise<string[]> {
   await assertFederatedSectionsInSync(repoRoot)
 
   const guidesDir = join(repoRoot, 'apps/docs/content/guides')
-  const troubleshootingDir = join(repoRoot, 'apps/docs/content/troubleshooting')
-
-  const [guideFiles, troubleshootingFiles] = await Promise.all([
-    walkMdxFiles(guidesDir).catch(() => [] as string[]),
-    walkMdxFiles(troubleshootingDir).catch(() => [] as string[]),
-  ])
+  const guideFiles = await walkMdxFiles(guidesDir).catch(() => [] as string[])
 
   const pages = new Set<string>()
 
   for (const file of guideFiles) {
     const relFromGuides = normalizeRepoPath(relative(guidesDir, file)).replace(/\.mdx$/, '')
-    if (isFederatedGuideSlug(relFromGuides)) continue
-    pages.add(`${DOCS_GUIDES_URL_PREFIX}${relFromGuides}`)
-  }
-
-  for (const file of troubleshootingFiles) {
-    const slug = basename(file, '.mdx')
-    pages.add(`${DOCS_TROUBLESHOOTING_URL_PREFIX}${slug}`)
+    const page = `${DOCS_GUIDES_URL_PREFIX}${relFromGuides}`
+    if (isFederatedGuideSlug(relFromGuides) || NAV_DISABLED_PAGES.has(page)) continue
+    pages.add(page)
   }
 
   return [...pages].sort()

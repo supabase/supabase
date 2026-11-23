@@ -4,7 +4,8 @@ import type { components } from 'api-types'
 import { realtimeKeys } from './keys'
 import { get, handleError } from '@/data/fetchers'
 import { IS_PLATFORM } from '@/lib/constants'
-import type { ResponseError, UseCustomQueryOptions } from '@/types'
+import type { StudioError } from '@/lib/errors/studio-errors'
+import type { UseCustomQueryOptions } from '@/types'
 
 type RealtimeConfigResponse = components['schemas']['RealtimeConfigResponse_Output']
 
@@ -39,7 +40,7 @@ export async function getRealtimeConfiguration(
     signal,
   })
   if (error) {
-    if ((error as ResponseError).message === 'Custom realtime config for a project not found') {
+    if ((error as StudioError).message === 'Custom realtime config for a project not found') {
       return REALTIME_DEFAULT_CONFIG
     } else {
       handleError(error)
@@ -49,7 +50,7 @@ export async function getRealtimeConfiguration(
 }
 
 export type RealtimeConfigurationData = Awaited<ReturnType<typeof getRealtimeConfiguration>>
-export type RealtimeConfigurationError = ResponseError
+export type RealtimeConfigurationError = StudioError
 
 export const useRealtimeConfigurationQuery = <TData = RealtimeConfigurationData>(
   { projectRef }: RealtimeConfigurationVariables,

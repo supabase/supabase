@@ -127,6 +127,15 @@ export const filterFields = [
     },
   },
   {
+    label: 'Pipeline ID',
+    value: 'pipeline_id',
+    type: 'checkbox',
+    defaultOpen: false,
+    options: [],
+    hasDynamicOptions: true,
+    hasAsyncSearch: true,
+  },
+  {
     label: 'Event message',
     value: 'event_message',
     type: 'checkbox',

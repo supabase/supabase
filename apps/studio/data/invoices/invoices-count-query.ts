@@ -2,7 +2,8 @@ import { useQuery } from '@tanstack/react-query'
 
 import { invoicesKeys } from './keys'
 import { head } from '@/data/fetchers'
-import type { ResponseError, UseCustomQueryOptions } from '@/types'
+import type { StudioError } from '@/lib/errors/studio-errors'
+import type { UseCustomQueryOptions } from '@/types'
 
 export type InvoicesCountVariables = {
   slug?: string
@@ -22,7 +23,7 @@ export async function getInvoicesCount({ slug }: InvoicesCountVariables, signal?
 }
 
 export type InvoicesCountData = Awaited<ReturnType<typeof getInvoicesCount>>
-export type InvoicesCountError = ResponseError
+export type InvoicesCountError = StudioError
 
 export const useInvoicesCountQuery = <TData = InvoicesCountData>(
   { slug }: InvoicesCountVariables,

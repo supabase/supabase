@@ -2,9 +2,7 @@
 
 import 'react-data-grid/lib/styles.css'
 import '@/styles/code.css'
-// Vite-only: defines @font-face for the custom fonts. The Next pipeline
-// (pages/_app.tsx) loads these via next/font instead, so this import has no
-// counterpart there — but dropping it under Vite makes the browser fall back
+// Defines @font-face for the custom fonts; without it the browser falls back
 // to system fonts.
 import '@/styles/fonts.css'
 import '@/styles/graphiql-base.css'
@@ -24,12 +22,13 @@ import { TanStackDevtools } from '@tanstack/react-devtools'
 import type { QueryClient } from '@tanstack/react-query'
 import { ReactQueryDevtoolsPanel } from '@tanstack/react-query-devtools'
 import {
-  ClientOnly,
   createRootRouteWithContext,
   HeadContent,
   Outlet,
   redirect,
   Scripts,
+  useHydrated,
+  useLocation,
   type AnyRouter,
   type ErrorComponentProps,
 } from '@tanstack/react-router'
@@ -62,6 +61,7 @@ import { ErrorBoundary } from 'react-error-boundary'
 import { TooltipProvider } from 'ui'
 import { TimestampInfoProvider } from 'ui-patterns/TimestampInfo'
 
+import { RecoveryReminderController } from '@/components/interfaces/Account/RecoveryReminderController'
 import { AppearanceSettingsProvider } from '@/components/interfaces/App/AppearanceSettingsProvider'
 import { StudioCommandMenu } from '@/components/interfaces/App/CommandMenu'
 import { StudioCommandProvider as CommandProvider } from '@/components/interfaces/App/CommandMenu/StudioCommandProvider'
@@ -69,16 +69,20 @@ import { FeaturePreviewContextProvider } from '@/components/interfaces/App/Featu
 import { FeaturePreviewModal } from '@/components/interfaces/App/FeaturePreview/FeaturePreviewModal'
 import { IndirectTaxDeclarationModal } from '@/components/interfaces/App/IndirectTaxDeclarationModal'
 import { MonacoThemeProvider } from '@/components/interfaces/App/MonacoThemeProvider'
+import { NotFoundPage } from '@/components/interfaces/App/NotFoundPage'
 import { RouteValidationWrapper } from '@/components/interfaces/App/RouteValidationWrapper'
+import { ServerErrorPage } from '@/components/interfaces/App/ServerErrorPage'
 import { ShellFallback } from '@/components/interfaces/App/ShellFallback'
 import { MainScrollContainerProvider } from '@/components/layouts/MainScrollContainerContext'
 import { BannerStackProvider } from '@/components/ui/BannerStack/BannerStackProvider'
 import { GlobalErrorBoundaryState } from '@/components/ui/ErrorBoundary/GlobalErrorBoundaryState'
+import { useChunkLoadReload } from '@/components/ui/ErrorBoundary/useChunkLoadReload'
 import { GlobalShortcuts } from '@/components/ui/GlobalShortcuts/GlobalShortcuts'
 import { useCustomContent } from '@/hooks/custom-content/useCustomContent'
 import { useSelectedOrganizationQuery } from '@/hooks/misc/useSelectedOrganization'
 import { useSelectedOrganizationCreatedAtQuery } from '@/hooks/misc/useSelectedOrganizationCreatedAt'
 import { AuthProvider } from '@/lib/auth'
+import { getChunkLoadReloadDecision, isChunkLoadError } from '@/lib/chunk-load-error'
 import { getCLIFaviconRoute } from '@/lib/cli-favicon'
 import { toUnixSecondsString } from '@/lib/configcat-attributes'
 import { configureMonacoLoader } from '@/lib/configure-monaco-loader'
@@ -88,12 +92,11 @@ import { splitInternalUrl } from '@/lib/internal-url'
 // Custom adapter instead of `nuqs/adapters/tanstack-router` — the stock one
 // injects a trailing slash before the query on every nuqs write (see module).
 import { NuqsAdapter } from '@/lib/nuqs-tanstack-adapter'
+import { isPrerenderedRoute } from '@/lib/prerendered-routes'
 import { ProfileProvider } from '@/lib/profile'
 import { Telemetry } from '@/lib/telemetry'
 import { ToastErrorTracker } from '@/lib/toast-errors'
 import { Toaster } from '@/lib/toaster'
-import Error404 from '@/pages/404'
-import Error500 from '@/pages/500'
 import { matchRedirect } from '@/redirects.shared'
 import { AiAssistantStateContextProvider } from '@/state/ai-assistant-state'
 
@@ -155,7 +158,7 @@ const IS_NON_PROD_ENV =
   process.env.NEXT_PUBLIC_ENVIRONMENT === 'local' ||
   process.env.NEXT_PUBLIC_ENVIRONMENT === 'staging'
 
-// Mirrors the `MAINTENANCE_MODE` reads in `next.config.ts` and `vercel.ts`.
+// Mirrors the `MAINTENANCE_MODE` read in `vercel.ts`.
 // The var is unprefixed, so vite.config.ts inlines it explicitly (see the
 // define there) rather than it arriving via the NEXT_PUBLIC_ sweep — that
 // keeps the toggle a single build-time env var across all three runtimes.
@@ -180,8 +183,23 @@ const ProjectStatusTab = IS_DEV_TOOLBAR_ENABLED
     )
   : () => null
 
+const MetricsTab = IS_DEV_TOOLBAR_ENABLED
+  ? lazy(() =>
+      import('@/components/ui/DevToolbar/MetricsTab').then((m) => ({ default: m.MetricsTab }))
+    )
+  : () => null
+
 const devToolbarExtraTabs: ExtraTab[] = IS_DEV_TOOLBAR_ENABLED
   ? [
+      {
+        id: 'metrics',
+        label: 'Metrics',
+        content: (
+          <Suspense fallback={null}>
+            <MetricsTab />
+          </Suspense>
+        ),
+      },
       {
         id: 'warnings',
         label: 'Warnings',
@@ -250,8 +268,16 @@ function DynamicTitle() {
 }
 
 const errorBoundaryHandler = (error: Error, _info: ErrorInfo) => {
+  // A chunk failure a reload recovers from isn't worth reporting; one that
+  // recurs inside the reload guard window is reported below
+  if (getChunkLoadReloadDecision(error)) {
+    window.location.reload()
+    return
+  }
+
   Sentry.withScope(function (scope) {
     scope.setTag('globalErrorBoundary', true)
+    if (isChunkLoadError(error)) scope.setTag('chunkLoadError', true)
     const eventId = Sentry.captureException(error)
     // Attach the Sentry event ID to the error object so it can be accessed by the error boundary
     if (eventId && error && typeof error === 'object') {
@@ -263,7 +289,7 @@ const errorBoundaryHandler = (error: Error, _info: ErrorInfo) => {
 }
 
 function NotFound() {
-  return <Error404 />
+  return <NotFoundPage />
 }
 
 function ErrorBoundaryRoute({ error }: ErrorComponentProps) {
@@ -271,22 +297,28 @@ function ErrorBoundaryRoute({ error }: ErrorComponentProps) {
   // `react-error-boundary`) — TanStack's `errorComponent` covers
   // errors thrown during route load/render before the in-tree
   // boundary mounts, so we report from both layers.
+  const { isReloading } = useChunkLoadReload(error)
+
   useEffect(() => {
+    if (isReloading) return
+
     Sentry.withScope((scope) => {
       scope.setTag('routerErrorComponent', true)
+      if (isChunkLoadError(error)) scope.setTag('chunkLoadError', true)
       const eventId = Sentry.captureException(error)
       if (eventId && error && typeof error === 'object') {
         Object.assign(error, { sentryId: eventId })
       }
     })
     console.error(error instanceof Error ? error.stack : error)
-  }, [error])
+  }, [error, isReloading])
 
-  return <Error500 />
+  if (isReloading) return null
+  return <ServerErrorPage />
 }
 
 export const Route = createRootRouteWithContext<RouterContext>()({
-  // Mirrors the redirect rules in `next.config.ts` / `vercel.ts`. Vercel's
+  // Mirrors the redirect rules in `vercel.ts`. Vercel's
   // edge layer already handles these for the platform deploy; this is the
   // self-hosted (Node-server) fallback and the client-side safety net.
   beforeLoad: ({ location }) => {
@@ -330,7 +362,11 @@ export const Route = createRootRouteWithContext<RouterContext>()({
 })
 
 function RootComponent() {
+  const location = useLocation()
+  const isHydrated = useHydrated()
   useThemeSandbox()
+  // Until hydration, match the served HTML: a prerendered page, or the SPA shell's fallback.
+  const canRenderPage = isHydrated || (IS_PLATFORM && isPrerenderedRoute(location.pathname))
 
   return (
     <ErrorBoundary FallbackComponent={GlobalErrorBoundaryState} onError={errorBoundaryHandler}>
@@ -350,9 +386,9 @@ function RootComponent() {
                               <BannerStackProvider>
                                 <FeaturePreviewContextProvider>
                                   <MainScrollContainerProvider>
-                                    <ClientOnly fallback={<ShellFallback />}>
-                                      <Outlet />
-                                    </ClientOnly>
+                                    <RecoveryReminderController href={location.href}>
+                                      {canRenderPage ? <Outlet /> : <ShellFallback />}
+                                    </RecoveryReminderController>
                                   </MainScrollContainerProvider>
                                   <GlobalShortcuts />
                                   <StudioCommandMenu />
@@ -399,7 +435,8 @@ function RootDocument({ children }: Readonly<{ children: ReactNode }>) {
         {children}
         {!isTestEnv && (
           <TanStackDevtools
-            config={{ position: 'bottom-right' }}
+            // Hidden unless the page is loaded with ?tanstack-devtools in the URL.
+            config={{ position: 'bottom-right', requireUrlFlag: true }}
             plugins={[
               {
                 name: 'TanStack Router',

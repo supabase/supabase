@@ -79,13 +79,13 @@ While Postgres is a _tool_, it has also become a _standard_. Nearly every new da
 
 ### OTel is the open telemetry standard
 
-It's even in the name "open telemetry". [OTel](https://opentelemetry.io/) is still nascent and incredibly [complicated](https://news.ycombinator.com/item?id=42655102), but it fits the open source tenets above: the license is Apache 2.0 and it’s vendor neutral. Just as the major cloud providers embraced Postgres, the leading telemetry platforms are now adopting OTel including [Datadog](https://docs.datadoghq.com/integrations/otel/), [Honeycomb](https://docs.honeycomb.io/send-data/opentelemetry/), [Grafana Labs](https://grafana.com/grafana/dashboards/15983-opentelemetry-collector/), and [Elastic](https://www.elastic.co/docs/solutions/observability/apm/use-opentelemetry-with-apm). For self-hosting, developers are able to choose from a various open source options like [SigNoz](https://github.com/SigNoz/signoz), [OpenObserve](https://github.com/openobserve/openobserve), and the default OTel [tools](https://github.com/open-telemetry/opentelemetry-collector).
+It's even in the name "open telemetry". [OTel](https://opentelemetry.io/) is still nascent and incredibly [complicated](https://news.ycombinator.com/item?id=42655102), but it fits the open source tenets above: the license is Apache 2.0 and it’s vendor neutral. Just as the major cloud providers embraced Postgres, the leading telemetry platforms are now adopting OTel including [Datadog](https://docs.datadoghq.com/integrations/otel/), [Honeycomb](https://docs.honeycomb.io/send-data/opentelemetry), [Grafana Labs](https://grafana.com/grafana/dashboards/15983-opentelemetry-collector/), and [Elastic](https://www.elastic.co/docs/solutions/observability/apm/use-opentelemetry-with-apm). For self-hosting, developers are able to choose from a various open source options like [SigNoz](https://github.com/SigNoz/signoz), [OpenObserve](https://github.com/openobserve/openobserve), and the default OTel [tools](https://github.com/open-telemetry/opentelemetry-collector).
 
 ### Iceberg is the open OLAP standard
 
 [Open Table Formats](https://www.startdataengineering.com/post/what_why_table_format/) are a relatively new development. They are simply an "agreed format" for organizing large amounts of data. Because the format is agreed, any tool can query it. There are a few competing Open Table Formats including [DeltaLake](https://delta.io/) and [Hudi](https://hudi.apache.org/), but [Iceberg](https://iceberg.apache.org/) has emerged as the leader.
 
-All the major data warehouses are adopting Iceberg, including [Databricks](https://docs.databricks.com/aws/en/delta/uniform), [Snowflake](https://docs.snowflake.com/en/user-guide/tables-iceberg), and [ClickHouse](https://clickhouse.com/docs/engines/table-engines/integrations/iceberg). The most important commercial entity however, driving the Third Tenet of Open Source, is AWS. At the end of 2024 AWS announced [S3 Tables](https://aws.amazon.com/blogs/aws/new-amazon-s3-tables-storage-optimized-for-analytics-workloads/), which makes it trivial to store data in S3 using Iceberg format in S3.
+All the major data warehouses are adopting Iceberg, including [Databricks](https://docs.databricks.com/aws/en/delta/uniform), [Snowflake](https://docs.snowflake.com/en/user-guide/tables-iceberg), and [ClickHouse](https://clickhouse.com/docs/reference/engines/table-engines/integrations/iceberg). The most important commercial entity however, driving the Third Tenet of Open Source, is AWS. At the end of 2024 AWS announced [S3 Tables](https://aws.amazon.com/blogs/aws/new-amazon-s3-tables-storage-optimized-for-analytics-workloads/), which makes it trivial to store data in S3 using Iceberg format in S3.
 
 ## S3 is the ultimate data infrastructure
 
@@ -109,12 +109,12 @@ The tooling for S3 interoperability differs slightly depending on the use-case:
 
 ## Data at Supabase
 
-Supabase is now relatively well-known as a Postgres provider. We've spent 5 years building a delightful database platform for developers and that will continue to be our focus.
+Supabase is now relatively well-known as a [Postgres provider](/solutions/hosted-postgres). We've spent 5 years building a delightful database platform for developers and that will continue to be our focus.
 
 What's unique about Supabase is that we're not _just_ a Postgres provider (despite the [memes](https://itsjustpostgres.com/)). We also offer [Supabase Storage](/storage), an S3-compatible object store. Where we're going is less about a database, and more about data. This includes:
 
 - Adding OTel to all of the open source tools we maintain.
-- Adding Iceberg support in Supabase Storage.
+- Adding Iceberg support in [Supabase Storage](/docs/guides/storage).
 - Exploring managed paths for moving Postgres data into analytical systems while preserving open formats and operational isolation.
 - Adding Iceberg read/write capabilities to Postgres via extensions and FDWs.
 

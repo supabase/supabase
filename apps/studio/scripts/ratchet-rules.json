@@ -1,6 +1,5 @@
 [
   "react-hooks/exhaustive-deps",
-  "import/no-anonymous-default-export",
   "@tanstack/query/exhaustive-deps",
   "@typescript-eslint/no-explicit-any",
   "no-restricted-exports",
@@ -10,5 +9,6 @@
   "jsx-a11y/no-redundant-roles",
   "jsx-a11y/anchor-is-valid",
   "jsx-a11y/heading-has-content",
-  "valtio/state-snapshot-rule"
+  "valtio/state-snapshot-rule",
+  "fga/no-unguarded-migrating"
 ]

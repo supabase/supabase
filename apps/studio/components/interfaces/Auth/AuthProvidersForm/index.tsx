@@ -60,7 +60,7 @@ export const AuthProvidersForm = () => {
                       hour.
                     </p>
                     <Button asChild className="w-min" icon={<ExternalLinkIcon />}>
-                      <Link href={`${DOCS_URL}/guides/platform/going-into-prod#security`}>
+                      <Link href={`${DOCS_URL}/guides/security/production-checklist#auth`}>
                         View security recommendations
                       </Link>
                     </Button>

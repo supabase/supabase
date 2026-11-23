@@ -8,7 +8,7 @@ import {
 } from '@tanstack/react-router'
 import { act, render, screen, waitFor } from '@testing-library/react'
 import { flushSync } from 'react-dom'
-import { describe, expect, it, vi } from 'vitest'
+import { afterEach, beforeEach, describe, expect, it, vi } from 'vitest'
 
 import { useInitializeFiltersFromUrl, useSyncFiltersToUrl } from './useFilterLifeCycle'
 import { ENTITY_TYPE } from '@/data/entity-types/entity-type-constants'
@@ -94,17 +94,26 @@ async function renderTableAt(url: string) {
 }
 
 // Outlasts the 500ms state → URL debounce, so any sync push would have landed.
-const settle = () => act(() => new Promise((resolve) => setTimeout(resolve, 700)))
+const settle = () => act(() => vi.advanceTimersByTimeAsync(700))
 
 const red = { column: 'name', operator: '=' as const, value: 'Red' }
 const filteredByRed = `${unfiltered}&filter=name%3Aeq%3ARed`
 
 describe('useSyncFiltersToUrl', () => {
+  // Fake clock (still ticking for waitFor) so the debounce can be skipped instead of waited out.
+  beforeEach(() => {
+    vi.useFakeTimers({ shouldAdvanceTime: true })
+  })
+  afterEach(() => {
+    vi.useRealTimers()
+  })
+
   it('follows Back/Forward between entries of the same table without adding entries', async () => {
     const { history, cleanup } = await renderTableAt(unfiltered)
 
     try {
       await act(async () => snap.setFilters([{ column: 'name', operator: '=', value: 'Red' }]))
+      await settle()
       await waitFor(() => expect(window.location.search).toContain('filter=name%3Aeq%3ARed'))
       const filteredIndex = getHistoryIndex()
 
@@ -151,8 +160,8 @@ describe('useSyncFiltersToUrl', () => {
 
     try {
       await act(async () => snap.setFilters([red]))
-      await waitFor(() => expect(window.location.search).toContain('filter=name%3Aeq%3ARed'))
       await settle()
+      await waitFor(() => expect(window.location.search).toContain('filter=name%3Aeq%3ARed'))
 
       await act(async () => sortParams.setParams((prev) => ({ ...prev, sort: ['name:asc'] })))
       await waitFor(() => expect(window.location.search).toContain('sort=name%3Aasc'))
@@ -176,6 +185,7 @@ describe('useSyncFiltersToUrl', () => {
       const loadedIndex = getHistoryIndex()
 
       await act(async () => snap.setFilters([]))
+      await settle()
       await waitFor(() => expect(window.location.search).not.toContain('filter'))
       expect(getHistoryIndex()).toBe(loadedIndex! + 1)
 

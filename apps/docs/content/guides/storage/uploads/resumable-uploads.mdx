@@ -379,6 +379,10 @@ var signedUrl = await supabase.Storage.From("bucket_name").CreateUploadSignedUrl
 
 See this [full example using Uppy with signed URLs](https://github.com/supabase/supabase/tree/master/examples/storage/resumable-upload-signed-uppy) for more context.
 
+### Revoke signed URLs
+
+You can't revoke individual signed URLs. To revoke all signed URLs, rotate your project's URL signing key, and then revoke the previous key. For more information, see [URL Signing Keys](/docs/guides/storage/security/signing-keys).
+
 ## Overwriting files
 
 When uploading a file to a path that already exists, the default behavior is to return a `400 Asset Already Exists` error.

@@ -171,8 +171,8 @@ cd apps/docs && pnpm run codegen:graphql
 This prints the schema to `__generated__/schema.graphql`
 (`scripts/graphqlSchema.ts`) and runs `graphql-codegen` (`codegen.ts`) to
 produce `~/__generated__/graphql` — the `RootQueryType*Args` and resolver
-types the model and resolver import. `predev` and `prebuild` run this
-automatically.
+types the model and resolver import. `dev` and `build` run this
+automatically as turbo dependencies.
 
 ## Related
 
@@ -182,4 +182,4 @@ automatically.
 - [`search-embeddings.md`](./search-embeddings.md) — the offline pipeline
   that populates what `searchDocs` queries.
 - [`build-pipeline.md`](./build-pipeline.md) — where `codegen:graphql` runs
-  in `predev` / `prebuild`.
+  as a turbo dependency of `dev` / `build`.

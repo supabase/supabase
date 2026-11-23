@@ -3,7 +3,8 @@ import { components } from 'api-types'
 
 import { configKeys } from './keys'
 import { get, handleError } from '@/data/fetchers'
-import type { ResponseError, UseCustomQueryOptions } from '@/types'
+import type { StudioError } from '@/lib/errors/studio-errors'
+import type { UseCustomQueryOptions } from '@/types'
 
 /**
  * Parses the exposed schema string returned from PostgREST config.
@@ -42,7 +43,7 @@ export async function getProjectPostgrestConfig(
 }
 
 export type ProjectPostgrestConfigData = Awaited<ReturnType<typeof getProjectPostgrestConfig>>
-export type ProjectPostgrestConfigError = ResponseError
+export type ProjectPostgrestConfigError = StudioError
 
 export const useProjectPostgrestConfigQuery = <TData = ProjectPostgrestConfigData>(
   { projectRef }: ProjectPostgrestConfigVariables,

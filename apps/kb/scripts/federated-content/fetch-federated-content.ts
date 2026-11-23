@@ -1,10 +1,10 @@
 // Fetches every troubleshooting article from the private supabase/troubleshooting
 // repo's `guides` folder into src/content/troubleshooting/ (gitignored,
-// regenerated on every prebuild — see content.config.ts's `troubleshooting`
+// regenerated on every build — see content.config.ts's `troubleshooting`
 // collection). No content processing: body text is written as fetched.
 import '../utils/dotenv.js'
 
-import { mkdir, writeFile } from 'node:fs/promises'
+import { mkdir, rm, writeFile } from 'node:fs/promises'
 import { dirname, join } from 'node:path'
 import { fileURLToPath } from 'node:url'
 import { Octokit } from '@octokit/core'
@@ -57,10 +57,11 @@ async function getFileContents(path: string): Promise<string> {
   return Buffer.from(response.data.content, 'base64').toString('utf-8')
 }
 
-// Local slug: strip the extension and the random hex suffix some filenames
-// carry (e.g. `foo-bar-94a76b.mdx` -> `foo-bar`).
+// Local slug: the filename without its extension. The hash suffix some
+// filenames carry (e.g. `foo-bar-94a76b.mdx` -> `foo-bar-94a76b`) is part of
+// the slug and is kept, matching what troubleshooting_entries.slug stores.
 function slugFromFilename(filename: string): string {
-  return filename.replace(/\.mdx?$/, '').replace(/-[0-9a-f]{6}$/i, '')
+  return filename.replace(/\.mdx?$/, '')
 }
 
 // Most source files use TOML frontmatter (`title = "..."`), which gray-matter
@@ -89,11 +90,12 @@ async function fetchPage(filename: string): Promise<'fetched' | 'legacy-toml'> {
     topics: guide.topics,
   }
   const output = matter.stringify(guide.body, frontmatter)
-  await writeFile(join(TROUBLESHOOTING_DIRECTORY, `${slugFromFilename(filename)}.md`), output)
+  await writeFile(join(TROUBLESHOOTING_DIRECTORY, `${slugFromFilename(filename)}.mdx`), output)
   return 'fetched'
 }
 
 async function fetchFederatedContent() {
+  await rm(TROUBLESHOOTING_DIRECTORY, { recursive: true, force: true })
   await mkdir(TROUBLESHOOTING_DIRECTORY, { recursive: true })
 
   const filenames = await listMarkdownFiles(SOURCE.dir)

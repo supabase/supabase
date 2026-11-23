@@ -15,46 +15,32 @@ import {
 import { WAREHOUSE_METADATA_SCHEMA } from '@/lib/warehouse'
 
 describe('WarehouseModePanel.utils:isSelectableWarehouseSchema', () => {
-  test('excludes information_schema', () => {
-    expect(isSelectableWarehouseSchema('information_schema')).toBe(false)
+  // Replicating system catalogs, secrets, internal bookkeeping, or the Warehouse's own DuckLake
+  // catalog into a warehouse is never intended.
+  test.each([
+    'information_schema',
+    'pg_catalog',
+    'pg_toast',
+    'vault',
+    'pgsodium',
+    'realtime',
+    '_realtime',
+    'cron',
+    'supabase_migrations',
+    'extensions',
+    WAREHOUSE_METADATA_SCHEMA,
+    'ducklake',
+  ])('excludes %s', (schema) => {
+    expect(isSelectableWarehouseSchema(schema)).toBe(false)
   })
 
-  test('excludes any schema starting with pg_', () => {
-    expect(isSelectableWarehouseSchema('pg_catalog')).toBe(false)
-    expect(isSelectableWarehouseSchema('pg_toast')).toBe(false)
-  })
-
-  test('excludes Supabase infrastructure schemas', () => {
-    // Replicating secrets or internal bookkeeping into a warehouse is never intended
-    expect(isSelectableWarehouseSchema('vault')).toBe(false)
-    expect(isSelectableWarehouseSchema('pgsodium')).toBe(false)
-    expect(isSelectableWarehouseSchema('realtime')).toBe(false)
-    expect(isSelectableWarehouseSchema('_realtime')).toBe(false)
-    expect(isSelectableWarehouseSchema('cron')).toBe(false)
-    expect(isSelectableWarehouseSchema('supabase_migrations')).toBe(false)
-    expect(isSelectableWarehouseSchema('extensions')).toBe(false)
-  })
-
-  test('includes public and other user schemas', () => {
-    expect(isSelectableWarehouseSchema('public')).toBe(true)
-    expect(isSelectableWarehouseSchema('analytics')).toBe(true)
-  })
-
-  test('includes auth and storage, which hold product data users replicate', () => {
-    expect(isSelectableWarehouseSchema('auth')).toBe(true)
-    expect(isSelectableWarehouseSchema('storage')).toBe(true)
-  })
-
-  test("excludes the Warehouse's own DuckLake catalog schema", () => {
-    // Replicating the catalog that describes the Warehouse would feed it its own metadata
-    expect(isSelectableWarehouseSchema(WAREHOUSE_METADATA_SCHEMA)).toBe(false)
-    expect(isSelectableWarehouseSchema('ducklake')).toBe(false)
-  })
-
-  test('includes schemas whose names merely resemble the catalog schema', () => {
-    expect(isSelectableWarehouseSchema('ducklake_staging')).toBe(true)
-    expect(isSelectableWarehouseSchema('my_ducklake')).toBe(true)
-  })
+  // auth and storage hold product data users replicate; ducklake_* merely resemble the catalog.
+  test.each(['public', 'analytics', 'auth', 'storage', 'ducklake_staging', 'my_ducklake'])(
+    'includes %s',
+    (schema) => {
+      expect(isSelectableWarehouseSchema(schema)).toBe(true)
+    }
+  )
 })
 
 describe('WarehouseModePanel.utils:buildSelectionFromPublicationTables', () => {
@@ -71,27 +57,6 @@ describe('WarehouseModePanel.utils:buildSelectionFromPublicationTables', () => {
     ).toEqual({ 'public.orders': true, 'auth.users': true })
   })
 
-  test('produces a fully checked schema when every table of that schema is published', () => {
-    const schemaTables = ['orders', 'customers']
-    const selection = buildSelectionFromPublicationTables(
-      schemaTables.map((name) => ({ schema: 'public', name }))
-    )
-    const selectedCount = schemaTables.filter(
-      (name) => selection[getSchemaTableKey('public', name)]
-    ).length
-
-    expect(getSchemaCheckedState({ selectedCount, totalCount: schemaTables.length })).toBe(true)
-  })
-
-  test('produces an indeterminate schema when only some of its tables are published', () => {
-    const selection = buildSelectionFromPublicationTables([{ schema: 'public', name: 'orders' }])
-    const selectedCount = ['orders', 'customers'].filter(
-      (name) => selection[getSchemaTableKey('public', name)]
-    ).length
-
-    expect(getSchemaCheckedState({ selectedCount, totalCount: 2 })).toBe('indeterminate')
-  })
-
   test('round-trips through buildWarehouseSetupTargets as a schema target when fully published', () => {
     const schemas: SchemaWithTables[] = [{ schema: 'public', tables: ['orders', 'customers'] }]
     const selection = buildSelectionFromPublicationTables([
@@ -106,22 +71,19 @@ describe('WarehouseModePanel.utils:buildSelectionFromPublicationTables', () => {
 })
 
 describe('WarehouseModePanel.utils:getSchemaCheckedState', () => {
-  test('is unchecked when nothing is selected', () => {
-    expect(getSchemaCheckedState({ selectedCount: 0, totalCount: 3 })).toBe(false)
-  })
-
-  test('is indeterminate when only some tables are selected', () => {
-    expect(getSchemaCheckedState({ selectedCount: 1, totalCount: 3 })).toBe('indeterminate')
-    expect(getSchemaCheckedState({ selectedCount: 2, totalCount: 3 })).toBe('indeterminate')
-  })
-
-  test('is checked when every table is selected', () => {
-    expect(getSchemaCheckedState({ selectedCount: 3, totalCount: 3 })).toBe(true)
-  })
-
-  test('is unchecked for an empty schema rather than checked', () => {
-    expect(getSchemaCheckedState({ selectedCount: 0, totalCount: 0 })).toBe(false)
-  })
+  test.each([
+    { selectedCount: 0, totalCount: 3, expected: false },
+    { selectedCount: 1, totalCount: 3, expected: 'indeterminate' },
+    { selectedCount: 2, totalCount: 3, expected: 'indeterminate' },
+    { selectedCount: 3, totalCount: 3, expected: true },
+    // An empty schema is unchecked rather than checked
+    { selectedCount: 0, totalCount: 0, expected: false },
+  ])(
+    '$selectedCount of $totalCount selected is $expected',
+    ({ selectedCount, totalCount, expected }) => {
+      expect(getSchemaCheckedState({ selectedCount, totalCount })).toBe(expected)
+    }
+  )
 })
 
 describe('WarehouseModePanel.utils:getSchemaTableKey', () => {
@@ -176,45 +138,25 @@ describe('WarehouseModePanel.utils:hasSelectionChanged', () => {
 })
 
 describe('WarehouseModePanel.utils:buildWarehouseSetupTargets', () => {
-  test('returns an empty array for an empty selection', () => {
-    const schemas: SchemaWithTables[] = [{ schema: 'public', tables: ['orders', 'customers'] }]
-    expect(buildWarehouseSetupTargets({}, schemas)).toEqual([])
-  })
-
-  test('returns an empty array when there are no schemas', () => {
-    expect(buildWarehouseSetupTargets({ 'public.orders': true }, [])).toEqual([])
-  })
-
-  test('emits a schema target when every table in that schema is selected', () => {
-    const schemas: SchemaWithTables[] = [{ schema: 'public', tables: ['orders', 'customers'] }]
-    const selection: SchemaTableSelection = {
-      'public.orders': true,
-      'public.customers': true,
-    }
-    expect(buildWarehouseSetupTargets(selection, schemas)).toEqual([
-      { type: 'schema', schema: 'public' },
-    ])
-  })
-
-  test('emits per-table targets when only some tables in a schema are selected', () => {
-    const schemas: SchemaWithTables[] = [{ schema: 'public', tables: ['orders', 'customers'] }]
-    const selection: SchemaTableSelection = {
-      'public.orders': true,
-      'public.customers': false,
-    }
-    expect(buildWarehouseSetupTargets(selection, schemas)).toEqual([
-      { type: 'table', schema: 'public', name: 'orders' },
-    ])
-  })
-
-  test('skips schemas with no tables', () => {
-    const schemas: SchemaWithTables[] = [{ schema: 'empty_schema', tables: [] }]
-    expect(buildWarehouseSetupTargets({ 'empty_schema.foo': true }, schemas)).toEqual([])
-  })
-
-  test('skips schemas with no selected tables', () => {
-    const schemas: SchemaWithTables[] = [{ schema: 'public', tables: ['orders'] }]
-    expect(buildWarehouseSetupTargets({ 'public.orders': false }, schemas)).toEqual([])
+  test.each<{ case: string; selection: SchemaTableSelection; schemas: SchemaWithTables[] }>([
+    {
+      case: 'an empty selection',
+      selection: {},
+      schemas: [{ schema: 'public', tables: ['orders', 'customers'] }],
+    },
+    { case: 'no schemas', selection: { 'public.orders': true }, schemas: [] },
+    {
+      case: 'a schema with no tables',
+      selection: { 'empty_schema.foo': true },
+      schemas: [{ schema: 'empty_schema', tables: [] }],
+    },
+    {
+      case: 'a schema with no selected tables',
+      selection: { 'public.orders': false },
+      schemas: [{ schema: 'public', tables: ['orders'] }],
+    },
+  ])('returns no targets for $case', ({ selection, schemas }) => {
+    expect(buildWarehouseSetupTargets(selection, schemas)).toEqual([])
   })
 
   test('ignores selection keys that reference tables outside the given schemas', () => {
@@ -228,7 +170,7 @@ describe('WarehouseModePanel.utils:buildWarehouseSetupTargets', () => {
     ])
   })
 
-  test('handles multiple schemas with a mix of full, partial, and no selection', () => {
+  test('emits schema targets for fully selected schemas and table targets for partial ones', () => {
     const schemas: SchemaWithTables[] = [
       { schema: 'public', tables: ['orders', 'customers'] },
       { schema: 'auth', tables: ['users', 'sessions'] },

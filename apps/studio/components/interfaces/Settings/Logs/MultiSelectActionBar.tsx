@@ -41,7 +41,7 @@ export function MultiSelectActionBar({
   const aiSnap = useAiAssistantStateSnapshot()
 
   function handleOpenAiAssistant() {
-    const prompt = buildLogsPrompt(selectedRowsData, queryType, sqlQuery)
+    const prompt = buildLogsPrompt(selectedRowsData, { queryType, sqlQuery })
     openSidebar(SIDEBAR_KEYS.AI_ASSISTANT)
     aiSnap.newChat({ initialMessage: prompt })
   }
@@ -54,7 +54,7 @@ export function MultiSelectActionBar({
       style={{ height: 40 }}
     >
       <span className="text-foreground-light font-mono text-xs">
-        {count} row{count !== 1 ? 's' : ''} selected
+        {`${count} ${count === 1 ? 'row' : 'rows'} selected`}
       </span>
 
       <div className="flex items-center gap-1 ml-auto">
@@ -95,7 +95,7 @@ export function MultiSelectActionBar({
 
         <AiAssistantDropdown
           label="Explain with AI"
-          buildPrompt={() => buildLogsPrompt(selectedRowsData, queryType, sqlQuery)}
+          buildPrompt={() => buildLogsPrompt(selectedRowsData, { queryType, sqlQuery })}
           onOpenAssistant={handleOpenAiAssistant}
           telemetrySource="log_explorer"
         />

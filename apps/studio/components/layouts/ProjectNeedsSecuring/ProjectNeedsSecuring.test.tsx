@@ -208,55 +208,28 @@ describe('ProjectNeedsSecuring', () => {
     )
   })
 
-  it('renders the project content when the security gate has been dismissed', () => {
-    mockUseLocalStorageQuery.mockReturnValue([
-      '2026-04-21T00:00:00.000Z',
-      vi.fn(),
-      { isLoading: false },
-    ])
-
-    render(
-      <ProjectNeedsSecuring>
-        <div data-testid="project-children">Project content</div>
-      </ProjectNeedsSecuring>
-    )
-
-    expect(screen.queryByText('Your project needs securing')).not.toBeInTheDocument()
-    expect(screen.getByTestId('project-children')).toBeInTheDocument()
-  })
-
-  it('renders the project content when there are no RLS issues', () => {
-    mockUseProjectLintsQuery.mockReturnValue({
-      data: [],
-      isPending: false,
-      isError: false,
-    })
-
-    render(
-      <ProjectNeedsSecuring>
-        <div data-testid="project-children">Project content</div>
-      </ProjectNeedsSecuring>
-    )
-
-    expect(screen.queryByText('Your project needs securing')).not.toBeInTheDocument()
-    expect(screen.getByTestId('project-children')).toBeInTheDocument()
-  })
-
-  it('renders the project content on non-home project routes', () => {
-    mockUseRouter.mockReturnValue({ pathname: '/project/[ref]/database/tables' })
-
-    render(
-      <ProjectNeedsSecuring>
-        <div data-testid="project-children">Project content</div>
-      </ProjectNeedsSecuring>
-    )
-
-    expect(screen.queryByText('Your project needs securing')).not.toBeInTheDocument()
-    expect(screen.getByTestId('project-children')).toBeInTheDocument()
-  })
-
-  it('renders the project content when the feature flag is disabled', () => {
-    mockUseFlag.mockReturnValue(false)
+  it.each([
+    [
+      'the security gate has been dismissed',
+      () =>
+        mockUseLocalStorageQuery.mockReturnValue([
+          '2026-04-21T00:00:00.000Z',
+          vi.fn(),
+          { isLoading: false },
+        ]),
+    ],
+    [
+      'there are no RLS issues',
+      () =>
+        mockUseProjectLintsQuery.mockReturnValue({ data: [], isPending: false, isError: false }),
+    ],
+    [
+      'on non-home project routes',
+      () => mockUseRouter.mockReturnValue({ pathname: '/project/[ref]/database/tables' }),
+    ],
+    ['the feature flag is disabled', () => mockUseFlag.mockReturnValue(false)],
+  ])('renders the project content when %s', (_, arrange) => {
+    arrange()
 
     render(
       <ProjectNeedsSecuring>

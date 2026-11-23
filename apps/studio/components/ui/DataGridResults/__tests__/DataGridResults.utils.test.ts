@@ -69,70 +69,33 @@ describe('Results.utils', () => {
   })
 
   describe('formatCellValue', () => {
-    it('returns NULL for null', () => {
-      expect(formatCellValue(null)).toBe('NULL')
-    })
-
-    it('returns strings as-is', () => {
-      expect(formatCellValue('hello')).toBe('hello')
-    })
-
-    it('stringifies objects', () => {
-      expect(formatCellValue({ a: 1 })).toBe('{"a":1}')
-    })
-
-    it('stringifies numbers', () => {
-      expect(formatCellValue(42)).toBe('42')
-    })
-
-    it('stringifies booleans', () => {
-      expect(formatCellValue(true)).toBe('true')
+    it.each([
+      [null, 'NULL'],
+      ['hello', 'hello'],
+      [{ a: 1 }, '{"a":1}'],
+      [42, '42'],
+      [true, 'true'],
+    ])('formats %j as %s', (value, expected) => {
+      expect(formatCellValue(value)).toBe(expected)
     })
   })
 
   describe('isLargeValue', () => {
-    it('returns false for null', () => {
-      expect(isLargeValue(null)).toBe(false)
-    })
-
-    it('returns false for undefined', () => {
-      expect(isLargeValue(undefined)).toBe(false)
-    })
-
-    it('returns false for an empty string', () => {
-      expect(isLargeValue('')).toBe(false)
-    })
-
-    it('returns false for a short string under the threshold', () => {
-      expect(isLargeValue('hello')).toBe(false)
-    })
-
-    it('returns false for a string at the 60-char boundary', () => {
-      expect(isLargeValue('a'.repeat(60))).toBe(false)
-    })
-
-    it('returns true for a string just over the 60-char threshold', () => {
-      expect(isLargeValue('a'.repeat(61))).toBe(true)
-    })
-
-    it('returns true for a short string containing a newline', () => {
-      expect(isLargeValue('hello\nworld')).toBe(true)
-    })
-
-    it('returns true for an object', () => {
-      expect(isLargeValue({ a: 1 })).toBe(true)
-    })
-
-    it('returns true for an array', () => {
-      expect(isLargeValue([1, 2, 3])).toBe(true)
-    })
-
-    it('returns false for a number', () => {
-      expect(isLargeValue(42)).toBe(false)
-    })
-
-    it('returns false for a boolean', () => {
-      expect(isLargeValue(true)).toBe(false)
+    it.each([
+      // Strings are large past 60 characters or when multi-line
+      ['a'.repeat(61), true],
+      ['hello\nworld', true],
+      [{ a: 1 }, true],
+      [[1, 2, 3], true],
+      [null, false],
+      [undefined, false],
+      ['', false],
+      ['hello', false],
+      ['a'.repeat(60), false],
+      [42, false],
+      [true, false],
+    ])('classifies %j as large: %s', (value, expected) => {
+      expect(isLargeValue(value)).toBe(expected)
     })
   })
 })

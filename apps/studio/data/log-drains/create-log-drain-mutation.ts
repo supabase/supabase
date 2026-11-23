@@ -4,7 +4,8 @@ import { toast } from 'sonner'
 import { logDrainsKeys } from './keys'
 import { LogDrainType } from '@/components/interfaces/LogDrains/LogDrains.constants'
 import { handleError, post } from '@/data/fetchers'
-import type { ResponseError, UseCustomMutationOptions } from '@/types'
+import type { StudioError } from '@/lib/errors/studio-errors'
+import type { UseCustomMutationOptions } from '@/types'
 
 export type LogDrainCreateVariables = {
   projectRef: string
@@ -36,12 +37,12 @@ export const useCreateLogDrainMutation = ({
   onError,
   ...options
 }: Omit<
-  UseCustomMutationOptions<LogDrainCreateData, ResponseError, LogDrainCreateVariables>,
+  UseCustomMutationOptions<LogDrainCreateData, StudioError, LogDrainCreateVariables>,
   'mutationFn'
 > = {}) => {
   const queryClient = useQueryClient()
 
-  return useMutation<LogDrainCreateData, ResponseError, LogDrainCreateVariables>({
+  return useMutation<LogDrainCreateData, StudioError, LogDrainCreateVariables>({
     mutationFn: (vars) => createLogDrain(vars),
     async onSuccess(data, variables, context) {
       const { projectRef } = variables

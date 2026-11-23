@@ -8,7 +8,7 @@
     "jsx": "preserve",
     "noEmit": true,
     "module": "preserve",
-    "target": "ES2021"
+    "target": "ES2022"
   },
   "exclude": ["node_modules"]
 }

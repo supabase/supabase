@@ -53,7 +53,7 @@ export const DownloadSnippetModal = ({ id, ...props }: DownloadSnippetModalProps
       caption: (
         <>
           Run this command from your project directory to download the snippet in a new migration
-          named <code className="text-code-inline break-normal">{migrationName}</code>.
+          named <code className="break-normal">{migrationName}</code>.
         </>
       ),
       docLink: {
@@ -70,7 +70,7 @@ export const DownloadSnippetModal = ({ id, ...props }: DownloadSnippetModalProps
         <>
           Run this command from your project directory to download the snippet. If your query
           consists of sample data, append it to the end of{' '}
-          <code className="text-code-inline break-normal">supabase/seed.sql</code>.
+          <code className="break-normal">supabase/seed.sql</code>.
         </>
       ),
       docLink: {
@@ -86,7 +86,7 @@ export const DownloadSnippetModal = ({ id, ...props }: DownloadSnippetModalProps
       caption: (
         <>
           Run this command from your project directory to download the snippet into a new SQL file
-          named <code className="text-code-inline break-normal">{migrationName}.sql</code>.
+          named <code className="break-normal">{migrationName}.sql</code>.
         </>
       ),
       cli: generateFileCliCommand(id, migrationName),

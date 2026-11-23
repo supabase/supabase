@@ -130,7 +130,11 @@ const VersionActionsMenu = ({
           className="gap-x-2 text-destructive focus:text-destructive"
         >
           <Trash2Icon size={14} />
-          {isDeleteMarker ? 'Delete marker permanently' : 'Delete permanently'}
+          {isDeleteMarker ? (
+            <span>Delete marker permanently</span>
+          ) : (
+            <span>Delete permanently</span>
+          )}
         </DropdownMenuItem>
       </DropdownMenuContent>
     </DropdownMenu>

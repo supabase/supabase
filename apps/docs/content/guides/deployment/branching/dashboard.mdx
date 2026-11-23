@@ -1,6 +1,6 @@
 ---
 title: 'Branching via the dashboard'
-subtitle: 'Create, manage, review, and merge branches directly in the dashboard'
+description: 'Create, manage, review, and merge branches directly in the dashboard'
 ---
 
 You can create, manage, review, and merge Supabase branches directly in the Supabase Dashboard. This is useful for quick testing, prototyping, or when you prefer to work in a no-code way. You can also connect a Supabase branch to a GitHub branch at a later time if needed.
@@ -79,7 +79,7 @@ The second is to click on manage branches from within the branch selector, then 
 
 ## Pulling changes from production into a branch
 
-When reviewing a merge request you may see a notice at the top of the page asking you to update your branch. This appears when your preview branch has drifted from your production branch. There may be public schema or edge function changes that have been made after your preview branch was created. Clicking update branch will attempt to pull in these changes, but be aware that by doing this your existing edge functions will be replaced. Any new edge functions created on the preview branch will remain untouched.
+When reviewing a merge request you may see a notice at the top of the page asking you to update your branch. This appears when your preview branch has drifted from your production branch. There may be public schema or edge function changes that have been made after your preview branch was created. Clicking update branch will attempt to pull in these changes, but be aware that by doing this your existing [edge functions](/docs/guides/functions) will be replaced. Any new edge functions created on the preview branch will remain untouched.
 
 ## Limitations
 

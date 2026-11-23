@@ -4,7 +4,8 @@ import { handleError, post } from '@/data/fetchers'
 import { invalidateOrganizationsQuery } from '@/data/organizations/organizations-query'
 import { invalidatePermissionsQuery } from '@/data/permissions/permissions-query'
 import { useInvalidateProjectsInfiniteQuery } from '@/data/projects/org-projects-infinite-query'
-import type { ResponseError, UseCustomMutationOptions } from '@/types'
+import type { StudioError } from '@/lib/errors/studio-errors'
+import type { UseCustomMutationOptions } from '@/types'
 
 export type OrganizationAcceptInvitationVariables = {
   slug: string
@@ -31,7 +32,7 @@ export const useOrganizationAcceptInvitationMutation = ({
 }: Omit<
   UseCustomMutationOptions<
     OrganizationMemberUpdateData,
-    ResponseError,
+    StudioError,
     OrganizationAcceptInvitationVariables
   >,
   'mutationFn'
@@ -41,7 +42,7 @@ export const useOrganizationAcceptInvitationMutation = ({
 
   return useMutation<
     OrganizationMemberUpdateData,
-    ResponseError,
+    StudioError,
     OrganizationAcceptInvitationVariables
   >({
     mutationFn: (vars) => acceptOrganizationInvitation(vars),

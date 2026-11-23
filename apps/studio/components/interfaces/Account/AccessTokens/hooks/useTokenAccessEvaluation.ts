@@ -7,7 +7,7 @@ import {
   type TokenAccessEvaluation,
 } from '../AccessToken.roles'
 import { useOrgAndProjectData } from './useOrgAndProjectData'
-import { usePermissionsQuery } from '@/data/permissions/permissions-query'
+import { usePermissionsQueryV2 } from '@/data/permissions/permissions-query-v2'
 
 interface UseTokenAccessEvaluationArgs {
   selection: PermissionSelection
@@ -33,7 +33,7 @@ export const useTokenAccessEvaluation = ({
   projectRefs,
   enabled = true,
 }: UseTokenAccessEvaluationArgs): TokenAccessEvaluation => {
-  const { data: permissions } = usePermissionsQuery({ enabled })
+  const { data: permissions } = usePermissionsQueryV2({ enabled })
   const { organizations, projects, isLoadingOrgs, isLoadingProjects } = useOrgAndProjectData({
     enabled,
   })

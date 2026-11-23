@@ -4,8 +4,10 @@ import { toast } from 'sonner'
 
 import { databaseQueuesKeys } from './keys'
 import { isQueueNameValid } from '@/components/interfaces/Integrations/Queues/Queues.utils'
+import { unguarded } from '@/data/fetchers'
 import { executeSql } from '@/data/sql/execute-sql-mutation'
-import type { ResponseError, UseCustomMutationOptions } from '@/types'
+import type { StudioError } from '@/lib/errors/studio-errors'
+import type { UseCustomMutationOptions } from '@/types'
 
 export type DatabaseQueueDeleteVariables = {
   projectRef: string
@@ -27,8 +29,11 @@ export async function deleteDatabaseQueue({
   const { result } = await executeSql({
     projectRef,
     connectionString,
+    sqlOrigin: 'studio',
+    queryName: 'database-queues-delete',
     sql: safeSql`select * from pgmq.drop_queue(${literal(queueName)});`,
     queryKey: databaseQueuesKeys.delete(queueName),
+    grant: unguarded.migrating,
   })
 
   return result
@@ -41,12 +46,12 @@ export const useDatabaseQueueDeleteMutation = ({
   onError,
   ...options
 }: Omit<
-  UseCustomMutationOptions<DatabaseQueueDeleteData, ResponseError, DatabaseQueueDeleteVariables>,
+  UseCustomMutationOptions<DatabaseQueueDeleteData, StudioError, DatabaseQueueDeleteVariables>,
   'mutationFn'
 > = {}) => {
   const queryClient = useQueryClient()
 
-  return useMutation<DatabaseQueueDeleteData, ResponseError, DatabaseQueueDeleteVariables>({
+  return useMutation<DatabaseQueueDeleteData, StudioError, DatabaseQueueDeleteVariables>({
     mutationFn: (vars) => deleteDatabaseQueue(vars),
     async onSuccess(data, variables, context) {
       const { projectRef } = variables

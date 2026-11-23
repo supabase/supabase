@@ -10,13 +10,13 @@ export type SlotWalStatus = 'reserved' | 'extended' | 'unreserved' | 'lost' | 'u
 export type SlotLagMetrics = {
   active: boolean
   wal_status?: SlotWalStatus | null
-  restart_lsn_bytes: number
-  confirmed_flush_lsn_bytes: number
-  // null means Postgres reports unlimited slot WAL retention.
+  restart_lsn_bytes?: number | null
+  confirmed_flush_lsn_bytes?: number | null
+  // Missing headroom can mean unlimited retention or an unavailable measurement.
   safe_wal_size_bytes?: number | null
   write_lag?: number | null
   flush_lag?: number | null
-  // Milliseconds since the destination last sent feedback. Present even when write/flush lag are not.
+  // Source clock minus the client's feedback timestamp; clock skew can make it negative.
   reply_time_lag?: number | null
 }
 

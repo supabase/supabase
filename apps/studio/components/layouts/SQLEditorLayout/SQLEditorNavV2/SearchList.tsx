@@ -114,7 +114,7 @@ export const SearchList = ({ search }: SearchListProps) => {
         )}
         {!isLoadingCounts && hasCounts && (
           <p className="px-4 pb-2 text-sm text-foreground-lighter">
-            {totalNumber} result{totalNumber === 1 ? '' : 's'} found
+            {totalNumber} result{totalNumber === 1 ? '' : <span>s</span>} <span>found</span>
           </p>
         )}
         {isSearchLoading && (

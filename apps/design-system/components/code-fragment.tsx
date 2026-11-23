@@ -50,11 +50,7 @@ export function CodeFragment({
     if (!Component) {
       return (
         <p className="text-sm text-muted-foreground">
-          Code fragment{' '}
-          <code className="relative rounded-sm bg-muted px-[0.3rem] py-[0.2rem] font-mono text-sm">
-            {name}
-          </code>{' '}
-          not found in registry.
+          Code fragment <code>{name}</code> not found in registry.
         </p>
       )
     }

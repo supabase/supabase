@@ -26,7 +26,7 @@ const {
   mockAddBanner,
   mockDismissBanner,
   mockProjectState,
-  mockResourceWarningsState,
+  mockOrgPlanState,
   mockBannerDismissedState,
   mockUseLocalStorageQuery,
 } = vi.hoisted(() => ({
@@ -42,7 +42,9 @@ const {
       integration_source: null as string | null,
     },
   },
-  mockResourceWarningsState: { current: undefined as any[] | undefined },
+  mockOrgPlanState: {
+    current: { id: 'pro', name: 'Pro' } as { id: string; name: string } | undefined,
+  },
   mockBannerDismissedState: { current: false },
   mockUseLocalStorageQuery: vi.fn(),
 }))
@@ -79,8 +81,8 @@ vi.mock('common', () => ({
     (_value: unknown) => {},
   IS_PLATFORM: false,
   LOCAL_STORAGE_KEYS: {
-    FREE_MICRO_UPGRADE_BANNER_DISMISSED: (ref: string) =>
-      `free-micro-upgrade-banner-dismissed-${ref}`,
+    FREE_MICRO_UPGRADE_BANNER_DISMISSED_AT: (ref: string) =>
+      `free-micro-upgrade-banner-dismissed-at-${ref}`,
     PROJECT_INTEGRATION_BANNER_DISMISSED: (ref: string, integrationSource: string) =>
       `project-integration-banner-dismissed-${ref}-${integrationSource}`,
   },
@@ -135,7 +137,9 @@ vi.mock('../MainScrollContainerContext', () => ({
 vi.mock('./BuildingState', () => ({ default: () => null }))
 vi.mock('./ConnectingState', () => ({ default: () => null }))
 vi.mock('./LoadingState', () => ({ LoadingState: () => null }))
-vi.mock('./PausedState/ProjectPausedState', () => ({ ProjectPausedState: () => null }))
+vi.mock('./PausedState/ProjectPausedState', () => ({
+  ProjectPausedState: () => <div>Project paused</div>,
+}))
 vi.mock('./PauseFailedState', () => ({ PauseFailedState: () => null }))
 vi.mock('./PausingState', () => ({ PausingState: () => null }))
 vi.mock('./ProductMenuBar', () => ({
@@ -190,13 +194,11 @@ vi.mock('@/components/ui/BannerStack/Banners/BannerFreeMicroUpgrade', () => ({
   BannerFreeMicroUpgrade: () => null,
 }))
 
-vi.mock('@/data/usage/resource-warnings-query', () => ({
-  useResourceWarningsQuery: () => ({ data: mockResourceWarningsState.current }),
-}))
+vi.mock('@/data/usage/resource-warnings-query', () => ({}))
 
 vi.mock('@/hooks/misc/useSelectedOrganization', () => ({
   useSelectedOrganizationQuery: () => ({
-    data: { name: 'Organization 1', slug: 'org-1' },
+    data: { name: 'Organization 1', slug: 'org-1', plan: mockOrgPlanState.current },
   }),
 }))
 
@@ -312,7 +314,7 @@ describe('ProjectLayout title', () => {
     }
     mockBannerDismissedState.current = false
     mockUseLocalStorageQuery.mockImplementation(() => [
-      mockBannerDismissedState.current,
+      mockBannerDismissedState.current ? new Date().toISOString() : null,
       vi.fn(),
       { isSuccess: true },
     ])
@@ -412,7 +414,7 @@ describe('ProjectLayout title', () => {
     })
   })
 
-  it('renders the Stripe project banner across project surfaces when the selected project is Stripe-connected', () => {
+  it('renders the Stripe project banner with a project-specific dismiss key when the selected project is Stripe-connected', () => {
     mockProjectState.current = {
       ...mockProjectState.current,
       integration_source: 'stripe_projects',
@@ -420,25 +422,33 @@ describe('ProjectLayout title', () => {
 
     renderLayout()
 
-    expect(screen.getByText('This project is connected to Stripe')).toBeTruthy()
+    expect(screen.getByText('This project is connected to Stripe')).toBeInTheDocument()
     expect(
       screen.getByText('Changes made here may affect your connected Stripe project.')
-    ).toBeTruthy()
-    expect(screen.getByTestId('partner-icon')).toBeTruthy()
-  })
-
-  it('uses a project-specific dismiss key for the Stripe project banner', () => {
-    mockProjectState.current = {
-      ...mockProjectState.current,
-      integration_source: 'stripe_projects',
-    }
-
-    renderLayout()
-
+    ).toBeInTheDocument()
+    expect(screen.getByTestId('partner-icon')).toBeInTheDocument()
     expect(mockUseLocalStorageQuery).toHaveBeenCalledWith(
       LOCAL_STORAGE_KEYS.PROJECT_INTEGRATION_BANNER_DISMISSED('default', 'stripe_projects'),
       false
     )
+  })
+
+  it('renders the paused state for a paused project', () => {
+    mockProjectState.current = { ...mockProjectState.current, status: 'INACTIVE' }
+
+    renderLayout()
+
+    expect(screen.getByText('Project paused')).toBeInTheDocument()
+  })
+
+  it('renders the branches page instead of the paused state for a paused project', () => {
+    mockProjectState.current = { ...mockProjectState.current, status: 'INACTIVE' }
+    mockRouter.pathname = '/project/[ref]/branches'
+    mockRouter.asPath = '/project/default/branches'
+
+    renderLayout()
+
+    expect(screen.queryByText('Project paused')).not.toBeInTheDocument()
   })
 })
 
@@ -454,14 +464,6 @@ describe('FREE_MICRO_UPGRADE banner', () => {
       infra_compute_size: 'nano',
       integration_source: null,
     }
-    mockResourceWarningsState.current = [
-      {
-        project: 'default',
-        cpu_exhaustion: true,
-        memory_and_swap_exhaustion: false,
-        disk_space_exhaustion: false,
-      },
-    ]
     mockBannerDismissedState.current = false
   })
 
@@ -476,11 +478,11 @@ describe('FREE_MICRO_UPGRADE banner', () => {
       infra_compute_size: undefined,
       integration_source: null,
     }
-    mockResourceWarningsState.current = undefined
+    mockOrgPlanState.current = { id: 'pro', name: 'Pro' }
     mockBannerDismissedState.current = false
   })
 
-  it('calls addBanner when project is nano and compute is near exhaustion', async () => {
+  it('calls addBanner when a paid-plan project is nano', async () => {
     renderLayout()
 
     await waitFor(() => {
@@ -490,41 +492,33 @@ describe('FREE_MICRO_UPGRADE banner', () => {
     })
   })
 
-  it('calls dismissBanner when banner was previously dismissed', async () => {
-    mockBannerDismissedState.current = true
-
-    renderLayout()
-
-    await waitFor(() => {
-      expect(mockDismissBanner).toHaveBeenCalledWith('free-micro-upgrade-banner')
-    })
-    expect(mockAddBanner).not.toHaveBeenCalledWith(
-      expect.objectContaining({ id: 'free-micro-upgrade-banner' })
-    )
-  })
-
-  it('calls dismissBanner when compute warnings are cleared', async () => {
-    mockResourceWarningsState.current = [
-      {
-        project: 'default',
-        cpu_exhaustion: false,
-        memory_and_swap_exhaustion: false,
-        disk_space_exhaustion: false,
+  it.each([
+    [
+      'the banner was previously dismissed',
+      () => {
+        mockBannerDismissedState.current = true
       },
-    ]
-
-    renderLayout()
-
-    await waitFor(() => {
-      expect(mockDismissBanner).toHaveBeenCalledWith('free-micro-upgrade-banner')
-    })
-    expect(mockAddBanner).not.toHaveBeenCalledWith(
-      expect.objectContaining({ id: 'free-micro-upgrade-banner' })
-    )
-  })
-
-  it('calls dismissBanner when project is not nano compute', async () => {
-    mockProjectState.current = { ...mockProjectState.current, infra_compute_size: 'micro' }
+    ],
+    [
+      'the project is not nano compute',
+      () => {
+        mockProjectState.current = { ...mockProjectState.current, infra_compute_size: 'micro' }
+      },
+    ],
+    [
+      'the organization is on the free plan',
+      () => {
+        mockOrgPlanState.current = { id: 'free', name: 'Free' }
+      },
+    ],
+    [
+      'the organization plan is not loaded yet',
+      () => {
+        mockOrgPlanState.current = undefined
+      },
+    ],
+  ])('calls dismissBanner instead of addBanner when %s', async (_, arrange) => {
+    arrange()
 
     renderLayout()
 

@@ -48,7 +48,7 @@ export const OperationItem = ({ operationId, tableId, content }: OperationItemPr
     <Card className="overflow-hidden">
       <CardHeader className="py-2 px-3 flex flex-row gap-2 space-y-0 items-center">
         <div className="min-w-0 flex-1">
-          <code className="text-code-inline dark:bg-surface-300 dark:border-foreground-muted/50">
+          <code className="dark:bg-surface-300 dark:border-foreground-muted/50">
             {fullTableName}
           </code>
           <div className="text-xs text-foreground mt-1 ml-0.5">

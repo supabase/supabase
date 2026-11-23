@@ -58,6 +58,7 @@ import { useContentQuery, type Content } from '@/data/content/content-query'
 import { useContentUpsertMutation } from '@/data/content/content-upsert-mutation'
 import { contentKeys } from '@/data/content/keys'
 import type { Snippet } from '@/data/content/sql-folders-query'
+import { unguarded } from '@/data/fetchers'
 import { useExecuteSqlMutation } from '@/data/sql/execute-sql-mutation'
 import { applyAutoLimit } from '@/data/sql/utils'
 import { useSelectedOrganizationQuery } from '@/hooks/misc/useSelectedOrganization'
@@ -69,6 +70,7 @@ import { SHORTCUT_IDS } from '@/state/shortcuts/registry'
 import { useIsShortcutEnabled } from '@/state/shortcuts/useIsShortcutEnabled'
 import { useSidebarManagerSnapshot } from '@/state/sidebar-manager-state'
 import { useSqlEditorSaveCoordinator } from '@/state/sql-editor/sql-editor-save-coordinator'
+import { sqlEditorSessionState } from '@/state/sql-editor/sql-editor-session-state'
 import { useSqlEditorV2StateSnapshot } from '@/state/sql-editor/sql-editor-state'
 
 export const EditorPanel = () => {
@@ -246,6 +248,7 @@ export const EditorPanel = () => {
 
     executeSql({
       sql: applyAutoLimit(acceptUntrustedSql(currentValue), 100).sql,
+      sqlOrigin: 'user',
       projectRef: project?.ref,
       connectionString: project?.connectionString,
       isStatementTimeoutDisabled: true,
@@ -253,6 +256,7 @@ export const EditorPanel = () => {
         throw executeError
       },
       contextualInvalidation: true,
+      grant: unguarded.migrating,
     })
   }
 
@@ -313,6 +317,10 @@ export const EditorPanel = () => {
     })
 
     sqlEditorSnap.addSnippet({ projectRef: ref, snippet })
+    if (results !== undefined && !error) {
+      const { appendAutoLimit } = applyAutoLimit(acceptUntrustedSql(currentValue), 100)
+      sqlEditorSessionState.addResult(snippet.id, [...results], appendAutoLimit ? 100 : undefined)
+    }
     requestSave(snippet.id)
 
     router.push(`/project/${ref}/sql/${snippet.id}`)
@@ -593,7 +601,8 @@ export const EditorPanel = () => {
             )}
             <div className="text-xs text-foreground-light border-t py-2 px-5 flex items-center justify-between">
               <span className="font-mono">
-                {results.length} rows{results.length >= 100 && ` (Limited to only 100 rows)`}
+                {results.length} rows
+                {results.length >= 100 && <span>{` (Limited to only 100 rows)`}</span>}
               </span>
               <Button size="tiny" className="ml-2" onClick={() => setShowResults((prev) => !prev)}>
                 {showResults ? 'Hide Results' : 'Show Results'}

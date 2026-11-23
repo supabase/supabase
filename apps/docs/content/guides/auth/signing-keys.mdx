@@ -20,7 +20,7 @@ When a JWT is issued by Supabase Auth, the key used to create its [signature](ht
 
 ### Benefits of the signing keys system
 
-We've designed the Signing keys system to address many problems the legacy system had. It goes hand-in-hand with the [publishable and secret API keys](/docs/guides/getting-started/api-keys).
+We've designed the Signing keys system to address many problems the legacy system had. It goes hand-in-hand with the [publishable and secret API keys](/docs/guides/getting-started/api-keys). If you are moving off `anon` and `service_role`, follow [Migrating to new API keys](/docs/guides/getting-started/migrating-to-new-api-keys).
 
 | Benefit                                     | Legacy JWT secret                                                                                                            | JWT signing keys                                                                                                                                                                       |
 | ------------------------------------------- | ---------------------------------------------------------------------------------------------------------------------------- | -------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
@@ -58,7 +58,7 @@ Key rotation and revocation are one of the most important processes for maintain
 - The legacy JWT secret has been leaked in logs, committed to source control, or accidentally exposed in the frontend build of your application, a library, desktop or mobile app package, etc.
 - You suspect that a [member of your organization](/docs/guides/platform/access-control) has lost control of their devices, and a malicious actor may have accessed the JWT secret via the Supabase dashboard or by accessing your application's backend configuration.
 - You suspect that an ex-team-member of your organization may be a malicious actor, by abusing the power the legacy JWT secret provides.
-- Make sure you also switch to [publishable and secret API keys](/docs/guides/getting-started/api-keys) and disable the `anon` and `service_role` keys.
+- Make sure you also switch to [publishable and secret API keys](/docs/guides/getting-started/api-keys) and disable the `anon` and `service_role` keys. For the steps, refer to [Migrating to new API keys](/docs/guides/getting-started/migrating-to-new-api-keys).
 - If you've imported a private key, and you're suspecting that this private key has been compromised on your end similarly.
 
 **Closer alignment to security best practices and compliance frameworks (SOC2, PCI-DSS, ISO27000, HIPAA, ...)**
@@ -71,6 +71,12 @@ Key rotation and revocation are one of the most important processes for maintain
 **Changing key algorithm for technical reasons**
 
 - You may wish to switch signing algorithms due to compatibility problems or to simplify development on your end.
+
+<Admonition type="note">
+
+Storage signed URLs use a separate key for signing, so rotating Auth signing keys doesn't invalidate them. For more information, see [Storage URL Signing Keys](/docs/guides/storage/security/signing-keys).
+
+</Admonition>
 
 ### Lifetime of a signing key
 
@@ -101,7 +107,7 @@ GET https://project-id.supabase.co/auth/v1/.well-known/jwks.json
 
 Note that this is secure as public keys are irreversible and can only be used to verify the signature of JSON Web Tokens, but not create new ones.
 
-This discovery endpoint is cached by Supabase's edge servers for 10 minutes. Furthermore the Supabase client libraries may cache the keys in memory for an additional 10 minutes. Your application may be using different caching behavior if you're not relying only on the Supabase client library.
+This discovery endpoint is cached by Supabase's edge servers for 10 minutes. Furthermore the [Supabase client](/docs/reference/javascript/introduction) libraries may cache the keys in memory for an additional 10 minutes. Your application may be using different caching behavior if you're not relying only on the Supabase client library.
 
 This multi-level cache is a trade-off allowing fast JWT verification without placing the Auth server in the hot path of your application, increasing its reliability and performance.
 
@@ -111,6 +117,13 @@ Finally this multi-level cache is cleared every 20 minutes, or longer if you hav
 
 - **Urgent key revocation.** If you are in a security incident where a signing key must be urgently revoked, due to the multi-level cache your application components may still trust and authenticate JWTs signed with the revoked key. Supabase products (Auth, Data API, Storage, Realtime) **do not rely on this cache and revocation is instantaneous.** Should this be an issue for you, ensure you've built a cache busting mechanism as part of your app's backend infrastructure.
 - **Quick key creation and rotation.** If you're migrating away from the legacy JWT secret or when only using the `supabase.auth.getClaims()` method this case is handled for you automatically. If you're verifying JWTs on your own, without the help of the Supabase client library, ensure that **all caches in your app** have picked up the newly created standby key before proceeding to rotation.
+
+If you use asymmetric signing keys and your backend can't reach the discovery endpoint, for example because outbound HTTPS requests are blocked, you can copy the public keys into your app and load them when it starts. Verifying a JWT then needs no network call. Copy every asymmetric key that isn't revoked: the in-use key, the standby key if you have one, and any previously used key. To get the public keys, do one of the following:
+
+- Request the discovery endpoint from a machine that can reach it. The response is one JSON Web Key Set with every trusted public key.
+- In the Supabase Dashboard, go to the [JWT signing keys](/dashboard/project/_/settings/jwt) page. Open the **More options** (⋮) menu next to a key, select **View key details**, and copy the **Public key set (JSON Web Key Set format)**. Each key's dialog contains only that key, so repeat this for each of those keys and combine their `keys` arrays into one key set.
+
+Copied keys never refresh, so your app doesn't learn about a rotation or a revocation. Before you rotate to a standby key, add it to your app and deploy. After you revoke a key, remove it from your app yourself, or your app keeps trusting JWTs signed with it.
 
 ## Choosing the right signing algorithm
 
@@ -201,7 +214,7 @@ In addition, you need to provide the following custom claims as the JWT payload.
 ```
 
 - `sub` is an optional UUID that uniquely identifies a user you want to impersonate in `auth.users` table.
-- `role` must be set to an existing Postgres role in your database, such as `anon`, `authenticated`, or `service_role`.
+- `role` must be set to an existing [Postgres role](/docs/guides/database/postgres/roles) in your database, such as `anon`, `authenticated`, or `service_role`.
 - `exp` must be set to a timestamp in the future (seconds since 1970) when this token expires. Prefer shorter-lived tokens.
 
 For simplicity, use the following CLI command to generate tokens with the desired header and payload.

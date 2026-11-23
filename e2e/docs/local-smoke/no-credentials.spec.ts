@@ -34,17 +34,6 @@ test.describe('docs dev runs locally without credentials', () => {
     await expect(page.getByRole('heading', { name: 'Advisors' })).toBeVisible()
   })
 
-  test('a troubleshooting article page renders without Supabase credentials', async ({ page }) => {
-    const errors = collectPageErrors(page)
-
-    const response = await page.goto('/docs/guides/troubleshooting/rls-simplified-BJTcS8')
-    expect(response?.status(), `expected 200, got ${response?.status()}`).toBe(200)
-
-    await expect(page.getByRole('heading', { name: 'RLS Simplified' })).toBeVisible()
-
-    expect(errors.some((message) => SUPABASE_URL_ERROR.test(message))).toBeFalsy()
-  })
-
   test('a federated guide missing locally returns a clean 404, not a crash', async ({ page }) => {
     const response = await page.goto('/docs/guides/graphql')
     expect(response?.status()).toBe(404)

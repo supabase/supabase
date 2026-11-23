@@ -1,9 +1,9 @@
 import { InfiniteData, useInfiniteQuery } from '@tanstack/react-query'
 
+import { get, handleError } from '../fetchers'
 import { oauthAppsKeys } from './keys'
-import { getMockOAuthAppGrants, USE_MOCKS } from './mocks'
-import type { ListOrgAppGrantsResponse } from './types'
-import type { ResponseError, UseCustomInfiniteQueryOptions } from '@/types'
+import type { StudioError } from '@/lib/errors/studio-errors'
+import type { UseCustomInfiniteQueryOptions } from '@/types'
 
 export type OAuthAppMemberGrantsVariables = {
   slug?: string
@@ -11,22 +11,28 @@ export type OAuthAppMemberGrantsVariables = {
   cursor?: string
 }
 
-export type { ListOrgAppGrantsResponse, OAuthGrantItem, OAuthGrantProject } from './types'
-
 export async function getOAuthAppMemberGrants({
   slug,
   appId,
   cursor,
-}: OAuthAppMemberGrantsVariables): Promise<ListOrgAppGrantsResponse> {
+}: OAuthAppMemberGrantsVariables) {
   if (!slug) throw new Error('Organization slug is required')
   if (!appId) throw new Error('App id is required')
-  if (!USE_MOCKS) throw new Error('OAuth app member grants are not yet implemented')
 
-  return getMockOAuthAppGrants(appId, cursor)
+  const { data, error } = await get(
+    '/platform/organizations/{slug}/oauth/approvals/{app_id}/grants',
+    {
+      params: { path: { slug, app_id: appId }, query: { page: { after: cursor } } },
+    }
+  )
+
+  if (error) handleError(error)
+  return data
 }
 
 export type OAuthAppMemberGrantsData = Awaited<ReturnType<typeof getOAuthAppMemberGrants>>
-export type OAuthAppMemberGrantsError = ResponseError
+export type OAuthAppMemberGrant = OAuthAppMemberGrantsData['data'][number]
+export type OAuthAppMemberGrantsError = StudioError
 
 export const useOAuthAppMemberGrantsQuery = <TData = OAuthAppMemberGrantsData>(
   { slug, appId, cursor }: OAuthAppMemberGrantsVariables,
@@ -45,7 +51,11 @@ export const useOAuthAppMemberGrantsQuery = <TData = OAuthAppMemberGrantsData>(
     queryKey: oauthAppsKeys.appMemberGrants(slug, appId, cursor),
     queryFn: ({ pageParam }) => getOAuthAppMemberGrants({ slug, appId, cursor: pageParam }),
     initialPageParam: cursor,
-    getNextPageParam: (lastPage) => lastPage.pagination.next_cursor,
-    enabled: enabled && USE_MOCKS && Boolean(slug) && Boolean(appId),
+    getNextPageParam: (lastPage) =>
+      lastPage.links.next
+        ? // The URL second paramater does not matter as we only want to extract the search params
+          new URL(lastPage.links.next, 'http://localhost').searchParams.get('page[after]')
+        : null,
+    enabled: enabled && Boolean(slug) && Boolean(appId),
     ...options,
   })

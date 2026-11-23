@@ -3,7 +3,7 @@ import { toast } from 'sonner'
 
 import { storageKeys } from './keys'
 import { del, handleError } from '@/data/fetchers'
-import type { ResponseError } from '@/types'
+import type { StudioError } from '@/lib/errors/studio-errors'
 
 type VectorBucketIndexDeleteVariables = {
   projectRef: string
@@ -40,12 +40,12 @@ export const useVectorBucketIndexDeleteMutation = ({
   onError,
   ...options
 }: Omit<
-  UseMutationOptions<VectorBucketIndexDeleteData, ResponseError, VectorBucketIndexDeleteVariables>,
+  UseMutationOptions<VectorBucketIndexDeleteData, StudioError, VectorBucketIndexDeleteVariables>,
   'mutationFn'
 > = {}) => {
   const queryClient = useQueryClient()
 
-  return useMutation<VectorBucketIndexDeleteData, ResponseError, VectorBucketIndexDeleteVariables>({
+  return useMutation<VectorBucketIndexDeleteData, StudioError, VectorBucketIndexDeleteVariables>({
     mutationFn: (vars) => deleteVectorBucketIndex(vars),
     async onSuccess(data, variables, context, mutationContext) {
       const { projectRef, bucketName } = variables

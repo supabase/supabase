@@ -22,6 +22,7 @@ import {
   FormItem,
   FormMessage,
   Input,
+  SplitButtonGroup,
 } from 'ui'
 
 export type KeyValueFieldArrayAction<TItem> = {
@@ -177,18 +178,14 @@ export const KeyValueFieldArray = <
         ))}
       </div>
 
-      <div className="flex items-center">
+      <SplitButtonGroup className="items-center">
         <Button
           size="tiny"
           type="button"
           icon={<Plus />}
           disabled={disabled}
           onClick={() => append(createEmptyRow())}
-          className={cn(
-            hasAddActions &&
-              'rounded-r-none px-3 hover:z-10 focus-visible:z-10 focus-visible:rounded-r-sm',
-            addButtonClassName
-          )}
+          className={cn(hasAddActions && 'px-3', addButtonClassName)}
         >
           {addLabel}
         </Button>
@@ -202,7 +199,7 @@ export const KeyValueFieldArray = <
                 icon={<ChevronDown size={14} />}
                 aria-label={addActionsLabel}
                 disabled={disabled}
-                className="shrink-0 rounded-l-none px-[4px] py-[5px] -ml-px focus-visible:z-10 focus-visible:rounded-l-sm"
+                className="shrink-0 px-1 py-1.25"
               />
             </DropdownMenuTrigger>
             <DropdownMenuContent align="end" side="bottom">
@@ -233,7 +230,7 @@ export const KeyValueFieldArray = <
             </DropdownMenuContent>
           </DropdownMenu>
         )}
-      </div>
+      </SplitButtonGroup>
     </div>
   )
 }

@@ -3,23 +3,25 @@ title: 'Configuration'
 subtitle: 'Configure your Supabase branches using configuration as code'
 ---
 
-This guide covers how to configure your Supabase branches, using the `config.toml` file. In one single file, you can configure all your branches, including branch settings and secrets.
+This guide covers how to configure your Supabase branches, using your config file (`supabase/config.toml` or `supabase/config.jsonc`). In one single file, you can configure all your branches, including branch settings and secrets.
+
+To switch formats, see [Config file formats](/docs/guides/local-development/cli/config-formats).
 
 ## Branch configuration with remotes
 
-When Branching is enabled, your `config.toml` settings automatically sync to all ephemeral branches through a one-to-one mapping between your Git and Supabase branches.
+When Branching is enabled, your config settings automatically sync to all ephemeral branches through a one-to-one mapping between your Git and Supabase branches.
 
 ### Basic configuration
 
-To update configuration for a Supabase branch, modify `config.toml` and push to git. The Supabase integration will detect the changes and apply them to the corresponding branch.
+To update configuration for a Supabase branch, modify your config file and push to git. The Supabase integration will detect the changes and apply them to the corresponding branch.
 
 ### Remote-specific configuration
 
-For persistent branches that need specific settings, you can use the `[remotes]` block in your `config.toml`. Each remote configuration must reference an existing project ID.
+For persistent branches that need specific settings, you can use a `remotes` entry in your config file. Each remote configuration must reference an existing project ID.
 
 Here's an example of configuring a separate seed script for a staging environment:
 
-```toml
+```toml supabase/config.toml
 [remotes.staging]
 project_id = "your-project-ref"
 
@@ -60,19 +62,19 @@ If no remote is declared or the project ID is incorrect, the configuration step 
 
 ### Available configuration options
 
-All standard configuration options are available in the `[remotes]` block. This includes:
+All standard configuration options are available in a `remotes` entry. This includes:
 
 - Database settings
 - API configurations
-- Authentication settings
-- Edge Functions configuration
+- [Authentication](/docs/guides/auth) settings
+- [Edge Functions](/docs/guides/functions) configuration
 - And more
 
 You can use this to maintain different configurations for different environments while keeping them all in version control.
 
 ## Managing secrets for branches
 
-For sensitive configuration like SMTP credentials or API keys, you can use the Supabase CLI to manage secrets for your branches. This is especially useful for custom SMTP setup or other services that require secure credentials.
+For sensitive configuration like SMTP credentials or API keys, you can use the [Supabase CLI](/docs/guides/local-development/cli/getting-started) to manage secrets for your branches. This is especially useful for [custom SMTP](/docs/guides/auth/auth-smtp) setup or other services that require secure credentials.
 
 To set secrets for a persistent branch:
 
@@ -86,9 +88,9 @@ supabase secrets set SMTP_USER=your-username
 supabase secrets set SMTP_PASSWORD=your-password
 ```
 
-These secrets will be available to your branch's services and can be used in your configuration. For example, in your `config.toml`:
+These secrets will be available to your branch's services and can be used in your configuration. For example, in your config file:
 
-```toml
+```toml supabase/config.toml
 [auth.smtp]
 host = "env(SMTP_HOST)"
 user = "env(SMTP_USER)"
@@ -133,11 +135,11 @@ This creates a new encryption key in `supabase/.env.preview` and a new decryptio
 npx supabase secrets set --env-file supabase/.env.keys
 ```
 
-3. Choose your configuration approach in `config.toml`:
+3. Choose your configuration approach in your config file:
 
 Option A: Use encrypted values directly:
 
-```toml
+```toml supabase/config.toml
 [auth.external.github]
 enabled = true
 secret = "encrypted:<encrypted-value>"
@@ -145,7 +147,7 @@ secret = "encrypted:<encrypted-value>"
 
 Option B: Use environment variables:
 
-```toml
+```toml supabase/config.toml
 [auth.external.github]
 enabled = true
 client_id = "env(SUPABASE_AUTH_EXTERNAL_GITHUB_CLIENT_ID)"
@@ -218,7 +220,7 @@ When you commit your `.env.preview` file with encrypted values, the branching ex
 
 Here's an example of a complete multi-environment configuration:
 
-```toml
+```toml supabase/config.toml
 # Default configuration for all branches
 [api]
 enabled = true
@@ -267,7 +269,7 @@ Use the value from the `BRANCH PROJECT ID` column as your `project_id` in the re
 
 For feature branches that need specific settings:
 
-```toml
+```toml supabase/config.toml
 [remotes.feature-oauth]
 project_id = "feature-branch-ref"
 

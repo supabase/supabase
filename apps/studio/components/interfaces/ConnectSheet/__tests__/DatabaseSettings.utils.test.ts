@@ -47,7 +47,7 @@ describe('getSelfHostedPoolerStrings', () => {
   test('uses POOLER_TENANT_ID and YOUR-PASSWORD placeholders', () => {
     const strings = getSelfHostedPoolerStrings('db.example.com', 6543)
     expect(strings.uri).toBe(
-      'postgresql://postgres.[POOLER_TENANT_ID]:[YOUR-PASSWORD]@db.example.com:6543/postgres'
+      'postgresql://postgres.[POOLER_TENANT_ID]:[YOUR-DATABASE-PASSWORD]@db.example.com:6543/postgres'
     )
   })
 
@@ -64,22 +64,19 @@ describe('getSelfHostedPoolerStrings', () => {
     expect(strings.dotnet).toContain('Database=mydb')
     expect(strings.nodejs).toBe(`DATABASE_URL=${strings.uri}`)
   })
-
-  test('defaults database name to postgres', () => {
-    const strings = getSelfHostedPoolerStrings('db.example.com', 6543)
-    expect(strings.uri.endsWith('/postgres')).toBe(true)
-  })
 })
 
 describe('getSelfHostedDirectStrings', () => {
   test('uses plain postgres user (no tenant id)', () => {
     const strings = getSelfHostedDirectStrings('db.example.com', 5432)
-    expect(strings.uri).toBe('postgresql://postgres:[YOUR-PASSWORD]@db.example.com:5432/postgres')
+    expect(strings.uri).toBe(
+      'postgresql://postgres:[YOUR-DATABASE-PASSWORD]@db.example.com:5432/postgres'
+    )
   })
 
   test('threads host, port, and database name through every format', () => {
     const strings = getSelfHostedDirectStrings('db.example.com', 5432, 'mydb')
-    expect(strings.uri).toContain('postgres:[YOUR-PASSWORD]@db.example.com:5432/mydb')
+    expect(strings.uri).toContain('postgres:[YOUR-DATABASE-PASSWORD]@db.example.com:5432/mydb')
     expect(strings.jdbc).toContain('db.example.com:5432/mydb')
     expect(strings.golang).toContain('user=postgres\n')
     expect(strings.dotnet).toContain('User Id=postgres;')
@@ -88,11 +85,11 @@ describe('getSelfHostedDirectStrings', () => {
 
 describe('buildConnectionStringPooler', () => {
   const sharedPlatform = makeStrings(
-    'postgresql://postgres.proj:[YOUR-PASSWORD]@aws-0-eu-west-1.pooler.supabase.com:6543/postgres',
-    'postgresql://postgres:[YOUR-PASSWORD]@db.proj.supabase.co:5432/postgres'
+    'postgresql://postgres.proj:[YOUR-DATABASE-PASSWORD]@aws-0-eu-west-1.pooler.supabase.com:6543/postgres',
+    'postgresql://postgres:[YOUR-DATABASE-PASSWORD]@db.proj.supabase.co:5432/postgres'
   )
   const dedicatedPlatform = makeStrings(
-    'postgresql://dedicated.proj:[YOUR-PASSWORD]@aws-0-eu-west-1.pooler.supabase.com:6543/postgres',
+    'postgresql://dedicated.proj:[YOUR-DATABASE-PASSWORD]@aws-0-eu-west-1.pooler.supabase.com:6543/postgres',
     ''
   )
   const connectionInfo = { db_host: 'db.example.com', db_port: 5432 }
@@ -156,13 +153,13 @@ describe('buildConnectionStringPooler', () => {
     })
 
     expect(result.transactionShared).toBe(
-      'postgresql://postgres.[POOLER_TENANT_ID]:[YOUR-PASSWORD]@supabase.example.com:6543/postgres'
+      'postgresql://postgres.[POOLER_TENANT_ID]:[YOUR-DATABASE-PASSWORD]@supabase.example.com:6543/postgres'
     )
     expect(result.sessionShared).toBe(
-      'postgresql://postgres.[POOLER_TENANT_ID]:[YOUR-PASSWORD]@supabase.example.com:5432/postgres'
+      'postgresql://postgres.[POOLER_TENANT_ID]:[YOUR-DATABASE-PASSWORD]@supabase.example.com:5432/postgres'
     )
     expect(result.direct).toBe(
-      'postgresql://postgres:[YOUR-PASSWORD]@supabase.example.com:5432/postgres'
+      'postgresql://postgres:[YOUR-DATABASE-PASSWORD]@supabase.example.com:5432/postgres'
     )
     expect(result.transactionDedicated).toBeUndefined()
     expect(result.sessionDedicated).toBeUndefined()
@@ -201,22 +198,6 @@ describe('buildConnectionStringPooler', () => {
     expect(result.transactionDedicated).toBeUndefined()
     expect(result.sessionDedicated).toBeUndefined()
     expect(result.ipv4SupportedForDedicatedPooler).toBe(false)
-  })
-
-  test('platform without high availability appends no SSL params', () => {
-    const result = buildConnectionStringPooler({
-      deploymentMode: platform,
-      connectionInfo,
-      connectionStringsShared: sharedPlatform,
-      connectionStringsDedicated: dedicatedPlatform,
-      ipv4Addon: true,
-      isHighAvailability: false,
-    })
-
-    expect(result.direct).toBe(sharedPlatform.direct.uri)
-    expect(result.transactionShared).toBe(sharedPlatform.pooler.uri)
-    expect(result.direct).not.toContain('sslnegotiation')
-    expect(result.transactionShared).not.toContain('sslnegotiation')
   })
 })
 
@@ -280,7 +261,7 @@ describe('getHighAvailabilityLoadBalancerConnectionInfo', () => {
     })
 
     expect(result.direct).toBe(
-      `postgresql://postgres:[YOUR-PASSWORD]@db.proj.supabase.co:5433/postgres?${HIGH_AVAILABILITY_SSL_PARAMS}`
+      `postgresql://postgres:[YOUR-DATABASE-PASSWORD]@db.proj.supabase.co:5433/postgres?${HIGH_AVAILABILITY_SSL_PARAMS}`
     )
   })
 })

@@ -23,15 +23,19 @@ export const LOG_TYPES_LABELS = {
   auth: 'Auth',
   storage: 'Storage',
   'edge function': 'Edge Function',
+  'edge function runtime': 'Edge Function runtime',
   realtime: 'Realtime',
   supavisor: 'Supavisor',
   pgbouncer: 'PgBouncer',
   multigres: 'Multigres',
+  pipelines: 'Pipelines',
   compute: 'Compute',
 }
 
 type LogType = keyof typeof LOG_TYPES_LABELS
 export const LOG_TYPES = Object.keys(LOG_TYPES_LABELS) as [LogType, ...LogType[]]
+
+export const PIPELINE_LOG_LEVEL_LABELS = { success: 'Info', warning: 'Warning', error: 'Error' }
 
 export const LOG_TYPE_TO_SOURCE: Record<Exclude<LogType, 'compute'>, string> = {
   edge: 'edge_logs',
@@ -39,11 +43,13 @@ export const LOG_TYPE_TO_SOURCE: Record<Exclude<LogType, 'compute'>, string> = {
   storage: 'storage_logs',
   postgres: 'postgres_logs',
   'edge function': 'function_edge_logs',
+  'edge function runtime': 'function_logs',
   auth: 'auth_logs',
   realtime: 'realtime_logs',
   supavisor: 'supavisor_logs',
   pgbouncer: 'pgbouncer_logs',
   multigres: 'multigres_logs',
+  pipelines: 'etl_replication_logs',
 }
 
 const parseAsSort = createParser({

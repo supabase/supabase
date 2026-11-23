@@ -4,7 +4,8 @@ import { profileKeys } from './keys'
 import { get, handleError } from '@/data/fetchers'
 import { AuditLog } from '@/data/organizations/organization-audit-logs-query'
 import { IS_PLATFORM } from '@/lib/constants'
-import type { ResponseError, UseCustomQueryOptions } from '@/types'
+import type { StudioError } from '@/lib/errors/studio-errors'
+import type { UseCustomQueryOptions } from '@/types'
 
 export type ProfileAuditLogsVariables = {
   iso_timestamp_start: string
@@ -29,7 +30,7 @@ export async function getProfileAuditLogs(
   return data as unknown as ProfileAuditLogsData
 }
 
-export type ProfileAuditLogsError = ResponseError
+export type ProfileAuditLogsError = StudioError
 export type ProfileAuditLogsData = {
   result: AuditLog[]
   retention_period: number

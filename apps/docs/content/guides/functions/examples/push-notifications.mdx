@@ -16,14 +16,14 @@ Push notifications are an important part of any mobile app. They allow you to se
   <TabPanel id="expo" label="Expo Push Notifications">
     [Expo](https://docs.expo.dev/push-notifications/overview/) makes implementing push notifications easy. All the hassle with device information and communicating with Firebase Cloud Messaging (FCM) or Apple Push Notification Service (APNs) is done behind the scenes. This allows you to treat Android and iOS notifications in the same way and save time both on the frontend and backend.
 
-    Find the example code on [GitHub](https://github.com/supabase/supabase/blob/master/examples/user-management/expo-push-notifications/).
+    Find the example code on [GitHub](https://github.com/supabase/supabase/tree/master/examples/user-management/expo-push-notifications).
 
     ## Supabase setup
 
     - [Create a new Supabase project](https://database.new).
     - Link your project: `supabase link --project-ref your-supabase-project-ref`
     - Start Supabase locally: `supabase start`
-    - Push up the schema: `supabase db push` (schema is defined in [supabase/migrations](https://github.com/supabase/supabase/blob/master/examples/user-management/expo-push-notifications/supabase/migrations/))
+    - Push up the schema: `supabase db push --remote` (schema is defined in [supabase/migrations](https://github.com/supabase/supabase/blob/master/examples/user-management/expo-push-notifications/supabase/migrations/))
 
     ## Expo setup
 
@@ -35,7 +35,7 @@ Push notifications are an important part of any mobile app. They allow you to se
     1. [Create a build for your physical device](https://docs.expo.dev/develop/development-builds/create-a-build/#create-a-build-for-the-device)
     1. Start the development server for your project: `npx expo start --dev-client`
     1. Scan the QR code shown in the terminal with your physical device.
-    1. Sign up/in to create a user in Supabase Auth.
+    1. Sign up/in to create a user in [Supabase Auth](/docs/guides/auth).
 
     ## Enhanced security for push notifications
 

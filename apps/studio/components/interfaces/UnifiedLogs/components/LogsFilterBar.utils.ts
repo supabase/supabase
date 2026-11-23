@@ -7,11 +7,17 @@ import {
 } from 'ui-patterns/FilterBar'
 import { z } from 'zod'
 
+import { LOG_TYPE_TO_SOURCE } from '../UnifiedLogs.constants'
 import {
+  getLogAttributeKey,
+  groupLogsFiltersByColumn,
   isLogsFilterColumnValue,
+  parseLogsFilterUrlParams,
   type LogsColumnFilterValue,
   type LogsFilterOperator,
 } from '../UnifiedLogs.filters'
+import type { QuerySearchParamsType } from '../UnifiedLogs.types'
+import { getAvailableLogTypes } from '../UnifiedLogs.utils'
 import { REPORTS_DATEPICKER_HELPERS } from '@/components/interfaces/Reports/Reports.constants'
 import {
   findMatchingDateHelper,
@@ -53,6 +59,14 @@ const COMPARISON_OPERATORS: FilterProperty['operators'] = [
   { label: 'Equals', value: '=', group: 'comparison' },
   { label: 'Not equal', value: '<>', group: 'comparison' },
 ]
+
+export const buildAttributeFilterProperty = (id: string): FilterProperty => ({
+  label: getLogAttributeKey(id) ?? id,
+  propertyGroupLabel: 'Attributes',
+  name: id,
+  type: 'string',
+  operators: COMPARISON_OPERATORS,
+})
 
 const PATTERN_OPERATORS: FilterProperty['operators'] = [
   { label: 'iLike', value: '~~*', group: 'pattern' },
@@ -161,4 +175,28 @@ export const formatTimeRangeValue = (value: FilterCondition['value']): string =>
   const [from, to] = range
   const helper = findMatchingDateHelper(from, to, REPORTS_DATEPICKER_HELPERS)
   return helper?.text ?? formatDateRange(from.toISOString(), to.toISOString())
+}
+
+export const getLogAttributeSources = (search: QuerySearchParamsType): string[] => {
+  const filter = groupLogsFiltersByColumn(parseLogsFilterUrlParams(search.filter)).log_type
+  const hasUser = !!search.user?.trim()
+  let types = getAvailableLogTypes(search)
+  if (filter?.operator === '=') types = types.filter((type) => filter.values.includes(type))
+  if (filter?.operator === '<>') {
+    types = types.filter(
+      (type) =>
+        !filter.values.includes(type) && (!!search.scope || type !== 'edge function runtime')
+    )
+  }
+  const scopeTypes = search.scope?.filters.filter(({ column }) => column === 'log_type') ?? []
+  const includedScopeTypes = scopeTypes.filter(({ operator }) => operator === '=')
+  const excludedScopeTypes = scopeTypes.filter(({ operator }) => operator === '<>')
+  if (includedScopeTypes.length > 0) {
+    types = types.filter((type) => includedScopeTypes.some(({ value }) => value === type))
+  }
+  types = types.filter((type) => !excludedScopeTypes.some(({ value }) => value === type))
+  if (hasUser) types = types.filter((type) => type === 'edge' || type === 'auth')
+  return Object.entries(LOG_TYPE_TO_SOURCE)
+    .filter(([type]) => types.includes(type))
+    .map(([, source]) => source)
 }

@@ -3,7 +3,8 @@ import { toast } from 'sonner'
 
 import { constructHeaders, fetchHandler, handleError } from '@/data/fetchers'
 import { API_URL } from '@/lib/constants'
-import type { ResponseError, UseCustomMutationOptions } from '@/types'
+import type { StudioError } from '@/lib/errors/studio-errors'
+import type { UseCustomMutationOptions } from '@/types'
 
 export type VerifyEmailVariables = {
   token: string
@@ -37,10 +38,10 @@ export const useVerifyEmailMutation = ({
   onError,
   ...options
 }: Omit<
-  UseCustomMutationOptions<VerifyEmailData, ResponseError, VerifyEmailVariables>,
+  UseCustomMutationOptions<VerifyEmailData, StudioError, VerifyEmailVariables>,
   'mutationFn'
 > = {}) => {
-  return useMutation<VerifyEmailData, ResponseError, VerifyEmailVariables>({
+  return useMutation<VerifyEmailData, StudioError, VerifyEmailVariables>({
     mutationFn: (vars) => verifyEmail(vars),
     async onSuccess(data, variables, context) {
       await onSuccess?.(data, variables, context)

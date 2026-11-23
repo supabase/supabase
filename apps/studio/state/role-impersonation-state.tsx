@@ -15,6 +15,8 @@ import {
   CustomAccessTokenHookDetails,
   useCustomAccessTokenHookDetails,
 } from '../hooks/misc/useCustomAccessTokenHookDetails'
+import { isUserFaultForSql } from '@/data/error-classification'
+import { unguarded } from '@/data/fetchers'
 import { executeSql } from '@/data/sql/execute-sql-mutation'
 import { useLatest } from '@/hooks/misc/useLatest'
 import { useSelectedProjectQuery } from '@/hooks/misc/useSelectedProject'
@@ -40,8 +42,13 @@ function useCustomizeAccessToken(
       const result = await executeSql({
         projectRef,
         connectionString,
+        // The hook is the user's own function: Studio wrote the call, the user wrote what it runs
+        sqlOrigin: 'studio',
+        queryName: 'customize-access-token-hook',
+        isUserFaultSqlState: isUserFaultForSql,
         sql: safeSql`select ${ident(schema)}.${ident(functionName)}(${literal(JSON.stringify(event))}::jsonb) as event;`,
         queryKey: ['customize-access-token', projectRef],
+        grant: unguarded.migrating,
       })
 
       return result?.result?.[0]?.event?.claims

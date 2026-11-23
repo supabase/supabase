@@ -1,44 +1,35 @@
-import { useParams } from 'common'
 import { PropsWithChildren } from 'react'
+import { PageContainer } from 'ui-patterns/PageContainer'
+import {
+  PageHeader,
+  PageHeaderAside,
+  PageHeaderDescription,
+  PageHeaderMeta,
+  PageHeaderSummary,
+  PageHeaderTitle,
+} from 'ui-patterns/PageHeader'
 
-import { PageLayout } from '@/components/layouts/PageLayout/PageLayout'
-import { ScaffoldContainer } from '@/components/layouts/Scaffold'
 import { DocsButton } from '@/components/ui/DocsButton'
-import { useHighAvailability } from '@/hooks/misc/useHighAvailability'
 import { DOCS_URL } from '@/lib/constants'
 
 const ApiKeysLayout = ({ children }: PropsWithChildren) => {
-  const { ref: projectRef } = useParams()
-  const { isHighAvailability } = useHighAvailability()
-
-  const navigationItems = [
-    {
-      label: 'Publishable and secret API keys',
-      href: `/project/${projectRef}/settings/api-keys`,
-      id: 'new-keys',
-    },
-    ...(isHighAvailability
-      ? []
-      : [
-          {
-            label: 'Legacy anon, service_role API keys',
-            href: `/project/${projectRef}/settings/api-keys/legacy`,
-            id: 'legacy-keys',
-          },
-        ]),
-  ]
-
   return (
-    <PageLayout
-      title="API Keys"
-      subtitle="Configure API keys to securely control access to your project"
-      navigationItems={navigationItems}
-      secondaryActions={<DocsButton href={`${DOCS_URL}/guides/api/api-keys`} />}
-    >
-      <ScaffoldContainer className="flex flex-col py-8 gap-8" bottomPadding>
-        {children}
-      </ScaffoldContainer>
-    </PageLayout>
+    <>
+      <PageHeader>
+        <PageHeaderMeta>
+          <PageHeaderSummary>
+            <PageHeaderTitle>API Keys</PageHeaderTitle>
+            <PageHeaderDescription>
+              Configure API keys to securely control access to your project
+            </PageHeaderDescription>
+          </PageHeaderSummary>
+          <PageHeaderAside>
+            <DocsButton href={`${DOCS_URL}/guides/api/api-keys`} />
+          </PageHeaderAside>
+        </PageHeaderMeta>
+      </PageHeader>
+      <PageContainer className="flex flex-col py-8 pb-16 gap-8">{children}</PageContainer>
+    </>
   )
 }
 

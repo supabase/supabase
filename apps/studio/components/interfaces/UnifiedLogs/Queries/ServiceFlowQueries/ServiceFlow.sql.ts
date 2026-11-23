@@ -170,7 +170,14 @@ const getBaseEdgeServiceFlowQuery = (
     left join unnest(COALESCE(sb_apikey_outer.apikey, [])) as sb_apikey_inner
 
 WHERE
-  el.id = ${analyticsLiteral(logId)}
+  ${
+    serviceType === 'auth'
+      ? safeSql`(el.id = ${analyticsLiteral(logId)} OR edge_logs_response_headers.cf_ray IN (
+    SELECT am.request_id FROM auth_logs AS a LEFT JOIN UNNEST(a.metadata) AS am
+    WHERE a.id = ${analyticsLiteral(logId)} AND am.request_id IS NOT NULL
+  ))`
+      : safeSql`el.id = ${analyticsLiteral(logId)}`
+  }
 `
 }
 
@@ -189,6 +196,21 @@ export const getPostgrestServiceFlowQuery = (logId: string): SafeLogSqlFragment 
 export const getAuthServiceFlowQuery = (logId: string): SafeLogSqlFragment => {
   return getBaseEdgeServiceFlowQuery(logId, 'auth')
 }
+
+export const getStandaloneAuthLogQuery = (logId: string): SafeLogSqlFragment => safeSql`
+SELECT
+  al.id,
+  al.timestamp,
+  'auth' AS log_type,
+  json_value(al.event_message, '$.status') AS status,
+  json_value(al.event_message, '$.method') AS method,
+  json_value(al.event_message, '$.path') AS pathname,
+  al.event_message,
+  al AS raw_log_data
+FROM auth_logs AS al
+WHERE al.id = ${analyticsLiteral(logId)}
+LIMIT 1
+`
 
 /**
  * Edge Function Service Flow Query for /functions/ requests
@@ -378,6 +400,7 @@ export const getPostgresServiceFlowQuery = (logId: string): SafeLogSqlFragment =
       pgl_parsed.query_id as query_id,
       pgl_parsed.query as query,
       pgl_parsed.detail as detail,
+      pgl_parsed.hint as hint,
 
       -- Session details
       pgl_parsed.session_id as session_id,

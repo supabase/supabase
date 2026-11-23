@@ -1,5 +1,6 @@
 import type { UserIdentity } from '@supabase/supabase-js'
 import { useQuery } from '@tanstack/react-query'
+import { useUser } from 'common'
 
 import { profileKeys } from './keys'
 import { auth } from '@/lib/gotrue'
@@ -30,9 +31,11 @@ export const useProfileIdentitiesQuery = <TData = ProfileIdentitiesData>({
   enabled = true,
   ...options
 }: UseCustomQueryOptions<ProfileIdentitiesData, ProfileIdentitiesError, TData> = {}) => {
+  const userId = useUser()?.id
   return useQuery<ProfileIdentitiesData, ProfileIdentitiesError, TData>({
-    queryKey: profileKeys.identities(),
+    queryKey: profileKeys.identities(userId),
     queryFn: () => getProfileIdentities(),
+    enabled,
     ...options,
   })
 }

@@ -9,7 +9,7 @@
 
 [सुपाबेस](https://supabase.com) एक ओपन सोर्स फ़ाायरबेस विकल्प है। हम एंटरप्राइज़-गुणवत्ता ओपन सोर्स सॉफ़्टवेयर उपकरण का उपयोग करके फ़ाायरबेस की सुविधाओं का निर्माण कर रहे हैं।
 
-- [x] होस्टेड पोस्टग्रेज डेटाबेस। [प्रलेखन](https://supabase.com/docs/guides/database)
+- [x] होस्टेड पोस्टग्रेज डेटाबेस। [प्रलेखन](https://supabase.com/docs/guides/database/overview)
 - [x] प्रमाणीकरण और प्राधिकरण। [प्रलेखन](https://supabase.com/docs/guides/auth)
 - [x] उत्पन्न एपीआईस।
   - [x] रेस्ट। [प्रलेखन](https://supabase.com/docs/guides/api#rest-api-overview)
@@ -62,7 +62,7 @@
 - [PostgreSQL](https://www.postgresql.org/) 30 से अधिक वर्षों के सक्रिय विकास के साथ एक वस्तु-संबंधपरक डेटाबेस प्रणाली है जिसने इसे विश्वसनीयता, सुविधा मजबूती और प्रदर्शन के लिए एक मजबूत प्रतिष्ठा अर्जित की है।
 - [Realtime](https://github.com/supabase/realtime) एक एलिक्जिर सर्वर है जो आपको पोस्टग्रॉसीक्यूएल आवेषण, अपडेट्स को सुनने की अनुमति देता है और वेबसोकेट का उपयोग करके हटाता है। सुपाबेस पोस्टग्रेज की अंतर्निहित प्रतिकृति कार्यक्षमता को सुनता है, प्रतिकृति बाइट स्ट्रीम को JSON में परिवर्तित करता है, फिर JSON को वेबस्कॉक पर प्रसारित करता है।
 - [PostgREST](http://postgrest.org/) एक वेब सर्वर है जो आपके पोस्टग्रेससीक्यूएल डेटाबेस को सीधे RESTful एपीआई में बदल देता है
-- [Storage](https://github.com/supabase/storage-api) अनुमतियाँ प्रबंधित करने के लिए पोस्टग्रेस का उपयोग करके S3 में संग्रहीत फ़ाइलों के प्रबंधन के लिए एक RESTful इंटरफ़ेस प्रदान करता है।
+- [Storage](https://github.com/supabase/storage) अनुमतियाँ प्रबंधित करने के लिए पोस्टग्रेस का उपयोग करके S3 में संग्रहीत फ़ाइलों के प्रबंधन के लिए एक RESTful इंटरफ़ेस प्रदान करता है।
 - [postgres-meta](https://github.com/supabase/postgres-meta) आपके पोस्टग्रेज के प्रबंधन के लिए एक RESTful एपीआई है, जिससे आप टेबल प्राप्त कर सकते हैं, भूमिकाएँ जोड़ सकते हैं और क्वेरीज़ आदि चला सकते हैं।
 - [GoTrue](https://github.com/netlify/gotrue) उपयोगकर्ताओं को प्रबंधित करने और SWT टोकन जारी करने के लिए एक SWT आधारित एपीआई है।
 - [Kong](https://github.com/Kong/kong) एक क्लाउड-नेटिव एपीआई गेटवे है।
@@ -81,9 +81,9 @@
     <th></th>
     <th>सुपाबेस</th>
     <th><a href="https://github.com/postgrest/postgrest" target="_blank" rel="noopener noreferrer">PostgREST</a></th>
-    <th><a href="https://github.com/supabase/gotrue" target="_blank" rel="noopener noreferrer">GoTrue</a></th>
+    <th><a href="https://github.com/supabase/auth" target="_blank" rel="noopener noreferrer">GoTrue</a></th>
     <th><a href="https://github.com/supabase/realtime" target="_blank" rel="noopener noreferrer">Realtime</a></th>
-    <th><a href="https://github.com/supabase/storage-api" target="_blank" rel="noopener noreferrer">Storage</a></th>
+    <th><a href="https://github.com/supabase/storage" target="_blank" rel="noopener noreferrer">Storage</a></th>
   </tr>
   <!-- TEMPLATE FOR NEW ROW -->
   <!-- START ROW
@@ -108,7 +108,7 @@
   <th colspan="6">💚 समुदाय 💚</th>
   <tr>
     <td>सीशार्प</td>
-    <td><a href="https://github.com/supabase-community/supabase-csharp" target="_blank" rel="noopener noreferrer">supabase-csharp</a></td>
+    <td><a href="https://github.com/supabase/supabase-csharp" target="_blank" rel="noopener noreferrer">supabase-csharp</a></td>
     <td><a href="https://github.com/supabase-community/postgrest-csharp" target="_blank" rel="noopener noreferrer">postgrest-csharp</a></td>
     <td><a href="https://github.com/supabase-community/gotrue-csharp" target="_blank" rel="noopener noreferrer">gotrue-csharp</a></td>
     <td><a href="https://github.com/supabase-community/realtime-csharp" target="_blank" rel="noopener noreferrer">realtime-csharp</a></td>
@@ -148,7 +148,7 @@
   </tr>
   <tr>
     <td>पाइथन</td>
-    <td><a href="https://github.com/supabase-community/supabase-py" target="_blank" rel="noopener noreferrer">supabase-py</a></td>
+    <td><a href="https://github.com/supabase/supabase-py" target="_blank" rel="noopener noreferrer">supabase-py</a></td>
     <td><a href="https://github.com/supabase-community/postgrest-py" target="_blank" rel="noopener noreferrer">postgrest-py</a></td>
     <td><a href="https://github.com/supabase-community/gotrue-py" target="_blank" rel="noopener noreferrer">gotrue-py</a></td>
     <td><a href="https://github.com/supabase-community/realtime-py" target="_blank" rel="noopener noreferrer">realtime-py</a></td>

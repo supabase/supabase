@@ -30,6 +30,7 @@ import { Input as DataInput } from 'ui-patterns/DataInputs/Input'
 import { FormItemLayout } from 'ui-patterns/form/FormItemLayout/FormItemLayout'
 
 import type { Enum } from './AuthProvidersForm.types'
+import { CommaSeparatedListInput } from './CommaSeparatedListInput'
 import { Markdown } from '@/components/interfaces/Markdown'
 import { BASE_PATH } from '@/lib/constants'
 
@@ -174,6 +175,39 @@ const FormField = ({
                     ) : (
                       <Input {...field} readOnly={readOnly} />
                     )}
+                  </FormControl>
+                </FormItemLayout>
+              )}
+            />
+          </SheetSection>
+          <Separator className="w-full" />
+        </>
+      )
+
+    case 'comma-separated-list':
+      return (
+        <>
+          <SheetSection>
+            <UIFormField
+              control={control}
+              name={name}
+              disabled={disabled}
+              render={({ field }) => (
+                <FormItemLayout
+                  layout="horizontal"
+                  label={properties.title}
+                  description={
+                    description ? (
+                      <Markdown content={description} className="text-foreground-lighter" />
+                    ) : null
+                  }
+                >
+                  <FormControl className="col-span-6">
+                    <CommaSeparatedListInput
+                      {...field}
+                      value={field.value ?? ''}
+                      readOnly={readOnly}
+                    />
                   </FormControl>
                 </FormItemLayout>
               )}

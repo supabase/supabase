@@ -21,6 +21,10 @@ vi.mock('@/hooks/misc/useSelectedProject', () => ({
 
 const eligibility = (delta: Record<string, unknown>) => ({
   can: false,
+  isLoading: false,
+  isError: false,
+  error: null,
+  refetch: vi.fn(),
   hasOverdueInvoices: false,
   isAWSProvider: true,
   isAwsK8s: false,
@@ -30,8 +34,65 @@ const eligibility = (delta: Record<string, unknown>) => ({
   isProWithSpendCapEnabled: false,
   isReachedMaxReplicas: false,
   isHighAvailability: false,
+  isCollationLineageCrossed: false,
   maxNumberOfReplicas: READ_REPLICAS_MAX_COUNT,
   ...delta,
+})
+
+describe('ReadReplicaEligibilityWarnings – loading and error states', () => {
+  it('shows no eligibility warnings while loading', () => {
+    customRender(
+      <ReadReplicaEligibilityWarnings
+        eligibility={eligibility({ isLoading: true, isCollationLineageCrossed: true })}
+        onRecommendCompute={vi.fn()}
+      />
+    )
+
+    expect(screen.queryByRole('alert')).not.toBeInTheDocument()
+  })
+
+  it('shows an error with a retry action that refetches', async () => {
+    const user = userEvent.setup()
+    const refetch = vi.fn()
+
+    customRender(
+      <ReadReplicaEligibilityWarnings
+        eligibility={eligibility({ isError: true, error: { message: 'Boom' }, refetch })}
+        onRecommendCompute={vi.fn()}
+      />
+    )
+
+    expect(screen.getByText(/Failed to check read replica eligibility/)).toBeInTheDocument()
+    await user.click(screen.getByRole('button', { name: 'Retry' }))
+    expect(refetch).toHaveBeenCalledTimes(1)
+  })
+})
+
+describe('ReadReplicaEligibilityWarnings – collation lineage', () => {
+  it('asks the user to upgrade Postgres and links to the upgrade section', () => {
+    customRender(
+      <ReadReplicaEligibilityWarnings
+        eligibility={eligibility({ isCollationLineageCrossed: true })}
+        onRecommendCompute={vi.fn()}
+      />
+    )
+
+    expect(screen.getByText('Upgrade Postgres before creating a read replica')).toBeInTheDocument()
+  })
+
+  it('collapses multiple blockers into a single admonition', () => {
+    customRender(
+      <ReadReplicaEligibilityWarnings
+        eligibility={eligibility({ isCollationLineageCrossed: true, isBelowSmallCompute: true })}
+        onRecommendCompute={vi.fn()}
+      />
+    )
+
+    expect(screen.getAllByRole('alert')).toHaveLength(1)
+    expect(screen.getByText("Read replicas can't be deployed yet")).toBeInTheDocument()
+    expect(screen.getByText('Upgrade Postgres before creating a read replica')).toBeInTheDocument()
+    expect(screen.getByText('Small compute required')).toBeInTheDocument()
+  })
 })
 
 describe('ReadReplicaEligibilityWarnings – below small compute', () => {
