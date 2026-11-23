@@ -224,10 +224,7 @@ const translateFilter = (
           join
         )})`
       }
-      return safeSql`(${joinSqlFragments(
-        values.map((v) => safeSql`(${HTTP_PATH_EXPR}) ${likeOp} ${lit('%' + v + '%')}`),
-        joinAndOr
-      )})`
+      return safeSql`(${HTTP_PATH_EXPR}) ${inOp} ${inList(values)}`
     }
     case 'host':
       // Best-effort: use full request URL since `host` isn't a top-level field.
