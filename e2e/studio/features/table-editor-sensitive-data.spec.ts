@@ -137,13 +137,11 @@ test.describe('table editor — sensitive data masking', () => {
       'actual value should be visible after reveal'
     ).toBeVisible({ timeout: 5000 })
 
-    // Wait for the temporary reveal to expire
-    await page.waitForTimeout(5500)
-
+    // The temporary reveal expires after 5s; the assertion retries until then
     await expect(
       page.getByRole('gridcell', { name: MASKED_VALUE }),
       'sensitive value should be masked again after 5 seconds'
-    ).toBeVisible()
+    ).toBeVisible({ timeout: 10_000 })
 
     await expect(
       page.getByRole('gridcell', { name: SECRET_VALUE }),

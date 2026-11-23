@@ -81,6 +81,10 @@ Supabase's combination of observability and hands-on support set it apart from t
   benchmark IOPS, and actually talk to the engineers helping us optimize. That's rare.
 </Quote>
 
+### Under the hood: AWS
+
+Behind all of this, Shelf runs on AWS. Supabase runs Koodos's Postgres database on Amazon EC2 compute, and that database holds the activity data, user profiles, and Auth records that millions of users see when they open the app, with compute scaled up around major launches and rightsized back down afterward. For a team with nobody dedicated to Postgres, the servers under Shelf are infrastructure Koodos doesn't have to host, patch, or maintain, even while syncing billions of data points.
+
 ## The approach
 
 Koodos uses Supabase as the backbone of Shelf's entire backend, powering authentication, user management, and critical transactional data.

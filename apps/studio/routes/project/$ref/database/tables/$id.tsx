@@ -1,13 +1,19 @@
-import { createFileRoute } from '@tanstack/react-router'
-import { useParams } from 'common'
+import { createFileRoute, Link } from '@tanstack/react-router'
+import { BreadcrumbItem, BreadcrumbLink, BreadcrumbList } from 'ui'
+import { PageBreadcrumbs } from 'ui-patterns/PageBreadcrumbs'
 import { PageContainer } from 'ui-patterns/PageContainer'
+import {
+  PageHeader,
+  PageHeaderMeta,
+  PageHeaderSummary,
+  PageHeaderTitle,
+} from 'ui-patterns/PageHeader'
 import { PageSection, PageSectionContent } from 'ui-patterns/PageSection'
 import { ShimmeringLoader } from 'ui-patterns/ShimmeringLoader'
 
 import { ColumnList } from '@/components/interfaces/Database/Tables/ColumnList'
-import DeleteConfirmationDialogs from '@/components/interfaces/TableGridEditor/DeleteConfirmationDialogs'
+import { DeleteConfirmationDialogs } from '@/components/interfaces/TableGridEditor/DeleteConfirmationDialogs'
 import { SidePanelEditor } from '@/components/interfaces/TableGridEditor/SidePanelEditor/SidePanelEditor'
-import { PageLayout } from '@/components/layouts/PageLayout/PageLayout'
 import { useTableEditorQuery } from '@/data/table-editor/table-editor-query'
 import { isTableLike } from '@/data/table-editor/table-editor-types'
 import { useSelectedProjectQuery } from '@/hooks/misc/useSelectedProject'
@@ -24,8 +30,8 @@ export const Route = createFileRoute('/project/$ref/database/tables/$id')({
 function DatabaseTables() {
   const snap = useTableEditorStateSnapshot()
 
-  const { id: _id, ref } = useParams()
-  const id = _id ? Number(_id) : undefined
+  const { id: idParam, ref } = Route.useParams()
+  const id = Number(idParam)
 
   const { data: project } = useSelectedProjectQuery()
   const { data: selectedTable, isPending: isLoading } = useTableEditorQuery({
@@ -36,28 +42,37 @@ function DatabaseTables() {
 
   return (
     <>
-      <PageLayout
-        title={isLoading ? <ShimmeringLoader className="w-40" /> : (selectedTable?.name ?? '')}
-        breadcrumbs={[
-          {
-            label: 'Tables',
-            href: `/project/${ref}/database/tables`,
-          },
-        ]}
-        size="large"
-      >
-        <PageContainer size="large">
-          <PageSection>
-            <PageSectionContent>
-              <ColumnList
-                onAddColumn={snap.onAddColumn}
-                onEditColumn={snap.onEditColumn}
-                onDeleteColumn={snap.onDeleteColumn}
-              />
-            </PageSectionContent>
-          </PageSection>
-        </PageContainer>
-      </PageLayout>
+      <PageBreadcrumbs>
+        <BreadcrumbList>
+          <BreadcrumbItem>
+            <BreadcrumbLink asChild>
+              <Link to="/project/$ref/database/tables" params={{ ref }}>
+                Tables
+              </Link>
+            </BreadcrumbLink>
+          </BreadcrumbItem>
+        </BreadcrumbList>
+      </PageBreadcrumbs>
+      <PageHeader size="large">
+        <PageHeaderMeta>
+          <PageHeaderSummary>
+            <PageHeaderTitle>
+              {isLoading ? <ShimmeringLoader className="w-40" /> : (selectedTable?.name ?? '')}
+            </PageHeaderTitle>
+          </PageHeaderSummary>
+        </PageHeaderMeta>
+      </PageHeader>
+      <PageContainer size="large">
+        <PageSection>
+          <PageSectionContent>
+            <ColumnList
+              onAddColumn={snap.onAddColumn}
+              onEditColumn={snap.onEditColumn}
+              onDeleteColumn={snap.onDeleteColumn}
+            />
+          </PageSectionContent>
+        </PageSection>
+      </PageContainer>
 
       {project?.ref !== undefined && selectedTable !== undefined && isTableLike(selectedTable) && (
         <TableEditorTableStateContextProvider

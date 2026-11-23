@@ -4389,6 +4389,10 @@ commands:
         name: --attribute-mapping-file <string>
         description: File containing a JSON mapping between SAML attributes to custom JWT claims.
         default_value: ''
+      - id: dedicated-scope
+        name: --dedicated-scope
+        description: Scope the SAML entity ID, metadata URL and ACS URL to this identity provider instead of the shared project-wide URLs.
+        default_value: 'false'
       - id: domains
         name: --domains <strings>
         description: Comma separated list of email domains to associate with the added identity provider.

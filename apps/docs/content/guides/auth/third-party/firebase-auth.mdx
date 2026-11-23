@@ -113,6 +113,8 @@ val supabase = createSupabaseClient(
 }
 ```
 
+On a client that sets `accessToken`, leave out the Auth plugin (`install(Auth)`). If you install it, supabase-kt throws an error when it creates the client.
+
 </TabPanel>
 </$Show>
 
@@ -136,18 +138,22 @@ val supabase = createSupabaseClient(
 }
 ```
 
+On a client that sets `accessToken`, leave out the Auth plugin (`install(Auth)`). If you install it, supabase-kt throws an error when it creates the client.
+
 </TabPanel>
 </$Show>
 
 </Tabs>
 
+A client that sets `accessToken` can't use Supabase Auth methods, such as password sign-in. On that client, sign users in and out with Firebase Auth. To use Supabase Auth as well, create a second client without `accessToken`. Send each user's requests with the client that matches how they signed in.
+
 ## Add a new Third-Party Auth integration to your project
 
 In the dashboard navigate to your project's [Authentication settings](/dashboard/project/_/auth/third-party) and find the Third-Party Auth section to add a new integration.
 
-In the CLI add the following config to your `supabase/config.toml` file:
+In the CLI add the following config to your config file (`supabase/config.toml` or `supabase/config.jsonc`):
 
-```toml
+```toml supabase/config.toml
 [auth.third_party.firebase]
 enabled = true
 project_id = "<id>"

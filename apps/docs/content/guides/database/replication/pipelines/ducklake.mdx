@@ -32,7 +32,7 @@ You can query replicated tables, but treat them and their underlying catalog and
 
 ## Configure DuckLake as a destination [#choose-a-configuration-mode]
 
-Follow [Set up Pipelines](/docs/guides/database/replication/pipelines#setup-overview). In **Add pipeline**, select **DuckLake**, enter a **Pipeline name**, choose a **Publication**, and set **Initial sync**. Then choose how to configure the catalog and storage.
+Follow [Set up Pipelines](/docs/guides/database/replication/pipelines#setup-overview) to enable Pipelines and select **DuckLake**. In the **Pipeline creation wizard** preview, configure the catalog and storage on **Connection**, then click **Continue** to validate the settings before choosing the publication and initial sync on **Data**. In the destination form, configure the connection and data settings together.
 
 ### Use this Supabase project [#use-supabase]
 
@@ -49,7 +49,6 @@ To configure the destination:
 2. Enter the **Metadata schema**.
 3. Choose the **Bucket**. Select **New bucket** at the bottom of the bucket list if you haven't created one yet.
 4. Optionally adjust **Pool size** under **Advanced settings** to tune destination concurrency and resource use.
-5. Click **Start pipeline**. Review any validation warnings, then confirm the estimated cost with **Create and start pipeline**.
 
 Credential-provisioning warnings are expected before creation: catalog and Storage credentials are provisioned when you save the destination. Review the metadata schema and bucket before proceeding.
 
@@ -76,9 +75,14 @@ Select **Enter connection details** under **Configuration method**, then configu
 - **Use SSL**: Choose **On** for HTTPS, or **Off** if your provider requires HTTP
 - **Metadata schema**: A unique Postgres schema for DuckLake metadata, using only letters, numbers, and underscores
 
-Optionally adjust **Pool size** under **Advanced settings** to tune destination concurrency and resource use. Complete validation and review the initial sync estimate before confirming creation.
+Optionally adjust **Pool size** under **Advanced settings** to tune destination concurrency and resource use.
 
 The catalog URL and storage credentials are stored as secrets and aren't returned after creation. When editing the destination, leave a secret field empty to keep its stored value, or enter a new value to replace it.
+
+### Start the pipeline
+
+- In the wizard, check the initial sync estimate on **Review** and click **Start pipeline**. If validation returns warnings, review them before confirming with **Start pipeline anyway**.
+- In the destination form, click **Start pipeline** to run validation. Confirm any warnings using the [destination form steps](/docs/guides/database/replication/pipelines#destination-form), then review the initial sync estimate and click **Create and start pipeline**.
 
 ## How replication works
 

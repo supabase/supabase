@@ -1,12 +1,12 @@
 import { useParams } from 'common'
 import { useEffect } from 'react'
+import { Card, Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from 'ui'
 
 import LanguageSelector from '../LanguageSelector'
 import { DOCS_RESOURCE_CONTENT } from '../ProjectAPIDocs.constants'
 import ResourceContent from '../ResourceContent'
 import type { ContentProps } from './Content.types'
 import { tempRemovePostgrestText } from './Content.utils'
-import Table from '@/components/to-be-cleaned/Table'
 import { useProjectJsonSchemaQuery } from '@/data/docs/project-json-schema-query'
 import { useAppStateSnapshot } from '@/state/app-state'
 
@@ -66,29 +66,35 @@ export const Entity = ({ language, apikey = '', endpoint = '' }: ContentProps) =
       </div>
       <div className="space-y-2 px-4 py-4 border-t-0!">
         <p className="text-sm text-foreground-light">Columns</p>
-        <Table
-          head={[
-            <Table.th key="name">Name</Table.th>,
-            <Table.th key="format">Format</Table.th>,
-            <Table.th key="type">Type</Table.th>,
-            <Table.th key="description">Description</Table.th>,
-          ]}
-          body={columns.map((column) => {
-            const formattedColumnType = getColumnType(column.type, column.format)
-            return (
-              <Table.tr key={column.id}>
-                <Table.td title={column.id}>{column.id}</Table.td>
-                <Table.td title={column.format}>
-                  <p className="truncate">{column.format}</p>
-                </Table.td>
-                <Table.td title={formattedColumnType}>{formattedColumnType}</Table.td>
-                <Table.td title={column.description}>
-                  {tempRemovePostgrestText(column.description ?? '').trim()}
-                </Table.td>
-              </Table.tr>
-            )
-          })}
-        />
+        <Card>
+          <Table>
+            <TableHeader>
+              <TableRow>
+                <TableHead key="name">Name</TableHead>
+                <TableHead key="format">Format</TableHead>
+                <TableHead key="type">Type</TableHead>
+                <TableHead key="description">Description</TableHead>
+              </TableRow>
+            </TableHeader>
+            <TableBody>
+              {columns.map((column) => {
+                const formattedColumnType = getColumnType(column.type, column.format)
+                return (
+                  <TableRow key={column.id}>
+                    <TableCell title={column.id}>{column.id}</TableCell>
+                    <TableCell title={column.format}>
+                      <p className="truncate">{column.format}</p>
+                    </TableCell>
+                    <TableCell title={formattedColumnType}>{formattedColumnType}</TableCell>
+                    <TableCell title={column.description}>
+                      {tempRemovePostgrestText(column.description ?? '').trim()}
+                    </TableCell>
+                  </TableRow>
+                )
+              })}
+            </TableBody>
+          </Table>
+        </Card>
       </div>
 
       <ResourceContent
