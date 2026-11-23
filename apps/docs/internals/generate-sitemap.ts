@@ -6,7 +6,7 @@
 import fs from 'fs'
 import { globby } from 'globby'
 import matter from 'gray-matter'
-import prettier from 'prettier'
+import { format } from 'oxfmt'
 import { checkGuidePageEnabled } from '~/features/docs/NavigationPageStatus.utils'
 
 import { generateReferencePages } from './files/reference-lib'
@@ -53,10 +53,10 @@ async function generate() {
     </urlset>
     `
 
-  const prettierConfig = await prettier.resolveConfig('./.prettierrc.js')
-  const formatted = await prettier.format(sitemap, {
-    ...prettierConfig,
-    parser: 'html',
+  const { code: formatted } = await format('sitemap.html', sitemap, {
+    tabWidth: 2,
+    printWidth: 100,
+    endOfLine: 'lf',
   })
 
   const sitemapFilePath = `public/sitemap.xml`

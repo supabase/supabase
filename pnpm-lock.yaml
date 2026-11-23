@@ -534,6 +534,9 @@ importers:
       openapi-fetch:
         specifier: 0.12.4
         version: 0.12.4
+      oxfmt:
+        specifier: 'catalog:'
+        version: 0.79.0(@astrojs/compiler-rs@0.5.2)
       radix-ui:
         specifier: 'catalog:'
         version: 1.4.3(@types/react-dom@19.2.3(@types/react@19.2.14))(@types/react@19.2.14)(react-dom@19.2.6(react@19.2.6))(react@19.2.6)
@@ -2134,6 +2137,9 @@ importers:
       maybe-turbo:
         specifier: workspace:*
         version: link:../../packages/maybe-turbo
+      oxfmt:
+        specifier: 'catalog:'
+        version: 0.79.0(@astrojs/compiler-rs@0.5.2)
       postcss:
         specifier: ^8.5.18
         version: 8.5.28
@@ -2372,6 +2378,9 @@ importers:
       minimist:
         specifier: ^1.2.7
         version: 1.2.8
+      oxfmt:
+        specifier: 'catalog:'
+        version: 0.79.0(@astrojs/compiler-rs@0.5.2)
       svgson:
         specifier: ^5.2.1
         version: 5.3.1
