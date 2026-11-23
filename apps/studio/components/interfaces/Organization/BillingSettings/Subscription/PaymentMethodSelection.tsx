@@ -76,7 +76,8 @@ export interface PaymentMethodSelectionProps {
   onSelectPaymentMethod: (id: string) => void
   layout?: 'vertical' | 'horizontal'
   readOnly: boolean
-  onAddressChange?: (address: CustomerAddress) => void
+  /** Receives null when there is no address to estimate against, which clears the preview address. */
+  onAddressChange?: (address: CustomerAddress | null) => void
   onTaxIdChange?: (taxId: CustomerTaxId | null) => void
   useAsDefaultBillingAddress: boolean
   onUseAsDefaultBillingAddressChange: (useAsDefault: boolean) => void
@@ -122,6 +123,7 @@ const PaymentMethodSelection = forwardRef(function PaymentMethodSelection(
     data: taxId,
     isPending: isCustomerTaxIdLoading,
     isError: isTaxIdError,
+    refetch: refetchTaxId,
   } = useOrganizationTaxIdQuery({ slug })
   const { mutateAsync: updateCustomerProfile } = useOrganizationCustomerProfileUpdateMutation({
     onError: () => {},
@@ -172,8 +174,9 @@ const PaymentMethodSelection = forwardRef(function PaymentMethodSelection(
   const arePaymentMethodsResolved =
     (arePaymentMethodsLoaded || isPaymentMethodsError) &&
     (isCustomerProfileLoaded || isCustomerProfileError)
-  const isAddingNewPaymentMethod =
-    hasChosenNewPaymentMethod ?? (arePaymentMethodsResolved && paymentMethods.data.length === 0)
+  // With no saved cards left there is nothing else to pick, whatever was chosen before.
+  const hasNoSavedPaymentMethods = arePaymentMethodsResolved && paymentMethods.data.length === 0
+  const isAddingNewPaymentMethod = hasNoSavedPaymentMethods || (hasChosenNewPaymentMethod ?? false)
   const isLoadingPaymentDetails = isLoading || isCustomerProfileLoading
   const hasSavedPaymentMethods = !isLoadingPaymentDetails && paymentMethods.data.length > 0
   // What follows the radio list (card form, or its loading skeleton) sits clear of it.
@@ -262,6 +265,11 @@ const PaymentMethodSelection = forwardRef(function PaymentMethodSelection(
     setHasChosenNewPaymentMethod(false)
     setSetupIntent(undefined)
     onSelectPaymentMethod(value)
+
+    // Submission uses the saved profile, so the preview has to estimate against it too
+    // rather than whatever was typed into the new card form.
+    onAddressChange?.(customerProfile?.address ?? null)
+    onTaxIdChange?.(taxId ?? null)
   }
 
   // The plan preview only needs to re-estimate tax for the address that was just saved,
@@ -417,6 +425,9 @@ const PaymentMethodSelection = forwardRef(function PaymentMethodSelection(
                 address={customerProfile.address}
                 billingName={customerProfile.billing_name}
                 taxId={taxId}
+                isTaxIdLoading={isCustomerTaxIdLoading}
+                isTaxIdError={isTaxIdError}
+                onRetryTaxId={() => refetchTaxId()}
                 disabled={readOnly}
                 onChange={handleBillingAddressChange}
               />
@@ -454,7 +465,9 @@ const PaymentMethodSelection = forwardRef(function PaymentMethodSelection(
                 {paymentMethods?.data.map((method) => (
                   <SelectItem key={method.id} value={method.id}>
                     <div className="flex items-center gap-2">
-                      <CardBrandIcon brand={method.card?.brand} />
+                      <span aria-hidden="true" className="flex shrink-0">
+                        <CardBrandIcon brand={method.card?.brand} />
+                      </span>
                       <span translate="no">{getCardLabel(method)}</span>
                     </div>
                   </SelectItem>

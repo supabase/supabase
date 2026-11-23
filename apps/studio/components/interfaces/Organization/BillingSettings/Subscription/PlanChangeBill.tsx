@@ -402,17 +402,18 @@ export const PlanChangeBill = ({
           )}
 
           <div className="mt-3">
-            {!hasActiveProjects && (
-              <div
-                role="status"
-                className="mb-2 flex items-start gap-2 rounded-md border border-warning-500 bg-warning-200 px-3 py-2 text-sm text-warning-600"
-              >
-                <TriangleAlertIcon size={14} className="mt-px shrink-0" aria-hidden="true" />
-                <span>
-                  This organization has no active projects. Did you select the correct organization?
-                </span>
-              </div>
-            )}
+            {/* The region stays mounted so screen readers announce the warning when it appears. */}
+            <div role="status">
+              {!hasActiveProjects && (
+                <div className="mb-2 flex items-start gap-2 rounded-md border border-warning-500 bg-warning-200 px-3 py-2 text-sm text-warning-600">
+                  <TriangleAlertIcon size={14} className="mt-px shrink-0" aria-hidden="true" />
+                  <span>
+                    This organization has no active projects. Did you select the correct
+                    organization?
+                  </span>
+                </div>
+              )}
+            </div>
 
             {computeProjects.map((project) => (
               <ComputeProjectRow key={project.ref} {...project} />

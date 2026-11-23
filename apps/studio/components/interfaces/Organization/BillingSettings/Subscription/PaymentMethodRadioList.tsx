@@ -85,7 +85,9 @@ export const PaymentMethodRadioList = ({
               value={method.id}
               isSelected={value === method.id}
             >
-              <CardBrandIcon brand={method.card?.brand} />
+              <span aria-hidden="true" className="flex shrink-0">
+                <CardBrandIcon brand={method.card?.brand} />
+              </span>
               <div className="min-w-0 flex-1">
                 <p className="text-base text-foreground" translate="no">
                   {getCardTitle(method.card)}

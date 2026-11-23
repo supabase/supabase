@@ -27,6 +27,7 @@ import {
   billingPartnerLabel,
   getPlanChangeType,
 } from '@/components/interfaces/Billing/Subscription/Subscription.utils'
+import { AlertError } from '@/components/ui/AlertError'
 import { type OrganizationBillingSubscriptionPreviewQueryResult } from '@/data/organizations/organization-billing-subscription-preview'
 import type { CustomerAddress, CustomerTaxId } from '@/data/organizations/types'
 import { OrgProject } from '@/data/projects/org-projects-infinite-query'
@@ -48,8 +49,11 @@ interface Props {
   currentPlanMeta?: Partial<OrgPlan> & { features: (string | string[])[] }
   subscriptionPreviewQueryResult: OrganizationBillingSubscriptionPreviewQueryResult
   projects: OrgProject[]
-  onAddressChange?: (address: CustomerAddress) => void
+  /** Receives null when there is no address to estimate against, which clears the preview address. */
+  onAddressChange?: (address: CustomerAddress | null) => void
   onTaxIdChange?: (taxId: CustomerTaxId | null) => void
+  /** The billing address was edited and the plan preview has not caught up with it yet. */
+  isBillingPreviewPending?: boolean
   useAsDefaultBillingAddress: boolean
   onUseAsDefaultBillingAddressChange: (useAsDefault: boolean) => void
 }
@@ -64,6 +68,7 @@ export const SubscriptionPlanUpdateView = ({
   projects,
   onAddressChange,
   onTaxIdChange,
+  isBillingPreviewPending = false,
   useAsDefaultBillingAddress,
   onUseAsDefaultBillingAddressChange,
 }: Props) => {
@@ -83,6 +88,9 @@ export const SubscriptionPlanUpdateView = ({
     isPending: subscriptionPreviewIsLoading,
     isFetching: subscriptionPreviewIsFetching,
     isSuccess: subscriptionPreviewInitialized,
+    isError: subscriptionPreviewIsError,
+    error: subscriptionPreviewError,
+    refetch: refetchSubscriptionPreview,
   } = subscriptionPreviewQueryResult
 
   const { data: subscription } = useOrgSubscriptionQuery({ orgSlug: slug })
@@ -161,6 +169,7 @@ export const SubscriptionPlanUpdateView = ({
   const onUpdateSubscription = async () => {
     if (!selectedOrganization?.slug) return console.error('org slug is required')
     if (!selectedTier) return console.error('Selected plan is required')
+    if (!subscriptionPreviewInitialized) return console.error('Plan preview is required')
 
     setPaymentConfirmationLoading(true)
 
@@ -279,6 +288,14 @@ export const SubscriptionPlanUpdateView = ({
               </div>
             )}
 
+            {subscriptionPreviewIsError && (
+              <AlertError error={subscriptionPreviewError} subject="Failed to estimate your bill">
+                <Button variant="default" onClick={() => refetchSubscriptionPreview()}>
+                  Try again
+                </Button>
+              </AlertError>
+            )}
+
             {subscriptionPreviewInitialized && (
               <div className={subscriptionPreviewIsFetching ? 'opacity-50 transition-opacity' : ''}>
                 <PlanChangeBill
@@ -373,7 +390,12 @@ export const SubscriptionPlanUpdateView = ({
 
               <Button
                 loading={isChangeInProgress}
-                disabled={subscriptionPreviewIsLoading || subscriptionPreviewIsFetching}
+                disabled={
+                  !subscriptionPreviewInitialized ||
+                  subscriptionPreviewIsLoading ||
+                  subscriptionPreviewIsFetching ||
+                  isBillingPreviewPending
+                }
                 variant="primary"
                 onClick={onUpdateSubscription}
                 size="medium"

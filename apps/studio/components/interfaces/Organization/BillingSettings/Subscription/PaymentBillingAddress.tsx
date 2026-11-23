@@ -157,6 +157,13 @@ interface PaymentBillingAddressProps {
   address: CustomerAddress
   billingName: string | undefined
   taxId: CustomerTaxId | null | undefined
+  /**
+   * An unresolved tax ID is not an absent one: saving an address edit while it is unknown
+   * would submit `tax_id: null` and wipe the real one, so editing waits for it.
+   */
+  isTaxIdLoading?: boolean
+  isTaxIdError?: boolean
+  onRetryTaxId?: () => void
   disabled?: boolean
   /**
    * The address and tax ID the plan preview should price against: the edit as soon as it
@@ -177,6 +184,9 @@ export const PaymentBillingAddress = ({
   address,
   billingName,
   taxId,
+  isTaxIdLoading = false,
+  isTaxIdError = false,
+  onRetryTaxId,
   disabled,
   onChange,
 }: PaymentBillingAddressProps) => {
@@ -258,14 +268,25 @@ export const PaymentBillingAddress = ({
             </p>
           )}
         </div>
-        <Button
-          variant="text"
-          className="shrink-0 px-0 text-foreground-light underline hover:text-foreground"
-          disabled={disabled}
-          onClick={() => setIsEditing(true)}
-        >
-          Edit
-        </Button>
+        {isTaxIdError ? (
+          <Button
+            variant="text"
+            className="shrink-0 px-0 text-foreground-light underline hover:text-foreground"
+            disabled={disabled}
+            onClick={onRetryTaxId}
+          >
+            Retry loading tax ID
+          </Button>
+        ) : (
+          <Button
+            variant="text"
+            className="shrink-0 px-0 text-foreground-light underline hover:text-foreground"
+            disabled={disabled || isTaxIdLoading}
+            onClick={() => setIsEditing(true)}
+          >
+            Edit
+          </Button>
+        )}
       </div>
 
       <Dialog

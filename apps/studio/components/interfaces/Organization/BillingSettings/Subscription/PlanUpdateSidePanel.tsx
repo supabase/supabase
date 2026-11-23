@@ -1,6 +1,7 @@
 import { useDebounce } from '@uidotdev/usehooks'
 import { useFlag, useParams } from 'common'
 import { StudioPricingSidePanelOpenedEvent } from 'common/telemetry-constants'
+import { isEqual } from 'lodash'
 import { useRouter } from 'next/router'
 import { useCallback, useEffect, useEffectEvent, useMemo, useRef, useState } from 'react'
 import { plans as subscriptionsPlans } from 'shared-data/plans'
@@ -117,9 +118,13 @@ export const PlanUpdateSidePanel = () => {
   const billingTaxId = useAsDefaultBillingAddress ? latestTaxId : null
   const debouncedAddress = useDebounce(billingAddress, 1000)
   const debouncedTaxId = useDebounce(billingTaxId, 1000)
+  // Until the debounce settles the preview prices an older address than the one on screen,
+  // and submitting would charge an amount the customer never reviewed.
+  const isBillingPreviewPending =
+    !isEqual(billingAddress, debouncedAddress) || !isEqual(billingTaxId, debouncedTaxId)
 
   const handleAddressChange = useCallback(
-    (address: CustomerAddress) => setLatestAddress(address),
+    (address: CustomerAddress | null) => setLatestAddress(address ?? undefined),
     []
   )
 
@@ -270,6 +275,7 @@ export const PlanUpdateSidePanel = () => {
     currentPlanMeta,
     onAddressChange: handleAddressChange,
     onTaxIdChange: handleTaxIdChange,
+    isBillingPreviewPending,
     useAsDefaultBillingAddress,
     onUseAsDefaultBillingAddressChange: handleUseAsDefaultBillingAddressChange,
   }
