@@ -5,11 +5,9 @@ import { classifyError } from '@/data/error-classification'
 import { useCreateTenantSourceMutation } from '@/data/replication/create-tenant-source-mutation'
 import { replicationSourcesQueryOptions } from '@/data/replication/sources-query'
 import type { StudioError } from '@/lib/errors/studio-errors'
-import { useReplicationClusterId } from '@/state/replication-cluster'
 
 /** Ensures a project's source exists before creating a pipeline in another region. */
 export const useEnsurePipelineRegionSource = (projectRef: string | undefined) => {
-  const clusterId = useReplicationClusterId()
   const queryClient = useQueryClient()
   const { mutateAsync: createTenantSource } = useCreateTenantSourceMutation({ onError: () => {} })
   const { mutateAsync, isPending, error, reset } = useMutation<
@@ -33,8 +31,7 @@ export const useEnsurePipelineRegionSource = (projectRef: string | undefined) =>
   })
 
   const ensureRegionSource = useCallback(
-    async (...target: [] | [string | undefined]) => {
-      const targetClusterId = target.length === 0 ? clusterId : target[0]
+    async (targetClusterId: string | undefined) => {
       try {
         await mutateAsync(targetClusterId)
         return true
@@ -42,7 +39,7 @@ export const useEnsurePipelineRegionSource = (projectRef: string | undefined) =>
         return false
       }
     },
-    [clusterId, mutateAsync]
+    [mutateAsync]
   )
 
   return { ensureRegionSource, isCreatingSource: isPending, error, reset }

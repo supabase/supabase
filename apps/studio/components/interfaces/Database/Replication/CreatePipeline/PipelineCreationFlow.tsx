@@ -174,7 +174,10 @@ const PipelineCreationSteps = ({
     enabled: accessibleStep === 'review',
   })
   const handleNext = async () => {
-    if (accessibleStep === 'destination' && (!isRegionReady || !(await ensureRegionSource())))
+    if (
+      accessibleStep === 'destination' &&
+      (!isRegionReady || !(await ensureRegionSource(clusterId)))
+    )
       return
     if (accessibleStep === 'connection' && !isConnectionVerified && !(await validateConnection()))
       return
