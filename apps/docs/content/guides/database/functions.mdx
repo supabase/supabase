@@ -481,7 +481,7 @@ By default, any role can run a database function. You can restrict execution in 
     alter default privileges in schema public revoke execute on functions from anon, authenticated;
     ```
 
-    The first statement applies to every function your role creates later, in every schema. Grant `execute` on each new function to the roles that call it, including helper functions that your Row Level Security policies call.
+    The first statement applies to every function your role creates later, in every schema. Grant `execute` on each new function to the roles that call it, including helper functions that your [Row Level Security](/docs/guides/database/postgres/row-level-security) policies call.
 
 You can then regrant permissions for a specific function to a specific role:
 

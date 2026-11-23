@@ -5,7 +5,11 @@ import posthog, {
 } from 'posthog-js'
 
 import { safeSessionStorage } from './safe-storage'
-import { getTelemetryPlatform } from './telemetry-utils'
+import {
+  getTelemetryCookieOptions,
+  getTelemetryPlatform,
+  redactEventUrlKeywords,
+} from './telemetry-utils'
 
 export type { CapturedNetworkRequest, SessionRecordingOptions }
 
@@ -97,18 +101,32 @@ class PostHogClient {
       capture_pageview: false, // We'll manually track pageviews
       capture_pageleave: false, // We'll manually track page leaves
       opt_out_persistence_by_default: true,
+      // Despite the name, 0 turns off the 5-minute and tab-focus flag reloads. Flags still
+      // load on init, identify and group changes.
+      remote_config_refresh_interval_ms: 0,
       ...buildSessionRecordingConfig(sessionReplay),
       // Not posthog.register(): super properties persist in localStorage shared by every
       // supabase.com app, so events sent before register() runs carry the last app's value.
       before_send: (event) => {
         const platform = getTelemetryPlatform()
         if (event && platform) event.properties.platform = platform
+        if (event) redactEventUrlKeywords(event)
         return event
       },
       loaded: (posthog) => {
         // init() only runs with consent. Clear an earlier opt-out before the flushes below,
         // which capture() would otherwise drop.
         this.optIn()
+
+        // Read first so onSessionId replays the id: a reload that finds the session unchanged
+        // reports no change. Subscribed before the flushes below, which can rotate it.
+        posthog.get_session_id()
+        posthog.onSessionId((sessionId) => {
+          // Skip while opted out, here or in another tab: an opt-out resets the session, and
+          // writing the new id would restore the cookie that withdrawing consent cleared.
+          if (this.optedOut || posthog.has_opted_out_capturing()) return
+          document.cookie = `session_id=${sessionId}; ${getTelemetryCookieOptions()}`
+        })
 
         // Apply pending properties that were set before PostHog
         // initialized due to poor connection or user not accepting
@@ -406,6 +424,21 @@ class PostHogClient {
       return posthog.get_session_id()
     } catch (error) {
       console.error('PostHog getSessionId failed:', error)
+      return undefined
+    }
+  }
+
+  /**
+   * Returns PostHog's session_id after counting this call as user activity: an expired
+   * session rotates first. Returns undefined until PostHog's `loaded` callback fires.
+   */
+  refreshSessionId(): string | undefined {
+    if (!this.initialized) return undefined
+
+    try {
+      return posthog.sessionManager?.checkAndGetSessionAndWindowId().sessionId
+    } catch (error) {
+      console.error('PostHog refreshSessionId failed:', error)
       return undefined
     }
   }

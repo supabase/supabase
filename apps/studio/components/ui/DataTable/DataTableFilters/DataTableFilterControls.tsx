@@ -41,8 +41,8 @@ export function DataTableFilterControls({
           return (
             <Fragment key={value}>
               <AccordionItem value={value} className="border-none">
-                <div className="flex items-center gap-2 pr-2">
-                  <AccordionTrigger className="flex-1 px-2 py-0 hover:no-underline data-[state=closed]:text-muted-foreground data-open:text-foreground focus-within:data-closed:text-foreground hover:data-closed:text-foreground">
+                <div className="flex items-center gap-2 px-2">
+                  <AccordionTrigger className="flex-1 px-0 py-0 hover:no-underline data-[state=closed]:text-muted-foreground data-open:text-foreground focus-within:data-closed:text-foreground hover:data-closed:text-foreground">
                     <div className="flex items-center gap-2 truncate py-2">
                       <p className="text-sm">{field.label}</p>
                     </div>
@@ -50,7 +50,7 @@ export function DataTableFilterControls({
                   <DataTableFilterResetButton {...field} />
                 </div>
                 <AccordionContent>
-                  <div className="p-1">
+                  <div className="py-1 px-2">
                     {(() => {
                       switch (field.type) {
                         case 'checkbox': {

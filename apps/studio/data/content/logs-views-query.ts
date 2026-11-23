@@ -14,11 +14,13 @@ export const logsViewsQueryOptions = ({ projectRef }: { projectRef?: string }) =
     queryKey: contentKeys.logsViews(projectRef),
     queryFn: async ({ signal }) => {
       const rows = await getAllLogContent({ projectRef }, signal)
-      return rows.flatMap((row): LogsView[] => {
-        if (!isLogsViewContent(row)) return []
-        const result = logsViewContentSchema.safeParse(row.content)
-        return result.success ? [{ ...result.data, id: row.id, name: row.name }] : []
-      })
+      return [...rows]
+        .sort((a, b) => a.inserted_at.localeCompare(b.inserted_at))
+        .flatMap((row): LogsView[] => {
+          if (!isLogsViewContent(row)) return []
+          const result = logsViewContentSchema.safeParse(row.content)
+          return result.success ? [{ ...result.data, id: row.id, name: row.name }] : []
+        })
     },
     enabled: IS_PLATFORM && !!projectRef,
   })

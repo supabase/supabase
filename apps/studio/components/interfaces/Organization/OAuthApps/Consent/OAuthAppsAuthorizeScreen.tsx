@@ -1,4 +1,6 @@
-import { useEffect, useMemo, useRef, useState } from 'react'
+import { useQuery } from '@tanstack/react-query'
+import { useEffect, useMemo, useState } from 'react'
+import { toast } from 'sonner'
 import { Button } from 'ui'
 import { Admonition } from 'ui-patterns/Admonition'
 import { TimestampInfo } from 'ui-patterns/TimestampInfo'
@@ -6,11 +8,13 @@ import { TimestampInfo } from 'ui-patterns/TimestampInfo'
 import { AuthorizeSuccessScreen } from './AuthorizeSuccessScreen'
 import { AuthorizingAsCard } from './AuthorizingAsCard'
 import { NoProjectsNotice } from './NoProjectsNotice'
+import { getFailedProjects, getPreselectedProjectRefs } from './OAuthAppsAuthorizeScreen.utils'
+import { OrganizationSelect } from './OrganizationSelect'
 import { MAX_SELECTED_PROJECTS, ProjectMultiSelect } from './ProjectMultiSelect'
 import { ScopeGroupCard } from './ScopeGroupCard'
 import { ScopeGroupCardWithDiff } from './ScopeGroupCardWithDiff'
 import { useMemberOrganization } from './useMemberOrganization'
-import { useProjectsByRefQuery } from './useProjectsByRefQuery'
+import { ApiAuthorizationInvalidScreen } from '@/components/interfaces/ApiAuthorization/ApiAuthorization.Invalid'
 import { ApiAuthorizationLoadingScreen } from '@/components/interfaces/ApiAuthorization/ApiAuthorization.Loading'
 import {
   DestinationLogo,
@@ -19,32 +23,28 @@ import {
   SupabaseLogo,
 } from '@/components/layouts/InterstitialLayout'
 import { AlertError } from '@/components/ui/AlertError'
-import { useOAuthAppsAuthorizeApproveMutation } from '@/data/oauth-apps/oauth-apps-authorize-approve-mutation'
+import {
+  OAuthAppsAuthorizeApproveData,
+  useOAuthAppsAuthorizeApproveMutation,
+} from '@/data/oauth-apps/oauth-apps-authorize-approve-mutation'
 import { useOAuthAppsAuthorizeDenyMutation } from '@/data/oauth-apps/oauth-apps-authorize-deny-mutation'
-import { useOAuthAppsAuthorizeOrganizationProjectsQuery } from '@/data/oauth-apps/oauth-apps-authorize-organization-projects-query'
-import { useOAuthAppsAuthorizeOrganizationsQuery } from '@/data/oauth-apps/oauth-apps-authorize-organizations-query'
-import { useOAuthAppsAuthorizeRequestQuery } from '@/data/oauth-apps/oauth-apps-authorize-request-query'
+import { getOAuthAppsAuthorizeRequestQueryOptions } from '@/data/oauth-apps/oauth-apps-authorize-request-query'
 import { useOAuthAppsPreflightValidationQuery } from '@/data/oauth-apps/oauth-apps-preflight-validation-query'
-import type {
-  OAuthAppsAuthorizeRedirect,
-  OAuthAuthorizeApproveRequest,
-  OAuthScopeValidationResult,
-} from '@/data/oauth-apps/types'
-import { getFailedProjects, getPreselectedProjectRefs } from '@/data/oauth-apps/types'
+import { isOAuthRoleValidationError, OAuthScopeValidationResult } from '@/data/oauth-apps/types'
+import { useOrgProjectsInfiniteQuery } from '@/data/projects/org-projects-infinite-query'
 import { useSignOut } from '@/lib/auth'
+import { useProfile } from '@/lib/profile'
 
 export interface OAuthAppsAuthorizeScreenProps {
   authId?: string
   organizationSlug?: string
-  projectRef?: string | null
-  navigate: (destination: string) => void
+  projectRef?: string
 }
 
 export const OAuthAppsAuthorizeScreen = ({
   authId,
-  organizationSlug,
-  projectRef = null,
-  navigate,
+  organizationSlug: initialOrganizationSlug,
+  projectRef,
 }: OAuthAppsAuthorizeScreenProps) => {
   const signOut = useSignOut()
 
@@ -53,22 +53,28 @@ export const OAuthAppsAuthorizeScreen = ({
     error: requestError,
     isPending: isPendingRequest,
     isError: isErrorRequest,
-  } = useOAuthAppsAuthorizeRequestQuery({ id: authId })
+  } = useQuery(
+    getOAuthAppsAuthorizeRequestQueryOptions({
+      id: authId,
+    })
+  )
 
   const grantKind = request?.grant_kind
   const isProjectScopingModeEnabled = request?.project_scoping_mode
 
   const [selectedProjectRefs, setSelectedProjectRefs] = useState<string[]>([])
   const [allProjectsSelected, setAllProjectsSelected] = useState(false)
-  const [approveRedirect, setApproveRedirect] = useState<OAuthAppsAuthorizeRedirect | null>(null)
+  const [approveRedirect, setApproveRedirect] = useState<OAuthAppsAuthorizeApproveData | null>(null)
   const [roleFailure, setRoleFailure] = useState<OAuthScopeValidationResult | null>(null)
 
   const {
-    data: identity,
+    profile,
     error: identityError,
-    isPending: isPendingIdentity,
+    isLoading: isPendingIdentity,
     isError: isErrorIdentity,
-  } = useOAuthAppsAuthorizeOrganizationsQuery({ id: authId })
+  } = useProfile()
+
+  const [organizationSlug, setOrganizationSlug] = useState(initialOrganizationSlug)
 
   const {
     data: memberOrg,
@@ -76,14 +82,21 @@ export const OAuthAppsAuthorizeScreen = ({
     isPending: isPendingMemberOrg,
     isError: isErrorMemberOrg,
   } = useMemberOrganization({
-    authId,
     organizationSlug,
     projectRef,
     request,
   })
+
   const [search, setSearch] = useState('')
 
-  // TODO: replace with useOrgProjectsInfiniteQuery
+  const handleOrganizationChange = (slug: string) => {
+    if (slug === memberOrg?.slug) return
+    setOrganizationSlug(slug)
+    setSelectedProjectRefs([])
+    setAllProjectsSelected(false)
+    setSearch('')
+  }
+
   const {
     data: projectsData,
     isPending: isPendingProjects,
@@ -91,10 +104,15 @@ export const OAuthAppsAuthorizeScreen = ({
     isFetchingNextPage: isFetchingNextPageProjects,
     hasNextPage: hasNextPageProjects,
     fetchNextPage: fetchNextPageProjects,
-  } = useOAuthAppsAuthorizeOrganizationProjectsQuery({
-    slug: memberOrg,
-    search,
-  })
+  } = useOrgProjectsInfiniteQuery(
+    {
+      slug: memberOrg?.slug,
+      search,
+    },
+    {
+      enabled: memberOrg != null,
+    }
+  )
 
   const projects = useMemo(
     () => projectsData?.pages.flatMap((page) => page.projects),
@@ -119,23 +137,57 @@ export const OAuthAppsAuthorizeScreen = ({
     error: preflightError,
   } = useOAuthAppsPreflightValidationQuery(
     {
-      appId: request?.app_id,
-      slug: memberOrg!,
+      auth_id: authId,
+      slug: memberOrg?.slug,
     },
     {
-      enabled: !isPendingRequest && !isPendingMemberOrg && !!memberOrg,
+      enabled: !isPendingRequest && !isPendingMemberOrg && memberOrg != null,
     }
   )
 
-  const seeded = useRef(false)
   useEffect(() => {
-    if (seeded.current || !projects || !preflightData || !memberOrg) return
-    seeded.current = true
-    if (!isProjectScopingModeEnabled) return
+    if (preflightData?.validation_failure) {
+      return setRoleFailure(preflightData.validation_failure)
+    }
+    if (isOAuthRoleValidationError(preflightError)) {
+      return setRoleFailure(preflightError.validation)
+    }
+    setRoleFailure(null)
+  }, [preflightData, preflightError])
+
+  const initialRefs = useMemo(() => {
+    const refs = new Set<string>()
+    if (preflightData?.existing_grant?.project_refs) {
+      preflightData.existing_grant.project_refs.forEach((ref) => refs.add(ref))
+    }
+    if (projectRef) {
+      refs.add(projectRef)
+    }
+    return Array.from(refs)
+  }, [preflightData?.existing_grant?.project_refs, projectRef])
+
+  const {
+    data: initialProjectsData,
+    isPending: isPendingInitialProjects,
+    isError: isErrorInitialProjects,
+    error: initialProjectsError,
+  } = useOrgProjectsInfiniteQuery(
+    {
+      slug: memberOrg?.slug,
+      refs: initialRefs,
+    },
+    {
+      enabled: memberOrg != null && initialRefs.length > 0,
+    }
+  )
+
+  useEffect(() => {
+    if (!preflightData || !memberOrg) return
 
     const grant = preflightData.existing_grant
     const hasAllProjectsGrant =
-      grant !== null && (grant.project_refs == null || grant.project_refs?.length === 0)
+      grant !== null && (grant?.project_refs == null || grant?.project_refs?.length === 0)
+    if (!hasAllProjectsGrant && !initialProjectsData) return
 
     if (hasAllProjectsGrant && isProjectScopingModeEnabled) {
       setAllProjectsSelected(true)
@@ -145,12 +197,27 @@ export const OAuthAppsAuthorizeScreen = ({
     const refs = getPreselectedProjectRefs({
       existingGrant: grant,
       projectRef,
-      liveProjects: projects,
+      liveProjects: initialProjectsData?.pages.flatMap((page) => page.projects) ?? [],
     })
     if (refs.length > 0) setSelectedProjectRefs(refs.slice(0, MAX_SELECTED_PROJECTS))
-  }, [preflightData, projects, memberOrg, isProjectScopingModeEnabled, projectRef])
+  }, [preflightData, initialProjectsData, memberOrg, isProjectScopingModeEnabled, projectRef])
 
-  const { data: selectedProjects } = useProjectsByRefQuery(selectedProjectRefs)
+  const { data: selectedProjectsData } = useOrgProjectsInfiniteQuery(
+    {
+      slug: memberOrg?.slug,
+      refs: selectedProjectRefs,
+    },
+    {
+      enabled: memberOrg != null && selectedProjectRefs.length > 0,
+    }
+  )
+  const selectedProjects = useMemo(
+    () =>
+      selectedProjectsData?.pages
+        .flatMap((page) => page.projects)
+        .filter((project) => selectedProjectRefs.includes(project.ref)),
+    [selectedProjectsData, selectedProjectRefs]
+  )
 
   const approveMutation = useOAuthAppsAuthorizeApproveMutation({
     onSuccess: (data) => {
@@ -158,23 +225,29 @@ export const OAuthAppsAuthorizeScreen = ({
       setApproveRedirect(data)
     },
     onError: (error) => {
-      // TODO: cleanup when removing mock data
-      // @ts-expect-error
-      setRoleFailure(error.validation)
+      if (isOAuthRoleValidationError(error)) {
+        setRoleFailure(error.validation)
+      } else {
+        toast.error(`Failed to authorize access to OAuth app: ${error.message}`)
+      }
     },
   })
   const denyMutation = useOAuthAppsAuthorizeDenyMutation({
     onSuccess: () => {
       if (request) {
-        window.location.href = request.redirect_uri
+        const url = new URL(request.redirect_uri)
+        url.searchParams.append('error', 'access_denied')
+        window.location.href = url.toString()
       }
     },
   })
 
-  const isSubmitting = approveMutation.isPending
+  const isSubmitting = approveMutation.isPending || denyMutation.isPending
   const hasProjects = (projects?.length ?? 0) > 0
 
-  const isBlockedOnProjects = isProjectScopingModeEnabled && !isPendingProjects && !hasProjects
+  // If there are no projects because of a search, we must not block users from changing their search query
+  const isBlockedOnProjects =
+    isProjectScopingModeEnabled && !isPendingProjects && !hasProjects && search.length === 0
   const canProceed = !isBlockedOnProjects
 
   const grantedProjects = (projects ?? []).filter((project) =>
@@ -193,7 +266,11 @@ export const OAuthAppsAuthorizeScreen = ({
   const usesSelectedProjects = isProjectScopingModeEnabled && !allProjectsSelected
   const hasNoSelection = usesSelectedProjects && selectedProjectRefs.length === 0
 
-  if (isPendingRequest || isPendingIdentity || isPendingMemberOrg) {
+  if (!authId) {
+    return <ApiAuthorizationInvalidScreen missingParameters={['auth_id']} />
+  }
+
+  if (isPendingRequest) {
     return <ApiAuthorizationLoadingScreen />
   }
 
@@ -209,7 +286,7 @@ export const OAuthAppsAuthorizeScreen = ({
       </InterstitialLayout>
     )
   }
-  if (isErrorIdentity) {
+  if (isErrorIdentity || (!isPendingIdentity && profile == null)) {
     return (
       <InterstitialLayout
         logo={<DestinationLogo name={request.name} />}
@@ -223,7 +300,7 @@ export const OAuthAppsAuthorizeScreen = ({
     )
   }
 
-  if (isErrorPreflight) {
+  if (isErrorPreflight && !isOAuthRoleValidationError(preflightError)) {
     return (
       <InterstitialLayout
         logo={<DestinationLogo name={request.name} />}
@@ -254,6 +331,32 @@ export const OAuthAppsAuthorizeScreen = ({
     )
   }
 
+  if (isErrorInitialProjects && isProjectScopingModeEnabled) {
+    return (
+      <InterstitialLayout
+        logo={<DestinationLogo name={request.name} />}
+        title={`Authorize ${request.name}`}
+        description="This application wants to access your Supabase Account"
+      >
+        <div className="flex flex-col gap-6 px-6 pb-6">
+          <AlertError
+            error={initialProjectsError}
+            subject="Failed to load projects for this authorization"
+          />
+        </div>
+      </InterstitialLayout>
+    )
+  }
+
+  if (
+    isPendingRequest ||
+    isPendingIdentity ||
+    isPendingMemberOrg ||
+    (isPendingInitialProjects && initialRefs.length > 0)
+  ) {
+    return <ApiAuthorizationLoadingScreen />
+  }
+
   if (approveRedirect) {
     return (
       <InterstitialLayout
@@ -265,8 +368,8 @@ export const OAuthAppsAuthorizeScreen = ({
         <AuthorizeSuccessScreen
           appName={request.name}
           grant={{
-            email: identity.email,
-            organization_slug: memberOrg,
+            email: profile!.primary_email,
+            organization_slug: memberOrg.slug,
             project_refs: usesSelectedProjects ? selectedProjectRefs : null,
             projects: grantedProjects,
             scopes: request.scopes,
@@ -284,21 +387,17 @@ export const OAuthAppsAuthorizeScreen = ({
     window.location.reload()
   }
 
-  const handleSwitchOrg = () => navigate('/organizations')
-
   const handleDeselectFlagged = () =>
     setSelectedProjectRefs((refs) => refs.filter((ref) => !flaggedRefs.includes(ref)))
 
   const handleApprove = () => {
-    if (hasNoSelection) return
-    const approveBody: OAuthAuthorizeApproveRequest = usesSelectedProjects
-      ? { project_refs: selectedProjectRefs }
-      : {}
-    approveMutation.mutate({ auth_id: authId, slug: memberOrg, body: approveBody })
+    if (hasNoSelection || isBlockedOnProjects) return
+    const approveBody = usesSelectedProjects ? { project_refs: selectedProjectRefs } : {}
+    approveMutation.mutate({ auth_id: authId, slug: memberOrg.slug, body: approveBody })
   }
 
   const handleDeny = () => {
-    denyMutation.mutate({ auth_id: authId, slug: memberOrg })
+    denyMutation.mutate({ auth_id: authId, slug: memberOrg.slug })
   }
 
   const footerMessage = isSubmitting
@@ -306,8 +405,6 @@ export const OAuthAppsAuthorizeScreen = ({
     : canProceed
       ? null
       : `Cancelling will redirect you to ${request.redirect_uri} with access denied.`
-
-  const cannotApprove = preflightData?.validation_failure != null || hasNoSelection
 
   return (
     <InterstitialLayout
@@ -330,11 +427,24 @@ export const OAuthAppsAuthorizeScreen = ({
       }
     >
       <div className="flex flex-col gap-6 px-6 pb-6">
-        {preflightData?.validation_failure != null && (
+        {isOAuthRoleValidationError(preflightError) && (
           <Admonition
             type="warning"
             title={`Couldn't authorize ${request.name}`}
-            description={`Your Read-only role in ${memberOrg} can't grant write access. Ask an admin to change your role, or switch organization.`}
+            description={preflightError.message}
+          />
+        )}
+        {roleFailure?.scope_target === 'all_projects' && !request.project_scoping_mode && (
+          <Admonition
+            type="warning"
+            title={`Couldn't authorize ${request.name}`}
+            description={
+              <span>
+                Your <strong>{roleFailure.role.name}</strong> role in{' '}
+                <strong>{memberOrg.name}</strong> can't grant write access. Ask an admin to change
+                your role, or switch organization.
+              </span>
+            }
           />
         )}
         {hasRoleFailure && (
@@ -345,26 +455,28 @@ export const OAuthAppsAuthorizeScreen = ({
                 ? "Couldn't authorize 1 project"
                 : `Couldn't authorize ${flaggedRefs.length} projects`
             }
-            description={`${request.name} needs write access but your role is read-only on the projects highlighted. Deselect them to continue.`}
+            description={
+              <span>
+                {request.name} needs write access but your role is read-only on the projects
+                highlighted. Deselect them to continue.
+              </span>
+            }
           />
         )}
 
         <fieldset disabled={isSubmitting} className="contents">
           <AuthorizingAsCard
-            email={identity.email}
-            organizationSlug={memberOrg}
+            email={profile!.primary_email}
             onSignOut={handleSignOut}
             request={request}
           />
-
+          <OrganizationSelect
+            organization={memberOrg}
+            onOrganizationChange={handleOrganizationChange}
+          />
           {isBlockedOnProjects && (
-            <NoProjectsNotice
-              appName={request.name}
-              organizationSlug={memberOrg}
-              onSwitchOrg={handleSwitchOrg}
-            />
+            <NoProjectsNotice appName={request.name} organizationName={memberOrg.name} />
           )}
-
           {canProceed && isProjectScopingModeEnabled && (
             <div className="flex flex-col gap-2">
               <ProjectMultiSelect
@@ -379,6 +491,7 @@ export const OAuthAppsAuthorizeScreen = ({
                 onAllProjectsChange={setAllProjectsSelected}
                 onSearchChange={setSearch}
                 projects={projects ?? []}
+                selectedProjectRefs={selectedProjectRefs}
                 selectedProjects={selectedProjects ?? []}
                 onLoadMore={handleLoadMoreProjects}
               />
@@ -421,22 +534,16 @@ export const OAuthAppsAuthorizeScreen = ({
         </fieldset>
 
         <div className="flex flex-col gap-2">
-          {canProceed ? (
-            <Button
-              block
-              variant={primaryActionVariant}
-              loading={isSubmitting || isPendingPreflight}
-              disabled={cannotApprove}
-              aria-label={primaryActionLabel}
-              onClick={hasRoleFailure ? handleDeselectFlagged : handleApprove}
-            >
-              {isSubmitting ? 'Authorizing...' : primaryActionLabel}
-            </Button>
-          ) : (
-            <Button block variant="primary" onClick={handleSwitchOrg}>
-              Switch organization
-            </Button>
-          )}
+          <Button
+            block
+            variant={primaryActionVariant}
+            loading={isSubmitting || isPendingPreflight}
+            aria-label={primaryActionLabel}
+            onClick={hasRoleFailure ? handleDeselectFlagged : handleApprove}
+          >
+            {isSubmitting ? 'Authorizing...' : primaryActionLabel}
+          </Button>
+
           {!isSubmitting && (
             <Button variant="text" block onClick={handleDeny}>
               Cancel

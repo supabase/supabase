@@ -3,10 +3,27 @@ import { Database } from 'icons'
 import { Loader2Icon, TrashIcon } from 'lucide-react'
 import { useEffect, useMemo, useState } from 'react'
 import { AWS_REGIONS } from 'shared-data'
-import { Badge, Button } from 'ui'
+import {
+  Badge,
+  BreadcrumbItem,
+  BreadcrumbLink,
+  BreadcrumbList,
+  BreadcrumbPage,
+  BreadcrumbSeparator,
+  Button,
+} from 'ui'
+import { PageBreadcrumbs } from 'ui-patterns/PageBreadcrumbs'
+import {
+  PageHeader,
+  PageHeaderAside,
+  PageHeaderDescription,
+  PageHeaderIcon,
+  PageHeaderMeta,
+  PageHeaderSummary,
+  PageHeaderTitle,
+} from 'ui-patterns/PageHeader'
 import { ShimmeringLoader } from 'ui-patterns/ShimmeringLoader'
 
-import { getInfrastructurePath } from '@/components/interfaces/Settings/Infrastructure/Infrastructure.utils'
 import { DropReplicaConfirmationModal } from '@/components/interfaces/Settings/Infrastructure/ReadReplicas/DropReplicaConfirmationModal'
 import { ReadReplicaDetails } from '@/components/interfaces/Settings/Infrastructure/ReadReplicas/ReadReplicaDetails'
 import { REPLICA_STATUS } from '@/components/interfaces/Settings/Infrastructure/ReadReplicas/ReadReplicas.constants'
@@ -15,8 +32,6 @@ import {
   getStatusLabel,
 } from '@/components/interfaces/Settings/Infrastructure/ReadReplicas/ReadReplicas.utils'
 import { RestartReplicaConfirmationModal } from '@/components/interfaces/Settings/Infrastructure/ReadReplicas/RestartReplicaConfirmationModal'
-import { PageLayout } from '@/components/layouts/PageLayout/PageLayout'
-import { ScaffoldDescription, ScaffoldTitle } from '@/components/layouts/Scaffold'
 import { ButtonTooltip } from '@/components/ui/ButtonTooltip'
 import CopyButton from '@/components/ui/CopyButton'
 import { useReadReplicasQuery } from '@/data/read-replicas/replicas-query'
@@ -84,72 +99,81 @@ function InfrastructureReadReplicaPage() {
   }, [databases.length, isSuccessReplicasStatuses, statuses])
 
   return (
-    <PageLayout
-      title={
-        <div className="flex items-center gap-x-3">
-          <ScaffoldTitle>Read Replica</ScaffoldTitle>
-          {isSuccessDatabases && (
-            <>
-              <Badge variant={STATUS_BADGE_VARIANT[statusLabel] ?? 'default'}>{statusLabel}</Badge>
-              {isInTransition && <Loader2Icon size={14} className="animate-spin" />}
-            </>
-          )}
-        </div>
-      }
-      subtitle={
-        isLoadingDatabases ? (
-          <ShimmeringLoader className="py-[11px]" />
-        ) : (
-          <div className="flex items-center gap-x-2 mt-0!">
-            <ScaffoldDescription>ID: {identifier}</ScaffoldDescription>
-            <CopyButton iconOnly variant="default" text={identifier ?? ''} />
-          </div>
-        )
-      }
-      icon={
-        <div className="shrink-0 w-10 h-10 relative bg-surface-100 border rounded-md flex items-center justify-center">
-          <Database size={20} className="text-foreground-light" />
-        </div>
-      }
-      breadcrumbs={[
-        {
-          label: 'Infrastructure',
-          href: getInfrastructurePath(ref),
-        },
-        {
-          label: regionLabel ? `Read Replica - ${regionLabel}` : 'Read Replica',
-        },
-      ]}
-      secondaryActions={
-        <ButtonTooltip
-          className="w-7"
-          icon={<TrashIcon />}
-          disabled={!replica}
-          tooltip={{
-            content: { side: 'bottom', text: 'Drop replica' },
-          }}
-          onClick={() => setShowConfirmDrop(true)}
-        />
-      }
-      primaryActions={[
-        <Button asChild key="logs">
-          <Link
-            to="/project/$ref/logs/postgres-logs"
-            params={{ ref }}
-            search={!!identifier ? { db: identifier } : {}}
-          >
-            View logs
-          </Link>
-        </Button>,
-        <Button
-          key="restart"
-          disabled={status !== 'ACTIVE_HEALTHY'}
-          onClick={() => setShowConfirmRestart(true)}
-        >
-          Restart replica
-        </Button>,
-      ]}
-    >
+    <>
+      <PageBreadcrumbs>
+        <BreadcrumbList>
+          <BreadcrumbItem>
+            <BreadcrumbLink asChild>
+              <Link to="/project/$ref/settings/infrastructure" params={{ ref }}>
+                Infrastructure
+              </Link>
+            </BreadcrumbLink>
+          </BreadcrumbItem>
+          <BreadcrumbSeparator />
+          <BreadcrumbItem>
+            <BreadcrumbPage>
+              {regionLabel ? `Read Replica - ${regionLabel}` : 'Read Replica'}
+            </BreadcrumbPage>
+          </BreadcrumbItem>
+        </BreadcrumbList>
+      </PageBreadcrumbs>
+      <PageHeader className="pt-7">
+        <PageHeaderMeta>
+          <PageHeaderIcon>
+            <div className="shrink-0 w-10 h-10 relative bg-surface-100 border rounded-md flex items-center justify-center">
+              <Database size={20} className="text-foreground-light" />
+            </div>
+          </PageHeaderIcon>
+          <PageHeaderSummary>
+            <PageHeaderTitle>
+              <span className="flex items-center gap-x-3">
+                <span>Read Replica</span>
+                {isSuccessDatabases && (
+                  <>
+                    <Badge variant={STATUS_BADGE_VARIANT[statusLabel] ?? 'default'}>
+                      {statusLabel}
+                    </Badge>
+                    {isInTransition && <Loader2Icon size={14} className="animate-spin" />}
+                  </>
+                )}
+              </span>
+            </PageHeaderTitle>
+            {isLoadingDatabases && <ShimmeringLoader className="py-2.75" />}
+            {!isLoadingDatabases && (
+              <div className="flex items-center gap-x-2">
+                <PageHeaderDescription>ID: {identifier}</PageHeaderDescription>
+                <CopyButton iconOnly variant="default" text={identifier ?? ''} />
+              </div>
+            )}
+          </PageHeaderSummary>
+          <PageHeaderAside>
+            <ButtonTooltip
+              className="w-7"
+              icon={<TrashIcon />}
+              disabled={!replica}
+              tooltip={{
+                content: { side: 'bottom', text: 'Drop replica' },
+              }}
+              onClick={() => setShowConfirmDrop(true)}
+            />
+            <Button asChild>
+              <Link
+                to="/project/$ref/logs/postgres-logs"
+                params={{ ref }}
+                search={!!identifier ? { db: identifier } : {}}
+              >
+                View logs
+              </Link>
+            </Button>
+            <Button
+              disabled={status !== 'ACTIVE_HEALTHY'}
+              onClick={() => setShowConfirmRestart(true)}
+            >
+              Restart replica
+            </Button>
+          </PageHeaderAside>
+        </PageHeaderMeta>
+      </PageHeader>
       <ReadReplicaDetails />
 
       <DropReplicaConfirmationModal
@@ -165,6 +189,6 @@ function InfrastructureReadReplicaPage() {
         onSuccess={() => setStatusRefetchInterval(5000)}
         onCancel={() => setShowConfirmRestart(false)}
       />
-    </PageLayout>
+    </>
   )
 }

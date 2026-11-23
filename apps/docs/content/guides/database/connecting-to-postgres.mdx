@@ -46,6 +46,8 @@ For every Postgres connection mode, the string comes from the same place:
 3. Choose the connection method you picked above.
 4. Copy the string and replace `[YOUR-DATABASE-PASSWORD]` with your database password. [Percent-encode](https://en.wikipedia.org/wiki/Percent-encoding) any reserved characters it contains, such as `&`, `#`, `?`, or a space.
 
+   The Supabase Dashboard doesn't show your database password after you create the project. If you don't have it, reset it with **Reset database password** in the Connect dialog or in your [Database Settings](/dashboard/project/_/database/settings#database-password). A reset breaks existing connections that use the old password.
+
 The sections below show what each string looks like and when to use it. Take the host, port, and username from the string you copied rather than typing the bracketed placeholders literally. The pooler host in particular can't be composed from your region, and pooled connections use a different username from direct connections. Both are covered under [Endpoints and IP versions](#endpoints-and-ip-versions).
 
 ### Direct connection [#direct-connection]
@@ -76,11 +78,11 @@ Get this string from the Supabase Dashboard by clicking [Connect](/dashboard/pro
 
 ### Shared pooler, transaction mode [#pooler-transaction-mode]
 
-The transaction mode connection string connects to your Postgres instance through the shared pooler in transaction-pooling mode. Use it for serverless and edge functions, which open many short-lived connections.
+The transaction mode connection string connects to your Postgres instance through the shared pooler in transaction-pooling mode. Use it for serverless and [edge functions](/docs/guides/functions), which open many short-lived connections.
 
 <Admonition type="caution">
 
-The shared pooler doesn't support [prepared statements](https://postgresql.org/docs/current/sql-prepare.html) in transaction mode. To avoid errors, turn them off in your connection library. See [Transaction mode limitations](#transaction-mode-limitations) for the setting your driver uses and for the other session-state features this affects.
+The shared pooler doesn't support [prepared statements](https://www.postgresql.org/docs/current/sql-prepare.html) in transaction mode. To avoid errors, turn them off in your connection library. See [Transaction mode limitations](#transaction-mode-limitations) for the setting your driver uses and for the other session-state features this affects.
 
 </Admonition>
 

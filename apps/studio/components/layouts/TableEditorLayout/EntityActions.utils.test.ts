@@ -10,7 +10,7 @@ const idsOf = (groups: EntityActionGroup[]) => flatten(groups).map((action) => a
 
 const getActions = (
   overrides: Partial<Parameters<typeof getEntityActions>[0]['entity']> = {},
-  context: { isActive?: boolean; isLocked?: boolean } = {}
+  context: { isLocked?: boolean } = {}
 ) =>
   getEntityActions({
     entity: {
@@ -21,13 +21,12 @@ const getActions = (
       ...overrides,
     },
     projectRef: 'abc',
-    isActive: true,
     isLocked: false,
     ...context,
   })
 
 describe('getEntityActions', () => {
-  it('offers every table action on the active table', () => {
+  it('offers every table action', () => {
     const groups = getActions()
 
     expect(idsOf(groups)).toEqual([
@@ -42,19 +41,6 @@ describe('getEntityActions', () => {
       'export-cli',
       'delete',
     ])
-    expect(flatten(groups).filter((action) => action.disabledReason)).toEqual([])
-  })
-
-  it('disables only the actions that act on the open table when the table is not active', () => {
-    const disabled = flatten(getActions({}, { isActive: false }))
-      .filter((action) => action.disabledReason !== undefined)
-      .map((action) => [action.id, action.disabledReason])
-
-    expect(disabled).toEqual([
-      ['edit-table', 'Open this table to edit it'],
-      ['duplicate-table', 'Open this table to duplicate it'],
-      ['delete', 'Open this table to delete it'],
-    ])
   })
 
   it('hides the actions that change the table in a locked schema', () => {
@@ -66,7 +52,7 @@ describe('getEntityActions', () => {
     expect(ids).toEqual(expect.arrayContaining(['copy-name', 'view-policies', 'export-csv']))
   })
 
-  it('scopes the policies link to the entity rather than the open table', () => {
+  it('scopes the policies link to the entity', () => {
     const policies = flatten(getActions({ id: 7, schema: 'my schema' })).find(
       (action) => action.id === 'view-policies'
     )

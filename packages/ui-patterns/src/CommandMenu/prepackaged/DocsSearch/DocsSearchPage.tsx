@@ -6,6 +6,7 @@ import {
   type DocsSearchResult as Page,
   type DocsSearchResultSection as PageSection,
 } from 'common'
+import { describeSearchQuery } from 'common/search-query-telemetry'
 import { Book, ChevronRight, Hash, Loader2, MessageSquare, Search } from 'lucide-react'
 import { useCallback, useEffect, useRef } from 'react'
 import { Button, cn, CommandGroup, CommandItem, CommandList, GithubIcon, StatusIcon } from 'ui'
@@ -88,7 +89,7 @@ const DocsSearchPage = () => {
         properties: {
           command_name: name,
           command_type: 'route',
-          search_query: query || undefined,
+          search_query: describeSearchQuery(query).query,
           result_path: path,
           app: telemetryContext.app,
         },

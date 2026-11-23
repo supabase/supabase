@@ -37,7 +37,7 @@ You will need to install and configure the following dependencies on your machin
 - [**Node.js**](https://nodejs.org) (version as documented in [`.nvmrc`](./.nvmrc))
 - [**pnpm**](https://pnpm.io/) (version as documented in the `packageManager` field in [`package.json`](./package.json))
 - [**make**](https://www.gnu.org/software/make/) (or the equivalent to `build-essentials` for your OS)
-- [**Docker**](https://docs.docker.com/get-docker/) (to run studio locally)
+- [**Docker**](https://docs.docker.com/get-started/get-docker/) (to run studio locally)
 
 ## Local development
 
@@ -127,7 +127,7 @@ To run Studio locally, you'll need to setup Docker in addition to your NextJS fr
 
 #### Prerequisites
 
-First, make sure you have the Docker installed on your device. You can download and install it from [here](https://docs.docker.com/get-docker/).
+First, make sure you have the Docker installed on your device. You can download and install it from [here](https://docs.docker.com/get-started/get-docker/).
 
 #### Get Started
 
