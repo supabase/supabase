@@ -3602,6 +3602,17 @@ export const reference_swift_v2 = {
   },
 }
 
+export const reference_swift_v3 = {
+  icon: 'reference-swift',
+  title: 'swift',
+  url: 'guides/reference/swift',
+  parent: '/reference',
+  pkg: {
+    name: 'supabase-swift',
+    repo: 'https://github.com/supabase/supabase-swift',
+  },
+}
+
 export const reference_kotlin_v1 = {
   icon: 'reference-kotlin',
   title: 'kotlin',
