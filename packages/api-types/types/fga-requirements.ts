@@ -308,6 +308,13 @@ export const fgaRequirements = {
   'POST /v2/projects/{ref}/transfers': [['organization_admin_write']],
   'POST /v2/projects/{ref}/transfers/previews': [['project_admin_read']],
   'POST /v2/projects/{ref}/warehouse/enable': [['project_admin_write', 'database_write']],
+  'POST /v2/projects/{ref}/warehouse/replication/add': [['project_admin_write', 'database_write']],
+  'POST /v2/projects/{ref}/warehouse/replication/remove': [
+    ['project_admin_write', 'database_write'],
+  ],
+  'POST /v2/projects/{ref}/warehouse/replication/resync': [
+    ['project_admin_write', 'database_write'],
+  ],
   'POST /v2/projects/{ref}/warehouse/setups': [['project_admin_write', 'database_write']],
   'PUT /v1/projects/{ref}/api-keys/legacy': [['api_gateway_keys_write']],
   'PUT /v1/projects/{ref}/config/auth/sso/providers/{provider_id}': [['auth_config_write']],
