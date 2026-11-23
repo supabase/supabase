@@ -29,7 +29,7 @@
   },
   {
     "question": "How does Supabase compare to other storage providers?",
-    "answer": "[Supabase Storage](https://supabase.com/storage) controls access to your files with Row Level Security policies on the `storage.objects` table, using the same user identity as the rest of your app.\n\nIt is S3-compatible, so you can use almost any S3 client. It also supports a REST API and resumable uploads. Files are served through a global CDN from over 285 cities, and you can resize and transform images on the fly. Analytics buckets (Apache Iceberg) and vector buckets are also available in alpha.\n\nYou can use Storage on its own or together with the rest of the platform. It works with [Auth](https://supabase.com/auth) for permissions and with [Edge Functions](https://supabase.com/edge-functions) for processing uploads.\n\nPricing is based on storage size, with a free tier included."
+    "answer": "[Supabase Storage](https://supabase.com/storage) is an open-source, S3-compatible storage solution. Control access to your files with Row Level Security policies, using the same user identity as the rest of your app.\n\nIt also supports a REST API and resumable uploads. Files are served through a global CDN, and you can resize and transform images on the fly.\n\nYou can use Storage on its own or together with the rest of the platform, such as integrating with [Auth](https://supabase.com/auth) for permissions and with [Edge Functions](https://supabase.com/edge-functions) for processing uploads.\n\nPricing is based on storage size, with a free tier included."
   },
   {
     "question": "How does Supabase compare to other queue providers?",
