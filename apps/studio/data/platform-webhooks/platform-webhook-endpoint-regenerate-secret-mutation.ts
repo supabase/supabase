@@ -6,7 +6,8 @@ import {
   regenerateWebhookEndpointSecret,
   type WebhookScopeParams,
 } from './platform-webhooks-fetchers'
-import type { ResponseError, UseCustomMutationOptions } from '@/types'
+import type { StudioError } from '@/lib/errors/studio-errors'
+import type { UseCustomMutationOptions } from '@/types'
 
 export type WebhookEndpointRegenerateSecretVariables = {
   scope: WebhookScopeParams
@@ -33,7 +34,7 @@ export const useWebhookEndpointRegenerateSecretMutation = ({
 }: Omit<
   UseCustomMutationOptions<
     WebhookEndpointRegenerateSecretData,
-    ResponseError,
+    StudioError,
     WebhookEndpointRegenerateSecretVariables
   >,
   'mutationFn'
@@ -42,7 +43,7 @@ export const useWebhookEndpointRegenerateSecretMutation = ({
 
   return useMutation<
     WebhookEndpointRegenerateSecretData,
-    ResponseError,
+    StudioError,
     WebhookEndpointRegenerateSecretVariables
   >({
     mutationFn: regenerateSecret,

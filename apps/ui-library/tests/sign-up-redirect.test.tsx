@@ -21,7 +21,7 @@ vi.mock('@tanstack/react-router', () => ({
 }))
 vi.mock('@tanstack/react-start', () => ({
   createServerFn: () => ({
-    inputValidator: () => ({
+    validator: () => ({
       handler: (handler: (ctx: { data: Record<string, unknown> }) => Promise<unknown>) => {
         confirm.mockImplementation(handler)
         return confirm

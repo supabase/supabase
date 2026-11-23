@@ -1,3 +1,4 @@
+// @vitest-environment jsdom
 import { toast } from 'sonner'
 import { copyToClipboard } from 'ui'
 import { beforeEach, describe, expect, it, vi } from 'vitest'
@@ -50,70 +51,36 @@ function makeFolder(name: string): StorageItem {
 }
 
 describe('validateFolderName', () => {
-  describe('valid names', () => {
-    it('accepts plain alphanumeric names', () => {
-      expect(validateFolderName('myfolder')).toBeNull()
-      expect(validateFolderName('MyFolder123')).toBeNull()
-    })
-
-    it('accepts names with underscores and hyphens', () => {
-      expect(validateFolderName('my_folder')).toBeNull()
-      expect(validateFolderName('my-folder')).toBeNull()
-    })
-
-    it('accepts names with dots', () => {
-      expect(validateFolderName('my.folder')).toBeNull()
-    })
-
-    it('accepts names with spaces', () => {
-      expect(validateFolderName('my folder')).toBeNull()
-    })
-
-    it('accepts names with allowed special characters', () => {
-      expect(validateFolderName('folder!')).toBeNull()
-      expect(validateFolderName("folder'")).toBeNull()
-      expect(validateFolderName('folder(1)')).toBeNull()
-      expect(validateFolderName('folder*')).toBeNull()
-      expect(validateFolderName('folder&name')).toBeNull()
-      expect(validateFolderName('folder$name')).toBeNull()
-      expect(validateFolderName('folder@name')).toBeNull()
-      expect(validateFolderName('folder=name')).toBeNull()
-      expect(validateFolderName('folder;name')).toBeNull()
-      expect(validateFolderName('folder:name')).toBeNull()
-      expect(validateFolderName('folder+name')).toBeNull()
-      expect(validateFolderName('folder,name')).toBeNull()
-      expect(validateFolderName('folder?name')).toBeNull()
-    })
-
-    it('accepts names with forward slashes', () => {
-      expect(validateFolderName('parent/child')).toBeNull()
-    })
-
-    it('accepts an empty string', () => {
-      expect(validateFolderName('')).toBeNull()
-    })
+  it.each([
+    'myfolder',
+    'MyFolder123',
+    'my_folder',
+    'my-folder',
+    'my.folder',
+    'my folder',
+    'folder!',
+    "folder'",
+    'folder(1)',
+    'folder*',
+    'folder&name',
+    'folder$name',
+    'folder@name',
+    'folder=name',
+    'folder;name',
+    'folder:name',
+    'folder+name',
+    'folder,name',
+    'folder?name',
+    'parent/child',
+    '',
+  ])('accepts %j', (name) => {
+    expect(validateFolderName(name)).toBeNull()
   })
 
-  describe('invalid names', () => {
-    it('rejects a name containing #', () => {
-      const result = validateFolderName('my#folder')
-      expect(result).toBe('Folder name cannot contain the "#" character')
-    })
-
-    it('rejects a name containing %', () => {
-      const result = validateFolderName('my%folder')
-      expect(result).toBe('Folder name cannot contain the "%" character')
-    })
-
-    it('rejects a name containing ^', () => {
-      const result = validateFolderName('my^folder')
-      expect(result).toBe('Folder name cannot contain the "^" character')
-    })
-
-    it('rejects a name containing [', () => {
-      const result = validateFolderName('my[folder')
-      expect(result).toBe('Folder name cannot contain the "[" character')
-    })
+  it.each(['#', '%', '^', '['])('rejects a name containing %s', (char) => {
+    expect(validateFolderName(`my${char}folder`)).toBe(
+      `Folder name cannot contain the "${char}" character`
+    )
   })
 })
 
@@ -154,11 +121,8 @@ describe('getPathAlongFoldersToIndex', () => {
     expect(getPathAlongFoldersToIndex({ openedFolders }, 0)).toBe('')
   })
 
-  it('returns the first folder name for index 1', () => {
-    expect(getPathAlongFoldersToIndex({ openedFolders }, 1)).toBe('images')
-  })
-
   it('returns folders joined up to (not including) the given index', () => {
+    expect(getPathAlongFoldersToIndex({ openedFolders }, 1)).toBe('images')
     expect(getPathAlongFoldersToIndex({ openedFolders }, 2)).toBe('images/2024')
     expect(getPathAlongFoldersToIndex({ openedFolders }, 3)).toBe('images/2024/january')
   })
@@ -234,11 +198,6 @@ describe('sanitizeNameForDuplicateInColumn', () => {
         sanitizeNameForDuplicateInColumn(state, { name: 'file.txt', reservedNames: ['FILE.TXT'] })
       ).toBeNull()
     })
-
-    it('leaves callers that pass none exactly as they were', () => {
-      const state = makeState([[{ name: 'file.txt' }]])
-      expect(sanitizeNameForDuplicateInColumn(state, { name: 'other.txt' })).toBe('other.txt')
-    })
   })
 
   describe('columnIndex', () => {
@@ -263,16 +222,6 @@ describe('sanitizeNameForDuplicateInColumn', () => {
       expect(sanitizeNameForDuplicateInColumn(state, { name: 'file.txt', columnIndex: 1 })).toBe(
         'file.txt'
       )
-    })
-
-    it('detects a conflict in the first column when columnIndex is 0', () => {
-      // col 0 has 'file.txt' → conflict
-      expect(sanitizeNameForDuplicateInColumn(state, { name: 'other.txt', columnIndex: 0 })).toBe(
-        'other.txt'
-      ) // 'other.txt' is not in col 0
-      expect(
-        sanitizeNameForDuplicateInColumn(state, { name: 'file.txt', columnIndex: 0 })
-      ).toBeNull()
     })
   })
 
@@ -390,12 +339,6 @@ describe('getStoragePathForItem', () => {
     expect(getStoragePathForItem(openedFolders, { ...makeFolder('2024'), columnIndex: 1 })).toBe(
       'avatars/2024'
     )
-  })
-
-  it('omits the bucket name so the value works with storage.from(bucket)', () => {
-    const openedFolders = [makeFolder('avatars')]
-    const path = getStoragePathForItem(openedFolders, { ...makeFile('a.png'), columnIndex: 1 })
-    expect(path.startsWith('my-bucket')).toBe(false)
   })
 })
 

@@ -80,8 +80,8 @@ export const VersionCompareWidget = ({
     </Button>
 
     <p className="text-xs leading-relaxed text-foreground-lighter">
-      {currentVersion && <strong>{currentVersion.versionId} </strong>}becomes a noncurrent version —
-      nothing is deleted.
+      {currentVersion && <strong>{currentVersion.versionId} </strong>}
+      <span>becomes a noncurrent version — nothing is deleted.</span>
     </p>
   </div>
 )

@@ -5,7 +5,8 @@ import { logDrainsKeys } from './keys'
 import { LogDrainType } from '@/components/interfaces/LogDrains/LogDrains.constants'
 import type { components } from '@/data/api'
 import { handleError, post } from '@/data/fetchers'
-import type { ResponseError, UseCustomMutationOptions } from '@/types'
+import type { StudioError } from '@/lib/errors/studio-errors'
+import type { UseCustomMutationOptions } from '@/types'
 
 export type AuditLogDrainConfig = components['schemas']['CreateBackendParamsOpenapi']['config']
 
@@ -39,12 +40,12 @@ export const useCreateAuditLogDrainMutation = ({
   onError,
   ...options
 }: Omit<
-  UseCustomMutationOptions<AuditLogDrainCreateData, ResponseError, AuditLogDrainCreateVariables>,
+  UseCustomMutationOptions<AuditLogDrainCreateData, StudioError, AuditLogDrainCreateVariables>,
   'mutationFn'
 > = {}) => {
   const queryClient = useQueryClient()
 
-  return useMutation<AuditLogDrainCreateData, ResponseError, AuditLogDrainCreateVariables>({
+  return useMutation<AuditLogDrainCreateData, StudioError, AuditLogDrainCreateVariables>({
     mutationFn: (vars) => createAuditLogDrain(vars),
     async onSuccess(data, variables, context) {
       const { slug } = variables

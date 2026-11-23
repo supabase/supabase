@@ -121,7 +121,7 @@ AlertDialogOverlay.displayName = AlertDialogPrimitive.Overlay.displayName
 
 const AlertDialogContentVariants = cva(
   cn(
-    'relative z-50 w-full max-w-screen border shadow-md dark:shadow-xs',
+    'relative z-50 w-full max-w-screen floating-surface-shadow-md',
     'data-open:animate-overlay-show data-closed:animate-overlay-hide',
     'sm:rounded-lg md:w-full',
     'bg-dash-sidebar'

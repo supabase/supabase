@@ -4,7 +4,10 @@ import { useEffect, useRef } from 'react'
 import { useLatest } from '@/hooks/misc/useLatest'
 import { useConfirmOnClose } from '@/hooks/ui/useConfirmOnClose'
 
-export const usePipelineNavigationGuard = (hasChanges: boolean) => {
+export const usePipelineNavigationGuard = (
+  hasChanges: boolean,
+  isNavigationLocked: () => boolean = () => false
+) => {
   const router = useTanStackRouter({ warn: false })
   const canLeave = useRef(false)
   const pending = useRef<(() => void) | undefined>(undefined)
@@ -18,7 +21,7 @@ export const usePipelineNavigationGuard = (hasChanges: boolean) => {
   })
   const requestNavigation = (proceed: () => void, cancel?: () => void) => {
     // Keep the first requested destination while its confirmation is open.
-    if (pending.current) {
+    if (isNavigationLocked() || pending.current) {
       cancel?.()
       return
     }
@@ -26,7 +29,7 @@ export const usePipelineNavigationGuard = (hasChanges: boolean) => {
     cancelPending.current = cancel
     confirmOnClose()
   }
-  const latest = useLatest({ hasChanges, requestNavigation })
+  const latest = useLatest({ hasChanges, requestNavigation, isNavigationLocked })
 
   useEffect(() => {
     const handleBeforeUnload = (event: BeforeUnloadEvent) => {
@@ -43,6 +46,7 @@ export const usePipelineNavigationGuard = (hasChanges: boolean) => {
     return router.history.block({
       enableBeforeUnload: false,
       blockerFn: ({ currentLocation, nextLocation }) => {
+        if (latest.current.isNavigationLocked() && !canLeave.current) return true
         if (
           !latest.current.hasChanges ||
           canLeave.current ||
@@ -61,6 +65,10 @@ export const usePipelineNavigationGuard = (hasChanges: boolean) => {
 
   return {
     requestNavigation,
+    completeNavigation: (proceed: () => void) => {
+      canLeave.current = true
+      proceed()
+    },
     modalProps: {
       ...modalProps,
       onCancel: () => {

@@ -3,8 +3,10 @@ import { useMutation, useQueryClient } from '@tanstack/react-query'
 import { toast } from 'sonner'
 
 import { databasePublicationsKeys } from './keys'
+import { unguarded } from '@/data/fetchers'
 import { executeSql } from '@/data/sql/execute-sql-mutation'
-import type { ResponseError, UseCustomMutationOptions } from '@/types'
+import type { StudioError } from '@/lib/errors/studio-errors'
+import type { UseCustomMutationOptions } from '@/types'
 
 export type DatabasePublicationCreateVariables = {
   projectRef: string
@@ -39,8 +41,11 @@ export async function createDatabasePublication({
   const { result } = await executeSql({
     projectRef,
     connectionString,
+    sqlOrigin: 'studio',
+    queryName: 'publication-create',
     sql,
     queryKey: ['publication', 'create'],
+    grant: unguarded.migrating,
   })
 
   return result
@@ -55,7 +60,7 @@ export const useDatabasePublicationCreateMutation = ({
 }: Omit<
   UseCustomMutationOptions<
     DatabasePublicationCreateData,
-    ResponseError,
+    StudioError,
     DatabasePublicationCreateVariables
   >,
   'mutationFn'
@@ -64,7 +69,7 @@ export const useDatabasePublicationCreateMutation = ({
 
   return useMutation<
     DatabasePublicationCreateData,
-    ResponseError,
+    StudioError,
     DatabasePublicationCreateVariables
   >({
     mutationFn: (vars) => createDatabasePublication(vars),

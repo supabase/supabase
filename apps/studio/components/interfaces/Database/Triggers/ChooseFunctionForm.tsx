@@ -1,3 +1,4 @@
+import { useQuery } from '@tanstack/react-query'
 import { useParams } from 'common'
 import { map as lodashMap, uniqBy } from 'lodash'
 import { HelpCircleIcon, TerminalIcon } from 'lucide-react'
@@ -9,10 +10,11 @@ import ProductEmptyState from '@/components/to-be-cleaned/ProductEmptyState'
 import { CodeEditor } from '@/components/ui/CodeEditor/CodeEditor'
 import InformationBox from '@/components/ui/InformationBox'
 import {
-  useDatabaseFunctionsQuery,
+  databaseFunctionsQueryOptions,
   type DatabaseFunction,
 } from '@/data/database-functions/database-functions-query'
 import { useSelectedProjectQuery } from '@/hooks/misc/useSelectedProject'
+import { useGrant } from '@/lib/grants'
 
 export interface ChooseFunctionFormProps {
   visible: boolean
@@ -23,10 +25,18 @@ export interface ChooseFunctionFormProps {
 const ChooseFunctionForm = ({ visible, onChange, setVisible }: ChooseFunctionFormProps) => {
   const { data: project } = useSelectedProjectQuery()
 
-  const { data = [] } = useDatabaseFunctionsQuery({
-    projectRef: project?.ref,
-    connectionString: project?.connectionString,
-  })
+  const readGrant = useGrant(
+    'POST /platform/pg-meta/{ref}/query',
+    { projectRef: project?.ref },
+    { variant: 'read' }
+  )
+  const { data = [] } = useQuery(
+    databaseFunctionsQueryOptions({
+      projectRef: project?.ref,
+      connectionString: project?.connectionString,
+      grant: readGrant.grant,
+    })
+  )
   const triggerFunctions = data.filter((fn) => fn.return_type === 'trigger')
   const hasPublicSchemaFunctions = triggerFunctions.length >= 1
   const functionSchemas = lodashMap(uniqBy(triggerFunctions, 'schema'), 'schema')
@@ -43,7 +53,6 @@ const ChooseFunctionForm = ({ visible, onChange, setVisible }: ChooseFunctionFor
       header="Pick a function"
       visible={visible}
       onCancel={() => setVisible(!visible)}
-      className="hooks-sidepanel"
     >
       <div className="py-6">
         {hasPublicSchemaFunctions ? (

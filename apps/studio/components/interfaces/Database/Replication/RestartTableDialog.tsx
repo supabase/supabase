@@ -45,15 +45,14 @@ export const RestartTableDialog = ({
   onResetStart,
   onResetComplete,
 }: RestartTableDialogProps) => {
-  const { ref: projectRef, pipelineId: _pipelineId } = useParams()
-  const pipelineId = Number(_pipelineId)
+  const { ref: projectRef, pipelineId } = useParams()
   const { runWithRequestStatus } = usePipelineRequestStatus()
   const restartRequestStatus = getRestartRequestStatus(pipelineStatusName)
   const tableName = `${table.schema}.${table.name}`
   const willCopyTable = shouldCopyTable(tableSyncCopy, table.id)
   const { mutateAsync: rollbackTables, isPending: isResetting } = useRollbackTablesMutation({
     onSuccess: () => {
-      toast.success(`Resetting "${tableName}"`)
+      toast.success(`Replication progress reset for "${tableName}"`)
       onOpenChange(false)
     },
     onError: (error) => {
@@ -80,12 +79,12 @@ export const RestartTableDialog = ({
   }
 
   const resetDescription = willCopyTable
-    ? 'This resets the table, deletes its destination data, and syncs existing rows again.'
-    : 'This resets the table and deletes its destination data. Initial sync is skipped, so replication resumes with new changes only.'
+    ? "This clears the table's saved replication progress. When replication resumes, its destination data is deleted and existing source rows are copied again."
+    : "This clears the table's saved replication progress. When replication resumes, its destination data is deleted. Initial sync is skipped, so only new changes are replicated."
   const shouldRestartPipeline = restartRequestStatus !== PipelineStatusRequestStatus.None
   const consequence = shouldRestartPipeline
-    ? `${resetDescription} The pipeline restarts automatically to apply the reset.`
-    : resetDescription
+    ? `${resetDescription} The pipeline restarts automatically. Other tables' unfinished initial syncs also start over.`
+    : `${resetDescription} A stopped pipeline stays stopped until you start it.`
 
   return (
     <AlertDialog open={open} onOpenChange={onOpenChange}>

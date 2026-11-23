@@ -35,9 +35,9 @@ export const AdvisorSignalDetail = ({ item }: AdvisorSignalDetailProps) => {
 
   const issueDescription = (
     <>
-      The IP address <code className="text-code-inline">{item.sourceData.ip}</code> is temporarily
-      blocked because of suspicious traffic or repeated failed password attempts. If this block is
-      expected, you can dismiss this signal or remove the ban.
+      The IP address <code>{item.sourceData.ip}</code> is temporarily blocked because of suspicious
+      traffic or repeated failed password attempts. If this block is expected, you can dismiss this
+      signal or remove the ban.
     </>
   )
 

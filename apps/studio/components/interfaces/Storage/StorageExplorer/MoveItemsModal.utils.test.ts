@@ -108,16 +108,8 @@ describe('filterFoldersBySearch', () => {
     expect(filterFoldersBySearch(folders, '   ')).toEqual([])
   })
 
-  it('matches names case insensitively', () => {
+  it('ranks exact names first, then prefixes, then substrings, case insensitively', () => {
     expect(filterFoldersBySearch(folders, 'PHOTOS').map((folder) => folder.path)).toEqual([
-      'archive/photos',
-      'photos',
-      'photos-2024',
-    ])
-  })
-
-  it('ranks exact names first, then prefixes, then substrings', () => {
-    expect(filterFoldersBySearch(folders, 'photos').map((folder) => folder.path)).toEqual([
       'archive/photos',
       'photos',
       'photos-2024',
@@ -150,12 +142,11 @@ describe('toFolders', () => {
     { id: null, name: 'videos' },
   ] as Parameters<typeof toFolders>[0]
 
-  it('drops files and keeps folders in order', () => {
-    expect(toFolders(objects, '').map((folder) => folder.name)).toEqual(['photos', 'videos'])
-  })
-
-  it('builds paths relative to the bucket root', () => {
-    expect(toFolders(objects, '').map((folder) => folder.path)).toEqual(['photos', 'videos'])
+  it('drops files and keeps folders in order, with paths relative to the bucket root', () => {
+    expect(toFolders(objects, '')).toEqual([
+      expect.objectContaining({ name: 'photos', path: 'photos' }),
+      expect.objectContaining({ name: 'videos', path: 'videos' }),
+    ])
   })
 
   it('prefixes paths with the parent folder', () => {

@@ -68,12 +68,14 @@ export const PipelineValidationAdmonition = forwardRef<
             {failures.length > 1 ? (
               <p className="mb-0.5! font-medium text-foreground">
                 {failure.name}
-                {hasCritical && failures.some((item) => item.failure_type === 'warning')
-                  ? ` (${failure.failure_type === 'critical' ? 'required' : 'warning'})`
-                  : ''}
+                {hasCritical && failures.some((item) => item.failure_type === 'warning') ? (
+                  <span>{` (${failure.failure_type === 'critical' ? 'required' : 'warning'})`}</span>
+                ) : (
+                  ''
+                )}
               </p>
             ) : null}
-            <Markdown className="text-sm text-foreground-light [&>p]:inline [&>p+p]:before:content-[' ']">
+            <Markdown className="text-sm text-foreground-light [&>p]:mb-2 [&>p:last-child]:mb-0">
               {failure.reason}
             </Markdown>
           </div>

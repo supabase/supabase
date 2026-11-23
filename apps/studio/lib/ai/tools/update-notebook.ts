@@ -32,6 +32,14 @@ export const contract = {
   inputSchema,
   outputSchema,
   minOptInLevel: 'schema',
+  availability: {
+    environments: new Set(['platform']),
+    requires: new Set(['explorer']),
+  },
   needsApproval: true,
+  promptGuidance: `- Use \`update_notebook\` to edit an existing notebook — insert, replace, delete, or move cells — instead of recreating it from scratch.
+- When the request clearly calls for editing a notebook, call \`update_notebook\` directly; the tool handles user approval.
+- \`update_notebook\` requires \`expected_updated_at\`, the \`updated_at\` you got from \`get_notebook\`. If the notebook changed since, the call is rejected — call \`get_notebook\` again and reissue \`update_notebook\` against the current content.
+- The cell authoring rules for \`create_notebook\` apply to every cell you insert or replace.`,
   toModelOutput: ({ id, name }) => ({ id, name }),
 } as const satisfies ToolContract

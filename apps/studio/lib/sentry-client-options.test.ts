@@ -7,49 +7,12 @@ import {
   isCancellationRejection,
   isChallengeExpiredError,
   isUserAbortedOperation,
+  shouldDropForSampleRate,
+  tagBrowserTranslationError,
 } from './sentry-client-options'
 
 describe('Sentry beforeSend filtering functions', () => {
   describe('isBrowserWalletExtensionError', () => {
-    it('returns true for Gate.io wallet extension error (gt-window-provider.js)', () => {
-      const event: SentryEvent = {
-        exception: {
-          values: [
-            {
-              type: 'TypeError',
-              value: 'en.shouldSetTallyForCurrentProvider is not a function',
-              stacktrace: {
-                frames: [
-                  { filename: 'app:///_next/static/chunks/main.js' } as StackFrame,
-                  { filename: 'app:///gt-window-provider.js' } as StackFrame,
-                ],
-              },
-            },
-          ],
-        },
-      }
-
-      expect(isBrowserWalletExtensionError(event)).toBe(true)
-    })
-
-    it('returns true for Gate.io BTC wallet extension error (gt-window-provider-btc.js)', () => {
-      const event: SentryEvent = {
-        exception: {
-          values: [
-            {
-              type: 'TypeError',
-              value: 'f.shouldSetTallyForCurrentProvider is not a function',
-              stacktrace: {
-                frames: [{ filename: 'app:///gt-window-provider-btc.js' } as StackFrame],
-              },
-            },
-          ],
-        },
-      }
-
-      expect(isBrowserWalletExtensionError(event)).toBe(true)
-    })
-
     it('returns true for wallet-provider in abs_path', () => {
       const event: SentryEvent = {
         exception: {
@@ -121,32 +84,15 @@ describe('Sentry beforeSend filtering functions', () => {
   })
 
   describe('isUserAbortedOperation', () => {
-    it('returns true for "operation was aborted" error', () => {
-      const error = new Error('The operation was aborted.')
-      const event: SentryEvent = {}
-
-      expect(isUserAbortedOperation(error, event)).toBe(true)
-    })
-
-    it('returns true for "signal is aborted" error', () => {
-      const error = new Error('signal is aborted without reason')
-      const event: SentryEvent = {}
-
-      expect(isUserAbortedOperation(error, event)).toBe(true)
-    })
-
-    it('returns true for "manually canceled" error', () => {
-      const error = new Error('operation is manually canceled')
-      const event: SentryEvent = {}
-
-      expect(isUserAbortedOperation(error, event)).toBe(true)
-    })
-
-    it('returns true for "AbortError" message', () => {
-      const error = new Error('AbortError: The operation was aborted')
-      const event: SentryEvent = {}
-
-      expect(isUserAbortedOperation(error, event)).toBe(true)
+    it.each([
+      // SUPABASE-APP-BG6
+      'The operation was aborted.',
+      // SUPABASE-APP-BG7
+      'signal is aborted without reason',
+      'operation is manually canceled',
+      'AbortError: The operation was aborted',
+    ])('returns true for an error with message %o', (message) => {
+      expect(isUserAbortedOperation(new Error(message), {})).toBe(true)
     })
 
     it('returns true when message is in event.message (no error object)', () => {
@@ -358,26 +304,6 @@ describe('Sentry beforeSend filtering functions', () => {
       expect(isBrowserWalletExtensionError(event)).toBe(true)
     })
 
-    it('correctly identifies SUPABASE-APP-BG6 pattern (user aborted)', () => {
-      // Based on actual Sentry issue SUPABASE-APP-BG6
-      const error = new Error('The operation was aborted.')
-      const event: SentryEvent = {
-        message: '[CRITICAL][sign in via EP] Failed: The operation was aborted.',
-      }
-
-      expect(isUserAbortedOperation(error, event)).toBe(true)
-    })
-
-    it('correctly identifies SUPABASE-APP-BG7 pattern (signal aborted)', () => {
-      // Based on actual Sentry issue SUPABASE-APP-BG7
-      const error = new Error('signal is aborted without reason')
-      const event: SentryEvent = {
-        message: '[CRITICAL][sign in via EP] Failed: signal is aborted without reason',
-      }
-
-      expect(isUserAbortedOperation(error, event)).toBe(true)
-    })
-
     it('correctly identifies SUPABASE-APP-ACC pattern (challenge expired)', () => {
       // Based on actual Sentry issue SUPABASE-APP-ACC
       const error = new Error('Non-Error promise rejection captured with value: challenge-expired')
@@ -419,6 +345,96 @@ describe('Sentry beforeSend filtering functions', () => {
   })
 })
 
+describe('shouldDropForSampleRate', () => {
+  it('keeps events without a sample_rate tag', () => {
+    expect(shouldDropForSampleRate({}, () => 0.99)).toBe(false)
+  })
+
+  it('keeps events with rate 1', () => {
+    expect(shouldDropForSampleRate({ tags: { sample_rate: 1 } }, () => 0.99)).toBe(false)
+  })
+
+  it('keeps or drops sampled events depending on the random draw', () => {
+    const event = { tags: { sample_rate: 0.1 } }
+    expect(shouldDropForSampleRate(event, () => 0.05)).toBe(false)
+    expect(shouldDropForSampleRate(event, () => 0.5)).toBe(true)
+  })
+
+  it('accepts numeric string rates', () => {
+    expect(shouldDropForSampleRate({ tags: { sample_rate: '0.1' } }, () => 0.5)).toBe(true)
+  })
+})
+
+describe('tagBrowserTranslationError', () => {
+  const domError = (): SentryEvent => ({
+    exception: {
+      values: [
+        {
+          type: 'NotFoundError',
+          value: "Failed to execute 'removeChild' on 'Node': The node is not a child of this node.",
+        },
+      ],
+    },
+  })
+
+  it('tags the error and sets the sample rate', () => {
+    const event = domError()
+    tagBrowserTranslationError(event, true)
+    expect(event.tags).toEqual({
+      sample_rate: 0.05,
+      browser_translation: true,
+      page_translated: true,
+    })
+  })
+
+  it('records when the page was not translated', () => {
+    const event = domError()
+    tagBrowserTranslationError(event, false)
+    expect(event.tags?.page_translated).toBe(false)
+  })
+
+  it('looks the page up itself when no answer is passed in', () => {
+    // Node test environment: there is no document, so the page counts as untranslated
+    const event = domError()
+    tagBrowserTranslationError(event)
+    expect(event.tags?.page_translated).toBe(false)
+  })
+
+  it('detects a translated page when no answer is passed in', () => {
+    vi.stubGlobal('document', {
+      documentElement: { classList: { contains: (cls: string) => cls === 'translated-ltr' } },
+      querySelector: () => null,
+    })
+    try {
+      const event = domError()
+      tagBrowserTranslationError(event)
+      expect(event.tags?.page_translated).toBe(true)
+    } finally {
+      vi.unstubAllGlobals()
+    }
+  })
+
+  it('uses the default rate when sample_rate is explicitly undefined', () => {
+    const event = { ...domError(), tags: { sample_rate: undefined } }
+    tagBrowserTranslationError(event, false)
+    expect(event.tags.sample_rate).toBe(0.05)
+  })
+
+  it('keeps tags that are already set', () => {
+    const event = { ...domError(), tags: { globalErrorBoundary: true, sample_rate: 1 } }
+    tagBrowserTranslationError(event, false)
+    expect(event.tags).toMatchObject({ globalErrorBoundary: true, sample_rate: 1 })
+  })
+
+  it('leaves other errors alone', () => {
+    const event: SentryEvent = {
+      exception: { values: [{ type: 'Error', value: 'Application error' }] },
+    }
+    tagBrowserTranslationError(event, true)
+    expect(event.tags).toBeUndefined()
+  })
+})
+
 describe('buildSentryClientOptions', () => {
   // Representative subset of Sentry's default integrations. `integrations`
   // is the function form: Sentry.init calls it with the defaults and installs
@@ -451,15 +467,13 @@ describe('buildSentryClientOptions', () => {
     })
     expect(withRelease.release).toBe('abc123')
 
-    // The key must be ABSENT when no release is passed: on the Next build a
-    // `release: undefined` entry would override the release injected into
-    // @sentry/nextjs's init by withSentryConfig (options are spread last).
+    // The key is absent when no release is passed.
     const withoutRelease = buildSentryClientOptions({ includeThirdPartyErrorFilter: true })
     expect('release' in withoutRelease).toBe(false)
   })
 
   it('includes the third-party error filter only when the build annotates frames', () => {
-    // Next build: withSentryConfig injects the applicationKey metadata.
+    // Builds whose bundler annotates frames with the applicationKey.
     expect(
       getIntegrationNames(buildSentryClientOptions({ includeThirdPartyErrorFilter: true }))
     ).toContain('ThirdPartyErrorsFilter')
@@ -479,6 +493,13 @@ describe('buildSentryClientOptions', () => {
     })
 
     expect(getIntegrationNames(options)).toContain('FakeRouterTracing')
+  })
+
+  it('no longer ignores insert/remove node errors, so beforeSend can sample them', () => {
+    const { ignoreErrors = [] } = buildSentryClientOptions({ includeThirdPartyErrorFilter: true })
+    expect(ignoreErrors).not.toContain("NotFoundError: Failed to execute 'removeChild' on 'Node'")
+    expect(ignoreErrors).not.toContain('NotFoundError: The object can not be found here.')
+    expect(ignoreErrors).toContain("Cannot read properties of null (reading 'parentNode')")
   })
 
   it('builds the same shared options for both builds (parity)', () => {
@@ -574,9 +595,73 @@ describe('which errors Studio sends to Sentry', () => {
     expect(Math.random).not.toHaveBeenCalled()
   })
 
+  it('drops user SQL errors even when something else captured them', async () => {
+    const { UserSqlError } = await import('@/lib/errors/studio-errors')
+    const event: Parameters<typeof beforeSend>[0] = {
+      type: undefined,
+      exception: {
+        values: [
+          { value: 'Failed to run sql query', stacktrace: { frames: [{ filename: 'app.js' }] } },
+        ],
+      },
+    }
+    const hint = { originalException: new UserSqlError({ message: 'Failed to run sql query' }) }
+    expect(await beforeSend(event, hint)).toBeNull()
+  })
+
   it('drops errors with no code location when they did not crash the page', async () => {
     expect(
       await beforeSend({ type: undefined, exception: { values: [{ value: 'No stack' }] } }, {})
     ).toBeNull()
+  })
+
+  describe('browser-translation DOM errors', () => {
+    const domErrorEvent = (): Parameters<typeof beforeSend>[0] => ({
+      type: undefined,
+      exception: {
+        values: [
+          {
+            type: 'NotFoundError',
+            value:
+              "Failed to execute 'removeChild' on 'Node': The node is not a child of this node.",
+            stacktrace: { frames: [{ filename: 'app.js' }] },
+          },
+        ],
+      },
+    })
+
+    it('sends the sampled share, tagged, without the extra 1% sampling', async () => {
+      vi.mocked(Math.random).mockReturnValueOnce(0.04)
+      const event = domErrorEvent()
+
+      expect(await beforeSend(event, {})).toBe(event)
+      expect(Math.random).toHaveBeenCalledOnce()
+      expect(event.tags).toMatchObject({
+        browser_translation: true,
+        sample_rate: 0.05,
+        codeSampleRate: '1',
+      })
+    })
+
+    it('samples them even when the event has no stack frames', async () => {
+      vi.mocked(Math.random).mockReturnValueOnce(0.04)
+      const event = domErrorEvent()
+      event.exception!.values![0].stacktrace = undefined
+
+      expect(await beforeSend(event, {})).toBe(event)
+    })
+
+    it('still drops other errors that have no stack frames', async () => {
+      const event: Parameters<typeof beforeSend>[0] = {
+        type: undefined,
+        exception: { values: [{ type: 'Error', value: 'Application error' }] },
+      }
+      expect(await beforeSend(event, {})).toBeNull()
+    })
+
+    it('drops the rest of them', async () => {
+      vi.mocked(Math.random).mockReturnValueOnce(0.5)
+      expect(await beforeSend(domErrorEvent(), {})).toBeNull()
+    })
   })
 })

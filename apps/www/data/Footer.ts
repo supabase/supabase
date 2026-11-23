@@ -4,7 +4,6 @@ import {
   skillBasedSolutions,
   useCaseSolutions,
 } from 'data/Solutions'
-import { PrivacySettings } from 'ui-patterns/PrivacySettings'
 
 const footerData = [
   {
@@ -101,8 +100,16 @@ const footerData = [
         url: '/partners/catalog',
       },
       {
-        text: 'Brand Assets',
-        url: '/brand-assets',
+        text: 'Knowledge Base',
+        url: '/kb',
+      },
+      {
+        text: 'FAQs',
+        url: '/kb/topics/faqs',
+      },
+      {
+        text: 'Brand Guidelines',
+        url: '/brand',
       },
       {
         text: 'Security & Compliance',
@@ -111,6 +118,10 @@ const footerData = [
       {
         text: 'Regions',
         url: '/regions',
+      },
+      {
+        text: 'dbarena',
+        url: 'https://dbarena.com',
       },
       {
         text: 'SOC2',
@@ -162,10 +173,6 @@ const footerData = [
         text: 'Open Source',
         url: '/open-source',
       },
-      {
-        text: 'DevTo',
-        url: 'https://dev.to/supabase',
-      },
     ],
   },
   {
@@ -190,10 +197,6 @@ const footerData = [
       {
         text: 'Privacy Policy',
         url: '/privacy',
-      },
-      {
-        text: 'Privacy Settings',
-        component: PrivacySettings,
       },
       {
         text: 'Acceptable Use Policy',

@@ -9,15 +9,21 @@ import { ForeignRowSelector } from './ForeignRowSelector/ForeignRowSelector'
 import { HeaderTitle } from './HeaderTitle'
 import { InputField } from './InputField'
 import { JsonEditor } from './JsonEditor'
+import { RowCreationOptions } from './RowCreationOptions'
 import type { EditValue, RowField } from './RowEditor.types'
 import {
   convertByteaToHex,
+  generateReusedRowFields,
   generateRowFields,
   generateRowObjectFromFields,
   generateUpdateRowPayload,
+  getPrimaryKeyMatch,
+  getTruncatedFieldNames,
+  mergeLargeValues,
   validateFields,
 } from './RowEditor.utils'
 import { TextEditor } from './TextEditor'
+import { useCopiedLargeValues } from './useCopiedLargeValues'
 import { getStableRowIdentifiers } from '@/components/grid/utils/queueOperationUtils'
 import { useIsQueueOperationsEnabled } from '@/components/interfaces/Account/Preferences/useDashboardSettings'
 import { useForeignKeyConstraintsQuery } from '@/data/database/foreign-key-constraints-query'
@@ -26,6 +32,8 @@ import type { Dictionary } from '@/types'
 
 export interface RowEditorProps {
   row?: Dictionary<any>
+  /** Seeds a new record from an existing row; primary key, identity, and generated values are cleared */
+  duplicateFrom?: Dictionary<any>
   selectedTable: PGTable
   visible: boolean
   editable?: boolean
@@ -38,6 +46,7 @@ const formId = 'row-editor-panel'
 
 export const RowEditor = ({
   row,
+  duplicateFrom,
   selectedTable,
   visible = false,
   editable = true,
@@ -63,7 +72,15 @@ export const RowEditor = ({
   const isEditingJson = selectedValueForJsonEdit !== undefined
 
   const [loading, setLoading] = useState(false)
+
+  // Duplicating a row copies the values the grid truncated by fetching them in full
+  const copiedLargeValues = useCopiedLargeValues({
+    table: selectedTable,
+    onValuesLoaded: (values) =>
+      setRowFields((fields) => mergeLargeValues({ fields, values }).fields),
+  })
   const [createMore, setCreateMore] = useState(false)
+  const [keepValues, setKeepValues] = useState(false)
 
   // Generated columns are always computed by the database, so they are excluded from the form.
   // They remain in rowFields as primary key identifiers may rely on them.
@@ -91,11 +108,29 @@ export const RowEditor = ({
   )
 
   useEffect(() => {
-    if (visible) {
-      setErrors({})
-      const rowFields = generateRowFields(row, selectedTable, foreignKeys)
-      setRowFields(rowFields)
+    if (!visible) {
+      copiedLargeValues.reset()
+      return
     }
+
+    setErrors({})
+    if (duplicateFrom === undefined) {
+      copiedLargeValues.reset()
+      setRowFields(generateRowFields(row, selectedTable, foreignKeys))
+      return
+    }
+
+    const sourceFields = generateRowFields(duplicateFrom, selectedTable, foreignKeys)
+    setRowFields(
+      generateReusedRowFields({
+        fields: sourceFields,
+        blankFields: generateRowFields(undefined, selectedTable, foreignKeys),
+      })
+    )
+    copiedLargeValues.load({
+      columns: getTruncatedFieldNames(sourceFields),
+      pkMatch: getPrimaryKeyMatch({ row: duplicateFrom, table: selectedTable }),
+    })
   }, [visible])
 
   const onUpdateField = (changes: Dictionary<any>) => {
@@ -127,6 +162,8 @@ export const RowEditor = ({
 
   const onSaveChanges = (e: React.FormEvent<HTMLFormElement>) => {
     e.preventDefault()
+    // Saving before the full values arrive would save blanks where values were expected
+    if (copiedLargeValues.isLoading) return
 
     const errors = validateFields(rowFields)
     setErrors(errors)
@@ -154,8 +191,10 @@ export const RowEditor = ({
       saveChanges(payload, isNewRecord, { ...configuration, createMore }, (err?: any) => {
         setLoading(false)
         if (!err && createMore && isNewRecord) {
-          const freshFields = generateRowFields(undefined, selectedTable, foreignKeys)
-          setRowFields(freshFields)
+          const blankFields = generateRowFields(undefined, selectedTable, foreignKeys)
+          setRowFields(
+            keepValues ? generateReusedRowFields({ fields: rowFields, blankFields }) : blankFields
+          )
           setErrors({})
         }
       })
@@ -192,6 +231,7 @@ export const RowEditor = ({
           applyButtonLabel={applyChangesLabel}
           closePanel={closePanel}
           hideApply={!editable}
+          disableApply={copiedLargeValues.isLoading}
           visible={visible}
         >
           {isNewRecord && editable && (
@@ -203,6 +243,9 @@ export const RowEditor = ({
                 onCheckedChange={(checked) => setCreateMore(checked)}
               />
               <Label htmlFor="create-more">Create more</Label>
+              {createMore && (
+                <RowCreationOptions keepValues={keepValues} onKeepValuesChange={setKeepValues} />
+              )}
             </div>
           )}
         </ActionBar>
@@ -224,7 +267,10 @@ export const RowEditor = ({
                         onEditJson={setSelectedValueForJsonEdit}
                         onEditText={setSelectedValueForTextEdit}
                         onSelectForeignKey={() => onOpenForeignRowSelector(field)}
-                        isEditable={editable}
+                        status={copiedLargeValues.statuses[field.name]}
+                        isEditable={
+                          editable && copiedLargeValues.statuses[field.name] !== 'loading'
+                        }
                         isNewRow={isNewRecord || '__tempId' in row}
                       />
                     )
@@ -253,7 +299,10 @@ export const RowEditor = ({
                           onEditText={setSelectedValueForTextEdit}
                           onEditJson={setSelectedValueForJsonEdit}
                           onSelectForeignKey={() => onOpenForeignRowSelector(field)}
-                          isEditable={editable}
+                          status={copiedLargeValues.statuses[field.name]}
+                          isEditable={
+                            editable && copiedLargeValues.statuses[field.name] !== 'loading'
+                          }
                           isNewRow={isNewRecord || '__tempId' in row}
                         />
                       )

@@ -152,7 +152,8 @@ export const JsonEditor = ({
         <div className="flex items-center justify-between">
           {view === 'edit' ? (
             <p>
-              {readOnly ? 'Viewing' : 'Editing'} value of: <code>{column}</code>
+              {readOnly ? <span>Viewing</span> : <span>Editing</span>} <span>value of:</span>{' '}
+              <code>{column}</code>
             </p>
           ) : (
             <p>

@@ -1,15 +1,12 @@
-import { EyeIcon, EyeOffIcon } from 'lucide-react'
+import { EditIcon, EyeIcon, EyeOffIcon } from 'lucide-react'
 import { useState } from 'react'
 import { useWatch, type Control } from 'react-hook-form'
 import { Button, Input, Separator } from 'ui'
 import { FormItemLayout } from 'ui-patterns/form/FormItemLayout/FormItemLayout'
 
 import { DestinationLogo } from '../DestinationLogo'
-import { CREATE_NEW_NAMESPACE } from '../DestinationPanel/DestinationForm/DestinationForm.constants'
 import type { DestinationPanelSchemaType } from '../DestinationPanel/DestinationForm/DestinationForm.schema'
 import {
-  ANALYTICS_BUCKET_BUCKET_FIELD_COPY,
-  ANALYTICS_BUCKET_NAMESPACE_FIELD_COPY,
   BIGQUERY_DATASET_ID_FIELD_COPY,
   BIGQUERY_PROJECT_ID_FIELD_COPY,
   CLICKHOUSE_DATABASE_FIELD_COPY,
@@ -26,6 +23,8 @@ import {
 import { PipelineRegionReadonly } from '../DestinationPanel/DestinationForm/PipelineRegionField'
 import type { DestinationType } from '../DestinationPanel/DestinationPanel.types'
 import { PipelineConnectionReview } from './PipelineConnectionReview'
+import { PipelineValidationAdmonition } from './PipelineValidationAdmonition'
+import type { ValidationFailure } from '@/data/replication/validate-destination-mutation'
 
 const MaskedUrl = ({ value, label }: { value: string; label: string }) => {
   const [isVisible, setIsVisible] = useState(false)
@@ -49,9 +48,15 @@ const MaskedUrl = ({ value, label }: { value: string; label: string }) => {
 export const PipelineDestinationReview = ({
   type,
   control,
+  onEditDestination,
+  onEditConnection,
+  validationFailures = [],
 }: {
   type: DestinationType
   control: Control<DestinationPanelSchemaType>
+  onEditDestination?: () => void
+  onEditConnection?: () => void
+  validationFailures?: ValidationFailure[]
 }) => {
   const [
     name,
@@ -67,9 +72,6 @@ export const PipelineDestinationReview = ({
     url,
     clickhouseDatabase,
     engine,
-    warehouse,
-    namespace,
-    newNamespace,
   ] = useWatch({
     control,
     name: [
@@ -86,9 +88,6 @@ export const PipelineDestinationReview = ({
       'clickhouseUrl',
       'clickhouseDatabase',
       'clickhouseEngine',
-      'warehouseName',
-      'namespace',
-      'newNamespaceName',
     ],
   })
   const rows: { label: string; value?: string; description: string; isMasked?: boolean }[] = []
@@ -131,60 +130,80 @@ export const PipelineDestinationReview = ({
         }
       )
       break
-    case 'Analytics Bucket':
-      rows.push(
-        { ...ANALYTICS_BUCKET_BUCKET_FIELD_COPY, value: warehouse },
-        {
-          ...ANALYTICS_BUCKET_NAMESPACE_FIELD_COPY,
-          value: namespace === CREATE_NEW_NAMESPACE ? newNamespace : namespace,
-        }
-      )
-      break
   }
   return (
     <section aria-label="Destination review">
       <div className="space-y-6 p-5">
-        <h3 className="text-sm font-medium text-foreground">Destination</h3>
+        <div className="flex items-center justify-between gap-2">
+          <h3 className="text-sm font-medium text-foreground">Destination</h3>
+          {onEditDestination && (
+            <Button
+              type="button"
+              icon={<EditIcon />}
+              size="tiny"
+              aria-label="Edit destination"
+              onClick={onEditDestination}
+            >
+              Edit
+            </Button>
+          )}
+        </div>
         <FormItemLayout
           isReactForm={false}
           layout="horizontal"
           label="Type"
-          description={`Destination type cannot be changed after creation. ${type === 'Analytics Bucket' ? 'Analytics Bucket is deprecated.' : `${type} support is in public alpha.`}`}
+          description={`Destination type cannot be changed after creation. ${type} support is in public alpha.`}
         >
-          <div className="flex items-center gap-3 rounded-md border bg-surface-200 p-3">
+          <div className="flex h-11 min-w-0 items-center gap-2 rounded-md border bg-surface-200 px-3">
             <DestinationLogo type={type} />
             <span className="text-sm text-foreground">{type}</span>
           </div>
         </FormItemLayout>
       </div>
       <Separator />
-      <div className="space-y-6 p-5">
-        <h3 className="text-sm font-medium text-foreground">Connection</h3>
-        {[{ ...PIPELINE_NAME_FIELD_COPY, value: name }, ...rows].map((row) => (
+      <section aria-label="Connection review">
+        <div className="space-y-6 p-5">
+          <div className="flex items-center justify-between gap-2">
+            <h3 className="text-sm font-medium text-foreground">Connection</h3>
+            {onEditConnection && (
+              <Button
+                type="button"
+                icon={<EditIcon />}
+                size="tiny"
+                aria-label="Edit connection"
+                onClick={onEditConnection}
+              >
+                Edit
+              </Button>
+            )}
+          </div>
+          {[{ ...PIPELINE_NAME_FIELD_COPY, value: name }, ...rows].map((row) => (
+            <FormItemLayout
+              key={row.label}
+              isReactForm={false}
+              layout="horizontal"
+              label={row.label}
+              description={row.description}
+            >
+              {row.isMasked ? (
+                <MaskedUrl key={`${type}-${row.value}`} value={row.value ?? ''} label={row.label} />
+              ) : (
+                <Input readOnly aria-label={row.label} value={row.value || 'Not set'} />
+              )}
+            </FormItemLayout>
+          ))}
+          <PipelineConnectionReview type={type} control={control} />
           <FormItemLayout
-            key={row.label}
             isReactForm={false}
             layout="horizontal"
-            label={row.label}
-            description={row.description}
+            label="Pipeline region"
+            description={`All pipelines run from this region. ${type} connections originate here.`}
           >
-            {row.isMasked ? (
-              <MaskedUrl key={`${type}-${row.value}`} value={row.value ?? ''} label={row.label} />
-            ) : (
-              <Input readOnly aria-label={row.label} value={row.value || 'Not set'} />
-            )}
+            <PipelineRegionReadonly />
           </FormItemLayout>
-        ))}
-        <PipelineConnectionReview type={type} control={control} />
-        <FormItemLayout
-          isReactForm={false}
-          layout="horizontal"
-          label="Pipeline region"
-          description={`All pipelines run from this region. ${type} connections originate here.`}
-        >
-          <PipelineRegionReadonly />
-        </FormItemLayout>
-      </div>
+        </div>
+        <PipelineValidationAdmonition failures={validationFailures} />
+      </section>
     </section>
   )
 }

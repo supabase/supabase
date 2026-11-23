@@ -1,11 +1,7 @@
 import { createFileRoute } from '@tanstack/react-router'
 
-import IntegrationPage from '@/pages/project/[ref]/integrations/[id]/[pageId]/index'
+import { MarketplaceDetail } from '@/components/interfaces/Integrations/Marketplace/MarketplaceDetail'
 
 export const Route = createFileRoute('/project/$ref/integrations/$id/$pageId/')({
-  component: IntegrationPageIdRoute,
+  component: MarketplaceDetail,
 })
-
-function IntegrationPageIdRoute() {
-  return <IntegrationPage dehydratedState={undefined} />
-}

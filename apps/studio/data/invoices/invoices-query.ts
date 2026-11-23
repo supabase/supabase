@@ -2,7 +2,8 @@ import { useQuery } from '@tanstack/react-query'
 
 import { invoicesKeys } from './keys'
 import { get, handleError } from '@/data/fetchers'
-import type { ResponseError, UseCustomQueryOptions } from '@/types'
+import type { StudioError } from '@/lib/errors/studio-errors'
+import type { UseCustomQueryOptions } from '@/types'
 
 export type InvoicesVariables = {
   slug?: string
@@ -29,7 +30,7 @@ export async function getInvoices(
 }
 
 export type InvoicesData = Awaited<ReturnType<typeof getInvoices>>
-export type InvoicesError = ResponseError
+export type InvoicesError = StudioError
 
 export const useInvoicesQuery = <TData = InvoicesData>(
   { slug, offset, limit }: InvoicesVariables,

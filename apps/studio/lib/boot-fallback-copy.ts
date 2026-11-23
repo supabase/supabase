@@ -1,5 +1,4 @@
-// Shared between ShellFallback (TanStack) and BootTimeoutFallback (Next.js) —
-// same "stuck loading" message, different markup per runtime (see FE-4460).
+// Copy for ShellFallback's "stuck loading" message (see FE-4460).
 export const BOOT_FALLBACK_REVEAL_DELAY_SECONDS = 7
 export const BOOT_FALLBACK_SUPPORT_EMAIL = 'support@supabase.io'
 export const BOOT_FALLBACK_MESSAGE =

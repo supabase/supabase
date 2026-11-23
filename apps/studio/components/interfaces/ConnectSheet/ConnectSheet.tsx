@@ -1,8 +1,18 @@
-import { PermissionAction } from '@supabase/shared-types/out/constants'
+import { useQuery } from '@tanstack/react-query'
 import { useParams } from 'common'
 import { parseAsBoolean, useQueryState } from 'nuqs'
 import { useEffect, useMemo, useRef } from 'react'
-import { cn, Sheet, SheetContent, SheetDescription, SheetHeader, SheetTitle } from 'ui'
+import {
+  cn,
+  ScrollBar,
+  ScrollRoot,
+  ScrollViewport,
+  Sheet,
+  SheetContent,
+  SheetDescription,
+  SheetHeader,
+  SheetTitle,
+} from 'ui'
 
 import type { ConnectMode, ProjectKeys } from './Connect.types'
 import { ConnectConfigSection, ModeSelector } from './ConnectConfigSection'
@@ -16,9 +26,10 @@ import { useConnectSheetParams } from './useConnectSheetParams'
 import { useConnectSheetShortcut } from './useConnectSheetShortcut'
 import { useConnectState } from './useConnectState'
 import { WarehouseTab } from './WarehouseTab'
-import { useAPIKeys } from '@/data/api-keys/api-keys-query'
+import { ApiKeysAccessNote } from '@/components/ui/ApiKeysAccessNote'
+import { apiKeysQueryOptions, getKeys } from '@/data/api-keys/api-keys-query'
 import { useProjectApiUrl } from '@/data/config/project-endpoint-query'
-import { useAsyncCheckPermissions } from '@/hooks/misc/useCheckPermissions'
+import { useGrant } from '@/lib/grants'
 import { useTrack } from '@/lib/telemetry/track'
 import { useAppStateSnapshot } from '@/state/app-state'
 
@@ -107,11 +118,10 @@ export const ConnectSheet = () => {
 
   const { data: endpoint = '' } = useProjectApiUrl({ projectRef }, { enabled: showConnect })
 
-  const { can: canReadAPIKeys } = useAsyncCheckPermissions(
-    PermissionAction.READ,
-    'service_api_keys'
+  const apiKeysGrant = useGrant('GET /v1/projects/{ref}/api-keys', { projectRef })
+  const { data: apiKeysData } = useQuery(
+    apiKeysQueryOptions({ projectRef, grant: apiKeysGrant.grant }, { select: getKeys })
   )
-  const { data: apiKeysData } = useAPIKeys({ projectRef }, { enabled: canReadAPIKeys })
 
   const projectKeys: ProjectKeys = useMemo(() => {
     const { anonKey, publishableKey } = apiKeysData ?? {}
@@ -169,34 +179,53 @@ export const ConnectSheet = () => {
           <SheetDescription>Choose how you want to use Supabase</SheetDescription>
         </SheetHeader>
 
-        <div className="flex min-w-0 flex-1 flex-col overflow-y-auto overflow-x-hidden divide-y">
-          <div className="p-8">
-            <ModeSelector
-              modes={availableModes}
-              selected={state.mode}
-              onChange={handleModeChange}
-            />
-          </div>
+        <ScrollRoot className="flex min-h-0 min-w-0 flex-1 flex-col">
+          <ScrollViewport className="[&>div]:block!">
+            <div className="flex min-w-0 flex-col divide-y">
+              <div className="p-8">
+                <ModeSelector
+                  modes={availableModes}
+                  selected={state.mode}
+                  onChange={handleModeChange}
+                />
+              </div>
 
-          {state.mode === 'warehouse' ? (
-            <WarehouseTab />
-          ) : (
-            <>
-              {activeFields.length > 0 && (
-                <div className="p-8">
-                  <ConnectConfigSection
-                    state={state}
-                    activeFields={activeFields}
-                    onFieldChange={handleFieldChange}
-                    getFieldOptions={getFieldOptions}
-                  />
-                </div>
+              {/* Only framework snippets embed API keys. The server env tab renders its own note
+                  next to the keys it offers to copy. */}
+              {state.mode === 'framework' && (
+                <ApiKeysAccessNote
+                  grant={apiKeysGrant}
+                  fallback="Replace the placeholders with your own keys."
+                  className="px-8 py-4"
+                />
               )}
 
-              <ConnectStepsSection steps={resolvedSteps} state={state} projectKeys={projectKeys} />
-            </>
-          )}
-        </div>
+              {state.mode === 'warehouse' ? (
+                <WarehouseTab />
+              ) : (
+                <>
+                  {activeFields.length > 0 && (
+                    <div className="p-8">
+                      <ConnectConfigSection
+                        state={state}
+                        activeFields={activeFields}
+                        onFieldChange={handleFieldChange}
+                        getFieldOptions={getFieldOptions}
+                      />
+                    </div>
+                  )}
+
+                  <ConnectStepsSection
+                    steps={resolvedSteps}
+                    state={state}
+                    projectKeys={projectKeys}
+                  />
+                </>
+              )}
+            </div>
+          </ScrollViewport>
+          <ScrollBar />
+        </ScrollRoot>
       </SheetContent>
     </Sheet>
   )

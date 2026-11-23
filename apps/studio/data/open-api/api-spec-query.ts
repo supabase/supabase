@@ -2,7 +2,8 @@ import { useQuery } from '@tanstack/react-query'
 
 import { openApiKeys } from './keys'
 import { get, handleError } from '@/data/fetchers'
-import type { ResponseError, UseCustomQueryOptions } from '@/types'
+import type { StudioError } from '@/lib/errors/studio-errors'
+import type { UseCustomQueryOptions } from '@/types'
 
 export type OpenAPISpecVariables = {
   projectRef?: string
@@ -52,7 +53,7 @@ export async function getOpenAPISpec({ projectRef }: OpenAPISpecVariables, signa
 }
 
 export type OpenAPISpecData = Awaited<OpenAPISpecResponse>
-export type OpenAPISpecError = ResponseError
+export type OpenAPISpecError = StudioError
 
 export const useOpenAPISpecQuery = <TData = OpenAPISpecData>(
   { projectRef }: OpenAPISpecVariables,

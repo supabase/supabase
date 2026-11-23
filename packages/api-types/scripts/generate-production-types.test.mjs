@@ -6,6 +6,19 @@ import test from 'node:test'
 
 import { generateTypes } from './verify-production-types.mjs'
 
+const validSpecification = JSON.stringify({
+  components: {
+    schemas: {
+      CreateScopedAccessTokenBody: {
+        properties: { permissions: { items: { enum: ['project_admin_read'] } } },
+      },
+    },
+  },
+  paths: {
+    '/v1/projects': { get: { 'x-fga-permissions': [['project_admin_read']] } },
+  },
+})
+
 const specifications = [{ name: 'api-v1', url: 'https://example.com/api/v1-json' }]
 
 test('generateTypes fetches specifications and generates types straight into the given directory', async (t) => {
@@ -20,7 +33,7 @@ test('generateTypes fetches specifications and generates types straight into the
   await generateTypes(specifications, {
     temporaryDirectory,
     generatedTypesDirectory,
-    fetchImpl: async (url) => ({ ok: true, text: async () => `spec from ${url}` }),
+    fetchImpl: async (url) => ({ ok: true, text: async () => validSpecification }),
     runImpl: async (command, args) => {
       runCalls.push([command, args])
       if (args.includes('--find-config-path')) return { stdout: '/repo/.prettierrc\n' }
@@ -29,7 +42,10 @@ test('generateTypes fetches specifications and generates types straight into the
   })
 
   const specification = await readFile(join(temporaryDirectory, 'api-v1.json'), 'utf8')
-  assert.match(specification, /v1-json/)
+  assert.equal(specification, validSpecification)
+
+  const fga = await readFile(join(generatedTypesDirectory, 'fga-requirements.ts'), 'utf8')
+  assert.match(fga, /"GET \/v1\/projects": \[\["project_admin_read"\]\]/)
 
   const redocly = await readFile(join(temporaryDirectory, 'redocly.yaml'), 'utf8')
   assert.match(redocly, new RegExp(`output: ${generatedTypesDirectory}/api-v1.d.ts`))
@@ -40,4 +56,5 @@ test('generateTypes fetches specifications and generates types straight into the
   assert.ok(runCalls[1][1].includes('--find-config-path'))
   assert.ok(runCalls[2][1].includes('--write'))
   assert.ok(runCalls[2][1].includes(join(generatedTypesDirectory, 'api-v1.d.ts')))
+  assert.ok(runCalls[2][1].includes(join(generatedTypesDirectory, 'fga-requirements.ts')))
 })

@@ -4,7 +4,6 @@ import {
   safeSql,
   type SafeSqlFragment,
 } from '@supabase/pg-meta/src/pg-format'
-import { PermissionAction } from '@supabase/shared-types/out/constants'
 import { CheckIcon, ChevronsUpDownIcon } from 'lucide-react'
 import { useEffect, useState } from 'react'
 import { UseFormReturn } from 'react-hook-form'
@@ -45,7 +44,7 @@ import {
 
 import { useDatabaseRolesQuery } from '@/data/database-roles/database-roles-query'
 import { useTablesQuery } from '@/data/tables/tables-query'
-import { useAsyncCheckPermissions } from '@/hooks/misc/useCheckPermissions'
+import { FGA_PERMISSIONS, useAsyncCheckPermissionsV2 } from '@/hooks/misc/useCheckPermissionsV2'
 import { useSelectedProjectQuery } from '@/hooks/misc/useSelectedProject'
 
 interface PolicyDetailsV2Props {
@@ -77,9 +76,8 @@ export const PolicyDetailsV2 = ({
 }: PolicyDetailsV2Props) => {
   const { data: project } = useSelectedProjectQuery()
   const [open, setOpen] = useState(false)
-  const { can: canUpdatePolicies } = useAsyncCheckPermissions(
-    PermissionAction.TENANT_SQL_ADMIN_WRITE,
-    'tables'
+  const { can: canUpdatePolicies } = useAsyncCheckPermissionsV2(
+    FGA_PERMISSIONS.PROJECT.DATABASE_WRITE
   )
 
   const { data: tables, isSuccess: isSuccessTables } = useTablesQuery({
@@ -150,7 +148,7 @@ export const PolicyDetailsV2 = ({
               <FormItem className="col-span-6 flex flex-col gap-y-1">
                 <FormLabel>
                   Table
-                  <code className="text-code-inline">on</code> clause
+                  <code>on</code> clause
                 </FormLabel>
                 {authContext === 'database' && (
                   <FormControl>
@@ -235,7 +233,7 @@ export const PolicyDetailsV2 = ({
             render={({ field }) => (
               <FormItem className="col-span-6 flex flex-col gap-y-1">
                 <FormLabel>
-                  Policy Behavior <code className="text-code-inline">as</code> clause
+                  Policy Behavior <code>as</code> clause
                 </FormLabel>
                 <FormControl>
                   <Select
@@ -272,7 +270,7 @@ export const PolicyDetailsV2 = ({
             render={({ field }) => (
               <FormItem className="col-span-12 flex flex-col gap-y-1">
                 <FormLabel>
-                  Policy Command <code className="text-code-inline">for</code> clause
+                  Policy Command <code>for</code> clause
                 </FormLabel>
                 <FormControl>
                   <RadioGroup
@@ -310,7 +308,7 @@ export const PolicyDetailsV2 = ({
             render={({ field }) => (
               <FormItem className="col-span-12 flex flex-col gap-y-1">
                 <FormLabel htmlFor="roles">
-                  Target Roles <code className="text-code-inline">to</code> clause
+                  Target Roles <code>to</code> clause
                 </FormLabel>
                 <FormControl>
                   <MultiSelector

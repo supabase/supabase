@@ -63,7 +63,8 @@ export const BannerTableEditorQueueOperations = () => {
         </div>
         <Button asChild className="w-min">
           <Link href={DASHBOARD_SETTINGS_URL}>
-            {isQueueOperationsEnabled ? 'View' : 'Enable in'} preferences
+            {isQueueOperationsEnabled ? <span>View</span> : <span>Enable in</span>}{' '}
+            <span>preferences</span>
           </Link>
         </Button>
       </div>

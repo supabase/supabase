@@ -1,5 +1,4 @@
 import { zodResolver } from '@hookform/resolvers/zod'
-import { PermissionAction } from '@supabase/shared-types/out/constants'
 import { useParams } from 'common'
 import { ExternalLinkIcon } from 'lucide-react'
 import Link from 'next/link'
@@ -37,7 +36,7 @@ import { InlineLink } from '@/components/ui/InlineLink'
 import { NoPermission } from '@/components/ui/NoPermission'
 import { useAuthConfigQuery } from '@/data/auth/auth-config-query'
 import { useAuthConfigUpdateMutation } from '@/data/auth/auth-config-update-mutation'
-import { useAsyncCheckPermissions } from '@/hooks/misc/useCheckPermissions'
+import { FGA_PERMISSIONS, useAsyncCheckPermissionsV2 } from '@/hooks/misc/useCheckPermissionsV2'
 import { useIsFeatureEnabled } from '@/hooks/misc/useIsFeatureEnabled'
 import { DOCS_URL } from '@/lib/constants'
 
@@ -62,13 +61,11 @@ export const BasicAuthSettingsForm = () => {
   } = useAuthConfigQuery({ projectRef })
   const { mutate: updateAuthConfig, isPending: isUpdatingConfig } = useAuthConfigUpdateMutation()
 
-  const { can: canReadConfig, isSuccess: isPermissionsLoaded } = useAsyncCheckPermissions(
-    PermissionAction.READ,
-    'custom_config_gotrue'
+  const { can: canReadConfig, isSuccess: isPermissionsLoaded } = useAsyncCheckPermissionsV2(
+    FGA_PERMISSIONS.PROJECT.AUTH_CONFIG_READ
   )
-  const { can: canUpdateConfig } = useAsyncCheckPermissions(
-    PermissionAction.UPDATE,
-    'custom_config_gotrue'
+  const { can: canUpdateConfig } = useAsyncCheckPermissionsV2(
+    FGA_PERMISSIONS.PROJECT.AUTH_CONFIG_WRITE
   )
 
   const form = useForm({
@@ -262,16 +259,14 @@ export const BasicAuthSettingsForm = () => {
                       <WarningIcon />
                       <div>
                         <AlertTitle>
-                          Anonymous users will use the{' '}
-                          <code className="text-code-inline">authenticated</code> role when signing
+                          Anonymous users will use the <code>authenticated</code> role when signing
                           in
                         </AlertTitle>
                         <AlertDescription className="flex flex-col gap-y-3">
                           <p>
                             As a result, anonymous users will be subjected to RLS policies that
-                            apply to the <code className="text-code-inline">public</code> and{' '}
-                            <code className="text-code-inline">authenticated</code> roles. We
-                            strongly advise{' '}
+                            apply to the <code>public</code> and <code>authenticated</code> roles.
+                            We strongly advise{' '}
                             <Link
                               href={`/project/${projectRef}/database/policies`}
                               className="text-foreground underline"

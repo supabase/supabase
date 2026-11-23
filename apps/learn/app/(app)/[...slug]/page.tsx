@@ -10,7 +10,7 @@ import { getNextPage } from '@/lib/get-next-page'
 import { getTableOfContents } from '@/lib/toc'
 import { absoluteUrl, cn } from '@/lib/utils'
 
-import '@/styles/code-block-variables.css'
+import 'config/code-block-variables.css'
 import '@/styles/mdx.css'
 
 import { ChevronRight } from 'lucide-react'

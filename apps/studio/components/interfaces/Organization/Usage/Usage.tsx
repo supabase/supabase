@@ -1,8 +1,8 @@
-import { PermissionAction } from '@supabase/shared-types/out/constants'
+import { useQuery } from '@tanstack/react-query'
 import { useParams } from 'common'
 import dayjs from 'dayjs'
 import { ChartAreaIcon, CheckIcon, ChevronDownIcon } from 'lucide-react'
-import { parseAsString, useQueryStates } from 'nuqs'
+import { useQueryStates } from 'nuqs'
 import { useMemo, useState } from 'react'
 import { Button, cn, CommandGroup, CommandItem } from 'ui'
 import { Admonition } from 'ui-patterns/Admonition'
@@ -17,7 +17,7 @@ import OrgLogUsage from './OrgLogUsage'
 import { Pipelines } from './Pipelines'
 import SizeAndCounts from './SizeAndCounts'
 import { TotalUsage } from './TotalUsage'
-import { getUsageBranchOptions, resolveUsageProjectRef } from './Usage.utils'
+import { getUsageBranchOptions, resolveUsageProjectRef, usageFilterParsers } from './Usage.utils'
 import { UsageBranchFilter } from './UsageBranchFilter'
 import { UsageFilterNotice } from './UsageFilterNotice'
 import {
@@ -32,22 +32,20 @@ import { HighAvailabilityDisabledEmptyState } from '@/components/ui/HighAvailabi
 import { NoPermission } from '@/components/ui/NoPermission'
 import { OrganizationProjectSelector } from '@/components/ui/OrganizationProjectSelector'
 import { useOrgDailyStatsQuery } from '@/data/analytics/org-daily-stats-query'
-import { useBranchesQuery } from '@/data/branches/branches-query'
+import { branchesQueryOptions } from '@/data/branches/branches-query'
 import { useProjectDetailQuery } from '@/data/projects/project-detail-query'
 import { useOrgSubscriptionQuery } from '@/data/subscriptions/org-subscription-query'
-import { useAsyncCheckPermissions } from '@/hooks/misc/useCheckPermissions'
+import { FGA_PERMISSIONS, useAsyncCheckPermissionsV2 } from '@/hooks/misc/useCheckPermissionsV2'
 import { resolveHighAvailability } from '@/hooks/misc/useHighAvailability'
 import { TIME_PERIODS_BILLING, TIME_PERIODS_REPORTS } from '@/lib/constants/metrics'
+import { useGrant } from '@/lib/grants'
 
 export const Usage = () => {
   const { slug } = useParams()
 
   const [dateRange, setDateRange] = useState<any>()
 
-  const [{ projectRef, branchRef }, setUsageFilter] = useQueryStates({
-    projectRef: parseAsString,
-    branchRef: parseAsString,
-  })
+  const [{ projectRef, branchRef }, setUsageFilter] = useQueryStates(usageFilterParsers)
   const [openProjectSelector, setOpenProjectSelector] = useState(false)
 
   const {
@@ -78,19 +76,32 @@ export const Usage = () => {
     !selectedProjectRef ||
     (!isLoadingSelectedProject && !isErrorSelectedProject && !isHighAvailability)
 
+  const isBranchesQueryEnabled = !!selectedProject && !isHighAvailability
+  const branchesGrant = useGrant('GET /v1/projects/{ref}/branches', {
+    projectRef: selectedProjectRef ?? undefined,
+  })
   const {
     data: branches,
-    isLoading: isLoadingBranches,
-    isPending: isPendingBranches,
-    isError: isErrorBranches,
+    isPending: isPendingBranchesQuery,
+    isError: isErrorBranchesQuery,
     isSuccess: isSuccessBranches,
-    error: branchesError,
-  } = useBranchesQuery(
-    {
-      projectRef: selectedProjectRef ?? undefined,
-    },
-    { enabled: !!selectedProject && !isHighAvailability }
+    error: branchesQueryError,
+  } = useQuery(
+    branchesQueryOptions(
+      {
+        projectRef: selectedProjectRef ?? undefined,
+        grant: branchesGrant.grant,
+      },
+      { enabled: isBranchesQueryEnabled }
+    )
   )
+  const isPendingBranches =
+    isBranchesQueryEnabled &&
+    (branchesGrant.status === 'loading' ||
+      (branchesGrant.status === 'granted' && isPendingBranchesQuery))
+  const isLoadingBranches = isPendingBranches
+  const isErrorBranches = isErrorBranchesQuery || branchesGrant.status === 'error'
+  const branchesError = branchesGrant.status === 'error' ? branchesGrant.error : branchesQueryError
   const branchOptions = useMemo(() => getUsageBranchOptions(branches), [branches])
   const usageProjectRef = resolveUsageProjectRef(
     selectedProjectRef,
@@ -104,18 +115,19 @@ export const Usage = () => {
   const isResolvingBranch =
     !!selectedProjectRef && !!selectedBranchRef && isPendingBranches && !isProjectLookupBlocked
   const isBranchLookupBlocked = !!selectedBranchRef && isErrorBranches
+  const isBranchLookupDenied = !!selectedBranchRef && branchesGrant.status === 'denied'
   const isBranchUnavailable =
     !!selectedBranchRef && isSuccessBranches && usageProjectRef !== selectedBranchRef
   const canShowUsage =
     !isLoadingSelectedProject &&
     !isResolvingBranch &&
     !isBranchLookupBlocked &&
+    !isBranchLookupDenied &&
     !isProjectLookupBlocked
   const canLoadUsage = canLoadProjectUsage && canShowUsage
 
-  const { can: canReadSubscriptions, isLoading: isLoadingPermissions } = useAsyncCheckPermissions(
-    PermissionAction.BILLING_READ,
-    'stripe.subscriptions'
+  const { can: canReadSubscriptions, isLoading: isLoadingPermissions } = useAsyncCheckPermissionsV2(
+    FGA_PERMISSIONS.ORGANIZATION.BILLING_READ
   )
 
   const {
@@ -362,6 +374,12 @@ export const Usage = () => {
       {isErrorBranches && (
         <ScaffoldContainer className="mt-5">
           <AlertError subject="Failed to retrieve branches" error={branchesError} />
+        </ScaffoldContainer>
+      )}
+
+      {isBranchLookupDenied && (
+        <ScaffoldContainer className="mt-5">
+          <NoPermission resourceText="view this branch's usage" />
         </ScaffoldContainer>
       )}
 

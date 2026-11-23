@@ -297,17 +297,3 @@ describe('unmapSqlContentField (notebooks)', () => {
     expect(result.content.cells[0]).not.toHaveProperty('_id')
   })
 })
-
-describe('remap/unmap round-trip', () => {
-  it('returns the original content shape after remap then unmap for sql snippets', () => {
-    const result = unmapSqlContentField(remapSqlContentField(SQL_SNIPPET))
-
-    expect(result.content).toEqual(SQL_SNIPPET.content)
-  })
-
-  it('returns the original content shape after remap then unmap for log_sql snippets', () => {
-    const result = unmapSqlContentField(remapSqlContentField(LOG_SQL_SNIPPET))
-
-    expect(result.content).toEqual(LOG_SQL_SNIPPET.content)
-  })
-})

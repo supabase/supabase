@@ -1,13 +1,37 @@
+// @vitest-environment jsdom
 import { describe, expect, it } from 'vitest'
 
 import {
+  buildPathWithParams,
   buildSignUpReturnPath,
   DEFAULT_FALLBACK_PATH,
   DEFAULT_SIGNUP_RETURN_PATH,
   getReturnToPath,
+  getSignInQuery,
   getSignUpReturnTo,
   validateReturnTo,
 } from './gotrue'
+
+describe('getSignInQuery', () => {
+  it('drops returnTo when it is exactly /new and keeps other params', () => {
+    expect(getSignInQuery({ returnTo: '/new', destination: 'cli' })).toEqual({ destination: 'cli' })
+    expect(getSignInQuery({ returnTo: ['/new', '/other'] })).toEqual({})
+  })
+
+  it('keeps /new with a query string', () => {
+    expect(getSignInQuery({ returnTo: '/new?foo=bar' })).toEqual({ returnTo: '/new?foo=bar' })
+  })
+
+  it('keeps other destinations and params', () => {
+    const query = { returnTo: '/project/ref', destination: 'cli' }
+    expect(getSignInQuery(query)).toEqual(query)
+  })
+
+  it('returns the query unchanged when there is no returnTo', () => {
+    expect(getSignInQuery({})).toEqual({})
+    expect(getSignInQuery({ method: 'github' })).toEqual({ method: 'github' })
+  })
+})
 
 describe('getSignUpReturnTo', () => {
   it('defaults to /new when returnTo is missing', () => {
@@ -122,6 +146,29 @@ describe('getReturnToPath', () => {
     window.location = { search: '?returnTo=%2Fmcp%2Fsecrets' }
 
     expect(getReturnToPath()).toBe('/mcp/secrets')
+  })
+})
+
+describe('transient auth params', () => {
+  const search =
+    '?error_description=Unable+to+exchange+external+code%3A+53f8&error=server_error&error_code=unexpected_failure&returnTo=%2Fnew'
+
+  it('buildPathWithParams does not carry them into the new path', () => {
+    // @ts-ignore
+    delete window.location
+    // @ts-ignore
+    window.location = { search }
+
+    expect(buildPathWithParams('/sign-in-mfa')).toBe('/sign-in-mfa?returnTo=%2Fnew')
+  })
+
+  it('getReturnToPath does not append them to the destination', () => {
+    // @ts-ignore
+    delete window.location
+    // @ts-ignore
+    window.location = { search }
+
+    expect(getReturnToPath()).toBe('/new')
   })
 })
 

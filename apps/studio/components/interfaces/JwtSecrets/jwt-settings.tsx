@@ -1,10 +1,10 @@
 import { zodResolver } from '@hookform/resolvers/zod'
-import { PermissionAction } from '@supabase/shared-types/out/constants'
 import {
   JwtSecretUpdateError,
   JwtSecretUpdateProgress,
   JwtSecretUpdateStatus,
 } from '@supabase/shared-types/out/events'
+import { useQuery } from '@tanstack/react-query'
 import { IS_PLATFORM, useFlag, useParams } from 'common'
 import {
   AlertCircleIcon,
@@ -56,17 +56,19 @@ import {
   JWT_SECRET_UPDATE_ERROR_MESSAGES,
   JWT_SECRET_UPDATE_PROGRESS_MESSAGES,
 } from './jwt.constants'
+import { AlertError } from '@/components/ui/AlertError'
 import { ButtonTooltip } from '@/components/ui/ButtonTooltip'
 import { InlineLink } from '@/components/ui/InlineLink'
 import Panel from '@/components/ui/Panel'
 import { TextConfirmModal } from '@/components/ui/TextConfirmModalWrapper'
-import { useLegacyAPIKeysStatusQuery } from '@/data/api-keys/legacy-api-keys-status-query'
+import { legacyAPIKeysStatusQueryOptions } from '@/data/api-keys/legacy-api-keys-status-query'
 import { useJwtSecretUpdateMutation } from '@/data/config/jwt-secret-update-mutation'
 import { useJwtSecretUpdatingStatusQuery } from '@/data/config/jwt-secret-updating-status-query'
 import { useProjectPostgrestConfigQuery } from '@/data/config/project-postgrest-config-query'
-import { useLegacyJWTSigningKeyQuery } from '@/data/jwt-signing-keys/legacy-jwt-signing-key-query'
-import { useAsyncCheckPermissions } from '@/hooks/misc/useCheckPermissions'
+import { legacyJWTSigningKeyQueryOptions } from '@/data/jwt-signing-keys/legacy-jwt-signing-key-query'
+import { FGA_PERMISSIONS, useAsyncCheckPermissionsV2 } from '@/hooks/misc/useCheckPermissionsV2'
 import { DOCS_URL } from '@/lib/constants'
+import { useGrant } from '@/lib/grants'
 import { uuidv4 } from '@/lib/helpers'
 
 const customJwtSecretFormSchema = z.object({
@@ -86,13 +88,11 @@ export const JWTSettings = () => {
   const [isCreatingKey, setIsCreatingKey] = useState<boolean>(false)
   const [isRegeneratingKey, setIsGeneratingKey] = useState<boolean>(false)
 
-  const { can: canReadJWTSecret } = useAsyncCheckPermissions(
-    PermissionAction.READ,
-    'field.jwt_secret'
+  const { can: canReadJWTSecret } = useAsyncCheckPermissionsV2(
+    FGA_PERMISSIONS.PROJECT.AUTH_SIGNING_KEYS_READ
   )
-  const { can: canGenerateNewJWTSecret } = useAsyncCheckPermissions(
-    PermissionAction.INFRA_EXECUTE,
-    'queue_job.projects.update_jwt'
+  const { can: canGenerateNewJWTSecret } = useAsyncCheckPermissionsV2(
+    FGA_PERMISSIONS.PROJECT.ADMIN_WRITE
   )
 
   const { data } = useJwtSecretUpdatingStatusQuery({ projectRef }, { enabled: IS_PLATFORM })
@@ -100,15 +100,31 @@ export const JWTSettings = () => {
   const { mutateAsync: updateJwt, isPending: isSubmittingJwtSecretUpdateRequest } =
     useJwtSecretUpdateMutation()
 
-  const { can: canReadAPIKeys } = useAsyncCheckPermissions(PermissionAction.SECRETS_READ, '*')
-  const { data: legacyKey, isPending } = useLegacyJWTSigningKeyQuery(
-    { projectRef },
-    { enabled: IS_PLATFORM && canReadAPIKeys, retry: false }
+  const legacyKeyGrant = useGrant('GET /v1/projects/{ref}/config/auth/signing-keys/legacy', {
+    projectRef,
+  })
+  const legacyStatusGrant = useGrant('GET /v1/projects/{ref}/api-keys/legacy', { projectRef })
+  // A 404 means the legacy JWT secret hasn't been migrated yet (`legacyKey` is `null`); other
+  // errors are real failures.
+  const {
+    data: legacyKey,
+    error: legacyKeyError,
+    isPending,
+    isError: isLegacyKeyError,
+  } = useQuery(
+    legacyJWTSigningKeyQueryOptions(
+      { projectRef, grant: legacyKeyGrant.grant },
+      { enabled: IS_PLATFORM }
+    )
   )
-  const { data: legacyAPIKeysStatus } = useLegacyAPIKeysStatusQuery(
-    { projectRef },
-    { enabled: IS_PLATFORM && canReadAPIKeys }
+  const { data: legacyAPIKeysStatus } = useQuery(
+    legacyAPIKeysStatusQueryOptions({ projectRef, grant: legacyStatusGrant.grant })
   )
+  const isLegacyGrantDenied =
+    legacyKeyGrant.status === 'denied' || legacyStatusGrant.status === 'denied'
+  const legacyGrantError =
+    (legacyKeyGrant.status === 'error' ? legacyKeyGrant.error : undefined) ??
+    (legacyStatusGrant.status === 'error' ? legacyStatusGrant.error : undefined)
 
   const { Failed, Updated, Updating } = JwtSecretUpdateStatus
 
@@ -172,6 +188,25 @@ export const JWTSettings = () => {
               </div>
             ) : (
               <>
+                {isLegacyGrantDenied && (
+                  <Admonition
+                    type="default"
+                    title="Legacy JWT secret details are unavailable"
+                    description="You need additional permissions to view the legacy JWT secret and API key status."
+                  />
+                )}
+                {legacyGrantError && (
+                  <AlertError
+                    error={legacyGrantError}
+                    subject="Failed to check legacy JWT secret permissions"
+                  />
+                )}
+                {isLegacyKeyError && (
+                  <AlertError
+                    error={legacyKeyError}
+                    subject="Failed to retrieve legacy JWT secret status"
+                  />
+                )}
                 {legacyKey && legacyKey.status !== 'revoked' && (
                   <Admonition
                     type="warning"
@@ -189,8 +224,8 @@ export const JWTSettings = () => {
                     {legacyAPIKeysStatus && legacyAPIKeysStatus.enabled && (
                       <p className="leading-normal!">
                         <em className="text-warning not-italic">
-                          This includes the <code className="text-code-inline">anon</code> and{' '}
-                          <code className="text-code-inline">service_role</code> JWT based API keys.
+                          This includes the <code>anon</code> and <code>service_role</code> JWT
+                          based API keys.
                         </em>{' '}
                         Consider switching to publishable and secret API keys to disable them.
                       </p>
@@ -246,7 +281,7 @@ export const JWTSettings = () => {
             )}
           </div>
 
-          {!isPending && !legacyKey && (
+          {!isPending && !isLegacyKeyError && !legacyKey && (
             <>
               {isUpdatingJwtSecret && (
                 <div className="flex items-center space-x-2">
@@ -303,10 +338,10 @@ export const JWTSettings = () => {
                             API Keys
                           </InlineLink>
                           , create a publishable key and secret key, then swap them into your apps
-                          in place of <code className="text-code-inline">anon</code> and{' '}
-                          <code className="text-code-inline break-keep!">service_role</code>{' '}
-                          respectively. Watch the "Last used" indicators to confirm no traffic still
-                          depends on the legacy keys.
+                          in place of <code>anon</code> and{' '}
+                          <code className="break-keep!">service_role</code> respectively. Watch the
+                          "Last used" indicators to confirm no traffic still depends on the legacy
+                          keys.
                         </p>
                       </li>
                       <li>
@@ -318,13 +353,10 @@ export const JWTSettings = () => {
                           to start signing new JWTs with the standby key.
                         </p>
                         <p className="text-foreground-lighter">
-                          Existing <code className="text-code-inline">anon</code>,{' '}
-                          <code className="text-code-inline">service_role</code>, and active user
+                          Existing <code>anon</code>, <code>service_role</code>, and active user
                           JWTs stay valid. Before rotating, switch any code that verifies JWTs
-                          directly against the legacy secret (e.g.{' '}
-                          <code className="text-code-inline">jose</code>,{' '}
-                          <code className="text-code-inline">jsonwebtoken</code>) to{' '}
-                          <code className="text-code-inline">supabase.auth.getClaims()</code> or a
+                          directly against the legacy secret (e.g. <code>jose</code>,{' '}
+                          <code>jsonwebtoken</code>) to <code>supabase.auth.getClaims()</code> or a
                           JWKS-based verifier, and disable the "Verify JWT" setting on any affected
                           Edge Functions.
                         </p>
@@ -357,7 +389,7 @@ export const JWTSettings = () => {
                       </li>
                       <li>
                         Improve app's performance by using public keys to verify JWTs instead of
-                        calling <code className="text-code-inline">getUser()</code>.
+                        calling <code>getUser()</code>.
                       </li>
                     </ul>
                   )}

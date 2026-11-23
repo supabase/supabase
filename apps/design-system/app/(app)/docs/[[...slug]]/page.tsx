@@ -8,7 +8,6 @@ import { getTableOfContents } from '@/lib/toc'
 import { absoluteUrl } from '@/lib/utils'
 /* eslint-disable turbo/no-undeclared-env-vars */
 
-import '@/styles/code-block-variables.css'
 import '@/styles/mdx.css'
 
 import { ChevronRight } from 'lucide-react'
@@ -49,7 +48,7 @@ export async function generateMetadata(props: DocPageProps): Promise<Metadata> {
         {
           url: siteConfig.ogImage,
           width: 1200,
-          height: 630,
+          height: 600,
           alt: siteConfig.name,
         },
       ],

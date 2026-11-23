@@ -4,7 +4,7 @@ import { components } from 'api-types'
 import { storageKeys } from './keys'
 import { get, handleError } from '@/data/fetchers'
 import { IS_PLATFORM } from '@/lib/constants'
-import type { ResponseError } from '@/types'
+import type { StudioError } from '@/lib/errors/studio-errors'
 
 export type BucketLifecycle = components['schemas']['BucketLifecycleResponse_Output']
 export type BucketLifecycleRule = BucketLifecycle['rules'][number]
@@ -14,7 +14,7 @@ export type BucketLifecycleVariables = {
   bucketId?: string
 }
 
-export type BucketLifecycleError = ResponseError
+export type BucketLifecycleError = StudioError
 
 /** No stored configuration answers 404, which is "no policy" rather than a query error. */
 async function getBucketLifecycle(

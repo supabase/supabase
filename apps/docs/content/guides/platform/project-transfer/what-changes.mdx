@@ -1,0 +1,130 @@
+---
+title: 'Changes after a project transfer'
+description: 'What a Supabase project transfer keeps and what it changes: data, API keys, downtime, billing, access, tokens, and the features that the Free Plan removes.'
+---
+
+A transfer moves a project to another organization. After the transfer, the target organization's members, roles, and billing apply to the project, and access tokens scoped to the source organization stop working for it, even when both organizations are on the same plan. A transfer to a different plan also applies the target plan's features and limits. For the steps, see [Transfer a project](/docs/guides/platform/project-transfer).
+
+The _source organization_ is the organization the project belongs to before the transfer. The _target organization_ is the organization you move the project to.
+
+## What stays the same
+
+A transfer doesn't copy or move data. The project stays on the same infrastructure and in the same region, and the following stay as they are:
+
+- The database
+- Auth users and sessions
+- Storage buckets and files
+- Edge Functions and their secrets
+- Cron jobs
+- Realtime
+
+The following identifiers also stay the same, so your apps keep working without changes:
+
+- The project ref and API URL
+- The API keys, including the legacy `anon` and `service_role` keys
+- The JWT secret and signing keys
+- The database connection strings and the pooler host
+
+Read replicas and branches move with the project when the target organization is on the Pro Plan and above.
+
+A transfer can't change the project's region. To move a project to a different region, see [Migrating within Supabase](/docs/guides/platform/migrating-within-supabase).
+
+Update your apps or tools in the following cases:
+
+- The target organization is on the Free Plan, and the project used a feature that the Free Plan removes. Examples are a custom domain, the IPv4 add-on, and SAML sign-in. See the [What a transfer to the Free Plan removes](#what-a-transfer-to-the-free-plan-removes) section.
+- You use an access token scoped to the source organization, or an app that you authorized for the source organization. See the [Access and tokens](#access-and-tokens) section.
+- The project was in a Vercel-managed organization. See [Transfer a Vercel-managed project](/docs/guides/platform/project-transfer/vercel-marketplace).
+
+## Downtime
+
+A transfer restarts the database only when it changes the project's compute size. That happens when you move a project on compute larger than Nano to a Free Plan organization. The following table lists the database downtime for each direction.
+
+| Transfer                                                           | Downtime                                           |
+| ------------------------------------------------------------------ | -------------------------------------------------- |
+| Between two organizations on the same plan                         | None                                               |
+| From the Free Plan to the Pro Plan and above                       | None                                               |
+| Between two different plans, Pro Plan and above                    | None                                               |
+| From the Pro Plan and above to the Free Plan, compute above Nano   | About a minute, while the project restarts on Nano |
+| From the Pro Plan and above to the Free Plan, compute already Nano | None                                               |
+
+The restart is queued when you confirm the transfer, and usually begins within seconds.
+
+A transfer to a Free Plan organization also affects other services:
+
+- The Auth service restarts to apply the Free Plan settings, even when the compute size doesn't change.
+- Removing a custom domain or vanity subdomain restarts the Auth service and the API gateway. Requests to the custom domain stop working.
+- Removing the IPv4 add-on doesn't restart the project, but connections to the IPv4 address stop working.
+
+For the full list, see the [What a transfer to the Free Plan removes](#what-a-transfer-to-the-free-plan-removes) section.
+
+A project that moves from the Free Plan to the Pro Plan and above keeps its Nano compute. You can upgrade it to Micro at no extra cost. See [Compute and disk](/docs/guides/platform/compute-and-disk).
+
+## Billing
+
+The source organization pays for the project's usage and add-ons up to the transfer. The target organization pays for them after the transfer. The charges appear on each organization's invoice when its billing cycle resets.
+
+Usage includes metrics such as disk size, [egress](/kb/troubleshooting/all-about-supabase-egress-a_Sg_e), and image transformations. Add-ons include [compute](/docs/guides/platform/compute-and-disk), [Point-in-Time Recovery](/docs/guides/platform/backups#point-in-time-recovery), [IPv4](/docs/guides/platform/ipv4-address), and [custom domains](/docs/guides/platform/custom-domains).
+
+The following stay with each organization:
+
+- **Subscription and plan fee.** The transfer doesn't change or prorate either organization's subscription.
+- **Credit balance.** Credits stay with the source organization. To move credits to another organization, [contact support](https://supabase.help).
+- **Compute Credits.** Each organization's Compute Credits apply to its own compute hours. They cover one project on Nano or Micro compute, so every further project adds compute costs. See [Manage Compute usage](/docs/guides/platform/manage-your-usage/compute).
+- **Payment method and billing details.** The target organization pays with its own payment method. The payment method, billing address, and billing email never move with a project.
+
+When you move a Free Plan project to an organization on the Pro Plan and above that already has active projects, the Supabase Dashboard shows the added monthly compute cost before you confirm.
+
+The target organization's Spend Cap setting applies to the project after the transfer. If the Spend Cap is on, the Dashboard warns that usage over the plan's quota can lead to restrictions.
+
+## Access and tokens
+
+A transfer doesn't change anyone's membership or role. Your role in the target organization applies to the project after the transfer. For example, an Owner of the source organization who has the Developer role in the target organization gets Developer access to the project. Members of the source organization who aren't members of the target organization lose access to the project.
+
+Personal access tokens for the Management API behave differently depending on their scope. The following table lists each case.
+
+| Token                                                    | After the transfer                                                              |
+| -------------------------------------------------------- | ------------------------------------------------------------------------------- |
+| Token with your account's full access, marked **Legacy** | Keeps working, if you're a member of the target organization                    |
+| Token scoped to the source organization                  | Stops working for the project. Create a token scoped to the target organization |
+| Token scoped to the target organization                  | Starts working for the project                                                  |
+| Token scoped to the project                              | Keeps working, if you still have a role on the project                          |
+
+You might need to re-authorize connected apps for the target organization. That includes OAuth apps and Model Context Protocol (MCP) clients that you authorized for the source organization.
+
+## Timing and notifications
+
+The project moves to the target organization as soon as you confirm. Changes that come from the target plan, such as a compute change, finish within minutes.
+
+Supabase doesn't send an email about a transfer. Organizations with access to [Platform Webhooks](/docs/guides/platform/webhooks), an early access feature, can subscribe to the [`v1.project.transferred`](/docs/guides/platform/webhooks/events#v1projecttransferred) event, which fires for both organizations.
+
+The transfer appears in your [account audit log](/dashboard/account/audit). On the Team Plan and Enterprise Plan, it also appears in the source organization's [audit log](/docs/guides/security/platform-audit-logs). Activity after the transfer appears in the target organization's audit log.
+
+## What a transfer to the Free Plan removes
+
+A project that moves to a Free Plan organization loses the features that the Free Plan doesn't include. Usage above the Free Plan quota can also lead to restrictions, so compare the project's usage with the Free Plan limits before you transfer.
+
+The Dashboard lists the affected add-ons before you confirm. The transfer removes or changes the following automatically:
+
+| Item                               | What happens                                                                                                                                                                  |
+| ---------------------------------- | ----------------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
+| Compute                            | Changes to Nano. A project on larger compute restarts. See the [Downtime](#downtime) section.                                                                                 |
+| Point-in-Time Recovery             | The add-on is removed.                                                                                                                                                        |
+| Backups                            | The **Backups** page no longer lists backups, because the Free Plan doesn't include them.                                                                                     |
+| Read replicas                      | Removed.                                                                                                                                                                      |
+| Custom domain and vanity subdomain | Removed. Point your clients back to the project's default `supabase.co` URL.                                                                                                  |
+| IPv4 add-on                        | Removed. Direct connections become IPv6 only. On an IPv4-only network, connect through the [shared pooler](/docs/guides/database/connecting-to-postgres#pooler-session-mode). |
+| Branching                          | Turned off for the project.                                                                                                                                                   |
+| Auth features                      | SAML sign-in, session time-boxing, the session inactivity timeout, and leaked password protection are turned off.                                                             |
+| Email templates                    | Reset to the defaults for some projects that send email through the default email provider. Projects with custom SMTP or a Send Email hook keep their templates.              |
+| Realtime settings                  | Settings above the Free Plan limits are reset.                                                                                                                                |
+| Storage features                   | Image transformations, analytics buckets, and CDN cache purging are turned off. The global file size limit returns to the Free Plan limit.                                    |
+
+Branches, log drains, Advanced MFA, and Pipelines block a transfer to the Free Plan, so remove them yourself first. See [Features that block a transfer](/docs/guides/platform/project-transfer/requirements#features-that-block-a-transfer).
+
+## Related resources
+
+To read more about project transfers, see these pages:
+
+- [Transfer a project](/docs/guides/platform/project-transfer): the steps for the Supabase Dashboard and the Management API.
+- [Project transfer requirements](/docs/guides/platform/project-transfer/requirements): every check a transfer runs, and what to do when one blocks the transfer.
+- [Troubleshoot a project transfer](/docs/guides/platform/project-transfer/troubleshooting): the cause and the fix for each message that blocks a transfer.

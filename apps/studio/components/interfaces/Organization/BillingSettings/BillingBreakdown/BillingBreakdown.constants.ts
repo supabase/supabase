@@ -147,12 +147,6 @@ export const BILLING_BREAKDOWN_METRICS = (subscription?: OrgSubscription): Metri
       category: 'Database',
     },
     {
-      key: PricingMetric.LOG_DRAIN_EVENTS,
-      name: 'Log Drain Events',
-      units: 'absolute',
-      category: 'Database',
-    },
-    {
       key: PricingMetric.LOG_INGESTION,
       name: 'Log Ingestion',
       units: 'bytes',
@@ -171,6 +165,12 @@ export const BILLING_BREAKDOWN_METRICS = (subscription?: OrgSubscription): Metri
           : undefined,
     },
     {
+      key: PricingMetric.LOG_DRAIN_EVENTS,
+      name: 'Log Drain Events',
+      units: 'absolute',
+      category: 'Database',
+    },
+    {
       key: PricingMetric.LOG_STORAGE,
       name: 'Log Storage',
       units: 'bytes',
@@ -185,7 +185,7 @@ export const BILLING_BREAKDOWN_METRICS = (subscription?: OrgSubscription): Metri
       anchor: 'active-compute',
     },
     {
-      key: PricingMetric.ETL_COPY_BACKFILL_DATA,
+      key: PricingMetric.PIPELINES_COPY_BACKFILL_DATA,
       name: 'Initial Sync Data Processed',
       units: 'bytes',
       unitName: 'GB',
@@ -193,7 +193,7 @@ export const BILLING_BREAKDOWN_METRICS = (subscription?: OrgSubscription): Metri
       anchor: 'pipeline-initial-sync-data',
     },
     {
-      key: PricingMetric.ETL_REPLICATED_DATA,
+      key: PricingMetric.PIPELINES_REPLICATED_DATA,
       name: 'Ongoing Replication Data Processed',
       units: 'bytes',
       unitName: 'GB',

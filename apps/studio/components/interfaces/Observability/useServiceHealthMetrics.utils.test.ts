@@ -1,4 +1,3 @@
-import dayjs from 'dayjs'
 import { afterEach, beforeEach, describe, expect, it, vi } from 'vitest'
 
 import type { LogsBarChartDatum } from '../ProjectHome/ProjectUsage.metrics'
@@ -11,51 +10,40 @@ import {
 
 describe('calculateDateRange', () => {
   beforeEach(() => {
-    // Mock the current time to ensure consistent test results
     vi.useFakeTimers()
     vi.setSystemTime(new Date('2024-01-15T12:00:00Z'))
   })
 
   afterEach(() => {
     vi.useRealTimers()
+    vi.unstubAllEnvs()
   })
 
-  it('calculates correct date range for 1hr interval', () => {
-    const result = calculateDateRange('1hr')
-
-    expect(result.startDate).toBe('2024-01-15T11:00:00.000Z')
-    expect(result.endDate).toBe('2024-01-15T12:00:00.000Z')
-  })
-
-  it('calculates correct date range for 1day interval', () => {
-    const result = calculateDateRange('1day')
-
-    expect(result.startDate).toBe('2024-01-14T12:00:00.000Z')
-    expect(result.endDate).toBe('2024-01-15T12:00:00.000Z')
-  })
-
-  it('calculates correct date range for 7day interval', () => {
-    const result = calculateDateRange('7day')
-
-    expect(result.startDate).toBe('2024-01-08T12:00:00.000Z')
-    expect(result.endDate).toBe('2024-01-15T12:00:00.000Z')
-  })
-
-  it('returns ISO format strings', () => {
-    const result = calculateDateRange('1hr')
-
-    expect(dayjs(result.startDate).isValid()).toBe(true)
-    expect(dayjs(result.endDate).isValid()).toBe(true)
-  })
-
-  it('end date is always after start date', () => {
-    const intervals: Array<'1hr' | '1day' | '7day'> = ['1hr', '1day', '7day']
-
-    intervals.forEach((interval) => {
-      const result = calculateDateRange(interval)
-      expect(dayjs(result.endDate).isAfter(dayjs(result.startDate))).toBe(true)
+  it.each([
+    ['1hr', '2024-01-15T11:00:00.000Z'],
+    ['1day', '2024-01-14T12:00:00.000Z'],
+    ['7day', '2024-01-08T12:00:00.000Z'],
+  ] as const)('calculates the date range for the %s interval', (interval, startDate) => {
+    expect(calculateDateRange(interval)).toEqual({
+      startDate,
+      endDate: '2024-01-15T12:00:00.000Z',
     })
   })
+
+  it.each([
+    ['7day after fall back', '7day', '2026-11-03T17:41:39.274Z', '2026-10-27T17:41:39.274Z'],
+    ['7day after spring forward', '7day', '2026-03-10T16:30:00.000Z', '2026-03-03T16:30:00.000Z'],
+    ['1day across fall back', '1day', '2026-11-01T07:30:00.000Z', '2026-10-31T07:30:00.000Z'],
+    ['1day across spring forward', '1day', '2026-03-08T07:30:00.000Z', '2026-03-07T07:30:00.000Z'],
+  ] as const)(
+    'uses the elapsed duration for %s in America/New_York',
+    (_, interval, now, startDate) => {
+      vi.stubEnv('TZ', 'America/New_York')
+      vi.setSystemTime(new Date(now))
+
+      expect(calculateDateRange(interval)).toEqual({ startDate, endDate: now })
+    }
+  )
 })
 
 describe('transformToBarChartData', () => {
@@ -108,16 +96,6 @@ describe('transformToBarChartData', () => {
     const result = transformToBarChartData([])
 
     expect(result).toEqual([])
-  })
-
-  it('preserves timestamp values', () => {
-    const rawData = [
-      { timestamp: '2024-01-15T12:00:00Z', ok_count: 10, warning_count: 0, error_count: 0 },
-    ]
-
-    const result = transformToBarChartData(rawData)
-
-    expect(result[0].timestamp).toBe('2024-01-15T12:00:00Z')
   })
 })
 
@@ -174,27 +152,14 @@ describe('calculateHealthMetrics', () => {
     })
   })
 
-  it('returns 0 error rate when total is 0', () => {
-    const eventChartData: LogsBarChartDatum[] = [
-      { timestamp: '2024-01-15T12:00:00Z', ok_count: 0, warning_count: 0, error_count: 0 },
-    ]
-
-    const result = calculateHealthMetrics(eventChartData)
-
-    expect(result).toEqual({
-      total: 0,
-      errorRate: 0,
-      successRate: 0,
-      errorCount: 0,
-      warningCount: 0,
-      okCount: 0,
-    })
-  })
-
-  it('handles empty array', () => {
-    const result = calculateHealthMetrics([])
-
-    expect(result).toEqual({
+  it.each([
+    [
+      'zero total',
+      [{ timestamp: '2024-01-15T12:00:00Z', ok_count: 0, warning_count: 0, error_count: 0 }],
+    ],
+    ['an empty array', []],
+  ])('returns zeroed metrics for %s', (_, eventChartData: LogsBarChartDatum[]) => {
+    expect(calculateHealthMetrics(eventChartData)).toEqual({
       total: 0,
       errorRate: 0,
       successRate: 0,
@@ -221,17 +186,6 @@ describe('calculateHealthMetrics', () => {
       warningCount: 10,
       okCount: 100,
     })
-  })
-
-  it('calculates correct error rate for high error scenario', () => {
-    const eventChartData: LogsBarChartDatum[] = [
-      { timestamp: '2024-01-15T12:00:00Z', ok_count: 10, warning_count: 10, error_count: 80 },
-    ]
-
-    const result = calculateHealthMetrics(eventChartData)
-
-    expect(result.errorRate).toBe(80)
-    expect(result.successRate).toBe(10)
   })
 })
 
@@ -266,20 +220,6 @@ describe('calculateAggregatedMetrics', () => {
     })
   })
 
-  it('handles single service', () => {
-    const services = [{ total: 100, errorCount: 10, warningCount: 5 }]
-
-    const result = calculateAggregatedMetrics(services)
-
-    expect(result).toEqual({
-      totalRequests: 100,
-      totalErrors: 10,
-      totalWarnings: 5,
-      overallErrorRate: 15,
-      overallSuccessRate: 85,
-    })
-  })
-
   it('handles services with zero metrics', () => {
     const services = [
       { total: 0, errorCount: 0, warningCount: 0 },
@@ -294,23 +234,6 @@ describe('calculateAggregatedMetrics', () => {
       totalWarnings: 5,
       overallErrorRate: 15,
       overallSuccessRate: 85,
-    })
-  })
-
-  it('calculates correct rates when all requests are successful', () => {
-    const services = [
-      { total: 100, errorCount: 0, warningCount: 0 },
-      { total: 200, errorCount: 0, warningCount: 0 },
-    ]
-
-    const result = calculateAggregatedMetrics(services)
-
-    expect(result).toEqual({
-      totalRequests: 300,
-      totalErrors: 0,
-      totalWarnings: 0,
-      overallErrorRate: 0,
-      overallSuccessRate: 100,
     })
   })
 

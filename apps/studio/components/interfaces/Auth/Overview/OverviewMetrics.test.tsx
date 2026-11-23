@@ -109,38 +109,39 @@ describe('Auth overview logs requests', () => {
     }
   })
 
-  describe.each(logQueries)('failures with useOtel=$useOtel', (query) => {
-    it.each(['http', 'string', 'object'] as const)(
-      'shows %s errors instead of empty log tables',
-      async (failure) => {
-        flags.otelLegacyLogs = query.useOtel
-        addAPIMock({
-          method: 'get',
-          path: query.endpoint,
-          response: () => {
-            if (failure === 'http') {
-              return HttpResponse.json<APIErrorBody>(
-                { message: 'Analytics unavailable' },
-                { status: 500 }
-              )
-            }
-            const error =
-              failure === 'string'
-                ? 'Analytics unavailable'
-                : { code: 500, errors: [], message: 'Analytics unavailable', status: 'INTERNAL' }
-            return HttpResponse.json<AnalyticsResponse>({ result: [], error })
-          },
-        })
+  // Error parsing is shared by both endpoints (the success test above covers endpoint
+  // selection), so the failure shapes only need checking against one of them
+  it.each(['http', 'string', 'object'] as const)(
+    'shows %s errors instead of empty log tables',
+    async (failure) => {
+      const query = logQueries[1]
+      flags.otelLegacyLogs = query.useOtel
+      addAPIMock({
+        method: 'get',
+        path: query.endpoint,
+        response: () => {
+          if (failure === 'http') {
+            return HttpResponse.json<APIErrorBody>(
+              { message: 'Analytics unavailable' },
+              { status: 500 }
+            )
+          }
+          const error =
+            failure === 'string'
+              ? 'Analytics unavailable'
+              : { code: 500, errors: [], message: 'Analytics unavailable', status: 'INTERNAL' }
+          return HttpResponse.json<AnalyticsResponse>({ result: [], error })
+        },
+      })
 
-        customRender(<OverviewMetrics isLoading={false} error={null} />)
+      customRender(<OverviewMetrics isLoading={false} error={null} />)
 
-        expect(await screen.findByText('Failed to retrieve Auth API errors')).toBeVisible()
-        expect(await screen.findByText('Failed to retrieve Auth server errors')).toBeVisible()
-        expect(screen.getAllByText('Error: Analytics unavailable')).toHaveLength(2)
-        expect(screen.queryByText('No data to show')).not.toBeInTheDocument()
-      }
-    )
-  })
+      expect(await screen.findByText('Failed to retrieve Auth API errors')).toBeVisible()
+      expect(await screen.findByText('Failed to retrieve Auth server errors')).toBeVisible()
+      expect(screen.getAllByText('Error: Analytics unavailable')).toHaveLength(2)
+      expect(screen.queryByText('No data to show')).not.toBeInTheDocument()
+    }
+  )
 })
 
 describe('Auth success rate presentation', () => {

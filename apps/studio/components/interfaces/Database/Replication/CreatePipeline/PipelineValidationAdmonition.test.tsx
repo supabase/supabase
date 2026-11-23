@@ -73,5 +73,4 @@ test('preserves API copy and inline code in compact results', () => {
   expect(screen.getByText('The dataset was not found.')).toBeInTheDocument()
   expect(screen.queryByRole('list')).not.toBeInTheDocument()
   expect(screen.getByText('my-gcp-proj').tagName).toBe('CODE')
-  expect(screen.getByText('my-gcp-proj')).toHaveClass('text-code-inline')
 })

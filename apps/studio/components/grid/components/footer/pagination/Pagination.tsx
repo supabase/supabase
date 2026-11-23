@@ -316,7 +316,7 @@ export const Pagination = ({ enableForeignRowsQuery = true }: PaginationProps) =
           {hasCountData && (
             <p className="text-xs text-foreground-light">
               {`${countString} ${count === 0 || count > 1 ? `records` : 'record'}`}{' '}
-              {data.is_estimate ? '(estimated)' : ''}
+              {data.is_estimate ? <span>(estimated)</span> : ''}
             </p>
           )}
 
@@ -341,9 +341,11 @@ export const Pagination = ({ enableForeignRowsQuery = true }: PaginationProps) =
                 />
               </TooltipTrigger>
               <TooltipContent side="top" className="w-72">
-                {hasCountData
-                  ? `This is an estimated value as your table has more than ${THRESHOLD_COUNT.toLocaleString()} rows.`
-                  : `Count not automatically loaded as your table has more than ${THRESHOLD_COUNT.toLocaleString()} rows.`}{' '}
+                {hasCountData ? (
+                  <span>{`This is an estimated value as your table has more than ${THRESHOLD_COUNT.toLocaleString()} rows.`}</span>
+                ) : (
+                  <span>{`Count not automatically loaded as your table has more than ${THRESHOLD_COUNT.toLocaleString()} rows.`}</span>
+                )}{' '}
                 <br />
                 <span className="text-primary">
                   Click to retrieve the exact count of the table.

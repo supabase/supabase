@@ -108,12 +108,25 @@ test('reports every generated type that differs from its committed counterpart',
     generatedTypesDirectory: '/generated',
     typesDirectory: '/committed',
     readFileImpl: async (path) => {
-      if (path.endsWith('api-v1.d.ts')) return 'matching type'
+      if (!path.endsWith('platform.d.ts')) return 'matching type'
       return path.includes('/generated/') ? 'new platform type' : 'committed platform type'
     },
   })
 
   assert.deepEqual(mismatches, ['platform.d.ts'])
+})
+
+test('reports fga-requirements.ts when it differs from the committed file', async () => {
+  const mismatches = await findMismatchedTypes(specifications, {
+    generatedTypesDirectory: '/generated',
+    typesDirectory: '/committed',
+    readFileImpl: async (path) => {
+      if (!path.endsWith('fga-requirements.ts')) return 'matching type'
+      return path.includes('/generated/') ? 'new requirements' : 'committed requirements'
+    },
+  })
+
+  assert.deepEqual(mismatches, ['fga-requirements.ts'])
 })
 
 test('rejects unsuccessful OpenAPI responses', async () => {

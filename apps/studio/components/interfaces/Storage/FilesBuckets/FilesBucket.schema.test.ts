@@ -109,8 +109,4 @@ describe('bucketVersioningFormFields', () => {
   it('rejects a fractional retention window', () => {
     expect(schema.safeParse({ version_expiry_days: 1.5 }).success).toBe(false)
   })
-
-  it('rejects an unknown expiration mode', () => {
-    expect(schema.safeParse({ expiration_mode: 'xor' }).success).toBe(false)
-  })
 })

@@ -302,7 +302,7 @@ function generateMcpToolsPartial(tools: McpMap, outputPath: string) {
       const requirement = publishable.some((group) => group.length === 0)
         ? 'None (always available)'
         : publishable.length === 0
-          ? 'Not available to scoped personal access tokens'
+          ? 'Not available to personal access tokens with a scope'
           : formatRequirement(publishable)
       return `| \`${tool}\` | ${requirement} |`
     })

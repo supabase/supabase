@@ -318,6 +318,10 @@ export const UsersV2 = () => {
     authConfig?.INDEX_WORKER_ENSURE_USER_SEARCH_INDEXES_EXIST === true &&
     indexWorkerStatus?.is_in_progress === true
 
+  // Avoids refetching an identical query when only the filter column changes (column is part of the query key).
+  const shouldUseColumnSearch =
+    filterKeywords.length > 0 && (improvedSearchEnabled || specificFilterColumn !== 'freeform')
+
   const {
     data,
     error,
@@ -343,7 +347,7 @@ export const UsersV2 = () => {
       sort: sortColumn as 'id' | 'created_at' | 'email' | 'phone',
       order: sortOrder as 'asc' | 'desc',
       // improved search will always have a column specified
-      ...(specificFilterColumn !== 'freeform' || improvedSearchEnabled
+      ...(shouldUseColumnSearch
         ? { column: specificFilterColumn as OptimizedSearchColumns }
         : { column: undefined }),
 
@@ -372,7 +376,6 @@ export const UsersV2 = () => {
     sort_order: sortOrder,
     providers: selectedProviders,
     user_type: filterUserType === 'all' ? undefined : filterUserType,
-    keywords: filterKeywords,
     filter_column: specificFilterColumn === 'freeform' ? undefined : specificFilterColumn,
   }
 
@@ -928,15 +931,18 @@ export const UsersV2 = () => {
       >
         <p className="text-sm text-foreground-light">
           This is permanent! Are you sure you want to delete the{' '}
-          {selectedUsers.size === 1 ? '' : `selected ${selectedUsers.size} `}user
-          {selectedUsers.size > 1 ? 's' : ''}
+          {selectedUsers.size === 1 ? '' : <span>{`selected ${selectedUsers.size} `}</span>}
+          <span>user</span>
+          {selectedUsers.size > 1 ? <span>s</span> : ''}
           {selectedUsers.size === 1 ? (
             <span className="text-foreground">
               {' '}
-              {selectedUserFromCheckbox?.email ?? selectedUserFromCheckbox?.phone ?? 'this user'}
+              {selectedUserFromCheckbox?.email ?? selectedUserFromCheckbox?.phone ?? (
+                <span>this user</span>
+              )}
             </span>
           ) : null}
-          ?
+          <span>?</span>
         </p>
       </ConfirmationModal>
 

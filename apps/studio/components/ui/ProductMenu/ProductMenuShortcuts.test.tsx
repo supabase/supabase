@@ -60,7 +60,8 @@ describe('ProductMenuShortcuts', () => {
     expect(mockUseShortcut).toHaveBeenCalledTimes(1)
     expect(mockUseShortcut).toHaveBeenCalledWith(
       SHORTCUT_IDS.NAV_DATABASE_TABLES,
-      expect.any(Function)
+      expect.any(Function),
+      { label: undefined }
     )
   })
 
@@ -101,7 +102,8 @@ describe('ProductMenuShortcuts', () => {
 
     expect(mockUseShortcut).toHaveBeenCalledWith(
       SHORTCUT_IDS.NAV_DATABASE_INDEXES,
-      expect.any(Function)
+      expect.any(Function),
+      { label: undefined }
     )
   })
 })

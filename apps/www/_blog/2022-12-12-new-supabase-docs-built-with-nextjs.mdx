@@ -24,7 +24,7 @@ When Supabase started in 2020, our website and our docs were powered by (the won
 However, as time went on, we began to face some challenges:
 
 - We added versioning to our client libraries. Supabase maintains multiple client libraries, each with different versions. This increased the complexity and reduced maintainability of our Docusaurus setup. Contributors and team members had trouble figuring out how to contribute fixes and write new docs.
-- It introduced friction with the rest of our stack (Next.js & Turborepo). At Supabase, we try and share as much setup and config as possible across projects. We have a monorepo of various Next.js sites with [shared](https://github.com/supabase/supabase/tree/master/packages) [Turborepo internal packages](https://turbo.build/repo/docs/handbook/sharing-code/internal-packages) including our Supabase UI library and configs for linting, Typescript, Tailwind and more. Having UI components and configs that we share across all projects is huge. The docs site was the only project not using Next.js and this internal packages setup.
+- It introduced friction with the rest of our stack (Next.js & Turborepo). At Supabase, we try and share as much setup and config as possible across projects. We have a monorepo of various Next.js sites with [shared](https://github.com/supabase/supabase/tree/master/packages) [Turborepo internal packages](https://turborepo.dev/docs/core-concepts/internal-packages) including our Supabase [UI library](/library) and configs for linting, Typescript, Tailwind and more. Having UI components and configs that we share across all projects is huge. The docs site was the only project not using Next.js and this internal packages setup.
 
 In short: we outgrew Docusaurus.
 
@@ -67,7 +67,7 @@ Previously when browsing through our reference docs, each function lived on a se
 
 We’ve also re-engineered how our reference docs are generated from typedoc, so it’s easier for contributors and our own team members to edit and add to Supabase documentation.
 
-Inspiration: [Stripe](https://stripe.com/docs/cli).
+Inspiration: [Stripe](https://docs.stripe.com/cli).
 
 ## What’s next
 
@@ -88,7 +88,7 @@ In the background, we’ve been working with the creator of [CodeHike](https://c
 
 ### Improved search
 
-We’re happy users of Algolia search and their extremely generous [Open Source](https://www.algolia.com/for-open-source/) plan.
+We’re happy users of Algolia search and their extremely generous [Open Source](https://www.algolia.com/for-open-source) plan.
 That said, we’re a Postgres company, and it would only be right for us to dog-food (and help to improve) all the features that Postgres have to offer.
 We hope to go deep in Postgres FTS (small hint: check back on [Friday](https://supabase.com/launch-week) for a search-related announcement).
 

@@ -1,3 +1,4 @@
+// @vitest-environment jsdom
 import { copyToClipboard } from 'ui'
 import { afterEach, beforeEach, describe, expect, test, vi } from 'vitest'
 

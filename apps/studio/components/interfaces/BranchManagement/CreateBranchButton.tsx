@@ -1,16 +1,17 @@
-import { PermissionAction } from '@supabase/shared-types/out/constants'
-
 import { ButtonTooltip } from '@/components/ui/ButtonTooltip'
-import { useAsyncCheckPermissions } from '@/hooks/misc/useCheckPermissions'
+import { useGrant, type GrantResult } from '@/lib/grants'
 import { useAppStateSnapshot } from '@/state/app-state'
+
+function getDisabledReason({ status }: GrantResult<'POST /v1/projects/{ref}/branches'>) {
+  if (status === 'denied') return 'You need additional permissions to create branches'
+  if (status === 'error') return 'Failed to check permissions'
+  return undefined
+}
 
 export const CreateBranchButton = () => {
   const snap = useAppStateSnapshot()
-  const { can: canCreateBranches } = useAsyncCheckPermissions(
-    PermissionAction.CREATE,
-    'preview_branches',
-    { resource: { is_default: false } }
-  )
+  const createBranchGrant = useGrant('POST /v1/projects/{ref}/branches', {})
+  const canCreateBranches = createBranchGrant.status === 'granted'
 
   return (
     <ButtonTooltip
@@ -20,9 +21,7 @@ export const CreateBranchButton = () => {
       tooltip={{
         content: {
           side: 'bottom',
-          text: !canCreateBranches
-            ? 'You need additional permissions to create branches'
-            : undefined,
+          text: getDisabledReason(createBranchGrant),
         },
       }}
     >

@@ -3,7 +3,8 @@ import { toast } from 'sonner'
 
 import type { CustomerAddress, CustomerTaxId } from './types'
 import { handleError, post } from '@/data/fetchers'
-import type { ResponseError, UseCustomMutationOptions } from '@/types'
+import type { StudioError } from '@/lib/errors/studio-errors'
+import type { UseCustomMutationOptions } from '@/types'
 
 export type OrganizationCreditTopUpVariables = {
   payment_method_id: string
@@ -66,12 +67,12 @@ export const useOrganizationCreditTopUpMutation = ({
 }: Omit<
   UseCustomMutationOptions<
     OrganizationTaxIdUpdateData,
-    ResponseError,
+    StudioError,
     OrganizationCreditTopUpVariables
   >,
   'mutationFn'
 > = {}) => {
-  return useMutation<OrganizationTaxIdUpdateData, ResponseError, OrganizationCreditTopUpVariables>({
+  return useMutation<OrganizationTaxIdUpdateData, StudioError, OrganizationCreditTopUpVariables>({
     mutationFn: (vars) => topUpCredits(vars),
     async onSuccess(data, variables, context) {
       await onSuccess?.(data, variables, context)

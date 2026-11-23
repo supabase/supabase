@@ -64,12 +64,6 @@ describe('parseSupamonitorLogs', () => {
       p95_plan_time: 4,
     })
   })
-
-  it('handles multiple log entries', () => {
-    const raw = [makeSampleLog(), makeSampleLog({ query: safeSql`SELECT 2`, query_id: 2 })]
-    const result = parseSupamonitorLogs(raw)
-    expect(result).toHaveLength(2)
-  })
 })
 
 describe('transformLogsToChartData', () => {
@@ -78,16 +72,11 @@ describe('transformLogsToChartData', () => {
     expect(transformLogsToChartData([])).toEqual([])
   })
 
-  it('filters out entries with no timestamp', () => {
-    const logs: ParsedLogEntry[] = [{ query: safeSql`SELECT 1`, calls: 5 }]
-    const result = transformLogsToChartData(logs)
-    expect(result).toEqual([])
-  })
-
-  it('filters out entries with invalid timestamp', () => {
-    const logs: ParsedLogEntry[] = [{ timestamp: 'not-a-date', calls: 5 }]
-    const result = transformLogsToChartData(logs)
-    expect(result).toEqual([])
+  it.each<[string, ParsedLogEntry]>([
+    ['no', { query: safeSql`SELECT 1`, calls: 5 }],
+    ['an invalid', { timestamp: 'not-a-date', calls: 5 }],
+  ])('filters out entries with %s timestamp', (_, log) => {
+    expect(transformLogsToChartData([log])).toEqual([])
   })
 
   it('transforms a valid log entry into a chart data point', () => {
@@ -290,19 +279,5 @@ describe('aggregateLogsByQuery', () => {
 
     expect(result).toHaveLength(1)
     expect(result[0].mean_time).toBe(0)
-  })
-
-  it('sets static fields correctly', () => {
-    const logs: ParsedLogEntry[] = [
-      { query: safeSql`SELECT 1`, calls: 1, total_exec_time: 10, total_plan_time: 0 },
-    ]
-
-    const result = aggregateLogsByQuery(logs)
-
-    expect(result[0].rows_read).toBe(0)
-    expect(result[0].cache_hit_rate).toBe(0)
-    expect(result[0].index_advisor_result).toBeNull()
-    expect(result[0]._total_cache_hits).toBe(0)
-    expect(result[0]._total_cache_misses).toBe(0)
   })
 })

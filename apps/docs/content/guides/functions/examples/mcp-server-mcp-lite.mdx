@@ -27,8 +27,8 @@ This combination offers several advantages:
 
 You need:
 
-- [Docker](https://docs.docker.com/get-docker/) (to run Supabase locally)
-- [Deno](https://deno.land/) (Supabase Edge Functions runtime)
+- [Docker](https://docs.docker.com/get-started/get-docker/) (to run Supabase locally)
+- [Deno](https://deno.com/) (Supabase Edge Functions runtime)
 - [Supabase CLI](/docs/guides/local-development/cli/getting-started)
 
 ## Create a new MCP server
@@ -57,11 +57,11 @@ my-mcp-server/
 
 ## Understanding the project structure
 
-### Minimal config.toml
+### Minimal config file [#minimal-configtoml]
 
 The template includes a minimal `config.toml` that runs only Edge Functions - no database, storage, or Studio UI. This keeps your local setup lightweight:
 
-```toml
+```toml supabase/config.toml
 # Minimal config for running only Edge Functions (no DB, storage, or studio)
 project_id = "starter-mcp-supabase"
 
@@ -233,7 +233,7 @@ mcp.tool('searchDatabase', {
 You can add tools that:
 
 - Query your Supabase database
-- Access Supabase Storage for file operations
+- Access [Supabase Storage](/docs/guides/storage) for file operations
 - Call external APIs
 - Process data with custom logic
 - Integrate with other Supabase features
@@ -284,9 +284,9 @@ For more security guidance, see the [MCP security guide](/docs/guides/getting-st
 
 With your MCP server running on Supabase Edge Functions, you can:
 
-- Connect it to your Supabase database for data-driven tools
-- Use Supabase Auth to secure your endpoints
-- Access Supabase Storage for file operations
+- Connect it to your [Supabase database](/docs/guides/database/overview) for data-driven tools
+- Use [Supabase Auth](/docs/guides/auth) to secure your endpoints
+- Access [Supabase Storage](/docs/guides/storage) for file operations
 - Deploy to multiple regions automatically
 - Scale to handle production traffic
 - Integrate with AI assistants like Claude, Cursor, or custom MCP clients
@@ -296,5 +296,5 @@ With your MCP server running on Supabase Edge Functions, you can:
 - [mcp-lite on GitHub](https://github.com/fiberplane/mcp-lite)
 - [Model Context Protocol Spec](https://modelcontextprotocol.io/)
 - [Supabase Edge Functions Docs](/docs/guides/functions)
-- [Deno Runtime Documentation](https://deno.land/)
+- [Deno Runtime Documentation](https://deno.com/)
 - [Fiberplane tutorial](https://blog.fiberplane.com/blog/mcp-lite-supabase-edge-functions/)

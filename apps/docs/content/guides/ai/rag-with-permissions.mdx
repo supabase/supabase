@@ -6,7 +6,7 @@ description: 'Implement fine-grained access control with retrieval augmented gen
 sidebar_label: 'RAG with Permissions'
 ---
 
-Since pgvector is built on top of Postgres, you can implement fine-grained access control on your vector database using [Row Level Security (RLS)](/docs/guides/database/postgres/row-level-security). This means you can restrict which documents are returned during a vector similarity search to users that have access to them. Supabase also supports [Foreign Data Wrappers (FDW)](/docs/guides/database/extensions/wrappers/overview) which means you can use an external database or data source to determine these permissions if your user data doesn't exist in Supabase.
+Since [pgvector](/docs/guides/database/extensions/pgvector) is built on top of Postgres, you can implement fine-grained access control on your vector database using [Row Level Security (RLS)](/docs/guides/database/postgres/row-level-security). This means you can restrict which documents are returned during a vector similarity search to users that have access to them. Supabase also supports [Foreign Data Wrappers (FDW)](/docs/guides/database/extensions/wrappers/overview) which means you can use an external database or data source to determine these permissions if your user data doesn't exist in Supabase.
 
 Use this guide to learn how to restrict access to documents when performing retrieval augmented generation (RAG).
 
@@ -116,7 +116,7 @@ You may have an existing system that stores users, documents, and their permissi
 
 <Admonition type="caution">
 
-RLS is latency-sensitive, so extra caution should be taken before implementing this method. Use the [query plan analyzer](/docs/guides/platform/performance#optimizing-poor-performing-queries) to measure execution times for your queries to ensure they are within expected ranges. For enterprise applications, contact enterprise@supabase.io.
+RLS is latency-sensitive, so extra caution should be taken before implementing this method. Use the [query plan analyzer](/docs/guides/database/query-optimization#analyze-the-query-plan) to measure execution times for your queries to ensure they are within expected ranges. For enterprise applications, contact enterprise@supabase.io.
 
 </Admonition>
 
@@ -235,9 +235,9 @@ You might be tempted to discard RLS completely and filter by user within the `wh
 
 #### Custom JWT with REST API
 
-If you would like to use the auto-generated REST API to query your Supabase database using JWTs from an external auth provider, you can get your auth provider to issue a custom JWT for Supabase.
+If you would like to use the auto-generated REST API to query your [Supabase database](/docs/guides/database/overview) using JWTs from an external auth provider, you can get your auth provider to issue a custom JWT for Supabase.
 
-See the [Clerk Supabase docs](https://clerk.com/docs/integrations/databases/supabase) for an example of how this can be done. Modify the instructions to work with your own auth provider as needed.
+See the [Clerk Supabase docs](https://clerk.com/docs/guides/development/integrations/databases/supabase) for an example of how this can be done. Modify the instructions to work with your own auth provider as needed.
 
 Now we can use the same RLS policy from our first example:
 

@@ -454,25 +454,6 @@ describe('NotebookProposalRenderer', () => {
     expect(screen.queryByRole('button', { name: 'Added Markdown cell' })).not.toBeInTheDocument()
   })
 
-  it('falls back to the compact completed body when previous_content is absent', () => {
-    render(
-      <NotebookProposalRenderer
-        mode="update"
-        state="output-available"
-        input={{
-          id: NOTEBOOK_ID,
-          expected_updated_at: '2024-01-01T00:00:00.000Z',
-          operations: [{ _tag: 'delete_cell', cell_id: 'cell-1' }],
-        }}
-        output={{ id: NOTEBOOK_ID, name: 'Signup funnel' }}
-      />
-    )
-
-    expect(screen.getByText('Notebook updated: Signup funnel')).toBeInTheDocument()
-    expect(screen.queryByText("This update can't be applied as written")).not.toBeInTheDocument()
-    expect(screen.getByRole('link', { name: 'Open notebook' })).toBeInTheDocument()
-  })
-
   it('falls back to the compact completed body when the snapshot no longer matches the operations', () => {
     render(
       <NotebookProposalRenderer

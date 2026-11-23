@@ -33,6 +33,8 @@ export const useSlowQueriesCount = (_projectRef?: string, refreshKey: number = 0
 
   const { data, isLoading, error } = useDbQuery({
     sql,
+    sqlOrigin: 'studio',
+    queryName: 'slow-queries-count',
   })
 
   const slowQueriesCount = useMemo(() => {

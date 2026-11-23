@@ -121,7 +121,7 @@ export const StripeSyncChangesCard = ({
                 />
               )}
               <span>
-                {dbLine} <code className="text-code-inline">stripe</code>
+                {dbLine} <code>stripe</code>
               </span>
             </li>
             <li className={ListItemClassName}>
@@ -135,8 +135,7 @@ export const StripeSyncChangesCard = ({
                 />
               )}
               <span>
-                {tableAndViewLine} <code className="text-code-inline">stripe</code> schema for
-                synced Stripe data
+                {tableAndViewLine} <code>stripe</code> schema for synced Stripe data
               </span>
             </li>
             <li className={ListItemClassName}>

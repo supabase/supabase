@@ -1,13 +1,13 @@
 import type { FetchStatus } from '@tanstack/react-query'
 
-import type { ResponseError } from '@/types'
+import type { StudioError } from '@/lib/errors/studio-errors'
 
 // Restart the interval after a response. Slow endpoints never accumulate overlapping polls.
 export const replicationPollingOptions = {
   refetchInterval: ({
     state,
   }: {
-    state: { fetchStatus: FetchStatus; error: ResponseError | null }
+    state: { fetchStatus: FetchStatus; error: StudioError | null }
   }) => {
     if (state.fetchStatus === 'fetching') return false
     const retryAfter = state.error?.retryAfter

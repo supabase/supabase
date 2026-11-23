@@ -1,9 +1,11 @@
 import { useQuery } from '@tanstack/react-query'
 import { components } from 'api-types'
+import { useIsLoggedIn } from 'common'
 
 import { serviceStatusKeys } from './keys'
-import { get, handleError } from '@/data/fetchers'
-import type { ResponseError, UseCustomQueryOptions } from '@/types'
+import { get, handleError, unguarded } from '@/data/fetchers'
+import type { StudioError } from '@/lib/errors/studio-errors'
+import type { UseCustomQueryOptions } from '@/types'
 
 export type ProjectServiceStatusVariables = {
   projectRef?: string
@@ -30,6 +32,7 @@ export async function getProjectServiceStatus(
       },
     },
     signal,
+    grant: unguarded.migrating,
   })
 
   if (error) handleError(error)
@@ -38,7 +41,7 @@ export async function getProjectServiceStatus(
 }
 
 export type ProjectServiceStatusData = Awaited<ReturnType<typeof getProjectServiceStatus>>
-export type ProjectServiceStatusError = ResponseError
+export type ProjectServiceStatusError = StudioError
 
 export const useProjectServiceStatusQuery = <TData = ProjectServiceStatusData>(
   { projectRef }: ProjectServiceStatusVariables,
@@ -46,10 +49,13 @@ export const useProjectServiceStatusQuery = <TData = ProjectServiceStatusData>(
     enabled = true,
     ...options
   }: UseCustomQueryOptions<ProjectServiceStatusData, ProjectServiceStatusError, TData> = {}
-) =>
-  useQuery<ProjectServiceStatusData, ProjectServiceStatusError, TData>({
+) => {
+  const isLoggedIn = useIsLoggedIn()
+
+  return useQuery<ProjectServiceStatusData, ProjectServiceStatusError, TData>({
     queryKey: serviceStatusKeys.serviceStatus(projectRef),
     queryFn: ({ signal }) => getProjectServiceStatus({ projectRef }, signal),
-    enabled: enabled && typeof projectRef !== 'undefined',
+    enabled: enabled && isLoggedIn && typeof projectRef !== 'undefined',
     ...options,
   })
+}

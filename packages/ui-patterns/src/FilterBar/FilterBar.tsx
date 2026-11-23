@@ -1,6 +1,6 @@
 'use client'
 
-import { Search } from 'lucide-react'
+import { SearchIcon } from 'lucide-react'
 import { motion } from 'motion/react'
 import React, { forwardRef } from 'react'
 import { cn } from 'ui'
@@ -28,7 +28,7 @@ export type FilterBarProps = {
   icon?: React.ReactNode
   /**
    * Name of the property to use when the user commits free text from the root input. Must match
-   * a `name` in `filterProperties`. When set, the dropdown shows a "Search <propertyLabel>: \"...\""
+   * a `name` in `filterProperties`. When set, the dropdown shows a "SearchIcon <propertyLabel>: \"...\""
    * item as the first option while the user is typing. Selecting it (Enter) creates a filter
    * `{ propertyName, operator: '=', value: typedText }`. If the property has no `=` operator,
    * the first operator in its list is used instead.
@@ -67,18 +67,18 @@ function FilterBarContent({ className }: { className?: string }) {
       >
         <div
           className={cn(
-            'relative flex items-center justify-center shrink-0 px-2 bg-surface-200 cursor-pointer',
+            'relative flex items-start justify-center shrink-0 px-2 bg-surface-200 cursor-pointer',
             variant === 'pill' ? 'bg-transparent border-r-0' : 'border-r'
           )}
           onClick={() => handleGroupFreeformFocus([])}
         >
           <div
             className={cn(
-              'transition-opacity duration-300 ease-in-out',
+              'transition-opacity duration-300 ease-in-out relative top-[4px]',
               loadingIcon ? 'opacity-0' : 'opacity-100'
             )}
           >
-            <Search className="text-foreground-muted w-4 h-4 sticky" />
+            <SearchIcon size={16} className="text-foreground-muted" />
           </div>
           {loadingIcon && (
             <div className="absolute inset-0 flex items-center justify-center">{loadingIcon}</div>

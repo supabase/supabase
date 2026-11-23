@@ -41,7 +41,7 @@ type SuccessResponse<P extends Endpoints, M extends Methods> = RemapPaths[P][M] 
     ? R201
     : never
 
-// Studio's standard error envelope — what `handleError` and `ResponseError` consume.
+// Studio's standard error envelope — what `handleError` and `StudioError` consume.
 // OpenAPI doesn't document error bodies (4xx/5xx are `content?: never`), so we
 // hardcode this convention to keep error-state tests strongly typed.
 export type APIErrorBody = { message: string }

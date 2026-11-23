@@ -18,7 +18,7 @@ Find the [example project on GitHub](https://github.com/elevenlabs/elevenlabs-ex
 
 ## Requirements
 
-- An ElevenLabs account with an [API key](/app/settings/api-keys).
+- An ElevenLabs account with an [API key](https://elevenlabs.io/app/developers/api-keys).
 - A [Supabase](https://supabase.com) account (you can sign up for a free account via [database.new](https://database.new)).
 - The [Supabase CLI](/docs/guides/local-development) installed on your machine.
 - The [Deno runtime](https://docs.deno.com/runtime/getting_started/installation/) installed on your machine and optionally [setup in your favourite IDE](https://docs.deno.com/runtime/getting_started/setup_your_environment).
@@ -48,7 +48,7 @@ Next, create a new database table to log the transcription results:
 supabase migrations new init
 ```
 
-This will create a new migration file in the `supabase/migrations` directory. Open the file and add the following SQL:
+This will create a new [migration file](/docs/guides/deployment/database-migrations) in the `supabase/migrations` directory. Open the file and add the following SQL:
 
 ```sql supabase/migrations/init.sql
 CREATE TABLE IF NOT EXISTS transcription_logs (
@@ -81,8 +81,8 @@ If you're using VS Code or Cursor, select `y` when the CLI prompts "Generate VS 
 
 Within the `supabase/functions` directory, create a new `.env` file and add the following variables:
 
-```env supabase/functions/.env
-# Find / create an API key at https://elevenlabs.io/app/settings/api-keys
+```dotenv supabase/functions/.env
+# Find / create an API key at https://elevenlabs.io/app/developers/api-keys
 ELEVENLABS_API_KEY=your_api_key
 
 # The bot token you received from the BotFather.
@@ -100,7 +100,7 @@ The project uses a couple of dependencies:
 - The [@supabase/supabase-js](/docs/reference/javascript/introduction) library to interact with the Supabase database.
 - The ElevenLabs [JavaScript SDK](https://github.com/elevenlabs/elevenlabs-js) to interact with the speech-to-text API.
 
-Since Supabase Edge Function uses the [Deno runtime](https://deno.land/), you don't need to install the dependencies, rather you can [import](https://docs.deno.com/examples/npm/) them via the `npm:` prefix.
+Since Supabase Edge Function uses the [Deno runtime](https://deno.com/), you don't need to install the dependencies, rather you can [import](https://docs.deno.com/examples/npm/) them via the `npm:` prefix.
 
 ## Code the Telegram bot
 
@@ -261,7 +261,7 @@ supabase link
 Run the following command to apply the database migrations from the `supabase/migrations` directory:
 
 ```bash
-supabase db push
+supabase db push --remote
 ```
 
 Navigate to the [table editor](/dashboard/project/_/editor) in your Supabase dashboard and you should see and empty `transcription_logs` table.

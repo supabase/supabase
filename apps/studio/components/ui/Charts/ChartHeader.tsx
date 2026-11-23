@@ -16,6 +16,13 @@ import { ButtonTooltip } from '@/components/ui/ButtonTooltip'
 import { formatDateTime, useFormatDateTime } from '@/lib/datetime'
 import { formatBytes, formatBytesMinMB } from '@/lib/helpers'
 
+export interface ChartHeaderStat {
+  label: string
+  value: number
+  /** Colors the dot next to the label */
+  tone: 'warning' | 'destructive'
+}
+
 export interface ChartHeaderProps {
   title?: string
   format?: string | ((value: unknown) => string)
@@ -37,6 +44,14 @@ export interface ChartHeaderProps {
   data?: any[]
   xAxisKey?: string
   yAxisKey?: string
+  thresholdZoneAttribute?: string
+  thresholdZoneWarning?: {
+    label: string
+    color: string
+    textColor?: string
+    badgeLabel?: string
+    tooltip: string
+  }
   xAxisIsDate?: boolean
   valuePrecision?: number
   shouldFormatBytes?: boolean
@@ -46,6 +61,16 @@ export interface ChartHeaderProps {
   sql?: string
   titleTooltip?: string
   showNewBadge?: boolean
+  /**
+   * Extra stats shown on the right of the header. Receives all chart rows, or only the hovered
+   * row while a point is hovered.
+   */
+  getHeaderStats?: (rows: Record<string, unknown>[]) => ChartHeaderStat[]
+  /**
+   * Index of the point hovered on this chart. Used for `getHeaderStats` when hover isn't synced
+   * across charts, in which case the shared hover state doesn't reach the header.
+   */
+  focusedIndex?: number | null
 }
 
 export const ChartHeader = ({
@@ -67,6 +92,8 @@ export const ChartHeader = ({
   data,
   xAxisKey,
   yAxisKey,
+  thresholdZoneAttribute,
+  thresholdZoneWarning,
   xAxisIsDate = true,
   displayDateInUtc,
   customDateFormat,
@@ -78,6 +105,8 @@ export const ChartHeader = ({
   titleTooltip,
   showNewBadge,
   isMemoryChart,
+  getHeaderStats,
+  focusedIndex,
 }: ChartHeaderProps) => {
   const { ref } = useParams()
   const { hoveredIndex, isHovered } = useChartHoverState(syncId || 'default')
@@ -123,10 +152,13 @@ export const ChartHeader = ({
       if (activeDataPoint) {
         // For stacked charts, we need to calculate the total of all attributes
         // that should be included in the total (excluding reference lines, max values, etc.)
-        let newValue = activeDataPoint[yAxisKey]
+        const isThresholdValueMissing =
+          thresholdZoneAttribute !== undefined &&
+          !Number.isFinite(activeDataPoint[thresholdZoneAttribute])
+        let newValue = isThresholdValueMissing ? 'Unavailable' : activeDataPoint[yAxisKey]
 
         // If this is a stacked chart with multiple attributes, calculate the total
-        if (attributes && attributes.length > 1) {
+        if (!isThresholdValueMissing && attributes && attributes.length > 1) {
           const attributesToIgnore =
             attributes
               ?.filter((a) => a.omitFromTotal || a.isMaxValue || a.provider === 'reference-line')
@@ -175,6 +207,7 @@ export const ChartHeader = ({
     data,
     xAxisKey,
     yAxisKey,
+    thresholdZoneAttribute,
     xAxisIsDate,
     displayDateInUtc,
     customDateFormat,
@@ -233,6 +266,11 @@ export const ChartHeader = ({
     </div>
   )
 
+  const syncedIndex = syncId && isHovered ? hoveredIndex : null
+  const statsIndex = syncedIndex ?? focusedIndex ?? null
+  const hoveredRow = statsIndex !== null ? data?.[statsIndex] : undefined
+  const headerStats = getHeaderStats?.(hoveredRow ? [hoveredRow] : (data ?? []))
+
   const highlighted = (
     <h4
       className={`text-foreground text-xl font-normal ${minimalHeader ? 'text-base' : 'text-2xl'}`}
@@ -277,6 +315,24 @@ export const ChartHeader = ({
         </div>
       </div>
       <div className="flex items-center gap-2">
+        {headerStats && headerStats.length > 0 && (
+          <div className="flex items-end gap-4 mr-2 text-foreground-light">
+            {headerStats.map((stat) => (
+              <div key={stat.label} className="flex flex-col items-end">
+                <div className="flex items-center gap-2">
+                  <div
+                    className={cn(
+                      'w-1.5 h-1.5 rounded-full',
+                      stat.tone === 'warning' ? 'bg-warning' : 'bg-destructive'
+                    )}
+                  />
+                  <span className="heading-meta">{stat.label}</span>
+                </div>
+                <span className="text-foreground text-base">{stat.value.toLocaleString()}</span>
+              </div>
+            ))}
+          </div>
+        )}
         {sql ? (
           <ButtonTooltip
             className="px-1.5"
@@ -294,6 +350,30 @@ export const ChartHeader = ({
           </ButtonTooltip>
         ) : null}
 
+        {thresholdZoneWarning && (
+          <Tooltip>
+            <TooltipTrigger asChild>
+              <Badge
+                tabIndex={0}
+                className="cursor-default focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring"
+                aria-label={`Warning: ${thresholdZoneWarning.label}`}
+                style={{
+                  color: thresholdZoneWarning.textColor ?? thresholdZoneWarning.color,
+                  borderColor: thresholdZoneWarning.color,
+                  backgroundColor: `color-mix(in srgb, ${thresholdZoneWarning.color} 10%, transparent)`,
+                }}
+              >
+                {thresholdZoneWarning.badgeLabel ?? 'Warning'}
+              </Badge>
+            </TooltipTrigger>
+            <TooltipContent className="max-w-xs" side="top">
+              <p className="font-medium">
+                {thresholdZoneWarning.label} threshold crossed in this time range.
+              </p>
+              <p>{thresholdZoneWarning.tooltip}</p>
+            </TooltipContent>
+          </Tooltip>
+        )}
         {!hideChartType && onChartStyleChange && (
           <ButtonTooltip
             className="px-1.5"

@@ -3,7 +3,8 @@ import { toast } from 'sonner'
 
 import { organizationKeys } from './keys'
 import { handleError, put } from '@/data/fetchers'
-import type { ResponseError, UseCustomMutationOptions } from '@/types'
+import type { StudioError } from '@/lib/errors/studio-errors'
+import type { UseCustomMutationOptions } from '@/types'
 
 export type OrganizationPaymentMethodDefaultVariables = {
   slug: string
@@ -37,7 +38,7 @@ export const useOrganizationPaymentMethodMarkAsDefaultMutation = ({
 }: Omit<
   UseCustomMutationOptions<
     OrganizationPaymentMethodDefaultData,
-    ResponseError,
+    StudioError,
     OrganizationPaymentMethodDefaultVariables
   >,
   'mutationFn'
@@ -46,7 +47,7 @@ export const useOrganizationPaymentMethodMarkAsDefaultMutation = ({
 
   return useMutation<
     OrganizationPaymentMethodDefaultData,
-    ResponseError,
+    StudioError,
     OrganizationPaymentMethodDefaultVariables
   >({
     mutationFn: (vars) => markPaymentMethodAsDefault(vars),

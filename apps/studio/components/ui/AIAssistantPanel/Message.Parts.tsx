@@ -31,8 +31,8 @@ import { NotebookRunRenderer } from './NotebookRunRenderer'
 import { OptInRequest } from './OptInRequest'
 import { parseSupportRequestMessage, SupportRequestMessage } from './SupportRequestMessage'
 import { useMinimumDisplayTime } from '@/hooks/misc/useMinimumDisplayTime'
-import { storedUpdateOptInLevelInputSchema } from '@/lib/ai/tool-filter'
 import { contract as deployEdgeFunctionContract } from '@/lib/ai/tools/deploy-edge-function'
+import { contract as updateOptInLevelContract } from '@/lib/ai/tools/update-opt-in-level'
 
 function MessagePartText({ textPart }: { textPart: TextUIPart }) {
   const { id, isLoading, readOnly, isUserMessage, state } = useMessageInfoContext()
@@ -275,7 +275,7 @@ function MessagePartUpdateOptInLevel({ toolPart }: { toolPart: ToolUIPart }) {
   const { state, input, output } = toolPart
   const { addToolApprovalResponse } = useMessageActionsContext()
 
-  const parsedInput = storedUpdateOptInLevelInputSchema.safeParse(input)
+  const parsedInput = updateOptInLevelContract.inputSchema.safeParse(input)
   if (state === 'input-streaming' || !parsedInput.success) return null
 
   const { confirmState, onApprove, onDeny } = getManualToolApprovalHandlers({

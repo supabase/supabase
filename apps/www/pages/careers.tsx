@@ -465,6 +465,16 @@ const CareerPage = ({
                 </Link>
               </Button>
             </div>
+            <p className="text-foreground-lighter text-sm mt-8">
+              Read our{' '}
+              <Link
+                href="/legal/privacy-resources/candidate-privacy-notice"
+                className="text-foreground hover:underline"
+              >
+                Candidate Privacy Notice
+              </Link>{' '}
+              to see how we handle your personal information when you apply.
+            </p>
           </SectionContainer>
         </div>
       </DefaultLayout>
@@ -491,15 +501,20 @@ const JobItem = ({ job }: { job: JobItemProps }) => {
       <h4 className="text-base min-w-[240px] lg:min-w-[316px] grow sm:truncate mr-6">
         {job.title}
       </h4>
-      <div className="flex justify-between justify-[normal] pt-2 md:pt-0 items-center">
+      <div className="flex justify-between gap-4 pt-2 md:pt-0 items-center">
         <div className="flex items-center gap-4 min-w-0">
-          <Badge>
+          <Badge className="min-w-0 max-w-full">
             <GlobeAltIcon className="w-3 h-3 shrink-0" />
             <span className="truncate">{job.location}</span>
           </Badge>
           <span className="hidden md:block">{job.employment}</span>
         </div>
-        <div className={cn(buttonVariants({ variant: 'default', size: 'tiny' }), 'rounded-full')}>
+        <div
+          className={cn(
+            buttonVariants({ variant: 'default', size: 'tiny' }),
+            'rounded-full shrink-0 whitespace-nowrap'
+          )}
+        >
           {isPlaceholderJob ? 'Submit resume' : 'Apply for position'}
         </div>
       </div>

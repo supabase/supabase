@@ -1,10 +1,12 @@
 'use client'
 
-import { useConsentState } from 'common'
+import { useConsentState } from 'common/consent-state'
+import { getPrivacyLinkLabel, readVisitorCountry } from 'common/visitor-country'
 import Link from 'next/link'
-import { PropsWithChildren, useState } from 'react'
+import { PropsWithChildren, useEffect, useState } from 'react'
 import {
   Button,
+  cn,
   Dialog,
   DialogContent,
   DialogFooter,
@@ -19,12 +21,28 @@ import {
 
 import { Admonition } from '../Admonition'
 
+export const PrivacySettingsLabel = () => {
+  const [country, setCountry] = useState<string>()
+  const [hasReadCountry, setHasReadCountry] = useState(false)
+
+  useEffect(() => {
+    setCountry(readVisitorCountry(document.cookie))
+    setHasReadCountry(true)
+  }, [])
+
+  // Hidden until the country cookie is read, so non-US visitors never see the US label flash.
+  return (
+    <span className={hasReadCountry ? undefined : 'invisible'}>{getPrivacyLinkLabel(country)}</span>
+  )
+}
+
 interface PrivacySettingsProps {
   className?: string
 }
 
 export const PrivacySettings = ({
   children,
+  className,
   ...props
 }: PropsWithChildren<PrivacySettingsProps>) => {
   const [isOpen, setIsOpen] = useState(false)
@@ -53,7 +71,11 @@ export const PrivacySettings = ({
   return (
     <Dialog open={isOpen} onOpenChange={(open) => setIsOpen(open)}>
       <DialogTrigger asChild>
-        <button {...props} onClick={() => setIsOpen(true)}>
+        <button
+          {...props}
+          className={cn('cursor-pointer', className)}
+          onClick={() => setIsOpen(true)}
+        >
           {children}
         </button>
       </DialogTrigger>

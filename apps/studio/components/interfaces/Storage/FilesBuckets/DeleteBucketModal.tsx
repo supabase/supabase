@@ -2,7 +2,7 @@ import { useParams } from 'common'
 import { useRouter } from 'next/router'
 import { toast } from 'sonner'
 
-import { extractBucketNameFromDefinition } from '@/components/interfaces/Storage/Storage.utils'
+import { getPolicyBucketNames } from '@/components/interfaces/Storage/Storage.utils'
 import { hasVersioningHistory } from '@/components/interfaces/Storage/StorageVersioning.constants'
 import { TextConfirmModal } from '@/components/ui/TextConfirmModalWrapper'
 import { useDatabasePoliciesQuery } from '@/data/database-policies/database-policies-query'
@@ -36,17 +36,21 @@ export const DeleteBucketModal = ({ visible, bucket, onClose }: DeleteBucketModa
       // policy cleanup below (which can be slow) doesn't hold the loading state or block
       // the success feedback.
       toast.success(`Successfully deleted bucket ${bucket.id}`)
-      onClose()
-      if (bucketId) router.push(`/project/${projectRef}/storage/files`)
+      if (bucketId) {
+        await router.push(`/project/${projectRef}/storage/files`)
+      } else {
+        onClose()
+      }
 
       if (!project) return console.error('Project is required')
 
-      // Clean up policies from the corresponding bucket that was deleted
+      // Clean up policies that target only the bucket that was deleted. Policies that also
+      // cover other buckets (or negate the bucket condition) are left in place.
       const bucketPolicies = (policies ?? []).filter((policy) => {
         if (policy.table !== 'objects') return false
 
-        const policyBucket = extractBucketNameFromDefinition(policy.definition ?? policy.check)
-        return policyBucket === bucket.name
+        const policyBuckets = getPolicyBucketNames(policy)
+        return policyBuckets.length === 1 && policyBuckets[0] === bucket.name
       })
 
       if (bucketPolicies.length === 0) return
@@ -99,8 +103,13 @@ export const DeleteBucketModal = ({ visible, bucket, onClose }: DeleteBucketModa
       <p className="text-sm">
         Your bucket <span className="font-bold text-foreground">{bucket.id}</span> and all of its
         contents will be permanently deleted.
-        {isRetainingVersions &&
-          ' That includes every archived file and every retained version, which cannot be restored afterwards.'}
+        {isRetainingVersions && (
+          <span>
+            {
+              ' That includes every archived file and every retained version, which cannot be restored afterwards.'
+            }
+          </span>
+        )}
       </p>
     </TextConfirmModal>
   )

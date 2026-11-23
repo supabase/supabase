@@ -14,40 +14,17 @@ describe('isFullyGranted', () => {
     expect(isFullyGranted(fullPrivileges())).toBe(true)
   })
 
-  it('returns false when anon is missing any CRUD privilege', () => {
-    const privileges = fullPrivileges()
-    privileges.anon = ['SELECT', 'INSERT', 'UPDATE'] // no DELETE
-    expect(isFullyGranted(privileges)).toBe(false)
-  })
-
-  it('returns false when authenticated has no privileges at all', () => {
-    const privileges = fullPrivileges()
-    privileges.authenticated = []
-    expect(isFullyGranted(privileges)).toBe(false)
-  })
-
-  it('returns false when service_role is missing a privilege', () => {
-    const privileges = fullPrivileges()
-    privileges.service_role = ['SELECT', 'INSERT', 'DELETE'] // no UPDATE
-    expect(isFullyGranted(privileges)).toBe(false)
-  })
-
-  it('returns false when every role has only SELECT (partial across the board)', () => {
-    const privileges: ApiPrivilegesByRole = {
-      anon: ['SELECT'],
-      authenticated: ['SELECT'],
-      service_role: ['SELECT'],
-    }
-    expect(isFullyGranted(privileges)).toBe(false)
-  })
-
-  it('returns false when no role has any privileges', () => {
-    const privileges: ApiPrivilegesByRole = {
-      anon: [],
-      authenticated: [],
-      service_role: [],
-    }
-    expect(isFullyGranted(privileges)).toBe(false)
+  it.each<[string, Partial<ApiPrivilegesByRole>]>([
+    ['anon is missing DELETE', { anon: ['SELECT', 'INSERT', 'UPDATE'] }],
+    ['authenticated has no privileges', { authenticated: [] }],
+    ['service_role is missing UPDATE', { service_role: ['SELECT', 'INSERT', 'DELETE'] }],
+    [
+      'every role has only SELECT',
+      { anon: ['SELECT'], authenticated: ['SELECT'], service_role: ['SELECT'] },
+    ],
+    ['no role has any privileges', { anon: [], authenticated: [], service_role: [] }],
+  ])('returns false when %s', (_, overrides) => {
+    expect(isFullyGranted({ ...fullPrivileges(), ...overrides })).toBe(false)
   })
 
   it('tolerates duplicate privilege entries', () => {

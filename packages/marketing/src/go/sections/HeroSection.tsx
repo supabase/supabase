@@ -8,9 +8,12 @@ import MediaBlock from './MediaBlock'
 export default function HeroSection({
   section,
   compact,
+  strongGradient,
 }: {
   section: GoHeroSection
   compact?: boolean
+  /** Fuller brand gradient for light-theme pages, where the default glow is hard to see. */
+  strongGradient?: boolean
 }) {
   const hasMedia = !!(section.image || section.video || section.youtubeUrl)
 
@@ -18,8 +21,12 @@ export default function HeroSection({
     <header
       className={cn(
         'flex flex-col border-b border-muted',
-        'bg-[radial-gradient(circle_at_50%_240%,hsl(var(--brand-300)),transparent_70%)]',
-        'md:bg-[radial-gradient(circle_at_50%_280%,hsl(var(--brand-300)),transparent_70%)]',
+        strongGradient
+          ? 'bg-[radial-gradient(ellipse_90%_120%_at_50%_110%,hsl(var(--brand-300)),transparent_75%)]'
+          : [
+              'bg-[radial-gradient(circle_at_50%_240%,hsl(var(--brand-300)),transparent_70%)]',
+              'md:bg-[radial-gradient(circle_at_50%_280%,hsl(var(--brand-300)),transparent_70%)]',
+            ],
         compact && 'items-center justify-center min-h-[35vh] lg:min-h-[50vh]'
       )}
     >
@@ -37,7 +44,7 @@ export default function HeroSection({
               {section.subtitle}
             </p>
           )}
-          <h1 className="text-3xl md:text-4xl leading-tight tracking-tight text-balance">
+          <h1 className="text-3xl md:text-4xl leading-tight tracking-tight text-balance whitespace-pre-line">
             {section.title}
           </h1>
           {section.description && (

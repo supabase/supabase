@@ -26,6 +26,11 @@ export function CommandListItem({
     <div
       ref={setRef}
       role="option"
+      aria-label={
+        item.propertyGroupLabel
+          ? `${item.propertyGroupLabel}: ${getActionItemLabel(item)}`
+          : undefined
+      }
       aria-disabled={item.disabled}
       onClick={() => {
         if (!item.disabled) onSelect(item)
@@ -51,9 +56,7 @@ export function CommandListItem({
         {includeIcon && item.icon}
         <span className="truncate">{getActionItemLabel(item)}</span>
       </span>
-      {item.count !== undefined && (
-        <code className="text-code-inline text-foreground-light">{item.count}</code>
-      )}
+      {item.count !== undefined && <code className="text-foreground-light">{item.count}</code>}
       {item.operatorSymbol && <OperatorSymbolBadge symbol={item.operatorSymbol} />}
     </div>
   )

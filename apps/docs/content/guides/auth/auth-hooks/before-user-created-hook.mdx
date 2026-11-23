@@ -173,7 +173,7 @@ This response will block the user creation and return the error message to the c
 
 ## Examples
 
-Each of the following examples shows how to use the `before-user-created` hook to control signup behavior. Each use case includes both an HTTP implementation (e.g. using an Edge Function) and a SQL implementation (Postgres function).
+Each of the following examples shows how to use the `before-user-created` hook to control signup behavior. Each use case includes both an HTTP implementation (e.g. using an [Edge Function](/docs/guides/functions)) and a SQL implementation (Postgres function).
 
 <Tabs
   scrollable
@@ -463,7 +463,7 @@ The `before-user-created` hook solves this by:
 
 Create a `.env` file with the following environment variables:
 
-```ini
+```dotenv
 BEFORE_USER_CREATED_HOOK_SECRET="v1,whsec_<base64_secret>"
 ```
 
@@ -538,7 +538,7 @@ The `before-user-created` hook solves this by:
 
 Create a `.env` file with the following environment variables:
 
-```ini
+```dotenv
 BEFORE_USER_CREATED_HOOK_SECRET="v1,whsec_<base64_secret>"
 ```
 
@@ -697,7 +697,7 @@ revoke execute
 
 Create a `.env` file with the following environment variables:
 
-```ini
+```dotenv
 BEFORE_USER_CREATED_HOOK_SECRET="v1,whsec_<base64_secret>"
 ```
 

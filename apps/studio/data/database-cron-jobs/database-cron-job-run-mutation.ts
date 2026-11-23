@@ -3,8 +3,10 @@ import { useMutation } from '@tanstack/react-query'
 import { toast } from 'sonner'
 
 import { databaseCronJobsKeys } from './keys'
+import { unguarded } from '@/data/fetchers'
 import { executeSql } from '@/data/sql/execute-sql-mutation'
-import type { ResponseError, UseCustomMutationOptions } from '@/types'
+import type { StudioError } from '@/lib/errors/studio-errors'
+import type { UseCustomMutationOptions } from '@/types'
 
 export type DatabaseCronJobRunVariables = {
   projectRef: string
@@ -23,6 +25,8 @@ export async function runDatabaseCronJobCommand({
   const { result } = await executeSql({
     projectRef,
     connectionString,
+    // EXECUTE runs the job's stored command, which the user wrote
+    sqlOrigin: 'user',
     sql: safeSql`DO $$
 DECLARE
   job_command text;
@@ -31,6 +35,7 @@ BEGIN
   EXECUTE job_command;
 END $$;`,
     queryKey: databaseCronJobsKeys.create(),
+    grant: unguarded.migrating,
   })
 
   return result
@@ -43,10 +48,10 @@ export const useDatabaseCronJobRunCommandMutation = ({
   onError,
   ...options
 }: Omit<
-  UseCustomMutationOptions<DatabaseCronJobRunData, ResponseError, DatabaseCronJobRunVariables>,
+  UseCustomMutationOptions<DatabaseCronJobRunData, StudioError, DatabaseCronJobRunVariables>,
   'mutationFn'
 > = {}) => {
-  return useMutation<DatabaseCronJobRunData, ResponseError, DatabaseCronJobRunVariables>({
+  return useMutation<DatabaseCronJobRunData, StudioError, DatabaseCronJobRunVariables>({
     mutationFn: (vars) => runDatabaseCronJobCommand(vars),
     async onSuccess(data, variables, context) {
       await onSuccess?.(data, variables, context)

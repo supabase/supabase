@@ -18,9 +18,11 @@ export const UsageFilterNotice = ({
     <ScaffoldContainer className="mt-5">
       <div className="flex flex-wrap items-center gap-x-3 gap-y-1 text-sm text-foreground-light">
         <p>
-          {branchName && `${branchName} branch only.`}
-          {!branchName && hasBranches && 'Main branch only. Other branches are tracked separately.'}
-          {!branchName && !hasBranches && 'This project only.'}
+          {branchName && <span>{`${branchName} branch only.`}</span>}
+          {!branchName && hasBranches && (
+            <span>Main branch only. Other branches are tracked separately.</span>
+          )}
+          {!branchName && !hasBranches && <span>This project only.</span>}
         </p>
         <div className="flex items-center gap-x-2">
           <Button variant="text" size="tiny" onClick={onViewOrganizationUsage}>

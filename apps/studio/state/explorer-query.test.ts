@@ -318,47 +318,26 @@ describe('explorer query drafts', () => {
     }
   })
 
-  it('normalizes a fractional persisted row limit to the default', () => {
-    const storage = createMemoryStorage()
-    storage.setItem(
-      LOCAL_STORAGE_KEYS.EXPLORER_QUERY_DRAFTS('project-a'),
-      JSON.stringify({
-        'query-1': { name: 'Query', sql: 'select 1', updatedAt: 1, rowLimit: 100.5 },
-      })
-    )
+  it.each([
+    ['a fractional', 100.5],
+    ['an out-of-range', 999999],
+    ['a non-numeric', 'unlimited'],
+  ])(
+    'normalizes %s persisted row limit to the default without dropping the draft',
+    (_, rowLimit) => {
+      const storage = createMemoryStorage()
+      storage.setItem(
+        LOCAL_STORAGE_KEYS.EXPLORER_QUERY_DRAFTS('project-a'),
+        JSON.stringify({
+          'query-1': { name: 'Query', sql: 'select 1', updatedAt: 1, rowLimit },
+        })
+      )
 
-    const state = createExplorerQueryState(storage)
-    expect(state.restoreDraft({ id: 'query-1', projectRef: 'project-a' })).toBe(true)
-    expect(state.drafts['query-1']).toMatchObject({ rowLimit: 100 })
-  })
-
-  it('normalizes an out-of-range persisted row limit to the default', () => {
-    const storage = createMemoryStorage()
-    storage.setItem(
-      LOCAL_STORAGE_KEYS.EXPLORER_QUERY_DRAFTS('project-a'),
-      JSON.stringify({
-        'query-1': { name: 'Query', sql: 'select 1', updatedAt: 1, rowLimit: 999999 },
-      })
-    )
-
-    const state = createExplorerQueryState(storage)
-    expect(state.restoreDraft({ id: 'query-1', projectRef: 'project-a' })).toBe(true)
-    expect(state.drafts['query-1']).toMatchObject({ rowLimit: 100 })
-  })
-
-  it('normalizes a non-numeric persisted row limit to the default without dropping the draft', () => {
-    const storage = createMemoryStorage()
-    storage.setItem(
-      LOCAL_STORAGE_KEYS.EXPLORER_QUERY_DRAFTS('project-a'),
-      JSON.stringify({
-        'query-1': { name: 'Query', sql: 'select 1', updatedAt: 1, rowLimit: 'unlimited' },
-      })
-    )
-
-    const state = createExplorerQueryState(storage)
-    expect(state.restoreDraft({ id: 'query-1', projectRef: 'project-a' })).toBe(true)
-    expect(state.drafts['query-1']).toMatchObject({ rowLimit: 100, uncheckedSql: 'select 1' })
-  })
+      const state = createExplorerQueryState(storage)
+      expect(state.restoreDraft({ id: 'query-1', projectRef: 'project-a' })).toBe(true)
+      expect(state.drafts['query-1']).toMatchObject({ rowLimit: 100, uncheckedSql: 'select 1' })
+    }
+  )
 
   it('persists and restores a per-draft impersonated role independently of other drafts', () => {
     const storage = createMemoryStorage()

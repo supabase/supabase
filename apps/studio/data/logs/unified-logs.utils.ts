@@ -12,7 +12,7 @@ type UnifiedLogMetadataRow = {
   event_message?: string | null
 }
 
-const unifiedLogsQueryRowSchema = z.object({
+export const unifiedLogsQueryRowSchema = z.object({
   id: z.string(),
   timestamp: z.union([z.string(), z.number()]),
   log_type: z.string(),
@@ -25,6 +25,8 @@ const unifiedLogsQueryRowSchema = z.object({
   logs: z.array(z.unknown()).nullable(),
   auth_user: z.string().nullish(),
   metadata: z.record(z.string(), z.unknown()).nullish(),
+  pipeline_id: z.string().nullish(),
+  pipeline_metadata: z.string().nullish(),
 })
 
 export type UnifiedLogsQueryRow = z.infer<typeof unifiedLogsQueryRowSchema>
@@ -46,8 +48,10 @@ const extractLeadingStatus = (s?: string) => {
   return m ? Number(m[1]) : undefined
 }
 
+const NON_REQUEST_LOG_TYPES = new Set(['compute', 'edge function runtime', 'pipelines'])
+
 export const extractLogMetadata = (row: UnifiedLogMetadataRow) => {
-  if (row.log_type === 'compute') {
+  if (row.log_type && NON_REQUEST_LOG_TYPES.has(row.log_type)) {
     return { status: null, method: null, pathname: null }
   }
 
@@ -85,6 +89,14 @@ export const mapUnifiedLogRow = (row: UnifiedLogsQueryRow) => {
     auth_user: isComputeLog ? null : row.auth_user || null,
   }
 
-  if (isComputeLog) return { ...mappedRow, metadata: row.metadata ?? null }
+  if (row.log_type === 'pipelines') {
+    const metadata = row.pipeline_metadata
+      ? z.record(z.string(), z.unknown()).parse(JSON.parse(row.pipeline_metadata))
+      : row.metadata
+    return { ...mappedRow, pipeline_id: row.pipeline_id ?? null, metadata: metadata ?? null }
+  }
+  if (isComputeLog || row.log_type === 'edge function runtime') {
+    return { ...mappedRow, metadata: row.metadata ?? null }
+  }
   return mappedRow
 }

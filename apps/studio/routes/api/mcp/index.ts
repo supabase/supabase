@@ -1,26 +1,20 @@
 import { WebStandardStreamableHTTPServerTransport } from '@modelcontextprotocol/sdk/server/webStandardStreamableHttp.js'
-import { createSupabaseMcpServer, SupabasePlatform } from '@supabase/mcp-server-supabase'
+import { createSupabaseMcpServer } from '@supabase/mcp-server-supabase'
 import { createFileRoute } from '@tanstack/react-router'
 import { stripIndent } from 'common-tags'
 import { z } from 'zod'
 
 import { commaSeparatedStringIntoArray, zBooleanString } from '@/lib/api/apiHelpers'
-import {
-  getDatabaseOperations,
-  getDebuggingOperations,
-  getDevelopmentOperations,
-} from '@/lib/api/self-hosted/mcp'
+import { getSelfHostedPlatform } from '@/lib/api/self-hosted/mcp'
 import { DEFAULT_PROJECT } from '@/lib/constants/api'
 
-// Twin of `pages/api/mcp/index.ts`. Web-fetch rewrite — the
-// pages-router version used the SDK's Node-shaped
-// `StreamableHTTPServerTransport`, which writes directly to the Node
-// `res` and can't run through the buffering `toWebHandler` shim. MCP's
-// `WebStandardStreamableHTTPServerTransport` accepts a Web `Request`
-// and returns a Web `Response` directly, so the handler can pass the
-// request through unmodified.
-
-const supportedFeatureGroupSchema = z.enum(['docs', 'database', 'development', 'debugging'])
+const supportedFeatureGroupSchema = z.enum([
+  'docs',
+  'database',
+  'development',
+  'debugging',
+  'feedback',
+])
 
 const mcpQuerySchema = z.object({
   features: z
@@ -57,11 +51,7 @@ const POST = async ({ request }: { request: Request }) => {
   const { features, read_only } = data
   const headers = request.headers
 
-  const platform: SupabasePlatform = {
-    database: getDatabaseOperations({ headers }),
-    development: getDevelopmentOperations({ headers }),
-    debugging: getDebuggingOperations({ headers }),
-  }
+  const platform = getSelfHostedPlatform({ headers })
 
   try {
     const server = createSupabaseMcpServer({

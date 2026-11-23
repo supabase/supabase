@@ -2,8 +2,9 @@ import { useMutation, useQueryClient } from '@tanstack/react-query'
 import { toast } from 'sonner'
 
 import { secretsKeys } from './keys'
-import { del, handleError } from '@/data/fetchers'
-import type { ResponseError, UseCustomMutationOptions } from '@/types'
+import { del, handleError, unguarded } from '@/data/fetchers'
+import type { StudioError } from '@/lib/errors/studio-errors'
+import type { UseCustomMutationOptions } from '@/types'
 
 export type SecretsDeleteVariables = {
   projectRef?: string
@@ -16,6 +17,7 @@ export async function deleteSecrets({ projectRef, secrets }: SecretsDeleteVariab
   const { data, error } = await del('/v1/projects/{ref}/secrets', {
     params: { path: { ref: projectRef } },
     body: secrets,
+    grant: unguarded.migrating,
   })
 
   if (error) handleError(error)
@@ -29,11 +31,11 @@ export const useSecretsDeleteMutation = ({
   onError,
   ...options
 }: Omit<
-  UseCustomMutationOptions<SecretsDeleteData, ResponseError, SecretsDeleteVariables>,
+  UseCustomMutationOptions<SecretsDeleteData, StudioError, SecretsDeleteVariables>,
   'mutationFn'
 > = {}) => {
   const queryClient = useQueryClient()
-  return useMutation<SecretsDeleteData, ResponseError, SecretsDeleteVariables>({
+  return useMutation<SecretsDeleteData, StudioError, SecretsDeleteVariables>({
     mutationFn: (vars) => deleteSecrets(vars),
     async onSuccess(data, variables, context) {
       const { projectRef } = variables

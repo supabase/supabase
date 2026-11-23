@@ -3,7 +3,8 @@ import { toast } from 'sonner'
 
 import { storageKeys } from './keys'
 import { del, handleError } from '@/data/fetchers'
-import type { ResponseError, UseCustomMutationOptions } from '@/types'
+import type { StudioError } from '@/lib/errors/studio-errors'
+import type { UseCustomMutationOptions } from '@/types'
 
 type DeleteIcebergNamespaceTableVariables = {
   warehouse: string
@@ -43,7 +44,7 @@ export const useIcebergNamespaceTableDeleteMutation = ({
 }: Omit<
   UseCustomMutationOptions<
     IcebergNamespaceTableDeleteData,
-    ResponseError,
+    StudioError,
     DeleteIcebergNamespaceTableVariables
   >,
   'mutationFn'
@@ -52,7 +53,7 @@ export const useIcebergNamespaceTableDeleteMutation = ({
 
   return useMutation<
     IcebergNamespaceTableDeleteData,
-    ResponseError,
+    StudioError,
     DeleteIcebergNamespaceTableVariables
   >({
     mutationFn: (vars) => deleteIcebergNamespaceTable({ ...vars }),

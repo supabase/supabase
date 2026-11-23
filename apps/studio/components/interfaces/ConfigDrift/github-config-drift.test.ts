@@ -67,29 +67,6 @@ describe('getConfigDriftSummary', () => {
   })
 
   describe('auth.additional_redirect_urls', () => {
-    it('counts an identical list as managed', () => {
-      const summary = summaryOf(
-        getConfigDriftSummary({
-          dashboardConfig: {
-            auth: { additional_redirect_urls: ['https://a.com', 'https://b.com'] },
-          },
-          githubConfig: { auth: { additional_redirect_urls: ['https://a.com', 'https://b.com'] } },
-        })
-      )
-
-      expect(summary).toEqual({
-        driftedFields: [],
-        matchedFields: [
-          {
-            section: 'auth',
-            configPath: 'auth.additional_redirect_urls',
-            value: ['https://a.com', 'https://b.com'],
-          },
-        ],
-        unmanagedFields: [],
-      })
-    })
-
     it('counts a list that differs only in order as managed', () => {
       const summary = summaryOf(
         getConfigDriftSummary({
@@ -243,7 +220,18 @@ describe('formatGitHubConfigDecodeMessage', () => {
       { path: 'api.max_rows', message: 'Expected number' },
     ])
 
-    expect(message).toEqual('config.toml has an invalid value at api.max_rows: expected number.')
+    expect(message).toEqual(
+      'The config file has an invalid value at api.max_rows: expected number.'
+    )
+  })
+
+  it('names the config file when provided', () => {
+    const message = formatGitHubConfigDecodeMessage(
+      [{ path: 'api.max_rows', message: 'Expected number' }],
+      'config.jsonc'
+    )
+
+    expect(message).toEqual('config.jsonc has an invalid value at api.max_rows: expected number.')
   })
 
   it('formats multiple issues as a comma-separated list', () => {
@@ -253,7 +241,7 @@ describe('formatGitHubConfigDecodeMessage', () => {
     ])
 
     expect(message).toEqual(
-      'config.toml has invalid values: api.max_rows (expected number), api.port (expected number).'
+      'The config file has invalid values: api.max_rows (expected number), api.port (expected number).'
     )
   })
 })

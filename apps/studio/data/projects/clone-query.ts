@@ -3,7 +3,8 @@ import { useQuery } from '@tanstack/react-query'
 import { projectKeys } from './keys'
 import { InfraInstanceSize } from '@/components/interfaces/DiskManagement/DiskManagement.types'
 import { get, handleError } from '@/data/fetchers'
-import type { ResponseError, UseCustomQueryOptions } from '@/types'
+import type { StudioError } from '@/lib/errors/studio-errors'
+import type { UseCustomQueryOptions } from '@/types'
 
 export async function getCloneBackups(projectRef?: string) {
   if (!projectRef) throw new Error('Project ref is required')
@@ -17,7 +18,7 @@ export async function getCloneBackups(projectRef?: string) {
 }
 
 export type CloneBackupsData = Awaited<ReturnType<typeof getCloneBackups>>
-export type CloneBackupsError = ResponseError
+export type CloneBackupsError = StudioError
 
 export const useCloneBackupsQuery = <
   TData = CloneBackupsData & {

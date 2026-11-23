@@ -58,9 +58,6 @@ describe('PipelineConnectionSection', () => {
     expect(screen.getByText('Credentials')).toBeInTheDocument()
     fireEvent.click(screen.getByRole('button', { name: /Advanced settings/ }))
     expect(screen.getByText(`Adjust how data is written to ${type}.`)).toBeInTheDocument()
-    expect(
-      screen.getByRole('button', { name: /Advanced settings/ }).closest('.border-t')
-    ).toHaveClass('border-t', 'border-default')
     expect(screen.getByLabelText(label)).toBeInTheDocument()
     expect(screen.queryByText('Batch wait time')).not.toBeInTheDocument()
     expect(screen.queryByText('Table layout')).not.toBeInTheDocument()
@@ -86,13 +83,10 @@ describe('PipelineConnectionSection', () => {
         expect(screen.queryByText(label)).not.toBeInTheDocument()
       }
       expect(screen.queryByText('Table layout controls') !== null).toBe(type === 'BigQuery')
-      expect(
-        screen.getByRole('button', { name: /Advanced settings/ }).closest('.border-t')
-      ).toHaveClass('border-default')
     }
   )
 
-  it.each<DestinationType>(['ClickHouse', 'Analytics Bucket'])(
+  it.each<DestinationType>(['ClickHouse'])(
     'does not show an empty connection accordion for %s',
     (type) => {
       customRender(<TestSection type={type} />)

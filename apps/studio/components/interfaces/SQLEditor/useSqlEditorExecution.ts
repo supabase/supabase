@@ -1,5 +1,5 @@
 import { type SafeSqlFragment } from '@supabase/pg-meta'
-import { useQueryClient } from '@tanstack/react-query'
+import { useQuery, useQueryClient } from '@tanstack/react-query'
 import { IS_PLATFORM, useParams } from 'common'
 import { useCallback, useState } from 'react'
 import { toast } from 'sonner'
@@ -13,13 +13,14 @@ import {
   shouldAutoGenerateTitle,
 } from './SQLEditor.utils'
 import { useSQLEditorContext } from './SQLEditorContext'
-import { useDatabaseEventTriggersQuery } from '@/data/database-event-triggers/database-event-triggers-query'
-import { isValidConnString } from '@/data/fetchers'
+import { databaseEventTriggersQueryOptions } from '@/data/database-event-triggers/database-event-triggers-query'
+import { isValidConnString, unguarded } from '@/data/fetchers'
 import { lintKeys } from '@/data/lint/keys'
 import { useReadReplicasQuery } from '@/data/read-replicas/replicas-query'
 import { useExecuteSqlMutation } from '@/data/sql/execute-sql-mutation'
 import { useOrgAiOptInLevel } from '@/hooks/misc/useOrgOptedIntoAi'
 import { useSelectedProjectQuery } from '@/hooks/misc/useSelectedProject'
+import { useGrant } from '@/lib/grants'
 import { useTrack } from '@/lib/telemetry/track'
 import { useDatabaseSelectorStateSnapshot } from '@/state/database-selector'
 import { useGetImpersonatedRoleState } from '@/state/role-impersonation-state'
@@ -55,9 +56,20 @@ export function useSqlEditorExecution({
     { projectRef: ref },
     { enabled: isValidConnString(project?.connectionString) }
   )
-  const { data: eventTriggers } = useDatabaseEventTriggersQuery(
-    { projectRef: project?.ref, connectionString: project?.connectionString },
-    { enabled: isValidConnString(project?.connectionString) }
+  const readGrant = useGrant(
+    'POST /platform/pg-meta/{ref}/query',
+    { projectRef: project?.ref },
+    { variant: 'read' }
+  )
+  const { data: eventTriggers } = useQuery(
+    databaseEventTriggersQueryOptions(
+      {
+        projectRef: project?.ref,
+        connectionString: project?.connectionString,
+        grant: readGrant.grant,
+      },
+      { enabled: isValidConnString(project?.connectionString) }
+    )
   )
 
   const [potentialIssues, setPotentialIssues] = useState<PotentialIssues>()
@@ -137,6 +149,7 @@ export function useSqlEditorExecution({
         handleError: (error) => {
           throw error
         },
+        grant: unguarded.migrating,
       })
 
       track('sql_editor_query_run_button_clicked', { source: 'database' })

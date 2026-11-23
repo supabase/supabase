@@ -2,7 +2,8 @@ import { useQuery } from '@tanstack/react-query'
 
 import { docsKeys } from './keys'
 import { get, handleError } from '@/data/fetchers'
-import type { ResponseError, UseCustomQueryOptions } from '@/types'
+import type { StudioError } from '@/lib/errors/studio-errors'
+import type { UseCustomQueryOptions } from '@/types'
 
 export type ProjectJsonSchemaVariables = {
   projectRef?: string
@@ -86,7 +87,7 @@ export async function getProjectJsonSchema(
 }
 
 export type ProjectJsonSchemaData = Awaited<ReturnType<typeof getProjectJsonSchema>>
-export type ProjectJsonSchemaError = ResponseError
+export type ProjectJsonSchemaError = StudioError
 
 export const useProjectJsonSchemaQuery = <TData = ProjectJsonSchemaData>(
   { projectRef }: ProjectJsonSchemaVariables,

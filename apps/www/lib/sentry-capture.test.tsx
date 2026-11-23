@@ -7,6 +7,11 @@ import { afterAll, afterEach, beforeAll, beforeEach, describe, expect, it, vi } 
 import GlobalError from '../app/global-error'
 import CustomError from '../pages/_error'
 
+vi.hoisted(() => {
+  // consent-state pulls in the shared browser helpers, which read this API at module load.
+  window.matchMedia = vi.fn().mockReturnValue({ matches: false })
+})
+
 type Transport = ReturnType<NonNullable<Parameters<typeof Sentry.init>[0]['transport']>>
 
 const envelopes: Parameters<Transport['send']>[0][] = []
@@ -129,4 +134,10 @@ describe('browser error reporting', () => {
       )
     }
   )
+
+  it('does not send browser extension messaging errors', async () => {
+    Sentry.captureException(new Error('Invalid call to runtime.sendMessage(). Tab not found.'))
+    await Sentry.flush()
+    expect(events()).toEqual([])
+  })
 })

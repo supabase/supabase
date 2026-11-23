@@ -3,7 +3,8 @@ import { toast } from 'sonner'
 
 import { storageCredentialsKeys } from './s3-access-key-keys'
 import { handleError, post } from '@/data/fetchers'
-import type { ResponseError, UseCustomMutationOptions } from '@/types'
+import type { StudioError } from '@/lib/errors/studio-errors'
+import type { UseCustomMutationOptions } from '@/types'
 
 export type CreateS3AccessKeyCredentialVariables = {
   description: string
@@ -34,14 +35,14 @@ export function useS3AccessKeyCreateMutation({
 }: Omit<
   UseCustomMutationOptions<
     S3AccessKeyCreateData,
-    ResponseError,
+    StudioError,
     CreateS3AccessKeyCredentialVariables
   >,
   'mutationFn'
 > = {}) {
   const queryClient = useQueryClient()
 
-  return useMutation<S3AccessKeyCreateData, ResponseError, CreateS3AccessKeyCredentialVariables>({
+  return useMutation<S3AccessKeyCreateData, StudioError, CreateS3AccessKeyCredentialVariables>({
     mutationFn: (vars) => createS3AccessKeyCredential(vars),
     async onSuccess(data, variables, context) {
       const { projectRef } = variables

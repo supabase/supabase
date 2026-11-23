@@ -74,33 +74,22 @@ describe('InstallIntegrationSheet', () => {
     mockExecuteSql.mockReset()
   })
 
-  it('install button is disabled when extensions are missing even if installationCommand exists', async () => {
-    mockExtensions.mockReturnValue([])
+  it.each([
+    { case: 'with', installationCommand: vi.fn().mockResolvedValue(undefined) },
+    { case: 'without', installationCommand: undefined },
+  ])(
+    'install button is disabled when extensions are missing, $case an installationCommand',
+    async ({ installationCommand }) => {
+      mockExtensions.mockReturnValue([])
 
-    customRender(
-      <InstallIntegrationSheet
-        integration={createIntegration({
-          installationCommand: vi.fn().mockResolvedValue(undefined),
-        })}
-      />
-    )
+      customRender(
+        <InstallIntegrationSheet integration={createIntegration({ installationCommand })} />
+      )
 
-    await userEvent.click(screen.getByRole('button', { name: 'Install integration' }))
-    expect(getInstallButton()).toBeDisabled()
-  })
-
-  it('install button is disabled when extensions are missing and no installationCommand', async () => {
-    mockExtensions.mockReturnValue([])
-
-    customRender(
-      <InstallIntegrationSheet
-        integration={createIntegration({ installationCommand: undefined })}
-      />
-    )
-
-    await userEvent.click(screen.getByRole('button', { name: 'Install integration' }))
-    expect(getInstallButton()).toBeDisabled()
-  })
+      await userEvent.click(screen.getByRole('button', { name: 'Install integration' }))
+      expect(getInstallButton()).toBeDisabled()
+    }
+  )
 
   it('uses installationCommand instead of SQL when provided', async () => {
     mockExtensions.mockReturnValue([

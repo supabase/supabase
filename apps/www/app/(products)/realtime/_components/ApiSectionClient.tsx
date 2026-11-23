@@ -100,7 +100,14 @@ export function ApiSectionClient({ examples }: { examples: ApiExample[] }) {
         </h3>
         <p className="text-foreground-lighter text-sm lg:text-base">
           APIs that you can understand. With powerful libraries that work on client and server-side
-          applications.
+          applications. Even use{' '}
+          <a
+            href="/library?category=Realtime"
+            className="text-foreground underline underline-offset-2 hover:text-foreground-light"
+          >
+            pre-built components
+          </a>
+          .
         </p>
       </div>
 

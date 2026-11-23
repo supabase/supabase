@@ -33,7 +33,8 @@ export const AuditLogsSelectionHeader = ({ table }: AuditLogsSelectionHeaderProp
           className="pl-10 pr-4 flex items-center justify-between border-b bg-surface-75 w-full overflow-hidden absolute top-0 left-0 right-0 z-20"
         >
           <p className="text-xs">
-            {selectedRows.length} row{selectedRows.length > 1 ? 's' : ''} selected
+            {selectedRows.length} row{selectedRows.length > 1 ? <span>s</span> : ''}{' '}
+            <span>selected</span>
           </p>
 
           <div className="flex items-center justify-center gap-x-2">

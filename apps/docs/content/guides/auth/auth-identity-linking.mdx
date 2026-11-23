@@ -94,7 +94,7 @@ response = supabase.auth.link_identity({'provider': 'google'})
 <$Show if="sdk:csharp">
 <TabPanel id="csharp" label="C#">
 
-Supabase Auth allows a user to initiate identity linking with a different email address when they are signed in. To link an OAuth identity to the user, call [`LinkIdentity()`](/docs/reference/csharp/link-identity):
+Supabase Auth allows a user to initiate identity linking with a different email address when they are signed in. To link an OAuth identity to the user, call [`LinkIdentity()`](/docs/reference/csharp/auth-linkidentity):
 
 ```c#
 var state = await supabase.Auth.LinkIdentity(Provider.Google, new SignInOptions { FlowType = OAuthFlowType.PKCE });
@@ -118,7 +118,7 @@ In the example above, the user will be redirected to Google to complete the OAut
 >
 <TabPanel id="js" label="JavaScript">
 
-For native mobile applications, you can link an identity using an ID token obtained from a third-party OAuth provider. This is useful when you want to use native OAuth flows (like Google Sign-In or [Sign in with Apple](/docs/guides/auth/social-login/auth-apple)) rather than web-based OAuth redirects.
+For native mobile applications, you can link an identity using an ID token obtained from a third-party OAuth provider. This is useful when you want to use native OAuth flows (like Google Sign-In or [Sign in with Apple](/docs/guides/auth/social-sign-in/auth-apple)) rather than web-based OAuth redirects.
 
 ```js
 // Example with Google Sign-In (using a native Google Sign-In library)
@@ -275,7 +275,7 @@ if google_identity:
 <$Show if="sdk:csharp">
 <TabPanel id="csharp" label="C#">
 
-Use `CurrentUser.Identities` to get all the identities linked to a user. Then, call [`UnlinkIdentity()`](/docs/reference/csharp/unlink-identity) to unlink the identity. The user needs to be signed in and have at least 2 linked identities in order to unlink an existing identity.
+Use `CurrentUser.Identities` to get all the identities linked to a user. Then, call [`UnlinkIdentity()`](/docs/reference/csharp/auth-unlinkidentity) to unlink the identity. The user needs to be signed in and have at least 2 linked identities in order to unlink an existing identity.
 
 ```c#
 // get all identities linked to the user
