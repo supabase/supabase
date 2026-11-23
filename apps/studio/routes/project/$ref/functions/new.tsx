@@ -1,5 +1,5 @@
 import { zodResolver } from '@hookform/resolvers/zod'
-import { createFileRoute, useNavigate } from '@tanstack/react-router'
+import { createFileRoute, Link, useNavigate } from '@tanstack/react-router'
 import { useParams } from 'common'
 import { isEqual } from 'lodash'
 import { AlertCircleIcon, BookIcon, CheckIcon } from 'lucide-react'
@@ -8,6 +8,11 @@ import { useForm } from 'react-hook-form'
 import { toast } from 'sonner'
 import {
   AiIconAnimation,
+  BreadcrumbItem,
+  BreadcrumbLink,
+  BreadcrumbList,
+  BreadcrumbPage,
+  BreadcrumbSeparator,
   Button,
   cn,
   Command,
@@ -29,10 +34,10 @@ import {
   TooltipContent,
   TooltipTrigger,
 } from 'ui'
+import { PageBreadcrumbs, PageBreadcrumbsActions } from 'ui-patterns/PageBreadcrumbs'
 import * as z from 'zod'
 
 import { EDGE_FUNCTION_TEMPLATES } from '@/components/interfaces/Functions/Functions.templates'
-import { PageLayout } from '@/components/layouts/PageLayout/PageLayout'
 import { SIDEBAR_KEYS } from '@/components/layouts/ProjectLayout/LayoutSidebar/LayoutSidebarProvider'
 import { DiscardChangesConfirmationDialog } from '@/components/ui-patterns/Dialogs/DiscardChangesConfirmationDialog'
 import { FileExplorerAndEditor } from '@/components/ui/FileExplorerAndEditor'
@@ -118,7 +123,8 @@ const INITIAL_FILES: FileData[] = [
 
 function NewFunctionPage() {
   const navigate = useNavigate()
-  const { ref, template } = useParams()
+  const { ref } = Route.useParams()
+  const { template } = useParams()
   const { data: project } = useSelectedProjectQuery()
   const { data: org } = useSelectedOrganizationQuery()
   const snap = useAiAssistantStateSnapshot()
@@ -291,74 +297,80 @@ function NewFunctionPage() {
     })
 
   return (
-    <PageLayout
-      size="full"
-      isCompact
-      title="Create new edge function"
-      breadcrumbs={[
-        {
-          label: 'Edge Functions',
-          href: `/project/${ref}/functions`,
-        },
-      ]}
-      primaryActions={
-        <>
-          <Popover open={open} onOpenChange={setOpen}>
-            <PopoverTrigger asChild>
-              <Button
-                size="tiny"
-                role="combobox"
-                aria-expanded={open}
-                aria-controls={templatesListboxId}
-                icon={<BookIcon size={14} />}
-              >
-                Templates
-              </Button>
-            </PopoverTrigger>
-            <PopoverContent id={templatesListboxId} className="w-[300px] p-0" align="end">
-              <Command>
-                <CommandInput placeholder="Search templates..." />
-                <CommandList>
-                  <CommandEmpty>No templates found.</CommandEmpty>
-                  <CommandGroup>
-                    {templates.map((template) => (
-                      <CommandItem
-                        key={template.value}
-                        value={template.value}
-                        onSelect={onSelectTemplate}
-                        onMouseEnter={() => handleTemplateMouseEnter(template.content)}
-                        onMouseLeave={handleTemplateMouseLeave}
-                        className="cursor-pointer"
-                      >
-                        <div className="flex flex-col gap-1">
-                          <div className="flex items-center">
-                            <CheckIcon
-                              className={cn(
-                                'mr-2 h-4 w-4',
-                                files.some((f) => f.content === template.content)
-                                  ? 'opacity-100'
-                                  : 'opacity-0'
-                              )}
-                            />
-                            <span className="text-foreground">{template.name}</span>
+    <div className="flex h-full min-h-full w-full flex-col items-stretch">
+      <PageBreadcrumbs
+        actions={
+          <PageBreadcrumbsActions>
+            <Popover open={open} onOpenChange={setOpen}>
+              <PopoverTrigger asChild>
+                <Button
+                  size="tiny"
+                  role="combobox"
+                  aria-expanded={open}
+                  aria-controls={templatesListboxId}
+                  icon={<BookIcon size={14} />}
+                >
+                  Templates
+                </Button>
+              </PopoverTrigger>
+              <PopoverContent id={templatesListboxId} className="w-[300px] p-0" align="end">
+                <Command>
+                  <CommandInput placeholder="Search templates..." />
+                  <CommandList>
+                    <CommandEmpty>No templates found.</CommandEmpty>
+                    <CommandGroup>
+                      {templates.map((template) => (
+                        <CommandItem
+                          key={template.value}
+                          value={template.value}
+                          onSelect={onSelectTemplate}
+                          onMouseEnter={() => handleTemplateMouseEnter(template.content)}
+                          onMouseLeave={handleTemplateMouseLeave}
+                          className="cursor-pointer"
+                        >
+                          <div className="flex flex-col gap-1">
+                            <div className="flex items-center">
+                              <CheckIcon
+                                className={cn(
+                                  'mr-2 h-4 w-4',
+                                  files.some((f) => f.content === template.content)
+                                    ? 'opacity-100'
+                                    : 'opacity-0'
+                                )}
+                              />
+                              <span className="text-foreground">{template.name}</span>
+                            </div>
+                            <span className="text-xs text-foreground-light pl-6">
+                              {template.description}
+                            </span>
                           </div>
-                          <span className="text-xs text-foreground-light pl-6">
-                            {template.description}
-                          </span>
-                        </div>
-                      </CommandItem>
-                    ))}
-                  </CommandGroup>
-                </CommandList>
-              </Command>
-            </PopoverContent>
-          </Popover>
-          <Button size="tiny" onClick={handleChat} icon={<AiIconAnimation size={16} />}>
-            Chat
-          </Button>
-        </>
-      }
-    >
+                        </CommandItem>
+                      ))}
+                    </CommandGroup>
+                  </CommandList>
+                </Command>
+              </PopoverContent>
+            </Popover>
+            <Button size="tiny" onClick={handleChat} icon={<AiIconAnimation size={16} />}>
+              Chat
+            </Button>
+          </PageBreadcrumbsActions>
+        }
+      >
+        <BreadcrumbList>
+          <BreadcrumbItem>
+            <BreadcrumbLink asChild>
+              <Link to="/project/$ref/functions" params={{ ref }}>
+                Edge Functions
+              </Link>
+            </BreadcrumbLink>
+          </BreadcrumbItem>
+          <BreadcrumbSeparator />
+          <BreadcrumbItem>
+            <BreadcrumbPage>Create new edge function</BreadcrumbPage>
+          </BreadcrumbItem>
+        </BreadcrumbList>
+      </PageBreadcrumbs>
       <FileExplorerAndEditor
         files={files}
         onFilesChange={setFiles}
@@ -426,6 +438,6 @@ function NewFunctionPage() {
         onCancel={handleCancelNavigation}
         onClose={handleConfirmNavigation}
       />
-    </PageLayout>
+    </div>
   )
 }
