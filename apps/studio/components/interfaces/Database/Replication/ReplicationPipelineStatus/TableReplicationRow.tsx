@@ -93,10 +93,10 @@ export const TableReplicationRow = ({
         ) : showDisabledState ? (
           <p className="text-sm text-foreground-lighter">{disabledStateMessage}</p>
         ) : isErrorState ? (
-          <div className="flex flex-col gap-y-3 text-sm text-foreground-lighter">
-            <p>{statusConfig.description}.</p>
+          <p className="text-sm text-foreground-lighter">
+            <span>{statusConfig.description}. </span>
             <ErroredTableDetails table={table} />
-          </div>
+          </p>
         ) : (
           <p className="text-sm text-foreground-lighter">{detailsLine}</p>
         )}

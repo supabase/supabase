@@ -3,6 +3,7 @@ import { ActivityIcon, ChevronDownIcon, RotateCcwIcon, SearchIcon, XIcon } from 
 import Link from 'next/link'
 import { parseAsString, useQueryState } from 'nuqs'
 import { useContext, useMemo, useState } from 'react'
+import { createPortal } from 'react-dom'
 import {
   Button,
   Card,
@@ -39,7 +40,7 @@ import {
   getPipelineUnifiedLogsUrl,
   getStatusName,
 } from '../Pipeline.utils'
-import { PipelineNoticeContext } from '../PipelineNoticeContext'
+import { PipelineNoticeContext, PipelineTableNoticeContext } from '../PipelineNoticeContext'
 import { PipelineStatusName } from '../Replication.constants'
 import { RestartTableDialog } from '../RestartTableDialog'
 import { PipelineHealthSection } from './PipelineHealthSection'
@@ -231,6 +232,7 @@ export const ReplicationPipelineStatus = () => {
   const showDisabledState = isPipelineBusy || !isPipelineActionable
   const canResetErroredTables = hasErroredTables && !showDisabledState
   const isNoticeAboveOverview = useContext(PipelineNoticeContext)
+  const tableNoticeTarget = useContext(PipelineTableNoticeContext)
   const stateNotice = getPipelineStateNotice({ requestStatus, statusName, tableStatuses })
   const isSlotDisconnected =
     !isStatusError && statusName === PipelineStatusName.STARTED && applyLagMetrics?.active === false
@@ -245,8 +247,39 @@ export const ReplicationPipelineStatus = () => {
     statusName,
   })
 
+  const tableErrorNotice =
+    hasErroredTables && statusName === PipelineStatusName.STARTED && !showDisabledState ? (
+      <Admonition
+        type="destructive"
+        layout="responsive"
+        title={
+          erroredTables.length === 1
+            ? '1 table stopped replicating'
+            : `${erroredTables.length} tables stopped replicating`
+        }
+        description="Open the error details before choosing recovery. Resetting a table clears its progress and replaces its destination data."
+        actions={
+          <Button
+            variant="default"
+            icon={<RotateCcwIcon />}
+            disabled={isPipelineBusy || isPipelineError}
+            loading={isPipelineBusy}
+            onClick={() => {
+              setBatchRestartMode('errored')
+              setShowBatchRestartDialog(true)
+            }}
+          >
+            Reset failed tables
+          </Button>
+        }
+      />
+    ) : null
+
   return (
     <>
+      {isNoticeAboveOverview &&
+        tableNoticeTarget &&
+        createPortal(tableErrorNotice, tableNoticeTarget)}
       <PageContainer size="large">
         <p className="sr-only" role="status" aria-live="polite">
           {isLoading ? 'Loading pipeline details' : ''}
@@ -280,32 +313,7 @@ export const ReplicationPipelineStatus = () => {
               />
             )}
 
-            {hasErroredTables && !showDisabledState && (
-              <Admonition
-                type="destructive"
-                layout="responsive"
-                title={
-                  erroredTables.length === 1
-                    ? '1 table stopped replicating'
-                    : `${erroredTables.length} tables stopped replicating`
-                }
-                description="Open the error details before choosing recovery. Resetting a table clears its progress and replaces its destination data."
-                actions={
-                  <Button
-                    variant="default"
-                    icon={<RotateCcwIcon />}
-                    disabled={isPipelineBusy || isPipelineError}
-                    loading={isPipelineBusy}
-                    onClick={() => {
-                      setBatchRestartMode('errored')
-                      setShowBatchRestartDialog(true)
-                    }}
-                  >
-                    Reset failed tables
-                  </Button>
-                }
-              />
-            )}
+            {!isNoticeAboveOverview && tableErrorNotice}
 
             {!isNoticeAboveOverview && isSlotDisconnected && (
               <Admonition

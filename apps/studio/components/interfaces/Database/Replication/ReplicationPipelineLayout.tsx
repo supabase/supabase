@@ -62,7 +62,7 @@ import {
   getRestartRequestStatus,
   getStatusName,
 } from './Pipeline.utils'
-import { PipelineNoticeContext } from './PipelineNoticeContext'
+import { PipelineNoticeContext, PipelineTableNoticeContext } from './PipelineNoticeContext'
 import { PipelineStatePill } from './PipelineStatePill'
 import { PipelineStatusName } from './Replication.constants'
 import { ReplicationDiagram } from './ReplicationDiagram'
@@ -79,7 +79,10 @@ import {
   getPipelineHealthNotice,
   getPipelineStateNotice,
 } from './ReplicationPipelineStatus/PipelineOverview.utils'
-import { getFormattedLagValue } from './ReplicationPipelineStatus/ReplicationPipelineStatus.utils'
+import {
+  getFormattedLagValue,
+  getInitialSyncProgress,
+} from './ReplicationPipelineStatus/ReplicationPipelineStatus.utils'
 import { UnknownDestinationNotice } from './UnknownDestinationNotice'
 import { UpdateVersionModal } from './UpdateVersionModal'
 import { useReplicationClusters } from './useReplicationClusters'
@@ -127,6 +130,7 @@ export const ReplicationPipelineLayout = ({ children }: PropsWithChildren) => {
   const [showUpdateVersionModal, setShowUpdateVersionModal] = useState(false)
   const [showDeleteDestination, setShowDeleteDestination] = useState(false)
   const [isDeleting, setIsDeleting] = useState(false)
+  const [tableNoticeTarget, setTableNoticeTarget] = useState<HTMLDivElement | null>(null)
   const [, setEdit] = useQueryState(
     'edit',
     parseAsInteger.withOptions({ history: 'push', clearOnDefault: true })
@@ -193,6 +197,22 @@ export const ReplicationPipelineLayout = ({ children }: PropsWithChildren) => {
   )
   const statusName = getStatusName(pipelineStatusData?.status)
   const displayState = getPipelineDisplayState(requestStatus, statusName)
+  const { syncingCount } = getInitialSyncProgress(replicationStatusData?.table_statuses ?? [])
+  const lagBytes = replicationStatusData?.apply_lag?.confirmed_flush_lsn_bytes
+  const isLagLive =
+    statusName === PipelineStatusName.STARTED &&
+    !isLagError &&
+    !isPipelineStatusError &&
+    requestStatus === PipelineStatusRequestStatus.None
+  let headerLag: string | undefined
+  if (lagBytes != null) headerLag = `Last reported lag: ${lag.display}`
+  if (isLagLive) {
+    if (syncingCount > 0) headerLag = 'Initial sync'
+    else if (lagBytes === 0) headerLag = 'Caught up'
+    else if (lagBytes != null) headerLag = `Lag: ${lag.display}`
+    else headerLag = 'Lag unavailable'
+  }
+
   const healthNotice = getPipelineHealthNotice({
     statusName,
     metrics: replicationStatusData?.apply_lag,
@@ -417,14 +437,14 @@ export const ReplicationPipelineLayout = ({ children }: PropsWithChildren) => {
                   projectRef={projectRef}
                   pipelineId={pipelineId}
                 />
-                <span aria-hidden="true">•</span>
-                <span className="text-foreground-light" aria-label="Replication lag">
-                  <span>{lag.display}</span>
-                  {replicationStatusData?.apply_lag?.confirmed_flush_lsn_bytes !== undefined &&
-                    (statusName !== PipelineStatusName.STARTED ||
-                      isLagError ||
-                      isPipelineStatusError) && <span> (last reported)</span>}
-                </span>
+                {headerLag && (
+                  <>
+                    <span aria-hidden="true">•</span>
+                    <span className="text-foreground-light" aria-label="Replication lag">
+                      {headerLag}
+                    </span>
+                  </>
+                )}
               </PageHeaderDescription>
             </PageHeaderSummary>
 
@@ -432,12 +452,12 @@ export const ReplicationPipelineLayout = ({ children }: PropsWithChildren) => {
               <div className="flex flex-wrap items-center justify-end gap-2">
                 {hasUpdate && (
                   <Button
-                    variant="primary"
+                    variant="default"
                     icon={<ArrowUpCircleIcon />}
                     onClick={() => setShowUpdateVersionModal(true)}
                     disabled={isPipelineRequestPending || isTransitioning}
                   >
-                    Update available
+                    Update
                   </Button>
                 )}
                 {canShowLifecycleAction && (
@@ -485,13 +505,13 @@ export const ReplicationPipelineLayout = ({ children }: PropsWithChildren) => {
                         className="gap-x-2 items-start"
                         onClick={() => onLifecycleAction('restart')}
                         aria-label="Restart pipeline"
-                        aria-description="Resume saved progress. Unfinished initial syncs start over."
+                        aria-description="Unfinished initial syncs restart."
                       >
                         <RotateCcwIcon size={14} className="mt-0.5 shrink-0" />
                         <div>
                           <span>Restart pipeline</span>
                           <p className="text-xs text-foreground-lighter">
-                            Resume saved progress. Unfinished initial syncs start over.
+                            Unfinished initial syncs restart.
                           </p>
                         </div>
                       </DropdownMenuItem>
@@ -535,7 +555,7 @@ export const ReplicationPipelineLayout = ({ children }: PropsWithChildren) => {
       </div>
 
       {isPipelineIdentityLoading && !pipelineError && (
-        <PageContainer size="large">
+        <PageContainer size="large" className="pt-8">
           <span className="sr-only">Loading pipeline details</span>
           <GenericSkeletonLoader />
         </PageContainer>
@@ -558,7 +578,7 @@ export const ReplicationPipelineLayout = ({ children }: PropsWithChildren) => {
       )}
 
       {pipeline && !isPipelineIdentityLoading && (
-        <PageContainer size="large" className="flex flex-col gap-y-6 pt-6">
+        <PageContainer size="large" className="flex flex-col gap-y-6 pt-8">
           {stateNotice && statusName !== PipelineStatusName.STOPPED && (
             <Admonition
               layout="responsive"
@@ -569,20 +589,19 @@ export const ReplicationPipelineLayout = ({ children }: PropsWithChildren) => {
               actions={renderNoticeActions()}
             />
           )}
-          {!stateNotice && (isPipelineStatusError || hasTableErrors) && (
+          {!stateNotice && isPipelineStatusError && (
             <Admonition
               layout="responsive"
               className="mb-2"
               type="warning"
-              title="Pipeline needs attention"
-              description="Check pipeline health and logs to investigate."
-              actions={
-                <a href="#pipeline-health" className="text-sm underline">
-                  View pipeline health
-                </a>
-              }
+              title="Pipeline status unavailable"
+              description="We can’t reach this pipeline right now. We’re retrying automatically."
             />
           )}
+          {hasTableErrors &&
+            statusName === PipelineStatusName.STARTED &&
+            !isTransitioning &&
+            !isLagError && <div ref={setTableNoticeTarget} />}
           <ReplicationDiagram pipelineId={pipeline.id} clusterId={clusterId} />
           <PageSection className="pt-6 last:pb-0">
             <PageSectionMeta>
@@ -622,6 +641,16 @@ export const ReplicationPipelineLayout = ({ children }: PropsWithChildren) => {
                         <span>{destinationType ?? 'Destination'}</span>
                       </span>
                     </PipelineDetailItem>
+                    {destinationIdentity.host && (
+                      <PipelineDetailItem label="Host">
+                        {destinationIdentity.host}
+                      </PipelineDetailItem>
+                    )}
+                    {destinationIdentity.databaseName && (
+                      <PipelineDetailItem label="Database">
+                        {destinationIdentity.databaseName}
+                      </PipelineDetailItem>
+                    )}
                     {destinationIdentity.projectId && (
                       <PipelineDetailItem label="Project">
                         {destinationIdentity.projectId}
@@ -641,7 +670,9 @@ export const ReplicationPipelineLayout = ({ children }: PropsWithChildren) => {
       )}
 
       <PipelineNoticeContext.Provider value={true}>
-        {!isUnknownDestination && (canModify || pipelineError) && children}
+        <PipelineTableNoticeContext.Provider value={tableNoticeTarget}>
+          {!isUnknownDestination && (canModify || pipelineError) && children}
+        </PipelineTableNoticeContext.Provider>
       </PipelineNoticeContext.Provider>
 
       <DestinationPanel />

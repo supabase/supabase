@@ -4,7 +4,7 @@ import {
   CircleStopIcon,
   EditIcon,
   EyeIcon,
-  FileTextIcon,
+  ListIcon,
   MoreVerticalIcon,
   PlayIcon,
   RotateCcwIcon,
@@ -212,7 +212,7 @@ export const RowMenu = ({
                   { projectRef, pipelineId: pipeline.id }
                 )}
               >
-                <FileTextIcon size={14} />
+                <ListIcon size={14} />
                 <span>View logs</span>
               </Link>
             </DropdownMenuItem>
@@ -251,13 +251,13 @@ export const RowMenu = ({
                   className="gap-x-2 items-start"
                   onClick={onRestartPipeline}
                   aria-label="Restart pipeline"
-                  aria-description="Resume saved progress. Unfinished initial syncs start over."
+                  aria-description="Unfinished initial syncs restart."
                 >
                   <RotateCcwIcon size={14} className="mt-0.5 shrink-0" />
                   <div>
                     <p>Restart pipeline</p>
                     <p className="text-xs text-foreground-lighter">
-                      Resume saved progress. Unfinished initial syncs start over.
+                      Unfinished initial syncs restart.
                     </p>
                   </div>
                 </DropdownMenuItem>

@@ -245,6 +245,46 @@ describe('ReplicationPipelineLayout', () => {
     mockVersion(false)
   })
 
+  test.each<{ status: Parameters<typeof mockStatus>[0]; bytes: number; label: string }>([
+    { status: 'started', bytes: 4096, label: 'Lag: 4 KB' },
+    { status: 'started', bytes: 0, label: 'Caught up' },
+    { status: 'failed', bytes: 4096, label: 'Last reported lag: 4 KB' },
+    { status: 'stopped', bytes: 4096, label: 'Last reported lag: 4 KB' },
+  ])('names the header lag for $status with $bytes bytes', async ({ status, bytes, label }) => {
+    mockStatus(status)
+    addAPIMock({
+      method: 'get',
+      path: '/platform/replication/:ref/pipelines/:pipeline_id/replication-status',
+      response: () =>
+        HttpResponse.json<PipelineReplicationStatusResponse>({
+          pipeline_id: '42',
+          table_statuses: [],
+          apply_lag: { active: true, confirmed_flush_lsn_bytes: bytes },
+        }),
+    })
+    renderLayout()
+    await waitFor(() => expect(screen.getByLabelText('Replication lag')).toHaveTextContent(label))
+  })
+
+  test('shows the ClickHouse host and database in Overview', async () => {
+    mockPipeline('42', {
+      ...DESTINATION,
+      config: {
+        clickhouse: {
+          url: 'https://preview.clickhouse.example',
+          user: 'default',
+          database: 'operations',
+          engine: 'merge_tree',
+        },
+      },
+    })
+    renderLayout()
+    const host = await screen.findByText('Host')
+    expect(within(host.parentElement!).getByText('preview.clickhouse.example')).toBeVisible()
+    const database = screen.getByText('Database', { exact: true })
+    expect(within(database.parentElement!).getByText('operations')).toBeVisible()
+  })
+
   test.each(['00150', '03h6pes1npx2ptvf052my5nx2'.repeat(4)])(
     'shows the full pipeline ID %s in the overview without a copy action',
     async (pipelineId) => {
@@ -256,6 +296,7 @@ describe('ReplicationPipelineLayout', () => {
       renderLayout()
 
       expect(await screen.findByText(pipelineId)).toBeVisible()
+      expect(screen.queryByLabelText('Replication lag')).not.toBeInTheDocument()
       expect(screen.getByRole('heading', { name: 'Overview' })).toBeVisible()
       expect(
         screen.queryByRole('button', { name: `Copy pipeline ID ${pipelineId}` })
@@ -274,7 +315,7 @@ describe('ReplicationPipelineLayout', () => {
 
       expect((await screen.findAllByRole('img', { name: 'Unknown destination' }))[0]).toBeVisible()
       expect(
-        screen.queryByRole('button', { name: /^(Start|Restart|Update available)$/ })
+        screen.queryByRole('button', { name: /^(Start|Restart|Update)$/ })
       ).not.toBeInTheDocument()
       expect(screen.queryByRole('button', { name: /Reset/ })).not.toBeInTheDocument()
       if (status === 'stopped') {
@@ -505,9 +546,7 @@ describe('ReplicationPipelineLayout', () => {
     // Primary button is Stop while running, so the menu carries Restart instead
     const restartAction = await screen.findByRole('menuitem', { name: 'Restart pipeline' })
     expect(restartAction).toBeVisible()
-    expect(restartAction).toHaveAccessibleDescription(
-      'Resume saved progress. Unfinished initial syncs start over.'
-    )
+    expect(restartAction).toHaveAccessibleDescription('Unfinished initial syncs restart.')
     expect(screen.queryByRole('menuitem', { name: 'Stop pipeline' })).not.toBeInTheDocument()
   })
 
@@ -518,7 +557,7 @@ describe('ReplicationPipelineLayout', () => {
 
     const lifecycleAction = await screen.findByRole('button', { name: 'Stop' })
     const options = screen.getByRole('button', { name: 'Pipeline options' })
-    const update = await screen.findByRole('button', { name: 'Update available' })
+    const update = await screen.findByRole('button', { name: 'Update' })
     expect(lifecycleAction).toBeEnabled()
     expect(options).toBeEnabled()
     expect(update).toBeEnabled()
@@ -558,7 +597,7 @@ describe('ReplicationPipelineLayout', () => {
 
     renderLayout()
 
-    const updateButton = await screen.findByRole('button', { name: 'Update available' })
+    const updateButton = await screen.findByRole('button', { name: 'Update' })
     await userEvent.click(updateButton)
     // The trigger button shares this name, so match the dialog's heading specifically
     expect(await screen.findByRole('heading', { name: 'Update available' })).toBeVisible()

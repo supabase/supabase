@@ -59,5 +59,7 @@ test('shows ClickHouse host and database without credentials or URL query parame
     },
   })
   expect(result.label).toBe('preview.example:8443 / events')
+  expect(result.host).toBe('preview.example:8443')
+  expect(result.databaseName).toBe('events')
   expect(result.id).not.toContain('secret')
 })

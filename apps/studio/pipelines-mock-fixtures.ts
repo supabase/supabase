@@ -35,26 +35,49 @@ const statuses = [
   'stopped',
   'started',
 ]
+const getDestinationConfig = (destinationId: number, scenario: string) => {
+  if (scenario === 'busy') {
+    if (destinationId === 5)
+      return {
+        snowflake: {
+          account_id: 'PREVIEW-ANALYTICS',
+          user: 'PIPELINES_USER',
+          database: 'WAREHOUSE',
+          schema: 'PUBLIC',
+        },
+      }
+    if (destinationId === 6)
+      return {
+        ducklake: {
+          catalog_url: 'postgres://preview.invalid/catalog',
+          data_path: 's3://preview-lake/events/',
+          metadata_schema: 'ducklake',
+          s3_region: 'us-east-1',
+        },
+      }
+    if (destinationId >= 7)
+      return {
+        clickhouse: {
+          url: 'https://preview.clickhouse.example',
+          user: 'default',
+          database: 'operations',
+        },
+      }
+  }
+  return {
+    big_query: {
+      connection_pool_size: 8,
+      dataset_id: 'analytics',
+      project_id: 'preview-warehouse',
+    },
+  }
+}
+
 const getDestination = (pipeline: (typeof allPipelines)[number], scenario: string) => ({
   id: pipeline.destination_id,
   name: pipeline.destination_name,
   tenant_id: projectRef,
-  config:
-    scenario === 'busy' && pipeline.destination_id >= 7
-      ? {
-          clickhouse: {
-            url: 'https://preview.clickhouse.example',
-            user: 'default',
-            database: 'operations',
-          },
-        }
-      : {
-          big_query: {
-            connection_pool_size: 8,
-            dataset_id: 'analytics',
-            project_id: 'preview-warehouse',
-          },
-        },
+  config: getDestinationConfig(pipeline.destination_id, scenario),
 })
 
 export function getPipelinesMockResponse(

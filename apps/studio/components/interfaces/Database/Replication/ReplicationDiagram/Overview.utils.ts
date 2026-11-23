@@ -37,6 +37,8 @@ export function getOverviewDestination({
     return {
       id: JSON.stringify(['ClickHouse', endpoint.origin, database]),
       type,
+      host: endpoint.host,
+      databaseName: database,
       label: `${endpoint.host} / ${database}`,
     }
   }
