@@ -85,7 +85,7 @@ If you depend on any of these overrides, plan to migrate before they are removed
   - Fixed transaction-mode clients hanging with 4 or more pipelined queries - [supavisor#1207](https://github.com/supabase/supavisor/pull/1207)
 - Updated PgBouncer to `v1.26.1-p0` (requires `docker-compose.pgbouncer.yml` update)
   - ⚠️ Fixed **security** issues reachable through the published pooler port, including unauthenticated crashes (CVE-2026-19888, CVE-2026-6668, CVE-2026-107349, CVE-2026-107350) - [PgBouncer news](https://github.com/pgbouncer/pgbouncer/blob/master/NEWS.md)
-  - Changed: `search_path` in connection parameters is ignored (`IGNORE_STARTUP_PARAMETERS`), so it can't leak between clients in transaction mode - [pgbouncer#1635](https://github.com/pgbouncer/pgbouncer/issues/1635)
+  - Changed: `search_path` passed at connect time is now ignored, not rejected, so it can't leak between clients (`IGNORE_STARTUP_PARAMETERS`). Use `SET LOCAL search_path` or schema-qualified names - [pgbouncer#1635](https://github.com/pgbouncer/pgbouncer/issues/1635)
 
 ### Analytics (Logflare)
 - Updated Vector to `0.62.0-alpine` (requires `docker-compose.logs.yml` update) - [Release](https://github.com/vectordotdev/vector/releases/tag/v0.62.0)

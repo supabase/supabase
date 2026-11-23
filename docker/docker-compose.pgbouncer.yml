@@ -56,5 +56,6 @@ services:
       STATS_USERS: pgbouncer
       # PgBouncer 1.26 accepts search_path in startup parameters, and in
       # transaction mode it can leak between clients on Postgres 17 and earlier
-      # (pgbouncer/pgbouncer#1635). Ignore it instead.
+      # (pgbouncer/pgbouncer#1635). Ignore it instead: such clients get the
+      # default search_path. Use SET LOCAL search_path or qualified names.
       IGNORE_STARTUP_PARAMETERS: extra_float_digits,search_path
