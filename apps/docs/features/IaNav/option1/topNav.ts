@@ -50,6 +50,7 @@ export const GLOBAL_MENU_ITEMS: GlobalMenuItems = [
           },
           { label: 'Auth', icon: 'auth', href: '/guides/auth', level: 'auth' },
           { label: 'Storage', icon: 'storage', href: '/guides/storage', level: 'storage' },
+          { label: 'Realtime', icon: 'realtime', href: '/guides/realtime', level: 'realtime' },
           {
             label: 'Edge Functions',
             icon: 'edge-functions',
@@ -57,7 +58,7 @@ export const GLOBAL_MENU_ITEMS: GlobalMenuItems = [
             level: 'functions',
           },
           {
-            label: 'REST, GraphQL and Realtime',
+            label: 'REST and GraphQL APIs',
             icon: 'rest',
             href: '/guides/api',
             level: 'api',
