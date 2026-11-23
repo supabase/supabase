@@ -117,13 +117,20 @@ Next.js static page rendering can cache user metadata and serve it to other anon
 
 ## Access control
 
-An anonymous user uses the `authenticated` role, like a permanent user. To tell them apart in row-level security (RLS) policies, check the `is_anonymous` claim in the JWT that `auth.jwt()` returns:
+An anonymous user uses the `authenticated` role, like a permanent user. To tell them apart in row-level security (RLS) policies, check the `is_anonymous` claim in the JWT that `auth.jwt()` returns.
+
+Run the following SQL using the [SQL Editor](/dashboard/project/_/sql) in the Supabase Dashboard or with `psql` over a direct connection. To connect with `psql`, see [Direct connection](/docs/guides/database/connecting-to-postgres#direct-connection).
 
 ```sql
 create policy "Only permanent users can post to the news feed"
 on news_feed as restrictive for insert
 to authenticated
 with check ((select (auth.jwt()->>'is_anonymous')::boolean) is false );
+
+create policy "Permanent users can post to the news feed"
+on news_feed for insert
+to authenticated
+with check ( true );
 
 create policy "Anonymous and permanent users can view the news feed"
 on news_feed for select
@@ -140,7 +147,9 @@ If your policies check the `is_anonymous` claim, a guest who links an email, pho
 
 </Admonition>
 
-To check the current state, read `is_anonymous` from `auth.users` through a [`security definer` function](/docs/guides/database/postgres/row-level-security#use-security-definer-functions). Create the function in a schema the Data API doesn't expose, such as `private`, and set `search_path = ''`:
+To check the current state, read `is_anonymous` from `auth.users` through a [`security definer` function](/docs/guides/database/postgres/row-level-security#use-security-definer-functions). Create the function in a schema the Data API doesn't expose, such as `private`, and set `search_path = ''`.
+
+Run the following SQL using the [SQL Editor](/dashboard/project/_/sql) in the Supabase Dashboard or with `psql` over a direct connection. To connect with `psql`, see [Direct connection](/docs/guides/database/connecting-to-postgres#direct-connection).
 
 ```sql
 create schema if not exists private;
@@ -162,11 +171,12 @@ revoke all on function private.is_permanent_user() from public;
 grant usage on schema private to authenticated;
 grant execute on function private.is_permanent_user() to authenticated;
 
-create policy "Only permanent users can post to the news feed"
-on news_feed as restrictive for insert
-to authenticated
+alter policy "Only permanent users can post to the news feed"
+on news_feed
 with check ( (select private.is_permanent_user()) );
 ```
+
+The `alter policy` statement replaces the claim check in the policy from the previous example, so stale tokens no longer fail. For a fresh setup, create the policy with `create policy ... as restrictive for insert` and the same `with check` expression, and add the permissive insert policy from the previous example.
 
 <Admonition type="note" title="Use restrictive policies">
 
