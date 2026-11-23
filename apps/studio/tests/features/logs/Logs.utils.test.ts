@@ -40,7 +40,9 @@ describe('fillTimeseries', () => {
     const result = fillTimeseries(data, 'timestamp', 'value', 0, min, max, 20, '2m')
 
     expect(result).toHaveLength(5)
-    const sortedResult = result.sort((a, b) => a.timestamp.localeCompare(b.timestamp))
+    const sortedResult = result.sort((a, b) =>
+      String(a.timestamp).localeCompare(String(b.timestamp))
+    )
 
     expect(sortedResult[0]).toEqual({ timestamp: '2023-01-01T00:00:00.000Z', value: 0 })
     expect(sortedResult[1]).toEqual({ timestamp: '2023-01-01T00:01:00.000Z', value: 10 })
@@ -57,7 +59,9 @@ describe('fillTimeseries', () => {
     const result = fillTimeseries(data, 'timestamp', ['count1', 'count2'], 5, min, max, 20, '1m')
 
     expect(result).toHaveLength(3)
-    const sortedResult = result.sort((a, b) => a.timestamp.localeCompare(b.timestamp))
+    const sortedResult = result.sort((a, b) =>
+      String(a.timestamp).localeCompare(String(b.timestamp))
+    )
 
     expect(sortedResult[0]).toEqual({ timestamp: '2023-01-01T00:00:00.000Z', count1: 5, count2: 5 })
     expect(sortedResult[1]).toEqual({
@@ -191,7 +195,9 @@ describe('fillTimeseries', () => {
     const result = fillTimeseries(data, 'timestamp', 'value', 0, min, max, 20, '1m')
 
     expect(result).toHaveLength(3)
-    const sortedResult = result.sort((a, b) => a.timestamp.localeCompare(b.timestamp))
+    const sortedResult = result.sort((a, b) =>
+      String(a.timestamp).localeCompare(String(b.timestamp))
+    )
 
     expect(sortedResult[0]).toEqual({ timestamp: '2023-01-01T00:00:00.000Z', value: 0 })
     expect(sortedResult[1]).toEqual({ timestamp: '2023-01-01T00:01:00.000Z', value: 1 })

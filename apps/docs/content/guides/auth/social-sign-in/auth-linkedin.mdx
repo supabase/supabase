@@ -125,7 +125,7 @@ suspend fun signInWithKaLinkedIn() {
 <$Show if="sdk:csharp">
 <TabPanel id="csharp" label="C#">
 
-When your user signs in, call [`SignIn()`](/docs/reference/csharp/sign-in-with-oauth) with `Provider.LinkedInOIDC` as the provider:
+When your user signs in, call [`SignIn()`](/docs/reference/csharp/auth-signinwithoauth) with `Provider.LinkedInOIDC` as the provider:
 
 ```c#
 var state = await supabase.Auth.SignIn(Provider.LinkedInOIDC);
@@ -188,7 +188,7 @@ suspend fun signOut() {
 <$Show if="sdk:csharp">
 <TabPanel id="csharp" label="C#">
 
-When your user signs out, call [SignOut()](/docs/reference/csharp/sign-out) to remove them from the browser session and any objects from local storage:
+When your user signs out, call [SignOut()](/docs/reference/csharp/auth-signout) to remove them from the browser session and any objects from local storage:
 
 ```c#
 await supabase.Auth.SignOut();
@@ -202,14 +202,16 @@ await supabase.Auth.SignOut();
 
 We are replacing the _LinkedIn_ provider with a new _LinkedIn (OIDC)_ provider to support recent changes to the LinkedIn [OAuth APIs](https://learn.microsoft.com/en-us/linkedin/shared/authentication/authorization-code-flow?context=linkedin%2Fcontext&tabs=HTTPS1). The new provider uses the [Open ID Connect standard](https://learn.microsoft.com/en-us/linkedin/consumer/integrations/self-serve/sign-in-with-linkedin-v2#validating-id-tokens). In view of this change, we have disabled edits on the _LinkedIn_ provider and will be removing it effective 4th January 2024. Developers with LinkedIn OAuth Applications created before 1st August 2023 should create a new OAuth application [via the steps outlined above](/docs/guides/auth/social-sign-in/auth-linkedin#create-a-linkedin-oauth-app) and migrate their credentials from the _LinkedIn_ provider to the _LinkedIn (OIDC)_ provider. Alternatively, you can also head to the `Products` section and add the newly release`Sign In with LinkedIn using OpenID Connect` to your existing OAuth application.
 
-Developers using the Supabase CLI to test their LinkedIn OAuth application should also update their `config.toml` to make use of the new provider:
+Developers using the [Supabase CLI](/docs/guides/local-development/cli/getting-started) to test their LinkedIn OAuth application should also update their config file (`supabase/config.toml` or `supabase/config.jsonc`) to make use of the new provider:
 
-```
+```toml supabase/config.toml
 [auth.external.linkedin_oidc]
 enabled = true
-client_id = ...
-secret = ...
+client_id = "env(SUPABASE_AUTH_EXTERNAL_LINKEDIN_OIDC_CLIENT_ID)"
+secret = "env(SUPABASE_AUTH_EXTERNAL_LINKEDIN_OIDC_SECRET)"
 ```
+
+Set both variables in the `.env` file at the root of your project. See [Using secrets inside your config file](/docs/guides/local-development/managing-config#using-secrets-inside-configtoml).
 
 Do reach out to support if you have any concerns around this change.
 

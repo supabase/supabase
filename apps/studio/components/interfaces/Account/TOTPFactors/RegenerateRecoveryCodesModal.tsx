@@ -18,6 +18,7 @@ export const useRegenerateRecoveryCodesModal = ({
   size,
   onComplete,
   onStart,
+  surface = 'account_security',
   showSecurityLink,
 }: RegenerateRecoveryCodesModalProps = {}) => {
   const mutation = useRecoveryCodesRegenerateMutation()
@@ -61,6 +62,7 @@ export const useRegenerateRecoveryCodesModal = ({
         <RecoveryCodesModal
           open={stage === 'codes'}
           mutation={mutation}
+          surface={surface}
           showSecurityLink={showSecurityLink}
           onOpenChange={(open) => {
             if (open) return

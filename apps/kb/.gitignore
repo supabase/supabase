@@ -4,7 +4,7 @@ dist/
 # generated markdown export (scripts/generate-markdown.ts)
 public/markdown/
 
-# federated troubleshooting content (scripts/federated-content), regenerated on every prebuild
+# federated troubleshooting content (scripts/federated-content), regenerated on every build
 src/content/troubleshooting/
 
 # generated types

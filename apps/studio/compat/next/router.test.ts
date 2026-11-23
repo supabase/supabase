@@ -12,7 +12,7 @@ describe('resolveUrl (next/router compat shim)', () => {
   })
 
   it('interpolates dynamic params from query into a bracketed pathname and drops them from the query string', () => {
-    // The regression we fixed: useUrlState pushes `router.pathname` (the bracketed
+    // The regression we fixed: callers pushed `router.pathname` (the bracketed
     // pattern) + query. Next fills the params; the shim must too, or TanStack
     // navigates to a literal `/project/[ref]/...` and bounces to "project not found".
     expect(

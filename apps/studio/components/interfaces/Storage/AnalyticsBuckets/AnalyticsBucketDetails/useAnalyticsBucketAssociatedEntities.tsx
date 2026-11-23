@@ -1,24 +1,14 @@
-import {
-  getAnalyticsBucketPublicationName,
-  getAnalyticsBucketS3KeyName,
-  getAnalyticsBucketsDestinationName,
-} from './AnalyticsBucketDetails.utils'
+import { getAnalyticsBucketS3KeyName } from './AnalyticsBucketDetails.utils'
 import { useAnalyticsBucketWrapperInstance } from './useAnalyticsBucketWrapperInstance'
 import { useFDWDeleteMutation } from '@/data/fdw/fdw-delete-mutation'
-import { useDeleteDestinationPipelineMutation } from '@/data/replication/delete-destination-pipeline-mutation'
-import { useReplicationDestinationsQuery } from '@/data/replication/destinations-query'
-import { useReplicationPipelinesQuery } from '@/data/replication/pipelines-query'
-import { useDeletePublicationMutation } from '@/data/replication/publication-delete-mutation'
-import { useReplicationPublicationQuery } from '@/data/replication/publication-query'
-import { useReplicationSourcesQuery } from '@/data/replication/sources-query'
 import { useS3AccessKeyDeleteMutation } from '@/data/storage/s3-access-key-delete-mutation'
 import { useStorageCredentialsQuery } from '@/data/storage/s3-access-key-query'
 import { FGA_PERMISSIONS, useAsyncCheckPermissionsV2 } from '@/hooks/misc/useCheckPermissionsV2'
 import { useSelectedProjectQuery } from '@/hooks/misc/useSelectedProject'
 
 /**
- * Returns all the data that's associated to a specified analytics bucket (e.g publications, S3 keys, etc)
- * Used for cleaning up analytics bucket after deletion
+ * Returns the foreign data wrapper and S3 key associated with an analytics bucket.
+ * Used for cleaning up those resources after bucket deletion.
  */
 export const useAnalyticsBucketAssociatedEntities = (
   { projectRef, bucketId }: { projectRef?: string; bucketId?: string },
@@ -42,37 +32,10 @@ export const useAnalyticsBucketAssociatedEntities = (
     (x) => x.description === getAnalyticsBucketS3KeyName(bucketId ?? '')
   )
 
-  const { data: sourcesData } = useReplicationSourcesQuery(
-    { projectRef },
-    { enabled: options.enabled }
-  )
-  const sourceId = sourcesData?.sources.find((s) => s.name === projectRef)?.id
-
-  const publicationName = bucketId ? getAnalyticsBucketPublicationName(bucketId) : undefined
-  const { data: publication } = useReplicationPublicationQuery(
-    { projectRef, sourceId, publicationName },
-    { enabled: options.enabled && publicationName !== undefined }
-  )
-
-  const { data: destinationsData } = useReplicationDestinationsQuery({ projectRef })
-  const destinations = destinationsData?.destinations ?? []
-  const destination = destinations.find(
-    (x) => x.name === getAnalyticsBucketsDestinationName(bucketId ?? '')
-  )
-
-  const { data: pipelines } = useReplicationPipelinesQuery({ projectRef })
-  const pipeline = pipelines?.pipelines.find(
-    (pipeline) => pipeline.config.publication_name === publicationName
-  )
-
   return {
     icebergWrapper,
     icebergWrapperMeta,
     s3AccessKey,
-    sourceId,
-    publication,
-    pipeline,
-    destination,
     isLoadingWrapperInstance,
   }
 }
@@ -85,15 +48,10 @@ export const useAnalyticsBucketDeleteCleanUp = ({
   bucketId?: string
 }) => {
   const { data: project } = useSelectedProjectQuery()
-  const {
-    icebergWrapper,
-    icebergWrapperMeta,
-    s3AccessKey,
-    publication,
-    sourceId,
-    pipeline,
-    destination,
-  } = useAnalyticsBucketAssociatedEntities({ projectRef, bucketId: bucketId })
+  const { icebergWrapper, icebergWrapperMeta, s3AccessKey } = useAnalyticsBucketAssociatedEntities({
+    projectRef,
+    bucketId,
+  })
 
   // Default error handlers from all mutations will be silenced
   const { mutateAsync: deleteFDW, isPending: isDeletingWrapper } = useFDWDeleteMutation({
@@ -102,13 +60,7 @@ export const useAnalyticsBucketDeleteCleanUp = ({
   const { mutateAsync: deleteS3AccessKey, isPending: isDeletingKey } = useS3AccessKeyDeleteMutation(
     { onError: () => {} }
   )
-  const { mutateAsync: deletePublication, isPending: isDeletingPublication } =
-    useDeletePublicationMutation({ onError: () => {} })
-  const { mutateAsync: deletePipeline, isPending: isDeletingPipeline } =
-    useDeleteDestinationPipelineMutation({ onError: () => {} })
-
-  const isDeleting =
-    isDeletingWrapper || isDeletingKey || isDeletingPublication || isDeletingPipeline
+  const isDeleting = isDeletingWrapper || isDeletingKey
 
   const mutateAsync = async () => {
     const connectionString = project?.connectionString
@@ -136,30 +88,6 @@ export const useAnalyticsBucketDeleteCleanUp = ({
       }
     } else {
       console.warn(`Unable to find and delete corresponding S3 access key for ${bucketId}`)
-    }
-
-    if (!!pipeline && !!destination) {
-      try {
-        await deletePipeline({
-          projectRef,
-          destinationId: destination?.id,
-          pipelineId: pipeline.id,
-        })
-      } catch (error: any) {
-        console.error(`Failed to delete replication pipeline for: ${bucketId}`, error.message)
-      }
-    } else {
-      console.warn(`Unable to find and delete replication pipeline for ${bucketId}`)
-    }
-
-    if (!!publication && !!sourceId) {
-      try {
-        await deletePublication({ projectRef, sourceId, publicationName: publication.name })
-      } catch (error: any) {
-        console.error(`Failed to delete replication publication for: ${bucketId}`, error.message)
-      }
-    } else {
-      console.warn(`Unable to find and delete replication publication for ${bucketId}`)
     }
   }
 

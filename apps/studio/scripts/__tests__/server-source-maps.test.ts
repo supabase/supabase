@@ -244,11 +244,11 @@ describe('server source maps', () => {
         '<html><body><!--ssr-outlet--><script type="module" src="/client.ts"></script></body></html>'
       )
       await writeFile(path.join(root, 'client.ts'), 'console.log("source-map-fixture")')
-      const originalFile = path.join(studioRoot, 'pages/api/get-deployment-commit.ts')
+      const originalFile = path.join(studioRoot, 'routes/api/get-deployment-commit.ts')
       const originalSource = await readFile(originalFile, 'utf8')
       await writeFile(
         path.join(root, 'server.ts'),
-        `import handler from ${JSON.stringify(originalFile)};\nexport default {fetch() {return new Response(handler.name)}};\n`
+        `import { Route } from ${JSON.stringify(originalFile)};\nexport default {fetch(request) {return Route.options.server.handlers.GET({ request })}};\n`
       )
       const generatedAppMaps: { fileName: string; code: string; map: SourceMap }[] = []
       const builder = await createBuilder({
@@ -295,7 +295,7 @@ describe('server source maps', () => {
                 const map: SourceMap = JSON.parse(JSON.stringify(chunk.map))
                 if (
                   map.sources.some((source) =>
-                    source.endsWith('/pages/api/get-deployment-commit.ts')
+                    source.endsWith('/routes/api/get-deployment-commit.ts')
                   )
                 ) {
                   generatedAppMaps.push({ fileName: chunk.fileName, code: chunk.code, map })
@@ -341,7 +341,7 @@ describe('server source maps', () => {
       expect(generatedAppMaps.length).toBeGreaterThan(0)
       for (const { fileName, code, map } of generatedAppMaps) {
         const sourceIndex = map.sources.findIndex((source) =>
-          source.endsWith('/pages/api/get-deployment-commit.ts')
+          source.endsWith('/routes/api/get-deployment-commit.ts')
         )
         expect(map.sourcesContent[sourceIndex]).toBe(originalSource)
         const marker = 'Failed to fetch commit details'

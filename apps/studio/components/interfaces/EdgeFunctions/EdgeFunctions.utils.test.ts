@@ -4,6 +4,7 @@ import {
   formatFunctionBodyToFiles,
   getDefaultSelectedFileId,
   getFallbackImportMapPath,
+  getFunctionZipEntries,
 } from './EdgeFunctions.utils'
 
 describe('formatFunctionBodyToFiles', () => {
@@ -195,6 +196,101 @@ describe('getDefaultSelectedFileId', () => {
   })
 })
 
+describe('getFunctionZipEntries', () => {
+  const paths = (entries: { path: string }[]) => entries.map((e) => e.path)
+
+  it('makes multipart file paths relative to the function slug', () => {
+    const files = [
+      { name: 'source/hello/index.ts', content: 'a' },
+      { name: 'source/hello/utils/helper.ts', content: 'b' },
+    ]
+    const entries = getFunctionZipEntries({ files, slug: 'hello', source: 'multipart' })
+    expect(paths(entries)).toEqual(['index.ts', 'utils/helper.ts'])
+  })
+
+  it('nests multipart files that reach above the base under src/', () => {
+    const files = [
+      { name: 'source/hello/index.ts', content: 'a' },
+      { name: 'source/hello/../shared/db.ts', content: 'b' },
+    ]
+    const entries = getFunctionZipEntries({ files, slug: 'hello', source: 'multipart' })
+    expect(paths(entries)).toEqual(['src/index.ts', 'shared/db.ts'])
+  })
+
+  it('never maps two multipart files to the same ZIP path when a real `src` folder exists', () => {
+    const files = [
+      { name: 'source/hello/index.ts', content: 'a' },
+      { name: 'source/hello/../src/index.ts', content: 'b' },
+    ]
+    const entries = getFunctionZipEntries({ files, slug: 'hello', source: 'multipart' })
+
+    expect(new Set(paths(entries)).size).toBe(2)
+    expect(paths(entries)).toEqual(['src_/index.ts', 'src/index.ts'])
+  })
+
+  it('normalizes multipart paths with `..` in the middle so none escape the ZIP root', () => {
+    const files = [
+      { name: 'source/hello/index.ts', content: 'a' },
+      { name: 'source/hello/utils/../../../etc/passwd', content: 'b' },
+    ]
+    const entries = getFunctionZipEntries({ files, slug: 'hello', source: 'multipart' })
+    expect(paths(entries)).toEqual(['src/src1/index.ts', 'etc/passwd'])
+  })
+
+  it('keeps eszip file paths as-is, even when a folder shares the slug name', () => {
+    const files = [
+      { name: 'index.ts', content: 'a' },
+      { name: 'auth/handler.ts', content: 'b' },
+      { name: 'handler.ts', content: 'c' },
+    ]
+    const entries = getFunctionZipEntries({ files, slug: 'auth', source: 'eszip' })
+    expect(paths(entries)).toEqual(['index.ts', 'auth/handler.ts', 'handler.ts'])
+  })
+
+  it('nests eszip files under src/ when shared files reach above the function root', () => {
+    const files = [
+      { name: 'index.ts', content: 'a' },
+      { name: '../_shared/cors.ts', content: 'b' },
+    ]
+    const eszipEntries = getFunctionZipEntries({ files, slug: 'hello', source: 'eszip' })
+    const multipartEntries = getFunctionZipEntries({
+      files: [
+        { name: 'source/hello/index.ts', content: 'a' },
+        { name: 'source/hello/../_shared/cors.ts', content: 'b' },
+      ],
+      slug: 'hello',
+      source: 'multipart',
+    })
+
+    expect(paths(eszipEntries)).toEqual(['src/index.ts', '_shared/cors.ts'])
+    expect(eszipEntries).toEqual(multipartEntries)
+  })
+
+  it('never produces eszip paths that escape the ZIP root', () => {
+    const files = [
+      { name: 'index.ts', content: 'a' },
+      { name: '../../evil.ts', content: 'b' },
+      { name: '/etc/passwd', content: 'c' },
+      { name: 'utils/./../../x.ts', content: 'd' },
+      { name: 'a//b\\..\\..\\..\\win.ts', content: 'e' },
+    ]
+    const entries = getFunctionZipEntries({ files, slug: 'hello', source: 'eszip' })
+
+    expect(paths(entries)).toEqual([
+      'src/src1/index.ts',
+      'evil.ts',
+      'src/src1/etc/passwd',
+      'src/x.ts',
+      'src/win.ts',
+    ])
+    for (const path of paths(entries)) {
+      expect(path.startsWith('/')).toBe(false)
+      expect(path.split('/')).not.toContain('..')
+      expect(path.split('/')).not.toContain('')
+    }
+  })
+})
+
 describe('getFallbackImportMapPath', () => {
   it.each(['deno.json', 'deno.jsonc', 'import_map.json', 'functions/hello/deno.jsonc'])(
     'finds %s',
@@ -204,7 +300,14 @@ describe('getFallbackImportMapPath', () => {
     }
   )
 
-  it.each(['deno.jso', 'deno-json', 'import_map.jsonn', 'deno.json.bak'])('ignores %s', (name) => {
+  it.each([
+    'deno.jso',
+    'deno-json',
+    'import_map.jsonn',
+    'deno.json.bak',
+    'notdeno.json',
+    'dir/myimport_map.json',
+  ])('ignores %s', (name) => {
     const files = [{ name: 'index.ts' }, { name }]
     expect(getFallbackImportMapPath(files)).toBeUndefined()
   })

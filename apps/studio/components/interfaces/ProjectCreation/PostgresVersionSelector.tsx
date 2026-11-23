@@ -12,7 +12,7 @@ import {
 } from 'ui'
 import { FormItemLayout } from 'ui-patterns/form/FormItemLayout/FormItemLayout'
 
-import { smartRegionToExactRegion } from './ProjectCreation.utils'
+import { smartRegionToExactRegion, sortPostgresVersionsNewestFirst } from './ProjectCreation.utils'
 import { useProjectCreationPostgresVersionsQuery } from '@/data/config/project-creation-postgres-versions-query'
 import { useProjectUnpausePostgresVersionsQuery } from '@/data/config/project-unpause-postgres-versions-query'
 import { useSelectedProjectQuery } from '@/hooks/misc/useSelectedProject'
@@ -108,7 +108,7 @@ export const PostgresVersionSelector = ({
     type === 'create'
       ? (createVersions?.available_versions ?? [])
       : (unpauseVersions?.available_versions ?? [])
-  const availableVersions = versions.sort((a, b) => a.version.localeCompare(b.version)).reverse()
+  const availableVersions = sortPostgresVersionsNewestFirst(versions)
   const postgresVersionSelection = useWatch({
     control: form.control,
     name: 'postgresVersionSelection',
