@@ -1,8 +1,9 @@
 import { screen } from '@testing-library/react'
 import type { platformComponents } from 'api-types'
 import { HttpResponse } from 'msw'
-import { expect, test } from 'vitest'
+import { expect, test, vi } from 'vitest'
 
+import { useReplicationCostEstimateQuery } from './cost-estimate-query'
 import { useReplicationPipelineStatusQuery } from './pipeline-status-query'
 import { ReplicationClusterProvider } from '@/state/replication-cluster'
 import { customRender } from '@/tests/lib/custom-render'
@@ -52,4 +53,42 @@ test('reads the same pipeline ID independently in the scoped and default cluster
 
   expect(await screen.findByText(`${pipelineId}: started`)).toBeInTheDocument()
   expect(await screen.findByText(`${pipelineId}: stopped`)).toBeInTheDocument()
+})
+
+test('shares the project cost estimate across default and scoped consumers', async () => {
+  const respond = vi.fn(() =>
+    HttpResponse.json<platformComponents['schemas']['CostEstimateResponse_Output']>({
+      currency: 'usd',
+      pipeline: { hourly_cost: 0.05, monthly_cost: 36.5 },
+      streaming: { rate_per_gb: 3 },
+      table_copy: { rate_per_gb: 0.6, total_bytes: 0, total_cost: 0, tables: [] },
+    })
+  )
+  addAPIMock({
+    method: 'get',
+    path: '/platform/replication/:ref/sources/:source_id/publications/:publication_name/cost-estimate',
+    response: respond,
+  })
+
+  function PublicationCost({ scope }: { scope: string }) {
+    const { data } = useReplicationCostEstimateQuery({
+      projectRef: 'default',
+      sourceId: 1,
+      publicationName: 'analytics',
+    })
+    return <p>{data && `${scope} monthly cost: ${data.pipeline.monthly_cost}`}</p>
+  }
+
+  customRender(
+    <>
+      <PublicationCost scope="Default" />
+      <ReplicationClusterProvider clusterId={clusterId}>
+        <PublicationCost scope="Cluster" />
+      </ReplicationClusterProvider>
+    </>
+  )
+
+  expect(await screen.findByText('Default monthly cost: 36.5')).toBeInTheDocument()
+  expect(await screen.findByText('Cluster monthly cost: 36.5')).toBeInTheDocument()
+  expect(respond).toHaveBeenCalledTimes(1)
 })

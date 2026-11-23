@@ -3,7 +3,7 @@ import type { platformComponents } from 'api-types'
 import { HttpResponse } from 'msw'
 import { expect, test } from 'vitest'
 
-import { PipelineRegionField } from './PipelineRegionField'
+import { PIPELINE_REGION, PipelineRegionField } from './PipelineRegionField'
 import { customRender } from '@/tests/lib/custom-render'
 import { addAPIMock } from '@/tests/lib/msw'
 
@@ -26,7 +26,9 @@ test('shows the API default region as read-only information', async () => {
 
   customRender(<PipelineRegionField />)
 
-  expect(await screen.findByText('South Asia (Mumbai)')).toBeInTheDocument()
-  expect(screen.getByText('ap-south-1')).toBeInTheDocument()
+  const region = screen.getByText(PIPELINE_REGION.displayName).closest('[aria-live="polite"]')
+  expect(region).toHaveAttribute('aria-atomic', 'true')
+  expect(region).toContainElement(await screen.findByText('South Asia (Mumbai)'))
+  expect(region).toContainElement(screen.getByText('ap-south-1'))
   expect(screen.queryByRole('combobox')).toBeNull()
 })

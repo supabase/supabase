@@ -58,6 +58,8 @@ export const PipelineRegionReadonly = ({ className }: { className?: string }) =>
 
   return (
     <div
+      aria-live="polite"
+      aria-atomic="true"
       className={cn(
         'flex h-9 min-w-0 items-center gap-x-2 rounded-md border bg-surface-200 px-3 text-sm',
         className

@@ -52,14 +52,8 @@ export const replicationKeys = {
   costEstimate: (
     projectRef: string | undefined,
     sourceId: number | undefined,
-    publicationName: string | undefined,
-    clusterId?: string
-  ) =>
-    [
-      ...publicationsKey(projectRef, sourceId, clusterId),
-      publicationName,
-      'cost-estimate',
-    ] as const,
+    publicationName: string | undefined
+  ) => [...publicationsKey(projectRef, sourceId), publicationName, 'cost-estimate'] as const,
   pipelines: (projectRef: string | undefined, clusterId?: string) =>
     [...replicationScope(projectRef, clusterId), 'pipelines'] as const,
   pipelineById: (
