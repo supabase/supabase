@@ -6,6 +6,14 @@ import { useInView } from 'react-intersection-observer'
 import { toast } from 'sonner'
 import { Button } from 'ui'
 import { Admonition } from 'ui-patterns/Admonition'
+import {
+  PageSection,
+  PageSectionContent,
+  PageSectionDescription,
+  PageSectionMeta,
+  PageSectionSummary,
+  PageSectionTitle,
+} from 'ui-patterns/PageSection'
 import { ShimmeringLoader } from 'ui-patterns/ShimmeringLoader'
 
 import ChangePaymentMethodModal from './ChangePaymentMethodModal'
@@ -13,11 +21,6 @@ import CreditCard from './CreditCard'
 import DeletePaymentMethodModal from './DeletePaymentMethodModal'
 import AddNewPaymentMethodModal from '@/components/interfaces/Billing/Payment/AddNewPaymentMethodModal'
 import { SupportLink } from '@/components/interfaces/Support/SupportLink'
-import {
-  ScaffoldSection,
-  ScaffoldSectionContent,
-  ScaffoldSectionDetail,
-} from '@/components/layouts/Scaffold'
 import { AlertError } from '@/components/ui/AlertError'
 import { FormPanel } from '@/components/ui/Forms/FormPanel'
 import { FormSection, FormSectionContent } from '@/components/ui/Forms/FormSection'
@@ -61,18 +64,18 @@ const PaymentMethods = () => {
     selectedOrganization?.managed_by === MANAGED_BY.STRIPE_PROJECTS
   return (
     <>
-      <ScaffoldSection ref={ref}>
-        <ScaffoldSectionDetail>
-          <div className="sticky space-y-2 top-12">
-            <p className="text-foreground text-base m-0">Payment Methods</p>
-            <p className="text-sm text-foreground-light mb-2 pr-4 m-0">
+      <PageSection ref={ref} orientation="horizontal">
+        <PageSectionMeta>
+          <PageSectionSummary>
+            <PageSectionTitle>Payment Methods</PageSectionTitle>
+            <PageSectionDescription>
               {isStripeManagedOrganization
                 ? 'Billing for this organisation is handled through Stripe Projects.'
                 : 'Payments for your subscription are made using the default card.'}
-            </p>
-          </div>
-        </ScaffoldSectionDetail>
-        <ScaffoldSectionContent>
+            </PageSectionDescription>
+          </PageSectionSummary>
+        </PageSectionMeta>
+        <PageSectionContent className="flex flex-col gap-6">
           {selectedOrganization && isPartnerBilledOrganization ? (
             <PartnerManagedResource
               managedBy={selectedOrganization?.managed_by}
@@ -191,8 +194,8 @@ const PaymentMethods = () => {
               )}
             </>
           )}
-        </ScaffoldSectionContent>
-      </ScaffoldSection>
+        </PageSectionContent>
+      </PageSection>
 
       <AddNewPaymentMethodModal
         visible={showAddPaymentMethodModal}
