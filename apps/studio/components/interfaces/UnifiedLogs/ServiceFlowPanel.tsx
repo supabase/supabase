@@ -1,4 +1,4 @@
-import { useState } from 'react'
+import { useRef, useState } from 'react'
 import {
   ResizableHandle,
   ResizablePanel,
@@ -45,6 +45,7 @@ export function ServiceFlowPanel({
   searchParameters,
 }: ServiceFlowPanelProps) {
   const [activeTab, setActiveTab] = useState('overview')
+  const overviewTabRef = useRef<HTMLButtonElement>(null)
 
   const [openedLog, setOpenedLog] = useState<{ fromId: string; log: ColumnSchema } | null>(null)
   const isRequestTimelineEnabled = useUnifiedLogsBackend(searchParameters)
@@ -67,10 +68,11 @@ export function ServiceFlowPanel({
     : getEventMessageDisplay(activeLog?.log_type ?? '', activeLog?.event_message).message ||
       activeLog?.id
 
-  // Stays on the timeline so the user can step through the request one log at a time
   const handleSelectTimelineLog = (log: ColumnSchema) => {
     if (!selectedRow) return
     setOpenedLog(log.id === selectedRow.id ? null : { fromId: selectedRow.id, log })
+    setActiveTab('overview')
+    overviewTabRef.current?.focus()
   }
   const { logsMetadata } = useIsFeatureEnabled(['logs:metadata'])
   const selectedJson = selectedRows.map((row) =>
@@ -118,7 +120,11 @@ export function ServiceFlowPanel({
               className="flex min-h-0 flex-1 flex-col"
             >
               <TabsList className="shrink-0 gap-x-5 px-4">
-                <TabsTrigger value="overview" className={TAB_TRIGGER_CLASS_NAME}>
+                <TabsTrigger
+                  ref={overviewTabRef}
+                  value="overview"
+                  className={TAB_TRIGGER_CLASS_NAME}
+                >
                   Overview
                 </TabsTrigger>
                 <TabsTrigger value="raw-json" className={TAB_TRIGGER_CLASS_NAME}>
