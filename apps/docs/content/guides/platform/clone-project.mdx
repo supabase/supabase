@@ -18,7 +18,7 @@ You can clone your Supabase project by restoring your data from an existing proj
 - Encryption root key (so [Vault](/docs/guides/database/vault) secrets and encrypted columns remain readable in the new project)
 - Key configurations from the original project, including the compute instance size, disk attributes, SSL enforcement settings, and network restrictions
 
-<$Partial path="restore-manual-configurations.mdx" />
+<$Partial path="restore-manual-configurations.mdx" variables={{ "extensions": "",  "project_settings": "" }} />
 
 Whether you're using physical backups or Point-in-Time recovery (PITR), this feature allows you to duplicate project data with ease, perform testing safely, or recover data for analysis. Access to this feature is exclusive to users on paid plans and requires that physical backups are enabled for the source project.
 
