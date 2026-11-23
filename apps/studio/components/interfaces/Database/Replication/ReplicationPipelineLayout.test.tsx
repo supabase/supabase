@@ -13,12 +13,12 @@ import { HttpResponse } from 'msw'
 import { ReactNode, useRef, type AnchorHTMLAttributes } from 'react'
 import { beforeEach, describe, expect, test, vi } from 'vitest'
 
+import { PipelineClusterScope } from './PipelineClusterScope'
 import { ReplicationPipelineLayout } from './ReplicationPipelineLayout'
 import { ReplicationPipelineStatus } from './ReplicationPipelineStatus/ReplicationPipelineStatus'
 import type { DestinationWireResponse, PipelineWireResponse } from '@/data/replication/api-types'
 import { replicationKeys } from '@/data/replication/keys'
 import { parseSearch, stringifySearch } from '@/lib/router-search-params'
-import { ReplicationClusterProvider } from '@/state/replication-cluster'
 import {
   PipelineRequestStatusProvider,
   PipelineStatusRequestStatus,
@@ -70,12 +70,10 @@ const renderWithRouter = (
 
 const renderLayout = (children?: ReactNode, queryClient?: QueryClient, clusterId?: string) =>
   renderWithRouter(
-    <PipelineRequestStatusProvider>
-      <ReplicationClusterProvider clusterId={clusterId}>
-        <ReplicationPipelineLayout>{children}</ReplicationPipelineLayout>
-      </ReplicationClusterProvider>
-    </PipelineRequestStatusProvider>,
-    { queryClient }
+    <PipelineClusterScope>
+      <ReplicationPipelineLayout>{children}</ReplicationPipelineLayout>
+    </PipelineClusterScope>,
+    { queryClient, nuqs: { searchParams: clusterId ? { cluster_id: clusterId } : undefined } }
   )
 
 const TableResetFixture = () => {
@@ -160,10 +158,14 @@ const DESTINATION: DestinationResponse = {
 }
 
 const mockPipeline = (id: string | number = 42, destination = DESTINATION) => {
+  const requestedClusters: (string | null)[] = []
   addAPIMock({
     method: 'get',
     path: '/platform/replication/:ref/pipelines/:pipeline_id',
-    response: () => HttpResponse.json<PipelineResponse>({ ...PIPELINE, id }),
+    response: ({ request }) => {
+      requestedClusters.push(new URL(request.url).searchParams.get('cluster_id'))
+      return HttpResponse.json<PipelineResponse>({ ...PIPELINE, id })
+    },
   })
   addAPIMock({
     method: 'get',
@@ -197,6 +199,7 @@ const mockPipeline = (id: string | number = 42, destination = DESTINATION) => {
         ],
       }),
   })
+  return requestedClusters
 }
 
 const mockStatus = (name: PipelineStatusResponse['status']['name'], id: string | number = 42) =>
@@ -340,7 +343,7 @@ describe('ReplicationPipelineLayout', () => {
   })
 
   test('deletes an unknown pipeline and returns to its cluster', async () => {
-    mockPipeline('42', { ...DESTINATION, config: { unknown: {} } })
+    const requestedClusters = mockPipeline('42', { ...DESTINATION, config: { unknown: {} } })
     mockStatus('started', '42')
     mockVersion(false, '42')
     addAPIMock({
@@ -367,8 +370,9 @@ describe('ReplicationPipelineLayout', () => {
     const clusterId = 'eu-west-1'
     const { router } = renderLayout(undefined, queryClient, clusterId)
     const listHref = '/project/default/database/pipelines?cluster_id=eu-west-1'
-    expect(screen.getByRole('link', { name: 'Pipelines' })).toHaveAttribute('href', listHref)
     await screen.findByRole('img', { name: 'Unknown destination' })
+    expect(requestedClusters).toEqual([clusterId])
+    expect(screen.getByRole('link', { name: 'Pipelines' })).toHaveAttribute('href', listHref)
     await userEvent.click(screen.getByRole('button', { name: 'Pipeline options' }))
     await userEvent.click(screen.getByRole('menuitem', { name: 'Delete pipeline' }))
     const dialog = await screen.findByRole('dialog')
@@ -400,7 +404,7 @@ describe('ReplicationPipelineLayout', () => {
     'renders pipeline %s and stops it using its original ID',
     async (pipelineId) => {
       routeParams.pipelineId = String(pipelineId)
-      mockPipeline(pipelineId)
+      const requestedClusters = mockPipeline(pipelineId)
       mockVersion(false, pipelineId)
       mockStatus('started', pipelineId)
       addAPIMock({
@@ -415,9 +419,12 @@ describe('ReplicationPipelineLayout', () => {
         },
       })
 
-      renderLayout()
+      const queryClient = new QueryClient()
+      queryClient.setQueryData(replicationKeys.clusters(), { default_cluster_id: '1', regions: [] })
+      renderLayout(undefined, queryClient, '1')
 
       expect(await screen.findByRole('heading', { name: 'Analytics warehouse' })).toBeVisible()
+      expect(requestedClusters).toEqual([null])
       expect(await screen.findByText('Running')).toBeVisible()
 
       await userEvent.click(screen.getByRole('button', { name: 'Stop' }))
