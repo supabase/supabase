@@ -78,6 +78,6 @@ on storage.objects
 for delete
 TO authenticated
 USING (
-    owner = (select auth.uid()::text)
+    owner_id = (select auth.uid()::text)
 );
 ```
