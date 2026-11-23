@@ -1,6 +1,5 @@
 [
   "react-hooks/exhaustive-deps",
-  "import/no-anonymous-default-export",
   "@tanstack/query/exhaustive-deps",
   "@typescript-eslint/no-explicit-any",
   "no-restricted-exports",
