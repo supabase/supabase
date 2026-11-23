@@ -83,8 +83,8 @@ vi.mock('common', () => ({
     (_value: unknown) => {},
   IS_PLATFORM: false,
   LOCAL_STORAGE_KEYS: {
-    FREE_MICRO_UPGRADE_BANNER_DISMISSED: (ref: string) =>
-      `free-micro-upgrade-banner-dismissed-${ref}`,
+    FREE_MICRO_UPGRADE_BANNER_DISMISSED_AT: (ref: string) =>
+      `free-micro-upgrade-banner-dismissed-at-${ref}`,
     PROJECT_INTEGRATION_BANNER_DISMISSED: (ref: string, integrationSource: string) =>
       `project-integration-banner-dismissed-${ref}-${integrationSource}`,
   },
@@ -318,7 +318,7 @@ describe('ProjectLayout title', () => {
     }
     mockBannerDismissedState.current = false
     mockUseLocalStorageQuery.mockImplementation(() => [
-      mockBannerDismissedState.current,
+      mockBannerDismissedState.current ? new Date().toISOString() : null,
       vi.fn(),
       { isSuccess: true },
     ])
