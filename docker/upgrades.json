@@ -61,7 +61,7 @@
     "requires": [
       "Realtime database migrations in this release are one-way: after Realtime v2.174.6 has started, going back to an older Realtime image makes every Postgres Changes subscription fail (error 42P10) until an index is recreated (SQL in the 0.8.5 CHANGELOG). Back up your database before running 'docker compose up'.",
       "Realtime broadcast persistence is now enabled: clients can store private-channel broadcast messages for replay if an RLS policy on realtime.messages allows it. Review your realtime.messages policies if they are broad.",
-      "The API gateway now sandboxes responses on /storage/v1/, /rest/v1/ and /functions/v1/: an HTML or SVG document opened directly from these routes no longer runs scripts or loads other resources. If you serve web pages from Storage or Edge Functions, host them elsewhere."
+      "HTML and SVG files opened directly in the browser from /storage/v1/, /rest/v1/ or /functions/v1/ can no longer run scripts or load other resources: the API gateway now adds a Content-Security-Policy to these routes. If you serve web pages from Storage or Edge Functions, host them elsewhere."
     ]
   }
 }

@@ -27,7 +27,7 @@ If you depend on any of these overrides, plan to migrate before they are removed
 ⚠️ **Note:** This update includes **important changes**. Please check the details below:
 - Includes **security fixes** for Auth, Storage, Supavisor, PgBouncer, nginx and Kong - updating is **strongly recommended**
 - Realtime database migrations in this release are one-way: rolling back to the previous Realtime version breaks Postgres Changes. **Back up your database** before updating. See the **Realtime** section below
-- The API gateway now sandboxes documents opened directly from Storage, the Data API and Edge Functions. See the **API gateway** section below
+- HTML and SVG files opened directly in the browser from Storage, the Data API or Edge Functions can no longer run scripts. See the **API gateway** section below
 - With the logs override, Vector needs a new environment variable or logs stop arriving. `update.sh` applies it. See the **Analytics (Logflare)** section below
 
 ### Documentation
@@ -35,7 +35,7 @@ If you depend on any of these overrides, plan to migrate before they are removed
 - Fixed the nginx template variable name in the [HTTPS proxy guide](https://supabase.com/docs/guides/self-hosting/self-hosted-proxy-https) - PR [#53740](https://github.com/supabase/supabase/pull/53740) (via [@sudhi76](https://github.com/sudhi76))
 
 ### API gateway
-- ⚠️ Changed: responses on `/storage/v1/`, `/rest/v1/` and `/functions/v1/` get a sandboxing `Content-Security-Policy`: HTML or SVG opened directly from them can't run scripts or load resources. `<img>`, `fetch` and downloads are unaffected (requires `volumes/api/envoy/lds.template.yaml` and `volumes/api/kong.yml` update) - PR [#53466](https://github.com/supabase/supabase/pull/53466)
+- ⚠️ Changed: the gateway adds a `Content-Security-Policy` to responses on `/storage/v1/`, `/rest/v1/` and `/functions/v1/`, so HTML or SVG opened directly in the browser can't run scripts or load other resources. `<img>`, `fetch` and downloads are unaffected (requires `volumes/api/envoy/lds.template.yaml` and `volumes/api/kong.yml` update) - PR [#53466](https://github.com/supabase/supabase/pull/53466)
 - Changed: Studio routes (`/`, `/mcp`, `/api/mcp`) no longer allow cross-origin requests (requires `volumes/api/envoy/lds.template.yaml` and `volumes/api/kong.yml` update) - PR [#53546](https://github.com/supabase/supabase/pull/53546)
 - Fixed the OAuth 2.1 server endpoints requiring an API key at the gateway (requires `volumes/api/envoy/lds.template.yaml` and `volumes/api/kong.yml` update) - PR [#53542](https://github.com/supabase/supabase/pull/53542)
 - Fixed Envoy cutting off responses after 30 seconds, such as long downloads; requests now time out after 5 idle minutes (requires `volumes/api/envoy/lds.template.yaml` update) - PR [#51620](https://github.com/supabase/supabase/pull/51620) (via [@mandar1045](https://github.com/mandar1045))
@@ -60,7 +60,7 @@ If you depend on any of these overrides, plan to migrate before they are removed
   - ⚠️ Changed: adds one-way database migrations. Rolling back to `v2.148.3` makes Postgres Changes subscriptions fail with error 42P10 until you recreate the old index: `CREATE UNIQUE INDEX IF NOT EXISTS subscription_subscription_id_entity_filters_action_filter_selec ON realtime.subscription USING btree (subscription_id, entity, filters, action_filter, COALESCE(selected_columns, '{}'::text[]));`
   - Added broadcast persistence: clients can store private-channel broadcasts for replay if an RLS policy on `realtime.messages` allows it - [realtime#2235](https://github.com/supabase/realtime/pull/2235)
   - Fixed Postgres Changes filters on array columns stopping all changes, and large `in` filters - [realtime#2362](https://github.com/supabase/realtime/pull/2362), [realtime#2097](https://github.com/supabase/realtime/pull/2097)
-- Changed: Realtime generates its Erlang cookie at startup, binds its internal RPC port to loopback and disables cluster discovery. Multi-node setups must set `RELEASE_COOKIE` (requires `docker-compose.yml`, `.env`, and `volumes/realtime/docker-entrypoint.sh` update) - PR [#53175](https://github.com/supabase/supabase/pull/53175)
+- ⚠️ Changed: Realtime generates its Erlang cookie at startup, binds its internal RPC port to loopback and disables cluster discovery. Multi-node setups must set `RELEASE_COOKIE` (requires `docker-compose.yml`, `.env`, and `volumes/realtime/docker-entrypoint.sh` update) - PR [#53175](https://github.com/supabase/supabase/pull/53175)
 
 ### Storage
 - Updated to `v1.98.6` - [Release](https://github.com/supabase/storage/releases/tag/v1.98.6)
