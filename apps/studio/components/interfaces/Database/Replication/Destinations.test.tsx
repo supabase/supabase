@@ -15,8 +15,8 @@ import { beforeEach, describe, expect, test, vi } from 'vitest'
 import { Destinations } from './Destinations'
 import { replicationKeys } from '@/data/replication/keys'
 import { parseSearch, stringifySearch } from '@/lib/router-search-params'
-import { PipelineRequestStatusProvider } from '@/state/replication-pipeline-request-status'
 import { ReplicationClusterProvider } from '@/state/replication-cluster'
+import { PipelineRequestStatusProvider } from '@/state/replication-pipeline-request-status'
 import { customRender, CustomWrapper } from '@/tests/lib/custom-render'
 import { addAPIMock, mswServer, type APIErrorBody } from '@/tests/lib/msw'
 
@@ -174,7 +174,7 @@ const renderList = async (waitForSources = true, clusterId?: string) => {
   await screen.findByRole('heading', { name: 'Add a pipeline' })
   if (waitForSources)
     await waitFor(() =>
-      expect(queryClient.getQueryState(replicationKeys.sources('default', clusterId))?.status).toBe(
+      expect(queryClient.getQueryState(replicationKeys.sources('default'))?.status).toBe(
         'success'
       )
     )
@@ -302,20 +302,16 @@ test('renders both wizard entry controls as links', async () => {
   const { router } = await renderList(true, 'eu-west-1')
   const links = screen.getAllByRole('link', { name: 'Add pipeline' })
   expect(links).toHaveLength(2)
-  links.forEach((link) =>
-    expect(link).toHaveAttribute('href', `${listPath}/new`)
-  )
+  links.forEach((link) => expect(link).toHaveAttribute('href', `${listPath}/new`))
   fireEvent.click(links[0], { ctrlKey: true })
   expect(router.history.location.href).toBe(listPath)
 })
-test('opens the wizard in the active cluster with the shortcut', async () => {
+test('opens the wizard from the combined list with the shortcut', async () => {
   options.wizard = true
   isEnabled = true
   const { router } = await renderList(true, 'eu-west-1')
   fireEvent.keyDown(document, { key: 'N', shiftKey: true })
-  await waitFor(() =>
-    expect(router.history.location.href).toBe(`${listPath}/new`)
-  )
+  await waitFor(() => expect(router.history.location.href).toBe(`${listPath}/new`))
 })
 test('enables Pipelines before opening the wizard', async () => {
   options.wizard = true
@@ -708,9 +704,7 @@ describe('regions', () => {
     const enableDialog = await screen.findByRole('dialog', { name: 'Enable Pipelines' })
     fireEvent.click(within(enableDialog).getByRole('button', { name: 'Enable' }))
 
-    await waitFor(() =>
-      expect(router.history.location.href).toBe(`${listPath}/new`)
-    )
+    await waitFor(() => expect(router.history.location.href).toBe(`${listPath}/new`))
     expect(enabledClusters).toEqual(new Set(['2', 'omitted']))
   })
 
