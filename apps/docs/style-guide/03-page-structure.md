@@ -28,7 +28,7 @@ writing.
 
 | Type      | Purpose                     | Contains                            | Doesn't contain                  | Example                                                                   |
 | --------- | --------------------------- | ----------------------------------- | -------------------------------- | ------------------------------------------------------------------------- |
-| Explainer | Learn a topic               | What it is, why, and when to use it | Instructions                     | [Auth architecture](/docs/guides/auth/architecture)                       |
+| Explainer | Learn a topic               | What it is, why, and when to use it | Procedures past two steps        | [Auth architecture](/docs/guides/auth/architecture)                       |
 | Tutorial  | Finish a multi-feature goal | Procedures plus the reasoning       | —                                | [Build a Next.js app](/docs/guides/getting-started/tutorials/with-nextjs) |
 | Guide     | Finish one task             | Procedures in sequence              | Background; link to an explainer | [Passwordless logins](/docs/guides/auth/auth-email-passwordless)          |
 | Reference | Look something up           | Parameters, return types, samples   | Context and use cases            | [JavaScript client](/docs/reference/javascript/introduction)              |
@@ -41,9 +41,10 @@ Reference content is generated from spec files rather than hand-authored. See
 Pick the one template that matches the page, and follow only that one. Each template
 answers a reader question and names its Information Type.
 
-| Page purpose            | Reader question       | Information type | Template                                         |
-| ----------------------- | --------------------- | ---------------- | ------------------------------------------------ |
-| Finish one task (guide) | How do I do one task? | Procedure        | [`how-to-guide.md`](./templates/how-to-guide.md) |
+| Page purpose              | Reader question                   | Information type | Template                                         |
+| ------------------------- | --------------------------------- | ---------------- | ------------------------------------------------ |
+| Learn a topic (explainer) | What is it, and when do I use it? | Concept          | [`explainer.md`](./templates/explainer.md)       |
+| Finish one task (guide)   | How do I do one task?             | Procedure        | [`how-to-guide.md`](./templates/how-to-guide.md) |
 
 If no row fits the page, say so and ask the requester. Don't invent a structure.
 
@@ -100,7 +101,23 @@ Keep the title to 35 characters or fewer, in sentence case.
 - **Task pages:** start with an imperative, such as `Create a table`.
 - **Explainers:** use a noun phrase, such as `Auth architecture`.
 
-**Not recommended:** Avoid gerunds. For example, `Creating a table`.
+Name the product when the noun alone could belong to several products, such as `Storage
+schema` or `Auth identities`. Search results, browser tabs, and AI answers show the title
+without the navigation around it. Leave the product out when the noun is already
+specific, such as `Keyword search`.
+
+Name the concept, not the page's place in the docs.
+
+**Not recommended:** Avoid gerunds, such as `Creating a table`, and questions, such as
+`What is a bucket?`. Avoid placeholder words such as `Fundamentals`, `Introduction`,
+`Overview`, and `Basics`. A URL that already uses one of these words keeps it, because
+renaming a URL breaks links.
+
+### (Optional) Sidebar label
+
+`sidebar_label` sets a shorter name for the page in the sidebar. The navigation section
+already names the product, so the label can drop it, such as `CDN` for `Storage CDN`. The
+label still names the same concept as the title.
 
 ### (Optional) Subtitle
 
