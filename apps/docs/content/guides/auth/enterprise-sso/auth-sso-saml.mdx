@@ -286,12 +286,6 @@ supabase sso add --type saml --remote=YOUR_PROJECT_REF \
 
 You can set a dedicated scope only when you add a connection. [`supabase sso update`](/docs/reference/cli/supabase-sso-update) doesn't accept the flag.
 
-<Admonition type="caution" title="Changing the scope signs users out">
-
-To change the scope of an existing connection, you have to remove it and add it again. Removing a connection signs out its users, and the new connection gets a new `sso_provider_id`. Before users sign in again, update every stored `sso_provider_id` value and every Row Level Security policy that references the old ID.
-
-</Admonition>
-
 `supabase sso show`, `add`, `update`, and `remove` print the connection's own `SP ENTITY ID` and `SP ACS URL` when it has a dedicated scope. `supabase sso info` always prints the shared values. The default `supabase sso list` table has no dedicated-scope column. To read the `saml.dedicated_scope` field, run `supabase sso show YOUR_PROVIDER_ID --remote=YOUR_PROJECT_REF -o json`.
 
 #### Set up an identity provider application
