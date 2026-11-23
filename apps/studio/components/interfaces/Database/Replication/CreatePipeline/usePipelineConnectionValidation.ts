@@ -8,6 +8,7 @@ import {
   getConnectionValidationIssues,
 } from './PipelineConnectionValidation.utils'
 import type { ValidationFailure } from '@/data/replication/validate-destination-mutation'
+import { useReplicationClusterId } from '@/state/replication-cluster'
 
 export const usePipelineConnectionValidation = ({
   projectRef,
@@ -19,6 +20,7 @@ export const usePipelineConnectionValidation = ({
   form: UseFormReturn<DestinationPanelSchemaType>
 }) => {
   const names = getConnectionFieldNames(type)
+  const clusterId = useReplicationClusterId()
   const values = useWatch({ control: form.control, name: names })
   const snapshot = JSON.stringify([type, ...values])
   const currentSnapshotRef = useRef(snapshot)
@@ -51,7 +53,7 @@ export const usePipelineConnectionValidation = ({
     setIsValidating(true)
     setResult(undefined)
     try {
-      const { validation_failures: failures } = await validateDestination({ data })
+      const { validation_failures: failures } = await validateDestination({ data, clusterId })
       if (currentSnapshotRef.current !== snapshot) return false
       const verified = !failures.some((failure) => failure.failure_type === 'critical')
       setResult({ snapshot, type, failures, verified })

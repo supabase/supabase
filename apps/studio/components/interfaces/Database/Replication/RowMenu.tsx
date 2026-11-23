@@ -38,6 +38,7 @@ import { useRestartPipelineMutation } from '@/data/replication/restart-pipeline-
 import { useStartPipelineMutation } from '@/data/replication/start-pipeline-mutation'
 import { useStopPipelineMutation } from '@/data/replication/stop-pipeline-mutation'
 import type { StudioError } from '@/lib/errors/studio-errors'
+import { useReplicationClusterId } from '@/state/replication-cluster'
 import {
   PipelineStatusRequestStatus,
   usePipelineRequestStatus,
@@ -69,6 +70,7 @@ export const RowMenu = ({
   onUpdateClick,
 }: RowMenuProps) => {
   const { ref: projectRef } = useParams()
+  const clusterId = useReplicationClusterId()
   const statusName = getStatusName(pipelineStatus)
 
   const [, setEdit] = useQueryState(
@@ -114,7 +116,7 @@ export const RowMenu = ({
 
     try {
       await runWithRequestStatus(pipeline.id, PipelineStatusRequestStatus.StartRequested, () =>
-        startPipeline({ projectRef, pipelineId: pipeline.id })
+        startPipeline({ projectRef, pipelineId: pipeline.id, clusterId })
       )
     } catch (error) {
       toast.error(`Failed to start pipeline: ${(error as StudioError).message}`)

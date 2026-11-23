@@ -1,8 +1,8 @@
+import { useMutation } from '@tanstack/react-query'
 import type { components } from 'api-types'
 
 import { buildCreateDestinationApiConfig } from './create-destination-pipeline-mutation'
 import type { DestinationConfig, TableSyncCopyConfig } from './types'
-import { useReplicationMutation } from './use-cluster-mutation'
 import { buildPipelineApiConfig } from './utils'
 import { handleError, post } from '@/data/fetchers'
 import type { StudioError } from '@/lib/errors/studio-errors'
@@ -73,7 +73,7 @@ export const useValidateDestinationMutation = (
     'mutationFn'
   >
 ) => {
-  return useReplicationMutation<ValidateDestinationData, StudioError, ValidateDestinationParams>({
+  return useMutation<ValidateDestinationData, StudioError, ValidateDestinationParams>({
     mutationFn: (vars) => validateDestination(vars),
     ...options,
   })

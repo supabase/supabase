@@ -1,8 +1,7 @@
-import { useQueryClient } from '@tanstack/react-query'
+import { useMutation, useQueryClient } from '@tanstack/react-query'
 import { toast } from 'sonner'
 
 import { replicationKeys } from './keys'
-import { useReplicationMutation } from './use-cluster-mutation'
 import { handleError, post } from '@/data/fetchers'
 import type { StudioError } from '@/lib/errors/studio-errors'
 import type { UseCustomMutationOptions } from '@/types'
@@ -45,7 +44,7 @@ export const useStartPipelineMutation = ({
 > = {}) => {
   const queryClient = useQueryClient()
 
-  return useReplicationMutation<StartPipelineData, StudioError, StartPipelineParams>({
+  return useMutation<StartPipelineData, StudioError, StartPipelineParams>({
     mutationFn: (vars) => startPipeline(vars),
     async onSuccess(data, variables, context) {
       const { projectRef, pipelineId } = variables

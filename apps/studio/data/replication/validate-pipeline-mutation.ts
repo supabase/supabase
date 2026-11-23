@@ -1,7 +1,7 @@
+import { useMutation } from '@tanstack/react-query'
 import { components } from 'api-types'
 
 import { type TableSyncCopyConfig } from './types'
-import { useReplicationMutation } from './use-cluster-mutation'
 import { buildPipelineApiConfig } from './utils'
 import { handleError, post } from '@/data/fetchers'
 import type { StudioError } from '@/lib/errors/studio-errors'
@@ -65,7 +65,7 @@ export const useValidatePipelineMutation = (
     'mutationFn'
   >
 ) => {
-  return useReplicationMutation<ValidatePipelineData, StudioError, ValidatePipelineParams>({
+  return useMutation<ValidatePipelineData, StudioError, ValidatePipelineParams>({
     mutationFn: (vars) => validatePipeline(vars),
     ...options,
   })

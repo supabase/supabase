@@ -104,6 +104,7 @@ export const useDestinationForm = ({ selectedType }: { selectedType: Destination
     const results = await Promise.allSettled([
       validateDestination({
         data,
+        clusterId,
         sourceId,
         publicationName: data.publicationName,
         maxFillMs: data.maxFillMs,
@@ -114,6 +115,7 @@ export const useDestinationForm = ({ selectedType }: { selectedType: Destination
       }),
       validatePipeline({
         projectRef,
+        clusterId,
         sourceId,
         publicationName: data.publicationName,
         maxFillMs: data.maxFillMs,
@@ -260,7 +262,7 @@ export const useDestinationForm = ({ selectedType }: { selectedType: Destination
         // create a duplicate pipeline; the new row offers its own start action.
         onClose()
         await runWithRequestStatus(pipelineId, PipelineStatusRequestStatus.StartRequested, () =>
-          startPipeline({ projectRef, pipelineId })
+          startPipeline({ projectRef, pipelineId, clusterId })
         )
         toast.success('Pipeline created. Starting…')
       }

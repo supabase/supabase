@@ -193,7 +193,7 @@ export const ReplicationPipelineLayout = ({ children }: PropsWithChildren) => {
     try {
       if (resolvedAction === 'start') {
         await runWithRequestStatus(pipeline.id, PipelineStatusRequestStatus.StartRequested, () =>
-          startPipeline({ projectRef, pipelineId: pipeline.id })
+          startPipeline({ projectRef, pipelineId: pipeline.id, clusterId })
         )
       } else if (resolvedAction === 'stop') {
         await runWithRequestStatus(pipeline.id, PipelineStatusRequestStatus.StopRequested, () =>
