@@ -46,11 +46,11 @@ import { CreateBranchModal } from '@/components/interfaces/BranchManagement/Crea
 import { ProjectAPIDocs } from '@/components/interfaces/ProjectAPIDocs/ProjectAPIDocs'
 import { BannerExplorer } from '@/components/ui/BannerStack/Banners/BannerExplorer'
 import { BannerFreeMicroUpgrade } from '@/components/ui/BannerStack/Banners/BannerFreeMicroUpgrade'
+import { isFreeMicroUpgradeBannerSnoozed } from '@/components/ui/BannerStack/Banners/BannerFreeMicroUpgrade.utils'
 import { BANNER_ID, useBannerStack } from '@/components/ui/BannerStack/BannerStackProvider'
 import { ButtonTooltip } from '@/components/ui/ButtonTooltip'
 import PartnerIcon from '@/components/ui/PartnerIcon'
 import { ResourceExhaustionWarningBanner } from '@/components/ui/ResourceExhaustionWarningBanner/ResourceExhaustionWarningBanner'
-import { useResourceWarningsQuery } from '@/data/usage/resource-warnings-query'
 import { useCustomContent } from '@/hooks/custom-content/useCustomContent'
 import { useLocalStorageQuery } from '@/hooks/misc/useLocalStorage'
 import { useSelectedOrganizationQuery } from '@/hooks/misc/useSelectedOrganization'
@@ -146,27 +146,20 @@ export const ProjectLayout = forwardRef<HTMLDivElement, PropsWithChildren<Projec
     const { data: selectedOrganization } = useSelectedOrganizationQuery()
     const { data: selectedProject } = useSelectedProjectQuery()
     const { addBanner, dismissBanner } = useBannerStack()
-    const { data: resourceWarnings } = useResourceWarningsQuery({
-      slug: selectedOrganization?.slug,
-    })
-    const projectResourceWarnings = (Array.isArray(resourceWarnings) ? resourceWarnings : []).find(
-      (w) => w.project === selectedProject?.ref
-    )
-    const isComputeNearExhaustion =
-      !!projectResourceWarnings?.cpu_exhaustion ||
-      !!projectResourceWarnings?.memory_and_swap_exhaustion ||
-      !!projectResourceWarnings?.disk_space_exhaustion ||
-      !!projectResourceWarnings?.disk_io_exhaustion
+
     const isNanoCompute = selectedProject?.infra_compute_size === 'nano'
     // The free Micro upgrade is only included on paid plans
     const isPaidPlan = !!selectedOrganization?.plan?.id && selectedOrganization.plan.id !== 'free'
-    const showUpgradeBanner = isPaidPlan && isNanoCompute && isComputeNearExhaustion
+    const showUpgradeBanner = isPaidPlan && isNanoCompute
 
     const isExplorerEnabled = useFlag('explorer')
 
-    const [isFreeMicroUpgradeBannerDismissed] = useLocalStorageQuery(
-      LOCAL_STORAGE_KEYS.FREE_MICRO_UPGRADE_BANNER_DISMISSED(selectedProject?.ref ?? ''),
-      false
+    const [freeMicroUpgradeBannerDismissedAt] = useLocalStorageQuery<string | null>(
+      LOCAL_STORAGE_KEYS.FREE_MICRO_UPGRADE_BANNER_DISMISSED_AT(selectedProject?.ref ?? ''),
+      null
+    )
+    const isFreeMicroUpgradeBannerDismissed = isFreeMicroUpgradeBannerSnoozed(
+      freeMicroUpgradeBannerDismissedAt
     )
     const [isProjectIntegrationBannerDismissed, setIsProjectIntegrationBannerDismissed] =
       useLocalStorageQuery(

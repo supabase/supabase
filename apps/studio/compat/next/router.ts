@@ -73,8 +73,8 @@ function serializeQuery(query: UrlObject['query']): string {
 // `query`, then drops the consumed keys from the query string — e.g.
 // `push({ pathname: '/project/[ref]/editor/[id]', query: { ref, id, foo } })`
 // resolves to `/project/<ref>/editor/<id>?foo=...`. `router.pathname` here is
-// the bracketed route *pattern* (see toNextPathPattern) and callers like
-// useUrlState push it back verbatim, so without this a sort/filter update on a
+// the bracketed route *pattern* (see toNextPathPattern) and callers may push
+// it back verbatim, so without this a sort/filter update on a
 // dynamic route would navigate TanStack to a LITERAL `/project/[ref]/...`,
 // which matches no project (ref === '[ref]') and bounces to a "project not
 // found" redirect. Mirrors Next's behaviour so those pushes stay on-page.
@@ -237,7 +237,7 @@ function toRelativeSameOrigin(url: string): string {
 // no direct equivalent for any of them (shallow, locale, scroll,
 // unstable_skipClientCache). Notably `shallow` is a no-op here, NOT a
 // push-vs-replace signal: callers pass `push(url, as, { shallow: true })`
-// expecting a normal history push (e.g. useUrlState, MonacoEditor). Whether
+// expecting a normal history push (e.g. MonacoEditor). Whether
 // a navigation replaces is decided solely by which method is called
 // (push vs replace) via the internal `_replace` flag below.
 type TransitionOptions = {

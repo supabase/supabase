@@ -133,7 +133,7 @@ export const DataApiDocsTab = () => {
   }
 
   return (
-    <div className="flex w-full bg-surface-100 flex-1 items-stretch">
+    <div className="flex w-full bg-surface-100 flex-1 items-stretch divide-x">
       <aside className="hidden lg:flex flex-col gap-y-6 w-60 shrink-0 p-10">
         <LangSelector
           selectedLang={selectedLang}

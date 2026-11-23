@@ -5,7 +5,18 @@ import dayjs from 'dayjs'
 import { ArrowRightIcon, ExternalLinkIcon, RefreshCwIcon } from 'lucide-react'
 import { useState } from 'react'
 import { toast } from 'sonner'
-import { Alert, AlertDescription, Button } from 'ui'
+import {
+  Alert,
+  AlertDescription,
+  Button,
+  Card,
+  Table,
+  TableBody,
+  TableCell,
+  TableHead,
+  TableHeader,
+  TableRow,
+} from 'ui'
 
 import {
   useDatabaseChartDeepLink,
@@ -23,7 +34,6 @@ import DiskSizeConfigurationModal from '@/components/interfaces/Settings/Databas
 import { getInfrastructurePath } from '@/components/interfaces/Settings/Infrastructure/Infrastructure.utils'
 import { LogsDatePicker } from '@/components/interfaces/Settings/Logs/Logs.DatePickers'
 import UpgradePrompt from '@/components/interfaces/Settings/Logs/UpgradePrompt'
-import Table from '@/components/to-be-cleaned/Table'
 import { ButtonTooltip } from '@/components/ui/ButtonTooltip'
 import type { MultiAttribute } from '@/components/ui/Charts/ComposedChart.utils'
 import { LazyComposedChartHandler } from '@/components/ui/Charts/ComposedChartHandler'
@@ -403,34 +413,35 @@ const DatabaseUsage = () => {
                   </span>
                 )}
                 {!props.isLoading && props.data.length > 0 && (
-                  <Table
-                    className="space-y-3 mt-4"
-                    head={[
-                      <Table.th key="object" className="py-2">
-                        Object
-                      </Table.th>,
-                      <Table.th key="size" className="py-2">
-                        Size
-                      </Table.th>,
-                    ]}
-                    body={props.data?.map((object) => {
-                      const percentage = (
-                        ((object.table_size as number) / databaseSizeBytes) *
-                        100
-                      ).toFixed(2)
+                  <Card className="mt-4">
+                    <Table>
+                      <TableHeader>
+                        <TableRow>
+                          <TableHead key="object">Object</TableHead>
+                          <TableHead key="size">Size</TableHead>
+                        </TableRow>
+                      </TableHeader>
+                      <TableBody>
+                        {props.data.map((object) => {
+                          const percentage = (
+                            ((object.table_size as number) / databaseSizeBytes) *
+                            100
+                          ).toFixed(2)
 
-                      return (
-                        <Table.tr key={`${object.schema_name}.${object.relname}`}>
-                          <Table.td>
-                            {object.schema_name}.{object.relname}
-                          </Table.td>
-                          <Table.td>
-                            {formatBytes(object.table_size)} ({percentage}%)
-                          </Table.td>
-                        </Table.tr>
-                      )
-                    })}
-                  />
+                          return (
+                            <TableRow key={`${object.schema_name}.${object.relname}`}>
+                              <TableCell>
+                                {object.schema_name}.{object.relname}
+                              </TableCell>
+                              <TableCell>
+                                {formatBytes(object.table_size)} ({percentage}%)
+                              </TableCell>
+                            </TableRow>
+                          )
+                        })}
+                      </TableBody>
+                    </Table>
+                  </Card>
                 )}
               </div>
             )
@@ -455,14 +466,14 @@ const renderDatabaseSizeAdditionalInfo = () => {
     <div className="px-6 pb-6">
       <Alert variant="default" className="mt-4">
         <AlertDescription>
-          <div className="space-y-2">
+          <div className="flex flex-col gap-y-2">
             <p>
               New Supabase projects have a database size of ~40-60mb. This space includes
               pre-installed extensions, schemas, and default Postgres data. Additional database size
               is used when installing extensions, even if those extensions are inactive.
             </p>
 
-            <Button asChild icon={<ExternalLinkIcon />}>
+            <Button asChild icon={<ExternalLinkIcon />} className="w-min">
               <a
                 href={`${DOCS_URL}/guides/platform/database-size#disk-space-usage`}
                 target="_blank"

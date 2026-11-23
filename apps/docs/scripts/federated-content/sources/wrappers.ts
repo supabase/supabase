@@ -158,6 +158,8 @@ const wrappers: FederatedContentSource = {
         dashboardIntegrationPath: 'iceberg_wrapper',
       },
       remoteFile: 'iceberg.md',
+      // Upstream H1 differs from `title`, so drop it to avoid a duplicate H1
+      dropLeadingHeading: true,
     },
     {
       slug: 'infura',
@@ -196,6 +198,8 @@ const wrappers: FederatedContentSource = {
         dashboardIntegrationPath: 'mssql_wrapper',
       },
       remoteFile: 'mssql.md',
+      // Upstream H1 differs from `title`, so drop it to avoid a duplicate H1
+      dropLeadingHeading: true,
     },
     {
       slug: 'mysql',
@@ -274,6 +278,8 @@ const wrappers: FederatedContentSource = {
         dashboardIntegrationPath: 's3_vectors_wrapper',
       },
       remoteFile: 's3vectors.md',
+      // Upstream H1 differs from `title`, so drop it to avoid a duplicate H1
+      dropLeadingHeading: true,
     },
     {
       slug: 'shopify',

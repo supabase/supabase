@@ -42,6 +42,10 @@ const CHUNK_LOAD_ERROR_PATTERNS = [
   /error loading dynamically imported module/i,
   // Safari / WebKit (incl. every iOS browser); carries no URL
   /Importing a module script failed/i,
+  // Safari / WebKit (incl. every iOS browser), when a module fetch fails access
+  // control (e.g. a proxy or captive portal redirects a chunk cross-origin, or
+  // a cross-origin response lacks CORS headers); carries no URL
+  /Cross-origin script load denied by Cross-Origin Resource Sharing policy/i,
   // Vite's dynamic-import dependency preloader
   /Unable to preload CSS/i,
   // Next.js / webpack (JS and CSS chunks)
