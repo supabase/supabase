@@ -1,6 +1,6 @@
 import { createFileRoute, Outlet } from '@tanstack/react-router'
-import { useParams } from 'common'
 
+import { ReplicationClusterProvider } from '@/state/replication-cluster'
 import { PipelineRequestStatusProvider } from '@/state/replication-pipeline-request-status'
 
 export const Route = createFileRoute('/project/$ref/database/pipelines')({
@@ -11,11 +11,13 @@ export const Route = createFileRoute('/project/$ref/database/pipelines')({
 })
 
 function PipelinesShell() {
-  const { ref: projectRef } = useParams()
+  const { ref: projectRef } = Route.useParams()
 
   return (
-    <PipelineRequestStatusProvider key={projectRef}>
-      <Outlet />
-    </PipelineRequestStatusProvider>
+    <ReplicationClusterProvider clusterId={undefined}>
+      <PipelineRequestStatusProvider key={projectRef}>
+        <Outlet />
+      </PipelineRequestStatusProvider>
+    </ReplicationClusterProvider>
   )
 }

@@ -1,57 +1,91 @@
+const replicationScope = (projectRef: string | undefined, clusterId?: string) =>
+  clusterId === undefined
+    ? (['projects', projectRef] as const)
+    : (['projects', projectRef, 'replication', clusterId] as const)
+
+// Publication create/update/delete invalidate this prefix to refresh names, details, and estimates.
+const publicationsKey = (
+  projectRef: string | undefined,
+  sourceId: number | undefined,
+  clusterId?: string
+) => [...replicationScope(projectRef, clusterId), 'sources', sourceId, 'publications'] as const
+
 export const replicationKeys = {
-  sources: (projectRef: string | undefined) => ['projects', projectRef, 'sources'] as const,
-  destinations: (projectRef: string | undefined) =>
-    ['projects', projectRef, 'destinations'] as const,
-  destinationById: (projectRef: string | undefined, destinationId: number | undefined | null) =>
-    ['projects', projectRef, 'destinations', destinationId] as const,
-  // Prefix shared by publicationNames, publication details, and cost-estimate keys.
-  // Publication create/update/delete invalidate this so all three refresh together.
-  publications: (projectRef: string | undefined, source_id: number | undefined) =>
-    ['projects', projectRef, 'sources', source_id, 'publications'] as const,
-  publicationNames: (projectRef: string | undefined, source_id: number | undefined) =>
-    ['projects', projectRef, 'sources', source_id, 'publications', 'list'] as const,
+  clusters: () => ['replication', 'clusters'] as const,
+  sources: (projectRef: string | undefined, clusterId?: string) =>
+    [...replicationScope(projectRef, clusterId), 'sources'] as const,
+  destinations: (projectRef: string | undefined, clusterId?: string) =>
+    [...replicationScope(projectRef, clusterId), 'destinations'] as const,
+  destinationById: (
+    projectRef: string | undefined,
+    destinationId: number | undefined | null,
+    clusterId?: string
+  ) => [...replicationScope(projectRef, clusterId), 'destinations', destinationId] as const,
+  publications: publicationsKey,
+  publicationNames: (
+    projectRef: string | undefined,
+    sourceId: number | undefined,
+    clusterId?: string
+  ) => [...publicationsKey(projectRef, sourceId, clusterId), 'list'] as const,
   publication: (
     projectRef: string | undefined,
-    source_id: number | undefined,
-    publicationName: string | undefined
-  ) =>
-    [
-      'projects',
-      projectRef,
-      'sources',
-      source_id,
-      'publications',
-      'detail',
-      publicationName,
-    ] as const,
-  tables: (projectRef: string | undefined, source_id: number | undefined) =>
-    ['projects', projectRef, 'sources', source_id, 'tables'] as const,
+    sourceId: number | undefined,
+    publicationName: string | undefined,
+    clusterId?: string
+  ) => [...publicationsKey(projectRef, sourceId, clusterId), 'detail', publicationName] as const,
+  tables: (projectRef: string | undefined, sourceId: number | undefined, clusterId?: string) =>
+    [...replicationScope(projectRef, clusterId), 'sources', sourceId, 'tables'] as const,
   tableColumns: (
     projectRef: string | undefined,
-    source_id: number | undefined,
-    tableId: number | undefined
-  ) => ['projects', projectRef, 'sources', source_id, 'tables', tableId, 'columns'] as const,
-  costEstimate: (
-    projectRef: string | undefined,
-    source_id: number | undefined,
-    publicationName: string | undefined
+    sourceId: number | undefined,
+    tableId: number | undefined,
+    clusterId?: string
   ) =>
     [
-      'projects',
-      projectRef,
+      ...replicationScope(projectRef, clusterId),
       'sources',
-      source_id,
-      'publications',
+      sourceId,
+      'tables',
+      tableId,
+      'columns',
+    ] as const,
+  costEstimate: (
+    projectRef: string | undefined,
+    sourceId: number | undefined,
+    publicationName: string | undefined,
+    clusterId?: string
+  ) =>
+    [
+      ...publicationsKey(projectRef, sourceId, clusterId),
       publicationName,
       'cost-estimate',
     ] as const,
-  pipelines: (projectRef: string | undefined) => ['projects', projectRef, 'pipelines'] as const,
-  pipelineById: (projectRef: string | undefined, pipelineId: string | undefined) =>
-    ['projects', projectRef, 'pipelines', pipelineId] as const,
-  pipelinesStatus: (projectRef: string | undefined, pipelineId: string | undefined) =>
-    ['projects', projectRef, 'pipelines', pipelineId, 'status'] as const,
-  pipelinesReplicationStatus: (projectRef: string | undefined, pipelineId: string | undefined) =>
-    ['projects', projectRef, 'pipelines', pipelineId, 'replication-status'] as const,
-  pipelinesVersion: (projectRef: string | undefined, pipelineId: string | undefined) =>
-    ['projects', projectRef, 'pipelines', pipelineId, 'version'] as const,
+  pipelines: (projectRef: string | undefined, clusterId?: string) =>
+    [...replicationScope(projectRef, clusterId), 'pipelines'] as const,
+  pipelineById: (
+    projectRef: string | undefined,
+    pipelineId: string | undefined,
+    clusterId?: string
+  ) => [...replicationScope(projectRef, clusterId), 'pipelines', pipelineId] as const,
+  pipelinesStatus: (
+    projectRef: string | undefined,
+    pipelineId: string | undefined,
+    clusterId?: string
+  ) => [...replicationScope(projectRef, clusterId), 'pipelines', pipelineId, 'status'] as const,
+  pipelinesReplicationStatus: (
+    projectRef: string | undefined,
+    pipelineId: string | undefined,
+    clusterId?: string
+  ) =>
+    [
+      ...replicationScope(projectRef, clusterId),
+      'pipelines',
+      pipelineId,
+      'replication-status',
+    ] as const,
+  pipelinesVersion: (
+    projectRef: string | undefined,
+    pipelineId: string | undefined,
+    clusterId?: string
+  ) => [...replicationScope(projectRef, clusterId), 'pipelines', pipelineId, 'version'] as const,
 }

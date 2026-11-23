@@ -1,21 +1,22 @@
-import { useQuery } from '@tanstack/react-query'
+import { queryOptions, useQuery } from '@tanstack/react-query'
 
 import { replicationKeys } from './keys'
 import { checkReplicationFeatureFlagRetry } from './utils'
 import { get, handleError } from '@/data/fetchers'
 import type { StudioError } from '@/lib/errors/studio-errors'
+import { useReplicationClusterId } from '@/state/replication-cluster'
 import type { UseCustomQueryOptions } from '@/types'
 
-type ReplicationDestinationsParams = { projectRef?: string }
+type ReplicationDestinationsParams = { projectRef?: string; clusterId?: string }
 
 async function fetchReplicationDestinations(
-  { projectRef }: ReplicationDestinationsParams,
+  { projectRef, clusterId }: ReplicationDestinationsParams,
   signal?: AbortSignal
 ) {
   if (!projectRef) throw new Error('projectRef is required')
 
   const { data, error } = await get('/platform/replication/{ref}/destinations', {
-    params: { path: { ref: projectRef } },
+    params: { path: { ref: projectRef }, query: { cluster_id: clusterId } },
     signal,
   })
   if (error) {
@@ -27,18 +28,30 @@ async function fetchReplicationDestinations(
 
 export type ReplicationDestinationsData = Awaited<ReturnType<typeof fetchReplicationDestinations>>
 
+const replicationDestinationsQueryOptions = <TData = ReplicationDestinationsData>({
+  projectRef,
+  clusterId,
+}: ReplicationDestinationsParams) =>
+  queryOptions<ReplicationDestinationsData, StudioError, TData>({
+    queryKey: replicationKeys.destinations(projectRef, clusterId),
+    queryFn: ({ signal }) => fetchReplicationDestinations({ projectRef, clusterId }, signal),
+    enabled: typeof projectRef !== 'undefined',
+    refetchOnWindowFocus: false,
+    retry: checkReplicationFeatureFlagRetry,
+  })
+
 export const useReplicationDestinationsQuery = <TData = ReplicationDestinationsData>(
-  { projectRef }: ReplicationDestinationsParams,
+  variables: ReplicationDestinationsParams,
   {
     enabled = true,
     ...options
   }: UseCustomQueryOptions<ReplicationDestinationsData, StudioError, TData> = {}
-) =>
-  useQuery<ReplicationDestinationsData, StudioError, TData>({
-    queryKey: replicationKeys.destinations(projectRef),
-    queryFn: ({ signal }) => fetchReplicationDestinations({ projectRef }, signal),
+) => {
+  const { projectRef } = variables
+  const clusterId = useReplicationClusterId(variables)
+  return useQuery<ReplicationDestinationsData, StudioError, TData>({
+    ...replicationDestinationsQueryOptions<TData>({ projectRef, clusterId }),
     enabled: enabled && typeof projectRef !== 'undefined',
-    refetchOnWindowFocus: false,
-    retry: checkReplicationFeatureFlagRetry,
     ...options,
   })
+}
