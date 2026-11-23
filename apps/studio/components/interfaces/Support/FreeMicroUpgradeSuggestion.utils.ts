@@ -7,4 +7,4 @@ export const isEligibleForFreeMicroUpgrade = ({
 }: {
   planId?: OrganizationPlanID
   computeSize?: string
-}) => !!planId && planId !== 'free' && computeSize === 'nano'
+}) => !!planId && planId !== 'free' && planId !== 'platform' && computeSize === 'nano'
