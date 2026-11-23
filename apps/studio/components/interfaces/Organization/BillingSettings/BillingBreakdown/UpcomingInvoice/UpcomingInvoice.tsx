@@ -28,7 +28,7 @@ import { useOrganizationQuery } from '@/data/organizations/organization-query'
 import { formatCurrency } from '@/lib/helpers'
 
 export interface UpcomingInvoiceProps {
-  slug: string
+  slug?: string
 }
 
 export const UpcomingInvoice = ({ slug }: UpcomingInvoiceProps) => {
@@ -49,10 +49,6 @@ export const UpcomingInvoice = ({ slug }: UpcomingInvoiceProps) => {
 
   return (
     <div ref={ref}>
-      <span role="status" className="sr-only">
-        {hasLoadedInvoice ? 'Upcoming invoice loaded' : ''}
-      </span>
-
       {isLoading && (
         <div className="space-y-2">
           <ShimmeringLoader />
