@@ -2,7 +2,7 @@
 import { LOCAL_STORAGE_KEYS } from 'common/constants/local-storage'
 import { afterEach, describe, expect, it } from 'vitest'
 
-import { IA_NAV_CACHE_SCRIPT, IA_NAV_FLAG } from './constants'
+import { IA_NAV_CACHE_SCRIPT, IA_NAV_FLAG, IA_NAV_OVERRIDE_KEY } from './constants'
 
 // the layout inlines this string in <head>, so the test runs it the same way the browser does
 const runCacheScript = () => new Function(IA_NAV_CACHE_SCRIPT)()
@@ -10,6 +10,7 @@ const runCacheScript = () => new Function(IA_NAV_CACHE_SCRIPT)()
 describe('IA_NAV_CACHE_SCRIPT', () => {
   afterEach(() => {
     localStorage.clear()
+    sessionStorage.clear()
     delete document.documentElement.dataset.iaNav
     window.history.replaceState(null, '', '/')
   })
@@ -36,6 +37,24 @@ describe('IA_NAV_CACHE_SCRIPT', () => {
     runCacheScript()
 
     expect(document.documentElement.dataset.iaNav).toBe('option-1')
+  })
+
+  it('marks the page from a saved override when the url has no param', () => {
+    localStorage.setItem(LOCAL_STORAGE_KEYS.IA_NAV_FLAG, 'false')
+    sessionStorage.setItem(IA_NAV_OVERRIDE_KEY, 'option-1')
+
+    runCacheScript()
+
+    expect(document.documentElement.dataset.iaNav).toBe('option-1')
+  })
+
+  it('leaves the page unmarked when the url forces control over a saved option-1', () => {
+    sessionStorage.setItem(IA_NAV_OVERRIDE_KEY, 'option-1')
+    window.history.replaceState(null, '', `/?${IA_NAV_FLAG}=control`)
+
+    runCacheScript()
+
+    expect(document.documentElement.dataset.iaNav).toBeUndefined()
   })
 
   it('leaves the page unmarked when the url forces control over a cached option-1', () => {

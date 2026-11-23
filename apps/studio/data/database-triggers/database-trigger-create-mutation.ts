@@ -1,22 +1,23 @@
-import pgMeta from '@supabase/pg-meta'
+import pgMeta, { asWriteSql } from '@supabase/pg-meta'
 import { PGTriggerCreate } from '@supabase/pg-meta/src/pg-meta-triggers'
 import { useMutation, useQueryClient } from '@tanstack/react-query'
 import { toast } from 'sonner'
 
 import { databaseTriggerKeys } from './keys'
-import { unguarded } from '@/data/fetchers'
-import { executeSql } from '@/data/sql/execute-sql-mutation'
+import { executeSql, type PgMetaWriteGrant } from '@/data/sql/execute-sql-mutation'
 import type { StudioError } from '@/lib/errors/studio-errors'
 import type { UseCustomMutationOptions } from '@/types'
 
 export type DatabaseTriggerCreateVariables = {
   projectRef: string
+  grant: PgMetaWriteGrant
   connectionString?: string | null
   payload: PGTriggerCreate
 }
 
 export async function createDatabaseTrigger({
   projectRef,
+  grant,
   connectionString,
   payload,
 }: DatabaseTriggerCreateVariables) {
@@ -27,9 +28,9 @@ export async function createDatabaseTrigger({
     connectionString,
     sqlOrigin: 'studio',
     queryName: 'trigger-create',
-    sql,
+    sql: asWriteSql(sql),
     queryKey: ['trigger', 'create'],
-    grant: unguarded.migrating,
+    grant,
   })
 
   return result

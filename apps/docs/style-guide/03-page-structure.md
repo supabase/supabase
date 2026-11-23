@@ -12,6 +12,7 @@ Apply this document when you add a page or move content around on an existing on
 | If you're deciding                                     | Read                                                          |
 | ------------------------------------------------------ | ------------------------------------------------------------- |
 | Which document type to write, and how big it should be | [Document types](#document-types)                             |
+| Which template a page follows                          | [Choose a template](#choose-a-template)                       |
 | What to put in a guide's frontmatter                   | [Write good frontmatter](#write-good-frontmatter)             |
 | Which reader question a chunk answers                  | [Information types](#information-types)                       |
 | How to order sections on the page                      | [Grouping sections](#grouping-sections)                       |
@@ -34,6 +35,17 @@ writing.
 
 Reference content is generated from spec files rather than hand-authored. See
 [CONTRIBUTING.md](../CONTRIBUTING.md) for the reference pipeline.
+
+### Choose a template
+
+Pick the one template that matches the page, and follow only that one. Each template
+answers a reader question and names its Information Type.
+
+| Page purpose            | Reader question       | Information type | Template                                         |
+| ----------------------- | --------------------- | ---------------- | ------------------------------------------------ |
+| Finish one task (guide) | How do I do one task? | Procedure        | [`how-to-guide.md`](./templates/how-to-guide.md) |
+
+If no row fits the page, say so and ask the requester. Don't invent a structure.
 
 ### Open a guide with a value statement
 

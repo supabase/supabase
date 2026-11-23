@@ -1,7 +1,7 @@
 import { beforeEach, describe, expect, it, vi } from 'vitest'
 
 import { classifyResponseError } from './error-classification'
-import { ERROR_ROUTING } from '@/lib/errors/error-routing'
+import { getErrorRouting } from '@/lib/errors/error-routing'
 import {
   ConnectionTimeoutError,
   isStudioError,
@@ -15,7 +15,7 @@ import {
 } from '@/lib/errors/studio-errors'
 
 const captureException = vi.hoisted(() => vi.fn(() => 'event-123'))
-vi.mock('@sentry/nextjs', () => ({ captureException }))
+vi.mock('@sentry/react', () => ({ captureException }))
 vi.mock('common', () => ({ IS_PLATFORM: false, getAccessToken: vi.fn() }))
 vi.mock('@/lib/constants', () => ({ API_URL: 'http://localhost' }))
 vi.mock('@/lib/helpers', () => ({ uuidv4: () => 'test-uuid' }))
@@ -60,14 +60,7 @@ describe('handleError — error classification', () => {
       false,
       'client_error',
     ],
-    [
-      '401',
-      { message: 'boom', code: 401 },
-      'UnclassifiedApiError',
-      'studio',
-      false,
-      'unauthorized',
-    ],
+    ['401', { message: 'boom', code: 401 }, 'UnclassifiedApiError', 'user', false, 'unauthorized'],
     ['403', { message: 'boom', code: 403 }, 'UnclassifiedApiError', 'studio', false, 'forbidden'],
     ['404', { message: 'boom', code: 404 }, 'UnclassifiedApiError', 'studio', false, 'not_found'],
     ['429', { message: 'boom', code: 429 }, 'UnclassifiedApiError', 'studio', true, 'rate_limited'],
@@ -191,7 +184,7 @@ describe('handleError — error classification', () => {
         expect.any(NetworkUnreachableError),
         expect.objectContaining({
           tags: expect.objectContaining({
-            sample_rate: ERROR_ROUTING.NetworkUnreachable.sentrySampleRate,
+            sample_rate: getErrorRouting(new NetworkUnreachableError({})).sentrySampleRate,
           }),
         })
       )
@@ -219,7 +212,7 @@ describe('handleError — error classification', () => {
         err,
         expect.objectContaining({
           tags: expect.objectContaining({
-            sample_rate: ERROR_ROUTING.UnexpectedError.sentrySampleRate,
+            sample_rate: getErrorRouting(err).sentrySampleRate,
           }),
         })
       )

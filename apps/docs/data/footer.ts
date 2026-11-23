@@ -1,5 +1,4 @@
-import { CheckCircle, FlaskConical, LifeBuoy } from 'lucide-react'
-import { PrivacySettings } from 'ui-patterns/PrivacySettings'
+import { CheckCircle, FlaskConical, LifeBuoy, MessagesSquare, ScrollText } from 'lucide-react'
 
 export const primaryLinks = [
   {
@@ -22,6 +21,12 @@ export const primaryLinks = [
   },
 ]
 
+export const linkCells = [
+  { label: 'System status', url: 'https://status.supabase.com/' },
+  { label: 'Product updates', url: 'https://supabase.com/changelog', icon: ScrollText },
+  { label: 'Contact support', url: 'https://supabase.com/support', icon: MessagesSquare },
+]
+
 export const secondaryLinks = [
   {
     title: 'Contributing',
@@ -32,6 +37,5 @@ export const secondaryLinks = [
     url: 'https://github.com/supabase/supabase/blob/master/apps/docs/CONTRIBUTING.md',
   },
   { title: 'Open Source', url: 'https://supabase.com/open-source' },
-  { title: 'SupaSquad', url: 'https://supabase.com/supasquad' },
-  { title: 'Privacy Settings', component: PrivacySettings },
+  { title: 'SupaSquad', url: 'https://supabase.com/open-source/contributing/supasquad' },
 ]

@@ -5,11 +5,8 @@ import { Button, Input, Separator } from 'ui'
 import { FormItemLayout } from 'ui-patterns/form/FormItemLayout/FormItemLayout'
 
 import { DestinationLogo } from '../DestinationLogo'
-import { CREATE_NEW_NAMESPACE } from '../DestinationPanel/DestinationForm/DestinationForm.constants'
 import type { DestinationPanelSchemaType } from '../DestinationPanel/DestinationForm/DestinationForm.schema'
 import {
-  ANALYTICS_BUCKET_BUCKET_FIELD_COPY,
-  ANALYTICS_BUCKET_NAMESPACE_FIELD_COPY,
   BIGQUERY_DATASET_ID_FIELD_COPY,
   BIGQUERY_PROJECT_ID_FIELD_COPY,
   CLICKHOUSE_DATABASE_FIELD_COPY,
@@ -75,9 +72,6 @@ export const PipelineDestinationReview = ({
     url,
     clickhouseDatabase,
     engine,
-    warehouse,
-    namespace,
-    newNamespace,
   ] = useWatch({
     control,
     name: [
@@ -94,9 +88,6 @@ export const PipelineDestinationReview = ({
       'clickhouseUrl',
       'clickhouseDatabase',
       'clickhouseEngine',
-      'warehouseName',
-      'namespace',
-      'newNamespaceName',
     ],
   })
   const rows: { label: string; value?: string; description: string; isMasked?: boolean }[] = []
@@ -139,15 +130,6 @@ export const PipelineDestinationReview = ({
         }
       )
       break
-    case 'Analytics Bucket':
-      rows.push(
-        { ...ANALYTICS_BUCKET_BUCKET_FIELD_COPY, value: warehouse },
-        {
-          ...ANALYTICS_BUCKET_NAMESPACE_FIELD_COPY,
-          value: namespace === CREATE_NEW_NAMESPACE ? newNamespace : namespace,
-        }
-      )
-      break
   }
   return (
     <section aria-label="Destination review">
@@ -170,7 +152,7 @@ export const PipelineDestinationReview = ({
           isReactForm={false}
           layout="horizontal"
           label="Type"
-          description={`Destination type cannot be changed after creation. ${type === 'Analytics Bucket' ? 'Analytics Bucket is deprecated.' : `${type} support is in public alpha.`}`}
+          description={`Destination type cannot be changed after creation. ${type} support is in public alpha.`}
         >
           <div className="flex h-11 min-w-0 items-center gap-2 rounded-md border bg-surface-200 px-3">
             <DestinationLogo type={type} />

@@ -73,8 +73,8 @@ function serializeQuery(query: UrlObject['query']): string {
 // `query`, then drops the consumed keys from the query string — e.g.
 // `push({ pathname: '/project/[ref]/editor/[id]', query: { ref, id, foo } })`
 // resolves to `/project/<ref>/editor/<id>?foo=...`. `router.pathname` here is
-// the bracketed route *pattern* (see toNextPathPattern) and callers like
-// useUrlState push it back verbatim, so without this a sort/filter update on a
+// the bracketed route *pattern* (see toNextPathPattern) and callers may push
+// it back verbatim, so without this a sort/filter update on a
 // dynamic route would navigate TanStack to a LITERAL `/project/[ref]/...`,
 // which matches no project (ref === '[ref]') and bounces to a "project not
 // found" redirect. Mirrors Next's behaviour so those pushes stay on-page.
@@ -237,7 +237,7 @@ function toRelativeSameOrigin(url: string): string {
 // no direct equivalent for any of them (shallow, locale, scroll,
 // unstable_skipClientCache). Notably `shallow` is a no-op here, NOT a
 // push-vs-replace signal: callers pass `push(url, as, { shallow: true })`
-// expecting a normal history push (e.g. useUrlState, MonacoEditor). Whether
+// expecting a normal history push (e.g. MonacoEditor). Whether
 // a navigation replaces is decided solely by which method is called
 // (push vs replace) via the internal `_replace` flag below.
 type TransitionOptions = {
@@ -414,32 +414,6 @@ export function useRouter() {
       events: getRouterEventsProxy(router),
     }
   }, [router, location.href, location.pathname, leafRouteId, params, search])
-}
-
-// Normalise an optional-catch-all route's params across both frameworks.
-//
-// Next's `[[...name]]` surfaces the trailing path as `query.name: string[]`,
-// while TanStack's splat (`$`) surfaces it as `query._splat: string`. The
-// shim can't rename `_splat` to the Next param name on its own — that name
-// only exists in the Next page filename and never reaches the router — so
-// the caller passes it. Returns the trailing path as a string[] plus the
-// remaining query params (with the catch-all keys stripped) for building
-// query strings. Shared by every migrated catch-all page so the logic lives
-// in one place.
-export function parseCatchAllRoute(
-  query: Record<string, string | string[] | undefined>,
-  paramName: string
-): {
-  segments: string[] | undefined
-  queryParams: Record<string, string | string[] | undefined>
-} {
-  const { [paramName]: raw, _splat, ...queryParams } = query
-  const segments = Array.isArray(raw)
-    ? raw
-    : typeof _splat === 'string' && _splat
-      ? _splat.split('/')
-      : undefined
-  return { segments, queryParams }
 }
 
 // Module-scope singleton — Next exposes the same proxy via

@@ -8,7 +8,7 @@ import { Row } from 'ui-patterns/Row'
 
 import { isChartIntervalKey, resolveChartInterval } from './ChartInterval.utils'
 import {
-  buildSortedServiceCards,
+  buildServiceCards,
   computeSuccessAndNonSuccessRates,
   getBucketLogRange,
   isServiceDisabled,
@@ -20,7 +20,7 @@ import {
   buildUnifiedLogsUrl,
   type UnifiedLogType,
 } from '@/components/interfaces/UnifiedLogs/UnifiedLogs.utils'
-import NoDataPlaceholder from '@/components/ui/Charts/NoDataPlaceholder'
+import { NoDataPlaceholder } from '@/components/ui/Charts/NoDataPlaceholder'
 import { ChartIntervalDropdown } from '@/components/ui/Logs/ChartIntervalDropdown'
 import { CHART_INTERVALS } from '@/components/ui/Logs/logs.utils'
 import { useCheckEntitlements } from '@/hooks/misc/useCheckEntitlements'
@@ -126,7 +126,7 @@ export const ProjectUsageSectionDeltas = () => {
   )
 
   const services = useMemo(
-    () => buildSortedServiceCards(serviceBase, serviceData),
+    () => buildServiceCards(serviceBase, serviceData),
     [serviceBase, serviceData]
   )
 

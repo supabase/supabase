@@ -1,8 +1,9 @@
-import * as Sentry from '@sentry/nextjs'
+import * as Sentry from '@sentry/react'
 import type { PGTable } from '@supabase/pg-meta'
 import { useQueryClient } from '@tanstack/react-query'
 import { useParams } from 'common'
 import { isEmpty, isUndefined, noop } from 'lodash'
+import { parseAsNativeArrayOf, parseAsString, useQueryStates } from 'nuqs'
 import { useState } from 'react'
 import { toast } from 'sonner'
 import { SonnerProgress, StatusIcon } from 'ui'
@@ -47,6 +48,7 @@ import type { ForeignKeyConstraint } from '@/data/database/foreign-key-constrain
 import { ENTITY_TYPE } from '@/data/entity-types/entity-type-constants'
 import { privilegeKeys } from '@/data/privileges/keys'
 import { useTableApiAccessPrivilegesMutation } from '@/data/privileges/table-api-access-mutation'
+import { useTableEditorQuery } from '@/data/table-editor/table-editor-query'
 import { isTableLike, type Entity } from '@/data/table-editor/table-editor-types'
 import { tableRowKeys } from '@/data/table-rows/keys'
 import { tableKeys } from '@/data/tables/keys'
@@ -55,7 +57,6 @@ import { RetrieveTableResult } from '@/data/tables/table-retrieve-query'
 import { getTables } from '@/data/tables/tables-query'
 import { useSelectedProjectQuery } from '@/hooks/misc/useSelectedProject'
 import { useConfirmOnClose } from '@/hooks/ui/useConfirmOnClose'
-import { useUrlState } from '@/hooks/ui/useUrlState'
 import { useVisibleKey } from '@/hooks/ui/useVisibleKey'
 import { type ApiPrivilegesByRole } from '@/lib/data-api-types'
 import { isObjectContainingKeys } from '@/lib/helpers'
@@ -134,10 +135,10 @@ const DUMMY_TABLE_API_ACCESS_PARAMS: TableApiAccessParams = {
 
 const createTableApiAccessHandlerParams = ({
   snap,
-  selectedTable,
+  targetTable,
 }: {
   snap: DeepReadonly<TableEditorState>
-  selectedTable?: PGTable
+  targetTable?: Pick<PGTable, 'schema' | 'name'>
 }): TableApiAccessParams | undefined => {
   const tableSidePanel = snap.sidePanel?.type === 'table' ? snap.sidePanel : undefined
   if (!tableSidePanel) return undefined
@@ -148,20 +149,20 @@ const createTableApiAccessHandlerParams = ({
     }
   }
 
-  if (!selectedTable) return undefined
+  if (!targetTable) return undefined
 
   if (tableSidePanel.mode === 'duplicate') {
     return {
       type: 'duplicate',
-      templateSchemaName: selectedTable.schema,
-      templateTableName: selectedTable.name,
+      templateSchemaName: targetTable.schema,
+      templateTableName: targetTable.name,
     }
   }
 
   return {
     type: 'edit',
-    schemaName: selectedTable.schema,
-    tableName: selectedTable.name,
+    schemaName: targetTable.schema,
+    tableName: targetTable.name,
   }
 }
 
@@ -184,7 +185,13 @@ export const SidePanelEditor = ({
   const { ref } = useParams()
   const snap = useTableEditorStateSnapshot()
   const tabsSnap = useTabsStateSnapshot()
-  const [_, setParams] = useUrlState({ arrayKeys: ['filter', 'sort'] })
+  const [, setFilterAndSortParams] = useQueryStates(
+    {
+      filter: parseAsNativeArrayOf(parseAsString),
+      sort: parseAsNativeArrayOf(parseAsString),
+    },
+    { history: 'replace' }
+  )
 
   const track = useTrack()
   const queryClient = useQueryClient()
@@ -196,6 +203,19 @@ export const SidePanelEditor = ({
   const [isEdited, setIsEdited] = useState<boolean>(false)
   const csvImportKey = useVisibleKey(snap.sidePanel?.type === 'csv-import')
 
+  // Edit and duplicate act on the table named in the state, which isn't necessarily the one open
+  // in the grid (`selectedTable`)
+  const tableSidePanel = snap.sidePanel?.type === 'table' ? snap.sidePanel : undefined
+  const targetTableId = tableSidePanel?.mode === 'new' ? undefined : tableSidePanel?.tableId
+  const { data: targetEntity } = useTableEditorQuery({
+    projectRef: project?.ref,
+    connectionString: project?.connectionString,
+    id: targetTableId,
+  })
+  const targetTable = targetEntity && isTableLike(targetEntity) ? targetEntity : undefined
+  // Without a target an edit would render as the "new table" form, so wait for it
+  const isAwaitingTargetTable = targetTableId !== undefined && targetTable === undefined
+
   const { data: publications } = useDatabasePublicationsQuery({
     projectRef: project?.ref,
     connectionString: project?.connectionString,
@@ -203,7 +223,7 @@ export const SidePanelEditor = ({
 
   const tableApiAccessParams = createTableApiAccessHandlerParams({
     snap,
-    selectedTable,
+    targetTable,
   })
   const apiAccessToggleHandler = useTableApiAccessHandlerWithHistory(
     // Dummy params used to appease TypeScript, actually gated by enabled flag
@@ -443,22 +463,15 @@ export const SidePanelEditor = ({
    * Adds the renamed column's filter and/or sort rules.
    */
   const reAddRenamedColumnSortAndFilter = (oldColumnName: string, newColumnName: string) => {
-    setParams((prevParams) => {
-      const existingFilters = (prevParams?.filter ?? []) as string[]
-      const existingSorts = (prevParams?.sort ?? []) as string[]
+    const renameColumnRule = (rule: string) => {
+      const [column] = rule.split(':')
+      return column === oldColumnName ? rule.replace(column, newColumnName) : rule
+    }
 
-      return {
-        ...prevParams,
-        filter: existingFilters.map((filter: string) => {
-          const [column] = filter.split(':')
-          return column === oldColumnName ? filter.replace(column, newColumnName) : filter
-        }),
-        sort: existingSorts.map((sort: string) => {
-          const [column] = sort.split(':')
-          return column === oldColumnName ? sort.replace(column, newColumnName) : sort
-        }),
-      }
-    })
+    setFilterAndSortParams((prev) => ({
+      filter: prev.filter?.map(renameColumnRule) ?? null,
+      sort: prev.sort?.map(renameColumnRule) ?? null,
+    }))
   }
 
   const updateTableRealtime = async (table: RetrieveTableResult, enabled: boolean) => {
@@ -715,8 +728,8 @@ export const SidePanelEditor = ({
             }
           }
         )
-      } else if (action === 'duplicate' && !!selectedTable) {
-        const tableToDuplicate = selectedTable
+      } else if (action === 'duplicate' && !!targetTable) {
+        const tableToDuplicate = targetTable
         toastId = toast.loading(`Duplicating table: ${tableToDuplicate.name}...`)
 
         const table = await duplicateTable(project?.ref!, project?.connectionString, payload, {
@@ -752,14 +765,14 @@ export const SidePanelEditor = ({
           { id: toastId }
         )
         onTableCreated(table)
-      } else if (action === 'update' && selectedTable) {
-        toastId = toast.loading(`Updating table: ${selectedTable.name}...`)
+      } else if (action === 'update' && targetTable) {
+        toastId = toast.loading(`Updating table: ${targetTable.name}...`)
 
         const { table, hasError } = await updateTable({
           projectRef: project?.ref!,
           connectionString: project?.connectionString,
           toastId,
-          table: selectedTable,
+          table: targetTable,
           payload,
           columns,
           foreignKeyRelations,
@@ -788,7 +801,7 @@ export const SidePanelEditor = ({
         } else {
           if (ref && payload.name) {
             // [Joshen] Only table entities can be updated via the dashboard
-            const tabId = createTabId(ENTITY_TYPE.TABLE, { id: selectedTable.id })
+            const tabId = createTabId(ENTITY_TYPE.TABLE, { id: targetTable.id })
             tabsSnap.updateTab(tabId, { label: payload.name })
           }
           toast.success(`Successfully updated ${table.name}!`, { id: toastId })
@@ -911,24 +924,19 @@ export const SidePanelEditor = ({
         />
       )}
       <TableEditor
-        table={
-          snap.sidePanel?.type === 'table' &&
-          (snap.sidePanel.mode === 'edit' || snap.sidePanel.mode === 'duplicate')
-            ? selectedTable
-            : undefined
-        }
+        table={targetTable}
         isDuplicating={isDuplicating}
         templateData={
-          snap.sidePanel?.type === 'table' && snap.sidePanel.templateData
+          tableSidePanel?.mode === 'new' && tableSidePanel.templateData
             ? {
-                ...snap.sidePanel.templateData,
-                columns: snap.sidePanel.templateData.columns
-                  ? [...snap.sidePanel.templateData.columns]
+                ...tableSidePanel.templateData,
+                columns: tableSidePanel.templateData.columns
+                  ? [...tableSidePanel.templateData.columns]
                   : undefined,
               }
             : undefined
         }
-        visible={snap.sidePanel?.type === 'table'}
+        visible={tableSidePanel !== undefined && !isAwaitingTargetTable}
         closePanel={onClosePanel}
         saveChanges={saveTable}
         updateEditorDirty={() => setIsEdited(true)}

@@ -8,6 +8,7 @@ import {
 import { useSupamonitorStatus } from '@/components/interfaces/QueryPerformance/hooks/useSupamonitorStatus'
 import { useContentQuery } from '@/data/content/content-query'
 import { useIsFeatureEnabled } from '@/hooks/misc/useIsFeatureEnabled'
+import { useIsWarehouseEnabled } from '@/hooks/misc/useIsWarehouseEnabled'
 import { customRenderHook as renderHook } from '@/tests/lib/custom-render'
 import { routerMock } from '@/tests/lib/route-mock'
 
@@ -47,8 +48,21 @@ vi.mock('@/data/content/content-query', () => ({
   useContentQuery: vi.fn(),
 }))
 
+vi.mock('@/hooks/misc/useIsWarehouseEnabled', () => ({
+  useIsWarehouseEnabled: vi.fn().mockReturnValue(false),
+}))
+
 describe('useGenerateObservabilityMenu', () => {
+  it.each([true, false])('shows Warehouse only with access: %s', (enabled) => {
+    vi.mocked(useIsWarehouseEnabled).mockReturnValue(enabled)
+    const { result } = renderHook(() => useGenerateObservabilityMenu())
+    expect(
+      result.current.flatMap((section) => section.items).some((item) => item.key === 'warehouse')
+    ).toBe(enabled)
+  })
+
   beforeEach(() => {
+    vi.mocked(useIsWarehouseEnabled).mockReturnValue(false)
     mockIsPlatform.value = true
     routerMock.setCurrentUrl(`/project/${REF}/observability`)
     vi.mocked(useFlag).mockReturnValue(false)
@@ -92,6 +106,7 @@ describe('useGenerateObservabilityMenu', () => {
   })
 
   it('includes API Gateway and the PRODUCT section on platform', () => {
+    vi.mocked(useIsWarehouseEnabled).mockReturnValue(false)
     mockIsPlatform.value = true
 
     const { result } = renderHook(() => useGenerateObservabilityMenu())

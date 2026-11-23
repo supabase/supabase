@@ -90,6 +90,7 @@ const renderForm = (flag: string | false | undefined) =>
         // An empty store reads as "flags not loaded yet"
         posthog: flag === undefined ? {} : { onboardingSurveyPlacement: flag },
         hasLoaded: true,
+        hasFlagsForSignedInUser: true,
       }}
     >
       <NewOrgForm onPaymentMethodReset={() => {}} onPlanSelected={() => {}} />
@@ -168,6 +169,27 @@ describe('NewOrgForm onboarding survey', () => {
       await fillNameAndSubmit()
 
       expect(surveyRequests).toEqual([{ slug: NEW_ORG_SLUG, kind: 'AGENCY' }])
+      expect(readFollowUpState()).toBeNull()
+    })
+
+    it('sends a partly answered survey and asks for no follow-up', async () => {
+      const { surveyRequests } = mockApi()
+      renderForm('org_form')
+
+      await chooseOption('Personal', 'Company')
+      await chooseOption('1 - 10', '50 - 99')
+      const [, canCodeSelect] = screen
+        .getAllByRole('combobox')
+        .filter((combobox) => combobox.textContent === 'Select an option')
+      await user.click(canCodeSelect)
+      await user.click(
+        within(await screen.findByRole('listbox')).getByRole('option', { name: 'Yes' })
+      )
+      await fillNameAndSubmit()
+
+      expect(surveyRequests).toEqual([
+        { slug: NEW_ORG_SLUG, kind: 'COMPANY', size: '50', can_code: 'yes' },
+      ])
       expect(readFollowUpState()).toBeNull()
     })
 
