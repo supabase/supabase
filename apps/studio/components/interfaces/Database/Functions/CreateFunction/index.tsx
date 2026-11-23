@@ -1,6 +1,6 @@
 import { zodResolver } from '@hookform/resolvers/zod'
 import { acceptUntrustedSql, untrustedSql } from '@supabase/pg-meta/src/pg-format'
-import { isEmpty, isNull, keyBy, mapValues, partition } from 'lodash'
+import { isEmpty, isNull, keyBy, mapValues, partition, uniq } from 'lodash'
 import { PlusIcon, TrashIcon } from 'lucide-react'
 import { useEffect, useMemo, useState } from 'react'
 import { SubmitHandler, useFieldArray, useForm, useWatch } from 'react-hook-form'
@@ -557,11 +557,13 @@ const FormFieldArgs = ({ readonly }: FormFieldConfigParamsProps) => {
                           </SelectTrigger>
                           <SelectContent>
                             <ScrollArea className="h-52">
-                              {['integer', ...POSTGRES_DATA_TYPES].map((option) => (
-                                <SelectItem value={option} key={option}>
-                                  {option}
-                                </SelectItem>
-                              ))}
+                              {uniq(['integer', ...POSTGRES_DATA_TYPES, field.value])
+                                .filter(Boolean)
+                                .map((option) => (
+                                  <SelectItem value={option} key={option}>
+                                    {option}
+                                  </SelectItem>
+                                ))}
                             </ScrollArea>
                           </SelectContent>
                         </Select>
