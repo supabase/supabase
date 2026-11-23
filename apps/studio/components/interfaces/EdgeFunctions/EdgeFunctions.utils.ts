@@ -286,8 +286,10 @@ export const formatFunctionBodyToFiles = ({
           }
 
           // prepend "/" to turn relative paths to absolute
-          file.name = relative('/' + base_path, '/' + file.name)
-          return file
+          return {
+            ...file,
+            name: relative('/' + base_path, '/' + file.name),
+          }
         } catch (e) {
           console.error(e)
           // return unmodified file
