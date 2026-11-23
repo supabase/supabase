@@ -14,26 +14,34 @@ import { createTabId, useTabsStateSnapshot, type TabRouter } from '@/state/tabs'
  */
 export const useCloseDeletedTableTab = () => {
   const navigate = useNavigate()
-  const { ref } = useParams()
+  const { ref, id: routeTableId } = useParams()
   const { selectedSchema } = useQuerySchemaState()
   const tabs = useTabsStateSnapshot()
   const { setLastVisitedTable } = useDashboardHistory()
 
-  const router: TabRouter = {
-    push: (url) => {
-      const { to, search } = splitInternalUrl(url)
-      return navigate({ to, search })
-    },
-    query: { ref, schema: selectedSchema },
-  }
-
   const closeDeletedTableTab = (table: Entity) => {
+    let hasNavigated = false
+    const router: TabRouter = {
+      push: (url) => {
+        hasNavigated = true
+        const { to, search } = splitInternalUrl(url)
+        return navigate({ to, search })
+      },
+      query: { ref, schema: selectedSchema },
+    }
+
     tabs.handleTabClose({
       id: createTabId(table.entity_type, { id: table.id }),
       router,
       editor: 'table',
       onClearDashboardHistory: () => setLastVisitedTable(undefined),
     })
+
+    const isDeletedTableOpen = routeTableId === String(table.id)
+    if (isDeletedTableOpen && !hasNavigated) {
+      setLastVisitedTable(undefined)
+      void navigate({ to: '/project/$ref/editor', params: { ref: ref ?? '' } })
+    }
   }
 
   return { closeDeletedTableTab }
