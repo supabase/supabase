@@ -58,15 +58,14 @@ The schema centers on three tables. Each `buckets` row can own many `objects` ro
 
 ## Modifying the schema
 
-<Admonition type="note">
+<Admonition type="danger">
 
-Treat the `storage` schema and its records as read-only. Do all operations, including uploading, copying, moving, and deleting, **through the Storage API**.
+Changing the `storage` schema or its records with SQL can leave objects that you can't access but are still billed for. Treat the schema and its records as read-only, and do all operations, including uploading, copying, moving, and deleting, **through the Storage API**.
 
 </Admonition>
 
 Changing the schema or its records with SQL causes problems that the Storage API avoids:
 
-- Changing Storage records can leave objects that you can't access but are still billed for.
 - Deleting metadata doesn't remove the object from the underlying storage provider.
 - Changing the schema can conflict with Supabase updates to it and cause downtime.
 
