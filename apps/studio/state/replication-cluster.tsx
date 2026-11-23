@@ -11,8 +11,4 @@ export const ReplicationClusterProvider = ({
   </ReplicationClusterContext.Provider>
 )
 
-export const useReplicationClusterId = (override?: { clusterId?: string }) => {
-  const clusterId = useContext(ReplicationClusterContext)
-  // An explicit undefined selects the API default from within a cluster scope.
-  return override && Object.hasOwn(override, 'clusterId') ? override.clusterId : clusterId
-}
+export const useReplicationClusterId = () => useContext(ReplicationClusterContext)

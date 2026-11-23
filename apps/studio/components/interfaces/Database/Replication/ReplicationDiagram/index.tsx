@@ -12,6 +12,7 @@ import '@xyflow/react/dist/style.css'
 
 import { SmoothstepEdge } from './Edges'
 import { checkLocalPipelinesNotSetUp } from '@/data/replication/utils'
+import { useReplicationClusterId } from '@/state/replication-cluster'
 
 export const ReplicationDiagram = () => {
   return (
@@ -32,6 +33,7 @@ const ReplicationDiagramContent = () => {
   const reactFlow = useReactFlow()
   const { resolvedTheme } = useTheme()
   const { ref: projectRef = 'default' } = useParams()
+  const clusterId = useReplicationClusterId()
 
   const {
     data,
@@ -40,6 +42,7 @@ const ReplicationDiagramContent = () => {
     isError: isErrorDestinations,
   } = useReplicationDestinationsQuery({
     projectRef,
+    clusterId,
   })
   const destinations = useMemo(() => data?.destinations ?? [], [data])
   const isLocalPipelinesNotSetUp = checkLocalPipelinesNotSetUp(destinationsError)

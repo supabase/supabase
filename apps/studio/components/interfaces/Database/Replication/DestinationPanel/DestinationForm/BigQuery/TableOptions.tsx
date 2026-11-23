@@ -13,6 +13,7 @@ import { findFirstErrorMessage, resolvePublishedColumnNames } from './TableOptio
 import { useReplicationPublicationQuery } from '@/data/replication/publication-query'
 import { useReplicationSourceId } from '@/data/replication/sources-query'
 import { useReplicationTablesQuery } from '@/data/replication/tables-query'
+import { useReplicationClusterId } from '@/state/replication-cluster'
 
 const tableLabel = (table: { schema: string; name: string }) => `${table.schema}.${table.name}`
 
@@ -78,7 +79,8 @@ interface TableOptionsProps {
 
 export const TableOptions = ({ control, showLoadError = true }: TableOptionsProps) => {
   const { ref: projectRef } = useParams()
-  const sourceId = useReplicationSourceId({ projectRef })
+  const clusterId = useReplicationClusterId()
+  const sourceId = useReplicationSourceId({ projectRef, clusterId })
   const publicationName = useWatch({ control, name: 'publicationName' })
   const tableOptions = useWatch({ control, name: 'tableOptions' }) ?? []
   const [expandedTableId, setExpandedTableId] = useState<number>()
@@ -91,6 +93,7 @@ export const TableOptions = ({ control, showLoadError = true }: TableOptionsProp
     isSuccess: isPublicationSuccess,
   } = useReplicationPublicationQuery({
     projectRef,
+    clusterId,
     sourceId,
     publicationName,
   })
@@ -134,7 +137,7 @@ export const TableOptions = ({ control, showLoadError = true }: TableOptionsProp
   const shouldResolvePartitionAncestry =
     selectedPublication?.config.type === 'tables' && tablesNeedingPartitionAncestry.size > 0
   const { data: sourceTables = [], isPending: isSourceTablesPending } = useReplicationTablesQuery(
-    { projectRef, sourceId },
+    { projectRef, clusterId, sourceId },
     {
       enabled: unavailableTableOptions.length > 0 || shouldResolvePartitionAncestry,
     }

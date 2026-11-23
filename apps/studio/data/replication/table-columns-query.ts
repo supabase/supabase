@@ -4,7 +4,6 @@ import { REPLICATION_METADATA_FRESHNESS_MS } from './constants'
 import { replicationKeys } from './keys'
 import { get, handleError } from '@/data/fetchers'
 import type { StudioError } from '@/lib/errors/studio-errors'
-import { useReplicationClusterId } from '@/state/replication-cluster'
 import type { UseCustomQueryOptions } from '@/types'
 
 type ReplicationTableColumnsParams = {
@@ -67,6 +66,5 @@ export const useReplicationTableColumnsQuery = <TData = ReplicationTableColumnsD
   variables: ReplicationTableColumnsParams,
   options: ReplicationTableColumnsQueryOptions<TData> = {}
 ) => {
-  const clusterId = useReplicationClusterId(variables)
-  return useQuery(replicationTableColumnsQueryOptions({ ...variables, clusterId }, options))
+  return useQuery(replicationTableColumnsQueryOptions(variables, options))
 }

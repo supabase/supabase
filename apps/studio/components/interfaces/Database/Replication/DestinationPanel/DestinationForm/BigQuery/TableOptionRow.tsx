@@ -18,6 +18,7 @@ import {
 } from './TableOptionFields'
 import { useReplicationSourceId } from '@/data/replication/sources-query'
 import { useReplicationTableColumnsQuery } from '@/data/replication/table-columns-query'
+import { useReplicationClusterId } from '@/state/replication-cluster'
 
 type TableOption = NonNullable<DestinationPanelSchemaType['tableOptions']>[number]
 type PartitionBy = TableOption['partitionBy']
@@ -62,7 +63,8 @@ const TableOptionEditor = ({
   onClear,
 }: TableOptionEditorProps) => {
   const { ref: projectRef } = useParams()
-  const sourceId = useReplicationSourceId({ projectRef })
+  const clusterId = useReplicationClusterId()
+  const sourceId = useReplicationSourceId({ projectRef, clusterId })
 
   const shouldInitiallyLoadColumns =
     partitionBy?.kind === 'time_column' ||
@@ -77,7 +79,7 @@ const TableOptionEditor = ({
     isSuccess,
     refetch: refetchColumns,
   } = useReplicationTableColumnsQuery(
-    { projectRef, sourceId, tableId },
+    { projectRef, clusterId, sourceId, tableId },
     { enabled: shouldLoadColumns }
   )
 

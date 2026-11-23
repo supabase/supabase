@@ -5,7 +5,6 @@ import { pipelineIdSchema } from './pipeline-id'
 import { checkReplicationFeatureFlagRetry } from './utils'
 import { get, handleError } from '@/data/fetchers'
 import type { StudioError } from '@/lib/errors/studio-errors'
-import { useReplicationClusterId } from '@/state/replication-cluster'
 import type { UseCustomQueryOptions } from '@/types'
 
 type ReplicationPipelinesParams = { projectRef?: string; clusterId?: string }
@@ -53,8 +52,7 @@ export const useReplicationPipelinesQuery = <TData = ReplicationPipelinesData>(
     ...options
   }: UseCustomQueryOptions<ReplicationPipelinesData, StudioError, TData> = {}
 ) => {
-  const { projectRef } = variables
-  const clusterId = useReplicationClusterId(variables)
+  const { projectRef, clusterId } = variables
   return useQuery<ReplicationPipelinesData, StudioError, TData>({
     ...replicationPipelinesQueryOptions<TData>({ projectRef, clusterId }),
     enabled: enabled && typeof projectRef !== 'undefined',

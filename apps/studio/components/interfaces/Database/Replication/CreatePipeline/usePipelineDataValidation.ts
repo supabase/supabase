@@ -5,6 +5,7 @@ import type { DestinationPanelSchemaType } from '../DestinationPanel/Destination
 import { dataFieldNames, getDataValidationIssues } from './PipelineDataValidation.utils'
 import { useReplicationPublicationNamesQuery } from '@/data/replication/publication-names-query'
 import { useReplicationPublicationQuery } from '@/data/replication/publication-query'
+import { useReplicationClusterId } from '@/state/replication-cluster'
 
 export const usePipelineDataValidation = ({
   projectRef,
@@ -33,8 +34,14 @@ export const usePipelineDataValidation = ({
     setDataErrorState(message ? { snapshot, message } : undefined)
   const dataError = dataErrorState?.snapshot === snapshot ? dataErrorState.message : undefined
 
-  const names = useReplicationPublicationNamesQuery({ projectRef, sourceId })
-  const publication = useReplicationPublicationQuery({ projectRef, sourceId, publicationName })
+  const clusterId = useReplicationClusterId()
+  const names = useReplicationPublicationNamesQuery({ projectRef, clusterId, sourceId })
+  const publication = useReplicationPublicationQuery({
+    projectRef,
+    clusterId,
+    sourceId,
+    publicationName,
+  })
   const isSelectedPublicationMissing =
     names.isSuccess && !names.data.some(({ name }) => name === publicationName)
   const hasPublicationLoadError =

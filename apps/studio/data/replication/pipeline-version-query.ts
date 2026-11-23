@@ -4,7 +4,6 @@ import { replicationKeys } from './keys'
 import { pipelineIdSchema } from './pipeline-id'
 import { get, handleError } from '@/data/fetchers'
 import type { StudioError } from '@/lib/errors/studio-errors'
-import { useReplicationClusterId } from '@/state/replication-cluster'
 import type { UseCustomQueryOptions } from '@/types'
 
 type ReplicationPipelineVersionParams = {
@@ -47,8 +46,7 @@ export const useReplicationPipelineVersionQuery = <TData = ReplicationPipelineVe
     ...options
   }: UseCustomQueryOptions<ReplicationPipelineVersionData, StudioError, TData> = {}
 ) => {
-  const { projectRef, pipelineId } = variables
-  const clusterId = useReplicationClusterId(variables)
+  const { projectRef, pipelineId, clusterId } = variables
   return useQuery<ReplicationPipelineVersionData, StudioError, TData>({
     queryKey: replicationKeys.pipelinesVersion(projectRef, pipelineId, clusterId),
     queryFn: ({ signal }) =>

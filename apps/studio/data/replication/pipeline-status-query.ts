@@ -5,7 +5,6 @@ import { pipelineIdSchema } from './pipeline-id'
 import { replicationPollingOptions } from './polling'
 import { get, handleError } from '@/data/fetchers'
 import type { StudioError } from '@/lib/errors/studio-errors'
-import { useReplicationClusterId } from '@/state/replication-cluster'
 import type { UseCustomQueryOptions } from '@/types'
 
 type ReplicationPipelinesStatusParams = {
@@ -95,9 +94,8 @@ export const useReplicationPipelineStatusQuery = <TData = ReplicationPipelineSta
   variables: ReplicationPipelinesStatusParams,
   options: UseCustomQueryOptions<ReplicationPipelineStatusData, StudioError, TData> = {}
 ) => {
-  const clusterId = useReplicationClusterId(variables)
   return useQuery<ReplicationPipelineStatusData, StudioError, TData>({
-    ...replicationPipelineStatusQueryOptions<TData>({ ...variables, clusterId }),
+    ...replicationPipelineStatusQueryOptions<TData>(variables),
     ...options,
     enabled:
       options.enabled !== false &&

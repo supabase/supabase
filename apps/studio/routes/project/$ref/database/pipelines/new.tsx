@@ -18,6 +18,7 @@ import { useIsFeatureEnabled } from '@/hooks/misc/useIsFeatureEnabled'
 import { useSelectedOrganizationQuery } from '@/hooks/misc/useSelectedOrganization'
 import { withAuth } from '@/hooks/misc/withAuth'
 import { isAbsoluteUrl, splitInternalUrl } from '@/lib/internal-url'
+import { useReplicationClusterId } from '@/state/replication-cluster'
 
 export const Route = createFileRoute('/project/$ref/database/pipelines/new')({
   staticData: { skipProjectLayout: true, skipDatabaseLayout: true },
@@ -32,6 +33,7 @@ function PipelineCreationRoute() {
 
 function PipelineCreationPage() {
   const { ref } = useParams()
+  const clusterId = useReplicationClusterId()
   const navigate = useNavigate()
   const { hasLoaded } = useFeatureFlags()
   const { isPending: isOrganizationPending } = useSelectedOrganizationQuery()
@@ -46,7 +48,7 @@ function PipelineCreationPage() {
     isLoading || (isEnabled && (!hasLoaded || isOrganizationPending || isPending))
   const canAccessFlow = isEnabled && !isHighAvailability && canUseReplication
   const sources = useReplicationSourcesQuery(
-    { projectRef: ref },
+    { projectRef: ref, clusterId },
     { enabled: !isProjectAccessLoading && canAccessFlow, refetchOnMount: 'always' }
   )
   const hasSource = sources.data?.sources.some((source) => source.name === ref) === true

@@ -3,7 +3,6 @@ import { useQuery } from '@tanstack/react-query'
 import { replicationKeys } from './keys'
 import { get, handleError } from '@/data/fetchers'
 import type { StudioError } from '@/lib/errors/studio-errors'
-import { useReplicationClusterId } from '@/state/replication-cluster'
 import type { UseCustomQueryOptions } from '@/types'
 
 type ReplicationDestinationByIdParams = {
@@ -43,8 +42,7 @@ export const useReplicationDestinationByIdQuery = <TData = ReplicationDestinatio
     ...options
   }: UseCustomQueryOptions<ReplicationDestinationByIdData, StudioError, TData> = {}
 ) => {
-  const { projectRef, destinationId } = variables
-  const clusterId = useReplicationClusterId(variables)
+  const { projectRef, destinationId, clusterId } = variables
   return useQuery<ReplicationDestinationByIdData, StudioError, TData>({
     queryKey: replicationKeys.destinationById(projectRef, destinationId, clusterId),
     queryFn: ({ signal }) =>

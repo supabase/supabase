@@ -7,6 +7,7 @@ import { useReplicationPipelineStatusQuery } from '@/data/replication/pipeline-s
 import { useReplicationPipelineVersionQuery } from '@/data/replication/pipeline-version-query'
 import { Pipeline } from '@/data/replication/pipelines-query'
 import { useUpdatePipelineVersionMutation } from '@/data/replication/update-pipeline-version-mutation'
+import { useReplicationClusterId } from '@/state/replication-cluster'
 import {
   PipelineStatusRequestStatus,
   usePipelineRequestStatus,
@@ -20,10 +21,12 @@ interface UpdateVersionModalProps {
 
 export const UpdateVersionModal = ({ visible, pipeline, onClose }: UpdateVersionModalProps) => {
   const { ref: projectRef } = useParams()
+  const clusterId = useReplicationClusterId()
   const { runWithRequestStatus } = usePipelineRequestStatus()
 
   const { data: pipelineStatusData } = useReplicationPipelineStatusQuery({
     projectRef,
+    clusterId,
     pipelineId: pipeline?.id,
   })
   const pipelineStatus = pipelineStatusData?.status
@@ -33,6 +36,7 @@ export const UpdateVersionModal = ({ visible, pipeline, onClose }: UpdateVersion
 
   const { data: versionData, isPending: isLoadingVersion } = useReplicationPipelineVersionQuery({
     projectRef,
+    clusterId,
     pipelineId: pipeline?.id,
   })
   const currentVersionName = versionData?.version?.name
