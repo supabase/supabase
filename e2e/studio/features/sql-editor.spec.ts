@@ -176,7 +176,7 @@ test.describe('SQL Editor', () => {
 
   test('keeps inline editor results when opened in the SQL editor', async ({ ref }) => {
     await page.goto(toUrl(`/project/${ref}`))
-    await page.locator('#editor-trigger').click()
+    await page.getByRole('button', { name: 'SQL Editor', exact: true }).click()
     await page.locator('.view-lines').click()
     await page.keyboard.press('ControlOrMeta+KeyA')
     await page.keyboard.type(`select 'kept on expand';`)
