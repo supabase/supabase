@@ -576,8 +576,9 @@ const TABLE_RELATED_RESOURCES_BUDGET = {
   maxExecutionTimeMs: 100,
 }
 
-test('getTableRelatedResourcesSql: policies and triggers stay index-scoped', async () => {
-  // t_0 is the hub table: many incoming foreign keys, so many internal triggers to skip
+test('getTableRelatedResourcesSql: policies, triggers and indexes stay index-scoped', async () => {
+  // t_0 is the hub table: many incoming foreign keys, so many internal triggers
+  // to skip, plus a primary key and unique constraint backing indexes of their own
   const result = await explainAnalyze(
     await getSearchDb(),
     getTableRelatedResourcesSql({ schema: 'stress', name: 't_0' })

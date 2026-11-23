@@ -1,11 +1,10 @@
 import { describe, expect, it } from 'vitest'
 
 import {
-  buildSortedServiceCards,
+  buildServiceCards,
   computeSuccessAndNonSuccessRates,
   getBucketLogRange,
   isServiceDisabled,
-  sortServicesByTraffic,
   sumErrors,
   sumTotal,
   sumWarnings,
@@ -36,35 +35,6 @@ describe('ProjectUsage.metrics', () => {
 
   it('computeSuccessAndNonSuccessRates returns zeroes when there are no requests', () => {
     expect(computeSuccessAndNonSuccessRates(0, 0, 0)).toEqual({ successRate: 0, nonSuccessRate: 0 })
-  })
-
-  describe('sortServicesByTraffic', () => {
-    it('orders services by total descending', () => {
-      const sorted = sortServicesByTraffic([
-        { key: 'a', total: 10 },
-        { key: 'b', total: 100 },
-        { key: 'c', total: 50 },
-      ])
-      expect(sorted.map((s) => s.key)).toEqual(['b', 'c', 'a'])
-    })
-
-    it('pushes services with no traffic to the end', () => {
-      const sorted = sortServicesByTraffic([
-        { key: 'empty', total: 0 },
-        { key: 'busy', total: 25 },
-        { key: 'idle', total: 0 },
-      ])
-      expect(sorted.map((s) => s.key)).toEqual(['busy', 'empty', 'idle'])
-    })
-
-    it('does not mutate the input array', () => {
-      const input = [
-        { key: 'a', total: 1 },
-        { key: 'b', total: 2 },
-      ]
-      sortServicesByTraffic(input)
-      expect(input.map((s) => s.key)).toEqual(['a', 'b'])
-    })
   })
 
   describe('isServiceDisabled', () => {
@@ -110,7 +80,7 @@ describe('ProjectUsage.metrics', () => {
     })
   })
 
-  describe('buildSortedServiceCards', () => {
+  describe('buildServiceCards', () => {
     const stats = (total: number, warningCount = 0, errorCount = 0) => ({
       eventChartData: [],
       total,
@@ -118,8 +88,8 @@ describe('ProjectUsage.metrics', () => {
       errorCount,
     })
 
-    it('drops disabled services, maps stats, and sorts by traffic', () => {
-      const cards = buildSortedServiceCards(
+    it('drops disabled services, maps stats, and keeps the input order', () => {
+      const cards = buildServiceCards(
         [
           { key: 'a', enabled: true },
           { key: 'b', enabled: false },
@@ -128,8 +98,21 @@ describe('ProjectUsage.metrics', () => {
         { a: stats(10, 1, 2), b: stats(999), c: stats(50) }
       )
 
-      expect(cards.map((c) => c.key)).toEqual(['c', 'a'])
-      expect(cards[1]).toMatchObject({ key: 'a', total: 10, warn: 1, err: 2, data: [] })
+      expect(cards.map((c) => c.key)).toEqual(['a', 'c'])
+      expect(cards[0]).toMatchObject({ key: 'a', total: 10, warn: 1, err: 2, data: [] })
+    })
+
+    it('keeps the same order when the totals change', () => {
+      const services: { key: 'a' | 'b' | 'c'; enabled: boolean }[] = [
+        { key: 'a', enabled: true },
+        { key: 'b', enabled: true },
+        { key: 'c', enabled: true },
+      ]
+      const first = buildServiceCards(services, { a: stats(1), b: stats(50), c: stats(10) })
+      const second = buildServiceCards(services, { a: stats(100), b: stats(0), c: stats(5) })
+
+      expect(first.map((c) => c.key)).toEqual(['a', 'b', 'c'])
+      expect(second.map((c) => c.key)).toEqual(['a', 'b', 'c'])
     })
   })
 })

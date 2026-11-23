@@ -693,7 +693,7 @@ export interface paths {
     }
     /**
      * Gets the Supabase config of a connected GitHub repository
-     * @description Reads `supabase/config.toml` from the workdir of the connected repository and returns it as JSON.
+     * @description Reads the Supabase config from the workdir of the connected repository and returns it as JSON. The file is `supabase/config.json` or `supabase/config.jsonc` if present, otherwise `supabase/config.toml`. Having both `config.json` and `config.jsonc` is rejected as ambiguous.
      */
     get: operations['GitHubConnectionsController_getGitHubConnectionConfig']
     put?: never
@@ -1835,6 +1835,67 @@ export interface paths {
     patch?: never
     trace?: never
   }
+  '/platform/organizations/{slug}/oauth/approvals': {
+    parameters: {
+      query?: never
+      header?: never
+      path?: never
+      cookie?: never
+    }
+    /**
+     * List approved oauth apps for an organization
+     * @description Returns a cursor-paginated list of OAuth apps approved by the organization or its members.
+     *
+     *     Use `page[after]` and `page[before]` to navigate pages and `page[size]` to control the number of approvals returned per page.
+     */
+    get: operations['OAuthApprovalsController_listApprovals']
+    put?: never
+    post?: never
+    delete?: never
+    options?: never
+    head?: never
+    patch?: never
+    trace?: never
+  }
+  '/platform/organizations/{slug}/oauth/approvals/{app_id}': {
+    parameters: {
+      query?: never
+      header?: never
+      path?: never
+      cookie?: never
+    }
+    get?: never
+    put?: never
+    post?: never
+    /** Revoke all grants of an oauth app in the organization */
+    delete: operations['OAuthApprovalsController_revokeOAuthAppApproval']
+    options?: never
+    head?: never
+    patch?: never
+    trace?: never
+  }
+  '/platform/organizations/{slug}/oauth/approvals/{app_id}/grants': {
+    parameters: {
+      query?: never
+      header?: never
+      path?: never
+      cookie?: never
+    }
+    /**
+     * List all grants for an approved OAuth app in an organization.
+     * @description Returns a cursor-paginated list of OAuth grants (both organization and member bound) approved for an OAuth app in this organization.
+     *
+     *     Use `page[after]` and `page[before]` to navigate pages and `page[size]` to control the number of approvals returned per page.
+     */
+    get: operations['OAuthApprovalsController_listGrants']
+    put?: never
+    post?: never
+    delete?: never
+    options?: never
+    head?: never
+    patch?: never
+    trace?: never
+  }
   '/platform/organizations/{slug}/oauth/apps': {
     parameters: {
       query?: never
@@ -2511,6 +2572,45 @@ export interface paths {
     /** Logged into account */
     post: operations['ProfileController_auditAccountLogin']
     delete?: never
+    options?: never
+    head?: never
+    patch?: never
+    trace?: never
+  }
+  '/platform/profile/oauth/grants': {
+    parameters: {
+      query?: never
+      header?: never
+      path?: never
+      cookie?: never
+    }
+    /**
+     * List the user's OAuth grants
+     * @description Returns a cursor-paginated list of the OAuth apps the user has granted access to on their own behalf.
+     *
+     *     Use `page[after]` and `page[before]` to navigate pages and `page[size]` to control the number of grants returned per page.
+     */
+    get: operations['OAuthGrantsController_listGrants']
+    put?: never
+    post?: never
+    delete?: never
+    options?: never
+    head?: never
+    patch?: never
+    trace?: never
+  }
+  '/platform/profile/oauth/grants/{grant_id}': {
+    parameters: {
+      query?: never
+      header?: never
+      path?: never
+      cookie?: never
+    }
+    get?: never
+    put?: never
+    post?: never
+    /** Revoke one of your own oauth grants */
+    delete: operations['OAuthGrantsController_revokeOAuthGrant']
     options?: never
     head?: never
     patch?: never
@@ -4329,6 +4429,26 @@ export interface paths {
      * @description Create a replication tenant and source. Requires bearer auth and an active, healthy project.
      */
     post: operations['TenantsSourcesController_createTenantSource']
+    delete?: never
+    options?: never
+    head?: never
+    patch?: never
+    trace?: never
+  }
+  '/platform/replication/regions': {
+    parameters: {
+      query?: never
+      header?: never
+      path?: never
+      cookie?: never
+    }
+    /**
+     * List available pipeline regions
+     * @description Returns available pipeline locations with display names, AWS region codes, and stable cluster IDs for routing.
+     */
+    get: operations['PipelineRegionsController_getRegions']
+    put?: never
+    post?: never
     delete?: never
     options?: never
     head?: never
@@ -6209,47 +6329,6 @@ export interface components {
             }
           }
         | {
-            iceberg: {
-              supabase: {
-                /**
-                 * @description Catalog token
-                 * @example A jwt secret
-                 */
-                catalog_token: string
-                /**
-                 * @description Namespace
-                 * @example my-namespace
-                 */
-                namespace?: string | null
-                /**
-                 * @description Project ref
-                 * @example abcdefghijklmnopqrst
-                 */
-                project_ref: string
-                /**
-                 * @description S3 access key ID
-                 * @example 53383b1d0cdb16a3afa63152656aa3cc
-                 */
-                s3_access_key_id: string
-                /**
-                 * @description S3 region
-                 * @example ap-southeast-1
-                 */
-                s3_region: string
-                /**
-                 * @description S3 secret access key
-                 * @example 25a0c5e69d847088a3e6ffb901adf4d19bbf74a400dec2ee49f46401039b3258
-                 */
-                s3_secret_access_key: string
-                /**
-                 * @description Warehouse name
-                 * @example my-warehouse
-                 */
-                warehouse_name: string
-              }
-            }
-          }
-        | {
             ducklake:
               | {
                   /**
@@ -6305,6 +6384,11 @@ export interface components {
                    * @example false
                    */
                   s3_use_ssl?: boolean
+                  /**
+                   * @description Immutable source namespace above replicated schemas. Omit to preserve the legacy flat layout.
+                   * @example abcjuqabhgwjjutfvtpa
+                   */
+                  table_namespace?: string | null
                   table_sorting?: {
                     tables?: {
                       schema: string
@@ -6457,6 +6541,11 @@ export interface components {
                         /** @enum {string} */
                         type: 'supabase_storage'
                       }
+                  /**
+                   * @description Immutable source namespace above replicated schemas. Omit to preserve the legacy flat layout.
+                   * @example abcjuqabhgwjjutfvtpa
+                   */
+                  table_namespace?: string | null
                   table_sorting?: {
                     tables?: {
                       schema: string
@@ -7483,47 +7572,6 @@ export interface components {
             }
           }
         | {
-            iceberg: {
-              supabase: {
-                /**
-                 * @description Catalog token
-                 * @example A jwt secret
-                 */
-                catalog_token: string
-                /**
-                 * @description Namespace
-                 * @example my-namespace
-                 */
-                namespace?: string | null
-                /**
-                 * @description Project ref
-                 * @example abcdefghijklmnopqrst
-                 */
-                project_ref: string
-                /**
-                 * @description S3 access key ID
-                 * @example 53383b1d0cdb16a3afa63152656aa3cc
-                 */
-                s3_access_key_id: string
-                /**
-                 * @description S3 region
-                 * @example ap-southeast-1
-                 */
-                s3_region: string
-                /**
-                 * @description S3 secret access key
-                 * @example 25a0c5e69d847088a3e6ffb901adf4d19bbf74a400dec2ee49f46401039b3258
-                 */
-                s3_secret_access_key: string
-                /**
-                 * @description Warehouse name
-                 * @example my-warehouse
-                 */
-                warehouse_name: string
-              }
-            }
-          }
-        | {
             ducklake:
               | {
                   /**
@@ -7579,6 +7627,11 @@ export interface components {
                    * @example false
                    */
                   s3_use_ssl?: boolean
+                  /**
+                   * @description Immutable source namespace above replicated schemas. Omit to preserve the legacy flat layout.
+                   * @example abcjuqabhgwjjutfvtpa
+                   */
+                  table_namespace?: string | null
                   table_sorting?: {
                     tables?: {
                       schema: string
@@ -7731,6 +7784,11 @@ export interface components {
                         /** @enum {string} */
                         type: 'supabase_storage'
                       }
+                  /**
+                   * @description Immutable source namespace above replicated schemas. Omit to preserve the legacy flat layout.
+                   * @example abcjuqabhgwjjutfvtpa
+                   */
+                  table_namespace?: string | null
                   table_sorting?: {
                     tables?: {
                       schema: string
@@ -8517,57 +8575,6 @@ export interface components {
             }
           }
         | {
-            iceberg:
-              | {
-                  supabase: {
-                    /**
-                     * @description Namespace
-                     * @example my-namespace
-                     */
-                    namespace?: string | null
-                    /**
-                     * @description Project ref
-                     * @example abcdefghijklmnopqrst
-                     */
-                    project_ref: string
-                    /**
-                     * @description S3 region
-                     * @example ap-southeast-1
-                     */
-                    s3_region: string
-                    /**
-                     * @description Warehouse name
-                     * @example my-warehouse
-                     */
-                    warehouse_name: string
-                  }
-                }
-              | {
-                  rest: {
-                    /**
-                     * @description Iceberg REST catalog URI
-                     * @example https://catalog.example.com
-                     */
-                    catalog_uri: string
-                    /**
-                     * @description Namespace
-                     * @example my-namespace
-                     */
-                    namespace?: string | null
-                    /**
-                     * @description S3-compatible storage endpoint
-                     * @example https://s3.example.com
-                     */
-                    s3_endpoint: string
-                    /**
-                     * @description Warehouse name
-                     * @example my-warehouse
-                     */
-                    warehouse_name: string
-                  }
-                }
-          }
-        | {
             ducklake: {
               /**
                * @description Persisted DuckLake data path
@@ -8604,6 +8611,7 @@ export interface components {
                * @example false
                */
               s3_use_ssl?: boolean | null
+              table_namespace?: string | null
               table_sorting?: {
                 tables: {
                   schema: string
@@ -8668,6 +8676,10 @@ export interface components {
                */
               user: string
             }
+          }
+        | {
+            /** @description Stored destination configuration could not be decoded. Read-only placeholder. */
+            unknown: Record<string, never>
           }
       /**
        * @description Destination id
@@ -8813,57 +8825,6 @@ export interface components {
               }
             }
           | {
-              iceberg:
-                | {
-                    supabase: {
-                      /**
-                       * @description Namespace
-                       * @example my-namespace
-                       */
-                      namespace?: string | null
-                      /**
-                       * @description Project ref
-                       * @example abcdefghijklmnopqrst
-                       */
-                      project_ref: string
-                      /**
-                       * @description S3 region
-                       * @example ap-southeast-1
-                       */
-                      s3_region: string
-                      /**
-                       * @description Warehouse name
-                       * @example my-warehouse
-                       */
-                      warehouse_name: string
-                    }
-                  }
-                | {
-                    rest: {
-                      /**
-                       * @description Iceberg REST catalog URI
-                       * @example https://catalog.example.com
-                       */
-                      catalog_uri: string
-                      /**
-                       * @description Namespace
-                       * @example my-namespace
-                       */
-                      namespace?: string | null
-                      /**
-                       * @description S3-compatible storage endpoint
-                       * @example https://s3.example.com
-                       */
-                      s3_endpoint: string
-                      /**
-                       * @description Warehouse name
-                       * @example my-warehouse
-                       */
-                      warehouse_name: string
-                    }
-                  }
-            }
-          | {
               ducklake: {
                 /**
                  * @description Persisted DuckLake data path
@@ -8900,6 +8861,7 @@ export interface components {
                  * @example false
                  */
                 s3_use_ssl?: boolean | null
+                table_namespace?: string | null
                 table_sorting?: {
                   tables: {
                     schema: string
@@ -8964,6 +8926,10 @@ export interface components {
                  */
                 user: string
               }
+            }
+          | {
+              /** @description Stored destination configuration could not be decoded. Read-only placeholder. */
+              unknown: Record<string, never>
             }
         /**
          * @description Destination id
@@ -9122,7 +9088,7 @@ export interface components {
       }[]
     }
     GetGitHubConnectionConfigResponse_Output: {
-      /** @description JSON representation of the parsed `supabase/config.toml`. Its shape is owned by the Supabase CLI and is passed through as-is. */
+      /** @description JSON representation of the parsed `supabase/config.toml`, `supabase/config.json` or `supabase/config.jsonc`. Its shape is owned by the Supabase CLI and is passed through as-is. */
       config: {
         [key: string]: unknown
       }
@@ -9269,19 +9235,12 @@ export interface components {
       integration: {
         name: string
       }
-      metadata: components['schemas']['GetOrganizationIntegrationResponseJsonValue']
+      metadata: components['schemas']['JsonValue']
       organization: {
         slug: string
       }
       updated_at: string
     }
-    /** @description Any JSON-serializable value */
-    GetOrganizationIntegrationResponseJsonValue:
-      | ((string | number | boolean) | null)
-      | components['schemas']['GetOrganizationIntegrationResponseJsonValue'][]
-      | {
-          [key: string]: components['schemas']['GetOrganizationIntegrationResponseJsonValue']
-        }
     GetPlatformAppInstallationResponse_Output: {
       /** Format: uuid */
       app_id: string
@@ -9645,7 +9604,7 @@ export interface components {
               | 'auth_mfa_web_authn_default'
               | 'log_drain_default'
               | 'etl_pipeline_default'
-            meta?: components['schemas']['GetSubscriptionResponseJsonValue']
+            meta?: components['schemas']['JsonValue']
             name: string
             price: number
             price_description: string
@@ -9660,13 +9619,6 @@ export interface components {
       }[]
       usage_billing_enabled: boolean
     }
-    /** @description Any JSON-serializable value */
-    GetSubscriptionResponseJsonValue:
-      | ((string | number | boolean) | null)
-      | components['schemas']['GetSubscriptionResponseJsonValue'][]
-      | {
-          [key: string]: components['schemas']['GetSubscriptionResponseJsonValue']
-        }
     GetUserContentByIdResponse_Output: {
       content?: {
         [key: string]: unknown
@@ -9754,19 +9706,12 @@ export interface components {
       integration: {
         name: string
       }
-      metadata: components['schemas']['GetUserOrganizationIntegrationResponseJsonValue']
+      metadata: components['schemas']['JsonValue']
       organization: {
         slug: string
       }
       updated_at: string
     }
-    /** @description Any JSON-serializable value */
-    GetUserOrganizationIntegrationResponseJsonValue:
-      | ((string | number | boolean) | null)
-      | components['schemas']['GetUserOrganizationIntegrationResponseJsonValue'][]
-      | {
-          [key: string]: components['schemas']['GetUserOrganizationIntegrationResponseJsonValue']
-        }
     GetVercelProjectsResponse_Output: {
       pagination: {
         count: number
@@ -9828,6 +9773,7 @@ export interface components {
       EXTERNAL_DISCORD_ENABLED: boolean
       EXTERNAL_DISCORD_SECRET: string
       EXTERNAL_EMAIL_ENABLED: boolean
+      EXTERNAL_EMAIL_MAGIC_LINK_DISABLED: boolean
       EXTERNAL_FACEBOOK_CLIENT_ID: string
       EXTERNAL_FACEBOOK_EMAIL_OPTIONAL: boolean
       EXTERNAL_FACEBOOK_ENABLED: boolean
@@ -10123,6 +10069,13 @@ export interface components {
       receipt_pdf: string
     }
     /** @description Any JSON-serializable value */
+    JsonValue:
+      | ((string | number | boolean) | null)
+      | components['schemas']['JsonValue'][]
+      | {
+          [key: string]: components['schemas']['JsonValue']
+        }
+    /** @description Any JSON-serializable value */
     JsonValue_Output:
       | ((string | number | boolean) | null)
       | components['schemas']['JsonValue_Output'][]
@@ -10392,6 +10345,181 @@ export interface components {
         oauth_app_id: string
       }[]
     }
+    ListOAuthApprovalsResponse_Output: {
+      data: {
+        attributes: {
+          /** @description Metadata about the approved OAuth app */
+          app: {
+            /** @description OAuth app publisher name, or null for dynamically registered apps */
+            created_by: string | null
+            /** @description URL for rendering the app icon */
+            icon: string | null
+            /** @description OAuth app name */
+            name: string
+          }
+          /** @description Timestamp of the most recent approval of this app, at the org or member level */
+          last_approved_at: string
+          /** @description Information about the organization-bound grant for this app, or null if only member-bound */
+          org_grant: {
+            /** @description Timestamp of the org-level approval */
+            approved_at: string
+            /** @description Scopes approved at the org level */
+            approved_scopes: (
+              | 'analytics:read'
+              | 'analytics:write'
+              | 'analytics_config:read'
+              | 'analytics_config:write'
+              | 'auth:read'
+              | 'auth:write'
+              | 'database:read'
+              | 'database:write'
+              | 'domains:read'
+              | 'domains:write'
+              | 'edge_functions:read'
+              | 'edge_functions:write'
+              | 'environment:read'
+              | 'environment:write'
+              | 'organizations:read'
+              | 'organizations:write'
+              | 'projects:read'
+              | 'projects:write'
+              | 'rest:read'
+              | 'rest:write'
+              | 'secrets:read'
+              | 'secrets:write'
+              | 'storage:read'
+              | 'storage:write'
+            )[]
+            /** @description Org-level grant ID */
+            grant_id: string
+          } | null
+          /** @enum {string} */
+          target: 'organization' | 'members' | 'organization_and_members'
+        }
+        /**
+         * Format: uuid
+         * @description OAuth app ID
+         */
+        id: string
+        /**
+         * @description Resource type.
+         * @enum {string}
+         */
+        type: 'oauth_app'
+      }[]
+      links: {
+        /**
+         * @description URL path to the first page if available.
+         * @example /platform/organizations/my-org/oauth/approvals?page[size]=10
+         */
+        first?: string | null
+        /**
+         * @description URL path to the last page if available.
+         * @example /platform/organizations/my-org/oauth/approvals?page[size]=10&page[after]=019adf7d-4513-71ba-b264-21900edb4295
+         */
+        last?: string | null
+        /**
+         * @description URL path to the next page.
+         * @example /platform/organizations/my-org/oauth/approvals?page[size]=10&page[after]=019adf7d-4513-7062-b292-78b86cc470a4
+         */
+        next: string | null
+        /**
+         * @description URL path to the previous page.
+         * @example /platform/organizations/my-org/oauth/approvals?page[size]=10&page[before]=019adf7d-4513-74c5-bb9a-f1bc0f7a95d7
+         */
+        prev: string | null
+      }
+    }
+    ListOAuthGrantsResponse_Output: {
+      data: {
+        attributes: {
+          /** @description Timestamp of the approval */
+          approved_at: string
+          /** @description Scopes approved by this grant */
+          approved_scopes: (
+            | 'analytics:read'
+            | 'analytics:write'
+            | 'analytics_config:read'
+            | 'analytics_config:write'
+            | 'auth:read'
+            | 'auth:write'
+            | 'database:read'
+            | 'database:write'
+            | 'domains:read'
+            | 'domains:write'
+            | 'edge_functions:read'
+            | 'edge_functions:write'
+            | 'environment:read'
+            | 'environment:write'
+            | 'organizations:read'
+            | 'organizations:write'
+            | 'projects:read'
+            | 'projects:write'
+            | 'rest:read'
+            | 'rest:write'
+            | 'secrets:read'
+            | 'secrets:write'
+            | 'storage:read'
+            | 'storage:write'
+          )[]
+          /**
+           * @description Whether the grant is bound to the organization or to a single member
+           * @enum {string}
+           */
+          kind: 'organization_bound' | 'member_bound'
+          /** @description Projects the grant is limited to, or null if it applies to all projects */
+          projects:
+            | {
+                /** @description Project name */
+                name: string
+                /** @description Project reference */
+                ref: string
+              }[]
+            | null
+          /** @description Member who approved the grant, or null for an organization-bound grant */
+          user: {
+            /** @description Member primary email, if the member has one */
+            email: string | null
+            /** @description Member user ID */
+            gotrue_id: string
+            /** @description Member username, for display when there is no email */
+            username: string
+          } | null
+        }
+        /**
+         * Format: uuid
+         * @description OAuth grant ID
+         */
+        id: string
+        /**
+         * @description Resource type.
+         * @enum {string}
+         */
+        type: 'oauth_grant'
+      }[]
+      links: {
+        /**
+         * @description URL path to the first page if available.
+         * @example /platform/organizations/my-org/oauth/approvals/my-app/grants?page[size]=10
+         */
+        first?: string | null
+        /**
+         * @description URL path to the last page if available.
+         * @example /platform/organizations/my-org/oauth/approvals/my-app/grants?page[size]=10&page[after]=019adf7d-4513-71ba-b264-21900edb4295
+         */
+        last?: string | null
+        /**
+         * @description URL path to the next page.
+         * @example /platform/organizations/my-org/oauth/approvals/my-app/grants?page[size]=10&page[after]=019adf7d-4513-7062-b292-78b86cc470a4
+         */
+        next: string | null
+        /**
+         * @description URL path to the previous page.
+         * @example /platform/organizations/my-org/oauth/approvals/my-app/grants?page[size]=10&page[before]=019adf7d-4513-74c5-bb9a-f1bc0f7a95d7
+         */
+        prev: string | null
+      }
+    }
     ListPlatformAppInstallationsResponse_Output: {
       installations: {
         /** Format: uuid */
@@ -10489,6 +10617,87 @@ export interface components {
         name: string
       }[]
     }
+    ListUserOAuthGrantsResponse_Output: {
+      data: {
+        attributes: {
+          app: {
+            created_by: string | null
+            icon: string | null
+            id: string
+            name: string
+          }
+          approved_at: string
+          approved_scopes: (
+            | 'analytics:read'
+            | 'analytics:write'
+            | 'analytics_config:read'
+            | 'analytics_config:write'
+            | 'auth:read'
+            | 'auth:write'
+            | 'database:read'
+            | 'database:write'
+            | 'domains:read'
+            | 'domains:write'
+            | 'edge_functions:read'
+            | 'edge_functions:write'
+            | 'environment:read'
+            | 'environment:write'
+            | 'organizations:read'
+            | 'organizations:write'
+            | 'projects:read'
+            | 'projects:write'
+            | 'rest:read'
+            | 'rest:write'
+            | 'secrets:read'
+            | 'secrets:write'
+            | 'storage:read'
+            | 'storage:write'
+          )[]
+          organization: {
+            name: string
+            slug: string
+          }
+          projects:
+            | {
+                name: string
+                ref: string
+              }[]
+            | null
+        }
+        /**
+         * Format: uuid
+         * @description Grant ID
+         */
+        id: string
+        /**
+         * @description Resource type.
+         * @enum {string}
+         */
+        type: 'oauth_grant'
+      }[]
+      links: {
+        /**
+         * @description URL path to the first page if available.
+         * @example /platform/profile/oauth/grants?page[size]=10
+         */
+        first?: string | null
+        /**
+         * @description URL path to the last page if available.
+         * @example /platform/profile/oauth/grants?page[size]=10&page[after]=019adf7d-4513-71ba-b264-21900edb4295
+         */
+        last?: string | null
+        /**
+         * @description URL path to the next page.
+         * @example /platform/profile/oauth/grants?page[size]=10&page[after]=019adf7d-4513-7062-b292-78b86cc470a4
+         */
+        next: string | null
+        /**
+         * @description URL path to the previous page.
+         * @example /platform/profile/oauth/grants?page[size]=10&page[before]=019adf7d-4513-74c5-bb9a-f1bc0f7a95d7
+         */
+        prev: string | null
+      }
+    }
     LoadBalancerDetailResponse_Output: {
       databases: {
         identifier: string
@@ -10517,6 +10726,14 @@ export interface components {
       username: string
     }
     MemberWithFreeProjectLimit_Output: {
+      free_plan_organizations: {
+        organization_name: string
+        projects: {
+          name: string
+          ref: string | null
+        }[]
+        slug: string | null
+      }[]
       free_project_limit: number
       primary_email: string
       username: string
@@ -10682,6 +10899,7 @@ export interface components {
     }
     OnboardingSurveyBody: {
       building?: string
+      can_code?: string
       heard_from?: string
       kind?: string
       size?: string
@@ -11209,6 +11427,18 @@ export interface components {
     PgbouncerStatusResponse_Output: {
       active: boolean
     }
+    PipelineRegionsResponse_Output: {
+      /** @description Configured default for this environment, used only when cluster_id is omitted. Invalid supplied IDs never fall back to it. */
+      default_cluster_id: string
+      regions: {
+        /** @description Immutable cluster ID stored in pipeline placements. Use this ID in requests; display names and region codes are not identifiers. */
+        cluster_id: string
+        /** @description Region code, or null for local development. */
+        region_code: string | null
+        /** @description Display name only. Renaming it does not change the cluster ID or routing. */
+        region_name: string
+      }[]
+    }
     PipelineReplicationStatusResponse_Output: {
       /** @description Stats about apply worker lag */
       apply_lag?: {
@@ -11378,6 +11608,11 @@ export interface components {
     }
     /** @description Pipeline */
     PipelineResponse_Output: {
+      /**
+       * @description Stable ID of the ETL cluster containing this pipeline; independent of its display name.
+       * @example 1
+       */
+      cluster_id: string
       /** @description Pipeline configuration */
       config: {
         /** @description Batch configuration */
@@ -11527,6 +11762,11 @@ export interface components {
     PipelinesResponse_Output: {
       /** @description List of pipelines */
       pipelines: {
+        /**
+         * @description Stable ID of the ETL cluster containing this pipeline; independent of its display name.
+         * @example 1
+         */
+        cluster_id: string
         /** @description Pipeline configuration */
         config: {
           /** @description Batch configuration */
@@ -14587,47 +14827,6 @@ export interface components {
             }
           }
         | {
-            iceberg: {
-              supabase: {
-                /**
-                 * @description Catalog token
-                 * @example A jwt secret
-                 */
-                catalog_token?: string | null
-                /**
-                 * @description Namespace
-                 * @example my-namespace
-                 */
-                namespace?: string | null
-                /**
-                 * @description Project ref
-                 * @example abcdefghijklmnopqrst
-                 */
-                project_ref?: string | null
-                /**
-                 * @description S3 access key ID
-                 * @example 53383b1d0cdb16a3afa63152656aa3cc
-                 */
-                s3_access_key_id?: string | null
-                /**
-                 * @description S3 region
-                 * @example ap-southeast-1
-                 */
-                s3_region?: string | null
-                /**
-                 * @description S3 secret access key
-                 * @example 25a0c5e69d847088a3e6ffb901adf4d19bbf74a400dec2ee49f46401039b3258
-                 */
-                s3_secret_access_key?: string | null
-                /**
-                 * @description Warehouse name
-                 * @example my-warehouse
-                 */
-                warehouse_name?: string | null
-              }
-            }
-          }
-        | {
             ducklake:
               | {
                   /**
@@ -14681,6 +14880,11 @@ export interface components {
                    * @example false
                    */
                   s3_use_ssl?: boolean | null
+                  /**
+                   * @description Immutable source namespace above replicated schemas. Omit to preserve the legacy flat layout.
+                   * @example abcjuqabhgwjjutfvtpa
+                   */
+                  table_namespace?: string | null
                   table_sorting?: {
                     tables?: {
                       schema: string
@@ -14831,6 +15035,11 @@ export interface components {
                         /** @enum {string} */
                         type: 'supabase_storage'
                       }
+                  /**
+                   * @description Immutable source namespace above replicated schemas. Omit to preserve the legacy flat layout.
+                   * @example abcjuqabhgwjjutfvtpa
+                   */
+                  table_namespace?: string | null
                   table_sorting?: {
                     tables?: {
                       schema: string
@@ -14960,6 +15169,7 @@ export interface components {
       EXTERNAL_DISCORD_ENABLED?: boolean | null
       EXTERNAL_DISCORD_SECRET?: string | null
       EXTERNAL_EMAIL_ENABLED?: boolean | null
+      EXTERNAL_EMAIL_MAGIC_LINK_DISABLED?: boolean
       EXTERNAL_FACEBOOK_CLIENT_ID?: string | null
       EXTERNAL_FACEBOOK_EMAIL_OPTIONAL?: boolean | null
       EXTERNAL_FACEBOOK_ENABLED?: boolean | null
@@ -15755,47 +15965,6 @@ export interface components {
             }
           }
         | {
-            iceberg: {
-              supabase: {
-                /**
-                 * @description Catalog token
-                 * @example A jwt secret
-                 */
-                catalog_token?: string | null
-                /**
-                 * @description Namespace
-                 * @example my-namespace
-                 */
-                namespace?: string | null
-                /**
-                 * @description Project ref
-                 * @example abcdefghijklmnopqrst
-                 */
-                project_ref?: string | null
-                /**
-                 * @description S3 access key ID
-                 * @example 53383b1d0cdb16a3afa63152656aa3cc
-                 */
-                s3_access_key_id?: string | null
-                /**
-                 * @description S3 region
-                 * @example ap-southeast-1
-                 */
-                s3_region?: string | null
-                /**
-                 * @description S3 secret access key
-                 * @example 25a0c5e69d847088a3e6ffb901adf4d19bbf74a400dec2ee49f46401039b3258
-                 */
-                s3_secret_access_key?: string | null
-                /**
-                 * @description Warehouse name
-                 * @example my-warehouse
-                 */
-                warehouse_name?: string | null
-              }
-            }
-          }
-        | {
             ducklake:
               | {
                   /**
@@ -15849,6 +16018,11 @@ export interface components {
                    * @example false
                    */
                   s3_use_ssl?: boolean | null
+                  /**
+                   * @description Immutable source namespace above replicated schemas. Omit to preserve the legacy flat layout.
+                   * @example abcjuqabhgwjjutfvtpa
+                   */
+                  table_namespace?: string | null
                   table_sorting?: {
                     tables?: {
                       schema: string
@@ -15999,6 +16173,11 @@ export interface components {
                         /** @enum {string} */
                         type: 'supabase_storage'
                       }
+                  /**
+                   * @description Immutable source namespace above replicated schemas. Omit to preserve the legacy flat layout.
+                   * @example abcjuqabhgwjjutfvtpa
+                   */
+                  table_namespace?: string | null
                   table_sorting?: {
                     tables?: {
                       schema: string
@@ -16645,47 +16824,6 @@ export interface components {
             }
           }
         | {
-            iceberg: {
-              supabase: {
-                /**
-                 * @description Catalog token
-                 * @example A jwt secret
-                 */
-                catalog_token: string
-                /**
-                 * @description Namespace
-                 * @example my-namespace
-                 */
-                namespace?: string | null
-                /**
-                 * @description Project ref
-                 * @example abcdefghijklmnopqrst
-                 */
-                project_ref: string
-                /**
-                 * @description S3 access key ID
-                 * @example 53383b1d0cdb16a3afa63152656aa3cc
-                 */
-                s3_access_key_id: string
-                /**
-                 * @description S3 region
-                 * @example ap-southeast-1
-                 */
-                s3_region: string
-                /**
-                 * @description S3 secret access key
-                 * @example 25a0c5e69d847088a3e6ffb901adf4d19bbf74a400dec2ee49f46401039b3258
-                 */
-                s3_secret_access_key: string
-                /**
-                 * @description Warehouse name
-                 * @example my-warehouse
-                 */
-                warehouse_name: string
-              }
-            }
-          }
-        | {
             ducklake:
               | {
                   /**
@@ -16741,6 +16879,11 @@ export interface components {
                    * @example false
                    */
                   s3_use_ssl?: boolean
+                  /**
+                   * @description Immutable source namespace above replicated schemas. Omit to preserve the legacy flat layout.
+                   * @example abcjuqabhgwjjutfvtpa
+                   */
+                  table_namespace?: string | null
                   table_sorting?: {
                     tables?: {
                       schema: string
@@ -16893,6 +17036,11 @@ export interface components {
                         /** @enum {string} */
                         type: 'supabase_storage'
                       }
+                  /**
+                   * @description Immutable source namespace above replicated schemas. Omit to preserve the legacy flat layout.
+                   * @example abcjuqabhgwjjutfvtpa
+                   */
+                  table_namespace?: string | null
                   table_sorting?: {
                     tables?: {
                       schema: string
@@ -17296,6 +17444,11 @@ export interface components {
          * @example [YOUR_S3_SECRET_ACCESS_KEY]
          */
         s3_secret_access_key: string
+        /**
+         * @description Source project namespace above replicated schemas in the DuckLake catalog. Omitted for existing flat-layout destinations.
+         * @example abcjuqabhgwjjutfvtpa
+         */
+        table_namespace?: string
       }
       /** @description Whether external catalog access is enabled */
       enabled: boolean
@@ -17454,8 +17607,8 @@ export interface components {
       /** @description Tables with Warehouse copies */
       tables: {
         /**
-         * @description DuckLake schema-qualified table name
-         * @example public.orders
+         * @description DuckLake table path with individually quoted identifiers, including the configured project namespace when present
+         * @example "abcjuqabhgwjjutfvtpa"."public"."orders"
          */
         copy_name: string
         /**
@@ -17579,8 +17732,8 @@ export interface components {
       /** @description Warehouse linked tables and replication-derived sync state */
       tables: {
         /**
-         * @description DuckLake schema-qualified table name
-         * @example public.orders
+         * @description DuckLake table path with individually quoted identifiers, including the configured project namespace when present
+         * @example "abcjuqabhgwjjutfvtpa"."public"."orders"
          */
         copy_name: string
         /**
@@ -17652,8 +17805,8 @@ export interface components {
       /** @description Tables with Warehouse copies */
       tables: {
         /**
-         * @description DuckLake schema-qualified table name
-         * @example public.orders
+         * @description DuckLake table path with individually quoted identifiers, including the configured project namespace when present
+         * @example "abcjuqabhgwjjutfvtpa"."public"."orders"
          */
         copy_name: string
         /**
@@ -19807,7 +19960,7 @@ export interface operations {
         }
         content?: never
       }
-      /** @description The config file could not be parsed as TOML */
+      /** @description The config file could not be parsed as TOML or JSON, or both `config.json` and `config.jsonc` exist */
       422: {
         headers: {
           [name: string]: unknown
@@ -23903,6 +24056,158 @@ export interface operations {
       }
     }
   }
+  OAuthApprovalsController_listApprovals: {
+    parameters: {
+      query?: {
+        page?: {
+          after?: string
+          before?: string
+          size?: number
+        }
+        /** @description Sort field, prefixed with `-` for descending order. Nulls sort last in ascending order and first in descending order. Defaults to `name`. */
+        sort?:
+          | 'name'
+          | '-name'
+          | 'created_by'
+          | '-created_by'
+          | 'last_approved_at'
+          | '-last_approved_at'
+      }
+      header?: never
+      path: {
+        /** @description Organization slug */
+        slug: string
+      }
+      cookie?: never
+    }
+    requestBody?: never
+    responses: {
+      200: {
+        headers: {
+          [name: string]: unknown
+        }
+        content: {
+          'application/json': components['schemas']['ListOAuthApprovalsResponse_Output']
+        }
+      }
+      /** @description Unauthorized */
+      401: {
+        headers: {
+          [name: string]: unknown
+        }
+        content?: never
+      }
+      /** @description Forbidden action */
+      403: {
+        headers: {
+          [name: string]: unknown
+        }
+        content?: never
+      }
+      /** @description Rate limit exceeded */
+      429: {
+        headers: {
+          [name: string]: unknown
+        }
+        content?: never
+      }
+    }
+  }
+  OAuthApprovalsController_revokeOAuthAppApproval: {
+    parameters: {
+      query?: never
+      header?: never
+      path: {
+        app_id: string
+        /** @description Organization slug */
+        slug: string
+      }
+      cookie?: never
+    }
+    requestBody?: never
+    responses: {
+      204: {
+        headers: {
+          [name: string]: unknown
+        }
+        content?: never
+      }
+      /** @description Unauthorized */
+      401: {
+        headers: {
+          [name: string]: unknown
+        }
+        content?: never
+      }
+      /** @description Forbidden action */
+      403: {
+        headers: {
+          [name: string]: unknown
+        }
+        content?: never
+      }
+      /** @description Rate limit exceeded */
+      429: {
+        headers: {
+          [name: string]: unknown
+        }
+        content?: never
+      }
+    }
+  }
+  OAuthApprovalsController_listGrants: {
+    parameters: {
+      query?: {
+        page?: {
+          after?: string
+          before?: string
+          size?: number
+        }
+        /** @description Sort field, prefixed with `-` for descending order. `user_email` sorts by the member email, falling back to username, and places the organization-bound grant (which has no user) first in ascending order and last in descending order. Defaults to `user_email`. */
+        sort?: 'user_email' | '-user_email' | 'approved_at' | '-approved_at'
+      }
+      header?: never
+      path: {
+        /** @description OAuth app ID */
+        app_id: string
+        /** @description Organization slug */
+        slug: string
+      }
+      cookie?: never
+    }
+    requestBody?: never
+    responses: {
+      200: {
+        headers: {
+          [name: string]: unknown
+        }
+        content: {
+          'application/json': components['schemas']['ListOAuthGrantsResponse_Output']
+        }
+      }
+      /** @description Unauthorized */
+      401: {
+        headers: {
+          [name: string]: unknown
+        }
+        content?: never
+      }
+      /** @description Forbidden action */
+      403: {
+        headers: {
+          [name: string]: unknown
+        }
+        content?: never
+      }
+      /** @description Rate limit exceeded */
+      429: {
+        headers: {
+          [name: string]: unknown
+        }
+        content?: never
+      }
+    }
+  }
   OAuthAppsController_listOAuthApps: {
     parameters: {
       query: {
@@ -26458,6 +26763,65 @@ export interface operations {
       }
     }
   }
+  OAuthGrantsController_listGrants: {
+    parameters: {
+      query?: {
+        page?: {
+          after?: string
+          before?: string
+          size?: number
+        }
+        /** @description Sort field, prefixed with `-` for descending order. Defaults to `app_name`. */
+        sort?:
+          | 'app_name'
+          | '-app_name'
+          | 'organization_name'
+          | '-organization_name'
+          | 'approved_at'
+          | '-approved_at'
+      }
+      header?: never
+      path?: never
+      cookie?: never
+    }
+    requestBody?: never
+    responses: {
+      200: {
+        headers: {
+          [name: string]: unknown
+        }
+        content: {
+          'application/json': components['schemas']['ListUserOAuthGrantsResponse_Output']
+        }
+      }
+      /** @description Failed to get user's OAuth grants */
+      500: {
+        headers: {
+          [name: string]: unknown
+        }
+        content?: never
+      }
+    }
+  }
+  OAuthGrantsController_revokeOAuthGrant: {
+    parameters: {
+      query?: never
+      header?: never
+      path: {
+        grant_id: string
+      }
+      cookie?: never
+    }
+    requestBody?: never
+    responses: {
+      204: {
+        headers: {
+          [name: string]: unknown
+        }
+        content?: never
+      }
+    }
+  }
   PermissionsController_getPermissions: {
     parameters: {
       query?: never
@@ -26620,6 +26984,8 @@ export interface operations {
         limit?: number
         /** @description Number of projects to skip */
         offset?: number
+        /** @description A comma-separated list of project refs to filter by. Accepts up to 100 refs. Refs of projects that do not exist or are not accessible are omitted from the response. */
+        refs?: string
         /** @description Search projects by name */
         search?: string
         /** @description Sort order for projects */
@@ -30123,6 +30489,7 @@ export interface operations {
           | 'disk_bytes_read'
           | 'disk_bytes_written'
           | 'pg_database_size'
+          | 'orioledb_undo_size'
           | 'disk_fs_size'
           | 'disk_fs_avail'
           | 'disk_fs_used'
@@ -30184,6 +30551,7 @@ export interface operations {
               | 'disk_bytes_read'
               | 'disk_bytes_written'
               | 'pg_database_size'
+              | 'orioledb_undo_size'
               | 'disk_fs_size'
               | 'disk_fs_avail'
               | 'disk_fs_used'
@@ -31548,7 +31916,10 @@ export interface operations {
   }
   DestinationsController_getDestinations: {
     parameters: {
-      query?: never
+      query?: {
+        /** @description Stable cluster ID from /platform/replication/regions; display names are not IDs. Only omission uses the environment default_cluster_id. Supplied IDs absent from the registry fail to resolve. */
+        cluster_id?: string
+      }
       header?: never
       path: {
         /** @description Project ref */
@@ -31599,7 +31970,10 @@ export interface operations {
   }
   DestinationsController_createDestination: {
     parameters: {
-      query?: never
+      query?: {
+        /** @description Stable cluster ID from /platform/replication/regions; display names are not IDs. Only omission uses the environment default_cluster_id. Supplied IDs absent from the registry fail to resolve. */
+        cluster_id?: string
+      }
       header?: never
       path: {
         /** @description Project ref */
@@ -31663,7 +32037,10 @@ export interface operations {
   }
   DestinationsPipelinesController_createDestinationPipeline: {
     parameters: {
-      query?: never
+      query?: {
+        /** @description Stable cluster ID from /platform/replication/regions; display names are not IDs. Only omission uses the environment default_cluster_id. Supplied IDs absent from the registry fail to resolve. */
+        cluster_id?: string
+      }
       header?: never
       path: {
         /** @description Project ref */
@@ -31709,6 +32086,13 @@ export interface operations {
         }
         content?: never
       }
+      /** @description Pipeline placement conflicts or the cluster pipeline limit is reached. */
+      409: {
+        headers: {
+          [name: string]: unknown
+        }
+        content?: never
+      }
       /** @description Rate limit exceeded */
       429: {
         headers: {
@@ -31727,7 +32111,10 @@ export interface operations {
   }
   DestinationsPipelinesController_updateDestinationPipeline: {
     parameters: {
-      query?: never
+      query?: {
+        /** @description Stable cluster ID from /platform/replication/regions; display names are not IDs. Only omission uses the environment default_cluster_id. Supplied IDs absent from the registry fail to resolve. */
+        cluster_id?: string
+      }
       header?: never
       path: {
         /** @description Destination id */
@@ -31793,7 +32180,10 @@ export interface operations {
   }
   DestinationsPipelinesController_deleteDestinationPipeline: {
     parameters: {
-      query?: never
+      query?: {
+        /** @description Stable cluster ID from /platform/replication/regions; display names are not IDs. Only omission uses the environment default_cluster_id. Supplied IDs absent from the registry fail to resolve. */
+        cluster_id?: string
+      }
       header?: never
       path: {
         /** @description Destination id */
@@ -31846,7 +32236,7 @@ export interface operations {
         }
         content?: never
       }
-      /** @description Pipeline is still active. */
+      /** @description Pipeline is active or another operation is in progress. */
       409: {
         headers: {
           [name: string]: unknown
@@ -31871,7 +32261,10 @@ export interface operations {
   }
   DestinationsController_getDestination: {
     parameters: {
-      query?: never
+      query?: {
+        /** @description Stable cluster ID from /platform/replication/regions; display names are not IDs. Only omission uses the environment default_cluster_id. Supplied IDs absent from the registry fail to resolve. */
+        cluster_id?: string
+      }
       header?: never
       path: {
         /** @description Destination id */
@@ -31924,7 +32317,10 @@ export interface operations {
   }
   DestinationsController_updateDestination: {
     parameters: {
-      query?: never
+      query?: {
+        /** @description Stable cluster ID from /platform/replication/regions; display names are not IDs. Only omission uses the environment default_cluster_id. Supplied IDs absent from the registry fail to resolve. */
+        cluster_id?: string
+      }
       header?: never
       path: {
         /** @description Destination id */
@@ -31988,7 +32384,10 @@ export interface operations {
   }
   DestinationsController_deleteDestination: {
     parameters: {
-      query?: never
+      query?: {
+        /** @description Stable cluster ID from /platform/replication/regions; display names are not IDs. Only omission uses the environment default_cluster_id. Supplied IDs absent from the registry fail to resolve. */
+        cluster_id?: string
+      }
       header?: never
       path: {
         /** @description Destination id */
@@ -32062,7 +32461,10 @@ export interface operations {
   }
   DestinationsController_validateDestination: {
     parameters: {
-      query?: never
+      query?: {
+        /** @description Stable cluster ID from /platform/replication/regions; display names are not IDs. Only omission uses the environment default_cluster_id. Supplied IDs absent from the registry fail to resolve. */
+        cluster_id?: string
+      }
       header?: never
       path: {
         /** @description Project ref */
@@ -32117,7 +32519,10 @@ export interface operations {
   }
   PipelinesController_getPipelines: {
     parameters: {
-      query?: never
+      query?: {
+        /** @description Stable cluster ID from /platform/replication/regions; display names are not IDs. Only omission uses the environment default_cluster_id. Supplied IDs absent from the registry fail to resolve. */
+        cluster_id?: string
+      }
       header?: never
       path: {
         /** @description Project ref */
@@ -32168,7 +32573,10 @@ export interface operations {
   }
   PipelinesController_createPipeline: {
     parameters: {
-      query?: never
+      query?: {
+        /** @description Stable cluster ID from /platform/replication/regions; display names are not IDs. Only omission uses the environment default_cluster_id. Supplied IDs absent from the registry fail to resolve. */
+        cluster_id?: string
+      }
       header?: never
       path: {
         /** @description Project ref */
@@ -32232,7 +32640,10 @@ export interface operations {
   }
   PipelinesController_getPipeline: {
     parameters: {
-      query?: never
+      query?: {
+        /** @description Stable cluster ID from /platform/replication/regions; display names are not IDs. Only omission uses the environment default_cluster_id. Supplied IDs absent from the registry fail to resolve. */
+        cluster_id?: string
+      }
       header?: never
       path: {
         /** @description Pipeline ID */
@@ -32285,7 +32696,10 @@ export interface operations {
   }
   PipelinesController_updatePipeline: {
     parameters: {
-      query?: never
+      query?: {
+        /** @description Stable cluster ID from /platform/replication/regions; display names are not IDs. Only omission uses the environment default_cluster_id. Supplied IDs absent from the registry fail to resolve. */
+        cluster_id?: string
+      }
       header?: never
       path: {
         /** @description Pipeline ID */
@@ -32349,7 +32763,10 @@ export interface operations {
   }
   PipelinesController_deletePipeline: {
     parameters: {
-      query?: never
+      query?: {
+        /** @description Stable cluster ID from /platform/replication/regions; display names are not IDs. Only omission uses the environment default_cluster_id. Supplied IDs absent from the registry fail to resolve. */
+        cluster_id?: string
+      }
       header?: never
       path: {
         /** @description Pipeline ID */
@@ -32398,7 +32815,7 @@ export interface operations {
         }
         content?: never
       }
-      /** @description Pipeline is still active. */
+      /** @description Pipeline is active or another operation is in progress. */
       409: {
         headers: {
           [name: string]: unknown
@@ -32423,7 +32840,10 @@ export interface operations {
   }
   PipelinesController_getPipelineReplicationStatus: {
     parameters: {
-      query?: never
+      query?: {
+        /** @description Stable cluster ID from /platform/replication/regions; display names are not IDs. Only omission uses the environment default_cluster_id. Supplied IDs absent from the registry fail to resolve. */
+        cluster_id?: string
+      }
       header?: never
       path: {
         /** @description Pipeline ID */
@@ -32476,7 +32896,10 @@ export interface operations {
   }
   PipelinesController_restartPipeline: {
     parameters: {
-      query?: never
+      query?: {
+        /** @description Stable cluster ID from /platform/replication/regions; display names are not IDs. Only omission uses the environment default_cluster_id. Supplied IDs absent from the registry fail to resolve. */
+        cluster_id?: string
+      }
       header?: never
       path: {
         /** @description Pipeline ID */
@@ -32543,7 +32966,10 @@ export interface operations {
   }
   PipelinesController_rollbackTables: {
     parameters: {
-      query?: never
+      query?: {
+        /** @description Stable cluster ID from /platform/replication/regions; display names are not IDs. Only omission uses the environment default_cluster_id. Supplied IDs absent from the registry fail to resolve. */
+        cluster_id?: string
+      }
       header?: never
       path: {
         /** @description Pipeline ID */
@@ -32609,7 +33035,10 @@ export interface operations {
   }
   PipelinesController_startPipeline: {
     parameters: {
-      query?: never
+      query?: {
+        /** @description Stable cluster ID from /platform/replication/regions; display names are not IDs. Only omission uses the environment default_cluster_id. Supplied IDs absent from the registry fail to resolve. */
+        cluster_id?: string
+      }
       header?: never
       path: {
         /** @description Pipeline ID */
@@ -32669,7 +33098,10 @@ export interface operations {
   }
   PipelinesController_getPipelineStatus: {
     parameters: {
-      query?: never
+      query?: {
+        /** @description Stable cluster ID from /platform/replication/regions; display names are not IDs. Only omission uses the environment default_cluster_id. Supplied IDs absent from the registry fail to resolve. */
+        cluster_id?: string
+      }
       header?: never
       path: {
         /** @description Pipeline ID */
@@ -32722,7 +33154,10 @@ export interface operations {
   }
   PipelinesController_stopPipeline: {
     parameters: {
-      query?: never
+      query?: {
+        /** @description Stable cluster ID from /platform/replication/regions; display names are not IDs. Only omission uses the environment default_cluster_id. Supplied IDs absent from the registry fail to resolve. */
+        cluster_id?: string
+      }
       header?: never
       path: {
         /** @description Pipeline ID */
@@ -32782,7 +33217,10 @@ export interface operations {
   }
   PipelinesController_getPipelineVersion: {
     parameters: {
-      query?: never
+      query?: {
+        /** @description Stable cluster ID from /platform/replication/regions; display names are not IDs. Only omission uses the environment default_cluster_id. Supplied IDs absent from the registry fail to resolve. */
+        cluster_id?: string
+      }
       header?: never
       path: {
         /** @description Pipeline ID */
@@ -32835,7 +33273,10 @@ export interface operations {
   }
   PipelinesController_updatePipelineVersion: {
     parameters: {
-      query?: never
+      query?: {
+        /** @description Stable cluster ID from /platform/replication/regions; display names are not IDs. Only omission uses the environment default_cluster_id. Supplied IDs absent from the registry fail to resolve. */
+        cluster_id?: string
+      }
       header?: never
       path: {
         /** @description Pipeline ID */
@@ -32899,7 +33340,10 @@ export interface operations {
   }
   PipelinesController_validatePipeline: {
     parameters: {
-      query?: never
+      query?: {
+        /** @description Stable cluster ID from /platform/replication/regions; display names are not IDs. Only omission uses the environment default_cluster_id. Supplied IDs absent from the registry fail to resolve. */
+        cluster_id?: string
+      }
       header?: never
       path: {
         /** @description Project ref */
@@ -32954,7 +33398,10 @@ export interface operations {
   }
   SourcesController_getSources: {
     parameters: {
-      query?: never
+      query?: {
+        /** @description Stable cluster ID from /platform/replication/regions; display names are not IDs. Only omission uses the environment default_cluster_id. Supplied IDs absent from the registry fail to resolve. */
+        cluster_id?: string
+      }
       header?: never
       path: {
         /** @description Project ref */
@@ -33005,7 +33452,10 @@ export interface operations {
   }
   SourcesController_createSource: {
     parameters: {
-      query?: never
+      query?: {
+        /** @description Stable cluster ID from /platform/replication/regions; display names are not IDs. Only omission uses the environment default_cluster_id. Supplied IDs absent from the registry fail to resolve. */
+        cluster_id?: string
+      }
       header?: never
       path: {
         /** @description Project ref */
@@ -33065,7 +33515,10 @@ export interface operations {
   }
   SourcesController_getPublications: {
     parameters: {
-      query?: never
+      query?: {
+        /** @description Stable cluster ID from /platform/replication/regions; display names are not IDs. Only omission uses the environment default_cluster_id. Supplied IDs absent from the registry fail to resolve. */
+        cluster_id?: string
+      }
       header?: never
       path: {
         /** @description Project ref */
@@ -33118,7 +33571,10 @@ export interface operations {
   }
   SourcesController_createPublication: {
     parameters: {
-      query?: never
+      query?: {
+        /** @description Stable cluster ID from /platform/replication/regions; display names are not IDs. Only omission uses the environment default_cluster_id. Supplied IDs absent from the registry fail to resolve. */
+        cluster_id?: string
+      }
       header?: never
       path: {
         /** @description Project ref */
@@ -33248,7 +33704,10 @@ export interface operations {
   }
   SourcesController_deletePublication: {
     parameters: {
-      query?: never
+      query?: {
+        /** @description Stable cluster ID from /platform/replication/regions; display names are not IDs. Only omission uses the environment default_cluster_id. Supplied IDs absent from the registry fail to resolve. */
+        cluster_id?: string
+      }
       header?: never
       path: {
         /** @description Publication name */
@@ -33372,7 +33831,10 @@ export interface operations {
   }
   SourcesController_getTables: {
     parameters: {
-      query?: never
+      query?: {
+        /** @description Stable cluster ID from /platform/replication/regions; display names are not IDs. Only omission uses the environment default_cluster_id. Supplied IDs absent from the registry fail to resolve. */
+        cluster_id?: string
+      }
       header?: never
       path: {
         /** @description Project ref */
@@ -33425,7 +33887,10 @@ export interface operations {
   }
   TenantsController_deleteTenant: {
     parameters: {
-      query?: never
+      query?: {
+        /** @description Stable cluster ID from /platform/replication/regions; display names are not IDs. Only omission uses the environment default_cluster_id. Supplied IDs absent from the registry fail to resolve. */
+        cluster_id?: string
+      }
       header?: never
       path: {
         /** @description Project ref */
@@ -33497,7 +33962,10 @@ export interface operations {
   }
   TenantsSourcesController_createTenantSource: {
     parameters: {
-      query?: never
+      query?: {
+        /** @description Stable cluster ID from /platform/replication/regions; display names are not IDs. Only omission uses the environment default_cluster_id. Supplied IDs absent from the registry fail to resolve. */
+        cluster_id?: string
+      }
       header?: never
       path: {
         /** @description Project ref */
@@ -33555,9 +34023,31 @@ export interface operations {
       }
     }
   }
-  V2SourcesController_getPublications: {
+  PipelineRegionsController_getRegions: {
     parameters: {
       query?: never
+      header?: never
+      path?: never
+      cookie?: never
+    }
+    requestBody?: never
+    responses: {
+      200: {
+        headers: {
+          [name: string]: unknown
+        }
+        content: {
+          'application/json': components['schemas']['PipelineRegionsResponse_Output']
+        }
+      }
+    }
+  }
+  V2SourcesController_getPublications: {
+    parameters: {
+      query?: {
+        /** @description Stable cluster ID from /platform/replication/regions; display names are not IDs. Only omission uses the environment default_cluster_id. Supplied IDs absent from the registry fail to resolve. */
+        cluster_id?: string
+      }
       header?: never
       path: {
         /** @description Project ref */
@@ -33610,7 +34100,10 @@ export interface operations {
   }
   V2SourcesController_getPublication: {
     parameters: {
-      query?: never
+      query?: {
+        /** @description Stable cluster ID from /platform/replication/regions; display names are not IDs. Only omission uses the environment default_cluster_id. Supplied IDs absent from the registry fail to resolve. */
+        cluster_id?: string
+      }
       header?: never
       path: {
         /** @description Publication name */
@@ -33672,7 +34165,10 @@ export interface operations {
   }
   V2SourcesController_putPublication: {
     parameters: {
-      query?: never
+      query?: {
+        /** @description Stable cluster ID from /platform/replication/regions; display names are not IDs. Only omission uses the environment default_cluster_id. Supplied IDs absent from the registry fail to resolve. */
+        cluster_id?: string
+      }
       header?: never
       path: {
         /** @description Publication name */
@@ -33749,7 +34245,10 @@ export interface operations {
   }
   V2SourcesController_deletePublication: {
     parameters: {
-      query?: never
+      query?: {
+        /** @description Stable cluster ID from /platform/replication/regions; display names are not IDs. Only omission uses the environment default_cluster_id. Supplied IDs absent from the registry fail to resolve. */
+        cluster_id?: string
+      }
       header?: never
       path: {
         /** @description Publication name */
@@ -33819,6 +34318,8 @@ export interface operations {
   V2SourcesController_getTables: {
     parameters: {
       query?: {
+        /** @description Stable cluster ID from /platform/replication/regions; display names are not IDs. Only omission uses the environment default_cluster_id. Supplied IDs absent from the registry fail to resolve. */
+        cluster_id?: string
         /** @description Restrict results to this schema */
         schema?: string
       }
@@ -33874,7 +34375,10 @@ export interface operations {
   }
   V2SourcesController_getTableColumns: {
     parameters: {
-      query?: never
+      query?: {
+        /** @description Stable cluster ID from /platform/replication/regions; display names are not IDs. Only omission uses the environment default_cluster_id. Supplied IDs absent from the registry fail to resolve. */
+        cluster_id?: string
+      }
       header?: never
       path: {
         /** @description Project ref */
@@ -36827,7 +37331,7 @@ export interface operations {
   WarehouseController_deleteWarehouse: {
     parameters: {
       query?: {
-        /** @description Permanently delete the managed DuckLake catalog schema and Storage bucket. Defaults to false. */
+        /** @description Permanently delete the managed DuckLake catalog schema and dedicated Storage bucket. Legacy shared buckets and their objects are retained. Defaults to false. */
         delete_data?: 'true' | 'false'
       }
       header?: never

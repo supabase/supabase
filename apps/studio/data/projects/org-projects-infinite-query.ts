@@ -26,6 +26,7 @@ interface GetOrgProjectsInfiniteVariables {
   search?: string
   page?: number
   statuses?: string[]
+  refs?: string[]
 }
 
 export type OrgProjectsResponse = components['schemas']['OrganizationProjectsResponse_Output']
@@ -37,6 +38,7 @@ export async function getOrganizationProjects(
     page = 0,
     sort = 'name_asc',
     search: _search = '',
+    refs: _refs = [],
     statuses: _statuses = [],
   }: GetOrgProjectsInfiniteVariables,
   signal?: AbortSignal,
@@ -48,9 +50,10 @@ export async function getOrganizationProjects(
   const offset = page * limit
   const search = _search.length === 0 ? undefined : _search
   const statuses = _statuses.length === 0 ? undefined : _statuses.join(',')
+  const refs = _refs.length === 0 ? undefined : _refs.join(',')
 
   const { data, error } = await get('/platform/organizations/{slug}/projects', {
-    params: { path: { slug }, query: { limit, offset, sort, search, statuses } },
+    params: { path: { slug }, query: { limit, offset, sort, search, statuses, refs } },
     signal,
     headers,
   })
@@ -63,7 +66,7 @@ export type OrgProjectsInfiniteData = Awaited<ReturnType<typeof getOrganizationP
 export type OrgProjectsInfiniteError = StudioError
 
 export const useOrgProjectsInfiniteQuery = <TData = OrgProjectsInfiniteData>(
-  { slug, sort = 'name_asc', search, statuses = [] }: GetOrgProjectsInfiniteVariables,
+  { slug, sort = 'name_asc', search, statuses = [], refs = [] }: GetOrgProjectsInfiniteVariables,
   {
     enabled = true,
     ...options
@@ -77,9 +80,9 @@ export const useOrgProjectsInfiniteQuery = <TData = OrgProjectsInfiniteData>(
 ) => {
   const { profile } = useProfile()
   return useInfiniteQuery({
-    queryKey: projectKeys.infiniteListByOrg(slug, { sort, search, statuses }),
+    queryKey: projectKeys.infiniteListByOrg(slug, { sort, search, statuses, refs }),
     queryFn: ({ signal, pageParam }) =>
-      getOrganizationProjects({ slug, page: pageParam, sort, search, statuses }, signal),
+      getOrganizationProjects({ slug, page: pageParam, sort, search, statuses, refs }, signal),
     enabled: enabled && profile !== undefined && typeof slug !== 'undefined',
     staleTime: 30 * 60 * 1000, // 30 minutes
     initialPageParam: 0,

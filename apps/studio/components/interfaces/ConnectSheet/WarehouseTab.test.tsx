@@ -136,7 +136,7 @@ describe('WarehouseTab', () => {
     expect(screen.getByDisplayValue('default.warehouse.supabase.co')).toBeInTheDocument()
     expect(
       screen.getByDisplayValue(
-        'flightsql://postgres:[YOUR-PASSWORD]@default.warehouse.supabase.co:443?tls=enabled'
+        'flightsql://postgres:[YOUR-DATABASE-PASSWORD]@default.warehouse.supabase.co:443?tls=enabled'
       )
     ).toBeInTheDocument()
     expect(screen.getByRole('link', { name: 'Manage Warehouse' })).toHaveAttribute(

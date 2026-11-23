@@ -1,11 +1,20 @@
 import { type TOCHeader } from '~/components/GuidesSidebar'
+import { CodeTabs } from '~/features/directives/CodeTabs.components'
+import {
+  CONFIG_FORMAT_QUERY_GROUP,
+  CONFIG_JSONC_NAME,
+  CONFIG_TOML_NAME,
+  convertConfigTomlToJsonc,
+} from '~/features/directives/ConfigFormats'
 import { GuideTemplate, newEditLink } from '~/features/docs/GuidesMdx.template'
 import { genGuideMeta } from '~/features/docs/GuidesMdx.utils'
+import { CodeBlock } from '~/features/ui/CodeBlock/CodeBlock'
+import { TabPanel } from '~/features/ui/Tabs'
 import type { Parameter } from '~/lib/refGenerator/refTypes'
 import specFile from '~/spec/cli_v1_config.yaml' with { type: 'yml' }
 import ReactMarkdown from 'react-markdown'
 import { Heading, Table } from 'ui'
-import { CodeBlock } from 'ui-patterns/CodeBlock'
+import { Admonition } from 'ui-patterns/Admonition'
 
 const meta = {
   title: 'Supabase CLI config',
@@ -44,6 +53,8 @@ const Config = () => {
 }
 
 function Info({ parameter }: { parameter: Parameter }) {
+  const jsonc = parameter.usage ? convertConfigTomlToJsonc(parameter.usage) : undefined
+
   return (
     <div className="mt-8">
       <div>
@@ -73,14 +84,25 @@ function Info({ parameter }: { parameter: Parameter }) {
             </div>
             <div className="mb-4 scroll-mt-16 mt-0 ">
               <p className="text-sm font-bold uppercase">Description</p>
-              <ReactMarkdown>{parameter.description}</ReactMarkdown>
+              <ReactMarkdown
+                components={{
+                  blockquote: ({ children }) => <Admonition type="note">{children}</Admonition>,
+                }}
+              >
+                {parameter.description}
+              </ReactMarkdown>
             </div>
             {parameter.usage && (
               <div className="mb-4 scroll-mt-16 mt-0 ">
                 <p className="text-sm font-bold uppercase">Usage</p>
-                <CodeBlock className="useless-code-block-class" language="py">
-                  {parameter.usage}
-                </CodeBlock>
+                <CodeTabs queryGroup={CONFIG_FORMAT_QUERY_GROUP}>
+                  <TabPanel id="toml" label={CONFIG_TOML_NAME}>
+                    <CodeBlock lang="toml" contents={parameter.usage} />
+                  </TabPanel>
+                  <TabPanel id="jsonc" label={CONFIG_JSONC_NAME}>
+                    <CodeBlock lang="jsonc" contents={jsonc} />
+                  </TabPanel>
+                </CodeTabs>
               </div>
             )}
             {parameter.links && (

@@ -88,24 +88,34 @@ describe('overview detail row actions on hover devices', () => {
   beforeEach(() => setIsHoverDevice(true))
   afterEach(() => setIsHoverDevice(false))
 
-  it('filters from the row actions instead of opening a menu', async () => {
+  it('applies equals and not equals from the same menu as touch devices', async () => {
     const user = userEvent.setup()
     render(<FilterableDetailRow />)
-    await user.click(screen.getByRole('button', { name: 'Filter where Method does not equal' }))
+    expect(screen.queryByRole('menu')).not.toBeInTheDocument()
+    await user.click(screen.getByText('GET'))
+    expect(screen.queryByRole('menu')).not.toBeInTheDocument()
+
+    await user.click(screen.getByRole('button', { name: 'Actions for Method' }))
+    expect(screen.getByRole('menuitem', { name: 'Copy Method' })).toBeVisible()
+    await user.click(screen.getByRole('menuitem', { name: 'Filter: equals' }))
+    expect(screen.getByRole('status', { name: 'Selected filters' })).toHaveTextContent(
+      '"operator":"=","values":["GET"]'
+    )
+
+    await user.click(screen.getByRole('button', { name: 'Actions for Method' }))
+    await user.click(screen.getByRole('menuitem', { name: 'Filter: not equals' }))
     expect(screen.getByRole('status', { name: 'Selected filters' })).toHaveTextContent(
       '"operator":"<>","values":["GET"]'
     )
-
-    await user.click(screen.getByText('GET'))
-    expect(screen.queryByRole('menu')).not.toBeInTheDocument()
   })
 
   it('offers copy but no filter on a row that cannot be filtered', async () => {
     const user = userEvent.setup()
     const copy = vi.spyOn(navigator.clipboard, 'writeText')
     render(<CopyOnlyDetailRow />)
-    expect(screen.queryByRole('button', { name: /^Filter where/ })).not.toBeInTheDocument()
-    await user.click(screen.getByRole('button', { name: 'Copy Count' }))
+    await user.click(screen.getByRole('button', { name: 'Actions for Count' }))
+    expect(screen.queryByRole('menuitem', { name: /filter/i })).not.toBeInTheDocument()
+    await user.click(screen.getByRole('menuitem', { name: 'Copy Count' }))
     expect(copy).toHaveBeenCalledWith('0')
   })
 })

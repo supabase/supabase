@@ -9,7 +9,7 @@ import { EdgeFunctionDetails } from './EdgeFunctionDetails'
 import { apiKeysKeys } from '@/data/api-keys/keys'
 import { FGA_PERMISSIONS } from '@/hooks/misc/useCheckPermissionsV2'
 import { customRender } from '@/tests/lib/custom-render'
-import { addAPIMock } from '@/tests/lib/msw'
+import { addAPIMock, type APIErrorBody } from '@/tests/lib/msw'
 import { mockPermissionsError } from '@/tests/lib/msw-permissions'
 import { ALL_FGA_PERMISSIONS, type PermissionsV2Response } from '@/tests/lib/permissions-fixtures'
 import { createMockProfileContext } from '@/tests/lib/profile-helpers'
@@ -165,6 +165,23 @@ describe('EdgeFunctionDetails', () => {
     await userEvent.click(screen.getByRole('button', { name: 'Show anon key' }))
     expect(await screen.findByText(/YOUR ANON KEY/)).toBeInTheDocument()
     expect(screen.queryByText(/sb_publishable_abc/)).not.toBeInTheDocument()
+  })
+
+  it('shows an error instead of the invoke snippet when the project endpoint fails to load', async () => {
+    mockProjectGrantContext({ ref: 'default' })
+    mockApiKeys()
+    mockFunctionDeps()
+    addAPIMock({
+      method: 'get',
+      path: '/platform/projects/:ref/settings',
+      response: () =>
+        HttpResponse.json<APIErrorBody>({ message: 'Settings unavailable' }, { status: 500 }),
+    })
+
+    customRender(<EdgeFunctionDetails />, { profileContext })
+
+    expect(await screen.findByText('Failed to retrieve function URL')).toBeVisible()
+    expect(screen.queryByText(/curl -L -X POST/)).not.toBeInTheDocument()
   })
 
   it('shows an error when permissions fail to load', async () => {

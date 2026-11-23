@@ -74,7 +74,7 @@ export const OrganizationDetailsForm = () => {
         onSubmit={orgDetailsForm.handleSubmit(onUpdateOrganizationDetails)}
       >
         <Card>
-          <CardContent>
+          <CardContent className="md:px-8">
             <FormField
               control={orgDetailsForm.control}
               name="name"
@@ -87,7 +87,7 @@ export const OrganizationDetailsForm = () => {
               )}
             />
           </CardContent>
-          <CardContent>
+          <CardContent className="md:px-8">
             <FormItemLayout label="Organization slug" layout="flex-row-reverse">
               <PasswordInput copy disabled id="slug" value={selectedOrganization?.slug ?? ''} />
             </FormItemLayout>

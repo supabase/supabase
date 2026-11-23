@@ -1,5 +1,5 @@
 /**
- * Studio API paths include temporary pipeline ID compatibility for rollout.
+ * Studio API paths include temporary replication response compatibility for rollout.
  * Import resource schemas directly from 'api-types'.
  */
 export type * from 'api-types'

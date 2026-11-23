@@ -61,9 +61,16 @@ export const RedirectUrlList = ({
     }
   }
 
+  const hasUrls = allowList.length > 0
+
   return (
     <div className="-space-y-px">
-      <ValueContainer className="py-3 flex items-center justify-end">
+      <ValueContainer className="py-3 flex flex-wrap items-center justify-end gap-y-2">
+        {hasUrls && (
+          <p className="mr-auto whitespace-nowrap text-foreground-muted text-sm">
+            Total URLs: {allowList.length}
+          </p>
+        )}
         {selectedUrls.length > 0 ? (
           <div className="flex items-center gap-x-2">
             <Button onClick={() => onSelectClearSelection()}>Clear selection</Button>
@@ -109,7 +116,7 @@ export const RedirectUrlList = ({
           </Shortcut>
         )}
       </ValueContainer>
-      {allowList.length > 0 ? (
+      {hasUrls ? (
         <>
           {allowList.map((url) => {
             const isSelected = selectedUrls.includes(url)
@@ -138,11 +145,6 @@ export const RedirectUrlList = ({
             description="Auth providers may need a URL to redirect back to"
           />
         </div>
-      )}
-      {allowList.length > 0 && (
-        <ValueContainer className="py-3 flex items-center justify-between">
-          <p className="pl-9 text-foreground-muted text-sm">Total URLs: {allowList.length}</p>
-        </ValueContainer>
       )}
     </div>
   )

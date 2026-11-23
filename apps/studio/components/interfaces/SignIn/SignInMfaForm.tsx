@@ -42,6 +42,10 @@ export const SignInMfaForm = ({ context = 'sign-in' }: SignInMfaFormProps) => {
   const signOut = useSignOut()
   const queryClient = useQueryClient()
   const searchParams = useSearchParams()
+  const recoveryCodeSearchParams = new URLSearchParams(searchParams?.toString())
+  if (context === 'forgot-password') {
+    recoveryCodeSearchParams.set('context', 'forgot-password')
+  }
   const { method: signInMethod = 'unknown' } = useParams()
   const enableAuthRecoveryCodes = useFlag('enableAuthRecoveryCodes')
   const { data: recoveryCodesStatus } = useRecoveryCodesStatusQuery({
@@ -255,7 +259,7 @@ export const SignInMfaForm = ({ context = 'sign-in' }: SignInMfaFormProps) => {
           {enableAuthRecoveryCodes && recoveryCodesStatus?.status === 'available' && (
             <li>
               <Link
-                href={`/sign-in-recovery-code?${searchParams}`}
+                href={`/sign-in-recovery-code?${recoveryCodeSearchParams}`}
                 className="text-sm transition text-foreground-light hover:text-foreground"
               >
                 Authenticate using a recovery code

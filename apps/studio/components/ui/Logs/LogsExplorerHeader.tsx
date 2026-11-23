@@ -13,6 +13,7 @@ import { useState } from 'react'
 import { logConstants } from 'shared-data'
 import {
   Button,
+  Card,
   cn,
   Command,
   CommandEmpty,
@@ -25,6 +26,12 @@ import {
   PopoverContent,
   PopoverTrigger,
   SidePanel,
+  Table,
+  TableBody,
+  TableCell,
+  TableHead,
+  TableHeader,
+  TableRow,
   Tooltip,
   TooltipContent,
   TooltipTrigger,
@@ -36,7 +43,6 @@ import {
   otelFieldsFromKeys,
   toOtelFieldSchemas,
 } from '@/components/interfaces/Settings/Logs/Logs.fieldReference'
-import Table from '@/components/to-be-cleaned/Table'
 import { useOtelLogKeysQuery } from '@/data/logs/otel-log-keys-query'
 import { DOCS_URL } from '@/lib/constants'
 
@@ -178,22 +184,28 @@ const LogsExplorerHeader = ({ subtitle }: LogsExplorerHeaderProps) => {
             {useOtel && isLoadingKeys ? (
               <p className="text-sm text-foreground-light py-2">Loading fields…</p>
             ) : (
-              <Table
-                head={[
-                  <Table.th className="text-xs p-2!" key="path">
-                    Path
-                  </Table.th>,
-                  <Table.th key="type" className="text-xs p-2!">
-                    Type
-                  </Table.th>,
-                ]}
-                body={(() => {
-                  const fields = useOtel
-                    ? otelFieldsFromKeys(discoveredKeys ?? [])
-                    : selectedSchema.fields
-                  return fields.map((field) => <Field key={field.path} field={field} />)
-                })()}
-              />
+              <Card>
+                <Table>
+                  <TableHeader>
+                    <TableRow>
+                      <TableHead className="text-xs p-2" key="path">
+                        Path
+                      </TableHead>
+                      <TableHead key="type" className="text-xs p-2">
+                        Type
+                      </TableHead>
+                    </TableRow>
+                  </TableHeader>
+                  <TableBody>
+                    {(useOtel
+                      ? otelFieldsFromKeys(discoveredKeys ?? [])
+                      : selectedSchema.fields
+                    ).map((field) => (
+                      <Field key={field.path} field={field} />
+                    ))}
+                  </TableBody>
+                </Table>
+              </Card>
             )}
           </div>
         </SidePanel>
@@ -215,9 +227,9 @@ const Field = ({
   const [isCopied, setIsCopied] = useState(false)
 
   return (
-    <Table.tr>
-      <Table.td
-        className="font-mono text-xs p-2! cursor-pointer hover:text-foreground transition flex items-center space-x-2"
+    <TableRow>
+      <TableCell
+        className="font-mono text-xs p-2 cursor-pointer hover:text-foreground transition flex items-center space-x-2"
         onClick={() =>
           copyToClipboard(field.path, () => {
             setIsCopied(true)
@@ -245,8 +257,8 @@ const Field = ({
             </TooltipContent>
           </Tooltip>
         )}
-      </Table.td>
-      <Table.td className="font-mono text-xs p-2!">{field.type}</Table.td>
-    </Table.tr>
+      </TableCell>
+      <TableCell className="font-mono text-xs p-2">{field.type}</TableCell>
+    </TableRow>
   )
 }

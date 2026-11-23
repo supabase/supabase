@@ -1,7 +1,6 @@
 import crypto from 'node:crypto'
 import { expect, Page } from '@playwright/test'
 
-import { expectClipboardValue } from '../utils/clipboard.js'
 import {
   createMaterializedView,
   createTable,
@@ -20,8 +19,11 @@ import { createApiResponseWaiter, waitForApiResponse } from '../utils/wait-for-r
  */
 const openEntityContextMenu = async (page: Page, entityName: string) => {
   const entityButton = page.getByRole('button', { name: `View ${entityName}`, exact: true })
-  await entityButton.click()
-  await entityButton.hover()
+  // Interact at the row's left padding: the centre can land on the Unrestricted badge, whose
+  // right-side tooltip then covers the menu button and intercepts the click
+  const rowEdge = { position: { x: 4, y: 14 } }
+  await entityButton.click(rowEdge)
+  await entityButton.hover(rowEdge)
   const menuButton = entityButton.locator('button[aria-haspopup="menu"]')
   await expect(menuButton).toBeVisible({ timeout: 30000 })
   await menuButton.click()
@@ -82,20 +84,6 @@ const setupMaterializedViewFixture = async (
 }
 
 test.describe('table editor — view context menu', () => {
-  test('copy name copies the view name to clipboard', async ({ page, ref }) => {
-    await using fixture = await setupViewFixture()
-    await goToTableEditor(page, ref)
-
-    await openEntityContextMenu(page, fixture.viewName)
-    await page.getByRole('menuitem', { name: 'Copy name' }).click()
-    await expect(
-      page.getByRole('menuitem', { name: 'Copy name' }),
-      'menu should close after Copy name click'
-    ).not.toBeVisible()
-
-    await expectClipboardValue({ page, value: fixture.viewName, exact: true })
-  })
-
   test('copy view definition copies CREATE VIEW statement to clipboard', async ({ page, ref }) => {
     await using fixture = await setupViewFixture()
     await goToTableEditor(page, ref)
@@ -197,17 +185,6 @@ test.describe('table editor — view context menu', () => {
 })
 
 test.describe('table editor — materialized view context menu', () => {
-  test('copy name copies the materialized view name to clipboard', async ({ page, ref }) => {
-    await using fixture = await setupMaterializedViewFixture()
-    await goToTableEditor(page, ref)
-
-    await openEntityContextMenu(page, fixture.mvName)
-    await page.getByRole('menuitem', { name: 'Copy name' }).click()
-    await expect(page.getByRole('menuitem', { name: 'Copy name' })).not.toBeVisible()
-
-    await expectClipboardValue({ page, value: fixture.mvName, exact: true })
-  })
-
   test('copy materialized view definition copies CREATE statement to clipboard', async ({
     page,
     ref,

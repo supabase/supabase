@@ -2,10 +2,8 @@ import { describe, expect, it } from 'vitest'
 
 import {
   formatFunctionSearchDetails,
+  formatTableSearchDetails,
   formatTriggerSearchDetails,
-  getFunctionEditorRoute,
-  getPolicyEditorRoute,
-  getTriggerEditorRoute,
   matchesTableRelatedSearch,
   matchesTriggerSearch,
 } from './DatabaseEntitySearch.utils'
@@ -26,25 +24,20 @@ describe('matchesTableRelatedSearch', () => {
   })
 })
 
-describe('getPolicyEditorRoute', () => {
-  it('sets the schema so the policy is listed on the policies page', () => {
-    expect(getPolicyEditorRoute('abc', { id: 7, schema: 'public' })).toBe(
-      '/project/abc/database/policies?schema=public&edit=7'
-    )
-  })
+describe('formatTableSearchDetails', () => {
+  const base = { id: 1, schema: 'public', name: 'blog_posts' }
 
-  it('encodes schema names', () => {
-    expect(getPolicyEditorRoute('abc', { id: 7, schema: 'my schema&x' })).toBe(
-      '/project/abc/database/policies?schema=my%20schema%26x&edit=7'
-    )
-  })
-})
-
-describe('getFunctionEditorRoute', () => {
-  it('sets the schema so the function is listed on the functions page', () => {
-    expect(getFunctionEditorRoute('abc', { id: 9, schema: 'my schema' })).toBe(
-      '/project/abc/database/functions?schema=my%20schema&edit=9'
-    )
+  it.each([
+    [{ ...base, type: 'r', rls_enabled: true, policy_count: 4 }, '4 policies • RLS enabled'],
+    [{ ...base, type: 'r', rls_enabled: false, policy_count: 1 }, '1 policy • RLS disabled'],
+    [{ ...base, type: 'p', rls_enabled: true, policy_count: 0 }, '0 policies • RLS enabled'],
+    [{ ...base, type: 'v', security_invoker: true }, 'Security invoker'],
+    [{ ...base, type: 'v', security_invoker: false }, 'Security definer'],
+    // Neither RLS nor security_invoker applies, and the icon already carries the kind
+    [{ ...base, type: 'm' }, ''],
+    [{ ...base, type: 'f' }, ''],
+  ] as const)('formats %j', (table, expected) => {
+    expect(formatTableSearchDetails(table)).toBe(expected)
   })
 })
 
@@ -56,14 +49,6 @@ describe('formatFunctionSearchDetails', () => {
     [{ type: 'procedure', args: '' }, 'procedure'],
   ] as const)('formats %j', (fn, expected) => {
     expect(formatFunctionSearchDetails(fn)).toBe(expected)
-  })
-})
-
-describe('getTriggerEditorRoute', () => {
-  it('links to the list page directly, since the index route drops the query string', () => {
-    expect(getTriggerEditorRoute('abc', { id: 5, schema: 'my schema' })).toBe(
-      '/project/abc/database/triggers/data?schema=my%20schema&edit=5'
-    )
   })
 })
 

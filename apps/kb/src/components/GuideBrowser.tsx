@@ -1,4 +1,4 @@
-import { ChevronDown } from 'lucide-react'
+import { ArrowUpRight, ChevronDown } from 'lucide-react'
 import { Fragment, useId, useState, useSyncExternalStore } from 'react'
 import {
   cn,
@@ -64,6 +64,10 @@ const bindPanelHeight = (content: HTMLDivElement | null) => {
   observer.observe(content)
   return () => observer.disconnect()
 }
+
+// the hostname of an off-site link, e.g. "dev.to". null for the kb's own pages
+const getExternalHost = (href: string) =>
+  /^https?:\/\//.test(href) ? new URL(href).hostname.replace(/^www\./, '') : null
 
 const toTabValue = (topic: Topic | null) => topic ?? 'all'
 
@@ -289,35 +293,65 @@ const GuideList = ({ guides, activeTopic, onTopicClear }: GuideListProps) => {
 
   return (
     <ul ref={bindRevealOnce} className={cn('m-0 flex list-none flex-col p-0', REVEAL_GROUP_CLASS)}>
-      {guides.map((guide, index) => (
-        <li
-          // guide and troubleshooting slugs can be the same. hrefs are unique
-          key={guide.href}
-          style={revealStyle(index % PAGE_SIZE)}
-          className={cn(
-            'border-b border-dashed border-muted last:border-b-0 transition-colors',
-            'hover:border-transparent has-[+li:hover]:border-transparent',
-            'has-[:focus-visible]:border-transparent has-[+li_:focus-visible]:border-transparent',
-            REVEAL_ITEM_CLASS
-          )}
-        >
-          <a
-            href={guide.href}
+      {guides.map((guide, index) => {
+        const externalHost = getExternalHost(guide.href)
+        return (
+          <li
+            // guide and troubleshooting slugs can be the same. hrefs are unique
+            key={guide.href}
+            style={revealStyle(index % PAGE_SIZE)}
             className={cn(
-              'group -mx-4 flex min-h-14 flex-col gap-1 rounded-md px-4 py-3 transition-colors',
-              'hover:bg-surface-200 focus-visible:bg-surface-200 focus-visible:outline-hidden',
-              'sm:flex-row sm:items-center sm:gap-8 sm:py-0'
+              'border-b border-dashed border-muted last:border-b-0 transition-colors',
+              'hover:border-transparent has-[+li:hover]:border-transparent',
+              'has-[:focus-visible]:border-transparent has-[+li_:focus-visible]:border-transparent',
+              REVEAL_ITEM_CLASS
             )}
           >
-            <span className="min-w-0 flex-1 text-sm font-medium tracking-body text-foreground">
-              {guide.title}
-            </span>
-            <span className="text-sm tracking-body text-foreground-lighter sm:max-w-1/2 sm:shrink-0 sm:truncate sm:text-right">
-              {guide.topics.join(', ')}
-            </span>
-          </a>
-        </li>
-      ))}
+            <a
+              href={guide.href}
+              // community guides link off-site
+              {...(externalHost && { target: '_blank', rel: 'noopener noreferrer' })}
+              className={cn(
+                'group -mx-4 flex min-h-14 flex-col gap-1 rounded-md px-4 py-3 transition-colors',
+                'hover:bg-surface-200 focus-visible:bg-surface-200 focus-visible:outline-hidden',
+                'sm:flex-row sm:items-center sm:gap-8 sm:py-0'
+              )}
+            >
+              <span className="min-w-0 flex-1 text-sm font-medium tracking-body text-foreground">
+                {externalHost ? (
+                  <span className="mr-3">
+                    <img
+                      // google serves a favicon for any host, so contributors do not upload a logo
+                      src={`https://www.google.com/s2/favicons?domain=${externalHost}&sz=32`}
+                      alt=""
+                      width={16}
+                      height={16}
+                      loading="lazy"
+                      referrerPolicy="no-referrer"
+                      className="mr-2 inline size-4 rounded-sm align-text-bottom"
+                    />
+                    {guide.author ?? externalHost}
+                  </span>
+                ) : null}
+                <span className={cn(externalHost && 'text-foreground-light')}>{guide.title}</span>
+                {externalHost ? (
+                  <span className="ml-1 text-foreground-lighter transition-colors group-hover:text-foreground-light">
+                    <ArrowUpRight
+                      aria-hidden
+                      strokeWidth={2.5}
+                      className="ml-1 inline size-4 align-text-bottom"
+                    />
+                    <span className="sr-only">(opens in a new tab)</span>
+                  </span>
+                ) : null}
+              </span>
+              <span className="text-sm tracking-body text-foreground-lighter sm:max-w-1/2 sm:shrink-0 sm:truncate sm:text-right">
+                {guide.topics.join(', ')}
+              </span>
+            </a>
+          </li>
+        )
+      })}
     </ul>
   )
 }
