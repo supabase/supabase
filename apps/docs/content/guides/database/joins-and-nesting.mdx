@@ -240,7 +240,7 @@ To filter out parent rows that do not match the related table, use `!inner` on t
 | `relation!inner(columns)`       | Use `inner join` behavior for that embedded relation.                                   | `instruments!inner(id, name)`           |
 | `relation!foreign_key(columns)` | Choose which foreign key relationship to use when multiple foreign keys match the join. | `scans!scan_id_start(id)`               |
 
-If you know the join you want in SQL, the [SQL to REST API Translator](/docs/guides/api/sql-to-rest) converts a SQL `select` query into the matching Data API request and Supabase JavaScript client code, turning SQL joins into embedded relations. The Data API supports only a subset of SQL, so some queries won't translate. For example, the translator handles only left and inner joins on columns with a foreign key relationship.
+If you know the join you want in SQL, use the [SQL to REST API Translator](/docs/guides/api/sql-to-rest). It converts a SQL `select` query into the matching Data API request and Supabase JavaScript client code, with joins as embedded relations. The Data API supports only a subset of SQL, so some queries won't translate. For example, the translator handles only left and inner joins that compare columns with `=`, and the request it returns works only when a foreign key links the two tables.
 
 ### Example data for join types
 
