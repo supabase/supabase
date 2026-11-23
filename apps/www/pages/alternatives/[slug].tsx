@@ -4,12 +4,10 @@ import LayoutComparison from '~/layouts/comparison'
 import mdxComponents from '~/lib/mdx/mdxComponents'
 import { mdxSerialize } from '~/lib/mdx/mdxSerialize'
 import { getAllPostSlugs, getPostdata, getSortedPosts } from '~/lib/posts'
+import { generateTocFromMarkdown } from '~/lib/toc'
 
 // import all components used in blog articles here
 // for instance, if you use a button, you must add `Button` in the components object below.
-
-// table of contents extractor
-const toc = require('markdown-toc')
 
 export async function getStaticPaths() {
   const paths = getAllPostSlugs('_alternatives')
@@ -53,7 +51,7 @@ export async function getStaticProps({ params }: any) {
         content: mdxSource,
         source: content,
         ...data,
-        toc: toc(content, { maxdepth: data.toc_depth ? data.toc_depth : 2 }),
+        toc: await generateTocFromMarkdown(content, data.toc_depth ? data.toc_depth : 2),
       },
     },
   }
