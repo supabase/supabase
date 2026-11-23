@@ -1,9 +1,8 @@
-import { useQueryClient } from '@tanstack/react-query'
+import { useMutation, useQueryClient } from '@tanstack/react-query'
 import { toast } from 'sonner'
 
 import { replicationKeys } from './keys'
 import { waitForPipelineStopped } from './pipeline-status-query'
-import { useReplicationMutation } from './use-cluster-mutation'
 import { handleError, post } from '@/data/fetchers'
 import type { StudioError } from '@/lib/errors/studio-errors'
 import type { UseCustomMutationOptions } from '@/types'
@@ -47,7 +46,7 @@ export const useStopPipelineMutation = ({
 > = {}) => {
   const queryClient = useQueryClient()
 
-  return useReplicationMutation<StopPipelineData, StudioError, StopPipelineParams>({
+  return useMutation<StopPipelineData, StudioError, StopPipelineParams>({
     mutationFn: async (variables) => {
       const data = await stopPipeline(variables)
       if (variables.waitUntilStopped) await waitForPipelineStopped(queryClient, variables)

@@ -1,10 +1,9 @@
-import { useQueryClient } from '@tanstack/react-query'
+import { useMutation, useQueryClient } from '@tanstack/react-query'
 import type { components } from 'api-types'
 import { toast } from 'sonner'
 
 import { replicationKeys } from './keys'
 import { pipelineIdSchema } from './pipeline-id'
-import { useReplicationMutation } from './use-cluster-mutation'
 import { handleError, post } from '@/data/fetchers'
 import type { StudioError } from '@/lib/errors/studio-errors'
 import type { UseCustomMutationOptions } from '@/types'
@@ -54,7 +53,7 @@ export const useRollbackTablesMutation = ({
 > = {}) => {
   const queryClient = useQueryClient()
 
-  return useReplicationMutation<RollbackTablesData, StudioError, RollbackTablesParams>({
+  return useMutation<RollbackTablesData, StudioError, RollbackTablesParams>({
     mutationFn: (vars) => rollbackTables(vars),
     async onSuccess(data, variables, context) {
       const { projectRef, pipelineId } = variables

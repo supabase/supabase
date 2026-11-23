@@ -1,7 +1,6 @@
-import { useQueryClient } from '@tanstack/react-query'
+import { useMutation, useQueryClient } from '@tanstack/react-query'
 
 import { replicationKeys } from './keys'
-import { useReplicationMutation } from './use-cluster-mutation'
 import { handleError, post } from '@/data/fetchers'
 import type { StudioError } from '@/lib/errors/studio-errors'
 import type { UseCustomMutationOptions } from '@/types'
@@ -47,7 +46,7 @@ export const useRestartPipelineMutation = ({
 > = {}) => {
   const queryClient = useQueryClient()
 
-  return useReplicationMutation<RestartPipelineData, StudioError, RestartPipelineParams>({
+  return useMutation<RestartPipelineData, StudioError, RestartPipelineParams>({
     mutationFn: (vars) => restartPipeline(vars),
     async onSuccess(data, variables, context) {
       const { projectRef, pipelineId } = variables

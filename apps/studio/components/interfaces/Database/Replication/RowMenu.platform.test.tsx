@@ -14,7 +14,7 @@ import {
   type ReplicationPipelineStatus,
   type ReplicationPipelineStatusResponse,
 } from '@/data/replication/pipeline-status-query'
-import { ReplicationClusterProvider } from '@/state/replication-cluster'
+import { ReplicationClusterProvider, useReplicationClusterId } from '@/state/replication-cluster'
 import {
   PipelineRequestStatusProvider,
   usePipelineRequestStatus,
@@ -48,12 +48,14 @@ const mockPipelineStatus = (statuses: Map<string | null, ReplicationPipelineStat
   return reads
 }
 
-const PipelineActions = ({ clusterId }: { clusterId: string }) => {
+const PipelineActions = () => {
+  const clusterId = useReplicationClusterId()
   const { data, error, isLoading, isError, isSuccess } = useReplicationPipelineStatusQuery(
-    pipelineParams,
+    { ...pipelineParams, clusterId },
     queryOptions
   )
   const { getRequestStatus } = usePipelineRequestStatus()
+  if (!clusterId) throw new Error('The pipeline actions require a cluster')
   return (
     <>
       <PipelineStatePill
@@ -98,7 +100,7 @@ const RegionView = () => {
       <Button onClick={() => void setClusterId(FRANKFURT)}>Frankfurt</Button>
       <Button onClick={() => void setClusterId(VIRGINIA)}>Virginia</Button>
       <ReplicationClusterProvider clusterId={clusterId}>
-        <PipelineActions clusterId={clusterId} />
+        <PipelineActions />
       </ReplicationClusterProvider>
     </PipelineRequestStatusProvider>
   )
