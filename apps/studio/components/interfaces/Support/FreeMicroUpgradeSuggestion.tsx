@@ -34,14 +34,9 @@ export const FreeMicroUpgradeSuggestion = ({
       className={className}
       title="Your project is eligible for a free compute upgrade"
     >
-      Your plan includes a free upgrade from Nano to Micro compute, which doubles the memory and
-      often resolves performance issues.{' '}
+      Your plan includes a free upgrade from Nano to Micro compute, which doubles the memory.{' '}
       <InlineLink href={`${getInfrastructurePath(projectRef)}?upgrade=micro`}>
         Upgrade to Micro
-      </InlineLink>{' '}
-      or read how compute sizes work in the{' '}
-      <InlineLink href="https://supabase.com/docs/guides/platform/compute-and-disk">
-        compute guide
       </InlineLink>
       .
     </Admonition>
