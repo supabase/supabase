@@ -14,16 +14,28 @@ import {
   useState,
 } from 'react'
 import { toast } from 'sonner'
-import { Button, Checkbox, Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from 'ui'
+import {
+  Button,
+  Checkbox,
+  cn,
+  Select,
+  SelectContent,
+  SelectItem,
+  SelectTrigger,
+  SelectValue,
+} from 'ui'
 import { FormItemLayout } from 'ui-patterns/form/FormItemLayout/FormItemLayout'
 import { ShimmeringLoader } from 'ui-patterns/ShimmeringLoader'
 
+import { PaymentBillingAddress } from './PaymentBillingAddress'
+import { NEW_PAYMENT_METHOD_VALUE, PaymentMethodRadioList } from './PaymentMethodRadioList'
 import { getStripeElementsAppearanceOptions } from '@/components/interfaces/Billing/Payment/Payment.utils'
 import { CardBrandIcon } from '@/components/interfaces/Billing/Payment/PaymentMethods/CreditCard'
 import {
   NewPaymentMethodElement,
   type PaymentMethodElementRef,
 } from '@/components/interfaces/Billing/Payment/PaymentMethods/NewPaymentMethodElement'
+import type { BillingAddressPayload } from '@/components/interfaces/Organization/BillingSettings/BillingCustomerData/useBillingCustomerDataForm'
 import { useOrganizationCustomerProfileQuery } from '@/data/organizations/organization-customer-profile-query'
 import { useOrganizationCustomerProfileUpdateMutation } from '@/data/organizations/organization-customer-profile-update-mutation'
 import { useOrganizationPaymentMethodSetupIntent } from '@/data/organizations/organization-payment-method-setup-intent-mutation'
@@ -53,7 +65,13 @@ const getCardLabel = (method: SavedPaymentMethod) => {
 
 export interface PaymentMethodSelectionProps {
   selectedPaymentMethod?: string
-  /** Field label above the saved-card select. Pass null when the surrounding section already names it. */
+  /**
+   * `select` is a dropdown of saved cards. `radio` lists them as options with the billing
+   * address underneath, and has no effect for an organization without a saved card, which
+   * goes straight to the new card form either way.
+   */
+  variant?: 'select' | 'radio'
+  /** Field label above the saved cards. Pass null when the surrounding section already names it. */
   label?: string | null
   onSelectPaymentMethod: (id: string) => void
   layout?: 'vertical' | 'horizontal'
@@ -68,6 +86,7 @@ export interface PaymentMethodSelectionProps {
 const PaymentMethodSelection = forwardRef(function PaymentMethodSelection(
   {
     selectedPaymentMethod,
+    variant = 'select',
     label = 'Payment method',
     onSelectPaymentMethod,
     layout = 'vertical',
@@ -155,6 +174,10 @@ const PaymentMethodSelection = forwardRef(function PaymentMethodSelection(
     (isCustomerProfileLoaded || isCustomerProfileError)
   const isAddingNewPaymentMethod =
     hasChosenNewPaymentMethod ?? (arePaymentMethodsResolved && paymentMethods.data.length === 0)
+  const isLoadingPaymentDetails = isLoading || isCustomerProfileLoading
+  const hasSavedPaymentMethods = !isLoadingPaymentDetails && paymentMethods.data.length > 0
+  // What follows the radio list (card form, or its loading skeleton) sits clear of it.
+  const belowRadioListClassName = hasSavedPaymentMethods && variant === 'radio' ? 'mt-4' : undefined
 
   const { mutate: initSetupIntent, isPending: setupIntentLoading } =
     useOrganizationPaymentMethodSetupIntent({
@@ -228,6 +251,28 @@ const PaymentMethodSelection = forwardRef(function PaymentMethodSelection(
       }
     }
   }, [selectedPaymentMethod, paymentMethods, onSelectPaymentMethod])
+
+  const handleRadioValueChange = (value: string) => {
+    if (value === NEW_PAYMENT_METHOD_VALUE) {
+      setHasChosenNewPaymentMethod(true)
+      return
+    }
+
+    // The card form is only mounted while adding one, and its setup intent is single use.
+    setHasChosenNewPaymentMethod(false)
+    setSetupIntent(undefined)
+    onSelectPaymentMethod(value)
+  }
+
+  // The plan preview only needs to re-estimate tax for the address that was just saved,
+  // or restored after a failed save.
+  const handleBillingAddressChange = ({
+    address,
+    tax_id,
+  }: Pick<BillingAddressPayload, 'address' | 'tax_id'>) => {
+    if (address) onAddressChange?.(address)
+    onTaxIdChange?.(tax_id)
+  }
 
   const getFormValues = async (): ReturnType<PaymentMethodElementRef['getFormValues']> => {
     if (isAddingNewPaymentMethod) {
@@ -350,12 +395,36 @@ const PaymentMethodSelection = forwardRef(function PaymentMethodSelection(
       />
 
       <div>
-        {isLoading || isCustomerProfileLoading ? (
+        {isLoadingPaymentDetails && (
           <div className="flex items-center px-4 py-2 space-x-4 border rounded-md border-strong bg-surface-200">
             <LoaderIcon className="animate-spin" size={14} />
             <p className="text-sm text-foreground-light">Retrieving payment methods</p>
           </div>
-        ) : paymentMethods.data.length > 0 && !isAddingNewPaymentMethod ? (
+        )}
+
+        {hasSavedPaymentMethods && variant === 'radio' && (
+          <div className="space-y-3">
+            <PaymentMethodRadioList
+              label={label ?? 'Payment method'}
+              paymentMethods={paymentMethods.data}
+              value={isAddingNewPaymentMethod ? NEW_PAYMENT_METHOD_VALUE : selectedPaymentMethod}
+              disabled={readOnly}
+              onValueChange={handleRadioValueChange}
+            />
+
+            {!isAddingNewPaymentMethod && customerProfile?.address != null && (
+              <PaymentBillingAddress
+                address={customerProfile.address}
+                billingName={customerProfile.billing_name}
+                taxId={taxId}
+                disabled={readOnly}
+                onChange={handleBillingAddressChange}
+              />
+            )}
+          </div>
+        )}
+
+        {hasSavedPaymentMethods && variant === 'select' && !isAddingNewPaymentMethod && (
           <FormItemLayout
             id="payment-method"
             isReactForm={false}
@@ -401,10 +470,10 @@ const PaymentMethodSelection = forwardRef(function PaymentMethodSelection(
               </SelectContent>
             </Select>
           </FormItemLayout>
-        ) : null}
+        )}
 
-        {stripePromise && setupIntent && customerProfile && (
-          <>
+        {isAddingNewPaymentMethod && stripePromise && setupIntent && customerProfile && (
+          <div className={belowRadioListClassName}>
             <Elements stripe={stripePromise} options={stripeOptionsPaymentMethod}>
               <NewPaymentMethodElement
                 ref={paymentRef}
@@ -436,11 +505,11 @@ const PaymentMethodSelection = forwardRef(function PaymentMethodSelection(
                 </label>
               </div>
             )}
-          </>
+          </div>
         )}
 
         {(setupIntentLoading || isCustomerProfileLoading || isCustomerTaxIdLoading) && (
-          <div className="space-y-2">
+          <div className={cn('space-y-2', belowRadioListClassName)}>
             <ShimmeringLoader className="h-10" />
             <div className="grid grid-cols-2 gap-4">
               <ShimmeringLoader className="h-10" />

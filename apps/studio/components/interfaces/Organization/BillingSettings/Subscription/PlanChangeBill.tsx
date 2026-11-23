@@ -52,18 +52,23 @@ const BillRow = ({
   description,
   amount,
   className,
+  badge,
 }: {
   label: string
   description?: string
   amount: string | null
   className?: string
+  badge?: ReactNode
 }) => (
   <div className={cn('flex items-start justify-between gap-4 px-5 py-4', className)}>
     <div>
       <p className="text-base text-foreground">{label}</p>
       {description && <p className="text-sm text-foreground-light">{description}</p>}
     </div>
-    <Amount className="text-base text-foreground">{amount}</Amount>
+    <div className="flex shrink-0 items-center gap-2">
+      {badge}
+      <Amount className="text-base text-foreground">{amount}</Amount>
+    </div>
   </div>
 )
 
@@ -217,12 +222,12 @@ const HourlyBillingPanel = ({
           <span translate="no">{formatHourlyRate(perProjectHourlyRate)}/hr</span> for every hour it
           exists, busy or idle
           {perProjectMonthlyPrice !== null && (
-            <>
+            <span>
               , which adds up to about{' '}
               <span translate="no">{formatRoundedCurrency(perProjectMonthlyPrice)}/mo</span>
-            </>
+            </span>
           )}
-          .{' '}
+          <span>.</span>{' '}
           <a
             href={`${DOCS_URL}/guides/platform/manage-your-usage/compute`}
             target="_blank"
@@ -305,8 +310,15 @@ const MonthlyTotal = ({ total, tax }: { total: number; tax: PlanChangeSummary['m
  * A paid add-on or usage line carried over to the new plan. Always condensed to one row:
  * which projects it covers matters far less here than the fact that it is still billed.
  */
-const AddonRow = ({ description, amount, projectCount, unitPriceDesc }: AddonLine) => (
+const AddonRow = ({
+  description,
+  amount,
+  projectCount,
+  unitPriceDesc,
+  isUnchanged,
+}: AddonLine & { isUnchanged: boolean }) => (
   <BillRow
+    badge={isUnchanged ? <Badge>No change</Badge> : undefined}
     label={
       projectCount > 0
         ? `${description} · ${projectCount} ${projectCount === 1 ? 'project' : 'projects'}`
@@ -435,7 +447,7 @@ export const PlanChangeBill = ({
       )}
 
       {summary.addons.map((addon) => (
-        <AddonRow key={addon.description} {...addon} />
+        <AddonRow key={addon.description} {...addon} isUnchanged={isCondensed} />
       ))}
 
       <div className="px-5 py-4">

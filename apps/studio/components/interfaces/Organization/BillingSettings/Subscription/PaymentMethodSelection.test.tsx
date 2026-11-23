@@ -1,4 +1,5 @@
 import { screen, waitFor } from '@testing-library/react'
+import userEvent from '@testing-library/user-event'
 import { platformComponents as components } from 'api-types'
 import { HttpResponse } from 'msw'
 import { useState } from 'react'
@@ -6,7 +7,7 @@ import { describe, expect, it, vi } from 'vitest'
 
 import PaymentMethodSelection from './PaymentMethodSelection'
 import { customRender } from '@/tests/lib/custom-render'
-import { addAPIMock } from '@/tests/lib/msw'
+import { addAPIMock, type APIErrorBody } from '@/tests/lib/msw'
 
 type PaymentsResponse = components['schemas']['PaymentsResponse_Output']
 type CustomerResponse = components['schemas']['CustomerResponse_Output']
@@ -47,6 +48,31 @@ vi.mock('@stripe/stripe-js', () => ({ loadStripe: () => Promise.resolve(null) })
 
 vi.mock('@stripe/react-stripe-js', () => ({
   Elements: ({ children }: { children: React.ReactNode }) => <div>{children}</div>,
+  // Stripe's field can't run in jsdom; this stands in for it and reports an edited address.
+  AddressElement: ({ onChange }: { onChange: (event: unknown) => void }) => (
+    <button
+      type="button"
+      data-testid="address-element"
+      onClick={() =>
+        onChange({
+          complete: true,
+          value: {
+            name: 'Acme',
+            address: {
+              line1: '2 New St',
+              line2: '',
+              city: 'Singapore',
+              state: '',
+              postal_code: '654321',
+              country: 'SG',
+            },
+          },
+        })
+      }
+    >
+      Change address
+    </button>
+  ),
 }))
 
 // Stands in for the whole Stripe card form, so its presence is the thing under test.
@@ -84,7 +110,13 @@ const card: PaymentsResponse['data'][number] = {
   card: { brand: 'visa', last4: '4242', exp_month: 8, exp_year: 2028 },
 }
 
-function mockBillingEndpoints({ paymentMethods }: { paymentMethods: PaymentsResponse['data'] }) {
+function mockBillingEndpoints({
+  paymentMethods,
+  taxId = null,
+}: {
+  paymentMethods: PaymentsResponse['data']
+  taxId?: TaxIdResponse['tax_id']
+}) {
   const setupIntentRequests: string[] = []
 
   addAPIMock({
@@ -122,7 +154,7 @@ function mockBillingEndpoints({ paymentMethods }: { paymentMethods: PaymentsResp
   addAPIMock({
     method: 'get',
     path: '/platform/organizations/:slug/tax-ids',
-    response: () => HttpResponse.json<TaxIdResponse>({ tax_id: null }),
+    response: () => HttpResponse.json<TaxIdResponse>({ tax_id: taxId }),
   })
 
   addAPIMock({
@@ -140,12 +172,36 @@ function mockBillingEndpoints({ paymentMethods }: { paymentMethods: PaymentsResp
   return { setupIntentRequests }
 }
 
+/**
+ * Answers the customer profile update only once `respond` is called, so a test can look at
+ * the screen while the request is still in flight.
+ */
+function holdCustomerUpdate() {
+  let respond!: (result: 'success' | 'failure') => void
+  const outcome = new Promise<'success' | 'failure'>((resolve) => {
+    respond = resolve
+  })
+
+  addAPIMock({
+    method: 'put',
+    path: '/platform/organizations/:slug/customer',
+    response: async () =>
+      (await outcome) === 'success'
+        ? new HttpResponse(null, { status: 204 })
+        : HttpResponse.json<APIErrorBody>({ message: 'Invalid tax ID' }, { status: 400 }),
+  })
+
+  return { respond }
+}
+
 /** Holds the selected id the way a real consumer does, so the trigger shows a value. */
-const PaymentMethodSelectionHarness = () => {
+const PaymentMethodSelectionHarness = ({ variant }: { variant?: 'select' | 'radio' }) => {
   const [selectedPaymentMethod, setSelectedPaymentMethod] = useState<string>()
 
   return (
     <PaymentMethodSelection
+      variant={variant}
+      label="Pay with"
       readOnly={false}
       selectedPaymentMethod={selectedPaymentMethod}
       onSelectPaymentMethod={setSelectedPaymentMethod}
@@ -155,7 +211,8 @@ const PaymentMethodSelectionHarness = () => {
   )
 }
 
-const renderSelection = () => customRender(<PaymentMethodSelectionHarness />)
+const renderSelection = (variant?: 'select' | 'radio') =>
+  customRender(<PaymentMethodSelectionHarness variant={variant} />)
 
 describe('PaymentMethodSelection', () => {
   it('shows the saved card rather than the new card form on first load', async () => {
@@ -178,5 +235,133 @@ describe('PaymentMethodSelection', () => {
 
     await waitFor(() => expect(setupIntentRequests).toHaveLength(1))
     expect(await screen.findByTestId('new-payment-method-form')).toBeInTheDocument()
+  })
+
+  describe('radio variant', () => {
+    it('lists the saved card as an option, with the billing address underneath', async () => {
+      const { setupIntentRequests } = mockBillingEndpoints({ paymentMethods: [card] })
+
+      renderSelection('radio')
+
+      const savedCard = await screen.findByRole('radio', { name: /Visa •••• 4242/ })
+      expect(savedCard).toBeChecked()
+      expect(screen.getByText('Expires 08/28')).toBeInTheDocument()
+      expect(screen.getByText('Default')).toBeInTheDocument()
+      expect(screen.getByRole('radio', { name: 'Add a new card' })).not.toBeChecked()
+
+      expect(screen.getByText('Acme')).toBeInTheDocument()
+      expect(screen.getByText('1 Test St, Singapore 123456')).toBeInTheDocument()
+      expect(screen.getByRole('button', { name: 'Edit' })).toBeEnabled()
+
+      expect(screen.queryByTestId('new-payment-method-form')).not.toBeInTheDocument()
+      expect(setupIntentRequests).toHaveLength(0)
+    })
+
+    it('shows the tax ID with the billing address only when the organization has one', async () => {
+      mockBillingEndpoints({
+        paymentMethods: [card],
+        taxId: { type: 'sg_gst', country: 'SG', value: 'M12345678X' },
+      })
+
+      renderSelection('radio')
+
+      expect(await screen.findByText('SG GST M12345678X')).toBeInTheDocument()
+    })
+
+    it('leaves the tax ID out when the organization has none', async () => {
+      mockBillingEndpoints({ paymentMethods: [card] })
+
+      renderSelection('radio')
+
+      expect(await screen.findByText('1 Test St, Singapore 123456')).toBeInTheDocument()
+      expect(screen.queryByText('Tax ID')).not.toBeInTheDocument()
+    })
+
+    it('swaps the billing address for the card form while adding a card, and back again', async () => {
+      const user = userEvent.setup()
+      mockBillingEndpoints({ paymentMethods: [card] })
+
+      renderSelection('radio')
+
+      await user.click(await screen.findByRole('radio', { name: 'Add a new card' }))
+
+      expect(await screen.findByTestId('new-payment-method-form')).toBeInTheDocument()
+      expect(screen.getByRole('radio', { name: 'Add a new card' })).toBeChecked()
+      expect(screen.queryByRole('button', { name: 'Edit' })).not.toBeInTheDocument()
+
+      await user.click(screen.getByRole('radio', { name: /Visa •••• 4242/ }))
+
+      expect(screen.queryByTestId('new-payment-method-form')).not.toBeInTheDocument()
+      expect(screen.getByRole('radio', { name: /Visa •••• 4242/ })).toBeChecked()
+      expect(screen.getByRole('button', { name: 'Edit' })).toBeInTheDocument()
+    })
+
+    it('opens the billing address editor, with nothing to save until it changes', async () => {
+      const user = userEvent.setup()
+      mockBillingEndpoints({ paymentMethods: [card] })
+
+      renderSelection('radio')
+
+      await user.click(await screen.findByRole('button', { name: 'Edit' }))
+
+      expect(
+        await screen.findByRole('dialog', { name: 'Edit billing address' })
+      ).toBeInTheDocument()
+      expect(screen.getByTestId('address-element')).toBeInTheDocument()
+      expect(screen.getByRole('button', { name: 'Save address' })).toBeDisabled()
+    })
+
+    it('shows an edited billing address straight away, without waiting on the request', async () => {
+      const user = userEvent.setup()
+      mockBillingEndpoints({ paymentMethods: [card] })
+      const update = holdCustomerUpdate()
+
+      renderSelection('radio')
+
+      await user.click(await screen.findByRole('button', { name: 'Edit' }))
+      await user.click(await screen.findByTestId('address-element'))
+      await user.click(screen.getByRole('button', { name: 'Save address' }))
+
+      expect(await screen.findByText('2 New St, Singapore 654321')).toBeInTheDocument()
+      await waitFor(() => expect(screen.queryByRole('dialog')).not.toBeInTheDocument())
+
+      update.respond('success')
+    })
+
+    it('puts the previous address back and reopens the editor when saving fails', async () => {
+      const user = userEvent.setup()
+      mockBillingEndpoints({ paymentMethods: [card] })
+      const update = holdCustomerUpdate()
+
+      renderSelection('radio')
+
+      await user.click(await screen.findByRole('button', { name: 'Edit' }))
+      await user.click(await screen.findByTestId('address-element'))
+      await user.click(screen.getByRole('button', { name: 'Save address' }))
+
+      expect(await screen.findByText('2 New St, Singapore 654321')).toBeInTheDocument()
+      await waitFor(() => expect(screen.queryByRole('dialog')).not.toBeInTheDocument())
+
+      update.respond('failure')
+
+      expect(
+        await screen.findByRole('dialog', { name: 'Edit billing address' })
+      ).toBeInTheDocument()
+      expect(screen.getByText('1 Test St, Singapore 123456')).toBeInTheDocument()
+      expect(screen.queryByText('2 New St, Singapore 654321')).not.toBeInTheDocument()
+      // The edit that failed is still there to retry, without having to change anything.
+      expect(screen.getByRole('button', { name: 'Save address' })).toBeEnabled()
+    })
+
+    it('goes straight to the card form when there is no saved card', async () => {
+      const { setupIntentRequests } = mockBillingEndpoints({ paymentMethods: [] })
+
+      renderSelection('radio')
+
+      await waitFor(() => expect(setupIntentRequests).toHaveLength(1))
+      expect(await screen.findByTestId('new-payment-method-form')).toBeInTheDocument()
+      expect(screen.queryByRole('radio')).not.toBeInTheDocument()
+      expect(screen.queryByRole('button', { name: 'Edit' })).not.toBeInTheDocument()
+    })
   })
 })

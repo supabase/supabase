@@ -347,6 +347,8 @@ export const SubscriptionPlanUpdateView = ({
                 <h2 className="mb-4 text-base font-medium text-foreground">Payment details</h2>
                 <PaymentMethodSelection
                   ref={paymentMethodSelectionRef}
+                  variant="radio"
+                  label="Pay with"
                   selectedPaymentMethod={selectedPaymentMethod}
                   onSelectPaymentMethod={(pm) => setSelectedPaymentMethod(pm)}
                   readOnly={isChangeInProgress}
