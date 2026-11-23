@@ -539,7 +539,13 @@ describe('ReplicationPipelineLayout', () => {
     renderLayout()
 
     await screen.findByRole('heading', { name: 'Analytics warehouse' })
-    await waitFor(() => expect(screen.getByRole('button', { name: 'Restart' })).toBeEnabled())
+    await waitFor(() => expect(screen.getAllByRole('button', { name: 'Restart' })).toHaveLength(2))
+    await userEvent.click(screen.getByRole('button', { name: 'More pipeline recovery actions' }))
+    expect(await screen.findByRole('menuitem', { name: 'View logs' })).toHaveAttribute(
+      'href',
+      expect.stringContaining('logs')
+    )
+    await userEvent.keyboard('{Escape}')
     await userEvent.click(screen.getByRole('button', { name: 'Pipeline options' }))
 
     expect(await screen.findByRole('menuitem', { name: 'Stop pipeline' })).toBeVisible()

@@ -116,18 +116,18 @@ test.each([
 
     const overview = await screen.findByRole('region', { name: 'Pipeline overview' })
     expect(within(overview).getByText('Primary database')).toBeVisible()
-    expect(await within(overview).findByText('East US (North Virginia)')).toBeVisible()
+    expect(await within(overview).findByText('North Virginia')).toBeVisible()
     if (selected) {
       expect(await within(overview).findByText('Frankfurt warehouse 1')).toBeVisible()
       expect(within(overview).queryByText('Frankfurt warehouse 2')).not.toBeInTheDocument()
-      expect(within(overview).queryByText('Southeast Asia (Singapore)')).not.toBeInTheDocument()
+      expect(within(overview).queryByText('Singapore')).not.toBeInTheDocument()
       expect(within(overview).getAllByText('BigQuery')).toHaveLength(1)
       expect(within(overview).queryByRole('link', { name: /warehouse/ })).not.toBeInTheDocument()
       return
     }
     expect(within(overview).getByText('Pipelines', { exact: true })).toBeVisible()
-    expect(await within(overview).findByText('Southeast Asia (Singapore)')).toBeVisible()
-    expect(await within(overview).findByText('Central EU (Frankfurt)')).toBeVisible()
+    expect(await within(overview).findByText('Singapore')).toBeVisible()
+    expect(await within(overview).findByText('Frankfurt')).toBeVisible()
 
     if (count > 2) {
       expect(screen.queryByRole('link', { name: /warehouse/ })).not.toBeInTheDocument()

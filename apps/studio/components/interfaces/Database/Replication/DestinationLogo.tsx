@@ -14,6 +14,11 @@ const BRAND_MARK_BY_TYPE: Partial<Record<ReplicationDestinationType, ThemedIconS
 }
 
 const SIZE_CLASS_NAME = {
+  inline: {
+    frame: 'h-5 w-5 rounded-sm border border-foreground-muted/20',
+    mark: 'h-3.5 w-3.5',
+    icon: 14,
+  },
   small: { frame: 'h-8 w-8 rounded-md', mark: 'h-4 w-4', icon: 16 },
   large: { frame: 'h-14 w-14 rounded-lg', mark: 'h-8 w-8', icon: 32 },
 } as const
@@ -48,7 +53,13 @@ export const DestinationLogo = ({
       aria-label={type === 'Unknown' ? 'Unknown destination' : undefined}
       className={cn('relative inline-flex shrink-0', className)}
     >
-      <span className={cn('flex items-center justify-center border bg-surface-100', sizing.frame)}>
+      <span
+        className={cn(
+          'flex items-center justify-center',
+          size !== 'inline' && 'border bg-surface-100',
+          sizing.frame
+        )}
+      >
         {brandMarkSrc === undefined ? (
           <DestinationIcon type={type} size={sizing.icon} className="text-foreground-light" />
         ) : (

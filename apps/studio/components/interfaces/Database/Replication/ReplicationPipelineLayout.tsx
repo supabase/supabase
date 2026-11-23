@@ -2,6 +2,7 @@ import { Link, useNavigate } from '@tanstack/react-router'
 import { useParams } from 'common'
 import {
   ArrowUpCircleIcon,
+  ChevronDownIcon,
   CircleStopIcon,
   EditIcon,
   ListIcon,
@@ -27,6 +28,7 @@ import {
   DropdownMenuItem,
   DropdownMenuSeparator,
   DropdownMenuTrigger,
+  SplitButtonGroup,
 } from 'ui'
 import { Admonition } from 'ui-patterns/Admonition'
 import { PageBreadcrumbs, PageBreadcrumbsActions } from 'ui-patterns/PageBreadcrumbs'
@@ -84,6 +86,7 @@ import { useReplicationClusters } from './useReplicationClusters'
 import { useUnifiedLogsPreview } from '@/components/interfaces/App/FeaturePreview/FeaturePreviewContext'
 import { AlertError } from '@/components/ui/AlertError'
 import { DocsButton } from '@/components/ui/DocsButton'
+import { RegionFlag } from '@/components/ui/RegionFlag'
 import { useDeleteDestinationPipelineMutation } from '@/data/replication/delete-destination-pipeline-mutation'
 import { useReplicationDestinationByIdQuery } from '@/data/replication/destination-by-id-query'
 import { useReplicationPipelineByIdQuery } from '@/data/replication/pipeline-by-id-query'
@@ -195,13 +198,17 @@ export const ReplicationPipelineLayout = ({ children }: PropsWithChildren) => {
     metrics: replicationStatusData?.apply_lag,
     isError: isLagError || isPipelineStatusError,
   })
+  const pipelineStateNotice = getPipelineStateNotice({
+    requestStatus,
+    statusName,
+    tableStatuses: replicationStatusData?.table_statuses ?? [],
+  })
   const stateNotice =
-    healthNotice ??
-    getPipelineStateNotice({
-      requestStatus,
-      statusName,
-      tableStatuses: replicationStatusData?.table_statuses ?? [],
-    })
+    healthNotice ?? (statusName === PipelineStatusName.STARTED ? undefined : pipelineStateNotice)
+  const regionName =
+    region?.region_name ?? (clusterId === undefined ? PIPELINE_REGION.displayName : 'Unknown')
+  const regionCode =
+    region?.region_code ?? (clusterId === undefined ? PIPELINE_REGION.code : undefined)
   const destinationType = getReplicationDestinationType(destination?.config)
   const destinationIdentity = getOverviewDestination({
     destination,
@@ -296,6 +303,48 @@ export const ReplicationPipelineLayout = ({ children }: PropsWithChildren) => {
   const logsUrl = isUnifiedLogsEnabled
     ? getPipelineUnifiedLogsUrl({ projectRef: projectRef!, pipelineId })
     : getPipelineLegacyLogsUrl({ projectRef: projectRef!, pipelineId })
+
+  const renderNoticeActions = () => {
+    if (!stateNotice?.showLogsLink) return undefined
+    if (statusName === PipelineStatusName.FAILED && canModify)
+      return (
+        <SplitButtonGroup aria-label="Pipeline recovery" className="w-full @lg:w-auto">
+          <Button
+            variant="default"
+            className="flex-1 @lg:flex-none"
+            icon={<RotateCcwIcon />}
+            disabled={isPipelineRequestPending || isTransitioning || isPipelineStatusError}
+            loading={isRestartingPipeline}
+            onClick={() => onLifecycleAction('restart')}
+          >
+            Restart
+          </Button>
+          <DropdownMenu>
+            <DropdownMenuTrigger asChild>
+              <Button
+                variant="default"
+                aria-label="More pipeline recovery actions"
+                className="shrink-0 px-1 py-1.25"
+                icon={<ChevronDownIcon />}
+              />
+            </DropdownMenuTrigger>
+            <DropdownMenuContent align="end" className="w-auto">
+              <DropdownMenuItem asChild>
+                <Link href={logsUrl}>
+                  <ListIcon size={14} className="mr-2" aria-hidden />
+                  <span>View logs</span>
+                </Link>
+              </DropdownMenuItem>
+            </DropdownMenuContent>
+          </DropdownMenu>
+        </SplitButtonGroup>
+      )
+    return (
+      <Button asChild variant="default" icon={<ListIcon />}>
+        <Link href={logsUrl}>Logs</Link>
+      </Button>
+    )
+  }
 
   return (
     <div className="flex min-h-full w-full flex-col items-stretch">
@@ -393,7 +442,12 @@ export const ReplicationPipelineLayout = ({ children }: PropsWithChildren) => {
                 )}
                 {canShowLifecycleAction && (
                   <Button
-                    variant={statusName === PipelineStatusName.STOPPED ? 'primary' : 'default'}
+                    variant={
+                      statusName === PipelineStatusName.STOPPED ||
+                      statusName === PipelineStatusName.FAILED
+                        ? 'primary'
+                        : 'default'
+                    }
                     icon={lifecycleIcon}
                     onClick={() => onLifecycleAction()}
                     loading={
@@ -505,42 +559,38 @@ export const ReplicationPipelineLayout = ({ children }: PropsWithChildren) => {
 
       {pipeline && !isPipelineIdentityLoading && (
         <PageContainer size="large" className="flex flex-col gap-y-6 pt-6">
-          <PageSection>
+          {stateNotice && statusName !== PipelineStatusName.STOPPED && (
+            <Admonition
+              layout="responsive"
+              className="mb-2"
+              type={stateNotice.type}
+              title={stateNotice.title}
+              description={stateNotice.description}
+              actions={renderNoticeActions()}
+            />
+          )}
+          {!stateNotice && (isPipelineStatusError || hasTableErrors) && (
+            <Admonition
+              layout="responsive"
+              className="mb-2"
+              type="warning"
+              title="Pipeline needs attention"
+              description="Check pipeline health and logs to investigate."
+              actions={
+                <a href="#pipeline-health" className="text-sm underline">
+                  View pipeline health
+                </a>
+              }
+            />
+          )}
+          <ReplicationDiagram pipelineId={pipeline.id} clusterId={clusterId} />
+          <PageSection className="pt-6 last:pb-0">
             <PageSectionMeta>
               <PageSectionSummary>
                 <PageSectionTitle>Overview</PageSectionTitle>
               </PageSectionSummary>
             </PageSectionMeta>
-            <PageSectionContent className="space-y-6">
-              {stateNotice && statusName !== PipelineStatusName.STOPPED && (
-                <Admonition
-                  layout="responsive"
-                  type={stateNotice.type}
-                  title={stateNotice.title}
-                  description={stateNotice.description}
-                  actions={
-                    stateNotice.showLogsLink ? (
-                      <Button asChild variant="default" icon={<ListIcon />}>
-                        <Link href={logsUrl}>Logs</Link>
-                      </Button>
-                    ) : undefined
-                  }
-                />
-              )}
-              {!stateNotice && (isPipelineStatusError || hasTableErrors) && (
-                <Admonition
-                  layout="responsive"
-                  type="warning"
-                  title="Pipeline needs attention"
-                  description="Check pipeline health and logs to investigate."
-                  actions={
-                    <a href="#pipeline-health" className="text-sm underline">
-                      View pipeline health
-                    </a>
-                  }
-                />
-              )}
-              <ReplicationDiagram pipelineId={pipeline.id} clusterId={clusterId} />
+            <PageSectionContent>
               <Card>
                 <CardContent className="pb-5">
                   <dl className={PIPELINE_DETAIL_GRID_CLASS_NAME}>
@@ -551,8 +601,26 @@ export const ReplicationPipelineLayout = ({ children }: PropsWithChildren) => {
                     <PipelineDetailItem label="Publication">
                       {pipeline.config.publication_name}
                     </PipelineDetailItem>
+                    <PipelineDetailItem label="Pipeline region">
+                      <span className="flex flex-wrap items-center gap-x-2 gap-y-1">
+                        {regionCode && <RegionFlag className="w-4 shrink-0" region={regionCode} />}
+                        <span>{regionName}</span>
+                        {regionCode && (
+                          <span className="text-foreground-lighter">({regionCode})</span>
+                        )}
+                      </span>
+                    </PipelineDetailItem>
+                  </dl>
+                  <dl
+                    className={`${PIPELINE_DETAIL_GRID_CLASS_NAME} border-t border-muted pt-5 mt-5`}
+                  >
                     <PipelineDetailItem label="Destination">
-                      {destinationType ?? 'Destination'}
+                      <span className="inline-flex items-center gap-2">
+                        {destinationType && (
+                          <DestinationLogo type={destinationType} size="inline" />
+                        )}
+                        <span>{destinationType ?? 'Destination'}</span>
+                      </span>
                     </PipelineDetailItem>
                     {destinationIdentity.projectId && (
                       <PipelineDetailItem label="Project">
@@ -564,10 +632,6 @@ export const ReplicationPipelineLayout = ({ children }: PropsWithChildren) => {
                         {destinationIdentity.datasetId}
                       </PipelineDetailItem>
                     )}
-                    <PipelineDetailItem label="Region">
-                      {(region?.regionCode ? `${region.regionName} (${region.regionCode})` : region?.regionName) ??
-                        (clusterId === undefined ? PIPELINE_REGION.displayName : 'Unknown')}
-                    </PipelineDetailItem>
                   </dl>
                 </CardContent>
               </Card>
