@@ -105,7 +105,7 @@ function parseArgument(value: string) {
   return { ...parsed, defaultValue }
 }
 
-export type FunctionArgument = { name: string; type: string; defaultValue?: string }
+type FunctionArgument = { name: string; type: string; defaultValue?: string }
 
 export function formatArgumentDeclarations(args: FunctionArgument[]) {
   return args.map((arg) =>
