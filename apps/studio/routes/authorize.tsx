@@ -26,11 +26,10 @@ function APIAuthorizationPage() {
       <>
         <title>{PAGE_TITLE}</title>
         <OAuthAppsAuthorizeScreen
-          key={auth_id}
+          key={`${auth_id}_${organization_slug ?? ''}_${project_ref ?? ''}`}
           authId={auth_id}
           organizationSlug={organization_slug}
           projectRef={organization_slug && project_ref ? project_ref : undefined}
-          navigate={(destination) => navigate({ href: destination })}
         />
       </>
     )

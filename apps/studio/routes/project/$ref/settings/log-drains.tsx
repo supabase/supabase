@@ -12,14 +12,22 @@ import {
   DropdownMenuTrigger,
 } from 'ui'
 import ConfirmationModal from 'ui-patterns/Dialogs/ConfirmationModal'
+import { PageContainer } from 'ui-patterns/PageContainer'
+import {
+  PageHeader,
+  PageHeaderAside,
+  PageHeaderDescription,
+  PageHeaderMeta,
+  PageHeaderSummary,
+  PageHeaderTitle,
+} from 'ui-patterns/PageHeader'
+import { PageSection } from 'ui-patterns/PageSection'
 import { GenericSkeletonLoader } from 'ui-patterns/ShimmeringLoader'
 
 import { LogDrainDestinationSheetForm } from '@/components/interfaces/LogDrains/LogDrainDestinationSheetForm'
 import { LogDrains } from '@/components/interfaces/LogDrains/LogDrains'
 import { LogDrainType } from '@/components/interfaces/LogDrains/LogDrains.constants'
 import { useEnabledLogDrainTypes } from '@/components/interfaces/LogDrains/useEnabledLogDrainTypes'
-import { PageLayout } from '@/components/layouts/PageLayout/PageLayout'
-import { ScaffoldContainer, ScaffoldSection } from '@/components/layouts/Scaffold'
 import { DocsButton } from '@/components/ui/DocsButton'
 import { Shortcut } from '@/components/ui/Shortcut'
 import {
@@ -108,8 +116,8 @@ function LogDrainsSettings() {
   }
 
   const content = (
-    <ScaffoldSection isFullWidth id="log-drains" className="gap-6">
-      <ScaffoldContainer className="flex flex-col gap-10" bottomPadding>
+    <PageSection id="log-drains" className="gap-6">
+      <PageContainer className="flex flex-col gap-10 pb-16">
         <LogDrainDestinationSheetForm
           mode={mode}
           open={open}
@@ -159,7 +167,7 @@ function LogDrainsSettings() {
         ) : (
           <LogDrains onUpdateDrainClick={handleUpdateClick} onNewDrainClick={handleNewClick} />
         )}
-      </ScaffoldContainer>
+      </PageContainer>
 
       <ConfirmationModal
         confirmLabel="Add destination"
@@ -192,71 +200,76 @@ function LogDrainsSettings() {
           <p>Are you sure you want to proceed?</p>
         </div>
       </ConfirmationModal>
-    </ScaffoldSection>
+    </PageSection>
   )
 
-  // [kemal]: Ordinarily <PageLayout /> would be bundled with the settings layout, however in this case we need access to some bits for the "Add destination" button to render as part of the in-built page header in <PageLayout />.
+  // [kemal]: Ordinarily the page header would be bundled with the settings layout, however in this case we need access to some bits for the "Add destination" button to render as part of the page header.
   if (!isLoadingEntitlement && hasAccessToLogDrains) {
     return (
-      <PageLayout
-        title="Log Drains"
-        subtitle="Send your project logs to third party destinations"
-        primaryActions={
-          <>
-            {!(logDrains?.length === 0) && (
-              <div className="flex items-center">
-                <Shortcut
-                  id={SHORTCUT_IDS.LOG_DRAINS_ADD_DESTINATION}
-                  onTrigger={handleAddDestinationClick}
-                  options={{ enabled: hasAccessToLogDrains && canManageLogDrains }}
-                  side="bottom"
-                  tooltipOpen={open ? false : undefined}
-                >
-                  <Button
-                    disabled={!hasAccessToLogDrains || !canManageLogDrains}
-                    onClick={handleAddDestinationClick}
-                    variant="primary"
-                    className="rounded-r-none px-3 hover:z-10 focus-visible:z-10 focus-visible:rounded-r-sm"
+      <>
+        <PageHeader>
+          <PageHeaderMeta>
+            <PageHeaderSummary>
+              <PageHeaderTitle>Log Drains</PageHeaderTitle>
+              <PageHeaderDescription>
+                Send your project logs to third party destinations
+              </PageHeaderDescription>
+            </PageHeaderSummary>
+            <PageHeaderAside>
+              <DocsButton href={`${DOCS_URL}/guides/platform/log-drains`} />
+              {!(logDrains?.length === 0) && (
+                <div className="flex items-center">
+                  <Shortcut
+                    id={SHORTCUT_IDS.LOG_DRAINS_ADD_DESTINATION}
+                    onTrigger={handleAddDestinationClick}
+                    options={{ enabled: hasAccessToLogDrains && canManageLogDrains }}
+                    side="bottom"
+                    tooltipOpen={open ? false : undefined}
                   >
-                    Add destination
-                  </Button>
-                </Shortcut>
-                <DropdownMenu>
-                  <DropdownMenuTrigger asChild>
                     <Button
+                      disabled={!hasAccessToLogDrains || !canManageLogDrains}
+                      onClick={handleAddDestinationClick}
                       variant="primary"
-                      aria-label="Choose destination type"
-                      className="shrink-0 rounded-l-none px-[4px] py-[5px] -ml-px focus-visible:z-10 focus-visible:rounded-l-sm"
-                      icon={<ChevronDownIcon />}
-                    />
-                  </DropdownMenuTrigger>
-                  <DropdownMenuContent align="end" side="bottom">
-                    {enabledDrainTypes.map((drainType) => (
-                      <DropdownMenuItem
-                        key={drainType.value}
-                        onClick={() => handleNewClick(drainType.value)}
-                      >
-                        <div className="flex items-center gap-3">
-                          {cloneElement(drainType.icon, { height: 16, width: 16 })}
-                          <div className="space-y-1">
-                            <p className="block text-foreground">{drainType.name}</p>
-                            {IS_PLATFORM && (
-                              <p className="text-xs text-foreground-lighter">Additional $60</p>
-                            )}
+                      className="rounded-r-none px-3 hover:z-10 focus-visible:z-10 focus-visible:rounded-r-sm"
+                    >
+                      Add destination
+                    </Button>
+                  </Shortcut>
+                  <DropdownMenu>
+                    <DropdownMenuTrigger asChild>
+                      <Button
+                        variant="primary"
+                        aria-label="Choose destination type"
+                        className="shrink-0 rounded-l-none px-1 py-1.25 -ml-px focus-visible:z-10 focus-visible:rounded-l-sm"
+                        icon={<ChevronDownIcon />}
+                      />
+                    </DropdownMenuTrigger>
+                    <DropdownMenuContent align="end" side="bottom">
+                      {enabledDrainTypes.map((drainType) => (
+                        <DropdownMenuItem
+                          key={drainType.value}
+                          onClick={() => handleNewClick(drainType.value)}
+                        >
+                          <div className="flex items-center gap-3">
+                            {cloneElement(drainType.icon, { height: 16, width: 16 })}
+                            <div className="space-y-1">
+                              <p className="block text-foreground">{drainType.name}</p>
+                              {IS_PLATFORM && (
+                                <p className="text-xs text-foreground-lighter">Additional $60</p>
+                              )}
+                            </div>
                           </div>
-                        </div>
-                      </DropdownMenuItem>
-                    ))}
-                  </DropdownMenuContent>
-                </DropdownMenu>
-              </div>
-            )}
-          </>
-        }
-        secondaryActions={<DocsButton href={`${DOCS_URL}/guides/platform/log-drains`} />}
-      >
+                        </DropdownMenuItem>
+                      ))}
+                    </DropdownMenuContent>
+                  </DropdownMenu>
+                </div>
+              )}
+            </PageHeaderAside>
+          </PageHeaderMeta>
+        </PageHeader>
         {content}
-      </PageLayout>
+      </>
     )
   }
 
