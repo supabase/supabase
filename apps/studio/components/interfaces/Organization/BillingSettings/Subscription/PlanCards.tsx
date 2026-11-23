@@ -5,7 +5,7 @@ import { plans as subscriptionsPlans } from 'shared-data/plans'
 import { AwsMarketplacePurchaseCallout } from './AwsMarketplacePurchaseCallout'
 import { EnterpriseCard } from './EnterpriseCard'
 import { PlanCard } from './PlanCard'
-import { getPlanCardsEntryAnimation } from './PlanCards.utils'
+import { getLiftedSide, getPlanCardsEntryAnimation } from './PlanCards.utils'
 import { getPlanChangeType } from '@/components/interfaces/Billing/Subscription/Subscription.utils'
 import type { OrgPlan, PlanId } from '@/data/subscriptions/types'
 import { useTrack } from '@/lib/telemetry/track'
@@ -43,15 +43,22 @@ export function PlanCards({
   const track = useTrack()
 
   const entryAnimation = getPlanCardsEntryAnimation(entryDelay)
+  const currentPlanIndex = subscriptionsPlans.findIndex(
+    (plan) => plan.planId === currentSubscriptionPlanId
+  )
 
   return (
-    <motion.div className="w-full py-6 grid grid-cols-12 gap-3" {...entryAnimation.container}>
-      {subscriptionsPlans.map((plan) => {
+    <motion.div
+      className="w-full py-6 grid grid-cols-12 gap-3 xl:gap-x-0"
+      {...entryAnimation.container}
+    >
+      {subscriptionsPlans.map((plan, index) => {
         const planMeta = availablePlans.find((p) => p.id === plan.id.split('tier_')[1])
         const price = planMeta?.price ?? 0
         const isDowngradeOption =
           getPlanChangeType(currentSubscriptionPlanId, plan?.planId) === 'downgrade'
-        const isCurrentPlan = planMeta?.id === currentSubscriptionPlanId
+        const isCurrentPlan = index === currentPlanIndex
+        const liftedSide = getLiftedSide({ index, liftedIndex: currentPlanIndex })
 
         const source = Array.isArray(router.query.source)
           ? router.query.source[0]
@@ -64,6 +71,7 @@ export function PlanCards({
               key={plan.id}
               plan={plan}
               isCurrentPlan={isCurrentPlan}
+              liftedSide={liftedSide}
               variants={entryAnimation.card}
             />
           )
@@ -75,6 +83,7 @@ export function PlanCards({
             plan={plan}
             price={price}
             isCurrentPlan={isCurrentPlan}
+            liftedSide={liftedSide}
             isDowngradeOption={isDowngradeOption}
             isLoadingPlans={isLoadingPlans}
             canUpdateSubscription={canUpdateSubscription}

@@ -86,7 +86,7 @@ export function PlanUpdateFullScreenShell({
       skipOverlayFade={skipOverlayFade}
       contentDelay={contentDelay}
       onBack={onClose}
-      contentClassName="max-w-6xl"
+      contentClassName="max-w-7xl"
       headerActions={
         <>
           <Button
