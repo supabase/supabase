@@ -194,8 +194,7 @@ vi.mock('@/components/ui/BannerStack/Banners/BannerFreeMicroUpgrade', () => ({
   BannerFreeMicroUpgrade: () => null,
 }))
 
-vi.mock('@/data/usage/resource-warnings-query', () => ({
-}))
+vi.mock('@/data/usage/resource-warnings-query', () => ({}))
 
 vi.mock('@/hooks/misc/useSelectedOrganization', () => ({
   useSelectedOrganizationQuery: () => ({
