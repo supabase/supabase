@@ -31,16 +31,7 @@ export const start: NavMenuConstant = {
   url: '/guides/getting-started',
   items: [
     { name: 'The Supabase way to build', url: '/guides/getting-started/the-supabase-way-to-build' },
-    {
-      name: 'API keys',
-      items: [
-        { name: 'API keys', url: '/guides/getting-started/api-keys' },
-        {
-          name: 'Rotate a leaked API key',
-          url: '/guides/security/rotate-leaked-api-keys',
-        },
-      ],
-    },
+    { name: 'API keys', url: '/guides/getting-started/api-keys' },
     {
       name: 'Migrate from legacy API keys',
       url: '/guides/getting-started/migrating-to-new-api-keys',
