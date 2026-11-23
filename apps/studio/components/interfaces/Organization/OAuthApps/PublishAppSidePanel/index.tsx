@@ -36,6 +36,12 @@ import { AuthorizeRequesterDetails } from '../AuthorizeRequesterDetails'
 import { OAuthSecrets } from '../OAuthSecrets/OAuthSecrets'
 import { AuthorizationSection } from './Authorization'
 import {
+  AuthorizationValues,
+  getAuthorizationChanges,
+  hasAuthorizationChanges,
+} from './Authorization.utils'
+import { AuthorizationConfirmDialog } from './AuthorizationConfirmDialog'
+import {
   formSchema,
   FormSchema,
   FormSchemaWithOAuthAppScopedGrants,
@@ -50,6 +56,7 @@ import {
 } from '@/data/oauth/oauth-app-create-mutation'
 import { useOAuthAppUpdateMutation } from '@/data/oauth/oauth-app-update-mutation'
 import type { OAuthApp } from '@/data/oauth/oauth-apps-query'
+import { useSelectedOrganizationQuery } from '@/hooks/misc/useSelectedOrganization'
 import { DOCS_URL } from '@/lib/constants'
 import { uuidv4 } from '@/lib/helpers'
 import { uploadAttachment } from '@/lib/upload'
@@ -93,10 +100,7 @@ function getFormDefaultValues(
         selectedApp.redirect_uris?.map((url) => {
           return { id: uuidv4(), value: url }
         }) ?? [],
-      member_bound_grant: selectedApp.grant_kind === 'member_bound',
-      member_bound_grant_confirmed: selectedApp.grant_kind === 'member_bound',
-      project_scoping: selectedApp.project_scoping_mode,
-      project_scoping_confirmed: selectedApp.project_scoping_mode === true,
+      ...getSavedAuthorizationValues(selectedApp),
     }
   }
 
@@ -113,9 +117,14 @@ function getFormDefaultValues(
     website: '',
     redirect_uris: [{ id: uuidv4(), value: '' }],
     member_bound_grant: false,
-    member_bound_grant_confirmed: false,
     project_scoping: false,
-    project_scoping_confirmed: false,
+  }
+}
+
+function getSavedAuthorizationValues(selectedApp: OAuthApp | undefined): AuthorizationValues {
+  return {
+    member_bound_grant: selectedApp?.grant_kind === 'member_bound',
+    project_scoping: selectedApp?.project_scoping_mode === true,
   }
 }
 
@@ -131,7 +140,9 @@ export const PublishAppSidePanel = ({
   const uploadButtonRef = useRef<HTMLInputElement | null>(null)
   const areOAuthAppScopedGrantsEnabled = useFlag('enableScopedOAuthPublish')
 
-  const { mutateAsync: createOAuthApp } = useOAuthAppCreateMutation({
+  const { data: organization } = useSelectedOrganizationQuery()
+
+  const { mutateAsync: createOAuthApp, isPending: isCreating } = useOAuthAppCreateMutation({
     onSuccess: (res, variables) => {
       toast.success(`Successfully created OAuth app "${variables.name}"!`)
       onClose()
@@ -141,7 +152,7 @@ export const PublishAppSidePanel = ({
       toast.error(`Failed to create OAuth application: ${error.message}`)
     },
   })
-  const { mutateAsync: updateOAuthApp } = useOAuthAppUpdateMutation({
+  const { mutateAsync: updateOAuthApp, isPending: isUpdating } = useOAuthAppUpdateMutation({
     onSuccess: (_, variables) => {
       toast.success(`Successfully updated OAuth app "${variables.name}"!`)
       onClose()
@@ -155,8 +166,18 @@ export const PublishAppSidePanel = ({
   const [iconFile, setIconFile] = useState<File>()
   const [iconUrl, setIconUrl] = useState<string>()
   const [scopes, setScopes] = useState<OAuthScope[]>([])
+  const [valuesPendingConfirmation, setValuesPendingConfirmation] =
+    useState<FormSchemaWithOAuthAppScopedGrants>()
+
+  const savedAuthorizationValues = getSavedAuthorizationValues(selectedApp)
+  const pendingAuthorizationChanges = getAuthorizationChanges(
+    savedAuthorizationValues,
+    valuesPendingConfirmation ?? savedAuthorizationValues
+  )
 
   useEffect(() => {
+    setValuesPendingConfirmation(undefined)
+
     if (visible) {
       setIconFile(undefined)
 
@@ -179,9 +200,7 @@ export const PublishAppSidePanel = ({
     event.target.value = ''
   }
 
-  const onSubmit: SubmitHandler<FormSchema | FormSchemaWithOAuthAppScopedGrants> = async (
-    values
-  ) => {
+  const saveApp = async (values: FormSchema | FormSchemaWithOAuthAppScopedGrants) => {
     if (!slug) return console.error('Slug is required')
 
     const { name, website, redirect_uris } = values
@@ -240,6 +259,26 @@ export const PublishAppSidePanel = ({
     }
   }
 
+  const onSubmit: SubmitHandler<FormSchema | FormSchemaWithOAuthAppScopedGrants> = async (
+    values
+  ) => {
+    if (isFormValuesWithOAuthAppScopedGrants(values, areOAuthAppScopedGrantsEnabled)) {
+      const changes = getAuthorizationChanges(savedAuthorizationValues, values)
+      if (hasAuthorizationChanges(changes)) {
+        setValuesPendingConfirmation(values)
+        return
+      }
+    }
+
+    await saveApp(values)
+  }
+
+  const onConfirmPermanentChanges = async () => {
+    if (valuesPendingConfirmation === undefined) return
+    await saveApp(valuesPendingConfirmation)
+    setValuesPendingConfirmation(undefined)
+  }
+
   const form = useForm<
     typeof areOAuthAppScopedGrantsEnabled extends true
       ? FormSchemaWithOAuthAppScopedGrants
@@ -253,6 +292,7 @@ export const PublishAppSidePanel = ({
   })
   const { reset } = form
   const { errors, isSubmitting } = form.formState
+  const isSaving = isSubmitting || isCreating || isUpdating
 
   useEffect(() => {
     if (visible) {
@@ -291,21 +331,21 @@ export const PublishAppSidePanel = ({
             Preview consent for users
           </Button>
           <div className="flex items-center space-x-2">
-            <Button disabled={isSubmitting} onClick={() => onClose()}>
+            <Button disabled={isSaving} onClick={() => onClose()}>
               Cancel
             </Button>
             <Shortcut
               id={SHORTCUT_IDS.ORG_OAUTH_APPS_SUBMIT}
               onTrigger={() => form.handleSubmit(onSubmit)()}
-              options={{ enabled: visible && !isSubmitting }}
+              options={{ enabled: visible && !isSaving }}
               side="top"
             >
               <Button
                 variant="primary"
                 type="submit"
                 form={FORM_ID}
-                loading={isSubmitting}
-                disabled={isSubmitting}
+                loading={isSaving}
+                disabled={isSaving}
               >
                 Confirm
               </Button>
@@ -476,7 +516,12 @@ export const PublishAppSidePanel = ({
           {isFormSchemaWithOAuthAppScopedGrants(form.control, areOAuthAppScopedGrantsEnabled) && (
             <>
               <SidePanel.Separator />
-              <AuthorizationSection control={form.control} />
+              <AuthorizationSection
+                control={form.control}
+                savedValues={selectedApp === undefined ? undefined : savedAuthorizationValues}
+                organizationName={organization?.name}
+                scopes={scopes}
+              />
             </>
           )}
 
@@ -525,6 +570,14 @@ export const PublishAppSidePanel = ({
           </AlertDialog>
         </form>
       </Form>
+
+      <AuthorizationConfirmDialog
+        visible={valuesPendingConfirmation !== undefined}
+        loading={isCreating || isUpdating}
+        changes={pendingAuthorizationChanges}
+        onCancel={() => setValuesPendingConfirmation(undefined)}
+        onConfirm={() => onConfirmPermanentChanges()}
+      />
     </SidePanel>
   )
 }

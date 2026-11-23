@@ -1,122 +1,302 @@
+import { ChevronDownIcon, ScaleIcon } from 'lucide-react'
 import { useId } from 'react'
-import { Control, FieldPath, FieldValues, useFormContext, useWatch } from 'react-hook-form'
-import { Checkbox, FormControl, FormField, Switch } from 'ui'
-import { Admonition } from 'ui-patterns/Admonition'
-import { FormItemLayout } from 'ui-patterns/form/FormItemLayout/FormItemLayout'
+import { Control, useWatch } from 'react-hook-form'
+import { Badge, Card, cn, FormField, RadioGroupStacked, RadioGroupStackedItem } from 'ui'
 
+import { ScopeGroupCard } from '../Consent/ScopeGroupCard'
 import {
-  getAuthorizationPreviewExplanation,
+  AuthorizationValues,
+  getAllProjectsRowLabel,
+  getConsentApprovalLine,
   getResultingGrantDescription,
 } from './Authorization.utils'
 import { FormSchemaWithOAuthAppScopedGrants } from './PublishAppSidePanel.utils'
+import { INTERSTITIAL_WIDTH_CLASS } from '@/components/layouts/InterstitialLayout'
 
-interface OneTimeWithConfirmToggleProps<TFieldValues extends FieldValues> {
-  control: Control<TFieldValues>
-  name: FieldPath<TFieldValues>
-  confirmedName: FieldPath<TFieldValues>
+const APPROVER_OPTIONS = {
+  looser: {
+    value: 'organization',
+    label: 'An owner, once for the whole organization',
+    description: 'One shared grant for everyone in the org.',
+  },
+  stricter: {
+    value: 'member',
+    label: 'Each member, for themselves',
+    description: 'A grant per person, never more than they can already do.',
+  },
+} as const
+
+const PROJECT_REACH_OPTIONS = {
+  looser: {
+    value: 'all',
+    label: 'All projects',
+    description: 'Every project, including ones created later. No choice shown.',
+  },
+  stricter: {
+    value: 'choose',
+    label: 'Let them choose',
+    description:
+      "People connecting pick all projects or specific ones. Requests to projects they didn't pick return 403.",
+  },
+} as const
+
+interface PermanentChoiceOption {
+  value: string
   label: string
   description: string
-  warningBody: string
 }
 
-export const OneTimeWithConfirmToggle = <TFieldValues extends FieldValues>({
-  control,
-  name,
-  confirmedName,
-  label,
-  description,
-  warningBody,
-}: OneTimeWithConfirmToggleProps<TFieldValues>) => {
-  const checkboxId = useId()
-  const { getFieldState } = useFormContext()
-  const isNewlyEnabled = useWatch({
-    control,
-    name,
-    compute: (value) => {
-      const fieldState = getFieldState(name)
-      return fieldState.isDirty && !!value
-    },
-  })
+const toChoiceValue = (
+  options: { looser: PermanentChoiceOption; stricter: PermanentChoiceOption },
+  isStricter: boolean
+) => (isStricter ? options.stricter.value : options.looser.value)
+
+interface ChoiceBadge {
+  label: string
+  variant?: 'default' | 'warning'
+}
+
+interface PermanentChoiceItemProps {
+  option: PermanentChoiceOption
+  badge?: ChoiceBadge
+  isDisabled?: boolean
+}
+
+const PermanentChoiceItem = ({ option, badge, isDisabled = false }: PermanentChoiceItemProps) => {
+  const id = useId()
+  const titleId = `${id}-title`
+  const descriptionId = `${id}-description`
+  const badgeId = `${id}-badge`
+
+  const describedBy = [descriptionId, badge === undefined ? undefined : badgeId]
+    .filter(Boolean)
+    .join(' ')
+
+  return (
+    <RadioGroupStackedItem
+      value={option.value}
+      disabled={isDisabled}
+      aria-labelledby={titleId}
+      aria-describedby={describedBy}
+      label={
+        <span className="flex flex-col gap-y-0.5">
+          <span className="flex items-center gap-x-2">
+            <span id={titleId}>{option.label}</span>
+            {badge !== undefined && (
+              <Badge id={badgeId} variant={badge.variant}>
+                {badge.label}
+              </Badge>
+            )}
+          </span>
+          <span id={descriptionId} className="text-sm text-foreground-lighter text-balance">
+            {option.description}
+          </span>
+        </span>
+      }
+    />
+  )
+}
+
+interface PermanentChoiceFieldProps {
+  legend: string
+  looser: PermanentChoiceOption
+  stricter: PermanentChoiceOption
+  value: string
+  /** The value currently persisted on the app, or undefined for an app that has never been saved. */
+  savedValue?: string
+  onChange: (value: string) => void
+}
+
+const PermanentChoiceField = ({
+  legend,
+  looser,
+  stricter,
+  value,
+  savedValue,
+  onChange,
+}: PermanentChoiceFieldProps) => {
+  const isLockedToStricter = savedValue === stricter.value
+
+  const getLooserBadge = (): ChoiceBadge | undefined => {
+    if (isLockedToStricter) return { label: "Can't switch back", variant: 'warning' }
+    if (savedValue === looser.value) return { label: 'Current' }
+    return undefined
+  }
+
+  const stricterBadge: ChoiceBadge =
+    savedValue === stricter.value
+      ? { label: 'Current' }
+      : { label: 'Permanent', variant: 'warning' }
+
+  return (
+    <fieldset>
+      <legend className="text-sm text-foreground mb-2">{legend}</legend>
+      <RadioGroupStacked
+        value={value}
+        onValueChange={(nextValue) => {
+          if (nextValue) onChange(nextValue)
+        }}
+      >
+        <PermanentChoiceItem
+          option={looser}
+          badge={getLooserBadge()}
+          isDisabled={isLockedToStricter}
+        />
+        <PermanentChoiceItem option={stricter} badge={stricterBadge} />
+      </RadioGroupStacked>
+    </fieldset>
+  )
+}
+
+interface AuthorizationPreviewProps {
+  appName: string
+  scopes: string[]
+  isMemberBoundGrant: boolean
+  isProjectScopingEnabled: boolean
+  organizationName?: string
+  savedValues?: AuthorizationValues
+}
+
+const AuthorizationPreview = ({
+  appName,
+  scopes,
+  isMemberBoundGrant,
+  isProjectScopingEnabled,
+  organizationName,
+  savedValues,
+}: AuthorizationPreviewProps) => {
+  const hasUnsavedChanges =
+    savedValues !== undefined &&
+    (savedValues.member_bound_grant !== isMemberBoundGrant ||
+      savedValues.project_scoping !== isProjectScopingEnabled)
 
   return (
     <div className="space-y-3">
-      <FormItemLayout
-        layout="flex-row-reverse"
-        className="justify-between"
-        label={label}
-        description={description}
-      >
-        <FormField
-          control={control}
-          name={name}
-          render={({ field, fieldState }) => (
-            <FormControl>
-              <Switch
-                ref={field.ref}
-                // TS can't know this field value is a boolean
-                checked={!!field.value}
-                disabled={!!field.value && !fieldState.isDirty}
-                aria-label={label}
-                onCheckedChange={(checked) => {
-                  field.onChange(checked)
-                }}
-              />
-            </FormControl>
-          )}
-        />
-      </FormItemLayout>
-      {isNewlyEnabled && (
-        <Admonition
-          type="warning"
-          layout="vertical"
-          title="This can't be turned off after you save"
-        >
-          <p>{warningBody}</p>
-          <FormField
-            control={control}
-            name={confirmedName}
-            render={({ field, fieldState }) => (
-              <>
-                <label htmlFor={checkboxId} className="flex items-start gap-2 pt-2 cursor-pointer">
-                  <Checkbox
-                    ref={field.ref}
-                    id={checkboxId}
-                    // TS can't know this field value is a boolean
-                    checked={!!field.value}
-                    onCheckedChange={(checked) => field.onChange(checked)}
-                    className="mt-0.5"
-                    aria-describedby={fieldState.invalid ? `${confirmedName}_error` : undefined}
-                  />
-                  <span className="text-sm text-foreground">
-                    I understand this is permanent. I can test it on a duplicate app first
-                  </span>
-                </label>
-                {fieldState.invalid ? (
-                  <p className="text-destructive" id={`${confirmedName}_error`}>
-                    {fieldState.error?.message}
-                  </p>
-                ) : null}
-              </>
+      <p className="text-sm text-foreground">Preview: what someone connecting will see</p>
+
+      <div className="overflow-hidden rounded-lg border">
+        <div className="relative h-72 overflow-hidden bg-studio">
+          <div
+            aria-hidden
+            className={cn(
+              'pointer-events-none absolute inset-x-0 flex justify-center px-6 opacity-60 select-none',
+              // The project picker sits further down the card, so crop more of the header to reach it
+              isProjectScopingEnabled ? '-top-40' : '-top-16'
             )}
-          />
-        </Admonition>
-      )}
+          >
+            <Card className={cn('w-full', INTERSTITIAL_WIDTH_CLASS)}>
+              <div className="flex flex-col items-center gap-1 px-6 pt-6 pb-5 text-center">
+                <p className="text-lg font-medium tracking-tight text-foreground">
+                  Authorize {appName}
+                </p>
+                <p className="text-sm text-foreground-lighter">
+                  This application wants to access your Supabase Account
+                </p>
+              </div>
+
+              <div className="flex flex-col gap-5 px-6 pb-6">
+                <section className="flex flex-col gap-2">
+                  <div className="divide-y rounded-md border bg-surface-75 px-4">
+                    <div className="flex items-center justify-between gap-4 py-2.5 text-xs">
+                      <span className="shrink-0 text-foreground-light">Authorizing as</span>
+                      <span className="min-w-0 truncate text-foreground">you@example.com</span>
+                    </div>
+                    {!isProjectScopingEnabled && (
+                      <div className="flex items-center justify-between gap-4 py-2.5 text-xs">
+                        <span className="shrink-0 text-foreground-light">Projects</span>
+                        <span className="min-w-0 truncate text-foreground">
+                          {getAllProjectsRowLabel(isMemberBoundGrant, organizationName)}
+                        </span>
+                      </div>
+                    )}
+                  </div>
+                  <p className="text-xs text-foreground-lighter">
+                    {getConsentApprovalLine(isMemberBoundGrant)}
+                  </p>
+                </section>
+
+                <div className="flex flex-col gap-2">
+                  <p className="text-sm text-foreground">Organization</p>
+                  <div className="flex items-center justify-between gap-2 rounded-md border bg-control px-3 py-1.5 text-sm text-foreground">
+                    <span className="truncate">{organizationName ?? 'Your organization'}</span>
+                    <ChevronDownIcon size={14} className="shrink-0 text-foreground-lighter" />
+                  </div>
+                </div>
+
+                {isProjectScopingEnabled && (
+                  <div className="flex flex-col gap-2">
+                    <p className="text-sm text-foreground">Projects</p>
+                    <span className="flex items-center gap-2 py-1 text-sm text-foreground">
+                      <span className="size-4 rounded-xs border border-strong" />
+                      All current and future projects
+                    </span>
+                    <div className="flex items-center justify-between gap-2 rounded-md border bg-control px-3 py-1.5 text-sm text-foreground-lighter">
+                      <span className="truncate">Select projects...</span>
+                      <ChevronDownIcon size={14} className="shrink-0" />
+                    </div>
+                  </div>
+                )}
+
+                <section className="flex flex-col gap-3">
+                  <p className="text-sm text-foreground">Permissions requested</p>
+                  {scopes.length > 0 && <ScopeGroupCard scopes={scopes} />}
+                  <p className="text-xs text-foreground-lighter">
+                    Authorizing {appName} grants it access to the permissions
+                    {isProjectScopingEnabled ? <span>{' and selected projects '}</span> : ' '}
+                    <span>above.</span>
+                  </p>
+                </section>
+              </div>
+            </Card>
+          </div>
+
+          <div className="pointer-events-none absolute inset-x-0 top-0 h-16 bg-linear-to-b from-background to-transparent" />
+          <div className="pointer-events-none absolute inset-x-0 bottom-0 h-20 bg-linear-to-t from-background to-transparent" />
+        </div>
+
+        <div className="flex gap-x-2 border-t bg-surface-100 px-4 py-3">
+          <ScaleIcon size={14} className="mt-0.5 shrink-0 text-foreground-lighter" />
+          <div className="min-w-0">
+            <p className="text-sm">
+              <span className="text-foreground-lighter">Resulting grant: </span>
+              <span className="text-foreground-light">
+                {getResultingGrantDescription(isMemberBoundGrant, isProjectScopingEnabled)}
+              </span>
+            </p>
+            {hasUnsavedChanges && (
+              <p className="text-sm text-foreground-lighter">
+                Today:{' '}
+                {getResultingGrantDescription(
+                  savedValues.member_bound_grant,
+                  savedValues.project_scoping
+                )}
+              </p>
+            )}
+          </div>
+        </div>
+      </div>
     </div>
   )
 }
 
 export interface AuthorizationSectionProps {
   control: Control<FormSchemaWithOAuthAppScopedGrants>
+  /** The values persisted on the app, or undefined while publishing a new app. */
+  savedValues?: AuthorizationValues
+  organizationName?: string
+  /** The scopes the app is asking for, mirrored into the consent preview. */
+  scopes?: string[]
 }
 
-export const AuthorizationSection = ({ control }: AuthorizationSectionProps) => {
-  const { explanation, resultingGrant } = useWatch({
+export const AuthorizationSection = ({
+  control,
+  savedValues,
+  organizationName,
+  scopes = [],
+}: AuthorizationSectionProps) => {
+  const [appName, isMemberBoundGrant, isProjectScopingEnabled] = useWatch({
     control,
-    name: ['member_bound_grant', 'project_scoping'],
-    compute: ([memberBoundGrant, projectScoping]) => ({
-      explanation: getAuthorizationPreviewExplanation(memberBoundGrant, projectScoping),
-      resultingGrant: getResultingGrantDescription(memberBoundGrant, projectScoping),
-    }),
+    name: ['name', 'member_bound_grant', 'project_scoping'],
   })
 
   return (
@@ -124,43 +304,52 @@ export const AuthorizationSection = ({ control }: AuthorizationSectionProps) => 
       <div className="flex flex-col">
         <span className="text-sm text-foreground">Authorization</span>
         <span className="text-sm text-foreground-light">
-          How your app is granted access when someone connects it
+          How your app gets access when someone connects it.
         </span>
       </div>
 
-      <OneTimeWithConfirmToggle
+      <FormField
         control={control}
-        label="Use the permissions of the person who connects"
-        description="Each member who connects gets their own grant, limited to what they can already do. When off, an owner approves one organization-wide grant."
-        warningBody="Existing connections keep working. Only new connections will use per-member grants."
         name="member_bound_grant"
-        confirmedName="member_bound_grant_confirmed"
+        render={({ field }) => (
+          <PermanentChoiceField
+            legend="Who approves access?"
+            looser={APPROVER_OPTIONS.looser}
+            stricter={APPROVER_OPTIONS.stricter}
+            value={toChoiceValue(APPROVER_OPTIONS, field.value)}
+            savedValue={
+              savedValues && toChoiceValue(APPROVER_OPTIONS, savedValues.member_bound_grant)
+            }
+            onChange={(value) => field.onChange(value === APPROVER_OPTIONS.stricter.value)}
+          />
+        )}
       />
 
-      <OneTimeWithConfirmToggle
+      <FormField
         control={control}
-        label="Ask for specific projects"
-        description="Users pick which projects your app can reach. Requests to other projects return 403. When off, your app reaches every project in the organization."
-        warningBody="Make sure your app reads the returned scopes and handles denied requests before you turn this on."
         name="project_scoping"
-        confirmedName="project_scoping_confirmed"
+        render={({ field }) => (
+          <PermanentChoiceField
+            legend="Which projects can it reach?"
+            looser={PROJECT_REACH_OPTIONS.looser}
+            stricter={PROJECT_REACH_OPTIONS.stricter}
+            value={toChoiceValue(PROJECT_REACH_OPTIONS, field.value)}
+            savedValue={
+              savedValues && toChoiceValue(PROJECT_REACH_OPTIONS, savedValues.project_scoping)
+            }
+            onChange={(value) => field.onChange(value === PROJECT_REACH_OPTIONS.stricter.value)}
+          />
+        )}
       />
 
-      <Admonition
-        type="note"
-        layout="vertical"
-        title="What your app users will see when they connect"
-      >
-        <p>
-          An organization owner approves your app once. It can then reach every project in their
-          organization.
-        </p>
-        {explanation && <p>{explanation}</p>}
-        <p>
-          <span className="text-foreground-lighter">Resulting grant: </span>
-          <span className="text-foreground-light">{resultingGrant}</span>
-        </p>
-      </Admonition>
+      <AuthorizationPreview
+        appName={appName.length > 0 ? appName : 'your app'}
+        scopes={scopes}
+        isMemberBoundGrant={isMemberBoundGrant}
+        isProjectScopingEnabled={isProjectScopingEnabled}
+        organizationName={organizationName}
+        savedValues={savedValues}
+      />
     </div>
   )
 }

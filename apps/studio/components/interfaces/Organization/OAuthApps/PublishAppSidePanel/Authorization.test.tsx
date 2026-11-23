@@ -1,135 +1,93 @@
 import { zodResolver } from '@hookform/resolvers/zod'
-import { fireEvent, screen, waitFor } from '@testing-library/react'
-import { SubmitHandler, useForm } from 'react-hook-form'
+import { fireEvent, screen } from '@testing-library/react'
+import { useForm } from 'react-hook-form'
 import { Form } from 'ui'
-import { describe, expect, test, vi } from 'vitest'
-import z from 'zod'
+import { describe, expect, test } from 'vitest'
 
-import { OneTimeWithConfirmToggle } from './Authorization'
+import { AuthorizationSection } from './Authorization'
+import { AuthorizationValues, DEFAULT_AUTHORIZATION_VALUES } from './Authorization.utils'
+import {
+  formSchemaWithOAuthAppScopedGrants,
+  FormSchemaWithOAuthAppScopedGrants,
+} from './PublishAppSidePanel.utils'
 import { customRender } from '@/tests/lib/custom-render'
 
-describe('OneTimeWithConfirmToggle', () => {
-  const schema = z
-    .object({
-      thing_to_enable: z.coerce.boolean(),
-      thing_to_enable_confirmed: z.coerce.boolean().optional(),
-    })
-    .superRefine((values, context) => {
-      if (values.thing_to_enable && !values.thing_to_enable_confirmed) {
-        context.addIssue({
-          code: 'custom',
-          path: ['thing_to_enable_confirmed'],
-          message: 'Please confirm you want to enable the thing',
-        })
-      }
-    })
-  type Schema = z.infer<typeof schema>
+const OWNER_OPTION = /An owner, once for the whole organization/
+const ALL_PROJECTS_OPTION = /^All projects(?! in)/
+const LET_THEM_CHOOSE_OPTION = /Let them choose/
 
-  const TestForm = ({
-    defaultValues,
-    onSubmit,
-  }: {
-    defaultValues: Schema
-    onSubmit: SubmitHandler<Schema>
-  }) => {
-    const form = useForm<Schema>({
-      defaultValues,
-      resolver: zodResolver(schema),
-    })
-
-    return (
-      <Form {...form}>
-        <form onSubmit={form.handleSubmit(onSubmit)}>
-          <OneTimeWithConfirmToggle
-            control={form.control}
-            name="thing_to_enable"
-            confirmedName="thing_to_enable_confirmed"
-            label="Thing to enable"
-            description=""
-            warningBody="Careful"
-          />
-          <button tabIndex={0} type="submit">
-            Save
-          </button>
-        </form>
-      </Form>
-    )
-  }
-
-  test('It requires the confirmation field to be checked when enabled from initially disabled', async () => {
-    const onSubmit = vi.fn()
-    customRender(
-      <TestForm
-        defaultValues={{
-          thing_to_enable: false,
-          thing_to_enable_confirmed: false,
-        }}
-        onSubmit={onSubmit}
-      />
-    )
-
-    // Confirmation is hidden initially
-    expect(
-      screen.queryByLabelText(
-        'I understand this is permanent. I can test it on a duplicate app first'
-      )
-    ).toBeNull()
-    fireEvent.click(await screen.findByLabelText('Thing to enable'))
-    // Confirmation is now visible
-    const confirmCheckbox = await screen.findByLabelText(
-      'I understand this is permanent. I can test it on a duplicate app first'
-    )
-    fireEvent.click(await screen.findByText('Save'))
-    await screen.findByText('Please confirm you want to enable the thing')
-    expect(onSubmit).not.toHaveBeenCalled()
-    fireEvent.click(confirmCheckbox)
-    fireEvent.click(await screen.findByText('Save'))
-    await waitFor(() => expect(onSubmit).toHaveBeenCalled())
+const TestForm = ({ savedValues }: { savedValues?: AuthorizationValues }) => {
+  const form = useForm<FormSchemaWithOAuthAppScopedGrants>({
+    defaultValues: {
+      name: 'Acme Deploy',
+      website: 'https://acme.test',
+      redirect_uris: [{ id: 'one', value: 'https://acme.test/callback' }],
+      ...(savedValues ?? DEFAULT_AUTHORIZATION_VALUES),
+    },
+    resolver: zodResolver(formSchemaWithOAuthAppScopedGrants),
   })
 
-  test('It does not requires the confirmation field to be checked when the field is not enabled', async () => {
-    const onSubmit = vi.fn()
-    customRender(
-      <TestForm
-        defaultValues={{
-          thing_to_enable: false,
-          thing_to_enable_confirmed: false,
-        }}
-        onSubmit={onSubmit}
+  return (
+    <Form {...form}>
+      <AuthorizationSection
+        control={form.control}
+        savedValues={savedValues}
+        organizationName="Acme"
       />
-    )
+    </Form>
+  )
+}
 
-    // Confirmation is hidden initially
-    expect(
-      screen.queryByLabelText(
-        'I understand this is permanent. I can test it on a duplicate app first'
-      )
-    ).toBeNull()
-    fireEvent.click(await screen.findByText('Save'))
-    await waitFor(() => expect(onSubmit).toHaveBeenCalled())
+describe('AuthorizationSection', () => {
+  test('a new app locks nothing and marks the stricter options as permanent', async () => {
+    customRender(<TestForm />)
+
+    expect(await screen.findByRole('radio', { name: OWNER_OPTION })).toBeEnabled()
+    expect(await screen.findByRole('radio', { name: ALL_PROJECTS_OPTION })).toBeEnabled()
+    expect(screen.queryByText('Current')).toBeNull()
+    expect(screen.getAllByText('Permanent')).toHaveLength(2)
   })
 
-  test('It does not allow to modify the field nor requires the confirmation field to be checked when the field is initially enabled', async () => {
-    const onSubmit = vi.fn()
-    customRender(
-      <TestForm
-        defaultValues={{
-          thing_to_enable: true,
-          thing_to_enable_confirmed: true,
-        }}
-        onSubmit={onSubmit}
-      />
-    )
+  test('an app on the default setup marks owner and all projects as current, with nothing locked', async () => {
+    customRender(<TestForm savedValues={DEFAULT_AUTHORIZATION_VALUES} />)
 
-    // Confirmation is hidden initially
+    expect(await screen.findByRole('radio', { name: OWNER_OPTION })).toBeEnabled()
+    expect(await screen.findByRole('radio', { name: ALL_PROJECTS_OPTION })).toBeEnabled()
+    expect(screen.getAllByText('Current')).toHaveLength(2)
+    expect(screen.queryByText("Can't switch back")).toBeNull()
+  })
+
+  test('a saved stricter value disables the looser option', async () => {
+    customRender(<TestForm savedValues={{ member_bound_grant: true, project_scoping: true }} />)
+
+    expect(await screen.findByRole('radio', { name: OWNER_OPTION })).toBeDisabled()
+    expect(await screen.findByRole('radio', { name: ALL_PROJECTS_OPTION })).toBeDisabled()
+    expect(screen.getAllByText("Can't switch back")).toHaveLength(2)
+    expect(screen.getAllByText('Current')).toHaveLength(2)
+  })
+
+  test('the preview describes the resulting grant and what it is today', async () => {
+    customRender(<TestForm savedValues={DEFAULT_AUTHORIZATION_VALUES} />)
+
     expect(
-      screen.queryByLabelText(
-        'I understand this is permanent. I can test it on a duplicate app first'
-      )
-    ).toBeNull()
-    expect(screen.queryByLabelText('Thing to enable')).toBeDisabled()
+      await screen.findByText('One grant for the organization, every project in it')
+    ).toBeVisible()
+    expect(screen.queryByText(/^Today:/)).toBeNull()
 
-    fireEvent.click(await screen.findByText('Save'))
-    await waitFor(() => expect(onSubmit).toHaveBeenCalled())
+    fireEvent.click(await screen.findByRole('radio', { name: LET_THEM_CHOOSE_OPTION }))
+
+    expect(
+      await screen.findByText('One grant for the organization, projects chosen when connecting')
+    ).toBeVisible()
+    expect(
+      await screen.findByText(/Today: One grant for the organization, every project in it/)
+    ).toBeVisible()
+  })
+
+  test('the preview mock is hidden from assistive technology', async () => {
+    customRender(<TestForm />)
+
+    const mock = (await screen.findByText('Authorize Acme Deploy')).closest('[aria-hidden="true"]')
+    expect(mock).not.toBeNull()
   })
 })

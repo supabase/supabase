@@ -1,23 +1,16 @@
-export interface AuthorizationToggleState {
-  checked: boolean
-  locked: boolean
-  confirmed: boolean
+export interface AuthorizationValues {
+  member_bound_grant: boolean
+  project_scoping: boolean
 }
 
-export function getAuthorizationPreviewExplanation(
-  isMemberBoundGrant: boolean,
-  isProjectScopingEnabled: boolean
-): string | null {
-  if (isMemberBoundGrant && isProjectScopingEnabled) {
-    return 'After you confirm, each member approves your app and picks which of their projects it can reach. It can do only what they can already do there.'
-  }
-  if (isMemberBoundGrant) {
-    return 'After you confirm, each member approves your app themselves. It can do only what that member can already do, across every project they can access.'
-  }
-  if (isProjectScopingEnabled) {
-    return 'After you confirm, an organization owner approves your app and picks which projects it can reach.'
-  }
-  return null
+export interface AuthorizationChanges {
+  isApproverChanged: boolean
+  isProjectReachChanged: boolean
+}
+
+export const DEFAULT_AUTHORIZATION_VALUES: AuthorizationValues = {
+  member_bound_grant: false,
+  project_scoping: false,
 }
 
 export function getResultingGrantDescription(
@@ -25,23 +18,58 @@ export function getResultingGrantDescription(
   isProjectScopingEnabled: boolean
 ): string {
   if (isMemberBoundGrant && isProjectScopingEnabled) {
-    return 'One grant per member, limited to chosen projects.'
+    return 'One grant per member, projects chosen when connecting'
   }
   if (isMemberBoundGrant) {
-    return 'One grant per member, organization-wide.'
+    return 'One grant per member, every project that member can access'
   }
   if (isProjectScopingEnabled) {
-    return 'One organization grant, limited to chosen projects.'
+    return 'One grant for the organization, projects chosen when connecting'
   }
-  return 'Legacy behaviour, unchanged from today.'
+  return 'One grant for the organization, every project in it'
 }
 
-export function isAuthorizationConfirmationPending(
-  memberBoundGrant: AuthorizationToggleState,
-  projectScoping: AuthorizationToggleState
-): boolean {
-  const isPending = (toggle: AuthorizationToggleState) =>
-    toggle.checked && !toggle.locked && !toggle.confirmed
+export function getConsentApprovalLine(isMemberBoundGrant: boolean): string {
+  return isMemberBoundGrant
+    ? "You're approving for yourself only"
+    : 'An org owner approves once, for everyone'
+}
 
-  return isPending(memberBoundGrant) || isPending(projectScoping)
+export function getAllProjectsRowLabel(
+  isMemberBoundGrant: boolean,
+  organizationName?: string
+): string {
+  if (isMemberBoundGrant) return 'All projects you can access'
+  return `All projects in ${organizationName ?? 'your organization'}`
+}
+
+export function getAuthorizationChanges(
+  savedValues: AuthorizationValues,
+  nextValues: AuthorizationValues
+): AuthorizationChanges {
+  return {
+    isApproverChanged: !savedValues.member_bound_grant && nextValues.member_bound_grant,
+    isProjectReachChanged: !savedValues.project_scoping && nextValues.project_scoping,
+  }
+}
+
+export function hasAuthorizationChanges(changes: AuthorizationChanges): boolean {
+  return changes.isApproverChanged || changes.isProjectReachChanged
+}
+
+export function getAuthorizationChangeDescriptions(changes: AuthorizationChanges): string[] {
+  const descriptions: string[] = []
+
+  if (changes.isApproverChanged) {
+    descriptions.push(
+      'Each member will connect with their own access instead of one owner-approved grant.'
+    )
+  }
+  if (changes.isProjectReachChanged) {
+    descriptions.push(
+      'People connecting will be able to limit your app to specific projects. Make sure your app reads the returned scopes and handles 403s.'
+    )
+  }
+
+  return descriptions
 }
