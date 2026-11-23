@@ -12,7 +12,7 @@ logo_inverse: /images/customers/logos/on-dark/koodos.png
 tags:
   - supabase
 date: '2025-12-16'
-company_url: 'https://shelf.im/'
+company_url: 'https://www.shelf.im/'
 misc: [{ label: 'Founded', text: 'USA' }]
 about: Social app that helps users understand themselves better by connecting their media platforms into one place.
 # "healthcare" | "fintech" | "ecommerce" | "education" | "gaming" | "media" | "real-estate" | "saas" | "social" | "analytics" | "ai" | "developer-tools"
@@ -30,7 +30,7 @@ supabase_products: ['database', 'auth', 'storage']
   way. The combination of Postgres performance and developer support has been incredible.
 </Quote>
 
-[Koodos](https://shelf.im/) is the company behind Shelf, a social app that helps users understand themselves better by connecting their media platforms into one place. Users can link Spotify, Apple Music, Netflix, Letterboxd, Goodreads, and more to build a personalized shelf of their interests, track how their tastes change over time, and discover connections with others based on shared media preferences.
+[Koodos](https://www.shelf.im/) is the company behind Shelf, a social app that helps users understand themselves better by connecting their media platforms into one place. Users can link Spotify, Apple Music, Netflix, Letterboxd, Goodreads, and more to build a personalized shelf of their interests, track how their tastes change over time, and discover connections with others based on shared media preferences.
 
 With billions of data points flowing through the system and millions of users, Koodos needed a backend that could scale without requiring a dedicated database team. Supabase has been that foundation since day zero.
 
@@ -63,7 +63,7 @@ Koodos chose Supabase from day one. The team evaluated alternatives like PlanetS
 Key reasons for choosing Supabase:
 
 - Speed to prototype without upfront architecture work
-- Complete platform with [Auth](https://www.supabase.com/auth), [Database](https://www.supabase.com/database), and [Storage](https://www.supabase.com/storage) in one place
+- Complete platform with [Auth](https://supabase.com/auth), [Database](https://supabase.com/database), and [Storage](https://supabase.com/storage) in one place
 - Strong SDK support for fast frontend integration
 - Managed Postgres with real-time monitoring for compute, memory, and IOPS
 - Enterprise support with direct access to Supabase engineers
@@ -80,6 +80,10 @@ Supabase's combination of observability and hands-on support set it apart from t
   We looked at other hosted databases, but Supabase gave us full visibility. We can inspect queries,
   benchmark IOPS, and actually talk to the engineers helping us optimize. That's rare.
 </Quote>
+
+### Under the hood: AWS
+
+Behind all of this, Shelf runs on AWS. Supabase runs Koodos's Postgres database on Amazon EC2 compute, and that database holds the activity data, user profiles, and Auth records that millions of users see when they open the app, with compute scaled up around major launches and rightsized back down afterward. For a team with nobody dedicated to Postgres, the servers under Shelf are infrastructure Koodos doesn't have to host, patch, or maintain, even while syncing billions of data points.
 
 ## The approach
 

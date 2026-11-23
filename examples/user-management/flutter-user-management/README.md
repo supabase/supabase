@@ -1,11 +1,11 @@
 # Supabase Flutter User Management
 
-This repo is a quick sample of how you can get started building apps using Flutter and Supabase. You can find a step by step guide of how to build out this app in the [Quickstart: Flutter guide](https://supabase.com/docs/guides/with-flutter).
+This repo is a quick sample of how you can get started building apps using Flutter and Supabase. You can find a step by step guide of how to build out this app in the [Quickstart: Flutter guide](https://supabase.com/docs/guides/getting-started/tutorials/with-flutter).
 
 This repo will demonstrate how to:
 
 - sign users in with Supabase Auth using [magic link](https://supabase.com/docs/reference/dart/auth-signinwithotp)
-- store and retrieve data with [Supabase database](https://supabase.com/docs/guides/database)
+- store and retrieve data with [Supabase database](https://supabase.com/docs/guides/database/overview)
 - store image files in [Supabase storage](https://supabase.com/docs/guides/storage)
 
 <img height="500px" src="https://raw.githubusercontent.com/supabase/supabase/master/examples/user-management/flutter-user-management/supabase-flutter-demo.png" alt="Supabase User Management example" />

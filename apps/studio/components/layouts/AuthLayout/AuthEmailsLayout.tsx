@@ -1,13 +1,24 @@
 import { useParams } from 'common'
+import Link from 'next/link'
+import { usePathname } from 'next/navigation'
 import { PropsWithChildren } from 'react'
+import { NavMenu, NavMenuItem } from 'ui'
+import {
+  PageHeader,
+  PageHeaderDescription,
+  PageHeaderMeta,
+  PageHeaderSummary,
+  PageHeaderTitle,
+} from 'ui-patterns/PageHeader'
+import { PageNav } from 'ui-patterns/PageNav'
 
 import AuthLayout from './AuthLayout'
-import { PageLayout } from '@/components/layouts/PageLayout/PageLayout'
 import { UnknownInterface } from '@/components/ui/UnknownInterface'
 import { useIsFeatureEnabled } from '@/hooks/misc/useIsFeatureEnabled'
 
 export const AuthEmailsLayout = ({ children }: PropsWithChildren<{}>) => {
   const { ref } = useParams()
+  const pathname = usePathname()
 
   const showEmails = useIsFeatureEnabled('authentication:emails')
 
@@ -25,13 +36,28 @@ export const AuthEmailsLayout = ({ children }: PropsWithChildren<{}>) => {
   return (
     <AuthLayout title="Emails">
       {showEmails ? (
-        <PageLayout
-          title="Emails"
-          subtitle="Configure what emails your users receive and how they are sent"
-          navigationItems={navItems}
-        >
+        <>
+          <PageHeader>
+            <PageHeaderMeta>
+              <PageHeaderSummary>
+                <PageHeaderTitle>Emails</PageHeaderTitle>
+                <PageHeaderDescription>
+                  Configure what emails your users receive and how they are sent
+                </PageHeaderDescription>
+              </PageHeaderSummary>
+            </PageHeaderMeta>
+          </PageHeader>
+          <PageNav size="default">
+            <NavMenu>
+              {navItems.map((item) => (
+                <NavMenuItem key={item.label} active={pathname === item.href}>
+                  <Link href={item.href}>{item.label}</Link>
+                </NavMenuItem>
+              ))}
+            </NavMenu>
+          </PageNav>
           {children}
-        </PageLayout>
+        </>
       ) : (
         <UnknownInterface urlBack={`/project/${ref}/auth/users`} />
       )}

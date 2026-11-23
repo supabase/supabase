@@ -1,11 +1,21 @@
 import { createFileRoute } from '@tanstack/react-router'
+import { PageContainer } from 'ui-patterns/PageContainer'
+import { PageSection, PageSectionContent } from 'ui-patterns/PageSection'
 
-import TriggersSchemaPage from '@/pages/project/[ref]/database/triggers/event'
+import { EventTriggersList } from '@/components/interfaces/Database/Triggers/EventTriggersList/EventTriggersList'
 
 export const Route = createFileRoute('/project/$ref/database/triggers/event')({
-  component: TriggersEventRoute,
+  component: TriggersSchemaPage,
 })
 
-function TriggersEventRoute() {
-  return <TriggersSchemaPage dehydratedState={undefined} />
+function TriggersSchemaPage() {
+  return (
+    <PageContainer size="large">
+      <PageSection>
+        <PageSectionContent>
+          <EventTriggersList />
+        </PageSectionContent>
+      </PageSection>
+    </PageContainer>
+  )
 }

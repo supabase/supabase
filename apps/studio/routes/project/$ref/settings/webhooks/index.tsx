@@ -1,12 +1,12 @@
 import { createFileRoute } from '@tanstack/react-router'
 
-import ProjectWebhooksSettings from '@/pages/project/[ref]/settings/webhooks/index'
+import { PlatformWebhooksPage } from '@/components/interfaces/Platform/Webhooks'
 
 export const Route = createFileRoute('/project/$ref/settings/webhooks/')({
-  component: SettingsWebhooksIndexRoute,
+  component: ProjectWebhooksSettings,
   staticData: { settingsLayoutTitle: 'Webhooks' },
 })
 
-function SettingsWebhooksIndexRoute() {
-  return <ProjectWebhooksSettings dehydratedState={undefined} />
+function ProjectWebhooksSettings() {
+  return <PlatformWebhooksPage scope="project" />
 }

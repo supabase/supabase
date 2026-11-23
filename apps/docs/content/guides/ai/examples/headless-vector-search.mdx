@@ -12,7 +12,7 @@ You can see how this works with the Supabase docs. Enter `cmd+k` and ask, for ex
 
 ## Tech stack
 
-- Supabase: Database & Edge Functions.
+- Supabase: [Database](/docs/guides/database/overview) & [Edge Functions](/docs/guides/functions).
 - OpenAI: Embeddings and completions.
 - GitHub Actions: for ingesting your markdown docs.
 
@@ -46,7 +46,7 @@ Now we can use the [Headless Vector Search](https://github.com/supabase/headless
 
 ### Ingest your documentation
 
-Now we need to push your documentation into the database as embeddings. You can do this manually, but to make it easier we've created a [GitHub Action](https://github.com/marketplace/actions/supabase-embeddings-generator) which can update your database every time there is a Pull Request.
+Now we need to push your documentation into the database as embeddings. You can do this manually, but to make it easier we've created a [GitHub Action](https://github.com/supabase/embeddings-generator) which can update your database every time there is a Pull Request.
 
 In your knowledge base repository, create a new action called `.github/workflows/generate_embeddings.yml` with the following content:
 

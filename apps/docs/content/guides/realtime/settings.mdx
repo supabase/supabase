@@ -41,7 +41,7 @@ Determines if the Realtime service is enabled or disabled for your project.
 Determines whether Realtime allows public channels, or restricts your project to private channels with [Realtime Authorization](/docs/guides/realtime/authorization).
 
 - **Enabled**: no policy check runs, but anyone holding your project's anon key can subscribe to and broadcast on any public channel.
-- **Disabled**: every join is checked against the Row Level Security policies on `realtime.messages`, so each join costs one authorization query. Clients that don't set `config.private` to `true` are rejected with `PrivateOnly`. With no policies, clients connect but receive no messages.
+- **Disabled**: every join is checked against the [Row Level Security](/docs/guides/database/postgres/row-level-security) policies on `realtime.messages`, so each join costs one authorization query. Clients that don't set `config.private` to `true` are rejected with `PrivateOnly`. With no policies, clients connect but receive no messages.
 
 ### Database connection pool size
 

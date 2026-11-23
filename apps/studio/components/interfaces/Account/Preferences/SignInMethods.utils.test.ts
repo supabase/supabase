@@ -79,8 +79,7 @@ describe('shouldShowAddPasswordRow', () => {
 })
 
 describe('canUnlinkIdentity', () => {
-  it('blocks unlinking the email identity while Auth leaves the password hash', () => {
-    // Control stays visible but disabled; this gates the confirm path.
+  it('blocks unlinking email while password status depends on the email identity', () => {
     expect(canUnlinkIdentity({ provider: 'email', identityCount: 2 })).toBe(false)
   })
 
