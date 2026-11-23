@@ -112,7 +112,7 @@ overrides:
   # and has its catalog queries (`packed/` there is the output of `pnpm pack`). Delete this
   # override once a released @supabase/mcp-server-supabase has the engine check, and move
   # apps/studio to that release.
-  '@supabase/mcp-server-supabase': github:supabase/mcp#d443bba0a6ceeede525c56e6d8ffd2f5bbff7e70&path:/packages/mcp-server-supabase/packed
+  '@supabase/mcp-server-supabase': github:supabase/mcp#36857d7198e1899c964e1633bdf3fda2cc5de6db&path:/packages/mcp-server-supabase/packed
   '@usercentrics/cmp-browser-sdk>uuid': ^11.1.1
   braintrust>esbuild: ^0.28.1
   braintrust>uuid: ^11.1.1
