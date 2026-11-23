@@ -25,7 +25,7 @@ A full-text search works in three steps:
 
 1. `to_tsvector()` converts your data into searchable tokens. Together, these tokens are called a _document_.
 2. `to_tsquery()` converts the search query into tokens to match, so a search for `eggs` can still match a value of `egg`.
-3. The `@@` operator returns the matches between the document and the query.
+3. The `@@` operator tests whether the document matches the query and returns a boolean. A `where` clause uses that result to select matching rows.
 
 For each function and its options, see [Full text search](/docs/guides/database/full-text-search#usage).
 
