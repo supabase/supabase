@@ -1,7 +1,6 @@
 import { Elements } from '@stripe/react-stripe-js'
 import { loadStripe, PaymentIntentResult, StripeElementsOptions } from '@stripe/stripe-js'
 import { useParams } from 'common'
-import { InfoIcon } from 'lucide-react'
 import { useTheme } from 'next-themes'
 import { useMemo, useRef, useState } from 'react'
 import { plans as subscriptionsPlans } from 'shared-data/plans'
@@ -19,6 +18,7 @@ import {
   getPausedProjects,
   getPlanChangeSummary,
 } from './PlanChangeSummary.utils'
+import { PlanMinusIcon } from './PlanIcons'
 import { FullScreenPanel } from './PlanUpdatePanelShell'
 import { getStripeElementsAppearanceOptions } from '@/components/interfaces/Billing/Payment/Payment.utils'
 import { PaymentConfirmation } from '@/components/interfaces/Billing/Payment/PaymentConfirmation'
@@ -393,17 +393,12 @@ export const SubscriptionPlanUpdateView = ({
                   {featuresToLose.map((feature) => (
                     <li
                       key={typeof feature === 'string' ? feature : feature[0]}
-                      className="flex items-start gap-3"
+                      className="flex items-start text-sm text-foreground-light"
                     >
-                      <InfoIcon
-                        size={14}
-                        strokeWidth={3}
-                        className="mt-1 shrink-0 text-warning-600"
-                        aria-hidden="true"
-                      />
-                      <p className="text-sm text-foreground-light">
-                        {typeof feature === 'string' ? feature : feature[0]}
-                      </p>
+                      <div className="flex h-lh w-6 shrink-0 items-center">
+                        <PlanMinusIcon className="size-5 -ml-0.5" />
+                      </div>
+                      <span>{typeof feature === 'string' ? feature : feature[0]}</span>
                     </li>
                   ))}
                 </ul>
