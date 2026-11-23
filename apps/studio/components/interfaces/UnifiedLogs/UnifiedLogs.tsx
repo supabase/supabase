@@ -557,7 +557,7 @@ export const UnifiedLogs = ({
       setIsReviewingChanges(false)
       setDismissedUpdateKey(null)
       toast.success('View updated')
-      track('unified_logs_view_updated', { updateType: 'filters' })
+      track('unified_logs_view_updated', { updateType: 'content' })
     } catch {
       return
     }

@@ -4547,7 +4547,7 @@ export interface UnifiedLogsViewCreatedEvent {
 }
 
 /**
- * User updated an existing saved view's name or filters in Unified Logs.
+ * User updated an existing saved view's name or content in Unified Logs.
  *
  * @group Events
  * @source studio
@@ -4556,7 +4556,8 @@ export interface UnifiedLogsViewCreatedEvent {
 export interface UnifiedLogsViewUpdatedEvent {
   action: 'unified_logs_view_updated'
   properties: {
-    updateType: 'name' | 'filters'
+    /** 'content' covers filters and view options (sort, latency range, log type toggles), which are saved and compared together. */
+    updateType: 'name' | 'content'
   }
   groups: TelemetryGroups
 }
