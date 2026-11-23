@@ -13,7 +13,7 @@ At build time, every page is also exported as a plain `.md` file, so the content
 
 Search is served by an API route in `api/search/`, backed by content indexed with `pnpm search:ingest`.
 
-## What belongs in /kb versus /docs
+## What belongs in `/kb` versus `/docs`
 
 - **`/kb` owns applied decisions and applied experience.** If the answer depends on factors outside the product (scale, budget, the existing stack, or the alternatives), it belongs in `/kb`.
 - **`/docs` owns product truth.** If Supabase alone determines the answer, it belongs in `/docs`. This includes API and SDK reference, configuration, product concepts, quickstarts, supported behavior and limits, and setup for a single integration.
