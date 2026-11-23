@@ -1,6 +1,1248 @@
 {
   "openapi": "3.0.0",
   "paths": {
+    "/v2/projects/{ref}/warehouse/capacity": {
+      "get": {
+        "description": "Returns capacity, admission, assignment-wait, and activation measurements over a bounded time range, using the project’s stored Warehouse placement. Use since or both from and to; the default is the last 30 minutes. Each measurement includes its definition, unit, aggregation, requested and effective ranges, rate_window_seconds, source-sample freshness, availability, coverage, and full series with dimension labels such as reason, kind, and result. Executor invocations in flight are distinct from worker admission grants. Occupied admission includes active plus pending grants. The configured admission limit does not imply an open gate or spare capacity. Missing, stale, and insufficient observations remain unavailable or null; they do not establish healthy or idle capacity. Point timestamps are evaluation times; last_sample_at is the original source-sample time. Rates and latency quantiles describe the effective rate window at each point, not the entire requested range. Each request returns up to eight measurements, and a failure of one measurement does not discard the other results. No raw queries or backend selectors are accepted.\n\nThis endpoint is currently in its **Alpha** stage.",
+        "operationId": "v2-get-warehouse-capacity",
+        "parameters": [
+          {
+            "name": "ref",
+            "required": true,
+            "in": "path",
+            "description": "Project ref",
+            "schema": {
+              "minLength": 20,
+              "maxLength": 20,
+              "pattern": "^[a-z]+$",
+              "example": "abcdefghijklmnopqrst",
+              "type": "string"
+            }
+          },
+          {
+            "name": "since",
+            "required": false,
+            "in": "query",
+            "description": "Look back from server time, for example 30m, 2h, or 1d. Defaults to 30m when from/to are omitted. Maximum 30d. Cannot be combined with from/to.",
+            "schema": { "pattern": "^[1-9]\\d*(s|m|h|d)$", "type": "string" }
+          },
+          {
+            "name": "from",
+            "required": false,
+            "in": "query",
+            "description": "Range start as an ISO timestamp, within the last 30 days. Requires to; cannot be combined with since.",
+            "schema": {
+              "format": "date-time",
+              "pattern": "^(?:(?:\\d\\d[2468][048]|\\d\\d[13579][26]|\\d\\d0[48]|[02468][048]00|[13579][26]00)-02-29|\\d{4}-(?:(?:0[13578]|1[02])-(?:0[1-9]|[12]\\d|3[01])|(?:0[469]|11)-(?:0[1-9]|[12]\\d|30)|(?:02)-(?:0[1-9]|1\\d|2[0-8])))T(?:(?:[01]\\d|2[0-3]):[0-5]\\d:[0-5]\\d(?:\\.\\d+)?(?:Z|([+-](?:[01]\\d|2[0-3]):[0-5]\\d)))$",
+              "type": "string"
+            }
+          },
+          {
+            "name": "to",
+            "required": false,
+            "in": "query",
+            "description": "Range end as an ISO timestamp, no later than server time. Requires from; cannot be combined with since. The service tolerates up to 60 seconds of request delay or clock skew.",
+            "schema": {
+              "format": "date-time",
+              "pattern": "^(?:(?:\\d\\d[2468][048]|\\d\\d[13579][26]|\\d\\d0[48]|[02468][048]00|[13579][26]00)-02-29|\\d{4}-(?:(?:0[13578]|1[02])-(?:0[1-9]|[12]\\d|3[01])|(?:0[469]|11)-(?:0[1-9]|[12]\\d|30)|(?:02)-(?:0[1-9]|1\\d|2[0-8])))T(?:(?:[01]\\d|2[0-3]):[0-5]\\d:[0-5]\\d(?:\\.\\d+)?(?:Z|([+-](?:[01]\\d|2[0-3]):[0-5]\\d)))$",
+              "type": "string"
+            }
+          },
+          {
+            "name": "attributes",
+            "required": false,
+            "in": "query",
+            "description": "Up to eight distinct measurements. Defaults to query_in_flight, worker_admission_limit, worker_admission_active, worker_admission_pending, worker_admission_occupied, admission_rejection_rate, assignment_wait_p95, activation_duration_p95. Supply a comma-separated list. Allowed measurements: query_in_flight, worker_admission_limit, worker_admission_active, worker_admission_pending, worker_admission_occupied, admission_rejection_rate, assignment_wait_mean, assignment_wait_p95, activation_rate, activation_duration_mean, activation_duration_p95.",
+            "schema": { "type": "string" }
+          },
+          {
+            "name": "interval",
+            "required": false,
+            "in": "query",
+            "description": "Defaults to 1m. The effective step increases to stay within 1441 points per series. Rate and latency windows are at least 5m.",
+            "schema": { "type": "string", "enum": ["1m", "5m", "10m", "30m", "1h", "1d"] }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "",
+            "content": {
+              "application/json": {
+                "schema": { "$ref": "#/components/schemas/V2WarehouseCapacityResponse_Output" }
+              }
+            }
+          },
+          "400": {
+            "description": "validation_failed: Invalid measurement selection, range, interval, or query parameter",
+            "content": {
+              "application/json": { "schema": { "$ref": "#/components/schemas/ErrorResponseBody" } }
+            }
+          },
+          "401": {
+            "description": "Unauthorized",
+            "content": {
+              "application/json": { "schema": { "$ref": "#/components/schemas/ErrorResponseBody" } }
+            }
+          },
+          "402": {
+            "description": "This feature requires the Pro, Team, or Enterprise organization plan.",
+            "content": {
+              "application/json": { "schema": { "$ref": "#/components/schemas/ErrorResponseBody" } }
+            }
+          },
+          "403": {
+            "description": "Forbidden action",
+            "content": {
+              "application/json": { "schema": { "$ref": "#/components/schemas/ErrorResponseBody" } }
+            }
+          },
+          "404": {
+            "description": "Project not found",
+            "content": {
+              "application/json": { "schema": { "$ref": "#/components/schemas/ErrorResponseBody" } }
+            }
+          },
+          "429": {
+            "description": "Rate limit exceeded",
+            "content": {
+              "application/json": { "schema": { "$ref": "#/components/schemas/ErrorResponseBody" } }
+            }
+          },
+          "503": {
+            "description": "warehouse_metrics_unavailable: Metrics query capacity is temporarily unavailable; retry after a short delay. warehouse_setup_unavailable: Warehouse feature or project metadata unavailable.",
+            "content": {
+              "application/json": { "schema": { "$ref": "#/components/schemas/ErrorResponseBody" } }
+            }
+          }
+        },
+        "security": [{ "bearer": [] }],
+        "summary": "Inspect Warehouse capacity diagnostics",
+        "tags": ["Projects Warehouse"],
+        "x-allowed-plans": ["Pro", "Team", "Enterprise"],
+        "x-badges": [
+          { "name": "OAuth scope: database:read", "position": "after" },
+          { "name": "Only available on Pro, Team, Enterprise", "position": "before" },
+          { "name": "Alpha", "position": "before" }
+        ],
+        "x-endpoint-owners": ["pipelines"],
+        "x-fga-permissions": [["database_read"]],
+        "x-oauth-scope": "database:read",
+        "x-operation": { "group": "warehouse.inspect", "method": "capacity" },
+        "x-scalar-stability": "experimental"
+      }
+    },
+    "/v2/projects/{ref}/warehouse/query-stats": {
+      "get": {
+        "description": "Returns aggregate workload measurements over a bounded time range, using the project’s stored Warehouse placement. Use since or both from and to; the default is the last 30 minutes. Each measurement includes its definition, unit, aggregation, requested and effective ranges, rate_window_seconds, source-sample freshness, availability, and full series with dimension labels. Point timestamps are evaluation times; last_sample_at is the original source-sample time. Rates and latency quantiles describe the effective rate window at each point, not the entire requested range. Do not average interval percentiles into a whole-range percentile. Executor invocations include metadata/schema work and are not counts of user SQL statements. Timeouts are included in errors; cancellation is separate. Missing and unavailable values remain null. No query history, individual-query attribution, raw queries, or backend selectors are exposed. Each request returns up to eight measurements. A failure of one measurement does not discard the other results.\n\nThis endpoint is currently in its **Alpha** stage.",
+        "operationId": "v2-get-warehouse-query-stats",
+        "parameters": [
+          {
+            "name": "ref",
+            "required": true,
+            "in": "path",
+            "description": "Project ref",
+            "schema": {
+              "minLength": 20,
+              "maxLength": 20,
+              "pattern": "^[a-z]+$",
+              "example": "abcdefghijklmnopqrst",
+              "type": "string"
+            }
+          },
+          {
+            "name": "since",
+            "required": false,
+            "in": "query",
+            "description": "Look back from server time, for example 30m, 2h, or 1d. Defaults to 30m when from/to are omitted. Maximum 30d. Cannot be combined with from/to.",
+            "schema": { "pattern": "^[1-9]\\d*(s|m|h|d)$", "type": "string" }
+          },
+          {
+            "name": "from",
+            "required": false,
+            "in": "query",
+            "description": "Range start as an ISO timestamp, within the last 30 days. Requires to; cannot be combined with since.",
+            "schema": {
+              "format": "date-time",
+              "pattern": "^(?:(?:\\d\\d[2468][048]|\\d\\d[13579][26]|\\d\\d0[48]|[02468][048]00|[13579][26]00)-02-29|\\d{4}-(?:(?:0[13578]|1[02])-(?:0[1-9]|[12]\\d|3[01])|(?:0[469]|11)-(?:0[1-9]|[12]\\d|30)|(?:02)-(?:0[1-9]|1\\d|2[0-8])))T(?:(?:[01]\\d|2[0-3]):[0-5]\\d:[0-5]\\d(?:\\.\\d+)?(?:Z|([+-](?:[01]\\d|2[0-3]):[0-5]\\d)))$",
+              "type": "string"
+            }
+          },
+          {
+            "name": "to",
+            "required": false,
+            "in": "query",
+            "description": "Range end as an ISO timestamp, no later than server time. Requires from; cannot be combined with since. The service tolerates up to 60 seconds of request delay or clock skew.",
+            "schema": {
+              "format": "date-time",
+              "pattern": "^(?:(?:\\d\\d[2468][048]|\\d\\d[13579][26]|\\d\\d0[48]|[02468][048]00|[13579][26]00)-02-29|\\d{4}-(?:(?:0[13578]|1[02])-(?:0[1-9]|[12]\\d|3[01])|(?:0[469]|11)-(?:0[1-9]|[12]\\d|30)|(?:02)-(?:0[1-9]|1\\d|2[0-8])))T(?:(?:[01]\\d|2[0-3]):[0-5]\\d:[0-5]\\d(?:\\.\\d+)?(?:Z|([+-](?:[01]\\d|2[0-3]):[0-5]\\d)))$",
+              "type": "string"
+            }
+          },
+          {
+            "name": "attributes",
+            "required": false,
+            "in": "query",
+            "description": "Up to eight distinct measurements. Defaults to query_rate, query_duration_p50, query_duration_p95, query_duration_p99, query_error_rate, query_timeout_rate. Supply a comma-separated list. Allowed measurements: query_rate, query_error_rate, query_timeout_rate, query_canceled_rate, query_duration_mean, query_duration_p50, query_duration_p95, query_duration_p99, duckdb_duration_mean, rpc_rate, rpc_duration_mean, rpc_duration_p95.",
+            "schema": { "type": "string" }
+          },
+          {
+            "name": "interval",
+            "required": false,
+            "in": "query",
+            "description": "Defaults to 1m. The effective step increases to stay within 1441 points per series. Rate and latency windows are at least 5m.",
+            "schema": { "type": "string", "enum": ["1m", "5m", "10m", "30m", "1h", "1d"] }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "",
+            "content": {
+              "application/json": {
+                "schema": { "$ref": "#/components/schemas/V2WarehouseQueryStatsResponse_Output" }
+              }
+            }
+          },
+          "400": {
+            "description": "validation_failed: Invalid measurement selection, range, interval, or query parameter",
+            "content": {
+              "application/json": { "schema": { "$ref": "#/components/schemas/ErrorResponseBody" } }
+            }
+          },
+          "401": {
+            "description": "Unauthorized",
+            "content": {
+              "application/json": { "schema": { "$ref": "#/components/schemas/ErrorResponseBody" } }
+            }
+          },
+          "402": {
+            "description": "This feature requires the Pro, Team, or Enterprise organization plan.",
+            "content": {
+              "application/json": { "schema": { "$ref": "#/components/schemas/ErrorResponseBody" } }
+            }
+          },
+          "403": {
+            "description": "Forbidden action",
+            "content": {
+              "application/json": { "schema": { "$ref": "#/components/schemas/ErrorResponseBody" } }
+            }
+          },
+          "404": {
+            "description": "Project not found",
+            "content": {
+              "application/json": { "schema": { "$ref": "#/components/schemas/ErrorResponseBody" } }
+            }
+          },
+          "429": {
+            "description": "Rate limit exceeded",
+            "content": {
+              "application/json": { "schema": { "$ref": "#/components/schemas/ErrorResponseBody" } }
+            }
+          },
+          "503": {
+            "description": "warehouse_metrics_unavailable: Metrics query capacity is temporarily unavailable; retry after a short delay. warehouse_setup_unavailable: Warehouse feature or project metadata unavailable.",
+            "content": {
+              "application/json": { "schema": { "$ref": "#/components/schemas/ErrorResponseBody" } }
+            }
+          }
+        },
+        "security": [{ "bearer": [] }],
+        "summary": "Inspect Warehouse workload query statistics",
+        "tags": ["Projects Warehouse"],
+        "x-allowed-plans": ["Pro", "Team", "Enterprise"],
+        "x-badges": [
+          { "name": "OAuth scope: database:read", "position": "after" },
+          { "name": "Only available on Pro, Team, Enterprise", "position": "before" },
+          { "name": "Alpha", "position": "before" }
+        ],
+        "x-endpoint-owners": ["pipelines"],
+        "x-fga-permissions": [["database_read"]],
+        "x-oauth-scope": "database:read",
+        "x-operation": { "group": "warehouse.inspect", "method": "query-stats" },
+        "x-scalar-stability": "experimental"
+      }
+    },
+    "/v2/projects/{ref}/warehouse": {
+      "delete": {
+        "description": "Stops replication and removes the Warehouse publication, FDW and dependent foreign tables, reader group, catalog access and query routing asynchronously. Stored Warehouse data is retained by default. Set delete_data=true to permanently delete the managed catalog schema and dedicated Storage bucket; destination SQL and Storage write permissions are also required. Legacy shared buckets and source Postgres tables are preserved. Reader memberships are not restored on re-enablement. Safe retries return the existing cleanup identity; changing an in-progress data policy returns a conflict. Poll the linked teardown for completion or partial cleanup failures.\n\nThis endpoint is currently in its **Alpha** stage.",
+        "operationId": "v2-disable-warehouse",
+        "parameters": [
+          {
+            "name": "ref",
+            "required": true,
+            "in": "path",
+            "description": "Project ref",
+            "schema": {
+              "minLength": 20,
+              "maxLength": 20,
+              "pattern": "^[a-z]+$",
+              "example": "abcdefghijklmnopqrst",
+              "type": "string"
+            }
+          },
+          {
+            "name": "delete_data",
+            "required": false,
+            "in": "query",
+            "description": "Permanently delete managed Warehouse data. Defaults to false (retain data). Source Postgres tables and legacy shared buckets are preserved.",
+            "schema": { "type": "boolean", "default": false }
+          }
+        ],
+        "responses": {
+          "202": {
+            "links": {
+              "teardown": {
+                "operationId": "v2-get-warehouse-teardown",
+                "parameters": {
+                  "ref": "$request.path.ref",
+                  "operation_id": "$response.body#/data/id"
+                }
+              }
+            },
+            "description": "",
+            "content": {
+              "application/json": {
+                "schema": { "$ref": "#/components/schemas/V2WarehouseTeardownResponse_Output" }
+              }
+            }
+          },
+          "400": {
+            "description": "Invalid deletion option or unmanaged destination",
+            "content": {
+              "application/json": { "schema": { "$ref": "#/components/schemas/ErrorResponseBody" } }
+            }
+          },
+          "401": {
+            "description": "Unauthorized",
+            "content": {
+              "application/json": { "schema": { "$ref": "#/components/schemas/ErrorResponseBody" } }
+            }
+          },
+          "402": {
+            "description": "This feature requires the Pro, Team, or Enterprise organization plan.",
+            "content": {
+              "application/json": { "schema": { "$ref": "#/components/schemas/ErrorResponseBody" } }
+            }
+          },
+          "403": {
+            "description": "Forbidden action",
+            "content": {
+              "application/json": { "schema": { "$ref": "#/components/schemas/ErrorResponseBody" } }
+            }
+          },
+          "409": {
+            "description": "Warehouse mutation or cleanup policy conflict",
+            "content": {
+              "application/json": { "schema": { "$ref": "#/components/schemas/ErrorResponseBody" } }
+            }
+          },
+          "429": {
+            "description": "Rate limit exceeded",
+            "content": {
+              "application/json": { "schema": { "$ref": "#/components/schemas/ErrorResponseBody" } }
+            }
+          },
+          "503": {
+            "description": "Warehouse cleanup unavailable",
+            "content": {
+              "application/json": { "schema": { "$ref": "#/components/schemas/ErrorResponseBody" } }
+            }
+          }
+        },
+        "security": [{ "bearer": [] }],
+        "summary": "Disable Warehouse replication and access",
+        "tags": ["Projects Warehouse"],
+        "x-allowed-plans": ["Pro", "Team", "Enterprise"],
+        "x-badges": [
+          { "name": "OAuth scope: database:write", "position": "after" },
+          { "name": "Only available on Pro, Team, Enterprise", "position": "before" },
+          { "name": "Alpha", "position": "before" }
+        ],
+        "x-endpoint-owners": ["pipelines"],
+        "x-fga-permissions": [["project_admin_write", "database_write"]],
+        "x-oauth-scope": "database:write",
+        "x-operation": { "group": "warehouse", "method": "disable" },
+        "x-scalar-stability": "experimental"
+      }
+    },
+    "/v2/projects/{ref}/warehouse/teardowns/current": {
+      "get": {
+        "description": "Reads the current durable cleanup state without contacting ETL or inspecting the FDW. Disabling means cleanup is in progress; disabled means cleanup completed; deletion_failed means cleanup may be partial. The original data policy and failure reason remain available. Optionally supply operation_id to observe a specific disable attempt. Returns a conflict if no cleanup state is available or the supplied identity does not match the current operation.\n\nThis endpoint is currently in its **Alpha** stage.",
+        "operationId": "v2-get-warehouse-teardown",
+        "parameters": [
+          {
+            "name": "ref",
+            "required": true,
+            "in": "path",
+            "description": "Project ref",
+            "schema": {
+              "minLength": 20,
+              "maxLength": 20,
+              "pattern": "^[a-z]+$",
+              "example": "abcdefghijklmnopqrst",
+              "type": "string"
+            }
+          },
+          {
+            "name": "operation_id",
+            "required": false,
+            "in": "query",
+            "description": "Optional cleanup operation identity returned by disable. Omit to read the current cleanup; when supplied, a different current operation returns a conflict.",
+            "schema": {
+              "format": "uuid",
+              "pattern": "^([0-9a-fA-F]{8}-[0-9a-fA-F]{4}-[1-8][0-9a-fA-F]{3}-[89abAB][0-9a-fA-F]{3}-[0-9a-fA-F]{12}|00000000-0000-0000-0000-000000000000|ffffffff-ffff-ffff-ffff-ffffffffffff)$",
+              "type": "string"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "",
+            "content": {
+              "application/json": {
+                "schema": { "$ref": "#/components/schemas/V2WarehouseTeardownResponse_Output" }
+              }
+            }
+          },
+          "401": {
+            "description": "Unauthorized",
+            "content": {
+              "application/json": { "schema": { "$ref": "#/components/schemas/ErrorResponseBody" } }
+            }
+          },
+          "403": {
+            "description": "Forbidden action",
+            "content": {
+              "application/json": { "schema": { "$ref": "#/components/schemas/ErrorResponseBody" } }
+            }
+          },
+          "409": {
+            "description": "Cleanup state is unavailable or the supplied operation identity is no longer current",
+            "content": {
+              "application/json": { "schema": { "$ref": "#/components/schemas/ErrorResponseBody" } }
+            }
+          },
+          "429": {
+            "description": "Rate limit exceeded",
+            "content": {
+              "application/json": { "schema": { "$ref": "#/components/schemas/ErrorResponseBody" } }
+            }
+          },
+          "503": {
+            "description": "Warehouse cleanup state unavailable",
+            "content": {
+              "application/json": { "schema": { "$ref": "#/components/schemas/ErrorResponseBody" } }
+            }
+          }
+        },
+        "security": [{ "bearer": [] }],
+        "summary": "Get Warehouse cleanup status",
+        "tags": ["Projects Warehouse"],
+        "x-badges": [
+          { "name": "OAuth scope: database:read", "position": "after" },
+          { "name": "Alpha", "position": "before" }
+        ],
+        "x-endpoint-owners": ["pipelines"],
+        "x-fga-permissions": [["database_read"]],
+        "x-oauth-scope": "database:read",
+        "x-operation": {
+          "group": "warehouse.teardowns",
+          "method": "get",
+          "poll": {
+            "status": "/data/attributes/lifecycle_status",
+            "succeeded": ["disabled"],
+            "failed": ["deletion_failed"],
+            "error": "/data/attributes/cleanup_error"
+          }
+        },
+        "x-scalar-stability": "experimental"
+      }
+    },
+    "/v2/projects/{ref}/warehouse/enable": {
+      "post": {
+        "description": "Enables replication for the currently eligible tables in a schema, or the named tables in that schema. Resolves source identities under the mutation lock without a preview or revision. Repeating the same selection is safe; a different existing selection is rejected. Schema selection excludes future tables; selected partition roots include future partitions. Acceptance does not imply completed synchronization.\n\nThis endpoint is currently in its **Alpha** stage.",
+        "operationId": "v2-enable-warehouse",
+        "parameters": [
+          {
+            "name": "ref",
+            "required": true,
+            "in": "path",
+            "description": "Project ref",
+            "schema": {
+              "minLength": 20,
+              "maxLength": 20,
+              "pattern": "^[a-z]+$",
+              "example": "abcdefghijklmnopqrst",
+              "type": "string"
+            }
+          }
+        ],
+        "requestBody": {
+          "required": true,
+          "content": {
+            "application/json": {
+              "schema": { "$ref": "#/components/schemas/V2WarehouseEnableRequest" }
+            }
+          }
+        },
+        "responses": {
+          "202": {
+            "links": {
+              "setup": {
+                "operationId": "v2-get-warehouse-setup",
+                "parameters": {
+                  "ref": "$request.path.ref",
+                  "selection_id": "$response.body#/data/attributes/selection_id"
+                }
+              }
+            },
+            "description": "",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/V2WarehouseEnableAcceptedResponse_Output"
+                }
+              }
+            }
+          },
+          "400": {
+            "description": "Empty or unsupported selection",
+            "content": {
+              "application/json": { "schema": { "$ref": "#/components/schemas/ErrorResponseBody" } }
+            }
+          },
+          "401": {
+            "description": "Unauthorized",
+            "content": {
+              "application/json": { "schema": { "$ref": "#/components/schemas/ErrorResponseBody" } }
+            }
+          },
+          "402": {
+            "description": "This feature requires the Pro, Team, or Enterprise organization plan.",
+            "content": {
+              "application/json": { "schema": { "$ref": "#/components/schemas/ErrorResponseBody" } }
+            }
+          },
+          "403": {
+            "description": "Forbidden action",
+            "content": {
+              "application/json": { "schema": { "$ref": "#/components/schemas/ErrorResponseBody" } }
+            }
+          },
+          "409": {
+            "description": "Existing selection or lifecycle conflict",
+            "content": {
+              "application/json": { "schema": { "$ref": "#/components/schemas/ErrorResponseBody" } }
+            }
+          },
+          "429": {
+            "description": "Rate limit exceeded",
+            "content": {
+              "application/json": { "schema": { "$ref": "#/components/schemas/ErrorResponseBody" } }
+            }
+          },
+          "503": {
+            "description": "Warehouse setup unavailable",
+            "content": {
+              "application/json": { "schema": { "$ref": "#/components/schemas/ErrorResponseBody" } }
+            }
+          }
+        },
+        "security": [{ "bearer": [] }],
+        "summary": "Enable Warehouse replication",
+        "tags": ["Projects Warehouse"],
+        "x-allowed-plans": ["Pro", "Team", "Enterprise"],
+        "x-badges": [
+          { "name": "OAuth scope: database:write", "position": "after" },
+          { "name": "Only available on Pro, Team, Enterprise", "position": "before" },
+          { "name": "Alpha", "position": "before" }
+        ],
+        "x-endpoint-owners": ["pipelines"],
+        "x-fga-permissions": [["project_admin_write", "database_write"]],
+        "x-oauth-scope": "database:write",
+        "x-operation": { "group": "warehouse", "method": "enable" },
+        "x-scalar-stability": "experimental"
+      }
+    },
+    "/v2/projects/{ref}/warehouse/setups": {
+      "post": {
+        "description": "Replaces the full selection, preserving existing placement and destination settings. Resolves source identities under the mutation lock. Empty selections asynchronously disable Warehouse while retaining data. FDW installation is opt-in. Acceptance does not imply completed synchronization.\n\nThis endpoint is currently in its **Alpha** stage.",
+        "operationId": "v2-create-warehouse-setup",
+        "parameters": [
+          {
+            "name": "ref",
+            "required": true,
+            "in": "path",
+            "description": "Project ref",
+            "schema": {
+              "minLength": 20,
+              "maxLength": 20,
+              "pattern": "^[a-z]+$",
+              "example": "abcdefghijklmnopqrst",
+              "type": "string"
+            }
+          }
+        ],
+        "requestBody": {
+          "required": true,
+          "content": {
+            "application/json": {
+              "schema": { "$ref": "#/components/schemas/V2WarehouseSetupRequest" }
+            }
+          }
+        },
+        "responses": {
+          "202": {
+            "description": "",
+            "content": {
+              "application/json": {
+                "schema": { "$ref": "#/components/schemas/V2WarehouseSetupAcceptedResponse_Output" }
+              }
+            }
+          },
+          "400": {
+            "description": "Empty or unsupported selection",
+            "content": {
+              "application/json": { "schema": { "$ref": "#/components/schemas/ErrorResponseBody" } }
+            }
+          },
+          "401": {
+            "description": "Unauthorized",
+            "content": {
+              "application/json": { "schema": { "$ref": "#/components/schemas/ErrorResponseBody" } }
+            }
+          },
+          "402": {
+            "description": "This feature requires the Pro, Team, or Enterprise organization plan.",
+            "content": {
+              "application/json": { "schema": { "$ref": "#/components/schemas/ErrorResponseBody" } }
+            }
+          },
+          "403": {
+            "description": "Forbidden action",
+            "content": {
+              "application/json": { "schema": { "$ref": "#/components/schemas/ErrorResponseBody" } }
+            }
+          },
+          "409": {
+            "description": "Source identity or lifecycle conflict",
+            "content": {
+              "application/json": { "schema": { "$ref": "#/components/schemas/ErrorResponseBody" } }
+            }
+          },
+          "429": {
+            "description": "Rate limit exceeded",
+            "content": {
+              "application/json": { "schema": { "$ref": "#/components/schemas/ErrorResponseBody" } }
+            }
+          },
+          "503": {
+            "description": "Warehouse setup unavailable",
+            "content": {
+              "application/json": { "schema": { "$ref": "#/components/schemas/ErrorResponseBody" } }
+            }
+          }
+        },
+        "security": [{ "bearer": [] }],
+        "summary": "Set up Warehouse or replace its replication selection",
+        "tags": ["Projects Warehouse"],
+        "x-allowed-plans": ["Pro", "Team", "Enterprise"],
+        "x-badges": [
+          { "name": "OAuth scope: database:write", "position": "after" },
+          { "name": "Only available on Pro, Team, Enterprise", "position": "before" },
+          { "name": "Alpha", "position": "before" }
+        ],
+        "x-endpoint-owners": ["pipelines"],
+        "x-fga-permissions": [["project_admin_write", "database_write"]],
+        "x-oauth-scope": "database:write",
+        "x-operation": { "group": "warehouse.setups", "method": "create" },
+        "x-scalar-stability": "experimental"
+      }
+    },
+    "/v2/projects/{ref}/warehouse/setups/current": {
+      "get": {
+        "description": "Returns setup phases, linked tables, pipeline and routing state, cleanup errors, and optional FDW inspection. Set inspect_fdw=false to skip database FDW inspection. A null table replication_state means no observation is available. Status succeeded requires initial copy, a running pipeline and ready routing; it does not verify query connectivity. Pass the selection_id returned by enable to reject a changed selection while waiting.\n\nThis endpoint is currently in its **Alpha** stage.",
+        "operationId": "v2-get-warehouse-setup",
+        "parameters": [
+          {
+            "name": "ref",
+            "required": true,
+            "in": "path",
+            "description": "Project ref",
+            "schema": {
+              "minLength": 20,
+              "maxLength": 20,
+              "pattern": "^[a-z]+$",
+              "example": "abcdefghijklmnopqrst",
+              "type": "string"
+            }
+          },
+          {
+            "name": "inspect_fdw",
+            "required": false,
+            "in": "query",
+            "description": "Inspect database FDW state. Defaults to true for current-status reads and false when selection_id is supplied.",
+            "schema": { "type": "string", "enum": ["true", "false"] }
+          },
+          {
+            "name": "selection_id",
+            "required": false,
+            "in": "query",
+            "description": "Accepted selection identity returned by enable. A different current nonempty selection returns a conflict.",
+            "schema": { "pattern": "^[a-f0-9]{64}$", "type": "string" }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "",
+            "content": {
+              "application/json": {
+                "schema": { "$ref": "#/components/schemas/V2WarehouseSetupStatusResponse_Output" }
+              }
+            }
+          },
+          "401": {
+            "description": "Unauthorized",
+            "content": {
+              "application/json": { "schema": { "$ref": "#/components/schemas/ErrorResponseBody" } }
+            }
+          },
+          "403": {
+            "description": "Forbidden action",
+            "content": {
+              "application/json": { "schema": { "$ref": "#/components/schemas/ErrorResponseBody" } }
+            }
+          },
+          "409": {
+            "description": "The accepted selection changed",
+            "content": {
+              "application/json": { "schema": { "$ref": "#/components/schemas/ErrorResponseBody" } }
+            }
+          },
+          "429": {
+            "description": "Rate limit exceeded",
+            "content": {
+              "application/json": { "schema": { "$ref": "#/components/schemas/ErrorResponseBody" } }
+            }
+          },
+          "503": {
+            "description": "Warehouse status unavailable",
+            "content": {
+              "application/json": { "schema": { "$ref": "#/components/schemas/ErrorResponseBody" } }
+            }
+          }
+        },
+        "security": [{ "bearer": [] }],
+        "summary": "Get Warehouse initial synchronization status",
+        "tags": ["Projects Warehouse"],
+        "x-badges": [
+          { "name": "OAuth scope: database:read", "position": "after" },
+          { "name": "Alpha", "position": "before" }
+        ],
+        "x-endpoint-owners": ["pipelines"],
+        "x-fga-permissions": [["database_read"]],
+        "x-oauth-scope": "database:read",
+        "x-operation": {
+          "group": "warehouse.setups",
+          "method": "get",
+          "poll": {
+            "status": "/data/attributes/status",
+            "succeeded": ["succeeded"],
+            "failed": ["failed"],
+            "error": "/data/attributes/status_error",
+            "inspect": "v2-get-warehouse-status"
+          }
+        },
+        "x-scalar-stability": "experimental"
+      }
+    },
+    "/v2/projects/{ref}/warehouse/status": {
+      "get": {
+        "description": "Returns provisioning, configured compute, replication, cleanup lifecycle and supported capabilities, including when individual dependencies are unavailable. Enabled Warehouse state is independent of the selected table count. Readiness is inferred from configuration and replication; query connectivity is not checked. Does not inspect the FDW. Observation timestamps are retrieval times, separate from table sync lag, pipeline apply lag and feedback age. Read access remains available without a replication entitlement; mutation endpoints enforce their own entitlements and permissions.\n\nThis endpoint is currently in its **Alpha** stage.",
+        "operationId": "v2-get-warehouse-status",
+        "parameters": [
+          {
+            "name": "ref",
+            "required": true,
+            "in": "path",
+            "description": "Project ref",
+            "schema": {
+              "minLength": 20,
+              "maxLength": 20,
+              "pattern": "^[a-z]+$",
+              "example": "abcdefghijklmnopqrst",
+              "type": "string"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "",
+            "content": {
+              "application/json": {
+                "schema": { "$ref": "#/components/schemas/V2WarehouseContextResponse_Output" }
+              }
+            }
+          },
+          "401": {
+            "description": "Unauthorized",
+            "content": {
+              "application/json": { "schema": { "$ref": "#/components/schemas/ErrorResponseBody" } }
+            }
+          },
+          "403": {
+            "description": "Forbidden action",
+            "content": {
+              "application/json": { "schema": { "$ref": "#/components/schemas/ErrorResponseBody" } }
+            }
+          },
+          "429": {
+            "description": "Rate limit exceeded",
+            "content": {
+              "application/json": { "schema": { "$ref": "#/components/schemas/ErrorResponseBody" } }
+            }
+          },
+          "503": {
+            "description": "Warehouse feature or project metadata unavailable",
+            "content": {
+              "application/json": { "schema": { "$ref": "#/components/schemas/ErrorResponseBody" } }
+            }
+          }
+        },
+        "security": [{ "bearer": [] }],
+        "summary": "Get consolidated Warehouse status and capabilities",
+        "tags": ["Projects Warehouse"],
+        "x-badges": [
+          { "name": "OAuth scope: database:read", "position": "after" },
+          { "name": "Alpha", "position": "before" }
+        ],
+        "x-endpoint-owners": ["pipelines"],
+        "x-fga-permissions": [["database_read"]],
+        "x-oauth-scope": "database:read",
+        "x-operation": { "group": "warehouse", "method": "status" },
+        "x-scalar-stability": "experimental"
+      }
+    },
+    "/v2/projects/{ref}/warehouse/connection": {
+      "get": {
+        "description": "Returns the public Arrow Flight SQL endpoint resolved from the project's Warehouse routing, with TLS required on port 443. Status is configured availability and query connectivity is not checked, so DNS readiness does not prove a query will succeed. Login uses a role in the source project database with that role's existing password (postgres uses the project database password), including when the catalog and storage are in another project. The role needs supabase_warehouse_reader membership, which is separate from Management API authorization. No passwords, tokens, catalog credentials or private endpoints are returned, and endpoint, host and port are null unless status is available or pending. Example client: usql -W 'flightsql://postgres@<host>:443?tls=enabled'.\n\nThis endpoint is currently in its **Alpha** stage.",
+        "operationId": "v2-get-warehouse-connection",
+        "parameters": [
+          {
+            "name": "ref",
+            "required": true,
+            "in": "path",
+            "description": "Project ref",
+            "schema": {
+              "minLength": 20,
+              "maxLength": 20,
+              "pattern": "^[a-z]+$",
+              "example": "abcdefghijklmnopqrst",
+              "type": "string"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "",
+            "content": {
+              "application/json": {
+                "schema": { "$ref": "#/components/schemas/V2WarehouseConnectionResponse_Output" }
+              }
+            }
+          },
+          "401": {
+            "description": "Unauthorized",
+            "content": {
+              "application/json": { "schema": { "$ref": "#/components/schemas/ErrorResponseBody" } }
+            }
+          },
+          "403": {
+            "description": "Forbidden action",
+            "content": {
+              "application/json": { "schema": { "$ref": "#/components/schemas/ErrorResponseBody" } }
+            }
+          },
+          "429": {
+            "description": "Rate limit exceeded",
+            "content": {
+              "application/json": { "schema": { "$ref": "#/components/schemas/ErrorResponseBody" } }
+            }
+          },
+          "503": {
+            "description": "Warehouse feature or project metadata unavailable",
+            "content": {
+              "application/json": { "schema": { "$ref": "#/components/schemas/ErrorResponseBody" } }
+            }
+          }
+        },
+        "security": [{ "bearer": [] }],
+        "summary": "Get Warehouse Flight SQL connection details",
+        "tags": ["Projects Warehouse"],
+        "x-badges": [
+          { "name": "OAuth scope: database:read", "position": "after" },
+          { "name": "Alpha", "position": "before" }
+        ],
+        "x-endpoint-owners": ["pipelines"],
+        "x-fga-permissions": [["database_read"]],
+        "x-oauth-scope": "database:read",
+        "x-operation": { "group": "warehouse", "method": "connection" },
+        "x-scalar-stability": "experimental"
+      }
+    },
+    "/v2/projects/{ref}/warehouse/tables": {
+      "get": {
+        "description": "Lists the source tables selected for Warehouse replication with their replication status and freshness, from the same observations as the Warehouse status. Freshness comes from the replication slot that carries each table: its own sync slot until it follows changes, then the pipeline apply slot; one slot never stands in for the other. lag_ms is that slot's flush lag. Postgres reports no lag time for a caught-up slot without new WAL, so lag_ms can be null while replication_feedback.flush_lag_bytes is 0; neither is ever filled with zero when unknown. observed_at is when the API read the replication state, not when data last synchronized. A stopped, failed or unreadable pipeline reports its tables as stopped or unknown rather than live, and keeps each table's last recorded state. Returns an empty list when Warehouse is not set up, its publication is missing, or it is being disabled or failed to clean up.\n\nThis endpoint is currently in its **Alpha** stage.",
+        "operationId": "v2-list-warehouse-tables",
+        "parameters": [
+          {
+            "name": "ref",
+            "required": true,
+            "in": "path",
+            "description": "Project ref",
+            "schema": {
+              "minLength": 20,
+              "maxLength": 20,
+              "pattern": "^[a-z]+$",
+              "example": "abcdefghijklmnopqrst",
+              "type": "string"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "",
+            "content": {
+              "application/json": {
+                "schema": { "$ref": "#/components/schemas/V2WarehouseTablesResponse_Output" }
+              }
+            }
+          },
+          "401": {
+            "description": "Unauthorized",
+            "content": {
+              "application/json": { "schema": { "$ref": "#/components/schemas/ErrorResponseBody" } }
+            }
+          },
+          "403": {
+            "description": "Forbidden action",
+            "content": {
+              "application/json": { "schema": { "$ref": "#/components/schemas/ErrorResponseBody" } }
+            }
+          },
+          "404": {
+            "description": "Warehouse DuckLake destination not found",
+            "content": {
+              "application/json": { "schema": { "$ref": "#/components/schemas/ErrorResponseBody" } }
+            }
+          },
+          "429": {
+            "description": "Rate limit exceeded",
+            "content": {
+              "application/json": { "schema": { "$ref": "#/components/schemas/ErrorResponseBody" } }
+            }
+          },
+          "503": {
+            "description": "Warehouse feature, project metadata or table selection unavailable",
+            "content": {
+              "application/json": { "schema": { "$ref": "#/components/schemas/ErrorResponseBody" } }
+            }
+          }
+        },
+        "security": [{ "bearer": [] }],
+        "summary": "List tables replicated to Warehouse",
+        "tags": ["Projects Warehouse"],
+        "x-badges": [
+          { "name": "OAuth scope: database:read", "position": "after" },
+          { "name": "Alpha", "position": "before" }
+        ],
+        "x-endpoint-owners": ["pipelines"],
+        "x-fga-permissions": [["database_read"]],
+        "x-oauth-scope": "database:read",
+        "x-operation": { "group": "warehouse.tables", "method": "list" },
+        "x-scalar-stability": "experimental"
+      }
+    },
+    "/v2/projects/{ref}/warehouse/tables/{table_id}": {
+      "get": {
+        "description": "Returns one source table selected for Warehouse replication by its source OID, from the same observations and with the same status and freshness attributes as the Warehouse tables list. Returns 404 when the table is not selected for replication, including when Warehouse is not set up, its publication is missing, or it is being disabled.\n\nThis endpoint is currently in its **Alpha** stage.",
+        "operationId": "v2-get-warehouse-table",
+        "parameters": [
+          {
+            "name": "ref",
+            "required": true,
+            "in": "path",
+            "description": "Project ref",
+            "schema": {
+              "minLength": 20,
+              "maxLength": 20,
+              "pattern": "^[a-z]+$",
+              "example": "abcdefghijklmnopqrst",
+              "type": "string"
+            }
+          },
+          {
+            "name": "table_id",
+            "required": true,
+            "in": "path",
+            "description": "Source PostgreSQL table OID, as returned by the Warehouse tables list.",
+            "schema": {
+              "maxLength": 10,
+              "pattern": "^[1-9]\\d*$",
+              "example": "16385",
+              "type": "string"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "",
+            "content": {
+              "application/json": {
+                "schema": { "$ref": "#/components/schemas/V2WarehouseTableResponse_Output" }
+              }
+            }
+          },
+          "401": {
+            "description": "Unauthorized",
+            "content": {
+              "application/json": { "schema": { "$ref": "#/components/schemas/ErrorResponseBody" } }
+            }
+          },
+          "403": {
+            "description": "Forbidden action",
+            "content": {
+              "application/json": { "schema": { "$ref": "#/components/schemas/ErrorResponseBody" } }
+            }
+          },
+          "404": {
+            "description": "Table not replicated to Warehouse, or Warehouse DuckLake destination not found",
+            "content": {
+              "application/json": { "schema": { "$ref": "#/components/schemas/ErrorResponseBody" } }
+            }
+          },
+          "429": {
+            "description": "Rate limit exceeded",
+            "content": {
+              "application/json": { "schema": { "$ref": "#/components/schemas/ErrorResponseBody" } }
+            }
+          },
+          "503": {
+            "description": "Warehouse feature, project metadata or table selection unavailable",
+            "content": {
+              "application/json": { "schema": { "$ref": "#/components/schemas/ErrorResponseBody" } }
+            }
+          }
+        },
+        "security": [{ "bearer": [] }],
+        "summary": "Get a table replicated to Warehouse",
+        "tags": ["Projects Warehouse"],
+        "x-badges": [
+          { "name": "OAuth scope: database:read", "position": "after" },
+          { "name": "Alpha", "position": "before" }
+        ],
+        "x-endpoint-owners": ["pipelines"],
+        "x-fga-permissions": [["database_read"]],
+        "x-oauth-scope": "database:read",
+        "x-operation": { "group": "warehouse.tables", "method": "get" },
+        "x-scalar-stability": "experimental"
+      }
+    },
+    "/v2/projects/{ref}/warehouse/tables/{table_id}/layout": {
+      "get": {
+        "description": "Returns the sorting and partitioning rules saved for one replicated table, by source OID, beside the layout the DuckLake catalog records for it. The two are reported separately and can differ: the replicator applies saved rules when it starts and then hourly, and a stopped pipeline applies them on its next start. observation_status reports whether the catalog was read; desired rules are returned even when it was not. A catalog layout governs files written after it changes and does not establish that existing files are sorted or partitioned. Returns 404 when the table is not replicated, including when Warehouse is not set up, is being disabled or failed to clean up.\n\nThis endpoint is currently in its **Alpha** stage.",
+        "operationId": "v2-get-warehouse-table-layout",
+        "parameters": [
+          {
+            "name": "ref",
+            "required": true,
+            "in": "path",
+            "description": "Project ref",
+            "schema": {
+              "minLength": 20,
+              "maxLength": 20,
+              "pattern": "^[a-z]+$",
+              "example": "abcdefghijklmnopqrst",
+              "type": "string"
+            }
+          },
+          {
+            "name": "table_id",
+            "required": true,
+            "in": "path",
+            "description": "Source PostgreSQL table OID, as returned by the Warehouse tables list.",
+            "schema": {
+              "maxLength": 10,
+              "pattern": "^[1-9]\\d*$",
+              "example": "16385",
+              "type": "string"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "",
+            "content": {
+              "application/json": {
+                "schema": { "$ref": "#/components/schemas/V2WarehouseTableLayoutResponse_Output" }
+              }
+            }
+          },
+          "401": {
+            "description": "Unauthorized",
+            "content": {
+              "application/json": { "schema": { "$ref": "#/components/schemas/ErrorResponseBody" } }
+            }
+          },
+          "403": {
+            "description": "Forbidden action",
+            "content": {
+              "application/json": { "schema": { "$ref": "#/components/schemas/ErrorResponseBody" } }
+            }
+          },
+          "404": {
+            "description": "Table not replicated to Warehouse",
+            "content": {
+              "application/json": { "schema": { "$ref": "#/components/schemas/ErrorResponseBody" } }
+            }
+          },
+          "429": {
+            "description": "Rate limit exceeded",
+            "content": {
+              "application/json": { "schema": { "$ref": "#/components/schemas/ErrorResponseBody" } }
+            }
+          },
+          "503": {
+            "description": "Warehouse feature, project metadata or table layout unavailable",
+            "content": {
+              "application/json": { "schema": { "$ref": "#/components/schemas/ErrorResponseBody" } }
+            }
+          }
+        },
+        "security": [{ "bearer": [] }],
+        "summary": "Get the layout of a table replicated to Warehouse",
+        "tags": ["Projects Warehouse"],
+        "x-badges": [
+          { "name": "OAuth scope: database:read", "position": "after" },
+          { "name": "Alpha", "position": "before" }
+        ],
+        "x-endpoint-owners": ["pipelines"],
+        "x-fga-permissions": [["database_read"]],
+        "x-oauth-scope": "database:read",
+        "x-operation": { "group": "warehouse.tables.layout", "method": "get" },
+        "x-scalar-stability": "experimental"
+      },
+      "patch": {
+        "description": "Updates saved sorting and partitioning rules for one source table object identifier (OID). Provide sort_by or partition_by; empty and reset-only patches are rejected. Omitted settings are preserved. Null makes a setting unmanaged. An empty partition list clears partitioning, and the none sort selector clears sorting. The backend validates the source schema and preserves other tables. When the layout changes, an active pipeline is restarted. A stopped pipeline stays stopped. reset_table defaults to false, preserving historical files and replication progress. When the layout changes, --reset-table resets the table and copies it again. This requires initial sync to be enabled. Reads are disrupted during the copy. An unchanged layout never restarts the pipeline or resets the table. Acceptance and application_status report orchestration. Run warehouse tables layout get to compare the desired and observed rules. Run warehouse tables get to check table replication status. These reads do not establish completion of this specific update. There is no revision, idempotency, resolved preview, or durable operation contract. A failed update can leave partial effects, including a completed reset. Inspect the saved layout, pipeline, and table state before retrying.\n\nThis endpoint is currently in its **Alpha** stage.",
+        "operationId": "v2-update-warehouse-table-layout",
+        "parameters": [
+          {
+            "name": "ref",
+            "required": true,
+            "in": "path",
+            "description": "Project ref",
+            "schema": {
+              "minLength": 20,
+              "maxLength": 20,
+              "pattern": "^[a-z]+$",
+              "example": "abcdefghijklmnopqrst",
+              "type": "string"
+            }
+          },
+          {
+            "name": "table_id",
+            "required": true,
+            "in": "path",
+            "description": "Source PostgreSQL table OID, as returned by the Warehouse tables list.",
+            "schema": {
+              "maxLength": 10,
+              "pattern": "^[1-9]\\d*$",
+              "example": "16385",
+              "type": "string"
+            }
+          }
+        ],
+        "requestBody": {
+          "required": true,
+          "content": {
+            "application/json": {
+              "schema": { "$ref": "#/components/schemas/V2WarehouseTableLayoutUpdateRequest" }
+            }
+          }
+        },
+        "responses": {
+          "202": {
+            "description": "",
+            "content": {
+              "application/json": {
+                "schema": { "$ref": "#/components/schemas/V2WarehouseTableLayoutResponse_Output" }
+              }
+            }
+          },
+          "400": {
+            "description": "Invalid layout or source schema",
+            "content": {
+              "application/json": { "schema": { "$ref": "#/components/schemas/ErrorResponseBody" } }
+            }
+          },
+          "401": {
+            "description": "Unauthorized",
+            "content": {
+              "application/json": { "schema": { "$ref": "#/components/schemas/ErrorResponseBody" } }
+            }
+          },
+          "402": {
+            "description": "This feature requires the Pro, Team, or Enterprise organization plan.",
+            "content": {
+              "application/json": { "schema": { "$ref": "#/components/schemas/ErrorResponseBody" } }
+            }
+          },
+          "403": {
+            "description": "Forbidden action",
+            "content": {
+              "application/json": { "schema": { "$ref": "#/components/schemas/ErrorResponseBody" } }
+            }
+          },
+          "404": {
+            "description": "Warehouse pipeline or replicated table not found",
+            "content": {
+              "application/json": { "schema": { "$ref": "#/components/schemas/ErrorResponseBody" } }
+            }
+          },
+          "409": {
+            "description": "Warehouse or pipeline mutation conflict, or reset requested without initial sync",
+            "content": {
+              "application/json": { "schema": { "$ref": "#/components/schemas/ErrorResponseBody" } }
+            }
+          },
+          "429": {
+            "description": "Rate limit exceeded",
+            "content": {
+              "application/json": { "schema": { "$ref": "#/components/schemas/ErrorResponseBody" } }
+            }
+          },
+          "503": {
+            "description": "Layout update unavailable or outcome uncertain; inspect the saved layout, pipeline, and table state before retrying",
+            "content": {
+              "application/json": { "schema": { "$ref": "#/components/schemas/ErrorResponseBody" } }
+            }
+          }
+        },
+        "security": [{ "bearer": [] }],
+        "summary": "Update the layout of a table replicated to Warehouse",
+        "tags": ["Projects Warehouse"],
+        "x-allowed-plans": ["Pro", "Team", "Enterprise"],
+        "x-badges": [
+          { "name": "OAuth scope: database:write", "position": "after" },
+          { "name": "Only available on Pro, Team, Enterprise", "position": "before" },
+          { "name": "Alpha", "position": "before" }
+        ],
+        "x-endpoint-owners": ["pipelines"],
+        "x-fga-permissions": [["project_admin_write", "database_write"]],
+        "x-oauth-scope": "database:write",
+        "x-operation": { "group": "warehouse.tables.layout", "method": "update" },
+        "x-scalar-stability": "experimental"
+      }
+    },
     "/v2/projects/{ref}/analytics/log-drains": {
       "get": {
         "operationId": "v2-list-log-drains",
@@ -563,6 +1805,66 @@
           ]
         ],
         "x-scalar-stability": "experimental"
+      }
+    },
+    "/v2/projects/{ref}/functions": {
+      "delete": {
+        "operationId": "v2-delete-project-function",
+        "parameters": [
+          {
+            "name": "ref",
+            "required": true,
+            "in": "path",
+            "description": "Project ref",
+            "schema": {
+              "minLength": 20,
+              "maxLength": 20,
+              "pattern": "^[a-z]+$",
+              "example": "abcdefghijklmnopqrst",
+              "type": "string"
+            }
+          }
+        ],
+        "responses": {
+          "204": { "description": "" },
+          "401": {
+            "description": "Unauthorized",
+            "content": {
+              "application/json": { "schema": { "$ref": "#/components/schemas/ErrorResponseBody" } }
+            }
+          },
+          "403": {
+            "description": "Forbidden action",
+            "content": {
+              "application/json": { "schema": { "$ref": "#/components/schemas/ErrorResponseBody" } }
+            }
+          },
+          "404": {
+            "description": "Project not found",
+            "content": {
+              "application/json": { "schema": { "$ref": "#/components/schemas/ErrorResponseBody" } }
+            }
+          },
+          "429": {
+            "description": "Rate limit exceeded",
+            "content": {
+              "application/json": { "schema": { "$ref": "#/components/schemas/ErrorResponseBody" } }
+            }
+          },
+          "500": {
+            "description": "Failed to delete project functions",
+            "content": {
+              "application/json": { "schema": { "$ref": "#/components/schemas/ErrorResponseBody" } }
+            }
+          }
+        },
+        "security": [{ "bearer": [] }],
+        "summary": "Deletes all Edge Functions from a project",
+        "tags": ["Projects"],
+        "x-badges": [{ "name": "OAuth scope: edge_functions:write", "position": "after" }],
+        "x-endpoint-owners": ["support-tooling", "functions"],
+        "x-fga-permissions": [["edge_functions_write"]],
+        "x-oauth-scope": "edge_functions:write"
       }
     },
     "/v2/projects/{ref}/notebooks": {
@@ -14225,6 +15527,2256 @@
   "components": {
     "securitySchemes": { "bearer": { "scheme": "bearer", "bearerFormat": "JWT", "type": "http" } },
     "schemas": {
+      "V2WarehouseCapacityResponse_Output": {
+        "type": "object",
+        "properties": {
+          "data": {
+            "type": "array",
+            "items": {
+              "type": "object",
+              "properties": {
+                "type": {
+                  "type": "string",
+                  "description": "Resource type.",
+                  "enum": ["warehouse_metric"]
+                },
+                "id": {
+                  "type": "string",
+                  "enum": [
+                    "query_rate",
+                    "query_error_rate",
+                    "query_timeout_rate",
+                    "query_canceled_rate",
+                    "query_duration_mean",
+                    "query_duration_p50",
+                    "query_duration_p95",
+                    "query_duration_p99",
+                    "duckdb_duration_mean",
+                    "assignment_wait_mean",
+                    "assignment_wait_p95",
+                    "query_in_flight",
+                    "admission_rejection_rate",
+                    "worker_admission_limit",
+                    "worker_admission_active",
+                    "worker_admission_pending",
+                    "worker_admission_occupied",
+                    "activation_rate",
+                    "activation_duration_mean",
+                    "activation_duration_p95",
+                    "rpc_rate",
+                    "rpc_duration_mean",
+                    "rpc_duration_p95"
+                  ]
+                },
+                "attributes": {
+                  "type": "object",
+                  "properties": {
+                    "project_ref": { "type": "string" },
+                    "metric": {
+                      "type": "string",
+                      "enum": [
+                        "query_rate",
+                        "query_error_rate",
+                        "query_timeout_rate",
+                        "query_canceled_rate",
+                        "query_duration_mean",
+                        "query_duration_p50",
+                        "query_duration_p95",
+                        "query_duration_p99",
+                        "duckdb_duration_mean",
+                        "assignment_wait_mean",
+                        "assignment_wait_p95",
+                        "query_in_flight",
+                        "admission_rejection_rate",
+                        "worker_admission_limit",
+                        "worker_admission_active",
+                        "worker_admission_pending",
+                        "worker_admission_occupied",
+                        "activation_rate",
+                        "activation_duration_mean",
+                        "activation_duration_p95",
+                        "rpc_rate",
+                        "rpc_duration_mean",
+                        "rpc_duration_p95"
+                      ]
+                    },
+                    "unit": {
+                      "type": "string",
+                      "enum": ["per_second", "seconds", "queries", "grants"]
+                    },
+                    "aggregation": {
+                      "type": "string",
+                      "enum": ["rate", "sum", "mean", "p50", "p95", "p99", "occupied"]
+                    },
+                    "definition": { "type": "string" },
+                    "requested": {
+                      "type": "object",
+                      "properties": {
+                        "metric": {
+                          "type": "string",
+                          "enum": [
+                            "query_rate",
+                            "query_error_rate",
+                            "query_timeout_rate",
+                            "query_canceled_rate",
+                            "query_duration_mean",
+                            "query_duration_p50",
+                            "query_duration_p95",
+                            "query_duration_p99",
+                            "duckdb_duration_mean",
+                            "assignment_wait_mean",
+                            "assignment_wait_p95",
+                            "query_in_flight",
+                            "admission_rejection_rate",
+                            "worker_admission_limit",
+                            "worker_admission_active",
+                            "worker_admission_pending",
+                            "worker_admission_occupied",
+                            "activation_rate",
+                            "activation_duration_mean",
+                            "activation_duration_p95",
+                            "rpc_rate",
+                            "rpc_duration_mean",
+                            "rpc_duration_p95"
+                          ]
+                        },
+                        "start": { "type": "number" },
+                        "end": { "type": "number" },
+                        "step": { "type": "number" }
+                      },
+                      "required": ["metric", "start", "end"]
+                    },
+                    "effective": {
+                      "type": "object",
+                      "properties": {
+                        "start": { "type": "number" },
+                        "end": { "type": "number" },
+                        "step": { "type": "number" },
+                        "rate_window_seconds": { "type": "number" }
+                      },
+                      "required": ["start", "end", "step", "rate_window_seconds"]
+                    },
+                    "scrape_interval_seconds": { "type": "number" },
+                    "availability": {
+                      "type": "string",
+                      "enum": [
+                        "ok",
+                        "partial",
+                        "stale",
+                        "no_data",
+                        "insufficient_data",
+                        "not_provisioned",
+                        "disabled",
+                        "unavailable"
+                      ]
+                    },
+                    "last_sample_at": {
+                      "description": "Latest observed source sample timestamp in Unix seconds; not the query evaluation timestamp.",
+                      "type": "number",
+                      "nullable": true
+                    },
+                    "series": {
+                      "type": "array",
+                      "items": {
+                        "type": "object",
+                        "properties": {
+                          "labels": {
+                            "type": "object",
+                            "additionalProperties": { "type": "string" }
+                          },
+                          "points": {
+                            "type": "array",
+                            "items": {
+                              "type": "object",
+                              "properties": {
+                                "timestamp": { "type": "number" },
+                                "value": { "type": "number", "nullable": true }
+                              },
+                              "required": ["timestamp", "value"]
+                            }
+                          },
+                          "coverage": {
+                            "type": "object",
+                            "properties": {
+                              "returned_points": { "type": "number" },
+                              "expected_points": { "type": "number" }
+                            },
+                            "required": ["returned_points", "expected_points"],
+                            "description": "Grid point coverage, not proof that every worker was scraped."
+                          }
+                        },
+                        "required": ["labels", "points", "coverage"]
+                      }
+                    }
+                  },
+                  "required": [
+                    "project_ref",
+                    "metric",
+                    "unit",
+                    "aggregation",
+                    "definition",
+                    "requested",
+                    "effective",
+                    "scrape_interval_seconds",
+                    "availability",
+                    "last_sample_at",
+                    "series"
+                  ]
+                }
+              },
+              "required": ["type", "id", "attributes"]
+            }
+          }
+        },
+        "required": ["data"]
+      },
+      "APIErrorObject": {
+        "type": "object",
+        "properties": {
+          "id": { "type": "string" },
+          "code": {
+            "type": "string",
+            "enum": [
+              "bad_request",
+              "forbidden",
+              "internal_server_error",
+              "not_found",
+              "payment_required",
+              "rate_limit_exceeded",
+              "request_timeout",
+              "request_too_large",
+              "unauthorized",
+              "validation_failed",
+              "warehouse_selection_empty",
+              "warehouse_selection_conflict",
+              "warehouse_selection_changed",
+              "warehouse_lifecycle_conflict",
+              "warehouse_setup_invalid",
+              "warehouse_not_found",
+              "warehouse_metrics_unavailable",
+              "warehouse_setup_unavailable",
+              "agentic_credential_not_found",
+              "backup_unsupported",
+              "branch_admin_required",
+              "compute_build_context_too_large",
+              "compute_build_in_progress",
+              "compute_deploy_rate_limit_exceeded",
+              "compute_instance_limit_exceeded",
+              "compute_instance_not_found",
+              "compute_not_enabled",
+              "compute_request_rejected",
+              "compute_unavailable",
+              "notebook_cell_duplicate",
+              "notebook_cell_unknown",
+              "notebook_disabled",
+              "notebook_not_found",
+              "notebook_sort_invalid",
+              "organization_invitation_email_delivery_failed",
+              "organization_invitations_partially_failed",
+              "organization_inviter_email_missing",
+              "organization_role_name_invalid",
+              "organization_role_not_entitled",
+              "pagination_cursor_invalid",
+              "project_branch_resync_unsupported",
+              "project_not_found",
+              "project_privatelink_disabled",
+              "project_transfer_disabled",
+              "delivery_not_found",
+              "endpoint_disabled",
+              "endpoint_event_type_not_subscribed",
+              "endpoint_not_found",
+              "endpoint_url_unresolvable",
+              "webhooks_access_disabled"
+            ]
+          },
+          "message": { "type": "string" },
+          "description": { "type": "string" },
+          "links": {
+            "type": "object",
+            "additionalProperties": {
+              "type": "object",
+              "properties": {
+                "href": { "type": "string" },
+                "rel": { "type": "string" },
+                "title": { "type": "string" },
+                "type": { "type": "string" },
+                "describedby": { "type": "string" },
+                "meta": { "type": "object", "additionalProperties": {} }
+              },
+              "required": ["href"]
+            }
+          },
+          "meta": { "type": "object", "additionalProperties": {} },
+          "issues": {
+            "type": "array",
+            "items": {
+              "type": "object",
+              "properties": {
+                "id": { "type": "string" },
+                "code": { "type": "string" },
+                "message": { "type": "string" },
+                "description": { "type": "string" },
+                "links": {
+                  "type": "object",
+                  "additionalProperties": {
+                    "type": "object",
+                    "properties": {
+                      "href": { "type": "string" },
+                      "rel": { "type": "string" },
+                      "title": { "type": "string" },
+                      "type": { "type": "string" },
+                      "describedby": { "type": "string" },
+                      "meta": { "type": "object", "additionalProperties": {} }
+                    },
+                    "required": ["href"]
+                  }
+                },
+                "meta": { "type": "object", "additionalProperties": {} }
+              },
+              "required": ["code", "message"]
+            }
+          }
+        },
+        "required": ["code", "message"],
+        "ref": "APIErrorObject"
+      },
+      "ErrorResponseBody": {
+        "type": "object",
+        "properties": { "error": { "$ref": "#/components/schemas/APIErrorObject" } },
+        "required": ["error"]
+      },
+      "V2WarehouseQueryStatsResponse_Output": {
+        "type": "object",
+        "properties": {
+          "data": {
+            "type": "array",
+            "items": {
+              "type": "object",
+              "properties": {
+                "type": {
+                  "type": "string",
+                  "description": "Resource type.",
+                  "enum": ["warehouse_metric"]
+                },
+                "id": {
+                  "type": "string",
+                  "enum": [
+                    "query_rate",
+                    "query_error_rate",
+                    "query_timeout_rate",
+                    "query_canceled_rate",
+                    "query_duration_mean",
+                    "query_duration_p50",
+                    "query_duration_p95",
+                    "query_duration_p99",
+                    "duckdb_duration_mean",
+                    "assignment_wait_mean",
+                    "assignment_wait_p95",
+                    "query_in_flight",
+                    "admission_rejection_rate",
+                    "worker_admission_limit",
+                    "worker_admission_active",
+                    "worker_admission_pending",
+                    "worker_admission_occupied",
+                    "activation_rate",
+                    "activation_duration_mean",
+                    "activation_duration_p95",
+                    "rpc_rate",
+                    "rpc_duration_mean",
+                    "rpc_duration_p95"
+                  ]
+                },
+                "attributes": {
+                  "type": "object",
+                  "properties": {
+                    "project_ref": { "type": "string" },
+                    "metric": {
+                      "type": "string",
+                      "enum": [
+                        "query_rate",
+                        "query_error_rate",
+                        "query_timeout_rate",
+                        "query_canceled_rate",
+                        "query_duration_mean",
+                        "query_duration_p50",
+                        "query_duration_p95",
+                        "query_duration_p99",
+                        "duckdb_duration_mean",
+                        "assignment_wait_mean",
+                        "assignment_wait_p95",
+                        "query_in_flight",
+                        "admission_rejection_rate",
+                        "worker_admission_limit",
+                        "worker_admission_active",
+                        "worker_admission_pending",
+                        "worker_admission_occupied",
+                        "activation_rate",
+                        "activation_duration_mean",
+                        "activation_duration_p95",
+                        "rpc_rate",
+                        "rpc_duration_mean",
+                        "rpc_duration_p95"
+                      ]
+                    },
+                    "unit": {
+                      "type": "string",
+                      "enum": ["per_second", "seconds", "queries", "grants"]
+                    },
+                    "aggregation": {
+                      "type": "string",
+                      "enum": ["rate", "sum", "mean", "p50", "p95", "p99", "occupied"]
+                    },
+                    "definition": { "type": "string" },
+                    "requested": {
+                      "type": "object",
+                      "properties": {
+                        "metric": {
+                          "type": "string",
+                          "enum": [
+                            "query_rate",
+                            "query_error_rate",
+                            "query_timeout_rate",
+                            "query_canceled_rate",
+                            "query_duration_mean",
+                            "query_duration_p50",
+                            "query_duration_p95",
+                            "query_duration_p99",
+                            "duckdb_duration_mean",
+                            "assignment_wait_mean",
+                            "assignment_wait_p95",
+                            "query_in_flight",
+                            "admission_rejection_rate",
+                            "worker_admission_limit",
+                            "worker_admission_active",
+                            "worker_admission_pending",
+                            "worker_admission_occupied",
+                            "activation_rate",
+                            "activation_duration_mean",
+                            "activation_duration_p95",
+                            "rpc_rate",
+                            "rpc_duration_mean",
+                            "rpc_duration_p95"
+                          ]
+                        },
+                        "start": { "type": "number" },
+                        "end": { "type": "number" },
+                        "step": { "type": "number" }
+                      },
+                      "required": ["metric", "start", "end"]
+                    },
+                    "effective": {
+                      "type": "object",
+                      "properties": {
+                        "start": { "type": "number" },
+                        "end": { "type": "number" },
+                        "step": { "type": "number" },
+                        "rate_window_seconds": { "type": "number" }
+                      },
+                      "required": ["start", "end", "step", "rate_window_seconds"]
+                    },
+                    "scrape_interval_seconds": { "type": "number" },
+                    "availability": {
+                      "type": "string",
+                      "enum": [
+                        "ok",
+                        "partial",
+                        "stale",
+                        "no_data",
+                        "insufficient_data",
+                        "not_provisioned",
+                        "disabled",
+                        "unavailable"
+                      ]
+                    },
+                    "last_sample_at": {
+                      "description": "Latest observed source sample timestamp in Unix seconds; not the query evaluation timestamp.",
+                      "type": "number",
+                      "nullable": true
+                    },
+                    "series": {
+                      "type": "array",
+                      "items": {
+                        "type": "object",
+                        "properties": {
+                          "labels": {
+                            "type": "object",
+                            "additionalProperties": { "type": "string" }
+                          },
+                          "points": {
+                            "type": "array",
+                            "items": {
+                              "type": "object",
+                              "properties": {
+                                "timestamp": { "type": "number" },
+                                "value": { "type": "number", "nullable": true }
+                              },
+                              "required": ["timestamp", "value"]
+                            }
+                          },
+                          "coverage": {
+                            "type": "object",
+                            "properties": {
+                              "returned_points": { "type": "number" },
+                              "expected_points": { "type": "number" }
+                            },
+                            "required": ["returned_points", "expected_points"],
+                            "description": "Grid point coverage, not proof that every worker was scraped."
+                          }
+                        },
+                        "required": ["labels", "points", "coverage"]
+                      }
+                    }
+                  },
+                  "required": [
+                    "project_ref",
+                    "metric",
+                    "unit",
+                    "aggregation",
+                    "definition",
+                    "requested",
+                    "effective",
+                    "scrape_interval_seconds",
+                    "availability",
+                    "last_sample_at",
+                    "series"
+                  ]
+                }
+              },
+              "required": ["type", "id", "attributes"]
+            }
+          }
+        },
+        "required": ["data"]
+      },
+      "V2WarehouseTeardownResponse_Output": {
+        "type": "object",
+        "properties": {
+          "data": {
+            "type": "object",
+            "properties": {
+              "type": {
+                "type": "string",
+                "description": "Resource type.",
+                "enum": ["warehouse_teardown"]
+              },
+              "id": {
+                "type": "string",
+                "format": "uuid",
+                "pattern": "^([0-9a-fA-F]{8}-[0-9a-fA-F]{4}-[1-8][0-9a-fA-F]{3}-[89abAB][0-9a-fA-F]{3}-[0-9a-fA-F]{12}|00000000-0000-0000-0000-000000000000|ffffffff-ffff-ffff-ffff-ffffffffffff)$"
+              },
+              "attributes": {
+                "type": "object",
+                "properties": {
+                  "lifecycle_status": {
+                    "type": "string",
+                    "enum": ["disabling", "disabled", "deletion_failed"]
+                  },
+                  "delete_data": {
+                    "type": "boolean",
+                    "description": "Whether this cleanup permanently deletes managed Warehouse data. Source Postgres tables are preserved in both modes."
+                  },
+                  "updated_at": {
+                    "type": "string",
+                    "format": "date-time",
+                    "pattern": "^(?:(?:\\d\\d[2468][048]|\\d\\d[13579][26]|\\d\\d0[48]|[02468][048]00|[13579][26]00)-02-29|\\d{4}-(?:(?:0[13578]|1[02])-(?:0[1-9]|[12]\\d|3[01])|(?:0[469]|11)-(?:0[1-9]|[12]\\d|30)|(?:02)-(?:0[1-9]|1\\d|2[0-8])))T(?:(?:[01]\\d|2[0-3]):[0-5]\\d:[0-5]\\d(?:\\.\\d+)?(?:Z|([+-](?:[01]\\d|2[0-3]):[0-5]\\d)))$"
+                  },
+                  "cleanup_error": {
+                    "description": "Last cleanup failure, or null when none was recorded. Failed cleanup can leave partially removed resources; retry disable with the same data policy.",
+                    "type": "string",
+                    "nullable": true
+                  }
+                },
+                "required": ["lifecycle_status", "delete_data", "updated_at", "cleanup_error"]
+              }
+            },
+            "required": ["type", "id", "attributes"]
+          }
+        },
+        "required": ["data"]
+      },
+      "V2WarehouseEnableRequest": {
+        "type": "object",
+        "properties": {
+          "data": {
+            "type": "object",
+            "properties": {
+              "type": {
+                "type": "string",
+                "description": "Resource type.",
+                "enum": ["warehouse_setup"]
+              },
+              "attributes": {
+                "type": "object",
+                "properties": {
+                  "warehouse_region": {
+                    "description": "Optional Warehouse compute region, independent of the source and catalog regions. Defaults to the existing assignment, or ap-southeast-1 in staging and eu-west-1 in production for a new assignment. DNS routing requires a registered cluster in that environment. Unsupported regions and changes to an existing assignment are rejected. Ignored when targets is empty.",
+                    "example": "ap-southeast-1",
+                    "type": "string",
+                    "minLength": 1
+                  },
+                  "destination_project_ref": {
+                    "description": "Supabase project to use for both the DuckLake PostgreSQL catalog and Supabase Storage. Defaults to this project on first setup and to the configured destination on later requests. The destination must be active and healthy, and another project requires SQL and Storage admin write permissions. An existing destination cannot be changed through setup. Ignored when targets is empty.",
+                    "example": "zyxwvutsrqponmlkjihg",
+                    "type": "string",
+                    "minLength": 20,
+                    "maxLength": 20,
+                    "pattern": "^[a-z]+$"
+                  },
+                  "install_fdw": {
+                    "description": "Whether to configure and install the Warehouse FDW in the project database. Defaults to false. Ignored when targets is empty.",
+                    "example": false,
+                    "type": "boolean"
+                  },
+                  "schema": {
+                    "type": "string",
+                    "minLength": 1,
+                    "description": "Source PostgreSQL schema. Without tables, selects its currently eligible tables only.",
+                    "example": "public"
+                  },
+                  "tables": {
+                    "description": "Table names in schema. Omit to select the currently eligible tables in that schema.",
+                    "x-ignore-array-items-must-be-objects": true,
+                    "minItems": 1,
+                    "type": "array",
+                    "items": { "type": "string", "minLength": 1 }
+                  }
+                },
+                "required": ["schema"],
+                "additionalProperties": false
+              }
+            },
+            "required": ["type", "attributes"]
+          }
+        },
+        "required": ["data"]
+      },
+      "V2WarehouseEnableAcceptedResponse_Output": {
+        "type": "object",
+        "properties": {
+          "data": {
+            "type": "object",
+            "properties": {
+              "type": {
+                "type": "string",
+                "description": "Resource type.",
+                "enum": ["warehouse_setup"]
+              },
+              "id": { "type": "string" },
+              "attributes": {
+                "type": "object",
+                "properties": {
+                  "tables": {
+                    "type": "array",
+                    "items": {
+                      "type": "object",
+                      "properties": {
+                        "schema": {
+                          "type": "string",
+                          "minLength": 1,
+                          "description": "Postgres schema name",
+                          "example": "public"
+                        },
+                        "name": {
+                          "type": "string",
+                          "minLength": 1,
+                          "description": "Postgres table name",
+                          "example": "orders"
+                        },
+                        "state": {
+                          "type": "string",
+                          "enum": ["syncing", "live", "error"],
+                          "description": "Warehouse copy sync state derived from replication status",
+                          "example": "live"
+                        },
+                        "lag_ms": {
+                          "description": "Replication lag in milliseconds, when available",
+                          "example": 12000,
+                          "type": "integer",
+                          "minimum": 0,
+                          "maximum": 9007199254740991
+                        },
+                        "last_synced_at": {
+                          "description": "Last sync timestamp, when available",
+                          "example": "2026-06-23T17:48:00Z",
+                          "type": "string",
+                          "format": "date-time",
+                          "pattern": "^(?:(?:\\d\\d[2468][048]|\\d\\d[13579][26]|\\d\\d0[48]|[02468][048]00|[13579][26]00)-02-29|\\d{4}-(?:(?:0[13578]|1[02])-(?:0[1-9]|[12]\\d|3[01])|(?:0[469]|11)-(?:0[1-9]|[12]\\d|30)|(?:02)-(?:0[1-9]|1\\d|2[0-8])))T(?:(?:[01]\\d|2[0-3]):[0-5]\\d:[0-5]\\d(?:\\.\\d+)?(?:Z))$"
+                        },
+                        "copy_name": {
+                          "type": "string",
+                          "description": "DuckLake table path with individually quoted identifiers, including the configured project namespace when present",
+                          "example": "\"abcjuqabhgwjjutfvtpa\".\"public\".\"orders\""
+                        },
+                        "warehouse_size_bytes": {
+                          "description": "Warehouse table size in bytes, when available",
+                          "example": 197912092672,
+                          "type": "integer",
+                          "minimum": 0,
+                          "maximum": 9007199254740991
+                        }
+                      },
+                      "required": ["schema", "name", "state", "copy_name"]
+                    },
+                    "description": "Tables with Warehouse copies"
+                  },
+                  "pipeline_id": {
+                    "type": "string",
+                    "minLength": 1,
+                    "description": "Warehouse replication pipeline ID, or null when Warehouse disable has been requested",
+                    "example": "03dg2o5teb2eucxr9ggh3uie6",
+                    "nullable": true
+                  },
+                  "accepted": { "type": "boolean", "enum": [true] },
+                  "selected_tables": {
+                    "type": "array",
+                    "items": {
+                      "type": "object",
+                      "properties": {
+                        "id": {
+                          "type": "integer",
+                          "exclusiveMinimum": true,
+                          "maximum": 4294967295,
+                          "minimum": 0
+                        },
+                        "schema": { "type": "string", "minLength": 1 },
+                        "name": { "type": "string", "minLength": 1 }
+                      },
+                      "required": ["id", "schema", "name"]
+                    }
+                  },
+                  "selection_id": {
+                    "type": "string",
+                    "pattern": "^[a-f0-9]{64}$",
+                    "description": "Identity of the accepted selection. Pass to the current setup read to reject a changed selection while waiting."
+                  }
+                },
+                "required": ["tables", "pipeline_id", "accepted", "selected_tables", "selection_id"]
+              }
+            },
+            "required": ["type", "id", "attributes"]
+          }
+        },
+        "required": ["data"]
+      },
+      "V2WarehouseSetupRequest": {
+        "type": "object",
+        "properties": {
+          "data": {
+            "type": "object",
+            "properties": {
+              "type": {
+                "type": "string",
+                "description": "Resource type.",
+                "enum": ["warehouse_setup"]
+              },
+              "attributes": {
+                "type": "object",
+                "properties": {
+                  "warehouse_region": {
+                    "description": "Optional Warehouse compute region, independent of the source and catalog regions. Defaults to the existing assignment, or ap-southeast-1 in staging and eu-west-1 in production for a new assignment. DNS routing requires a registered cluster in that environment. Unsupported regions and changes to an existing assignment are rejected. Ignored when targets is empty.",
+                    "example": "ap-southeast-1",
+                    "type": "string",
+                    "minLength": 1
+                  },
+                  "destination_project_ref": {
+                    "description": "Supabase project to use for both the DuckLake PostgreSQL catalog and Supabase Storage. Defaults to this project on first setup and to the configured destination on later requests. The destination must be active and healthy, and another project requires SQL and Storage admin write permissions. An existing destination cannot be changed through setup. Ignored when targets is empty.",
+                    "example": "zyxwvutsrqponmlkjihg",
+                    "type": "string",
+                    "minLength": 20,
+                    "maxLength": 20,
+                    "pattern": "^[a-z]+$"
+                  },
+                  "targets": {
+                    "type": "array",
+                    "items": {
+                      "oneOf": [
+                        {
+                          "type": "object",
+                          "properties": {
+                            "type": { "type": "string", "enum": ["schema"] },
+                            "schema": {
+                              "type": "string",
+                              "minLength": 1,
+                              "description": "Postgres schema whose currently eligible tables should be copied",
+                              "example": "public"
+                            }
+                          },
+                          "required": ["type", "schema"]
+                        },
+                        {
+                          "type": "object",
+                          "properties": {
+                            "type": { "type": "string", "enum": ["table"] },
+                            "schema": {
+                              "type": "string",
+                              "minLength": 1,
+                              "description": "Postgres schema name",
+                              "example": "public"
+                            },
+                            "name": {
+                              "type": "string",
+                              "minLength": 1,
+                              "description": "Postgres table name",
+                              "example": "orders"
+                            }
+                          },
+                          "required": ["type", "schema", "name"]
+                        }
+                      ]
+                    },
+                    "description": "Complete selection of schemas and individual tables to copy, replacing the previous selection. Schema targets expand to the eligible tables present when the request is processed. An empty array asynchronously disables Warehouse while retaining its data. Prefer DELETE to disable Warehouse; poll setup-status for completion."
+                  },
+                  "install_fdw": {
+                    "description": "Whether to configure and install the Warehouse FDW in the project database. Defaults to false. Ignored when targets is empty.",
+                    "example": false,
+                    "type": "boolean"
+                  }
+                },
+                "required": ["targets"],
+                "additionalProperties": false
+              }
+            },
+            "required": ["type", "attributes"]
+          }
+        },
+        "required": ["data"]
+      },
+      "V2WarehouseSetupAcceptedResponse_Output": {
+        "type": "object",
+        "properties": {
+          "data": {
+            "type": "object",
+            "properties": {
+              "type": {
+                "type": "string",
+                "description": "Resource type.",
+                "enum": ["warehouse_setup"]
+              },
+              "id": { "type": "string" },
+              "attributes": {
+                "type": "object",
+                "properties": {
+                  "tables": {
+                    "type": "array",
+                    "items": {
+                      "type": "object",
+                      "properties": {
+                        "schema": {
+                          "type": "string",
+                          "minLength": 1,
+                          "description": "Postgres schema name",
+                          "example": "public"
+                        },
+                        "name": {
+                          "type": "string",
+                          "minLength": 1,
+                          "description": "Postgres table name",
+                          "example": "orders"
+                        },
+                        "state": {
+                          "type": "string",
+                          "enum": ["syncing", "live", "error"],
+                          "description": "Warehouse copy sync state derived from replication status",
+                          "example": "live"
+                        },
+                        "lag_ms": {
+                          "description": "Replication lag in milliseconds, when available",
+                          "example": 12000,
+                          "type": "integer",
+                          "minimum": 0,
+                          "maximum": 9007199254740991
+                        },
+                        "last_synced_at": {
+                          "description": "Last sync timestamp, when available",
+                          "example": "2026-06-23T17:48:00Z",
+                          "type": "string",
+                          "format": "date-time",
+                          "pattern": "^(?:(?:\\d\\d[2468][048]|\\d\\d[13579][26]|\\d\\d0[48]|[02468][048]00|[13579][26]00)-02-29|\\d{4}-(?:(?:0[13578]|1[02])-(?:0[1-9]|[12]\\d|3[01])|(?:0[469]|11)-(?:0[1-9]|[12]\\d|30)|(?:02)-(?:0[1-9]|1\\d|2[0-8])))T(?:(?:[01]\\d|2[0-3]):[0-5]\\d:[0-5]\\d(?:\\.\\d+)?(?:Z))$"
+                        },
+                        "copy_name": {
+                          "type": "string",
+                          "description": "DuckLake table path with individually quoted identifiers, including the configured project namespace when present",
+                          "example": "\"abcjuqabhgwjjutfvtpa\".\"public\".\"orders\""
+                        },
+                        "warehouse_size_bytes": {
+                          "description": "Warehouse table size in bytes, when available",
+                          "example": 197912092672,
+                          "type": "integer",
+                          "minimum": 0,
+                          "maximum": 9007199254740991
+                        }
+                      },
+                      "required": ["schema", "name", "state", "copy_name"]
+                    },
+                    "description": "Tables with Warehouse copies"
+                  },
+                  "pipeline_id": {
+                    "type": "string",
+                    "minLength": 1,
+                    "description": "Warehouse replication pipeline ID, or null when Warehouse disable has been requested",
+                    "example": "03dg2o5teb2eucxr9ggh3uie6",
+                    "nullable": true
+                  },
+                  "accepted": { "type": "boolean", "enum": [true] },
+                  "selected_tables": {
+                    "type": "array",
+                    "items": {
+                      "type": "object",
+                      "properties": {
+                        "id": {
+                          "type": "integer",
+                          "exclusiveMinimum": true,
+                          "maximum": 4294967295,
+                          "minimum": 0
+                        },
+                        "schema": { "type": "string", "minLength": 1 },
+                        "name": { "type": "string", "minLength": 1 }
+                      },
+                      "required": ["id", "schema", "name"]
+                    }
+                  }
+                },
+                "required": ["tables", "pipeline_id", "accepted", "selected_tables"]
+              }
+            },
+            "required": ["type", "id", "attributes"]
+          }
+        },
+        "required": ["data"]
+      },
+      "V2WarehouseSetupStatusResponse_Output": {
+        "type": "object",
+        "properties": {
+          "data": {
+            "type": "object",
+            "properties": {
+              "type": {
+                "type": "string",
+                "description": "Resource type.",
+                "enum": ["warehouse_setup"]
+              },
+              "id": { "type": "string" },
+              "attributes": {
+                "type": "object",
+                "properties": {
+                  "dns": {
+                    "description": "Warehouse DNS delivery status. Ready means the DNS API accepted the route; client DNS caches may still be updating.",
+                    "type": "object",
+                    "properties": {
+                      "hostname": { "type": "string" },
+                      "region": { "type": "string" },
+                      "status": {
+                        "type": "string",
+                        "enum": ["pending", "ready", "error", "removed"]
+                      }
+                    },
+                    "required": ["hostname", "region", "status"]
+                  },
+                  "delete_data": {
+                    "description": "Whether the current disable request deletes DuckLake data.",
+                    "type": "boolean"
+                  },
+                  "error": {
+                    "description": "Warehouse cleanup failure, when present.",
+                    "type": "string"
+                  },
+                  "setup_status": {
+                    "type": "string",
+                    "enum": [
+                      "not_started",
+                      "setting_up",
+                      "copying",
+                      "complete",
+                      "error",
+                      "disabling",
+                      "disabled",
+                      "deletion_failed"
+                    ],
+                    "description": "Overall Warehouse lifecycle status, using persisted state during teardown and replication state during setup",
+                    "example": "copying"
+                  },
+                  "pipeline_id": {
+                    "description": "Warehouse replication pipeline ID when it exists",
+                    "example": "03dg2o5teb2eucxr9ggh3uie6",
+                    "type": "string",
+                    "minLength": 1
+                  },
+                  "steps": {
+                    "type": "array",
+                    "items": {
+                      "type": "object",
+                      "properties": {
+                        "name": {
+                          "type": "string",
+                          "enum": ["warehouse_pipeline", "warehouse_copy", "warehouse_fdw"],
+                          "description": "Observable Warehouse setup phase",
+                          "example": "warehouse_copy"
+                        },
+                        "status": {
+                          "type": "string",
+                          "enum": ["waiting", "running", "completed", "skipped", "error"],
+                          "description": "Derived Warehouse setup step status",
+                          "example": "running"
+                        },
+                        "message": {
+                          "description": "Best-effort progress or error message derived from Warehouse state",
+                          "example": "Pending initial copy: public.orders:copying_table",
+                          "type": "string"
+                        }
+                      },
+                      "required": ["name", "status"]
+                    },
+                    "description": "Warehouse setup phases in execution order"
+                  },
+                  "tables": {
+                    "type": "array",
+                    "items": {
+                      "type": "object",
+                      "properties": {
+                        "schema": {
+                          "type": "string",
+                          "minLength": 1,
+                          "description": "Postgres schema name",
+                          "example": "public"
+                        },
+                        "name": {
+                          "type": "string",
+                          "minLength": 1,
+                          "description": "Postgres table name",
+                          "example": "orders"
+                        },
+                        "state": {
+                          "type": "string",
+                          "enum": ["syncing", "live", "error"],
+                          "description": "Warehouse copy sync state derived from replication status",
+                          "example": "live"
+                        },
+                        "lag_ms": {
+                          "description": "Replication lag in milliseconds, when available",
+                          "example": 12000,
+                          "type": "integer",
+                          "minimum": 0,
+                          "maximum": 9007199254740991
+                        },
+                        "last_synced_at": {
+                          "description": "Last sync timestamp, when available",
+                          "example": "2026-06-23T17:48:00Z",
+                          "type": "string",
+                          "format": "date-time",
+                          "pattern": "^(?:(?:\\d\\d[2468][048]|\\d\\d[13579][26]|\\d\\d0[48]|[02468][048]00|[13579][26]00)-02-29|\\d{4}-(?:(?:0[13578]|1[02])-(?:0[1-9]|[12]\\d|3[01])|(?:0[469]|11)-(?:0[1-9]|[12]\\d|30)|(?:02)-(?:0[1-9]|1\\d|2[0-8])))T(?:(?:[01]\\d|2[0-3]):[0-5]\\d:[0-5]\\d(?:\\.\\d+)?(?:Z))$"
+                        },
+                        "copy_name": {
+                          "type": "string",
+                          "description": "DuckLake table path with individually quoted identifiers, including the configured project namespace when present",
+                          "example": "\"abcjuqabhgwjjutfvtpa\".\"public\".\"orders\""
+                        },
+                        "warehouse_size_bytes": {
+                          "description": "Warehouse table size in bytes, when available",
+                          "example": 197912092672,
+                          "type": "integer",
+                          "minimum": 0,
+                          "maximum": 9007199254740991
+                        },
+                        "id": {
+                          "type": "integer",
+                          "exclusiveMinimum": true,
+                          "maximum": 4294967295,
+                          "minimum": 0
+                        },
+                        "replication_state": { "type": "string", "nullable": true }
+                      },
+                      "required": [
+                        "schema",
+                        "name",
+                        "state",
+                        "copy_name",
+                        "id",
+                        "replication_state"
+                      ]
+                    }
+                  },
+                  "fdw_status": {
+                    "type": "object",
+                    "properties": {
+                      "extension_available": {
+                        "type": "boolean",
+                        "description": "Whether fdw_warehouse is available to install on the project database instance",
+                        "example": true
+                      },
+                      "extension_installed": {
+                        "type": "boolean",
+                        "description": "Whether the fdw_warehouse extension exists in the project database",
+                        "example": true
+                      },
+                      "wrapper_installed": {
+                        "type": "boolean",
+                        "description": "Whether the Warehouse foreign data wrapper exists in the project database",
+                        "example": true
+                      },
+                      "server_configured": {
+                        "type": "boolean",
+                        "description": "Whether the Warehouse foreign server exists in the project database",
+                        "example": true
+                      },
+                      "schema_created": {
+                        "type": "boolean",
+                        "description": "Whether the local Warehouse schema exists in the project database",
+                        "example": true
+                      },
+                      "foreign_schema_imported": {
+                        "type": "boolean",
+                        "description": "Whether the Warehouse foreign schema import has exposed the Warehouse snapshots table",
+                        "example": true
+                      }
+                    },
+                    "required": [
+                      "extension_available",
+                      "extension_installed",
+                      "wrapper_installed",
+                      "server_configured",
+                      "schema_created",
+                      "foreign_schema_imported"
+                    ],
+                    "description": "Project database FDW setup markers; null during or after teardown, when setup inspection is inapplicable.",
+                    "nullable": true
+                  },
+                  "status": {
+                    "type": "string",
+                    "enum": ["running", "succeeded", "failed"],
+                    "description": "Current enablement readiness. Success requires initial copy, a running pipeline and ready routing; this is not a historical operation result or a query connectivity check."
+                  },
+                  "status_error": {
+                    "description": "Reason current enablement readiness failed. Separate from Studio setup or cleanup errors.",
+                    "type": "string"
+                  },
+                  "replication_state": { "type": "string" }
+                },
+                "required": [
+                  "setup_status",
+                  "steps",
+                  "tables",
+                  "fdw_status",
+                  "status",
+                  "replication_state"
+                ]
+              }
+            },
+            "required": ["type", "id", "attributes"]
+          }
+        },
+        "required": ["data"]
+      },
+      "V2WarehouseContextResponse_Output": {
+        "type": "object",
+        "properties": {
+          "data": {
+            "type": "object",
+            "properties": {
+              "type": {
+                "type": "string",
+                "description": "Resource type.",
+                "enum": ["warehouse_context"]
+              },
+              "id": {
+                "type": "string",
+                "minLength": 20,
+                "maxLength": 20,
+                "pattern": "^[a-z]+$",
+                "description": "Project ref",
+                "example": "abcdefghijklmnopqrst"
+              },
+              "attributes": {
+                "type": "object",
+                "properties": {
+                  "project_ref": {
+                    "type": "string",
+                    "minLength": 20,
+                    "maxLength": 20,
+                    "pattern": "^[a-z]+$",
+                    "description": "Project ref",
+                    "example": "abcdefghijklmnopqrst"
+                  },
+                  "observed_at": {
+                    "type": "string",
+                    "format": "date-time",
+                    "pattern": "^(?:(?:\\d\\d[2468][048]|\\d\\d[13579][26]|\\d\\d0[48]|[02468][048]00|[13579][26]00)-02-29|\\d{4}-(?:(?:0[13578]|1[02])-(?:0[1-9]|[12]\\d|3[01])|(?:0[469]|11)-(?:0[1-9]|[12]\\d|30)|(?:02)-(?:0[1-9]|1\\d|2[0-8])))T(?:(?:[01]\\d|2[0-3]):[0-5]\\d:[0-5]\\d(?:\\.\\d+)?(?:Z))$"
+                  },
+                  "enabled": {
+                    "description": "Whether Warehouse is enabled, independently of selected table count. Null means provisioning could not be determined.",
+                    "type": "boolean",
+                    "nullable": true
+                  },
+                  "configured_readiness": {
+                    "type": "string",
+                    "enum": ["ready", "not_ready", "unavailable"],
+                    "description": "Readiness inferred from configuration and replication observations; no query is executed."
+                  },
+                  "query_connectivity": { "type": "string", "enum": ["not_checked"] },
+                  "status": {
+                    "type": "string",
+                    "enum": [
+                      "not_provisioned",
+                      "disabled",
+                      "disabling",
+                      "starting",
+                      "ready",
+                      "stopped",
+                      "stopping",
+                      "degraded",
+                      "unavailable"
+                    ],
+                    "description": "Warehouse setup and replication status. Ready means the Warehouse connection is configured and tables are replicating ongoing changes. It does not guarantee that a query will succeed."
+                  },
+                  "lifecycle": {
+                    "type": "object",
+                    "properties": {
+                      "status": {
+                        "type": "string",
+                        "enum": ["disabling", "disabled", "deletion_failed"]
+                      },
+                      "updated_at": {
+                        "type": "string",
+                        "format": "date-time",
+                        "pattern": "^(?:(?:\\d\\d[2468][048]|\\d\\d[13579][26]|\\d\\d0[48]|[02468][048]00|[13579][26]00)-02-29|\\d{4}-(?:(?:0[13578]|1[02])-(?:0[1-9]|[12]\\d|3[01])|(?:0[469]|11)-(?:0[1-9]|[12]\\d|30)|(?:02)-(?:0[1-9]|1\\d|2[0-8])))T(?:(?:[01]\\d|2[0-3]):[0-5]\\d:[0-5]\\d(?:\\.\\d+)?(?:Z))$"
+                      },
+                      "delete_data": { "type": "boolean" }
+                    },
+                    "required": ["status", "updated_at", "delete_data"],
+                    "nullable": true
+                  },
+                  "compute": {
+                    "type": "object",
+                    "properties": {
+                      "status": {
+                        "type": "string",
+                        "enum": ["available", "unavailable", "not_provisioned"]
+                      },
+                      "region": { "type": "string", "nullable": true },
+                      "routing_status": {
+                        "type": "string",
+                        "enum": ["pending", "ready", "error", "removed", null],
+                        "nullable": true
+                      },
+                      "observed_at": {
+                        "type": "string",
+                        "format": "date-time",
+                        "pattern": "^(?:(?:\\d\\d[2468][048]|\\d\\d[13579][26]|\\d\\d0[48]|[02468][048]00|[13579][26]00)-02-29|\\d{4}-(?:(?:0[13578]|1[02])-(?:0[1-9]|[12]\\d|3[01])|(?:0[469]|11)-(?:0[1-9]|[12]\\d|30)|(?:02)-(?:0[1-9]|1\\d|2[0-8])))T(?:(?:[01]\\d|2[0-3]):[0-5]\\d:[0-5]\\d(?:\\.\\d+)?(?:Z))$",
+                        "description": "Time the API retrieved this information. This timestamp does not indicate when data was measured or last synchronized.",
+                        "nullable": true
+                      },
+                      "unavailable_reason": {
+                        "type": "string",
+                        "enum": [
+                          "assignment_unavailable",
+                          "observation_unavailable",
+                          "identity_mismatch",
+                          "cleanup_in_progress",
+                          "cleanup_failed",
+                          null
+                        ],
+                        "nullable": true
+                      }
+                    },
+                    "required": [
+                      "status",
+                      "region",
+                      "routing_status",
+                      "observed_at",
+                      "unavailable_reason"
+                    ],
+                    "description": "Configured Warehouse compute and region, which may differ from the source database region. Live availability and capacity are not reported."
+                  },
+                  "pipeline": {
+                    "type": "object",
+                    "properties": {
+                      "id": { "type": "string", "minLength": 1 },
+                      "status": {
+                        "type": "string",
+                        "enum": [
+                          "stopped",
+                          "starting",
+                          "started",
+                          "stopping",
+                          "unknown",
+                          "failed",
+                          "unavailable"
+                        ]
+                      },
+                      "observed_at": {
+                        "type": "string",
+                        "format": "date-time",
+                        "pattern": "^(?:(?:\\d\\d[2468][048]|\\d\\d[13579][26]|\\d\\d0[48]|[02468][048]00|[13579][26]00)-02-29|\\d{4}-(?:(?:0[13578]|1[02])-(?:0[1-9]|[12]\\d|3[01])|(?:0[469]|11)-(?:0[1-9]|[12]\\d|30)|(?:02)-(?:0[1-9]|1\\d|2[0-8])))T(?:(?:[01]\\d|2[0-3]):[0-5]\\d:[0-5]\\d(?:\\.\\d+)?(?:Z))$",
+                        "description": "Time the API retrieved this information. This timestamp does not indicate when data was measured or last synchronized.",
+                        "nullable": true
+                      },
+                      "unavailable_reason": {
+                        "type": "string",
+                        "enum": [
+                          "assignment_unavailable",
+                          "observation_unavailable",
+                          "identity_mismatch",
+                          "cleanup_in_progress",
+                          "cleanup_failed",
+                          null
+                        ],
+                        "nullable": true
+                      }
+                    },
+                    "required": ["id", "status", "observed_at", "unavailable_reason"],
+                    "nullable": true
+                  },
+                  "replication": {
+                    "type": "object",
+                    "properties": {
+                      "status": {
+                        "type": "string",
+                        "enum": [
+                          "available",
+                          "unavailable",
+                          "not_provisioned",
+                          "not_started",
+                          "stopped"
+                        ]
+                      },
+                      "observed_at": {
+                        "type": "string",
+                        "format": "date-time",
+                        "pattern": "^(?:(?:\\d\\d[2468][048]|\\d\\d[13579][26]|\\d\\d0[48]|[02468][048]00|[13579][26]00)-02-29|\\d{4}-(?:(?:0[13578]|1[02])-(?:0[1-9]|[12]\\d|3[01])|(?:0[469]|11)-(?:0[1-9]|[12]\\d|30)|(?:02)-(?:0[1-9]|1\\d|2[0-8])))T(?:(?:[01]\\d|2[0-3]):[0-5]\\d:[0-5]\\d(?:\\.\\d+)?(?:Z))$",
+                        "description": "Time the API retrieved this information. This timestamp does not indicate when data was measured or last synchronized.",
+                        "nullable": true
+                      },
+                      "apply_lag": {
+                        "type": "object",
+                        "properties": {
+                          "active": { "type": "boolean" },
+                          "wal_status": {
+                            "type": "string",
+                            "enum": ["reserved", "extended", "unreserved", "lost", "unknown", null],
+                            "nullable": true
+                          },
+                          "write_lag_ms": { "type": "number", "minimum": 0, "nullable": true },
+                          "flush_lag_ms": { "type": "number", "minimum": 0, "nullable": true },
+                          "flush_lag_bytes": {
+                            "type": "integer",
+                            "minimum": 0,
+                            "maximum": 9007199254740991,
+                            "nullable": true
+                          },
+                          "feedback_age_ms": { "type": "number", "minimum": 0, "nullable": true }
+                        },
+                        "required": [
+                          "active",
+                          "wal_status",
+                          "write_lag_ms",
+                          "flush_lag_ms",
+                          "flush_lag_bytes",
+                          "feedback_age_ms"
+                        ],
+                        "description": "Postgres replication feedback. Null means Postgres reported no value; lag times also become null shortly after a caught-up slot sees no new WAL, while flush_lag_bytes, the WAL not yet confirmed flushed, reads 0. Feedback age measures time since the last response and does not establish how current query results are.",
+                        "nullable": true
+                      },
+                      "unavailable_reason": {
+                        "type": "string",
+                        "enum": [
+                          "assignment_unavailable",
+                          "observation_unavailable",
+                          "identity_mismatch",
+                          "cleanup_in_progress",
+                          "cleanup_failed",
+                          null
+                        ],
+                        "nullable": true
+                      }
+                    },
+                    "required": ["status", "observed_at", "apply_lag", "unavailable_reason"]
+                  },
+                  "tables": {
+                    "type": "object",
+                    "properties": {
+                      "status": {
+                        "type": "string",
+                        "enum": ["available", "unavailable", "not_provisioned"]
+                      },
+                      "observed_at": {
+                        "type": "string",
+                        "format": "date-time",
+                        "pattern": "^(?:(?:\\d\\d[2468][048]|\\d\\d[13579][26]|\\d\\d0[48]|[02468][048]00|[13579][26]00)-02-29|\\d{4}-(?:(?:0[13578]|1[02])-(?:0[1-9]|[12]\\d|3[01])|(?:0[469]|11)-(?:0[1-9]|[12]\\d|30)|(?:02)-(?:0[1-9]|1\\d|2[0-8])))T(?:(?:[01]\\d|2[0-3]):[0-5]\\d:[0-5]\\d(?:\\.\\d+)?(?:Z))$",
+                        "description": "Time the API retrieved this information. This timestamp does not indicate when data was measured or last synchronized.",
+                        "nullable": true
+                      },
+                      "unavailable_reason": {
+                        "type": "string",
+                        "enum": [
+                          "assignment_unavailable",
+                          "observation_unavailable",
+                          "identity_mismatch",
+                          "cleanup_in_progress",
+                          "cleanup_failed",
+                          null
+                        ],
+                        "nullable": true
+                      },
+                      "items": {
+                        "type": "array",
+                        "items": {
+                          "type": "object",
+                          "properties": {
+                            "id": {
+                              "type": "integer",
+                              "exclusiveMinimum": true,
+                              "maximum": 9007199254740991,
+                              "minimum": 0
+                            },
+                            "schema": { "type": "string" },
+                            "name": { "type": "string" },
+                            "replication_state": {
+                              "type": "string",
+                              "enum": [
+                                "queued",
+                                "copying_table",
+                                "copied_table",
+                                "following_wal",
+                                "error",
+                                null
+                              ],
+                              "nullable": true
+                            },
+                            "sync_lag": {
+                              "type": "object",
+                              "properties": {
+                                "active": { "type": "boolean" },
+                                "wal_status": {
+                                  "type": "string",
+                                  "enum": [
+                                    "reserved",
+                                    "extended",
+                                    "unreserved",
+                                    "lost",
+                                    "unknown",
+                                    null
+                                  ],
+                                  "nullable": true
+                                },
+                                "write_lag_ms": {
+                                  "type": "number",
+                                  "minimum": 0,
+                                  "nullable": true
+                                },
+                                "flush_lag_ms": {
+                                  "type": "number",
+                                  "minimum": 0,
+                                  "nullable": true
+                                },
+                                "flush_lag_bytes": {
+                                  "type": "integer",
+                                  "minimum": 0,
+                                  "maximum": 9007199254740991,
+                                  "nullable": true
+                                },
+                                "feedback_age_ms": {
+                                  "type": "number",
+                                  "minimum": 0,
+                                  "nullable": true
+                                }
+                              },
+                              "required": [
+                                "active",
+                                "wal_status",
+                                "write_lag_ms",
+                                "flush_lag_ms",
+                                "flush_lag_bytes",
+                                "feedback_age_ms"
+                              ],
+                              "description": "Postgres replication feedback. Null means Postgres reported no value; lag times also become null shortly after a caught-up slot sees no new WAL, while flush_lag_bytes, the WAL not yet confirmed flushed, reads 0. Feedback age measures time since the last response and does not establish how current query results are.",
+                              "nullable": true
+                            }
+                          },
+                          "required": ["id", "schema", "name", "replication_state", "sync_lag"]
+                        }
+                      }
+                    },
+                    "required": ["status", "observed_at", "unavailable_reason", "items"]
+                  },
+                  "capabilities": {
+                    "type": "object",
+                    "properties": {
+                      "context": { "type": "boolean" },
+                      "workload_metrics": { "type": "boolean" },
+                      "query_explain": { "type": "boolean" },
+                      "table_layout_read": { "type": "boolean" },
+                      "table_layout_update": { "type": "boolean" },
+                      "replication_add": { "type": "boolean" },
+                      "replication_remove": { "type": "boolean" },
+                      "table_resync": { "type": "boolean" }
+                    },
+                    "required": [
+                      "context",
+                      "workload_metrics",
+                      "query_explain",
+                      "table_layout_read",
+                      "table_layout_update",
+                      "replication_add",
+                      "replication_remove",
+                      "table_resync"
+                    ],
+                    "description": "Complete operations supported by this API, not caller authorization. Each operation still requires its feature, entitlement and project permission checks."
+                  }
+                },
+                "required": [
+                  "project_ref",
+                  "observed_at",
+                  "enabled",
+                  "configured_readiness",
+                  "query_connectivity",
+                  "status",
+                  "lifecycle",
+                  "compute",
+                  "pipeline",
+                  "replication",
+                  "tables",
+                  "capabilities"
+                ]
+              }
+            },
+            "required": ["type", "id", "attributes"]
+          }
+        },
+        "required": ["data"]
+      },
+      "V2WarehouseConnectionResponse_Output": {
+        "type": "object",
+        "properties": {
+          "data": {
+            "type": "object",
+            "properties": {
+              "type": {
+                "type": "string",
+                "description": "Resource type.",
+                "enum": ["warehouse_connection"]
+              },
+              "id": {
+                "type": "string",
+                "minLength": 20,
+                "maxLength": 20,
+                "pattern": "^[a-z]+$",
+                "description": "Project ref",
+                "example": "abcdefghijklmnopqrst"
+              },
+              "attributes": {
+                "type": "object",
+                "properties": {
+                  "project_ref": {
+                    "type": "string",
+                    "minLength": 20,
+                    "maxLength": 20,
+                    "pattern": "^[a-z]+$",
+                    "description": "Project ref",
+                    "example": "abcdefghijklmnopqrst"
+                  },
+                  "observed_at": {
+                    "type": "string",
+                    "format": "date-time",
+                    "pattern": "^(?:(?:\\d\\d[2468][048]|\\d\\d[13579][26]|\\d\\d0[48]|[02468][048]00|[13579][26]00)-02-29|\\d{4}-(?:(?:0[13578]|1[02])-(?:0[1-9]|[12]\\d|3[01])|(?:0[469]|11)-(?:0[1-9]|[12]\\d|30)|(?:02)-(?:0[1-9]|1\\d|2[0-8])))T(?:(?:[01]\\d|2[0-3]):[0-5]\\d:[0-5]\\d(?:\\.\\d+)?(?:Z))$",
+                    "description": "Time the API retrieved this information. This timestamp does not indicate when connectivity was last verified."
+                  },
+                  "status": {
+                    "type": "string",
+                    "enum": [
+                      "available",
+                      "pending",
+                      "not_configured",
+                      "disabling",
+                      "disabled",
+                      "unavailable"
+                    ],
+                    "description": "Configured availability of the Warehouse endpoint, derived from routing and lifecycle state. It is not a connectivity probe: a ready route does not prove a query will succeed."
+                  },
+                  "unavailable_reason": {
+                    "type": "string",
+                    "enum": [
+                      "assignment_unavailable",
+                      "routing_failed",
+                      "observation_unavailable",
+                      "cleanup_failed",
+                      null
+                    ],
+                    "description": "Why the endpoint is unavailable. Null unless status is unavailable.",
+                    "nullable": true
+                  },
+                  "protocol": { "type": "string", "enum": ["arrow_flight_sql"] },
+                  "endpoint": {
+                    "description": "Arrow Flight SQL URI, grpc+tls://<host>:443. Null unless status is available or pending.",
+                    "type": "string",
+                    "nullable": true
+                  },
+                  "host": {
+                    "description": "Public hostname of the Flight SQL endpoint. Null unless status is available or pending.",
+                    "type": "string",
+                    "nullable": true
+                  },
+                  "port": {
+                    "type": "integer",
+                    "minimum": -9007199254740991,
+                    "maximum": 9007199254740991,
+                    "description": "Public TLS port of the Flight SQL endpoint. Null unless status is available or pending.",
+                    "nullable": true
+                  },
+                  "tls_required": { "type": "boolean", "enum": [true] },
+                  "region": {
+                    "description": "Assigned Warehouse compute region, which may differ from the source database region. Null when the project has no project-specific route.",
+                    "type": "string",
+                    "nullable": true
+                  },
+                  "routing_status": {
+                    "type": "string",
+                    "enum": ["pending", "ready", "error", "removed", null],
+                    "description": "DNS delivery status of the project route. Null when the project uses the shared legacy route.",
+                    "nullable": true
+                  },
+                  "authentication": {
+                    "type": "object",
+                    "properties": {
+                      "method": { "type": "string", "enum": ["database_username_password"] },
+                      "credential_source": {
+                        "type": "string",
+                        "enum": ["source_project_database"]
+                      },
+                      "default_username": { "type": "string", "enum": ["postgres"] },
+                      "password_guidance": { "type": "string" },
+                      "required_membership": {
+                        "type": "string",
+                        "enum": ["supabase_warehouse_reader"]
+                      },
+                      "membership_guidance": { "type": "string" }
+                    },
+                    "required": [
+                      "method",
+                      "credential_source",
+                      "default_username",
+                      "password_guidance",
+                      "required_membership",
+                      "membership_guidance"
+                    ],
+                    "description": "How to authenticate. No credentials are returned; the password is never exposed by this API."
+                  },
+                  "access_mode": { "type": "string", "enum": ["read_only"] },
+                  "query_connectivity": { "type": "string", "enum": ["not_checked"] }
+                },
+                "required": [
+                  "project_ref",
+                  "observed_at",
+                  "status",
+                  "unavailable_reason",
+                  "protocol",
+                  "endpoint",
+                  "host",
+                  "port",
+                  "tls_required",
+                  "region",
+                  "routing_status",
+                  "authentication",
+                  "access_mode",
+                  "query_connectivity"
+                ]
+              }
+            },
+            "required": ["type", "id", "attributes"]
+          }
+        },
+        "required": ["data"]
+      },
+      "V2WarehouseTablesResponse_Output": {
+        "type": "object",
+        "properties": {
+          "data": {
+            "type": "array",
+            "items": {
+              "type": "object",
+              "properties": {
+                "type": {
+                  "type": "string",
+                  "description": "Resource type.",
+                  "enum": ["warehouse_table"]
+                },
+                "id": {
+                  "type": "string",
+                  "maxLength": 10,
+                  "pattern": "^[1-9]\\d*$",
+                  "description": "Source PostgreSQL table OID, as returned by the Warehouse tables list.",
+                  "example": "16385"
+                },
+                "attributes": {
+                  "type": "object",
+                  "properties": {
+                    "schema": {
+                      "type": "string",
+                      "description": "Source PostgreSQL schema of the table."
+                    },
+                    "name": { "type": "string", "description": "Source PostgreSQL table name." },
+                    "warehouse_name": {
+                      "type": "string",
+                      "description": "Quoted, fully qualified name of the replicated table in the Warehouse."
+                    },
+                    "status": {
+                      "type": "string",
+                      "enum": ["syncing", "live", "error", "stopped", "unknown"],
+                      "description": "Replication status. error means the table failed to replicate; stopped means the pipeline is stopped, stopping or failed, so the table receives no changes; live means the table follows changes; syncing means it is queued, copying or catching up; unknown means the pipeline status or the table state was not observed, for example before replication starts."
+                    },
+                    "replication_state": {
+                      "type": "string",
+                      "enum": [
+                        "queued",
+                        "copying_table",
+                        "copied_table",
+                        "following_wal",
+                        "error",
+                        null
+                      ],
+                      "description": "Last replication state the pipeline recorded for the table, also while the pipeline is stopped. Null when none was observed.",
+                      "nullable": true
+                    },
+                    "observed_at": {
+                      "type": "string",
+                      "format": "date-time",
+                      "pattern": "^(?:(?:\\d\\d[2468][048]|\\d\\d[13579][26]|\\d\\d0[48]|[02468][048]00|[13579][26]00)-02-29|\\d{4}-(?:(?:0[13578]|1[02])-(?:0[1-9]|[12]\\d|3[01])|(?:0[469]|11)-(?:0[1-9]|[12]\\d|30)|(?:02)-(?:0[1-9]|1\\d|2[0-8])))T(?:(?:[01]\\d|2[0-3]):[0-5]\\d:[0-5]\\d(?:\\.\\d+)?(?:Z))$",
+                      "description": "Time the API retrieved the replication state of the table. It does not indicate when data was last synchronized.",
+                      "nullable": true
+                    },
+                    "replication_feedback": {
+                      "type": "object",
+                      "properties": {
+                        "active": { "type": "boolean" },
+                        "wal_status": {
+                          "type": "string",
+                          "enum": ["reserved", "extended", "unreserved", "lost", "unknown", null],
+                          "nullable": true
+                        },
+                        "write_lag_ms": { "type": "number", "minimum": 0, "nullable": true },
+                        "flush_lag_ms": { "type": "number", "minimum": 0, "nullable": true },
+                        "flush_lag_bytes": {
+                          "type": "integer",
+                          "minimum": 0,
+                          "maximum": 9007199254740991,
+                          "nullable": true
+                        },
+                        "feedback_age_ms": { "type": "number", "minimum": 0, "nullable": true },
+                        "source": {
+                          "type": "string",
+                          "enum": ["table_sync", "pipeline_apply"],
+                          "description": "Replication slot that reported the feedback: the table's own sync slot until it follows changes, or the pipeline apply slot once it does."
+                        }
+                      },
+                      "required": [
+                        "active",
+                        "wal_status",
+                        "write_lag_ms",
+                        "flush_lag_ms",
+                        "flush_lag_bytes",
+                        "feedback_age_ms",
+                        "source"
+                      ],
+                      "description": "Postgres feedback from the replication slot named in source. Null when no feedback is available, including while the pipeline is stopped. Feedback age measures time since the slot last responded and does not establish how current query results are.",
+                      "nullable": true
+                    },
+                    "lag_ms": {
+                      "type": "number",
+                      "minimum": 0,
+                      "description": "Flush lag in milliseconds that Postgres reports for the slot in replication_feedback. Null when there is no feedback or Postgres reports no recent measurement, which includes a caught-up slot without new WAL; replication_feedback.flush_lag_bytes reads 0 in that case.",
+                      "nullable": true
+                    }
+                  },
+                  "required": [
+                    "schema",
+                    "name",
+                    "warehouse_name",
+                    "status",
+                    "replication_state",
+                    "observed_at",
+                    "replication_feedback",
+                    "lag_ms"
+                  ]
+                }
+              },
+              "required": ["type", "id", "attributes"]
+            }
+          }
+        },
+        "required": ["data"]
+      },
+      "V2WarehouseTableResponse_Output": {
+        "type": "object",
+        "properties": {
+          "data": {
+            "type": "object",
+            "properties": {
+              "type": {
+                "type": "string",
+                "description": "Resource type.",
+                "enum": ["warehouse_table"]
+              },
+              "id": {
+                "type": "string",
+                "maxLength": 10,
+                "pattern": "^[1-9]\\d*$",
+                "description": "Source PostgreSQL table OID, as returned by the Warehouse tables list.",
+                "example": "16385"
+              },
+              "attributes": {
+                "type": "object",
+                "properties": {
+                  "schema": {
+                    "type": "string",
+                    "description": "Source PostgreSQL schema of the table."
+                  },
+                  "name": { "type": "string", "description": "Source PostgreSQL table name." },
+                  "warehouse_name": {
+                    "type": "string",
+                    "description": "Quoted, fully qualified name of the replicated table in the Warehouse."
+                  },
+                  "status": {
+                    "type": "string",
+                    "enum": ["syncing", "live", "error", "stopped", "unknown"],
+                    "description": "Replication status. error means the table failed to replicate; stopped means the pipeline is stopped, stopping or failed, so the table receives no changes; live means the table follows changes; syncing means it is queued, copying or catching up; unknown means the pipeline status or the table state was not observed, for example before replication starts."
+                  },
+                  "replication_state": {
+                    "type": "string",
+                    "enum": [
+                      "queued",
+                      "copying_table",
+                      "copied_table",
+                      "following_wal",
+                      "error",
+                      null
+                    ],
+                    "description": "Last replication state the pipeline recorded for the table, also while the pipeline is stopped. Null when none was observed.",
+                    "nullable": true
+                  },
+                  "observed_at": {
+                    "type": "string",
+                    "format": "date-time",
+                    "pattern": "^(?:(?:\\d\\d[2468][048]|\\d\\d[13579][26]|\\d\\d0[48]|[02468][048]00|[13579][26]00)-02-29|\\d{4}-(?:(?:0[13578]|1[02])-(?:0[1-9]|[12]\\d|3[01])|(?:0[469]|11)-(?:0[1-9]|[12]\\d|30)|(?:02)-(?:0[1-9]|1\\d|2[0-8])))T(?:(?:[01]\\d|2[0-3]):[0-5]\\d:[0-5]\\d(?:\\.\\d+)?(?:Z))$",
+                    "description": "Time the API retrieved the replication state of the table. It does not indicate when data was last synchronized.",
+                    "nullable": true
+                  },
+                  "replication_feedback": {
+                    "type": "object",
+                    "properties": {
+                      "active": { "type": "boolean" },
+                      "wal_status": {
+                        "type": "string",
+                        "enum": ["reserved", "extended", "unreserved", "lost", "unknown", null],
+                        "nullable": true
+                      },
+                      "write_lag_ms": { "type": "number", "minimum": 0, "nullable": true },
+                      "flush_lag_ms": { "type": "number", "minimum": 0, "nullable": true },
+                      "flush_lag_bytes": {
+                        "type": "integer",
+                        "minimum": 0,
+                        "maximum": 9007199254740991,
+                        "nullable": true
+                      },
+                      "feedback_age_ms": { "type": "number", "minimum": 0, "nullable": true },
+                      "source": {
+                        "type": "string",
+                        "enum": ["table_sync", "pipeline_apply"],
+                        "description": "Replication slot that reported the feedback: the table's own sync slot until it follows changes, or the pipeline apply slot once it does."
+                      }
+                    },
+                    "required": [
+                      "active",
+                      "wal_status",
+                      "write_lag_ms",
+                      "flush_lag_ms",
+                      "flush_lag_bytes",
+                      "feedback_age_ms",
+                      "source"
+                    ],
+                    "description": "Postgres feedback from the replication slot named in source. Null when no feedback is available, including while the pipeline is stopped. Feedback age measures time since the slot last responded and does not establish how current query results are.",
+                    "nullable": true
+                  },
+                  "lag_ms": {
+                    "type": "number",
+                    "minimum": 0,
+                    "description": "Flush lag in milliseconds that Postgres reports for the slot in replication_feedback. Null when there is no feedback or Postgres reports no recent measurement, which includes a caught-up slot without new WAL; replication_feedback.flush_lag_bytes reads 0 in that case.",
+                    "nullable": true
+                  }
+                },
+                "required": [
+                  "schema",
+                  "name",
+                  "warehouse_name",
+                  "status",
+                  "replication_state",
+                  "observed_at",
+                  "replication_feedback",
+                  "lag_ms"
+                ]
+              }
+            },
+            "required": ["type", "id", "attributes"]
+          }
+        },
+        "required": ["data"]
+      },
+      "V2WarehouseTableLayoutResponse_Output": {
+        "type": "object",
+        "properties": {
+          "data": {
+            "type": "object",
+            "properties": {
+              "type": {
+                "type": "string",
+                "description": "Resource type.",
+                "enum": ["warehouse_table_layout"]
+              },
+              "id": {
+                "type": "string",
+                "maxLength": 10,
+                "pattern": "^[1-9]\\d*$",
+                "description": "Source PostgreSQL table OID, as returned by the Warehouse tables list.",
+                "example": "16385"
+              },
+              "attributes": {
+                "type": "object",
+                "properties": {
+                  "pipeline_id": {
+                    "type": "string",
+                    "description": "Warehouse replication pipeline identity."
+                  },
+                  "schema": {
+                    "type": "string",
+                    "description": "Source PostgreSQL schema of the table."
+                  },
+                  "name": { "type": "string", "description": "Source PostgreSQL table name." },
+                  "application_status": {
+                    "type": "string",
+                    "description": "Backend orchestration state. Runtime acceptance does not establish that the desired layout has been observed in the catalog."
+                  },
+                  "reset_table": {
+                    "type": "boolean",
+                    "description": "Whether this update reset source replication state. False for unchanged layouts and reads; reads do not retain reset history. True does not establish completion of recopy."
+                  },
+                  "desired": {
+                    "type": "object",
+                    "properties": {
+                      "sort_by": {
+                        "anyOf": [
+                          {
+                            "oneOf": [
+                              {
+                                "type": "object",
+                                "properties": { "kind": { "type": "string", "enum": ["none"] } },
+                                "required": ["kind"]
+                              },
+                              {
+                                "type": "object",
+                                "properties": {
+                                  "kind": { "type": "string", "enum": ["primary_key"] }
+                                },
+                                "required": ["kind"]
+                              },
+                              {
+                                "type": "object",
+                                "properties": {
+                                  "kind": { "type": "string", "enum": ["columns"] },
+                                  "columns": {
+                                    "type": "array",
+                                    "items": {
+                                      "type": "object",
+                                      "properties": {
+                                        "name": {
+                                          "type": "string",
+                                          "description": "Source column name."
+                                        },
+                                        "direction": { "type": "string", "enum": ["asc", "desc"] },
+                                        "nulls": {
+                                          "type": "string",
+                                          "enum": ["first", "last", null],
+                                          "description": "Null placement. Null uses DuckLake's default placement.",
+                                          "nullable": true
+                                        }
+                                      },
+                                      "required": ["name", "direction", "nulls"]
+                                    }
+                                  }
+                                },
+                                "required": ["kind", "columns"]
+                              }
+                            ]
+                          },
+                          { "type": "object", "nullable": true, "enum": [null] }
+                        ],
+                        "description": "Configured sort order. none explicitly clears sorting, primary_key sorts by the source primary-key columns in key order, and columns lists them. Null leaves sorting unmanaged."
+                      },
+                      "partition_by": {
+                        "type": "array",
+                        "items": {
+                          "type": "object",
+                          "properties": {
+                            "column": { "type": "string", "description": "Source column name." },
+                            "transform": {
+                              "oneOf": [
+                                {
+                                  "type": "object",
+                                  "properties": {
+                                    "kind": { "type": "string", "enum": ["identity"] }
+                                  },
+                                  "required": ["kind"]
+                                },
+                                {
+                                  "type": "object",
+                                  "properties": { "kind": { "type": "string", "enum": ["year"] } },
+                                  "required": ["kind"]
+                                },
+                                {
+                                  "type": "object",
+                                  "properties": { "kind": { "type": "string", "enum": ["month"] } },
+                                  "required": ["kind"]
+                                },
+                                {
+                                  "type": "object",
+                                  "properties": { "kind": { "type": "string", "enum": ["day"] } },
+                                  "required": ["kind"]
+                                },
+                                {
+                                  "type": "object",
+                                  "properties": { "kind": { "type": "string", "enum": ["hour"] } },
+                                  "required": ["kind"]
+                                },
+                                {
+                                  "type": "object",
+                                  "properties": {
+                                    "kind": { "type": "string", "enum": ["bucket"] },
+                                    "count": {
+                                      "type": "integer",
+                                      "exclusiveMinimum": true,
+                                      "maximum": 2147483647,
+                                      "description": "Number of hash buckets.",
+                                      "minimum": 0
+                                    }
+                                  },
+                                  "required": ["kind", "count"]
+                                }
+                              ]
+                            }
+                          },
+                          "required": ["column", "transform"]
+                        },
+                        "description": "Configured partition keys in order. An empty list explicitly clears partitioning; null leaves it unmanaged.",
+                        "nullable": true
+                      }
+                    },
+                    "required": ["sort_by", "partition_by"],
+                    "description": "Saved layout rules. The replicator applies them on start and hourly, so they can differ from the observed layout."
+                  },
+                  "observation_status": {
+                    "type": "string",
+                    "enum": ["observed", "table_missing", "unavailable", "not_requested"],
+                    "description": "observed when the DuckLake catalog was read, table_missing when the catalog has no table for it yet, unavailable when the catalog could not be read, and not_requested when an update returned without reading the catalog."
+                  },
+                  "observed": {
+                    "type": "object",
+                    "properties": {
+                      "sort_by": {
+                        "type": "array",
+                        "items": {
+                          "type": "object",
+                          "properties": {
+                            "expression": { "type": "string" },
+                            "direction": { "type": "string" },
+                            "nulls": { "type": "string" }
+                          },
+                          "required": ["expression", "direction", "nulls"]
+                        },
+                        "description": "Active sort expressions in key order, as the catalog reports them."
+                      },
+                      "partition_by": {
+                        "type": "array",
+                        "items": {
+                          "type": "object",
+                          "properties": {
+                            "column": { "type": "string" },
+                            "transform": { "type": "string" }
+                          },
+                          "required": ["column", "transform"]
+                        },
+                        "description": "Active partition keys in key order, with transforms as the catalog reports them, for example bucket(16)."
+                      },
+                      "observed_at": {
+                        "type": "string",
+                        "format": "date-time",
+                        "pattern": "^(?:(?:\\d\\d[2468][048]|\\d\\d[13579][26]|\\d\\d0[48]|[02468][048]00|[13579][26]00)-02-29|\\d{4}-(?:(?:0[13578]|1[02])-(?:0[1-9]|[12]\\d|3[01])|(?:0[469]|11)-(?:0[1-9]|[12]\\d|30)|(?:02)-(?:0[1-9]|1\\d|2[0-8])))T(?:(?:[01]\\d|2[0-3]):[0-5]\\d:[0-5]\\d(?:\\.\\d+)?(?:Z))$",
+                        "description": "Time the catalog metadata was read."
+                      }
+                    },
+                    "required": ["sort_by", "partition_by", "observed_at"],
+                    "description": "Layout recorded in the DuckLake catalog, null unless observation_status is observed. Catalog metadata governs files written after it changes and does not establish that existing files are sorted or partitioned.",
+                    "nullable": true
+                  }
+                },
+                "required": [
+                  "pipeline_id",
+                  "schema",
+                  "name",
+                  "application_status",
+                  "reset_table",
+                  "desired",
+                  "observation_status",
+                  "observed"
+                ]
+              }
+            },
+            "required": ["type", "id", "attributes"]
+          }
+        },
+        "required": ["data"]
+      },
+      "V2WarehouseTableLayoutUpdateRequest": {
+        "type": "object",
+        "properties": {
+          "data": {
+            "type": "object",
+            "properties": {
+              "type": {
+                "type": "string",
+                "description": "Resource type.",
+                "enum": ["warehouse_table_layout"]
+              },
+              "attributes": {
+                "type": "object",
+                "properties": {
+                  "reset_table": {
+                    "description": "Defaults to false, preserving historical files and replication progress. When the layout changes, true resets the table and copies it again. This requires initial sync to be enabled. Reads are disrupted during the copy. An unchanged layout never resets the table.",
+                    "type": "boolean"
+                  },
+                  "sort_by": {
+                    "description": "Omit to preserve the saved sorting. Null makes sorting unmanaged. The none selector explicitly clears sorting. Otherwise, supply the complete sort selector.",
+                    "anyOf": [
+                      {
+                        "oneOf": [
+                          {
+                            "type": "object",
+                            "properties": { "kind": { "type": "string", "enum": ["none"] } },
+                            "required": ["kind"],
+                            "additionalProperties": false
+                          },
+                          {
+                            "type": "object",
+                            "properties": { "kind": { "type": "string", "enum": ["primary_key"] } },
+                            "required": ["kind"],
+                            "additionalProperties": false
+                          },
+                          {
+                            "type": "object",
+                            "properties": {
+                              "kind": { "type": "string", "enum": ["columns"] },
+                              "columns": {
+                                "minItems": 1,
+                                "type": "array",
+                                "items": {
+                                  "type": "object",
+                                  "properties": {
+                                    "name": {
+                                      "type": "string",
+                                      "minLength": 1,
+                                      "description": "Source column name."
+                                    },
+                                    "direction": { "type": "string", "enum": ["asc", "desc"] },
+                                    "nulls": {
+                                      "type": "string",
+                                      "enum": ["first", "last", null],
+                                      "description": "Null placement. Null uses DuckLake's default placement.",
+                                      "nullable": true
+                                    }
+                                  },
+                                  "required": ["name", "direction"],
+                                  "additionalProperties": false
+                                }
+                              }
+                            },
+                            "required": ["kind", "columns"],
+                            "additionalProperties": false
+                          }
+                        ]
+                      },
+                      { "type": "object", "nullable": true, "enum": [null] }
+                    ]
+                  },
+                  "partition_by": {
+                    "type": "array",
+                    "items": {
+                      "type": "object",
+                      "properties": {
+                        "column": {
+                          "type": "string",
+                          "minLength": 1,
+                          "description": "Source column name."
+                        },
+                        "transform": {
+                          "oneOf": [
+                            {
+                              "type": "object",
+                              "properties": { "kind": { "type": "string", "enum": ["identity"] } },
+                              "required": ["kind"],
+                              "additionalProperties": false
+                            },
+                            {
+                              "type": "object",
+                              "properties": { "kind": { "type": "string", "enum": ["year"] } },
+                              "required": ["kind"],
+                              "additionalProperties": false
+                            },
+                            {
+                              "type": "object",
+                              "properties": { "kind": { "type": "string", "enum": ["month"] } },
+                              "required": ["kind"],
+                              "additionalProperties": false
+                            },
+                            {
+                              "type": "object",
+                              "properties": { "kind": { "type": "string", "enum": ["day"] } },
+                              "required": ["kind"],
+                              "additionalProperties": false
+                            },
+                            {
+                              "type": "object",
+                              "properties": { "kind": { "type": "string", "enum": ["hour"] } },
+                              "required": ["kind"],
+                              "additionalProperties": false
+                            },
+                            {
+                              "type": "object",
+                              "properties": {
+                                "kind": { "type": "string", "enum": ["bucket"] },
+                                "count": {
+                                  "type": "integer",
+                                  "exclusiveMinimum": true,
+                                  "maximum": 2147483647,
+                                  "description": "Number of hash buckets.",
+                                  "minimum": 0
+                                }
+                              },
+                              "required": ["kind", "count"],
+                              "additionalProperties": false
+                            }
+                          ]
+                        }
+                      },
+                      "required": ["column", "transform"],
+                      "additionalProperties": false
+                    },
+                    "description": "Omit to preserve the saved partitioning. Null makes partitioning unmanaged. An empty list explicitly clears partitioning. Otherwise, supply all ordered partition keys.",
+                    "nullable": true
+                  }
+                },
+                "additionalProperties": false
+              }
+            },
+            "required": ["type", "attributes"]
+          }
+        },
+        "required": ["data"]
+      },
       "ListLogDrainsResponse_Output": {
         "type": "object",
         "properties": {
@@ -14374,113 +17926,6 @@
           }
         },
         "required": ["data"]
-      },
-      "APIErrorObject": {
-        "type": "object",
-        "properties": {
-          "id": { "type": "string" },
-          "code": {
-            "type": "string",
-            "enum": [
-              "bad_request",
-              "forbidden",
-              "internal_server_error",
-              "not_found",
-              "payment_required",
-              "rate_limit_exceeded",
-              "request_timeout",
-              "request_too_large",
-              "unauthorized",
-              "validation_failed",
-              "agentic_credential_not_found",
-              "backup_unsupported",
-              "branch_admin_required",
-              "compute_build_context_too_large",
-              "compute_build_in_progress",
-              "compute_deploy_rate_limit_exceeded",
-              "compute_instance_limit_exceeded",
-              "compute_instance_not_found",
-              "compute_not_enabled",
-              "compute_request_rejected",
-              "compute_unavailable",
-              "notebook_cell_duplicate",
-              "notebook_cell_unknown",
-              "notebook_disabled",
-              "notebook_not_found",
-              "notebook_sort_invalid",
-              "organization_invitation_email_delivery_failed",
-              "organization_invitations_partially_failed",
-              "organization_inviter_email_missing",
-              "organization_role_name_invalid",
-              "organization_role_not_entitled",
-              "pagination_cursor_invalid",
-              "project_branch_resync_unsupported",
-              "project_not_found",
-              "project_privatelink_disabled",
-              "project_transfer_disabled",
-              "delivery_not_found",
-              "endpoint_disabled",
-              "endpoint_event_type_not_subscribed",
-              "endpoint_not_found",
-              "endpoint_url_unresolvable",
-              "webhooks_access_disabled"
-            ]
-          },
-          "message": { "type": "string" },
-          "description": { "type": "string" },
-          "links": {
-            "type": "object",
-            "additionalProperties": {
-              "type": "object",
-              "properties": {
-                "href": { "type": "string" },
-                "rel": { "type": "string" },
-                "title": { "type": "string" },
-                "type": { "type": "string" },
-                "describedby": { "type": "string" },
-                "meta": { "type": "object", "additionalProperties": {} }
-              },
-              "required": ["href"]
-            }
-          },
-          "meta": { "type": "object", "additionalProperties": {} },
-          "issues": {
-            "type": "array",
-            "items": {
-              "type": "object",
-              "properties": {
-                "id": { "type": "string" },
-                "code": { "type": "string" },
-                "message": { "type": "string" },
-                "description": { "type": "string" },
-                "links": {
-                  "type": "object",
-                  "additionalProperties": {
-                    "type": "object",
-                    "properties": {
-                      "href": { "type": "string" },
-                      "rel": { "type": "string" },
-                      "title": { "type": "string" },
-                      "type": { "type": "string" },
-                      "describedby": { "type": "string" },
-                      "meta": { "type": "object", "additionalProperties": {} }
-                    },
-                    "required": ["href"]
-                  }
-                },
-                "meta": { "type": "object", "additionalProperties": {} }
-              },
-              "required": ["code", "message"]
-            }
-          }
-        },
-        "required": ["code", "message"],
-        "ref": "APIErrorObject"
-      },
-      "ErrorResponseBody": {
-        "type": "object",
-        "properties": { "error": { "$ref": "#/components/schemas/APIErrorObject" } },
-        "required": ["error"]
       },
       "CreateLogDrainRequestOpenApi": {
         "type": "object",
@@ -17205,6 +20650,14 @@
                   "request_too_large",
                   "unauthorized",
                   "validation_failed",
+                  "warehouse_selection_empty",
+                  "warehouse_selection_conflict",
+                  "warehouse_selection_changed",
+                  "warehouse_lifecycle_conflict",
+                  "warehouse_setup_invalid",
+                  "warehouse_not_found",
+                  "warehouse_metrics_unavailable",
+                  "warehouse_setup_unavailable",
                   "agentic_credential_not_found",
                   "backup_unsupported",
                   "branch_admin_required",
@@ -17648,7 +21101,8 @@
                         "RESTARTING",
                         "PAUSE_FAILED",
                         "RESIZING",
-                        "PROMOTING"
+                        "PROMOTING",
+                        "RIGHTSIZING"
                       ],
                       "description": "Project status"
                     },

@@ -83,6 +83,12 @@
         "type": "operation"
       },
       {
+        "id": "v1-post-project-logs",
+        "title": "Post project logs",
+        "slug": "v1-post-project-logs",
+        "type": "operation"
+      },
+      {
         "id": "v1-scrape-project-metrics",
         "title": "Scrape project metrics",
         "slug": "v1-scrape-project-metrics",
@@ -611,6 +617,12 @@
         "type": "operation"
       },
       {
+        "id": "v1-delete-all-functions",
+        "title": "Delete all functions",
+        "slug": "v1-delete-all-functions",
+        "type": "operation"
+      },
+      {
         "id": "v1-deploy-a-function",
         "title": "Deploy a function",
         "slug": "v1-deploy-a-function",
@@ -1079,6 +1091,12 @@
         "type": "operation"
       },
       {
+        "id": "v2-delete-project-function",
+        "title": "Delete project function",
+        "slug": "v2-delete-project-function",
+        "type": "operation"
+      },
+      {
         "id": "v2-download-project-backup",
         "title": "Download project backup",
         "slug": "v2-download-project-backup",
@@ -1262,6 +1280,90 @@
         "id": "v1-upgrade-postgres-version",
         "title": "Upgrade postgres version",
         "slug": "v1-upgrade-postgres-version",
+        "type": "operation"
+      }
+    ]
+  },
+  {
+    "type": "category",
+    "title": "Projects Warehouse",
+    "items": [
+      {
+        "id": "v2-create-warehouse-setup",
+        "title": "Create warehouse setup",
+        "slug": "v2-create-warehouse-setup",
+        "type": "operation"
+      },
+      {
+        "id": "v2-disable-warehouse",
+        "title": "Disable warehouse",
+        "slug": "v2-disable-warehouse",
+        "type": "operation"
+      },
+      {
+        "id": "v2-enable-warehouse",
+        "title": "Enable warehouse",
+        "slug": "v2-enable-warehouse",
+        "type": "operation"
+      },
+      {
+        "id": "v2-get-warehouse-capacity",
+        "title": "Get warehouse capacity",
+        "slug": "v2-get-warehouse-capacity",
+        "type": "operation"
+      },
+      {
+        "id": "v2-get-warehouse-connection",
+        "title": "Get warehouse connection",
+        "slug": "v2-get-warehouse-connection",
+        "type": "operation"
+      },
+      {
+        "id": "v2-get-warehouse-query-stats",
+        "title": "Get warehouse query stats",
+        "slug": "v2-get-warehouse-query-stats",
+        "type": "operation"
+      },
+      {
+        "id": "v2-get-warehouse-setup",
+        "title": "Get warehouse setup",
+        "slug": "v2-get-warehouse-setup",
+        "type": "operation"
+      },
+      {
+        "id": "v2-get-warehouse-status",
+        "title": "Get warehouse status",
+        "slug": "v2-get-warehouse-status",
+        "type": "operation"
+      },
+      {
+        "id": "v2-get-warehouse-table",
+        "title": "Get warehouse table",
+        "slug": "v2-get-warehouse-table",
+        "type": "operation"
+      },
+      {
+        "id": "v2-get-warehouse-table-layout",
+        "title": "Get warehouse table layout",
+        "slug": "v2-get-warehouse-table-layout",
+        "type": "operation"
+      },
+      {
+        "id": "v2-get-warehouse-teardown",
+        "title": "Get warehouse teardown",
+        "slug": "v2-get-warehouse-teardown",
+        "type": "operation"
+      },
+      {
+        "id": "v2-list-warehouse-tables",
+        "title": "List warehouse tables",
+        "slug": "v2-list-warehouse-tables",
+        "type": "operation"
+      },
+      {
+        "id": "v2-update-warehouse-table-layout",
+        "title": "Update warehouse table layout",
+        "slug": "v2-update-warehouse-table-layout",
         "type": "operation"
       }
     ]

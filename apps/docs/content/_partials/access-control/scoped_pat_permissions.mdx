@@ -13,19 +13,23 @@
 |                                  |                 | [Preview a project transfer](/docs/reference/api/v2-preview-a-project-transfer)                                     |
 |                                  | Read-write      | [Cancel a project restoration](/docs/reference/api/v1-cancel-a-project-restoration)                                 |
 |                                  |                 | [Create private link association](/docs/reference/api/v2-create-private-link-association)                           |
+|                                  |                 | [Create warehouse setup](/docs/reference/api/v2-create-warehouse-setup)[^2]                                         |
 |                                  |                 | [Delete a project](/docs/reference/api/v1-delete-a-project)                                                         |
 |                                  |                 | [Delete private link association](/docs/reference/api/v2-delete-private-link-association)                           |
 |                                  |                 | [Delete private link association for database](/docs/reference/api/v2-delete-private-link-association-for-database) |
+|                                  |                 | [Disable warehouse](/docs/reference/api/v2-disable-warehouse)[^2]                                                   |
+|                                  |                 | [Enable warehouse](/docs/reference/api/v2-enable-warehouse)[^2]                                                     |
 |                                  |                 | [Get pgsodium config](/docs/reference/api/v1-get-pgsodium-config)                                                   |
-|                                  |                 | [OAuth authorize project claim](/docs/reference/api/v1-oauth-authorize-project-claim)[^2]                           |
+|                                  |                 | [OAuth authorize project claim](/docs/reference/api/v1-oauth-authorize-project-claim)[^3]                           |
 |                                  |                 | [Pause a project](/docs/reference/api/v1-pause-a-project)                                                           |
 |                                  |                 | [Restart a project](/docs/reference/api/v1-restart-a-project)                                                       |
 |                                  |                 | [Restore a project](/docs/reference/api/v1-restore-a-project)                                                       |
 |                                  |                 | [Update a project](/docs/reference/api/v1-update-a-project)                                                         |
-|                                  |                 | [Update auth service config](/docs/reference/api/v1-update-auth-service-config)[^3]                                 |
+|                                  |                 | [Update auth service config](/docs/reference/api/v1-update-auth-service-config)[^4]                                 |
 |                                  |                 | [Update JIT access config](/docs/reference/api/v1-update-jit-access-config)                                         |
 |                                  |                 | [Update pgsodium config](/docs/reference/api/v1-update-pgsodium-config)                                             |
-|                                  |                 | [Upgrade postgres version](/docs/reference/api/v1-upgrade-postgres-version)[^4]                                     |
+|                                  |                 | [Update warehouse table layout](/docs/reference/api/v2-update-warehouse-table-layout)[^2]                           |
+|                                  |                 | [Upgrade postgres version](/docs/reference/api/v1-upgrade-postgres-version)[^2]                                     |
 | Action Runs                      | Read            | [Count action runs](/docs/reference/api/v1-count-action-runs)                                                       |
 |                                  |                 | [Get action run](/docs/reference/api/v1-get-action-run)                                                             |
 |                                  |                 | [Get action run logs](/docs/reference/api/v1-get-action-run-logs)                                                   |
@@ -40,6 +44,7 @@
 |                                  |                 | [Update log drain](/docs/reference/api/v2-update-log-drain)                                                         |
 | Logs                             | Read            | [Get project logs](/docs/reference/api/v1-get-project-logs)                                                         |
 |                                  |                 | [Get project logs all](/docs/reference/api/v1-get-project-logs-all)                                                 |
+|                                  |                 | [Post project logs](/docs/reference/api/v1-post-project-logs)                                                       |
 |                                  |                 | [Scrape project metrics](/docs/reference/api/v1-scrape-project-metrics)                                             |
 | Usage Analytics                  | Read            | [Get project function combined stats](/docs/reference/api/v1-get-project-function-combined-stats)                   |
 |                                  |                 | [Get project usage API count](/docs/reference/api/v1-get-project-usage-api-count)                                   |
@@ -72,12 +77,25 @@
 |                                  |                 | [Get postgres upgrade status](/docs/reference/api/v1-get-postgres-upgrade-status)[^1]                               |
 |                                  |                 | [Get project config](/docs/reference/api/v2-get-project-config)[^5]                                                 |
 |                                  |                 | [Get project PgBouncer config](/docs/reference/api/v1-get-project-pgbouncer-config)                                 |
+|                                  |                 | [Get warehouse capacity](/docs/reference/api/v2-get-warehouse-capacity)                                             |
+|                                  |                 | [Get warehouse connection](/docs/reference/api/v2-get-warehouse-connection)                                         |
+|                                  |                 | [Get warehouse query stats](/docs/reference/api/v2-get-warehouse-query-stats)                                       |
+|                                  |                 | [Get warehouse setup](/docs/reference/api/v2-get-warehouse-setup)                                                   |
+|                                  |                 | [Get warehouse status](/docs/reference/api/v2-get-warehouse-status)                                                 |
+|                                  |                 | [Get warehouse table](/docs/reference/api/v2-get-warehouse-table)                                                   |
+|                                  |                 | [Get warehouse table layout](/docs/reference/api/v2-get-warehouse-table-layout)                                     |
+|                                  |                 | [Get warehouse teardown](/docs/reference/api/v2-get-warehouse-teardown)                                             |
+|                                  |                 | [List warehouse tables](/docs/reference/api/v2-list-warehouse-tables)                                               |
 |                                  |                 | [Read only query](/docs/reference/api/v1-read-only-query)                                                           |
 |                                  |                 | [Run a query](/docs/reference/api/v1-run-a-query)                                                                   |
 |                                  | Read-write      | [Create login role](/docs/reference/api/v1-create-login-role)                                                       |
+|                                  |                 | [Create warehouse setup](/docs/reference/api/v2-create-warehouse-setup)[^2]                                         |
 |                                  |                 | [Delete login roles](/docs/reference/api/v1-delete-login-roles)                                                     |
+|                                  |                 | [Disable warehouse](/docs/reference/api/v2-disable-warehouse)[^2]                                                   |
+|                                  |                 | [Enable warehouse](/docs/reference/api/v2-enable-warehouse)[^2]                                                     |
 |                                  |                 | [Run a query](/docs/reference/api/v1-run-a-query)                                                                   |
-|                                  |                 | [Upgrade postgres version](/docs/reference/api/v1-upgrade-postgres-version)[^4]                                     |
+|                                  |                 | [Update warehouse table layout](/docs/reference/api/v2-update-warehouse-table-layout)[^2]                           |
+|                                  |                 | [Upgrade postgres version](/docs/reference/api/v1-upgrade-postgres-version)[^2]                                     |
 | Database Config                  | Read            | [Get postgres config](/docs/reference/api/v1-get-postgres-config)                                                   |
 |                                  |                 | [Get project config](/docs/reference/api/v2-get-project-config)[^5]                                                 |
 |                                  | Read-write      | [Patch postgres config](/docs/reference/api/v1-patch-postgres-config)                                               |
@@ -133,7 +151,7 @@
 |                                  |                 | [Delete a SSO provider](/docs/reference/api/v1-delete-a-sso-provider)                                               |
 |                                  |                 | [Delete project TPA integration](/docs/reference/api/v1-delete-project-tpa-integration)                             |
 |                                  |                 | [Update a SSO provider](/docs/reference/api/v1-update-a-sso-provider)                                               |
-|                                  |                 | [Update auth service config](/docs/reference/api/v1-update-auth-service-config)[^3]                                 |
+|                                  |                 | [Update auth service config](/docs/reference/api/v1-update-auth-service-config)[^4]                                 |
 | Auth Signing Keys                | Read            | [Get legacy signing key](/docs/reference/api/v1-get-legacy-signing-key)                                             |
 |                                  |                 | [Get project signing key](/docs/reference/api/v1-get-project-signing-key)                                           |
 |                                  |                 | [Get project signing keys](/docs/reference/api/v1-get-project-signing-keys)                                         |
@@ -151,6 +169,8 @@
 |                                  | Read-write      | [Bulk update functions](/docs/reference/api/v1-bulk-update-functions)                                               |
 |                                  |                 | [Create a function](/docs/reference/api/v1-create-a-function)                                                       |
 |                                  |                 | [Delete a function](/docs/reference/api/v1-delete-a-function)                                                       |
+|                                  |                 | [Delete all functions](/docs/reference/api/v1-delete-all-functions)                                                 |
+|                                  |                 | [Delete project function](/docs/reference/api/v2-delete-project-function)                                           |
 |                                  |                 | [Deploy a function](/docs/reference/api/v1-deploy-a-function)                                                       |
 |                                  |                 | [Update a function](/docs/reference/api/v1-update-a-function)                                                       |
 | Edge Function Secrets            | Read            | [List all secrets](/docs/reference/api/v1-list-all-secrets)                                                         |
@@ -221,7 +241,7 @@
 | Organization Settings            | Read            | [Get an organization](/docs/reference/api/v1-get-an-organization)                                                   |
 |                                  |                 | [Get organization entitlements](/docs/reference/api/v1-get-organization-entitlements)                               |
 |                                  | Read-write      | [Assign organization member role](/docs/reference/api/v2-assign-organization-member-role)                           |
-|                                  |                 | [OAuth authorize project claim](/docs/reference/api/v1-oauth-authorize-project-claim)[^2]                           |
+|                                  |                 | [OAuth authorize project claim](/docs/reference/api/v1-oauth-authorize-project-claim)[^3]                           |
 |                                  |                 | [Remove organization members](/docs/reference/api/v2-remove-organization-members)                                   |
 |                                  |                 | [Transfer a project](/docs/reference/api/v2-transfer-a-project)                                                     |
 | Organization Members             | Read            | [List organization members](/docs/reference/api/v1-list-organization-members)                                       |
@@ -246,11 +266,11 @@
 
 [^1]: Requires **Project Settings** (Read) and **Database** (Read).
 
-[^2]: Requires **Organization Settings** (Read-write) and **Project Settings** (Read-write).
+[^2]: Requires **Project Settings** (Read-write) and **Database** (Read-write).
 
-[^3]: Requires **Auth Config** (Read-write) and **Project Settings** (Read-write).
+[^3]: Requires **Organization Settings** (Read-write) and **Project Settings** (Read-write).
 
-[^4]: Requires **Project Settings** (Read-write) and **Database** (Read-write).
+[^4]: Requires **Auth Config** (Read-write) and **Project Settings** (Read-write).
 
 [^5]: Requires **Database Config** (Read), **Database** (Read), **SSL Enforcement** (Read), **Network Restrictions** (Read), **Auth Config** (Read), **Data API Config** (Read), **Realtime Config** (Read), and **Storage Config** (Read).
 
